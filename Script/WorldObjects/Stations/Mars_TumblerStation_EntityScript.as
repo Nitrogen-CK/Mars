@@ -104,12 +104,10 @@ class UMars_TumblerStation_EntityScript : UMars_FeedStation_EntityScript
     // The nominal piece the reseat is measured with: a 12 cm cube.
     private const float32 PieceSize = 12.0f;
 
-    // The label over the far top of the cage, facing the operator; after a refused press its first line says why for
-    // RefusalSeconds.
+    // The label over the far top of the cage, facing the operator; a refused press flashes on its last line.
     private const float64 LabelBack = 18.0;
     private const float64 LabelHeight = 12.0;
     private const float32 LabelWorldSize = 7.0f;
-    private const float32 RefusalSeconds = 0.6f;
 
     private const FLinearColor k_IronColor = FLinearColor(0.08f, 0.08f, 0.09f, 1.0f);
     private const FLinearColor k_CageColor = FLinearColor(0.55f, 0.42f, 0.2f, 1.0f);
@@ -138,17 +136,8 @@ class UMars_TumblerStation_EntityScript : UMars_FeedStation_EntityScript
     private FCk_Handle_UnrealComponent _LeverGripPart;
     // The hover the cue last painted; unset until both parts exist.
     private TOptional<EMars_Tumbler_Target> _PaintedHover;
-    // One per piece entity still in the drum, in admission order.
-    private TArray<FMars_Station_PieceDisplay> _PieceVisuals;
-    // The last refused press and the seconds the label still shows it.
-    private EMars_Tumbler_Refusal _Refusal = EMars_Tumbler_Refusal::NotHome;
-    private float32 _RefusalLeft = 0.0f;
-    // The right glove's pose override: the one last sent and the operator it went to (sent only on change).
-    private TOptional<EMars_HandGripPose> _AppliedRightPose;
-    private FCk_Handle _PosedOperator;
-    // Tinted parts not painted yet (their components are created asynchronously), with their colours, in parallel.
-    private TArray<FCk_Handle_UnrealComponent> _PendingTintParts;
-    private TArray<FLinearColor> _PendingTintColors;
+    // The right glove's pose override (Power while the hand reaches for or holds the lever).
+    private FMars_StationFeed_Presentation _RightPose;
 
     // The base composes the transform, the visuals and nodes (AddVisuals: the axle with its Mover and lever Control, the
     // hinge with its Mover, the grip, tab and hand nodes, the feed hand and the release node) and the Station
@@ -174,6 +163,8 @@ class UMars_TumblerStation_EntityScript : UMars_FeedStation_EntityScript
         _LeverSpec = LeverControl;
         _LeverSpec.Interaction = ECk_Interaction_CompletionPolicy::ManuallyCompleted;
         _LeverSpec.Manipulation.PullAxis = FVector(-1.0, 0.0, 0.0);
+
+        _RightPose.Hand = EMars_Hand::Right;
     }
 
     // A rejected lever or Tumbler spec or node already ensured (utils_control::Add, utils_tumbler::Add): the station stands
@@ -211,9 +202,7 @@ class UMars_TumblerStation_EntityScript : UMars_FeedStation_EntityScript
             _TumblerHandle.UnbindFrom_OnTakeOutRefused(FMars_Delegate_Tumbler_OnTakeOutRefused(this, n"OnTakeOutRefused"));
         }
 
-        Clear_RightPose();
-        // The pieces wear their own displays; only the records go.
-        _PieceVisuals.Empty();
+        _RightPose.Clear(FCk_Handle());
 
         Super::DoEndPlay(InHandle);
     }
@@ -227,14 +216,10 @@ class UMars_TumblerStation_EntityScript : UMars_FeedStation_EntityScript
     protected void Configure_Operation(FMars_Station_Spec& InOutSpec) override
     {
         auto Grips = TArray<FMars_Station_Grip>();
-        Grips.Add(FMars_Station_Grip(EMars_Hand::Right, GameplayTags::Station_Node_Tool, NAME_None,
-            EMars_HandGripPose::Open, TOptional<float32>(), EMars_FPHands_GripFrame::Node, EMars_FPHands_GripRoll::Fixed));
+        Grips.Add(Make_NodeGrip(EMars_Hand::Right, GameplayTags::Station_Node_Tool, EMars_HandGripPose::Open));
         InOutSpec.Grips = Grips;
 
-        InOutSpec.Camera.LookControl = EMars_Station_LookControl::Captured;
-        InOutSpec.Camera.PitchOffset = CameraPitch;
-        InOutSpec.Camera.ViewLocal = TOptional<FTransform>(FTransform(FRotator(CameraPitch, 0.0, 0.0),
-            FVector(-(float64(DrumInnerRadius) + ViewBack), 0.0, ViewHeight)));
+        InOutSpec.Camera = Make_CapturedCameraAt(FVector(-(float64(DrumInnerRadius) + ViewBack), 0.0, ViewHeight), CameraPitch);
         InOutSpec.Prompt = FMars_Station_PromptSpec(
             NSLOCTEXT("MarsInteraction", "TumblerBatchPrompt", "Coat the batch"),
             NSLOCTEXT("MarsInteraction", "TumblerStationInUsePrompt", "In use"));
@@ -296,20 +281,24 @@ class UMars_TumblerStation_EntityScript : UMars_FeedStation_EntityScript
         return LabelWorldSize;
     }
 
-    // Why the drum would not take a piece now (the add-food press's gate).
+    // Why the drum would not take a piece now (the add-food press's gate, the kernel's load refusal).
     protected FString Get_StationGateText() const override
     {
         if (ck::Is_NOT_Valid(_TumblerHandle))
         { return "station busy"; }
 
-        if (_TumblerHandle.Get_PieceCount() >= _TumblerHandle.Get_Spec().Drum.Capacity)
+        const auto Refusal = _TumblerHandle.TryGet_LoadRefusal();
+        if (Refusal == EMars_Tumbler_LoadRefusal::Full)
         { return "drum full"; }
 
-        if (_TumblerHandle.Get_Hatch() != EMars_Tumbler_Hatch::Open)
+        if (Refusal == EMars_Tumbler_LoadRefusal::HatchNotOpen)
         { return "open the hatch first"; }
 
-        if (_TumblerHandle.Get_Drum() != EMars_Tumbler_Drum::Home)
+        if (Refusal == EMars_Tumbler_LoadRefusal::NotHome)
         { return "wait for home"; }
+
+        if (Refusal == EMars_Tumbler_LoadRefusal::TransferInFlight)
+        { return "wait for the piece"; }
 
         return "station busy";
     }
@@ -330,7 +319,9 @@ class UMars_TumblerStation_EntityScript : UMars_FeedStation_EntityScript
         _AxleMover = utils_mover::Add(_AxleNode, AxleSpec);
 
         auto AxleEntity = _AxleNode.H();
-        _Lever = utils_control::Add(AxleEntity, _LeverSpec, _AxleMover);
+        auto LeverSpec = _LeverSpec;
+        LeverSpec.Mover = _AxleMover;
+        _Lever = utils_control::Add(AxleEntity, LeverSpec);
 
         // The shaft, from outside the left disc to the lever arm.
         auto Axle = _AxleNode.As_Transform();
@@ -473,20 +464,14 @@ class UMars_TumblerStation_EntityScript : UMars_FeedStation_EntityScript
         return AddTintedPart(InParent, Rod, InColor);
     }
 
-    // InPart under InParent, painted InColor once its component exists: a part's PrimaryColor alone leaves the ProtoGrid
-    // instance's own secondary and line colours.
+    // InPart under InParent in InColor and the ProtoGrid shades derived from it (a PrimaryColor alone would leave the
+    // instance's own secondary and line colours).
     private FCk_Handle_UnrealComponent AddTintedPart(FCk_Handle_Transform& InParent, FMars_MeshPart InPart, FLinearColor InColor)
     {
         auto Part = InPart;
         Part.PrimaryColor = TOptional<FLinearColor>(InColor);
-        const auto Handle = InParent.Add_MeshPart(this, Part);
-        if (ck::IsValid(Handle))
-        {
-            _PendingTintParts.Add(Handle);
-            _PendingTintColors.Add(InColor);
-        }
-
-        return Handle;
+        Part.Tint = EMars_MeshPart_Tint::ProtoGrid;
+        return InParent.Add_MeshPart(this, Part);
     }
 
     //----------------------------------------------------------------------------------------------------------------------
@@ -526,51 +511,25 @@ class UMars_TumblerStation_EntityScript : UMars_FeedStation_EntityScript
     // The dressing (every frame; the Tumbler feature and the feed are the source of truth)
     //----------------------------------------------------------------------------------------------------------------------
 
-    // After the base advanced the feed and before it refreshes the label.
+    // After the base wrote the pieces' looks and before it refreshes the label.
     protected void Dress(float32 InDeltaSeconds) override
     {
         if (ck::Is_NOT_Valid(_TumblerHandle))
         { return; }
 
-        _RefusalLeft = Math::Max(0.0f, _RefusalLeft - InDeltaSeconds);
-        Advance_PieceVisuals();
-        Apply_PendingTints();
         Apply_HoverCue();
         Apply_RightPose();
     }
 
-    // Each piece's look from the kernel's mapping of its cook state (utils_cookstate::Make_DisplayParams: its coverage so far
-    // as its crumb). A record whose piece the kernel no longer holds (taken out, or reset) or whose entity is gone is
-    // dropped.
-    private void Advance_PieceVisuals()
+    protected bool Get_HoldsPiece(const FMars_CookingFeed_PieceId& InPieceId) const override
     {
-        for (int32 Index = _PieceVisuals.Num() - 1; Index >= 0; --Index)
-        {
-            auto Display = _PieceVisuals[Index];
-            if (ck::Is_NOT_Valid(Display.Entity) || _TumblerHandle.Get_HasPiece(Display.Id) == false)
-            {
-                _PieceVisuals.RemoveAt(Index);
-                continue;
-            }
-
-            Display.CookState = utils_cookstate::Make_DisplayParams(_TumblerHandle.Get_PieceCookState(Display.Id));
-            utils_station::Write_PieceDisplay(Display);
-            _PieceVisuals[Index] = Display;
-        }
+        return ck::IsValid(_TumblerHandle) && _TumblerHandle.Get_HasPiece(InPieceId);
     }
 
-    // Every tinted part whose component now exists, once.
-    private void Apply_PendingTints()
+    // The kernel's mapping of the piece's cook state (utils_cookstate::Make_DisplayParams: its coverage so far as its crumb).
+    protected FMars_CookState Make_PieceLook(const FMars_Station_PieceDisplay& InRecord, float32 InDeltaSeconds) const override
     {
-        for (int32 Index = _PendingTintParts.Num() - 1; Index >= 0; --Index)
-        {
-            if (ck::Is_NOT_Valid(utils_unreal_component::Get_Component(_PendingTintParts[Index])))
-            { continue; }
-
-            _PendingTintParts[Index].Paint_MeshPart(_PendingTintColors[Index]);
-            _PendingTintParts.RemoveAt(Index);
-            _PendingTintColors.RemoveAt(Index);
-        }
+        return utils_cookstate::Make_DisplayParams(_TumblerHandle.Get_PieceCookState(InRecord.Id));
     }
 
     // The hovered target's part reads k_HoverColor, the other its own colour. Repainted on a hover edge, and the first time
@@ -591,56 +550,26 @@ class UMars_TumblerStation_EntityScript : UMars_FeedStation_EntityScript
     }
 
     // The station's operator closes the right glove (Power) while the hand reaches for or holds the lever; Free clears the
-    // override. Sent only when it changes; a different operator (or none) first gets the old one cleared.
+    // override.
     private void Apply_RightPose()
     {
-        auto Operator = _Root.H().As_Station().Get_Operator();
-        if (_PosedOperator != Operator)
-        { Clear_RightPose(); }
-
         auto Pose = TOptional<EMars_HandGripPose>();
         if (_TumblerHandle.Get_HandMode() != EMars_Tumbler_HandMode::Free)
         { Pose = TOptional<EMars_HandGripPose>(EMars_HandGripPose::Power); }
 
-        if (Pose == _AppliedRightPose)
-        { return; }
-
-        auto Hands = Operator.As_FPHands(ECk_SanityCheck::UnChecked);
-        if (ck::Is_NOT_Valid(Hands))
-        { return; }
-
-        Hands.Request_SetPoseOverride(FMars_Request_FPHands_SetPoseOverride(EMars_Hand::Right, Pose));
-        _AppliedRightPose = Pose;
-        _PosedOperator = Operator;
-    }
-
-    // Unsets the override on the gloves it was sent to (gloves already gone need nothing).
-    private void Clear_RightPose()
-    {
-        if (_AppliedRightPose.IsSet())
-        {
-            auto Hands = _PosedOperator.As_FPHands(ECk_SanityCheck::UnChecked);
-            if (ck::IsValid(Hands))
-            { Hands.Request_SetPoseOverride(FMars_Request_FPHands_SetPoseOverride(EMars_Hand::Right, TOptional<EMars_HandGripPose>())); }
-        }
-
-        _AppliedRightPose.Reset();
-        _PosedOperator = FCk_Handle();
+        _RightPose.Apply_Pose(_Root.H().As_Station().Get_Operator(), Pose);
     }
 
     //----------------------------------------------------------------------------------------------------------------------
     // The label
     //----------------------------------------------------------------------------------------------------------------------
 
-    // What the label reads: why the last press was refused (for RefusalSeconds), otherwise the batch: how many pieces are in,
-    // the hatch, and the batch's mean coverage. A station whose drum was not built says so.
+    // What the label reads: the batch: how many pieces are in, the hatch, and the batch's mean coverage. A station whose
+    // drum was not built says so.
     protected FText Get_StateLabel() const override
     {
         if (ck::Is_NOT_Valid(_TumblerHandle))
         { return FText::FromString("tumbler not built"); }
-
-        if (_RefusalLeft > 0.0f)
-        { return FText::FromString(Get_RefusalText(_Refusal)); }
 
         const auto Ids = _TumblerHandle.Get_PieceIds();
         auto CoverageSum = 0.0f;
@@ -693,7 +622,7 @@ class UMars_TumblerStation_EntityScript : UMars_FeedStation_EntityScript
     UFUNCTION()
     private void OnPieceAdded(FCk_Handle_Tumbler InTumbler, FMars_CookingFeed_PieceId InPieceId, FCk_Handle InPiece)
     {
-        _PieceVisuals.Add(utils_station::Make_PieceDisplay(InPieceId, InPiece));
+        Add_PieceRecord(InPieceId, InPiece);
     }
 
     UFUNCTION()
@@ -711,9 +640,7 @@ class UMars_TumblerStation_EntityScript : UMars_FeedStation_EntityScript
     UFUNCTION()
     private void OnPressRefused(FCk_Handle_Tumbler InTumbler, EMars_Tumbler_Refusal InRefusal)
     {
-        _Refusal = InRefusal;
-        _RefusalLeft = RefusalSeconds;
-        Refresh_Label();
+        Flash_Refusal(Get_RefusalText(InRefusal));
     }
 
     UFUNCTION()

@@ -1,7 +1,7 @@
 // An operated station stays focusable and refuses Use. A station with a Use probe stands in front of the player-path
 // carrier; a bare operator reserves it by request, so its Use interactable holds the Operated claim. The carrier's view
 // then turns onto the probe: the station's Use target is focused by the carrier (its state machine Focused) with its
-// framework target disabled and its prompt reading the occupied text, and a Use press starts no interaction - the bare
+// framework target disabled and its prompt still there, and a Use press starts no interaction - the bare
 // operator keeps the station. Isolated origin (90000, -40000, -30000).
 class UMars_AutoTest_Station_AnOperatedStationStaysFocusableAndRefusesUse : UMars_AutoTestRig_PlayerPath
 {
@@ -43,9 +43,10 @@ class UMars_AutoTest_Station_AnOperatedStationStaysFocusableAndRefusesUse : UMar
         Probe.ProbeShape = utils_shapes::Make_Sphere(FCk_ShapeSphere_Dimensions(k_ProbeRadius));
         Probe.ProbeOffset = FTransform(FRotator::ZeroRotator, k_ProbeLocal);
 
-        auto Setup = FMars_Station_Setup();
-        Setup.Probe = TOptional<FMars_Interactable_ProbeInfo>(Probe);
-        _Station = utils_station::Add(Root, FMars_Station_Spec(), Setup);
+        auto Spec = FMars_Station_Spec();
+        Spec.Setup.Probe = TOptional<FMars_Interactable_ProbeInfo>(Probe);
+        Spec.Setup.UsePrompt = FMars_InteractPrompt_Spec(mars::Mars_IA_Interact_Use, Spec.Prompt.Text);
+        _Station = utils_station::Add(Root, Spec);
 
         auto OperatorEntity = utils_entity_lifetime::Request_CreateEntity(Parent);
         _Operator = utils_operator::Add(OperatorEntity);
@@ -87,9 +88,7 @@ class UMars_AutoTest_Station_AnOperatedStationStaysFocusableAndRefusesUse : UMar
         Assert_True(_Station.Get_Interactable().Get_IsFocusable(), "Operated keeps the station's Use interactable focusable");
         Assert_True(utils_interact_target::Get_Enabled(Target) == ECk_EnableDisable::Disable, "its framework target is disabled");
 
-        const auto Prompt = Target.As_InteractPrompt();
-        Assert_Equals_String(Prompt.Get_DisplayText().ToString(), FMars_Station_PromptSpec().OccupiedText.ToString(),
-            "its prompt reads the occupied text");
+        Assert_Valid(Target.As_InteractPrompt(ECk_SanityCheck::UnChecked), "its prompt is still there for the focuser to read");
 
         _UseKey.Press();
     }

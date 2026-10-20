@@ -48,74 +48,47 @@ class UMars_SmState_Tumbler_Operated : UCk_SmState_EntityScript
     }
 }
 
-// The operator's input, read off its InputIntents: one look per drained look delta (degrees; X yaw right+, Y pitch down+),
-// which moves the free hand or rocks the gripped lever; Interact_Use going down is a press and coming up a release. Both
-// are seeded on enter, so a delta or a hold from before the station was taken never counts. No operator intents
-// (headless) = nothing to read.
-class UMars_SmTask_Tumbler_OperatorInput : UCk_SmTask_EntityScript
+// The operator's input: one look per drained look delta (degrees; X yaw right+, Y pitch down+), which moves the free hand
+// or rocks the gripped lever; Interact_Use going down is a press and coming up a release. A release and a press between
+// two polls send both (the kernel drains Release before Press).
+class UMars_SmTask_Tumbler_OperatorInput : UMars_SmTask_StationOperatorInput
 {
-    default _TaskMode = ECk_SmTaskMode::Tick;
-
     private FCk_Handle_Tumbler _Tumbler;
-    private FCk_Handle_InputIntents _Intents;
-    private int32 _SeenLookSequence = 0;
-    // The activation frame of the Interact_Use hold last seen; unset while it is not held.
-    private TOptional<int32> _SeenUseFrame;
+    private FMars_LookCursor _Look;
+    private FMars_IntentEdge _Use;
 
-    UFUNCTION(BlueprintOverride)
-    void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
+    protected void Bind(FCk_Handle InStation) override
     {
-        auto StationEntity = ck::Ctx(InHandle);
-        _Tumbler = StationEntity.As_Tumbler();
-        _Intents = FCk_Handle_InputIntents();
+        _Tumbler = InStation.As_Tumbler();
+    }
 
-        auto Station = StationEntity.As_Station();
-        auto Operator = Station.Get_Operator();
-        _Intents = Operator.As_InputIntents(ECk_SanityCheck::UnChecked);
-        if (ck::Is_NOT_Valid(_Intents))
+    protected void Seed() override
+    {
+        _Look.Seed(_Intents);
+        _Use.Seed(_Intents, GameplayTags::Mars_Intent_Interact_Use);
+    }
+
+    protected void Poll() override
+    {
+        if (ck::Is_NOT_Valid(_Tumbler))
         { return; }
 
-        _SeenLookSequence = _Intents.Get_LookDeltaSequence();
-        _SeenUseFrame = _Intents.TryGet_IntentActivationFrame(GameplayTags::Mars_Intent_Interact_Use);
-    }
+        if (_Look.Advance(_Intents))
+        { _Tumbler.Request_Look(FMars_Request_Tumbler_Look(_Intents.Get_LookDelta())); }
 
-    // Must return Running every frame: a Succeeded/Failed result would end the task while Operated is still active.
-    UFUNCTION(BlueprintOverride)
-    ECk_SmTaskResult DoTick(FCk_Handle_SmTask InHandle, FCk_Time InDeltaT, ECk_Sm_NetContext InNetContext)
-    {
-        if (ck::Is_NOT_Valid(_Tumbler) || ck::Is_NOT_Valid(_Intents))
-        { return ECk_SmTaskResult::Running; }
-
-        const auto Sequence = _Intents.Get_LookDeltaSequence();
-        if (Sequence != _SeenLookSequence)
-        {
-            _SeenLookSequence = Sequence;
-            _Tumbler.Request_Look(FMars_Request_Tumbler_Look(_Intents.Get_LookDelta()));
-        }
-
-        const auto UseFrame = _Intents.TryGet_IntentActivationFrame(GameplayTags::Mars_Intent_Interact_Use);
-        if (UseFrame == _SeenUseFrame)
-        { return ECk_SmTaskResult::Running; }
-
-        // A new activation frame while one was already seen is a release and a press between two ticks: both are sent (the
-        // kernel drains Release before Press).
-        if (_SeenUseFrame.IsSet())
+        const auto Edge = _Use.Advance(_Intents, GameplayTags::Mars_Intent_Interact_Use);
+        if (utils_station::Get_HasRelease(Edge))
         { _Tumbler.Request_Release(FMars_Request_Tumbler_Release()); }
 
-        if (UseFrame.IsSet())
+        if (utils_station::Get_HasPress(Edge))
         { _Tumbler.Request_Press(FMars_Request_Tumbler_Press()); }
-
-        _SeenUseFrame = UseFrame;
-        return ECk_SmTaskResult::Running;
     }
 
-    UFUNCTION(BlueprintOverride)
-    void DoExitTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
+    protected void Unbind() override
     {
         _Tumbler = FCk_Handle_Tumbler();
-        _Intents = FCk_Handle_InputIntents();
-        _SeenLookSequence = 0;
-        _SeenUseFrame.Reset();
+        _Look = FMars_LookCursor();
+        _Use = FMars_IntentEdge();
     }
 }
 
@@ -136,72 +109,58 @@ class UMars_SmTask_Tumbler_CancelOnExit : UCk_SmTask_EntityScript
     }
 }
 
-// The shared add-food input, gated by the tumbler: it can load only with the hatch Open, the drum Home, nothing in flight
-// and room in the drum. A gated press is the feed's StationGate refusal (the label says why); nothing is queued.
+// The shared add-food input, gated by the tumbler's load refusal (room in the drum, the hatch Open, the drum Home, nothing
+// in flight). A gated press is the feed's StationGate refusal (the label says why); nothing is queued.
 class UMars_SmTask_TumblerFeed_OperatorInput : UMars_SmTask_StationFeed_OperatorInput
 {
     private FCk_Handle_Tumbler _Tumbler;
 
-    UFUNCTION(BlueprintOverride)
-    void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
+    protected void Bind(FCk_Handle InStation) override
     {
-        Super::DoEnterTask(InHandle, InNetContext);
-        _Tumbler = ck::Ctx(InHandle).As_Tumbler();
+        Super::Bind(InStation);
+        _Tumbler = InStation.As_Tumbler();
     }
 
-    UFUNCTION(BlueprintOverride)
-    void DoExitTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
+    protected void Unbind() override
     {
-        Super::DoExitTask(InHandle, InNetContext);
+        Super::Unbind();
         _Tumbler = FCk_Handle_Tumbler();
     }
 
     protected bool Get_CanBeginTransfer() const override
     {
-        return ck::IsValid(_Tumbler) && _Tumbler.Get_CanLoad();
+        return ck::IsValid(_Tumbler) && _Tumbler.TryGet_LoadRefusal().IsSet() == false;
     }
 }
 
-// The operator's legend rows while operating, under owner key k_OwnerKey: "move the hand" (IA_Look) and one Use row
-// (IA_Interact_Use) re-texted on every hover, hand, hatch and drum edge with what a press does now: open or close the
-// hovered hatch, grip the hovered lever, let go of it, or wait for the drum to come home. Registered once on enter (the
-// display drains registers before unregisters, so the rows are re-texted, never re-registered). The batch's state is the
-// station's world label, not a row. An operator without a display (headless) gets no rows.
-class UMars_SmTask_Tumbler_OperatorHints : UCk_SmTask_EntityScript
+// The operator's legend rows while operating: "move the hand" (IA_Look) and one Use row (IA_Interact_Use) re-texted on
+// every hover, hand, hatch and drum edge with what a press does now: open or close the hovered hatch, grip the hovered
+// lever, let go of it, or wait for the drum to come home. The batch's state is the station's world label, not a row.
+class UMars_SmTask_Tumbler_OperatorHints : UMars_SmTask_StationOperatorHints
 {
-    default _TaskMode = ECk_SmTaskMode::EnterExitOnly;
-
-    private const FName k_OwnerKey = n"Tumbler";
     private const int32 k_LookSortOrder = 7;
     private const int32 k_UseSortOrder = 8;
 
     private FCk_Handle_Tumbler _Tumbler;
-    private FCk_Handle_ActionHintDisplay _Display;
     private FCk_Handle_ActionHintRow _UseRow;
 
-    UFUNCTION(BlueprintOverride)
-    void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
+    protected FName Get_OwnerKey() const override
     {
-        _Display = FCk_Handle_ActionHintDisplay();
+        return n"Tumbler";
+    }
 
-        auto StationEntity = ck::Ctx(InHandle);
-        auto Station = StationEntity.As_Station();
-        auto Operator = Station.Get_Operator();
-        _Display = Operator.As_ActionHintDisplay(ECk_SanityCheck::UnChecked);
-        if (ck::Is_NOT_Valid(_Display))
-        { return; }
-
-        _Tumbler = StationEntity.As_Tumbler();
-        _Display.Request_RegisterHint(FMars_ActionHint_Spec(mars::Mars_IA_Look, FText::FromString("move the hand"), k_LookSortOrder, k_OwnerKey));
-        _UseRow = _Display.Request_RegisterHint(FMars_ActionHint_Spec(mars::Mars_IA_Interact_Use, Get_UseText(), k_UseSortOrder, k_OwnerKey));
+    protected void Register_Rows() override
+    {
+        _Tumbler = _Station.As_Tumbler();
+        Show_Row(FCk_Handle_ActionHintRow(), Make_Row(mars::Mars_IA_Look, "move the hand", k_LookSortOrder));
+        _UseRow = Show_Row(_UseRow, Make_Row(mars::Mars_IA_Interact_Use, Get_UseText(), k_UseSortOrder));
         _Tumbler.BindTo_OnHoverChanged(FMars_Delegate_Tumbler_OnHoverChanged(this, n"OnHoverChanged"));
         _Tumbler.BindTo_OnHandModeChanged(FMars_Delegate_Tumbler_OnHandModeChanged(this, n"OnHandModeChanged"));
         _Tumbler.BindTo_OnHatchChanged(FMars_Delegate_Tumbler_OnHatchChanged(this, n"OnHatchChanged"));
         _Tumbler.BindTo_OnDrumChanged(FMars_Delegate_Tumbler_OnDrumChanged(this, n"OnDrumChanged"));
     }
 
-    UFUNCTION(BlueprintOverride)
-    void DoExitTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
+    protected void Unregister_Rows() override
     {
         if (ck::IsValid(_Tumbler))
         {
@@ -211,11 +170,7 @@ class UMars_SmTask_Tumbler_OperatorHints : UCk_SmTask_EntityScript
             _Tumbler.UnbindFrom_OnDrumChanged(FMars_Delegate_Tumbler_OnDrumChanged(this, n"OnDrumChanged"));
         }
 
-        if (ck::IsValid(_Display))
-        { _Display.Request_UnregisterHintsByOwner(FMars_Request_ActionHintDisplay_UnregisterByOwner(k_OwnerKey)); }
-
         _Tumbler = FCk_Handle_Tumbler();
-        _Display = FCk_Handle_ActionHintDisplay();
         _UseRow = FCk_Handle_ActionHintRow();
     }
 
@@ -245,33 +200,31 @@ class UMars_SmTask_Tumbler_OperatorHints : UCk_SmTask_EntityScript
 
     private void Refresh_UseRow()
     {
-        if (ck::Is_NOT_Valid(_Display) || ck::Is_NOT_Valid(_UseRow) || ck::Is_NOT_Valid(_Tumbler))
-        { return; }
-
-        _Display.Request_UpdateHint(FMars_Request_ActionHintDisplay_Update(_UseRow, Get_UseText()));
+        if (ck::IsValid(_Tumbler))
+        { Retext_Row(_UseRow, Get_UseText()); }
     }
 
     // What a press does now, read from the kernel (its signals broadcast after the whole tick applied). A regrip while the
     // drum returns is allowed, so the lever row does not wait for home; the hatch does.
-    private FText Get_UseText() const
+    private FString Get_UseText() const
     {
         if (_Tumbler.Get_HandMode() != EMars_Tumbler_HandMode::Free)
-        { return FText::FromString("release to let go"); }
+        { return "release to let go"; }
 
         const auto Hovered = _Tumbler.Get_Hovered();
         if (Hovered == EMars_Tumbler_Target::Lever)
-        { return FText::FromString("hold to grip the lever"); }
+        { return "hold to grip the lever"; }
 
         if (_Tumbler.Get_Drum() != EMars_Tumbler_Drum::Home)
-        { return FText::FromString("wait for home"); }
+        { return "wait for home"; }
 
         if (Hovered == EMars_Tumbler_Target::Hatch)
         {
             const auto Hatch = _Tumbler.Get_Hatch();
             const auto IsOpenOrOpening = Hatch == EMars_Tumbler_Hatch::Open || Hatch == EMars_Tumbler_Hatch::Opening;
-            return FText::FromString(IsOpenOrOpening ? "close the hatch" : "open the hatch");
+            return IsOpenOrOpening ? "close the hatch" : "open the hatch";
         }
 
-        return FText::FromString("point at the hatch or the lever");
+        return "point at the hatch or the lever";
     }
 }

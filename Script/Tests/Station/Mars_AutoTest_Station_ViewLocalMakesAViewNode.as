@@ -21,7 +21,7 @@ class UMars_AutoTest_Station_ViewLocalMakesAViewNode : UMars_AutoTestRig_Station
         Spec.Camera.ViewLocal = TOptional<FTransform>(ViewLocal);
         auto StationEntity = utils_entity_lifetime::Request_CreateEntity(InHandle);
         auto Root = utils_transform::Add(StationEntity, RootWorld, ECk_Replication::DoesNotReplicate);
-        _Viewed = utils_station::Add(Root, Spec, FMars_Station_Setup());
+        _Viewed = utils_station::Add(Root, Spec);
 
         _Unviewed = AddStation(InHandle, FMars_Station_Spec());
 

@@ -561,18 +561,18 @@ class UMars_Steward_EntityScript : UCk_GenericEntityScript_UE
         if (ck::IsValid(_Face))
         { return utils_transform::Get_EntityCurrentTransform(_Face); }
 
-        const float64 ReferenceEyeHeight = 229.0;
-        return FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, ReferenceEyeHeight)) * utils_transform::Get_EntityCurrentTransform(_Root);
+        const auto EyeHeight = float64(_Config.Body.ReferenceEyeHeightCm * _Config.Body.Scale);
+        return FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, EyeHeight)) * utils_transform::Get_EntityCurrentTransform(_Root);
     }
 
     // Moves the View node: Seize turns the victim's view to the face where it stands, Lift carries it to the bite point
-    // (BiteDistanceCm out of the face, looking back at it), and it stays there.
+    // (Bite.DistanceCm out of the face, looking back at it), and it stays there.
     private void Update_MawView(EMars_Devour_Phase InPhase, float32 InAlpha)
     {
         const auto FaceWorld = Get_FaceWorld();
         const auto FaceLocation = FaceWorld.GetLocation();
         const auto FaceForward = FaceWorld.GetRotation().GetForwardVector();
-        const auto BiteLocation = FaceLocation + FaceForward * _Config.Maw.BiteDistanceCm;
+        const auto BiteLocation = FaceLocation + FaceForward * _Config.Maw.Bite.DistanceCm;
         const auto BiteRotation = FRotator::MakeFromXZ(FaceForward * -1.0, FVector::UpVector).Quaternion();
 
         const auto StartLocation = _ViewStart.GetLocation();
@@ -623,9 +623,9 @@ class UMars_Steward_EntityScript : UCk_GenericEntityScript_UE
         { return; }
 
         const auto& Maw = _Config.Maw;
-        const auto Scale = Maw.PlateSizeCm / 100.0;
+        const auto Scale = Maw.Plate.SizeCm / 100.0;
         auto Part = FMars_MeshPart(
-            FTransform(FRotator(0.0, 90.0, 90.0), FVector(Maw.PlateDistanceCm, 0.0, 0.0), FVector(Scale, Scale, 1.0)),
+            FTransform(FRotator(0.0, 90.0, 90.0), FVector(Maw.Plate.DistanceCm, 0.0, 0.0), FVector(Scale, Scale, 1.0)),
             engine::load::Plane(), LookMaster, collision::profile::NoCollision, n"Steward_MawPlate");
         Part.CastShadow = false;
         Part.ReceivesDecals = false;
@@ -652,7 +652,7 @@ class UMars_Steward_EntityScript : UCk_GenericEntityScript_UE
     private void Push_MawFrame(const FMars_Steward_MawFrame& InFrame)
     {
         const auto& Maw = _Config.Maw;
-        const auto Span = Maw.PlateSizeCm / Maw.PlateDistanceCm;
+        const auto Span = Maw.Plate.SizeCm / Maw.Plate.DistanceCm;
         Push_MawGroup(MawSlot_Face, FLinearColor(InFrame.Strength, InFrame.EyeOpen, InFrame.Evil, InFrame.Mouth));
         Push_MawGroup(MawSlot_Jaws, FLinearColor(InFrame.Jaw, InFrame.Zoom, Span, InFrame.Veil));
         Push_MawGroup(MawSlot_Dread, FLinearColor(InFrame.Heat, InFrame.Shake, InFrame.TiltRadians, 0.0f));

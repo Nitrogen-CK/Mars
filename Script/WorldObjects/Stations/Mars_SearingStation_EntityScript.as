@@ -32,11 +32,14 @@ enum EMars_SearingStation_Pool
     Pooled
 }
 
-// The station's record of one admitted piece: its display record and its pool.
+// The station's pool record of one admitted piece (its look is the feed base's record).
 struct FMars_SearingStation_PieceVisual
 {
     UPROPERTY()
-    FMars_Station_PieceDisplay Display;
+    FMars_CookingFeed_PieceId Id;
+
+    UPROPERTY()
+    FCk_Handle Entity;
 
     // Art cm in the pan mesh's frame (the pan material's units): where the piece last lay on the pan, and its oil trail
     // lagging that. A piece off the pan keeps both.
@@ -350,7 +353,6 @@ class UMars_SearingStation_EntityScript : UMars_FeedStation_EntityScript
             _SearingHandle.UnbindFrom_OnTakeOutRefused(FMars_Delegate_Searing_OnTakeOutRefused(this, n"OnTakeOutRefused"));
         }
 
-        // The pieces wear their own displays; only the records go.
         _PieceVisuals.Empty();
 
         _PanMaterial = nullptr;
@@ -379,15 +381,11 @@ class UMars_SearingStation_EntityScript : UMars_FeedStation_EntityScript
     {
         // The handle node wraps the right glove around the handle (the base adds the feed's left grip).
         auto Grips = TArray<FMars_Station_Grip>();
-        Grips.Add(FMars_Station_Grip(EMars_Hand::Right, GameplayTags::Station_Node_Tool, NAME_None,
-            EMars_HandGripPose::Power, TOptional<float32>(), EMars_FPHands_GripFrame::Node, EMars_FPHands_GripRoll::Fixed));
+        Grips.Add(Make_NodeGrip(EMars_Hand::Right, GameplayTags::Station_Node_Tool, EMars_HandGripPose::Power));
         InOutSpec.Grips = Grips;
 
-        InOutSpec.Camera.LookControl = EMars_Station_LookControl::Captured;
-        InOutSpec.Camera.PitchOffset = CameraPitch;
         // Back along the pitched view line from the pan's rest pivot, so the pan is dead centre on screen.
-        InOutSpec.Camera.ViewLocal = TOptional<FTransform>(
-            utils_station::Make_ViewLocal(FVector(StoveX, 0.0, Get_PanRestZ()), CameraPitch, ViewDistance));
+        InOutSpec.Camera = Make_CapturedCamera(FVector(StoveX, 0.0, Get_PanRestZ()), CameraPitch, ViewDistance);
         InOutSpec.Prompt = FMars_Station_PromptSpec(
             NSLOCTEXT("MarsInteraction", "SearSteakPrompt", "Sear steak"),
             NSLOCTEXT("MarsInteraction", "SearingStationInUsePrompt", "In use"));
@@ -521,8 +519,11 @@ class UMars_SearingStation_EntityScript : UMars_FeedStation_EntityScript
     // A piece's record: the piece wears its own display, and its cook state starts as the piece arrived with it.
     private void AddPieceVisuals(const FMars_CookingFeed_PieceId& InPieceId, FCk_Handle InPiece)
     {
+        Add_PieceRecord(InPieceId, InPiece);
+
         auto Visual = FMars_SearingStation_PieceVisual();
-        Visual.Display = utils_station::Make_PieceDisplay(InPieceId, InPiece);
+        Visual.Id = InPieceId;
+        Visual.Entity = InPiece;
         _PieceVisuals.Add(Visual);
     }
 
@@ -542,7 +543,6 @@ class UMars_SearingStation_EntityScript : UMars_FeedStation_EntityScript
         Advance_FootprintNode();
         Advance_BubblesNode();
         Advance_Sizzle(InDeltaSeconds);
-        Advance_PieceVisuals(InDeltaSeconds);
         Apply_PanMaterial();
         Apply_OilFx();
         Apply_SizzleSound();
@@ -556,11 +556,17 @@ class UMars_SearingStation_EntityScript : UMars_FeedStation_EntityScript
     {
         const auto Scale = float64(PanScale);
         const auto Alpha = 1.0 - Math::Exp(-float64(InDeltaSeconds) / float64(TrailLagSeconds));
-        for (int32 Index = 0; Index < _PieceVisuals.Num(); ++Index)
+        for (int32 Index = _PieceVisuals.Num() - 1; Index >= 0; --Index)
         {
             auto Visual = _PieceVisuals[Index];
-            const auto Id = Visual.Display.Id;
-            const auto OnPan = _SearingHandle.Get_HasPiece(Id) && Get_IsLiveOnPan(Id);
+            const auto Id = Visual.Id;
+            if (ck::Is_NOT_Valid(Visual.Entity) || _SearingHandle.Get_HasPiece(Id) == false)
+            {
+                _PieceVisuals.RemoveAt(Index);
+                continue;
+            }
+
+            const auto OnPan = Get_IsLiveOnPan(Id);
             const auto Hovering = OnPan == false && Get_IsLiveOverPan(Id);
             Visual.Pool = (OnPan || Hovering) ? EMars_SearingStation_Pool::Pooled : EMars_SearingStation_Pool::None;
             if (OnPan)
@@ -590,7 +596,7 @@ class UMars_SearingStation_EntityScript : UMars_FeedStation_EntityScript
         for (const auto& Visual : _PieceVisuals)
         {
             if (Visual.Pool == EMars_SearingStation_Pool::Pooled)
-            { Largest = Math::Max(Largest, Get_PoolHalf(Visual.Display.Id)); }
+            { Largest = Math::Max(Largest, Get_PoolHalf(Visual.Id)); }
         }
 
         if (Largest > 0.0f)
@@ -708,7 +714,7 @@ class UMars_SearingStation_EntityScript : UMars_FeedStation_EntityScript
 
         const auto PieceWorld = utils_transform::Get_EntityCurrentTransform(Entity.As_Transform());
         const auto PanLocalRotation = _SearingHandle.Get_PanBaseWorld().GetRotation().Inverse() * PieceWorld.GetRotation();
-        const auto HalfZ = utils_searing::Get_WorldHalfExtentZ(PanLocalRotation, _SearingHandle.Get_PieceHalfExtents(InPieceId));
+        const auto HalfZ = utils_foodpiece::Get_WorldHalfExtentZ(PanLocalRotation, _SearingHandle.Get_PieceHalfExtents(InPieceId));
         const auto Underside = _SearingHandle.Get_PiecePanLocal(InPieceId).Z - float64(utils_searing::k_PanSurfaceZ) - HalfZ;
         return float32(Math::Clamp(Underside / (float64(PoolLiftFadeCm) * float64(PanScale)), 0.0, 1.0));
     }
@@ -799,43 +805,34 @@ class UMars_SearingStation_EntityScript : UMars_FeedStation_EntityScript
         return false;
     }
 
-    // Each piece's look from the kernel's mapping of its cook state (utils_cookstate::Make_DisplayParams over its sears so
-    // far), its oil coat layered by the pan's heat. A face that has just seared through is written at once, past the write
-    // threshold, so a finished face shows its full crust (1.0), not the last value within the threshold of it. A record whose
-    // piece the kernel no longer holds (taken out, or destroyed at the end of its linger) or whose entity is gone is
-    // dropped; a lost piece keeps its last cook state.
-    private void Advance_PieceVisuals(float32 InDeltaSeconds)
+    protected bool Get_HoldsPiece(const FMars_CookingFeed_PieceId& InPieceId) const override
     {
-        const auto IsHot = _SearingHandle.Get_IsHot();
-        for (int32 Index = _PieceVisuals.Num() - 1; Index >= 0; --Index)
-        {
-            auto Visual = _PieceVisuals[Index];
-            auto& Display = Visual.Display;
-            if (ck::Is_NOT_Valid(Display.Entity) || _SearingHandle.Get_HasPiece(Display.Id) == false)
-            {
-                _PieceVisuals.RemoveAt(Index);
-                continue;
-            }
+        return ck::IsValid(_SearingHandle) && _SearingHandle.Get_HasPiece(InPieceId);
+    }
 
-            if (_SearingHandle.Get_PieceStatus(Display.Id) == EMars_Searing_PieceStatus::Lost)
-            { continue; }
+    // A lost piece keeps its last look.
+    protected bool Get_IsPieceFrozen(const FMars_CookingFeed_PieceId& InPieceId) const override
+    {
+        return _SearingHandle.Get_PieceStatus(InPieceId) == EMars_Searing_PieceStatus::Lost;
+    }
 
-            const auto OilCoat = Display.CookState.OilCoat;
-            Display.CookState = utils_cookstate::Make_DisplayParams(_SearingHandle.Get_PieceCookState(Display.Id));
+    // The kernel's mapping of the piece's cook state (utils_cookstate::Make_DisplayParams over its sears so far), its oil
+    // coat layered by the pan's heat.
+    protected FMars_CookState Make_PieceLook(const FMars_Station_PieceDisplay& InRecord, float32 InDeltaSeconds) const override
+    {
+        const auto OilCoat = InRecord.CookState.OilCoat;
+        auto Look = utils_cookstate::Make_DisplayParams(_SearingHandle.Get_PieceCookState(InRecord.Id));
 
-            const auto OnHotPan = IsHot && _SearingHandle.Get_PieceContact(Display.Id) == EMars_Searing_Contact::OnPan;
-            Display.CookState.OilCoat = Math::FInterpConstantTo(OilCoat, OnHotPan ? OilCoatOnPan : OilCoatOffPan,
-                InDeltaSeconds, OilCoatRate);
-            if (Get_HasUnshownSearedFace(Display))
-            {
-                if (utils_station::Write_PieceLook(Display.Piece, Display.CookState))
-                { Display.Written = Display.CookState; }
-            }
-            else
-            { utils_station::Write_PieceDisplay(Display); }
+        const auto OnHotPan = _SearingHandle.Get_IsHot() && _SearingHandle.Get_PieceContact(InRecord.Id) == EMars_Searing_Contact::OnPan;
+        Look.OilCoat = Math::FInterpConstantTo(OilCoat, OnHotPan ? OilCoatOnPan : OilCoatOffPan, InDeltaSeconds, OilCoatRate);
+        return Look;
+    }
 
-            _PieceVisuals[Index] = Visual;
-        }
+    // A face that has just seared through is written at once, past the write threshold, so a finished face shows its full
+    // crust (1.0), not the last value within the threshold of it.
+    protected bool Get_IsPieceLookUrgent(const FMars_Station_PieceDisplay& InRecord) const override
+    {
+        return Get_HasUnshownSearedFace(InRecord);
     }
 
     // A face of the look is seared through (1.0) but the display was last written short of it.
@@ -872,7 +869,7 @@ class UMars_SearingStation_EntityScript : UMars_FeedStation_EntityScript
             if (Visual.Pool == EMars_SearingStation_Pool::None || Slot >= k_PoolSlots)
             { continue; }
 
-            const auto Radius = Get_PoolHalf(Visual.Display.Id) * FootprintPerHalf * (1.0f - Visual.Lift);
+            const auto Radius = Get_PoolHalf(Visual.Id) * FootprintPerHalf * (1.0f - Visual.Lift);
             _PanMaterial.SetVectorParameterValue(_FootprintParameterNames[Slot],
                 FLinearColor(float32(Visual.Footprint.X), float32(Visual.Footprint.Y), Radius, 0.0f));
             _PanMaterial.SetVectorParameterValue(_TrailParameterNames[Slot],
@@ -1192,7 +1189,7 @@ class UMars_SearingStation_EntityScript : UMars_FeedStation_EntityScript
     }
 
     UFUNCTION()
-    private void OnFaceSeared(FCk_Handle_Searing InSearing, FMars_CookingFeed_PieceId InPieceId, EMars_Searing_Face InFace)
+    private void OnFaceSeared(FCk_Handle_Searing InSearing, FMars_CookingFeed_PieceId InPieceId, EMars_FoodPiece_Face InFace)
     {
         Play_SearedBurst(InPieceId);
     }

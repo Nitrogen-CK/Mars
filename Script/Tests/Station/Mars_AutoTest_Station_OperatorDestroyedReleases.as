@@ -1,45 +1,34 @@
 // A destroyed operator releases: the reserve arms a destroy watch on the operator, so destroying the operator entity (no
-// release request anywhere) frees the station with OnReleased(A, OperatorLost), and the Use prompt goes back from
-// Prompt.OccupiedText to Prompt.Text with the Use target enabled again. Uses the real reserve path (a direct Operator stamp would
-// bypass the watch under test).
+// release request anywhere) frees the station with OnReleased(A, OperatorLost), and the Use interactable drops the
+// Operated claim with its target enabled again. Uses the real reserve path (a direct Operator stamp would bypass the watch
+// under test).
 class UMars_AutoTest_Station_OperatorDestroyedReleases : UMars_AutoTestRig_Station
 {
     private FCk_Handle_Station _Station;
     private FCk_Handle _Operator;
-    private FMars_Station_Spec _Spec;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
-        _Spec = FMars_Station_Spec();
-        _Spec.Prompt = FMars_Station_PromptSpec(FText::FromString("Use test station"), FText::FromString("Test station in use"));
-        _Station = AddStation(InHandle, _Spec);
+        _Station = AddStation(InHandle, FMars_Station_Spec());
         _Operator = AddOperator(InHandle);
 
         _Station.BindTo_OnReserved(FMars_Delegate_Station_OnReserved(this, n"OnReserved"));
         _Station.BindTo_OnReleased(FMars_Delegate_Station_OnReleased(this, n"OnReleased"));
 
         Add_Step("reserve for the operator", n"Step_Reserve");
-        Add_Step_WaitUntil("the station is reserved and its prompt reads the occupied text", n"Check_ReservedAndOccupied", 0, 0);
+        Add_Step_WaitUntil("the station is reserved and its Use interactable holds the Operated claim", n"Check_ReservedAndClaimed", 0, 0);
         Add_Step("the Use target is disabled; destroy the operator entity", n"Step_DestroyOperator");
         Add_Step_WaitUntil("the station is released", n"Check_Released", 0, 0);
         Add_Step("the release was OperatorLost and the station is free", n"Step_AssertReleased");
-        Add_Step_WaitUntil("the prompt reads the prompt text again", n"Check_PromptRestored", 0, 0);
+        Add_Step_WaitUntil("the Operated claim is released", n"Check_ClaimReleased", 0, 0);
         Add_Step("the Use target is enabled again", n"Step_AssertEnabled");
         Run_Steps(InHandle);
     }
 
-    // The Use target and its prompt are composed with the station, so their absence fails the test.
-    private FString Get_PromptText()
+    private bool Get_IsClaimed()
     {
-        auto Target = _Station.Get_UseTarget();
-        if (ck::Is_NOT_Valid(Target))
-        {
-            FinishFailure("the station has no Use target");
-            return "";
-        }
-
-        return Target.As_InteractPrompt().Get_PromptText().ToString();
+        return _Station.Get_Interactable().Get_IsDisabledFor(EMars_Interactable_DisableReason::Operated);
     }
 
     UFUNCTION()
@@ -51,10 +40,10 @@ class UMars_AutoTest_Station_OperatorDestroyedReleases : UMars_AutoTestRig_Stati
     }
 
     UFUNCTION()
-    private void Check_ReservedAndOccupied(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    private void Check_ReservedAndClaimed(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(_Reserved.Num() > 0 && Get_PromptText() == _Spec.Prompt.OccupiedText.ToString());
+        Res.Set(_Reserved.Num() > 0 && Get_IsClaimed());
     }
 
     UFUNCTION()
@@ -82,10 +71,10 @@ class UMars_AutoTest_Station_OperatorDestroyedReleases : UMars_AutoTestRig_Stati
     }
 
     UFUNCTION()
-    private void Check_PromptRestored(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    private void Check_ClaimReleased(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(Get_PromptText() == _Spec.Prompt.Text.ToString());
+        Res.Set(Get_IsClaimed() == false);
     }
 
     UFUNCTION()

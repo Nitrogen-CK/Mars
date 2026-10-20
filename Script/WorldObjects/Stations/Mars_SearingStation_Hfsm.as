@@ -82,90 +82,49 @@ class UMars_SmTask_Searing_HeatOnEnter : UCk_SmTask_EntityScript
     }
 }
 
-// The operator's input, read off its InputIntents: one look per drained look delta (degrees; X yaw right+, Y pitch down+),
-// which tilts the pan and, fast and upward, tosses it. Seeded on enter, so a delta from before the station was taken does
-// not count. No operator intents (headless) = nothing to read.
-class UMars_SmTask_Searing_OperatorInput : UCk_SmTask_EntityScript
+// The operator's input: one look per drained look delta (degrees; X yaw right+, Y pitch down+), which tilts the pan and,
+// fast and upward, tosses it.
+class UMars_SmTask_Searing_OperatorInput : UMars_SmTask_StationOperatorInput
 {
-    default _TaskMode = ECk_SmTaskMode::Tick;
-
     private FCk_Handle_Searing _Searing;
-    private FCk_Handle_InputIntents _Intents;
-    private int32 _SeenLookSequence = 0;
+    private FMars_LookCursor _Look;
 
-    UFUNCTION(BlueprintOverride)
-    void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
+    protected void Bind(FCk_Handle InStation) override
     {
-        auto StationEntity = ck::Ctx(InHandle);
-        _Searing = StationEntity.As_Searing();
-        _Intents = FCk_Handle_InputIntents();
-
-        auto Station = StationEntity.As_Station();
-        auto Operator = Station.Get_Operator();
-        _Intents = Operator.As_InputIntents(ECk_SanityCheck::UnChecked);
-        if (ck::Is_NOT_Valid(_Intents))
-        { return; }
-
-        _SeenLookSequence = _Intents.Get_LookDeltaSequence();
+        _Searing = InStation.As_Searing();
     }
 
-    // Must return Running every frame: a Succeeded/Failed result would end the task while Operated is still active.
-    UFUNCTION(BlueprintOverride)
-    ECk_SmTaskResult DoTick(FCk_Handle_SmTask InHandle, FCk_Time InDeltaT, ECk_Sm_NetContext InNetContext)
+    protected void Seed() override
     {
-        if (ck::Is_NOT_Valid(_Searing) || ck::Is_NOT_Valid(_Intents))
-        { return ECk_SmTaskResult::Running; }
-
-        const auto Sequence = _Intents.Get_LookDeltaSequence();
-        if (Sequence != _SeenLookSequence)
-        {
-            _SeenLookSequence = Sequence;
-            _Searing.Request_Look(FMars_Request_Searing_Look(_Intents.Get_LookDelta()));
-        }
-
-        return ECk_SmTaskResult::Running;
+        _Look.Seed(_Intents);
     }
 
-    UFUNCTION(BlueprintOverride)
-    void DoExitTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
+    protected void Poll() override
+    {
+        if (ck::IsValid(_Searing) && _Look.Advance(_Intents))
+        { _Searing.Request_Look(FMars_Request_Searing_Look(_Intents.Get_LookDelta())); }
+    }
+
+    protected void Unbind() override
     {
         _Searing = FCk_Handle_Searing();
-        _Intents = FCk_Handle_InputIntents();
-        _SeenLookSequence = 0;
+        _Look = FMars_LookCursor();
     }
 }
 
-// The operator's legend row while operating, under owner key k_OwnerKey: "tilt the pan, flick up to toss" (IA_Look). The
-// pieces' state is the station's world label, not a row. An operator without a display (headless) gets no rows.
-class UMars_SmTask_Searing_OperatorHints : UCk_SmTask_EntityScript
+// The operator's legend row while operating: "tilt the pan, flick up to toss" (IA_Look). The pieces' state is the
+// station's world label, not a row.
+class UMars_SmTask_Searing_OperatorHints : UMars_SmTask_StationOperatorHints
 {
-    default _TaskMode = ECk_SmTaskMode::EnterExitOnly;
-
-    private const FName k_OwnerKey = n"Searing";
     private const int32 k_TiltSortOrder = 7;
 
-    private FCk_Handle_ActionHintDisplay _Display;
-
-    UFUNCTION(BlueprintOverride)
-    void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
+    protected FName Get_OwnerKey() const override
     {
-        _Display = FCk_Handle_ActionHintDisplay();
-
-        auto Station = ck::Ctx(InHandle).As_Station();
-        auto Operator = Station.Get_Operator();
-        _Display = Operator.As_ActionHintDisplay(ECk_SanityCheck::UnChecked);
-        if (ck::Is_NOT_Valid(_Display))
-        { return; }
-
-        _Display.Request_RegisterHint(FMars_ActionHint_Spec(mars::Mars_IA_Look, FText::FromString("tilt the pan, flick up to toss"), k_TiltSortOrder, k_OwnerKey));
+        return n"Searing";
     }
 
-    UFUNCTION(BlueprintOverride)
-    void DoExitTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
+    protected void Register_Rows() override
     {
-        if (ck::IsValid(_Display))
-        { _Display.Request_UnregisterHintsByOwner(FMars_Request_ActionHintDisplay_UnregisterByOwner(k_OwnerKey)); }
-
-        _Display = FCk_Handle_ActionHintDisplay();
+        Show_Row(FCk_Handle_ActionHintRow(), Make_Row(mars::Mars_IA_Look, "tilt the pan, flick up to toss", k_TiltSortOrder));
     }
 }

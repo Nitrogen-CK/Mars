@@ -9,8 +9,23 @@
 //
 //   Idle      tasks: StationFeed_Source, StationFeed_Bridge
 //   Operated  tasks: StationFeed_Source, StationFeed_OperatorInput (Tick), StationFeed_Bridge, StationFeed_OperatorHints
-//                    (Tick), StationFeed_TakeOutInput (Tick, a station whose kernel hands pieces back: Searing, Fry,
-//                    Tumbler)
+//                    (Tick), StationFeed_TakeOutInput (Tick, a station whose kernel hands pieces back through the feed's
+//                    take-out: Searing, Fry, Batter, Tumbler)
+//
+// The input and hint tasks are the shared station shapes (Mars_Station_SmTasks.as).
+
+namespace utils_cooking_feed
+{
+    // Every piece InStation's kernel would hand back onto the platter docked on InOutputDock, capped at its free room (no
+    // tray docked caps it at none, which the kernel refuses NoRoom and the station's label says).
+    void Request_TakeOutToDock(FCk_Handle InStation, FCk_Handle_PlatterDock InOutputDock)
+    {
+        const auto Tray = InOutputDock.Get_Platter();
+        const auto Room = ck::IsValid(Tray) ? Tray.Get_FreeCount() : 0;
+        auto Station = InStation;
+        Request_StationTakeOut(Station, FMars_Request_StationTakeOut(Room, Tray));
+    }
+}
 
 // The feed draws from whatever platter has landed on the station's input dock: set on enter (only a platter that has
 // arrived), and again on every arrival and undock (an undock leaves the feed unsourced, which cancels a transfer in
@@ -67,69 +82,47 @@ class UMars_SmTask_StationFeed_Source : UCk_SmTask_EntityScript
     }
 }
 
-// The operator's add-food presses, read off its InputIntents: each fresh activation of the StationAddFood row is one
-// BeginTransfer, which the feed refuses while the hand is busy or the source is missing or empty. A station may shut its
-// own gate on the edge (a subclass overrides Get_CanBeginTransfer): the press still goes to the feed, gated Shut, and the
-// feed refuses it StationGate (OnTransferRefused). Every edge is consumed whether or not it is taken (nothing is queued),
-// and the seen frame is seeded on enter, so a press held from before the station was taken never counts. No operator
-// intents (headless) = nothing to read.
-class UMars_SmTask_StationFeed_OperatorInput : UCk_SmTask_EntityScript
+// The operator's add-food presses: each fresh press of the StationAddFood row is one BeginTransfer, which the feed refuses
+// while the hand is busy or the source is missing or empty. A station may shut its own gate on the press (a subclass
+// overrides Get_CanBeginTransfer): the press still goes to the feed, gated Shut, and the feed refuses it StationGate
+// (OnTransferRefused). Every press is consumed whether or not it is taken (nothing is queued).
+class UMars_SmTask_StationFeed_OperatorInput : UMars_SmTask_StationOperatorInput
 {
-    default _TaskMode = ECk_SmTaskMode::Tick;
+    protected FCk_Handle_CookingFeed _Feed;
+    private FMars_IntentEdge _AddFood;
 
-    private FCk_Handle_CookingFeed _Feed;
-    private FCk_Handle_InputIntents _Intents;
-    // The activation frame of the StationAddFood hold last seen; unset while it is not held.
-    private TOptional<int32> _SeenAddFoodFrame;
-
-    UFUNCTION(BlueprintOverride)
-    void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
+    protected void Bind(FCk_Handle InStation) override
     {
-        auto StationEntity = ck::Ctx(InHandle);
-        _Feed = StationEntity.As_CookingFeed();
-        _Intents = FCk_Handle_InputIntents();
-
-        auto Station = StationEntity.As_Station();
-        auto Operator = Station.Get_Operator();
-        _Intents = Operator.As_InputIntents(ECk_SanityCheck::UnChecked);
-        if (ck::Is_NOT_Valid(_Intents))
-        { return; }
-
-        _SeenAddFoodFrame = _Intents.TryGet_IntentActivationFrame(GameplayTags::Mars_Intent_StationAddFood);
+        _Feed = InStation.As_CookingFeed();
     }
 
-    // Must return Running every frame: a Succeeded/Failed result would end the task while Operated is still active.
-    UFUNCTION(BlueprintOverride)
-    ECk_SmTaskResult DoTick(FCk_Handle_SmTask InHandle, FCk_Time InDeltaT, ECk_Sm_NetContext InNetContext)
+    protected void Seed() override
     {
-        if (ck::Is_NOT_Valid(_Feed) || ck::Is_NOT_Valid(_Intents))
-        { return ECk_SmTaskResult::Running; }
+        _AddFood.Seed(_Intents, GameplayTags::Mars_Intent_StationAddFood);
+    }
 
-        const auto AddFoodFrame = _Intents.TryGet_IntentActivationFrame(GameplayTags::Mars_Intent_StationAddFood);
-        if (AddFoodFrame == _SeenAddFoodFrame)
-        { return ECk_SmTaskResult::Running; }
+    protected void Poll() override
+    {
+        if (ck::Is_NOT_Valid(_Feed))
+        { return; }
 
-        _SeenAddFoodFrame = AddFoodFrame;
-        if (AddFoodFrame.IsSet() == false)
-        { return ECk_SmTaskResult::Running; }
+        if (utils_station::Get_HasPress(_AddFood.Advance(_Intents, GameplayTags::Mars_Intent_StationAddFood)) == false)
+        { return; }
 
         const auto Gate = Get_CanBeginTransfer() ? EMars_CookingFeed_StationGate::Open : EMars_CookingFeed_StationGate::Shut;
         _Feed.Request_BeginTransfer(FMars_Request_CookingFeed_BeginTransfer(Gate));
-        return ECk_SmTaskResult::Running;
     }
 
     // The operator leaving cancels the transfer; the feed decides what that means: a hand still reaching for or grasping its
     // piece stops (a piece already taken off the platter goes back onto it), and a transfer past its grasp is committed and
     // lands through the bridge running in every state, so nothing strands either way.
-    UFUNCTION(BlueprintOverride)
-    void DoExitTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
+    protected void Unbind() override
     {
         if (ck::IsValid(_Feed))
         { _Feed.Request_Cancel(FMars_Request_CookingFeed_Cancel()); }
 
         _Feed = FCk_Handle_CookingFeed();
-        _Intents = FCk_Handle_InputIntents();
-        _SeenAddFoodFrame.Reset();
+        _AddFood = FMars_IntentEdge();
     }
 
     // The station's own gate on a fresh press, ahead of the feed's (a tumbler refuses while its hatch is shut).
@@ -283,97 +276,60 @@ class UMars_SmTask_StationFeed_Bridge : UCk_SmTask_EntityScript
     }
 }
 
-// The operator's take-out presses. Each fresh activation of Interact_Secondary asks the station's kernel, through the
-// station's take-out contract (utils_cooking_feed::Request_StationTakeOut), to hand every piece that is ready onto the
-// docked finished tray, no more than it has room for (none with no tray docked): the kernel loads them, takes back what the
-// tray refuses, and refuses a take-out that hands nothing back (OnTakeOutRefused: NoRoom, NothingReady), which the station's
-// label says. The press is seeded on enter, so a hold from before the station was taken never counts. No kernel that hands
-// pieces back (no take-out readout on the station) or no output dock on the context (a composition that failed and already
-// ensured) = nothing to take out; no operator intents (headless) = no presses.
-class UMars_SmTask_StationFeed_TakeOutInput : UCk_SmTask_EntityScript
+// The operator's take-out presses. Each fresh press of Interact_Secondary asks the station's kernel, through the station's
+// take-out contract (utils_cooking_feed::Request_TakeOutToDock), to hand every piece that is ready onto the docked finished
+// tray, no more than it has room for (none with no tray docked): the kernel loads them, takes back what the tray refuses,
+// and refuses a take-out that hands nothing back (OnTakeOutRefused: NoRoom, NothingReady), which the station's label says.
+// No kernel that hands pieces back (no take-out readout on the station) or no output dock on the context (a composition
+// that failed and already ensured) = nothing to take out.
+class UMars_SmTask_StationFeed_TakeOutInput : UMars_SmTask_StationOperatorInput
 {
-    default _TaskMode = ECk_SmTaskMode::Tick;
-
-    private FCk_Handle _Station;
     private FCk_Handle_PlatterDock _OutputDock;
-    private FCk_Handle_InputIntents _Intents;
-    // The activation frame of the Interact_Secondary hold last seen; unset while it is not held.
-    private TOptional<int32> _SeenTakeOutFrame;
+    private FMars_IntentEdge _TakeOut;
 
-    UFUNCTION(BlueprintOverride)
-    void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
+    protected void Bind(FCk_Handle InStation) override
     {
-        _Station = ck::Ctx(InHandle);
-        _OutputDock = utils_platter_dock::Find_OnStation(_Station, EMars_PlatterDock_Role::Output);
-        _Intents = FCk_Handle_InputIntents();
-        if (ck::Is_NOT_Valid(_OutputDock) || utils_cooking_feed::Get_HasTakeOut(_Station) == false)
-        { return; }
-
-        auto Station = _Station.As_Station();
-        auto Operator = Station.Get_Operator();
-        _Intents = Operator.As_InputIntents(ECk_SanityCheck::UnChecked);
-        if (ck::Is_NOT_Valid(_Intents))
-        { return; }
-
-        _SeenTakeOutFrame = _Intents.TryGet_IntentActivationFrame(GameplayTags::Mars_Intent_Interact_Secondary);
-    }
-
-    // Must return Running every frame: a Succeeded/Failed result would end the task while Operated is still active.
-    UFUNCTION(BlueprintOverride)
-    ECk_SmTaskResult DoTick(FCk_Handle_SmTask InHandle, FCk_Time InDeltaT, ECk_Sm_NetContext InNetContext)
-    {
-        if (ck::Is_NOT_Valid(_OutputDock) || ck::Is_NOT_Valid(_Intents))
-        { return ECk_SmTaskResult::Running; }
-
-        const auto TakeOutFrame = _Intents.TryGet_IntentActivationFrame(GameplayTags::Mars_Intent_Interact_Secondary);
-        if (TakeOutFrame != _SeenTakeOutFrame)
-        {
-            _SeenTakeOutFrame = TakeOutFrame;
-            if (TakeOutFrame.IsSet())
-            { Request_TakeOut(); }
-        }
-
-        return ECk_SmTaskResult::Running;
-    }
-
-    UFUNCTION(BlueprintOverride)
-    void DoExitTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
-    {
-        _Station = FCk_Handle();
         _OutputDock = FCk_Handle_PlatterDock();
-        _Intents = FCk_Handle_InputIntents();
-        _SeenTakeOutFrame.Reset();
+        if (utils_cooking_feed::Get_HasTakeOut(InStation))
+        { _OutputDock = utils_platter_dock::Find_OnStation(InStation, EMars_PlatterDock_Role::Output); }
     }
 
-    // Every ready piece onto the docked tray, capped at its free room: no tray caps it at none.
-    private void Request_TakeOut()
+    protected void Seed() override
     {
-        const auto Tray = _OutputDock.Get_Platter();
-        const auto Room = ck::IsValid(Tray) ? Tray.Get_FreeCount() : 0;
-        utils_cooking_feed::Request_StationTakeOut(_Station, FMars_Request_StationTakeOut(Room, Tray));
+        _TakeOut.Seed(_Intents, GameplayTags::Mars_Intent_Interact_Secondary);
+    }
+
+    protected void Poll() override
+    {
+        if (ck::Is_NOT_Valid(_OutputDock))
+        { return; }
+
+        if (utils_station::Get_HasPress(_TakeOut.Advance(_Intents, GameplayTags::Mars_Intent_Interact_Secondary)))
+        { utils_cooking_feed::Request_TakeOutToDock(_Station, _OutputDock); }
+    }
+
+    protected void Unbind() override
+    {
+        _OutputDock = FCk_Handle_PlatterDock();
+        _TakeOut = FMars_IntentEdge();
     }
 }
 
-// The operator's rows while operating. The add-food row (IA_StationAddFood): "add food - N left" while the hand is idle,
-// "adding food... - N left" while it is busy, the station's own refusal while it would refuse a press (a subclass's
-// TryGet_StationRefusal: the cutting station's "board busy"), "no platter" without a source, "platter empty" once nothing
-// is left on it, "settling - N left" while the pile re-settles (a press then is refused until a piece freezes);
-// registered once on enter under the Operating state's owner key (its leave-unregister clears it) and re-texted on every
-// stock and phase edge (the display drains registers before unregisters, so the row is never re-registered). The take-out
-// row (IA_Interact_Secondary), on a station whose kernel hands pieces back (it keeps the station's take-out readout) and
-// only while a finished tray is docked: "take out - N ready", re-texted on the frame the readout's count changes. An
-// operator without a display (headless) gets no rows.
-class UMars_SmTask_StationFeed_OperatorHints : UCk_SmTask_EntityScript
+// The operator's rows while operating, under owner key StationFeed. The add-food row (IA_StationAddFood): "add food - N left"
+// while the hand is idle, "adding food... - N left" while it is busy, the station's own refusal while it would refuse a
+// press (a subclass's TryGet_StationRefusal: the cutting station's "board busy"), "no platter" without a source, "platter
+// empty" once nothing is left on it, "settling - N left" while the pile re-settles (a press then is refused until a piece
+// freezes); re-texted on every stock and phase edge. The take-out row (IA_Interact_Secondary), on a station whose kernel
+// hands pieces back (it keeps the station's take-out readout) and only while a finished tray is docked: "take out - N
+// ready", re-texted on the frame the readout's count changes.
+class UMars_SmTask_StationFeed_OperatorHints : UMars_SmTask_StationOperatorHints
 {
     default _TaskMode = ECk_SmTaskMode::Tick;
 
-    private const FName k_OwnerKey = n"Station";
     private const int32 k_AddFoodSortOrder = 6;
     private const int32 k_TakeOutSortOrder = 9;
 
-    private FCk_Handle _Station;
-    private FCk_Handle_CookingFeed _Feed;
-    private FCk_Handle_ActionHintDisplay _Display;
+    protected FCk_Handle_CookingFeed _Feed;
     private FCk_Handle_ActionHintRow _AddFoodRow;
     private FCk_Handle_PlatterDock _OutputDock;
     // Registered while a finished tray is docked.
@@ -381,39 +337,40 @@ class UMars_SmTask_StationFeed_OperatorHints : UCk_SmTask_EntityScript
     // The ready count the take-out row last said.
     private int32 _ShownTakeable = 0;
 
+    // Must return Running every frame: a Succeeded/Failed result would end the task while Operated is still active.
     UFUNCTION(BlueprintOverride)
-    void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
+    ECk_SmTaskResult DoTick(FCk_Handle_SmTask InHandle, FCk_Time InDeltaT, ECk_Sm_NetContext InNetContext)
     {
-        _Display = FCk_Handle_ActionHintDisplay();
+        if (ck::Is_NOT_Valid(_TakeOutRow))
+        { return ECk_SmTaskResult::Running; }
 
-        _Station = ck::Ctx(InHandle);
-        auto Station = _Station.As_Station();
-        auto Operator = Station.Get_Operator();
-        _Display = Operator.As_ActionHintDisplay(ECk_SanityCheck::UnChecked);
-        if (ck::Is_NOT_Valid(_Display))
-        { return; }
+        const auto Takeable = utils_cooking_feed::Get_Takeable(_Station).Num();
+        if (Takeable != _ShownTakeable)
+        {
+            _ShownTakeable = Takeable;
+            Retext_Row(_TakeOutRow, Get_TakeOutText());
+        }
 
+        return ECk_SmTaskResult::Running;
+    }
+
+    // Not the Operating state's "Station" key: that state's leave row outlives these.
+    protected FName Get_OwnerKey() const override
+    {
+        return n"StationFeed";
+    }
+
+    protected void Register_Rows() override
+    {
         _Feed = _Station.As_CookingFeed();
-        _AddFoodRow = _Display.Request_RegisterHint(
-            FMars_ActionHint_Spec(mars::Mars_IA_StationAddFood, Get_AddFoodText(), k_AddFoodSortOrder, k_OwnerKey));
+        _AddFoodRow = Show_Row(_AddFoodRow, Make_Row(mars::Mars_IA_StationAddFood, Get_AddFoodText(), k_AddFoodSortOrder));
         _Feed.BindTo_OnStockChanged(FMars_Delegate_CookingFeed_OnStockChanged(this, n"OnStockChanged"));
         _Feed.BindTo_OnPhaseChanged(FMars_Delegate_CookingFeed_OnPhaseChanged(this, n"OnPhaseChanged"));
 
         Watch_TakeOut();
     }
 
-    // Must return Running every frame: a Succeeded/Failed result would end the task while Operated is still active.
-    UFUNCTION(BlueprintOverride)
-    ECk_SmTaskResult DoTick(FCk_Handle_SmTask InHandle, FCk_Time InDeltaT, ECk_Sm_NetContext InNetContext)
-    {
-        if (ck::IsValid(_TakeOutRow) && utils_cooking_feed::Get_Takeable(_Station).Num() != _ShownTakeable)
-        { Refresh_TakeOutRow(); }
-
-        return ECk_SmTaskResult::Running;
-    }
-
-    UFUNCTION(BlueprintOverride)
-    void DoExitTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
+    protected void Unregister_Rows() override
     {
         if (ck::IsValid(_Feed))
         {
@@ -421,17 +378,14 @@ class UMars_SmTask_StationFeed_OperatorHints : UCk_SmTask_EntityScript
             _Feed.UnbindFrom_OnPhaseChanged(FMars_Delegate_CookingFeed_OnPhaseChanged(this, n"OnPhaseChanged"));
         }
 
-        Unwatch_TakeOut();
+        if (ck::IsValid(_OutputDock))
+        {
+            _OutputDock.UnbindFrom_OnDocked(FMars_Delegate_PlatterDock_OnDocked(this, n"OnOutputDocked"));
+            _OutputDock.UnbindFrom_OnUndocked(FMars_Delegate_PlatterDock_OnUndocked(this, n"OnOutputUndocked"));
+        }
 
-        if (ck::IsValid(_Display) && ck::IsValid(_AddFoodRow))
-        { _Display.Request_UnregisterHint(FMars_Request_ActionHintDisplay_Unregister(_AddFoodRow)); }
-
-        if (ck::IsValid(_Display) && ck::IsValid(_TakeOutRow))
-        { _Display.Request_UnregisterHint(FMars_Request_ActionHintDisplay_Unregister(_TakeOutRow)); }
-
-        _Station = FCk_Handle();
         _Feed = FCk_Handle_CookingFeed();
-        _Display = FCk_Handle_ActionHintDisplay();
+        _OutputDock = FCk_Handle_PlatterDock();
         _AddFoodRow = FCk_Handle_ActionHintRow();
         _TakeOutRow = FCk_Handle_ActionHintRow();
         _ShownTakeable = 0;
@@ -441,69 +395,44 @@ class UMars_SmTask_StationFeed_OperatorHints : UCk_SmTask_EntityScript
     // take-out row.
     private void Watch_TakeOut()
     {
+        if (utils_cooking_feed::Get_HasTakeOut(_Station) == false)
+        { return; }
+
         _OutputDock = utils_platter_dock::Find_OnStation(_Station, EMars_PlatterDock_Role::Output);
-        if (ck::Is_NOT_Valid(_OutputDock) || utils_cooking_feed::Get_HasTakeOut(_Station) == false)
-        {
-            _OutputDock = FCk_Handle_PlatterDock();
-            return;
-        }
+        if (ck::Is_NOT_Valid(_OutputDock))
+        { return; }
 
         _OutputDock.BindTo_OnDocked(FMars_Delegate_PlatterDock_OnDocked(this, n"OnOutputDocked"));
         _OutputDock.BindTo_OnUndocked(FMars_Delegate_PlatterDock_OnUndocked(this, n"OnOutputUndocked"));
 
         if (ck::IsValid(_OutputDock.Get_Platter()))
-        { Register_TakeOut(); }
+        { Show_TakeOut(); }
     }
 
-    private void Unwatch_TakeOut()
-    {
-        if (ck::IsValid(_OutputDock))
-        {
-            _OutputDock.UnbindFrom_OnDocked(FMars_Delegate_PlatterDock_OnDocked(this, n"OnOutputDocked"));
-            _OutputDock.UnbindFrom_OnUndocked(FMars_Delegate_PlatterDock_OnUndocked(this, n"OnOutputUndocked"));
-        }
-
-        _OutputDock = FCk_Handle_PlatterDock();
-    }
-
-    private void Register_TakeOut()
+    private void Show_TakeOut()
     {
         if (ck::IsValid(_TakeOutRow))
         { return; }
 
         _ShownTakeable = utils_cooking_feed::Get_Takeable(_Station).Num();
-        _TakeOutRow = _Display.Request_RegisterHint(
-            FMars_ActionHint_Spec(mars::Mars_IA_Interact_Secondary, Get_TakeOutText(), k_TakeOutSortOrder, k_OwnerKey));
+        _TakeOutRow = Show_Row(_TakeOutRow, Make_Row(mars::Mars_IA_Interact_Secondary, Get_TakeOutText(), k_TakeOutSortOrder));
     }
 
-    private void Refresh_TakeOutRow()
+    private FString Get_TakeOutText() const
     {
-        if (ck::Is_NOT_Valid(_Display) || ck::Is_NOT_Valid(_TakeOutRow))
-        { return; }
-
-        _ShownTakeable = utils_cooking_feed::Get_Takeable(_Station).Num();
-        _Display.Request_UpdateHint(FMars_Request_ActionHintDisplay_Update(_TakeOutRow, Get_TakeOutText()));
-    }
-
-    private FText Get_TakeOutText() const
-    {
-        return FText::FromString(f"take out - {_ShownTakeable} ready");
+        return f"take out - {_ShownTakeable} ready";
     }
 
     UFUNCTION()
     private void OnOutputDocked(FCk_Handle_PlatterDock InDock, FCk_Handle_Platter InPlatter)
     {
-        Register_TakeOut();
+        Show_TakeOut();
     }
 
     UFUNCTION()
     private void OnOutputUndocked(FCk_Handle_PlatterDock InDock, FCk_Handle_Platter InPlatter)
     {
-        if (ck::Is_NOT_Valid(_TakeOutRow))
-        { return; }
-
-        _Display.Request_UnregisterHint(FMars_Request_ActionHintDisplay_Unregister(_TakeOutRow));
-        _TakeOutRow = FCk_Handle_ActionHintRow();
+        _TakeOutRow = Clear_Row(_TakeOutRow);
     }
 
     UFUNCTION()
@@ -521,34 +450,34 @@ class UMars_SmTask_StationFeed_OperatorHints : UCk_SmTask_EntityScript
     // Also for a subclass, on the edges of its own refusal.
     protected void Refresh_AddFoodRow()
     {
-        if (ck::Is_NOT_Valid(_Display) || ck::Is_NOT_Valid(_AddFoodRow))
+        if (ck::Is_NOT_Valid(_Feed))
         { return; }
 
-        _Display.Request_UpdateHint(FMars_Request_ActionHintDisplay_Update(_AddFoodRow, Get_AddFoodText()));
+        Retext_Row(_AddFoodRow, Get_AddFoodText());
     }
 
     // Why the station's own gate would refuse a press now (its OperatorInput's Get_CanBeginTransfer); unset = it would not.
     protected TOptional<FString> TryGet_StationRefusal() const { return TOptional<FString>(); }
 
-    private FText Get_AddFoodText() const
+    private FString Get_AddFoodText() const
     {
         const auto Available = _Feed.Get_Available();
         if (_Feed.Get_IsBusy())
-        { return FText::FromString(f"adding food... - {Available} left"); }
+        { return f"adding food... - {Available} left"; }
 
         const auto StationRefusal = TryGet_StationRefusal();
         if (StationRefusal.IsSet())
-        { return FText::FromString(StationRefusal.GetValue()); }
+        { return StationRefusal.GetValue(); }
 
         if (_Feed.Get_IsSourced() == false)
-        { return FText::FromString("no platter"); }
+        { return "no platter"; }
 
         if (Available <= 0)
-        { return FText::FromString("platter empty"); }
+        { return "platter empty"; }
 
         if (_Feed.Get_IsSettling())
-        { return FText::FromString(f"settling - {Available} left"); }
+        { return f"settling - {Available} left"; }
 
-        return FText::FromString(f"add food - {Available} left");
+        return f"add food - {Available} left";
     }
 }

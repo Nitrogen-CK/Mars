@@ -79,24 +79,10 @@ class AMars_TestLamp : AActor
 
         auto LampTransform = Lamp.As_Transform();
 
-        auto VisualParams = utils_unreal_component::Make_Params(
-            UStaticMeshComponent, ECk_UnrealComponent_TickPolicy::DoNotTick, n"TestLampVisual");
-        auto Visual = utils_unreal_component::Add(Lamp, VisualParams);
-        utils_unreal_component::BindTo_OnAdded(Visual, FCk_Delegate_UnrealComponent_OnAdded(this, n"OnVisualAdded"));
+        LampTransform.Add_MeshPart(this, FMars_MeshPart(FTransform::Identity, Mesh.StaticMesh, Mesh.GetMaterial(0),
+            collision::profile::NoCollision, n"TestLampVisual"));
 
         utils_interactable::Create(LampTransform, Spec);
-    }
-
-    UFUNCTION()
-    private void OnVisualAdded(FCk_Handle_UnrealComponent InHandle)
-    {
-        auto Visual = Cast<UStaticMeshComponent>(utils_unreal_component::Get_Component(InHandle));
-        if (ck::EnsureIfNot(ck::IsValid(Visual), f"[TestLamp] [{GetName()}] visual [{InHandle.ToString()}] was added without its static mesh component"))
-        { return; }
-
-        Visual.SetStaticMesh(Mesh.StaticMesh);
-        Visual.SetMaterial(0, Mesh.GetMaterial(0));
-        Visual.SetCollisionEnabled(ECollisionEnabled::NoCollision);
     }
 }
 

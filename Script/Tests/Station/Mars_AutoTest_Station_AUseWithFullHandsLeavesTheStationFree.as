@@ -91,7 +91,7 @@ class UMars_AutoTest_Station_AUseWithFullHandsLeavesTheStationFree : UMars_AutoT
         Res.Set(_Station.Get_Interactable().Get_CurrentFocuser() == _Carrier
             && utils_state_machine::Get_CurrentStateClass(_Station.Get_UseTarget().As_StateMachine()) == UMars_SmState_Interactable_Focused
             && Prompt.Get_IsBlocked()
-            && Prompt.Get_DisplayText().ToString() == utils_interactable::Get_HandsFullText().ToString());
+            && Prompt.Get_BlockedReason() == EMars_InteractPrompt_BlockedReason::HandsFull);
     }
 
     UFUNCTION()

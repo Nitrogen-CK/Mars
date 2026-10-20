@@ -57,125 +57,80 @@ class UMars_SmTask_Mortar_Engage : UCk_SmTask_EntityScript
     }
 }
 
-// The operator's input, read off its InputIntents: Interact_Primary going down presses the pestle (a strike in the Crush
-// phase, the grind in the Grind phase) and coming up releases it, one collect per rising edge of Interact_Secondary and
-// one switch of seasoning per rising edge of Drop (R: the hands are empty at a station, so nothing else reads it here).
-// All are seeded on enter, so a hold from before the station was taken never counts. No operator intents (headless) =
-// nothing to read.
-class UMars_SmTask_Mortar_OperatorInput : UCk_SmTask_EntityScript
+// The operator's input: Interact_Primary going down presses the pestle (a strike in the Crush phase, the grind in the
+// Grind phase) and coming up releases it (a release and a press between two polls send both: the kernel drains Release
+// before Press), one collect per press of Interact_Secondary and one switch of seasoning per press of Drop (R: the hands
+// are empty at a station, so nothing else reads it here).
+class UMars_SmTask_Mortar_OperatorInput : UMars_SmTask_StationOperatorInput
 {
-    default _TaskMode = ECk_SmTaskMode::Tick;
-
     private FCk_Handle_Mortar _Mortar;
-    private FCk_Handle_InputIntents _Intents;
-    // The activation frame of the Interact_Primary hold last seen; unset while it is not held.
-    private TOptional<int32> _SeenPrimaryFrame;
-    // The same for Interact_Secondary.
-    private TOptional<int32> _SeenCollectFrame;
-    // The same for Drop.
-    private TOptional<int32> _SeenSwitchFrame;
+    private FMars_IntentEdge _Primary;
+    private FMars_IntentEdge _Collect;
+    private FMars_IntentEdge _Switch;
 
-    UFUNCTION(BlueprintOverride)
-    void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
+    protected void Bind(FCk_Handle InStation) override
     {
-        auto StationEntity = ck::Ctx(InHandle);
-        _Mortar = StationEntity.As_Mortar(ECk_SanityCheck::UnChecked);
-        _Intents = FCk_Handle_InputIntents();
+        _Mortar = InStation.As_Mortar(ECk_SanityCheck::UnChecked);
+    }
 
-        auto Station = StationEntity.As_Station();
-        auto Operator = Station.Get_Operator();
-        _Intents = Operator.As_InputIntents(ECk_SanityCheck::UnChecked);
-        if (ck::Is_NOT_Valid(_Intents))
+    protected void Seed() override
+    {
+        _Primary.Seed(_Intents, GameplayTags::Mars_Intent_Interact_Primary);
+        _Collect.Seed(_Intents, GameplayTags::Mars_Intent_Interact_Secondary);
+        _Switch.Seed(_Intents, GameplayTags::Mars_Intent_Drop);
+    }
+
+    protected void Poll() override
+    {
+        if (ck::Is_NOT_Valid(_Mortar))
         { return; }
 
-        _SeenPrimaryFrame = _Intents.TryGet_IntentActivationFrame(GameplayTags::Mars_Intent_Interact_Primary);
-        _SeenCollectFrame = _Intents.TryGet_IntentActivationFrame(GameplayTags::Mars_Intent_Interact_Secondary);
-        _SeenSwitchFrame = _Intents.TryGet_IntentActivationFrame(GameplayTags::Mars_Intent_Drop);
+        const auto Primary = _Primary.Advance(_Intents, GameplayTags::Mars_Intent_Interact_Primary);
+        if (utils_station::Get_HasRelease(Primary))
+        { _Mortar.Request_Release(FMars_Request_Mortar_Release()); }
+
+        if (utils_station::Get_HasPress(Primary))
+        { _Mortar.Request_Press(FMars_Request_Mortar_Press()); }
+
+        if (utils_station::Get_HasPress(_Collect.Advance(_Intents, GameplayTags::Mars_Intent_Interact_Secondary)))
+        { _Mortar.Request_Collect(FMars_Request_Mortar_Collect()); }
+
+        if (utils_station::Get_HasPress(_Switch.Advance(_Intents, GameplayTags::Mars_Intent_Drop)))
+        { _Mortar.Request_SwitchSeasoning(FMars_Request_Mortar_SwitchSeasoning()); }
     }
 
-    // Must return Running every frame: a Succeeded/Failed result would end the task while Operated is still active.
-    UFUNCTION(BlueprintOverride)
-    ECk_SmTaskResult DoTick(FCk_Handle_SmTask InHandle, FCk_Time InDeltaT, ECk_Sm_NetContext InNetContext)
-    {
-        if (ck::Is_NOT_Valid(_Mortar) || ck::Is_NOT_Valid(_Intents))
-        { return ECk_SmTaskResult::Running; }
-
-        const auto PrimaryFrame = _Intents.TryGet_IntentActivationFrame(GameplayTags::Mars_Intent_Interact_Primary);
-        if (PrimaryFrame != _SeenPrimaryFrame)
-        {
-            // A new activation frame while one was already seen is a release and a press between two ticks: both are sent
-            // (the kernel drains Release before Press).
-            if (_SeenPrimaryFrame.IsSet())
-            { _Mortar.Request_Release(FMars_Request_Mortar_Release()); }
-
-            if (PrimaryFrame.IsSet())
-            { _Mortar.Request_Press(FMars_Request_Mortar_Press()); }
-
-            _SeenPrimaryFrame = PrimaryFrame;
-        }
-
-        const auto CollectFrame = _Intents.TryGet_IntentActivationFrame(GameplayTags::Mars_Intent_Interact_Secondary);
-        if (CollectFrame != _SeenCollectFrame)
-        {
-            _SeenCollectFrame = CollectFrame;
-            if (CollectFrame.IsSet())
-            { _Mortar.Request_Collect(FMars_Request_Mortar_Collect()); }
-        }
-
-        const auto SwitchFrame = _Intents.TryGet_IntentActivationFrame(GameplayTags::Mars_Intent_Drop);
-        if (SwitchFrame != _SeenSwitchFrame)
-        {
-            _SeenSwitchFrame = SwitchFrame;
-            if (SwitchFrame.IsSet())
-            { _Mortar.Request_SwitchSeasoning(FMars_Request_Mortar_SwitchSeasoning()); }
-        }
-
-        return ECk_SmTaskResult::Running;
-    }
-
-    UFUNCTION(BlueprintOverride)
-    void DoExitTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
+    protected void Unbind() override
     {
         _Mortar = FCk_Handle_Mortar();
-        _Intents = FCk_Handle_InputIntents();
-        _SeenPrimaryFrame.Reset();
-        _SeenCollectFrame.Reset();
-        _SeenSwitchFrame.Reset();
+        _Primary = FMars_IntentEdge();
+        _Collect = FMars_IntentEdge();
+        _Switch = FMars_IntentEdge();
     }
 }
 
-// The operator's legend rows while operating, under owner key k_OwnerKey, re-read on every step of the batch: the pestle's
-// row (IA_Interact_Primary: "crush on the green" in the Crush phase, "hold to grind" in the Grind phase, gone once Done),
-// "collect" (IA_Interact_Secondary) while the batch is Done, and the other seasoning's name (IA_Drop) while the batch is
-// fresh. An operator without a display (headless) gets no rows.
-class UMars_SmTask_Mortar_OperatorHints : UCk_SmTask_EntityScript
+// The operator's legend rows while operating, re-read on every step of the batch: the pestle's row (IA_Interact_Primary:
+// "crush on the green" in the Crush phase, "hold to grind" in the Grind phase, gone once Done), "collect"
+// (IA_Interact_Secondary) while the batch is Done, and the other seasoning's name (IA_Drop) while the batch is fresh.
+class UMars_SmTask_Mortar_OperatorHints : UMars_SmTask_StationOperatorHints
 {
-    default _TaskMode = ECk_SmTaskMode::EnterExitOnly;
-
-    private const FName k_OwnerKey = n"Mortar";
     private const int32 k_PestleSortOrder = 5;
     private const int32 k_CollectSortOrder = 9;
     private const int32 k_SwitchSortOrder = 10;
 
     private FCk_Handle_Mortar _Mortar;
-    private FCk_Handle_ActionHintDisplay _Display;
     private FCk_Handle_ActionHintRow _PestleRow;
     private FCk_Handle_ActionHintRow _CollectRow;
     private FCk_Handle_ActionHintRow _SwitchRow;
 
-    UFUNCTION(BlueprintOverride)
-    void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
+    protected FName Get_OwnerKey() const override
     {
-        _Display = FCk_Handle_ActionHintDisplay();
+        return n"Mortar";
+    }
 
-        auto StationEntity = ck::Ctx(InHandle);
-        auto Station = StationEntity.As_Station();
-        auto Operator = Station.Get_Operator();
-        _Display = Operator.As_ActionHintDisplay(ECk_SanityCheck::UnChecked);
-        if (ck::Is_NOT_Valid(_Display))
-        { return; }
-
-        _Mortar = StationEntity.As_Mortar(ECk_SanityCheck::UnChecked);
+    // No Mortar on the context (a composition that failed and already ensured) = no rows.
+    protected void Register_Rows() override
+    {
+        _Mortar = _Station.As_Mortar(ECk_SanityCheck::UnChecked);
         if (ck::Is_NOT_Valid(_Mortar))
         { return; }
 
@@ -183,17 +138,12 @@ class UMars_SmTask_Mortar_OperatorHints : UCk_SmTask_EntityScript
         Refresh_Rows(_Mortar.Get_Batch());
     }
 
-    UFUNCTION(BlueprintOverride)
-    void DoExitTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
+    protected void Unregister_Rows() override
     {
         if (ck::IsValid(_Mortar))
         { _Mortar.UnbindFrom_OnBatchChanged(FMars_Delegate_Mortar_OnBatchChanged(this, n"OnBatchChanged")); }
 
-        if (ck::IsValid(_Display))
-        { _Display.Request_UnregisterHintsByOwner(FMars_Request_ActionHintDisplay_UnregisterByOwner(k_OwnerKey)); }
-
         _Mortar = FCk_Handle_Mortar();
-        _Display = FCk_Handle_ActionHintDisplay();
         _PestleRow = FCk_Handle_ActionHintRow();
         _CollectRow = FCk_Handle_ActionHintRow();
         _SwitchRow = FCk_Handle_ActionHintRow();
@@ -202,9 +152,6 @@ class UMars_SmTask_Mortar_OperatorHints : UCk_SmTask_EntityScript
     UFUNCTION()
     private void OnBatchChanged(FCk_Handle_Mortar InMortar, FMars_Mortar_Batch InBatch)
     {
-        if (ck::Is_NOT_Valid(_Display))
-        { return; }
-
         Refresh_Rows(InBatch);
     }
 
@@ -215,38 +162,20 @@ class UMars_SmTask_Mortar_OperatorHints : UCk_SmTask_EntityScript
         else
         {
             const FString PestleText = InBatch.Phase == EMars_Mortar_Phase::Crush ? "crush on the green" : "hold to grind";
-            _PestleRow = Show_Row(_PestleRow, FMars_ActionHint_Spec(mars::Mars_IA_Interact_Primary, FText::FromString(PestleText), k_PestleSortOrder, k_OwnerKey));
+            _PestleRow = Show_Row(_PestleRow, Make_Row(mars::Mars_IA_Interact_Primary, PestleText, k_PestleSortOrder));
         }
 
         if (InBatch.Phase == EMars_Mortar_Phase::Done)
-        { _CollectRow = Show_Row(_CollectRow, FMars_ActionHint_Spec(mars::Mars_IA_Interact_Secondary, FText::FromString("collect"), k_CollectSortOrder, k_OwnerKey)); }
+        { _CollectRow = Show_Row(_CollectRow, Make_Row(mars::Mars_IA_Interact_Secondary, "collect", k_CollectSortOrder)); }
         else
         { _CollectRow = Clear_Row(_CollectRow); }
 
         if (utils_mortar::Get_IsFresh(InBatch))
         {
             const FString SwitchText = InBatch.Seasoning == EMars_Mortar_Seasoning::Salt ? "switch to pepper" : "switch to salt";
-            _SwitchRow = Show_Row(_SwitchRow, FMars_ActionHint_Spec(mars::Mars_IA_Drop, FText::FromString(SwitchText), k_SwitchSortOrder, k_OwnerKey));
+            _SwitchRow = Show_Row(_SwitchRow, Make_Row(mars::Mars_IA_Drop, SwitchText, k_SwitchSortOrder));
         }
         else
         { _SwitchRow = Clear_Row(_SwitchRow); }
-    }
-
-    // InRow reading InSpec's text: registered if it is not shown yet, re-texted otherwise. Returns the row to keep.
-    private FCk_Handle_ActionHintRow Show_Row(FCk_Handle_ActionHintRow InRow, const FMars_ActionHint_Spec& InSpec)
-    {
-        if (ck::Is_NOT_Valid(InRow))
-        { return _Display.Request_RegisterHint(InSpec); }
-
-        _Display.Request_UpdateHint(FMars_Request_ActionHintDisplay_Update(InRow, InSpec.Text));
-        return InRow;
-    }
-
-    private FCk_Handle_ActionHintRow Clear_Row(FCk_Handle_ActionHintRow InRow)
-    {
-        if (ck::IsValid(InRow))
-        { _Display.Request_UnregisterHint(FMars_Request_ActionHintDisplay_Unregister(InRow)); }
-
-        return FCk_Handle_ActionHintRow();
     }
 }

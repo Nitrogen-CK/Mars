@@ -14,10 +14,8 @@ enum EMars_RackMount
     Wall
 }
 
-class AMars_HangingRack : AActor
+class AMars_HangingRack : AMars_LinkDressing
 {
-    default bReplicates = false;
-
     UPROPERTY(DefaultComponent, RootComponent)
     USceneComponent SceneRoot;
     default SceneRoot.Mobility = EComponentMobility::Static;
@@ -74,7 +72,7 @@ class AMars_HangingRack : AActor
     UPROPERTY(Category = "Layout")
     float32 Drop = 300.0f;
 
-    // Ceiling: the chains meet the bar this far in from its ends (cm).
+    // The chains (Ceiling) or the wall brackets (Wall) meet the bar this far in from its ends (cm).
     UPROPERTY(Category = "Layout")
     float32 ChainInset = 10.0f;
 
@@ -151,9 +149,7 @@ class AMars_HangingRack : AActor
     float32 LinkOverlap = 6.0f;
 
     private const int32 ItemPoolCount = 6;
-    private const FName JoltNoBakeTag = n"Ck.Jolt.NoBake";
     private const FString StationMeshFolder = "/Game/Mars/Gameplay/Cooking/Stations/Meshes";
-    private const FString KitMeshFolder = "/Game/Mars/Environment/Meshes/Crypt";
     private const FVector CubeBarScale = FVector(0.01, 0.025, 0.025);
 
     UFUNCTION(BlueprintOverride)
@@ -253,8 +249,7 @@ class AMars_HangingRack : AActor
         if (ck::Is_NOT_Valid(LinkMesh))
         { return 0.0; }
 
-        const float MeshLength = 2.0 * LinkMesh.GetBounds().BoxExtent.X;
-        return Math::Max(MeshLength - float(LinkOverlap), Math::Max(MeshLength * 0.5, 1.0));
+        return Get_LinkPitchOf(LinkMesh, FVector::OneVector, LinkOverlap);
     }
 
     // A straight vertical run of links from InTop down InLength cm; returns the length actually laid (whole links).
@@ -378,59 +373,42 @@ class AMars_HangingRack : AActor
         { Primitives.Add(Pool); }
 
         for (auto Primitive : Primitives)
-        {
-            Primitive.SetCollisionProfileName(collision::profile::NoCollision);
-            Primitive.ComponentTags.AddUnique(JoltNoBakeTag);
-        }
+        { Apply_Collides(Primitive, false); }
 
-        Tags.AddUnique(JoltNoBakeTag);
+        Apply_ActorBaked(false);
     }
 
-    // The kit's rack hardware and link, looked up only in the editor world (a missing package must not log: it fails
-    // automation runs, and the editor asset library refuses play worlds). Found once, each is kept on its property so
-    // PIE and cooked builds never look it up. A rack with no ItemMeshes hangs the three copper pieces.
+    // The kit's rack hardware and link (TryLoad_EditorMesh: the editor world only). Found once, each is kept on its
+    // property. A rack with no ItemMeshes hangs the three copper pieces.
     private void Resolve_DefaultMeshes()
     {
-#if EDITOR
-        auto OwningWorld = GetWorld();
-        if (ck::Is_NOT_Valid(OwningWorld) || OwningWorld.IsGameWorld())
+        if (ck::Is_NOT_Valid(BarMesh))
+        { BarMesh = TryLoad_EditorMesh(StationMeshFolder, "RackBar_Mars_SM"); }
+
+        if (ck::Is_NOT_Valid(HookMesh))
+        { HookMesh = TryLoad_EditorMesh(StationMeshFolder, "RackHook_Mars_SM"); }
+
+        if (ck::Is_NOT_Valid(BracketMesh))
+        { BracketMesh = TryLoad_EditorMesh(StationMeshFolder, "RackBracket_Mars_SM"); }
+
+        if (ck::Is_NOT_Valid(PlateMesh))
+        { PlateMesh = TryLoad_EditorMesh(KitMeshFolder, "CryptChainHook_Mars_SM"); }
+
+        if (ck::Is_NOT_Valid(LinkMesh))
+        { LinkMesh = TryLoad_EditorMesh(KitMeshFolder, "CryptChainLink_Mars_SM"); }
+
+        if (ItemMeshes.Num() > 0)
         { return; }
 
-        if (ck::Is_NOT_Valid(BarMesh))
-        { BarMesh = TryLoad_Mesh(StationMeshFolder, "RackBar_Mars_SM"); }
-        if (ck::Is_NOT_Valid(HookMesh))
-        { HookMesh = TryLoad_Mesh(StationMeshFolder, "RackHook_Mars_SM"); }
-        if (ck::Is_NOT_Valid(BracketMesh))
-        { BracketMesh = TryLoad_Mesh(StationMeshFolder, "RackBracket_Mars_SM"); }
-        if (ck::Is_NOT_Valid(PlateMesh))
-        { PlateMesh = TryLoad_Mesh(KitMeshFolder, "CryptChainHook_Mars_SM"); }
-        if (ck::Is_NOT_Valid(LinkMesh))
-        { LinkMesh = TryLoad_Mesh(KitMeshFolder, "CryptChainLink_Mars_SM"); }
-
-        if (ItemMeshes.Num() == 0)
+        TArray<FString> Defaults;
+        Defaults.Add("HangPan_Mars_SM");
+        Defaults.Add("HangSaucepan_Mars_SM");
+        Defaults.Add("HangLadle_Mars_SM");
+        for (const FString& MeshName : Defaults)
         {
-            TArray<FString> Defaults;
-            Defaults.Add("HangPan_Mars_SM");
-            Defaults.Add("HangSaucepan_Mars_SM");
-            Defaults.Add("HangLadle_Mars_SM");
-            for (const FString& MeshName : Defaults)
-            {
-                auto Mesh = TryLoad_Mesh(StationMeshFolder, MeshName);
-                if (ck::IsValid(Mesh))
-                { ItemMeshes.Add(Mesh); }
-            }
+            auto Mesh = TryLoad_EditorMesh(StationMeshFolder, MeshName);
+            if (ck::IsValid(Mesh))
+            { ItemMeshes.Add(Mesh); }
         }
-#endif
     }
-
-#if EDITOR
-    private UStaticMesh TryLoad_Mesh(const FString& InFolder, const FString& InName)
-    {
-        const FString PackagePath = f"{InFolder}/{InName}";
-        if (EditorAsset::DoesAssetExist(PackagePath) == false)
-        { return nullptr; }
-
-        return Cast<UStaticMesh>(LoadObject(this, f"{PackagePath}.{InName}"));
-    }
-#endif
 }

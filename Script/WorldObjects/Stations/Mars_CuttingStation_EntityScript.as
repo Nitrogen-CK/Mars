@@ -238,23 +238,19 @@ class UMars_CuttingStation_EntityScript : UMars_FeedStation_EntityScript
             _CuttingHandle.BindTo_OnChopLanded(FMars_Delegate_Cutting_OnChopLanded(this, n"OnChopLanded"));
         }
 
-        // The board still cuts what reaches it when the feed is rejected.
-        return true;
+        // The control drives both (checked): a station missing either stands without a feed, docks or dressing.
+        return ck::IsValid(_CuttingHandle) && ck::IsValid(_Board);
     }
 
     protected void Configure_Operation(FMars_Station_Spec& InOutSpec) override
     {
         // The handle node wraps the right glove around the horizontal handle.
         auto Grips = TArray<FMars_Station_Grip>();
-        Grips.Add(FMars_Station_Grip(EMars_Hand::Right, GameplayTags::Station_Node_Tool, NAME_None,
-            EMars_HandGripPose::Power, TOptional<float32>(), EMars_FPHands_GripFrame::Node, EMars_FPHands_GripRoll::Fixed));
+        Grips.Add(Make_NodeGrip(EMars_Hand::Right, GameplayTags::Station_Node_Tool, EMars_HandGripPose::Power));
         InOutSpec.Grips = Grips;
 
-        InOutSpec.Camera.LookControl = EMars_Station_LookControl::Captured;
-        InOutSpec.Camera.PitchOffset = CameraPitch;
         // Back along the pitched view line from the middle of the board's top, so the board is dead centre on screen.
-        InOutSpec.Camera.ViewLocal = TOptional<FTransform>(
-            utils_station::Make_ViewLocal(FVector(BoardX, 0.0, Get_BoardTop()), CameraPitch, ViewDistance));
+        InOutSpec.Camera = Make_CapturedCamera(FVector(BoardX, 0.0, Get_BoardTop()), CameraPitch, ViewDistance);
         InOutSpec.Prompt = FMars_Station_PromptSpec(
             NSLOCTEXT("MarsInteraction", "CutFoodPrompt", "Cut food"),
             NSLOCTEXT("MarsInteraction", "CuttingStationInUsePrompt", "In use"));

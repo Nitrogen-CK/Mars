@@ -37,45 +37,41 @@ mixin FMars_CookingFeed_HandGeometry Make_HandGeometry(const FMars_StationFeed_G
     return Hand;
 }
 
-// What one presentation frame reads: the feed, the station's operator (invalid while nobody operates), the station root's
-// world transform and the frame's real time.
-struct FMars_StationFeed_Frame
-{
-    FCk_Handle_CookingFeed Feed;
-    FCk_Handle Operator;
-    FTransform RootWorld;
-    float32 DeltaSeconds = 0.0f;
-
-    FMars_StationFeed_Frame() {}
-
-    FMars_StationFeed_Frame(FCk_Handle_CookingFeed InFeed, FCk_Handle InOperator, FTransform InRootWorld, float32 InDeltaSeconds)
-    {
-        Feed = InFeed;
-        Operator = InOperator;
-        RootWorld = InRootWorld;
-        DeltaSeconds = InDeltaSeconds;
-    }
-}
-
-// The station script owns one and advances it from its dressing tick. It samples the feed (never writes it) and keeps no
-// clock of its own: the left glove's pose override follows the feed's phase. The glove follows the feed's hand node
-// (Station.Node.Feed), which the feed moves itself by its hand geometry.
+// One glove's pose override, sent only when it changes (InHand: the left glove follows the feed; a station may keep
+// another for its own glove). The station script owns it and samples, never writes, what it follows; it keeps no clock.
 struct FMars_StationFeed_Presentation
 {
-    // The override last sent to PosedOperator's left glove.
+    EMars_Hand Hand = EMars_Hand::Left;
+
+    // The override last sent to PosedOperator's glove.
     TOptional<EMars_HandGripPose> AppliedPose;
 
     FCk_Handle PosedOperator;
 }
 
-// Sets the operator's LEFT pose override: Open while reaching and returning, Cradle from Grasp through AwaitAdmission,
-// cleared once idle.
-mixin void Advance(FMars_StationFeed_Presentation& Self, const FMars_StationFeed_Frame& InFrame)
+namespace utils_station
 {
-    if (ck::Is_NOT_Valid(InFrame.Feed))
+    // The feed's glove: Open while reaching and returning, Cradle from Grasp through AwaitAdmission, no override (unset)
+    // while idle.
+    TOptional<EMars_HandGripPose> Get_FeedGlovePose(EMars_CookingFeed_Phase InPhase)
+    {
+        if (InPhase == EMars_CookingFeed_Phase::Idle)
+        { return TOptional<EMars_HandGripPose>(); }
+
+        if (InPhase == EMars_CookingFeed_Phase::Reach || InPhase == EMars_CookingFeed_Phase::Return)
+        { return TOptional<EMars_HandGripPose>(EMars_HandGripPose::Open); }
+
+        return TOptional<EMars_HandGripPose>(EMars_HandGripPose::Cradle);
+    }
+}
+
+// InOperator's glove follows InFeed's phase (InOperator invalid while nobody operates).
+mixin void Advance(FMars_StationFeed_Presentation& Self, FCk_Handle_CookingFeed InFeed, FCk_Handle InOperator)
+{
+    if (ck::Is_NOT_Valid(InFeed))
     { return; }
 
-    Self.Apply_Pose(InFrame.Operator, Self.Get_Pose(InFrame.Feed.Get_Phase()));
+    Self.Apply_Pose(InOperator, utils_station::Get_FeedGlovePose(InFeed.Get_Phase()));
 }
 
 // Exit or teardown: the override is cleared on the gloves it was sent to (else InOperator's).
@@ -87,19 +83,7 @@ mixin void Clear(FMars_StationFeed_Presentation& Self, FCk_Handle InOperator)
     Self.Clear_PoseOverride();
 }
 
-// Unset = no override (idle).
-mixin TOptional<EMars_HandGripPose> Get_Pose(const FMars_StationFeed_Presentation& Self, EMars_CookingFeed_Phase InPhase)
-{
-    if (InPhase == EMars_CookingFeed_Phase::Idle)
-    { return TOptional<EMars_HandGripPose>(); }
-
-    if (InPhase == EMars_CookingFeed_Phase::Reach || InPhase == EMars_CookingFeed_Phase::Return)
-    { return TOptional<EMars_HandGripPose>(EMars_HandGripPose::Open); }
-
-    return TOptional<EMars_HandGripPose>(EMars_HandGripPose::Cradle);
-}
-
-// Sends the override only when it changes; a different operator first gets the old one cleared.
+// Sends the override only when it changes; a different operator (or none) first gets the old one cleared.
 mixin void Apply_Pose(FMars_StationFeed_Presentation& Self, FCk_Handle InOperator, TOptional<EMars_HandGripPose> InPose)
 {
     if (Self.PosedOperator != InOperator)
@@ -112,7 +96,7 @@ mixin void Apply_Pose(FMars_StationFeed_Presentation& Self, FCk_Handle InOperato
     if (ck::Is_NOT_Valid(Hands))
     { return; }
 
-    Hands.Request_SetPoseOverride(FMars_Request_FPHands_SetPoseOverride(EMars_Hand::Left, InPose));
+    Hands.Request_SetPoseOverride(FMars_Request_FPHands_SetPoseOverride(Self.Hand, InPose));
     Self.AppliedPose = InPose;
     Self.PosedOperator = InOperator;
 }
@@ -124,7 +108,7 @@ mixin void Clear_PoseOverride(FMars_StationFeed_Presentation& Self)
     {
         auto Hands = Self.PosedOperator.As_FPHands(ECk_SanityCheck::UnChecked);
         if (ck::IsValid(Hands))
-        { Hands.Request_SetPoseOverride(FMars_Request_FPHands_SetPoseOverride(EMars_Hand::Left, TOptional<EMars_HandGripPose>())); }
+        { Hands.Request_SetPoseOverride(FMars_Request_FPHands_SetPoseOverride(Self.Hand, TOptional<EMars_HandGripPose>())); }
     }
 
     Self.AppliedPose.Reset();

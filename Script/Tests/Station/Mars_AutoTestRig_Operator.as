@@ -54,7 +54,7 @@ class UMars_AutoTestState_OperatorRigOperating : UCk_SmState_EntityScript
 // The operator rig: the player-path carrier (gloves, the Hands sub-SM, a Use resolver, InputIntents fed by a private key
 // stack, the merged intent task, the real InteractionFocus over a rig-aimed trace) made an operator: the Operator feature,
 // an action hint display, the Operate mapping on its resolver beside Use, and key rows for Back, Interact_Primary,
-// Interact_Secondary and StationAddFood beside Use, composed under UMars_AutoTestState_OperatorRig. It takes a station the
+// Interact_Secondary, StationAddFood and Drop beside Use, composed under UMars_AutoTestState_OperatorRig. It takes a station the
 // way the player does - the view on the station's Use probe, a Use press, the station's own reserve interaction - and
 // leaves it with Back. The station is a bare one (Build_BareStation) or a subclass's.
 UCLASS(Abstract)
@@ -90,9 +90,10 @@ class UMars_AutoTestRig_Operator : UMars_AutoTestRig_PlayerPath
         Probe.ProbeShape = utils_shapes::Make_Sphere(FCk_ShapeSphere_Dimensions(20.0f));
         Probe.ProbeOffset = FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, _EyeHeight));
 
-        auto Setup = FMars_Station_Setup();
-        Setup.Probe = TOptional<FMars_Interactable_ProbeInfo>(Probe);
-        Watch_Station(utils_station::Add(Root, FMars_Station_Spec(), Setup));
+        auto Spec = FMars_Station_Spec();
+        Spec.Setup.Probe = TOptional<FMars_Interactable_ProbeInfo>(Probe);
+        Spec.Setup.UsePrompt = FMars_InteractPrompt_Spec(mars::Mars_IA_Interact_Use, Spec.Prompt.Text);
+        Watch_Station(utils_station::Add(Root, Spec));
     }
 
     protected void Watch_Station(FCk_Handle_Station InStation)
@@ -145,6 +146,12 @@ class UMars_AutoTestRig_Operator : UMars_AutoTestRig_PlayerPath
         return _Intents.Get_IsIntentActive(InIntent);
     }
 
+    // One look delta on the carrier's intents (degrees; X yaw right+, Y pitch down+), as the player's look input feeds it.
+    protected void Add_LookDelta(FVector InDelta)
+    {
+        _Intents.Request_AddLookDelta(FMars_Request_InputIntents_AddLookDelta(InDelta));
+    }
+
     // A row reading InText is on the carrier's legend.
     protected bool Get_HasHint(FString InText) const
     {
@@ -167,6 +174,7 @@ class UMars_AutoTestRig_Operator : UMars_AutoTestRig_PlayerPath
         Rows.Add(FMars_AutoTestHelper_KeyRow(EKeys::F11, GameplayTags::Mars_Intent_Interact_Primary, n"IP"));
         Rows.Add(FMars_AutoTestHelper_KeyRow(EKeys::F12, GameplayTags::Mars_Intent_Interact_Secondary, n"IS"));
         Rows.Add(FMars_AutoTestHelper_KeyRow(EKeys::F8, GameplayTags::Mars_Intent_StationAddFood, n"AF"));
+        Rows.Add(FMars_AutoTestHelper_KeyRow(EKeys::F7, GameplayTags::Mars_Intent_Drop, n"DR"));
         return Rows;
     }
 
@@ -237,8 +245,8 @@ class UMars_AutoTestRig_Operator : UMars_AutoTestRig_PlayerPath
     }
 }
 
-// The operator rig at a real heat station: the searing or fry station spawned through its entity script with its two
-// platter docks, World-mode platters lying on floors beside it until a test docks them, and the carrier standing in front
+// The operator rig at a real feed station: the searing, fry, batter, tumbler or cutting station spawned through its entity
+// script with its two platter docks, World-mode platters lying on floors beside it until a test docks them, and the carrier standing in front
 // of it. The station, the platters, the boxes, docking and readiness are the shared heat-station fixture's
 // (UMars_AutoTestHelper_HeatStation), as UMars_AutoTestRig_HeatStation's are. The handlers record the feed's settles and
 // the kernel's take-outs.
@@ -254,12 +262,20 @@ class UMars_AutoTestRig_HeatOperator : UMars_AutoTestRig_Operator
     protected FCk_Handle_Searing _Searing;
     // Invalid on the searing station.
     protected FCk_Handle_Fry _Fry;
+    // Each invalid but on its own station.
+    protected FCk_Handle_Batter _Batter;
+    protected FCk_Handle_Tumbler _Tumbler;
+    protected FCk_Handle_Cutting _Cutting;
+    protected FCk_Handle_FoodBoard _Board;
     protected FCk_Handle_PlatterDock _InputDock;
     protected FCk_Handle_PlatterDock _OutputDock;
     protected TArray<EMars_CookingFeed_Settle> _Settles;
     protected TArray<FCk_Handle_FoodPiece> _TakenOut;
 
     private UMars_AutoTestHelper_HeatStation _Fixture;
+
+    // A short coat, so a batter test fills one within its time.
+    protected const float32 k_BatterCoatSeconds = 0.5f;
 
     // The real InKind station at InStationOrigin with the feed's default timing; the carrier stands at InCarrierLocal from
     // the station's origin, facing it.
@@ -271,10 +287,19 @@ class UMars_AutoTestRig_HeatOperator : UMars_AutoTestRig_Operator
         _Fixture = Cast<UMars_AutoTestHelper_HeatStation>(NewObject(this, UMars_AutoTestHelper_HeatStation));
 
         auto Pending = FCk_Handle_PendingEntityScript();
-        if (InKind == EMars_AutoTest_HeatStation::Searing)
-        { Pending = _Fixture.Spawn_Searing(InHandle, InStationOrigin, FMars_CookingFeed_TimingSpec()); }
-        else
-        { Pending = _Fixture.Spawn_Fry(InHandle, InStationOrigin, FMars_CookingFeed_TimingSpec()); }
+        switch (InKind)
+        {
+            case EMars_AutoTest_HeatStation::Searing:
+            { Pending = _Fixture.Spawn_Searing(InHandle, InStationOrigin, FMars_CookingFeed_TimingSpec()); break; }
+            case EMars_AutoTest_HeatStation::Fry:
+            { Pending = _Fixture.Spawn_Fry(InHandle, InStationOrigin, FMars_CookingFeed_TimingSpec()); break; }
+            case EMars_AutoTest_HeatStation::Batter:
+            { Pending = _Fixture.Spawn_Batter(InHandle, InStationOrigin, k_BatterCoatSeconds); break; }
+            case EMars_AutoTest_HeatStation::Tumbler:
+            { Pending = _Fixture.Spawn_Tumbler(InHandle, InStationOrigin, FMars_Tumbler_Spec()); break; }
+            case EMars_AutoTest_HeatStation::Cutting:
+            { Pending = _Fixture.Spawn_Cutting(InHandle, InStationOrigin); break; }
+        }
 
         utils_pending_entity_script::Promise_OnConstructed(Pending, FCk_Delegate_EntityScript_Constructed(this, n"OnHeatStationConstructed"));
     }
@@ -329,18 +354,32 @@ class UMars_AutoTestRig_HeatOperator : UMars_AutoTestRig_Operator
         return _Fixture.Get_IsDocked(InDock, InPlatterEntity);
     }
 
-    // The kernel's admitted pieces, in admission order.
+    // The kernel's admitted pieces, in admission order; none on the cutting station (its board holds pieces, not ids).
     protected TArray<FMars_CookingFeed_PieceId> Get_PieceIds() const
     {
         if (_Kind == EMars_AutoTest_HeatStation::Searing)
         { return _Searing.Get_PieceIds(); }
 
-        return _Fry.Get_PieceIds();
+        if (_Kind == EMars_AutoTest_HeatStation::Fry)
+        { return _Fry.Get_PieceIds(); }
+
+        if (_Kind == EMars_AutoTest_HeatStation::Batter)
+        { return _Batter.Get_PieceIds(); }
+
+        if (_Kind == EMars_AutoTest_HeatStation::Tumbler)
+        { return _Tumbler.Get_PieceIds(); }
+
+        return TArray<FMars_CookingFeed_PieceId>();
     }
 
     protected bool Get_IsStationOperated() const
     {
         return _Fixture.Get_IsOperated(_Station, _Kind);
+    }
+
+    protected bool Get_IsStationIdle() const
+    {
+        return _Fixture.Get_IsIdle(_Station, _Kind);
     }
 
     protected int32 Get_SettleCount(EMars_CookingFeed_Settle InSettle) const
@@ -380,6 +419,10 @@ class UMars_AutoTestRig_HeatOperator : UMars_AutoTestRig_Operator
         _Feed = InEntityScriptHandle.As_CookingFeed();
         _Searing = InEntityScriptHandle.As_Searing(ECk_SanityCheck::UnChecked);
         _Fry = InEntityScriptHandle.As_Fry(ECk_SanityCheck::UnChecked);
+        _Batter = InEntityScriptHandle.As_Batter(ECk_SanityCheck::UnChecked);
+        _Tumbler = InEntityScriptHandle.As_Tumbler(ECk_SanityCheck::UnChecked);
+        _Cutting = InEntityScriptHandle.As_Cutting(ECk_SanityCheck::UnChecked);
+        _Board = InEntityScriptHandle.As_FoodBoard(ECk_SanityCheck::UnChecked);
         _InputDock = utils_platter_dock::Find_OnStation(InEntityScriptHandle, EMars_PlatterDock_Role::Input);
         _OutputDock = utils_platter_dock::Find_OnStation(InEntityScriptHandle, EMars_PlatterDock_Role::Output);
 
@@ -389,6 +432,12 @@ class UMars_AutoTestRig_HeatOperator : UMars_AutoTestRig_Operator
 
         if (ck::IsValid(_Fry))
         { _Fry.BindTo_OnPieceTakenOut(FMars_Delegate_Fry_OnPieceTakenOut(this, n"OnFryTakenOut")); }
+
+        if (ck::IsValid(_Batter))
+        { _Batter.BindTo_OnPieceTakenOut(FMars_Delegate_Batter_OnPieceTakenOut(this, n"OnBatterTakenOut")); }
+
+        if (ck::IsValid(_Tumbler))
+        { _Tumbler.BindTo_OnPieceTakenOut(FMars_Delegate_Tumbler_OnPieceTakenOut(this, n"OnTumblerTakenOut")); }
     }
 
     UFUNCTION()
@@ -405,6 +454,18 @@ class UMars_AutoTestRig_HeatOperator : UMars_AutoTestRig_Operator
 
     UFUNCTION()
     private void OnFryTakenOut(FCk_Handle_Fry InFry, FMars_CookingFeed_PieceId InPieceId, FCk_Handle_FoodPiece InPiece)
+    {
+        _TakenOut.Add(InPiece);
+    }
+
+    UFUNCTION()
+    private void OnBatterTakenOut(FCk_Handle_Batter InBatter, FMars_CookingFeed_PieceId InPieceId, FCk_Handle_FoodPiece InPiece)
+    {
+        _TakenOut.Add(InPiece);
+    }
+
+    UFUNCTION()
+    private void OnTumblerTakenOut(FCk_Handle_Tumbler InTumbler, FMars_CookingFeed_PieceId InPieceId, FCk_Handle_FoodPiece InPiece)
     {
         _TakenOut.Add(InPiece);
     }

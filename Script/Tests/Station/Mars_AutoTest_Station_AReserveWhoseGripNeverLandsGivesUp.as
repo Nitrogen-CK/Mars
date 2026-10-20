@@ -3,7 +3,7 @@
 // for the carrier by request (what the reserve interaction would issue). The carrier's state machine enters Operating, whose
 // Grip task starts the grip interaction; the gloves refuse its reach (OutOfReach), and the Grip task gives the station up
 // (Request_Leave): the station releases the carrier once, at the operator's request, within the grip's landing bound
-// (utils_player_sm::Get_GripLandSeconds), and is free. The carrier's state machine is back in Roam with no grip interaction,
+// (utils_fphands::Get_GripLandSeconds), and is free. The carrier's state machine is back in Roam with no grip interaction,
 // no leave row and the rock still in both gloves. Isolated origin (175000, -70000, -30000).
 class UMars_AutoTest_Station_AReserveWhoseGripNeverLandsGivesUp : UMars_AutoTestRig_Operator
 {
@@ -111,7 +111,7 @@ class UMars_AutoTest_Station_AReserveWhoseGripNeverLandsGivesUp : UMars_AutoTest
         Assert_True(_ReleaseReasons.Num() == 1 && _ReleaseReasons[0] == EMars_Station_ReleaseReason::OperatorRequested,
             f"the station released the carrier once, at the operator's request ({_ReleaseReasons.Num()} releases)");
 
-        const auto Bound = float64(utils_player_sm::Get_GripLandSeconds(_Hands));
+        const auto Bound = float64(utils_fphands::Get_GripLandSeconds(_Hands));
         const auto GaveUpAfter = _ReleasedSeconds - _ReservedSeconds;
         Assert_True(GaveUpAfter >= 0.0 && GaveUpAfter <= Bound,
             f"the station was given up within the grip's landing bound of {Bound} s (after {GaveUpAfter} s)");

@@ -73,7 +73,7 @@ asset MarsDustPuff of UCkUsf_LookDefinition
     _Parameters.Add(SelfLight);
 }
 
-class UMars_MortarStation_EntityScript : UMars_Station_EntityScript
+class UMars_MortarStation_EntityScript : UMars_CounterStation_EntityScript
 {
     default _ShowInPlaceActors = true;
 
@@ -147,7 +147,6 @@ class UMars_MortarStation_EntityScript : UMars_Station_EntityScript
     // uu a side of the engine's plane mesh.
     private const float64 k_PlaneMeshSpan = 100.0;
 
-    private FCk_Handle_Transform _Root;
     private FCk_Handle_Mortar _MortarHandle;
     // The pestle's strike, drawn from the kernel's strike signals: start = raised, end = on the batch.
     private FCk_Handle_Mover _StrikeMover;
@@ -158,17 +157,13 @@ class UMars_MortarStation_EntityScript : UMars_Station_EntityScript
     // The left glove's rest on the table beside the mortar.
     private FCk_Handle_Transform _LeftHandNode;
     private FCk_Handle_UnrealComponent _PilePart;
-    private FCk_Handle_UnrealComponent _Label;
     // The dust's card; invalid where nothing renders (AddDust).
     private FCk_Handle_UnrealComponent _DustPart;
-    private FCk_Handle_Timer _DressingTick;
 
     // The dressing's own state: the grind's blend (0 at rest, 1 circling), its angle, and the orbit offset last written.
     private float32 _GrindBlend = 0.0f;
     private float64 _GrindAngle = 0.0;
     private FVector _WrittenOrbit = FVector::ZeroVector;
-    // The text last written to the label: it is rewritten only when it changes.
-    private FString _LabelText;
     // The entity script is a UObject, not a fragment, so it may hold these. The dust's material is read back from its
     // card once the component exists.
     private USoundBase _KnockSound;
@@ -179,45 +174,29 @@ class UMars_MortarStation_EntityScript : UMars_Station_EntityScript
     // The seasoning whose tint the dust wears; unset until written.
     private TOptional<EMars_Mortar_Seasoning> _DustSeasoning;
 
-    // The base composes the transform, the visuals and nodes (AddVisuals) and the Station (Configure_Spec, grips on the
-    // registered nodes); the kernel needs the station entity, so it is composed after, and its signals are bound here, not
-    // at begin play, so no edge can be missed.
-    UFUNCTION(BlueprintOverride)
-    ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
+    // A rejected Mortar spec already ensured in utils_mortar::Add: the station stands with nothing to grind.
+    protected bool Compose_Kernel(FCk_Handle& InHandle) override
     {
-        const auto Flow = Super::DoConstruct(InHandle);
-
-        // A rejected station already ensured in utils_station::Add; there is nothing to work at.
-        auto StationHandle = InHandle.As_Station(ECk_SanityCheck::UnChecked);
-        if (ck::Is_NOT_Valid(StationHandle))
-        { return Flow; }
-
-        // A rejected Mortar spec already ensured in utils_mortar::Add.
         _MortarHandle = utils_mortar::Add(InHandle, Mortar);
         if (ck::Is_NOT_Valid(_MortarHandle))
-        { return Flow; }
+        { return false; }
 
         _MortarHandle.BindTo_OnStrikeStarted(FMars_Delegate_Mortar_OnStrikeStarted(this, n"OnStrikeStarted"));
         _MortarHandle.BindTo_OnStrikeLanded(FMars_Delegate_Mortar_OnStrikeLanded(this, n"OnStrikeLanded"));
         _MortarHandle.BindTo_OnBatchChanged(FMars_Delegate_Mortar_OnBatchChanged(this, n"OnBatchChanged"));
         _KnockSound = assets::load::KnifeChop_Cue();
-
-        // The timer dies with the entity; nothing to unbind.
-        _DressingTick = utils_timer::Create_Tick(InHandle, FCk_Delegate_Timer(this, n"OnDressingTick"));
-        return Flow;
+        return true;
     }
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
-        if (ck::IsValid(_PilePart))
-        { utils_unreal_component::BindTo_OnAdded(_PilePart, FCk_Delegate_UnrealComponent_OnAdded(this, n"OnPartAdded")); }
+        Super::DoBeginPlay(InHandle);
 
-        if (ck::IsValid(_Label))
-        { utils_unreal_component::BindTo_OnAdded(_Label, FCk_Delegate_UnrealComponent_OnAdded(this, n"OnPartAdded")); }
+        if (ck::IsValid(_PilePart))
+        { utils_unreal_component::BindTo_OnAdded(_PilePart, FCk_Delegate_UnrealComponent_OnAdded(this, n"OnPilePartAdded")); }
 
         Refresh_Pile();
-        Refresh_Label();
     }
 
     // The parts are hosted components: they die with their entities.
@@ -232,46 +211,32 @@ class UMars_MortarStation_EntityScript : UMars_Station_EntityScript
         }
 
         _DustMaterial = nullptr;
+        Super::DoEndPlay(InHandle);
     }
 
     //----------------------------------------------------------------------------------------------------------------------
     // Station hooks
     //----------------------------------------------------------------------------------------------------------------------
 
-    protected void Configure_Spec(FMars_Station_Spec& InOutSpec) override
+    protected void Configure_Operation(FMars_Station_Spec& InOutSpec) override
     {
-        InOutSpec.StandLocal = FTransform(FRotator::ZeroRotator, FVector(-(TableDepth * 0.5 + constants_station::k_StandGap), 0.0, 0.0));
-
         // The right glove wraps the pestle; the left lies palm down on the table.
         auto Grips = TArray<FMars_Station_Grip>();
-        Grips.Add(FMars_Station_Grip(EMars_Hand::Right, GameplayTags::Station_Node_Tool, NAME_None,
-            EMars_HandGripPose::Power, TOptional<float32>(), EMars_FPHands_GripFrame::Node, EMars_FPHands_GripRoll::Fixed));
-        Grips.Add(FMars_Station_Grip(EMars_Hand::Left, GameplayTags::Station_Node_Surface, NAME_None,
-            EMars_HandGripPose::Open, TOptional<float32>(), EMars_FPHands_GripFrame::Node, EMars_FPHands_GripRoll::Fixed));
+        Grips.Add(Make_NodeGrip(EMars_Hand::Right, GameplayTags::Station_Node_Tool, EMars_HandGripPose::Power));
+        Grips.Add(Make_NodeGrip(EMars_Hand::Left, GameplayTags::Station_Node_Surface, EMars_HandGripPose::Open));
         InOutSpec.Grips = Grips;
 
-        InOutSpec.Camera.LookControl = EMars_Station_LookControl::Captured;
-        InOutSpec.Camera.PitchOffset = CameraPitch;
         // Back along the pitched view line from the middle of the mortar's rim, so the bowl is dead centre on screen.
-        InOutSpec.Camera.ViewLocal = TOptional<FTransform>(
-            utils_station::Make_ViewLocal(FVector(0.0, 0.0, Get_RimZ()), CameraPitch, ViewDistance));
+        InOutSpec.Camera = Make_CapturedCamera(FVector(0.0, 0.0, Get_RimZ()), CameraPitch, ViewDistance);
         InOutSpec.Prompt = FMars_Station_PromptSpec(
             NSLOCTEXT("MarsInteraction", "GrindSeasoningPrompt", "Grind seasoning"),
             NSLOCTEXT("MarsInteraction", "MortarStationInUsePrompt", "In use"));
         InOutSpec.MinigameStateClass = UMars_SmState_Mortar_Idle;
     }
 
-    // The Use probe: the table's footprint and height, k_ProbePadding all round.
-    protected TOptional<FMars_Interactable_ProbeInfo> Make_Probe() const override
+    protected FVector2D Get_CounterFootprint() const override
     {
-        const auto Padding = constants_station::k_ProbePadding;
-
-        auto Probe = FMars_Interactable_ProbeInfo();
-        Probe.ProbeSpec = FCk_Probe_Spec(GameplayTags::Probe_Mars_Interact);
-        Probe.ProbeShape = utils_shapes::Make_Box(FCk_ShapeBox_Dimensions(
-            FVector(TableDepth * 0.5 + Padding, TableWidth * 0.5 + Padding, TableHeight * 0.5 + Padding)));
-        Probe.ProbeOffset = FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, TableHeight * 0.5));
-        return TOptional<FMars_Interactable_ProbeInfo>(Probe);
+        return FVector2D(TableDepth, TableWidth);
     }
 
     protected void AddVisuals(FCk_Handle_Transform& InRoot) override
@@ -303,7 +268,9 @@ class UMars_MortarStation_EntityScript : UMars_Station_EntityScript
             utils_fphands::Make_GripRotation(EMars_Hand::Left, Fingers, -FVector::UpVector),
             LeftHandLocal + FVector(0.0, 0.0, TableHeight + constants_station::k_PalmLift))).As_Transform();
 
-        AddLabel(InRoot);
+        // Yawed 180 the text faces the operator's side.
+        AddLabel(FTransform(FRotator(0.0, 180.0, 0.0), FVector(TableDepth * 0.5 - LabelInset, 0.0, TableHeight + LabelLift)),
+            EVerticalTextAligment::EVRTA_TextBottom, n"MortarStation_Label");
     }
 
     protected void Register_GripNodes(TArray<FMars_Station_GripNode>& OutNodes) override
@@ -368,28 +335,6 @@ class UMars_MortarStation_EntityScript : UMars_Station_EntityScript
         _DustPart = InRoot.Add_MeshPart(this, Part);
     }
 
-    // Yawed 180 the text faces the operator's side. Tagged TAG_MarsStationLabel like every station's label.
-    private void AddLabel(FCk_Handle_Transform& InRoot)
-    {
-        auto Node = utils_scene_node::Create(InRoot, FTransform(FRotator(0.0, 180.0, 0.0),
-            FVector(TableDepth * 0.5 - LabelInset, 0.0, TableHeight + LabelLift)));
-
-        auto Archetype = NewObject(this, UTextRenderComponent);
-        Archetype.SetMobility(EComponentMobility::Movable);
-        Archetype.SetCollisionEnabled(ECollisionEnabled::NoCollision);
-        Archetype.SetHorizontalAlignment(EHorizTextAligment::EHTA_Center);
-        Archetype.SetVerticalAlignment(EVerticalTextAligment::EVRTA_TextBottom);
-        Archetype.SetWorldSize(constants_station::k_LabelWorldSize);
-        Archetype.SetTextRenderColor(constants_ui_colors::k_StationLabel);
-        Archetype.SetText(FText::FromString(""));
-
-        auto ComponentParams = utils_unreal_component::Make_Params_FromArchetype(
-            Archetype, ECk_UnrealComponent_TickPolicy::DoNotTick, n"MortarStation_Label");
-        _Label = utils_unreal_component::Add(Node, ComponentParams);
-        if (ck::IsValid(_Label))
-        { utils_entity_tag::Add(_Label, n"TAG_MarsStationLabel"); }
-    }
-
     private float64 Get_BowlFloorZ() const
     {
         return TableHeight + MortarBowlFloor * PropScale;
@@ -428,7 +373,7 @@ class UMars_MortarStation_EntityScript : UMars_Station_EntityScript
     }
 
     // The pile wears the batch's mesh (each pile mesh carries its own material). Nothing until its component exists (it
-    // is created asynchronously): OnPartAdded refreshes then.
+    // is created asynchronously): OnPilePartAdded refreshes then.
     private void Refresh_Pile()
     {
         if (ck::Is_NOT_Valid(_MortarHandle) || ck::Is_NOT_Valid(_PilePart))
@@ -445,10 +390,10 @@ class UMars_MortarStation_EntityScript : UMars_Station_EntityScript
     }
 
     // What the batch is and what it needs, then what has been ground so far.
-    private FString Get_StateLabel() const
+    protected FText Get_StateLabel() const override
     {
         if (ck::Is_NOT_Valid(_MortarHandle))
-        { return ""; }
+        { return FText::FromString("mortar not built"); }
 
         const auto Batch = _MortarHandle.Get_Batch();
         const FString Seasoning = Batch.Seasoning == EMars_Mortar_Seasoning::Salt ? "Salt" : "Pepper";
@@ -459,28 +404,12 @@ class UMars_MortarStation_EntityScript : UMars_Station_EntityScript
         { BatchLine = f"{Seasoning}: grind"; }
 
         const auto Tally = _MortarHandle.Get_Tally();
-        if (Tally.Salt == 0 && Tally.Pepper == 0)
-        { return BatchLine; }
+        const auto Salt = Tally.Get_Count(EMars_Mortar_Seasoning::Salt);
+        const auto Pepper = Tally.Get_Count(EMars_Mortar_Seasoning::Pepper);
+        if (Salt == 0 && Pepper == 0)
+        { return FText::FromString(BatchLine); }
 
-        return f"{BatchLine}\nground: {Tally.Salt} salt - {Tally.Pepper} pepper";
-    }
-
-    // Rewritten only when the text changes. Nothing until the component exists; OnPartAdded refreshes then.
-    private void Refresh_Label()
-    {
-        if (ck::Is_NOT_Valid(_Label))
-        { return; }
-
-        auto Text = Cast<UTextRenderComponent>(utils_unreal_component::Get_Component(_Label));
-        if (ck::Is_NOT_Valid(Text))
-        { return; }
-
-        const auto LabelText = Get_StateLabel();
-        if (LabelText == _LabelText)
-        { return; }
-
-        _LabelText = LabelText;
-        Text.SetText(FText::FromString(LabelText));
+        return FText::FromString(f"{BatchLine}\nground: {Salt} salt - {Pepper} pepper");
     }
 
     // The bowl's centre at the top of a pile, in the world: where the pestle knocks.
@@ -582,23 +511,19 @@ class UMars_MortarStation_EntityScript : UMars_Station_EntityScript
     // Handlers
     //----------------------------------------------------------------------------------------------------------------------
 
-    UFUNCTION()
-    private void OnDressingTick(FCk_Handle_Timer InHandle, FCk_Chrono InChrono, FCk_Time InDeltaT)
+    protected void Dress(float32 InDeltaSeconds) override
     {
         if (ck::Is_NOT_Valid(_MortarHandle))
         { return; }
 
-        const auto DeltaSeconds = float32(InDeltaT.Get_Seconds());
-        Advance_Grind(DeltaSeconds);
-        Advance_Dust(DeltaSeconds);
-        Refresh_Label();
+        Advance_Grind(InDeltaSeconds);
+        Advance_Dust(InDeltaSeconds);
     }
 
     UFUNCTION()
-    private void OnPartAdded(FCk_Handle_UnrealComponent InHandle)
+    private void OnPilePartAdded(FCk_Handle_UnrealComponent InHandle)
     {
         Refresh_Pile();
-        Refresh_Label();
     }
 
     // The pestle drops toward the batch.

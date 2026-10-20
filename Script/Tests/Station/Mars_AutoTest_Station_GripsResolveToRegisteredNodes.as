@@ -22,10 +22,9 @@ class UMars_AutoTest_Station_GripsResolveToRegisteredNodes : UCk_AutoTest_Base
         Spec.Grips.Add(FMars_Station_Grip(EMars_Hand::Right, Get_ToolTag(), NAME_None, EMars_HandGripPose::Power, TOptional<float32>(), EMars_FPHands_GripFrame::Aimed, EMars_FPHands_GripRoll::Fixed));
         Spec.Grips.Add(FMars_Station_Grip(EMars_Hand::Left, Get_SurfaceTag(), NAME_None, EMars_HandGripPose::Open, TOptional<float32>(80.0f), EMars_FPHands_GripFrame::Aimed, EMars_FPHands_GripRoll::Fixed));
 
-        auto Setup = FMars_Station_Setup();
-        Setup.GripNodes.Add(FMars_Station_GripNode(Get_SurfaceTag(), _SurfaceNode));
-        Setup.GripNodes.Add(FMars_Station_GripNode(Get_ToolTag(), _ToolNode));
-        _Station = utils_station::Add(Root, Spec, Setup);
+        Spec.Setup.GripNodes.Add(FMars_Station_GripNode(Get_SurfaceTag(), _SurfaceNode));
+        Spec.Setup.GripNodes.Add(FMars_Station_GripNode(Get_ToolTag(), _ToolNode));
+        _Station = utils_station::Add(Root, Spec);
 
         Add_Step("the root carries a two-row grip table on the registered nodes", n"Step_AssertGripTable");
         Add_Step_WaitUntil("the grip target exists", n"Check_HasGripTarget", 0, 0);
@@ -113,10 +112,9 @@ class UMars_AutoTest_Station_GripsResolveToRegisteredNodes : UCk_AutoTest_Base
 
         auto Spec = FMars_Station_Spec();
         Spec.Grips.Add(FMars_Station_Grip(EMars_Hand::Right, Get_ToolTag(), NAME_None, EMars_HandGripPose::Power, TOptional<float32>(), EMars_FPHands_GripFrame::Aimed, EMars_FPHands_GripRoll::Fixed));
-        auto Setup = FMars_Station_Setup();
-        Setup.GripNodes.Add(FMars_Station_GripNode(Get_SurfaceTag(), SurfaceNode));
+        Spec.Setup.GripNodes.Add(FMars_Station_GripNode(Get_SurfaceTag(), SurfaceNode));
 
-        auto Rejected = utils_station::Add(Root, Spec, Setup);
+        auto Rejected = utils_station::Add(Root, Spec);
         Assert_Invalid(Rejected, "Add with a grip naming an unregistered node returns an invalid station");
         Assert_False(RejectedEntity.Has_Fragment(FMars_Fragment_FPHands_Grips), "a rejected station declares no grip table");
         Assert_False(RejectedEntity.Has_Fragment(FMars_Feature_Station), "a rejected station adds no feature fragment");

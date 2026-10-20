@@ -1,7 +1,8 @@
 // The fry station: a counter (depth along local X, width along local Y; the operator at -X, +Y their right) with an iron pot
 // of hot oil on its centre, the raw platter's dock on the LEFT and a fixed wire drain basket on the RIGHT, on the counter,
-// out of the oil, with the finished tray's dock beyond it. A skimmer is parked over the oil: its node carries an Implement (no look tilt, a pour roll and a commanded lift
-// the skim sets, a commanded slide the kernel steers across the pot, a corridor and the basket) and, at its origin, the
+// out of the oil, with the finished tray's dock beyond it. A skimmer is parked over the oil: its node carries an Implement
+// (utils_fry::Make_SkimmerImplementSpec: no look tilt, a pour roll and a commanded lift the skim sets, a commanded slide the
+// kernel steers across the pot, a corridor and the basket) and, at its origin, the
 // scoop's disc and lip bodies, with the handle, a stem and the grip bar beside it; the basket node carries the basket's
 // five kinematic boxes. Every part under those nodes is a NoCollision visual. The Fry feature lives on the station entity
 // and its own state machine (UMars_SmState_Fry_Idle) reads the operator. The pot starts empty: a CookingFeed on the same
@@ -24,7 +25,7 @@ class UMars_FryStation_EntityScript : UMars_FeedStation_EntityScript
     UPROPERTY(ExposeOnSpawn)
     FMars_Fry_Spec Fry;
 
-    // The skimmer's slide and dip; its modes, bounds and Nodes are set here.
+    // The skimmer's feel; its modes, bounds and Nodes are the kernel's (utils_fry::Make_SkimmerImplementSpec) and set here.
     UPROPERTY(ExposeOnSpawn)
     FMars_Implement_Spec SkimmerImplement;
 
@@ -55,16 +56,13 @@ class UMars_FryStation_EntityScript : UMars_FeedStation_EntityScript
     // half metre a counter-level basket would (a piece poured from that height bounced over the wall); its walls
     // BasketWallHeight tall, still under the carried scoop's underside.
     // FryerBasket_Mars_SM (inner 44 x 26 x 16, pivot at its inner floor centre) stretched along Y to a 44 x 44 interior,
-    // the square the pour window needs (k_MinPourWindow both ways); the kinematic boxes follow the same spec.
+    // the square the pour window needs (utils_fry::k_MinPourWindowCm both ways); the kinematic boxes follow the same spec.
     private const float64 BasketGap = 6.0;
     private const float64 BasketFloorTopZ = PotRimZ - 2.0;
     private const float64 BasketWallHeight = 16.0;
     private const float32 BasketInnerHalf = 22.0f;
     private const float64 BasketMeshInnerY = 26.0;
     private const float64 RodThickness = 1.2;
-    // cm: the narrowest the pour window (where the whole bowl is over the basket interior) may be on either axis: twice the
-    // pour's 11 cm.
-    private const float32 k_MinPourWindow = 22.0f;
 
     // The skimmer: parked over the far oil with the disc top 17 above the rim, so a carried scoop clears the rim and the
     // basket's walls. The dip lowers the disc top to ScoopDipTopZ: a floating piece's bottom sits about 7.8 below the oil
@@ -82,12 +80,8 @@ class UMars_FryStation_EntityScript : UMars_FeedStation_EntityScript
     // piece on it is not thrown off.
     private const float32 SkimmerLiftSpringHz = 1.5f;
     private const float32 SkimmerLiftDampingRatio = 1.0f;
-    // uu past the dip and the carry the lift may travel before its clamp (critically damped: never reached).
-    private const float32 SkimmerLiftHeadroom = 2.0f;
     // Room for the kernel's pour (the scoop spec's PourPitchDegrees, 55 by default).
     private const float32 SkimmerMaxTiltDegrees = 60.0f;
-    // uu the skimmer's own slide clamp reaches past the kernel's reach bounds (the kernel's clamp is the real one).
-    private const float64 SkimmerSlideMargin = 1.0;
 
     // The release node over the oil, left of the park (a dropped piece never lands on the parked scoop): ReleaseBack uu
     // nearer the operator than the park, at ReleaseY, ReleaseAboveOil over the oil line.
@@ -128,8 +122,6 @@ class UMars_FryStation_EntityScript : UMars_FeedStation_EntityScript
     private FCk_Handle_JoltBody _ScoopBody;
     // The right glove's grip (Station.Node.Tool): the skimmer's grip bar, so the glove rides the slide, the dip and the pour.
     private FCk_Handle_Transform _SkimmerHandleNode;
-    // One per piece entity still alive, in admission order.
-    private TArray<FMars_Station_PieceDisplay> _PieceVisuals;
 
     // The base composes the transform, the visuals and nodes (AddVisuals: the basket and skimmer nodes and their bodies, the
     // feed hand and the release node) and the Station (Configure_Spec, grips on the registered nodes); the skimmer Implement
@@ -148,20 +140,13 @@ class UMars_FryStation_EntityScript : UMars_FeedStation_EntityScript
         _FrySpec.Basket.InnerHalfY = BasketInnerHalf;
         _FrySpec.Scoop.CarryLift = 0.0f;
         _FrySpec.Scoop.DipLift = float32(ScoopDipTopZ - ScoopPark.Z);
-        _FrySpec.Reach = Make_Reach();
+        _FrySpec.Reach = utils_fry::Make_Reach(_FrySpec, Get_BasketLocal());
     }
 
-    // A geometry that cannot pour into the basket, or carries the scoop through the rim or the basket's walls, builds no
-    // fryer: the station stands with its label saying so.
+    // A geometry that carries the scoop through the rim or the basket's walls builds no fryer (a basket with no pour window
+    // is the kernel's own Validate): the station stands with its label saying so.
     protected bool Compose_Kernel(FCk_Handle& InHandle) override
     {
-        const auto& Basket = _FrySpec.Basket;
-        const auto BowlRadius = _FrySpec.Scoop.BowlRadius;
-        const auto HasPourWindow = 2.0f * (Basket.InnerHalfX - BowlRadius) >= k_MinPourWindow && 2.0f * (Basket.InnerHalfY - BowlRadius) >= k_MinPourWindow;
-        if (ck::EnsureIfNot(HasPourWindow,
-            f"[FryStation] the basket (InnerHalfX {Basket.InnerHalfX}, InnerHalfY {Basket.InnerHalfY}) leaves a pour window under {k_MinPourWindow} cm for a bowl of radius {BowlRadius}: no fryer is built"))
-        { return false; }
-
         const auto CarryUnderside = ScoopPark.Z - float64(_FrySpec.Scoop.DiscThickness);
         const auto ClearsRimAndWalls = CarryUnderside > PotRimZ && CarryUnderside > Get_BasketWallTopZ();
         if (ck::EnsureIfNot(ClearsRimAndWalls,
@@ -199,9 +184,6 @@ class UMars_FryStation_EntityScript : UMars_FeedStation_EntityScript
             _FryHandle.UnbindFrom_OnAdmissionRefused(FMars_Delegate_Fry_OnAdmissionRefused(this, n"OnAdmissionRefused"));
         }
 
-        // The pieces wear their own displays; only the records go.
-        _PieceVisuals.Empty();
-
         Super::DoEndPlay(InHandle);
     }
 
@@ -213,14 +195,10 @@ class UMars_FryStation_EntityScript : UMars_FeedStation_EntityScript
     {
         // The skimmer's grip bar wraps the right glove around it (riding the slide, the dip and the pour roll).
         auto Grips = TArray<FMars_Station_Grip>();
-        Grips.Add(FMars_Station_Grip(EMars_Hand::Right, GameplayTags::Station_Node_Tool, NAME_None,
-            EMars_HandGripPose::Power, TOptional<float32>(), EMars_FPHands_GripFrame::Node, EMars_FPHands_GripRoll::Fixed));
+        Grips.Add(Make_NodeGrip(EMars_Hand::Right, GameplayTags::Station_Node_Tool, EMars_HandGripPose::Power));
         InOutSpec.Grips = Grips;
 
-        InOutSpec.Camera.LookControl = EMars_Station_LookControl::Captured;
-        InOutSpec.Camera.PitchOffset = CameraPitch;
-        InOutSpec.Camera.ViewLocal = TOptional<FTransform>(FTransform(FRotator(CameraPitch, 0.0, 0.0),
-            FVector(-(PotInnerRadius + ViewGap), 0.0, ViewHeight)));
+        InOutSpec.Camera = Make_CapturedCameraAt(FVector(-(PotInnerRadius + ViewGap), 0.0, ViewHeight), CameraPitch);
         InOutSpec.Prompt = FMars_Station_PromptSpec(
             NSLOCTEXT("MarsInteraction", "FryBatchPrompt", "Fry the batch"),
             NSLOCTEXT("MarsInteraction", "FryStationInUsePrompt", "In use"));
@@ -376,48 +354,16 @@ class UMars_FryStation_EntityScript : UMars_FeedStation_EntityScript
             FTransform(utils_fphands::Make_GripRotation(EMars_Hand::Right, FVector::ForwardVector, -FVector::UpVector), GripLocal)).As_Transform();
     }
 
-    // The skimmer's Implement: never tilted by the look; its slide is the kernel's (Commanded), clamped by the implement
-    // only to the box bounding the kernel's reach (the kernel's own clamp is the real one), and it stays where it is left;
-    // its commanded lift and its pour tilt are the kernel's skim, never the look.
+    // The skimmer's Implement as the kernel drives it (utils_fry::Make_SkimmerImplementSpec), with this station's feel: a
+    // tilt that reaches the pour, a slow critically damped lift, the skimmer node.
     private FMars_Implement_Spec Make_SkimmerImplementSpec() const
     {
-        const auto& Scoop = _FrySpec.Scoop;
-        const auto Bounds = utils_fry::Get_ReachBounds(_FrySpec);
-        auto Spec = SkimmerImplement;
-        Spec.Tilt.Axes = EMars_Implement_TiltAxes::None;
-        Spec.Tilt.Relax = EMars_Implement_Relax::WhileIdle;
-        Spec.Tilt.MaxTiltDegrees = SkimmerMaxTiltDegrees;
-        Spec.Lift.Mode = EMars_Implement_LiftMode::Commanded;
-        Spec.Lift.LiftPerLookDegree = 0.0f;
-        Spec.Lift.MinLift = Scoop.DipLift - SkimmerLiftHeadroom;
-        Spec.Lift.MaxLift = Scoop.CarryLift + SkimmerLiftHeadroom;
-        Spec.Lift.SpringHz = SkimmerLiftSpringHz;
-        Spec.Lift.DampingRatio = SkimmerLiftDampingRatio;
-        Spec.Slide.Mode = EMars_Implement_SlideMode::Commanded;
-        Spec.Slide.CmPerLookDegree = 0.0f;
-        Spec.Slide.Radius = 0.0f;
-        Spec.Slide.Centre = Bounds.Centre - FVector2D(ScoopPark.X, ScoopPark.Y);
-        Spec.Slide.HalfExtentX = float32(Bounds.HalfExtent.X + SkimmerSlideMargin);
-        Spec.Slide.HalfExtentY = float32(Bounds.HalfExtent.Y + SkimmerSlideMargin);
-        Spec.Nodes = FMars_Implement_Nodes(_SkimmerNode);
-        return Spec;
-    }
-
-    // The carried scoop's reach from this station's geometry (the pot disc is the kernel's, from Zones.PotRadius): a corridor
-    // as wide as the basket from the pot's axis to the basket interior's near (-Y) edge (overlapping the pot disc, so the two
-    // join without a gap), and the basket's interior footprint.
-    private FMars_Fry_ReachSpec Make_Reach() const
-    {
-        const auto& Basket = _FrySpec.Basket;
-        const auto BasketY = Get_BasketLocal().Y;
-        const auto InteriorNearY = BasketY - float64(Basket.InnerHalfY);
-
-        auto Reach = _FrySpec.Reach;
-        Reach.CorridorCentre = FVector2D(0.0, InteriorNearY * 0.5);
-        Reach.CorridorHalfExtent = FVector2D(float64(Basket.InnerHalfX), InteriorNearY * 0.5);
-        Reach.BasketCentre = FVector2D(0.0, BasketY);
-        Reach.BasketHalfExtent = FVector2D(float64(Basket.InnerHalfX), float64(Basket.InnerHalfY));
-        return Reach;
+        auto Base = SkimmerImplement;
+        Base.Tilt.MaxTiltDegrees = SkimmerMaxTiltDegrees;
+        Base.Lift.SpringHz = SkimmerLiftSpringHz;
+        Base.Lift.DampingRatio = SkimmerLiftDampingRatio;
+        Base.Nodes = FMars_Implement_Nodes(_SkimmerNode);
+        return utils_fry::Make_SkimmerImplementSpec(_FrySpec, Base, FVector2D(ScoopPark.X, ScoopPark.Y));
     }
 
     // The basket frame (the floor's top centre) in the station frame: on its stand, its interior BasketGap off the pot's
@@ -437,50 +383,37 @@ class UMars_FryStation_EntityScript : UMars_FeedStation_EntityScript
     // The dressing (every frame; the Fry feature and the feed are the source of truth)
     //----------------------------------------------------------------------------------------------------------------------
 
-    // After the base advanced the feed and before it refreshes the label.
-    protected void Dress(float32 InDeltaSeconds) override
+    protected bool Get_HoldsPiece(const FMars_CookingFeed_PieceId& InPieceId) const override
     {
-        if (ck::Is_NOT_Valid(_FryHandle))
-        { return; }
-
-        Advance_PieceVisuals(InDeltaSeconds);
+        return ck::IsValid(_FryHandle) && _FryHandle.Get_HasPiece(InPieceId);
     }
 
-    // Each piece's look from the kernel's mapping of its cook state (utils_cookstate::Make_DisplayParams: its faces' batter
-    // heat, the batter's fry their mean); its oil coat ramps up while it floats in the oil and, in the basket, falls with its
-    // drain progress (never back up). A record whose piece the kernel no longer holds (taken out, or destroyed at the end of its linger) or whose entity
-    // is gone is dropped; a lost piece keeps its last cook state.
-    private void Advance_PieceVisuals(float32 InDeltaSeconds)
+    // A lost piece keeps its last look.
+    protected bool Get_IsPieceFrozen(const FMars_CookingFeed_PieceId& InPieceId) const override
     {
-        for (int32 Index = _PieceVisuals.Num() - 1; Index >= 0; --Index)
+        return _FryHandle.Get_PieceWhereabouts(InPieceId) == EMars_Fry_Whereabouts::Lost;
+    }
+
+    // The kernel's mapping of the piece's cook state (utils_cookstate::Make_DisplayParams: its faces' batter heat, the batter's
+    // fry their mean); its oil coat ramps up while it floats in the oil and, in the basket, falls with its drain progress
+    // (never back up).
+    protected FMars_CookState Make_PieceLook(const FMars_Station_PieceDisplay& InRecord, float32 InDeltaSeconds) const override
+    {
+        const auto OilCoat = InRecord.CookState.OilCoat;
+        auto Look = utils_cookstate::Make_DisplayParams(_FryHandle.Get_PieceCookState(InRecord.Id));
+        Look.OilCoat = OilCoat;
+
+        const auto Whereabouts = _FryHandle.Get_PieceWhereabouts(InRecord.Id);
+        if (Whereabouts == EMars_Fry_Whereabouts::Oil)
+        { Look.OilCoat = Math::FInterpConstantTo(OilCoat, OilCoatInOil, InDeltaSeconds, OilCoatRate); }
+        else if (Whereabouts == EMars_Fry_Whereabouts::DrainBasket)
         {
-            auto Display = _PieceVisuals[Index];
-            if (ck::Is_NOT_Valid(Display.Entity) || _FryHandle.Get_HasPiece(Display.Id) == false)
-            {
-                _PieceVisuals.RemoveAt(Index);
-                continue;
-            }
-
-            const auto Whereabouts = _FryHandle.Get_PieceWhereabouts(Display.Id);
-            if (Whereabouts == EMars_Fry_Whereabouts::Lost)
-            { continue; }
-
-            const auto OilCoat = Display.CookState.OilCoat;
-            Display.CookState = utils_cookstate::Make_DisplayParams(_FryHandle.Get_PieceCookState(Display.Id));
-            Display.CookState.OilCoat = OilCoat;
-
-            if (Whereabouts == EMars_Fry_Whereabouts::Oil)
-            { Display.CookState.OilCoat = Math::FInterpConstantTo(OilCoat, OilCoatInOil, InDeltaSeconds, OilCoatRate); }
-            else if (Whereabouts == EMars_Fry_Whereabouts::DrainBasket)
-            {
-                const auto OilCoatDrained = _FryHandle.Get_Spec().Receiver.DrainedOilCoat;
-                const auto Dripped = OilCoatInOil + (OilCoatDrained - OilCoatInOil) * _FryHandle.Get_PieceDrainProgress(Display.Id);
-                Display.CookState.OilCoat = Math::Min(OilCoat, Dripped);
-            }
-
-            utils_station::Write_PieceDisplay(Display);
-            _PieceVisuals[Index] = Display;
+            const auto OilCoatDrained = _FryHandle.Get_Spec().Receiver.DrainedOilCoat;
+            const auto Dripped = OilCoatInOil + (OilCoatDrained - OilCoatInOil) * _FryHandle.Get_PieceDrainProgress(InRecord.Id);
+            Look.OilCoat = Math::Min(OilCoat, Dripped);
         }
+
+        return Look;
     }
 
     //----------------------------------------------------------------------------------------------------------------------
@@ -519,7 +452,7 @@ class UMars_FryStation_EntityScript : UMars_FeedStation_EntityScript
     UFUNCTION()
     private void OnPieceAdded(FCk_Handle_Fry InFry, FMars_CookingFeed_PieceId InPieceId, FCk_Handle InPiece)
     {
-        _PieceVisuals.Add(utils_station::Make_PieceDisplay(InPieceId, InPiece));
+        Add_PieceRecord(InPieceId, InPiece);
     }
 
     UFUNCTION()

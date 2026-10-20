@@ -1,11 +1,13 @@
 // The heat-station rigs' shared fixture (UMars_AutoTestRig_HeatStation, UMars_AutoTestRig_HeatOperator, and the tumbler's
-// station test): the real searing, fry or tumbler station spawned through its entity script as its own context, World-mode
+// station test): the real searing, fry, batter, tumbler or cutting station spawned through its entity script as its own
+// context, World-mode
 // platters lying on static floors beside it, the FoodPiece rig's box fixture, docking, and the readiness both rigs wait
 // for. What it spawns under the world's transient entity is returned for the rig to track for cleanup (Track_ForCleanup is
 // the test's).
 class UMars_AutoTestHelper_HeatStation : UObject
 {
     private UMars_AutoTestHelper_FoodOnPlatter _FoodOnPlatter;
+    private UMars_AutoTestHelper_CookingFixture _CookingFixture;
 
     // The real searing station at InOrigin with InTiming on its feed, under InOwner; constructed when the returned pending
     // entity script says so.
@@ -37,14 +39,31 @@ class UMars_AutoTestHelper_HeatStation : UObject
         return Spawn_AsOwnContext(utils_entity_script::Request_SpawnEntity(InOwner, UMars_TumblerStation_EntityScript, SpawnParams));
     }
 
+    // The real batter station at InOrigin with InCoatSeconds per coat and the feed's default timing, under InOwner; constructed
+    // when the returned pending entity script says so.
+    FCk_Handle_PendingEntityScript Spawn_Batter(FCk_Handle InOwner, FVector InOrigin, float32 InCoatSeconds)
+    {
+        auto SpawnParams = UMars_BatterStation_EntityScript::Params();
+        SpawnParams.SpawnTransform = FTransform(FRotator::ZeroRotator, InOrigin);
+        SpawnParams.Batter.Coat.CoatSeconds = InCoatSeconds;
+        return Spawn_AsOwnContext(utils_entity_script::Request_SpawnEntity(InOwner, UMars_BatterStation_EntityScript, SpawnParams));
+    }
+
+    // The real cutting station at InOrigin with its default board and the feed's default timing, under InOwner; constructed
+    // when the returned pending entity script says so.
+    FCk_Handle_PendingEntityScript Spawn_Cutting(FCk_Handle InOwner, FVector InOrigin)
+    {
+        auto SpawnParams = UMars_CuttingStation_EntityScript::Params();
+        SpawnParams.SpawnTransform = FTransform(FRotator::ZeroRotator, InOrigin);
+        return Spawn_AsOwnContext(utils_entity_script::Request_SpawnEntity(InOwner, UMars_CuttingStation_EntityScript, SpawnParams));
+    }
+
     // An empty InPlatterItem platter lying on a floor whose top is at InFloorTop (a platter drops what it is given only while
     // it lies still); under construction until Get_IsPlatterReady says otherwise.
     FCk_Handle Spawn_EmptyPlatter(FCk_Handle InOwner, FVector InFloorTop, UCk_InventoryItem_Definition InPlatterItem)
     {
-        auto Owner = InOwner;
-        Spawn_PlatterFloor(Owner, InFloorTop);
-        const auto PlatterWorld = FTransform(FRotator::ZeroRotator, InFloorTop + FVector(0.0, 0.0, constants_platter::k_FloorAboveBase + 0.5));
-        return utils_platter::Request_SpawnWorld(Owner, FMars_Platter_SpawnSpec(PlatterWorld, InPlatterItem));
+        const auto Spec = FMars_Platter_SpawnSpec(FTransform(FRotator::ZeroRotator, InFloorTop), InPlatterItem);
+        return Get_CookingFixture().Spawn_PlatterOnFloor(InOwner, Spec, 60.0);
     }
 
     // InFoodItem's whole joint spawned at InWorld and loaded onto InPlatterEntity once both are constructed (the kernel path:
@@ -57,20 +76,19 @@ class UMars_AutoTestHelper_HeatStation : UObject
         return _FoodOnPlatter.Spawn_Onto(InPlatterEntity, InFoodItem, FTransform(FRotator::ZeroRotator, InWorld));
     }
 
-    // The FoodPiece rig's box fixture (a CPU-readable 1000 cm3 cube) with InKind and no definition: Transform, RuntimeMesh
-    // and FoodPiece on a new entity under the world's transient entity.
+    // The cooking fixture's box (a CPU-readable 1000 cm3 cube) of InKind weighing 0.1 kg, with no definition, under the
+    // world's transient entity.
     FCk_Handle_FoodPiece Build_Box(FTransform InWorld, FGameplayTag InKind)
     {
-        auto Spec = FMars_FoodPiece_Spec();
-        Spec.Data.MassKg = 0.1;
-        Spec.Data.Kind.AddTag(InKind);
-        Spec.Tuners = FMars_FoodPiece_Tuners(0.0001, 0.05);
+        return Get_CookingFixture().Build_Box(InWorld, InKind, 0.1);
+    }
 
-        auto Entity = utils_entity_lifetime::Request_CreateEntity(ck::TransientEntity());
-        utils_transform::Add(Entity, InWorld, ECk_Replication::DoesNotReplicate);
-        utils_runtime_mesh::Add(Entity, FCk_RuntimeMesh_Spec(
-            TSoftObjectPtr<UStaticMesh>(FSoftObjectPath("/CkTests/CkRuntimeMesh/Cooked/SM_Import_CPU.SM_Import_CPU"))));
-        return utils_foodpiece::Add(Entity, Spec);
+    private UMars_AutoTestHelper_CookingFixture Get_CookingFixture()
+    {
+        if (ck::Is_NOT_Valid(_CookingFixture))
+        { _CookingFixture = Cast<UMars_AutoTestHelper_CookingFixture>(NewObject(this, UMars_AutoTestHelper_CookingFixture)); }
+
+        return _CookingFixture;
     }
 
     // Constructed (a World-mode platter whose holder holds its item) with InHeld pieces landed on it.
@@ -112,7 +130,14 @@ class UMars_AutoTestHelper_HeatStation : UObject
         if (ck::IsValid(Searing))
         { return IsComposed && utils_jolt_body::Get_IsBodyAdded(Searing.Get_Spec().Nodes.PanBaseBody); }
 
-        return IsComposed && ck::IsValid(Entity.As_Fry(ECk_SanityCheck::UnChecked));
+        const auto Tumbler = Entity.As_Tumbler(ECk_SanityCheck::UnChecked);
+        if (ck::IsValid(Tumbler))
+        { return IsComposed && utils_jolt_body::Get_IsBodyAdded(Tumbler.Get_Spec().Nodes.DrumBody); }
+
+        if (ck::IsValid(Entity.As_Cutting(ECk_SanityCheck::UnChecked)))
+        { return IsComposed && ck::IsValid(Entity.As_FoodBoard(ECk_SanityCheck::UnChecked)); }
+
+        return IsComposed && (ck::IsValid(Entity.As_Fry(ECk_SanityCheck::UnChecked)) || ck::IsValid(Entity.As_Batter(ECk_SanityCheck::UnChecked)));
     }
 
     // The station's own state machine is in InKind's Operated state.
@@ -122,7 +147,16 @@ class UMars_AutoTestHelper_HeatStation : UObject
         if (InKind == EMars_AutoTest_HeatStation::Searing)
         { return StateClass == UMars_SmState_Searing_Operated; }
 
-        return StateClass == UMars_SmState_Fry_Operated;
+        if (InKind == EMars_AutoTest_HeatStation::Fry)
+        { return StateClass == UMars_SmState_Fry_Operated; }
+
+        if (InKind == EMars_AutoTest_HeatStation::Batter)
+        { return StateClass == UMars_SmState_Batter_Operated; }
+
+        if (InKind == EMars_AutoTest_HeatStation::Tumbler)
+        { return StateClass == UMars_SmState_Tumbler_Operated; }
+
+        return StateClass == UMars_SmState_Cutting_Operated;
     }
 
     // The station's own state machine is in InKind's Idle state.
@@ -132,7 +166,16 @@ class UMars_AutoTestHelper_HeatStation : UObject
         if (InKind == EMars_AutoTest_HeatStation::Searing)
         { return StateClass == UMars_SmState_Searing_Idle; }
 
-        return StateClass == UMars_SmState_Fry_Idle;
+        if (InKind == EMars_AutoTest_HeatStation::Fry)
+        { return StateClass == UMars_SmState_Fry_Idle; }
+
+        if (InKind == EMars_AutoTest_HeatStation::Batter)
+        { return StateClass == UMars_SmState_Batter_Idle; }
+
+        if (InKind == EMars_AutoTest_HeatStation::Tumbler)
+        { return StateClass == UMars_SmState_Tumbler_Idle; }
+
+        return StateClass == UMars_SmState_Cutting_Idle;
     }
 
     // As the map's entity spawner does: the station is its own context, so its state machine's ck::Ctx is the station.
@@ -142,21 +185,5 @@ class UMars_AutoTestHelper_HeatStation : UObject
         auto Station = Pending.Get_EntityUnderConstruction();
         Station.Request_OverrideToSelf();
         return Pending;
-    }
-
-    // A static slab whose top is at InTop, for a World-mode platter to lie still on; a platter spawned at InTop + the tray's
-    // base height rests on it.
-    private void Spawn_PlatterFloor(FCk_Handle InOwner, FVector InTop)
-    {
-        auto Owner = InOwner;
-        auto Floor = utils_entity_lifetime::Request_CreateEntity(Owner);
-        utils_transform::Add(Floor, FTransform(FRotator::ZeroRotator, InTop - FVector(0.0, 0.0, 1.0)), ECk_Replication::DoesNotReplicate);
-        auto Shape = FCk_Jolt_ShapeDimensions(ECk_Jolt_ShapeType::Box);
-        Shape.Set_HalfExtents(FVector(60.0, 60.0, 1.0));
-        auto FloorSpec = FCk_JoltBody_Spec(ECk_JoltBody_ShapeSource::ExplicitShape);
-        FloorSpec.Set_ShapeDimensions(Shape);
-        FloorSpec.Set_MotionType(ECk_MotionType::Static);
-        FloorSpec.Set_CollisionProfileName(n"BlockAll");
-        utils_jolt_body::Add(Floor, FloorSpec);
     }
 }

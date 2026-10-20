@@ -12,7 +12,7 @@ class UMars_AutoTestRig_Station : UCk_AutoTest_Base
     {
         auto StationEntity = utils_entity_lifetime::Request_CreateEntity(InHandle);
         auto Root = utils_transform::Add(StationEntity, FTransform::Identity, ECk_Replication::DoesNotReplicate);
-        return utils_station::Add(Root, InSpec, FMars_Station_Setup());
+        return utils_station::Add(Root, InSpec);
     }
 
     protected FCk_Handle_Operator AddOperator(FCk_Handle InHandle)

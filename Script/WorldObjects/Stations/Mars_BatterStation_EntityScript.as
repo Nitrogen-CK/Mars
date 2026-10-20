@@ -8,8 +8,17 @@
 // docked raw platter: its station-feed tasks turn the operator's add-food press into a left-hand transfer whose release
 // over the bowl lands in the station's admission inbox. The base builds the feed's nodes and the docks and keeps the label;
 // this script builds the bowl and, every frame, dresses every piece (the wet batter's sheen as its coat grows, then its
-// food's battered shell once its ledger says battered, through utils_station::Write_PieceLook) and lowers the right glove
-// with the dip.
+// food's battered shell once its ledger says battered, through Write_Look) and lowers the right glove with the dip.
+
+// A piece a take-out handed back, waiting for its ledger's dip to dress its battered shell.
+struct FMars_BatterStation_Departing
+{
+    FMars_Station_PieceDisplay Display;
+
+    // Frames waited so far.
+    int32 Frames = 0;
+}
+
 class UMars_BatterStation_EntityScript : UMars_FeedStation_EntityScript
 {
     default _ShowInPlaceActors = true;
@@ -79,12 +88,8 @@ class UMars_BatterStation_EntityScript : UMars_FeedStation_EntityScript
     // The right glove's grip (Station.Node.Tool) at its rest offset.
     private FCk_Handle_SceneNode _DipperNode;
     private FTransform _DipperRest;
-    // One per piece the bowl holds, in admission order.
-    private TArray<FMars_Station_PieceDisplay> _PieceVisuals;
-    // Pieces a take-out handed back, waiting for their ledger's dip to dress their battered shell; frames waited, in
-    // parallel.
-    private TArray<FMars_Station_PieceDisplay> _Departing;
-    private TArray<int32> _DepartingFrames;
+    // Pieces a take-out handed back, waiting for their ledger's dip to dress their battered shell.
+    private TArray<FMars_BatterStation_Departing> _Departing;
 
     protected void Prepare_Kernel() override
     {
@@ -125,9 +130,7 @@ class UMars_BatterStation_EntityScript : UMars_FeedStation_EntityScript
         }
 
         // The pieces wear their own displays; only the records go.
-        _PieceVisuals.Empty();
         _Departing.Empty();
-        _DepartingFrames.Empty();
 
         Super::DoEndPlay(InHandle);
     }
@@ -140,14 +143,10 @@ class UMars_BatterStation_EntityScript : UMars_FeedStation_EntityScript
     protected void Configure_Operation(FMars_Station_Spec& InOutSpec) override
     {
         auto Grips = TArray<FMars_Station_Grip>();
-        Grips.Add(FMars_Station_Grip(EMars_Hand::Right, GameplayTags::Station_Node_Tool, NAME_None,
-            EMars_HandGripPose::Open, TOptional<float32>(), EMars_FPHands_GripFrame::Node, EMars_FPHands_GripRoll::Fixed));
+        Grips.Add(Make_NodeGrip(EMars_Hand::Right, GameplayTags::Station_Node_Tool, EMars_HandGripPose::Open));
         InOutSpec.Grips = Grips;
 
-        InOutSpec.Camera.LookControl = EMars_Station_LookControl::Captured;
-        InOutSpec.Camera.PitchOffset = CameraPitch;
-        InOutSpec.Camera.ViewLocal = TOptional<FTransform>(
-            utils_station::Make_ViewLocal(FVector(0.0, 0.0, Get_BowlPivotZ() + BatterDepth), CameraPitch, ViewDistance));
+        InOutSpec.Camera = Make_CapturedCamera(FVector(0.0, 0.0, Get_BowlPivotZ() + BatterDepth), CameraPitch, ViewDistance);
         InOutSpec.Prompt = FMars_Station_PromptSpec(
             NSLOCTEXT("MarsInteraction", "BatterBatchPrompt", "Batter the batch"),
             NSLOCTEXT("MarsInteraction", "BatterStationInUsePrompt", "In use"));
@@ -200,11 +199,18 @@ class UMars_BatterStation_EntityScript : UMars_FeedStation_EntityScript
         return LabelWorldSize;
     }
 
-    // Why the bowl would not take a piece now (the add-food press's gate).
+    // Why the bowl would not take a piece now (the add-food press's gate, the kernel's load refusal).
     protected FString Get_StationGateText() const override
     {
-        if (ck::IsValid(_BatterHandle) && _BatterHandle.Get_PieceCount() >= _BatterHandle.Get_Spec().Bowl.Capacity)
+        if (ck::Is_NOT_Valid(_BatterHandle))
+        { return "station busy"; }
+
+        const auto Refusal = _BatterHandle.TryGet_LoadRefusal();
+        if (Refusal == EMars_Batter_LoadRefusal::Full)
         { return "bowl full"; }
+
+        if (Refusal == EMars_Batter_LoadRefusal::TransferInFlight)
+        { return "wait for the piece"; }
 
         return "station busy";
     }
@@ -254,36 +260,28 @@ class UMars_BatterStation_EntityScript : UMars_FeedStation_EntityScript
     // The dressing (every frame; the Batter feature and the feed are the source of truth)
     //----------------------------------------------------------------------------------------------------------------------
 
-    // After the base advanced the feed and before it refreshes the label.
+    // After the base wrote the pieces' looks and before it refreshes the label.
     protected void Dress(float32 InDeltaSeconds) override
     {
         if (ck::Is_NOT_Valid(_BatterHandle))
         { return; }
 
-        Advance_PieceVisuals();
         Advance_Departing();
         Apply_DipperPose();
     }
 
-    // Each piece's look from its ledger (utils_cookstate::Make_DisplayParams), with the wet batter's sheen (the oil-coat
-    // slot) at its coat so far: the dip reads on the raw display as it coats. A record whose piece the bowl no longer holds
-    // (taken out: OnPieceTakenOut moved it to _Departing; reset) or whose entity is gone is dropped.
-    private void Advance_PieceVisuals()
+    protected bool Get_HoldsPiece(const FMars_CookingFeed_PieceId& InPieceId) const override
     {
-        for (int32 Index = _PieceVisuals.Num() - 1; Index >= 0; --Index)
-        {
-            auto Display = _PieceVisuals[Index];
-            if (ck::Is_NOT_Valid(Display.Entity) || _BatterHandle.Get_HasPiece(Display.Id) == false)
-            {
-                _PieceVisuals.RemoveAt(Index);
-                continue;
-            }
+        return ck::IsValid(_BatterHandle) && _BatterHandle.Get_HasPiece(InPieceId);
+    }
 
-            Display.CookState = utils_cookstate::Make_DisplayParams(Display.Piece.Get_CookState());
-            Display.CookState.OilCoat = _BatterHandle.Get_PieceCoat(Display.Id);
-            utils_station::Write_PieceDisplay(Display);
-            _PieceVisuals[Index] = Display;
-        }
+    // The ledger's look (utils_cookstate::Make_DisplayParams) with the wet batter's sheen (the oil-coat slot) at its coat so
+    // far: the dip reads on the raw display as it coats.
+    protected FMars_CookState Make_PieceLook(const FMars_Station_PieceDisplay& InRecord, float32 InDeltaSeconds) const override
+    {
+        auto Look = utils_cookstate::Make_DisplayParams(InRecord.Piece.Get_CookState());
+        Look.OilCoat = _BatterHandle.Get_PieceCoat(InRecord.Id);
+        return Look;
     }
 
     // A taken-out piece's ledger turns battered a drain after its take-out: its look is written from the ledger then (the
@@ -293,17 +291,20 @@ class UMars_BatterStation_EntityScript : UMars_FeedStation_EntityScript
     {
         for (int32 Index = _Departing.Num() - 1; Index >= 0; --Index)
         {
-            auto Display = _Departing[Index];
-            _DepartingFrames[Index] += 1;
-            const auto IsGone = ck::Is_NOT_Valid(Display.Entity) || ck::Is_NOT_Valid(Display.Piece);
-            const auto IsBattered = IsGone == false && utils_batter::Get_IsBattered(Display.Piece.Get_CookState());
+            auto Departing = _Departing[Index];
+            Departing.Frames += 1;
+            const auto Piece = Departing.Display.Piece;
+            const auto IsGone = ck::Is_NOT_Valid(Departing.Display.Entity) || ck::Is_NOT_Valid(Piece);
+            const auto IsBattered = IsGone == false && utils_batter::Get_IsBattered(Piece.Get_CookState());
             if (IsBattered)
-            { utils_station::Write_PieceLook(Display.Piece, utils_cookstate::Make_DisplayParams(Display.Piece.Get_CookState())); }
-            else if (IsGone == false && _DepartingFrames[Index] < DepartFrames)
-            { continue; }
+            { Piece.Write_Look(utils_cookstate::Make_DisplayParams(Piece.Get_CookState())); }
+            else if (IsGone == false && Departing.Frames < DepartFrames)
+            {
+                _Departing[Index] = Departing;
+                continue;
+            }
 
             _Departing.RemoveAt(Index);
-            _DepartingFrames.RemoveAt(Index);
         }
     }
 
@@ -354,22 +355,20 @@ class UMars_BatterStation_EntityScript : UMars_FeedStation_EntityScript
     UFUNCTION()
     private void OnPieceAdded(FCk_Handle_Batter InBatter, FMars_CookingFeed_PieceId InPieceId, FCk_Handle InPiece)
     {
-        _PieceVisuals.Add(utils_station::Make_PieceDisplay(InPieceId, InPiece));
+        Add_PieceRecord(InPieceId, InPiece);
     }
 
     // The piece leaves the bowl battered: its record waits for the ledger's dip to dress its shell.
     UFUNCTION()
     private void OnPieceTakenOut(FCk_Handle_Batter InBatter, FMars_CookingFeed_PieceId InPieceId, FCk_Handle_FoodPiece InPiece)
     {
-        for (int32 Index = _PieceVisuals.Num() - 1; Index >= 0; --Index)
-        {
-            if (_PieceVisuals[Index].Id.Get_IsSame(InPieceId) == false)
-            { continue; }
+        const auto Record = TryTake_PieceRecord(InPieceId);
+        if (Record.IsSet() == false)
+        { return; }
 
-            _Departing.Add(_PieceVisuals[Index]);
-            _DepartingFrames.Add(0);
-            _PieceVisuals.RemoveAt(Index);
-        }
+        auto Departing = FMars_BatterStation_Departing();
+        Departing.Display = Record.GetValue();
+        _Departing.Add(Departing);
     }
 
     // The piece went back to the raw platter: the label says why.

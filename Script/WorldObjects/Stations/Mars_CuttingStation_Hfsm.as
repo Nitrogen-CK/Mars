@@ -52,31 +52,12 @@ namespace utils_cutting
         return FGameplayTagQuery::MakeQuery_MatchAnyTags(Kinds);
     }
 
-    // The board takes one joint at a time: an add-food press is refused while it holds anything, cut or whole.
-    bool Get_IsBoardBusy(const FCk_Handle_FoodBoard& InBoard)
-    {
-        return InBoard.Get_HeldCount() > 0;
-    }
-
-    // The platter docked on the station's finished-tray dock; invalid with nothing docked.
-    FCk_Handle_Platter TryGet_Tray(FCk_Handle InStation)
-    {
-        const auto Dock = utils_platter_dock::Find_OnStation(InStation, EMars_PlatterDock_Role::Output);
-        if (ck::Is_NOT_Valid(Dock))
-        { return FCk_Handle_Platter(); }
-
-        return Dock.Get_Platter();
-    }
-
     // The sweep, the station's take-out: the board hands its free pieces to the docked finished tray, no more than it has
     // room for, loading each one it lets go. No tray docked caps it at none, which the board refuses (OnReleaseRefused
     // NoRoom), and the station's label says so.
     void Request_Sweep(FCk_Handle InStation)
     {
-        const auto Tray = TryGet_Tray(InStation);
-        const auto Room = ck::IsValid(Tray) ? Tray.Get_FreeCount() : 0;
-        auto Station = InStation;
-        utils_cooking_feed::Request_StationTakeOut(Station, FMars_Request_StationTakeOut(Room, Tray));
+        utils_cooking_feed::Request_TakeOutToDock(InStation, utils_platter_dock::Find_OnStation(InStation, EMars_PlatterDock_Role::Output));
     }
 
     // The turn: the food on the board yaws a quarter turn about the board's pile node, so the next chops cross the last ones.
@@ -138,98 +119,56 @@ class UMars_SmTask_Cutting_ResetOnEnter : UCk_SmTask_EntityScript
     }
 }
 
-// The operator's input, read off its InputIntents: one nudge per drained look delta (its horizontal component in degrees,
-// k_LateralCmPerLookDegree cm along the board each; positive = mouse right = the board's +Y, the operator's right), one
-// chop per rising edge of Interact_Primary, one sweep (utils_cutting::Request_Sweep) per rising edge of Interact_Secondary
-// and one turn (utils_cutting::Request_Turn) per rising edge of Drop (R: the hands are empty at a station, so nothing else
-// reads it here). All are seeded on enter, so a delta or a press from before the station was taken does not count. No
-// operator intents (headless) = nothing to read.
-class UMars_SmTask_Cutting_OperatorInput : UCk_SmTask_EntityScript
+// The operator's input: one nudge per drained look delta (its horizontal component in degrees, k_LateralCmPerLookDegree cm
+// along the board each; positive = mouse right = the board's +Y, the operator's right), one chop per press of
+// Interact_Primary, one sweep (utils_cutting::Request_Sweep) per press of Interact_Secondary and one turn
+// (utils_cutting::Request_Turn) per press of Drop (R: the hands are empty at a station, so nothing else reads it here).
+class UMars_SmTask_Cutting_OperatorInput : UMars_SmTask_StationOperatorInput
 {
-    default _TaskMode = ECk_SmTaskMode::Tick;
-
-    private FCk_Handle _Station;
     private FCk_Handle_Cutting _Cutting;
-    private FCk_Handle_InputIntents _Intents;
-    private int32 _SeenLookSequence = 0;
-    // The activation frame of the Interact_Primary hold last seen; unset while it is not held.
-    private TOptional<int32> _SeenChopFrame;
-    // The same for Interact_Secondary.
-    private TOptional<int32> _SeenSweepFrame;
-    // The same for Drop.
-    private TOptional<int32> _SeenTurnFrame;
+    private FMars_LookCursor _Look;
+    private FMars_IntentEdge _Chop;
+    private FMars_IntentEdge _Sweep;
+    private FMars_IntentEdge _Turn;
 
-    UFUNCTION(BlueprintOverride)
-    void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
+    protected void Bind(FCk_Handle InStation) override
     {
-        auto StationEntity = ck::Ctx(InHandle);
-        _Station = StationEntity;
-        _Cutting = StationEntity.As_Cutting();
-        _Intents = FCk_Handle_InputIntents();
+        _Cutting = InStation.As_Cutting();
+    }
 
-        auto Station = StationEntity.As_Station();
-        auto Operator = Station.Get_Operator();
-        _Intents = Operator.As_InputIntents(ECk_SanityCheck::UnChecked);
-        if (ck::Is_NOT_Valid(_Intents))
+    protected void Seed() override
+    {
+        _Look.Seed(_Intents);
+        _Chop.Seed(_Intents, GameplayTags::Mars_Intent_Interact_Primary);
+        _Sweep.Seed(_Intents, GameplayTags::Mars_Intent_Interact_Secondary);
+        _Turn.Seed(_Intents, GameplayTags::Mars_Intent_Drop);
+    }
+
+    protected void Poll() override
+    {
+        if (ck::Is_NOT_Valid(_Cutting))
         { return; }
 
-        _SeenLookSequence = _Intents.Get_LookDeltaSequence();
-        _SeenChopFrame = _Intents.TryGet_IntentActivationFrame(GameplayTags::Mars_Intent_Interact_Primary);
-        _SeenSweepFrame = _Intents.TryGet_IntentActivationFrame(GameplayTags::Mars_Intent_Interact_Secondary);
-        _SeenTurnFrame = _Intents.TryGet_IntentActivationFrame(GameplayTags::Mars_Intent_Drop);
+        if (_Look.Advance(_Intents))
+        { _Cutting.Request_Nudge(FMars_Request_Cutting_Nudge(float32(_Intents.Get_LookDelta().X) * utils_cutting::k_LateralCmPerLookDegree)); }
+
+        if (utils_station::Get_HasPress(_Chop.Advance(_Intents, GameplayTags::Mars_Intent_Interact_Primary)))
+        { _Cutting.Request_Chop(FMars_Request_Cutting_Chop()); }
+
+        if (utils_station::Get_HasPress(_Sweep.Advance(_Intents, GameplayTags::Mars_Intent_Interact_Secondary)))
+        { utils_cutting::Request_Sweep(_Station); }
+
+        if (utils_station::Get_HasPress(_Turn.Advance(_Intents, GameplayTags::Mars_Intent_Drop)))
+        { utils_cutting::Request_Turn(_Station); }
     }
 
-    // Must return Running every frame: a Succeeded/Failed result would end the task while Operated is still active.
-    UFUNCTION(BlueprintOverride)
-    ECk_SmTaskResult DoTick(FCk_Handle_SmTask InHandle, FCk_Time InDeltaT, ECk_Sm_NetContext InNetContext)
+    protected void Unbind() override
     {
-        if (ck::Is_NOT_Valid(_Cutting) || ck::Is_NOT_Valid(_Intents))
-        { return ECk_SmTaskResult::Running; }
-
-        const auto Sequence = _Intents.Get_LookDeltaSequence();
-        if (Sequence != _SeenLookSequence)
-        {
-            _SeenLookSequence = Sequence;
-            _Cutting.Request_Nudge(FMars_Request_Cutting_Nudge(float32(_Intents.Get_LookDelta().X) * utils_cutting::k_LateralCmPerLookDegree));
-        }
-
-        const auto ChopFrame = _Intents.TryGet_IntentActivationFrame(GameplayTags::Mars_Intent_Interact_Primary);
-        if (ChopFrame != _SeenChopFrame)
-        {
-            _SeenChopFrame = ChopFrame;
-            if (ChopFrame.IsSet())
-            { _Cutting.Request_Chop(FMars_Request_Cutting_Chop()); }
-        }
-
-        const auto SweepFrame = _Intents.TryGet_IntentActivationFrame(GameplayTags::Mars_Intent_Interact_Secondary);
-        if (SweepFrame != _SeenSweepFrame)
-        {
-            _SeenSweepFrame = SweepFrame;
-            if (SweepFrame.IsSet())
-            { utils_cutting::Request_Sweep(_Station); }
-        }
-
-        const auto TurnFrame = _Intents.TryGet_IntentActivationFrame(GameplayTags::Mars_Intent_Drop);
-        if (TurnFrame != _SeenTurnFrame)
-        {
-            _SeenTurnFrame = TurnFrame;
-            if (TurnFrame.IsSet())
-            { utils_cutting::Request_Turn(_Station); }
-        }
-
-        return ECk_SmTaskResult::Running;
-    }
-
-    UFUNCTION(BlueprintOverride)
-    void DoExitTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
-    {
-        _Station = FCk_Handle();
         _Cutting = FCk_Handle_Cutting();
-        _Intents = FCk_Handle_InputIntents();
-        _SeenLookSequence = 0;
-        _SeenChopFrame.Reset();
-        _SeenSweepFrame.Reset();
-        _SeenTurnFrame.Reset();
+        _Look = FMars_LookCursor();
+        _Chop = FMars_IntentEdge();
+        _Sweep = FMars_IntentEdge();
+        _Turn = FMars_IntentEdge();
     }
 }
 
@@ -277,29 +216,27 @@ class UMars_SmTask_Cutting_CutBridge : UCk_SmTask_EntityScript
     }
 }
 
-// The shared add-food input, refused by the cutting station while the board holds anything (utils_cutting::Get_IsBoardBusy:
-// one joint at a time): a refused edge is consumed before BeginTransfer, so nothing is queued.
+// The shared add-food input, refused by the cutting station while the board holds anything (one joint at a time): a
+// refused press is the feed's StationGate refusal, so nothing is queued.
 class UMars_SmTask_CuttingFeed_OperatorInput : UMars_SmTask_StationFeed_OperatorInput
 {
     private FCk_Handle_FoodBoard _Board;
 
-    UFUNCTION(BlueprintOverride)
-    void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
+    protected void Bind(FCk_Handle InStation) override
     {
-        Super::DoEnterTask(InHandle, InNetContext);
-        _Board = ck::Ctx(InHandle).As_FoodBoard();
+        Super::Bind(InStation);
+        _Board = InStation.As_FoodBoard();
     }
 
-    UFUNCTION(BlueprintOverride)
-    void DoExitTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
+    protected void Unbind() override
     {
-        Super::DoExitTask(InHandle, InNetContext);
+        Super::Unbind();
         _Board = FCk_Handle_FoodBoard();
     }
 
     protected bool Get_CanBeginTransfer() const override
     {
-        return utils_cutting::Get_IsBoardBusy(_Board) == false;
+        return ck::IsValid(_Board) && _Board.Get_HeldCount() == 0;
     }
 }
 
@@ -310,17 +247,15 @@ class UMars_SmTask_CuttingFeed_OperatorHints : UMars_SmTask_StationFeed_Operator
     private FCk_Handle_FoodBoard _Board;
 
     // The board first: the row's first text reads it.
-    UFUNCTION(BlueprintOverride)
-    void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
+    protected void Register_Rows() override
     {
-        _Board = ck::Ctx(InHandle).As_FoodBoard();
+        _Board = _Station.As_FoodBoard();
         _Board.BindTo_OnPlaced(FMars_Delegate_FoodBoard_OnPlaced(this, n"OnBoardPlaced"));
         _Board.BindTo_OnReleased(FMars_Delegate_FoodBoard_OnReleased(this, n"OnBoardReleased"));
-        Super::DoEnterTask(InHandle, InNetContext);
+        Super::Register_Rows();
     }
 
-    UFUNCTION(BlueprintOverride)
-    void DoExitTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
+    protected void Unregister_Rows() override
     {
         if (ck::IsValid(_Board))
         {
@@ -328,13 +263,13 @@ class UMars_SmTask_CuttingFeed_OperatorHints : UMars_SmTask_StationFeed_Operator
             _Board.UnbindFrom_OnReleased(FMars_Delegate_FoodBoard_OnReleased(this, n"OnBoardReleased"));
         }
 
-        Super::DoExitTask(InHandle, InNetContext);
+        Super::Unregister_Rows();
         _Board = FCk_Handle_FoodBoard();
     }
 
     protected TOptional<FString> TryGet_StationRefusal() const override
     {
-        if (utils_cutting::Get_IsBoardBusy(_Board) == false)
+        if (ck::Is_NOT_Valid(_Board) || _Board.Get_HeldCount() == 0)
         { return TOptional<FString>(); }
 
         const FString Refusal = "board busy";
@@ -354,22 +289,17 @@ class UMars_SmTask_CuttingFeed_OperatorHints : UMars_SmTask_StationFeed_Operator
     }
 }
 
-// The operator's legend rows while operating, under owner key k_OwnerKey: "move hand" (IA_Look), "chop"
-// (IA_Interact_Primary), "to tray" (IA_Interact_Secondary) while a finished tray is docked, and "turn" (IA_Drop) while the
-// board holds anything; the add-food row (sort order 6) is the feed's, between chop and to tray. The board's count is the
-// station's world label, not a row: a legend row without an InputAction does not render. An operator without a display
-// (headless) gets no rows.
-class UMars_SmTask_Cutting_OperatorHints : UCk_SmTask_EntityScript
+// The operator's legend rows while operating: "move hand" (IA_Look), "chop" (IA_Interact_Primary), "to tray"
+// (IA_Interact_Secondary) while a finished tray is docked, and "turn" (IA_Drop) while the board holds anything; the add-food
+// row (sort order 6) is the feed's, between chop and to tray. The board's count is the station's world label, not a row: a
+// legend row without an InputAction does not render.
+class UMars_SmTask_Cutting_OperatorHints : UMars_SmTask_StationOperatorHints
 {
-    default _TaskMode = ECk_SmTaskMode::EnterExitOnly;
-
-    private const FName k_OwnerKey = n"Cutting";
     private const int32 k_MoveHandSortOrder = 4;
     private const int32 k_ChopSortOrder = 5;
     private const int32 k_SweepSortOrder = 9;
     private const int32 k_TurnSortOrder = 10;
 
-    private FCk_Handle_ActionHintDisplay _Display;
     private FCk_Handle_PlatterDock _OutputDock;
     private FCk_Handle_FoodBoard _Board;
     // Registered while a finished tray is docked.
@@ -377,22 +307,17 @@ class UMars_SmTask_Cutting_OperatorHints : UCk_SmTask_EntityScript
     // Registered while the board holds anything.
     private FCk_Handle_ActionHintRow _TurnRow;
 
-    UFUNCTION(BlueprintOverride)
-    void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
+    protected FName Get_OwnerKey() const override
     {
-        _Display = FCk_Handle_ActionHintDisplay();
+        return n"Cutting";
+    }
 
-        auto StationEntity = ck::Ctx(InHandle);
-        auto Station = StationEntity.As_Station();
-        auto Operator = Station.Get_Operator();
-        _Display = Operator.As_ActionHintDisplay(ECk_SanityCheck::UnChecked);
-        if (ck::Is_NOT_Valid(_Display))
-        { return; }
+    protected void Register_Rows() override
+    {
+        Show_Row(FCk_Handle_ActionHintRow(), Make_Row(mars::Mars_IA_Look, "move hand", k_MoveHandSortOrder));
+        Show_Row(FCk_Handle_ActionHintRow(), Make_Row(mars::Mars_IA_Interact_Primary, "chop", k_ChopSortOrder));
 
-        _Display.Request_RegisterHint(FMars_ActionHint_Spec(mars::Mars_IA_Look, FText::FromString("move hand"), k_MoveHandSortOrder, k_OwnerKey));
-        _Display.Request_RegisterHint(FMars_ActionHint_Spec(mars::Mars_IA_Interact_Primary, FText::FromString("chop"), k_ChopSortOrder, k_OwnerKey));
-
-        _Board = StationEntity.As_FoodBoard(ECk_SanityCheck::UnChecked);
+        _Board = _Station.As_FoodBoard(ECk_SanityCheck::UnChecked);
         if (ck::IsValid(_Board))
         {
             _Board.BindTo_OnPlaced(FMars_Delegate_FoodBoard_OnPlaced(this, n"OnBoardPlaced"));
@@ -400,18 +325,17 @@ class UMars_SmTask_Cutting_OperatorHints : UCk_SmTask_EntityScript
             Refresh_TurnRow();
         }
 
-        _OutputDock = utils_platter_dock::Find_OnStation(StationEntity, EMars_PlatterDock_Role::Output);
+        _OutputDock = utils_platter_dock::Find_OnStation(_Station, EMars_PlatterDock_Role::Output);
         if (ck::Is_NOT_Valid(_OutputDock))
         { return; }
 
         _OutputDock.BindTo_OnDocked(FMars_Delegate_PlatterDock_OnDocked(this, n"OnOutputDocked"));
         _OutputDock.BindTo_OnUndocked(FMars_Delegate_PlatterDock_OnUndocked(this, n"OnOutputUndocked"));
         if (ck::IsValid(_OutputDock.Get_Platter()))
-        { Register_Sweep(); }
+        { Show_Sweep(); }
     }
 
-    UFUNCTION(BlueprintOverride)
-    void DoExitTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
+    protected void Unregister_Rows() override
     {
         if (ck::IsValid(_OutputDock))
         {
@@ -425,22 +349,16 @@ class UMars_SmTask_Cutting_OperatorHints : UCk_SmTask_EntityScript
             _Board.UnbindFrom_OnReleased(FMars_Delegate_FoodBoard_OnReleased(this, n"OnBoardReleased"));
         }
 
-        if (ck::IsValid(_Display))
-        { _Display.Request_UnregisterHintsByOwner(FMars_Request_ActionHintDisplay_UnregisterByOwner(k_OwnerKey)); }
-
-        _Display = FCk_Handle_ActionHintDisplay();
         _OutputDock = FCk_Handle_PlatterDock();
         _Board = FCk_Handle_FoodBoard();
         _SweepRow = FCk_Handle_ActionHintRow();
         _TurnRow = FCk_Handle_ActionHintRow();
     }
 
-    private void Register_Sweep()
+    private void Show_Sweep()
     {
-        if (ck::IsValid(_SweepRow))
-        { return; }
-
-        _SweepRow = _Display.Request_RegisterHint(FMars_ActionHint_Spec(mars::Mars_IA_Interact_Secondary, FText::FromString("to tray"), k_SweepSortOrder, k_OwnerKey));
+        if (ck::Is_NOT_Valid(_SweepRow))
+        { _SweepRow = Show_Row(_SweepRow, Make_Row(mars::Mars_IA_Interact_Secondary, "to tray", k_SweepSortOrder)); }
     }
 
     // A cut keeps the count above zero, so placements and releases are the only edges.
@@ -449,31 +367,24 @@ class UMars_SmTask_Cutting_OperatorHints : UCk_SmTask_EntityScript
         const auto HoldsAnything = _Board.Get_HeldCount() > 0;
         if (HoldsAnything && ck::Is_NOT_Valid(_TurnRow))
         {
-            _TurnRow = _Display.Request_RegisterHint(FMars_ActionHint_Spec(mars::Mars_IA_Drop, FText::FromString("turn"), k_TurnSortOrder, k_OwnerKey));
+            _TurnRow = Show_Row(_TurnRow, Make_Row(mars::Mars_IA_Drop, "turn", k_TurnSortOrder));
             return;
         }
 
-        if (HoldsAnything == false && ck::IsValid(_TurnRow))
-        {
-            _Display.Request_UnregisterHint(FMars_Request_ActionHintDisplay_Unregister(_TurnRow));
-            _TurnRow = FCk_Handle_ActionHintRow();
-        }
+        if (HoldsAnything == false)
+        { _TurnRow = Clear_Row(_TurnRow); }
     }
 
     UFUNCTION()
     private void OnOutputDocked(FCk_Handle_PlatterDock InDock, FCk_Handle_Platter InPlatter)
     {
-        Register_Sweep();
+        Show_Sweep();
     }
 
     UFUNCTION()
     private void OnOutputUndocked(FCk_Handle_PlatterDock InDock, FCk_Handle_Platter InPlatter)
     {
-        if (ck::Is_NOT_Valid(_SweepRow))
-        { return; }
-
-        _Display.Request_UnregisterHint(FMars_Request_ActionHintDisplay_Unregister(_SweepRow));
-        _SweepRow = FCk_Handle_ActionHintRow();
+        _SweepRow = Clear_Row(_SweepRow);
     }
 
     UFUNCTION()

@@ -94,10 +94,8 @@ struct FMars_HangingChain_Catenary
     }
 }
 
-class AMars_HangingChain : AActor
+class AMars_HangingChain : AMars_LinkDressing
 {
-    default bReplicates = false;
-
     // Static with the links (a Static child cannot attach to a Movable root); UseStaticMobility flips both.
     UPROPERTY(DefaultComponent, RootComponent)
     USceneComponent SceneRoot;
@@ -158,7 +156,6 @@ class AMars_HangingChain : AActor
     UPROPERTY(Category = "Links")
     float32 LinkOverlap = 6.0f;
 
-    private const FString KitLinkAsset = "/Game/Mars/Environment/Meshes/Crypt/CryptChainLink_Mars_SM";
     private const FVector CubeLinkScale = FVector(0.07, 0.015, 0.04);
 
     UPROPERTY(Category = "Links")
@@ -181,8 +178,6 @@ class AMars_HangingChain : AActor
     UPROPERTY(Category = "Physics")
     bool UseStaticMobility = true;
 
-    private const FName JoltNoBakeTag = n"Ck.Jolt.NoBake";
-
     UFUNCTION(BlueprintOverride)
     void ConstructionScript()
     {
@@ -194,7 +189,12 @@ class AMars_HangingChain : AActor
     {
         auto Mesh = LinkMesh;
         if (ck::Is_NOT_Valid(Mesh))
-        { Mesh = TryLoad_KitLink(); }
+        {
+            // Found once, the kit link is kept on LinkMesh.
+            Mesh = TryLoad_EditorMesh(KitMeshFolder, "CryptChainLink_Mars_SM");
+            if (ck::IsValid(Mesh))
+            { LinkMesh = Mesh; }
+        }
 
         const bool IsCubeFallback = ck::Is_NOT_Valid(Mesh);
         if (IsCubeFallback)
@@ -232,26 +232,6 @@ class AMars_HangingChain : AActor
         return Spline.GetSplineLength();
     }
 
-    // The kit link, looked up only in the editor world (a missing package must not log: it fails automation runs,
-    // and the editor asset library refuses play worlds). Found once, it is kept on LinkMesh so PIE and cooked builds
-    // never look it up.
-    private UStaticMesh TryLoad_KitLink()
-    {
-#if EDITOR
-        auto World = GetWorld();
-        if (ck::Is_NOT_Valid(World) || World.IsGameWorld() || EditorAsset::DoesAssetExist(KitLinkAsset) == false)
-        { return nullptr; }
-
-        auto Found = Cast<UStaticMesh>(LoadObject(this, f"{KitLinkAsset}.CryptChainLink_Mars_SM"));
-        if (ck::IsValid(Found))
-        { LinkMesh = Found; }
-
-        return Found;
-#else
-        return nullptr;
-#endif
-    }
-
     // Instance properties cannot be defaults: they are applied per rebuild.
     private void ApplyPhysics()
     {
@@ -265,23 +245,9 @@ class AMars_HangingChain : AActor
         Primitives.Add(EndAttachment);
 
         for (auto Primitive : Primitives)
-        {
-            if (Collides)
-            {
-                Primitive.SetCollisionProfileName(collision::profile::BlockAll);
-                Primitive.ComponentTags.Remove(JoltNoBakeTag);
-            }
-            else
-            {
-                Primitive.SetCollisionProfileName(collision::profile::NoCollision);
-                Primitive.ComponentTags.AddUnique(JoltNoBakeTag);
-            }
-        }
+        { Apply_Collides(Primitive, Collides); }
 
-        if (Collides)
-        { Tags.Remove(JoltNoBakeTag); }
-        else
-        { Tags.AddUnique(JoltNoBakeTag); }
+        Apply_ActorBaked(Collides);
     }
 
     private void AuthorSpline()
@@ -318,14 +284,12 @@ class AMars_HangingChain : AActor
         Spline.UpdateSpline();
     }
 
-    // The overlap never eats more than half a link: a short fallback link still reads as a chain.
     private float Get_LinkPitch(UStaticMesh InMesh, FVector InScale) const
     {
         if (LinkPitchOverride > 0.0f)
         { return float(LinkPitchOverride); }
 
-        const float MeshLength = 2.0 * InMesh.GetBounds().BoxExtent.X * InScale.X;
-        return Math::Max(MeshLength - float(LinkOverlap), Math::Max(MeshLength * 0.5, 1.0));
+        return Get_LinkPitchOf(InMesh, InScale, LinkOverlap);
     }
 
     // DefaultComponents survive construction-script reruns, so the instances must be cleared first.

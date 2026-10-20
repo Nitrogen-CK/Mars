@@ -19,9 +19,13 @@ struct FMars_Steward_Body
     FTransform MeshOffset = FTransform(FRotator(0.0, -90.0, 0.0), FVector::ZeroVector, FVector::OneVector);
 
     // Uniform body scale. Steward_Mars_SK is authored at the steward's height (289.9 cm to the top of its toque, its
-    // eyes 229 cm up), so this is 1; it is the one number to change to try another height.
+    // eyes ReferenceEyeHeightCm up), so this is 1; it is the one number to change to try another height.
     UPROPERTY()
     float32 Scale = 1.0f;
+
+    // The reference pose's eye height above the root (cm): where the face is taken to be before the body exists.
+    UPROPERTY()
+    float32 ReferenceEyeHeightCm = 229.0f;
 }
 
 // Where the eyes sit on the steward. They are drawn by the body mesh itself: its face plate is the EyesSlot section,
@@ -104,6 +108,55 @@ namespace constants_steward
     const FName k_VictimTag = n"TAG_MarsCombatTarget";
 }
 
+// The face plate: a square SizeCm wide, DistanceCm in front of the victim's eye. Just past the 10 cm near plane, so it is
+// nearer than the first-person gloves and whatever they hold (drawn scaled toward the eye, FMars_FPHands_ViewSpec). It
+// must cover the view: at a 90 degree field of view the view is twice the distance wide.
+struct FMars_Steward_MawPlate
+{
+    UPROPERTY()
+    float32 SizeCm = 60.0f;
+
+    UPROPERTY()
+    float32 DistanceCm = 12.0f;
+
+    // The plate's light while the face shows. The look divides it by the view's exposure, so it is what reaches the
+    // screen whatever the level's light: 1 is the tonemapper's near-white, where the teeth lose their shading.
+    UPROPERTY()
+    float32 Brightness = 0.7f;
+}
+
+// By the end of the grin: how hot the eyes burn and how far they have turned to the evil shape (both finish in the bite's
+// first moments), and how far the head is cocked.
+struct FMars_Steward_MawGrin
+{
+    UPROPERTY()
+    float32 Heat = 0.7f;
+
+    UPROPERTY()
+    float32 Evil = 0.5f;
+
+    UPROPERTY()
+    float32 TiltDeg = -8.0f;
+}
+
+// The bite: where the victim's view is held once lifted (DistanceCm out of the face node along its +X, looking back at
+// it), the face's Zoom while the open maw is held in view (GapeZoom) and as the jaws close on the view (Zoom), and how
+// far the view shudders by the bite's end (half view widths).
+struct FMars_Steward_MawBite
+{
+    UPROPERTY()
+    float32 DistanceCm = 45.0f;
+
+    UPROPERTY()
+    float32 GapeZoom = 1.12f;
+
+    UPROPERTY()
+    float32 Zoom = 3.4f;
+
+    UPROPERTY()
+    float32 Shake = 0.02f;
+}
+
 // How the steward stages a devouring (the Devour feature runs its clock): where the victim's view is taken, and the face
 // plate that fills it from Blink on.
 struct FMars_Steward_Maw
@@ -111,45 +164,14 @@ struct FMars_Steward_Maw
     UPROPERTY()
     FMars_Devour_Timing Timing;
 
-    // Where the victim's view is held once lifted: this far out of the face node along its +X, looking back at it.
     UPROPERTY()
-    float32 BiteDistanceCm = 45.0f;
-
-    // The face plate: a square this wide, this far in front of the victim's eye. Just past the 10 cm near plane, so it
-    // is nearer than the first-person gloves and whatever they hold (drawn scaled toward the eye, FMars_FPHands_ViewSpec).
-    // It must cover the view: at a 90 degree field of view the view is twice the distance wide.
-    UPROPERTY()
-    float32 PlateSizeCm = 60.0f;
+    FMars_Steward_MawPlate Plate;
 
     UPROPERTY()
-    float32 PlateDistanceCm = 12.0f;
-
-    // The plate's light while the face shows. The look divides it by the view's exposure, so it is what reaches the
-    // screen whatever the level's light: 1 is the tonemapper's near-white, where the teeth lose their shading.
-    UPROPERTY()
-    float32 Brightness = 0.7f;
-
-    // The face's Zoom while the open maw is held in view, and as the jaws close on the view.
-    UPROPERTY()
-    float32 GapeZoom = 1.12f;
+    FMars_Steward_MawGrin Grin;
 
     UPROPERTY()
-    float32 BiteZoom = 3.4f;
-
-    // By the end of the grin: how hot the eyes burn and how far they have turned to the evil shape (both finish in the
-    // bite's first moments), and how far the head is cocked. And how far the view shudders by the bite's end (half
-    // view widths).
-    UPROPERTY()
-    float32 GrinHeat = 0.7f;
-
-    UPROPERTY()
-    float32 GrinEvil = 0.5f;
-
-    UPROPERTY()
-    float32 GrinTiltDeg = -8.0f;
-
-    UPROPERTY()
-    float32 BiteShake = 0.02f;
+    FMars_Steward_MawBite Bite;
 
     // The plate lifts off the victim's view over this long once the victim is let go: the world comes back from black.
     UPROPERTY()
@@ -159,22 +181,22 @@ struct FMars_Steward_Maw
 // The face plate through the run, InAlpha 0..1 through InPhase. Blink is black (the cut from the steward's head to the
 // plate). Grin opens the eyes at once, then splits the mouth into the clenched grin of needle teeth while the eyes
 // narrow, catch fire and start to turn, the head cocks and the face creeps closer. Bite finishes the eyes' turn to evil,
-// fully alight, as the jaws swing wide; the gaping maw is held in view (GapeZoom), shuddering, then comes down over the view (BiteZoom), snaps
-// shut and goes black. Swallowed stays black. Seize and Lift have no plate. The plate hides the whole world throughout
-// (Veil 1).
+// fully alight, as the jaws swing wide; the gaping maw is held in view (Bite.GapeZoom), shuddering, then comes down over
+// the view (Bite.Zoom), snaps shut and goes black. Swallowed stays black. Seize and Lift have no plate. The plate hides the
+// whole world throughout (Veil 1).
 mixin FMars_Steward_MawFrame Get_Frame(const FMars_Steward_Maw& Self, EMars_Devour_Phase InPhase, float32 InAlpha)
 {
     auto Frame = FMars_Steward_MawFrame();
     const float32 GrinZoom = 1.08f;
     const float32 GrinEyeOpen = 0.8f;
-    const auto GrinTilt = float32(Math::DegreesToRadians(Self.GrinTiltDeg));
+    const auto GrinTilt = float32(Math::DegreesToRadians(Self.Grin.TiltDeg));
 
     if (InPhase == EMars_Devour_Phase::Grin)
     {
-        Frame.Strength = Self.Brightness;
+        Frame.Strength = Self.Plate.Brightness;
         Frame.EyeOpen = Math::SmoothStep(0.0f, 0.1f, InAlpha) * Math::Lerp(1.0f, GrinEyeOpen, Math::SmoothStep(0.4f, 1.0f, InAlpha));
-        Frame.Heat = Self.GrinHeat * Math::SmoothStep(0.2f, 0.9f, InAlpha);
-        Frame.Evil = Self.GrinEvil * Math::SmoothStep(0.55f, 1.0f, InAlpha);
+        Frame.Heat = Self.Grin.Heat * Math::SmoothStep(0.2f, 0.9f, InAlpha);
+        Frame.Evil = Self.Grin.Evil * Math::SmoothStep(0.55f, 1.0f, InAlpha);
         Frame.Mouth = Math::SmoothStep(0.3f, 0.75f, InAlpha);
         Frame.TiltRadians = GrinTilt * Math::SmoothStep(0.2f, 1.0f, InAlpha);
         Frame.Zoom = Math::Lerp(1.0f, GrinZoom, InAlpha);
@@ -190,13 +212,13 @@ mixin FMars_Steward_MawFrame Get_Frame(const FMars_Steward_Maw& Self, EMars_Devo
         const float32 BlackAt = 0.93f;
 
         const auto Turning = Math::SmoothStep(0.0f, 0.2f, InAlpha);
-        Frame.Strength = InAlpha < BlackAt ? Self.Brightness : 0.0f;
+        Frame.Strength = InAlpha < BlackAt ? Self.Plate.Brightness : 0.0f;
         Frame.EyeOpen = Math::Lerp(GrinEyeOpen, 1.0f, Turning);
         Frame.Mouth = 1.0f;
-        Frame.Evil = Math::Lerp(Self.GrinEvil, 1.0f, Turning);
-        Frame.Heat = Math::Lerp(Self.GrinHeat, 1.0f, Turning);
+        Frame.Evil = Math::Lerp(Self.Grin.Evil, 1.0f, Turning);
+        Frame.Heat = Math::Lerp(Self.Grin.Heat, 1.0f, Turning);
         Frame.TiltRadians = GrinTilt * (1.0f - Math::SmoothStep(0.0f, 0.25f, InAlpha));
-        Frame.Shake = Self.BiteShake * InAlpha;
+        Frame.Shake = Self.Bite.Shake * InAlpha;
 
         const auto Opening = Math::Clamp(InAlpha / OpenAt, 0.0f, 1.0f);
         const auto Shutting = Math::Clamp((InAlpha - ShutFrom) / (ShutAt - ShutFrom), 0.0f, 1.0f);
@@ -204,7 +226,7 @@ mixin FMars_Steward_MawFrame Get_Frame(const FMars_Steward_Maw& Self, EMars_Devo
 
         const auto Gaping = Math::SmoothStep(0.0f, LungeFrom, InAlpha);
         const auto Lunge = Math::Clamp((InAlpha - LungeFrom) / (ShutAt - LungeFrom), 0.0f, 1.0f);
-        Frame.Zoom = Math::Lerp(Math::Lerp(GrinZoom, Self.GapeZoom, Gaping), Self.BiteZoom, Lunge * Lunge);
+        Frame.Zoom = Math::Lerp(Math::Lerp(GrinZoom, Self.Bite.GapeZoom, Gaping), Self.Bite.Zoom, Lunge * Lunge);
     }
 
     return Frame;
@@ -237,6 +259,9 @@ class UMars_Steward_Config : UDataAsset
         if ((Body.Scale > 0.0f) == false)
         { return FMars_Validation(f"Body.Scale [{Body.Scale}] must be positive"); }
 
+        if ((Body.ReferenceEyeHeightCm > 0.0f) == false)
+        { return FMars_Validation(f"Body.ReferenceEyeHeightCm [{Body.ReferenceEyeHeightCm}] must be positive"); }
+
         // IsValid: finite, with a normalized rotation.
         if (Body.MeshOffset.IsValid() == false)
         { return FMars_Validation(f"Body.MeshOffset [{Body.MeshOffset}] is not finite or its rotation is not normalized"); }
@@ -265,32 +290,32 @@ class UMars_Steward_Config : UDataAsset
         { return FMars_Validation(f"Maw.Timing: {TimingValidation.Get_Error()}"); }
 
         // A NaN fails each comparison, so it is rejected too.
-        if ((Maw.BiteDistanceCm > 0.0f) == false)
-        { return FMars_Validation(f"Maw.BiteDistanceCm [{Maw.BiteDistanceCm}] must be positive"); }
+        if ((Maw.Bite.DistanceCm > 0.0f) == false)
+        { return FMars_Validation(f"Maw.Bite.DistanceCm [{Maw.Bite.DistanceCm}] must be positive"); }
 
-        if ((Maw.PlateDistanceCm > 0.0f) == false)
-        { return FMars_Validation(f"Maw.PlateDistanceCm [{Maw.PlateDistanceCm}] must be positive"); }
+        if ((Maw.Plate.DistanceCm > 0.0f) == false)
+        { return FMars_Validation(f"Maw.Plate.DistanceCm [{Maw.Plate.DistanceCm}] must be positive"); }
 
-        if ((Maw.PlateSizeCm >= Maw.PlateDistanceCm * 2.0f) == false)
-        { return FMars_Validation(f"Maw.PlateSizeCm [{Maw.PlateSizeCm}] must be at least twice PlateDistanceCm [{Maw.PlateDistanceCm}] to cover the view"); }
+        if ((Maw.Plate.SizeCm >= Maw.Plate.DistanceCm * 2.0f) == false)
+        { return FMars_Validation(f"Maw.Plate.SizeCm [{Maw.Plate.SizeCm}] must be at least twice Plate.DistanceCm [{Maw.Plate.DistanceCm}] to cover the view"); }
 
-        if ((Maw.GapeZoom >= 1.0f) == false)
-        { return FMars_Validation(f"Maw.GapeZoom [{Maw.GapeZoom}] must be at least 1"); }
+        if ((Maw.Bite.GapeZoom >= 1.0f) == false)
+        { return FMars_Validation(f"Maw.Bite.GapeZoom [{Maw.Bite.GapeZoom}] must be at least 1"); }
 
-        if ((Maw.BiteZoom >= Maw.GapeZoom) == false)
-        { return FMars_Validation(f"Maw.BiteZoom [{Maw.BiteZoom}] must be at least GapeZoom [{Maw.GapeZoom}]"); }
+        if ((Maw.Bite.Zoom >= Maw.Bite.GapeZoom) == false)
+        { return FMars_Validation(f"Maw.Bite.Zoom [{Maw.Bite.Zoom}] must be at least Bite.GapeZoom [{Maw.Bite.GapeZoom}]"); }
 
-        if ((Maw.GrinHeat >= 0.0f && Maw.GrinHeat <= 1.0f) == false)
-        { return FMars_Validation(f"Maw.GrinHeat [{Maw.GrinHeat}] must be within 0..1"); }
+        if ((Maw.Grin.Heat >= 0.0f && Maw.Grin.Heat <= 1.0f) == false)
+        { return FMars_Validation(f"Maw.Grin.Heat [{Maw.Grin.Heat}] must be within 0..1"); }
 
-        if ((Maw.GrinEvil >= 0.0f && Maw.GrinEvil <= 1.0f) == false)
-        { return FMars_Validation(f"Maw.GrinEvil [{Maw.GrinEvil}] must be within 0..1"); }
+        if ((Maw.Grin.Evil >= 0.0f && Maw.Grin.Evil <= 1.0f) == false)
+        { return FMars_Validation(f"Maw.Grin.Evil [{Maw.Grin.Evil}] must be within 0..1"); }
 
-        if ((Maw.BiteShake >= 0.0f) == false)
-        { return FMars_Validation(f"Maw.BiteShake [{Maw.BiteShake}] is negative"); }
+        if ((Maw.Bite.Shake >= 0.0f) == false)
+        { return FMars_Validation(f"Maw.Bite.Shake [{Maw.Bite.Shake}] is negative"); }
 
-        if ((Maw.Brightness >= 0.0f) == false)
-        { return FMars_Validation(f"Maw.Brightness [{Maw.Brightness}] is negative"); }
+        if ((Maw.Plate.Brightness >= 0.0f) == false)
+        { return FMars_Validation(f"Maw.Plate.Brightness [{Maw.Plate.Brightness}] is negative"); }
 
         if ((Maw.FadeBackSeconds >= 0.0f) == false)
         { return FMars_Validation(f"Maw.FadeBackSeconds [{Maw.FadeBackSeconds}] is negative"); }

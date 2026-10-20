@@ -1,7 +1,7 @@
 // A plain workbench station: a TableDepth x TableWidth x TableHeight table centred on the origin (depth along local X,
 // width along local Y), the operator standing StandGap uu in front of its -X edge facing +X, and the right glove flat on
 // the table top near that edge. Place it with +X pointing away from where the player walks up.
-class UMars_WorkbenchStation_EntityScript : UMars_Station_EntityScript
+class UMars_WorkbenchStation_EntityScript : UMars_CounterStation_EntityScript
 {
     default _ShowInPlaceActors = true;
 
@@ -16,29 +16,34 @@ class UMars_WorkbenchStation_EntityScript : UMars_Station_EntityScript
 
     private FCk_Handle_Transform _TableTopNode;
 
-    protected void Configure_Spec(FMars_Station_Spec& InOutSpec) override
+    protected void Configure_Operation(FMars_Station_Spec& InOutSpec) override
     {
-        InOutSpec.StandLocal = FTransform(FRotator::ZeroRotator, FVector(-(TableDepth * 0.5 + StandGap), 0.0, 0.0));
-
         auto Grips = TArray<FMars_Station_Grip>();
         Grips.Add(FMars_Station_Grip(EMars_Hand::Right, GameplayTags::Station_Node_Surface, NAME_None,
             EMars_HandGripPose::Open, TOptional<float32>(), EMars_FPHands_GripFrame::Aimed, EMars_FPHands_GripRoll::Fixed));
         InOutSpec.Grips = Grips;
     }
 
-    protected TOptional<FMars_Interactable_ProbeInfo> Make_Probe() const override
+    protected FVector2D Get_CounterFootprint() const override
     {
-        auto Probe = FMars_Interactable_ProbeInfo();
-        Probe.ProbeSpec = FCk_Probe_Spec(GameplayTags::Probe_Mars_Interact);
-        Probe.ProbeShape = utils_shapes::Make_Box(
-            FCk_ShapeBox_Dimensions(FVector(TableDepth * 0.5 + 5.0, TableWidth * 0.5 + 5.0, TableHeight * 0.5 + 5.0)));
-        Probe.ProbeOffset = FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, TableHeight * 0.5));
-        return TOptional<FMars_Interactable_ProbeInfo>(Probe);
+        return FVector2D(TableDepth, TableWidth);
+    }
+
+    protected float64 Get_StandGap() const override
+    {
+        return StandGap;
+    }
+
+    // No label and nothing that moves.
+    protected bool Get_HasDressing() const override
+    {
+        return false;
     }
 
     // Engine cube is 100 uu with its pivot at the centre.
     protected void AddVisuals(FCk_Handle_Transform& InRoot) override
     {
+        _Root = InRoot;
         InRoot.Add_MeshPart(this, FMars_MeshPart(
             FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, TableHeight * 0.5), FVector(TableDepth, TableWidth, TableHeight) * 0.01),
             engine::load::Cube(), assets::load::ProtoGrid_Platform_Mars_MI(), collision::profile::BlockAll, n"Workbench_Table"));

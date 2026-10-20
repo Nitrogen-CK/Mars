@@ -1,8 +1,11 @@
-// Which heat station a heat-station test spawned.
+// Which station a heat-station or heat-operator test spawned (UMars_AutoTestRig_HeatStation spawns only Searing and Fry).
 enum EMars_AutoTest_HeatStation
 {
     Searing,
-    Fry
+    Fry,
+    Batter,
+    Tumbler,
+    Cutting
 }
 
 // The heat-station rig: the real searing or fry station, spawned at an isolated origin through its entity script with its
