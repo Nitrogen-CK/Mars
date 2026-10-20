@@ -153,10 +153,12 @@ class UMars_AutoTestState_ManipulateControlBothIntentsRig : UCk_SmState_EntitySc
     }
 }
 
-// Use and Primary on one key (the keyboard's left mouse button) with Primary resolving the Use channel first, as the player
-// maps them: one press on a lever opens both intents, and it starts one interaction, which the pull ends. Regression for the
-// second interaction the Primary task started in the same frame (neither was live yet): the pull ended one, the other stayed
-// live while the key was held, and the focus task stayed pinned on the lever, its prompt on screen (2026-10-20).
+// Use and Primary held from the same frame with Primary resolving the Use channel first, as the player has them: the left
+// mouse button drives both input actions, so one click brings both rows down on one frame (two rows on one physical key do
+// not bake: a shared terminal resolves to one intent). One click on a lever opens both intents, and it starts one
+// interaction, which the pull ends. Regression for the second interaction the Primary task started in the same frame
+// (neither was live yet): the pull ended one, the other stayed live while the button was held, and the focus task stayed
+// pinned on the lever, its prompt on screen (2026-10-20).
 class UMars_AutoTest_Control_ASharedKeyPressStartsOneInteraction : UMars_AutoTestRig_LeverThroughPlayer
 {
     default _TimeoutSeconds = 15.0f;
@@ -166,9 +168,9 @@ class UMars_AutoTest_Control_ASharedKeyPressStartsOneInteraction : UMars_AutoTes
     {
         BuildPlayerAndLever(InHandle, FMars_FPHands_Spec());
 
-        // The Primary row on the Use row's own key.
+        // The Primary row on a key of its own, pressed in the Use row's frame.
         auto ExtraRows = TArray<FMars_AutoTestHelper_KeyRow>();
-        ExtraRows.Add(FMars_AutoTestHelper_KeyRow(EKeys::F9, GameplayTags::Mars_Intent_Interact_Primary, n"IP"));
+        ExtraRows.Add(FMars_AutoTestHelper_KeyRow(EKeys::F10, GameplayTags::Mars_Intent_Interact_Primary, n"IP"));
         _UseKey = Cast<UMars_AutoTestHelper_UseKey>(NewObject(this, UMars_AutoTestHelper_UseKey));
         _UseKey.Build_WithRows(InHandle, EKeys::F9, ExtraRows);
 
@@ -177,12 +179,12 @@ class UMars_AutoTest_Control_ASharedKeyPressStartsOneInteraction : UMars_AutoTes
         Add_Step_WaitUntil("the Hands SM rests, listening for a reach", n"Check_HandsRest", 0, 0);
         Add_Step("focus the lever", n"Step_FocusLever");
         Add_Steps_UseRowLive();
-        Add_Step("offer the lever to the resolver and press the shared key", n"Step_UseLever");
+        Add_Step("offer the lever to the resolver and press Use and Primary in one frame", n"Step_PressBothRows");
         Add_Step_WaitUntil("the gloves grip and the lever is manipulated", n"Check_IsManipulating", k_SlowPolls, 0);
         Add_Step_WaitUntil("pull until the threshold ends the manipulation", n"Check_PullUntilEnded", 0, 0);
         Add_Step_WaitUntil("the interaction finishes", n"Check_InteractionFinished", 0, 0);
-        Add_Step_WaitSeconds("the shared key stays held", 0.3f);
-        Add_Step("one interaction started, and none is left while the key is held", n"Step_AssertOneInteraction");
+        Add_Step_WaitSeconds("both rows stay held", 0.3f);
+        Add_Step("one interaction started, and none is left while the rows are held", n"Step_AssertOneInteraction");
         Run_Steps(InHandle);
     }
 
@@ -214,13 +216,22 @@ class UMars_AutoTest_Control_ASharedKeyPressStartsOneInteraction : UMars_AutoTes
         _Interactable.Request_Focus(FMars_Request_Interactable_Focus(_Player));
     }
 
+    // What one left click does: both input actions go down on the same frame.
+    UFUNCTION()
+    private void Step_PressBothRows(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        OfferLever();
+        _UseKey.Press();
+        _UseKey.Press_Row(GameplayTags::Mars_Intent_Interact_Primary);
+    }
+
     UFUNCTION()
     private void Step_AssertOneInteraction(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_True(Get_IsUseHeld(), "the shared key is still held");
-        Assert_Equals_Int(_NewInteractionCount, 1, "one press on the shared key started one interaction");
+        Assert_True(Get_IsUseHeld(), "Use is still held");
+        Assert_Equals_Int(_NewInteractionCount, 1, "one click on both rows started one interaction");
         Assert_Equals_Int(_FinishedResults.Num(), 1, "the pull finished it");
         Assert_False(ck::IsValid(utils_interact_target::TryGet_Interaction(_Target, _Player)),
-            "no interaction from the player is left on the lever while the key is held");
+            "no interaction from the player is left on the lever while the rows are held");
     }
 }
