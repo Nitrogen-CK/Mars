@@ -265,13 +265,6 @@
       "added": "2026-10-19"
     },
     {
-      "test": "Project.Functional Tests.Mars.Maps.AutoTests_Mars_MAP.Mars_AutoTest_PackFit_WornPackRaisesTheCrouch",
-      "status": "red",
-      "reason": "Mars test that has never passed since it was added (89fcf5a, 2026-10-17). The production pawn it spawns is destroyed 7 frames later, standing still on the test floor (a temporary OnDestroyed trace on 2026-10-19 logged it at Z 8054.5, test not finished), before any step runs; no Mars script destroys a pawn, so the destroyer is not identified. The pair of ensures that fail it (CkTransform SyncToActor 'does NOT have a valid RootComponent' on the Player entity, CkSway 'Player.Hand offset was written by something other than Sway') are the entity outliving its destroyed actor for a frame.",
-      "evidence": "Mars dev c37b85b+ (script review, 2026-10-19), UnrealToolbox: 21 runs in Saved/Logs, 0 passes - every full gate that day (editor-ui, mechanisms, combat, interaction, player-hands, crawler, items-cutcarry, stations, the final combined pass) and solo fresh boots (Review-player-hands-PackFit.log); the same ensure pair in Saved/Logs/V3h-transient.log from 2026-10-17, before the review.",
-      "added": "2026-10-19"
-    },
-    {
       "test": "Project.Functional Tests.Mars.Maps.AutoTests_Mars_MAP.Mars_AutoTest_EyesDummy_ComposesAndWrites",
       "status": "red",
       "reason": "Mars test. Seen: CkUsf: Look [MarsEyePlate] master material has shader compile errors (or is still compiling) - it will render as the checkered DefaultMaterial. See LogShaderCompilers for the HLSL error, then re-run Generate Look Materials or 'RecompileShaders Material M_CkUsf_Look_MarsEyePlate'. [log]",
