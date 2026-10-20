@@ -1,4 +1,4 @@
-"""Warrens v3: the live layout, data/warrens.json (run: python design_warrens_v3.py).
+"""Warrens v3: the previous live layout, kept as data/warrens_v3.json (run: python design_warrens_v3.py).
 
 r2 spread 140 x 110 m of mostly corridor around a hearth on the west edge. v3 folds the same anchors, node names and
 closure group into 96 x 80 m on two stacked levels, Dark Souls style:
@@ -15,7 +15,7 @@ import json
 import math
 from pathlib import Path
 
-OUT = Path(__file__).resolve().parent / 'data' / 'warrens.json'
+OUT = Path(__file__).resolve().parent / 'data' / 'warrens_v3.json'
 TUNNEL, CORRIDOR = 2.5, 3.0
 
 NODES = {

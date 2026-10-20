@@ -22,5 +22,17 @@ such map has a frozen route graph here.
   and the Jolt bake. The builder rasterizes each level at 0.5 m (links by width, rooms, foyer pads walkable; the rest
   of the footprint solid), so bent passages are built as drawn. The Deep is roofed; the map has no daylight.
 
+- `viewer/` is a 3D mockup of any `data/warrens*.json` (see `viewer/README.md`): `python viewer/make_layouts.py`,
+  then open `viewer/index.html`. Orbit, plan and a first-person walk at the chef's speeds under the game's lantern
+  darkness, with the checker's metrics beside it. It is where a layout is iterated before the builder runs.
+- `design_warrens_v4.py` writes `data/warrens_v4.json`: v3's graph with the rooms, pockets, water and props fleshed
+  out (`docs/design/expedition-maps-r02/warrens-v4/REVIEW.md`). Not live: it uses data the builder cannot build yet
+  (polygon rooms, per-cell floor heights, pockets, water, props; listed at the top of `viewer/viewer.js`).
+
+- Route gates with a crawl beside them carry a `leverNode` (the end of the link on whose side a one-sided lever gate puts
+  its lever); pockets (`niches`) carry an `anchorId` (the CamelCase tag leaf) and the `C` ones are the plan's `caches`
+  (`maxActiveCaches` resolve Active per run). The builder places one flavour anchor per pocket and gives each route anchor
+  its lever side and crawl plug point; every pocket id needs its `Anchor.Mars.Warrens.<Id>` tag registered by hand.
+
 Changing a node position or a link cost changes the plan, so the solver tests' expected distances must be
 recomputed from the new data.

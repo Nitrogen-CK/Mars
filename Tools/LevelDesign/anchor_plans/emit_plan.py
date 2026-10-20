@@ -65,7 +65,13 @@ def main():
     for e in d["entrances"] + d["courts"]:
         if e["node"] not in nodes:
             fail(f"{e['anchorId']} names an unknown node")
-    anchor_ids = grouped + [e["anchorId"] for e in d["entrances"] + d["courts"]]
+    for l in d["links"]:
+        if l.get("leverNode") and (not l["closedBy"] or l["leverNode"] not in (l["a"], l["b"])):
+            fail(f"link {l['a']}-{l['b']}: a lever node must be an end of a closable link")
+    caches = d.get("caches", [])
+    if len(caches) != len(set(caches)):
+        fail("cache anchor ids must be unique")
+    anchor_ids = grouped + [e["anchorId"] for e in d["entrances"] + d["courts"]] + caches
     tags = registered_tags()
     for aid in anchor_ids:
         if not re.fullmatch(r"[A-Za-z][A-Za-z0-9]*", aid):
@@ -84,15 +90,17 @@ def main():
     w(f"    MapName = n\"{title}\";")
     w(f"    Hearth = n\"{d['hearth']}\";")
     w(f"    QuarryMinWalkCm = {f(d['quarryMinWalkCm'])}f;")
-    w(f"    SourceRevision = \"{d['source']}\";")
+    w(f"    SourceRevision = \"{d['source'].replace(chr(92), chr(92) * 2).replace(chr(34), chr(92) + chr(34))}\";")  # a quote in the source string must not end the literal
     w("")
     for nid in sorted(nodes):
         x, y, z = nodes[nid]
         w(f"    Nodes.Add(FMars_AnchorPlan_Node(n\"{nid}\", FVector({f(x * 100)}, {f(y * 100)}, {f(z * 100)})));")
     w("")
-    for l in d["links"]:
+    for li, l in enumerate(d["links"]):
         closed = anchor_accessor(title, l["closedBy"]) if l["closedBy"] else "FGameplayTag()"
         w(f"    Links.Add(FMars_AnchorPlan_Link(n\"{l['a']}\", n\"{l['b']}\", {f(l['costCm'])}f, {closed}));")
+        if l.get("leverNode"):
+            w(f"    Links[{li}].LeverNode = n\"{l['leverNode']}\";")
     w("")
     for e in d["entrances"]:
         w(f"    Entrances.Add(FMars_AnchorPlan_Entrance({anchor_accessor(title, e['anchorId'])}, n\"{e['playerStartTag']}\", n\"{e['node']}\"));")
@@ -103,6 +111,11 @@ def main():
         w(f"    Groups.Add(FMars_AnchorPlan_Group(n\"{g['name']}\", {g['maxClosed']}));")
         for a in g["anchorIds"]:
             w(f"    Groups[{gi}].AnchorIds.Add({anchor_accessor(title, a)});")
+    if caches:
+        w("")
+        w(f"    MaxActiveCaches = {int(d.get('maxActiveCaches', 2))};")
+        for a in caches:
+            w(f"    Caches.Add({anchor_accessor(title, a)});")
     w("}")
     w("")
     w("namespace utils_anchor_resolver")
