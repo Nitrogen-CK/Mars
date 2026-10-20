@@ -2974,6 +2974,29 @@ class UMars_TESTONLY_Processor_CrawlerMelee_EngageWatch_Driver : UMars_TESTONLY_
     }
 }
 
+class UMars_TESTONLY_Processor_CrawlerMelee_HolderCommand_Driver : UMars_TESTONLY_Processor_CrawlerMelee_HolderCommand
+{
+    UFUNCTION(BlueprintOverride)
+    void Configure(FCk_ScriptProcessorQuery& Query)
+    {
+        Query.ReadWrite(FMars_TESTONLY_CrawlerMelee_HolderCommand);
+        Super::Configure(Query);
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void ForEachBatch(FCk_ScriptQueryBatch Batch, FCk_Time InDeltaT)
+    {
+        auto _CkPerfScope = ck::ScopedStat("UMars_TESTONLY_Processor_CrawlerMelee_HolderCommand_Driver::ForEachBatch");
+        const int32 NumEntities = Batch.Num();
+        for (int32 i = 0; i < NumEntities; ++i)
+        {
+            auto Handle = Batch.GetHandle(i);
+            FMars_TESTONLY_CrawlerMelee_HolderCommand& P0 = Batch.Get(i, FMars_TESTONLY_CrawlerMelee_HolderCommand);
+            ForEachEntity(InDeltaT, Handle, P0);
+        }
+    }
+}
+
 class UMars_TESTONLY_Processor_CrawlerMelee_MoveToWatch_Driver : UMars_TESTONLY_Processor_CrawlerMelee_MoveToWatch
 {
     UFUNCTION(BlueprintOverride)

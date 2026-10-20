@@ -131,7 +131,7 @@ class UMars_Anchor_QuarryCrawler4_EntityScript : UMars_Crawler_EntityScript
         Spec.Combat.Targeting.HomeRadius = Anchor.HomeRadiusCm;
         Spec.Combat.Targeting.AcquireRadius = Anchor.HomeRadiusCm + 100.0f;
         Spec.Combat.Targeting.LoseRadius = Anchor.HomeRadiusCm + 400.0f;
-        Spec.Combat.Loadout = utils_crawler::Get_AttackReferenceLoadout(EMars_Crawler_AttackPreset::Crawler4, false);
+        Spec.Combat.Loadout = utils_crawler::Get_AttackReferenceLoadout(EMars_Crawler_AttackPreset::Crawler4, EMars_AttackReference_Kind::Parity);
         Spec.Combat.JabClip = TSoftObjectPtr<UCk_ProceduralAction_Data>();
         Spec.Combat.PincerClip = TSoftObjectPtr<UCk_ProceduralAction_Data>();
         return Super::DoConstruct(InHandle);

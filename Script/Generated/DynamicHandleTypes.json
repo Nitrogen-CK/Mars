@@ -507,7 +507,7 @@
 		{
 			"TypeName": "FCk_Handle_Pendulum",
 			"ShortName": "Pendulum",
-			"Description": "A swinging hazard: an oscillator whose hazard is armed while it runs",
+			"Description": "A swinging hazard: an oscillator whose hazard is armed while it swings",
 			"SourceAsset": "/Script/AngelscriptAssets.Mars_PendulumHandle",
 			"RequiredFragments": [
 				"Mars_Feature_Pendulum"
