@@ -2096,6 +2096,19 @@ namespace UMars_AutoTest_Control_ARefusedReachBeginsTheManipulationAtOnce
 }
 
 USTRUCT()
+struct FMars_AutoTest_Control_ASharedKeyPressStartsOneInteraction_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Control_ASharedKeyPressStartsOneInteraction
+{
+    FMars_AutoTest_Control_ASharedKeyPressStartsOneInteraction_SpawnParams Params()
+    {
+        return FMars_AutoTest_Control_ASharedKeyPressStartsOneInteraction_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_Control_GripBegunManipulationEngagesAtThreshold_SpawnParams
 {
 }
@@ -2148,6 +2161,19 @@ namespace UMars_AutoTest_Control_MomentaryReleasesAndReArms
 }
 
 USTRUCT()
+struct FMars_AutoTest_Control_NoInteractionOutlivesAPulledGrip_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Control_NoInteractionOutlivesAPulledGrip
+{
+    FMars_AutoTest_Control_NoInteractionOutlivesAPulledGrip_SpawnParams Params()
+    {
+        return FMars_AutoTest_Control_NoInteractionOutlivesAPulledGrip_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_Control_PendingGripFreezesCamera_SpawnParams
 {
 }
@@ -2157,6 +2183,32 @@ namespace UMars_AutoTest_Control_PendingGripFreezesCamera
     FMars_AutoTest_Control_PendingGripFreezesCamera_SpawnParams Params()
     {
         return FMars_AutoTest_Control_PendingGripFreezesCamera_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Control_PromptClearsWhenALetGoGripEnds_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Control_PromptClearsWhenALetGoGripEnds
+{
+    FMars_AutoTest_Control_PromptClearsWhenALetGoGripEnds_SpawnParams Params()
+    {
+        return FMars_AutoTest_Control_PromptClearsWhenALetGoGripEnds_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Control_PromptClearsWhenAPulledGripEnds_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Control_PromptClearsWhenAPulledGripEnds
+{
+    FMars_AutoTest_Control_PromptClearsWhenAPulledGripEnds_SpawnParams Params()
+    {
+        return FMars_AutoTest_Control_PromptClearsWhenAPulledGripEnds_SpawnParams();
     }
 }
 
@@ -9910,6 +9962,19 @@ namespace UMars_AutoTestState_LeftLocomotion
     FMars_AutoTestState_LeftLocomotion_SpawnParams Params()
     {
         return FMars_AutoTestState_LeftLocomotion_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTestState_ManipulateControlBothIntentsRig_SpawnParams
+{
+}
+
+namespace UMars_AutoTestState_ManipulateControlBothIntentsRig
+{
+    FMars_AutoTestState_ManipulateControlBothIntentsRig_SpawnParams Params()
+    {
+        return FMars_AutoTestState_ManipulateControlBothIntentsRig_SpawnParams();
     }
 }
 
