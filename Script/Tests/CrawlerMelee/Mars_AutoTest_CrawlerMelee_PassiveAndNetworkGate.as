@@ -126,7 +126,7 @@ class UMars_AutoTest_CrawlerMelee_PassiveAndNetworkGate : UMars_AutoTestRig_Craw
         ck::Trace(f"[CrawlerMelee] passive and network gate: world net mode={Get_NetModeText()}");
 
         Assert_False(_Crawler.Get_IsCombatArmed(), "(1) the crawler is unarmed");
-        Assert_False(_Crawler.Has_Fragment(FMars_Fragment_Crawler_Engage), "(1) the unarmed crawler carries no Engage state");
+        Assert_False(_Crawler.Has_Fragment(FMars_Fragment_Crawler_EngageBlackboard), "(1) the unarmed crawler carries no Engage state");
         Assert_True(_Violation.Len() == 0, f"(1) the unarmed crawler never engaged ({_Violation})");
     }
 

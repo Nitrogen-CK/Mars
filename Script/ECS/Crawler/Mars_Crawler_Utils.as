@@ -219,7 +219,7 @@ namespace utils_crawler
             }
 
             RootEntity.Add_Fragment(Selection);
-            RootEntity.Add_Fragment(FMars_Fragment_Crawler_Engage());
+            RootEntity.Add_Fragment(FMars_Fragment_Crawler_EngageBlackboard());
         }
 
         // Last: Alive's conditions read the Dead attribute and the brain as the machine enters its initial state.
@@ -770,10 +770,10 @@ mixin TOptional<EMars_Crawler_AttackReject> Get_StartRejection(const FCk_Handle_
 // The Engage behaviour's current stage; None outside Engage and on an unarmed crawler.
 mixin EMars_Crawler_EngageStage Get_EngageStage(const FCk_Handle_Crawler& Self)
 {
-    if (Self.Has_Fragment(FMars_Fragment_Crawler_Engage) == false)
+    if (Self.Has_Fragment(FMars_Fragment_Crawler_EngageBlackboard) == false)
     { return EMars_Crawler_EngageStage::None; }
 
-    return Self.Get_Fragment(FMars_Fragment_Crawler_Engage).Stage;
+    return Self.Get_Fragment(FMars_Fragment_Crawler_EngageBlackboard).Stage;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

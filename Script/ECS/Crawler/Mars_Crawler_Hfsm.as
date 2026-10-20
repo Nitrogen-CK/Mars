@@ -253,11 +253,11 @@ class UMars_SmState_Crawler_Engage : UCk_SmState_EntityScript
         Navigator.Request_Stop(FMars_Request_SurfaceNavigator_Stop());
         Crawler.Request_CancelAttack(FMars_Request_Crawler_CancelAttack(EMars_Crawler_AttackCancel::StateExit));
 
-        if (Crawler.Has_Fragment(FMars_Fragment_Crawler_Engage) == false)
+        if (Crawler.Has_Fragment(FMars_Fragment_Crawler_EngageBlackboard) == false)
         { return; }
 
-        auto& Engage = Crawler.Get_Fragment(FMars_Fragment_Crawler_Engage);
-        Engage = FMars_Fragment_Crawler_Engage();
+        auto& Engage = Crawler.Get_Fragment(FMars_Fragment_Crawler_EngageBlackboard);
+        Engage = FMars_Fragment_Crawler_EngageBlackboard();
     }
 }
 
@@ -380,7 +380,7 @@ class UMars_SmTask_Crawler_EngageStage : UCk_SmTask_EntityScript
         if (ck::Is_NOT_Valid(_Crawler))
         { return; }
 
-        auto& Engage = _Crawler.Get_Fragment(FMars_Fragment_Crawler_Engage);
+        auto& Engage = _Crawler.Get_Fragment(FMars_Fragment_Crawler_EngageBlackboard);
         Engage.Stage = Stage;
         Engage.StageElapsed = 0.0f;
         EnterStage(Engage);
@@ -393,7 +393,7 @@ class UMars_SmTask_Crawler_EngageStage : UCk_SmTask_EntityScript
         if (ck::Is_NOT_Valid(_Crawler))
         { return ECk_SmTaskResult::Running; }
 
-        auto& Engage = _Crawler.Get_Fragment(FMars_Fragment_Crawler_Engage);
+        auto& Engage = _Crawler.Get_Fragment(FMars_Fragment_Crawler_EngageBlackboard);
         if (Engage.Stage != Stage)
         { return ECk_SmTaskResult::Running; }
 
@@ -411,14 +411,14 @@ class UMars_SmTask_Crawler_EngageStage : UCk_SmTask_EntityScript
         _Crawler = FCk_Handle_Crawler();
     }
 
-    protected void EnterStage(FMars_Fragment_Crawler_Engage& InOutEngage) {}
+    protected void EnterStage(FMars_Fragment_Crawler_EngageBlackboard& InOutEngage) {}
 
-    protected void TickStage(FMars_Fragment_Crawler_Engage& InOutEngage) {}
+    protected void TickStage(FMars_Fragment_Crawler_EngageBlackboard& InOutEngage) {}
 
     protected void ExitStage() {}
 
     // Wait, which hands back to Approach no sooner than InRetrySeconds from now (0: as soon as the cooldown is over).
-    protected void HandOverToWait(FMars_Fragment_Crawler_Engage& InOutEngage, float32 InRetrySeconds)
+    protected void HandOverToWait(FMars_Fragment_Crawler_EngageBlackboard& InOutEngage, float32 InRetrySeconds)
     {
         InOutEngage.RetryUntil = InRetrySeconds;
         InOutEngage.Stage = EMars_Crawler_EngageStage::Wait;
@@ -440,12 +440,12 @@ class UMars_SmTask_Crawler_Engage_Approach : UMars_SmTask_Crawler_EngageStage
 {
     default Stage = EMars_Crawler_EngageStage::Approach;
 
-    protected void EnterStage(FMars_Fragment_Crawler_Engage& InOutEngage) override
+    protected void EnterStage(FMars_Fragment_Crawler_EngageBlackboard& InOutEngage) override
     {
         InOutEngage.LastRepathAt.Reset();
     }
 
-    protected void TickStage(FMars_Fragment_Crawler_Engage& InOutEngage) override
+    protected void TickStage(FMars_Fragment_Crawler_EngageBlackboard& InOutEngage) override
     {
         const auto Target = _Crawler.Get_CombatTarget();
         // A target that is no longer valid clears the HasCombatTarget fact, and the replan leaves Engage.
@@ -509,7 +509,7 @@ class UMars_SmTask_Crawler_Engage_Approach : UMars_SmTask_Crawler_EngageStage
         { RequestMoveTo(InOutEngage, TargetLocation); }
     }
 
-    private void RequestMoveTo(FMars_Fragment_Crawler_Engage& InOutEngage, FVector InTargetLocation)
+    private void RequestMoveTo(FMars_Fragment_Crawler_EngageBlackboard& InOutEngage, FVector InTargetLocation)
     {
         auto Navigator = _Crawler.Get_Navigator();
         Navigator.Request_MoveTo(FMars_Request_SurfaceNavigator_MoveTo(InTargetLocation));
@@ -533,14 +533,14 @@ class UMars_SmTask_Crawler_Engage_Prepare : UMars_SmTask_Crawler_EngageStage
     private bool _StopRequested = false;
     private TOptional<FVector> _AimedTangent;
 
-    protected void EnterStage(FMars_Fragment_Crawler_Engage& InOutEngage) override
+    protected void EnterStage(FMars_Fragment_Crawler_EngageBlackboard& InOutEngage) override
     {
         _StopRequested = false;
         _AimedTangent.Reset();
         _Crawler.Request_PrepareAttack(FMars_Request_Crawler_PrepareAttack(_Crawler.Get_CombatTarget(), ECk_EnableDisable::Enable));
     }
 
-    protected void TickStage(FMars_Fragment_Crawler_Engage& InOutEngage) override
+    protected void TickStage(FMars_Fragment_Crawler_EngageBlackboard& InOutEngage) override
     {
         auto Navigator = _Crawler.Get_Navigator();
         if (_StopRequested == false)
@@ -629,7 +629,7 @@ class UMars_SmTask_Crawler_Engage_Attack : UMars_SmTask_Crawler_EngageStage
     private int32 _UnadmittedTicks = 0;
     private bool _CommittedSteerSent = false;
 
-    protected void EnterStage(FMars_Fragment_Crawler_Engage& InOutEngage) override
+    protected void EnterStage(FMars_Fragment_Crawler_EngageBlackboard& InOutEngage) override
     {
         _GenerationAtStart = _Crawler.Get_AttackGeneration();
         _UnadmittedTicks = 0;
@@ -646,7 +646,7 @@ class UMars_SmTask_Crawler_Engage_Attack : UMars_SmTask_Crawler_EngageStage
             Advice.Selection.Selected.GetValue(), Advice.SelectionGeneration));
     }
 
-    protected void TickStage(FMars_Fragment_Crawler_Engage& InOutEngage) override
+    protected void TickStage(FMars_Fragment_Crawler_EngageBlackboard& InOutEngage) override
     {
         const auto Phase = _Crawler.Get_AttackPhase();
         if (_Crawler.Get_AttackGeneration() != _GenerationAtStart)
@@ -688,13 +688,13 @@ class UMars_SmTask_Crawler_Engage_Wait : UMars_SmTask_Crawler_EngageStage
 {
     default Stage = EMars_Crawler_EngageStage::Wait;
 
-    protected void EnterStage(FMars_Fragment_Crawler_Engage& InOutEngage) override
+    protected void EnterStage(FMars_Fragment_Crawler_EngageBlackboard& InOutEngage) override
     {
         auto Navigator = _Crawler.Get_Navigator();
         Navigator.Request_Stop(FMars_Request_SurfaceNavigator_Stop());
     }
 
-    protected void TickStage(FMars_Fragment_Crawler_Engage& InOutEngage) override
+    protected void TickStage(FMars_Fragment_Crawler_EngageBlackboard& InOutEngage) override
     {
         if (_Crawler.Get_IsHeldByAttack() || InOutEngage.StageElapsed < InOutEngage.RetryUntil)
         { return; }

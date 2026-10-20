@@ -243,6 +243,9 @@ These are maintainer rulings; they override defaults from the framework skills w
   `TArray<...>` per kind on `FMars_Fragment_<Feature>_Requests`, drained by `UMars_Processor_<Feature>_HandleRequests`
   (snapshot → `Request_TryRemove` → apply in documented order → broadcast). Signals are `delegate`/`event _MC` pairs in
   `FMars_Fragment_<Feature>_Signals`, bound lazily, broadcast only `if (Has_Fragment(Signals))`.
+  One exception: a feature's own HFSM may keep its working state in a blackboard fragment
+  (`FMars_Fragment_<Feature>_<SubSm>Blackboard`) that only its tasks write and no processor reads (stage, stage clock,
+  retry deadline). It holds no simulation state; anything a processor needs goes through a request.
 - **Namespaces.** Only `utils_<feature>` namespaces exist. No helper namespaces (`mars_foo`, `mars_foo_math`); fold
   them into the feature's utils when you touch them. Functions that read feature state are `mixin`s on the typed
   handle; pure helpers are `utils_<feature>` functions.

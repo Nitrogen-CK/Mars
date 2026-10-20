@@ -827,10 +827,10 @@ enum EMars_Crawler_EngageStage
     Wait
 }
 
-// Owner: the Engage stage tasks (Mars_Crawler_Hfsm.as), not a processor: each stage's task writes the stage it hands over
-// to and the sub-SM's polled conditions read it; leaving Engage resets it. Times are on the current stage's clock,
-// StageElapsed.
-struct FMars_Fragment_Crawler_Engage
+// The Engage sub-SM's blackboard (the request-doctrine exception in CLAUDE.md): only the Engage stage tasks
+// (Mars_Crawler_Hfsm.as) write it and no processor reads it; each stage's task writes the stage it hands over to and the
+// sub-SM's polled conditions read it; leaving Engage resets it. Times are on the current stage's clock, StageElapsed.
+struct FMars_Fragment_Crawler_EngageBlackboard
 {
     UPROPERTY()
     EMars_Crawler_EngageStage Stage = EMars_Crawler_EngageStage::None;
