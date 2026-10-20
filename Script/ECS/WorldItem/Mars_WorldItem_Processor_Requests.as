@@ -1,4 +1,4 @@
-// Drains ArriveNextMount, then Release (each kind in queue order) for Persistent world items. Where a world item mounts
+// Drains ArriveNextMount (latest wins), then Release (in queue order) for Persistent world items. Where a world item mounts
 // is not requested: UMars_Processor_WorldItem_Reconcile derives it from the inventory its item lives in.
 //
 // A Release validates before it mutates: the item must sit in an inventory other than the holder, with no release already

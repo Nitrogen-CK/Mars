@@ -87,7 +87,7 @@ class UMars_SmTask_ItemUse_Refuel : UCk_SmTask_EntityScript
             return;
         }
 
-        Lantern.Request_Refuel(FMars_Request_Lantern_Refuel(Tallow.Get_TallowMeasures()));
+        Lantern.Request_Refuel(FMars_Request_Lantern_Refuel(Tallow.Get_Tallow().Measures));
 
         auto Request = FCk_Request_Inventory_RemoveItem(Tallow);
         Request.Set_PostRemovePolicy(ECk_Inventory_PostRemovePolicy::DestroyItem);

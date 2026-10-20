@@ -86,20 +86,17 @@ class UMars_Processor_CargoSlot_HandleRequests : UCk_Processor_Script_Base_UE
                                     FCk_Handle_Item InNewItemInTarget,
                                     ECk_Inventory_OperationResult_Transfer InResult)
     {
-        const auto Succeeded = InResult == ECk_Inventory_OperationResult_Transfer::Success;
-        ck::EnsureIfNot(Succeeded,
-            f"[CargoSlot] Moving [{InItem.ToString()}] from [{InSource.ToString()}] to [{InTarget.ToString()}] failed with [{InResult :n}]");
+        if (ck::EnsureIfNot(InResult == ECk_Inventory_OperationResult_Transfer::Success,
+            f"[CargoSlot] Moving [{InItem.ToString()}] from [{InSource.ToString()}] to [{InTarget.ToString()}] failed with [{InResult :n}]"))
+        {
+            auto TargetSlot = utils_entity_lifetime::Get_LifetimeOwner(InTarget).As_CargoSlot(ECk_SanityCheck::UnChecked);
+            if (ck::IsValid(TargetSlot))
+            { Broadcast_TransferFailed(TargetSlot, InItem); }
 
-        if (Succeeded)
-        { return; }
-
-        auto TargetSlot = utils_entity_lifetime::Get_LifetimeOwner(InTarget).As_CargoSlot(ECk_SanityCheck::UnChecked);
-        if (ck::IsValid(TargetSlot))
-        { Broadcast_TransferFailed(TargetSlot, InItem); }
-
-        auto SourceSlot = utils_entity_lifetime::Get_LifetimeOwner(InSource).As_CargoSlot(ECk_SanityCheck::UnChecked);
-        if (ck::IsValid(SourceSlot))
-        { Broadcast_TransferFailed(SourceSlot, InItem); }
+            auto SourceSlot = utils_entity_lifetime::Get_LifetimeOwner(InSource).As_CargoSlot(ECk_SanityCheck::UnChecked);
+            if (ck::IsValid(SourceSlot))
+            { Broadcast_TransferFailed(SourceSlot, InItem); }
+        }
     }
 
     private void Broadcast_TransferFailed(FCk_Handle_CargoSlot& InSlot, const FCk_Handle_Item& InItem)

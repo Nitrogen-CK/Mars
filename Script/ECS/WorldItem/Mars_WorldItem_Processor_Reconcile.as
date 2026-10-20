@@ -104,9 +104,12 @@ class UMars_Processor_WorldItem_Reconcile : UCk_Processor_Script_Base_UE
         Pending = Mount;
     }
 
-    // The item dies with its inventory: its body goes too, detached first so it never rides a node on its way out.
+    // The item dies with its inventory: its body goes too, detached first so it never rides a node on its way out. InWhy is
+    // logged: a Persistent body that vanishes with its carrier leaves a trace.
     private void End(FCk_Handle_WorldItem& InWorldItem, const FString& InWhy)
     {
+        Log(f"[WorldItem] [{InWorldItem.ToString()}] ends: {InWhy}");
+
         auto SceneNode = InWorldItem.As_SceneNode(ECk_SanityCheck::UnChecked);
         if (ck::IsValid(SceneNode))
         { utils_scene_node::Request_Detach(SceneNode); }

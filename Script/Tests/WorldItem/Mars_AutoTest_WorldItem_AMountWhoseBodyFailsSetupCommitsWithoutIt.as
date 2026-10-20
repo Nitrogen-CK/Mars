@@ -59,14 +59,16 @@ class UMars_AutoTest_WorldItem_AMountWhoseBodyFailsSetupCommitsWithoutIt : UMars
         HolderParams.Set_StackingPolicy(ECk_Inventory_StackingPolicy::NoStacking);
         _Holder = utils_inventory_data_only::Add(Entity, HolderParams, ECk_Replication::DoesNotReplicate);
 
+        auto Composition = FMars_WorldItem_Composition();
+        Composition.Body = _Body;
+        Composition.BodyProfile = n"Mars_Test_NoSuchProfile";
+        Composition.BoundsFit = FMars_WorldItem_BoundsFit(k_BodyHalfExtents, FVector::ZeroVector);
+
         auto Spec = FMars_WorldItem_Spec();
         Spec.Mode = EMars_WorldItem_Mode::World;
         Spec.Definition = utils_held_item::Make_DefinitionSoft(mars_items::Backpack());
-        Spec.Holder = _Holder;
-        Spec.Pickup = utils_interactable::Create(Root, FMars_Interactable_Spec());
-        Spec.Body = _Body;
-        Spec.BodyProfile = n"Mars_Test_NoSuchProfile";
-        Spec.BoundsFit = FMars_WorldItem_BoundsFit(k_BodyHalfExtents, FVector::ZeroVector);
+        Spec.World = TOptional<FMars_WorldItem_WorldParts>(
+            FMars_WorldItem_WorldParts(_Holder, utils_interactable::Create(Root, FMars_Interactable_Spec()), Composition));
         _WorldItem = utils_world_item::Add(Entity, Spec);
         _WorldItem.BindTo_OnMountChanged(FMars_Delegate_WorldItem_OnMountChanged(this, n"OnMountChanged"));
 
@@ -114,7 +116,7 @@ class UMars_AutoTest_WorldItem_AMountWhoseBodyFailsSetupCommitsWithoutIt : UMars
     private void Check_Carried(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(_WorldItem.Get_Mount() == EMars_WorldItem_Mount::Carried && Get_MountParent() == _BackNode);
+        Res.Set(_WorldItem.Get_Mount() == EMars_WorldItem_Mount::Carried && Get_MountParent(_WorldItem) == _BackNode);
     }
 
     UFUNCTION()
@@ -129,16 +131,6 @@ class UMars_AutoTest_WorldItem_AMountWhoseBodyFailsSetupCommitsWithoutIt : UMars
             Assert_True(_MountsFrom[0] == EMars_WorldItem_Mount::World && _MountsTo[0] == EMars_WorldItem_Mount::Carried,
                 f"it reported World -> Carried (got {_MountsFrom[0] :n} -> {_MountsTo[0] :n})");
         }
-    }
-
-    // Invalid while the item is not scene-node attached.
-    private FCk_Handle_Transform Get_MountParent() const
-    {
-        auto Node = _WorldItem.As_SceneNode(ECk_SanityCheck::UnChecked);
-        if (ck::Is_NOT_Valid(Node))
-        { return FCk_Handle_Transform(); }
-
-        return utils_scene_node::Get_Parent(Node);
     }
 
     UFUNCTION()

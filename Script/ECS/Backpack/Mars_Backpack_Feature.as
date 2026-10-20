@@ -24,12 +24,13 @@ struct FMars_Backpack_Spec
     TArray<FMars_CargoSlot_Spec> CargoSlots;
 }
 
-// 1..8 cargo slots, every ProbeRadius > 0, indices exactly 0..N-1 with none repeated.
+// 1..constants_cargo_slot::k_MaxCount cargo slots, every ProbeRadius > 0 and finite with a prompt input action, indices
+// exactly 0..N-1 with none repeated.
 mixin FMars_Validation Validate(const FMars_Backpack_Spec& Self)
 {
     const auto Count = Self.CargoSlots.Num();
-    if (Count < 1 || Count > 8)
-    { return FMars_Validation(f"[{Count}] cargo slots is outside [1, 8] - Inventory.Mars.Cargo.N tags only go that far"); }
+    if (Count < 1 || Count > constants_cargo_slot::k_MaxCount)
+    { return FMars_Validation(f"[{Count}] cargo slots is outside [1, {constants_cargo_slot::k_MaxCount}] - Inventory.Mars.Cargo.N tags only go that far"); }
 
     const auto LastIndex = Count - 1;
     for (int32 Entry = 0; Entry < Count; ++Entry)
@@ -38,8 +39,11 @@ mixin FMars_Validation Validate(const FMars_Backpack_Spec& Self)
         if (Slot.Index < 0 || Slot.Index > LastIndex)
         { return FMars_Validation(f"cargo slot entry [{Entry}] has index [{Slot.Index}] outside [0, {LastIndex}]"); }
 
-        if (Slot.ProbeRadius <= 0.0f)
+        if (Math::IsFinite(Slot.ProbeRadius) == false || Slot.ProbeRadius <= 0.0f)
         { return FMars_Validation(f"cargo slot entry [{Entry}] has a non-positive ProbeRadius [{Slot.ProbeRadius}]"); }
+
+        if (Slot.Prompt.InputAction.IsNull())
+        { return FMars_Validation(f"cargo slot entry [{Entry}] has no prompt input action"); }
 
         for (int32 Earlier = 0; Earlier < Entry; ++Earlier)
         {

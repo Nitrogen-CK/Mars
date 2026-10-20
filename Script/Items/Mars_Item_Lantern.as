@@ -8,12 +8,6 @@ namespace constants_lantern_item
     const float64 k_MeshScale = 0.55;
     // The bail's top over the pivot at k_MeshScale: hanging the lantern from a hand or a belt drops it by this much.
     const float64 k_BailHeight = 32.0;
-
-    FGameplayTag Get_BeltPoint()
-    {
-        // Resolved by name: the accessor exists only once a restarted editor has registered the tag.
-        return GameplayTags::ResolveGameplayTag(n"AttachPoint.Mars.Belt");
-    }
 }
 
 asset Mars_ItemDef_Lantern of UCk_InventoryItem_Definition
@@ -26,7 +20,7 @@ asset Mars_ItemDef_Lantern of UCk_InventoryItem_Definition
     Presentation.Grip.Pose = EMars_HandGripPose::Power;
     Presentation.Grip.Handedness = EMars_ItemPresentation_Handedness::OneHanded;
     Presentation.Mounting.Persistence = EMars_WorldItem_Persistence::Persistent;
-    Presentation.Mounting.CarryPoint = constants_lantern_item::Get_BeltPoint();
+    Presentation.Mounting.CarryPoint = GameplayTags::AttachPoint_Mars_Belt;
     // Hung by its bail from the hand and from the belt.
     Presentation.Mounting.HeldOffset = FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, -constants_lantern_item::k_BailHeight));
     Presentation.Mounting.CarryOffset = FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, -constants_lantern_item::k_BailHeight));
@@ -51,14 +45,10 @@ asset Mars_ItemDef_Tallow of UCk_InventoryItem_Definition
 {
     _CoreInfo = FCk_InventoryItem_CoreInfo(FText::FromString("Tallow"));
 
-    auto Presentation = Cast<UMars_ItemTrait_Presentation>(NewObject(this, UMars_ItemTrait_Presentation));
-    Presentation.Visual.Mesh = engine::Cylinder();
-    Presentation.Visual.MeshScale = FVector(0.09, 0.09, 0.07);
-    Presentation.Visual.MaterialOverride = TSoftObjectPtr<UMaterialInterface>(assets::ProtoGrid_Item_Mars_MI().ToSoftObjectPath());
-    Presentation.Visual.PrimaryColor = TOptional<FLinearColor>(FLinearColor(0.93f, 0.86f, 0.66f, 1.0f));
-    Presentation.Grip.Pose = EMars_HandGripPose::Power;
-    Presentation.Grip.Handedness = EMars_ItemPresentation_Handedness::OneHanded;
-    _ItemTraits.Add(Presentation);
+    auto Blockout = FMars_ItemBlockout(engine::Cylinder(), FVector(0.09, 0.09, 0.07), EMars_ItemPresentation_Handedness::OneHanded);
+    Blockout.Pose = TOptional<EMars_HandGripPose>(EMars_HandGripPose::Power);
+    Blockout.Color = TOptional<FLinearColor>(FLinearColor(0.93f, 0.86f, 0.66f, 1.0f));
+    mars_items::Add_BlockoutTraits(this, Blockout);
 
     auto UseAction = Cast<UMars_ItemTrait_UseAction>(NewObject(this, UMars_ItemTrait_UseAction));
     UseAction.UseStateClass = UMars_SmState_ItemUse_Refuel;
@@ -69,9 +59,6 @@ asset Mars_ItemDef_Tallow of UCk_InventoryItem_Definition
 
     auto Tallow = Cast<UMars_ItemTrait_Tallow>(NewObject(this, UMars_ItemTrait_Tallow));
     _ItemTraits.Add(Tallow);
-
-    auto Throwable = Cast<UMars_ItemTrait_Throwable>(NewObject(this, UMars_ItemTrait_Throwable));
-    _ItemTraits.Add(Throwable);
 }
 
 namespace mars_items

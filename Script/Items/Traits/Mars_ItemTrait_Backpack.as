@@ -17,7 +17,7 @@ struct FMars_CargoSlot_Mount
 UCLASS(Meta = (DisplayName = "🎒 Backpack"))
 class UMars_ItemTrait_Backpack : UCk_ItemTrait
 {
-    // 1..8 (Inventory.Mars.Cargo.0..7).
+    // 1..constants_cargo_slot::k_MaxCount (Inventory.Mars.Cargo.N).
     UPROPERTY()
     TArray<FMars_CargoSlot_Mount> CargoSlots;
 

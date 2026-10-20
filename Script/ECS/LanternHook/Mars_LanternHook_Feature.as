@@ -45,12 +45,6 @@ namespace constants_lantern_hook
 {
     // Beats a world item's pickup (0), so the hung lantern's own pickup never steals the hook's prompt.
     const int32 k_FocusPriority = 10;
-
-    // Resolved by name: the accessor exists only once a restarted editor has registered the tag.
-    FGameplayTag Get_InventoryTag()
-    {
-        return GameplayTags::ResolveGameplayTag(n"Inventory.Mars.LanternHook");
-    }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -91,8 +85,8 @@ mixin FMars_Validation Validate(const FMars_LanternHook_Spec& Self)
 // State
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Inventory, Interactable and HangNode are composed by utils_lantern_hook::Add. LastSeen and LastAsserted are written only
-// by UMars_Processor_LanternHook_Sync, LastPromptAction only by UMars_Processor_LanternHook_Prompt.
+// Inventory, Interactable and HangNode are composed by utils_lantern_hook::Add. LastSeen and LastOutput are written only
+// by UMars_Processor_LanternHook_Sync.
 struct FMars_Fragment_LanternHook
 {
     UPROPERTY()
@@ -110,11 +104,7 @@ struct FMars_Fragment_LanternHook
 
     // What the sync last asked of the same-entity MechanismSource; unset before its first pass.
     UPROPERTY()
-    TOptional<bool> LastAsserted;
-
-    // The action the prompt currently shows; unset while the hook is not focused.
-    UPROPERTY()
-    TOptional<EMars_LanternHook_Action> LastPromptAction;
+    TOptional<EMars_MechanismSource_Output> LastOutput;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

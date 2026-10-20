@@ -449,8 +449,31 @@ struct FMars_WorldItem_Composition
 // Spec
 //--------------------------------------------------------------------------------------------------------------------------
 
-// What the entity script composed for utils_world_item::Add. Holder and Pickup exist in World mode only; Body in World
-// mode with a Mesh.
+// A World-mode world item's parts: the holder its item lives in, the pickup, and what the entity script built for its body
+// (the Composition's Body, BodyProfile, BoundsFit and Launch).
+struct FMars_WorldItem_WorldParts
+{
+    UPROPERTY()
+    FCk_Handle_Inventory_DataOnly Holder;
+
+    UPROPERTY()
+    FCk_Handle_Interactable Pickup;
+
+    UPROPERTY()
+    FMars_WorldItem_Composition Composition;
+
+    FMars_WorldItem_WorldParts() {}
+
+    FMars_WorldItem_WorldParts(const FCk_Handle_Inventory_DataOnly& InHolder, const FCk_Handle_Interactable& InPickup,
+                               const FMars_WorldItem_Composition& InComposition)
+    {
+        Holder = InHolder;
+        Pickup = InPickup;
+        Composition = InComposition;
+    }
+}
+
+// What the entity script composed for utils_world_item::Add: World mode sets World, Visual mode may set Arrival.
 struct FMars_WorldItem_Spec
 {
     UPROPERTY()
@@ -460,29 +483,11 @@ struct FMars_WorldItem_Spec
     TSoftObjectPtr<UCk_InventoryItem_Definition> Definition;
 
     UPROPERTY()
-    FCk_Handle_Inventory_DataOnly Holder;
-
-    UPROPERTY()
-    FCk_Handle_Interactable Pickup;
-
-    UPROPERTY()
-    FCk_Handle_JoltBody Body;
-
-    // World mode with a Body: the profile it was built with (FMars_WorldItem_Composition.BodyProfile).
-    UPROPERTY()
-    FName BodyProfile = constants_world_item::k_DefaultBodyProfile;
-
-    // World mode: what the body spans (FMars_WorldItem_Composition.BoundsFit).
-    UPROPERTY()
-    FMars_WorldItem_BoundsFit BoundsFit;
+    TOptional<FMars_WorldItem_WorldParts> World;
 
     // Visual mode: the offset lerp of a visual that arrives from somewhere.
     UPROPERTY()
     TOptional<FMars_Fragment_WorldItem_Arrival> Arrival;
-
-    // World mode with a Body: the launch of a dropped or thrown item.
-    UPROPERTY()
-    TOptional<FMars_Fragment_WorldItem_PendingLaunch> Launch;
 }
 
 mixin FMars_Validation Validate(const FMars_WorldItem_Spec& Self)
@@ -490,25 +495,30 @@ mixin FMars_Validation Validate(const FMars_WorldItem_Spec& Self)
     if (Self.Definition.IsNull())
     { return FMars_Validation("Definition is not set"); }
 
-    if (Self.Mode == EMars_WorldItem_Mode::World)
+    if (Self.Mode == EMars_WorldItem_Mode::Visual)
     {
-        if (ck::Is_NOT_Valid(Self.Holder) || ck::Is_NOT_Valid(Self.Pickup))
-        { return FMars_Validation("a World-mode world item needs a Holder and a Pickup"); }
-
-        if (Self.Arrival.IsSet())
-        { return FMars_Validation("only a Visual-mode world item arrives"); }
-
-        if (Self.Launch.IsSet() && ck::Is_NOT_Valid(Self.Body))
-        { return FMars_Validation("a launch needs a Body"); }
-
-        if (ck::IsValid(Self.Body) && Self.BodyProfile.IsNone())
-        { return FMars_Validation("a Body needs the BodyProfile it was built with"); }
+        if (Self.World.IsSet())
+        { return FMars_Validation("a Visual-mode world item has no World parts (Holder, Pickup, Body or Launch)"); }
 
         return FMars_Validation();
     }
 
-    if (ck::IsValid(Self.Holder) || ck::IsValid(Self.Pickup) || ck::IsValid(Self.Body) || Self.Launch.IsSet())
-    { return FMars_Validation("a Visual-mode world item has no Holder, Pickup, Body or Launch"); }
+    if (Self.Arrival.IsSet())
+    { return FMars_Validation("only a Visual-mode world item arrives"); }
+
+    if (Self.World.IsSet() == false)
+    { return FMars_Validation("a World-mode world item needs its World parts"); }
+
+    const auto& World = Self.World.GetValue();
+    if (ck::Is_NOT_Valid(World.Holder) || ck::Is_NOT_Valid(World.Pickup))
+    { return FMars_Validation("a World-mode world item needs a Holder and a Pickup"); }
+
+    const auto& Composition = World.Composition;
+    if (Composition.Launch.IsSet() && ck::Is_NOT_Valid(Composition.Body))
+    { return FMars_Validation("a launch needs a Body"); }
+
+    if (ck::IsValid(Composition.Body) && Composition.BodyProfile.IsNone())
+    { return FMars_Validation("a Body needs the BodyProfile it was built with"); }
 
     return FMars_Validation();
 }

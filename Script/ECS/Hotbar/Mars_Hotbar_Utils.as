@@ -29,6 +29,19 @@ namespace utils_hotbar
 {
     const int32 k_MaxBagSlotCount = 8;
 
+    // Processor-only: UMars_Processor_Hotbar_HandleRequests and UMars_Processor_Hotbar_Sync are SelectedIndex's only
+    // writers, and both go through here so a change always broadcasts OnSelectionChanged.
+    void Apply_Selection(FCk_Handle_Hotbar& InHotbar, FMars_Fragment_Hotbar& InState, TOptional<int32> InNewIndex)
+    {
+        if (InState.SelectedIndex == InNewIndex)
+        { return; }
+
+        InState.SelectedIndex = InNewIndex;
+
+        if (InHotbar.Has_Fragment(FMars_Fragment_Hotbar_Signals))
+        { InHotbar.Get_Fragment(FMars_Fragment_Hotbar_Signals).OnSelectionChanged.Broadcast(InHotbar); }
+    }
+
     // The slot-fit rule, the one place it is written: a backpack fits only the backpack slot, a hands-only item only the
     // overflow slot, any other item a bag slot or the overflow slot. CkInventory enforces it on every add and transfer
     // through the accept predicates; the stow and take targets ask it before they name a slot.
@@ -280,25 +293,19 @@ mixin FCk_Handle_Inventory_DataOnly TryGet_TakeTarget(const FCk_Handle_Hotbar& S
 mixin void Request_Select(FCk_Handle_Hotbar& Self, const FMars_Request_Hotbar_Select& InRequest)
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Hotbar_Requests);
-    Requests.SelectionChangeRequests.Add(FMars_Hotbar_SelectionChangeRequest(EMars_Hotbar_SelectionChange::Select, InRequest.Index));
+    Requests.SelectionChangeRequests.Add(FMars_Hotbar_SelectionChangeRequest(InRequest));
 }
 
-mixin void Request_Deselect(FCk_Handle_Hotbar& Self)
+mixin void Request_Deselect(FCk_Handle_Hotbar& Self, const FMars_Request_Hotbar_Deselect& InRequest)
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Hotbar_Requests);
-    Requests.SelectionChangeRequests.Add(FMars_Hotbar_SelectionChangeRequest(EMars_Hotbar_SelectionChange::Deselect));
+    Requests.SelectionChangeRequests.Add(FMars_Hotbar_SelectionChangeRequest(InRequest));
 }
 
-mixin void Request_CycleNext(FCk_Handle_Hotbar& Self)
+mixin void Request_Cycle(FCk_Handle_Hotbar& Self, const FMars_Request_Hotbar_Cycle& InRequest)
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Hotbar_Requests);
-    Requests.SelectionChangeRequests.Add(FMars_Hotbar_SelectionChangeRequest(EMars_Hotbar_SelectionChange::CycleNext));
-}
-
-mixin void Request_CyclePrevious(FCk_Handle_Hotbar& Self)
-{
-    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Hotbar_Requests);
-    Requests.SelectionChangeRequests.Add(FMars_Hotbar_SelectionChangeRequest(EMars_Hotbar_SelectionChange::CyclePrevious));
+    Requests.SelectionChangeRequests.Add(FMars_Hotbar_SelectionChangeRequest(InRequest));
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

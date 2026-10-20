@@ -13,11 +13,15 @@ namespace utils_world_item
         Params.Definition = InSpec.Definition;
 
         auto State = FMars_Fragment_WorldItem();
-        State.Holder = InSpec.Holder;
-        State.Pickup = InSpec.Pickup;
-        State.Body = InSpec.Body;
-        State.BodyProfile = InSpec.BodyProfile;
-        State.BoundsFit = InSpec.BoundsFit;
+        if (InSpec.World.IsSet())
+        {
+            const auto& World = InSpec.World.GetValue();
+            State.Holder = World.Holder;
+            State.Pickup = World.Pickup;
+            State.Body = World.Composition.Body;
+            State.BodyProfile = World.Composition.BodyProfile;
+            State.BoundsFit = World.Composition.BoundsFit;
+        }
 
         InHandle.Add_Fragment(FMars_Feature_WorldItem());
         InHandle.Add_Fragment(Params);
@@ -25,8 +29,8 @@ namespace utils_world_item
         Add_ReachHint(InHandle, InSpec);
 
         // Never applied here: the body is not added for at least one frame. The launch processor drains it.
-        if (InSpec.Launch.IsSet())
-        { InHandle.Add_Fragment(InSpec.Launch.GetValue()); }
+        if (InSpec.World.IsSet() && InSpec.World.GetValue().Composition.Launch.IsSet())
+        { InHandle.Add_Fragment(InSpec.World.GetValue().Composition.Launch.GetValue()); }
 
         if (InSpec.Arrival.IsSet())
         { InHandle.Add_Fragment(InSpec.Arrival.GetValue()); }
@@ -241,7 +245,7 @@ namespace utils_world_item
     // handedness) ensures and hints nothing.
     void Add_ReachHint(FCk_Handle& InHandle, const FMars_WorldItem_Spec& InSpec)
     {
-        if (InSpec.Mode != EMars_WorldItem_Mode::World)
+        if (InSpec.World.IsSet() == false)
         { return; }
 
         auto Definition = System::LoadAsset_Blocking(InSpec.Definition);
@@ -257,7 +261,7 @@ namespace utils_world_item
         { return; }
 
         utils_reach_hint::Add(InHandle,
-            FMars_Fragment_ReachHint(InSpec.BoundsFit, Presentation.Grip.Handedness, Presentation.Grip.HalfWidth));
+            FMars_Fragment_ReachHint(InSpec.World.GetValue().Composition.BoundsFit, Presentation.Grip.Handedness, Presentation.Grip.HalfWidth));
     }
 
     // A Visual-mode world item of InSpec.Item, owned by InOwner (it dies with it). It spawns where it starts - at
@@ -311,6 +315,29 @@ namespace utils_world_item
         { return FMars_WorldItem_Arrival(); }
 
         return FMars_WorldItem_Arrival(InPending.World);
+    }
+
+    // For a container that recorded where a moving item visually was (FMars_WorldItem_PendingArrival) and reacts to what
+    // lands: the arrival for InItem when the record is for InItem and fresh, else unset. The record is cleared either way,
+    // so it never outlives the next content change.
+    FMars_WorldItem_Arrival Consume_PendingArrival(TOptional<FMars_WorldItem_PendingArrival>& InOutPending, const FCk_Handle_Item& InItem)
+    {
+        auto Arrival = FMars_WorldItem_Arrival();
+        if (InOutPending.IsSet() && InOutPending.GetValue().Item == InItem)
+        { Arrival = Get_FreshArrival(InOutPending.GetValue()); }
+
+        InOutPending.Reset();
+        return Arrival;
+    }
+
+    // The world pose of InEntity when it has a transform yet (a pending visual may not), else of InFallback.
+    FTransform Get_WorldOf(const FCk_Handle& InEntity, const FCk_Handle& InFallback)
+    {
+        const auto EntityTransform = InEntity.As_Transform(ECk_SanityCheck::UnChecked);
+        if (ck::IsValid(EntityTransform))
+        { return utils_transform::Get_EntityCurrentTransform(EntityTransform); }
+
+        return utils_transform::Get_EntityCurrentTransform(InFallback.As_Transform());
     }
 
     // Null when the definition does not resolve or carries no Presentation trait.
@@ -512,6 +539,12 @@ mixin EMars_WorldItem_Mount Get_TargetMount(const FCk_Handle_WorldItem& Self)
 mixin FCk_Handle Get_Carrier(const FCk_Handle_WorldItem& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_WorldItem).Committed.Carrier;
+}
+
+// The carrier's attach point the committed mount rides; invalid while it rides none.
+mixin FGameplayTag Get_MountPoint(const FCk_Handle_WorldItem& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_WorldItem).Committed.Point;
 }
 
 // Landed: the committed mount is where the item's inventory says it belongs, with nothing pending (no mount waiting on the

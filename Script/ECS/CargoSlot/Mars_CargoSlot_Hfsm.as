@@ -9,11 +9,8 @@ class UMars_SmState_CargoSlot_Interact : UMars_SmState_InteractTarget_RunTask
 // next visual lerps from there) and runs until the slot reports the expected content, or that the transfer was refused.
 // A Blocked_ action fails (ActionBlocked): the prompt processor disables the target for it, but can lag the initiator's
 // hands by a frame. A failure names its reason on the interaction's stamped context, which the sub-SM's Failed end reports.
-class UMars_SmTask_CargoSlot_StowOrTake : UCk_SmTask_EntityScript
+class UMars_SmTask_CargoSlot_StowOrTake : UMars_SmTask_InteractionWork
 {
-    default _TaskMode = ECk_SmTaskMode::Tick;
-
-    private ECk_SmTaskResult _Outcome = ECk_SmTaskResult::Running;
     private FCk_Handle_CargoSlot _Slot;
     private FCk_Handle_Item _Item;
     private EMars_CargoSlot_Action _Action = EMars_CargoSlot_Action::Stow;
@@ -25,21 +22,14 @@ class UMars_SmTask_CargoSlot_StowOrTake : UCk_SmTask_EntityScript
         _Slot = FCk_Handle_CargoSlot();
         _Item = FCk_Handle_Item();
 
-        // The context is the InteractTarget; the initiator is stamped on the per-interaction sub-SM root.
-        auto Context = Get_StateMachineContext();
-        FCk_Handle SubSm = Get_OwningStateMachine();
-        const auto HasContext = Context.Has_Fragment(FMars_Fragment_InteractionContext)
-            && ck::IsValid(SubSm) && SubSm.Has_Fragment(FMars_Fragment_InteractionContext);
-        if (ck::EnsureIfNot(HasContext, "[CargoSlot] Interaction ran without an interaction context"))
-        {
-            _Outcome = ECk_SmTaskResult::Failed;
-            return;
-        }
+        FCk_Handle Owner;
+        FCk_Handle Initiator;
+        if (TryGet_InteractionEnds(Owner, Initiator) == false)
+        { return; }
 
-        auto Owner = Context.Get_Fragment(FMars_Fragment_InteractionContext).InteractableOwner;
-        auto Initiator = SubSm.Get_Fragment(FMars_Fragment_InteractionContext).Initiator;
-        auto Slot = Owner.As_CargoSlot();
-        if (ck::Is_NOT_Valid(Slot) || ck::EnsureIfNot(ck::IsValid(Initiator), f"[CargoSlot] [{Slot.ToString()}] interaction has no initiator"))
+        auto Slot = Owner.As_CargoSlot(ECk_SanityCheck::UnChecked);
+        if (ck::EnsureIfNot(ck::IsValid(Slot), f"[CargoSlot] Interaction owner [{Owner.ToString()}] is no cargo slot")
+            || ck::EnsureIfNot(ck::IsValid(Initiator), f"[CargoSlot] [{Slot.ToString()}] interaction has no initiator"))
         {
             _Outcome = ECk_SmTaskResult::Failed;
             return;
@@ -50,7 +40,7 @@ class UMars_SmTask_CargoSlot_StowOrTake : UCk_SmTask_EntityScript
         {
             auto HeldItem = Initiator.As_HeldItem();
             auto Item = HeldItem.Get_CurrentItem();
-            const auto From = DoGet_WorldOf(HeldItem.Get_PresentationEntity(), HeldItem.Get_HandAttachPoint());
+            const auto From = utils_world_item::Get_WorldOf(HeldItem.Get_PresentationEntity(), HeldItem.Get_HandAttachPoint());
 
             DoStart(Slot, Item, Action);
             Slot.Request_Stow(FMars_Request_CargoSlot_Stow(Item, From));
@@ -60,7 +50,7 @@ class UMars_SmTask_CargoSlot_StowOrTake : UCk_SmTask_EntityScript
         if (Action == EMars_CargoSlot_Action::Take)
         {
             auto Item = Slot.Get_Item();
-            const auto From = DoGet_WorldOf(Slot.Get_Visual(), Slot);
+            const auto From = utils_world_item::Get_WorldOf(Slot.Get_Visual(), Slot);
             const auto Target = Initiator.As_Hotbar().TryGet_TakeTarget(Item);
 
             auto HeldItem = Initiator.As_HeldItem();
@@ -72,12 +62,6 @@ class UMars_SmTask_CargoSlot_StowOrTake : UCk_SmTask_EntityScript
         }
 
         DoFail(EMars_Interaction_FailReason::ActionBlocked);
-    }
-
-    UFUNCTION(BlueprintOverride)
-    ECk_SmTaskResult DoTick(FCk_Handle_SmTask InHandle, FCk_Time InDeltaT, ECk_Sm_NetContext InNetContext)
-    {
-        return _Outcome;
     }
 
     UFUNCTION(BlueprintOverride)
@@ -125,21 +109,5 @@ class UMars_SmTask_CargoSlot_StowOrTake : UCk_SmTask_EntityScript
         }
 
         _Slot = FCk_Handle_CargoSlot();
-    }
-
-    // The world pose of InEntity when it has a transform yet (a pending visual may not), else of InFallback.
-    private FTransform DoGet_WorldOf(FCk_Handle InEntity, FCk_Handle InFallback) const
-    {
-        const auto EntityTransform = InEntity.As_Transform(ECk_SanityCheck::UnChecked);
-        if (ck::IsValid(EntityTransform))
-        { return utils_transform::Get_EntityCurrentTransform(EntityTransform); }
-
-        return utils_transform::Get_EntityCurrentTransform(InFallback.As_Transform());
-    }
-
-    private void DoFail(EMars_Interaction_FailReason InReason)
-    {
-        utils_interactable::Record_FailReason(Get_OwningStateMachine(), InReason);
-        _Outcome = ECk_SmTaskResult::Failed;
     }
 }

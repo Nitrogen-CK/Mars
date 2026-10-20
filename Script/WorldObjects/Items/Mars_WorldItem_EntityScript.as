@@ -196,16 +196,13 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
 
         auto Root = InHandle.As_Transform();
 
+        const auto Holder = AddHolder(InHandle);
+        _Pickup = AddPickup(Root, InComposition.ProbeFit);
+
         auto Spec = FMars_WorldItem_Spec();
         Spec.Mode = EMars_WorldItem_Mode::World;
         Spec.Definition = Definition;
-        Spec.Holder = AddHolder(InHandle);
-        Spec.Body = InComposition.Body;
-        Spec.BodyProfile = InComposition.BodyProfile;
-        Spec.BoundsFit = InComposition.BoundsFit;
-        Spec.Pickup = AddPickup(Root, InComposition.ProbeFit);
-        Spec.Launch = InComposition.Launch;
-        _Pickup = Spec.Pickup;
+        Spec.World = TOptional<FMars_WorldItem_WorldParts>(FMars_WorldItem_WorldParts(Holder, _Pickup, InComposition));
 
         auto WorldItem = utils_world_item::Add(InHandle, Spec);
         if (ck::Is_NOT_Valid(WorldItem))
@@ -384,7 +381,10 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
         }
 
         if (ck::EnsureIfNot(InItemsCreated.Num() > 0, f"[WorldItem] Seeding [{_SelfEntity.ToString()}] reported success but created no item"))
-        { return; }
+        {
+            utils_entity_lifetime::Request_DestroyEntity(_SelfEntity);
+            return;
+        }
 
         auto WorldItem = _SelfEntity.As_WorldItem();
         utils_world_item::Add_Item(WorldItem, InItemsCreated[0]);
@@ -428,8 +428,8 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
     }
 
     // A focuser whose hotbar has nowhere to stow the held item makes the pickup hold its HotbarFull claim: the pickup stays
-    // focused, a press starts nothing, and its prompt reads Get_HotbarFullText. The claim goes when one of that hotbar's
-    // slots frees room, or when the hotbar's owner is torn down. A holder that holds no item yet (an item just spawned,
+    // focused, a press starts nothing, and its prompt is blocked HotbarFull (the prompt widget words it). The claim goes
+    // when one of that hotbar's slots frees room, or when the hotbar's owner is torn down. A holder that holds no item yet (an item just spawned,
     // not adopted) claims nothing: a press then fails the pickup. Releasing re-enables the pickup only if no other claimant
     // (a mount, a ledger) holds it too.
     UFUNCTION()
@@ -444,7 +444,7 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
         _Pickup.Request_Disable(FMars_Request_Interactable_Disable(EMars_Interactable_DisableReason::HotbarFull));
         _GatingHotbar.BindTo_OnSlotItemChanged(FMars_Delegate_Hotbar_OnSlotItemChanged(this, n"OnGatingHotbarSlotItemChanged"));
         _GatingHotbar.H().BindTo_OnBeginDestroy(FCk_Delegate_OnBeginDestroy(this, n"OnGatingHotbarBeginDestroy"));
-        Set_PromptBlocked(FMars_Request_InteractPrompt_SetBlocked(Get_HotbarFullText()));
+        Set_PromptBlocked(FMars_Request_InteractPrompt_SetBlocked(EMars_InteractPrompt_BlockedReason::HotbarFull));
     }
 
     UFUNCTION()
@@ -493,12 +493,6 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
         auto Prompt = _Pickup.Get_InteractTarget(GameplayTags::InteractionChannel_Mars_Use).As_InteractPrompt(ECk_SanityCheck::UnChecked);
         if (ck::IsValid(Prompt))
         { Prompt.Request_SetBlocked(InRequest); }
-    }
-
-    // What the pickup's prompt reads while a focuser's full hotbar holds the HotbarFull claim.
-    protected FText Get_HotbarFullText() const
-    {
-        return FText::FromString("Hotbar full");
     }
 
     // Whether the pickup stays enabled for InHotbar's owner: an item-aware stow check (a second backpack has nowhere to go

@@ -88,7 +88,6 @@ class UMars_AutoTest_WorldItem_PersistentCarryHoldRelease : UMars_AutoTestRig_Ca
         Assert_True(_Hotbar.Get_BackpackItem() == _Item, "the backpack slot holds the backpack item");
     }
 
-
     UFUNCTION()
     private void Check_Carried(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
@@ -96,7 +95,7 @@ class UMars_AutoTest_WorldItem_PersistentCarryHoldRelease : UMars_AutoTestRig_Ca
         Res.Set(ck::IsValid(_WorldItem) &&
                 _WorldItem.Get_Mount() == EMars_WorldItem_Mount::Carried &&
                 _WorldItem.Get_Carrier() == _Carrier &&
-                DoGet_MountParent() == _BackNode &&
+                Get_MountParent(_WorldItem) == _BackNode &&
                 DoGet_MotionType() == ECk_MotionType::Kinematic);
     }
 
@@ -112,7 +111,7 @@ class UMars_AutoTest_WorldItem_PersistentCarryHoldRelease : UMars_AutoTestRig_Ca
         auto Res = OutResult;
         Res.Set(ck::IsValid(_WorldItem) &&
                 _WorldItem.Get_Mount() == EMars_WorldItem_Mount::Held &&
-                DoGet_MountParent() == _HandNode &&
+                Get_MountParent(_WorldItem) == _HandNode &&
                 DoGet_MotionType() == ECk_MotionType::Kinematic);
     }
 
@@ -134,16 +133,6 @@ class UMars_AutoTest_WorldItem_PersistentCarryHoldRelease : UMars_AutoTestRig_Ca
                 _WorldItem.Is_SceneNode() == false &&
                 DoGet_MotionType() == ECk_MotionType::Dynamic &&
                 _WorldItem.Has_Fragment(FMars_Fragment_WorldItem_PendingLaunch) == false);
-    }
-
-    // Invalid while the world item is not scene-node attached.
-    private FCk_Handle_Transform DoGet_MountParent() const
-    {
-        auto Node = _WorldItem.As_SceneNode(ECk_SanityCheck::UnChecked);
-        if (ck::Is_NOT_Valid(Node))
-        { return FCk_Handle_Transform(); }
-
-        return utils_scene_node::Get_Parent(Node);
     }
 
     // A World-mode backpack always has a body (its mesh is the engine cube), so a missing one fails the test.

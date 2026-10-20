@@ -16,7 +16,6 @@ class UMars_AutoTest_WorldItem_TheMountFollowsTheItemsInventory : UMars_AutoTest
     private const FVector k_StationOffset = FVector(0.0, 300.0, 0.0);
     // Polls of the heading wait, one a frame, from the move to the first that sees the new mount.
     private const int32 k_MaxPollsToHead = 3;
-    private const int32 k_LegCount = 7;
     // The slab's and the platter's construction (their joints import) outrun the default poll budget at lane frame
     // rate.
     private const int32 k_SlowPolls = 900;
@@ -28,8 +27,8 @@ class UMars_AutoTest_WorldItem_TheMountFollowsTheItemsInventory : UMars_AutoTest
     private FCk_Handle_WorldItem _Slab;
     private FCk_Handle_PlatterDock _Dock;
 
-    // The leg under way: its item, where it must end, and the polls it took to head there.
-    private int32 _Leg = 0;
+    // The leg under way: its name, its item, where it must end, and the polls it took to head there.
+    private FString _Leg;
     private FCk_Handle_WorldItem _Subject;
     private EMars_WorldItem_Mount _ExpectedMount = EMars_WorldItem_Mount::World;
     private FCk_Handle _ExpectedCarrier;
@@ -43,22 +42,14 @@ class UMars_AutoTest_WorldItem_TheMountFollowsTheItemsInventory : UMars_AutoTest
         Add_CarrierBodyWithBack(InHandle, k_Origin);
         Add_Hotbar(_Carrier, 1);
 
-        Spawn_Floor(InHandle, k_Origin + k_PackOffset);
+        Spawn_FloorSlab(InHandle, k_Origin + k_PackOffset);
         auto PackParams = UMars_Backpack_EntityScript::Params();
         PackParams.Definition = mars_items::Backpack();
         PackParams.Mode = EMars_WorldItem_Mode::World;
         PackParams.SpawnTransform = FTransform(FRotator::ZeroRotator, k_Origin + k_PackOffset + FVector(0.0, 0.0, 20.0));
         _PackEntity = utils_entity_script::Request_SpawnEntity(InHandle, UMars_Backpack_EntityScript, PackParams).Get_EntityUnderConstruction();
 
-        Spawn_Floor(InHandle, k_Origin + k_SlabOffset);
-        auto SlabParams = UMars_FoodItem_EntityScript::Params();
-        SlabParams.SpawnTransform = FTransform(FRotator::ZeroRotator, k_Origin + k_SlabOffset + FVector(0.0, 0.0, 5.0));
-        SlabParams.Definition = utils_held_item::Make_DefinitionSoft(mars_items::Food_MeatSlab());
-        SlabParams.Mode = EMars_WorldItem_Mode::World;
-
-        // A piece outlives its spawner: under the world's transient entity, tracked for cleanup.
-        _SlabEntity = utils_entity_script::Request_SpawnEntity(ck::TransientEntity(), UMars_FoodItem_EntityScript, SlabParams).Get_EntityUnderConstruction();
-        Track_ForCleanup(_SlabEntity);
+        _SlabEntity = Spawn_FoodItemOnFloor(InHandle, mars_items::Food_MeatSlab(), k_Origin + k_SlabOffset);
 
         Spawn_Platter(InHandle, FMars_Platter_SpawnSpec(FTransform(FRotator::ZeroRotator, k_Origin + k_PlatterOffset)));
         auto Root = Build_StationRoot(InHandle, k_Origin + k_StationOffset);
@@ -66,30 +57,24 @@ class UMars_AutoTest_WorldItem_TheMountFollowsTheItemsInventory : UMars_AutoTest
             FTransform(FRotator::ZeroRotator, FVector(0.0, 60.0, 70.0)), "input platter"));
 
         Add_Step_WaitUntil("the pack, the slab and the platter are constructed, their items linked", n"Check_Constructed", k_SlowPolls, 0);
-        for (int32 Leg = 0; Leg < k_LegCount; ++Leg)
-        {
-            Add_Step(f"leg {Leg}: move", n"Step_Move");
-            Add_Step_WaitUntil(f"leg {Leg}: it heads for its mount", n"Check_Headed", 0, 0);
-            Add_Step(f"leg {Leg}: headed within {k_MaxPollsToHead} frames of the move", n"Step_AssertHeaded");
-            Add_Step_WaitUntil(f"leg {Leg}: it settles", n"Check_Settled", 0, 0);
-            Add_Step(f"leg {Leg}: the mount, its carrier and its node", n"Step_AssertLanded");
-        }
+        Add_LegSteps("put the pack on (Carried on the Back)", n"Step_Leg_WearThePack");
+        Add_LegSteps("take the slab into the hands (Held on the Hand)", n"Step_Leg_TakeTheSlab");
+        Add_LegSteps("lower the slab (Carried on the Back)", n"Step_Leg_LowerTheSlab");
+        Add_LegSteps("raise the slab (Held on the Hand)", n"Step_Leg_RaiseTheSlab");
+        Add_LegSteps("stow the slab in the pack (Carried on the slot)", n"Step_Leg_StowTheSlab");
+        Add_LegSteps("take the platter into the overflow (Held on the Hand)", n"Step_Leg_TakeThePlatter");
+        Add_LegSteps("dock the platter (Carried on the dock)", n"Step_Leg_DockThePlatter");
         Run_Steps(InHandle);
     }
 
-    // A static slab whose top is at InTop.
-    private void Spawn_Floor(FCk_Handle InOwner, FVector InTop)
+    // InMoveStep moves the item and names the leg's expected mount, carrier and node.
+    private void Add_LegSteps(const FString& InLeg, FName InMoveStep)
     {
-        auto Owner = InOwner;
-        auto Floor = utils_entity_lifetime::Request_CreateEntity(Owner);
-        utils_transform::Add(Floor, FTransform(FRotator::ZeroRotator, InTop - FVector(0.0, 0.0, 1.0)), ECk_Replication::DoesNotReplicate);
-        auto Shape = FCk_Jolt_ShapeDimensions(ECk_Jolt_ShapeType::Box);
-        Shape.Set_HalfExtents(FVector(80.0, 80.0, 1.0));
-        auto FloorSpec = FCk_JoltBody_Spec(ECk_JoltBody_ShapeSource::ExplicitShape);
-        FloorSpec.Set_ShapeDimensions(Shape);
-        FloorSpec.Set_MotionType(ECk_MotionType::Static);
-        FloorSpec.Set_CollisionProfileName(n"BlockAll");
-        utils_jolt_body::Add(Floor, FloorSpec);
+        Add_Step(f"{InLeg}: move", InMoveStep);
+        Add_Step_WaitUntil(f"{InLeg}: it heads for its mount", n"Check_Headed", 0, 0);
+        Add_Step(f"{InLeg}: headed within {k_MaxPollsToHead} frames of the move", n"Step_AssertHeaded");
+        Add_Step_WaitUntil(f"{InLeg}: it settles", n"Check_Settled", 0, 0);
+        Add_Step(f"{InLeg}: the mount, its carrier and its node", n"Step_AssertLanded");
     }
 
     UFUNCTION()
@@ -101,12 +86,13 @@ class UMars_AutoTest_WorldItem_TheMountFollowsTheItemsInventory : UMars_AutoTest
 
         const auto PackReady = ck::IsValid(_PackEntity) && _PackEntity.Is_Backpack() && _PackEntity.Is_WorldItem()
             && ck::IsValid(_PackEntity.As_WorldItem().Get_Item());
-        const auto SlabReady = ck::IsValid(_SlabEntity) && _SlabEntity.Is_WorldItem() && ck::IsValid(_SlabEntity.As_WorldItem().Get_Item());
+        const auto Slab = TryGet_ConstructedWorldItem(_SlabEntity);
+        const auto SlabReady = ck::IsValid(Slab) && ck::IsValid(Slab.Get_Item());
         if (PackReady && SlabReady && ck::Is_NOT_Valid(_Pack))
         {
             _Pack = _PackEntity.As_WorldItem();
             _CargoSlot = _PackEntity.As_Backpack().Get_CargoSlot(0);
-            _Slab = _SlabEntity.As_WorldItem();
+            _Slab = Slab;
         }
 
         auto Res = OutResult;
@@ -114,71 +100,83 @@ class UMars_AutoTest_WorldItem_TheMountFollowsTheItemsInventory : UMars_AutoTest
     }
 
     UFUNCTION()
-    private void Step_Move(FCk_Handle InHandle, FInstancedStruct InPayload)
+    private void Step_Leg_WearThePack(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
+        Begin_Leg("the pack", _Pack);
+        Expect(EMars_WorldItem_Mount::Carried, _Carrier, _BackNode);
+        Move(_Pack.Get_Holder(), _Pack.Get_Item(), _Hotbar.Get_BackpackSlot());
+    }
+
+    UFUNCTION()
+    private void Step_Leg_TakeTheSlab(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        Begin_Leg("the slab taken", _Slab);
+        Expect(EMars_WorldItem_Mount::Held, _Carrier, _HandNode);
+        Move(_Slab.Get_Holder(), _Slab.Get_Item(), _Hotbar.Get_Slot(0));
+    }
+
+    UFUNCTION()
+    private void Step_Leg_LowerTheSlab(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        Begin_Leg("the slab lowered", _Slab);
+        Expect(EMars_WorldItem_Mount::Carried, _Carrier, _BackNode);
+        _Hotbar.Request_Deselect(FMars_Request_Hotbar_Deselect());
+    }
+
+    UFUNCTION()
+    private void Step_Leg_RaiseTheSlab(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        Begin_Leg("the slab raised", _Slab);
+        Expect(EMars_WorldItem_Mount::Held, _Carrier, _HandNode);
+        _Hotbar.Request_Select(FMars_Request_Hotbar_Select(0));
+    }
+
+    UFUNCTION()
+    private void Step_Leg_StowTheSlab(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        Begin_Leg("the slab stowed", _Slab);
+        FCk_Handle SlotEntity = _CargoSlot;
+        Expect(EMars_WorldItem_Mount::Carried, SlotEntity, SlotEntity.As_Transform());
+        Move(_Hotbar.Get_Slot(0), _Slab.Get_Item(), _CargoSlot.Get_Inventory());
+    }
+
+    UFUNCTION()
+    private void Step_Leg_TakeThePlatter(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        Begin_Leg("the platter taken", _WorldItems[0]);
+        Expect(EMars_WorldItem_Mount::Held, _Carrier, _HandNode);
+        Move(_WorldItems[0].Get_Holder(), _PlatterItems[0], _Hotbar.Get_Slot(_Hotbar.Get_OverflowIndex()));
+    }
+
+    UFUNCTION()
+    private void Step_Leg_DockThePlatter(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        Begin_Leg("the platter docked", _WorldItems[0]);
+        FCk_Handle DockEntity = _Dock;
+        Expect(EMars_WorldItem_Mount::Carried, DockEntity, _Dock.Get_Node());
+        Move(_Hotbar.Get_Slot(_Hotbar.Get_OverflowIndex()), _PlatterItems[0], _Dock.Get_Inventory());
+    }
+
+    private void Begin_Leg(const FString& InLeg, FCk_Handle_WorldItem InSubject)
+    {
+        _Leg = InLeg;
+        _Subject = InSubject;
         _LegPolls = 0;
         _HeadedAtPoll.Reset();
-        FCk_Handle SlotEntity = _CargoSlot;
-        FCk_Handle DockEntity = _Dock;
-        const auto Overflow = _Hotbar.Get_Slot(_Hotbar.Get_OverflowIndex());
+    }
 
-        if (_Leg == 0)
-        {
-            _Subject = _Pack;
-            _ExpectedMount = EMars_WorldItem_Mount::Carried;
-            _ExpectedCarrier = _Carrier;
-            _ExpectedParent = _BackNode;
-            Move(_Pack.Get_Holder(), _Pack.Get_Item(), _Hotbar.Get_BackpackSlot());
-        }
-        else if (_Leg == 1)
-        {
-            _Subject = _Slab;
-            _ExpectedMount = EMars_WorldItem_Mount::Held;
-            _ExpectedCarrier = _Carrier;
-            _ExpectedParent = _HandNode;
-            Move(_Slab.Get_Holder(), _Slab.Get_Item(), _Hotbar.Get_Slot(0));
-        }
-        else if (_Leg == 2)
-        {
-            _ExpectedMount = EMars_WorldItem_Mount::Carried;
-            _ExpectedParent = _BackNode;
-            _Hotbar.Request_Deselect();
-        }
-        else if (_Leg == 3)
-        {
-            _ExpectedMount = EMars_WorldItem_Mount::Held;
-            _ExpectedParent = _HandNode;
-            _Hotbar.Request_Select(FMars_Request_Hotbar_Select(0));
-        }
-        else if (_Leg == 4)
-        {
-            _ExpectedMount = EMars_WorldItem_Mount::Carried;
-            _ExpectedCarrier = SlotEntity;
-            _ExpectedParent = SlotEntity.As_Transform();
-            Move(_Hotbar.Get_Slot(0), _Slab.Get_Item(), _CargoSlot.Get_Inventory());
-        }
-        else if (_Leg == 5)
-        {
-            _Subject = _WorldItems[0];
-            _ExpectedMount = EMars_WorldItem_Mount::Held;
-            _ExpectedCarrier = _Carrier;
-            _ExpectedParent = _HandNode;
-            Move(_WorldItems[0].Get_Holder(), _PlatterItems[0], Overflow);
-        }
-        else
-        {
-            _ExpectedMount = EMars_WorldItem_Mount::Carried;
-            _ExpectedCarrier = DockEntity;
-            _ExpectedParent = _Dock.Get_Node();
-            Move(Overflow, _PlatterItems[0], _Dock.Get_Inventory());
-        }
+    private void Expect(EMars_WorldItem_Mount InMount, FCk_Handle InCarrier, FCk_Handle_Transform InParent)
+    {
+        _ExpectedMount = InMount;
+        _ExpectedCarrier = InCarrier;
+        _ExpectedParent = InParent;
     }
 
     private void Move(FCk_Handle_Inventory_DataOnly InFrom, FCk_Handle_Item InItem, FCk_Handle_Inventory_DataOnly InTo)
     {
         if (ck::Is_NOT_Valid(InFrom) || ck::Is_NOT_Valid(InItem) || ck::Is_NOT_Valid(InTo))
         {
-            FinishFailure(f"leg {_Leg}: a move needs a source, an item and a target");
+            FinishFailure(f"{_Leg}: a move needs a source, an item and a target");
             return;
         }
 
@@ -196,7 +194,7 @@ class UMars_AutoTest_WorldItem_TheMountFollowsTheItemsInventory : UMars_AutoTest
                                 ECk_Inventory_OperationResult_Transfer InResult)
     {
         if (InResult != ECk_Inventory_OperationResult_Transfer::Success)
-        { FinishFailure(f"leg {_Leg}: the transfer failed with [{InResult :n}]"); }
+        { FinishFailure(f"{_Leg}: the transfer failed with [{InResult :n}]"); }
     }
 
     UFUNCTION()
@@ -216,7 +214,7 @@ class UMars_AutoTest_WorldItem_TheMountFollowsTheItemsInventory : UMars_AutoTest
     private void Step_AssertHeaded(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         Assert_True(_HeadedAtPoll.IsSet() && _HeadedAtPoll.GetValue() <= k_MaxPollsToHead,
-            f"leg {_Leg}: it headed for [{_ExpectedMount :n}] within {k_MaxPollsToHead} frames of the move (frame {_LegPolls})");
+            f"{_Leg}: it headed for [{_ExpectedMount :n}] within {k_MaxPollsToHead} frames of the move (frame {_LegPolls})");
     }
 
     UFUNCTION()
@@ -230,11 +228,10 @@ class UMars_AutoTest_WorldItem_TheMountFollowsTheItemsInventory : UMars_AutoTest
     private void Step_AssertLanded(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         Assert_True(_Subject.Get_Mount() == _ExpectedMount,
-            f"leg {_Leg}: mounted [{_Subject.Get_Mount() :n}], expected [{_ExpectedMount :n}]");
+            f"{_Leg}: mounted [{_Subject.Get_Mount() :n}], expected [{_ExpectedMount :n}]");
         Assert_True(_Subject.Get_Carrier() == _ExpectedCarrier,
-            f"leg {_Leg}: carried by [{_Subject.Get_Carrier().ToString()}], expected [{_ExpectedCarrier.ToString()}]");
-        Assert_True(Get_MountParent(_Subject) == _ExpectedParent, f"leg {_Leg}: it hangs off the expected node");
-        ++_Leg;
+            f"{_Leg}: carried by [{_Subject.Get_Carrier().ToString()}], expected [{_ExpectedCarrier.ToString()}]");
+        Assert_True(Get_MountParent(_Subject) == _ExpectedParent, f"{_Leg}: it hangs off the expected node");
     }
 
     // Where the item is going: the pending mount's target while one waits on the body, else the committed mount.

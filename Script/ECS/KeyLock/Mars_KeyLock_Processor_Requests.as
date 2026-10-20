@@ -99,20 +99,17 @@ class UMars_Processor_KeyLock_HandleRequests : UCk_Processor_Script_Base_UE
                                     FCk_Handle_Item InNewItemInTarget,
                                     ECk_Inventory_OperationResult_Transfer InResult)
     {
-        const auto Succeeded = InResult == ECk_Inventory_OperationResult_Transfer::Success;
-        ck::EnsureIfNot(Succeeded,
-            f"[KeyLock] Moving [{InItem.ToString()}] from [{InSource.ToString()}] to [{InTarget.ToString()}] failed with [{InResult :n}]");
+        if (ck::EnsureIfNot(InResult == ECk_Inventory_OperationResult_Transfer::Success,
+            f"[KeyLock] Moving [{InItem.ToString()}] from [{InSource.ToString()}] to [{InTarget.ToString()}] failed with [{InResult :n}]"))
+        {
+            auto TargetLock = utils_entity_lifetime::Get_LifetimeOwner(InTarget).As_KeyLock(ECk_SanityCheck::UnChecked);
+            if (ck::IsValid(TargetLock))
+            { Broadcast_TransferFailed(TargetLock, InItem); }
 
-        if (Succeeded)
-        { return; }
-
-        auto TargetLock = utils_entity_lifetime::Get_LifetimeOwner(InTarget).As_KeyLock(ECk_SanityCheck::UnChecked);
-        if (ck::IsValid(TargetLock))
-        { Broadcast_TransferFailed(TargetLock, InItem); }
-
-        auto SourceLock = utils_entity_lifetime::Get_LifetimeOwner(InSource).As_KeyLock(ECk_SanityCheck::UnChecked);
-        if (ck::IsValid(SourceLock))
-        { Broadcast_TransferFailed(SourceLock, InItem); }
+            auto SourceLock = utils_entity_lifetime::Get_LifetimeOwner(InSource).As_KeyLock(ECk_SanityCheck::UnChecked);
+            if (ck::IsValid(SourceLock))
+            { Broadcast_TransferFailed(SourceLock, InItem); }
+        }
     }
 
     private void Broadcast_TransferFailed(FCk_Handle_KeyLock& InLock, const FCk_Handle_Item& InItem)

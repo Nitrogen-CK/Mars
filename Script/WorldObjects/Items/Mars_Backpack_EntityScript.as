@@ -92,6 +92,7 @@ class UMars_Backpack_EntityScript : UMars_WorldItem_EntityScript
             SlotSpec.Index = Index;
             SlotSpec.ProbeRadius = Mount.ProbeRadius;
             SlotSpec.MountOffset = Mount.Offset;
+            SlotSpec.Prompt = utils_cargo_slot::Make_PromptSpec();
 
             if (Mount.Socket.IsSet())
             {

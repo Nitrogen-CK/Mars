@@ -9,11 +9,8 @@ class UMars_SmState_KeyLock_Interact : UMars_SmState_InteractTarget_RunTask
 // next visual lerps from there) and runs until the lock reports the expected content, or that the transfer was refused.
 // A Blocked_ action fails (ActionBlocked): the prompt processor disables the target for it, but can lag the initiator's
 // hands by a frame.
-class UMars_SmTask_KeyLock_InsertOrTake : UCk_SmTask_EntityScript
+class UMars_SmTask_KeyLock_InsertOrTake : UMars_SmTask_InteractionWork
 {
-    default _TaskMode = ECk_SmTaskMode::Tick;
-
-    private ECk_SmTaskResult _Outcome = ECk_SmTaskResult::Running;
     private FCk_Handle_KeyLock _Lock;
     private FCk_Handle_Item _Item;
     private EMars_KeyLock_Action _Action = EMars_KeyLock_Action::Insert;
@@ -25,19 +22,11 @@ class UMars_SmTask_KeyLock_InsertOrTake : UCk_SmTask_EntityScript
         _Lock = FCk_Handle_KeyLock();
         _Item = FCk_Handle_Item();
 
-        // The context is the InteractTarget; the initiator is stamped on the per-interaction sub-SM root.
-        auto Context = Get_StateMachineContext();
-        FCk_Handle SubSm = Get_OwningStateMachine();
-        const auto HasContext = Context.Has_Fragment(FMars_Fragment_InteractionContext)
-            && ck::IsValid(SubSm) && SubSm.Has_Fragment(FMars_Fragment_InteractionContext);
-        if (ck::EnsureIfNot(HasContext, "[KeyLock] Interaction ran without an interaction context"))
-        {
-            _Outcome = ECk_SmTaskResult::Failed;
-            return;
-        }
+        FCk_Handle Owner;
+        FCk_Handle Initiator;
+        if (TryGet_InteractionEnds(Owner, Initiator) == false)
+        { return; }
 
-        auto Owner = Context.Get_Fragment(FMars_Fragment_InteractionContext).InteractableOwner;
-        auto Initiator = SubSm.Get_Fragment(FMars_Fragment_InteractionContext).Initiator;
         auto Lock = Owner.As_KeyLock(ECk_SanityCheck::UnChecked);
         if (ck::EnsureIfNot(ck::IsValid(Lock), f"[KeyLock] Interaction owner [{Owner.ToString()}] is no lock")
             || ck::EnsureIfNot(ck::IsValid(Initiator), f"[KeyLock] [{Lock.ToString()}] interaction has no initiator"))
@@ -51,7 +40,7 @@ class UMars_SmTask_KeyLock_InsertOrTake : UCk_SmTask_EntityScript
         {
             auto HeldItem = Initiator.As_HeldItem();
             auto Item = HeldItem.Get_CurrentItem();
-            const auto From = DoGet_WorldOf(HeldItem.Get_PresentationEntity(), HeldItem.Get_HandAttachPoint());
+            const auto From = utils_world_item::Get_WorldOf(HeldItem.Get_PresentationEntity(), HeldItem.Get_HandAttachPoint());
 
             DoStart(Lock, Item, Action);
             Lock.Request_Insert(FMars_Request_KeyLock_Insert(Item, From));
@@ -61,7 +50,7 @@ class UMars_SmTask_KeyLock_InsertOrTake : UCk_SmTask_EntityScript
         if (Action == EMars_KeyLock_Action::Take)
         {
             auto Item = Lock.Get_Key();
-            const auto From = DoGet_WorldOf(Lock.Get_Visual(), Lock.Get_KeyMount());
+            const auto From = utils_world_item::Get_WorldOf(Lock.Get_Visual(), Lock.Get_KeyMount());
             const auto Target = Initiator.As_Hotbar().TryGet_TakeTarget(Item);
 
             auto HeldItem = Initiator.As_HeldItem();
@@ -73,12 +62,6 @@ class UMars_SmTask_KeyLock_InsertOrTake : UCk_SmTask_EntityScript
         }
 
         DoFail(EMars_Interaction_FailReason::ActionBlocked);
-    }
-
-    UFUNCTION(BlueprintOverride)
-    ECk_SmTaskResult DoTick(FCk_Handle_SmTask InHandle, FCk_Time InDeltaT, ECk_Sm_NetContext InNetContext)
-    {
-        return _Outcome;
     }
 
     UFUNCTION(BlueprintOverride)
@@ -126,21 +109,5 @@ class UMars_SmTask_KeyLock_InsertOrTake : UCk_SmTask_EntityScript
         }
 
         _Lock = FCk_Handle_KeyLock();
-    }
-
-    // The world pose of InEntity when it has a transform yet (a pending visual may not), else of InFallback.
-    private FTransform DoGet_WorldOf(FCk_Handle InEntity, FCk_Handle InFallback) const
-    {
-        const auto EntityTransform = InEntity.As_Transform(ECk_SanityCheck::UnChecked);
-        if (ck::IsValid(EntityTransform))
-        { return utils_transform::Get_EntityCurrentTransform(EntityTransform); }
-
-        return utils_transform::Get_EntityCurrentTransform(InFallback.As_Transform());
-    }
-
-    private void DoFail(EMars_Interaction_FailReason InReason)
-    {
-        utils_interactable::Record_FailReason(Get_OwningStateMachine(), InReason);
-        _Outcome = ECk_SmTaskResult::Failed;
     }
 }

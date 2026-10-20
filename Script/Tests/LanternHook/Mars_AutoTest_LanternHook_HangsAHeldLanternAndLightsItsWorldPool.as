@@ -1,9 +1,13 @@
 // A carrier holding an open lantern lights its Held pool; hanging it moves the lantern's one body onto the hook (Carried by
 // the hook entity, settled), where it lights its World pool - the radius and the Probe.Mars.Light probe both follow - and
 // leaves the carrier's hands empty; an empty-handed carrier then reads Take, and taking it puts it back in the carrier's
-// hand at its Held pool. Isolated Z band: -97000.
+// hand at its Held pool. The hook's OnLanternChanged fires once per edge: naming the lantern on the hang, naming no
+// lantern on the take. Isolated Z band: -97000.
 class UMars_AutoTest_LanternHook_HangsAHeldLanternAndLightsItsWorldPool : UMars_AutoTestRig_LanternHook
 {
+    // Every OnLanternChanged, in order (invalid = emptied).
+    private TArray<FCk_Handle_Item> _LanternChanges;
+
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
@@ -12,6 +16,7 @@ class UMars_AutoTest_LanternHook_HangsAHeldLanternAndLightsItsWorldPool : UMars_
         _HeldItem = utils_held_item::Add(_Carrier);
 
         _Hook = MakeHook(InHandle, FVector(150.0, 0.0, -97000.0), FGameplayTag());
+        _Hook.BindTo_OnLanternChanged(FMars_Delegate_LanternHook_OnLanternChanged(this, n"OnHookLanternChanged"));
         SpawnLantern(InHandle, mars_items::Lantern(), FVector(0.0, 150.0, -97000.0));
 
         Add_Step_WaitUntil("the lantern world item is composed", n"Check_LanternReady", k_SlowPolls, 0);
@@ -28,6 +33,12 @@ class UMars_AutoTest_LanternHook_HangsAHeldLanternAndLightsItsWorldPool : UMars_
         Add_Step_WaitUntil("the carrier holds the lit lantern at its Held pool again", n"Check_LanternHeldAndLit", k_SlowPolls, 0);
         Add_Step("the hook is empty", n"Step_AssertHookEmpty");
         Run_Steps(InHandle);
+    }
+
+    UFUNCTION()
+    private void OnHookLanternChanged(FCk_Handle_LanternHook InHook, FCk_Handle_Item InMaybeLantern)
+    {
+        _LanternChanges.Add(InMaybeLantern);
     }
 
     UFUNCTION()
@@ -66,6 +77,9 @@ class UMars_AutoTest_LanternHook_HangsAHeldLanternAndLightsItsWorldPool : UMars_
 
         const auto Action = _Hook.Get_ActionFor(_Carrier);
         Assert_True(Action == EMars_LanternHook_Action::Take, f"an empty-handed carrier reads Take on a hung lantern (got [{Action :n}])");
+
+        Assert_Equals_Int(_LanternChanges.Num(), 1, "OnLanternChanged fired once for the hang");
+        Assert_True(_LanternChanges[0] == Get_LanternItem(), "the hang's OnLanternChanged names the lantern");
     }
 
     UFUNCTION()
@@ -86,6 +100,8 @@ class UMars_AutoTest_LanternHook_HangsAHeldLanternAndLightsItsWorldPool : UMars_
     private void Step_AssertHookEmpty(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         Assert_False(_Hook.Get_IsOccupied(), "the hook is empty once its lantern is taken");
+        Assert_Equals_Int(_LanternChanges.Num(), 2, "OnLanternChanged fired once per edge: hang, take");
+        Assert_True(ck::Is_NOT_Valid(_LanternChanges[1]), "the take's OnLanternChanged names no lantern");
     }
 
     // InPool's probe is the shown one and the only enabled one.

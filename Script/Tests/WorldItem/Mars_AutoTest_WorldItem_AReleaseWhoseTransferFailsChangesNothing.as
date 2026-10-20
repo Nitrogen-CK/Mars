@@ -42,7 +42,7 @@ class UMars_AutoTest_WorldItem_AReleaseWhoseTransferFailsChangesNothing : UMars_
         Add_CarrierBodyWithBack(InHandle, k_Origin);
         Add_Hotbar(_Carrier, 1);
 
-        Spawn_Floor(InHandle, k_Origin + k_PackOffset);
+        Spawn_FloorSlab(InHandle, k_Origin + k_PackOffset);
         auto SpawnParams = UMars_WorldItem_EntityScript::Params();
         SpawnParams.Definition = mars_items::Backpack();
         SpawnParams.Mode = EMars_WorldItem_Mode::World;
@@ -57,21 +57,6 @@ class UMars_AutoTest_WorldItem_AReleaseWhoseTransferFailsChangesNothing : UMars_
         Add_Step_WaitUntil("the release's transfer is refused and answered", n"Check_ReleaseRefused", 0, 0);
         Add_Step("nothing changed", n"Step_AssertUnchanged");
         Run_Steps(InHandle);
-    }
-
-    // A static slab whose top is at InTop.
-    private void Spawn_Floor(FCk_Handle InOwner, FVector InTop)
-    {
-        auto Owner = InOwner;
-        auto Floor = utils_entity_lifetime::Request_CreateEntity(Owner);
-        utils_transform::Add(Floor, FTransform(FRotator::ZeroRotator, InTop - FVector(0.0, 0.0, 1.0)), ECk_Replication::DoesNotReplicate);
-        auto Shape = FCk_Jolt_ShapeDimensions(ECk_Jolt_ShapeType::Box);
-        Shape.Set_HalfExtents(FVector(80.0, 80.0, 1.0));
-        auto FloorSpec = FCk_JoltBody_Spec(ECk_JoltBody_ShapeSource::ExplicitShape);
-        FloorSpec.Set_ShapeDimensions(Shape);
-        FloorSpec.Set_MotionType(ECk_MotionType::Static);
-        FloorSpec.Set_CollisionProfileName(n"BlockAll");
-        utils_jolt_body::Add(Floor, FloorSpec);
     }
 
     UFUNCTION()
@@ -151,19 +136,9 @@ class UMars_AutoTest_WorldItem_AReleaseWhoseTransferFailsChangesNothing : UMars_
     {
         Assert_True(_Pack.Get_Mount() == EMars_WorldItem_Mount::Carried && _Pack.Get_Carrier() == _Carrier,
             f"{InWhen}: Carried by the carrier (got [{_Pack.Get_Mount() :n}])");
-        Assert_True(Get_MountParent() == _BackNode, f"{InWhen}: attached to the Back node");
+        Assert_True(Get_MountParent(_Pack) == _BackNode, f"{InWhen}: attached to the Back node");
         Assert_True(utils_jolt_body::Get_MotionType(_Pack.Get_Body()) == ECk_MotionType::Kinematic, f"{InWhen}: the body is Kinematic");
         Assert_True(_Pack.Get_Pickup().Get_EnableDisable() == ECk_EnableDisable::Disable, f"{InWhen}: the pickup is disabled");
-    }
-
-    // Invalid while the world item is not scene-node attached.
-    private FCk_Handle_Transform Get_MountParent() const
-    {
-        auto Node = _Pack.As_SceneNode(ECk_SanityCheck::UnChecked);
-        if (ck::Is_NOT_Valid(Node))
-        { return FCk_Handle_Transform(); }
-
-        return utils_scene_node::Get_Parent(Node);
     }
 }
 

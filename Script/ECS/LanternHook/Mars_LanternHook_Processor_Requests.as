@@ -4,7 +4,8 @@
 //   Hang:   Item.Get_ParentInventory() -> this hook's inventory. Refused unless the hook is empty and Item is a lantern.
 //   Take:   this hook's inventory -> Target. Refused unless Item is the hung lantern.
 //   Refuel: the lantern hung at the drain gets Tallow's measures (its own request) and Tallow is destroyed. Refused unless
-//           a lantern with room hangs here and Tallow is tallow in an inventory.
+//           a lantern hangs here with room left after the refuels already queued in this drain (the lantern applies them
+//           only in its own drain), and Tallow is tallow in an inventory. A refused tallow is kept.
 // A refused request (here, or by the inventory) ensures - the caller bypassed Get_ActionFor, or raced another change to
 // the hook - and broadcasts OnRequestFailed so whoever waits on the hook can stop waiting.
 class UMars_Processor_LanternHook_HandleRequests : UCk_Processor_Script_Base_UE
@@ -37,8 +38,9 @@ class UMars_Processor_LanternHook_HandleRequests : UCk_Processor_Script_Base_UE
         for (const auto& Request : TakeRequests)
         { HandleTakeRequest(Self, InState, Request); }
 
+        auto QueuedMeasures = 0;
         for (const auto& Request : RefuelRequests)
-        { HandleRefuelRequest(Self, Request); }
+        { HandleRefuelRequest(Self, Request, QueuedMeasures); }
     }
 
     private void HandleHangRequest(FCk_Handle_LanternHook& InHook,
@@ -84,21 +86,25 @@ class UMars_Processor_LanternHook_HandleRequests : UCk_Processor_Script_Base_UE
             FCk_Delegate_Inventory_OnOperationResult_Transfer(this, n"OnTransferComplete"));
     }
 
-    private void HandleRefuelRequest(FCk_Handle_LanternHook& InHook, const FMars_Request_LanternHook_Refuel& InRequest)
+    // InOutQueuedMeasures totals the measures this drain has already queued on the hung lantern.
+    private void HandleRefuelRequest(FCk_Handle_LanternHook& InHook, const FMars_Request_LanternHook_Refuel& InRequest,
+                                     int32& InOutQueuedMeasures)
     {
         auto Tallow = InRequest.Tallow;
         auto Lantern = InHook.Get_Lantern();
         const auto IsTallow = ck::IsValid(Tallow) && Tallow.Has_Tallow();
         auto Inventory = IsTallow ? Tallow.Get_ParentInventory() : FCk_Handle_Inventory();
-        const auto CanRefuel = IsTallow && ck::IsValid(Inventory) && ck::IsValid(Lantern) && Lantern.Get_CanRefuel();
-        if (ck::EnsureIfNot(CanRefuel,
+        const auto HasRoom = ck::IsValid(Lantern) && Lantern.Get_MeasuresLeft() + InOutQueuedMeasures < Lantern.Get_Measures();
+        if (ck::EnsureIfNot(IsTallow && ck::IsValid(Inventory) && HasRoom,
             f"[LanternHook] Refuel at [{InHook.ToString()}]: [{Tallow.ToString()}] is no tallow in an inventory, or no lantern with room hangs here - skipped"))
         {
             Broadcast_RequestFailed(InHook, Tallow);
             return;
         }
 
-        Lantern.Request_Refuel(FMars_Request_Lantern_Refuel(Tallow.Get_TallowMeasures()));
+        const auto Measures = Tallow.Get_Tallow().Measures;
+        InOutQueuedMeasures += Measures;
+        Lantern.Request_Refuel(FMars_Request_Lantern_Refuel(Measures));
 
         auto Remove = FCk_Request_Inventory_RemoveItem(Tallow);
         Remove.Set_PostRemovePolicy(ECk_Inventory_PostRemovePolicy::DestroyItem);
@@ -114,20 +120,17 @@ class UMars_Processor_LanternHook_HandleRequests : UCk_Processor_Script_Base_UE
                                     FCk_Handle_Item InNewItemInTarget,
                                     ECk_Inventory_OperationResult_Transfer InResult)
     {
-        const auto Succeeded = InResult == ECk_Inventory_OperationResult_Transfer::Success;
-        ck::EnsureIfNot(Succeeded,
-            f"[LanternHook] Moving [{InItem.ToString()}] from [{InSource.ToString()}] to [{InTarget.ToString()}] failed with [{InResult :n}]");
+        if (ck::EnsureIfNot(InResult == ECk_Inventory_OperationResult_Transfer::Success,
+            f"[LanternHook] Moving [{InItem.ToString()}] from [{InSource.ToString()}] to [{InTarget.ToString()}] failed with [{InResult :n}]"))
+        {
+            auto TargetHook = utils_entity_lifetime::Get_LifetimeOwner(InTarget).As_LanternHook(ECk_SanityCheck::UnChecked);
+            if (ck::IsValid(TargetHook))
+            { Broadcast_RequestFailed(TargetHook, InItem); }
 
-        if (Succeeded)
-        { return; }
-
-        auto TargetHook = utils_entity_lifetime::Get_LifetimeOwner(InTarget).As_LanternHook(ECk_SanityCheck::UnChecked);
-        if (ck::IsValid(TargetHook))
-        { Broadcast_RequestFailed(TargetHook, InItem); }
-
-        auto SourceHook = utils_entity_lifetime::Get_LifetimeOwner(InSource).As_LanternHook(ECk_SanityCheck::UnChecked);
-        if (ck::IsValid(SourceHook))
-        { Broadcast_RequestFailed(SourceHook, InItem); }
+            auto SourceHook = utils_entity_lifetime::Get_LifetimeOwner(InSource).As_LanternHook(ECk_SanityCheck::UnChecked);
+            if (ck::IsValid(SourceHook))
+            { Broadcast_RequestFailed(SourceHook, InItem); }
+        }
     }
 
     private void Broadcast_RequestFailed(FCk_Handle_LanternHook& InHook, const FCk_Handle_Item& InItem)

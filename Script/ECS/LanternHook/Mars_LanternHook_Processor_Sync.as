@@ -14,7 +14,8 @@ class UMars_Processor_LanternHook_Sync : UCk_Processor_Script_Base_UE
     void ForEachEntity(FCk_Time InDeltaT, FCk_Handle& InHandle, FMars_Fragment_LanternHook& InState)
     {
         auto Self = InHandle.As_LanternHook();
-        DoSync_Source(InHandle, InState, Self.Get_HoldsLitLantern());
+        const auto Output = Self.Get_HoldsLitLantern() ? EMars_MechanismSource_Output::Asserted : EMars_MechanismSource_Output::Deasserted;
+        DoSync_Source(InHandle, InState, Output);
 
         auto Now = InState.Inventory.Get_SoleItem();
         if (Now == InState.LastSeen)
@@ -25,18 +26,17 @@ class UMars_Processor_LanternHook_Sync : UCk_Processor_Script_Base_UE
         { Self.Get_Fragment(FMars_Fragment_LanternHook_Signals).OnLanternChanged.Broadcast(Self, Now); }
     }
 
-    private void DoSync_Source(FCk_Handle& InHandle, FMars_Fragment_LanternHook& InState, bool InAsserted)
+    private void DoSync_Source(FCk_Handle& InHandle, FMars_Fragment_LanternHook& InState, EMars_MechanismSource_Output InOutput)
     {
-        if (InState.LastAsserted.IsSet() && InState.LastAsserted.GetValue() == InAsserted)
+        if (InState.LastOutput.IsSet() && InState.LastOutput.GetValue() == InOutput)
         { return; }
 
-        InState.LastAsserted = TOptional<bool>(InAsserted);
+        InState.LastOutput = TOptional<EMars_MechanismSource_Output>(InOutput);
 
         auto Source = InHandle.As_MechanismSource(ECk_SanityCheck::UnChecked);
         if (ck::Is_NOT_Valid(Source))
         { return; }
 
-        const auto Output = InAsserted ? EMars_MechanismSource_Output::Asserted : EMars_MechanismSource_Output::Deasserted;
-        Source.Request_SetOutput(FMars_Request_MechanismSource_SetOutput(Output));
+        Source.Request_SetOutput(utils_mechanism_source::Make_SetOutput(InOutput));
     }
 }

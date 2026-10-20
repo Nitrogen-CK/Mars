@@ -4,28 +4,15 @@ asset Mars_ItemDef_Rock of UCk_InventoryItem_Definition
 {
     _CoreInfo = FCk_InventoryItem_CoreInfo(FText::FromString("Rock"));
 
-    auto Presentation = Cast<UMars_ItemTrait_Presentation>(NewObject(this, UMars_ItemTrait_Presentation));
-    Presentation.Visual.Mesh = engine::Sphere();
-    Presentation.Visual.MeshScale = FVector(0.3, 0.3, 0.3);
-    Presentation.Visual.MaterialOverride = TSoftObjectPtr<UMaterialInterface>(assets::ProtoGrid_Item_Mars_MI().ToSoftObjectPath());
-    Presentation.Grip.Shape = EMars_FPHands_GripShape::Sphere;
-    Presentation.Grip.Handedness = EMars_ItemPresentation_Handedness::TwoHanded;
-    _ItemTraits.Add(Presentation);
-
-    auto Throwable = Cast<UMars_ItemTrait_Throwable>(NewObject(this, UMars_ItemTrait_Throwable));
-    _ItemTraits.Add(Throwable);
+    mars_items::Add_BlockoutTraits(this, mars_items::Make_BallBlockout(FVector(0.3, 0.3, 0.3)));
 }
 
 asset Mars_ItemDef_Ration of UCk_InventoryItem_Definition
 {
     _CoreInfo = FCk_InventoryItem_CoreInfo(FText::FromString("Ration"));
 
-    auto Presentation = Cast<UMars_ItemTrait_Presentation>(NewObject(this, UMars_ItemTrait_Presentation));
-    Presentation.Visual.Mesh = engine::Cube();
-    Presentation.Visual.MeshScale = FVector(0.3, 0.3, 0.3);
-    Presentation.Visual.MaterialOverride = TSoftObjectPtr<UMaterialInterface>(assets::ProtoGrid_Item_Mars_MI().ToSoftObjectPath());
-    Presentation.Grip.Handedness = EMars_ItemPresentation_Handedness::TwoHanded;
-    _ItemTraits.Add(Presentation);
+    mars_items::Add_BlockoutTraits(this,
+        FMars_ItemBlockout(engine::Cube(), FVector(0.3, 0.3, 0.3), EMars_ItemPresentation_Handedness::TwoHanded));
 
     auto UseAction = Cast<UMars_ItemTrait_UseAction>(NewObject(this, UMars_ItemTrait_UseAction));
     UseAction.UseStateClass = UMars_SmState_ItemUse_Consume;
@@ -34,24 +21,14 @@ asset Mars_ItemDef_Ration of UCk_InventoryItem_Definition
     UseAction.HoldSeconds = 1.0f;
     UseAction.ConsumeOnSuccess = true;
     _ItemTraits.Add(UseAction);
-
-    auto Throwable = Cast<UMars_ItemTrait_Throwable>(NewObject(this, UMars_ItemTrait_Throwable));
-    _ItemTraits.Add(Throwable);
 }
 
 asset Mars_ItemDef_Cog of UCk_InventoryItem_Definition
 {
     _CoreInfo = FCk_InventoryItem_CoreInfo(FText::FromString("Cog"));
 
-    auto Presentation = Cast<UMars_ItemTrait_Presentation>(NewObject(this, UMars_ItemTrait_Presentation));
-    Presentation.Visual.Mesh = engine::Cylinder();
-    Presentation.Visual.MeshScale = FVector(0.3, 0.3, 0.3);
-    Presentation.Visual.MaterialOverride = TSoftObjectPtr<UMaterialInterface>(assets::ProtoGrid_Item_Mars_MI().ToSoftObjectPath());
-    Presentation.Grip.Handedness = EMars_ItemPresentation_Handedness::TwoHanded;
-    _ItemTraits.Add(Presentation);
-
-    auto Throwable = Cast<UMars_ItemTrait_Throwable>(NewObject(this, UMars_ItemTrait_Throwable));
-    _ItemTraits.Add(Throwable);
+    mars_items::Add_BlockoutTraits(this,
+        FMars_ItemBlockout(engine::Cylinder(), FVector(0.3, 0.3, 0.3), EMars_ItemPresentation_Handedness::TwoHanded));
 }
 
 // One cargo mount per pocket socket on the mesh (Pocket1..3); stowed items sit on the socket itself.
@@ -73,11 +50,7 @@ asset Mars_ItemDef_Backpack of UCk_InventoryItem_Definition
     Presentation.Grip.Handedness = EMars_ItemPresentation_Handedness::TwoHanded;
     _ItemTraits.Add(Presentation);
 
-    auto Throwable = Cast<UMars_ItemTrait_Throwable>(NewObject(this, UMars_ItemTrait_Throwable));
-    Throwable.ThrowSpeed = 500.0f;
-    Throwable.DropSpeed = 100.0f;
-    Throwable.AngularVelocityDeg = FVector::ZeroVector;
-    _ItemTraits.Add(Throwable);
+    _ItemTraits.Add(mars_items::Make_PlatterThrowable(this));
 
     auto Backpack = Cast<UMars_ItemTrait_Backpack>(NewObject(this, UMars_ItemTrait_Backpack));
     auto Mount = FMars_CargoSlot_Mount();
@@ -173,13 +146,9 @@ asset Mars_ItemDef_Pan of UCk_InventoryItem_Definition
 {
     _CoreInfo = FCk_InventoryItem_CoreInfo(FText::FromString("Pan"));
 
-    auto Presentation = Cast<UMars_ItemTrait_Presentation>(NewObject(this, UMars_ItemTrait_Presentation));
-    Presentation.Visual.Mesh = engine::Cube();
-    Presentation.Visual.MeshScale = FVector(0.35, 0.35, 0.04);
-    Presentation.Visual.MaterialOverride = TSoftObjectPtr<UMaterialInterface>(assets::ProtoGrid_Item_Mars_MI().ToSoftObjectPath());
-    Presentation.Grip.Pose = EMars_HandGripPose::Power;
-    Presentation.Grip.Handedness = EMars_ItemPresentation_Handedness::TwoHanded;
-    _ItemTraits.Add(Presentation);
+    auto Blockout = FMars_ItemBlockout(engine::Cube(), FVector(0.35, 0.35, 0.04), EMars_ItemPresentation_Handedness::TwoHanded);
+    Blockout.Pose = TOptional<EMars_HandGripPose>(EMars_HandGripPose::Power);
+    mars_items::Add_BlockoutTraits(this, Blockout);
 
     auto UseAction = Cast<UMars_ItemTrait_UseAction>(NewObject(this, UMars_ItemTrait_UseAction));
     UseAction.UseStateClass = UMars_SmState_ItemUse_Strike;
@@ -193,9 +162,6 @@ asset Mars_ItemDef_Pan of UCk_InventoryItem_Definition
     Strike.Swing = utils_hand_swing::Make_SwipeArc();
     Strike.HitShake = assets::Impact_Light_CameraShake_Mars_BP_Class();
     _ItemTraits.Add(Strike);
-
-    auto Throwable = Cast<UMars_ItemTrait_Throwable>(NewObject(this, UMars_ItemTrait_Throwable));
-    _ItemTraits.Add(Throwable);
 }
 
 namespace mars_items

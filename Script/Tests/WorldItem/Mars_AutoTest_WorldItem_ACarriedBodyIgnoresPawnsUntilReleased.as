@@ -40,15 +40,7 @@ class UMars_AutoTest_WorldItem_ACarriedBodyIgnoresPawnsUntilReleased : UMars_Aut
         Add_CarrierBodyWithBack(InHandle, k_Origin);
         Add_Hotbar(_Carrier, 2);
 
-        Add_StaticBox(InHandle, k_Origin + k_SlabOffset - FVector(0.0, 0.0, 1.0), FVector(80.0, 80.0, 1.0));
-        auto SpawnParams = UMars_FoodItem_EntityScript::Params();
-        SpawnParams.SpawnTransform = FTransform(FRotator::ZeroRotator, k_Origin + k_SlabOffset + FVector(0.0, 0.0, 5.0));
-        SpawnParams.Definition = utils_held_item::Make_DefinitionSoft(mars_items::Food_MeatSlab());
-        SpawnParams.Mode = EMars_WorldItem_Mode::World;
-
-        // A piece outlives its spawner: under the world's transient entity, tracked for cleanup.
-        _SlabEntity = utils_entity_script::Request_SpawnEntity(ck::TransientEntity(), UMars_FoodItem_EntityScript, SpawnParams).Get_EntityUnderConstruction();
-        Track_ForCleanup(_SlabEntity);
+        _SlabEntity = Spawn_FoodItemOnFloor(InHandle, mars_items::Food_MeatSlab(), k_Origin + k_SlabOffset);
 
         Add_Step_WaitUntil("the slab is constructed and its body added", n"Check_SlabReady", k_SlowPolls, 0);
         Add_Step("the carrier picks the slab up", n"Step_PickUp");
@@ -66,28 +58,14 @@ class UMars_AutoTest_WorldItem_ACarriedBodyIgnoresPawnsUntilReleased : UMars_Aut
         Run_Steps(InHandle);
     }
 
-    // A static BlockAll box under InOwner, centred at InCentre.
-    private void Add_StaticBox(FCk_Handle InOwner, FVector InCentre, FVector InHalfExtents)
-    {
-        auto Owner = InOwner;
-        auto Entity = utils_entity_lifetime::Request_CreateEntity(Owner);
-        utils_transform::Add(Entity, FTransform(FRotator::ZeroRotator, InCentre), ECk_Replication::DoesNotReplicate);
-        auto Shape = FCk_Jolt_ShapeDimensions(ECk_Jolt_ShapeType::Box);
-        Shape.Set_HalfExtents(InHalfExtents);
-        auto Spec = FCk_JoltBody_Spec(ECk_JoltBody_ShapeSource::ExplicitShape);
-        Spec.Set_ShapeDimensions(Shape);
-        Spec.Set_MotionType(ECk_MotionType::Static);
-        Spec.Set_CollisionProfileName(n"BlockAll");
-        utils_jolt_body::Add(Entity, Spec);
-    }
-
     UFUNCTION()
     private void Check_SlabReady(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
-        const auto IsConstructed = ck::IsValid(_SlabEntity) && _SlabEntity.Is_WorldItem() && ck::IsValid(_SlabEntity.As_WorldItem().Get_HeldItem());
+        const auto Slab = TryGet_ConstructedWorldItem(_SlabEntity);
+        const auto IsConstructed = ck::IsValid(Slab);
         if (IsConstructed && ck::Is_NOT_Valid(_Slab))
         {
-            _Slab = _SlabEntity.As_WorldItem();
+            _Slab = Slab;
             _Item = _Slab.Get_HeldItem();
         }
 
@@ -141,7 +119,7 @@ class UMars_AutoTest_WorldItem_ACarriedBodyIgnoresPawnsUntilReleased : UMars_Aut
         }
 
         auto Owner = InHandle;
-        Add_StaticBox(Owner, FVector(_SlabCentre.X, _SlabCentre.Y, _FloorTop - 1.0), FVector(25.0, 25.0, 1.0));
+        Spawn_StaticSlab(Owner, FVector(_SlabCentre.X, _SlabCentre.Y, _FloorTop - 1.0), FVector(25.0, 25.0, 1.0));
 
         // Spawned a little above its rest on the floor; it falls onto it.
         _CharacterEntity = utils_entity_lifetime::Request_CreateEntity(Owner);

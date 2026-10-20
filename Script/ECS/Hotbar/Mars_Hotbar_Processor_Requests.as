@@ -34,10 +34,8 @@ class UMars_Processor_Hotbar_HandleRequests : UCk_Processor_Script_Base_UE
             }
             else if (Request.Change == EMars_Hotbar_SelectionChange::Deselect)
             { HandleDeselectRequest(Self, InState); }
-            else if (Request.Change == EMars_Hotbar_SelectionChange::CycleNext)
-            { HandleCycleRequest(Self, InState, EMars_Hotbar_CycleDirection::Next); }
             else
-            { HandleCycleRequest(Self, InState, EMars_Hotbar_CycleDirection::Previous); }
+            { HandleCycleRequest(Self, InState, Request.Direction); }
         }
     }
 
@@ -59,7 +57,7 @@ class UMars_Processor_Hotbar_HandleRequests : UCk_Processor_Script_Base_UE
         if (InIndex != OverflowIndex && TryPark(InHotbar, InState, Target))
         { return; }
 
-        Apply_Selection(InHotbar, InState, Target);
+        utils_hotbar::Apply_Selection(InHotbar, InState, Target);
     }
 
     private void HandleDeselectRequest(FCk_Handle_Hotbar& InHotbar, FMars_Fragment_Hotbar& InState)
@@ -68,7 +66,7 @@ class UMars_Processor_Hotbar_HandleRequests : UCk_Processor_Script_Base_UE
         if (TryPark(InHotbar, InState, NoSelection))
         { return; }
 
-        Apply_Selection(InHotbar, InState, NoSelection);
+        utils_hotbar::Apply_Selection(InHotbar, InState, NoSelection);
     }
 
     private void HandleCycleRequest(FCk_Handle_Hotbar& InHotbar, FMars_Fragment_Hotbar& InState, EMars_Hotbar_CycleDirection InDirection)
@@ -103,17 +101,5 @@ class UMars_Processor_Hotbar_HandleRequests : UCk_Processor_Script_Base_UE
         { InHotbar.Get_Fragment(FMars_Fragment_Hotbar_Signals).OnOverflowEjectRequested.Broadcast(InHotbar, OverflowItem); }
 
         return true;
-    }
-
-    // This processor and UMars_Processor_Hotbar_Sync are SelectedIndex's only writers; each keeps its own copy.
-    private void Apply_Selection(FCk_Handle_Hotbar& InHotbar, FMars_Fragment_Hotbar& InState, TOptional<int32> InNewIndex)
-    {
-        if (InState.SelectedIndex == InNewIndex)
-        { return; }
-
-        InState.SelectedIndex = InNewIndex;
-
-        if (InHotbar.Has_Fragment(FMars_Fragment_Hotbar_Signals))
-        { InHotbar.Get_Fragment(FMars_Fragment_Hotbar_Signals).OnSelectionChanged.Broadcast(InHotbar); }
     }
 }

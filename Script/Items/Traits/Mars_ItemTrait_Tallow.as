@@ -11,12 +11,7 @@ mixin bool Has_Tallow(const FCk_Handle_Item& Self)
     return Self.Has_ItemTrait(UMars_ItemTrait_Tallow);
 }
 
-// 0 for an item that is no tallow.
-mixin int32 Get_TallowMeasures(const FCk_Handle_Item& Self)
+mixin const UMars_ItemTrait_Tallow Get_Tallow(const FCk_Handle_Item& Self)
 {
-    if (Self.Has_Tallow() == false)
-    { return 0; }
-
-    const UMars_ItemTrait_Tallow Tallow = Self.Get_ItemTrait(UMars_ItemTrait_Tallow);
-    return Tallow.Measures;
+    return Self.Get_ItemTrait(UMars_ItemTrait_Tallow);
 }

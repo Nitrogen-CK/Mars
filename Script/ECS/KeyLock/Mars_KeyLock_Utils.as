@@ -46,54 +46,16 @@ namespace utils_key_lock
         return InHandle.As_KeyLock();
     }
 
-    // The lock's one interact target: Use, a placeholder prompt UMars_Processor_KeyLock_Prompt rewrites while focused, and
-    // WhileLive: an insert or a removal lives until the lock reports it.
-    FMars_Interactable_TargetEntry Make_InteractTarget()
+    // The lock's one interact target: Use with the caller's prompt (a placeholder the lock's prompt processor rewrites
+    // while focused), and WhileLive: an insert or a removal lives until the lock reports it.
+    FMars_Interactable_TargetEntry Make_InteractTarget(FMars_InteractPrompt_Spec InPrompt)
     {
-        auto Prompt = FMars_InteractPrompt_Spec();
-        Prompt.InputAction = mars::Mars_IA_Interact_Use;
-        Prompt.PromptText = FText::FromString("Keyhole");
-
         auto Target = FMars_Interactable_TargetEntry();
         Target.InteractTargetSpec = FCk_InteractTarget_Spec(GameplayTags::InteractionChannel_Mars_Use);
-        Target.InteractPromptSpec = Prompt;
+        Target.InteractPromptSpec = InPrompt;
         Target.InteractionStateClass = UMars_SmState_KeyLock_Interact;
         Target.Work = EMars_Interactable_Work::WhileLive;
         return Target;
-    }
-
-    // "Red" for Key.Mars.Red: the tag's last segment.
-    FString Get_KeyName(FGameplayTag InKeyId)
-    {
-        const auto TagName = InKeyId.ToString();
-        FString Head;
-        FString Leaf;
-        if (TagName.Split(".", Head, Leaf, ESearchCase::IgnoreCase, ESearchDir::FromEnd))
-        { return Leaf; }
-
-        return TagName;
-    }
-
-    // InItemName is the held key for Insert and the inserted key for Take; InAcceptedKey names the key a Blocked_ lock
-    // asks for.
-    FText Get_PromptText(EMars_KeyLock_Action InAction, FText InItemName, FGameplayTag InAcceptedKey)
-    {
-        if (InAction == EMars_KeyLock_Action::Insert)
-        { return FText::FromString(f"Insert {InItemName.ToString()}"); }
-
-        if (InAction == EMars_KeyLock_Action::Take)
-        { return FText::FromString(f"Take {InItemName.ToString()}"); }
-
-        if (InAction == EMars_KeyLock_Action::Blocked_NothingHeld || InAction == EMars_KeyLock_Action::Blocked_WrongKey)
-        { return FText::FromString(f"Needs {Get_KeyName(InAcceptedKey)} key"); }
-
-        if (InAction == EMars_KeyLock_Action::Blocked_KeyKept)
-        { return FText::FromString("Unlocked"); }
-
-        if (InAction == EMars_KeyLock_Action::Blocked_HandsFull)
-        { return FText::FromString("Hands full"); }
-
-        return FText::FromString("No room");
     }
 }
 
@@ -159,7 +121,7 @@ mixin bool Get_Accepts(const FCk_Handle_KeyLock& Self, const FCk_Handle_Item& In
 //   empty,     hands empty                                    -> Blocked_NothingHeld
 //   occupied,  Kept                                           -> Blocked_KeyKept
 //   occupied,  Removable, holds anything                      -> Blocked_HandsFull
-//   occupied,  Removable, hands empty, a hotbar take target   -> Remove
+//   occupied,  Removable, hands empty, a hotbar take target   -> Take
 //   occupied,  Removable, hands empty, no take target         -> Blocked_NoRoom
 // A focuser without HeldItem + Hotbar -> Blocked_NothingHeld.
 mixin EMars_KeyLock_Action Get_ActionFor(const FCk_Handle_KeyLock& Self, FCk_Handle InFocuser)

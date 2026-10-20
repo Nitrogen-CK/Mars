@@ -105,7 +105,7 @@ struct FMars_Fragment_KeyLock_Params
 //--------------------------------------------------------------------------------------------------------------------------
 
 // Inventory is composed by utils_key_lock::Add. Visual and LastSeen are written only by UMars_Processor_KeyLock_Sync,
-// PendingArrival by the request drain and the sync, LastPromptAction only by UMars_Processor_KeyLock_Prompt.
+// PendingArrival by the request drain and the sync.
 struct FMars_Fragment_KeyLock
 {
     UPROPERTY()
@@ -128,10 +128,6 @@ struct FMars_Fragment_KeyLock
     // Where an inserted key visually was; its visual in the lock starts there.
     UPROPERTY()
     TOptional<FMars_WorldItem_PendingArrival> PendingArrival;
-
-    // The action the prompt currently shows; unset while the lock is not focused.
-    UPROPERTY()
-    TOptional<EMars_KeyLock_Action> LastPromptAction;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

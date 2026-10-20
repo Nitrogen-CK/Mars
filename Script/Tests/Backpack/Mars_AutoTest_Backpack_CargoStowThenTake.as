@@ -2,13 +2,16 @@
 // the slot holds it with a cargo visual and the hotbar slot empties - then takes it back into the selected empty bag
 // slot - the hotbar holds it and the slot and its visual are gone. Get_ActionFor reads Stow on the empty slot while the
 // rock is held; once the hands are empty an empty slot reads Blocked_NothingHeld and the occupied slot 0 reads Take.
-// Isolated Z band: -53000.
+// Slot 0's OnItemChanged fires once per edge: naming the rock on the stow, naming no item on the take. Isolated Z band:
+// -53000.
 class UMars_AutoTest_Backpack_CargoStowThenTake : UMars_AutoTestRig_Carrier
 {
     private FCk_Handle_Backpack _Backpack;
     private FCk_Handle_CargoSlot _Slot0;
     private FCk_Handle_Inventory_DataOnly _RockHolder;
     private FCk_Handle_Item _Rock;
+    // Every OnItemChanged of slot 0, in order (invalid = emptied).
+    private TArray<FCk_Handle_Item> _ItemChanges;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
@@ -39,6 +42,7 @@ class UMars_AutoTest_Backpack_CargoStowThenTake : UMars_AutoTestRig_Carrier
         Add_Step("empty hands: an empty slot reads Blocked_NothingHeld, the occupied slot 0 reads Take", n"Step_AssertAfterStow");
         Add_Step("request Take out of slot 0 into the take target", n"Step_TakeFromSlot0");
         Add_Step_WaitUntil("the hotbar holds the rock again, slot 0 and its visual are empty", n"Check_Taken");
+        Add_Step("slot 0's OnItemChanged fired once more, naming no item", n"Step_AssertItemEdges");
         Run_Steps(InHandle);
     }
 
@@ -46,6 +50,12 @@ class UMars_AutoTest_Backpack_CargoStowThenTake : UMars_AutoTestRig_Carrier
     private void OnBackpackConstructed(FCk_Handle_EntityScript InEntityScriptHandle)
     {
         _Backpack = InEntityScriptHandle.As_Backpack();
+    }
+
+    UFUNCTION()
+    private void OnSlotItemChanged(FCk_Handle_CargoSlot InSlot, FCk_Handle_Item InMaybeItem)
+    {
+        _ItemChanges.Add(InMaybeItem);
     }
 
     UFUNCTION()
@@ -96,6 +106,7 @@ class UMars_AutoTest_Backpack_CargoStowThenTake : UMars_AutoTestRig_Carrier
         Assert_False(_Slot0.Get_IsOccupied(), "slot 0 before the stow");
         const auto Action = _Slot0.Get_ActionFor(_Carrier);
         Assert_True(Action == EMars_CargoSlot_Action::Stow, f"Get_ActionFor(carrier holding a rock) on an empty slot (got [{Action :n}])");
+        _Slot0.BindTo_OnItemChanged(FMars_Delegate_CargoSlot_OnItemChanged(this, n"OnSlotItemChanged"));
     }
 
     UFUNCTION()
@@ -123,6 +134,9 @@ class UMars_AutoTest_Backpack_CargoStowThenTake : UMars_AutoTestRig_Carrier
         const auto OccupiedSlotAction = _Slot0.Get_ActionFor(_Carrier);
         Assert_True(OccupiedSlotAction == EMars_CargoSlot_Action::Take,
             f"Get_ActionFor(empty-handed carrier, selected empty bag slot) on the occupied slot (got [{OccupiedSlotAction :n}])");
+
+        Assert_Equals_Int(_ItemChanges.Num(), 1, "slot 0's OnItemChanged fired once for the stow");
+        Assert_True(_ItemChanges[0] == _Rock, "the stow's OnItemChanged names the rock");
     }
 
     UFUNCTION()
@@ -145,5 +159,12 @@ class UMars_AutoTest_Backpack_CargoStowThenTake : UMars_AutoTestRig_Carrier
         Res.Set(_Hotbar.Get_ItemAt(0) == _Rock &&
                 _Slot0.Get_IsOccupied() == false &&
                 ck::Is_NOT_Valid(_Slot0.Get_Visual()));
+    }
+
+    UFUNCTION()
+    private void Step_AssertItemEdges(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        Assert_Equals_Int(_ItemChanges.Num(), 2, "slot 0's OnItemChanged fired once per edge: stow, take");
+        Assert_True(ck::Is_NOT_Valid(_ItemChanges[1]), "the take's OnItemChanged names no item");
     }
 }

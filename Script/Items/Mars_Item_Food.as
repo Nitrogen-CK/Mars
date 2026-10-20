@@ -7,12 +7,7 @@ asset Mars_ItemDef_Food_MeatSlab of UCk_InventoryItem_Definition
     _CoreInfo = FCk_InventoryItem_CoreInfo(FText::FromString("Meat slab"));
 
     // The slab's long axis (its mesh +X) across the view, held level a little below and in front of the hands.
-    _ItemTraits.Add(mars_items::Make_FoodPresentation(this, FTransform(FRotator(0.0, 90.0, 0.0), FVector(14.0, 0.0, -12.0)), 18.0f));
-    _ItemTraits.Add(mars_items::Make_PlatterThrowable(this));
-
-    auto Food = Cast<UMars_ItemTrait_Food>(NewObject(this, UMars_ItemTrait_Food));
-    Food.Food = mars::Food_MeatSlab_Mars;
-    _ItemTraits.Add(Food);
+    mars_items::Add_FoodTraits(this, FMars_FoodItemLook(FTransform(FRotator(0.0, 90.0, 0.0), FVector(14.0, 0.0, -12.0)), 18.0f, mars::Food_MeatSlab_Mars));
 }
 
 asset Mars_ItemDef_Food_MushroomSlice of UCk_InventoryItem_Definition
@@ -20,12 +15,7 @@ asset Mars_ItemDef_Food_MushroomSlice of UCk_InventoryItem_Definition
     _CoreInfo = FCk_InventoryItem_CoreInfo(FText::FromString("Mushroom slice"));
 
     // The slice's long axis (its mesh +Y) already runs across the view.
-    _ItemTraits.Add(mars_items::Make_FoodPresentation(this, FTransform(FRotator::ZeroRotator, FVector(14.0, 0.0, -12.0)), 6.0f));
-    _ItemTraits.Add(mars_items::Make_PlatterThrowable(this));
-
-    auto Food = Cast<UMars_ItemTrait_Food>(NewObject(this, UMars_ItemTrait_Food));
-    Food.Food = mars::Food_MushroomSlice_Mars;
-    _ItemTraits.Add(Food);
+    mars_items::Add_FoodTraits(this, FMars_FoodItemLook(FTransform(FRotator::ZeroRotator, FVector(14.0, 0.0, -12.0)), 6.0f, mars::Food_MushroomSlice_Mars));
 }
 
 asset Mars_ItemDef_Food_Drumstick of UCk_InventoryItem_Definition
@@ -33,12 +23,7 @@ asset Mars_ItemDef_Food_Drumstick of UCk_InventoryItem_Definition
     _CoreInfo = FCk_InventoryItem_CoreInfo(FText::FromString("Drumstick"));
 
     // The drumstick's long axis (its mesh +X) across the view, like the slab.
-    _ItemTraits.Add(mars_items::Make_FoodPresentation(this, FTransform(FRotator(0.0, 90.0, 0.0), FVector(14.0, 0.0, -12.0)), 11.0f));
-    _ItemTraits.Add(mars_items::Make_PlatterThrowable(this));
-
-    auto Food = Cast<UMars_ItemTrait_Food>(NewObject(this, UMars_ItemTrait_Food));
-    Food.Food = mars::Food_Drumstick_Mars;
-    _ItemTraits.Add(Food);
+    mars_items::Add_FoodTraits(this, FMars_FoodItemLook(FTransform(FRotator(0.0, 90.0, 0.0), FVector(14.0, 0.0, -12.0)), 11.0f, mars::Food_Drumstick_Mars));
 }
 
 asset Mars_ItemDef_Food_Tentacle of UCk_InventoryItem_Definition
@@ -46,12 +31,7 @@ asset Mars_ItemDef_Food_Tentacle of UCk_InventoryItem_Definition
     _CoreInfo = FCk_InventoryItem_CoreInfo(FText::FromString("Tentacle"));
 
     // The tentacle's long axis (its mesh +X) across the view.
-    _ItemTraits.Add(mars_items::Make_FoodPresentation(this, FTransform(FRotator(0.0, 90.0, 0.0), FVector(14.0, 0.0, -12.0)), 15.0f));
-    _ItemTraits.Add(mars_items::Make_PlatterThrowable(this));
-
-    auto Food = Cast<UMars_ItemTrait_Food>(NewObject(this, UMars_ItemTrait_Food));
-    Food.Food = mars::Food_Tentacle_Mars;
-    _ItemTraits.Add(Food);
+    mars_items::Add_FoodTraits(this, FMars_FoodItemLook(FTransform(FRotator(0.0, 90.0, 0.0), FVector(14.0, 0.0, -12.0)), 15.0f, mars::Food_Tentacle_Mars));
 }
 
 asset Mars_ItemDef_Food_Puffer of UCk_InventoryItem_Definition
@@ -59,12 +39,7 @@ asset Mars_ItemDef_Food_Puffer of UCk_InventoryItem_Definition
     _CoreInfo = FCk_InventoryItem_CoreInfo(FText::FromString("Puffer"));
 
     // Round: unrotated, the palms either side of the body.
-    _ItemTraits.Add(mars_items::Make_FoodPresentation(this, FTransform(FRotator::ZeroRotator, FVector(14.0, 0.0, -12.0)), 7.5f));
-    _ItemTraits.Add(mars_items::Make_PlatterThrowable(this));
-
-    auto Food = Cast<UMars_ItemTrait_Food>(NewObject(this, UMars_ItemTrait_Food));
-    Food.Food = mars::Food_Puffer_Mars;
-    _ItemTraits.Add(Food);
+    mars_items::Add_FoodTraits(this, FMars_FoodItemLook(FTransform(FRotator::ZeroRotator, FVector(14.0, 0.0, -12.0)), 7.5f, mars::Food_Puffer_Mars));
 }
 
 asset Mars_ItemDef_Food_SpikedBerry of UCk_InventoryItem_Definition
@@ -72,12 +47,7 @@ asset Mars_ItemDef_Food_SpikedBerry of UCk_InventoryItem_Definition
     _CoreInfo = FCk_InventoryItem_CoreInfo(FText::FromString("Spiked berry"));
 
     // Round: unrotated, the palms either side of the body.
-    _ItemTraits.Add(mars_items::Make_FoodPresentation(this, FTransform(FRotator::ZeroRotator, FVector(14.0, 0.0, -12.0)), 5.5f));
-    _ItemTraits.Add(mars_items::Make_PlatterThrowable(this));
-
-    auto Food = Cast<UMars_ItemTrait_Food>(NewObject(this, UMars_ItemTrait_Food));
-    Food.Food = mars::Food_SpikedBerry_Mars;
-    _ItemTraits.Add(Food);
+    mars_items::Add_FoodTraits(this, FMars_FoodItemLook(FTransform(FRotator::ZeroRotator, FVector(14.0, 0.0, -12.0)), 5.5f, mars::Food_SpikedBerry_Mars));
 }
 
 asset Mars_ItemDef_Food_Mushroom of UCk_InventoryItem_Definition
@@ -85,12 +55,7 @@ asset Mars_ItemDef_Food_Mushroom of UCk_InventoryItem_Definition
     _CoreInfo = FCk_InventoryItem_CoreInfo(FText::FromString("Mushroom"));
 
     // The whole mushroom standing on its stem, unrotated.
-    _ItemTraits.Add(mars_items::Make_FoodPresentation(this, FTransform(FRotator::ZeroRotator, FVector(14.0, 0.0, -12.0)), 6.5f));
-    _ItemTraits.Add(mars_items::Make_PlatterThrowable(this));
-
-    auto Food = Cast<UMars_ItemTrait_Food>(NewObject(this, UMars_ItemTrait_Food));
-    Food.Food = mars::Food_Mushroom_Mars;
-    _ItemTraits.Add(Food);
+    mars_items::Add_FoodTraits(this, FMars_FoodItemLook(FTransform(FRotator::ZeroRotator, FVector(14.0, 0.0, -12.0)), 6.5f, mars::Food_Mushroom_Mars));
 }
 
 asset Mars_ItemDef_Food_Pickle of UCk_InventoryItem_Definition
@@ -98,12 +63,7 @@ asset Mars_ItemDef_Food_Pickle of UCk_InventoryItem_Definition
     _CoreInfo = FCk_InventoryItem_CoreInfo(FText::FromString("Pickle"));
 
     // The pickle's long axis (its mesh +X) across the view, like the slab.
-    _ItemTraits.Add(mars_items::Make_FoodPresentation(this, FTransform(FRotator(0.0, 90.0, 0.0), FVector(14.0, 0.0, -12.0)), 10.0f));
-    _ItemTraits.Add(mars_items::Make_PlatterThrowable(this));
-
-    auto Food = Cast<UMars_ItemTrait_Food>(NewObject(this, UMars_ItemTrait_Food));
-    Food.Food = mars::Food_Pickle_Mars;
-    _ItemTraits.Add(Food);
+    mars_items::Add_FoodTraits(this, FMars_FoodItemLook(FTransform(FRotator(0.0, 90.0, 0.0), FVector(14.0, 0.0, -12.0)), 10.0f, mars::Food_Pickle_Mars));
 }
 
 namespace mars_items

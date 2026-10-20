@@ -48,21 +48,6 @@ enum EMars_Lantern_Pool
 // Constants
 //--------------------------------------------------------------------------------------------------------------------------
 
-namespace constants_lantern
-{
-    // Resolved by name: the accessors exist only once a restarted editor has registered the tags.
-    FGameplayTag Get_LightProbeName()
-    {
-        return GameplayTags::ResolveGameplayTag(n"Probe.Mars.Light");
-    }
-
-    // A lantern Carried on this point is hung (a sconce, a pack hook) and lights its World radius.
-    FGameplayTag Get_HookPoint()
-    {
-        return GameplayTags::ResolveGameplayTag(n"AttachPoint.Mars.Hook");
-    }
-}
-
 //--------------------------------------------------------------------------------------------------------------------------
 // Spec
 //--------------------------------------------------------------------------------------------------------------------------

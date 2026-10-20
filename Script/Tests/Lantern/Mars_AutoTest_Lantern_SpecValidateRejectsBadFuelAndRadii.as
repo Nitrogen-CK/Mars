@@ -17,19 +17,19 @@ class UMars_AutoTest_Lantern_SpecValidateRejectsBadFuelAndRadii : UCk_AutoTest_B
 
         auto NoMeasures = FMars_Lantern_Spec();
         NoMeasures.Measures = 0;
-        Assert_False(NoMeasures.Validate().IsValid(), "zero measures is rejected");
+        AssertRejected(NoMeasures, "zero measures", "Measures [");
 
         auto Timeless = FMars_Lantern_Spec();
         Timeless.SecondsPerMeasure = 0.0f;
-        Assert_False(Timeless.Validate().IsValid(), "a zero-length measure is rejected");
+        AssertRejected(Timeless, "a zero-length measure", "SecondsPerMeasure [");
 
         auto LongGutter = FMars_Lantern_Spec();
         LongGutter.GutterSeconds = LongGutter.SecondsPerMeasure + 1.0f;
-        Assert_False(LongGutter.Validate().IsValid(), "a gutter longer than a measure is rejected");
+        AssertRejected(LongGutter, "a gutter longer than a measure", "GutterSeconds [");
 
         auto Overfull = FMars_Lantern_Spec();
         Overfull.StartMeasures = TOptional<int32>(Overfull.Measures + 1);
-        Assert_False(Overfull.Validate().IsValid(), "starting with more than Measures is rejected");
+        AssertRejected(Overfull, "starting with more than Measures", "StartMeasures [");
 
         auto Empty = FMars_Lantern_Spec();
         Empty.StartMeasures = TOptional<int32>(0);
@@ -37,6 +37,14 @@ class UMars_AutoTest_Lantern_SpecValidateRejectsBadFuelAndRadii : UCk_AutoTest_B
 
         auto Unlit = FMars_Lantern_Spec();
         Unlit.Radius.World = 0.0f;
-        Assert_False(Unlit.Validate().IsValid(), "a zero radius is rejected");
+        AssertRejected(Unlit, "a zero radius", "every Radius");
+    }
+
+    // InRule opens the error: the field whose rule broke.
+    private void AssertRejected(const FMars_Lantern_Spec& InSpec, const FString& InCase, const FString& InRule)
+    {
+        const auto Validation = InSpec.Validate();
+        Assert_False(Validation.IsValid(), f"{InCase} is rejected");
+        Assert_True(Validation.Get_Error().StartsWith(InRule), f"{InCase} names its rule, [{InRule}...] (error: {Validation.Get_Error()})");
     }
 }

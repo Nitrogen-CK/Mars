@@ -36,7 +36,7 @@ class UMars_AutoTest_WorldItem_OnMountSettledFiresOnceAtTheEndOfTheArrival : UMa
         const UMars_ItemTrait_Presentation Presentation = mars_items::Backpack().Get_ItemTraitByClass(UMars_ItemTrait_Presentation);
         _ArriveSeconds = Presentation.Mounting.ArriveSeconds;
 
-        Spawn_Floor(InHandle, k_Origin + k_PackOffset);
+        Spawn_FloorSlab(InHandle, k_Origin + k_PackOffset);
         auto SpawnParams = UMars_WorldItem_EntityScript::Params();
         SpawnParams.Definition = mars_items::Backpack();
         SpawnParams.Mode = EMars_WorldItem_Mode::World;
@@ -56,21 +56,6 @@ class UMars_AutoTest_WorldItem_OnMountSettledFiresOnceAtTheEndOfTheArrival : UMa
         Add_Step_WaitSeconds("a second settle would fire in this window", 0.5f);
         Add_Step("one World settle, in the frame it committed", n"Step_AssertWorld");
         Run_Steps(InHandle);
-    }
-
-    // A static slab whose top is at InTop.
-    private void Spawn_Floor(FCk_Handle InOwner, FVector InTop)
-    {
-        auto Owner = InOwner;
-        auto Floor = utils_entity_lifetime::Request_CreateEntity(Owner);
-        utils_transform::Add(Floor, FTransform(FRotator::ZeroRotator, InTop - FVector(0.0, 0.0, 1.0)), ECk_Replication::DoesNotReplicate);
-        auto Shape = FCk_Jolt_ShapeDimensions(ECk_Jolt_ShapeType::Box);
-        Shape.Set_HalfExtents(FVector(80.0, 80.0, 1.0));
-        auto FloorSpec = FCk_JoltBody_Spec(ECk_JoltBody_ShapeSource::ExplicitShape);
-        FloorSpec.Set_ShapeDimensions(Shape);
-        FloorSpec.Set_MotionType(ECk_MotionType::Static);
-        FloorSpec.Set_CollisionProfileName(n"BlockAll");
-        utils_jolt_body::Add(Floor, FloorSpec);
     }
 
     UFUNCTION()

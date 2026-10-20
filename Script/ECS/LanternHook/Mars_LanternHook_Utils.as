@@ -12,18 +12,15 @@ namespace utils_lantern_hook
     // A capacity-1 Inventory.Mars.LanternHook inventory (accept policy CDO) on InHandle whose lantern rides InHandle's
     // AttachPoint.Mars.Hook (the caller's HangNode) at HangOffset, the hook's feature on it, and the caller's Interactable
     // recorded for the prompt. InHandle is the carrier a hung lantern mounts on: it publishes no other attach point. A spec
-    // that fails Validate(), or an editor that has not registered the hook tags yet, ensures and adds nothing.
+    // that fails Validate() ensures and adds nothing.
     FCk_Handle_LanternHook Add(FCk_Handle& InHandle, FMars_LanternHook_Spec InSpec)
     {
         const auto Validation = InSpec.Validate();
         if (ck::EnsureIfNot(Validation.IsValid(), f"[LanternHook] [{InHandle.ToString()}] rejected the spec: {Validation.Get_Error()}"))
         { return FCk_Handle_LanternHook(); }
 
-        const auto HookPoint = constants_lantern::Get_HookPoint();
-        const auto InventoryTag = constants_lantern_hook::Get_InventoryTag();
-        if (ck::EnsureIfNot(HookPoint.IsValid() && InventoryTag.IsValid(),
-            f"[LanternHook] [{InHandle.ToString()}] AttachPoint.Mars.Hook or Inventory.Mars.LanternHook is not registered (restart the editor)"))
-        { return FCk_Handle_LanternHook(); }
+        const auto HookPoint = GameplayTags::AttachPoint_Mars_Hook;
+        const auto InventoryTag = GameplayTags::Inventory_Mars_LanternHook;
 
         TSubclassOf<UMars_LanternHook_AcceptPolicy> PolicyClass = UMars_LanternHook_AcceptPolicy;
         auto Policy = PolicyClass.GetDefaultObject();
@@ -52,17 +49,13 @@ namespace utils_lantern_hook
         return InHandle.As_LanternHook();
     }
 
-    // The hook's one interact target: Use, a placeholder prompt UMars_Processor_LanternHook_Prompt rewrites while focused,
-    // and WhileLive: a hang or a take lives until the hook reports it.
-    FMars_Interactable_TargetEntry Make_InteractTarget()
+    // The hook's one interact target: Use with the caller's prompt (a placeholder the hook's prompt processor rewrites
+    // while focused), and WhileLive: a hang or a take lives until the hook reports it.
+    FMars_Interactable_TargetEntry Make_InteractTarget(FMars_InteractPrompt_Spec InPrompt)
     {
-        auto Prompt = FMars_InteractPrompt_Spec();
-        Prompt.InputAction = mars::Mars_IA_Interact_Use;
-        Prompt.PromptText = FText::FromString("Lantern hook");
-
         auto Target = FMars_Interactable_TargetEntry();
         Target.InteractTargetSpec = FCk_InteractTarget_Spec(GameplayTags::InteractionChannel_Mars_Use);
-        Target.InteractPromptSpec = Prompt;
+        Target.InteractPromptSpec = InPrompt;
         Target.InteractionStateClass = UMars_SmState_LanternHook_Interact;
         Target.Work = EMars_Interactable_Work::WhileLive;
         return Target;
@@ -75,33 +68,6 @@ namespace utils_lantern_hook
         return ck::IsValid(InItem) && InItem.Has_LanternTrait() && InItem.Has_PersistentWorldItem();
     }
 
-    // InItemName is the held lantern for Hang, the hung one for Take and Refuel.
-    FText Get_PromptText(EMars_LanternHook_Action InAction, FText InItemName)
-    {
-        const auto Name = InItemName.ToString();
-        if (InAction == EMars_LanternHook_Action::Hang)
-        { return FText::FromString(f"Hang {Name}"); }
-
-        if (InAction == EMars_LanternHook_Action::Take)
-        { return FText::FromString(f"Take {Name}"); }
-
-        if (InAction == EMars_LanternHook_Action::Refuel)
-        { return FText::FromString(f"Refuel {Name}"); }
-
-        if (InAction == EMars_LanternHook_Action::Blocked_NotALantern)
-        { return FText::FromString("Lanterns only"); }
-
-        if (InAction == EMars_LanternHook_Action::Blocked_HandsFull)
-        { return utils_interactable::Get_HandsFullText(); }
-
-        if (InAction == EMars_LanternHook_Action::Blocked_NoRoom)
-        { return FText::FromString("No room"); }
-
-        if (InAction == EMars_LanternHook_Action::Blocked_Full)
-        { return FText::FromString(f"{Name} is full"); }
-
-        return FText::FromString("Lantern hook");
-    }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

@@ -82,7 +82,7 @@ class UMars_SmTask_ItemUse_Throw : UCk_SmTask_EntityScript
         // The use interactable is built by HeldItemUse, so its owner always has it.
         auto Player = Context.Get_Fragment(FMars_Fragment_InteractionContext).InteractableOwner;
         auto Use = Player.As_HeldItemUse();
-        Use.Request_Throw();
+        Use.Request_Throw(FMars_Request_HeldItemUse_Throw());
         Mark_Result(ECk_SmTaskResult::Succeeded);
     }
 }
@@ -109,15 +109,13 @@ enum EMars_ItemUse_StrikePhase
 // AMars_PlayerCharacter::Request_Strike, which swings the owner's gloves and carries the swing to every machine's body;
 // an entity with no character (tests) swings its own HandSwing when it has one. After the trait's WindupSeconds, one
 // sphere sweep from the player's viewpoint along its forward out to Reach through
-// utils_damage_dealer::Try_StrikeSweep (filtered on Probe.Mars.HitZone; Blocking world policy, so a wall in front of a
+// the dealer's Request_StrikeSweep (filtered on Probe.Mars.HitZone; Blocking world policy, so a wall in front of a
 // hurtbox stops the swing; Silent overlap notify). The first hurtbox hit is dealt through the player's DamageDealer,
 // which resolves it to its zone. Succeeds RecoverySeconds after the sweep. Fails when the player has no dealer or
 // viewpoint, or the held item has no Strike trait. Exiting mid-swing (the use torn down) cancels the local swing.
 class UMars_SmTask_ItemUse_Strike : UCk_SmTask_EntityScript
 {
     default _TaskMode = ECk_SmTaskMode::Tick;
-
-    private const float32 k_ImpulseSpeed = 300.0f;
 
     private ECk_SmTaskResult _Outcome = ECk_SmTaskResult::Running;
     private FCk_Handle _Player;
@@ -131,6 +129,7 @@ class UMars_SmTask_ItemUse_Strike : UCk_SmTask_EntityScript
     private float32 _Radius = 0.0f;
     private float32 _WindupSeconds = 0.0f;
     private float32 _RecoverySeconds = 0.0f;
+    private float32 _ImpulseSpeed = 0.0f;
 
     private float32 _Elapsed = 0.0f;
     private EMars_ItemUse_StrikePhase _Phase = EMars_ItemUse_StrikePhase::Windup;
@@ -178,6 +177,7 @@ class UMars_SmTask_ItemUse_Strike : UCk_SmTask_EntityScript
         _Radius = Strike.Radius;
         _WindupSeconds = Strike.WindupSeconds;
         _RecoverySeconds = Strike.RecoverySeconds;
+        _ImpulseSpeed = Strike.ImpulseSpeed;
 
         _Player = Player;
         _Dealer = Dealer;
@@ -201,7 +201,7 @@ class UMars_SmTask_ItemUse_Strike : UCk_SmTask_EntityScript
         { return; }
 
         auto Swing = _Player.As_HandSwing();
-        Swing.Request_Cancel();
+        Swing.Request_Cancel(FMars_Request_HandSwing_Cancel());
     }
 
     UFUNCTION(BlueprintOverride)
@@ -237,11 +237,11 @@ class UMars_SmTask_ItemUse_Strike : UCk_SmTask_EntityScript
 
         auto Template = utils_damage_dealer::Make_Event(_Dealer, _Damage, _DamageType);
         Template.Source.Causer = _Item;
-        Template.Hit.Impulse = Forward * k_ImpulseSpeed;
+        Template.Hit.Impulse = Forward * _ImpulseSpeed;
 
         // The dealer is the player's entity: the sweep skips that entity's own bodies and its own zone's hurtboxes, not the
         // rest of the player's ownership tree.
-        const auto Hit = utils_damage_dealer::Try_StrikeSweep(_Dealer, FMars_DamageDealer_Sweep(Start, Start + Forward * _Reach, _Radius), Template);
+        const auto Hit = _Dealer.Request_StrikeSweep(FMars_DamageDealer_Sweep(Start, Start + Forward * _Reach, _Radius), Template);
 
         // A zone hit plays through the dealer's OnDamageDealt; a blow the world stops has no damage to cue it.
         if (Hit.Get_HitKind() != ECk_ProbeTrace_HitKind::World)

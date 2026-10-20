@@ -33,7 +33,7 @@ class UMars_AutoTest_CargoSlot_AFoodItemStowsIntoThePackAndRidesIt : UMars_AutoT
         Add_Hotbar(_Carrier, 1);
         _HeldItem = utils_held_item::Add(_Carrier);
 
-        Spawn_Floor(InHandle, k_Origin + k_PackOffset);
+        Spawn_FloorSlab(InHandle, k_Origin + k_PackOffset);
         auto PackParams = UMars_Backpack_EntityScript::Params();
         PackParams.Definition = mars_items::Backpack();
         PackParams.Mode = EMars_WorldItem_Mode::World;
@@ -41,16 +41,7 @@ class UMars_AutoTest_CargoSlot_AFoodItemStowsIntoThePackAndRidesIt : UMars_AutoT
         auto PackPending = utils_entity_script::Request_SpawnEntity(InHandle, UMars_Backpack_EntityScript, PackParams);
         _PackEntity = PackPending.Get_EntityUnderConstruction();
 
-        Spawn_Floor(InHandle, k_Origin + k_FoodOffset);
-        auto FoodParams = UMars_FoodItem_EntityScript::Params();
-        FoodParams.SpawnTransform = FTransform(FRotator::ZeroRotator, k_Origin + k_FoodOffset + FVector(0.0, 0.0, 5.0));
-        FoodParams.Definition = utils_held_item::Make_DefinitionSoft(mars_items::Food_MeatSlab());
-        FoodParams.Mode = EMars_WorldItem_Mode::World;
-
-        // A piece outlives its spawner: under the world's transient entity, tracked for cleanup.
-        auto PieceOwner = ck::TransientEntity();
-        _FoodEntity = utils_entity_script::Request_SpawnEntity(PieceOwner, UMars_FoodItem_EntityScript, FoodParams).Get_EntityUnderConstruction();
-        Track_ForCleanup(_FoodEntity);
+        _FoodEntity = Spawn_FoodItemOnFloor(InHandle, mars_items::Food_MeatSlab(), k_Origin + k_FoodOffset);
 
         Add_Step_WaitUntil("the pack and the slab are constructed", n"Check_Constructed", k_SlowPolls, 0);
         Add_Step("the carrier puts the pack on", n"Step_WearPack");
@@ -67,31 +58,6 @@ class UMars_AutoTest_CargoSlot_AFoodItemStowsIntoThePackAndRidesIt : UMars_AutoT
         Add_Step_WaitUntil("the slab is Held on the hand again", n"Check_SlabHeld", k_SlowPolls, 0);
         Add_Step("the bag slot holds it and slot 0 is empty", n"Step_AssertTakenBack");
         Run_Steps(InHandle);
-    }
-
-    // A static slab whose top is at InTop.
-    private void Spawn_Floor(FCk_Handle InOwner, FVector InTop)
-    {
-        auto Owner = InOwner;
-        auto Floor = utils_entity_lifetime::Request_CreateEntity(Owner);
-        utils_transform::Add(Floor, FTransform(FRotator::ZeroRotator, InTop - FVector(0.0, 0.0, 1.0)), ECk_Replication::DoesNotReplicate);
-        auto Shape = FCk_Jolt_ShapeDimensions(ECk_Jolt_ShapeType::Box);
-        Shape.Set_HalfExtents(FVector(80.0, 80.0, 1.0));
-        auto FloorSpec = FCk_JoltBody_Spec(ECk_JoltBody_ShapeSource::ExplicitShape);
-        FloorSpec.Set_ShapeDimensions(Shape);
-        FloorSpec.Set_MotionType(ECk_MotionType::Static);
-        FloorSpec.Set_CollisionProfileName(n"BlockAll");
-        utils_jolt_body::Add(Floor, FloorSpec);
-    }
-
-    // Invalid while InWorldItem is not scene-node attached.
-    private FCk_Handle_Transform Get_MountParent(const FCk_Handle_WorldItem& InWorldItem) const
-    {
-        auto Node = InWorldItem.As_SceneNode(ECk_SanityCheck::UnChecked);
-        if (ck::Is_NOT_Valid(Node))
-        { return FCk_Handle_Transform(); }
-
-        return utils_scene_node::Get_Parent(Node);
     }
 
     // InEntity's scene-node parents reach InAncestor within k_MaxChainLength steps.
@@ -119,13 +85,14 @@ class UMars_AutoTest_CargoSlot_AFoodItemStowsIntoThePackAndRidesIt : UMars_AutoT
     {
         const auto PackReady = ck::IsValid(_PackEntity) && _PackEntity.Is_Backpack() && _PackEntity.Is_WorldItem()
             && ck::IsValid(_PackEntity.As_WorldItem().Get_HeldItem());
-        const auto FoodReady = ck::IsValid(_FoodEntity) && _FoodEntity.Is_WorldItem() && ck::IsValid(_FoodEntity.As_WorldItem().Get_HeldItem());
+        const auto Food = TryGet_ConstructedWorldItem(_FoodEntity);
+        const auto FoodReady = ck::IsValid(Food);
         if (PackReady && FoodReady && ck::Is_NOT_Valid(_Backpack))
         {
             _Backpack = _PackEntity.As_Backpack();
             _PackWorldItem = _PackEntity.As_WorldItem();
             _Slot0 = _Backpack.Get_CargoSlot(0);
-            _Slab = _FoodEntity.As_WorldItem();
+            _Slab = Food;
             _SlabItem = _Slab.Get_HeldItem();
         }
 

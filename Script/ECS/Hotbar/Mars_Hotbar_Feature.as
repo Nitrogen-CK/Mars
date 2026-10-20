@@ -26,8 +26,7 @@ enum EMars_Hotbar_SelectionChange
 {
     Select,
     Deselect,
-    CycleNext,
-    CyclePrevious
+    Cycle
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -150,6 +149,25 @@ struct FMars_Request_Hotbar_Select
     }
 }
 
+struct FMars_Request_Hotbar_Deselect
+{
+    UPROPERTY()
+    bool Requested = true;
+}
+
+struct FMars_Request_Hotbar_Cycle
+{
+    UPROPERTY()
+    EMars_Hotbar_CycleDirection Direction = EMars_Hotbar_CycleDirection::Next;
+
+    FMars_Request_Hotbar_Cycle() {}
+
+    FMars_Request_Hotbar_Cycle(EMars_Hotbar_CycleDirection InDirection)
+    {
+        Direction = InDirection;
+    }
+}
+
 // A Select, Deselect or Cycle request, queued with the other kinds so the drain applies them in arrival order.
 struct FMars_Hotbar_SelectionChangeRequest
 {
@@ -160,17 +178,27 @@ struct FMars_Hotbar_SelectionChangeRequest
     UPROPERTY()
     TOptional<int32> Index;
 
+    // Cycle only.
+    UPROPERTY()
+    EMars_Hotbar_CycleDirection Direction = EMars_Hotbar_CycleDirection::Next;
+
     FMars_Hotbar_SelectionChangeRequest() {}
 
-    FMars_Hotbar_SelectionChangeRequest(EMars_Hotbar_SelectionChange InChange)
+    FMars_Hotbar_SelectionChangeRequest(const FMars_Request_Hotbar_Select& InRequest)
     {
-        Change = InChange;
+        Change = EMars_Hotbar_SelectionChange::Select;
+        Index = InRequest.Index;
     }
 
-    FMars_Hotbar_SelectionChangeRequest(EMars_Hotbar_SelectionChange InChange, TOptional<int32> InIndex)
+    FMars_Hotbar_SelectionChangeRequest(const FMars_Request_Hotbar_Deselect& InRequest)
     {
-        Change = InChange;
-        Index = InIndex;
+        Change = EMars_Hotbar_SelectionChange::Deselect;
+    }
+
+    FMars_Hotbar_SelectionChangeRequest(const FMars_Request_Hotbar_Cycle& InRequest)
+    {
+        Change = EMars_Hotbar_SelectionChange::Cycle;
+        Direction = InRequest.Direction;
     }
 }
 

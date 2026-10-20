@@ -19,7 +19,12 @@ class UMars_Processor_Lantern_HandleRequests : UCk_Processor_Script_Base_UE
 
         auto Added = 0;
         for (const auto& Refuel : InRequests.RefuelRequests)
-        { Added += Math::Max(Refuel.Measures, 0); }
+        {
+            if (ck::EnsureIfNot(Refuel.Measures > 0, f"[Lantern] [{Self.ToString()}] got a refuel of [{Refuel.Measures}] measures"))
+            { continue; }
+
+            Added += Refuel.Measures;
+        }
 
         const auto HasShutter = InRequests.SetShutterRequests.Num() > 0;
         auto Shutter = InState.Shutter;

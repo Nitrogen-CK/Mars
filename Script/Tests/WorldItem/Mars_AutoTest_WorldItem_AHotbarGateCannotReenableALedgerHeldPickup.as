@@ -25,17 +25,7 @@ class UMars_AutoTest_WorldItem_AHotbarGateCannotReenableALedgerHeldPickup : UMar
         _Holders.Add(MakeSeededHolder(InHandle, mars_items::Rock()));
         _Holders.Add(MakeSeededHolder(InHandle, mars_items::Rock()));
 
-        Spawn_Floor(InHandle, k_Origin + FVector(200.0, 0.0, 0.0));
-
-        auto SpawnParams = UMars_FoodItem_EntityScript::Params();
-        SpawnParams.SpawnTransform = FTransform(FRotator::ZeroRotator, k_Origin + FVector(200.0, 0.0, 5.0));
-        SpawnParams.Definition = utils_held_item::Make_DefinitionSoft(mars_items::Food_MeatSlab());
-        SpawnParams.Mode = EMars_WorldItem_Mode::World;
-
-        // A piece outlives its spawner: under the world's transient entity, tracked for cleanup.
-        auto Owner = ck::TransientEntity();
-        _Entity = utils_entity_script::Request_SpawnEntity(Owner, UMars_FoodItem_EntityScript, SpawnParams).Get_EntityUnderConstruction();
-        Track_ForCleanup(_Entity);
+        _Entity = Spawn_FoodItemOnFloor(InHandle, mars_items::Food_MeatSlab(), k_Origin + FVector(200.0, 0.0, 0.0));
 
         Add_Step_WaitUntil("both rock holders are seeded", n"Check_HoldersSeeded", 0, 0);
         Add_Step_WaitUntil("the slab is constructed and its holder holds its item", n"Check_Constructed", k_SlowPolls, 0);
@@ -54,21 +44,6 @@ class UMars_AutoTest_WorldItem_AHotbarGateCannotReenableALedgerHeldPickup : UMar
         Run_Steps(InHandle);
     }
 
-    // A static slab whose top is at InTop.
-    private void Spawn_Floor(FCk_Handle InOwner, FVector InTop)
-    {
-        auto Owner = InOwner;
-        auto Floor = utils_entity_lifetime::Request_CreateEntity(Owner);
-        utils_transform::Add(Floor, FTransform(FRotator::ZeroRotator, InTop - FVector(0.0, 0.0, 1.0)), ECk_Replication::DoesNotReplicate);
-        auto Shape = FCk_Jolt_ShapeDimensions(ECk_Jolt_ShapeType::Box);
-        Shape.Set_HalfExtents(FVector(80.0, 80.0, 1.0));
-        auto FloorSpec = FCk_JoltBody_Spec(ECk_JoltBody_ShapeSource::ExplicitShape);
-        FloorSpec.Set_ShapeDimensions(Shape);
-        FloorSpec.Set_MotionType(ECk_MotionType::Static);
-        FloorSpec.Set_CollisionProfileName(n"BlockAll");
-        utils_jolt_body::Add(Floor, FloorSpec);
-    }
-
     private FCk_Handle_InteractTarget Get_PickupTarget() const
     {
         return _Slab.Get_Pickup().Get_InteractTarget(GameplayTags::InteractionChannel_Mars_Use);
@@ -77,10 +52,11 @@ class UMars_AutoTest_WorldItem_AHotbarGateCannotReenableALedgerHeldPickup : UMar
     UFUNCTION()
     private void Check_Constructed(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
-        const auto IsConstructed = ck::IsValid(_Entity) && _Entity.Is_WorldItem() && ck::IsValid(_Entity.As_WorldItem().Get_HeldItem());
+        const auto WorldItem = TryGet_ConstructedWorldItem(_Entity);
+        const auto IsConstructed = ck::IsValid(WorldItem);
         if (IsConstructed && ck::Is_NOT_Valid(_Slab))
         {
-            _Slab = _Entity.As_WorldItem();
+            _Slab = WorldItem;
             _SlabItem = _Slab.Get_HeldItem();
         }
 

@@ -45,7 +45,7 @@ namespace utils_cargo_slot
 
         auto State = FMars_Fragment_CargoSlot();
         State.Inventory = Inventory;
-        State.Interactable = DoCreate_Interactable(SlotNode, InSpec.ProbeRadius);
+        State.Interactable = DoCreate_Interactable(SlotNode, InSpec);
 
         SlotNode.Add_Fragment(FMars_Feature_CargoSlot());
         SlotNode.Add_Fragment(Params);
@@ -63,50 +63,23 @@ namespace utils_cargo_slot
         return InItem.Has_PersistentWorldItem() == false || InItem.Has_Food();
     }
 
-    // InItemName is the held item for Stow and the slot's item for Take; the Blocked_ texts ignore it.
-    FText Get_PromptText(EMars_CargoSlot_Action InAction, FText InItemName)
-    {
-        if (InAction == EMars_CargoSlot_Action::Stow)
-        { return FText::FromString(f"Stow {InItemName.ToString()}"); }
-
-        if (InAction == EMars_CargoSlot_Action::Take)
-        { return FText::FromString(f"Take {InItemName.ToString()}"); }
-
-        if (InAction == EMars_CargoSlot_Action::Blocked_NothingHeld)
-        { return FText::FromString("Nothing to stow"); }
-
-        if (InAction == EMars_CargoSlot_Action::Blocked_NotStowable)
-        { return FText::FromString("Can't stow that"); }
-
-        if (InAction == EMars_CargoSlot_Action::Blocked_SlotOccupied)
-        { return FText::FromString("Slot occupied"); }
-
-        if (InAction == EMars_CargoSlot_Action::Blocked_NoRoom)
-        { return FText::FromString("No room"); }
-
-        return FText::FromString("Put the pack down");
-    }
-
     // The probe carries Probe.Mars.Interact (the player's interaction trace only sees probes under that tag) and is
-    // Kinematic: it follows the pack. The prompt text is a placeholder until UMars_Processor_CargoSlot_Prompt writes
-    // the focuser's action. The target is WhileLive: a stow or a take lives until the slot reports it.
-    FCk_Handle_Interactable DoCreate_Interactable(FCk_Handle_Transform& InSlotNode, float32 InProbeRadius)
+    // Kinematic: it follows the pack. The spec's prompt is a placeholder until the slot's prompt processor
+    // (UMars_Processor_CargoSlot_Prompt) words the focuser's action. The target is WhileLive: a stow or a take lives until
+    // the slot reports it.
+    FCk_Handle_Interactable DoCreate_Interactable(FCk_Handle_Transform& InSlotNode, const FMars_CargoSlot_Spec& InSpec)
     {
         auto Probe = FMars_Interactable_ProbeInfo();
         Probe.ProbeSpec = FCk_Probe_Spec(GameplayTags::Probe_Mars_Interact);
         Probe.ProbeSpec.Set_MotionType(ECk_MotionType::Kinematic);
-        Probe.ProbeShape = utils_shapes::Make_Sphere(FCk_ShapeSphere_Dimensions(InProbeRadius));
+        Probe.ProbeShape = utils_shapes::Make_Sphere(FCk_ShapeSphere_Dimensions(InSpec.ProbeRadius));
         Probe.ProbeOffset = FTransform::Identity;
 
         auto TargetSpec = FCk_InteractTarget_Spec(GameplayTags::InteractionChannel_Mars_Use);
 
-        auto Prompt = FMars_InteractPrompt_Spec();
-        Prompt.InputAction = mars::Mars_IA_Interact_Use;
-        Prompt.PromptText = FText::FromString("Cargo");
-
         auto Target = FMars_Interactable_TargetEntry();
         Target.InteractTargetSpec = TargetSpec;
-        Target.InteractPromptSpec = Prompt;
+        Target.InteractPromptSpec = InSpec.Prompt;
         Target.InteractionStateClass = UMars_SmState_CargoSlot_Interact;
         Target.Work = EMars_Interactable_Work::WhileLive;
 

@@ -35,7 +35,7 @@ namespace utils_lantern
     // the lantern's side; receivers' triggers filter on the name.
     FMars_Fragment_Lantern_LightProbes DoCreate_LightProbes(FCk_Handle_Transform& InRoot, const FMars_Lantern_Radius& InRadius)
     {
-        auto ProbeSpec = FCk_Probe_Spec(constants_lantern::Get_LightProbeName());
+        auto ProbeSpec = FCk_Probe_Spec(GameplayTags::Probe_Mars_Light);
         ProbeSpec.Set_MotionType(ECk_MotionType::Kinematic)
                  .Set_ResponsePolicy(ECk_ProbeResponse_Policy::Silent)
                  .Set_StartingState(ECk_EnableDisable::Disable);
@@ -227,7 +227,7 @@ mixin EMars_Lantern_Pool Get_LightPool(const FCk_Handle_Lantern& Self)
 
     if (Mount == EMars_WorldItem_Mount::Carried)
     {
-        const auto Point = WorldItem.Get_Fragment(FMars_Fragment_WorldItem).Committed.Point;
+        const auto Point = WorldItem.Get_MountPoint();
         const UMars_ItemTrait_Presentation Presentation = utils_world_item::TryGet_Presentation(WorldItem);
         const auto IsCarryPoint = ck::IsValid(Presentation) && Point.IsValid() && Point == Presentation.Mounting.CarryPoint;
         return IsCarryPoint ? EMars_Lantern_Pool::Stowed : EMars_Lantern_Pool::World;

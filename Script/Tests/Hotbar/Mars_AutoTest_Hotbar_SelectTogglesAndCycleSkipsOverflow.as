@@ -27,19 +27,19 @@ class UMars_AutoTest_Hotbar_SelectTogglesAndCycleSkipsOverflow : UMars_AutoTestR
     UFUNCTION()
     private void Step_CycleNext(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        _Hotbar.Request_CycleNext();
+        _Hotbar.Request_Cycle(FMars_Request_Hotbar_Cycle(EMars_Hotbar_CycleDirection::Next));
     }
 
     UFUNCTION()
     private void Step_CyclePrevious(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        _Hotbar.Request_CyclePrevious();
+        _Hotbar.Request_Cycle(FMars_Request_Hotbar_Cycle(EMars_Hotbar_CycleDirection::Previous));
     }
 
     UFUNCTION()
     private void Step_Deselect(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        _Hotbar.Request_Deselect();
+        _Hotbar.Request_Deselect(FMars_Request_Hotbar_Deselect());
     }
 
     UFUNCTION()

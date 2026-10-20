@@ -33,22 +33,14 @@ class UMars_AutoTest_WorldItem_AnItemWhoseHolderDiesEndsItself : UMars_AutoTestR
         Add_CarrierBodyWithBack(InHandle, k_Origin);
         Add_Hotbar(_Carrier, 1);
 
-        Spawn_Floor(InHandle, k_Origin + k_PackOffset);
+        Spawn_FloorSlab(InHandle, k_Origin + k_PackOffset);
         auto PackParams = UMars_Backpack_EntityScript::Params();
         PackParams.Definition = mars_items::Backpack();
         PackParams.Mode = EMars_WorldItem_Mode::World;
         PackParams.SpawnTransform = FTransform(FRotator::ZeroRotator, k_Origin + k_PackOffset + FVector(0.0, 0.0, 20.0));
         _PackEntity = utils_entity_script::Request_SpawnEntity(InHandle, UMars_Backpack_EntityScript, PackParams).Get_EntityUnderConstruction();
 
-        Spawn_Floor(InHandle, k_Origin + k_SlabOffset);
-        auto SlabParams = UMars_FoodItem_EntityScript::Params();
-        SlabParams.SpawnTransform = FTransform(FRotator::ZeroRotator, k_Origin + k_SlabOffset + FVector(0.0, 0.0, 5.0));
-        SlabParams.Definition = utils_held_item::Make_DefinitionSoft(mars_items::Food_MeatSlab());
-        SlabParams.Mode = EMars_WorldItem_Mode::World;
-
-        // A piece outlives its spawner: under the world's transient entity, tracked for cleanup.
-        _SlabEntity = utils_entity_script::Request_SpawnEntity(ck::TransientEntity(), UMars_FoodItem_EntityScript, SlabParams).Get_EntityUnderConstruction();
-        Track_ForCleanup(_SlabEntity);
+        _SlabEntity = Spawn_FoodItemOnFloor(InHandle, mars_items::Food_MeatSlab(), k_Origin + k_SlabOffset);
 
         Add_Step_WaitUntil("the pack and the slab are constructed, their items linked", n"Check_Constructed", k_SlowPolls, 0);
         Add_Step("put the pack on: its holder -> the backpack slot", n"Step_WearPack");
@@ -61,32 +53,18 @@ class UMars_AutoTest_WorldItem_AnItemWhoseHolderDiesEndsItself : UMars_AutoTestR
         Run_Steps(InHandle);
     }
 
-    // A static slab whose top is at InTop.
-    private void Spawn_Floor(FCk_Handle InOwner, FVector InTop)
-    {
-        auto Owner = InOwner;
-        auto Floor = utils_entity_lifetime::Request_CreateEntity(Owner);
-        utils_transform::Add(Floor, FTransform(FRotator::ZeroRotator, InTop - FVector(0.0, 0.0, 1.0)), ECk_Replication::DoesNotReplicate);
-        auto Shape = FCk_Jolt_ShapeDimensions(ECk_Jolt_ShapeType::Box);
-        Shape.Set_HalfExtents(FVector(80.0, 80.0, 1.0));
-        auto FloorSpec = FCk_JoltBody_Spec(ECk_JoltBody_ShapeSource::ExplicitShape);
-        FloorSpec.Set_ShapeDimensions(Shape);
-        FloorSpec.Set_MotionType(ECk_MotionType::Static);
-        FloorSpec.Set_CollisionProfileName(n"BlockAll");
-        utils_jolt_body::Add(Floor, FloorSpec);
-    }
-
     UFUNCTION()
     private void Check_Constructed(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         const auto PackReady = ck::IsValid(_PackEntity) && _PackEntity.Is_Backpack() && _PackEntity.Is_WorldItem()
             && ck::IsValid(_PackEntity.As_WorldItem().Get_Item());
-        const auto SlabReady = ck::IsValid(_SlabEntity) && _SlabEntity.Is_WorldItem() && ck::IsValid(_SlabEntity.As_WorldItem().Get_Item());
+        const auto Slab = TryGet_ConstructedWorldItem(_SlabEntity);
+        const auto SlabReady = ck::IsValid(Slab) && ck::IsValid(Slab.Get_Item());
         if (PackReady && SlabReady && ck::Is_NOT_Valid(_Pack))
         {
             _Pack = _PackEntity.As_WorldItem();
             _CargoSlot = _PackEntity.As_Backpack().Get_CargoSlot(0);
-            _Slab = _SlabEntity.As_WorldItem();
+            _Slab = Slab;
             _SlabItem = _Slab.Get_Item();
         }
 

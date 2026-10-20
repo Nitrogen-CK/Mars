@@ -1,7 +1,8 @@
-// Polls each slot's item against the last pass (the Hotbar sync shape). A change destroys the old cargo visual, spawns
-// one for the new item (a Visual-mode world item under the slot node at Presentation.Mounting.CargoOffset, arriving from where a
-// fresh stow said it was), then broadcasts OnItemChanged. A Persistent item gets no visual: its own world item mounts on
-// the slot's node (UMars_Processor_WorldItem_Reconcile).
+// Polls each slot's item against the last pass (the Hotbar sync shape). A change consumes the pending arrival, destroys
+// the old cargo visual, spawns one for the new item (a Visual-mode world item under the slot node at
+// Presentation.Mounting.CargoOffset, arriving from where a fresh stow said it was; owned by the slot entity, so it dies
+// with the pack), then broadcasts OnItemChanged. A Persistent item gets no visual: its own world item mounts on the slot's
+// node (UMars_Processor_WorldItem_Reconcile).
 class UMars_Processor_CargoSlot_Sync : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -19,6 +20,7 @@ class UMars_Processor_CargoSlot_Sync : UCk_Processor_Script_Base_UE
         { return; }
 
         InState.LastSeen = Now;
+        const auto Arrival = utils_world_item::Consume_PendingArrival(InState.PendingArrival, Now);
 
         if (ck::IsValid(InState.Visual))
         { utils_entity_lifetime::Request_DestroyEntity(InState.Visual); }
@@ -26,25 +28,15 @@ class UMars_Processor_CargoSlot_Sync : UCk_Processor_Script_Base_UE
         InState.Visual = FCk_Handle();
 
         if (ck::IsValid(Now) && Now.Has_Presentation() && Now.Has_PersistentWorldItem() == false)
-        { InState.Visual = SpawnVisual(InHandle, InState, Now); }
+        {
+            const UMars_ItemTrait_Presentation Presentation = Now.Get_Presentation();
+            auto Visual = FMars_WorldItem_VisualSpec(Now, InHandle.As_Transform(), Presentation.Mounting.CargoOffset);
+            Visual.ArriveFrom = Arrival;
+            InState.Visual = utils_world_item::Request_SpawnVisual(InHandle, Visual);
+        }
 
         auto Self = InHandle.As_CargoSlot();
         if (Self.Has_Fragment(FMars_Fragment_CargoSlot_Signals))
         { Self.Get_Fragment(FMars_Fragment_CargoSlot_Signals).OnItemChanged.Broadcast(Self, Now); }
-    }
-
-    // Owned by the slot entity, so it dies with the pack. The item's pending arrival is consumed here either way.
-    private FCk_Handle SpawnVisual(FCk_Handle& InSlot, FMars_Fragment_CargoSlot& InState, FCk_Handle_Item& InItem)
-    {
-        const UMars_ItemTrait_Presentation Presentation = InItem.Get_Presentation();
-
-        auto Visual = FMars_WorldItem_VisualSpec(InItem, InSlot.As_Transform(), Presentation.Mounting.CargoOffset);
-        if (InState.PendingArrival.IsSet() && InState.PendingArrival.GetValue().Item == InItem)
-        {
-            Visual.ArriveFrom = utils_world_item::Get_FreshArrival(InState.PendingArrival.GetValue());
-            InState.PendingArrival.Reset();
-        }
-
-        return utils_world_item::Request_SpawnVisual(InSlot, Visual);
     }
 }

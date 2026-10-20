@@ -9,11 +9,8 @@ class UMars_SmState_LanternHook_Interact : UMars_SmState_InteractTarget_RunTask
 // reports the expected content, or that the request was refused; a refuel succeeds once requested (the hook ensures and
 // keeps the tallow when it refuses). A Blocked_ action fails (ActionBlocked): the prompt processor disables the target for
 // it, but can lag the initiator's hands by a frame.
-class UMars_SmTask_LanternHook_Interact : UCk_SmTask_EntityScript
+class UMars_SmTask_LanternHook_Interact : UMars_SmTask_InteractionWork
 {
-    default _TaskMode = ECk_SmTaskMode::Tick;
-
-    private ECk_SmTaskResult _Outcome = ECk_SmTaskResult::Running;
     private FCk_Handle_LanternHook _Hook;
     private FCk_Handle_Item _Item;
     private EMars_LanternHook_Action _Action = EMars_LanternHook_Action::Hang;
@@ -25,19 +22,11 @@ class UMars_SmTask_LanternHook_Interact : UCk_SmTask_EntityScript
         _Hook = FCk_Handle_LanternHook();
         _Item = FCk_Handle_Item();
 
-        // The context is the InteractTarget; the initiator is stamped on the per-interaction sub-SM root.
-        auto Context = Get_StateMachineContext();
-        FCk_Handle SubSm = Get_OwningStateMachine();
-        const auto HasContext = Context.Has_Fragment(FMars_Fragment_InteractionContext)
-            && ck::IsValid(SubSm) && SubSm.Has_Fragment(FMars_Fragment_InteractionContext);
-        if (ck::EnsureIfNot(HasContext, "[LanternHook] Interaction ran without an interaction context"))
-        {
-            _Outcome = ECk_SmTaskResult::Failed;
-            return;
-        }
+        FCk_Handle Owner;
+        FCk_Handle Initiator;
+        if (TryGet_InteractionEnds(Owner, Initiator) == false)
+        { return; }
 
-        auto Owner = Context.Get_Fragment(FMars_Fragment_InteractionContext).InteractableOwner;
-        auto Initiator = SubSm.Get_Fragment(FMars_Fragment_InteractionContext).Initiator;
         auto Hook = Owner.As_LanternHook(ECk_SanityCheck::UnChecked);
         if (ck::EnsureIfNot(ck::IsValid(Hook), f"[LanternHook] Interaction owner [{Owner.ToString()}] is no lantern hook")
             || ck::EnsureIfNot(ck::IsValid(Initiator), f"[LanternHook] [{Hook.ToString()}] interaction has no initiator"))
@@ -72,12 +61,6 @@ class UMars_SmTask_LanternHook_Interact : UCk_SmTask_EntityScript
         }
 
         DoFail(EMars_Interaction_FailReason::ActionBlocked);
-    }
-
-    UFUNCTION(BlueprintOverride)
-    ECk_SmTaskResult DoTick(FCk_Handle_SmTask InHandle, FCk_Time InDeltaT, ECk_Sm_NetContext InNetContext)
-    {
-        return _Outcome;
     }
 
     UFUNCTION(BlueprintOverride)
@@ -125,11 +108,5 @@ class UMars_SmTask_LanternHook_Interact : UCk_SmTask_EntityScript
         }
 
         _Hook = FCk_Handle_LanternHook();
-    }
-
-    private void DoFail(EMars_Interaction_FailReason InReason)
-    {
-        utils_interactable::Record_FailReason(Get_OwningStateMachine(), InReason);
-        _Outcome = ECk_SmTaskResult::Failed;
     }
 }

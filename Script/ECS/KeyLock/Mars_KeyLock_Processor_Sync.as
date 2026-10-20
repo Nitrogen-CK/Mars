@@ -18,37 +18,30 @@ class UMars_Processor_KeyLock_Sync : UCk_Processor_Script_Base_UE
         { return; }
 
         InState.LastSeen = Now;
+        const auto Arrival = utils_world_item::Consume_PendingArrival(InState.PendingArrival, Now);
 
         if (ck::IsValid(InState.Visual))
         { utils_entity_lifetime::Request_DestroyEntity(InState.Visual); }
 
         InState.Visual = FCk_Handle();
 
+        // Owned by the lock entity, so it dies with the lock.
         if (ck::IsValid(Now) && Now.Has_Presentation())
-        { InState.Visual = SpawnVisual(InHandle, InState, Now); }
+        {
+            auto Visual = FMars_WorldItem_VisualSpec(Now, InState.KeyMount, FTransform::Identity);
+            Visual.ArriveFrom = Arrival;
+            InState.Visual = utils_world_item::Request_SpawnVisual(InHandle, Visual);
+        }
 
         auto Source = InHandle.As_MechanismSource(ECk_SanityCheck::UnChecked);
         if (ck::IsValid(Source))
         {
             const auto Output = ck::IsValid(Now) ? EMars_MechanismSource_Output::Asserted : EMars_MechanismSource_Output::Deasserted;
-            Source.Request_SetOutput(FMars_Request_MechanismSource_SetOutput(Output));
+            Source.Request_SetOutput(utils_mechanism_source::Make_SetOutput(Output));
         }
 
         auto Self = InHandle.As_KeyLock();
         if (Self.Has_Fragment(FMars_Fragment_KeyLock_Signals))
         { Self.Get_Fragment(FMars_Fragment_KeyLock_Signals).OnKeyChanged.Broadcast(Self, Now); }
-    }
-
-    // Owned by the lock entity, so it dies with the lock. The key's pending arrival is consumed here either way.
-    private FCk_Handle SpawnVisual(FCk_Handle& InLock, FMars_Fragment_KeyLock& InState, FCk_Handle_Item& InItem)
-    {
-        auto Visual = FMars_WorldItem_VisualSpec(InItem, InState.KeyMount, FTransform::Identity);
-        if (InState.PendingArrival.IsSet() && InState.PendingArrival.GetValue().Item == InItem)
-        {
-            Visual.ArriveFrom = utils_world_item::Get_FreshArrival(InState.PendingArrival.GetValue());
-            InState.PendingArrival.Reset();
-        }
-
-        return utils_world_item::Request_SpawnVisual(InLock, Visual);
     }
 }

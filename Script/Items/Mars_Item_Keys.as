@@ -32,57 +32,34 @@ namespace constants_key_colors
     }
 }
 
-namespace utils_key_item
-{
-    // Every key's traits: one shape; only the tag and the colour differ. The asset names it (_CoreInfo is read-only here).
-    void Add_Traits(UCk_InventoryItem_Definition InDefinition, FGameplayTag InKeyId)
-    {
-        auto Presentation = Cast<UMars_ItemTrait_Presentation>(NewObject(InDefinition, UMars_ItemTrait_Presentation));
-        Presentation.Visual.Mesh = engine::Cube();
-        Presentation.Visual.MeshScale = FVector(0.3, 0.08, 0.05);
-        Presentation.Visual.MaterialOverride = TSoftObjectPtr<UMaterialInterface>(assets::ProtoGrid_Item_Mars_MI().ToSoftObjectPath());
-        Presentation.Visual.PrimaryColor = TOptional<FLinearColor>(constants_key_colors::Get_Color(InKeyId));
-        Presentation.Grip.Pose = EMars_HandGripPose::Power;
-        Presentation.Grip.Handedness = EMars_ItemPresentation_Handedness::OneHanded;
-        InDefinition._ItemTraits.Add(Presentation);
-
-        auto Key = Cast<UMars_ItemTrait_Key>(NewObject(InDefinition, UMars_ItemTrait_Key));
-        Key.KeyId = InKeyId;
-        InDefinition._ItemTraits.Add(Key);
-
-        auto Throwable = Cast<UMars_ItemTrait_Throwable>(NewObject(InDefinition, UMars_ItemTrait_Throwable));
-        InDefinition._ItemTraits.Add(Throwable);
-    }
-}
-
 asset Mars_ItemDef_Key_Red of UCk_InventoryItem_Definition
 {
     _CoreInfo = FCk_InventoryItem_CoreInfo(FText::FromString("Red key"));
-    utils_key_item::Add_Traits(this, GameplayTags::Key_Mars_Red);
+    mars_items::Add_KeyTraits(this, GameplayTags::Key_Mars_Red);
 }
 
 asset Mars_ItemDef_Key_Blue of UCk_InventoryItem_Definition
 {
     _CoreInfo = FCk_InventoryItem_CoreInfo(FText::FromString("Blue key"));
-    utils_key_item::Add_Traits(this, GameplayTags::Key_Mars_Blue);
+    mars_items::Add_KeyTraits(this, GameplayTags::Key_Mars_Blue);
 }
 
 asset Mars_ItemDef_Key_Green of UCk_InventoryItem_Definition
 {
     _CoreInfo = FCk_InventoryItem_CoreInfo(FText::FromString("Green key"));
-    utils_key_item::Add_Traits(this, GameplayTags::Key_Mars_Green);
+    mars_items::Add_KeyTraits(this, GameplayTags::Key_Mars_Green);
 }
 
 asset Mars_ItemDef_Key_Yellow of UCk_InventoryItem_Definition
 {
     _CoreInfo = FCk_InventoryItem_CoreInfo(FText::FromString("Yellow key"));
-    utils_key_item::Add_Traits(this, GameplayTags::Key_Mars_Yellow);
+    mars_items::Add_KeyTraits(this, GameplayTags::Key_Mars_Yellow);
 }
 
 asset Mars_ItemDef_Key_Purple of UCk_InventoryItem_Definition
 {
     _CoreInfo = FCk_InventoryItem_CoreInfo(FText::FromString("Purple key"));
-    utils_key_item::Add_Traits(this, GameplayTags::Key_Mars_Purple);
+    mars_items::Add_KeyTraits(this, GameplayTags::Key_Mars_Purple);
 }
 
 namespace mars_items

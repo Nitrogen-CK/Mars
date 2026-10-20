@@ -8,7 +8,7 @@ asset Mars_TestItemDef_LowLantern of UCk_InventoryItem_Definition
     Presentation.Visual.MeshScale = FVector(constants_lantern_item::k_MeshScale, constants_lantern_item::k_MeshScale, constants_lantern_item::k_MeshScale);
     Presentation.Grip.Handedness = EMars_ItemPresentation_Handedness::OneHanded;
     Presentation.Mounting.Persistence = EMars_WorldItem_Persistence::Persistent;
-    Presentation.Mounting.CarryPoint = constants_lantern_item::Get_BeltPoint();
+    Presentation.Mounting.CarryPoint = GameplayTags::AttachPoint_Mars_Belt;
     Presentation.WorldItem.ScriptClass = UMars_Lantern_EntityScript;
     _ItemTraits.Add(Presentation);
 
@@ -41,16 +41,11 @@ class UMars_AutoTestRig_LanternHook : UMars_AutoTestRig_Carrier
     // and AttachPoint.Mars.Belt (the lantern's carry point), as the player's are.
     protected void Add_CarrierBodyWithBelt(FCk_Handle InHandle, FVector InLocation)
     {
+        auto Body = FMars_AutoTestHelper_CarrierBody(InLocation);
+        Body.ExtraPoints.Add(FMars_AutoTestHelper_CarrierPoint(GameplayTags::AttachPoint_Mars_Belt, FVector(10.0, 20.0, 0.0)));
+
         _Carrier = InHandle;
-        auto Root = utils_transform::Add(_Carrier, FTransform(FRotator::ZeroRotator, InLocation), ECk_Replication::DoesNotReplicate);
-
-        _HandNode = utils_scene_node::Create(Root, FTransform(FRotator::ZeroRotator, FVector(40.0, 20.0, 60.0))).As_Transform();
-        auto BeltNode = utils_scene_node::Create(Root, FTransform(FRotator::ZeroRotator, FVector(10.0, 20.0, 0.0))).As_Transform();
-
-        auto AttachPointsSpec = FMars_AttachPoints_Spec();
-        AttachPointsSpec.Points.Add(FMars_AttachPoint_Entry(GameplayTags::AttachPoint_Mars_Hand, _HandNode));
-        AttachPointsSpec.Points.Add(FMars_AttachPoint_Entry(constants_lantern_item::Get_BeltPoint(), BeltNode));
-        utils_attach_points::Add(_Carrier, AttachPointsSpec);
+        _HandNode = Build_CarrierBody(_Carrier, Body).Hand;
     }
 
     // A hook at InLocation whose source asserts InChannel (unset = no source).

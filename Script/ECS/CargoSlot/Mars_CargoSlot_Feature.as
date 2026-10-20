@@ -41,6 +41,9 @@ namespace constants_cargo_slot
     // Beats the pack's own pickup (0), whose probe sphere encloses the cargo probes under the same view ray.
     const int32 k_FocusPriority = 10;
 
+    // Slot indices run [0, k_MaxCount): the Inventory.Mars.Cargo.N tags only go that far.
+    const int32 k_MaxCount = 8;
+
     // The point a slot publishes on its own node for a stowed Persistent item to be carried on. Attach points are looked up
     // on the carrier, so the dock's tag names the slot's node here; no slot has a second point.
     FGameplayTag Get_MountPoint() { return GameplayTags::AttachPoint_Mars_Dock; }
@@ -68,16 +71,24 @@ struct FMars_CargoSlot_Spec
     // The pack's world item (its Mount decides Blocked_PackHeld); the slot is created under its root.
     UPROPERTY()
     FCk_Handle_WorldItem Backpack;
+
+    // The slot's Use prompt (its input action and placeholder text): the assembly's words.
+    UPROPERTY()
+    FMars_InteractPrompt_Spec Prompt;
 }
 
-// Index in [0, 7] (the Inventory.Mars.Cargo.N tags only go that far), ProbeRadius > 0, a valid Backpack.
+// Index in [0, constants_cargo_slot::k_MaxCount), ProbeRadius > 0 and finite, a valid Backpack, a prompt input action.
 mixin FMars_Validation Validate(const FMars_CargoSlot_Spec& Self)
 {
-    if (Self.Index < 0 || Self.Index > 7)
-    { return FMars_Validation(f"Index [{Self.Index}] is outside [0, 7] - Inventory.Mars.Cargo.N tags only go that far"); }
+    const auto LastIndex = constants_cargo_slot::k_MaxCount - 1;
+    if (Self.Index < 0 || Self.Index > LastIndex)
+    { return FMars_Validation(f"Index [{Self.Index}] is outside [0, {LastIndex}] - Inventory.Mars.Cargo.N tags only go that far"); }
 
-    if (Self.ProbeRadius <= 0.0f)
+    if (Math::IsFinite(Self.ProbeRadius) == false || Self.ProbeRadius <= 0.0f)
     { return FMars_Validation(f"slot [{Self.Index}] has a non-positive ProbeRadius [{Self.ProbeRadius}]"); }
+
+    if (Self.Prompt.InputAction.IsNull())
+    { return FMars_Validation(f"slot [{Self.Index}] has no prompt input action"); }
 
     if (ck::Is_NOT_Valid(Self.Backpack))
     { return FMars_Validation(f"slot [{Self.Index}] has no Backpack"); }
@@ -100,8 +111,7 @@ struct FMars_Fragment_CargoSlot_Params
 //--------------------------------------------------------------------------------------------------------------------------
 
 // Inventory and Interactable are composed by utils_cargo_slot::Create. Visual and LastSeen are written only by
-// UMars_Processor_CargoSlot_Sync, PendingArrival by the request drain and the sync, LastPromptAction only by
-// UMars_Processor_CargoSlot_Prompt.
+// UMars_Processor_CargoSlot_Sync, PendingArrival by the request drain and the sync.
 struct FMars_Fragment_CargoSlot
 {
     UPROPERTY()
@@ -121,10 +131,6 @@ struct FMars_Fragment_CargoSlot
     // Where a stowed item visually was; its cargo visual starts there.
     UPROPERTY()
     TOptional<FMars_WorldItem_PendingArrival> PendingArrival;
-
-    // The action the prompt currently shows; unset while the slot is not focused.
-    UPROPERTY()
-    TOptional<EMars_CargoSlot_Action> LastPromptAction;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

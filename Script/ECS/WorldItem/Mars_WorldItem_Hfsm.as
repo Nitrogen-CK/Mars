@@ -50,19 +50,10 @@ class UMars_SmTask_WorldItem_StowIntoInitiator : UMars_SmTask_ActAtGrip
         _Initiator = FCk_Handle();
         _WorldItem = FCk_Handle_WorldItem();
 
-        // The context is the InteractTarget; the initiator is stamped on the per-interaction sub-SM root.
-        auto Context = Get_StateMachineContext();
-        FCk_Handle SubSm = Get_OwningStateMachine();
-        const auto HasContext = Context.Has_Fragment(FMars_Fragment_InteractionContext)
-            && ck::IsValid(SubSm) && SubSm.Has_Fragment(FMars_Fragment_InteractionContext);
-        if (ck::EnsureIfNot(HasContext, "[WorldItem] Pickup ran without an interaction context"))
-        {
-            _Outcome = ECk_SmTaskResult::Failed;
-            return;
-        }
-
-        auto Owner = Context.Get_Fragment(FMars_Fragment_InteractionContext).InteractableOwner;
-        auto Initiator = SubSm.Get_Fragment(FMars_Fragment_InteractionContext).Initiator;
+        FCk_Handle Owner;
+        FCk_Handle Initiator;
+        if (TryGet_InteractionEnds(Owner, Initiator) == false)
+        { return; }
 
         // The pickup state runs only on a world item's own target, for an initiator that stows into a hotbar.
         auto WorldItem = Owner.As_WorldItem(ECk_SanityCheck::UnChecked);

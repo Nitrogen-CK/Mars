@@ -29,6 +29,10 @@ class UMars_ItemTrait_Strike : UCk_ItemTrait
     UPROPERTY()
     float32 RecoverySeconds = 0.35f;
 
+    // The blow's impulse along the view, in cm/s, handed to whatever the sweep hits.
+    UPROPERTY()
+    float32 ImpulseSpeed = 300.0f;
+
     // Shakes the striker's camera when the blow lands on a zone (an Impact_*_CameraShake_Mars_BP); null shakes nothing.
     UPROPERTY()
     TSoftClassPtr<UCameraShakeBase> HitShake;
