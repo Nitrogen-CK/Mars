@@ -128,6 +128,21 @@ class UMars_Processor_FoodPiece_HandleRequests : UCk_Processor_Script_Base_UE
         Broadcast_CutResolved(Piece, FMars_FoodPiece_CutResult(Outcome, InResult.Get_Outcome()));
     }
 
+    // The cook state the halves inherit: the source's ledger, or the last SetCookState still queued on it. A slice resolves
+    // a frame or more after it was submitted, so a write sent while the piece was Cutting may not have drained yet; the
+    // source dies at the commit, so without this the write would be lost.
+    private FMars_FoodPiece_CookState Get_CookStateAtCommit(const FCk_Handle_FoodPiece& InSource, const FMars_Fragment_FoodPiece& InState) const
+    {
+        if (InSource.Has_Fragment(FMars_Fragment_FoodPiece_Requests) == false)
+        { return InState.CookState; }
+
+        const auto& Pending = InSource.Get_Fragment(FMars_Fragment_FoodPiece_Requests).SetCookStateRequests;
+        if (Pending.Num() == 0)
+        { return InState.CookState; }
+
+        return Pending.Last().CookState;
+    }
+
     // Removes and returns the ledger's piece for InOperationID. Every result answers a slice this processor entered, so a
     // missing entry is a broken ledger.
     private FCk_Handle_FoodPiece Take_CutInFlight(FCk_Handle& InWorld, const FGuid& InOperationID)
@@ -171,7 +186,7 @@ class UMars_Processor_FoodPiece_HandleRequests : UCk_Processor_Script_Base_UE
         auto HalfSpec = FMars_FoodPiece_Spec(FMars_FoodPiece_Data(), InSource.Get_Tuners(), InSource.Get_Cap(), InSource.Get_BodyTuners());
         HalfSpec.Data.Lineage = State.Lineage;
         HalfSpec.Data.ParentId = State.Id;
-        HalfSpec.Data.CookState = State.CookState;
+        HalfSpec.Data.CookState = Get_CookStateAtCommit(InSource, State);
         HalfSpec.Data.Definition = State.Definition;
         HalfSpec.Data.Kind = State.Kind;
 

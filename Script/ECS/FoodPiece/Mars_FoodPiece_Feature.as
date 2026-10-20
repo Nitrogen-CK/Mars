@@ -443,7 +443,8 @@ struct FMars_Request_FoodPiece_Cut
 }
 
 // Replace the piece's cook state (a heat kernel's write-back when the piece leaves it). Applied before any cut in the same
-// drain, so the halves of that cut carry it.
+// drain, so the halves of that cut carry it; one sent while the piece is Cutting reaches the halves too (the commit takes
+// the last write still queued on the source).
 struct FMars_Request_FoodPiece_SetCookState
 {
     UPROPERTY()
