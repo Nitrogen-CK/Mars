@@ -80,6 +80,33 @@ namespace utils_trap
         return Spec;
     }
 
+    // One burst per power-up: Telegraph 0.8 / Fire 1.2, not looping, run while powered. A cycle set running starts at its
+    // first phase, so each rising edge on the sink fires once; power held past the burst does not refire it.
+    FMars_Trap_Spec Make_BurstVentSpec()
+    {
+        const auto Telegraph = GameplayTags::Mechanism_Phase_Telegraph;
+        const auto Fire = GameplayTags::Mechanism_Phase_Fire;
+
+        auto Spec = FMars_Trap_Spec();
+        Spec.Cycle.Phases.Add(FMars_CyclePhase(Telegraph, 0.8f));
+        Spec.Cycle.Phases.Add(FMars_CyclePhase(Fire, 1.2f));
+        Spec.Cycle.Loop = false;
+        Spec.Cycle.StartRunning = false;
+        Spec.Powered = EMars_PoweredBehavior::RunWhilePowered;
+
+        auto TelegraphAction = FMars_Trap_PhaseAction();
+        TelegraphAction.Phase = Telegraph;
+        TelegraphAction.HazardArmed = TOptional<bool>(false);
+        Spec.Actions.Add(TelegraphAction);
+
+        auto FireAction = FMars_Trap_PhaseAction();
+        FireAction.Phase = Fire;
+        FireAction.HazardArmed = TOptional<bool>(true);
+        Spec.Actions.Add(FireAction);
+
+        return Spec;
+    }
+
     // Idle 3.0 / Telegraph 1.0 / Fire 1.5: the hazard arms on Fire and disarms on Idle.
     FMars_Trap_Spec Make_VentSpec()
     {
