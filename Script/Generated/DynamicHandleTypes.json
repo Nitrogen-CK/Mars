@@ -64,6 +64,15 @@
 			]
 		},
 		{
+			"TypeName": "FCk_Handle_Bellkeeper",
+			"ShortName": "Bellkeeper",
+			"Description": "A dial lock judged on commit: a wrong commit vents and costs a reward, the right one opens and pays out what is left",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_BellkeeperHandle",
+			"RequiredFragments": [
+				"Mars_Feature_Bellkeeper"
+			]
+		},
+		{
 			"TypeName": "FCk_Handle_BodyPart",
 			"ShortName": "BodyPart",
 			"Description": "A monster part with its own Health and HitZone, a condition ledger, spill to the body, and a depletion policy (detach a leg, break, none)",
@@ -187,6 +196,15 @@
 			"SourceAsset": "/Script/AngelscriptAssets.Mars_DevourHandle",
 			"RequiredFragments": [
 				"Mars_Feature_Devour"
+			]
+		},
+		{
+			"TypeName": "FCk_Handle_Dial",
+			"ShortName": "Dial",
+			"Description": "A ring of detents and the index it points at; it turns one way or the other and can be locked",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_DialHandle",
+			"RequiredFragments": [
+				"Mars_Feature_Dial"
 			]
 		},
 		{
