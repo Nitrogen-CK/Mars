@@ -3299,6 +3299,42 @@ class AMars_AutoTest_Devour_SpecValidateRejectsAPhaseWithNoTime_Actor : ACk_Auto
     }
 }
 
+class AMars_AutoTest_Dial_LockDropsStepsUntilUnlocked_Actor : ACk_AutoTestRunner
+{
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Dial_LockDropsStepsUntilUnlocked");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_Dial_SpecValidation_Actor : ACk_AutoTestRunner
+{
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Dial_SpecValidation");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_Dial_StepsWrapBothWaysWithOneBroadcastPerDrain_Actor : ACk_AutoTestRunner
+{
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Dial_StepsWrapBothWaysWithOneBroadcastPerDrain");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
 class AMars_AutoTest_Emote_TagsMapToEveryEmoteAndBack_Actor : ACk_AutoTestRunner
 {
     UFUNCTION(BlueprintOverride)
@@ -3403,42 +3439,6 @@ class AMars_AutoTest_Eyes_BlinkCountsAtFixedInterval_Actor : ACk_AutoTestRunner
         auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Eyes_BlinkCountsAtFixedInterval");
         TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
         ResolvedClass = Path.TryLoadClass();
-class AMars_AutoTest_Dial_LockDropsStepsUntilUnlocked_Actor : ACk_AutoTestRunner
-{
-    UFUNCTION(BlueprintOverride)
-    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
-    {
-        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Dial_LockDropsStepsUntilUnlocked");
-        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
-        ResolvedClass = Path.TryLoadClass();
-        return ResolvedClass;
-    }
-}
-
-class AMars_AutoTest_Dial_SpecValidation_Actor : ACk_AutoTestRunner
-{
-    UFUNCTION(BlueprintOverride)
-    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
-    {
-        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Dial_SpecValidation");
-        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
-        ResolvedClass = Path.TryLoadClass();
-        return ResolvedClass;
-    }
-}
-
-class AMars_AutoTest_Dial_StepsWrapBothWaysWithOneBroadcastPerDrain_Actor : ACk_AutoTestRunner
-{
-    UFUNCTION(BlueprintOverride)
-    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
-    {
-        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Dial_StepsWrapBothWaysWithOneBroadcastPerDrain");
-        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
-        ResolvedClass = Path.TryLoadClass();
-        return ResolvedClass;
-    }
-}
-
         return ResolvedClass;
     }
 }

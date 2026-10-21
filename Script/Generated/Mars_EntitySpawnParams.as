@@ -4449,6 +4449,45 @@ namespace UMars_AutoTest_Devour_SpecValidateRejectsAPhaseWithNoTime
 }
 
 USTRUCT()
+struct FMars_AutoTest_Dial_LockDropsStepsUntilUnlocked_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Dial_LockDropsStepsUntilUnlocked
+{
+    FMars_AutoTest_Dial_LockDropsStepsUntilUnlocked_SpawnParams Params()
+    {
+        return FMars_AutoTest_Dial_LockDropsStepsUntilUnlocked_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Dial_SpecValidation_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Dial_SpecValidation
+{
+    FMars_AutoTest_Dial_SpecValidation_SpawnParams Params()
+    {
+        return FMars_AutoTest_Dial_SpecValidation_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Dial_StepsWrapBothWaysWithOneBroadcastPerDrain_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Dial_StepsWrapBothWaysWithOneBroadcastPerDrain
+{
+    FMars_AutoTest_Dial_StepsWrapBothWaysWithOneBroadcastPerDrain_SpawnParams Params()
+    {
+        return FMars_AutoTest_Dial_StepsWrapBothWaysWithOneBroadcastPerDrain_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_Emote_TagsMapToEveryEmoteAndBack_SpawnParams
 {
 }
@@ -4549,45 +4588,6 @@ namespace UMars_AutoTest_Eyes_ApplyWritesPlate
     FMars_AutoTest_Eyes_ApplyWritesPlate_SpawnParams Params()
     {
         return FMars_AutoTest_Eyes_ApplyWritesPlate_SpawnParams();
-    }
-}
-
-USTRUCT()
-struct FMars_AutoTest_Dial_LockDropsStepsUntilUnlocked_SpawnParams
-{
-}
-
-namespace UMars_AutoTest_Dial_LockDropsStepsUntilUnlocked
-{
-    FMars_AutoTest_Dial_LockDropsStepsUntilUnlocked_SpawnParams Params()
-    {
-        return FMars_AutoTest_Dial_LockDropsStepsUntilUnlocked_SpawnParams();
-    }
-}
-
-USTRUCT()
-struct FMars_AutoTest_Dial_SpecValidation_SpawnParams
-{
-}
-
-namespace UMars_AutoTest_Dial_SpecValidation
-{
-    FMars_AutoTest_Dial_SpecValidation_SpawnParams Params()
-    {
-        return FMars_AutoTest_Dial_SpecValidation_SpawnParams();
-    }
-}
-
-USTRUCT()
-struct FMars_AutoTest_Dial_StepsWrapBothWaysWithOneBroadcastPerDrain_SpawnParams
-{
-}
-
-namespace UMars_AutoTest_Dial_StepsWrapBothWaysWithOneBroadcastPerDrain
-{
-    FMars_AutoTest_Dial_StepsWrapBothWaysWithOneBroadcastPerDrain_SpawnParams Params()
-    {
-        return FMars_AutoTest_Dial_StepsWrapBothWaysWithOneBroadcastPerDrain_SpawnParams();
     }
 }
 
@@ -10285,6 +10285,96 @@ namespace UMars_BatterStation_EntityScript
 }
 
 USTRUCT()
+struct FMars_Bellkeeper_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    TArray<EMars_Bellkeeper_Glyph> Phrase;
+
+    UPROPERTY()
+    TArray<EMars_Bellkeeper_Glyph> StartGlyphs;
+
+    UPROPERTY()
+    TArray<FMars_Bellkeeper_Reward> Rewards;
+
+    UPROPERTY()
+    FGameplayTag CommitChannel = FGameplayTag();
+
+    UPROPERTY()
+    FGameplayTag VentChannel = FGameplayTag();
+
+    UPROPERTY()
+    float32 VentPulseSeconds = 2.0f;
+
+    UPROPERTY()
+    FMars_MechanismSource_Spec Source = FMars_MechanismSource_Spec();
+
+    UPROPERTY()
+    FText PromptText = FText::FromString("Turn dial");
+
+    FMars_Bellkeeper_EntityScript_SpawnParams(FTransform InSpawnTransform, TArray<EMars_Bellkeeper_Glyph> InPhrase, TArray<EMars_Bellkeeper_Glyph> InStartGlyphs, TArray<FMars_Bellkeeper_Reward> InRewards, FGameplayTag InCommitChannel, FGameplayTag InVentChannel, float32 InVentPulseSeconds, FMars_MechanismSource_Spec InSource, FText InPromptText)
+    {
+        SpawnTransform = InSpawnTransform;
+        Phrase = InPhrase;
+        StartGlyphs = InStartGlyphs;
+        Rewards = InRewards;
+        CommitChannel = InCommitChannel;
+        VentChannel = InVentChannel;
+        VentPulseSeconds = InVentPulseSeconds;
+        Source = InSource;
+        PromptText = InPromptText;
+    }
+}
+
+namespace UMars_Bellkeeper_EntityScript
+{
+    FMars_Bellkeeper_EntityScript_SpawnParams Params()
+    {
+        return FMars_Bellkeeper_EntityScript_SpawnParams();
+    }
+
+    FMars_Bellkeeper_EntityScript_SpawnParams Params(FTransform InSpawnTransform, TArray<EMars_Bellkeeper_Glyph> InPhrase, TArray<EMars_Bellkeeper_Glyph> InStartGlyphs, TArray<FMars_Bellkeeper_Reward> InRewards, FGameplayTag InCommitChannel, FGameplayTag InVentChannel, float32 InVentPulseSeconds, FMars_MechanismSource_Spec InSource, FText InPromptText)
+    {
+        return FMars_Bellkeeper_EntityScript_SpawnParams(InSpawnTransform, InPhrase, InStartGlyphs, InRewards, InCommitChannel, InVentChannel, InVentPulseSeconds, InSource, InPromptText);
+    }
+}
+
+USTRUCT()
+struct FMars_BellkeeperClue_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    TArray<EMars_Bellkeeper_Glyph> Phrase;
+
+    UPROPERTY()
+    float32 GlyphSize = 40.0f;
+
+    FMars_BellkeeperClue_EntityScript_SpawnParams(FTransform InSpawnTransform, TArray<EMars_Bellkeeper_Glyph> InPhrase, float32 InGlyphSize)
+    {
+        SpawnTransform = InSpawnTransform;
+        Phrase = InPhrase;
+        GlyphSize = InGlyphSize;
+    }
+}
+
+namespace UMars_BellkeeperClue_EntityScript
+{
+    FMars_BellkeeperClue_EntityScript_SpawnParams Params()
+    {
+        return FMars_BellkeeperClue_EntityScript_SpawnParams();
+    }
+
+    FMars_BellkeeperClue_EntityScript_SpawnParams Params(FTransform InSpawnTransform, TArray<EMars_Bellkeeper_Glyph> InPhrase, float32 InGlyphSize)
+    {
+        return FMars_BellkeeperClue_EntityScript_SpawnParams(InSpawnTransform, InPhrase, InGlyphSize);
+    }
+}
+
+USTRUCT()
 struct FMars_CameraLayer_Devour_SpawnParams
 {
 }
@@ -10388,96 +10478,6 @@ USTRUCT()
 struct FMars_CuttingStation_EntityScript_SpawnParams
 {
     UPROPERTY()
-USTRUCT()
-struct FMars_Bellkeeper_EntityScript_SpawnParams
-{
-    UPROPERTY()
-    FTransform SpawnTransform = FTransform::Identity;
-
-    UPROPERTY()
-    TArray<EMars_Bellkeeper_Glyph> Phrase;
-
-    UPROPERTY()
-    TArray<EMars_Bellkeeper_Glyph> StartGlyphs;
-
-    UPROPERTY()
-    TArray<FMars_Bellkeeper_Reward> Rewards;
-
-    UPROPERTY()
-    FGameplayTag CommitChannel = FGameplayTag();
-
-    UPROPERTY()
-    FGameplayTag VentChannel = FGameplayTag();
-
-    UPROPERTY()
-    float32 VentPulseSeconds = 2.0f;
-
-    UPROPERTY()
-    FMars_MechanismSource_Spec Source = FMars_MechanismSource_Spec();
-
-    UPROPERTY()
-    FText PromptText = FText::FromString("Turn dial");
-
-    FMars_Bellkeeper_EntityScript_SpawnParams(FTransform InSpawnTransform, TArray<EMars_Bellkeeper_Glyph> InPhrase, TArray<EMars_Bellkeeper_Glyph> InStartGlyphs, TArray<FMars_Bellkeeper_Reward> InRewards, FGameplayTag InCommitChannel, FGameplayTag InVentChannel, float32 InVentPulseSeconds, FMars_MechanismSource_Spec InSource, FText InPromptText)
-    {
-        SpawnTransform = InSpawnTransform;
-        Phrase = InPhrase;
-        StartGlyphs = InStartGlyphs;
-        Rewards = InRewards;
-        CommitChannel = InCommitChannel;
-        VentChannel = InVentChannel;
-        VentPulseSeconds = InVentPulseSeconds;
-        Source = InSource;
-        PromptText = InPromptText;
-    }
-}
-
-namespace UMars_Bellkeeper_EntityScript
-{
-    FMars_Bellkeeper_EntityScript_SpawnParams Params()
-    {
-        return FMars_Bellkeeper_EntityScript_SpawnParams();
-    }
-
-    FMars_Bellkeeper_EntityScript_SpawnParams Params(FTransform InSpawnTransform, TArray<EMars_Bellkeeper_Glyph> InPhrase, TArray<EMars_Bellkeeper_Glyph> InStartGlyphs, TArray<FMars_Bellkeeper_Reward> InRewards, FGameplayTag InCommitChannel, FGameplayTag InVentChannel, float32 InVentPulseSeconds, FMars_MechanismSource_Spec InSource, FText InPromptText)
-    {
-        return FMars_Bellkeeper_EntityScript_SpawnParams(InSpawnTransform, InPhrase, InStartGlyphs, InRewards, InCommitChannel, InVentChannel, InVentPulseSeconds, InSource, InPromptText);
-    }
-}
-
-USTRUCT()
-struct FMars_BellkeeperClue_EntityScript_SpawnParams
-{
-    UPROPERTY()
-    FTransform SpawnTransform = FTransform::Identity;
-
-    UPROPERTY()
-    TArray<EMars_Bellkeeper_Glyph> Phrase;
-
-    UPROPERTY()
-    float32 GlyphSize = 40.0f;
-
-    FMars_BellkeeperClue_EntityScript_SpawnParams(FTransform InSpawnTransform, TArray<EMars_Bellkeeper_Glyph> InPhrase, float32 InGlyphSize)
-    {
-        SpawnTransform = InSpawnTransform;
-        Phrase = InPhrase;
-        GlyphSize = InGlyphSize;
-    }
-}
-
-namespace UMars_BellkeeperClue_EntityScript
-{
-    FMars_BellkeeperClue_EntityScript_SpawnParams Params()
-    {
-        return FMars_BellkeeperClue_EntityScript_SpawnParams();
-    }
-
-    FMars_BellkeeperClue_EntityScript_SpawnParams Params(FTransform InSpawnTransform, TArray<EMars_Bellkeeper_Glyph> InPhrase, float32 InGlyphSize)
-    {
-        return FMars_BellkeeperClue_EntityScript_SpawnParams(InSpawnTransform, InPhrase, InGlyphSize);
-    }
-}
-
     FTransform SpawnTransform = FTransform::Identity;
 
     UPROPERTY()
@@ -11796,19 +11796,19 @@ struct FMars_Gauntlet_Bell_Chain_EntityScript_SpawnParams
     FTransform SpawnTransform = FTransform::Identity;
 
     UPROPERTY()
-    FMars_Control_Spec Control = FMars_Control_Spec(ECk_Interaction_CompletionPolicy::Instant, 1.5f, EMars_Control_Behavior::Momentary, 0.4000000059604645f, false, FMars_Control_Manipulation_Spec());
+    FMars_Control_Spec Control = FMars_Control_Spec(ECk_Interaction_CompletionPolicy::ManuallyCompleted, 1.5f, EMars_Control_Behavior::Momentary, 0.25f, false, FMars_Control_Manipulation_Spec(FVector(0.0, 0.0, -1.0), 0.029999999329447746f, 0.8500000238418579f, 60.0f, 12.0f, true));
 
     UPROPERTY()
     FMars_MechanismSource_Spec Source;
 
     UPROPERTY()
-    FLinearColor GlyphColor = FLinearColor(1.0f, 0.6000000238418579f, 0.15000000596046448f, 1.0f);
+    float32 PullDistance = 40.0f;
 
     UPROPERTY()
     float32 ChainLength = 110.0f;
 
     UPROPERTY()
-    FText PromptText = FText::FromString("Press seal");
+    float32 MoveDuration = 0.30000001192092896f;
 
     UPROPERTY()
     FText PromptText = FText::FromString("Pull chain");
@@ -11818,8 +11818,9 @@ struct FMars_Gauntlet_Bell_Chain_EntityScript_SpawnParams
         SpawnTransform = InSpawnTransform;
         Control = InControl;
         Source = InSource;
-        GlyphColor = InGlyphColor;
-        Glyph = InGlyph;
+        PullDistance = InPullDistance;
+        ChainLength = InChainLength;
+        MoveDuration = InMoveDuration;
         PromptText = InPromptText;
     }
 }
@@ -12069,29 +12070,20 @@ struct FMars_Gauntlet_Bell_Vent_EntityScript_SpawnParams
     FTransform SpawnTransform = FTransform::Identity;
 
     UPROPERTY()
-    FMars_Control_Spec Control = FMars_Control_Spec(ECk_Interaction_CompletionPolicy::ManuallyCompleted, 1.5f, EMars_Control_Behavior::Momentary, 0.25f, false, FMars_Control_Manipulation_Spec(FVector(0.0, 0.0, -1.0), 0.029999999329447746f, 0.8500000238418579f, 60.0f, 12.0f, true));
+    FMars_Trap_Spec Trap;
 
     UPROPERTY()
-    FMars_MechanismSource_Spec Source;
+    FMars_MechanismSink_Spec Sink;
 
     UPROPERTY()
-    float32 PullDistance = 40.0f;
-
-    UPROPERTY()
-    EMars_Seal_Glyph Glyph = EMars_Seal_Glyph::Triangle;
-
-    UPROPERTY()
-    float32 MoveDuration = 0.30000001192092896f;
+    FMars_Hazard_Spec Hazard = FMars_Hazard_Spec();
 
     FMars_Gauntlet_Bell_Vent_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Trap_Spec InTrap, FMars_MechanismSink_Spec InSink, FMars_Hazard_Spec InHazard)
     {
         SpawnTransform = InSpawnTransform;
-        Control = InControl;
-        Source = InSource;
-        PullDistance = InPullDistance;
-        ChainLength = InChainLength;
-        MoveDuration = InMoveDuration;
-        PromptText = InPromptText;
+        Trap = InTrap;
+        Sink = InSink;
+        Hazard = InHazard;
     }
 }
 
@@ -12291,7 +12283,7 @@ struct FMars_Gauntlet_Choir_CircleSeal_EntityScript_SpawnParams
     FTransform SpawnTransform = FTransform::Identity;
 
     UPROPERTY()
-    FMars_Trap_Spec Trap;
+    FMars_Control_Spec Control = FMars_Control_Spec(ECk_Interaction_CompletionPolicy::Instant, 1.5f, EMars_Control_Behavior::Momentary, 0.4000000059604645f, false, FMars_Control_Manipulation_Spec());
 
     UPROPERTY()
     FMars_MechanismSource_Spec Source;
@@ -12303,14 +12295,16 @@ struct FMars_Gauntlet_Choir_CircleSeal_EntityScript_SpawnParams
     EMars_Seal_Glyph Glyph = EMars_Seal_Glyph::Circle;
 
     UPROPERTY()
-    FMars_Hazard_Spec Hazard = FMars_Hazard_Spec();
+    FText PromptText = FText::FromString("Press seal");
 
     FMars_Gauntlet_Choir_CircleSeal_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Control_Spec InControl, FMars_MechanismSource_Spec InSource, FLinearColor InGlyphColor, EMars_Seal_Glyph InGlyph, FText InPromptText)
     {
         SpawnTransform = InSpawnTransform;
-        Trap = InTrap;
-        Sink = InSink;
-        Hazard = InHazard;
+        Control = InControl;
+        Source = InSource;
+        GlyphColor = InGlyphColor;
+        Glyph = InGlyph;
+        PromptText = InPromptText;
     }
 }
 
@@ -12415,7 +12409,13 @@ struct FMars_Gauntlet_Choir_TriangleSeal_EntityScript_SpawnParams
     FMars_Control_Spec Control = FMars_Control_Spec(ECk_Interaction_CompletionPolicy::Instant, 1.5f, EMars_Control_Behavior::Momentary, 0.4000000059604645f, false, FMars_Control_Manipulation_Spec());
 
     UPROPERTY()
-    FMars_MechanismSink_Spec Sink;
+    FMars_MechanismSource_Spec Source;
+
+    UPROPERTY()
+    FLinearColor GlyphColor = FLinearColor(1.0f, 0.6000000238418579f, 0.15000000596046448f, 1.0f);
+
+    UPROPERTY()
+    EMars_Seal_Glyph Glyph = EMars_Seal_Glyph::Triangle;
 
     UPROPERTY()
     FText PromptText = FText::FromString("Press seal");
