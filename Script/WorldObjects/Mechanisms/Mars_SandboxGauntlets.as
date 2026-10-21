@@ -3,7 +3,7 @@
 // Script/Editor/Mars_SandboxGauntletBuilder.as places them). Not under Script/Editor: the saved map references these
 // classes at runtime. Struct fields other than channels are set in DoConstruct, as in Mars_SandboxMechanisms.as.
 //
-// The seals' glyph colors match on purpose: the silhouette (circle, triangle) is the key, not the color.
+// The Blind Choir's seal glyph colors match on purpose: the silhouette (circle, triangle) is the key, not the color.
 
 //--------------------------------------------------------------------------------------------------------------------------
 // G1 - The Mourner's Table: the chef plate AND the backpack plate, pressed together, latch the truffle alcove open.
@@ -64,33 +64,87 @@ class UMars_Gauntlet_Truffle_EntityScript : UMars_WorldItem_EntityScript
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-// G3 - The Bellkeeper's Confession: the lower circle seal, then the upper triangle seal, latch the reliquary gate; the
-// reliquary's hand wheel latches the return door to the hall.
+// G3 - The Bellkeeper's Confession: three dials on the lower west wall, a pull chain on the gallery; the plaque over the
+// reliquary gate shows the phrase. A wrong pull vents steam across the chain and snuffs a candle (Cleaver, then
+// Tenderizer); the right one latches the reliquary gate and lays out what is left (the Ration always). The reliquary's
+// hand wheel latches the return door to the hall.
 //--------------------------------------------------------------------------------------------------------------------------
 
-class UMars_Gauntlet_Bell_CircleSeal_EntityScript : UMars_Seal_EntityScript
+namespace constants_gauntlet_bell
 {
-    default _ShowInPlaceActors = false;
-    default Source.OutputChannel = GameplayTags::Mechanism_Channel_Gauntlet_Bell_Circle;
-    default Glyph = EMars_Seal_Glyph::Circle;
-    default GlyphColor = FLinearColor(1.0f, 0.6f, 0.15f, 1.0f);
+    // The one phrase: the panel's answer and the plaque's glyphs both read it.
+    TArray<EMars_Bellkeeper_Glyph> Get_Phrase()
+    {
+        TArray<EMars_Bellkeeper_Glyph> Phrase;
+        Phrase.Add(EMars_Bellkeeper_Glyph::Diamond);
+        Phrase.Add(EMars_Bellkeeper_Glyph::Triangle);
+        Phrase.Add(EMars_Bellkeeper_Glyph::Cross);
+        return Phrase;
+    }
 }
 
-class UMars_Gauntlet_Bell_TriangleSeal_EntityScript : UMars_Seal_EntityScript
+class UMars_Gauntlet_Bell_Panel_EntityScript : UMars_Bellkeeper_EntityScript
 {
     default _ShowInPlaceActors = false;
-    default Source.OutputChannel = GameplayTags::Mechanism_Channel_Gauntlet_Bell_Triangle;
-    default Glyph = EMars_Seal_Glyph::Triangle;
-    default GlyphColor = FLinearColor(1.0f, 0.6f, 0.15f, 1.0f);
-}
-
-// Circle, then triangle. No step timeout; a wrong seal resets the unfinished progress.
-class UMars_Gauntlet_Bell_Sequence_EntityScript : UMars_SequenceNode_EntityScript
-{
-    default _ShowInPlaceActors = false;
-    default Sequence.Steps.Add(GameplayTags::Mechanism_Channel_Gauntlet_Bell_Circle);
-    default Sequence.Steps.Add(GameplayTags::Mechanism_Channel_Gauntlet_Bell_Triangle);
+    default CommitChannel = GameplayTags::Mechanism_Channel_Gauntlet_Bell_Commit;
+    default VentChannel = GameplayTags::Mechanism_Channel_Gauntlet_Bell_Vent;
     default Source.OutputChannel = GameplayTags::Mechanism_Channel_Gauntlet_Bell_Open;
+
+    UFUNCTION(BlueprintOverride)
+    ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
+    {
+        Phrase = constants_gauntlet_bell::Get_Phrase();
+
+        StartGlyphs.Reset();
+        for (int32 Index = 0; Index < Phrase.Num(); ++Index)
+        { StartGlyphs.Add(EMars_Bellkeeper_Glyph::Square); }
+
+        // Slightly longer than the burst vent's 2.0 s, so the power never cuts the burst short.
+        VentPulseSeconds = 2.2f;
+
+        // Offsets from the panel (cell -590, 600, 120) to the reliquary floor (cell X -560..-160, Y 1100..1400).
+        Rewards.Reset();
+        Rewards.Add(FMars_Bellkeeper_Reward(utils_held_item::Make_DefinitionSoft(mars_items::Cleaver()),
+            FTransform(FVector(160.0, 620.0, -90.0))));
+        Rewards.Add(FMars_Bellkeeper_Reward(utils_held_item::Make_DefinitionSoft(mars_items::Tenderizer()),
+            FTransform(FVector(240.0, 620.0, -90.0))));
+        Rewards.Add(FMars_Bellkeeper_Reward(utils_held_item::Make_DefinitionSoft(mars_items::Ration()),
+            FTransform(FVector(320.0, 620.0, -90.0))));
+
+        return Super::DoConstruct(InHandle);
+    }
+}
+
+class UMars_Gauntlet_Bell_Clue_EntityScript : UMars_BellkeeperClue_EntityScript
+{
+    default _ShowInPlaceActors = false;
+
+    UFUNCTION(BlueprintOverride)
+    ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
+    {
+        Phrase = constants_gauntlet_bell::Get_Phrase();
+        return Super::DoConstruct(InHandle);
+    }
+}
+
+class UMars_Gauntlet_Bell_Chain_EntityScript : UMars_PullChain_EntityScript
+{
+    default _ShowInPlaceActors = false;
+    default Source.OutputChannel = GameplayTags::Mechanism_Channel_Gauntlet_Bell_Commit;
+}
+
+// One burst per wrong pull, across the chain's pull stand, pushing the puller toward the north wall.
+class UMars_Gauntlet_Bell_Vent_EntityScript : UMars_Vent_EntityScript
+{
+    default _ShowInPlaceActors = false;
+    default Sink.InputChannels.Add(GameplayTags::Mechanism_Channel_Gauntlet_Bell_Vent);
+
+    UFUNCTION(BlueprintOverride)
+    ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
+    {
+        Trap = utils_trap::Make_BurstVentSpec();
+        return Super::DoConstruct(InHandle);
+    }
 }
 
 class UMars_Gauntlet_Bell_ReliquaryGate_EntityScript : UMars_Gate_EntityScript

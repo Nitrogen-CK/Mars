@@ -219,9 +219,10 @@ namespace utils_mars_sandbox
     }
 
     // 03 - The Bellkeeper's Confession. 15 x 14 m, two height bands. The barred reliquary (north-west) shows from the door,
-    // with the order relief (circle -> triangle) on its header and the sequence lamps beside it. The circle seal is on the
-    // lower west wall; the triangle seal on the east wall of the gallery (top 300), up a 3 m wide stair. Inside the
-    // reliquary a hand wheel latches the return door into the west corridor, which runs straight back to the hall.
+    // with the phrase plaque (three glyphs) on its header. The three-dial panel is on the lower west wall; the commit
+    // chain and its steam vent on the gallery (top 300), up a 3 m wide stair. The right phrase latches the reliquary and
+    // lays out Cleaver, Tenderizer and Ration, less one per wrong pull (the Ration always). Inside the reliquary a hand
+    // wheel latches the return door into the west corridor, which runs straight back to the hall.
     void Spawn_Gauntlet3_Bellkeeper(const FMars_SandboxGauntlet_Cell& InCell)
     {
         const auto Height = k_GauntletTallWallHeight;
@@ -249,22 +250,23 @@ namespace utils_mars_sandbox
         InCell.Balustrade("GalleryRail_West", FVector(260.0, 655.0, 300.0), FVector(260.0, 1395.0, 300.0));
         InCell.Balustrade("GalleryRail_South", FVector(260.0, 660.0, 300.0), FVector(295.0, 660.0, 300.0));
 
-        // The order relief over the reliquary gate, read left to right by a player looking north (+X is their left).
-        const auto ReliefZ = 300.0;
-        InCell.Glyph("Glyph_ClueCircle", EMars_Seal_Glyph::Circle, FVector(-305.0, 1088.0, ReliefZ));
-        InCell.Arrow("Glyph_ClueArrow", FVector(-375.0, 1088.0, ReliefZ));
-        InCell.Glyph("Glyph_ClueTriangle", EMars_Seal_Glyph::Triangle, FVector(-445.0, 1088.0, ReliefZ));
+        // The phrase plaque over the reliquary gate, on the wall's south face: pitch -90 faces +X, yaw -90 turns that to -Y,
+        // so its first glyph lands on the left of a player looking north (+X).
+        InCell.Place(UMars_Gauntlet_Bell_Clue_EntityScript, "Mech_Clue", FTransform(FRotator(-90.0, -90.0, 0.0), FVector(-375.0, 1090.0, 300.0)));
 
-        // Seals face out of their walls (pitch -90 faces +X; yaw 180 then faces -X). The triangle seal sits high enough on
-        // the gallery wall to show over the gallery's edge from the middle of the lower floor.
-        InCell.Place(UMars_Gauntlet_Bell_CircleSeal_EntityScript, "Mech_CircleSeal",
+        // The dial panel on the lower west wall, facing +X (pitch -90); the commit chain on the gallery's east wall (yaw 180
+        // points its bracket's +X out of the wall), its grip 1.2 m above the gallery. Each wrong guess is a climb.
+        InCell.Place(UMars_Gauntlet_Bell_Panel_EntityScript, "Mech_DialPanel",
             FTransform(FRotator(-90.0, 0.0, 0.0), FVector(-590.0, 600.0, 120.0)));
-        InCell.Place(UMars_Gauntlet_Bell_TriangleSeal_EntityScript, "Mech_TriangleSeal",
-            FTransform(FRotator(-90.0, 180.0, 0.0), FVector(590.0, 1000.0, 460.0)));
+        InCell.Place(UMars_Gauntlet_Bell_Chain_EntityScript, "Mech_CommitChain",
+            FTransform(FRotator(0.0, 180.0, 0.0), FVector(590.0, 1000.0, 530.0)));
 
-        // Yawed 90, the sequence lamps run circle (left) to triangle (right) for a player looking north.
+        // The vent on the gallery floor south of the chain, jetting north (yaw 90) across its pull stand: a wrong pull
+        // pushes the puller toward the north wall, away from the gallery's open edge.
+        InCell.Place(UMars_Gauntlet_Bell_Vent_EntityScript, "Mech_CommitVent",
+            FTransform(FRotator(0.0, 90.0, 0.0), FVector(540.0, 850.0, 300.0)));
+
         const auto North = FRotator(0.0, 90.0, 0.0);
-        InCell.Place(UMars_Gauntlet_Bell_Sequence_EntityScript, "Mech_Sequence", FTransform(North, FVector(-540.0, 1030.0, 0.0)));
         InCell.Place(UMars_Gauntlet_Bell_ReliquaryGate_EntityScript, "Mech_ReliquaryGate", FTransform(North, FVector(-375.0, 1100.0, 0.0)));
 
         // The wheel on the reliquary's north wall (yaw -90 points its +X out of the wall, south); the door spans Y (yaw 0).
