@@ -1,10 +1,27 @@
-// Placeable Bellkeeper dial lock: a wall plate with one dial per Phrase glyph, each ringed by the six glyphs. Use turns a
-// dial one detent clockwise; nothing marks the answer. Every rising edge on CommitChannel (a pull chain) judges the dials:
+// Placeable Bellkeeper dial lock: a wall plate with one dial per Phrase glyph, each ringed by the six glyphs. Use grips a
+// dial's knob and dragging the look sideways turns it (right = clockwise), clicking at each detent it passes; letting go
+// snaps it onto the nearest one. Nothing marks the answer. Every rising edge on CommitChannel (a pull chain) judges the dials:
 // a wrong commit asserts VentChannel for VentPulseSeconds (a steam vent listens) and costs the front reward, the last is
 // always kept; the right one locks the dials, asserts Source and spawns the remaining Rewards.
 // The origin is the mounting surface and the plate faces local +Z, up = local -X (pitch -90 to face +X on a wall); dial 0
 // is on the viewer's left (local +Y). Above the dials, one candle per reward still at stake; beside them a lamp that
 // flashes red on a wrong commit and stays green once solved.
+// Optional placement of the dedicated vent, in world axes from the panel's origin (centimetres).
+struct FMars_Bellkeeper_OwnedVent
+{
+    UPROPERTY()
+    bool Enabled = false;
+
+    UPROPERTY()
+    FVector OffsetWorld = FVector::ZeroVector;
+
+    UPROPERTY()
+    FRotator Rotation = FRotator::ZeroRotator;
+
+    UPROPERTY()
+    FVector PushImpulse = FVector(900.0, 0.0, 250.0);
+}
+
 class UMars_Bellkeeper_EntityScript : UCk_GenericEntityScript_UE
 {
     default _ShowInPlaceActors = true;
@@ -43,6 +60,22 @@ class UMars_Bellkeeper_EntityScript : UCk_GenericEntityScript_UE
     UPROPERTY(ExposeOnSpawn)
     FText PromptText = NSLOCTEXT("MarsInteraction", "TurnDialPrompt", "Turn dial");
 
+    // Knob degrees per degree of sideways look while gripped: at 2, a 30 degree drag moves one of the six detents.
+    UPROPERTY(ExposeOnSpawn)
+    float32 DialDegreesPerLookDegree = 2.0f;
+
+    UPROPERTY(ExposeOnSpawn)
+    FMars_Bellkeeper_OwnedVent OwnedVent;
+
+    UPROPERTY(ExposeOnSpawn)
+    FVector BellOffsetWorld = FVector(0.0, 0.0, 70.0);
+
+    // A detent's click (greybox: a metal punch pitched up and quiet).
+    private const float32 ClickVolume = 0.25f;
+    private const float32 ClickPitch = 2.2f;
+    // A fast flick past several detents in one frame clicks at most this many times.
+    private const int32 MaxClicksPerFrame = 3;
+
     private const float64 DialSpacing = 45.0;
     private const float64 PlateThickness = 6.0;
     private const float64 RingRadius = 14.0;
@@ -56,16 +89,74 @@ class UMars_Bellkeeper_EntityScript : UCk_GenericEntityScript_UE
     private FCk_Handle_UnrealComponent _Lamp;
     // Valid while the lamp flashes a wrong commit.
     private FCk_Handle_Timer _FlashTimer;
+    private USoundBase _ClickSound;
+    private USoundBase _WrongStroke;
+    private USoundBase _RightStroke;
+    private FCk_Handle_Transform _Root;
+    private FCk_Handle_UnrealComponent _BellPart;
+    private FCk_Handle_PendingEntityScript _PendingVent;
 
     UFUNCTION(BlueprintOverride)
     ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
     {
         auto Root = utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::DoesNotReplicate);
+        _Root = Root;
         utils_entity_tag::Add(InHandle, n"TAG_MarsBellkeeper");
+        _ClickSound = assets::load::metal_punch_01_Mars_SND();
+        _WrongStroke = assets::load::metal_punch_04_Mars_SND();
+        _RightStroke = assets::load::metal_punch_07_Mars_SND();
 
         AddPlate(Root);
         for (int32 Index = 0; Index < Phrase.Num(); ++Index)
         { AddDial(Root, Index); }
+
+        const auto BellLocal = SpawnTransform.InverseTransformPosition(SpawnTransform.GetLocation() + BellOffsetWorld);
+        _BellPart = Root.Add_MeshPart(this, FMars_MeshPart(
+            FTransform(FRotator(90.0, 0.0, 0.0), BellLocal, FVector(0.35, 0.35, 0.4)),
+            engine::load::Cone(), assets::load::ProtoGrid_Interactable_Mars_MI(), collision::profile::NoCollision, n"Bellkeeper_Bell"));
+
+        if (OwnedVent.Enabled)
+        {
+            auto VentParams = UMars_Vent_EntityScript::Params();
+            VentParams.SpawnTransform = FTransform(OwnedVent.Rotation, SpawnTransform.GetLocation() + OwnedVent.OffsetWorld);
+            VentParams.Trap = utils_trap::Make_BurstVentSpec();
+            VentParams.Hazard.PushImpulse = OwnedVent.PushImpulse;
+            // Empty Sink: only the Bellkeeper controls this owned child's Cycle.
+            _PendingVent = utils_entity_script::Request_SpawnEntity(InHandle, UMars_Vent_EntityScript, VentParams);
+            if (ck::EnsureIfNot(ck::IsValid(_PendingVent), "[Bellkeeper] could not construct its dedicated vent"))
+            { return ECk_EntityScript_ConstructionFlow::Finished; }
+
+            utils_pending_entity_script::Promise_OnConstructed(_PendingVent,
+                FCk_Delegate_EntityScript_Constructed(this, n"OnVentConstructed"));
+            // Child spawn waits for its parent's construction pipeline to finish. Commit/kernel wiring stays absent
+            // until OnVentConstructed, while this local visual construction must finish now to let the child proceed.
+            return ECk_EntityScript_ConstructionFlow::Finished;
+        }
+
+        AddLock(InHandle, FCk_Handle_Cycle());
+        AddLights(Root);
+        return ECk_EntityScript_ConstructionFlow::Finished;
+    }
+
+    UFUNCTION()
+    private void OnVentConstructed(FCk_Handle_EntityScript InVent)
+    {
+        if (ck::Is_NOT_Valid(_Root) || ck::Is_NOT_Valid(InVent))
+        { return; }
+
+        auto Owner = utils_entity_lifetime::Get_LifetimeOwner(InVent);
+        auto Cycle = InVent.As_Cycle(ECk_SanityCheck::UnChecked);
+        if (ck::EnsureIfNot(Owner == _Root.H() && ck::IsValid(Cycle),
+            "[Bellkeeper] dedicated vent must finish with its public Cycle under the panel"))
+        { return; }
+
+        _PendingVent = FCk_Handle_PendingEntityScript();
+        AddLock(Owner, Cycle);
+        AddLights(_Root);
+    }
+
+    private void AddLock(FCk_Handle& InHandle, FCk_Handle_Cycle InVentCycle)
+    {
 
         auto Spec = FMars_Bellkeeper_Spec();
         Spec.Dials = _Dials;
@@ -74,8 +165,8 @@ class UMars_Bellkeeper_EntityScript : UCk_GenericEntityScript_UE
 
         for (const auto& Reward : Rewards)
         {
-            const auto World = FTransform(Reward.Transform.Rotator(), SpawnTransform.GetLocation() + Reward.Transform.GetLocation());
-            Spec.Rewards.Add(FMars_Bellkeeper_Reward(Reward.Definition, World));
+            const auto RewardWorld = FTransform(Reward.Transform.Rotator(), SpawnTransform.GetLocation() + Reward.Transform.GetLocation());
+            Spec.Rewards.Add(FMars_Bellkeeper_Reward(Reward.Definition, RewardWorld));
         }
 
         if (VentChannel.IsValid())
@@ -86,6 +177,7 @@ class UMars_Bellkeeper_EntityScript : UCk_GenericEntityScript_UE
             Spec.VentSource = utils_mechanism_source::Add(VentEntity, VentSpec);
         }
         Spec.VentPulseSeconds = VentPulseSeconds;
+        Spec.VentCycle = InVentCycle;
 
         _Bellkeeper = utils_bellkeeper::Add(InHandle, Spec);
 
@@ -103,9 +195,6 @@ class UMars_Bellkeeper_EntityScript : UCk_GenericEntityScript_UE
 
         utils_mechanism_source::TryAdd(InHandle, Source);
 
-        AddLights(Root);
-
-        return ECk_EntityScript_ConstructionFlow::Finished;
     }
 
     // Dial InIndex's centre on the plate, dial 0 on the viewer's left (local +Y).
@@ -166,27 +255,31 @@ class UMars_Bellkeeper_EntityScript : UCk_GenericEntityScript_UE
             FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, 3.0), FVector(0.14, 0.14, 0.05)),
             engine::load::Cylinder(), assets::load::ProtoGrid_Interactable_Mars_MI(), collision::profile::NoCollision, n"Bellkeeper_Knob"));
 
-        // The pointer runs along the knob's +X, which the knob's yaw turns onto the glyph it points at.
-        auto PointerPart = FMars_MeshPart(FTransform(FRotator::ZeroRotator, FVector(5.5, 0.0, 6.0), FVector(0.09, 0.025, 0.02)),
-            engine::load::Cube(), assets::load::ProtoGrid_Interactable_Mars_MI(), collision::profile::NoCollision, n"Bellkeeper_Pointer");
+        // The pointer is the knob's grip: a lever handle lying along the knob's +X (which the knob's yaw turns onto the glyph
+        // it points at), off centre so it reads one way; its Grip socket is where the gloves take hold and turn with it.
+        auto PointerPart = FMars_MeshPart(FTransform(FRotator(90.0, 0.0, 0.0), FVector(4.0, 0.0, 7.0), FVector(0.035, 0.035, 0.11)),
+            assets::load::LeverHandle_Mars_SM(), assets::load::ProtoGrid_Interactable_Mars_MI(), collision::profile::NoCollision, n"Bellkeeper_Pointer");
         PointerPart.PrimaryColor = TOptional<FLinearColor>(FLinearColor(0.9f, 0.85f, 0.7f, 1.0f));
         KnobTransform.Add_MeshPart(this, PointerPart);
 
         if (ck::Is_NOT_Valid(Dial))
         { return; }
 
-        Dial.BindTo_OnIndexChanged(FMars_Delegate_Dial_OnIndexChanged(this, n"OnDialIndexChanged"));
+        Dial.BindTo_OnAngleChanged(FMars_Delegate_Dial_OnAngleChanged(this, n"OnDialAngleChanged"));
 
+        // Gripped and turned, never pulled over: dragging toward the viewer's right (local -Y) turns it clockwise.
         auto ControlSpec = FMars_Control_Spec();
-        ControlSpec.Behavior = EMars_Control_Behavior::Momentary;
-        ControlSpec.ActiveSeconds = 0.15f;
+        ControlSpec.Interaction = ECk_Interaction_CompletionPolicy::ManuallyCompleted;
+        ControlSpec.Manipulation.Mode = EMars_Control_ManipulationMode::FreeTurn;
+        ControlSpec.Manipulation.PullAxis = FVector(0.0, -1.0, 0.0);
         auto Control = utils_control::Add(DialEntity, ControlSpec);
 
         // A rejected Control spec already ensured in utils_control::Add.
         if (ck::Is_NOT_Valid(Control))
         { return; }
 
-        Control.BindTo_OnEngaged(FMars_Delegate_Control_OnEngaged(this, n"OnDialEngaged"));
+        Control.BindTo_OnTurned(FMars_Delegate_Control_OnTurned(this, n"OnDialTurned"));
+        Control.BindTo_OnManipulationChanged(FMars_Delegate_Control_OnManipulationChanged(this, n"OnDialGripChanged"));
 
         auto Probe = FMars_Interactable_ProbeInfo();
         Probe.ProbeSpec = FCk_Probe_Spec(GameplayTags::Probe_Mars_Interact);
@@ -270,14 +363,25 @@ class UMars_Bellkeeper_EntityScript : UCk_GenericEntityScript_UE
     //----------------------------------------------------------------------------------------------------------------------
 
     UFUNCTION()
-    private void OnDialEngaged(FCk_Handle_Control InControl)
+    private void OnDialTurned(FCk_Handle_Control InControl, float32 InDegrees)
     {
         auto Dial = InControl.As_Dial();
-        Dial.Request_Step(FMars_Request_Dial_Step(1));
+        Dial.Request_Turn(FMars_Request_Dial_Turn(InDegrees * DialDegreesPerLookDegree));
     }
 
     UFUNCTION()
-    private void OnDialIndexChanged(FCk_Handle_Dial InDial, int32 InIndex)
+    private void OnDialGripChanged(FCk_Handle_Control InControl, EMars_Control_Grip InGrip)
+    {
+        if (InGrip != EMars_Control_Grip::Released)
+        { return; }
+
+        auto Dial = InControl.As_Dial();
+        Dial.Request_Settle(FMars_Request_Dial_Settle());
+    }
+
+    // Glyph 0 sits at the top (yaw 180) and the angle runs clockwise with the glyph ring.
+    UFUNCTION()
+    private void OnDialAngleChanged(FCk_Handle_Dial InDial, float32 InAngle, int32 InDetentsCrossed)
     {
         const auto DialIndex = _Dials.FindIndex(InDial);
         if (_Knobs.IsValidIndex(DialIndex) == false)
@@ -285,7 +389,14 @@ class UMars_Bellkeeper_EntityScript : UCk_GenericEntityScript_UE
 
         auto Knob = _Knobs[DialIndex];
         utils_scene_node::Request_UpdateOffset(Knob,
-            FCk_Request_SceneNode_UpdateRelativeTransform(FTransform(FRotator(0.0, Get_GlyphYaw(InIndex), 0.0), FVector::ZeroVector)));
+            FCk_Request_SceneNode_UpdateRelativeTransform(FTransform(FRotator(0.0, 180.0 + InAngle, 0.0), FVector::ZeroVector)));
+
+        if (InDetentsCrossed <= 0 || ck::Is_NOT_Valid(_ClickSound))
+        { return; }
+
+        const auto At = utils_transform::Get_EntityCurrentLocation(Knob.As_Transform());
+        for (int32 Click = 0; Click < Math::Min(InDetentsCrossed, MaxClicksPerFrame); ++Click)
+        { Gameplay::PlaySoundAtLocation(_ClickSound, At, FRotator::ZeroRotator, ClickVolume, ClickPitch); }
     }
 
     UFUNCTION()
@@ -297,13 +408,28 @@ class UMars_Bellkeeper_EntityScript : UCk_GenericEntityScript_UE
     UFUNCTION()
     private void OnCommitFailed(FCk_Handle_Bellkeeper InBellkeeper, int32 InRemainingRewards)
     {
+        PlayStroke(_WrongStroke, 0.7f);
         StartWrongFlash();
     }
 
     UFUNCTION()
     private void OnSolved(FCk_Handle_Bellkeeper InBellkeeper)
     {
+        PlayStroke(_RightStroke, 1.15f);
         Repaint();
+    }
+
+    private void PlayStroke(USoundBase InSound, float32 InPitch)
+    {
+        if (ck::Is_NOT_Valid(InSound) || ck::Is_NOT_Valid(_BellPart))
+        { return; }
+
+        auto Bell = Cast<USceneComponent>(utils_unreal_component::Get_Component(_BellPart));
+        if (ck::Is_NOT_Valid(Bell))
+        { return; }
+
+        Gameplay::SpawnSoundAttached(InSound, Bell, NAME_None, FVector::ZeroVector, FRotator::ZeroRotator,
+            EAttachLocation::KeepRelativeOffset, true, 0.8f, InPitch, 0.0f, nullptr, nullptr, true);
     }
 
     UFUNCTION()

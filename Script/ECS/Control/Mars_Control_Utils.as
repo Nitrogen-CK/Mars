@@ -171,6 +171,14 @@ mixin EMars_Control_ManipulationCompletion Get_ManipulationCompletion(const FCk_
     return State.Manipulation.GetValue().Completion;
 }
 
+// A gripped control that moves nothing and hands its pull out as OnTurned (EMars_Control_ManipulationMode::FreeTurn).
+mixin bool Get_IsFreeTurn(const FCk_Handle_Control& Self)
+{
+    const auto& Params = Self.Get_Fragment(FMars_Fragment_Control_Params);
+    return Params.CompletionPolicy == ECk_Interaction_CompletionPolicy::ManuallyCompleted
+        && Params.Manipulation.Mode == EMars_Control_ManipulationMode::FreeTurn;
+}
+
 // A ManuallyCompleted control whose handle springs back to rest after every pull instead of following IsActive (a pull
 // chain). Every pull then runs toward the end pose.
 mixin bool Get_ReturnsToRest(const FCk_Handle_Control& Self)
@@ -294,4 +302,18 @@ mixin void UnbindFrom_OnManipulationProgress(FCk_Handle_Control& Self, FMars_Del
     { return; }
 
     Self.Get_Fragment(FMars_Fragment_Control_Signals).OnManipulationProgress.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void BindTo_OnTurned(FCk_Handle_Control& Self, FMars_Delegate_Control_OnTurned InDelegate)
+{
+    auto& Fragment = Self.AddOrGet_Fragment(FMars_Fragment_Control_Signals);
+    Fragment.OnTurned.AddUFunction(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void UnbindFrom_OnTurned(FCk_Handle_Control& Self, FMars_Delegate_Control_OnTurned InDelegate)
+{
+    if (Self.Has_Fragment(FMars_Fragment_Control_Signals) == false)
+    { return; }
+
+    Self.Get_Fragment(FMars_Fragment_Control_Signals).OnTurned.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
 }

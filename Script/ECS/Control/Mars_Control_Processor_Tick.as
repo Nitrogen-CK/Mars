@@ -21,6 +21,11 @@ class UMars_Processor_Control_Tick : UCk_Processor_Script_Base_UE
     void ForEachEntity(FCk_Time InDeltaT, FCk_Handle& InHandle, FMars_Fragment_Control& InState)
     {
         auto Self = InHandle.As_Control();
+
+        // A FreeTurn grip has no handle travel: its pull leaves as OnTurned from the request drain.
+        if (Self.Get_IsFreeTurn())
+        { return; }
+
         const auto& Tuning = Self.Get_Fragment(FMars_Fragment_Control_Params).Manipulation;
 
         const auto DeltaSeconds = Math::Min(float32(InDeltaT.Get_Seconds()), k_MaxStepSeconds);

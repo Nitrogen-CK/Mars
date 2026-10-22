@@ -43,6 +43,16 @@ enum EMars_Control_ManipulationCompletion
     OnRelease
 }
 
+// What a gripped ManuallyCompleted control does with the pull: Travel moves its handle along PullAxis between its poses
+// (a lever, a pull chain); FreeTurn moves nothing and hands each drain's pull degrees out as OnTurned (a dial's knob,
+// which its owner turns), and its grip never crosses a threshold: it lasts until EndManipulation, whatever the request's
+// Completion. Opt-in: every existing control is Travel.
+enum EMars_Control_ManipulationMode
+{
+    Travel,
+    FreeTurn
+}
+
 // How a ManuallyCompleted control is pulled: the player grips it (Use) and swings the look input along PullAxis. The
 // spawn-params generator emits a non-default value as the positional constructor call.
 struct FMars_Control_Manipulation_Spec
@@ -72,6 +82,10 @@ struct FMars_Control_Manipulation_Spec
     UPROPERTY()
     bool ReturnsToRest = false;
 
+    // FreeTurn ignores AlphaPerDegree, EngageAlpha, the spring and ReturnsToRest; PullAxis still picks the drag direction.
+    UPROPERTY()
+    EMars_Control_ManipulationMode Mode = EMars_Control_ManipulationMode::Travel;
+
     FMars_Control_Manipulation_Spec() {}
 
     FMars_Control_Manipulation_Spec(
@@ -80,7 +94,8 @@ struct FMars_Control_Manipulation_Spec
         float32 InEngageAlpha,
         float32 InStiffness,
         float32 InDamping,
-        bool InReturnsToRest)
+        bool InReturnsToRest,
+        EMars_Control_ManipulationMode InMode = EMars_Control_ManipulationMode::Travel)
     {
         PullAxis = InPullAxis;
         AlphaPerDegree = InAlphaPerDegree;
@@ -88,6 +103,7 @@ struct FMars_Control_Manipulation_Spec
         Stiffness = InStiffness;
         Damping = InDamping;
         ReturnsToRest = InReturnsToRest;
+        Mode = InMode;
     }
 }
 
@@ -159,6 +175,9 @@ mixin FMars_Validation Validate(const FMars_Control_Spec& Self)
         if (Manipulation.Damping < 0.0f)
         { return FMars_Validation(f"ManuallyCompleted control has a negative Manipulation.Damping [{Manipulation.Damping}]"); }
     }
+
+    if (Self.Manipulation.Mode == EMars_Control_ManipulationMode::FreeTurn && Self.Interaction != ECk_Interaction_CompletionPolicy::ManuallyCompleted)
+    { return FMars_Validation("FreeTurn control must be ManuallyCompleted: only a grip turns it"); }
 
     if (Self.Behavior == EMars_Control_Behavior::Momentary && Self.ActiveSeconds <= 0.0f)
     { return FMars_Validation(f"Momentary control has a non-positive ActiveSeconds [{Self.ActiveSeconds}]"); }
@@ -265,12 +284,17 @@ event void FMars_Delegate_Control_OnManipulationChanged_MC(FCk_Handle_Control In
 delegate void FMars_Delegate_Control_OnManipulationProgress(FCk_Handle_Control InControl, float32 InProgress);
 event void FMars_Delegate_Control_OnManipulationProgress_MC(FCk_Handle_Control InControl, float32 InProgress);
 
+// FreeTurn only: the drain's summed pull degrees while gripped (positive along PullAxis); never zero.
+delegate void FMars_Delegate_Control_OnTurned(FCk_Handle_Control InControl, float32 InDegrees);
+event void FMars_Delegate_Control_OnTurned_MC(FCk_Handle_Control InControl, float32 InDegrees);
+
 struct FMars_Fragment_Control_Signals
 {
     FMars_Delegate_Control_OnActiveChanged_MC OnActiveChanged;
     FMars_Delegate_Control_OnEngaged_MC OnEngaged;
     FMars_Delegate_Control_OnManipulationChanged_MC OnManipulationChanged;
     FMars_Delegate_Control_OnManipulationProgress_MC OnManipulationProgress;
+    FMars_Delegate_Control_OnTurned_MC OnTurned;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

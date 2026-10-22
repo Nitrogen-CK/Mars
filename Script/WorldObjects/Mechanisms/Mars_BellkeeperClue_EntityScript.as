@@ -39,6 +39,7 @@ class UMars_BellkeeperClue_EntityScript : UCk_GenericEntityScript_UE
             auto DiscPart = FMars_MeshPart(FTransform(FRotator::ZeroRotator, Center + FVector(0.0, 0.0, 0.5), FVector(Disc, Disc, 1.0) * 0.01),
                 engine::load::Cylinder(), assets::load::ProtoGrid_Wall_Mars_MI(), collision::profile::NoCollision, n"BellkeeperClue_Disc");
             DiscPart.PrimaryColor = TOptional<FLinearColor>(FLinearColor(0.08f, 0.07f, 0.06f, 1.0f));
+            DiscPart.Tint = EMars_MeshPart_Tint::ProtoGrid;
             Root.Add_MeshPart(this, DiscPart);
 
             Root.Add_BellkeeperGlyph(this, FMars_Bellkeeper_GlyphPlacement(Phrase[Index], Center + FVector(0.0, 0.0, 1.0), GlyphSize));

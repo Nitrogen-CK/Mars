@@ -786,6 +786,32 @@ class AMars_AutoTest_Bellkeeper_ACommitEdgeIsJudgedOnce_Actor : ACk_AutoTestRunn
     }
 }
 
+class AMars_AutoTest_Bellkeeper_OwnedPanelConstructsAndTearsDownItsVent_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 12.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Bellkeeper_OwnedPanelConstructsAndTearsDownItsVent");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_Bellkeeper_RecommitRestartsThePoweredBurst_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 12.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Bellkeeper_RecommitRestartsThePoweredBurst");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
 class AMars_AutoTest_Bellkeeper_RightCommitPaysTheRemainingRewardsOnce_Actor : ACk_AutoTestRunner
 {
     default _TimeoutSeconds = 10.0f;
@@ -799,12 +825,51 @@ class AMars_AutoTest_Bellkeeper_RightCommitPaysTheRemainingRewardsOnce_Actor : A
     }
 }
 
+class AMars_AutoTest_Bellkeeper_SolveCancelsADedicatedRestart_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 12.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Bellkeeper_SolveCancelsADedicatedRestart");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_Bellkeeper_SolveSettlesAnUnreleasedDial_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 10.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Bellkeeper_SolveSettlesAnUnreleasedDial");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
 class AMars_AutoTest_Bellkeeper_SpecValidation_Actor : ACk_AutoTestRunner
 {
     UFUNCTION(BlueprintOverride)
     TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
     {
         auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Bellkeeper_SpecValidation");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_Bellkeeper_TeardownCancelsADedicatedRestart_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 10.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Bellkeeper_TeardownCancelsADedicatedRestart");
         TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
         ResolvedClass = Path.TryLoadClass();
         return ResolvedClass;
@@ -1081,6 +1146,18 @@ class AMars_AutoTest_Control_ASharedKeyPressStartsOneInteraction_Actor : ACk_Aut
     TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
     {
         auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Control_ASharedKeyPressStartsOneInteraction");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_Control_FreeTurnHandsOutItsPullUntilRelease_Actor : ACk_AutoTestRunner
+{
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Control_FreeTurnHandsOutItsPullUntilRelease");
         TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
         ResolvedClass = Path.TryLoadClass();
         return ResolvedClass;
@@ -3342,6 +3419,18 @@ class AMars_AutoTest_Dial_StepsWrapBothWaysWithOneBroadcastPerDrain_Actor : ACk_
     TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
     {
         auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Dial_StepsWrapBothWaysWithOneBroadcastPerDrain");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_Dial_TurnFollowsAndSettlesOnTheNearestDetent_Actor : ACk_AutoTestRunner
+{
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Dial_TurnFollowsAndSettlesOnTheNearestDetent");
         TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
         ResolvedClass = Path.TryLoadClass();
         return ResolvedClass;

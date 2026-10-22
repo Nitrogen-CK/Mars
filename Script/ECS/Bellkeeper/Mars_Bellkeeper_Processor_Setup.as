@@ -29,6 +29,10 @@ class UMars_Processor_Bellkeeper_Setup : UCk_Processor_Script_Base_UE
             Source.Request_SetOutput(utils_mechanism_source::Make_SetOutput(Output));
         }
 
+        auto VentCycle = Bellkeeper.Get_Fragment(FMars_Fragment_Bellkeeper_Params).VentCycle;
+        if (ck::IsValid(VentCycle))
+        { VentCycle.BindTo_OnRunningChanged(FMars_Delegate_Cycle_OnRunningChanged(this, n"OnVentCycleChanged")); }
+
         Bellkeeper.Request_TryRemove(FMars_Tag_Bellkeeper_NeedsSetup);
     }
 
@@ -37,5 +41,19 @@ class UMars_Processor_Bellkeeper_Setup : UCk_Processor_Script_Base_UE
     {
         auto Bellkeeper = InSink.As_Bellkeeper();
         Bellkeeper.Request_Commit(FMars_Request_Bellkeeper_Commit());
+    }
+
+    UFUNCTION()
+    private void OnVentCycleChanged(FCk_Handle_Cycle InCycle, EMars_Cycle_RunState InRunState)
+    {
+        auto Owner = utils_entity_lifetime::Get_LifetimeOwner(InCycle);
+        if (ck::Is_NOT_Valid(Owner))
+        { return; }
+
+        auto Bellkeeper = Owner.As_Bellkeeper(ECk_SanityCheck::UnChecked);
+        if (ck::Is_NOT_Valid(Bellkeeper) || Bellkeeper.Get_Fragment(FMars_Fragment_Bellkeeper_Params).VentCycle != InCycle)
+        { return; }
+
+        Bellkeeper.Request_VentCycleChanged(FMars_Request_Bellkeeper_VentCycleChanged(InCycle, InRunState));
     }
 }

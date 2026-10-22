@@ -78,8 +78,10 @@ class UMars_Processor_Control_HandleRequests : UCk_Processor_Script_Base_UE
         if (HasBeginManipulation)
         { Began = BeginManipulation(Self, InState, BeginManipulationRequest); }
 
+        // FreeTurn: the drain's pull degrees, broadcast after the grip edges below.
+        auto TurnDegrees = 0.0f;
         if (InState.Manipulation.IsSet())
-        { ApplyNudges(Self, InState, NudgeRequests); }
+        { TurnDegrees = ApplyNudges(Self, InState, NudgeRequests); }
 
         if (HasEngage && Self.Has_Fragment(FMars_Fragment_Control_Signals))
         { Self.Get_Fragment(FMars_Fragment_Control_Signals).OnEngaged.Broadcast(Self); }
@@ -98,6 +100,9 @@ class UMars_Processor_Control_HandleRequests : UCk_Processor_Script_Base_UE
 
         if (Began && Self.Has_Fragment(FMars_Fragment_Control_Signals))
         { Self.Get_Fragment(FMars_Fragment_Control_Signals).OnManipulationChanged.Broadcast(Self, EMars_Control_Grip::Gripped); }
+
+        if (TurnDegrees != 0.0f && Self.Has_Fragment(FMars_Fragment_Control_Signals))
+        { Self.Get_Fragment(FMars_Fragment_Control_Signals).OnTurned.Broadcast(Self, TurnDegrees); }
     }
 
     // Lets go before the threshold: the handle settles back to the current target pose from wherever it is.
@@ -128,9 +133,12 @@ class UMars_Processor_Control_HandleRequests : UCk_Processor_Script_Base_UE
 
         const auto RestAlpha = InControl.Get_PullDirection() == EMars_Control_PullDirection::TowardStart ? 1.0f : 0.0f;
 
+        // A FreeTurn grip has no threshold to cross, whatever the request asked.
+        const auto IsFreeTurn = InControl.Get_IsFreeTurn();
+
         auto Manipulation = FMars_Control_Manipulation();
         Manipulation.Interaction = InRequest.Interaction;
-        Manipulation.Completion = InRequest.Completion;
+        Manipulation.Completion = IsFreeTurn ? EMars_Control_ManipulationCompletion::OnRelease : InRequest.Completion;
         Manipulation.Alpha = HasMover ? Mover.Get_Alpha() : RestAlpha;
         Manipulation.Pull = Manipulation.Alpha;
         InState.Manipulation = Manipulation;
@@ -144,22 +152,27 @@ class UMars_Processor_Control_HandleRequests : UCk_Processor_Script_Base_UE
         return true;
     }
 
-    private void ApplyNudges(
+    // Returns the drain's degrees for a FreeTurn control (its pull is not integrated), 0 for Travel.
+    private float32 ApplyNudges(
         FCk_Handle_Control& InControl,
         FMars_Fragment_Control& InState,
         const TArray<FMars_Request_Control_Nudge>& InNudges)
     {
         if (InNudges.IsEmpty())
-        { return; }
+        { return 0.0f; }
 
         auto PullDegrees = 0.0f;
         for (const auto& Nudge : InNudges)
         { PullDegrees += Nudge.PullDegrees; }
 
+        if (InControl.Get_IsFreeTurn())
+        { return PullDegrees; }
+
         const auto AlphaPerDegree = InControl.Get_Fragment(FMars_Fragment_Control_Params).Manipulation.AlphaPerDegree;
         auto Manipulation = InState.Manipulation.GetValue();
         Manipulation.Pull = Math::Clamp(Manipulation.Pull + PullDegrees * AlphaPerDegree, 0.0f, 1.0f);
         InState.Manipulation = Manipulation;
+        return 0.0f;
     }
 
     private void ArmReleaseTimer(FCk_Handle_Control& InControl, FMars_Fragment_Control& InState, float32 InActiveSeconds)

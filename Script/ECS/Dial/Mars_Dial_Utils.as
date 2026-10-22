@@ -12,6 +12,7 @@ namespace utils_dial
 
         auto State = FMars_Fragment_Dial();
         State.Index = InSpec.StartIndex;
+        State.Angle = Get_DetentAngle(InSpec.StartIndex, InSpec.Positions);
 
         InHandle.Add_Fragment(FMars_Feature_Dial());
         InHandle.Add_Fragment(Params);
@@ -25,6 +26,21 @@ namespace utils_dial
         const auto Moved = (InIndex + InDetents) % InPositions;
         return Moved < 0 ? Moved + InPositions : Moved;
     }
+
+    // Where detent InIndex stands, degrees in [0, 360).
+    float32 Get_DetentAngle(int32 InIndex, int32 InPositions)
+    { return float32(InIndex) * 360.0f / float32(InPositions); }
+
+    // InDegrees wrapped into [0, 360).
+    float32 Get_WrappedAngle(float32 InDegrees)
+    {
+        const auto Wrapped = Math::Fmod(InDegrees, 360.0f);
+        return Wrapped < 0.0f ? Wrapped + 360.0f : Wrapped;
+    }
+
+    // The detent nearest InAngle (which must be in [0, 360)).
+    int32 Get_NearestDetent(float32 InAngle, int32 InPositions)
+    { return Get_Wrapped(Math::RoundToInt(InAngle * float32(InPositions) / 360.0f), 0, InPositions); }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -46,6 +62,11 @@ mixin bool Get_IsLocked(const FCk_Handle_Dial& Self)
     return Self.Get_Fragment(FMars_Fragment_Dial).Locked;
 }
 
+mixin float32 Get_Angle(const FCk_Handle_Dial& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_Dial).Angle;
+}
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Requests
 //--------------------------------------------------------------------------------------------------------------------------
@@ -60,6 +81,18 @@ mixin void Request_SetLocked(FCk_Handle_Dial& Self, const FMars_Request_Dial_Set
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Dial_Requests);
     Requests.LockRequests.Add(InRequest);
+}
+
+mixin void Request_Turn(FCk_Handle_Dial& Self, const FMars_Request_Dial_Turn& InRequest)
+{
+    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Dial_Requests);
+    Requests.TurnRequests.Add(InRequest);
+}
+
+mixin void Request_Settle(FCk_Handle_Dial& Self, const FMars_Request_Dial_Settle& InRequest)
+{
+    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Dial_Requests);
+    Requests.SettleRequests.Add(InRequest);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -78,4 +111,18 @@ mixin void UnbindFrom_OnIndexChanged(FCk_Handle_Dial& Self, FMars_Delegate_Dial_
     { return; }
 
     Self.Get_Fragment(FMars_Fragment_Dial_Signals).OnIndexChanged.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void BindTo_OnAngleChanged(FCk_Handle_Dial& Self, FMars_Delegate_Dial_OnAngleChanged InDelegate)
+{
+    auto& Fragment = Self.AddOrGet_Fragment(FMars_Fragment_Dial_Signals);
+    Fragment.OnAngleChanged.AddUFunction(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void UnbindFrom_OnAngleChanged(FCk_Handle_Dial& Self, FMars_Delegate_Dial_OnAngleChanged InDelegate)
+{
+    if (Self.Has_Fragment(FMars_Fragment_Dial_Signals) == false)
+    { return; }
+
+    Self.Get_Fragment(FMars_Fragment_Dial_Signals).OnAngleChanged.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
 }

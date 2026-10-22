@@ -1849,6 +1849,32 @@ namespace UMars_AutoTest_Bellkeeper_ACommitEdgeIsJudgedOnce
 }
 
 USTRUCT()
+struct FMars_AutoTest_Bellkeeper_OwnedPanelConstructsAndTearsDownItsVent_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Bellkeeper_OwnedPanelConstructsAndTearsDownItsVent
+{
+    FMars_AutoTest_Bellkeeper_OwnedPanelConstructsAndTearsDownItsVent_SpawnParams Params()
+    {
+        return FMars_AutoTest_Bellkeeper_OwnedPanelConstructsAndTearsDownItsVent_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Bellkeeper_RecommitRestartsThePoweredBurst_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Bellkeeper_RecommitRestartsThePoweredBurst
+{
+    FMars_AutoTest_Bellkeeper_RecommitRestartsThePoweredBurst_SpawnParams Params()
+    {
+        return FMars_AutoTest_Bellkeeper_RecommitRestartsThePoweredBurst_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_Bellkeeper_RightCommitPaysTheRemainingRewardsOnce_SpawnParams
 {
 }
@@ -1862,6 +1888,32 @@ namespace UMars_AutoTest_Bellkeeper_RightCommitPaysTheRemainingRewardsOnce
 }
 
 USTRUCT()
+struct FMars_AutoTest_Bellkeeper_SolveCancelsADedicatedRestart_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Bellkeeper_SolveCancelsADedicatedRestart
+{
+    FMars_AutoTest_Bellkeeper_SolveCancelsADedicatedRestart_SpawnParams Params()
+    {
+        return FMars_AutoTest_Bellkeeper_SolveCancelsADedicatedRestart_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Bellkeeper_SolveSettlesAnUnreleasedDial_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Bellkeeper_SolveSettlesAnUnreleasedDial
+{
+    FMars_AutoTest_Bellkeeper_SolveSettlesAnUnreleasedDial_SpawnParams Params()
+    {
+        return FMars_AutoTest_Bellkeeper_SolveSettlesAnUnreleasedDial_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_Bellkeeper_SpecValidation_SpawnParams
 {
 }
@@ -1871,6 +1923,19 @@ namespace UMars_AutoTest_Bellkeeper_SpecValidation
     FMars_AutoTest_Bellkeeper_SpecValidation_SpawnParams Params()
     {
         return FMars_AutoTest_Bellkeeper_SpecValidation_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Bellkeeper_TeardownCancelsADedicatedRestart_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Bellkeeper_TeardownCancelsADedicatedRestart
+{
+    FMars_AutoTest_Bellkeeper_TeardownCancelsADedicatedRestart_SpawnParams Params()
+    {
+        return FMars_AutoTest_Bellkeeper_TeardownCancelsADedicatedRestart_SpawnParams();
     }
 }
 
@@ -2083,6 +2148,19 @@ namespace UMars_AutoTest_CargoSlot_ATransferThatFailsBroadcasts
 }
 
 USTRUCT()
+struct FMars_AutoTest_CargoSlot_FoodDoesNotDriveADroppedPack_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CargoSlot_FoodDoesNotDriveADroppedPack
+{
+    FMars_AutoTest_CargoSlot_FoodDoesNotDriveADroppedPack_SpawnParams Params()
+    {
+        return FMars_AutoTest_CargoSlot_FoodDoesNotDriveADroppedPack_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_CargoSlot_SpecValidateRejectsBadSlot_SpawnParams
 {
 }
@@ -2170,6 +2248,19 @@ namespace UMars_AutoTest_Control_ASharedKeyPressStartsOneInteraction
     FMars_AutoTest_Control_ASharedKeyPressStartsOneInteraction_SpawnParams Params()
     {
         return FMars_AutoTest_Control_ASharedKeyPressStartsOneInteraction_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Control_FreeTurnHandsOutItsPullUntilRelease_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Control_FreeTurnHandsOutItsPullUntilRelease
+{
+    FMars_AutoTest_Control_FreeTurnHandsOutItsPullUntilRelease_SpawnParams Params()
+    {
+        return FMars_AutoTest_Control_FreeTurnHandsOutItsPullUntilRelease_SpawnParams();
     }
 }
 
@@ -4484,6 +4575,19 @@ namespace UMars_AutoTest_Dial_StepsWrapBothWaysWithOneBroadcastPerDrain
     FMars_AutoTest_Dial_StepsWrapBothWaysWithOneBroadcastPerDrain_SpawnParams Params()
     {
         return FMars_AutoTest_Dial_StepsWrapBothWaysWithOneBroadcastPerDrain_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Dial_TurnFollowsAndSettlesOnTheNearestDetent_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Dial_TurnFollowsAndSettlesOnTheNearestDetent
+{
+    FMars_AutoTest_Dial_TurnFollowsAndSettlesOnTheNearestDetent_SpawnParams Params()
+    {
+        return FMars_AutoTest_Dial_TurnFollowsAndSettlesOnTheNearestDetent_SpawnParams();
     }
 }
 
@@ -10314,7 +10418,16 @@ struct FMars_Bellkeeper_EntityScript_SpawnParams
     UPROPERTY()
     FText PromptText = FText::FromString("Turn dial");
 
-    FMars_Bellkeeper_EntityScript_SpawnParams(FTransform InSpawnTransform, TArray<EMars_Bellkeeper_Glyph> InPhrase, TArray<EMars_Bellkeeper_Glyph> InStartGlyphs, TArray<FMars_Bellkeeper_Reward> InRewards, FGameplayTag InCommitChannel, FGameplayTag InVentChannel, float32 InVentPulseSeconds, FMars_MechanismSource_Spec InSource, FText InPromptText)
+    UPROPERTY()
+    float32 DialDegreesPerLookDegree = 2.0f;
+
+    UPROPERTY()
+    FMars_Bellkeeper_OwnedVent OwnedVent = FMars_Bellkeeper_OwnedVent();
+
+    UPROPERTY()
+    FVector BellOffsetWorld = FVector(0.0, 0.0, 70.0);
+
+    FMars_Bellkeeper_EntityScript_SpawnParams(FTransform InSpawnTransform, TArray<EMars_Bellkeeper_Glyph> InPhrase, TArray<EMars_Bellkeeper_Glyph> InStartGlyphs, TArray<FMars_Bellkeeper_Reward> InRewards, FGameplayTag InCommitChannel, FGameplayTag InVentChannel, float32 InVentPulseSeconds, FMars_MechanismSource_Spec InSource, FText InPromptText, float32 InDialDegreesPerLookDegree, FMars_Bellkeeper_OwnedVent InOwnedVent, FVector InBellOffsetWorld)
     {
         SpawnTransform = InSpawnTransform;
         Phrase = InPhrase;
@@ -10325,6 +10438,9 @@ struct FMars_Bellkeeper_EntityScript_SpawnParams
         VentPulseSeconds = InVentPulseSeconds;
         Source = InSource;
         PromptText = InPromptText;
+        DialDegreesPerLookDegree = InDialDegreesPerLookDegree;
+        OwnedVent = InOwnedVent;
+        BellOffsetWorld = InBellOffsetWorld;
     }
 }
 
@@ -10335,9 +10451,9 @@ namespace UMars_Bellkeeper_EntityScript
         return FMars_Bellkeeper_EntityScript_SpawnParams();
     }
 
-    FMars_Bellkeeper_EntityScript_SpawnParams Params(FTransform InSpawnTransform, TArray<EMars_Bellkeeper_Glyph> InPhrase, TArray<EMars_Bellkeeper_Glyph> InStartGlyphs, TArray<FMars_Bellkeeper_Reward> InRewards, FGameplayTag InCommitChannel, FGameplayTag InVentChannel, float32 InVentPulseSeconds, FMars_MechanismSource_Spec InSource, FText InPromptText)
+    FMars_Bellkeeper_EntityScript_SpawnParams Params(FTransform InSpawnTransform, TArray<EMars_Bellkeeper_Glyph> InPhrase, TArray<EMars_Bellkeeper_Glyph> InStartGlyphs, TArray<FMars_Bellkeeper_Reward> InRewards, FGameplayTag InCommitChannel, FGameplayTag InVentChannel, float32 InVentPulseSeconds, FMars_MechanismSource_Spec InSource, FText InPromptText, float32 InDialDegreesPerLookDegree, FMars_Bellkeeper_OwnedVent InOwnedVent, FVector InBellOffsetWorld)
     {
-        return FMars_Bellkeeper_EntityScript_SpawnParams(InSpawnTransform, InPhrase, InStartGlyphs, InRewards, InCommitChannel, InVentChannel, InVentPulseSeconds, InSource, InPromptText);
+        return FMars_Bellkeeper_EntityScript_SpawnParams(InSpawnTransform, InPhrase, InStartGlyphs, InRewards, InCommitChannel, InVentChannel, InVentPulseSeconds, InSource, InPromptText, InDialDegreesPerLookDegree, InOwnedVent, InBellOffsetWorld);
     }
 }
 
@@ -10518,7 +10634,7 @@ struct FMars_Demo_EndpointAggressionLever_EntityScript_SpawnParams
     FTransform SpawnTransform = FTransform::Identity;
 
     UPROPERTY()
-    FMars_Control_Spec Control = FMars_Control_Spec(ECk_Interaction_CompletionPolicy::Instant, 1.5f, EMars_Control_Behavior::Toggle, 1.0f, false, FMars_Control_Manipulation_Spec(FVector(-1.0, 0.0, 0.0), 0.019999999552965164f, 0.8500000238418579f, 60.0f, 12.0f, false));
+    FMars_Control_Spec Control = FMars_Control_Spec(ECk_Interaction_CompletionPolicy::Instant, 1.5f, EMars_Control_Behavior::Toggle, 1.0f, false, FMars_Control_Manipulation_Spec(FVector(-1.0, 0.0, 0.0), 0.019999999552965164f, 0.8500000238418579f, 60.0f, 12.0f, false, EMars_Control_ManipulationMode::Travel));
 
     UPROPERTY()
     FMars_MechanismSource_Spec Source;
@@ -11796,7 +11912,7 @@ struct FMars_Gauntlet_Bell_Chain_EntityScript_SpawnParams
     FTransform SpawnTransform = FTransform::Identity;
 
     UPROPERTY()
-    FMars_Control_Spec Control = FMars_Control_Spec(ECk_Interaction_CompletionPolicy::ManuallyCompleted, 1.5f, EMars_Control_Behavior::Momentary, 0.25f, false, FMars_Control_Manipulation_Spec(FVector(0.0, 0.0, -1.0), 0.029999999329447746f, 0.8500000238418579f, 60.0f, 12.0f, true));
+    FMars_Control_Spec Control = FMars_Control_Spec(ECk_Interaction_CompletionPolicy::ManuallyCompleted, 1.5f, EMars_Control_Behavior::Momentary, 0.25f, false, FMars_Control_Manipulation_Spec(FVector(0.0, 0.0, -1.0), 0.029999999329447746f, 0.8500000238418579f, 60.0f, 12.0f, true, EMars_Control_ManipulationMode::Travel));
 
     UPROPERTY()
     FMars_MechanismSource_Spec Source;
@@ -11901,7 +12017,16 @@ struct FMars_Gauntlet_Bell_Panel_EntityScript_SpawnParams
     UPROPERTY()
     FText PromptText = FText::FromString("Turn dial");
 
-    FMars_Gauntlet_Bell_Panel_EntityScript_SpawnParams(FTransform InSpawnTransform, TArray<EMars_Bellkeeper_Glyph> InPhrase, TArray<EMars_Bellkeeper_Glyph> InStartGlyphs, TArray<FMars_Bellkeeper_Reward> InRewards, FGameplayTag InCommitChannel, FGameplayTag InVentChannel, float32 InVentPulseSeconds, FMars_MechanismSource_Spec InSource, FText InPromptText)
+    UPROPERTY()
+    float32 DialDegreesPerLookDegree = 2.0f;
+
+    UPROPERTY()
+    FMars_Bellkeeper_OwnedVent OwnedVent = FMars_Bellkeeper_OwnedVent();
+
+    UPROPERTY()
+    FVector BellOffsetWorld = FVector(0.0, 0.0, 70.0);
+
+    FMars_Gauntlet_Bell_Panel_EntityScript_SpawnParams(FTransform InSpawnTransform, TArray<EMars_Bellkeeper_Glyph> InPhrase, TArray<EMars_Bellkeeper_Glyph> InStartGlyphs, TArray<FMars_Bellkeeper_Reward> InRewards, FGameplayTag InCommitChannel, FGameplayTag InVentChannel, float32 InVentPulseSeconds, FMars_MechanismSource_Spec InSource, FText InPromptText, float32 InDialDegreesPerLookDegree, FMars_Bellkeeper_OwnedVent InOwnedVent, FVector InBellOffsetWorld)
     {
         SpawnTransform = InSpawnTransform;
         Phrase = InPhrase;
@@ -11912,6 +12037,9 @@ struct FMars_Gauntlet_Bell_Panel_EntityScript_SpawnParams
         VentPulseSeconds = InVentPulseSeconds;
         Source = InSource;
         PromptText = InPromptText;
+        DialDegreesPerLookDegree = InDialDegreesPerLookDegree;
+        OwnedVent = InOwnedVent;
+        BellOffsetWorld = InBellOffsetWorld;
     }
 }
 
@@ -11922,9 +12050,9 @@ namespace UMars_Gauntlet_Bell_Panel_EntityScript
         return FMars_Gauntlet_Bell_Panel_EntityScript_SpawnParams();
     }
 
-    FMars_Gauntlet_Bell_Panel_EntityScript_SpawnParams Params(FTransform InSpawnTransform, TArray<EMars_Bellkeeper_Glyph> InPhrase, TArray<EMars_Bellkeeper_Glyph> InStartGlyphs, TArray<FMars_Bellkeeper_Reward> InRewards, FGameplayTag InCommitChannel, FGameplayTag InVentChannel, float32 InVentPulseSeconds, FMars_MechanismSource_Spec InSource, FText InPromptText)
+    FMars_Gauntlet_Bell_Panel_EntityScript_SpawnParams Params(FTransform InSpawnTransform, TArray<EMars_Bellkeeper_Glyph> InPhrase, TArray<EMars_Bellkeeper_Glyph> InStartGlyphs, TArray<FMars_Bellkeeper_Reward> InRewards, FGameplayTag InCommitChannel, FGameplayTag InVentChannel, float32 InVentPulseSeconds, FMars_MechanismSource_Spec InSource, FText InPromptText, float32 InDialDegreesPerLookDegree, FMars_Bellkeeper_OwnedVent InOwnedVent, FVector InBellOffsetWorld)
     {
-        return FMars_Gauntlet_Bell_Panel_EntityScript_SpawnParams(InSpawnTransform, InPhrase, InStartGlyphs, InRewards, InCommitChannel, InVentChannel, InVentPulseSeconds, InSource, InPromptText);
+        return FMars_Gauntlet_Bell_Panel_EntityScript_SpawnParams(InSpawnTransform, InPhrase, InStartGlyphs, InRewards, InCommitChannel, InVentChannel, InVentPulseSeconds, InSource, InPromptText, InDialDegreesPerLookDegree, InOwnedVent, InBellOffsetWorld);
     }
 }
 
@@ -12107,7 +12235,7 @@ struct FMars_Gauntlet_Censer_Chain_EntityScript_SpawnParams
     FTransform SpawnTransform = FTransform::Identity;
 
     UPROPERTY()
-    FMars_Control_Spec Control = FMars_Control_Spec(ECk_Interaction_CompletionPolicy::ManuallyCompleted, 1.5f, EMars_Control_Behavior::Momentary, 0.25f, false, FMars_Control_Manipulation_Spec(FVector(0.0, 0.0, -1.0), 0.029999999329447746f, 0.8500000238418579f, 60.0f, 12.0f, true));
+    FMars_Control_Spec Control = FMars_Control_Spec(ECk_Interaction_CompletionPolicy::ManuallyCompleted, 1.5f, EMars_Control_Behavior::Momentary, 0.25f, false, FMars_Control_Manipulation_Spec(FVector(0.0, 0.0, -1.0), 0.029999999329447746f, 0.8500000238418579f, 60.0f, 12.0f, true, EMars_Control_ManipulationMode::Travel));
 
     UPROPERTY()
     FMars_MechanismSource_Spec Source;
@@ -12737,7 +12865,7 @@ struct FMars_Gauntlet_Porter_Chain_EntityScript_SpawnParams
     FTransform SpawnTransform = FTransform::Identity;
 
     UPROPERTY()
-    FMars_Control_Spec Control = FMars_Control_Spec(ECk_Interaction_CompletionPolicy::ManuallyCompleted, 1.5f, EMars_Control_Behavior::Momentary, 0.25f, false, FMars_Control_Manipulation_Spec(FVector(0.0, 0.0, -1.0), 0.029999999329447746f, 0.8500000238418579f, 60.0f, 12.0f, true));
+    FMars_Control_Spec Control = FMars_Control_Spec(ECk_Interaction_CompletionPolicy::ManuallyCompleted, 1.5f, EMars_Control_Behavior::Momentary, 0.25f, false, FMars_Control_Manipulation_Spec(FVector(0.0, 0.0, -1.0), 0.029999999329447746f, 0.8500000238418579f, 60.0f, 12.0f, true, EMars_Control_ManipulationMode::Travel));
 
     UPROPERTY()
     FMars_MechanismSource_Spec Source;
@@ -13371,7 +13499,7 @@ struct FMars_Lever_EntityScript_SpawnParams
     FTransform SpawnTransform = FTransform::Identity;
 
     UPROPERTY()
-    FMars_Control_Spec Control = FMars_Control_Spec(ECk_Interaction_CompletionPolicy::Instant, 1.5f, EMars_Control_Behavior::Toggle, 1.0f, false, FMars_Control_Manipulation_Spec(FVector(-1.0, 0.0, 0.0), 0.019999999552965164f, 0.8500000238418579f, 60.0f, 12.0f, false));
+    FMars_Control_Spec Control = FMars_Control_Spec(ECk_Interaction_CompletionPolicy::Instant, 1.5f, EMars_Control_Behavior::Toggle, 1.0f, false, FMars_Control_Manipulation_Spec(FVector(-1.0, 0.0, 0.0), 0.019999999552965164f, 0.8500000238418579f, 60.0f, 12.0f, false, EMars_Control_ManipulationMode::Travel));
 
     UPROPERTY()
     FMars_MechanismSource_Spec Source = FMars_MechanismSource_Spec();
@@ -13756,7 +13884,7 @@ struct FMars_PullChain_EntityScript_SpawnParams
     FTransform SpawnTransform = FTransform::Identity;
 
     UPROPERTY()
-    FMars_Control_Spec Control = FMars_Control_Spec(ECk_Interaction_CompletionPolicy::ManuallyCompleted, 1.5f, EMars_Control_Behavior::Momentary, 0.25f, false, FMars_Control_Manipulation_Spec(FVector(0.0, 0.0, -1.0), 0.029999999329447746f, 0.8500000238418579f, 60.0f, 12.0f, true));
+    FMars_Control_Spec Control = FMars_Control_Spec(ECk_Interaction_CompletionPolicy::ManuallyCompleted, 1.5f, EMars_Control_Behavior::Momentary, 0.25f, false, FMars_Control_Manipulation_Spec(FVector(0.0, 0.0, -1.0), 0.029999999329447746f, 0.8500000238418579f, 60.0f, 12.0f, true, EMars_Control_ManipulationMode::Travel));
 
     UPROPERTY()
     FMars_MechanismSource_Spec Source = FMars_MechanismSource_Spec();
@@ -13805,7 +13933,7 @@ struct FMars_Sandbox_AggressionLever_EntityScript_SpawnParams
     FTransform SpawnTransform = FTransform::Identity;
 
     UPROPERTY()
-    FMars_Control_Spec Control = FMars_Control_Spec(ECk_Interaction_CompletionPolicy::Instant, 1.5f, EMars_Control_Behavior::Toggle, 1.0f, false, FMars_Control_Manipulation_Spec(FVector(-1.0, 0.0, 0.0), 0.019999999552965164f, 0.8500000238418579f, 60.0f, 12.0f, false));
+    FMars_Control_Spec Control = FMars_Control_Spec(ECk_Interaction_CompletionPolicy::Instant, 1.5f, EMars_Control_Behavior::Toggle, 1.0f, false, FMars_Control_Manipulation_Spec(FVector(-1.0, 0.0, 0.0), 0.019999999552965164f, 0.8500000238418579f, 60.0f, 12.0f, false, EMars_Control_ManipulationMode::Travel));
 
     UPROPERTY()
     FMars_MechanismSource_Spec Source;
@@ -13940,7 +14068,7 @@ struct FMars_Sandbox_ChainL_EntityScript_SpawnParams
     FTransform SpawnTransform = FTransform::Identity;
 
     UPROPERTY()
-    FMars_Control_Spec Control = FMars_Control_Spec(ECk_Interaction_CompletionPolicy::ManuallyCompleted, 1.5f, EMars_Control_Behavior::Momentary, 0.25f, false, FMars_Control_Manipulation_Spec(FVector(0.0, 0.0, -1.0), 0.029999999329447746f, 0.8500000238418579f, 60.0f, 12.0f, true));
+    FMars_Control_Spec Control = FMars_Control_Spec(ECk_Interaction_CompletionPolicy::ManuallyCompleted, 1.5f, EMars_Control_Behavior::Momentary, 0.25f, false, FMars_Control_Manipulation_Spec(FVector(0.0, 0.0, -1.0), 0.029999999329447746f, 0.8500000238418579f, 60.0f, 12.0f, true, EMars_Control_ManipulationMode::Travel));
 
     UPROPERTY()
     FMars_MechanismSource_Spec Source;
@@ -14849,7 +14977,7 @@ struct FMars_Sandbox_LeverA_EntityScript_SpawnParams
     FTransform SpawnTransform = FTransform::Identity;
 
     UPROPERTY()
-    FMars_Control_Spec Control = FMars_Control_Spec(ECk_Interaction_CompletionPolicy::Instant, 1.5f, EMars_Control_Behavior::Toggle, 1.0f, false, FMars_Control_Manipulation_Spec(FVector(-1.0, 0.0, 0.0), 0.019999999552965164f, 0.8500000238418579f, 60.0f, 12.0f, false));
+    FMars_Control_Spec Control = FMars_Control_Spec(ECk_Interaction_CompletionPolicy::Instant, 1.5f, EMars_Control_Behavior::Toggle, 1.0f, false, FMars_Control_Manipulation_Spec(FVector(-1.0, 0.0, 0.0), 0.019999999552965164f, 0.8500000238418579f, 60.0f, 12.0f, false, EMars_Control_ManipulationMode::Travel));
 
     UPROPERTY()
     FMars_MechanismSource_Spec Source;
@@ -14894,7 +15022,7 @@ struct FMars_Sandbox_LeverB_EntityScript_SpawnParams
     FTransform SpawnTransform = FTransform::Identity;
 
     UPROPERTY()
-    FMars_Control_Spec Control = FMars_Control_Spec(ECk_Interaction_CompletionPolicy::Instant, 1.5f, EMars_Control_Behavior::Toggle, 1.0f, false, FMars_Control_Manipulation_Spec(FVector(-1.0, 0.0, 0.0), 0.019999999552965164f, 0.8500000238418579f, 60.0f, 12.0f, false));
+    FMars_Control_Spec Control = FMars_Control_Spec(ECk_Interaction_CompletionPolicy::Instant, 1.5f, EMars_Control_Behavior::Toggle, 1.0f, false, FMars_Control_Manipulation_Spec(FVector(-1.0, 0.0, 0.0), 0.019999999552965164f, 0.8500000238418579f, 60.0f, 12.0f, false, EMars_Control_ManipulationMode::Travel));
 
     UPROPERTY()
     FMars_MechanismSource_Spec Source;
@@ -14939,7 +15067,7 @@ struct FMars_Sandbox_LeverK_EntityScript_SpawnParams
     FTransform SpawnTransform = FTransform::Identity;
 
     UPROPERTY()
-    FMars_Control_Spec Control = FMars_Control_Spec(ECk_Interaction_CompletionPolicy::Instant, 1.5f, EMars_Control_Behavior::Toggle, 1.0f, false, FMars_Control_Manipulation_Spec(FVector(-1.0, 0.0, 0.0), 0.019999999552965164f, 0.8500000238418579f, 60.0f, 12.0f, false));
+    FMars_Control_Spec Control = FMars_Control_Spec(ECk_Interaction_CompletionPolicy::Instant, 1.5f, EMars_Control_Behavior::Toggle, 1.0f, false, FMars_Control_Manipulation_Spec(FVector(-1.0, 0.0, 0.0), 0.019999999552965164f, 0.8500000238418579f, 60.0f, 12.0f, false, EMars_Control_ManipulationMode::Travel));
 
     UPROPERTY()
     FMars_MechanismSource_Spec Source;
@@ -19272,7 +19400,7 @@ struct FMars_TumblerStation_EntityScript_SpawnParams
     FMars_Tumbler_Spec Tumbler = FMars_Tumbler_Spec();
 
     UPROPERTY()
-    FMars_Control_Spec LeverControl = FMars_Control_Spec(ECk_Interaction_CompletionPolicy::Instant, 1.5f, EMars_Control_Behavior::Toggle, 1.0f, false, FMars_Control_Manipulation_Spec(FVector::ZeroVector, 0.012000000104308128f, 0.8500000238418579f, 60.0f, 12.0f, false));
+    FMars_Control_Spec LeverControl = FMars_Control_Spec(ECk_Interaction_CompletionPolicy::Instant, 1.5f, EMars_Control_Behavior::Toggle, 1.0f, false, FMars_Control_Manipulation_Spec(FVector::ZeroVector, 0.012000000104308128f, 0.8500000238418579f, 60.0f, 12.0f, false, EMars_Control_ManipulationMode::Travel));
 
     FMars_TumblerStation_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Station_Spec InStation, FMars_CookingFeed_Spec InFeed, FMars_Tumbler_Spec InTumbler, FMars_Control_Spec InLeverControl)
     {

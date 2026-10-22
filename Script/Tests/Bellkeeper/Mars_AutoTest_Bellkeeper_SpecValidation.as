@@ -42,5 +42,20 @@ class UMars_AutoTest_Bellkeeper_SpecValidation : UMars_AutoTestRig_Bellkeeper
         auto NoVent = Good;
         NoVent.VentSource = FCk_Handle_MechanismSource();
         Assert_True(NoVent.Validate().IsValid(), "the vent is optional");
+
+        auto CycleSpec = utils_trap::Make_BurstVentSpec().Cycle;
+        auto ForeignEntity = utils_entity_lifetime::Request_CreateEntity(InHandle);
+        auto ForeignCycle = Good;
+        ForeignCycle.VentCycle = utils_cycle::Add(ForeignEntity, CycleSpec);
+        Assert_False(ForeignCycle.Validate().IsValid(), "a foreign Cycle is rejected before composition");
+
+        auto ChildEntity = utils_entity_lifetime::Request_CreateEntity(_Entity);
+        auto Dedicated = Good;
+        Dedicated.VentCycle = utils_cycle::Add(ChildEntity, CycleSpec);
+        Assert_True(Dedicated.Validate().IsValid(), "a directly owned dedicated Cycle validates");
+        auto SinkSpec = FMars_MechanismSink_Spec();
+        SinkSpec.InputChannels.Add(GameplayTags::Mechanism_Channel_K);
+        utils_mechanism_sink::Add(ChildEntity, SinkSpec);
+        Assert_False(Dedicated.Validate().IsValid(), "a competing sink is rejected before composition");
     }
 }

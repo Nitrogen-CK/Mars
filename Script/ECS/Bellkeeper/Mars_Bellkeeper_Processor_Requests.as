@@ -20,6 +20,7 @@ class UMars_Processor_Bellkeeper_HandleRequests : UCk_Processor_Script_Base_UE
         auto Self = InHandle.As_Bellkeeper();
 
         const auto EndVentRequests = InRequests.EndVentRequests;
+        const auto CycleChanges = InRequests.VentCycleChanges;
         const auto HasCommit = InRequests.CommitRequests.Num() > 0;
 
         // InRequests is invalid past this line; removing before broadcasting lets re-entrant requests survive.
@@ -31,6 +32,9 @@ class UMars_Processor_Bellkeeper_HandleRequests : UCk_Processor_Script_Base_UE
             if (ck::IsValid(EndVentRequest.Timer) && State.VentTimer == EndVentRequest.Timer)
             { EndVent(Self, State); }
         }
+
+        for (const auto& Change : CycleChanges)
+        { ApplyCycleAcknowledgement(Self, Change); }
 
         if (HasCommit == false || Self.Get_IsSolved())
         { return; }
@@ -96,7 +100,23 @@ class UMars_Processor_Bellkeeper_HandleRequests : UCk_Processor_Script_Base_UE
         auto& State = InBellkeeper.Get_Fragment(FMars_Fragment_Bellkeeper);
         State.FailedCommits += 1;
 
-        if (ck::IsValid(VentSource))
+        auto VentCycle = Params.VentCycle;
+        if (ck::IsValid(VentCycle))
+        {
+            DestroyVentTimer(State);
+            SetVentOutput(InBellkeeper, EMars_MechanismSource_Output::Deasserted);
+            if (VentCycle.Get_IsRunning())
+            {
+                State.VentTransition = EMars_Bellkeeper_VentTransition::AwaitStopped;
+                VentCycle.Request_SetRunning(FMars_Request_Cycle_SetRunning(EMars_Cycle_RunState::Stopped));
+            }
+            else
+            {
+                State.VentTransition = EMars_Bellkeeper_VentTransition::AwaitRunning;
+                VentCycle.Request_SetRunning(FMars_Request_Cycle_SetRunning(EMars_Cycle_RunState::Running));
+            }
+        }
+        else if (ck::IsValid(VentSource))
         {
             DestroyVentTimer(State);
             State.VentTimer = ArmVentTimer(InBellkeeper, PulseSeconds);
@@ -110,14 +130,57 @@ class UMars_Processor_Bellkeeper_HandleRequests : UCk_Processor_Script_Base_UE
 
     private void EndVent(FCk_Handle_Bellkeeper& InBellkeeper, FMars_Fragment_Bellkeeper& InState)
     {
-        if (ck::Is_NOT_Valid(InState.VentTimer))
-        { return; }
-
+        // A solve can arrive while a restart has no timer yet. Clear its intent before stopping the child.
+        InState.VentTransition = EMars_Bellkeeper_VentTransition::Idle;
         DestroyVentTimer(InState);
+
+        auto Cycle = InBellkeeper.Get_Fragment(FMars_Fragment_Bellkeeper_Params).VentCycle;
+        if (ck::IsValid(Cycle))
+        { Cycle.Request_SetRunning(FMars_Request_Cycle_SetRunning(EMars_Cycle_RunState::Stopped)); }
+
+        SetVentOutput(InBellkeeper, EMars_MechanismSource_Output::Deasserted);
+    }
+
+    private void SetVentOutput(FCk_Handle_Bellkeeper& InBellkeeper, EMars_MechanismSource_Output InOutput)
+    {
 
         auto VentSource = InBellkeeper.Get_Fragment(FMars_Fragment_Bellkeeper_Params).VentSource;
         if (ck::IsValid(VentSource))
-        { VentSource.Request_SetOutput(utils_mechanism_source::Make_SetOutput(EMars_MechanismSource_Output::Deasserted)); }
+        { VentSource.Request_SetOutput(utils_mechanism_source::Make_SetOutput(InOutput)); }
+    }
+
+    private void ApplyCycleAcknowledgement(FCk_Handle_Bellkeeper& InBellkeeper, const FMars_Request_Bellkeeper_VentCycleChanged& InChange)
+    {
+        const auto& Params = InBellkeeper.Get_Fragment(FMars_Fragment_Bellkeeper_Params);
+        auto Cycle = Params.VentCycle;
+        if (ck::Is_NOT_Valid(Cycle) || InChange.Cycle != Cycle
+            || Cycle.Get_IsRunning() != (InChange.RunState == EMars_Cycle_RunState::Running))
+        { return; }
+
+        auto& State = InBellkeeper.Get_Fragment(FMars_Fragment_Bellkeeper);
+        if (State.Solved)
+        {
+            EndVent(InBellkeeper, State);
+            return;
+        }
+
+        if (State.VentTransition == EMars_Bellkeeper_VentTransition::AwaitStopped
+            && InChange.RunState == EMars_Cycle_RunState::Stopped)
+        {
+            State.VentTransition = EMars_Bellkeeper_VentTransition::AwaitRunning;
+            Cycle.Request_SetRunning(FMars_Request_Cycle_SetRunning(EMars_Cycle_RunState::Running));
+        }
+        else if (State.VentTransition == EMars_Bellkeeper_VentTransition::AwaitRunning
+            && InChange.RunState == EMars_Cycle_RunState::Running)
+        {
+            State.VentTransition = EMars_Bellkeeper_VentTransition::Active;
+            DestroyVentTimer(State);
+            State.VentTimer = ArmVentTimer(InBellkeeper, Params.VentPulseSeconds);
+            SetVentOutput(InBellkeeper, EMars_MechanismSource_Output::Asserted);
+        }
+        else if (State.VentTransition == EMars_Bellkeeper_VentTransition::Active
+            && InChange.RunState == EMars_Cycle_RunState::Stopped)
+        { EndVent(InBellkeeper, State); }
     }
 
     private void DestroyVentTimer(FMars_Fragment_Bellkeeper& InState)
@@ -150,7 +213,9 @@ class UMars_Processor_Bellkeeper_HandleRequests : UCk_Processor_Script_Base_UE
         { return; }
 
         // A pulse restarted by a newer wrong commit can still finish in the frame it was destroyed; the drain drops it.
-        auto Bellkeeper = Owner.As_Bellkeeper();
+        auto Bellkeeper = Owner.As_Bellkeeper(ECk_SanityCheck::UnChecked);
+        if (ck::Is_NOT_Valid(Bellkeeper))
+        { return; }
         Bellkeeper.Request_EndVent(FMars_Request_Bellkeeper_EndVent(InTimer));
     }
 }

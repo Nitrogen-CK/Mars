@@ -52,8 +52,13 @@ struct FMars_Fragment_Dial_Params
 // Written only by UMars_Processor_Dial_HandleRequests and utils_dial::Add.
 struct FMars_Fragment_Dial
 {
+    // The detent nearest Angle.
     UPROPERTY()
     int32 Index = 0;
+
+    // Where the pointer stands, degrees in [0, 360): Index * 360 / Positions at rest, anywhere between while turned.
+    UPROPERTY()
+    float32 Angle = 0.0f;
 
     UPROPERTY()
     bool Locked = false;
@@ -66,9 +71,15 @@ struct FMars_Fragment_Dial
 delegate void FMars_Delegate_Dial_OnIndexChanged(FCk_Handle_Dial InDial, int32 InIndex);
 event void FMars_Delegate_Dial_OnIndexChanged_MC(FCk_Handle_Dial InDial, int32 InIndex);
 
+// Once per drain that moved the pointer: where it stands now and how many detents it passed on the way (steps count each
+// detent; a turn counts each half-detent line it crossed; a settle crosses none).
+delegate void FMars_Delegate_Dial_OnAngleChanged(FCk_Handle_Dial InDial, float32 InAngle, int32 InDetentsCrossed);
+event void FMars_Delegate_Dial_OnAngleChanged_MC(FCk_Handle_Dial InDial, float32 InAngle, int32 InDetentsCrossed);
+
 struct FMars_Fragment_Dial_Signals
 {
     FMars_Delegate_Dial_OnIndexChanged_MC OnIndexChanged;
+    FMars_Delegate_Dial_OnAngleChanged_MC OnAngleChanged;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -102,7 +113,33 @@ struct FMars_Request_Dial_SetLocked
     }
 }
 
-// The last lock request applies first, then the steps in arrival order: a step queued beside a lock is judged against it.
+// Degrees of free turn: the pointer follows, positive forward (toward higher indices), and Index becomes the detent nearest
+// it. Summed per drain.
+struct FMars_Request_Dial_Turn
+{
+    UPROPERTY()
+    float32 Degrees = 0.0f;
+
+    FMars_Request_Dial_Turn() {}
+
+    FMars_Request_Dial_Turn(float32 InDegrees)
+    {
+        Degrees = InDegrees;
+    }
+}
+
+// Snaps the pointer onto the detent nearest it (a let-go knob).
+struct FMars_Request_Dial_Settle
+{
+    UPROPERTY()
+    bool Requested = true;
+
+    FMars_Request_Dial_Settle() {}
+}
+
+// The last lock request applies first (a locked dial drops everything else), then the steps in arrival order, then the
+// summed turn, then a settle: a step or a turn queued beside a lock is judged against it, and a settle in the same drain as
+// a turn lands on the detent the turn ended nearest.
 struct FMars_Fragment_Dial_Requests
 {
     UPROPERTY()
@@ -110,4 +147,10 @@ struct FMars_Fragment_Dial_Requests
 
     UPROPERTY()
     TArray<FMars_Request_Dial_Step> StepRequests;
+
+    UPROPERTY()
+    TArray<FMars_Request_Dial_Turn> TurnRequests;
+
+    UPROPERTY()
+    TArray<FMars_Request_Dial_Settle> SettleRequests;
 }

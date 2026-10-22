@@ -65,8 +65,9 @@ class UMars_InteractPrompt_Widget : UMars_KeyGlyph_Widget
         auto Control = ck::IsValid(Target) ? Target.TryGet_ManipulatedControl() : FCk_Handle_Control();
 
         // A ring shows for a timed hold or a pulled control (empty until it fills): a WhileLive target is ManuallyCompleted
-        // too, and nothing would fill it.
-        Show_Progress(InPrompt.Get_CompletionPolicy() == ECk_Interaction_CompletionPolicy::Timed || ck::IsValid(Control));
+        // too, and nothing would fill it; neither does a free-turned one (a dial's knob has no threshold).
+        const auto IsPulledControl = ck::IsValid(Control) && Control.Get_IsFreeTurn() == false;
+        Show_Progress(InPrompt.Get_CompletionPolicy() == ECk_Interaction_CompletionPolicy::Timed || IsPulledControl);
 
         if (ck::IsValid(Control))
         { ListenForManipulation(Control); }

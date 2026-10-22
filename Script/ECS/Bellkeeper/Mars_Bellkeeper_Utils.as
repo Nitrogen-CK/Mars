@@ -9,12 +9,18 @@ namespace utils_bellkeeper
         if (ck::EnsureIfNot(Validation.IsValid(), f"[Bellkeeper] [{InHandle.ToString()}] rejected the spec: {Validation.Get_Error()}"))
         { return FCk_Handle_Bellkeeper(); }
 
+        if (ck::IsValid(InSpec.VentCycle)
+            && ck::EnsureIfNot(utils_entity_lifetime::Get_LifetimeOwner(InSpec.VentCycle) == InHandle,
+                "[Bellkeeper] VentCycle must be a directly owned child of the lock"))
+        { return FCk_Handle_Bellkeeper(); }
+
         auto Params = FMars_Fragment_Bellkeeper_Params();
         Params.Dials = InSpec.Dials;
         Params.Answer = InSpec.Answer;
         Params.Rewards = InSpec.Rewards;
         Params.VentSource = InSpec.VentSource;
         Params.VentPulseSeconds = InSpec.VentPulseSeconds;
+        Params.VentCycle = InSpec.VentCycle;
 
         InHandle.Add_Fragment(FMars_Feature_Bellkeeper());
         InHandle.Add_Fragment(Params);
@@ -47,7 +53,10 @@ mixin bool Get_IsSolved(const FCk_Handle_Bellkeeper& Self)
 
 mixin bool Get_IsVenting(const FCk_Handle_Bellkeeper& Self)
 {
-    return ck::IsValid(Self.Get_Fragment(FMars_Fragment_Bellkeeper).VentTimer);
+    const auto& State = Self.Get_Fragment(FMars_Fragment_Bellkeeper);
+    // Includes a dedicated stop/start handshake in flight. This is intent, not proof of running Cycle/armed Hazard;
+    // consumers needing that physical state must inspect the composed Cycle/Hazard. Legacy mode remains timer-based.
+    return ck::IsValid(State.VentTimer) || State.VentTransition != EMars_Bellkeeper_VentTransition::Idle;
 }
 
 mixin TArray<FCk_Handle> Get_RewardHandles(const FCk_Handle_Bellkeeper& Self)
@@ -69,6 +78,12 @@ mixin void Request_EndVent(FCk_Handle_Bellkeeper& Self, const FMars_Request_Bell
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Bellkeeper_Requests);
     Requests.EndVentRequests.Add(InRequest);
+}
+
+mixin void Request_VentCycleChanged(FCk_Handle_Bellkeeper& Self, const FMars_Request_Bellkeeper_VentCycleChanged& InRequest)
+{
+    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Bellkeeper_Requests);
+    Requests.VentCycleChanges.Add(InRequest);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

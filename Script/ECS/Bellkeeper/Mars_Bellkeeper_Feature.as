@@ -50,6 +50,10 @@ struct FMars_Bellkeeper_Spec
 
     UPROPERTY()
     float32 VentPulseSeconds = 2.0f;
+
+    // Optional dedicated, directly owned child Cycle with no MechanismSink. Bellkeeper alone controls its restarts.
+    // Omitted preserves the legacy source-only pulse contract, which cannot restart an already-powered external vent.
+    FCk_Handle_Cycle VentCycle;
 }
 
 // Dials to judge with one answer each, on the ring, none starting on it; a reward to keep; a vent pulse that runs.
@@ -86,6 +90,15 @@ mixin FMars_Validation Validate(const FMars_Bellkeeper_Spec& Self)
     if (Self.VentPulseSeconds <= 0.0f)
     { return FMars_Validation(f"VentPulseSeconds [{Self.VentPulseSeconds}] must be positive"); }
 
+    if (ck::IsValid(Self.VentCycle))
+    {
+        if (Self.VentCycle.Has_Fragment(FMars_Feature_MechanismSink))
+        { return FMars_Validation("VentCycle must have no MechanismSink: Bellkeeper is its sole controller"); }
+
+        if (utils_entity_lifetime::Get_LifetimeOwner(Self.VentCycle) != utils_entity_lifetime::Get_LifetimeOwner(Self.Dials[0]))
+        { return FMars_Validation("VentCycle must be a directly owned sibling of the dials"); }
+    }
+
     return FMars_Validation();
 }
 
@@ -109,11 +122,22 @@ struct FMars_Fragment_Bellkeeper_Params
 
     UPROPERTY()
     float32 VentPulseSeconds = 2.0f;
+
+    UPROPERTY()
+    FCk_Handle_Cycle VentCycle;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 // State
 //--------------------------------------------------------------------------------------------------------------------------
+
+enum EMars_Bellkeeper_VentTransition
+{
+    Idle,
+    AwaitStopped,
+    AwaitRunning,
+    Active
+}
 
 // Written only by UMars_Processor_Bellkeeper_HandleRequests and utils_bellkeeper::Add.
 struct FMars_Fragment_Bellkeeper
@@ -131,6 +155,9 @@ struct FMars_Fragment_Bellkeeper
     // Valid while the vent source is asserted.
     UPROPERTY()
     FCk_Handle_Timer VentTimer;
+
+    UPROPERTY()
+    EMars_Bellkeeper_VentTransition VentTransition = EMars_Bellkeeper_VentTransition::Idle;
 }
 
 struct FMars_Tag_Bellkeeper_NeedsSetup {}
@@ -178,12 +205,34 @@ struct FMars_Request_Bellkeeper_EndVent
     }
 }
 
+// A real transition acknowledgement, not an instruction to change the Cycle. Identity/current-state checks reject stale
+// callbacks; only an acknowledged stop allows a restart, and only an acknowledged start arms its pulse clock.
+struct FMars_Request_Bellkeeper_VentCycleChanged
+{
+    UPROPERTY()
+    FCk_Handle_Cycle Cycle;
+
+    UPROPERTY()
+    EMars_Cycle_RunState RunState = EMars_Cycle_RunState::Stopped;
+
+    FMars_Request_Bellkeeper_VentCycleChanged() {}
+
+    FMars_Request_Bellkeeper_VentCycleChanged(FCk_Handle_Cycle InCycle, EMars_Cycle_RunState InRunState)
+    {
+        Cycle = InCycle;
+        RunState = InRunState;
+    }
+}
+
 // Ended pulses apply first, then the commit. At most one commit is judged per drain, so a doubled edge cannot cost two
 // rewards.
 struct FMars_Fragment_Bellkeeper_Requests
 {
     UPROPERTY()
     TArray<FMars_Request_Bellkeeper_EndVent> EndVentRequests;
+
+    UPROPERTY()
+    TArray<FMars_Request_Bellkeeper_VentCycleChanged> VentCycleChanges;
 
     UPROPERTY()
     TArray<FMars_Request_Bellkeeper_Commit> CommitRequests;
