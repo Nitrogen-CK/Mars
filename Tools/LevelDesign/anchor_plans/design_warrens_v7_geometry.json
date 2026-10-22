@@ -1,0 +1,9059 @@
+{
+ "_source": {
+  "file": "design_warrens_v6_geometry.json",
+  "revision": "v7r1",
+  "note": "Independent frozen v6 copy plus explicit spatial and Phase3 local route/fixture deltas; generic mechanics, cache pool and frozen source preserved."
+ },
+ "deviations": [
+  "grotto-overlook deck extended north from y 23.0 to 24.0 so the approach never spans open air over the Grotto edge (the edge slants from y 23.25 at x -1 to 24.0 at x -2)",
+  "kitchen cargo aperture 2.0 x 2.2 m (Mars_Gate fixed opening, decision D2) instead of 2.5 x 2.3 m",
+  "v7 preserves v6 graph, puzzle, cache and channel contracts; geometry, furnishings and static validation metadata only.",
+  "P2 south dry pad has 0.25 m steps; water stays cosmetic.",
+  "Small brackets, tube frames, repair inlays and feeding scars are NoCollision.",
+  "Phase 2 amendment: validate ladder front mount/shaft separately from the top exit/approach. Keep the historical Phase 1 broad rectangle and lower platform wall.",
+  "Phase 2 emitted-solid recovery amendment: lift only old chimes at.z by 0.20 m (strand underside 2.1 -> 2.3 m), and move roof recovery goal from [44,52,0] to [44,52.25,0]. Clearance remains 2.2 m; no graph or puzzle changes.",
+  "2026-10-21 readability correction: split conduits have hollow break rims and roof hangers; drying racks are open leg/slat frames. Wall-seat kitchen rail/closet header and suspend gallery beams/Chime strands; preserve all graph, mechanism and bay contracts.",
+  "Authorized coordinated Cistern crossing revision: local22-degree descent, flat lower underpass, retained upper thin bridge at original height; no graph nodes, links, mechanisms, or global ramp defaults changed."
+ ],
+ "newRooms": [
+  {
+   "id": "root-grotto",
+   "label": "Root Grotto",
+   "poly": [
+    [
+     -24,
+     6
+    ],
+    [
+     -17,
+     0
+    ],
+    [
+     -4,
+     1
+    ],
+    [
+     2,
+     7
+    ],
+    [
+     2,
+     21
+    ],
+    [
+     -6,
+     27
+    ],
+    [
+     -19,
+     23
+    ],
+    [
+     -25,
+     14
+    ]
+   ],
+   "z": -2.5,
+   "district": "grotto",
+   "note": "New west extension, not a re-skin of the Cistern. Dry perimeter circulation around an explicit floor-founded harvest shelf and central mineral divider; one shelf has a short exposed approach and a full-width safe bypass. Keep a continuous 3 m pack route. No water is added in this first prototype. Shell opens from the 2.2 m entry to 4 m clear height; exact irregular roof is a later blockout target.",
+   "top": 1.5
+  },
+  {
+   "id": "grotto-recess",
+   "label": "Root Listener's Recess",
+   "rect": [
+    -26,
+    30,
+    -18,
+    36
+   ],
+   "z": -2.5,
+   "district": "grotto",
+   "note": "Small new standing discovery pocket reached by one optional 1.5 x 1.3 m packless squeeze. A fixed environmental find and view into root strata; no required ingredient, new exit, or always-active loot promise.",
+   "top": 0.0
+  },
+  {
+   "id": "spiral-well",
+   "label": "Old Service Spiral",
+   "rect": [
+    -13.5,
+    37.5,
+    -2.5,
+    48.5
+   ],
+   "z": -2.5,
+   "top": 3,
+   "district": "bone",
+   "note": "A small new vertical service room with its main floor at -2.5. Eighteen supported spiral treads climb 270 degrees to a separate upper landing at 0. The upper approach crosses on an explicit supported deck; no flat upper floor bypasses the stair."
+  }
+ ],
+ "structures": [
+  {
+   "id": "kitchen-west",
+   "kind": "wall",
+   "at": [
+    35,
+    45.5,
+    0
+   ],
+   "size": [
+    0.25,
+    10,
+    2.7
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "note": "Cut only named peek/crawl apertures; other wall remains continuous."
+  },
+  {
+   "id": "kitchen-east",
+   "kind": "wall",
+   "at": [
+    45,
+    45.5,
+    0
+   ],
+   "size": [
+    0.25,
+    10,
+    2.7
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "note": "Only the named cargo aperture interrupts this wall; its leaf fills the opening while locked."
+  },
+  {
+   "id": "kitchen-south",
+   "kind": "wall",
+   "at": [
+    40,
+    40.5,
+    0
+   ],
+   "size": [
+    10.25,
+    0.25,
+    2.7
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "note": ""
+  },
+  {
+   "id": "kitchen-north",
+   "kind": "wall",
+   "at": [
+    40,
+    50.5,
+    0
+   ],
+   "size": [
+    10.25,
+    0.25,
+    2.7
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "note": ""
+  },
+  {
+   "id": "kitchen-roof",
+   "kind": "roof",
+   "at": [
+    40,
+    45.5,
+    2.7
+   ],
+   "size": [
+    10.25,
+    10.25,
+    0.2
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "note": "Continuous solid roof with top at 2.9. About 1.7 m remains beneath the old loft underside. No roof opening enters the kitchen."
+  },
+  {
+   "id": "kitchen-cargo-leaf",
+   "kind": "door",
+   "at": [
+    45,
+    44,
+    0
+   ],
+   "size": [
+    0.25,
+    2.0,
+    2.2
+   ],
+   "yaw": 0,
+   "state": "locked",
+   "collision": true,
+   "note": "Withdraw and latch clear after operating the exterior crank. The player need not hold the control."
+  },
+  {
+   "id": "kitchen-crawl-leaf",
+   "kind": "door",
+   "at": [
+    35,
+    47.8,
+    0
+   ],
+   "size": [
+    0.25,
+    1.5,
+    1.3
+   ],
+   "yaw": 0,
+   "state": "locked",
+   "collision": true,
+   "note": "Initially latched. The same exterior release opens this port, so it cannot bypass the initial lock."
+  },
+  {
+   "id": "roof-recovery-ledge",
+   "kind": "platform",
+   "at": [
+    44,
+    51.2,
+    1.2
+   ],
+   "size": [
+    2,
+    1.25,
+    0.25
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "note": "Visible roof recovery: descend from 2.9 to 1.45, then to the public floor. Keep the x40 north approach clear; verify collision and fall damage.",
+   "rails": false
+  },
+  {
+   "id": "spiral-upper-landing",
+   "kind": "platform",
+   "at": [
+    -8,
+    38.75,
+    -0.2
+   ],
+   "size": [
+    2.5,
+    1.5,
+    0.2
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "note": "Upper landing at z0 meets the spiral south end and supported Court approach."
+  },
+  {
+   "id": "grotto-overlook",
+   "kind": "platform",
+   "at": [
+    -1,
+    21.0,
+    -0.2
+   ],
+   "size": [
+    4,
+    6.0,
+    0.2
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "note": "Supported deck with top at0. Subtract its named floor opening only from this deck. The lower floor remains intact; clear height beneath the deck is2.3 m."
+  },
+  {
+   "id": "spiral-entry-bridge",
+   "kind": "platform",
+   "at": [
+    -4.5,
+    36.875,
+    -0.2
+   ],
+   "size": [
+    7.941190087134295,
+    3,
+    0.2
+   ],
+   "yaw": 151.82140989004085,
+   "state": "always",
+   "collision": true,
+   "note": "Explicit upper deck across the service-well floor below. Supported by the existing-height approach, upper landing and two floor posts; top is 0."
+  },
+  {
+   "id": "spiral-bearing-00",
+   "kind": "beam",
+   "at": [
+    -4.57952,
+    43.45032,
+    -2.79111
+   ],
+   "size": [
+    2.7,
+    0.18,
+    0.25
+   ],
+   "yaw": 7.5,
+   "state": "always",
+   "collision": true,
+   "note": "Radial tread bearing, embedded in the central pier and below the 0.18 m tread slab."
+  },
+  {
+   "id": "spiral-bearing-01",
+   "kind": "beam",
+   "at": [
+    -4.81262,
+    44.32026,
+    -2.65222
+   ],
+   "size": [
+    2.7,
+    0.18,
+    0.25
+   ],
+   "yaw": 22.5,
+   "state": "always",
+   "collision": true,
+   "note": "Radial tread bearing, embedded in the central pier and below the 0.18 m tread slab."
+  },
+  {
+   "id": "spiral-bearing-02",
+   "kind": "beam",
+   "at": [
+    -5.26293,
+    45.10023,
+    -2.51333
+   ],
+   "size": [
+    2.7,
+    0.18,
+    0.25
+   ],
+   "yaw": 37.5,
+   "state": "always",
+   "collision": true,
+   "note": "Radial tread bearing, embedded in the central pier and below the 0.18 m tread slab."
+  },
+  {
+   "id": "spiral-bearing-03",
+   "kind": "beam",
+   "at": [
+    -5.89977,
+    45.73707,
+    -2.37444
+   ],
+   "size": [
+    2.7,
+    0.18,
+    0.25
+   ],
+   "yaw": 52.5,
+   "state": "always",
+   "collision": true,
+   "note": "Radial tread bearing, embedded in the central pier and below the 0.18 m tread slab."
+  },
+  {
+   "id": "spiral-bearing-04",
+   "kind": "beam",
+   "at": [
+    -6.67974,
+    46.18738,
+    -2.23556
+   ],
+   "size": [
+    2.7,
+    0.18,
+    0.25
+   ],
+   "yaw": 67.5,
+   "state": "always",
+   "collision": true,
+   "note": "Radial tread bearing, embedded in the central pier and below the 0.18 m tread slab."
+  },
+  {
+   "id": "spiral-bearing-05",
+   "kind": "beam",
+   "at": [
+    -7.54968,
+    46.42048,
+    -2.09667
+   ],
+   "size": [
+    2.7,
+    0.18,
+    0.25
+   ],
+   "yaw": 82.5,
+   "state": "always",
+   "collision": true,
+   "note": "Radial tread bearing, embedded in the central pier and below the 0.18 m tread slab."
+  },
+  {
+   "id": "spiral-bearing-06",
+   "kind": "beam",
+   "at": [
+    -8.45032,
+    46.42048,
+    -1.95778
+   ],
+   "size": [
+    2.7,
+    0.18,
+    0.25
+   ],
+   "yaw": 97.5,
+   "state": "always",
+   "collision": true,
+   "note": "Radial tread bearing, embedded in the central pier and below the 0.18 m tread slab."
+  },
+  {
+   "id": "spiral-bearing-07",
+   "kind": "beam",
+   "at": [
+    -9.32026,
+    46.18738,
+    -1.81889
+   ],
+   "size": [
+    2.7,
+    0.18,
+    0.25
+   ],
+   "yaw": 112.5,
+   "state": "always",
+   "collision": true,
+   "note": "Radial tread bearing, embedded in the central pier and below the 0.18 m tread slab."
+  },
+  {
+   "id": "spiral-bearing-08",
+   "kind": "beam",
+   "at": [
+    -10.10023,
+    45.73707,
+    -1.68
+   ],
+   "size": [
+    2.7,
+    0.18,
+    0.25
+   ],
+   "yaw": 127.5,
+   "state": "always",
+   "collision": true,
+   "note": "Radial tread bearing, embedded in the central pier and below the 0.18 m tread slab."
+  },
+  {
+   "id": "spiral-bearing-09",
+   "kind": "beam",
+   "at": [
+    -10.73707,
+    45.10023,
+    -1.54111
+   ],
+   "size": [
+    2.7,
+    0.18,
+    0.25
+   ],
+   "yaw": 142.5,
+   "state": "always",
+   "collision": true,
+   "note": "Radial tread bearing, embedded in the central pier and below the 0.18 m tread slab."
+  },
+  {
+   "id": "spiral-bearing-10",
+   "kind": "beam",
+   "at": [
+    -11.18738,
+    44.32026,
+    -1.40222
+   ],
+   "size": [
+    2.7,
+    0.18,
+    0.25
+   ],
+   "yaw": 157.5,
+   "state": "always",
+   "collision": true,
+   "note": "Radial tread bearing, embedded in the central pier and below the 0.18 m tread slab."
+  },
+  {
+   "id": "spiral-bearing-11",
+   "kind": "beam",
+   "at": [
+    -11.42048,
+    43.45032,
+    -1.26333
+   ],
+   "size": [
+    2.7,
+    0.18,
+    0.25
+   ],
+   "yaw": 172.5,
+   "state": "always",
+   "collision": true,
+   "note": "Radial tread bearing, embedded in the central pier and below the 0.18 m tread slab."
+  },
+  {
+   "id": "spiral-bearing-12",
+   "kind": "beam",
+   "at": [
+    -11.42048,
+    42.54968,
+    -1.12444
+   ],
+   "size": [
+    2.7,
+    0.18,
+    0.25
+   ],
+   "yaw": 187.5,
+   "state": "always",
+   "collision": true,
+   "note": "Radial tread bearing, embedded in the central pier and below the 0.18 m tread slab."
+  },
+  {
+   "id": "spiral-bearing-13",
+   "kind": "beam",
+   "at": [
+    -11.18738,
+    41.67974,
+    -0.98556
+   ],
+   "size": [
+    2.7,
+    0.18,
+    0.25
+   ],
+   "yaw": 202.5,
+   "state": "always",
+   "collision": true,
+   "note": "Radial tread bearing, embedded in the central pier and below the 0.18 m tread slab."
+  },
+  {
+   "id": "spiral-bearing-14",
+   "kind": "beam",
+   "at": [
+    -10.73707,
+    40.89977,
+    -0.84667
+   ],
+   "size": [
+    2.7,
+    0.18,
+    0.25
+   ],
+   "yaw": 217.5,
+   "state": "always",
+   "collision": true,
+   "note": "Radial tread bearing, embedded in the central pier and below the 0.18 m tread slab."
+  },
+  {
+   "id": "spiral-bearing-15",
+   "kind": "beam",
+   "at": [
+    -10.10023,
+    40.26293,
+    -0.70778
+   ],
+   "size": [
+    2.7,
+    0.18,
+    0.25
+   ],
+   "yaw": 232.5,
+   "state": "always",
+   "collision": true,
+   "note": "Radial tread bearing, embedded in the central pier and below the 0.18 m tread slab."
+  },
+  {
+   "id": "spiral-bearing-16",
+   "kind": "beam",
+   "at": [
+    -9.32026,
+    39.81262,
+    -0.56889
+   ],
+   "size": [
+    2.7,
+    0.18,
+    0.25
+   ],
+   "yaw": 247.5,
+   "state": "always",
+   "collision": true,
+   "note": "Radial tread bearing, embedded in the central pier and below the 0.18 m tread slab."
+  },
+  {
+   "id": "spiral-bearing-17",
+   "kind": "beam",
+   "at": [
+    -8.45032,
+    39.57952,
+    -0.43
+   ],
+   "size": [
+    2.7,
+    0.18,
+    0.25
+   ],
+   "yaw": 262.5,
+   "state": "always",
+   "collision": true,
+   "note": "Radial tread bearing, embedded in the central pier and below the 0.18 m tread slab."
+  },
+  {
+   "id": "overlook-bearing-0",
+   "kind": "beam",
+   "at": [
+    -1,
+    18.5,
+    -0.4
+   ],
+   "size": [
+    4,
+    0.2,
+    0.2
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "note": "Crossbeam between floor posts and overlook deck underside -0.2."
+  },
+  {
+   "id": "overlook-bearing-1",
+   "kind": "beam",
+   "at": [
+    -1,
+    22.25,
+    -0.4
+   ],
+   "size": [
+    4,
+    0.2,
+    0.2
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "note": "Crossbeam between floor posts and overlook deck underside -0.2."
+  },
+  {
+   "id": "A1-soot-hood",
+   "kind": "beam",
+   "at": [
+    40,
+    44,
+    2.25
+   ],
+   "size": [
+    2.2,
+    2.2,
+    0.35
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 1,
+   "role": "silhouette",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "A1-hood-flue",
+   "kind": "beam",
+   "at": [
+    40,
+    44,
+    2.6
+   ],
+   "size": [
+    0.65,
+    0.65,
+    0.1
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 1,
+   "role": "silhouette",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "A1-utensil-rail",
+   "kind": "beam",
+   "at": [
+    40,
+    50.36,
+    1.8
+   ],
+   "size": [
+    5,
+    0.12,
+    0.12
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": false,
+   "areaId": 1,
+   "role": "threshold",
+   "note": "Wall seated: rear face overlaps north wall at y50.375.",
+   "rails": false
+  },
+  {
+   "id": "A1-drive-bracket-0",
+   "kind": "beam",
+   "at": [
+    34.8,
+    49.2,
+    2.35
+   ],
+   "size": [
+    0.35,
+    0.35,
+    0.3
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": false,
+   "areaId": 1,
+   "role": "threshold",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "A1-drive-bracket-1",
+   "kind": "beam",
+   "at": [
+    37.3,
+    50.3,
+    2.35
+   ],
+   "size": [
+    0.35,
+    0.35,
+    0.3
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": false,
+   "areaId": 1,
+   "role": "threshold",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "A1-drive-bracket-2",
+   "kind": "beam",
+   "at": [
+    43.5,
+    50.3,
+    2.35
+   ],
+   "size": [
+    0.35,
+    0.35,
+    0.3
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": false,
+   "areaId": 1,
+   "role": "threshold",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "A2-suspended-root",
+   "kind": "beam",
+   "at": [
+    65.1,
+    47.8,
+    -3.8
+   ],
+   "size": [
+    0.7,
+    0.7,
+    10.6
+   ],
+   "yaw": 20,
+   "state": "always",
+   "collision": true,
+   "areaId": 2,
+   "role": "silhouette",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "A2-abandoned-hoist",
+   "kind": "beam",
+   "at": [
+    65.1,
+    47.8,
+    6.8
+   ],
+   "size": [
+    3.2,
+    0.5,
+    0.45
+   ],
+   "yaw": -25,
+   "state": "always",
+   "collision": true,
+   "areaId": 2,
+   "role": "silhouette",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "A2-bucket-frame-0",
+   "kind": "beam",
+   "at": [
+    48.95,
+    48.6,
+    0
+   ],
+   "size": [
+    0.14,
+    0.14,
+    1.2
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": false,
+   "areaId": 2,
+   "role": "threshold",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "A2-bucket-frame-1",
+   "kind": "beam",
+   "at": [
+    50.05,
+    48.6,
+    0
+   ],
+   "size": [
+    0.14,
+    0.14,
+    1.2
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": false,
+   "areaId": 2,
+   "role": "threshold",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "A2-bucket-crossbar",
+   "kind": "beam",
+   "at": [
+    49.5,
+    48.6,
+    1.2
+   ],
+   "size": [
+    1.25,
+    0.14,
+    0.14
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": false,
+   "areaId": 2,
+   "role": "threshold",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "A3-procession-seat-0",
+   "kind": "beam",
+   "at": [
+    7.5,
+    37.5,
+    0
+   ],
+   "size": [
+    1.6,
+    2.5,
+    0.45
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 3,
+   "role": "silhouette",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "A3-procession-back-0",
+   "kind": "beam",
+   "at": [
+    6.85,
+    37.5,
+    0.45
+   ],
+   "size": [
+    0.25,
+    2.5,
+    0.7
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 3,
+   "role": "silhouette",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "A3-procession-seat-1",
+   "kind": "beam",
+   "at": [
+    7.5,
+    41.5,
+    0
+   ],
+   "size": [
+    1.6,
+    2.5,
+    0.45
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 3,
+   "role": "silhouette",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "A3-procession-back-1",
+   "kind": "beam",
+   "at": [
+    6.85,
+    41.5,
+    0.45
+   ],
+   "size": [
+    0.25,
+    2.5,
+    0.7
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 3,
+   "role": "silhouette",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "A3-procession-seat-2",
+   "kind": "beam",
+   "at": [
+    7.5,
+    45.5,
+    0
+   ],
+   "size": [
+    1.6,
+    2.5,
+    0.45
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 3,
+   "role": "silhouette",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "A3-procession-back-2",
+   "kind": "beam",
+   "at": [
+    6.85,
+    45.5,
+    0.45
+   ],
+   "size": [
+    0.25,
+    2.5,
+    0.7
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 3,
+   "role": "silhouette",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "A3-mourner-shard",
+   "kind": "beam",
+   "at": [
+    7.9,
+    49.4,
+    0
+   ],
+   "size": [
+    0.7,
+    1.2,
+    3.8
+   ],
+   "yaw": -18,
+   "state": "always",
+   "collision": true,
+   "areaId": 3,
+   "role": "silhouette",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "A3-broken-service-wall",
+   "kind": "beam",
+   "at": [
+    26.7,
+    37.7,
+    0
+   ],
+   "size": [
+    0.45,
+    3.8,
+    0.75
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 3,
+   "role": "threshold",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "A4-margin-stack-0",
+   "kind": "beam",
+   "at": [
+    35.2,
+    67.7,
+    2.5
+   ],
+   "size": [
+    0.9,
+    1.2,
+    3.6
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 4,
+   "role": "silhouette",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "A4-margin-stack-1",
+   "kind": "beam",
+   "at": [
+    35.2,
+    70.6,
+    2.5
+   ],
+   "size": [
+    0.9,
+    1.2,
+    2.7
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 4,
+   "role": "silhouette",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "A4-margin-stack-2",
+   "kind": "beam",
+   "at": [
+    46.8,
+    71.4,
+    2.5
+   ],
+   "size": [
+    0.9,
+    1.2,
+    3.8
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 4,
+   "role": "silhouette",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "A4-margin-stack-3",
+   "kind": "beam",
+   "at": [
+    47.1,
+    64.2,
+    2.5
+   ],
+   "size": [
+    0.9,
+    1.2,
+    2.8
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 4,
+   "role": "silhouette",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "A4-broken-stack",
+   "kind": "beam",
+   "at": [
+    37.1,
+    71.4,
+    2.5
+   ],
+   "size": [
+    2.8,
+    0.8,
+    1.7
+   ],
+   "yaw": 24,
+   "state": "always",
+   "collision": true,
+   "areaId": 4,
+   "role": "silhouette",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "A4-vessel-table",
+   "kind": "beam",
+   "at": [
+    39.4,
+    71.6,
+    2.5
+   ],
+   "size": [
+    2.1,
+    0.8,
+    0.65
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 4,
+   "role": "threshold",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B5-bridge-buttress-0",
+   "kind": "beam",
+   "at": [
+    54.6,
+    54.1,
+    2.5
+   ],
+   "size": [
+    0.65,
+    0.8,
+    3.4
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 5,
+   "role": "threshold",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B5-bridge-buttress-1",
+   "kind": "beam",
+   "at": [
+    65.4,
+    54.1,
+    2.5
+   ],
+   "size": [
+    0.65,
+    0.8,
+    3.4
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 5,
+   "role": "threshold",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B5-ordered-plinth-0",
+   "kind": "beam",
+   "at": [
+    68.5,
+    72.5,
+    2.5
+   ],
+   "size": [
+    0.85,
+    0.85,
+    2.9
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 5,
+   "role": "silhouette",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B5-ordered-plinth-1",
+   "kind": "beam",
+   "at": [
+    70.2,
+    72.5,
+    2.5
+   ],
+   "size": [
+    0.85,
+    0.85,
+    3.15
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 5,
+   "role": "silhouette",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B5-ordered-plinth-2",
+   "kind": "beam",
+   "at": [
+    77,
+    72.5,
+    2.5
+   ],
+   "size": [
+    0.85,
+    0.85,
+    3.4
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 5,
+   "role": "silhouette",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B5-disturbed-tomb",
+   "kind": "beam",
+   "at": [
+    77,
+    77,
+    2.5
+   ],
+   "size": [
+    1.4,
+    2,
+    0.65
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 5,
+   "role": "silhouette",
+   "note": "Low side tomb; random cache centre remains clear.",
+   "rails": false
+  },
+  {
+   "id": "B6-repair-beam-0",
+   "kind": "beam",
+   "at": [
+    50,
+    40.5,
+    7.4
+   ],
+   "size": [
+    3.5,
+    0.2,
+    0.22
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 6,
+   "role": "threshold",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B6-repair-beam-1",
+   "kind": "beam",
+   "at": [
+    50,
+    49.2,
+    7.4
+   ],
+   "size": [
+    3.5,
+    0.2,
+    0.22
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 6,
+   "role": "threshold",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B6-repair-beam-2",
+   "kind": "beam",
+   "at": [
+    70.7,
+    44.5,
+    7.4
+   ],
+   "size": [
+    5,
+    0.2,
+    0.22
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 6,
+   "role": "threshold",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B6-repair-beam-3",
+   "kind": "beam",
+   "at": [
+    70.7,
+    48,
+    7.4
+   ],
+   "size": [
+    5,
+    0.2,
+    0.22
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 6,
+   "role": "threshold",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B6-gallery-repair",
+   "kind": "beam",
+   "at": [
+    50,
+    40.5,
+    5.005
+   ],
+   "size": [
+    2.4,
+    1.8,
+    0.02
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": false,
+   "areaId": 6,
+   "role": "silhouette",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B7-bone-instrument-left",
+   "kind": "beam",
+   "at": [
+    82.8,
+    48,
+    3.15
+   ],
+   "size": [
+    4.2,
+    0.45,
+    0.65
+   ],
+   "yaw": 24,
+   "state": "always",
+   "collision": true,
+   "areaId": 7,
+   "role": "silhouette",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B7-bone-instrument-right",
+   "kind": "beam",
+   "at": [
+    85.6,
+    48,
+    3.15
+   ],
+   "size": [
+    4.2,
+    0.45,
+    0.65
+   ],
+   "yaw": -24,
+   "state": "always",
+   "collision": true,
+   "areaId": 7,
+   "role": "silhouette",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B7-instrument-crown",
+   "kind": "beam",
+   "at": [
+    84.2,
+    48,
+    3.8
+   ],
+   "size": [
+    1.2,
+    0.8,
+    1.4
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 7,
+   "role": "silhouette",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B7-perimeter-strand-0",
+   "kind": "beam",
+   "at": [
+    91.5,
+    45,
+    3.1
+   ],
+   "size": [
+    0.12,
+    0.12,
+    2.6
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 7,
+   "role": "silhouette",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B7-perimeter-strand-1",
+   "kind": "beam",
+   "at": [
+    91.5,
+    49,
+    3.1
+   ],
+   "size": [
+    0.12,
+    0.12,
+    2.1
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 7,
+   "role": "silhouette",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B7-perimeter-strand-2",
+   "kind": "beam",
+   "at": [
+    89.8,
+    51.65,
+    3.1
+   ],
+   "size": [
+    0.12,
+    0.12,
+    2.8
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 7,
+   "role": "silhouette",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-pump-crosshead",
+   "kind": "beam",
+   "at": [
+    47,
+    12,
+    0.7
+   ],
+   "size": [
+    3.2,
+    0.65,
+    0.45
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "silhouette",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-drying-rack-0",
+   "kind": "beam",
+   "at": [
+    64.4,
+    8.885,
+    -1.78
+   ],
+   "size": [
+    5.5,
+    0.07,
+    0.08
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "silhouette",
+   "note": "Front rail of open two-tier drying frame; former solid slab removed.",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-rail-0",
+   "kind": "beam",
+   "at": [
+    64.4,
+    8.91,
+    -1.7
+   ],
+   "size": [
+    5.5,
+    0.12,
+    0.15
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "silhouette",
+   "note": "Long top drying rail, visibly carried by four legs and open slatted tiers.",
+   "rails": false
+  },
+  {
+   "id": "B8-drying-rack-1",
+   "kind": "beam",
+   "at": [
+    64.4,
+    10.585,
+    -1.78
+   ],
+   "size": [
+    5.5,
+    0.07,
+    0.08
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "silhouette",
+   "note": "Front rail of open two-tier drying frame; former solid slab removed.",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-rail-1",
+   "kind": "beam",
+   "at": [
+    64.4,
+    10.610000000000001,
+    -1.7
+   ],
+   "size": [
+    5.5,
+    0.12,
+    0.15
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "silhouette",
+   "note": "Long top drying rail, visibly carried by four legs and open slatted tiers.",
+   "rails": false
+  },
+  {
+   "id": "B8-split-pipe-0",
+   "kind": "beam",
+   "at": [
+    84.6,
+    17.6,
+    -0.15
+   ],
+   "size": [
+    3.8,
+    0.3,
+    0.045
+   ],
+   "yaw": 35,
+   "state": "always",
+   "collision": false,
+   "areaId": 8,
+   "role": "threshold",
+   "note": "Lower skin of open-ended rectangular brine conduit; ceiling-hung, no drain animation.",
+   "rails": false
+  },
+  {
+   "id": "B8-split-pipe-1",
+   "kind": "beam",
+   "at": [
+    81.8,
+    19.2,
+    -0.15
+   ],
+   "size": [
+    3.8,
+    0.3,
+    0.045
+   ],
+   "yaw": -25,
+   "state": "always",
+   "collision": false,
+   "areaId": 8,
+   "role": "threshold",
+   "note": "Lower skin of open-ended rectangular brine conduit; ceiling-hung, no drain animation.",
+   "rails": false
+  },
+  {
+   "id": "B8-maintenance-alcove",
+   "kind": "beam",
+   "at": [
+    56,
+    25.8,
+    -2.5
+   ],
+   "size": [
+    2.7,
+    0.75,
+    0.7
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "threshold",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "C9-cistern-rib-0",
+   "kind": "beam",
+   "at": [
+    23.2,
+    10.3,
+    -3
+   ],
+   "size": [
+    0.5,
+    2.2,
+    3.8
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 9,
+   "role": "silhouette",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "C9-cistern-rib-1",
+   "kind": "beam",
+   "at": [
+    31,
+    10.3,
+    -3
+   ],
+   "size": [
+    0.5,
+    2.2,
+    3.8
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 9,
+   "role": "silhouette",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "C9-cistern-rib-crown",
+   "kind": "beam",
+   "at": [
+    27.1,
+    10.3,
+    0.8
+   ],
+   "size": [
+    8.3,
+    0.4,
+    0.45
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 9,
+   "role": "silhouette",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "C9-dry-foot-ledge",
+   "kind": "platform",
+   "at": [
+    32.3,
+    13,
+    -3
+   ],
+   "size": [
+    1.4,
+    8,
+    0.5
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 9,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "C9-P2-south-dry-pad",
+   "kind": "platform",
+   "at": [
+    50.5,
+    25.5,
+    -5.5
+   ],
+   "size": [
+    2.4,
+    2.4,
+    0.5
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 9,
+   "role": "support",
+   "note": "Accepted future dry pad: basin floor -5.5, dry top -5; no drain.",
+   "rails": false
+  },
+  {
+   "id": "C9-P2-pad-step-0",
+   "kind": "platform",
+   "at": [
+    50.5,
+    24.05,
+    -5.5
+   ],
+   "size": [
+    2.4,
+    0.5,
+    0.25
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 9,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "C9-P2-gate-apron",
+   "kind": "platform",
+   "at": [
+    51.333333,
+    27.3,
+    -5.5
+   ],
+   "size": [
+    2,
+    1.4,
+    0.5
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 9,
+   "role": "support",
+   "note": "Dry floor connects the south pad to the unchanged grate throat; no water simulation.",
+   "rails": false
+  },
+  {
+   "id": "C10-outer-mineral-spine",
+   "kind": "beam",
+   "at": [
+    -13.2,
+    43,
+    -2.5
+   ],
+   "size": [
+    0.35,
+    5.8,
+    4.4
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 10,
+   "role": "silhouette",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "C10-outer-mineral-shard",
+   "kind": "beam",
+   "at": [
+    -12.9,
+    46.8,
+    -2.5
+   ],
+   "size": [
+    0.45,
+    1.8,
+    3.3
+   ],
+   "yaw": 25,
+   "state": "always",
+   "collision": true,
+   "areaId": 10,
+   "role": "silhouette",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "C10-inspection-lip-west",
+   "kind": "beam",
+   "at": [
+    -2.3,
+    19.7,
+    0
+   ],
+   "size": [
+    0.2,
+    1.8,
+    0.18
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 10,
+   "role": "threshold",
+   "note": "Retained lip on three sides; north entry open, lower exit visible.",
+   "rails": false
+  },
+  {
+   "id": "C10-inspection-lip-east",
+   "kind": "beam",
+   "at": [
+    -0.7,
+    19.7,
+    0
+   ],
+   "size": [
+    0.2,
+    1.8,
+    0.18
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 10,
+   "role": "threshold",
+   "note": "Retained lip on three sides; north entry open, lower exit visible.",
+   "rails": false
+  },
+  {
+   "id": "C10-inspection-lip-south",
+   "kind": "beam",
+   "at": [
+    -1.5,
+    18.9,
+    0
+   ],
+   "size": [
+    1.8,
+    0.2,
+    0.18
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 10,
+   "role": "threshold",
+   "note": "Retained lip on three sides; north entry open, lower exit visible.",
+   "rails": false
+  },
+  {
+   "id": "C11-leaning-root-foot",
+   "kind": "beam",
+   "at": [
+    -16.1,
+    16.8,
+    -1.85
+   ],
+   "size": [
+    1.1,
+    1.1,
+    1.3
+   ],
+   "yaw": 25,
+   "state": "always",
+   "collision": true,
+   "areaId": 11,
+   "role": "silhouette",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "C11-leaning-root-shoulder",
+   "kind": "beam",
+   "at": [
+    -16.8,
+    16.8,
+    -0.55
+   ],
+   "size": [
+    2.2,
+    1.1,
+    1.1
+   ],
+   "yaw": -18,
+   "state": "always",
+   "collision": true,
+   "areaId": 11,
+   "role": "silhouette",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "C11-root-crown",
+   "kind": "beam",
+   "at": [
+    -17.8,
+    16.8,
+    0.55
+   ],
+   "size": [
+    4.7,
+    2,
+    0.65
+   ],
+   "yaw": -15,
+   "state": "always",
+   "collision": true,
+   "areaId": 11,
+   "role": "silhouette",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "C11-tube-0-side--1",
+   "kind": "beam",
+   "at": [
+    -24.72,
+    34,
+    -2.5
+   ],
+   "size": [
+    0.12,
+    0.6,
+    1.9
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": false,
+   "areaId": 11,
+   "role": "threshold",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "C11-tube-0-side-1",
+   "kind": "beam",
+   "at": [
+    -24.08,
+    34,
+    -2.5
+   ],
+   "size": [
+    0.12,
+    0.6,
+    1.9
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": false,
+   "areaId": 11,
+   "role": "threshold",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "C11-tube-0-top",
+   "kind": "beam",
+   "at": [
+    -24.4,
+    34,
+    -0.6
+   ],
+   "size": [
+    0.75,
+    0.6,
+    0.12
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": false,
+   "areaId": 11,
+   "role": "threshold",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "C11-tube-1-side--1",
+   "kind": "beam",
+   "at": [
+    -22.32,
+    34,
+    -2.5
+   ],
+   "size": [
+    0.12,
+    0.6,
+    1.9
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": false,
+   "areaId": 11,
+   "role": "threshold",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "C11-tube-1-side-1",
+   "kind": "beam",
+   "at": [
+    -21.68,
+    34,
+    -2.5
+   ],
+   "size": [
+    0.12,
+    0.6,
+    1.9
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": false,
+   "areaId": 11,
+   "role": "threshold",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "C11-tube-1-top",
+   "kind": "beam",
+   "at": [
+    -22,
+    34,
+    -0.6
+   ],
+   "size": [
+    0.75,
+    0.6,
+    0.12
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": false,
+   "areaId": 11,
+   "role": "threshold",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "C11-tube-2-side--1",
+   "kind": "beam",
+   "at": [
+    -19.92,
+    34,
+    -2.5
+   ],
+   "size": [
+    0.12,
+    0.6,
+    1.9
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": false,
+   "areaId": 11,
+   "role": "threshold",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "C11-tube-2-side-1",
+   "kind": "beam",
+   "at": [
+    -19.28,
+    34,
+    -2.5
+   ],
+   "size": [
+    0.12,
+    0.6,
+    1.9
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": false,
+   "areaId": 11,
+   "role": "threshold",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "C11-tube-2-top",
+   "kind": "beam",
+   "at": [
+    -19.6,
+    34,
+    -0.6
+   ],
+   "size": [
+    0.75,
+    0.6,
+    0.12
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": false,
+   "areaId": 11,
+   "role": "threshold",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "C12-feeding-scar-0",
+   "kind": "beam",
+   "at": [
+    63.5,
+    48,
+    -4.995
+   ],
+   "size": [
+    3,
+    0.16,
+    0.02
+   ],
+   "yaw": -25,
+   "state": "always",
+   "collision": false,
+   "areaId": 12,
+   "role": "silhouette",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "C12-feeding-scar-1",
+   "kind": "beam",
+   "at": [
+    65,
+    46.3,
+    -4.995
+   ],
+   "size": [
+    3,
+    0.16,
+    0.02
+   ],
+   "yaw": -25,
+   "state": "always",
+   "collision": false,
+   "areaId": 12,
+   "role": "silhouette",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "C12-closet-repair-header",
+   "kind": "beam",
+   "at": [
+    48,
+    34.95,
+    2.3
+   ],
+   "size": [
+    5.5,
+    0.2,
+    0.2
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 12,
+   "role": "threshold",
+   "note": "North wall-seated header; underside remains z2.3 above loaded clearance.",
+   "rails": false
+  },
+  {
+   "id": "C12-closet-repair-post",
+   "kind": "beam",
+   "at": [
+    45.45,
+    31.45,
+    0
+   ],
+   "size": [
+    0.25,
+    0.25,
+    2.4
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 12,
+   "role": "threshold",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "C12-vault-fuel-rest-0",
+   "kind": "beam",
+   "at": [
+    76,
+    61,
+    -5
+   ],
+   "size": [
+    0.7,
+    0.7,
+    0.65
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 12,
+   "role": "silhouette",
+   "note": "Stable separate fixed tallow rest; actual existing Tallow fixture above.",
+   "rails": false
+  },
+  {
+   "id": "C12-vault-fuel-rest-1",
+   "kind": "beam",
+   "at": [
+    76,
+    57.8,
+    -5
+   ],
+   "size": [
+    0.7,
+    0.7,
+    0.65
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 12,
+   "role": "silhouette",
+   "note": "Stable separate fixed tallow rest; actual existing Tallow fixture above.",
+   "rails": false
+  },
+  {
+   "id": "B8-pipe-0-upper-skin",
+   "kind": "beam",
+   "at": [
+    84.6,
+    17.6,
+    0.105
+   ],
+   "size": [
+    3.8,
+    0.3,
+    0.045
+   ],
+   "yaw": 35,
+   "state": "always",
+   "collision": false,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-pipe-0-side--1",
+   "kind": "beam",
+   "at": [
+    84.673131,
+    17.495558,
+    -0.105
+   ],
+   "size": [
+    3.8,
+    0.045,
+    0.21
+   ],
+   "yaw": 35,
+   "state": "always",
+   "collision": false,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-pipe-0-side-1",
+   "kind": "beam",
+   "at": [
+    84.526869,
+    17.704442,
+    -0.105
+   ],
+   "size": [
+    3.8,
+    0.045,
+    0.21
+   ],
+   "yaw": 35,
+   "state": "always",
+   "collision": false,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-pipe-0-rim--1-side--1",
+   "kind": "beam",
+   "at": [
+    83.196004,
+    16.397172,
+    -0.195
+   ],
+   "size": [
+    0.12,
+    0.06,
+    0.39
+   ],
+   "yaw": 35,
+   "state": "always",
+   "collision": false,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-pipe-0-rim--1-side-1",
+   "kind": "beam",
+   "at": [
+    82.989516,
+    16.692067,
+    -0.195
+   ],
+   "size": [
+    0.12,
+    0.06,
+    0.39
+   ],
+   "yaw": 35,
+   "state": "always",
+   "collision": false,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-pipe-0-rim--1-z--0.195",
+   "kind": "beam",
+   "at": [
+    83.09276,
+    16.544619,
+    -0.195
+   ],
+   "size": [
+    0.12,
+    0.3,
+    0.045
+   ],
+   "yaw": 35,
+   "state": "always",
+   "collision": false,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-pipe-0-rim--1-z-0.150",
+   "kind": "beam",
+   "at": [
+    83.09276,
+    16.544619,
+    0.15
+   ],
+   "size": [
+    0.12,
+    0.3,
+    0.045
+   ],
+   "yaw": 35,
+   "state": "always",
+   "collision": false,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-pipe-0-rim-1-side--1",
+   "kind": "beam",
+   "at": [
+    86.210484,
+    18.507933,
+    -0.195
+   ],
+   "size": [
+    0.12,
+    0.06,
+    0.39
+   ],
+   "yaw": 35,
+   "state": "always",
+   "collision": false,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-pipe-0-rim-1-side-1",
+   "kind": "beam",
+   "at": [
+    86.003996,
+    18.802828,
+    -0.195
+   ],
+   "size": [
+    0.12,
+    0.06,
+    0.39
+   ],
+   "yaw": 35,
+   "state": "always",
+   "collision": false,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-pipe-0-rim-1-z--0.195",
+   "kind": "beam",
+   "at": [
+    86.10724,
+    18.655381,
+    -0.195
+   ],
+   "size": [
+    0.12,
+    0.3,
+    0.045
+   ],
+   "yaw": 35,
+   "state": "always",
+   "collision": false,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-pipe-0-rim-1-z-0.150",
+   "kind": "beam",
+   "at": [
+    86.10724,
+    18.655381,
+    0.15
+   ],
+   "size": [
+    0.12,
+    0.3,
+    0.045
+   ],
+   "yaw": 35,
+   "state": "always",
+   "collision": false,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-pipe-saddle-0-0",
+   "kind": "beam",
+   "at": [
+    83.821806,
+    17.055102,
+    -0.23
+   ],
+   "size": [
+    0.14,
+    0.54,
+    0.08
+   ],
+   "yaw": 35,
+   "state": "always",
+   "collision": false,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-pipe-hanger-0-0--1",
+   "kind": "beam",
+   "at": [
+    83.953728,
+    16.866697,
+    -0.15
+   ],
+   "size": [
+    0.055,
+    0.055,
+    2.27
+   ],
+   "yaw": 35,
+   "state": "always",
+   "collision": false,
+   "areaId": 8,
+   "role": "support",
+   "note": "Roof tie reaches measured Sluice ceiling underside z2.1; bottom contacts saddle.",
+   "rails": false
+  },
+  {
+   "id": "B8-pipe-hanger-0-0-1",
+   "kind": "beam",
+   "at": [
+    83.689883,
+    17.243507,
+    -0.15
+   ],
+   "size": [
+    0.055,
+    0.055,
+    2.27
+   ],
+   "yaw": 35,
+   "state": "always",
+   "collision": false,
+   "areaId": 8,
+   "role": "support",
+   "note": "Roof tie reaches measured Sluice ceiling underside z2.1; bottom contacts saddle.",
+   "rails": false
+  },
+  {
+   "id": "B8-pipe-saddle-0-1",
+   "kind": "beam",
+   "at": [
+    85.378194,
+    18.144898,
+    -0.23
+   ],
+   "size": [
+    0.14,
+    0.54,
+    0.08
+   ],
+   "yaw": 35,
+   "state": "always",
+   "collision": false,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-pipe-hanger-0-1--1",
+   "kind": "beam",
+   "at": [
+    85.510117,
+    17.956493,
+    -0.15
+   ],
+   "size": [
+    0.055,
+    0.055,
+    2.27
+   ],
+   "yaw": 35,
+   "state": "always",
+   "collision": false,
+   "areaId": 8,
+   "role": "support",
+   "note": "Roof tie reaches measured Sluice ceiling underside z2.1; bottom contacts saddle.",
+   "rails": false
+  },
+  {
+   "id": "B8-pipe-hanger-0-1-1",
+   "kind": "beam",
+   "at": [
+    85.246272,
+    18.333303,
+    -0.15
+   ],
+   "size": [
+    0.055,
+    0.055,
+    2.27
+   ],
+   "yaw": 35,
+   "state": "always",
+   "collision": false,
+   "areaId": 8,
+   "role": "support",
+   "note": "Roof tie reaches measured Sluice ceiling underside z2.1; bottom contacts saddle.",
+   "rails": false
+  },
+  {
+   "id": "B8-pipe-1-upper-skin",
+   "kind": "beam",
+   "at": [
+    81.8,
+    19.2,
+    0.105
+   ],
+   "size": [
+    3.8,
+    0.3,
+    0.045
+   ],
+   "yaw": -25,
+   "state": "always",
+   "collision": false,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-pipe-1-side--1",
+   "kind": "beam",
+   "at": [
+    81.746116,
+    19.084446,
+    -0.105
+   ],
+   "size": [
+    3.8,
+    0.045,
+    0.21
+   ],
+   "yaw": -25,
+   "state": "always",
+   "collision": false,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-pipe-1-side-1",
+   "kind": "beam",
+   "at": [
+    81.853884,
+    19.315554,
+    -0.105
+   ],
+   "size": [
+    3.8,
+    0.045,
+    0.21
+   ],
+   "yaw": -25,
+   "state": "always",
+   "collision": false,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-pipe-1-rim--1-side--1",
+   "kind": "beam",
+   "at": [
+    80.056322,
+    19.814482,
+    -0.195
+   ],
+   "size": [
+    0.12,
+    0.06,
+    0.39
+   ],
+   "yaw": -25,
+   "state": "always",
+   "collision": false,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-pipe-1-rim--1-side-1",
+   "kind": "beam",
+   "at": [
+    80.208465,
+    20.140753,
+    -0.195
+   ],
+   "size": [
+    0.12,
+    0.06,
+    0.39
+   ],
+   "yaw": -25,
+   "state": "always",
+   "collision": false,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-pipe-1-rim--1-z--0.195",
+   "kind": "beam",
+   "at": [
+    80.132394,
+    19.977618,
+    -0.195
+   ],
+   "size": [
+    0.12,
+    0.3,
+    0.045
+   ],
+   "yaw": -25,
+   "state": "always",
+   "collision": false,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-pipe-1-rim--1-z-0.150",
+   "kind": "beam",
+   "at": [
+    80.132394,
+    19.977618,
+    0.15
+   ],
+   "size": [
+    0.12,
+    0.3,
+    0.045
+   ],
+   "yaw": -25,
+   "state": "always",
+   "collision": false,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-pipe-1-rim-1-side--1",
+   "kind": "beam",
+   "at": [
+    83.391535,
+    18.259247,
+    -0.195
+   ],
+   "size": [
+    0.12,
+    0.06,
+    0.39
+   ],
+   "yaw": -25,
+   "state": "always",
+   "collision": false,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-pipe-1-rim-1-side-1",
+   "kind": "beam",
+   "at": [
+    83.543678,
+    18.585518,
+    -0.195
+   ],
+   "size": [
+    0.12,
+    0.06,
+    0.39
+   ],
+   "yaw": -25,
+   "state": "always",
+   "collision": false,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-pipe-1-rim-1-z--0.195",
+   "kind": "beam",
+   "at": [
+    83.467606,
+    18.422382,
+    -0.195
+   ],
+   "size": [
+    0.12,
+    0.3,
+    0.045
+   ],
+   "yaw": -25,
+   "state": "always",
+   "collision": false,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-pipe-1-rim-1-z-0.150",
+   "kind": "beam",
+   "at": [
+    83.467606,
+    18.422382,
+    0.15
+   ],
+   "size": [
+    0.12,
+    0.3,
+    0.045
+   ],
+   "yaw": -25,
+   "state": "always",
+   "collision": false,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-pipe-saddle-1-0",
+   "kind": "beam",
+   "at": [
+    80.939008,
+    19.601487,
+    -0.23
+   ],
+   "size": [
+    0.14,
+    0.54,
+    0.08
+   ],
+   "yaw": -25,
+   "state": "always",
+   "collision": false,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-pipe-hanger-1-0--1",
+   "kind": "beam",
+   "at": [
+    80.841805,
+    19.393037,
+    -0.15
+   ],
+   "size": [
+    0.055,
+    0.055,
+    2.27
+   ],
+   "yaw": -25,
+   "state": "always",
+   "collision": false,
+   "areaId": 8,
+   "role": "support",
+   "note": "Roof tie reaches measured Sluice ceiling underside z2.1; bottom contacts saddle.",
+   "rails": false
+  },
+  {
+   "id": "B8-pipe-hanger-1-0-1",
+   "kind": "beam",
+   "at": [
+    81.03621,
+    19.809938,
+    -0.15
+   ],
+   "size": [
+    0.055,
+    0.055,
+    2.27
+   ],
+   "yaw": -25,
+   "state": "always",
+   "collision": false,
+   "areaId": 8,
+   "role": "support",
+   "note": "Roof tie reaches measured Sluice ceiling underside z2.1; bottom contacts saddle.",
+   "rails": false
+  },
+  {
+   "id": "B8-pipe-saddle-1-1",
+   "kind": "beam",
+   "at": [
+    82.660992,
+    18.798513,
+    -0.23
+   ],
+   "size": [
+    0.14,
+    0.54,
+    0.08
+   ],
+   "yaw": -25,
+   "state": "always",
+   "collision": false,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-pipe-hanger-1-1--1",
+   "kind": "beam",
+   "at": [
+    82.56379,
+    18.590062,
+    -0.15
+   ],
+   "size": [
+    0.055,
+    0.055,
+    2.27
+   ],
+   "yaw": -25,
+   "state": "always",
+   "collision": false,
+   "areaId": 8,
+   "role": "support",
+   "note": "Roof tie reaches measured Sluice ceiling underside z2.1; bottom contacts saddle.",
+   "rails": false
+  },
+  {
+   "id": "B8-pipe-hanger-1-1-1",
+   "kind": "beam",
+   "at": [
+    82.758195,
+    19.006963,
+    -0.15
+   ],
+   "size": [
+    0.055,
+    0.055,
+    2.27
+   ],
+   "yaw": -25,
+   "state": "always",
+   "collision": false,
+   "areaId": 8,
+   "role": "support",
+   "note": "Roof tie reaches measured Sluice ceiling underside z2.1; bottom contacts saddle.",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-0-rear-rail",
+   "kind": "beam",
+   "at": [
+    64.4,
+    9.315,
+    -1.78
+   ],
+   "size": [
+    5.5,
+    0.07,
+    0.08
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-0-leg--1--1",
+   "kind": "beam",
+   "at": [
+    61.73,
+    8.89,
+    -2.5
+   ],
+   "size": [
+    0.16,
+    0.08,
+    0.85
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-0-leg--1-1",
+   "kind": "beam",
+   "at": [
+    61.73,
+    9.31,
+    -2.5
+   ],
+   "size": [
+    0.16,
+    0.08,
+    0.85
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-0-leg-1--1",
+   "kind": "beam",
+   "at": [
+    67.07,
+    8.89,
+    -2.5
+   ],
+   "size": [
+    0.16,
+    0.08,
+    0.85
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-0-leg-1-1",
+   "kind": "beam",
+   "at": [
+    67.07,
+    9.31,
+    -2.5
+   ],
+   "size": [
+    0.16,
+    0.08,
+    0.85
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-0-slat-0-0",
+   "kind": "beam",
+   "at": [
+    61.8,
+    9.1,
+    -2.18
+   ],
+   "size": [
+    0.12,
+    0.5,
+    0.045
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-0-slat-0-1",
+   "kind": "beam",
+   "at": [
+    62.2,
+    9.1,
+    -2.18
+   ],
+   "size": [
+    0.12,
+    0.5,
+    0.045
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-0-slat-0-2",
+   "kind": "beam",
+   "at": [
+    62.6,
+    9.1,
+    -2.18
+   ],
+   "size": [
+    0.12,
+    0.5,
+    0.045
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-0-slat-0-3",
+   "kind": "beam",
+   "at": [
+    63.0,
+    9.1,
+    -2.18
+   ],
+   "size": [
+    0.12,
+    0.5,
+    0.045
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-0-slat-0-4",
+   "kind": "beam",
+   "at": [
+    63.4,
+    9.1,
+    -2.18
+   ],
+   "size": [
+    0.12,
+    0.5,
+    0.045
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-0-slat-0-5",
+   "kind": "beam",
+   "at": [
+    63.8,
+    9.1,
+    -2.18
+   ],
+   "size": [
+    0.12,
+    0.5,
+    0.045
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-0-slat-0-6",
+   "kind": "beam",
+   "at": [
+    64.2,
+    9.1,
+    -2.18
+   ],
+   "size": [
+    0.12,
+    0.5,
+    0.045
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-0-slat-0-7",
+   "kind": "beam",
+   "at": [
+    64.6,
+    9.1,
+    -2.18
+   ],
+   "size": [
+    0.12,
+    0.5,
+    0.045
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-0-slat-0-8",
+   "kind": "beam",
+   "at": [
+    65.0,
+    9.1,
+    -2.18
+   ],
+   "size": [
+    0.12,
+    0.5,
+    0.045
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-0-slat-0-9",
+   "kind": "beam",
+   "at": [
+    65.4,
+    9.1,
+    -2.18
+   ],
+   "size": [
+    0.12,
+    0.5,
+    0.045
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-0-slat-0-10",
+   "kind": "beam",
+   "at": [
+    65.8,
+    9.1,
+    -2.18
+   ],
+   "size": [
+    0.12,
+    0.5,
+    0.045
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-0-slat-0-11",
+   "kind": "beam",
+   "at": [
+    66.2,
+    9.1,
+    -2.18
+   ],
+   "size": [
+    0.12,
+    0.5,
+    0.045
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-0-slat-0-12",
+   "kind": "beam",
+   "at": [
+    66.6,
+    9.1,
+    -2.18
+   ],
+   "size": [
+    0.12,
+    0.5,
+    0.045
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-0-slat-0-13",
+   "kind": "beam",
+   "at": [
+    67.0,
+    9.1,
+    -2.18
+   ],
+   "size": [
+    0.12,
+    0.5,
+    0.045
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-0-slat-1-0",
+   "kind": "beam",
+   "at": [
+    61.8,
+    9.1,
+    -1.8
+   ],
+   "size": [
+    0.12,
+    0.5,
+    0.045
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-0-slat-1-1",
+   "kind": "beam",
+   "at": [
+    62.2,
+    9.1,
+    -1.8
+   ],
+   "size": [
+    0.12,
+    0.5,
+    0.045
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-0-slat-1-2",
+   "kind": "beam",
+   "at": [
+    62.6,
+    9.1,
+    -1.8
+   ],
+   "size": [
+    0.12,
+    0.5,
+    0.045
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-0-slat-1-3",
+   "kind": "beam",
+   "at": [
+    63.0,
+    9.1,
+    -1.8
+   ],
+   "size": [
+    0.12,
+    0.5,
+    0.045
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-0-slat-1-4",
+   "kind": "beam",
+   "at": [
+    63.4,
+    9.1,
+    -1.8
+   ],
+   "size": [
+    0.12,
+    0.5,
+    0.045
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-0-slat-1-5",
+   "kind": "beam",
+   "at": [
+    63.8,
+    9.1,
+    -1.8
+   ],
+   "size": [
+    0.12,
+    0.5,
+    0.045
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-0-slat-1-6",
+   "kind": "beam",
+   "at": [
+    64.2,
+    9.1,
+    -1.8
+   ],
+   "size": [
+    0.12,
+    0.5,
+    0.045
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-0-slat-1-7",
+   "kind": "beam",
+   "at": [
+    64.6,
+    9.1,
+    -1.8
+   ],
+   "size": [
+    0.12,
+    0.5,
+    0.045
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-0-slat-1-8",
+   "kind": "beam",
+   "at": [
+    65.0,
+    9.1,
+    -1.8
+   ],
+   "size": [
+    0.12,
+    0.5,
+    0.045
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-0-slat-1-9",
+   "kind": "beam",
+   "at": [
+    65.4,
+    9.1,
+    -1.8
+   ],
+   "size": [
+    0.12,
+    0.5,
+    0.045
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-0-slat-1-10",
+   "kind": "beam",
+   "at": [
+    65.8,
+    9.1,
+    -1.8
+   ],
+   "size": [
+    0.12,
+    0.5,
+    0.045
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-0-slat-1-11",
+   "kind": "beam",
+   "at": [
+    66.2,
+    9.1,
+    -1.8
+   ],
+   "size": [
+    0.12,
+    0.5,
+    0.045
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-0-slat-1-12",
+   "kind": "beam",
+   "at": [
+    66.6,
+    9.1,
+    -1.8
+   ],
+   "size": [
+    0.12,
+    0.5,
+    0.045
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-0-slat-1-13",
+   "kind": "beam",
+   "at": [
+    67.0,
+    9.1,
+    -1.8
+   ],
+   "size": [
+    0.12,
+    0.5,
+    0.045
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-1-rear-rail",
+   "kind": "beam",
+   "at": [
+    64.4,
+    11.015,
+    -1.78
+   ],
+   "size": [
+    5.5,
+    0.07,
+    0.08
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-1-leg--1--1",
+   "kind": "beam",
+   "at": [
+    61.73,
+    10.59,
+    -2.5
+   ],
+   "size": [
+    0.16,
+    0.08,
+    0.85
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-1-leg--1-1",
+   "kind": "beam",
+   "at": [
+    61.73,
+    11.01,
+    -2.5
+   ],
+   "size": [
+    0.16,
+    0.08,
+    0.85
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-1-leg-1--1",
+   "kind": "beam",
+   "at": [
+    67.07,
+    10.59,
+    -2.5
+   ],
+   "size": [
+    0.16,
+    0.08,
+    0.85
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-1-leg-1-1",
+   "kind": "beam",
+   "at": [
+    67.07,
+    11.01,
+    -2.5
+   ],
+   "size": [
+    0.16,
+    0.08,
+    0.85
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-1-slat-0-0",
+   "kind": "beam",
+   "at": [
+    61.8,
+    10.8,
+    -2.18
+   ],
+   "size": [
+    0.12,
+    0.5,
+    0.045
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-1-slat-0-1",
+   "kind": "beam",
+   "at": [
+    62.2,
+    10.8,
+    -2.18
+   ],
+   "size": [
+    0.12,
+    0.5,
+    0.045
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-1-slat-0-2",
+   "kind": "beam",
+   "at": [
+    62.6,
+    10.8,
+    -2.18
+   ],
+   "size": [
+    0.12,
+    0.5,
+    0.045
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-1-slat-0-3",
+   "kind": "beam",
+   "at": [
+    63.0,
+    10.8,
+    -2.18
+   ],
+   "size": [
+    0.12,
+    0.5,
+    0.045
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-1-slat-0-4",
+   "kind": "beam",
+   "at": [
+    63.4,
+    10.8,
+    -2.18
+   ],
+   "size": [
+    0.12,
+    0.5,
+    0.045
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-1-slat-0-5",
+   "kind": "beam",
+   "at": [
+    63.8,
+    10.8,
+    -2.18
+   ],
+   "size": [
+    0.12,
+    0.5,
+    0.045
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-1-slat-0-6",
+   "kind": "beam",
+   "at": [
+    64.2,
+    10.8,
+    -2.18
+   ],
+   "size": [
+    0.12,
+    0.5,
+    0.045
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-1-slat-0-7",
+   "kind": "beam",
+   "at": [
+    64.6,
+    10.8,
+    -2.18
+   ],
+   "size": [
+    0.12,
+    0.5,
+    0.045
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-1-slat-0-8",
+   "kind": "beam",
+   "at": [
+    65.0,
+    10.8,
+    -2.18
+   ],
+   "size": [
+    0.12,
+    0.5,
+    0.045
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-1-slat-0-9",
+   "kind": "beam",
+   "at": [
+    65.4,
+    10.8,
+    -2.18
+   ],
+   "size": [
+    0.12,
+    0.5,
+    0.045
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-1-slat-0-10",
+   "kind": "beam",
+   "at": [
+    65.8,
+    10.8,
+    -2.18
+   ],
+   "size": [
+    0.12,
+    0.5,
+    0.045
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-1-slat-0-11",
+   "kind": "beam",
+   "at": [
+    66.2,
+    10.8,
+    -2.18
+   ],
+   "size": [
+    0.12,
+    0.5,
+    0.045
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-1-slat-0-12",
+   "kind": "beam",
+   "at": [
+    66.6,
+    10.8,
+    -2.18
+   ],
+   "size": [
+    0.12,
+    0.5,
+    0.045
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-1-slat-0-13",
+   "kind": "beam",
+   "at": [
+    67.0,
+    10.8,
+    -2.18
+   ],
+   "size": [
+    0.12,
+    0.5,
+    0.045
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-1-slat-1-0",
+   "kind": "beam",
+   "at": [
+    61.8,
+    10.8,
+    -1.8
+   ],
+   "size": [
+    0.12,
+    0.5,
+    0.045
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-1-slat-1-1",
+   "kind": "beam",
+   "at": [
+    62.2,
+    10.8,
+    -1.8
+   ],
+   "size": [
+    0.12,
+    0.5,
+    0.045
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-1-slat-1-2",
+   "kind": "beam",
+   "at": [
+    62.6,
+    10.8,
+    -1.8
+   ],
+   "size": [
+    0.12,
+    0.5,
+    0.045
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-1-slat-1-3",
+   "kind": "beam",
+   "at": [
+    63.0,
+    10.8,
+    -1.8
+   ],
+   "size": [
+    0.12,
+    0.5,
+    0.045
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-1-slat-1-4",
+   "kind": "beam",
+   "at": [
+    63.4,
+    10.8,
+    -1.8
+   ],
+   "size": [
+    0.12,
+    0.5,
+    0.045
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-1-slat-1-5",
+   "kind": "beam",
+   "at": [
+    63.8,
+    10.8,
+    -1.8
+   ],
+   "size": [
+    0.12,
+    0.5,
+    0.045
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-1-slat-1-6",
+   "kind": "beam",
+   "at": [
+    64.2,
+    10.8,
+    -1.8
+   ],
+   "size": [
+    0.12,
+    0.5,
+    0.045
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-1-slat-1-7",
+   "kind": "beam",
+   "at": [
+    64.6,
+    10.8,
+    -1.8
+   ],
+   "size": [
+    0.12,
+    0.5,
+    0.045
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-1-slat-1-8",
+   "kind": "beam",
+   "at": [
+    65.0,
+    10.8,
+    -1.8
+   ],
+   "size": [
+    0.12,
+    0.5,
+    0.045
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-1-slat-1-9",
+   "kind": "beam",
+   "at": [
+    65.4,
+    10.8,
+    -1.8
+   ],
+   "size": [
+    0.12,
+    0.5,
+    0.045
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-1-slat-1-10",
+   "kind": "beam",
+   "at": [
+    65.8,
+    10.8,
+    -1.8
+   ],
+   "size": [
+    0.12,
+    0.5,
+    0.045
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-1-slat-1-11",
+   "kind": "beam",
+   "at": [
+    66.2,
+    10.8,
+    -1.8
+   ],
+   "size": [
+    0.12,
+    0.5,
+    0.045
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-1-slat-1-12",
+   "kind": "beam",
+   "at": [
+    66.6,
+    10.8,
+    -1.8
+   ],
+   "size": [
+    0.12,
+    0.5,
+    0.045
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-1-slat-1-13",
+   "kind": "beam",
+   "at": [
+    67.0,
+    10.8,
+    -1.8
+   ],
+   "size": [
+    0.12,
+    0.5,
+    0.045
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B6-ceiling-tie-0--1",
+   "kind": "beam",
+   "at": [
+    48.6,
+    40.5,
+    7.62
+   ],
+   "size": [
+    0.12,
+    0.12,
+    1.4
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": false,
+   "areaId": 6,
+   "role": "support",
+   "note": "Visible roof suspension, underside z9.0; no new loaded-path collision.",
+   "rails": false
+  },
+  {
+   "id": "B6-ceiling-tie-0-1",
+   "kind": "beam",
+   "at": [
+    51.4,
+    40.5,
+    7.62
+   ],
+   "size": [
+    0.12,
+    0.12,
+    1.4
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": false,
+   "areaId": 6,
+   "role": "support",
+   "note": "Visible roof suspension, underside z9.0; no new loaded-path collision.",
+   "rails": false
+  },
+  {
+   "id": "B6-ceiling-tie-1--1",
+   "kind": "beam",
+   "at": [
+    48.6,
+    49.2,
+    7.62
+   ],
+   "size": [
+    0.12,
+    0.12,
+    1.4
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": false,
+   "areaId": 6,
+   "role": "support",
+   "note": "Visible roof suspension, underside z9.0; no new loaded-path collision.",
+   "rails": false
+  },
+  {
+   "id": "B6-ceiling-tie-1-1",
+   "kind": "beam",
+   "at": [
+    51.4,
+    49.2,
+    7.62
+   ],
+   "size": [
+    0.12,
+    0.12,
+    1.4
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": false,
+   "areaId": 6,
+   "role": "support",
+   "note": "Visible roof suspension, underside z9.0; no new loaded-path collision.",
+   "rails": false
+  },
+  {
+   "id": "B6-ceiling-tie-2--1",
+   "kind": "beam",
+   "at": [
+    68.55,
+    44.5,
+    7.62
+   ],
+   "size": [
+    0.12,
+    0.12,
+    1.4
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": false,
+   "areaId": 6,
+   "role": "support",
+   "note": "Visible roof suspension, underside z9.0; no new loaded-path collision.",
+   "rails": false
+  },
+  {
+   "id": "B6-ceiling-tie-2-1",
+   "kind": "beam",
+   "at": [
+    72.85,
+    44.5,
+    7.62
+   ],
+   "size": [
+    0.12,
+    0.12,
+    1.4
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": false,
+   "areaId": 6,
+   "role": "support",
+   "note": "Visible roof suspension, underside z9.0; no new loaded-path collision.",
+   "rails": false
+  },
+  {
+   "id": "B6-ceiling-tie-3--1",
+   "kind": "beam",
+   "at": [
+    68.55,
+    48,
+    7.62
+   ],
+   "size": [
+    0.12,
+    0.12,
+    1.4
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": false,
+   "areaId": 6,
+   "role": "support",
+   "note": "Visible roof suspension, underside z9.0; no new loaded-path collision.",
+   "rails": false
+  },
+  {
+   "id": "B6-ceiling-tie-3-1",
+   "kind": "beam",
+   "at": [
+    72.85,
+    48,
+    7.62
+   ],
+   "size": [
+    0.12,
+    0.12,
+    1.4
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": false,
+   "areaId": 6,
+   "role": "support",
+   "note": "Visible roof suspension, underside z9.0; no new loaded-path collision.",
+   "rails": false
+  },
+  {
+   "id": "B7-strand-roof-tie-0",
+   "kind": "beam",
+   "at": [
+    91.5,
+    45,
+    5.7
+   ],
+   "size": [
+    0.055,
+    0.055,
+    3.32
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": false,
+   "areaId": 7,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "B7-strand-roof-tie-1",
+   "kind": "beam",
+   "at": [
+    91.5,
+    49,
+    5.2
+   ],
+   "size": [
+    0.055,
+    0.055,
+    3.82
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": false,
+   "areaId": 7,
+   "role": "support",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "C12-closet-repair-return-joist",
+   "kind": "beam",
+   "at": [
+    45.45,
+    33.2,
+    2.3
+   ],
+   "size": [
+    0.25,
+    3.6,
+    0.16
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": false,
+   "areaId": 12,
+   "role": "support",
+   "note": "Joins floor post at y31.45 to header/north wall, above z2.2 clearance.",
+   "rails": false
+  },
+  {
+   "id": "A2-hoist-roof-tie-0",
+   "kind": "beam",
+   "at": [
+    64.0124,
+    48.3071,
+    7.23
+   ],
+   "size": [
+    0.1,
+    0.1,
+    1.79
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": false,
+   "areaId": 2,
+   "role": "support",
+   "note": "Visible ceiling attachment reaches emitted roof underside z9.0.",
+   "rails": false
+  },
+  {
+   "id": "A2-hoist-roof-tie-1",
+   "kind": "beam",
+   "at": [
+    66.1876,
+    47.2929,
+    7.23
+   ],
+   "size": [
+    0.1,
+    0.1,
+    1.79
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": false,
+   "areaId": 2,
+   "role": "support",
+   "note": "Visible ceiling attachment reaches emitted roof underside z9.0.",
+   "rails": false
+  },
+  {
+   "id": "B7-strand-roof-tie-2",
+   "kind": "beam",
+   "at": [
+    89.8,
+    51.65,
+    5.88
+   ],
+   "size": [
+    0.055,
+    0.055,
+    3.14
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": false,
+   "areaId": 7,
+   "role": "support",
+   "note": "Visible ceiling attachment reaches emitted roof underside z9.0.",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-0-lower-rail--1",
+   "kind": "beam",
+   "at": [
+    64.4,
+    8.885,
+    -2.18
+   ],
+   "size": [
+    5.5,
+    0.07,
+    0.08
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "Lower shelf slats bear on longitudinal rails carried by legs.",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-0-lower-rail-1",
+   "kind": "beam",
+   "at": [
+    64.4,
+    9.315,
+    -2.18
+   ],
+   "size": [
+    5.5,
+    0.07,
+    0.08
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "Lower shelf slats bear on longitudinal rails carried by legs.",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-1-lower-rail--1",
+   "kind": "beam",
+   "at": [
+    64.4,
+    10.585,
+    -2.18
+   ],
+   "size": [
+    5.5,
+    0.07,
+    0.08
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "Lower shelf slats bear on longitudinal rails carried by legs.",
+   "rails": false
+  },
+  {
+   "id": "B8-rack-1-lower-rail-1",
+   "kind": "beam",
+   "at": [
+    64.4,
+    11.015,
+    -2.18
+   ],
+   "size": [
+    5.5,
+    0.07,
+    0.08
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 8,
+   "role": "support",
+   "note": "Lower shelf slats bear on longitudinal rails carried by legs.",
+   "rails": false
+  },
+  {
+   "id": "C9-cistern-return-bridge",
+   "kind": "platform",
+   "at": [
+    47.6,
+    21.76,
+    -2.7
+   ],
+   "size": [
+    6,
+    3.2,
+    0.2
+   ],
+   "yaw": 125.53767779197437,
+   "state": "always",
+   "collision": true,
+   "areaId": 9,
+   "role": "crossing",
+   "note": "Upper PU-p1 route remains z-2.5 on a thin bearing deck over flat lower floor z-5; 2.3m underside clearance.",
+   "rails": false
+  },
+  {
+   "id": "C9-bridge-guard--1",
+   "kind": "beam",
+   "at": [
+    48.86128688037044,
+    22.6609192002646,
+    -2.5
+   ],
+   "size": [
+    4,
+    0.1,
+    0.8
+   ],
+   "yaw": 125.53767779197437,
+   "state": "always",
+   "collision": true,
+   "areaId": 9,
+   "role": "crossing",
+   "note": "Edge guard leaves full3m clear upper crossing; carried by thin bridge deck.",
+   "rails": false
+  },
+  {
+   "id": "C9-bridge-guard-1",
+   "kind": "beam",
+   "at": [
+    46.33871311962956,
+    20.859080799735402,
+    -2.5
+   ],
+   "size": [
+    4,
+    0.1,
+    0.8
+   ],
+   "yaw": 125.53767779197437,
+   "state": "always",
+   "collision": true,
+   "areaId": 9,
+   "role": "crossing",
+   "note": "Edge guard leaves full3m clear upper crossing; carried by thin bridge deck.",
+   "rails": false
+  },
+  {
+   "id": "D3-PK-crank-rise",
+   "kind": "beam",
+   "at": [
+    34.8,
+    49.2,
+    1.1
+   ],
+   "size": [
+    0.1,
+    0.1,
+    1.42
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": false,
+   "areaId": 1,
+   "role": "gate-cue",
+   "note": "Fixed drive path; both actual shutters use unchanged PK latch.",
+   "rails": false
+  },
+  {
+   "id": "D3-PK-west-header",
+   "kind": "beam",
+   "at": [
+    34.8,
+    48.5,
+    2.48
+   ],
+   "size": [
+    0.1,
+    1.5,
+    0.08
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": false,
+   "areaId": 1,
+   "role": "gate-cue",
+   "note": "Fixed drive path; both actual shutters use unchanged PK latch.",
+   "rails": false
+  },
+  {
+   "id": "D3-PK-west-leaf-link",
+   "kind": "beam",
+   "at": [
+    34.8,
+    47.8,
+    2.3
+   ],
+   "size": [
+    0.1,
+    0.1,
+    0.26
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": false,
+   "areaId": 1,
+   "role": "gate-cue",
+   "note": "Fixed drive path; both actual shutters use unchanged PK latch.",
+   "rails": false
+  },
+  {
+   "id": "D3-PK-north-return",
+   "kind": "beam",
+   "at": [
+    34.8,
+    49.75,
+    2.48
+   ],
+   "size": [
+    0.1,
+    1.2,
+    0.08
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": false,
+   "areaId": 1,
+   "role": "gate-cue",
+   "note": "Fixed drive path; both actual shutters use unchanged PK latch.",
+   "rails": false
+  },
+  {
+   "id": "D3-PK-north-drive",
+   "kind": "beam",
+   "at": [
+    39.9,
+    50.3,
+    2.48
+   ],
+   "size": [
+    10.3,
+    0.1,
+    0.08
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": false,
+   "areaId": 1,
+   "role": "gate-cue",
+   "note": "Fixed drive path; both actual shutters use unchanged PK latch.",
+   "rails": false
+  },
+  {
+   "id": "D3-PK-east-drive",
+   "kind": "beam",
+   "at": [
+    45.0,
+    47.15,
+    2.48
+   ],
+   "size": [
+    0.1,
+    6.4,
+    0.08
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": false,
+   "areaId": 1,
+   "role": "gate-cue",
+   "note": "Fixed drive path; both actual shutters use unchanged PK latch.",
+   "rails": false
+  },
+  {
+   "id": "D3-PK-east-leaf-link",
+   "kind": "beam",
+   "at": [
+    45.0,
+    44,
+    2.3
+   ],
+   "size": [
+    0.1,
+    0.1,
+    0.26
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": false,
+   "areaId": 1,
+   "role": "gate-cue",
+   "note": "Fixed drive path; both actual shutters use unchanged PK latch.",
+   "rails": false
+  },
+  {
+   "id": "D3-Mourner-fuel-rest",
+   "kind": "beam",
+   "at": [
+    79.65,
+    77.2,
+    2.5
+   ],
+   "size": [
+    0.7,
+    0.7,
+    0.65
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 5,
+   "role": "reward-rest",
+   "note": "Separate stable fixed-fuel rest, deeper than pickup reach from the closed gate; clear of cache centre [79,76,2.5].",
+   "rails": false
+  },
+  {
+   "id": "D3-P3-plate-post",
+   "kind": "beam",
+   "at": [
+    45.5,
+    72.8,
+    2.5
+   ],
+   "size": [
+    0.1,
+    0.1,
+    1.7
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": false,
+   "areaId": 4,
+   "role": "gate-cue",
+   "note": "Floor-founded single-occupancy sign support.",
+   "rails": false
+  },
+  {
+   "id": "D3-P3-plate-board",
+   "kind": "beam",
+   "at": [
+    45.5,
+    72.8,
+    3.8
+   ],
+   "size": [
+    1.1,
+    0.12,
+    0.45
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": false,
+   "areaId": 4,
+   "role": "gate-cue",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "D3-P3-plate-one-mark",
+   "kind": "beam",
+   "at": [
+    45.5,
+    72.725,
+    3.88
+   ],
+   "size": [
+    0.18,
+    0.02,
+    0.24
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": false,
+   "areaId": 4,
+   "role": "one-occupancy-mark",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "D3-P3-Mourner-post",
+   "kind": "beam",
+   "at": [
+    77.3,
+    73.9,
+    2.5
+   ],
+   "size": [
+    0.1,
+    0.1,
+    1.7
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": false,
+   "areaId": 5,
+   "role": "gate-cue",
+   "note": "Floor-founded single-occupancy sign support.",
+   "rails": false
+  },
+  {
+   "id": "D3-P3-Mourner-board",
+   "kind": "beam",
+   "at": [
+    77.3,
+    73.9,
+    3.8
+   ],
+   "size": [
+    1.1,
+    0.12,
+    0.45
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": false,
+   "areaId": 5,
+   "role": "gate-cue",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "D3-P3-Mourner-one-mark",
+   "kind": "beam",
+   "at": [
+    77.3,
+    73.825,
+    3.88
+   ],
+   "size": [
+    0.18,
+    0.02,
+    0.24
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": false,
+   "areaId": 5,
+   "role": "one-occupancy-mark",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "D3-P2-wheel-stem",
+   "kind": "beam",
+   "at": [
+    82.8,
+    10.12,
+    -1.05
+   ],
+   "size": [
+    0.08,
+    0.1,
+    0.35
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": false,
+   "areaId": 8,
+   "role": "gate-cue",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "D3-P2-wheel-cross",
+   "kind": "beam",
+   "at": [
+    82.8,
+    10.12,
+    -0.77
+   ],
+   "size": [
+    0.5,
+    0.1,
+    0.08
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": false,
+   "areaId": 8,
+   "role": "gate-cue",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "D3-P2-wheel-fork--1",
+   "kind": "beam",
+   "at": [
+    82.59,
+    10.12,
+    -0.77
+   ],
+   "size": [
+    0.08,
+    0.1,
+    0.25
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": false,
+   "areaId": 8,
+   "role": "gate-cue",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "D3-P2-wheel-fork-1",
+   "kind": "beam",
+   "at": [
+    83.00999999999999,
+    10.12,
+    -0.77
+   ],
+   "size": [
+    0.08,
+    0.1,
+    0.25
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": false,
+   "areaId": 8,
+   "role": "gate-cue",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "D3-P2-bars-stem",
+   "kind": "beam",
+   "at": [
+    52.65,
+    27.75,
+    -3.6
+   ],
+   "size": [
+    0.08,
+    0.72,
+    0.35
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": false,
+   "areaId": 9,
+   "role": "gate-cue",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "D3-P2-bars-cross",
+   "kind": "beam",
+   "at": [
+    52.65,
+    27.75,
+    -3.3200000000000003
+   ],
+   "size": [
+    0.5,
+    0.72,
+    0.08
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": false,
+   "areaId": 9,
+   "role": "gate-cue",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "D3-P2-bars-fork--1",
+   "kind": "beam",
+   "at": [
+    52.44,
+    27.75,
+    -3.3200000000000003
+   ],
+   "size": [
+    0.08,
+    0.72,
+    0.25
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": false,
+   "areaId": 9,
+   "role": "gate-cue",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "D3-P2-bars-fork-1",
+   "kind": "beam",
+   "at": [
+    52.86,
+    27.75,
+    -3.3200000000000003
+   ],
+   "size": [
+    0.08,
+    0.72,
+    0.25
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": false,
+   "areaId": 9,
+   "role": "gate-cue",
+   "note": "",
+   "rails": false
+  },
+  {
+   "id": "D3-P2-bars-frame-bracket",
+   "kind": "beam",
+   "at": [
+    52.55,
+    27.75,
+    -3.64
+   ],
+   "size": [
+    0.3,
+    0.72,
+    0.1
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": false,
+   "areaId": 9,
+   "role": "gate-cue",
+   "note": "Seats matching split-pipe badge on the actual grate frame; outside the clear opening.",
+   "rails": false
+  },
+  {
+   "id": "D3-kitchen-large-platter-rest",
+   "kind": "beam",
+   "at": [
+    42,
+    42,
+    0
+   ],
+   "size": [
+    0.7,
+    0.7,
+    0.7
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 2,
+   "role": "receiving-rest",
+   "note": "Stable receiving rest for the existing platter; clear of the cargo receiving bay and transit lane.",
+   "rails": false
+  },
+  {
+   "id": "D3-kitchen-small-platter-rest",
+   "kind": "beam",
+   "at": [
+    43,
+    42,
+    0
+   ],
+   "size": [
+    0.7,
+    0.7,
+    0.7
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "areaId": 2,
+   "role": "receiving-rest",
+   "note": "Stable receiving rest for the existing platter; clear of the cargo receiving bay and transit lane.",
+   "rails": false
+  }
+ ],
+ "openings": [
+  {
+   "id": "kitchen-cargo-aperture",
+   "kind": "wall",
+   "axis": "x",
+   "at": [
+    45,
+    44,
+    0
+   ],
+   "width": 2.0,
+   "height": 2.2,
+   "z": 0,
+   "throughDepth": 0.5,
+   "traversable": true,
+   "sourceIds": [
+    "kitchen-east"
+   ],
+   "note": "Cargo opening; the matching shutter closes it in the locked state."
+  },
+  {
+   "id": "kitchen-crawl-aperture",
+   "kind": "wall",
+   "axis": "x",
+   "at": [
+    35,
+    47.8,
+    0
+   ],
+   "width": 1.5,
+   "height": 1.3,
+   "z": 0,
+   "throughDepth": 0.5,
+   "traversable": true,
+   "sourceIds": [
+    "kitchen-west"
+   ],
+   "note": "Packless service opening after unlock. Its matching shutter prevents initial entry."
+  },
+  {
+   "id": "kitchen-fracture",
+   "kind": "wall",
+   "axis": "x",
+   "at": [
+    35,
+    44.1,
+    1.05
+   ],
+   "width": 1.6,
+   "height": 0.6,
+   "z": 1.05,
+   "throughDepth": 0.5,
+   "traversable": false,
+   "sourceIds": [
+    "kitchen-west"
+   ],
+   "note": "Sight only: y43.3\u201344.9, z1.05\u20131.65. The0.6 m aperture cannot fit the1.05 m crouched body. It adds no traversal edge or interaction-through-wall release."
+  },
+  {
+   "id": "overlook-floor-break",
+   "kind": "floor",
+   "rect": [
+    -2.2,
+    19,
+    -0.8,
+    20.4
+   ],
+   "z": 0,
+   "throughDepth": 0.4,
+   "traversable": true,
+   "sourceIds": [
+    "grotto-overlook"
+   ],
+   "note": "Actual1.4\u00d71.4 m deck opening above a visible floor2.5 m below. Optional drop; pack clearance is unproven. Return by the spiral or Cistern, without climbing back through the hole."
+  }
+ ],
+ "roofBreaks": [
+  {
+   "id": "grotto-roof-break",
+   "rect": [
+    -4,
+    17.5,
+    2,
+    24
+   ],
+   "note": "Remove the Grotto ceiling above the overlook for headroom and sky light. This is a real opening, not a crack texture."
+  },
+  {
+   "id": "overlook-approach-roof-break",
+   "rect": [
+    -4,
+    17.5,
+    2,
+    24
+   ],
+   "note": "Continue the same sky aperture through the upper approach roof; do not leave a second roof hiding the Grotto break."
+  }
+ ],
+ "connectors": [
+  {
+   "id": "service-spiral",
+   "kind": "spiral-stair",
+   "points": [
+    [
+     -4.5,
+     43.0,
+     -2.5
+    ],
+    [
+     -4.61926,
+     43.90587,
+     -2.36111
+    ],
+    [
+     -4.96891,
+     44.75,
+     -2.22222
+    ],
+    [
+     -5.52513,
+     45.47487,
+     -2.08333
+    ],
+    [
+     -6.25,
+     46.03109,
+     -1.94444
+    ],
+    [
+     -7.09413,
+     46.38074,
+     -1.80556
+    ],
+    [
+     -8.0,
+     46.5,
+     -1.66667
+    ],
+    [
+     -8.90587,
+     46.38074,
+     -1.52778
+    ],
+    [
+     -9.75,
+     46.03109,
+     -1.38889
+    ],
+    [
+     -10.47487,
+     45.47487,
+     -1.25
+    ],
+    [
+     -11.03109,
+     44.75,
+     -1.11111
+    ],
+    [
+     -11.38074,
+     43.90587,
+     -0.97222
+    ],
+    [
+     -11.5,
+     43.0,
+     -0.83333
+    ],
+    [
+     -11.38074,
+     42.09413,
+     -0.69444
+    ],
+    [
+     -11.03109,
+     41.25,
+     -0.55556
+    ],
+    [
+     -10.47487,
+     40.52513,
+     -0.41667
+    ],
+    [
+     -9.75,
+     39.96891,
+     -0.27778
+    ],
+    [
+     -8.90587,
+     39.61926,
+     -0.13889
+    ],
+    [
+     -8.0,
+     39.5,
+     0.0
+    ]
+   ],
+   "width": 2.5,
+   "thickness": 0.18,
+   "clearHeight": 2.2,
+   "core": {
+    "at": [
+     -8,
+     43,
+     -2.5
+    ],
+    "radius": 2.3,
+    "height": 5.5
+   },
+   "stepCount": 18,
+   "ports": [
+    "spiral-low",
+    "spiral-high"
+   ],
+   "role": "optional",
+   "note": "Eighteen broad treads through 270 degrees, rising 2.5 m: about 0.139 m per riser. Centreline radius 3.5 m, width 2.5 m. Emit real horizontal treads with risers and guards. The 2.3 m central pier bears into their inner edges; explicit radial beams support the outer span. Never collapse this to a straight ramp. Worn-pack turns and headroom need observation.",
+   "rails": {
+    "innerRadius": 2.4,
+    "outerRadius": 4.7,
+    "height": 0.9,
+    "thickness": 0.08
+   },
+   "treads": [
+    {
+     "id": "service-tread-00",
+     "poly": [
+      [
+       -5.75,
+       43.0
+      ],
+      [
+       -3.25,
+       43.0
+      ],
+      [
+       -3.411852,
+       44.22939
+      ],
+      [
+       -5.826667,
+       43.582343
+      ]
+     ],
+     "top": -2.361111,
+     "thickness": 0.18
+    },
+    {
+     "id": "service-tread-01",
+     "poly": [
+      [
+       -5.826667,
+       43.582343
+      ],
+      [
+       -3.411852,
+       44.22939
+      ],
+      [
+       -3.886379,
+       45.375
+      ],
+      [
+       -6.051443,
+       44.125
+      ]
+     ],
+     "top": -2.222222,
+     "thickness": 0.18
+    },
+    {
+     "id": "service-tread-02",
+     "poly": [
+      [
+       -6.051443,
+       44.125
+      ],
+      [
+       -3.886379,
+       45.375
+      ],
+      [
+       -4.641243,
+       46.358757
+      ],
+      [
+       -6.40901,
+       44.59099
+      ]
+     ],
+     "top": -2.083333,
+     "thickness": 0.18
+    },
+    {
+     "id": "service-tread-03",
+     "poly": [
+      [
+       -6.40901,
+       44.59099
+      ],
+      [
+       -4.641243,
+       46.358757
+      ],
+      [
+       -5.625,
+       47.113621
+      ],
+      [
+       -6.875,
+       44.948557
+      ]
+     ],
+     "top": -1.944444,
+     "thickness": 0.18
+    },
+    {
+     "id": "service-tread-04",
+     "poly": [
+      [
+       -6.875,
+       44.948557
+      ],
+      [
+       -5.625,
+       47.113621
+      ],
+      [
+       -6.77061,
+       47.588148
+      ],
+      [
+       -7.417657,
+       45.173333
+      ]
+     ],
+     "top": -1.805556,
+     "thickness": 0.18
+    },
+    {
+     "id": "service-tread-05",
+     "poly": [
+      [
+       -7.417657,
+       45.173333
+      ],
+      [
+       -6.77061,
+       47.588148
+      ],
+      [
+       -8.0,
+       47.75
+      ],
+      [
+       -8.0,
+       45.25
+      ]
+     ],
+     "top": -1.666667,
+     "thickness": 0.18
+    },
+    {
+     "id": "service-tread-06",
+     "poly": [
+      [
+       -8.0,
+       45.25
+      ],
+      [
+       -8.0,
+       47.75
+      ],
+      [
+       -9.22939,
+       47.588148
+      ],
+      [
+       -8.582343,
+       45.173333
+      ]
+     ],
+     "top": -1.527778,
+     "thickness": 0.18
+    },
+    {
+     "id": "service-tread-07",
+     "poly": [
+      [
+       -8.582343,
+       45.173333
+      ],
+      [
+       -9.22939,
+       47.588148
+      ],
+      [
+       -10.375,
+       47.113621
+      ],
+      [
+       -9.125,
+       44.948557
+      ]
+     ],
+     "top": -1.388889,
+     "thickness": 0.18
+    },
+    {
+     "id": "service-tread-08",
+     "poly": [
+      [
+       -9.125,
+       44.948557
+      ],
+      [
+       -10.375,
+       47.113621
+      ],
+      [
+       -11.358757,
+       46.358757
+      ],
+      [
+       -9.59099,
+       44.59099
+      ]
+     ],
+     "top": -1.25,
+     "thickness": 0.18
+    },
+    {
+     "id": "service-tread-09",
+     "poly": [
+      [
+       -9.59099,
+       44.59099
+      ],
+      [
+       -11.358757,
+       46.358757
+      ],
+      [
+       -12.113621,
+       45.375
+      ],
+      [
+       -9.948557,
+       44.125
+      ]
+     ],
+     "top": -1.111111,
+     "thickness": 0.18
+    },
+    {
+     "id": "service-tread-10",
+     "poly": [
+      [
+       -9.948557,
+       44.125
+      ],
+      [
+       -12.113621,
+       45.375
+      ],
+      [
+       -12.588148,
+       44.22939
+      ],
+      [
+       -10.173333,
+       43.582343
+      ]
+     ],
+     "top": -0.972222,
+     "thickness": 0.18
+    },
+    {
+     "id": "service-tread-11",
+     "poly": [
+      [
+       -10.173333,
+       43.582343
+      ],
+      [
+       -12.588148,
+       44.22939
+      ],
+      [
+       -12.75,
+       43.0
+      ],
+      [
+       -10.25,
+       43.0
+      ]
+     ],
+     "top": -0.833333,
+     "thickness": 0.18
+    },
+    {
+     "id": "service-tread-12",
+     "poly": [
+      [
+       -10.25,
+       43.0
+      ],
+      [
+       -12.75,
+       43.0
+      ],
+      [
+       -12.588148,
+       41.77061
+      ],
+      [
+       -10.173333,
+       42.417657
+      ]
+     ],
+     "top": -0.694444,
+     "thickness": 0.18
+    },
+    {
+     "id": "service-tread-13",
+     "poly": [
+      [
+       -10.173333,
+       42.417657
+      ],
+      [
+       -12.588148,
+       41.77061
+      ],
+      [
+       -12.113621,
+       40.625
+      ],
+      [
+       -9.948557,
+       41.875
+      ]
+     ],
+     "top": -0.555556,
+     "thickness": 0.18
+    },
+    {
+     "id": "service-tread-14",
+     "poly": [
+      [
+       -9.948557,
+       41.875
+      ],
+      [
+       -12.113621,
+       40.625
+      ],
+      [
+       -11.358757,
+       39.641243
+      ],
+      [
+       -9.59099,
+       41.40901
+      ]
+     ],
+     "top": -0.416667,
+     "thickness": 0.18
+    },
+    {
+     "id": "service-tread-15",
+     "poly": [
+      [
+       -9.59099,
+       41.40901
+      ],
+      [
+       -11.358757,
+       39.641243
+      ],
+      [
+       -10.375,
+       38.886379
+      ],
+      [
+       -9.125,
+       41.051443
+      ]
+     ],
+     "top": -0.277778,
+     "thickness": 0.18
+    },
+    {
+     "id": "service-tread-16",
+     "poly": [
+      [
+       -9.125,
+       41.051443
+      ],
+      [
+       -10.375,
+       38.886379
+      ],
+      [
+       -9.22939,
+       38.411852
+      ],
+      [
+       -8.582343,
+       40.826667
+      ]
+     ],
+     "top": -0.138889,
+     "thickness": 0.18
+    },
+    {
+     "id": "service-tread-17",
+     "poly": [
+      [
+       -8.582343,
+       40.826667
+      ],
+      [
+       -9.22939,
+       38.411852
+      ],
+      [
+       -8.0,
+       38.25
+      ],
+      [
+       -8.0,
+       40.75
+      ]
+     ],
+     "top": 0.0,
+     "thickness": 0.18
+    }
+   ]
+  }
+ ],
+ "terrain": [
+  {
+   "id": "grotto-natural-rise",
+   "poly": [
+    [
+     -22,
+     5
+    ],
+    [
+     -8,
+     3
+    ],
+    [
+     -3,
+     9
+    ],
+    [
+     -7,
+     12
+    ],
+    [
+     -21,
+     12
+    ]
+   ],
+   "vertices": [
+    [
+     -22,
+     5,
+     -2.5
+    ],
+    [
+     -8,
+     3,
+     -2.5
+    ],
+    [
+     -3,
+     9,
+     -2.5
+    ],
+    [
+     -7,
+     12,
+     -2.5
+    ],
+    [
+     -21,
+     12,
+     -2.5
+    ],
+    [
+     -13,
+     8,
+     -1.8
+    ]
+   ],
+   "triangles": [
+    [
+     0,
+     1,
+     5
+    ],
+    [
+     1,
+     2,
+     5
+    ],
+    [
+     2,
+     3,
+     5
+    ],
+    [
+     3,
+     4,
+     5
+    ],
+    [
+     4,
+     0,
+     5
+    ]
+   ],
+   "mode": "replace-floor",
+   "note": "Replace the flat floor with a triangulated natural rise of0.7 m. Boundary vertices stay at\u22122.5 for continuous joins. This optional southern approach does not narrow the required northern bypass; no jump is needed."
+  }
+ ],
+ "kitchen": {
+  "volume": {
+   "rect": [
+    35,
+    40.5,
+    45,
+    50.5
+   ],
+   "floor": 0,
+   "ceiling": 2.7,
+   "roofTop": 2.9
+  },
+  "ports": [
+   {
+    "id": "cargo-east",
+    "opening": "kitchen-cargo-aperture",
+    "leaf": "kitchen-cargo-leaf",
+    "initial": "locked",
+    "after": "open",
+    "pack": true
+   },
+   {
+    "id": "service-west",
+    "opening": "kitchen-crawl-aperture",
+    "leaf": "kitchen-crawl-leaf",
+    "initial": "locked",
+    "after": "open",
+    "pack": false
+   }
+  ],
+  "actuator": {
+   "id": "kitchen-drive",
+   "at": [
+    34.6,
+    49.2,
+    1.1
+   ],
+   "approach": [
+    33.5,
+    49.2,
+    0
+   ],
+   "requiresTool": false,
+   "requiresKitchenAccess": false
+  },
+  "publicNodes": {
+   "west": [
+    33,
+    45.6,
+    0
+   ],
+   "east": [
+    47,
+    44,
+    0
+   ],
+   "north": [
+    40,
+    52,
+    0
+   ],
+   "south": [
+    40,
+    38.5,
+    0
+   ]
+  },
+  "interiorRelease": {
+   "at": [
+    35.125,
+    49.2,
+    1.1
+   ],
+   "yaw": 0.0,
+   "note": "interior emergency release on the west wall inside face"
+  },
+  "exteriorCrank": {
+   "at": [
+    34.875,
+    49.2,
+    1.1
+   ],
+   "yaw": 180.0,
+   "note": "exterior hand crank on the west wall outside face"
+  }
+ },
+ "newProps": [
+  {
+   "kind": "mineral-divider",
+   "at": [
+    -10,
+    18.5,
+    -2.5
+   ],
+   "size": [
+    6,
+    2,
+    2.4
+   ],
+   "yaw": 0,
+   "note": "Grotto mineral island: bounds x[-13,-7], y[17.5,19.5]; direct shelf approach passes south, 3 m dry alternative passes north/west. Vent is supported on its south face."
+  },
+  {
+   "kind": "harvest-shelf",
+   "at": [
+    -16,
+    16,
+    -2.5
+   ],
+   "size": [
+    2,
+    1.6,
+    0.65
+   ],
+   "yaw": 0,
+   "note": "Required fungal crown grows from this floor-founded mineral shelf; work from its east or west face. This is an interaction target, not a walking waypoint."
+  },
+  {
+   "kind": "vent-mouth",
+   "at": [
+    -10,
+    17.3,
+    -1.8
+   ],
+   "size": [
+    0.5,
+    0.5,
+    0.5
+   ],
+   "yaw": 0,
+   "note": "Wall-mounted mouth touches the mineral divider south face; jet/hiss points south across the direct approach. Visible brackets/pipe fix it to the shoulder. No floating mid-lane trap."
+  },
+  {
+   "kind": "chime-post",
+   "at": [
+    80.5,
+    48,
+    0
+   ],
+   "size": [
+    0.35,
+    0.35,
+    3.5
+   ],
+   "yaw": 0,
+   "note": "West support outside the CH-ch1 walked corridor: approximately2.3 m from its centreline before subtracting post half-width. Check pawn/pack swept clearance in blockout."
+  },
+  {
+   "kind": "chime-post",
+   "at": [
+    88,
+    48,
+    0
+   ],
+   "size": [
+    0.35,
+    0.35,
+    3.5
+   ],
+   "yaw": 0,
+   "note": "East support shifted to x88 to clear the S3-CH diagonal as well as CH-ch2; verify swept pack clearance after actual support construction."
+  },
+  {
+   "kind": "chime-beam",
+   "at": [
+    84.25,
+    48,
+    3.5
+   ],
+   "size": [
+    7.85,
+    0.35,
+    0.35
+   ],
+   "yaw": 0,
+   "note": "Supported crossbeam spans both post tops (x80.325..88.175) and contacts the original bar at z3.5; existing strands retain 2.1 m minimum height."
+  },
+  {
+   "kind": "bait-basin",
+   "at": [
+    59,
+    39,
+    -5
+   ],
+   "size": [
+    1.2,
+    1.2,
+    0.45
+   ],
+   "yaw": 0,
+   "note": "Grounded bait display, off the sump centreline; exact creature approach and retreat-clearance test required."
+  },
+  {
+   "kind": "kitchen-pendant",
+   "at": [
+    40,
+    44,
+    2.35
+   ],
+   "size": [
+    0.25,
+    0.25,
+    0.35
+   ],
+   "yaw": 0,
+   "note": "Ceiling-mounted warm fixture: its top at2.7 contacts the kitchen roof underside."
+  },
+  {
+   "kind": "kitchen-drive",
+   "at": [
+    34.6,
+    49.2,
+    0.7
+   ],
+   "size": [
+    0.45,
+    0.5,
+    0.8
+   ],
+   "yaw": 0,
+   "note": "Exterior hand crank on a bracket connected to the west wall atx34.875. Operation needs no tool, kitchen item or second player."
+  },
+  {
+   "kind": "drive-bracket",
+   "at": [
+    34.75,
+    49.2,
+    0.95
+   ],
+   "size": [
+    0.3,
+    0.18,
+    0.18
+   ],
+   "yaw": 0,
+   "note": "Bracket joins the crank mount to the west wall with visible physical contact."
+  },
+  {
+   "kind": "drive-shaft",
+   "at": [
+    35,
+    49.2,
+    1.1
+   ],
+   "size": [
+    0.6,
+    0.1,
+    0.1
+   ],
+   "yaw": 0,
+   "note": "Wall-bearing shaft carries the persistent release for both shutters. Mechanism animation is proposed work."
+  },
+  {
+   "kind": "spiral-bridge-post",
+   "at": [
+    -5.5,
+    38.5,
+    -2.5
+   ],
+   "size": [
+    0.3,
+    0.3,
+    2.3
+   ],
+   "yaw": 0,
+   "note": "Floor-founded bearing to the upper deck/landing underside at -0.2; outside the central walking trace."
+  },
+  {
+   "kind": "spiral-bridge-post",
+   "at": [
+    -9,
+    38.5,
+    -2.5
+   ],
+   "size": [
+    0.3,
+    0.3,
+    2.3
+   ],
+   "yaw": 0,
+   "note": "Floor-founded bearing to the upper deck/landing underside at -0.2; outside the central walking trace."
+  },
+  {
+   "kind": "overlook-post",
+   "at": [
+    -2.5,
+    18.5,
+    -2.5
+   ],
+   "size": [
+    0.25,
+    0.25,
+    2.1
+   ],
+   "yaw": 0,
+   "note": "Grounded inside the Grotto polygon; top -0.4 bears the overlook crossbeam."
+  },
+  {
+   "kind": "overlook-post",
+   "at": [
+    0.5,
+    18.5,
+    -2.5
+   ],
+   "size": [
+    0.25,
+    0.25,
+    2.1
+   ],
+   "yaw": 0,
+   "note": "Grounded inside the Grotto polygon; top -0.4 bears the overlook crossbeam."
+  },
+  {
+   "kind": "overlook-post",
+   "at": [
+    -2.5,
+    22.25,
+    -2.5
+   ],
+   "size": [
+    0.25,
+    0.25,
+    2.1
+   ],
+   "yaw": 0,
+   "note": "Grounded inside the Grotto polygon; top -0.4 bears the overlook crossbeam."
+  },
+  {
+   "kind": "overlook-post",
+   "at": [
+    -0.5,
+    22.25,
+    -2.5
+   ],
+   "size": [
+    0.25,
+    0.25,
+    2.1
+   ],
+   "yaw": 0,
+   "note": "Grounded inside the Grotto polygon; top -0.4 bears the overlook crossbeam."
+  },
+  {
+   "kind": "crank-lamp-bracket",
+   "at": [
+    34.85,
+    49.2,
+    1.7
+   ],
+   "size": [
+    0.15,
+    0.2,
+    0.2
+   ],
+   "yaw": 0,
+   "note": "Visible wall contact for the task lamp at34.75,49.2,1.8; bracket intersects the kitchen west wall rather than leaving the light floating."
+  },
+  {
+   "kind": "spiral-ceiling-fixture",
+   "at": [
+    -4.9,
+    43,
+    2.65
+   ],
+   "size": [
+    0.2,
+    0.2,
+    0.35
+   ],
+   "yaw": 0,
+   "note": "A short roof-mounted fixture for the service-well light; top3.0 contacts the room ceiling. Keep the source outside the central pier."
+  }
+ ],
+ "existingPropChanges": [
+  {
+   "sourceKind": "bench",
+   "sourceAt": [
+    36,
+    51,
+    0
+   ],
+   "action": "move",
+   "to": [
+    38,
+    47.9,
+    0
+   ],
+   "size": [
+    2.8,
+    1.2,
+    0.9
+   ],
+   "note": "Move and widen the cutting bench inside the kitchen for shared preparation."
+  },
+  {
+   "sourceKind": "station",
+   "sourceAt": [
+    41,
+    51.5,
+    0
+   ],
+   "action": "move",
+   "to": [
+    42,
+    48,
+    0
+   ],
+   "note": "Relocate the existing station inside the work enclosure; leave the public north aisle clear."
+  },
+  {
+   "sourceKind": "station",
+   "sourceAt": [
+    45,
+    51,
+    0
+   ],
+   "action": "move",
+   "to": [
+    44,
+    48.5,
+    0
+   ],
+   "note": "Relocate the existing station inside the work enclosure; leave the public north aisle clear."
+  }
+ ],
+ "existingLightChanges": [
+  {
+   "sourceAt": [
+    40,
+    44,
+    3
+   ],
+   "action": "move",
+   "to": [
+    40,
+    44,
+    2.4
+   ],
+   "note": "Move the existing hearth light below the new solid roof; keep it physically inside the workroom."
+  }
+ ],
+ "fixtures": [
+  {
+   "id": "find-drive",
+   "at": [
+    34.75,
+    49.2,
+    1.8
+   ],
+   "color": "#dfb67b",
+   "mount": "West-wall bracket"
+  },
+  {
+   "id": "spiral-depth",
+   "at": [
+    -4.9,
+    43,
+    2.7
+   ],
+   "color": "#a8bdca",
+   "mount": "Service-well roof at3.0"
+  },
+  {
+   "id": "grotto-roof-light",
+   "at": [
+    -1,
+    20,
+    4
+   ],
+   "color": "#aabfc9",
+   "mount": "Sky through the two aligned ceiling cuts"
+  },
+  {
+   "id": "crown-focus",
+   "at": [
+    -16,
+    16,
+    -1.7
+   ],
+   "color": "#b9c6a2",
+   "mount": "Fungal growth on the floor-founded harvest shelf"
+  }
+ ],
+ "retireNiches": [
+  "pump-trap",
+  "cellar-vents"
+ ],
+ "propChanges": [
+  {
+   "areaId": 1,
+   "kind": "plinth",
+   "from": [
+    33,
+    44,
+    0
+   ],
+   "set": {
+    "at": [
+     36.5,
+     36.4,
+     0
+    ],
+    "note": "Public chapel pack rest moved off R1 reunion and through-route; no pickup added."
+   }
+  },
+  {
+   "areaId": 3,
+   "kind": "statue",
+   "from": [
+    16,
+    55,
+    0
+   ],
+   "set": {
+    "at": [
+     8.5,
+     51.5,
+     0
+    ],
+    "note": "Split mourner at Court margin; clears north procession route."
+   }
+  },
+  {
+   "areaId": 4,
+   "kind": "stack",
+   "from": [
+    39,
+    64,
+    2.5
+   ],
+   "remove": true
+  },
+  {
+   "areaId": 4,
+   "kind": "stack",
+   "from": [
+    43,
+    67.5,
+    2.5
+   ],
+   "remove": true
+  },
+  {
+   "areaId": 4,
+   "kind": "stack",
+   "from": [
+    39,
+    71,
+    2.5
+   ],
+   "remove": true
+  },
+  {
+   "areaId": 11,
+   "kind": "vent-mouth",
+   "from": [
+    -10,
+    17.3,
+    -1.8
+   ],
+   "remove": true
+  },
+  {
+   "areaId": 11,
+   "kind": "mineral-divider",
+   "from": [
+    -10,
+    18.5,
+    -2.5
+   ],
+   "set": {
+    "note": "Mineral divider with north bypass; no live vent or bait rule."
+   }
+  },
+  {
+   "areaId": 11,
+   "kind": "harvest-shelf",
+   "from": [
+    -16,
+    16,
+    -2.5
+   ],
+   "set": {
+    "note": "Optional existing mushroom forage on dry apron; crown is static."
+   }
+  },
+  {
+   "areaId": 7,
+   "kind": "chimes",
+   "from": [
+    84,
+    48,
+    0
+   ],
+   "set": {
+    "note": "Abandoned bone instrument; spatial dressing, not an alarm.",
+    "at": [
+     84,
+     48,
+     0.2
+    ]
+   }
+  },
+  {
+   "areaId": 12,
+   "kind": "bait-basin",
+   "from": [
+    59,
+    39,
+    -5
+   ],
+   "set": {
+    "note": "Abandoned feeding bowl; no bait mechanic."
+   }
+  },
+  {
+   "areaId": 8,
+   "kind": "pillar",
+   "from": [
+    84,
+    13,
+    -2.5
+   ],
+   "set": {
+    "note": "the hand-wheel: releases the Drowned Gallery bars (P2); water stays cosmetic"
+   }
+  },
+  {
+   "areaId": 2,
+   "kind": "bench",
+   "from": [
+    38,
+    47.9,
+    0
+   ],
+   "remove": true
+  },
+  {
+   "areaId": 2,
+   "kind": "station",
+   "from": [
+    42,
+    48,
+    0
+   ],
+   "remove": true
+  },
+  {
+   "areaId": 7,
+   "kind": "stack",
+   "from": [
+    60,
+    38.25,
+    -2.2
+   ],
+   "remove": true
+  },
+  {
+   "areaId": 7,
+   "kind": "station",
+   "from": [
+    89,
+    57,
+    0
+   ],
+   "remove": true
+  }
+ ],
+ "twoPlayer": {
+  "contractVersion": 1,
+  "evidenceBoundary": "Authored static reservations; actual worn/filled-pack movement, item recovery and paired use require observed Phase 2 gates.",
+  "clearRectangles": [
+   {
+    "id": "PK-east",
+    "rectPlanM": [
+     45.8,
+     42.8,
+     48.2,
+     45.2
+    ],
+    "floorZ": 0
+   },
+   {
+    "id": "PK-receiving",
+    "rectPlanM": [
+     41.8,
+     42.8,
+     44.2,
+     45.2
+    ],
+    "floorZ": 0
+   },
+   {
+    "id": "closet-top-wait",
+    "rectPlanM": [
+     46.099999999999994,
+     31.8,
+     48.5,
+     34.2
+    ],
+    "floorZ": 0
+   },
+   {
+    "id": "closet-bottom-wait",
+    "rectPlanM": [
+     49.099999999999994,
+     28.8,
+     51.5,
+     31.2
+    ],
+    "floorZ": -5
+   },
+   {
+    "id": "chime-top-wait",
+    "rectPlanM": [
+     69.3,
+     50.3,
+     71.7,
+     52.7
+    ],
+    "floorZ": 5
+   },
+   {
+    "id": "chime-bottom-wait",
+    "rectPlanM": [
+     74.8,
+     44.8,
+     77.2,
+     47.2
+    ],
+    "floorZ": 0
+   },
+   {
+    "id": "R1-reunion",
+    "rectPlanM": [
+     31.8,
+     44.4,
+     34.2,
+     46.800000000000004
+    ],
+    "floorZ": 0
+   },
+   {
+    "id": "R2-reunion",
+    "rectPlanM": [
+     66.8,
+     47.3,
+     69.2,
+     49.7
+    ],
+    "floorZ": 0
+   },
+   {
+    "id": "R3-reunion",
+    "rectPlanM": [
+     63.8,
+     16.3,
+     66.2,
+     18.7
+    ],
+    "floorZ": -2.5
+   },
+   {
+    "id": "R5-ossuary",
+    "rectPlanM": [
+     44.8,
+     65.8,
+     47.2,
+     68.2
+    ],
+    "floorZ": 2.5
+   },
+   {
+    "id": "R5-bridge",
+    "rectPlanM": [
+     54.3,
+     58.8,
+     56.7,
+     61.2
+    ],
+    "floorZ": 2.5
+   },
+   {
+    "id": "R6-court",
+    "rectPlanM": [
+     12.8,
+     31.3,
+     15.2,
+     33.7
+    ],
+    "floorZ": 0
+   },
+   {
+    "id": "R6-cistern",
+    "rectPlanM": [
+     22.8,
+     19.3,
+     25.2,
+     21.7
+    ],
+    "floorZ": -2.5
+   },
+   {
+    "id": "grotto-east",
+    "rectPlanM": [
+     -1.7,
+     13.8,
+     0.7,
+     16.2
+    ],
+    "floorZ": -2.5
+   },
+   {
+    "id": "grotto-north",
+    "rectPlanM": [
+     -9.2,
+     22.3,
+     -6.8,
+     24.7
+    ],
+    "floorZ": -2.5
+   },
+   {
+    "id": "grotto-forage",
+    "rectPlanM": [
+     -11.2,
+     14.3,
+     -8.8,
+     16.7
+    ],
+    "floorZ": -2.5
+   },
+   {
+    "id": "P2-north",
+    "rectPlanM": [
+     55.3,
+     28.8,
+     57.7,
+     31.2
+    ],
+    "floorZ": -5
+   },
+   {
+    "id": "pit-west-cargo",
+    "rectPlanM": [
+     48.8,
+     45.8,
+     51.2,
+     48.2
+    ],
+    "floorZ": -5
+   },
+   {
+    "id": "pit-east-cargo",
+    "rectPlanM": [
+     68.8,
+     45.8,
+     71.2,
+     48.2
+    ],
+    "floorZ": -5
+   },
+   {
+    "id": "P2-south",
+    "rectPlanM": [
+     49.3,
+     24.3,
+     51.7,
+     26.7
+    ],
+    "floorZ": -5
+   }
+  ],
+  "clearHeightM": 2.2,
+  "ladderReservations": [
+   {
+    "ladder": "closet",
+    "framePlanM": [
+     50,
+     33,
+     -5
+    ],
+    "heightMetres": 5,
+    "sourceClimbStandoffMetres": 0.45,
+    "sourceTopExitDepthMetres": 0.7,
+    "topExitFeetPlanM": [
+     49.3,
+     33,
+     0
+    ],
+    "waitingRectIds": [
+     "closet-top-wait",
+     "closet-bottom-wait"
+    ],
+    "evidence": "sourceframe and conservative reservedvolume; actual loadedmount Phase2",
+    "historicalPhase1MountRectPlanM": [
+     48.7,
+     32.1,
+     51.05,
+     33.9
+    ],
+    "frontMountRectPlanM": [
+     50.05,
+     32.5,
+     50.9,
+     33.5
+    ],
+    "shaftRectPlanM": [
+     50.06,
+     32.61,
+     50.84,
+     33.39
+    ],
+    "topApproachRectPlanM": [
+     49.1,
+     32.5,
+     49.95,
+     33.5
+    ],
+    "amendment": "Phase 2 separates +X lower mount/shaft and -X upper exit. Original Phase 1 combined rectangle included the lower platform wall.",
+    "sourceEvidence": [
+     "Script/ECS/Ladder/Mars_Ladder_Feature.as:17-40",
+     "Script/ECS/Ladder/Mars_Ladder_Utils.as:18-34",
+     "Script/ECS/Ladder/Mars_Ladder_Utils.as:95-103",
+     "entry-20261021T020235Z/ladder-frame-probes.json (6/6 clear editor capsule probes; not loaded movement)."
+    ]
+   },
+   {
+    "ladder": "chime",
+    "framePlanM": [
+     74,
+     50,
+     0
+    ],
+    "heightMetres": 5,
+    "sourceClimbStandoffMetres": 0.45,
+    "sourceTopExitDepthMetres": 0.7,
+    "topExitFeetPlanM": [
+     73.3,
+     50,
+     5
+    ],
+    "waitingRectIds": [
+     "chime-top-wait",
+     "chime-bottom-wait"
+    ],
+    "evidence": "sourceframe and conservative reservedvolume; actual loadedmount Phase2",
+    "historicalPhase1MountRectPlanM": [
+     72.7,
+     49.1,
+     75.05,
+     50.9
+    ],
+    "frontMountRectPlanM": [
+     74.05,
+     49.5,
+     74.9,
+     50.5
+    ],
+    "shaftRectPlanM": [
+     74.06,
+     49.61,
+     74.84,
+     50.39
+    ],
+    "topApproachRectPlanM": [
+     73.1,
+     49.5,
+     73.95,
+     50.5
+    ],
+    "amendment": "Phase 2 separates +X lower mount/shaft and -X upper exit. Original Phase 1 combined rectangle included the lower platform wall.",
+    "sourceEvidence": [
+     "Script/ECS/Ladder/Mars_Ladder_Feature.as:17-40",
+     "Script/ECS/Ladder/Mars_Ladder_Utils.as:18-34",
+     "Script/ECS/Ladder/Mars_Ladder_Utils.as:95-103",
+     "entry-20261021T020235Z/ladder-frame-probes.json (6/6 clear editor capsule probes; not loaded movement)."
+    ]
+   }
+  ],
+  "stationReservations": [
+   {
+    "id": "Cutting",
+    "positionPlanM": [
+     37.8,
+     48,
+     0
+    ],
+    "yawDegrees": 0,
+    "tableFullFootprintM": [
+     0.8,
+     1.6
+    ],
+    "operatorCapsuleRectPlanM": [
+     36.58,
+     47.61,
+     37.36,
+     48.39
+    ],
+    "transverseWorkRectPlanM": [
+     36.58,
+     47.1,
+     37.36,
+     48.9
+    ],
+    "cameraPlanM": [
+     37.576351859999995,
+     48,
+     1.72480776
+    ],
+    "dockFramesPlanM": [
+     [
+      37.75,
+      47.38,
+      0.715
+     ],
+     [
+      37.75,
+      48.62,
+      0.715
+     ]
+    ]
+   },
+   {
+    "id": "Searing",
+    "positionPlanM": [
+     41.2,
+     48,
+     0
+    ],
+    "yawDegrees": 180,
+    "tableFullFootprintM": [
+     0.8,
+     1.6
+    ],
+    "operatorCapsuleRectPlanM": [
+     41.64,
+     47.61,
+     42.42,
+     48.39
+    ],
+    "transverseWorkRectPlanM": [
+     41.64,
+     47.1,
+     42.42,
+     48.9
+    ],
+    "cameraPlanM": [
+     41.724620050000006,
+     48,
+     1.7470676299999999
+    ],
+    "dockFramesPlanM": [
+     [
+      41.2,
+      48.54,
+      0.715
+     ],
+     [
+      41.45,
+      47.46,
+      0.715
+     ]
+    ]
+   }
+  ],
+  "kitchenTransit": {
+   "rectPlanM": [
+    35.5,
+    45,
+    44.5,
+    47
+   ],
+   "floorZ": 0
+  },
+  "structuralGroups": [
+   {
+    "areaId": 1,
+    "label": "Lamp Chapel / kitchen",
+    "batch": "A",
+    "geometryIds": [
+     "A1-soot-hood",
+     "A1-hood-flue",
+     "A1-utensil-rail",
+     "A1-drive-bracket-0",
+     "A1-drive-bracket-1",
+     "A1-drive-bracket-2"
+    ],
+    "checkpoint": {
+     "eyePlanM": [
+      43,
+      43,
+      1.35
+     ],
+     "targetPlanM": [
+      40,
+      44,
+      2.3
+     ]
+    },
+    "intention": "Both see shutter response from different sides, then reunite at cargo port. Receiving and working positions do not collide. Warmth offers psychological relief, not guaranteed immunity."
+   },
+   {
+    "areaId": 2,
+    "label": "The Well / rim",
+    "batch": "A",
+    "geometryIds": [
+     "A2-suspended-root",
+     "A2-abandoned-hoist",
+     "A2-bucket-frame-0",
+     "A2-bucket-frame-1",
+     "A2-bucket-crossbar",
+     "A2-hoist-roof-tie-0",
+     "A2-hoist-roof-tie-1"
+    ],
+    "checkpoint": {
+     "eyePlanM": [
+      50.7,
+      43,
+      1.35
+     ],
+     "targetPlanM": [
+      60,
+      44,
+      -3.8
+     ]
+    },
+    "intention": "Both can see the lower destination at once; one points out closet/bridge while the other follows it visually. No decor hides the quarry silhouette or landing."
+   },
+   {
+    "areaId": 3,
+    "label": "Charnel Court",
+    "batch": "A",
+    "geometryIds": [
+     "A3-procession-seat-0",
+     "A3-procession-back-0",
+     "A3-procession-seat-1",
+     "A3-procession-back-1",
+     "A3-procession-seat-2",
+     "A3-procession-back-2",
+     "A3-mourner-shard",
+     "A3-broken-service-wall"
+    ],
+    "checkpoint": {
+     "eyePlanM": [
+      24.5,
+      38,
+      1.35
+     ],
+     "targetPlanM": [
+      8,
+      43,
+      1
+     ]
+    },
+    "intention": "Scout follows rim sightline while carrier chooses stair; both rejoin at c1 without a compulsory hold. Two people identify arena, exit and alternative before entering."
+   },
+   {
+    "areaId": 4,
+    "label": "Ossuary",
+    "batch": "A",
+    "geometryIds": [
+     "A4-margin-stack-0",
+     "A4-margin-stack-1",
+     "A4-margin-stack-2",
+     "A4-margin-stack-3",
+     "A4-broken-stack",
+     "A4-vessel-table"
+    ],
+    "checkpoint": {
+     "eyePlanM": [
+      41,
+      64,
+      3.85
+     ],
+     "targetPlanM": [
+      36,
+      70,
+      4
+     ]
+    },
+    "intention": "One reads the one-person occupancy emblem while the other checks the opened route. P3 remains a latch, so leaving together is obvious."
+   },
+   {
+    "areaId": 5,
+    "label": "Bridge / Reliquary / Mourner",
+    "batch": "B",
+    "geometryIds": [
+     "B5-bridge-buttress-0",
+     "B5-bridge-buttress-1",
+     "B5-ordered-plinth-0",
+     "B5-ordered-plinth-1",
+     "B5-ordered-plinth-2",
+     "B5-disturbed-tomb"
+    ],
+    "checkpoint": {
+     "eyePlanM": [
+      59,
+      55,
+      3.85
+     ],
+     "targetPlanM": [
+      73,
+      70,
+      4
+     ]
+    },
+    "intention": "Reader can communicate while partner advances, or both read then travel together. Mourner payoff is visible through bars. No plate-holder job is fabricated."
+   },
+   {
+    "areaId": 6,
+    "label": "Upper galleries / key / Chime ladder",
+    "batch": "B",
+    "geometryIds": [
+     "B6-repair-beam-0",
+     "B6-repair-beam-1",
+     "B6-repair-beam-2",
+     "B6-repair-beam-3",
+     "B6-gallery-repair",
+     "B6-ceiling-tie-0--1",
+     "B6-ceiling-tie-0-1",
+     "B6-ceiling-tie-1--1",
+     "B6-ceiling-tie-1-1",
+     "B6-ceiling-tie-2--1",
+     "B6-ceiling-tie-2-1",
+     "B6-ceiling-tie-3--1",
+     "B6-ceiling-tie-3-1"
+    ],
+    "checkpoint": {
+     "eyePlanM": [
+      70.5,
+      51,
+      6.35
+     ],
+     "targetPlanM": [
+      70.7,
+      44.5,
+      7.5
+     ]
+    },
+    "intention": "One locates key/ladder release while carrier waits in a useful overlook rather than blocking a mount. Both test loaded ascent/descent and item retrieval."
+   },
+   {
+    "areaId": 7,
+    "label": "Chime Hall / Bellkeeper",
+    "batch": "B",
+    "geometryIds": [
+     "B7-bone-instrument-left",
+     "B7-bone-instrument-right",
+     "B7-instrument-crown",
+     "B7-perimeter-strand-0",
+     "B7-perimeter-strand-1",
+     "B7-perimeter-strand-2",
+     "B7-strand-roof-tie-0",
+     "B7-strand-roof-tie-1",
+     "B7-strand-roof-tie-2"
+    ],
+    "checkpoint": {
+     "eyePlanM": [
+      84,
+      41,
+      1.35
+     ],
+     "targetPlanM": [
+      84.2,
+      48,
+      4
+     ]
+    },
+    "intention": "Reader/operator swap voluntarily; solo player can memorize and walk. Partner can see the set dials and stakes without receiving correctness hints."
+   },
+   {
+    "areaId": 8,
+    "label": "Pump / Salt Cellar / Sluice",
+    "batch": "B",
+    "geometryIds": [
+     "B8-pump-crosshead",
+     "B8-drying-rack-0",
+     "B8-rack-rail-0",
+     "B8-drying-rack-1",
+     "B8-rack-rail-1",
+     "B8-split-pipe-0",
+     "B8-split-pipe-1",
+     "B8-maintenance-alcove",
+     "B8-pipe-0-upper-skin",
+     "B8-pipe-0-side--1",
+     "B8-pipe-0-side-1",
+     "B8-pipe-0-rim--1-side--1",
+     "B8-pipe-0-rim--1-side-1",
+     "B8-pipe-0-rim--1-z--0.195",
+     "B8-pipe-0-rim--1-z-0.150",
+     "B8-pipe-0-rim-1-side--1",
+     "B8-pipe-0-rim-1-side-1",
+     "B8-pipe-0-rim-1-z--0.195",
+     "B8-pipe-0-rim-1-z-0.150",
+     "B8-pipe-saddle-0-0",
+     "B8-pipe-hanger-0-0--1",
+     "B8-pipe-hanger-0-0-1",
+     "B8-pipe-saddle-0-1",
+     "B8-pipe-hanger-0-1--1",
+     "B8-pipe-hanger-0-1-1",
+     "B8-pipe-1-upper-skin",
+     "B8-pipe-1-side--1",
+     "B8-pipe-1-side-1",
+     "B8-pipe-1-rim--1-side--1",
+     "B8-pipe-1-rim--1-side-1",
+     "B8-pipe-1-rim--1-z--0.195",
+     "B8-pipe-1-rim--1-z-0.150",
+     "B8-pipe-1-rim-1-side--1",
+     "B8-pipe-1-rim-1-side-1",
+     "B8-pipe-1-rim-1-z--0.195",
+     "B8-pipe-1-rim-1-z-0.150",
+     "B8-pipe-saddle-1-0",
+     "B8-pipe-hanger-1-0--1",
+     "B8-pipe-hanger-1-0-1",
+     "B8-pipe-saddle-1-1",
+     "B8-pipe-hanger-1-1--1",
+     "B8-pipe-hanger-1-1-1",
+     "B8-rack-0-rear-rail",
+     "B8-rack-0-leg--1--1",
+     "B8-rack-0-leg--1-1",
+     "B8-rack-0-leg-1--1",
+     "B8-rack-0-leg-1-1",
+     "B8-rack-0-slat-0-0",
+     "B8-rack-0-slat-0-1",
+     "B8-rack-0-slat-0-2",
+     "B8-rack-0-slat-0-3",
+     "B8-rack-0-slat-0-4",
+     "B8-rack-0-slat-0-5",
+     "B8-rack-0-slat-0-6",
+     "B8-rack-0-slat-0-7",
+     "B8-rack-0-slat-0-8",
+     "B8-rack-0-slat-0-9",
+     "B8-rack-0-slat-0-10",
+     "B8-rack-0-slat-0-11",
+     "B8-rack-0-slat-0-12",
+     "B8-rack-0-slat-0-13",
+     "B8-rack-0-slat-1-0",
+     "B8-rack-0-slat-1-1",
+     "B8-rack-0-slat-1-2",
+     "B8-rack-0-slat-1-3",
+     "B8-rack-0-slat-1-4",
+     "B8-rack-0-slat-1-5",
+     "B8-rack-0-slat-1-6",
+     "B8-rack-0-slat-1-7",
+     "B8-rack-0-slat-1-8",
+     "B8-rack-0-slat-1-9",
+     "B8-rack-0-slat-1-10",
+     "B8-rack-0-slat-1-11",
+     "B8-rack-0-slat-1-12",
+     "B8-rack-0-slat-1-13",
+     "B8-rack-1-rear-rail",
+     "B8-rack-1-leg--1--1",
+     "B8-rack-1-leg--1-1",
+     "B8-rack-1-leg-1--1",
+     "B8-rack-1-leg-1-1",
+     "B8-rack-1-slat-0-0",
+     "B8-rack-1-slat-0-1",
+     "B8-rack-1-slat-0-2",
+     "B8-rack-1-slat-0-3",
+     "B8-rack-1-slat-0-4",
+     "B8-rack-1-slat-0-5",
+     "B8-rack-1-slat-0-6",
+     "B8-rack-1-slat-0-7",
+     "B8-rack-1-slat-0-8",
+     "B8-rack-1-slat-0-9",
+     "B8-rack-1-slat-0-10",
+     "B8-rack-1-slat-0-11",
+     "B8-rack-1-slat-0-12",
+     "B8-rack-1-slat-0-13",
+     "B8-rack-1-slat-1-0",
+     "B8-rack-1-slat-1-1",
+     "B8-rack-1-slat-1-2",
+     "B8-rack-1-slat-1-3",
+     "B8-rack-1-slat-1-4",
+     "B8-rack-1-slat-1-5",
+     "B8-rack-1-slat-1-6",
+     "B8-rack-1-slat-1-7",
+     "B8-rack-1-slat-1-8",
+     "B8-rack-1-slat-1-9",
+     "B8-rack-1-slat-1-10",
+     "B8-rack-1-slat-1-11",
+     "B8-rack-1-slat-1-12",
+     "B8-rack-1-slat-1-13",
+     "B8-rack-0-lower-rail--1",
+     "B8-rack-0-lower-rail-1",
+     "B8-rack-1-lower-rail--1",
+     "B8-rack-1-lower-rail-1"
+    ],
+    "checkpoint": {
+     "eyePlanM": [
+      52,
+      20,
+      -1.15
+     ],
+     "targetPlanM": [
+      47,
+      12,
+      0
+     ]
+    },
+    "intention": "One operates while the other handles optional forage/route inspection; both can leave immediately after latch. Players identify which remote bars changed."
+   },
+   {
+    "areaId": 9,
+    "label": "Cistern / Drowned Gallery",
+    "batch": "C",
+    "geometryIds": [
+     "C9-cistern-rib-0",
+     "C9-cistern-rib-1",
+     "C9-cistern-rib-crown",
+     "C9-dry-foot-ledge",
+     "C9-P2-south-dry-pad",
+     "C9-P2-pad-step-0",
+     "C9-P2-gate-apron",
+     "C9-cistern-return-bridge",
+     "C9-bridge-guard--1",
+     "C9-bridge-guard-1"
+    ],
+    "checkpoint": {
+     "eyePlanM": [
+      35,
+      19,
+      -1.15
+     ],
+     "targetPlanM": [
+      27,
+      10,
+      0
+     ]
+    },
+    "intention": "Pair chooses lower route for approach/return reasons and can exchange cargo outside the grate. They do not wait for nonexistent water level changes."
+   },
+   {
+    "areaId": 10,
+    "label": "Service spiral / overlook",
+    "batch": "C",
+    "geometryIds": [
+     "C10-outer-mineral-spine",
+     "C10-outer-mineral-shard",
+     "C10-inspection-lip-west",
+     "C10-inspection-lip-east",
+     "C10-inspection-lip-south"
+    ],
+    "checkpoint": {
+     "eyePlanM": [
+      -8,
+      39.4,
+      1.35
+     ],
+     "targetPlanM": [
+      -12.9,
+      43,
+      0
+     ]
+    },
+    "intention": "Carrier takes spiral while scout may inspect overlook; reunion is gN staging. A player can decline the drop and still reach destination."
+   },
+   {
+    "areaId": 11,
+    "label": "Root Grotto / Listener recess",
+    "batch": "C",
+    "geometryIds": [
+     "C11-leaning-root-foot",
+     "C11-leaning-root-shoulder",
+     "C11-root-crown",
+     "C11-tube-0-side--1",
+     "C11-tube-0-side-1",
+     "C11-tube-0-top",
+     "C11-tube-1-side--1",
+     "C11-tube-1-side-1",
+     "C11-tube-1-top",
+     "C11-tube-2-side--1",
+     "C11-tube-2-side-1",
+     "C11-tube-2-top"
+    ],
+    "checkpoint": {
+     "eyePlanM": [
+      0,
+      15,
+      -1.15
+     ],
+     "targetPlanM": [
+      -17,
+      16.8,
+      0.2
+     ]
+    },
+    "intention": "One inspects shelf/recess while other stages pack and checks exit, then roles swap. Long Court/spiral path earns information/loaded access; Cistern path earns direct low access."
+   },
+   {
+    "areaId": 12,
+    "label": "Pit / Vault / closet",
+    "batch": "C",
+    "geometryIds": [
+     "C12-feeding-scar-0",
+     "C12-feeding-scar-1",
+     "C12-closet-repair-header",
+     "C12-closet-repair-post",
+     "C12-vault-fuel-rest-0",
+     "C12-vault-fuel-rest-1",
+     "C12-closet-repair-return-joist"
+    ],
+    "checkpoint": {
+     "eyePlanM": [
+      54,
+      47,
+      -3.65
+     ],
+     "targetPlanM": [
+      48,
+      33,
+      -3
+     ]
+    },
+    "intention": "One stages while other inspects/handles existing quarry resources, then swap. Loaded exit through closet/SC2 visibly repays exploration. Drop tests never require a revive-system change."
+   }
+  ],
+  "viewPositions": [
+   {
+    "id": "well-west-reader",
+    "feetPlanM": [
+     50.6,
+     41.8,
+     0
+    ]
+   },
+   {
+    "id": "well-west-partner",
+    "feetPlanM": [
+     50.6,
+     43,
+     0
+    ]
+   },
+   {
+    "id": "bridge-reader",
+    "feetPlanM": [
+     58.2,
+     54.8,
+     2.5
+    ]
+   },
+   {
+    "id": "bridge-partner",
+    "feetPlanM": [
+     59.4,
+     54.8,
+     2.5
+    ]
+   }
+  ],
+  "drops": [
+   {
+    "id": "gallery-west",
+    "source": "gW-drop",
+    "fromPlanM": [
+     48,
+     47,
+     5
+    ],
+    "landingRectPlanM": [
+     46.8,
+     46.3,
+     48.2,
+     47.7
+    ],
+    "floorZ": 0,
+    "exitPlanM": [
+     47,
+     44,
+     0
+    ],
+    "exitNode": "aE",
+    "visibleExit": true
+   },
+   {
+    "id": "gallery-east",
+    "source": "gE-drop",
+    "fromPlanM": [
+     74,
+     53,
+     5
+    ],
+    "landingRectPlanM": [
+     74.2,
+     52.3,
+     75.6,
+     53.7
+    ],
+    "floorZ": 0,
+    "exitPlanM": [
+     84,
+     48,
+     0
+    ],
+    "exitNode": "CH",
+    "visibleExit": true
+   },
+   {
+    "id": "inspection-opening",
+    "source": "overlook-floor-break",
+    "fromPlanM": [
+     -1.5,
+     19.7,
+     0
+    ],
+    "landingRectPlanM": [
+     -2.2,
+     19,
+     -0.8,
+     20.4
+    ],
+    "floorZ": -2.5,
+    "exitPlanM": [
+     0,
+     15,
+     -2.5
+    ],
+    "exitNode": "gE",
+    "visibleExit": true
+   },
+   {
+    "id": "kitchen-roof-recovery",
+    "source": "roof-recovery-ledge",
+    "fromPlanM": [
+     44,
+     50.4,
+     2.9
+    ],
+    "landingRectPlanM": [
+     43.3,
+     50.7,
+     44.7,
+     51.7
+    ],
+    "floorZ": 1.45,
+    "exitPlanM": [
+     44,
+     52.25,
+     0
+    ],
+    "exitNode": "aN",
+    "visibleExit": true,
+    "historicalExitPlanM": [
+     44,
+     52,
+     0
+    ],
+    "exitAmendment": "Phase 2 stronger emitted-solid recovery gate: original goal was 0.175 m from the retained ledge, inside the 0.39 m chef radius. Move only the recorded floor goal +0.25 m Y; root editor probe confirms floor 0 and clear 0.39 m radius / 2.2 m height."
+   }
+  ]
+ },
+ "localRooms": [
+  {
+   "id": "v7-bucket-recess",
+   "label": "",
+   "rect": [
+    48.2,
+    47.5,
+    50.6,
+    50
+   ],
+   "z": 0,
+   "note": "Local safe hoist-bucket recess between public aisle and Well rim; no graph node or route obligation."
+  }
+ ],
+ "clearanceCuts": [
+  {
+   "id": "C9-P2-pad-ceiling",
+   "areaId": 9,
+   "rect": [
+    49.3,
+    24.3,
+    51.7,
+    26.7
+   ],
+   "zMin": -2.95,
+   "zMax": -2.75,
+   "note": "Local 0.2 m underside recess gives raised pad 2.25 m headroom; preserves the floor above."
+  },
+  {
+   "id": "C9-P2-aperture",
+   "areaId": 9,
+   "rect": [
+    50.333333,
+    27.45,
+    52.333333,
+    28.05
+   ],
+   "zMin": -5,
+   "zMax": -2.75,
+   "note": "Exact 2 m gate throat around unchanged P2 gate frame, correcting cell-aligned rock intrusion only."
+  },
+  {
+   "id": "C9-underpass-underside-recess",
+   "areaId": 9,
+   "rect": [
+    45,
+    19.5,
+    51.7,
+    26.7
+   ],
+   "zMin": -2.95,
+   "zMax": -2.75,
+   "floorTopZ": -2.5,
+   "note": "Only lower0.15m of existing0.4m Pump slab: preserve all top\u22122.5 support and leave0.25m cap, giving lower\u22125 route2.25m headroom."
+  }
+ ],
+ "rampOverrides": [
+  {
+   "link": [
+    "ci1",
+    "dg"
+   ],
+   "areaId": 9,
+   "descentEnd": [
+    45.0,
+    20.2
+   ],
+   "roofZ": -5.5,
+   "note": "Local descent reaches lower floor before upper PU-p1 bridge; preserve both graph routes.",
+   "bridgeId": "C9-cistern-return-bridge",
+   "start": [
+    41.25,
+    17.95
+   ]
+  }
+ ],
+ "entryKitPan": true,
+ "localFixtures": [
+  {
+   "id": "P3 fixed Mourner tallow",
+   "cls": "Mars_WorldItem_Tallow_EntityScript",
+   "at": [
+    79.65,
+    77.2,
+    3.35
+   ],
+   "areaId": 5
+  },
+  {
+   "id": "P1 fixed Vault tallow 1",
+   "cls": "Mars_WorldItem_Tallow_EntityScript",
+   "at": [
+    76,
+    61,
+    -4.2
+   ],
+   "areaId": 12
+  },
+  {
+   "id": "P1 fixed Vault tallow 2",
+   "cls": "Mars_WorldItem_Tallow_EntityScript",
+   "at": [
+    76,
+    57.8,
+    -4.2
+   ],
+   "areaId": 12
+  },
+  {
+   "id": "Grotto optional existing mushroom forage",
+   "cls": "Mars_Expedition_MushroomBed_EntityScript",
+   "at": [
+    -12.3,
+    15.5,
+    -2.5
+   ],
+   "yaw": 0,
+   "areaId": 11
+  },
+  {
+   "id": "Kitchen cutting station",
+   "cls": "Mars_CuttingStation_EntityScript",
+   "at": [
+    37.8,
+    48,
+    0
+   ],
+   "yaw": 0,
+   "areaId": 2
+  },
+  {
+   "id": "Kitchen searing station",
+   "cls": "Mars_SearingStation_EntityScript",
+   "at": [
+    41.2,
+    48,
+    0
+   ],
+   "yaw": 180,
+   "areaId": 2
+  },
+  {
+   "id": "Kitchen receiving large platter",
+   "cls": "Mars_Platter_Large_EntityScript",
+   "at": [
+    42,
+    42,
+    0.75
+   ],
+   "yaw": 0,
+   "areaId": 2
+  },
+  {
+   "id": "Kitchen receiving small platter",
+   "cls": "Mars_Platter_EntityScript",
+   "at": [
+    43,
+    42,
+    0.75
+   ],
+   "yaw": 0,
+   "areaId": 2
+  }
+ ],
+ "wayfindingLabels": [
+  {
+   "id": "PK-exterior",
+   "at": [
+    34.72,
+    49.2,
+    1.72
+   ],
+   "yaw": 180,
+   "text": "SHUTTER DRIVE",
+   "sizeCm": 12
+  },
+  {
+   "id": "P2-wheel",
+   "at": [
+    84,
+    10.14,
+    -0.55
+   ],
+   "yaw": 90,
+   "text": "SLUICE BARS",
+   "sizeCm": 13
+  },
+  {
+   "id": "P2-bars-south",
+   "at": [
+    52.65,
+    27.37,
+    -2.95
+   ],
+   "yaw": -90,
+   "text": "SLUICE BARS",
+   "sizeCm": 11
+  },
+  {
+   "id": "P2-bars-north",
+   "at": [
+    52.65,
+    28.13,
+    -2.95
+   ],
+   "yaw": 90,
+   "text": "SLUICE BARS",
+   "sizeCm": 11
+  },
+  {
+   "id": "P3-plate",
+   "at": [
+    45.5,
+    72.72,
+    4.12
+   ],
+   "yaw": -90,
+   "text": "ONE CHEF OR PACK\nLATCHES MOURNER",
+   "sizeCm": 8
+  },
+  {
+   "id": "P3-Mourner",
+   "at": [
+    77.3,
+    73.81,
+    4.12
+   ],
+   "yaw": -90,
+   "text": "ONE WEIGHT\nLATCHED OPEN",
+   "sizeCm": 8
+  },
+  {
+   "id": "P4-stakes",
+   "at": [
+    91.4,
+    57.72,
+    1.7
+   ],
+   "yaw": -90,
+   "text": "WRONG RINGS LOSE TOOLS\nTHE LAST RATION REMAINS",
+   "sizeCm": 7,
+   "textMaterial": "/Engine/EngineMaterials/UnlitText.UnlitText",
+   "color": [
+    32,
+    24,
+    16,
+    255
+   ]
+  }
+ ],
+ "bellkeeper": {
+  "phrase": [
+   "Diamond",
+   "Triangle",
+   "Cross"
+  ],
+  "startGlyphs": [
+   "Square",
+   "Square",
+   "Square"
+  ],
+  "panel": {
+   "at": [
+    87,
+    57.98,
+    1.2
+   ],
+   "pitch": -90,
+   "yaw": -90
+  },
+  "chain": {
+   "at": [
+    91.4,
+    57.98,
+    2.3
+   ],
+   "yaw": -90
+  },
+  "bellAt": [
+   91.4,
+   57.75,
+   2.45
+  ],
+  "vent": {
+   "at": [
+    91.4,
+    57.6,
+    -0.35
+   ],
+   "yaw": -75,
+   "pushImpulseLocalCmS": [
+    900,
+    0,
+    250
+   ],
+   "triggerRectPlanM": [
+    91.09127538301513,
+    54.30891715520507,
+    92.64047317935396,
+    57.413749870154284
+   ],
+   "landingRectPlanM": [
+    91.15,
+    50.3,
+    93.55,
+    54.5
+   ],
+   "triggerPolygonPlanM": [
+    [
+     91.09127538301513,
+     57.20669463407227
+    ],
+    [
+     91.8677325183227,
+     54.30891715520507
+    ],
+    [
+     92.64047317935396,
+     54.515972391287086
+    ],
+    [
+     91.8640160440464,
+     57.413749870154284
+    ]
+   ],
+   "loadedSweep": {
+    "startPlanM": [
+     91.8,
+     56.6,
+     0
+    ],
+    "endPlanM": [
+     93.0,
+     52.12,
+     0
+    ],
+    "radiusM": 0.75,
+    "heightM": 2.1,
+    "provenance": "Conservative reservation around body/pack; measured resting native pack 86.13 x 116.26 x 120.99 cm and capsule radius39/halfheight75 cm. Not a trajectory prediction."
+   }
+  },
+  "clue": {
+   "at": [
+    60,
+    38.25,
+    -2.2
+   ],
+   "pitch": -90,
+   "yaw": 90,
+   "glyphSizeCm": 60,
+   "readerAt": [
+    60,
+    53.6,
+    2.5
+   ]
+  },
+  "operatorAt": [
+   87,
+   56.6,
+   0
+  ],
+  "chainStandAt": [
+   91.8,
+   56.6,
+   0
+  ],
+  "partnerStageRectPlanM": [
+   88.2,
+   55.3,
+   90.6,
+   57.7
+  ],
+  "rewards": [
+   {
+    "definition": "Mars_ItemDef_Cleaver",
+    "at": [
+     87.4,
+     60.6,
+     0
+    ]
+   },
+   {
+    "definition": "Mars_ItemDef_Tenderizer",
+    "at": [
+     89,
+     61.2,
+     0
+    ]
+   },
+   {
+    "definition": "Mars_ItemDef_Ration",
+    "at": [
+     90.6,
+     60.6,
+     0
+    ]
+   }
+  ],
+  "stakesCue": "WRONG RINGS LOSE TOOLS\nTHE LAST RATION REMAINS",
+  "proofBoundary": "Authored envelopes only; normal-camera readability, loaded-chef clearances, actual push trajectory and audio are pending PIE.",
+  "taskLights": [
+   {
+    "at": [
+     89.9,
+     56.2,
+     2.6
+    ],
+    "kind": "task"
+   },
+   {
+    "at": [
+     60,
+     39.0,
+     -1.0
+    ],
+    "kind": "task",
+    "scale": 0.03
+   }
+  ]
+ },
+ "presentation": {
+  "batch": "A",
+  "materials": [
+   {
+    "id": "Limestone",
+    "path": "/Game/Mars/Environment/Warrens/Materials/Limestone_Mars_MI",
+    "parent": "/CkFoundation/CkUsf/GeneratedLooks/M_CkUsf_Look_Displace",
+    "vectors": {
+     "BaseColor": [
+      0.3272727272727272,
+      0.2909090909090909,
+      0.21818181818181814
+     ]
+    },
+    "scalars": {
+     "Amplitude": 0.0,
+     "Frequency": 0.0,
+     "Speed": 0.0
+    }
+   },
+   {
+    "id": "Bone",
+    "path": "/Game/Mars/Environment/Warrens/Materials/Bone_Mars_MI",
+    "parent": "/CkFoundation/CkUsf/GeneratedLooks/M_CkUsf_Look_Displace",
+    "vectors": {
+     "BaseColor": [
+      0.6,
+      0.5272727272727272,
+      0.3818181818181818
+     ]
+    },
+    "scalars": {
+     "Amplitude": 0.0,
+     "Frequency": 0.0,
+     "Speed": 0.0
+    }
+   },
+   {
+    "id": "SootTimber",
+    "path": "/Game/Mars/Environment/Warrens/Materials/SootTimber_Mars_MI",
+    "parent": "/CkFoundation/CkUsf/GeneratedLooks/M_CkUsf_Look_Displace",
+    "vectors": {
+     "BaseColor": [
+      0.06363636363636364,
+      0.045454545454545456,
+      0.03272727272727272
+     ]
+    },
+    "scalars": {
+     "Amplitude": 0.0,
+     "Frequency": 0.0,
+     "Speed": 0.0
+    }
+   },
+   {
+    "id": "DarkIron",
+    "path": "/Game/Mars/Environment/Warrens/Materials/DarkIron_Mars_MI",
+    "parent": "/CkFoundation/CkUsf/GeneratedLooks/M_CkUsf_Look_Displace",
+    "vectors": {
+     "BaseColor": [
+      0.09999999999999999,
+      0.11818181818181818,
+      0.1272727272727273
+     ]
+    },
+    "scalars": {
+     "Amplitude": 0.0,
+     "Frequency": 0.0,
+     "Speed": 0.0
+    }
+   },
+   {
+    "id": "Mineral",
+    "path": "/Game/Mars/Environment/Warrens/Materials/Mineral_Mars_MI",
+    "parent": "/CkFoundation/CkUsf/GeneratedLooks/M_CkUsf_Look_Displace",
+    "vectors": {
+     "BaseColor": [
+      0.13636363636363635,
+      0.20909090909090908,
+      0.23636363636363636
+     ]
+    },
+    "scalars": {
+     "Amplitude": 0.0,
+     "Frequency": 0.0,
+     "Speed": 0.0
+    }
+   },
+   {
+    "id": "RootWood",
+    "path": "/Game/Mars/Environment/Warrens/Materials/RootWood_Mars_MI",
+    "parent": "/CkFoundation/CkUsf/GeneratedLooks/M_CkUsf_Look_Displace",
+    "vectors": {
+     "BaseColor": [
+      0.2545454545454546,
+      0.13636363636363635,
+      0.05818181818181818
+     ]
+    },
+    "scalars": {
+     "Amplitude": 0.0,
+     "Frequency": 0.0,
+     "Speed": 0.0
+    }
+   },
+   {
+    "id": "DarkMortar",
+    "path": "/Game/Mars/Environment/Warrens/Materials/DarkMortar_Mars_MI",
+    "parent": "/CkFoundation/CkUsf/GeneratedLooks/M_CkUsf_Look_Displace",
+    "vectors": {
+     "BaseColor": [
+      0.06363636363636364,
+      0.07454545454545454,
+      0.07999999999999999
+     ]
+    },
+    "scalars": {
+     "Amplitude": 0.0,
+     "Frequency": 0.0,
+     "Speed": 0.0
+    }
+   },
+   {
+    "id": "NeutralFloor",
+    "path": "/Game/Mars/Environment/Warrens/Materials/NeutralFloor_Mars_MI",
+    "parent": "/CkFoundation/CkUsf/GeneratedLooks/M_CkUsf_Look_Displace",
+    "vectors": {
+     "BaseColor": [
+      0.1909090909090909,
+      0.1909090909090909,
+      0.1727272727272727
+     ]
+    },
+    "scalars": {
+     "Amplitude": 0.0,
+     "Frequency": 0.0,
+     "Speed": 0.0
+    }
+   },
+   {
+    "id": "NeutralWall",
+    "path": "/Game/Mars/Environment/Warrens/Materials/NeutralWall_Mars_MI",
+    "parent": "/CkFoundation/CkUsf/GeneratedLooks/M_CkUsf_Look_Displace",
+    "vectors": {
+     "BaseColor": [
+      0.2909090909090909,
+      0.2727272727272727,
+      0.23636363636363636
+     ]
+    },
+    "scalars": {
+     "Amplitude": 0.0,
+     "Frequency": 0.0,
+     "Speed": 0.0
+    }
+   },
+   {
+    "id": "NeutralRoof",
+    "path": "/Game/Mars/Environment/Warrens/Materials/NeutralRoof_Mars_MI",
+    "parent": "/CkFoundation/CkUsf/GeneratedLooks/M_CkUsf_Look_Displace",
+    "vectors": {
+     "BaseColor": [
+      0.1272727272727273,
+      0.13636363636363635,
+      0.13636363636363635
+     ]
+    },
+    "scalars": {
+     "Amplitude": 0.0,
+     "Frequency": 0.0,
+     "Speed": 0.0
+    }
+   }
+  ],
+  "regions": [
+   {
+    "id": "A-kitchen",
+    "areaId": 1,
+    "bounds": [
+     30.75,
+     34.75,
+     -0.41,
+     49.0,
+     53.25,
+     4.1
+    ],
+    "kinds": [
+     "floor",
+     "wall",
+     "roof",
+     "ramp",
+     "gallery"
+    ],
+    "material": "/Game/Mars/Environment/Warrens/Materials/Limestone_Mars_MI"
+   },
+   {
+    "id": "A-well",
+    "areaId": 2,
+    "bounds": [
+     49.25,
+     34.75,
+     -0.41,
+     70.75,
+     53.25,
+     9.5
+    ],
+    "kinds": [
+     "floor",
+     "wall",
+     "roof",
+     "ramp",
+     "gallery",
+     "root",
+     "pier"
+    ],
+    "material": "/Game/Mars/Environment/Warrens/Materials/Mineral_Mars_MI"
+   },
+   {
+    "id": "A-court",
+    "areaId": 3,
+    "bounds": [
+     5.5,
+     29.5,
+     -1.91,
+     28.5,
+     56.5,
+     6.5
+    ],
+    "kinds": [
+     "floor",
+     "wall",
+     "roof",
+     "ramp",
+     "gallery"
+    ],
+    "material": "/Game/Mars/Environment/Warrens/Materials/Limestone_Mars_MI"
+   },
+   {
+    "id": "A-ossuary",
+    "areaId": 4,
+    "bounds": [
+     33.5,
+     60.5,
+     2.09,
+     48.5,
+     73.5,
+     7.0
+    ],
+    "kinds": [
+     "floor",
+     "wall",
+     "roof",
+     "ramp",
+     "gallery"
+    ],
+    "material": "/Game/Mars/Environment/Warrens/Materials/DarkMortar_Mars_MI"
+   }
+  ],
+  "sourceOverrides": [
+   {
+    "sourceId": "A1-soot-hood",
+    "material": "/Game/Mars/Environment/Warrens/Materials/SootTimber_Mars_MI"
+   },
+   {
+    "sourceId": "A1-hood-flue",
+    "material": "/Game/Mars/Environment/Warrens/Materials/SootTimber_Mars_MI"
+   },
+   {
+    "sourceId": "A1-utensil-rail",
+    "material": "/Game/Mars/Environment/Warrens/Materials/DarkIron_Mars_MI"
+   },
+   {
+    "sourceId": "A1-drive-bracket-0",
+    "material": "/Game/Mars/Environment/Warrens/Materials/DarkIron_Mars_MI"
+   },
+   {
+    "sourceId": "A1-drive-bracket-1",
+    "material": "/Game/Mars/Environment/Warrens/Materials/DarkIron_Mars_MI"
+   },
+   {
+    "sourceId": "A1-drive-bracket-2",
+    "material": "/Game/Mars/Environment/Warrens/Materials/DarkIron_Mars_MI"
+   },
+   {
+    "sourceId": "A2-suspended-root",
+    "material": "/Game/Mars/Environment/Warrens/Materials/RootWood_Mars_MI"
+   },
+   {
+    "sourceId": "A2-abandoned-hoist",
+    "material": "/Game/Mars/Environment/Warrens/Materials/SootTimber_Mars_MI"
+   },
+   {
+    "sourceId": "A2-bucket-frame-0",
+    "material": "/Game/Mars/Environment/Warrens/Materials/DarkIron_Mars_MI"
+   },
+   {
+    "sourceId": "A2-bucket-frame-1",
+    "material": "/Game/Mars/Environment/Warrens/Materials/DarkIron_Mars_MI"
+   },
+   {
+    "sourceId": "A2-bucket-crossbar",
+    "material": "/Game/Mars/Environment/Warrens/Materials/DarkIron_Mars_MI"
+   },
+   {
+    "sourceId": "A3-procession-seat-0",
+    "material": "/Game/Mars/Environment/Warrens/Materials/Limestone_Mars_MI"
+   },
+   {
+    "sourceId": "A3-procession-back-0",
+    "material": "/Game/Mars/Environment/Warrens/Materials/Limestone_Mars_MI"
+   },
+   {
+    "sourceId": "A3-procession-seat-1",
+    "material": "/Game/Mars/Environment/Warrens/Materials/Limestone_Mars_MI"
+   },
+   {
+    "sourceId": "A3-procession-back-1",
+    "material": "/Game/Mars/Environment/Warrens/Materials/Limestone_Mars_MI"
+   },
+   {
+    "sourceId": "A3-procession-seat-2",
+    "material": "/Game/Mars/Environment/Warrens/Materials/Limestone_Mars_MI"
+   },
+   {
+    "sourceId": "A3-procession-back-2",
+    "material": "/Game/Mars/Environment/Warrens/Materials/Limestone_Mars_MI"
+   },
+   {
+    "sourceId": "A3-mourner-shard",
+    "material": "/Game/Mars/Environment/Warrens/Materials/DarkMortar_Mars_MI"
+   },
+   {
+    "sourceId": "A3-broken-service-wall",
+    "material": "/Game/Mars/Environment/Warrens/Materials/Limestone_Mars_MI"
+   },
+   {
+    "sourceId": "A4-margin-stack-0",
+    "material": "/Game/Mars/Environment/Warrens/Materials/Bone_Mars_MI"
+   },
+   {
+    "sourceId": "A4-margin-stack-1",
+    "material": "/Game/Mars/Environment/Warrens/Materials/Bone_Mars_MI"
+   },
+   {
+    "sourceId": "A4-margin-stack-2",
+    "material": "/Game/Mars/Environment/Warrens/Materials/Bone_Mars_MI"
+   },
+   {
+    "sourceId": "A4-margin-stack-3",
+    "material": "/Game/Mars/Environment/Warrens/Materials/Bone_Mars_MI"
+   },
+   {
+    "sourceId": "A4-broken-stack",
+    "material": "/Game/Mars/Environment/Warrens/Materials/Bone_Mars_MI"
+   },
+   {
+    "sourceId": "A4-vessel-table",
+    "material": "/Game/Mars/Environment/Warrens/Materials/SootTimber_Mars_MI"
+   },
+   {
+    "sourceId": "A2-hoist-roof-tie-0",
+    "material": "/Game/Mars/Environment/Warrens/Materials/SootTimber_Mars_MI"
+   },
+   {
+    "sourceId": "A2-hoist-roof-tie-1",
+    "material": "/Game/Mars/Environment/Warrens/Materials/SootTimber_Mars_MI"
+   },
+   {
+    "sourceId": "D3-kitchen-large-platter-rest",
+    "material": "/Game/Mars/Environment/Warrens/Materials/SootTimber_Mars_MI"
+   },
+   {
+    "sourceId": "D3-kitchen-small-platter-rest",
+    "material": "/Game/Mars/Environment/Warrens/Materials/SootTimber_Mars_MI"
+   },
+   {
+    "sourceId": "legacy-prop-13",
+    "material": "/Game/Mars/Environment/Warrens/Materials/DarkMortar_Mars_MI"
+   },
+   {
+    "sourceId": "legacy-prop-14",
+    "material": "/Game/Mars/Environment/Warrens/Materials/DarkMortar_Mars_MI"
+   },
+   {
+    "sourceId": "legacy-prop-15",
+    "material": "/Game/Mars/Environment/Warrens/Materials/DarkMortar_Mars_MI"
+   }
+  ],
+  "dressing": [
+   {
+    "id": "A1-wall-toolboard",
+    "areaId": 1,
+    "mesh": "/Game/Mars/Environment/Meshes/Camp/CampToolBoard_Mars_SM",
+    "at": [
+     40,
+     50.3,
+     1.2
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "yaw": 180,
+    "collision": "NoCollision"
+   },
+   {
+    "id": "A2-bucket-hook",
+    "areaId": 2,
+    "mesh": "/Game/Mars/Environment/Meshes/Crypt/CryptChainHook_Mars_SM",
+    "at": [
+     49.5,
+     48.6,
+     1.23
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "yaw": 0,
+    "collision": "NoCollision",
+    "material": "/Game/Mars/Environment/Warrens/Materials/DarkIron_Mars_MI"
+   },
+   {
+    "id": "A2-bucket-chain-0",
+    "areaId": 2,
+    "mesh": "/Game/Mars/Environment/Meshes/Crypt/CryptChainLink_Mars_SM",
+    "at": [
+     49.5,
+     48.6,
+     1.06
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "yaw": 0,
+    "collision": "NoCollision",
+    "material": "/Game/Mars/Environment/Warrens/Materials/DarkIron_Mars_MI"
+   },
+   {
+    "id": "A2-bucket-chain-1",
+    "areaId": 2,
+    "mesh": "/Game/Mars/Environment/Meshes/Crypt/CryptChainLink_Mars_SM",
+    "at": [
+     49.5,
+     48.6,
+     1.0
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "yaw": 90,
+    "collision": "NoCollision",
+    "material": "/Game/Mars/Environment/Warrens/Materials/DarkIron_Mars_MI"
+   },
+   {
+    "id": "A2-bucket-chain-2",
+    "areaId": 2,
+    "mesh": "/Game/Mars/Environment/Meshes/Crypt/CryptChainLink_Mars_SM",
+    "at": [
+     49.5,
+     48.6,
+     0.9400000000000001
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "yaw": 0,
+    "collision": "NoCollision",
+    "material": "/Game/Mars/Environment/Warrens/Materials/DarkIron_Mars_MI"
+   },
+   {
+    "id": "A2-bucket-chain-3",
+    "areaId": 2,
+    "mesh": "/Game/Mars/Environment/Meshes/Crypt/CryptChainLink_Mars_SM",
+    "at": [
+     49.5,
+     48.6,
+     0.8800000000000001
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "yaw": 90,
+    "collision": "NoCollision",
+    "material": "/Game/Mars/Environment/Warrens/Materials/DarkIron_Mars_MI"
+   },
+   {
+    "id": "A2-bucket-chain-4",
+    "areaId": 2,
+    "mesh": "/Game/Mars/Environment/Meshes/Crypt/CryptChainLink_Mars_SM",
+    "at": [
+     49.5,
+     48.6,
+     0.8200000000000001
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "yaw": 0,
+    "collision": "NoCollision",
+    "material": "/Game/Mars/Environment/Warrens/Materials/DarkIron_Mars_MI"
+   },
+   {
+    "id": "A2-bucket-chain-5",
+    "areaId": 2,
+    "mesh": "/Game/Mars/Environment/Meshes/Crypt/CryptChainLink_Mars_SM",
+    "at": [
+     49.5,
+     48.6,
+     0.76
+    ],
+    "scale": [
+     1,
+     1,
+     1
+    ],
+    "yaw": 90,
+    "collision": "NoCollision",
+    "material": "/Game/Mars/Environment/Warrens/Materials/DarkIron_Mars_MI"
+   },
+   {
+    "id": "A3-broken-service-stone",
+    "areaId": 3,
+    "mesh": "/Game/Mars/Environment/Meshes/Boxes/BoxSarcophagusBroken_Mars_SM",
+    "at": [
+     26.5,
+     39.9,
+     0.055
+    ],
+    "scale": [
+     0.55,
+     0.55,
+     0.55
+    ],
+    "yaw": 90,
+    "collision": "NoCollision",
+    "material": "/Game/Mars/Environment/Warrens/Materials/Limestone_Mars_MI"
+   },
+   {
+    "id": "A3-split-monument-face-0",
+    "areaId": 3,
+    "mesh": "/Engine/BasicShapes/Cube",
+    "at": [
+     8.153,
+     48.982,
+     1.6800000000000002
+    ],
+    "scale": [
+     0.12,
+     0.48,
+     3.2
+    ],
+    "yaw": -18,
+    "collision": "NoCollision",
+    "material": "/Game/Mars/Environment/Warrens/Materials/Bone_Mars_MI"
+   },
+   {
+    "id": "A3-split-monument-face-1",
+    "areaId": 3,
+    "mesh": "/Engine/BasicShapes/Cube",
+    "at": [
+     8.351,
+     49.59,
+     1.905
+    ],
+    "scale": [
+     0.12,
+     0.48,
+     3.65
+    ],
+    "yaw": -18,
+    "collision": "NoCollision",
+    "material": "/Game/Mars/Environment/Warrens/Materials/Bone_Mars_MI"
+   },
+   {
+    "id": "A4-bone-stack-face-0",
+    "areaId": 4,
+    "mesh": "/Game/Mars/Environment/Meshes/Crypt/CryptWallOssuary4m_Mars_SM",
+    "at": [
+     35.7533813199997,
+     68.2999999926565,
+     2.865083440308087
+    ],
+    "scale": [
+     0.3,
+     0.3,
+     0.9242618741976893
+    ],
+    "yaw": -90,
+    "collision": "NoCollision",
+    "material": "/Game/Mars/Environment/Warrens/Materials/Bone_Mars_MI"
+   },
+   {
+    "id": "A4-bone-stack-face-1",
+    "areaId": 4,
+    "mesh": "/Game/Mars/Environment/Meshes/Crypt/CryptWallOssuary4m_Mars_SM",
+    "at": [
+     35.7533813199997,
+     71.19999999265649,
+     2.7738125802310654
+    ],
+    "scale": [
+     0.3,
+     0.3,
+     0.693196405648267
+    ],
+    "yaw": -90,
+    "collision": "NoCollision",
+    "material": "/Game/Mars/Environment/Warrens/Materials/Bone_Mars_MI"
+   },
+   {
+    "id": "A4-bone-stack-face-2",
+    "areaId": 4,
+    "mesh": "/Game/Mars/Environment/Meshes/Crypt/CryptWallOssuary4m_Mars_SM",
+    "at": [
+     46.2466186800003,
+     70.80000000734351,
+     2.8853658536585365
+    ],
+    "scale": [
+     0.3,
+     0.3,
+     0.975609756097561
+    ],
+    "yaw": 90,
+    "collision": "NoCollision",
+    "material": "/Game/Mars/Environment/Warrens/Materials/Bone_Mars_MI"
+   },
+   {
+    "id": "A4-bone-stack-face-3",
+    "areaId": 4,
+    "mesh": "/Game/Mars/Environment/Meshes/Crypt/CryptWallOssuary4m_Mars_SM",
+    "at": [
+     46.54661868000031,
+     63.60000000734351,
+     2.7839537869062903
+    ],
+    "scale": [
+     0.3,
+     0.3,
+     0.7188703465982028
+    ],
+    "yaw": 90,
+    "collision": "NoCollision",
+    "material": "/Game/Mars/Environment/Warrens/Materials/Bone_Mars_MI"
+   },
+   {
+    "id": "A4-sorted-vessel-0",
+    "areaId": 4,
+    "mesh": "/Game/Mars/Environment/Meshes/Camp/CampCauldron_Mars_SM",
+    "at": [
+     38.8,
+     71.6,
+     3.141000000715256
+    ],
+    "scale": [
+     0.15,
+     0.15,
+     0.15
+    ],
+    "yaw": 0,
+    "collision": "NoCollision"
+   },
+   {
+    "id": "A4-sorted-vessel-1",
+    "areaId": 4,
+    "mesh": "/Game/Mars/Environment/Meshes/Camp/CampCauldron_Mars_SM",
+    "at": [
+     39.4,
+     71.6,
+     3.139200000858307
+    ],
+    "scale": [
+     0.18,
+     0.18,
+     0.18
+    ],
+    "yaw": 0,
+    "collision": "NoCollision"
+   },
+   {
+    "id": "A4-sorted-vessel-2",
+    "areaId": 4,
+    "mesh": "/Game/Mars/Environment/Meshes/Camp/CampCauldron_Mars_SM",
+    "at": [
+     40,
+     71.6,
+     3.142200000619888
+    ],
+    "scale": [
+     0.13,
+     0.13,
+     0.13
+    ],
+    "yaw": 0,
+    "collision": "NoCollision"
+   }
+  ],
+  "note": "Batch A material/dressing axis. Existing collision, lights, controls and rewards unchanged. Pending HearthCooling/WellDripChain/CourtLooseStone/OssuaryDryTick block sound acceptance.",
+  "lightOverrides": [
+   {
+    "id": "A1-hearth-overexposure",
+    "matchAt": [
+     40,
+     44,
+     2.4
+    ],
+    "kind": "hearth",
+    "scale": 0.25
+   },
+   {
+    "id": "A3-ceiling-hotspot",
+    "matchAt": [
+     16,
+     43,
+     5.0
+    ],
+    "kind": "cold",
+    "scale": 0.5
+   }
+  ],
+  "taskLights": [
+   {
+    "id": "A1-cutting-work",
+    "areaId": 1,
+    "at": [
+     37.8,
+     47.7,
+     2.25
+    ],
+    "kind": "task",
+    "scale": 0.24
+   },
+   {
+    "id": "A1-searing-work",
+    "areaId": 1,
+    "at": [
+     41.2,
+     47.7,
+     2.25
+    ],
+    "kind": "task",
+    "scale": 0.24
+   },
+   {
+    "id": "A2-bucket-hook",
+    "areaId": 2,
+    "at": [
+     49.7,
+     48.0,
+     1.9
+    ],
+    "kind": "task",
+    "scale": 0.2
+   },
+   {
+    "id": "A2-distant-lower-depth",
+    "areaId": 2,
+    "at": [
+     64.0,
+     47.0,
+     -3.2
+    ],
+    "kind": "fill_cold_depth",
+    "fill": true,
+    "intensity": 65,
+    "radius": 4.5,
+    "colour": [
+     0.55,
+     0.7,
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "id": "A3-monument-rake",
+    "areaId": 3,
+    "at": [
+     10.0,
+     48.0,
+     2.2
+    ],
+    "kind": "task",
+    "scale": 0.22
+   },
+   {
+    "id": "A3-service-wall-edge",
+    "areaId": 3,
+    "at": [
+     25.4,
+     40.1,
+     1.5
+    ],
+    "kind": "task",
+    "scale": 0.14
+   },
+   {
+    "id": "A4-west-niche-rake",
+    "areaId": 4,
+    "at": [
+     36.7,
+     69.0,
+     5.3
+    ],
+    "kind": "task",
+    "scale": 0.18
+   },
+   {
+    "id": "A4-east-niche-plate",
+    "areaId": 4,
+    "at": [
+     45.3,
+     71.6,
+     4.8
+    ],
+    "kind": "task",
+    "scale": 0.16
+   },
+   {
+    "id": "A4-open-vessel-table",
+    "areaId": 4,
+    "at": [
+     39.4,
+     71.1,
+     4.3
+    ],
+    "kind": "task",
+    "scale": 0.16
+   }
+  ],
+  "defaultMaterials": {
+   "floor": "/Game/Mars/Environment/Warrens/Materials/NeutralFloor_Mars_MI",
+   "wall": "/Game/Mars/Environment/Warrens/Materials/NeutralWall_Mars_MI",
+   "roof": "/Game/Mars/Environment/Warrens/Materials/NeutralRoof_Mars_MI",
+   "ramp": "/Game/Mars/Environment/Warrens/Materials/NeutralFloor_Mars_MI",
+   "gallery": "/Game/Mars/Environment/Warrens/Materials/NeutralFloor_Mars_MI",
+   "hearth": "/Game/Mars/Environment/Warrens/Materials/DarkIron_Mars_MI",
+   "grate": "/Game/Mars/Environment/Warrens/Materials/DarkIron_Mars_MI",
+   "water": "/Game/Mars/Environment/Warrens/Materials/Mineral_Mars_MI",
+   "prop": "/Game/Mars/Environment/Warrens/Materials/Limestone_Mars_MI",
+   "root": "/Game/Mars/Environment/Warrens/Materials/RootWood_Mars_MI",
+   "candle": "/Game/Mars/Environment/Warrens/Materials/Bone_Mars_MI",
+   "inlay": "/Game/Mars/Environment/Warrens/Materials/DarkIron_Mars_MI",
+   "pier": "/Game/Mars/Environment/Warrens/Materials/NeutralWall_Mars_MI",
+   "dressing": "/Game/Mars/Environment/Warrens/Materials/Limestone_Mars_MI"
+  }
+ }
+}

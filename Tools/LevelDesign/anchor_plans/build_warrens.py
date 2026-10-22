@@ -18,6 +18,7 @@ height. A UE location is ((x - 70), (y - 55), z) * 100. Never creates, loads or 
 actors tagged OWN.
 """
 import json
+import hashlib
 import math
 import os
 from pathlib import Path
@@ -39,7 +40,7 @@ PUZZLE_CHANNEL_ROOT = 'Mechanism.Channel.Warrens.Puzzle'  # registered by hand i
 CUBE = '/Engine/BasicShapes/Cube'
 CYLINDER = '/Engine/BasicShapes/Cylinder'
 PROTO = '/Game/Mars/Materials/ProtoGrid/ProtoGrid_'
-MATERIALS = {  # box kind -> material; one HISM actor per kind
+MATERIALS = {  # box kind -> default material; optional v7 presentation groups split a kind
     'floor': PROTO + 'Floor_Mars_MI',
     'wall': PROTO + 'Wall_Mars_MI',
     'roof': PROTO + 'Wall_Mars_MI',
@@ -53,9 +54,10 @@ MATERIALS = {  # box kind -> material; one HISM actor per kind
     'candle': PROTO + 'Interactable_Mars_MI',  # the brightest instance stands in for emissive tallow
     'inlay': PROTO + 'Item_Mars_MI',  # a floor groove drawn as a thin collision-free strip
     'pier': PROTO + 'Wall_Mars_MI',  # the service spiral's central pier
+    'dressing': PROTO + 'Platform_Mars_MI',  # opt-in non-colliding authored silhouette pieces
 }
 MESHES = {'root': CYLINDER, 'candle': CYLINDER, 'pier': CYLINDER}
-COLLISION = {'water': 'NoCollision', 'inlay': 'NoCollision'}
+COLLISION = {'water': 'NoCollision', 'inlay': 'NoCollision', 'dressing': 'NoCollision'}
 STRICT_TAGS = True  # False: an unregistered gameplay tag is logged and left unset instead of stopping apply() (an editor booted before the ini edit)
 CELL = 0.5
 SLAB = 0.4
@@ -324,13 +326,19 @@ def ramps_of(d):
         dx, dy = lower[0] - upper[0], lower[1] - upper[1]
         run = math.hypot(dx, dy)
         ux, uy = dx / run, dy / run
-        start = (upper[0] + ux * RAMP_START, upper[1] + uy * RAMP_START)
-        roof = d.get('rampRoofZ')
+        override = next((r for r in d.get('rampOverrides', []) if r['link'] == [link['a'], link['b']]), {})
+        start = tuple(override.get('start', (upper[0] + ux * RAMP_START, upper[1] + uy * RAMP_START)))
+        assert seg_dist(start, upper[:2], lower[:2]) < .001, 'dive start must stay on its existing link'
+        descent_end = tuple(override.get('descentEnd', lower[:2]))
+        assert seg_dist(descent_end, start, lower[:2]) < .001, 'dive descent must stay on its existing link'
+        slope_run = math.dist(start, descent_end)
+        assert slope_run > 1.0, 'dive descent is too short'
+        roof = override.get('roofZ', d.get('rampRoofZ'))
         frac = 1.0 if roof is None else min(1.0, (upper[2] - roof) / (upper[2] - lower[2]) + 0.5 / (run - RAMP_START))
         open_end = (start[0] + (lower[0] - start[0]) * frac, start[1] + (lower[1] - start[1]) * frac)
-        out.append(dict(link=link, upper=(upper[0], upper[1]), start=start, open_end=open_end, end=(lower[0], lower[1]), top=upper[2],
+        out.append(dict(link=link, upper=(upper[0], upper[1]), start=start, open_end=open_end, end=(lower[0], lower[1]), descent_end=descent_end, top=upper[2],
                         bottom=lower[2], width=link['width'], yaw=math.degrees(math.atan2(dy, dx)),
-                        degrees=math.degrees(math.atan2(upper[2] - lower[2], run - RAMP_START)),
+                        degrees=math.degrees(math.atan2(upper[2] - lower[2], slope_run)),
                         upper_level=level_of_z(upper[2], U), lower_level=level_of_z(lower[2], U)))
     return out
 
@@ -416,7 +424,7 @@ def gated_mouths(d):
                 out.append(dict(id=pz['id'], wall=(wx0, y0 - CELL, wx1, y0), at=(cx, y0 - CELL / 2), yaw=90.0, axis='x', z=room['z'], level='deep'))
             else:
                 raise AssertionError('the Drowned Gallery must enter the lair across its south edge')
-        elif kind.startswith('Mourner cache gate') or kind.startswith('Bellkeeper seal pair'):
+        elif kind.startswith('Mourner cache gate') or kind.startswith('Bellkeeper'):
             key = 'Mourner' if kind.startswith('Mourner') else 'Bellkeeper'
             niche = next(n for n in d.get('niches', []) if key in n.get('note', ''))
             x0, y0, x1, y1 = niche['rect']
@@ -940,6 +948,7 @@ def floor_span(grid, at, yaw, width, slack=1.0):
 
 def prop_boxes(boxes, p):
     """Landmark dressing as basic shapes, kinds mapped as the viewer does."""
+    first = len(boxes)
     kind, (sx, sy, sz), z, yaw = p['kind'], p['size'], p['at'][2], p.get('yaw', 0.0)
     x, y = p['at'][0], p['at'][1]
     if kind == 'root':
@@ -959,6 +968,11 @@ def prop_boxes(boxes, p):
         boxes.append(box('inlay', (x, y, z + sz / 2), (sx, sy, sz), yaw))
     else:
         boxes.append(box('prop', (x, y, z + sz / 2), (sx, sy, sz), yaw))
+    if 'id' in p:
+        for emitted in boxes[first:]:
+            emitted['sourceId'] = p['id']
+            if p.get('collision') is False:
+                emitted['kind'] = 'dressing'
 
 
 def is_puzzle_standin(p):
@@ -967,8 +981,94 @@ def is_puzzle_standin(p):
     return any(key in note for key in ('hand-wheel', 'sluice grate', 'pack plate', 'seal pair')) or p['kind'] == 'kitchen-drive'
 
 
-def manifest(write=True):
-    d = load()
+def box_corners(value):
+    """Plan-space corners with the same pitch/yaw convention as emitted UE transforms."""
+    yaw, pitch = math.radians(value['yaw']), math.radians(value['pitch'])
+    for i in (-0.5, 0.5):
+        for j in (-0.5, 0.5):
+            for k in (-0.5, 0.5):
+                x, y, z = (value['size'][n] * v for n, v in enumerate((i, j, k)))
+                px, pz = x * math.cos(pitch) - z * math.sin(pitch), x * math.sin(pitch) + z * math.cos(pitch)
+                yield (value['centre'][0] + px * math.cos(yaw) - y * math.sin(yaw),
+                       value['centre'][1] + px * math.sin(yaw) + y * math.cos(yaw), value['centre'][2] + pz)
+
+
+def apply_presentation(man, presentation):
+    """Emission-only overrides; crossing merged pieces keep their existing neutral defaults."""
+    materials = {m['path'] for m in presentation['materials']}
+    regions = presentation.get('regions', [])
+    overrides = presentation.get('sourceOverrides', [])
+    assert len({r['id'] for r in regions}) == len(regions), 'duplicate presentation region'
+    assert len({o['sourceId'] for o in overrides}) == len(overrides), 'duplicate presentation source override'
+    sources = {b.get('sourceId') for b in man['boxes']}
+    assert all(o['sourceId'] in sources for o in overrides), 'unknown presentation sourceId'
+    for region in regions:
+        bounds = region['bounds']
+        assert len(bounds) == 6 and all(math.isfinite(v) for v in bounds), region['id']
+        assert all(bounds[k] < bounds[k + 3] for k in range(3)), region['id']
+        assert all(kind in MATERIALS for kind in region['kinds']), region['id']
+        assert region['material'] in materials, region['material']
+    for index, a in enumerate(regions):
+        for b in regions[index + 1:]:
+            assert not all(min(a['bounds'][k + 3], b['bounds'][k + 3]) > max(a['bounds'][k], b['bounds'][k])
+                           for k in range(3)), 'overlapping presentation regions: ' + a['id'] + '/' + b['id']
+    default_materials = presentation.get('defaultMaterials', {})
+    assert all(kind in MATERIALS and path in materials for kind, path in default_materials.items()), 'unknown presentation default material'
+    by_source = {o['sourceId']: o for o in overrides}
+    for value in man['boxes']:
+        if value['kind'] in default_materials:
+            value.setdefault('material', default_materials[value['kind']])
+        points = tuple(box_corners(value))
+        matches = [r for r in regions if value['kind'] in r['kinds'] and
+                   all(all(r['bounds'][k] - 1e-7 <= p[k] <= r['bounds'][k + 3] + 1e-7 for k in range(3)) for p in points)]
+        assert len(matches) <= 1, 'ambiguous presentation box'
+        if matches:
+            value['material'] = matches[0]['material']
+        override = by_source.get(value.get('sourceId'))
+        if override:
+            assert override['material'] in materials, override['material']
+            value['material'] = override['material']
+    dressing = presentation.get('dressing', [])
+    assert len({v['id'] for v in dressing}) == len(dressing), 'duplicate presentation dressing'
+    for value in dressing:
+        assert value['collision'] == 'NoCollision', 'presentation dressing must be NoCollision: ' + value['id']
+        assert len(value['at']) == len(value['scale']) == 3 and all(math.isfinite(v) for v in value['at'] + value['scale']), value['id']
+        assert all(v > 0 for v in value['scale']) and math.isfinite(value.get('yaw', 0)), value['id']
+        assert value.get('material', next(iter(materials))) in materials, value['id']
+    man['dressing'] = dressing
+    light_overrides = presentation.get('lightOverrides', [])
+    task_lights = presentation.get('taskLights', [])
+    assert len({v['id'] for v in light_overrides + task_lights}) == len(light_overrides + task_lights), 'duplicate presentation light id'
+    for value in light_overrides:
+        matches = [v for v in man['lights'] if v['kind'] == value['kind'] and v['at'] == value['matchAt']]
+        assert len(matches) == 1, 'presentation light override must match exactly once: ' + value['id']
+        assert math.isfinite(value['scale']) and value['scale'] > 0, value['id']
+        matches[0]['scale'] = value['scale']
+    for value in task_lights:
+        assert len(value['at']) == 3 and all(math.isfinite(v) for v in value['at']), value['id']
+        if value.get('fill'):
+            assert all(math.isfinite(value[k]) and value[k] > 0 for k in ('intensity', 'radius')), value['id']
+            assert len(value['colour']) == 4 and all(math.isfinite(v) for v in value['colour']), value['id']
+        else:
+            assert value['kind'] in LIGHT_KINDS and math.isfinite(value['scale']) and value['scale'] > 0, value['id']
+    man['lights'].extend(task_lights)
+
+
+def render_groups(boxes):
+    """Kind retains its mesh; full effective paths/profile identify deterministic HISM groups."""
+    groups = {}
+    for kind in MATERIALS:
+        for value in boxes:
+            if value['kind'] == kind:
+                key = (kind, value.get('material', MATERIALS[kind]), value.get('collision', COLLISION.get(kind, 'BlockAll')))
+                groups.setdefault(key, []).append(value)
+    assert sum(map(len, groups.values())) == len(boxes), 'unknown box kind'
+    return groups
+
+
+def manifest(write=True, data=None):
+    """Build from live data, or explicitly supplied data for a write-free authoring preview."""
+    d = load() if data is None else data
     U = d.get('upper')
     nodes, links = d['nodes'], d['links']
     boxes, starts, entities, lights, pockets = [], [], [], [], []
@@ -1057,8 +1157,13 @@ def manifest(write=True):
         return False
 
     for grid_name, grid in (('main', main), ('deep', deep)):
+        crossing_ids = {o['bridgeId'] for o in d.get('rampOverrides', []) if 'bridgeId' in o and
+                        any(o['link'] == [r['link']['a'], r['link']['b']] and r['upper_level'] == grid_name for r in ramps)}
+        crossing_decks = [s for s in d.get('structures', []) if s['id'] in crossing_ids]
+        def crossing_or_mouth(mid):
+            return ramp_mouth(mid) or any(in_box2d(mid, s, .05) for s in crossing_decks)
         pieces = rail_edges(grid, main_heads if grid_name == 'main' else [], [], 'floor', hole_of if grid_name == 'main' else None, blocked=rail_blocked[grid_name])
-        pieces += rail_edges(grid, [], [], 'floor', None, open_class='ramp', skip_fn=ramp_mouth, blocked=rail_blocked[grid_name])
+        pieces += rail_edges(grid, [], [], 'floor', None, open_class='ramp', skip_fn=crossing_or_mouth, blocked=rail_blocked[grid_name])
         for (x0, y0, x1, y1), z, rail in pieces:
             rails.append((x0, y0, x1, y1))
             if x0 == x1:
@@ -1117,9 +1222,9 @@ def manifest(write=True):
         slabs(boxes, 'wall', [rim], DEEP_Z - SLAB, rim_top)
     # Ramps: dives and in-level stairs.
     for r in ramps:
-        length = math.dist(r['start'], r['end'])
+        length = math.dist(r['start'], r['descent_end'])
         drop = r['top'] - r['bottom']
-        mid = ((r['start'][0] + r['end'][0]) / 2, (r['start'][1] + r['end'][1]) / 2, (r['top'] + r['bottom']) / 2 - SLAB / 2)
+        mid = ((r['start'][0] + r['descent_end'][0]) / 2, (r['start'][1] + r['descent_end'][1]) / 2, (r['top'] + r['bottom']) / 2 - SLAB / 2)
         boxes.append(box('ramp', mid, (math.hypot(length, drop), r['width'], SLAB), r['yaw'], -r['degrees']))
     for tr in treads:
         for p, q in tr['segments']:
@@ -1143,12 +1248,19 @@ def manifest(write=True):
     for s in d.get('structures', []):
         if s['kind'] == 'door':
             continue
+        first = len(boxes)
+        kind = 'dressing' if s.get('collision') is False else struct_kind[s['kind']]
         if s.get('yaw'):
             assert not any(s['id'] in o.get('sourceIds', []) for o in openings), 'a rotated structure cannot take an opening cut: ' + s['id']
-            boxes.append(box(struct_kind[s['kind']], (s['at'][0], s['at'][1], s['at'][2] + s['size'][2] / 2), s['size'], s['yaw']))
-            continue
-        for lo, hi in structure_pieces(s, openings):
-            boxes.append(box(struct_kind[s['kind']], [(lo[k] + hi[k]) / 2 for k in range(3)], [hi[k] - lo[k] for k in range(3)]))
+            boxes.append(box(kind, (s['at'][0], s['at'][1], s['at'][2] + s['size'][2] / 2), s['size'], s['yaw']))
+        else:
+            for lo, hi in structure_pieces(s, openings):
+                boxes.append(box(kind, [(lo[k] + hi[k]) / 2 for k in range(3)], [hi[k] - lo[k] for k in range(3)]))
+        if d.get('twoPlayer'):
+            for emitted in boxes[first:]:
+                emitted['sourceId'] = s['id']
+                if 'areaId' in s:
+                    emitted['areaId'] = s['areaId']
 
     def open_air(p, top):
         """Beside a deck edge: walkable floor at least 1 m down, with no deck, tread or over-crossing near the deck's height."""
@@ -1203,6 +1315,33 @@ def manifest(write=True):
             for r in (rails_spec['innerRadius'], rails_spec['outerRadius']):
                 boxes.append(box('gallery', (cx + r * math.cos(am), cy + r * math.sin(am), t['top'] + rails_spec['height'] / 2),
                                  (rails_spec['thickness'], 2 * r * math.sin(da / 2), rails_spec['height']), math.degrees(am)))
+
+    # Recesses default to rock. An explicit floorTopZ selects only that floor
+    # elevation; the Cistern underside recess preserves its upper walking face.
+    for cut in d.get('clearanceCuts', []):
+        pieces = []
+        for index, emitted in enumerate(boxes):
+            selected_kind = 'floor' if 'floorTopZ' in cut else 'wall'
+            if emitted['kind'] != selected_kind or emitted['yaw'] or emitted['pitch']:
+                pieces.append(emitted)
+                continue
+            centre, size = emitted['centre'], emitted['size']
+            if 'floorTopZ' in cut and abs(centre[2]+size[2]/2-cut['floorTopZ']) > .005:
+                pieces.append(emitted)
+                continue
+            source = dict(id='raster', at=[centre[0], centre[1], centre[2] - size[2] / 2], size=size)
+            opening = dict(kind='floor', rect=cut['rect'], z=(cut['zMin'] + cut['zMax']) / 2,
+                           throughDepth=(cut['zMax'] - cut['zMin']) / 2, sourceIds=['raster'])
+            bounds = structure_pieces(source, [opening])
+            if len(bounds) == 1 and all(abs(bounds[0][0][k] - (centre[k] - size[k] / 2)) < 1e-6 for k in range(3)) \
+                    and all(abs(bounds[0][1][k] - (centre[k] + size[k] / 2)) < 1e-6 for k in range(3)):
+                pieces.append(emitted)
+                continue
+            for lo, hi in bounds:
+                piece = box(selected_kind, [(lo[k] + hi[k]) / 2 for k in range(3)], [hi[k] - lo[k] for k in range(3)])
+                piece['sourceId'] = 'cut:' + cut['id'] + ':' + str(index)
+                pieces.append(piece)
+        boxes = pieces
 
     # --- Entities -------------------------------------------------------------------------------------------------------
     def entity(cls, at, yaw, props, note, pitch=0.0, **extra):
@@ -1270,7 +1409,35 @@ def manifest(write=True):
                    dict(Trigger=dict(fields=dict(DetectionFilter=dict(tags=['Probe.Mars.Player', 'Probe.Mars.Backpack']))),
                         Occupancy=dict(fields=dict(RequiredCount=1, ReleaseDelaySeconds=0.5)),
                         Source=dict(fields=dict(OutputChannel=puzzle_channel(pz['id'])))), pz['id'] + ' pack plate')
-        elif kind.startswith('Bellkeeper seal pair'):  # P4: two seals in the order the glyph shows, a sequence node, a latched gate on the niche
+        elif kind.startswith('Bellkeeper') and 'bellkeeper' in d:
+            encounter = d['bellkeeper']
+            phrase, start_glyphs = encounter['phrase'], encounter['startGlyphs']
+            glyphs = ('Square', 'Circle', 'Triangle', 'Diamond', 'Cross', 'Bars')
+            assert len(phrase) == len(start_glyphs) == 3
+            assert all(g in glyphs for g in phrase + start_glyphs)
+            assert all(a != b for a, b in zip(phrase, start_glyphs)), 'a dial starts on its answer'
+            panel, vent, clue, chain = (encounter[k] for k in ('panel', 'vent', 'clue', 'chain'))
+            offset = lambda at: [round((at[i] - panel['at'][i]) * 100.0, 4) for i in range(3)]
+            glyph_array = lambda values: dict(array=[dict(enum='EMars_Bellkeeper_Glyph', value=g) for g in values])
+            m = mouths_by_id[pz['id']]
+            entity('Mars_Gate_EntityScript', [m['at'][0], m['at'][1], m['z']], m['yaw'], latched_bars(pz),
+                   'P4 dial gate', spanCm=GATE_OPENING * 100.0)
+            rewards = [dict(struct='Mars_Bellkeeper_Reward', fields=dict(
+                Definition=dict(asset='/Script/AngelscriptAssets.' + reward['definition']),
+                Transform=dict(transform=dict(location=offset(reward['at']))))) for reward in encounter['rewards']]
+            entity('Mars_Bellkeeper_EntityScript', panel['at'], panel['yaw'],
+                   dict(Phrase=glyph_array(phrase), StartGlyphs=glyph_array(start_glyphs), Rewards=dict(array=rewards),
+                        CommitChannel=puzzle_channel('P4.Commit'), VentChannel=puzzle_channel('P4.Vent'),
+                        Source=dict(fields=dict(OutputChannel=puzzle_channel('P4'))),
+                        BellOffsetWorld=dict(vector=offset(encounter['bellAt'])),
+                        OwnedVent=dict(fields=dict(Enabled=True, OffsetWorld=dict(vector=offset(vent['at'])),
+                            Rotation=dict(rotator=[0, vent['yaw'], 0]), PushImpulse=dict(vector=vent['pushImpulseLocalCmS'])))),
+                   'P4 dial lock', pitch=panel['pitch'])
+            entity('Mars_PullChain_EntityScript', chain['at'], chain['yaw'],
+                   dict(Source=dict(fields=dict(OutputChannel=puzzle_channel('P4.Commit')))), 'P4 commit chain')
+            entity('Mars_BellkeeperClue_EntityScript', clue['at'], clue['yaw'],
+                   dict(Phrase=glyph_array(phrase), GlyphSize=clue['glyphSizeCm']), 'P4 Bridge clue', pitch=clue['pitch'])
+        elif kind.startswith('Bellkeeper seal pair'):  # Frozen v5/v6 composition remains available.
             m = mouths_by_id[pz['id']]
             sz = m['z']
             niche = next(n for n in d.get('niches', []) if 'Bellkeeper' in n.get('note', ''))
@@ -1305,6 +1472,10 @@ def manifest(write=True):
                 entity('Mars_HandWheel_EntityScript', list(w['at']), w['yaw'],
                        dict(Source=dict(fields=dict(OutputChannel=puzzle_channel(pz['id'])))), pz['id'] + ' ' + key)
 
+    # Explicit local fixtures opt in per layout; the existing class owns all gameplay behavior.
+    for fixture in d.get('localFixtures', []):
+        entity(fixture['cls'], fixture['at'], fixture.get('yaw', 0.0), fixture.get('props', {}), fixture['id'])
+
     # The hearth.
     k = nodes[d['hearth']]
     boxes.append(box('hearth', (k[0], k[1], k[2] + 0.5), (1.5, 1.5, 1.0)))
@@ -1325,6 +1496,8 @@ def manifest(write=True):
         for slot, (ox, oy) in enumerate([(-1.2, -1.2), (1.2, -1.2), (-1.2, 1.2), (1.2, 1.2)]):
             starts.append(dict(group=group, tag=e['playerStartTag'], slot=slot, at=[cx + ox, cy + oy, sz + 0.92], yaw=round(yaw, 3)))
         entity('Mars_WorldItem_Backpack_EntityScript', [cx - uy * 2.8, cy + ux * 2.8, sz + 0.3], 0.0, {}, f'{group} pack')
+        if d.get('entryKitPan'):
+            entity('Mars_WorldItem_Pan_EntityScript', [cx - uy * 2.8 + 0.8, cy + ux * 2.8, sz + 0.3], 0.0, {}, f'{group} entry Pan')
         lights.append(dict(at=[cx, cy, sz + 2.6], kind='foyer'))
         # The mouth gate stands on the corridor past the pad: the first point along the link, from FOYER/2 + 0.5 on, where
         # the walkable run across the link is no wider than the link itself (walls close both ends of the leaf), so the
@@ -1404,7 +1577,7 @@ def manifest(write=True):
                 if aid in ramp_of and ramp_of[aid]['link']['a'] != link['a']:
                     side = 'Behind' if side == 'Ahead' else 'Ahead'
                 props['LeverSide'] = dict(enum='EMars_Anchor_LeverSide', value=side)
-            entity('Mars_Anchor_Route_EntityScript', [at[0], at[1], z], yaw, props, aid)
+            entity(d.get('routeAnchorClass', 'Mars_Anchor_Route_EntityScript'), [at[0], at[1], z], yaw, props, aid)
         elif fam == 'H':
             n = nodes[anchor['node']]
             entity('Mars_Anchor_Hunt_EntityScript', list(n), 0.0, dict(AnchorId=anchor_tag(aid), HomeRadiusCm=1000.0), aid)
@@ -1418,6 +1591,8 @@ def manifest(write=True):
     # SpanCm = the pocket's depth along that axis (wall-mounted candidates stand on the back wall). A threat pocket also
     # gets its own small nav field.
     for n in d.get('niches', []):
+        if n.get('authoredReward'):
+            continue  # its geometry remains; Bellkeeper pays the authored physical pickups
         cx, cy = shape_centre(n)
         nz = n.get('z', 0)
         x0, y0, x1, y1 = shape_bounds(n)
@@ -1513,8 +1688,12 @@ def manifest(write=True):
     result = dict(map=MAP, owner=OWN, boxes=boxes, starts=starts, entities=entities, lights=lights, pockets=pockets,
                   crawls=d['crawls'], rampDegrees=[round(r['degrees'], 1) for r in ramps],
                   stairDegrees={tr['id']: round(tr['degrees'], 1) for tr in treads}, deviations=DEVIATIONS + (V6_DEVIATIONS + d.get('geometryDeviations', []) if d.get('structures') else []))
+    if d.get('wayfindingLabels'):
+        result['labels'] = d['wayfindingLabels']
+    if d.get('presentation'):
+        apply_presentation(result, d['presentation'])
     summary = dict(boxes=len(boxes), starts=len(starts),
-                   anchors=sum(1 for e in entities if e['cls'].startswith('Mars_Anchor_') and 'NavField' not in e['cls']),
+                   anchors=sum(1 for e in entities if (e['cls'].startswith('Mars_Anchor_') or e['cls'] == 'Mars_Warrens_Anchor_Route_EntityScript') and 'NavField' not in e['cls']),
                    navfields=sum(1 for e in entities if 'NavField' in e['cls']),
                    packs=sum(1 for e in entities if 'Backpack' in e['cls']),
                    ladders=sum(1 for e in entities if 'Ladder' in e['cls']),
@@ -1543,6 +1722,19 @@ def apply():
     ea = u.get_editor_subsystem(u.EditorActorSubsystem)
     world = u.get_editor_subsystem(u.UnrealEditorSubsystem).get_editor_world()
     assert world.get_path_name().split('.')[0] == MAP, 'open ' + MAP + ' first (found ' + world.get_path_name() + ')'
+    label_materials = {}
+    for label in man.get('labels', []):
+        if label.get('textMaterial'):
+            material = u.load_asset(label['textMaterial'])
+            assert material, 'missing text material: ' + label['textMaterial']
+            label_materials[label['id']] = material
+    groups = render_groups(man['boxes'])
+    dressing = man.get('dressing', [])
+    meshes = {path: u.load_asset(path) for path in {CUBE, *MESHES.values(), *(v['mesh'] for v in dressing)}}
+    assert all(isinstance(mesh, u.StaticMesh) for mesh in meshes.values()), 'missing/non-mesh presentation asset: ' + str(meshes)
+    paths = {key[1] for key in groups} | {v['material'] for v in dressing if v.get('material')}
+    materials = {path: u.load_asset(path) for path in paths}
+    assert all(isinstance(material, u.MaterialInterface) for material in materials.values()), 'missing/non-material presentation asset: ' + str(materials)
     missing_tags = []
     for a in ea.get_all_level_actors():
         if OWN in [str(t) for t in a.tags]:
@@ -1556,15 +1748,10 @@ def apply():
         a.set_folder_path(folder or ('Warrens/' + label.split('_')[0]))
         return a
 
-    meshes = {path: u.load_asset(path) for path in {CUBE, *MESHES.values()}}
-    assert all(meshes.values()), meshes
-    for kind, path in MATERIALS.items():
-        values = [b for b in man['boxes'] if b['kind'] == kind]
-        if not values:
-            continue
-        material = u.load_asset(path)
-        assert material, path
-        a = actor(u.Actor, 'Greybox_' + kind)
+    for (kind, path, collision), values in groups.items():
+        original = path == MATERIALS[kind] and collision == COLLISION.get(kind, 'BlockAll')
+        suffix = '' if original else '_' + hashlib.sha256((path + '\0' + collision).encode()).hexdigest()[:12]
+        a = actor(u.Actor, 'Greybox_' + kind + suffix)
         a.root_component.set_mobility(u.ComponentMobility.STATIC)  # a static HISM cannot attach under a movable root
         h = ss.k2_gather_subobject_data_for_instance(a)[0]
         ch, reason = ss.add_new_subobject(u.AddNewSubobjectParams(parent_handle=h, new_class=u.HierarchicalInstancedStaticMeshComponent))
@@ -1572,11 +1759,21 @@ def apply():
         assert c, str(reason)
         c.set_mobility(u.ComponentMobility.STATIC)
         c.set_static_mesh(meshes[MESHES.get(kind, CUBE)])
-        c.set_collision_profile_name(COLLISION.get(kind, 'BlockAll'))
-        c.set_material(0, material)
+        c.set_collision_profile_name(collision)
+        c.set_material(0, materials[path])
         for b in values:
             c.add_instance(u.Transform(location=worldpos(u, b['centre']), rotation=u.Rotator(pitch=b['pitch'], yaw=b['yaw'], roll=0),
                                        scale=u.Vector(*b['size'])), world_space=True)
+    for value in dressing:
+        a = actor(u.StaticMeshActor, 'Dressing_' + value['id'], worldpos(u, value['at']), value.get('yaw', 0), 'Warrens/Dressing')
+        c = a.static_mesh_component
+        c.set_mobility(u.ComponentMobility.STATIC)
+        c.set_static_mesh(meshes[value['mesh']])
+        c.set_collision_profile_name(value['collision'])
+        a.set_actor_scale3d(u.Vector(*value['scale']))
+        if value.get('material'):
+            for slot in range(len(meshes[value['mesh']].static_materials)):
+                c.set_material(slot, materials[value['material']])
     for i, v in enumerate(man['lights']):
         if v.get('fill'):
             intensity, radius, colour = v['intensity'], v['radius'], v['colour']
@@ -1594,6 +1791,17 @@ def apply():
     for v in man['starts']:
         a = actor(u.PlayerStart, 'Entrance_' + v['group'] + '_' + str(v['slot']), worldpos(u, v['at']), v['yaw'])
         a.set_editor_property('player_start_tag', u.Name(v['tag']))
+    for v in man.get('labels', []):
+        a = actor(u.TextRenderActor, 'Sign_' + v['id'], worldpos(u, v['at']), v['yaw'], 'Warrens/Wayfinding')
+        c = a.get_component_by_class(u.TextRenderComponent)
+        assert c, 'TextRenderActor has no text component: ' + v['id']
+        c.set_text(v['text'])
+        c.set_world_size(v.get('sizeCm', 14.0))
+        c.set_horizontal_alignment(u.HorizTextAligment.EHTA_CENTER)
+        c.set_text_render_color(u.Color(*v.get('color', (232, 218, 178, 255))))
+        if v['id'] in label_materials:
+            c.set_text_material(label_materials[v['id']])
+        c.set_collision_profile_name('NoCollision')
 
     def tag_of(name):
         tag = u.GameplayTag()
@@ -1606,6 +1814,22 @@ def apply():
         return tag
 
     def coerce(value):
+        if isinstance(value, dict) and 'vector' in value:
+            return u.Vector(*value['vector'])
+        if isinstance(value, dict) and 'rotator' in value:
+            pitch, yaw, roll = value['rotator']
+            return u.Rotator(pitch=pitch, yaw=yaw, roll=roll)
+        if isinstance(value, dict) and 'transform' in value:
+            return u.Transform(location=coerce(dict(vector=value['transform']['location'])))
+        if isinstance(value, dict) and 'asset' in value:
+            asset = u.load_asset(value['asset'])
+            assert asset, value['asset']
+            return asset
+        if isinstance(value, dict) and 'struct' in value:
+            struct = getattr(u, value['struct'])()
+            for field, field_value in value['fields'].items():
+                struct.set_editor_property(field, coerce(field_value))
+            return struct
         if isinstance(value, dict) and 'enum' in value:
             enum_type = getattr(u, value['enum'][1:], None) or getattr(u, value['enum'])
             return getattr(enum_type, value['value'].upper())
@@ -1715,7 +1939,9 @@ def audit():
             for p, q in zip(pts, pts[1:]):
                 paths.append((p, q, za, za))
     for r in ramps_of(d):
-        paths.append((r['start'], r['end'], r['top'], r['bottom']))
+        paths.append((r['start'], r['descent_end'], r['top'], r['bottom']))
+        if r['descent_end'] != r['end']:
+            paths.append((r['descent_end'], r['end'], r['bottom'], r['bottom']))
     for tr in treads_of(d):
         for p, q in tr['segments']:
             paths.append((p[:2], q[:2], p[2], q[2]))

@@ -152,6 +152,31 @@ class AMars_AutoTest_AnchorCandidate_RubbleStaysClosed_Actor : ACk_AutoTestRunne
     }
 }
 
+class AMars_AutoTest_AnchorCandidate_WarrensRowsRespectRoleAndEligibility_Actor : ACk_AutoTestRunner
+{
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_AnchorCandidate_WarrensRowsRespectRoleAndEligibility");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_AnchorCandidate_WarrensScoutLatchSupportsSequentialAccess_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 20.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_AnchorCandidate_WarrensScoutLatchSupportsSequentialAccess");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
 class AMars_AutoTest_AnchorResolver_CacheBudget_Actor : ACk_AutoTestRunner
 {
     default _TimeoutSeconds = 10.0f;
