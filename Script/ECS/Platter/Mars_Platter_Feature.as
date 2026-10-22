@@ -43,7 +43,7 @@ enum EMars_Platter_FreezeCause
 }
 
 // Whether the platter rides a carrier (Carried or Held): its pile then ignores pawns, as the tray's own body does
-// (constants_world_item::k_MountedBodyProfile); Free, every piece collides as its own body surface says.
+// (constants_platter::k_PhysicalBodyProfile); Free, every piece collides as its own body surface says.
 enum EMars_Platter_Mounting
 {
     Free,
@@ -62,7 +62,8 @@ namespace constants_platter
     // body at all).
     const float64 k_WallThicknessCm = 2.0;
     const float64 k_WallLiftCm = 0.2;
-    const FName k_WallCollisionProfile = n"IgnoreOnlyPawn";
+    const FName k_PhysicalBodyProfile = n"Mars_PlatterPhysical";
+    const FName k_WallCollisionProfile = k_PhysicalBodyProfile;
     const float32 k_WallFriction = 0.3f;
     const float32 k_WallRestitution = 0.0f;
     const float32 k_WallMassKg = 1.0f;

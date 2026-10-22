@@ -11,7 +11,7 @@
 // The attach keeps the current world pose (the relative transform to the attach point), and an Arrival lerps the offset
 // to the mount offset, so the item visibly travels to the back / hand / dock instead of snapping; a mount whose arrival
 // has no travel attaches at the offset and broadcasts OnMountSettled at once (the Arrive processor broadcasts it at the end
-// of a travel). Before the attach the body stops colliding with pawns (constants_world_item::k_MountedBodyProfile): a
+// of a travel). Before the attach the body takes its retained mounted profile (QueryOnly by default): a
 // kinematic item travelling through, then resting against, its carrier's capsule would shove the character every step. A
 // release restores the body's own profile.
 class UMars_Processor_WorldItem_Mount : UCk_Processor_Script_Base_UE
@@ -85,7 +85,7 @@ class UMars_Processor_WorldItem_Mount : UCk_Processor_Script_Base_UE
         if (MountsWithBody)
         {
             utils_jolt_body::Request_SetCollisionProfile(Body,
-                FCk_Request_JoltBody_SetCollisionProfile(constants_world_item::k_MountedBodyProfile),
+                FCk_Request_JoltBody_SetCollisionProfile(Self.Get_Fragment(FMars_Fragment_WorldItem_Params).MountedBodyProfile),
                 FCk_Delegate_Request_OnCompleted(this, n"OnMountedProfileApplied"));
         }
 
@@ -137,6 +137,6 @@ class UMars_Processor_WorldItem_Mount : UCk_Processor_Script_Base_UE
         { return; }
 
         auto& State = Owner.Get_Fragment(FMars_Fragment_WorldItem);
-        State.AppliedBodyProfile = TOptional<FName>(constants_world_item::k_MountedBodyProfile);
+        State.AppliedBodyProfile = TOptional<FName>(Owner.Get_Fragment(FMars_Fragment_WorldItem_Params).MountedBodyProfile);
     }
 }

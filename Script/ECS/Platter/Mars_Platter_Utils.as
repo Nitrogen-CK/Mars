@@ -106,7 +106,7 @@ namespace utils_platter
         { return; }
 
         const auto Profile = InMounting == EMars_Platter_Mounting::Mounted
-            ? constants_world_item::k_MountedBodyProfile
+            ? constants_platter::k_PhysicalBodyProfile
             : InPiece.Get_BodyTuners().CollisionProfileName;
         utils_jolt_body::Request_SetCollisionProfile(Body, FCk_Request_JoltBody_SetCollisionProfile(Profile));
     }

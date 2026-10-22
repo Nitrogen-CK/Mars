@@ -1001,6 +1001,19 @@ class AMars_AutoTest_CargoSlot_AFoodItemStowsIntoThePackAndRidesIt_Actor : ACk_A
     }
 }
 
+class AMars_AutoTest_CargoSlot_FoodDoesNotDriveADroppedPack_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 30.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_CargoSlot_FoodDoesNotDriveADroppedPack");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
 class AMars_AutoTest_CargoSlot_SpecValidateRejectsBadSlot_Actor : ACk_AutoTestRunner
 {
     UFUNCTION(BlueprintOverride)

@@ -21,6 +21,14 @@ namespace utils_world_item
             State.Body = World.Composition.Body;
             State.BodyProfile = World.Composition.BodyProfile;
             State.BoundsFit = World.Composition.BoundsFit;
+
+            const UCk_InventoryItem_Definition Definition = InSpec.Definition.Get();
+            if (ck::IsValid(Definition))
+            {
+                const UMars_ItemTrait_Presentation Presentation = Definition.Get_ItemTraitByClass(UMars_ItemTrait_Presentation);
+                if (ck::IsValid(Presentation))
+                { Params.MountedBodyProfile = Presentation.Mounting.MountedBodyProfile; }
+            }
         }
 
         InHandle.Add_Fragment(FMars_Feature_WorldItem());

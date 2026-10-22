@@ -138,6 +138,8 @@ class UMars_AutoTest_Platter_WorldItemCarriesItsPiecesThroughStowHoldAndRelease 
     UFUNCTION()
     private void Step_AssertRidesInHand(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
+        Assert_True(_WorldItem.Get_AppliedBodyProfile() == TOptional<FName>(constants_platter::k_PhysicalBodyProfile),
+            "the held tray acknowledged its opted-in physical support profile");
         const auto OverflowIndex = _Hotbar.Get_OverflowIndex();
         Assert_True(_Hotbar.Get_ItemAt(OverflowIndex) == _Item, "the overflow slot holds the platter");
         Assert_True(_Hotbar.Get_SelectedIndex() == TOptional<int32>(OverflowIndex), "the overflow slot is selected");
@@ -172,6 +174,8 @@ class UMars_AutoTest_Platter_WorldItemCarriesItsPiecesThroughStowHoldAndRelease 
 
         auto Body = _WorldItem.Get_Body();
         Assert_True(utils_jolt_body::Get_MotionType(Body) == ECk_MotionType::Dynamic, "the released platter's body is Dynamic");
+        Assert_True(_WorldItem.Get_AppliedBodyProfile() == TOptional<FName>(_WorldItem.Get_BodyProfile()),
+            "release acknowledged restoration of the tray's original profile");
 
         const auto Held = _Platter.Get_Held();
         Assert_Equals_Int(Held.Num(), 1, "the released platter still holds its piece");

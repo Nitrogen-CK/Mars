@@ -50,6 +50,7 @@ namespace mars_items
         Presentation.Grip.Handedness = EMars_ItemPresentation_Handedness::TwoHanded;
         Presentation.Mounting.HeldOffset = FTransform(FRotator::ZeroRotator, InHeldLocation);
         Presentation.Mounting.Persistence = EMars_WorldItem_Persistence::Persistent;
+        Presentation.Mounting.MountedBodyProfile = constants_platter::k_PhysicalBodyProfile;
         Presentation.Mounting.CarryPoint = GameplayTags::AttachPoint_Mars_Hand;
         Presentation.Mounting.CarryOffset = Presentation.Mounting.HeldOffset;
         Presentation.WorldItem.ScriptClass = UMars_Platter_EntityScript;

@@ -520,6 +520,17 @@ mixin FMars_Validation Validate(const FMars_WorldItem_Spec& Self)
     if (ck::IsValid(Composition.Body) && Composition.BodyProfile.IsNone())
     { return FMars_Validation("a Body needs the BodyProfile it was built with"); }
 
+    if (ck::IsValid(Composition.Body))
+    {
+        const UCk_InventoryItem_Definition Definition = Self.Definition.Get();
+        if (ck::IsValid(Definition))
+        {
+            const UMars_ItemTrait_Presentation Presentation = Definition.Get_ItemTraitByClass(UMars_ItemTrait_Presentation);
+            if (ck::IsValid(Presentation) && Presentation.Mounting.MountedBodyProfile.IsNone())
+            { return FMars_Validation("a Body needs its mounted collision profile"); }
+        }
+    }
+
     return FMars_Validation();
 }
 
@@ -535,6 +546,10 @@ struct FMars_Fragment_WorldItem_Params
     // Soft: fragments must not hold strong UObject refs.
     UPROPERTY()
     TSoftObjectPtr<UCk_InventoryItem_Definition> Definition;
+
+    // Retained at composition: mount request and acknowledgement use the same profile name.
+    UPROPERTY()
+    FName MountedBodyProfile = constants_world_item::k_MountedBodyProfile;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -555,7 +570,7 @@ struct FMars_Fragment_WorldItem
     UPROPERTY()
     FCk_Handle_JoltBody Body;
 
-    // The profile Body was built with; a mount swaps it for constants_world_item::k_MountedBodyProfile and a release
+    // The profile Body was built with; a mount swaps it for its retained mounted profile and a release
     // restores it.
     UPROPERTY()
     FName BodyProfile = constants_world_item::k_DefaultBodyProfile;

@@ -74,6 +74,10 @@ struct FMars_ItemPresentation_Mounting
     UPROPERTY()
     EMars_WorldItem_Persistence Persistence = EMars_WorldItem_Persistence::Transient;
 
+    // QueryOnly by default. A carried support surface opts into its own physical profile.
+    UPROPERTY()
+    FName MountedBodyProfile = constants_world_item::k_MountedBodyProfile;
+
     // Persistent only: the carrier's attach point the item mounts to while carried and not held (AttachPoint.Mars.Back).
     UPROPERTY()
     FGameplayTag CarryPoint;

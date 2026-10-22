@@ -83,6 +83,20 @@ class UMars_AutoTest_WorldItem_SpecValidateRejectsMixedModes : UCk_AutoTest_Base
         Parts = Make_Parts();
         Parts.Composition.BodyProfile = NAME_None;
         AssertRejected(Make_WorldOf(Parts), "BodyProfile", "a Body with no BodyProfile");
+
+        // The same immutable definition is harmless when no physical mount can consume it.
+        auto ProfilelessVisual = Make_Visual();
+        ProfilelessVisual.Definition = utils_held_item::Make_DefinitionSoft(mars_test_world_item::NoMountedProfile());
+        Assert_True(ProfilelessVisual.Validate().IsValid(), "a Visual item does not consume a mounted body profile");
+        Parts = Make_Parts();
+        Parts.Composition.Body = FCk_Handle_JoltBody();
+        auto ProfilelessBodiless = Make_WorldOf(Parts);
+        ProfilelessBodiless.Definition = ProfilelessVisual.Definition;
+        Assert_True(ProfilelessBodiless.Validate().IsValid(), "a bodiless World item does not consume a mounted body profile");
+
+        auto ProfilelessBody = Make_World();
+        ProfilelessBody.Definition = ProfilelessVisual.Definition;
+        AssertRejected(ProfilelessBody, "mounted collision profile", "a Body with a cleared mounted profile");
     }
 
     private FMars_WorldItem_Spec Make_Visual() const
