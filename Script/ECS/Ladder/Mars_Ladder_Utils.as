@@ -1,8 +1,7 @@
 namespace utils_ladder
 {
-    // Each zone reaches this far past the rails, and the top zone this far past the top exit (uu).
+    // Each zone reaches this far past the rails (uu).
     const float64 k_ZoneSidePadding = 20.0;
-    const float64 k_TopZoneOvershoot = 20.0;
 
     // Composes the ladder on InRoot (its frame is InRoot's transform, see FMars_Ladder_Spec) with its two zones as child
     // trigger nodes that detect the player probe. A rejected spec ensures and returns an invalid handle.
@@ -25,8 +24,8 @@ namespace utils_ladder
         FrontSpec.DetectionFilter = PlayerProbe;
         auto FrontZone = utils_trigger::Add(InRoot, FrontSpec);
 
-        // Behind the plane at the top, on the platform, reaching just past the top exit.
-        const auto TopHalfDepth = (float64(InParams.TopExitDepth) + k_TopZoneOvershoot) * 0.5;
+        // Behind the plane at the top, on the platform, TopMountDepth deep: a strip at the edge, clear of the top exit.
+        const auto TopHalfDepth = float64(InParams.TopMountDepth) * 0.5;
         const auto TopHalfHeight = float64(InParams.ZoneHeightPadding) * 0.5;
         auto TopSpec = FMars_Trigger_Spec();
         TopSpec.Shape = EMars_Trigger_Shape::Box;
@@ -110,4 +109,10 @@ mixin FVector Get_TowardPlaneWorld(const FCk_Handle_Ladder& Self, EMars_Ladder_Z
 {
     const auto LocalDirection = InZone == EMars_Ladder_Zone::Front ? FVector(-1.0, 0.0, 0.0) : FVector(1.0, 0.0, 0.0);
     return Self.Get_FrameWorld().GetRotation().RotateVector(LocalDirection);
+}
+
+// Out of the ladder, away from the wall (local +X), in world space.
+mixin FVector Get_OutWorld(const FCk_Handle_Ladder& Self)
+{
+    return Self.Get_FrameWorld().GetRotation().RotateVector(FVector(1.0, 0.0, 0.0));
 }

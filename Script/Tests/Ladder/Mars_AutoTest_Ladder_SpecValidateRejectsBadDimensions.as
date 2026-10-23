@@ -1,5 +1,5 @@
-// Validate() accepts the default ladder and rejects one with no height, no standoff, no top exit or no zone height padding,
-// each with an error naming the field it rejected.
+// Validate() accepts the default ladder and rejects one with no height, no standoff, no top exit, no zone height padding
+// or no top mount depth, each with an error naming the field it rejected, and one whose top zone reaches its top exit.
 class UMars_AutoTest_Ladder_SpecValidateRejectsBadDimensions : UCk_AutoTest_Base
 {
     UFUNCTION(BlueprintOverride)
@@ -29,6 +29,18 @@ class UMars_AutoTest_Ladder_SpecValidateRejectsBadDimensions : UCk_AutoTest_Base
         auto NoZonePadding = FMars_Ladder_Spec();
         NoZonePadding.ZoneHeightPadding = 0.0f;
         AssertRejectedField(NoZonePadding, "ZoneHeightPadding");
+
+        auto NoTopMount = FMars_Ladder_Spec();
+        NoTopMount.TopMountDepth = 0.0f;
+        AssertRejectedField(NoTopMount, "TopMountDepth");
+
+        // A top-out at TopExitDepth would land inside a zone as deep.
+        auto TopMountReachesExit = FMars_Ladder_Spec();
+        TopMountReachesExit.TopMountDepth = TopMountReachesExit.TopExitDepth;
+        const auto ReachValidation = TopMountReachesExit.Validate();
+        Assert_False(ReachValidation.IsValid(), "Validate() rejects a TopMountDepth that reaches the TopExitDepth");
+        Assert_True(ReachValidation.Get_Error().Contains("reaches its TopExitDepth"),
+            f"the error names the top exit it reaches (got [{ReachValidation.Get_Error()}])");
     }
 
     private void AssertValid(const FMars_Ladder_Spec& InSpec, const FString& InCase)

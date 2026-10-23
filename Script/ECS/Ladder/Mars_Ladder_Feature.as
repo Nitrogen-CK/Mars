@@ -39,6 +39,11 @@ struct FMars_Ladder_Spec
     UPROPERTY()
     float32 TopExitDepth = 70.0f;
 
+    // TopZone depth behind the plane. Shorter than TopExitDepth by more than a climber's capsule radius (the zone detects
+    // the whole body probe), so a top-out lands outside the zone and walking on does not grab the ladder again.
+    UPROPERTY()
+    float32 TopMountDepth = 25.0f;
+
     // Both zones extend this far above their edge (a capsule's worth).
     UPROPERTY()
     float32 ZoneHeightPadding = 100.0f;
@@ -51,7 +56,8 @@ struct FMars_Ladder_Spec
         float32 InStandoff,
         float32 InMountDepth,
         float32 InTopExitDepth,
-        float32 InZoneHeightPadding)
+        float32 InZoneHeightPadding,
+        float32 InTopMountDepth)
     {
         Height = InHeight;
         Width = InWidth;
@@ -59,12 +65,14 @@ struct FMars_Ladder_Spec
         MountDepth = InMountDepth;
         TopExitDepth = InTopExitDepth;
         ZoneHeightPadding = InZoneHeightPadding;
+        TopMountDepth = InTopMountDepth;
     }
 }
 
 // Every length must be positive: a zero height has no line to climb, a zero standoff puts the capsule in the rungs,
 // zero-depth zones or exit detect nothing / drop the climber on the edge, and zones with no height padding stop at their
-// edge, below a standing capsule. The climb speed is the climber's (FMars_Climber_Spec).
+// edge, below a standing capsule. The top zone must stop short of the top exit, or a top-out lands in it. The climb speed
+// is the climber's (FMars_Climber_Spec).
 mixin FMars_Validation Validate(const FMars_Ladder_Spec& Self)
 {
     if (Self.Height <= 0.0f)
@@ -84,6 +92,12 @@ mixin FMars_Validation Validate(const FMars_Ladder_Spec& Self)
 
     if (Self.ZoneHeightPadding <= 0.0f)
     { return FMars_Validation(f"Ladder has a non-positive ZoneHeightPadding [{Self.ZoneHeightPadding}]"); }
+
+    if (Self.TopMountDepth <= 0.0f)
+    { return FMars_Validation(f"Ladder has a non-positive TopMountDepth [{Self.TopMountDepth}]"); }
+
+    if (Self.TopMountDepth >= Self.TopExitDepth)
+    { return FMars_Validation(f"Ladder has a TopMountDepth [{Self.TopMountDepth}] that reaches its TopExitDepth [{Self.TopExitDepth}]: a top-out would land in the zone"); }
 
     return FMars_Validation();
 }

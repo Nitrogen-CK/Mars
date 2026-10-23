@@ -21,6 +21,20 @@ namespace utils_climber
     {
         return Cast<ACharacter>(utils_owning_actor::TryGet_EntityOwningActor_Recursive(InHandle));
     }
+
+    // +1 while the view points up the ladder (into the wall, or up), -1 while it points down it (out over the room, or
+    // down): forward input times this sign is the climb axis, so walking onto a ladder from its top with forward held
+    // climbs down. Up the ladder is halfway between world up and into the wall, so a level look along the wall is the
+    // ambiguous case; within constants_climber::k_ClimbViewDeadBand of it the previous sign holds.
+    float32 Get_ClimbViewSign(const FMars_Climber_ViewQuery& InQuery)
+    {
+        const auto UpTheLadder = (FVector::UpVector - InQuery.LadderOut).GetSafeNormal();
+        const auto Dot = InQuery.ViewForward.GetSafeNormal().DotProduct(UpTheLadder);
+        if (Math::Abs(Dot) < constants_climber::k_ClimbViewDeadBand)
+        { return InQuery.PreviousSign; }
+
+        return Dot > 0.0 ? 1.0f : -1.0f;
+    }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

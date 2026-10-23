@@ -1,6 +1,6 @@
 // While climbing: moves Alpha along the ladder by this frame's climb input at the climber's ClimbSpeed, asks the request
-// drain to end the climb at the top (only once the climber has left the top since a Top mount), at the bottom, or when the
-// ladder dies, and otherwise holds the character on the climb line with no velocity.
+// drain to end the climb at the top, at the bottom, or when the ladder dies, and otherwise holds the character on the climb
+// line with no velocity.
 class UMars_Processor_Climber_Tick : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -34,13 +34,9 @@ class UMars_Processor_Climber_Tick : UCk_Processor_Script_Base_UE
         const auto DeltaSeconds = float32(InDeltaT.Get_Seconds());
         const auto AlphaPerSecond = Self.Get_ClimbSpeed() / Ladder.Get_Height();
         Climb.Alpha = Math::Clamp(Climb.Alpha + Axis * AlphaPerSecond * DeltaSeconds, 0.0f, 1.0f);
-
-        if (Climb.Alpha < constants_climber::k_LeftTopAlpha)
-        { Climb.HasLeftTop = true; }
-
         InState.Climb = Climb;
 
-        if (Climb.Alpha >= 1.0f && Axis > 0.0f && Climb.HasLeftTop)
+        if (Climb.Alpha >= 1.0f && Axis > 0.0f)
         {
             Self.Request_Dismount(FMars_Request_Climber_Dismount(EMars_Climber_Dismount::Top));
             return;

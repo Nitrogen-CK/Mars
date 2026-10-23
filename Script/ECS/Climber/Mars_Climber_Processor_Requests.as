@@ -97,8 +97,8 @@ class UMars_Processor_Climber_HandleRequests : UCk_Processor_Script_Base_UE
         return true;
     }
 
-    // Front seeds Alpha from where the character's feet are on the line (0 without a character); Top seeds 1 and arms
-    // the leave-the-top guard. A ladder destroyed since the request is skipped.
+    // Front seeds Alpha from where the character's feet are on the line (0 without a character); Top seeds 1. A ladder
+    // destroyed since the request is skipped.
     private void HandleMount(FCk_Handle_Climber& InClimber, FMars_Fragment_Climber& InState, FMars_Request_Climber_Mount InRequest)
     {
         if (InState.Climb.IsSet())
@@ -112,7 +112,6 @@ class UMars_Processor_Climber_HandleRequests : UCk_Processor_Script_Base_UE
 
         auto Climb = FMars_Climber_Climb();
         Climb.Ladder = Ladder;
-        Climb.HasLeftTop = InRequest.Zone != EMars_Ladder_Zone::Top;
         if (InRequest.Zone == EMars_Ladder_Zone::Top)
         { Climb.Alpha = 1.0f; }
         else if (ck::IsValid(Character))
@@ -139,25 +138,29 @@ class UMars_Processor_Climber_HandleRequests : UCk_Processor_Script_Base_UE
         { InClimber.Get_Fragment(FMars_Fragment_Climber_Signals).OnClimbingChanged.Broadcast(InClimber, EMars_Climber_ClimbState::Climbing); }
     }
 
+    // A Top dismount whose exit the character cannot be placed at keeps the climb (see Apply_DismountToCharacter).
     private void FinishDismount(FCk_Handle_Climber& InClimber, FMars_Fragment_Climber& InState, EMars_Climber_Dismount InReason)
     {
         const auto Ladder = InState.Climb.GetValue().Ladder;
+        if (Apply_DismountToCharacter(utils_climber::TryGet_Character(InClimber), Ladder, InReason) == false)
+        { return; }
+
         InState.Climb.Reset();
         InState.LastDismount = TOptional<EMars_Climber_Dismount>(InReason);
         InClimber.Request_TryRemove(FMars_Tag_Climber_Climbing);
-
-        Apply_DismountToCharacter(utils_climber::TryGet_Character(InClimber), Ladder, InReason);
 
         if (InClimber.Has_Fragment(FMars_Fragment_Climber_Signals))
         { InClimber.Get_Fragment(FMars_Fragment_Climber_Signals).OnClimbingChanged.Broadcast(InClimber, EMars_Climber_ClimbState::NotClimbing); }
     }
 
-    // Puts InCharacter (null headless) where InReason leaves it. Top: onto the platform at the ladder's top exit, walking.
-    // Bottom / Lost: walking in place. Jump: falling, launched away from the plane.
-    private void Apply_DismountToCharacter(ACharacter InCharacter, FCk_Handle_Ladder InLadder, EMars_Climber_Dismount InReason)
+    // Puts InCharacter (null headless) where InReason leaves it. Top: onto the platform at the ladder's top exit, walking,
+    // through Teleport, which nudges the capsule clear of anything overlapping the exit; false (the climber stays at the
+    // top, and the next push up retries) when no clear spot is found, e.g. another player stands on the exit. Bottom /
+    // Lost: walking in place. Jump: falling, launched away from the plane. True whenever the character left the ladder.
+    private bool Apply_DismountToCharacter(ACharacter InCharacter, FCk_Handle_Ladder InLadder, EMars_Climber_Dismount InReason)
     {
         if (ck::Is_NOT_Valid(InCharacter))
-        { return; }
+        { return true; }
 
         auto Movement = InCharacter.CharacterMovement;
 
@@ -165,9 +168,11 @@ class UMars_Processor_Climber_HandleRequests : UCk_Processor_Script_Base_UE
         {
             const auto HalfHeight = InCharacter.CapsuleComponent.GetScaledCapsuleHalfHeight();
             const auto Exit = InLadder.Get_TopExitWorld().GetLocation() + FVector(0.0, 0.0, HalfHeight + constants_climber::k_TopOutClearance);
-            InCharacter.SetActorLocationAndRotation(Exit, InCharacter.GetActorRotation(), true);
+            if (InCharacter.Teleport(Exit, InCharacter.GetActorRotation()) == false)
+            { return false; }
+
             Movement.SetMovementMode(EMovementMode::MOVE_Walking);
-            return;
+            return true;
         }
 
         if (InReason == EMars_Climber_Dismount::Jump)
@@ -180,9 +185,10 @@ class UMars_Processor_Climber_HandleRequests : UCk_Processor_Script_Base_UE
             const auto OverrideXY = true;
             const auto OverrideZ = true;
             InCharacter.LaunchCharacter(Away + FVector(0.0, 0.0, constants_climber::k_JumpUpSpeed), OverrideXY, OverrideZ);
-            return;
+            return true;
         }
 
         Movement.SetMovementMode(EMovementMode::MOVE_Walking);
+        return true;
     }
 }

@@ -290,15 +290,20 @@ class UMars_SmState_Loco_Climb : UCk_SmState_EntityScript
     }
 }
 
-// The Climb state's input: every tick the move intent is non-zero, its forward axis (W/S) climbs the ladder; a fresh Jump
-// press jumps off. Ticks, unlike its EnterExitOnly base, whose enter/exit still run through Super; handles are cached
-// BEFORE Super::DoEnterTask (the base's first OnMatcherRebound runs inside it).
+// The Climb state's input: every tick the move intent is non-zero, its forward axis (W/S) climbs the ladder the way the
+// view points (utils_climber::Get_ClimbViewSign: looking into the wall or up, W climbs up; looking out over the room or
+// down, W climbs down; S the reverse), as Source-engine ladders do; a fresh Jump press jumps off. Without a character the
+// sign stays +1 (W up). Ticks, unlike its EnterExitOnly base, whose enter/exit still run through Super; handles are
+// cached BEFORE Super::DoEnterTask (the base's first OnMatcherRebound runs inside it).
 class UMars_SmTask_ClimbInput : UMars_SmTask_IntentEdges
 {
     default _TaskMode = ECk_SmTaskMode::Tick;
 
+    private ACharacter _Character;
     private FCk_Handle_Climber _Climber;
     private FCk_Handle_InputIntents _MoveIntents;
+    // Held by Get_ClimbViewSign inside its dead band; starts at up.
+    private float32 _ViewSign = 1.0f;
 
     UFUNCTION(BlueprintOverride)
     void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
@@ -306,10 +311,11 @@ class UMars_SmTask_ClimbInput : UMars_SmTask_IntentEdges
         auto Player = ck::Ctx(InHandle);
         _Climber = Player.As_Climber(ECk_SanityCheck::UnChecked);
         _MoveIntents = Player.As_InputIntents(ECk_SanityCheck::UnChecked);
+        _Character = Cast<ACharacter>(ck::ToActor(Player, ECk_SanityCheck::UnChecked));
+        _ViewSign = 1.0f;
 
-        auto Character = Cast<ACharacter>(ck::ToActor(Player, ECk_SanityCheck::UnChecked));
-        if (ck::IsValid(Character) && Character.bIsCrouched && utils_player_sm::Get_IsOwningCopy(InHandle, InNetContext))
-        { Character.UnCrouch(); }
+        if (ck::IsValid(_Character) && _Character.bIsCrouched && utils_player_sm::Get_IsOwningCopy(InHandle, InNetContext))
+        { _Character.UnCrouch(); }
 
         Super::DoEnterTask(InHandle, InNetContext);
     }
@@ -319,6 +325,7 @@ class UMars_SmTask_ClimbInput : UMars_SmTask_IntentEdges
     {
         Super::DoExitTask(InHandle, InNetContext);
 
+        _Character = nullptr;
         _Climber = FCk_Handle_Climber();
         _MoveIntents = FCk_Handle_InputIntents();
     }
@@ -333,7 +340,14 @@ class UMars_SmTask_ClimbInput : UMars_SmTask_IntentEdges
         if (MoveDirection.SizeSquared() <= 0.0001)
         { return ECk_SmTaskResult::Running; }
 
-        _Climber.Request_Climb(FMars_Request_Climber_Climb(float32(MoveDirection.X)));
+        auto Ladder = _Climber.Get_Ladder();
+        if (ck::IsValid(_Character) && ck::IsValid(Ladder))
+        {
+            const auto View = FMars_Climber_ViewQuery(_Character.GetControlRotation().Vector(), Ladder.Get_OutWorld(), _ViewSign);
+            _ViewSign = utils_climber::Get_ClimbViewSign(View);
+        }
+
+        _Climber.Request_Climb(FMars_Request_Climber_Climb(float32(MoveDirection.X) * _ViewSign));
         return ECk_SmTaskResult::Running;
     }
 
@@ -347,17 +361,21 @@ class UMars_SmTask_ClimbInput : UMars_SmTask_IntentEdges
 }
 
 // On Locomotion: steps the player onto a ladder whose zone they stand in when they walk toward it - the move direction
-// rotated by control yaw (as UMars_SmTask_Movement applies it) points at the ladder (dot > 0.5 with the zone's toward-plane
-// direction). A Top candidate also needs the feet on the platform (above Height - 20 over the ladder's foot), so reaching
-// the top zone from the front does not mount at the top. Without a character the yaw is 0 and the feet check is skipped.
-// After any dismount it waits RemountCooldownSeconds before mounting again: a top-out leaves the player in the TopZone and
-// a jump-off leaves them in the FrontZone, often still holding a direction that points at the ladder, and the next tick
-// would otherwise put them straight back on it.
+// rotated by control yaw (as UMars_SmTask_Movement applies it) points at the ladder (dot with the zone's toward-plane
+// direction above FrontMountDot, or the stricter TopMountDot at the top, so a walk along or across an edge does not grab
+// the ladder head). A Top candidate also needs the feet on the platform (above Height - 20 over the ladder's foot), so
+// reaching the top zone from the front does not mount at the top. Without a character the yaw is 0 and the feet check is
+// skipped. After any dismount it waits RemountCooldownSeconds before mounting again: a jump-off leaves the player in the
+// FrontZone, often still holding a direction that points at the ladder, and the next tick would otherwise put them
+// straight back on it (a top-out lands clear of the TopZone, see FMars_Ladder_Spec::TopMountDepth).
 class UMars_SmTask_ClimberMountIntent : UCk_SmTask_EntityScript
 {
     default _TaskMode = ECk_SmTaskMode::Tick;
 
     protected float32 RemountCooldownSeconds = 0.4f;
+    // Within ~60 deg of straight at the ladder from the front; within ~35 deg of straight at the edge from the top.
+    protected float64 FrontMountDot = 0.5;
+    protected float64 TopMountDot = 0.8;
 
     private ACharacter _Character;
     private FCk_Handle_Climber _Climber;
@@ -431,7 +449,8 @@ class UMars_SmTask_ClimberMountIntent : UCk_SmTask_EntityScript
             if (ck::Is_NOT_Valid(Ladder))
             { continue; }
 
-            if (MoveWorld.DotProduct(Ladder.Get_TowardPlaneWorld(Candidate.Zone)) <= 0.5)
+            const auto MountDot = Candidate.Zone == EMars_Ladder_Zone::Top ? TopMountDot : FrontMountDot;
+            if (MoveWorld.DotProduct(Ladder.Get_TowardPlaneWorld(Candidate.Zone)) <= MountDot)
             { continue; }
 
             if (Candidate.Zone == EMars_Ladder_Zone::Top && Get_IsOnPlatform(Ladder) == false)

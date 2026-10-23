@@ -90,11 +90,6 @@ struct FMars_Climber_Climb
     UPROPERTY()
     float32 Alpha = 0.0f;
 
-    // False after a Top mount until Alpha drops below constants_climber::k_LeftTopAlpha: holding up right after mounting
-    // at the top does not top out.
-    UPROPERTY()
-    bool HasLeftTop = true;
-
     // This frame's climb input, summed by the request drain; the tick clamps it to [-1, 1], consumes and zeroes it.
     UPROPERTY()
     float32 PendingAxis = 0.0f;
@@ -119,10 +114,36 @@ struct FMars_Fragment_Climber
 // Present while Climb is set; gates UMars_Processor_Climber_Tick.
 struct FMars_Tag_Climber_Climbing {}
 
+// Which way along the ladder a climber's view points, for utils_climber::Get_ClimbViewSign.
+struct FMars_Climber_ViewQuery
+{
+    // The look direction, pitch included (world).
+    UPROPERTY()
+    FVector ViewForward = FVector::ForwardVector;
+
+    // The ladder's out direction, away from the wall (FCk_Handle_Ladder::Get_OutWorld).
+    UPROPERTY()
+    FVector LadderOut = FVector::ForwardVector;
+
+    // The sign the last query returned; held inside the dead band.
+    UPROPERTY()
+    float32 PreviousSign = 1.0f;
+
+    FMars_Climber_ViewQuery() {}
+
+    FMars_Climber_ViewQuery(FVector InViewForward, FVector InLadderOut, float32 InPreviousSign)
+    {
+        ViewForward = InViewForward;
+        LadderOut = InLadderOut;
+        PreviousSign = InPreviousSign;
+    }
+}
+
 namespace constants_climber
 {
-    // A Top mount re-arms the top-out once the climber is below this alpha.
-    const float32 k_LeftTopAlpha = 0.95f;
+    // utils_climber::Get_ClimbViewSign keeps the previous sign while the view is this close to level along the wall
+    // (|dot| with the up-the-ladder direction).
+    const float64 k_ClimbViewDeadBand = 0.2;
 
     // A top-out lifts the capsule this far above the platform so it does not start inside the floor (uu).
     const float64 k_TopOutClearance = 2.0;
