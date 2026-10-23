@@ -9787,171 +9787,289 @@
    {
     "id": "Limestone",
     "path": "/Game/Mars/Environment/Warrens/Materials/Limestone_Mars_MI",
-    "parent": "/CkFoundation/CkUsf/GeneratedLooks/M_CkUsf_Look_Displace",
+    "parent": "/CkFoundation/CkUsf/GeneratedLooks/M_CkUsf_Look_ProtoGrid",
     "vectors": {
-     "BaseColor": [
-      0.3272727272727272,
-      0.2909090909090909,
-      0.21818181818181814
+     "PrimaryColor": [
+      0.3,
+      0.26,
+      0.19
+     ],
+     "SecondaryColor": [
+      0.36,
+      0.32,
+      0.23
+     ],
+     "LineColor": [
+      0.14,
+      0.13,
+      0.11
      ]
     },
     "scalars": {
-     "Amplitude": 0.0,
-     "Frequency": 0.0,
-     "Speed": 0.0
+     "CellSize": 60,
+     "SubCells": 3,
+     "LineWidth": 0.9,
+     "ShiftX": 0,
+     "ShiftY": 0
     }
    },
    {
     "id": "Bone",
     "path": "/Game/Mars/Environment/Warrens/Materials/Bone_Mars_MI",
-    "parent": "/CkFoundation/CkUsf/GeneratedLooks/M_CkUsf_Look_Displace",
+    "parent": "/CkFoundation/CkUsf/GeneratedLooks/M_CkUsf_Look_ProtoGrid",
     "vectors": {
-     "BaseColor": [
-      0.6,
-      0.5272727272727272,
-      0.3818181818181818
+     "PrimaryColor": [
+      0.45,
+      0.38,
+      0.26
+     ],
+     "SecondaryColor": [
+      0.56,
+      0.48,
+      0.34
+     ],
+     "LineColor": [
+      0.24,
+      0.2,
+      0.13
      ]
     },
     "scalars": {
-     "Amplitude": 0.0,
-     "Frequency": 0.0,
-     "Speed": 0.0
+     "CellSize": 25,
+     "SubCells": 2,
+     "LineWidth": 0.45,
+     "ShiftX": 0,
+     "ShiftY": 0
     }
    },
    {
     "id": "SootTimber",
     "path": "/Game/Mars/Environment/Warrens/Materials/SootTimber_Mars_MI",
-    "parent": "/CkFoundation/CkUsf/GeneratedLooks/M_CkUsf_Look_Displace",
+    "parent": "/CkFoundation/CkUsf/GeneratedLooks/M_CkUsf_Look_ProtoGridUV",
     "vectors": {
-     "BaseColor": [
-      0.06363636363636364,
-      0.045454545454545456,
-      0.03272727272727272
+     "PrimaryColor": [
+      0.16,
+      0.065,
+      0.025
+     ],
+     "SecondaryColor": [
+      0.24,
+      0.11,
+      0.04
+     ],
+     "LineColor": [
+      0.06,
+      0.025,
+      0.012
      ]
     },
     "scalars": {
-     "Amplitude": 0.0,
-     "Frequency": 0.0,
-     "Speed": 0.0
+     "CellsU": 1,
+     "CellsV": 6,
+     "SubCells": 1,
+     "LineWidth": 0.035
     }
    },
    {
     "id": "DarkIron",
     "path": "/Game/Mars/Environment/Warrens/Materials/DarkIron_Mars_MI",
-    "parent": "/CkFoundation/CkUsf/GeneratedLooks/M_CkUsf_Look_Displace",
+    "parent": "/CkFoundation/CkUsf/GeneratedLooks/M_CkUsf_Look_ProtoGrid",
     "vectors": {
-     "BaseColor": [
-      0.09999999999999999,
-      0.11818181818181818,
-      0.1272727272727273
+     "PrimaryColor": [
+      0.14,
+      0.17,
+      0.2
+     ],
+     "SecondaryColor": [
+      0.21,
+      0.25,
+      0.29
+     ],
+     "LineColor": [
+      0.48,
+      0.55,
+      0.64
      ]
     },
     "scalars": {
-     "Amplitude": 0.0,
-     "Frequency": 0.0,
-     "Speed": 0.0
+     "CellSize": 50,
+     "SubCells": 2,
+     "LineWidth": 0.4,
+     "ShiftX": 0,
+     "ShiftY": 0
     }
    },
    {
     "id": "Mineral",
     "path": "/Game/Mars/Environment/Warrens/Materials/Mineral_Mars_MI",
-    "parent": "/CkFoundation/CkUsf/GeneratedLooks/M_CkUsf_Look_Displace",
+    "parent": "/CkFoundation/CkUsf/GeneratedLooks/M_CkUsf_Look_ProtoGrid",
     "vectors": {
-     "BaseColor": [
-      0.13636363636363635,
-      0.20909090909090908,
-      0.23636363636363636
+     "PrimaryColor": [
+      0.1,
+      0.2,
+      0.22
+     ],
+     "SecondaryColor": [
+      0.14,
+      0.29,
+      0.28
+     ],
+     "LineColor": [
+      0.3,
+      0.43,
+      0.39
      ]
     },
     "scalars": {
-     "Amplitude": 0.0,
-     "Frequency": 0.0,
-     "Speed": 0.0
+     "CellSize": 50,
+     "SubCells": 4,
+     "LineWidth": 0.65,
+     "ShiftX": 0,
+     "ShiftY": 0
     }
    },
    {
     "id": "RootWood",
     "path": "/Game/Mars/Environment/Warrens/Materials/RootWood_Mars_MI",
-    "parent": "/CkFoundation/CkUsf/GeneratedLooks/M_CkUsf_Look_Displace",
+    "parent": "/CkFoundation/CkUsf/GeneratedLooks/M_CkUsf_Look_ProtoGridUV",
     "vectors": {
-     "BaseColor": [
-      0.2545454545454546,
-      0.13636363636363635,
-      0.05818181818181818
+     "PrimaryColor": [
+      0.11,
+      0.065,
+      0.025
+     ],
+     "SecondaryColor": [
+      0.19,
+      0.12,
+      0.035
+     ],
+     "LineColor": [
+      0.04,
+      0.025,
+      0.01
      ]
     },
     "scalars": {
-     "Amplitude": 0.0,
-     "Frequency": 0.0,
-     "Speed": 0.0
+     "CellsU": 2,
+     "CellsV": 10,
+     "SubCells": 1,
+     "LineWidth": 0.025
     }
    },
    {
     "id": "DarkMortar",
     "path": "/Game/Mars/Environment/Warrens/Materials/DarkMortar_Mars_MI",
-    "parent": "/CkFoundation/CkUsf/GeneratedLooks/M_CkUsf_Look_Displace",
+    "parent": "/CkFoundation/CkUsf/GeneratedLooks/M_CkUsf_Look_ProtoGrid",
     "vectors": {
-     "BaseColor": [
-      0.06363636363636364,
-      0.07454545454545454,
-      0.07999999999999999
+     "PrimaryColor": [
+      0.055,
+      0.065,
+      0.075
+     ],
+     "SecondaryColor": [
+      0.075,
+      0.085,
+      0.095
+     ],
+     "LineColor": [
+      0.17,
+      0.18,
+      0.19
      ]
     },
     "scalars": {
-     "Amplitude": 0.0,
-     "Frequency": 0.0,
-     "Speed": 0.0
+     "CellSize": 80,
+     "SubCells": 2,
+     "LineWidth": 0.75,
+     "ShiftX": 0,
+     "ShiftY": 0
     }
    },
    {
     "id": "NeutralFloor",
     "path": "/Game/Mars/Environment/Warrens/Materials/NeutralFloor_Mars_MI",
-    "parent": "/CkFoundation/CkUsf/GeneratedLooks/M_CkUsf_Look_Displace",
+    "parent": "/CkFoundation/CkUsf/GeneratedLooks/M_CkUsf_Look_ProtoGrid",
     "vectors": {
-     "BaseColor": [
-      0.1909090909090909,
-      0.1909090909090909,
-      0.1727272727272727
+     "PrimaryColor": [
+      0.17,
+      0.16,
+      0.14
+     ],
+     "SecondaryColor": [
+      0.22,
+      0.21,
+      0.18
+     ],
+     "LineColor": [
+      0.48,
+      0.46,
+      0.42
      ]
     },
     "scalars": {
-     "Amplitude": 0.0,
-     "Frequency": 0.0,
-     "Speed": 0.0
+     "CellSize": 100,
+     "SubCells": 4,
+     "LineWidth": 0.65,
+     "ShiftX": 0,
+     "ShiftY": 0
     }
    },
    {
     "id": "NeutralWall",
     "path": "/Game/Mars/Environment/Warrens/Materials/NeutralWall_Mars_MI",
-    "parent": "/CkFoundation/CkUsf/GeneratedLooks/M_CkUsf_Look_Displace",
+    "parent": "/CkFoundation/CkUsf/GeneratedLooks/M_CkUsf_Look_ProtoGrid",
     "vectors": {
-     "BaseColor": [
-      0.2909090909090909,
-      0.2727272727272727,
-      0.23636363636363636
+     "PrimaryColor": [
+      0.13,
+      0.145,
+      0.17
+     ],
+     "SecondaryColor": [
+      0.175,
+      0.195,
+      0.225
+     ],
+     "LineColor": [
+      0.4,
+      0.43,
+      0.48
      ]
     },
     "scalars": {
-     "Amplitude": 0.0,
-     "Frequency": 0.0,
-     "Speed": 0.0
+     "CellSize": 100,
+     "SubCells": 4,
+     "LineWidth": 0.65,
+     "ShiftX": 0,
+     "ShiftY": 0
     }
    },
    {
     "id": "NeutralRoof",
     "path": "/Game/Mars/Environment/Warrens/Materials/NeutralRoof_Mars_MI",
-    "parent": "/CkFoundation/CkUsf/GeneratedLooks/M_CkUsf_Look_Displace",
+    "parent": "/CkFoundation/CkUsf/GeneratedLooks/M_CkUsf_Look_ProtoGrid",
     "vectors": {
-     "BaseColor": [
-      0.1272727272727273,
-      0.13636363636363635,
-      0.13636363636363635
+     "PrimaryColor": [
+      0.11,
+      0.12,
+      0.14
+     ],
+     "SecondaryColor": [
+      0.145,
+      0.16,
+      0.18
+     ],
+     "LineColor": [
+      0.32,
+      0.33,
+      0.35
      ]
     },
     "scalars": {
-     "Amplitude": 0.0,
-     "Frequency": 0.0,
-     "Speed": 0.0
+     "CellSize": 100,
+     "SubCells": 4,
+     "LineWidth": 0.6,
+     "ShiftX": 0,
+     "ShiftY": 0
     }
    }
   ],
