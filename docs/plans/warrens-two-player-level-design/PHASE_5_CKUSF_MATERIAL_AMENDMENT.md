@@ -1,5 +1,7 @@
 # Warrens CkUSF material amendment - 2026-10-22
 
+**Superseded by [the material readability repair](MATERIAL_REPAIR_20261022.md).** The user found this flat Displace result inadequate and explicitly approved distinct blockout treatments, including CkUSF grid fallbacks. The account below is historical; its zero-grid and keep-all-variation-zero instructions no longer describe the current material contract.
+
 User request: "dont use regular greybox material, prefer using the ckusf instead." This supersedes the repository's older ProtoGrid surface preference for this authored Warrens map. It authorizes map-wide material cleanup, not new BatchB/C dressing, lighting, sound, gameplay or multiplayer work.
 
 ## Actual change

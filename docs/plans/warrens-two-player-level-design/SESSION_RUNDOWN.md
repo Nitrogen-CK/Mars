@@ -1,5 +1,7 @@
 # Warrens session rundown
 
+**Later material correction:** the flat Displace amendment was rejected in play and replaced by [readable CkUSF blockout treatments](MATERIAL_REPAIR_20261022.md), verified in 16 matched PIE views. That repair and the subsequent orange stair/ramp landmarks are committed locally; nothing is pushed. See the repair record for the later scope and evidence.
+
 2026-10-22, America/Toronto. Scope: this conversation's review, implementation plan, Phases1-5, physical/readability corrections, authorized local pack-loading repair and requested CkUSF material amendment. Layout and intention for two players; no multiplayer engineering. Session work is committed locally; nothing is pushed. See [commit record](COMMIT_RECORD.md) for boundaries and remaining unrelated changes.
 
 ## Current outcome
