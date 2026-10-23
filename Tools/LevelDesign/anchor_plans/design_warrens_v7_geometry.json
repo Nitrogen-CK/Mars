@@ -8487,6 +8487,35 @@
      "ShiftX": 0,
      "ShiftY": 0
     }
+   },
+   {
+    "id": "TraversalOrange",
+    "path": "/Game/Mars/Environment/Warrens/Materials/TraversalOrange_Mars_MI",
+    "parent": "/CkFoundation/CkUsf/GeneratedLooks/M_CkUsf_Look_ProtoGrid",
+    "vectors": {
+     "PrimaryColor": [
+      0.42,
+      0.14,
+      0.03
+     ],
+     "SecondaryColor": [
+      0.52,
+      0.19,
+      0.05
+     ],
+     "LineColor": [
+      1,
+      0.72,
+      0.42
+     ]
+    },
+    "scalars": {
+     "CellSize": 50,
+     "SubCells": 4,
+     "LineWidth": 0.65,
+     "ShiftX": 0,
+     "ShiftY": 0
+    }
    }
   ],
   "regions": [
@@ -9172,6 +9201,15 @@
    "inlay": "/Game/Mars/Environment/Warrens/Materials/DarkIron_Mars_MI",
    "pier": "/Game/Mars/Environment/Warrens/Materials/NeutralWall_Mars_MI",
    "dressing": "/Game/Mars/Environment/Warrens/Materials/Limestone_Mars_MI"
+  },
+  "traversalAccent": {
+   "material": "/Game/Mars/Environment/Warrens/Materials/TraversalOrange_Mars_MI",
+   "kinds": [
+    "ramp"
+   ],
+   "connectors": [
+    "service-spiral"
+   ]
   }
  }
 }

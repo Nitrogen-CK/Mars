@@ -1015,6 +1015,9 @@ def apply_presentation(man, presentation):
     default_materials = presentation.get('defaultMaterials', {})
     assert all(kind in MATERIALS and path in materials for kind, path in default_materials.items()), 'unknown presentation default material'
     by_source = {o['sourceId']: o for o in overrides}
+    accent = presentation.get('traversalAccent', {})
+    assert not accent or (accent['material'] in materials and
+                          all(kind in MATERIALS for kind in accent.get('kinds', []))), 'unknown traversal accent'
     for value in man['boxes']:
         if value['kind'] in default_materials:
             value.setdefault('material', default_materials[value['kind']])
@@ -1028,6 +1031,8 @@ def apply_presentation(man, presentation):
         if override:
             assert override['material'] in materials, override['material']
             value['material'] = override['material']
+        if value['kind'] in accent.get('kinds', []):
+            value['material'] = accent['material']
     dressing = presentation.get('dressing', [])
     assert len({v['id'] for v in dressing}) == len(dressing), 'duplicate presentation dressing'
     for value in dressing:
@@ -1312,6 +1317,9 @@ def manifest(write=True, data=None):
                 rc = (ri + ro) / 2
                 boxes.append(box('floor', (cx + rc * math.cos(am), cy + rc * math.sin(am), t['top'] - t['thickness'] / 2),
                                  (ro - ri, 2 * ro * math.sin(da / 2), t['thickness']), math.degrees(am)))
+                accent = d.get('presentation', {}).get('traversalAccent', {})
+                if c['id'] in accent.get('connectors', []):
+                    boxes[-1]['material'] = accent['material']
             for r in (rails_spec['innerRadius'], rails_spec['outerRadius']):
                 boxes.append(box('gallery', (cx + r * math.cos(am), cy + r * math.sin(am), t['top'] + rails_spec['height'] / 2),
                                  (rails_spec['thickness'], 2 * r * math.sin(da / 2), rails_spec['height']), math.degrees(am)))
