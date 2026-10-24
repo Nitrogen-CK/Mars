@@ -1,0 +1,52 @@
+{
+  "tile": "Catacomb",
+  "asset": "/Game/Mars/Maps/Variants/v8c/LI_Warrens_Catacomb",
+  "instances": 3671,
+  "hism_groups": 15,
+  "counts": {
+    "BACKING_TX01": 1320,
+    "BACKING_TX02": 494,
+    "CCS09": 16,
+    "CCS11": 15,
+    "CCS13": 494,
+    "CCS13_TX01": 491,
+    "CCS15": 829,
+    "CCS60": 2,
+    "CCS61": 2,
+    "CCS62": 2,
+    "CCS64": 2,
+    "WVC026": 1,
+    "WVC052": 1,
+    "WVC053": 1,
+    "WVC081": 1
+  },
+  "material_overrides": [
+    {
+      "actor": "Warrens_Greybox_floor",
+      "component": "HierarchicalInstancedStaticMesh",
+      "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX02.M_CCK_TX02"
+    },
+    {
+      "actor": "Warrens_Greybox_wall",
+      "component": "HierarchicalInstancedStaticMesh",
+      "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX17.M_CCK_TX17"
+    },
+    {
+      "actor": "Warrens_Greybox_ramp",
+      "component": "HierarchicalInstancedStaticMesh",
+      "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX02.M_CCK_TX02"
+    },
+    {
+      "actor": "Warrens_Greybox_gallery",
+      "component": "HierarchicalInstancedStaticMesh",
+      "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX09.M_CCK_TX09"
+    },
+    {
+      "actor": "Warrens_Greybox_prop",
+      "component": "HierarchicalInstancedStaticMesh",
+      "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX01.M_CCK_TX01"
+    }
+  ],
+  "gate_bindings": [],
+  "rollback": "D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\Reports\\Backups\\20261024-062002\\LI_Warrens_Catacomb.umap"
+}

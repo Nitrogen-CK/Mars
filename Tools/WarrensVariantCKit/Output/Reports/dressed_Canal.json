@@ -1,0 +1,61 @@
+{
+  "tile": "Canal",
+  "asset": "/Game/Mars/Maps/Variants/v8c/LI_Warrens_Canal",
+  "instances": 2184,
+  "hism_groups": 19,
+  "counts": {
+    "BACKING_TX01": 484,
+    "BACKING_TX02": 537,
+    "CCS03": 29,
+    "CCS04": 12,
+    "CCS09": 28,
+    "CCS11": 22,
+    "CCS13": 537,
+    "CCS13_TX01": 30,
+    "CCS15": 454,
+    "CCS43": 2,
+    "CCS50": 2,
+    "CCS60": 7,
+    "CCS61": 7,
+    "CCS62": 3,
+    "CCS64": 10,
+    "CCS71": 1,
+    "WVC007": 10,
+    "WVC008": 8,
+    "WVC064": 1
+  },
+  "material_overrides": [
+    {
+      "actor": "Warrens_Greybox_floor",
+      "component": "HierarchicalInstancedStaticMesh",
+      "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX02.M_CCK_TX02"
+    },
+    {
+      "actor": "Warrens_Greybox_wall",
+      "component": "HierarchicalInstancedStaticMesh",
+      "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX01.M_CCK_TX01"
+    },
+    {
+      "actor": "Warrens_Greybox_ramp",
+      "component": "HierarchicalInstancedStaticMesh",
+      "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX02.M_CCK_TX02"
+    },
+    {
+      "actor": "Warrens_Greybox_gallery",
+      "component": "HierarchicalInstancedStaticMesh",
+      "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX09.M_CCK_TX09"
+    },
+    {
+      "actor": "Warrens_Greybox_water",
+      "component": "HierarchicalInstancedStaticMesh",
+      "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_FX_Water.M_CCK_FX_Water"
+    },
+    {
+      "actor": "Warrens_Greybox_candle",
+      "component": "HierarchicalInstancedStaticMesh",
+      "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX09.M_CCK_TX09"
+    }
+  ],
+  "gate_bindings": [],
+  "rollback": "D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\Reports\\Backups\\20261024-062002\\LI_Warrens_Canal.umap"
+}

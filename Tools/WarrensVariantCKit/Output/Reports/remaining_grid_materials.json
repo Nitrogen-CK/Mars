@@ -1,0 +1,142 @@
+[
+  {
+    "actor": "Warrens_Greybox_floor",
+    "path": "/Game/Mars/Maps/Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Actor_0",
+    "component": "HierarchicalInstancedStaticMesh",
+    "materials": [
+      "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Floor_Mars_MI.ProtoGrid_Floor_Mars_MI"
+    ],
+    "visible": true,
+    "hidden": false
+  },
+  {
+    "actor": "Warrens_Greybox_wall",
+    "path": "/Game/Mars/Maps/Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Actor_1",
+    "component": "HierarchicalInstancedStaticMesh",
+    "materials": [
+      "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+    ],
+    "visible": true,
+    "hidden": false
+  },
+  {
+    "actor": "Warrens_Greybox_ramp",
+    "path": "/Game/Mars/Maps/Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Actor_2",
+    "component": "HierarchicalInstancedStaticMesh",
+    "materials": [
+      "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Platform_Mars_MI.ProtoGrid_Platform_Mars_MI"
+    ],
+    "visible": true,
+    "hidden": false
+  },
+  {
+    "actor": "Ck_EditorSelectionProxyHost_Actor_UE5",
+    "path": "/Game/Mars/Maps/Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_5",
+    "component": "StaticMeshComponent_0",
+    "materials": [
+      "/Game/Mars/Maps/Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_5.StaticMeshComponent_0.MID_ProtoGrid_Item_Mars_MI_0"
+    ],
+    "visible": true,
+    "hidden": false
+  },
+  {
+    "actor": "Ck_EditorSelectionProxyHost_Actor_UE6",
+    "path": "/Game/Mars/Maps/Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_6",
+    "component": "StaticMeshComponent_0",
+    "materials": [
+      "/Game/Mars/Maps/Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_6.StaticMeshComponent_0.MID_ProtoGrid_Item_Mars_MI_0"
+    ],
+    "visible": true,
+    "hidden": false
+  },
+  {
+    "actor": "Ck_EditorSelectionProxyHost_Actor_UE7",
+    "path": "/Game/Mars/Maps/Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_7",
+    "component": "StaticMeshComponent_0",
+    "materials": [
+      "/Game/Mars/Maps/Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_7.StaticMeshComponent_0.MID_ProtoGrid_Item_Mars_MI_0"
+    ],
+    "visible": true,
+    "hidden": false
+  },
+  {
+    "actor": "Ck_EditorSelectionProxyHost_Actor_UE9",
+    "path": "/Game/Mars/Maps/Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_9",
+    "component": "StaticMeshComponent_0",
+    "materials": [
+      "/Game/Mars/Maps/Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_9.StaticMeshComponent_0.MID_ProtoGrid_Item_Mars_MI_0"
+    ],
+    "visible": true,
+    "hidden": false
+  },
+  {
+    "actor": "Ck_EditorSelectionProxyHost_Actor_UE10",
+    "path": "/Game/Mars/Maps/Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_10",
+    "component": "StaticMeshComponent_0",
+    "materials": [
+      "/Game/Mars/Maps/Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_10.StaticMeshComponent_0.MID_ProtoGrid_Item_Mars_MI_0"
+    ],
+    "visible": true,
+    "hidden": false
+  },
+  {
+    "actor": "Ck_EditorSelectionProxyHost_Actor_UE12",
+    "path": "/Game/Mars/Maps/Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_12",
+    "component": "StaticMeshComponent_0",
+    "materials": [
+      "/Game/Mars/Maps/Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_12.StaticMeshComponent_0.MID_ProtoGrid_Item_Mars_MI_0"
+    ],
+    "visible": true,
+    "hidden": false
+  },
+  {
+    "actor": "Ck_EditorSelectionProxyHost_Actor_UE13",
+    "path": "/Game/Mars/Maps/Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_13",
+    "component": "StaticMeshComponent_0",
+    "materials": [
+      "/Game/Mars/Maps/Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_13.StaticMeshComponent_0.MID_ProtoGrid_Item_Mars_MI_0"
+    ],
+    "visible": true,
+    "hidden": false
+  },
+  {
+    "actor": "Ck_EditorSelectionProxyHost_Actor_UE15",
+    "path": "/Game/Mars/Maps/Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_15",
+    "component": "StaticMeshComponent_0",
+    "materials": [
+      "/Game/Mars/Maps/Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_15.StaticMeshComponent_0.MID_ProtoGrid_Item_Mars_MI_0"
+    ],
+    "visible": true,
+    "hidden": false
+  },
+  {
+    "actor": "Ck_EditorSelectionProxyHost_Actor_UE16",
+    "path": "/Game/Mars/Maps/Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_16",
+    "component": "StaticMeshComponent_0",
+    "materials": [
+      "/Game/Mars/Maps/Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_16.StaticMeshComponent_0.MID_ProtoGrid_Item_Mars_MI_0"
+    ],
+    "visible": true,
+    "hidden": false
+  },
+  {
+    "actor": "Ck_EditorSelectionProxyHost_Actor_UE18",
+    "path": "/Game/Mars/Maps/Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_18",
+    "component": "StaticMeshComponent_0",
+    "materials": [
+      "/Game/Mars/Maps/Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_18.StaticMeshComponent_0.MID_ProtoGrid_Item_Mars_MI_0"
+    ],
+    "visible": true,
+    "hidden": false
+  },
+  {
+    "actor": "Ck_EditorSelectionProxyHost_Actor_UE19",
+    "path": "/Game/Mars/Maps/Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_19",
+    "component": "StaticMeshComponent_0",
+    "materials": [
+      "/Game/Mars/Maps/Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_19.StaticMeshComponent_0.MID_ProtoGrid_Item_Mars_MI_0"
+    ],
+    "visible": true,
+    "hidden": false
+  }
+]

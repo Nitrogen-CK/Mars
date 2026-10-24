@@ -1,0 +1,24 @@
+{
+  "generated_utc": "2026-10-24T18:51:41.811222+00:00",
+  "status": "art_pipeline_and_scoped_audit_complete",
+  "head": "793bd123b2d2f4ebe9f398487f4cf48992fc9f22",
+  "districts": 11,
+  "rooms": 24,
+  "library_models": 196,
+  "new_models": 83,
+  "reused_models": 113,
+  "source_instances": 7481,
+  "art_instances": 37511,
+  "runtime_views": 55,
+  "editor_dirty_maps": 0,
+  "editor_dirty_content": 0,
+  "committed": false,
+  "pushed": false,
+  "artifact_sha256": {
+    "Tools\\WarrensVariantCKit\\Output\\WarrensVariantC_KitLibrary.blend": "860cac453221d8b3d14657c822ac9d00c4d5411d99ad0d8c5c14b7972796afa2",
+    "Tools\\WarrensVariantCKit\\Output\\WarrensVariantC_Diorama.blend": "d6c09f86469a515bf47b5d8b2f9782e30950b8df58a9d7b26f38640703f64945",
+    "Tools\\WarrensVariantCKit\\Output\\fitted_instances.json": "67f8e8d87ab166ab7fd0cd5e285a08e02b8643c856de3bf028130271021b9d34",
+    "Tools\\WarrensVariantCKit\\Output\\asset_manifest.json": "19eb309e0c686bd4917438422017a391a391288f715a992ad8b2c599875fd10d",
+    "Tools\\WarrensVariantCKit\\Output\\Reports\\runtime_capture_manifest.json": "69a700fbfd360ca7e7068cc54c346453736e187270655539789a657288859303"
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "scope": "Focused Anchor and Gate-name filters; not a full suite",
+  "baseline_warrens": {
+    "passed": 6,
+    "failed": 0
+  },
+  "runs": [
+    {
+      "filter": "Anchor",
+      "exit_code": 0,
+      "total": 41,
+      "passed": 41,
+      "failed": 0,
+      "skipped": 0,
+      "contaminated": 0,
+      "log": "Toolbox-Anchor.log"
+    },
+    {
+      "filter": "Gate",
+      "exit_code": 0,
+      "total": 52,
+      "passed": 51,
+      "failed": 1,
+      "skipped": 0,
+      "contaminated": 0,
+      "log": "Toolbox-Gate.log"
+    }
+  ],
+  "listed_known_failure": "Monolith.ReflectionIntel.Risk.ConditionalGateSweep",
+  "gameplay_gate_tests": {
+    "passed": 2,
+    "failed": 0,
+    "names": [
+      "ThresholdDefersCloseUntilClear",
+      "UnsourcedSinkClosesStartOpenGate"
+    ]
+  },
+  "warrens_subset": {
+    "passed": 6,
+    "failed": 0,
+    "evidence": "Toolbox-Anchor.log six final Warrens Test Completed Success records"
+  },
+  "new_failures": 0
+}

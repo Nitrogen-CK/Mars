@@ -1,0 +1,1284 @@
+[
+  {
+    "id": "ROOM_hall",
+    "kind": "room",
+    "label": "Arrival Hall",
+    "plan_eye": [
+      13.0,
+      49.0,
+      1.4
+    ],
+    "target": [
+      40,
+      55.5,
+      5
+    ],
+    "source_floor": "Warrens_Greybox_floor:54",
+    "requested_base": [
+      13,
+      49,
+      0
+    ],
+    "eye_height_m": 1.4
+  },
+  {
+    "id": "ROOM_closet",
+    "kind": "room",
+    "label": "closet",
+    "plan_eye": [
+      20.5,
+      40.0,
+      1.4
+    ],
+    "target": [
+      18,
+      40,
+      1
+    ],
+    "source_floor": "Warrens_Greybox_floor:33",
+    "requested_base": [
+      20.5,
+      40,
+      0
+    ],
+    "eye_height_m": 1.4
+  },
+  {
+    "id": "ROOM_court",
+    "kind": "room",
+    "label": "Charnel Court",
+    "plan_eye": [
+      14.0,
+      69.0,
+      -0.10000000000000009
+    ],
+    "target": [
+      15,
+      88,
+      2
+    ],
+    "source_floor": "Warrens_Greybox_floor:128",
+    "requested_base": [
+      14,
+      69,
+      -1.5
+    ],
+    "eye_height_m": 1.4
+  },
+  {
+    "id": "ROOM_court-pit",
+    "kind": "room",
+    "label": "court-pit",
+    "plan_eye": [
+      9.0,
+      77.0,
+      -0.10000000000000009
+    ],
+    "target": [
+      21,
+      81,
+      -0.4
+    ],
+    "source_floor": "Warrens_Greybox_floor:148",
+    "requested_base": [
+      9,
+      77,
+      -1.5
+    ],
+    "eye_height_m": 1.4
+  },
+  {
+    "id": "ROOM_rimW",
+    "kind": "room",
+    "label": "rimW",
+    "plan_eye": [
+      31.0,
+      50.0,
+      1.4
+    ],
+    "target": [
+      40,
+      55.5,
+      4
+    ],
+    "source_floor": "Warrens_Greybox_floor:50",
+    "requested_base": [
+      31,
+      50,
+      0
+    ],
+    "eye_height_m": 1.4
+  },
+  {
+    "id": "ROOM_rimE",
+    "kind": "room",
+    "label": "rimE",
+    "plan_eye": [
+      48.0,
+      50.0,
+      1.4
+    ],
+    "target": [
+      102,
+      50,
+      3
+    ],
+    "source_floor": "Warrens_Greybox_floor:45",
+    "requested_base": [
+      48,
+      50,
+      0
+    ],
+    "eye_height_m": 1.4
+  },
+  {
+    "id": "ROOM_rimN",
+    "kind": "room",
+    "label": "The Well",
+    "plan_eye": [
+      43.45922011883811,
+      56.108655439013546,
+      1.4
+    ],
+    "target": [
+      48.5,
+      57,
+      1.4
+    ],
+    "source_floor": "Warrens_Greybox_floor:73",
+    "requested_base": [
+      43,
+      55,
+      0
+    ],
+    "eye_height_m": 1.4
+  },
+  {
+    "id": "ROOM_rimS",
+    "kind": "room",
+    "label": "rimS",
+    "plan_eye": [
+      39.43431457505076,
+      43.93431457505076,
+      1.4
+    ],
+    "target": [
+      40,
+      55.5,
+      4
+    ],
+    "source_floor": "Warrens_Greybox_floor:36",
+    "requested_base": [
+      40,
+      44.5,
+      0
+    ],
+    "eye_height_m": 1.4
+  },
+  {
+    "id": "ROOM_ossuary",
+    "kind": "room",
+    "label": "Ossuary",
+    "plan_eye": [
+      44.0,
+      65.0,
+      3.9
+    ],
+    "target": [
+      52,
+      76,
+      3.7
+    ],
+    "source_floor": "Warrens_Greybox_floor:3",
+    "requested_base": [
+      44,
+      65,
+      2.5
+    ],
+    "eye_height_m": 1.4
+  },
+  {
+    "id": "ROOM_bridgehead",
+    "kind": "room",
+    "label": "Bridgehead",
+    "plan_eye": [
+      58.0,
+      73.0,
+      3.9
+    ],
+    "target": [
+      74,
+      74,
+      3
+    ],
+    "source_floor": "Warrens_Greybox_floor:5",
+    "requested_base": [
+      58,
+      73,
+      2.5
+    ],
+    "eye_height_m": 1.4
+  },
+  {
+    "id": "ROOM_ford-w",
+    "kind": "room",
+    "label": "The Ford",
+    "plan_eye": [
+      54.0,
+      48.0,
+      -1.1
+    ],
+    "target": [
+      74,
+      49,
+      -1
+    ],
+    "source_floor": "Warrens_Greybox_floor:23",
+    "requested_base": [
+      54,
+      48,
+      -2.5
+    ],
+    "eye_height_m": 1.4
+  },
+  {
+    "id": "ROOM_ford-e",
+    "kind": "room",
+    "label": "ford-e",
+    "plan_eye": [
+      83.0,
+      49.0,
+      1.1561519855778128
+    ],
+    "target": [
+      91,
+      50,
+      1.2
+    ],
+    "source_floor": "Warrens_Greybox_ramp:0",
+    "requested_base": [
+      83,
+      49,
+      0
+    ],
+    "eye_height_m": 1.4
+  },
+  {
+    "id": "ROOM_reliquary",
+    "kind": "room",
+    "label": "Reliquary",
+    "plan_eye": [
+      94.0,
+      77.0,
+      3.9
+    ],
+    "target": [
+      88,
+      84,
+      3.4
+    ],
+    "source_floor": "Warrens_Greybox_floor:1",
+    "requested_base": [
+      94,
+      77,
+      2.5
+    ],
+    "eye_height_m": 1.4
+  },
+  {
+    "id": "ROOM_mill",
+    "kind": "room",
+    "label": "Salt Mill",
+    "plan_eye": [
+      86.0,
+      99.0,
+      6.4
+    ],
+    "target": [
+      95,
+      104,
+      6
+    ],
+    "source_floor": "Warrens_Greybox_gallery:0",
+    "requested_base": [
+      86,
+      99,
+      5
+    ],
+    "eye_height_m": 1.4
+  },
+  {
+    "id": "ROOM_catacomb",
+    "kind": "room",
+    "label": "Catacomb",
+    "plan_eye": [
+      -22.0,
+      74.0,
+      1.4
+    ],
+    "target": [
+      -18,
+      80,
+      1
+    ],
+    "source_floor": "Warrens_Greybox_floor:20",
+    "requested_base": [
+      -22,
+      74,
+      0
+    ],
+    "eye_height_m": 1.4
+  },
+  {
+    "id": "ROOM_belfry",
+    "kind": "room",
+    "label": "The Belfry",
+    "plan_eye": [
+      94.0,
+      57.0,
+      1.4
+    ],
+    "target": [
+      104,
+      50,
+      15
+    ],
+    "source_floor": "Warrens_Greybox_floor:20",
+    "requested_base": [
+      94,
+      57,
+      0
+    ],
+    "eye_height_m": 1.4
+  },
+  {
+    "id": "ROOM_bell-loft",
+    "kind": "room",
+    "label": "Bell Loft",
+    "plan_eye": [
+      103.0,
+      61.0,
+      3.9
+    ],
+    "target": [
+      104,
+      50,
+      16
+    ],
+    "source_floor": "Warrens_Greybox_floor:80",
+    "requested_base": [
+      103,
+      61,
+      2.5
+    ],
+    "eye_height_m": 1.4
+  },
+  {
+    "id": "ROOM_cellar",
+    "kind": "room",
+    "label": "Salt Cellar",
+    "plan_eye": [
+      103.0,
+      23.0,
+      -1.1
+    ],
+    "target": [
+      100,
+      16,
+      -1.5
+    ],
+    "source_floor": "Warrens_Greybox_floor:4",
+    "requested_base": [
+      103,
+      23,
+      -2.5
+    ],
+    "eye_height_m": 1.4
+  },
+  {
+    "id": "ROOM_sluice",
+    "kind": "room",
+    "label": "Sluice",
+    "plan_eye": [
+      122.0,
+      11.0,
+      -1.1
+    ],
+    "target": [
+      122,
+      20,
+      -1.5
+    ],
+    "source_floor": "Warrens_Greybox_floor:0",
+    "requested_base": [
+      122,
+      11,
+      -2.5
+    ],
+    "eye_height_m": 1.4
+  },
+  {
+    "id": "ROOM_larder",
+    "kind": "room",
+    "label": "Brine Larder",
+    "plan_eye": [
+      116.0,
+      35.0,
+      -1.5
+    ],
+    "target": [
+      126,
+      43,
+      -1
+    ],
+    "source_floor": "Warrens_Greybox_floor:87",
+    "requested_base": [
+      116,
+      35,
+      -2.5
+    ],
+    "eye_height_m": 1.4
+  },
+  {
+    "id": "ROOM_pump",
+    "kind": "room",
+    "label": "Pump Room",
+    "plan_eye": [
+      61.0,
+      29.0,
+      -1.1
+    ],
+    "target": [
+      54,
+      22,
+      1
+    ],
+    "source_floor": "Warrens_Greybox_floor:11",
+    "requested_base": [
+      61,
+      29,
+      -2.5
+    ],
+    "eye_height_m": 1.4
+  },
+  {
+    "id": "ROOM_cistern",
+    "kind": "room",
+    "label": "Cistern",
+    "plan_eye": [
+      8.3,
+      37.0,
+      -1.1
+    ],
+    "target": [
+      16,
+      35,
+      -1.5
+    ],
+    "source_floor": "Warrens_Greybox_floor:1",
+    "requested_base": [
+      8.3,
+      37,
+      -2.5
+    ],
+    "eye_height_m": 1.4
+  },
+  {
+    "id": "ROOM_lair",
+    "kind": "room",
+    "label": "The Pit",
+    "plan_eye": [
+      40.0,
+      50.0,
+      -3.6
+    ],
+    "target": [
+      48,
+      54,
+      -3.8
+    ],
+    "source_floor": "Warrens_Greybox_floor:55",
+    "requested_base": [
+      40,
+      50,
+      -5
+    ],
+    "eye_height_m": 1.4
+  },
+  {
+    "id": "ROOM_vault",
+    "kind": "room",
+    "label": "Vault",
+    "plan_eye": [
+      59.5,
+      57.5,
+      -3.6
+    ],
+    "target": [
+      64,
+      62,
+      -3.8
+    ],
+    "source_floor": "Warrens_Greybox_floor:143",
+    "requested_base": [
+      59.5,
+      57.5,
+      -5
+    ],
+    "eye_height_m": 1.4
+  },
+  {
+    "id": "VIEW_ford-hoist",
+    "kind": "sightline",
+    "label": "The Ford -> the hoist (and, turning, the bell): both landmarks from one spot",
+    "plan_eye": [
+      74.0,
+      48.5,
+      -1.093840687936828
+    ],
+    "target": [
+      40,
+      55.5,
+      7
+    ],
+    "source_floor": "Warrens_Greybox_ramp:0",
+    "requested_base": [
+      74,
+      48.5,
+      -2.5
+    ],
+    "eye_height_m": 1.4
+  },
+  {
+    "id": "VIEW_ford-bell",
+    "kind": "sightline",
+    "label": "The Ford -> the bell",
+    "plan_eye": [
+      74.0,
+      48.5,
+      -1.093840687936828
+    ],
+    "target": [
+      104,
+      50,
+      16
+    ],
+    "source_floor": "Warrens_Greybox_ramp:0",
+    "requested_base": [
+      74,
+      48.5,
+      -2.5
+    ],
+    "eye_height_m": 1.4
+  },
+  {
+    "id": "VIEW_bridge-hoist",
+    "kind": "sightline",
+    "label": "Bone Bridge -> the hoist over the Well",
+    "plan_eye": [
+      73.0,
+      74.0,
+      3.9
+    ],
+    "target": [
+      40,
+      55.5,
+      7
+    ],
+    "source_floor": "Warrens_Greybox_ramp:1",
+    "requested_base": [
+      73,
+      74,
+      2.5
+    ],
+    "eye_height_m": 1.4
+  },
+  {
+    "id": "VIEW_bridge-bell",
+    "kind": "sightline",
+    "label": "Bone Bridge -> the bell",
+    "plan_eye": [
+      73.0,
+      74.0,
+      3.9
+    ],
+    "target": [
+      104,
+      50,
+      16
+    ],
+    "source_floor": "Warrens_Greybox_ramp:1",
+    "requested_base": [
+      73,
+      74,
+      2.5
+    ],
+    "eye_height_m": 1.4
+  },
+  {
+    "id": "VIEW_rim-glyphs",
+    "kind": "sightline",
+    "label": "Well east rim -> the glyphs on the tower's west face (P4), across the canal",
+    "plan_eye": [
+      48.0,
+      50.0,
+      1.4
+    ],
+    "target": [
+      102,
+      50,
+      2
+    ],
+    "source_floor": "Warrens_Greybox_floor:45",
+    "requested_base": [
+      48,
+      50,
+      0
+    ],
+    "eye_height_m": 1.4
+  },
+  {
+    "id": "VIEW_hall-hoist",
+    "kind": "sightline",
+    "label": "Camp Door -> the hoist",
+    "plan_eye": [
+      24.5,
+      49.0,
+      1.4
+    ],
+    "target": [
+      40,
+      55.5,
+      7
+    ],
+    "source_floor": "Warrens_Greybox_floor:64",
+    "requested_base": [
+      24.5,
+      49,
+      0
+    ],
+    "eye_height_m": 1.4
+  },
+  {
+    "id": "VIEW_loft-well",
+    "kind": "sightline",
+    "label": "Belfry loft -> the Well's shaft light across the canal",
+    "plan_eye": [
+      100.5,
+      60.0,
+      3.9
+    ],
+    "target": [
+      40,
+      50,
+      8
+    ],
+    "source_floor": "Warrens_Greybox_floor:79",
+    "requested_base": [
+      100.5,
+      60,
+      2.5
+    ],
+    "eye_height_m": 1.4
+  },
+  {
+    "id": "VIEW_belfry-pit",
+    "kind": "sightline",
+    "label": "Belfry west arch -> the Well's shaft light over the Ford",
+    "plan_eye": [
+      90.0,
+      54.0,
+      1.4
+    ],
+    "target": [
+      40,
+      50,
+      8
+    ],
+    "source_floor": "Warrens_Greybox_floor:19",
+    "requested_base": [
+      90,
+      54,
+      0
+    ],
+    "eye_height_m": 1.4
+  },
+  {
+    "id": "VIEW_pit-hoist",
+    "kind": "sightline",
+    "label": "Pit -> up the shaft",
+    "plan_eye": [
+      40.0,
+      46.0,
+      -3.6
+    ],
+    "target": [
+      40,
+      55.5,
+      7
+    ],
+    "source_floor": "Warrens_Greybox_floor:55",
+    "requested_base": [
+      40,
+      46,
+      -5
+    ],
+    "eye_height_m": 1.4
+  },
+  {
+    "id": "VIEW_larder-bell",
+    "kind": "sightline",
+    "label": "Brine Larder -> the bell overhead through the roof break",
+    "plan_eye": [
+      120.0,
+      40.0,
+      -1.5
+    ],
+    "target": [
+      104,
+      50,
+      16
+    ],
+    "source_floor": "Warrens_Greybox_floor:91",
+    "requested_base": [
+      120,
+      40,
+      -2.5
+    ],
+    "eye_height_m": 1.4
+  },
+  {
+    "id": "SEAM_Hub__Court__court",
+    "kind": "boundary",
+    "label": "Hub / Court",
+    "plan_eye": [
+      19.0,
+      61.0,
+      1.4
+    ],
+    "target": [
+      22,
+      62,
+      1.1
+    ],
+    "source_floor": "Warrens_Greybox_floor:2",
+    "requested_base": [
+      19,
+      61,
+      0
+    ],
+    "eye_height_m": 1.4
+  },
+  {
+    "id": "SEAM_Hub__Ossuary__ossuary",
+    "kind": "boundary",
+    "label": "Hub / Ossuary",
+    "plan_eye": [
+      42.0,
+      60.0,
+      2.524779190048595
+    ],
+    "target": [
+      44.0,
+      64.0,
+      3.9
+    ],
+    "source_floor": "Warrens_Greybox_ramp:0",
+    "requested_base": [
+      42,
+      60,
+      1.2
+    ],
+    "eye_height_m": 1.4,
+    "source_camera_proof": {
+      "authored_route": "wN -> o0",
+      "body_probes": 15,
+      "body_radius_m": 0.35,
+      "body_clear": true,
+      "target_segment_clear": true,
+      "target_only_contact_excluded": true
+    }
+  },
+  {
+    "id": "SEAM_Court__Ossuary__ossuary",
+    "kind": "boundary",
+    "label": "Court / Ossuary",
+    "plan_eye": [
+      30.0,
+      86.0,
+      2.1783536422718273
+    ],
+    "target": [
+      32.0,
+      86.0,
+      2.437231034515993
+    ],
+    "source_floor": "Warrens_Greybox_ramp:3",
+    "requested_base": [
+      30,
+      86,
+      0
+    ],
+    "eye_height_m": 1.4,
+    "source_camera_proof": {
+      "authored_route": "c2 -> via(32,86) -> o1",
+      "body_probes": 15,
+      "body_radius_m": 0.35,
+      "body_clear": true,
+      "target_segment_clear": true,
+      "target_only_contact_excluded": true
+    }
+  },
+  {
+    "id": "SEAM_Hub__Waterworks-W__pump",
+    "kind": "boundary",
+    "label": "Hub / Waterworks-W",
+    "plan_eye": [
+      50.0,
+      40.0,
+      0.5869999999999999
+    ],
+    "target": [
+      52.0,
+      38.0,
+      0.1435907599347792
+    ],
+    "source_floor": "Warrens_Greybox_floor:149",
+    "requested_base": [
+      50,
+      40,
+      -1.2
+    ],
+    "eye_height_m": 1.4,
+    "source_camera_proof": {
+      "authored_route": "wSE -> via(52,38) -> p1",
+      "body_probes": 15,
+      "body_radius_m": 0.35,
+      "body_clear": true,
+      "target_segment_clear": true,
+      "target_only_contact_excluded": true
+    }
+  },
+  {
+    "id": "SEAM_Court__Waterworks-W__cistern",
+    "kind": "boundary",
+    "label": "Court / Waterworks-W",
+    "plan_eye": [
+      5.0,
+      56.0,
+      -0.799836845532341
+    ],
+    "target": [
+      4.5,
+      55.0,
+      -1.1
+    ],
+    "source_floor": "Warrens_Greybox_ramp:3",
+    "requested_base": [
+      5,
+      56,
+      -1.2
+    ],
+    "eye_height_m": 1.4,
+    "source_camera_proof": {
+      "authored_route": "c1 -> cw",
+      "body_probes": 15,
+      "body_radius_m": 0.35,
+      "body_clear": true,
+      "target_segment_clear": true,
+      "target_only_contact_excluded": true
+    }
+  },
+  {
+    "id": "SEAM_Hub__Pit__cascade",
+    "kind": "boundary",
+    "label": "Hub / Pit",
+    "plan_eye": [
+      36.0,
+      35.0,
+      -0.7756476483135275
+    ],
+    "target": [
+      46,
+      30,
+      -3.9
+    ],
+    "source_floor": "Warrens_Greybox_ramp:0",
+    "requested_base": [
+      36,
+      35,
+      -2.5
+    ],
+    "eye_height_m": 1.4
+  },
+  {
+    "id": "SEAM_Hub__Pit__closet",
+    "kind": "boundary",
+    "label": "Hub / Pit",
+    "plan_eye": [
+      19.0,
+      40.0,
+      -3.6
+    ],
+    "target": [
+      19,
+      43,
+      -3.9
+    ],
+    "source_floor": "Warrens_Greybox_floor:133",
+    "requested_base": [
+      19,
+      40,
+      -5
+    ],
+    "eye_height_m": 1.4
+  },
+  {
+    "id": "SEAM_Waterworks-W__Pit__sump",
+    "kind": "boundary",
+    "label": "Waterworks-W / Pit",
+    "plan_eye": [
+      46.0,
+      30.0,
+      -2.3451753535177424
+    ],
+    "target": [
+      44,
+      38,
+      -3.9
+    ],
+    "source_floor": "Warrens_Greybox_ramp:1",
+    "requested_base": [
+      46,
+      30,
+      -3.8
+    ],
+    "eye_height_m": 1.4
+  },
+  {
+    "id": "SEAM_Waterworks-W__Canal__chain",
+    "kind": "boundary",
+    "label": "Waterworks-W / Canal",
+    "plan_eye": [
+      81.0,
+      25.0,
+      -1.1
+    ],
+    "target": [
+      66.0,
+      26.0,
+      -1.1
+    ],
+    "source_floor": "Warrens_Greybox_ramp:2",
+    "requested_base": [
+      81,
+      25,
+      -2.5
+    ],
+    "eye_height_m": 1.4,
+    "source_camera_proof": {
+      "authored_route": "extraRamps.chain-crossing west endpoint",
+      "body_probes": 15,
+      "body_radius_m": 0.35,
+      "body_clear": true,
+      "target_segment_clear": true,
+      "target_only_contact_excluded": true
+    }
+  },
+  {
+    "id": "SEAM_Canal__Brineworks__chain-e",
+    "kind": "boundary",
+    "label": "Canal / Brineworks",
+    "plan_eye": [
+      81.0,
+      25.0,
+      -1.1
+    ],
+    "target": [
+      96,
+      24,
+      -1.4
+    ],
+    "source_floor": "Warrens_Greybox_ramp:2",
+    "requested_base": [
+      81,
+      25,
+      -2.5
+    ],
+    "eye_height_m": 1.4
+  },
+  {
+    "id": "SEAM_Ossuary__Canal__bridge",
+    "kind": "boundary",
+    "label": "Ossuary / Canal",
+    "plan_eye": [
+      73.0,
+      74.0,
+      3.9
+    ],
+    "target": [
+      66,
+      74,
+      3.6
+    ],
+    "source_floor": "Warrens_Greybox_ramp:1",
+    "requested_base": [
+      73,
+      74,
+      2.5
+    ],
+    "eye_height_m": 1.4
+  },
+  {
+    "id": "SEAM_Canal__Reliquary__bridge-e",
+    "kind": "boundary",
+    "label": "Canal / Reliquary",
+    "plan_eye": [
+      73.0,
+      74.0,
+      3.9
+    ],
+    "target": [
+      84,
+      74,
+      3.6
+    ],
+    "source_floor": "Warrens_Greybox_ramp:1",
+    "requested_base": [
+      73,
+      74,
+      2.5
+    ],
+    "eye_height_m": 1.4
+  },
+  {
+    "id": "SEAM_Hub__Canal__ford",
+    "kind": "boundary",
+    "label": "Hub / Canal",
+    "plan_eye": [
+      53.0,
+      50.0,
+      0.12031284795354846
+    ],
+    "target": [
+      66,
+      49,
+      -1.4
+    ],
+    "source_floor": "Warrens_Greybox_ramp:2",
+    "requested_base": [
+      53,
+      50,
+      -1.2
+    ],
+    "eye_height_m": 1.4
+  },
+  {
+    "id": "SEAM_Canal__Belfry__ford-e",
+    "kind": "boundary",
+    "label": "Canal / Belfry",
+    "plan_eye": [
+      85.0,
+      49.0,
+      1.4
+    ],
+    "target": [
+      88,
+      52,
+      1.1
+    ],
+    "source_floor": "Warrens_Greybox_floor:15",
+    "requested_base": [
+      85,
+      49,
+      -1.2
+    ],
+    "eye_height_m": 1.4
+  },
+  {
+    "id": "SEAM_Belfry__Reliquary__reliquary",
+    "kind": "boundary",
+    "label": "Belfry / Reliquary",
+    "plan_eye": [
+      92.0,
+      68.0,
+      2.5729999999999995
+    ],
+    "target": [
+      92,
+      66,
+      3.6
+    ],
+    "source_floor": "Warrens_Greybox_floor:209",
+    "requested_base": [
+      92,
+      68,
+      1.2
+    ],
+    "eye_height_m": 1.4
+  },
+  {
+    "id": "SEAM_Belfry__Brineworks__cellar",
+    "kind": "boundary",
+    "label": "Belfry / Brineworks",
+    "plan_eye": [
+      96.0,
+      36.0,
+      0.12399999999999989
+    ],
+    "target": [
+      96,
+      30,
+      -1.4
+    ],
+    "source_floor": "Warrens_Greybox_floor:123",
+    "requested_base": [
+      96,
+      36,
+      -1.2
+    ],
+    "eye_height_m": 1.4
+  },
+  {
+    "id": "SEAM_Belfry__Brineworks__larder",
+    "kind": "boundary",
+    "label": "Belfry / Brineworks",
+    "plan_eye": [
+      112.0,
+      52.0,
+      0.33800821306632
+    ],
+    "target": [
+      112.0,
+      46.0,
+      -1.1
+    ],
+    "source_floor": "Warrens_Greybox_ramp:2",
+    "requested_base": [
+      112,
+      52,
+      -1.2
+    ],
+    "eye_height_m": 1.4,
+    "source_camera_proof": {
+      "authored_route": "be -> bl0",
+      "body_probes": 15,
+      "body_radius_m": 0.35,
+      "body_clear": true,
+      "target_segment_clear": true,
+      "target_only_contact_excluded": true
+    }
+  },
+  {
+    "id": "SEAM_Reliquary__Mill__mill",
+    "kind": "boundary",
+    "label": "Reliquary / Mill",
+    "plan_eye": [
+      104.0,
+      101.0,
+      5.152237502298547
+    ],
+    "target": [
+      104.0,
+      104.0,
+      5.6015948087525285
+    ],
+    "source_floor": "Warrens_Greybox_ramp:2",
+    "requested_base": [
+      104,
+      101,
+      3.8
+    ],
+    "eye_height_m": 1.4,
+    "source_camera_proof": {
+      "authored_route": "extraRamps.mill-stair-b endpoint",
+      "body_probes": 15,
+      "body_radius_m": 0.35,
+      "body_clear": true,
+      "target_segment_clear": true,
+      "target_only_contact_excluded": true
+    }
+  },
+  {
+    "id": "SEAM_Court__Catacomb__court",
+    "kind": "boundary",
+    "label": "Court / Catacomb",
+    "plan_eye": [
+      -2.0,
+      63.0,
+      1.4
+    ],
+    "target": [
+      -2,
+      64,
+      1.1
+    ],
+    "source_floor": "Warrens_Greybox_floor:13",
+    "requested_base": [
+      -2,
+      63,
+      0
+    ],
+    "eye_height_m": 1.4
+  },
+  {
+    "id": "SEAM_Catacomb__Pit__pit",
+    "kind": "boundary",
+    "label": "Catacomb / Pit",
+    "plan_eye": [
+      -8.0,
+      50.0,
+      -2.3451753535177424
+    ],
+    "target": [
+      -4.0,
+      46.0,
+      -3.5951788116191206
+    ],
+    "source_floor": "Warrens_Greybox_ramp:1",
+    "requested_base": [
+      -8,
+      50,
+      -3
+    ],
+    "eye_height_m": 1.4,
+    "source_camera_proof": {
+      "authored_route": "extraRamps.catacomb-dive-b endpoint",
+      "body_probes": 15,
+      "body_radius_m": 0.35,
+      "body_clear": true,
+      "target_segment_clear": true,
+      "target_only_contact_excluded": true
+    }
+  },
+  {
+    "id": "SEAM_Brineworks__Pit__undercroft",
+    "kind": "boundary",
+    "label": "Brineworks / Pit",
+    "plan_eye": [
+      80.0,
+      25.0667,
+      -3.6
+    ],
+    "target": [
+      66.0,
+      26.0,
+      -3.6
+    ],
+    "source_floor": "Warrens_Greybox_floor:121",
+    "requested_base": [
+      80,
+      25.0667,
+      -5
+    ],
+    "eye_height_m": 1.4,
+    "source_camera_proof": {
+      "authored_route": "ut1 -> via(80,25.0667) -> via(66,26) -> ut2",
+      "body_probes": 15,
+      "body_radius_m": 0.35,
+      "body_clear": true,
+      "target_segment_clear": true,
+      "target_only_contact_excluded": true
+    }
+  }
+]

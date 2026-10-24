@@ -1,0 +1,8 @@
+{
+  "world": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP",
+  "instances": 37511,
+  "hism_groups": 266,
+  "all_visuals_no_collision": true,
+  "old_passes_absent": true,
+  "translucent_non_shadowing_lantern_inserts": 67
+}

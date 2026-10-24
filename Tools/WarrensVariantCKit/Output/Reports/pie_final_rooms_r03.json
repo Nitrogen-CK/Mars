@@ -1,0 +1,430 @@
+{
+  "session_id": "pie_smoke_8_141118",
+  "status": "complete",
+  "marker": "VARIANT_C_FINAL_ROOMS_R03",
+  "map": "UEDPIE_0_Warrens_VariantC_Mars_MAP",
+  "duration": 77,
+  "pie_active": true,
+  "pie_ready": true,
+  "lifecycle": "teardown-complete",
+  "sample_count": 3922,
+  "elapsed_seconds": 77.01766290143132,
+  "var_summary": {},
+  "runtime_identity": {
+    "actor": "Mars_PlayerCharacter_0",
+    "actor_class": "Mars_PlayerCharacter",
+    "skel_comp": "CharacterMesh0",
+    "anim_instance_class": "/Game/Mars/Gameplay/PlayerCharacter/Chef/ABP_Chef.ABP_Chef_C",
+    "mesh_anim_class": "/Game/Mars/Gameplay/PlayerCharacter/Chef/ABP_Chef.ABP_Chef_C",
+    "animation_mode": "anim_blueprint",
+    "anim_class_changed": false
+  },
+  "grouped_counts": {
+    "active_runtime": {
+      "must_absent": {
+        "Blueprint Runtime Error": 0,
+        "Accessed None": 0,
+        "LogChooser": 0,
+        "Assertion failed": 0,
+        "Fatal error": 0,
+        "LogScript: Error": 0
+      },
+      "must_present": {
+        "VARIANT_C_RUNTIME_AUDIT_PASSED": 1,
+        "LIVE_GRID_AUDIT": 1
+      },
+      "observe_only": {},
+      "warn": {},
+      "entry_count": 241
+    },
+    "teardown": {
+      "must_absent": {
+        "Blueprint Runtime Error": 0,
+        "Accessed None": 0,
+        "LogChooser": 0,
+        "Assertion failed": 0,
+        "Fatal error": 0,
+        "LogScript: Error": 0
+      },
+      "entry_count": 66,
+      "allowed": true
+    },
+    "ignore_after_pattern": "BeginTearingDown"
+  },
+  "warnings": [],
+  "missing_must_present": [],
+  "post_marker_counts": {
+    "Blueprint Runtime Error": 0,
+    "Accessed None": 0,
+    "LogChooser": 0,
+    "Assertion failed": 0,
+    "Fatal error": 0,
+    "LogScript: Error": 0,
+    "VARIANT_C_RUNTIME_AUDIT_PASSED": 1,
+    "LIVE_GRID_AUDIT": 1
+  },
+  "total_matches": 0,
+  "ok": true,
+  "probes": [
+    {
+      "at_seconds": 1,
+      "fired": true,
+      "fired_at_seconds": 1.007736001163721,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 2,
+      "fired": true,
+      "fired_at_seconds": 2.012553498148918,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 3.5,
+      "fired": true,
+      "fired_at_seconds": 3.5160739980638027,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 5,
+      "fired": true,
+      "fired_at_seconds": 5.001214098185301,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 6.5,
+      "fired": true,
+      "fired_at_seconds": 6.506700001657009,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 8,
+      "fired": true,
+      "fired_at_seconds": 8.013751700520515,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 9.5,
+      "fired": true,
+      "fired_at_seconds": 9.503367900848389,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 11,
+      "fired": true,
+      "fired_at_seconds": 11.014779400080442,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 12.5,
+      "fired": true,
+      "fired_at_seconds": 12.506143301725388,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 14,
+      "fired": true,
+      "fired_at_seconds": 14.010493699461222,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 15.5,
+      "fired": true,
+      "fired_at_seconds": 15.503450699150562,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 17,
+      "fired": true,
+      "fired_at_seconds": 17.011000599712133,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 18.5,
+      "fired": true,
+      "fired_at_seconds": 18.501764800399542,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 20,
+      "fired": true,
+      "fired_at_seconds": 20.001642800867558,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 21.5,
+      "fired": true,
+      "fired_at_seconds": 21.503731198608875,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 23,
+      "fired": true,
+      "fired_at_seconds": 23.015571899712086,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 24.5,
+      "fired": true,
+      "fired_at_seconds": 24.506773699074984,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 26,
+      "fired": true,
+      "fired_at_seconds": 26.010458298027515,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 27.5,
+      "fired": true,
+      "fired_at_seconds": 27.511389400810003,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 29,
+      "fired": true,
+      "fired_at_seconds": 29.00861420109868,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 30.5,
+      "fired": true,
+      "fired_at_seconds": 30.511796798557043,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 32,
+      "fired": true,
+      "fired_at_seconds": 32.00770499929786,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 33.5,
+      "fired": true,
+      "fired_at_seconds": 33.50632670149207,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 35,
+      "fired": true,
+      "fired_at_seconds": 35.0110785998404,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 36.5,
+      "fired": true,
+      "fired_at_seconds": 36.513978600502014,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 38,
+      "fired": true,
+      "fired_at_seconds": 38.001273300498724,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 39.5,
+      "fired": true,
+      "fired_at_seconds": 39.5046600997448,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 41,
+      "fired": true,
+      "fired_at_seconds": 41.01904460042715,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 42.5,
+      "fired": true,
+      "fired_at_seconds": 42.92281709983945,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 44,
+      "fired": true,
+      "fired_at_seconds": 44.047060400247574,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 45.5,
+      "fired": true,
+      "fired_at_seconds": 45.5030037984252,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 47,
+      "fired": true,
+      "fired_at_seconds": 47.00614779815078,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 48.5,
+      "fired": true,
+      "fired_at_seconds": 48.514569498598576,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 50,
+      "fired": true,
+      "fired_at_seconds": 50.00305860117078,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 51.5,
+      "fired": true,
+      "fired_at_seconds": 51.508374601602554,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 53,
+      "fired": true,
+      "fired_at_seconds": 53.01201140135527,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 54.5,
+      "fired": true,
+      "fired_at_seconds": 54.50772599875927,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 56,
+      "fired": true,
+      "fired_at_seconds": 56.00270050019026,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 57.5,
+      "fired": true,
+      "fired_at_seconds": 57.51831429824233,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 59,
+      "fired": true,
+      "fired_at_seconds": 59.0011992007494,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 60.5,
+      "fired": true,
+      "fired_at_seconds": 60.509488098323345,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 62,
+      "fired": true,
+      "fired_at_seconds": 62.00372130051255,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 63.5,
+      "fired": true,
+      "fired_at_seconds": 63.50139059871435,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 65,
+      "fired": true,
+      "fired_at_seconds": 65.0004662014544,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 66.5,
+      "fired": true,
+      "fired_at_seconds": 66.50871089845896,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 68,
+      "fired": true,
+      "fired_at_seconds": 68.0123497992754,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 69.5,
+      "fired": true,
+      "fired_at_seconds": 69.50576239824295,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 71,
+      "fired": true,
+      "fired_at_seconds": 71.00100829824805,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 72.5,
+      "fired": true,
+      "fired_at_seconds": 72.51500859856606,
+      "python_ok": true,
+      "python_output": "None"
+    }
+  ],
+  "actor_setup": [
+    {
+      "class": "/Script/Engine.CameraActor",
+      "class_resolved": true,
+      "requested_count": 1,
+      "spawned_count": 1,
+      "actors": [
+        {
+          "spawned": true,
+          "name": "CameraActor_0",
+          "runtime_class": "/Script/Engine.CameraActor",
+          "applied": [],
+          "unmatched": []
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,162 @@
+{
+  "session_id": "pie_smoke_14_144658",
+  "status": "complete",
+  "marker": "VARIANT_C_FINAL_SLUICE_R06",
+  "map": "UEDPIE_0_Warrens_VariantC_Mars_MAP",
+  "duration": 25,
+  "pie_active": true,
+  "pie_ready": true,
+  "lifecycle": "teardown-complete",
+  "sample_count": 1392,
+  "elapsed_seconds": 25.00469160079956,
+  "var_summary": {},
+  "runtime_identity": {
+    "actor": "Mars_PlayerCharacter_0",
+    "actor_class": "Mars_PlayerCharacter",
+    "skel_comp": "CharacterMesh0",
+    "anim_instance_class": "/Game/Mars/Gameplay/PlayerCharacter/Chef/ABP_Chef.ABP_Chef_C",
+    "mesh_anim_class": "/Game/Mars/Gameplay/PlayerCharacter/Chef/ABP_Chef.ABP_Chef_C",
+    "animation_mode": "anim_blueprint",
+    "anim_class_changed": false
+  },
+  "grouped_counts": {
+    "active_runtime": {
+      "must_absent": {
+        "Blueprint Runtime Error": 0,
+        "Accessed None": 0,
+        "LogChooser": 0,
+        "Assertion failed": 0,
+        "Fatal error": 0,
+        "LogScript: Error": 0
+      },
+      "must_present": {
+        "VARIANT_C_RUNTIME_AUDIT_PASSED": 1
+      },
+      "observe_only": {},
+      "warn": {},
+      "entry_count": 134
+    },
+    "teardown": {
+      "must_absent": {
+        "Blueprint Runtime Error": 0,
+        "Accessed None": 0,
+        "LogChooser": 0,
+        "Assertion failed": 0,
+        "Fatal error": 0,
+        "LogScript: Error": 0
+      },
+      "entry_count": 41,
+      "allowed": true
+    },
+    "ignore_after_pattern": "BeginTearingDown"
+  },
+  "warnings": [],
+  "missing_must_present": [],
+  "post_marker_counts": {
+    "Blueprint Runtime Error": 0,
+    "Accessed None": 0,
+    "LogChooser": 0,
+    "Assertion failed": 0,
+    "Fatal error": 0,
+    "LogScript: Error": 0,
+    "VARIANT_C_RUNTIME_AUDIT_PASSED": 1
+  },
+  "total_matches": 0,
+  "ok": true,
+  "probes": [
+    {
+      "at_seconds": 1,
+      "fired": true,
+      "fired_at_seconds": 1.0105844996869564,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 2,
+      "fired": true,
+      "fired_at_seconds": 2.007033299654722,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 4,
+      "fired": true,
+      "fired_at_seconds": 4.010078299790621,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 6,
+      "fired": true,
+      "fired_at_seconds": 6.014081098139286,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 8,
+      "fired": true,
+      "fired_at_seconds": 8.007250998169184,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 10,
+      "fired": true,
+      "fired_at_seconds": 10.01131859794259,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 12,
+      "fired": true,
+      "fired_at_seconds": 12.012960400432348,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 14,
+      "fired": true,
+      "fired_at_seconds": 14.011245999485254,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 16,
+      "fired": true,
+      "fired_at_seconds": 16.01617030054331,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 18,
+      "fired": true,
+      "fired_at_seconds": 18.009881399571896,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 20,
+      "fired": true,
+      "fired_at_seconds": 20.000034298747778,
+      "python_ok": true,
+      "python_output": "None"
+    }
+  ],
+  "actor_setup": [
+    {
+      "class": "/Script/Engine.CameraActor",
+      "class_resolved": true,
+      "requested_count": 1,
+      "spawned_count": 1,
+      "actors": [
+        {
+          "spawned": true,
+          "name": "CameraActor_0",
+          "runtime_class": "/Script/Engine.CameraActor",
+          "applied": [],
+          "unmatched": []
+        }
+      ]
+    }
+  ]
+}

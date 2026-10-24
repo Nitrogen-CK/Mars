@@ -1,0 +1,8131 @@
+{
+  "schema": 1,
+  "source": {
+    "path": "Tools/LevelDesign/anchor_plans/data/warrens_v8c.json",
+    "sha256": "f87a76e39b879f4e3b1945a7e369781d08511744c35f6223880168fc20274be2",
+    "art_sources": [
+      "docs/art/warrens-c-dressing-r01/ROOM_DRESSING.md",
+      "docs/art/warrens-c-dressing-r01/room_dressing.json",
+      "docs/art/warrens-c-dressing-r01/assembly_recipes.json",
+      "docs/art/warrens-c-dressing-r01/prop_catalog.json"
+    ]
+  },
+  "status": "source-grounded offline plan; no full-world snapshot, placement, engine or physical-input verification performed by this delegate",
+  "counts": {
+    "tiles": 11,
+    "rooms": 24,
+    "source_prop_recipes": 26,
+    "puzzles": 7,
+    "ports": 46,
+    "ramps": 11,
+    "route_links": 72,
+    "low_links": 9,
+    "crawls": 4,
+    "ladders": 2,
+    "sightlines": 10,
+    "windows": 7,
+    "continuity_checkpoints": 21
+  },
+  "contracts": {
+    "plan_to_world_cm": "[(x-70)*100,(y-55)*100,z*100]",
+    "imported_front": "+Y; Blender neutral front -Y becomes X,-Y,Z in Unreal",
+    "wall_orientations": {
+      "north_wall": 0,
+      "south_wall": 180,
+      "west_wall": -90,
+      "east_wall": 90
+    },
+    "visual_collision": "NoCollision; original collision and gameplay remain authoritative",
+    "camera_eye_offsets_m": {
+      "standing": 1.4,
+      "crouch": 0.9
+    },
+    "camera_offsets_status": "proposed below stated 1.50m/1.05m capsule envelopes; confirm actual pawn camera before acceptance",
+    "capsule_metres": {
+      "diameter": 0.78,
+      "standing_height": 1.5,
+      "scout_crouch_height": 1.05,
+      "pack_crouch_height": 1.4
+    },
+    "keep_clear_control_radius_m": 1.25,
+    "material_roles": "amber/teal come from local lights; quiet matte albedo; exact tile size from material catalog",
+    "assembly": "fit normalized modeled bounds/pivots, attach shaft/hook/plate by real submesh geometry, put whole vault below opaque source roof only where >=2m visual headroom survives"
+  },
+  "zones": [
+    {
+      "source_tile": {
+        "id": "Hub",
+        "label": "LI_Warrens_Hub",
+        "asset": "LI_Warrens_Hub",
+        "z": 0,
+        "rect": [
+          4,
+          36,
+          54,
+          60
+        ],
+        "ports": [
+          {
+            "id": "camp",
+            "at": [
+              4,
+              50,
+              0
+            ],
+            "width": 3,
+            "kind": "door"
+          },
+          {
+            "id": "court",
+            "at": [
+              16,
+              58,
+              0
+            ],
+            "width": 3,
+            "kind": "door"
+          },
+          {
+            "id": "ossuary",
+            "at": [
+              40,
+              58,
+              0
+            ],
+            "width": 3,
+            "kind": "stair"
+          },
+          {
+            "id": "pump",
+            "at": [
+              44,
+              38,
+              0
+            ],
+            "width": 3,
+            "kind": "stair"
+          },
+          {
+            "id": "ford",
+            "at": [
+              52,
+              50,
+              0
+            ],
+            "width": 3,
+            "kind": "stair"
+          },
+          {
+            "id": "cascade",
+            "at": [
+              44,
+              40,
+              0
+            ],
+            "width": 4,
+            "kind": "stair"
+          },
+          {
+            "id": "closet",
+            "at": [
+              19,
+              40,
+              -5
+            ],
+            "width": 1,
+            "kind": "ladder"
+          }
+        ],
+        "note": "the Arrival Hall, closet, the Well, its rims and the hoist"
+      },
+      "zone_art": {
+        "id": "Hub",
+        "rooms": [
+          "hall",
+          "closet",
+          "rimW",
+          "rimE",
+          "rimN",
+          "rimS"
+        ],
+        "concepts": [
+          "ENVC-01",
+          "ENVC-11"
+        ],
+        "materials": [
+          "TX01",
+          "TX02",
+          "TX08",
+          "TX09",
+          "TX10"
+        ],
+        "identity": "West bank: the hoist, a clear circular Well rim, and a modest warm arrival island. The shaft and timber silhouette orient the whole district.",
+        "hero": [
+          "H01",
+          "H02",
+          "H03",
+          "H04",
+          "I20",
+          "L09"
+        ],
+        "support": [
+          "A10",
+          "P03",
+          "P05",
+          "P25",
+          "P26",
+          "P28",
+          "D15",
+          "L01",
+          "L04"
+        ],
+        "placement": "Keep the hoist at [40,55.5,0] within its 1.6 x1.6 x7.5m source proxy. Place crates/rope behind the rim path and on closed wall bays. The pack plinth remains at [10,47.5,0]. Closet dressing frames the existing 5m scout ladder and closet-side bar control.",
+        "avoid": "No decorative cage that implies a new rideable lift. No opaque hoist banner in the east-rim glyph view. No handle on the barred hall face. Preserve the shaft opening and walkable rim.",
+        "views": [
+          "hall-hoist",
+          "rim-glyphs",
+          "pit-hoist",
+          "ford-hoist",
+          "loft-well"
+        ],
+        "story": "One service notice and one rope repair cluster; the exit stays legible without adding arrows to every wall.",
+        "environment_kit": [
+          "E02",
+          "E08",
+          "E17",
+          "E18",
+          "E22",
+          "E23"
+        ],
+        "target_density": "Proposal: one hero cluster per authored point,2-4 support clusters per closed-wall room; leave at least one whole wall bay empty. No automatic scatter."
+      },
+      "saved_tile_key": "Hub",
+      "provisional_pivot_plan": [
+        4,
+        36,
+        0
+      ],
+      "surface_scope": "ALL saved owned floor heights and source structural sides/undersides; no ROI by declared rectangle; preserve source-owned frontier extensions",
+      "concept_links": [
+        "docs/art/warrens-c-dressing-r01/references/ENVC-01-the-well-on-the-first-bank.png",
+        "docs/art/warrens-c-dressing-r01/references/ENVC-11-canal-rim-wayfinding.png"
+      ],
+      "district_sheet": "docs/art/warrens-c-dressing-r01/art/district-sheets/DRESS01_HubDressingAssembly.png",
+      "source_prop_indices": [
+        0,
+        4,
+        18
+      ],
+      "standing_camera_room": "hall",
+      "crouch_camera": {
+        "coordinate_basis": "closet room floor",
+        "ground_plan": [
+          17,
+          40,
+          0
+        ],
+        "eye_plan": [
+          17,
+          40,
+          0.9
+        ],
+        "target_plan": [
+          19,
+          42,
+          0.9
+        ],
+        "status": "candidate, confirm real saved floor/headroom; scout-only when source packFits=false"
+      },
+      "protected_port_count": 7
+    },
+    {
+      "source_tile": {
+        "id": "Court",
+        "label": "LI_Warrens_Court",
+        "asset": "LI_Warrens_Court",
+        "z": 0,
+        "rect": [
+          -4,
+          60,
+          30,
+          94
+        ],
+        "ports": [
+          {
+            "id": "hall",
+            "at": [
+              22,
+              62,
+              0
+            ],
+            "width": 3,
+            "kind": "door"
+          },
+          {
+            "id": "ossuary",
+            "at": [
+              30,
+              86,
+              0
+            ],
+            "width": 3,
+            "kind": "stair"
+          },
+          {
+            "id": "cistern",
+            "at": [
+              6,
+              60,
+              0
+            ],
+            "width": 3,
+            "kind": "stair"
+          }
+        ]
+      },
+      "zone_art": {
+        "id": "Court",
+        "rooms": [
+          "court",
+          "court-pit"
+        ],
+        "concepts": [
+          "ENVC-01"
+        ],
+        "materials": [
+          "TX01",
+          "TX04",
+          "TX06",
+          "TX08"
+        ],
+        "identity": "A broad hunting court with one split mourner silhouette. Low interrupted storage at the edges; a quiet floor in the center.",
+        "hero": [
+          "H14"
+        ],
+        "support": [
+          "A21",
+          "A22",
+          "P26",
+          "D01",
+          "D04",
+          "L08"
+        ],
+        "placement": "Source statue center [15,88,0], proxy 2 x1.2 x4.5m. Keep the 0m rim and -1.5m sunken court distinct. Dress outer walls and non-traversed alcoves instead of filling the combat floor.",
+        "avoid": "No crate maze, pillars or hanging roots that alter retreat routes. Do not raise the sunken floor with debris. Optional mushrooms must not masquerade as required harvestable food.",
+        "views": [],
+        "story": "One abandoned service delivery at an outer wall, with sparse royal cloth caught on the stone.",
+        "environment_kit": [
+          "E01",
+          "E02",
+          "E08",
+          "E24"
+        ],
+        "target_density": "Proposal: one hero cluster per authored point,2-4 support clusters per closed-wall room; leave at least one whole wall bay empty. No automatic scatter."
+      },
+      "saved_tile_key": "Court",
+      "provisional_pivot_plan": [
+        -4,
+        60,
+        0
+      ],
+      "surface_scope": "ALL saved owned floor heights and source structural sides/undersides; no ROI by declared rectangle; preserve source-owned frontier extensions",
+      "concept_links": [
+        "docs/art/warrens-c-dressing-r01/references/ENVC-01-the-well-on-the-first-bank.png"
+      ],
+      "district_sheet": "docs/art/warrens-c-dressing-r01/art/district-sheets/DRESS02_CourtDressingAssembly.png",
+      "source_prop_indices": [
+        3
+      ],
+      "standing_camera_room": "court",
+      "crouch_camera": {
+        "coordinate_basis": "crawls.crawl-r6.a",
+        "ground_plan": [
+          8,
+          64,
+          0
+        ],
+        "eye_plan": [
+          8,
+          64,
+          0.9
+        ],
+        "target_plan": [
+          10,
+          48,
+          0.9
+        ],
+        "status": "candidate, confirm real saved floor/headroom; scout-only when source packFits=false"
+      },
+      "protected_port_count": 3
+    },
+    {
+      "source_tile": {
+        "id": "Ossuary",
+        "label": "LI_Warrens_Ossuary",
+        "asset": "LI_Warrens_Ossuary",
+        "z": 2.5,
+        "rect": [
+          36,
+          60,
+          64,
+          84
+        ],
+        "ports": [
+          {
+            "id": "rim",
+            "at": [
+              42,
+              60,
+              2.5
+            ],
+            "width": 3,
+            "kind": "stair"
+          },
+          {
+            "id": "court",
+            "at": [
+              36,
+              80,
+              2.5
+            ],
+            "width": 3,
+            "kind": "stair"
+          },
+          {
+            "id": "bridge",
+            "at": [
+              62,
+              74,
+              2.5
+            ],
+            "width": 3,
+            "kind": "bridge"
+          }
+        ]
+      },
+      "zone_art": {
+        "id": "Ossuary",
+        "rooms": [
+          "ossuary",
+          "bridgehead"
+        ],
+        "concepts": [
+          "ENVC-06",
+          "ENVC-03"
+        ],
+        "materials": [
+          "TX01",
+          "TX06",
+          "TX08",
+          "TX10"
+        ],
+        "identity": "First-bank bone storage at +2.5m. The west pack plate and the east-bound Bone Bridge are visually connected by one shared Mourner seal.",
+        "hero": [
+          "I06",
+          "P29"
+        ],
+        "support": [
+          "P01",
+          "P11",
+          "P12",
+          "A20",
+          "L04",
+          "D07"
+        ],
+        "placement": "Plate remains at [42,66,2.5], source proxy 2 x2 x0.3m. Bone-stack envelopes stay at [52,68,2.5] and [50,76,2.5], each 6 x1 x2.6m. Use merged bone bundles inside those envelopes.",
+        "avoid": "No shelf across the south-east sight window or bridge mouth. P3 latches after a pack press; art must not imply a simultaneous hold or a second player waiting here.",
+        "views": [
+          "bridge-hoist",
+          "bridge-bell"
+        ],
+        "story": "Bone bundles are stacked for kitchens rather than medical realism. A repeated small Mourner badge points to the related cache gate, not an invented lock sequence.",
+        "environment_kit": [
+          "E02",
+          "E08"
+        ],
+        "target_density": "Proposal: one hero cluster per authored point,2-4 support clusters per closed-wall room; leave at least one whole wall bay empty. No automatic scatter."
+      },
+      "saved_tile_key": "Ossuary",
+      "provisional_pivot_plan": [
+        36,
+        60,
+        2.5
+      ],
+      "surface_scope": "ALL saved owned floor heights and source structural sides/undersides; no ROI by declared rectangle; preserve source-owned frontier extensions",
+      "concept_links": [
+        "docs/art/warrens-c-dressing-r01/references/ENVC-06-ossuary-pack-plate.png",
+        "docs/art/warrens-c-dressing-r01/references/ENVC-03-bone-bridge-crossing.png"
+      ],
+      "district_sheet": "docs/art/warrens-c-dressing-r01/art/district-sheets/DRESS03_OssuaryDressingAssembly.png",
+      "source_prop_indices": [
+        6,
+        7,
+        8,
+        19
+      ],
+      "standing_camera_room": "ossuary",
+      "crouch_camera": {
+        "coordinate_basis": "nodes.O",
+        "ground_plan": [
+          48,
+          72,
+          2.5
+        ],
+        "eye_plan": [
+          48,
+          72,
+          3.4
+        ],
+        "target_plan": [
+          42,
+          66,
+          3.4
+        ],
+        "status": "candidate, confirm real saved floor/headroom; scout-only when source packFits=false"
+      },
+      "protected_port_count": 3
+    },
+    {
+      "source_tile": {
+        "id": "Waterworks-W",
+        "label": "LI_Warrens_WaterworksW",
+        "asset": "LI_Warrens_WaterworksW",
+        "z": -2.5,
+        "rect": [
+          4,
+          14,
+          70,
+          36
+        ],
+        "ports": [
+          {
+            "id": "rim",
+            "at": [
+              48,
+              36,
+              -2.5
+            ],
+            "width": 3,
+            "kind": "stair"
+          },
+          {
+            "id": "court",
+            "at": [
+              12,
+              36,
+              -2.5
+            ],
+            "width": 3,
+            "kind": "stair"
+          },
+          {
+            "id": "chain",
+            "at": [
+              66,
+              26,
+              -2.5
+            ],
+            "width": 2.5,
+            "kind": "bridge"
+          },
+          {
+            "id": "sump",
+            "at": [
+              48,
+              34,
+              -2.5
+            ],
+            "width": 2.5,
+            "kind": "stair"
+          },
+          {
+            "id": "S5",
+            "at": [
+              16,
+              26,
+              -2.5
+            ],
+            "width": 3,
+            "kind": "door"
+          }
+        ],
+        "note": "Pump Room, Cistern, the humped tunnel between them"
+      },
+      "zone_art": {
+        "id": "Waterworks-W",
+        "rooms": [
+          "pump",
+          "cistern"
+        ],
+        "concepts": [
+          "ENVC-10",
+          "ENVC-05"
+        ],
+        "materials": [
+          "TX17",
+          "TX09",
+          "TX11",
+          "TX01"
+        ],
+        "identity": "A damp low western utility district. The 6m pump is the heavy audio/shape landmark; the Cistern is a broad readable shallow basin.",
+        "hero": [
+          "H13",
+          "W10"
+        ],
+        "support": [
+          "W04",
+          "W05",
+          "W06",
+          "W07",
+          "W09",
+          "P05",
+          "D02",
+          "D11",
+          "L01"
+        ],
+        "placement": "Pump source [54,22,-2.5], size2 x2 x6m. Cistern water remains the source 0.4m pool, not a deep new hazard. Pipes stay against closed walls; curved joints reuse the one pipe diameter. Frame the barred Chain Crossing view from the Pump end.",
+        "avoid": "No pipe across the humped connector or source ramps. No new ledges across deep water and no decorative turnable wheel beside the real control. Wet decals remain visual only.",
+        "views": [],
+        "story": "Use one repair patch and a small drain leak to suggest maintenance. Floor chain and moving bars are P2 tells; do not bury them under rust/debris.",
+        "environment_kit": [
+          "E02",
+          "E03",
+          "E05",
+          "E07",
+          "E08",
+          "E12",
+          "E13",
+          "E14",
+          "E20"
+        ],
+        "target_density": "Proposal: one hero cluster per authored point,2-4 support clusters per closed-wall room; leave at least one whole wall bay empty. No automatic scatter."
+      },
+      "saved_tile_key": "WaterworksW",
+      "provisional_pivot_plan": [
+        4,
+        14,
+        -2.5
+      ],
+      "surface_scope": "ALL saved owned floor heights and source structural sides/undersides; no ROI by declared rectangle; preserve source-owned frontier extensions",
+      "concept_links": [
+        "docs/art/warrens-c-dressing-r01/references/ENVC-10-cistern-bank-chamber.png",
+        "docs/art/warrens-c-dressing-r01/references/ENVC-05-chain-crossing-and-sluice.png"
+      ],
+      "district_sheet": "docs/art/warrens-c-dressing-r01/art/district-sheets/DRESS04_Waterworks-WDressingAssembly.png",
+      "source_prop_indices": [
+        12,
+        17
+      ],
+      "standing_camera_room": "pump",
+      "crouch_camera": {
+        "coordinate_basis": "nodes.tm",
+        "ground_plan": [
+          38,
+          21,
+          -1
+        ],
+        "eye_plan": [
+          38,
+          21,
+          -0.09999999999999998
+        ],
+        "target_plan": [
+          50,
+          24,
+          -1.1
+        ],
+        "status": "candidate, confirm real saved floor/headroom; scout-only when source packFits=false"
+      },
+      "protected_port_count": 5
+    },
+    {
+      "source_tile": {
+        "id": "Pit",
+        "label": "LI_Warrens_Pit",
+        "asset": "LI_Warrens_Pit",
+        "z": -5,
+        "rect": [
+          16,
+          22,
+          68,
+          66
+        ],
+        "ports": [
+          {
+            "id": "cascade",
+            "at": [
+              46,
+              30,
+              -5
+            ],
+            "width": 4,
+            "kind": "stair"
+          },
+          {
+            "id": "sump",
+            "at": [
+              44,
+              38,
+              -5
+            ],
+            "width": 2.5,
+            "kind": "stair"
+          },
+          {
+            "id": "undercroft",
+            "at": [
+              56,
+              30,
+              -5
+            ],
+            "width": 2.5,
+            "kind": "crawl"
+          },
+          {
+            "id": "closet",
+            "at": [
+              19,
+              40,
+              -5
+            ],
+            "width": 1,
+            "kind": "ladder"
+          }
+        ]
+      },
+      "zone_art": {
+        "id": "Pit",
+        "rooms": [
+          "lair",
+          "vault"
+        ],
+        "concepts": [
+          "ENVC-12"
+        ],
+        "materials": [
+          "TX04",
+          "TX17",
+          "TX08",
+          "TX09"
+        ],
+        "identity": "The lowest cavern at -5m. One compact Vault mouth, roots framing the shaft above, and an earned scout return ladder.",
+        "hero": [
+          "I19",
+          "I11",
+          "I16"
+        ],
+        "support": [
+          "A21",
+          "A22",
+          "D01",
+          "D02",
+          "L04"
+        ],
+        "placement": "Keep Red-key door source [57,60,-5] and its250cm span. Ladder uses the source [19,40] baseZ-5,height5m and the authored closet top. Roots can use the [35,46,-5] source envelope but must not occlude the hoist view.",
+        "avoid": "No extra stepping stones, new platforms or climbable root escape. No glowing loot-style mineral heaps. Vault sweep, key lock and ladder arrival areas remain clear.",
+        "views": [
+          "pit-hoist"
+        ],
+        "story": "Very few small props. One old supply remnant near a closed wall should make the scale of the cavern stronger.",
+        "environment_kit": [
+          "E01",
+          "E02",
+          "E03",
+          "E04",
+          "E05",
+          "E06",
+          "E08",
+          "E09",
+          "E13",
+          "E21"
+        ],
+        "target_density": "Proposal: one hero cluster per authored point,2-4 support clusters per closed-wall room; leave at least one whole wall bay empty. No automatic scatter."
+      },
+      "saved_tile_key": "Pit",
+      "provisional_pivot_plan": [
+        16,
+        22,
+        -5
+      ],
+      "surface_scope": "ALL saved owned floor heights and source structural sides/undersides; no ROI by declared rectangle; preserve source-owned frontier extensions",
+      "concept_links": [
+        "docs/art/warrens-c-dressing-r01/references/ENVC-12-pit-vault-and-scout-exit.png"
+      ],
+      "district_sheet": "docs/art/warrens-c-dressing-r01/art/district-sheets/DRESS05_PitDressingAssembly.png",
+      "source_prop_indices": [
+        5,
+        21
+      ],
+      "standing_camera_room": "lair",
+      "crouch_camera": {
+        "coordinate_basis": "nodes.ut2",
+        "ground_plan": [
+          56,
+          30,
+          -5
+        ],
+        "eye_plan": [
+          56,
+          30,
+          -4.1
+        ],
+        "target_plan": [
+          50,
+          36,
+          -4.1
+        ],
+        "status": "candidate, confirm real saved floor/headroom; scout-only when source packFits=false"
+      },
+      "protected_port_count": 4
+    },
+    {
+      "source_tile": {
+        "id": "Canal",
+        "label": "LI_Warrens_Canal",
+        "asset": "LI_Warrens_Canal",
+        "z": -2.5,
+        "rect": [
+          66,
+          -4,
+          88,
+          104
+        ],
+        "ports": [
+          {
+            "id": "bridge-w",
+            "at": [
+              66,
+              74,
+              2.5
+            ],
+            "width": 3,
+            "kind": "bridge"
+          },
+          {
+            "id": "bridge-e",
+            "at": [
+              88,
+              74,
+              2.5
+            ],
+            "width": 3,
+            "kind": "bridge"
+          },
+          {
+            "id": "ford-w",
+            "at": [
+              66,
+              49,
+              -2.5
+            ],
+            "width": 4,
+            "kind": "door"
+          },
+          {
+            "id": "ford-e",
+            "at": [
+              88,
+              49,
+              0
+            ],
+            "width": 4,
+            "kind": "stair"
+          },
+          {
+            "id": "chain-w",
+            "at": [
+              66,
+              26,
+              -2.5
+            ],
+            "width": 2.5,
+            "kind": "bridge"
+          },
+          {
+            "id": "chain-e",
+            "at": [
+              88,
+              24,
+              -2.5
+            ],
+            "width": 2.5,
+            "kind": "bridge"
+          }
+        ],
+        "note": "the canal, the Ford, both bridges: the edge is one tile; the Undercroft passes under it on the Brineworks tile"
+      },
+      "zone_art": {
+        "id": "Canal",
+        "rooms": [
+          "ford-w",
+          "ford-e"
+        ],
+        "concepts": [
+          "ENVC-03",
+          "ENVC-04",
+          "ENVC-05",
+          "ENVC-11"
+        ],
+        "materials": [
+          "TX01",
+          "TX06",
+          "TX17",
+          "TX09"
+        ],
+        "identity": "The district edge and exactly the authored crossing beats: Bone Bridge above, always-open shallow Ford, controlled Chain Crossing below. Both towers remain recognizable.",
+        "hero": [
+          "A11",
+          "A12",
+          "A13",
+          "H10",
+          "W01",
+          "I05"
+        ],
+        "support": [
+          "A10",
+          "P27",
+          "P28",
+          "D13",
+          "L03"
+        ],
+        "placement": "Use the source tile ports: Bone Bridge W/E[66,74,2.5]/[88,74,2.5], Ford[66,49,-2.5]/[88,49,0], Chain[66,26,-2.5]/[88,24,-2.5]. Decorative bridge skins preserve existing deck widths, rails and movement collision. Ford water is0.4m; canal depth is2m.",
+        "avoid": "The paintings contain scenic stones; do not turn them into a fourth crossing. Retain source deep-water rails and do not add climb-out props. No banners across both-tower views or the clue ray.",
+        "views": [
+          "ford-hoist",
+          "ford-bell",
+          "bridge-hoist",
+          "bridge-bell",
+          "rim-glyphs"
+        ],
+        "story": "Hoist-hook marks on the west bank, bell marks on the east. Shape redundancy works in darkness; color is secondary.",
+        "environment_kit": [
+          "E01",
+          "E02",
+          "E03",
+          "E04",
+          "E06",
+          "E07",
+          "E08",
+          "E09",
+          "E10",
+          "E11",
+          "E21"
+        ],
+        "target_density": "Proposal: one hero cluster per authored point,2-4 support clusters per closed-wall room; leave at least one whole wall bay empty. No automatic scatter."
+      },
+      "saved_tile_key": "Canal",
+      "provisional_pivot_plan": [
+        66,
+        -4,
+        -2.5
+      ],
+      "surface_scope": "ALL saved owned floor heights and source structural sides/undersides; no ROI by declared rectangle; preserve source-owned frontier extensions",
+      "concept_links": [
+        "docs/art/warrens-c-dressing-r01/references/ENVC-03-bone-bridge-crossing.png",
+        "docs/art/warrens-c-dressing-r01/references/ENVC-04-the-ford.png",
+        "docs/art/warrens-c-dressing-r01/references/ENVC-05-chain-crossing-and-sluice.png",
+        "docs/art/warrens-c-dressing-r01/references/ENVC-11-canal-rim-wayfinding.png"
+      ],
+      "district_sheet": "docs/art/warrens-c-dressing-r01/art/district-sheets/DRESS06_CanalDressingAssembly.png",
+      "source_prop_indices": [
+        22
+      ],
+      "standing_camera_room": "ford-w",
+      "crouch_camera": {
+        "coordinate_basis": "nodes.fm",
+        "ground_plan": [
+          74,
+          49,
+          -2.5
+        ],
+        "eye_plan": [
+          74,
+          49,
+          -1.6
+        ],
+        "target_plan": [
+          84,
+          49,
+          0.9
+        ],
+        "status": "candidate, confirm real saved floor/headroom; scout-only when source packFits=false"
+      },
+      "protected_port_count": 6
+    },
+    {
+      "source_tile": {
+        "id": "Belfry",
+        "label": "LI_Warrens_Belfry",
+        "asset": "LI_Warrens_Belfry",
+        "z": 0,
+        "rect": [
+          84,
+          38,
+          124,
+          68
+        ],
+        "ports": [
+          {
+            "id": "ford",
+            "at": [
+              88,
+              49,
+              0
+            ],
+            "width": 4,
+            "kind": "stair"
+          },
+          {
+            "id": "reliquary",
+            "at": [
+              92,
+              68,
+              0
+            ],
+            "width": 3,
+            "kind": "stair"
+          },
+          {
+            "id": "cellar",
+            "at": [
+              96,
+              38,
+              0
+            ],
+            "width": 3,
+            "kind": "stair"
+          },
+          {
+            "id": "larder",
+            "at": [
+              112,
+              50,
+              0
+            ],
+            "width": 3,
+            "kind": "stair"
+          }
+        ],
+        "note": "the Bell Tower, its loft, the dial lock, the Sealed Burial"
+      },
+      "zone_art": {
+        "id": "Belfry",
+        "rooms": [
+          "belfry",
+          "bell-loft"
+        ],
+        "concepts": [
+          "ENVC-02",
+          "ENVC-07"
+        ],
+        "materials": [
+          "TX01",
+          "TX10",
+          "TX08",
+          "TX06"
+        ],
+        "identity": "East-bank vertical landmark: 22m tower, high bell around+16m, accessible loft+2.5m. A coherent panel/lever/key family sits at reachable authored locations.",
+        "hero": [
+          "H06",
+          "H07",
+          "H08",
+          "H09",
+          "I01",
+          "I02",
+          "I07",
+          "I08",
+          "I09",
+          "I10",
+          "I17"
+        ],
+        "support": [
+          "P27",
+          "A24",
+          "L03",
+          "P14",
+          "P11",
+          "W01",
+          "P25"
+        ],
+        "placement": "Key plinth [104,60,2.5], dial panel[108,46,0], loft lever[102,60,2.5]. The source ladder at[100,57] hasheight2.5m. The large west-facing clue is read across the canal from the Well rim; keep glyph discs individual.",
+        "avoid": "Never suspend the Red key at the high bell. Do not bake a random three-symbol answer into a mural. Keep the intended Reliquary rail drop and landing open; do not repair that authored gap with a decorative railing.",
+        "views": [
+          "ford-bell",
+          "bridge-bell",
+          "rim-glyphs",
+          "loft-well",
+          "belfry-pit"
+        ],
+        "story": "Sparse bell cloth and bone chimes, not rows of extra collectible-looking keys.",
+        "environment_kit": [
+          "E02",
+          "E08",
+          "E16",
+          "E17",
+          "E18",
+          "E19",
+          "E22",
+          "E23",
+          "E24"
+        ],
+        "target_density": "Proposal: one hero cluster per authored point,2-4 support clusters per closed-wall room; leave at least one whole wall bay empty. No automatic scatter."
+      },
+      "saved_tile_key": "Belfry",
+      "provisional_pivot_plan": [
+        84,
+        38,
+        0
+      ],
+      "surface_scope": "ALL saved owned floor heights and source structural sides/undersides; no ROI by declared rectangle; preserve source-owned frontier extensions",
+      "concept_links": [
+        "docs/art/warrens-c-dressing-r01/references/ENVC-02-belfry-on-the-other-bank.png",
+        "docs/art/warrens-c-dressing-r01/references/ENVC-07-reliquary-stair-and-loft-access.png"
+      ],
+      "district_sheet": "docs/art/warrens-c-dressing-r01/art/district-sheets/DRESS07_BelfryDressingAssembly.png",
+      "source_prop_indices": [
+        1,
+        2,
+        10,
+        11,
+        16,
+        20
+      ],
+      "standing_camera_room": "belfry",
+      "crouch_camera": {
+        "coordinate_basis": "crawls.crawl-sealed.a",
+        "ground_plan": [
+          110,
+          56,
+          0
+        ],
+        "eye_plan": [
+          110,
+          56,
+          0.9
+        ],
+        "target_plan": [
+          116,
+          60.5,
+          0.9
+        ],
+        "status": "candidate, confirm real saved floor/headroom; scout-only when source packFits=false"
+      },
+      "protected_port_count": 4
+    },
+    {
+      "source_tile": {
+        "id": "Reliquary",
+        "label": "LI_Warrens_Reliquary",
+        "asset": "LI_Warrens_Reliquary",
+        "z": 2.5,
+        "rect": [
+          80,
+          66,
+          108,
+          102
+        ],
+        "ports": [
+          {
+            "id": "bridge",
+            "at": [
+              84,
+              74,
+              2.5
+            ],
+            "width": 3,
+            "kind": "bridge"
+          },
+          {
+            "id": "belfry",
+            "at": [
+              92,
+              66,
+              2.5
+            ],
+            "width": 3,
+            "kind": "stair"
+          },
+          {
+            "id": "S2",
+            "at": [
+              110,
+              80,
+              2.5
+            ],
+            "width": 3,
+            "kind": "door"
+          },
+          {
+            "id": "mill",
+            "at": [
+              100,
+              94,
+              2.5
+            ],
+            "width": 3,
+            "kind": "stair"
+          }
+        ]
+      },
+      "zone_art": {
+        "id": "Reliquary",
+        "rooms": [
+          "reliquary"
+        ],
+        "concepts": [
+          "ENVC-07",
+          "ENVC-06"
+        ],
+        "materials": [
+          "TX01",
+          "TX10",
+          "TX08",
+          "TX06"
+        ],
+        "identity": "Brass-and-stone storage on the east side of the Bone Bridge. One tomb silhouette and a stair that offers the authored loft approach.",
+        "hero": [
+          "H15",
+          "I18",
+          "P29"
+        ],
+        "support": [
+          "P01",
+          "P13",
+          "A20",
+          "L04",
+          "P27"
+        ],
+        "placement": "Source tomb [88,84,2.5] size3 x1.5 x1.2m. Keep the P3 Mourner gate at[100,76,2.5]. Use shelves on closed wall bays, with generous blank space around the reward target and stair/rail-drop approach.",
+        "avoid": "No extra gate, secret interactable badge or simultaneous co-op plate requirement. Keep the mill-return drop landing clear.",
+        "views": [
+          "bridge-bell",
+          "bridge-hoist"
+        ],
+        "story": "One repaired brass box and an abstract kitchen-harvest mural can supply history without looking like a second puzzle.",
+        "environment_kit": [
+          "E02",
+          "E08",
+          "E22",
+          "E23"
+        ],
+        "target_density": "Proposal: one hero cluster per authored point,2-4 support clusters per closed-wall room; leave at least one whole wall bay empty. No automatic scatter."
+      },
+      "saved_tile_key": "Reliquary",
+      "provisional_pivot_plan": [
+        80,
+        66,
+        2.5
+      ],
+      "surface_scope": "ALL saved owned floor heights and source structural sides/undersides; no ROI by declared rectangle; preserve source-owned frontier extensions",
+      "concept_links": [
+        "docs/art/warrens-c-dressing-r01/references/ENVC-07-reliquary-stair-and-loft-access.png",
+        "docs/art/warrens-c-dressing-r01/references/ENVC-06-ossuary-pack-plate.png"
+      ],
+      "district_sheet": "docs/art/warrens-c-dressing-r01/art/district-sheets/DRESS08_ReliquaryDressingAssembly.png",
+      "source_prop_indices": [
+        9
+      ],
+      "standing_camera_room": "reliquary",
+      "crouch_camera": {
+        "coordinate_basis": "nodes.RQ",
+        "ground_plan": [
+          92,
+          80,
+          2.5
+        ],
+        "eye_plan": [
+          92,
+          80,
+          3.4
+        ],
+        "target_plan": [
+          100,
+          76,
+          3.4
+        ],
+        "status": "candidate, confirm real saved floor/headroom; scout-only when source packFits=false"
+      },
+      "protected_port_count": 4
+    },
+    {
+      "source_tile": {
+        "id": "Mill",
+        "label": "LI_Warrens_Mill",
+        "asset": "LI_Warrens_Mill",
+        "z": 5,
+        "rect": [
+          78,
+          92,
+          110,
+          116
+        ],
+        "ports": [
+          {
+            "id": "reliquary",
+            "at": [
+              100,
+              94,
+              2.5
+            ],
+            "width": 3,
+            "kind": "stair"
+          },
+          {
+            "id": "drop",
+            "at": [
+              90,
+              96,
+              5
+            ],
+            "width": 2,
+            "kind": "drop"
+          }
+        ],
+        "note": "the Salt Mill: the Curing Room wing (P7) above the Reliquary"
+      },
+      "zone_art": {
+        "id": "Mill",
+        "rooms": [
+          "mill"
+        ],
+        "concepts": [
+          "ENVC-08",
+          "ENVC-09"
+        ],
+        "materials": [
+          "TX05",
+          "TX08",
+          "TX12",
+          "TX15",
+          "TX09"
+        ],
+        "identity": "The +5m Curing Room: a clear brine vat work island, an octagonal millstone, salt chute and drying rack. This is the required P7 support stop.",
+        "hero": [
+          "H11",
+          "H12",
+          "I12",
+          "P30"
+        ],
+        "support": [
+          "I13",
+          "P02",
+          "P05",
+          "P08",
+          "P09",
+          "P10",
+          "P14",
+          "P15",
+          "P22",
+          "P23",
+          "D03",
+          "L02"
+        ],
+        "placement": "Curing vat [88,106,5], proxy2.4 x1.6 x1.4m; millstone[95,100.5,5],size2.5 x2.5 x2m. Stage pack space beside the station and retain all approach/control points. Dress the rack behind, not above the hand interaction plane.",
+        "avoid": "No sack pile on the Reliquary stair or the authored one-way mill rail drop. Do not move the required vat to the Brine Larder just because a painting shows a workbench there.",
+        "views": [],
+        "story": "One curing-service patch is enough. The room reads as a process stop through vat, rack and salt rather than a new tutorial wall of text.",
+        "environment_kit": [
+          "E02",
+          "E08",
+          "E15",
+          "E17",
+          "E18",
+          "E22",
+          "E23"
+        ],
+        "target_density": "Proposal: one hero cluster per authored point,2-4 support clusters per closed-wall room; leave at least one whole wall bay empty. No automatic scatter."
+      },
+      "saved_tile_key": "Mill",
+      "provisional_pivot_plan": [
+        78,
+        92,
+        5
+      ],
+      "surface_scope": "ALL saved owned floor heights and source structural sides/undersides; no ROI by declared rectangle; preserve source-owned frontier extensions",
+      "concept_links": [
+        "docs/art/warrens-c-dressing-r01/references/ENVC-08-salt-mill-above-the-canal.png",
+        "docs/art/warrens-c-dressing-r01/references/ENVC-09-brine-larder-canal-cellar.png"
+      ],
+      "district_sheet": "docs/art/warrens-c-dressing-r01/art/district-sheets/DRESS09_MillDressingAssembly.png",
+      "source_prop_indices": [
+        23,
+        24
+      ],
+      "standing_camera_room": "mill",
+      "crouch_camera": {
+        "coordinate_basis": "nodes.ML",
+        "ground_plan": [
+          92,
+          103,
+          5
+        ],
+        "eye_plan": [
+          92,
+          103,
+          5.9
+        ],
+        "target_plan": [
+          88,
+          106,
+          5.9
+        ],
+        "status": "candidate, confirm real saved floor/headroom; scout-only when source packFits=false"
+      },
+      "protected_port_count": 2
+    },
+    {
+      "source_tile": {
+        "id": "Catacomb",
+        "label": "LI_Warrens_Catacomb",
+        "asset": "LI_Warrens_Catacomb",
+        "z": 0,
+        "rect": [
+          -28,
+          40,
+          -2,
+          92
+        ],
+        "ports": [
+          {
+            "id": "court",
+            "at": [
+              -2,
+              64,
+              0
+            ],
+            "width": 2.5,
+            "kind": "crawl"
+          },
+          {
+            "id": "pit",
+            "at": [
+              -2,
+              46,
+              -4
+            ],
+            "width": 2.5,
+            "kind": "stair"
+          }
+        ],
+        "note": "the far west bead; its dive is a fourth way into the Pit"
+      },
+      "zone_art": {
+        "id": "Catacomb",
+        "rooms": [
+          "catacomb"
+        ],
+        "concepts": [
+          "ENVC-12"
+        ],
+        "materials": [
+          "TX04",
+          "TX01",
+          "TX06",
+          "TX19"
+        ],
+        "identity": "A low, far-west burial bead with one open tomb and a descending connection into the Pit. More irregular shell, fewer manufactured props.",
+        "hero": [
+          "H15"
+        ],
+        "support": [
+          "A20",
+          "A21",
+          "P11",
+          "P12",
+          "D07",
+          "D14",
+          "L04"
+        ],
+        "placement": "Source open tomb[-18,80,0],size3 x1.5 x1.2m. Keep the Court crawl, the dive and arrival/exit headroom exactly as authored. A sparse urn grouping can mark a closed side bay.",
+        "avoid": "No tomb lid across the crawl, no low web over an interaction target, no cache doorway painted onto a closed wall.",
+        "views": [],
+        "story": "A faded decorative harvest mural is optional; do not use the six Bellkeeper glyphs as decorative wallpaper.",
+        "environment_kit": [
+          "E01",
+          "E02",
+          "E03",
+          "E04",
+          "E05",
+          "E08",
+          "E20",
+          "E24"
+        ],
+        "target_density": "Proposal: one hero cluster per authored point,2-4 support clusters per closed-wall room; leave at least one whole wall bay empty. No automatic scatter."
+      },
+      "saved_tile_key": "Catacomb",
+      "provisional_pivot_plan": [
+        -28,
+        40,
+        0
+      ],
+      "surface_scope": "ALL saved owned floor heights and source structural sides/undersides; no ROI by declared rectangle; preserve source-owned frontier extensions",
+      "concept_links": [
+        "docs/art/warrens-c-dressing-r01/references/ENVC-12-pit-vault-and-scout-exit.png"
+      ],
+      "district_sheet": "docs/art/warrens-c-dressing-r01/art/district-sheets/DRESS10_CatacombDressingAssembly.png",
+      "source_prop_indices": [
+        25
+      ],
+      "standing_camera_room": "catacomb",
+      "crouch_camera": {
+        "coordinate_basis": "nodes.ct0",
+        "ground_plan": [
+          -6,
+          68,
+          0
+        ],
+        "eye_plan": [
+          -6,
+          68,
+          0.9
+        ],
+        "target_plan": [
+          -2,
+          63,
+          0.9
+        ],
+        "status": "candidate, confirm real saved floor/headroom; scout-only when source packFits=false"
+      },
+      "protected_port_count": 2
+    },
+    {
+      "source_tile": {
+        "id": "Brineworks",
+        "label": "LI_Warrens_Brineworks",
+        "asset": "LI_Warrens_Brineworks",
+        "z": -2.5,
+        "rect": [
+          88,
+          4,
+          144,
+          54
+        ],
+        "ports": [
+          {
+            "id": "belfry-cellar",
+            "at": [
+              96,
+              30,
+              -2.5
+            ],
+            "width": 3,
+            "kind": "stair"
+          },
+          {
+            "id": "belfry-larder",
+            "at": [
+              112,
+              50,
+              -2.5
+            ],
+            "width": 3,
+            "kind": "stair"
+          },
+          {
+            "id": "chain",
+            "at": [
+              96,
+              24,
+              -2.5
+            ],
+            "width": 2.5,
+            "kind": "bridge"
+          },
+          {
+            "id": "undercroft",
+            "at": [
+              88,
+              26,
+              -5
+            ],
+            "width": 2.5,
+            "kind": "crawl"
+          },
+          {
+            "id": "S3",
+            "at": [
+              140,
+              40,
+              -2.5
+            ],
+            "width": 3,
+            "kind": "door"
+          },
+          {
+            "id": "S4",
+            "at": [
+              122,
+              0,
+              -2.5
+            ],
+            "width": 3,
+            "kind": "door"
+          }
+        ],
+        "note": "Salt Cellar, Sluice, Brine Larder, the Undercroft under the canal"
+      },
+      "zone_art": {
+        "id": "Brineworks",
+        "rooms": [
+          "cellar",
+          "sluice",
+          "larder"
+        ],
+        "concepts": [
+          "ENVC-05",
+          "ENVC-09"
+        ],
+        "materials": [
+          "TX17",
+          "TX08",
+          "TX11",
+          "TX05",
+          "TX15"
+        ],
+        "identity": "East-bank Salt Cellar, Sluice and shallow Brine Larder, plus the Undercroft route beneath the canal. Salt, brine barrels and the floor chain distinguish it from the western pump.",
+        "hero": [
+          "I03",
+          "I04",
+          "W01",
+          "W02",
+          "W03"
+        ],
+        "support": [
+          "W08",
+          "P05",
+          "P06",
+          "P08",
+          "P09",
+          "P14",
+          "P15",
+          "D08",
+          "L01"
+        ],
+        "placement": "Sluice control [122,12,-2.5]. Source floor-chain proxy [110,20,-2.5],24 x0.4 x0.2m: use repeated links/guides rather than one long baked mesh. Brine Larder water remains0.4m and its roof break keeps the bell visible.",
+        "avoid": "No second mandatory curing station. No crates above the Undercroft headroom, on the chain tell, across the bars, or in the Larder-to-bell roof sightline. Storage jars must not mimic collectible monsters.",
+        "views": [
+          "larder-bell"
+        ],
+        "story": "Closed brine stores and one empty drying rack suggest overflow from the Mill, rather than moving the run objective here.",
+        "environment_kit": [
+          "E02",
+          "E05",
+          "E07",
+          "E08",
+          "E12",
+          "E13",
+          "E14",
+          "E15",
+          "E20"
+        ],
+        "target_density": "Proposal: one hero cluster per authored point,2-4 support clusters per closed-wall room; leave at least one whole wall bay empty. No automatic scatter."
+      },
+      "saved_tile_key": "Brineworks",
+      "provisional_pivot_plan": [
+        88,
+        4,
+        -2.5
+      ],
+      "surface_scope": "ALL saved owned floor heights and source structural sides/undersides; no ROI by declared rectangle; preserve source-owned frontier extensions",
+      "concept_links": [
+        "docs/art/warrens-c-dressing-r01/references/ENVC-05-chain-crossing-and-sluice.png",
+        "docs/art/warrens-c-dressing-r01/references/ENVC-09-brine-larder-canal-cellar.png"
+      ],
+      "district_sheet": "docs/art/warrens-c-dressing-r01/art/district-sheets/DRESS11_BrineworksDressingAssembly.png",
+      "source_prop_indices": [
+        13,
+        14,
+        15
+      ],
+      "standing_camera_room": "cellar",
+      "crouch_camera": {
+        "coordinate_basis": "crawls.crawl-r7.a",
+        "ground_plan": [
+          104.5,
+          29.8,
+          -5
+        ],
+        "eye_plan": [
+          104.5,
+          29.8,
+          -4.1
+        ],
+        "target_plan": [
+          100,
+          31,
+          -4.1
+        ],
+        "status": "candidate, confirm real saved floor/headroom; scout-only when source packFits=false"
+      },
+      "protected_port_count": 6
+    }
+  ],
+  "rooms": [
+    {
+      "source_room": {
+        "id": "hall",
+        "label": "Arrival Hall",
+        "poly": [
+          [
+            10,
+            44
+          ],
+          [
+            22,
+            44
+          ],
+          [
+            25,
+            47
+          ],
+          [
+            25,
+            53
+          ],
+          [
+            22,
+            56
+          ],
+          [
+            10,
+            56
+          ],
+          [
+            7,
+            53
+          ],
+          [
+            7,
+            47
+          ]
+        ],
+        "z": 0,
+        "light": "hearth"
+      },
+      "logical_zone": "Hub",
+      "standing_camera": {
+        "ground_plan": [
+          16,
+          50,
+          0
+        ],
+        "eye_plan": [
+          16,
+          50,
+          1.4
+        ],
+        "target_plan": [
+          40,
+          55.5,
+          7
+        ],
+        "coordinate_basis": "nodes.K",
+        "status": "candidate: snap ground to saved source top or actual wade state; sweep capsule/headroom before capture"
+      },
+      "crouch_camera": {
+        "ground_plan": [
+          16,
+          50,
+          0
+        ],
+        "eye_plan": [
+          16,
+          50,
+          0.9
+        ],
+        "target_plan": [
+          40,
+          55.5,
+          7
+        ],
+        "status": "candidate; no low-passage claim unless source marks it"
+      }
+    },
+    {
+      "source_room": {
+        "id": "closet",
+        "label": "",
+        "rect": [
+          16,
+          38,
+          22,
+          42
+        ],
+        "z": 0
+      },
+      "logical_zone": "Hub",
+      "standing_camera": {
+        "ground_plan": [
+          17,
+          40,
+          0
+        ],
+        "eye_plan": [
+          17,
+          40,
+          1.4
+        ],
+        "target_plan": [
+          19,
+          42,
+          1
+        ],
+        "coordinate_basis": "rooms.closet inset outside closet-well opening",
+        "status": "candidate: snap ground to saved source top or actual wade state; sweep capsule/headroom before capture"
+      },
+      "crouch_camera": {
+        "ground_plan": [
+          17,
+          40,
+          0
+        ],
+        "eye_plan": [
+          17,
+          40,
+          0.9
+        ],
+        "target_plan": [
+          19,
+          42,
+          1
+        ],
+        "status": "candidate; no low-passage claim unless source marks it"
+      }
+    },
+    {
+      "source_room": {
+        "id": "court",
+        "label": "Charnel Court",
+        "poly": [
+          [
+            2,
+            66
+          ],
+          [
+            8,
+            63
+          ],
+          [
+            24,
+            64
+          ],
+          [
+            29,
+            70
+          ],
+          [
+            28,
+            86
+          ],
+          [
+            23,
+            91
+          ],
+          [
+            8,
+            90
+          ],
+          [
+            1,
+            84
+          ]
+        ],
+        "z": 0,
+        "light": "cold",
+        "top": 9
+      },
+      "logical_zone": "Court",
+      "standing_camera": {
+        "ground_plan": [
+          24,
+          86,
+          0
+        ],
+        "eye_plan": [
+          24,
+          86,
+          1.4
+        ],
+        "target_plan": [
+          15,
+          88,
+          2.2
+        ],
+        "coordinate_basis": "nodes.c2",
+        "status": "candidate: snap ground to saved source top or actual wade state; sweep capsule/headroom before capture"
+      },
+      "crouch_camera": {
+        "ground_plan": [
+          24,
+          86,
+          0
+        ],
+        "eye_plan": [
+          24,
+          86,
+          0.9
+        ],
+        "target_plan": [
+          15,
+          88,
+          2.2
+        ],
+        "status": "candidate; no low-passage claim unless source marks it"
+      }
+    },
+    {
+      "source_room": {
+        "id": "court-pit",
+        "label": "",
+        "poly": [
+          [
+            6,
+            68
+          ],
+          [
+            24,
+            68
+          ],
+          [
+            23.5,
+            84
+          ],
+          [
+            20,
+            84.5
+          ],
+          [
+            7,
+            84
+          ],
+          [
+            5,
+            76
+          ]
+        ],
+        "z": -1.5
+      },
+      "logical_zone": "Court",
+      "standing_camera": {
+        "ground_plan": [
+          15,
+          76,
+          -1.5
+        ],
+        "eye_plan": [
+          15,
+          76,
+          -0.10000000000000009
+        ],
+        "target_plan": [
+          15,
+          88,
+          2.2
+        ],
+        "coordinate_basis": "nodes.H1",
+        "status": "candidate: snap ground to saved source top or actual wade state; sweep capsule/headroom before capture"
+      },
+      "crouch_camera": {
+        "ground_plan": [
+          15,
+          76,
+          -1.5
+        ],
+        "eye_plan": [
+          15,
+          76,
+          -0.6
+        ],
+        "target_plan": [
+          15,
+          88,
+          2.2
+        ],
+        "status": "candidate; no low-passage claim unless source marks it"
+      }
+    },
+    {
+      "source_room": {
+        "id": "rimW",
+        "label": "",
+        "rect": [
+          29,
+          42,
+          34,
+          58
+        ],
+        "z": 0
+      },
+      "logical_zone": "Hub",
+      "standing_camera": {
+        "ground_plan": [
+          31,
+          50,
+          0
+        ],
+        "eye_plan": [
+          31,
+          50,
+          1.4
+        ],
+        "target_plan": [
+          40,
+          55.5,
+          7
+        ],
+        "coordinate_basis": "nodes.wW",
+        "status": "candidate: snap ground to saved source top or actual wade state; sweep capsule/headroom before capture"
+      },
+      "crouch_camera": {
+        "ground_plan": [
+          31,
+          50,
+          0
+        ],
+        "eye_plan": [
+          31,
+          50,
+          0.9
+        ],
+        "target_plan": [
+          40,
+          55.5,
+          7
+        ],
+        "status": "candidate; no low-passage claim unless source marks it"
+      }
+    },
+    {
+      "source_room": {
+        "id": "rimE",
+        "label": "",
+        "rect": [
+          46,
+          42,
+          51,
+          58
+        ],
+        "z": 0
+      },
+      "logical_zone": "Hub",
+      "standing_camera": {
+        "ground_plan": [
+          48.5,
+          50,
+          0
+        ],
+        "eye_plan": [
+          48.5,
+          50,
+          1.4
+        ],
+        "target_plan": [
+          102,
+          50,
+          2
+        ],
+        "coordinate_basis": "nodes.wE",
+        "status": "candidate: snap ground to saved source top or actual wade state; sweep capsule/headroom before capture"
+      },
+      "crouch_camera": {
+        "ground_plan": [
+          48.5,
+          50,
+          0
+        ],
+        "eye_plan": [
+          48.5,
+          50,
+          0.9
+        ],
+        "target_plan": [
+          102,
+          50,
+          2
+        ],
+        "status": "candidate; no low-passage claim unless source marks it"
+      }
+    },
+    {
+      "source_room": {
+        "id": "rimN",
+        "label": "The Well",
+        "rect": [
+          29,
+          53,
+          51,
+          58
+        ],
+        "z": 0
+      },
+      "logical_zone": "Hub",
+      "standing_camera": {
+        "ground_plan": [
+          40,
+          57,
+          0
+        ],
+        "eye_plan": [
+          40,
+          57,
+          1.4
+        ],
+        "target_plan": [
+          40,
+          55.5,
+          4
+        ],
+        "coordinate_basis": "nodes.wN",
+        "status": "candidate: snap ground to saved source top or actual wade state; sweep capsule/headroom before capture"
+      },
+      "crouch_camera": {
+        "ground_plan": [
+          40,
+          57,
+          0
+        ],
+        "eye_plan": [
+          40,
+          57,
+          0.9
+        ],
+        "target_plan": [
+          40,
+          55.5,
+          4
+        ],
+        "status": "candidate; no low-passage claim unless source marks it"
+      }
+    },
+    {
+      "source_room": {
+        "id": "rimS",
+        "label": "",
+        "rect": [
+          29,
+          42,
+          51,
+          47
+        ],
+        "z": 0
+      },
+      "logical_zone": "Hub",
+      "standing_camera": {
+        "ground_plan": [
+          40,
+          43,
+          0
+        ],
+        "eye_plan": [
+          40,
+          43,
+          1.4
+        ],
+        "target_plan": [
+          40,
+          55.5,
+          7
+        ],
+        "coordinate_basis": "nodes.wS",
+        "status": "candidate: snap ground to saved source top or actual wade state; sweep capsule/headroom before capture"
+      },
+      "crouch_camera": {
+        "ground_plan": [
+          40,
+          43,
+          0
+        ],
+        "eye_plan": [
+          40,
+          43,
+          0.9
+        ],
+        "target_plan": [
+          40,
+          55.5,
+          7
+        ],
+        "status": "candidate; no low-passage claim unless source marks it"
+      }
+    },
+    {
+      "source_room": {
+        "id": "ossuary",
+        "label": "Ossuary",
+        "rect": [
+          40,
+          64,
+          56,
+          80
+        ],
+        "z": 2.5,
+        "top": 9
+      },
+      "logical_zone": "Ossuary",
+      "standing_camera": {
+        "ground_plan": [
+          48,
+          72,
+          2.5
+        ],
+        "eye_plan": [
+          48,
+          72,
+          3.9
+        ],
+        "target_plan": [
+          42,
+          66,
+          2.8
+        ],
+        "coordinate_basis": "nodes.O",
+        "status": "candidate: snap ground to saved source top or actual wade state; sweep capsule/headroom before capture"
+      },
+      "crouch_camera": {
+        "ground_plan": [
+          48,
+          72,
+          2.5
+        ],
+        "eye_plan": [
+          48,
+          72,
+          3.4
+        ],
+        "target_plan": [
+          42,
+          66,
+          2.8
+        ],
+        "status": "candidate; no low-passage claim unless source marks it"
+      }
+    },
+    {
+      "source_room": {
+        "id": "bridgehead",
+        "label": "Bridgehead",
+        "rect": [
+          56,
+          70,
+          62,
+          78
+        ],
+        "z": 2.5,
+        "top": 9
+      },
+      "logical_zone": "Ossuary",
+      "standing_camera": {
+        "ground_plan": [
+          59,
+          74,
+          2.5
+        ],
+        "eye_plan": [
+          59,
+          74,
+          3.9
+        ],
+        "target_plan": [
+          73,
+          74,
+          3.8
+        ],
+        "coordinate_basis": "nodes.bh",
+        "status": "candidate: snap ground to saved source top or actual wade state; sweep capsule/headroom before capture"
+      },
+      "crouch_camera": {
+        "ground_plan": [
+          59,
+          74,
+          2.5
+        ],
+        "eye_plan": [
+          59,
+          74,
+          3.4
+        ],
+        "target_plan": [
+          73,
+          74,
+          3.8
+        ],
+        "status": "candidate; no low-passage claim unless source marks it"
+      }
+    },
+    {
+      "source_room": {
+        "id": "ford-w",
+        "label": "The Ford",
+        "poly": [
+          [
+            52,
+            45
+          ],
+          [
+            57,
+            44
+          ],
+          [
+            58,
+            52
+          ],
+          [
+            52.5,
+            54
+          ]
+        ],
+        "z": -2.5,
+        "top": 9
+      },
+      "logical_zone": "Canal",
+      "standing_camera": {
+        "ground_plan": [
+          57,
+          49,
+          -2.5
+        ],
+        "eye_plan": [
+          57,
+          49,
+          -1.1
+        ],
+        "target_plan": [
+          104,
+          50,
+          16
+        ],
+        "coordinate_basis": "nodes.fw",
+        "status": "candidate: snap ground to saved source top or actual wade state; sweep capsule/headroom before capture"
+      },
+      "crouch_camera": {
+        "ground_plan": [
+          57,
+          49,
+          -2.5
+        ],
+        "eye_plan": [
+          57,
+          49,
+          -1.6
+        ],
+        "target_plan": [
+          104,
+          50,
+          16
+        ],
+        "status": "candidate; no low-passage claim unless source marks it"
+      }
+    },
+    {
+      "source_room": {
+        "id": "ford-e",
+        "label": "",
+        "poly": [
+          [
+            80,
+            45
+          ],
+          [
+            87,
+            46
+          ],
+          [
+            86,
+            53
+          ],
+          [
+            80,
+            52
+          ]
+        ],
+        "z": 0,
+        "top": 12
+      },
+      "logical_zone": "Canal",
+      "standing_camera": {
+        "ground_plan": [
+          84,
+          49,
+          0
+        ],
+        "eye_plan": [
+          84,
+          49,
+          1.4
+        ],
+        "target_plan": [
+          40,
+          55.5,
+          7
+        ],
+        "coordinate_basis": "nodes.fe",
+        "status": "candidate: snap ground to saved source top or actual wade state; sweep capsule/headroom before capture"
+      },
+      "crouch_camera": {
+        "ground_plan": [
+          84,
+          49,
+          0
+        ],
+        "eye_plan": [
+          84,
+          49,
+          0.9
+        ],
+        "target_plan": [
+          40,
+          55.5,
+          7
+        ],
+        "status": "candidate; no low-passage claim unless source marks it"
+      }
+    },
+    {
+      "source_room": {
+        "id": "reliquary",
+        "label": "Reliquary",
+        "rect": [
+          84,
+          72,
+          100,
+          96
+        ],
+        "z": 2.5,
+        "light": "dim",
+        "top": 8
+      },
+      "logical_zone": "Reliquary",
+      "standing_camera": {
+        "ground_plan": [
+          92,
+          80,
+          2.5
+        ],
+        "eye_plan": [
+          92,
+          80,
+          3.9
+        ],
+        "target_plan": [
+          88,
+          84,
+          3.1
+        ],
+        "coordinate_basis": "nodes.RQ",
+        "status": "candidate: snap ground to saved source top or actual wade state; sweep capsule/headroom before capture"
+      },
+      "crouch_camera": {
+        "ground_plan": [
+          92,
+          80,
+          2.5
+        ],
+        "eye_plan": [
+          92,
+          80,
+          3.4
+        ],
+        "target_plan": [
+          88,
+          84,
+          3.1
+        ],
+        "status": "candidate; no low-passage claim unless source marks it"
+      }
+    },
+    {
+      "source_room": {
+        "id": "mill",
+        "label": "Salt Mill",
+        "rect": [
+          84,
+          96,
+          100,
+          110
+        ],
+        "z": 5,
+        "light": "dim",
+        "top": 6
+      },
+      "logical_zone": "Mill",
+      "standing_camera": {
+        "ground_plan": [
+          92,
+          103,
+          5
+        ],
+        "eye_plan": [
+          92,
+          103,
+          6.4
+        ],
+        "target_plan": [
+          88,
+          106,
+          5.8
+        ],
+        "coordinate_basis": "nodes.ML",
+        "status": "candidate: snap ground to saved source top or actual wade state; sweep capsule/headroom before capture"
+      },
+      "crouch_camera": {
+        "ground_plan": [
+          92,
+          103,
+          5
+        ],
+        "eye_plan": [
+          92,
+          103,
+          5.9
+        ],
+        "target_plan": [
+          88,
+          106,
+          5.8
+        ],
+        "status": "candidate; no low-passage claim unless source marks it"
+      }
+    },
+    {
+      "source_room": {
+        "id": "catacomb",
+        "label": "Catacomb",
+        "poly": [
+          [
+            -24,
+            68
+          ],
+          [
+            -18,
+            64
+          ],
+          [
+            -8,
+            66
+          ],
+          [
+            -4,
+            74
+          ],
+          [
+            -6,
+            84
+          ],
+          [
+            -14,
+            88
+          ],
+          [
+            -24,
+            82
+          ]
+        ],
+        "z": 0,
+        "top": 3.5
+      },
+      "logical_zone": "Catacomb",
+      "standing_camera": {
+        "ground_plan": [
+          -14,
+          76,
+          0
+        ],
+        "eye_plan": [
+          -14,
+          76,
+          1.4
+        ],
+        "target_plan": [
+          -18,
+          80,
+          0.6
+        ],
+        "coordinate_basis": "nodes.CT",
+        "status": "candidate: snap ground to saved source top or actual wade state; sweep capsule/headroom before capture"
+      },
+      "crouch_camera": {
+        "ground_plan": [
+          -14,
+          76,
+          0
+        ],
+        "eye_plan": [
+          -14,
+          76,
+          0.9
+        ],
+        "target_plan": [
+          -18,
+          80,
+          0.6
+        ],
+        "status": "candidate; no low-passage claim unless source marks it"
+      }
+    },
+    {
+      "source_room": {
+        "id": "belfry",
+        "label": "The Belfry",
+        "poly": [
+          [
+            88,
+            44
+          ],
+          [
+            108,
+            44
+          ],
+          [
+            110,
+            48
+          ],
+          [
+            110,
+            60
+          ],
+          [
+            108,
+            64
+          ],
+          [
+            88,
+            64
+          ],
+          [
+            86,
+            60
+          ],
+          [
+            86,
+            48
+          ]
+        ],
+        "z": 0,
+        "light": "cold",
+        "top": 9
+      },
+      "logical_zone": "Belfry",
+      "standing_camera": {
+        "ground_plan": [
+          90,
+          54,
+          0
+        ],
+        "eye_plan": [
+          90,
+          54,
+          1.4
+        ],
+        "target_plan": [
+          104,
+          50,
+          16
+        ],
+        "coordinate_basis": "views.belfry-pit.from",
+        "status": "candidate: snap ground to saved source top or actual wade state; sweep capsule/headroom before capture"
+      },
+      "crouch_camera": {
+        "ground_plan": [
+          90,
+          54,
+          0
+        ],
+        "eye_plan": [
+          90,
+          54,
+          0.9
+        ],
+        "target_plan": [
+          104,
+          50,
+          16
+        ],
+        "status": "candidate; no low-passage claim unless source marks it"
+      }
+    },
+    {
+      "source_room": {
+        "id": "bell-loft",
+        "label": "Bell Loft",
+        "rect": [
+          100,
+          56,
+          108,
+          64
+        ],
+        "z": 2.5,
+        "top": 9,
+        "note": "a +2.5 mezzanine in the Belfry's north-east: the Red key under the bell; the canal and the Well seen from its west rail"
+      },
+      "logical_zone": "Belfry",
+      "standing_camera": {
+        "ground_plan": [
+          100.5,
+          60,
+          2.5
+        ],
+        "eye_plan": [
+          100.5,
+          60,
+          3.9
+        ],
+        "target_plan": [
+          40,
+          50,
+          8
+        ],
+        "coordinate_basis": "views.loft-well.from",
+        "status": "candidate: snap ground to saved source top or actual wade state; sweep capsule/headroom before capture"
+      },
+      "crouch_camera": {
+        "ground_plan": [
+          100.5,
+          60,
+          2.5
+        ],
+        "eye_plan": [
+          100.5,
+          60,
+          3.4
+        ],
+        "target_plan": [
+          40,
+          50,
+          8
+        ],
+        "status": "candidate; no low-passage claim unless source marks it"
+      }
+    },
+    {
+      "source_room": {
+        "id": "cellar",
+        "label": "Salt Cellar",
+        "rect": [
+          96,
+          12,
+          110,
+          26
+        ],
+        "z": -2.5,
+        "top": 3.2
+      },
+      "logical_zone": "Brineworks",
+      "standing_camera": {
+        "ground_plan": [
+          104,
+          19,
+          -2.5
+        ],
+        "eye_plan": [
+          104,
+          19,
+          -1.1
+        ],
+        "target_plan": [
+          110,
+          20,
+          -2.4
+        ],
+        "coordinate_basis": "nodes.CE",
+        "status": "candidate: snap ground to saved source top or actual wade state; sweep capsule/headroom before capture"
+      },
+      "crouch_camera": {
+        "ground_plan": [
+          104,
+          19,
+          -2.5
+        ],
+        "eye_plan": [
+          104,
+          19,
+          -1.6
+        ],
+        "target_plan": [
+          110,
+          20,
+          -2.4
+        ],
+        "status": "candidate; no low-passage claim unless source marks it"
+      }
+    },
+    {
+      "source_room": {
+        "id": "sluice",
+        "label": "Sluice",
+        "rect": [
+          114,
+          8,
+          130,
+          22
+        ],
+        "z": -2.5,
+        "light": "dim"
+      },
+      "logical_zone": "Brineworks",
+      "standing_camera": {
+        "ground_plan": [
+          122,
+          15,
+          -2.5
+        ],
+        "eye_plan": [
+          122,
+          15,
+          -1.1
+        ],
+        "target_plan": [
+          122,
+          12,
+          -1.7
+        ],
+        "coordinate_basis": "nodes.SL",
+        "status": "candidate: snap ground to saved source top or actual wade state; sweep capsule/headroom before capture"
+      },
+      "crouch_camera": {
+        "ground_plan": [
+          122,
+          15,
+          -2.5
+        ],
+        "eye_plan": [
+          122,
+          15,
+          -1.6
+        ],
+        "target_plan": [
+          122,
+          12,
+          -1.7
+        ],
+        "status": "candidate; no low-passage claim unless source marks it"
+      }
+    },
+    {
+      "source_room": {
+        "id": "larder",
+        "label": "Brine Larder",
+        "poly": [
+          [
+            110,
+            34
+          ],
+          [
+            116,
+            30
+          ],
+          [
+            128,
+            32
+          ],
+          [
+            132,
+            40
+          ],
+          [
+            128,
+            49
+          ],
+          [
+            116,
+            50
+          ],
+          [
+            109,
+            44
+          ]
+        ],
+        "z": -2.5,
+        "top": 12
+      },
+      "logical_zone": "Brineworks",
+      "standing_camera": {
+        "ground_plan": [
+          120,
+          40,
+          -2.5
+        ],
+        "eye_plan": [
+          120,
+          40,
+          -1.1
+        ],
+        "target_plan": [
+          104,
+          50,
+          16
+        ],
+        "coordinate_basis": "nodes.BL",
+        "status": "candidate: snap ground to saved source top or actual wade state; sweep capsule/headroom before capture"
+      },
+      "crouch_camera": {
+        "ground_plan": [
+          120,
+          40,
+          -2.5
+        ],
+        "eye_plan": [
+          120,
+          40,
+          -1.6
+        ],
+        "target_plan": [
+          104,
+          50,
+          16
+        ],
+        "status": "candidate; no low-passage claim unless source marks it"
+      }
+    },
+    {
+      "source_room": {
+        "id": "pump",
+        "label": "Pump Room",
+        "rect": [
+          50,
+          18,
+          66,
+          32
+        ],
+        "z": -2.5,
+        "light": "dim",
+        "top": 8
+      },
+      "logical_zone": "Waterworks-W",
+      "standing_camera": {
+        "ground_plan": [
+          58,
+          25,
+          -2.5
+        ],
+        "eye_plan": [
+          58,
+          25,
+          -1.1
+        ],
+        "target_plan": [
+          54,
+          22,
+          0.5
+        ],
+        "coordinate_basis": "nodes.PU",
+        "status": "candidate: snap ground to saved source top or actual wade state; sweep capsule/headroom before capture"
+      },
+      "crouch_camera": {
+        "ground_plan": [
+          58,
+          25,
+          -2.5
+        ],
+        "eye_plan": [
+          58,
+          25,
+          -1.6
+        ],
+        "target_plan": [
+          54,
+          22,
+          0.5
+        ],
+        "status": "candidate; no low-passage claim unless source marks it"
+      }
+    },
+    {
+      "source_room": {
+        "id": "cistern",
+        "label": "Cistern",
+        "poly": [
+          [
+            8,
+            32
+          ],
+          [
+            14,
+            28
+          ],
+          [
+            22,
+            30
+          ],
+          [
+            26,
+            37
+          ],
+          [
+            22.5,
+            37.5
+          ],
+          [
+            15.5,
+            37.5
+          ],
+          [
+            15.5,
+            43.5
+          ],
+          [
+            12,
+            43.5
+          ],
+          [
+            6,
+            40
+          ]
+        ],
+        "z": -2.5
+      },
+      "logical_zone": "Waterworks-W",
+      "standing_camera": {
+        "ground_plan": [
+          16,
+          37,
+          -2.5
+        ],
+        "eye_plan": [
+          16,
+          37,
+          -1.1
+        ],
+        "target_plan": [
+          18,
+          34,
+          -2.59
+        ],
+        "coordinate_basis": "nodes.CI",
+        "status": "candidate: snap ground to saved source top or actual wade state; sweep capsule/headroom before capture"
+      },
+      "crouch_camera": {
+        "ground_plan": [
+          16,
+          37,
+          -2.5
+        ],
+        "eye_plan": [
+          16,
+          37,
+          -1.6
+        ],
+        "target_plan": [
+          18,
+          34,
+          -2.59
+        ],
+        "status": "candidate; no low-passage claim unless source marks it"
+      }
+    },
+    {
+      "source_room": {
+        "id": "lair",
+        "label": "The Pit",
+        "poly": [
+          [
+            22,
+            30
+          ],
+          [
+            36,
+            24
+          ],
+          [
+            50,
+            28
+          ],
+          [
+            57,
+            38
+          ],
+          [
+            56,
+            56
+          ],
+          [
+            48,
+            64
+          ],
+          [
+            30,
+            62
+          ],
+          [
+            20,
+            52
+          ],
+          [
+            18,
+            40
+          ]
+        ],
+        "z": -5.0,
+        "light": "cold"
+      },
+      "logical_zone": "Pit",
+      "standing_camera": {
+        "ground_plan": [
+          40,
+          50,
+          -5
+        ],
+        "eye_plan": [
+          40,
+          50,
+          -3.6
+        ],
+        "target_plan": [
+          40,
+          55.5,
+          7
+        ],
+        "coordinate_basis": "nodes.H2",
+        "status": "candidate: snap ground to saved source top or actual wade state; sweep capsule/headroom before capture"
+      },
+      "crouch_camera": {
+        "ground_plan": [
+          40,
+          50,
+          -5
+        ],
+        "eye_plan": [
+          40,
+          50,
+          -4.1
+        ],
+        "target_plan": [
+          40,
+          55.5,
+          7
+        ],
+        "status": "candidate; no low-passage claim unless source marks it"
+      }
+    },
+    {
+      "source_room": {
+        "id": "vault",
+        "label": "Vault",
+        "rect": [
+          58,
+          56,
+          66,
+          64
+        ],
+        "z": -5.0
+      },
+      "logical_zone": "Pit",
+      "standing_camera": {
+        "ground_plan": [
+          62,
+          60,
+          -5
+        ],
+        "eye_plan": [
+          62,
+          60,
+          -3.6
+        ],
+        "target_plan": [
+          57,
+          60,
+          -3.8
+        ],
+        "coordinate_basis": "rooms.vault inset beyond door sweep",
+        "status": "candidate: snap ground to saved source top or actual wade state; sweep capsule/headroom before capture"
+      },
+      "crouch_camera": {
+        "ground_plan": [
+          62,
+          60,
+          -5
+        ],
+        "eye_plan": [
+          62,
+          60,
+          -4.1
+        ],
+        "target_plan": [
+          57,
+          60,
+          -3.8
+        ],
+        "status": "candidate; no low-passage claim unless source marks it"
+      }
+    }
+  ],
+  "source_prop_assemblies": [
+    {
+      "source_prop_index": 0,
+      "kind": "station",
+      "note": "THE HOIST over the north rim of the Well",
+      "source_anchor_metres": [
+        40,
+        55.5,
+        0
+      ],
+      "source_proxy_size_metres": [
+        1.6,
+        1.6,
+        7.5
+      ],
+      "catalog_ids": [
+        "H01",
+        "H02",
+        "H03",
+        "H04",
+        "H05"
+      ],
+      "assembly_rule": "Whole source hoist envelope; separate all moving/optional cage components. No new elevator behavior.",
+      "zone": "Hub",
+      "placement_status": "fit_source_snapshot_before_apply",
+      "catalog_names": {
+        "H01": "WellHoistFrame",
+        "H02": "HoistPulley",
+        "H03": "HoistDrum",
+        "H04": "HoistHook",
+        "H05": "HoistCage"
+      },
+      "required_model_sheets": [
+        "docs/art/warrens-c-dressing-r01/art/model-sheets/MODEL02_WellHoist.png",
+        "docs/art/warrens-c-dressing-r01/art/model-sheets/MODEL36_WellHoistMechanicalBreakdown.png"
+      ],
+      "actor_contract": "static NoCollision source proxy replacement, no new route",
+      "reference_precedence": "source recipe/catalog names and dimensions override sheet labels"
+    },
+    {
+      "source_prop_index": 1,
+      "kind": "pillar",
+      "note": "THE BELL TOWER: 22 m, the bell cold-lit at +16, heard across the canal",
+      "source_anchor_metres": [
+        104,
+        50,
+        0
+      ],
+      "source_proxy_size_metres": [
+        4.0,
+        4.0,
+        22.0
+      ],
+      "catalog_ids": [
+        "H06",
+        "H07",
+        "H08",
+        "H09"
+      ],
+      "assembly_rule": "Assemble modular crown/pier skins within22m tower envelope; high bell near+16m. Key stays on the+2.5m loft.",
+      "zone": "Belfry",
+      "placement_status": "fit_source_snapshot_before_apply",
+      "catalog_names": {
+        "H06": "BellTowerCrownModule",
+        "H07": "HighLandmarkBell",
+        "H08": "BellYoke",
+        "H09": "BellClapper"
+      },
+      "required_model_sheets": [
+        "docs/art/warrens-c-dressing-r01/art/model-sheets/MODEL03_BelfryBellRig.png",
+        "docs/art/warrens-c-dressing-r01/art/model-sheets/MODEL23_LandmarkBellConstruction.png"
+      ],
+      "actor_contract": "static NoCollision source proxy replacement, no new route",
+      "reference_precedence": "source recipe/catalog names and dimensions override sheet labels"
+    },
+    {
+      "source_prop_index": 2,
+      "kind": "stack",
+      "note": "the three glyphs on the tower's west face (P4), read from the Well's east rim",
+      "source_anchor_metres": [
+        102,
+        50,
+        2.0
+      ],
+      "source_proxy_size_metres": [
+        0.3,
+        4.0,
+        2.0
+      ],
+      "catalog_ids": [
+        "P25",
+        "I07"
+      ],
+      "assembly_rule": "Use the P25 TowerClueBacking variant sized400x30x200cm and six swappable I07 glyph resources. Face/phrase/ordering remain source/runtime-controlled; no painted answer.",
+      "zone": "Belfry",
+      "placement_status": "fit_source_snapshot_before_apply",
+      "catalog_names": {
+        "P25": "RecipeNoticeBoard",
+        "I07": "GlyphFaceInsert"
+      },
+      "required_model_sheets": [
+        "docs/art/warrens-c-dressing-r01/art/model-sheets/MODEL10_InteractionHousingKit-r02.png",
+        "docs/art/warrens-c-dressing-r01/art/model-sheets/MODEL30_NoticeBoardsAndRoyalCloth.png"
+      ],
+      "actor_contract": "runtime-controlled skin only; no duplicate pickup/control, preserve moving/static split",
+      "reference_precedence": "source recipe/catalog names and dimensions override sheet labels"
+    },
+    {
+      "source_prop_index": 3,
+      "kind": "statue",
+      "note": "split mourner: the Court landmark",
+      "source_anchor_metres": [
+        15,
+        88,
+        0
+      ],
+      "source_proxy_size_metres": [
+        2.0,
+        1.2,
+        4.5
+      ],
+      "catalog_ids": [
+        "H14"
+      ],
+      "assembly_rule": "Source Court landmark; keep surrounding hunt floor open.",
+      "zone": "Court",
+      "placement_status": "fit_source_snapshot_before_apply",
+      "catalog_names": {
+        "H14": "SplitMourner"
+      },
+      "required_model_sheets": [
+        "docs/art/warrens-c-dressing-r01/art/model-sheets/MODEL11_MournerAndBurialKit.png"
+      ],
+      "actor_contract": "static NoCollision source proxy replacement, no new route",
+      "reference_precedence": "source recipe/catalog names and dimensions override sheet labels"
+    },
+    {
+      "source_prop_index": 4,
+      "kind": "plinth",
+      "note": "pack plinth by the Camp Door",
+      "source_anchor_metres": [
+        10,
+        47.5,
+        0
+      ],
+      "source_proxy_size_metres": [
+        1.2,
+        1.2,
+        0.3
+      ],
+      "catalog_ids": [
+        "I20"
+      ],
+      "assembly_rule": "Existing camp-door pack staging point; do not generate a second backpack.",
+      "zone": "Hub",
+      "placement_status": "fit_source_snapshot_before_apply",
+      "catalog_names": {
+        "I20": "CampPackPlinth"
+      },
+      "required_model_sheets": [
+        "docs/art/warrens-c-dressing-r01/art/model-sheets/MODEL26_VaultDoorCampPlinthAndBox-r02.png"
+      ],
+      "actor_contract": "runtime-controlled skin only; no duplicate pickup/control, preserve moving/static split",
+      "reference_precedence": "source recipe/catalog names and dimensions override sheet labels"
+    },
+    {
+      "source_prop_index": 5,
+      "kind": "root",
+      "note": "roots down the west wall of the Well",
+      "source_anchor_metres": [
+        35,
+        46,
+        -5.0
+      ],
+      "source_proxy_size_metres": [
+        1.4,
+        1.4,
+        14.0
+      ],
+      "catalog_ids": [
+        "D01",
+        "D02"
+      ],
+      "assembly_rule": "Repeat short root modules inside the full source root envelope. Do not model one14m mesh or create a climbable route.",
+      "zone": "Pit",
+      "placement_status": "fit_source_snapshot_before_apply",
+      "catalog_names": {
+        "D01": "RootShort",
+        "D02": "RootLong"
+      },
+      "required_model_sheets": [
+        "docs/art/warrens-c-dressing-r01/art/model-sheets/MODEL12_RootsAndForageDressKit.png"
+      ],
+      "actor_contract": "static NoCollision source proxy replacement, no new route",
+      "reference_precedence": "source recipe/catalog names and dimensions override sheet labels"
+    },
+    {
+      "source_prop_index": 6,
+      "kind": "stack",
+      "note": "bone stacks",
+      "source_anchor_metres": [
+        52,
+        68,
+        2.5
+      ],
+      "source_proxy_size_metres": [
+        6.0,
+        1.0,
+        2.6
+      ],
+      "catalog_ids": [
+        "P01",
+        "P11"
+      ],
+      "assembly_rule": "Shared shelving and merged bone bundles inside the exact source stack envelope.",
+      "zone": "Ossuary",
+      "placement_status": "fit_source_snapshot_before_apply",
+      "catalog_names": {
+        "P01": "TimberShelf",
+        "P11": "BoneBundle"
+      },
+      "required_model_sheets": [
+        "docs/art/warrens-c-dressing-r01/art/model-sheets/MODEL08_PantryStorageKit.png",
+        "docs/art/warrens-c-dressing-r01/art/model-sheets/MODEL11_MournerAndBurialKit.png",
+        "docs/art/warrens-c-dressing-r01/art/model-sheets/MODEL24_ServiceBellsAndBoneChimes.png"
+      ],
+      "actor_contract": "static NoCollision source proxy replacement, no new route",
+      "reference_precedence": "source recipe/catalog names and dimensions override sheet labels"
+    },
+    {
+      "source_prop_index": 7,
+      "kind": "stack",
+      "note": "",
+      "source_anchor_metres": [
+        50,
+        76,
+        2.5
+      ],
+      "source_proxy_size_metres": [
+        6.0,
+        1.0,
+        2.6
+      ],
+      "catalog_ids": [
+        "P01",
+        "P11"
+      ],
+      "assembly_rule": "Shared shelving and merged bone bundles inside the exact source stack envelope.",
+      "zone": "Ossuary",
+      "placement_status": "fit_source_snapshot_before_apply",
+      "catalog_names": {
+        "P01": "TimberShelf",
+        "P11": "BoneBundle"
+      },
+      "required_model_sheets": [
+        "docs/art/warrens-c-dressing-r01/art/model-sheets/MODEL08_PantryStorageKit.png",
+        "docs/art/warrens-c-dressing-r01/art/model-sheets/MODEL11_MournerAndBurialKit.png",
+        "docs/art/warrens-c-dressing-r01/art/model-sheets/MODEL24_ServiceBellsAndBoneChimes.png"
+      ],
+      "actor_contract": "static NoCollision source proxy replacement, no new route",
+      "reference_precedence": "source recipe/catalog names and dimensions override sheet labels"
+    },
+    {
+      "source_prop_index": 8,
+      "kind": "plinth",
+      "note": "the pack plate (P3)",
+      "source_anchor_metres": [
+        42,
+        66,
+        2.5
+      ],
+      "source_proxy_size_metres": [
+        2.0,
+        2.0,
+        0.3
+      ],
+      "catalog_ids": [
+        "I06",
+        "P29"
+      ],
+      "assembly_rule": "P3 plate latches; no simultaneous hold. Source plate collision remains authoritative.",
+      "zone": "Ossuary",
+      "placement_status": "fit_source_snapshot_before_apply",
+      "catalog_names": {
+        "I06": "PackPlateHousing",
+        "P29": "MournerSealPlaque"
+      },
+      "required_model_sheets": [
+        "docs/art/warrens-c-dressing-r01/art/model-sheets/MODEL10_InteractionHousingKit-r02.png",
+        "docs/art/warrens-c-dressing-r01/art/model-sheets/MODEL31_DistrictSignsAndStationPlaques.png"
+      ],
+      "actor_contract": "runtime-controlled skin only; no duplicate pickup/control, preserve moving/static split",
+      "reference_precedence": "source recipe/catalog names and dimensions override sheet labels"
+    },
+    {
+      "source_prop_index": 9,
+      "kind": "sarcophagus",
+      "note": "the reliquary tomb",
+      "source_anchor_metres": [
+        88,
+        84,
+        2.5
+      ],
+      "source_proxy_size_metres": [
+        3.0,
+        1.5,
+        1.2
+      ],
+      "catalog_ids": [
+        "H15"
+      ],
+      "assembly_rule": "Shared body and separate lid; only the Catacomb source calls for an open tomb.",
+      "zone": "Reliquary",
+      "placement_status": "fit_source_snapshot_before_apply",
+      "catalog_names": {
+        "H15": "Sarcophagus"
+      },
+      "required_model_sheets": [
+        "docs/art/warrens-c-dressing-r01/art/model-sheets/MODEL11_MournerAndBurialKit.png"
+      ],
+      "actor_contract": "static NoCollision source proxy replacement, no new route",
+      "reference_precedence": "source recipe/catalog names and dimensions override sheet labels"
+    },
+    {
+      "source_prop_index": 10,
+      "kind": "plinth",
+      "note": "the key plinth under the bell (P1)",
+      "source_anchor_metres": [
+        104,
+        60,
+        2.5
+      ],
+      "source_proxy_size_metres": [
+        0.8,
+        0.8,
+        0.3
+      ],
+      "catalog_ids": [
+        "I01",
+        "I14"
+      ],
+      "assembly_rule": "Reuse the existing key pickup on the reachable loft; do not generate another key.",
+      "zone": "Belfry",
+      "placement_status": "fit_source_snapshot_before_apply",
+      "catalog_names": {
+        "I01": "KeyLoftPlinth",
+        "I14": "ExistingRedKey"
+      },
+      "required_model_sheets": [
+        "docs/art/warrens-c-dressing-r01/art/model-sheets/MODEL03_BelfryBellRig.png"
+      ],
+      "actor_contract": "runtime-controlled skin only; no duplicate pickup/control, preserve moving/static split",
+      "reference_precedence": "source recipe/catalog names and dimensions override sheet labels"
+    },
+    {
+      "source_prop_index": 11,
+      "kind": "station",
+      "note": "the dial lock (P4)",
+      "source_anchor_metres": [
+        108,
+        46,
+        0
+      ],
+      "source_proxy_size_metres": [
+        1.0,
+        0.4,
+        1.4
+      ],
+      "catalog_ids": [
+        "I02",
+        "I07",
+        "I08"
+      ],
+      "assembly_rule": "Blank housing and separate runtime glyph discs. No baked answer.",
+      "zone": "Belfry",
+      "placement_status": "fit_source_snapshot_before_apply",
+      "catalog_names": {
+        "I02": "BellkeeperPanelHousing",
+        "I07": "GlyphFaceInsert",
+        "I08": "DialBlank"
+      },
+      "required_model_sheets": [
+        "docs/art/warrens-c-dressing-r01/art/model-sheets/MODEL10_InteractionHousingKit-r02.png"
+      ],
+      "actor_contract": "runtime-controlled skin only; no duplicate pickup/control, preserve moving/static split",
+      "reference_precedence": "source recipe/catalog names and dimensions override sheet labels"
+    },
+    {
+      "source_prop_index": 12,
+      "kind": "pillar",
+      "note": "the pump: the west bank's audio landmark",
+      "source_anchor_metres": [
+        54,
+        22,
+        -2.5
+      ],
+      "source_proxy_size_metres": [
+        2.0,
+        2.0,
+        6.0
+      ],
+      "catalog_ids": [
+        "H13",
+        "W04",
+        "W05",
+        "W06"
+      ],
+      "assembly_rule": "Retain the west-bank audio landmark and source control presentation ownership.",
+      "zone": "Waterworks-W",
+      "placement_status": "reuse_existing_PumpCisternKit",
+      "catalog_names": {
+        "H13": "PumpTower",
+        "W04": "PipeStraight200",
+        "W05": "PipeElbow90",
+        "W06": "PipeCollar"
+      },
+      "required_model_sheets": [
+        "docs/art/warrens-c-dressing-r01/art/model-sheets/MODEL07_PumpWaterworks.png",
+        "docs/art/warrens-c-dressing-r01/art/model-sheets/MODEL38_PumpAndPipeAssemblyBreakdown.png"
+      ],
+      "actor_contract": "static NoCollision source proxy replacement, no new route",
+      "reference_precedence": "source recipe/catalog names and dimensions override sheet labels"
+    },
+    {
+      "source_prop_index": 13,
+      "kind": "pillar",
+      "note": "the hand-wheel (P2)",
+      "source_anchor_metres": [
+        122,
+        12,
+        -2.5
+      ],
+      "source_proxy_size_metres": [
+        1.0,
+        1.0,
+        1.6
+      ],
+      "catalog_ids": [
+        "I03",
+        "I04"
+      ],
+      "assembly_rule": "Keep source handwheel pivot, grip, control and channel; no decorative duplicate control.",
+      "zone": "Brineworks",
+      "placement_status": "reuse_existing_ChainCrossingKit",
+      "catalog_names": {
+        "I03": "SluiceHandwheelPedestal",
+        "I04": "WheelAxle"
+      },
+      "required_model_sheets": [
+        "docs/art/warrens-c-dressing-r01/art/model-sheets/MODEL05_SluiceChainKit.png"
+      ],
+      "actor_contract": "runtime-controlled skin only; no duplicate pickup/control, preserve moving/static split",
+      "reference_precedence": "source recipe/catalog names and dimensions override sheet labels"
+    },
+    {
+      "source_prop_index": 14,
+      "kind": "stack",
+      "note": "the chain along the Cellar floor, from the crossing to the wheel (P2 tell)",
+      "source_anchor_metres": [
+        110,
+        20,
+        -2.5
+      ],
+      "source_proxy_size_metres": [
+        24.0,
+        0.4,
+        0.2
+      ],
+      "catalog_ids": [
+        "W01",
+        "W02"
+      ],
+      "assembly_rule": "Repeat links/guides along the24m source chain tell, not one unique long mesh. Preserve the control-to-gate read.",
+      "zone": "Brineworks",
+      "placement_status": "reuse_existing_ChainCrossingKit",
+      "catalog_names": {
+        "W01": "HeavyChainLink",
+        "W02": "FloorChainGuide200"
+      },
+      "required_model_sheets": [
+        "docs/art/warrens-c-dressing-r01/art/model-sheets/MODEL05_SluiceChainKit.png"
+      ],
+      "actor_contract": "static NoCollision source proxy replacement, no new route",
+      "reference_precedence": "source recipe/catalog names and dimensions override sheet labels"
+    },
+    {
+      "source_prop_index": 15,
+      "kind": "stack",
+      "note": "salt crystals",
+      "source_anchor_metres": [
+        100,
+        16,
+        -2.5
+      ],
+      "source_proxy_size_metres": [
+        2.0,
+        2.0,
+        1.4
+      ],
+      "catalog_ids": [
+        "P09",
+        "D08"
+      ],
+      "assembly_rule": "Merge a few large solid salt shapes; no glowy treasure cluster.",
+      "zone": "Brineworks",
+      "placement_status": "reuse_existing_ChainCrossingKit",
+      "catalog_names": {
+        "P09": "SaltCrystalChunk",
+        "D08": "SaltChunkCluster"
+      },
+      "required_model_sheets": [
+        "docs/art/warrens-c-dressing-r01/art/model-sheets/MODEL12_RootsAndForageDressKit.png",
+        "docs/art/warrens-c-dressing-r01/art/model-sheets/MODEL27_SaltAndMillStorage.png"
+      ],
+      "actor_contract": "static NoCollision source proxy replacement, no new route",
+      "reference_precedence": "source recipe/catalog names and dimensions override sheet labels"
+    },
+    {
+      "source_prop_index": 16,
+      "kind": "chimes",
+      "note": "bone chimes under the tower",
+      "source_anchor_metres": [
+        98,
+        54,
+        0
+      ],
+      "source_proxy_size_metres": [
+        6.0,
+        0.2,
+        3.5
+      ],
+      "catalog_ids": [
+        "P14",
+        "P11",
+        "W01"
+      ],
+      "assembly_rule": "Source6m-wide bone-chime assembly: instance3 shared2m crossbars, hang single-bone P11 variants with short W01 chains. Keep within the shallow source envelope. No new SFX logic.",
+      "zone": "Belfry",
+      "placement_status": "fit_source_snapshot_before_apply",
+      "catalog_names": {
+        "P14": "HerbDryingRod",
+        "P11": "BoneBundle",
+        "W01": "HeavyChainLink"
+      },
+      "required_model_sheets": [
+        "docs/art/warrens-c-dressing-r01/art/model-sheets/MODEL05_SluiceChainKit.png",
+        "docs/art/warrens-c-dressing-r01/art/model-sheets/MODEL06_SaltMillCuringStation.png",
+        "docs/art/warrens-c-dressing-r01/art/model-sheets/MODEL11_MournerAndBurialKit.png",
+        "docs/art/warrens-c-dressing-r01/art/model-sheets/MODEL24_ServiceBellsAndBoneChimes.png"
+      ],
+      "actor_contract": "static NoCollision source proxy replacement, no new route",
+      "reference_precedence": "source recipe/catalog names and dimensions override sheet labels"
+    },
+    {
+      "source_prop_index": 17,
+      "kind": "root",
+      "note": "roots through the Cistern roof",
+      "source_anchor_metres": [
+        24,
+        34,
+        -2.5
+      ],
+      "source_proxy_size_metres": [
+        1.2,
+        1.2,
+        5.0
+      ],
+      "catalog_ids": [
+        "D01",
+        "D02"
+      ],
+      "assembly_rule": "Repeat short root modules inside the full source root envelope. Do not model one14m mesh or create a climbable route.",
+      "zone": "Waterworks-W",
+      "placement_status": "reuse_existing_PumpCisternKit",
+      "catalog_names": {
+        "D01": "RootShort",
+        "D02": "RootLong"
+      },
+      "required_model_sheets": [
+        "docs/art/warrens-c-dressing-r01/art/model-sheets/MODEL12_RootsAndForageDressKit.png"
+      ],
+      "actor_contract": "static NoCollision source proxy replacement, no new route",
+      "reference_precedence": "source recipe/catalog names and dimensions override sheet labels"
+    },
+    {
+      "source_prop_index": 18,
+      "kind": "candles",
+      "note": "tallow",
+      "source_anchor_metres": [
+        12,
+        46,
+        0
+      ],
+      "source_proxy_size_metres": [
+        0.9,
+        0.9,
+        0.5
+      ],
+      "catalog_ids": [
+        "L04",
+        "L07"
+      ],
+      "assembly_rule": "Art skins at the authored candle location; do not automatically spawn extra point lights.",
+      "zone": "Hub",
+      "placement_status": "fit_source_snapshot_before_apply",
+      "catalog_names": {
+        "L04": "CandleHolder",
+        "L07": "CandleTrio"
+      },
+      "required_model_sheets": [
+        "docs/art/warrens-c-dressing-r01/art/model-sheets/MODEL09_PracticalLightKit.png",
+        "docs/art/warrens-c-dressing-r01/art/model-sheets/MODEL32_GlassWaxBrazierAndLightFrame.png"
+      ],
+      "actor_contract": "static NoCollision source proxy replacement, no new route",
+      "reference_precedence": "source recipe/catalog names and dimensions override sheet labels"
+    },
+    {
+      "source_prop_index": 19,
+      "kind": "candles",
+      "note": "tallow",
+      "source_anchor_metres": [
+        54,
+        66,
+        2.5
+      ],
+      "source_proxy_size_metres": [
+        0.9,
+        0.9,
+        0.5
+      ],
+      "catalog_ids": [
+        "L04",
+        "L07"
+      ],
+      "assembly_rule": "Art skins at the authored candle location; do not automatically spawn extra point lights.",
+      "zone": "Ossuary",
+      "placement_status": "fit_source_snapshot_before_apply",
+      "catalog_names": {
+        "L04": "CandleHolder",
+        "L07": "CandleTrio"
+      },
+      "required_model_sheets": [
+        "docs/art/warrens-c-dressing-r01/art/model-sheets/MODEL09_PracticalLightKit.png",
+        "docs/art/warrens-c-dressing-r01/art/model-sheets/MODEL32_GlassWaxBrazierAndLightFrame.png"
+      ],
+      "actor_contract": "static NoCollision source proxy replacement, no new route",
+      "reference_precedence": "source recipe/catalog names and dimensions override sheet labels"
+    },
+    {
+      "source_prop_index": 20,
+      "kind": "candles",
+      "note": "tallow",
+      "source_anchor_metres": [
+        90,
+        46,
+        0
+      ],
+      "source_proxy_size_metres": [
+        0.9,
+        0.9,
+        0.5
+      ],
+      "catalog_ids": [
+        "L04",
+        "L07"
+      ],
+      "assembly_rule": "Art skins at the authored candle location; do not automatically spawn extra point lights.",
+      "zone": "Belfry",
+      "placement_status": "fit_source_snapshot_before_apply",
+      "catalog_names": {
+        "L04": "CandleHolder",
+        "L07": "CandleTrio"
+      },
+      "required_model_sheets": [
+        "docs/art/warrens-c-dressing-r01/art/model-sheets/MODEL09_PracticalLightKit.png",
+        "docs/art/warrens-c-dressing-r01/art/model-sheets/MODEL32_GlassWaxBrazierAndLightFrame.png"
+      ],
+      "actor_contract": "static NoCollision source proxy replacement, no new route",
+      "reference_precedence": "source recipe/catalog names and dimensions override sheet labels"
+    },
+    {
+      "source_prop_index": 21,
+      "kind": "candles",
+      "note": "tallow",
+      "source_anchor_metres": [
+        22,
+        58,
+        -5.0
+      ],
+      "source_proxy_size_metres": [
+        0.9,
+        0.9,
+        0.5
+      ],
+      "catalog_ids": [
+        "L04",
+        "L07"
+      ],
+      "assembly_rule": "Art skins at the authored candle location; do not automatically spawn extra point lights.",
+      "zone": "Pit",
+      "placement_status": "fit_source_snapshot_before_apply",
+      "catalog_names": {
+        "L04": "CandleHolder",
+        "L07": "CandleTrio"
+      },
+      "required_model_sheets": [
+        "docs/art/warrens-c-dressing-r01/art/model-sheets/MODEL09_PracticalLightKit.png",
+        "docs/art/warrens-c-dressing-r01/art/model-sheets/MODEL32_GlassWaxBrazierAndLightFrame.png"
+      ],
+      "actor_contract": "static NoCollision source proxy replacement, no new route",
+      "reference_precedence": "source recipe/catalog names and dimensions override sheet labels"
+    },
+    {
+      "source_prop_index": 22,
+      "kind": "candles",
+      "note": "tallow: the Ford's east step",
+      "source_anchor_metres": [
+        82,
+        50,
+        0
+      ],
+      "source_proxy_size_metres": [
+        0.9,
+        0.9,
+        0.5
+      ],
+      "catalog_ids": [
+        "L04",
+        "L07"
+      ],
+      "assembly_rule": "Art skins at the authored candle location; do not automatically spawn extra point lights.",
+      "zone": "Canal",
+      "placement_status": "fit_source_snapshot_before_apply",
+      "catalog_names": {
+        "L04": "CandleHolder",
+        "L07": "CandleTrio"
+      },
+      "required_model_sheets": [
+        "docs/art/warrens-c-dressing-r01/art/model-sheets/MODEL09_PracticalLightKit.png",
+        "docs/art/warrens-c-dressing-r01/art/model-sheets/MODEL32_GlassWaxBrazierAndLightFrame.png"
+      ],
+      "actor_contract": "static NoCollision source proxy replacement, no new route",
+      "reference_precedence": "source recipe/catalog names and dimensions override sheet labels"
+    },
+    {
+      "source_prop_index": 23,
+      "kind": "station",
+      "note": "the brine vat (P7): the Curing Room",
+      "source_anchor_metres": [
+        88,
+        106,
+        5
+      ],
+      "source_proxy_size_metres": [
+        2.4,
+        1.6,
+        1.4
+      ],
+      "catalog_ids": [
+        "I12",
+        "I13",
+        "W11",
+        "P14",
+        "P15"
+      ],
+      "assembly_rule": "Salt Mill P7 source stop, not a second Larder objective. Preserve hands/pack approach.",
+      "zone": "Mill",
+      "placement_status": "fit_source_snapshot_before_apply",
+      "catalog_names": {
+        "I12": "CuringVat",
+        "I13": "CuringVatLid",
+        "W11": "VatLiquidInsert",
+        "P14": "HerbDryingRod",
+        "P15": "DryingRack"
+      },
+      "required_model_sheets": [
+        "docs/art/warrens-c-dressing-r01/art/model-sheets/MODEL06_SaltMillCuringStation.png",
+        "docs/art/warrens-c-dressing-r01/art/model-sheets/MODEL08_PantryStorageKit.png",
+        "docs/art/warrens-c-dressing-r01/art/model-sheets/MODEL22_CisternAndVatLiquids.png",
+        "docs/art/warrens-c-dressing-r01/art/model-sheets/MODEL37_MillAndCuringVatBreakdown-r02.png"
+      ],
+      "actor_contract": "runtime-controlled skin only; no duplicate pickup/control, preserve moving/static split",
+      "reference_precedence": "source recipe/catalog names and dimensions override sheet labels"
+    },
+    {
+      "source_prop_index": 24,
+      "kind": "pillar",
+      "note": "the millstone",
+      "source_anchor_metres": [
+        95,
+        100.5,
+        5
+      ],
+      "source_proxy_size_metres": [
+        2.5,
+        2.5,
+        2.0
+      ],
+      "catalog_ids": [
+        "H11",
+        "H12",
+        "P22"
+      ],
+      "assembly_rule": "Octagonal mill silhouette; chute/hopper are separate supporting art.",
+      "zone": "Mill",
+      "placement_status": "fit_source_snapshot_before_apply",
+      "catalog_names": {
+        "H11": "MillstoneDrum",
+        "H12": "SaltChute",
+        "P22": "MillHopper"
+      },
+      "required_model_sheets": [
+        "docs/art/warrens-c-dressing-r01/art/model-sheets/MODEL06_SaltMillCuringStation.png",
+        "docs/art/warrens-c-dressing-r01/art/model-sheets/MODEL27_SaltAndMillStorage.png",
+        "docs/art/warrens-c-dressing-r01/art/model-sheets/MODEL37_MillAndCuringVatBreakdown-r02.png"
+      ],
+      "actor_contract": "static NoCollision source proxy replacement, no new route",
+      "reference_precedence": "source recipe/catalog names and dimensions override sheet labels"
+    },
+    {
+      "source_prop_index": 25,
+      "kind": "sarcophagus",
+      "note": "the Catacomb's one open tomb",
+      "source_anchor_metres": [
+        -18,
+        80,
+        0
+      ],
+      "source_proxy_size_metres": [
+        3.0,
+        1.5,
+        1.2
+      ],
+      "catalog_ids": [
+        "H15"
+      ],
+      "assembly_rule": "Shared body and separate lid; only the Catacomb source calls for an open tomb.",
+      "zone": "Catacomb",
+      "placement_status": "fit_source_snapshot_before_apply",
+      "catalog_names": {
+        "H15": "Sarcophagus"
+      },
+      "required_model_sheets": [
+        "docs/art/warrens-c-dressing-r01/art/model-sheets/MODEL11_MournerAndBurialKit.png"
+      ],
+      "actor_contract": "static NoCollision source proxy replacement, no new route",
+      "reference_precedence": "source recipe/catalog names and dimensions override sheet labels"
+    }
+  ],
+  "puzzle_art": [
+    {
+      "id": "P1",
+      "kind": "Red key door",
+      "at": [
+        57,
+        60,
+        -5.0
+      ],
+      "needsAt": [
+        104,
+        60,
+        2.5
+      ],
+      "needsNote": "the key under the bell on the Belfry loft: other bank, other landmark",
+      "art_catalog_ids": [
+        "I01",
+        "I11",
+        "I14",
+        "I19"
+      ],
+      "catalog_names": {
+        "I01": "KeyLoftPlinth",
+        "I11": "RedKeyEscutcheon",
+        "I14": "ExistingRedKey",
+        "I19": "VaultDoorSkin"
+      },
+      "required_model_sheets": [
+        "docs/art/warrens-c-dressing-r01/art/model-sheets/MODEL03_BelfryBellRig.png",
+        "docs/art/warrens-c-dressing-r01/art/model-sheets/MODEL10_InteractionHousingKit-r02.png",
+        "docs/art/warrens-c-dressing-r01/art/model-sheets/MODEL26_VaultDoorCampPlinthAndBox-r02.png"
+      ],
+      "placement_contract": "Existing runtime actor owns exact attachment, collision, state, trace and moving part; fit visual skin to snapshot, do not instantiate a competing control"
+    },
+    {
+      "id": "P2",
+      "kind": "the Chain Crossing's latched bars (Pump end)",
+      "at": [
+        67,
+        26,
+        -2.5
+      ],
+      "needsAt": [
+        122,
+        12,
+        -2.5
+      ],
+      "needsNote": "the Sluice hand-wheel on the east bank lowers the chain causeway; the chain runs along the Cellar floor to the wheel: the tell",
+      "existing": "hand-wheel + latched Bars gate",
+      "art_catalog_ids": [
+        "I03",
+        "I04",
+        "I05",
+        "W01",
+        "W02",
+        "W03"
+      ],
+      "catalog_names": {
+        "I03": "SluiceHandwheelPedestal",
+        "I04": "WheelAxle",
+        "I05": "ChainCrossingBarsSkin",
+        "W01": "HeavyChainLink",
+        "W02": "FloorChainGuide200",
+        "W03": "ChainDrum"
+      },
+      "required_model_sheets": [
+        "docs/art/warrens-c-dressing-r01/art/model-sheets/MODEL05_SluiceChainKit.png"
+      ],
+      "placement_contract": "Existing runtime actor owns exact attachment, collision, state, trace and moving part; fit visual skin to snapshot, do not instantiate a competing control"
+    },
+    {
+      "id": "P3",
+      "kind": "Mourner cache gate (latched)",
+      "at": [
+        100,
+        76,
+        2.5
+      ],
+      "needsAt": [
+        42,
+        66,
+        2.5
+      ],
+      "needsNote": "the pack plate at the Ossuary's west end: set the pack down west, the gate latches east, cross the Bone Bridge",
+      "latch": true,
+      "art_catalog_ids": [
+        "I06",
+        "I18",
+        "P29"
+      ],
+      "catalog_names": {
+        "I06": "PackPlateHousing",
+        "I18": "MournerCacheGateSkin",
+        "P29": "MournerSealPlaque"
+      },
+      "required_model_sheets": [
+        "docs/art/warrens-c-dressing-r01/art/model-sheets/MODEL10_InteractionHousingKit-r02.png",
+        "docs/art/warrens-c-dressing-r01/art/model-sheets/MODEL25_LaddersAndBacksideGateHardware.png",
+        "docs/art/warrens-c-dressing-r01/art/model-sheets/MODEL31_DistrictSignsAndStationPlaques.png"
+      ],
+      "placement_contract": "Existing runtime actor owns exact attachment, collision, state, trace and moving part; fit visual skin to snapshot, do not instantiate a competing control"
+    },
+    {
+      "id": "P4",
+      "kind": "Bellkeeper dial lock",
+      "at": [
+        108,
+        46,
+        0
+      ],
+      "needsAt": [
+        48.5,
+        50,
+        0
+      ],
+      "needsNote": "the three glyphs painted on the Bell Tower's west face, read from the Well's east rim across the canal",
+      "art_catalog_ids": [
+        "I02",
+        "I07",
+        "I08",
+        "P25"
+      ],
+      "catalog_names": {
+        "I02": "BellkeeperPanelHousing",
+        "I07": "GlyphFaceInsert",
+        "I08": "DialBlank",
+        "P25": "RecipeNoticeBoard"
+      },
+      "required_model_sheets": [
+        "docs/art/warrens-c-dressing-r01/art/model-sheets/MODEL10_InteractionHousingKit-r02.png",
+        "docs/art/warrens-c-dressing-r01/art/model-sheets/MODEL30_NoticeBoardsAndRoyalCloth.png"
+      ],
+      "placement_contract": "Existing runtime actor owns exact attachment, collision, state, trace and moving part; fit visual skin to snapshot, do not instantiate a competing control"
+    },
+    {
+      "id": "P5",
+      "kind": "barred ladder foot (Belfry)",
+      "at": [
+        104,
+        56,
+        0
+      ],
+      "needsAt": [
+        102,
+        60,
+        2.5
+      ],
+      "needsNote": "the lever on the loft; the loft is first reached by the Reliquary stair's rail drop",
+      "art_catalog_ids": [
+        "I09",
+        "I10",
+        "I17"
+      ],
+      "catalog_names": {
+        "I09": "LadderFootBarsSkin",
+        "I10": "LoftLeverSkin",
+        "I17": "LoftLadder125Segment"
+      },
+      "required_model_sheets": [
+        "docs/art/warrens-c-dressing-r01/art/model-sheets/MODEL10_InteractionHousingKit-r02.png",
+        "docs/art/warrens-c-dressing-r01/art/model-sheets/MODEL25_LaddersAndBacksideGateHardware.png"
+      ],
+      "placement_contract": "Existing runtime actor owns exact attachment, collision, state, trace and moving part; fit visual skin to snapshot, do not instantiate a competing control"
+    },
+    {
+      "id": "P6",
+      "kind": "SC2 barred closet door",
+      "at": [
+        19,
+        42,
+        0
+      ],
+      "needsAt": [
+        19,
+        40,
+        -5.0
+      ],
+      "needsNote": "climb the closet ladder out of the Pit",
+      "art_catalog_ids": [
+        "I05",
+        "I15",
+        "I16"
+      ],
+      "catalog_names": {
+        "I05": "ChainCrossingBarsSkin",
+        "I15": "BacksideBarLeverSkin",
+        "I16": "ScoutLadder100Segment"
+      },
+      "required_model_sheets": [
+        "docs/art/warrens-c-dressing-r01/art/model-sheets/MODEL05_SluiceChainKit.png",
+        "docs/art/warrens-c-dressing-r01/art/model-sheets/MODEL25_LaddersAndBacksideGateHardware.png"
+      ],
+      "placement_contract": "Existing runtime actor owns exact attachment, collision, state, trace and moving part; fit visual skin to snapshot, do not instantiate a competing control"
+    },
+    {
+      "id": "P7",
+      "kind": "Curing Room (support objective)",
+      "at": [
+        88,
+        106,
+        5
+      ],
+      "needsAt": [
+        98,
+        54,
+        0
+      ],
+      "needsNote": "the Curing Room: the hunted part is brined here before it travels (the run's second required stop); the vat, the drying racks, a plinth for the pack",
+      "art_catalog_ids": [
+        "I12",
+        "P14",
+        "P15",
+        "P30"
+      ],
+      "catalog_names": {
+        "I12": "CuringVat",
+        "P14": "HerbDryingRod",
+        "P15": "DryingRack",
+        "P30": "CuringStopPlaque"
+      },
+      "required_model_sheets": [
+        "docs/art/warrens-c-dressing-r01/art/model-sheets/MODEL06_SaltMillCuringStation.png",
+        "docs/art/warrens-c-dressing-r01/art/model-sheets/MODEL08_PantryStorageKit.png",
+        "docs/art/warrens-c-dressing-r01/art/model-sheets/MODEL31_DistrictSignsAndStationPlaques.png",
+        "docs/art/warrens-c-dressing-r01/art/model-sheets/MODEL37_MillAndCuringVatBreakdown-r02.png"
+      ],
+      "placement_contract": "Existing runtime actor owns exact attachment, collision, state, trace and moving part; fit visual skin to snapshot, do not instantiate a competing control"
+    }
+  ],
+  "protected": {
+    "ports_by_tile": {
+      "Hub": [
+        {
+          "id": "camp",
+          "at": [
+            4,
+            50,
+            0
+          ],
+          "width": 3,
+          "kind": "door"
+        },
+        {
+          "id": "court",
+          "at": [
+            16,
+            58,
+            0
+          ],
+          "width": 3,
+          "kind": "door"
+        },
+        {
+          "id": "ossuary",
+          "at": [
+            40,
+            58,
+            0
+          ],
+          "width": 3,
+          "kind": "stair"
+        },
+        {
+          "id": "pump",
+          "at": [
+            44,
+            38,
+            0
+          ],
+          "width": 3,
+          "kind": "stair"
+        },
+        {
+          "id": "ford",
+          "at": [
+            52,
+            50,
+            0
+          ],
+          "width": 3,
+          "kind": "stair"
+        },
+        {
+          "id": "cascade",
+          "at": [
+            44,
+            40,
+            0
+          ],
+          "width": 4,
+          "kind": "stair"
+        },
+        {
+          "id": "closet",
+          "at": [
+            19,
+            40,
+            -5
+          ],
+          "width": 1,
+          "kind": "ladder"
+        }
+      ],
+      "Court": [
+        {
+          "id": "hall",
+          "at": [
+            22,
+            62,
+            0
+          ],
+          "width": 3,
+          "kind": "door"
+        },
+        {
+          "id": "ossuary",
+          "at": [
+            30,
+            86,
+            0
+          ],
+          "width": 3,
+          "kind": "stair"
+        },
+        {
+          "id": "cistern",
+          "at": [
+            6,
+            60,
+            0
+          ],
+          "width": 3,
+          "kind": "stair"
+        }
+      ],
+      "Ossuary": [
+        {
+          "id": "rim",
+          "at": [
+            42,
+            60,
+            2.5
+          ],
+          "width": 3,
+          "kind": "stair"
+        },
+        {
+          "id": "court",
+          "at": [
+            36,
+            80,
+            2.5
+          ],
+          "width": 3,
+          "kind": "stair"
+        },
+        {
+          "id": "bridge",
+          "at": [
+            62,
+            74,
+            2.5
+          ],
+          "width": 3,
+          "kind": "bridge"
+        }
+      ],
+      "Waterworks-W": [
+        {
+          "id": "rim",
+          "at": [
+            48,
+            36,
+            -2.5
+          ],
+          "width": 3,
+          "kind": "stair"
+        },
+        {
+          "id": "court",
+          "at": [
+            12,
+            36,
+            -2.5
+          ],
+          "width": 3,
+          "kind": "stair"
+        },
+        {
+          "id": "chain",
+          "at": [
+            66,
+            26,
+            -2.5
+          ],
+          "width": 2.5,
+          "kind": "bridge"
+        },
+        {
+          "id": "sump",
+          "at": [
+            48,
+            34,
+            -2.5
+          ],
+          "width": 2.5,
+          "kind": "stair"
+        },
+        {
+          "id": "S5",
+          "at": [
+            16,
+            26,
+            -2.5
+          ],
+          "width": 3,
+          "kind": "door"
+        }
+      ],
+      "Pit": [
+        {
+          "id": "cascade",
+          "at": [
+            46,
+            30,
+            -5
+          ],
+          "width": 4,
+          "kind": "stair"
+        },
+        {
+          "id": "sump",
+          "at": [
+            44,
+            38,
+            -5
+          ],
+          "width": 2.5,
+          "kind": "stair"
+        },
+        {
+          "id": "undercroft",
+          "at": [
+            56,
+            30,
+            -5
+          ],
+          "width": 2.5,
+          "kind": "crawl"
+        },
+        {
+          "id": "closet",
+          "at": [
+            19,
+            40,
+            -5
+          ],
+          "width": 1,
+          "kind": "ladder"
+        }
+      ],
+      "Canal": [
+        {
+          "id": "bridge-w",
+          "at": [
+            66,
+            74,
+            2.5
+          ],
+          "width": 3,
+          "kind": "bridge"
+        },
+        {
+          "id": "bridge-e",
+          "at": [
+            88,
+            74,
+            2.5
+          ],
+          "width": 3,
+          "kind": "bridge"
+        },
+        {
+          "id": "ford-w",
+          "at": [
+            66,
+            49,
+            -2.5
+          ],
+          "width": 4,
+          "kind": "door"
+        },
+        {
+          "id": "ford-e",
+          "at": [
+            88,
+            49,
+            0
+          ],
+          "width": 4,
+          "kind": "stair"
+        },
+        {
+          "id": "chain-w",
+          "at": [
+            66,
+            26,
+            -2.5
+          ],
+          "width": 2.5,
+          "kind": "bridge"
+        },
+        {
+          "id": "chain-e",
+          "at": [
+            88,
+            24,
+            -2.5
+          ],
+          "width": 2.5,
+          "kind": "bridge"
+        }
+      ],
+      "Belfry": [
+        {
+          "id": "ford",
+          "at": [
+            88,
+            49,
+            0
+          ],
+          "width": 4,
+          "kind": "stair"
+        },
+        {
+          "id": "reliquary",
+          "at": [
+            92,
+            68,
+            0
+          ],
+          "width": 3,
+          "kind": "stair"
+        },
+        {
+          "id": "cellar",
+          "at": [
+            96,
+            38,
+            0
+          ],
+          "width": 3,
+          "kind": "stair"
+        },
+        {
+          "id": "larder",
+          "at": [
+            112,
+            50,
+            0
+          ],
+          "width": 3,
+          "kind": "stair"
+        }
+      ],
+      "Reliquary": [
+        {
+          "id": "bridge",
+          "at": [
+            84,
+            74,
+            2.5
+          ],
+          "width": 3,
+          "kind": "bridge"
+        },
+        {
+          "id": "belfry",
+          "at": [
+            92,
+            66,
+            2.5
+          ],
+          "width": 3,
+          "kind": "stair"
+        },
+        {
+          "id": "S2",
+          "at": [
+            110,
+            80,
+            2.5
+          ],
+          "width": 3,
+          "kind": "door"
+        },
+        {
+          "id": "mill",
+          "at": [
+            100,
+            94,
+            2.5
+          ],
+          "width": 3,
+          "kind": "stair"
+        }
+      ],
+      "Mill": [
+        {
+          "id": "reliquary",
+          "at": [
+            100,
+            94,
+            2.5
+          ],
+          "width": 3,
+          "kind": "stair"
+        },
+        {
+          "id": "drop",
+          "at": [
+            90,
+            96,
+            5
+          ],
+          "width": 2,
+          "kind": "drop"
+        }
+      ],
+      "Catacomb": [
+        {
+          "id": "court",
+          "at": [
+            -2,
+            64,
+            0
+          ],
+          "width": 2.5,
+          "kind": "crawl"
+        },
+        {
+          "id": "pit",
+          "at": [
+            -2,
+            46,
+            -4
+          ],
+          "width": 2.5,
+          "kind": "stair"
+        }
+      ],
+      "Brineworks": [
+        {
+          "id": "belfry-cellar",
+          "at": [
+            96,
+            30,
+            -2.5
+          ],
+          "width": 3,
+          "kind": "stair"
+        },
+        {
+          "id": "belfry-larder",
+          "at": [
+            112,
+            50,
+            -2.5
+          ],
+          "width": 3,
+          "kind": "stair"
+        },
+        {
+          "id": "chain",
+          "at": [
+            96,
+            24,
+            -2.5
+          ],
+          "width": 2.5,
+          "kind": "bridge"
+        },
+        {
+          "id": "undercroft",
+          "at": [
+            88,
+            26,
+            -5
+          ],
+          "width": 2.5,
+          "kind": "crawl"
+        },
+        {
+          "id": "S3",
+          "at": [
+            140,
+            40,
+            -2.5
+          ],
+          "width": 3,
+          "kind": "door"
+        },
+        {
+          "id": "S4",
+          "at": [
+            122,
+            0,
+            -2.5
+          ],
+          "width": 3,
+          "kind": "door"
+        }
+      ]
+    },
+    "route_links": [
+      {
+        "a": "S1",
+        "b": "K",
+        "via": [
+          [
+            7,
+            50
+          ]
+        ],
+        "width": 3.0,
+        "kind": "walk",
+        "closedBy": null,
+        "costCm": 1800,
+        "leverNode": null,
+        "over": true
+      },
+      {
+        "a": "K",
+        "b": "ke",
+        "via": [],
+        "width": 3.0,
+        "kind": "walk",
+        "closedBy": null,
+        "costCm": 900,
+        "leverNode": null
+      },
+      {
+        "a": "ke",
+        "b": "wW",
+        "via": [],
+        "width": 3.0,
+        "kind": "walk",
+        "closedBy": null,
+        "costCm": 600,
+        "leverNode": null
+      },
+      {
+        "a": "K",
+        "b": "kn",
+        "via": [],
+        "width": 3.0,
+        "kind": "walk",
+        "closedBy": null,
+        "costCm": 600,
+        "leverNode": null
+      },
+      {
+        "a": "kn",
+        "b": "h0",
+        "via": [
+          [
+            16,
+            60
+          ],
+          [
+            22,
+            62
+          ]
+        ],
+        "width": 3.0,
+        "kind": "walk",
+        "closedBy": "R1",
+        "costCm": 1480,
+        "leverNode": null
+      },
+      {
+        "a": "wW",
+        "b": "wN",
+        "via": [
+          [
+            31,
+            57
+          ]
+        ],
+        "width": 3.0,
+        "kind": "walk",
+        "closedBy": null,
+        "costCm": 1600,
+        "leverNode": null
+      },
+      {
+        "a": "wN",
+        "b": "wE",
+        "via": [
+          [
+            48.5,
+            57
+          ]
+        ],
+        "width": 3.0,
+        "kind": "walk",
+        "closedBy": null,
+        "costCm": 1550,
+        "leverNode": null
+      },
+      {
+        "a": "wE",
+        "b": "wSE",
+        "via": [],
+        "width": 3.0,
+        "kind": "walk",
+        "closedBy": null,
+        "costCm": 700,
+        "leverNode": null
+      },
+      {
+        "a": "wSE",
+        "b": "wS",
+        "via": [],
+        "width": 3.0,
+        "kind": "walk",
+        "closedBy": null,
+        "costCm": 850,
+        "leverNode": null
+      },
+      {
+        "a": "wS",
+        "b": "wW",
+        "via": [
+          [
+            31,
+            43
+          ]
+        ],
+        "width": 3.0,
+        "kind": "walk",
+        "closedBy": null,
+        "costCm": 1600,
+        "leverNode": null
+      },
+      {
+        "a": "wS",
+        "b": "d2",
+        "via": [],
+        "width": 4.0,
+        "kind": "stair",
+        "closedBy": "R2",
+        "costCm": 1857,
+        "leverNode": null
+      },
+      {
+        "a": "wN",
+        "b": "o0",
+        "via": [],
+        "width": 3.0,
+        "kind": "stair",
+        "closedBy": null,
+        "costCm": 844,
+        "leverNode": null
+      },
+      {
+        "a": "wSE",
+        "b": "p1",
+        "via": [
+          [
+            52,
+            38
+          ]
+        ],
+        "width": 3.0,
+        "kind": "stair",
+        "closedBy": "R4",
+        "costCm": 1236,
+        "leverNode": null
+      },
+      {
+        "a": "wE",
+        "b": "fw",
+        "via": [
+          [
+            52,
+            50
+          ],
+          [
+            55,
+            50
+          ]
+        ],
+        "width": 3.0,
+        "kind": "stair",
+        "closedBy": null,
+        "costCm": 909,
+        "leverNode": null
+      },
+      {
+        "a": "h0",
+        "b": "p0",
+        "via": [],
+        "width": 4.0,
+        "kind": "stair",
+        "closedBy": null,
+        "costCm": 585,
+        "leverNode": null
+      },
+      {
+        "a": "c2",
+        "b": "p3",
+        "via": [],
+        "width": 3.0,
+        "kind": "stair",
+        "closedBy": null,
+        "costCm": 585,
+        "leverNode": null
+      },
+      {
+        "a": "c1",
+        "b": "ps",
+        "via": [],
+        "width": 3.0,
+        "kind": "stair",
+        "closedBy": null,
+        "costCm": 737,
+        "leverNode": null
+      },
+      {
+        "a": "p0",
+        "b": "H1",
+        "via": [],
+        "width": 3.0,
+        "kind": "walk",
+        "closedBy": null,
+        "costCm": 781,
+        "leverNode": null
+      },
+      {
+        "a": "p3",
+        "b": "H1",
+        "via": [],
+        "width": 3.0,
+        "kind": "walk",
+        "closedBy": null,
+        "costCm": 781,
+        "leverNode": null
+      },
+      {
+        "a": "ps",
+        "b": "H1",
+        "via": [],
+        "width": 3.0,
+        "kind": "walk",
+        "closedBy": null,
+        "costCm": 781,
+        "leverNode": null
+      },
+      {
+        "a": "h0",
+        "b": "c2",
+        "via": [
+          [
+            26.5,
+            69
+          ],
+          [
+            26.5,
+            83
+          ]
+        ],
+        "width": 3.0,
+        "kind": "walk",
+        "closedBy": null,
+        "costCm": 2181,
+        "leverNode": null
+      },
+      {
+        "a": "c2",
+        "b": "c1",
+        "via": [
+          [
+            4,
+            86
+          ],
+          [
+            4,
+            70
+          ]
+        ],
+        "width": 3.0,
+        "kind": "walk",
+        "closedBy": null,
+        "costCm": 4232,
+        "leverNode": null
+      },
+      {
+        "a": "c2",
+        "b": "o1",
+        "via": [
+          [
+            32,
+            86
+          ]
+        ],
+        "width": 3.0,
+        "kind": "stair",
+        "closedBy": null,
+        "costCm": 1947,
+        "leverNode": null
+      },
+      {
+        "a": "c1",
+        "b": "cw",
+        "via": [],
+        "width": 3.0,
+        "kind": "stair",
+        "closedBy": "R6",
+        "costCm": 946,
+        "leverNode": "cw"
+      },
+      {
+        "a": "cw",
+        "b": "ci2",
+        "via": [
+          [
+            4.5,
+            43.5
+          ]
+        ],
+        "width": 2.5,
+        "kind": "walk",
+        "closedBy": null,
+        "costCm": 2101,
+        "leverNode": null
+      },
+      {
+        "a": "o0",
+        "b": "O",
+        "via": [],
+        "width": 3.0,
+        "kind": "walk",
+        "closedBy": null,
+        "costCm": 894,
+        "leverNode": null
+      },
+      {
+        "a": "o1",
+        "b": "O",
+        "via": [],
+        "width": 3.0,
+        "kind": "walk",
+        "closedBy": null,
+        "costCm": 1000,
+        "leverNode": null
+      },
+      {
+        "a": "O",
+        "b": "bh",
+        "via": [],
+        "width": 3.0,
+        "kind": "walk",
+        "closedBy": null,
+        "costCm": 1118,
+        "leverNode": null
+      },
+      {
+        "a": "bh",
+        "b": "rh",
+        "via": [],
+        "width": 3.0,
+        "kind": "ramp",
+        "closedBy": "R5",
+        "costCm": 2668,
+        "leverNode": null
+      },
+      {
+        "a": "rh",
+        "b": "RQ",
+        "via": [],
+        "width": 3.0,
+        "kind": "walk",
+        "closedBy": null,
+        "costCm": 700,
+        "leverNode": null
+      },
+      {
+        "a": "S2",
+        "b": "RQ",
+        "via": [
+          [
+            100,
+            80
+          ]
+        ],
+        "width": 3.0,
+        "kind": "walk",
+        "closedBy": null,
+        "costCm": 1800,
+        "leverNode": null
+      },
+      {
+        "a": "RQ",
+        "b": "rq1",
+        "via": [],
+        "width": 3.0,
+        "kind": "walk",
+        "closedBy": null,
+        "costCm": 800,
+        "leverNode": null
+      },
+      {
+        "a": "RQ",
+        "b": "rq2",
+        "via": [],
+        "width": 3.0,
+        "kind": "walk",
+        "closedBy": null,
+        "costCm": 1523,
+        "leverNode": null
+      },
+      {
+        "a": "rq2",
+        "b": "ml0",
+        "via": [
+          [
+            104,
+            98
+          ],
+          [
+            104,
+            104
+          ]
+        ],
+        "width": 3.0,
+        "kind": "ramp",
+        "closedBy": null,
+        "costCm": 1969,
+        "leverNode": null
+      },
+      {
+        "a": "ml0",
+        "b": "ML",
+        "via": [],
+        "width": 3.0,
+        "kind": "walk",
+        "closedBy": null,
+        "costCm": 671,
+        "leverNode": null
+      },
+      {
+        "a": "c1",
+        "b": "ct0",
+        "via": [
+          [
+            0,
+            62
+          ]
+        ],
+        "width": 2.5,
+        "kind": "walk",
+        "closedBy": null,
+        "costCm": 1481,
+        "leverNode": null
+      },
+      {
+        "a": "ct0",
+        "b": "CT",
+        "via": [],
+        "width": 3.0,
+        "kind": "walk",
+        "closedBy": null,
+        "costCm": 1131,
+        "leverNode": null
+      },
+      {
+        "a": "CT",
+        "b": "ct1",
+        "via": [],
+        "width": 3.0,
+        "kind": "walk",
+        "closedBy": null,
+        "costCm": 1265,
+        "leverNode": null
+      },
+      {
+        "a": "ct1",
+        "b": "lw",
+        "via": [
+          [
+            -12,
+            54
+          ],
+          [
+            -4,
+            46
+          ],
+          [
+            8,
+            48
+          ]
+        ],
+        "width": 2.5,
+        "kind": "ramp",
+        "closedBy": null,
+        "costCm": 4698,
+        "leverNode": null
+      },
+      {
+        "a": "lw",
+        "b": "H2",
+        "via": [],
+        "width": 2.5,
+        "kind": "walk",
+        "closedBy": null,
+        "costCm": 1924,
+        "leverNode": null
+      },
+      {
+        "a": "rq1",
+        "b": "bn",
+        "via": [
+          [
+            92,
+            68
+          ]
+        ],
+        "width": 3.0,
+        "kind": "stair",
+        "closedBy": null,
+        "costCm": 998,
+        "leverNode": null
+      },
+      {
+        "a": "bn",
+        "b": "BF",
+        "via": [],
+        "width": 3.0,
+        "kind": "walk",
+        "closedBy": null,
+        "costCm": 1020,
+        "leverNode": null
+      },
+      {
+        "a": "BF",
+        "b": "bs",
+        "via": [],
+        "width": 3.0,
+        "kind": "walk",
+        "closedBy": null,
+        "costCm": 1020,
+        "leverNode": null
+      },
+      {
+        "a": "BF",
+        "b": "be",
+        "via": [],
+        "width": 3.0,
+        "kind": "walk",
+        "closedBy": null,
+        "costCm": 1000,
+        "leverNode": null
+      },
+      {
+        "a": "BF",
+        "b": "fe",
+        "via": [
+          [
+            90,
+            54
+          ]
+        ],
+        "width": 3.0,
+        "kind": "walk",
+        "closedBy": null,
+        "costCm": 1581,
+        "leverNode": null
+      },
+      {
+        "a": "fe",
+        "b": "fm",
+        "via": [],
+        "width": 4.0,
+        "kind": "stair",
+        "closedBy": null,
+        "costCm": 1031,
+        "leverNode": null
+      },
+      {
+        "a": "fm",
+        "b": "fw",
+        "via": [],
+        "width": 4.0,
+        "kind": "walk",
+        "closedBy": null,
+        "costCm": 1700,
+        "leverNode": null
+      },
+      {
+        "a": "bs",
+        "b": "ce0",
+        "via": [
+          [
+            96,
+            36
+          ]
+        ],
+        "width": 3.0,
+        "kind": "stair",
+        "closedBy": "R3",
+        "costCm": 1817,
+        "leverNode": "ce0"
+      },
+      {
+        "a": "be",
+        "b": "bl0",
+        "via": [
+          [
+            112,
+            52
+          ]
+        ],
+        "width": 3.0,
+        "kind": "stair",
+        "closedBy": null,
+        "costCm": 1077,
+        "leverNode": null
+      },
+      {
+        "a": "ce0",
+        "b": "CE",
+        "via": [],
+        "width": 3.0,
+        "kind": "walk",
+        "closedBy": null,
+        "costCm": 1063,
+        "leverNode": null
+      },
+      {
+        "a": "CE",
+        "b": "SL",
+        "via": [
+          [
+            112,
+            16
+          ]
+        ],
+        "width": 3.0,
+        "kind": "walk",
+        "closedBy": null,
+        "costCm": 1859,
+        "leverNode": null
+      },
+      {
+        "a": "S4",
+        "b": "SL",
+        "via": [],
+        "width": 3.0,
+        "kind": "walk",
+        "closedBy": null,
+        "costCm": 1500,
+        "leverNode": null
+      },
+      {
+        "a": "bl0",
+        "b": "BL",
+        "via": [],
+        "width": 3.0,
+        "kind": "walk",
+        "closedBy": null,
+        "costCm": 1000,
+        "leverNode": null
+      },
+      {
+        "a": "BL",
+        "b": "bl1",
+        "via": [],
+        "width": 3.0,
+        "kind": "walk",
+        "closedBy": null,
+        "costCm": 1000,
+        "leverNode": null
+      },
+      {
+        "a": "S3",
+        "b": "BL",
+        "via": [
+          [
+            130,
+            40
+          ]
+        ],
+        "width": 3.0,
+        "kind": "walk",
+        "closedBy": null,
+        "costCm": 2000,
+        "leverNode": null
+      },
+      {
+        "a": "SL",
+        "b": "bl1",
+        "via": [
+          [
+            118,
+            22
+          ],
+          [
+            116,
+            28
+          ]
+        ],
+        "width": 3.0,
+        "kind": "walk",
+        "closedBy": null,
+        "costCm": 2160,
+        "leverNode": null
+      },
+      {
+        "a": "bl1",
+        "b": "ut1",
+        "via": [],
+        "width": 2.5,
+        "kind": "ramp",
+        "closedBy": null,
+        "costCm": 1031,
+        "leverNode": null
+      },
+      {
+        "a": "ut1",
+        "b": "ut2",
+        "via": [
+          [
+            92,
+            22
+          ],
+          [
+            80,
+            25.0667
+          ],
+          [
+            66,
+            26
+          ]
+        ],
+        "width": 2.5,
+        "kind": "walk",
+        "closedBy": "R7",
+        "costCm": 5060,
+        "leverNode": "ut1"
+      },
+      {
+        "a": "ut2",
+        "b": "ls",
+        "via": [],
+        "width": 2.5,
+        "kind": "walk",
+        "closedBy": null,
+        "costCm": 849,
+        "leverNode": null
+      },
+      {
+        "a": "p1",
+        "b": "PU",
+        "via": [],
+        "width": 3.0,
+        "kind": "walk",
+        "closedBy": null,
+        "costCm": 922,
+        "leverNode": null
+      },
+      {
+        "a": "PU",
+        "b": "p0w",
+        "via": [],
+        "width": 3.0,
+        "kind": "walk",
+        "closedBy": null,
+        "costCm": 806,
+        "leverNode": null
+      },
+      {
+        "a": "PU",
+        "b": "pe",
+        "via": [],
+        "width": 3.0,
+        "kind": "walk",
+        "closedBy": null,
+        "costCm": 806,
+        "leverNode": null
+      },
+      {
+        "a": "PU",
+        "b": "sp",
+        "via": [],
+        "width": 3.0,
+        "kind": "walk",
+        "closedBy": null,
+        "costCm": 806,
+        "leverNode": null
+      },
+      {
+        "a": "sp",
+        "b": "sf",
+        "via": [],
+        "width": 2.5,
+        "kind": "ramp",
+        "closedBy": null,
+        "costCm": 1159,
+        "leverNode": null
+      },
+      {
+        "a": "sf",
+        "b": "H2",
+        "via": [],
+        "width": 2.5,
+        "kind": "walk",
+        "closedBy": null,
+        "costCm": 1612,
+        "leverNode": null
+      },
+      {
+        "a": "p0w",
+        "b": "tm",
+        "via": [
+          [
+            44,
+            22
+          ]
+        ],
+        "width": 2.5,
+        "kind": "stair",
+        "closedBy": null,
+        "costCm": 1250,
+        "leverNode": null
+      },
+      {
+        "a": "tm",
+        "b": "ci1",
+        "via": [
+          [
+            32,
+            25
+          ]
+        ],
+        "width": 2.5,
+        "kind": "stair",
+        "closedBy": null,
+        "costCm": 2087,
+        "leverNode": null
+      },
+      {
+        "a": "ci1",
+        "b": "CI",
+        "via": [],
+        "width": 3.0,
+        "kind": "walk",
+        "closedBy": null,
+        "costCm": 806,
+        "leverNode": null
+      },
+      {
+        "a": "CI",
+        "b": "ci2",
+        "via": [],
+        "width": 3.0,
+        "kind": "walk",
+        "closedBy": null,
+        "costCm": 632,
+        "leverNode": null
+      },
+      {
+        "a": "S5",
+        "b": "CI",
+        "via": [],
+        "width": 3.0,
+        "kind": "walk",
+        "closedBy": null,
+        "costCm": 1500,
+        "leverNode": null
+      },
+      {
+        "a": "d2",
+        "b": "H2",
+        "via": [
+          [
+            29,
+            28.5
+          ],
+          [
+            30,
+            33
+          ],
+          [
+            33,
+            40
+          ]
+        ],
+        "width": 2.5,
+        "kind": "walk",
+        "closedBy": null,
+        "costCm": 2779,
+        "leverNode": null
+      },
+      {
+        "a": "ls",
+        "b": "H2",
+        "via": [],
+        "width": 2.5,
+        "kind": "walk",
+        "closedBy": null,
+        "costCm": 1720,
+        "leverNode": null
+      }
+    ],
+    "nodes": {
+      "S1": [
+        -2,
+        50,
+        0
+      ],
+      "K": [
+        16,
+        50,
+        0
+      ],
+      "kn": [
+        16,
+        56,
+        0
+      ],
+      "ke": [
+        25,
+        50,
+        0
+      ],
+      "wW": [
+        31,
+        50,
+        0
+      ],
+      "wN": [
+        40,
+        57,
+        0
+      ],
+      "wE": [
+        48.5,
+        50,
+        0
+      ],
+      "wS": [
+        40,
+        43,
+        0
+      ],
+      "wSE": [
+        48.5,
+        43,
+        0
+      ],
+      "h0": [
+        24,
+        66,
+        0
+      ],
+      "c2": [
+        24,
+        86,
+        0
+      ],
+      "c1": [
+        6,
+        64,
+        0
+      ],
+      "H1": [
+        15,
+        76,
+        -1.5
+      ],
+      "p0": [
+        20,
+        70,
+        -1.5
+      ],
+      "p3": [
+        20,
+        82,
+        -1.5
+      ],
+      "ps": [
+        10,
+        70,
+        -1.5
+      ],
+      "o0": [
+        44,
+        64,
+        2.5
+      ],
+      "O": [
+        48,
+        72,
+        2.5
+      ],
+      "o1": [
+        40,
+        78,
+        2.5
+      ],
+      "bh": [
+        59,
+        74,
+        2.5
+      ],
+      "rh": [
+        85,
+        80,
+        2.5
+      ],
+      "RQ": [
+        92,
+        80,
+        2.5
+      ],
+      "rq1": [
+        92,
+        72,
+        2.5
+      ],
+      "S2": [
+        110,
+        80,
+        2.5
+      ],
+      "rq2": [
+        98,
+        94,
+        2.5
+      ],
+      "ml0": [
+        98,
+        106,
+        5
+      ],
+      "ML": [
+        92,
+        103,
+        5
+      ],
+      "ct0": [
+        -6,
+        68,
+        0
+      ],
+      "CT": [
+        -14,
+        76,
+        0
+      ],
+      "ct1": [
+        -10,
+        64,
+        0
+      ],
+      "lw": [
+        21,
+        47,
+        -5.0
+      ],
+      "bn": [
+        96,
+        64,
+        0
+      ],
+      "BF": [
+        98,
+        54,
+        0
+      ],
+      "bs": [
+        96,
+        44,
+        0
+      ],
+      "be": [
+        108,
+        54,
+        0
+      ],
+      "fe": [
+        84,
+        49,
+        0
+      ],
+      "fw": [
+        57,
+        49,
+        -2.5
+      ],
+      "fm": [
+        74,
+        49,
+        -2.5
+      ],
+      "ce0": [
+        96,
+        26,
+        -2.5
+      ],
+      "CE": [
+        104,
+        19,
+        -2.5
+      ],
+      "SL": [
+        122,
+        15,
+        -2.5
+      ],
+      "S4": [
+        122,
+        0,
+        -2.5
+      ],
+      "bl0": [
+        112,
+        46,
+        -2.5
+      ],
+      "BL": [
+        120,
+        40,
+        -2.5
+      ],
+      "bl1": [
+        112,
+        34,
+        -2.5
+      ],
+      "S3": [
+        140,
+        40,
+        -2.5
+      ],
+      "ut1": [
+        104,
+        28,
+        -5.0
+      ],
+      "ut2": [
+        56,
+        30,
+        -5.0
+      ],
+      "ls": [
+        50,
+        36,
+        -5.0
+      ],
+      "p1": [
+        52,
+        32,
+        -2.5
+      ],
+      "PU": [
+        58,
+        25,
+        -2.5
+      ],
+      "p0w": [
+        50,
+        24,
+        -2.5
+      ],
+      "pe": [
+        66,
+        26,
+        -2.5
+      ],
+      "tm": [
+        38,
+        21,
+        -1.0
+      ],
+      "ci1": [
+        24,
+        36,
+        -2.5
+      ],
+      "CI": [
+        16,
+        37,
+        -2.5
+      ],
+      "ci2": [
+        14,
+        43,
+        -2.5
+      ],
+      "S5": [
+        16,
+        22,
+        -2.5
+      ],
+      "cw": [
+        4.5,
+        55,
+        -2.5
+      ],
+      "H2": [
+        40,
+        50,
+        -5.0
+      ],
+      "d2": [
+        32,
+        27,
+        -5.0
+      ],
+      "sp": [
+        50,
+        26,
+        -2.5
+      ],
+      "sf": [
+        42,
+        34,
+        -5.0
+      ]
+    },
+    "ramps": [
+      {
+        "id": "bone-bridge",
+        "a": [
+          62,
+          74,
+          2.5
+        ],
+        "b": [
+          84,
+          74,
+          2.5
+        ],
+        "width": 3.0,
+        "note": "the Bone Bridge: 22 m over the canal at +2.5; R5 at its west head"
+      },
+      {
+        "id": "chain-crossing",
+        "a": [
+          66,
+          26,
+          -2.5
+        ],
+        "b": [
+          96,
+          24,
+          -2.5
+        ],
+        "width": 2.5,
+        "note": "the Chain Crossing: a causeway lowered from the Cellar side (shortcut ChainCrossing), the pack's short way between the two banks' waterworks"
+      },
+      {
+        "id": "sump-stair",
+        "a": [
+          50,
+          26,
+          -2.5
+        ],
+        "b": [
+          42,
+          34,
+          -5.0
+        ],
+        "width": 2.5,
+        "note": "the Sump Stair: Pump Room down into the Pit (open), from the Pump's west wall"
+      },
+      {
+        "id": "larder-undercroft",
+        "a": [
+          112,
+          34,
+          -2.5
+        ],
+        "b": [
+          104,
+          28,
+          -5.0
+        ],
+        "width": 2.5,
+        "note": "Brine Larder down into the Undercroft"
+      },
+      {
+        "id": "mill-stair-a",
+        "a": [
+          98,
+          94,
+          2.5
+        ],
+        "b": [
+          104,
+          98,
+          3.3
+        ],
+        "width": 3.0,
+        "note": "the mill stair: Reliquary up to the Salt Mill, round its east side"
+      },
+      {
+        "id": "mill-stair-b",
+        "a": [
+          104,
+          98,
+          3.3
+        ],
+        "b": [
+          104,
+          104,
+          4.2
+        ],
+        "width": 3.0
+      },
+      {
+        "id": "mill-stair-c",
+        "a": [
+          104,
+          104,
+          4.2
+        ],
+        "b": [
+          98,
+          106,
+          5
+        ],
+        "width": 3.0
+      },
+      {
+        "id": "catacomb-dive-a",
+        "a": [
+          -10,
+          64,
+          0
+        ],
+        "b": [
+          -12,
+          54,
+          -2.5
+        ],
+        "width": 2.5,
+        "note": "the Catacomb Dive winds down into the Pit's west end"
+      },
+      {
+        "id": "catacomb-dive-b",
+        "a": [
+          -12,
+          54,
+          -2.5
+        ],
+        "b": [
+          -4,
+          46,
+          -5.0
+        ],
+        "width": 2.5
+      },
+      {
+        "id": "catacomb-dive-c",
+        "a": [
+          -4,
+          46,
+          -5.0
+        ],
+        "b": [
+          8,
+          48,
+          -5.0
+        ],
+        "width": 2.5
+      },
+      {
+        "id": "catacomb-dive-d",
+        "a": [
+          8,
+          48,
+          -5.0
+        ],
+        "b": [
+          21,
+          47,
+          -5.0
+        ],
+        "width": 2.5
+      }
+    ],
+    "crawls": [
+      {
+        "id": "crawl-r3",
+        "a": [
+          100,
+          44.5
+        ],
+        "b": [
+          102,
+          25.5
+        ],
+        "z": 0,
+        "packFits": false,
+        "note": "beside the Belfry-Cellar stair; ends 2.5 m above the Cellar floor",
+        "purpose": "reach the R3 lever in the Cellar; the scout drops, the pack takes the stair"
+      },
+      {
+        "id": "crawl-r6",
+        "a": [
+          8,
+          64
+        ],
+        "b": [
+          10,
+          48
+        ],
+        "z": 0,
+        "packFits": false,
+        "note": "beside the Court-Cistern stair; a drop at its end",
+        "purpose": "reach the R6 lever by the Cistern stair foot"
+      },
+      {
+        "id": "crawl-r7",
+        "a": [
+          104.5,
+          29.8
+        ],
+        "via": [
+          [
+            100,
+            31
+          ]
+        ],
+        "b": [
+          96,
+          25.5
+        ],
+        "z": -5.0,
+        "packFits": false,
+        "note": "beside the Undercroft mouth",
+        "purpose": "reach the R7 lever on the tunnel side"
+      },
+      {
+        "id": "crawl-sealed",
+        "a": [
+          110,
+          56
+        ],
+        "b": [
+          116,
+          60.5
+        ],
+        "z": 0,
+        "packFits": false,
+        "note": "a gap behind the Belfry's east wall",
+        "purpose": "the one squeeze that leads somewhere new: the Sealed Burial"
+      }
+    ],
+    "low_links": [
+      [
+        "ut1",
+        "ut2"
+      ],
+      [
+        "ut2",
+        "ls"
+      ],
+      [
+        "p0w",
+        "tm"
+      ],
+      [
+        "tm",
+        "ci1"
+      ],
+      [
+        "d2",
+        "H2"
+      ],
+      [
+        "c1",
+        "ct0"
+      ],
+      [
+        "ct1",
+        "lw"
+      ],
+      [
+        "lw",
+        "H2"
+      ],
+      [
+        "cw",
+        "ci2"
+      ]
+    ],
+    "ladders": [
+      {
+        "id": "closet-ladder",
+        "at": [
+          19,
+          40
+        ],
+        "baseZ": -5.0,
+        "height": 5.0,
+        "yaw": 0.0,
+        "oneWay": true,
+        "note": "from the Pit's west end up into the hall closet",
+        "purpose": "the Pit's one-way way home, pack included"
+      },
+      {
+        "id": "belfry-ladder",
+        "at": [
+          100,
+          57
+        ],
+        "baseZ": 0.0,
+        "height": 2.5,
+        "yaw": 180.0,
+        "kind": "barred",
+        "oneWay": false,
+        "note": "Belfry floor up to the loft; its foot is barred (P5) until the lever on the loft is pulled, reached by the Reliquary's rail drop",
+        "purpose": "the loft holds the Red key and the best view in the district"
+      }
+    ],
+    "openings": [
+      {
+        "id": "well",
+        "level": "main",
+        "rect": [
+          34,
+          44,
+          46,
+          56
+        ],
+        "kind": "open",
+        "rail": 0.6,
+        "note": "the Well: rim at 0, Pit at -5, open to the sky-light at +24"
+      },
+      {
+        "id": "well-upper",
+        "level": "upper",
+        "rect": [
+          34,
+          44,
+          46,
+          56
+        ],
+        "kind": "open"
+      },
+      {
+        "id": "closet-well",
+        "level": "main",
+        "rect": [
+          19.0,
+          39.25,
+          20.5,
+          40.75
+        ],
+        "kind": "open"
+      }
+    ],
+    "rail_gaps": [
+      {
+        "id": "mill-drop",
+        "a": [
+          88,
+          96
+        ],
+        "b": [
+          92,
+          96
+        ],
+        "note": "one-way drop: Salt Mill rail -> the Reliquary floor, 2.5 m: the Curing Room's short way home"
+      }
+    ],
+    "drops": [
+      {
+        "id": "loft-drop",
+        "a": [
+          100,
+          58.5
+        ],
+        "b": [
+          100,
+          62
+        ],
+        "z": 2.5,
+        "note": "the loft mezzanine's west edge: open, the one-way drop to the Belfry floor"
+      }
+    ],
+    "windows": [
+      {
+        "id": "ford-north",
+        "a": [
+          60,
+          50.5
+        ],
+        "b": [
+          60,
+          55.5
+        ],
+        "sill": 1.2,
+        "head": 8.0,
+        "note": "the Ford corridor's north wall and the rock to the rim, opened above a parapet: the Well and its hoist seen from the Ford, the shaft light from the loft"
+      },
+      {
+        "id": "ford-rim",
+        "a": [
+          52,
+          50.5
+        ],
+        "b": [
+          52,
+          53.75
+        ],
+        "sill": 1.2,
+        "head": 8.0,
+        "note": "the rim's east wall over the Ford's west step"
+      },
+      {
+        "id": "belfry-west",
+        "a": [
+          82,
+          52.5
+        ],
+        "b": [
+          82,
+          58.5
+        ],
+        "sill": 1.2,
+        "head": 8.0,
+        "note": "the Belfry's west wall above the canal: the loft rail looks across to the Well"
+      },
+      {
+        "id": "bridge-bank",
+        "a": [
+          62.37,
+          69.76
+        ],
+        "b": [
+          63.25,
+          68.19
+        ],
+        "sill": 3.7,
+        "head": 9.0,
+        "note": "the canal's west bank under the Bone Bridge: the hoist seen from the bridge"
+      },
+      {
+        "id": "ossuary-rim",
+        "a": [
+          49.07,
+          62.3
+        ],
+        "b": [
+          49.95,
+          60.73
+        ],
+        "sill": 3.7,
+        "head": 9.0,
+        "note": "the Ossuary's south-east corner to the Well"
+      },
+      {
+        "id": "bridge-east",
+        "a": [
+          81.72,
+          65.35
+        ],
+        "b": [
+          83.56,
+          67.73
+        ],
+        "sill": 4.0,
+        "head": 11.0,
+        "note": "the canal's east bank to the Belfry: the bell seen from the bridge"
+      },
+      {
+        "id": "larder-belfry",
+        "a": [
+          110.92,
+          47.44
+        ],
+        "b": [
+          109.34,
+          44.9
+        ],
+        "sill": 6.0,
+        "head": 12.0,
+        "note": "a roof break between the Brine Larder and the Belfry: the bell overhead"
+      }
+    ],
+    "sightlines": [
+      {
+        "id": "ford-hoist",
+        "from": [
+          74,
+          48.5,
+          -2.5
+        ],
+        "to": [
+          40,
+          55.5,
+          7
+        ],
+        "label": "The Ford -> the hoist (and, turning, the bell): both landmarks from one spot"
+      },
+      {
+        "id": "ford-bell",
+        "from": [
+          74,
+          48.5,
+          -2.5
+        ],
+        "to": [
+          104,
+          50,
+          16
+        ],
+        "label": "The Ford -> the bell"
+      },
+      {
+        "id": "bridge-hoist",
+        "from": [
+          73,
+          74,
+          2.5
+        ],
+        "to": [
+          40,
+          55.5,
+          7
+        ],
+        "label": "Bone Bridge -> the hoist over the Well"
+      },
+      {
+        "id": "bridge-bell",
+        "from": [
+          73,
+          74,
+          2.5
+        ],
+        "to": [
+          104,
+          50,
+          16
+        ],
+        "label": "Bone Bridge -> the bell"
+      },
+      {
+        "id": "rim-glyphs",
+        "from": [
+          48,
+          50,
+          0
+        ],
+        "to": [
+          102,
+          50,
+          2
+        ],
+        "label": "Well east rim -> the glyphs on the tower's west face (P4), across the canal"
+      },
+      {
+        "id": "hall-hoist",
+        "from": [
+          24.5,
+          49,
+          0
+        ],
+        "to": [
+          40,
+          55.5,
+          7
+        ],
+        "label": "Camp Door -> the hoist"
+      },
+      {
+        "id": "loft-well",
+        "from": [
+          100.5,
+          60,
+          2.5
+        ],
+        "to": [
+          40,
+          50,
+          8
+        ],
+        "label": "Belfry loft -> the Well's shaft light across the canal"
+      },
+      {
+        "id": "belfry-pit",
+        "from": [
+          90,
+          54,
+          0
+        ],
+        "to": [
+          40,
+          50,
+          8
+        ],
+        "label": "Belfry west arch -> the Well's shaft light over the Ford"
+      },
+      {
+        "id": "pit-hoist",
+        "from": [
+          40,
+          46,
+          -5
+        ],
+        "to": [
+          40,
+          55.5,
+          7
+        ],
+        "label": "Pit -> up the shaft"
+      },
+      {
+        "id": "larder-bell",
+        "from": [
+          120,
+          40,
+          -2.5
+        ],
+        "to": [
+          104,
+          50,
+          16
+        ],
+        "label": "Brine Larder -> the bell overhead through the roof break"
+      }
+    ],
+    "shortcuts": [
+      {
+        "id": "SC2",
+        "at": [
+          19,
+          42
+        ],
+        "yaw": 90.0,
+        "spanCm": 250.0,
+        "leverSide": -1,
+        "oneWay": true,
+        "channel": "Mechanism.Channel.Warrens.Shortcut.SC2",
+        "note": "closet -> hall; lever in the closet"
+      },
+      {
+        "id": "ChainCrossing",
+        "at": [
+          67,
+          26
+        ],
+        "yaw": 90.0,
+        "spanCm": 250.0,
+        "leverSide": 1,
+        "oneWay": true,
+        "channel": "Mechanism.Channel.Warrens.Shortcut.Chain",
+        "note": "the Chain Crossing: barred at the Pump end, lowered by the Sluice hand-wheel (P2); from then on both ways"
+      }
+    ],
+    "source_water": [
+      {
+        "id": "canal",
+        "poly": [
+          [
+            70,
+            -4
+          ],
+          [
+            78,
+            -4
+          ],
+          [
+            77,
+            20
+          ],
+          [
+            79,
+            40
+          ],
+          [
+            77,
+            60
+          ],
+          [
+            79,
+            84
+          ],
+          [
+            77,
+            104
+          ],
+          [
+            69,
+            104
+          ],
+          [
+            71,
+            80
+          ],
+          [
+            69,
+            60
+          ],
+          [
+            71,
+            36
+          ],
+          [
+            69,
+            16
+          ]
+        ],
+        "z": -2.5,
+        "depth": 2.0,
+        "top": 20,
+        "note": "the Drowned Canal: 2 m deep, impassable; the district's edge"
+      },
+      {
+        "id": "ford",
+        "rect": [
+          68,
+          46,
+          80,
+          52
+        ],
+        "z": -2.5,
+        "depth": 0.4,
+        "top": 20,
+        "note": "the Ford: knee-deep, slow, always open"
+      },
+      {
+        "id": "cistern-basin",
+        "poly": [
+          [
+            10,
+            32
+          ],
+          [
+            20,
+            32
+          ],
+          [
+            21.5,
+            36.5
+          ],
+          [
+            15,
+            37
+          ],
+          [
+            15,
+            43
+          ],
+          [
+            10,
+            42
+          ]
+        ],
+        "z": -2.5,
+        "depth": 0.4,
+        "note": "the Cistern pool"
+      },
+      {
+        "id": "larder-water",
+        "poly": [
+          [
+            112,
+            34
+          ],
+          [
+            126,
+            34
+          ],
+          [
+            128,
+            46
+          ],
+          [
+            116,
+            48
+          ]
+        ],
+        "z": -2.5,
+        "depth": 0.4,
+        "note": "the Brine Larder: knee-deep stores"
+      }
+    ],
+    "source_lights": [
+      {
+        "at": [
+          16,
+          50,
+          3.0
+        ],
+        "kind": "hearth"
+      },
+      {
+        "at": [
+          40,
+          50,
+          8.0
+        ],
+        "kind": "shaft"
+      },
+      {
+        "at": [
+          40,
+          50,
+          -3.0
+        ],
+        "kind": "cold"
+      },
+      {
+        "at": [
+          15,
+          76,
+          5.0
+        ],
+        "kind": "cold"
+      },
+      {
+        "at": [
+          104,
+          50,
+          16.0
+        ],
+        "kind": "cold"
+      },
+      {
+        "at": [
+          98,
+          54,
+          6.0
+        ],
+        "kind": "cold"
+      },
+      {
+        "at": [
+          92,
+          80,
+          5.1
+        ],
+        "kind": "dim"
+      },
+      {
+        "at": [
+          58,
+          25,
+          0.1
+        ],
+        "kind": "dim"
+      },
+      {
+        "at": [
+          122,
+          15,
+          0.1
+        ],
+        "kind": "dim"
+      },
+      {
+        "at": [
+          120,
+          40,
+          0.1
+        ],
+        "kind": "dim"
+      },
+      {
+        "at": [
+          16,
+          37,
+          -0.5
+        ],
+        "kind": "dim"
+      },
+      {
+        "at": [
+          48,
+          72,
+          5.1
+        ],
+        "kind": "dim"
+      },
+      {
+        "at": [
+          69,
+          49,
+          1.0
+        ],
+        "kind": "foyer"
+      },
+      {
+        "at": [
+          92,
+          103,
+          7.6
+        ],
+        "kind": "dim"
+      },
+      {
+        "at": [
+          -14,
+          76,
+          3.0
+        ],
+        "kind": "cold"
+      }
+    ],
+    "transitions": [
+      {
+        "id": "t-camp",
+        "at": [
+          5,
+          50,
+          0
+        ],
+        "kind": "reveal",
+        "label": "camp stair -> the hall; the Well framed by the east door"
+      },
+      {
+        "id": "t-court",
+        "at": [
+          19,
+          61,
+          0
+        ],
+        "kind": "turn",
+        "label": "hall -> Court: bent passage, R1"
+      },
+      {
+        "id": "t-ossuary",
+        "at": [
+          42,
+          60,
+          1.2
+        ],
+        "kind": "stair",
+        "label": "rim N -> Ossuary: straight stair up, the hoist behind you"
+      },
+      {
+        "id": "t-cascade",
+        "at": [
+          36,
+          35,
+          -2.5
+        ],
+        "kind": "stair",
+        "label": "rim S -> Pit: the cascade (R2)"
+      },
+      {
+        "id": "t-pump",
+        "at": [
+          50,
+          40,
+          -1.2
+        ],
+        "kind": "stair",
+        "label": "rim S -> Pump: dog-leg down (R4)"
+      },
+      {
+        "id": "t-ford-w",
+        "at": [
+          53,
+          50,
+          -1.2
+        ],
+        "kind": "stair",
+        "label": "rim E -> down to the Ford"
+      },
+      {
+        "id": "t-ford",
+        "at": [
+          74,
+          49,
+          -2.5
+        ],
+        "kind": "reveal",
+        "label": "the Ford: open air, both landmarks"
+      },
+      {
+        "id": "t-ford-e",
+        "at": [
+          85,
+          49,
+          -1.2
+        ],
+        "kind": "stair",
+        "label": "Ford -> Belfry: up the east step"
+      },
+      {
+        "id": "t-bridge",
+        "at": [
+          73,
+          74,
+          2.5
+        ],
+        "kind": "bridge",
+        "label": "the Bone Bridge, 22 m over the canal (R5)"
+      },
+      {
+        "id": "t-chain",
+        "at": [
+          81,
+          25,
+          -2.5
+        ],
+        "kind": "bridge",
+        "label": "the Chain Crossing: barred until the Sluice wheel lowers it (P2)"
+      },
+      {
+        "id": "t-sump",
+        "at": [
+          46,
+          30,
+          -3.8
+        ],
+        "kind": "stair",
+        "label": "Pump -> Pit: the Sump Stair, the waterworks' own way down"
+      },
+      {
+        "id": "t-undercroft",
+        "at": [
+          80,
+          26,
+          -5
+        ],
+        "kind": "squeeze",
+        "label": "the Undercroft: low winding tunnel under the canal (R7)"
+      },
+      {
+        "id": "t-wetstair",
+        "at": [
+          5,
+          56,
+          -1.2
+        ],
+        "kind": "stair",
+        "label": "Court -> Cistern: the long wet stair (R6)"
+      },
+      {
+        "id": "t-hump",
+        "at": [
+          38,
+          21,
+          -1.0
+        ],
+        "kind": "squeeze",
+        "label": "Cistern -> Pump: low tunnel that climbs a hump and drops again"
+      },
+      {
+        "id": "t-relbelfry",
+        "at": [
+          92,
+          68,
+          1.2
+        ],
+        "kind": "stair",
+        "label": "Reliquary -> Belfry: stair down under the tower"
+      },
+      {
+        "id": "t-cellar",
+        "at": [
+          96,
+          36,
+          -1.2
+        ],
+        "kind": "stair",
+        "label": "Belfry -> Cellar (R3)"
+      },
+      {
+        "id": "t-larder",
+        "at": [
+          112,
+          52,
+          -1.2
+        ],
+        "kind": "stair",
+        "label": "Belfry -> Brine Larder: down into the water"
+      },
+      {
+        "id": "t-ledge",
+        "at": [
+          119,
+          50,
+          -1.0
+        ],
+        "kind": "jump",
+        "label": "ledge hop: larder stair -> the dry shelf above the brine"
+      },
+      {
+        "id": "t-pitshelf",
+        "at": [
+          33,
+          62,
+          -3.0
+        ],
+        "kind": "jump",
+        "label": "ledge hop: cascade foot -> the root shelf on the Pit's north wall"
+      },
+      {
+        "id": "t-loftdrop",
+        "at": [
+          100,
+          60,
+          2.5
+        ],
+        "kind": "drop",
+        "label": "one-way drop: loft mezzanine -> Belfry floor (2.5 m)"
+      },
+      {
+        "id": "t-millstair",
+        "at": [
+          104,
+          101,
+          3.8
+        ],
+        "kind": "stair",
+        "label": "Reliquary -> Salt Mill: the mill stair winds up to +5"
+      },
+      {
+        "id": "t-milldrop",
+        "at": [
+          90,
+          96,
+          5
+        ],
+        "kind": "drop",
+        "label": "one-way drop: Salt Mill -> Reliquary (2.5 m)"
+      },
+      {
+        "id": "t-catacomb",
+        "at": [
+          -2,
+          63,
+          0
+        ],
+        "kind": "squeeze",
+        "label": "Court -> Catacomb: low tunnel round the back"
+      },
+      {
+        "id": "t-catacombdive",
+        "at": [
+          -8,
+          50,
+          -3
+        ],
+        "kind": "stair",
+        "label": "the Catacomb Dive: winding down into the Pit's west end"
+      }
+    ],
+    "entrances": [
+      {
+        "anchorId": "S1",
+        "playerStartTag": "Expedition.Entrance.S1",
+        "node": "S1"
+      },
+      {
+        "anchorId": "S2",
+        "playerStartTag": "Expedition.Entrance.S2",
+        "node": "S2"
+      },
+      {
+        "anchorId": "S3",
+        "playerStartTag": "Expedition.Entrance.S3",
+        "node": "S3"
+      },
+      {
+        "anchorId": "S4",
+        "playerStartTag": "Expedition.Entrance.S4",
+        "node": "S4"
+      },
+      {
+        "anchorId": "S5",
+        "playerStartTag": "Expedition.Entrance.S5",
+        "node": "S5"
+      }
+    ],
+    "caches": [
+      "Mourner",
+      "SealedBurial",
+      "Porter",
+      "CatacombCache"
+    ],
+    "route_anchors": [
+      {
+        "id": "S1",
+        "family": "S",
+        "at": [
+          -2,
+          50
+        ],
+        "node": "S1",
+        "note": "foyer"
+      },
+      {
+        "id": "S2",
+        "family": "S",
+        "at": [
+          110,
+          80
+        ],
+        "node": "S2",
+        "note": "foyer"
+      },
+      {
+        "id": "S3",
+        "family": "S",
+        "at": [
+          140,
+          40
+        ],
+        "node": "S3",
+        "note": "foyer"
+      },
+      {
+        "id": "S4",
+        "family": "S",
+        "at": [
+          122,
+          0
+        ],
+        "node": "S4",
+        "note": "foyer"
+      },
+      {
+        "id": "S5",
+        "family": "S",
+        "at": [
+          16,
+          22
+        ],
+        "node": "S5",
+        "note": "foyer"
+      },
+      {
+        "id": "H1",
+        "family": "H",
+        "at": [
+          15,
+          76
+        ],
+        "node": "H1",
+        "note": "hunt court"
+      },
+      {
+        "id": "H2",
+        "family": "H",
+        "at": [
+          40,
+          50
+        ],
+        "node": "H2",
+        "note": "hunt court"
+      },
+      {
+        "id": "H3",
+        "family": "H",
+        "at": [
+          98,
+          54
+        ],
+        "node": "BF",
+        "note": "hunt court"
+      },
+      {
+        "id": "R1",
+        "family": "R",
+        "at": [
+          22,
+          63
+        ],
+        "node": "kn",
+        "note": "route gate"
+      },
+      {
+        "id": "R2",
+        "family": "R",
+        "at": [
+          39,
+          41
+        ],
+        "node": "wS",
+        "note": "route gate"
+      },
+      {
+        "id": "R4",
+        "family": "R",
+        "at": [
+          49.5,
+          41.5
+        ],
+        "node": "wSE",
+        "note": "route gate"
+      },
+      {
+        "id": "R6",
+        "family": "R",
+        "at": [
+          5,
+          60
+        ],
+        "node": "c1",
+        "note": "route gate"
+      },
+      {
+        "id": "R5",
+        "family": "R",
+        "at": [
+          63,
+          74
+        ],
+        "node": "bh",
+        "note": "route gate"
+      },
+      {
+        "id": "R3",
+        "family": "R",
+        "at": [
+          96,
+          34
+        ],
+        "node": "bs",
+        "note": "route gate"
+      },
+      {
+        "id": "R7",
+        "family": "R",
+        "at": [
+          100,
+          26
+        ],
+        "node": "ut1",
+        "note": "route gate"
+      }
+    ]
+  },
+  "continuity_checkpoints": [
+    {
+      "id": "Hub__Court__court",
+      "zones": [
+        "Hub",
+        "Court"
+      ],
+      "source_port_a": {
+        "id": "court",
+        "at": [
+          16,
+          58,
+          0
+        ],
+        "width": 3,
+        "kind": "door"
+      },
+      "source_port_b": {
+        "id": "hall",
+        "at": [
+          22,
+          62,
+          0
+        ],
+        "width": 3,
+        "kind": "door"
+      },
+      "transition": {
+        "id": "t-court",
+        "at": [
+          19,
+          61,
+          0
+        ],
+        "kind": "turn",
+        "label": "hall -> Court: bent passage, R1"
+      },
+      "checks": [
+        "walk both directions where permitted; standing/scout/pack fit",
+        "same source top and ramp slope across seam; no floating fascia or floor overlap",
+        "continuous material scale and water height; no abrupt local light seam",
+        "retain gate sweep/drop/ladder rail gap; do not bridge mismatched port coordinates with invented geometry"
+      ]
+    },
+    {
+      "id": "Hub__Ossuary__ossuary",
+      "zones": [
+        "Hub",
+        "Ossuary"
+      ],
+      "source_port_a": {
+        "id": "ossuary",
+        "at": [
+          40,
+          58,
+          0
+        ],
+        "width": 3,
+        "kind": "stair"
+      },
+      "source_port_b": {
+        "id": "rim",
+        "at": [
+          42,
+          60,
+          2.5
+        ],
+        "width": 3,
+        "kind": "stair"
+      },
+      "transition": {
+        "id": "t-ossuary",
+        "at": [
+          42,
+          60,
+          1.2
+        ],
+        "kind": "stair",
+        "label": "rim N -> Ossuary: straight stair up, the hoist behind you"
+      },
+      "checks": [
+        "walk both directions where permitted; standing/scout/pack fit",
+        "same source top and ramp slope across seam; no floating fascia or floor overlap",
+        "continuous material scale and water height; no abrupt local light seam",
+        "retain gate sweep/drop/ladder rail gap; do not bridge mismatched port coordinates with invented geometry"
+      ]
+    },
+    {
+      "id": "Court__Ossuary__ossuary",
+      "zones": [
+        "Court",
+        "Ossuary"
+      ],
+      "source_port_a": {
+        "id": "ossuary",
+        "at": [
+          30,
+          86,
+          0
+        ],
+        "width": 3,
+        "kind": "stair"
+      },
+      "source_port_b": {
+        "id": "court",
+        "at": [
+          36,
+          80,
+          2.5
+        ],
+        "width": 3,
+        "kind": "stair"
+      },
+      "transition": null,
+      "checks": [
+        "walk both directions where permitted; standing/scout/pack fit",
+        "same source top and ramp slope across seam; no floating fascia or floor overlap",
+        "continuous material scale and water height; no abrupt local light seam",
+        "retain gate sweep/drop/ladder rail gap; do not bridge mismatched port coordinates with invented geometry"
+      ]
+    },
+    {
+      "id": "Hub__Waterworks-W__pump",
+      "zones": [
+        "Hub",
+        "Waterworks-W"
+      ],
+      "source_port_a": {
+        "id": "pump",
+        "at": [
+          44,
+          38,
+          0
+        ],
+        "width": 3,
+        "kind": "stair"
+      },
+      "source_port_b": {
+        "id": "rim",
+        "at": [
+          48,
+          36,
+          -2.5
+        ],
+        "width": 3,
+        "kind": "stair"
+      },
+      "transition": {
+        "id": "t-pump",
+        "at": [
+          50,
+          40,
+          -1.2
+        ],
+        "kind": "stair",
+        "label": "rim S -> Pump: dog-leg down (R4)"
+      },
+      "checks": [
+        "walk both directions where permitted; standing/scout/pack fit",
+        "same source top and ramp slope across seam; no floating fascia or floor overlap",
+        "continuous material scale and water height; no abrupt local light seam",
+        "retain gate sweep/drop/ladder rail gap; do not bridge mismatched port coordinates with invented geometry"
+      ]
+    },
+    {
+      "id": "Court__Waterworks-W__cistern",
+      "zones": [
+        "Court",
+        "Waterworks-W"
+      ],
+      "source_port_a": {
+        "id": "cistern",
+        "at": [
+          6,
+          60,
+          0
+        ],
+        "width": 3,
+        "kind": "stair"
+      },
+      "source_port_b": {
+        "id": "court",
+        "at": [
+          12,
+          36,
+          -2.5
+        ],
+        "width": 3,
+        "kind": "stair"
+      },
+      "transition": {
+        "id": "t-wetstair",
+        "at": [
+          5,
+          56,
+          -1.2
+        ],
+        "kind": "stair",
+        "label": "Court -> Cistern: the long wet stair (R6)"
+      },
+      "checks": [
+        "walk both directions where permitted; standing/scout/pack fit",
+        "same source top and ramp slope across seam; no floating fascia or floor overlap",
+        "continuous material scale and water height; no abrupt local light seam",
+        "retain gate sweep/drop/ladder rail gap; do not bridge mismatched port coordinates with invented geometry"
+      ]
+    },
+    {
+      "id": "Hub__Pit__cascade",
+      "zones": [
+        "Hub",
+        "Pit"
+      ],
+      "source_port_a": {
+        "id": "cascade",
+        "at": [
+          44,
+          40,
+          0
+        ],
+        "width": 4,
+        "kind": "stair"
+      },
+      "source_port_b": {
+        "id": "cascade",
+        "at": [
+          46,
+          30,
+          -5
+        ],
+        "width": 4,
+        "kind": "stair"
+      },
+      "transition": {
+        "id": "t-cascade",
+        "at": [
+          36,
+          35,
+          -2.5
+        ],
+        "kind": "stair",
+        "label": "rim S -> Pit: the cascade (R2)"
+      },
+      "checks": [
+        "walk both directions where permitted; standing/scout/pack fit",
+        "same source top and ramp slope across seam; no floating fascia or floor overlap",
+        "continuous material scale and water height; no abrupt local light seam",
+        "retain gate sweep/drop/ladder rail gap; do not bridge mismatched port coordinates with invented geometry"
+      ]
+    },
+    {
+      "id": "Hub__Pit__closet",
+      "zones": [
+        "Hub",
+        "Pit"
+      ],
+      "source_port_a": {
+        "id": "closet",
+        "at": [
+          19,
+          40,
+          -5
+        ],
+        "width": 1,
+        "kind": "ladder"
+      },
+      "source_port_b": {
+        "id": "closet",
+        "at": [
+          19,
+          40,
+          -5
+        ],
+        "width": 1,
+        "kind": "ladder"
+      },
+      "transition": null,
+      "checks": [
+        "walk both directions where permitted; standing/scout/pack fit",
+        "same source top and ramp slope across seam; no floating fascia or floor overlap",
+        "continuous material scale and water height; no abrupt local light seam",
+        "retain gate sweep/drop/ladder rail gap; do not bridge mismatched port coordinates with invented geometry"
+      ]
+    },
+    {
+      "id": "Waterworks-W__Pit__sump",
+      "zones": [
+        "Waterworks-W",
+        "Pit"
+      ],
+      "source_port_a": {
+        "id": "sump",
+        "at": [
+          48,
+          34,
+          -2.5
+        ],
+        "width": 2.5,
+        "kind": "stair"
+      },
+      "source_port_b": {
+        "id": "sump",
+        "at": [
+          44,
+          38,
+          -5
+        ],
+        "width": 2.5,
+        "kind": "stair"
+      },
+      "transition": {
+        "id": "t-sump",
+        "at": [
+          46,
+          30,
+          -3.8
+        ],
+        "kind": "stair",
+        "label": "Pump -> Pit: the Sump Stair, the waterworks' own way down"
+      },
+      "checks": [
+        "walk both directions where permitted; standing/scout/pack fit",
+        "same source top and ramp slope across seam; no floating fascia or floor overlap",
+        "continuous material scale and water height; no abrupt local light seam",
+        "retain gate sweep/drop/ladder rail gap; do not bridge mismatched port coordinates with invented geometry"
+      ]
+    },
+    {
+      "id": "Waterworks-W__Canal__chain",
+      "zones": [
+        "Waterworks-W",
+        "Canal"
+      ],
+      "source_port_a": {
+        "id": "chain",
+        "at": [
+          66,
+          26,
+          -2.5
+        ],
+        "width": 2.5,
+        "kind": "bridge"
+      },
+      "source_port_b": {
+        "id": "chain-w",
+        "at": [
+          66,
+          26,
+          -2.5
+        ],
+        "width": 2.5,
+        "kind": "bridge"
+      },
+      "transition": {
+        "id": "t-chain",
+        "at": [
+          81,
+          25,
+          -2.5
+        ],
+        "kind": "bridge",
+        "label": "the Chain Crossing: barred until the Sluice wheel lowers it (P2)"
+      },
+      "checks": [
+        "walk both directions where permitted; standing/scout/pack fit",
+        "same source top and ramp slope across seam; no floating fascia or floor overlap",
+        "continuous material scale and water height; no abrupt local light seam",
+        "retain gate sweep/drop/ladder rail gap; do not bridge mismatched port coordinates with invented geometry"
+      ]
+    },
+    {
+      "id": "Canal__Brineworks__chain-e",
+      "zones": [
+        "Canal",
+        "Brineworks"
+      ],
+      "source_port_a": {
+        "id": "chain-e",
+        "at": [
+          88,
+          24,
+          -2.5
+        ],
+        "width": 2.5,
+        "kind": "bridge"
+      },
+      "source_port_b": {
+        "id": "chain",
+        "at": [
+          96,
+          24,
+          -2.5
+        ],
+        "width": 2.5,
+        "kind": "bridge"
+      },
+      "transition": {
+        "id": "t-chain",
+        "at": [
+          81,
+          25,
+          -2.5
+        ],
+        "kind": "bridge",
+        "label": "the Chain Crossing: barred until the Sluice wheel lowers it (P2)"
+      },
+      "checks": [
+        "walk both directions where permitted; standing/scout/pack fit",
+        "same source top and ramp slope across seam; no floating fascia or floor overlap",
+        "continuous material scale and water height; no abrupt local light seam",
+        "retain gate sweep/drop/ladder rail gap; do not bridge mismatched port coordinates with invented geometry"
+      ]
+    },
+    {
+      "id": "Ossuary__Canal__bridge",
+      "zones": [
+        "Ossuary",
+        "Canal"
+      ],
+      "source_port_a": {
+        "id": "bridge",
+        "at": [
+          62,
+          74,
+          2.5
+        ],
+        "width": 3,
+        "kind": "bridge"
+      },
+      "source_port_b": {
+        "id": "bridge-w",
+        "at": [
+          66,
+          74,
+          2.5
+        ],
+        "width": 3,
+        "kind": "bridge"
+      },
+      "transition": {
+        "id": "t-bridge",
+        "at": [
+          73,
+          74,
+          2.5
+        ],
+        "kind": "bridge",
+        "label": "the Bone Bridge, 22 m over the canal (R5)"
+      },
+      "checks": [
+        "walk both directions where permitted; standing/scout/pack fit",
+        "same source top and ramp slope across seam; no floating fascia or floor overlap",
+        "continuous material scale and water height; no abrupt local light seam",
+        "retain gate sweep/drop/ladder rail gap; do not bridge mismatched port coordinates with invented geometry"
+      ]
+    },
+    {
+      "id": "Canal__Reliquary__bridge-e",
+      "zones": [
+        "Canal",
+        "Reliquary"
+      ],
+      "source_port_a": {
+        "id": "bridge-e",
+        "at": [
+          88,
+          74,
+          2.5
+        ],
+        "width": 3,
+        "kind": "bridge"
+      },
+      "source_port_b": {
+        "id": "bridge",
+        "at": [
+          84,
+          74,
+          2.5
+        ],
+        "width": 3,
+        "kind": "bridge"
+      },
+      "transition": {
+        "id": "t-bridge",
+        "at": [
+          73,
+          74,
+          2.5
+        ],
+        "kind": "bridge",
+        "label": "the Bone Bridge, 22 m over the canal (R5)"
+      },
+      "checks": [
+        "walk both directions where permitted; standing/scout/pack fit",
+        "same source top and ramp slope across seam; no floating fascia or floor overlap",
+        "continuous material scale and water height; no abrupt local light seam",
+        "retain gate sweep/drop/ladder rail gap; do not bridge mismatched port coordinates with invented geometry"
+      ]
+    },
+    {
+      "id": "Hub__Canal__ford",
+      "zones": [
+        "Hub",
+        "Canal"
+      ],
+      "source_port_a": {
+        "id": "ford",
+        "at": [
+          52,
+          50,
+          0
+        ],
+        "width": 3,
+        "kind": "stair"
+      },
+      "source_port_b": {
+        "id": "ford-w",
+        "at": [
+          66,
+          49,
+          -2.5
+        ],
+        "width": 4,
+        "kind": "door"
+      },
+      "transition": {
+        "id": "t-ford-w",
+        "at": [
+          53,
+          50,
+          -1.2
+        ],
+        "kind": "stair",
+        "label": "rim E -> down to the Ford"
+      },
+      "checks": [
+        "walk both directions where permitted; standing/scout/pack fit",
+        "same source top and ramp slope across seam; no floating fascia or floor overlap",
+        "continuous material scale and water height; no abrupt local light seam",
+        "retain gate sweep/drop/ladder rail gap; do not bridge mismatched port coordinates with invented geometry"
+      ]
+    },
+    {
+      "id": "Canal__Belfry__ford-e",
+      "zones": [
+        "Canal",
+        "Belfry"
+      ],
+      "source_port_a": {
+        "id": "ford-e",
+        "at": [
+          88,
+          49,
+          0
+        ],
+        "width": 4,
+        "kind": "stair"
+      },
+      "source_port_b": {
+        "id": "ford",
+        "at": [
+          88,
+          49,
+          0
+        ],
+        "width": 4,
+        "kind": "stair"
+      },
+      "transition": {
+        "id": "t-ford-e",
+        "at": [
+          85,
+          49,
+          -1.2
+        ],
+        "kind": "stair",
+        "label": "Ford -> Belfry: up the east step"
+      },
+      "checks": [
+        "walk both directions where permitted; standing/scout/pack fit",
+        "same source top and ramp slope across seam; no floating fascia or floor overlap",
+        "continuous material scale and water height; no abrupt local light seam",
+        "retain gate sweep/drop/ladder rail gap; do not bridge mismatched port coordinates with invented geometry"
+      ]
+    },
+    {
+      "id": "Belfry__Reliquary__reliquary",
+      "zones": [
+        "Belfry",
+        "Reliquary"
+      ],
+      "source_port_a": {
+        "id": "reliquary",
+        "at": [
+          92,
+          68,
+          0
+        ],
+        "width": 3,
+        "kind": "stair"
+      },
+      "source_port_b": {
+        "id": "belfry",
+        "at": [
+          92,
+          66,
+          2.5
+        ],
+        "width": 3,
+        "kind": "stair"
+      },
+      "transition": {
+        "id": "t-relbelfry",
+        "at": [
+          92,
+          68,
+          1.2
+        ],
+        "kind": "stair",
+        "label": "Reliquary -> Belfry: stair down under the tower"
+      },
+      "checks": [
+        "walk both directions where permitted; standing/scout/pack fit",
+        "same source top and ramp slope across seam; no floating fascia or floor overlap",
+        "continuous material scale and water height; no abrupt local light seam",
+        "retain gate sweep/drop/ladder rail gap; do not bridge mismatched port coordinates with invented geometry"
+      ]
+    },
+    {
+      "id": "Belfry__Brineworks__cellar",
+      "zones": [
+        "Belfry",
+        "Brineworks"
+      ],
+      "source_port_a": {
+        "id": "cellar",
+        "at": [
+          96,
+          38,
+          0
+        ],
+        "width": 3,
+        "kind": "stair"
+      },
+      "source_port_b": {
+        "id": "belfry-cellar",
+        "at": [
+          96,
+          30,
+          -2.5
+        ],
+        "width": 3,
+        "kind": "stair"
+      },
+      "transition": {
+        "id": "t-cellar",
+        "at": [
+          96,
+          36,
+          -1.2
+        ],
+        "kind": "stair",
+        "label": "Belfry -> Cellar (R3)"
+      },
+      "checks": [
+        "walk both directions where permitted; standing/scout/pack fit",
+        "same source top and ramp slope across seam; no floating fascia or floor overlap",
+        "continuous material scale and water height; no abrupt local light seam",
+        "retain gate sweep/drop/ladder rail gap; do not bridge mismatched port coordinates with invented geometry"
+      ]
+    },
+    {
+      "id": "Belfry__Brineworks__larder",
+      "zones": [
+        "Belfry",
+        "Brineworks"
+      ],
+      "source_port_a": {
+        "id": "larder",
+        "at": [
+          112,
+          50,
+          0
+        ],
+        "width": 3,
+        "kind": "stair"
+      },
+      "source_port_b": {
+        "id": "belfry-larder",
+        "at": [
+          112,
+          50,
+          -2.5
+        ],
+        "width": 3,
+        "kind": "stair"
+      },
+      "transition": {
+        "id": "t-larder",
+        "at": [
+          112,
+          52,
+          -1.2
+        ],
+        "kind": "stair",
+        "label": "Belfry -> Brine Larder: down into the water"
+      },
+      "checks": [
+        "walk both directions where permitted; standing/scout/pack fit",
+        "same source top and ramp slope across seam; no floating fascia or floor overlap",
+        "continuous material scale and water height; no abrupt local light seam",
+        "retain gate sweep/drop/ladder rail gap; do not bridge mismatched port coordinates with invented geometry"
+      ]
+    },
+    {
+      "id": "Reliquary__Mill__mill",
+      "zones": [
+        "Reliquary",
+        "Mill"
+      ],
+      "source_port_a": {
+        "id": "mill",
+        "at": [
+          100,
+          94,
+          2.5
+        ],
+        "width": 3,
+        "kind": "stair"
+      },
+      "source_port_b": {
+        "id": "reliquary",
+        "at": [
+          100,
+          94,
+          2.5
+        ],
+        "width": 3,
+        "kind": "stair"
+      },
+      "transition": {
+        "id": "t-millstair",
+        "at": [
+          104,
+          101,
+          3.8
+        ],
+        "kind": "stair",
+        "label": "Reliquary -> Salt Mill: the mill stair winds up to +5"
+      },
+      "checks": [
+        "walk both directions where permitted; standing/scout/pack fit",
+        "same source top and ramp slope across seam; no floating fascia or floor overlap",
+        "continuous material scale and water height; no abrupt local light seam",
+        "retain gate sweep/drop/ladder rail gap; do not bridge mismatched port coordinates with invented geometry"
+      ]
+    },
+    {
+      "id": "Court__Catacomb__court",
+      "zones": [
+        "Court",
+        "Catacomb"
+      ],
+      "source_port_a": null,
+      "source_port_b": {
+        "id": "court",
+        "at": [
+          -2,
+          64,
+          0
+        ],
+        "width": 2.5,
+        "kind": "crawl"
+      },
+      "transition": {
+        "id": "t-catacomb",
+        "at": [
+          -2,
+          63,
+          0
+        ],
+        "kind": "squeeze",
+        "label": "Court -> Catacomb: low tunnel round the back"
+      },
+      "checks": [
+        "walk both directions where permitted; standing/scout/pack fit",
+        "same source top and ramp slope across seam; no floating fascia or floor overlap",
+        "continuous material scale and water height; no abrupt local light seam",
+        "retain gate sweep/drop/ladder rail gap; do not bridge mismatched port coordinates with invented geometry"
+      ]
+    },
+    {
+      "id": "Catacomb__Pit__pit",
+      "zones": [
+        "Catacomb",
+        "Pit"
+      ],
+      "source_port_a": {
+        "id": "pit",
+        "at": [
+          -2,
+          46,
+          -4
+        ],
+        "width": 2.5,
+        "kind": "stair"
+      },
+      "source_port_b": null,
+      "transition": {
+        "id": "t-catacombdive",
+        "at": [
+          -8,
+          50,
+          -3
+        ],
+        "kind": "stair",
+        "label": "the Catacomb Dive: winding down into the Pit's west end"
+      },
+      "checks": [
+        "walk both directions where permitted; standing/scout/pack fit",
+        "same source top and ramp slope across seam; no floating fascia or floor overlap",
+        "continuous material scale and water height; no abrupt local light seam",
+        "retain gate sweep/drop/ladder rail gap; do not bridge mismatched port coordinates with invented geometry"
+      ]
+    },
+    {
+      "id": "Brineworks__Pit__undercroft",
+      "zones": [
+        "Brineworks",
+        "Pit"
+      ],
+      "source_port_a": {
+        "id": "undercroft",
+        "at": [
+          88,
+          26,
+          -5
+        ],
+        "width": 2.5,
+        "kind": "crawl"
+      },
+      "source_port_b": {
+        "id": "undercroft",
+        "at": [
+          56,
+          30,
+          -5
+        ],
+        "width": 2.5,
+        "kind": "crawl"
+      },
+      "transition": {
+        "id": "t-undercroft",
+        "at": [
+          80,
+          26,
+          -5
+        ],
+        "kind": "squeeze",
+        "label": "the Undercroft: low winding tunnel under the canal (R7)"
+      },
+      "checks": [
+        "walk both directions where permitted; standing/scout/pack fit",
+        "same source top and ramp slope across seam; no floating fascia or floor overlap",
+        "continuous material scale and water height; no abrupt local light seam",
+        "retain gate sweep/drop/ladder rail gap; do not bridge mismatched port coordinates with invented geometry"
+      ]
+    }
+  ],
+  "reference_validation": {
+    "links_checked": 45,
+    "missing": [],
+    "visually_inspected": [
+      "references/C-CONCEPTS.jpg",
+      "references/ENVC-02-belfry-on-the-other-bank.png",
+      "references/ENVC-08-salt-mill-above-the-canal.png",
+      "references/ENVC-12-pit-vault-and-scout-exit.png",
+      "art/district-sheets/DRESS01_HubDressingAssembly.png",
+      "art/district-sheets/DRESS02_CourtDressingAssembly.png",
+      "art/district-sheets/DRESS03_OssuaryDressingAssembly.png",
+      "art/district-sheets/DRESS07_BelfryDressingAssembly.png",
+      "art/district-sheets/DRESS09_MillDressingAssembly.png",
+      "art/district-sheets/DRESS10_CatacombDressingAssembly.png",
+      "art/district-sheets/DRESS11_BrineworksDressingAssembly.png",
+      "art/model-sheets/MODEL36_WellHoistMechanicalBreakdown.png",
+      "art/model-sheets/MODEL37_MillAndCuringVatBreakdown-r02.png"
+    ]
+  }
+}

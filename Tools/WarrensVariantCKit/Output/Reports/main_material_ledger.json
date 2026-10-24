@@ -1,0 +1,17 @@
+[
+  {
+    "actor": "Warrens_Greybox_floor",
+    "component": "HierarchicalInstancedStaticMesh",
+    "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX02.M_CCK_TX02"
+  },
+  {
+    "actor": "Warrens_Greybox_wall",
+    "component": "HierarchicalInstancedStaticMesh",
+    "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX17.M_CCK_TX17"
+  },
+  {
+    "actor": "Warrens_Greybox_ramp",
+    "component": "HierarchicalInstancedStaticMesh",
+    "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX02.M_CCK_TX02"
+  }
+]

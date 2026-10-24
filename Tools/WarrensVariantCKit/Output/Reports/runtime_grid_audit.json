@@ -1,0 +1,2380 @@
+{
+  "grids": [
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_0",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -5100.0,
+        -1300.0,
+        88.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_1",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -5100.0,
+        -1300.0,
+        215.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_2",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -5187.5,
+        -1300.0,
+        110.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_3",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -5162.5,
+        -1300.0,
+        110.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_4",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -5137.5,
+        -1300.0,
+        110.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_5",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -5112.5,
+        -1300.0,
+        110.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_6",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -5087.5,
+        -1300.0,
+        110.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_7",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -5062.5,
+        -1300.0,
+        110.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_8",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -5037.5,
+        -1300.0,
+        110.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_9",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -5012.5,
+        -1300.0,
+        110.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_10",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -5100.0,
+        -1300.0,
+        230.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_11",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -5210.0,
+        -1300.0,
+        120.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_12",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -4990.0,
+        -1300.0,
+        120.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_13",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Interactable_Mars_MI.ProtoGrid_Interactable_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -5195.0,
+        -1450.0,
+        45.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_14",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Interactable_Mars_MI.ProtoGrid_Interactable_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -5195.0,
+        -1450.0,
+        0.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_15",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -300.0,
+        -2900.0,
+        88.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_16",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -300.0,
+        -2900.0,
+        215.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_17",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -387.5,
+        -2900.0,
+        110.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_18",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -362.5,
+        -2900.0,
+        110.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_19",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -337.5,
+        -2900.0,
+        110.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_20",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -312.5,
+        -2900.0,
+        110.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_21",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -287.5,
+        -2900.0,
+        110.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_22",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -262.5,
+        -2900.0,
+        110.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_23",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -237.5,
+        -2900.0,
+        110.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_24",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -212.5,
+        -2900.0,
+        110.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_25",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -300.0,
+        -2900.0,
+        230.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_26",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -410.0,
+        -2900.0,
+        120.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_27",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -190.0,
+        -2900.0,
+        120.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_28",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Interactable_Mars_MI.ProtoGrid_Interactable_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -204.99999999999997,
+        -2750.0,
+        45.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_29",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Interactable_Mars_MI.ProtoGrid_Interactable_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -204.99999999999997,
+        -2750.0,
+        0.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_32",
+      "materials": [
+        "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host.StaticMeshComponent_32.MID_ProtoGrid_Item_Mars_MI_0"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        4019.9640352336282,
+        2349.9261934367532,
+        253.49996948242188
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_33",
+      "materials": [
+        "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host.StaticMeshComponent_33.MID_ProtoGrid_Item_Mars_MI_0"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        3979.98193359375,
+        2350.016845703125,
+        253.49996948242188
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_36",
+      "materials": [
+        "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host.StaticMeshComponent_36.MID_ProtoGrid_Item_Mars_MI_0"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        4940.05224609375,
+        -5370.0390625,
+        -246.50001050291212
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_37",
+      "materials": [
+        "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host.StaticMeshComponent_37.MID_ProtoGrid_Item_Mars_MI_0"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        4900.0078125,
+        -5370.01318359375,
+        -246.50016309077364
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_40",
+      "materials": [
+        "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host.StaticMeshComponent_40.MID_ProtoGrid_Item_Mars_MI_0"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -7180.2373046875,
+        -102.48959261800064,
+        3.494648189957246
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_41",
+      "materials": [
+        "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host.StaticMeshComponent_41.MID_ProtoGrid_Item_Mars_MI_0"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -7220.2333984375,
+        -102.4865493774414,
+        3.498291492462158
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_44",
+      "materials": [
+        "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host.StaticMeshComponent_44.MID_ProtoGrid_Item_Mars_MI_0"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        7020.0078125,
+        -1650.0137939453125,
+        -246.5001783495627
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_45",
+      "materials": [
+        "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host.StaticMeshComponent_45.MID_ProtoGrid_Item_Mars_MI_0"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        6980.00927734375,
+        -1650.015380859375,
+        -246.50000574697697
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_48",
+      "materials": [
+        "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host.StaticMeshComponent_48.MID_ProtoGrid_Item_Mars_MI_0"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -5659.9267578125,
+        -3170.01318359375,
+        -246.50001525878906
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_49",
+      "materials": [
+        "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host.StaticMeshComponent_49.MID_ProtoGrid_Item_Mars_MI_0"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -5699.99267578125,
+        -3170.0176542194968,
+        -246.4999877144237
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_50",
+      "materials": [
+        "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host.StaticMeshComponent_50.MID_ProtoGrid_Item_Mars_MI_0"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        3400.0,
+        500.0,
+        249.9647674560547
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_56",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -5222.5,
+        -1300.0,
+        130.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_57",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -4977.5,
+        -1300.0,
+        130.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_58",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -2735.0,
+        1100.0,
+        252.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_59",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -2865.0,
+        1100.0,
+        252.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_60",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -2800.0,
+        1165.0,
+        252.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_61",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -2800.0,
+        1035.0,
+        252.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_62",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Interactable_Mars_MI.ProtoGrid_Interactable_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -2800.0,
+        1100.0,
+        254.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_63",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -422.5,
+        -2900.0,
+        130.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_64",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -177.5,
+        -2900.0,
+        130.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_65",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Interactable_Mars_MI.ProtoGrid_Interactable_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -5100.0,
+        -1500.0,
+        -20.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_66",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Interactable_Mars_MI.ProtoGrid_Interactable_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -5100.0,
+        -1500.0,
+        -50.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_67",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Interactable_Mars_MI.ProtoGrid_Interactable_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -5100.0,
+        -1500.0,
+        -80.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_68",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Interactable_Mars_MI.ProtoGrid_Interactable_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -5100.0,
+        -1500.0,
+        -110.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_69",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Interactable_Mars_MI.ProtoGrid_Interactable_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -5100.0,
+        -1500.0,
+        -140.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_70",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Interactable_Mars_MI.ProtoGrid_Interactable_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -5100.0,
+        -1500.0,
+        -170.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_71",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Interactable_Mars_MI.ProtoGrid_Interactable_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -5100.0,
+        -1500.0,
+        -200.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_72",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Interactable_Mars_MI.ProtoGrid_Interactable_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -5100.0,
+        -1500.0,
+        -230.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_73",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Interactable_Mars_MI.ProtoGrid_Interactable_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -5100.0,
+        -1500.0,
+        -260.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_74",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Interactable_Mars_MI.ProtoGrid_Interactable_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -5100.0,
+        -1500.0,
+        -290.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_75",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Interactable_Mars_MI.ProtoGrid_Interactable_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -5100.0,
+        -1500.0,
+        -320.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_76",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Interactable_Mars_MI.ProtoGrid_Interactable_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -5100.0,
+        -1500.0,
+        -350.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_77",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Interactable_Mars_MI.ProtoGrid_Interactable_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -5100.0,
+        -1500.0,
+        -380.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_78",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Interactable_Mars_MI.ProtoGrid_Interactable_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -5100.0,
+        -1500.0,
+        -410.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_79",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Interactable_Mars_MI.ProtoGrid_Interactable_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -5100.0,
+        -1500.0,
+        -440.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_80",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Interactable_Mars_MI.ProtoGrid_Interactable_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -5100.0,
+        -1500.0,
+        -470.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_81",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Interactable_Mars_MI.ProtoGrid_Interactable_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -5100.0,
+        -1470.0,
+        -250.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_82",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Interactable_Mars_MI.ProtoGrid_Interactable_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -5100.0,
+        -1530.0,
+        -250.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_83",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -1300.0,
+        500.0,
+        -412.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_84",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -1300.0,
+        500.0,
+        -285.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_85",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -1300.0,
+        587.5,
+        -390.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_86",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -1300.0,
+        562.5,
+        -390.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_87",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -1300.0,
+        537.5,
+        -390.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_88",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -1300.0,
+        512.5,
+        -390.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_89",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -1300.0,
+        487.5,
+        -390.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_90",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -1300.0,
+        462.5,
+        -390.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_91",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -1300.0,
+        437.5,
+        -390.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_92",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -1300.0,
+        412.5,
+        -390.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_93",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -1300.0,
+        500.0,
+        -270.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_94",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -1300.0,
+        610.0,
+        -380.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_95",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -1300.0,
+        390.0,
+        -380.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_96",
+      "materials": [
+        "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:Mars_Sandbox_KeyLock_Red_EntityScript_0.StaticMeshComponent_2.MID_ProtoGrid_Interactable_Mars_MI_0"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -1400.0,
+        329.99999999999955,
+        -491.8
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_97",
+      "materials": [
+        "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:Mars_Sandbox_KeyLock_Red_EntityScript_0.StaticMeshComponent_1.MID_ProtoGrid_Interactable_Mars_MI_0"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -1400.0,
+        329.99999999999955,
+        -493.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_98",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Interactable_Mars_MI.ProtoGrid_Interactable_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -1400.0,
+        329.99999999999955,
+        -497.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_99",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Interactable_Mars_MI.ProtoGrid_Interactable_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        3000.0,
+        200.0,
+        240.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_100",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Interactable_Mars_MI.ProtoGrid_Interactable_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        3000.0,
+        200.0,
+        210.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_101",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Interactable_Mars_MI.ProtoGrid_Interactable_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        3000.0,
+        200.0,
+        180.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_102",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Interactable_Mars_MI.ProtoGrid_Interactable_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        3000.0,
+        200.0,
+        150.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_103",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Interactable_Mars_MI.ProtoGrid_Interactable_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        3000.0,
+        200.0,
+        120.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_104",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Interactable_Mars_MI.ProtoGrid_Interactable_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        3000.0,
+        200.0,
+        90.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_105",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Interactable_Mars_MI.ProtoGrid_Interactable_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        3000.0,
+        200.0,
+        60.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_106",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Interactable_Mars_MI.ProtoGrid_Interactable_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        3000.0,
+        200.0,
+        30.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_107",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Interactable_Mars_MI.ProtoGrid_Interactable_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        3000.0,
+        170.0,
+        125.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_108",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Interactable_Mars_MI.ProtoGrid_Interactable_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        3000.0,
+        230.0,
+        125.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_122",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Interactable_Mars_MI.ProtoGrid_Interactable_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        3200.0,
+        500.0,
+        295.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_123",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Interactable_Mars_MI.ProtoGrid_Interactable_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        3200.0,
+        500.0,
+        250.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_143",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Interactable_Mars_MI.ProtoGrid_Interactable_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -6500.0,
+        3450.0,
+        15.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_147",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Item_Mars_MI.ProtoGrid_Item_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -4000.0,
+        1800.0,
+        60.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_150",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Item_Mars_MI.ProtoGrid_Item_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -7300.0,
+        2400.0,
+        60.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_151",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Platform_Mars_MI.ProtoGrid_Platform_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -2400.0,
+        2730.0,
+        270.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_152",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Platform_Mars_MI.ProtoGrid_Platform_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -2400.0,
+        2570.0,
+        270.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_153",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Platform_Mars_MI.ProtoGrid_Platform_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -2480.0,
+        2650.0,
+        270.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_154",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Platform_Mars_MI.ProtoGrid_Platform_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -2320.0,
+        2650.0,
+        270.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_155",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Interactable_Mars_MI.ProtoGrid_Interactable_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -2400.0,
+        2650.0,
+        470.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_156",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -2400.0,
+        2710.0,
+        510.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_157",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -2400.0,
+        2770.0,
+        380.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_160",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Platform_Mars_MI.ProtoGrid_Platform_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -6480.0,
+        -1900.0,
+        -230.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_161",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Platform_Mars_MI.ProtoGrid_Platform_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -6320.0,
+        -1900.0,
+        -230.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_162",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Platform_Mars_MI.ProtoGrid_Platform_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -6400.0,
+        -1980.0,
+        -230.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_163",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Platform_Mars_MI.ProtoGrid_Platform_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -6400.0,
+        -1820.0,
+        -230.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_164",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Interactable_Mars_MI.ProtoGrid_Interactable_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -6400.0,
+        -1900.0,
+        -30.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_165",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -6460.0,
+        -1900.0,
+        10.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_166",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -6520.0,
+        -1900.0,
+        -120.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_169",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Item_Mars_MI.ProtoGrid_Item_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        300.0,
+        2300.0,
+        310.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_170",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Interactable_Mars_MI.ProtoGrid_Interactable_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -4800.0,
+        100.0,
+        -485.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_172",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Interactable_Mars_MI.ProtoGrid_Interactable_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        4200.0,
+        600.0,
+        15.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_176",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Interactable_Mars_MI.ProtoGrid_Interactable_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        1200.0,
+        4650.0,
+        515.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_183",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Platform_Mars_MI.ProtoGrid_Platform_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        2800.0,
+        -4570.0,
+        -230.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_184",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Platform_Mars_MI.ProtoGrid_Platform_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        2800.0,
+        -4430.0,
+        -230.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_185",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Platform_Mars_MI.ProtoGrid_Platform_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        2870.0,
+        -4500.0,
+        -230.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_186",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Platform_Mars_MI.ProtoGrid_Platform_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        2730.0,
+        -4500.0,
+        -230.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_187",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Item_Mars_MI.ProtoGrid_Item_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        2800.0,
+        -4500.0,
+        -122.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_188",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Interactable_Mars_MI.ProtoGrid_Interactable_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        2800.0,
+        -4500.0,
+        -160.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_189",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Interactable_Mars_MI.ProtoGrid_Interactable_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        2800.0,
+        -4500.0,
+        -80.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_190",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        2800.0,
+        -4500.0,
+        0.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_193",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Platform_Mars_MI.ProtoGrid_Platform_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -9680.0,
+        1900.0,
+        20.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_194",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Platform_Mars_MI.ProtoGrid_Platform_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -9520.0,
+        1900.0,
+        20.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_195",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Platform_Mars_MI.ProtoGrid_Platform_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -9600.0,
+        1820.0,
+        20.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_196",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Platform_Mars_MI.ProtoGrid_Platform_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -9600.0,
+        1980.0,
+        20.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_197",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Interactable_Mars_MI.ProtoGrid_Interactable_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -9600.0,
+        1900.0,
+        220.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_198",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -9660.0,
+        1900.0,
+        260.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_199",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -9720.0,
+        1900.0,
+        130.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_221",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Interactable_Mars_MI.ProtoGrid_Interactable_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -4934.417504425324,
+        699.5035205936962,
+        45.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_222",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Interactable_Mars_MI.ProtoGrid_Interactable_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -4934.417504425324,
+        699.5035205936962,
+        0.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_223",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Interactable_Mars_MI.ProtoGrid_Interactable_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -4567.702495574675,
+        851.5564794063035,
+        45.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_224",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Interactable_Mars_MI.ProtoGrid_Interactable_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -4567.702495574675,
+        851.5564794063035,
+        0.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_225",
+      "materials": [
+        "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:Mars_LanternSconce_EntityScript_4.StaticMeshComponent_2.MID_ProtoGrid_Interactable_Mars_MI_0"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -3366.0,
+        1850.0,
+        399.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_226",
+      "materials": [
+        "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:Mars_LanternSconce_EntityScript_4.StaticMeshComponent_1.MID_ProtoGrid_Interactable_Mars_MI_0"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -3381.0,
+        1850.0,
+        402.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_227",
+      "materials": [
+        "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:Mars_LanternSconce_EntityScript_4.StaticMeshComponent_0.MID_ProtoGrid_Interactable_Mars_MI_0"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -3398.0,
+        1850.0,
+        390.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_232",
+      "materials": [
+        "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:Mars_LanternSconce_EntityScript_3.StaticMeshComponent_2.MID_ProtoGrid_Interactable_Mars_MI_0"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -366.0,
+        -2550.0,
+        -101.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_233",
+      "materials": [
+        "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:Mars_LanternSconce_EntityScript_3.StaticMeshComponent_1.MID_ProtoGrid_Interactable_Mars_MI_0"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -381.0,
+        -2550.0,
+        -98.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_234",
+      "materials": [
+        "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:Mars_LanternSconce_EntityScript_3.StaticMeshComponent_0.MID_ProtoGrid_Interactable_Mars_MI_0"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -398.0,
+        -2550.0,
+        -110.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_235",
+      "materials": [
+        "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:Mars_LanternSconce_EntityScript_2.StaticMeshComponent_2.MID_ProtoGrid_Interactable_Mars_MI_0"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -5166.0,
+        -900.0,
+        -351.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_236",
+      "materials": [
+        "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:Mars_LanternSconce_EntityScript_2.StaticMeshComponent_1.MID_ProtoGrid_Interactable_Mars_MI_0"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -5181.0,
+        -900.0,
+        -348.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_237",
+      "materials": [
+        "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:Mars_LanternSconce_EntityScript_2.StaticMeshComponent_0.MID_ProtoGrid_Interactable_Mars_MI_0"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -5198.0,
+        -900.0,
+        -360.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_238",
+      "materials": [
+        "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host.StaticMeshComponent_238.MID_ProtoGrid_Interactable_Mars_MI_0"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -3986.0,
+        892.0,
+        -140.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_239",
+      "materials": [
+        "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host.StaticMeshComponent_239.MID_ProtoGrid_Interactable_Mars_MI_0"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -3986.0,
+        864.0,
+        -140.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_240",
+      "materials": [
+        "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host.StaticMeshComponent_240.MID_ProtoGrid_Interactable_Mars_MI_0"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -3986.0,
+        836.0,
+        -140.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_241",
+      "materials": [
+        "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host.StaticMeshComponent_241.MID_ProtoGrid_Interactable_Mars_MI_0"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -3986.0,
+        808.0,
+        -140.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_242",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        -3997.0,
+        850.0,
+        -140.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_243",
+      "materials": [
+        "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:Mars_LanternSconce_EntityScript_1.StaticMeshComponent_2.MID_ProtoGrid_Interactable_Mars_MI_0"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        5000.0,
+        -234.0,
+        49.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_244",
+      "materials": [
+        "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:Mars_LanternSconce_EntityScript_1.StaticMeshComponent_1.MID_ProtoGrid_Interactable_Mars_MI_0"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        5000.0,
+        -218.99999999999997,
+        52.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_245",
+      "materials": [
+        "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:Mars_LanternSconce_EntityScript_1.StaticMeshComponent_0.MID_ProtoGrid_Interactable_Mars_MI_0"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        5000.0,
+        -201.99999999999997,
+        40.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_250",
+      "materials": [
+        "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:Mars_LanternSconce_EntityScript_0.StaticMeshComponent_2.MID_ProtoGrid_Interactable_Mars_MI_0"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        2800.0,
+        5766.0,
+        649.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_251",
+      "materials": [
+        "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:Mars_LanternSconce_EntityScript_0.StaticMeshComponent_1.MID_ProtoGrid_Interactable_Mars_MI_0"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        2800.0,
+        5781.0,
+        652.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_252",
+      "materials": [
+        "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:Mars_LanternSconce_EntityScript_0.StaticMeshComponent_0.MID_ProtoGrid_Interactable_Mars_MI_0"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        2800.0,
+        5798.0,
+        640.0
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_274",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Interactable_Mars_MI.ProtoGrid_Interactable_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        2480.0,
+        -2250.0,
+        -93.89000000000001
+      ]
+    },
+    {
+      "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+      "class_name": "Actor",
+      "component": "StaticMeshComponent_275",
+      "materials": [
+        "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Interactable_Mars_MI.ProtoGrid_Interactable_Mars_MI"
+      ],
+      "visible": true,
+      "hidden": false,
+      "at": [
+        2480.0,
+        -2250.0,
+        -138.89000000000001
+      ]
+    }
+  ],
+  "bell_lights": [
+    {
+      "actor": "/Temp/Game/Mars/Maps/Variants/v8c/UEDPIE_0_LI_Warrens_Belfry_LevelInstance_5c6733f7f791ef24_1.LI_Warrens_Belfry:PersistentLevel.PointLight_0",
+      "intensity": 8.0
+    }
+  ]
+}

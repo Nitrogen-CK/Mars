@@ -1,0 +1,179 @@
+{
+  "schema": 1,
+  "status": "Two optional source-supported candidates; no live writes",
+  "units": "plan metres",
+  "max_requested": 6,
+  "candidates": [
+    {
+      "id": "S4_static_entrance_arch",
+      "tile": "Main",
+      "mesh_id": "WVC003",
+      "at": [
+        122,
+        3.9,
+        -2.5
+      ],
+      "yaw": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "role": "source-supported static entrance mouth arch",
+      "collision": "NoCollision",
+      "source_route": {
+        "a": "S4",
+        "b": "SL",
+        "width_m": 3,
+        "closedBy": null
+      },
+      "source_opening": {
+        "at": [
+          122,
+          4.0,
+          -2.5
+        ],
+        "inner_x": [
+          120.5,
+          123.5
+        ],
+        "mount_face_offset_y_m": -0.1
+      },
+      "source_supportIDs": [
+        {
+          "tile": "Brineworks",
+          "key": "Warrens_Greybox_wall:65"
+        },
+        {
+          "tile": "Brineworks",
+          "key": "Warrens_Greybox_wall:66"
+        },
+        {
+          "tile": "Main",
+          "key": "Warrens_Greybox_floor:0"
+        }
+      ],
+      "clearanceproof": {
+        "model_outer_m": [
+          3.8,
+          0.45,
+          4.2
+        ],
+        "clear_width_below_spring_m": 3,
+        "clear_spring_height_m": 2.3,
+        "central_apex_clear_height_m": 3.8,
+        "existing_source_underside_z": 2.1,
+        "arch_top_z": 1.7000000000000002,
+        "space_above_arch_m": 0.3999999999999999,
+        "jamb_full_width_wall_overlap_m": 0.4,
+        "jamb_depth_overlap_with_source_wall_m": 0.125,
+        "each_foot_total_area_m2": 0.18,
+        "each_foot_floor_contact_area_m2": 0.13,
+        "each_foot_remaining_retained_wall_foundation_area_m2": 0.05,
+        "foot_union_samples": 180,
+        "unsupported_foot_samples": 0,
+        "central_route_samples": 1860,
+        "blocked_central_route_samples": 0,
+        "nearest_puzzle_or_shortcut_or_actuator_xy_m": 8.1,
+        "source_low_link": false,
+        "source_window": false,
+        "active_gate": false,
+        "method": "Actual unrotated source solid union including Main pivot(70,55,0). Foot support sampled at source floor minus1mm; clear opening sampled through full depth at floor+.05..2.29. Arch feet sit on retained source plane and will be buried8mm by floor art. Jamb rear125mm is embedded into source jamb, remaining325mm of depth has actual floor contact. No roof, route or port geometry added."
+      },
+      "runtime_status": "Source fit only; main may omit. Existing wall veneer projects12mm into nominal opening; final PIE checks visual junction and pawn clearance."
+    },
+    {
+      "id": "S5_static_entrance_arch",
+      "tile": "WaterworksW",
+      "mesh_id": "WVC003",
+      "at": [
+        16,
+        25.9,
+        -2.5
+      ],
+      "yaw": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "role": "source-supported static entrance mouth arch",
+      "collision": "NoCollision",
+      "source_route": {
+        "a": "S5",
+        "b": "CI",
+        "width_m": 3,
+        "closedBy": null
+      },
+      "source_opening": {
+        "at": [
+          16,
+          26.0,
+          -2.5
+        ],
+        "inner_x": [
+          14.5,
+          17.5
+        ],
+        "mount_face_offset_y_m": -0.1
+      },
+      "source_supportIDs": [
+        {
+          "tile": "WaterworksW",
+          "key": "Warrens_Greybox_wall:87"
+        },
+        {
+          "tile": "WaterworksW",
+          "key": "Warrens_Greybox_wall:88"
+        },
+        {
+          "tile": "WaterworksW",
+          "key": "Warrens_Greybox_floor:1"
+        }
+      ],
+      "clearanceproof": {
+        "model_outer_m": [
+          3.8,
+          0.45,
+          4.2
+        ],
+        "clear_width_below_spring_m": 3,
+        "clear_spring_height_m": 2.3,
+        "central_apex_clear_height_m": 3.8,
+        "existing_source_underside_z": 2.1,
+        "arch_top_z": 1.7000000000000002,
+        "space_above_arch_m": 0.3999999999999999,
+        "jamb_full_width_wall_overlap_m": 0.4,
+        "jamb_depth_overlap_with_source_wall_m": 0.125,
+        "each_foot_total_area_m2": 0.18,
+        "each_foot_floor_contact_area_m2": 0.13,
+        "each_foot_remaining_retained_wall_foundation_area_m2": 0.05,
+        "foot_union_samples": 180,
+        "unsupported_foot_samples": 0,
+        "central_route_samples": 1860,
+        "blocked_central_route_samples": 0,
+        "nearest_puzzle_or_shortcut_or_actuator_xy_m": 14.415616532080758,
+        "source_low_link": false,
+        "source_window": false,
+        "active_gate": false,
+        "method": "Actual unrotated source solid union including Main pivot(70,55,0). Foot support sampled at source floor minus1mm; clear opening sampled through full depth at floor+.05..2.29. Arch feet sit on retained source plane and will be buried8mm by floor art. Jamb rear125mm is embedded into source jamb, remaining325mm of depth has actual floor contact. No roof, route or port geometry added."
+      },
+      "runtime_status": "Source fit only; main may omit. Existing wall veneer projects12mm into nominal opening; final PIE checks visual junction and pawn clearance."
+    }
+  ],
+  "rejected": [
+    "Hub/Court bent transition is not a simple static rectangular doorway and may be gated; omitted.",
+    "S2/S3 entrance node centers lack two nearby source jambs; omitted.",
+    "No WVC004 candidate justified without touching retained mechanisms, narrow links, or inventing a portal."
+  ],
+  "evidence": {
+    "tile_baseline": "D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\Reports\\source_baseline.json",
+    "main_baseline": "D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\Reports\\main_source_baseline.json",
+    "main_pivot": [
+      70,
+      55,
+      0
+    ],
+    "source_plan": "Tools/LevelDesign/anchor_plans/data/warrens_v8c.json"
+  }
+}

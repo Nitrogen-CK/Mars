@@ -1,0 +1,63 @@
+{
+  "tile": "Ossuary",
+  "asset": "/Game/Mars/Maps/Variants/v8c/LI_Warrens_Ossuary",
+  "instances": 2218,
+  "hism_groups": 15,
+  "counts": {
+    "BACKING_TX01": 828,
+    "BACKING_TX02": 265,
+    "CCS13": 265,
+    "CCS13_TX01": 231,
+    "CCS15": 597,
+    "CCS60": 3,
+    "CCS61": 3,
+    "CCS62": 3,
+    "CCS64": 6,
+    "CCS69": 6,
+    "CCS78": 1,
+    "WVC052": 7,
+    "WVC053": 1,
+    "WVC064": 1,
+    "WVC083_ART04": 1
+  },
+  "material_overrides": [
+    {
+      "actor": "Warrens_Greybox_floor",
+      "component": "HierarchicalInstancedStaticMesh",
+      "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX04.M_CCK_TX04"
+    },
+    {
+      "actor": "Warrens_Greybox_wall",
+      "component": "HierarchicalInstancedStaticMesh",
+      "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX01.M_CCK_TX01"
+    },
+    {
+      "actor": "Warrens_Greybox_roof",
+      "component": "HierarchicalInstancedStaticMesh",
+      "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX01.M_CCK_TX01"
+    },
+    {
+      "actor": "Warrens_Greybox_ramp",
+      "component": "HierarchicalInstancedStaticMesh",
+      "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX02.M_CCK_TX02"
+    },
+    {
+      "actor": "Warrens_Greybox_prop",
+      "component": "HierarchicalInstancedStaticMesh",
+      "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX01.M_CCK_TX01"
+    },
+    {
+      "actor": "Warrens_Greybox_candle",
+      "component": "HierarchicalInstancedStaticMesh",
+      "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX09.M_CCK_TX09"
+    }
+  ],
+  "gate_bindings": [
+    {
+      "actor": "Warrens_Mars_Anchor_Route_EntityScript_31",
+      "property": "GateMaterialOverride",
+      "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX09.M_CCK_TX09"
+    }
+  ],
+  "rollback": "D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\Reports\\Backups\\20261024-062002\\LI_Warrens_Ossuary.umap"
+}

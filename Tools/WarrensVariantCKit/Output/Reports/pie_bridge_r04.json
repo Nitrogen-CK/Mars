@@ -1,0 +1,178 @@
+{
+  "session_id": "pie_smoke_10_141727",
+  "status": "complete",
+  "marker": "VARIANT_C_FINAL_BRIDGE_R04",
+  "map": "UEDPIE_0_Warrens_VariantC_Mars_MAP",
+  "duration": 29,
+  "pie_active": true,
+  "pie_ready": true,
+  "lifecycle": "teardown-complete",
+  "sample_count": 944,
+  "elapsed_seconds": 29.01327019929886,
+  "var_summary": {},
+  "runtime_identity": {
+    "actor": "Mars_PlayerCharacter_0",
+    "actor_class": "Mars_PlayerCharacter",
+    "skel_comp": "CharacterMesh0",
+    "anim_instance_class": "/Game/Mars/Gameplay/PlayerCharacter/Chef/ABP_Chef.ABP_Chef_C",
+    "mesh_anim_class": "/Game/Mars/Gameplay/PlayerCharacter/Chef/ABP_Chef.ABP_Chef_C",
+    "animation_mode": "anim_blueprint",
+    "anim_class_changed": false
+  },
+  "grouped_counts": {
+    "active_runtime": {
+      "must_absent": {
+        "Blueprint Runtime Error": 0,
+        "Accessed None": 0,
+        "LogChooser": 0,
+        "Assertion failed": 0,
+        "Fatal error": 0,
+        "LogScript: Error": 0
+      },
+      "must_present": {
+        "VARIANT_C_RUNTIME_AUDIT_PASSED": 1,
+        "LIVE_GRID_AUDIT": 1
+      },
+      "observe_only": {},
+      "warn": {},
+      "entry_count": 172
+    },
+    "teardown": {
+      "must_absent": {
+        "Blueprint Runtime Error": 0,
+        "Accessed None": 0,
+        "LogChooser": 0,
+        "Assertion failed": 0,
+        "Fatal error": 0,
+        "LogScript: Error": 0
+      },
+      "entry_count": 40,
+      "allowed": true
+    },
+    "ignore_after_pattern": "BeginTearingDown"
+  },
+  "warnings": [],
+  "missing_must_present": [],
+  "post_marker_counts": {
+    "Blueprint Runtime Error": 0,
+    "Accessed None": 0,
+    "LogChooser": 0,
+    "Assertion failed": 0,
+    "Fatal error": 0,
+    "LogScript: Error": 0,
+    "VARIANT_C_RUNTIME_AUDIT_PASSED": 1,
+    "LIVE_GRID_AUDIT": 1
+  },
+  "total_matches": 0,
+  "ok": true,
+  "probes": [
+    {
+      "at_seconds": 1,
+      "fired": true,
+      "fired_at_seconds": 1.0168964006006718,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 2,
+      "fired": true,
+      "fired_at_seconds": 2.000704601407051,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 4,
+      "fired": true,
+      "fired_at_seconds": 4.006755601614714,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 6,
+      "fired": true,
+      "fired_at_seconds": 7.016602400690317,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 8,
+      "fired": true,
+      "fired_at_seconds": 8.009530201554298,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 10,
+      "fired": true,
+      "fired_at_seconds": 10.000645201653242,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 12,
+      "fired": true,
+      "fired_at_seconds": 12.002580597996712,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 14,
+      "fired": true,
+      "fired_at_seconds": 14.007256601005793,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 16,
+      "fired": true,
+      "fired_at_seconds": 16.012687399983406,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 18,
+      "fired": true,
+      "fired_at_seconds": 18.11517219990492,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 20,
+      "fired": true,
+      "fired_at_seconds": 20.001512199640274,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 22,
+      "fired": true,
+      "fired_at_seconds": 22.004335701465607,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 24,
+      "fired": true,
+      "fired_at_seconds": 24.00144699960947,
+      "python_ok": true,
+      "python_output": "None"
+    }
+  ],
+  "actor_setup": [
+    {
+      "class": "/Script/Engine.CameraActor",
+      "class_resolved": true,
+      "requested_count": 1,
+      "spawned_count": 1,
+      "actors": [
+        {
+          "spawned": true,
+          "name": "CameraActor_0",
+          "runtime_class": "/Script/Engine.CameraActor",
+          "applied": [],
+          "unmatched": []
+        }
+      ]
+    }
+  ]
+}

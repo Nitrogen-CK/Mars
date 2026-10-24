@@ -1,0 +1,110 @@
+{
+  "tile": "Hub",
+  "asset": "/Game/Mars/Maps/Variants/v8c/LI_Warrens_Hub",
+  "instances": 4345,
+  "hism_groups": 37,
+  "counts": {
+    "BACKING_TX01": 1448,
+    "BACKING_TX02": 619,
+    "CCS09": 37,
+    "CCS11": 34,
+    "CCS13": 619,
+    "CCS13_TX01": 422,
+    "CCS15": 1026,
+    "CCS27": 68,
+    "CCS57": 1,
+    "CCS60": 7,
+    "CCS61": 7,
+    "CCS62": 7,
+    "CCS64": 11,
+    "CCS67": 3,
+    "CCS71": 1,
+    "CCS73": 2,
+    "CCS78": 1,
+    "CCS86": 2,
+    "PWC03": 2,
+    "PWC10": 10,
+    "PWC11": 1,
+    "PWC12": 1,
+    "PWC13": 1,
+    "PWC17": 2,
+    "PWC19": 1,
+    "PWC20": 1,
+    "PWC24": 1,
+    "PWC25": 1,
+    "WVC013": 1,
+    "WVC014": 1,
+    "WVC015": 1,
+    "WVC016": 1,
+    "WVC044": 1,
+    "WVC048": 1,
+    "WVC064": 1,
+    "WVC065": 1,
+    "WVC083_ART01": 1
+  },
+  "material_overrides": [
+    {
+      "actor": "Warrens_Greybox_floor",
+      "component": "HierarchicalInstancedStaticMesh",
+      "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX02.M_CCK_TX02"
+    },
+    {
+      "actor": "Warrens_Greybox_wall",
+      "component": "HierarchicalInstancedStaticMesh",
+      "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX01.M_CCK_TX01"
+    },
+    {
+      "actor": "Warrens_Greybox_roof",
+      "component": "HierarchicalInstancedStaticMesh",
+      "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX01.M_CCK_TX01"
+    },
+    {
+      "actor": "Warrens_Greybox_ramp",
+      "component": "HierarchicalInstancedStaticMesh",
+      "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX02.M_CCK_TX02"
+    },
+    {
+      "actor": "Warrens_Greybox_gallery",
+      "component": "HierarchicalInstancedStaticMesh",
+      "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX09.M_CCK_TX09"
+    },
+    {
+      "actor": "Warrens_Greybox_hearth",
+      "component": "HierarchicalInstancedStaticMesh",
+      "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX09.M_CCK_TX09"
+    },
+    {
+      "actor": "Warrens_Greybox_water",
+      "component": "HierarchicalInstancedStaticMesh",
+      "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_FX_Water.M_CCK_FX_Water"
+    },
+    {
+      "actor": "Warrens_Greybox_prop",
+      "component": "HierarchicalInstancedStaticMesh",
+      "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX01.M_CCK_TX01"
+    },
+    {
+      "actor": "Warrens_Greybox_candle",
+      "component": "HierarchicalInstancedStaticMesh",
+      "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX09.M_CCK_TX09"
+    }
+  ],
+  "gate_bindings": [
+    {
+      "actor": "Warrens_Mars_Anchor_Route_EntityScript_28",
+      "property": "GateMaterialOverride",
+      "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX09.M_CCK_TX09"
+    },
+    {
+      "actor": "Warrens_Mars_Anchor_Route_EntityScript_29",
+      "property": "GateMaterialOverride",
+      "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX09.M_CCK_TX09"
+    },
+    {
+      "actor": "Warrens_Mars_Anchor_Route_EntityScript_30",
+      "property": "GateMaterialOverride",
+      "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX09.M_CCK_TX09"
+    }
+  ],
+  "rollback": "D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\Reports\\Backups\\20261024-062002\\LI_Warrens_Hub.umap"
+}

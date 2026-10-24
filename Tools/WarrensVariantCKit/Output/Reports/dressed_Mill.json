@@ -1,0 +1,63 @@
+{
+  "tile": "Mill",
+  "asset": "/Game/Mars/Maps/Variants/v8c/LI_Warrens_Mill",
+  "instances": 806,
+  "hism_groups": 21,
+  "counts": {
+    "BACKING_TX01": 190,
+    "BACKING_TX02": 186,
+    "CCS09": 12,
+    "CCS11": 10,
+    "CCS13": 186,
+    "CCS13_TX01": 3,
+    "CCS15": 187,
+    "CCS60": 3,
+    "CCS61": 3,
+    "CCS62": 3,
+    "CCS64": 3,
+    "CCS68": 1,
+    "CCS78": 1,
+    "SOURCE_CUBE_TX02_TX02": 11,
+    "WVC023": 1,
+    "WVC024": 1,
+    "WVC027": 1,
+    "WVC037": 1,
+    "WVC050": 1,
+    "WVC056": 1,
+    "WVC083_ART06": 1
+  },
+  "material_overrides": [
+    {
+      "actor": "Warrens_Greybox_floor",
+      "component": "HierarchicalInstancedStaticMesh",
+      "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX02.M_CCK_TX02"
+    },
+    {
+      "actor": "Warrens_Greybox_wall",
+      "component": "HierarchicalInstancedStaticMesh",
+      "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX01.M_CCK_TX01"
+    },
+    {
+      "actor": "Warrens_Greybox_roof",
+      "component": "HierarchicalInstancedStaticMesh",
+      "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX01.M_CCK_TX01"
+    },
+    {
+      "actor": "Warrens_Greybox_ramp",
+      "component": "HierarchicalInstancedStaticMesh",
+      "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX02.M_CCK_TX02"
+    },
+    {
+      "actor": "Warrens_Greybox_gallery",
+      "component": "HierarchicalInstancedStaticMesh",
+      "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX09.M_CCK_TX09"
+    },
+    {
+      "actor": "Warrens_Greybox_prop",
+      "component": "HierarchicalInstancedStaticMesh",
+      "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX01.M_CCK_TX01"
+    }
+  ],
+  "gate_bindings": [],
+  "rollback": "D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\Reports\\Backups\\20261024-062002\\LI_Warrens_Mill.umap"
+}

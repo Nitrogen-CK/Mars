@@ -1,0 +1,78 @@
+{
+  "tile": "Belfry",
+  "asset": "/Game/Mars/Maps/Variants/v8c/LI_Warrens_Belfry",
+  "instances": 2984,
+  "hism_groups": 25,
+  "counts": {
+    "BACKING_TX01": 702,
+    "BACKING_TX02": 464,
+    "CCS06": 20,
+    "CCS09": 14,
+    "CCS11": 11,
+    "CCS13": 464,
+    "CCS13_TX01": 112,
+    "CCS15": 590,
+    "CCS27": 565,
+    "CCS60": 5,
+    "CCS61": 5,
+    "CCS62": 5,
+    "CCS64": 8,
+    "CCS71": 2,
+    "CCS86": 1,
+    "SOURCE_CUBE_TX01_TX01": 2,
+    "WVC018": 2,
+    "WVC019": 1,
+    "WVC020": 1,
+    "WVC021": 1,
+    "WVC028": 1,
+    "WVC064": 1,
+    "WVC077": 1,
+    "WVC080": 1,
+    "WVC082": 5
+  },
+  "material_overrides": [
+    {
+      "actor": "Warrens_Greybox_floor",
+      "component": "HierarchicalInstancedStaticMesh",
+      "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX02.M_CCK_TX02"
+    },
+    {
+      "actor": "Warrens_Greybox_wall",
+      "component": "HierarchicalInstancedStaticMesh",
+      "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX01.M_CCK_TX01"
+    },
+    {
+      "actor": "Warrens_Greybox_roof",
+      "component": "HierarchicalInstancedStaticMesh",
+      "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX01.M_CCK_TX01"
+    },
+    {
+      "actor": "Warrens_Greybox_ramp",
+      "component": "HierarchicalInstancedStaticMesh",
+      "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX02.M_CCK_TX02"
+    },
+    {
+      "actor": "Warrens_Greybox_gallery",
+      "component": "HierarchicalInstancedStaticMesh",
+      "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX09.M_CCK_TX09"
+    },
+    {
+      "actor": "Warrens_Greybox_prop",
+      "component": "HierarchicalInstancedStaticMesh",
+      "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX01.M_CCK_TX01"
+    },
+    {
+      "actor": "Warrens_Greybox_candle",
+      "component": "HierarchicalInstancedStaticMesh",
+      "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX09.M_CCK_TX09"
+    }
+  ],
+  "gate_bindings": [
+    {
+      "actor": "Warrens_Mars_Gate_EntityScript_2",
+      "property": "MaterialOverride",
+      "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX09.M_CCK_TX09"
+    }
+  ],
+  "rollback": "D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\Reports\\Backups\\20261024-062002\\LI_Warrens_Belfry.umap"
+}

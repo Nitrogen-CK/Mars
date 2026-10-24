@@ -1,0 +1,104 @@
+{
+  "session_id": "pie_smoke_11_142013",
+  "status": "complete",
+  "marker": "VARIANT_C_GLASS_SHADOW_DIAG",
+  "map": "UEDPIE_0_Warrens_VariantC_Mars_MAP",
+  "duration": 13,
+  "pie_active": true,
+  "pie_ready": true,
+  "lifecycle": "teardown-complete",
+  "sample_count": 716,
+  "elapsed_seconds": 13.000440001487732,
+  "var_summary": {},
+  "runtime_identity": {
+    "actor": "Mars_PlayerCharacter_0",
+    "actor_class": "Mars_PlayerCharacter",
+    "skel_comp": "CharacterMesh0",
+    "anim_instance_class": "/Game/Mars/Gameplay/PlayerCharacter/Chef/ABP_Chef.ABP_Chef_C",
+    "mesh_anim_class": "/Game/Mars/Gameplay/PlayerCharacter/Chef/ABP_Chef.ABP_Chef_C",
+    "animation_mode": "anim_blueprint",
+    "anim_class_changed": false
+  },
+  "grouped_counts": {
+    "active_runtime": {
+      "must_absent": {
+        "Blueprint Runtime Error": 0,
+        "Accessed None": 0,
+        "LogChooser": 0
+      },
+      "must_present": {
+        "BRIDGE_GLASS_SHADOW_DISABLED": 1
+      },
+      "observe_only": {},
+      "warn": {},
+      "entry_count": 118
+    },
+    "teardown": {
+      "must_absent": {
+        "Blueprint Runtime Error": 0,
+        "Accessed None": 0,
+        "LogChooser": 0
+      },
+      "entry_count": 43,
+      "allowed": true
+    },
+    "ignore_after_pattern": "BeginTearingDown"
+  },
+  "warnings": [],
+  "missing_must_present": [],
+  "post_marker_counts": {
+    "Blueprint Runtime Error": 0,
+    "Accessed None": 0,
+    "LogChooser": 0,
+    "BRIDGE_GLASS_SHADOW_DISABLED": 1
+  },
+  "total_matches": 0,
+  "ok": true,
+  "probes": [
+    {
+      "at_seconds": 1,
+      "fired": true,
+      "fired_at_seconds": 1.003601599484682,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 3,
+      "fired": true,
+      "fired_at_seconds": 3.012422401458025,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 6,
+      "fired": true,
+      "fired_at_seconds": 6.006869699805975,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 9,
+      "fired": true,
+      "fired_at_seconds": 9.001150600612164,
+      "python_ok": true,
+      "python_output": "None"
+    }
+  ],
+  "actor_setup": [
+    {
+      "class": "/Script/Engine.CameraActor",
+      "class_resolved": true,
+      "requested_count": 1,
+      "spawned_count": 1,
+      "actors": [
+        {
+          "spawned": true,
+          "name": "CameraActor_0",
+          "runtime_class": "/Script/Engine.CameraActor",
+          "applied": [],
+          "unmatched": []
+        }
+      ]
+    }
+  ]
+}

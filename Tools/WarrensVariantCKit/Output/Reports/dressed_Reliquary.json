@@ -1,0 +1,62 @@
+{
+  "tile": "Reliquary",
+  "asset": "/Game/Mars/Maps/Variants/v8c/LI_Warrens_Reliquary",
+  "instances": 1565,
+  "hism_groups": 14,
+  "counts": {
+    "BACKING_TX01": 464,
+    "BACKING_TX02": 310,
+    "CCS13": 310,
+    "CCS13_TX01": 53,
+    "CCS15": 411,
+    "CCS60": 3,
+    "CCS61": 3,
+    "CCS62": 3,
+    "CCS64": 3,
+    "WVC026": 1,
+    "WVC053": 1,
+    "WVC054": 1,
+    "WVC060": 1,
+    "WVC081": 1
+  },
+  "material_overrides": [
+    {
+      "actor": "Warrens_Greybox_floor",
+      "component": "HierarchicalInstancedStaticMesh",
+      "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX04.M_CCK_TX04"
+    },
+    {
+      "actor": "Warrens_Greybox_wall",
+      "component": "HierarchicalInstancedStaticMesh",
+      "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX01.M_CCK_TX01"
+    },
+    {
+      "actor": "Warrens_Greybox_roof",
+      "component": "HierarchicalInstancedStaticMesh",
+      "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX01.M_CCK_TX01"
+    },
+    {
+      "actor": "Warrens_Greybox_ramp",
+      "component": "HierarchicalInstancedStaticMesh",
+      "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX02.M_CCK_TX02"
+    },
+    {
+      "actor": "Warrens_Greybox_prop",
+      "component": "HierarchicalInstancedStaticMesh",
+      "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX01.M_CCK_TX01"
+    }
+  ],
+  "gate_bindings": [
+    {
+      "actor": "Warrens_Mars_Gate_EntityScript_9",
+      "property": "MaterialOverride",
+      "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX09.M_CCK_TX09"
+    },
+    {
+      "actor": "Warrens_Mars_Anchor_Spawn_EntityScript_17",
+      "property": "GateMaterialOverride",
+      "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX09.M_CCK_TX09"
+    }
+  ],
+  "rollback": "D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\Reports\\Backups\\20261024-062002\\LI_Warrens_Reliquary.umap"
+}

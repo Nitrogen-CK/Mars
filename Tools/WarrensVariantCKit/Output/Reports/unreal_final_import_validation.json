@@ -1,0 +1,988 @@
+{
+  "status": "passed",
+  "generated_utc": "2026-10-24T18:47:35.570703+00:00",
+  "meshes": [
+    {
+      "id": "CCS01",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS01_CausewayDeckBay_Mars_SM.WarrensC_CCS01_CausewayDeckBay_Mars_SM",
+      "source_sha256": "0509780a7c7262600b032518d8df1ac0840c6c5b5b0c57c17abb532b363a274c"
+    },
+    {
+      "id": "CCS02",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS02_CausewayEndClosure_Mars_SM.WarrensC_CCS02_CausewayEndClosure_Mars_SM",
+      "source_sha256": "cefec95ed99fc43bd5176d020bda651430b28129c36f88ae43e96b20dae78935"
+    },
+    {
+      "id": "CCS03",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS03_DeckEdgeFascia_Mars_SM.WarrensC_CCS03_DeckEdgeFascia_Mars_SM",
+      "source_sha256": "dd2fd70fd806dc3cce19cd3dcb48dd5cc9621cdecbffe37b9fb50dd1540f9f2d"
+    },
+    {
+      "id": "CCS04",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS04_DeckUndersideRib_Mars_SM.WarrensC_CCS04_DeckUndersideRib_Mars_SM",
+      "source_sha256": "db973ba3ec21e864c080549711bd4cd6c26b1e4398b168b9f57f06ab6050c10b"
+    },
+    {
+      "id": "CCS05",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS05_BankAbutment_Mars_SM.WarrensC_CCS05_BankAbutment_Mars_SM",
+      "source_sha256": "6246ca5ba5e07817265bc67f2c316604bb4e7d354f2f4b050ab8fb44b11cc4d4"
+    },
+    {
+      "id": "CCS06",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS06_SupportPierShell_Mars_SM.WarrensC_CCS06_SupportPierShell_Mars_SM",
+      "source_sha256": "3324afb436552605cf5b4bd3f6f3b081f649943fb089d9b4ed4374cfd4f3a271"
+    },
+    {
+      "id": "CCS07",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS07_PierWaterlineCollar_Mars_SM.WarrensC_CCS07_PierWaterlineCollar_Mars_SM",
+      "source_sha256": "20fc7de5e2b15479358b03d351f843af784b26954109ea53c465617d5f96d131"
+    },
+    {
+      "id": "CCS08",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS08_BankCopingStrip_Mars_SM.WarrensC_CCS08_BankCopingStrip_Mars_SM",
+      "source_sha256": "2f82140f5db6b1944a6ea717eeb38bbf642e7300a8d81c8f3b64eda1723b7daa"
+    },
+    {
+      "id": "CCS09",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS09_RailPost_Mars_SM.WarrensC_CCS09_RailPost_Mars_SM",
+      "source_sha256": "d92480cbcd0ccb09b93d82b3a6afa071ce37d587bf4cad5a6999b4f639986063"
+    },
+    {
+      "id": "CCS10",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS10_RailCap_Mars_SM.WarrensC_CCS10_RailCap_Mars_SM",
+      "source_sha256": "387bf2a58c0ad46c509f7352d684814d5b529dd9aa8f1c93579de877cdb796fb"
+    },
+    {
+      "id": "CCS11",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS11_RailInfillBay_Mars_SM.WarrensC_CCS11_RailInfillBay_Mars_SM",
+      "source_sha256": "e7a5783352079770a18343735424e405dde8a2ba8152b01620de288c91072510"
+    },
+    {
+      "id": "CCS12",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS12_RailEndTerminal_Mars_SM.WarrensC_CCS12_RailEndTerminal_Mars_SM",
+      "source_sha256": "567e18cf5b931e831a789919a52ed024096b29456cb91c8d7ba655bb7797f79d"
+    },
+    {
+      "id": "CCS13",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS13_RoomFloorBay_Mars_SM.WarrensC_CCS13_RoomFloorBay_Mars_SM",
+      "source_sha256": "ee4c8a90dcb8092ff3f3f463b1dc55ce276f8ef4ee2fc9395cdd331576855586"
+    },
+    {
+      "id": "CCS14",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS14_FloorFillerBay_Mars_SM.WarrensC_CCS14_FloorFillerBay_Mars_SM",
+      "source_sha256": "c5f46f299d592f3447b8748dd160b285218258570be324d350232f1c2fefbf30"
+    },
+    {
+      "id": "CCS15",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS15_RoomWallBay_Mars_SM.WarrensC_CCS15_RoomWallBay_Mars_SM",
+      "source_sha256": "df3dbd658247e2a930dc9405454ad1c168c757d2a375e5f2aecbe89642de8cab"
+    },
+    {
+      "id": "CCS16",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS16_WallCornerPier_Mars_SM.WarrensC_CCS16_WallCornerPier_Mars_SM",
+      "source_sha256": "35e5872f6364a9c01a6af8c985051f1429030dddee95a215ffc790ad7f2df72f"
+    },
+    {
+      "id": "CCS17",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS17_ArchSurround_Mars_SM.WarrensC_CCS17_ArchSurround_Mars_SM",
+      "source_sha256": "a075bbb65478022bdec43a8fbdb3959162ffaceb30b9f09ef358d09e6ea40122"
+    },
+    {
+      "id": "CCS18",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS18_VaultCeilingBay_Mars_SM.WarrensC_CCS18_VaultCeilingBay_Mars_SM",
+      "source_sha256": "b8afd5900296cec391f371177e68e9a295c7fbacf155a66343d980c770ce6bfc"
+    },
+    {
+      "id": "CCS19",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS19_PlasterRepairPatch_Mars_SM.WarrensC_CCS19_PlasterRepairPatch_Mars_SM",
+      "source_sha256": "f8a2290437d7306e3d370e965295285538a37e97764ffc32837a92a32f788c9f"
+    },
+    {
+      "id": "CCS20",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS20_StairAndThresholdFascia_Mars_SM.WarrensC_CCS20_StairAndThresholdFascia_Mars_SM",
+      "source_sha256": "67f3e46de07eda2e4748e3a5e2214f2db1f4ca8800e482fcca4a730a9c568a62"
+    },
+    {
+      "id": "CCS21",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS21_HandwheelBody_Mars_SM.WarrensC_CCS21_HandwheelBody_Mars_SM",
+      "source_sha256": "bef63318e8fbaf81001084c3565804d2c01ec3f36260d29225191107490afe3e"
+    },
+    {
+      "id": "CCS22",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS22_WheelAxleStub_Mars_SM.WarrensC_CCS22_WheelAxleStub_Mars_SM",
+      "source_sha256": "57e0ea2143ca4447ba0a4881518d1010fda647c35f61e0a79aa5f76b0aadc880"
+    },
+    {
+      "id": "CCS23",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS23_WheelMountHousing_Mars_SM.WarrensC_CCS23_WheelMountHousing_Mars_SM",
+      "source_sha256": "efc1ac254742e709d0a6a78385dfce3b0aa7f7b66973034ee957d09d322ad219"
+    },
+    {
+      "id": "CCS24",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS24_ChainDrum_Mars_SM.WarrensC_CCS24_ChainDrum_Mars_SM",
+      "source_sha256": "8b7c415e42bc8922f51f1eda8ef1f0a42917a3d55fc33ca9d19ba0a6dc252088"
+    },
+    {
+      "id": "CCS25",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS25_AxleBearingBlock_Mars_SM.WarrensC_CCS25_AxleBearingBlock_Mars_SM",
+      "source_sha256": "fb63a88f313a8c00c9542ff1827e97b825c237121daa85c5e6a99487bcdf2de4"
+    },
+    {
+      "id": "CCS26",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS26_PawlCover_Mars_SM.WarrensC_CCS26_PawlCover_Mars_SM",
+      "source_sha256": "1581a7a983a379fee29e961c5300afe492232a0ec9ba1c5a4d38bfee4f05b2ed"
+    },
+    {
+      "id": "CCS27",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS27_HeavyChainLink_Mars_SM.WarrensC_CCS27_HeavyChainLink_Mars_SM",
+      "source_sha256": "0afa611d2add6e0bae605852b1734d9a27638762d0d3ab9b956b56ab90f4724d"
+    },
+    {
+      "id": "CCS28",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS28_ChainCornerGuide_Mars_SM.WarrensC_CCS28_ChainCornerGuide_Mars_SM",
+      "source_sha256": "afd6bd7100e31328590100d9e0a5462adb08314b60914b58e8c97d63dda54e03"
+    },
+    {
+      "id": "CCS29",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS29_FloorChainGuide_Mars_SM.WarrensC_CCS29_FloorChainGuide_Mars_SM",
+      "source_sha256": "1560207e2eff655df85154b42c95a0fb46a736f66172d2ed1ce30ba35cb18b52"
+    },
+    {
+      "id": "CCS30",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS30_ChainEndAnchor_Mars_SM.WarrensC_CCS30_ChainEndAnchor_Mars_SM",
+      "source_sha256": "915583e89a288101d268b6b083c677572adbd62d633d1dbbc464ae3ed21be5ce"
+    },
+    {
+      "id": "CCS31",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS31_WallFairlead_Mars_SM.WarrensC_CCS31_WallFairlead_Mars_SM",
+      "source_sha256": "8ae1a9ab77a121e9d96416d386db02302a3e8c21697f80d62509e154498092da"
+    },
+    {
+      "id": "CCS32",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS32_OverheadChainHanger_Mars_SM.WarrensC_CCS32_OverheadChainHanger_Mars_SM",
+      "source_sha256": "7758020116989eb984ff558046f446d7d90ea4d601f0f5561e65c92dca4f02b4"
+    },
+    {
+      "id": "CCS33",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS33_RisingBarGateLeaf_Mars_SM.WarrensC_CCS33_RisingBarGateLeaf_Mars_SM",
+      "source_sha256": "db2aa13cdf96384b9e80e5d9c461654e0ada5a0954d05318136d4d463a631501"
+    },
+    {
+      "id": "CCS34",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS34_GateFramePost_Mars_SM.WarrensC_CCS34_GateFramePost_Mars_SM",
+      "source_sha256": "8e1db95b915e77d380398de4c68e660638b8c60311c565ede76925adb4362ce2"
+    },
+    {
+      "id": "CCS35",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS35_GateLintel_Mars_SM.WarrensC_CCS35_GateLintel_Mars_SM",
+      "source_sha256": "cef27d2e2b1650b58e642bdf9afe7b8fc392c786ce5a45b88b05ac0beb4c5a18"
+    },
+    {
+      "id": "CCS36",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS36_GateGuideChannel_Mars_SM.WarrensC_CCS36_GateGuideChannel_Mars_SM",
+      "source_sha256": "b56f1d1e2651bd0dc78ebced8c65613c78aadfb9a66726b1fc85cc77be16d79c"
+    },
+    {
+      "id": "CCS37",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS37_GateTopHood_Mars_SM.WarrensC_CCS37_GateTopHood_Mars_SM",
+      "source_sha256": "8ab08c15b9e7e36dce233de50b6a607b520ab60ac1aa307c4b2f467f8ea01f8b"
+    },
+    {
+      "id": "CCS38",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS38_GateStopShoe_Mars_SM.WarrensC_CCS38_GateStopShoe_Mars_SM",
+      "source_sha256": "2142aa99de08b5c5994ea45e34c5d3659982911afb0f7812656285ef93cb7ce0"
+    },
+    {
+      "id": "CCS39",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS39_CounterweightCase_Mars_SM.WarrensC_CCS39_CounterweightCase_Mars_SM",
+      "source_sha256": "c2ece72c126495947dd30ed8e0d638063bc62ccfe4c6ab91f5b1c1142d154b50"
+    },
+    {
+      "id": "CCS40",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS40_ExistingShortcutLeverHandle_Mars_SM.WarrensC_CCS40_ExistingShortcutLeverHandle_Mars_SM",
+      "source_sha256": "d81414c3890ffe42b4eaa83787e6add3bf1c728ea7e2674e2c8d7ec8ac319868"
+    },
+    {
+      "id": "CCS41",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS41_LeverMountBase_Mars_SM.WarrensC_CCS41_LeverMountBase_Mars_SM",
+      "source_sha256": "f4c05a57791fefe10f362dcf7cef7e23bf0842678fbdc0cfd1174e93824b8f32"
+    },
+    {
+      "id": "CCS42",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS42_FastenerAndPinKit_Mars_SM.WarrensC_CCS42_FastenerAndPinKit_Mars_SM",
+      "source_sha256": "f2b003f44294daa651bce849167eb9c0261c3715085cad350172537881f1c1f2"
+    },
+    {
+      "id": "CCS43",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS43_LargeBankRock_Mars_SM.WarrensC_CCS43_LargeBankRock_Mars_SM",
+      "source_sha256": "1f7c4cfa2ad016069eef37522ae79b1eeb17861df405af74c8e248d339d031e0"
+    },
+    {
+      "id": "CCS44",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS44_MediumRockWedge_Mars_SM.WarrensC_CCS44_MediumRockWedge_Mars_SM",
+      "source_sha256": "0613c94ff4cd7e3d95c1587cebdeb463c24d2fd5a78be6e970918e1840045275"
+    },
+    {
+      "id": "CCS45",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS45_CaveWallPanel_Mars_SM.WarrensC_CCS45_CaveWallPanel_Mars_SM",
+      "source_sha256": "20cafe2cd0c9fceaeace009025ec29cfa8431cdd7a8d22900b0b600e798d06d6"
+    },
+    {
+      "id": "CCS46",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS46_CaveInsideCorner_Mars_SM.WarrensC_CCS46_CaveInsideCorner_Mars_SM",
+      "source_sha256": "6fb8166258641cc6d8c3747371dc1ce1bf42b777e8634a8fd4c662d5e735ebaf"
+    },
+    {
+      "id": "CCS47",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS47_CaveCeilingCap_Mars_SM.WarrensC_CCS47_CaveCeilingCap_Mars_SM",
+      "source_sha256": "9d510ccdc5576eceba9bd796f4da3c9b5b4dc587e19d2de6e5b83292813743f4"
+    },
+    {
+      "id": "CCS48",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS48_WetBankSkirt_Mars_SM.WarrensC_CCS48_WetBankSkirt_Mars_SM",
+      "source_sha256": "62a9ca27526a0b1586c25ff02dc323e36a83ec2ea200664d0a88d37a0e69b841"
+    },
+    {
+      "id": "CCS49",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS49_TallCliffFace_Mars_SM.WarrensC_CCS49_TallCliffFace_Mars_SM",
+      "source_sha256": "c13297c31b25012c413c78bf9634c61d12f8841744d38751c87f5a610fab2cff"
+    },
+    {
+      "id": "CCS50",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS50_WallToeRubble_Mars_SM.WarrensC_CCS50_WallToeRubble_Mars_SM",
+      "source_sha256": "d910df370abeedc7ddf7f109b500b966879d61ec626e3bcbb2c10b9009a49893"
+    },
+    {
+      "id": "CCS51",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS51_DeepCanalSurface_Mars_SM.WarrensC_CCS51_DeepCanalSurface_Mars_SM",
+      "source_sha256": "8998e347f4c22632f5bbc2bf9fe1f75893d57ce32bc7a3612725bf7be714d346"
+    },
+    {
+      "id": "CCS52",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS52_FoamEdgeStrip_Mars_SM.WarrensC_CCS52_FoamEdgeStrip_Mars_SM",
+      "source_sha256": "aaf148ac19e10ee0d0886c0b02c67ae639240934b3814ee930e801b5779f2bb2"
+    },
+    {
+      "id": "CCS53",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS53_WallWaterlineCard_Mars_SM.WarrensC_CCS53_WallWaterlineCard_Mars_SM",
+      "source_sha256": "4622a3ab9c4d4b74dcb811c61db792d94db3a463d2de7396c6a08b7c939f2b2e"
+    },
+    {
+      "id": "CCS54",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS54_BrineGutter_Mars_SM.WarrensC_CCS54_BrineGutter_Mars_SM",
+      "source_sha256": "d69a99040fa101ce8e88537d2e6a1b0c18a4a58428d1b44a50a02f7aa26600ab"
+    },
+    {
+      "id": "CCS55",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS55_WallSpout_Mars_SM.WarrensC_CCS55_WallSpout_Mars_SM",
+      "source_sha256": "78c1edd692a884f0ddb91d0ec741d11c23bcfb5996bb988b0495b33ec241dfc8"
+    },
+    {
+      "id": "CCS56",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS56_OutletFlowRibbon_Mars_SM.WarrensC_CCS56_OutletFlowRibbon_Mars_SM",
+      "source_sha256": "4cb4ce2a9bc6832c89f365bd78b3595d93e2733f79f0d59ebed22cfebc049301"
+    },
+    {
+      "id": "CCS57",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS57_DripRippleCard_Mars_SM.WarrensC_CCS57_DripRippleCard_Mars_SM",
+      "source_sha256": "1b5ea92fc903ef797865a53e3312c5ba5832918848769f7a17e0c15006e9c7a0"
+    },
+    {
+      "id": "CCS58",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS58_VerticalDripCard_Mars_SM.WarrensC_CCS58_VerticalDripCard_Mars_SM",
+      "source_sha256": "a63d65549fb3516c92e480fba221c161f34c3d2185a0e704ebd6ae3106095161"
+    },
+    {
+      "id": "CCS59",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS59_FloorPuddleCard_Mars_SM.WarrensC_CCS59_FloorPuddleCard_Mars_SM",
+      "source_sha256": "f870ecd2d048ce8992a246795925663416d2474fc47388f14ec4276933f16b30"
+    },
+    {
+      "id": "CCS60",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS60_LanternHousing_Mars_SM.WarrensC_CCS60_LanternHousing_Mars_SM",
+      "source_sha256": "5d91007f0441157d9e33a45ea8bcaeb61909f1afb166e8ab0899c92eae8ba084"
+    },
+    {
+      "id": "CCS61",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS61_LanternGlass_Mars_SM.WarrensC_CCS61_LanternGlass_Mars_SM",
+      "source_sha256": "2333a351280894c6c26a9ded6e91adae1c20159148883994772eebb39cae1321"
+    },
+    {
+      "id": "CCS62",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS62_WallLanternHook_Mars_SM.WarrensC_CCS62_WallLanternHook_Mars_SM",
+      "source_sha256": "52a83f41f1c8f14326230ec49f4ce8f5b7d1962975df6275d43b5773a2e38cfd"
+    },
+    {
+      "id": "CCS63",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS63_SconceFixture_Mars_SM.WarrensC_CCS63_SconceFixture_Mars_SM",
+      "source_sha256": "7c0a04a194bbf73333d93640ac8ab314ebadb9d28d3ac47bd5f53eb617634665"
+    },
+    {
+      "id": "CCS64",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS64_FlameCard_Mars_SM.WarrensC_CCS64_FlameCard_Mars_SM",
+      "source_sha256": "18b1fc3d9d1d98d69187f9d123b400d7c0fbc84ea63b4c4d49940b1920056ad1"
+    },
+    {
+      "id": "CCS65",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS65_LanternRestSet_Mars_SM.WarrensC_CCS65_LanternRestSet_Mars_SM",
+      "source_sha256": "690c36e04c3f21d35b5d3297fa898cb518be3b0791d297470dd17e53077ca463"
+    },
+    {
+      "id": "CCS66",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS66_BrineBarrel_Mars_SM.WarrensC_CCS66_BrineBarrel_Mars_SM",
+      "source_sha256": "f5e9e1dd92591cbc40469eefe2cf3870e88f82131a9c89de2d05f6098f7e0d97"
+    },
+    {
+      "id": "CCS67",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS67_CrateBodyAndLid_Mars_SM.WarrensC_CCS67_CrateBodyAndLid_Mars_SM",
+      "source_sha256": "ec35d74423106e8464986b70dbf24783ae1434028e3998ae4d9bb3fa7af16d49"
+    },
+    {
+      "id": "CCS68",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS68_ClothSack_Mars_SM.WarrensC_CCS68_ClothSack_Mars_SM",
+      "source_sha256": "94d0ad5788475715a4c6aba5d32825da72a699082e36e9e1e128ae2817ed50a3"
+    },
+    {
+      "id": "CCS69",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS69_StorageShelf_Mars_SM.WarrensC_CCS69_StorageShelf_Mars_SM",
+      "source_sha256": "3490556d20e02c89471b2934eba6571637baac75a520e23a0e6b744bff487bdb"
+    },
+    {
+      "id": "CCS70",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS70_SaltChunkCluster_Mars_SM.WarrensC_CCS70_SaltChunkCluster_Mars_SM",
+      "source_sha256": "ef444976746201d8703d87f3753ac09db23cc03ae4a6dff73963f23d82e3c5c2"
+    },
+    {
+      "id": "CCS71",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS71_RopeCoil_Mars_SM.WarrensC_CCS71_RopeCoil_Mars_SM",
+      "source_sha256": "c1a97d3e99308441ce30751e9025c7dea1f3d37d54b439e04de6aa4fd2bf4b68"
+    },
+    {
+      "id": "CCS72",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS72_RepairPlank_Mars_SM.WarrensC_CCS72_RepairPlank_Mars_SM",
+      "source_sha256": "a8485a78cd8f7745a3985ebdb45cd244ae0a628f4731202a84cfff838cd06b1f"
+    },
+    {
+      "id": "CCS73",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS73_BoltedRepairPlate_Mars_SM.WarrensC_CCS73_BoltedRepairPlate_Mars_SM",
+      "source_sha256": "3f5e8c3e4b2e4e484dc52031b92739fd920e6b4da0bb9fff8292725edd5fef9e"
+    },
+    {
+      "id": "CCS74",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS74_ClothScrap_Mars_SM.WarrensC_CCS74_ClothScrap_Mars_SM",
+      "source_sha256": "23caed52fe3f45cd94eb4e285abb71d039e37fbbf3c04ea6b40de79bc94d0f5c"
+    },
+    {
+      "id": "CCS75",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS75_MaintenanceBucket_Mars_SM.WarrensC_CCS75_MaintenanceBucket_Mars_SM",
+      "source_sha256": "8454293e6687f3d2e4c8f29c12c73454e028f7dba36ca17f7bbec49d4ba4ae9e"
+    },
+    {
+      "id": "CCS76",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS76_LongLadle_Mars_SM.WarrensC_CCS76_LongLadle_Mars_SM",
+      "source_sha256": "81cdbc3f846eebdf7d33332ec9db256f4a6ae33c6cd869b1a744a6229be39655"
+    },
+    {
+      "id": "CCS77",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS77_ReedBasket_Mars_SM.WarrensC_CCS77_ReedBasket_Mars_SM",
+      "source_sha256": "b16aeed75da4c21450da0e6c13e85495f8db015c193eae2a503415524368fccd"
+    },
+    {
+      "id": "CCS78",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS78_MaintenanceNoticeBoard_Mars_SM.WarrensC_CCS78_MaintenanceNoticeBoard_Mars_SM",
+      "source_sha256": "98a1ad058211a620a34877712f2761524eddd85485b76371deddf20351d16f89"
+    },
+    {
+      "id": "CCS79",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS79_SluiceIdentityPlaque_Mars_SM.WarrensC_CCS79_SluiceIdentityPlaque_Mars_SM",
+      "source_sha256": "a3019f19ffe7e9e54aa8f3312b5d4269bdb62ab3315181cc2cd447f9e407504b"
+    },
+    {
+      "id": "CCS80",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS80_RouteMarkerPlate_Mars_SM.WarrensC_CCS80_RouteMarkerPlate_Mars_SM",
+      "source_sha256": "0417c45a6a350fe1a8c0659e88f86a0917f235fcabbc769597801f5da1581632"
+    },
+    {
+      "id": "CCS81",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS81_BankClothMarker_Mars_SM.WarrensC_CCS81_BankClothMarker_Mars_SM",
+      "source_sha256": "44ec543163a22722e1e90ffe383dce836688cba6217b5d27fc330f1356731e97"
+    },
+    {
+      "id": "CCS82",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS82_SaltWearDecalCarrier_Mars_SM.WarrensC_CCS82_SaltWearDecalCarrier_Mars_SM",
+      "source_sha256": "d64c4d3e4d34d84f858f359a841ca97639fd585ee352c691dd8838057fec5e47"
+    },
+    {
+      "id": "CCS83",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS83_DampStreakDecalCarrier_Mars_SM.WarrensC_CCS83_DampStreakDecalCarrier_Mars_SM",
+      "source_sha256": "3a19553d5ab3eaf238d0e3bb6e346e9632b9706b91c0145164423f6d36fac4d0"
+    },
+    {
+      "id": "CCS84",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS84_CobwebCorner_Mars_SM.WarrensC_CCS84_CobwebCorner_Mars_SM",
+      "source_sha256": "49a7684e2d586cb283080d8e0f050008f373747d37be0037fa2e351e54f917b7"
+    },
+    {
+      "id": "CCS85",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS85_BrokenFloorTile_Mars_SM.WarrensC_CCS85_BrokenFloorTile_Mars_SM",
+      "source_sha256": "8abee7f5612746ffe220aabd98af8ffe30bdf429d49d9923fc937da53aa81aaf"
+    },
+    {
+      "id": "CCS86",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS86_TimberSupportBeam_Mars_SM.WarrensC_CCS86_TimberSupportBeam_Mars_SM",
+      "source_sha256": "c516710ef6a873408e6954f7c2d1fd2b36aee4ff255a116ed378fde455f48709"
+    },
+    {
+      "id": "CCS87",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS87_DiagonalTimberBrace_Mars_SM.WarrensC_CCS87_DiagonalTimberBrace_Mars_SM",
+      "source_sha256": "2a2dec5948f79883566d0fbd1005bf29da62aaab0b4cf8a626d4a575b6f33921"
+    },
+    {
+      "id": "CCS88",
+      "path": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS88_FloorDrainAndGrille_Mars_SM.WarrensC_CCS88_FloorDrainAndGrille_Mars_SM",
+      "source_sha256": "f6351a906b35ba296dd132087476000b69220937de42644aa162d6edb3c8cab3"
+    },
+    {
+      "id": "PWC01",
+      "path": "/Game/Mars/Environment/PumpCisternKit/Meshes/WarrensC_PWC01_PumpTowerBody_Mars_SM.WarrensC_PWC01_PumpTowerBody_Mars_SM",
+      "source_sha256": "93e656d8fd514683657c69482e7e75d5d69e550c8839f34d18dc7694928d94b2"
+    },
+    {
+      "id": "PWC02",
+      "path": "/Game/Mars/Environment/PumpCisternKit/Meshes/WarrensC_PWC02_PumpFlywheel_Mars_SM.WarrensC_PWC02_PumpFlywheel_Mars_SM",
+      "source_sha256": "32e1a18d2153ab04f93e9af9cb16f97fed0873ec9ea224610253540bf778189b"
+    },
+    {
+      "id": "PWC03",
+      "path": "/Game/Mars/Environment/PumpCisternKit/Meshes/WarrensC_PWC03_PistonRod_Mars_SM.WarrensC_PWC03_PistonRod_Mars_SM",
+      "source_sha256": "dfb3ddbf0637afd9060cdf7bd6542ebc0256fef4b5c26529c13962eecd72e16b"
+    },
+    {
+      "id": "PWC04",
+      "path": "/Game/Mars/Environment/PumpCisternKit/Meshes/WarrensC_PWC04_PumpDiagonalBrace_Mars_SM.WarrensC_PWC04_PumpDiagonalBrace_Mars_SM",
+      "source_sha256": "de4aa623d67b84efef2418584b5797b899eb573f8e7afe98106f42d6ede896c6"
+    },
+    {
+      "id": "PWC05",
+      "path": "/Game/Mars/Environment/PumpCisternKit/Meshes/WarrensC_PWC05_PipeStraight_Mars_SM.WarrensC_PWC05_PipeStraight_Mars_SM",
+      "source_sha256": "8432c6e1fc099e2445347c3a8c978ad92f8cc368e9bd5800cd0ccb0d10984d9a"
+    },
+    {
+      "id": "PWC06",
+      "path": "/Game/Mars/Environment/PumpCisternKit/Meshes/WarrensC_PWC06_PipeElbow_Mars_SM.WarrensC_PWC06_PipeElbow_Mars_SM",
+      "source_sha256": "9a26f700643c5734990612abb50dc2a796eeaa0e992c26e5aab8ab4e9fc630b1"
+    },
+    {
+      "id": "PWC07",
+      "path": "/Game/Mars/Environment/PumpCisternKit/Meshes/WarrensC_PWC07_PipeCollar_Mars_SM.WarrensC_PWC07_PipeCollar_Mars_SM",
+      "source_sha256": "1dc7f890bfd546eaa73ee88c692ea5b18e5f7837b4b587901adc675fea002048"
+    },
+    {
+      "id": "PWC08",
+      "path": "/Game/Mars/Environment/PumpCisternKit/Meshes/WarrensC_PWC08_PipeWallBracket_Mars_SM.WarrensC_PWC08_PipeWallBracket_Mars_SM",
+      "source_sha256": "38f1cd62f1c1ddfbda01832136629a9d0c81d6a76d9719b24204e968bbd4006c"
+    },
+    {
+      "id": "PWC09",
+      "path": "/Game/Mars/Environment/PumpCisternKit/Meshes/WarrensC_PWC09_PipeEndCap_Mars_SM.WarrensC_PWC09_PipeEndCap_Mars_SM",
+      "source_sha256": "339c064cf588f6daa472affd453ec4d76625650b15cf6dc929ce586b82530079"
+    },
+    {
+      "id": "PWC10",
+      "path": "/Game/Mars/Environment/PumpCisternKit/Meshes/WarrensC_PWC10_CisternRimStraight_Mars_SM.WarrensC_PWC10_CisternRimStraight_Mars_SM",
+      "source_sha256": "ab45889ba4336276d7e7848129355acc5eb51a7110d3b8fde3e499bbafb7b538"
+    },
+    {
+      "id": "PWC11",
+      "path": "/Game/Mars/Environment/PumpCisternKit/Meshes/WarrensC_PWC11_CisternRimInnerCorner_Mars_SM.WarrensC_PWC11_CisternRimInnerCorner_Mars_SM",
+      "source_sha256": "87fda48f4a63849b7f3ff99045dc2e7e4910c5f9a1410c023fbaa65e1e1ad45b"
+    },
+    {
+      "id": "PWC12",
+      "path": "/Game/Mars/Environment/PumpCisternKit/Meshes/WarrensC_PWC12_CisternRimEnd_Mars_SM.WarrensC_PWC12_CisternRimEnd_Mars_SM",
+      "source_sha256": "31031b7e3c316a1670c82ba9cc9c33e30033b36798de1bfff3a2919e219f22a4"
+    },
+    {
+      "id": "PWC13",
+      "path": "/Game/Mars/Environment/PumpCisternKit/Meshes/WarrensC_PWC13_WaterGaugeBoard_Mars_SM.WarrensC_PWC13_WaterGaugeBoard_Mars_SM",
+      "source_sha256": "c5ebb771698f6030eea8f04606a61f16592c2409a04f2f0b35e3aa88bceb2d91"
+    },
+    {
+      "id": "PWC14",
+      "path": "/Game/Mars/Environment/PumpCisternKit/Meshes/WarrensC_PWC14_RootFork_Mars_SM.WarrensC_PWC14_RootFork_Mars_SM",
+      "source_sha256": "f014eeb30fc080251440b16704c04372bc3f001ffbea2ef00ee2d3d149bad9d5"
+    },
+    {
+      "id": "PWC15",
+      "path": "/Game/Mars/Environment/PumpCisternKit/Meshes/WarrensC_PWC15_RootTendril_Mars_SM.WarrensC_PWC15_RootTendril_Mars_SM",
+      "source_sha256": "04bbc332a459876432e33ceb14ecf57bbfe21f351521a458a0e393634b1a4232"
+    },
+    {
+      "id": "PWC16",
+      "path": "/Game/Mars/Environment/PumpCisternKit/Meshes/WarrensC_PWC16_RootSocketCollar_Mars_SM.WarrensC_PWC16_RootSocketCollar_Mars_SM",
+      "source_sha256": "2a8fff9c8b4101ecfe74b8e1d2b382092b4ac204971edd5138a8b8912230b2dc"
+    },
+    {
+      "id": "PWC17",
+      "path": "/Game/Mars/Environment/PumpCisternKit/Meshes/WarrensC_PWC17_CisternBedPebbleCluster_Mars_SM.WarrensC_PWC17_CisternBedPebbleCluster_Mars_SM",
+      "source_sha256": "7178087528d8a757b34ccecd0200a29a60f177ff4f7b3d18e28becf683ead0f2"
+    },
+    {
+      "id": "PWC18",
+      "path": "/Game/Mars/Environment/PumpCisternKit/Meshes/WarrensC_PWC18_PipeRepairWrap_Mars_SM.WarrensC_PWC18_PipeRepairWrap_Mars_SM",
+      "source_sha256": "324d85de8638759a47b97e909f9381568aca72f6e248819eaa8fa762c51f23a4"
+    },
+    {
+      "id": "PWC19",
+      "path": "/Game/Mars/Environment/PumpCisternKit/Meshes/WarrensC_PWC19_ToolRack_Mars_SM.WarrensC_PWC19_ToolRack_Mars_SM",
+      "source_sha256": "202ea9c6e49b08c2821131aa6ab7c1aedefdd8dfeee3fbb791a60e1c193165ee"
+    },
+    {
+      "id": "PWC20",
+      "path": "/Game/Mars/Environment/PumpCisternKit/Meshes/WarrensC_PWC20_Spanner_Mars_SM.WarrensC_PWC20_Spanner_Mars_SM",
+      "source_sha256": "8baa576c661fafd1bc1d2ee5bfea860bbab51162e263cf58bfc22b12c03159d9"
+    },
+    {
+      "id": "PWC21",
+      "path": "/Game/Mars/Environment/PumpCisternKit/Meshes/WarrensC_PWC21_Bucket_Mars_SM.WarrensC_PWC21_Bucket_Mars_SM",
+      "source_sha256": "0b1543621860fe6ef6e0c2d04c62f3214bf650ae006efa47f09adbc84c1125aa"
+    },
+    {
+      "id": "PWC22",
+      "path": "/Game/Mars/Environment/PumpCisternKit/Meshes/WarrensC_PWC22_TallowDripTray_Mars_SM.WarrensC_PWC22_TallowDripTray_Mars_SM",
+      "source_sha256": "9768be8631641f88026008f5ac4b793539f84ad06dcf6dbfda702b47c70811d4"
+    },
+    {
+      "id": "PWC23",
+      "path": "/Game/Mars/Environment/PumpCisternKit/Meshes/WarrensC_PWC23_CandleStub_Mars_SM.WarrensC_PWC23_CandleStub_Mars_SM",
+      "source_sha256": "215ae6bc31b5c5587f41f59428044293dd353197acb531e81a27307b7abb2801"
+    },
+    {
+      "id": "PWC24",
+      "path": "/Game/Mars/Environment/PumpCisternKit/Meshes/WarrensC_PWC24_ClothBanner_Mars_SM.WarrensC_PWC24_ClothBanner_Mars_SM",
+      "source_sha256": "3258a34ef590adcf67868c7d01b83b3483ddc2bc05539683a9f9f71a8ab56367"
+    },
+    {
+      "id": "PWC25",
+      "path": "/Game/Mars/Environment/PumpCisternKit/Meshes/WarrensC_PWC25_CisternWaterSurface_Mars_SM.WarrensC_PWC25_CisternWaterSurface_Mars_SM",
+      "source_sha256": "218f5f177b6f30c9136a3763e628ea0fe0d6679aa3488033fefc5823114e9492"
+    },
+    {
+      "id": "WVC001",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC001_PierBase_Mars_SM.WarrensC_WVC001_PierBase_Mars_SM",
+      "source_sha256": "29df5affac745f5fd2b55b658d16e48aea6364a964b5ed320ef1e3135dc9aeb9"
+    },
+    {
+      "id": "WVC002",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC002_PierCapital_Mars_SM.WarrensC_WVC002_PierCapital_Mars_SM",
+      "source_sha256": "dac8f705286826b038e9a1850f037e6d4c55c7400df80822ab619d8cbb93f2e3"
+    },
+    {
+      "id": "WVC003",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC003_ArchSurround300_Mars_SM.WarrensC_WVC003_ArchSurround300_Mars_SM",
+      "source_sha256": "62ede6ee1306163cc16c4b93993071287b906e316a423f3c96bdd33b47282531"
+    },
+    {
+      "id": "WVC004",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC004_ArchSurround250_Mars_SM.WarrensC_WVC004_ArchSurround250_Mars_SM",
+      "source_sha256": "d5a8d26df9470193966af2b532818fc476053f5e09a17cf1b65710e1c2fa6889"
+    },
+    {
+      "id": "WVC005",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC005_ArchKeystone_Mars_SM.WarrensC_WVC005_ArchKeystone_Mars_SM",
+      "source_sha256": "f3005ff2845cf17832285a460c2aec324cbadc12410e8e31180bccdaede83ce0"
+    },
+    {
+      "id": "WVC006",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC006_BoneArchRib_Mars_SM.WarrensC_WVC006_BoneArchRib_Mars_SM",
+      "source_sha256": "10e6b5ffc7917a1006138203247e47b03851c1d7b19372951148a1d36f86c177"
+    },
+    {
+      "id": "WVC007",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC007_BoneBridgePost_Mars_SM.WarrensC_WVC007_BoneBridgePost_Mars_SM",
+      "source_sha256": "d7dd271b26abf0c7070227ca2e85618f8bcad4a28cf16113799529605a1dd3eb"
+    },
+    {
+      "id": "WVC008",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC008_BoneCoping200_Mars_SM.WarrensC_WVC008_BoneCoping200_Mars_SM",
+      "source_sha256": "cf42a5e3742c05a654dc2268732248bbafb29423f4fd9d9fe73d05627cd537d7"
+    },
+    {
+      "id": "WVC009",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC009_ThresholdCover_Mars_SM.WarrensC_WVC009_ThresholdCover_Mars_SM",
+      "source_sha256": "e08303e4a6c3770833109b72514e450f766f2d5e1eb17bdcd3eb7ac0bd72823f"
+    },
+    {
+      "id": "WVC010",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC010_BurialNicheFrame_Mars_SM.WarrensC_WVC010_BurialNicheFrame_Mars_SM",
+      "source_sha256": "feed1d773e503be25887e94d42d93107a9082e04df51a1abf4eef6f292ffd941"
+    },
+    {
+      "id": "WVC011",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC011_CrackCoverStrip_Mars_SM.WarrensC_WVC011_CrackCoverStrip_Mars_SM",
+      "source_sha256": "f00ec77710fcdb93b98b358a1bfe541df73781b675b1339a7561fb7847c25cea"
+    },
+    {
+      "id": "WVC012",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC012_WindowSurround_Mars_SM.WarrensC_WVC012_WindowSurround_Mars_SM",
+      "source_sha256": "1c589852686a6b84191cd9ed31a18336a454f4af2f740d7fcccabed4413bd0b0"
+    },
+    {
+      "id": "WVC013",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC013_WellHoistFrame_Mars_SM.WarrensC_WVC013_WellHoistFrame_Mars_SM",
+      "source_sha256": "a7a33d60bfd03bc5faae81f9081becdc500abc9098f4d30c00d7c80faa4b1410"
+    },
+    {
+      "id": "WVC014",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC014_HoistPulley_Mars_SM.WarrensC_WVC014_HoistPulley_Mars_SM",
+      "source_sha256": "1566b63cff5c54fc496c319e856390f0892bfbcf485bee24cdcccf25cc166a46"
+    },
+    {
+      "id": "WVC015",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC015_HoistDrum_Mars_SM.WarrensC_WVC015_HoistDrum_Mars_SM",
+      "source_sha256": "2ccc7a7425ccbd2ab4803119d8130ed73c66e886d4f8c2ff0c7f90a4dada4520"
+    },
+    {
+      "id": "WVC016",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC016_HoistHook_Mars_SM.WarrensC_WVC016_HoistHook_Mars_SM",
+      "source_sha256": "9481f83c269d478844df66527a4ed7ac03dc4b7edac9a953217d003827648723"
+    },
+    {
+      "id": "WVC017",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC017_HoistCage_Mars_SM.WarrensC_WVC017_HoistCage_Mars_SM",
+      "source_sha256": "1dbfcb86da276f9a58894e7daf75354d1a006ab275229117ff325ab13dab852a"
+    },
+    {
+      "id": "WVC018",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC018_BellTowerCrownModule_Mars_SM.WarrensC_WVC018_BellTowerCrownModule_Mars_SM",
+      "source_sha256": "76bda3e8967b0d10fc42f7869452e8f18947112d863d2737f9f41268d89093c8"
+    },
+    {
+      "id": "WVC019",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC019_HighLandmarkBell_Mars_SM.WarrensC_WVC019_HighLandmarkBell_Mars_SM",
+      "source_sha256": "93206ed6804de94b92d4d6845d3117434ff0a2e329b61d5c2e15e8934c416960"
+    },
+    {
+      "id": "WVC020",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC020_BellYoke_Mars_SM.WarrensC_WVC020_BellYoke_Mars_SM",
+      "source_sha256": "7b7d7f4e4b4c5375cbbdcefe09a2ebf1b67f8b31ee31f18dae39aa22b6ea3377"
+    },
+    {
+      "id": "WVC021",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC021_BellClapper_Mars_SM.WarrensC_WVC021_BellClapper_Mars_SM",
+      "source_sha256": "9da8a76c3cebf1ab3a65cb7ffbe2470c1a9e67f1e397ccbed69d681bfd7a0768"
+    },
+    {
+      "id": "WVC022",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC022_BoneBridgeKeystone_Mars_SM.WarrensC_WVC022_BoneBridgeKeystone_Mars_SM",
+      "source_sha256": "2ad5df74fdcd9cbe76d0437b3d04049063bc31c0b9406f8be27ee6e28f5bb252"
+    },
+    {
+      "id": "WVC023",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC023_MillstoneDrum_Mars_SM.WarrensC_WVC023_MillstoneDrum_Mars_SM",
+      "source_sha256": "8f9daf800d0c5cc5c184a58dd46b5e786b3455f81aeea77dd21ff5e7b463335b"
+    },
+    {
+      "id": "WVC024",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC024_SaltChute_Mars_SM.WarrensC_WVC024_SaltChute_Mars_SM",
+      "source_sha256": "fbfde858c876fd47ab563c4cf857f8147b87ec300b84d93b90a787c65392380e"
+    },
+    {
+      "id": "WVC025",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC025_SplitMourner_Mars_SM.WarrensC_WVC025_SplitMourner_Mars_SM",
+      "source_sha256": "d89fcffab691d5f9269de0b0dd9642bb82b4dd47e38f4887cfbebbb48b664f77"
+    },
+    {
+      "id": "WVC026",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC026_Sarcophagus_Mars_SM.WarrensC_WVC026_Sarcophagus_Mars_SM",
+      "source_sha256": "04150d59603ae4207351a94fe855c54cb9ade88c93988d03d3fb3a140c38b04c"
+    },
+    {
+      "id": "WVC027",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC027_VatLiquidInsert_Mars_SM.WarrensC_WVC027_VatLiquidInsert_Mars_SM",
+      "source_sha256": "6a626b914a933093eee750721330f9f8789e13ac61cc24f1adbc9efa966feca8"
+    },
+    {
+      "id": "WVC028",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC028_KeyLoftPlinth_Mars_SM.WarrensC_WVC028_KeyLoftPlinth_Mars_SM",
+      "source_sha256": "04b697cd760e332ca9687d3307cba6752ee7a40dc6bd19b5a5cb1766b2523e25"
+    },
+    {
+      "id": "WVC029",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC029_BellkeeperPanelHousing_Mars_SM.WarrensC_WVC029_BellkeeperPanelHousing_Mars_SM",
+      "source_sha256": "da8aab4e80357f2bfd87aeff211be6eee779cc455b58f485e46d950ce6c844b0"
+    },
+    {
+      "id": "WVC030",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC030_WheelAxle_Mars_SM.WarrensC_WVC030_WheelAxle_Mars_SM",
+      "source_sha256": "2187fd05a0b1bacc7b08adf8ef4bbf5eb05fd9a15a6e4c2f3e8a5298e6287f77"
+    },
+    {
+      "id": "WVC031",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC031_ChainCrossingBarsSkin_Mars_SM.WarrensC_WVC031_ChainCrossingBarsSkin_Mars_SM",
+      "source_sha256": "c0fa41a26c4e458d42cc14a157d8e922b4c101406809fe05b232e62ecfcf9c87"
+    },
+    {
+      "id": "WVC032",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC032_PackPlateHousing_Mars_SM.WarrensC_WVC032_PackPlateHousing_Mars_SM",
+      "source_sha256": "2e17bee0533dcb15ac60c2ebbfdf8c65828e5222c71bcfc3ecf9d5482e6e5839"
+    },
+    {
+      "id": "WVC033",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC033_DialBlank_Mars_SM.WarrensC_WVC033_DialBlank_Mars_SM",
+      "source_sha256": "04a541075fa93630a8bed49b67e908d5e58ac20aee27915e16ae53d199c4a279"
+    },
+    {
+      "id": "WVC034",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC034_LadderFootBarsSkin_Mars_SM.WarrensC_WVC034_LadderFootBarsSkin_Mars_SM",
+      "source_sha256": "e8e2a2cc0c7fac5e22206d57d14007c2c09001eefb700797821e4837dc084906"
+    },
+    {
+      "id": "WVC035",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC035_LoftLeverSkin_Mars_SM.WarrensC_WVC035_LoftLeverSkin_Mars_SM",
+      "source_sha256": "5d152c2a051e2ad22884f8e6057d7d58a95ce93709ec429740698b3ee75bde43"
+    },
+    {
+      "id": "WVC036",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC036_RedKeyEscutcheon_Mars_SM.WarrensC_WVC036_RedKeyEscutcheon_Mars_SM",
+      "source_sha256": "5bdb460e581cd9d29b3201da244f1833d79e5888f563820a3e1d80b63d70b519"
+    },
+    {
+      "id": "WVC037",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC037_CuringVat_Mars_SM.WarrensC_WVC037_CuringVat_Mars_SM",
+      "source_sha256": "c1a4a3305ed52914fd16c28f101c6ff81ff2cfd7dad752cf0032ff1d4bb3febe"
+    },
+    {
+      "id": "WVC038",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC038_CuringVatLid_Mars_SM.WarrensC_WVC038_CuringVatLid_Mars_SM",
+      "source_sha256": "82eabfadf3c144f17352080e64e9c8d89997d843699d6be8c8baf0267af958b6"
+    },
+    {
+      "id": "WVC039",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC039_BacksideBarLeverSkin_Mars_SM.WarrensC_WVC039_BacksideBarLeverSkin_Mars_SM",
+      "source_sha256": "84a7a91366d14ad0ea65d49a0d149eac38942884442c4678fb5da58d5f52e4f0"
+    },
+    {
+      "id": "WVC040",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC040_ScoutLadder100Segment_Mars_SM.WarrensC_WVC040_ScoutLadder100Segment_Mars_SM",
+      "source_sha256": "5108b2d849fbc188c13f820bc64fb29f13691b01a324725dc268fe55c807495f"
+    },
+    {
+      "id": "WVC041",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC041_LoftLadder125Segment_Mars_SM.WarrensC_WVC041_LoftLadder125Segment_Mars_SM",
+      "source_sha256": "17e1eed4ece976a42f3b2da52bc83b5db05b14e8ee03c9df1c84dbe979897fc5"
+    },
+    {
+      "id": "WVC042",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC042_MournerCacheGateSkin_Mars_SM.WarrensC_WVC042_MournerCacheGateSkin_Mars_SM",
+      "source_sha256": "7246605c750857302ba8521b6a69741c50021ccbfafb22584269458d16485bed"
+    },
+    {
+      "id": "WVC043",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC043_VaultDoorSkin_Mars_SM.WarrensC_WVC043_VaultDoorSkin_Mars_SM",
+      "source_sha256": "9fac348a3506aa18f4f4f8ea9289b9dc5eb402bfb22839e087975c1784e71823"
+    },
+    {
+      "id": "WVC044",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC044_CampPackPlinth_Mars_SM.WarrensC_WVC044_CampPackPlinth_Mars_SM",
+      "source_sha256": "5352c217a26db7c4c8d08376f21be553edb61b1497ccd4a5713d7b181c5809d7"
+    },
+    {
+      "id": "WVC045",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC045_PreparationBench_Mars_SM.WarrensC_WVC045_PreparationBench_Mars_SM",
+      "source_sha256": "6c961c9874c33f4c7614339c860d1ad119d59713a0e4973262e58125a89ae8bc"
+    },
+    {
+      "id": "WVC046",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC046_StorageCrateBody_Mars_SM.WarrensC_WVC046_StorageCrateBody_Mars_SM",
+      "source_sha256": "7cd6cf240a44dc8fc00e25b0d5f987f13963231557a47d083dd09cd3f06a497c"
+    },
+    {
+      "id": "WVC047",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC047_StorageCrateLid_Mars_SM.WarrensC_WVC047_StorageCrateLid_Mars_SM",
+      "source_sha256": "2227b039762719c77e7ac95e7b842a6bab64064302b1a012905bb674ff3e8a42"
+    },
+    {
+      "id": "WVC048",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC048_OliveStorageJar_Mars_SM.WarrensC_WVC048_OliveStorageJar_Mars_SM",
+      "source_sha256": "3b1887e99a62cfbbe2d991b3e9333a684e4b8c7cf2cc060c7238878d1f25b64e"
+    },
+    {
+      "id": "WVC049",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC049_ServingBowl_Mars_SM.WarrensC_WVC049_ServingBowl_Mars_SM",
+      "source_sha256": "f4c5629c6ae8a6adf6df08a7bda8e349efacf6ff4a5f1baee713b4e73b1a024c"
+    },
+    {
+      "id": "WVC050",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC050_SaltCrystalChunk_Mars_SM.WarrensC_WVC050_SaltCrystalChunk_Mars_SM",
+      "source_sha256": "dae8b874c68a6459125fd298da0dde53468516cddc45c1fe8c45415aaf11fde8"
+    },
+    {
+      "id": "WVC051",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC051_SaltHeap_Mars_SM.WarrensC_WVC051_SaltHeap_Mars_SM",
+      "source_sha256": "1a62c1ad8e6457030738efa9e4d91eb59f03e4a4dd5eb77a16fc1503db348478"
+    },
+    {
+      "id": "WVC052",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC052_BoneBundle_Mars_SM.WarrensC_WVC052_BoneBundle_Mars_SM",
+      "source_sha256": "c015fdbf500ad3218f06af5a9eb255e65064a21c44b8ead6a6693ede97b15acb"
+    },
+    {
+      "id": "WVC053",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC053_OssuaryUrn_Mars_SM.WarrensC_WVC053_OssuaryUrn_Mars_SM",
+      "source_sha256": "aa0dde6c362e04f117d8281153def7db4dba707a85ecad1a52ff179906bd892b"
+    },
+    {
+      "id": "WVC054",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC054_ReliquaryBox_Mars_SM.WarrensC_WVC054_ReliquaryBox_Mars_SM",
+      "source_sha256": "f33bdcb825b3025532700c3c99e8cfbbc97ee9cd05847dffc6359aba06c6fd1c"
+    },
+    {
+      "id": "WVC055",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC055_HerbDryingRod_Mars_SM.WarrensC_WVC055_HerbDryingRod_Mars_SM",
+      "source_sha256": "23c751c39f9bcb82f280d07d4b5a4ba56978eb9ef2cdfb01fbc08d4b14a38807"
+    },
+    {
+      "id": "WVC056",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC056_DryingRack_Mars_SM.WarrensC_WVC056_DryingRack_Mars_SM",
+      "source_sha256": "a74df136b1f9a29302e0ccf10a55739a69172416b28f0c6dbd02790ef4816cef"
+    },
+    {
+      "id": "WVC057",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC057_TallowPot_Mars_SM.WarrensC_WVC057_TallowPot_Mars_SM",
+      "source_sha256": "2c9dbb474faff1e6fd6875a7e64e98d231d5779821535e60afcd3002b9915b8b"
+    },
+    {
+      "id": "WVC058",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC058_Cup_Mars_SM.WarrensC_WVC058_Cup_Mars_SM",
+      "source_sha256": "be961b889d0a6744822d4a65e6af6e4e4095ab51370fa3e029740d34c614c71b"
+    },
+    {
+      "id": "WVC059",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC059_Platter_Mars_SM.WarrensC_WVC059_Platter_Mars_SM",
+      "source_sha256": "136fd12a8e098595dc0a080f4f95d3929869cf18fa3e2fec10e9ab961d35a394"
+    },
+    {
+      "id": "WVC060",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC060_FoldedCloth_Mars_SM.WarrensC_WVC060_FoldedCloth_Mars_SM",
+      "source_sha256": "dbaec5bef8d2b5112f46cb0caced464f1a4329f2c846558f69287d1bd78f719a"
+    },
+    {
+      "id": "WVC061",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC061_MortarPestle_Mars_SM.WarrensC_WVC061_MortarPestle_Mars_SM",
+      "source_sha256": "cb7db4a2213f38a1d6e27ed052c0cdcf31f2d2420c735c638ea6ecd1d0490d7d"
+    },
+    {
+      "id": "WVC062",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC062_MillHopper_Mars_SM.WarrensC_WVC062_MillHopper_Mars_SM",
+      "source_sha256": "43dee3f816662fb33b102a9e7e980d56501f383b94ce9380cf55614072c82092"
+    },
+    {
+      "id": "WVC063",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC063_WindowShutter_Mars_SM.WarrensC_WVC063_WindowShutter_Mars_SM",
+      "source_sha256": "03f6501ea7728309e4f9d94e91579d5405229415004cd927286063e65bbd2bfb"
+    },
+    {
+      "id": "WVC064",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC064_CandleHolder_Mars_SM.WarrensC_WVC064_CandleHolder_Mars_SM",
+      "source_sha256": "72c6f196445c365b7964065f5fdab0a4023cdbb67347d3baafd9a47c1bb2b03e"
+    },
+    {
+      "id": "WVC065",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC065_EmberBrazier_Mars_SM.WarrensC_WVC065_EmberBrazier_Mars_SM",
+      "source_sha256": "041e9654e164f1b70c44615c9d94d869ab1a1da4c3e16500d2f68ce1949f4840"
+    },
+    {
+      "id": "WVC066",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC066_ShaftLightFrame_Mars_SM.WarrensC_WVC066_ShaftLightFrame_Mars_SM",
+      "source_sha256": "6ca7f084d84722464948367ef67f625591f4d3ba9daa6520000c5d3e71f50f63"
+    },
+    {
+      "id": "WVC067",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC067_RootShort_Mars_SM.WarrensC_WVC067_RootShort_Mars_SM",
+      "source_sha256": "637c6a2a565aa77ccab856e331cd2de107b395c2440ee74187d22ef36c260869"
+    },
+    {
+      "id": "WVC068",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC068_RootLong_Mars_SM.WarrensC_WVC068_RootLong_Mars_SM",
+      "source_sha256": "fc5facdbf2914755d05f331b654907952f86396468326786dff95e0fa2b46036"
+    },
+    {
+      "id": "WVC069",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC069_DryHerbBunch_Mars_SM.WarrensC_WVC069_DryHerbBunch_Mars_SM",
+      "source_sha256": "88f305d2c3612302c811bfa1d977f758da09351c5064353c3bf2cdef55215fda"
+    },
+    {
+      "id": "WVC070",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC070_MushroomCluster_Mars_SM.WarrensC_WVC070_MushroomCluster_Mars_SM",
+      "source_sha256": "a895c05bff96d9b137601f01f33a4ee4d30fb6820e6f7604f1b90f9b9d019826"
+    },
+    {
+      "id": "WVC071",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC071_BoneFragment_Mars_SM.WarrensC_WVC071_BoneFragment_Mars_SM",
+      "source_sha256": "5de68717179265e114827c904c4bfea149896dffd3d8efd4bbf7a78eaef52143"
+    },
+    {
+      "id": "WVC072",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC072_DustCardPlane_Mars_SM.WarrensC_WVC072_DustCardPlane_Mars_SM",
+      "source_sha256": "da7bcd0371f5d5a036e9cfd61a83e5a6325f2c76a20da5b772c4dfd71644a3e1"
+    },
+    {
+      "id": "WVC073",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC073_CobwebCorner_Mars_SM.WarrensC_WVC073_CobwebCorner_Mars_SM",
+      "source_sha256": "8f9dc1bd767678b6d357d24f6e6c59ac68c8f2df6374b556b0094cd958e9017d"
+    },
+    {
+      "id": "WVC074",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC074_ShelfDivider_Mars_SM.WarrensC_WVC074_ShelfDivider_Mars_SM",
+      "source_sha256": "429c16fac6f100a6e8e9277826c4bbef8d1a53a69d24e69a36c507329e2323c5"
+    },
+    {
+      "id": "WVC075",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC075_RockButtressLarge_Mars_SM.WarrensC_WVC075_RockButtressLarge_Mars_SM",
+      "source_sha256": "240524910fb93b9cb4402013ecf245a4b2b04e6ef2231eacb220851ef5103e7e"
+    },
+    {
+      "id": "WVC076",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC076_BellLipDamageInsert_Mars_SM.WarrensC_WVC076_BellLipDamageInsert_Mars_SM",
+      "source_sha256": "72264b78dc84447aac34e8b0f67986f9527d10125d5f235b4c7f5750101099a2"
+    },
+    {
+      "id": "WVC077",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC077_ServiceBellSmall_Mars_SM.WarrensC_WVC077_ServiceBellSmall_Mars_SM",
+      "source_sha256": "fd042b61b577e297da089fd975c620dad70314dc6d75de8cd070adc25d60cf89"
+    },
+    {
+      "id": "WVC078",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC078_BellBracket_Mars_SM.WarrensC_WVC078_BellBracket_Mars_SM",
+      "source_sha256": "21b6045dfd0b52b52d46be97b7a23c686f9c194bd41136aa3d8666b0040646c9"
+    },
+    {
+      "id": "WVC079",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC079_LowMistCard_Mars_SM.WarrensC_WVC079_LowMistCard_Mars_SM",
+      "source_sha256": "297b28bb3dfcb5e3d1fea5f54bf5093c0ecd83d5127a82ff6303ac95e029dff4"
+    },
+    {
+      "id": "WVC080",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC080_BrokenBeamEnd_Mars_SM.WarrensC_WVC080_BrokenBeamEnd_Mars_SM",
+      "source_sha256": "cfc6925bf7eb0337de2990829b69c9df6cf798e76fb8b7256b932cdc43b54520"
+    },
+    {
+      "id": "WVC081",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC081_SarcophagusLid_Mars_SM.WarrensC_WVC081_SarcophagusLid_Mars_SM",
+      "source_sha256": "151283f40dfa597ec8af0c83d67e119d5ca24c510c18d3e8324f670d070169ac"
+    },
+    {
+      "id": "WVC082",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC082_SingleChimeBone_Mars_SM.WarrensC_WVC082_SingleChimeBone_Mars_SM",
+      "source_sha256": "67be9afeb72875e6d7292ded207f57bcb3feda2df3ecbbb6517ea1661de99275"
+    },
+    {
+      "id": "WVC083",
+      "path": "/Game/Mars/Environment/WarrensVariantCKit/Meshes/WarrensC_WVC083_EmblemSurfaceCarrier_Mars_SM.WarrensC_WVC083_EmblemSurfaceCarrier_Mars_SM",
+      "source_sha256": "e137a192147a62704235e68d28c4c6f4b90b249244dc3fc667c18738fa72249c"
+    }
+  ],
+  "count": 196,
+  "scope": "Saved asset/export hashes, material bindings and generated collision; no packaged claim"
+}

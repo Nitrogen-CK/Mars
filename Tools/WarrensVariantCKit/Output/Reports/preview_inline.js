@@ -1,0 +1,5 @@
+
+const cards=[...document.querySelectorAll('.asset-card')], search=document.querySelector('#search'), tile=document.querySelector('#tileFilter'), category=document.querySelector('#categoryFilter'), status=document.querySelector('#statusFilter'), count=document.querySelector('#resultCount');
+function filter(){const q=search.value.toLowerCase().trim(),t=tile.value,c=category.value,s=status.value;let n=0;for(const el of cards){const ok=(!q||el.dataset.search.includes(q))&&(!t||el.dataset.tiles.split('|').includes(t))&&(!c||el.dataset.category===c)&&(!s||el.dataset.status===s);el.hidden=!ok;if(ok)n++}count.textContent=`Showing ${n} of ${cards.length} library entries.`}
+[search,tile,category,status].forEach(el=>el.addEventListener('input',filter));filter();
+const runtimeKind=document.querySelector('#runtimeKind'),viewCards=[...document.querySelectorAll('.view-card')];runtimeKind?.addEventListener('input',()=>{for(const el of viewCards)el.hidden=!!runtimeKind.value&&el.dataset.kind!==runtimeKind.value});

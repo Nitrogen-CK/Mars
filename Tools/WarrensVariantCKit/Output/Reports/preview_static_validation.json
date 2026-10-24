@@ -1,0 +1,8 @@
+{
+  "status": "passed",
+  "library_cards": 196,
+  "runtime_cards": 55,
+  "local_references": 681,
+  "missing_local_references": [],
+  "browser_ui": "Not exercised: local-file protocol denied by browser security policy. No alternate browser or HTTP workaround used."
+}

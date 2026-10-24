@@ -1,0 +1,39 @@
+{
+  "tile": "Main",
+  "asset": "/Game/Mars/Maps/Warrens_VariantC_Mars_MAP",
+  "instances": 1601,
+  "hism_groups": 6,
+  "counts": {
+    "BACKING_TX01": 623,
+    "BACKING_TX02": 177,
+    "CCS13": 177,
+    "CCS13_TX01": 147,
+    "CCS15": 476,
+    "WVC003": 1
+  },
+  "material_overrides": [
+    {
+      "actor": "Warrens_Greybox_floor",
+      "component": "HierarchicalInstancedStaticMesh",
+      "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX02.M_CCK_TX02"
+    },
+    {
+      "actor": "Warrens_Greybox_wall",
+      "component": "HierarchicalInstancedStaticMesh",
+      "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX17.M_CCK_TX17"
+    },
+    {
+      "actor": "Warrens_Greybox_ramp",
+      "component": "HierarchicalInstancedStaticMesh",
+      "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX02.M_CCK_TX02"
+    }
+  ],
+  "gate_bindings": [
+    {
+      "actor": "Warrens_Mars_Anchor_Spawn_EntityScript_16",
+      "property": "GateMaterialOverride",
+      "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX09.M_CCK_TX09"
+    }
+  ],
+  "rollback": "D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\Reports\\Backups\\Main-20261024-071619\\Warrens_VariantC_Mars_MAP.umap"
+}

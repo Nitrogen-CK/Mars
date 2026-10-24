@@ -1,0 +1,3809 @@
+{
+  "status": "passed",
+  "generated_utc": "2026-10-24T18:46:00.453975+00:00",
+  "blend_file": "D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\WarrensVariantC_KitLibrary.blend",
+  "assets": [
+    {
+      "id": "WVC001",
+      "status": "passed",
+      "vertices": 72,
+      "triangles": 132,
+      "bounds_cm": [
+        110.00000238418579,
+        110.00000238418579,
+        34.99999910593032
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX01"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.0002505753107664838
+    },
+    {
+      "id": "WVC002",
+      "status": "passed",
+      "vertices": 96,
+      "triangles": 176,
+      "bounds_cm": [
+        110.00000238418579,
+        110.00000238418579,
+        44.99999821186065
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX01"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.0001278446216659623
+    },
+    {
+      "id": "WVC003",
+      "status": "passed",
+      "vertices": 280,
+      "triangles": 484,
+      "bounds_cm": [
+        379.9999952316284,
+        44.999998807907104,
+        420.0000429153448
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX01"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.0010647446219057488
+    },
+    {
+      "id": "WVC004",
+      "status": "passed",
+      "vertices": 280,
+      "triangles": 484,
+      "bounds_cm": [
+        329.9999952316284,
+        44.999998807907104,
+        379.99999284744257
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX01"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.0010646842929951537
+    },
+    {
+      "id": "WVC005",
+      "status": "passed",
+      "vertices": 8,
+      "triangles": 12,
+      "bounds_cm": [
+        69.9999988079071,
+        60.00000238418579,
+        80.00000178813936
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX01"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.1344000099993529
+    },
+    {
+      "id": "WVC006",
+      "status": "passed",
+      "vertices": 56,
+      "triangles": 84,
+      "bounds_cm": [
+        200.0,
+        44.999998807907104,
+        120.0000071525574
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX06"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.024657101889843575
+    },
+    {
+      "id": "WVC007",
+      "status": "passed",
+      "vertices": 56,
+      "triangles": 100,
+      "bounds_cm": [
+        50.0,
+        50.0,
+        110.0000035762787
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX06"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.0007794228990694628
+    },
+    {
+      "id": "WVC008",
+      "status": "passed",
+      "vertices": 72,
+      "triangles": 132,
+      "bounds_cm": [
+        199.99998807907104,
+        34.99999940395355,
+        34.99999910593032
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX06"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.0010637222790558659
+    },
+    {
+      "id": "WVC009",
+      "status": "passed",
+      "vertices": 24,
+      "triangles": 44,
+      "bounds_cm": [
+        250.0,
+        50.0,
+        2.9999998994171606
+      ],
+      "pivot": "top contact",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX09"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 1.3856268970399377e-05
+    },
+    {
+      "id": "WVC010",
+      "status": "passed",
+      "vertices": 98,
+      "triangles": 172,
+      "bounds_cm": [
+        160.0000023841858,
+        25.0,
+        179.9999928474426
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX01",
+        "TX06"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.00033668364613304285
+    },
+    {
+      "id": "WVC011",
+      "status": "passed",
+      "vertices": 16,
+      "triangles": 28,
+      "bounds_cm": [
+        200.0,
+        25.0,
+        60.0000035762787
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX04"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.03216000569270215
+    },
+    {
+      "id": "WVC012",
+      "status": "passed",
+      "vertices": 184,
+      "triangles": 308,
+      "bounds_cm": [
+        220.00000476837158,
+        30.000001192092896,
+        200.0
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX01"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.001066189612336941
+    },
+    {
+      "id": "WVC013",
+      "status": "passed",
+      "vertices": 448,
+      "triangles": 800,
+      "bounds_cm": [
+        160.0000023841858,
+        160.0000023841858,
+        750.0
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX08",
+        "TX09"
+      ],
+      "socket_count": 2,
+      "minimum_triangle_area_m2": 0.0001948532793133619
+    },
+    {
+      "id": "WVC014",
+      "status": "passed",
+      "vertices": 216,
+      "triangles": 404,
+      "bounds_cm": [
+        89.99999761581421,
+        30.000001192092896,
+        89.99999761581421
+      ],
+      "pivot": "center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX08",
+        "TX09"
+      ],
+      "socket_count": 3,
+      "minimum_triangle_area_m2": 0.00043950363405873005
+    },
+    {
+      "id": "WVC015",
+      "status": "passed",
+      "vertices": 400,
+      "triangles": 788,
+      "bounds_cm": [
+        100.0,
+        69.9999988079071,
+        100.0
+      ],
+      "pivot": "center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX08",
+        "TX09"
+      ],
+      "socket_count": 2,
+      "minimum_triangle_area_m2": 0.0008110565892125867
+    },
+    {
+      "id": "WVC016",
+      "status": "passed",
+      "vertices": 70,
+      "triangles": 136,
+      "bounds_cm": [
+        45.00000178813934,
+        20.000000298023224,
+        80.00000178813936
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX09"
+      ],
+      "socket_count": 2,
+      "minimum_triangle_area_m2": 0.0006208412704009588
+    },
+    {
+      "id": "WVC017",
+      "status": "passed",
+      "vertices": 672,
+      "triangles": 1228,
+      "bounds_cm": [
+        139.9999976158142,
+        139.9999976158142,
+        179.9999928474426
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX08",
+        "TX09"
+      ],
+      "socket_count": 1,
+      "minimum_triangle_area_m2": 5.5773470816155346e-05
+    },
+    {
+      "id": "WVC018",
+      "status": "passed",
+      "vertices": 880,
+      "triangles": 1528,
+      "bounds_cm": [
+        400.0,
+        400.0,
+        400.0
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX01",
+        "TX10"
+      ],
+      "socket_count": 2,
+      "minimum_triangle_area_m2": 3.4102214895597404e-05
+    },
+    {
+      "id": "WVC019",
+      "status": "passed",
+      "vertices": 180,
+      "triangles": 356,
+      "bounds_cm": [
+        240.00000953674316,
+        240.00000953674316,
+        279.99999284744257
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX10"
+      ],
+      "socket_count": 3,
+      "minimum_triangle_area_m2": 0.0038584670498618165
+    },
+    {
+      "id": "WVC020",
+      "status": "passed",
+      "vertices": 108,
+      "triangles": 196,
+      "bounds_cm": [
+        300.0,
+        100.0,
+        80.0000011920929
+      ],
+      "pivot": "center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX08",
+        "TX09"
+      ],
+      "socket_count": 4,
+      "minimum_triangle_area_m2": 0.00019485534872098358
+    },
+    {
+      "id": "WVC021",
+      "status": "passed",
+      "vertices": 96,
+      "triangles": 180,
+      "bounds_cm": [
+        30.000001192092896,
+        30.000001192092896,
+        179.99999523162842
+      ],
+      "pivot": "center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX09"
+      ],
+      "socket_count": 2,
+      "minimum_triangle_area_m2": 0.0002684102449738531
+    },
+    {
+      "id": "WVC022",
+      "status": "passed",
+      "vertices": 86,
+      "triangles": 148,
+      "bounds_cm": [
+        150.0,
+        69.9999988079071,
+        100.0
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX06"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.0002074794513193805
+    },
+    {
+      "id": "WVC023",
+      "status": "passed",
+      "vertices": 304,
+      "triangles": 576,
+      "bounds_cm": [
+        250.0,
+        250.0,
+        200.0
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX01",
+        "TX08"
+      ],
+      "socket_count": 2,
+      "minimum_triangle_area_m2": 0.00024386719601149102
+    },
+    {
+      "id": "WVC024",
+      "status": "passed",
+      "vertices": 64,
+      "triangles": 104,
+      "bounds_cm": [
+        200.0,
+        80.0000011920929,
+        120.0000071525574
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX08",
+        "TX05"
+      ],
+      "socket_count": 2,
+      "minimum_triangle_area_m2": 0.00019485534872098358
+    },
+    {
+      "id": "WVC025",
+      "status": "passed",
+      "vertices": 144,
+      "triangles": 249,
+      "bounds_cm": [
+        200.0,
+        120.00000476837158,
+        450.0
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX01",
+        "TX06"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.00019485534872098358
+    },
+    {
+      "id": "WVC026",
+      "status": "passed",
+      "vertices": 408,
+      "triangles": 748,
+      "bounds_cm": [
+        300.0,
+        150.0,
+        120.0000071525574
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX01",
+        "TX10"
+      ],
+      "socket_count": 1,
+      "minimum_triangle_area_m2": 1.3461725279936332e-05
+    },
+    {
+      "id": "WVC027",
+      "status": "passed",
+      "vertices": 4,
+      "triangles": 2,
+      "bounds_cm": [
+        209.99999046325684,
+        129.99999523162842,
+        0.0
+      ],
+      "pivot": "center",
+      "uv_layers": 1,
+      "material_keys": [
+        "FX_ShallowWater"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 1.364999906518954
+    },
+    {
+      "id": "WVC028",
+      "status": "passed",
+      "vertices": 120,
+      "triangles": 220,
+      "bounds_cm": [
+        80.0000011920929,
+        80.0000011920929,
+        30.00000178813935
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX01",
+        "TX10"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 4.0405758066940245e-06
+    },
+    {
+      "id": "WVC029",
+      "status": "passed",
+      "vertices": 264,
+      "triangles": 508,
+      "bounds_cm": [
+        100.0,
+        40.00000059604645,
+        139.99999642372129
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX09",
+        "TX10"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.00028059212088405523
+    },
+    {
+      "id": "WVC030",
+      "status": "passed",
+      "vertices": 60,
+      "triangles": 108,
+      "bounds_cm": [
+        20.000000298023224,
+        80.0000011920929,
+        20.000000298023224
+      ],
+      "pivot": "center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX09"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.00045372252065144653
+    },
+    {
+      "id": "WVC031",
+      "status": "passed",
+      "vertices": 318,
+      "triangles": 556,
+      "bounds_cm": [
+        250.0,
+        30.000001192092896,
+        250.0
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX09"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.00015529766863075595
+    },
+    {
+      "id": "WVC032",
+      "status": "passed",
+      "vertices": 120,
+      "triangles": 220,
+      "bounds_cm": [
+        200.0,
+        200.0,
+        30.00000178813935
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX01",
+        "TX10"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 6.46484701691887e-05
+    },
+    {
+      "id": "WVC033",
+      "status": "passed",
+      "vertices": 72,
+      "triangles": 140,
+      "bounds_cm": [
+        20.000000298023224,
+        7.999999821186066,
+        20.000000298023224
+      ],
+      "pivot": "center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX10",
+        "TX09"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.00028987724665081703
+    },
+    {
+      "id": "WVC034",
+      "status": "passed",
+      "vertices": 144,
+      "triangles": 264,
+      "bounds_cm": [
+        100.0,
+        20.000000298023224,
+        170.0000071525574
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX09"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.00014312255587073389
+    },
+    {
+      "id": "WVC035",
+      "status": "passed",
+      "vertices": 56,
+      "triangles": 100,
+      "bounds_cm": [
+        50.0,
+        34.99999940395355,
+        79.9999928474426
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX09",
+        "TX08"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.0009067264972625949
+    },
+    {
+      "id": "WVC036",
+      "status": "passed",
+      "vertices": 48,
+      "triangles": 96,
+      "bounds_cm": [
+        34.99999940395355,
+        10.000000149011612,
+        50.0
+      ],
+      "pivot": "center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX09"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.0019337497636613742
+    },
+    {
+      "id": "WVC037",
+      "status": "passed",
+      "vertices": 184,
+      "triangles": 290,
+      "bounds_cm": [
+        240.00000953674316,
+        160.0000023841858,
+        139.99999642372129
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX08",
+        "TX15",
+        "TX09"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.0011736520170132338
+    },
+    {
+      "id": "WVC038",
+      "status": "passed",
+      "vertices": 136,
+      "triangles": 248,
+      "bounds_cm": [
+        240.00000953674316,
+        160.0000023841858,
+        15.000000894069675
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX08",
+        "TX09"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 6.313236936300665e-06
+    },
+    {
+      "id": "WVC039",
+      "status": "passed",
+      "vertices": 56,
+      "triangles": 100,
+      "bounds_cm": [
+        40.00000059604645,
+        25.0,
+        80.00000178813936
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX09",
+        "TX08"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.0005579153284502375
+    },
+    {
+      "id": "WVC040",
+      "status": "passed",
+      "vertices": 216,
+      "triangles": 396,
+      "bounds_cm": [
+        100.0,
+        15.000000596046448,
+        100.0
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX08",
+        "TX09"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.00012388553522054625
+    },
+    {
+      "id": "WVC041",
+      "status": "passed",
+      "vertices": 240,
+      "triangles": 440,
+      "bounds_cm": [
+        100.0,
+        15.000000596046448,
+        125.0
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX08",
+        "TX09"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.00012388553522054625
+    },
+    {
+      "id": "WVC042",
+      "status": "passed",
+      "vertices": 264,
+      "triangles": 484,
+      "bounds_cm": [
+        250.0,
+        30.000001192092896,
+        250.0
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX09"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.00015529766863075595
+    },
+    {
+      "id": "WVC043",
+      "status": "passed",
+      "vertices": 176,
+      "triangles": 312,
+      "bounds_cm": [
+        250.0,
+        30.000001192092896,
+        300.0
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX09",
+        "TX01"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.002382349928706464
+    },
+    {
+      "id": "WVC044",
+      "status": "passed",
+      "vertices": 72,
+      "triangles": 132,
+      "bounds_cm": [
+        120.00000476837158,
+        120.00000476837158,
+        30.00000178813935
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX01"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 8.182115940267386e-05
+    },
+    {
+      "id": "WVC045",
+      "status": "passed",
+      "vertices": 264,
+      "triangles": 484,
+      "bounds_cm": [
+        200.0,
+        69.9999988079071,
+        89.9999964237213
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX07",
+        "TX09"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 3.994031559913352e-06
+    },
+    {
+      "id": "WVC046",
+      "status": "passed",
+      "vertices": 216,
+      "triangles": 396,
+      "bounds_cm": [
+        80.0000011920929,
+        59.99999642372131,
+        60.0000035762787
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX07",
+        "TX09"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 3.4110491240423003e-06
+    },
+    {
+      "id": "WVC047",
+      "status": "passed",
+      "vertices": 72,
+      "triangles": 132,
+      "bounds_cm": [
+        80.0000011920929,
+        60.00000238418579,
+        7.9999997317791
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX07"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 3.117693737033034e-05
+    },
+    {
+      "id": "WVC048",
+      "status": "passed",
+      "vertices": 138,
+      "triangles": 292,
+      "bounds_cm": [
+        44.999998807907104,
+        44.999998807907104,
+        60.0000035762787
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX15"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.00038616035477962655
+    },
+    {
+      "id": "WVC049",
+      "status": "passed",
+      "vertices": 50,
+      "triangles": 116,
+      "bounds_cm": [
+        34.99999940395355,
+        34.99999940395355,
+        14.000000089406967
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX15"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.001133598285557282
+    },
+    {
+      "id": "WVC050",
+      "status": "passed",
+      "vertices": 35,
+      "triangles": 66,
+      "bounds_cm": [
+        50.0,
+        50.0,
+        60.0000035762787
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX05"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.00012347583035716154
+    },
+    {
+      "id": "WVC051",
+      "status": "passed",
+      "vertices": 270,
+      "triangles": 504,
+      "bounds_cm": [
+        150.0,
+        99.99999403953552,
+        69.99999821186064
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX05"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 6.673160457963909e-05
+    },
+    {
+      "id": "WVC052",
+      "status": "passed",
+      "vertices": 258,
+      "triangles": 448,
+      "bounds_cm": [
+        120.00000476837158,
+        40.00000059604645,
+        50.0
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX06"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 2.1486951292798245e-05
+    },
+    {
+      "id": "WVC053",
+      "status": "passed",
+      "vertices": 154,
+      "triangles": 296,
+      "bounds_cm": [
+        40.00000059604645,
+        40.00000059604645,
+        60.0000035762787
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX06"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.00014720908352385055
+    },
+    {
+      "id": "WVC054",
+      "status": "passed",
+      "vertices": 96,
+      "triangles": 176,
+      "bounds_cm": [
+        80.0000011920929,
+        50.0,
+        49.99999850988388
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX10",
+        "TX08"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 1.1690559267046328e-05
+    },
+    {
+      "id": "WVC055",
+      "status": "passed",
+      "vertices": 88,
+      "triangles": 156,
+      "bounds_cm": [
+        200.0,
+        30.000001192092896,
+        30.00000178813935
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX08",
+        "TX14"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 2.9074643102650065e-05
+    },
+    {
+      "id": "WVC056",
+      "status": "passed",
+      "vertices": 184,
+      "triangles": 324,
+      "bounds_cm": [
+        200.0,
+        60.00000238418579,
+        220.0000071525574
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX08",
+        "TX14"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 3.6785814364725774e-05
+    },
+    {
+      "id": "WVC057",
+      "status": "passed",
+      "vertices": 150,
+      "triangles": 268,
+      "bounds_cm": [
+        44.999998807907104,
+        44.999998807907104,
+        34.99999910593032
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX15",
+        "TX18"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.00012965267356123406
+    },
+    {
+      "id": "WVC058",
+      "status": "passed",
+      "vertices": 74,
+      "triangles": 164,
+      "bounds_cm": [
+        20.000000298023224,
+        20.000000298023224,
+        25.0
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX15"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.00025433071964116945
+    },
+    {
+      "id": "WVC059",
+      "status": "passed",
+      "vertices": 50,
+      "triangles": 116,
+      "bounds_cm": [
+        55.000001192092896,
+        40.00000059604645,
+        7.000000044703484
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX15"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.0010167723664694307
+    },
+    {
+      "id": "WVC060",
+      "status": "passed",
+      "vertices": 96,
+      "triangles": 176,
+      "bounds_cm": [
+        80.0000011920929,
+        60.00000238418579,
+        3.99999986588955
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX12"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 4.095679426371518e-06
+    },
+    {
+      "id": "WVC061",
+      "status": "passed",
+      "vertices": 92,
+      "triangles": 188,
+      "bounds_cm": [
+        34.99999940395355,
+        34.99999940395355,
+        44.99999821186065
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX01"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.0002115175379455735
+    },
+    {
+      "id": "WVC062",
+      "status": "passed",
+      "vertices": 352,
+      "triangles": 624,
+      "bounds_cm": [
+        179.99999523162842,
+        160.0000023841858,
+        139.99999642372129
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX08",
+        "TX09"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 8.172449254639692e-06
+    },
+    {
+      "id": "WVC063",
+      "status": "passed",
+      "vertices": 264,
+      "triangles": 484,
+      "bounds_cm": [
+        99.99999403953552,
+        20.000000298023224,
+        160.00000357627871
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX08",
+        "TX09"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 8.045412029712424e-06
+    },
+    {
+      "id": "WVC064",
+      "status": "passed",
+      "vertices": 128,
+      "triangles": 216,
+      "bounds_cm": [
+        44.999998807907104,
+        34.99999940395355,
+        40.00000089406968
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX09",
+        "TX18"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 6.598819108781067e-05
+    },
+    {
+      "id": "WVC065",
+      "status": "passed",
+      "vertices": 126,
+      "triangles": 200,
+      "bounds_cm": [
+        89.99999761581421,
+        89.99999761581421,
+        99.99999701976776
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX09",
+        "TX19"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.0007498811389275259
+    },
+    {
+      "id": "WVC066",
+      "status": "passed",
+      "vertices": 96,
+      "triangles": 176,
+      "bounds_cm": [
+        200.0,
+        50.0,
+        150.0
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX01"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.0005412652994852032
+    },
+    {
+      "id": "WVC067",
+      "status": "passed",
+      "vertices": 126,
+      "triangles": 232,
+      "bounds_cm": [
+        200.0,
+        80.0000011920929,
+        120.0000071525574
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX08"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.00011400816008353677
+    },
+    {
+      "id": "WVC068",
+      "status": "passed",
+      "vertices": 126,
+      "triangles": 232,
+      "bounds_cm": [
+        200.0,
+        59.99999642372131,
+        250.0
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX08"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 9.861844708084465e-05
+    },
+    {
+      "id": "WVC069",
+      "status": "passed",
+      "vertices": 180,
+      "triangles": 276,
+      "bounds_cm": [
+        50.0,
+        30.000001192092896,
+        80.00000178813936
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "AT01",
+        "AT01",
+        "TX14"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 3.4294288036426396e-05
+    },
+    {
+      "id": "WVC070",
+      "status": "passed",
+      "vertices": 162,
+      "triangles": 300,
+      "bounds_cm": [
+        59.99999642372131,
+        60.00000238418579,
+        50.0
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "AT01"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 4.3610935986423734e-05
+    },
+    {
+      "id": "WVC071",
+      "status": "passed",
+      "vertices": 42,
+      "triangles": 72,
+      "bounds_cm": [
+        40.00000059604645,
+        20.000000298023224,
+        14.999998658895475
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX06"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.0007575249833899263
+    },
+    {
+      "id": "WVC072",
+      "status": "passed",
+      "vertices": 4,
+      "triangles": 2,
+      "bounds_cm": [
+        100.0,
+        0.0,
+        0.9999999664723875
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "FX_Dust"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.0049999999368446875
+    },
+    {
+      "id": "WVC073",
+      "status": "passed",
+      "vertices": 104,
+      "triangles": 156,
+      "bounds_cm": [
+        80.0000011920929,
+        5.000000074505806,
+        80.00000178813936
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "AT01"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 9.220852310389951e-05
+    },
+    {
+      "id": "WVC074",
+      "status": "passed",
+      "vertices": 72,
+      "triangles": 132,
+      "bounds_cm": [
+        200.0,
+        40.00000059604645,
+        10.00000022351742
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX08"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 2.1650603940901237e-05
+    },
+    {
+      "id": "WVC075",
+      "status": "passed",
+      "vertices": 10,
+      "triangles": 16,
+      "bounds_cm": [
+        300.0,
+        179.99999523162842,
+        450.0
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX04"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.3388780940297369
+    },
+    {
+      "id": "WVC076",
+      "status": "passed",
+      "vertices": 12,
+      "triangles": 20,
+      "bounds_cm": [
+        89.99999761581421,
+        25.0,
+        69.99999821186064
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX10"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.010937498775975977
+    },
+    {
+      "id": "WVC077",
+      "status": "passed",
+      "vertices": 208,
+      "triangles": 384,
+      "bounds_cm": [
+        44.999998807907104,
+        44.999998807907104,
+        60.0000035762787
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX10"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 8.899477553204094e-05
+    },
+    {
+      "id": "WVC078",
+      "status": "passed",
+      "vertices": 108,
+      "triangles": 204,
+      "bounds_cm": [
+        70.00000476837158,
+        40.00000059604645,
+        89.9999964237213
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX08",
+        "TX09"
+      ],
+      "socket_count": 2,
+      "minimum_triangle_area_m2": 0.000332282974463478
+    },
+    {
+      "id": "WVC079",
+      "status": "passed",
+      "vertices": 4,
+      "triangles": 2,
+      "bounds_cm": [
+        300.0,
+        0.0,
+        100.0
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "FX_Dust"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 1.5
+    },
+    {
+      "id": "WVC080",
+      "status": "passed",
+      "vertices": 42,
+      "triangles": 68,
+      "bounds_cm": [
+        100.0,
+        34.99999940395355,
+        34.99999910593032
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX08"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.00019485559713958403
+    },
+    {
+      "id": "WVC081",
+      "status": "passed",
+      "vertices": 48,
+      "triangles": 88,
+      "bounds_cm": [
+        300.0,
+        150.0,
+        20.00000044703484
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX01"
+      ],
+      "socket_count": 1,
+      "minimum_triangle_area_m2": 0.0002172911421256741
+    },
+    {
+      "id": "WVC082",
+      "status": "passed",
+      "vertices": 70,
+      "triangles": 120,
+      "bounds_cm": [
+        80.0000011920929,
+        11.999999731779099,
+        11.999999731779099
+      ],
+      "pivot": "center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX06"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.0001985419623207376
+    },
+    {
+      "id": "WVC083",
+      "status": "passed",
+      "vertices": 4,
+      "triangles": 2,
+      "bounds_cm": [
+        60.00000238418579,
+        0.0,
+        80.00000178813936
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "ART01"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.2400000056996941
+    },
+    {
+      "id": "CCS01",
+      "status": "passed",
+      "vertices": 164,
+      "triangles": 280,
+      "bounds_cm": [
+        250.0,
+        200.0,
+        20.00000044703484
+      ],
+      "pivot": "top contact",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX02"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.0003464096630544198
+    },
+    {
+      "id": "CCS02",
+      "status": "passed",
+      "vertices": 128,
+      "triangles": 220,
+      "bounds_cm": [
+        250.0,
+        100.0,
+        20.00000044703484
+      ],
+      "pivot": "top contact",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX02"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.0003464100168798825
+    },
+    {
+      "id": "CCS03",
+      "status": "passed",
+      "vertices": 72,
+      "triangles": 132,
+      "bounds_cm": [
+        199.99998807907104,
+        20.000000298023224,
+        60.0000035762787
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX01"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.0011253732234548022
+    },
+    {
+      "id": "CCS04",
+      "status": "passed",
+      "vertices": 72,
+      "triangles": 108,
+      "bounds_cm": [
+        250.0,
+        40.00000059604645,
+        50.0
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX01"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.010650850979706254
+    },
+    {
+      "id": "CCS05",
+      "status": "passed",
+      "vertices": 426,
+      "triangles": 780,
+      "bounds_cm": [
+        300.0,
+        100.0,
+        300.0
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX01"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.001281362725837893
+    },
+    {
+      "id": "CCS06",
+      "status": "passed",
+      "vertices": 360,
+      "triangles": 660,
+      "bounds_cm": [
+        120.00000476837158,
+        120.00000476837158,
+        300.0
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX01"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.0009156808904445509
+    },
+    {
+      "id": "CCS07",
+      "status": "passed",
+      "vertices": 32,
+      "triangles": 64,
+      "bounds_cm": [
+        139.9999976158142,
+        139.9999976158142,
+        40.00000089406968
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX17"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.007745921037319186
+    },
+    {
+      "id": "CCS08",
+      "status": "passed",
+      "vertices": 144,
+      "triangles": 264,
+      "bounds_cm": [
+        199.99998807907104,
+        34.99999940395355,
+        30.00000178813935
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX01"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.00021787191969586722
+    },
+    {
+      "id": "CCS09",
+      "status": "passed",
+      "vertices": 144,
+      "triangles": 264,
+      "bounds_cm": [
+        30.000001192092896,
+        30.000001192092896,
+        100.0
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX01"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.00010478940589080383
+    },
+    {
+      "id": "CCS10",
+      "status": "passed",
+      "vertices": 48,
+      "triangles": 88,
+      "bounds_cm": [
+        40.00000059604645,
+        40.00000059604645,
+        15.000000894069675
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX01"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 2.725566634242751e-05
+    },
+    {
+      "id": "CCS11",
+      "status": "passed",
+      "vertices": 216,
+      "triangles": 396,
+      "bounds_cm": [
+        200.0,
+        11.999999731779099,
+        80.00000178813936
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX09"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.00011137828850780124
+    },
+    {
+      "id": "CCS12",
+      "status": "passed",
+      "vertices": 200,
+      "triangles": 372,
+      "bounds_cm": [
+        40.00000059604645,
+        34.99999940395355,
+        100.0
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX01",
+        "TX09"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 4.479791556696411e-05
+    },
+    {
+      "id": "CCS13",
+      "status": "passed",
+      "vertices": 116,
+      "triangles": 192,
+      "bounds_cm": [
+        200.0,
+        200.0,
+        5.00000011175871
+      ],
+      "pivot": "top contact",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX02"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.0022663413753993057
+    },
+    {
+      "id": "CCS14",
+      "status": "passed",
+      "vertices": 80,
+      "triangles": 132,
+      "bounds_cm": [
+        100.0,
+        200.0,
+        5.00000011175871
+      ],
+      "pivot": "top contact",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX02"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.0017869120200554322
+    },
+    {
+      "id": "CCS15",
+      "status": "passed",
+      "vertices": 360,
+      "triangles": 660,
+      "bounds_cm": [
+        200.0,
+        34.99999940395355,
+        299.99998807907104
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX01"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.001295179081672481
+    },
+    {
+      "id": "CCS16",
+      "status": "passed",
+      "vertices": 144,
+      "triangles": 264,
+      "bounds_cm": [
+        60.00000238418579,
+        60.00000238418579,
+        300.0
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX01"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.0009431011931016601
+    },
+    {
+      "id": "CCS17",
+      "status": "passed",
+      "vertices": 264,
+      "triangles": 460,
+      "bounds_cm": [
+        300.0,
+        40.00000059604645,
+        350.0
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX01"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.0013539290036849317
+    },
+    {
+      "id": "CCS18",
+      "status": "passed",
+      "vertices": 146,
+      "triangles": 272,
+      "bounds_cm": [
+        200.0,
+        200.0,
+        30.00000178813935
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX01"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.00011128294129003295
+    },
+    {
+      "id": "CCS19",
+      "status": "passed",
+      "vertices": 24,
+      "triangles": 44,
+      "bounds_cm": [
+        150.0,
+        2.9999999329447746,
+        160.00000357627871
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX03"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.004789700062529954
+    },
+    {
+      "id": "CCS20",
+      "status": "passed",
+      "vertices": 16,
+      "triangles": 28,
+      "bounds_cm": [
+        250.0,
+        5.000000074505806,
+        30.00000178813935
+      ],
+      "pivot": "top contact",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX01"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.0005699987411746343
+    },
+    {
+      "id": "CCS21",
+      "status": "passed",
+      "vertices": 192,
+      "triangles": 360,
+      "bounds_cm": [
+        50.0,
+        5.000000074505806,
+        50.0
+      ],
+      "pivot": "center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX09"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.00024925964054702834
+    },
+    {
+      "id": "CCS22",
+      "status": "passed",
+      "vertices": 72,
+      "triangles": 132,
+      "bounds_cm": [
+        11.999999731779099,
+        30.000001192092896,
+        11.999999731779099
+      ],
+      "pivot": "center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX09"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 7.562596071281523e-05
+    },
+    {
+      "id": "CCS23",
+      "status": "passed",
+      "vertices": 166,
+      "triangles": 324,
+      "bounds_cm": [
+        100.0,
+        100.0,
+        160.00000357627871
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX01",
+        "TX09"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.0002845331372560412
+    },
+    {
+      "id": "CCS24",
+      "status": "passed",
+      "vertices": 528,
+      "triangles": 1036,
+      "bounds_cm": [
+        60.00000238418579,
+        80.0000011920929,
+        60.00000238418579
+      ],
+      "pivot": "center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX09"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.00027913622469611884
+    },
+    {
+      "id": "CCS25",
+      "status": "passed",
+      "vertices": 192,
+      "triangles": 364,
+      "bounds_cm": [
+        30.000001192092896,
+        25.0,
+        34.99999940395355
+      ],
+      "pivot": "center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX09"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 5.674500607550936e-05
+    },
+    {
+      "id": "CCS26",
+      "status": "passed",
+      "vertices": 60,
+      "triangles": 104,
+      "bounds_cm": [
+        44.999998807907104,
+        20.000000298023224,
+        40.00000089406968
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX09"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.00011165544587068425
+    },
+    {
+      "id": "CCS27",
+      "status": "passed",
+      "vertices": 128,
+      "triangles": 256,
+      "bounds_cm": [
+        31.999999284744263,
+        20.000000298023224,
+        7.999999821186066
+      ],
+      "pivot": "center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX09"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 2.2767399108158893e-05
+    },
+    {
+      "id": "CCS28",
+      "status": "passed",
+      "vertices": 408,
+      "triangles": 788,
+      "bounds_cm": [
+        60.00000238418579,
+        60.00000238418579,
+        40.00000089406968
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX09"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 7.719472309185246e-05
+    },
+    {
+      "id": "CCS29",
+      "status": "passed",
+      "vertices": 216,
+      "triangles": 396,
+      "bounds_cm": [
+        200.0,
+        40.00000059604645,
+        20.00000044703484
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX09"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 2.1650626054992655e-05
+    },
+    {
+      "id": "CCS30",
+      "status": "passed",
+      "vertices": 400,
+      "triangles": 768,
+      "bounds_cm": [
+        34.99999940395355,
+        25.0,
+        40.00000089406968
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX09"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 4.3352108346138174e-05
+    },
+    {
+      "id": "CCS31",
+      "status": "passed",
+      "vertices": 240,
+      "triangles": 448,
+      "bounds_cm": [
+        44.999998807907104,
+        25.0,
+        44.99999821186065
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX09"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.00014029597655964673
+    },
+    {
+      "id": "CCS32",
+      "status": "passed",
+      "vertices": 200,
+      "triangles": 384,
+      "bounds_cm": [
+        30.000001192092896,
+        34.99999940395355,
+        49.99999850988388
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX09"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.000122445038057728
+    },
+    {
+      "id": "CCS33",
+      "status": "passed",
+      "vertices": 480,
+      "triangles": 844,
+      "bounds_cm": [
+        200.0,
+        11.999999731779099,
+        220.0000071525574
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX09"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.00012077983410584271
+    },
+    {
+      "id": "CCS34",
+      "status": "passed",
+      "vertices": 120,
+      "triangles": 220,
+      "bounds_cm": [
+        20.000000298023224,
+        40.00000059604645,
+        240.0000143051148
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX01",
+        "TX09"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 3.994462173839772e-06
+    },
+    {
+      "id": "CCS35",
+      "status": "passed",
+      "vertices": 96,
+      "triangles": 176,
+      "bounds_cm": [
+        239.99998569488525,
+        40.00000059604645,
+        20.00000044703484
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX01"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.00012488006664121038
+    },
+    {
+      "id": "CCS36",
+      "status": "passed",
+      "vertices": 168,
+      "triangles": 308,
+      "bounds_cm": [
+        15.000000596046448,
+        20.000000298023224,
+        440.0000143051148
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX09"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 8.859597296965041e-06
+    },
+    {
+      "id": "CCS37",
+      "status": "passed",
+      "vertices": 144,
+      "triangles": 264,
+      "bounds_cm": [
+        240.00000953674316,
+        50.0,
+        80.00000178813936
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX01",
+        "TX09"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 8.660246191476353e-05
+    },
+    {
+      "id": "CCS38",
+      "status": "passed",
+      "vertices": 56,
+      "triangles": 96,
+      "bounds_cm": [
+        25.0,
+        30.000001192092896,
+        15.000000894069675
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX09"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 3.636473566325709e-05
+    },
+    {
+      "id": "CCS39",
+      "status": "passed",
+      "vertices": 264,
+      "triangles": 468,
+      "bounds_cm": [
+        44.999998807907104,
+        40.00000059604645,
+        240.0000143051148
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX09"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 1.86990347233211e-06
+    },
+    {
+      "id": "CCS40",
+      "status": "passed",
+      "vertices": 144,
+      "triangles": 276,
+      "bounds_cm": [
+        15.000000596046448,
+        19.999998807907104,
+        80.00000178813936
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX09"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 6.519978347220188e-05
+    },
+    {
+      "id": "CCS41",
+      "status": "passed",
+      "vertices": 312,
+      "triangles": 596,
+      "bounds_cm": [
+        40.00000059604645,
+        40.00000059604645,
+        50.0
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX01",
+        "TX09"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.00014029597655964673
+    },
+    {
+      "id": "CCS42",
+      "status": "passed",
+      "vertices": 180,
+      "triangles": 340,
+      "bounds_cm": [
+        20.000000298023224,
+        20.000000298023224,
+        20.00000044703484
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX09"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 1.6121024556607287e-05
+    },
+    {
+      "id": "CCS43",
+      "status": "passed",
+      "vertices": 21,
+      "triangles": 38,
+      "bounds_cm": [
+        300.0,
+        199.99998807907104,
+        250.0
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX04"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.14532664080234023
+    },
+    {
+      "id": "CCS44",
+      "status": "passed",
+      "vertices": 21,
+      "triangles": 38,
+      "bounds_cm": [
+        160.0000023841858,
+        120.00000476837158,
+        129.9999928474426
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX04"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.05906804171366004
+    },
+    {
+      "id": "CCS45",
+      "status": "passed",
+      "vertices": 48,
+      "triangles": 92,
+      "bounds_cm": [
+        400.0,
+        100.0,
+        400.0
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX04"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.2102458440259892
+    },
+    {
+      "id": "CCS46",
+      "status": "passed",
+      "vertices": 96,
+      "triangles": 184,
+      "bounds_cm": [
+        300.0,
+        300.0,
+        400.0
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX04"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.08160117921241598
+    },
+    {
+      "id": "CCS47",
+      "status": "passed",
+      "vertices": 21,
+      "triangles": 38,
+      "bounds_cm": [
+        400.0,
+        400.0,
+        100.0
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX04"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.2671145928055385
+    },
+    {
+      "id": "CCS48",
+      "status": "passed",
+      "vertices": 60,
+      "triangles": 102,
+      "bounds_cm": [
+        400.0,
+        119.99999284744263,
+        200.0
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX04",
+        "TX17"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.16029791229215756
+    },
+    {
+      "id": "CCS49",
+      "status": "passed",
+      "vertices": 48,
+      "triangles": 92,
+      "bounds_cm": [
+        400.0,
+        150.0,
+        600.0
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX04"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.3605679692319526
+    },
+    {
+      "id": "CCS50",
+      "status": "passed",
+      "vertices": 147,
+      "triangles": 266,
+      "bounds_cm": [
+        200.0,
+        60.00000238418579,
+        30.00000178813935
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX04"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.002824724192824645
+    },
+    {
+      "id": "CCS51",
+      "status": "passed",
+      "vertices": 4,
+      "triangles": 2,
+      "bounds_cm": [
+        400.0,
+        400.0,
+        0.0
+      ],
+      "pivot": "top contact",
+      "uv_layers": 1,
+      "material_keys": [
+        "FX_Water"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 8.0
+    },
+    {
+      "id": "CCS52",
+      "status": "passed",
+      "vertices": 26,
+      "triangles": 24,
+      "bounds_cm": [
+        200.0,
+        50.0,
+        0.0
+      ],
+      "pivot": "top contact",
+      "uv_layers": 1,
+      "material_keys": [
+        "Foam"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.020833332013959645
+    },
+    {
+      "id": "CCS53",
+      "status": "passed",
+      "vertices": 4,
+      "triangles": 2,
+      "bounds_cm": [
+        200.0,
+        0.0,
+        0.9999999664723875
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "Wear_DampLeak"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.009999999873689375
+    },
+    {
+      "id": "CCS54",
+      "status": "passed",
+      "vertices": 72,
+      "triangles": 132,
+      "bounds_cm": [
+        200.0,
+        44.999998807907104,
+        30.00000178813935
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX17"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.00010101322969561376
+    },
+    {
+      "id": "CCS55",
+      "status": "passed",
+      "vertices": 32,
+      "triangles": 64,
+      "bounds_cm": [
+        60.00000238418579,
+        80.0000011920929,
+        60.0000035762787
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX17"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.007239003714412806
+    },
+    {
+      "id": "CCS56",
+      "status": "passed",
+      "vertices": 14,
+      "triangles": 12,
+      "bounds_cm": [
+        40.00000059604645,
+        34.99999940395355,
+        100.0
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "Drip"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.026652448440797193
+    },
+    {
+      "id": "CCS57",
+      "status": "passed",
+      "vertices": 192,
+      "triangles": 384,
+      "bounds_cm": [
+        80.0000011920929,
+        80.0000011920929,
+        0.9999999664723875
+      ],
+      "pivot": "top contact",
+      "uv_layers": 1,
+      "material_keys": [
+        "Ripple"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.0003561766767279336
+    },
+    {
+      "id": "CCS58",
+      "status": "passed",
+      "vertices": 20,
+      "triangles": 10,
+      "bounds_cm": [
+        30.000001192092896,
+        0.0,
+        119.9999892711638
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "Drip"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.005882357189649387
+    },
+    {
+      "id": "CCS59",
+      "status": "passed",
+      "vertices": 12,
+      "triangles": 10,
+      "bounds_cm": [
+        150.00001192092896,
+        100.0,
+        0.0
+      ],
+      "pivot": "top contact",
+      "uv_layers": 1,
+      "material_keys": [
+        "Puddle"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.01590877772974286
+    },
+    {
+      "id": "CCS60",
+      "status": "passed",
+      "vertices": 528,
+      "triangles": 972,
+      "bounds_cm": [
+        34.99999940395355,
+        25.0,
+        55.00000178813935
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX09"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 3.0962171616227445e-06
+    },
+    {
+      "id": "CCS61",
+      "status": "passed",
+      "vertices": 24,
+      "triangles": 44,
+      "bounds_cm": [
+        25.0,
+        20.000000298023224,
+        34.99999910593032
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "Glass"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.00024000002473181692
+    },
+    {
+      "id": "CCS62",
+      "status": "passed",
+      "vertices": 110,
+      "triangles": 196,
+      "bounds_cm": [
+        15.000000596046448,
+        25.0,
+        25.0
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX09"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 3.8253922282674454e-05
+    },
+    {
+      "id": "CCS63",
+      "status": "passed",
+      "vertices": 152,
+      "triangles": 284,
+      "bounds_cm": [
+        30.000001192092896,
+        34.99999940395355,
+        60.0000035762787
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX09"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 3.271083588079252e-05
+    },
+    {
+      "id": "CCS64",
+      "status": "passed",
+      "vertices": 22,
+      "triangles": 40,
+      "bounds_cm": [
+        25.0,
+        0.9999999776482582,
+        50.0
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "FX_Flame"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.0004123104783741151
+    },
+    {
+      "id": "CCS65",
+      "status": "passed",
+      "vertices": 160,
+      "triangles": 288,
+      "bounds_cm": [
+        44.999998807907104,
+        40.00000059604645,
+        60.0000035762787
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX01",
+        "TX08",
+        "TX09"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 7.927984056051937e-06
+    },
+    {
+      "id": "CCS66",
+      "status": "passed",
+      "vertices": 408,
+      "triangles": 748,
+      "bounds_cm": [
+        89.99999761581421,
+        89.99999761581421,
+        120.0000071525574
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX08",
+        "TX09",
+        "TX07"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 1.458017040965085e-05
+    },
+    {
+      "id": "CCS67",
+      "status": "passed",
+      "vertices": 664,
+      "triangles": 1212,
+      "bounds_cm": [
+        100.0,
+        80.0000011920929,
+        80.00000178813936
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX08"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 2.816051438942355e-05
+    },
+    {
+      "id": "CCS68",
+      "status": "passed",
+      "vertices": 168,
+      "triangles": 320,
+      "bounds_cm": [
+        70.00000476837158,
+        59.99999642372131,
+        100.0
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX12",
+        "TX14"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 6.800525102650874e-05
+    },
+    {
+      "id": "CCS69",
+      "status": "passed",
+      "vertices": 528,
+      "triangles": 968,
+      "bounds_cm": [
+        200.0,
+        50.0,
+        220.0000071525574
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX08"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 4.243523620670131e-05
+    },
+    {
+      "id": "CCS70",
+      "status": "passed",
+      "vertices": 120,
+      "triangles": 220,
+      "bounds_cm": [
+        80.0000011920929,
+        69.9999988079071,
+        40.00000089406968
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX05"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.0005334131522555732
+    },
+    {
+      "id": "CCS71",
+      "status": "passed",
+      "vertices": 564,
+      "triangles": 1120,
+      "bounds_cm": [
+        60.00000238418579,
+        59.99999642372131,
+        20.00000044703484
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX14"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.0001580403731849164
+    },
+    {
+      "id": "CCS72",
+      "status": "passed",
+      "vertices": 30,
+      "triangles": 48,
+      "bounds_cm": [
+        150.0,
+        25.0,
+        5.999999798834321
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX07",
+        "TX08"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 4.0440430244882967e-05
+    },
+    {
+      "id": "CCS73",
+      "status": "passed",
+      "vertices": 64,
+      "triangles": 108,
+      "bounds_cm": [
+        69.9999988079071,
+        40.00000059604645,
+        3.99999986588955
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX09"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.00023999996922066498
+    },
+    {
+      "id": "CCS74",
+      "status": "passed",
+      "vertices": 50,
+      "triangles": 96,
+      "bounds_cm": [
+        49.99999701976776,
+        50.0,
+        1.999999932944775
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX12"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.00016529593313369353
+    },
+    {
+      "id": "CCS75",
+      "status": "passed",
+      "vertices": 222,
+      "triangles": 428,
+      "bounds_cm": [
+        50.0,
+        44.999998807907104,
+        55.00000178813935
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX08",
+        "TX09"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.0001459504972139288
+    },
+    {
+      "id": "CCS76",
+      "status": "passed",
+      "vertices": 64,
+      "triangles": 116,
+      "bounds_cm": [
+        25.0,
+        15.000000596046448,
+        89.9999964237213
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX08"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 5.0910136699720844e-05
+    },
+    {
+      "id": "CCS77",
+      "status": "passed",
+      "vertices": 568,
+      "triangles": 1076,
+      "bounds_cm": [
+        69.9999988079071,
+        60.00000238418579,
+        60.0000035762787
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX08"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.000231384627888857
+    },
+    {
+      "id": "CCS78",
+      "status": "passed",
+      "vertices": 144,
+      "triangles": 256,
+      "bounds_cm": [
+        69.9999988079071,
+        2.9999999329447746,
+        100.0
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX08",
+        "TX16",
+        "TX09"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 2.6533891199533723e-07
+    },
+    {
+      "id": "CCS79",
+      "status": "passed",
+      "vertices": 348,
+      "triangles": 648,
+      "bounds_cm": [
+        60.00000238418579,
+        3.0000001192092896,
+        60.0000035762787
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX16",
+        "TX09"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 6.170648064649638e-06
+    },
+    {
+      "id": "CCS80",
+      "status": "passed",
+      "vertices": 12,
+      "triangles": 20,
+      "bounds_cm": [
+        50.0,
+        2.9999999329447746,
+        40.00000089406968
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX16"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.0018139459912263364
+    },
+    {
+      "id": "CCS81",
+      "status": "passed",
+      "vertices": 124,
+      "triangles": 224,
+      "bounds_cm": [
+        60.00000238418579,
+        3.999999910593033,
+        139.99999642372129
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX09",
+        "TX12"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 3.4640986035863146e-06
+    },
+    {
+      "id": "CCS82",
+      "status": "passed",
+      "vertices": 4,
+      "triangles": 2,
+      "bounds_cm": [
+        120.00000476837158,
+        0.0,
+        69.99999821186064
+      ],
+      "pivot": "top contact",
+      "uv_layers": 1,
+      "material_keys": [
+        "Wear_SaltResidue"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.42000002466496894
+    },
+    {
+      "id": "CCS83",
+      "status": "passed",
+      "vertices": 4,
+      "triangles": 2,
+      "bounds_cm": [
+        150.0,
+        0.0,
+        120.0000071525574
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "Wear_DampLeak"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.9000000344382385
+    },
+    {
+      "id": "CCS84",
+      "status": "passed",
+      "vertices": 120,
+      "triangles": 204,
+      "bounds_cm": [
+        80.0000011920929,
+        5.000000074505806,
+        80.00000178813936
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "AT01"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.0001079170663098439
+    },
+    {
+      "id": "CCS85",
+      "status": "passed",
+      "vertices": 44,
+      "triangles": 72,
+      "bounds_cm": [
+        80.0000011920929,
+        60.00000238418579,
+        20.00000044703484
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX01"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.0058424240032838365
+    },
+    {
+      "id": "CCS86",
+      "status": "passed",
+      "vertices": 40,
+      "triangles": 68,
+      "bounds_cm": [
+        200.0,
+        30.000001192092896,
+        34.99999910593032
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX08"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.00045370584996389234
+    },
+    {
+      "id": "CCS87",
+      "status": "passed",
+      "vertices": 124,
+      "triangles": 220,
+      "bounds_cm": [
+        120.00000476837158,
+        24.99999850988388,
+        119.9999892711638
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX08",
+        "TX09"
+      ],
+      "socket_count": 2,
+      "minimum_triangle_area_m2": 2.74674851830421e-05
+    },
+    {
+      "id": "CCS88",
+      "status": "passed",
+      "vertices": 256,
+      "triangles": 472,
+      "bounds_cm": [
+        80.0000011920929,
+        80.0000011920929,
+        15.000000894069675
+      ],
+      "pivot": "top contact",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX01",
+        "TX09",
+        "TX17"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 2.199839468687902e-05
+    },
+    {
+      "id": "PWC01",
+      "status": "passed",
+      "vertices": 260,
+      "triangles": 492,
+      "bounds_cm": [
+        200.0,
+        200.0,
+        600.0
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX09",
+        "TX11"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.005033552668869864
+    },
+    {
+      "id": "PWC02",
+      "status": "passed",
+      "vertices": 184,
+      "triangles": 344,
+      "bounds_cm": [
+        89.99999761581421,
+        23.999999463558197,
+        89.99999761581421
+      ],
+      "pivot": "center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX09",
+        "TX11"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.0005304402900738745
+    },
+    {
+      "id": "PWC03",
+      "status": "passed",
+      "vertices": 48,
+      "triangles": 84,
+      "bounds_cm": [
+        23.999999463558197,
+        23.999999463558197,
+        160.0000023841858
+      ],
+      "pivot": "center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX09",
+        "TX11"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.001164975586248845
+    },
+    {
+      "id": "PWC04",
+      "status": "passed",
+      "vertices": 60,
+      "triangles": 108,
+      "bounds_cm": [
+        79.99999523162842,
+        34.99999940395355,
+        139.99999642372129
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX09",
+        "TX11"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.00024192080493660792
+    },
+    {
+      "id": "PWC05",
+      "status": "passed",
+      "vertices": 144,
+      "triangles": 288,
+      "bounds_cm": [
+        200.0,
+        40.00000059604645,
+        40.00000059604645
+      ],
+      "pivot": "center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX11",
+        "TX09"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.0010939644183338673
+    },
+    {
+      "id": "PWC06",
+      "status": "passed",
+      "vertices": 276,
+      "triangles": 552,
+      "bounds_cm": [
+        80.0000011920929,
+        80.0000011920929,
+        40.00000059604645
+      ],
+      "pivot": "center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX11",
+        "TX09"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.0003340460597676634
+    },
+    {
+      "id": "PWC07",
+      "status": "passed",
+      "vertices": 120,
+      "triangles": 216,
+      "bounds_cm": [
+        18.000000715255737,
+        50.0,
+        50.0
+      ],
+      "pivot": "center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX09"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.000520039400484507
+    },
+    {
+      "id": "PWC08",
+      "status": "passed",
+      "vertices": 72,
+      "triangles": 128,
+      "bounds_cm": [
+        34.99999940395355,
+        30.000001192092896,
+        64.9999964237213
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX09",
+        "TX11"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.00028360721154838846
+    },
+    {
+      "id": "PWC09",
+      "status": "passed",
+      "vertices": 48,
+      "triangles": 88,
+      "bounds_cm": [
+        11.999999731779099,
+        50.0,
+        50.0
+      ],
+      "pivot": "center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX09",
+        "TX11"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.0029541388521126606
+    },
+    {
+      "id": "PWC10",
+      "status": "passed",
+      "vertices": 48,
+      "triangles": 88,
+      "bounds_cm": [
+        200.0,
+        55.000001192092896,
+        55.00000178813935
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX04",
+        "TX02"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.0016362257323817117
+    },
+    {
+      "id": "PWC11",
+      "status": "passed",
+      "vertices": 48,
+      "triangles": 88,
+      "bounds_cm": [
+        79.99999523162842,
+        80.0000011920929,
+        55.00000178813935
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX04"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.0023757367151818623
+    },
+    {
+      "id": "PWC12",
+      "status": "passed",
+      "vertices": 48,
+      "triangles": 88,
+      "bounds_cm": [
+        60.00000238418579,
+        55.000001192092896,
+        55.00000178813935
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX04",
+        "TX02"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.0014027991630630272
+    },
+    {
+      "id": "PWC13",
+      "status": "passed",
+      "vertices": 168,
+      "triangles": 308,
+      "bounds_cm": [
+        34.99999940395355,
+        11.999999731779099,
+        150.0
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX08",
+        "TX09"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 6.641059692398718e-06
+    },
+    {
+      "id": "PWC14",
+      "status": "passed",
+      "vertices": 140,
+      "triangles": 264,
+      "bounds_cm": [
+        200.0,
+        69.9999988079071,
+        250.0
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX08"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.0001101659595552497
+    },
+    {
+      "id": "PWC15",
+      "status": "passed",
+      "vertices": 42,
+      "triangles": 80,
+      "bounds_cm": [
+        49.99999701976776,
+        44.999998807907104,
+        220.0000071525574
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX08"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 8.232395120663075e-05
+    },
+    {
+      "id": "PWC16",
+      "status": "passed",
+      "vertices": 148,
+      "triangles": 272,
+      "bounds_cm": [
+        100.0,
+        44.999998807907104,
+        34.99999910593032
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX04",
+        "TX08"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 3.429223973746886e-05
+    },
+    {
+      "id": "PWC17",
+      "status": "passed",
+      "vertices": 84,
+      "triangles": 140,
+      "bounds_cm": [
+        100.0,
+        79.99999523162842,
+        15.000000894069675
+      ],
+      "pivot": "top contact",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX04"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.0031227361767549307
+    },
+    {
+      "id": "PWC18",
+      "status": "passed",
+      "vertices": 160,
+      "triangles": 280,
+      "bounds_cm": [
+        69.9999988079071,
+        55.000001192092896,
+        55.000001192092896
+      ],
+      "pivot": "center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX09",
+        "TX11"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.00010499990495243187
+    },
+    {
+      "id": "PWC19",
+      "status": "passed",
+      "vertices": 120,
+      "triangles": 220,
+      "bounds_cm": [
+        100.0,
+        25.0,
+        139.99999642372129
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX08"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.00018474066622519998
+    },
+    {
+      "id": "PWC20",
+      "status": "passed",
+      "vertices": 80,
+      "triangles": 152,
+      "bounds_cm": [
+        55.000001192092896,
+        11.999999731779099,
+        15.000000596046448
+      ],
+      "pivot": "center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX09"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.00015783315845215403
+    },
+    {
+      "id": "PWC21",
+      "status": "passed",
+      "vertices": 128,
+      "triangles": 248,
+      "bounds_cm": [
+        44.999998807907104,
+        44.999998807907104,
+        50.0
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX09",
+        "TX11"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 0.00015149163445139733
+    },
+    {
+      "id": "PWC22",
+      "status": "passed",
+      "vertices": 120,
+      "triangles": 220,
+      "bounds_cm": [
+        60.00000238418579,
+        40.00000059604645,
+        7.9999997317791
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX09",
+        "TX11"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 4.9263291867704246e-05
+    },
+    {
+      "id": "PWC23",
+      "status": "passed",
+      "vertices": 62,
+      "triangles": 104,
+      "bounds_cm": [
+        15.000000596046448,
+        15.000000596046448,
+        30.00000178813935
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX16",
+        "TX09"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 5.7649613505212395e-05
+    },
+    {
+      "id": "PWC24",
+      "status": "passed",
+      "vertices": 52,
+      "triangles": 96,
+      "bounds_cm": [
+        69.9999988079071,
+        5.000000074505806,
+        120.0000071525574
+      ],
+      "pivot": "bottom center",
+      "uv_layers": 1,
+      "material_keys": [
+        "TX08",
+        "TX12"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 7.9677769932507e-05
+    },
+    {
+      "id": "PWC25",
+      "status": "passed",
+      "vertices": 6,
+      "triangles": 4,
+      "bounds_cm": [
+        1150.0,
+        1100.0,
+        0.0
+      ],
+      "pivot": "center",
+      "uv_layers": 1,
+      "material_keys": [
+        "FX_ShallowWater"
+      ],
+      "socket_count": 0,
+      "minimum_triangle_area_m2": 15.0
+    }
+  ],
+  "errors": [],
+  "scope": "Fresh saved Blender artifact only",
+  "production_input_sha256": {
+    "WarrensVariantCKit\\build_kit.py": "46d40aaf813e9d7f4996939bfb8fd38d8e3a20fd1a72cf6af830b9d6d30b8319",
+    "WarrensVariantCKit\\model_catalog.json": "02be715cebb62882cadd3dd0ca550265afcd76679683af6b9ae38c6d2694729b",
+    "ChainCrossingKit\\build_kit.py": "06644f17491707f6e10c289c358b2b0c788c1f4ae5c6e5a8a59f85e3342507db",
+    "WarrensVariantCKit\\generators\\architecture_interaction.py": "bf0c2d5a144e32b181d689d93148fb7ed47c06ae83ffdedd734adf476067f905",
+    "WarrensVariantCKit\\generators\\heroes.py": "a543a07181d085701dade4890f02d0736b0344e53f35415a477edc850f69a10d",
+    "WarrensVariantCKit\\generators\\organic_lighting.py": "b6a64121e583cd8d0909729426d32094ff9c679d20e8423a60fbecfda0a61165",
+    "WarrensVariantCKit\\generators\\props.py": "ea6aec5f7cd5ba1d6de428997c796914717b0dcc089c94209386f4482bd66007",
+    "WarrensVariantCKit\\Output\\fitted_instances.json": "67f8e8d87ab166ab7fd0cd5e285a08e02b8643c856de3bf028130271021b9d34"
+  },
+  "bell_opening": {
+    "id": "WVC019",
+    "status": "passed",
+    "open_mouth_rays": [
+      {
+        "x": -0.30000001192092896,
+        "y": -0.30000001192092896,
+        "first_hit_z": 2.3658101558685303
+      },
+      {
+        "x": -0.30000001192092896,
+        "y": 0.0,
+        "first_hit_z": 2.4804704189300537
+      },
+      {
+        "x": -0.30000001192092896,
+        "y": 0.30000001192092896,
+        "first_hit_z": 2.3658101558685303
+      },
+      {
+        "x": 0.0,
+        "y": -0.30000001192092896,
+        "first_hit_z": 2.4804704189300537
+      },
+      {
+        "x": 0.0,
+        "y": 0.0,
+        "first_hit_z": 2.5200002193450928
+      },
+      {
+        "x": 0.0,
+        "y": 0.30000001192092896,
+        "first_hit_z": 2.4804704189300537
+      },
+      {
+        "x": 0.30000001192092896,
+        "y": -0.30000001192092896,
+        "first_hit_z": 2.3658101558685303
+      },
+      {
+        "x": 0.30000001192092896,
+        "y": 0.0,
+        "first_hit_z": 2.4804704189300537
+      },
+      {
+        "x": 0.30000001192092896,
+        "y": 0.30000001192092896,
+        "first_hit_z": 2.3658101558685303
+      }
+    ],
+    "cavity_wall_rays": [
+      {
+        "direction": [
+          1.0,
+          0.0,
+          0.0
+        ],
+        "inner_distance_m": 0.7857141494750977,
+        "wall_thickness_m": 0.12000005763983726
+      },
+      {
+        "direction": [
+          0.7071067690849304,
+          0.7071067690849304,
+          0.0
+        ],
+        "inner_distance_m": 0.7589417099952698,
+        "wall_thickness_m": 0.11591100019431114
+      },
+      {
+        "direction": [
+          6.123234262925839e-17,
+          1.0,
+          0.0
+        ],
+        "inner_distance_m": 0.7857141494750977,
+        "wall_thickness_m": 0.12000006509041786
+      },
+      {
+        "direction": [
+          -0.7071067690849304,
+          0.7071067690849304,
+          0.0
+        ],
+        "inner_distance_m": 0.758941650390625,
+        "wall_thickness_m": 0.1159110970518589
+      },
+      {
+        "direction": [
+          -1.0,
+          1.2246468525851679e-16,
+          0.0
+        ],
+        "inner_distance_m": 0.7857141494750977,
+        "wall_thickness_m": 0.12000006509041786
+      },
+      {
+        "direction": [
+          -0.7071067690849304,
+          -0.7071067690849304,
+          0.0
+        ],
+        "inner_distance_m": 0.7589417099952698,
+        "wall_thickness_m": 0.11591100019431114
+      },
+      {
+        "direction": [
+          -1.8369701465288538e-16,
+          -1.0,
+          0.0
+        ],
+        "inner_distance_m": 0.7857141494750977,
+        "wall_thickness_m": 0.12000006509041786
+      },
+      {
+        "direction": [
+          0.7071067690849304,
+          -0.7071067690849304,
+          0.0
+        ],
+        "inner_distance_m": 0.758941650390625,
+        "wall_thickness_m": 0.1159110970518589
+      }
+    ]
+  },
+  "separate_part_contacts": {
+    "status": "passed",
+    "tolerance_m": 0.005,
+    "contacts": [
+      {
+        "tile": "Hub",
+        "left": "WVC013",
+        "right": "WVC014",
+        "sockets": [
+          "pulley_axle",
+          "axle_center"
+        ],
+        "gap_m": 2.9802322387695312e-08
+      },
+      {
+        "tile": "Hub",
+        "left": "WVC013",
+        "right": "WVC015",
+        "sockets": [
+          "drum_axle",
+          "axle_center"
+        ],
+        "gap_m": 2.9802322387695312e-08
+      },
+      {
+        "tile": "Belfry",
+        "left": "WVC020",
+        "right": "WVC019",
+        "sockets": [
+          "bell_attachment",
+          "crown_attachment"
+        ],
+        "gap_m": 1.9073486328125e-06
+      },
+      {
+        "tile": "Belfry",
+        "left": "WVC019",
+        "right": "WVC021",
+        "sockets": [
+          "clapper_hinge",
+          "hinge_center"
+        ],
+        "gap_m": 0.0
+      },
+      {
+        "tile": "Reliquary",
+        "left": "WVC026",
+        "right": "WVC081",
+        "sockets": [
+          "lid_seat",
+          "underside_center"
+        ],
+        "gap_m": 0.0
+      }
+    ],
+    "scope": "Saved assembly socket coincidence; does not prove complete collision-free fit"
+  },
+  "new_models": 83,
+  "reused_models": 113,
+  "library_entries": 196,
+  "packed_file_images": 139,
+  "triangles": 54063,
+  "stage": "assembled",
+  "asset_manifest_sha256": "19eb309e0c686bd4917438422017a391a391288f715a992ad8b2c599875fd10d"
+}

@@ -1,0 +1,57 @@
+{
+  "status": "passed",
+  "tiles": {
+    "Hub": {
+      "instances": 4345,
+      "hism_groups": 37
+    },
+    "Court": {
+      "instances": 4142,
+      "hism_groups": 14
+    },
+    "Ossuary": {
+      "instances": 2218,
+      "hism_groups": 15
+    },
+    "WaterworksW": {
+      "instances": 5689,
+      "hism_groups": 43
+    },
+    "Pit": {
+      "instances": 3874,
+      "hism_groups": 13
+    },
+    "Canal": {
+      "instances": 2184,
+      "hism_groups": 19
+    },
+    "Belfry": {
+      "instances": 2984,
+      "hism_groups": 25
+    },
+    "Reliquary": {
+      "instances": 1565,
+      "hism_groups": 14
+    },
+    "Mill": {
+      "instances": 806,
+      "hism_groups": 21
+    },
+    "Catacomb": {
+      "instances": 3671,
+      "hism_groups": 15
+    },
+    "Brineworks": {
+      "instances": 4432,
+      "hism_groups": 44
+    },
+    "Main": {
+      "instances": 1601,
+      "hism_groups": 6
+    }
+  },
+  "original_actor_checks": 190,
+  "original_instance_checks": 7481,
+  "owned_instances": 37511,
+  "material_component_checks": 69
+}

@@ -1,0 +1,68 @@
+{
+  "Hub": {
+    "asset": "/Game/Mars/Maps/Variants/v8c/LI_Warrens_Hub",
+    "disk": "D:\\Repositories\\CkRepos\\Orion\\Content\\Mars\\Maps\\Variants\\v8c\\LI_Warrens_Hub.umap",
+    "sha256": "6d24b3aea08d5afbf874b331ac01105aca586f814d5c53c42c640e58d6885be0",
+    "backup": "D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\Reports\\Backups\\20261024-062002\\LI_Warrens_Hub.umap"
+  },
+  "Court": {
+    "asset": "/Game/Mars/Maps/Variants/v8c/LI_Warrens_Court",
+    "disk": "D:\\Repositories\\CkRepos\\Orion\\Content\\Mars\\Maps\\Variants\\v8c\\LI_Warrens_Court.umap",
+    "sha256": "d40359ddd93502e7e31a1e1ab6a80043e5c0f0b37bf41c32ced7d6c953462746",
+    "backup": "D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\Reports\\Backups\\20261024-062002\\LI_Warrens_Court.umap"
+  },
+  "Ossuary": {
+    "asset": "/Game/Mars/Maps/Variants/v8c/LI_Warrens_Ossuary",
+    "disk": "D:\\Repositories\\CkRepos\\Orion\\Content\\Mars\\Maps\\Variants\\v8c\\LI_Warrens_Ossuary.umap",
+    "sha256": "20da5646729d6e8575f83036ab6ff8021f173fa90a5c4dc58391571c67f130d6",
+    "backup": "D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\Reports\\Backups\\20261024-062002\\LI_Warrens_Ossuary.umap"
+  },
+  "WaterworksW": {
+    "asset": "/Game/Mars/Maps/Variants/v8c/LI_Warrens_WaterworksW",
+    "disk": "D:\\Repositories\\CkRepos\\Orion\\Content\\Mars\\Maps\\Variants\\v8c\\LI_Warrens_WaterworksW.umap",
+    "sha256": "07d42fb4aebdb1aa4a176f00bca1b3f7973ed85d5f84d7f2a0b570d27a27a1e6",
+    "backup": "D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\Reports\\Backups\\20261024-062002\\LI_Warrens_WaterworksW.umap"
+  },
+  "Pit": {
+    "asset": "/Game/Mars/Maps/Variants/v8c/LI_Warrens_Pit",
+    "disk": "D:\\Repositories\\CkRepos\\Orion\\Content\\Mars\\Maps\\Variants\\v8c\\LI_Warrens_Pit.umap",
+    "sha256": "1703039002372399aa8e34213dc8d47d79308dbcaed4c96e09c95dd6fc720213",
+    "backup": "D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\Reports\\Backups\\20261024-062002\\LI_Warrens_Pit.umap"
+  },
+  "Canal": {
+    "asset": "/Game/Mars/Maps/Variants/v8c/LI_Warrens_Canal",
+    "disk": "D:\\Repositories\\CkRepos\\Orion\\Content\\Mars\\Maps\\Variants\\v8c\\LI_Warrens_Canal.umap",
+    "sha256": "33e7ed4f6cd9b32f644b3990e7ecc3ba28ec861ec189c2274c6d0e3d92ecca19",
+    "backup": "D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\Reports\\Backups\\20261024-062002\\LI_Warrens_Canal.umap"
+  },
+  "Belfry": {
+    "asset": "/Game/Mars/Maps/Variants/v8c/LI_Warrens_Belfry",
+    "disk": "D:\\Repositories\\CkRepos\\Orion\\Content\\Mars\\Maps\\Variants\\v8c\\LI_Warrens_Belfry.umap",
+    "sha256": "21cf584fc1dfd7ba3593158c1dc6c47bccaf3906067016147eaba4c5a54bcf83",
+    "backup": "D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\Reports\\Backups\\20261024-062002\\LI_Warrens_Belfry.umap"
+  },
+  "Reliquary": {
+    "asset": "/Game/Mars/Maps/Variants/v8c/LI_Warrens_Reliquary",
+    "disk": "D:\\Repositories\\CkRepos\\Orion\\Content\\Mars\\Maps\\Variants\\v8c\\LI_Warrens_Reliquary.umap",
+    "sha256": "468425ae0f2547f2c049951d3baa717f244c15394ac546c03c43c09066cf45a5",
+    "backup": "D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\Reports\\Backups\\20261024-062002\\LI_Warrens_Reliquary.umap"
+  },
+  "Mill": {
+    "asset": "/Game/Mars/Maps/Variants/v8c/LI_Warrens_Mill",
+    "disk": "D:\\Repositories\\CkRepos\\Orion\\Content\\Mars\\Maps\\Variants\\v8c\\LI_Warrens_Mill.umap",
+    "sha256": "717770cb7cc30eece1490e1bbd6f0fe527e1f87f9521f1bbc14e28a7c4f876b4",
+    "backup": "D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\Reports\\Backups\\20261024-062002\\LI_Warrens_Mill.umap"
+  },
+  "Catacomb": {
+    "asset": "/Game/Mars/Maps/Variants/v8c/LI_Warrens_Catacomb",
+    "disk": "D:\\Repositories\\CkRepos\\Orion\\Content\\Mars\\Maps\\Variants\\v8c\\LI_Warrens_Catacomb.umap",
+    "sha256": "eed9d7e6dcd14e9c5b6aa46df88bdf17cb1a7e36cb2067166b0096b264657ee2",
+    "backup": "D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\Reports\\Backups\\20261024-062002\\LI_Warrens_Catacomb.umap"
+  },
+  "Brineworks": {
+    "asset": "/Game/Mars/Maps/Variants/v8c/LI_Warrens_Brineworks",
+    "disk": "D:\\Repositories\\CkRepos\\Orion\\Content\\Mars\\Maps\\Variants\\v8c\\LI_Warrens_Brineworks.umap",
+    "sha256": "9c689b00da43dac0b5c4168e1c80403e5769d2650e78d294769d434d8b36cba0",
+    "backup": "D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\Reports\\Backups\\20261024-062002\\LI_Warrens_Brineworks.umap"
+  }
+}
