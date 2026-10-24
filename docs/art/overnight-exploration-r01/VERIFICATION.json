@@ -1,0 +1,28 @@
+{
+  "verified_utc": "2026-10-24T03:42:37.404398+00:00",
+  "concepts": 108,
+  "categories": {
+    "cookbook": 12,
+    "environment-B": 12,
+    "environment-C": 12,
+    "environment-D": 12,
+    "intro": 12,
+    "hud": 12,
+    "mechanisms": 12,
+    "monsters": 12,
+    "vermin": 12
+  },
+  "inspected": 108,
+  "unique_image_hashes": 108,
+  "minimum_dimensions": [
+    1536,
+    1024
+  ],
+  "exact_prompt_files": 108,
+  "thumbnail_files": 108,
+  "source_layout_hash_matches": true,
+  "gallery_cards": 108,
+  "gallery_javascript_syntax": "passed: node --check",
+  "browser_observation": "Not run: browser policy blocked file:// navigation. Image sheets inspected directly.",
+  "unreal_changes": "None in this art task"
+}

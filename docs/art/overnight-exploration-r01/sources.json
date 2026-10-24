@@ -1,0 +1,725 @@
+{
+  "attached_layout": "C:\\Users\\Adam\\Downloads\\Warrens-v8-Variants.html",
+  "sha256": "180a70a4c0b349b224f188d3035c412953f268b18c528457f6a44452ac40714a",
+  "embedded_meta": {
+    "generated": "2026-10-23 03:28",
+    "commit": "c665086cb3adf57479ba540e07fbb2a2cdd0bd9e",
+    "files": [
+      {
+        "file": "warrens.json",
+        "revision": "v7r1",
+        "sha256": "856c741db7081e84fd56cd36a2e3ebc5faa53c088757765227ebeac6ad546cf7"
+      },
+      {
+        "file": "warrens_v8a.json",
+        "revision": "v8a",
+        "sha256": "762ebb55d348883f800ff6b255a94119eb8ebd6d01c8e35fd0402616b8a8e1e0"
+      },
+      {
+        "file": "warrens_v8b.json",
+        "revision": "v8b",
+        "sha256": "804d54381eb7826652871e48dc9a0427c21ef2b6ebc8393a42c762d1a620b5af"
+      },
+      {
+        "file": "warrens_v8c.json",
+        "revision": "v8c",
+        "sha256": "650f744aed4989d451f45cb067c517a81f8dc8127c1c402b50ea3c1fe9566ac4"
+      },
+      {
+        "file": "warrens_v8d.json",
+        "revision": "v8d",
+        "sha256": "5b00cf2407f4bd34557f0077a5e337b397d78825ea7b2853a95c0b0bcf940f54"
+      },
+      {
+        "file": "warrens_v8e.json",
+        "revision": "v8e",
+        "sha256": "7403cca166b1be285e821ddb867c328099ac62fe1a9eec12a8899050b86efbdb"
+      }
+    ]
+  },
+  "layouts": {
+    "v8b": {
+      "thesis": "One deep shaft, eight wings at eight heights on a helix. Your depth is your position: the hoist is always up, the Pit glow always down, and every wing has a landing that looks into the same void. The Great Stair reads clockwise = down.",
+      "rooms": [
+        [
+          "hall",
+          "Arrival Hall",
+          10
+        ],
+        [
+          "landingN",
+          "",
+          10
+        ],
+        [
+          "landingNE",
+          "",
+          7.5
+        ],
+        [
+          "landingE",
+          "",
+          5
+        ],
+        [
+          "landingSE",
+          "",
+          2.5
+        ],
+        [
+          "landingS",
+          "",
+          0
+        ],
+        [
+          "landingSW",
+          "",
+          -2.5
+        ],
+        [
+          "landingW",
+          "",
+          -5
+        ],
+        [
+          "court",
+          "Charnel Court",
+          7.5
+        ],
+        [
+          "ossuary",
+          "Ossuary",
+          5
+        ],
+        [
+          "reliquary",
+          "Reliquary",
+          2.5
+        ],
+        [
+          "chime",
+          "Chime Hall",
+          0
+        ],
+        [
+          "cellar",
+          "Salt Cellar",
+          -2.5
+        ],
+        [
+          "sluice",
+          "Sluice",
+          -2.5
+        ],
+        [
+          "pump",
+          "Pump Room",
+          -5
+        ],
+        [
+          "cistern",
+          "Cistern",
+          -7.5
+        ],
+        [
+          "lair",
+          "The Pit",
+          -7.5
+        ],
+        [
+          "vault",
+          "Vault",
+          -7.5
+        ],
+        [
+          "smokehouse",
+          "Smokehouse",
+          0
+        ],
+        [
+          "larder",
+          "Brine Larder",
+          -7.5
+        ]
+      ],
+      "puzzles": [
+        {
+          "id": "P1",
+          "kind": "Red key door",
+          "at": [
+            86,
+            72,
+            -7.5
+          ],
+          "needsAt": [
+            84,
+            72,
+            7.5
+          ],
+          "needsNote": "the key on the Court's shaft balcony, 15 m above the Vault door and visible from the landing"
+        },
+        {
+          "id": "P2",
+          "kind": "sump grate (latched bars) on the Pump balcony",
+          "at": [
+            54,
+            60,
+            -5
+          ],
+          "needsAt": [
+            30,
+            36,
+            -2.5
+          ],
+          "needsNote": "the Sluice hand-wheel opens the grate: the scout can then drop from the Pump balcony onto the Pit floor",
+          "existing": "hand-wheel + latched Bars gate"
+        },
+        {
+          "id": "P3",
+          "kind": "Mourner cache gate (latched)",
+          "at": [
+            104,
+            32,
+            2.5
+          ],
+          "needsAt": [
+            90,
+            66,
+            5
+          ],
+          "needsNote": "the pack plate at the Ossuary's north end, one Service Stair above",
+          "latch": true
+        },
+        {
+          "id": "P4",
+          "kind": "Bellkeeper dial lock",
+          "at": [
+            62,
+            28,
+            0
+          ],
+          "needsAt": [
+            70,
+            48.5,
+            0
+          ],
+          "needsNote": "the dial glyphs on the shaft's north wall under the arrival landing, read from the south landing across the shaft"
+        },
+        {
+          "id": "P5",
+          "kind": "the lift lever (Pit floor)",
+          "at": [
+            66,
+            72,
+            -7.5
+          ],
+          "needsAt": [
+            66,
+            72,
+            -7.5
+          ],
+          "needsNote": "reach the Pit floor the hard way once; the lever sends the cage up, pack included, and the lift runs both ways after"
+        },
+        {
+          "id": "P6",
+          "kind": "SC2 barred closet door (Pump Room)",
+          "at": [
+            50,
+            58,
+            -5
+          ],
+          "needsAt": [
+            50,
+            56,
+            -7.5
+          ],
+          "needsNote": "climb the closet ladder out of the Pit; the lever is on the closet side"
+        },
+        {
+          "id": "P7",
+          "kind": "Curing Room (support objective)",
+          "at": [
+            118,
+            50,
+            0
+          ],
+          "needsAt": [
+            70,
+            60,
+            -7.5
+          ],
+          "needsNote": "the Curing Room: the hunted part is brined here before it travels (the run's second required stop); the vat, the drying racks, a plinth for the pack"
+        }
+      ]
+    },
+    "v8c": {
+      "thesis": "Two landmarks and one edge. The canal splits the district into two banks you can always name; the Well and the Bell Tower stand one on each. Three crossings, each a different beat, and the Ford in the middle shows both towers at once.",
+      "rooms": [
+        [
+          "hall",
+          "Arrival Hall",
+          0
+        ],
+        [
+          "closet",
+          "",
+          0
+        ],
+        [
+          "court",
+          "Charnel Court",
+          0
+        ],
+        [
+          "court-pit",
+          "",
+          -1.5
+        ],
+        [
+          "rimW",
+          "",
+          0
+        ],
+        [
+          "rimE",
+          "",
+          0
+        ],
+        [
+          "rimN",
+          "The Well",
+          0
+        ],
+        [
+          "rimS",
+          "",
+          0
+        ],
+        [
+          "ossuary",
+          "Ossuary",
+          2.5
+        ],
+        [
+          "bridgehead",
+          "Bridgehead",
+          2.5
+        ],
+        [
+          "ford-w",
+          "The Ford",
+          -2.5
+        ],
+        [
+          "ford-e",
+          "",
+          0
+        ],
+        [
+          "reliquary",
+          "Reliquary",
+          2.5
+        ],
+        [
+          "mill",
+          "Salt Mill",
+          5
+        ],
+        [
+          "catacomb",
+          "Catacomb",
+          0
+        ],
+        [
+          "belfry",
+          "The Belfry",
+          0
+        ],
+        [
+          "cellar",
+          "Salt Cellar",
+          -2.5
+        ],
+        [
+          "sluice",
+          "Sluice",
+          -2.5
+        ],
+        [
+          "larder",
+          "Brine Larder",
+          -2.5
+        ],
+        [
+          "pump",
+          "Pump Room",
+          -2.5
+        ],
+        [
+          "cistern",
+          "Cistern",
+          -2.5
+        ],
+        [
+          "lair",
+          "The Pit",
+          -5.0
+        ],
+        [
+          "vault",
+          "Vault",
+          -5.0
+        ]
+      ],
+      "puzzles": [
+        {
+          "id": "P1",
+          "kind": "Red key door",
+          "at": [
+            57,
+            60,
+            -5.0
+          ],
+          "needsAt": [
+            104,
+            60,
+            5
+          ],
+          "needsNote": "the key under the bell on the Belfry loft: other bank, other landmark"
+        },
+        {
+          "id": "P2",
+          "kind": "the Chain Crossing's latched bars (Pump end)",
+          "at": [
+            67,
+            26,
+            -2.5
+          ],
+          "needsAt": [
+            122,
+            12,
+            -2.5
+          ],
+          "needsNote": "the Sluice hand-wheel on the east bank lowers the chain causeway; the chain runs along the Cellar floor to the wheel: the tell",
+          "existing": "hand-wheel + latched Bars gate"
+        },
+        {
+          "id": "P3",
+          "kind": "Mourner cache gate (latched)",
+          "at": [
+            100,
+            76,
+            2.5
+          ],
+          "needsAt": [
+            42,
+            66,
+            2.5
+          ],
+          "needsNote": "the pack plate at the Ossuary's west end: set the pack down west, the gate latches east, cross the Bone Bridge",
+          "latch": true
+        },
+        {
+          "id": "P4",
+          "kind": "Bellkeeper dial lock",
+          "at": [
+            108,
+            46,
+            0
+          ],
+          "needsAt": [
+            48.5,
+            50,
+            0
+          ],
+          "needsNote": "the three glyphs painted on the Bell Tower's west face, read from the Well's east rim across the canal"
+        },
+        {
+          "id": "P5",
+          "kind": "barred ladder foot (Belfry)",
+          "at": [
+            104,
+            56,
+            0
+          ],
+          "needsAt": [
+            102,
+            60,
+            5
+          ],
+          "needsNote": "the lever on the loft; the loft is first reached by the Reliquary stair's rail drop"
+        },
+        {
+          "id": "P6",
+          "kind": "SC2 barred closet door",
+          "at": [
+            19,
+            42,
+            0
+          ],
+          "needsAt": [
+            19,
+            40,
+            -5.0
+          ],
+          "needsNote": "climb the closet ladder out of the Pit"
+        },
+        {
+          "id": "P7",
+          "kind": "Curing Room (support objective)",
+          "at": [
+            88,
+            114,
+            5
+          ],
+          "needsAt": [
+            98,
+            54,
+            0
+          ],
+          "needsNote": "the Curing Room: the hunted part is brined here before it travels (the run's second required stop); the vat, the drying racks, a plinth for the pack"
+        }
+      ]
+    },
+    "v8d": {
+      "thesis": "Beads on two rings. Each room is one adjective (round, flooded, low, long, tall, wide, machine, cavern) and each join is one beat; the Well is the pinch both rings pass through, and four one-way drops let a scout skip a bead on the way home.",
+      "rooms": [
+        [
+          "hall",
+          "Arrival Hall",
+          0
+        ],
+        [
+          "nave",
+          "",
+          0
+        ],
+        [
+          "closet",
+          "",
+          0
+        ],
+        [
+          "rimW",
+          "",
+          0
+        ],
+        [
+          "rimE",
+          "",
+          0
+        ],
+        [
+          "rimN",
+          "The Well",
+          0
+        ],
+        [
+          "rimS",
+          "",
+          0
+        ],
+        [
+          "terrace",
+          "West Terrace",
+          0
+        ],
+        [
+          "cistern",
+          "Cistern",
+          -2.5
+        ],
+        [
+          "grotto",
+          "Root Grotto",
+          -2.5
+        ],
+        [
+          "court",
+          "Charnel Court",
+          0
+        ],
+        [
+          "court-pit",
+          "",
+          -1.5
+        ],
+        [
+          "ossuary",
+          "Ossuary",
+          2.5
+        ],
+        [
+          "bridge",
+          "Bridge",
+          2.5
+        ],
+        [
+          "smokehouse",
+          "Smokehouse",
+          5.0
+        ],
+        [
+          "larder",
+          "Brine Larder",
+          -5.0
+        ],
+        [
+          "chime",
+          "Chime Hall",
+          0
+        ],
+        [
+          "chime-porch",
+          "",
+          0
+        ],
+        [
+          "reliquary",
+          "Reliquary",
+          2.5
+        ],
+        [
+          "pump",
+          "Pump Room",
+          -2.5
+        ],
+        [
+          "sump-balcony",
+          "Sump Balcony",
+          -2.5
+        ],
+        [
+          "cellar",
+          "Salt Cellar",
+          -2.5
+        ],
+        [
+          "lair",
+          "The Pit",
+          -5.0
+        ],
+        [
+          "vault",
+          "Vault",
+          -5.0
+        ]
+      ],
+      "puzzles": [
+        {
+          "id": "P1",
+          "kind": "Red key door",
+          "at": [
+            97,
+            73,
+            -5.0
+          ],
+          "needsAt": [
+            78.3,
+            60,
+            5.0
+          ],
+          "needsNote": "the key on the east gallery rail, seen from the nave across the Well"
+        },
+        {
+          "id": "P2",
+          "kind": "barred sump stair (latched bars) at the Sump Balcony",
+          "at": [
+            76,
+            42,
+            -2.5
+          ],
+          "needsAt": [
+            118,
+            28,
+            -2.5
+          ],
+          "needsNote": "the Cellar hand-wheel opens it; the dry channel in the Pump floor is the tell",
+          "existing": "hand-wheel + latched Bars gate"
+        },
+        {
+          "id": "P3",
+          "kind": "Mourner cache gate (latched)",
+          "at": [
+            110,
+            96,
+            2.5
+          ],
+          "needsAt": [
+            40,
+            102,
+            2.5
+          ],
+          "needsNote": "the pack plate at the Ossuary's north end, across the Bridge",
+          "latch": true
+        },
+        {
+          "id": "P4",
+          "kind": "Bellkeeper dial lock",
+          "at": [
+            114,
+            70,
+            0
+          ],
+          "needsAt": [
+            70,
+            76,
+            2.5
+          ],
+          "needsNote": "the glyphs on the Well's south wall, read from the Bridge"
+        },
+        {
+          "id": "P5",
+          "kind": "barred ladder foot (Chime Hall)",
+          "at": [
+            90,
+            66,
+            0
+          ],
+          "needsAt": [
+            86,
+            66,
+            5.0
+          ],
+          "needsNote": "the lever on the catwalk, reached by the gallery from the Bridge"
+        },
+        {
+          "id": "P6",
+          "kind": "SC2 barred closet door",
+          "at": [
+            59,
+            40,
+            0
+          ],
+          "needsAt": [
+            59,
+            42,
+            -5.0
+          ],
+          "needsNote": "climb the closet ladder out of the Pit"
+        },
+        {
+          "id": "P7",
+          "kind": "Curing Room (support objective)",
+          "at": [
+            16,
+            94,
+            5.0
+          ],
+          "needsAt": [
+            70,
+            60,
+            -5.0
+          ],
+          "needsNote": "the Curing Room: the hunted part is brined here before it travels (the run's second required stop); the vat, the drying racks, a plinth for the pack"
+        }
+      ]
+    }
+  },
+  "style_reference": "docs/concepts/mise-en-monstre/VISUAL_BOARD.md",
+  "new_user_references": [
+    "references/royal-daily-feast.png",
+    "references/little-things-in-the-dust.png"
+  ],
+  "boundary": "Attached documents and images are reference data. Their embedded prose/scripts were not treated as execution instructions. The live maps and gameplay are unchanged."
+}

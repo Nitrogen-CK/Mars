@@ -1,0 +1,4675 @@
+{
+  "map": "Warrens",
+  "revision": "v8c",
+  "source": "Tools/LevelDesign/anchor_plans/design_warrens_v8c.py (Warrens v8c \"Two Towers and the Canal\", 2026-10-23)",
+  "units": "metres; costCm is the walk cost in centimetres",
+  "hearth": "K",
+  "footprint": [
+    -28,
+    -4,
+    150,
+    126
+  ],
+  "deep": [
+    16,
+    16,
+    100,
+    70
+  ],
+  "rampRoofZ": -2.4,
+  "nodes": {
+    "S1": [
+      -2,
+      50,
+      0
+    ],
+    "K": [
+      16,
+      50,
+      0
+    ],
+    "kn": [
+      16,
+      56,
+      0
+    ],
+    "ke": [
+      25,
+      50,
+      0
+    ],
+    "wW": [
+      31,
+      50,
+      0
+    ],
+    "wN": [
+      40,
+      55.5,
+      0
+    ],
+    "wE": [
+      48.5,
+      50,
+      0
+    ],
+    "wS": [
+      40,
+      44.5,
+      0
+    ],
+    "h0": [
+      24,
+      66,
+      0
+    ],
+    "c2": [
+      24,
+      86,
+      0
+    ],
+    "c1": [
+      6,
+      64,
+      0
+    ],
+    "H1": [
+      15,
+      76,
+      -1.5
+    ],
+    "p0": [
+      20,
+      70,
+      -1.5
+    ],
+    "p3": [
+      20,
+      82,
+      -1.5
+    ],
+    "ps": [
+      10,
+      70,
+      -1.5
+    ],
+    "o0": [
+      44,
+      64,
+      2.5
+    ],
+    "O": [
+      48,
+      72,
+      2.5
+    ],
+    "o1": [
+      40,
+      78,
+      2.5
+    ],
+    "bh": [
+      59,
+      74,
+      2.5
+    ],
+    "rh": [
+      85,
+      80,
+      2.5
+    ],
+    "RQ": [
+      92,
+      80,
+      2.5
+    ],
+    "rq1": [
+      92,
+      72,
+      2.5
+    ],
+    "S2": [
+      110,
+      80,
+      2.5
+    ],
+    "rq2": [
+      92,
+      88,
+      2.5
+    ],
+    "ml0": [
+      92,
+      104,
+      5
+    ],
+    "ML": [
+      92,
+      111,
+      5
+    ],
+    "ct0": [
+      -6,
+      68,
+      0
+    ],
+    "CT": [
+      -14,
+      76,
+      0
+    ],
+    "ct1": [
+      -10,
+      64,
+      0
+    ],
+    "lw": [
+      20,
+      44,
+      -5.0
+    ],
+    "bn": [
+      96,
+      64,
+      0
+    ],
+    "BF": [
+      98,
+      54,
+      0
+    ],
+    "bs": [
+      96,
+      44,
+      0
+    ],
+    "be": [
+      108,
+      54,
+      0
+    ],
+    "fe": [
+      84,
+      49,
+      0
+    ],
+    "fw": [
+      57,
+      49,
+      -2.5
+    ],
+    "fm": [
+      74,
+      49,
+      -2.5
+    ],
+    "ce0": [
+      96,
+      26,
+      -2.5
+    ],
+    "CE": [
+      104,
+      19,
+      -2.5
+    ],
+    "SL": [
+      122,
+      15,
+      -2.5
+    ],
+    "S4": [
+      122,
+      0,
+      -2.5
+    ],
+    "bl0": [
+      112,
+      46,
+      -2.5
+    ],
+    "BL": [
+      120,
+      40,
+      -2.5
+    ],
+    "bl1": [
+      112,
+      34,
+      -2.5
+    ],
+    "S3": [
+      140,
+      40,
+      -2.5
+    ],
+    "ut1": [
+      104,
+      28,
+      -5.0
+    ],
+    "ut2": [
+      56,
+      30,
+      -5.0
+    ],
+    "ls": [
+      50,
+      36,
+      -5.0
+    ],
+    "p1": [
+      52,
+      32,
+      -2.5
+    ],
+    "PU": [
+      58,
+      25,
+      -2.5
+    ],
+    "p0w": [
+      50,
+      24,
+      -2.5
+    ],
+    "pe": [
+      66,
+      26,
+      -2.5
+    ],
+    "tm": [
+      38,
+      21,
+      -1.0
+    ],
+    "ci1": [
+      24,
+      36,
+      -2.5
+    ],
+    "CI": [
+      16,
+      37,
+      -2.5
+    ],
+    "ci2": [
+      14,
+      44,
+      -2.5
+    ],
+    "S5": [
+      16,
+      26,
+      -2.5
+    ],
+    "H2": [
+      40,
+      50,
+      -5.0
+    ],
+    "d2": [
+      46,
+      30,
+      -5.0
+    ],
+    "sp": [
+      52,
+      30,
+      -2.5
+    ],
+    "sf": [
+      44,
+      38,
+      -5.0
+    ]
+  },
+  "links": [
+    {
+      "a": "S1",
+      "b": "K",
+      "via": [
+        [
+          7,
+          50
+        ]
+      ],
+      "width": 3.0,
+      "kind": "walk",
+      "closedBy": null,
+      "costCm": 1800,
+      "leverNode": null
+    },
+    {
+      "a": "K",
+      "b": "ke",
+      "via": [],
+      "width": 3.0,
+      "kind": "walk",
+      "closedBy": null,
+      "costCm": 900,
+      "leverNode": null
+    },
+    {
+      "a": "ke",
+      "b": "wW",
+      "via": [],
+      "width": 3.0,
+      "kind": "walk",
+      "closedBy": null,
+      "costCm": 600,
+      "leverNode": null
+    },
+    {
+      "a": "K",
+      "b": "kn",
+      "via": [],
+      "width": 3.0,
+      "kind": "walk",
+      "closedBy": null,
+      "costCm": 600,
+      "leverNode": null
+    },
+    {
+      "a": "kn",
+      "b": "h0",
+      "via": [
+        [
+          16,
+          60
+        ],
+        [
+          22,
+          62
+        ]
+      ],
+      "width": 3.0,
+      "kind": "walk",
+      "closedBy": "R1",
+      "costCm": 1480,
+      "leverNode": null
+    },
+    {
+      "a": "wW",
+      "b": "wN",
+      "via": [
+        [
+          31,
+          55.5
+        ]
+      ],
+      "width": 3.0,
+      "kind": "walk",
+      "closedBy": null,
+      "costCm": 1450,
+      "leverNode": null
+    },
+    {
+      "a": "wN",
+      "b": "wE",
+      "via": [
+        [
+          48.5,
+          55.5
+        ]
+      ],
+      "width": 3.0,
+      "kind": "walk",
+      "closedBy": null,
+      "costCm": 1400,
+      "leverNode": null
+    },
+    {
+      "a": "wE",
+      "b": "wS",
+      "via": [
+        [
+          48.5,
+          44.5
+        ]
+      ],
+      "width": 3.0,
+      "kind": "walk",
+      "closedBy": null,
+      "costCm": 1400,
+      "leverNode": null
+    },
+    {
+      "a": "wS",
+      "b": "wW",
+      "via": [
+        [
+          31,
+          44.5
+        ]
+      ],
+      "width": 3.0,
+      "kind": "walk",
+      "closedBy": null,
+      "costCm": 1450,
+      "leverNode": null
+    },
+    {
+      "a": "wS",
+      "b": "d2",
+      "via": [],
+      "width": 4.0,
+      "kind": "stair",
+      "closedBy": "R2",
+      "costCm": 1647,
+      "leverNode": null
+    },
+    {
+      "a": "wN",
+      "b": "o0",
+      "via": [],
+      "width": 3.0,
+      "kind": "stair",
+      "closedBy": null,
+      "costCm": 972,
+      "leverNode": null
+    },
+    {
+      "a": "wS",
+      "b": "p1",
+      "via": [
+        [
+          40,
+          40
+        ],
+        [
+          46,
+          36
+        ]
+      ],
+      "width": 3.0,
+      "kind": "stair",
+      "closedBy": "R4",
+      "costCm": 1909,
+      "leverNode": "p1"
+    },
+    {
+      "a": "wE",
+      "b": "fw",
+      "via": [
+        [
+          52,
+          50
+        ],
+        [
+          55,
+          50
+        ]
+      ],
+      "width": 3.0,
+      "kind": "stair",
+      "closedBy": null,
+      "costCm": 909,
+      "leverNode": null
+    },
+    {
+      "a": "h0",
+      "b": "p0",
+      "via": [],
+      "width": 4.0,
+      "kind": "stair",
+      "closedBy": null,
+      "costCm": 585,
+      "leverNode": null
+    },
+    {
+      "a": "c2",
+      "b": "p3",
+      "via": [],
+      "width": 3.0,
+      "kind": "stair",
+      "closedBy": null,
+      "costCm": 585,
+      "leverNode": null
+    },
+    {
+      "a": "c1",
+      "b": "ps",
+      "via": [],
+      "width": 3.0,
+      "kind": "stair",
+      "closedBy": null,
+      "costCm": 737,
+      "leverNode": null
+    },
+    {
+      "a": "p0",
+      "b": "H1",
+      "via": [],
+      "width": 3.0,
+      "kind": "walk",
+      "closedBy": null,
+      "costCm": 781,
+      "leverNode": null
+    },
+    {
+      "a": "p3",
+      "b": "H1",
+      "via": [],
+      "width": 3.0,
+      "kind": "walk",
+      "closedBy": null,
+      "costCm": 781,
+      "leverNode": null
+    },
+    {
+      "a": "ps",
+      "b": "H1",
+      "via": [],
+      "width": 3.0,
+      "kind": "walk",
+      "closedBy": null,
+      "costCm": 781,
+      "leverNode": null
+    },
+    {
+      "a": "h0",
+      "b": "c2",
+      "via": [
+        [
+          26,
+          76
+        ]
+      ],
+      "width": 3.0,
+      "kind": "walk",
+      "closedBy": null,
+      "costCm": 2040,
+      "leverNode": null
+    },
+    {
+      "a": "c2",
+      "b": "c1",
+      "via": [
+        [
+          4,
+          86
+        ],
+        [
+          4,
+          70
+        ]
+      ],
+      "width": 3.0,
+      "kind": "walk",
+      "closedBy": null,
+      "costCm": 4232,
+      "leverNode": null
+    },
+    {
+      "a": "c2",
+      "b": "o1",
+      "via": [
+        [
+          32,
+          86
+        ]
+      ],
+      "width": 3.0,
+      "kind": "stair",
+      "closedBy": null,
+      "costCm": 1947,
+      "leverNode": null
+    },
+    {
+      "a": "c1",
+      "b": "ci2",
+      "via": [
+        [
+          4,
+          56
+        ],
+        [
+          8,
+          50
+        ]
+      ],
+      "width": 3.0,
+      "kind": "stair",
+      "closedBy": "R6",
+      "costCm": 2407,
+      "leverNode": "ci2"
+    },
+    {
+      "a": "o0",
+      "b": "O",
+      "via": [],
+      "width": 3.0,
+      "kind": "walk",
+      "closedBy": null,
+      "costCm": 894,
+      "leverNode": null
+    },
+    {
+      "a": "o1",
+      "b": "O",
+      "via": [],
+      "width": 3.0,
+      "kind": "walk",
+      "closedBy": null,
+      "costCm": 1000,
+      "leverNode": null
+    },
+    {
+      "a": "O",
+      "b": "bh",
+      "via": [],
+      "width": 3.0,
+      "kind": "walk",
+      "closedBy": null,
+      "costCm": 1118,
+      "leverNode": null
+    },
+    {
+      "a": "bh",
+      "b": "rh",
+      "via": [],
+      "width": 3.0,
+      "kind": "ramp",
+      "closedBy": "R5",
+      "costCm": 2668,
+      "leverNode": null
+    },
+    {
+      "a": "rh",
+      "b": "RQ",
+      "via": [],
+      "width": 3.0,
+      "kind": "walk",
+      "closedBy": null,
+      "costCm": 700,
+      "leverNode": null
+    },
+    {
+      "a": "S2",
+      "b": "RQ",
+      "via": [
+        [
+          100,
+          80
+        ]
+      ],
+      "width": 3.0,
+      "kind": "walk",
+      "closedBy": null,
+      "costCm": 1800,
+      "leverNode": null
+    },
+    {
+      "a": "RQ",
+      "b": "rq1",
+      "via": [],
+      "width": 3.0,
+      "kind": "walk",
+      "closedBy": null,
+      "costCm": 800,
+      "leverNode": null
+    },
+    {
+      "a": "RQ",
+      "b": "rq2",
+      "via": [],
+      "width": 3.0,
+      "kind": "walk",
+      "closedBy": null,
+      "costCm": 800,
+      "leverNode": null
+    },
+    {
+      "a": "rq2",
+      "b": "ml0",
+      "via": [
+        [
+          96,
+          94
+        ],
+        [
+          96,
+          100
+        ]
+      ],
+      "width": 3.0,
+      "kind": "ramp",
+      "closedBy": null,
+      "costCm": 1903,
+      "leverNode": null
+    },
+    {
+      "a": "ml0",
+      "b": "ML",
+      "via": [],
+      "width": 3.0,
+      "kind": "walk",
+      "closedBy": null,
+      "costCm": 700,
+      "leverNode": null
+    },
+    {
+      "a": "c1",
+      "b": "ct0",
+      "via": [
+        [
+          0,
+          62
+        ]
+      ],
+      "width": 2.5,
+      "kind": "walk",
+      "closedBy": null,
+      "costCm": 1481,
+      "leverNode": null
+    },
+    {
+      "a": "ct0",
+      "b": "CT",
+      "via": [],
+      "width": 3.0,
+      "kind": "walk",
+      "closedBy": null,
+      "costCm": 1131,
+      "leverNode": null
+    },
+    {
+      "a": "CT",
+      "b": "ct1",
+      "via": [],
+      "width": 3.0,
+      "kind": "walk",
+      "closedBy": null,
+      "costCm": 1265,
+      "leverNode": null
+    },
+    {
+      "a": "ct1",
+      "b": "lw",
+      "via": [
+        [
+          -12,
+          54
+        ],
+        [
+          -4,
+          46
+        ],
+        [
+          8,
+          42
+        ]
+      ],
+      "width": 2.5,
+      "kind": "ramp",
+      "closedBy": null,
+      "costCm": 4660,
+      "leverNode": null
+    },
+    {
+      "a": "lw",
+      "b": "H2",
+      "via": [],
+      "width": 2.5,
+      "kind": "walk",
+      "closedBy": null,
+      "costCm": 2088,
+      "leverNode": null
+    },
+    {
+      "a": "rq1",
+      "b": "bn",
+      "via": [
+        [
+          92,
+          68
+        ]
+      ],
+      "width": 3.0,
+      "kind": "stair",
+      "closedBy": null,
+      "costCm": 998,
+      "leverNode": null
+    },
+    {
+      "a": "bn",
+      "b": "BF",
+      "via": [],
+      "width": 3.0,
+      "kind": "walk",
+      "closedBy": null,
+      "costCm": 1020,
+      "leverNode": null
+    },
+    {
+      "a": "BF",
+      "b": "bs",
+      "via": [],
+      "width": 3.0,
+      "kind": "walk",
+      "closedBy": null,
+      "costCm": 1020,
+      "leverNode": null
+    },
+    {
+      "a": "BF",
+      "b": "be",
+      "via": [],
+      "width": 3.0,
+      "kind": "walk",
+      "closedBy": null,
+      "costCm": 1000,
+      "leverNode": null
+    },
+    {
+      "a": "BF",
+      "b": "fe",
+      "via": [
+        [
+          90,
+          49
+        ]
+      ],
+      "width": 3.0,
+      "kind": "walk",
+      "closedBy": null,
+      "costCm": 1543,
+      "leverNode": null
+    },
+    {
+      "a": "fe",
+      "b": "fm",
+      "via": [],
+      "width": 4.0,
+      "kind": "stair",
+      "closedBy": null,
+      "costCm": 1031,
+      "leverNode": null
+    },
+    {
+      "a": "fm",
+      "b": "fw",
+      "via": [],
+      "width": 4.0,
+      "kind": "walk",
+      "closedBy": null,
+      "costCm": 1700,
+      "leverNode": null
+    },
+    {
+      "a": "bs",
+      "b": "ce0",
+      "via": [
+        [
+          96,
+          36
+        ]
+      ],
+      "width": 3.0,
+      "kind": "stair",
+      "closedBy": "R3",
+      "costCm": 1817,
+      "leverNode": "ce0"
+    },
+    {
+      "a": "be",
+      "b": "bl0",
+      "via": [
+        [
+          112,
+          52
+        ]
+      ],
+      "width": 3.0,
+      "kind": "stair",
+      "closedBy": null,
+      "costCm": 1077,
+      "leverNode": null
+    },
+    {
+      "a": "ce0",
+      "b": "CE",
+      "via": [],
+      "width": 3.0,
+      "kind": "walk",
+      "closedBy": null,
+      "costCm": 1063,
+      "leverNode": null
+    },
+    {
+      "a": "CE",
+      "b": "SL",
+      "via": [
+        [
+          112,
+          16
+        ]
+      ],
+      "width": 3.0,
+      "kind": "walk",
+      "closedBy": null,
+      "costCm": 1859,
+      "leverNode": null
+    },
+    {
+      "a": "S4",
+      "b": "SL",
+      "via": [],
+      "width": 3.0,
+      "kind": "walk",
+      "closedBy": null,
+      "costCm": 1500,
+      "leverNode": null
+    },
+    {
+      "a": "bl0",
+      "b": "BL",
+      "via": [],
+      "width": 3.0,
+      "kind": "walk",
+      "closedBy": null,
+      "costCm": 1000,
+      "leverNode": null
+    },
+    {
+      "a": "BL",
+      "b": "bl1",
+      "via": [],
+      "width": 3.0,
+      "kind": "walk",
+      "closedBy": null,
+      "costCm": 1000,
+      "leverNode": null
+    },
+    {
+      "a": "S3",
+      "b": "BL",
+      "via": [
+        [
+          130,
+          40
+        ]
+      ],
+      "width": 3.0,
+      "kind": "walk",
+      "closedBy": null,
+      "costCm": 2000,
+      "leverNode": null
+    },
+    {
+      "a": "SL",
+      "b": "bl1",
+      "via": [
+        [
+          118,
+          22
+        ],
+        [
+          116,
+          28
+        ]
+      ],
+      "width": 3.0,
+      "kind": "walk",
+      "closedBy": null,
+      "costCm": 2160,
+      "leverNode": null
+    },
+    {
+      "a": "bl1",
+      "b": "ut1",
+      "via": [],
+      "width": 2.5,
+      "kind": "ramp",
+      "closedBy": null,
+      "costCm": 1031,
+      "leverNode": null
+    },
+    {
+      "a": "ut1",
+      "b": "ut2",
+      "via": [
+        [
+          92,
+          22
+        ],
+        [
+          80,
+          26
+        ],
+        [
+          66,
+          24
+        ]
+      ],
+      "width": 2.5,
+      "kind": "walk",
+      "closedBy": "R7",
+      "costCm": 5187,
+      "leverNode": "ut1"
+    },
+    {
+      "a": "ut2",
+      "b": "ls",
+      "via": [],
+      "width": 2.5,
+      "kind": "walk",
+      "closedBy": null,
+      "costCm": 849,
+      "leverNode": null
+    },
+    {
+      "a": "p1",
+      "b": "PU",
+      "via": [],
+      "width": 3.0,
+      "kind": "walk",
+      "closedBy": null,
+      "costCm": 922,
+      "leverNode": null
+    },
+    {
+      "a": "PU",
+      "b": "p0w",
+      "via": [],
+      "width": 3.0,
+      "kind": "walk",
+      "closedBy": null,
+      "costCm": 806,
+      "leverNode": null
+    },
+    {
+      "a": "PU",
+      "b": "pe",
+      "via": [],
+      "width": 3.0,
+      "kind": "walk",
+      "closedBy": null,
+      "costCm": 806,
+      "leverNode": null
+    },
+    {
+      "a": "PU",
+      "b": "sp",
+      "via": [],
+      "width": 3.0,
+      "kind": "walk",
+      "closedBy": null,
+      "costCm": 781,
+      "leverNode": null
+    },
+    {
+      "a": "sp",
+      "b": "sf",
+      "via": [],
+      "width": 2.5,
+      "kind": "ramp",
+      "closedBy": null,
+      "costCm": 1159,
+      "leverNode": null
+    },
+    {
+      "a": "sf",
+      "b": "H2",
+      "via": [],
+      "width": 2.5,
+      "kind": "walk",
+      "closedBy": null,
+      "costCm": 1265,
+      "leverNode": null
+    },
+    {
+      "a": "p0w",
+      "b": "tm",
+      "via": [
+        [
+          44,
+          22
+        ]
+      ],
+      "width": 2.5,
+      "kind": "stair",
+      "closedBy": null,
+      "costCm": 1250,
+      "leverNode": null
+    },
+    {
+      "a": "tm",
+      "b": "ci1",
+      "via": [
+        [
+          32,
+          25
+        ]
+      ],
+      "width": 2.5,
+      "kind": "stair",
+      "closedBy": null,
+      "costCm": 2087,
+      "leverNode": null
+    },
+    {
+      "a": "ci1",
+      "b": "CI",
+      "via": [],
+      "width": 3.0,
+      "kind": "walk",
+      "closedBy": null,
+      "costCm": 806,
+      "leverNode": null
+    },
+    {
+      "a": "CI",
+      "b": "ci2",
+      "via": [],
+      "width": 3.0,
+      "kind": "walk",
+      "closedBy": null,
+      "costCm": 728,
+      "leverNode": null
+    },
+    {
+      "a": "S5",
+      "b": "CI",
+      "via": [],
+      "width": 3.0,
+      "kind": "walk",
+      "closedBy": null,
+      "costCm": 1100,
+      "leverNode": null
+    },
+    {
+      "a": "d2",
+      "b": "H2",
+      "via": [
+        [
+          46,
+          40
+        ]
+      ],
+      "width": 2.5,
+      "kind": "walk",
+      "closedBy": null,
+      "costCm": 2166,
+      "leverNode": null
+    },
+    {
+      "a": "ls",
+      "b": "H2",
+      "via": [],
+      "width": 2.5,
+      "kind": "walk",
+      "closedBy": null,
+      "costCm": 1720,
+      "leverNode": null
+    }
+  ],
+  "rooms": [
+    {
+      "id": "hall",
+      "label": "Arrival Hall",
+      "poly": [
+        [
+          10,
+          44
+        ],
+        [
+          22,
+          44
+        ],
+        [
+          25,
+          47
+        ],
+        [
+          25,
+          53
+        ],
+        [
+          22,
+          56
+        ],
+        [
+          10,
+          56
+        ],
+        [
+          7,
+          53
+        ],
+        [
+          7,
+          47
+        ]
+      ],
+      "z": 0,
+      "light": "hearth"
+    },
+    {
+      "id": "closet",
+      "label": "",
+      "rect": [
+        16,
+        38,
+        22,
+        42
+      ],
+      "z": 0
+    },
+    {
+      "id": "court",
+      "label": "Charnel Court",
+      "poly": [
+        [
+          2,
+          66
+        ],
+        [
+          8,
+          63
+        ],
+        [
+          24,
+          64
+        ],
+        [
+          29,
+          70
+        ],
+        [
+          28,
+          86
+        ],
+        [
+          23,
+          91
+        ],
+        [
+          8,
+          90
+        ],
+        [
+          1,
+          84
+        ]
+      ],
+      "z": 0,
+      "light": "cold",
+      "top": 9
+    },
+    {
+      "id": "court-pit",
+      "label": "",
+      "poly": [
+        [
+          6,
+          68
+        ],
+        [
+          24,
+          68
+        ],
+        [
+          25,
+          84
+        ],
+        [
+          20,
+          87
+        ],
+        [
+          7,
+          86
+        ],
+        [
+          5,
+          76
+        ]
+      ],
+      "z": -1.5
+    },
+    {
+      "id": "rimW",
+      "label": "",
+      "rect": [
+        29,
+        42,
+        34,
+        58
+      ],
+      "z": 0
+    },
+    {
+      "id": "rimE",
+      "label": "",
+      "rect": [
+        46,
+        42,
+        51,
+        58
+      ],
+      "z": 0
+    },
+    {
+      "id": "rimN",
+      "label": "The Well",
+      "rect": [
+        29,
+        53,
+        51,
+        58
+      ],
+      "z": 0
+    },
+    {
+      "id": "rimS",
+      "label": "",
+      "rect": [
+        29,
+        42,
+        51,
+        47
+      ],
+      "z": 0
+    },
+    {
+      "id": "ossuary",
+      "label": "Ossuary",
+      "rect": [
+        40,
+        64,
+        56,
+        80
+      ],
+      "z": 2.5,
+      "top": 5
+    },
+    {
+      "id": "bridgehead",
+      "label": "Bridgehead",
+      "rect": [
+        56,
+        70,
+        62,
+        78
+      ],
+      "z": 2.5,
+      "top": 9
+    },
+    {
+      "id": "ford-w",
+      "label": "The Ford",
+      "poly": [
+        [
+          52,
+          45
+        ],
+        [
+          57,
+          44
+        ],
+        [
+          58,
+          52
+        ],
+        [
+          53,
+          53
+        ]
+      ],
+      "z": -2.5
+    },
+    {
+      "id": "ford-e",
+      "label": "",
+      "poly": [
+        [
+          80,
+          45
+        ],
+        [
+          87,
+          46
+        ],
+        [
+          86,
+          53
+        ],
+        [
+          80,
+          52
+        ]
+      ],
+      "z": 0
+    },
+    {
+      "id": "reliquary",
+      "label": "Reliquary",
+      "rect": [
+        84,
+        72,
+        100,
+        88
+      ],
+      "z": 2.5,
+      "light": "dim",
+      "top": 8
+    },
+    {
+      "id": "mill",
+      "label": "Salt Mill",
+      "rect": [
+        84,
+        104,
+        100,
+        118
+      ],
+      "z": 5,
+      "light": "dim",
+      "top": 6
+    },
+    {
+      "id": "catacomb",
+      "label": "Catacomb",
+      "poly": [
+        [
+          -24,
+          68
+        ],
+        [
+          -18,
+          64
+        ],
+        [
+          -8,
+          66
+        ],
+        [
+          -4,
+          74
+        ],
+        [
+          -6,
+          84
+        ],
+        [
+          -14,
+          88
+        ],
+        [
+          -24,
+          82
+        ]
+      ],
+      "z": 0,
+      "top": 3.5
+    },
+    {
+      "id": "belfry",
+      "label": "The Belfry",
+      "poly": [
+        [
+          88,
+          44
+        ],
+        [
+          108,
+          44
+        ],
+        [
+          110,
+          48
+        ],
+        [
+          110,
+          60
+        ],
+        [
+          108,
+          64
+        ],
+        [
+          88,
+          64
+        ],
+        [
+          86,
+          60
+        ],
+        [
+          86,
+          48
+        ]
+      ],
+      "z": 0,
+      "light": "cold",
+      "top": 9
+    },
+    {
+      "id": "cellar",
+      "label": "Salt Cellar",
+      "rect": [
+        96,
+        12,
+        110,
+        26
+      ],
+      "z": -2.5,
+      "top": 3.2
+    },
+    {
+      "id": "sluice",
+      "label": "Sluice",
+      "rect": [
+        114,
+        8,
+        130,
+        22
+      ],
+      "z": -2.5,
+      "light": "dim"
+    },
+    {
+      "id": "larder",
+      "label": "Brine Larder",
+      "poly": [
+        [
+          110,
+          34
+        ],
+        [
+          116,
+          30
+        ],
+        [
+          128,
+          32
+        ],
+        [
+          132,
+          40
+        ],
+        [
+          128,
+          49
+        ],
+        [
+          116,
+          50
+        ],
+        [
+          109,
+          44
+        ]
+      ],
+      "z": -2.5,
+      "top": 6
+    },
+    {
+      "id": "pump",
+      "label": "Pump Room",
+      "rect": [
+        50,
+        18,
+        66,
+        32
+      ],
+      "z": -2.5,
+      "light": "dim",
+      "top": 8
+    },
+    {
+      "id": "cistern",
+      "label": "Cistern",
+      "poly": [
+        [
+          8,
+          32
+        ],
+        [
+          14,
+          28
+        ],
+        [
+          22,
+          30
+        ],
+        [
+          26,
+          37
+        ],
+        [
+          22,
+          45
+        ],
+        [
+          12,
+          46
+        ],
+        [
+          6,
+          40
+        ]
+      ],
+      "z": -2.5
+    },
+    {
+      "id": "lair",
+      "label": "The Pit",
+      "poly": [
+        [
+          22,
+          30
+        ],
+        [
+          36,
+          24
+        ],
+        [
+          50,
+          28
+        ],
+        [
+          57,
+          38
+        ],
+        [
+          56,
+          56
+        ],
+        [
+          48,
+          64
+        ],
+        [
+          30,
+          62
+        ],
+        [
+          20,
+          52
+        ],
+        [
+          18,
+          40
+        ]
+      ],
+      "z": -5.0,
+      "light": "cold"
+    },
+    {
+      "id": "vault",
+      "label": "Vault",
+      "rect": [
+        58,
+        56,
+        66,
+        64
+      ],
+      "z": -5.0
+    }
+  ],
+  "crawls": [
+    {
+      "id": "crawl-r3",
+      "a": [
+        100,
+        40
+      ],
+      "b": [
+        102,
+        30
+      ],
+      "z": 0,
+      "packFits": false,
+      "note": "beside the Belfry-Cellar stair; ends 2.5 m above the Cellar floor",
+      "purpose": "reach the R3 lever in the Cellar; the scout drops, the pack takes the stair"
+    },
+    {
+      "id": "crawl-r4",
+      "a": [
+        44,
+        41
+      ],
+      "b": [
+        50,
+        34
+      ],
+      "z": 0,
+      "packFits": false,
+      "note": "beside the rim-Pump stair; a drop at its end",
+      "purpose": "reach the R4 lever in the Pump Room"
+    },
+    {
+      "id": "crawl-r6",
+      "a": [
+        8,
+        62
+      ],
+      "b": [
+        10,
+        48
+      ],
+      "z": 0,
+      "packFits": false,
+      "note": "beside the Court-Cistern stair; a drop at its end",
+      "purpose": "reach the R6 lever by the Cistern stair foot"
+    },
+    {
+      "id": "crawl-r7",
+      "a": [
+        108,
+        30
+      ],
+      "b": [
+        100,
+        30
+      ],
+      "z": -5.0,
+      "packFits": false,
+      "note": "beside the Undercroft mouth",
+      "purpose": "reach the R7 lever on the tunnel side"
+    },
+    {
+      "id": "crawl-sealed",
+      "a": [
+        110,
+        58
+      ],
+      "b": [
+        116,
+        62
+      ],
+      "z": 0,
+      "packFits": false,
+      "note": "a gap behind the Belfry's east wall",
+      "purpose": "the one squeeze that leads somewhere new: the Sealed Burial"
+    }
+  ],
+  "galleries": [],
+  "upper": {
+    "z": 5.0,
+    "top": 24.0,
+    "mainTop": 4.6,
+    "tallRooms": [
+      "belfry",
+      "court",
+      "rimW",
+      "rimE",
+      "rimN",
+      "rimS",
+      "bridgehead",
+      "reliquary"
+    ],
+    "platforms": [
+      {
+        "id": "bell-loft",
+        "rect": [
+          100,
+          56,
+          108,
+          64
+        ],
+        "note": "the Belfry loft at +5: the Red key under the bell; the canal and the Well seen from its west rail"
+      }
+    ],
+    "walkways": [],
+    "railGaps": [
+      {
+        "id": "loft-drop",
+        "a": [
+          100,
+          58
+        ],
+        "b": [
+          100,
+          62
+        ],
+        "note": "drop from the loft back into the Belfry"
+      },
+      {
+        "id": "mill-drop",
+        "a": [
+          88,
+          104
+        ],
+        "b": [
+          92,
+          104
+        ],
+        "note": "one-way drop: Salt Mill rail -> the Reliquary floor, 2.5 m: the Curing Room's short way home"
+      }
+    ]
+  },
+  "ladders": [
+    {
+      "id": "closet-ladder",
+      "at": [
+        19,
+        40
+      ],
+      "baseZ": -5.0,
+      "height": 5.0,
+      "yaw": 0.0,
+      "oneWay": true,
+      "note": "from the Pit's west end up into the hall closet",
+      "purpose": "the Pit's one-way way home, pack included"
+    },
+    {
+      "id": "belfry-ladder",
+      "at": [
+        104,
+        56
+      ],
+      "baseZ": 0.0,
+      "height": 5.0,
+      "yaw": 0.0,
+      "kind": "barred",
+      "oneWay": false,
+      "note": "Belfry floor up to the loft; its foot is barred (P5) until the lever on the loft is pulled, reached by the Reliquary's rail drop",
+      "purpose": "the loft holds the Red key and the best view in the district"
+    }
+  ],
+  "holes": [
+    {
+      "id": "well",
+      "level": "main",
+      "rect": [
+        34,
+        44,
+        46,
+        56
+      ],
+      "kind": "open",
+      "rail": 0.6,
+      "note": "the Well: rim at 0, Pit at -5, open to the sky-light at +24"
+    },
+    {
+      "id": "well-upper",
+      "level": "upper",
+      "rect": [
+        34,
+        44,
+        46,
+        56
+      ],
+      "kind": "open"
+    },
+    {
+      "id": "closet-well",
+      "level": "main",
+      "rect": [
+        18.25,
+        39.25,
+        19.75,
+        40.75
+      ],
+      "kind": "open"
+    }
+  ],
+  "extraWalks": [
+    {
+      "id": "sc2-door",
+      "pts": [
+        [
+          19,
+          42
+        ],
+        [
+          19,
+          44
+        ]
+      ],
+      "width": 2.5,
+      "note": "closet to hall, barred from the hall side"
+    },
+    {
+      "id": "vault-passage",
+      "level": "deep",
+      "pts": [
+        [
+          56,
+          60
+        ],
+        [
+          58,
+          60
+        ]
+      ],
+      "width": 2.5,
+      "note": "Pit to the vault door"
+    }
+  ],
+  "shortcuts": [
+    {
+      "id": "SC2",
+      "at": [
+        19,
+        42
+      ],
+      "yaw": 90.0,
+      "spanCm": 250.0,
+      "leverSide": -1,
+      "oneWay": true,
+      "channel": "Mechanism.Channel.Warrens.Shortcut.SC2",
+      "note": "closet -> hall; lever in the closet"
+    },
+    {
+      "id": "SC-E",
+      "at": [
+        67,
+        26
+      ],
+      "yaw": 90.0,
+      "spanCm": 250.0,
+      "leverSide": 1,
+      "oneWay": true,
+      "channel": "Mechanism.Channel.Warrens.Shortcut.Chain",
+      "note": "the Chain Crossing: barred at the Pump end, lowered by the Sluice hand-wheel (P2); from then on both ways"
+    }
+  ],
+  "cracks": [],
+  "pillars": [
+    {
+      "level": "main",
+      "rect": [
+        8,
+        72,
+        11,
+        75
+      ]
+    },
+    {
+      "level": "main",
+      "rect": [
+        20,
+        80,
+        23,
+        83
+      ]
+    },
+    {
+      "level": "main",
+      "rect": [
+        90,
+        48,
+        92,
+        50
+      ]
+    },
+    {
+      "level": "main",
+      "rect": [
+        90,
+        58,
+        92,
+        60
+      ]
+    },
+    {
+      "level": "deep",
+      "rect": [
+        26,
+        32,
+        29,
+        35
+      ]
+    },
+    {
+      "level": "deep",
+      "rect": [
+        50,
+        56,
+        53,
+        59
+      ]
+    }
+  ],
+  "lowLinks": [
+    [
+      "ut1",
+      "ut2"
+    ],
+    [
+      "ut2",
+      "ls"
+    ],
+    [
+      "p0w",
+      "tm"
+    ],
+    [
+      "tm",
+      "ci1"
+    ],
+    [
+      "d2",
+      "H2"
+    ],
+    [
+      "c1",
+      "ct0"
+    ],
+    [
+      "ct1",
+      "lw"
+    ],
+    [
+      "lw",
+      "H2"
+    ]
+  ],
+  "lowRoof": 2.2,
+  "locks": [
+    {
+      "id": "vault",
+      "door": {
+        "at": [
+          57,
+          60
+        ],
+        "yaw": 0.0,
+        "spanCm": 250.0,
+        "level": "deep"
+      },
+      "lock": {
+        "at": [
+          56,
+          58.3
+        ],
+        "yaw": 90.0,
+        "level": "deep"
+      },
+      "key": "Red",
+      "keyAt": [
+        104,
+        60,
+        5.3
+      ],
+      "channel": "Mechanism.Channel.Keys.Red",
+      "note": "the key under the bell on the Belfry loft, across the canal from the Vault"
+    }
+  ],
+  "puzzles": [
+    {
+      "id": "P1",
+      "kind": "Red key door",
+      "at": [
+        57,
+        60,
+        -5.0
+      ],
+      "needsAt": [
+        104,
+        60,
+        5
+      ],
+      "needsNote": "the key under the bell on the Belfry loft: other bank, other landmark"
+    },
+    {
+      "id": "P2",
+      "kind": "the Chain Crossing's latched bars (Pump end)",
+      "at": [
+        67,
+        26,
+        -2.5
+      ],
+      "needsAt": [
+        122,
+        12,
+        -2.5
+      ],
+      "needsNote": "the Sluice hand-wheel on the east bank lowers the chain causeway; the chain runs along the Cellar floor to the wheel: the tell",
+      "existing": "hand-wheel + latched Bars gate"
+    },
+    {
+      "id": "P3",
+      "kind": "Mourner cache gate (latched)",
+      "at": [
+        100,
+        76,
+        2.5
+      ],
+      "needsAt": [
+        42,
+        66,
+        2.5
+      ],
+      "needsNote": "the pack plate at the Ossuary's west end: set the pack down west, the gate latches east, cross the Bone Bridge",
+      "latch": true
+    },
+    {
+      "id": "P4",
+      "kind": "Bellkeeper dial lock",
+      "at": [
+        108,
+        46,
+        0
+      ],
+      "needsAt": [
+        48.5,
+        50,
+        0
+      ],
+      "needsNote": "the three glyphs painted on the Bell Tower's west face, read from the Well's east rim across the canal"
+    },
+    {
+      "id": "P5",
+      "kind": "barred ladder foot (Belfry)",
+      "at": [
+        104,
+        56,
+        0
+      ],
+      "needsAt": [
+        102,
+        60,
+        5
+      ],
+      "needsNote": "the lever on the loft; the loft is first reached by the Reliquary stair's rail drop"
+    },
+    {
+      "id": "P6",
+      "kind": "SC2 barred closet door",
+      "at": [
+        19,
+        42,
+        0
+      ],
+      "needsAt": [
+        19,
+        40,
+        -5.0
+      ],
+      "needsNote": "climb the closet ladder out of the Pit"
+    },
+    {
+      "id": "P7",
+      "kind": "Curing Room (support objective)",
+      "at": [
+        88,
+        114,
+        5
+      ],
+      "needsAt": [
+        98,
+        54,
+        0
+      ],
+      "needsNote": "the Curing Room: the hunted part is brined here before it travels (the run's second required stop); the vat, the drying racks, a plinth for the pack"
+    }
+  ],
+  "extraRamps": [
+    {
+      "id": "bone-bridge",
+      "a": [
+        62,
+        74,
+        2.5
+      ],
+      "b": [
+        84,
+        74,
+        2.5
+      ],
+      "width": 3.0,
+      "note": "the Bone Bridge: 22 m over the canal at +2.5; R5 at its west head"
+    },
+    {
+      "id": "chain-crossing",
+      "a": [
+        66,
+        26,
+        -2.5
+      ],
+      "b": [
+        96,
+        24,
+        -2.5
+      ],
+      "width": 2.5,
+      "note": "the Chain Crossing: a causeway lowered from the Cellar side (SC-E), the pack's short way between the two banks' waterworks"
+    },
+    {
+      "id": "sump-stair",
+      "a": [
+        52,
+        30,
+        -2.5
+      ],
+      "b": [
+        44,
+        38,
+        -5.0
+      ],
+      "width": 2.5,
+      "note": "the Sump Stair: Pump Room down into the Pit (open)"
+    },
+    {
+      "id": "larder-undercroft",
+      "a": [
+        112,
+        34,
+        -2.5
+      ],
+      "b": [
+        104,
+        28,
+        -5.0
+      ],
+      "width": 2.5,
+      "note": "Brine Larder down into the Undercroft"
+    },
+    {
+      "id": "mill-stair-a",
+      "a": [
+        92,
+        88,
+        2.5
+      ],
+      "b": [
+        96,
+        94,
+        3.4
+      ],
+      "width": 3.0,
+      "note": "the mill stair: Reliquary up to the Salt Mill"
+    },
+    {
+      "id": "mill-stair-b",
+      "a": [
+        96,
+        94,
+        3.4
+      ],
+      "b": [
+        96,
+        100,
+        4.3
+      ],
+      "width": 3.0
+    },
+    {
+      "id": "mill-stair-c",
+      "a": [
+        96,
+        100,
+        4.3
+      ],
+      "b": [
+        92,
+        104,
+        5
+      ],
+      "width": 3.0
+    },
+    {
+      "id": "catacomb-dive-a",
+      "a": [
+        -10,
+        64,
+        0
+      ],
+      "b": [
+        -12,
+        54,
+        -2.0
+      ],
+      "width": 2.5,
+      "note": "the Catacomb Dive winds down into the Pit's west end"
+    },
+    {
+      "id": "catacomb-dive-b",
+      "a": [
+        -12,
+        54,
+        -2.0
+      ],
+      "b": [
+        -4,
+        46,
+        -4.0
+      ],
+      "width": 2.5
+    },
+    {
+      "id": "catacomb-dive-c",
+      "a": [
+        -4,
+        46,
+        -4.0
+      ],
+      "b": [
+        8,
+        42,
+        -5.0
+      ],
+      "width": 2.5
+    },
+    {
+      "id": "catacomb-dive-d",
+      "a": [
+        8,
+        42,
+        -5.0
+      ],
+      "b": [
+        20,
+        44,
+        -5.0
+      ],
+      "width": 2.5
+    }
+  ],
+  "niches": [
+    {
+      "id": "court-pack",
+      "rect": [
+        2,
+        91,
+        6,
+        94
+      ],
+      "z": 0,
+      "family": "P",
+      "note": "pack plinth at the court's north-west",
+      "anchorId": "CourtPack"
+    },
+    {
+      "id": "court-forage",
+      "rect": [
+        -3,
+        74,
+        1,
+        78
+      ],
+      "z": 0,
+      "family": "F",
+      "note": "mushrooms in the west burial niche",
+      "anchorId": "CourtForage"
+    },
+    {
+      "id": "court-omen",
+      "rect": [
+        29,
+        72,
+        31,
+        74
+      ],
+      "z": 0,
+      "family": "O",
+      "note": "eyes in the east wall niche",
+      "anchorId": "CourtOmen"
+    },
+    {
+      "id": "court-threat",
+      "rect": [
+        10,
+        59,
+        14,
+        63
+      ],
+      "z": 0,
+      "family": "T",
+      "note": "sentry alcove south of the arena",
+      "anchorId": "CourtThreat"
+    },
+    {
+      "id": "ossuary-husk",
+      "rect": [
+        44,
+        80,
+        48,
+        83
+      ],
+      "z": 2.5,
+      "family": "F",
+      "note": "husk spill in the north niche",
+      "anchorId": "OssuaryHusk"
+    },
+    {
+      "id": "ossuary-rest",
+      "rect": [
+        36,
+        72,
+        40,
+        75
+      ],
+      "z": 2.5,
+      "family": "N",
+      "note": "lantern rest by the court stair",
+      "anchorId": "OssuaryRest"
+    },
+    {
+      "id": "bridge-omen",
+      "rect": [
+        72,
+        77,
+        74,
+        79
+      ],
+      "z": 2.5,
+      "family": "O",
+      "note": "chains swaying under the Bone Bridge",
+      "anchorId": "BridgeOmen"
+    },
+    {
+      "id": "mourner",
+      "rect": [
+        100,
+        74,
+        106,
+        78
+      ],
+      "z": 2.5,
+      "family": "C",
+      "note": "Mourner cache behind the pack-plate gate (P3)",
+      "anchorId": "Mourner"
+    },
+    {
+      "id": "reliquary-rest",
+      "rect": [
+        84,
+        88,
+        88,
+        91
+      ],
+      "z": 2.5,
+      "family": "N",
+      "note": "lantern rest by the S2 mouth",
+      "anchorId": "ReliquaryRest"
+    },
+    {
+      "id": "bellkeeper",
+      "rect": [
+        110,
+        42,
+        116,
+        46
+      ],
+      "z": 0,
+      "family": "C",
+      "note": "Bellkeeper's Confession behind the dial lock (P4)",
+      "anchorId": "Bellkeeper"
+    },
+    {
+      "id": "belfry-threat",
+      "rect": [
+        86,
+        40,
+        90,
+        44
+      ],
+      "z": 0,
+      "family": "T",
+      "note": "sentry niche south of the tower",
+      "anchorId": "BelfryThreat"
+    },
+    {
+      "id": "belfry-pack",
+      "rect": [
+        110,
+        60,
+        114,
+        64
+      ],
+      "z": 0,
+      "family": "P",
+      "note": "pack plinth by the larder stair",
+      "anchorId": "BelfryPack"
+    },
+    {
+      "id": "sealed-burial",
+      "rect": [
+        116,
+        60,
+        121,
+        66
+      ],
+      "z": 0,
+      "family": "C",
+      "note": "the Sealed Burial behind crawl-sealed",
+      "anchorId": "SealedBurial"
+    },
+    {
+      "id": "cellar-salt",
+      "rect": [
+        96,
+        8,
+        100,
+        12
+      ],
+      "z": -2.5,
+      "family": "F",
+      "note": "salt crystals",
+      "anchorId": "CellarSalt"
+    },
+    {
+      "id": "porter",
+      "rect": [
+        130,
+        12,
+        138,
+        18
+      ],
+      "z": -2.5,
+      "family": "C",
+      "note": "Porter's Wager off the Sluice",
+      "anchorId": "Porter"
+    },
+    {
+      "id": "larder-forage",
+      "rect": [
+        132,
+        36,
+        136,
+        40
+      ],
+      "z": -2.5,
+      "family": "F",
+      "note": "brined stores: a wade to reach them",
+      "anchorId": "LarderForage"
+    },
+    {
+      "id": "larder-ledge",
+      "rect": [
+        118,
+        50,
+        122,
+        53
+      ],
+      "z": -1.0,
+      "family": "N",
+      "note": "a dry ledge 1.5 m above the brine: a ledge hop from the stair",
+      "anchorId": "LarderLedge"
+    },
+    {
+      "id": "larder-threat",
+      "rect": [
+        112,
+        28,
+        116,
+        31
+      ],
+      "z": -2.5,
+      "family": "T",
+      "note": "something under the water",
+      "anchorId": "LarderThreat"
+    },
+    {
+      "id": "pump-omen",
+      "rect": [
+        46,
+        20,
+        50,
+        23
+      ],
+      "z": -2.5,
+      "family": "O",
+      "note": "swaying chains in the west niche",
+      "anchorId": "PumpOmen"
+    },
+    {
+      "id": "pump-rest",
+      "rect": [
+        66,
+        28,
+        70,
+        31
+      ],
+      "z": -2.5,
+      "family": "N",
+      "note": "lantern rest at the chain crossing",
+      "anchorId": "PumpRest"
+    },
+    {
+      "id": "cistern-forage",
+      "rect": [
+        4,
+        34,
+        8,
+        38
+      ],
+      "z": -2.5,
+      "family": "F",
+      "note": "mushroom bed across the basin",
+      "anchorId": "CisternForage"
+    },
+    {
+      "id": "pit-pack",
+      "rect": [
+        20,
+        54,
+        24,
+        58
+      ],
+      "z": -5.0,
+      "family": "P",
+      "note": "pack plinth at the Pit's north-west",
+      "anchorId": "PitPack"
+    },
+    {
+      "id": "pit-rest",
+      "rect": [
+        18,
+        44,
+        22,
+        48
+      ],
+      "z": -5.0,
+      "family": "N",
+      "note": "lantern rest at the lair's west wall",
+      "anchorId": "PitRest"
+    },
+    {
+      "id": "pit-forage",
+      "rect": [
+        52,
+        40,
+        56,
+        44
+      ],
+      "z": -5.0,
+      "family": "F",
+      "note": "deep mushrooms by the Undercroft mouth",
+      "anchorId": "PitForage"
+    },
+    {
+      "id": "pit-shelf",
+      "rect": [
+        30,
+        62,
+        36,
+        65
+      ],
+      "z": -3.0,
+      "family": "O",
+      "note": "a root shelf 2 m up the Pit's north wall: eyes; a ledge hop from the cascade",
+      "anchorId": "PitShelf"
+    },
+    {
+      "id": "mill-pack",
+      "rect": [
+        100,
+        112,
+        104,
+        115
+      ],
+      "z": 5,
+      "family": "P",
+      "note": "pack plinth by the vat",
+      "anchorId": "MillPack"
+    },
+    {
+      "id": "mill-threat",
+      "rect": [
+        80,
+        108,
+        84,
+        112
+      ],
+      "z": 5,
+      "family": "T",
+      "note": "something among the millstones",
+      "anchorId": "MillThreat"
+    },
+    {
+      "id": "mill-rest",
+      "rect": [
+        96,
+        118,
+        100,
+        121
+      ],
+      "z": 5,
+      "family": "N",
+      "note": "lantern rest at the mill's north",
+      "anchorId": "MillRest"
+    },
+    {
+      "id": "catacomb-husk",
+      "rect": [
+        -28,
+        72,
+        -24,
+        76
+      ],
+      "z": 0,
+      "family": "F",
+      "note": "husk spill in the deepest niche",
+      "anchorId": "CatacombHusk"
+    },
+    {
+      "id": "catacomb-cache",
+      "rect": [
+        -12,
+        88,
+        -6,
+        92
+      ],
+      "z": 0,
+      "family": "C",
+      "note": "the Catacomb cache: a sealed drawer",
+      "anchorId": "CatacombCache"
+    },
+    {
+      "id": "catacomb-omen",
+      "rect": [
+        -4,
+        78,
+        -2,
+        80
+      ],
+      "z": 0,
+      "family": "O",
+      "note": "eyes in the east niche",
+      "anchorId": "CatacombOmen"
+    }
+  ],
+  "caches": [
+    "Mourner",
+    "Bellkeeper",
+    "SealedBurial",
+    "Porter",
+    "CatacombCache"
+  ],
+  "maxActiveCaches": 2,
+  "water": [
+    {
+      "id": "canal",
+      "poly": [
+        [
+          70,
+          -4
+        ],
+        [
+          78,
+          -4
+        ],
+        [
+          77,
+          20
+        ],
+        [
+          79,
+          40
+        ],
+        [
+          77,
+          60
+        ],
+        [
+          79,
+          84
+        ],
+        [
+          77,
+          104
+        ],
+        [
+          69,
+          104
+        ],
+        [
+          71,
+          80
+        ],
+        [
+          69,
+          60
+        ],
+        [
+          71,
+          36
+        ],
+        [
+          69,
+          16
+        ]
+      ],
+      "z": -2.5,
+      "depth": 2.0,
+      "note": "the Drowned Canal: 2 m deep, impassable; the district's edge"
+    },
+    {
+      "id": "ford",
+      "rect": [
+        68,
+        46,
+        80,
+        52
+      ],
+      "z": -2.5,
+      "depth": 0.5,
+      "note": "the Ford: knee-deep, slow, always open"
+    },
+    {
+      "id": "cistern-basin",
+      "poly": [
+        [
+          10,
+          32
+        ],
+        [
+          20,
+          32
+        ],
+        [
+          22,
+          38
+        ],
+        [
+          18,
+          44
+        ],
+        [
+          10,
+          42
+        ]
+      ],
+      "z": -2.5,
+      "depth": 0.5,
+      "note": "the Cistern pool"
+    },
+    {
+      "id": "larder-water",
+      "poly": [
+        [
+          112,
+          34
+        ],
+        [
+          126,
+          34
+        ],
+        [
+          128,
+          46
+        ],
+        [
+          116,
+          48
+        ]
+      ],
+      "z": -2.5,
+      "depth": 0.5,
+      "note": "the Brine Larder: knee-deep stores"
+    }
+  ],
+  "props": [
+    {
+      "kind": "station",
+      "at": [
+        40,
+        56,
+        0
+      ],
+      "size": [
+        1.6,
+        1.6,
+        7.5
+      ],
+      "note": "THE HOIST over the north rim of the Well"
+    },
+    {
+      "kind": "pillar",
+      "at": [
+        104,
+        54,
+        0
+      ],
+      "size": [
+        4.0,
+        4.0,
+        22.0
+      ],
+      "note": "THE BELL TOWER: 22 m, the bell cold-lit at +16, heard across the canal"
+    },
+    {
+      "kind": "stack",
+      "at": [
+        102,
+        50,
+        2.0
+      ],
+      "size": [
+        0.3,
+        4.0,
+        2.0
+      ],
+      "yaw": 0,
+      "note": "the three glyphs on the tower's west face (P4), read from the Well's east rim"
+    },
+    {
+      "kind": "statue",
+      "at": [
+        15,
+        88,
+        0
+      ],
+      "size": [
+        2.0,
+        1.2,
+        4.5
+      ],
+      "yaw": -90,
+      "note": "split mourner: the Court landmark"
+    },
+    {
+      "kind": "plinth",
+      "at": [
+        10,
+        50,
+        0
+      ],
+      "size": [
+        1.2,
+        1.2,
+        0.3
+      ],
+      "note": "pack plinth by the Camp Door"
+    },
+    {
+      "kind": "root",
+      "at": [
+        35,
+        46,
+        -5.0
+      ],
+      "size": [
+        1.4,
+        1.4,
+        14.0
+      ],
+      "note": "roots down the west wall of the Well"
+    },
+    {
+      "kind": "stack",
+      "at": [
+        44,
+        68,
+        2.5
+      ],
+      "size": [
+        6.0,
+        1.0,
+        2.6
+      ],
+      "note": "bone stacks"
+    },
+    {
+      "kind": "stack",
+      "at": [
+        50,
+        76,
+        2.5
+      ],
+      "size": [
+        6.0,
+        1.0,
+        2.6
+      ]
+    },
+    {
+      "kind": "plinth",
+      "at": [
+        42,
+        66,
+        2.5
+      ],
+      "size": [
+        2.0,
+        2.0,
+        0.3
+      ],
+      "note": "the pack plate (P3)"
+    },
+    {
+      "kind": "sarcophagus",
+      "at": [
+        92,
+        84,
+        2.5
+      ],
+      "size": [
+        3.0,
+        1.5,
+        1.2
+      ],
+      "note": "the reliquary tomb"
+    },
+    {
+      "kind": "plinth",
+      "at": [
+        104,
+        60,
+        5.0
+      ],
+      "size": [
+        0.8,
+        0.8,
+        0.3
+      ],
+      "note": "the key plinth under the bell (P1)"
+    },
+    {
+      "kind": "station",
+      "at": [
+        108,
+        46,
+        0
+      ],
+      "size": [
+        1.0,
+        0.4,
+        1.4
+      ],
+      "note": "the dial lock (P4)"
+    },
+    {
+      "kind": "pillar",
+      "at": [
+        54,
+        22,
+        -2.5
+      ],
+      "size": [
+        2.0,
+        2.0,
+        6.0
+      ],
+      "note": "the pump: the west bank's audio landmark"
+    },
+    {
+      "kind": "pillar",
+      "at": [
+        122,
+        12,
+        -2.5
+      ],
+      "size": [
+        1.0,
+        1.0,
+        1.6
+      ],
+      "note": "the hand-wheel (P2)"
+    },
+    {
+      "kind": "stack",
+      "at": [
+        110,
+        20,
+        -2.5
+      ],
+      "size": [
+        24.0,
+        0.4,
+        0.2
+      ],
+      "note": "the chain along the Cellar floor, from the crossing to the wheel (P2 tell)"
+    },
+    {
+      "kind": "stack",
+      "at": [
+        100,
+        16,
+        -2.5
+      ],
+      "size": [
+        2.0,
+        2.0,
+        1.4
+      ],
+      "note": "salt crystals"
+    },
+    {
+      "kind": "chimes",
+      "at": [
+        98,
+        54,
+        0
+      ],
+      "size": [
+        6.0,
+        0.2,
+        3.5
+      ],
+      "yaw": 0,
+      "note": "bone chimes under the tower"
+    },
+    {
+      "kind": "root",
+      "at": [
+        24,
+        34,
+        -2.5
+      ],
+      "size": [
+        1.2,
+        1.2,
+        5.0
+      ],
+      "note": "roots through the Cistern roof"
+    },
+    {
+      "kind": "candles",
+      "at": [
+        12,
+        46,
+        0
+      ],
+      "size": [
+        0.9,
+        0.9,
+        0.5
+      ],
+      "note": "tallow"
+    },
+    {
+      "kind": "candles",
+      "at": [
+        54,
+        66,
+        2.5
+      ],
+      "size": [
+        0.9,
+        0.9,
+        0.5
+      ],
+      "note": "tallow"
+    },
+    {
+      "kind": "candles",
+      "at": [
+        90,
+        46,
+        0
+      ],
+      "size": [
+        0.9,
+        0.9,
+        0.5
+      ],
+      "note": "tallow"
+    },
+    {
+      "kind": "candles",
+      "at": [
+        22,
+        58,
+        -5.0
+      ],
+      "size": [
+        0.9,
+        0.9,
+        0.5
+      ],
+      "note": "tallow"
+    },
+    {
+      "kind": "candles",
+      "at": [
+        82,
+        50,
+        0
+      ],
+      "size": [
+        0.9,
+        0.9,
+        0.5
+      ],
+      "note": "tallow: the Ford's east step"
+    },
+    {
+      "kind": "station",
+      "at": [
+        88,
+        114,
+        5
+      ],
+      "size": [
+        2.4,
+        1.6,
+        1.4
+      ],
+      "note": "the brine vat (P7): the Curing Room"
+    },
+    {
+      "kind": "pillar",
+      "at": [
+        94,
+        110,
+        5
+      ],
+      "size": [
+        2.5,
+        2.5,
+        2.0
+      ],
+      "note": "the millstone"
+    },
+    {
+      "kind": "sarcophagus",
+      "at": [
+        -14,
+        76,
+        0
+      ],
+      "size": [
+        3.0,
+        1.5,
+        1.2
+      ],
+      "note": "the Catacomb's one open tomb"
+    }
+  ],
+  "lights": [
+    {
+      "at": [
+        16,
+        50,
+        3.0
+      ],
+      "kind": "hearth"
+    },
+    {
+      "at": [
+        40,
+        50,
+        8.0
+      ],
+      "kind": "shaft"
+    },
+    {
+      "at": [
+        40,
+        50,
+        -3.0
+      ],
+      "kind": "cold"
+    },
+    {
+      "at": [
+        15,
+        76,
+        5.0
+      ],
+      "kind": "cold"
+    },
+    {
+      "at": [
+        104,
+        54,
+        16.0
+      ],
+      "kind": "cold"
+    },
+    {
+      "at": [
+        98,
+        54,
+        6.0
+      ],
+      "kind": "cold"
+    },
+    {
+      "at": [
+        92,
+        80,
+        5.1
+      ],
+      "kind": "dim"
+    },
+    {
+      "at": [
+        58,
+        25,
+        0.1
+      ],
+      "kind": "dim"
+    },
+    {
+      "at": [
+        122,
+        15,
+        0.1
+      ],
+      "kind": "dim"
+    },
+    {
+      "at": [
+        120,
+        40,
+        0.1
+      ],
+      "kind": "dim"
+    },
+    {
+      "at": [
+        16,
+        37,
+        -0.5
+      ],
+      "kind": "dim"
+    },
+    {
+      "at": [
+        48,
+        72,
+        5.1
+      ],
+      "kind": "dim"
+    },
+    {
+      "at": [
+        69,
+        49,
+        1.0
+      ],
+      "kind": "foyer"
+    },
+    {
+      "at": [
+        92,
+        111,
+        7.6
+      ],
+      "kind": "dim"
+    },
+    {
+      "at": [
+        -14,
+        76,
+        3.0
+      ],
+      "kind": "cold"
+    }
+  ],
+  "groups": [
+    {
+      "name": "Warren",
+      "anchorIds": [
+        "R1",
+        "R2",
+        "R4",
+        "R6",
+        "R5",
+        "R3",
+        "R7"
+      ],
+      "maxClosed": 3
+    }
+  ],
+  "entrances": [
+    {
+      "anchorId": "S1",
+      "playerStartTag": "Expedition.Entrance.S1",
+      "node": "S1"
+    },
+    {
+      "anchorId": "S2",
+      "playerStartTag": "Expedition.Entrance.S2",
+      "node": "S2"
+    },
+    {
+      "anchorId": "S3",
+      "playerStartTag": "Expedition.Entrance.S3",
+      "node": "S3"
+    },
+    {
+      "anchorId": "S4",
+      "playerStartTag": "Expedition.Entrance.S4",
+      "node": "S4"
+    },
+    {
+      "anchorId": "S5",
+      "playerStartTag": "Expedition.Entrance.S5",
+      "node": "S5"
+    }
+  ],
+  "courts": [
+    {
+      "anchorId": "H1",
+      "node": "H1"
+    },
+    {
+      "anchorId": "H2",
+      "node": "H2"
+    },
+    {
+      "anchorId": "H3",
+      "node": "BF"
+    }
+  ],
+  "anchors": [
+    {
+      "id": "S1",
+      "family": "S",
+      "at": [
+        -2,
+        50
+      ],
+      "node": "S1",
+      "note": "foyer"
+    },
+    {
+      "id": "S2",
+      "family": "S",
+      "at": [
+        110,
+        80
+      ],
+      "node": "S2",
+      "note": "foyer"
+    },
+    {
+      "id": "S3",
+      "family": "S",
+      "at": [
+        140,
+        40
+      ],
+      "node": "S3",
+      "note": "foyer"
+    },
+    {
+      "id": "S4",
+      "family": "S",
+      "at": [
+        122,
+        0
+      ],
+      "node": "S4",
+      "note": "foyer"
+    },
+    {
+      "id": "S5",
+      "family": "S",
+      "at": [
+        16,
+        26
+      ],
+      "node": "S5",
+      "note": "foyer"
+    },
+    {
+      "id": "H1",
+      "family": "H",
+      "at": [
+        15,
+        76
+      ],
+      "node": "H1",
+      "note": "hunt court"
+    },
+    {
+      "id": "H2",
+      "family": "H",
+      "at": [
+        40,
+        50
+      ],
+      "node": "H2",
+      "note": "hunt court"
+    },
+    {
+      "id": "H3",
+      "family": "H",
+      "at": [
+        98,
+        54
+      ],
+      "node": "BF",
+      "note": "hunt court"
+    },
+    {
+      "id": "R1",
+      "family": "R",
+      "at": [
+        22,
+        63
+      ],
+      "node": "kn",
+      "note": "route gate"
+    },
+    {
+      "id": "R2",
+      "family": "R",
+      "at": [
+        41,
+        42
+      ],
+      "node": "wS",
+      "note": "route gate"
+    },
+    {
+      "id": "R4",
+      "family": "R",
+      "at": [
+        44,
+        38
+      ],
+      "node": "wS",
+      "note": "route gate"
+    },
+    {
+      "id": "R6",
+      "family": "R",
+      "at": [
+        5,
+        60
+      ],
+      "node": "c1",
+      "note": "route gate"
+    },
+    {
+      "id": "R5",
+      "family": "R",
+      "at": [
+        63,
+        74
+      ],
+      "node": "bh",
+      "note": "route gate"
+    },
+    {
+      "id": "R3",
+      "family": "R",
+      "at": [
+        96,
+        34
+      ],
+      "node": "bs",
+      "note": "route gate"
+    },
+    {
+      "id": "R7",
+      "family": "R",
+      "at": [
+        100,
+        26
+      ],
+      "node": "ut1",
+      "note": "route gate"
+    }
+  ],
+  "channels": {
+    "R1": "Mechanism.Channel.Anchor.Warrens.R1",
+    "R2": "Mechanism.Channel.Anchor.Warrens.R2",
+    "R4": "Mechanism.Channel.Anchor.Warrens.R4",
+    "R6": "Mechanism.Channel.Anchor.Warrens.R6",
+    "R5": "Mechanism.Channel.Anchor.Warrens.R5",
+    "R3": "Mechanism.Channel.Anchor.Warrens.R3",
+    "R7": "Mechanism.Channel.Anchor.Warrens.R7"
+  },
+  "quarryMinWalkCm": 5000,
+  "instances": [
+    {
+      "id": "Hub",
+      "label": "LI_Warrens_Hub",
+      "asset": "LI_Warrens_Hub",
+      "z": 0,
+      "rect": [
+        4,
+        36,
+        54,
+        60
+      ],
+      "ports": [
+        {
+          "id": "camp",
+          "at": [
+            4,
+            50,
+            0
+          ],
+          "width": 3,
+          "kind": "door"
+        },
+        {
+          "id": "court",
+          "at": [
+            16,
+            58,
+            0
+          ],
+          "width": 3,
+          "kind": "door"
+        },
+        {
+          "id": "ossuary",
+          "at": [
+            40,
+            58,
+            0
+          ],
+          "width": 3,
+          "kind": "stair"
+        },
+        {
+          "id": "pump",
+          "at": [
+            44,
+            38,
+            0
+          ],
+          "width": 3,
+          "kind": "stair"
+        },
+        {
+          "id": "ford",
+          "at": [
+            52,
+            50,
+            0
+          ],
+          "width": 3,
+          "kind": "stair"
+        },
+        {
+          "id": "cascade",
+          "at": [
+            44,
+            40,
+            0
+          ],
+          "width": 4,
+          "kind": "stair"
+        },
+        {
+          "id": "closet",
+          "at": [
+            19,
+            40,
+            -5
+          ],
+          "width": 1,
+          "kind": "ladder"
+        }
+      ],
+      "note": "the Arrival Hall, closet, the Well, its rims and the hoist"
+    },
+    {
+      "id": "Court",
+      "label": "LI_Warrens_Court",
+      "asset": "LI_Warrens_Court",
+      "z": 0,
+      "rect": [
+        -4,
+        60,
+        30,
+        94
+      ],
+      "ports": [
+        {
+          "id": "hall",
+          "at": [
+            22,
+            62,
+            0
+          ],
+          "width": 3,
+          "kind": "door"
+        },
+        {
+          "id": "ossuary",
+          "at": [
+            30,
+            86,
+            0
+          ],
+          "width": 3,
+          "kind": "stair"
+        },
+        {
+          "id": "cistern",
+          "at": [
+            6,
+            60,
+            0
+          ],
+          "width": 3,
+          "kind": "stair"
+        }
+      ]
+    },
+    {
+      "id": "Ossuary",
+      "label": "LI_Warrens_Ossuary",
+      "asset": "LI_Warrens_Ossuary",
+      "z": 2.5,
+      "rect": [
+        36,
+        60,
+        64,
+        84
+      ],
+      "ports": [
+        {
+          "id": "rim",
+          "at": [
+            42,
+            60,
+            2.5
+          ],
+          "width": 3,
+          "kind": "stair"
+        },
+        {
+          "id": "court",
+          "at": [
+            36,
+            80,
+            2.5
+          ],
+          "width": 3,
+          "kind": "stair"
+        },
+        {
+          "id": "bridge",
+          "at": [
+            62,
+            74,
+            2.5
+          ],
+          "width": 3,
+          "kind": "bridge"
+        }
+      ]
+    },
+    {
+      "id": "Waterworks-W",
+      "label": "LI_Warrens_WaterworksW",
+      "asset": "LI_Warrens_WaterworksW",
+      "z": -2.5,
+      "rect": [
+        4,
+        14,
+        70,
+        36
+      ],
+      "ports": [
+        {
+          "id": "rim",
+          "at": [
+            48,
+            36,
+            -2.5
+          ],
+          "width": 3,
+          "kind": "stair"
+        },
+        {
+          "id": "court",
+          "at": [
+            12,
+            36,
+            -2.5
+          ],
+          "width": 3,
+          "kind": "stair"
+        },
+        {
+          "id": "chain",
+          "at": [
+            66,
+            26,
+            -2.5
+          ],
+          "width": 2.5,
+          "kind": "bridge"
+        },
+        {
+          "id": "sump",
+          "at": [
+            48,
+            34,
+            -2.5
+          ],
+          "width": 2.5,
+          "kind": "stair"
+        },
+        {
+          "id": "S5",
+          "at": [
+            16,
+            26,
+            -2.5
+          ],
+          "width": 3,
+          "kind": "door"
+        }
+      ],
+      "note": "Pump Room, Cistern, the humped tunnel between them"
+    },
+    {
+      "id": "Pit",
+      "label": "LI_Warrens_Pit",
+      "asset": "LI_Warrens_Pit",
+      "z": -5,
+      "rect": [
+        16,
+        22,
+        68,
+        66
+      ],
+      "ports": [
+        {
+          "id": "cascade",
+          "at": [
+            46,
+            30,
+            -5
+          ],
+          "width": 4,
+          "kind": "stair"
+        },
+        {
+          "id": "sump",
+          "at": [
+            44,
+            38,
+            -5
+          ],
+          "width": 2.5,
+          "kind": "stair"
+        },
+        {
+          "id": "undercroft",
+          "at": [
+            56,
+            30,
+            -5
+          ],
+          "width": 2.5,
+          "kind": "crawl"
+        },
+        {
+          "id": "closet",
+          "at": [
+            19,
+            40,
+            -5
+          ],
+          "width": 1,
+          "kind": "ladder"
+        }
+      ]
+    },
+    {
+      "id": "Canal",
+      "label": "LI_Warrens_Canal",
+      "asset": "LI_Warrens_Canal",
+      "z": -2.5,
+      "rect": [
+        66,
+        -4,
+        88,
+        104
+      ],
+      "ports": [
+        {
+          "id": "bridge-w",
+          "at": [
+            66,
+            74,
+            2.5
+          ],
+          "width": 3,
+          "kind": "bridge"
+        },
+        {
+          "id": "bridge-e",
+          "at": [
+            88,
+            74,
+            2.5
+          ],
+          "width": 3,
+          "kind": "bridge"
+        },
+        {
+          "id": "ford-w",
+          "at": [
+            66,
+            49,
+            -2.5
+          ],
+          "width": 4,
+          "kind": "door"
+        },
+        {
+          "id": "ford-e",
+          "at": [
+            88,
+            49,
+            0
+          ],
+          "width": 4,
+          "kind": "stair"
+        },
+        {
+          "id": "chain-w",
+          "at": [
+            66,
+            26,
+            -2.5
+          ],
+          "width": 2.5,
+          "kind": "bridge"
+        },
+        {
+          "id": "chain-e",
+          "at": [
+            88,
+            24,
+            -2.5
+          ],
+          "width": 2.5,
+          "kind": "bridge"
+        }
+      ],
+      "note": "the canal, the Ford, both bridges: the edge is one tile; the Undercroft passes under it on the Brineworks tile"
+    },
+    {
+      "id": "Belfry",
+      "label": "LI_Warrens_Belfry",
+      "asset": "LI_Warrens_Belfry",
+      "z": 0,
+      "rect": [
+        84,
+        38,
+        124,
+        68
+      ],
+      "ports": [
+        {
+          "id": "ford",
+          "at": [
+            88,
+            49,
+            0
+          ],
+          "width": 4,
+          "kind": "stair"
+        },
+        {
+          "id": "reliquary",
+          "at": [
+            92,
+            68,
+            0
+          ],
+          "width": 3,
+          "kind": "stair"
+        },
+        {
+          "id": "cellar",
+          "at": [
+            96,
+            38,
+            0
+          ],
+          "width": 3,
+          "kind": "stair"
+        },
+        {
+          "id": "larder",
+          "at": [
+            112,
+            50,
+            0
+          ],
+          "width": 3,
+          "kind": "stair"
+        }
+      ],
+      "note": "the Bell Tower, its loft, the dial lock, the Sealed Burial"
+    },
+    {
+      "id": "Reliquary",
+      "label": "LI_Warrens_Reliquary",
+      "asset": "LI_Warrens_Reliquary",
+      "z": 2.5,
+      "rect": [
+        80,
+        66,
+        108,
+        102
+      ],
+      "ports": [
+        {
+          "id": "bridge",
+          "at": [
+            84,
+            74,
+            2.5
+          ],
+          "width": 3,
+          "kind": "bridge"
+        },
+        {
+          "id": "belfry",
+          "at": [
+            92,
+            66,
+            2.5
+          ],
+          "width": 3,
+          "kind": "stair"
+        },
+        {
+          "id": "S2",
+          "at": [
+            110,
+            80,
+            2.5
+          ],
+          "width": 3,
+          "kind": "door"
+        },
+        {
+          "id": "mill",
+          "at": [
+            92,
+            90,
+            2.5
+          ],
+          "width": 3,
+          "kind": "stair"
+        }
+      ]
+    },
+    {
+      "id": "Mill",
+      "label": "LI_Warrens_Mill",
+      "asset": "LI_Warrens_Mill",
+      "z": 5,
+      "rect": [
+        78,
+        90,
+        106,
+        124
+      ],
+      "ports": [
+        {
+          "id": "reliquary",
+          "at": [
+            92,
+            90,
+            2.5
+          ],
+          "width": 3,
+          "kind": "stair"
+        },
+        {
+          "id": "drop",
+          "at": [
+            90,
+            104,
+            5
+          ],
+          "width": 2,
+          "kind": "drop"
+        }
+      ],
+      "note": "the Salt Mill: the Curing Room wing (P7) above the Reliquary"
+    },
+    {
+      "id": "Catacomb",
+      "label": "LI_Warrens_Catacomb",
+      "asset": "LI_Warrens_Catacomb",
+      "z": 0,
+      "rect": [
+        -28,
+        40,
+        -2,
+        92
+      ],
+      "ports": [
+        {
+          "id": "court",
+          "at": [
+            -2,
+            64,
+            0
+          ],
+          "width": 2.5,
+          "kind": "crawl"
+        },
+        {
+          "id": "pit",
+          "at": [
+            -2,
+            46,
+            -4
+          ],
+          "width": 2.5,
+          "kind": "stair"
+        }
+      ],
+      "note": "the far west bead; its dive is a fourth way into the Pit"
+    },
+    {
+      "id": "Brineworks",
+      "label": "LI_Warrens_Brineworks",
+      "asset": "LI_Warrens_Brineworks",
+      "z": -2.5,
+      "rect": [
+        88,
+        4,
+        144,
+        54
+      ],
+      "ports": [
+        {
+          "id": "belfry-cellar",
+          "at": [
+            96,
+            30,
+            -2.5
+          ],
+          "width": 3,
+          "kind": "stair"
+        },
+        {
+          "id": "belfry-larder",
+          "at": [
+            112,
+            50,
+            -2.5
+          ],
+          "width": 3,
+          "kind": "stair"
+        },
+        {
+          "id": "chain",
+          "at": [
+            96,
+            24,
+            -2.5
+          ],
+          "width": 2.5,
+          "kind": "bridge"
+        },
+        {
+          "id": "undercroft",
+          "at": [
+            88,
+            26,
+            -5
+          ],
+          "width": 2.5,
+          "kind": "crawl"
+        },
+        {
+          "id": "S3",
+          "at": [
+            140,
+            40,
+            -2.5
+          ],
+          "width": 3,
+          "kind": "door"
+        },
+        {
+          "id": "S4",
+          "at": [
+            122,
+            0,
+            -2.5
+          ],
+          "width": 3,
+          "kind": "door"
+        }
+      ],
+      "note": "Salt Cellar, Sluice, Brine Larder, the Undercroft under the canal"
+    }
+  ],
+  "views": [
+    {
+      "id": "ford-hoist",
+      "from": [
+        74,
+        49,
+        -2.5
+      ],
+      "to": [
+        40,
+        56,
+        7
+      ],
+      "label": "The Ford -> the hoist (and, turning, the bell): both landmarks from one spot"
+    },
+    {
+      "id": "ford-bell",
+      "from": [
+        74,
+        49,
+        -2.5
+      ],
+      "to": [
+        104,
+        54,
+        16
+      ],
+      "label": "The Ford -> the bell"
+    },
+    {
+      "id": "bridge-hoist",
+      "from": [
+        73,
+        74,
+        2.5
+      ],
+      "to": [
+        40,
+        56,
+        7
+      ],
+      "label": "Bone Bridge -> the hoist over the Well"
+    },
+    {
+      "id": "bridge-bell",
+      "from": [
+        73,
+        74,
+        2.5
+      ],
+      "to": [
+        104,
+        54,
+        16
+      ],
+      "label": "Bone Bridge -> the bell"
+    },
+    {
+      "id": "rim-glyphs",
+      "from": [
+        48,
+        50,
+        0
+      ],
+      "to": [
+        102,
+        50,
+        2
+      ],
+      "label": "Well east rim -> the glyphs on the tower's west face (P4), across the canal"
+    },
+    {
+      "id": "hall-hoist",
+      "from": [
+        22,
+        50,
+        0
+      ],
+      "to": [
+        40,
+        56,
+        7
+      ],
+      "label": "Camp Door -> the hoist"
+    },
+    {
+      "id": "loft-well",
+      "from": [
+        102,
+        60,
+        5
+      ],
+      "to": [
+        40,
+        50,
+        0
+      ],
+      "label": "Belfry loft -> the Well's shaft light across the canal"
+    },
+    {
+      "id": "belfry-pit",
+      "from": [
+        90,
+        54,
+        0
+      ],
+      "to": [
+        40,
+        50,
+        -5
+      ],
+      "label": "Belfry west arch -> the Well, 60 m away over the Ford"
+    },
+    {
+      "id": "pit-hoist",
+      "from": [
+        40,
+        46,
+        -5
+      ],
+      "to": [
+        40,
+        56,
+        7
+      ],
+      "label": "Pit -> up the shaft"
+    },
+    {
+      "id": "larder-bell",
+      "from": [
+        120,
+        40,
+        -2.5
+      ],
+      "to": [
+        104,
+        54,
+        16
+      ],
+      "label": "Brine Larder -> the bell overhead through the roof break"
+    }
+  ],
+  "transitions": [
+    {
+      "id": "t-camp",
+      "at": [
+        5,
+        50,
+        0
+      ],
+      "kind": "reveal",
+      "label": "camp stair -> the hall; the Well framed by the east door"
+    },
+    {
+      "id": "t-court",
+      "at": [
+        19,
+        61,
+        0
+      ],
+      "kind": "turn",
+      "label": "hall -> Court: bent passage, R1"
+    },
+    {
+      "id": "t-ossuary",
+      "at": [
+        42,
+        60,
+        1.2
+      ],
+      "kind": "stair",
+      "label": "rim N -> Ossuary: straight stair up, the hoist behind you"
+    },
+    {
+      "id": "t-cascade",
+      "at": [
+        43,
+        38,
+        -2.5
+      ],
+      "kind": "stair",
+      "label": "rim S -> Pit: the cascade (R2)"
+    },
+    {
+      "id": "t-pump",
+      "at": [
+        44,
+        38,
+        -1.2
+      ],
+      "kind": "stair",
+      "label": "rim S -> Pump: dog-leg down (R4)"
+    },
+    {
+      "id": "t-ford-w",
+      "at": [
+        53,
+        50,
+        -1.2
+      ],
+      "kind": "stair",
+      "label": "rim E -> down to the Ford"
+    },
+    {
+      "id": "t-ford",
+      "at": [
+        74,
+        49,
+        -2.5
+      ],
+      "kind": "reveal",
+      "label": "the Ford: open air, both landmarks"
+    },
+    {
+      "id": "t-ford-e",
+      "at": [
+        85,
+        49,
+        -1.2
+      ],
+      "kind": "stair",
+      "label": "Ford -> Belfry: up the east step"
+    },
+    {
+      "id": "t-bridge",
+      "at": [
+        73,
+        74,
+        2.5
+      ],
+      "kind": "bridge",
+      "label": "the Bone Bridge, 22 m over the canal (R5)"
+    },
+    {
+      "id": "t-chain",
+      "at": [
+        81,
+        25,
+        -2.5
+      ],
+      "kind": "bridge",
+      "label": "the Chain Crossing: barred until the Sluice wheel lowers it (P2)"
+    },
+    {
+      "id": "t-sump",
+      "at": [
+        48,
+        34,
+        -3.8
+      ],
+      "kind": "stair",
+      "label": "Pump -> Pit: the Sump Stair, the waterworks' own way down"
+    },
+    {
+      "id": "t-undercroft",
+      "at": [
+        80,
+        26,
+        -5
+      ],
+      "kind": "squeeze",
+      "label": "the Undercroft: low winding tunnel under the canal (R7)"
+    },
+    {
+      "id": "t-wetstair",
+      "at": [
+        5,
+        56,
+        -1.2
+      ],
+      "kind": "stair",
+      "label": "Court -> Cistern: the long wet stair (R6)"
+    },
+    {
+      "id": "t-hump",
+      "at": [
+        38,
+        21,
+        -1.0
+      ],
+      "kind": "squeeze",
+      "label": "Cistern -> Pump: low tunnel that climbs a hump and drops again"
+    },
+    {
+      "id": "t-relbelfry",
+      "at": [
+        92,
+        68,
+        1.2
+      ],
+      "kind": "stair",
+      "label": "Reliquary -> Belfry: stair down under the tower"
+    },
+    {
+      "id": "t-cellar",
+      "at": [
+        96,
+        36,
+        -1.2
+      ],
+      "kind": "stair",
+      "label": "Belfry -> Cellar (R3)"
+    },
+    {
+      "id": "t-larder",
+      "at": [
+        112,
+        52,
+        -1.2
+      ],
+      "kind": "stair",
+      "label": "Belfry -> Brine Larder: down into the water"
+    },
+    {
+      "id": "t-ledge",
+      "at": [
+        119,
+        50,
+        -1.0
+      ],
+      "kind": "jump",
+      "label": "ledge hop: larder stair -> the dry shelf above the brine"
+    },
+    {
+      "id": "t-pitshelf",
+      "at": [
+        33,
+        62,
+        -3.0
+      ],
+      "kind": "jump",
+      "label": "ledge hop: cascade foot -> the root shelf on the Pit's north wall"
+    },
+    {
+      "id": "t-loftdrop",
+      "at": [
+        100,
+        60,
+        5
+      ],
+      "kind": "drop",
+      "label": "one-way drop: loft -> Belfry floor"
+    },
+    {
+      "id": "t-millstair",
+      "at": [
+        96,
+        97,
+        3.8
+      ],
+      "kind": "stair",
+      "label": "Reliquary -> Salt Mill: the mill stair winds up to +5"
+    },
+    {
+      "id": "t-milldrop",
+      "at": [
+        90,
+        104,
+        5
+      ],
+      "kind": "drop",
+      "label": "one-way drop: Salt Mill -> Reliquary (2.5 m)"
+    },
+    {
+      "id": "t-catacomb",
+      "at": [
+        -2,
+        63,
+        0
+      ],
+      "kind": "squeeze",
+      "label": "Court -> Catacomb: low tunnel round the back"
+    },
+    {
+      "id": "t-catacombdive",
+      "at": [
+        -8,
+        50,
+        -3
+      ],
+      "kind": "stair",
+      "label": "the Catacomb Dive: winding down into the Pit's west end"
+    }
+  ],
+  "landmark": {
+    "id": "well",
+    "label": "THE WELL (west) and THE BELL TOWER (east)",
+    "at": [
+      72,
+      50,
+      0
+    ],
+    "faces": [
+      {
+        "dir": "W",
+        "label": "the Well: hoist, shaft light, the Pit glow"
+      },
+      {
+        "dir": "E",
+        "label": "the Bell Tower: 22 m, cold bell light, heard everywhere"
+      },
+      {
+        "dir": "N",
+        "label": "the Bone Bridge"
+      },
+      {
+        "dir": "S",
+        "label": "the Chain Crossing and the Undercroft"
+      }
+    ]
+  },
+  "notes": {
+    "thesis": "Two landmarks and one edge. The canal splits the district into two banks you can always name; the Well and the Bell Tower stand one on each. Three crossings, each a different beat, and the Ford in the middle shows both towers at once.",
+    "principles": [
+      "Lynch: a real edge (impassable water) plus two landmarks gives triangulation, not just recognition",
+      "Dark Souls distant views: Parish and Sen's see each other; here the rim reads the tower's glyphs and the loft sees the Well",
+      "Thresholds: every crossing is a beat (a long bridge, a wade, a low tunnel); bank-internal connectors wind and change height (the hump tunnel, the wet stair)",
+      "Cavern and dungeon: built rooms (Ossuary, Reliquary, Cellar, Pump) are orthogonal; grown ones (Court, Cistern, Larder, Pit, the canal) are not",
+      "Sound as weenie: the bell and the pump are the two audio landmarks, one per bank",
+      "Deep Dish / Tunic: the Chain Crossing is seen barred from the Pump long before the Sluice wheel is found (P2)",
+      "Lunacid rule: every loop's far point is unique (loft with the bell, Brine Larder wade, Sealed Burial)"
+    ],
+    "changes": [
+      "Footprint 156 x 108 m, flatter: +2.5 / 0 / -2.5 and the Pit at -5; no +5 galleries except the Belfry loft",
+      "Chime Hall becomes the Belfry (H3) under a 22 m tower; the Reliquary and the brine stores move to the east bank",
+      "P4's glyphs move onto the tower, read from the Well rim: the two landmarks exchange information",
+      "The Drowned Gallery becomes the Undercroft under the canal (graph link, R7); the Sump Stair is open; P2 is the Chain Crossing",
+      "Two ledge hops (Larder shelf, Pit root shelf) as pocket rewards off the main floors",
+      "Nine Level Instance tiles; the canal is its own tile (water, Ford, both bridges)"
+    ],
+    "sizing": "15-20 min: hunt court + Curing Room (Salt Mill, east bank +5) + forage + return; a Belfry contract crosses the canal, cures on the same bank and returns by the bridge or the Ford",
+    "risks": [
+      "Bigger map, longer walks: the Ford is the only always-open crossing; a pack crossing anywhere else needs R5 open or the chain lowered",
+      "Two hunt courts (Court, Pit) on the west bank and one (Belfry) on the east: a Belfry contract means crossing twice with cargo",
+      "Water as an edge needs real impassability (depth, no climb-out) that the viewer only labels",
+      "The Bell Tower's height needs the Belfry tile to be 24 m tall; roof breaks for the Larder view are art"
+    ]
+  },
+  "_checks": {
+    "closureSetsChecked": 64,
+    "stranded": 0
+  },
+  "_file": "warrens_v8c.json",
+  "_tab": "v8c"
+}

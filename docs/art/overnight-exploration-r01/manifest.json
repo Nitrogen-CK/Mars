@@ -1,0 +1,1518 @@
+{
+  "DESIGN_INDEX.md": {
+    "bytes": 71281,
+    "sha256": "eeaa8021a804f6a85b9c22f141e4b9a4549bf59bc1c7cfc0f3d9b6acbb977b64"
+  },
+  "finalize.py": {
+    "bytes": 2130,
+    "sha256": "7181fe21c0f333e28d8ff469975f7704ebfcaa3f0ad2cf87124f009260c7d938"
+  },
+  "harden_gallery.py": {
+    "bytes": 1006,
+    "sha256": "785391d0c3c8e7aaf1bd8bda7e20472a785a69c7282800340774cdb9dd1b66a7"
+  },
+  "library.py": {
+    "bytes": 15066,
+    "sha256": "d0c065694494937562cf989afe01fdd76729711ab2d98e66e75cf6dd23da003f"
+  },
+  "OVERVIEW.jpg": {
+    "bytes": 706682,
+    "sha256": "54c98505870942df10b33dfaccbb81c5aa74d07ced1176248745ef55eade3890"
+  },
+  "plan.json": {
+    "bytes": 339944,
+    "sha256": "8cfb0ddc6cddfd4faa5dbffdc49b4a85c15e7097f47f446e2eff13c585616446"
+  },
+  "prepare.py": {
+    "bytes": 49038,
+    "sha256": "fe98d91618e5e56987aef53b094e7f157e8e8507bd1e5e5a9e0e4f664d912463"
+  },
+  "PREVIEW.html": {
+    "bytes": 80308,
+    "sha256": "e2a69b7a04b9a6661032af1745eb2787077b2b9060919804021e4128538e634d"
+  },
+  "progress.json": {
+    "bytes": 78719,
+    "sha256": "391cb4ce9fff2d6098ea1069356026f32006eecc6fafc33f0ef2dad593227532"
+  },
+  "README.md": {
+    "bytes": 2078,
+    "sha256": "26478fbfc819eed51b7d819d20cea81d0723b12abbffa7b094cde9f42fd47f50"
+  },
+  "refine_gallery.py": {
+    "bytes": 3490,
+    "sha256": "8b3b8a8810e314101a737c955fc897a41c608a5734c63ecf07113fcd920854c6"
+  },
+  "review-script.js": {
+    "bytes": 76475,
+    "sha256": "79b0a570091d7c966884bb9af595323d865b3cc6d396f1bd4200199b74f69272"
+  },
+  "review_batch.py": {
+    "bytes": 1958,
+    "sha256": "1fbc41c688abdde93c29f4e5739f26e519ebe0f5e5370790a36280e002483849"
+  },
+  "sources.json": {
+    "bytes": 16476,
+    "sha256": "bd0a93ae51bbe153d56e69cc859124a55a6cafec8f13c95c3e0266d146a7038f"
+  },
+  "VERIFICATION.json": {
+    "bytes": 743,
+    "sha256": "6ed503c9b31aa7f897cd7436ae2986ffa1131209115d07d68c0cab28411faedc"
+  },
+  "verify_library.py": {
+    "bytes": 3165,
+    "sha256": "5c5356795b2de76a873de294fe8a0a5c395fccba0c51009b82024b170a6867c6"
+  },
+  "write_design_index.py": {
+    "bytes": 2941,
+    "sha256": "73869c7b5227cfcf16cac3736451309b456f3e23d1c676429d956defdd3cc0dd"
+  },
+  "contact-sheets/cookbook.jpg": {
+    "bytes": 900862,
+    "sha256": "99bf743e8d383858522ae17173d95733074d0fc8760efdb7f3c7bfcd50b17a37"
+  },
+  "contact-sheets/environment-B.jpg": {
+    "bytes": 592192,
+    "sha256": "a292437872ad0b2143fb04b83f25d5366df63cf257aaf9a181ed45e2a829e153"
+  },
+  "contact-sheets/environment-C.jpg": {
+    "bytes": 584079,
+    "sha256": "af2178e13a73ab5ac106d5d85f11a48d31a61585de6cb835730c0f16fbafeb6b"
+  },
+  "contact-sheets/environment-D.jpg": {
+    "bytes": 574072,
+    "sha256": "d09d58fa08da3cabdc5614f51422d2fce162a4e7a74d7f9a1e5aa719d524e32d"
+  },
+  "contact-sheets/hud.jpg": {
+    "bytes": 797947,
+    "sha256": "c8838626e88e2dcf381da69f1502c89d1a57726c256f577b9b4426d0480d6325"
+  },
+  "contact-sheets/intro.jpg": {
+    "bytes": 855307,
+    "sha256": "e510b19abd5c8781337e71687e02a30e6770eb579ad21e087396a8dc8527fb95"
+  },
+  "contact-sheets/mechanisms.jpg": {
+    "bytes": 756412,
+    "sha256": "e7c3b6953498d718664822d8c2523edf59502ba95d5760bbe1a3006097b5af4d"
+  },
+  "contact-sheets/monsters.jpg": {
+    "bytes": 606677,
+    "sha256": "dde01efc5c4a132c0e1608c82ca3c0cf2bc3d08b37d5e8e37dfebd046e915a30"
+  },
+  "contact-sheets/vermin.jpg": {
+    "bytes": 724497,
+    "sha256": "9c357cd0db7751ac619378d34e19c64637ad1f1577d0c4ac83f2f44ca0585642"
+  },
+  "prompts/CB-01.txt": {
+    "bytes": 1651,
+    "sha256": "8332bfeced64539caf5ce221308c7e00fe4359a4664ff7731007d8a37c3849c1"
+  },
+  "prompts/CB-02.txt": {
+    "bytes": 2133,
+    "sha256": "861b9fafccdca150504d69ba279b3c4640aa5d7a06a92acb2c8ff51c0b94785b"
+  },
+  "prompts/CB-03.txt": {
+    "bytes": 2110,
+    "sha256": "02d56e586977271fae6106acb0045a19b6c8477a2bd5ff8117291f72bdf9c019"
+  },
+  "prompts/CB-04.txt": {
+    "bytes": 2114,
+    "sha256": "5edf1cd6f81e0fb8d7cd3f11e64318fe440ab4af21b887f54965d35fcf04a0e5"
+  },
+  "prompts/CB-05.txt": {
+    "bytes": 2100,
+    "sha256": "8247e41cb8c86c90ca390232948206ff0a6949ed9e692e5c5b4cdedb9a11f499"
+  },
+  "prompts/CB-06.txt": {
+    "bytes": 2106,
+    "sha256": "fe92ddb535fd0b4a1260eacffc0b53e481d60716470b1488c3145367a2c15dd6"
+  },
+  "prompts/CB-07.txt": {
+    "bytes": 2107,
+    "sha256": "99fd03bf2f2eaaf710d71dbaf2c6b5c987844b558f1732224df17cd7740ab378"
+  },
+  "prompts/CB-08.txt": {
+    "bytes": 2102,
+    "sha256": "61889074454638eaa00e7bd17c0f72e5a9edc4c68bb1fa0f8d8efe1d8cb8894d"
+  },
+  "prompts/CB-09.txt": {
+    "bytes": 2091,
+    "sha256": "ff42b6dd1f155b59b0043601637ec57b4a604135609d02829cf8515edaa04274"
+  },
+  "prompts/CB-10.txt": {
+    "bytes": 2096,
+    "sha256": "5148d9d5cd76159fefb29c1c22ff7b9f632199b6577b10986cb0dc8d540d6bb2"
+  },
+  "prompts/CB-11.txt": {
+    "bytes": 2099,
+    "sha256": "7b605fa8048f8f0d488a27164378bbf2afff29f4603a2a9a2d71d56d817db698"
+  },
+  "prompts/CB-12.txt": {
+    "bytes": 2124,
+    "sha256": "1a407b5acfc6d690968f2db1788ef3ca15d29c6eeeab7c887549349926ecb28f"
+  },
+  "prompts/ENVB-01.txt": {
+    "bytes": 2273,
+    "sha256": "e3b047bed0ac272b32949ec549c9252e5a25b4b2339023cb92d4930d2520975e"
+  },
+  "prompts/ENVB-02.txt": {
+    "bytes": 2537,
+    "sha256": "70ea882c121d76bbd08084afda6618e5a533852759a8be58341bc033eef7f929"
+  },
+  "prompts/ENVB-03.txt": {
+    "bytes": 2514,
+    "sha256": "4d8e6705f21ca88e61db4a4e71cd8bd8d3e073cf8a7efde2f8123a4e0cc1c4a9"
+  },
+  "prompts/ENVB-04.txt": {
+    "bytes": 2528,
+    "sha256": "b14dd39ad1e3b7ba249a5be85a282c6525be7f20c8b97c672b24f27a88c1d366"
+  },
+  "prompts/ENVB-05.txt": {
+    "bytes": 2537,
+    "sha256": "61759dd6e79f108c1d7594cd074eb6a046f29090eadfa4fc4e80f4ae8cb0a156"
+  },
+  "prompts/ENVB-06.txt": {
+    "bytes": 2534,
+    "sha256": "ebf2d1ed773ba63bae0c38ba243e6d796eab5839473d002d54f82acccc3c9c3a"
+  },
+  "prompts/ENVB-07.txt": {
+    "bytes": 2545,
+    "sha256": "982162f6171ccc58cf44f58170ab5bf5990f3de35ab3908d18336476f9604de2"
+  },
+  "prompts/ENVB-08.txt": {
+    "bytes": 2540,
+    "sha256": "0fdd75850877ad3e6e8302c5944c4690691b0883ce058ebd47bd8bef7eada683"
+  },
+  "prompts/ENVB-09.txt": {
+    "bytes": 2524,
+    "sha256": "62bfa631633005afd65fe9eecf43daeb8e2f659b1bcd9b153ded85a4e60df50a"
+  },
+  "prompts/ENVB-10.txt": {
+    "bytes": 2537,
+    "sha256": "11e9340d16efec2a667ec14724ad4006b64a23d164b7ff1cf4d070cf30b3ab5b"
+  },
+  "prompts/ENVB-11.txt": {
+    "bytes": 2523,
+    "sha256": "a9e0bd8b5a1a61a9081f0ddb5123c140f72b85e383c8837c2505a73f0797e2c6"
+  },
+  "prompts/ENVB-12.txt": {
+    "bytes": 2577,
+    "sha256": "bd9bb79b006f724819337debc2190100f68ead75dcb21f78faf075fcccdce56c"
+  },
+  "prompts/ENVC-01.txt": {
+    "bytes": 2266,
+    "sha256": "deed1c59aa6f1dc4bc8f46ce5f49ebb5f82d8ec7ffe5e6e8c290599f0092042b"
+  },
+  "prompts/ENVC-02.txt": {
+    "bytes": 2269,
+    "sha256": "f175e9758372f4a56ca390d9d61059bce9141fd9be94c24ccb5c2fc88baede1b"
+  },
+  "prompts/ENVC-03.txt": {
+    "bytes": 2271,
+    "sha256": "4dd67e101770c8d4a348f2e53db4693f1ce34da26136c775dc4c077d69e72b5d"
+  },
+  "prompts/ENVC-04.txt": {
+    "bytes": 2313,
+    "sha256": "1a71da004740b4dc24116a6eb6b2a59ecb26055f2a12e14499c16df8deb7302e"
+  },
+  "prompts/ENVC-05.txt": {
+    "bytes": 2326,
+    "sha256": "e22b93742b281efa0c4d00a777c5e087af4a33768d624f291f4f2b24e9b7fa90"
+  },
+  "prompts/ENVC-06.txt": {
+    "bytes": 2347,
+    "sha256": "162f6225773d87fb7c5a669025acd5c5de01f2a3464357e3d9473bbe3ac72656"
+  },
+  "prompts/ENVC-07.txt": {
+    "bytes": 2316,
+    "sha256": "676b13a962ab9c8fab88e638483374d790b64167fe597e3524028809963effc6"
+  },
+  "prompts/ENVC-08.txt": {
+    "bytes": 2301,
+    "sha256": "f5639a97e4330c9afdff30ee373c302e46b0284d97b79742d25af7cf869d394a"
+  },
+  "prompts/ENVC-09.txt": {
+    "bytes": 2308,
+    "sha256": "dea2d3a60f3352bc80db90e66950ceb8a28e5f0a9d59203b5f319a64f58e02fe"
+  },
+  "prompts/ENVC-10.txt": {
+    "bytes": 2301,
+    "sha256": "1a5866f394c4402e1df258daf477df85b1dabc409ce3da1eea125986c805ca80"
+  },
+  "prompts/ENVC-11.txt": {
+    "bytes": 2327,
+    "sha256": "53eec4201a3d8125dda745b3b92224a6a85b78503e02b5b442222572651eefd3"
+  },
+  "prompts/ENVC-12.txt": {
+    "bytes": 2304,
+    "sha256": "9b5f95a139352f647a88ad7480fcef7aa0647ccc7e6dcbb11120b53a683da49b"
+  },
+  "prompts/ENVD-01.txt": {
+    "bytes": 2279,
+    "sha256": "b8426f52d99636e8a8042de7a083421f0a5c3a1ccddd8e92fa3b383199c6d961"
+  },
+  "prompts/ENVD-02.txt": {
+    "bytes": 2272,
+    "sha256": "2edd651a00648965f9bba414bb0bc352ff09fe0a7335d3c3c3a619e855e7bdb4"
+  },
+  "prompts/ENVD-03.txt": {
+    "bytes": 2282,
+    "sha256": "71b9521afdbe445d103b9f9d2285ab384d07524a38d70e3165b76aaf5f079258"
+  },
+  "prompts/ENVD-04.txt": {
+    "bytes": 2303,
+    "sha256": "1cbbf690c04ec9bca879fae5d8085b327c2b7cfeb8fa7752771f1cb39237e24c"
+  },
+  "prompts/ENVD-05.txt": {
+    "bytes": 2335,
+    "sha256": "0a734f5b66b4a3c4cea1b26551cf49ea7228b9406c27942946d37b0e4f8e3b32"
+  },
+  "prompts/ENVD-06.txt": {
+    "bytes": 2305,
+    "sha256": "af7c777b2ef44d7647cfb3387d2116691e9e7c4abc9282fb28ae82879508e7da"
+  },
+  "prompts/ENVD-07.txt": {
+    "bytes": 2323,
+    "sha256": "29cbb90863715a4ecacb7f61f659afb393eb3e49211c2222bd14d2e48412e750"
+  },
+  "prompts/ENVD-08.txt": {
+    "bytes": 2312,
+    "sha256": "b8f779f891b035762b2db770a053d035fcdb8e20da873edf276a1a05c44e4fcf"
+  },
+  "prompts/ENVD-09.txt": {
+    "bytes": 2322,
+    "sha256": "09d4c6425534e229d79c6713d5c38f2e38ead129a75b1ad8353e61e5b24aa166"
+  },
+  "prompts/ENVD-10.txt": {
+    "bytes": 2307,
+    "sha256": "67c497b33edc645211445adcdc512721208211905a95a7a20c9498b8ab6d1277"
+  },
+  "prompts/ENVD-11.txt": {
+    "bytes": 2306,
+    "sha256": "9232b84171839f4c68a812024c977dec0002881471193ed9d2032093ab326819"
+  },
+  "prompts/ENVD-12.txt": {
+    "bytes": 2323,
+    "sha256": "c7adcfdb3d3cafbff88df57470866e4c6bad84fd1de78d2bd2b87b6b5af0472d"
+  },
+  "prompts/HUD-01.txt": {
+    "bytes": 1012,
+    "sha256": "a4bc19a49146764bc70c8f6fcff804f070cb59d8585998f83a71d68bf80b7550"
+  },
+  "prompts/HUD-02.txt": {
+    "bytes": 2763,
+    "sha256": "3b093339a6c13fb53a6e99baf0a3cab0e64641c585b4a96099c73b9cb03b09f7"
+  },
+  "prompts/HUD-03.txt": {
+    "bytes": 2745,
+    "sha256": "79e017b8328421cb6f609ed4f38526a16bbc5f9990f548f8c4c915bc4ab12dbc"
+  },
+  "prompts/HUD-04.txt": {
+    "bytes": 2751,
+    "sha256": "8b6a82a9fbda7f34a1268793b136194270464fcc9b63fd0c8c9893cec57f6789"
+  },
+  "prompts/HUD-05.txt": {
+    "bytes": 2751,
+    "sha256": "ad656e2916fde42e61b66672820138db600742efc4695079ae559989dc5b12a1"
+  },
+  "prompts/HUD-06.txt": {
+    "bytes": 2758,
+    "sha256": "1ac6d9244c9636aed80b9bcc0c8c7441124bdf5cee89104fa268f80184ce22f1"
+  },
+  "prompts/HUD-07.txt": {
+    "bytes": 2759,
+    "sha256": "918dff87f62766b89964203f849bc293e1462bc35f70bbc4b575129a1745c3ff"
+  },
+  "prompts/HUD-08.txt": {
+    "bytes": 2731,
+    "sha256": "da00cd164cf864acec8748574146c41b49e8fda36124f354718f4e38e7159e73"
+  },
+  "prompts/HUD-09.txt": {
+    "bytes": 2748,
+    "sha256": "4b68bd68ff13268f1c908327d48df05e2d5a2bd77705bdd8427bfc3c38caf2dc"
+  },
+  "prompts/HUD-10.txt": {
+    "bytes": 2733,
+    "sha256": "ea3b05b6c22307322345cf2dd8e162ee0861e62e4e67c8235adec29d2d46f5f9"
+  },
+  "prompts/HUD-11.txt": {
+    "bytes": 2732,
+    "sha256": "3b833393ca8bbd4265fb6ef8df6ebf325b715fa65565ade008f3aaf5f0cb921c"
+  },
+  "prompts/HUD-12.txt": {
+    "bytes": 2788,
+    "sha256": "c046d0d2772464c1db9f603e0c450e7f92a89648cba846a2ddef936dd1379986"
+  },
+  "prompts/IN-01.txt": {
+    "bytes": 2221,
+    "sha256": "d9dbc52783bf09b6b873e7d75e18af7c569aad4bda2816be3b747508fda96b10"
+  },
+  "prompts/IN-02.txt": {
+    "bytes": 2167,
+    "sha256": "3a62da7293dad4cbb2c21bd45bfeefe15a6068d97071e58eef5ca75228112c1c"
+  },
+  "prompts/IN-03.txt": {
+    "bytes": 2154,
+    "sha256": "e9e69d12e34dd2955f383ff0bf3973251ee5e7748d4ec1ee0481378173e82fc5"
+  },
+  "prompts/IN-04.txt": {
+    "bytes": 2179,
+    "sha256": "1ca64edcab6d23050ecdb530c699f98a50d3cb3219cc645e3a6db5ffeccafa9d"
+  },
+  "prompts/IN-05.txt": {
+    "bytes": 2191,
+    "sha256": "e37cc2d60294e1e556890f26bc9ff9191233de8f0673744f0381309e1661558a"
+  },
+  "prompts/IN-06.txt": {
+    "bytes": 2175,
+    "sha256": "054fd7d89ebb96b14a74a74d030728a5792cd93ed93c1f5ff34323ee3f7a65ab"
+  },
+  "prompts/IN-07.txt": {
+    "bytes": 2201,
+    "sha256": "6ee9bf0fbbc099c6110e712fda4aa4042b04b044c53139d159df6891602c600a"
+  },
+  "prompts/IN-08.txt": {
+    "bytes": 2204,
+    "sha256": "c89ba07ae3f8e104047bd16894e44c6d24bdfff4726f8f9e4920d1d63e949d94"
+  },
+  "prompts/IN-09.txt": {
+    "bytes": 2191,
+    "sha256": "958223e0f52d7b2d5c4cf185f954a036fb5ca3338af936329072e5bd74fe695f"
+  },
+  "prompts/IN-10.txt": {
+    "bytes": 2216,
+    "sha256": "62f338490242f0c210e2ef8e02f36ba25bf1abf2a2d9acb931703d44687f6a55"
+  },
+  "prompts/IN-11.txt": {
+    "bytes": 2200,
+    "sha256": "31c2907f60d23ecb9614144ac040a3555e9991bc1fcf08505fd83dafd2b64ccd"
+  },
+  "prompts/IN-12.txt": {
+    "bytes": 2176,
+    "sha256": "a95ca26a2c2a478b2ac27e5b9e24e45252290734d062e114747621a7de7f1efa"
+  },
+  "prompts/MECH-01.txt": {
+    "bytes": 2240,
+    "sha256": "4fb298412b6b91a38d1ccb3aba1e1505e796f4ea37641bac3993ac791e81d82e"
+  },
+  "prompts/MECH-02.txt": {
+    "bytes": 2111,
+    "sha256": "e6be7fafa453d223ee2cd5b8c4db16cd3bf579008d7649caf24e2cfd1740928c"
+  },
+  "prompts/MECH-03.txt": {
+    "bytes": 2107,
+    "sha256": "0784fa63720ea680b7a7235442ac608ba8e4dae0b6bc0de2ad97c81a1c155c49"
+  },
+  "prompts/MECH-04.txt": {
+    "bytes": 2116,
+    "sha256": "4b555b2375de6c1e6c1d0d0893f62beaaaed0be10d93f9ca318d1d0c758fcf8f"
+  },
+  "prompts/MECH-05.txt": {
+    "bytes": 2093,
+    "sha256": "ce5521dc1536856cc72a7e38699dde7ce1a4d78c1fa15f3de60b1303f848b6ad"
+  },
+  "prompts/MECH-06.txt": {
+    "bytes": 2096,
+    "sha256": "78d880d31ec3db634819ee0ea0bb845eca74cbdef4f28d5f2590f1c0f60767b6"
+  },
+  "prompts/MECH-07.txt": {
+    "bytes": 2132,
+    "sha256": "9408af2f3c981a6f1ade4f95a92bdbb07b46d457eeb820a6a913d385b1cc973b"
+  },
+  "prompts/MECH-08.txt": {
+    "bytes": 2113,
+    "sha256": "6c4980996c03d610d86d0c6fec6242833b6966f83b0a2add5335603441acaad4"
+  },
+  "prompts/MECH-09.txt": {
+    "bytes": 2086,
+    "sha256": "5c1657d856c03916735e32dabb1ea3c86df468be71f72746c51eee40a341d519"
+  },
+  "prompts/MECH-10.txt": {
+    "bytes": 2092,
+    "sha256": "e875d5da2a38850bce8c61a4cdd6c68173a2bb9b439b35f3bcf461e45be953d2"
+  },
+  "prompts/MECH-11.txt": {
+    "bytes": 2098,
+    "sha256": "19f9ed3b924a694b94c85801d2fb0ef3461379ea44cef7f076b46146b261c39c"
+  },
+  "prompts/MECH-12.txt": {
+    "bytes": 2132,
+    "sha256": "276494a860d27814b0dbe11ad97de409da4a369c04092e485a1219472053a623"
+  },
+  "prompts/MON-01.txt": {
+    "bytes": 2194,
+    "sha256": "b4bff90b36f65e59db85c58c27754ee8f2b90a86e0311823b2d9785097e16190"
+  },
+  "prompts/MON-02.txt": {
+    "bytes": 2165,
+    "sha256": "808866c3c82c81396968f326d84d6d7041ac6289010c53e94a75ca572bc15711"
+  },
+  "prompts/MON-03.txt": {
+    "bytes": 2144,
+    "sha256": "cbd994d4101bdfff87fba1117a567e2539bee6769852e5f4a0a1345bb6de69ca"
+  },
+  "prompts/MON-04.txt": {
+    "bytes": 2075,
+    "sha256": "02e0cd9c58d5988a28afcba3f63cfb9fae882070e0231e12c7b0bc2ba321fd49"
+  },
+  "prompts/MON-05.txt": {
+    "bytes": 2125,
+    "sha256": "af1d41b3f623da4e3e9f88d37901673058f3739b88c5e782c5343147a7d4dea9"
+  },
+  "prompts/MON-06.txt": {
+    "bytes": 2125,
+    "sha256": "e4d8143370f2d4429de18d42c33a690b559e36590cb2155d9dc439256e3427df"
+  },
+  "prompts/MON-07.txt": {
+    "bytes": 2118,
+    "sha256": "c897cf3358d2789bdf69c3bc82ad90777e68e6f9f957abf1c7a69532731170e3"
+  },
+  "prompts/MON-08.txt": {
+    "bytes": 2119,
+    "sha256": "9a7098a12a4ee824666567ceaa2cd6fd1dcc12f6ea124b1826b0aeaddd16e01b"
+  },
+  "prompts/MON-09.txt": {
+    "bytes": 2134,
+    "sha256": "f5ad9ffb62a6284f8a6018ecdcaadb07754088ab592a32e8ad3e64e672bd4cd3"
+  },
+  "prompts/MON-10.txt": {
+    "bytes": 2120,
+    "sha256": "4de55cf9ffff8f907032142fb035ba92b44bbec1fb0c434432882e0998377f9d"
+  },
+  "prompts/MON-11.txt": {
+    "bytes": 2116,
+    "sha256": "311b226aacc1cd93bd0a2f6400eeea416065df6932bceb64c74cc94b6d29e861"
+  },
+  "prompts/MON-12.txt": {
+    "bytes": 2119,
+    "sha256": "38773e171392f925ad34b03b01c0a811c127a5e20655f02d672b50fefbe8a67d"
+  },
+  "prompts/VER-01.txt": {
+    "bytes": 2082,
+    "sha256": "7b56a9b17db4d89da6595a5672ea2ff4964f55ac2b5341c90e4e505b1c8c2b4f"
+  },
+  "prompts/VER-02.txt": {
+    "bytes": 2080,
+    "sha256": "f7e3cc3d73dd980e8fcd32a2d1cfcf91e262a57c4bd5bf4918215373c996285d"
+  },
+  "prompts/VER-03.txt": {
+    "bytes": 2209,
+    "sha256": "fe3a1c00d2c53ac842655c791af3f72147cccd82572ba6557e4cbe4e601ad61a"
+  },
+  "prompts/VER-04.txt": {
+    "bytes": 2187,
+    "sha256": "c89e2e3d1126a4ede0b1b7fd806670bc674eb7a01dcabce7bcbe30b7a586feb2"
+  },
+  "prompts/VER-05.txt": {
+    "bytes": 2204,
+    "sha256": "14f561d07c0bb7f90d739b48fc9a8f086bb843a64c45c37f53740b8f65fc7e35"
+  },
+  "prompts/VER-06.txt": {
+    "bytes": 2212,
+    "sha256": "c7ce10130915e21e8eb60880ca9188f059e26fda528b9b640f214e1fa9ac14c8"
+  },
+  "prompts/VER-07.txt": {
+    "bytes": 2187,
+    "sha256": "f84a2118bc12a9dac117b8df3523911db62be156782a7450d49ef8358da127cd"
+  },
+  "prompts/VER-08.txt": {
+    "bytes": 2159,
+    "sha256": "8358db7e026737d4ea1f16bd22c85a519548ed34804957098ede323276b788b4"
+  },
+  "prompts/VER-09.txt": {
+    "bytes": 2222,
+    "sha256": "577c583337d216a0bee0a81a2db02a4403ae170f0c5d97a35e926b9db647b23d"
+  },
+  "prompts/VER-10.txt": {
+    "bytes": 2192,
+    "sha256": "d844d75af5c21c3dbaff5537cfb008b42a8ac5208b44cdecf65a1cdd72b47bb3"
+  },
+  "prompts/VER-11.txt": {
+    "bytes": 2181,
+    "sha256": "afa3a737b4af9b822609401e5cac663c1fd97e2cb01b9dc79c29545a15154d55"
+  },
+  "prompts/VER-12.txt": {
+    "bytes": 2208,
+    "sha256": "3a74e0f8e796a9767ec50d7dee21b5e36bfce8923772c43c069ad24a08c60c4b"
+  },
+  "qa/review-001.jpg": {
+    "bytes": 763892,
+    "sha256": "0285811c063fb291e1f49836bb8098cbb320ad68a750b1e580e773b05f500e05"
+  },
+  "qa/review-001.json": {
+    "bytes": 124,
+    "sha256": "c900f09b72c00b25ebd567c76e901d1ebe65f082166c13f13e7b15afaf602859"
+  },
+  "qa/review-002.jpg": {
+    "bytes": 583881,
+    "sha256": "8abf25f7c9701ba487b80b93bfbd089e060b998ff4194fabd43c0161f4b707a0"
+  },
+  "qa/review-002.json": {
+    "bytes": 92,
+    "sha256": "f11d9307cc47b182d1c3a58e6990452845a9da7376c5af89280da25e010e22a9"
+  },
+  "qa/review-003.jpg": {
+    "bytes": 590944,
+    "sha256": "a9b7830a44dcbbef0739f3ee6935e3eecfb8a05bec313182d484de2371256748"
+  },
+  "qa/review-003.json": {
+    "bytes": 92,
+    "sha256": "c784f35a36207ade46eaf64191c8d7720b3042c1e3f44cbb8393fa825e1887dc"
+  },
+  "qa/review-004.jpg": {
+    "bytes": 539368,
+    "sha256": "c665c59deccbc39c3c731a7f6774e74aa491f017138ba9eec5005058deb3382f"
+  },
+  "qa/review-004.json": {
+    "bytes": 81,
+    "sha256": "1bd14243d7c7bb367b8e1eb257c858b7a28a9ac55db86e3af43ed81fb6708e41"
+  },
+  "qa/review-005.jpg": {
+    "bytes": 683722,
+    "sha256": "7a305496f8bfa73f8dad0a503c1a5fcdab6a4c19d0edf93be96b33741dfac250"
+  },
+  "qa/review-005.json": {
+    "bytes": 103,
+    "sha256": "2454eb0707c1942cbde9c69c1d79f695e38bcb95fa7d3b2d4b32d03db87857d3"
+  },
+  "qa/review-006.jpg": {
+    "bytes": 598909,
+    "sha256": "ae428855c3fa0abb7e0cccfe788e81ddf1727abd480cbfc9d7a5d553cce3c6a0"
+  },
+  "qa/review-006.json": {
+    "bytes": 92,
+    "sha256": "d19e6de2d23a099b83713727bdffd548f78273d2cb74e4ce2941bb7ab8a5b9aa"
+  },
+  "qa/review-007.jpg": {
+    "bytes": 600232,
+    "sha256": "8f413145ee9efd813d20b10f4e696ae3ee59e05a135502d729c88675b4e94ac8"
+  },
+  "qa/review-007.json": {
+    "bytes": 92,
+    "sha256": "05cce1c42520bf18b172f3f09061daba39258e3bf714ea4ab0a66f987ac3199a"
+  },
+  "qa/review-008.jpg": {
+    "bytes": 584856,
+    "sha256": "23b71c74b2e61d9b096d0a8589606ce2fd4c6e9fafead569ed0598b85f94dbb9"
+  },
+  "qa/review-008.json": {
+    "bytes": 92,
+    "sha256": "f5d10c271a3bc4c5ba8d459a6a44199dd24a67ca0c0f53bb884bab5160a23301"
+  },
+  "qa/review-009.jpg": {
+    "bytes": 608986,
+    "sha256": "87118ba1efdb620296cd7f4c8d56bfb84573920d9c22861f60f7834f16ddfadb"
+  },
+  "qa/review-009.json": {
+    "bytes": 92,
+    "sha256": "19b03490aa56236bba8432a5692091d0e190b1494bf964712f09ccc960c859b1"
+  },
+  "qa/review-010.jpg": {
+    "bytes": 580179,
+    "sha256": "7a8f1dbd41405ed33fa2d48de1e651c2d34ad9f0806fe48121a761cae94e4831"
+  },
+  "qa/review-010.json": {
+    "bytes": 92,
+    "sha256": "c93cbbce1564af65f426f9058a5999c72d63864472913a8d620e0bdf33b8bbbc"
+  },
+  "qa/review-011.jpg": {
+    "bytes": 354543,
+    "sha256": "19e095f222754b3197f3aaaaf91fa31c581aef9f1f2c3c85dcf1c4987c07dc13"
+  },
+  "qa/review-011.json": {
+    "bytes": 50,
+    "sha256": "efdeca38fd28f613c95cf1b7fc2a010e58390ad355218d05dd4429c46cb33c1e"
+  },
+  "references/little-things-in-the-dust.png": {
+    "bytes": 2350733,
+    "sha256": "c918eda5432e985e8985b31c8d6daf9c12207cef6bc5f7976861a4822e0af975"
+  },
+  "references/royal-daily-feast.png": {
+    "bytes": 1102306,
+    "sha256": "d0dc4a69149abde0d20d88371ea28c376389e349d4741aa703ee88280200410b"
+  },
+  "references/v8b-attached-layout.json": {
+    "bytes": 72664,
+    "sha256": "92fe2201fcd711cd1a6edec64cdeaabdbca9305105bf9142ecd039b894c8946b"
+  },
+  "references/v8c-attached-layout.json": {
+    "bytes": 80462,
+    "sha256": "a2764a908ddec00f341d2bf0f8aac37b76552948b4ff6a37f161b01705e9f2d5"
+  },
+  "references/v8d-attached-layout.json": {
+    "bytes": 80444,
+    "sha256": "85199b27221cdb9518c4e15e4a70c450e3c2ef8c6ded2e6d66c7d3b15db54235"
+  },
+  "references/Warrens-v8-Variants.html": {
+    "bytes": 1057998,
+    "sha256": "180a70a4c0b349b224f188d3035c412953f268b18c528457f6a44452ac40714a"
+  },
+  "thumbs/CB-01.jpg": {
+    "bytes": 54645,
+    "sha256": "6a7ba6cebe8618f3916832037044406019fb2b877c854dd810dee8fe57e63a03"
+  },
+  "thumbs/CB-02.jpg": {
+    "bytes": 56928,
+    "sha256": "01ef6cb0af00a7fd807cf86acd5f7cc6fd950c8c5df5e94644d2316c1e469800"
+  },
+  "thumbs/CB-03.jpg": {
+    "bytes": 61353,
+    "sha256": "8c9b2a4a6875bac8bc35b27c680c95a7dfbe1cf1b5cefe9aa3cbcdffeebafe12"
+  },
+  "thumbs/CB-04.jpg": {
+    "bytes": 53544,
+    "sha256": "21b880e4390ffa653e251e5988ed682e9d7f911ee070618e8bb588a284a6357a"
+  },
+  "thumbs/CB-05.jpg": {
+    "bytes": 52704,
+    "sha256": "c3b05a860d8a4978c094faf2082383f642873494399781d30a154d0543098f9f"
+  },
+  "thumbs/CB-06.jpg": {
+    "bytes": 59751,
+    "sha256": "8831baea6038f18155f5f05e6f5becde4e16c7b0a150ceda1f7555d37b5bba18"
+  },
+  "thumbs/CB-07.jpg": {
+    "bytes": 60085,
+    "sha256": "30c2f7db1f1a6974f280ec7aa876acb6007b09cda7f3d3df8b754ce9cdebfe02"
+  },
+  "thumbs/CB-08.jpg": {
+    "bytes": 53606,
+    "sha256": "cb15b734b4681ab1efb9f94c255da96520573449f256aafbbd9758221c42a8a8"
+  },
+  "thumbs/CB-09.jpg": {
+    "bytes": 52482,
+    "sha256": "c225443268ba67145d796a6df9368436ecce5a78e02c8fcc849beedd5b68938e"
+  },
+  "thumbs/CB-10.jpg": {
+    "bytes": 54716,
+    "sha256": "75130806e40f2b6bbf2f44caa0ac98e7f45ffd6df52eda11b8c4ec0a06e996fd"
+  },
+  "thumbs/CB-11.jpg": {
+    "bytes": 67769,
+    "sha256": "a62390e9d613244976b80e62c37e16b36bddcb6d73614f8ea47383e31582a33e"
+  },
+  "thumbs/CB-12.jpg": {
+    "bytes": 55951,
+    "sha256": "5fe6b5eefd77ec15b90b8b9d3f7ea7da699099d64b45f63ddda9fbd2d4b130c6"
+  },
+  "thumbs/ENVB-01.jpg": {
+    "bytes": 36218,
+    "sha256": "2efc002130e91100038610a70a652647b682398221dbedc67b7c690b850c8c65"
+  },
+  "thumbs/ENVB-02.jpg": {
+    "bytes": 32270,
+    "sha256": "b6fd6cae70a71fe1bd4c5abd4fec993040429fbbcac2b9212ac3791ff36887ec"
+  },
+  "thumbs/ENVB-03.jpg": {
+    "bytes": 34471,
+    "sha256": "96e22e6c8ce46fc8d873a2075d2e7c2a78941cf3a9a45305a52f000e9f5d0dac"
+  },
+  "thumbs/ENVB-04.jpg": {
+    "bytes": 34778,
+    "sha256": "45a1188cd85879d75f75a973161ebaa973c6b85723bd449e272c4c5dc51845d9"
+  },
+  "thumbs/ENVB-05.jpg": {
+    "bytes": 33211,
+    "sha256": "1cc3f452cb855452176803f6a8ac3a43acd23bf400237cff7d1b8fd4bca9f1b3"
+  },
+  "thumbs/ENVB-06.jpg": {
+    "bytes": 33681,
+    "sha256": "e3d40d7240a7077469c3fb1819227efa0e6eca69332b9ede090ada204c1cd0b2"
+  },
+  "thumbs/ENVB-07.jpg": {
+    "bytes": 39164,
+    "sha256": "ca3b397181072ee17004c310eb0c53c7bc25ccf63d22a7a880d1d2d38ea1e824"
+  },
+  "thumbs/ENVB-08.jpg": {
+    "bytes": 37740,
+    "sha256": "b535a8927556c3166f3416caefdeba414824c2f944e56c881b89026ea302fa42"
+  },
+  "thumbs/ENVB-09.jpg": {
+    "bytes": 34357,
+    "sha256": "b65d21f03309cf36b44a7185f92c61f45b48c3f5aa37e5e759daa145041c5571"
+  },
+  "thumbs/ENVB-10.jpg": {
+    "bytes": 33897,
+    "sha256": "5d0127d0f3eba7c036d10fdd068be4f18a5be05fc74c998f3767e914edecb052"
+  },
+  "thumbs/ENVB-11.jpg": {
+    "bytes": 36921,
+    "sha256": "b6be2451a708814c58a47445392cde8f218aaea9f6d1222578a0544227f82f03"
+  },
+  "thumbs/ENVB-12.jpg": {
+    "bytes": 33910,
+    "sha256": "49640e965e8fad053ab20fbd333d9f0b0944c7168a87da25a07fc5dd1dc2f7fc"
+  },
+  "thumbs/ENVC-01.jpg": {
+    "bytes": 30351,
+    "sha256": "d0103aa32c8c30ea6f32d83cf6ffd6b129c9c52e43f67c37f2b20bd16f0d8507"
+  },
+  "thumbs/ENVC-02.jpg": {
+    "bytes": 28993,
+    "sha256": "57a000e2c3b7920d9b0314008ac376e07c65482006496db4e5ec0c0abd52d89b"
+  },
+  "thumbs/ENVC-03.jpg": {
+    "bytes": 37433,
+    "sha256": "2dafe3c9b6b37adcc252b434183cb82c74558970b74e1b6eb7b71271944fc74e"
+  },
+  "thumbs/ENVC-04.jpg": {
+    "bytes": 33206,
+    "sha256": "48028edc575071ceb44bb116eb9f7248db27a6c86175a98663be442a688da929"
+  },
+  "thumbs/ENVC-05.jpg": {
+    "bytes": 33480,
+    "sha256": "f21371825807b2f8807aefe929f5b8c55ccc5c3f2f8637a3b999155362abc148"
+  },
+  "thumbs/ENVC-06.jpg": {
+    "bytes": 34592,
+    "sha256": "06d8aa3fdfc7c061b44b393474f2cf7d23ea01dea26e51de29fd85e01ee3f4f3"
+  },
+  "thumbs/ENVC-07.jpg": {
+    "bytes": 37155,
+    "sha256": "ac6f0357a2693246ed4d7dc6842d51995de02c65833385e983241c3c64e4e902"
+  },
+  "thumbs/ENVC-08.jpg": {
+    "bytes": 36313,
+    "sha256": "c914e1af7b183cd30a9530e0c8e79f061799b36029528c29dc1d4458ba84e8a5"
+  },
+  "thumbs/ENVC-09.jpg": {
+    "bytes": 38264,
+    "sha256": "40837f26de624ff175a52b7f9b3c5f666397564cf9c4dccc1dc1c6498957ab16"
+  },
+  "thumbs/ENVC-10.jpg": {
+    "bytes": 33326,
+    "sha256": "7cd82bff301aab774d9713f6f57f8329ee8d48bf7b25daec839d9c083bc29d17"
+  },
+  "thumbs/ENVC-11.jpg": {
+    "bytes": 36094,
+    "sha256": "b287cf8119240b7b282c328fc59ef8ba9b1e55cbe112d643898fb6fa9560902e"
+  },
+  "thumbs/ENVC-12.jpg": {
+    "bytes": 33747,
+    "sha256": "6f6635521b0eeb5e752b9441e6f81e8ba8f693200f9af90de446fc55af00d681"
+  },
+  "thumbs/ENVD-01.jpg": {
+    "bytes": 32639,
+    "sha256": "bdd7219047456c593b5286df5d412b06c6f4140f3c3333d26d7c7ee086485d52"
+  },
+  "thumbs/ENVD-02.jpg": {
+    "bytes": 35672,
+    "sha256": "45fea55d57dcf3def8c3349f18e70fcc912255e0fac835506bb44695b750c9c6"
+  },
+  "thumbs/ENVD-03.jpg": {
+    "bytes": 30158,
+    "sha256": "7cf7bd4a2d678a8a611c9c389d8f864809d6da03666f39c539cce0b7ceb347fb"
+  },
+  "thumbs/ENVD-04.jpg": {
+    "bytes": 30612,
+    "sha256": "689f2bdc904a63fd50daca9634c036833f77178b5ea4216446d44f71cb4f122f"
+  },
+  "thumbs/ENVD-05.jpg": {
+    "bytes": 34249,
+    "sha256": "e43ce8eda4e560e364128f5062e08ce7f803749e385abb4f7372dc20342ae269"
+  },
+  "thumbs/ENVD-06.jpg": {
+    "bytes": 35011,
+    "sha256": "e7b40e1dea14a0d583523e497f894c255e63b16fc21831060f0ca83391aa46d8"
+  },
+  "thumbs/ENVD-07.jpg": {
+    "bytes": 36946,
+    "sha256": "85d6dfb616b5df22e6c2877c1aa8d42a2c93dbd81018b0bd37491135caa78e67"
+  },
+  "thumbs/ENVD-08.jpg": {
+    "bytes": 33880,
+    "sha256": "064f7c416754cb5d40d8b898ad82a9b3fa09e35c35546ada6625893652cbd418"
+  },
+  "thumbs/ENVD-09.jpg": {
+    "bytes": 36240,
+    "sha256": "c1203054a81608c67b654daac6363016eaf4eb86c671e370883e7e4df2bbe9a8"
+  },
+  "thumbs/ENVD-10.jpg": {
+    "bytes": 31186,
+    "sha256": "7ce074cb2f548b6d44f4b21b44b44b046a297dfbb5aca00bd644116088d9b86c"
+  },
+  "thumbs/ENVD-11.jpg": {
+    "bytes": 34895,
+    "sha256": "59ba95eaffcb111dee7525640ab472f6c911675273993e9ea98ae4c855238232"
+  },
+  "thumbs/ENVD-12.jpg": {
+    "bytes": 32890,
+    "sha256": "964f012bfce4c1ce04ea66c6814b7e939aab6a651a0df56e36012fe4af7a42b6"
+  },
+  "thumbs/HUD-01.jpg": {
+    "bytes": 48550,
+    "sha256": "c6d1c1e69235b1cdb504b02a52eb1e9fe0b68a42325f4e7627727ec72031ecf0"
+  },
+  "thumbs/HUD-02.jpg": {
+    "bytes": 47567,
+    "sha256": "e8adf2b157fba091669abc9d857cbdf926c44393a2dc67db54b39e539aaa8a7e"
+  },
+  "thumbs/HUD-03.jpg": {
+    "bytes": 52326,
+    "sha256": "354a2cbddd1122e681792e6c476d41cf599ab1b0a827abc229e95075ca4c0a2d"
+  },
+  "thumbs/HUD-04.jpg": {
+    "bytes": 50200,
+    "sha256": "8077e30ca8a3d4576e28821267bef01599752afddb1ba01c1b36e508de7920ac"
+  },
+  "thumbs/HUD-05.jpg": {
+    "bytes": 48094,
+    "sha256": "addd568580c2211e8a28411395dfa34fc0616d53138908334d6326f791a3a755"
+  },
+  "thumbs/HUD-06.jpg": {
+    "bytes": 49765,
+    "sha256": "2e83ab3c6dd069b73a568288ec2e760c6855c508c1fbbb491911ad57f56a90ea"
+  },
+  "thumbs/HUD-07.jpg": {
+    "bytes": 46122,
+    "sha256": "1d1d94781bb255dcb1bfc662410da9c27027f415ffa7fd3980b3a354a18e7fac"
+  },
+  "thumbs/HUD-08.jpg": {
+    "bytes": 48199,
+    "sha256": "831d563b0f09d7e5cff54b5a2f6cbe30146677d79aa81e4abccefa674378f16d"
+  },
+  "thumbs/HUD-09.jpg": {
+    "bytes": 52009,
+    "sha256": "59e4bd1db4259e441b6d61045d5773334479b63de3b5b0cee59de6e32c1607b5"
+  },
+  "thumbs/HUD-10.jpg": {
+    "bytes": 52383,
+    "sha256": "d17663ba3ec75a46a065420c68fbfaa78502522d00f58b0bff3eda2abe1a5284"
+  },
+  "thumbs/HUD-11.jpg": {
+    "bytes": 47180,
+    "sha256": "a8e0a09ace4687a9d0a70a3e6fb8e94ba6c7c33391e40b9ebac67b623e62a1c1"
+  },
+  "thumbs/HUD-12.jpg": {
+    "bytes": 46066,
+    "sha256": "7306cc9b6d46205effeef001b784f41e265d9dcd5f7eed780414ac07d3723fde"
+  },
+  "thumbs/IN-01.jpg": {
+    "bytes": 53312,
+    "sha256": "2bd02e228408b65b7ef5235a99bf9e8929aac69fe0b215ac3e60bfd1eb1be1f6"
+  },
+  "thumbs/IN-02.jpg": {
+    "bytes": 55229,
+    "sha256": "9ddd160490962eede657265ecc9ffbac2b639ea0daa165d7ce8d09a5a948f91b"
+  },
+  "thumbs/IN-03.jpg": {
+    "bytes": 48317,
+    "sha256": "2b1e6c0374a68881658ba64f6284be49c460148978739046b3e3b2e0002188ae"
+  },
+  "thumbs/IN-04.jpg": {
+    "bytes": 54942,
+    "sha256": "db27c5d9a8796413a1ea316c41659e12d83733090a5470f4aeab65db582276ef"
+  },
+  "thumbs/IN-05.jpg": {
+    "bytes": 52113,
+    "sha256": "a5b566c89b2d9001b40d305667e804467fed5f67e9df8202f1aabcf516763142"
+  },
+  "thumbs/IN-06.jpg": {
+    "bytes": 59477,
+    "sha256": "5b851b2562432c6e54190f49ca55dd268f953e92c6843ff890c1ad4493cddecd"
+  },
+  "thumbs/IN-07.jpg": {
+    "bytes": 51380,
+    "sha256": "4e07b8c211e17008fd18a157f79f96858d65c53c0e9f672522bf669774c64255"
+  },
+  "thumbs/IN-08.jpg": {
+    "bytes": 55765,
+    "sha256": "3fb26cbaee73fc661a9cb0203a5d2ecf19fc36562e103491d3c6a4b7820a05ed"
+  },
+  "thumbs/IN-09.jpg": {
+    "bytes": 54194,
+    "sha256": "3bc86773f42671659b5a4688b805597bbcafdfd01db0ef6da767750d9ea601ef"
+  },
+  "thumbs/IN-10.jpg": {
+    "bytes": 52174,
+    "sha256": "691198e2009dc728e3fde4db25d45a01da7ebc21bb36e7488fd9f7706e3d8e2d"
+  },
+  "thumbs/IN-11.jpg": {
+    "bytes": 54217,
+    "sha256": "93a0dd63176c28e35d231f7fdbec56ea2a6f97a727493c4f968d69485e7cdda7"
+  },
+  "thumbs/IN-12.jpg": {
+    "bytes": 55789,
+    "sha256": "35584fc8ab8b391a601ba372b6996193753937303bb6fbc9f66f0e8bfc2b3101"
+  },
+  "thumbs/MECH-01.jpg": {
+    "bytes": 47028,
+    "sha256": "6d4ce5f420e93c79b6cb3dca05a46d5109bdaff20536c039c4bf855de3946402"
+  },
+  "thumbs/MECH-02.jpg": {
+    "bytes": 48425,
+    "sha256": "4545701edc2db51ff96f58496d2e3c51180db4bb1f1b4352c702fe4cc52b674c"
+  },
+  "thumbs/MECH-03.jpg": {
+    "bytes": 52774,
+    "sha256": "9c1ffca25d59e0e70794b5927ab5d465e69157114f903e3d00b82c0dd70d56ef"
+  },
+  "thumbs/MECH-04.jpg": {
+    "bytes": 45676,
+    "sha256": "15efbd0091d4e251a2b905dcaa7423c8eeb8cd4119264725a369e421c08305ac"
+  },
+  "thumbs/MECH-05.jpg": {
+    "bytes": 45619,
+    "sha256": "21bb8f4daba88bfc661c20f98e36597cf9d5c7e22011602ecca1e8c20cad83f5"
+  },
+  "thumbs/MECH-06.jpg": {
+    "bytes": 44633,
+    "sha256": "955ee3b6b985c172c962978f3c51951f12628acc29587ce734eb7e3ce6ad53c8"
+  },
+  "thumbs/MECH-07.jpg": {
+    "bytes": 46339,
+    "sha256": "f6ba5b82156ac16193204e8f7348d1173b94aee6d83075271425b73b9a3c0665"
+  },
+  "thumbs/MECH-08.jpg": {
+    "bytes": 47960,
+    "sha256": "e01a6b91de98044b455b8ce44cb7a98a186db5f29a8b5b45b3bdd10affe9355e"
+  },
+  "thumbs/MECH-09.jpg": {
+    "bytes": 45815,
+    "sha256": "e910203c61c4d8916a8782b2048c40ecd40f36453ff01cf302956c30633f7fcd"
+  },
+  "thumbs/MECH-10.jpg": {
+    "bytes": 42513,
+    "sha256": "9a36db58276321751960bb624c41093fb0ace87c2c08cf8bd4e007b737e61feb"
+  },
+  "thumbs/MECH-11.jpg": {
+    "bytes": 45239,
+    "sha256": "d9ca5267c07ebf239285a832f4573b87cf7a3e0cfa5e802bed065dd5cc639bc7"
+  },
+  "thumbs/MECH-12.jpg": {
+    "bytes": 40870,
+    "sha256": "b27a8ab2bfe953141d4e5ab9de7b745727a37bc9d619f173e3477f3b7838de4c"
+  },
+  "thumbs/MON-01.jpg": {
+    "bytes": 37622,
+    "sha256": "382be054b7c7f532bd6cf1188046e043c7c6b97ac3dc6985703fbee094993d76"
+  },
+  "thumbs/MON-02.jpg": {
+    "bytes": 35188,
+    "sha256": "d275fa3023bd323ef82139596ad50dc7d5cfc054ca5415f2d14cff97aba78a80"
+  },
+  "thumbs/MON-03.jpg": {
+    "bytes": 33600,
+    "sha256": "85f84403f369f01e69ed0114e11fba2e6d91f2ba398da8194c0524176a480352"
+  },
+  "thumbs/MON-04.jpg": {
+    "bytes": 36891,
+    "sha256": "b3b99fb932508071c0110b16b8e8927833e0fc21ef0bf18ccba2dfb70e5efb64"
+  },
+  "thumbs/MON-05.jpg": {
+    "bytes": 35883,
+    "sha256": "2328a046be0a162e709cb72d1ff11fe0794c782e8a149b4c7843cf5309026351"
+  },
+  "thumbs/MON-06.jpg": {
+    "bytes": 36961,
+    "sha256": "4b67d8c6a3d2824f58c8ad3a61d48d640f8bce58aa385ec5bf0dfd1c2ddabcfa"
+  },
+  "thumbs/MON-07.jpg": {
+    "bytes": 38813,
+    "sha256": "954ceb013949453e91ffd8e4e97a2fec76bf11868c601e2d71dee9e00a5dd1db"
+  },
+  "thumbs/MON-08.jpg": {
+    "bytes": 35946,
+    "sha256": "fb088838c722e800edd476b8e7c9b1a13d930597908fc8e3b8ee32e71ea428e7"
+  },
+  "thumbs/MON-09.jpg": {
+    "bytes": 35227,
+    "sha256": "aa70f639e23ccf5f8cf84bb2a712f32e7b283b1553ca4ae74e6f21a46fc350ad"
+  },
+  "thumbs/MON-10.jpg": {
+    "bytes": 36942,
+    "sha256": "ec5ab755670a35a2ff6d347d9033480e3e95b09c1cd483a97f6abd16a51b4ac8"
+  },
+  "thumbs/MON-11.jpg": {
+    "bytes": 32632,
+    "sha256": "7ca88a040a4e207941d66483a62575c481b940e6f2a07c835dc7c0f5984805e6"
+  },
+  "thumbs/MON-12.jpg": {
+    "bytes": 44563,
+    "sha256": "0f0da4790ae1871e7fe51138679304619e02347ba8b3f2032686d1f6ad13d2cb"
+  },
+  "thumbs/VER-01.jpg": {
+    "bytes": 45833,
+    "sha256": "8840ec9c3c713f5f4d69729bcc4fda15ae97c5cc110d57b9d22b4c8274afaf6b"
+  },
+  "thumbs/VER-02.jpg": {
+    "bytes": 45320,
+    "sha256": "b00d0603cb3f69e84ebc1320f44606ac649536e9b26648987a9a89235620f93e"
+  },
+  "thumbs/VER-03.jpg": {
+    "bytes": 43696,
+    "sha256": "e21f22207df37579969d1da6894978d19ca5d828c77d769076cdc381007432f3"
+  },
+  "thumbs/VER-04.jpg": {
+    "bytes": 42515,
+    "sha256": "53298f9c62defe67dba646f4da4d11d9577b2ac116f2e9526a4aac5258d40fc4"
+  },
+  "thumbs/VER-05.jpg": {
+    "bytes": 43180,
+    "sha256": "ac1e6e1540808fd277752287e06f7190e49634eeab81fcbfc0bf1bfa1b050f82"
+  },
+  "thumbs/VER-06.jpg": {
+    "bytes": 45479,
+    "sha256": "1774b7ba1ef25def23da6cf220ae2f0c27bf4fe9eb53e2072a4bdaecefb6d71c"
+  },
+  "thumbs/VER-07.jpg": {
+    "bytes": 46341,
+    "sha256": "01f5818e7dc5c5001de37de11c10e7a1a3be74989d99309d05dee9913b6895ad"
+  },
+  "thumbs/VER-08.jpg": {
+    "bytes": 44244,
+    "sha256": "0db558151c97b1d4c8ab2cd3ca5cf7cb48c0ba10fb235c0f44b60960f81d6046"
+  },
+  "thumbs/VER-09.jpg": {
+    "bytes": 39584,
+    "sha256": "c132cc102c23b6fed28dcee7ad28da08fcb9297c0643672c8ad8a8cc7f867b3c"
+  },
+  "thumbs/VER-10.jpg": {
+    "bytes": 44282,
+    "sha256": "cd815eaea0d8dbc5e1c39f3d6d87bc66a7127f77d398e8152ad5ac043ac4a59f"
+  },
+  "thumbs/VER-11.jpg": {
+    "bytes": 41411,
+    "sha256": "7ea4770b8c400db598fdb379d4d3c3341107a515b9d32043956faf81a5f93531"
+  },
+  "thumbs/VER-12.jpg": {
+    "bytes": 47023,
+    "sha256": "846f7b4e913d255e601819cf1d6f690aad7970f615059183b80a9aa7c3176d78"
+  },
+  "images/cookbook/CB-01-apprentice-margin-doodles.png": {
+    "bytes": 2330743,
+    "sha256": "b8e42a21bc3e8d4d5d1b3ac9aa136e4abbda620d082cc57f5ef17a9e7cedf19f"
+  },
+  "images/cookbook/CB-02-sticker-recipe-club.png": {
+    "bytes": 2249028,
+    "sha256": "c60bb4919bc7230157416c2ef888d104554ab9bc7de5396f5c6329a809c80638"
+  },
+  "images/cookbook/CB-03-kitchen-rubber-stamps.png": {
+    "bytes": 2975888,
+    "sha256": "8ee7c11faf52cbbeb981e66b8aa5af8d8d10cd7089e1c7ec8d5fd375a37e1c8b"
+  },
+  "images/cookbook/CB-04-grease-pencil-corrections.png": {
+    "bytes": 2330367,
+    "sha256": "be05f3c56737a72de9b958a48efd4fe42f0726a7350a2b91b646a9a2287cd890"
+  },
+  "images/cookbook/CB-05-pinned-kitchen-tickets.png": {
+    "bytes": 2280862,
+    "sha256": "1bf79f7f7627403088c3549225897c84fd7ab7f538e868e72a1e5414440f545d"
+  },
+  "images/cookbook/CB-06-sewn-patch-notebook.png": {
+    "bytes": 2689745,
+    "sha256": "5cfb29ddf820cb58df601fee01a76339fe21114be4fe97013fd839b01032e63a"
+  },
+  "images/cookbook/CB-07-pictogram-trail.png": {
+    "bytes": 2114644,
+    "sha256": "9cfb8c3250db653fccffa65d7008ca9607af199c0bc76a610267c4fd6cada7d5"
+  },
+  "images/cookbook/CB-08-shadow-puppets-and-speech-bubbles.png": {
+    "bytes": 2270636,
+    "sha256": "c2e5e3d4ca74f2f7da5b43949787d08a837948a81e9a15652041bcfd84a618a3"
+  },
+  "images/cookbook/CB-09-napkin-scrap-scrapbook.png": {
+    "bytes": 2406272,
+    "sha256": "c0053b5937aa11cfd2c5919e041686cb23e96711dbd9bf243aa636535bcf4a18"
+  },
+  "images/cookbook/CB-10-scout-route-annotations.png": {
+    "bytes": 2252530,
+    "sha256": "3628ceae84944c02c2d36d1ae38f70a987895b444c8048101df635765d53c330"
+  },
+  "images/cookbook/CB-11-kitchen-comic-strips.png": {
+    "bytes": 2340402,
+    "sha256": "6cdff0c07aea8f83a7768c06717bef2c661574d9ae9a329c599ed1b9904d5d5a"
+  },
+  "images/cookbook/CB-12-nope-and-yep-field-cards.png": {
+    "bytes": 2182201,
+    "sha256": "7159c07a6d5a0470578227641665b42d2dce6e74eac0f581f62886c4e964752a"
+  },
+  "images/environment-B/ENVB-01-arrival-hall-and-hoist.png": {
+    "bytes": 1782589,
+    "sha256": "2f227420a7dce7cce9a5ba5aa005b2bba2eccf0c2c4a706f9f8372205fe1219e"
+  },
+  "images/environment-B/ENVB-02-the-great-stair.png": {
+    "bytes": 1767439,
+    "sha256": "59491fbcdfb13510f80f90934cdae1c1af4e1f02d93db13d264a4bf87b524591"
+  },
+  "images/environment-B/ENVB-03-charnel-court-balcony.png": {
+    "bytes": 1702913,
+    "sha256": "88298b84f7a17a36384f7bcb533a041f27c37507980b73bebdf722b76d14a92a"
+  },
+  "images/environment-B/ENVB-04-ossuary-bone-pantry.png": {
+    "bytes": 1743384,
+    "sha256": "5c107a59e6779a21ff87e5629f12ef3fe244f15781291bb9a4b79a24e0c9a608"
+  },
+  "images/environment-B/ENVB-05-reliquary-brass-shelves.png": {
+    "bytes": 1707759,
+    "sha256": "43e82a8c2c50e6f900d4ac37e065ee14bd4ad5ae5f108b2a3d764b4b0750ade6"
+  },
+  "images/environment-B/ENVB-06-chime-hall-landing.png": {
+    "bytes": 1679163,
+    "sha256": "3115d755bf3576c6806de5dabdbd917d7bbb7ed8c5f3908f00b8fbde5c130458"
+  },
+  "images/environment-B/ENVB-07-salt-cellar-strata.png": {
+    "bytes": 1865631,
+    "sha256": "0bcb9ada902dc87fff9d5ef2bb43be7bc372bc813dea229f60b665bf45c5ad9e"
+  },
+  "images/environment-B/ENVB-08-pump-room-machinery.png": {
+    "bytes": 1820138,
+    "sha256": "bd567ac9dab3227c2b44b0b3ac0d94ab9876a24eaadfe24fa146bf28dc48c412"
+  },
+  "images/environment-B/ENVB-09-cistern-lowest-water.png": {
+    "bytes": 1827518,
+    "sha256": "ade795664723ff4c340e933fbb2d9fba37089c9baa2e133036596a29f7186446"
+  },
+  "images/environment-B/ENVB-10-smokehouse-ember-room.png": {
+    "bytes": 1752144,
+    "sha256": "5e67924259a99f5374253ea6ec58691fe88ab1060989ae8fed8699db40399f44"
+  },
+  "images/environment-B/ENVB-11-brine-larder-support-stop.png": {
+    "bytes": 1817450,
+    "sha256": "648550bc333afbeb3ede098b5086cefac8a43f243a33baa3c62f8d0e70a3384d"
+  },
+  "images/environment-B/ENVB-12-the-pit-and-earned-return.png": {
+    "bytes": 1788057,
+    "sha256": "00cffbbdd9e5564cde594635ea7e57c98a5efe7618fb07a0af0e5aab36725726"
+  },
+  "images/environment-C/ENVC-01-the-well-on-the-first-bank.png": {
+    "bytes": 1714873,
+    "sha256": "c2c6db7577e6b241220b38bbfac515d3d879046e821d894445f9b93936f5bd74"
+  },
+  "images/environment-C/ENVC-02-belfry-on-the-other-bank.png": {
+    "bytes": 1593829,
+    "sha256": "4552f308678cc08594ddc7fe40cbd6342221ee32b0e5060d1b2887d0f22aa992"
+  },
+  "images/environment-C/ENVC-03-bone-bridge-crossing.png": {
+    "bytes": 1773862,
+    "sha256": "55ff7ae19803e1b49691bbf09ed533228b21e60393923b3be49b921004044b30"
+  },
+  "images/environment-C/ENVC-04-the-ford.png": {
+    "bytes": 1762925,
+    "sha256": "cea067e3af75ece03fef43f86e6bf3e1bc99e60cb6a9d6a839ddb03ad17988dd"
+  },
+  "images/environment-C/ENVC-05-chain-crossing-and-sluice.png": {
+    "bytes": 1754385,
+    "sha256": "327964a2b40aa24da3ebc07779878c1e1a125b565b5835f041a659ad7140e7a0"
+  },
+  "images/environment-C/ENVC-06-ossuary-pack-plate.png": {
+    "bytes": 1734755,
+    "sha256": "685ce47ce8b74ad4074453176f3b9aeb0330386873b87032412730991cb824dd"
+  },
+  "images/environment-C/ENVC-07-reliquary-stair-and-loft-access.png": {
+    "bytes": 1823572,
+    "sha256": "c6b79afe8527c28b5b9bfe938fdc2c4fc53689a8714b21612c97bc7a2ccb8b72"
+  },
+  "images/environment-C/ENVC-08-salt-mill-above-the-canal.png": {
+    "bytes": 1777086,
+    "sha256": "ff83f573d8c75466840a49a1a25d1ea2afe700ccddab98c9f01e2a72901b985c"
+  },
+  "images/environment-C/ENVC-09-brine-larder-canal-cellar.png": {
+    "bytes": 1825534,
+    "sha256": "9f127818838c1440901b869047eab0b3562e89091aa8869eb01a760da8cd707c"
+  },
+  "images/environment-C/ENVC-10-cistern-bank-chamber.png": {
+    "bytes": 1764995,
+    "sha256": "4c3fde2779ed6cf1896d7cb8384293dcc6fcb297c17c3bc80aa37a3cbf93722d"
+  },
+  "images/environment-C/ENVC-11-canal-rim-wayfinding.png": {
+    "bytes": 1751673,
+    "sha256": "0404721aad226ef490910a1e2d50bed6c21524af500b828d6e5826901cc117b9"
+  },
+  "images/environment-C/ENVC-12-pit-vault-and-scout-exit.png": {
+    "bytes": 1644557,
+    "sha256": "c53499fffb24d42a71f21b71fd165c30094421fe913feca96f62b9b99adaa745"
+  },
+  "images/environment-D/ENVD-01-arrival-nave-leading-line.png": {
+    "bytes": 1834130,
+    "sha256": "8c13e801fb48b798b0b35d6510157debd0ff80e850e21a750838b6a98f436b64"
+  },
+  "images/environment-D/ENVD-02-the-well-pinch.png": {
+    "bytes": 1768428,
+    "sha256": "9b88a9c423e93cc42b21816908df18d80407794a38846bcd7893ce591eb11973"
+  },
+  "images/environment-D/ENVD-03-west-terrace-wide-room.png": {
+    "bytes": 1680240,
+    "sha256": "0a5c5182579d4b46b8cca7ae01191f7c5e9779b6dcaa4b9920001a4b32066334"
+  },
+  "images/environment-D/ENVD-04-cistern-round-flooded-bead.png": {
+    "bytes": 1633682,
+    "sha256": "ff6ee2a6e12031ee6422ccfb3c21121a335b1b2c703a048f77ddd21a7713df4f"
+  },
+  "images/environment-D/ENVD-05-root-grotto-low-organic-bead.png": {
+    "bytes": 1753210,
+    "sha256": "de3826ed416cea7e226f4c735985b71822f26e0d49dc7ee29f6436cd0c302df2"
+  },
+  "images/environment-D/ENVD-06-charnel-court-sunken-hearth.png": {
+    "bytes": 1686970,
+    "sha256": "ab52b955d8489f583abfaec5c9a2f01be1614397ad50e17636d4a82f70a236e9"
+  },
+  "images/environment-D/ENVD-07-ossuary-long-upper-gallery.png": {
+    "bytes": 1738589,
+    "sha256": "15753055dba923fdfe843c8006819e04fa7a185f469d07a3f8e39bdd6f76400b"
+  },
+  "images/environment-D/ENVD-08-smokehouse-tall-tower.png": {
+    "bytes": 1816035,
+    "sha256": "fafc653c883e18f0fd5d22f7403344e2c26e55b53d3883c7963b53c4bd24a980"
+  },
+  "images/environment-D/ENVD-09-chime-hall-long-rhythm.png": {
+    "bytes": 1676646,
+    "sha256": "718c589ee4bfa83f1ce36ef0e1d6720fce5b55b55ea8ffb1c687e1902e1a2e8e"
+  },
+  "images/environment-D/ENVD-10-pump-room-machine-bead.png": {
+    "bytes": 1747592,
+    "sha256": "d02488c51081bc6dd4eb3989c89a27892ab747d5dbe016cdb640ab8d4ee54749"
+  },
+  "images/environment-D/ENVD-11-salt-cellar-low-bead.png": {
+    "bytes": 1907790,
+    "sha256": "4860cea27d71d8980840556b7a2236cceca431f6a3d0a2ee189b8da2c718ad81"
+  },
+  "images/environment-D/ENVD-12-pit-cavern-below-the-rings.png": {
+    "bytes": 1652590,
+    "sha256": "bbbb8d8e26285cadfb36dbaf4fa26b4f306316cf98d216148b87e101843ed247"
+  },
+  "images/hud/HUD-01-kitchen-ticket-rail-r02.png": {
+    "bytes": 1948901,
+    "sha256": "3d96df67149504fd0d98c3fe2ffb6b2aade30341cef5ab5056cccfa101fe246c"
+  },
+  "images/hud/HUD-01-kitchen-ticket-rail.png": {
+    "bytes": 2084518,
+    "sha256": "73f4c7a9c1cadef84360df47b7d5739d5e367907fba4d6d58283f4bef0a3fa1e"
+  },
+  "images/hud/HUD-02-pinned-parchment-corners.png": {
+    "bytes": 2044691,
+    "sha256": "728f0b01bb87d1aeb977f72e82c0ff564fd414ec7cfac206c57034aead8b7aab"
+  },
+  "images/hud/HUD-03-apron-stitch-ribbon.png": {
+    "bytes": 2021117,
+    "sha256": "f3b2859511348cb3dc971c4ccbe0e8b99499fa69f0cd3c4c53f4bd624644ce87"
+  },
+  "images/hud/HUD-04-chalk-marks-on-ivory.png": {
+    "bytes": 2290024,
+    "sha256": "a6559f283bc6f28f3ece5ce491da793a9504041f4ee46196c1ec1ec35496089c"
+  },
+  "images/hud/HUD-05-the-little-service-ledger.png": {
+    "bytes": 2188435,
+    "sha256": "3eff94948d56161ea3801b323946647085526e0b7e1dd030f52bafed281b1a8d"
+  },
+  "images/hud/HUD-06-hanging-pantry-tags.png": {
+    "bytes": 2036528,
+    "sha256": "8b1e06ba4feba1cbe9ad9a3c6dcbddc3a21b4fb3047c3b08318962a1ef75f368"
+  },
+  "images/hud/HUD-07-folded-napkin-cards.png": {
+    "bytes": 1990836,
+    "sha256": "06596381e1bff76e483104f85d8d9b74959c66eb46d13c45799ff9da20d624fb"
+  },
+  "images/hud/HUD-08-royal-rubber-stamps.png": {
+    "bytes": 2092497,
+    "sha256": "03703ac246773659cb08e45149019ed120851ea698c62486726492c8291f4ffb"
+  },
+  "images/hud/HUD-09-pictogram-pantry.png": {
+    "bytes": 2276550,
+    "sha256": "36544335e3b8d1739162429e2a660b94bdab6ef5e10527e618021098e45a2e6f"
+  },
+  "images/hud/HUD-10-torn-kitchen-newspaper.png": {
+    "bytes": 2073817,
+    "sha256": "146a67905d92a4072ab111ff2422e1b53bae1f18bde67a2a7d78118d733be019"
+  },
+  "images/hud/HUD-11-twine-and-wax-service-kit.png": {
+    "bytes": 2032752,
+    "sha256": "d5a7e463fe2401afaf01e033d428db5535c992625dbe14be48081d750c757c69"
+  },
+  "images/hud/HUD-12-quiet-single-sheet-hud.png": {
+    "bytes": 2042021,
+    "sha256": "3261568256ddc04aa6b91c384545d0885406791c4f6843be9ce8642eb8b0e407"
+  },
+  "images/intro/IN-01-the-last-spoonful.png": {
+    "bytes": 2038186,
+    "sha256": "6feb7e95f1adb734a3ea9a3c6e4e77fce963f1798e87b18a25949fd268ac647f"
+  },
+  "images/intro/IN-02-the-runaway-royal-order.png": {
+    "bytes": 2013430,
+    "sha256": "91c398f678e53f749004ced2a8110a9767a49cfbdb1a45e80bbf9e217147fa79"
+  },
+  "images/intro/IN-03-a-letter-at-the-bunk.png": {
+    "bytes": 1837034,
+    "sha256": "b570f6d50a03782830266ae5a041ae1a20b345a10e39ee08c4ad6826e6999785"
+  },
+  "images/intro/IN-04-beneath-the-banquet-table.png": {
+    "bytes": 2029127,
+    "sha256": "2e392d1fcb4ab7a369f637c9e031c59e0e76c98f5b328f407c4852d9c1139309"
+  },
+  "images/intro/IN-05-the-lift-passes-the-whole-kingdom.png": {
+    "bytes": 2014841,
+    "sha256": "9b37eacbfc535aa3b1de9a92653e744899ccf3b12bdadf4bb42152b622a8deb5"
+  },
+  "images/intro/IN-06-the-accidental-appointment.png": {
+    "bytes": 2077946,
+    "sha256": "5bf9a76b8c1cefc83d9894f3fd5481872ddc64175b69e1eb16cd17cabc31e98f"
+  },
+  "images/intro/IN-07-a-court-portrait-comes-alive.png": {
+    "bytes": 2088921,
+    "sha256": "1379b26fd4c48bb27bd7f4077f650c02f631cb505c17817c5271652bea4a14c7"
+  },
+  "images/intro/IN-08-the-lost-aroma.png": {
+    "bytes": 2036074,
+    "sha256": "f458c7a9455082ffc1c4c4f8d143d84dd009b3c737b295ac29ef0e57aaa87e03"
+  },
+  "images/intro/IN-09-bell-page-delivery-round.png": {
+    "bytes": 2041577,
+    "sha256": "9efffde6943bb522771cf4484f5c565b1fe69d836c6ea6e80b2a0261901ed2c6"
+  },
+  "images/intro/IN-10-the-torn-royal-recipe.png": {
+    "bytes": 2106744,
+    "sha256": "a674a0ecf7d70005f6a57616bd32da71d9f50e2ad56c8b9c15e07d56fccf2956"
+  },
+  "images/intro/IN-11-the-daily-feast-ritual.png": {
+    "bytes": 2035072,
+    "sha256": "1a51e04aa998566555c490d0d3d5a8c7d36a37d41e6ad29c623d8a41846829c8"
+  },
+  "images/intro/IN-12-the-pop-up-feast-book.png": {
+    "bytes": 2196288,
+    "sha256": "d5ee7367af6e32bfc0c9938e807ea40a926b37eff39d1060b56f14f0f255f23f"
+  },
+  "images/mechanisms/MECH-01-fractured-seal-recipe-slab.png": {
+    "bytes": 1945962,
+    "sha256": "3ce0fbeb77645fba16f51abeaa1070768fcaf9506b2897eb927b04371446a723"
+  },
+  "images/mechanisms/MECH-02-broken-copper-serving-plate.png": {
+    "bytes": 2236579,
+    "sha256": "01a7c1d1ce78532d549e97bc9d66006764c6359c5382e07b91ef9307d9cfad23"
+  },
+  "images/mechanisms/MECH-03-charcoal-rubbing-scraps.png": {
+    "bytes": 2363390,
+    "sha256": "71be521f9ed49afdcd8282435ae2e27676a2aa3ecd3a66778de42163852f1bd1"
+  },
+  "images/mechanisms/MECH-04-hanging-feast-plate-order.png": {
+    "bytes": 2027570,
+    "sha256": "30848d3d884338f8f086a17e8016bc4e822c6655b3310e282f240c8c8343a2c9"
+  },
+  "images/mechanisms/MECH-05-bellkeeper-chipped-relief.png": {
+    "bytes": 1997701,
+    "sha256": "0c8c57ec8f690ed1d8cf75070a13b21f8b0eb2219169137c1fe24bb38b281acb"
+  },
+  "images/mechanisms/MECH-06-shadow-stencil-halves.png": {
+    "bytes": 1882659,
+    "sha256": "e4c62e1ed81831b04b08d188c0485fb6b345c9f4f77546088d8efaa15e3812b8"
+  },
+  "images/mechanisms/MECH-07-roots-around-the-old-waymarks.png": {
+    "bytes": 2100681,
+    "sha256": "91a39221c25608db0f87d6fb9b598a8838fc0d7baf66baa46c8018ecb525c879"
+  },
+  "images/mechanisms/MECH-08-brine-channel-tells-the-mechanism.png": {
+    "bytes": 2083177,
+    "sha256": "764200079c5608157f8a99001cdabf92ab32ba3af5dc1d3fb7dc500794f3a5e1"
+  },
+  "images/mechanisms/MECH-09-quarry-cuts-and-kitchen-marks.png": {
+    "bytes": 2360268,
+    "sha256": "e38b94214648fc928221453e844e2f4962ad74813b1264c4de768c94026491fd"
+  },
+  "images/mechanisms/MECH-10-the-shared-pack-plinth.png": {
+    "bytes": 1895292,
+    "sha256": "5d26dda8bcee48d2f9aebace1c3cc9094dbbb45410cef016539b6eddb3806c1d"
+  },
+  "images/mechanisms/MECH-11-backside-bar-and-earned-shortcut.png": {
+    "bytes": 2018782,
+    "sha256": "cda325e23d117e193a5b189e2249ca6196ddc0c8e9712f75aa2979dc32913383"
+  },
+  "images/mechanisms/MECH-12-the-far-key-in-the-window.png": {
+    "bytes": 1947567,
+    "sha256": "47e4a361e0aaa60cb67a193555e160b23fe944657edecc8ae5bfa9ef7cc3e5bb"
+  },
+  "images/monsters/MON-01-long-widow.png": {
+    "bytes": 1675279,
+    "sha256": "3e476547431ef1cd960a63e5daf2d4a52cd2be590af8a31972caa999b52552ab"
+  },
+  "images/monsters/MON-02-pickle-mimic.png": {
+    "bytes": 1700964,
+    "sha256": "4eae333f58ef873cda0d4e18e4e11973b96863cbe3a62695dbd613a5426e649c"
+  },
+  "images/monsters/MON-03-cauldron-slime.png": {
+    "bytes": 1694608,
+    "sha256": "784f0ca4c9065a0e149025797dc712c892f6ae9a17c8984cf51769c3c6fae1f3"
+  },
+  "images/monsters/MON-04-bread-crab.png": {
+    "bytes": 1779675,
+    "sha256": "cad1234f38abf5cc4a0616a0ae160c2a8e9e5dff2b2a517849cb5a830da73a39"
+  },
+  "images/monsters/MON-05-marrow-knight.png": {
+    "bytes": 1671577,
+    "sha256": "6b11c25f9fa6b47fda7884a464482ef1548a55812c000f35bce4523242259dbb"
+  },
+  "images/monsters/MON-06-bellied-pilgrim.png": {
+    "bytes": 1765190,
+    "sha256": "125830ccca50ca3e1c8d1fc56d8b0f9145dd62502dbc4bebc10199d2912a961d"
+  },
+  "images/monsters/MON-07-knuckleback.png": {
+    "bytes": 1862012,
+    "sha256": "ad2453ceec85065e549f57c50145ea4ad99794e0776beddd28fd2e9378518143"
+  },
+  "images/monsters/MON-08-root-listener.png": {
+    "bytes": 1759155,
+    "sha256": "1037f5ccacc473657789a4f3ab78ed74740ddd65da06dbaa77f7ba424ebf5fc1"
+  },
+  "images/monsters/MON-09-pantry-porter.png": {
+    "bytes": 1732478,
+    "sha256": "2e78efdd48c57988eaedd55ac957e7b8947cda83fce0cbcff8bdaf3f0512fee6"
+  },
+  "images/monsters/MON-10-rag-maw.png": {
+    "bytes": 1860558,
+    "sha256": "d33d9dc2d94942bc85ea5ecc27b96daa4c3ab593a59845c207729ab4369b0fa5"
+  },
+  "images/monsters/MON-11-wax-wisp.png": {
+    "bytes": 1647829,
+    "sha256": "42f0c4578223946ef499998233c1639919e73e9feb5f390c89fb37b6db7558d3"
+  },
+  "images/monsters/MON-12-brine-hog.png": {
+    "bytes": 1917358,
+    "sha256": "f996e1ac22c6acd26b984c4a52cea3fc5df2e48e0d0285d6bd98d90088228a65"
+  },
+  "images/vermin/VER-01-crumb-foragers.png": {
+    "bytes": 1964739,
+    "sha256": "f0163cd14601840f2342b3383360b3adb8cf7eeed96ba0cf111c851a9e5ad0ec"
+  },
+  "images/vermin/VER-02-tiny-noise-makers.png": {
+    "bytes": 1873897,
+    "sha256": "3f13b8d12cd41a6282799497dc8e896fb661033b1c088ce74cbe6d36664f1f5e"
+  },
+  "images/vermin/VER-03-lamp-and-warmth-followers.png": {
+    "bytes": 1834839,
+    "sha256": "d65f63c42f1f1b88930eccbb2b9b19252a293d911f062bfe597dd6c5980f3b41"
+  },
+  "images/vermin/VER-04-little-pantry-thieves.png": {
+    "bytes": 2011400,
+    "sha256": "f91e4cdfa2baebcb25e7878616da11e7b72359a12790c8642845d1bae89fd11a"
+  },
+  "images/vermin/VER-05-guides-through-the-small-gaps.png": {
+    "bytes": 1839369,
+    "sha256": "f7c703e5f4b614bd963130d8201bbc188ce8b4a8acaadcc13d17125cc7471f7a"
+  },
+  "images/vermin/VER-06-sleepy-kitchen-residents.png": {
+    "bytes": 2004949,
+    "sha256": "f90ce7129702d346a4ef6e816f6d820ac1ca2f3ae884878e17782e147779efcd"
+  },
+  "images/vermin/VER-07-a-small-startle-cascade.png": {
+    "bytes": 2046668,
+    "sha256": "c61300c8a2cf086a79477d36844ce26c854270178c675f8f5235474d67d79930"
+  },
+  "images/vermin/VER-08-the-pantry-cleaning-crew.png": {
+    "bytes": 1905209,
+    "sha256": "4db48d83e7b274dca1b5c1de97291e20354cf6a1d9a22da9f698e90ea1200615"
+  },
+  "images/vermin/VER-09-harmless-eyes-in-the-dark.png": {
+    "bytes": 1890260,
+    "sha256": "6f3b4ba4dc0dbc9845160fe143293b46ddb6b9d93ad999eb47106e91833dd80b"
+  },
+  "images/vermin/VER-10-the-crumb-led-scout.png": {
+    "bytes": 2040750,
+    "sha256": "e186b9b9ae9f50b345779ffb8b05cb3bacd82de5ba198361cb939dcd009372d7"
+  },
+  "images/vermin/VER-11-curious-jar-visitors.png": {
+    "bytes": 1851153,
+    "sha256": "d732aba8f4554612bf6d6ac51ed48ed0cf9e8da05de3ee643809da424eb8cb7e"
+  },
+  "images/vermin/VER-12-herb-and-paper-couriers.png": {
+    "bytes": 2039290,
+    "sha256": "b8b955a7d1a8a5a611335f30c01b970aa9ca444e02871dca020f4d783e9acd48"
+  }
+}

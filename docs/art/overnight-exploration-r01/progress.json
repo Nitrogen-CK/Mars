@@ -1,0 +1,1303 @@
+{
+  "completed": {
+    "CB-01": {
+      "path": "images/cookbook/CB-01-apprentice-margin-doodles.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-20afe810-cf19-422b-bad3-588ec9687fb4.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "b8e42a21bc3e8d4d5d1b3ac9aa136e4abbda620d082cc57f5ef17a9e7cedf19f",
+      "generated_utc": "2026-10-23T11:07:38.692173+00:00",
+      "review": "inspected"
+    },
+    "ENVB-01": {
+      "path": "images/environment-B/ENVB-01-arrival-hall-and-hoist.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-75b81079-bac3-4681-b56e-3756d31bd870.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "2f227420a7dce7cce9a5ba5aa005b2bba2eccf0c2c4a706f9f8372205fe1219e",
+      "generated_utc": "2026-10-23T11:10:01.242091+00:00",
+      "review": "inspected"
+    },
+    "HUD-01": {
+      "path": "images/hud/HUD-01-kitchen-ticket-rail-r02.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-b5ff87ab-f0e8-4057-af03-6d66992baac1.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "3d96df67149504fd0d98c3fe2ffb6b2aade30341cef5ab5056cccfa101fe246c",
+      "generated_utc": "2026-10-23T11:15:16.908638+00:00",
+      "review": "inspected"
+    },
+    "MON-01": {
+      "path": "images/monsters/MON-01-long-widow.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-0a9a7254-7b64-44f4-9799-eb8a05f866f7.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "3e476547431ef1cd960a63e5daf2d4a52cd2be590af8a31972caa999b52552ab",
+      "generated_utc": "2026-10-23T11:10:03.453646+00:00",
+      "review": "inspected"
+    },
+    "ENVC-01": {
+      "path": "images/environment-C/ENVC-01-the-well-on-the-first-bank.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-f24f0938-7ddc-4dab-9e22-5d3d62e1dd66.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "c2c6db7577e6b241220b38bbfac515d3d879046e821d894445f9b93936f5bd74",
+      "generated_utc": "2026-10-23T11:12:56.384940+00:00",
+      "review": "inspected"
+    },
+    "ENVD-01": {
+      "path": "images/environment-D/ENVD-01-arrival-nave-leading-line.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-76cf2741-3b27-4b8c-8ae5-4c238402ebe8.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "8c13e801fb48b798b0b35d6510157debd0ff80e850e21a750838b6a98f436b64",
+      "generated_utc": "2026-10-23T11:13:14.770995+00:00",
+      "review": "inspected"
+    },
+    "IN-01": {
+      "path": "images/intro/IN-01-the-last-spoonful.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-e2e6e8b3-322c-488a-8a61-d00c3cc71583.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "6feb7e95f1adb734a3ea9a3c6e4e77fce963f1798e87b18a25949fd268ac647f",
+      "generated_utc": "2026-10-23T11:13:52.575397+00:00",
+      "review": "inspected"
+    },
+    "CB-02": {
+      "path": "images/cookbook/CB-02-sticker-recipe-club.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-6b9c77ba-4538-4669-99a1-b39fd9d3ea1a.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "c60bb4919bc7230157416c2ef888d104554ab9bc7de5396f5c6329a809c80638",
+      "generated_utc": "2026-10-23T11:17:16.431387+00:00",
+      "review": "inspected"
+    },
+    "ENVB-02": {
+      "path": "images/environment-B/ENVB-02-the-great-stair.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-d2359fe8-361f-463f-87e6-08505eaa99d5.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "59491fbcdfb13510f80f90934cdae1c1af4e1f02d93db13d264a4bf87b524591",
+      "generated_utc": "2026-10-23T11:17:42.302227+00:00",
+      "review": "inspected"
+    },
+    "HUD-02": {
+      "path": "images/hud/HUD-02-pinned-parchment-corners.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-c77c8aff-953c-4c86-b99c-74e81ecbb38f.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "728f0b01bb87d1aeb977f72e82c0ff564fd414ec7cfac206c57034aead8b7aab",
+      "generated_utc": "2026-10-23T11:18:19.876664+00:00",
+      "review": "inspected"
+    },
+    "MECH-01": {
+      "path": "images/mechanisms/MECH-01-fractured-seal-recipe-slab.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-f980d73b-801f-4a3f-bb9f-7c0531f40438.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "3ce0fbeb77645fba16f51abeaa1070768fcaf9506b2897eb927b04371446a723",
+      "generated_utc": "2026-10-23T11:18:54.617493+00:00",
+      "review": "inspected"
+    },
+    "MON-02": {
+      "path": "images/monsters/MON-02-pickle-mimic.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-e96ee49f-2da5-480b-a0fd-3db57731d602.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "4eae333f58ef873cda0d4e18e4e11973b96863cbe3a62695dbd613a5426e649c",
+      "generated_utc": "2026-10-23T11:19:15.893750+00:00",
+      "review": "inspected"
+    },
+    "VER-01": {
+      "path": "images/vermin/VER-01-crumb-foragers.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-19fe2444-5c11-4982-9476-526679bb70d8.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "f0163cd14601840f2342b3383360b3adb8cf7eeed96ba0cf111c851a9e5ad0ec",
+      "generated_utc": "2026-10-23T11:19:39.558160+00:00",
+      "review": "inspected"
+    },
+    "ENVC-02": {
+      "path": "images/environment-C/ENVC-02-belfry-on-the-other-bank.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-4517105b-0829-4258-bb17-b11293b48acb.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "4552f308678cc08594ddc7fe40cbd6342221ee32b0e5060d1b2887d0f22aa992",
+      "generated_utc": "2026-10-23T11:21:14.871412+00:00",
+      "review": "inspected"
+    },
+    "ENVD-02": {
+      "path": "images/environment-D/ENVD-02-the-well-pinch.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-cfcf4a2c-26de-404a-9e2a-a1b93acb9694.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "9b88a9c423e93cc42b21816908df18d80407794a38846bcd7893ce591eb11973",
+      "generated_utc": "2026-10-23T11:21:39.507013+00:00",
+      "review": "inspected"
+    },
+    "IN-02": {
+      "path": "images/intro/IN-02-the-runaway-royal-order.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-28aa9c88-7a1d-4b3b-a938-3959bf30ce64.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "91c398f678e53f749004ced2a8110a9767a49cfbdb1a45e80bbf9e217147fa79",
+      "generated_utc": "2026-10-23T11:23:18.822475+00:00",
+      "review": "inspected"
+    },
+    "MECH-02": {
+      "path": "images/mechanisms/MECH-02-broken-copper-serving-plate.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-2561aff6-3556-452b-a621-0bd2a7041daf.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "01a7c1d1ce78532d549e97bc9d66006764c6359c5382e07b91ef9307d9cfad23",
+      "generated_utc": "2026-10-23T11:23:45.070141+00:00",
+      "review": "inspected"
+    },
+    "VER-02": {
+      "path": "images/vermin/VER-02-tiny-noise-makers.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-c27478fc-b8e7-4e30-b6d5-a08f4a5b6c5d.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "3f13b8d12cd41a6282799497dc8e896fb661033b1c088ce74cbe6d36664f1f5e",
+      "generated_utc": "2026-10-23T11:24:09.039049+00:00",
+      "review": "inspected"
+    },
+    "CB-03": {
+      "path": "images/cookbook/CB-03-kitchen-rubber-stamps.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-b6be13e1-8cb6-4f3a-876f-73144254b1e3.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "8ee7c11faf52cbbeb981e66b8aa5af8d8d10cd7089e1c7ec8d5fd375a37e1c8b",
+      "generated_utc": "2026-10-23T11:24:34.803076+00:00",
+      "review": "inspected"
+    },
+    "ENVB-03": {
+      "path": "images/environment-B/ENVB-03-charnel-court-balcony.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-41c314fa-585d-4101-8b72-766fde67f4b4.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "88298b84f7a17a36384f7bcb533a041f27c37507980b73bebdf722b76d14a92a",
+      "generated_utc": "2026-10-23T11:25:09.425844+00:00",
+      "review": "inspected"
+    },
+    "ENVC-03": {
+      "path": "images/environment-C/ENVC-03-bone-bridge-crossing.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-838bcc6b-5da6-40d2-b3ab-fb0d5bf060a2.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "55ff7ae19803e1b49691bbf09ed533228b21e60393923b3be49b921004044b30",
+      "generated_utc": "2026-10-23T11:25:32.985616+00:00",
+      "review": "inspected"
+    },
+    "ENVD-03": {
+      "path": "images/environment-D/ENVD-03-west-terrace-wide-room.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-58a33923-6c72-4750-9dc2-d60b169816c1.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "0a5c5182579d4b46b8cca7ae01191f7c5e9779b6dcaa4b9920001a4b32066334",
+      "generated_utc": "2026-10-23T11:25:55.397334+00:00",
+      "review": "inspected"
+    },
+    "HUD-03": {
+      "path": "images/hud/HUD-03-apron-stitch-ribbon.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-21aa854d-46b4-4868-a550-a927e6256dc7.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "f3b2859511348cb3dc971c4ccbe0e8b99499fa69f0cd3c4c53f4bd624644ce87",
+      "generated_utc": "2026-10-23T11:31:04.116181+00:00",
+      "review": "inspected"
+    },
+    "IN-03": {
+      "path": "images/intro/IN-03-a-letter-at-the-bunk.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-50ba2e47-4efd-443c-ae71-d1c60c087c9c.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "b570f6d50a03782830266ae5a041ae1a20b345a10e39ee08c4ad6826e6999785",
+      "generated_utc": "2026-10-23T11:31:40.894323+00:00",
+      "review": "inspected"
+    },
+    "MECH-03": {
+      "path": "images/mechanisms/MECH-03-charcoal-rubbing-scraps.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-7e787704-949e-46df-b743-38db73b8bdf3.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "71be521f9ed49afdcd8282435ae2e27676a2aa3ecd3a66778de42163852f1bd1",
+      "generated_utc": "2026-10-23T11:32:20.093702+00:00",
+      "review": "inspected"
+    },
+    "MON-03": {
+      "path": "images/monsters/MON-03-cauldron-slime.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-d7e76f14-2cb2-45b4-8626-4ce76ff963c4.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "784f0ca4c9065a0e149025797dc712c892f6ae9a17c8984cf51769c3c6fae1f3",
+      "generated_utc": "2026-10-23T11:32:43.599045+00:00",
+      "review": "inspected"
+    },
+    "VER-03": {
+      "path": "images/vermin/VER-03-lamp-and-warmth-followers.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-10a8dc21-fce2-4736-a542-a02c038c3526.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "d65f63c42f1f1b88930eccbb2b9b19252a293d911f062bfe597dd6c5980f3b41",
+      "generated_utc": "2026-10-23T11:33:08.807144+00:00",
+      "review": "inspected"
+    },
+    "CB-04": {
+      "path": "images/cookbook/CB-04-grease-pencil-corrections.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-aa1417af-cddd-474a-a36d-918876e35b14.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "be05f3c56737a72de9b958a48efd4fe42f0726a7350a2b91b646a9a2287cd890",
+      "generated_utc": "2026-10-23T11:33:42.701890+00:00",
+      "review": "inspected"
+    },
+    "ENVB-04": {
+      "path": "images/environment-B/ENVB-04-ossuary-bone-pantry.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-13c39597-51f9-40b0-8503-fa073882d8c9.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "5c107a59e6779a21ff87e5629f12ef3fe244f15781291bb9a4b79a24e0c9a608",
+      "generated_utc": "2026-10-23T11:34:19.435191+00:00",
+      "review": "inspected"
+    },
+    "ENVC-04": {
+      "path": "images/environment-C/ENVC-04-the-ford.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-c52899a4-286f-432e-9649-45c7ebaae140.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "cea067e3af75ece03fef43f86e6bf3e1bc99e60cb6a9d6a839ddb03ad17988dd",
+      "generated_utc": "2026-10-23T11:34:42.258908+00:00",
+      "review": "inspected"
+    },
+    "ENVD-04": {
+      "path": "images/environment-D/ENVD-04-cistern-round-flooded-bead.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-51a09ac7-b5db-45e9-9dd2-cb0447a92e16.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "ff6ee2a6e12031ee6422ccfb3c21121a335b1b2c703a048f77ddd21a7713df4f",
+      "generated_utc": "2026-10-23T11:35:06.452135+00:00",
+      "review": "inspected"
+    },
+    "HUD-04": {
+      "path": "images/hud/HUD-04-chalk-marks-on-ivory.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-942f9da9-200a-4ead-97f1-0bf2d3be69f9.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "a6559f283bc6f28f3ece5ce491da793a9504041f4ee46196c1ec1ec35496089c",
+      "generated_utc": "2026-10-23T11:35:58.669877+00:00",
+      "review": "inspected"
+    },
+    "IN-04": {
+      "path": "images/intro/IN-04-beneath-the-banquet-table.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-ca42458a-2af3-4a6a-b295-ad9ddcbe716d.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "2e392d1fcb4ab7a369f637c9e031c59e0e76c98f5b328f407c4852d9c1139309",
+      "generated_utc": "2026-10-23T11:36:38.142033+00:00",
+      "review": "inspected"
+    },
+    "MECH-04": {
+      "path": "images/mechanisms/MECH-04-hanging-feast-plate-order.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-b791d1f4-02e7-4735-aa56-91bab9f591ce.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "30848d3d884338f8f086a17e8016bc4e822c6655b3310e282f240c8c8343a2c9",
+      "generated_utc": "2026-10-23T11:37:04.795950+00:00",
+      "review": "inspected"
+    },
+    "MON-04": {
+      "path": "images/monsters/MON-04-bread-crab.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-1aeef850-a296-4791-b63c-5728a533eb6f.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "cad1234f38abf5cc4a0616a0ae160c2a8e9e5dff2b2a517849cb5a830da73a39",
+      "generated_utc": "2026-10-23T11:37:30.762457+00:00",
+      "review": "inspected"
+    },
+    "VER-04": {
+      "path": "images/vermin/VER-04-little-pantry-thieves.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-36bf3447-88dd-4a0c-adf5-232f11184a33.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "f91e4cdfa2baebcb25e7878616da11e7b72359a12790c8642845d1bae89fd11a",
+      "generated_utc": "2026-10-23T11:37:53.407351+00:00",
+      "review": "inspected"
+    },
+    "CB-05": {
+      "path": "images/cookbook/CB-05-pinned-kitchen-tickets.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-0fb5469b-f296-4a22-81e3-961012e631d1.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "1bf79f7f7627403088c3549225897c84fd7ab7f538e868e72a1e5414440f545d",
+      "generated_utc": "2026-10-23T11:38:31.445157+00:00",
+      "review": "inspected"
+    },
+    "ENVB-05": {
+      "path": "images/environment-B/ENVB-05-reliquary-brass-shelves.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-124d5438-f0d3-4773-91b8-2eeb516bd84a.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "43e82a8c2c50e6f900d4ac37e065ee14bd4ad5ae5f108b2a3d764b4b0750ade6",
+      "generated_utc": "2026-10-23T11:38:56.923428+00:00",
+      "review": "inspected"
+    },
+    "ENVC-05": {
+      "path": "images/environment-C/ENVC-05-chain-crossing-and-sluice.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-feae31e7-11eb-48cf-b228-786dda8b735d.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "327964a2b40aa24da3ebc07779878c1e1a125b565b5835f041a659ad7140e7a0",
+      "generated_utc": "2026-10-23T11:39:32.728429+00:00",
+      "review": "inspected"
+    },
+    "ENVD-05": {
+      "path": "images/environment-D/ENVD-05-root-grotto-low-organic-bead.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-f1bf0e06-38b9-418f-868c-18a45325f7a2.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "de3826ed416cea7e226f4c735985b71822f26e0d49dc7ee29f6436cd0c302df2",
+      "generated_utc": "2026-10-23T11:39:57.301352+00:00",
+      "review": "inspected"
+    },
+    "HUD-05": {
+      "path": "images/hud/HUD-05-the-little-service-ledger.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-895ada42-aab6-4001-a8f4-2a15af2e6d10.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "3eff94948d56161ea3801b323946647085526e0b7e1dd030f52bafed281b1a8d",
+      "generated_utc": "2026-10-23T11:40:35.053101+00:00",
+      "review": "inspected"
+    },
+    "IN-05": {
+      "path": "images/intro/IN-05-the-lift-passes-the-whole-kingdom.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-fb087678-16d3-42ee-af2a-bbc010058ada.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "9b37eacbfc535aa3b1de9a92653e744899ccf3b12bdadf4bb42152b622a8deb5",
+      "generated_utc": "2026-10-23T11:41:16.019286+00:00",
+      "review": "inspected"
+    },
+    "MECH-05": {
+      "path": "images/mechanisms/MECH-05-bellkeeper-chipped-relief.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-d2bd13ba-b12e-44c3-a4df-1d9901fac53a.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "0c8c57ec8f690ed1d8cf75070a13b21f8b0eb2219169137c1fe24bb38b281acb",
+      "generated_utc": "2026-10-23T11:41:40.677815+00:00",
+      "review": "inspected"
+    },
+    "MON-05": {
+      "path": "images/monsters/MON-05-marrow-knight.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-87d69a15-78fa-406a-a79e-f950bc4c2f99.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "6b11c25f9fa6b47fda7884a464482ef1548a55812c000f35bce4523242259dbb",
+      "generated_utc": "2026-10-23T11:42:03.718624+00:00",
+      "review": "inspected"
+    },
+    "VER-05": {
+      "path": "images/vermin/VER-05-guides-through-the-small-gaps.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-9be34266-81fc-4ee6-b1b8-f936cb1c8197.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "f7c703e5f4b614bd963130d8201bbc188ce8b4a8acaadcc13d17125cc7471f7a",
+      "generated_utc": "2026-10-23T11:42:30.431577+00:00",
+      "review": "inspected"
+    },
+    "CB-06": {
+      "path": "images/cookbook/CB-06-sewn-patch-notebook.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-d1b47448-781e-4846-ae91-420de7d1b26e.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "5cfb29ddf820cb58df601fee01a76339fe21114be4fe97013fd839b01032e63a",
+      "generated_utc": "2026-10-23T11:43:07.355491+00:00",
+      "review": "inspected"
+    },
+    "ENVB-06": {
+      "path": "images/environment-B/ENVB-06-chime-hall-landing.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-f9045c8d-95f8-4214-80f0-fdbe598b2fd8.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "3115d755bf3576c6806de5dabdbd917d7bbb7ed8c5f3908f00b8fbde5c130458",
+      "generated_utc": "2026-10-23T11:43:42.251262+00:00",
+      "review": "inspected"
+    },
+    "ENVC-06": {
+      "path": "images/environment-C/ENVC-06-ossuary-pack-plate.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-1bfc63dc-27d8-4656-b642-70727fd52e55.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "685ce47ce8b74ad4074453176f3b9aeb0330386873b87032412730991cb824dd",
+      "generated_utc": "2026-10-23T11:44:06.840715+00:00",
+      "review": "inspected"
+    },
+    "ENVD-06": {
+      "path": "images/environment-D/ENVD-06-charnel-court-sunken-hearth.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-fee0cb69-d7e6-48d3-9ceb-d5c883ecbd89.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "ab52b955d8489f583abfaec5c9a2f01be1614397ad50e17636d4a82f70a236e9",
+      "generated_utc": "2026-10-23T11:44:43.965626+00:00",
+      "review": "inspected"
+    },
+    "HUD-06": {
+      "path": "images/hud/HUD-06-hanging-pantry-tags.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-fbfe8106-a284-4d36-826d-b9142edc8c6a.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "8b1e06ba4feba1cbe9ad9a3c6dcbddc3a21b4fb3047c3b08318962a1ef75f368",
+      "generated_utc": "2026-10-23T11:45:52.879706+00:00",
+      "review": "inspected"
+    },
+    "IN-06": {
+      "path": "images/intro/IN-06-the-accidental-appointment.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-10ca84f5-5e02-4d28-b9b1-5e031922ee36.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "5bf9a76b8c1cefc83d9894f3fd5481872ddc64175b69e1eb16cd17cabc31e98f",
+      "generated_utc": "2026-10-23T11:46:33.658090+00:00",
+      "review": "inspected"
+    },
+    "MECH-06": {
+      "path": "images/mechanisms/MECH-06-shadow-stencil-halves.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-f18fff31-16d9-47d5-9d2f-3a7186d32fa1.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "e4c62e1ed81831b04b08d188c0485fb6b345c9f4f77546088d8efaa15e3812b8",
+      "generated_utc": "2026-10-23T11:46:57.750031+00:00",
+      "review": "inspected"
+    },
+    "MON-06": {
+      "path": "images/monsters/MON-06-bellied-pilgrim.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-a62afc7d-2dbb-4a03-87ee-0e6e63150670.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "125830ccca50ca3e1c8d1fc56d8b0f9145dd62502dbc4bebc10199d2912a961d",
+      "generated_utc": "2026-10-23T11:47:24.631002+00:00",
+      "review": "inspected"
+    },
+    "VER-06": {
+      "path": "images/vermin/VER-06-sleepy-kitchen-residents.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-be3c5766-59d1-4dd3-9cb3-1f794bb50011.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "f90ce7129702d346a4ef6e816f6d820ac1ca2f3ae884878e17782e147779efcd",
+      "generated_utc": "2026-10-23T11:47:49.486068+00:00",
+      "review": "inspected"
+    },
+    "CB-07": {
+      "path": "images/cookbook/CB-07-pictogram-trail.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-f8a80641-f44b-40d5-85b3-0c9c11602d8f.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "9cfb8c3250db653fccffa65d7008ca9607af199c0bc76a610267c4fd6cada7d5",
+      "generated_utc": "2026-10-23T11:48:24.425483+00:00",
+      "review": "inspected"
+    },
+    "ENVB-07": {
+      "path": "images/environment-B/ENVB-07-salt-cellar-strata.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-a696dbc4-8478-4d19-b0a4-bf91ccebcd84.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "0bcb9ada902dc87fff9d5ef2bb43be7bc372bc813dea229f60b665bf45c5ad9e",
+      "generated_utc": "2026-10-23T11:49:04.433884+00:00",
+      "review": "inspected"
+    },
+    "ENVC-07": {
+      "path": "images/environment-C/ENVC-07-reliquary-stair-and-loft-access.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-b04ef851-0f44-4eee-a511-51a47e3b2efe.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "c6b79afe8527c28b5b9bfe938fdc2c4fc53689a8714b21612c97bc7a2ccb8b72",
+      "generated_utc": "2026-10-23T11:49:27.811192+00:00",
+      "review": "inspected"
+    },
+    "ENVD-07": {
+      "path": "images/environment-D/ENVD-07-ossuary-long-upper-gallery.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-e6ed402d-e570-4728-a74a-6bd176a79053.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "15753055dba923fdfe843c8006819e04fa7a185f469d07a3f8e39bdd6f76400b",
+      "generated_utc": "2026-10-23T11:49:52.364710+00:00",
+      "review": "inspected"
+    },
+    "HUD-07": {
+      "path": "images/hud/HUD-07-folded-napkin-cards.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-aef375ca-3bb7-42a7-a2f2-52b5fba2bdff.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "06596381e1bff76e483104f85d8d9b74959c66eb46d13c45799ff9da20d624fb",
+      "generated_utc": "2026-10-23T11:50:33.028254+00:00",
+      "review": "inspected"
+    },
+    "IN-07": {
+      "path": "images/intro/IN-07-a-court-portrait-comes-alive.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-53338371-b9d5-4da5-9f21-0eeca57037ad.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "1379b26fd4c48bb27bd7f4077f650c02f631cb505c17817c5271652bea4a14c7",
+      "generated_utc": "2026-10-23T11:51:11.498051+00:00",
+      "review": "inspected"
+    },
+    "MECH-07": {
+      "path": "images/mechanisms/MECH-07-roots-around-the-old-waymarks.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-393d9760-8c71-494b-a821-d9ff5624e3fe.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "91a39221c25608db0f87d6fb9b598a8838fc0d7baf66baa46c8018ecb525c879",
+      "generated_utc": "2026-10-23T11:51:52.188029+00:00",
+      "review": "inspected"
+    },
+    "MON-07": {
+      "path": "images/monsters/MON-07-knuckleback.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-4a2422df-06a0-4291-879e-065ce0c59e34.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "ad2453ceec85065e549f57c50145ea4ad99794e0776beddd28fd2e9378518143",
+      "generated_utc": "2026-10-23T11:52:31.433793+00:00",
+      "review": "inspected"
+    },
+    "VER-07": {
+      "path": "images/vermin/VER-07-a-small-startle-cascade.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-e2938527-7413-456e-93f7-9656b73189e0.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "c61300c8a2cf086a79477d36844ce26c854270178c675f8f5235474d67d79930",
+      "generated_utc": "2026-10-23T11:52:56.998564+00:00",
+      "review": "inspected"
+    },
+    "ENVB-08": {
+      "path": "images/environment-B/ENVB-08-pump-room-machinery.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-5d3f252c-824b-46a3-ae9b-d2d0af5c05fd.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "bd567ac9dab3227c2b44b0b3ac0d94ab9876a24eaadfe24fa146bf28dc48c412",
+      "generated_utc": "2026-10-23T11:53:31.228810+00:00",
+      "review": "inspected"
+    },
+    "CB-08": {
+      "path": "images/cookbook/CB-08-shadow-puppets-and-speech-bubbles.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-ea4a9976-0e26-4420-a9dc-a3160f047541.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "c2e5e3d4ca74f2f7da5b43949787d08a837948a81e9a15652041bcfd84a618a3",
+      "generated_utc": "2026-10-23T11:53:55.895790+00:00",
+      "review": "inspected"
+    },
+    "ENVC-08": {
+      "path": "images/environment-C/ENVC-08-salt-mill-above-the-canal.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-7ad0b7c5-1c13-4174-a23f-0df47c49a26b.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "ff83f573d8c75466840a49a1a25d1ea2afe700ccddab98c9f01e2a72901b985c",
+      "generated_utc": "2026-10-23T11:54:19.908815+00:00",
+      "review": "inspected"
+    },
+    "ENVD-08": {
+      "path": "images/environment-D/ENVD-08-smokehouse-tall-tower.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-2971f2cb-98fe-46df-aa71-588b7d497934.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "fafc653c883e18f0fd5d22f7403344e2c26e55b53d3883c7963b53c4bd24a980",
+      "generated_utc": "2026-10-23T11:54:45.739356+00:00",
+      "review": "inspected"
+    },
+    "HUD-08": {
+      "path": "images/hud/HUD-08-royal-rubber-stamps.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-4c144497-2868-40c9-83d0-b68a1f91e283.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "03703ac246773659cb08e45149019ed120851ea698c62486726492c8291f4ffb",
+      "generated_utc": "2026-10-23T11:56:06.470418+00:00",
+      "review": "inspected"
+    },
+    "IN-08": {
+      "path": "images/intro/IN-08-the-lost-aroma.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-a30d7f6d-ff82-4ff1-ab87-da5564b61fa5.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "f458c7a9455082ffc1c4c4f8d143d84dd009b3c737b295ac29ef0e57aaa87e03",
+      "generated_utc": "2026-10-23T11:56:44.984993+00:00",
+      "review": "inspected"
+    },
+    "MECH-08": {
+      "path": "images/mechanisms/MECH-08-brine-channel-tells-the-mechanism.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-142a6570-6449-4bc6-81e5-e7d5617d829e.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "764200079c5608157f8a99001cdabf92ab32ba3af5dc1d3fb7dc500794f3a5e1",
+      "generated_utc": "2026-10-23T11:57:25.421325+00:00",
+      "review": "inspected"
+    },
+    "MON-08": {
+      "path": "images/monsters/MON-08-root-listener.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-23c8a871-5e32-4bc2-892e-7bb28c9869bd.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "1037f5ccacc473657789a4f3ab78ed74740ddd65da06dbaa77f7ba424ebf5fc1",
+      "generated_utc": "2026-10-23T11:57:53.042889+00:00",
+      "review": "inspected"
+    },
+    "VER-08": {
+      "path": "images/vermin/VER-08-the-pantry-cleaning-crew.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-673bcb81-376b-48eb-9316-c0a16d1cde07.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "4db48d83e7b274dca1b5c1de97291e20354cf6a1d9a22da9f698e90ea1200615",
+      "generated_utc": "2026-10-23T11:58:18.524198+00:00",
+      "review": "inspected"
+    },
+    "CB-09": {
+      "path": "images/cookbook/CB-09-napkin-scrap-scrapbook.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-fa451f88-8236-4da9-8167-ccb125ffb112.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "c0053b5937aa11cfd2c5919e041686cb23e96711dbd9bf243aa636535bcf4a18",
+      "generated_utc": "2026-10-23T11:58:42.466365+00:00",
+      "review": "inspected"
+    },
+    "ENVB-09": {
+      "path": "images/environment-B/ENVB-09-cistern-lowest-water.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-5fdbb536-ebb0-4a0d-a636-7ee55632f5ea.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "ade795664723ff4c340e933fbb2d9fba37089c9baa2e133036596a29f7186446",
+      "generated_utc": "2026-10-23T11:59:08.347262+00:00",
+      "review": "inspected"
+    },
+    "ENVC-09": {
+      "path": "images/environment-C/ENVC-09-brine-larder-canal-cellar.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-5a3324a7-d8a1-4f14-a3aa-c4c80beba7fa.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "9f127818838c1440901b869047eab0b3562e89091aa8869eb01a760da8cd707c",
+      "generated_utc": "2026-10-23T11:59:46.440181+00:00",
+      "review": "inspected"
+    },
+    "ENVD-09": {
+      "path": "images/environment-D/ENVD-09-chime-hall-long-rhythm.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-de996d24-19d6-4aec-9750-108597877bd8.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "718c589ee4bfa83f1ce36ef0e1d6720fce5b55b55ea8ffb1c687e1902e1a2e8e",
+      "generated_utc": "2026-10-23T12:00:19.340699+00:00",
+      "review": "inspected"
+    },
+    "HUD-09": {
+      "path": "images/hud/HUD-09-pictogram-pantry.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-7eeee3dd-6b37-434c-92b2-05268b36dc97.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "36544335e3b8d1739162429e2a660b94bdab6ef5e10527e618021098e45a2e6f",
+      "generated_utc": "2026-10-23T12:00:58.336360+00:00",
+      "review": "inspected"
+    },
+    "IN-09": {
+      "path": "images/intro/IN-09-bell-page-delivery-round.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-32b84cbd-13bb-4b68-83c7-6688398f81bd.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "9efffde6943bb522771cf4484f5c565b1fe69d836c6ea6e80b2a0261901ed2c6",
+      "generated_utc": "2026-10-23T12:01:40.815994+00:00",
+      "review": "inspected"
+    },
+    "MECH-09": {
+      "path": "images/mechanisms/MECH-09-quarry-cuts-and-kitchen-marks.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-888fb48e-2e74-4891-9f36-c7e967f0ece1.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "e38b94214648fc928221453e844e2f4962ad74813b1264c4de768c94026491fd",
+      "generated_utc": "2026-10-23T12:02:08.005446+00:00",
+      "review": "inspected"
+    },
+    "MON-09": {
+      "path": "images/monsters/MON-09-pantry-porter.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-e36ac53c-06e5-46a7-b8a8-01c16c0ac3bd.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "2e78efdd48c57988eaedd55ac957e7b8947cda83fce0cbcff8bdaf3f0512fee6",
+      "generated_utc": "2026-10-23T12:02:46.191096+00:00",
+      "review": "inspected"
+    },
+    "VER-09": {
+      "path": "images/vermin/VER-09-harmless-eyes-in-the-dark.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-d2962689-7580-429e-93ef-d48916d944ca.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "6f3b4ba4dc0dbc9845160fe143293b46ddb6b9d93ad999eb47106e91833dd80b",
+      "generated_utc": "2026-10-23T12:03:05.203250+00:00",
+      "review": "inspected"
+    },
+    "CB-10": {
+      "path": "images/cookbook/CB-10-scout-route-annotations.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-2bc9df68-6470-4c72-bcf3-da92d82a564c.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "3628ceae84944c02c2d36d1ae38f70a987895b444c8048101df635765d53c330",
+      "generated_utc": "2026-10-23T12:03:43.815072+00:00",
+      "review": "inspected"
+    },
+    "ENVB-10": {
+      "path": "images/environment-B/ENVB-10-smokehouse-ember-room.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-2bd87b84-c4f1-4a03-a40f-2fd59cce8377.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "5e67924259a99f5374253ea6ec58691fe88ab1060989ae8fed8699db40399f44",
+      "generated_utc": "2026-10-23T12:04:11.651393+00:00",
+      "review": "inspected"
+    },
+    "ENVC-10": {
+      "path": "images/environment-C/ENVC-10-cistern-bank-chamber.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-126852e1-9908-4e70-a5c0-24c2fc491829.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "4c3fde2779ed6cf1896d7cb8384293dcc6fcb297c17c3bc80aa37a3cbf93722d",
+      "generated_utc": "2026-10-23T12:04:36.069698+00:00",
+      "review": "inspected"
+    },
+    "ENVD-10": {
+      "path": "images/environment-D/ENVD-10-pump-room-machine-bead.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-31ed8d84-66d0-4a48-a8aa-e8d01d97fb28.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "d02488c51081bc6dd4eb3989c89a27892ab747d5dbe016cdb640ab8d4ee54749",
+      "generated_utc": "2026-10-23T12:05:03.077348+00:00",
+      "review": "inspected"
+    },
+    "HUD-10": {
+      "path": "images/hud/HUD-10-torn-kitchen-newspaper.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-8f03ab2e-23ab-4ef1-8bab-ac19765ecc4f.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "146a67905d92a4072ab111ff2422e1b53bae1f18bde67a2a7d78118d733be019",
+      "generated_utc": "2026-10-23T12:06:23.213907+00:00",
+      "review": "inspected"
+    },
+    "IN-10": {
+      "path": "images/intro/IN-10-the-torn-royal-recipe.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-0646c2e0-64fe-42ce-ade6-b4e7b43a03a7.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "a674a0ecf7d70005f6a57616bd32da71d9f50e2ad56c8b9c15e07d56fccf2956",
+      "generated_utc": "2026-10-23T12:07:01.054102+00:00",
+      "review": "inspected"
+    },
+    "MECH-10": {
+      "path": "images/mechanisms/MECH-10-the-shared-pack-plinth.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-033c3cc5-5005-4625-9b36-4a51b3c7255d.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "5d26dda8bcee48d2f9aebace1c3cc9094dbbb45410cef016539b6eddb3806c1d",
+      "generated_utc": "2026-10-23T12:07:38.450851+00:00",
+      "review": "inspected"
+    },
+    "MON-10": {
+      "path": "images/monsters/MON-10-rag-maw.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-a564ea85-ddd2-4701-bf3e-410c00874e90.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "d33d9dc2d94942bc85ea5ecc27b96daa4c3ab593a59845c207729ab4369b0fa5",
+      "generated_utc": "2026-10-23T12:08:03.425176+00:00",
+      "review": "inspected"
+    },
+    "VER-10": {
+      "path": "images/vermin/VER-10-the-crumb-led-scout.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-1374a808-097b-4d11-adfc-a2668f1d5b7b.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "e186b9b9ae9f50b345779ffb8b05cb3bacd82de5ba198361cb939dcd009372d7",
+      "generated_utc": "2026-10-23T12:08:29.520639+00:00",
+      "review": "inspected"
+    },
+    "CB-11": {
+      "path": "images/cookbook/CB-11-kitchen-comic-strips.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-a253c188-8da7-4ca8-81f4-58bf1a87cae0.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "6cdff0c07aea8f83a7768c06717bef2c661574d9ae9a329c599ed1b9904d5d5a",
+      "generated_utc": "2026-10-23T12:09:06.875782+00:00",
+      "review": "inspected"
+    },
+    "ENVB-11": {
+      "path": "images/environment-B/ENVB-11-brine-larder-support-stop.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-c28ab266-fb2e-4859-b202-9317522e9cec.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "648550bc333afbeb3ede098b5086cefac8a43f243a33baa3c62f8d0e70a3384d",
+      "generated_utc": "2026-10-23T12:09:49.735054+00:00",
+      "review": "inspected"
+    },
+    "ENVC-11": {
+      "path": "images/environment-C/ENVC-11-canal-rim-wayfinding.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-10b8becc-8cd4-4331-9727-764b4745552e.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "0404721aad226ef490910a1e2d50bed6c21524af500b828d6e5826901cc117b9",
+      "generated_utc": "2026-10-23T12:10:25.171632+00:00",
+      "review": "inspected"
+    },
+    "ENVD-11": {
+      "path": "images/environment-D/ENVD-11-salt-cellar-low-bead.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-eb4100c2-9c20-492f-b27a-95532e644121.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "4860cea27d71d8980840556b7a2236cceca431f6a3d0a2ee189b8da2c718ad81",
+      "generated_utc": "2026-10-23T12:10:47.916934+00:00",
+      "review": "inspected"
+    },
+    "HUD-11": {
+      "path": "images/hud/HUD-11-twine-and-wax-service-kit.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-bfbe4e6a-5fa8-4d7f-a6c0-e9dc2ba80ffa.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "d5a7e463fe2401afaf01e033d428db5535c992625dbe14be48081d750c757c69",
+      "generated_utc": "2026-10-23T12:11:25.516841+00:00",
+      "review": "inspected"
+    },
+    "IN-11": {
+      "path": "images/intro/IN-11-the-daily-feast-ritual.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-b5f80ece-313b-48a0-a4d8-b8730ce42f53.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "1a51e04aa998566555c490d0d3d5a8c7d36a37d41e6ad29c623d8a41846829c8",
+      "generated_utc": "2026-10-23T12:12:05.479383+00:00",
+      "review": "inspected"
+    },
+    "MECH-11": {
+      "path": "images/mechanisms/MECH-11-backside-bar-and-earned-shortcut.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-e8456842-d158-482e-9d1d-b61031ebb0ba.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "cda325e23d117e193a5b189e2249ca6196ddc0c8e9712f75aa2979dc32913383",
+      "generated_utc": "2026-10-23T12:12:31.473471+00:00",
+      "review": "inspected"
+    },
+    "MON-11": {
+      "path": "images/monsters/MON-11-wax-wisp.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-bfa66c0c-decf-430a-a649-1fba3f6e126c.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "42f0c4578223946ef499998233c1639919e73e9feb5f390c89fb37b6db7558d3",
+      "generated_utc": "2026-10-23T12:12:55.725565+00:00",
+      "review": "inspected"
+    },
+    "VER-11": {
+      "path": "images/vermin/VER-11-curious-jar-visitors.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-be2e9100-aeae-40ae-986d-2014e800a4b6.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "d732aba8f4554612bf6d6ac51ed48ed0cf9e8da05de3ee643809da424eb8cb7e",
+      "generated_utc": "2026-10-23T12:13:19.727246+00:00",
+      "review": "inspected"
+    },
+    "CB-12": {
+      "path": "images/cookbook/CB-12-nope-and-yep-field-cards.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-3c1fff8c-4560-4a15-8188-7de30697368c.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "7159c07a6d5a0470578227641665b42d2dce6e74eac0f581f62886c4e964752a",
+      "generated_utc": "2026-10-23T12:13:56.471642+00:00",
+      "review": "inspected"
+    },
+    "ENVB-12": {
+      "path": "images/environment-B/ENVB-12-the-pit-and-earned-return.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-0fdc7ee0-6e9b-45a9-b89f-199c5530ba1b.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "00cffbbdd9e5564cde594635ea7e57c98a5efe7618fb07a0af0e5aab36725726",
+      "generated_utc": "2026-10-23T12:14:21.961555+00:00",
+      "review": "inspected"
+    },
+    "ENVC-12": {
+      "path": "images/environment-C/ENVC-12-pit-vault-and-scout-exit.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-7d0c24bc-4841-4adc-8cb1-d8fafbeaadc3.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "c53499fffb24d42a71f21b71fd165c30094421fe913feca96f62b9b99adaa745",
+      "generated_utc": "2026-10-23T12:14:56.647038+00:00",
+      "review": "inspected"
+    },
+    "ENVD-12": {
+      "path": "images/environment-D/ENVD-12-pit-cavern-below-the-rings.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-07f2beed-0c4b-4008-b39f-31be1d95fffb.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "bbbb8d8e26285cadfb36dbaf4fa26b4f306316cf98d216148b87e101843ed247",
+      "generated_utc": "2026-10-23T12:15:30.446786+00:00",
+      "review": "inspected"
+    },
+    "HUD-12": {
+      "path": "images/hud/HUD-12-quiet-single-sheet-hud.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-267c1f5c-06c5-48fe-9337-e46925c9fcfe.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "3261568256ddc04aa6b91c384545d0885406791c4f6843be9ce8642eb8b0e407",
+      "generated_utc": "2026-10-23T12:16:56.660369+00:00",
+      "review": "inspected"
+    },
+    "IN-12": {
+      "path": "images/intro/IN-12-the-pop-up-feast-book.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-3ee83205-e161-4a0a-a92f-b4847d26fea2.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "d5ee7367af6e32bfc0c9938e807ea40a926b37eff39d1060b56f14f0f255f23f",
+      "generated_utc": "2026-10-23T12:17:38.038525+00:00",
+      "review": "inspected"
+    },
+    "MECH-12": {
+      "path": "images/mechanisms/MECH-12-the-far-key-in-the-window.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-f6314f05-dd57-4444-a7ce-c24bb6cefb54.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "47e4a361e0aaa60cb67a193555e160b23fe944657edecc8ae5bfa9ef7cc3e5bb",
+      "generated_utc": "2026-10-23T12:18:05.444204+00:00",
+      "review": "inspected"
+    },
+    "MON-12": {
+      "path": "images/monsters/MON-12-brine-hog.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-8f4a995d-f315-4270-b237-e056f7bb6471.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "f996e1ac22c6acd26b984c4a52cea3fc5df2e48e0d0285d6bd98d90088228a65",
+      "generated_utc": "2026-10-23T12:18:43.083706+00:00",
+      "review": "inspected"
+    },
+    "VER-12": {
+      "path": "images/vermin/VER-12-herb-and-paper-couriers.png",
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-95dfdd71-0066-4c0e-ad31-d444b9631232.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "b8b955a7d1a8a5a611335f30c01b970aa9ca444e02871dca020f4d783e9acd48",
+      "generated_utc": "2026-10-23T12:19:09.373487+00:00",
+      "review": "inspected"
+    }
+  },
+  "failed": {},
+  "quality_notes": {
+    "CB-01": "Inspected full resolution: sparse ink, clear sticker row and four large preparation panels. Diagram details remain exploratory.",
+    "ENVB-01": "Inspected both views: consistent hoist and amber-teal low-poly language. Shaft depth is dramatized beyond the17.5m layout; treat this as a mood study, not a metric construction drawing.",
+    "MON-01": "Inspected silhouette and behavior beats: tiny high body, long probing limbs and route escape are clear. Bottom encounter vignette is partly over-shoulder rather than pure first-person.",
+    "ENVC-01": "Inspected full-resolution board: composition and category content present. Printed text and exact game metrics remain concept-stage details.",
+    "ENVD-01": "Inspected full-resolution board: composition and category content present. Printed text and exact game metrics remain concept-stage details.",
+    "IN-01": "Inspected full-resolution board: composition and category content present. Printed text and exact game metrics remain concept-stage details.",
+    "HUD-01": "Inspected full-resolution board: composition and category content present. Printed text and exact game metrics remain concept-stage details.",
+    "MECH-01": "Inspected full-resolution board: composition and category content present. Printed text and exact game metrics remain concept-stage details.",
+    "VER-01": "Inspected full-resolution board: composition and category content present. Printed text and exact game metrics remain concept-stage details.",
+    "HUD-02": "Inspected full-resolution board: composition and category content present. Printed text and exact game metrics remain concept-stage details.",
+    "CB-02": "Contact-sheet inspection confirms distinct category compositions and the requested stylized direction. Typography and spatial proportions remain exploratory concepts.",
+    "CB-03": "Contact-sheet inspection confirms distinct category compositions and the requested stylized direction. Typography and spatial proportions remain exploratory concepts.",
+    "ENVB-02": "Contact-sheet inspection confirms distinct category compositions and the requested stylized direction. Typography and spatial proportions remain exploratory concepts.",
+    "ENVB-03": "Contact-sheet inspection confirms distinct category compositions and the requested stylized direction. Typography and spatial proportions remain exploratory concepts.",
+    "ENVC-02": "Contact-sheet inspection confirms distinct category compositions and the requested stylized direction. Typography and spatial proportions remain exploratory concepts.",
+    "ENVC-03": "Contact-sheet inspection confirms distinct category compositions and the requested stylized direction. Typography and spatial proportions remain exploratory concepts.",
+    "ENVD-02": "Contact-sheet inspection confirms distinct category compositions and the requested stylized direction. Typography and spatial proportions remain exploratory concepts.",
+    "ENVD-03": "Contact-sheet inspection confirms distinct category compositions and the requested stylized direction. Typography and spatial proportions remain exploratory concepts.",
+    "IN-02": "Contact-sheet inspection confirms distinct category compositions and the requested stylized direction. Typography and spatial proportions remain exploratory concepts.",
+    "MECH-02": "Contact-sheet inspection confirms distinct category compositions and the requested stylized direction. Typography and spatial proportions remain exploratory concepts.",
+    "MON-02": "Contact-sheet inspection confirms distinct category compositions and the requested stylized direction. Typography and spatial proportions remain exploratory concepts.",
+    "VER-02": "Contact-sheet inspection confirms distinct category compositions and the requested stylized direction. Typography and spatial proportions remain exploratory concepts.",
+    "CB-04": "Inspected labelled contact sheet: the requested page/component or environment/behavior panels are present, category directions are visually distinct and use the stylized palette. Typography and map proportions remain concept-stage.",
+    "ENVB-04": "Inspected labelled contact sheet: the requested page/component or environment/behavior panels are present, category directions are visually distinct and use the stylized palette. Typography and map proportions remain concept-stage.",
+    "ENVC-04": "Inspected labelled contact sheet: the requested page/component or environment/behavior panels are present, category directions are visually distinct and use the stylized palette. Typography and map proportions remain concept-stage.",
+    "ENVD-04": "Inspected labelled contact sheet: the requested page/component or environment/behavior panels are present, category directions are visually distinct and use the stylized palette. Typography and map proportions remain concept-stage.",
+    "IN-03": "Inspected labelled contact sheet: the requested page/component or environment/behavior panels are present, category directions are visually distinct and use the stylized palette. Typography and map proportions remain concept-stage.",
+    "HUD-03": "Inspected labelled contact sheet: the requested page/component or environment/behavior panels are present, category directions are visually distinct and use the stylized palette. Typography and map proportions remain concept-stage.",
+    "MECH-03": "Inspected labelled contact sheet: the requested page/component or environment/behavior panels are present, category directions are visually distinct and use the stylized palette. Typography and map proportions remain concept-stage.",
+    "MON-03": "Inspected labelled contact sheet: the requested page/component or environment/behavior panels are present, category directions are visually distinct and use the stylized palette. Typography and map proportions remain concept-stage.",
+    "VER-03": "Inspected labelled contact sheet: the requested page/component or environment/behavior panels are present, category directions are visually distinct and use the stylized palette. Typography and map proportions remain concept-stage.",
+    "CB-05": "Inspected labelled contact sheet: the requested page/component or environment/behavior panels are present, category directions are visually distinct and use the stylized palette. Typography and map proportions remain concept-stage.",
+    "ENVB-05": "Inspected labelled contact sheet: the requested page/component or environment/behavior panels are present, category directions are visually distinct and use the stylized palette. Typography and map proportions remain concept-stage.",
+    "ENVC-05": "Inspected labelled contact sheet: the requested page/component or environment/behavior panels are present, category directions are visually distinct and use the stylized palette. Typography and map proportions remain concept-stage.",
+    "ENVD-05": "Inspected labelled contact sheet: the requested page/component or environment/behavior panels are present, category directions are visually distinct and use the stylized palette. Typography and map proportions remain concept-stage.",
+    "IN-04": "Inspected labelled contact sheet: the requested page/component or environment/behavior panels are present, category directions are visually distinct and use the stylized palette. Typography and map proportions remain concept-stage.",
+    "HUD-04": "Inspected labelled contact sheet: the requested page/component or environment/behavior panels are present, category directions are visually distinct and use the stylized palette. Typography and map proportions remain concept-stage.",
+    "MECH-04": "Inspected labelled contact sheet: the requested page/component or environment/behavior panels are present, category directions are visually distinct and use the stylized palette. Typography and map proportions remain concept-stage.",
+    "MON-04": "Inspected labelled contact sheet: the requested page/component or environment/behavior panels are present, category directions are visually distinct and use the stylized palette. Typography and map proportions remain concept-stage.",
+    "VER-04": "Inspected labelled contact sheet: the requested page/component or environment/behavior panels are present, category directions are visually distinct and use the stylized palette. Typography and map proportions remain concept-stage.",
+    "CB-06": "Inspected labelled contact sheet: the requested page/component or environment/behavior panels are present, category directions are visually distinct and use the stylized palette. Typography and map proportions remain concept-stage.",
+    "ENVB-06": "Inspected labelled contact sheet: the requested page/component or environment/behavior panels are present, category directions are visually distinct and use the stylized palette. Typography and map proportions remain concept-stage.",
+    "ENVC-06": "Inspected labelled contact sheet: the requested page/component or environment/behavior panels are present, category directions are visually distinct and use the stylized palette. Typography and map proportions remain concept-stage.",
+    "IN-05": "Inspected labelled contact sheet: the requested page/component or environment/behavior panels are present, category directions are visually distinct and use the stylized palette. Typography and map proportions remain concept-stage.",
+    "HUD-05": "Inspected labelled contact sheet: the requested page/component or environment/behavior panels are present, category directions are visually distinct and use the stylized palette. Typography and map proportions remain concept-stage.",
+    "MECH-05": "Inspected labelled contact sheet: the requested page/component or environment/behavior panels are present, category directions are visually distinct and use the stylized palette. Typography and map proportions remain concept-stage.",
+    "MON-05": "Inspected labelled contact sheet: the requested page/component or environment/behavior panels are present, category directions are visually distinct and use the stylized palette. Typography and map proportions remain concept-stage.",
+    "VER-05": "Inspected labelled contact sheet: the requested page/component or environment/behavior panels are present, category directions are visually distinct and use the stylized palette. Typography and map proportions remain concept-stage.",
+    "CB-07": "Inspected labelled contact sheet: distinct silhouettes and graphic treatments, coherent amber/teal stylization, requested paired or sequential panels present. HUD world prompts use LMB. Precise room dimensions and generated typography remain exploratory.",
+    "ENVB-07": "Inspected labelled contact sheet: distinct silhouettes and graphic treatments, coherent amber/teal stylization, requested paired or sequential panels present. HUD world prompts use LMB. Precise room dimensions and generated typography remain exploratory.",
+    "ENVC-07": "Inspected labelled contact sheet: distinct silhouettes and graphic treatments, coherent amber/teal stylization, requested paired or sequential panels present. HUD world prompts use LMB. Precise room dimensions and generated typography remain exploratory.",
+    "ENVD-06": "Inspected labelled contact sheet: distinct silhouettes and graphic treatments, coherent amber/teal stylization, requested paired or sequential panels present. HUD world prompts use LMB. Precise room dimensions and generated typography remain exploratory.",
+    "ENVD-07": "Inspected labelled contact sheet: distinct silhouettes and graphic treatments, coherent amber/teal stylization, requested paired or sequential panels present. HUD world prompts use LMB. Precise room dimensions and generated typography remain exploratory.",
+    "IN-06": "Inspected labelled contact sheet: distinct silhouettes and graphic treatments, coherent amber/teal stylization, requested paired or sequential panels present. HUD world prompts use LMB. Precise room dimensions and generated typography remain exploratory.",
+    "HUD-06": "Inspected labelled contact sheet: distinct silhouettes and graphic treatments, coherent amber/teal stylization, requested paired or sequential panels present. HUD world prompts use LMB. Precise room dimensions and generated typography remain exploratory.",
+    "MECH-06": "Inspected labelled contact sheet: distinct silhouettes and graphic treatments, coherent amber/teal stylization, requested paired or sequential panels present. HUD world prompts use LMB. Precise room dimensions and generated typography remain exploratory.",
+    "MON-06": "Inspected labelled contact sheet: distinct silhouettes and graphic treatments, coherent amber/teal stylization, requested paired or sequential panels present. HUD world prompts use LMB. Precise room dimensions and generated typography remain exploratory.",
+    "VER-06": "Inspected labelled contact sheet: distinct silhouettes and graphic treatments, coherent amber/teal stylization, requested paired or sequential panels present. HUD world prompts use LMB. Precise room dimensions and generated typography remain exploratory.",
+    "CB-08": "Inspected labelled contact sheet: distinct silhouettes and graphic treatments, coherent amber/teal stylization, requested paired or sequential panels present. HUD world prompts use LMB. Precise room dimensions and generated typography remain exploratory.",
+    "ENVB-08": "Inspected labelled contact sheet: distinct silhouettes and graphic treatments, coherent amber/teal stylization, requested paired or sequential panels present. HUD world prompts use LMB. Precise room dimensions and generated typography remain exploratory.",
+    "ENVC-08": "Inspected labelled contact sheet: distinct silhouettes and graphic treatments, coherent amber/teal stylization, requested paired or sequential panels present. HUD world prompts use LMB. Precise room dimensions and generated typography remain exploratory.",
+    "ENVD-08": "Inspected labelled contact sheet: distinct silhouettes and graphic treatments, coherent amber/teal stylization, requested paired or sequential panels present. HUD world prompts use LMB. Precise room dimensions and generated typography remain exploratory.",
+    "IN-07": "Inspected labelled contact sheet: distinct silhouettes and graphic treatments, coherent amber/teal stylization, requested paired or sequential panels present. HUD world prompts use LMB. Precise room dimensions and generated typography remain exploratory.",
+    "HUD-07": "Inspected labelled contact sheet: distinct silhouettes and graphic treatments, coherent amber/teal stylization, requested paired or sequential panels present. HUD world prompts use LMB. Precise room dimensions and generated typography remain exploratory.",
+    "MECH-07": "Inspected labelled contact sheet: distinct silhouettes and graphic treatments, coherent amber/teal stylization, requested paired or sequential panels present. HUD world prompts use LMB. Precise room dimensions and generated typography remain exploratory.",
+    "MON-07": "Inspected labelled contact sheet: distinct silhouettes and graphic treatments, coherent amber/teal stylization, requested paired or sequential panels present. HUD world prompts use LMB. Precise room dimensions and generated typography remain exploratory.",
+    "VER-07": "Inspected labelled contact sheet: distinct silhouettes and graphic treatments, coherent amber/teal stylization, requested paired or sequential panels present. HUD world prompts use LMB. Precise room dimensions and generated typography remain exploratory.",
+    "CB-09": "Inspected the labelled contact sheet and HUD-08 at full resolution. Distinct category treatments, readable silhouettes and requested view/state panels are present. HUD hints use the specified bindings. Exact metrics, recipes and generated text remain exploratory.",
+    "ENVB-09": "Inspected the labelled contact sheet and HUD-08 at full resolution. Distinct category treatments, readable silhouettes and requested view/state panels are present. HUD hints use the specified bindings. Exact metrics, recipes and generated text remain exploratory.",
+    "ENVC-09": "Inspected the labelled contact sheet and HUD-08 at full resolution. Distinct category treatments, readable silhouettes and requested view/state panels are present. HUD hints use the specified bindings. Exact metrics, recipes and generated text remain exploratory.",
+    "ENVD-09": "Inspected the labelled contact sheet and HUD-08 at full resolution. Distinct category treatments, readable silhouettes and requested view/state panels are present. HUD hints use the specified bindings. Exact metrics, recipes and generated text remain exploratory.",
+    "IN-08": "Inspected the labelled contact sheet and HUD-08 at full resolution. Distinct category treatments, readable silhouettes and requested view/state panels are present. HUD hints use the specified bindings. Exact metrics, recipes and generated text remain exploratory.",
+    "HUD-08": "Inspected the labelled contact sheet and HUD-08 at full resolution. Distinct category treatments, readable silhouettes and requested view/state panels are present. HUD hints use the specified bindings. Exact metrics, recipes and generated text remain exploratory.",
+    "MECH-08": "Inspected the labelled contact sheet and HUD-08 at full resolution. Distinct category treatments, readable silhouettes and requested view/state panels are present. HUD hints use the specified bindings. Exact metrics, recipes and generated text remain exploratory.",
+    "MON-08": "Inspected the labelled contact sheet and HUD-08 at full resolution. Distinct category treatments, readable silhouettes and requested view/state panels are present. HUD hints use the specified bindings. Exact metrics, recipes and generated text remain exploratory.",
+    "VER-08": "Inspected the labelled contact sheet and HUD-08 at full resolution. Distinct category treatments, readable silhouettes and requested view/state panels are present. HUD hints use the specified bindings. Exact metrics, recipes and generated text remain exploratory.",
+    "CB-10": "Inspected the labelled contact sheet and HUD-08 at full resolution. Distinct category treatments, readable silhouettes and requested view/state panels are present. HUD hints use the specified bindings. Exact metrics, recipes and generated text remain exploratory.",
+    "ENVB-10": "Inspected the labelled contact sheet and HUD-08 at full resolution. Distinct category treatments, readable silhouettes and requested view/state panels are present. HUD hints use the specified bindings. Exact metrics, recipes and generated text remain exploratory.",
+    "ENVC-10": "Inspected the labelled contact sheet and HUD-08 at full resolution. Distinct category treatments, readable silhouettes and requested view/state panels are present. HUD hints use the specified bindings. Exact metrics, recipes and generated text remain exploratory.",
+    "ENVD-10": "Inspected the labelled contact sheet and HUD-08 at full resolution. Distinct category treatments, readable silhouettes and requested view/state panels are present. HUD hints use the specified bindings. Exact metrics, recipes and generated text remain exploratory.",
+    "IN-09": "Inspected the labelled contact sheet and HUD-08 at full resolution. Distinct category treatments, readable silhouettes and requested view/state panels are present. HUD hints use the specified bindings. Exact metrics, recipes and generated text remain exploratory.",
+    "HUD-09": "Inspected the labelled contact sheet and HUD-08 at full resolution. Distinct category treatments, readable silhouettes and requested view/state panels are present. HUD hints use the specified bindings. Exact metrics, recipes and generated text remain exploratory.",
+    "MECH-09": "Inspected the labelled contact sheet and HUD-08 at full resolution. Distinct category treatments, readable silhouettes and requested view/state panels are present. HUD hints use the specified bindings. Exact metrics, recipes and generated text remain exploratory.",
+    "MON-09": "Inspected the labelled contact sheet and HUD-08 at full resolution. Distinct category treatments, readable silhouettes and requested view/state panels are present. HUD hints use the specified bindings. Exact metrics, recipes and generated text remain exploratory.",
+    "VER-09": "Inspected the labelled contact sheet and HUD-08 at full resolution. Distinct category treatments, readable silhouettes and requested view/state panels are present. HUD hints use the specified bindings. Exact metrics, recipes and generated text remain exploratory.",
+    "CB-11": "Inspected labelled contact sheet: complete component or encounter panels, distinct low-poly silhouettes and light/dark room pairs. HUD uses one active dish and LMB interactions. Diagram dimensions and generated typography are exploratory.",
+    "ENVB-11": "Inspected labelled contact sheet: complete component or encounter panels, distinct low-poly silhouettes and light/dark room pairs. HUD uses one active dish and LMB interactions. Diagram dimensions and generated typography are exploratory.",
+    "ENVC-11": "Inspected labelled contact sheet: complete component or encounter panels, distinct low-poly silhouettes and light/dark room pairs. HUD uses one active dish and LMB interactions. Diagram dimensions and generated typography are exploratory.",
+    "ENVD-11": "Inspected labelled contact sheet: complete component or encounter panels, distinct low-poly silhouettes and light/dark room pairs. HUD uses one active dish and LMB interactions. Diagram dimensions and generated typography are exploratory.",
+    "IN-10": "Inspected labelled contact sheet: complete component or encounter panels, distinct low-poly silhouettes and light/dark room pairs. HUD uses one active dish and LMB interactions. Diagram dimensions and generated typography are exploratory.",
+    "HUD-10": "Inspected labelled contact sheet: complete component or encounter panels, distinct low-poly silhouettes and light/dark room pairs. HUD uses one active dish and LMB interactions. Diagram dimensions and generated typography are exploratory.",
+    "MECH-10": "Inspected labelled contact sheet: complete component or encounter panels, distinct low-poly silhouettes and light/dark room pairs. HUD uses one active dish and LMB interactions. Diagram dimensions and generated typography are exploratory.",
+    "MON-10": "Inspected labelled contact sheet: complete component or encounter panels, distinct low-poly silhouettes and light/dark room pairs. HUD uses one active dish and LMB interactions. Diagram dimensions and generated typography are exploratory.",
+    "VER-10": "Inspected labelled contact sheet: complete component or encounter panels, distinct low-poly silhouettes and light/dark room pairs. HUD uses one active dish and LMB interactions. Diagram dimensions and generated typography are exploratory.",
+    "CB-12": "Inspected contact sheet: the final cookbook treatment, B/C/D destination views, six-beat feast ritual, complete HUD, shortcut sequence, Wax Wisp tells and four-family vermin board are present. Typography, metrics and behavior implementation remain concept-stage.",
+    "ENVB-12": "Inspected contact sheet: the final cookbook treatment, B/C/D destination views, six-beat feast ritual, complete HUD, shortcut sequence, Wax Wisp tells and four-family vermin board are present. Typography, metrics and behavior implementation remain concept-stage.",
+    "ENVC-12": "Inspected contact sheet: the final cookbook treatment, B/C/D destination views, six-beat feast ritual, complete HUD, shortcut sequence, Wax Wisp tells and four-family vermin board are present. Typography, metrics and behavior implementation remain concept-stage.",
+    "ENVD-12": "Inspected contact sheet: the final cookbook treatment, B/C/D destination views, six-beat feast ritual, complete HUD, shortcut sequence, Wax Wisp tells and four-family vermin board are present. Typography, metrics and behavior implementation remain concept-stage.",
+    "IN-11": "Inspected contact sheet: the final cookbook treatment, B/C/D destination views, six-beat feast ritual, complete HUD, shortcut sequence, Wax Wisp tells and four-family vermin board are present. Typography, metrics and behavior implementation remain concept-stage.",
+    "HUD-11": "Inspected contact sheet: the final cookbook treatment, B/C/D destination views, six-beat feast ritual, complete HUD, shortcut sequence, Wax Wisp tells and four-family vermin board are present. Typography, metrics and behavior implementation remain concept-stage.",
+    "MECH-11": "Inspected contact sheet: the final cookbook treatment, B/C/D destination views, six-beat feast ritual, complete HUD, shortcut sequence, Wax Wisp tells and four-family vermin board are present. Typography, metrics and behavior implementation remain concept-stage.",
+    "MON-11": "Inspected contact sheet: the final cookbook treatment, B/C/D destination views, six-beat feast ritual, complete HUD, shortcut sequence, Wax Wisp tells and four-family vermin board are present. Typography, metrics and behavior implementation remain concept-stage.",
+    "VER-11": "Inspected contact sheet: the final cookbook treatment, B/C/D destination views, six-beat feast ritual, complete HUD, shortcut sequence, Wax Wisp tells and four-family vermin board are present. Typography, metrics and behavior implementation remain concept-stage.",
+    "IN-12": "Inspected final five sheets: six-frame pop-up intro, compact complete HUD, far-key/receiver study, Brine Hog lure loop and four different courier-vermin silhouettes. All requested panels are present. Text, metrics and proposed behavior require production design approval.",
+    "HUD-12": "Inspected final five sheets: six-frame pop-up intro, compact complete HUD, far-key/receiver study, Brine Hog lure loop and four different courier-vermin silhouettes. All requested panels are present. Text, metrics and proposed behavior require production design approval.",
+    "MECH-12": "Inspected final five sheets: six-frame pop-up intro, compact complete HUD, far-key/receiver study, Brine Hog lure loop and four different courier-vermin silhouettes. All requested panels are present. Text, metrics and proposed behavior require production design approval.",
+    "MON-12": "Inspected final five sheets: six-frame pop-up intro, compact complete HUD, far-key/receiver study, Brine Hog lure loop and four different courier-vermin silhouettes. All requested panels are present. Text, metrics and proposed behavior require production design approval.",
+    "VER-12": "Inspected final five sheets: six-frame pop-up intro, compact complete HUD, far-key/receiver study, Brine Hog lure loop and four different courier-vermin silhouettes. All requested panels are present. Text, metrics and proposed behavior require production design approval."
+  }
+}
