@@ -1,0 +1,17 @@
+{
+  "world": "/Game/Mars/Maps/Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP",
+  "camera": {
+    "at": [
+      -6282.959890998111,
+      -521.5221572291246,
+      112.34599741072304
+    ],
+    "rotation": [
+      62.08999992161946,
+      -12.040022850036538,
+      0.0
+    ]
+  },
+  "dirty_maps": [],
+  "dirty_content": []
+}

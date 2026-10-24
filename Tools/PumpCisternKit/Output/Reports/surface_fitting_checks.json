@@ -1,0 +1,123 @@
+{
+  "tiles": {
+    "WaterworksW": {
+      "source_floor_boxes": 429,
+      "selected_floor_boxes": 429,
+      "exposed_floor_samples": 1287,
+      "missing_floor_samples": 0,
+      "buried_floor_cells_excluded": 0,
+      "floor_boxes_with_center_overhead_below_2_2m": 1,
+      "ceiling_policy": "Only source undersides with 2.2..10m existing clearance; low tunnels retained without vault veneer",
+      "emitted_floor_union_area_m2": 565.75,
+      "ramp_instances_covered": 6,
+      "roles": {
+        "source floor veneer": 576,
+        "source floor seam backing": 576,
+        "source ceiling underside": 491,
+        "source ceiling seam backing": 491,
+        "source exposed wall veneer": 1648,
+        "source wall seam backing": 1648,
+        "source ramp top veneer": 64,
+        "source ramp seam backing": 64
+      },
+      "excluded": {
+        "wall_face_no_overhead_ceiling_above_10m": 193
+      },
+      "ramp_source_area_m2": 168.4176499999999,
+      "ramp_emitted_area_m2": 168.41764999999998,
+      "ramp_normal_offset_max_error_m": 1.547373340571312e-15,
+      "wall_segments_without_overhead_source_box": 498,
+      "selected_floor_bounds": [
+        4.0,
+        11.0,
+        73.5,
+        38.0
+      ]
+    },
+    "Hub": {
+      "source_floor_boxes": 301,
+      "selected_floor_boxes": 34,
+      "exposed_floor_samples": 102,
+      "missing_floor_samples": 0,
+      "buried_floor_cells_excluded": 0,
+      "floor_boxes_with_center_overhead_below_2_2m": 6,
+      "ceiling_policy": "Only source undersides with 2.2..10m existing clearance; low tunnels retained without vault veneer",
+      "emitted_floor_union_area_m2": 89.25,
+      "ramp_instances_covered": 0,
+      "roles": {
+        "source floor veneer": 75,
+        "source floor seam backing": 75,
+        "source ceiling underside": 81,
+        "source ceiling seam backing": 81,
+        "source exposed wall veneer": 107,
+        "source wall seam backing": 107
+      },
+      "excluded": {
+        "outside_rect_floor": 66,
+        "upper_floor": 201,
+        "ramp_outside_scope": 5
+      },
+      "ramp_source_area_m2": 0.0,
+      "ramp_emitted_area_m2": 0.0,
+      "ramp_normal_offset_max_error_m": 0.0,
+      "wall_segments_without_overhead_source_box": 0,
+      "selected_floor_bounds": [
+        4,
+        36,
+        26.0,
+        45
+      ]
+    }
+  },
+  "untouched_semantic_areas": [
+    "All surfaces outside each tile specification rectangle or floor-height range",
+    "Original source actors, collision, galleries, props, water and gameplay mechanisms"
+  ],
+  "evidence_scope": "Pure Python source-surface geometry; requires Unreal and PIE visual acceptance",
+  "rotation_checks": {
+    "positive_pitch_x": [
+      6.123233995736766e-17,
+      0.0,
+      1.0
+    ],
+    "positive_yaw_x": [
+      6.123233995736766e-17,
+      1.0,
+      0.0
+    ],
+    "positive_roll_y": [
+      0.0,
+      6.123233995736766e-17,
+      -1.0
+    ]
+  },
+  "generated_geometry_checks": {
+    "placements": 6084,
+    "invalid_dimensions": 0,
+    "scoped_xy_corner_violations": 0,
+    "hub_xy_corner_violations": 0,
+    "asset_dimensions_metres": {
+      "CCS13": [
+        2.0,
+        2.0,
+        0.050000001117587095
+      ],
+      "CCS15": [
+        2.0,
+        0.3499999940395355,
+        2.9999998807907104
+      ],
+      "CCS18": [
+        2.0,
+        2.0,
+        0.3000000178813935
+      ],
+      "BACKING": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    "all_rows_no_collision": true
+  }
+}

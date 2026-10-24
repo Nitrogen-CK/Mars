@@ -1,0 +1,6 @@
+VERSION 1
+
+0c56938e-d1bb-5933-8ecc-885cdb2a591e:Architecture:Architecture
+8a4c1dca-789b-5950-b61a-3aa93c820808:Mechanisms:Mechanisms
+432c7fa5-3a9d-5156-8a83-ee8cd984a216:Water:Water
+36753a06-5c16-50f6-8bdf-40f867e66b01:Dressing:Dressing

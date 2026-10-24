@@ -1,0 +1,139 @@
+{
+	"material": "M_CCK_TX16",
+	"packagePath": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX16",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "e7a0c14abc87e5a46e3ffd63382be81c",
+		"exporterVersion": 3
+	},
+	"blendMode": "BLEND_Opaque",
+	"twoSided": false,
+	"unlit": false,
+	"shadingModel": "MSM_DefaultLit",
+	"domain": "MD_Surface",
+	"connectedOutputs": [
+		"BaseColor",
+		"Normal"
+	],
+	"expressions":
+	{
+		"TextureSample": 4
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "TextureSample",
+				"name": "MaterialExpressionTextureSample_1",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"Texture": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX16_Parchment_ORM.T_CCK_TX16_Parchment_ORM",
+					"SamplerType": "SAMPLERTYPE_Masks"
+				}
+			},
+			{
+				"id": 1,
+				"class": "TextureSample",
+				"name": "MaterialExpressionTextureSample_3",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"Texture": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX16_Parchment_BaseColor.T_CCK_TX16_Parchment_BaseColor"
+				}
+			},
+			{
+				"id": 2,
+				"class": "TextureSample",
+				"name": "MaterialExpressionTextureSample_4",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"Texture": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX16_Parchment_ORM.T_CCK_TX16_Parchment_ORM",
+					"SamplerType": "SAMPLERTYPE_Masks"
+				}
+			},
+			{
+				"id": 3,
+				"class": "TextureSample",
+				"name": "MaterialExpressionTextureSample_5",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"Texture": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX16_Parchment_NormalDX.T_CCK_TX16_Parchment_NormalDX",
+					"SamplerType": "SAMPLERTYPE_Normal"
+				}
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_BaseColor",
+				"node": 1,
+				"output": 0,
+				"mask": "rgb"
+			},
+			{
+				"property": "MP_Metallic",
+				"node": 2,
+				"output": 3,
+				"mask": "b"
+			},
+			{
+				"property": "MP_Roughness",
+				"node": 2,
+				"output": 2,
+				"mask": "g"
+			},
+			{
+				"property": "MP_Normal",
+				"node": 3,
+				"output": 0,
+				"mask": "rgb"
+			},
+			{
+				"property": "MP_AmbientOcclusion",
+				"node": 2,
+				"output": 1,
+				"mask": "r"
+			}
+		]
+	},
+	"scalarParams": [],
+	"vectorParams": [],
+	"textureParams": [],
+	"usedTextures": [
+		"/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX16_Parchment_NormalDX.T_CCK_TX16_Parchment_NormalDX",
+		"/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX16_Parchment_BaseColor.T_CCK_TX16_Parchment_BaseColor",
+		"/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX16_Parchment_ORM.T_CCK_TX16_Parchment_ORM"
+	]
+}

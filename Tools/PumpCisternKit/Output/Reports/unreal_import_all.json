@@ -1,0 +1,1246 @@
+{
+  "status": "passed",
+  "requested_ids": [
+    "PWC01",
+    "PWC02",
+    "PWC03",
+    "PWC04",
+    "PWC05",
+    "PWC06",
+    "PWC07",
+    "PWC08",
+    "PWC09",
+    "PWC10",
+    "PWC11",
+    "PWC12",
+    "PWC13",
+    "PWC14",
+    "PWC15",
+    "PWC16",
+    "PWC17",
+    "PWC18",
+    "PWC19",
+    "PWC20",
+    "PWC21",
+    "PWC22",
+    "PWC23",
+    "PWC24",
+    "PWC25"
+  ],
+  "destination": "/Game/Mars/Environment/PumpCisternKit",
+  "source_manifest_sha256": "f7ffc576a845047cde0fb15f6e7b68c693c449cd7bc7a007ca1fe77ff858966d",
+  "meshes": [
+    {
+      "id": "PWC01",
+      "path": "/Game/Mars/Environment/PumpCisternKit/Meshes/WarrensC_PWC01_PumpTowerBody_Mars_SM.WarrensC_PWC01_PumpTowerBody_Mars_SM",
+      "actual_dimensions_cm": [
+        200.0,
+        200.0,
+        600.0
+      ],
+      "expected_dimensions_cm": [
+        200.0,
+        200.0,
+        600.0
+      ],
+      "catalog_dimensions_cm": [
+        200.0,
+        200.0,
+        600.0
+      ],
+      "max_axis_error_cm": 0.0,
+      "bounds_origin_cm": [
+        0.0,
+        0.0,
+        300.0
+      ],
+      "material_slots": [
+        {
+          "imported_name": "WarrensC_BlackIron_Mars_MI",
+          "slot_name": "WarrensC_BlackIron_Mars_MI",
+          "key": "TX09",
+          "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX09.M_CCK_TX09"
+        },
+        {
+          "imported_name": "WarrensC_PatinatedCopper_Mars_MI",
+          "slot_name": "WarrensC_PatinatedCopper_Mars_MI",
+          "key": "TX11",
+          "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX11.M_CCK_TX11"
+        }
+      ],
+      "pruned_unreferenced_material_slots": [],
+      "simple_collision_count": 0,
+      "convex_collision_count": 0,
+      "sections_lod0": 2,
+      "source_sha256": "93e656d8fd514683657c69482e7e75d5d69e550c8839f34d18dc7694928d94b2",
+      "blender_to_unreal_axes": "X,-Y,Z",
+      "imported_front_axis": "+Y",
+      "imported_mechanism_yaw_adapter": null
+    },
+    {
+      "id": "PWC02",
+      "path": "/Game/Mars/Environment/PumpCisternKit/Meshes/WarrensC_PWC02_PumpFlywheel_Mars_SM.WarrensC_PWC02_PumpFlywheel_Mars_SM",
+      "actual_dimensions_cm": [
+        90.0,
+        24.00000762939453,
+        90.0
+      ],
+      "expected_dimensions_cm": [
+        90.0,
+        24.0,
+        90.0
+      ],
+      "catalog_dimensions_cm": [
+        90.0,
+        24.0,
+        90.0
+      ],
+      "max_axis_error_cm": 7.62939453125e-06,
+      "bounds_origin_cm": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material_slots": [
+        {
+          "imported_name": "WarrensC_BlackIron_Mars_MI",
+          "slot_name": "WarrensC_BlackIron_Mars_MI",
+          "key": "TX09",
+          "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX09.M_CCK_TX09"
+        },
+        {
+          "imported_name": "WarrensC_PatinatedCopper_Mars_MI",
+          "slot_name": "WarrensC_PatinatedCopper_Mars_MI",
+          "key": "TX11",
+          "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX11.M_CCK_TX11"
+        }
+      ],
+      "pruned_unreferenced_material_slots": [],
+      "simple_collision_count": 0,
+      "convex_collision_count": 0,
+      "sections_lod0": 2,
+      "source_sha256": "32e1a18d2153ab04f93e9af9cb16f97fed0873ec9ea224610253540bf778189b",
+      "blender_to_unreal_axes": "X,-Y,Z",
+      "imported_front_axis": "+Y",
+      "imported_mechanism_yaw_adapter": null
+    },
+    {
+      "id": "PWC03",
+      "path": "/Game/Mars/Environment/PumpCisternKit/Meshes/WarrensC_PWC03_PistonRod_Mars_SM.WarrensC_PWC03_PistonRod_Mars_SM",
+      "actual_dimensions_cm": [
+        24.0,
+        24.0,
+        160.0
+      ],
+      "expected_dimensions_cm": [
+        24.0,
+        24.0,
+        160.0
+      ],
+      "catalog_dimensions_cm": [
+        24.0,
+        24.0,
+        160.0
+      ],
+      "max_axis_error_cm": 0.0,
+      "bounds_origin_cm": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material_slots": [
+        {
+          "imported_name": "WarrensC_BlackIron_Mars_MI",
+          "slot_name": "WarrensC_BlackIron_Mars_MI",
+          "key": "TX09",
+          "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX09.M_CCK_TX09"
+        },
+        {
+          "imported_name": "WarrensC_PatinatedCopper_Mars_MI",
+          "slot_name": "WarrensC_PatinatedCopper_Mars_MI",
+          "key": "TX11",
+          "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX11.M_CCK_TX11"
+        }
+      ],
+      "pruned_unreferenced_material_slots": [],
+      "simple_collision_count": 0,
+      "convex_collision_count": 0,
+      "sections_lod0": 2,
+      "source_sha256": "dfb3ddbf0637afd9060cdf7bd6542ebc0256fef4b5c26529c13962eecd72e16b",
+      "blender_to_unreal_axes": "X,-Y,Z",
+      "imported_front_axis": "+Y",
+      "imported_mechanism_yaw_adapter": null
+    },
+    {
+      "id": "PWC04",
+      "path": "/Game/Mars/Environment/PumpCisternKit/Meshes/WarrensC_PWC04_PumpDiagonalBrace_Mars_SM.WarrensC_PWC04_PumpDiagonalBrace_Mars_SM",
+      "actual_dimensions_cm": [
+        79.99999237060547,
+        35.00000762939453,
+        139.9999988079071
+      ],
+      "expected_dimensions_cm": [
+        80.0,
+        35.0,
+        140.0
+      ],
+      "catalog_dimensions_cm": [
+        80.0,
+        35.0,
+        140.0
+      ],
+      "max_axis_error_cm": 7.62939453125e-06,
+      "bounds_origin_cm": [
+        0.0,
+        0.0,
+        70.00000059604645
+      ],
+      "material_slots": [
+        {
+          "imported_name": "WarrensC_BlackIron_Mars_MI",
+          "slot_name": "WarrensC_BlackIron_Mars_MI",
+          "key": "TX09",
+          "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX09.M_CCK_TX09"
+        },
+        {
+          "imported_name": "WarrensC_PatinatedCopper_Mars_MI",
+          "slot_name": "WarrensC_PatinatedCopper_Mars_MI",
+          "key": "TX11",
+          "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX11.M_CCK_TX11"
+        }
+      ],
+      "pruned_unreferenced_material_slots": [],
+      "simple_collision_count": 0,
+      "convex_collision_count": 0,
+      "sections_lod0": 2,
+      "source_sha256": "de4aa623d67b84efef2418584b5797b899eb573f8e7afe98106f42d6ede896c6",
+      "blender_to_unreal_axes": "X,-Y,Z",
+      "imported_front_axis": "+Y",
+      "imported_mechanism_yaw_adapter": null
+    },
+    {
+      "id": "PWC05",
+      "path": "/Game/Mars/Environment/PumpCisternKit/Meshes/WarrensC_PWC05_PipeStraight_Mars_SM.WarrensC_PWC05_PipeStraight_Mars_SM",
+      "actual_dimensions_cm": [
+        200.0,
+        40.00001525878906,
+        40.0
+      ],
+      "expected_dimensions_cm": [
+        200.0,
+        40.0,
+        40.0
+      ],
+      "catalog_dimensions_cm": [
+        200.0,
+        40.0,
+        40.0
+      ],
+      "max_axis_error_cm": 1.52587890625e-05,
+      "bounds_origin_cm": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material_slots": [
+        {
+          "imported_name": "WarrensC_PatinatedCopper_Mars_MI",
+          "slot_name": "WarrensC_PatinatedCopper_Mars_MI",
+          "key": "TX11",
+          "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX11.M_CCK_TX11"
+        },
+        {
+          "imported_name": "WarrensC_BlackIron_Mars_MI",
+          "slot_name": "WarrensC_BlackIron_Mars_MI",
+          "key": "TX09",
+          "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX09.M_CCK_TX09"
+        }
+      ],
+      "pruned_unreferenced_material_slots": [],
+      "simple_collision_count": 0,
+      "convex_collision_count": 0,
+      "sections_lod0": 2,
+      "source_sha256": "8432c6e1fc099e2445347c3a8c978ad92f8cc368e9bd5800cd0ccb0d10984d9a",
+      "blender_to_unreal_axes": "X,-Y,Z",
+      "imported_front_axis": "+Y",
+      "imported_mechanism_yaw_adapter": null
+    },
+    {
+      "id": "PWC06",
+      "path": "/Game/Mars/Environment/PumpCisternKit/Meshes/WarrensC_PWC06_PipeElbow_Mars_SM.WarrensC_PWC06_PipeElbow_Mars_SM",
+      "actual_dimensions_cm": [
+        80.00000762939453,
+        80.0,
+        40.0
+      ],
+      "expected_dimensions_cm": [
+        80.0,
+        80.0,
+        40.0
+      ],
+      "catalog_dimensions_cm": [
+        80.0,
+        80.0,
+        40.0
+      ],
+      "max_axis_error_cm": 7.62939453125e-06,
+      "bounds_origin_cm": [
+        0.0,
+        -3.814697265625e-06,
+        0.0
+      ],
+      "material_slots": [
+        {
+          "imported_name": "WarrensC_PatinatedCopper_Mars_MI",
+          "slot_name": "WarrensC_PatinatedCopper_Mars_MI",
+          "key": "TX11",
+          "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX11.M_CCK_TX11"
+        },
+        {
+          "imported_name": "WarrensC_BlackIron_Mars_MI",
+          "slot_name": "WarrensC_BlackIron_Mars_MI",
+          "key": "TX09",
+          "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX09.M_CCK_TX09"
+        }
+      ],
+      "pruned_unreferenced_material_slots": [],
+      "simple_collision_count": 0,
+      "convex_collision_count": 0,
+      "sections_lod0": 2,
+      "source_sha256": "9a26f700643c5734990612abb50dc2a796eeaa0e992c26e5aab8ab4e9fc630b1",
+      "blender_to_unreal_axes": "X,-Y,Z",
+      "imported_front_axis": "+Y",
+      "imported_mechanism_yaw_adapter": null
+    },
+    {
+      "id": "PWC07",
+      "path": "/Game/Mars/Environment/PumpCisternKit/Meshes/WarrensC_PWC07_PipeCollar_Mars_SM.WarrensC_PWC07_PipeCollar_Mars_SM",
+      "actual_dimensions_cm": [
+        18.000003814697266,
+        50.0,
+        50.0
+      ],
+      "expected_dimensions_cm": [
+        18.0,
+        50.0,
+        50.0
+      ],
+      "catalog_dimensions_cm": [
+        18.0,
+        50.0,
+        50.0
+      ],
+      "max_axis_error_cm": 3.814697265625e-06,
+      "bounds_origin_cm": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material_slots": [
+        {
+          "imported_name": "WarrensC_BlackIron_Mars_MI",
+          "slot_name": "WarrensC_BlackIron_Mars_MI",
+          "key": "TX09",
+          "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX09.M_CCK_TX09"
+        }
+      ],
+      "pruned_unreferenced_material_slots": [],
+      "simple_collision_count": 0,
+      "convex_collision_count": 0,
+      "sections_lod0": 1,
+      "source_sha256": "1dc7f890bfd546eaa73ee88c692ea5b18e5f7837b4b587901adc675fea002048",
+      "blender_to_unreal_axes": "X,-Y,Z",
+      "imported_front_axis": "+Y",
+      "imported_mechanism_yaw_adapter": null
+    },
+    {
+      "id": "PWC08",
+      "path": "/Game/Mars/Environment/PumpCisternKit/Meshes/WarrensC_PWC08_PipeWallBracket_Mars_SM.WarrensC_PWC08_PipeWallBracket_Mars_SM",
+      "actual_dimensions_cm": [
+        35.00000190734863,
+        30.000003814697266,
+        64.9999988079071
+      ],
+      "expected_dimensions_cm": [
+        35.0,
+        30.0,
+        65.0
+      ],
+      "catalog_dimensions_cm": [
+        35.0,
+        30.0,
+        65.0
+      ],
+      "max_axis_error_cm": 3.814697265625e-06,
+      "bounds_origin_cm": [
+        9.5367431640625e-07,
+        0.0,
+        32.50000059604645
+      ],
+      "material_slots": [
+        {
+          "imported_name": "WarrensC_BlackIron_Mars_MI",
+          "slot_name": "WarrensC_BlackIron_Mars_MI",
+          "key": "TX09",
+          "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX09.M_CCK_TX09"
+        },
+        {
+          "imported_name": "WarrensC_PatinatedCopper_Mars_MI",
+          "slot_name": "WarrensC_PatinatedCopper_Mars_MI",
+          "key": "TX11",
+          "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX11.M_CCK_TX11"
+        }
+      ],
+      "pruned_unreferenced_material_slots": [],
+      "simple_collision_count": 0,
+      "convex_collision_count": 0,
+      "sections_lod0": 2,
+      "source_sha256": "38f1cd62f1c1ddfbda01832136629a9d0c81d6a76d9719b24204e968bbd4006c",
+      "blender_to_unreal_axes": "X,-Y,Z",
+      "imported_front_axis": "+Y",
+      "imported_mechanism_yaw_adapter": null
+    },
+    {
+      "id": "PWC09",
+      "path": "/Game/Mars/Environment/PumpCisternKit/Meshes/WarrensC_PWC09_PipeEndCap_Mars_SM.WarrensC_PWC09_PipeEndCap_Mars_SM",
+      "actual_dimensions_cm": [
+        12.000001907348633,
+        50.0,
+        50.0
+      ],
+      "expected_dimensions_cm": [
+        12.0,
+        50.0,
+        50.0
+      ],
+      "catalog_dimensions_cm": [
+        12.0,
+        50.0,
+        50.0
+      ],
+      "max_axis_error_cm": 1.9073486328125e-06,
+      "bounds_origin_cm": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material_slots": [
+        {
+          "imported_name": "WarrensC_BlackIron_Mars_MI",
+          "slot_name": "WarrensC_BlackIron_Mars_MI",
+          "key": "TX09",
+          "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX09.M_CCK_TX09"
+        },
+        {
+          "imported_name": "WarrensC_PatinatedCopper_Mars_MI",
+          "slot_name": "WarrensC_PatinatedCopper_Mars_MI",
+          "key": "TX11",
+          "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX11.M_CCK_TX11"
+        }
+      ],
+      "pruned_unreferenced_material_slots": [],
+      "simple_collision_count": 0,
+      "convex_collision_count": 0,
+      "sections_lod0": 2,
+      "source_sha256": "339c064cf588f6daa472affd453ec4d76625650b15cf6dc929ce586b82530079",
+      "blender_to_unreal_axes": "X,-Y,Z",
+      "imported_front_axis": "+Y",
+      "imported_mechanism_yaw_adapter": null
+    },
+    {
+      "id": "PWC10",
+      "path": "/Game/Mars/Environment/PumpCisternKit/Meshes/WarrensC_PWC10_CisternRimStraight_Mars_SM.WarrensC_PWC10_CisternRimStraight_Mars_SM",
+      "actual_dimensions_cm": [
+        200.0,
+        55.00001525878906,
+        55.00000059604645
+      ],
+      "expected_dimensions_cm": [
+        200.0,
+        55.0,
+        55.0
+      ],
+      "catalog_dimensions_cm": [
+        200.0,
+        55.0,
+        55.0
+      ],
+      "max_axis_error_cm": 1.52587890625e-05,
+      "bounds_origin_cm": [
+        0.0,
+        0.0,
+        27.499999701976776
+      ],
+      "material_slots": [
+        {
+          "imported_name": "WarrensC_CaveRock_Mars_MI",
+          "slot_name": "WarrensC_CaveRock_Mars_MI",
+          "key": "TX04",
+          "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX04.M_CCK_TX04"
+        },
+        {
+          "imported_name": "WarrensC_BroadFlagstone_Mars_MI",
+          "slot_name": "WarrensC_BroadFlagstone_Mars_MI",
+          "key": "TX02",
+          "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX02.M_CCK_TX02"
+        }
+      ],
+      "pruned_unreferenced_material_slots": [],
+      "simple_collision_count": 0,
+      "convex_collision_count": 0,
+      "sections_lod0": 2,
+      "source_sha256": "ab45889ba4336276d7e7848129355acc5eb51a7110d3b8fde3e499bbafb7b538",
+      "blender_to_unreal_axes": "X,-Y,Z",
+      "imported_front_axis": "+Y",
+      "imported_mechanism_yaw_adapter": null
+    },
+    {
+      "id": "PWC11",
+      "path": "/Game/Mars/Environment/PumpCisternKit/Meshes/WarrensC_PWC11_CisternRimInnerCorner_Mars_SM.WarrensC_PWC11_CisternRimInnerCorner_Mars_SM",
+      "actual_dimensions_cm": [
+        79.99999618530273,
+        80.00000762939453,
+        55.00000059604645
+      ],
+      "expected_dimensions_cm": [
+        80.0,
+        80.0,
+        55.0
+      ],
+      "catalog_dimensions_cm": [
+        80.0,
+        80.0,
+        55.0
+      ],
+      "max_axis_error_cm": 7.62939453125e-06,
+      "bounds_origin_cm": [
+        -1.9073486328125e-06,
+        0.0,
+        27.499999701976776
+      ],
+      "material_slots": [
+        {
+          "imported_name": "WarrensC_CaveRock_Mars_MI",
+          "slot_name": "WarrensC_CaveRock_Mars_MI",
+          "key": "TX04",
+          "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX04.M_CCK_TX04"
+        }
+      ],
+      "pruned_unreferenced_material_slots": [],
+      "simple_collision_count": 0,
+      "convex_collision_count": 0,
+      "sections_lod0": 1,
+      "source_sha256": "87fda48f4a63849b7f3ff99045dc2e7e4910c5f9a1410c023fbaa65e1e1ad45b",
+      "blender_to_unreal_axes": "X,-Y,Z",
+      "imported_front_axis": "+Y",
+      "imported_mechanism_yaw_adapter": null
+    },
+    {
+      "id": "PWC12",
+      "path": "/Game/Mars/Environment/PumpCisternKit/Meshes/WarrensC_PWC12_CisternRimEnd_Mars_SM.WarrensC_PWC12_CisternRimEnd_Mars_SM",
+      "actual_dimensions_cm": [
+        60.00000762939453,
+        55.000003814697266,
+        55.00000059604645
+      ],
+      "expected_dimensions_cm": [
+        60.0,
+        55.0,
+        55.0
+      ],
+      "catalog_dimensions_cm": [
+        60.0,
+        55.0,
+        55.0
+      ],
+      "max_axis_error_cm": 7.62939453125e-06,
+      "bounds_origin_cm": [
+        0.0,
+        0.0,
+        27.499999701976776
+      ],
+      "material_slots": [
+        {
+          "imported_name": "WarrensC_CaveRock_Mars_MI",
+          "slot_name": "WarrensC_CaveRock_Mars_MI",
+          "key": "TX04",
+          "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX04.M_CCK_TX04"
+        },
+        {
+          "imported_name": "WarrensC_BroadFlagstone_Mars_MI",
+          "slot_name": "WarrensC_BroadFlagstone_Mars_MI",
+          "key": "TX02",
+          "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX02.M_CCK_TX02"
+        }
+      ],
+      "pruned_unreferenced_material_slots": [],
+      "simple_collision_count": 0,
+      "convex_collision_count": 0,
+      "sections_lod0": 2,
+      "source_sha256": "31031b7e3c316a1670c82ba9cc9c33e30033b36798de1bfff3a2919e219f22a4",
+      "blender_to_unreal_axes": "X,-Y,Z",
+      "imported_front_axis": "+Y",
+      "imported_mechanism_yaw_adapter": null
+    },
+    {
+      "id": "PWC13",
+      "path": "/Game/Mars/Environment/PumpCisternKit/Meshes/WarrensC_PWC13_WaterGaugeBoard_Mars_SM.WarrensC_PWC13_WaterGaugeBoard_Mars_SM",
+      "actual_dimensions_cm": [
+        35.0,
+        12.000002384185791,
+        150.0
+      ],
+      "expected_dimensions_cm": [
+        35.0,
+        12.0,
+        150.0
+      ],
+      "catalog_dimensions_cm": [
+        35.0,
+        12.0,
+        150.0
+      ],
+      "max_axis_error_cm": 2.384185791015625e-06,
+      "bounds_origin_cm": [
+        0.0,
+        -2.384185791015625e-07,
+        75.0
+      ],
+      "material_slots": [
+        {
+          "imported_name": "WarrensC_DarkTimber_Mars_MI",
+          "slot_name": "WarrensC_DarkTimber_Mars_MI",
+          "key": "TX08",
+          "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX08.M_CCK_TX08"
+        },
+        {
+          "imported_name": "WarrensC_BlackIron_Mars_MI",
+          "slot_name": "WarrensC_BlackIron_Mars_MI",
+          "key": "TX09",
+          "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX09.M_CCK_TX09"
+        }
+      ],
+      "pruned_unreferenced_material_slots": [],
+      "simple_collision_count": 0,
+      "convex_collision_count": 0,
+      "sections_lod0": 2,
+      "source_sha256": "c5ebb771698f6030eea8f04606a61f16592c2409a04f2f0b35e3aa88bceb2d91",
+      "blender_to_unreal_axes": "X,-Y,Z",
+      "imported_front_axis": "+Y",
+      "imported_mechanism_yaw_adapter": null
+    },
+    {
+      "id": "PWC14",
+      "path": "/Game/Mars/Environment/PumpCisternKit/Meshes/WarrensC_PWC14_RootFork_Mars_SM.WarrensC_PWC14_RootFork_Mars_SM",
+      "actual_dimensions_cm": [
+        200.0,
+        70.0,
+        250.0
+      ],
+      "expected_dimensions_cm": [
+        200.0,
+        70.0,
+        250.0
+      ],
+      "catalog_dimensions_cm": [
+        200.0,
+        70.0,
+        250.0
+      ],
+      "max_axis_error_cm": 0.0,
+      "bounds_origin_cm": [
+        0.0,
+        0.0,
+        125.0
+      ],
+      "material_slots": [
+        {
+          "imported_name": "WarrensC_DarkTimber_Mars_MI",
+          "slot_name": "WarrensC_DarkTimber_Mars_MI",
+          "key": "TX08",
+          "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX08.M_CCK_TX08"
+        }
+      ],
+      "pruned_unreferenced_material_slots": [],
+      "simple_collision_count": 0,
+      "convex_collision_count": 0,
+      "sections_lod0": 1,
+      "source_sha256": "f014eeb30fc080251440b16704c04372bc3f001ffbea2ef00ee2d3d149bad9d5",
+      "blender_to_unreal_axes": "X,-Y,Z",
+      "imported_front_axis": "+Y",
+      "imported_mechanism_yaw_adapter": null
+    },
+    {
+      "id": "PWC15",
+      "path": "/Game/Mars/Environment/PumpCisternKit/Meshes/WarrensC_PWC15_RootTendril_Mars_SM.WarrensC_PWC15_RootTendril_Mars_SM",
+      "actual_dimensions_cm": [
+        49.999996185302734,
+        45.0,
+        220.0000023841858
+      ],
+      "expected_dimensions_cm": [
+        50.0,
+        45.0,
+        220.00001
+      ],
+      "catalog_dimensions_cm": [
+        50.0,
+        45.0,
+        220.0
+      ],
+      "max_axis_error_cm": 7.6158142121585115e-06,
+      "bounds_origin_cm": [
+        0.0,
+        0.0,
+        109.9999988079071
+      ],
+      "material_slots": [
+        {
+          "imported_name": "WarrensC_DarkTimber_Mars_MI",
+          "slot_name": "WarrensC_DarkTimber_Mars_MI",
+          "key": "TX08",
+          "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX08.M_CCK_TX08"
+        }
+      ],
+      "pruned_unreferenced_material_slots": [],
+      "simple_collision_count": 0,
+      "convex_collision_count": 0,
+      "sections_lod0": 1,
+      "source_sha256": "04bbc332a459876432e33ceb14ecf57bbfe21f351521a458a0e393634b1a4232",
+      "blender_to_unreal_axes": "X,-Y,Z",
+      "imported_front_axis": "+Y",
+      "imported_mechanism_yaw_adapter": null
+    },
+    {
+      "id": "PWC16",
+      "path": "/Game/Mars/Environment/PumpCisternKit/Meshes/WarrensC_PWC16_RootSocketCollar_Mars_SM.WarrensC_PWC16_RootSocketCollar_Mars_SM",
+      "actual_dimensions_cm": [
+        100.0,
+        45.000003814697266,
+        34.999999701976776
+      ],
+      "expected_dimensions_cm": [
+        100.0,
+        45.0,
+        35.0
+      ],
+      "catalog_dimensions_cm": [
+        100.0,
+        45.0,
+        35.0
+      ],
+      "max_axis_error_cm": 3.814697265625e-06,
+      "bounds_origin_cm": [
+        0.0,
+        0.0,
+        17.500000149011612
+      ],
+      "material_slots": [
+        {
+          "imported_name": "WarrensC_CaveRock_Mars_MI",
+          "slot_name": "WarrensC_CaveRock_Mars_MI",
+          "key": "TX04",
+          "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX04.M_CCK_TX04"
+        },
+        {
+          "imported_name": "WarrensC_DarkTimber_Mars_MI",
+          "slot_name": "WarrensC_DarkTimber_Mars_MI",
+          "key": "TX08",
+          "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX08.M_CCK_TX08"
+        }
+      ],
+      "pruned_unreferenced_material_slots": [],
+      "simple_collision_count": 0,
+      "convex_collision_count": 0,
+      "sections_lod0": 2,
+      "source_sha256": "2a8fff9c8b4101ecfe74b8e1d2b382092b4ac204971edd5138a8b8912230b2dc",
+      "blender_to_unreal_axes": "X,-Y,Z",
+      "imported_front_axis": "+Y",
+      "imported_mechanism_yaw_adapter": null
+    },
+    {
+      "id": "PWC17",
+      "path": "/Game/Mars/Environment/PumpCisternKit/Meshes/WarrensC_PWC17_CisternBedPebbleCluster_Mars_SM.WarrensC_PWC17_CisternBedPebbleCluster_Mars_SM",
+      "actual_dimensions_cm": [
+        100.0,
+        80.0,
+        15.00000125169754
+      ],
+      "expected_dimensions_cm": [
+        100.0,
+        80.0,
+        15.0
+      ],
+      "catalog_dimensions_cm": [
+        100.0,
+        80.0,
+        15.0
+      ],
+      "max_axis_error_cm": 1.2516975402832031e-06,
+      "bounds_origin_cm": [
+        0.0,
+        0.0,
+        -7.500000327825546
+      ],
+      "material_slots": [
+        {
+          "imported_name": "WarrensC_CaveRock_Mars_MI",
+          "slot_name": "WarrensC_CaveRock_Mars_MI",
+          "key": "TX04",
+          "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX04.M_CCK_TX04"
+        }
+      ],
+      "pruned_unreferenced_material_slots": [],
+      "simple_collision_count": 0,
+      "convex_collision_count": 0,
+      "sections_lod0": 1,
+      "source_sha256": "7178087528d8a757b34ccecd0200a29a60f177ff4f7b3d18e28becf683ead0f2",
+      "blender_to_unreal_axes": "X,-Y,Z",
+      "imported_front_axis": "+Y",
+      "imported_mechanism_yaw_adapter": null
+    },
+    {
+      "id": "PWC18",
+      "path": "/Game/Mars/Environment/PumpCisternKit/Meshes/WarrensC_PWC18_PipeRepairWrap_Mars_SM.WarrensC_PWC18_PipeRepairWrap_Mars_SM",
+      "actual_dimensions_cm": [
+        70.00000762939453,
+        55.00000762939453,
+        55.0
+      ],
+      "expected_dimensions_cm": [
+        70.0,
+        55.0,
+        55.0
+      ],
+      "catalog_dimensions_cm": [
+        70.0,
+        55.0,
+        55.0
+      ],
+      "max_axis_error_cm": 7.62939453125e-06,
+      "bounds_origin_cm": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "material_slots": [
+        {
+          "imported_name": "WarrensC_BlackIron_Mars_MI",
+          "slot_name": "WarrensC_BlackIron_Mars_MI",
+          "key": "TX09",
+          "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX09.M_CCK_TX09"
+        },
+        {
+          "imported_name": "WarrensC_PatinatedCopper_Mars_MI",
+          "slot_name": "WarrensC_PatinatedCopper_Mars_MI",
+          "key": "TX11",
+          "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX11.M_CCK_TX11"
+        }
+      ],
+      "pruned_unreferenced_material_slots": [],
+      "simple_collision_count": 0,
+      "convex_collision_count": 0,
+      "sections_lod0": 2,
+      "source_sha256": "324d85de8638759a47b97e909f9381568aca72f6e248819eaa8fa762c51f23a4",
+      "blender_to_unreal_axes": "X,-Y,Z",
+      "imported_front_axis": "+Y",
+      "imported_mechanism_yaw_adapter": null
+    },
+    {
+      "id": "PWC19",
+      "path": "/Game/Mars/Environment/PumpCisternKit/Meshes/WarrensC_PWC19_ToolRack_Mars_SM.WarrensC_PWC19_ToolRack_Mars_SM",
+      "actual_dimensions_cm": [
+        100.0,
+        25.00000762939453,
+        139.9999988079071
+      ],
+      "expected_dimensions_cm": [
+        100.0,
+        25.0,
+        140.0
+      ],
+      "catalog_dimensions_cm": [
+        100.0,
+        25.0,
+        140.0
+      ],
+      "max_axis_error_cm": 7.62939453125e-06,
+      "bounds_origin_cm": [
+        0.0,
+        0.0,
+        70.00000059604645
+      ],
+      "material_slots": [
+        {
+          "imported_name": "WarrensC_DarkTimber_Mars_MI",
+          "slot_name": "WarrensC_DarkTimber_Mars_MI",
+          "key": "TX08",
+          "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX08.M_CCK_TX08"
+        }
+      ],
+      "pruned_unreferenced_material_slots": [],
+      "simple_collision_count": 0,
+      "convex_collision_count": 0,
+      "sections_lod0": 1,
+      "source_sha256": "202ea9c6e49b08c2821131aa6ab7c1aedefdd8dfeee3fbb791a60e1c193165ee",
+      "blender_to_unreal_axes": "X,-Y,Z",
+      "imported_front_axis": "+Y",
+      "imported_mechanism_yaw_adapter": null
+    },
+    {
+      "id": "PWC20",
+      "path": "/Game/Mars/Environment/PumpCisternKit/Meshes/WarrensC_PWC20_Spanner_Mars_SM.WarrensC_PWC20_Spanner_Mars_SM",
+      "actual_dimensions_cm": [
+        55.0,
+        12.000001430511475,
+        15.000000953674316
+      ],
+      "expected_dimensions_cm": [
+        55.0,
+        12.0,
+        15.0
+      ],
+      "catalog_dimensions_cm": [
+        55.0,
+        12.0,
+        15.0
+      ],
+      "max_axis_error_cm": 1.430511474609375e-06,
+      "bounds_origin_cm": [
+        0.0,
+        1.6689300537109375e-06,
+        0.0
+      ],
+      "material_slots": [
+        {
+          "imported_name": "WarrensC_BlackIron_Mars_MI",
+          "slot_name": "WarrensC_BlackIron_Mars_MI",
+          "key": "TX09",
+          "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX09.M_CCK_TX09"
+        }
+      ],
+      "pruned_unreferenced_material_slots": [],
+      "simple_collision_count": 0,
+      "convex_collision_count": 0,
+      "sections_lod0": 1,
+      "source_sha256": "8baa576c661fafd1bc1d2ee5bfea860bbab51162e263cf58bfc22b12c03159d9",
+      "blender_to_unreal_axes": "X,-Y,Z",
+      "imported_front_axis": "+Y",
+      "imported_mechanism_yaw_adapter": null
+    },
+    {
+      "id": "PWC21",
+      "path": "/Game/Mars/Environment/PumpCisternKit/Meshes/WarrensC_PWC21_Bucket_Mars_SM.WarrensC_PWC21_Bucket_Mars_SM",
+      "actual_dimensions_cm": [
+        45.0,
+        45.0,
+        50.0
+      ],
+      "expected_dimensions_cm": [
+        45.0,
+        45.0,
+        50.0
+      ],
+      "catalog_dimensions_cm": [
+        45.0,
+        45.0,
+        50.0
+      ],
+      "max_axis_error_cm": 0.0,
+      "bounds_origin_cm": [
+        0.0,
+        0.0,
+        25.0
+      ],
+      "material_slots": [
+        {
+          "imported_name": "WarrensC_BlackIron_Mars_MI",
+          "slot_name": "WarrensC_BlackIron_Mars_MI",
+          "key": "TX09",
+          "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX09.M_CCK_TX09"
+        },
+        {
+          "imported_name": "WarrensC_PatinatedCopper_Mars_MI",
+          "slot_name": "WarrensC_PatinatedCopper_Mars_MI",
+          "key": "TX11",
+          "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX11.M_CCK_TX11"
+        }
+      ],
+      "pruned_unreferenced_material_slots": [],
+      "simple_collision_count": 0,
+      "convex_collision_count": 0,
+      "sections_lod0": 2,
+      "source_sha256": "0b1543621860fe6ef6e0c2d04c62f3214bf650ae006efa47f09adbc84c1125aa",
+      "blender_to_unreal_axes": "X,-Y,Z",
+      "imported_front_axis": "+Y",
+      "imported_mechanism_yaw_adapter": null
+    },
+    {
+      "id": "PWC22",
+      "path": "/Game/Mars/Environment/PumpCisternKit/Meshes/WarrensC_PWC22_TallowDripTray_Mars_SM.WarrensC_PWC22_TallowDripTray_Mars_SM",
+      "actual_dimensions_cm": [
+        60.00000762939453,
+        40.000003814697266,
+        7.999999910593033
+      ],
+      "expected_dimensions_cm": [
+        60.0,
+        40.0,
+        8.0
+      ],
+      "catalog_dimensions_cm": [
+        60.0,
+        40.0,
+        8.0
+      ],
+      "max_axis_error_cm": 7.62939453125e-06,
+      "bounds_origin_cm": [
+        0.0,
+        0.0,
+        4.000000044703484
+      ],
+      "material_slots": [
+        {
+          "imported_name": "WarrensC_BlackIron_Mars_MI",
+          "slot_name": "WarrensC_BlackIron_Mars_MI",
+          "key": "TX09",
+          "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX09.M_CCK_TX09"
+        },
+        {
+          "imported_name": "WarrensC_PatinatedCopper_Mars_MI",
+          "slot_name": "WarrensC_PatinatedCopper_Mars_MI",
+          "key": "TX11",
+          "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX11.M_CCK_TX11"
+        }
+      ],
+      "pruned_unreferenced_material_slots": [],
+      "simple_collision_count": 0,
+      "convex_collision_count": 0,
+      "sections_lod0": 2,
+      "source_sha256": "9768be8631641f88026008f5ac4b793539f84ad06dcf6dbfda702b47c70811d4",
+      "blender_to_unreal_axes": "X,-Y,Z",
+      "imported_front_axis": "+Y",
+      "imported_mechanism_yaw_adapter": null
+    },
+    {
+      "id": "PWC23",
+      "path": "/Game/Mars/Environment/PumpCisternKit/Meshes/WarrensC_PWC23_CandleStub_Mars_SM.WarrensC_PWC23_CandleStub_Mars_SM",
+      "actual_dimensions_cm": [
+        15.000000953674316,
+        15.000000953674316,
+        30.00000250339508
+      ],
+      "expected_dimensions_cm": [
+        15.0,
+        15.0,
+        30.0
+      ],
+      "catalog_dimensions_cm": [
+        15.0,
+        15.0,
+        30.0
+      ],
+      "max_axis_error_cm": 2.5033950805664062e-06,
+      "bounds_origin_cm": [
+        0.0,
+        0.0,
+        15.000000655651093
+      ],
+      "material_slots": [
+        {
+          "imported_name": "WarrensC_Parchment_Mars_MI",
+          "slot_name": "WarrensC_Parchment_Mars_MI",
+          "key": "TX16",
+          "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX16.M_CCK_TX16"
+        },
+        {
+          "imported_name": "WarrensC_BlackIron_Mars_MI",
+          "slot_name": "WarrensC_BlackIron_Mars_MI",
+          "key": "TX09",
+          "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX09.M_CCK_TX09"
+        }
+      ],
+      "pruned_unreferenced_material_slots": [],
+      "simple_collision_count": 0,
+      "convex_collision_count": 0,
+      "sections_lod0": 2,
+      "source_sha256": "215ae6bc31b5c5587f41f59428044293dd353197acb531e81a27307b7abb2801",
+      "blender_to_unreal_axes": "X,-Y,Z",
+      "imported_front_axis": "+Y",
+      "imported_mechanism_yaw_adapter": null
+    },
+    {
+      "id": "PWC24",
+      "path": "/Game/Mars/Environment/PumpCisternKit/Meshes/WarrensC_PWC24_ClothBanner_Mars_SM.WarrensC_PWC24_ClothBanner_Mars_SM",
+      "actual_dimensions_cm": [
+        70.0,
+        5.000005722045898,
+        120.00001001358032
+      ],
+      "expected_dimensions_cm": [
+        70.0,
+        5.0,
+        120.00001
+      ],
+      "catalog_dimensions_cm": [
+        70.0,
+        5.0,
+        120.0
+      ],
+      "max_axis_error_cm": 5.7220458984375e-06,
+      "bounds_origin_cm": [
+        0.0,
+        0.0,
+        60.00000262260437
+      ],
+      "material_slots": [
+        {
+          "imported_name": "WarrensC_DarkTimber_Mars_MI",
+          "slot_name": "WarrensC_DarkTimber_Mars_MI",
+          "key": "TX08",
+          "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX08.M_CCK_TX08"
+        },
+        {
+          "imported_name": "WarrensC_LinenCanvas_Mars_MI",
+          "slot_name": "WarrensC_LinenCanvas_Mars_MI",
+          "key": "TX12",
+          "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX12.M_CCK_TX12"
+        }
+      ],
+      "pruned_unreferenced_material_slots": [],
+      "simple_collision_count": 0,
+      "convex_collision_count": 0,
+      "sections_lod0": 2,
+      "source_sha256": "3258a34ef590adcf67868c7d01b83b3483ddc2bc05539683a9f9f71a8ab56367",
+      "blender_to_unreal_axes": "X,-Y,Z",
+      "imported_front_axis": "+Y",
+      "imported_mechanism_yaw_adapter": null
+    },
+    {
+      "id": "PWC25",
+      "path": "/Game/Mars/Environment/PumpCisternKit/Meshes/WarrensC_PWC25_CisternWaterSurface_Mars_SM.WarrensC_PWC25_CisternWaterSurface_Mars_SM",
+      "actual_dimensions_cm": [
+        1150.0000610351562,
+        1100.0000610351562,
+        0.0
+      ],
+      "expected_dimensions_cm": [
+        1150.0,
+        1100.0,
+        0.0
+      ],
+      "catalog_dimensions_cm": [
+        1150.0,
+        1100.0,
+        0.0
+      ],
+      "max_axis_error_cm": 6.103515625e-05,
+      "bounds_origin_cm": [
+        -3.0517578125e-05,
+        -3.0517578125e-05,
+        0.0
+      ],
+      "material_slots": [
+        {
+          "imported_name": "CCK_FX_ShallowWater",
+          "slot_name": "CCK_FX_ShallowWater",
+          "key": "FX_ShallowWater",
+          "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_FX_ShallowWater.M_CCK_FX_ShallowWater"
+        }
+      ],
+      "pruned_unreferenced_material_slots": [],
+      "simple_collision_count": 0,
+      "convex_collision_count": 0,
+      "sections_lod0": 1,
+      "source_sha256": "218f5f177b6f30c9136a3763e628ea0fe0d6679aa3488033fefc5823114e9492",
+      "blender_to_unreal_axes": "X,-Y,Z",
+      "imported_front_axis": "+Y",
+      "imported_mechanism_yaw_adapter": null
+    }
+  ],
+  "materials": {
+    "FX_ShallowWater": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_FX_ShallowWater.M_CCK_FX_ShallowWater",
+    "TX01": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX01.M_CCK_TX01",
+    "TX02": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX02.M_CCK_TX02",
+    "TX03": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX03.M_CCK_TX03",
+    "TX04": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX04.M_CCK_TX04",
+    "TX05": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX05.M_CCK_TX05",
+    "TX06": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX06.M_CCK_TX06",
+    "TX07": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX07.M_CCK_TX07",
+    "TX08": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX08.M_CCK_TX08",
+    "TX09": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX09.M_CCK_TX09",
+    "TX10": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX10.M_CCK_TX10",
+    "TX11": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX11.M_CCK_TX11",
+    "TX12": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX12.M_CCK_TX12",
+    "TX13": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX13.M_CCK_TX13",
+    "TX14": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX14.M_CCK_TX14",
+    "TX15": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX15.M_CCK_TX15",
+    "TX16": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX16.M_CCK_TX16",
+    "TX17": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX17.M_CCK_TX17",
+    "TX18": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX18.M_CCK_TX18",
+    "TX19": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX19.M_CCK_TX19"
+  },
+  "textures": {
+    "textures/fx/Water_NormalDX.png": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_Water_NormalDX.T_CCK_Water_NormalDX",
+    "textures/surfaces/TX01_LimestoneAshlar_BaseColor.png": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX01_LimestoneAshlar_BaseColor.T_CCK_TX01_LimestoneAshlar_BaseColor",
+    "textures/surfaces/TX01_LimestoneAshlar_NormalDX.png": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX01_LimestoneAshlar_NormalDX.T_CCK_TX01_LimestoneAshlar_NormalDX",
+    "textures/surfaces/TX01_LimestoneAshlar_ORM.png": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX01_LimestoneAshlar_ORM.T_CCK_TX01_LimestoneAshlar_ORM",
+    "textures/surfaces/TX02_BroadFlagstone_BaseColor.png": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX02_BroadFlagstone_BaseColor.T_CCK_TX02_BroadFlagstone_BaseColor",
+    "textures/surfaces/TX02_BroadFlagstone_NormalDX.png": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX02_BroadFlagstone_NormalDX.T_CCK_TX02_BroadFlagstone_NormalDX",
+    "textures/surfaces/TX02_BroadFlagstone_ORM.png": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX02_BroadFlagstone_ORM.T_CCK_TX02_BroadFlagstone_ORM",
+    "textures/surfaces/TX03_LimePlaster_BaseColor.png": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX03_LimePlaster_BaseColor.T_CCK_TX03_LimePlaster_BaseColor",
+    "textures/surfaces/TX03_LimePlaster_NormalDX.png": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX03_LimePlaster_NormalDX.T_CCK_TX03_LimePlaster_NormalDX",
+    "textures/surfaces/TX03_LimePlaster_ORM.png": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX03_LimePlaster_ORM.T_CCK_TX03_LimePlaster_ORM",
+    "textures/surfaces/TX04_CaveRock_BaseColor.png": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX04_CaveRock_BaseColor.T_CCK_TX04_CaveRock_BaseColor",
+    "textures/surfaces/TX04_CaveRock_NormalDX.png": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX04_CaveRock_NormalDX.T_CCK_TX04_CaveRock_NormalDX",
+    "textures/surfaces/TX04_CaveRock_ORM.png": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX04_CaveRock_ORM.T_CCK_TX04_CaveRock_ORM",
+    "textures/surfaces/TX05_SaltCrust_BaseColor.png": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX05_SaltCrust_BaseColor.T_CCK_TX05_SaltCrust_BaseColor",
+    "textures/surfaces/TX05_SaltCrust_NormalDX.png": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX05_SaltCrust_NormalDX.T_CCK_TX05_SaltCrust_NormalDX",
+    "textures/surfaces/TX05_SaltCrust_ORM.png": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX05_SaltCrust_ORM.T_CCK_TX05_SaltCrust_ORM",
+    "textures/surfaces/TX06_BoneIvory_BaseColor.png": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX06_BoneIvory_BaseColor.T_CCK_TX06_BoneIvory_BaseColor",
+    "textures/surfaces/TX06_BoneIvory_NormalDX.png": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX06_BoneIvory_NormalDX.T_CCK_TX06_BoneIvory_NormalDX",
+    "textures/surfaces/TX06_BoneIvory_ORM.png": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX06_BoneIvory_ORM.T_CCK_TX06_BoneIvory_ORM",
+    "textures/surfaces/TX07_OakPlank_BaseColor.png": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX07_OakPlank_BaseColor.T_CCK_TX07_OakPlank_BaseColor",
+    "textures/surfaces/TX07_OakPlank_NormalDX.png": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX07_OakPlank_NormalDX.T_CCK_TX07_OakPlank_NormalDX",
+    "textures/surfaces/TX07_OakPlank_ORM.png": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX07_OakPlank_ORM.T_CCK_TX07_OakPlank_ORM",
+    "textures/surfaces/TX08_DarkTimber_BaseColor.png": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX08_DarkTimber_BaseColor.T_CCK_TX08_DarkTimber_BaseColor",
+    "textures/surfaces/TX08_DarkTimber_NormalDX.png": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX08_DarkTimber_NormalDX.T_CCK_TX08_DarkTimber_NormalDX",
+    "textures/surfaces/TX08_DarkTimber_ORM.png": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX08_DarkTimber_ORM.T_CCK_TX08_DarkTimber_ORM",
+    "textures/surfaces/TX09_BlackIron_BaseColor.png": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX09_BlackIron_BaseColor.T_CCK_TX09_BlackIron_BaseColor",
+    "textures/surfaces/TX09_BlackIron_NormalDX.png": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX09_BlackIron_NormalDX.T_CCK_TX09_BlackIron_NormalDX",
+    "textures/surfaces/TX09_BlackIron_ORM.png": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX09_BlackIron_ORM.T_CCK_TX09_BlackIron_ORM",
+    "textures/surfaces/TX10_AgedBrass_BaseColor.png": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX10_AgedBrass_BaseColor.T_CCK_TX10_AgedBrass_BaseColor",
+    "textures/surfaces/TX10_AgedBrass_NormalDX.png": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX10_AgedBrass_NormalDX.T_CCK_TX10_AgedBrass_NormalDX",
+    "textures/surfaces/TX10_AgedBrass_ORM.png": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX10_AgedBrass_ORM.T_CCK_TX10_AgedBrass_ORM",
+    "textures/surfaces/TX11_PatinatedCopper_BaseColor.png": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX11_PatinatedCopper_BaseColor.T_CCK_TX11_PatinatedCopper_BaseColor",
+    "textures/surfaces/TX11_PatinatedCopper_NormalDX.png": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX11_PatinatedCopper_NormalDX.T_CCK_TX11_PatinatedCopper_NormalDX",
+    "textures/surfaces/TX11_PatinatedCopper_ORM.png": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX11_PatinatedCopper_ORM.T_CCK_TX11_PatinatedCopper_ORM",
+    "textures/surfaces/TX12_LinenCanvas_BaseColor.png": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX12_LinenCanvas_BaseColor.T_CCK_TX12_LinenCanvas_BaseColor",
+    "textures/surfaces/TX12_LinenCanvas_NormalDX.png": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX12_LinenCanvas_NormalDX.T_CCK_TX12_LinenCanvas_NormalDX",
+    "textures/surfaces/TX12_LinenCanvas_ORM.png": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX12_LinenCanvas_ORM.T_CCK_TX12_LinenCanvas_ORM",
+    "textures/surfaces/TX13_BrownLeather_BaseColor.png": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX13_BrownLeather_BaseColor.T_CCK_TX13_BrownLeather_BaseColor",
+    "textures/surfaces/TX13_BrownLeather_NormalDX.png": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX13_BrownLeather_NormalDX.T_CCK_TX13_BrownLeather_NormalDX",
+    "textures/surfaces/TX13_BrownLeather_ORM.png": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX13_BrownLeather_ORM.T_CCK_TX13_BrownLeather_ORM",
+    "textures/surfaces/TX14_RopeFibre_BaseColor.png": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX14_RopeFibre_BaseColor.T_CCK_TX14_RopeFibre_BaseColor",
+    "textures/surfaces/TX14_RopeFibre_NormalDX.png": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX14_RopeFibre_NormalDX.T_CCK_TX14_RopeFibre_NormalDX",
+    "textures/surfaces/TX14_RopeFibre_ORM.png": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX14_RopeFibre_ORM.T_CCK_TX14_RopeFibre_ORM",
+    "textures/surfaces/TX15_OliveCeramic_BaseColor.png": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX15_OliveCeramic_BaseColor.T_CCK_TX15_OliveCeramic_BaseColor",
+    "textures/surfaces/TX15_OliveCeramic_NormalDX.png": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX15_OliveCeramic_NormalDX.T_CCK_TX15_OliveCeramic_NormalDX",
+    "textures/surfaces/TX15_OliveCeramic_ORM.png": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX15_OliveCeramic_ORM.T_CCK_TX15_OliveCeramic_ORM",
+    "textures/surfaces/TX16_Parchment_BaseColor.png": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX16_Parchment_BaseColor.T_CCK_TX16_Parchment_BaseColor",
+    "textures/surfaces/TX16_Parchment_NormalDX.png": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX16_Parchment_NormalDX.T_CCK_TX16_Parchment_NormalDX",
+    "textures/surfaces/TX16_Parchment_ORM.png": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX16_Parchment_ORM.T_CCK_TX16_Parchment_ORM",
+    "textures/surfaces/TX17_DampStone_BaseColor.png": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX17_DampStone_BaseColor.T_CCK_TX17_DampStone_BaseColor",
+    "textures/surfaces/TX17_DampStone_NormalDX.png": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX17_DampStone_NormalDX.T_CCK_TX17_DampStone_NormalDX",
+    "textures/surfaces/TX17_DampStone_ORM.png": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX17_DampStone_ORM.T_CCK_TX17_DampStone_ORM",
+    "textures/surfaces/TX18_TallowWax_BaseColor.png": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX18_TallowWax_BaseColor.T_CCK_TX18_TallowWax_BaseColor",
+    "textures/surfaces/TX18_TallowWax_NormalDX.png": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX18_TallowWax_NormalDX.T_CCK_TX18_TallowWax_NormalDX",
+    "textures/surfaces/TX18_TallowWax_ORM.png": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX18_TallowWax_ORM.T_CCK_TX18_TallowWax_ORM",
+    "textures/surfaces/TX19_Soot_BaseColor.png": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX19_Soot_BaseColor.T_CCK_TX19_Soot_BaseColor",
+    "textures/surfaces/TX19_Soot_NormalDX.png": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX19_Soot_NormalDX.T_CCK_TX19_Soot_NormalDX",
+    "textures/surfaces/TX19_Soot_ORM.png": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX19_Soot_ORM.T_CCK_TX19_Soot_ORM"
+  },
+  "errors": [],
+  "count": 25,
+  "elapsed_seconds": 3.711
+}

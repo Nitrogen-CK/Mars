@@ -1,0 +1,94 @@
+{
+	"material": "M_CCK_Glass",
+	"packagePath": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_Glass",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "82260ac95213912c3d27efcaf132a06a",
+		"exporterVersion": 3
+	},
+	"blendMode": "BLEND_Translucent",
+	"twoSided": true,
+	"unlit": false,
+	"shadingModel": "MSM_DefaultLit",
+	"domain": "MD_Surface",
+	"connectedOutputs": [
+		"BaseColor",
+		"Opacity"
+	],
+	"expressions":
+	{
+		"Constant": 3,
+		"Constant3Vector": 1
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "Constant3Vector",
+				"name": "MaterialExpressionConstant3Vector_0",
+				"outputs": [
+					"None",
+					"None",
+					"None",
+					"None"
+				],
+				"props":
+				{
+					"Constant": "(R=0.550000,G=0.640000,B=0.550000,A=1.000000)"
+				}
+			},
+			{
+				"id": 1,
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_0",
+				"props":
+				{
+					"R": 0.11999999731779099
+				}
+			},
+			{
+				"id": 2,
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_1"
+			},
+			{
+				"id": 3,
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_2",
+				"props":
+				{
+					"R": 0.20000000298023224
+				}
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_Opacity",
+				"node": 3,
+				"output": 0
+			},
+			{
+				"property": "MP_BaseColor",
+				"node": 0,
+				"output": 0,
+				"mask": "rgb"
+			},
+			{
+				"property": "MP_Metallic",
+				"node": 2,
+				"output": 0
+			},
+			{
+				"property": "MP_Roughness",
+				"node": 1,
+				"output": 0
+			}
+		]
+	},
+	"scalarParams": [],
+	"vectorParams": [],
+	"textureParams": [],
+	"usedTextures": []
+}

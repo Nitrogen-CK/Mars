@@ -1,0 +1,27 @@
+{
+  "tile": "Canal",
+  "asset": "/Game/Mars/Maps/Variants/v8c/LI_Warrens_Canal",
+  "instances": 377,
+  "unique_meshes": 17,
+  "counts": {
+    "BACKING_TX01": 32,
+    "BACKING_TX02": 56,
+    "CCS03": 29,
+    "CCS04": 12,
+    "CCS09": 20,
+    "CCS10": 20,
+    "CCS13": 56,
+    "CCS15": 20,
+    "CCS18": 12,
+    "CCS27": 102,
+    "CCS43": 2,
+    "CCS50": 2,
+    "CCS60": 2,
+    "CCS61": 2,
+    "CCS62": 2,
+    "CCS64": 2,
+    "SOURCE_GALLERY": 6
+  },
+  "backup": "D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\Reports\\Backups\\20261024-031008\\LI_Warrens_Canal.umap",
+  "material_overrides": []
+}

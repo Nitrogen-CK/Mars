@@ -1,0 +1,176 @@
+{
+  "session_id": "pie_smoke_2_060942",
+  "status": "complete",
+  "marker": "WATERWORKS_FINAL_ART_REVIEW",
+  "map": "UEDPIE_0_Warrens_VariantC_Mars_MAP",
+  "duration": 40,
+  "pie_active": true,
+  "pie_ready": true,
+  "lifecycle": "teardown-complete",
+  "sample_count": 1745,
+  "elapsed_seconds": 40.00793109834194,
+  "var_summary": {},
+  "runtime_identity": {
+    "actor": "Mars_PlayerCharacter_0",
+    "actor_class": "Mars_PlayerCharacter",
+    "skel_comp": "CharacterMesh0",
+    "anim_instance_class": "/Game/Mars/Gameplay/PlayerCharacter/Chef/ABP_Chef.ABP_Chef_C",
+    "mesh_anim_class": "/Game/Mars/Gameplay/PlayerCharacter/Chef/ABP_Chef.ABP_Chef_C",
+    "animation_mode": "anim_blueprint",
+    "anim_class_changed": false
+  },
+  "grouped_counts": {
+    "active_runtime": {
+      "must_absent": {
+        "Blueprint Runtime Error": 0,
+        "Accessed None": 0,
+        "LogChooser": 0,
+        "Ensure condition failed": 0,
+        "Assertion failed": 0,
+        "Fatal error": 0
+      },
+      "must_present": {
+        "WATERWORKS_RUNTIME_AUDIT_PASSED 8104": 1
+      },
+      "observe_only": {},
+      "warn": {},
+      "entry_count": 146
+    },
+    "teardown": {
+      "must_absent": {
+        "Blueprint Runtime Error": 0,
+        "Accessed None": 0,
+        "LogChooser": 0,
+        "Ensure condition failed": 0,
+        "Assertion failed": 0,
+        "Fatal error": 0
+      },
+      "entry_count": 51,
+      "allowed": true
+    },
+    "ignore_after_pattern": "BeginTearingDown"
+  },
+  "warnings": [],
+  "missing_must_present": [],
+  "post_marker_counts": {
+    "Blueprint Runtime Error": 0,
+    "Accessed None": 0,
+    "LogChooser": 0,
+    "Ensure condition failed": 0,
+    "Assertion failed": 0,
+    "Fatal error": 0,
+    "WATERWORKS_RUNTIME_AUDIT_PASSED 8104": 1
+  },
+  "total_matches": 0,
+  "ok": true,
+  "probes": [
+    {
+      "at_seconds": 1.5,
+      "fired": true,
+      "fired_at_seconds": 1.5079929009079933,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 2,
+      "fired": true,
+      "fired_at_seconds": 2.005155798047781,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 5,
+      "fired": true,
+      "fired_at_seconds": 5.005967497825623,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 8,
+      "fired": true,
+      "fired_at_seconds": 8.021408397704363,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 11,
+      "fired": true,
+      "fired_at_seconds": 11.000076599419117,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 14,
+      "fired": true,
+      "fired_at_seconds": 14.019168198108673,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 17,
+      "fired": true,
+      "fired_at_seconds": 17.00163010135293,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 20,
+      "fired": true,
+      "fired_at_seconds": 20.01035000011325,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 23,
+      "fired": true,
+      "fired_at_seconds": 23.007030300796032,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 26,
+      "fired": true,
+      "fired_at_seconds": 26.018943198025227,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 29,
+      "fired": true,
+      "fired_at_seconds": 29.012447901070118,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 32,
+      "fired": true,
+      "fired_at_seconds": 32.01529809832573,
+      "python_ok": true,
+      "python_output": "None"
+    },
+    {
+      "at_seconds": 35,
+      "fired": true,
+      "fired_at_seconds": 35.002329498529434,
+      "python_ok": true,
+      "python_output": "None"
+    }
+  ],
+  "actor_setup": [
+    {
+      "class": "/Script/Engine.CameraActor",
+      "class_resolved": true,
+      "requested_count": 1,
+      "spawned_count": 1,
+      "actors": [
+        {
+          "spawned": true,
+          "name": "CameraActor_0",
+          "runtime_class": "/Script/Engine.CameraActor",
+          "applied": [],
+          "unmatched": []
+        }
+      ]
+    }
+  ]
+}

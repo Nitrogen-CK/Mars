@@ -1,0 +1,67 @@
+{
+  "tile": "Hub",
+  "asset": "/Game/Mars/Maps/Variants/v8c/LI_Warrens_Hub",
+  "instances": 596,
+  "unique_meshes": 23,
+  "counts": {
+    "BACKING_TX01": 188,
+    "BACKING_TX02": 75,
+    "CCS09": 16,
+    "CCS10": 16,
+    "CCS11": 10,
+    "CCS13": 75,
+    "CCS15": 107,
+    "CCS18": 81,
+    "CCS57": 1,
+    "CCS60": 1,
+    "CCS61": 1,
+    "CCS62": 1,
+    "CCS64": 1,
+    "PWC10": 10,
+    "PWC11": 1,
+    "PWC12": 1,
+    "PWC13": 1,
+    "PWC17": 2,
+    "PWC19": 1,
+    "PWC20": 1,
+    "PWC24": 1,
+    "PWC25": 1,
+    "SOURCE_GALLERY": 4
+  },
+  "backup": "D:\\Repositories\\CkRepos\\Orion\\Tools\\PumpCisternKit\\Output\\Reports\\Backups\\20261024-050500\\LI_Warrens_Hub.umap",
+  "collision": "NoCollision",
+  "coverage": {
+    "source_floor_boxes": 301,
+    "selected_floor_boxes": 34,
+    "exposed_floor_samples": 102,
+    "missing_floor_samples": 0,
+    "buried_floor_cells_excluded": 0,
+    "floor_boxes_with_center_overhead_below_2_2m": 6,
+    "ceiling_policy": "Only source undersides with 2.2..10m existing clearance; low tunnels retained without vault veneer",
+    "emitted_floor_union_area_m2": 89.25,
+    "ramp_instances_covered": 0,
+    "roles": {
+      "source floor veneer": 75,
+      "source floor seam backing": 75,
+      "source ceiling underside": 81,
+      "source ceiling seam backing": 81,
+      "source exposed wall veneer": 107,
+      "source wall seam backing": 107
+    },
+    "excluded": {
+      "outside_rect_floor": 66,
+      "upper_floor": 201,
+      "ramp_outside_scope": 5
+    },
+    "ramp_source_area_m2": 0.0,
+    "ramp_emitted_area_m2": 0.0,
+    "ramp_normal_offset_max_error_m": 0.0,
+    "wall_segments_without_overhead_source_box": 0,
+    "selected_floor_bounds": [
+      4,
+      36,
+      26.0,
+      45
+    ]
+  }
+}

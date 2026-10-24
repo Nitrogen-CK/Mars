@@ -1,0 +1,27 @@
+{
+  "status": "passed",
+  "tiles": {
+    "WaterworksW": {
+      "original_actors": 13,
+      "hism_components": 17,
+      "instances": 125,
+      "original_transforms_and_collision_unchanged": true
+    },
+    "Canal": {
+      "original_actors": 8,
+      "hism_components": 13,
+      "instances": 275,
+      "original_transforms_and_collision_unchanged": true
+    },
+    "Brineworks": {
+      "original_actors": 18,
+      "hism_components": 43,
+      "instances": 816,
+      "original_transforms_and_collision_unchanged": true
+    }
+  },
+  "original_actor_checks": 39,
+  "original_instance_checks": 2476,
+  "new_instances": 1216,
+  "dirty_maps": []
+}

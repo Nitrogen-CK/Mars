@@ -1,0 +1,1030 @@
+{
+  "count": 25,
+  "assets": [
+    {
+      "id": "PWC01",
+      "name": "WarrensC_PWC01_PumpTowerBody_Mars_SM",
+      "dimensions_cm": [
+        200.0,
+        200.0,
+        600.0
+      ],
+      "actual_dimensions_cm": [
+        200.0,
+        200.0,
+        600.0
+      ],
+      "bounds_min_cm": [
+        -100.0,
+        -100.0,
+        0.0
+      ],
+      "bounds_max_cm": [
+        100.0,
+        100.0,
+        600.0
+      ],
+      "vertices": 260,
+      "triangles": 492,
+      "materials": [
+        "WarrensC_BlackIron_Mars_MI",
+        "WarrensC_PatinatedCopper_Mars_MI"
+      ],
+      "material_keys": [
+        "TX09",
+        "TX11"
+      ],
+      "flags": {
+        "hero_base_cylinder_cap": true,
+        "flywheel_separate": true,
+        "pivot": "bottom center"
+      },
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_PWC01_PumpTowerBody_Mars_SM.fbx"
+    },
+    {
+      "id": "PWC02",
+      "name": "WarrensC_PWC02_PumpFlywheel_Mars_SM",
+      "dimensions_cm": [
+        90.0,
+        24.0,
+        90.0
+      ],
+      "actual_dimensions_cm": [
+        90.0,
+        24.0,
+        90.0
+      ],
+      "bounds_min_cm": [
+        -44.999998807907104,
+        -11.999999731779099,
+        -44.999998807907104
+      ],
+      "bounds_max_cm": [
+        44.999998807907104,
+        11.999999731779099,
+        44.999998807907104
+      ],
+      "vertices": 184,
+      "triangles": 344,
+      "materials": [
+        "WarrensC_BlackIron_Mars_MI",
+        "WarrensC_PatinatedCopper_Mars_MI"
+      ],
+      "material_keys": [
+        "TX09",
+        "TX11"
+      ],
+      "flags": {
+        "axis": "Y",
+        "wheel_plane": "XZ",
+        "spokes": 6,
+        "pivot": "center"
+      },
+      "pivot": "center",
+      "fbx": "FBX\\WarrensC_PWC02_PumpFlywheel_Mars_SM.fbx"
+    },
+    {
+      "id": "PWC03",
+      "name": "WarrensC_PWC03_PistonRod_Mars_SM",
+      "dimensions_cm": [
+        24.0,
+        24.0,
+        160.0
+      ],
+      "actual_dimensions_cm": [
+        24.0,
+        24.0,
+        160.0
+      ],
+      "bounds_min_cm": [
+        -11.999999731779099,
+        -11.999999731779099,
+        -80.0000011920929
+      ],
+      "bounds_max_cm": [
+        11.999999731779099,
+        11.999999731779099,
+        80.0000011920929
+      ],
+      "vertices": 48,
+      "triangles": 84,
+      "materials": [
+        "WarrensC_BlackIron_Mars_MI",
+        "WarrensC_PatinatedCopper_Mars_MI"
+      ],
+      "material_keys": [
+        "TX09",
+        "TX11"
+      ],
+      "flags": {
+        "separate_moving_part": true,
+        "pivot": "center"
+      },
+      "pivot": "center",
+      "fbx": "FBX\\WarrensC_PWC03_PistonRod_Mars_SM.fbx"
+    },
+    {
+      "id": "PWC04",
+      "name": "WarrensC_PWC04_PumpDiagonalBrace_Mars_SM",
+      "dimensions_cm": [
+        80.0,
+        35.0,
+        140.0
+      ],
+      "actual_dimensions_cm": [
+        80.0,
+        35.0,
+        140.0
+      ],
+      "bounds_min_cm": [
+        -39.99999761581421,
+        -17.499999701976776,
+        1.1920929132713809e-06
+      ],
+      "bounds_max_cm": [
+        39.99999761581421,
+        17.499999701976776,
+        139.9999976158142
+      ],
+      "vertices": 60,
+      "triangles": 108,
+      "materials": [
+        "WarrensC_BlackIron_Mars_MI",
+        "WarrensC_PatinatedCopper_Mars_MI"
+      ],
+      "material_keys": [
+        "TX09",
+        "TX11"
+      ],
+      "flags": {
+        "axis": "XZ",
+        "pivot": "bottom center"
+      },
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_PWC04_PumpDiagonalBrace_Mars_SM.fbx"
+    },
+    {
+      "id": "PWC05",
+      "name": "WarrensC_PWC05_PipeStraight_Mars_SM",
+      "dimensions_cm": [
+        200.0,
+        40.0,
+        40.0
+      ],
+      "actual_dimensions_cm": [
+        200.0,
+        40.0,
+        40.0
+      ],
+      "bounds_min_cm": [
+        -100.0,
+        -20.000000298023224,
+        -20.000000298023224
+      ],
+      "bounds_max_cm": [
+        100.0,
+        20.000000298023224,
+        20.000000298023224
+      ],
+      "vertices": 144,
+      "triangles": 288,
+      "materials": [
+        "WarrensC_PatinatedCopper_Mars_MI",
+        "WarrensC_BlackIron_Mars_MI"
+      ],
+      "material_keys": [
+        "TX11",
+        "TX09"
+      ],
+      "flags": {
+        "axis": "X",
+        "hollow_mouths": true,
+        "pivot": "center",
+        "open_mouths": true
+      },
+      "pivot": "center",
+      "fbx": "FBX\\WarrensC_PWC05_PipeStraight_Mars_SM.fbx"
+    },
+    {
+      "id": "PWC06",
+      "name": "WarrensC_PWC06_PipeElbow_Mars_SM",
+      "dimensions_cm": [
+        80.0,
+        80.0,
+        40.0
+      ],
+      "actual_dimensions_cm": [
+        80.0,
+        80.0,
+        40.0
+      ],
+      "bounds_min_cm": [
+        -40.00000059604645,
+        -40.00000059604645,
+        -20.000000298023224
+      ],
+      "bounds_max_cm": [
+        40.00000059604645,
+        40.00000059604645,
+        20.000000298023224
+      ],
+      "vertices": 276,
+      "triangles": 552,
+      "materials": [
+        "WarrensC_PatinatedCopper_Mars_MI",
+        "WarrensC_BlackIron_Mars_MI"
+      ],
+      "material_keys": [
+        "TX11",
+        "TX09"
+      ],
+      "flags": {
+        "axis": "XY",
+        "hollow_mouths": true,
+        "socket_centers_m": [
+          [
+            -0.008163267093517019,
+            0.3183673387962003,
+            0.0
+          ],
+          [
+            0.3183673387962003,
+            -0.008163267093517019,
+            0.0
+          ]
+        ],
+        "pivot": "center",
+        "open_mouths": true
+      },
+      "pivot": "center",
+      "fbx": "FBX\\WarrensC_PWC06_PipeElbow_Mars_SM.fbx"
+    },
+    {
+      "id": "PWC07",
+      "name": "WarrensC_PWC07_PipeCollar_Mars_SM",
+      "dimensions_cm": [
+        18.0,
+        50.0,
+        50.0
+      ],
+      "actual_dimensions_cm": [
+        18.0,
+        50.0,
+        50.0
+      ],
+      "bounds_min_cm": [
+        -9.000000357627869,
+        -25.0,
+        -25.0
+      ],
+      "bounds_max_cm": [
+        9.000000357627869,
+        25.0,
+        25.0
+      ],
+      "vertices": 120,
+      "triangles": 216,
+      "materials": [
+        "WarrensC_BlackIron_Mars_MI"
+      ],
+      "material_keys": [
+        "TX09"
+      ],
+      "flags": {
+        "axis": "X",
+        "hollow_center": true,
+        "open_mouths": true,
+        "pivot": "center"
+      },
+      "pivot": "center",
+      "fbx": "FBX\\WarrensC_PWC07_PipeCollar_Mars_SM.fbx"
+    },
+    {
+      "id": "PWC08",
+      "name": "WarrensC_PWC08_PipeWallBracket_Mars_SM",
+      "dimensions_cm": [
+        35.0,
+        30.0,
+        65.0
+      ],
+      "actual_dimensions_cm": [
+        35.0,
+        30.0,
+        65.0
+      ],
+      "bounds_min_cm": [
+        -17.499999701976776,
+        -15.000000596046448,
+        1.1920929132713809e-06
+      ],
+      "bounds_max_cm": [
+        17.499999701976776,
+        15.000000596046448,
+        64.99999761581421
+      ],
+      "vertices": 72,
+      "triangles": 128,
+      "materials": [
+        "WarrensC_BlackIron_Mars_MI",
+        "WarrensC_PatinatedCopper_Mars_MI"
+      ],
+      "material_keys": [
+        "TX09",
+        "TX11"
+      ],
+      "flags": {
+        "pivot": "bottom center"
+      },
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_PWC08_PipeWallBracket_Mars_SM.fbx"
+    },
+    {
+      "id": "PWC09",
+      "name": "WarrensC_PWC09_PipeEndCap_Mars_SM",
+      "dimensions_cm": [
+        12.0,
+        50.0,
+        50.0
+      ],
+      "actual_dimensions_cm": [
+        12.0,
+        50.0,
+        50.0
+      ],
+      "bounds_min_cm": [
+        -5.999999865889549,
+        -25.0,
+        -25.0
+      ],
+      "bounds_max_cm": [
+        5.999999865889549,
+        25.0,
+        25.0
+      ],
+      "vertices": 48,
+      "triangles": 88,
+      "materials": [
+        "WarrensC_BlackIron_Mars_MI",
+        "WarrensC_PatinatedCopper_Mars_MI"
+      ],
+      "material_keys": [
+        "TX09",
+        "TX11"
+      ],
+      "flags": {
+        "axis": "X",
+        "closed_end": true,
+        "pivot": "center"
+      },
+      "pivot": "center",
+      "fbx": "FBX\\WarrensC_PWC09_PipeEndCap_Mars_SM.fbx"
+    },
+    {
+      "id": "PWC10",
+      "name": "WarrensC_PWC10_CisternRimStraight_Mars_SM",
+      "dimensions_cm": [
+        200.0,
+        55.0,
+        55.0
+      ],
+      "actual_dimensions_cm": [
+        200.0,
+        55.0,
+        55.0
+      ],
+      "bounds_min_cm": [
+        -100.0,
+        -27.500000596046448,
+        -5.960464566356904e-07
+      ],
+      "bounds_max_cm": [
+        100.0,
+        27.500000596046448,
+        55.000001192092896
+      ],
+      "vertices": 48,
+      "triangles": 88,
+      "materials": [
+        "WarrensC_CaveRock_Mars_MI",
+        "WarrensC_BroadFlagstone_Mars_MI"
+      ],
+      "material_keys": [
+        "TX04",
+        "TX02"
+      ],
+      "flags": {
+        "pivot": "bottom center"
+      },
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_PWC10_CisternRimStraight_Mars_SM.fbx"
+    },
+    {
+      "id": "PWC11",
+      "name": "WarrensC_PWC11_CisternRimInnerCorner_Mars_SM",
+      "dimensions_cm": [
+        80.0,
+        80.0,
+        55.0
+      ],
+      "actual_dimensions_cm": [
+        80.0,
+        80.0,
+        55.0
+      ],
+      "bounds_min_cm": [
+        -39.99999761581421,
+        -40.00000059604645,
+        -5.960464566356904e-07
+      ],
+      "bounds_max_cm": [
+        39.99999761581421,
+        40.00000059604645,
+        55.000001192092896
+      ],
+      "vertices": 48,
+      "triangles": 88,
+      "materials": [
+        "WarrensC_CaveRock_Mars_MI"
+      ],
+      "material_keys": [
+        "TX04"
+      ],
+      "flags": {
+        "shape": "L; open inside corner",
+        "pivot": "bottom center"
+      },
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_PWC11_CisternRimInnerCorner_Mars_SM.fbx"
+    },
+    {
+      "id": "PWC12",
+      "name": "WarrensC_PWC12_CisternRimEnd_Mars_SM",
+      "dimensions_cm": [
+        60.0,
+        55.0,
+        55.0
+      ],
+      "actual_dimensions_cm": [
+        60.0,
+        55.0,
+        55.0
+      ],
+      "bounds_min_cm": [
+        -30.000001192092896,
+        -27.500000596046448,
+        -5.960464566356904e-07
+      ],
+      "bounds_max_cm": [
+        30.000001192092896,
+        27.500000596046448,
+        55.000001192092896
+      ],
+      "vertices": 48,
+      "triangles": 88,
+      "materials": [
+        "WarrensC_CaveRock_Mars_MI",
+        "WarrensC_BroadFlagstone_Mars_MI"
+      ],
+      "material_keys": [
+        "TX04",
+        "TX02"
+      ],
+      "flags": {
+        "pivot": "bottom center",
+        "end_cap": true
+      },
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_PWC12_CisternRimEnd_Mars_SM.fbx"
+    },
+    {
+      "id": "PWC13",
+      "name": "WarrensC_PWC13_WaterGaugeBoard_Mars_SM",
+      "dimensions_cm": [
+        35.0,
+        12.0,
+        150.0
+      ],
+      "actual_dimensions_cm": [
+        35.0,
+        12.0,
+        150.0
+      ],
+      "bounds_min_cm": [
+        -17.499999701976776,
+        -5.999999865889549,
+        0.0
+      ],
+      "bounds_max_cm": [
+        17.499999701976776,
+        5.999999865889549,
+        150.0
+      ],
+      "vertices": 168,
+      "triangles": 308,
+      "materials": [
+        "WarrensC_DarkTimber_Mars_MI",
+        "WarrensC_BlackIron_Mars_MI"
+      ],
+      "material_keys": [
+        "TX08",
+        "TX09"
+      ],
+      "flags": {
+        "ticks_only_no_control": true,
+        "pivot": "bottom center"
+      },
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_PWC13_WaterGaugeBoard_Mars_SM.fbx"
+    },
+    {
+      "id": "PWC14",
+      "name": "WarrensC_PWC14_RootFork_Mars_SM",
+      "dimensions_cm": [
+        200.0,
+        70.0,
+        250.0
+      ],
+      "actual_dimensions_cm": [
+        200.0,
+        70.0,
+        250.0
+      ],
+      "bounds_min_cm": [
+        -100.0,
+        -34.99999940395355,
+        0.0
+      ],
+      "bounds_max_cm": [
+        100.0,
+        34.99999940395355,
+        250.0
+      ],
+      "vertices": 140,
+      "triangles": 264,
+      "materials": [
+        "WarrensC_DarkTimber_Mars_MI"
+      ],
+      "material_keys": [
+        "TX08"
+      ],
+      "flags": {
+        "non_climbable_visual": true,
+        "pivot": "bottom center"
+      },
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_PWC14_RootFork_Mars_SM.fbx"
+    },
+    {
+      "id": "PWC15",
+      "name": "WarrensC_PWC15_RootTendril_Mars_SM",
+      "dimensions_cm": [
+        50.0,
+        45.0,
+        220.0
+      ],
+      "actual_dimensions_cm": [
+        50.0,
+        45.0,
+        220.00001
+      ],
+      "bounds_min_cm": [
+        -24.99999850988388,
+        -22.499999403953552,
+        -2.3841858265427618e-06
+      ],
+      "bounds_max_cm": [
+        24.99999850988388,
+        22.499999403953552,
+        220.00000476837158
+      ],
+      "vertices": 42,
+      "triangles": 80,
+      "materials": [
+        "WarrensC_DarkTimber_Mars_MI"
+      ],
+      "material_keys": [
+        "TX08"
+      ],
+      "flags": {
+        "non_climbable_visual": true,
+        "pivot": "bottom center"
+      },
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_PWC15_RootTendril_Mars_SM.fbx"
+    },
+    {
+      "id": "PWC16",
+      "name": "WarrensC_PWC16_RootSocketCollar_Mars_SM",
+      "dimensions_cm": [
+        100.0,
+        45.0,
+        35.0
+      ],
+      "actual_dimensions_cm": [
+        100.0,
+        45.0,
+        35.0
+      ],
+      "bounds_min_cm": [
+        -50.0,
+        -22.499999403953552,
+        2.980232283178452e-07
+      ],
+      "bounds_max_cm": [
+        50.0,
+        22.499999403953552,
+        34.99999940395355
+      ],
+      "vertices": 148,
+      "triangles": 272,
+      "materials": [
+        "WarrensC_CaveRock_Mars_MI",
+        "WarrensC_DarkTimber_Mars_MI"
+      ],
+      "material_keys": [
+        "TX04",
+        "TX08"
+      ],
+      "flags": {
+        "pivot": "bottom center",
+        "hollow_center": true,
+        "elliptical_footprint": true
+      },
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_PWC16_RootSocketCollar_Mars_SM.fbx"
+    },
+    {
+      "id": "PWC17",
+      "name": "WarrensC_PWC17_CisternBedPebbleCluster_Mars_SM",
+      "dimensions_cm": [
+        100.0,
+        80.0,
+        15.0
+      ],
+      "actual_dimensions_cm": [
+        100.0,
+        80.0,
+        15.0
+      ],
+      "bounds_min_cm": [
+        -50.0,
+        -39.99999761581421,
+        -15.000000596046448
+      ],
+      "bounds_max_cm": [
+        50.0,
+        39.99999761581421,
+        2.980232283178452e-07
+      ],
+      "vertices": 84,
+      "triangles": 140,
+      "materials": [
+        "WarrensC_CaveRock_Mars_MI"
+      ],
+      "material_keys": [
+        "TX04"
+      ],
+      "flags": {
+        "pivot": "top contact"
+      },
+      "pivot": "top contact",
+      "fbx": "FBX\\WarrensC_PWC17_CisternBedPebbleCluster_Mars_SM.fbx"
+    },
+    {
+      "id": "PWC18",
+      "name": "WarrensC_PWC18_PipeRepairWrap_Mars_SM",
+      "dimensions_cm": [
+        70.0,
+        55.0,
+        55.0
+      ],
+      "actual_dimensions_cm": [
+        70.0,
+        55.0,
+        55.0
+      ],
+      "bounds_min_cm": [
+        -34.99999940395355,
+        -27.500000596046448,
+        -27.500000596046448
+      ],
+      "bounds_max_cm": [
+        34.99999940395355,
+        27.500000596046448,
+        27.500000596046448
+      ],
+      "vertices": 160,
+      "triangles": 280,
+      "materials": [
+        "WarrensC_BlackIron_Mars_MI",
+        "WarrensC_PatinatedCopper_Mars_MI"
+      ],
+      "material_keys": [
+        "TX09",
+        "TX11"
+      ],
+      "flags": {
+        "two_annular_straps": true,
+        "curved_patch": true,
+        "open_bore": true,
+        "pivot": "center"
+      },
+      "pivot": "center",
+      "fbx": "FBX\\WarrensC_PWC18_PipeRepairWrap_Mars_SM.fbx"
+    },
+    {
+      "id": "PWC19",
+      "name": "WarrensC_PWC19_ToolRack_Mars_SM",
+      "dimensions_cm": [
+        100.0,
+        25.0,
+        140.0
+      ],
+      "actual_dimensions_cm": [
+        100.0,
+        25.0,
+        140.0
+      ],
+      "bounds_min_cm": [
+        -50.0,
+        -12.5,
+        1.1920929132713809e-06
+      ],
+      "bounds_max_cm": [
+        50.0,
+        12.5,
+        139.9999976158142
+      ],
+      "vertices": 120,
+      "triangles": 220,
+      "materials": [
+        "WarrensC_DarkTimber_Mars_MI"
+      ],
+      "material_keys": [
+        "TX08"
+      ],
+      "flags": {
+        "no_hanging_over_interaction_plane": true,
+        "pivot": "bottom center"
+      },
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_PWC19_ToolRack_Mars_SM.fbx"
+    },
+    {
+      "id": "PWC20",
+      "name": "WarrensC_PWC20_Spanner_Mars_SM",
+      "dimensions_cm": [
+        55.0,
+        12.0,
+        15.0
+      ],
+      "actual_dimensions_cm": [
+        55.0,
+        12.0,
+        15.0
+      ],
+      "bounds_min_cm": [
+        -27.500000596046448,
+        -5.999999865889549,
+        -7.500000298023224
+      ],
+      "bounds_max_cm": [
+        27.500000596046448,
+        5.999999865889549,
+        7.500000298023224
+      ],
+      "vertices": 80,
+      "triangles": 152,
+      "materials": [
+        "WarrensC_BlackIron_Mars_MI"
+      ],
+      "material_keys": [
+        "TX09"
+      ],
+      "flags": {
+        "pivot": "center"
+      },
+      "pivot": "center",
+      "fbx": "FBX\\WarrensC_PWC20_Spanner_Mars_SM.fbx"
+    },
+    {
+      "id": "PWC21",
+      "name": "WarrensC_PWC21_Bucket_Mars_SM",
+      "dimensions_cm": [
+        45.0,
+        45.0,
+        50.0
+      ],
+      "actual_dimensions_cm": [
+        45.0,
+        45.0,
+        50.0
+      ],
+      "bounds_min_cm": [
+        -22.499999403953552,
+        -22.499999403953552,
+        0.0
+      ],
+      "bounds_max_cm": [
+        22.499999403953552,
+        22.499999403953552,
+        50.0
+      ],
+      "vertices": 128,
+      "triangles": 248,
+      "materials": [
+        "WarrensC_BlackIron_Mars_MI",
+        "WarrensC_PatinatedCopper_Mars_MI"
+      ],
+      "material_keys": [
+        "TX09",
+        "TX11"
+      ],
+      "flags": {
+        "hollow_open_top": true,
+        "closed_inner_bottom": true,
+        "pivot": "bottom center"
+      },
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_PWC21_Bucket_Mars_SM.fbx"
+    },
+    {
+      "id": "PWC22",
+      "name": "WarrensC_PWC22_TallowDripTray_Mars_SM",
+      "dimensions_cm": [
+        60.0,
+        40.0,
+        8.0
+      ],
+      "actual_dimensions_cm": [
+        60.0,
+        40.0,
+        8.0
+      ],
+      "bounds_min_cm": [
+        -30.000001192092896,
+        -20.000000298023224,
+        8.940696516468449e-08
+      ],
+      "bounds_max_cm": [
+        30.000001192092896,
+        20.000000298023224,
+        7.999999821186066
+      ],
+      "vertices": 120,
+      "triangles": 220,
+      "materials": [
+        "WarrensC_BlackIron_Mars_MI",
+        "WarrensC_PatinatedCopper_Mars_MI"
+      ],
+      "material_keys": [
+        "TX09",
+        "TX11"
+      ],
+      "flags": {
+        "pivot": "bottom center"
+      },
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_PWC22_TallowDripTray_Mars_SM.fbx"
+    },
+    {
+      "id": "PWC23",
+      "name": "WarrensC_PWC23_CandleStub_Mars_SM",
+      "dimensions_cm": [
+        15.0,
+        15.0,
+        30.0
+      ],
+      "actual_dimensions_cm": [
+        15.0,
+        15.0,
+        30.0
+      ],
+      "bounds_min_cm": [
+        -7.500000298023224,
+        -7.500000298023224,
+        -5.960464566356904e-07
+      ],
+      "bounds_max_cm": [
+        7.500000298023224,
+        7.500000298023224,
+        30.000001192092896
+      ],
+      "vertices": 62,
+      "triangles": 104,
+      "materials": [
+        "WarrensC_Parchment_Mars_MI",
+        "WarrensC_BlackIron_Mars_MI"
+      ],
+      "material_keys": [
+        "TX16",
+        "TX09"
+      ],
+      "flags": {
+        "unlit_static_prop": true,
+        "pivot": "bottom center"
+      },
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_PWC23_CandleStub_Mars_SM.fbx"
+    },
+    {
+      "id": "PWC24",
+      "name": "WarrensC_PWC24_ClothBanner_Mars_SM",
+      "dimensions_cm": [
+        70.0,
+        5.0,
+        120.0
+      ],
+      "actual_dimensions_cm": [
+        70.0,
+        5.0,
+        120.00001
+      ],
+      "bounds_min_cm": [
+        -34.99999940395355,
+        -2.500000037252903,
+        -2.3841858265427618e-06
+      ],
+      "bounds_max_cm": [
+        34.99999940395355,
+        2.500000037252903,
+        120.00000476837158
+      ],
+      "vertices": 52,
+      "triangles": 96,
+      "materials": [
+        "WarrensC_DarkTimber_Mars_MI",
+        "WarrensC_LinenCanvas_Mars_MI"
+      ],
+      "material_keys": [
+        "TX08",
+        "TX12"
+      ],
+      "flags": {
+        "plain_muted_no_glyphs": true,
+        "two_sided_geometry": true,
+        "pivot": "bottom center"
+      },
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_PWC24_ClothBanner_Mars_SM.fbx"
+    },
+    {
+      "id": "PWC25",
+      "name": "WarrensC_PWC25_CisternWaterSurface_Mars_SM",
+      "dimensions_cm": [
+        1150.0,
+        1100.0,
+        0.0
+      ],
+      "actual_dimensions_cm": [
+        1150.0,
+        1100.0,
+        0.0
+      ],
+      "bounds_min_cm": [
+        -575.0,
+        -550.0,
+        0.0
+      ],
+      "bounds_max_cm": [
+        575.0,
+        550.0,
+        0.0
+      ],
+      "vertices": 6,
+      "triangles": 4,
+      "materials": [
+        "CCK_FX_ShallowWater"
+      ],
+      "material_keys": [
+        "FX_ShallowWater"
+      ],
+      "flags": {
+        "card": true,
+        "source_polygon": true
+      },
+      "pivot": "center",
+      "fbx": "FBX\\WarrensC_PWC25_CisternWaterSurface_Mars_SM.fbx"
+    }
+  ],
+  "shared_reuse_ids": [
+    "CCS09",
+    "CCS10",
+    "CCS11",
+    "CCS13",
+    "CCS15",
+    "CCS18",
+    "CCS57",
+    "CCS60",
+    "CCS61",
+    "CCS62",
+    "CCS64",
+    "CCS66",
+    "CCS67",
+    "CCS88"
+  ],
+  "library_entries": 39,
+  "diorama_instances": 5093,
+  "units": "Blender metres; FBX explicit centimetres"
+}

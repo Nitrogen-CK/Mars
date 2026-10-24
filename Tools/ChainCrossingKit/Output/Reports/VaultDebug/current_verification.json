@@ -1,0 +1,22 @@
+{
+  "asset": "CCS18",
+  "triangles": 368,
+  "vertices": 210,
+  "polygons": 232,
+  "shell_bottom_triangles": 32,
+  "shell_top_triangles": 32,
+  "sample_count": 3481,
+  "minimum_thickness_m": 0.05749994516372681,
+  "maximum_thickness_m": 0.05750003457069397,
+  "nonmanifold_edges": 0,
+  "shell_xy_envelope_m": [
+    [
+      -1.0,
+      1.0
+    ],
+    [
+      -1.0,
+      1.0
+    ]
+  ]
+}

@@ -1,0 +1,103 @@
+{
+	"material": "M_CCK_Foam",
+	"packagePath": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_Foam",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "171c0401df00f5247b3f4a6393c6c850",
+		"exporterVersion": 3
+	},
+	"blendMode": "BLEND_Translucent",
+	"twoSided": true,
+	"unlit": false,
+	"shadingModel": "MSM_DefaultLit",
+	"domain": "MD_Surface",
+	"connectedOutputs": [
+		"BaseColor",
+		"Opacity"
+	],
+	"expressions":
+	{
+		"Constant": 4,
+		"Constant3Vector": 1
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_0",
+				"props":
+				{
+					"R": 0.80000001192092896
+				}
+			},
+			{
+				"id": 1,
+				"class": "Constant3Vector",
+				"name": "MaterialExpressionConstant3Vector_1",
+				"outputs": [
+					"None",
+					"None",
+					"None",
+					"None"
+				],
+				"props":
+				{
+					"Constant": "(R=0.650000,G=0.680000,B=0.540000,A=1.000000)"
+				}
+			},
+			{
+				"id": 2,
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_3",
+				"props":
+				{
+					"R": 0.80000001192092896
+				}
+			},
+			{
+				"id": 3,
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_4"
+			},
+			{
+				"id": 4,
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_5",
+				"props":
+				{
+					"R": 0.64999997615814209
+				}
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_Opacity",
+				"node": 4,
+				"output": 0
+			},
+			{
+				"property": "MP_BaseColor",
+				"node": 1,
+				"output": 0,
+				"mask": "rgb"
+			},
+			{
+				"property": "MP_Metallic",
+				"node": 3,
+				"output": 0
+			},
+			{
+				"property": "MP_Roughness",
+				"node": 2,
+				"output": 0
+			}
+		]
+	},
+	"scalarParams": [],
+	"vectorParams": [],
+	"textureParams": [],
+	"usedTextures": []
+}

@@ -1,0 +1,38 @@
+{
+  "tile": "WaterworksW",
+  "asset": "/Game/Mars/Maps/Variants/v8c/LI_Warrens_WaterworksW",
+  "instances": 56,
+  "unique_meshes": 12,
+  "counts": {
+    "CCS09": 8,
+    "CCS10": 8,
+    "CCS27": 28,
+    "CCS36": 2,
+    "CCS37": 1,
+    "CCS43": 2,
+    "CCS50": 2,
+    "CCS60": 1,
+    "CCS61": 1,
+    "CCS62": 1,
+    "CCS64": 1,
+    "CCS65": 1
+  },
+  "backup": "D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\Reports\\Backups\\20261024-031008\\LI_Warrens_WaterworksW.umap",
+  "material_overrides": [
+    {
+      "actor": "Warrens_Greybox_floor",
+      "component": "HierarchicalInstancedStaticMesh",
+      "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX02.M_CCK_TX02"
+    },
+    {
+      "actor": "Warrens_Greybox_wall",
+      "component": "HierarchicalInstancedStaticMesh",
+      "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX01.M_CCK_TX01"
+    },
+    {
+      "actor": "Warrens_Greybox_ramp",
+      "component": "HierarchicalInstancedStaticMesh",
+      "material": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX02.M_CCK_TX02"
+    }
+  ]
+}

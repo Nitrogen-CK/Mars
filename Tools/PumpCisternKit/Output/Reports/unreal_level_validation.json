@@ -1,0 +1,52 @@
+{
+  "status": "passed",
+  "tiles": {
+    "WaterworksW": {
+      "Mars.ChainCrossingKit.Authoring.v1": {
+        "instances": 56,
+        "hism_groups": 12
+      },
+      "Mars.PumpCisternKit.Authoring.v1": {
+        "instances": 5645,
+        "hism_groups": 35
+      }
+    },
+    "Canal": {
+      "Mars.ChainCrossingKit.Authoring.v1": {
+        "instances": 377,
+        "hism_groups": 17
+      },
+      "Mars.PumpCisternKit.Authoring.v1": {
+        "instances": 0,
+        "hism_groups": 0
+      }
+    },
+    "Brineworks": {
+      "Mars.ChainCrossingKit.Authoring.v1": {
+        "instances": 1430,
+        "hism_groups": 43
+      },
+      "Mars.PumpCisternKit.Authoring.v1": {
+        "instances": 0,
+        "hism_groups": 0
+      }
+    },
+    "Hub": {
+      "Mars.ChainCrossingKit.Authoring.v1": {
+        "instances": 0,
+        "hism_groups": 0
+      },
+      "Mars.PumpCisternKit.Authoring.v1": {
+        "instances": 596,
+        "hism_groups": 23
+      }
+    }
+  },
+  "original_actor_checks": 55,
+  "original_instance_checks": 3286,
+  "new_instances": 8104,
+  "owners": {
+    "Mars.ChainCrossingKit.Authoring.v1": 1863,
+    "Mars.PumpCisternKit.Authoring.v1": 6241
+  }
+}

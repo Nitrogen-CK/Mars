@@ -1,0 +1,1076 @@
+{
+  "status": "passed",
+  "asset_count": 88,
+  "triangles": 26686,
+  "scenes": {
+    "01_KitLibrary": {
+      "linked_collection_instances": 88,
+      "unique_collections": 88
+    },
+    "02_ChainCrossingDiorama": {
+      "linked_collection_instances": 259,
+      "unique_collections": 37
+    }
+  },
+  "packed_images": 77,
+  "vault_matching_triangle_pairs": 32,
+  "vault_minimum_shell_thickness_cm": 5.749998986721039,
+  "assets": [
+    {
+      "id": "CCS01",
+      "vertices": 164,
+      "triangles": 280,
+      "bounds_cm": [
+        250.0,
+        200.0,
+        20.00000044703484
+      ],
+      "uv0": true,
+      "asset_catalog": "a5945a55-e40f-5cf9-9fe0-dbf46899aeac"
+    },
+    {
+      "id": "CCS02",
+      "vertices": 128,
+      "triangles": 220,
+      "bounds_cm": [
+        250.0,
+        100.0,
+        20.00000044703484
+      ],
+      "uv0": true,
+      "asset_catalog": "a5945a55-e40f-5cf9-9fe0-dbf46899aeac"
+    },
+    {
+      "id": "CCS03",
+      "vertices": 72,
+      "triangles": 132,
+      "bounds_cm": [
+        199.99998807907104,
+        20.000000298023224,
+        60.0000035762787
+      ],
+      "uv0": true,
+      "asset_catalog": "a5945a55-e40f-5cf9-9fe0-dbf46899aeac"
+    },
+    {
+      "id": "CCS04",
+      "vertices": 72,
+      "triangles": 108,
+      "bounds_cm": [
+        250.0,
+        40.00000059604645,
+        50.0
+      ],
+      "uv0": true,
+      "asset_catalog": "a5945a55-e40f-5cf9-9fe0-dbf46899aeac"
+    },
+    {
+      "id": "CCS05",
+      "vertices": 426,
+      "triangles": 780,
+      "bounds_cm": [
+        300.0,
+        100.0,
+        300.0
+      ],
+      "uv0": true,
+      "asset_catalog": "a5945a55-e40f-5cf9-9fe0-dbf46899aeac"
+    },
+    {
+      "id": "CCS06",
+      "vertices": 360,
+      "triangles": 660,
+      "bounds_cm": [
+        120.00000476837158,
+        120.00000476837158,
+        300.0
+      ],
+      "uv0": true,
+      "asset_catalog": "a5945a55-e40f-5cf9-9fe0-dbf46899aeac"
+    },
+    {
+      "id": "CCS07",
+      "vertices": 32,
+      "triangles": 64,
+      "bounds_cm": [
+        139.9999976158142,
+        139.9999976158142,
+        40.00000089406968
+      ],
+      "uv0": true,
+      "asset_catalog": "a5945a55-e40f-5cf9-9fe0-dbf46899aeac"
+    },
+    {
+      "id": "CCS08",
+      "vertices": 144,
+      "triangles": 264,
+      "bounds_cm": [
+        199.99998807907104,
+        34.99999940395355,
+        30.00000178813935
+      ],
+      "uv0": true,
+      "asset_catalog": "a5945a55-e40f-5cf9-9fe0-dbf46899aeac"
+    },
+    {
+      "id": "CCS09",
+      "vertices": 144,
+      "triangles": 264,
+      "bounds_cm": [
+        30.000001192092896,
+        30.000001192092896,
+        100.0
+      ],
+      "uv0": true,
+      "asset_catalog": "a5945a55-e40f-5cf9-9fe0-dbf46899aeac"
+    },
+    {
+      "id": "CCS10",
+      "vertices": 48,
+      "triangles": 88,
+      "bounds_cm": [
+        40.00000059604645,
+        40.00000059604645,
+        15.000000894069675
+      ],
+      "uv0": true,
+      "asset_catalog": "a5945a55-e40f-5cf9-9fe0-dbf46899aeac"
+    },
+    {
+      "id": "CCS11",
+      "vertices": 216,
+      "triangles": 396,
+      "bounds_cm": [
+        200.0,
+        11.999999731779099,
+        80.00000178813936
+      ],
+      "uv0": true,
+      "asset_catalog": "a5945a55-e40f-5cf9-9fe0-dbf46899aeac"
+    },
+    {
+      "id": "CCS12",
+      "vertices": 200,
+      "triangles": 372,
+      "bounds_cm": [
+        40.00000059604645,
+        34.99999940395355,
+        100.0
+      ],
+      "uv0": true,
+      "asset_catalog": "a5945a55-e40f-5cf9-9fe0-dbf46899aeac"
+    },
+    {
+      "id": "CCS13",
+      "vertices": 116,
+      "triangles": 192,
+      "bounds_cm": [
+        200.0,
+        200.0,
+        5.00000011175871
+      ],
+      "uv0": true,
+      "asset_catalog": "a5945a55-e40f-5cf9-9fe0-dbf46899aeac"
+    },
+    {
+      "id": "CCS14",
+      "vertices": 80,
+      "triangles": 132,
+      "bounds_cm": [
+        100.0,
+        200.0,
+        5.00000011175871
+      ],
+      "uv0": true,
+      "asset_catalog": "a5945a55-e40f-5cf9-9fe0-dbf46899aeac"
+    },
+    {
+      "id": "CCS15",
+      "vertices": 360,
+      "triangles": 660,
+      "bounds_cm": [
+        200.0,
+        34.99999940395355,
+        299.99998807907104
+      ],
+      "uv0": true,
+      "asset_catalog": "a5945a55-e40f-5cf9-9fe0-dbf46899aeac"
+    },
+    {
+      "id": "CCS16",
+      "vertices": 144,
+      "triangles": 264,
+      "bounds_cm": [
+        60.00000238418579,
+        60.00000238418579,
+        300.0
+      ],
+      "uv0": true,
+      "asset_catalog": "a5945a55-e40f-5cf9-9fe0-dbf46899aeac"
+    },
+    {
+      "id": "CCS17",
+      "vertices": 264,
+      "triangles": 460,
+      "bounds_cm": [
+        300.0,
+        40.00000059604645,
+        350.0
+      ],
+      "uv0": true,
+      "asset_catalog": "a5945a55-e40f-5cf9-9fe0-dbf46899aeac"
+    },
+    {
+      "id": "CCS18",
+      "vertices": 210,
+      "triangles": 368,
+      "bounds_cm": [
+        200.0,
+        200.0,
+        30.00000178813935
+      ],
+      "uv0": true,
+      "asset_catalog": "a5945a55-e40f-5cf9-9fe0-dbf46899aeac"
+    },
+    {
+      "id": "CCS19",
+      "vertices": 24,
+      "triangles": 44,
+      "bounds_cm": [
+        150.0,
+        2.9999999329447746,
+        160.00000357627871
+      ],
+      "uv0": true,
+      "asset_catalog": "a5945a55-e40f-5cf9-9fe0-dbf46899aeac"
+    },
+    {
+      "id": "CCS20",
+      "vertices": 16,
+      "triangles": 28,
+      "bounds_cm": [
+        250.0,
+        5.000000074505806,
+        30.00000178813935
+      ],
+      "uv0": true,
+      "asset_catalog": "a5945a55-e40f-5cf9-9fe0-dbf46899aeac"
+    },
+    {
+      "id": "CCS21",
+      "vertices": 192,
+      "triangles": 360,
+      "bounds_cm": [
+        50.0,
+        5.000000074505806,
+        50.0
+      ],
+      "uv0": true,
+      "asset_catalog": "aa798bdc-ddea-5a1f-8253-c0d9b4f60c93"
+    },
+    {
+      "id": "CCS22",
+      "vertices": 72,
+      "triangles": 132,
+      "bounds_cm": [
+        11.999999731779099,
+        30.000001192092896,
+        11.999999731779099
+      ],
+      "uv0": true,
+      "asset_catalog": "aa798bdc-ddea-5a1f-8253-c0d9b4f60c93"
+    },
+    {
+      "id": "CCS23",
+      "vertices": 166,
+      "triangles": 324,
+      "bounds_cm": [
+        100.0,
+        100.0,
+        160.00000357627871
+      ],
+      "uv0": true,
+      "asset_catalog": "aa798bdc-ddea-5a1f-8253-c0d9b4f60c93"
+    },
+    {
+      "id": "CCS24",
+      "vertices": 528,
+      "triangles": 1036,
+      "bounds_cm": [
+        60.00000238418579,
+        80.0000011920929,
+        60.00000238418579
+      ],
+      "uv0": true,
+      "asset_catalog": "aa798bdc-ddea-5a1f-8253-c0d9b4f60c93"
+    },
+    {
+      "id": "CCS25",
+      "vertices": 192,
+      "triangles": 364,
+      "bounds_cm": [
+        30.000001192092896,
+        25.0,
+        34.99999940395355
+      ],
+      "uv0": true,
+      "asset_catalog": "aa798bdc-ddea-5a1f-8253-c0d9b4f60c93"
+    },
+    {
+      "id": "CCS26",
+      "vertices": 60,
+      "triangles": 104,
+      "bounds_cm": [
+        44.999998807907104,
+        20.000000298023224,
+        40.00000089406968
+      ],
+      "uv0": true,
+      "asset_catalog": "aa798bdc-ddea-5a1f-8253-c0d9b4f60c93"
+    },
+    {
+      "id": "CCS27",
+      "vertices": 128,
+      "triangles": 256,
+      "bounds_cm": [
+        31.999999284744263,
+        20.000000298023224,
+        7.999999821186066
+      ],
+      "uv0": true,
+      "asset_catalog": "aa798bdc-ddea-5a1f-8253-c0d9b4f60c93"
+    },
+    {
+      "id": "CCS28",
+      "vertices": 408,
+      "triangles": 788,
+      "bounds_cm": [
+        60.00000238418579,
+        60.00000238418579,
+        40.00000089406968
+      ],
+      "uv0": true,
+      "asset_catalog": "aa798bdc-ddea-5a1f-8253-c0d9b4f60c93"
+    },
+    {
+      "id": "CCS29",
+      "vertices": 216,
+      "triangles": 396,
+      "bounds_cm": [
+        200.0,
+        40.00000059604645,
+        20.00000044703484
+      ],
+      "uv0": true,
+      "asset_catalog": "aa798bdc-ddea-5a1f-8253-c0d9b4f60c93"
+    },
+    {
+      "id": "CCS30",
+      "vertices": 400,
+      "triangles": 768,
+      "bounds_cm": [
+        34.99999940395355,
+        25.0,
+        40.00000089406968
+      ],
+      "uv0": true,
+      "asset_catalog": "aa798bdc-ddea-5a1f-8253-c0d9b4f60c93"
+    },
+    {
+      "id": "CCS31",
+      "vertices": 240,
+      "triangles": 448,
+      "bounds_cm": [
+        44.999998807907104,
+        25.0,
+        44.99999821186065
+      ],
+      "uv0": true,
+      "asset_catalog": "aa798bdc-ddea-5a1f-8253-c0d9b4f60c93"
+    },
+    {
+      "id": "CCS32",
+      "vertices": 200,
+      "triangles": 384,
+      "bounds_cm": [
+        30.000001192092896,
+        34.99999940395355,
+        49.99999850988388
+      ],
+      "uv0": true,
+      "asset_catalog": "aa798bdc-ddea-5a1f-8253-c0d9b4f60c93"
+    },
+    {
+      "id": "CCS33",
+      "vertices": 480,
+      "triangles": 844,
+      "bounds_cm": [
+        200.0,
+        11.999999731779099,
+        220.0000071525574
+      ],
+      "uv0": true,
+      "asset_catalog": "aa798bdc-ddea-5a1f-8253-c0d9b4f60c93"
+    },
+    {
+      "id": "CCS34",
+      "vertices": 120,
+      "triangles": 220,
+      "bounds_cm": [
+        20.000000298023224,
+        40.00000059604645,
+        240.0000143051148
+      ],
+      "uv0": true,
+      "asset_catalog": "aa798bdc-ddea-5a1f-8253-c0d9b4f60c93"
+    },
+    {
+      "id": "CCS35",
+      "vertices": 96,
+      "triangles": 176,
+      "bounds_cm": [
+        239.99998569488525,
+        40.00000059604645,
+        20.00000044703484
+      ],
+      "uv0": true,
+      "asset_catalog": "aa798bdc-ddea-5a1f-8253-c0d9b4f60c93"
+    },
+    {
+      "id": "CCS36",
+      "vertices": 168,
+      "triangles": 308,
+      "bounds_cm": [
+        15.000000596046448,
+        20.000000298023224,
+        440.0000143051148
+      ],
+      "uv0": true,
+      "asset_catalog": "aa798bdc-ddea-5a1f-8253-c0d9b4f60c93"
+    },
+    {
+      "id": "CCS37",
+      "vertices": 144,
+      "triangles": 264,
+      "bounds_cm": [
+        240.00000953674316,
+        50.0,
+        80.00000178813936
+      ],
+      "uv0": true,
+      "asset_catalog": "aa798bdc-ddea-5a1f-8253-c0d9b4f60c93"
+    },
+    {
+      "id": "CCS38",
+      "vertices": 56,
+      "triangles": 96,
+      "bounds_cm": [
+        25.0,
+        30.000001192092896,
+        15.000000894069675
+      ],
+      "uv0": true,
+      "asset_catalog": "aa798bdc-ddea-5a1f-8253-c0d9b4f60c93"
+    },
+    {
+      "id": "CCS39",
+      "vertices": 264,
+      "triangles": 468,
+      "bounds_cm": [
+        44.999998807907104,
+        40.00000059604645,
+        240.0000143051148
+      ],
+      "uv0": true,
+      "asset_catalog": "aa798bdc-ddea-5a1f-8253-c0d9b4f60c93"
+    },
+    {
+      "id": "CCS40",
+      "vertices": 144,
+      "triangles": 276,
+      "bounds_cm": [
+        15.000000596046448,
+        19.999998807907104,
+        80.00000178813936
+      ],
+      "uv0": true,
+      "asset_catalog": "aa798bdc-ddea-5a1f-8253-c0d9b4f60c93"
+    },
+    {
+      "id": "CCS41",
+      "vertices": 312,
+      "triangles": 596,
+      "bounds_cm": [
+        40.00000059604645,
+        40.00000059604645,
+        50.0
+      ],
+      "uv0": true,
+      "asset_catalog": "aa798bdc-ddea-5a1f-8253-c0d9b4f60c93"
+    },
+    {
+      "id": "CCS42",
+      "vertices": 180,
+      "triangles": 340,
+      "bounds_cm": [
+        20.000000298023224,
+        20.000000298023224,
+        20.00000044703484
+      ],
+      "uv0": true,
+      "asset_catalog": "aa798bdc-ddea-5a1f-8253-c0d9b4f60c93"
+    },
+    {
+      "id": "CCS43",
+      "vertices": 21,
+      "triangles": 38,
+      "bounds_cm": [
+        300.0,
+        199.99998807907104,
+        250.0
+      ],
+      "uv0": true,
+      "asset_catalog": "a5945a55-e40f-5cf9-9fe0-dbf46899aeac"
+    },
+    {
+      "id": "CCS44",
+      "vertices": 21,
+      "triangles": 38,
+      "bounds_cm": [
+        160.0000023841858,
+        120.00000476837158,
+        129.9999928474426
+      ],
+      "uv0": true,
+      "asset_catalog": "a5945a55-e40f-5cf9-9fe0-dbf46899aeac"
+    },
+    {
+      "id": "CCS45",
+      "vertices": 48,
+      "triangles": 92,
+      "bounds_cm": [
+        400.0,
+        100.0,
+        400.0
+      ],
+      "uv0": true,
+      "asset_catalog": "a5945a55-e40f-5cf9-9fe0-dbf46899aeac"
+    },
+    {
+      "id": "CCS46",
+      "vertices": 96,
+      "triangles": 184,
+      "bounds_cm": [
+        300.0,
+        300.0,
+        400.0
+      ],
+      "uv0": true,
+      "asset_catalog": "a5945a55-e40f-5cf9-9fe0-dbf46899aeac"
+    },
+    {
+      "id": "CCS47",
+      "vertices": 21,
+      "triangles": 38,
+      "bounds_cm": [
+        400.0,
+        400.0,
+        100.0
+      ],
+      "uv0": true,
+      "asset_catalog": "a5945a55-e40f-5cf9-9fe0-dbf46899aeac"
+    },
+    {
+      "id": "CCS48",
+      "vertices": 60,
+      "triangles": 102,
+      "bounds_cm": [
+        400.0,
+        119.99999284744263,
+        200.0
+      ],
+      "uv0": true,
+      "asset_catalog": "a5945a55-e40f-5cf9-9fe0-dbf46899aeac"
+    },
+    {
+      "id": "CCS49",
+      "vertices": 48,
+      "triangles": 92,
+      "bounds_cm": [
+        400.0,
+        150.0,
+        600.0
+      ],
+      "uv0": true,
+      "asset_catalog": "a5945a55-e40f-5cf9-9fe0-dbf46899aeac"
+    },
+    {
+      "id": "CCS50",
+      "vertices": 147,
+      "triangles": 266,
+      "bounds_cm": [
+        200.0,
+        60.00000238418579,
+        30.00000178813935
+      ],
+      "uv0": true,
+      "asset_catalog": "a5945a55-e40f-5cf9-9fe0-dbf46899aeac"
+    },
+    {
+      "id": "CCS51",
+      "vertices": 4,
+      "triangles": 2,
+      "bounds_cm": [
+        400.0,
+        400.0,
+        0.0
+      ],
+      "uv0": true,
+      "asset_catalog": "adffc8c5-9cfb-5aee-89e8-b45a919510ec"
+    },
+    {
+      "id": "CCS52",
+      "vertices": 26,
+      "triangles": 24,
+      "bounds_cm": [
+        200.0,
+        50.0,
+        0.0
+      ],
+      "uv0": true,
+      "asset_catalog": "adffc8c5-9cfb-5aee-89e8-b45a919510ec"
+    },
+    {
+      "id": "CCS53",
+      "vertices": 4,
+      "triangles": 2,
+      "bounds_cm": [
+        200.0,
+        0.0,
+        0.9999999664723875
+      ],
+      "uv0": true,
+      "asset_catalog": "adffc8c5-9cfb-5aee-89e8-b45a919510ec"
+    },
+    {
+      "id": "CCS54",
+      "vertices": 72,
+      "triangles": 132,
+      "bounds_cm": [
+        200.0,
+        44.999998807907104,
+        30.00000178813935
+      ],
+      "uv0": true,
+      "asset_catalog": "adffc8c5-9cfb-5aee-89e8-b45a919510ec"
+    },
+    {
+      "id": "CCS55",
+      "vertices": 32,
+      "triangles": 64,
+      "bounds_cm": [
+        60.00000238418579,
+        80.0000011920929,
+        60.0000035762787
+      ],
+      "uv0": true,
+      "asset_catalog": "adffc8c5-9cfb-5aee-89e8-b45a919510ec"
+    },
+    {
+      "id": "CCS56",
+      "vertices": 14,
+      "triangles": 12,
+      "bounds_cm": [
+        40.00000059604645,
+        34.99999940395355,
+        100.0
+      ],
+      "uv0": true,
+      "asset_catalog": "adffc8c5-9cfb-5aee-89e8-b45a919510ec"
+    },
+    {
+      "id": "CCS57",
+      "vertices": 192,
+      "triangles": 384,
+      "bounds_cm": [
+        80.0000011920929,
+        80.0000011920929,
+        0.9999999664723875
+      ],
+      "uv0": true,
+      "asset_catalog": "adffc8c5-9cfb-5aee-89e8-b45a919510ec"
+    },
+    {
+      "id": "CCS58",
+      "vertices": 20,
+      "triangles": 10,
+      "bounds_cm": [
+        30.000001192092896,
+        0.0,
+        119.9999892711638
+      ],
+      "uv0": true,
+      "asset_catalog": "adffc8c5-9cfb-5aee-89e8-b45a919510ec"
+    },
+    {
+      "id": "CCS59",
+      "vertices": 12,
+      "triangles": 10,
+      "bounds_cm": [
+        150.00001192092896,
+        100.0,
+        0.0
+      ],
+      "uv0": true,
+      "asset_catalog": "adffc8c5-9cfb-5aee-89e8-b45a919510ec"
+    },
+    {
+      "id": "CCS60",
+      "vertices": 528,
+      "triangles": 972,
+      "bounds_cm": [
+        34.99999940395355,
+        25.0,
+        55.00000178813935
+      ],
+      "uv0": true,
+      "asset_catalog": "e94e3fff-eb32-5e22-8372-0fb402bd590f"
+    },
+    {
+      "id": "CCS61",
+      "vertices": 24,
+      "triangles": 44,
+      "bounds_cm": [
+        25.0,
+        20.000000298023224,
+        34.99999910593032
+      ],
+      "uv0": true,
+      "asset_catalog": "e94e3fff-eb32-5e22-8372-0fb402bd590f"
+    },
+    {
+      "id": "CCS62",
+      "vertices": 110,
+      "triangles": 196,
+      "bounds_cm": [
+        15.000000596046448,
+        25.0,
+        25.0
+      ],
+      "uv0": true,
+      "asset_catalog": "e94e3fff-eb32-5e22-8372-0fb402bd590f"
+    },
+    {
+      "id": "CCS63",
+      "vertices": 152,
+      "triangles": 284,
+      "bounds_cm": [
+        30.000001192092896,
+        34.99999940395355,
+        60.0000035762787
+      ],
+      "uv0": true,
+      "asset_catalog": "e94e3fff-eb32-5e22-8372-0fb402bd590f"
+    },
+    {
+      "id": "CCS64",
+      "vertices": 22,
+      "triangles": 40,
+      "bounds_cm": [
+        25.0,
+        0.9999999776482582,
+        50.0
+      ],
+      "uv0": true,
+      "asset_catalog": "e94e3fff-eb32-5e22-8372-0fb402bd590f"
+    },
+    {
+      "id": "CCS65",
+      "vertices": 160,
+      "triangles": 288,
+      "bounds_cm": [
+        44.999998807907104,
+        40.00000059604645,
+        60.0000035762787
+      ],
+      "uv0": true,
+      "asset_catalog": "e94e3fff-eb32-5e22-8372-0fb402bd590f"
+    },
+    {
+      "id": "CCS66",
+      "vertices": 408,
+      "triangles": 748,
+      "bounds_cm": [
+        89.99999761581421,
+        89.99999761581421,
+        120.0000071525574
+      ],
+      "uv0": true,
+      "asset_catalog": "e94e3fff-eb32-5e22-8372-0fb402bd590f"
+    },
+    {
+      "id": "CCS67",
+      "vertices": 664,
+      "triangles": 1212,
+      "bounds_cm": [
+        100.0,
+        80.0000011920929,
+        80.00000178813936
+      ],
+      "uv0": true,
+      "asset_catalog": "e94e3fff-eb32-5e22-8372-0fb402bd590f"
+    },
+    {
+      "id": "CCS68",
+      "vertices": 168,
+      "triangles": 320,
+      "bounds_cm": [
+        70.00000476837158,
+        59.99999642372131,
+        100.0
+      ],
+      "uv0": true,
+      "asset_catalog": "e94e3fff-eb32-5e22-8372-0fb402bd590f"
+    },
+    {
+      "id": "CCS69",
+      "vertices": 528,
+      "triangles": 968,
+      "bounds_cm": [
+        200.0,
+        50.0,
+        220.0000071525574
+      ],
+      "uv0": true,
+      "asset_catalog": "e94e3fff-eb32-5e22-8372-0fb402bd590f"
+    },
+    {
+      "id": "CCS70",
+      "vertices": 120,
+      "triangles": 220,
+      "bounds_cm": [
+        80.0000011920929,
+        69.9999988079071,
+        40.00000089406968
+      ],
+      "uv0": true,
+      "asset_catalog": "e94e3fff-eb32-5e22-8372-0fb402bd590f"
+    },
+    {
+      "id": "CCS71",
+      "vertices": 564,
+      "triangles": 1120,
+      "bounds_cm": [
+        60.00000238418579,
+        59.99999642372131,
+        20.00000044703484
+      ],
+      "uv0": true,
+      "asset_catalog": "e94e3fff-eb32-5e22-8372-0fb402bd590f"
+    },
+    {
+      "id": "CCS72",
+      "vertices": 30,
+      "triangles": 48,
+      "bounds_cm": [
+        150.0,
+        25.0,
+        5.999999798834321
+      ],
+      "uv0": true,
+      "asset_catalog": "e94e3fff-eb32-5e22-8372-0fb402bd590f"
+    },
+    {
+      "id": "CCS73",
+      "vertices": 64,
+      "triangles": 108,
+      "bounds_cm": [
+        69.9999988079071,
+        40.00000059604645,
+        3.99999986588955
+      ],
+      "uv0": true,
+      "asset_catalog": "e94e3fff-eb32-5e22-8372-0fb402bd590f"
+    },
+    {
+      "id": "CCS74",
+      "vertices": 50,
+      "triangles": 96,
+      "bounds_cm": [
+        49.99999701976776,
+        50.0,
+        1.999999932944775
+      ],
+      "uv0": true,
+      "asset_catalog": "e94e3fff-eb32-5e22-8372-0fb402bd590f"
+    },
+    {
+      "id": "CCS75",
+      "vertices": 222,
+      "triangles": 428,
+      "bounds_cm": [
+        50.0,
+        44.999998807907104,
+        55.00000178813935
+      ],
+      "uv0": true,
+      "asset_catalog": "e94e3fff-eb32-5e22-8372-0fb402bd590f"
+    },
+    {
+      "id": "CCS76",
+      "vertices": 64,
+      "triangles": 116,
+      "bounds_cm": [
+        25.0,
+        15.000000596046448,
+        89.9999964237213
+      ],
+      "uv0": true,
+      "asset_catalog": "e94e3fff-eb32-5e22-8372-0fb402bd590f"
+    },
+    {
+      "id": "CCS77",
+      "vertices": 568,
+      "triangles": 1076,
+      "bounds_cm": [
+        69.9999988079071,
+        60.00000238418579,
+        60.0000035762787
+      ],
+      "uv0": true,
+      "asset_catalog": "e94e3fff-eb32-5e22-8372-0fb402bd590f"
+    },
+    {
+      "id": "CCS78",
+      "vertices": 144,
+      "triangles": 256,
+      "bounds_cm": [
+        69.9999988079071,
+        2.9999999329447746,
+        100.0
+      ],
+      "uv0": true,
+      "asset_catalog": "e94e3fff-eb32-5e22-8372-0fb402bd590f"
+    },
+    {
+      "id": "CCS79",
+      "vertices": 348,
+      "triangles": 648,
+      "bounds_cm": [
+        60.00000238418579,
+        3.0000001192092896,
+        60.0000035762787
+      ],
+      "uv0": true,
+      "asset_catalog": "e94e3fff-eb32-5e22-8372-0fb402bd590f"
+    },
+    {
+      "id": "CCS80",
+      "vertices": 12,
+      "triangles": 20,
+      "bounds_cm": [
+        50.0,
+        2.9999999329447746,
+        40.00000089406968
+      ],
+      "uv0": true,
+      "asset_catalog": "e94e3fff-eb32-5e22-8372-0fb402bd590f"
+    },
+    {
+      "id": "CCS81",
+      "vertices": 124,
+      "triangles": 224,
+      "bounds_cm": [
+        60.00000238418579,
+        3.999999910593033,
+        139.99999642372129
+      ],
+      "uv0": true,
+      "asset_catalog": "e94e3fff-eb32-5e22-8372-0fb402bd590f"
+    },
+    {
+      "id": "CCS82",
+      "vertices": 4,
+      "triangles": 2,
+      "bounds_cm": [
+        120.00000476837158,
+        0.0,
+        69.99999821186064
+      ],
+      "uv0": true,
+      "asset_catalog": "e94e3fff-eb32-5e22-8372-0fb402bd590f"
+    },
+    {
+      "id": "CCS83",
+      "vertices": 4,
+      "triangles": 2,
+      "bounds_cm": [
+        150.0,
+        0.0,
+        120.0000071525574
+      ],
+      "uv0": true,
+      "asset_catalog": "e94e3fff-eb32-5e22-8372-0fb402bd590f"
+    },
+    {
+      "id": "CCS84",
+      "vertices": 120,
+      "triangles": 204,
+      "bounds_cm": [
+        80.0000011920929,
+        5.000000074505806,
+        80.00000178813936
+      ],
+      "uv0": true,
+      "asset_catalog": "e94e3fff-eb32-5e22-8372-0fb402bd590f"
+    },
+    {
+      "id": "CCS85",
+      "vertices": 44,
+      "triangles": 72,
+      "bounds_cm": [
+        80.0000011920929,
+        60.00000238418579,
+        20.00000044703484
+      ],
+      "uv0": true,
+      "asset_catalog": "e94e3fff-eb32-5e22-8372-0fb402bd590f"
+    },
+    {
+      "id": "CCS86",
+      "vertices": 40,
+      "triangles": 68,
+      "bounds_cm": [
+        200.0,
+        30.000001192092896,
+        34.99999910593032
+      ],
+      "uv0": true,
+      "asset_catalog": "a5945a55-e40f-5cf9-9fe0-dbf46899aeac"
+    },
+    {
+      "id": "CCS87",
+      "vertices": 124,
+      "triangles": 220,
+      "bounds_cm": [
+        120.00000476837158,
+        24.99999850988388,
+        119.9999892711638
+      ],
+      "uv0": true,
+      "asset_catalog": "a5945a55-e40f-5cf9-9fe0-dbf46899aeac"
+    },
+    {
+      "id": "CCS88",
+      "vertices": 256,
+      "triangles": 472,
+      "bounds_cm": [
+        80.0000011920929,
+        80.0000011920929,
+        15.000000894069675
+      ],
+      "uv0": true,
+      "asset_catalog": "a5945a55-e40f-5cf9-9fe0-dbf46899aeac"
+    }
+  ]
+}

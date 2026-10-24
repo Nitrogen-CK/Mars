@@ -1,0 +1,12 @@
+{
+  "world": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP",
+  "hism_components": 73,
+  "instances": 1216,
+  "all_no_collision": true,
+  "spectator_at": [
+    -300.0,
+    -2900.0,
+    -90.0
+  ],
+  "observation": "Runtime spectator observation at standing eye height, not walking or input validation."
+}

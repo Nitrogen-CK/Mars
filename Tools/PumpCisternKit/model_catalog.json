@@ -1,0 +1,554 @@
+[
+  {
+    "id": "PWC01",
+    "name": "PumpTowerBody",
+    "dimensions_cm": {
+      "width": 200,
+      "depth": 200,
+      "height": 600
+    },
+    "materials": [
+      "TX09",
+      "TX11"
+    ],
+    "category": "Mechanisms",
+    "pivot": "bottom center",
+    "model_sheet": "PC01",
+    "flags": {
+      "hero_base_cylinder_cap": true,
+      "flywheel_separate": true
+    },
+    "notes": "2 m source footprint and 6 m landmark body; hollow side outlet; no duplicated flywheel.",
+    "collision": "NoCollision visual art; retained greybox/gameplay collision is authoritative.",
+    "reference_image": "Concepts/PC01.png",
+    "blender_brief": "Generate PWC01 PumpTowerBody as low-poly flat-shaded visual dressing. Envelope W/D/H 200x200x600 cm; pivot bottom center; materials TX09, TX11; category Mechanisms. 2 m source footprint and 6 m landmark body; hollow side outlet; no duplicated flywheel. Use the cited PC concept sheet for silhouette. No collision, lights, gameplay, or UI."
+  },
+  {
+    "id": "PWC02",
+    "name": "PumpFlywheel",
+    "dimensions_cm": {
+      "width": 90,
+      "depth": 24,
+      "height": 90
+    },
+    "materials": [
+      "TX09",
+      "TX11"
+    ],
+    "category": "Mechanisms",
+    "pivot": "center",
+    "model_sheet": "PC01",
+    "flags": {
+      "axis": "Y",
+      "wheel_plane": "XZ",
+      "spokes": 6
+    },
+    "notes": "Six-spoke wheel in XZ; axle along Y; dimensions 90x24x90 cm.",
+    "reference_image": "Concepts/PC01.png",
+    "blender_brief": "Generate PWC02 PumpFlywheel as low-poly flat-shaded visual dressing. Envelope W/D/H 90x24x90 cm; pivot center; materials TX09, TX11; category Mechanisms. Six-spoke wheel in XZ; axle along Y; dimensions 90x24x90 cm. Use the cited PC concept sheet for silhouette. No collision, lights, gameplay, or UI."
+  },
+  {
+    "id": "PWC03",
+    "name": "PistonRod",
+    "dimensions_cm": {
+      "width": 24,
+      "depth": 24,
+      "height": 160
+    },
+    "materials": [
+      "TX09",
+      "TX11"
+    ],
+    "category": "Mechanisms",
+    "pivot": "center",
+    "model_sheet": "PC01",
+    "flags": {
+      "separate_moving_part": true
+    },
+    "notes": "Simple vertical rod with restrained end collars.",
+    "reference_image": "Concepts/PC01.png",
+    "blender_brief": "Generate PWC03 PistonRod as low-poly flat-shaded visual dressing. Envelope W/D/H 24x24x160 cm; pivot center; materials TX09, TX11; category Mechanisms. Simple vertical rod with restrained end collars. Use the cited PC concept sheet for silhouette. No collision, lights, gameplay, or UI."
+  },
+  {
+    "id": "PWC04",
+    "name": "PumpDiagonalBrace",
+    "dimensions_cm": {
+      "width": 80,
+      "depth": 35,
+      "height": 140
+    },
+    "materials": [
+      "TX08",
+      "TX09"
+    ],
+    "category": "Mechanisms",
+    "pivot": "bottom center",
+    "model_sheet": "PC01",
+    "notes": "Diagonal support leans across XZ with compact end shoes.",
+    "reference_image": "Concepts/PC01.png",
+    "flags": {
+      "axis": "XZ"
+    },
+    "blender_brief": "Generate PWC04 PumpDiagonalBrace as low-poly flat-shaded visual dressing. Envelope W/D/H 80x35x140 cm; pivot bottom center; materials TX08, TX09; category Mechanisms. Diagonal support leans across XZ with compact end shoes. Use the cited PC concept sheet for silhouette. No collision, lights, gameplay, or UI."
+  },
+  {
+    "id": "PWC05",
+    "name": "PipeStraight",
+    "dimensions_cm": {
+      "width": 200,
+      "depth": 40,
+      "height": 40
+    },
+    "materials": [
+      "TX11",
+      "TX09"
+    ],
+    "category": "Mechanisms",
+    "pivot": "center",
+    "model_sheet": "PC02",
+    "flags": {
+      "axis": "X",
+      "hollow_mouths": true
+    },
+    "notes": "Two metre straight hollow pipe; axis X; open ends and flange lips.",
+    "reference_image": "Concepts/PC02.png",
+    "blender_brief": "Generate PWC05 PipeStraight as low-poly flat-shaded visual dressing. Envelope W/D/H 200x40x40 cm; pivot center; materials TX11, TX09; category Mechanisms. Two metre straight hollow pipe; axis X; open ends and flange lips. Use the cited PC concept sheet for silhouette. No collision, lights, gameplay, or UI."
+  },
+  {
+    "id": "PWC06",
+    "name": "PipeElbow",
+    "dimensions_cm": {
+      "width": 80,
+      "depth": 80,
+      "height": 40
+    },
+    "materials": [
+      "TX11",
+      "TX09"
+    ],
+    "category": "Mechanisms",
+    "pivot": "center",
+    "model_sheet": "PC02",
+    "flags": {
+      "axis": "XY",
+      "hollow_mouths": true,
+      "socket_centers_m": [
+        [
+          -0.1,
+          0.1,
+          0
+        ],
+        [
+          0.1,
+          -0.1,
+          0
+        ]
+      ]
+    },
+    "notes": "Horizontal quarter bend with open ends.",
+    "reference_image": "Concepts/PC02.png",
+    "blender_brief": "Generate PWC06 PipeElbow as low-poly flat-shaded visual dressing. Envelope W/D/H 80x80x40 cm; pivot center; materials TX11, TX09; category Mechanisms. Horizontal quarter bend with open ends. Use the cited PC concept sheet for silhouette. No collision, lights, gameplay, or UI."
+  },
+  {
+    "id": "PWC07",
+    "name": "PipeCollar",
+    "dimensions_cm": {
+      "width": 18,
+      "depth": 50,
+      "height": 50
+    },
+    "materials": [
+      "TX09",
+      "TX11"
+    ],
+    "category": "Mechanisms",
+    "pivot": "center",
+    "model_sheet": "PC02",
+    "flags": {
+      "axis": "X",
+      "hollow_center": true,
+      "open_mouths": true
+    },
+    "notes": "Open annular coupling flange.",
+    "reference_image": "Concepts/PC02.png",
+    "blender_brief": "Generate PWC07 PipeCollar as low-poly flat-shaded visual dressing. Envelope W/D/H 18x50x50 cm; pivot center; materials TX09, TX11; category Mechanisms. Open annular coupling flange. Use the cited PC concept sheet for silhouette. No collision, lights, gameplay, or UI."
+  },
+  {
+    "id": "PWC08",
+    "name": "PipeWallBracket",
+    "dimensions_cm": {
+      "width": 35,
+      "depth": 30,
+      "height": 65
+    },
+    "materials": [
+      "TX09",
+      "TX11"
+    ],
+    "category": "Mechanisms",
+    "pivot": "bottom center",
+    "model_sheet": "PC02",
+    "notes": "Fixed wall plate and pipe cradle; no pipe included.",
+    "reference_image": "Concepts/PC02.png",
+    "blender_brief": "Generate PWC08 PipeWallBracket as low-poly flat-shaded visual dressing. Envelope W/D/H 35x30x65 cm; pivot bottom center; materials TX09, TX11; category Mechanisms. Fixed wall plate and pipe cradle; no pipe included. Use the cited PC concept sheet for silhouette. No collision, lights, gameplay, or UI."
+  },
+  {
+    "id": "PWC09",
+    "name": "PipeEndCap",
+    "dimensions_cm": {
+      "width": 12,
+      "depth": 50,
+      "height": 50
+    },
+    "materials": [
+      "TX09",
+      "TX11"
+    ],
+    "category": "Mechanisms",
+    "pivot": "center",
+    "model_sheet": "PC02",
+    "flags": {
+      "axis": "X",
+      "closed_end": true
+    },
+    "notes": "Closed pipe end, visually distinct from open coupling.",
+    "reference_image": "Concepts/PC02.png",
+    "blender_brief": "Generate PWC09 PipeEndCap as low-poly flat-shaded visual dressing. Envelope W/D/H 12x50x50 cm; pivot center; materials TX09, TX11; category Mechanisms. Closed pipe end, visually distinct from open coupling. Use the cited PC concept sheet for silhouette. No collision, lights, gameplay, or UI."
+  },
+  {
+    "id": "PWC10",
+    "name": "CisternRimStraight",
+    "dimensions_cm": {
+      "width": 200,
+      "depth": 55,
+      "height": 55
+    },
+    "materials": [
+      "TX04",
+      "TX02"
+    ],
+    "category": "Architecture",
+    "pivot": "bottom center",
+    "model_sheet": "PC03",
+    "notes": "Straight coping segment for the shallow basin edge.",
+    "reference_image": "Concepts/PC03.png",
+    "blender_brief": "Generate PWC10 CisternRimStraight as low-poly flat-shaded visual dressing. Envelope W/D/H 200x55x55 cm; pivot bottom center; materials TX04, TX02; category Architecture. Straight coping segment for the shallow basin edge. Use the cited PC concept sheet for silhouette. No collision, lights, gameplay, or UI."
+  },
+  {
+    "id": "PWC11",
+    "name": "CisternRimInnerCorner",
+    "dimensions_cm": {
+      "width": 80,
+      "depth": 80,
+      "height": 55
+    },
+    "materials": [
+      "TX04",
+      "TX02"
+    ],
+    "category": "Architecture",
+    "pivot": "bottom center",
+    "model_sheet": "PC03",
+    "flags": {
+      "shape": "L; open inside corner"
+    },
+    "notes": "L-shaped joined coping with an open basin-side corner.",
+    "reference_image": "Concepts/PC03.png",
+    "blender_brief": "Generate PWC11 CisternRimInnerCorner as low-poly flat-shaded visual dressing. Envelope W/D/H 80x80x55 cm; pivot bottom center; materials TX04, TX02; category Architecture. L-shaped joined coping with an open basin-side corner. Use the cited PC concept sheet for silhouette. No collision, lights, gameplay, or UI."
+  },
+  {
+    "id": "PWC12",
+    "name": "CisternRimEnd",
+    "dimensions_cm": {
+      "width": 60,
+      "depth": 55,
+      "height": 55
+    },
+    "materials": [
+      "TX04",
+      "TX02"
+    ],
+    "category": "Architecture",
+    "pivot": "bottom center",
+    "model_sheet": "PC03",
+    "notes": "Short closed terminus for a rim run.",
+    "reference_image": "Concepts/PC03.png",
+    "blender_brief": "Generate PWC12 CisternRimEnd as low-poly flat-shaded visual dressing. Envelope W/D/H 60x55x55 cm; pivot bottom center; materials TX04, TX02; category Architecture. Short closed terminus for a rim run. Use the cited PC concept sheet for silhouette. No collision, lights, gameplay, or UI."
+  },
+  {
+    "id": "PWC13",
+    "name": "WaterGaugeBoard",
+    "dimensions_cm": {
+      "width": 35,
+      "depth": 12,
+      "height": 150
+    },
+    "materials": [
+      "TX08",
+      "TX09"
+    ],
+    "category": "Dressing",
+    "pivot": "bottom center",
+    "model_sheet": "PC03",
+    "flags": {
+      "ticks_only_no_control": true
+    },
+    "notes": "Plain board with physical level ticks; no text, dial, UI, or control.",
+    "reference_image": "Concepts/PC03.png",
+    "blender_brief": "Generate PWC13 WaterGaugeBoard as low-poly flat-shaded visual dressing. Envelope W/D/H 35x12x150 cm; pivot bottom center; materials TX08, TX09; category Dressing. Plain board with physical level ticks; no text, dial, UI, or control. Use the cited PC concept sheet for silhouette. No collision, lights, gameplay, or UI."
+  },
+  {
+    "id": "PWC14",
+    "name": "RootFork",
+    "dimensions_cm": {
+      "width": 200,
+      "depth": 70,
+      "height": 250
+    },
+    "materials": [
+      "TX08",
+      "TX04"
+    ],
+    "category": "Dressing",
+    "pivot": "bottom center",
+    "model_sheet": "PC04",
+    "flags": {
+      "non_climbable_visual": true
+    },
+    "notes": "Chunky three-prong root cluster for the authored roof penetration only.",
+    "reference_image": "Concepts/PC04.png",
+    "blender_brief": "Generate PWC14 RootFork as low-poly flat-shaded visual dressing. Envelope W/D/H 200x70x250 cm; pivot bottom center; materials TX08, TX04; category Dressing. Chunky three-prong root cluster for the authored roof penetration only. Use the cited PC concept sheet for silhouette. No collision, lights, gameplay, or UI."
+  },
+  {
+    "id": "PWC15",
+    "name": "RootTendril",
+    "dimensions_cm": {
+      "width": 50,
+      "depth": 45,
+      "height": 220
+    },
+    "materials": [
+      "TX08"
+    ],
+    "category": "Dressing",
+    "pivot": "bottom center",
+    "model_sheet": "PC04",
+    "flags": {
+      "non_climbable_visual": true
+    },
+    "notes": "Single narrow root with a small natural bend.",
+    "reference_image": "Concepts/PC04.png",
+    "blender_brief": "Generate PWC15 RootTendril as low-poly flat-shaded visual dressing. Envelope W/D/H 50x45x220 cm; pivot bottom center; materials TX08; category Dressing. Single narrow root with a small natural bend. Use the cited PC concept sheet for silhouette. No collision, lights, gameplay, or UI."
+  },
+  {
+    "id": "PWC16",
+    "name": "RootSocketCollar",
+    "dimensions_cm": {
+      "width": 100,
+      "depth": 45,
+      "height": 35
+    },
+    "materials": [
+      "TX08",
+      "TX04"
+    ],
+    "category": "Dressing",
+    "pivot": "bottom center",
+    "model_sheet": "PC04",
+    "notes": "Low radial root-and-stone transition collar.",
+    "reference_image": "Concepts/PC04.png",
+    "flags": {
+      "pivot": "bottom center",
+      "hollow_center": true,
+      "elliptical_footprint": true
+    },
+    "blender_brief": "Generate PWC16 RootSocketCollar as low-poly flat-shaded visual dressing. Envelope W/D/H 100x45x35 cm; pivot bottom center; materials TX08, TX04; category Dressing. Low radial root-and-stone transition collar. Use the cited PC concept sheet for silhouette. No collision, lights, gameplay, or UI."
+  },
+  {
+    "id": "PWC17",
+    "name": "CisternBedPebbleCluster",
+    "dimensions_cm": {
+      "width": 100,
+      "depth": 80,
+      "height": 15
+    },
+    "materials": [
+      "TX04",
+      "TX02"
+    ],
+    "category": "Dressing",
+    "pivot": "top contact",
+    "model_sheet": "PC03",
+    "notes": "Sparse low pebbles for the basin bed; must not imply climbable footing.",
+    "reference_image": "Concepts/PC03.png",
+    "blender_brief": "Generate PWC17 CisternBedPebbleCluster as low-poly flat-shaded visual dressing. Envelope W/D/H 100x80x15 cm; pivot top contact; materials TX04, TX02; category Dressing. Sparse low pebbles for the basin bed; must not imply climbable footing. Use the cited PC concept sheet for silhouette. No collision, lights, gameplay, or UI."
+  },
+  {
+    "id": "PWC18",
+    "name": "PipeRepairWrap",
+    "dimensions_cm": {
+      "width": 70,
+      "depth": 55,
+      "height": 55
+    },
+    "materials": [
+      "TX09",
+      "TX08"
+    ],
+    "category": "Dressing",
+    "pivot": "center",
+    "model_sheet": "PC02",
+    "notes": "Two annular X-axis straps and a curved patch segment; bore remains open.",
+    "reference_image": "Concepts/PC02.png",
+    "flags": {
+      "two_annular_straps": true,
+      "curved_patch": true,
+      "open_bore": true
+    },
+    "blender_brief": "Generate PWC18 PipeRepairWrap as low-poly flat-shaded visual dressing. Envelope W/D/H 70x55x55 cm; pivot center; materials TX09, TX08; category Dressing. Two annular X-axis straps and a curved patch segment; bore remains open. Use the cited PC concept sheet for silhouette. No collision, lights, gameplay, or UI."
+  },
+  {
+    "id": "PWC19",
+    "name": "ToolRack",
+    "dimensions_cm": {
+      "width": 100,
+      "depth": 25,
+      "height": 140
+    },
+    "materials": [
+      "TX08",
+      "TX09"
+    ],
+    "category": "Dressing",
+    "pivot": "bottom center",
+    "model_sheet": "PC05",
+    "notes": "Wall-side rack with clear space below and no dangling silhouettes.",
+    "reference_image": "Concepts/PC05.png",
+    "blender_brief": "Generate PWC19 ToolRack as low-poly flat-shaded visual dressing. Envelope W/D/H 100x25x140 cm; pivot bottom center; materials TX08, TX09; category Dressing. Wall-side rack with clear space below and no dangling silhouettes. Use the cited PC concept sheet for silhouette. No collision, lights, gameplay, or UI.",
+    "flags": {
+      "no_hanging_over_interaction_plane": true
+    }
+  },
+  {
+    "id": "PWC20",
+    "name": "Spanner",
+    "dimensions_cm": {
+      "width": 55,
+      "depth": 12,
+      "height": 15
+    },
+    "materials": [
+      "TX09"
+    ],
+    "category": "Dressing",
+    "pivot": "center",
+    "model_sheet": "PC05",
+    "notes": "Chunky single-piece open-jaw maintenance spanner.",
+    "reference_image": "Concepts/PC05.png",
+    "blender_brief": "Generate PWC20 Spanner as low-poly flat-shaded visual dressing. Envelope W/D/H 55x12x15 cm; pivot center; materials TX09; category Dressing. Chunky single-piece open-jaw maintenance spanner. Use the cited PC concept sheet for silhouette. No collision, lights, gameplay, or UI."
+  },
+  {
+    "id": "PWC21",
+    "name": "Bucket",
+    "dimensions_cm": {
+      "width": 45,
+      "depth": 45,
+      "height": 50
+    },
+    "materials": [
+      "TX09",
+      "TX11"
+    ],
+    "category": "Dressing",
+    "pivot": "bottom center",
+    "model_sheet": "PC05",
+    "flags": {
+      "hollow_open_top": true,
+      "closed_inner_bottom": true
+    },
+    "notes": "Polygonal tapered pail with a closed inner bottom, open mouth and angular handle.",
+    "reference_image": "Concepts/PC05.png",
+    "blender_brief": "Generate PWC21 Bucket as low-poly flat-shaded visual dressing. Envelope W/D/H 45x45x50 cm; pivot bottom center; materials TX09, TX11; category Dressing. Polygonal tapered pail with a closed inner bottom, open mouth and angular handle. Use the cited PC concept sheet for silhouette. No collision, lights, gameplay, or UI."
+  },
+  {
+    "id": "PWC22",
+    "name": "TallowDripTray",
+    "dimensions_cm": {
+      "width": 60,
+      "depth": 40,
+      "height": 8
+    },
+    "materials": [
+      "TX09"
+    ],
+    "category": "Dressing",
+    "pivot": "bottom center",
+    "model_sheet": "PC05",
+    "notes": "Shallow metal tray; no flame or light.",
+    "reference_image": "Concepts/PC05.png",
+    "blender_brief": "Generate PWC22 TallowDripTray as low-poly flat-shaded visual dressing. Envelope W/D/H 60x40x8 cm; pivot bottom center; materials TX09; category Dressing. Shallow metal tray; no flame or light. Use the cited PC concept sheet for silhouette. No collision, lights, gameplay, or UI."
+  },
+  {
+    "id": "PWC23",
+    "name": "CandleStub",
+    "dimensions_cm": {
+      "width": 15,
+      "depth": 15,
+      "height": 30
+    },
+    "materials": [
+      "TX16",
+      "TX09"
+    ],
+    "category": "Dressing",
+    "pivot": "bottom center",
+    "model_sheet": "PC05",
+    "flags": {
+      "unlit_static_prop": true
+    },
+    "notes": "Off-white wax candle with broad wax drips; static and unlit.",
+    "reference_image": "Concepts/PC05.png",
+    "blender_brief": "Generate PWC23 CandleStub as low-poly flat-shaded visual dressing. Envelope W/D/H 15x15x30 cm; pivot bottom center; materials TX16, TX09; category Dressing. Off-white wax candle with broad wax drips; static and unlit. Use the cited PC concept sheet for silhouette. No collision, lights, gameplay, or UI."
+  },
+  {
+    "id": "PWC24",
+    "name": "ClothBanner",
+    "dimensions_cm": {
+      "width": 70,
+      "depth": 5,
+      "height": 120
+    },
+    "materials": [
+      "TX12",
+      "TX08"
+    ],
+    "category": "Dressing",
+    "pivot": "bottom center",
+    "model_sheet": "PC04",
+    "flags": {
+      "plain_muted_no_glyphs": true,
+      "two_sided_geometry": true
+    },
+    "notes": "Quiet muted cloth with shallow folds and thickness; no random glyphs or text.",
+    "reference_image": "Concepts/PC04.png",
+    "blender_brief": "Generate PWC24 ClothBanner as low-poly flat-shaded visual dressing. Envelope W/D/H 70x5x120 cm; pivot bottom center; materials TX12, TX08; category Dressing. Quiet muted cloth with shallow folds and thickness; no random glyphs or text. Use the cited PC concept sheet for silhouette. No collision, lights, gameplay, or UI."
+  },
+  {
+    "id": "PWC25",
+    "name": "CisternWaterSurface",
+    "dimensions_cm": {
+      "width": 1150,
+      "depth": 1100,
+      "height": 0
+    },
+    "materials": [
+      "FX_ShallowWater"
+    ],
+    "category": "Water",
+    "pivot": "center",
+    "model_sheet": "PC06",
+    "reference_image": "Concepts/PC06.svg",
+    "notes": "Exact source basin polygon. Flat visual sheet at retained source water height; translucent material, no volume/collision/depth change.",
+    "blender_brief": "Generate the exact six-vertex v8c cistern-basin source polygon, centered on its bounds (15.75,37.5), mirrored Y to neutral Blender, Z=0. Render carrier only."
+  }
+]

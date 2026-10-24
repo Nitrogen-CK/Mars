@@ -1,0 +1,122 @@
+{
+	"material": "M_CCK_FX_Water",
+	"packagePath": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_FX_Water",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "9821bbda46ca6d67cf8641f3ff50683d",
+		"exporterVersion": 3
+	},
+	"blendMode": "BLEND_Opaque",
+	"twoSided": true,
+	"unlit": false,
+	"shadingModel": "MSM_DefaultLit",
+	"domain": "MD_Surface",
+	"connectedOutputs": [
+		"BaseColor",
+		"Normal"
+	],
+	"expressions":
+	{
+		"Constant": 2,
+		"Constant3Vector": 2,
+		"TextureSample": 1
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "Constant3Vector",
+				"name": "MaterialExpressionConstant3Vector_0",
+				"outputs": [
+					"None",
+					"None",
+					"None",
+					"None"
+				],
+				"props":
+				{
+					"Constant": "(R=0.055000,G=0.120000,B=0.095000,A=1.000000)"
+				}
+			},
+			{
+				"id": 1,
+				"class": "TextureSample",
+				"name": "MaterialExpressionTextureSample_1",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"Texture": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_Water_NormalDX.T_CCK_Water_NormalDX",
+					"SamplerType": "SAMPLERTYPE_Normal"
+				}
+			},
+			{
+				"id": 2,
+				"class": "Constant3Vector",
+				"name": "MaterialExpressionConstant3Vector_1",
+				"outputs": [
+					"None",
+					"None",
+					"None",
+					"None"
+				],
+				"props":
+				{
+					"Constant": "(R=0.055000,G=0.120000,B=0.095000,A=1.000000)"
+				}
+			},
+			{
+				"id": 3,
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_2",
+				"props":
+				{
+					"R": 0.23999999463558197
+				}
+			},
+			{
+				"id": 4,
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_3"
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_BaseColor",
+				"node": 2,
+				"output": 0,
+				"mask": "rgb"
+			},
+			{
+				"property": "MP_Metallic",
+				"node": 4,
+				"output": 0
+			},
+			{
+				"property": "MP_Roughness",
+				"node": 3,
+				"output": 0
+			},
+			{
+				"property": "MP_Normal",
+				"node": 1,
+				"output": 0,
+				"mask": "rgb"
+			}
+		]
+	},
+	"scalarParams": [],
+	"vectorParams": [],
+	"textureParams": [],
+	"usedTextures": [
+		"/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_Water_NormalDX.T_CCK_Water_NormalDX"
+	]
+}

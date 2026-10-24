@@ -1,0 +1,12 @@
+{
+  "world": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP",
+  "counts": {
+    "Mars.ChainCrossingKit.Authoring.v1": 1863,
+    "Mars.PumpCisternKit.Authoring.v1": 6241
+  },
+  "hism_groups": {
+    "Mars.ChainCrossingKit.Authoring.v1": 72,
+    "Mars.PumpCisternKit.Authoring.v1": 58
+  },
+  "all_owned_hisms_no_collision": true
+}
