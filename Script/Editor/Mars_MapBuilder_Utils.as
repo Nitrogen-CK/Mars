@@ -93,6 +93,18 @@ namespace utils_mars_map_builder
         return nullptr;
     }
 
+    // The open editor world when its map name starts with InMapPrefix (a family of maps: the Warrens and its layout
+    // variants); warns and returns null otherwise.
+    UWorld TryGet_OpenMapInFamily(const FString& InCommand, const FString& InMapPrefix)
+    {
+        auto World = UUnrealEditorSubsystem::Get().GetEditorWorld();
+        if (ck::IsValid(World) && World.GetName().ToString().StartsWith(InMapPrefix))
+        { return World; }
+
+        ck::Trace(f"[{InCommand}] Open a {InMapPrefix}* map first.", NAME_None, 2.0f, FLinearColor::Yellow);
+        return nullptr;
+    }
+
     // The open editor world when it is an untitled level and nothing is saved at InMapPath yet; warns and returns null
     // otherwise. A builder that needs a fresh level guards on this, then saves with SaveWorld.
     UWorld TryGet_UntitledWorld(const FString& InCommand, const FString& InMapPath)

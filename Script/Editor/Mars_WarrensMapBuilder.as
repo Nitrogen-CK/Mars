@@ -1,5 +1,5 @@
-// Editor-only: one-shot placements for the Catacomb Warrens map (/Game/Mars/Maps/Warrens_Mars_MAP). Open the map, run
-// the command, and it saves the level.
+// Editor-only: one-shot placements for the Catacomb Warrens map (/Game/Mars/Maps/Warrens_Mars_MAP) and its layout
+// variants (any Warrens_* map, e.g. Warrens_VariantC_Mars_MAP). Open the map, run the command, and it saves the level.
 //
 // Mars.Warrens.PlaceLantern: the expedition starts with a lantern and two tallow cakes lying beside the starting
 // backpack. Every entrance has its own backpack spawner (found by name) and a run picks one entrance, so each gets its own
@@ -18,7 +18,7 @@ const FConsoleCommand Mars_PlaceWarrensLanternCommand("Mars.Warrens.PlaceLantern
 
 namespace utils_mars_warrens
 {
-    const FString k_MapPath = "/Game/Mars/Maps/Warrens_Mars_MAP";
+    const FString k_MapPrefix = "Warrens_";  // the live map and every Warrens_Variant*_Mars_MAP greybox
     const FString k_LanternLabel = "Item_Warrens_Lantern";
     const FString k_TallowLabelPrefix = "Item_Warrens_Tallow_";
 
@@ -30,7 +30,7 @@ namespace utils_mars_warrens
     void PlaceLantern()
     {
         const FString Command = "Mars.Warrens.PlaceLantern";
-        if (ck::Is_NOT_Valid(utils_mars_map_builder::TryGet_OpenMap(Command, k_MapPath)))
+        if (ck::Is_NOT_Valid(utils_mars_map_builder::TryGet_OpenMapInFamily(Command, k_MapPrefix)))
         { return; }
 
         auto Backpacks = Get_BackpackSpawners();
