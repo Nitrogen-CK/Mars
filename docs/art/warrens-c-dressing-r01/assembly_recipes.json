@@ -1,0 +1,576 @@
+{
+  "source_props": [
+    {
+      "source_prop_index": 0,
+      "kind": "station",
+      "note": "THE HOIST over the north rim of the Well",
+      "source_anchor_metres": [
+        40,
+        55.5,
+        0
+      ],
+      "source_proxy_size_metres": [
+        1.6,
+        1.6,
+        7.5
+      ],
+      "catalog_ids": [
+        "H01",
+        "H02",
+        "H03",
+        "H04",
+        "H05"
+      ],
+      "assembly_rule": "Whole source hoist envelope; separate all moving/optional cage components. No new elevator behavior."
+    },
+    {
+      "source_prop_index": 1,
+      "kind": "pillar",
+      "note": "THE BELL TOWER: 22 m, the bell cold-lit at +16, heard across the canal",
+      "source_anchor_metres": [
+        104,
+        50,
+        0
+      ],
+      "source_proxy_size_metres": [
+        4.0,
+        4.0,
+        22.0
+      ],
+      "catalog_ids": [
+        "H06",
+        "H07",
+        "H08",
+        "H09"
+      ],
+      "assembly_rule": "Assemble modular crown/pier skins within22m tower envelope; high bell near+16m. Key stays on the+2.5m loft."
+    },
+    {
+      "source_prop_index": 2,
+      "kind": "stack",
+      "note": "the three glyphs on the tower's west face (P4), read from the Well's east rim",
+      "source_anchor_metres": [
+        102,
+        50,
+        2.0
+      ],
+      "source_proxy_size_metres": [
+        0.3,
+        4.0,
+        2.0
+      ],
+      "catalog_ids": [
+        "P25",
+        "I07"
+      ],
+      "assembly_rule": "Use the P25 TowerClueBacking variant sized400x30x200cm and six swappable I07 glyph resources. Face/phrase/ordering remain source/runtime-controlled; no painted answer."
+    },
+    {
+      "source_prop_index": 3,
+      "kind": "statue",
+      "note": "split mourner: the Court landmark",
+      "source_anchor_metres": [
+        15,
+        88,
+        0
+      ],
+      "source_proxy_size_metres": [
+        2.0,
+        1.2,
+        4.5
+      ],
+      "catalog_ids": [
+        "H14"
+      ],
+      "assembly_rule": "Source Court landmark; keep surrounding hunt floor open."
+    },
+    {
+      "source_prop_index": 4,
+      "kind": "plinth",
+      "note": "pack plinth by the Camp Door",
+      "source_anchor_metres": [
+        10,
+        47.5,
+        0
+      ],
+      "source_proxy_size_metres": [
+        1.2,
+        1.2,
+        0.3
+      ],
+      "catalog_ids": [
+        "I20"
+      ],
+      "assembly_rule": "Existing camp-door pack staging point; do not generate a second backpack."
+    },
+    {
+      "source_prop_index": 5,
+      "kind": "root",
+      "note": "roots down the west wall of the Well",
+      "source_anchor_metres": [
+        35,
+        46,
+        -5.0
+      ],
+      "source_proxy_size_metres": [
+        1.4,
+        1.4,
+        14.0
+      ],
+      "catalog_ids": [
+        "D01",
+        "D02"
+      ],
+      "assembly_rule": "Repeat short root modules inside the full source root envelope. Do not model one14m mesh or create a climbable route."
+    },
+    {
+      "source_prop_index": 6,
+      "kind": "stack",
+      "note": "bone stacks",
+      "source_anchor_metres": [
+        52,
+        68,
+        2.5
+      ],
+      "source_proxy_size_metres": [
+        6.0,
+        1.0,
+        2.6
+      ],
+      "catalog_ids": [
+        "P01",
+        "P11"
+      ],
+      "assembly_rule": "Shared shelving and merged bone bundles inside the exact source stack envelope."
+    },
+    {
+      "source_prop_index": 7,
+      "kind": "stack",
+      "note": "",
+      "source_anchor_metres": [
+        50,
+        76,
+        2.5
+      ],
+      "source_proxy_size_metres": [
+        6.0,
+        1.0,
+        2.6
+      ],
+      "catalog_ids": [
+        "P01",
+        "P11"
+      ],
+      "assembly_rule": "Shared shelving and merged bone bundles inside the exact source stack envelope."
+    },
+    {
+      "source_prop_index": 8,
+      "kind": "plinth",
+      "note": "the pack plate (P3)",
+      "source_anchor_metres": [
+        42,
+        66,
+        2.5
+      ],
+      "source_proxy_size_metres": [
+        2.0,
+        2.0,
+        0.3
+      ],
+      "catalog_ids": [
+        "I06",
+        "P29"
+      ],
+      "assembly_rule": "P3 plate latches; no simultaneous hold. Source plate collision remains authoritative."
+    },
+    {
+      "source_prop_index": 9,
+      "kind": "sarcophagus",
+      "note": "the reliquary tomb",
+      "source_anchor_metres": [
+        88,
+        84,
+        2.5
+      ],
+      "source_proxy_size_metres": [
+        3.0,
+        1.5,
+        1.2
+      ],
+      "catalog_ids": [
+        "H15"
+      ],
+      "assembly_rule": "Shared body and separate lid; only the Catacomb source calls for an open tomb."
+    },
+    {
+      "source_prop_index": 10,
+      "kind": "plinth",
+      "note": "the key plinth under the bell (P1)",
+      "source_anchor_metres": [
+        104,
+        60,
+        2.5
+      ],
+      "source_proxy_size_metres": [
+        0.8,
+        0.8,
+        0.3
+      ],
+      "catalog_ids": [
+        "I01",
+        "I14"
+      ],
+      "assembly_rule": "Reuse the existing key pickup on the reachable loft; do not generate another key."
+    },
+    {
+      "source_prop_index": 11,
+      "kind": "station",
+      "note": "the dial lock (P4)",
+      "source_anchor_metres": [
+        108,
+        46,
+        0
+      ],
+      "source_proxy_size_metres": [
+        1.0,
+        0.4,
+        1.4
+      ],
+      "catalog_ids": [
+        "I02",
+        "I07",
+        "I08"
+      ],
+      "assembly_rule": "Blank housing and separate runtime glyph discs. No baked answer."
+    },
+    {
+      "source_prop_index": 12,
+      "kind": "pillar",
+      "note": "the pump: the west bank's audio landmark",
+      "source_anchor_metres": [
+        54,
+        22,
+        -2.5
+      ],
+      "source_proxy_size_metres": [
+        2.0,
+        2.0,
+        6.0
+      ],
+      "catalog_ids": [
+        "H13",
+        "W04",
+        "W05",
+        "W06"
+      ],
+      "assembly_rule": "Retain the west-bank audio landmark and source control presentation ownership."
+    },
+    {
+      "source_prop_index": 13,
+      "kind": "pillar",
+      "note": "the hand-wheel (P2)",
+      "source_anchor_metres": [
+        122,
+        12,
+        -2.5
+      ],
+      "source_proxy_size_metres": [
+        1.0,
+        1.0,
+        1.6
+      ],
+      "catalog_ids": [
+        "I03",
+        "I04"
+      ],
+      "assembly_rule": "Keep source handwheel pivot, grip, control and channel; no decorative duplicate control."
+    },
+    {
+      "source_prop_index": 14,
+      "kind": "stack",
+      "note": "the chain along the Cellar floor, from the crossing to the wheel (P2 tell)",
+      "source_anchor_metres": [
+        110,
+        20,
+        -2.5
+      ],
+      "source_proxy_size_metres": [
+        24.0,
+        0.4,
+        0.2
+      ],
+      "catalog_ids": [
+        "W01",
+        "W02"
+      ],
+      "assembly_rule": "Repeat links/guides along the24m source chain tell, not one unique long mesh. Preserve the control-to-gate read."
+    },
+    {
+      "source_prop_index": 15,
+      "kind": "stack",
+      "note": "salt crystals",
+      "source_anchor_metres": [
+        100,
+        16,
+        -2.5
+      ],
+      "source_proxy_size_metres": [
+        2.0,
+        2.0,
+        1.4
+      ],
+      "catalog_ids": [
+        "P09",
+        "D08"
+      ],
+      "assembly_rule": "Merge a few large solid salt shapes; no glowy treasure cluster."
+    },
+    {
+      "source_prop_index": 16,
+      "kind": "chimes",
+      "note": "bone chimes under the tower",
+      "source_anchor_metres": [
+        98,
+        54,
+        0
+      ],
+      "source_proxy_size_metres": [
+        6.0,
+        0.2,
+        3.5
+      ],
+      "catalog_ids": [
+        "P14",
+        "P11",
+        "W01"
+      ],
+      "assembly_rule": "Source6m-wide bone-chime assembly: instance3 shared2m crossbars, hang single-bone P11 variants with short W01 chains. Keep within the shallow source envelope. No new SFX logic."
+    },
+    {
+      "source_prop_index": 17,
+      "kind": "root",
+      "note": "roots through the Cistern roof",
+      "source_anchor_metres": [
+        24,
+        34,
+        -2.5
+      ],
+      "source_proxy_size_metres": [
+        1.2,
+        1.2,
+        5.0
+      ],
+      "catalog_ids": [
+        "D01",
+        "D02"
+      ],
+      "assembly_rule": "Repeat short root modules inside the full source root envelope. Do not model one14m mesh or create a climbable route."
+    },
+    {
+      "source_prop_index": 18,
+      "kind": "candles",
+      "note": "tallow",
+      "source_anchor_metres": [
+        12,
+        46,
+        0
+      ],
+      "source_proxy_size_metres": [
+        0.9,
+        0.9,
+        0.5
+      ],
+      "catalog_ids": [
+        "L04",
+        "L07"
+      ],
+      "assembly_rule": "Art skins at the authored candle location; do not automatically spawn extra point lights."
+    },
+    {
+      "source_prop_index": 19,
+      "kind": "candles",
+      "note": "tallow",
+      "source_anchor_metres": [
+        54,
+        66,
+        2.5
+      ],
+      "source_proxy_size_metres": [
+        0.9,
+        0.9,
+        0.5
+      ],
+      "catalog_ids": [
+        "L04",
+        "L07"
+      ],
+      "assembly_rule": "Art skins at the authored candle location; do not automatically spawn extra point lights."
+    },
+    {
+      "source_prop_index": 20,
+      "kind": "candles",
+      "note": "tallow",
+      "source_anchor_metres": [
+        90,
+        46,
+        0
+      ],
+      "source_proxy_size_metres": [
+        0.9,
+        0.9,
+        0.5
+      ],
+      "catalog_ids": [
+        "L04",
+        "L07"
+      ],
+      "assembly_rule": "Art skins at the authored candle location; do not automatically spawn extra point lights."
+    },
+    {
+      "source_prop_index": 21,
+      "kind": "candles",
+      "note": "tallow",
+      "source_anchor_metres": [
+        22,
+        58,
+        -5.0
+      ],
+      "source_proxy_size_metres": [
+        0.9,
+        0.9,
+        0.5
+      ],
+      "catalog_ids": [
+        "L04",
+        "L07"
+      ],
+      "assembly_rule": "Art skins at the authored candle location; do not automatically spawn extra point lights."
+    },
+    {
+      "source_prop_index": 22,
+      "kind": "candles",
+      "note": "tallow: the Ford's east step",
+      "source_anchor_metres": [
+        82,
+        50,
+        0
+      ],
+      "source_proxy_size_metres": [
+        0.9,
+        0.9,
+        0.5
+      ],
+      "catalog_ids": [
+        "L04",
+        "L07"
+      ],
+      "assembly_rule": "Art skins at the authored candle location; do not automatically spawn extra point lights."
+    },
+    {
+      "source_prop_index": 23,
+      "kind": "station",
+      "note": "the brine vat (P7): the Curing Room",
+      "source_anchor_metres": [
+        88,
+        106,
+        5
+      ],
+      "source_proxy_size_metres": [
+        2.4,
+        1.6,
+        1.4
+      ],
+      "catalog_ids": [
+        "I12",
+        "I13",
+        "W11",
+        "P14",
+        "P15"
+      ],
+      "assembly_rule": "Salt Mill P7 source stop, not a second Larder objective. Preserve hands/pack approach."
+    },
+    {
+      "source_prop_index": 24,
+      "kind": "pillar",
+      "note": "the millstone",
+      "source_anchor_metres": [
+        95,
+        100.5,
+        5
+      ],
+      "source_proxy_size_metres": [
+        2.5,
+        2.5,
+        2.0
+      ],
+      "catalog_ids": [
+        "H11",
+        "H12",
+        "P22"
+      ],
+      "assembly_rule": "Octagonal mill silhouette; chute/hopper are separate supporting art."
+    },
+    {
+      "source_prop_index": 25,
+      "kind": "sarcophagus",
+      "note": "the Catacomb's one open tomb",
+      "source_anchor_metres": [
+        -18,
+        80,
+        0
+      ],
+      "source_proxy_size_metres": [
+        3.0,
+        1.5,
+        1.2
+      ],
+      "catalog_ids": [
+        "H15"
+      ],
+      "assembly_rule": "Shared body and separate lid; only the Catacomb source calls for an open tomb."
+    }
+  ],
+  "puzzle_art": {
+    "P1": [
+      "I01",
+      "I11",
+      "I14",
+      "I19"
+    ],
+    "P2": [
+      "I03",
+      "I04",
+      "I05",
+      "W01",
+      "W02",
+      "W03"
+    ],
+    "P3": [
+      "I06",
+      "I18",
+      "P29"
+    ],
+    "P4": [
+      "I02",
+      "I07",
+      "I08",
+      "P25"
+    ],
+    "P5": [
+      "I09",
+      "I10",
+      "I17"
+    ],
+    "P6": [
+      "I05",
+      "I15",
+      "I16"
+    ],
+    "P7": [
+      "I12",
+      "P14",
+      "P15",
+      "P30"
+    ]
+  }
+}

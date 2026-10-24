@@ -1,0 +1,290 @@
+[
+  {
+    "name": "StoneLight",
+    "srgb_hex": "#a5a38a",
+    "index": 0,
+    "uv_center": [
+      0.0625,
+      0.875
+    ]
+  },
+  {
+    "name": "StoneMid",
+    "srgb_hex": "#858473",
+    "index": 1,
+    "uv_center": [
+      0.1875,
+      0.875
+    ]
+  },
+  {
+    "name": "StoneDark",
+    "srgb_hex": "#59645f",
+    "index": 2,
+    "uv_center": [
+      0.3125,
+      0.875
+    ]
+  },
+  {
+    "name": "Mortar",
+    "srgb_hex": "#535c55",
+    "index": 3,
+    "uv_center": [
+      0.4375,
+      0.875
+    ]
+  },
+  {
+    "name": "Ivory",
+    "srgb_hex": "#d6c79f",
+    "index": 4,
+    "uv_center": [
+      0.5625,
+      0.875
+    ]
+  },
+  {
+    "name": "Bone",
+    "srgb_hex": "#c1b38d",
+    "index": 5,
+    "uv_center": [
+      0.6875,
+      0.875
+    ]
+  },
+  {
+    "name": "Salt",
+    "srgb_hex": "#ddd8bc",
+    "index": 6,
+    "uv_center": [
+      0.8125,
+      0.875
+    ]
+  },
+  {
+    "name": "Chalk",
+    "srgb_hex": "#ebe0bd",
+    "index": 7,
+    "uv_center": [
+      0.9375,
+      0.875
+    ]
+  },
+  {
+    "name": "Oak",
+    "srgb_hex": "#826247",
+    "index": 8,
+    "uv_center": [
+      0.0625,
+      0.625
+    ]
+  },
+  {
+    "name": "DarkOak",
+    "srgb_hex": "#4e4030",
+    "index": 9,
+    "uv_center": [
+      0.1875,
+      0.625
+    ]
+  },
+  {
+    "name": "Rope",
+    "srgb_hex": "#a58c5f",
+    "index": 10,
+    "uv_center": [
+      0.3125,
+      0.625
+    ]
+  },
+  {
+    "name": "Leather",
+    "srgb_hex": "#705039",
+    "index": 11,
+    "uv_center": [
+      0.4375,
+      0.625
+    ]
+  },
+  {
+    "name": "Iron",
+    "srgb_hex": "#686e69",
+    "index": 12,
+    "uv_center": [
+      0.5625,
+      0.625
+    ]
+  },
+  {
+    "name": "IronDark",
+    "srgb_hex": "#383f3b",
+    "index": 13,
+    "uv_center": [
+      0.6875,
+      0.625
+    ]
+  },
+  {
+    "name": "Brass",
+    "srgb_hex": "#ad9258",
+    "index": 14,
+    "uv_center": [
+      0.8125,
+      0.625
+    ]
+  },
+  {
+    "name": "CopperPatina",
+    "srgb_hex": "#60816f",
+    "index": 15,
+    "uv_center": [
+      0.9375,
+      0.625
+    ]
+  },
+  {
+    "name": "Canvas",
+    "srgb_hex": "#c4b18b",
+    "index": 16,
+    "uv_center": [
+      0.0625,
+      0.375
+    ]
+  },
+  {
+    "name": "Paper",
+    "srgb_hex": "#decfa8",
+    "index": 17,
+    "uv_center": [
+      0.1875,
+      0.375
+    ]
+  },
+  {
+    "name": "RoyalRed",
+    "srgb_hex": "#873c34",
+    "index": 18,
+    "uv_center": [
+      0.3125,
+      0.375
+    ]
+  },
+  {
+    "name": "ServiceOlive",
+    "srgb_hex": "#657249",
+    "index": 19,
+    "uv_center": [
+      0.4375,
+      0.375
+    ]
+  },
+  {
+    "name": "BellTeal",
+    "srgb_hex": "#42645b",
+    "index": 20,
+    "uv_center": [
+      0.5625,
+      0.375
+    ]
+  },
+  {
+    "name": "WarningOchre",
+    "srgb_hex": "#bd9251",
+    "index": 21,
+    "uv_center": [
+      0.6875,
+      0.375
+    ]
+  },
+  {
+    "name": "Clay",
+    "srgb_hex": "#965f41",
+    "index": 22,
+    "uv_center": [
+      0.8125,
+      0.375
+    ]
+  },
+  {
+    "name": "CeramicCream",
+    "srgb_hex": "#c4b99b",
+    "index": 23,
+    "uv_center": [
+      0.9375,
+      0.375
+    ]
+  },
+  {
+    "name": "HerbDark",
+    "srgb_hex": "#3f5937",
+    "index": 24,
+    "uv_center": [
+      0.0625,
+      0.125
+    ]
+  },
+  {
+    "name": "HerbLight",
+    "srgb_hex": "#74814b",
+    "index": 25,
+    "uv_center": [
+      0.1875,
+      0.125
+    ]
+  },
+  {
+    "name": "Truffle",
+    "srgb_hex": "#4f4635",
+    "index": 26,
+    "uv_center": [
+      0.3125,
+      0.125
+    ]
+  },
+  {
+    "name": "Brine",
+    "srgb_hex": "#4b6d52",
+    "index": 27,
+    "uv_center": [
+      0.4375,
+      0.125
+    ]
+  },
+  {
+    "name": "Wax",
+    "srgb_hex": "#dbcca5",
+    "index": 28,
+    "uv_center": [
+      0.5625,
+      0.125
+    ]
+  },
+  {
+    "name": "Soot",
+    "srgb_hex": "#303831",
+    "index": 29,
+    "uv_center": [
+      0.6875,
+      0.125
+    ]
+  },
+  {
+    "name": "Ember",
+    "srgb_hex": "#d87939",
+    "index": 30,
+    "uv_center": [
+      0.8125,
+      0.125
+    ]
+  },
+  {
+    "name": "EyeIvory",
+    "srgb_hex": "#f5e5ad",
+    "index": 31,
+    "uv_center": [
+      0.9375,
+      0.125
+    ]
+  }
+]

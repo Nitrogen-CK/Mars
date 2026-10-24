@@ -1,0 +1,440 @@
+{
+  "revision": "v8c",
+  "shortcuts": [
+    {
+      "id": "SC2",
+      "at": [
+        19,
+        42
+      ],
+      "yaw": 90.0,
+      "spanCm": 250.0,
+      "leverSide": -1,
+      "oneWay": true,
+      "channel": "Mechanism.Channel.Warrens.Shortcut.SC2",
+      "note": "closet -> hall; lever in the closet"
+    },
+    {
+      "id": "ChainCrossing",
+      "at": [
+        67,
+        26
+      ],
+      "yaw": 90.0,
+      "spanCm": 250.0,
+      "leverSide": 1,
+      "oneWay": true,
+      "channel": "Mechanism.Channel.Warrens.Shortcut.Chain",
+      "note": "the Chain Crossing: barred at the Pump end, lowered by the Sluice hand-wheel (P2); from then on both ways"
+    }
+  ],
+  "puzzles": [
+    {
+      "id": "P1",
+      "kind": "Red key door",
+      "at": [
+        57,
+        60,
+        -5.0
+      ],
+      "needsAt": [
+        104,
+        60,
+        2.5
+      ],
+      "needsNote": "the key under the bell on the Belfry loft: other bank, other landmark"
+    },
+    {
+      "id": "P2",
+      "kind": "the Chain Crossing's latched bars (Pump end)",
+      "at": [
+        67,
+        26,
+        -2.5
+      ],
+      "needsAt": [
+        122,
+        12,
+        -2.5
+      ],
+      "needsNote": "the Sluice hand-wheel on the east bank lowers the chain causeway; the chain runs along the Cellar floor to the wheel: the tell",
+      "existing": "hand-wheel + latched Bars gate"
+    },
+    {
+      "id": "P3",
+      "kind": "Mourner cache gate (latched)",
+      "at": [
+        100,
+        76,
+        2.5
+      ],
+      "needsAt": [
+        42,
+        66,
+        2.5
+      ],
+      "needsNote": "the pack plate at the Ossuary's west end: set the pack down west, the gate latches east, cross the Bone Bridge",
+      "latch": true
+    },
+    {
+      "id": "P4",
+      "kind": "Bellkeeper dial lock",
+      "at": [
+        108,
+        46,
+        0
+      ],
+      "needsAt": [
+        48.5,
+        50,
+        0
+      ],
+      "needsNote": "the three glyphs painted on the Bell Tower's west face, read from the Well's east rim across the canal"
+    },
+    {
+      "id": "P5",
+      "kind": "barred ladder foot (Belfry)",
+      "at": [
+        104,
+        56,
+        0
+      ],
+      "needsAt": [
+        102,
+        60,
+        2.5
+      ],
+      "needsNote": "the lever on the loft; the loft is first reached by the Reliquary stair's rail drop"
+    },
+    {
+      "id": "P6",
+      "kind": "SC2 barred closet door",
+      "at": [
+        19,
+        42,
+        0
+      ],
+      "needsAt": [
+        19,
+        40,
+        -5.0
+      ],
+      "needsNote": "climb the closet ladder out of the Pit"
+    },
+    {
+      "id": "P7",
+      "kind": "Curing Room (support objective)",
+      "at": [
+        88,
+        106,
+        5
+      ],
+      "needsAt": [
+        98,
+        54,
+        0
+      ],
+      "needsNote": "the Curing Room: the hunted part is brined here before it travels (the run's second required stop); the vat, the drying racks, a plinth for the pack"
+    }
+  ],
+  "extraRamps": [
+    {
+      "id": "bone-bridge",
+      "a": [
+        62,
+        74,
+        2.5
+      ],
+      "b": [
+        84,
+        74,
+        2.5
+      ],
+      "width": 3.0,
+      "note": "the Bone Bridge: 22 m over the canal at +2.5; R5 at its west head"
+    },
+    {
+      "id": "chain-crossing",
+      "a": [
+        66,
+        26,
+        -2.5
+      ],
+      "b": [
+        96,
+        24,
+        -2.5
+      ],
+      "width": 2.5,
+      "note": "the Chain Crossing: a causeway lowered from the Cellar side (shortcut ChainCrossing), the pack's short way between the two banks' waterworks"
+    },
+    {
+      "id": "sump-stair",
+      "a": [
+        50,
+        26,
+        -2.5
+      ],
+      "b": [
+        42,
+        34,
+        -5.0
+      ],
+      "width": 2.5,
+      "note": "the Sump Stair: Pump Room down into the Pit (open), from the Pump's west wall"
+    },
+    {
+      "id": "larder-undercroft",
+      "a": [
+        112,
+        34,
+        -2.5
+      ],
+      "b": [
+        104,
+        28,
+        -5.0
+      ],
+      "width": 2.5,
+      "note": "Brine Larder down into the Undercroft"
+    },
+    {
+      "id": "mill-stair-a",
+      "a": [
+        98,
+        94,
+        2.5
+      ],
+      "b": [
+        104,
+        98,
+        3.3
+      ],
+      "width": 3.0,
+      "note": "the mill stair: Reliquary up to the Salt Mill, round its east side"
+    },
+    {
+      "id": "mill-stair-b",
+      "a": [
+        104,
+        98,
+        3.3
+      ],
+      "b": [
+        104,
+        104,
+        4.2
+      ],
+      "width": 3.0
+    },
+    {
+      "id": "mill-stair-c",
+      "a": [
+        104,
+        104,
+        4.2
+      ],
+      "b": [
+        98,
+        106,
+        5
+      ],
+      "width": 3.0
+    },
+    {
+      "id": "catacomb-dive-a",
+      "a": [
+        -10,
+        64,
+        0
+      ],
+      "b": [
+        -12,
+        54,
+        -2.5
+      ],
+      "width": 2.5,
+      "note": "the Catacomb Dive winds down into the Pit's west end"
+    },
+    {
+      "id": "catacomb-dive-b",
+      "a": [
+        -12,
+        54,
+        -2.5
+      ],
+      "b": [
+        -4,
+        46,
+        -5.0
+      ],
+      "width": 2.5
+    },
+    {
+      "id": "catacomb-dive-c",
+      "a": [
+        -4,
+        46,
+        -5.0
+      ],
+      "b": [
+        8,
+        48,
+        -5.0
+      ],
+      "width": 2.5
+    },
+    {
+      "id": "catacomb-dive-d",
+      "a": [
+        8,
+        48,
+        -5.0
+      ],
+      "b": [
+        21,
+        47,
+        -5.0
+      ],
+      "width": 2.5
+    }
+  ],
+  "water": [
+    {
+      "id": "canal",
+      "poly": [
+        [
+          70,
+          -4
+        ],
+        [
+          78,
+          -4
+        ],
+        [
+          77,
+          20
+        ],
+        [
+          79,
+          40
+        ],
+        [
+          77,
+          60
+        ],
+        [
+          79,
+          84
+        ],
+        [
+          77,
+          104
+        ],
+        [
+          69,
+          104
+        ],
+        [
+          71,
+          80
+        ],
+        [
+          69,
+          60
+        ],
+        [
+          71,
+          36
+        ],
+        [
+          69,
+          16
+        ]
+      ],
+      "z": -2.5,
+      "depth": 2.0,
+      "top": 20,
+      "note": "the Drowned Canal: 2 m deep, impassable; the district's edge"
+    },
+    {
+      "id": "ford",
+      "rect": [
+        68,
+        46,
+        80,
+        52
+      ],
+      "z": -2.5,
+      "depth": 0.4,
+      "top": 20,
+      "note": "the Ford: knee-deep, slow, always open"
+    },
+    {
+      "id": "cistern-basin",
+      "poly": [
+        [
+          10,
+          32
+        ],
+        [
+          20,
+          32
+        ],
+        [
+          21.5,
+          36.5
+        ],
+        [
+          15,
+          37
+        ],
+        [
+          15,
+          43
+        ],
+        [
+          10,
+          42
+        ]
+      ],
+      "z": -2.5,
+      "depth": 0.4,
+      "note": "the Cistern pool"
+    },
+    {
+      "id": "larder-water",
+      "poly": [
+        [
+          112,
+          34
+        ],
+        [
+          126,
+          34
+        ],
+        [
+          128,
+          46
+        ],
+        [
+          116,
+          48
+        ]
+      ],
+      "z": -2.5,
+      "depth": 0.4,
+      "note": "the Brine Larder: knee-deep stores"
+    }
+  ],
+  "deepWaterRail": 1.0,
+  "source_sha256": "f87a76e39b879f4e3b1945a7e369781d08511744c35f6223880168fc20274be2",
+  "engine_observation": "Read-only MCP: editor world is Warrens_VariantC_Mars_MAP; nested mechanism actors were not resolved by top-level actor labels. No PIE behavior claimed.",
+  "source_code_contracts": {
+    "causeway": "Tools/LevelDesign/anchor_plans/design_warrens_v8c.py:143: [66,26,-2.5] to [96,24,-2.5], width2.5m",
+    "gate": "Script/WorldObjects/Mechanisms/Mars_Gate_EntityScript.as:40-41: 200x220cm clear opening; static frame and vertically moving leaf",
+    "gate_travel": "Script/ECS/Gate/Mars_Gate_Feature.as:27: OpenOffset[0,0,220]cm",
+    "wheel": "Script/WorldObjects/Mechanisms/Mars_HandWheel_EntityScript.as:32,75: 30cm offset, 50cm diameter, 5cm thickness",
+    "builder_mismatch": "build_warrens.py:2233 matches kind.startswith(sluice grate), whereas current P2 kind is the Chain Crossing latched bars; ChainCrossing is spawned through shortcuts[] at2209-2215 with a lever-owning Mars_Shortcut_EntityScript."
+  }
+}

@@ -1,0 +1,19 @@
+# W05 / PipeElbow90
+
+Generate PipeElbow90, asset W05, for Mise en Monstre Warrens C. Ultra-low-poly flat shading, chunky primitive silhouette, 1-2 broad bevels, no realistic microdetail. Proposed width/depth/height [80.0, 80.0, 40.0]cm. Blender Z up, width local X, front -Y. Pivot: bottom-center at contact plane. Materials ['TX11', 'TX09']. same diameter as W04; no end caps in socket openings. NoCollision visual dressing; retained greybox/world collision is authoritative. UV0: use shared palette or one trim lane for small props; tiling surfaces at catalog tile_metres for large forms. UV1: non-overlapping lightmap UVs with padding when static-light use requires them. Keep all moving components separate. Apply object scale; do not add gameplay, lights or collision automatically. Output one named collection, meshes, optional UCX only when later approved, and a neutral front/side/three-quarter preview.
+
+Priority: P1
+
+Dimension basis: proposed modeling envelope; fit current source ports/collision before dressing
+
+Tiles: Waterworks-W, Brineworks
+
+Triangle target: [150, 1200] (proposal).
+
+Sockets: []
+
+## Visual references
+
+- [MODEL07](../art/model-sheets/MODEL07_PumpWaterworks.png)
+- [MODEL38](../art/model-sheets/MODEL38_PumpAndPipeAssemblyBreakdown.png)
+- [DRESS04](../art/district-sheets/DRESS04_Waterworks-WDressingAssembly.png)

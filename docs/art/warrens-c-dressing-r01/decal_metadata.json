@@ -1,0 +1,362 @@
+[
+  {
+    "name": "Glyph_Square",
+    "png": "textures/decals/Glyph_Square.png",
+    "svg": "textures/decals/Glyph_Square.svg",
+    "cell": [
+      0,
+      0
+    ],
+    "uv_min": [
+      0.01953125,
+      0.884765625
+    ],
+    "uv_max": [
+      0.23046875,
+      0.990234375
+    ],
+    "semantic": "runtime-authored lock glyph"
+  },
+  {
+    "name": "Glyph_Circle",
+    "png": "textures/decals/Glyph_Circle.png",
+    "svg": "textures/decals/Glyph_Circle.svg",
+    "cell": [
+      1,
+      0
+    ],
+    "uv_min": [
+      0.26953125,
+      0.884765625
+    ],
+    "uv_max": [
+      0.48046875,
+      0.990234375
+    ],
+    "semantic": "runtime-authored lock glyph"
+  },
+  {
+    "name": "Glyph_Triangle",
+    "png": "textures/decals/Glyph_Triangle.png",
+    "svg": "textures/decals/Glyph_Triangle.svg",
+    "cell": [
+      2,
+      0
+    ],
+    "uv_min": [
+      0.51953125,
+      0.884765625
+    ],
+    "uv_max": [
+      0.73046875,
+      0.990234375
+    ],
+    "semantic": "runtime-authored lock glyph"
+  },
+  {
+    "name": "Glyph_Diamond",
+    "png": "textures/decals/Glyph_Diamond.png",
+    "svg": "textures/decals/Glyph_Diamond.svg",
+    "cell": [
+      3,
+      0
+    ],
+    "uv_min": [
+      0.76953125,
+      0.884765625
+    ],
+    "uv_max": [
+      0.98046875,
+      0.990234375
+    ],
+    "semantic": "runtime-authored lock glyph"
+  },
+  {
+    "name": "Glyph_Cross",
+    "png": "textures/decals/Glyph_Cross.png",
+    "svg": "textures/decals/Glyph_Cross.svg",
+    "cell": [
+      0,
+      1
+    ],
+    "uv_min": [
+      0.01953125,
+      0.759765625
+    ],
+    "uv_max": [
+      0.23046875,
+      0.865234375
+    ],
+    "semantic": "runtime-authored lock glyph"
+  },
+  {
+    "name": "Glyph_Bars",
+    "png": "textures/decals/Glyph_Bars.png",
+    "svg": "textures/decals/Glyph_Bars.svg",
+    "cell": [
+      1,
+      1
+    ],
+    "uv_min": [
+      0.26953125,
+      0.759765625
+    ],
+    "uv_max": [
+      0.48046875,
+      0.865234375
+    ],
+    "semantic": "runtime-authored lock glyph"
+  },
+  {
+    "name": "Nav_Bell",
+    "png": "textures/decals/Nav_Bell.png",
+    "svg": "textures/decals/Nav_Bell.svg",
+    "cell": [
+      2,
+      1
+    ],
+    "uv_min": [
+      0.51953125,
+      0.759765625
+    ],
+    "uv_max": [
+      0.73046875,
+      0.865234375
+    ],
+    "semantic": "proposed navigation art; place only on a route that actually exists"
+  },
+  {
+    "name": "Nav_Hoist",
+    "png": "textures/decals/Nav_Hoist.png",
+    "svg": "textures/decals/Nav_Hoist.svg",
+    "cell": [
+      3,
+      1
+    ],
+    "uv_min": [
+      0.76953125,
+      0.759765625
+    ],
+    "uv_max": [
+      0.98046875,
+      0.865234375
+    ],
+    "semantic": "proposed navigation art; place only on a route that actually exists"
+  },
+  {
+    "name": "Nav_Vat",
+    "png": "textures/decals/Nav_Vat.png",
+    "svg": "textures/decals/Nav_Vat.svg",
+    "cell": [
+      0,
+      2
+    ],
+    "uv_min": [
+      0.01953125,
+      0.634765625
+    ],
+    "uv_max": [
+      0.23046875,
+      0.740234375
+    ],
+    "semantic": "proposed navigation art; place only on a route that actually exists"
+  },
+  {
+    "name": "Nav_Pack",
+    "png": "textures/decals/Nav_Pack.png",
+    "svg": "textures/decals/Nav_Pack.svg",
+    "cell": [
+      1,
+      2
+    ],
+    "uv_min": [
+      0.26953125,
+      0.634765625
+    ],
+    "uv_max": [
+      0.48046875,
+      0.740234375
+    ],
+    "semantic": "proposed navigation art; place only on a route that actually exists"
+  },
+  {
+    "name": "Nav_Lantern",
+    "png": "textures/decals/Nav_Lantern.png",
+    "svg": "textures/decals/Nav_Lantern.svg",
+    "cell": [
+      2,
+      2
+    ],
+    "uv_min": [
+      0.51953125,
+      0.634765625
+    ],
+    "uv_max": [
+      0.73046875,
+      0.740234375
+    ],
+    "semantic": "proposed navigation art; place only on a route that actually exists"
+  },
+  {
+    "name": "Nav_Key",
+    "png": "textures/decals/Nav_Key.png",
+    "svg": "textures/decals/Nav_Key.svg",
+    "cell": [
+      3,
+      2
+    ],
+    "uv_min": [
+      0.76953125,
+      0.634765625
+    ],
+    "uv_max": [
+      0.98046875,
+      0.740234375
+    ],
+    "semantic": "proposed navigation art; place only on a route that actually exists"
+  },
+  {
+    "name": "Nav_Ladder",
+    "png": "textures/decals/Nav_Ladder.png",
+    "svg": "textures/decals/Nav_Ladder.svg",
+    "cell": [
+      0,
+      3
+    ],
+    "uv_min": [
+      0.01953125,
+      0.509765625
+    ],
+    "uv_max": [
+      0.23046875,
+      0.615234375
+    ],
+    "semantic": "proposed navigation art; place only on a route that actually exists"
+  },
+  {
+    "name": "Nav_Crawl",
+    "png": "textures/decals/Nav_Crawl.png",
+    "svg": "textures/decals/Nav_Crawl.svg",
+    "cell": [
+      1,
+      3
+    ],
+    "uv_min": [
+      0.26953125,
+      0.509765625
+    ],
+    "uv_max": [
+      0.48046875,
+      0.615234375
+    ],
+    "semantic": "proposed navigation art; place only on a route that actually exists"
+  },
+  {
+    "name": "Nav_ArrowRight",
+    "png": "textures/decals/Nav_ArrowRight.png",
+    "svg": "textures/decals/Nav_ArrowRight.svg",
+    "cell": [
+      2,
+      3
+    ],
+    "uv_min": [
+      0.51953125,
+      0.509765625
+    ],
+    "uv_max": [
+      0.73046875,
+      0.615234375
+    ],
+    "semantic": "proposed navigation art; place only on a route that actually exists"
+  },
+  {
+    "name": "Nav_ArrowLeft",
+    "png": "textures/decals/Nav_ArrowLeft.png",
+    "svg": "textures/decals/Nav_ArrowLeft.svg",
+    "cell": [
+      3,
+      3
+    ],
+    "uv_min": [
+      0.76953125,
+      0.509765625
+    ],
+    "uv_max": [
+      0.98046875,
+      0.615234375
+    ],
+    "semantic": "proposed navigation art; place only on a route that actually exists"
+  },
+  {
+    "name": "Nav_ArrowUp",
+    "png": "textures/decals/Nav_ArrowUp.png",
+    "svg": "textures/decals/Nav_ArrowUp.svg",
+    "cell": [
+      0,
+      4
+    ],
+    "uv_min": [
+      0.01953125,
+      0.384765625
+    ],
+    "uv_max": [
+      0.23046875,
+      0.490234375
+    ],
+    "semantic": "proposed navigation art; place only on a route that actually exists"
+  },
+  {
+    "name": "Nav_ArrowDown",
+    "png": "textures/decals/Nav_ArrowDown.png",
+    "svg": "textures/decals/Nav_ArrowDown.svg",
+    "cell": [
+      1,
+      4
+    ],
+    "uv_min": [
+      0.26953125,
+      0.384765625
+    ],
+    "uv_max": [
+      0.48046875,
+      0.490234375
+    ],
+    "semantic": "proposed navigation art; place only on a route that actually exists"
+  },
+  {
+    "name": "Nav_DropWarning",
+    "png": "textures/decals/Nav_DropWarning.png",
+    "svg": "textures/decals/Nav_DropWarning.svg",
+    "cell": [
+      2,
+      4
+    ],
+    "uv_min": [
+      0.51953125,
+      0.384765625
+    ],
+    "uv_max": [
+      0.73046875,
+      0.490234375
+    ],
+    "semantic": "proposed navigation art; place only on a route that actually exists"
+  },
+  {
+    "name": "Nav_CookPot",
+    "png": "textures/decals/Nav_CookPot.png",
+    "svg": "textures/decals/Nav_CookPot.svg",
+    "cell": [
+      3,
+      4
+    ],
+    "uv_min": [
+      0.76953125,
+      0.384765625
+    ],
+    "uv_max": [
+      0.98046875,
+      0.490234375
+    ],
+    "semantic": "proposed navigation art; place only on a route that actually exists"
+  }
+]

@@ -1,0 +1,20 @@
+{
+  "component_entries": 88,
+  "roles": {
+    "core": 36,
+    "support": 34,
+    "optional": 16,
+    "compatibility": 2
+  },
+  "model_sheets": 23,
+  "assembly_and_player_sheets": 4,
+  "native_images_reviewed": 27,
+  "components_with_one_linked_model_sheet": 88,
+  "selected_wheel_revision": "CS06-r02.png",
+  "source_contracts_read": true,
+  "source_control_mismatch_documented": true,
+  "gallery_javascript_syntax": "passed",
+  "static_links": "passed",
+  "browser_visual_observation": "Not claimed: local-file browser navigation unavailable under tool policy.",
+  "production_meshes_or_unreal_integration": false
+}

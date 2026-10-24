@@ -1,0 +1,282 @@
+{
+  "MODEL14": {
+    "image": "art/model-sheets/MODEL14_FloorAndCeilingSkins.png",
+    "sha256": "90f9b7c6ff471c73fd2946c50aadbf841d65fe9c93fc25bcbf13448a41c4dd13",
+    "mode": "native image"
+  },
+  "MODEL15": {
+    "image": "art/model-sheets/MODEL15_StairsWindowsAndThresholds.png",
+    "sha256": "4b2c644ff78a9d908b287e3786aac17bcceda9f63abff1a56f9613907cf922a4",
+    "mode": "native image"
+  },
+  "MODEL24": {
+    "image": "art/model-sheets/MODEL24_ServiceBellsAndBoneChimes.png",
+    "sha256": "60dbedcbccc2227edcaa62af699e2bcb7e0bf7fce30de9464d1be3cdc4201d2e",
+    "mode": "native image"
+  },
+  "MODEL25": {
+    "image": "art/model-sheets/MODEL25_LaddersAndBacksideGateHardware.png",
+    "sha256": "0fcae84f98606c0594d9354f6f7611e45d021b554e425850efc38e71befd3889",
+    "mode": "native image"
+  },
+  "MODEL27": {
+    "image": "art/model-sheets/MODEL27_SaltAndMillStorage.png",
+    "sha256": "b309219087ef6b93df6a66259d90103e92071bfc6fd4d5d8bd28713ab3d97dc5",
+    "mode": "native image"
+  },
+  "MODEL28": {
+    "image": "art/model-sheets/MODEL28_KitchenTabletopKit.png",
+    "sha256": "babb04f0e74613ed436d7e59b105fdc44e8d9929a2319b98b36841597e61c583",
+    "mode": "native image"
+  },
+  "CS01": {
+    "image": "sections/chain-crossing-sluice/art/CS01.png",
+    "sha256": "a9e558342e7f689f8c2ea05e3042e06c9491a02c7cd97bbcdb0a677b0a07cc65",
+    "mode": "native image"
+  },
+  "CS02": {
+    "image": "sections/chain-crossing-sluice/art/CS02.png",
+    "sha256": "2b0e328d7f062063d5c4a3b916b1daccfbb62c160bd5155727de6d67d3eb9b7f",
+    "mode": "native image"
+  },
+  "CS03": {
+    "image": "sections/chain-crossing-sluice/art/CS03.png",
+    "sha256": "254557fe1ccb46c09be4a4b17ad64332a90c37a5584e234297a733687648d2fe",
+    "mode": "native image"
+  },
+  "CS04": {
+    "image": "sections/chain-crossing-sluice/art/CS04.png",
+    "sha256": "34e18dfb838c4d08a0f672ac5d8fe998f651783c7588fcb5317910a2af859173",
+    "mode": "native image"
+  },
+  "CS05": {
+    "image": "sections/chain-crossing-sluice/art/CS05.png",
+    "sha256": "90418911276014a89b34da2e3d2eeb70733755a6f6a72339f7cae599c9ee86d3",
+    "mode": "contact sheet with targeted native wheel and gate inspection"
+  },
+  "CS06": {
+    "image": "sections/chain-crossing-sluice/art/CS06-r02.png",
+    "sha256": "c7954b5724317af5eea00178ca82d71f9500238f459e48b0f2f1e26ed0db3513",
+    "mode": "contact sheet with targeted native wheel and gate inspection"
+  },
+  "CS07": {
+    "image": "sections/chain-crossing-sluice/art/CS07.png",
+    "sha256": "ef26b7f85d08c3ea0f152af5c4c0a9c0447f548fd8b8d8c60ca48422df9142a7",
+    "mode": "contact sheet with targeted native wheel and gate inspection"
+  },
+  "CS08": {
+    "image": "sections/chain-crossing-sluice/art/CS08.png",
+    "sha256": "84043b010277d633749c0d9007b7eb1c4f76e2d1d6c4ac4c03fbb9e2e8dcbfb8",
+    "mode": "contact sheet with targeted native wheel and gate inspection"
+  },
+  "CS09": {
+    "image": "sections/chain-crossing-sluice/art/CS09.png",
+    "sha256": "db1647a7e8c2a64d4976fb07b85b7b70658924d712125c05366c9fe029f0ecbf",
+    "mode": "contact sheet with targeted native wheel and gate inspection"
+  },
+  "CS10": {
+    "image": "sections/chain-crossing-sluice/art/CS10.png",
+    "sha256": "0501883ccf7ae1f348da0d713d8974dfa239578c610cf3dd324fa9d0edd0e818",
+    "mode": "contact sheet with targeted native wheel and gate inspection"
+  },
+  "CS11": {
+    "image": "sections/chain-crossing-sluice/art/CS11.png",
+    "sha256": "8d710f519ae7a2e9265f8dd7a9cf0c9405555b522ff152056fd86b98d28a3e35",
+    "mode": "contact sheet with targeted native wheel and gate inspection"
+  },
+  "CS12": {
+    "image": "sections/chain-crossing-sluice/art/CS12.png",
+    "sha256": "e186adba5a744ec5dfb2e56f64a52f580a7d8a1ff76be3a30f7b010536dcdc64",
+    "mode": "contact sheet with targeted native wheel and gate inspection"
+  },
+  "CS13": {
+    "image": "sections/chain-crossing-sluice/art/CS13.png",
+    "sha256": "cef30306b43e87f5232d3f01fcb4a899619c951881606e1fc94a81d9dcc94a58",
+    "mode": "contact sheet with targeted native wheel and gate inspection"
+  },
+  "CS14": {
+    "image": "sections/chain-crossing-sluice/art/CS14.png",
+    "sha256": "e2b99560f2071b8017fdbd72fe96b80a99ab8cb1f05cfd5854cb7b7b25258233",
+    "mode": "contact sheet with targeted native wheel and gate inspection"
+  },
+  "CS15": {
+    "image": "sections/chain-crossing-sluice/art/CS15.png",
+    "sha256": "cfaf5175b8987b2c67091acda2016c1e7148d39bcaa8c0c8fa217c23fa1f654c",
+    "mode": "contact sheet with targeted native wheel and gate inspection"
+  },
+  "CS16": {
+    "image": "sections/chain-crossing-sluice/art/CS16.png",
+    "sha256": "7dba9b9af063100aca118289616931c8d98784dc111131709e323f700f14f018",
+    "mode": "contact sheet with targeted native wheel and gate inspection"
+  },
+  "CS17": {
+    "image": "sections/chain-crossing-sluice/art/CS17.png",
+    "sha256": "de002f7dd5a664f0cf5281157f73cfae8a9aac844ac33b1acb4e8432d239a26a",
+    "mode": "contact sheet with targeted native wheel and gate inspection"
+  },
+  "CS18": {
+    "image": "sections/chain-crossing-sluice/art/CS18.png",
+    "sha256": "0dd1a3535c24b189b69f4634ed1198ab415caafc0a217250ae835d9a69a04cef",
+    "mode": "contact sheet with targeted native wheel and gate inspection"
+  },
+  "CS19": {
+    "image": "sections/chain-crossing-sluice/art/CS19.png",
+    "sha256": "ac7a0a1813559005bfff6cdb4c8532c0f01cf6bac14932c64563c4f58b41fbc6",
+    "mode": "contact sheet with targeted native wheel and gate inspection"
+  },
+  "CS20": {
+    "image": "sections/chain-crossing-sluice/art/CS20.png",
+    "sha256": "d5d73cf2dd9bcb52b989623dcc784ea8652470b8794bc9e4b1756bcecf8dfce0",
+    "mode": "contact sheet with targeted native wheel and gate inspection"
+  },
+  "CS21": {
+    "image": "sections/chain-crossing-sluice/art/CS21.png",
+    "sha256": "005ed4a2cf624f12a352720051df7359c5df06b7ffcd05c2e79e0e66e1b58734",
+    "mode": "native image"
+  },
+  "CS22": {
+    "image": "sections/chain-crossing-sluice/art/CS22.png",
+    "sha256": "d30c1b064708d63fffafc1a1fc20f983dc03aee2d931739bcca7171bb353e511",
+    "mode": "native image"
+  },
+  "CS25": {
+    "image": "sections/chain-crossing-sluice/art/CS25.png",
+    "sha256": "64780a88564ecb0deb212b34433cbea73c1e637a470257abf437a1a896c00a6e",
+    "mode": "native image"
+  },
+  "CS26": {
+    "image": "sections/chain-crossing-sluice/art/CS26-r02.png",
+    "sha256": "4a257fd50735c4b3f7833ef0d6966f698face01c43bc61b19078879a3eb03a59",
+    "mode": "native image"
+  },
+  "CS27": {
+    "image": "sections/chain-crossing-sluice/art/CS27.png",
+    "sha256": "b6d61312a1a6bf8f23114f7bf55af17766b3ec3190e3529422170afad9d81d94",
+    "mode": "native image"
+  },
+  "MODEL13": {
+    "image": "art/model-sheets/MODEL13_MasonryClosures-r02.png",
+    "sha256": "8541293fdf893111d3067351179ce0c09d6f0c90ec508fd8c885e10930bd9060",
+    "mode": "native image"
+  },
+  "MODEL26": {
+    "image": "art/model-sheets/MODEL26_VaultDoorCampPlinthAndBox-r02.png",
+    "sha256": "cd2a6caf4ba7c97d12d273f5cc25b78e5b13c35d9d73c88484179027777a6850",
+    "mode": "native image"
+  },
+  "CS23": {
+    "image": "sections/chain-crossing-sluice/art/CS23-r02.png",
+    "sha256": "0d15fa9f823faa1e116f06a0d0d5dea8c3de399b32c49cbaa205bc19dc9b99f3",
+    "mode": "native image"
+  },
+  "CS24": {
+    "image": "sections/chain-crossing-sluice/art/CS24-r02.png",
+    "sha256": "83f4cf1a642ed684990b8b12da22c189a0c0caacb7d0c78f17b6dd0741864897",
+    "mode": "native image"
+  },
+  "MODEL29": {
+    "image": "art/model-sheets/MODEL29_BasketClothAndShelfParts.png",
+    "sha256": "08e7066b89be1508d0775d166e9d3729c375373751230bb9953426ef38945ae1",
+    "mode": "contact sheet inspection; district boards composition-only"
+  },
+  "MODEL30": {
+    "image": "art/model-sheets/MODEL30_NoticeBoardsAndRoyalCloth.png",
+    "sha256": "7bfa9c69487d397892edd6dc2330440af672b0dc9499f56e8582323baa7ce6fa",
+    "mode": "contact sheet inspection; district boards composition-only"
+  },
+  "MODEL31": {
+    "image": "art/model-sheets/MODEL31_DistrictSignsAndStationPlaques.png",
+    "sha256": "382444578ba5aaeaa76555e1bc72215283acf6fb0108e886891ab224c984427a",
+    "mode": "contact sheet inspection; district boards composition-only"
+  },
+  "MODEL32": {
+    "image": "art/model-sheets/MODEL32_GlassWaxBrazierAndLightFrame.png",
+    "sha256": "f0b94979a7277538cae78c23af9bc748b1f6a6b0f35e451bc65dfeb113fd84a0",
+    "mode": "contact sheet inspection; district boards composition-only"
+  },
+  "MODEL33": {
+    "image": "art/model-sheets/MODEL33_RepairAndBurialAccents.png",
+    "sha256": "597a87044b30f1ad5c57c7d822b26f3e678fe2164824a235afdd67f0c3b1ff37",
+    "mode": "contact sheet inspection; district boards composition-only"
+  },
+  "MODEL34": {
+    "image": "art/model-sheets/MODEL34_AtmosphereCarrierMeshes.png",
+    "sha256": "f9d3d7aa618c270c7a7d52445aaf44b9a2655edb00196fcbd592ee71cda2966a",
+    "mode": "contact sheet inspection; district boards composition-only"
+  },
+  "MODEL35": {
+    "image": "art/model-sheets/MODEL35_TimberStructureAndBreaks.png",
+    "sha256": "2150f733d03a6153a38e9347369759b038fc3531667cf68bafe168fd7e1d81c0",
+    "mode": "contact sheet inspection; district boards composition-only"
+  },
+  "MODEL36": {
+    "image": "art/model-sheets/MODEL36_WellHoistMechanicalBreakdown.png",
+    "sha256": "cc8eb746f68aa8a301d04b44381494018b630e16f27e716bf743a4281b5de4e3",
+    "mode": "contact sheet inspection; district boards composition-only"
+  },
+  "MODEL38": {
+    "image": "art/model-sheets/MODEL38_PumpAndPipeAssemblyBreakdown.png",
+    "sha256": "0c6600ba0abee706c4a7467377c252f88c052a84493690dcbbb95e7d551959b2",
+    "mode": "contact sheet inspection; district boards composition-only"
+  },
+  "DRESS01": {
+    "image": "art/district-sheets/DRESS01_HubDressingAssembly.png",
+    "sha256": "1aef3e6ad58bf9e79bded1cdaa09f7ae206c04ca54630ebd3782a2e9e19f4549",
+    "mode": "contact sheet inspection; district boards composition-only"
+  },
+  "DRESS02": {
+    "image": "art/district-sheets/DRESS02_CourtDressingAssembly.png",
+    "sha256": "11bd4607ce2945901a46eb78c1f6b4ea67ccd9e47dd48cf0ce3d584362b91a19",
+    "mode": "contact sheet inspection; district boards composition-only"
+  },
+  "DRESS03": {
+    "image": "art/district-sheets/DRESS03_OssuaryDressingAssembly.png",
+    "sha256": "79ca3f8f4c66c8a7aa503a6545d79e1aefc95a99351832fc7e9416e3b701b4a5",
+    "mode": "contact sheet inspection; district boards composition-only"
+  },
+  "DRESS04": {
+    "image": "art/district-sheets/DRESS04_Waterworks-WDressingAssembly.png",
+    "sha256": "3d14f85ef11a6b7774490ab5a2ce219c643c89220498c04aba61d4b3fdec9469",
+    "mode": "contact sheet inspection; district boards composition-only"
+  },
+  "DRESS05": {
+    "image": "art/district-sheets/DRESS05_PitDressingAssembly.png",
+    "sha256": "2c1be651b37b59417a3ac47b0678b3f98b188e8c070c7a8ce2c0670ad428fa63",
+    "mode": "contact sheet inspection; district boards composition-only"
+  },
+  "DRESS06": {
+    "image": "art/district-sheets/DRESS06_CanalDressingAssembly.png",
+    "sha256": "81061fcdf9751baf2449bb55ef301e6b820e1e59d4c161c1655f3797f41dcdef",
+    "mode": "contact sheet inspection; district boards composition-only"
+  },
+  "DRESS07": {
+    "image": "art/district-sheets/DRESS07_BelfryDressingAssembly.png",
+    "sha256": "10c8312c615f98a6e9257f02dbf093c6f7a730dcbc9217446a9c66de31e2438c",
+    "mode": "contact sheet inspection; district boards composition-only"
+  },
+  "DRESS08": {
+    "image": "art/district-sheets/DRESS08_ReliquaryDressingAssembly.png",
+    "sha256": "dcaa6ce0c202107a2da01926668de8a6d8807189a22d5fb72c78e4eda4335791",
+    "mode": "contact sheet inspection; district boards composition-only"
+  },
+  "DRESS09": {
+    "image": "art/district-sheets/DRESS09_MillDressingAssembly.png",
+    "sha256": "cb6852afd10fd1ed25f9f4b5bff7a87724ffef4526159306b69ac6f6d52ddcd8",
+    "mode": "contact sheet inspection; district boards composition-only"
+  },
+  "DRESS10": {
+    "image": "art/district-sheets/DRESS10_CatacombDressingAssembly.png",
+    "sha256": "f2d174c5b3de04b5dd35cd4e8918be16b93e37a20fc9717513f585876880d54d",
+    "mode": "contact sheet inspection; district boards composition-only"
+  },
+  "DRESS11": {
+    "image": "art/district-sheets/DRESS11_BrineworksDressingAssembly.png",
+    "sha256": "b9104cc3b45cfdaed200c520013e2a65d01c95d05183f82056e04a68157772bf",
+    "mode": "contact sheet inspection; district boards composition-only"
+  },
+  "MODEL37": {
+    "image": "art/model-sheets/MODEL37_MillAndCuringVatBreakdown-r02.png",
+    "sha256": "41623ca07551745cee4a2b1cf6ac3400e4d6241d5a494c5a4c353c55aeaf40af",
+    "mode": "native image"
+  }
+}

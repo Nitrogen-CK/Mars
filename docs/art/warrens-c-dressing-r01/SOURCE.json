@@ -1,0 +1,52 @@
+{
+  "layout": "Tools\\LevelDesign\\anchor_plans\\data\\warrens_v8c.json",
+  "sha256": "f87a76e39b879f4e3b1945a7e369781d08511744c35f6223880168fc20274be2",
+  "revision": "v8c",
+  "concept_snapshot": "docs/art/overnight-exploration-r01",
+  "concept_ids": [
+    "ENVC-01",
+    "ENVC-02",
+    "ENVC-03",
+    "ENVC-04",
+    "ENVC-05",
+    "ENVC-06",
+    "ENVC-07",
+    "ENVC-08",
+    "ENVC-09",
+    "ENVC-10",
+    "ENVC-11",
+    "ENVC-12"
+  ],
+  "source_rule": "Current JSON owns dimensions, ports, puzzle relationships, views and tile boundaries. Concept paintings own mood and broad forms only.",
+  "confirmed": {
+    "level_instance_tiles": 11,
+    "room_records": 24,
+    "protected_views": 10,
+    "capsule_cm": {
+      "diameter": 78,
+      "standing_height": 150,
+      "crouched_height": 105,
+      "crouched_with_pack": 140
+    },
+    "capsule_source": "Script/PlayerCharacter/Mars_PlayerCharacter_Assets.as:70",
+    "bell_tower_height_m": 22,
+    "high_bell_z_m": 16,
+    "key_plinth_z_m": 2.5,
+    "curing_stop": "Mill / P7 at [88,106,5]",
+    "glyphs": [
+      "Square",
+      "Circle",
+      "Triangle",
+      "Diamond",
+      "Cross",
+      "Bars"
+    ]
+  },
+  "important_differences": [
+    "P7 curing vat belongs in Salt Mill, not a second mandatory Brine Larder station.",
+    "Key remains on accessible +2.5 m loft; overhead landmark bell is at +16 m.",
+    "There are 11 current instance tiles. Stale prose in notes saying nine is not the instance list.",
+    "No fractured-clue quest is added to P4. Six existing glyphs stay individually swappable; phrase remains authored by gameplay.",
+    "Foliage, banners and shelf dressing must not block the ten authored landmark/clue views."
+  ]
+}

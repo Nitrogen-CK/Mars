@@ -1,0 +1,48 @@
+{
+  "source_sha256": "f87a76e39b879f4e3b1945a7e369781d08511744c35f6223880168fc20274be2",
+  "source_still_matches_current_layout": true,
+  "surface_families": 19,
+  "surface_maps": 95,
+  "matching_surface_edge_tests": 190,
+  "normal_max_unit_length_error": 0.0041283369064331055,
+  "trim_sheets": 2,
+  "technical_pngs_power_of_two": 135,
+  "vector_icons": 20,
+  "canonical_glyphs": 6,
+  "painted_alpha_sources": 6,
+  "model_sheets": 38,
+  "district_sheets": 11,
+  "selected_art_inspected": 82,
+  "prop_entries": 150,
+  "new_models_with_reviewed_reference": 149,
+  "reuse_only_entries": [
+    "I14"
+  ],
+  "priorities": {
+    "P0": 67,
+    "P1": 66,
+    "P2": 17
+  },
+  "tiles": 11,
+  "source_rooms": 24,
+  "source_dressing_proxies_covered": 26,
+  "authored_puzzles_covered": 7,
+  "protected_views": 10,
+  "fresh_blender_reopen": {
+    "fresh_process_open": true,
+    "blender_version": "5.2.2 LTS",
+    "scenes": 3,
+    "unique_asset_materials": 35,
+    "packed_images": 77,
+    "relative_image_paths": true,
+    "internal_viewer_images_excluded": 2,
+    "packed_image_hashes_match_sources": true,
+    "normal_and_color_space_nodes_checked": true,
+    "production_meshes_or_unreal_integration_claimed": false
+  },
+  "gallery_javascript_syntax": "passed",
+  "browser_visual_observation": "Not claimed; local file navigation was blocked by browser policy in this chat.",
+  "district_composition_status": "Inspected as exploratory composition only; in-image IDs/layout are non-authoritative and not accepted as technical/placement plans.",
+  "unreal_import_or_pie_acceptance": false,
+  "live_map_or_gameplay_edits": false
+}

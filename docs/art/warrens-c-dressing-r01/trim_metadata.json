@@ -1,0 +1,282 @@
+[
+  {
+    "id": "AT02",
+    "name": "ArchitectureTrim",
+    "repeat_u": true,
+    "repeat_v": false,
+    "resolution": [
+      1024,
+      1024
+    ],
+    "bands": [
+      {
+        "row_from_top": 0,
+        "material": "TX01",
+        "name": "LimestoneAshlar",
+        "uv_min": [
+          0,
+          0.8828125
+        ],
+        "uv_max": [
+          1,
+          0.9921875
+        ],
+        "v_center": 0.9375,
+        "gutter_pixels": 8
+      },
+      {
+        "row_from_top": 1,
+        "material": "TX03",
+        "name": "LimePlaster",
+        "uv_min": [
+          0,
+          0.7578125
+        ],
+        "uv_max": [
+          1,
+          0.8671875
+        ],
+        "v_center": 0.8125,
+        "gutter_pixels": 8
+      },
+      {
+        "row_from_top": 2,
+        "material": "TX08",
+        "name": "DarkTimber",
+        "uv_min": [
+          0,
+          0.6328125
+        ],
+        "uv_max": [
+          1,
+          0.7421875
+        ],
+        "v_center": 0.6875,
+        "gutter_pixels": 8
+      },
+      {
+        "row_from_top": 3,
+        "material": "TX09",
+        "name": "BlackIron",
+        "uv_min": [
+          0,
+          0.5078125
+        ],
+        "uv_max": [
+          1,
+          0.6171875
+        ],
+        "v_center": 0.5625,
+        "gutter_pixels": 8
+      },
+      {
+        "row_from_top": 4,
+        "material": "TX10",
+        "name": "AgedBrass",
+        "uv_min": [
+          0,
+          0.3828125
+        ],
+        "uv_max": [
+          1,
+          0.4921875
+        ],
+        "v_center": 0.4375,
+        "gutter_pixels": 8
+      },
+      {
+        "row_from_top": 5,
+        "material": "TX06",
+        "name": "BoneIvory",
+        "uv_min": [
+          0,
+          0.2578125
+        ],
+        "uv_max": [
+          1,
+          0.3671875
+        ],
+        "v_center": 0.3125,
+        "gutter_pixels": 8
+      },
+      {
+        "row_from_top": 6,
+        "material": "TX17",
+        "name": "DampStone",
+        "uv_min": [
+          0,
+          0.1328125
+        ],
+        "uv_max": [
+          1,
+          0.2421875
+        ],
+        "v_center": 0.1875,
+        "gutter_pixels": 8
+      },
+      {
+        "row_from_top": 7,
+        "material": "TX19",
+        "name": "Soot",
+        "uv_min": [
+          0,
+          0.0078125
+        ],
+        "uv_max": [
+          1,
+          0.1171875
+        ],
+        "v_center": 0.0625,
+        "gutter_pixels": 8
+      }
+    ],
+    "maps": {
+      "BaseColor": "textures/atlases/AT02_ArchitectureTrim_BaseColor.png",
+      "ORM": "textures/atlases/AT02_ArchitectureTrim_ORM.png",
+      "NormalGL": "textures/atlases/AT02_ArchitectureTrim_NormalGL.png",
+      "NormalDX": "textures/atlases/AT02_ArchitectureTrim_NormalDX.png",
+      "Height": "textures/atlases/AT02_ArchitectureTrim_Height.png"
+    },
+    "usage": "Place UVs inside one band; repeat U only. Never stretch UVs across band boundaries."
+  },
+  {
+    "id": "AT03",
+    "name": "PropTrim",
+    "repeat_u": true,
+    "repeat_v": false,
+    "resolution": [
+      1024,
+      1024
+    ],
+    "bands": [
+      {
+        "row_from_top": 0,
+        "material": "TX12",
+        "name": "LinenCanvas",
+        "uv_min": [
+          0,
+          0.8828125
+        ],
+        "uv_max": [
+          1,
+          0.9921875
+        ],
+        "v_center": 0.9375,
+        "gutter_pixels": 8
+      },
+      {
+        "row_from_top": 1,
+        "material": "TX13",
+        "name": "BrownLeather",
+        "uv_min": [
+          0,
+          0.7578125
+        ],
+        "uv_max": [
+          1,
+          0.8671875
+        ],
+        "v_center": 0.8125,
+        "gutter_pixels": 8
+      },
+      {
+        "row_from_top": 2,
+        "material": "TX14",
+        "name": "RopeFibre",
+        "uv_min": [
+          0,
+          0.6328125
+        ],
+        "uv_max": [
+          1,
+          0.7421875
+        ],
+        "v_center": 0.6875,
+        "gutter_pixels": 8
+      },
+      {
+        "row_from_top": 3,
+        "material": "TX09",
+        "name": "BlackIron",
+        "uv_min": [
+          0,
+          0.5078125
+        ],
+        "uv_max": [
+          1,
+          0.6171875
+        ],
+        "v_center": 0.5625,
+        "gutter_pixels": 8
+      },
+      {
+        "row_from_top": 4,
+        "material": "TX10",
+        "name": "AgedBrass",
+        "uv_min": [
+          0,
+          0.3828125
+        ],
+        "uv_max": [
+          1,
+          0.4921875
+        ],
+        "v_center": 0.4375,
+        "gutter_pixels": 8
+      },
+      {
+        "row_from_top": 5,
+        "material": "TX15",
+        "name": "OliveCeramic",
+        "uv_min": [
+          0,
+          0.2578125
+        ],
+        "uv_max": [
+          1,
+          0.3671875
+        ],
+        "v_center": 0.3125,
+        "gutter_pixels": 8
+      },
+      {
+        "row_from_top": 6,
+        "material": "TX18",
+        "name": "TallowWax",
+        "uv_min": [
+          0,
+          0.1328125
+        ],
+        "uv_max": [
+          1,
+          0.2421875
+        ],
+        "v_center": 0.1875,
+        "gutter_pixels": 8
+      },
+      {
+        "row_from_top": 7,
+        "material": "TX16",
+        "name": "Parchment",
+        "uv_min": [
+          0,
+          0.0078125
+        ],
+        "uv_max": [
+          1,
+          0.1171875
+        ],
+        "v_center": 0.0625,
+        "gutter_pixels": 8
+      }
+    ],
+    "maps": {
+      "BaseColor": "textures/atlases/AT03_PropTrim_BaseColor.png",
+      "ORM": "textures/atlases/AT03_PropTrim_ORM.png",
+      "NormalGL": "textures/atlases/AT03_PropTrim_NormalGL.png",
+      "NormalDX": "textures/atlases/AT03_PropTrim_NormalDX.png",
+      "Height": "textures/atlases/AT03_PropTrim_Height.png"
+    },
+    "usage": "Place UVs inside one band; repeat U only. Never stretch UVs across band boundaries."
+  }
+]

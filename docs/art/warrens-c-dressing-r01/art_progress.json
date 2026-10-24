@@ -1,0 +1,1000 @@
+{
+  "completed": {
+    "ART01": {
+      "path": "art/painted/ART01_RoyalClocheCrest.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "sha256": "e6b75f7093cae5da3a905738a043b086dc6aabcedcbbfdc60181455fb4201671",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-fa2ba69b-37fc-4974-b2a7-381da64958f6.png",
+      "review": "inspected"
+    },
+    "ART02": {
+      "path": "art/painted/ART02_WellHoistEmblem.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "sha256": "68f5ce9d40c04590709c457c8b9103b892dcff28fd6f511a0eecabff3f5ad112",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-b78ca1f6-25de-4b63-89aa-301f370b09ef.png",
+      "review": "inspected"
+    },
+    "ART03": {
+      "path": "art/painted/ART03_BellBankEmblem-r02.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "sha256": "435f7ab2b675a34f1e34b59f6ad140e9e42bdf6c198e455630a23c8491e2ae08",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-006bda9d-2b5a-4081-b832-ba74763307b5.png",
+      "review": "inspected"
+    },
+    "ART04": {
+      "path": "art/painted/ART04_MournerServiceSeal.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "sha256": "542ebc84b5f5f308ca466292001e7fc46206be3dccb98c5a2d3dd2cbdc25ee69",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-ac3c3fa6-5bb4-47c3-b96a-1469b2519c70.png",
+      "review": "inspected"
+    },
+    "ART05": {
+      "path": "art/painted/ART05_KitchenHarvestMural.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "sha256": "95576edffc0569d913c885e049240a338e8d4668783e0772034adba6d2cd479f",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-82f0c69a-3ec5-410a-bfb0-1eb6704dad58.png",
+      "review": "inspected"
+    },
+    "ART06": {
+      "path": "art/painted/ART06_CuringServicePatch.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "sha256": "eca10f203d5e3450cce4de716614be50cc3711e1fbd557eee890c4fdae8627e6",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-74ac13b7-06d0-4d44-9f89-d913bdd602f4.png",
+      "review": "inspected"
+    },
+    "MODEL01": {
+      "path": "art/model-sheets/MODEL01_SharedMasonryKit.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "08dd9b74ff5dd48c1e600ab80746b6429038389c4a31f3bd13c8f58dc5687f0c",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-47e4cc6b-0c0c-4ee3-ab7e-03fd6dabfebc.png",
+      "review": "inspected"
+    },
+    "MODEL02": {
+      "path": "art/model-sheets/MODEL02_WellHoist.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "d9b702cbddcd759ee38cbc8b4d67414c762c73200e5ec273e9feedf1eedec67a",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-10f37fb2-8baa-4919-97bc-1b214c8996d5.png",
+      "review": "inspected"
+    },
+    "MODEL03": {
+      "path": "art/model-sheets/MODEL03_BelfryBellRig.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "ffba9348acd029fcffd10beebc1f4072360bba6b61fa54344c2f2dc7c48af617",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-3874e963-9e27-437d-8aa9-82516c18ad9e.png",
+      "review": "inspected"
+    },
+    "MODEL04": {
+      "path": "art/model-sheets/MODEL04_BoneBridgeDress.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "a7b64f790dcc2e1cc1c264aae659dee45048b7e542cad0609938fee2caf04f89",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-01144e38-f604-4e37-916a-346cf16efe17.png",
+      "review": "inspected"
+    },
+    "MODEL05": {
+      "path": "art/model-sheets/MODEL05_SluiceChainKit.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "fcd5cf3f2e89ee728a2d4a2bb35c5e4d308182b64837fce5db36ea1fafc1bb63",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-0c599d11-5bc9-4ad3-8e38-2b57b123fedb.png",
+      "review": "inspected"
+    },
+    "MODEL06": {
+      "path": "art/model-sheets/MODEL06_SaltMillCuringStation.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "2fa0464f215a59af891da43677a1f4b7e226880726393bc2f9093ce07fcf0b4c",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-9a45aeb0-1d09-4df1-92c2-6c7e0d0abe72.png",
+      "review": "inspected"
+    },
+    "MODEL07": {
+      "path": "art/model-sheets/MODEL07_PumpWaterworks.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "c4dffdc7f34bfaf181ff65c63c9a91331de51696d82e119f79a8b27f8972f0b0",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-e250fb05-6365-40e2-9810-816e34e35ba1.png",
+      "review": "inspected"
+    },
+    "MODEL08": {
+      "path": "art/model-sheets/MODEL08_PantryStorageKit.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "d1cca71fdb4c37e7120f70caaeaf501e214988d7285009083a4469c7e1111204",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-c702025f-192a-4988-8e43-f8712110dfe3.png",
+      "review": "inspected"
+    },
+    "MODEL09": {
+      "path": "art/model-sheets/MODEL09_PracticalLightKit.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "db01406bb618b4ffd85b84706ca1a8f08a38720a172a501983e1de5df266cd87",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-b6f2a25d-a595-42dd-b38e-4f8b2d615836.png",
+      "review": "inspected"
+    },
+    "MODEL10": {
+      "path": "art/model-sheets/MODEL10_InteractionHousingKit-r02.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "4ac14a5474edf395957f6e729d95f3253d60b31cc0c94aecb6bf0f3f54fb58a8",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-810c19e1-5863-4c14-9825-b88e557f3c89.png",
+      "review": "inspected"
+    },
+    "MODEL11": {
+      "path": "art/model-sheets/MODEL11_MournerAndBurialKit.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "c5357a683eb96d9022ee75d158bfbc7277212468b51f1ad81f0e8573fd4447c5",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-e17ad5a5-4f60-4b19-aa38-f478bbc20106.png",
+      "review": "inspected"
+    },
+    "MODEL12": {
+      "path": "art/model-sheets/MODEL12_RootsAndForageDressKit.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "9bc2ca49b074939c337c1b2b8676552cf14e1f57a2f3c1adfe518b0680ae2dc6",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-3442d77a-e913-4470-82eb-9f4398099ffe.png",
+      "review": "inspected"
+    },
+    "MODEL16": {
+      "path": "art/model-sheets/MODEL16_LargeRockSilhouettes.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "588dc340b0fa774179f769e202e96a8f5fdf3487f1824ad21398ec93070fc54c",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-2eb9c7a5-75ee-436a-ae8c-a957e5ce4c0c.png",
+      "review": "inspected"
+    },
+    "MODEL17": {
+      "path": "art/model-sheets/MODEL17_CaveWallCeilingAndCorners.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "f14de8c3450c20e882d62aaab238fd6135ca10a249a134f19851cecd223ac35e",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-d05ba6e5-5970-4a1a-b448-7facf0e222a7.png",
+      "review": "inspected"
+    },
+    "MODEL18": {
+      "path": "art/model-sheets/MODEL18_CliffsBanksAndRubble.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "925c62ec4fec59a5bd7caa6ba28c187ffda21670fb9533cfe52b69fa85866545",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-977f7b9c-7c73-4e41-8f4f-a6e93fdf91f1.png",
+      "review": "inspected"
+    },
+    "MODEL19": {
+      "path": "art/model-sheets/MODEL19_CanalGuttersAndCisternEdges.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "231cefc70d7095f226b1aa481be29a1e955d4b08ebe9ef311bf83a9f7d7144cf",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-8cb9ecc2-b07a-4768-8982-d16767b86349.png",
+      "review": "inspected"
+    },
+    "MODEL20": {
+      "path": "art/model-sheets/MODEL20_DeepAndShallowWaterAssembly.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "5b6920b570f783df0b37f3ea81edea79fbeeab32c305bc5fe6fb6cf85719194b",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-61a124df-72bc-475b-aae6-f6bf020cd98e.png",
+      "review": "inspected"
+    },
+    "MODEL21": {
+      "path": "art/model-sheets/MODEL21_OutletFlowAndDripImpacts.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "aa6dadb712b95c91f378a9c9661bf901825555051d049b3b8217b8617e519780",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-d0285ffe-f4f3-481e-8dce-ae0a464ae42f.png",
+      "review": "inspected"
+    },
+    "MODEL22": {
+      "path": "art/model-sheets/MODEL22_CisternAndVatLiquids.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "daa9bf66c27f9aee446eae2e1700126603d866746362d74f7db0f2efe1852af1",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-ea96b257-e917-4774-894c-f703e143ed74.png",
+      "review": "inspected"
+    },
+    "MODEL23": {
+      "path": "art/model-sheets/MODEL23_LandmarkBellConstruction.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "fd6345e202bf128f30d9533aa7f4022fe2f04f76cc9c83604210a28a16894cbf",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-83dc6288-d053-4e41-9c9e-4f72a69d83dd.png",
+      "review": "inspected"
+    },
+    "MODEL13": {
+      "path": "art/model-sheets/MODEL13_MasonryClosures-r02.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "8541293fdf893111d3067351179ce0c09d6f0c90ec508fd8c885e10930bd9060",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-2a9ee5b2-5c28-43aa-a265-0c785285ce52.png",
+      "review": "inspected",
+      "review_mode": "native image"
+    },
+    "MODEL14": {
+      "path": "art/model-sheets/MODEL14_FloorAndCeilingSkins.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "90f9b7c6ff471c73fd2946c50aadbf841d65fe9c93fc25bcbf13448a41c4dd13",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-12a6bb72-588b-4b6f-b85e-c6912486768b.png",
+      "review": "inspected",
+      "review_mode": "native image"
+    },
+    "MODEL15": {
+      "path": "art/model-sheets/MODEL15_StairsWindowsAndThresholds.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "4b2c644ff78a9d908b287e3786aac17bcceda9f63abff1a56f9613907cf922a4",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-7a417f28-c654-4134-8f6b-b76eb42f265b.png",
+      "review": "inspected",
+      "review_mode": "native image"
+    },
+    "MODEL24": {
+      "path": "art/model-sheets/MODEL24_ServiceBellsAndBoneChimes.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "60dbedcbccc2227edcaa62af699e2bcb7e0bf7fce30de9464d1be3cdc4201d2e",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-a618a18b-476b-4176-80fc-1275dfa1a42f.png",
+      "review": "inspected",
+      "review_mode": "native image"
+    },
+    "MODEL25": {
+      "path": "art/model-sheets/MODEL25_LaddersAndBacksideGateHardware.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "0fcae84f98606c0594d9354f6f7611e45d021b554e425850efc38e71befd3889",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-6df573c2-057e-42f0-834e-bf9d119ebe10.png",
+      "review": "inspected",
+      "review_mode": "native image"
+    },
+    "MODEL26": {
+      "path": "art/model-sheets/MODEL26_VaultDoorCampPlinthAndBox-r02.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "cd2a6caf4ba7c97d12d273f5cc25b78e5b13c35d9d73c88484179027777a6850",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-1e9872f5-b8cf-4ee1-a9f0-4a445443a5f2.png",
+      "review": "inspected",
+      "review_mode": "native image"
+    },
+    "MODEL27": {
+      "path": "art/model-sheets/MODEL27_SaltAndMillStorage.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "b309219087ef6b93df6a66259d90103e92071bfc6fd4d5d8bd28713ab3d97dc5",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-9424a8b3-4fa0-4300-9ecf-8d0ac336d7d5.png",
+      "review": "inspected",
+      "review_mode": "native image"
+    },
+    "MODEL28": {
+      "path": "art/model-sheets/MODEL28_KitchenTabletopKit.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "babb04f0e74613ed436d7e59b105fdc44e8d9929a2319b98b36841597e61c583",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-14dceabf-2581-4e80-a0e2-be74d12f68db.png",
+      "review": "inspected",
+      "review_mode": "native image"
+    },
+    "CS01": {
+      "path": "sections/chain-crossing-sluice/art/CS01.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "a9e558342e7f689f8c2ea05e3042e06c9491a02c7cd97bbcdb0a677b0a07cc65",
+      "alpha_extrema": null,
+      "original": "C:/Users/Adam/.codex/generated_images/01a1668d-a628-7c93-97d0-8560538ae97d/exec-c0c6c513-803e-4237-936f-0ee415a27e38.png",
+      "review": "inspected",
+      "review_mode": "native image"
+    },
+    "CS02": {
+      "path": "sections/chain-crossing-sluice/art/CS02.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "2b0e328d7f062063d5c4a3b916b1daccfbb62c160bd5155727de6d67d3eb9b7f",
+      "alpha_extrema": null,
+      "original": "C:/Users/Adam/.codex/generated_images/01a1668d-a628-7c93-97d0-8560538ae97d/exec-41cdae3e-69ce-47fd-b2f8-be2c6fc880d3.png",
+      "review": "inspected",
+      "review_mode": "native image"
+    },
+    "CS03": {
+      "path": "sections/chain-crossing-sluice/art/CS03.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "254557fe1ccb46c09be4a4b17ad64332a90c37a5584e234297a733687648d2fe",
+      "alpha_extrema": null,
+      "original": "C:/Users/Adam/.codex/generated_images/01a1668d-a628-7c93-97d0-8560538ae97d/exec-164069b6-9933-4e49-9262-1f9b0464634d.png",
+      "review": "inspected",
+      "review_mode": "native image"
+    },
+    "CS06": {
+      "path": "sections/chain-crossing-sluice/art/CS06-r02.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "c7954b5724317af5eea00178ca82d71f9500238f459e48b0f2f1e26ed0db3513",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-00903b07-5553-4296-8e0e-a844ecd48726.png",
+      "review": "inspected",
+      "review_mode": "contact sheet with targeted native wheel and gate inspection"
+    },
+    "CS04": {
+      "path": "sections/chain-crossing-sluice/art/CS04.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "34e18dfb838c4d08a0f672ac5d8fe998f651783c7588fcb5317910a2af859173",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-bb4516cb-e2c9-4ba9-b436-60ba72c1e9e3.png",
+      "review": "inspected",
+      "review_mode": "native image"
+    },
+    "CS05": {
+      "path": "sections/chain-crossing-sluice/art/CS05.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "90418911276014a89b34da2e3d2eeb70733755a6f6a72339f7cae599c9ee86d3",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-14330825-1610-4181-84e9-995d75422d7e.png",
+      "review": "inspected",
+      "review_mode": "contact sheet with targeted native wheel and gate inspection"
+    },
+    "CS12": {
+      "path": "sections/chain-crossing-sluice/art/CS12.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "e186adba5a744ec5dfb2e56f64a52f580a7d8a1ff76be3a30f7b010536dcdc64",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-aad2d494-f19c-403d-877c-17c9c47846e8.png",
+      "review": "inspected",
+      "review_mode": "contact sheet with targeted native wheel and gate inspection"
+    },
+    "CS13": {
+      "path": "sections/chain-crossing-sluice/art/CS13.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "cef30306b43e87f5232d3f01fcb4a899619c951881606e1fc94a81d9dcc94a58",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-242d2e1f-db83-4aad-9b87-03b4a7658e70.png",
+      "review": "inspected",
+      "review_mode": "contact sheet with targeted native wheel and gate inspection"
+    },
+    "CS14": {
+      "path": "sections/chain-crossing-sluice/art/CS14.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "e2b99560f2071b8017fdbd72fe96b80a99ab8cb1f05cfd5854cb7b7b25258233",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-8f3f6300-4404-4f29-bd5b-230b99c1435b.png",
+      "review": "inspected",
+      "review_mode": "contact sheet with targeted native wheel and gate inspection"
+    },
+    "CS07": {
+      "path": "sections/chain-crossing-sluice/art/CS07.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "ef26b7f85d08c3ea0f152af5c4c0a9c0447f548fd8b8d8c60ca48422df9142a7",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-2c8bc4e7-e475-432c-a248-7abe6c22193f.png",
+      "review": "inspected",
+      "review_mode": "contact sheet with targeted native wheel and gate inspection"
+    },
+    "CS15": {
+      "path": "sections/chain-crossing-sluice/art/CS15.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "cfaf5175b8987b2c67091acda2016c1e7148d39bcaa8c0c8fa217c23fa1f654c",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-ef03abbd-bd43-415b-b1f5-12d552ed6153.png",
+      "review": "inspected",
+      "review_mode": "contact sheet with targeted native wheel and gate inspection"
+    },
+    "CS08": {
+      "path": "sections/chain-crossing-sluice/art/CS08.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "84043b010277d633749c0d9007b7eb1c4f76e2d1d6c4ac4c03fbb9e2e8dcbfb8",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-fcd6748f-ccbc-4f4d-b35f-2cc931bec13f.png",
+      "review": "inspected",
+      "review_mode": "contact sheet with targeted native wheel and gate inspection"
+    },
+    "CS16": {
+      "path": "sections/chain-crossing-sluice/art/CS16.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "7dba9b9af063100aca118289616931c8d98784dc111131709e323f700f14f018",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-2f97b261-40f1-4e3b-b6b3-b008bdfb5ebb.png",
+      "review": "inspected",
+      "review_mode": "contact sheet with targeted native wheel and gate inspection"
+    },
+    "CS09": {
+      "path": "sections/chain-crossing-sluice/art/CS09.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "db1647a7e8c2a64d4976fb07b85b7b70658924d712125c05366c9fe029f0ecbf",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-76543ea6-c7da-456d-82a1-20a7b89e7160.png",
+      "review": "inspected",
+      "review_mode": "contact sheet with targeted native wheel and gate inspection"
+    },
+    "CS17": {
+      "path": "sections/chain-crossing-sluice/art/CS17.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "de002f7dd5a664f0cf5281157f73cfae8a9aac844ac33b1acb4e8432d239a26a",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-1c6fc7db-d64c-4bdf-9ea5-193a9df9dcd1.png",
+      "review": "inspected",
+      "review_mode": "contact sheet with targeted native wheel and gate inspection"
+    },
+    "CS10": {
+      "path": "sections/chain-crossing-sluice/art/CS10.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "0501883ccf7ae1f348da0d713d8974dfa239578c610cf3dd324fa9d0edd0e818",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-e63e7975-b709-498d-8c24-0b09813c735c.png",
+      "review": "inspected",
+      "review_mode": "contact sheet with targeted native wheel and gate inspection"
+    },
+    "CS18": {
+      "path": "sections/chain-crossing-sluice/art/CS18.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "0dd1a3535c24b189b69f4634ed1198ab415caafc0a217250ae835d9a69a04cef",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-348552be-1177-4e06-8211-e45612bce95f.png",
+      "review": "inspected",
+      "review_mode": "contact sheet with targeted native wheel and gate inspection"
+    },
+    "CS11": {
+      "path": "sections/chain-crossing-sluice/art/CS11.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "8d710f519ae7a2e9265f8dd7a9cf0c9405555b522ff152056fd86b98d28a3e35",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-0e1d2740-ff28-4815-8c57-2a17da4691b4.png",
+      "review": "inspected",
+      "review_mode": "contact sheet with targeted native wheel and gate inspection"
+    },
+    "CS19": {
+      "path": "sections/chain-crossing-sluice/art/CS19.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "ac7a0a1813559005bfff6cdb4c8532c0f01cf6bac14932c64563c4f58b41fbc6",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-6d8fa2d0-588f-4663-a771-b34a454df2ef.png",
+      "review": "inspected",
+      "review_mode": "contact sheet with targeted native wheel and gate inspection"
+    },
+    "CS20": {
+      "path": "sections/chain-crossing-sluice/art/CS20.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "d5d73cf2dd9bcb52b989623dcc784ea8652470b8794bc9e4b1756bcecf8dfce0",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-badc5c42-bd68-430a-b399-22ecd42b2ac7.png",
+      "review": "inspected",
+      "review_mode": "contact sheet with targeted native wheel and gate inspection"
+    },
+    "CS21": {
+      "path": "sections/chain-crossing-sluice/art/CS21.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "005ed4a2cf624f12a352720051df7359c5df06b7ffcd05c2e79e0e66e1b58734",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-1777652f-2308-4599-943b-2c4cb36f0135.png",
+      "review": "inspected",
+      "review_mode": "native image"
+    },
+    "CS22": {
+      "path": "sections/chain-crossing-sluice/art/CS22.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "d30c1b064708d63fffafc1a1fc20f983dc03aee2d931739bcca7171bb353e511",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-11622f48-4859-4a7e-ac31-16a3950d4b86.png",
+      "review": "inspected",
+      "review_mode": "native image"
+    },
+    "CS23": {
+      "path": "sections/chain-crossing-sluice/art/CS23-r02.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "0d15fa9f823faa1e116f06a0d0d5dea8c3de399b32c49cbaa205bc19dc9b99f3",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-9ed0d102-abc6-4483-99b2-8d357f3fc939.png",
+      "review": "inspected",
+      "review_mode": "native image"
+    },
+    "CS24": {
+      "path": "sections/chain-crossing-sluice/art/CS24-r02.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "83f4cf1a642ed684990b8b12da22c189a0c0caacb7d0c78f17b6dd0741864897",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-2881801a-856e-4f50-ae92-578fe6640aec.png",
+      "review": "inspected",
+      "review_mode": "native image"
+    },
+    "CS25": {
+      "path": "sections/chain-crossing-sluice/art/CS25.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "64780a88564ecb0deb212b34433cbea73c1e637a470257abf437a1a896c00a6e",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-d44030e5-08b8-462c-9081-574e188cfcd1.png",
+      "review": "inspected",
+      "review_mode": "native image"
+    },
+    "CS26": {
+      "path": "sections/chain-crossing-sluice/art/CS26-r02.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "4a257fd50735c4b3f7833ef0d6966f698face01c43bc61b19078879a3eb03a59",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-19aeb71d-89d5-4d0d-a8f6-05549e58a820.png",
+      "review": "inspected",
+      "review_mode": "native image"
+    },
+    "CS27": {
+      "path": "sections/chain-crossing-sluice/art/CS27.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "b6d61312a1a6bf8f23114f7bf55af17766b3ec3190e3529422170afad9d81d94",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-587cb503-8011-49ee-8d34-1a8c91f53be7.png",
+      "review": "inspected",
+      "review_mode": "native image"
+    },
+    "DRESS01": {
+      "path": "art/district-sheets/DRESS01_HubDressingAssembly.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "1aef3e6ad58bf9e79bded1cdaa09f7ae206c04ca54630ebd3782a2e9e19f4549",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-4da7b8ce-7387-4260-bea7-c7aebe6149b2.png",
+      "review": "inspected",
+      "review_mode": "contact sheet inspection; district boards composition-only"
+    },
+    "DRESS02": {
+      "path": "art/district-sheets/DRESS02_CourtDressingAssembly.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "11bd4607ce2945901a46eb78c1f6b4ea67ccd9e47dd48cf0ce3d584362b91a19",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-b77f81c9-c497-48a8-8dbf-66fc0620a7d4.png",
+      "review": "inspected",
+      "review_mode": "contact sheet inspection; district boards composition-only"
+    },
+    "DRESS03": {
+      "path": "art/district-sheets/DRESS03_OssuaryDressingAssembly.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "79ca3f8f4c66c8a7aa503a6545d79e1aefc95a99351832fc7e9416e3b701b4a5",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-538338cb-6fe2-4c66-b9f7-3d9c7e517555.png",
+      "review": "inspected",
+      "review_mode": "contact sheet inspection; district boards composition-only"
+    },
+    "DRESS04": {
+      "path": "art/district-sheets/DRESS04_Waterworks-WDressingAssembly.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "3d14f85ef11a6b7774490ab5a2ce219c643c89220498c04aba61d4b3fdec9469",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-65e24959-8576-46ab-a8a7-ec5e6b644c1e.png",
+      "review": "inspected",
+      "review_mode": "contact sheet inspection; district boards composition-only"
+    },
+    "DRESS05": {
+      "path": "art/district-sheets/DRESS05_PitDressingAssembly.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "2c1be651b37b59417a3ac47b0678b3f98b188e8c070c7a8ce2c0670ad428fa63",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-5e3eb612-6377-4cf7-bd19-0ee5e609748e.png",
+      "review": "inspected",
+      "review_mode": "contact sheet inspection; district boards composition-only"
+    },
+    "DRESS06": {
+      "path": "art/district-sheets/DRESS06_CanalDressingAssembly.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "81061fcdf9751baf2449bb55ef301e6b820e1e59d4c161c1655f3797f41dcdef",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-31f738c4-abf7-4d7e-b4eb-cb5c7ea0e5d1.png",
+      "review": "inspected",
+      "review_mode": "contact sheet inspection; district boards composition-only"
+    },
+    "DRESS07": {
+      "path": "art/district-sheets/DRESS07_BelfryDressingAssembly.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "10c8312c615f98a6e9257f02dbf093c6f7a730dcbc9217446a9c66de31e2438c",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-5d426da3-4b11-49ca-8c23-0db7f634e8e7.png",
+      "review": "inspected",
+      "review_mode": "contact sheet inspection; district boards composition-only"
+    },
+    "DRESS08": {
+      "path": "art/district-sheets/DRESS08_ReliquaryDressingAssembly.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "dcaa6ce0c202107a2da01926668de8a6d8807189a22d5fb72c78e4eda4335791",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-ddc073cc-269e-4fb7-ae1f-e99cd9e00e0a.png",
+      "review": "inspected",
+      "review_mode": "contact sheet inspection; district boards composition-only"
+    },
+    "DRESS09": {
+      "path": "art/district-sheets/DRESS09_MillDressingAssembly.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "cb6852afd10fd1ed25f9f4b5bff7a87724ffef4526159306b69ac6f6d52ddcd8",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-088e3bdd-181c-4d4a-b9df-950719747da4.png",
+      "review": "inspected",
+      "review_mode": "contact sheet inspection; district boards composition-only"
+    },
+    "DRESS10": {
+      "path": "art/district-sheets/DRESS10_CatacombDressingAssembly.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "f2d174c5b3de04b5dd35cd4e8918be16b93e37a20fc9717513f585876880d54d",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-9e972985-6cca-4909-a34a-ad386727a706.png",
+      "review": "inspected",
+      "review_mode": "contact sheet inspection; district boards composition-only"
+    },
+    "DRESS11": {
+      "path": "art/district-sheets/DRESS11_BrineworksDressingAssembly.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "b9104cc3b45cfdaed200c520013e2a65d01c95d05183f82056e04a68157772bf",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-94338380-1cd1-4f6c-900f-84457094c5ab.png",
+      "review": "inspected",
+      "review_mode": "contact sheet inspection; district boards composition-only"
+    },
+    "MODEL29": {
+      "path": "art/model-sheets/MODEL29_BasketClothAndShelfParts.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "08e7066b89be1508d0775d166e9d3729c375373751230bb9953426ef38945ae1",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-79950b78-9b1b-4dc6-a70d-9a2ae48e70b6.png",
+      "review": "inspected",
+      "review_mode": "contact sheet inspection; district boards composition-only"
+    },
+    "MODEL30": {
+      "path": "art/model-sheets/MODEL30_NoticeBoardsAndRoyalCloth.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "7bfa9c69487d397892edd6dc2330440af672b0dc9499f56e8582323baa7ce6fa",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-77b61be0-1b58-494f-81b5-3bf6b4ee76cb.png",
+      "review": "inspected",
+      "review_mode": "contact sheet inspection; district boards composition-only"
+    },
+    "MODEL31": {
+      "path": "art/model-sheets/MODEL31_DistrictSignsAndStationPlaques.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "382444578ba5aaeaa76555e1bc72215283acf6fb0108e886891ab224c984427a",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-3558ae3c-8140-403b-a4d3-3fbef58c1a98.png",
+      "review": "inspected",
+      "review_mode": "contact sheet inspection; district boards composition-only"
+    },
+    "MODEL32": {
+      "path": "art/model-sheets/MODEL32_GlassWaxBrazierAndLightFrame.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "f0b94979a7277538cae78c23af9bc748b1f6a6b0f35e451bc65dfeb113fd84a0",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-4dfa5193-7b0a-4c45-9c98-1eb55b77bfa4.png",
+      "review": "inspected",
+      "review_mode": "contact sheet inspection; district boards composition-only"
+    },
+    "MODEL33": {
+      "path": "art/model-sheets/MODEL33_RepairAndBurialAccents.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "597a87044b30f1ad5c57c7d822b26f3e678fe2164824a235afdd67f0c3b1ff37",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-34c5c6ce-a212-4dab-ad93-716032143ccf.png",
+      "review": "inspected",
+      "review_mode": "contact sheet inspection; district boards composition-only"
+    },
+    "MODEL34": {
+      "path": "art/model-sheets/MODEL34_AtmosphereCarrierMeshes.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "f9d3d7aa618c270c7a7d52445aaf44b9a2655edb00196fcbd592ee71cda2966a",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-3c885bee-6096-43cc-9394-63fe1832be2b.png",
+      "review": "inspected",
+      "review_mode": "contact sheet inspection; district boards composition-only"
+    },
+    "MODEL35": {
+      "path": "art/model-sheets/MODEL35_TimberStructureAndBreaks.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "2150f733d03a6153a38e9347369759b038fc3531667cf68bafe168fd7e1d81c0",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-77c1e96b-95a4-45cc-ac37-6f6f418df867.png",
+      "review": "inspected",
+      "review_mode": "contact sheet inspection; district boards composition-only"
+    },
+    "MODEL36": {
+      "path": "art/model-sheets/MODEL36_WellHoistMechanicalBreakdown.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "cc8eb746f68aa8a301d04b44381494018b630e16f27e716bf743a4281b5de4e3",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-1a30c73a-62d8-4d74-a91b-45782ffac4cb.png",
+      "review": "inspected",
+      "review_mode": "contact sheet inspection; district boards composition-only"
+    },
+    "MODEL37": {
+      "path": "art/model-sheets/MODEL37_MillAndCuringVatBreakdown-r02.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "41623ca07551745cee4a2b1cf6ac3400e4d6241d5a494c5a4c353c55aeaf40af",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-4c285b64-747e-4a91-9314-45f6d25b7c0d.png",
+      "review": "inspected",
+      "review_mode": "native image"
+    },
+    "MODEL38": {
+      "path": "art/model-sheets/MODEL38_PumpAndPipeAssemblyBreakdown.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "0c6600ba0abee706c4a7467377c252f88c052a84493690dcbbb95e7d551959b2",
+      "alpha_extrema": null,
+      "original": "C:\\Users\\Adam\\.codex\\generated_images\\01a1668d-a628-7c93-97d0-8560538ae97d\\exec-ad79d765-c2b2-41b8-b02e-c58a19e6bb68.png",
+      "review": "inspected",
+      "review_mode": "contact sheet inspection; district boards composition-only"
+    }
+  },
+  "review_notes": {
+    "ART01": "Inspected native image or labelled contact sheet for silhouette, component separation, style and intended role. Written catalog dimensions govern AI-labelled views. MODEL10 r02 matches the six solid canonical glyphs; ART03 r02 removes a misleading diamond-like bell motif.",
+    "ART02": "Inspected native image or labelled contact sheet for silhouette, component separation, style and intended role. Written catalog dimensions govern AI-labelled views. MODEL10 r02 matches the six solid canonical glyphs; ART03 r02 removes a misleading diamond-like bell motif.",
+    "ART03": "Inspected native image or labelled contact sheet for silhouette, component separation, style and intended role. Written catalog dimensions govern AI-labelled views. MODEL10 r02 matches the six solid canonical glyphs; ART03 r02 removes a misleading diamond-like bell motif.",
+    "ART04": "Inspected native image or labelled contact sheet for silhouette, component separation, style and intended role. Written catalog dimensions govern AI-labelled views. MODEL10 r02 matches the six solid canonical glyphs; ART03 r02 removes a misleading diamond-like bell motif.",
+    "ART05": "Inspected native image or labelled contact sheet for silhouette, component separation, style and intended role. Written catalog dimensions govern AI-labelled views. MODEL10 r02 matches the six solid canonical glyphs; ART03 r02 removes a misleading diamond-like bell motif.",
+    "ART06": "Inspected native image or labelled contact sheet for silhouette, component separation, style and intended role. Written catalog dimensions govern AI-labelled views. MODEL10 r02 matches the six solid canonical glyphs; ART03 r02 removes a misleading diamond-like bell motif.",
+    "MODEL01": "Inspected native image or labelled contact sheet for silhouette, component separation, style and intended role. Written catalog dimensions govern AI-labelled views. MODEL10 r02 matches the six solid canonical glyphs; ART03 r02 removes a misleading diamond-like bell motif.",
+    "MODEL02": "Inspected native image or labelled contact sheet for silhouette, component separation, style and intended role. Written catalog dimensions govern AI-labelled views. MODEL10 r02 matches the six solid canonical glyphs; ART03 r02 removes a misleading diamond-like bell motif.",
+    "MODEL03": "Inspected native image or labelled contact sheet for silhouette, component separation, style and intended role. Written catalog dimensions govern AI-labelled views. MODEL10 r02 matches the six solid canonical glyphs; ART03 r02 removes a misleading diamond-like bell motif.",
+    "MODEL04": "Inspected native image or labelled contact sheet for silhouette, component separation, style and intended role. Written catalog dimensions govern AI-labelled views. MODEL10 r02 matches the six solid canonical glyphs; ART03 r02 removes a misleading diamond-like bell motif.",
+    "MODEL05": "Inspected native image or labelled contact sheet for silhouette, component separation, style and intended role. Written catalog dimensions govern AI-labelled views. MODEL10 r02 matches the six solid canonical glyphs; ART03 r02 removes a misleading diamond-like bell motif.",
+    "MODEL06": "Inspected native image or labelled contact sheet for silhouette, component separation, style and intended role. Written catalog dimensions govern AI-labelled views. MODEL10 r02 matches the six solid canonical glyphs; ART03 r02 removes a misleading diamond-like bell motif.",
+    "MODEL07": "Inspected native image or labelled contact sheet for silhouette, component separation, style and intended role. Written catalog dimensions govern AI-labelled views. MODEL10 r02 matches the six solid canonical glyphs; ART03 r02 removes a misleading diamond-like bell motif.",
+    "MODEL08": "Inspected native image or labelled contact sheet for silhouette, component separation, style and intended role. Written catalog dimensions govern AI-labelled views. MODEL10 r02 matches the six solid canonical glyphs; ART03 r02 removes a misleading diamond-like bell motif.",
+    "MODEL09": "Inspected native image or labelled contact sheet for silhouette, component separation, style and intended role. Written catalog dimensions govern AI-labelled views. MODEL10 r02 matches the six solid canonical glyphs; ART03 r02 removes a misleading diamond-like bell motif.",
+    "MODEL10": "Inspected native image or labelled contact sheet for silhouette, component separation, style and intended role. Written catalog dimensions govern AI-labelled views. MODEL10 r02 matches the six solid canonical glyphs; ART03 r02 removes a misleading diamond-like bell motif.",
+    "MODEL11": "Inspected native image or labelled contact sheet for silhouette, component separation, style and intended role. Written catalog dimensions govern AI-labelled views. MODEL10 r02 matches the six solid canonical glyphs; ART03 r02 removes a misleading diamond-like bell motif.",
+    "MODEL12": "Inspected native image or labelled contact sheet for silhouette, component separation, style and intended role. Written catalog dimensions govern AI-labelled views. MODEL10 r02 matches the six solid canonical glyphs; ART03 r02 removes a misleading diamond-like bell motif."
+  }
+}

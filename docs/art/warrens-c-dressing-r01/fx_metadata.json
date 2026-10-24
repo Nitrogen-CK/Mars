@@ -1,0 +1,11 @@
+{
+  "water_tile_metres": 4,
+  "water_noise_channels": {
+    "R": "slow breakup",
+    "G": "second periodic phase",
+    "B": "sparse foam mask",
+    "A": "white"
+  },
+  "water_flow": "No authored flow direction. Pan two normal samples in shader; do not infer traversability from texture.",
+  "flame": "Mesh/card only, proposed emissive material; no animated simulation or light tuning supplied."
+}

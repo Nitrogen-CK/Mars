@@ -1,0 +1,24 @@
+E01|RockButtressLarge|architecture|0|300,180,450|TX04|Pit,Catacomb,Court,Canal|3|broad faceted shoulder fitted outside existing movement envelope; never add a walkable shelf
+E02|RockWedge|architecture|1|200,120,180|TX04|all|4|asymmetric wedge to close shell seams; rotate only outside existing clearances
+E03|CaveWallStraight400|architecture|0|400,100,400|TX04|Pit,Catacomb,Canal,Waterworks-W|3|flat rear contact plane and large angular planes; no procedural micro-rock noise
+E04|CaveWallCorner|architecture|0|300,300,400|TX04|Pit,Catacomb,Canal|2|inside and outside corner variants; fit retained shell without narrowing its ports
+E05|CaveCeilingCap400|architecture|0|400,400,100|TX04|Pit,Catacomb,Waterworks-W,Brineworks|3|underside facets; pivot rear top contact corner; lower silhouette stays above authored headroom and views
+E06|CavePillarShell|architecture|1|200,200,500|TX04|Pit,Canal|2|split half-shells around an existing support only; do not scatter new pillars in playable space
+E07|RockBankSkirt400|architecture|0|400,120,200|TX04,TX17|Canal,Waterworks-W,Brineworks|3|vertical wet-rock skirt below retained bank; no ledges across the deep canal
+E08|RubbleToeStrip200|detail|1|200,60,30|TX04|all|4|merge 5-8 chunky rocks as a strip at closed walls; keep outside paths or sink flush
+E09|CliffFace400|architecture|0|400,150,600|TX04|Pit,Canal|3|large planar vertical height module with overlapping ends; no new climb route or silhouette blocking landmark views
+E10|DeepCanalWaterTile400|waterworks|0|400,400,1|FX_Water|Canal|1|flat repeatable non-colliding surface carrier at existing authored canal water level; 2m depth remains gameplay-owned
+E11|ShallowFordWaterTile200|waterworks|0|200,200,1|FX_Water|Canal|1|surface carrier above existing ford floor; 0.4m water and permanent open ford route remain authored; no stepping-stone puzzle
+E12|OutletFlowRibbon|waterworks|1|40,35,100|FX_Water|Waterworks-W,Brineworks|2|optional short spout-to-existing-pool visual ribbon; no new waterfall route or changes to water level; animated material hookup is later work
+E13|DripRippleCard|detail|2|80,80,1|FX_Water|Waterworks-W,Brineworks,Pit|2|horizontal alpha carrier for one drip impact; static geometry plus mask specification only; no particle timing supplied
+E14|CisternWaterTile400|waterworks|0|400,400,1|FX_Water|Waterworks-W,Brineworks|1|shared shallow-pool surface carrier; transparent enough to read the retained 0.4m floor; do not imply a deep pit
+E15|BrineScumCard|detail|2|150,100,1|FX_Water,TX05|Mill,Brineworks|3|sparse off-white foam/scum alpha patches at liquid perimeter; never fill or hide a real interaction target
+E16|BellLipDamageInsert|detail|1|90,25,70|TX10|Belfry|2|optional static chipped-lip insert/variant on landmark bell; no new collectible broken-bell objective and no invented exposed gears
+E17|ServiceBellSmall|storage|1|45,45,60|TX10|Hub,Mill,Belfry|2|closed-wall decorative bell; visually smaller and duller than high landmark bell; no interactive prompt or audio system implied
+E18|BellBracket|architecture|1|70,40,90|TX08,TX09|Hub,Mill,Belfry|2|wall-mounted timber/iron bracket for E17; no decorative pull rope that suggests an interaction
+E19|BoneChimeRail|storage|1|120,30,50|TX08,TX14,TX06|Belfry|2|rail plus separate 3-5 P11 single-bone components; blunt graphic bone silhouettes and no lock glyphs
+E20|DripCard|detail|2|30,1,120|FX_Water|Waterworks-W,Brineworks,Catacomb|2|vertical alpha carrier for sparse leaks; geometry/material input only, no finished moving particles or gameplay wetness
+E21|LowMistCard|detail|2|300,1,100|FX_Dust|Pit,Canal|1|optional sparse soft carrier outside routes and views; reuse breakup noise; not a finished fog or volumetric system
+E22|TimberBeam200|architecture|0|200,30,35|TX08|Hub,Belfry,Mill,Reliquary|3|broad square beam with one bevel; scale length only after checking joints; overhead beam must retain source headroom
+E23|TimberBrace|architecture|1|120,25,120|TX08,TX09|Hub,Belfry,Mill,Reliquary|2|diagonal support fitted to existing posts; no climbable brace across a port
+E24|BrokenBeamEnd|detail|1|100,35,35|TX08|Court,Catacomb,Belfry|3|three broad cut splinters; closed-wall dress only and no fake traversal plank

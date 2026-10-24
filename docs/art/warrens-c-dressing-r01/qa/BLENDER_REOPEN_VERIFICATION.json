@@ -1,0 +1,12 @@
+{
+  "fresh_process_open": true,
+  "blender_version": "5.2.2 LTS",
+  "scenes": 3,
+  "unique_asset_materials": 35,
+  "packed_images": 77,
+  "relative_image_paths": true,
+  "internal_viewer_images_excluded": 2,
+  "packed_image_hashes_match_sources": true,
+  "normal_and_color_space_nodes_checked": true,
+  "production_meshes_or_unreal_integration_claimed": false
+}

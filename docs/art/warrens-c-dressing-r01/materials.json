@@ -1,0 +1,439 @@
+[
+  {
+    "id": "TX01",
+    "name": "LimestoneAshlar",
+    "family": "ashlar",
+    "base_srgb_hex": "#858473",
+    "roughness": 0.86,
+    "metallic": 0,
+    "tile_metres": [
+      2,
+      2
+    ],
+    "relief_mm": 1.2,
+    "resolution": 1024,
+    "asset_stem": "WarrensC_LimestoneAshlar",
+    "maps": {
+      "BaseColor": "textures/surfaces/TX01_LimestoneAshlar_BaseColor.png",
+      "ORM": "textures/surfaces/TX01_LimestoneAshlar_ORM.png",
+      "NormalGL": "textures/surfaces/TX01_LimestoneAshlar_NormalGL.png",
+      "NormalDX": "textures/surfaces/TX01_LimestoneAshlar_NormalDX.png",
+      "Height": "textures/surfaces/TX01_LimestoneAshlar_Height.png"
+    },
+    "role": "Subtle shared surface variation. Geometry and face colors supply the low-poly silhouette; no baked amber/teal light."
+  },
+  {
+    "id": "TX02",
+    "name": "BroadFlagstone",
+    "family": "flagstone",
+    "base_srgb_hex": "#777a71",
+    "roughness": 0.88,
+    "metallic": 0,
+    "tile_metres": [
+      2,
+      2
+    ],
+    "relief_mm": 0.9,
+    "resolution": 1024,
+    "asset_stem": "WarrensC_BroadFlagstone",
+    "maps": {
+      "BaseColor": "textures/surfaces/TX02_BroadFlagstone_BaseColor.png",
+      "ORM": "textures/surfaces/TX02_BroadFlagstone_ORM.png",
+      "NormalGL": "textures/surfaces/TX02_BroadFlagstone_NormalGL.png",
+      "NormalDX": "textures/surfaces/TX02_BroadFlagstone_NormalDX.png",
+      "Height": "textures/surfaces/TX02_BroadFlagstone_Height.png"
+    },
+    "role": "Subtle shared surface variation. Geometry and face colors supply the low-poly silhouette; no baked amber/teal light."
+  },
+  {
+    "id": "TX03",
+    "name": "LimePlaster",
+    "family": "plaster",
+    "base_srgb_hex": "#bab59b",
+    "roughness": 0.92,
+    "metallic": 0,
+    "tile_metres": [
+      2,
+      2
+    ],
+    "relief_mm": 0.3,
+    "resolution": 1024,
+    "asset_stem": "WarrensC_LimePlaster",
+    "maps": {
+      "BaseColor": "textures/surfaces/TX03_LimePlaster_BaseColor.png",
+      "ORM": "textures/surfaces/TX03_LimePlaster_ORM.png",
+      "NormalGL": "textures/surfaces/TX03_LimePlaster_NormalGL.png",
+      "NormalDX": "textures/surfaces/TX03_LimePlaster_NormalDX.png",
+      "Height": "textures/surfaces/TX03_LimePlaster_Height.png"
+    },
+    "role": "Subtle shared surface variation. Geometry and face colors supply the low-poly silhouette; no baked amber/teal light."
+  },
+  {
+    "id": "TX04",
+    "name": "CaveRock",
+    "family": "rock",
+    "base_srgb_hex": "#616e69",
+    "roughness": 0.91,
+    "metallic": 0,
+    "tile_metres": [
+      3,
+      3
+    ],
+    "relief_mm": 0.5,
+    "resolution": 1024,
+    "asset_stem": "WarrensC_CaveRock",
+    "maps": {
+      "BaseColor": "textures/surfaces/TX04_CaveRock_BaseColor.png",
+      "ORM": "textures/surfaces/TX04_CaveRock_ORM.png",
+      "NormalGL": "textures/surfaces/TX04_CaveRock_NormalGL.png",
+      "NormalDX": "textures/surfaces/TX04_CaveRock_NormalDX.png",
+      "Height": "textures/surfaces/TX04_CaveRock_Height.png"
+    },
+    "role": "Subtle shared surface variation. Geometry and face colors supply the low-poly silhouette; no baked amber/teal light."
+  },
+  {
+    "id": "TX05",
+    "name": "SaltCrust",
+    "family": "salt",
+    "base_srgb_hex": "#d0ccb4",
+    "roughness": 0.93,
+    "metallic": 0,
+    "tile_metres": [
+      1,
+      1
+    ],
+    "relief_mm": 0.6,
+    "resolution": 1024,
+    "asset_stem": "WarrensC_SaltCrust",
+    "maps": {
+      "BaseColor": "textures/surfaces/TX05_SaltCrust_BaseColor.png",
+      "ORM": "textures/surfaces/TX05_SaltCrust_ORM.png",
+      "NormalGL": "textures/surfaces/TX05_SaltCrust_NormalGL.png",
+      "NormalDX": "textures/surfaces/TX05_SaltCrust_NormalDX.png",
+      "Height": "textures/surfaces/TX05_SaltCrust_Height.png"
+    },
+    "role": "Subtle shared surface variation. Geometry and face colors supply the low-poly silhouette; no baked amber/teal light."
+  },
+  {
+    "id": "TX06",
+    "name": "BoneIvory",
+    "family": "bone",
+    "base_srgb_hex": "#c9bd94",
+    "roughness": 0.79,
+    "metallic": 0,
+    "tile_metres": [
+      1,
+      1
+    ],
+    "relief_mm": 0.2,
+    "resolution": 1024,
+    "asset_stem": "WarrensC_BoneIvory",
+    "maps": {
+      "BaseColor": "textures/surfaces/TX06_BoneIvory_BaseColor.png",
+      "ORM": "textures/surfaces/TX06_BoneIvory_ORM.png",
+      "NormalGL": "textures/surfaces/TX06_BoneIvory_NormalGL.png",
+      "NormalDX": "textures/surfaces/TX06_BoneIvory_NormalDX.png",
+      "Height": "textures/surfaces/TX06_BoneIvory_Height.png"
+    },
+    "role": "Subtle shared surface variation. Geometry and face colors supply the low-poly silhouette; no baked amber/teal light."
+  },
+  {
+    "id": "TX07",
+    "name": "OakPlank",
+    "family": "plank",
+    "base_srgb_hex": "#79604a",
+    "roughness": 0.84,
+    "metallic": 0,
+    "tile_metres": [
+      2,
+      2
+    ],
+    "relief_mm": 0.6,
+    "resolution": 1024,
+    "asset_stem": "WarrensC_OakPlank",
+    "maps": {
+      "BaseColor": "textures/surfaces/TX07_OakPlank_BaseColor.png",
+      "ORM": "textures/surfaces/TX07_OakPlank_ORM.png",
+      "NormalGL": "textures/surfaces/TX07_OakPlank_NormalGL.png",
+      "NormalDX": "textures/surfaces/TX07_OakPlank_NormalDX.png",
+      "Height": "textures/surfaces/TX07_OakPlank_Height.png"
+    },
+    "role": "Subtle shared surface variation. Geometry and face colors supply the low-poly silhouette; no baked amber/teal light."
+  },
+  {
+    "id": "TX08",
+    "name": "DarkTimber",
+    "family": "timber",
+    "base_srgb_hex": "#504633",
+    "roughness": 0.85,
+    "metallic": 0,
+    "tile_metres": [
+      1,
+      2
+    ],
+    "relief_mm": 0.3,
+    "resolution": 1024,
+    "asset_stem": "WarrensC_DarkTimber",
+    "maps": {
+      "BaseColor": "textures/surfaces/TX08_DarkTimber_BaseColor.png",
+      "ORM": "textures/surfaces/TX08_DarkTimber_ORM.png",
+      "NormalGL": "textures/surfaces/TX08_DarkTimber_NormalGL.png",
+      "NormalDX": "textures/surfaces/TX08_DarkTimber_NormalDX.png",
+      "Height": "textures/surfaces/TX08_DarkTimber_Height.png"
+    },
+    "role": "Subtle shared surface variation. Geometry and face colors supply the low-poly silhouette; no baked amber/teal light."
+  },
+  {
+    "id": "TX09",
+    "name": "BlackIron",
+    "family": "iron",
+    "base_srgb_hex": "#696b64",
+    "roughness": 0.69,
+    "metallic": 1,
+    "tile_metres": [
+      1,
+      1
+    ],
+    "relief_mm": 0.1,
+    "resolution": 1024,
+    "asset_stem": "WarrensC_BlackIron",
+    "maps": {
+      "BaseColor": "textures/surfaces/TX09_BlackIron_BaseColor.png",
+      "ORM": "textures/surfaces/TX09_BlackIron_ORM.png",
+      "NormalGL": "textures/surfaces/TX09_BlackIron_NormalGL.png",
+      "NormalDX": "textures/surfaces/TX09_BlackIron_NormalDX.png",
+      "Height": "textures/surfaces/TX09_BlackIron_Height.png"
+    },
+    "role": "Subtle shared surface variation. Geometry and face colors supply the low-poly silhouette; no baked amber/teal light."
+  },
+  {
+    "id": "TX10",
+    "name": "AgedBrass",
+    "family": "brass",
+    "base_srgb_hex": "#ad9258",
+    "roughness": 0.62,
+    "metallic": 1,
+    "tile_metres": [
+      1,
+      1
+    ],
+    "relief_mm": 0.1,
+    "resolution": 1024,
+    "asset_stem": "WarrensC_AgedBrass",
+    "maps": {
+      "BaseColor": "textures/surfaces/TX10_AgedBrass_BaseColor.png",
+      "ORM": "textures/surfaces/TX10_AgedBrass_ORM.png",
+      "NormalGL": "textures/surfaces/TX10_AgedBrass_NormalGL.png",
+      "NormalDX": "textures/surfaces/TX10_AgedBrass_NormalDX.png",
+      "Height": "textures/surfaces/TX10_AgedBrass_Height.png"
+    },
+    "role": "Subtle shared surface variation. Geometry and face colors supply the low-poly silhouette; no baked amber/teal light."
+  },
+  {
+    "id": "TX11",
+    "name": "PatinatedCopper",
+    "family": "copper",
+    "base_srgb_hex": "#617e6c",
+    "roughness": 0.8,
+    "metallic": 0,
+    "tile_metres": [
+      1,
+      1
+    ],
+    "relief_mm": 0.1,
+    "resolution": 1024,
+    "asset_stem": "WarrensC_PatinatedCopper",
+    "maps": {
+      "BaseColor": "textures/surfaces/TX11_PatinatedCopper_BaseColor.png",
+      "ORM": "textures/surfaces/TX11_PatinatedCopper_ORM.png",
+      "NormalGL": "textures/surfaces/TX11_PatinatedCopper_NormalGL.png",
+      "NormalDX": "textures/surfaces/TX11_PatinatedCopper_NormalDX.png",
+      "Height": "textures/surfaces/TX11_PatinatedCopper_Height.png"
+    },
+    "role": "Fully oxidized matte copper surface; opaque oxide is dielectric. No bare-metal reflection islands."
+  },
+  {
+    "id": "TX12",
+    "name": "LinenCanvas",
+    "family": "cloth",
+    "base_srgb_hex": "#b9ac87",
+    "roughness": 0.96,
+    "metallic": 0,
+    "tile_metres": [
+      1,
+      1
+    ],
+    "relief_mm": 0.15,
+    "resolution": 1024,
+    "asset_stem": "WarrensC_LinenCanvas",
+    "maps": {
+      "BaseColor": "textures/surfaces/TX12_LinenCanvas_BaseColor.png",
+      "ORM": "textures/surfaces/TX12_LinenCanvas_ORM.png",
+      "NormalGL": "textures/surfaces/TX12_LinenCanvas_NormalGL.png",
+      "NormalDX": "textures/surfaces/TX12_LinenCanvas_NormalDX.png",
+      "Height": "textures/surfaces/TX12_LinenCanvas_Height.png"
+    },
+    "role": "Subtle shared surface variation. Geometry and face colors supply the low-poly silhouette; no baked amber/teal light."
+  },
+  {
+    "id": "TX13",
+    "name": "BrownLeather",
+    "family": "leather",
+    "base_srgb_hex": "#6f4d35",
+    "roughness": 0.82,
+    "metallic": 0,
+    "tile_metres": [
+      1,
+      1
+    ],
+    "relief_mm": 0.2,
+    "resolution": 1024,
+    "asset_stem": "WarrensC_BrownLeather",
+    "maps": {
+      "BaseColor": "textures/surfaces/TX13_BrownLeather_BaseColor.png",
+      "ORM": "textures/surfaces/TX13_BrownLeather_ORM.png",
+      "NormalGL": "textures/surfaces/TX13_BrownLeather_NormalGL.png",
+      "NormalDX": "textures/surfaces/TX13_BrownLeather_NormalDX.png",
+      "Height": "textures/surfaces/TX13_BrownLeather_Height.png"
+    },
+    "role": "Subtle shared surface variation. Geometry and face colors supply the low-poly silhouette; no baked amber/teal light."
+  },
+  {
+    "id": "TX14",
+    "name": "RopeFibre",
+    "family": "rope",
+    "base_srgb_hex": "#9a865d",
+    "roughness": 0.96,
+    "metallic": 0,
+    "tile_metres": [
+      0.5,
+      1
+    ],
+    "relief_mm": 0.2,
+    "resolution": 1024,
+    "asset_stem": "WarrensC_RopeFibre",
+    "maps": {
+      "BaseColor": "textures/surfaces/TX14_RopeFibre_BaseColor.png",
+      "ORM": "textures/surfaces/TX14_RopeFibre_ORM.png",
+      "NormalGL": "textures/surfaces/TX14_RopeFibre_NormalGL.png",
+      "NormalDX": "textures/surfaces/TX14_RopeFibre_NormalDX.png",
+      "Height": "textures/surfaces/TX14_RopeFibre_Height.png"
+    },
+    "role": "Subtle shared surface variation. Geometry and face colors supply the low-poly silhouette; no baked amber/teal light."
+  },
+  {
+    "id": "TX15",
+    "name": "OliveCeramic",
+    "family": "ceramic",
+    "base_srgb_hex": "#63714b",
+    "roughness": 0.42,
+    "metallic": 0,
+    "tile_metres": [
+      1,
+      1
+    ],
+    "relief_mm": 0.1,
+    "resolution": 1024,
+    "asset_stem": "WarrensC_OliveCeramic",
+    "maps": {
+      "BaseColor": "textures/surfaces/TX15_OliveCeramic_BaseColor.png",
+      "ORM": "textures/surfaces/TX15_OliveCeramic_ORM.png",
+      "NormalGL": "textures/surfaces/TX15_OliveCeramic_NormalGL.png",
+      "NormalDX": "textures/surfaces/TX15_OliveCeramic_NormalDX.png",
+      "Height": "textures/surfaces/TX15_OliveCeramic_Height.png"
+    },
+    "role": "Subtle shared surface variation. Geometry and face colors supply the low-poly silhouette; no baked amber/teal light."
+  },
+  {
+    "id": "TX16",
+    "name": "Parchment",
+    "family": "paper",
+    "base_srgb_hex": "#d8c79e",
+    "roughness": 0.97,
+    "metallic": 0,
+    "tile_metres": [
+      1,
+      1
+    ],
+    "relief_mm": 0.05,
+    "resolution": 1024,
+    "asset_stem": "WarrensC_Parchment",
+    "maps": {
+      "BaseColor": "textures/surfaces/TX16_Parchment_BaseColor.png",
+      "ORM": "textures/surfaces/TX16_Parchment_ORM.png",
+      "NormalGL": "textures/surfaces/TX16_Parchment_NormalGL.png",
+      "NormalDX": "textures/surfaces/TX16_Parchment_NormalDX.png",
+      "Height": "textures/surfaces/TX16_Parchment_Height.png"
+    },
+    "role": "Subtle shared surface variation. Geometry and face colors supply the low-poly silhouette; no baked amber/teal light."
+  },
+  {
+    "id": "TX17",
+    "name": "DampStone",
+    "family": "wetstone",
+    "base_srgb_hex": "#626e66",
+    "roughness": 0.43,
+    "metallic": 0,
+    "tile_metres": [
+      2,
+      2
+    ],
+    "relief_mm": 0.8,
+    "resolution": 1024,
+    "asset_stem": "WarrensC_DampStone",
+    "maps": {
+      "BaseColor": "textures/surfaces/TX17_DampStone_BaseColor.png",
+      "ORM": "textures/surfaces/TX17_DampStone_ORM.png",
+      "NormalGL": "textures/surfaces/TX17_DampStone_NormalGL.png",
+      "NormalDX": "textures/surfaces/TX17_DampStone_NormalDX.png",
+      "Height": "textures/surfaces/TX17_DampStone_Height.png"
+    },
+    "role": "Subtle shared surface variation. Geometry and face colors supply the low-poly silhouette; no baked amber/teal light."
+  },
+  {
+    "id": "TX18",
+    "name": "TallowWax",
+    "family": "wax",
+    "base_srgb_hex": "#d2c49a",
+    "roughness": 0.59,
+    "metallic": 0,
+    "tile_metres": [
+      0.5,
+      0.5
+    ],
+    "relief_mm": 0.1,
+    "resolution": 1024,
+    "asset_stem": "WarrensC_TallowWax",
+    "maps": {
+      "BaseColor": "textures/surfaces/TX18_TallowWax_BaseColor.png",
+      "ORM": "textures/surfaces/TX18_TallowWax_ORM.png",
+      "NormalGL": "textures/surfaces/TX18_TallowWax_NormalGL.png",
+      "NormalDX": "textures/surfaces/TX18_TallowWax_NormalDX.png",
+      "Height": "textures/surfaces/TX18_TallowWax_Height.png"
+    },
+    "role": "Subtle shared surface variation. Geometry and face colors supply the low-poly silhouette; no baked amber/teal light."
+  },
+  {
+    "id": "TX19",
+    "name": "Soot",
+    "family": "soot",
+    "base_srgb_hex": "#343b36",
+    "roughness": 0.98,
+    "metallic": 0,
+    "tile_metres": [
+      1,
+      1
+    ],
+    "relief_mm": 0.05,
+    "resolution": 1024,
+    "asset_stem": "WarrensC_Soot",
+    "maps": {
+      "BaseColor": "textures/surfaces/TX19_Soot_BaseColor.png",
+      "ORM": "textures/surfaces/TX19_Soot_ORM.png",
+      "NormalGL": "textures/surfaces/TX19_Soot_NormalGL.png",
+      "NormalDX": "textures/surfaces/TX19_Soot_NormalDX.png",
+      "Height": "textures/surfaces/TX19_Soot_Height.png"
+    },
+    "role": "Subtle shared surface variation. Geometry and face colors supply the low-poly silhouette; no baked amber/teal light."
+  }
+]
