@@ -19,6 +19,7 @@ namespace utils_anchor
         Params.LeverSide = InSpec.LeverSide;
         Params.CrawlOffsetCm = InSpec.CrawlOffsetCm;
         Params.PinnedRow = InSpec.PinnedRow;
+        Params.GateMaterialOverride = InSpec.GateMaterialOverride;
 
         InHandle.Add_Fragment(FMars_Feature_Anchor());
         InHandle.Add_Fragment(Params);
@@ -61,6 +62,9 @@ mixin EMars_Anchor_LeverSide Get_LeverSide(const FCk_Handle_Anchor& Self)
 
 mixin TOptional<FVector2D> Get_CrawlOffsetCm(const FCk_Handle_Anchor& Self)
 { return Self.Get_Fragment(FMars_Fragment_Anchor_Params).CrawlOffsetCm; }
+
+mixin UMaterialInterface Get_GateMaterialOverride(const FCk_Handle_Anchor& Self)
+{ return Self.Get_Fragment(FMars_Fragment_Anchor_Params).GateMaterialOverride.Get(); }
 
 mixin EMars_Anchor_State Get_State(const FCk_Handle_Anchor& Self)
 { return Self.Get_Fragment(FMars_Fragment_Anchor).State; }

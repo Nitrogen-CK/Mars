@@ -10,14 +10,16 @@ namespace utils_anchor
     const float64 k_CandidateFillerHeight = 260.0;
 
     // Two blocking walls that close the rest of the street beside a 2 m gate frame.
-    void Add_CandidateSideFillers(UCk_EntityScript_UE InOuter, FCk_Handle_Transform& InRoot, float32 InSpanCm)
+    void Add_CandidateSideFillers(UCk_EntityScript_UE InOuter, FCk_Handle_Transform& InRoot, float32 InSpanCm, UMaterialInterface InMaterialOverride = nullptr)
     {
         const auto FillerWidth = (float64(InSpanCm) - k_CandidateFrameWidth) * 0.5;
         if (FillerWidth <= 0.0)
         { return; }
 
         auto CubeMesh = engine::load::Cube();
-        auto WallMaterial = assets::load::ProtoGrid_Wall_Mars_MI();
+        auto WallMaterial = InMaterialOverride;
+        if (ck::Is_NOT_Valid(WallMaterial))
+        { WallMaterial = assets::load::ProtoGrid_Wall_Mars_MI(); }
         const auto CentreY = k_CandidateFrameWidth * 0.5 + FillerWidth * 0.5;
         const auto Scale = FVector(k_CandidateFillerDepth, FillerWidth, k_CandidateFillerHeight) * 0.01;
         InRoot.Add_MeshPart(InOuter, FMars_MeshPart(FTransform(FRotator::ZeroRotator, FVector(0.0, -CentreY, k_CandidateFillerHeight * 0.5), Scale),
@@ -38,10 +40,13 @@ namespace utils_anchor
         { return; }
 
         const auto Offset = InAnchor.CrawlOffsetCm.GetValue();
+        auto WallMaterial = InAnchor.GateMaterialOverride.Get();
+        if (ck::Is_NOT_Valid(WallMaterial))
+        { WallMaterial = assets::load::ProtoGrid_Wall_Mars_MI(); }
         const auto Scale = FVector(k_CrawlPlugSize, k_CrawlPlugSize, k_CrawlPlugHeight) * 0.01;
         InRoot.Add_MeshPart(InOuter, FMars_MeshPart(
             FTransform(FRotator::ZeroRotator, FVector(Offset.X, Offset.Y, k_CrawlPlugHeight * 0.5), Scale),
-            engine::load::Cube(), assets::load::ProtoGrid_Wall_Mars_MI(), collision::profile::BlockAll, n"AnchorCrawlPlug"));
+            engine::load::Cube(), WallMaterial, collision::profile::BlockAll, n"AnchorCrawlPlug"));
     }
 }
 
@@ -61,10 +66,11 @@ class UMars_Anchor_Rubble_EntityScript : UCk_GenericEntityScript_UE
     ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
     {
         auto Root = utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::DoesNotReplicate);
-        utils_anchor::Add_CandidateSideFillers(this, Root, Anchor.SpanCm);
+        utils_anchor::Add_CandidateSideFillers(this, Root, Anchor.SpanCm, Anchor.GateMaterialOverride.Get());
         utils_anchor::Add_CandidateCrawlPlug(this, Root, Anchor);
 
         auto GateParams = UMars_Gate_EntityScript::Params();
+        GateParams.MaterialOverride = Anchor.GateMaterialOverride;
         GateParams.SpawnTransform = SpawnTransform;
         GateParams.Leaf = EMars_Gate_Leaf::Solid;
         GateParams.Gate.StartOpen = false;
@@ -94,10 +100,11 @@ class UMars_Anchor_LeverGate_EntityScript : UCk_GenericEntityScript_UE
     ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
     {
         auto Root = utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::DoesNotReplicate);
-        utils_anchor::Add_CandidateSideFillers(this, Root, Anchor.SpanCm);
+        utils_anchor::Add_CandidateSideFillers(this, Root, Anchor.SpanCm, Anchor.GateMaterialOverride.Get());
         utils_anchor::Add_CandidateCrawlPlug(this, Root, Anchor);
 
         auto GateParams = UMars_Gate_EntityScript::Params();
+        GateParams.MaterialOverride = Anchor.GateMaterialOverride;
         GateParams.SpawnTransform = SpawnTransform;
         GateParams.Leaf = EMars_Gate_Leaf::Bars;
         GateParams.Sink.InputChannels.Add(Anchor.Channel);
@@ -192,9 +199,10 @@ class UMars_Anchor_OneSidedLeverGate_EntityScript : UCk_GenericEntityScript_UE
         { return ECk_EntityScript_ConstructionFlow::Finished; }
 
         auto Root = utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::DoesNotReplicate);
-        utils_anchor::Add_CandidateSideFillers(this, Root, Anchor.SpanCm);
+        utils_anchor::Add_CandidateSideFillers(this, Root, Anchor.SpanCm, Anchor.GateMaterialOverride.Get());
 
         auto GateParams = UMars_Gate_EntityScript::Params();
+        GateParams.MaterialOverride = Anchor.GateMaterialOverride;
         GateParams.SpawnTransform = SpawnTransform;
         GateParams.Leaf = EMars_Gate_Leaf::Bars;
         GateParams.Sink.InputChannels.Add(Anchor.Channel);

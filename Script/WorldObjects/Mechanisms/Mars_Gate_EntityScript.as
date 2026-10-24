@@ -36,6 +36,10 @@ class UMars_Gate_EntityScript : UCk_GenericEntityScript_UE
     UPROPERTY(ExposeOnSpawn)
     bool WaitsForClearThreshold = false;
 
+    // Optional presentation override for the frame and leaf; unset keeps the prototype material.
+    UPROPERTY(ExposeOnSpawn)
+    UMaterialInterface MaterialOverride = nullptr;
+
     // Engine cube is 100 uu, pivot at its center. The opening spans local Y (width) and Z (height).
     private const float64 k_OpeningWidth = 200.0;
     private const float64 k_OpeningHeight = 220.0;
@@ -80,7 +84,9 @@ class UMars_Gate_EntityScript : UCk_GenericEntityScript_UE
     private void AddFrame(FCk_Handle_Transform& InRoot)
     {
         auto CubeMesh = engine::load::Cube();
-        auto WallMaterial = assets::load::ProtoGrid_Wall_Mars_MI();
+        auto WallMaterial = MaterialOverride;
+        if (ck::Is_NOT_Valid(WallMaterial))
+        { WallMaterial = assets::load::ProtoGrid_Wall_Mars_MI(); }
 
         const float64 FrameThickness = 20.0;
         const float64 FrameDepth = 40.0;
@@ -102,7 +108,9 @@ class UMars_Gate_EntityScript : UCk_GenericEntityScript_UE
     private void AddLeaf(FCk_Handle_Gate InGate)
     {
         auto CubeMesh = engine::load::Cube();
-        auto WallMaterial = assets::load::ProtoGrid_Wall_Mars_MI();
+        auto WallMaterial = MaterialOverride;
+        if (ck::Is_NOT_Valid(WallMaterial))
+        { WallMaterial = assets::load::ProtoGrid_Wall_Mars_MI(); }
 
         auto MovingTransform = InGate.Get_MovingNode().As_Transform();
         if (Leaf == EMars_Gate_Leaf::Bars)

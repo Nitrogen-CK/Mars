@@ -144,7 +144,10 @@ struct FMars_Anchor_Cache_EntityScript_SpawnParams
     UPROPERTY()
     TOptional<int> PinnedRow;
 
-    FMars_Anchor_Cache_EntityScript_SpawnParams(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow)
+    UPROPERTY()
+    TWeakObjectPtr<UMaterialInterface> GateMaterialOverride = nullptr;
+
+    FMars_Anchor_Cache_EntityScript_SpawnParams(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow, UMaterialInterface InGateMaterialOverride)
     {
         SpawnTransform = InSpawnTransform;
         AnchorId = InAnchorId;
@@ -156,6 +159,7 @@ struct FMars_Anchor_Cache_EntityScript_SpawnParams
         CrawlAlongCm = InCrawlAlongCm;
         CrawlOffsetCm = InCrawlOffsetCm;
         PinnedRow = InPinnedRow;
+        GateMaterialOverride = TWeakObjectPtr<UMaterialInterface>(InGateMaterialOverride);
     }
 }
 
@@ -166,9 +170,9 @@ namespace UMars_Anchor_Cache_EntityScript
         return FMars_Anchor_Cache_EntityScript_SpawnParams();
     }
 
-    FMars_Anchor_Cache_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow)
+    FMars_Anchor_Cache_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow, UMaterialInterface InGateMaterialOverride)
     {
-        return FMars_Anchor_Cache_EntityScript_SpawnParams(InSpawnTransform, InAnchorId, InChannel, InSpanCm, InHomeRadiusCm, InLeverSide, InHasCrawl, InCrawlAlongCm, InCrawlOffsetCm, InPinnedRow);
+        return FMars_Anchor_Cache_EntityScript_SpawnParams(InSpawnTransform, InAnchorId, InChannel, InSpanCm, InHomeRadiusCm, InLeverSide, InHasCrawl, InCrawlAlongCm, InCrawlOffsetCm, InPinnedRow, InGateMaterialOverride);
     }
 }
 
@@ -234,7 +238,10 @@ struct FMars_Anchor_Forage_EntityScript_SpawnParams
     UPROPERTY()
     TOptional<int> PinnedRow;
 
-    FMars_Anchor_Forage_EntityScript_SpawnParams(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow)
+    UPROPERTY()
+    TWeakObjectPtr<UMaterialInterface> GateMaterialOverride = nullptr;
+
+    FMars_Anchor_Forage_EntityScript_SpawnParams(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow, UMaterialInterface InGateMaterialOverride)
     {
         SpawnTransform = InSpawnTransform;
         AnchorId = InAnchorId;
@@ -246,6 +253,7 @@ struct FMars_Anchor_Forage_EntityScript_SpawnParams
         CrawlAlongCm = InCrawlAlongCm;
         CrawlOffsetCm = InCrawlOffsetCm;
         PinnedRow = InPinnedRow;
+        GateMaterialOverride = TWeakObjectPtr<UMaterialInterface>(InGateMaterialOverride);
     }
 }
 
@@ -256,9 +264,9 @@ namespace UMars_Anchor_Forage_EntityScript
         return FMars_Anchor_Forage_EntityScript_SpawnParams();
     }
 
-    FMars_Anchor_Forage_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow)
+    FMars_Anchor_Forage_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow, UMaterialInterface InGateMaterialOverride)
     {
-        return FMars_Anchor_Forage_EntityScript_SpawnParams(InSpawnTransform, InAnchorId, InChannel, InSpanCm, InHomeRadiusCm, InLeverSide, InHasCrawl, InCrawlAlongCm, InCrawlOffsetCm, InPinnedRow);
+        return FMars_Anchor_Forage_EntityScript_SpawnParams(InSpawnTransform, InAnchorId, InChannel, InSpanCm, InHomeRadiusCm, InLeverSide, InHasCrawl, InCrawlAlongCm, InCrawlOffsetCm, InPinnedRow, InGateMaterialOverride);
     }
 }
 
@@ -295,7 +303,10 @@ struct FMars_Anchor_Hunt_EntityScript_SpawnParams
     UPROPERTY()
     TOptional<int> PinnedRow;
 
-    FMars_Anchor_Hunt_EntityScript_SpawnParams(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow)
+    UPROPERTY()
+    TWeakObjectPtr<UMaterialInterface> GateMaterialOverride = nullptr;
+
+    FMars_Anchor_Hunt_EntityScript_SpawnParams(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow, UMaterialInterface InGateMaterialOverride)
     {
         SpawnTransform = InSpawnTransform;
         AnchorId = InAnchorId;
@@ -307,6 +318,7 @@ struct FMars_Anchor_Hunt_EntityScript_SpawnParams
         CrawlAlongCm = InCrawlAlongCm;
         CrawlOffsetCm = InCrawlOffsetCm;
         PinnedRow = InPinnedRow;
+        GateMaterialOverride = TWeakObjectPtr<UMaterialInterface>(InGateMaterialOverride);
     }
 }
 
@@ -317,9 +329,9 @@ namespace UMars_Anchor_Hunt_EntityScript
         return FMars_Anchor_Hunt_EntityScript_SpawnParams();
     }
 
-    FMars_Anchor_Hunt_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow)
+    FMars_Anchor_Hunt_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow, UMaterialInterface InGateMaterialOverride)
     {
-        return FMars_Anchor_Hunt_EntityScript_SpawnParams(InSpawnTransform, InAnchorId, InChannel, InSpanCm, InHomeRadiusCm, InLeverSide, InHasCrawl, InCrawlAlongCm, InCrawlOffsetCm, InPinnedRow);
+        return FMars_Anchor_Hunt_EntityScript_SpawnParams(InSpawnTransform, InAnchorId, InChannel, InSpanCm, InHomeRadiusCm, InLeverSide, InHasCrawl, InCrawlAlongCm, InCrawlOffsetCm, InPinnedRow, InGateMaterialOverride);
     }
 }
 
@@ -385,7 +397,10 @@ struct FMars_Anchor_Omen_EntityScript_SpawnParams
     UPROPERTY()
     TOptional<int> PinnedRow;
 
-    FMars_Anchor_Omen_EntityScript_SpawnParams(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow)
+    UPROPERTY()
+    TWeakObjectPtr<UMaterialInterface> GateMaterialOverride = nullptr;
+
+    FMars_Anchor_Omen_EntityScript_SpawnParams(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow, UMaterialInterface InGateMaterialOverride)
     {
         SpawnTransform = InSpawnTransform;
         AnchorId = InAnchorId;
@@ -397,6 +412,7 @@ struct FMars_Anchor_Omen_EntityScript_SpawnParams
         CrawlAlongCm = InCrawlAlongCm;
         CrawlOffsetCm = InCrawlOffsetCm;
         PinnedRow = InPinnedRow;
+        GateMaterialOverride = TWeakObjectPtr<UMaterialInterface>(InGateMaterialOverride);
     }
 }
 
@@ -407,9 +423,9 @@ namespace UMars_Anchor_Omen_EntityScript
         return FMars_Anchor_Omen_EntityScript_SpawnParams();
     }
 
-    FMars_Anchor_Omen_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow)
+    FMars_Anchor_Omen_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow, UMaterialInterface InGateMaterialOverride)
     {
-        return FMars_Anchor_Omen_EntityScript_SpawnParams(InSpawnTransform, InAnchorId, InChannel, InSpanCm, InHomeRadiusCm, InLeverSide, InHasCrawl, InCrawlAlongCm, InCrawlOffsetCm, InPinnedRow);
+        return FMars_Anchor_Omen_EntityScript_SpawnParams(InSpawnTransform, InAnchorId, InChannel, InSpanCm, InHomeRadiusCm, InLeverSide, InHasCrawl, InCrawlAlongCm, InCrawlOffsetCm, InPinnedRow, InGateMaterialOverride);
     }
 }
 
@@ -504,7 +520,10 @@ struct FMars_Anchor_Pack_EntityScript_SpawnParams
     UPROPERTY()
     TOptional<int> PinnedRow;
 
-    FMars_Anchor_Pack_EntityScript_SpawnParams(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow)
+    UPROPERTY()
+    TWeakObjectPtr<UMaterialInterface> GateMaterialOverride = nullptr;
+
+    FMars_Anchor_Pack_EntityScript_SpawnParams(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow, UMaterialInterface InGateMaterialOverride)
     {
         SpawnTransform = InSpawnTransform;
         AnchorId = InAnchorId;
@@ -516,6 +535,7 @@ struct FMars_Anchor_Pack_EntityScript_SpawnParams
         CrawlAlongCm = InCrawlAlongCm;
         CrawlOffsetCm = InCrawlOffsetCm;
         PinnedRow = InPinnedRow;
+        GateMaterialOverride = TWeakObjectPtr<UMaterialInterface>(InGateMaterialOverride);
     }
 }
 
@@ -526,9 +546,9 @@ namespace UMars_Anchor_Pack_EntityScript
         return FMars_Anchor_Pack_EntityScript_SpawnParams();
     }
 
-    FMars_Anchor_Pack_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow)
+    FMars_Anchor_Pack_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow, UMaterialInterface InGateMaterialOverride)
     {
-        return FMars_Anchor_Pack_EntityScript_SpawnParams(InSpawnTransform, InAnchorId, InChannel, InSpanCm, InHomeRadiusCm, InLeverSide, InHasCrawl, InCrawlAlongCm, InCrawlOffsetCm, InPinnedRow);
+        return FMars_Anchor_Pack_EntityScript_SpawnParams(InSpawnTransform, InAnchorId, InChannel, InSpanCm, InHomeRadiusCm, InLeverSide, InHasCrawl, InCrawlAlongCm, InCrawlOffsetCm, InPinnedRow, InGateMaterialOverride);
     }
 }
 
@@ -668,7 +688,10 @@ struct FMars_Anchor_Rest_EntityScript_SpawnParams
     UPROPERTY()
     TOptional<int> PinnedRow;
 
-    FMars_Anchor_Rest_EntityScript_SpawnParams(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow)
+    UPROPERTY()
+    TWeakObjectPtr<UMaterialInterface> GateMaterialOverride = nullptr;
+
+    FMars_Anchor_Rest_EntityScript_SpawnParams(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow, UMaterialInterface InGateMaterialOverride)
     {
         SpawnTransform = InSpawnTransform;
         AnchorId = InAnchorId;
@@ -680,6 +703,7 @@ struct FMars_Anchor_Rest_EntityScript_SpawnParams
         CrawlAlongCm = InCrawlAlongCm;
         CrawlOffsetCm = InCrawlOffsetCm;
         PinnedRow = InPinnedRow;
+        GateMaterialOverride = TWeakObjectPtr<UMaterialInterface>(InGateMaterialOverride);
     }
 }
 
@@ -690,9 +714,9 @@ namespace UMars_Anchor_Rest_EntityScript
         return FMars_Anchor_Rest_EntityScript_SpawnParams();
     }
 
-    FMars_Anchor_Rest_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow)
+    FMars_Anchor_Rest_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow, UMaterialInterface InGateMaterialOverride)
     {
-        return FMars_Anchor_Rest_EntityScript_SpawnParams(InSpawnTransform, InAnchorId, InChannel, InSpanCm, InHomeRadiusCm, InLeverSide, InHasCrawl, InCrawlAlongCm, InCrawlOffsetCm, InPinnedRow);
+        return FMars_Anchor_Rest_EntityScript_SpawnParams(InSpawnTransform, InAnchorId, InChannel, InSpanCm, InHomeRadiusCm, InLeverSide, InHasCrawl, InCrawlAlongCm, InCrawlOffsetCm, InPinnedRow, InGateMaterialOverride);
     }
 }
 
@@ -758,7 +782,10 @@ struct FMars_Anchor_Route_EntityScript_SpawnParams
     UPROPERTY()
     TOptional<int> PinnedRow;
 
-    FMars_Anchor_Route_EntityScript_SpawnParams(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow)
+    UPROPERTY()
+    TWeakObjectPtr<UMaterialInterface> GateMaterialOverride = nullptr;
+
+    FMars_Anchor_Route_EntityScript_SpawnParams(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow, UMaterialInterface InGateMaterialOverride)
     {
         SpawnTransform = InSpawnTransform;
         AnchorId = InAnchorId;
@@ -770,6 +797,7 @@ struct FMars_Anchor_Route_EntityScript_SpawnParams
         CrawlAlongCm = InCrawlAlongCm;
         CrawlOffsetCm = InCrawlOffsetCm;
         PinnedRow = InPinnedRow;
+        GateMaterialOverride = TWeakObjectPtr<UMaterialInterface>(InGateMaterialOverride);
     }
 }
 
@@ -780,9 +808,9 @@ namespace UMars_Anchor_Route_EntityScript
         return FMars_Anchor_Route_EntityScript_SpawnParams();
     }
 
-    FMars_Anchor_Route_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow)
+    FMars_Anchor_Route_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow, UMaterialInterface InGateMaterialOverride)
     {
-        return FMars_Anchor_Route_EntityScript_SpawnParams(InSpawnTransform, InAnchorId, InChannel, InSpanCm, InHomeRadiusCm, InLeverSide, InHasCrawl, InCrawlAlongCm, InCrawlOffsetCm, InPinnedRow);
+        return FMars_Anchor_Route_EntityScript_SpawnParams(InSpawnTransform, InAnchorId, InChannel, InSpanCm, InHomeRadiusCm, InLeverSide, InHasCrawl, InCrawlAlongCm, InCrawlOffsetCm, InPinnedRow, InGateMaterialOverride);
     }
 }
 
@@ -893,7 +921,10 @@ struct FMars_Anchor_Spawn_EntityScript_SpawnParams
     UPROPERTY()
     TOptional<int> PinnedRow;
 
-    FMars_Anchor_Spawn_EntityScript_SpawnParams(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow)
+    UPROPERTY()
+    TWeakObjectPtr<UMaterialInterface> GateMaterialOverride = nullptr;
+
+    FMars_Anchor_Spawn_EntityScript_SpawnParams(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow, UMaterialInterface InGateMaterialOverride)
     {
         SpawnTransform = InSpawnTransform;
         AnchorId = InAnchorId;
@@ -905,6 +936,7 @@ struct FMars_Anchor_Spawn_EntityScript_SpawnParams
         CrawlAlongCm = InCrawlAlongCm;
         CrawlOffsetCm = InCrawlOffsetCm;
         PinnedRow = InPinnedRow;
+        GateMaterialOverride = TWeakObjectPtr<UMaterialInterface>(InGateMaterialOverride);
     }
 }
 
@@ -915,9 +947,9 @@ namespace UMars_Anchor_Spawn_EntityScript
         return FMars_Anchor_Spawn_EntityScript_SpawnParams();
     }
 
-    FMars_Anchor_Spawn_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow)
+    FMars_Anchor_Spawn_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow, UMaterialInterface InGateMaterialOverride)
     {
-        return FMars_Anchor_Spawn_EntityScript_SpawnParams(InSpawnTransform, InAnchorId, InChannel, InSpanCm, InHomeRadiusCm, InLeverSide, InHasCrawl, InCrawlAlongCm, InCrawlOffsetCm, InPinnedRow);
+        return FMars_Anchor_Spawn_EntityScript_SpawnParams(InSpawnTransform, InAnchorId, InChannel, InSpanCm, InHomeRadiusCm, InLeverSide, InHasCrawl, InCrawlAlongCm, InCrawlOffsetCm, InPinnedRow, InGateMaterialOverride);
     }
 }
 
@@ -954,7 +986,10 @@ struct FMars_Anchor_Threat_EntityScript_SpawnParams
     UPROPERTY()
     TOptional<int> PinnedRow;
 
-    FMars_Anchor_Threat_EntityScript_SpawnParams(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow)
+    UPROPERTY()
+    TWeakObjectPtr<UMaterialInterface> GateMaterialOverride = nullptr;
+
+    FMars_Anchor_Threat_EntityScript_SpawnParams(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow, UMaterialInterface InGateMaterialOverride)
     {
         SpawnTransform = InSpawnTransform;
         AnchorId = InAnchorId;
@@ -966,6 +1001,7 @@ struct FMars_Anchor_Threat_EntityScript_SpawnParams
         CrawlAlongCm = InCrawlAlongCm;
         CrawlOffsetCm = InCrawlOffsetCm;
         PinnedRow = InPinnedRow;
+        GateMaterialOverride = TWeakObjectPtr<UMaterialInterface>(InGateMaterialOverride);
     }
 }
 
@@ -976,9 +1012,9 @@ namespace UMars_Anchor_Threat_EntityScript
         return FMars_Anchor_Threat_EntityScript_SpawnParams();
     }
 
-    FMars_Anchor_Threat_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow)
+    FMars_Anchor_Threat_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow, UMaterialInterface InGateMaterialOverride)
     {
-        return FMars_Anchor_Threat_EntityScript_SpawnParams(InSpawnTransform, InAnchorId, InChannel, InSpanCm, InHomeRadiusCm, InLeverSide, InHasCrawl, InCrawlAlongCm, InCrawlOffsetCm, InPinnedRow);
+        return FMars_Anchor_Threat_EntityScript_SpawnParams(InSpawnTransform, InAnchorId, InChannel, InSpanCm, InHomeRadiusCm, InLeverSide, InHasCrawl, InCrawlAlongCm, InCrawlOffsetCm, InPinnedRow, InGateMaterialOverride);
     }
 }
 
@@ -1015,7 +1051,10 @@ struct FMars_Anchor_Trap_EntityScript_SpawnParams
     UPROPERTY()
     TOptional<int> PinnedRow;
 
-    FMars_Anchor_Trap_EntityScript_SpawnParams(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow)
+    UPROPERTY()
+    TWeakObjectPtr<UMaterialInterface> GateMaterialOverride = nullptr;
+
+    FMars_Anchor_Trap_EntityScript_SpawnParams(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow, UMaterialInterface InGateMaterialOverride)
     {
         SpawnTransform = InSpawnTransform;
         AnchorId = InAnchorId;
@@ -1027,6 +1066,7 @@ struct FMars_Anchor_Trap_EntityScript_SpawnParams
         CrawlAlongCm = InCrawlAlongCm;
         CrawlOffsetCm = InCrawlOffsetCm;
         PinnedRow = InPinnedRow;
+        GateMaterialOverride = TWeakObjectPtr<UMaterialInterface>(InGateMaterialOverride);
     }
 }
 
@@ -1037,9 +1077,9 @@ namespace UMars_Anchor_Trap_EntityScript
         return FMars_Anchor_Trap_EntityScript_SpawnParams();
     }
 
-    FMars_Anchor_Trap_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow)
+    FMars_Anchor_Trap_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow, UMaterialInterface InGateMaterialOverride)
     {
-        return FMars_Anchor_Trap_EntityScript_SpawnParams(InSpawnTransform, InAnchorId, InChannel, InSpanCm, InHomeRadiusCm, InLeverSide, InHasCrawl, InCrawlAlongCm, InCrawlOffsetCm, InPinnedRow);
+        return FMars_Anchor_Trap_EntityScript_SpawnParams(InSpawnTransform, InAnchorId, InChannel, InSpanCm, InHomeRadiusCm, InLeverSide, InHasCrawl, InCrawlAlongCm, InCrawlOffsetCm, InPinnedRow, InGateMaterialOverride);
     }
 }
 
@@ -11907,7 +11947,10 @@ struct FMars_Gate_EntityScript_SpawnParams
     UPROPERTY()
     bool WaitsForClearThreshold = false;
 
-    FMars_Gate_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold)
+    UPROPERTY()
+    TWeakObjectPtr<UMaterialInterface> MaterialOverride = nullptr;
+
+    FMars_Gate_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold, UMaterialInterface InMaterialOverride)
     {
         SpawnTransform = InSpawnTransform;
         Gate = InGate;
@@ -11915,6 +11958,7 @@ struct FMars_Gate_EntityScript_SpawnParams
         Source = InSource;
         Leaf = InLeaf;
         WaitsForClearThreshold = InWaitsForClearThreshold;
+        MaterialOverride = TWeakObjectPtr<UMaterialInterface>(InMaterialOverride);
     }
 }
 
@@ -11925,9 +11969,9 @@ namespace UMars_Gate_EntityScript
         return FMars_Gate_EntityScript_SpawnParams();
     }
 
-    FMars_Gate_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold)
+    FMars_Gate_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold, UMaterialInterface InMaterialOverride)
     {
-        return FMars_Gate_EntityScript_SpawnParams(InSpawnTransform, InGate, InSink, InSource, InLeaf, InWaitsForClearThreshold);
+        return FMars_Gate_EntityScript_SpawnParams(InSpawnTransform, InGate, InSink, InSource, InLeaf, InWaitsForClearThreshold, InMaterialOverride);
     }
 }
 
@@ -12103,7 +12147,10 @@ struct FMars_Gauntlet_Bell_ReliquaryGate_EntityScript_SpawnParams
     UPROPERTY()
     bool WaitsForClearThreshold = false;
 
-    FMars_Gauntlet_Bell_ReliquaryGate_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold)
+    UPROPERTY()
+    TWeakObjectPtr<UMaterialInterface> MaterialOverride = nullptr;
+
+    FMars_Gauntlet_Bell_ReliquaryGate_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold, UMaterialInterface InMaterialOverride)
     {
         SpawnTransform = InSpawnTransform;
         Gate = InGate;
@@ -12111,6 +12158,7 @@ struct FMars_Gauntlet_Bell_ReliquaryGate_EntityScript_SpawnParams
         Source = InSource;
         Leaf = InLeaf;
         WaitsForClearThreshold = InWaitsForClearThreshold;
+        MaterialOverride = TWeakObjectPtr<UMaterialInterface>(InMaterialOverride);
     }
 }
 
@@ -12121,9 +12169,9 @@ namespace UMars_Gauntlet_Bell_ReliquaryGate_EntityScript
         return FMars_Gauntlet_Bell_ReliquaryGate_EntityScript_SpawnParams();
     }
 
-    FMars_Gauntlet_Bell_ReliquaryGate_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold)
+    FMars_Gauntlet_Bell_ReliquaryGate_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold, UMaterialInterface InMaterialOverride)
     {
-        return FMars_Gauntlet_Bell_ReliquaryGate_EntityScript_SpawnParams(InSpawnTransform, InGate, InSink, InSource, InLeaf, InWaitsForClearThreshold);
+        return FMars_Gauntlet_Bell_ReliquaryGate_EntityScript_SpawnParams(InSpawnTransform, InGate, InSink, InSource, InLeaf, InWaitsForClearThreshold, InMaterialOverride);
     }
 }
 
@@ -12148,7 +12196,10 @@ struct FMars_Gauntlet_Bell_ReturnDoor_EntityScript_SpawnParams
     UPROPERTY()
     bool WaitsForClearThreshold = false;
 
-    FMars_Gauntlet_Bell_ReturnDoor_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold)
+    UPROPERTY()
+    TWeakObjectPtr<UMaterialInterface> MaterialOverride = nullptr;
+
+    FMars_Gauntlet_Bell_ReturnDoor_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold, UMaterialInterface InMaterialOverride)
     {
         SpawnTransform = InSpawnTransform;
         Gate = InGate;
@@ -12156,6 +12207,7 @@ struct FMars_Gauntlet_Bell_ReturnDoor_EntityScript_SpawnParams
         Source = InSource;
         Leaf = InLeaf;
         WaitsForClearThreshold = InWaitsForClearThreshold;
+        MaterialOverride = TWeakObjectPtr<UMaterialInterface>(InMaterialOverride);
     }
 }
 
@@ -12166,9 +12218,9 @@ namespace UMars_Gauntlet_Bell_ReturnDoor_EntityScript
         return FMars_Gauntlet_Bell_ReturnDoor_EntityScript_SpawnParams();
     }
 
-    FMars_Gauntlet_Bell_ReturnDoor_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold)
+    FMars_Gauntlet_Bell_ReturnDoor_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold, UMaterialInterface InMaterialOverride)
     {
-        return FMars_Gauntlet_Bell_ReturnDoor_EntityScript_SpawnParams(InSpawnTransform, InGate, InSink, InSource, InLeaf, InWaitsForClearThreshold);
+        return FMars_Gauntlet_Bell_ReturnDoor_EntityScript_SpawnParams(InSpawnTransform, InGate, InSink, InSource, InLeaf, InWaitsForClearThreshold, InMaterialOverride);
     }
 }
 
@@ -12406,7 +12458,10 @@ struct FMars_Gauntlet_Censer_Shutter_EntityScript_SpawnParams
     UPROPERTY()
     bool WaitsForClearThreshold = true;
 
-    FMars_Gauntlet_Censer_Shutter_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold)
+    UPROPERTY()
+    TWeakObjectPtr<UMaterialInterface> MaterialOverride = nullptr;
+
+    FMars_Gauntlet_Censer_Shutter_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold, UMaterialInterface InMaterialOverride)
     {
         SpawnTransform = InSpawnTransform;
         Gate = InGate;
@@ -12414,6 +12469,7 @@ struct FMars_Gauntlet_Censer_Shutter_EntityScript_SpawnParams
         Source = InSource;
         Leaf = InLeaf;
         WaitsForClearThreshold = InWaitsForClearThreshold;
+        MaterialOverride = TWeakObjectPtr<UMaterialInterface>(InMaterialOverride);
     }
 }
 
@@ -12424,9 +12480,9 @@ namespace UMars_Gauntlet_Censer_Shutter_EntityScript
         return FMars_Gauntlet_Censer_Shutter_EntityScript_SpawnParams();
     }
 
-    FMars_Gauntlet_Censer_Shutter_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold)
+    FMars_Gauntlet_Censer_Shutter_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold, UMaterialInterface InMaterialOverride)
     {
-        return FMars_Gauntlet_Censer_Shutter_EntityScript_SpawnParams(InSpawnTransform, InGate, InSink, InSource, InLeaf, InWaitsForClearThreshold);
+        return FMars_Gauntlet_Censer_Shutter_EntityScript_SpawnParams(InSpawnTransform, InGate, InSink, InSource, InLeaf, InWaitsForClearThreshold, InMaterialOverride);
     }
 }
 
@@ -12529,7 +12585,10 @@ struct FMars_Gauntlet_Choir_Shutter_EntityScript_SpawnParams
     UPROPERTY()
     bool WaitsForClearThreshold = false;
 
-    FMars_Gauntlet_Choir_Shutter_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold)
+    UPROPERTY()
+    TWeakObjectPtr<UMaterialInterface> MaterialOverride = nullptr;
+
+    FMars_Gauntlet_Choir_Shutter_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold, UMaterialInterface InMaterialOverride)
     {
         SpawnTransform = InSpawnTransform;
         Gate = InGate;
@@ -12537,6 +12596,7 @@ struct FMars_Gauntlet_Choir_Shutter_EntityScript_SpawnParams
         Source = InSource;
         Leaf = InLeaf;
         WaitsForClearThreshold = InWaitsForClearThreshold;
+        MaterialOverride = TWeakObjectPtr<UMaterialInterface>(InMaterialOverride);
     }
 }
 
@@ -12547,9 +12607,9 @@ namespace UMars_Gauntlet_Choir_Shutter_EntityScript
         return FMars_Gauntlet_Choir_Shutter_EntityScript_SpawnParams();
     }
 
-    FMars_Gauntlet_Choir_Shutter_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold)
+    FMars_Gauntlet_Choir_Shutter_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold, UMaterialInterface InMaterialOverride)
     {
-        return FMars_Gauntlet_Choir_Shutter_EntityScript_SpawnParams(InSpawnTransform, InGate, InSink, InSource, InLeaf, InWaitsForClearThreshold);
+        return FMars_Gauntlet_Choir_Shutter_EntityScript_SpawnParams(InSpawnTransform, InGate, InSink, InSource, InLeaf, InWaitsForClearThreshold, InMaterialOverride);
     }
 }
 
@@ -12619,7 +12679,10 @@ struct FMars_Gauntlet_Choir_VaultGate_EntityScript_SpawnParams
     UPROPERTY()
     bool WaitsForClearThreshold = false;
 
-    FMars_Gauntlet_Choir_VaultGate_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold)
+    UPROPERTY()
+    TWeakObjectPtr<UMaterialInterface> MaterialOverride = nullptr;
+
+    FMars_Gauntlet_Choir_VaultGate_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold, UMaterialInterface InMaterialOverride)
     {
         SpawnTransform = InSpawnTransform;
         Gate = InGate;
@@ -12627,6 +12690,7 @@ struct FMars_Gauntlet_Choir_VaultGate_EntityScript_SpawnParams
         Source = InSource;
         Leaf = InLeaf;
         WaitsForClearThreshold = InWaitsForClearThreshold;
+        MaterialOverride = TWeakObjectPtr<UMaterialInterface>(InMaterialOverride);
     }
 }
 
@@ -12637,9 +12701,9 @@ namespace UMars_Gauntlet_Choir_VaultGate_EntityScript
         return FMars_Gauntlet_Choir_VaultGate_EntityScript_SpawnParams();
     }
 
-    FMars_Gauntlet_Choir_VaultGate_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold)
+    FMars_Gauntlet_Choir_VaultGate_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold, UMaterialInterface InMaterialOverride)
     {
-        return FMars_Gauntlet_Choir_VaultGate_EntityScript_SpawnParams(InSpawnTransform, InGate, InSink, InSource, InLeaf, InWaitsForClearThreshold);
+        return FMars_Gauntlet_Choir_VaultGate_EntityScript_SpawnParams(InSpawnTransform, InGate, InSink, InSource, InLeaf, InWaitsForClearThreshold, InMaterialOverride);
     }
 }
 
@@ -12770,7 +12834,10 @@ struct FMars_Gauntlet_Mourner_AlcoveGate_EntityScript_SpawnParams
     UPROPERTY()
     bool WaitsForClearThreshold = false;
 
-    FMars_Gauntlet_Mourner_AlcoveGate_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold)
+    UPROPERTY()
+    TWeakObjectPtr<UMaterialInterface> MaterialOverride = nullptr;
+
+    FMars_Gauntlet_Mourner_AlcoveGate_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold, UMaterialInterface InMaterialOverride)
     {
         SpawnTransform = InSpawnTransform;
         Gate = InGate;
@@ -12778,6 +12845,7 @@ struct FMars_Gauntlet_Mourner_AlcoveGate_EntityScript_SpawnParams
         Source = InSource;
         Leaf = InLeaf;
         WaitsForClearThreshold = InWaitsForClearThreshold;
+        MaterialOverride = TWeakObjectPtr<UMaterialInterface>(InMaterialOverride);
     }
 }
 
@@ -12788,9 +12856,9 @@ namespace UMars_Gauntlet_Mourner_AlcoveGate_EntityScript
         return FMars_Gauntlet_Mourner_AlcoveGate_EntityScript_SpawnParams();
     }
 
-    FMars_Gauntlet_Mourner_AlcoveGate_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold)
+    FMars_Gauntlet_Mourner_AlcoveGate_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold, UMaterialInterface InMaterialOverride)
     {
-        return FMars_Gauntlet_Mourner_AlcoveGate_EntityScript_SpawnParams(InSpawnTransform, InGate, InSink, InSource, InLeaf, InWaitsForClearThreshold);
+        return FMars_Gauntlet_Mourner_AlcoveGate_EntityScript_SpawnParams(InSpawnTransform, InGate, InSink, InSource, InLeaf, InWaitsForClearThreshold, InMaterialOverride);
     }
 }
 
@@ -12954,7 +13022,10 @@ struct FMars_Gauntlet_Porter_Gate_EntityScript_SpawnParams
     UPROPERTY()
     bool WaitsForClearThreshold = true;
 
-    FMars_Gauntlet_Porter_Gate_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold)
+    UPROPERTY()
+    TWeakObjectPtr<UMaterialInterface> MaterialOverride = nullptr;
+
+    FMars_Gauntlet_Porter_Gate_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold, UMaterialInterface InMaterialOverride)
     {
         SpawnTransform = InSpawnTransform;
         Gate = InGate;
@@ -12962,6 +13033,7 @@ struct FMars_Gauntlet_Porter_Gate_EntityScript_SpawnParams
         Source = InSource;
         Leaf = InLeaf;
         WaitsForClearThreshold = InWaitsForClearThreshold;
+        MaterialOverride = TWeakObjectPtr<UMaterialInterface>(InMaterialOverride);
     }
 }
 
@@ -12972,9 +13044,9 @@ namespace UMars_Gauntlet_Porter_Gate_EntityScript
         return FMars_Gauntlet_Porter_Gate_EntityScript_SpawnParams();
     }
 
-    FMars_Gauntlet_Porter_Gate_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold)
+    FMars_Gauntlet_Porter_Gate_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold, UMaterialInterface InMaterialOverride)
     {
-        return FMars_Gauntlet_Porter_Gate_EntityScript_SpawnParams(InSpawnTransform, InGate, InSink, InSource, InLeaf, InWaitsForClearThreshold);
+        return FMars_Gauntlet_Porter_Gate_EntityScript_SpawnParams(InSpawnTransform, InGate, InSink, InSource, InLeaf, InWaitsForClearThreshold, InMaterialOverride);
     }
 }
 
@@ -14345,7 +14417,10 @@ struct FMars_Sandbox_GateA_EntityScript_SpawnParams
     UPROPERTY()
     bool WaitsForClearThreshold = false;
 
-    FMars_Sandbox_GateA_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold)
+    UPROPERTY()
+    TWeakObjectPtr<UMaterialInterface> MaterialOverride = nullptr;
+
+    FMars_Sandbox_GateA_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold, UMaterialInterface InMaterialOverride)
     {
         SpawnTransform = InSpawnTransform;
         Gate = InGate;
@@ -14353,6 +14428,7 @@ struct FMars_Sandbox_GateA_EntityScript_SpawnParams
         Source = InSource;
         Leaf = InLeaf;
         WaitsForClearThreshold = InWaitsForClearThreshold;
+        MaterialOverride = TWeakObjectPtr<UMaterialInterface>(InMaterialOverride);
     }
 }
 
@@ -14363,9 +14439,9 @@ namespace UMars_Sandbox_GateA_EntityScript
         return FMars_Sandbox_GateA_EntityScript_SpawnParams();
     }
 
-    FMars_Sandbox_GateA_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold)
+    FMars_Sandbox_GateA_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold, UMaterialInterface InMaterialOverride)
     {
-        return FMars_Sandbox_GateA_EntityScript_SpawnParams(InSpawnTransform, InGate, InSink, InSource, InLeaf, InWaitsForClearThreshold);
+        return FMars_Sandbox_GateA_EntityScript_SpawnParams(InSpawnTransform, InGate, InSink, InSource, InLeaf, InWaitsForClearThreshold, InMaterialOverride);
     }
 }
 
@@ -14390,7 +14466,10 @@ struct FMars_Sandbox_GateB_EntityScript_SpawnParams
     UPROPERTY()
     bool WaitsForClearThreshold = false;
 
-    FMars_Sandbox_GateB_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold)
+    UPROPERTY()
+    TWeakObjectPtr<UMaterialInterface> MaterialOverride = nullptr;
+
+    FMars_Sandbox_GateB_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold, UMaterialInterface InMaterialOverride)
     {
         SpawnTransform = InSpawnTransform;
         Gate = InGate;
@@ -14398,6 +14477,7 @@ struct FMars_Sandbox_GateB_EntityScript_SpawnParams
         Source = InSource;
         Leaf = InLeaf;
         WaitsForClearThreshold = InWaitsForClearThreshold;
+        MaterialOverride = TWeakObjectPtr<UMaterialInterface>(InMaterialOverride);
     }
 }
 
@@ -14408,9 +14488,9 @@ namespace UMars_Sandbox_GateB_EntityScript
         return FMars_Sandbox_GateB_EntityScript_SpawnParams();
     }
 
-    FMars_Sandbox_GateB_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold)
+    FMars_Sandbox_GateB_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold, UMaterialInterface InMaterialOverride)
     {
-        return FMars_Sandbox_GateB_EntityScript_SpawnParams(InSpawnTransform, InGate, InSink, InSource, InLeaf, InWaitsForClearThreshold);
+        return FMars_Sandbox_GateB_EntityScript_SpawnParams(InSpawnTransform, InGate, InSink, InSource, InLeaf, InWaitsForClearThreshold, InMaterialOverride);
     }
 }
 
@@ -14435,7 +14515,10 @@ struct FMars_Sandbox_GateC_EntityScript_SpawnParams
     UPROPERTY()
     bool WaitsForClearThreshold = false;
 
-    FMars_Sandbox_GateC_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold)
+    UPROPERTY()
+    TWeakObjectPtr<UMaterialInterface> MaterialOverride = nullptr;
+
+    FMars_Sandbox_GateC_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold, UMaterialInterface InMaterialOverride)
     {
         SpawnTransform = InSpawnTransform;
         Gate = InGate;
@@ -14443,6 +14526,7 @@ struct FMars_Sandbox_GateC_EntityScript_SpawnParams
         Source = InSource;
         Leaf = InLeaf;
         WaitsForClearThreshold = InWaitsForClearThreshold;
+        MaterialOverride = TWeakObjectPtr<UMaterialInterface>(InMaterialOverride);
     }
 }
 
@@ -14453,9 +14537,9 @@ namespace UMars_Sandbox_GateC_EntityScript
         return FMars_Sandbox_GateC_EntityScript_SpawnParams();
     }
 
-    FMars_Sandbox_GateC_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold)
+    FMars_Sandbox_GateC_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold, UMaterialInterface InMaterialOverride)
     {
-        return FMars_Sandbox_GateC_EntityScript_SpawnParams(InSpawnTransform, InGate, InSink, InSource, InLeaf, InWaitsForClearThreshold);
+        return FMars_Sandbox_GateC_EntityScript_SpawnParams(InSpawnTransform, InGate, InSink, InSource, InLeaf, InWaitsForClearThreshold, InMaterialOverride);
     }
 }
 
@@ -14480,7 +14564,10 @@ struct FMars_Sandbox_GateF_EntityScript_SpawnParams
     UPROPERTY()
     bool WaitsForClearThreshold = false;
 
-    FMars_Sandbox_GateF_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold)
+    UPROPERTY()
+    TWeakObjectPtr<UMaterialInterface> MaterialOverride = nullptr;
+
+    FMars_Sandbox_GateF_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold, UMaterialInterface InMaterialOverride)
     {
         SpawnTransform = InSpawnTransform;
         Gate = InGate;
@@ -14488,6 +14575,7 @@ struct FMars_Sandbox_GateF_EntityScript_SpawnParams
         Source = InSource;
         Leaf = InLeaf;
         WaitsForClearThreshold = InWaitsForClearThreshold;
+        MaterialOverride = TWeakObjectPtr<UMaterialInterface>(InMaterialOverride);
     }
 }
 
@@ -14498,9 +14586,9 @@ namespace UMars_Sandbox_GateF_EntityScript
         return FMars_Sandbox_GateF_EntityScript_SpawnParams();
     }
 
-    FMars_Sandbox_GateF_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold)
+    FMars_Sandbox_GateF_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold, UMaterialInterface InMaterialOverride)
     {
-        return FMars_Sandbox_GateF_EntityScript_SpawnParams(InSpawnTransform, InGate, InSink, InSource, InLeaf, InWaitsForClearThreshold);
+        return FMars_Sandbox_GateF_EntityScript_SpawnParams(InSpawnTransform, InGate, InSink, InSource, InLeaf, InWaitsForClearThreshold, InMaterialOverride);
     }
 }
 
@@ -14525,7 +14613,10 @@ struct FMars_Sandbox_GateI_EntityScript_SpawnParams
     UPROPERTY()
     bool WaitsForClearThreshold = false;
 
-    FMars_Sandbox_GateI_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold)
+    UPROPERTY()
+    TWeakObjectPtr<UMaterialInterface> MaterialOverride = nullptr;
+
+    FMars_Sandbox_GateI_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold, UMaterialInterface InMaterialOverride)
     {
         SpawnTransform = InSpawnTransform;
         Gate = InGate;
@@ -14533,6 +14624,7 @@ struct FMars_Sandbox_GateI_EntityScript_SpawnParams
         Source = InSource;
         Leaf = InLeaf;
         WaitsForClearThreshold = InWaitsForClearThreshold;
+        MaterialOverride = TWeakObjectPtr<UMaterialInterface>(InMaterialOverride);
     }
 }
 
@@ -14543,9 +14635,9 @@ namespace UMars_Sandbox_GateI_EntityScript
         return FMars_Sandbox_GateI_EntityScript_SpawnParams();
     }
 
-    FMars_Sandbox_GateI_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold)
+    FMars_Sandbox_GateI_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold, UMaterialInterface InMaterialOverride)
     {
-        return FMars_Sandbox_GateI_EntityScript_SpawnParams(InSpawnTransform, InGate, InSink, InSource, InLeaf, InWaitsForClearThreshold);
+        return FMars_Sandbox_GateI_EntityScript_SpawnParams(InSpawnTransform, InGate, InSink, InSource, InLeaf, InWaitsForClearThreshold, InMaterialOverride);
     }
 }
 
@@ -14570,7 +14662,10 @@ struct FMars_Sandbox_GateM_EntityScript_SpawnParams
     UPROPERTY()
     bool WaitsForClearThreshold = false;
 
-    FMars_Sandbox_GateM_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold)
+    UPROPERTY()
+    TWeakObjectPtr<UMaterialInterface> MaterialOverride = nullptr;
+
+    FMars_Sandbox_GateM_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold, UMaterialInterface InMaterialOverride)
     {
         SpawnTransform = InSpawnTransform;
         Gate = InGate;
@@ -14578,6 +14673,7 @@ struct FMars_Sandbox_GateM_EntityScript_SpawnParams
         Source = InSource;
         Leaf = InLeaf;
         WaitsForClearThreshold = InWaitsForClearThreshold;
+        MaterialOverride = TWeakObjectPtr<UMaterialInterface>(InMaterialOverride);
     }
 }
 
@@ -14588,9 +14684,9 @@ namespace UMars_Sandbox_GateM_EntityScript
         return FMars_Sandbox_GateM_EntityScript_SpawnParams();
     }
 
-    FMars_Sandbox_GateM_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold)
+    FMars_Sandbox_GateM_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold, UMaterialInterface InMaterialOverride)
     {
-        return FMars_Sandbox_GateM_EntityScript_SpawnParams(InSpawnTransform, InGate, InSink, InSource, InLeaf, InWaitsForClearThreshold);
+        return FMars_Sandbox_GateM_EntityScript_SpawnParams(InSpawnTransform, InGate, InSink, InSource, InLeaf, InWaitsForClearThreshold, InMaterialOverride);
     }
 }
 
@@ -14615,7 +14711,10 @@ struct FMars_Sandbox_KeyDoor_BlueYellow_EntityScript_SpawnParams
     UPROPERTY()
     bool WaitsForClearThreshold = false;
 
-    FMars_Sandbox_KeyDoor_BlueYellow_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold)
+    UPROPERTY()
+    TWeakObjectPtr<UMaterialInterface> MaterialOverride = nullptr;
+
+    FMars_Sandbox_KeyDoor_BlueYellow_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold, UMaterialInterface InMaterialOverride)
     {
         SpawnTransform = InSpawnTransform;
         Gate = InGate;
@@ -14623,6 +14722,7 @@ struct FMars_Sandbox_KeyDoor_BlueYellow_EntityScript_SpawnParams
         Source = InSource;
         Leaf = InLeaf;
         WaitsForClearThreshold = InWaitsForClearThreshold;
+        MaterialOverride = TWeakObjectPtr<UMaterialInterface>(InMaterialOverride);
     }
 }
 
@@ -14633,9 +14733,9 @@ namespace UMars_Sandbox_KeyDoor_BlueYellow_EntityScript
         return FMars_Sandbox_KeyDoor_BlueYellow_EntityScript_SpawnParams();
     }
 
-    FMars_Sandbox_KeyDoor_BlueYellow_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold)
+    FMars_Sandbox_KeyDoor_BlueYellow_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold, UMaterialInterface InMaterialOverride)
     {
-        return FMars_Sandbox_KeyDoor_BlueYellow_EntityScript_SpawnParams(InSpawnTransform, InGate, InSink, InSource, InLeaf, InWaitsForClearThreshold);
+        return FMars_Sandbox_KeyDoor_BlueYellow_EntityScript_SpawnParams(InSpawnTransform, InGate, InSink, InSource, InLeaf, InWaitsForClearThreshold, InMaterialOverride);
     }
 }
 
@@ -14660,7 +14760,10 @@ struct FMars_Sandbox_KeyDoor_Green_EntityScript_SpawnParams
     UPROPERTY()
     bool WaitsForClearThreshold = false;
 
-    FMars_Sandbox_KeyDoor_Green_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold)
+    UPROPERTY()
+    TWeakObjectPtr<UMaterialInterface> MaterialOverride = nullptr;
+
+    FMars_Sandbox_KeyDoor_Green_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold, UMaterialInterface InMaterialOverride)
     {
         SpawnTransform = InSpawnTransform;
         Gate = InGate;
@@ -14668,6 +14771,7 @@ struct FMars_Sandbox_KeyDoor_Green_EntityScript_SpawnParams
         Source = InSource;
         Leaf = InLeaf;
         WaitsForClearThreshold = InWaitsForClearThreshold;
+        MaterialOverride = TWeakObjectPtr<UMaterialInterface>(InMaterialOverride);
     }
 }
 
@@ -14678,9 +14782,9 @@ namespace UMars_Sandbox_KeyDoor_Green_EntityScript
         return FMars_Sandbox_KeyDoor_Green_EntityScript_SpawnParams();
     }
 
-    FMars_Sandbox_KeyDoor_Green_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold)
+    FMars_Sandbox_KeyDoor_Green_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold, UMaterialInterface InMaterialOverride)
     {
-        return FMars_Sandbox_KeyDoor_Green_EntityScript_SpawnParams(InSpawnTransform, InGate, InSink, InSource, InLeaf, InWaitsForClearThreshold);
+        return FMars_Sandbox_KeyDoor_Green_EntityScript_SpawnParams(InSpawnTransform, InGate, InSink, InSource, InLeaf, InWaitsForClearThreshold, InMaterialOverride);
     }
 }
 
@@ -14705,7 +14809,10 @@ struct FMars_Sandbox_KeyDoor_Purple_EntityScript_SpawnParams
     UPROPERTY()
     bool WaitsForClearThreshold = true;
 
-    FMars_Sandbox_KeyDoor_Purple_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold)
+    UPROPERTY()
+    TWeakObjectPtr<UMaterialInterface> MaterialOverride = nullptr;
+
+    FMars_Sandbox_KeyDoor_Purple_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold, UMaterialInterface InMaterialOverride)
     {
         SpawnTransform = InSpawnTransform;
         Gate = InGate;
@@ -14713,6 +14820,7 @@ struct FMars_Sandbox_KeyDoor_Purple_EntityScript_SpawnParams
         Source = InSource;
         Leaf = InLeaf;
         WaitsForClearThreshold = InWaitsForClearThreshold;
+        MaterialOverride = TWeakObjectPtr<UMaterialInterface>(InMaterialOverride);
     }
 }
 
@@ -14723,9 +14831,9 @@ namespace UMars_Sandbox_KeyDoor_Purple_EntityScript
         return FMars_Sandbox_KeyDoor_Purple_EntityScript_SpawnParams();
     }
 
-    FMars_Sandbox_KeyDoor_Purple_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold)
+    FMars_Sandbox_KeyDoor_Purple_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold, UMaterialInterface InMaterialOverride)
     {
-        return FMars_Sandbox_KeyDoor_Purple_EntityScript_SpawnParams(InSpawnTransform, InGate, InSink, InSource, InLeaf, InWaitsForClearThreshold);
+        return FMars_Sandbox_KeyDoor_Purple_EntityScript_SpawnParams(InSpawnTransform, InGate, InSink, InSource, InLeaf, InWaitsForClearThreshold, InMaterialOverride);
     }
 }
 
@@ -14750,7 +14858,10 @@ struct FMars_Sandbox_KeyDoor_Red_EntityScript_SpawnParams
     UPROPERTY()
     bool WaitsForClearThreshold = false;
 
-    FMars_Sandbox_KeyDoor_Red_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold)
+    UPROPERTY()
+    TWeakObjectPtr<UMaterialInterface> MaterialOverride = nullptr;
+
+    FMars_Sandbox_KeyDoor_Red_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold, UMaterialInterface InMaterialOverride)
     {
         SpawnTransform = InSpawnTransform;
         Gate = InGate;
@@ -14758,6 +14869,7 @@ struct FMars_Sandbox_KeyDoor_Red_EntityScript_SpawnParams
         Source = InSource;
         Leaf = InLeaf;
         WaitsForClearThreshold = InWaitsForClearThreshold;
+        MaterialOverride = TWeakObjectPtr<UMaterialInterface>(InMaterialOverride);
     }
 }
 
@@ -14768,9 +14880,9 @@ namespace UMars_Sandbox_KeyDoor_Red_EntityScript
         return FMars_Sandbox_KeyDoor_Red_EntityScript_SpawnParams();
     }
 
-    FMars_Sandbox_KeyDoor_Red_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold)
+    FMars_Sandbox_KeyDoor_Red_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold, UMaterialInterface InMaterialOverride)
     {
-        return FMars_Sandbox_KeyDoor_Red_EntityScript_SpawnParams(InSpawnTransform, InGate, InSink, InSource, InLeaf, InWaitsForClearThreshold);
+        return FMars_Sandbox_KeyDoor_Red_EntityScript_SpawnParams(InSpawnTransform, InGate, InSink, InSource, InLeaf, InWaitsForClearThreshold, InMaterialOverride);
     }
 }
 
@@ -19155,7 +19267,10 @@ struct FMars_TESTONLY_Anchor_EntityScript_SpawnParams
     UPROPERTY()
     TOptional<int> PinnedRow;
 
-    FMars_TESTONLY_Anchor_EntityScript_SpawnParams(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow)
+    UPROPERTY()
+    TWeakObjectPtr<UMaterialInterface> GateMaterialOverride = nullptr;
+
+    FMars_TESTONLY_Anchor_EntityScript_SpawnParams(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow, UMaterialInterface InGateMaterialOverride)
     {
         SpawnTransform = InSpawnTransform;
         AnchorId = InAnchorId;
@@ -19167,6 +19282,7 @@ struct FMars_TESTONLY_Anchor_EntityScript_SpawnParams
         CrawlAlongCm = InCrawlAlongCm;
         CrawlOffsetCm = InCrawlOffsetCm;
         PinnedRow = InPinnedRow;
+        GateMaterialOverride = TWeakObjectPtr<UMaterialInterface>(InGateMaterialOverride);
     }
 }
 
@@ -19177,9 +19293,9 @@ namespace UMars_TESTONLY_Anchor_EntityScript
         return FMars_TESTONLY_Anchor_EntityScript_SpawnParams();
     }
 
-    FMars_TESTONLY_Anchor_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow)
+    FMars_TESTONLY_Anchor_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow, UMaterialInterface InGateMaterialOverride)
     {
-        return FMars_TESTONLY_Anchor_EntityScript_SpawnParams(InSpawnTransform, InAnchorId, InChannel, InSpanCm, InHomeRadiusCm, InLeverSide, InHasCrawl, InCrawlAlongCm, InCrawlOffsetCm, InPinnedRow);
+        return FMars_TESTONLY_Anchor_EntityScript_SpawnParams(InSpawnTransform, InAnchorId, InChannel, InSpanCm, InHomeRadiusCm, InLeverSide, InHasCrawl, InCrawlAlongCm, InCrawlOffsetCm, InPinnedRow, InGateMaterialOverride);
     }
 }
 
@@ -19521,7 +19637,10 @@ struct FMars_Warrens_Anchor_Route_EntityScript_SpawnParams
     UPROPERTY()
     TOptional<int> PinnedRow;
 
-    FMars_Warrens_Anchor_Route_EntityScript_SpawnParams(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow)
+    UPROPERTY()
+    TWeakObjectPtr<UMaterialInterface> GateMaterialOverride = nullptr;
+
+    FMars_Warrens_Anchor_Route_EntityScript_SpawnParams(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow, UMaterialInterface InGateMaterialOverride)
     {
         SpawnTransform = InSpawnTransform;
         AnchorId = InAnchorId;
@@ -19533,6 +19652,7 @@ struct FMars_Warrens_Anchor_Route_EntityScript_SpawnParams
         CrawlAlongCm = InCrawlAlongCm;
         CrawlOffsetCm = InCrawlOffsetCm;
         PinnedRow = InPinnedRow;
+        GateMaterialOverride = TWeakObjectPtr<UMaterialInterface>(InGateMaterialOverride);
     }
 }
 
@@ -19543,9 +19663,9 @@ namespace UMars_Warrens_Anchor_Route_EntityScript
         return FMars_Warrens_Anchor_Route_EntityScript_SpawnParams();
     }
 
-    FMars_Warrens_Anchor_Route_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow)
+    FMars_Warrens_Anchor_Route_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow, UMaterialInterface InGateMaterialOverride)
     {
-        return FMars_Warrens_Anchor_Route_EntityScript_SpawnParams(InSpawnTransform, InAnchorId, InChannel, InSpanCm, InHomeRadiusCm, InLeverSide, InHasCrawl, InCrawlAlongCm, InCrawlOffsetCm, InPinnedRow);
+        return FMars_Warrens_Anchor_Route_EntityScript_SpawnParams(InSpawnTransform, InAnchorId, InChannel, InSpanCm, InHomeRadiusCm, InLeverSide, InHasCrawl, InCrawlAlongCm, InCrawlOffsetCm, InPinnedRow, InGateMaterialOverride);
     }
 }
 

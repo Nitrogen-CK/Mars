@@ -173,6 +173,10 @@ class UMars_Anchor_EntityScript : UCk_GenericEntityScript_UE
     UPROPERTY(ExposeOnSpawn)
     TOptional<int32> PinnedRow;
 
+    // Optional gate/frame/filler presentation for this placement; unset keeps the prototype material.
+    UPROPERTY(ExposeOnSpawn)
+    UMaterialInterface GateMaterialOverride = nullptr;
+
     protected EMars_Anchor_Family Get_Family() const
     { return EMars_Anchor_Family::Route; }
 
@@ -196,6 +200,7 @@ class UMars_Anchor_EntityScript : UCk_GenericEntityScript_UE
         if (HasCrawl)
         { Spec.CrawlOffsetCm = TOptional<FVector2D>(FVector2D(CrawlAlongCm, CrawlOffsetCm)); }
         Spec.PinnedRow = PinnedRow;
+        Spec.GateMaterialOverride = GateMaterialOverride;
         utils_anchor::Add(InHandle, Spec);
 
         return ECk_EntityScript_ConstructionFlow::Finished;

@@ -130,6 +130,10 @@ struct FMars_Anchor_Context
 
     UPROPERTY()
     TOptional<FVector2D> CrawlOffsetCm;
+
+    // Weak: the context is retained in resolve request fragments.
+    UPROPERTY()
+    TWeakObjectPtr<UMaterialInterface> GateMaterialOverride;
 }
 
 // Spawn params passed to every candidate. Injection matches by property name; an AngelScript class ignores a field it
@@ -188,6 +192,10 @@ struct FMars_Anchor_Spec
     // Debug: always wins over the resolver's draw; the ledger marks it.
     UPROPERTY()
     TOptional<int32> PinnedRow;
+
+    // Optional presentation only; unset preserves the prototype gate material.
+    UPROPERTY()
+    UMaterialInterface GateMaterialOverride = nullptr;
 }
 
 mixin FMars_Validation Validate(const FMars_Anchor_Spec& Self)
@@ -248,6 +256,9 @@ struct FMars_Fragment_Anchor_Params
 
     UPROPERTY()
     TOptional<int32> PinnedRow;
+
+    UPROPERTY()
+    TWeakObjectPtr<UMaterialInterface> GateMaterialOverride;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
