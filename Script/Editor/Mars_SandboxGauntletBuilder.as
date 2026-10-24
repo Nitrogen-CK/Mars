@@ -1,4 +1,4 @@
-// Editor-only: the sandbox gauntlets, five cells that each combine several mechanisms (presets in
+// Editor-only: the sandbox gauntlets, cells that each combine several mechanisms (presets in
 // Script/WorldObjects/Mechanisms/Mars_SandboxGauntlets.as). A hall runs along the main floor's north edge; the cells open
 // off its north side, each a self-contained socket with its own walls, controls, reward and recovery.
 //
@@ -14,6 +14,14 @@ void Mars_BuildSandboxGauntletsFunc(const TArray<FString>& Args)
 }
 
 const FConsoleCommand Mars_BuildSandboxGauntletsCommand("Mars.Sandbox.BuildGauntlets", n"Mars_BuildSandboxGauntletsFunc");
+
+UFUNCTION()
+void Mars_BuildSandboxGauntlet8Func(const TArray<FString>& Args)
+{
+    utils_mars_sandbox::BuildGauntlet8();
+}
+
+const FConsoleCommand Mars_BuildSandboxGauntlet8Command("Mars.Sandbox.BuildGauntlet8", n"Mars_BuildSandboxGauntlet8Func");
 
 // A straight stair rising toward +Y: Steps risers of Riser over treads of Tread (15 x 20 over 30 climbs 300 in 450), Width
 // wide along X.
@@ -144,6 +152,10 @@ namespace utils_mars_sandbox
 {
     const FString k_GauntletLabelPrefix = "Gauntlet";
     const FString k_GauntletHallFloorLabel = "GauntletHall_Floor";
+    const FString k_GauntletHallFloorEastLabel = "GauntletHall_FloorEast";
+    const FString k_GauntletHallWallEastLabel = "GauntletHall_WallEast";
+    const FString k_Gauntlet8FloorLabel = "Gauntlet8_Floor_South";
+    const FString k_WaterSheetMaterial = "/CkFoundation/CkUsf/GeneratedLooks/M_CkUsf_Look_Glass.M_CkUsf_Look_Glass";
 
     // The tall cells (galleries at 300) get walls a gallery player cannot see over.
     const float64 k_GauntletWallHeight = 300.0;
@@ -160,6 +172,28 @@ namespace utils_mars_sandbox
         utils_mars_map_builder::SaveOpenLevel(Command);
     }
 
+    // Adds cell 08 to a sandbox whose gauntlets are already built; never rebuilds the other cells. The hall's old east wall
+    // goes, unless an earlier run already extended the hall.
+    void BuildGauntlet8()
+    {
+        const FString Command = "Mars.Sandbox.BuildGauntlet8";
+        if (Get_CanAdd(Command, k_Gauntlet8FloorLabel, "Delete the Gauntlet8_* actors first to rebuild.") == false)
+        { return; }
+
+        if (ck::Is_NOT_Valid(utils_mars_map_builder::TryGet_LevelActor(k_GauntletHallFloorEastLabel)))
+        {
+            auto OldEastWall = utils_mars_map_builder::TryGet_LevelActor(k_GauntletHallWallEastLabel);
+            if (ck::IsValid(OldEastWall))
+            { UEditorActorSubsystem::Get().DestroyActor(OldEastWall); }
+
+            Spawn_GauntletHallEast();
+        }
+
+        Spawn_Gauntlet8_ChainCrossing(FMars_SandboxGauntlet_Cell(FVector(2700.0, 2600.0, 0.0), "Gauntlet8"));
+        Apply_ProtoGridMaterials();
+        utils_mars_map_builder::SaveOpenLevel(Command);
+    }
+
     void Spawn_Gauntlets()
     {
         Spawn_GauntletHall();
@@ -168,6 +202,8 @@ namespace utils_mars_sandbox
         Spawn_Gauntlet1_MournersTable(FMars_SandboxGauntlet_Cell(FVector(-400.0, 2600.0, 0.0), "Gauntlet1"));
         Spawn_Gauntlet5_PortersWager(FMars_SandboxGauntlet_Cell(FVector(400.0, 2600.0, 0.0), "Gauntlet5"));
         Spawn_Gauntlet4_CensersWindow(FMars_SandboxGauntlet_Cell(FVector(1400.0, 2600.0, 0.0), "Gauntlet4"));
+        Spawn_GauntletHallEast();
+        Spawn_Gauntlet8_ChainCrossing(FMars_SandboxGauntlet_Cell(FVector(2700.0, 2600.0, 0.0), "Gauntlet8"));
     }
 
     // Local origin (0, 2000): the hall's south edge on the main floor's north edge. Its north side is the cells' south
@@ -179,10 +215,10 @@ namespace utils_mars_sandbox
 
         Hall.Block("Floor", FVector(-3700.0, 0.0, -20.0), FVector(2000.0, 600.0, 0.0));
 
-        // The main floor ends at X=-2000; west of it the hall's south edge needs a wall.
+        // The main floor ends at X=-2000; west of it the hall's south edge needs a wall. The east end is
+        // Spawn_GauntletHallEast's.
         Hall.Block("WallSouth", FVector(-3700.0, -10.0, 0.0), FVector(-2000.0, 10.0, Height));
         Hall.Block("WallWest", FVector(-3710.0, 0.0, 0.0), FVector(-3690.0, 600.0, Height));
-        Hall.Block("WallEast", FVector(1990.0, 0.0, 0.0), FVector(2010.0, 600.0, Height));
 
         Hall.Block("Filler_3_6", FVector(-2200.0, 590.0, 0.0), FVector(-2100.0, 610.0, Height));
         Hall.Block("Filler_6_1", FVector(-900.0, 590.0, 0.0), FVector(-800.0, 610.0, Height));
@@ -405,17 +441,102 @@ namespace utils_mars_sandbox
         InCell.Place(UMars_Gauntlet_Fungus_EntityScript, "Item_Fungus", FTransform(FRotator::ZeroRotator, FVector(0.0, 1150.0, 30.0)));
     }
 
-    // Floors grey, raised and edge pieces (galleries, stairs, rails, plinths, the bell) orange, clue glyphs green, the rest
-    // walls.
+    // East of cell 04 the hall runs on to X 3400 for cell 08. Its south side there is room 3's north wall (Y 2100), so the
+    // floor starts on that line and needs no wall of its own.
+    void Spawn_GauntletHallEast()
+    {
+        const auto Hall = FMars_SandboxGauntlet_Cell(FVector(0.0, 2000.0, 0.0), "GauntletHall");
+        const auto Height = k_GauntletWallHeight;
+
+        Hall.Block("FloorEast", FVector(2000.0, 100.0, -20.0), FVector(3400.0, 600.0, 0.0));
+        Hall.Block("WallEast", FVector(3390.0, 100.0, 0.0), FVector(3410.0, 600.0, Height));
+        Hall.Block("Filler_4_8", FVector(2000.0, 590.0, 0.0), FVector(2100.0, 610.0, Height));
+        Hall.Block("Filler_8_East", FVector(3300.0, 590.0, 0.0), FVector(3400.0, 610.0, Height));
+    }
+
+    // 08 - The Chain Crossing. 12 x 14 m: a near bank, a 4 m channel of dark water, the far bank. The plank bridge stands up
+    // across the channel's mouth; the windlass on the near bank hauls it down (three turns), and the far bank's lamp lights
+    // when it lands. The reward lies under the lamp. A fall into the channel climbs back to the near bank by the stair at
+    // its east end.
+    void Spawn_Gauntlet8_ChainCrossing(const FMars_SandboxGauntlet_Cell& InCell)
+    {
+        const auto Height = k_GauntletTallWallHeight;
+
+        InCell.Block("Floor_South", FVector(-600.0, 0.0, -20.0), FVector(600.0, 450.0, 0.0));
+        InCell.Block("Floor_North", FVector(-600.0, 850.0, -20.0), FVector(600.0, 1400.0, 0.0));
+
+        // The channel: its bed 200 down, its banks' faces under the floors, the cell walls carried down to the bed at its
+        // ends, and a glass sheet just under the banks' lip for the water (no collision: a fall goes through it).
+        InCell.Block("Water", FVector(-600.0, 450.0, -220.0), FVector(600.0, 850.0, -200.0));
+        InCell.Block("WaterWall_South", FVector(-600.0, 430.0, -200.0), FVector(600.0, 450.0, -20.0));
+        InCell.Block("WaterWall_North", FVector(-600.0, 850.0, -200.0), FVector(600.0, 870.0, -20.0));
+        InCell.Block("WaterWall_West", FVector(-610.0, 450.0, -220.0), FVector(-590.0, 850.0, 0.0));
+        InCell.Block("WaterWall_East", FVector(590.0, 450.0, -220.0), FVector(610.0, 850.0, 0.0));
+        auto Sheet = utils_mars_map_builder::Spawn_Block(engine::load::Cube(), FMars_MapBuilder_Block(
+            f"{InCell.Prefix}_WaterSheet", InCell.Origin + FVector(0.0, 650.0, -11.0), FVector(12.0, 4.0, 0.02)));
+        if (ck::IsValid(Sheet))
+        { Sheet.StaticMeshComponent.SetCollisionProfileName(collision::profile::NoCollision); }
+
+        // The way out of the water: ten 20 uu steps rising south along the east wall to the near bank.
+        for (int32 Index = 0; Index < 10; ++Index)
+        {
+            const auto North = 850.0 - 40.0 * Index;
+            InCell.Block(f"Stair_Recovery_{Index}", FVector(450.0, North - 40.0, -200.0), FVector(590.0, North, -180.0 + 20.0 * Index));
+        }
+
+        InCell.Block("WallSouth_West", FVector(-600.0, -10.0, 0.0), FVector(-120.0, 10.0, Height));
+        InCell.Block("WallSouth_East", FVector(120.0, -10.0, 0.0), FVector(600.0, 10.0, Height));
+        InCell.Block("WallWest", FVector(-610.0, 0.0, 0.0), FVector(-590.0, 1400.0, Height));
+        InCell.Block("WallEast", FVector(590.0, 0.0, 0.0), FVector(610.0, 1400.0, Height));
+        InCell.Block("WallNorth", FVector(-600.0, 1390.0, 0.0), FVector(600.0, 1410.0, Height));
+
+        // Rails on both bank edges, open at the bridge's mouth (its hinge posts close the near side) and over the recovery
+        // stair; bollards at the far mouth.
+        InCell.Balustrade("BankRail_SouthWest", FVector(-590.0, 445.0, 0.0), FVector(-190.0, 445.0, 0.0));
+        InCell.Balustrade("BankRail_SouthEast", FVector(190.0, 445.0, 0.0), FVector(440.0, 445.0, 0.0));
+        InCell.Balustrade("BankRail_NorthWest", FVector(-590.0, 855.0, 0.0), FVector(-190.0, 855.0, 0.0));
+        InCell.Balustrade("BankRail_NorthEast", FVector(190.0, 855.0, 0.0), FVector(590.0, 855.0, 0.0));
+        InCell.Block("Bollard_NorthWest", FVector(-185.0, 850.0, 0.0), FVector(-155.0, 880.0, 110.0));
+        InCell.Block("Bollard_NorthEast", FVector(155.0, 850.0, 0.0), FVector(185.0, 880.0, 110.0));
+        InCell.Block("LampPost", FVector(-10.0, 1290.0, 0.0), FVector(10.0, 1310.0, 250.0));
+
+        // The bridge's hinge on the near bank's edge, its deck along +Y; the windlass lands at (-300, 300) facing south.
+        InCell.Place(UMars_Gauntlet_Chain_Bridge_EntityScript, "Mech_ChainBridge", FTransform(FRotator::ZeroRotator, FVector(0.0, 450.0, 0.0)));
+
+        // The fixtures hang along local -Z: rolled over, they stand on their posts. The lanterns sit on the bridge's hinge
+        // posts (100 tall, centred 165 either side of the mouth).
+        const auto Standing = FRotator(0.0, 0.0, 180.0);
+        InCell.Place(UMars_Gauntlet_Chain_Lantern_EntityScript, "Mech_LanternWest", FTransform(Standing, FVector(-165.0, 435.0, 100.0)));
+        InCell.Place(UMars_Gauntlet_Chain_Lantern_EntityScript, "Mech_LanternEast", FTransform(Standing, FVector(165.0, 435.0, 100.0)));
+        InCell.Place(UMars_Gauntlet_Chain_Lamp_EntityScript, "Mech_FarLamp", FTransform(Standing, FVector(0.0, 1300.0, 250.0)));
+
+        InCell.Place(UMars_Gauntlet_Fig_EntityScript, "Item_Fig", FTransform(FRotator::ZeroRotator, FVector(0.0, 1250.0, 30.0)));
+    }
+
+    // Floors grey, raised and edge pieces (galleries, stairs, rails, plinths, the bell, bollards) orange, clue glyphs green,
+    // the water sheet glass, the rest (the channel too) walls.
     void Apply_GauntletMaterial(AStaticMeshActor InBlock, const FString& InLabel, const FMars_MapBuilder_ProtoGridSet& InGrid)
     {
+        if (InLabel.Contains("_WaterSheet"))
+        {
+            auto Glass = Cast<UMaterialInterface>(System::LoadAsset_Blocking(TSoftObjectPtr<UMaterialInterface>(FSoftObjectPath(k_WaterSheetMaterial))));
+            if (ck::EnsureIfNot(ck::IsValid(Glass), f"[Mars.Sandbox] Water sheet material [{k_WaterSheetMaterial}] not found"))
+            { return; }
+
+            InBlock.StaticMeshComponent.SetMaterial(0, Glass);
+            return;
+        }
+
         auto Material = InGrid.Wall;
-        if (InLabel.EndsWith("_Floor") || InLabel.EndsWith("AlcoveFloor"))
+        if (InLabel.EndsWith("_Floor") || InLabel.EndsWith("AlcoveFloor") || InLabel.Contains("_Floor_") || InLabel.EndsWith("_FloorEast"))
         { Material = InGrid.Floor; }
+        else if (InLabel.Contains("_Water"))
+        { Material = InGrid.Wall; }
         else if (InLabel.Contains("_Glyph"))
         { Material = InGrid.Interactable; }
         else if (InLabel.Contains("_Gallery") || InLabel.Contains("_Stair") || InLabel.Contains("Rail")
-            || InLabel.Contains("Parapet") || InLabel.Contains("_Plinth") || InLabel.Contains("_Bell") || InLabel.Contains("LoftFloor"))
+            || InLabel.Contains("Parapet") || InLabel.Contains("_Plinth") || InLabel.Contains("_Bell") || InLabel.Contains("LoftFloor")
+            || InLabel.Contains("_Bollard") || InLabel.Contains("LampPost"))
         { Material = InGrid.Platform; }
 
         InBlock.StaticMeshComponent.SetMaterial(0, Material);

@@ -1,6 +1,6 @@
-// Preconfigured mechanisms and rewards for the sandbox gauntlets: five cells off a hall north of the main floor, each a
-// self-contained socket combining several mechanisms (Mars.Sandbox.BuildGauntlets in
-// Script/Editor/Mars_SandboxGauntletBuilder.as places them). Not under Script/Editor: the saved map references these
+// Preconfigured mechanisms and rewards for the sandbox gauntlets: cells off a hall north of the main floor, each a
+// self-contained socket combining several mechanisms (Mars.Sandbox.BuildGauntlets and Mars.Sandbox.BuildGauntlet8 in
+// Script/Editor/Mars_SandboxGauntletBuilder.as place them). Not under Script/Editor: the saved map references these
 // classes at runtime. Struct fields other than channels are set in DoConstruct, as in Mars_SandboxMechanisms.as.
 //
 // The Blind Choir's seal glyph colors match on purpose: the silhouette (circle, triangle) is the key, not the color.
@@ -368,4 +368,36 @@ class UMars_Gauntlet_Choir_VaultGate_EntityScript : UMars_Gate_EntityScript
 class UMars_Gauntlet_Fungus_EntityScript : UMars_WorldItem_EntityScript
 {
     default Definition = mars_items::Fungus();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+// G8 - The Chain Crossing: cranking the windlass hauls the plank bridge down across the channel; the far bank's lamp lights
+// when it lands. The lanterns on the bridge's hinge posts are always lit.
+//--------------------------------------------------------------------------------------------------------------------------
+
+class UMars_Gauntlet_Chain_Bridge_EntityScript : UMars_ChainBridge_EntityScript
+{
+    default _ShowInPlaceActors = false;
+    default Source.OutputChannel = GameplayTags::Mechanism_Channel_Gauntlet_Chain_Down;
+}
+
+// Warm and always lit; the builder rolls it over so it stands on its post.
+class UMars_Gauntlet_Chain_Lantern_EntityScript : UMars_LightFixture_EntityScript
+{
+    default _ShowInPlaceActors = false;
+    default LightColor = FLinearColor(1.0f, 0.62f, 0.3f, 1.0f);
+    default Intensity = 3000.0f;
+    default AttenuationRadius = 700.0f;
+}
+
+class UMars_Gauntlet_Chain_Lamp_EntityScript : UMars_LightFixture_EntityScript
+{
+    default _ShowInPlaceActors = false;
+    default Sink.InputChannels.Add(GameplayTags::Mechanism_Channel_Gauntlet_Chain_Down);
+    default LightColor = FLinearColor(1.0f, 0.62f, 0.3f, 1.0f);
+}
+
+class UMars_Gauntlet_Fig_EntityScript : UMars_WorldItem_EntityScript
+{
+    default Definition = mars_items::Fig();
 }
