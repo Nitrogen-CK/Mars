@@ -1,8 +1,12 @@
 """Emits an AngelScript anchor plan from a frozen map data file.
 
 Usage (repo root):  python Tools/LevelDesign/anchor_plans/emit_plan.py warrens
+                    python Tools/LevelDesign/anchor_plans/emit_plan.py warrens_v8c --plan WarrensC
 Reads   Tools/LevelDesign/anchor_plans/data/<name>.json
-Writes  Script/ECS/AnchorResolver/Plans/Mars_AnchorPlan_<Name>.as   (never edit that file by hand)
+Writes  Script/ECS/AnchorResolver/Plans/Mars_AnchorPlan_<Plan>.as   (never edit that file by hand)
+<Plan> defaults to the data's `map`. --plan names a second plan over the same map's tags (a layout variant): the asset
+Mars_AnchorPlan_<Plan>, its accessor utils_anchor_resolver::Plan_<Plan>() and its MapName (the run-history key) take the
+plan name, while the anchor tags stay Anchor.Mars.<map>.*, so variants of one map share its registered tags.
 Exit 1 if the data breaks a rule the AS Validate() also enforces, so a bad plan never reaches the editor.
 
 Anchor ids are gameplay tags: an anchor id <Id> in the data is the tag Anchor.Mars.<Map>.<Id>, emitted through its
@@ -40,12 +44,20 @@ def registered_tags():
 
 
 def main():
-    if len(sys.argv) != 2:
-        fail("usage: emit_plan.py <name>")
-    name = sys.argv[1].lower()
+    args = sys.argv[1:]
+    plan = None
+    if len(args) == 3 and args[1] == "--plan":
+        plan = args[2]
+        args = args[:1]
+    if len(args) != 1:
+        fail("usage: emit_plan.py <name> [--plan <Plan>]")
+    name = args[0].lower()
     src = os.path.join(ROOT, "Tools", "LevelDesign", "anchor_plans", "data", f"{name}.json")
     d = json.load(open(src, encoding="utf-8"))
     title = d["map"]
+    plan = plan or title
+    if not re.fullmatch(r"[A-Za-z][A-Za-z0-9]*", plan):
+        fail(f"plan name {plan} is not an identifier (it becomes the asset and accessor names)")
     nodes = d["nodes"]
 
     if len({nid.lower() for nid in nodes}) != len(nodes):
@@ -85,9 +97,9 @@ def main():
     w("// re-run the emitter. Source of the data: " + d["source"])
     w(f"// Anchor ids are the Anchor.Mars.{title}.* tags (Config/DefaultGameplayTags.ini); node ids are graph-internal names.")
     w("")
-    w(f"asset Mars_AnchorPlan_{title} of UMars_AnchorPlan_Def")
+    w(f"asset Mars_AnchorPlan_{plan} of UMars_AnchorPlan_Def")
     w("{")
-    w(f"    MapName = n\"{title}\";")
+    w(f"    MapName = n\"{plan}\";")
     w(f"    Hearth = n\"{d['hearth']}\";")
     w(f"    QuarryMinWalkCm = {f(d['quarryMinWalkCm'])}f;")
     w(f"    SourceRevision = \"{d['source'].replace(chr(92), chr(92) * 2).replace(chr(34), chr(92) + chr(34))}\";")  # a quote in the source string must not end the literal
@@ -121,12 +133,12 @@ def main():
     w("namespace utils_anchor_resolver")
     w("{")
     w("    // Script assets resolve across files only through a namespace accessor in their own file.")
-    w(f"    UMars_AnchorPlan_Def Plan_{title}()")
-    w(f"    {{ return Mars_AnchorPlan_{title}; }}")
+    w(f"    UMars_AnchorPlan_Def Plan_{plan}()")
+    w(f"    {{ return Mars_AnchorPlan_{plan}; }}")
     w("}")
     w("")
 
-    dst = os.path.join(ROOT, "Script", "ECS", "AnchorResolver", "Plans", f"Mars_AnchorPlan_{title}.as")
+    dst = os.path.join(ROOT, "Script", "ECS", "AnchorResolver", "Plans", f"Mars_AnchorPlan_{plan}.as")
     os.makedirs(os.path.dirname(dst), exist_ok=True)
     with open(dst, "w", encoding="utf-8", newline="\n") as fh:
         fh.write("\n".join(out))

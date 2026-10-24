@@ -4,6 +4,12 @@
     (Unreal Python, on the open /Game/Mars/Maps/Warrens_Mars_MAP)
     import build_warrens; build_warrens.apply()                  -> places the greybox, anchors, packs, puzzles, lights, game mode; saves
     build_warrens.audit()                                        -> floor traces, start capsules, crawl fit, Jolt bake
+    A variant: WARRENS_DATA=data/warrens_v8c.json WARRENS_MAP=/Game/Mars/Maps/Warrens_VariantC_Mars_MAP WARRENS_STRICT_TAGS=0;
+    WARRENS_GAMEMODE=Mars_WarrensC_GameMode (the World Settings game mode on the variant's emitted plan; default
+    Mars_Warrens_GameMode); its files are Saved/AnchorPlans/<revision>-{manifest,built,audit}.json. Link kinds ramp, lift, drop and ladder are
+    graph-only (their geometry is extraRamps[], ladders[], holes[]); unknown keys are ignored. Opt-in data keys: movementChecks
+    (walkBreaks also check the built boxes for the chef's 0.45 m step and 2 m clear height; dropErrors, blockedViews, slopeErrors,
+    propErrors), capWadeDepth (wading pools sunk at most 0.4 m); layers dropGaps[], windows[], a gap's landing, a top over the roof.
 
 Three levels (main, deep, upper) are rasterized at CELL metres the way viewer/viewer.js rasterize() does: every cell carries
 its own floor height, so a room, pocket or basin may sit at any z (-2.5 / -1.5 / +2.5 are main-grid cells; below -2.5 is the
@@ -25,9 +31,11 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[2]
-DATA = Path(os.environ.get('WARRENS_DATA', HERE / 'data' / 'warrens.json'))  # WARRENS_DATA previews another layout
+LIVE_DATA = HERE / 'data' / 'warrens.json'
+LIVE_MAP = '/Game/Mars/Maps/Warrens_Mars_MAP'
+DATA = Path(os.environ.get('WARRENS_DATA', LIVE_DATA))  # WARRENS_DATA previews another layout
 OUT = ROOT / 'Saved' / 'AnchorPlans'
-MAP = '/Game/Mars/Maps/Warrens_Mars_MAP'
+MAP = os.environ.get('WARRENS_MAP', LIVE_MAP)  # WARRENS_MAP builds a variant into its own level
 OWN = 'Mars.Anchor.Authoring.Warrens'
 ANCHOR_TAG_ROOT = 'Anchor.Mars.Warrens'  # an anchor id in the data is the leaf of its tag (emit_plan.py emits the same tags)
 SHORTCUT_TAG_ROOT = 'Shortcut.Mars.Warrens'
@@ -48,7 +56,7 @@ MATERIALS = {  # box kind -> default material; optional v7 presentation groups s
     'gallery': PROTO + 'Platform_Mars_MI',
     'hearth': PROTO + 'Interactable_Mars_MI',
     'grate': PROTO + 'Wall_Mars_MI',
-    'water': PROTO + 'Platform_Mars_MI',  # dressing: no translucent ProtoGrid instance exists, so a thin collision-free sheet
+    'water': '/CkFoundation/CkUsf/GeneratedLooks/M_CkUsf_Look_Glass',  # a translucent collision-free sheet: the sunk bed shows through (a layout's presentation default still wins)
     'prop': PROTO + 'Platform_Mars_MI',
     'root': PROTO + 'Item_Mars_MI',
     'candle': PROTO + 'Interactable_Mars_MI',  # the brightest instance stands in for emissive tallow
@@ -58,7 +66,10 @@ MATERIALS = {  # box kind -> default material; optional v7 presentation groups s
 }
 MESHES = {'root': CYLINDER, 'candle': CYLINDER, 'pier': CYLINDER}
 COLLISION = {'water': 'NoCollision', 'inlay': 'NoCollision', 'dressing': 'NoCollision'}
-STRICT_TAGS = True  # False: an unregistered gameplay tag is logged and left unset instead of stopping apply() (an editor booted before the ini edit)
+TILES = os.environ.get('WARRENS_TILES', '1') != '0'  # a layout with instances[] builds as Level Instance tiles; '0' keeps the flat build
+TILE_ROOT = '/Game/Mars/Maps/Variants'  # tile levels: <TILE_ROOT>/<revision>/<instance asset>
+STRICT_TAGS = os.environ.get('WARRENS_STRICT_TAGS', '1') != '0'  # '0': an unregistered gameplay tag is logged and left unset instead of stopping apply() (a variant's new pocket ids)
+GAMEMODE = os.environ.get('WARRENS_GAMEMODE', 'Mars_Warrens_GameMode')  # the World Settings game mode; a layout variant names its own (Mars_WarrensC_GameMode on its emitted plan)
 CELL = 0.5
 SLAB = 0.4
 WALL_TOP = 4.0
@@ -69,6 +80,7 @@ CRAWL_WIDTH = 1.5
 CRAWL_HEIGHT = 1.3  # the sandbox crouch tunnel: 150 standing is blocked, 105 crouched fits
 GALLERY_RAIL = 1.0
 HOLE_RAIL = 1.0  # a main-floor hole without its own rail height
+DEEP_WATER = 1.0  # water deeper than this gets a HOLE_RAIL along its banks: its sunk bed has no way back out
 RAIL_MOUTH = 0.6  # a dive ramp's cut is railed along its sides from this far past its start line
 GRATE_PITCH = 0.25  # bar spacing: a capsule (39 cm radius) walks across, nothing falls through
 TREAD_DROP = 0.2  # stepped filler under an in-level ramp sits this far under the lerped surface (never pokes through a 0.4 slab)
@@ -98,6 +110,7 @@ FILL_KINDS = {
     'chalk': (130, (0.9, 0.88, 0.8)),
 }
 WALKABLE = ('floor', 'low', 'crawl', 'grate', 'tread')
+GRAPH_ONLY = ('ramp', 'lift', 'drop', 'ladder')  # link kinds with no geometry of their own: never rasterized, walked or traced
 BLOCKING = ('solid', 'crack', 'outside')
 DEVIATIONS = [
     'dive stairs are straight ramps starting 2 m past the upper node; in-level stairs are straight ramps between their end nodes',
@@ -117,6 +130,11 @@ V6_DEVIATIONS = [  # the explicit 3D layer (data with structures)
 
 def load():
     return json.loads(DATA.read_text(encoding='utf-8'))
+
+
+def out_file(what, d):
+    """Saved/AnchorPlans/<stem>-<what>.json: warrens-* for the live data, <revision>-* for a variant (never the live files)."""
+    return OUT / (('warrens' if DATA.resolve() == LIVE_DATA.resolve() else d['revision']) + '-' + what + '.json')
 
 
 def anchor_tag(aid):
@@ -233,9 +251,9 @@ class Grid:
         if z is not None:
             self.zf[j][i] = float(z)
 
-    def stamp_segment(self, a, b, half, value, only=None, square=False, zfn=None):
+    def stamp_segment(self, a, b, half, value, only=None, square=False, zfn=None, keep=None):
         """Cells within half of segment ab; square ends drop the round caps (a ramp's mouth must not bite a neighbour).
-        zfn(t) gives the floor height at parameter t along ab; None keeps each cell's height."""
+        zfn(t) gives the floor height at parameter t along ab; None keeps each cell's height. keep(i, j, t) spares a cell."""
         xa, xb = min(a[0], b[0]) - half, max(a[0], b[0]) + half
         ya, yb = min(a[1], b[1]) - half, max(a[1], b[1]) + half
         for j in range(max(0, int(math.floor((ya - self.y0) / CELL))), min(self.ny, int(math.floor((yb - self.y0) / CELL)) + 1)):
@@ -244,7 +262,7 @@ class Grid:
                 t = seg_param(p, a, b)
                 if square and not 0.0 <= t <= 1.0:
                     continue
-                if seg_dist(p, a, b) <= half and (only is None or self.c[j][i] in only):
+                if seg_dist(p, a, b) <= half and (only is None or self.c[j][i] in only) and (keep is None or not keep(i, j, t)):
                     self.set(i, j, value, None if zfn is None else zfn(max(0.0, min(1.0, t))))
 
     def stamp_shape(self, shape, value, only=None, z=None):
@@ -367,10 +385,79 @@ def treads_of(d):
     for r in d.get('extraRamps', []):
         hi, lo = (r['a'], r['b']) if r['a'][2] > r['b'][2] else (r['b'], r['a'])
         run = math.dist(hi[:2], lo[:2])
-        out.append(dict(id=r['id'], segments=[(tuple(hi), tuple(lo))], width=r['width'], level=level_of_z(lo[2], U),
-                        other_level=level_of_z(hi[2], U) if level_of_z(hi[2], U) != level_of_z(lo[2], U) else None, closedBy=None,
+        level = level_of_z(lo[2], U)
+        if level == 'upper' and lo[2] < U['z']:  # a flight of a chained stair between +2.5 and the upper floor runs inside the main level's height
+            level = 'main'
+        out.append(dict(id=r['id'], segments=[(tuple(hi), tuple(lo))], width=r['width'], level=level,
+                        other_level=level_of_z(hi[2], U) if level_of_z(hi[2], U) != level else None, closedBy=None,
                         degrees=math.degrees(math.atan2(hi[2] - lo[2], run))))
     return out
+
+
+def on_flight_cell(g, i, j, segs, half):
+    """A tread cell that lies on one of these flight segments (inside its square ends): its lerped height stays."""
+    p = g.centre(i, j)
+    return g.c[j][i] == 'tread' and any(seg_dist(p, a[:2], b[:2]) <= half and 0.0 <= seg_param(p, a[:2], b[:2]) <= 1.0 for a, b in segs)
+
+
+WADE_DEPTH = 0.4  # capWadeDepth: a wading pool (depth <= DEEP_WATER) is sunk at most this, so every bank is a step the chef climbs
+
+
+def water_depth(d, w):
+    """The sunk depth of a water body as built (opt-in data capWadeDepth caps a wading pool at WADE_DEPTH)."""
+    depth = w.get('depth', 0.5)
+    return min(depth, WADE_DEPTH) if d.get('capWadeDepth') and depth <= DEEP_WATER else depth
+
+
+def drop_gaps(d):
+    """Authored drops off a floor edge: upper.railGaps (the rafters) and dropGaps (a main- or deep-grid room edge at z)."""
+    U = d.get('upper')
+    out = [dict(g, level='upper') for g in (U or {}).get('railGaps', [])]
+    return out + [dict(g, level=level_of_z(g['z'], U)) for g in d.get('dropGaps', [])]
+
+
+GAP_CLEAR = 1.5  # how far behind a drop gap's line rock is cleared to reach its floor (a diagonal or partial room edge)
+
+
+def open_gap_spans(d, grids):
+    """A drop gap on a diagonal or partial room edge: along its whole span, the rock cells between the gap line and the
+    floor behind it (on the floor's side, within GAP_CLEAR) become floor at that floor's height, so every metre of the gap
+    is an open edge. The floor's side is the one with walkable cells at the gap's height along the span."""
+    for gap in drop_gaps(d):
+        g = grids.get(gap['level'])
+        if g is None:
+            continue
+        a, b = tuple(gap['a']), tuple(gap['b'])
+        L = math.dist(a, b)
+        if L < 1e-6:
+            continue
+        n = (-(b[1] - a[1]) / L, (b[0] - a[0]) / L)
+        N = max(1, int(math.ceil(L / (CELL / 2))))
+        pts = [(a[0] + (b[0] - a[0]) * (k + 0.5) / N, a[1] + (b[1] - a[1]) * (k + 0.5) / N) for k in range(N)]
+
+        def floor_near(p, sgn):  # [(cells to clear), floor z] behind p on side sgn, or None
+            rock = []
+            s = CELL / 2
+            while s <= GAP_CLEAR + 1e-6:
+                i, j = g.cell_of((p[0] + n[0] * sgn * s, p[1] + n[1] * sgn * s))
+                c = g.get(i, j)
+                if c in WALKABLE and ('z' not in gap or abs(g.zf[j][i] - gap['z']) < 0.3):
+                    return rock, g.zf[j][i]
+                if c != 'solid':
+                    return None
+                rock.append((i, j))
+                s += CELL
+            return None
+
+        best = None
+        for sgn in (1, -1):
+            found = [f for f in (floor_near(p, sgn) for p in pts) if f is not None]
+            if found and (best is None or len(found) > len(best)):
+                best = found
+        for rock, z in best or []:
+            for i, j in rock:
+                if g.c[j][i] == 'solid':
+                    g.set(i, j, 'floor', z)
 
 
 def tread_z(tread, pt):
@@ -397,12 +484,24 @@ def barred_ladders(d):
         for side in (-1, 1):
             p = (x + sx * side * CAGE_HALF, y + sy * side * CAGE_HALF)
             stubs.append((p, (p[0] + fx * CAGE_DEPTH, p[1] + fy * CAGE_DEPTH)))
+        bx, by = x - fx * CELL / 2, y - fy * CELL / 2  # a back across the ladder's foot (rock already where it stands on a wall)
+        stubs.append(((bx - sx * CAGE_HALF, by - sy * CAGE_HALF), (bx + sx * CAGE_HALF, by + sy * CAGE_HALF)))
         out.append(dict(ladder=l, gate_at=(x + fx * (CAGE_DEPTH - 0.25), y + fy * (CAGE_DEPTH - 0.25)), yaw=l['yaw'], stubs=stubs,
-                        z=l['baseZ']))
+                        z=l['baseZ'], head=l['baseZ'] + l['height']))
     return out
 
 
 GATE_OPENING = 2.0  # Mars_Gate's fixed opening (k_OpeningWidth); the rest of a wider mouth is walled
+PUZZLE_BUILT_BY = ('barred ladder', 'sluice grate', 'Mourner cache gate', 'Bellkeeper seal pair', 'kitchen shutters')  # kinds manifest() places
+
+
+def unbuilt_puzzle(d, pz):
+    """A puzzle row no builder branch places (its gate stays unwalled): a dial lock without its bellkeeper encounter, or a
+    kind the builder does not know. Key doors (locks[]) and SC barred doors (shortcuts[]) are built from their own tables."""
+    kind = pz['kind']
+    if kind.startswith('Bellkeeper') and not kind.startswith('Bellkeeper seal pair'):
+        return 'bellkeeper' not in d
+    return not (kind.startswith(PUZZLE_BUILT_BY) or 'key door' in kind or kind.startswith('SC'))
 
 
 def gated_mouths(d):
@@ -424,7 +523,7 @@ def gated_mouths(d):
                 out.append(dict(id=pz['id'], wall=(wx0, y0 - CELL, wx1, y0), at=(cx, y0 - CELL / 2), yaw=90.0, axis='x', z=room['z'], level='deep'))
             else:
                 raise AssertionError('the Drowned Gallery must enter the lair across its south edge')
-        elif kind.startswith('Mourner cache gate') or kind.startswith('Bellkeeper'):
+        elif kind.startswith('Mourner cache gate') or (kind.startswith('Bellkeeper') and not unbuilt_puzzle(d, pz)):
             key = 'Mourner' if kind.startswith('Mourner') else 'Bellkeeper'
             niche = next(n for n in d.get('niches', []) if key in n.get('note', ''))
             x0, y0, x1, y1 = niche['rect']
@@ -578,10 +677,18 @@ def rasterize(d):
     for n in d.get('niches', []):
         G(n.get('z', 0)).stamp_shape(n, 'floor', None, n.get('z', 0))
     for w in d.get('water', []):
-        G(w.get('z', 0)).stamp_shape(w, 'floor', None, w.get('z', 0) - w.get('depth', 0.5))
+        G(w.get('z', 0)).stamp_shape(w, 'floor', None, w.get('z', 0) - water_depth(d, w))
     for e in d['entrances']:
         sx, sy, sz = nodes[e['node']]
         G(sz).stamp_rect((max(fp[0], sx - FOYER / 2), max(fp[1], sy - FOYER / 2), min(fp[2], sx + FOYER / 2), min(fp[3], sy + FOYER / 2)), 'floor', sz)
+    for gap in drop_gaps(d):  # a drop's authored landing: floor at its height, open air above it up to the gap's grid
+        if gap.get('landing'):
+            lz, rect = gap['landing']['z'], dict(rect=gap['landing']['rect'])
+            G(lz).stamp_shape(rect, 'floor', None, lz)
+            order = ('deep', 'main', 'upper')
+            for name in order[order.index(level_of_z(lz, U)) + 1:order.index(gap['level']) + 1]:
+                if grids[name]:
+                    grids[name].stamp_shape(rect, 'void')
     # 3. in-level stair treads and extra ramps: lerped heights, square ends; the other grid of an extra ramp opens above it
     treads = treads_of(d)
     for tr in treads:
@@ -589,14 +696,34 @@ def rasterize(d):
         for p, q in tr['segments']:
             g.stamp_segment(p[:2], q[:2], tr['width'] / 2, 'tread', None, True, zfn=lambda t, p=p, q=q: p[2] + (q[2] - p[2]) * t)
             if tr['other_level'] and grids[tr['other_level']]:
-                grids[tr['other_level']].stamp_segment(p[:2], q[:2], tr['width'] / 2, 'void', None, True)
+                o = grids[tr['other_level']]  # a tread of that grid passing well over this flight stays (an over-crossing stair)
+                o.stamp_segment(p[:2], q[:2], tr['width'] / 2, 'void', None, True,
+                                keep=lambda i, j, t, o=o, p=p, q=q: o.c[j][i] == 'tread' and o.zf[j][i] - (p[2] + (q[2] - p[2]) * max(0.0, min(1.0, t))) > d.get('lowRoof', 2.2))
+        for (p, q), (_, r) in zip(tr['segments'], tr['segments'][1:]):  # a bend: a disc, so the square ends leave no notch on its outside
+            g.stamp_segment(q[:2], q[:2], tr['width'] / 2, 'tread', None, False, zfn=lambda t, z=q[2]: z,
+                            keep=lambda i, j, t, g=g, segs=((p, q), (q, r)), w=tr['width'] / 2: on_flight_cell(g, i, j, segs, w))
+    joints = {}  # chained flights (extraRamps[] rows sharing an end on one grid) get the same disc at their joint
+    for tr in treads:
+        for p in (tr['segments'][0][0], tr['segments'][-1][1]):
+            joints.setdefault((round(p[0], 3), round(p[1], 3), round(p[2], 3), tr['level']), []).append(tr)
+    for (x, y, z, level), trs in joints.items():  # the disc fills only the notch outside both flights: a flight keeps its lerped
+        if len(trs) > 1:                          # treads to the joint, so it meets its landing flush (a flat disc left a 0.5 m lip)
+            g = grids[level]
+            segs = [pq for t in trs for pq in t['segments']]
+            g.stamp_segment((x, y), (x, y), min(t['width'] for t in trs) / 2, 'tread', None, False, zfn=lambda t, z=z: z,
+                            keep=lambda i, j, t, g=g, segs=segs, w=min(t['width'] for t in trs) / 2: on_flight_cell(g, i, j, segs, w))
     # 4. dive ramps
     ramps = ramps_of(d)
     for r in ramps:
         gu, gl = grids[r['upper_level']], grids[r['lower_level']]
         gu.stamp_segment(r['upper'], r['start'], r['width'] / 2, 'floor', zfn=lambda t, z=r['top']: z)
         gu.stamp_segment(r['start'], r['open_end'], r['width'] / 2, 'ramp', None, True)
-        gl.stamp_segment(r['upper'], r['end'], r['width'] / 2, 'floor', zfn=lambda t, z=r['bottom']: z)
+        run, s0, s1 = math.dist(r['upper'], r['end']), math.dist(r['upper'], r['start']), math.dist(r['upper'], r['descent_end'])
+        surf = lambda t, r=r, run=run, s0=s0, s1=s1: r['top'] if t * run <= s0 else r['bottom'] + (r['top'] - r['bottom']) * max(0.0, (s1 - t * run) / (s1 - s0))
+        # a walk of the lower grid already passing well under the ramp (below its foot, with headroom) is kept: a tunnel under the dive
+        gl.stamp_segment(r['upper'], r['end'], r['width'] / 2, 'floor', zfn=lambda t, z=r['bottom']: z,
+                         keep=lambda i, j, t, gl=gl, r=r, surf=surf: gl.c[j][i] in WALKABLE and gl.zf[j][i] < r['bottom'] - STEP_UP
+                         and gl.zf[j][i] + d.get('lowRoof', 2.2) + SLAB < surf(max(0.0, min(1.0, t))))
     # 5. crawls at their height, only through rock
     for c in d['crawls']:
         pts = crawl_pts(c)
@@ -610,8 +737,8 @@ def rasterize(d):
         if 'rect' in w:
             g.stamp_rect(w['rect'], 'floor', g.z)
         else:
-            for p, q in zip(w['pts'], w['pts'][1:]):
-                g.stamp_segment(tuple(p), tuple(q), w['width'] / 2, 'floor', zfn=lambda t, z=g.z: z)
+            for p, q in zip(w['pts'], w['pts'][1:]):  # an optional z puts the walk at its own height (a Pit floor below the Deep's base)
+                g.stamp_segment(tuple(p), tuple(q), w['width'] / 2, 'floor', zfn=lambda t, z=w.get('z', g.z): z)
     for c in d.get('cracks', []):
         main.stamp_segment(tuple(c['a']), tuple(c['b']), c['width'] / 2, 'crack', only=('solid',))
     # 7. holes: a grate or an open void on their level; an open main hole is open through the upper level too
@@ -638,8 +765,11 @@ def rasterize(d):
             g.stamp_shape(pl, 'solid')
     for cage in barred_ladders(d):
         g = G(cage['z'])
-        for a, b in cage['stubs']:
-            g.stamp_segment(a, b, CELL / 2 - 0.01, 'solid', None, True)
+        for k, (a, b) in enumerate(cage['stubs']):
+            # the back stub (the last) spares a cell that is the head's own floor on this grid (a loft the ladder climbs onto):
+            # that floor's slab is the stub there, capped at the head, so the head stays mountable
+            keep = (lambda i, j, t, g=g, hz=cage['head']: g.c[j][i] in WALKABLE and abs(g.zf[j][i] - hz) < 0.3) if k == len(cage['stubs']) - 1 else None
+            g.stamp_segment(a, b, CELL / 2 - 0.01, 'solid', None, True, keep=keep)
     for m in gated_mouths(d):  # the mouth row walled, except the gate's opening
         g = grids[m['level']]
         x0, y0, x1, y1 = m['wall']
@@ -652,13 +782,22 @@ def rasterize(d):
                 along = px - cx if m['axis'] == 'x' else py - cy
                 if abs(along) > GATE_OPENING / 2:
                     g.set(i, j, 'solid')
-    # 10. over-crossings: a link or extra walk flagged over is stamped last, capping the lower floor it passes above
+    open_gap_spans(d, grids)
+    # 10. over-crossings: a link or extra walk flagged over is stamped last, capping the lower floor it passes above. A link
+    # flagged ownDeck carries its own deck across an open room (no authored platform): those capped room cells keep their
+    # class and height (the room runs on under it) and get a floor slab at the link's height and rails on its open sides.
+    own_decks = {'main': set(), 'deep': set(), 'upper': set()}
     for link in d['links']:
         if link.get('over'):
             za = nodes[link['a']][2]
             is_low = tuple(sorted((link['a'], link['b']))) in low
-            stamp_over(G(za), polyline(d, link), link['width'] / 2, za, 'low' if is_low else 'floor',
-                       d.get('lowRoof', 2.2) if is_low else link.get('clearHeight', main_top), lambda p, z: deck_over(d, p, z))
+            own = bool(link.get('ownDeck')) and not is_low
+            capped = stamp_over(G(za), polyline(d, link), link['width'] / 2, za, 'low' if is_low else 'floor',
+                                d.get('lowRoof', 2.2) if is_low else link.get('clearHeight', main_top),
+                                (lambda p, z: True) if own else (lambda p, z: deck_over(d, p, z)))
+            if own:
+                g = G(za)
+                own_decks[level_of_z(za, U)] |= {c for c in capped if g.c[c[1]][c[0]] != 'low'}
     for w in d.get('extraWalks', []):
         if w.get('over'):
             g = grids[w.get('level', 'main')]
@@ -718,7 +857,9 @@ def rasterize(d):
 
     # Ceilings. Main: the cell's height plus mainTop, a room's own top, the upper roof over a tall room, the low/crawl lintels.
     tall = [r for r in d['rooms'] if U and r['id'] in U['tallRooms']]
-    topped = [r for r in d['rooms'] if r.get('top') is not None and level_of_z(r['z'], U) == 'main']
+    topped = [r for r in d['rooms'] + d.get('water', []) if r.get('top') is not None and level_of_z(r.get('z', 0), U) == 'main']  # a water body may carry its own top too (a canal's cavern)
+    towering = [r for r in topped if U and r['top'] > U['top'] + 0.01]
+    towers = {}  # main cell -> that room's top (roofed there, walled from the rafter roof up)
     for j in range(main.ny):
         for i in range(main.nx):
             c, p = main.c[j][i], main.centre(i, j)
@@ -729,6 +870,9 @@ def rasterize(d):
             for r in tall:
                 if shape_contains(r, p):
                     t = U['top']
+            for r in towering:  # a room whose own top is above the rafter roof keeps it, tall or not (a cavern over a canal or a shaft)
+                if shape_contains(r, p):
+                    t = towers[(i, j)] = r['top']
             if c == 'low':
                 t = main.zf[j][i] + d.get('lowRoof', 2.2)
             elif c == 'crawl':
@@ -756,17 +900,18 @@ def rasterize(d):
             else:
                 t = -SLAB
             deep.top[j][i] = t
-    return dict(main=main, deep=deep, upper=upper, ramps=ramps, treads=treads, U=U, main_top=main_top, struct_blocked=struct_blocked, sky=sky)
+    return dict(main=main, deep=deep, upper=upper, ramps=ramps, treads=treads, U=U, main_top=main_top, struct_blocked=struct_blocked, sky=sky, own_decks=own_decks, towers=towers)
 
 
 def cell_at(grid, pt):
     return grid.at(pt)
 
 
-def rail_edges(grid, heads, gaps, want_class='floor', hole_of=None, open_class='void', skip_fn=None, blocked=None):
+def rail_edges(grid, heads, gaps, want_class='floor', hole_of=None, open_class='void', skip_fn=None, blocked=None, rail_of=None):
     """Edges between a floor cell and an open cell, merged into runs, minus ladder heads and drop gaps. hole_of(mid)
     returns the hole a main-floor edge belongs to (its rail height); None skips edges that belong to no hole. skip_fn(mid)
-    drops further edges (a ramp's mouth). blocked, when given, collects the (cell, cell) pairs a rail separates."""
+    drops further edges (a ramp's mouth). blocked, when given, collects the (cell, cell) pairs a rail separates. rail_of(floor
+    cell centre, open side point) gives an edge's own rail height (an upper hole's or platform's `rail`), None for GALLERY_RAIL."""
     def skip(mx, my):
         return any(math.hypot(mx - hx, my - hy) < 0.9 for hx, hy in heads) or any(seg_dist((mx, my), a, b) < 0.3 for a, b in gaps) \
             or (skip_fn is not None and skip_fn((mx, my)))
@@ -784,6 +929,10 @@ def rail_edges(grid, heads, gaps, want_class='floor', hole_of=None, open_class='
                 if skip(*mid):
                     continue
                 rail = GALLERY_RAIL
+                if rail_of is not None:
+                    own = rail_of((x0 + CELL / 2, y0 + CELL / 2), (mid[0] + di * 0.25, mid[1] + dj * 0.25))
+                    if own is not None:
+                        rail = own
                 if hole_of is not None:
                     hole = hole_of((mid[0] + di * 0.25, mid[1] + dj * 0.25))
                     if hole is None:
@@ -807,6 +956,120 @@ def rail_edges(grid, heads, gaps, want_class='floor', hole_of=None, open_class='
     return out
 
 
+LEDGE_DROP = 2.0  # a walkable edge dropping further than this gets a rail (the 1.5 m court rims stay open)
+
+
+def column_landing(R, p, z):
+    """The highest surface over XY p, on any of the three grids, a chef standing at height z could step or fall onto:
+    a walkable cell's floor, an over-crossing's deck, a rock top; None when there is none below z + STEP_UP."""
+    U = R['U']
+    best = None
+    for name in ('upper', 'main', 'deep'):
+        g = R[name]
+        if g is None:
+            continue
+        i, j = g.cell_of(p)
+        c = g.get(i, j)
+        cands = []
+        if c in WALKABLE:
+            cands.append(g.zf[j][i])
+        if (i, j) in g.caps:
+            cands.append(g.caps[(i, j)][0])
+        if c == 'solid':
+            cands.append({'upper': U['top'] if U else WALL_TOP, 'main': R['main_top'], 'deep': g.top[j][i]}[name])
+        for s in cands:
+            if s <= z + STEP_UP + 1e-6 and (best is None or s > best):
+                best = s
+    return best
+
+
+def ledge_rails(d, R, boxes, rails, rail_blocked, upper_railed):
+    """A rail (data ledgeRail, default 1 m; deepWaterRail, default ledgeRail, on a deep-water edge) along every walkable cell edge that drops more than LEDGE_DROP to a lower walkable cell or into a void (the
+    landing found through the grids below, so a flight's head onto another grid's landing is no drop), and along every edge
+    standing more than STEP_UP above a deep-water bed (depth > DEEP_WATER) of another water body (a shallow ford beside a deep
+    canal included). Never on an edge already railed, an authored rail gap, a ladder head, a crawl or low tunnel mouth, the
+    rim of a hole with its own rail height, or a deep-water edge under an over-crossing. The rails close their edges for the
+    leak search. A flight's side over open air is a cell edge like any other. The ledge rule is opt-in (data railLedges); the
+    deep-water rule always applies."""
+    U = R['U']
+    ledge_rail = d.get('ledgeRail', HOLE_RAIL)  # the data's ledge rail height (a 0.6 m parapet where the Pit must be seen)
+    water_rail = d.get('deepWaterRail', ledge_rail)  # the deep-water rule's own height (deep water stays jump-proof: its bed has no way out)
+    ledges = bool(d.get('railLedges'))  # opt-in: the live layout keeps two unrailed 2.5 m ledges (main floor +2.5 over the 0 floor at y 53, x 54..66; x -3, y 37.5)
+    gaps = [(tuple(g['a']), tuple(g['b'])) for g in (U or {}).get('railGaps', [])]
+    floor_gaps = [(tuple(g['a']), tuple(g['b']), g['z']) for g in d.get('dropGaps', [])]  # a room edge's authored drop: open at its height
+    heads = [(l['at'][0], l['at'][1], l['baseZ'] + l['height']) for l in d.get('ladders', [])]
+    own_rail_holes = [h for h in d.get('holes', []) if h.get('rail') is not None and h['kind'] != 'grate']
+    bodies = {}  # (level, i, j) -> (water index, deep): the cells of each water body at its sunk bed
+    for level in ('main', 'deep'):
+        g = R[level]
+        for k, w in enumerate(d.get('water', [])):
+            if level_of_z(w.get('z', 0), U) != level:
+                continue
+            bed = w.get('z', 0) - water_depth(d, w)
+            x0, y0, x1, y1 = shape_bounds(w)
+            (i0, j0), (i1, j1) = g.cell_of((x0, y0)), g.cell_of((x1, y1))
+            for j in range(max(0, j0), min(g.ny, j1 + 1)):
+                for i in range(max(0, i0), min(g.nx, i1 + 1)):
+                    if g.c[j][i] in WALKABLE and abs(g.zf[j][i] - bed) < 1e-6 and shape_contains(w, g.centre(i, j)):
+                        bodies[(level, i, j)] = (k, w.get('depth', 0.5) > DEEP_WATER)
+    pieces = {}
+    for level in ('main', 'deep', 'upper'):
+        g = R[level]
+        if g is None:
+            continue
+        done = rail_blocked[level] | (upper_railed if level == 'upper' else set())
+        for j in range(g.ny):
+            for i in range(g.nx):
+                c = g.c[j][i]
+                if c not in WALKABLE or c in ('crawl', 'low'):
+                    continue
+                za = g.zf[j][i]
+                x0, y0 = g.x0 + i * CELL, g.y0 + j * CELL
+                for di, dj, kind, line, start in ((0, -1, 'h', y0, x0), (0, 1, 'h', y0 + CELL, x0), (-1, 0, 'v', x0, y0), (1, 0, 'v', x0 + CELL, y0)):
+                    n = (i + di, j + dj)
+                    edge = frozenset(((i, j), n))
+                    cb = g.get(*n)
+                    if edge in done or (cb not in WALKABLE and cb != 'void') or cb in ('crawl', 'low'):
+                        continue
+                    mid = (start + CELL / 2, line) if kind == 'h' else (line, start + CELL / 2)
+                    if any(seg_dist(mid, a, b) < 0.3 for a, b in gaps) or any(seg_dist(mid, a, b) < 0.3 and abs(gz - za) < 0.3 for a, b, gz in floor_gaps) or \
+                            any(math.hypot(mid[0] - hx, mid[1] - hy) < 0.9 and abs(hz - za) < 0.3 for hx, hy, hz in heads):
+                        continue
+                    p = g.centre(*n)
+                    if cb == 'void' and c == 'floor' and any(h['level'] == level for h in own_rail_holes if shape_contains(h, p)):
+                        continue  # that hole's own rail (a main floor's rim; a flight's side gets the 1 m rail)
+                    cap = g.caps.get(n)
+                    if cb in WALKABLE and g.zf[n[1]][n[0]] > za + STEP_UP and not (cap and cap[0] <= za + STEP_UP):
+                        continue  # a step up, not a drop
+                    landing = column_landing(R, p, za)
+                    drop = math.inf if landing is None else za - landing
+                    body = bodies.get((level,) + n)
+                    water = body is not None and body[1] and landing is not None and abs(landing - g.zf[n[1]][n[0]]) < 1e-6 \
+                        and (i, j) not in g.caps and bodies.get((level, i, j), (None,))[0] != body[0]
+                    wet = water and drop > STEP_UP
+                    if not ((ledges and drop > LEDGE_DROP) or wet):
+                        continue
+                    rail_blocked[level].add(edge)
+                    done.add(edge)
+                    pieces.setdefault((kind, round(line, 3), round(za, 3), water_rail if wet else ledge_rail), []).append(start)
+    for (kind, line, z, height), runs in sorted(pieces.items()):
+        runs.sort()
+        run0 = prev = runs[0]
+        for st in runs[1:] + [None]:
+            if st is not None and abs(st - prev - CELL) < 1e-6:
+                prev = st
+                continue
+            a, b = run0, prev + CELL
+            x0, y0, x1, y1 = (a, line, b, line) if kind == 'h' else (line, a, line, b)
+            rails.append((x0, y0, x1, y1))
+            if x0 == x1:
+                slabs(boxes, 'gallery', [(x0 - 0.05, y0, x0 + 0.05, y1)], z, z + height)
+            else:
+                slabs(boxes, 'gallery', [(x0, y0 - 0.05, x1, y0 + 0.05)], z, z + height)
+            if st is not None:
+                run0 = prev = st
+
+
 def ladder_checks(d, R):
     """Each ladder: floor in front of its foot, open air in front of it at the top level, a landing behind its head."""
     U = d.get('upper')
@@ -823,7 +1086,9 @@ def ladder_checks(d, R):
             errors.append(l['id'] + ': no floor in front of the foot')
         elif abs(base.z_of((x + fx * 0.6, y + fy * 0.6)) - l['baseZ']) > 0.05:
             errors.append(l['id'] + ': the floor in front of the foot is not at its base height')
-        if cell_at(top, (x + fx * 0.45, y + fy * 0.45)) != 'void':
+        front = (x + fx * 0.45, y + fy * 0.45)
+        ledge = top is base and cell_at(base, front) in ('floor', 'grate') and abs(base.z_of(front) - l['baseZ']) <= 0.05
+        if cell_at(top, front) != 'void' and not ledge:  # a ladder up a ledge on one grid climbs in front of its own foot floor
             errors.append(l['id'] + ': the climb is roofed (no opening in front of the ladder at the top)')
         if cell_at(top, (x - fx * 0.75, y - fy * 0.75)) not in ('floor', 'grate'):
             errors.append(l['id'] + ': no landing behind the head')
@@ -893,8 +1158,19 @@ def walk_breaks(d, R):
         if link['kind'] == 'walk' and za == zb:
             lines.append((link['a'] + '-' + link['b'], polyline(d, link), R[level_of_z(za, U)]))
     for tr in R['treads']:
-        lines.append((tr['id'], [p[:2] for p, q in tr['segments']] + [tr['segments'][-1][1][:2]], R[tr['level']]))
-    for name, pts, grid in lines:
+        lines.append((tr['id'], [p[:2] for p, q in tr['segments']] + [tr['segments'][-1][1][:2]], R[tr['level']], R[tr['other_level']] if tr['other_level'] else None))
+    # A flight that crosses grids opens its other grid ('void'): a walk stepping onto that opening steps onto the flight,
+    # as a walk onto a dive ramp's cut does.
+    flights = [(p[:2], q[:2], tr['width'] / 2) for tr in R['treads'] if tr['other_level'] for p, q in tr['segments']]
+
+    def on_flight(h):
+        return any(seg_dist(h, a, b) <= w and -1e-6 <= seg_param(h, a, b) <= 1 + 1e-6 for a, b, w in flights)
+
+    def walkable(grid, h):
+        c = grid.at(h)
+        return c in WALKABLE or c == 'ramp' or (c == 'void' and on_flight(grid.centre(*grid.cell_of(h))))
+
+    for name, pts, grid, *other in lines:  # a cross-grid flight's line may stand on either of its grids (its head joins the other's floor)
         if grid is None:
             out.append(name + ' (no grid)')
             continue
@@ -902,7 +1178,7 @@ def walk_breaks(d, R):
             seg = math.dist(p, q)
             n = max(1, int(seg / 0.25))
             hits = [(p[0] + (q[0] - p[0]) * k / n, p[1] + (q[1] - p[1]) * k / n) for k in range(n + 1)]
-            if any(grid.at(h) not in WALKABLE and grid.at(h) != 'ramp' for h in hits):
+            if any(not walkable(grid, h) and not (other and other[0] and walkable(other[0], h)) for h in hits):
                 out.append(name)
                 break
     return out
@@ -1071,6 +1347,468 @@ def render_groups(boxes):
     return groups
 
 
+FLOORISH = ('floor', 'ramp', 'gallery', 'grate', 'water', 'hearth', 'inlay')  # a box of these kinds stands at its top
+
+
+def tile_of(tiles, p, z):
+    """The instance whose bounds hold p (x, y), the one with z nearest where several do; None is the assembly."""
+    inside = [t for t in tiles if shape_contains(t, p)]
+    return min(inside, key=lambda t: abs(t['z'] - z))['id'] if inside else None
+
+
+def assign_tiles(man, tiles):
+    """Every box (by its centre: a merged box keeps its extent), light, start, entity and pocket gets its tile; returns counts."""
+    def box_z(b):
+        if b['pitch']:
+            return b['centre'][2]
+        half = b['size'][2] / 2
+        return b['centre'][2] + half if b['kind'] in FLOORISH else b['centre'][2] - half + (SLAB if b['kind'] in ('wall', 'roof') else 0.0)
+
+    rows = [('boxes', b, b['centre'][:2], box_z(b)) for b in man['boxes']]
+    rows += [('lights', v, v['at'][:2], v['at'][2] - 1.5) for v in man['lights']]
+    rows += [('starts', v, v['at'][:2], v['at'][2] - 0.92) for v in man['starts']]
+    rows += [('entities', v, v['at'][:2], v['at'][2]) for v in man['entities']]
+    rows += [('pockets', v, v['at'][:2], v['at'][2]) for v in man['pockets']]
+    counts = {}
+    for what, v, p, z in rows:
+        # World items (the packs) stay in the assembly: the lantern command and the stranded-item check list the persistent
+        # level's actors only (EditorActorSubsystem.GetAllLevelActors does not reach into Level Instances). Player starts stay
+        # there too: the game mode picks its start before the Level Instances have streamed in (a start inside a tile is not
+        # found: "[ExpeditionGameMode] no PlayerStart tagged ...", and the chef spawns at the world origin).
+        v['tile'] = None if what == 'starts' or (what == 'entities' and v['cls'].startswith('Mars_WorldItem_')) else tile_of(tiles, p, z)
+        c = counts.setdefault(v['tile'] or 'assembly', dict(boxes=0, lights=0, starts=0, entities=0, pockets=0))
+        c[what] += 1
+    return counts
+
+
+# --- P5: the built boxes as collision, for the manifest-time movement and view checks (opt-in data movementChecks) ------
+CHEF_STEP = 0.45  # the chef's max_step_height (Script/PlayerCharacter/Mars_PlayerCharacter_Assets.as); STEP_UP stays the leak search's
+HEADROOM = 2.0  # clear height a walk line keeps over its floor
+DROP_FALL = 3.0  # the longest authored drop
+DROP_REACH = 1.5  # a drop's landing lies within this of the edge
+DIVE_MAX, STAIR_MAX = 18.0, 26.6  # the kit's limits: a dive ramp; an in-level stair or a flight
+EYE = 1.1  # a view's eye over its spot (the chef's; a rail of any height blocks it, as the editor's WorldStatic trace does)
+PROP_KINDS = ('prop', 'root', 'candle', 'pier')
+WINDOW_SILL = 1.2  # a window's sill over the higher floor beside it (a parapet, never a step)
+WINDOW_DEPTH = 12.0  # the most rock a window cuts through on one side
+
+
+def box_frame(b, v, translate=True):
+    """A world vector (a point when translate) in box b's local frame (origin at its centre, axes before pitch and yaw)."""
+    yaw, pitch = math.radians(b['yaw']), math.radians(b['pitch'])
+    dx, dy, dz = (v[k] - b['centre'][k] for k in range(3)) if translate else v
+    px, ly = dx * math.cos(yaw) + dy * math.sin(yaw), -dx * math.sin(yaw) + dy * math.cos(yaw)
+    return px * math.cos(pitch) + dz * math.sin(pitch), ly, -px * math.sin(pitch) + dz * math.cos(pitch)
+
+
+class Solids:
+    """The manifest's colliding boxes, bucketed on a BUCKET m plan grid: what a chef stands on, walks into or looks past."""
+    BUCKET = 2.0
+
+    def __init__(self, boxes, skip=lambda b: False):
+        self.items, self.buckets = [], {}
+        for b in boxes:
+            if b.get('collision', COLLISION.get(b['kind'], 'BlockAll')) == 'NoCollision' or skip(b):
+                continue
+            pts = list(box_corners(b))
+            lo, hi = [min(p[k] for p in pts) for k in range(3)], [max(p[k] for p in pts) for k in range(3)]
+            for bx in range(int(math.floor(lo[0] / self.BUCKET)), int(math.floor(hi[0] / self.BUCKET)) + 1):
+                for by in range(int(math.floor(lo[1] / self.BUCKET)), int(math.floor(hi[1] / self.BUCKET)) + 1):
+                    self.buckets.setdefault((bx, by), []).append(len(self.items))
+            self.items.append(b)
+
+    def near(self, x, y):
+        return self.buckets.get((int(math.floor(x / self.BUCKET)), int(math.floor(y / self.BUCKET))), [])
+
+    def span(self, b, x, y, pad=0.0):
+        """(bottom, top) of box b over plan point (x, y), or None (a pitched box: its tilted faces there)."""
+        px, ly, _ = box_frame(b, (x, y, b['centre'][2]))
+        sx, sy, sz = (s / 2 for s in b['size'])
+        if abs(ly) > sy + pad:
+            return None
+        if not b['pitch']:
+            return (b['centre'][2] - sz, b['centre'][2] + sz) if abs(px) <= sx + pad else None
+        p = math.radians(b['pitch'])
+        xt, xb = (px + sz * math.sin(p)) / math.cos(p), (px - sz * math.sin(p)) / math.cos(p)
+        top = b['centre'][2] + xt * math.sin(p) + sz * math.cos(p) if abs(xt) <= sx + pad else None
+        bot = b['centre'][2] + xb * math.sin(p) - sz * math.cos(p) if abs(xb) <= sx + pad else None
+        if top is None and bot is None:
+            return None
+        return (bot if bot is not None else top - 2 * sz, top if top is not None else bot + 2 * sz)
+
+    def column(self, x, y, pad=0.0):
+        """[(bottom, top, box)] of every box over (x, y)."""
+        out = []
+        for k in self.near(x, y):
+            s = self.span(self.items[k], x, y, pad)
+            if s:
+                out.append((s[0], s[1], self.items[k]))
+        return out
+
+    def ray(self, a, b, skip=lambda bx: False):
+        """The first box the segment a -> b enters: (t along it, hit point, box), or None."""
+        d = [b[k] - a[k] for k in range(3)]
+        n = max(1, int(math.dist(a[:2], b[:2]) / 1.0))
+        cand = set()
+        for s in range(n + 1):
+            x, y = a[0] + d[0] * s / n, a[1] + d[1] * s / n
+            for dx in (-1, 0, 1):
+                for dy in (-1, 0, 1):
+                    cand.update(self.near(x + dx * self.BUCKET, y + dy * self.BUCKET))
+        best = None
+        for k in cand:
+            bx = self.items[k]
+            if skip(bx):
+                continue
+            o, v = box_frame(bx, a), box_frame(bx, d, translate=False)
+            t0, t1 = 0.0, 1.0
+            for axis in range(3):
+                half = bx['size'][axis] / 2
+                if abs(v[axis]) < 1e-12:
+                    if abs(o[axis]) > half:
+                        t0 = 2.0
+                        break
+                    continue
+                ta, tb = sorted(((-half - o[axis]) / v[axis], (half - o[axis]) / v[axis]))
+                t0, t1 = max(t0, ta), min(t1, tb)
+                if t0 > t1:
+                    break
+            if t0 <= t1 and t0 <= 1.0 and (best is None or t0 < best[0]):
+                best = (t0, tuple(a[k2] + d[k2] * t0 for k2 in range(3)), bx)
+        return best
+
+
+def box_label(b):
+    c, s = b['centre'], b['size']
+    return f"{b['kind']}{' ' + b['sourceId'] if b.get('sourceId') else ''} ({c[0]:.2f}, {c[1]:.2f}, {c[2]:.2f}) {s[0]:g} x {s[1]:g} x {s[2]:g}"
+
+
+def cut_windows(d, R, boxes):
+    """windows[]: along the wall edge a -> b, every wall box between z sill and head is cut away through the rock to open air on
+    both sides (the rock measured cell by cell along the edge's normal, on whichever grids the band meets). The sill stands at least
+    WINDOW_SILL over the higher floor beside it, so the window is a parapet, never a step."""
+    if not d.get('windows'):
+        return boxes
+    main = R['main']
+    rock = Solids([b for b in boxes if b['kind'] == 'wall'])
+    for w in d['windows']:
+        a, b, sill, head = tuple(w['a']), tuple(w['b']), w['sill'], w['head']
+        assert head > sill, 'window ' + w['id'] + ': head under sill'
+        L = math.dist(a, b)
+        tx, ty = (b[0] - a[0]) / L, (b[1] - a[1]) / L
+        cells, floors = set(), []
+        band = lambda p: any(lo < head - 0.01 and hi > sill + 0.01 for lo, hi, _ in rock.column(*p))
+        for k in range(int(L / (CELL / 2)) + 1):
+            o = (a[0] + tx * k * CELL / 2, a[1] + ty * k * CELL / 2)
+            for side in (1, -1):
+                s = CELL / 2
+                while s <= WINDOW_DEPTH and band((o[0] - ty * side * s, o[1] + tx * side * s)):
+                    cells.add(main.cell_of((o[0] - ty * side * s, o[1] + tx * side * s)))
+                    s += CELL / 2
+                assert s <= WINDOW_DEPTH, 'window ' + w['id'] + f': more than {WINDOW_DEPTH} m of rock on one side at ({o[0]:.1f}, {o[1]:.1f})'
+                p = (o[0] - ty * side * s, o[1] + tx * side * s)  # the open cell beyond the rock: its floors (any grid) under the head
+                floors += [g.z_of(p) for g in (R['main'], R['deep'], R['upper']) if g and g.at(p) in WALKABLE and g.z_of(p) < head]
+        if floors:
+            assert sill >= max(floors) + WINDOW_SILL - 1e-6, 'window ' + w['id'] + f': sill {sill} under {max(floors) + WINDOW_SILL} (the higher floor {max(floors)} + {WINDOW_SILL})'
+        mark = Grid(d['footprint'], None, 0.0)
+        for i, j in cells:
+            if mark.inside(i, j):
+                mark.set(i, j, True)
+        rects = mark.rects(True)
+        out = []
+        for index, e in enumerate(boxes):
+            if e['kind'] != 'wall' or e['yaw'] or e['pitch']:
+                out.append(e)
+                continue
+            source = dict(id='raster', at=[e['centre'][0], e['centre'][1], e['centre'][2] - e['size'][2] / 2], size=e['size'])
+            cuts = [dict(kind='floor', rect=r, z=(sill + head) / 2, throughDepth=(head - sill) / 2, sourceIds=['raster']) for r in rects]
+            pieces = structure_pieces(source, cuts)
+            if len(pieces) == 1 and all(abs(pieces[0][0][k] - (e['centre'][k] - e['size'][k] / 2)) < 1e-6 and abs(pieces[0][1][k] - (e['centre'][k] + e['size'][k] / 2)) < 1e-6 for k in range(3)):
+                out.append(e)
+                continue
+            for lo, hi in pieces:
+                piece = box('wall', [(lo[k] + hi[k]) / 2 for k in range(3)], [hi[k] - lo[k] for k in range(3)])
+                piece.update({k: v for k, v in e.items() if k in ('material', 'sourceId')})
+                out.append(piece)
+        boxes = out
+    return boxes
+
+
+def slope_errors(d):
+    """Dives over DIVE_MAX and in-level stairs and flights over STAIR_MAX, measured on the ramp as built (a dive from its start
+    RAMP_START past the upper node, or its rampOverrides start, to its descent end)."""
+    out = []
+    nodes = d['nodes']
+    for r in ramps_of(d):
+        if r['degrees'] > DIVE_MAX + 0.05:
+            a, b = r['link']['a'], r['link']['b']
+            run = math.dist(r['start'], r['descent_end'])
+            authored = math.degrees(math.atan2(abs(nodes[a][2] - nodes[b][2]), math.dist(nodes[a][:2], nodes[b][:2])))
+            out.append(f"dive {a}-{b}: {r['degrees']:.1f} deg > {DIVE_MAX:g} on the built ramp ({r['top'] - r['bottom']:g} m over {run:.1f} m from its start, "
+                       f"{math.dist(r['upper'], r['start']):.1f} m past the upper node; node to node {authored:.1f} deg)")
+    flights = {r['id'] for r in d.get('extraRamps', [])}
+    for tr in treads_of(d):
+        if tr['degrees'] > STAIR_MAX + 0.05:
+            run = sum(math.dist(p[:2], q[:2]) for p, q in tr['segments'])
+            rise = abs(tr['segments'][0][0][2] - tr['segments'][-1][1][2])
+            out.append(f"{'flight' if tr['id'] in flights else 'stair'} {tr['id']}: {tr['degrees']:.1f} deg > {STAIR_MAX:g} ({rise:g} m over {run:.1f} m, as built)")
+    return out
+
+
+def walk_lines(d, R):
+    """Every built walk line as (name, [(x, y, z)] every <= 0.5 m): plan walks, extra walks, upper walkways, in-level stairs and
+    flights (lerped), dives as built (flat to the ramp start, down to the descent end, flat to the foot)."""
+    U = d.get('upper')
+    nodes = d['nodes']
+    raw = []
+    for link in d['links']:
+        za, zb = nodes[link['a']][2], nodes[link['b']][2]
+        if link['kind'] == 'walk' and abs(za - zb) < 0.01:
+            raw.append((link['a'] + '-' + link['b'], [p + (za,) for p in polyline(d, link)]))
+    for tr in R['treads']:
+        raw.append((tr['id'], [tr['segments'][0][0]] + [q for p, q in tr['segments']]))
+    for r in R['ramps']:
+        raw.append((r['link']['a'] + '-' + r['link']['b'], [r['upper'] + (r['top'],), r['start'] + (r['top'],), r['descent_end'] + (r['bottom'],), r['end'] + (r['bottom'],)]))
+    for w in d.get('extraWalks', []):
+        if 'pts' in w:
+            wz = w.get('z', {'deep': DEEP_Z, 'upper': U['z'] if U else 0.0}.get(w.get('level'), 0.0))
+            raw.append((w['id'], [tuple(p[:2]) + (wz,) for p in w['pts']]))
+    for w in (U or {}).get('walkways', []):
+        raw.append((w['id'], [tuple(p[:2]) + (U['z'],) for p in w['pts']]))
+    out = []
+    for name, pts in raw:
+        dense = [tuple(pts[0])]
+        for p, q in zip(pts, pts[1:]):
+            n = max(1, int(math.ceil(math.dist(p[:2], q[:2]) / 0.5)))
+            dense += [tuple(p[k] + (q[k] - p[k]) * s / n for k in range(3)) for s in range(1, n + 1)]
+        out.append((name, dense))
+    return out
+
+
+def movement_checks(d, R, boxes, entities, rail_blocked):
+    """P5 manifest checks on the built boxes (opt-in data movementChecks). Returns the height-aware walkBreaks entries and the
+    dropErrors, blockedViews, slopeErrors, propErrors lists."""
+    U = d.get('upper')
+    solid = Solids(boxes, skip=lambda b: b['kind'] in PROP_KINDS or b['kind'] == 'hearth')  # props are propErrors; the hearth marks K
+    lines = walk_lines(d, R)
+    breaks, drops, views, props = [], [], [], []
+
+    def emit(name, runs, what):
+        for run in runs:
+            worst = max(run, key=lambda r: r[0])
+            breaks.append(f'{name}: {what(worst)}' + (f' ({len(run)} samples)' if len(run) > 1 else ''))
+
+    # 1/7. steps over CHEF_STEP, a floor off the line's height, anything under HEADROOM over the floor (rails, lips, walls, roofs,
+    # an over-crossing's slab), per line; consecutive offending samples are one entry at the worst
+    floors = {}
+    for name, pts in lines:
+        prev, issues = None, {'step': [], 'off': [], 'low': [], 'none': []}
+        hs = []
+        for x, y, ze in pts:
+            col = solid.column(x, y)
+            under = [c for c in col if c[1] <= ze + 0.6]
+            if not under:
+                issues['none'].append((0, x, y, ze))
+                hs.append(None)
+                prev = None
+                continue
+            h = max(c[1] for c in under)
+            hs.append(h)
+            if abs(h - ze) > CHEF_STEP + 0.05:
+                issues['off'].append((abs(h - ze), x, y, h, ze))
+            if prev is not None and abs(h - prev) > CHEF_STEP + 0.02:
+                issues['step'].append((abs(h - prev), x, y, h, prev))
+            over = [c for c in col if c[1] > h + CHEF_STEP + 0.02 and c[0] < h + HEADROOM - 0.02]
+            if over:
+                lo, hi, ob = min(over, key=lambda c: c[0])
+                issues['low'].append((-max(0.0, lo - h), x, y, h, ob))
+            elif prev is not None:  # a thin rail or a wall edge between two samples: rays at knee, chest and head height
+                for off in (CHEF_STEP + 0.1, 1.2, HEADROOM - 0.05):
+                    hit = solid.ray((px, py, prev + off), (x, y, h + off))
+                    if hit:
+                        issues['low'].append((-off, x, y, h, hit[2]))
+                        break
+            prev, px, py = h, x, y
+        floors[name] = list(zip(pts, hs))
+        for kind, rows in issues.items():
+            runs, cur = [], []
+            idx = {(r[1], r[2]) for r in rows}
+            for x, y, _ in pts:
+                if (x, y) in idx:
+                    cur.append(next(r for r in rows if (r[1], r[2]) == (x, y)))
+                elif cur:
+                    runs.append(cur)
+                    cur = []
+            if cur:
+                runs.append(cur)
+            if kind == 'step':
+                emit(name, runs, lambda r: f'a {r[0]:.2f} m step ({r[4]:.2f} -> {r[3]:.2f}) at ({r[1]:.2f}, {r[2]:.2f}) (chef steps {CHEF_STEP:g})')
+            elif kind == 'off':
+                emit(name, runs, lambda r: f'the floor at ({r[1]:.2f}, {r[2]:.2f}) is {r[3]:.2f}, {r[0]:.2f} m off the line ({r[4]:.2f})')
+            elif kind == 'low':
+                emit(name, runs, lambda r: f'{box_label(r[4])} at ({r[1]:.2f}, {r[2]:.2f}), {-r[0]:.2f} m over the floor {r[3]:.2f} (clear height {HEADROOM:g})')
+            else:
+                emit(name, runs, lambda r: f'no floor under ({r[1]:.2f}, {r[2]:.2f}, {r[3]:.2f})')
+    # 7. a route gate's leaf standing on another route (its own link, flight or dive excepted; any gate on a line at another height)
+    closers = {l['closedBy']: l for l in d['links'] if l['closedBy']}
+    for e in entities:
+        if not (any(e['cls'].endswith(c) for c in GATE_CLASSES) or '_KeyDoor_' in e['cls']):
+            continue
+        gx, gy, gz = e['at']
+        a = math.radians(e['yaw'])
+        half = e['props'].get('SpanCm', e.get('spanCm', 0.0)) / 200.0
+        own, ends = set(), []  # its own lines; the nodes it guards (a line leaving such a node starts beside the leaf)
+        if e['note'] in closers:
+            l = closers[e['note']]
+            own.add(l['a'] + '-' + l['b'])
+            ends += [d['nodes'][l['a']][:2], d['nodes'][l['b']][:2]]
+            own |= {tr['id'] for tr in R['treads'] if any(seg_dist((gx, gy), p[:2], q[:2]) <= 1.0 for p, q in tr['segments'])}
+        for en in d['entrances']:
+            if en['anchorId'] == e['note']:
+                own |= {l['a'] + '-' + l['b'] for l in d['links'] if en['node'] in (l['a'], l['b'])}
+                ends.append(d['nodes'][en['node']][:2])
+        for name, rows in floors.items():
+            if name in own:
+                continue
+            for (x, y, ze), h in rows:
+                along = (x - gx) * math.cos(a) + (y - gy) * math.sin(a)
+                lat = -(x - gx) * math.sin(a) + (y - gy) * math.cos(a)
+                if h is None or abs(along) > 0.35 or abs(lat) > half or any(math.dist((x, y), q) <= 1.0 for q in ends):
+                    continue
+                if own and gz - HEADROOM < h < gz + 2.5 or not own and (gz - HEADROOM < h < gz - 0.5 or gz + 0.5 < h < gz + 2.5):
+                    breaks.append(f"{name}: the gate {e['note']} ({gx:.2f}, {gy:.2f}, {gz:.2f}) stands across it at ({x:.2f}, {y:.2f}, {h:.2f})")
+                    break
+    # 1. wading banks: a shallow pool's bed cell beside walkable floor more than a step up, unrailed
+    for level in ('main', 'deep'):
+        g = R[level]
+        for w in d.get('water', []):
+            if level_of_z(w.get('z', 0), U) != level or w.get('depth', 0.5) > DEEP_WATER:
+                continue
+            bed = w.get('z', 0) - water_depth(d, w)
+            x0, y0, x1, y1 = shape_bounds(w)
+            (i0, j0), (i1, j1) = g.cell_of((x0, y0)), g.cell_of((x1, y1))
+            high = []
+            for j in range(max(0, j0), min(g.ny, j1 + 1)):
+                for i in range(max(0, i0), min(g.nx, i1 + 1)):
+                    if g.c[j][i] not in WALKABLE or abs(g.zf[j][i] - bed) > 1e-6 or not shape_contains(w, g.centre(i, j)):
+                        continue
+                    for n in ((i + 1, j), (i - 1, j), (i, j + 1), (i, j - 1)):
+                        if g.get(*n) in ('floor', 'low', 'grate') and g.zf[n[1]][n[0]] - bed > CHEF_STEP + 1e-6 and frozenset(((i, j), n)) not in rail_blocked[level]:
+                            high.append((g.zf[n[1]][n[0]] - bed, (g.centre(i, j)[0] + g.centre(*n)[0]) / 2, (g.centre(i, j)[1] + g.centre(*n)[1]) / 2))
+            if high:
+                worst = max(high)
+                breaks.append(f"water {w['id']}: a {worst[0]:.2f} m bank on {len(high)} bed edges, e.g. ({worst[1]:.2f}, {worst[2]:.2f}) (bed {bed:g}; chef steps {CHEF_STEP:g})")
+
+    # 2. drops: from the edge outward, the first column lower than a step is the landing: walkable, at most DROP_FALL down, within
+    # DROP_REACH, with nothing in the way at the drop's height before it
+    def drop_probe(o, gz, n, reach=DROP_REACH):
+        s = 0.25
+        while s <= reach + 1e-6:
+            p = (o[0] + n[0] * s, o[1] + n[1] * s)
+            col = solid.column(*p)
+            wall = [c for c in col if c[1] > gz + CHEF_STEP + 0.02 and c[0] < gz + HEADROOM]
+            if wall:
+                return f'walled by {box_label(min(wall, key=lambda c: c[0])[2])} {s:g} m out at ({p[0]:.2f}, {p[1]:.2f})'
+            under = [c for c in col if c[1] <= gz + CHEF_STEP + 0.02]
+            land = max(under, key=lambda c: c[1]) if under else None
+            if land is None or land[1] < gz - CHEF_STEP:
+                if land is None:
+                    return f'falls into nothing {s:g} m out at ({p[0]:.2f}, {p[1]:.2f})'
+                if gz - land[1] > DROP_FALL + 0.01:
+                    return f'falls {gz - land[1]:.2f} m (more than {DROP_FALL:g}) onto {box_label(land[2])} at ({p[0]:.2f}, {p[1]:.2f}, {land[1]:.2f})'
+                if land[2]['kind'] == 'wall':
+                    return f'lands on rock ({box_label(land[2])}) at ({p[0]:.2f}, {p[1]:.2f}, {land[1]:.2f})'
+                return None
+            s += 0.25
+        return f'not a drop: the floor stays within a step of {gz:g} for {reach:g} m beyond the edge (a stair or flight head)'
+
+    gaps = drop_gaps(d)
+    for gap in gaps:
+        a, b = tuple(gap['a']), tuple(gap['b'])
+        L = math.dist(a, b)
+        mid, n = ((a[0] + b[0]) / 2, (a[1] + b[1]) / 2), (-(b[1] - a[1]) / L, (b[0] - a[0]) / L)
+        frame = None
+        order = [gap['level']] + [lv for lv in ('upper', 'main', 'deep') if lv != gap['level']] if 'z' not in gap else [gap['level']]
+        for lv in order:
+            g = R[lv]
+            if g is None:
+                continue
+            sides = []
+            for sgn in (1, -1):
+                p = (mid[0] + n[0] * sgn * 0.25, mid[1] + n[1] * sgn * 0.25)
+                sides.append(g.z_of(p) if g.at(p) in WALKABLE and ('z' not in gap or abs(g.z_of(p) - gap['z']) < 0.3) else None)
+            if sides[0] is not None and (sides[1] is None or sides[0] > sides[1] + CHEF_STEP):
+                frame = (sides[0], (-n[0], -n[1]))
+            elif sides[1] is not None and (sides[0] is None or sides[1] > sides[0] + CHEF_STEP):
+                frame = (sides[1], n)
+            if frame:
+                break
+        trans = [t['id'] for t in d.get('transitions', []) if t.get('kind') == 'drop' and math.dist(t['at'][:2], mid) <= 2.0]
+        label = gap['id'] + (' (' + ', '.join(trans) + ')' if trans else '')
+        if frame is None:
+            drops.append(f'{label}: the gap at ({mid[0]:.2f}, {mid[1]:.2f}) is on no floor edge (floor within a step, or none, on both sides: not a drop)')
+            continue
+        err = drop_probe(mid, frame[0], frame[1])
+        if err:
+            drops.append(f'{label} at ({mid[0]:.2f}, {mid[1]:.2f}, {frame[0]:g}): {err}')
+            continue
+        # the whole span: every half metre of the gap is reachable from its floor and drops onto a landing
+        N = max(1, int(math.ceil(L / 0.5)))
+        bad = []
+        for k in range(N):
+            p = (a[0] + (b[0] - a[0]) * (k + 0.5) / N, a[1] + (b[1] - a[1]) * (k + 0.5) / N)
+            q = (p[0] - frame[1][0] * 0.25, p[1] - frame[1][1] * 0.25)  # the floor's side of the line
+            wall = [c for c in solid.column(*q) if c[1] > frame[0] + CHEF_STEP + 0.02 and c[0] < frame[0] + HEADROOM]
+            e = f'walled on its floor side by {box_label(min(wall, key=lambda c: c[0])[2])} at ({q[0]:.2f}, {q[1]:.2f})' if wall                 else drop_probe(p, frame[0], frame[1])
+            if e:
+                bad.append(e)
+        if bad:
+            drops.append(f'{label} at ({mid[0]:.2f}, {mid[1]:.2f}, {frame[0]:g}): {len(bad)} of {N} half-metre samples along the gap are closed, e.g. {bad[0]}')
+    dirs = [(math.cos(math.radians(k * 45)), math.sin(math.radians(k * 45))) for k in range(8)]
+    for t in d.get('transitions', []):
+        if t.get('kind') == 'drop' and not any(math.dist(t['at'][:2], ((g['a'][0] + g['b'][0]) / 2, (g['a'][1] + g['b'][1]) / 2)) <= 2.0 for g in gaps):
+            errs = [drop_probe(tuple(t['at'][:2]), t['at'][2], v, reach=3.0) for v in dirs]
+            if all(errs):
+                drops.append(f"{t['id']} (a drop with no rail gap) at ({t['at'][0]:g}, {t['at'][1]:g}, {t['at'][2]:g}): no edge within 3 m drops onto a landing ({errs[0]})")
+        elif t.get('kind') == 'jump':  # a ledge pocket: one of its edges drops onto a landing
+            near = [nc for nc in d.get('niches', []) if math.dist(shape_centre(nc), t['at'][:2]) <= 4.0]
+            if not near:
+                continue
+            nc = min(near, key=lambda nc: math.dist(shape_centre(nc), t['at'][:2]))
+            x0, y0, x1, y1 = shape_bounds(nc)
+            nz = nc.get('z', 0)
+            edges = [((x0, y0), (x1, y0), (0, -1)), ((x0, y1), (x1, y1), (0, 1)), ((x0, y0), (x0, y1), (-1, 0)), ((x1, y0), (x1, y1), (1, 0))]
+            errs = [drop_probe((p0[0] + (p1[0] - p0[0]) * k / 8, p0[1] + (p1[1] - p0[1]) * k / 8), nz, v) for p0, p1, v in edges for k in range(1, 8)]
+            if all(errs):  # every probe along every edge (the mouth may be off-centre)
+                drops.append(f"{nc['id']} ({t['id']}, a ledge pocket at {nz:g}): no edge drops onto a landing (e.g. {errs[3]})")
+
+    # 4. views: eye over the spot to the target, against every colliding box (rails too; not water, inlay, dressing); the target's own box passes
+    seen = Solids(boxes)
+    for v in d.get('views', []):
+        f, to = v['from'], tuple(v['to'])
+        eye = (f[0], f[1], f[2] + EYE)
+        hit = seen.ray(eye, to)
+        if hit is None or math.dist(hit[1], to) <= 1.5:
+            continue
+        bx = hit[2]
+        if seen.span(bx, to[0], to[1], 0.05) and (lambda s: s[0] - 0.05 <= to[2] <= s[1] + 0.05)(seen.span(bx, to[0], to[1], 0.05)) \
+                or (bx['kind'] in PROP_KINDS and math.dist(bx['centre'][:2], to[:2]) <= 2.5):
+            continue  # the landmark's own body
+        views.append(f"{v['id']}: {box_label(bx)} at ({hit[1][0]:.2f}, {hit[1][1]:.2f}, {hit[1][2]:.2f}), {math.dist(hit[1], to):.1f} m short of the target")
+
+    # 6. props on walk lines: a colliding prop box within 0.2 m of a line, between its floor and HEADROOM over it
+    prop_solid = Solids([b for b in boxes if b['kind'] in PROP_KINDS])
+    for name, pts in lines:
+        hit = {}
+        for x, y, ze in pts:
+            for lo, hi, bx in prop_solid.column(x, y, pad=0.2):
+                if lo < ze + HEADROOM and hi > ze + 0.05:
+                    hit.setdefault(id(bx), (bx, x, y, ze))
+        for bx, x, y, ze in hit.values():
+            props.append(f'{box_label(bx)} stands on {name} at ({x:.2f}, {y:.2f}, {ze:.2f})')
+    return dict(walkBreaks=breaks, dropErrors=drops, blockedViews=views, slopeErrors=slope_errors(d), propErrors=props)
+
+
 def manifest(write=True, data=None):
     """Build from live data, or explicitly supplied data for a write-free authoring preview."""
     d = load() if data is None else data
@@ -1101,7 +1839,7 @@ def manifest(write=True, data=None):
 
     def lintel(cls, height):
         def f(i, j):
-            if main.c[j][i] != cls or (i, j) in R['sky']:
+            if main.c[j][i] != cls or ((i, j) in R['sky'] and cls != 'crawl'):  # a crawl keeps its lintel under a roof break (it is the squeeze, not the room's roof)
                 return None
             if (i, j) in main.caps:  # capped_lintel() builds it
                 return None
@@ -1167,8 +1905,9 @@ def manifest(write=True, data=None):
         crossing_decks = [s for s in d.get('structures', []) if s['id'] in crossing_ids]
         def crossing_or_mouth(mid):
             return ramp_mouth(mid) or any(in_box2d(mid, s, .05) for s in crossing_decks)
-        pieces = rail_edges(grid, main_heads if grid_name == 'main' else [], [], 'floor', hole_of if grid_name == 'main' else None, blocked=rail_blocked[grid_name])
-        pieces += rail_edges(grid, [], [], 'floor', None, open_class='ramp', skip_fn=crossing_or_mouth, blocked=rail_blocked[grid_name])
+        floor_gaps = [(tuple(g['a']), tuple(g['b'])) for g in drop_gaps(d) if g['level'] == grid_name]  # dropGaps on this grid stay open
+        pieces = rail_edges(grid, main_heads if grid_name == 'main' else [], floor_gaps, 'floor', hole_of if grid_name == 'main' else None, blocked=rail_blocked[grid_name])
+        pieces += rail_edges(grid, [], floor_gaps, 'floor', None, open_class='ramp', skip_fn=crossing_or_mouth, blocked=rail_blocked[grid_name])
         for (x0, y0, x1, y1), z, rail in pieces:
             rails.append((x0, y0, x1, y1))
             if x0 == x1:
@@ -1176,7 +1915,45 @@ def manifest(write=True, data=None):
             else:
                 slabs(boxes, 'gallery', [(x0, y0 - 0.05, x1, y0 + 0.05)], z, z + rail)
 
+    # Deep water and ledges are railed by ledge_rails(), after the gallery rails (it skips the edges those already close).
+
+    # An ownDeck over-crossing's deck: a floor slab on each capped room cell at the deck height, and a GALLERY_RAIL along every
+    # edge to a cell that is neither deck nor floor near the deck's height (the open room below), as a deck structure is railed.
+    for level, cells in R['own_decks'].items():
+        if not cells:
+            continue
+        grid = R[level]
+        for (bottom, top), rects in key_rects(grid, lambda i, j, cells=cells, grid=grid: (grid.caps[(i, j)][0] - SLAB, grid.caps[(i, j)][0]) if (i, j) in cells else None).items():
+            slabs(boxes, 'floor', rects, bottom, top)
+        deck_pieces = {}
+        for i, j in sorted(cells):
+            top = grid.caps[(i, j)][0]
+            x0, y0 = grid.x0 + i * CELL, grid.y0 + j * CELL
+            for di, dj, kind, line, start in ((0, -1, 'h', y0, x0), (0, 1, 'h', y0 + CELL, x0), (-1, 0, 'v', x0, y0), (1, 0, 'v', x0 + CELL, y0)):
+                n = (i + di, j + dj)
+                if n in cells or (grid.get(*n) in WALKABLE and abs(grid.z_at(*n) - top) <= 0.6) or grid.get(*n) in BLOCKING:
+                    continue
+                rail_blocked[level].add(frozenset(((i, j), n)))
+                deck_pieces.setdefault((kind, round(line, 3), round(top, 3)), []).append(start)
+        for (kind, line, z), runs in deck_pieces.items():
+            runs.sort()
+            run0 = prev = runs[0]
+            for st in runs[1:] + [None]:
+                if st is not None and abs(st - prev - CELL) < 1e-6:
+                    prev = st
+                    continue
+                a, b = run0, prev + CELL
+                rx0, ry0, rx1, ry1 = (a, line, b, line) if kind == 'h' else (line, a, line, b)
+                rails.append((rx0, ry0, rx1, ry1))
+                if rx0 == rx1:
+                    slabs(boxes, 'gallery', [(rx0 - 0.05, ry0, rx0 + 0.05, ry1)], z, z + GALLERY_RAIL)
+                else:
+                    slabs(boxes, 'gallery', [(rx0, ry0 - 0.05, rx1, ry0 + 0.05)], z, z + GALLERY_RAIL)
+                if st is not None:
+                    run0 = prev = st
+
     # --- Upper level boxes --------------------------------------------------------------------------------------------
+    upper_railed = set()  # the edges the gallery rails below close (kept apart from rail_blocked: the leak search never used them)
     if upper:
         def upper_solid(i, j):
             if upper.c[j][i] != 'solid':
@@ -1192,20 +1969,63 @@ def manifest(write=True, data=None):
 
         for (b, t), rects in key_rects(upper, upper_solid).items():
             slabs(boxes, 'wall', rects, b, t)
-        slabs(boxes, 'gallery', upper.rects('floor'), U['z'] - SLAB, U['z'])
-        slabs(boxes, 'roof', upper.groups(lambda i, j: True if upper.c[j][i] != 'solid' else None).get(True, []), U['top'], U['top'] + 0.3)
+        for (b, t), rects in key_rects(upper, lambda i, j: (upper.zf[j][i] - SLAB, upper.zf[j][i]) if upper.c[j][i] == 'floor' else None).items():
+            slabs(boxes, 'gallery', rects, b, t)  # each upper room at its own height (+5 galleries, +7.5 / +10 wings)
+        for (b, t), rects in key_rects(upper, lambda i, j: (upper.zf[j][i] - SLAB, upper.zf[j][i]) if upper.c[j][i] == 'crawl' else None).items():
+            slabs(boxes, 'floor', rects, b, t)  # a crawl on the upper grid: its floor and its lintel up to the roof (the upper rock has a hole there)
+        for (b, t), rects in key_rects(upper, lambda i, j: (upper.zf[j][i] + CRAWL_HEIGHT, U['top']) if upper.c[j][i] == 'crawl' else None).items():
+            slabs(boxes, 'wall', rects, b, t)
+        def tower_top(i, j):  # a main cell of a room whose own top stands above the rafter roof: that top, or None
+            return R['towers'].get(main.cell_of(upper.centre(i, j))) if upper.inside(i, j) else None
+
+        slabs(boxes, 'roof', upper.groups(lambda i, j: True if upper.c[j][i] != 'solid' and tower_top(i, j) is None else None).get(True, []), U['top'], U['top'] + 0.3)
+        towering = bool(R['towers'])
+        for (b, t), rects in (key_rects(upper, lambda i, j: None if tower_top(i, j) is None else (tower_top(i, j), tower_top(i, j) + 0.3)) if towering else {}).items():
+            slabs(boxes, 'roof', rects, b, t)  # that room's own roof
+
+        def tower_ring(i, j):  # the wall round such a room from the rafter roof up to its roof
+            if tower_top(i, j) is not None:
+                return None
+            tops = [t for t in (tower_top(i + di, j + dj) for di in (-1, 0, 1) for dj in (-1, 0, 1)) if t is not None]
+            return (U['top'], max(tops) + 0.3) if tops else None
+
+        for (b, t), rects in (key_rects(upper, tower_ring) if towering else {}).items():
+            slabs(boxes, 'wall', rects, b, t)
         heads = [tuple(l['at']) for l in d.get('ladders', []) if abs(l['baseZ'] + l['height'] - U['z']) < 0.01]
         gaps = [(tuple(g['a']), tuple(g['b'])) for g in U.get('railGaps', [])]
-        for (x0, y0, x1, y1), z, rail in rail_edges(upper, heads, gaps):
+        mouth_fn = None
+        if d.get('flightMouthsOpen'):  # opt-in: an upper floor edge onto a void whose surface below is within a step (a flight's head) stays open
+            def mouth_fn(mid):
+                h_edge = abs((mid[1] - upper.y0) / CELL - round((mid[1] - upper.y0) / CELL)) < 1e-6
+                for s in (1, -1):
+                    p, q = ((mid[0], mid[1] + s * CELL / 2), (mid[0], mid[1] - s * CELL / 2)) if h_edge else ((mid[0] + s * CELL / 2, mid[1]), (mid[0] - s * CELL / 2, mid[1]))
+                    if upper.at(p) == 'void' and upper.at(q) == 'floor':
+                        landing = column_landing(R, p, upper.z_of(q))
+                        return landing is not None and upper.z_of(q) - landing <= STEP_UP
+                return False
+        upper_rail_holes = [h for h in d.get('holes', []) if h['level'] == 'upper' and h['kind'] != 'grate' and h.get('rail') is not None]
+        railed_platforms = [pl for pl in U['platforms'] if pl.get('rail') is not None]
+
+        def upper_rail_of(floor_p, open_p):  # a hole's own rail (the open side), else the platform's (the floor side), else GALLERY_RAIL
+            h = next((h for h in upper_rail_holes if shape_contains(h, open_p)), None)
+            if h is not None:
+                return h['rail']
+            pl = next((pl for pl in railed_platforms if shape_contains(pl, floor_p)), None)
+            return None if pl is None else pl['rail']
+
+        for (x0, y0, x1, y1), z, rail in rail_edges(upper, heads, gaps, skip_fn=mouth_fn, blocked=upper_railed,
+                                                    rail_of=upper_rail_of if upper_rail_holes or railed_platforms else None):
             rails.append((x0, y0, x1, y1))
             if x0 == x1:
-                slabs(boxes, 'gallery', [(x0 - 0.05, y0, x0 + 0.05, y1)], U['z'], U['z'] + GALLERY_RAIL)
+                slabs(boxes, 'gallery', [(x0 - 0.05, y0, x0 + 0.05, y1)], z, z + rail)
             else:
-                slabs(boxes, 'gallery', [(x0, y0 - 0.05, x1, y0 + 0.05)], U['z'], U['z'] + GALLERY_RAIL)
+                slabs(boxes, 'gallery', [(x0, y0 - 0.05, x1, y0 + 0.05)], z, z + rail)
+
+    ledge_rails(d, R, boxes, rails, rail_blocked, upper_railed)
 
     # --- Deep boxes ---------------------------------------------------------------------------------------------------
     def deep_floor(i, j):
-        if deep.c[j][i] not in ('floor', 'grate', 'low'):
+        if deep.c[j][i] not in ('floor', 'grate', 'low', 'crawl'):
             return None
         return (deep.walkable_neighbour_floor(i, j) - SLAB, deep.zf[j][i])
 
@@ -1216,10 +2036,14 @@ def manifest(write=True, data=None):
 
     for (b, t), rects in key_rects(deep, deep_floor).items():
         slabs(boxes, 'floor', rects, b, t)
+    for (b, t), rects in key_rects(deep, lambda i, j: (deep.walkable_neighbour_floor(i, j) - SLAB, deep.zf[j][i] - TREAD_DROP) if deep.c[j][i] == 'tread' else None).items():
+        slabs(boxes, 'floor', rects, b, t)  # stepped filler under a Deep flight, as on the main level (no open floor under its edge)
     for (b, t), rects in key_rects(deep, deep_solid).items():
         slabs(boxes, 'wall', rects, b, t)
-    for (b, t), rects in key_rects(deep, lambda i, j: (deep.zf[j][i] + d.get('lowRoof', 2.2), -SLAB) if deep.c[j][i] == 'low' else None).items():
-        slabs(boxes, 'wall', rects, b, t)  # a low tunnel's lintel in the Deep
+    for (b, t), rects in key_rects(deep, lambda i, j: (deep.zf[j][i] + d.get('lowRoof', 2.2), min(-SLAB, deep.top[j][i]) if d.get('deepLowRoofFollowsFloor') else -SLAB) if deep.c[j][i] == 'low' else None).items():
+        slabs(boxes, 'wall', rects, b, t)  # a low tunnel's lintel in the Deep (opt-in: only up to the slab of a main floor below -0.4 above it)
+    for (b, t), rects in key_rects(deep, lambda i, j: (deep.zf[j][i] + CRAWL_HEIGHT, min(-SLAB, deep.top[j][i])) if deep.c[j][i] == 'crawl' else None).items():
+        slabs(boxes, 'wall', rects, b, t)  # a crawl gap's lintel in the Deep
     # A rim so a foyer pad on the footprint edge never opens onto nothing.
     rim_top = U['top'] if U else WALL_TOP
     for rim in [(fx0 - 0.5, fy0 - 0.5, fx1 + 0.5, fy0), (fx0 - 0.5, fy1, fx1 + 0.5, fy1 + 0.5),
@@ -1350,6 +2174,7 @@ def manifest(write=True, data=None):
                 piece['sourceId'] = 'cut:' + cut['id'] + ':' + str(index)
                 pieces.append(piece)
         boxes = pieces
+    boxes = cut_windows(d, R, boxes)
 
     # --- Entities -------------------------------------------------------------------------------------------------------
     def entity(cls, at, yaw, props, note, pitch=0.0, **extra):
@@ -1359,6 +2184,7 @@ def manifest(write=True, data=None):
         entities.append(e)
         return e
 
+    lift_links = [l for l in links if l['kind'] == 'lift' and math.dist(nodes[l['a']][:2], nodes[l['b']][:2]) < 0.01]
     for l in d.get('ladders', []):
         entity('Mars_Ladder_EntityScript', [l['at'][0], l['at'][1], l['baseZ']], l['yaw'],
                dict(Ladder=dict(fields=dict(Height=l['height'] * 100.0))), l['id'])
@@ -1381,7 +2207,9 @@ def manifest(write=True, data=None):
         entity('Mars_Sandbox_KeyLock_' + colour + '_EntityScript', [*lk['lock']['at'], lz], lk['lock']['yaw'], {}, lk['id'] + ' lock')
         entity('Mars_WorldItem_Key_' + colour + '_EntityScript', list(lk['keyAt']), 0.0, {}, lk['id'] + ' key')
     for sc in d.get('shortcuts', []):  # P6
-        entity('Mars_Shortcut_EntityScript', [sc['at'][0], sc['at'][1], 0.0], sc['yaw'],
+        if any(math.dist(sc['at'], nodes[l['a']][:2]) < 2.0 for l in lift_links):
+            continue  # the shortcut of a lift (a lift has no builder geometry): listed under unbuiltLinks
+        entity('Mars_Shortcut_EntityScript', [sc['at'][0], sc['at'][1], sc.get('z', 0.0)], sc['yaw'],
                dict(ShortcutId=shortcut_tag(sc['id']), Channel=dict(tag=sc['channel']), SpanCm=sc['spanCm'],
                     LeverSide=dict(enum='EMars_Shortcut_LeverSide', value='Ahead' if sc['leverSide'] > 0 else 'Behind')), sc['id'])
     mouths_by_id = {m['id']: m for m in gated_mouths(d)}
@@ -1559,11 +2387,17 @@ def manifest(write=True, data=None):
                 at, yaw, z = r['start'], r['yaw'], r['top']
             else:
                 pts = polyline(d, link)
-                best = min(zip(pts, pts[1:]), key=lambda pq: seg_dist(tuple(anchor['at']), pq[0], pq[1]))
+                if link['kind'] in GRAPH_ONLY:  # the gate stands on the flight that carries the link (extraRamps[]), facing a -> b
+                    tr, (p, q) = min(((tr, pq) for tr in treads for pq in tr['segments']), key=lambda e: seg_dist(tuple(anchor['at']), e[1][0][:2], e[1][1][:2]))
+                    if (q[0] - p[0]) * (pts[-1][0] - pts[0][0]) + (q[1] - p[1]) * (pts[-1][1] - pts[0][1]) < 0:
+                        p, q = q, p
+                    best = (p[:2], q[:2])
+                else:
+                    best = min(zip(pts, pts[1:]), key=lambda pq: seg_dist(tuple(anchor['at']), pq[0], pq[1]))
                 yaw = math.degrees(math.atan2(best[1][1] - best[0][1], best[1][0] - best[0][0]))
                 t = max(0.0, min(1.0, seg_param(tuple(anchor['at']), best[0], best[1])))
                 on_link = (best[0][0] + (best[1][0] - best[0][0]) * t, best[0][1] + (best[1][1] - best[0][1]) * t)  # the authored point, dropped onto the link's line
-                z = z_on_link(d, link, on_link)
+                z = tread_z(tr, on_link) if link['kind'] in GRAPH_ONLY else z_on_link(d, link, on_link)
                 at, span = floor_span(R[level_of_z(z, U)], on_link, yaw, link['width'])  # the leaf seals the whole passage, not just the link's width
                 props['SpanCm'] = span * 100.0
             # The crawl beside this gate (its note says 'beside RN') as a lateral offset in the gate's local frame, and the
@@ -1651,8 +2485,12 @@ def manifest(write=True, data=None):
             ladder_errors.append(c['id'] + ': no crawl cell (the line lies inside other floor)')
         elif cells.count('crawl') < 4:
             ladder_errors.append(c['id'] + ': under 1 m of crawl')
-        ends_ok = all(any(g.at(q) in WALKABLE and g.at(q) != 'crawl' for q in [(px + dx, py + dy) for dx in (-0.5, 0, 0.5) for dy in (-0.5, 0, 0.5)])
-                      for px, py in (c['a'], c['b']))
+        def opens(q):  # walkable floor at the end, or a void with a landing at most 3 m below the crawl (a crawl may end over a drop)
+            if g.at(q) == 'void':
+                landing = column_landing(R, q, c.get('z', 0))
+                return landing is not None and c.get('z', 0) - landing <= 3.0
+            return g.at(q) in WALKABLE and g.at(q) != 'crawl'
+        ends_ok = all(any(opens(q) for q in [(px + dx, py + dy) for dx in (-0.5, 0, 0.5) for dy in (-0.5, 0, 0.5)]) for px, py in (c['a'], c['b']))
         if not ends_ok:
             ladder_errors.append(c['id'] + ': an end does not open onto floor')
     dx0, dy0, dx1, dy1 = d['deep']
@@ -1677,7 +2515,7 @@ def manifest(write=True, data=None):
             n = max(1, int(math.dist(a, b) / 0.25))
             for k in range(n + 1):
                 q = (a[0] + (b[0] - a[0]) * k / n, a[1] + (b[1] - a[1]) * k / n)
-                if main.at(q) == 'floor' and main.z_of(q) < z - 1.0 and not deck_over(d, q, z):
+                if main.at(q) == 'floor' and main.z_of(q) < z - 1.0 and not deck_over(d, q, z) and main.cell_of(q) not in R['own_decks']['main']:
                     cap_errors.append(f'{name}: its walk line at ({q[0]:.2f}, {q[1]:.2f}) is above open floor with no deck')
     connector_errors = []
     for c in d.get('connectors', []):  # real treads: every riser low enough to walk, ends meeting the floor and the head deck
@@ -1700,6 +2538,9 @@ def manifest(write=True, data=None):
         result['labels'] = d['wayfindingLabels']
     if d.get('presentation'):
         apply_presentation(result, d['presentation'])
+    tile_counts = assign_tiles(result, d['instances']) if TILES and d.get('instances') else None
+    if tile_counts:
+        result['tiles'] = [dict(t, pivot=list(shape_bounds(t)[:2]) + [t['z']]) for t in d['instances']]
     summary = dict(boxes=len(boxes), starts=len(starts),
                    anchors=sum(1 for e in entities if (e['cls'].startswith('Mars_Anchor_') or e['cls'] == 'Mars_Warrens_Anchor_Route_EntityScript') and 'NavField' not in e['cls']),
                    navfields=sum(1 for e in entities if 'NavField' in e['cls']),
@@ -1713,9 +2554,24 @@ def manifest(write=True, data=None):
     if d.get('structures') or d.get('connectors'):
         summary.update(structures=len(d.get('structures', [])), caps=len(main.caps), deckRails=deck_rails, capErrors=cap_errors,
                        connectorErrors=connector_errors)
+    if tile_counts:
+        summary['tiles'] = tile_counts
+    unbuilt_links = [l['a'] + '-' + l['b'] + ' (lift' + ''.join(', shortcut ' + sc['id'] for sc in d.get('shortcuts', [])
+                                                   if math.dist(sc['at'], nodes[l['a']][:2]) < 2.0) + ')' for l in lift_links]
+    if unbuilt_links:  # a lift link has no geometry here (graph-only, no cage or counterweight): reported, never silently dropped
+        result['unbuiltLinks'] = summary['unbuiltLinks'] = unbuilt_links
+    unbuilt = [p['id'] + ' (' + p['kind'] + ')' for p in d.get('puzzles', []) if unbuilt_puzzle(d, p)]
+    if unbuilt:  # a variant's puzzle rows the builder has no branch for: reported, never silently dropped
+        result['unbuiltPuzzles'] = summary['unbuiltPuzzles'] = unbuilt
+    if d.get('movementChecks'):  # opt-in (P5): the built boxes checked for the chef's step, clear height, drops, views, slopes, props
+        checks = movement_checks(d, R, boxes, entities, rail_blocked)
+        summary['walkBreaks'] = breaks + checks.pop('walkBreaks')
+        result['walkBreaks'] = summary['walkBreaks']
+        result.update(checks)
+        summary.update(checks)
     if write:
         OUT.mkdir(parents=True, exist_ok=True)
-        (OUT / 'warrens-manifest.json').write_text(json.dumps(result, indent=1), encoding='utf-8')
+        out_file('manifest', d).write_text(json.dumps(result, indent=1), encoding='utf-8')
         print(json.dumps(summary))
     return result, summary
 
@@ -1730,6 +2586,7 @@ def apply():
     ea = u.get_editor_subsystem(u.EditorActorSubsystem)
     world = u.get_editor_subsystem(u.UnrealEditorSubsystem).get_editor_world()
     assert world.get_path_name().split('.')[0] == MAP, 'open ' + MAP + ' first (found ' + world.get_path_name() + ')'
+    assert MAP != LIVE_MAP or DATA.resolve() == LIVE_DATA.resolve(), 'a variant layout never builds into ' + LIVE_MAP + ' (set WARRENS_MAP)'
     label_materials = {}
     for label in man.get('labels', []):
         if label.get('textMaterial'):
@@ -1743,12 +2600,14 @@ def apply():
     paths = {key[1] for key in groups} | {v['material'] for v in dressing if v.get('material')}
     materials = {path: u.load_asset(path) for path in paths}
     assert all(isinstance(material, u.MaterialInterface) for material in materials.values()), 'missing/non-material presentation asset: ' + str(materials)
-    missing_tags = []
-    for a in ea.get_all_level_actors():
-        if OWN in [str(t) for t in a.tags]:
-            ea.destroy_actor(a)
+    missing_tags, skipped = [], []
     ss = u.get_engine_subsystem(u.SubobjectDataSubsystem)
 
+    def clear_own():  # Level Instances first: that unloads their levels, so the rest are this level's own actors
+        for only_instances in (True, False):
+            for a in ea.get_all_level_actors():
+                if OWN in [str(t) for t in a.tags] and (isinstance(a, u.LevelInstance) or not only_instances):
+                    ea.destroy_actor(a)
     def actor(cls, label, at=(0, 0, 0), yaw=0.0, folder=None, tags=()):
         a = ea.spawn_actor_from_class(cls, at if isinstance(at, u.Vector) else u.Vector(*at), u.Rotator(pitch=0, yaw=yaw, roll=0))
         a.set_actor_label('Warrens_' + label)
@@ -1756,129 +2615,168 @@ def apply():
         a.set_folder_path(folder or ('Warrens/' + label.split('_')[0]))
         return a
 
-    for (kind, path, collision), values in groups.items():
-        original = path == MATERIALS[kind] and collision == COLLISION.get(kind, 'BlockAll')
-        suffix = '' if original else '_' + hashlib.sha256((path + '\0' + collision).encode()).hexdigest()[:12]
-        a = actor(u.Actor, 'Greybox_' + kind + suffix)
-        a.root_component.set_mobility(u.ComponentMobility.STATIC)  # a static HISM cannot attach under a movable root
-        h = ss.k2_gather_subobject_data_for_instance(a)[0]
-        ch, reason = ss.add_new_subobject(u.AddNewSubobjectParams(parent_handle=h, new_class=u.HierarchicalInstancedStaticMeshComponent))
-        c = u.SubobjectDataBlueprintFunctionLibrary.get_associated_object(u.SubobjectDataBlueprintFunctionLibrary.get_data(ch))
-        assert c, str(reason)
-        c.set_mobility(u.ComponentMobility.STATIC)
-        c.set_static_mesh(meshes[MESHES.get(kind, CUBE)])
-        c.set_collision_profile_name(collision)
-        c.set_material(0, materials[path])
-        for b in values:
-            c.add_instance(u.Transform(location=worldpos(u, b['centre']), rotation=u.Rotator(pitch=b['pitch'], yaw=b['yaw'], roll=0),
-                                       scale=u.Vector(*b['size'])), world_space=True)
-    for value in dressing:
-        a = actor(u.StaticMeshActor, 'Dressing_' + value['id'], worldpos(u, value['at']), value.get('yaw', 0), 'Warrens/Dressing')
-        c = a.static_mesh_component
-        c.set_mobility(u.ComponentMobility.STATIC)
-        c.set_static_mesh(meshes[value['mesh']])
-        c.set_collision_profile_name(value['collision'])
-        a.set_actor_scale3d(u.Vector(*value['scale']))
-        if value.get('material'):
-            for slot in range(len(meshes[value['mesh']].static_materials)):
-                c.set_material(slot, materials[value['material']])
-    for i, v in enumerate(man['lights']):
-        if v.get('fill'):
-            intensity, radius, colour = v['intensity'], v['radius'], v['colour']
-        else:
-            intensity, radius, colour = LIGHT_KINDS[v['kind']]
-            intensity *= v.get('scale', 1.0)
-        a = actor(u.PointLight, 'Light_' + v['kind'] + '_' + str(i), worldpos(u, v['at']))
-        c = a.point_light_component
-        c.set_mobility(u.ComponentMobility.STATIONARY)
-        if v.get('fill'):  # a fill only lifts the room's darkness; no shadow (and no stationary-shadow overlap budget)
-            c.set_cast_shadows(False)
-        c.set_intensity(intensity)
-        c.set_attenuation_radius(radius * 100.0)
-        c.set_light_color(u.LinearColor(*colour))
-    for v in man['starts']:
-        a = actor(u.PlayerStart, 'Entrance_' + v['group'] + '_' + str(v['slot']), worldpos(u, v['at']), v['yaw'])
-        a.set_editor_property('player_start_tag', u.Name(v['tag']))
-    for v in man.get('labels', []):
-        a = actor(u.TextRenderActor, 'Sign_' + v['id'], worldpos(u, v['at']), v['yaw'], 'Warrens/Wayfinding')
-        c = a.get_component_by_class(u.TextRenderComponent)
-        assert c, 'TextRenderActor has no text component: ' + v['id']
-        c.set_text(v['text'])
-        c.set_world_size(v.get('sizeCm', 14.0))
-        c.set_horizontal_alignment(u.HorizTextAligment.EHTA_CENTER)
-        c.set_text_render_color(u.Color(*v.get('color', (232, 218, 178, 255))))
-        if v['id'] in label_materials:
-            c.set_text_material(label_materials[v['id']])
-        c.set_collision_profile_name('NoCollision')
+    def build(tile, origin):
+        """Spawn every item of one tile (None: the assembly, or everything when flat), located relative to origin."""
+        def pos(at):
+            return worldpos(u, at) - origin
 
-    def tag_of(name):
-        tag = u.GameplayTag()
-        tag.import_text('(TagName="' + name + '")')
-        if name not in tag.export_text():
-            if STRICT_TAGS:
-                raise AssertionError('gameplay tag ' + name + ' is not registered')
-            u.log_warning('Warrens: gameplay tag ' + name + ' is not registered in this editor (restart it after editing the ini); left unset')
-            missing_tags.append(name)
-        return tag
+        for (kind, path, collision), values in render_groups([b for b in man['boxes'] if b.get('tile') == tile]).items():
+            original = path == MATERIALS[kind] and collision == COLLISION.get(kind, 'BlockAll')
+            suffix = '' if original else '_' + hashlib.sha256((path + '\0' + collision).encode()).hexdigest()[:12]
+            a = actor(u.Actor, 'Greybox_' + kind + suffix)
+            a.root_component.set_mobility(u.ComponentMobility.STATIC)  # a static HISM cannot attach under a movable root
+            h = ss.k2_gather_subobject_data_for_instance(a)[0]
+            ch, reason = ss.add_new_subobject(u.AddNewSubobjectParams(parent_handle=h, new_class=u.HierarchicalInstancedStaticMeshComponent))
+            c = u.SubobjectDataBlueprintFunctionLibrary.get_associated_object(u.SubobjectDataBlueprintFunctionLibrary.get_data(ch))
+            assert c, str(reason)
+            c.set_mobility(u.ComponentMobility.STATIC)
+            c.set_static_mesh(meshes[MESHES.get(kind, CUBE)])
+            c.set_collision_profile_name(collision)
+            c.set_material(0, materials[path])
+            for b in values:
+                c.add_instance(u.Transform(location=pos(b['centre']), rotation=u.Rotator(pitch=b['pitch'], yaw=b['yaw'], roll=0),
+                                           scale=u.Vector(*b['size'])), world_space=True)
+        for value in [v for v in dressing if v.get('tile') == tile]:
+            a = actor(u.StaticMeshActor, 'Dressing_' + value['id'], pos(value['at']), value.get('yaw', 0), 'Warrens/Dressing')
+            c = a.static_mesh_component
+            c.set_mobility(u.ComponentMobility.STATIC)
+            c.set_static_mesh(meshes[value['mesh']])
+            c.set_collision_profile_name(value['collision'])
+            a.set_actor_scale3d(u.Vector(*value['scale']))
+            if value.get('material'):
+                for slot in range(len(meshes[value['mesh']].static_materials)):
+                    c.set_material(slot, materials[value['material']])
+        for i, v in enumerate(man['lights']):
+            if v.get('tile') != tile:
+                continue
+            if v.get('fill'):
+                intensity, radius, colour = v['intensity'], v['radius'], v['colour']
+            else:
+                intensity, radius, colour = LIGHT_KINDS[v['kind']]
+                intensity *= v.get('scale', 1.0)
+            a = actor(u.PointLight, 'Light_' + v['kind'] + '_' + str(i), pos(v['at']))
+            c = a.point_light_component
+            c.set_mobility(u.ComponentMobility.STATIONARY)
+            if v.get('fill'):  # a fill only lifts the room's darkness; no shadow (and no stationary-shadow overlap budget)
+                c.set_cast_shadows(False)
+            c.set_intensity(intensity)
+            c.set_attenuation_radius(radius * 100.0)
+            c.set_light_color(u.LinearColor(*colour))
+        for v in man['starts']:
+            if v.get('tile') != tile:
+                continue
+            a = actor(u.PlayerStart, 'Entrance_' + v['group'] + '_' + str(v['slot']), pos(v['at']), v['yaw'])
+            a.set_editor_property('player_start_tag', u.Name(v['tag']))
+        for v in man.get('labels', []):
+            if v.get('tile') != tile:
+                continue
+            a = actor(u.TextRenderActor, 'Sign_' + v['id'], pos(v['at']), v['yaw'], 'Warrens/Wayfinding')
+            c = a.get_component_by_class(u.TextRenderComponent)
+            assert c, 'TextRenderActor has no text component: ' + v['id']
+            c.set_text(v['text'])
+            c.set_world_size(v.get('sizeCm', 14.0))
+            c.set_horizontal_alignment(u.HorizTextAligment.EHTA_CENTER)
+            c.set_text_render_color(u.Color(*v.get('color', (232, 218, 178, 255))))
+            if v['id'] in label_materials:
+                c.set_text_material(label_materials[v['id']])
+            c.set_collision_profile_name('NoCollision')
 
-    def coerce(value):
-        if isinstance(value, dict) and 'vector' in value:
-            return u.Vector(*value['vector'])
-        if isinstance(value, dict) and 'rotator' in value:
-            pitch, yaw, roll = value['rotator']
-            return u.Rotator(pitch=pitch, yaw=yaw, roll=roll)
-        if isinstance(value, dict) and 'transform' in value:
-            return u.Transform(location=coerce(dict(vector=value['transform']['location'])))
-        if isinstance(value, dict) and 'asset' in value:
-            asset = u.load_asset(value['asset'])
-            assert asset, value['asset']
-            return asset
-        if isinstance(value, dict) and 'struct' in value:
-            struct = getattr(u, value['struct'])()
-            for field, field_value in value['fields'].items():
-                struct.set_editor_property(field, coerce(field_value))
-            return struct
-        if isinstance(value, dict) and 'enum' in value:
-            enum_type = getattr(u, value['enum'][1:], None) or getattr(u, value['enum'])
-            return getattr(enum_type, value['value'].upper())
-        if isinstance(value, dict) and 'tag' in value:
-            return tag_of(value['tag'])
-        if isinstance(value, dict) and 'tags' in value:
-            container = u.GameplayTagContainer()
-            container.import_text('(GameplayTags=(' + ','.join('(TagName="' + t + '")' for t in value['tags']) + '))')
-            assert all(t in container.export_text() for t in value['tags']), 'a gameplay tag in ' + str(value['tags']) + ' is not registered'
-            return container
-        if isinstance(value, dict) and 'array' in value:
-            return [coerce(x) for x in value['array']]
-        if isinstance(value, str):
-            return u.Name(value)
-        return value
+        def tag_of(name):
+            tag = u.GameplayTag()
+            tag.import_text('(TagName="' + name + '")')
+            if name not in tag.export_text():
+                if STRICT_TAGS:
+                    raise AssertionError('gameplay tag ' + name + ' is not registered')
+                u.log_warning('Warrens: gameplay tag ' + name + ' is not registered in this editor (restart it after editing the ini); left unset')
+                missing_tags.append(name)
+            return tag
 
-    for i, v in enumerate(man['entities']):
-        cls = u.load_class(None, '/Script/Angelscript.' + v['cls'])
-        if not cls:
-            raise RuntimeError('Missing gameplay class ' + v['cls'] + ' (has the script compiled?)')
-        a = ea.spawn_actor_from_object(cls, worldpos(u, v['at']), u.Rotator(pitch=v.get('pitch', 0.0), yaw=v['yaw'], roll=0))
-        assert a, v['cls']
-        a.tags = [u.Name(OWN)]
-        a.set_actor_label('Warrens_' + v['cls'] + '_' + str(i))
-        a.set_folder_path('Warrens/Gameplay')
-        script = a.get_editor_property('_EntityScript')
-        for key, value in v['props'].items():
-            before = len(missing_tags)
-            if isinstance(value, dict) and 'fields' in value:
-                struct = script.get_editor_property(key)
+        def coerce(value):
+            if isinstance(value, dict) and 'vector' in value:
+                return u.Vector(*value['vector'])
+            if isinstance(value, dict) and 'rotator' in value:
+                pitch, yaw, roll = value['rotator']
+                return u.Rotator(pitch=pitch, yaw=yaw, roll=roll)
+            if isinstance(value, dict) and 'transform' in value:
+                return u.Transform(location=coerce(dict(vector=value['transform']['location'])))
+            if isinstance(value, dict) and 'asset' in value:
+                asset = u.load_asset(value['asset'])
+                assert asset, value['asset']
+                return asset
+            if isinstance(value, dict) and 'struct' in value:
+                struct = getattr(u, value['struct'])()
                 for field, field_value in value['fields'].items():
                     struct.set_editor_property(field, coerce(field_value))
-                value = struct
-            else:
-                value = coerce(value)
-            if len(missing_tags) > before:  # an unset channel would make the script's construction ensure: leave the whole spec at its default
-                u.log_warning('Warrens: ' + v['note'] + ': ' + key + ' left at its default (its channel tag is not loaded)')
+                return struct
+            if isinstance(value, dict) and 'enum' in value:
+                enum_type = getattr(u, value['enum'][1:], None) or getattr(u, value['enum'])
+                return getattr(enum_type, value['value'].upper())
+            if isinstance(value, dict) and 'tag' in value:
+                return tag_of(value['tag'])
+            if isinstance(value, dict) and 'tags' in value:
+                container = u.GameplayTagContainer()
+                container.import_text('(GameplayTags=(' + ','.join('(TagName="' + t + '")' for t in value['tags']) + '))')
+                assert all(t in container.export_text() for t in value['tags']), 'a gameplay tag in ' + str(value['tags']) + ' is not registered'
+                return container
+            if isinstance(value, dict) and 'array' in value:
+                return [coerce(x) for x in value['array']]
+            if isinstance(value, str):
+                return u.Name(value)
+            return value
+
+        for i, v in enumerate(man['entities']):
+            if v.get('tile') != tile:
                 continue
-            script.set_editor_property(key, value)
-    mode = u.load_class(None, '/Script/Angelscript.Mars_Warrens_GameMode')
-    assert mode, 'Mars_Warrens_GameMode has not compiled'
+            cls = u.load_class(None, '/Script/Angelscript.' + v['cls'])
+            if not cls:
+                raise RuntimeError('Missing gameplay class ' + v['cls'] + ' (has the script compiled?)')
+            before = len(missing_tags)
+            values = {key: (value, coerce(value) if not (isinstance(value, dict) and 'fields' in value) else None) for key, value in v['props'].items()}
+            for value in v['props'].values():  # a struct's tags too (Sink channels, Source outputs)
+                if isinstance(value, dict) and 'fields' in value:
+                    for field_value in value['fields'].values():
+                        coerce(field_value)
+            if len(missing_tags) > before:  # an entity whose id or channel tag is not loaded would only ensure on construction: not placed
+                u.log_warning('Warrens: ' + v['note'] + ' (' + v['cls'] + ') not placed: a tag it needs is not registered')
+                skipped.append(v['note'])
+                continue
+            a = ea.spawn_actor_from_object(cls, pos(v['at']), u.Rotator(pitch=v.get('pitch', 0.0), yaw=v['yaw'], roll=0))
+            assert a, v['cls']
+            a.tags = [u.Name(OWN)]
+            a.set_actor_label('Warrens_' + v['cls'] + '_' + str(i))
+            a.set_folder_path('Warrens/Gameplay')
+            script = a.get_editor_property('_EntityScript')
+            for key, (value, coerced) in values.items():
+                if isinstance(value, dict) and 'fields' in value:
+                    struct = script.get_editor_property(key)
+                    for field, field_value in value['fields'].items():
+                        struct.set_editor_property(field, coerce(field_value))
+                    coerced = struct
+                script.set_editor_property(key, coerced)
+
+    tiles = man.get('tiles', [])
+    les = u.get_editor_subsystem(u.LevelEditorSubsystem)
+    revision = load()['revision']
+    tile_path = lambda t: TILE_ROOT + '/' + revision + '/' + t['asset']
+    if tiles:  # each tile is its own level, its actors relative to the tile's pivot (its bounds' min x, min y at its z)
+        assert les.save_current_level()
+    for t in tiles:
+        path = tile_path(t)
+        assert les.load_level(path) if u.EditorAssetLibrary.does_asset_exist(path) else les.new_level(path, False), 'cannot open tile level ' + path
+        clear_own()
+        build(t['id'], worldpos(u, t['pivot']))
+        assert les.save_current_level(), path
+    if tiles:
+        assert les.load_level(MAP), MAP
+        world = u.get_editor_subsystem(u.UnrealEditorSubsystem).get_editor_world()
+    clear_own()
+    build(None, u.Vector(0, 0, 0))
+    for t in tiles:  # one Level Instance per tile, at its pivot; setting world_asset loads it (PostEditChange)
+        a = actor(u.LevelInstance, 'LI_' + t['id'], worldpos(u, t['pivot']), 0.0, 'Warrens/Instances')
+        a.set_editor_property('world_asset', u.load_asset(tile_path(t)))
+        assert str(a.get_editor_property('world_asset')), 'Level Instance ' + t['id'] + ' kept no world asset'
+    mode = u.load_class(None, '/Script/Angelscript.' + GAMEMODE)
+    assert mode, GAMEMODE + ' has not compiled'
     world.get_world_settings().set_editor_property('default_game_mode', mode)
     # Lighting: no daylight. A navy ambient floor (AMBIENT_FILL) so unlit rooms read as dark, not black, and fixed exposure so the
     # eye never adapts the dark away.
@@ -1904,7 +2802,7 @@ def apply():
     # The lantern and tallow beside each pack (Mars.Warrens.PlaceLantern, Script/Editor/Mars_WarrensMapBuilder.as) are
     # not the builder's, but they follow the packs: a set left more than 4 m from every pack was stranded by a foyer
     # move and goes; the command then places a set beside every pack that has none, and saves.
-    packs = [a.get_actor_location() for a in ea.get_all_level_actors()
+    packs = [a.get_actor_location() for a in u.GameplayStatics.get_all_actors_of_class(world, u.Actor)  # every level, instances too
              if OWN in [str(t) for t in a.tags] and 'Backpack' in a.get_actor_label()]
     stranded = 0
     for a in ea.get_all_level_actors():
@@ -1914,9 +2812,9 @@ def apply():
                 ea.destroy_actor(a)
                 stranded += 1
     u.SystemLibrary.execute_console_command(world, 'Mars.Warrens.PlaceLantern')
-    record = dict(map=MAP, strandedItemsRemoved=stranded, missingTags=sorted(set(missing_tags)),
+    record = dict(map=MAP, strandedItemsRemoved=stranded, missingTags=sorted(set(missing_tags)), skippedEntities=skipped, **({'tiles': summary['tiles']} if 'tiles' in summary else {}),
                   **{k: summary[k] for k in ('boxes', 'starts', 'anchors', 'navfields', 'packs', 'ladders', 'gates', 'mechanisms', 'pockets', 'props', 'crawls', 'lights')})
-    (OUT / 'warrens-built.json').write_text(json.dumps(record, indent=1), encoding='utf-8')
+    out_file('built', load()).write_text(json.dumps(record, indent=1), encoding='utf-8')
     print(json.dumps(record))
 
 
@@ -1955,7 +2853,7 @@ def audit():
             paths.append((p[:2], q[:2], p[2], q[2]))
     for walk in d.get('extraWalks', []):
         if 'pts' in walk:
-            wz = {'deep': DEEP_Z, 'upper': U['z'] if U else 0.0}.get(walk.get('level'), 0.0)
+            wz = walk.get('z', {'deep': DEEP_Z, 'upper': U['z'] if U else 0.0}.get(walk.get('level'), 0.0))
             paths += [(tuple(p), tuple(q), wz, wz) for p, q in zip(walk['pts'], walk['pts'][1:])]
     if U:
         uz = U['z']
@@ -1991,16 +2889,25 @@ def audit():
     low = {tuple(sorted(pair)) for pair in d.get('lowLinks', [])}
     ramp_feet = [r['end'] for r in ramps_of(d)]
     ramp_feet += [tuple(c['points'][0][:2]) for c in d.get('connectors', [])]  # a spiral's foot: the sample stands on its first tread
+    ramp_feet += [tuple(min(tr['segments'][0][0], tr['segments'][-1][1], key=lambda p: p[2])[:2]) for tr in treads_of(d)]  # a stair's or flight's foot
+    dives = {(r['link']['a'], r['link']['b']): r for r in ramps_of(d)}
     for link in d['links']:
-        if tuple(sorted((link['a'], link['b']))) not in low:
+        if tuple(sorted((link['a'], link['b']))) not in low or link['kind'] in GRAPH_ONLY:  # a graph-only link's tunnel is its flights
             continue
-        lz = nodes[link['a']][2]
-        pts = polyline(d, link)
-        for p, q in zip(pts, pts[1:]):
+        dive = dives.get((link['a'], link['b']))
+        if dive:  # a low dive is built straight (its vias ignored): sample the ramp as built, flat to its start, down, flat to its foot
+            legs = [(dive['upper'], dive['start'], dive['top'], dive['top']), (dive['start'], dive['descent_end'], dive['top'], dive['bottom']),
+                    (dive['descent_end'], dive['end'], dive['bottom'], dive['bottom'])]
+        else:
+            pts = polyline(d, link)
+            legs = [(p, q, None, None) for p, q in zip(pts, pts[1:])]
+        for p, q, z0, z1 in legs:
             seg = math.dist(p, q)
             for k in range(int(seg) + 1):
                 t = 0.0 if seg == 0 else min(k / seg, 1.0)
-                pt = (p[0] + (q[0] - p[0]) * t, p[1] + (q[1] - p[1]) * t, lz + 0.77)
+                pt = (p[0] + (q[0] - p[0]) * t, p[1] + (q[1] - p[1]) * t)
+                pz = z_on_link(d, link, pt) if z0 is None else z0 + (z1 - z0) * t
+                pt = pt + (pz + 0.77,)  # a low stair (a humped tunnel) is sampled at its own height
                 if any(math.dist(pt[:2], f) < 0.5 for f in ramp_feet):
                     continue
                 if capsule_blocked(pt, 75):
@@ -2017,7 +2924,7 @@ def audit():
     result = dict(samples=count, missing=len(missing), startsClear=clear, crawlsOk=crawls_ok, crawls=len(d['crawls']),
                   lowTunnelBlocked=len(low_blocked), jolt=bool(jolt), deviations=DEVIATIONS, **extra)
     OUT.mkdir(parents=True, exist_ok=True)
-    (OUT / 'warrens-audit.json').write_text(json.dumps(dict(result, missingSamples=missing[:200], lowBlockedSamples=low_blocked[:50]), indent=1), encoding='utf-8')
+    out_file('audit', d).write_text(json.dumps(dict(result, missingSamples=missing[:200], lowBlockedSamples=low_blocked[:50]), indent=1), encoding='utf-8')
     print(json.dumps(result))
 
 
