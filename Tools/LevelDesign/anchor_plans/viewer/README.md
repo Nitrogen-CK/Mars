@@ -28,3 +28,12 @@ crawl lintels, low tunnels, cracks, grates, Rafters platforms and rails, ladders
 the viewer also accepts what the builder does not know yet (listed at the top of `viewer.js`): polygon rooms, rooms at
 any height, `extraRamps`, `niches` (pockets), `water`, `props`, and holes on any level. Those are the proposals the
 builder needs to learn before a layout that uses them can be built.
+
+**v8 variants.** Optional top-level fields `instances` (Level Instance tiles + ports), `views` (Well-window sightlines;
+Walk's "go to view…" or `?goview=<id>` stands you at one), `transitions` (beats), `landmark` (faces) and `notes` (shown
+under "Variant notes") are drawn as overlays with their own toggles and summarised in the metrics; `links[].kind`
+`ladder` / `lift` / `drop` are graph-only (costed, never stamped). A layout without them renders as before. Anything the
+rasterizer cannot draw (a room outside its level's grid, an unknown link kind, a sloped walk link) is listed under
+"Cannot render". `python viewer/export_variants.py [--layouts v8a v8b] [--output PATH]` writes one offline HTML with a
+tab per layout (data/warrens.json first, as the baseline) and a Compare table, plus a READ-ME.txt; default output
+`docs/design/warrens-v8-variants-20261023/Warrens-v8-Variants.html`.

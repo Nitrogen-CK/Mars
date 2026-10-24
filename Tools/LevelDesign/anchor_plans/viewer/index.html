@@ -27,6 +27,7 @@
   #hud { position: absolute; left: 12px; bottom: 12px; background: rgba(11,13,14,.75); padding: 6px 10px; border-radius: 4px; display: none; font-family: ui-monospace, monospace; font-size: 12px; }
   #help { position: absolute; right: 12px; top: 12px; background: rgba(11,13,14,.75); padding: 6px 10px; border-radius: 4px; color: var(--muted); font-size: 12px; max-width: 320px; }
   #pitch { font-size: 11px; color: var(--muted); margin-top: 8px; word-break: break-word; }
+  #notes p { margin: 0 0 6px; } #notes ul { margin: 2px 0 8px; padding-left: 18px; }
   .legend span { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; vertical-align: middle; }
 </style>
 </head>
@@ -37,7 +38,7 @@
     <select id="layout"></select>
     <div id="pitch"></div>
     <h2>View</h2>
-    <div class="row"><button id="mode-orbit" class="on">Orbit</button><button id="mode-plan">Plan</button><button id="mode-fp">Walk</button><select id="goto" style="width:auto"></select></div>
+    <div class="row"><button id="mode-orbit" class="on">Orbit</button><button id="mode-plan">Plan</button><button id="mode-fp">Walk</button><select id="goto" style="width:auto"></select><select id="gotoview" style="width:auto;max-width:100%;display:none"></select></div>
     <div class="row"><button id="light-work" class="on">Work light</button><button id="light-exp">Expedition light</button><label><input type="checkbox" id="t-lanternonly"> lantern + hearth only</label></div>
     <div class="row">
       <label><input type="checkbox" id="t-main"> main</label><label><input type="checkbox" id="t-deep"> undercroft</label><label><input type="checkbox" id="t-upper"> rafters</label><label><input type="checkbox" id="t-roof"> roofs</label>
@@ -45,8 +46,13 @@
     <div class="row">
       <label><input type="checkbox" id="t-labels"> labels</label><label><input type="checkbox" id="t-anchors"> anchors</label><label><input type="checkbox" id="t-niches"> pockets</label><label><input type="checkbox" id="t-props"> props</label>
     </div>
+    <div class="row" id="v8-toggles">
+      <label><input type="checkbox" id="t-instances"> instances</label><label><input type="checkbox" id="t-views"> views</label><label><input type="checkbox" id="t-beats"> beats</label>
+    </div>
     <h2>Metrics (plan graph + data)</h2>
     <div id="metrics"></div>
+    <h2 id="notes-h" style="display:none">Variant notes</h2>
+    <div id="notes"></div>
     <h2>Legend</h2>
     <div class="legend">
       <div><span style="background:#f2efe6"></span>S entrance (4 capsules + pack) <span style="background:#d1352a;margin-left:8px"></span>H hunt court, 10 m home</div>

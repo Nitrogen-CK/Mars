@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Warrens v8 · layout variants</title>
+<style><!--INDEX_STYLE--></style>
+<style>
+  body { display: flex; flex-direction: column; }
+  #app { flex: 1; min-height: 0; height: auto; }
+  #vhead { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; padding: 8px 12px; background: var(--paper); border-bottom: 1px solid var(--rule); }
+  #vhead .vtitle { font-size: 15px; font-weight: 650; }
+  #vhead .vtitle span { color: var(--accent); }
+  #vtabs { display: flex; gap: 6px; flex-wrap: wrap; }
+  #vtabs button[aria-pressed=true] { background: #3b4a2a; border-color: #6f8f3a; }
+  #vstamp { font-size: 11px; color: var(--muted); margin-left: auto; }
+  #compare { flex: 1; min-height: 0; overflow: auto; padding: 14px 16px 24px; }
+  #compare[hidden], #app[hidden] { display: none; }
+  #compare table { border-collapse: collapse; width: auto; min-width: 100%; }
+  #compare th, #compare td { vertical-align: top; padding: 6px 10px; border-top: 1px solid var(--rule); text-align: left; min-width: 180px; max-width: 320px; }
+  #compare td:first-child, #compare th:first-child { color: var(--muted); width: auto; min-width: 150px; position: sticky; left: 0; background: var(--bg); }
+  #compare th { font-size: 13px; color: var(--accent); border-top: 0; }
+  #compare tr.thesis td { color: var(--fg); font-style: italic; }
+  #compare .warn { color: #ff8a7a; }
+  #compare p.muted { max-width: 900px; }
+</style>
+</head>
+<body>
+<header id="vhead"><div class="vtitle">Warrens v8 <span>·</span> layout variants</div><nav id="vtabs" aria-label="Layouts"></nav><div id="vstamp"></div></header>
+<section id="compare" hidden></section>
+<!--APP-->
+<script>window.MARS_VARIANTS = <!--DATA-->; window.MARS_LAYOUTS = window.MARS_VARIANTS.layouts;</script>
+<script><!--THREE--></script>
+<script><!--VIEWER--></script>
+<script><!--SCRIPT--></script>
+</body>
+</html>
