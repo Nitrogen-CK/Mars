@@ -91,10 +91,11 @@ class UMars_Processor_LanternHook_HandleRequests : UCk_Processor_Script_Base_UE
                                      int32& InOutQueuedMeasures)
     {
         auto Tallow = InRequest.Tallow;
-        auto Lantern = InHook.Get_Lantern();
+        auto Flame = InHook.Get_Flame();
         const auto IsTallow = ck::IsValid(Tallow) && Tallow.Has_Tallow();
         auto Inventory = IsTallow ? Tallow.Get_ParentInventory() : FCk_Handle_Inventory();
-        const auto HasRoom = ck::IsValid(Lantern) && Lantern.Get_MeasuresLeft() + InOutQueuedMeasures < Lantern.Get_Measures();
+        const auto HasRoom = ck::IsValid(Flame) && Flame.Get_CanRefuel()
+            && Flame.Get_MeasuresLeft() + InOutQueuedMeasures < Flame.Get_Measures();
         if (ck::EnsureIfNot(IsTallow && ck::IsValid(Inventory) && HasRoom,
             f"[LanternHook] Refuel at [{InHook.ToString()}]: [{Tallow.ToString()}] is no tallow in an inventory, or no lantern with room hangs here - skipped"))
         {
@@ -104,7 +105,7 @@ class UMars_Processor_LanternHook_HandleRequests : UCk_Processor_Script_Base_UE
 
         const auto Measures = Tallow.Get_Tallow().Measures;
         InOutQueuedMeasures += Measures;
-        Lantern.Request_Refuel(FMars_Request_Lantern_Refuel(Measures));
+        Flame.Request_Refuel(FMars_Request_Flame_Refuel(Measures));
 
         auto Remove = FCk_Request_Inventory_RemoveItem(Tallow);
         Remove.Set_PostRemovePolicy(ECk_Inventory_PostRemovePolicy::DestroyItem);

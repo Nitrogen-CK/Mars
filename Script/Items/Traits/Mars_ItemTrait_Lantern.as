@@ -1,10 +1,8 @@
-// A lantern: its world item composes the Lantern feature from Spec (UMars_Lantern_EntityScript), so the item must be
-// Persistent - one body carries the flame from the floor to the hand to the belt.
+// Marks a lantern: it hangs by its bail, so a lantern hook accepts it (utils_lantern_hook::Get_IsLantern). Its flame is
+// the item's UMars_ItemTrait_Flame.
 UCLASS(Meta = (DisplayName = "🏮 Lantern"))
 class UMars_ItemTrait_Lantern : UCk_ItemTrait
 {
-    UPROPERTY()
-    FMars_Lantern_Spec Spec;
 }
 
 mixin bool Has_LanternTrait(const FCk_Handle_Item& Self)

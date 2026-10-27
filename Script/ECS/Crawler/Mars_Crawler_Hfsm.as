@@ -522,8 +522,8 @@ class UMars_SmTask_Crawler_Engage_Approach : UMars_SmTask_Crawler_EngageStage
 // relinquished SurfaceMotion's steering), a zero-speed steer toward the target on the support plane turns the root in
 // place, re-sent only when that direction turns by more than 2 degrees. Then it polls the start admission: admissible
 // hands over to Attack, OutOfRange back to Approach, and anything still in the way after Prepare.TimeoutSeconds to Wait
-// for BlockedRetrySeconds. A Shun crawler facing a raised lit lantern (Get_IsWarded) holds here, facing its bearer,
-// until the lantern is lowered or the timeout hands over to Wait: it hesitates, never flees.
+// for BlockedRetrySeconds. A Shun crawler facing a raised lit flame (Get_IsWarded) holds here, facing its bearer,
+// until the flame is lowered or the timeout hands over to Wait: it hesitates, never flees.
 class UMars_SmTask_Crawler_Engage_Prepare : UMars_SmTask_Crawler_EngageStage
 {
     default Stage = EMars_Crawler_EngageStage::Prepare;
@@ -716,7 +716,7 @@ enum EMars_Crawler_RoamPhase
     Dwell
 }
 
-// Pick a goal in RoamBounds - a Seek crawler standing in lantern light picks the light (TryGet_LightLure) - (once no
+// Pick a goal in RoamBounds - a Seek crawler standing in flame light picks the light (TryGet_LightLure) - (once no
 // attack holds the crawler where it stands, Get_IsHeldByAttack) -> MoveTo -> on Arrived
 // dwell RoamDwellSeconds -> repeat. A failed move picks again at once,
 // except after 3 consecutive failures, when it dwells first (no tight NoPath loop); a move stopped from outside dwells

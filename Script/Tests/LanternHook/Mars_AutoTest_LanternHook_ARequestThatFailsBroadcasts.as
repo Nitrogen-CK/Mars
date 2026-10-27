@@ -31,7 +31,7 @@ class UMars_AutoTest_LanternHook_ARequestThatFailsBroadcasts : UMars_AutoTestRig
         SpawnLantern(InHandle, mars_items::Lantern(), FVector(0.0, 150.0, -96000.0));
         _RefusingHolder = MakeRefusingHolder(InHandle);
 
-        Add_Step_WaitUntil("the lantern world item is composed", n"Check_LanternReady", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the lantern world item is composed", n"Check_FlameReady", k_SlowPolls, 0);
         Add_Step("hang the lantern from its world item's holder", n"Step_HangFromHolder");
         Add_Step_WaitUntil("the lantern hangs on the hook, settled", n"Check_Hung", k_SlowPolls, 0);
         Add_Step("the hook announced the lantern once; take it toward the refusing holder", n"Step_AssertHungAndTake");
@@ -68,17 +68,17 @@ class UMars_AutoTest_LanternHook_ARequestThatFailsBroadcasts : UMars_AutoTestRig
     private void Step_HangFromHolder(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         Assert_Valid(_Hook, "the hook");
-        _Hook.Request_Hang(FMars_Request_LanternHook_Hang(Get_LanternItem()));
+        _Hook.Request_Hang(FMars_Request_LanternHook_Hang(Get_FlameItem()));
     }
 
     UFUNCTION()
     private void Step_AssertHungAndTake(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         Assert_Equals_Int(_LanternChanges.Num(), 1, "OnLanternChanged fired once for the hang");
-        Assert_True(_LanternChanges[0] == Get_LanternItem(), "the hang's OnLanternChanged names the lantern");
+        Assert_True(_LanternChanges[0] == Get_FlameItem(), "the hang's OnLanternChanged names the lantern");
         Assert_Equals_Int(_FailedItems.Num(), 0, "no request failed while hanging");
 
-        _Hook.Request_Take(FMars_Request_LanternHook_Take(Get_LanternItem(), _RefusingHolder));
+        _Hook.Request_Take(FMars_Request_LanternHook_Take(Get_FlameItem(), _RefusingHolder));
     }
 
     UFUNCTION()
@@ -93,8 +93,8 @@ class UMars_AutoTest_LanternHook_ARequestThatFailsBroadcasts : UMars_AutoTestRig
     {
         Assert_Equals_Int(_FailedItems.Num(), 1, "OnRequestFailed fired once");
         Assert_True(_FailedHooks[0] == _Hook, "the hook reported the failure");
-        Assert_True(_FailedItems[0] == Get_LanternItem(), "the failure names the lantern");
-        Assert_True(_Hook.Get_Item() == Get_LanternItem(), "the lantern still hangs on the hook");
+        Assert_True(_FailedItems[0] == Get_FlameItem(), "the failure names the lantern");
+        Assert_True(_Hook.Get_Item() == Get_FlameItem(), "the lantern still hangs on the hook");
         Assert_True(_Hook.Get_HasArrived(), "the lantern is still Carried by the hook and settled");
         Assert_Equals_Int(_RefusingHolder.Get_NumItems(), 0, "the refusing holder stayed empty");
         Assert_Equals_Int(_LanternChanges.Num(), 1, "OnLanternChanged did not fire again");

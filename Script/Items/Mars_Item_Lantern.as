@@ -1,6 +1,7 @@
 // The lantern and its fuel. The lantern is Persistent (its one body carries the flame between the floor, the hand and the
-// belt) and its world item is UMars_Lantern_EntityScript, which composes the Lantern kernel and draws the light. Tallow
-// is a plain one-handed consumable: using it refuels a carried lantern.
+// belt) and its world item is UMars_Lantern_EntityScript, which composes the Flame kernel and draws the light. Its flame is
+// glass-enclosed, lights itself (the shutter) and stays lit on the belt at a smaller pool. Tallow is a plain one-handed
+// consumable: using it refuels a carried lantern.
 
 namespace constants_lantern_item
 {
@@ -28,10 +29,27 @@ asset Mars_ItemDef_Lantern of UCk_InventoryItem_Definition
     _ItemTraits.Add(Presentation);
 
     auto UseAction = Cast<UMars_ItemTrait_UseAction>(NewObject(this, UMars_ItemTrait_UseAction));
-    UseAction.UseStateClass = UMars_SmState_ItemUse_ToggleShutter;
+    UseAction.UseStateClass = UMars_SmState_ItemUse_ToggleFlame;
     UseAction.HintText = FText::FromString("shutter");
     UseAction.CompletionPolicy = ECk_Interaction_CompletionPolicy::Instant;
     _ItemTraits.Add(UseAction);
+
+    auto Fuel = FMars_Flame_Fuel();
+    Fuel.Measures = 4;
+    Fuel.SecondsPerMeasure = 60.0f;
+    Fuel.GutterSeconds = 10.0f;
+    Fuel.Refuel = EMars_Flame_Refuel::Refuelable;
+
+    auto Flame = Cast<UMars_ItemTrait_Flame>(NewObject(this, UMars_ItemTrait_Flame));
+    Flame.Spec.Fuel = TOptional<FMars_Flame_Fuel>(Fuel);
+    Flame.Spec.StartIgnition = EMars_Flame_Ignition::Snuffed;
+    Flame.Spec.Enclosure = EMars_Flame_Enclosure::Enclosed;
+    Flame.Spec.Lighting = EMars_Flame_Lighting::SelfLighting;
+    Flame.Spec.OnStow = EMars_Flame_OnStow::StaysLit;
+    Flame.Spec.Radius.Held = 700.0f;
+    Flame.Spec.Radius.Stowed = 350.0f;
+    Flame.Spec.Radius.World = 900.0f;
+    _ItemTraits.Add(Flame);
 
     auto Lantern = Cast<UMars_ItemTrait_Lantern>(NewObject(this, UMars_ItemTrait_Lantern));
     _ItemTraits.Add(Lantern);

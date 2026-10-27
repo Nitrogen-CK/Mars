@@ -12,12 +12,18 @@ asset Mars_TestItemDef_HalfLantern of UCk_InventoryItem_Definition
     Presentation.WorldItem.ScriptClass = UMars_Lantern_EntityScript;
     _ItemTraits.Add(Presentation);
 
+    auto Fuel = FMars_Flame_Fuel();
+    Fuel.StartMeasures = TOptional<int32>(2);
+
+    auto Flame = Cast<UMars_ItemTrait_Flame>(NewObject(this, UMars_ItemTrait_Flame));
+    Flame.Spec = mars_test_items::Make_LanternFlameSpec(Fuel);
+    _ItemTraits.Add(Flame);
+
     auto Lantern = Cast<UMars_ItemTrait_Lantern>(NewObject(this, UMars_ItemTrait_Lantern));
-    Lantern.Spec.StartMeasures = TOptional<int32>(2);
     _ItemTraits.Add(Lantern);
 }
 
-// Two refuels queued in one drain against a lantern with room for one keep the second tallow. A shuttered lantern at two
+// Two refuels queued in one drain against a lantern with room for one keep the second tallow. A snuffed lantern at two
 // measures of four is hung from its world item's holder onto an empty hook. Two tallows, each in its own holder, are
 // queued for refuel in the same frame. The drain takes the first: the lantern fills to four and the first tallow is
 // destroyed. The second would overfill the lantern counting the measures already queued, so the drain ensures,
@@ -63,7 +69,7 @@ class UMars_AutoTest_LanternHook_TwoRefuelsInOneDrainKeepTheSecondTallow : UMars
             _Items.Add(_Holders[1].Get_Items()[0]);
         }
 
-        const auto Composed = Get_IsLanternReady();
+        const auto Composed = Get_IsFlameReady();
         auto Res = OutResult;
         Res.Set(Seeded && Composed);
     }
@@ -72,13 +78,13 @@ class UMars_AutoTest_LanternHook_TwoRefuelsInOneDrainKeepTheSecondTallow : UMars
     private void Step_HangFromHolder(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         Assert_Valid(_Hook, "the hook");
-        _Hook.Request_Hang(FMars_Request_LanternHook_Hang(Get_LanternItem()));
+        _Hook.Request_Hang(FMars_Request_LanternHook_Hang(Get_FlameItem()));
     }
 
     UFUNCTION()
     private void Step_RefuelTwice(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        const auto Lantern = _Hook.Get_Lantern();
+        const auto Lantern = _Hook.Get_Flame();
         Assert_Valid(Lantern, "the hung lantern");
         Assert_Equals_Int(Lantern.Get_Measures(), 4, "the lantern holds four measures");
         Assert_Equals_Int(Lantern.Get_MeasuresLeft(), 2, "the half lantern has two measures left");
@@ -93,13 +99,13 @@ class UMars_AutoTest_LanternHook_TwoRefuelsInOneDrainKeepTheSecondTallow : UMars
     private void Check_FirstRefuelApplied(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(_Hook.Get_Lantern().Get_MeasuresLeft() == 4 && ck::Is_NOT_Valid(_Items[0]));
+        Res.Set(_Hook.Get_Flame().Get_MeasuresLeft() == 4 && ck::Is_NOT_Valid(_Items[0]));
     }
 
     UFUNCTION()
     private void Step_AssertSecondKept(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        const auto Lantern = _Hook.Get_Lantern();
+        const auto Lantern = _Hook.Get_Flame();
         Assert_Equals_Int(Lantern.Get_MeasuresLeft(), 4, "the lantern is full");
         Assert_False(Lantern.Get_CanRefuel(), "a full lantern has no room");
         Assert_Equals_Int(_Holders[0].Get_NumItems(), 0, "the first tallow left its holder");

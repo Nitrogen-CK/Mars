@@ -235,6 +235,15 @@
 			]
 		},
 		{
+			"TypeName": "FCk_Handle_Flame",
+			"ShortName": "Flame",
+			"Description": "A flame, bare or behind glass: lit or snuffed, burning measures of fuel or none, lighting a pool that follows where it is carried",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_FlameHandle",
+			"RequiredFragments": [
+				"Mars_Feature_Flame"
+			]
+		},
+		{
 			"TypeName": "FCk_Handle_FoodBoard",
 			"ShortName": "FoodBoard",
 			"Description": "The food a station holds: a ledger of FoodPiece handles that a chop cuts within a budget and a sweep releases as physics bodies",
@@ -421,15 +430,6 @@
 			"SourceAsset": "/Script/AngelscriptAssets.Mars_LadderHandle",
 			"RequiredFragments": [
 				"Mars_Feature_Ladder"
-			]
-		},
-		{
-			"TypeName": "FCk_Handle_Lantern",
-			"ShortName": "Lantern",
-			"Description": "A tallow flame behind a shutter: burns measures of tallow while open, gutters on the last, and lights a radius that follows where it is carried",
-			"SourceAsset": "/Script/AngelscriptAssets.Mars_LanternHandle",
-			"RequiredFragments": [
-				"Mars_Feature_Lantern"
 			]
 		},
 		{

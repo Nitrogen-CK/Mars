@@ -1,17 +1,18 @@
-// Lantern use states (Mars_ItemUse_Hfsm.as shape): each overrides UMars_SmState_InteractTarget_Enter on the held-item use
+// Flame use states (Mars_ItemUse_Hfsm.as shape): each overrides UMars_SmState_InteractTarget_Enter on the held-item use
 // interactable, whose owner is the player.
 
 //--------------------------------------------------------------------------------------------------------------------------
-// Toggle shutter
+// Toggle flame
 //--------------------------------------------------------------------------------------------------------------------------
 
-class UMars_SmState_ItemUse_ToggleShutter : UMars_SmState_InteractTarget_RunTask
+class UMars_SmState_ItemUse_ToggleFlame : UMars_SmState_InteractTarget_RunTask
 {
-    default TaskClass = UMars_SmTask_ItemUse_ToggleShutter;
+    default TaskClass = UMars_SmTask_ItemUse_ToggleFlame;
 }
 
-// Opens a shuttered held lantern and shutters an open one. A spent lantern's shutter still moves; it shows no flame.
-class UMars_SmTask_ItemUse_ToggleShutter : UCk_SmTask_EntityScript
+// Snuffs a lit held flame and lights an unlit one that can light itself (a lantern's shutter, a torch's strike). One that
+// cannot - spent, or needing another flame - fails and stays as it is.
+class UMars_SmTask_ItemUse_ToggleFlame : UCk_SmTask_EntityScript
 {
     default _TaskMode = ECk_SmTaskMode::EnterExitOnly;
 
@@ -25,17 +26,27 @@ class UMars_SmTask_ItemUse_ToggleShutter : UCk_SmTask_EntityScript
             return;
         }
 
-        auto Lantern = HeldItem.Get_CurrentItem().TryGet_Lantern();
-        if (ck::EnsureIfNot(ck::IsValid(Lantern), f"[ItemUse] ToggleShutter ran while [{HeldItem.ToString()}] holds no lantern"))
+        auto Flame = HeldItem.Get_CurrentItem().TryGet_Flame();
+        if (ck::EnsureIfNot(ck::IsValid(Flame), f"[ItemUse] ToggleFlame ran while [{HeldItem.ToString()}] holds no flame"))
         {
             Mark_Result(ECk_SmTaskResult::Failed);
             return;
         }
 
-        const auto Next = Lantern.Get_Shutter() == EMars_Lantern_Shutter::Open
-            ? EMars_Lantern_Shutter::Shuttered
-            : EMars_Lantern_Shutter::Open;
-        Lantern.Request_SetShutter(FMars_Request_Lantern_SetShutter(Next));
+        if (Flame.Get_Ignition() == EMars_Flame_Ignition::Lit)
+        {
+            Flame.Request_SetIgnition(FMars_Request_Flame_SetIgnition(EMars_Flame_Ignition::Snuffed));
+            Mark_Result(ECk_SmTaskResult::Succeeded);
+            return;
+        }
+
+        if (Flame.Get_CanSelfLight() == false)
+        {
+            Mark_Result(ECk_SmTaskResult::Failed);
+            return;
+        }
+
+        Flame.Request_SetIgnition(FMars_Request_Flame_SetIgnition(EMars_Flame_Ignition::Lit));
         Mark_Result(ECk_SmTaskResult::Succeeded);
     }
 }
@@ -49,8 +60,8 @@ class UMars_SmState_ItemUse_Refuel : UMars_SmState_InteractTarget_RunTask
     default TaskClass = UMars_SmTask_ItemUse_Refuel;
 }
 
-// Feeds the held tallow to the emptiest lantern in the user's hotbar and uses the tallow up. Every carried lantern full
-// (or none carried): fails, and the tallow is kept.
+// Feeds the held tallow to the emptiest refuelable flame in the user's hotbar and uses the tallow up. None that can take
+// it (every one full, unlimited or not refuelable, or none carried): fails, and the tallow is kept.
 class UMars_SmTask_ItemUse_Refuel : UCk_SmTask_EntityScript
 {
     default _TaskMode = ECk_SmTaskMode::EnterExitOnly;
@@ -73,8 +84,8 @@ class UMars_SmTask_ItemUse_Refuel : UCk_SmTask_EntityScript
         }
 
         const auto Hotbar = HeldItem.H().As_Hotbar(ECk_SanityCheck::UnChecked);
-        auto Lantern = ck::IsValid(Hotbar) ? utils_lantern::TryGet_RefuelTarget(Hotbar) : FCk_Handle_Lantern();
-        if (ck::Is_NOT_Valid(Lantern))
+        auto Flame = ck::IsValid(Hotbar) ? utils_flame::TryGet_RefuelTarget(Hotbar) : FCk_Handle_Flame();
+        if (ck::Is_NOT_Valid(Flame) || Flame.Get_CanRefuel() == false)
         {
             Mark_Result(ECk_SmTaskResult::Failed);
             return;
@@ -87,7 +98,7 @@ class UMars_SmTask_ItemUse_Refuel : UCk_SmTask_EntityScript
             return;
         }
 
-        Lantern.Request_Refuel(FMars_Request_Lantern_Refuel(Tallow.Get_Tallow().Measures));
+        Flame.Request_Refuel(FMars_Request_Flame_Refuel(Tallow.Get_Tallow().Measures));
 
         auto Request = FCk_Request_Inventory_RemoveItem(Tallow);
         Request.Set_PostRemovePolicy(ECk_Inventory_PostRemovePolicy::DestroyItem);

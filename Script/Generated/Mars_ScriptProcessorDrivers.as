@@ -1126,6 +1126,100 @@ class UMars_Processor_Eyes_Resolve_Driver : UMars_Processor_Eyes_Resolve
     }
 }
 
+class UMars_Processor_Flame_Burn_Driver : UMars_Processor_Flame_Burn
+{
+    UFUNCTION(BlueprintOverride)
+    void Configure(FCk_ScriptProcessorQuery& Query)
+    {
+        Query.ReadWrite(FMars_Fragment_Flame);
+        Super::Configure(Query);
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void ForEachBatch(FCk_ScriptQueryBatch Batch, FCk_Time InDeltaT)
+    {
+        auto _CkPerfScope = ck::ScopedStat("UMars_Processor_Flame_Burn_Driver::ForEachBatch");
+        const int32 NumEntities = Batch.Num();
+        for (int32 i = 0; i < NumEntities; ++i)
+        {
+            auto Handle = Batch.GetHandle(i);
+            FMars_Fragment_Flame& P0 = Batch.Get(i, FMars_Fragment_Flame);
+            ForEachEntity(InDeltaT, Handle, P0);
+        }
+    }
+}
+
+class UMars_Processor_Flame_HandleRequests_Driver : UMars_Processor_Flame_HandleRequests
+{
+    UFUNCTION(BlueprintOverride)
+    void Configure(FCk_ScriptProcessorQuery& Query)
+    {
+        Query.ReadWrite(FMars_Fragment_Flame_Requests);
+        Query.ReadWrite(FMars_Fragment_Flame);
+        Super::Configure(Query);
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void ForEachBatch(FCk_ScriptQueryBatch Batch, FCk_Time InDeltaT)
+    {
+        auto _CkPerfScope = ck::ScopedStat("UMars_Processor_Flame_HandleRequests_Driver::ForEachBatch");
+        const int32 NumEntities = Batch.Num();
+        for (int32 i = 0; i < NumEntities; ++i)
+        {
+            auto Handle = Batch.GetHandle(i);
+            FMars_Fragment_Flame_Requests& P0 = Batch.Get(i, FMars_Fragment_Flame_Requests);
+            FMars_Fragment_Flame& P1 = Batch.Get(i, FMars_Fragment_Flame);
+            ForEachEntity(InDeltaT, Handle, P0, P1);
+        }
+    }
+}
+
+class UMars_Processor_Flame_Pool_Driver : UMars_Processor_Flame_Pool
+{
+    UFUNCTION(BlueprintOverride)
+    void Configure(FCk_ScriptProcessorQuery& Query)
+    {
+        Query.ReadWrite(FMars_Fragment_Flame);
+        Super::Configure(Query);
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void ForEachBatch(FCk_ScriptQueryBatch Batch, FCk_Time InDeltaT)
+    {
+        auto _CkPerfScope = ck::ScopedStat("UMars_Processor_Flame_Pool_Driver::ForEachBatch");
+        const int32 NumEntities = Batch.Num();
+        for (int32 i = 0; i < NumEntities; ++i)
+        {
+            auto Handle = Batch.GetHandle(i);
+            FMars_Fragment_Flame& P0 = Batch.Get(i, FMars_Fragment_Flame);
+            ForEachEntity(InDeltaT, Handle, P0);
+        }
+    }
+}
+
+class UMars_Processor_Flame_Source_Driver : UMars_Processor_Flame_Source
+{
+    UFUNCTION(BlueprintOverride)
+    void Configure(FCk_ScriptProcessorQuery& Query)
+    {
+        Query.ReadWrite(FMars_Fragment_Flame);
+        Super::Configure(Query);
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void ForEachBatch(FCk_ScriptQueryBatch Batch, FCk_Time InDeltaT)
+    {
+        auto _CkPerfScope = ck::ScopedStat("UMars_Processor_Flame_Source_Driver::ForEachBatch");
+        const int32 NumEntities = Batch.Num();
+        for (int32 i = 0; i < NumEntities; ++i)
+        {
+            auto Handle = Batch.GetHandle(i);
+            FMars_Fragment_Flame& P0 = Batch.Get(i, FMars_Fragment_Flame);
+            ForEachEntity(InDeltaT, Handle, P0);
+        }
+    }
+}
+
 class UMars_Processor_FoodBoard_HandleRequests_Driver : UMars_Processor_FoodBoard_HandleRequests
 {
     UFUNCTION(BlueprintOverride)
@@ -1911,77 +2005,6 @@ class UMars_Processor_Ladder_Setup_Driver : UMars_Processor_Ladder_Setup
         {
             auto Handle = Batch.GetHandle(i);
             ForEachEntity(InDeltaT, Handle);
-        }
-    }
-}
-
-class UMars_Processor_Lantern_Burn_Driver : UMars_Processor_Lantern_Burn
-{
-    UFUNCTION(BlueprintOverride)
-    void Configure(FCk_ScriptProcessorQuery& Query)
-    {
-        Query.ReadWrite(FMars_Fragment_Lantern);
-        Super::Configure(Query);
-    }
-
-    UFUNCTION(BlueprintOverride)
-    void ForEachBatch(FCk_ScriptQueryBatch Batch, FCk_Time InDeltaT)
-    {
-        auto _CkPerfScope = ck::ScopedStat("UMars_Processor_Lantern_Burn_Driver::ForEachBatch");
-        const int32 NumEntities = Batch.Num();
-        for (int32 i = 0; i < NumEntities; ++i)
-        {
-            auto Handle = Batch.GetHandle(i);
-            FMars_Fragment_Lantern& P0 = Batch.Get(i, FMars_Fragment_Lantern);
-            ForEachEntity(InDeltaT, Handle, P0);
-        }
-    }
-}
-
-class UMars_Processor_Lantern_HandleRequests_Driver : UMars_Processor_Lantern_HandleRequests
-{
-    UFUNCTION(BlueprintOverride)
-    void Configure(FCk_ScriptProcessorQuery& Query)
-    {
-        Query.ReadWrite(FMars_Fragment_Lantern_Requests);
-        Query.ReadWrite(FMars_Fragment_Lantern);
-        Super::Configure(Query);
-    }
-
-    UFUNCTION(BlueprintOverride)
-    void ForEachBatch(FCk_ScriptQueryBatch Batch, FCk_Time InDeltaT)
-    {
-        auto _CkPerfScope = ck::ScopedStat("UMars_Processor_Lantern_HandleRequests_Driver::ForEachBatch");
-        const int32 NumEntities = Batch.Num();
-        for (int32 i = 0; i < NumEntities; ++i)
-        {
-            auto Handle = Batch.GetHandle(i);
-            FMars_Fragment_Lantern_Requests& P0 = Batch.Get(i, FMars_Fragment_Lantern_Requests);
-            FMars_Fragment_Lantern& P1 = Batch.Get(i, FMars_Fragment_Lantern);
-            ForEachEntity(InDeltaT, Handle, P0, P1);
-        }
-    }
-}
-
-class UMars_Processor_Lantern_LightProbe_Driver : UMars_Processor_Lantern_LightProbe
-{
-    UFUNCTION(BlueprintOverride)
-    void Configure(FCk_ScriptProcessorQuery& Query)
-    {
-        Query.ReadWrite(FMars_Fragment_Lantern_LightProbes);
-        Super::Configure(Query);
-    }
-
-    UFUNCTION(BlueprintOverride)
-    void ForEachBatch(FCk_ScriptQueryBatch Batch, FCk_Time InDeltaT)
-    {
-        auto _CkPerfScope = ck::ScopedStat("UMars_Processor_Lantern_LightProbe_Driver::ForEachBatch");
-        const int32 NumEntities = Batch.Num();
-        for (int32 i = 0; i < NumEntities; ++i)
-        {
-            auto Handle = Batch.GetHandle(i);
-            FMars_Fragment_Lantern_LightProbes& P0 = Batch.Get(i, FMars_Fragment_Lantern_LightProbes);
-            ForEachEntity(InDeltaT, Handle, P0);
         }
     }
 }

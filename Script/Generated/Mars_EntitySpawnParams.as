@@ -4970,6 +4970,71 @@ namespace UMars_AutoTest_EyesDummy_ComposesAndWrites
 }
 
 USTRUCT()
+struct FMars_AutoTest_Flame_AnUnlimitedFlameNeverGuttersAndCannotRefuel_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Flame_AnUnlimitedFlameNeverGuttersAndCannotRefuel
+{
+    FMars_AutoTest_Flame_AnUnlimitedFlameNeverGuttersAndCannotRefuel_SpawnParams Params()
+    {
+        return FMars_AutoTest_Flame_AnUnlimitedFlameNeverGuttersAndCannotRefuel_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Flame_AStaysLitFlameKeepsBurningOnTheBeltAndSwapsToItsStowedProbe_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Flame_AStaysLitFlameKeepsBurningOnTheBeltAndSwapsToItsStowedProbe
+{
+    FMars_AutoTest_Flame_AStaysLitFlameKeepsBurningOnTheBeltAndSwapsToItsStowedProbe_SpawnParams Params()
+    {
+        return FMars_AutoTest_Flame_AStaysLitFlameKeepsBurningOnTheBeltAndSwapsToItsStowedProbe_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Flame_BurnsOnlyWhileLitThenGuttersAndGoesOut_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Flame_BurnsOnlyWhileLitThenGuttersAndGoesOut
+{
+    FMars_AutoTest_Flame_BurnsOnlyWhileLitThenGuttersAndGoesOut_SpawnParams Params()
+    {
+        return FMars_AutoTest_Flame_BurnsOnlyWhileLitThenGuttersAndGoesOut_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Flame_RefuelCapsAndRelightsInOneFrame_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Flame_RefuelCapsAndRelightsInOneFrame
+{
+    FMars_AutoTest_Flame_RefuelCapsAndRelightsInOneFrame_SpawnParams Params()
+    {
+        return FMars_AutoTest_Flame_RefuelCapsAndRelightsInOneFrame_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Flame_SpecValidateRejectsBadFuelRadiiAndBornSpent_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Flame_SpecValidateRejectsBadFuelRadiiAndBornSpent
+{
+    FMars_AutoTest_Flame_SpecValidateRejectsBadFuelRadiiAndBornSpent_SpawnParams Params()
+    {
+        return FMars_AutoTest_Flame_SpecValidateRejectsBadFuelRadiiAndBornSpent_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_FoodBoard_AChopAfterAWaitingTurnWaitsForIt_SpawnParams
 {
 }
@@ -7280,45 +7345,6 @@ namespace UMars_AutoTest_LanFlow_DirectAddressValidation
     FMars_AutoTest_LanFlow_DirectAddressValidation_SpawnParams Params()
     {
         return FMars_AutoTest_LanFlow_DirectAddressValidation_SpawnParams();
-    }
-}
-
-USTRUCT()
-struct FMars_AutoTest_Lantern_BurnsOnlyWhileOpenThenGuttersAndGoesOut_SpawnParams
-{
-}
-
-namespace UMars_AutoTest_Lantern_BurnsOnlyWhileOpenThenGuttersAndGoesOut
-{
-    FMars_AutoTest_Lantern_BurnsOnlyWhileOpenThenGuttersAndGoesOut_SpawnParams Params()
-    {
-        return FMars_AutoTest_Lantern_BurnsOnlyWhileOpenThenGuttersAndGoesOut_SpawnParams();
-    }
-}
-
-USTRUCT()
-struct FMars_AutoTest_Lantern_RefuelCapsAndRelightsInOneFrame_SpawnParams
-{
-}
-
-namespace UMars_AutoTest_Lantern_RefuelCapsAndRelightsInOneFrame
-{
-    FMars_AutoTest_Lantern_RefuelCapsAndRelightsInOneFrame_SpawnParams Params()
-    {
-        return FMars_AutoTest_Lantern_RefuelCapsAndRelightsInOneFrame_SpawnParams();
-    }
-}
-
-USTRUCT()
-struct FMars_AutoTest_Lantern_SpecValidateRejectsBadFuelAndRadii_SpawnParams
-{
-}
-
-namespace UMars_AutoTest_Lantern_SpecValidateRejectsBadFuelAndRadii
-{
-    FMars_AutoTest_Lantern_SpecValidateRejectsBadFuelAndRadii_SpawnParams Params()
-    {
-        return FMars_AutoTest_Lantern_SpecValidateRejectsBadFuelAndRadii_SpawnParams();
     }
 }
 
@@ -11133,6 +11159,67 @@ namespace UMars_EyesDummy_EntityScript
     FMars_EyesDummy_EntityScript_SpawnParams Params(FTransform InSpawnTransform)
     {
         return FMars_EyesDummy_EntityScript_SpawnParams(InSpawnTransform);
+    }
+}
+
+USTRUCT()
+struct FMars_FlameItem_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    TSoftObjectPtr<UCk_InventoryItem_Definition> Definition = nullptr;
+
+    UPROPERTY()
+    EMars_WorldItem_Mode Mode = EMars_WorldItem_Mode::World;
+
+    UPROPERTY()
+    FCk_Handle AttachTo = FCk_Handle();
+
+    UPROPERTY()
+    FTransform AttachOffset = FTransform::Identity;
+
+    UPROPERTY()
+    FCk_Handle_Item SourceItem = FCk_Handle_Item();
+
+    UPROPERTY()
+    FCk_Handle_Inventory SourceInventory = FCk_Handle_Inventory();
+
+    UPROPERTY()
+    FVector LaunchVelocity = FVector::ZeroVector;
+
+    UPROPERTY()
+    FVector AngularVelocityDeg = FVector::ZeroVector;
+
+    UPROPERTY()
+    FMars_WorldItem_Arrival ArriveFrom = FMars_WorldItem_Arrival();
+
+    FMars_FlameItem_EntityScript_SpawnParams(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg, FMars_WorldItem_Arrival InArriveFrom)
+    {
+        SpawnTransform = InSpawnTransform;
+        Definition = InDefinition;
+        Mode = InMode;
+        AttachTo = InAttachTo;
+        AttachOffset = InAttachOffset;
+        SourceItem = InSourceItem;
+        SourceInventory = InSourceInventory;
+        LaunchVelocity = InLaunchVelocity;
+        AngularVelocityDeg = InAngularVelocityDeg;
+        ArriveFrom = InArriveFrom;
+    }
+}
+
+namespace UMars_FlameItem_EntityScript
+{
+    FMars_FlameItem_EntityScript_SpawnParams Params()
+    {
+        return FMars_FlameItem_EntityScript_SpawnParams();
+    }
+
+    FMars_FlameItem_EntityScript_SpawnParams Params(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg, FMars_WorldItem_Arrival InArriveFrom)
+    {
+        return FMars_FlameItem_EntityScript_SpawnParams(InSpawnTransform, InDefinition, InMode, InAttachTo, InAttachOffset, InSourceItem, InSourceInventory, InLaunchVelocity, InAngularVelocityDeg, InArriveFrom);
     }
 }
 
@@ -17324,15 +17411,15 @@ namespace UMars_SmState_ItemUse_Throw
 }
 
 USTRUCT()
-struct FMars_SmState_ItemUse_ToggleShutter_SpawnParams
+struct FMars_SmState_ItemUse_ToggleFlame_SpawnParams
 {
 }
 
-namespace UMars_SmState_ItemUse_ToggleShutter
+namespace UMars_SmState_ItemUse_ToggleFlame
 {
-    FMars_SmState_ItemUse_ToggleShutter_SpawnParams Params()
+    FMars_SmState_ItemUse_ToggleFlame_SpawnParams Params()
     {
-        return FMars_SmState_ItemUse_ToggleShutter_SpawnParams();
+        return FMars_SmState_ItemUse_ToggleFlame_SpawnParams();
     }
 }
 
@@ -18533,15 +18620,15 @@ namespace UMars_SmTask_ItemUse_Throw
 }
 
 USTRUCT()
-struct FMars_SmTask_ItemUse_ToggleShutter_SpawnParams
+struct FMars_SmTask_ItemUse_ToggleFlame_SpawnParams
 {
 }
 
-namespace UMars_SmTask_ItemUse_ToggleShutter
+namespace UMars_SmTask_ItemUse_ToggleFlame
 {
-    FMars_SmTask_ItemUse_ToggleShutter_SpawnParams Params()
+    FMars_SmTask_ItemUse_ToggleFlame_SpawnParams Params()
     {
-        return FMars_SmTask_ItemUse_ToggleShutter_SpawnParams();
+        return FMars_SmTask_ItemUse_ToggleFlame_SpawnParams();
     }
 }
 

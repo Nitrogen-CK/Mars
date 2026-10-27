@@ -96,14 +96,14 @@ mixin FCk_Handle_Item Get_Item(const FCk_Handle_LanternHook& Self)
     return Inventory.Get_SoleItem();
 }
 
-// The hung lantern; invalid while the hook is empty.
-mixin FCk_Handle_Lantern Get_Lantern(const FCk_Handle_LanternHook& Self)
+// The hung lantern's flame; invalid while the hook is empty.
+mixin FCk_Handle_Flame Get_Flame(const FCk_Handle_LanternHook& Self)
 {
     const auto Item = Self.Get_Item();
     if (ck::Is_NOT_Valid(Item))
-    { return FCk_Handle_Lantern(); }
+    { return FCk_Handle_Flame(); }
 
-    return Item.TryGet_Lantern();
+    return Item.TryGet_Flame();
 }
 
 mixin bool Get_IsOccupied(const FCk_Handle_LanternHook& Self)
@@ -112,20 +112,20 @@ mixin bool Get_IsOccupied(const FCk_Handle_LanternHook& Self)
 }
 
 // A lit lantern hangs on the hook: what its source asserts.
-mixin bool Get_HoldsLitLantern(const FCk_Handle_LanternHook& Self)
+mixin bool Get_HoldsLitFlame(const FCk_Handle_LanternHook& Self)
 {
-    const auto Lantern = Self.Get_Lantern();
-    return ck::IsValid(Lantern) && Lantern.Get_IsLit();
+    const auto Flame = Self.Get_Flame();
+    return ck::IsValid(Flame) && Flame.Get_IsLit();
 }
 
 // The hung lantern has landed on the hook: its world item settled, Carried by this hook. False while empty or on its way.
 mixin bool Get_HasArrived(const FCk_Handle_LanternHook& Self)
 {
-    const auto Lantern = Self.Get_Lantern();
-    if (ck::Is_NOT_Valid(Lantern))
+    const auto Flame = Self.Get_Flame();
+    if (ck::Is_NOT_Valid(Flame))
     { return false; }
 
-    const auto WorldItem = Lantern.H().As_WorldItem(ECk_SanityCheck::UnChecked);
+    const auto WorldItem = Flame.H().As_WorldItem(ECk_SanityCheck::UnChecked);
     const FCk_Handle HookEntity = Self;
     return ck::IsValid(WorldItem) && WorldItem.Get_Mount() == EMars_WorldItem_Mount::Carried
         && WorldItem.Get_Carrier() == HookEntity && WorldItem.Get_IsSettled();
@@ -161,8 +161,8 @@ mixin EMars_LanternHook_Action Get_ActionFor(const FCk_Handle_LanternHook& Self,
 
     if (ck::IsValid(Held) && Held.Has_Tallow())
     {
-        const auto Lantern = Self.Get_Lantern();
-        return ck::IsValid(Lantern) && Lantern.Get_CanRefuel() ? EMars_LanternHook_Action::Refuel : EMars_LanternHook_Action::Blocked_Full;
+        const auto Flame = Self.Get_Flame();
+        return ck::IsValid(Flame) && Flame.Get_CanRefuel() ? EMars_LanternHook_Action::Refuel : EMars_LanternHook_Action::Blocked_Full;
     }
 
     if (ck::IsValid(Held))

@@ -1,8 +1,9 @@
 // A Shun crawler (the default LightResponse) will not lunge at a target that holds a lit lantern in its hand: with the lit
 // lantern raised its light sense feels the Held pool, Get_IsWarded holds, and a start at the target is rejected Warded with
-// no attack begun. Stowing the lantern (selecting an empty hotbar slot: it goes dark, the crawler feels no light) lifts the
-// ward, and the next start is admitted (it is a ward, never a flee: the crawler never moves away). The target stands 55 cm
-// beyond the neutral hit centre, so the admitted jab misses and cools down.
+// no attack begun. Stowing the lantern (selecting an empty hotbar slot) lifts the ward: it stays lit on the belt at its
+// Stowed pool, which may still reach the crawler, but a flame on a belt is not held. The next start is admitted (it is a
+// ward, never a flee: the crawler never moves away). The target stands 55 cm beyond the neutral hit centre, so the
+// admitted jab misses and cools down.
 class UMars_AutoTest_CrawlerMelee_ShunsAHeldLitLantern : UMars_AutoTestRig_CrawlerMelee
 {
     default _TimeoutSeconds = 40.0f;
@@ -28,7 +29,7 @@ class UMars_AutoTest_CrawlerMelee_ShunsAHeldLitLantern : UMars_AutoTestRig_Crawl
         Add_Step_WaitUntil("the start drained and was rejected", n"Check_StartRejected", k_SlowPolls, 0);
         Add_Step("the start was rejected Warded and no attack began", n"Step_AssertWarded");
         Add_Step("the target stows the lantern", n"Step_LowerLantern");
-        Add_Step_WaitUntil("the stowed lantern is dark, the crawler feels no light and the ward is lifted", n"Check_Lowered", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the stowed lantern lights its Stowed pool and the ward is lifted", n"Check_Lowered", k_SlowPolls, 0);
         Add_Step("request the attack again", n"Step_StartAgain");
         Add_Step_WaitUntil("the attack is admitted (Windup)", n"Check_Admitted", k_SlowPolls, 0);
         Add_Step_WaitUntil("the attack is back in Idle", n"Check_AttackFinished", k_SlowPolls, 0);
@@ -68,16 +69,16 @@ class UMars_AutoTest_CrawlerMelee_ShunsAHeldLitLantern : UMars_AutoTestRig_Crawl
         _LanternItem = InEntityScriptHandle.As_WorldItem();
     }
 
-    private FCk_Handle_Lantern Get_Lantern() const
+    private FCk_Handle_Flame Get_Flame() const
     {
-        return _LanternItem.H().As_Lantern(ECk_SanityCheck::UnChecked);
+        return _LanternItem.H().As_Flame(ECk_SanityCheck::UnChecked);
     }
 
     UFUNCTION()
     private void Check_LanternReady(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(ck::IsValid(_LanternItem) && ck::IsValid(Get_Lantern()) && ck::IsValid(_LanternItem.Get_HeldItem()));
+        Res.Set(ck::IsValid(_LanternItem) && ck::IsValid(Get_Flame()) && ck::IsValid(_LanternItem.Get_HeldItem()));
     }
 
     // The pickup task's stow: the lantern's holder -> the target's stow target (its empty hand takes it).
@@ -96,16 +97,16 @@ class UMars_AutoTest_CrawlerMelee_ShunsAHeldLitLantern : UMars_AutoTestRig_Crawl
         Holder.Request_TransferItem_ToDataOnly(FCk_Request_Inventory_TransferItem_ToDataOnly(Item, Target),
             FCk_Delegate_Inventory_OnOperationResult_Transfer());
 
-        auto Lantern = Get_Lantern();
-        Lantern.Request_SetShutter(FMars_Request_Lantern_SetShutter(EMars_Lantern_Shutter::Open));
+        auto Flame = Get_Flame();
+        Flame.Request_SetIgnition(FMars_Request_Flame_SetIgnition(EMars_Flame_Ignition::Lit));
     }
 
     UFUNCTION()
     private void Check_Warded(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
-        const auto Lantern = Get_Lantern();
+        const auto Flame = Get_Flame();
         auto Res = OutResult;
-        Res.Set(Lantern.Get_IsLit() && Lantern.Get_IsHeldBy(_Target.Entity) && _Crawler.Get_IsWarded(_Target.Entity));
+        Res.Set(Flame.Get_IsLit() && Flame.Get_IsHeldBy(_Target.Entity) && _Crawler.Get_IsWarded(_Target.Entity));
     }
 
     UFUNCTION()
@@ -120,7 +121,7 @@ class UMars_AutoTest_CrawlerMelee_ShunsAHeldLitLantern : UMars_AutoTestRig_Crawl
         _GenerationBefore = _Crawler.Get_AttackGeneration();
     }
 
-    // Selecting the empty slot stows the lantern on its carry point (the target's belt node), where it lights nothing.
+    // Selecting the empty slot stows the lantern on its carry point (the target's belt node), where it stays lit.
     UFUNCTION()
     private void Step_LowerLantern(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
@@ -130,11 +131,12 @@ class UMars_AutoTest_CrawlerMelee_ShunsAHeldLitLantern : UMars_AutoTestRig_Crawl
     UFUNCTION()
     private void Check_Lowered(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
-        const auto Lantern = Get_Lantern();
+        const auto Flame = Get_Flame();
+        const auto Shown = Flame.Get_ShownLightPool();
         auto Res = OutResult;
-        Res.Set(_LanternItem.Get_Mount() == EMars_WorldItem_Mount::Carried && Lantern.Get_IsStowed()
-            && Lantern.Get_IsLit() == false && Lantern.Get_Shutter() == EMars_Lantern_Shutter::Open
-            && _Crawler.Get_LightsOn().Num() == 0 && _Crawler.Get_IsWarded(_Target.Entity) == false);
+        Res.Set(_LanternItem.Get_Mount() == EMars_WorldItem_Mount::Carried && Flame.Get_IsStowed()
+            && Flame.Get_Ignition() == EMars_Flame_Ignition::Lit && Shown.IsSet() && Shown.GetValue() == EMars_Flame_Pool::Stowed
+            && _Crawler.Get_IsWarded(_Target.Entity) == false);
     }
 
     UFUNCTION()
