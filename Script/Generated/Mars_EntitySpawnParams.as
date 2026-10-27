@@ -4970,6 +4970,19 @@ namespace UMars_AutoTest_EyesDummy_ComposesAndWrites
 }
 
 USTRUCT()
+struct FMars_AutoTest_Flame_ALitFlameAssertsItsOwnSource_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Flame_ALitFlameAssertsItsOwnSource
+{
+    FMars_AutoTest_Flame_ALitFlameAssertsItsOwnSource_SpawnParams Params()
+    {
+        return FMars_AutoTest_Flame_ALitFlameAssertsItsOwnSource_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_Flame_AnUnlimitedFlameNeverGuttersAndCannotRefuel_SpawnParams
 {
 }
@@ -5018,6 +5031,32 @@ namespace UMars_AutoTest_Flame_BurnsOnlyWhileLitThenGuttersAndGoesOut
     FMars_AutoTest_Flame_BurnsOnlyWhileLitThenGuttersAndGoesOut_SpawnParams Params()
     {
         return FMars_AutoTest_Flame_BurnsOnlyWhileLitThenGuttersAndGoesOut_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Flame_IgniteActionReadsTheFocusersHand_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Flame_IgniteActionReadsTheFocusersHand
+{
+    FMars_AutoTest_Flame_IgniteActionReadsTheFocusersHand_SpawnParams Params()
+    {
+        return FMars_AutoTest_Flame_IgniteActionReadsTheFocusersHand_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Flame_OpenFirePassesToOpenAndNeverThroughGlass_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Flame_OpenFirePassesToOpenAndNeverThroughGlass
+{
+    FMars_AutoTest_Flame_OpenFirePassesToOpenAndNeverThroughGlass_SpawnParams Params()
+    {
+        return FMars_AutoTest_Flame_OpenFirePassesToOpenAndNeverThroughGlass_SpawnParams();
     }
 }
 
@@ -10655,6 +10694,47 @@ namespace UMars_CampUiStation_EntityScript
 }
 
 USTRUCT()
+struct FMars_Candle_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_Flame_Spec Flame;
+
+    UPROPERTY()
+    FMars_MechanismSource_Spec Source = FMars_MechanismSource_Spec();
+
+    UPROPERTY()
+    FText Name = FText::FromString("");
+
+    UPROPERTY()
+    EMars_Flame_Ignition StartLit = EMars_Flame_Ignition::Snuffed;
+
+    FMars_Candle_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Flame_Spec InFlame, FMars_MechanismSource_Spec InSource, FText InName, EMars_Flame_Ignition InStartLit)
+    {
+        SpawnTransform = InSpawnTransform;
+        Flame = InFlame;
+        Source = InSource;
+        Name = InName;
+        StartLit = InStartLit;
+    }
+}
+
+namespace UMars_Candle_EntityScript
+{
+    FMars_Candle_EntityScript_SpawnParams Params()
+    {
+        return FMars_Candle_EntityScript_SpawnParams();
+    }
+
+    FMars_Candle_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Flame_Spec InFlame, FMars_MechanismSource_Spec InSource, FText InName, EMars_Flame_Ignition InStartLit)
+    {
+        return FMars_Candle_EntityScript_SpawnParams(InSpawnTransform, InFlame, InSource, InName, InStartLit);
+    }
+}
+
+USTRUCT()
 struct FMars_Crawler_EntityScript_SpawnParams
 {
     UPROPERTY()
@@ -14215,6 +14295,47 @@ namespace UMars_Sandbox_BackpackPlateF_EntityScript
 }
 
 USTRUCT()
+struct FMars_Sandbox_Candle_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_Flame_Spec Flame;
+
+    UPROPERTY()
+    FMars_MechanismSource_Spec Source = FMars_MechanismSource_Spec();
+
+    UPROPERTY()
+    FText Name = FText::FromString("");
+
+    UPROPERTY()
+    EMars_Flame_Ignition StartLit = EMars_Flame_Ignition::Snuffed;
+
+    FMars_Sandbox_Candle_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Flame_Spec InFlame, FMars_MechanismSource_Spec InSource, FText InName, EMars_Flame_Ignition InStartLit)
+    {
+        SpawnTransform = InSpawnTransform;
+        Flame = InFlame;
+        Source = InSource;
+        Name = InName;
+        StartLit = InStartLit;
+    }
+}
+
+namespace UMars_Sandbox_Candle_EntityScript
+{
+    FMars_Sandbox_Candle_EntityScript_SpawnParams Params()
+    {
+        return FMars_Sandbox_Candle_EntityScript_SpawnParams();
+    }
+
+    FMars_Sandbox_Candle_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Flame_Spec InFlame, FMars_MechanismSource_Spec InSource, FText InName, EMars_Flame_Ignition InStartLit)
+    {
+        return FMars_Sandbox_Candle_EntityScript_SpawnParams(InSpawnTransform, InFlame, InSource, InName, InStartLit);
+    }
+}
+
+USTRUCT()
 struct FMars_Sandbox_CeilingLight_EntityScript_SpawnParams
 {
     UPROPERTY()
@@ -14493,6 +14614,51 @@ namespace UMars_Sandbox_FailSwitch_EntityScript
     FMars_Sandbox_FailSwitch_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Control_Spec InControl, FMars_MechanismSource_Spec InSource, FVector InPressOffset, float32 InMoveDuration, FText InPromptText)
     {
         return FMars_Sandbox_FailSwitch_EntityScript_SpawnParams(InSpawnTransform, InControl, InSource, InPressOffset, InMoveDuration, InPromptText);
+    }
+}
+
+USTRUCT()
+struct FMars_Sandbox_FlameLight_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_MechanismSink_Spec Sink;
+
+    UPROPERTY()
+    float32 Intensity = 8000.0f;
+
+    UPROPERTY()
+    float32 AttenuationRadius = 1100.0f;
+
+    UPROPERTY()
+    FLinearColor LightColor = FLinearColor(1.0f, 0.8999999761581421f, 0.75f, 1.0f);
+
+    UPROPERTY()
+    float DropLength = 40.0;
+
+    FMars_Sandbox_FlameLight_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_MechanismSink_Spec InSink, float32 InIntensity, float32 InAttenuationRadius, FLinearColor InLightColor, float InDropLength)
+    {
+        SpawnTransform = InSpawnTransform;
+        Sink = InSink;
+        Intensity = InIntensity;
+        AttenuationRadius = InAttenuationRadius;
+        LightColor = InLightColor;
+        DropLength = InDropLength;
+    }
+}
+
+namespace UMars_Sandbox_FlameLight_EntityScript
+{
+    FMars_Sandbox_FlameLight_EntityScript_SpawnParams Params()
+    {
+        return FMars_Sandbox_FlameLight_EntityScript_SpawnParams();
+    }
+
+    FMars_Sandbox_FlameLight_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_MechanismSink_Spec InSink, float32 InIntensity, float32 InAttenuationRadius, FLinearColor InLightColor, float InDropLength)
+    {
+        return FMars_Sandbox_FlameLight_EntityScript_SpawnParams(InSpawnTransform, InSink, InIntensity, InAttenuationRadius, InLightColor, InDropLength);
     }
 }
 
@@ -17164,6 +17330,19 @@ namespace UMars_SmState_ExitAndTerminate
 }
 
 USTRUCT()
+struct FMars_SmState_Flame_Ignite_SpawnParams
+{
+}
+
+namespace UMars_SmState_Flame_Ignite
+{
+    FMars_SmState_Flame_Ignite_SpawnParams Params()
+    {
+        return FMars_SmState_Flame_Ignite_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_SmState_Fry_Idle_SpawnParams
 {
 }
@@ -18187,6 +18366,19 @@ namespace UMars_SmTask_EndInteraction_Succeeded
     FMars_SmTask_EndInteraction_Succeeded_SpawnParams Params()
     {
         return FMars_SmTask_EndInteraction_Succeeded_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_Flame_Ignite_SpawnParams
+{
+}
+
+namespace UMars_SmTask_Flame_Ignite
+{
+    FMars_SmTask_Flame_Ignite_SpawnParams Params()
+    {
+        return FMars_SmTask_Flame_Ignite_SpawnParams();
     }
 }
 
@@ -19762,6 +19954,47 @@ namespace UMars_Vent_EntityScript
     FMars_Vent_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Trap_Spec InTrap, FMars_MechanismSink_Spec InSink, FMars_Hazard_Spec InHazard)
     {
         return FMars_Vent_EntityScript_SpawnParams(InSpawnTransform, InTrap, InSink, InHazard);
+    }
+}
+
+USTRUCT()
+struct FMars_WallTorch_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_Flame_Spec Flame;
+
+    UPROPERTY()
+    FMars_MechanismSource_Spec Source = FMars_MechanismSource_Spec();
+
+    UPROPERTY()
+    FText Name = FText::FromString("");
+
+    UPROPERTY()
+    EMars_Flame_Ignition StartLit = EMars_Flame_Ignition::Snuffed;
+
+    FMars_WallTorch_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Flame_Spec InFlame, FMars_MechanismSource_Spec InSource, FText InName, EMars_Flame_Ignition InStartLit)
+    {
+        SpawnTransform = InSpawnTransform;
+        Flame = InFlame;
+        Source = InSource;
+        Name = InName;
+        StartLit = InStartLit;
+    }
+}
+
+namespace UMars_WallTorch_EntityScript
+{
+    FMars_WallTorch_EntityScript_SpawnParams Params()
+    {
+        return FMars_WallTorch_EntityScript_SpawnParams();
+    }
+
+    FMars_WallTorch_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Flame_Spec InFlame, FMars_MechanismSource_Spec InSource, FText InName, EMars_Flame_Ignition InStartLit)
+    {
+        return FMars_WallTorch_EntityScript_SpawnParams(InSpawnTransform, InFlame, InSource, InName, InStartLit);
     }
 }
 

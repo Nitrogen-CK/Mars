@@ -1220,6 +1220,29 @@ class UMars_Processor_Flame_Source_Driver : UMars_Processor_Flame_Source
     }
 }
 
+class UMars_Processor_FlameFixture_Prompt_Driver : UMars_Processor_FlameFixture_Prompt
+{
+    UFUNCTION(BlueprintOverride)
+    void Configure(FCk_ScriptProcessorQuery& Query)
+    {
+        Query.ReadWrite(FMars_Fragment_FlameFixture_Name);
+        Super::Configure(Query);
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void ForEachBatch(FCk_ScriptQueryBatch Batch, FCk_Time InDeltaT)
+    {
+        auto _CkPerfScope = ck::ScopedStat("UMars_Processor_FlameFixture_Prompt_Driver::ForEachBatch");
+        const int32 NumEntities = Batch.Num();
+        for (int32 i = 0; i < NumEntities; ++i)
+        {
+            auto Handle = Batch.GetHandle(i);
+            FMars_Fragment_FlameFixture_Name& P0 = Batch.Get(i, FMars_Fragment_FlameFixture_Name);
+            ForEachEntity(InDeltaT, Handle, P0);
+        }
+    }
+}
+
 class UMars_Processor_FoodBoard_HandleRequests_Driver : UMars_Processor_FoodBoard_HandleRequests
 {
     UFUNCTION(BlueprintOverride)

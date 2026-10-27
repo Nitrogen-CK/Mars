@@ -29,3 +29,40 @@ class UMars_Sandbox_CeilingLight_EntityScript : UMars_LightFixture_EntityScript
         return Super::DoConstruct(InHandle);
     }
 }
+
+// The flame fixtures' pieces (Mars.Sandbox.PlaceFlames in Script/Editor/Mars_Flames_MapBuilder.as).
+namespace utils_flame_fixture
+{
+    // By name: a tag added to the ini while the editor runs is registered only at its next start.
+    FGameplayTag Get_SandboxChannel()
+    {
+        return FGameplayTag::RequestGameplayTag(n"Mechanism.Channel.Flames.Sandbox");
+    }
+}
+
+// A candle whose lit flame asserts the room's flame channel.
+class UMars_Sandbox_Candle_EntityScript : UMars_Candle_EntityScript
+{
+    default _ShowInPlaceActors = false;
+
+    UFUNCTION(BlueprintOverride)
+    ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
+    {
+        Source.OutputChannel = utils_flame_fixture::Get_SandboxChannel();
+        return Super::DoConstruct(InHandle);
+    }
+}
+
+// A ceiling lamp lit only while every source on the room's flame channel is asserted: both candles lit.
+class UMars_Sandbox_FlameLight_EntityScript : UMars_LightFixture_EntityScript
+{
+    default _ShowInPlaceActors = false;
+
+    UFUNCTION(BlueprintOverride)
+    ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
+    {
+        Sink.InputChannels.Add(utils_flame_fixture::Get_SandboxChannel());
+        Sink.Rule = EMars_MechanismSink_Rule::AllSources;
+        return Super::DoConstruct(InHandle);
+    }
+}
