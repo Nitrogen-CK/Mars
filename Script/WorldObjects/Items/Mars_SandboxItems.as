@@ -39,3 +39,9 @@ class UMars_WorldItem_Tallow_EntityScript : UMars_WorldItem_EntityScript
 {
     default Definition = mars_items::Tallow();
 }
+
+// The torch composes its flame and head (UMars_Torch_EntityScript).
+class UMars_WorldItem_Torch_EntityScript : UMars_Torch_EntityScript
+{
+    default Definition = mars_items::Torch();
+}
