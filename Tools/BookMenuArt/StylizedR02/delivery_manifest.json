@@ -1,0 +1,390 @@
+{
+  "DELIVERY.json": {
+    "bytes": 5191,
+    "sha256": "3d1b90b2d70ab5aac6029b00cc31319438a1a9659b19350bef1827d2dc8c3cda"
+  },
+  "DependencyCleanup/01-open-index.json": {
+    "bytes": 1219,
+    "sha256": "d92d135682e0f9aa7f6a48d971898a2aeb509123e749c24ad50fce0c50885cbf"
+  },
+  "DependencyCleanup/02-index-after-gc.json": {
+    "bytes": 1223,
+    "sha256": "03602d68c9817d6ef8eb3da89ddd1a7bba05e3adb58df22afa8a094d5f5f2795"
+  },
+  "DependencyCleanup/03-recipe-after-gc.json": {
+    "bytes": 1228,
+    "sha256": "622c77bdbc1c45583090d6b39ffe31899b9bedf25830813d737df8e11e01f533"
+  },
+  "DependencyCleanup/04-ck-recipe.json": {
+    "bytes": 3032,
+    "sha256": "985673bfcdf345aa04c0aa10cd6b4686c22e0c36969a68f85a48af9cc28c25ad"
+  },
+  "DependencyCleanup/04-ck-recipe.png": {
+    "bytes": 1438061,
+    "sha256": "aa5ecf9d75e9b0df1ee4f72e3fd421f79ab348c026de3dd038de09c4d63754b3"
+  },
+  "DependencyCleanup/05-notes-after-gc.json": {
+    "bytes": 1231,
+    "sha256": "dd43d0d77ca67d11ae08ad85b477c25f7d4dfaadb758f57a4952255d9007252a"
+  },
+  "DependencyCleanup/06-reverse-recipe.json": {
+    "bytes": 1227,
+    "sha256": "6f990728274727d1f13d4089dc78b96c0dc5385ffe5a55b6504b4b2fec673ea5"
+  },
+  "DependencyCleanup/07-dropped-released.json": {
+    "bytes": 273,
+    "sha256": "29502289b0fc653606853821af56c56a4f3422c79a9a1b9ca52bfb7eba780ace"
+  },
+  "DependencyCleanup/08-reopened-new-textures.json": {
+    "bytes": 1238,
+    "sha256": "2882d9fc25a68936a83735e655f0c53da9b82d0f543bb878c2ff1aceec3338d2"
+  },
+  "DependencyCleanup/09-reopened-after-gc.json": {
+    "bytes": 1234,
+    "sha256": "1ecf6dad83301befbf5ecd5251647f2f7765e16de9f1ec71fc95dd33c54ca2c7"
+  },
+  "DependencyCleanup/README.md": {
+    "bytes": 3466,
+    "sha256": "24498ba4e0aa97c34952e4a51378c510fa2c7c38f6fc7e67f7d1a6f969a530de"
+  },
+  "DependencyCleanup/REPORT.json": {
+    "bytes": 6095,
+    "sha256": "72dc7c7511e24d61fe96c568cda91001fcac4794deefbcd357923e2d37183582"
+  },
+  "DependencyCleanup/asset_dependencies.json": {
+    "bytes": 16936,
+    "sha256": "723f0ad550e32d830bbbb90aa920850c20e8653a13f80db956507bc846b50dfa"
+  },
+  "DependencyCleanup/audit_dependencies.py": {
+    "bytes": 997,
+    "sha256": "f735d7c906f41fb77a99dc133cbd33474abe60ed40c92c7b0a215d9a67acb2af"
+  },
+  "DependencyCleanup/finalize_report.py": {
+    "bytes": 8474,
+    "sha256": "a36362a7ef4cb1d3497057f49113055b4f45ac097570500e00a2e2cdbfb1393c"
+  },
+  "DependencyCleanup/migrate_widgets.py": {
+    "bytes": 2448,
+    "sha256": "f7acd4f6e0bbee49ee8eb5c32d8f9704f4853893539f11cba7ccd487aaf9450b"
+  },
+  "DependencyCleanup/verify_runtime.py": {
+    "bytes": 1984,
+    "sha256": "54d6afe677f0bc9e19d6db060d69b0a1c0d6e146f997ec6ea0fc3d2cce3e5d26"
+  },
+  "DependencyCleanup/widget_migration.json": {
+    "bytes": 6934,
+    "sha256": "75532b11dc9f1dd50c8be930cecc00c8e9c401c1f6e261bc3efebb38d0360c25"
+  },
+  "GutterFix/03-forward-recipe.json": {
+    "bytes": 26485,
+    "sha256": "9cd87df5cded0ebcbd3463d0b213e0b97d2971afd19ce6693ea2ed971a46dd13"
+  },
+  "GutterFix/04-after-forward-recipe.json": {
+    "bytes": 2674,
+    "sha256": "d455f89024bf236f0a3dbdbafa7f374aa6115f2c3d9768bfee96b97083400146"
+  },
+  "GutterFix/04-after-forward-recipe.png": {
+    "bytes": 1446090,
+    "sha256": "32c9f58dd2819f08b67ba89fa410a544d66bb6bfd25b1f763b006504480aa706"
+  },
+  "GutterFix/05-forward-notes.json": {
+    "bytes": 29320,
+    "sha256": "a790f04bda2e324d3355f1d4881152869e10ddd6c8adb480a7fd8991d985ae3e"
+  },
+  "GutterFix/06-after-forward-notes.json": {
+    "bytes": 2869,
+    "sha256": "346ed1846da7e57de019abe4a697c0d4ec9439f87d520490b8b9aaded7335aef"
+  },
+  "GutterFix/06-after-forward-notes.png": {
+    "bytes": 1248738,
+    "sha256": "c7d8b16bd4318cc934cfe89b1aa88e07245be5082a58d661a3d0edda71c5e02f"
+  },
+  "GutterFix/07-reverse-recipe.json": {
+    "bytes": 35502,
+    "sha256": "a1b60728029afc0bcb5c4318358bc8a0b920a34bbf46b1ff691fc9a0b96aac45"
+  },
+  "GutterFix/08-after-reverse-recipe.json": {
+    "bytes": 3059,
+    "sha256": "b34709da5df65ad10e99fa3de9fe457a83a9f7b94f82b1b6d07abe88e83c33e8"
+  },
+  "GutterFix/08-after-reverse-recipe.png": {
+    "bytes": 1439126,
+    "sha256": "31d0a19cbf52bfe472c6cfcfd8714f68e672662c37a0fb2d1c0638cfb73084da"
+  },
+  "GutterFix/COMPARE.html": {
+    "bytes": 1335,
+    "sha256": "676d87b506b3caba4efe4da0a34f37a006f4c2ee8e2bc3980518ff031b1de6ac"
+  },
+  "GutterFix/Middle-comparison.png": {
+    "bytes": 373606,
+    "sha256": "61389cc331a9715aeccf4a6ba7e84b24917762e08fe61939c77a6e43202172a4"
+  },
+  "GutterFix/REPORT.json": {
+    "bytes": 3410,
+    "sha256": "54698a3e33a830e6081a1c919c328f3d0eab70887cd710a1d05804d6c3e4c836"
+  },
+  "GutterFix/native-root-forward.json": {
+    "bytes": 31908,
+    "sha256": "eb2e32f66464c521672fa3ee44a609344c14a9a6c8837f900c7b2717ffa90886"
+  },
+  "GutterFix/native-root-reverse.json": {
+    "bytes": 31851,
+    "sha256": "75cf191bfae8b5f4ccc35414099828e7d3d3603b6e14f22bc1a1475bc755269c"
+  },
+  "INTEGRATION.md": {
+    "bytes": 5476,
+    "sha256": "74ad680ef42ea0c85c4eb0e2e47fd7f0de78e0fc8fd1c1b0e479582cf15259ce"
+  },
+  "Model/Cookbook_StylizedR02.blend": {
+    "bytes": 3862674,
+    "sha256": "333f49a5cf983653cfd02d69a7a1857c232929bf40504a162f4852eb66df407b"
+  },
+  "Model/Cookbook_StylizedR02_WidgetReady.blend": {
+    "bytes": 503916,
+    "sha256": "ec22559937274f099efd7a03f80494c4628ad144e1e544b3bc0e85c5b342f767"
+  },
+  "Model/FBX/Book_Lying_Open_01.fbx": {
+    "bytes": 861884,
+    "sha256": "7d97689fc16ca1cad26972c6a967b73aa8b60f9e3d7bde513e366670768b1328"
+  },
+  "Model/FBX/Book_Lying_Open_Page_Turn_L_to_R_02.fbx": {
+    "bytes": 915004,
+    "sha256": "c5a92bae529f3f37d6bb2d56578d532a796435d26d17f6a09d96ad3d7a5237d9"
+  },
+  "Model/FBX/Book_Lying_Open_Page_Turn_R_to_L_02.fbx": {
+    "bytes": 915020,
+    "sha256": "083cf207386f5c5a0de259bbbf1061cc367a8788dab0085619798920309ad372"
+  },
+  "Model/FBX/Book_Lying_Open_to_R_01.fbx": {
+    "bytes": 869820,
+    "sha256": "ec83c2ee4cc8f22159e9401c088ae83eeab94e48569e64b048c280272f8abf41"
+  },
+  "Model/FBX/Book_Lying_R_01.fbx": {
+    "bytes": 861884,
+    "sha256": "59ca75da445356867d7dd14a4732a611b378d5958f1c8bea1e42ee8ae144b26d"
+  },
+  "Model/FBX/Book_Lying_R_to_Open_01.fbx": {
+    "bytes": 869836,
+    "sha256": "dab518c58716d07ff3aa311845df49e25a90c942659f2d59343b9272042b52a4"
+  },
+  "Model/FBX/SK_Cookbook_StylizedR02.fbx": {
+    "bytes": 760908,
+    "sha256": "790bc3cd67cb60f58e30c235f29108b0862c50baab480d42a6c4aff930a05458"
+  },
+  "Model/README.md": {
+    "bytes": 9111,
+    "sha256": "25b2a34699c81cc629874944426bb432c8a631b34b77dab1ce0552e6e63e3444"
+  },
+  "Model/Renders/01-closed.png": {
+    "bytes": 1631479,
+    "sha256": "96687a6fd928496a1aab7eb93af98ad0d26854c0c627aeadc04d55c1f03ad955"
+  },
+  "Model/Renders/02-open.png": {
+    "bytes": 2087306,
+    "sha256": "b991441d0ae692297e3e1f9ad9b6cc39e76221014d10476130c45c0f0cb48aa4"
+  },
+  "Model/Renders/03-rear.png": {
+    "bytes": 1599640,
+    "sha256": "e701907f9c7afecb0946e5de5536b4d1d3ca244d92c3499da654aa8e3d131f10"
+  },
+  "Model/Renders/04-side.png": {
+    "bytes": 1592765,
+    "sha256": "316aecd4f6ba1158dc152c1a039578367a77b704a1b705a6991a2b1fd2cb549d"
+  },
+  "Model/Renders/05-page-turn.png": {
+    "bytes": 2012562,
+    "sha256": "55f6df6d0118611570588af3589a400f83bb8c4a712a6c525e0a5c991c1e9070"
+  },
+  "Model/Renders/06-turn-early.png": {
+    "bytes": 2032896,
+    "sha256": "d8b598667f41045712b04603db847f60b2298baa0fe36d53143886b71cc0ddae"
+  },
+  "Model/Renders/07-turn-late.png": {
+    "bytes": 2046376,
+    "sha256": "c742d2748eb2fc25a7ee4fc2e16fb93895550277b1387ed1cd1c57109c56a33f"
+  },
+  "Model/Renders/08-opening.png": {
+    "bytes": 1921772,
+    "sha256": "453556d637a140c9104143767f09747bb7019942152adb49b9918de7b9fcfdd3"
+  },
+  "Model/Renders/ContactSheet.png": {
+    "bytes": 1893304,
+    "sha256": "23842ca9715cd714f278d14a382734e80ebaa3d56875039bd2fd9076e58ba5da"
+  },
+  "Model/Renders/CookbookMotion.gif": {
+    "bytes": 9570541,
+    "sha256": "26ce849ec1f5a8cb227dc197d8d278d5f71281c4e0e0fa237feecf1d6579394c"
+  },
+  "Model/artifact_manifest.json": {
+    "bytes": 6485,
+    "sha256": "c487d7e677ef4929fbbc53bdbcd6e42a7d34014486021ed7d204ded81ea0add7"
+  },
+  "Model/build_stylized.py": {
+    "bytes": 24001,
+    "sha256": "d438c69125378a3e3a4312c15edaa3e84ee68295d3fe297ebc740b5e3d3f06a3"
+  },
+  "Model/check_gutter.py": {
+    "bytes": 1971,
+    "sha256": "c1aae7fa1b8fa3253531816e5f59f40b4d44b9b50b2b20897b6411e02f5690c2"
+  },
+  "Model/cm_export_report.json": {
+    "bytes": 2265,
+    "sha256": "05f1db84676f7d4546f36daee6571863d7206cc795e250f0b348cf3d83c55bb4"
+  },
+  "Model/cover_arc_before.json": {
+    "bytes": 9615,
+    "sha256": "3462fe207ff0f131f0add1bdbb395aff2c8f8199b7f78e24c64375fbd4fd728b"
+  },
+  "Model/export_centimetres.py": {
+    "bytes": 6516,
+    "sha256": "71968e81c5b5441bdad1595e096ca2c917e1a54edfefde43adfb3ee8ce828711"
+  },
+  "Model/export_morph_curves.py": {
+    "bytes": 2368,
+    "sha256": "2791db5038a9d024a682274d50e6e47dc94e869912ed013e269fa59abc0de245"
+  },
+  "Model/fbx_binary_units.json": {
+    "bytes": 10810,
+    "sha256": "088db9fc172b4d216d68eece5bd6a273e15c598f5ca59793335804019358c3dc"
+  },
+  "Model/fix_gutter_actions.py": {
+    "bytes": 1201,
+    "sha256": "07abcc6c86ee63cc5edd2d884018e0a9eb71a17f668f9b7f17b38742fa3a9d1a"
+  },
+  "Model/gutter_before.json": {
+    "bytes": 3435,
+    "sha256": "5ef2bc2d6fb12d6be734018d693e882a96ce761421ceeb001941736082e22088"
+  },
+  "Model/gutter_validation.json": {
+    "bytes": 3417,
+    "sha256": "d437732d12ad736778c920f9aa643c415b17fbfbba78caa932474103726c4432"
+  },
+  "Model/inspect_fbx_units.py": {
+    "bytes": 2292,
+    "sha256": "990c94b9f285f82ddf0bae72939ad329302bb77cdc7a3bfe6a4ed49e89177f63"
+  },
+  "Model/inspect_source.py": {
+    "bytes": 1930,
+    "sha256": "8b1fafdef417067b577ff692854b8f40bd6f4eb9c19d8800d3bf08d1304b676d"
+  },
+  "Model/make_contact_sheet.py": {
+    "bytes": 945,
+    "sha256": "7a93f52cc6723263da08886b2c3b2ee8710b1cc4649fbd330b03ce2f901f4726"
+  },
+  "Model/make_motion_gif.py": {
+    "bytes": 785,
+    "sha256": "60c3ffc34567908193dab4065132f1204b84d0992fbfb8f490f217e0bf6dca07"
+  },
+  "Model/materials.json": {
+    "bytes": 1623,
+    "sha256": "87b710c31dc6fa1517eb1df60742ef8ac332564fc33d7ab1a88bed47a5770f93"
+  },
+  "Model/morph_curves.json": {
+    "bytes": 48226,
+    "sha256": "7697c04af3e52d9234973d64da9f89db354c5e79b841e039eacedbcaaffb76a5"
+  },
+  "Model/package_manifest.py": {
+    "bytes": 903,
+    "sha256": "01da8452ceab2ca2a5f72c3a527db8f8057f1ec05e4fb44e52488309ece1e3c6"
+  },
+  "Model/render_motion.py": {
+    "bytes": 1310,
+    "sha256": "bd4b67e324551d920178b9eea4598b9ad148b285b621ca480e416639ff991258"
+  },
+  "Model/roundtrip_validation.json": {
+    "bytes": 9621,
+    "sha256": "be2706497476d9c298927da9de1ff5865e5ee31a5375377f661ecf5eef67553c"
+  },
+  "Model/source_inspection.json": {
+    "bytes": 44099,
+    "sha256": "dcb56eae86bf206c1950eeb3c5277c09db907d724e91548c947c8c1942701358"
+  },
+  "Model/validate_and_roundtrip.py": {
+    "bytes": 6869,
+    "sha256": "0a35807535248fa934c54046a6022c1d4b67064bff75cbbee81ca5298bbdc2d7"
+  },
+  "Model/validation.json": {
+    "bytes": 5004,
+    "sha256": "aa98497d30ff75897749b34bfdeb2972f1dcfc294b4ee49c6b55c8d38cc4fb4a"
+  },
+  "PREVIEW.html": {
+    "bytes": 7250,
+    "sha256": "5ec2e983af05dadbba8fcfc48892b47ddf736466bedf8e07104051918c46b7bf"
+  },
+  "SandboxPlacement/REPORT.json": {
+    "bytes": 894,
+    "sha256": "7c7fba26862fd50040ee0344f97672a4c4150e5264ba79e8a16d2ecf853bc202"
+  },
+  "Textures/PROMPTS.json": {
+    "bytes": 3665,
+    "sha256": "317952aaa1b2ac6c48fe8759da4d8c8952c8c5ae2fba475e494912c392990015"
+  },
+  "Textures/PageLeft.png": {
+    "bytes": 1830581,
+    "sha256": "3412b9602b6d2c1784371f301690954b033a76f3410c788c7950e28046c9fea3"
+  },
+  "Textures/PageRight.png": {
+    "bytes": 1746006,
+    "sha256": "e658d5ba590bf2d9641cb0e82aeaf62dd32f88770a212dcac45c5edffa4aee8b"
+  },
+  "UnrealPreview/VerifiedClosed/closed_000_t0.02.png": {
+    "bytes": 227474,
+    "sha256": "42d5fdf10ebe161a6ee9da17c514d9a334dfe3dc58eeac08421a14ae6e495d24"
+  },
+  "UnrealPreview/VerifiedClosing/Closing_000_t0.02.png": {
+    "bytes": 401019,
+    "sha256": "0d2d60870cf8a66971518caa98f14366365d49d9d2f185945825adb468c6d2a1"
+  },
+  "UnrealPreview/VerifiedOpen/Open_000_t0.02.png": {
+    "bytes": 655532,
+    "sha256": "1d3481f9f19f57c5ecded9b9a56887a0743d65763c52bef71f653c4505dd4ae8"
+  },
+  "UnrealPreview/VerifiedOpening/Opening_000_t0.02.png": {
+    "bytes": 410434,
+    "sha256": "289b3c14c12a02bb8c16d09daaaeeffc2476e53e6b4603b7a72ad5f5cc6585b0"
+  },
+  "UnrealPreview/VerifiedTurnEarly/TurnEarly_000_t0.02.png": {
+    "bytes": 702100,
+    "sha256": "795abf59c8698619eb47cbe04e3abf02dc176fbe3289957a5da77f7eb92f8990"
+  },
+  "UnrealPreview/VerifiedTurnLate/TurnLate_000_t0.02.png": {
+    "bytes": 696009,
+    "sha256": "c01d7c39849610c3d72f5db86af7fc766d482aac404f5cd8725380ef21252823"
+  },
+  "UnrealPreview/VerifiedTurnMid/TurnMid_000_t0.02.png": {
+    "bytes": 717379,
+    "sha256": "f063afaa1c31496429ccd367d1fdba225050680eed58127badfc18a342bab2eb"
+  },
+  "UnrealPreview/VerifiedTurnReverse/TurnReverse_000_t0.02.png": {
+    "bytes": 723343,
+    "sha256": "3b56176d635c8baad53bb488ed15e3e0271bbac5f2b8499547053e8ea0f04b19"
+  },
+  "apply_morph_curves.py": {
+    "bytes": 3649,
+    "sha256": "f8f32619f99a6070824ef9e6035d0116085d4343a685bda707cfb63ba245a7a4"
+  },
+  "import_unreal.py": {
+    "bytes": 9407,
+    "sha256": "4296dce2c8a00c275ff28c2471f5dd01ad7e6f376d347ad5fa36bf9e381b6249"
+  },
+  "package_delivery.py": {
+    "bytes": 1662,
+    "sha256": "241cf360d92a1aed6de4daee50e6670ae6b0e50223993bd7584357f8e2f7e9fa"
+  },
+  "refresh_cover_arc_delivery.py": {
+    "bytes": 1567,
+    "sha256": "89b0320a7074859dccce3f522e6ca5a0d2381a8f4f46364d03a99dcda1cf3809"
+  },
+  "unreal_import_report.json": {
+    "bytes": 5691,
+    "sha256": "1861cf3b0b73c2551f70dd99303843adfeb985221e72e5e349065d497cf3dc49"
+  },
+  "unreal_morph_report.json": {
+    "bytes": 6666,
+    "sha256": "9c93100c01fd333c4ef5cc7f8df559aad55278d3b0e6976f0c2452223e643600"
+  },
+  "unreal_pose_captures.json": {
+    "bytes": 8598,
+    "sha256": "50aabbc096b8e1e8abaabe37903cb51e509f0723e9e7a15e71e00096e5282894"
+  }
+}

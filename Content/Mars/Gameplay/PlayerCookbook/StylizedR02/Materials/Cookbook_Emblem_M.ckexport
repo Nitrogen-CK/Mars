@@ -1,0 +1,69 @@
+{
+	"material": "Cookbook_Emblem_M",
+	"packagePath": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_Emblem_M",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "68ff4240c960748e1e07119753f9d62e",
+		"exporterVersion": 3
+	},
+	"blendMode": "BLEND_Opaque",
+	"twoSided": false,
+	"unlit": false,
+	"shadingModel": "MSM_DefaultLit",
+	"domain": "MD_Surface",
+	"connectedOutputs": [
+		"BaseColor"
+	],
+	"expressions":
+	{
+		"Constant": 1,
+		"Constant3Vector": 1
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "Constant3Vector",
+				"name": "MaterialExpressionConstant3Vector_0",
+				"outputs": [
+					"None",
+					"None",
+					"None",
+					"None"
+				],
+				"props":
+				{
+					"Constant": "(R=0.830000,G=0.650000,B=0.300000,A=1.000000)"
+				}
+			},
+			{
+				"id": 1,
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_0",
+				"props":
+				{
+					"R": 0.86000001430511475
+				}
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_BaseColor",
+				"node": 0,
+				"output": 0,
+				"mask": "rgb"
+			},
+			{
+				"property": "MP_Roughness",
+				"node": 1,
+				"output": 0
+			}
+		]
+	},
+	"scalarParams": [],
+	"vectorParams": [],
+	"textureParams": [],
+	"usedTextures": []
+}

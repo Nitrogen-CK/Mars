@@ -1,0 +1,1590 @@
+{
+	"material": "PlayerCookbook_PageB_Mars_MI",
+	"packagePath": "/Game/Mars/Gameplay/PlayerCookbook/Materials/PlayerCookbook_PageB_Mars_MI",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "7b0061ef88589b837c96b025465fb253",
+		"exporterVersion": 3
+	},
+	"parentChain": [
+		"/Game/Mars/Gameplay/PlayerCookbook/Materials/PlayerCookbook_PageA_Mars_MI.PlayerCookbook_PageA_Mars_MI",
+		"/Game/Mars/Gameplay/PlayerCookbook/Materials/PlayerCookbook_Pages_Mars_M.PlayerCookbook_Pages_Mars_M"
+	],
+	"blendMode": "BLEND_Opaque",
+	"twoSided": false,
+	"unlit": false,
+	"shadingModel": "MSM_DefaultLit",
+	"domain": "MD_Surface",
+	"connectedOutputs": [],
+	"expressions":
+	{
+		"Add": 1,
+		"Constant": 1,
+		"GetMaterialAttributes": 1,
+		"MaterialFunctionCall": 10,
+		"Multiply": 1,
+		"Reroute": 3,
+		"ScalarParameter": 23,
+		"SetMaterialAttributes": 1,
+		"StaticBool": 1,
+		"StaticBoolParameter": 13,
+		"StaticSwitch": 6,
+		"TextureCoordinate": 3,
+		"TextureObjectParameter": 4,
+		"TextureSampleParameter2D": 2,
+		"VectorParameter": 4
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "StaticSwitch",
+				"name": "MaterialExpressionStaticSwitch_38",
+				"desc": "UV",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "True",
+						"node": 54,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "False",
+						"node": 53,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "Value",
+						"node": 55,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"bCommentBubbleVisible": true
+				}
+			},
+			{
+				"id": 1,
+				"class": "TextureObjectParameter",
+				"name": "MaterialExpressionTextureObjectParameter_2",
+				"props":
+				{
+					"ParameterName": "N",
+					"Group": "03 - Base Material",
+					"SortPriority": 20,
+					"Texture": "/BookMenu/Textures/T_Paper_02_N_1k.T_Paper_02_N_1k",
+					"SamplerType": "SAMPLERTYPE_Normal"
+				}
+			},
+			{
+				"id": 2,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_9",
+				"props":
+				{
+					"ParameterName": "Rotation (UV0)",
+					"Group": "01 - UV",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 3,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_27",
+				"props":
+				{
+					"ParameterName": "Rotation  (UV2)",
+					"Group": "01 - UV",
+					"SortPriority": 3
+				}
+			},
+			{
+				"id": 4,
+				"class": "MaterialFunctionCall",
+				"name": "MaterialExpressionMaterialFunctionCall_6",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "1st UV Rotation (S)",
+						"node": 2,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "3rd UV Rotation (S)",
+						"node": 3,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "1st UV Tiling (S)",
+						"node": 5,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "3rd UV Tiling (S)",
+						"node": 6,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"1st UV",
+					"3rd UV"
+				],
+				"props":
+				{
+					"MaterialFunction": "/BookMenu/Materials/Functions/MF_UV_Rotation.MF_UV_Rotation"
+				}
+			},
+			{
+				"id": 5,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_10",
+				"props":
+				{
+					"DefaultValue": 1,
+					"ParameterName": "Tiling (UV0)",
+					"Group": "01 - UV",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 6,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_26",
+				"props":
+				{
+					"DefaultValue": 1,
+					"ParameterName": "Tiling (UV2)",
+					"Group": "01 - UV",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 7,
+				"class": "MaterialFunctionCall",
+				"name": "MaterialExpressionMaterialFunctionCall_7",
+				"inputs": [
+					{
+						"index": 1,
+						"name": "BC Tex (T2d)",
+						"node": 8,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "Use R in Alpha (SB)",
+						"node": 9,
+						"output": 0
+					},
+					{
+						"index": 4,
+						"name": "R Multiplier (S)",
+						"node": 20,
+						"output": 0
+					},
+					{
+						"index": 11,
+						"name": "UV (V2)",
+						"node": 4,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"Alpha",
+					"Result"
+				],
+				"props":
+				{
+					"MaterialFunction": "/BookMenu/Materials/Functions/MF_BC_Simple.MF_BC_Simple"
+				}
+			},
+			{
+				"id": 8,
+				"class": "TextureObjectParameter",
+				"name": "MaterialExpressionTextureObjectParameter_6",
+				"desc": "Base Color Texture with either Roughness or Height in the Alpha channel. Opacity is not supportet here.",
+				"props":
+				{
+					"ParameterName": "BC",
+					"Group": "03 - Base Material",
+					"SortPriority": 10,
+					"Texture": "/BookMenu/Textures/T_Paper_02_BC_R_2k.T_Paper_02_BC_R_2k"
+				}
+			},
+			{
+				"id": 9,
+				"class": "StaticBoolParameter",
+				"name": "MaterialExpressionStaticBoolParameter_1",
+				"desc": "Use the alpha channel of the Base Color Texture as roughness information",
+				"props":
+				{
+					"DefaultValue": true,
+					"ParameterName": "BC (A) as Roughness",
+					"Group": "03 - Base Material",
+					"SortPriority": 15
+				}
+			},
+			{
+				"id": 10,
+				"class": "StaticBoolParameter",
+				"name": "MaterialExpressionStaticBoolParameter_4",
+				"props":
+				{
+					"ParameterName": "Bypass AO",
+					"Group": "03 - Base Material",
+					"SortPriority": 210
+				}
+			},
+			{
+				"id": 11,
+				"class": "StaticBoolParameter",
+				"name": "MaterialExpressionStaticBoolParameter_3",
+				"props":
+				{
+					"ParameterName": "Bypass R",
+					"Group": "03 - Base Material",
+					"SortPriority": 220
+				}
+			},
+			{
+				"id": 12,
+				"class": "StaticBoolParameter",
+				"name": "MaterialExpressionStaticBoolParameter_5",
+				"props":
+				{
+					"ParameterName": "Bypass MT",
+					"Group": "03 - Base Material",
+					"SortPriority": 230
+				}
+			},
+			{
+				"id": 13,
+				"class": "StaticBoolParameter",
+				"name": "MaterialExpressionStaticBoolParameter_8",
+				"props":
+				{
+					"ParameterName": "Constant AO",
+					"Group": "03 - Base Material",
+					"SortPriority": 230
+				}
+			},
+			{
+				"id": 14,
+				"class": "StaticBoolParameter",
+				"name": "MaterialExpressionStaticBoolParameter_6",
+				"props":
+				{
+					"ParameterName": "Constant R",
+					"Group": "03 - Base Material",
+					"SortPriority": 240
+				}
+			},
+			{
+				"id": 15,
+				"class": "StaticBoolParameter",
+				"name": "MaterialExpressionStaticBoolParameter_10",
+				"props":
+				{
+					"ParameterName": "Constant MT",
+					"Group": "03 - Base Material",
+					"SortPriority": 250
+				}
+			},
+			{
+				"id": 16,
+				"class": "TextureObjectParameter",
+				"name": "MaterialExpressionTextureObjectParameter_7",
+				"props":
+				{
+					"ParameterName": "ORM",
+					"Group": "03 - Base Material",
+					"SortPriority": 100,
+					"Texture": "/BookMenu/Textures/T_Paper_02_ORM_1k.T_Paper_02_ORM_1k",
+					"SamplerType": "SAMPLERTYPE_LinearColor"
+				}
+			},
+			{
+				"id": 17,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_11",
+				"props":
+				{
+					"DefaultValue": 1,
+					"ParameterName": "AO",
+					"Group": "03 - Base Material",
+					"SortPriority": 260
+				}
+			},
+			{
+				"id": 18,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_12",
+				"props":
+				{
+					"DefaultValue": 1,
+					"ParameterName": "MT",
+					"Group": "03 - Base Material",
+					"SortPriority": 280
+				}
+			},
+			{
+				"id": 19,
+				"class": "MaterialFunctionCall",
+				"name": "MaterialExpressionMaterialFunctionCall_8",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "In (MA)",
+						"node": 7,
+						"output": 1
+					},
+					{
+						"index": 1,
+						"name": "ORM Tex (T2d)",
+						"node": 16,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "AO Mult (S)",
+						"node": 22,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "Bypass AO (SB)",
+						"node": 10,
+						"output": 0
+					},
+					{
+						"index": 4,
+						"name": "Constant AO (SB)",
+						"node": 13,
+						"output": 0
+					},
+					{
+						"index": 5,
+						"name": "R Mult (S)",
+						"node": 21,
+						"output": 0
+					},
+					{
+						"index": 6,
+						"name": "Bypass R (SB)",
+						"node": 27,
+						"output": 0
+					},
+					{
+						"index": 7,
+						"name": "Constant R (SB)",
+						"node": 14,
+						"output": 0
+					},
+					{
+						"index": 8,
+						"name": "MT Mult (S)",
+						"node": 23,
+						"output": 0
+					},
+					{
+						"index": 9,
+						"name": "Bypass MT (SB)",
+						"node": 12,
+						"output": 0
+					},
+					{
+						"index": 10,
+						"name": "Constant MT (SB)",
+						"node": 15,
+						"output": 0
+					},
+					{
+						"index": 12,
+						"name": "UV (V2)",
+						"node": 4,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"MaterialFunction": "/BookMenu/Materials/Functions/MF_ORM_Simple.MF_ORM_Simple"
+				}
+			},
+			{
+				"id": 20,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_13",
+				"desc": "If parameter \"Constant R\" is checked, this parameter works as a constant. If an ORM Texture is used, this parameter works as a multiplier for the roughness channel (G).",
+				"props":
+				{
+					"DefaultValue": 1,
+					"ParameterName": "R",
+					"Group": "03 - Base Material",
+					"SortPriority": 270
+				}
+			},
+			{
+				"id": 21,
+				"class": "Reroute",
+				"name": "MaterialExpressionReroute_8",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Input",
+						"node": 20,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 22,
+				"class": "Reroute",
+				"name": "MaterialExpressionReroute_9",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Input",
+						"node": 17,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 23,
+				"class": "Reroute",
+				"name": "MaterialExpressionReroute_10",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Input",
+						"node": 18,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 24,
+				"class": "MaterialFunctionCall",
+				"name": "MaterialExpressionMaterialFunctionCall_9",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "In (MA)",
+						"node": 19,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "NTex (T2d)",
+						"node": 1,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "Adjust Intensity (SB)",
+						"node": 25,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "Intensity (S)",
+						"node": 26,
+						"output": 0
+					},
+					{
+						"index": 5,
+						"name": "UV (V2)",
+						"node": 4,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"MaterialFunction": "/BookMenu/Materials/Functions/MF_N_Simple.MF_N_Simple"
+				}
+			},
+			{
+				"id": 25,
+				"class": "StaticBoolParameter",
+				"name": "MaterialExpressionStaticBoolParameter_12",
+				"props":
+				{
+					"ParameterName": "Adjust N Intensity",
+					"Group": "03 - Base Material",
+					"SortPriority": 320
+				}
+			},
+			{
+				"id": 26,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_14",
+				"props":
+				{
+					"DefaultValue": 1,
+					"ParameterName": "N Intensity",
+					"Group": "03 - Base Material",
+					"SortPriority": 330
+				}
+			},
+			{
+				"id": 27,
+				"class": "StaticSwitch",
+				"name": "MaterialExpressionStaticSwitch_2",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "True",
+						"node": 28,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "False",
+						"node": 11,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "Value",
+						"node": 9,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 28,
+				"class": "StaticBool",
+				"name": "MaterialExpressionStaticBool_2",
+				"props":
+				{
+					"Value": true
+				}
+			},
+			{
+				"id": 29,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_4",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.401042,G=0.303281,B=0.216001,A=1.000000)",
+					"ParameterName": "Tint",
+					"Group": "03 - Base Material",
+					"SortPriority": 810
+				}
+			},
+			{
+				"id": 30,
+				"class": "StaticBoolParameter",
+				"name": "MaterialExpressionStaticBoolParameter_36",
+				"props":
+				{
+					"ParameterName": "Use Tint",
+					"Group": "01 - Global",
+					"SortPriority": 800
+				}
+			},
+			{
+				"id": 31,
+				"class": "MaterialFunctionCall",
+				"name": "MaterialExpressionMaterialFunctionCall_18",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "BaseMat (MA)",
+						"node": 24,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "Color (V3)",
+						"node": 29,
+						"output": 0,
+						"mask": "rgb"
+					}
+				],
+				"props":
+				{
+					"MaterialFunction": "/BookMenu/Materials/Functions/MF_Simple_Base_Color_Overlay.MF_Simple_Base_Color_Overlay"
+				}
+			},
+			{
+				"id": 32,
+				"class": "StaticSwitch",
+				"name": "MaterialExpressionStaticSwitch_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "True",
+						"node": 31,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "False",
+						"node": 24,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "Value",
+						"node": 30,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 33,
+				"class": "StaticBoolParameter",
+				"name": "MaterialExpressionStaticBoolParameter_2",
+				"props":
+				{
+					"ParameterName": "Use Text Mask",
+					"Group": "04 - Text"
+				}
+			},
+			{
+				"id": 34,
+				"class": "StaticSwitch",
+				"name": "MaterialExpressionStaticSwitch_3",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "True",
+						"node": 35,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "False",
+						"node": 32,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "Value",
+						"node": 33,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 35,
+				"class": "MaterialFunctionCall",
+				"name": "MaterialExpressionMaterialFunctionCall_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Color (V3)",
+						"node": 36,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 1,
+						"name": "Roughness (S)",
+						"node": 37,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "Intensity (S)",
+						"node": 38,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "Mask (S)",
+						"node": 41,
+						"output": 0
+					},
+					{
+						"index": 4,
+						"name": "Metallic (V3)",
+						"node": 39,
+						"output": 0
+					},
+					{
+						"index": 5,
+						"name": "Base_Material (MA)",
+						"node": 32,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"MaterialFunction": "/BookMenu/Materials/Functions/MF_Mask_to_BC_R_M.MF_Mask_to_BC_R_M"
+				}
+			},
+			{
+				"id": 36,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_2",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.000000,G=0.000000,B=0.000000,A=1.000000)",
+					"ParameterName": "Text Color",
+					"Group": "04 - Text",
+					"SortPriority": 810
+				}
+			},
+			{
+				"id": 37,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_0",
+				"props":
+				{
+					"DefaultValue": 1,
+					"SliderMin": -1,
+					"SliderMax": 5,
+					"ParameterName": "Text Roughness",
+					"Group": "04 - Text",
+					"SortPriority": 12
+				}
+			},
+			{
+				"id": 38,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_1",
+				"props":
+				{
+					"DefaultValue": 1,
+					"SliderMax": 5,
+					"ParameterName": "Text Mask Intensity",
+					"Group": "04 - Text",
+					"SortPriority": 12
+				}
+			},
+			{
+				"id": 39,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_2",
+				"props":
+				{
+					"SliderMax": 5,
+					"ParameterName": "Text Metallic",
+					"Group": "04 - Text",
+					"SortPriority": 12
+				}
+			},
+			{
+				"id": 40,
+				"class": "TextureObjectParameter",
+				"name": "MaterialExpressionTextureObjectParameter_1",
+				"props":
+				{
+					"ParameterName": "Mask",
+					"Group": "02 - Mask",
+					"SortPriority": 105,
+					"Texture": "/BookMenu/Textures/Basic/T_Basic_01_Op.T_Basic_01_Op"
+				}
+			},
+			{
+				"id": 41,
+				"class": "MaterialFunctionCall",
+				"name": "MaterialExpressionMaterialFunctionCall_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Mask (T2d)",
+						"node": 40,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "Intensity (R) (S)",
+						"node": 42,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "Contrast (R) (S)",
+						"node": 45,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "Intensity (G) (S)",
+						"node": 43,
+						"output": 0
+					},
+					{
+						"index": 4,
+						"name": "Contrast (G) (S)",
+						"node": 46,
+						"output": 0
+					},
+					{
+						"index": 5,
+						"name": "Intensity (B) (S)",
+						"node": 44,
+						"output": 0
+					},
+					{
+						"index": 6,
+						"name": "Contrast (B) (S)",
+						"node": 47,
+						"output": 0
+					},
+					{
+						"index": 10,
+						"name": "UV (V2)",
+						"node": 61,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"Mask R",
+					"Mask G",
+					"Mask B",
+					"Mask A",
+					"Mask RGBA"
+				],
+				"props":
+				{
+					"MaterialFunction": "/BookMenu/Materials/Functions/MF_Mask_Splitter_Simple.MF_Mask_Splitter_Simple"
+				}
+			},
+			{
+				"id": 42,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_3",
+				"props":
+				{
+					"DefaultValue": 1,
+					"SliderMax": 5,
+					"ParameterName": "Text Mask Intensity (R)",
+					"Group": "02 - Mask",
+					"SortPriority": 12
+				}
+			},
+			{
+				"id": 43,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_5",
+				"props":
+				{
+					"SliderMax": 5,
+					"ParameterName": "Edge MaskIntensity (G)",
+					"Group": "02 - Mask",
+					"SortPriority": 22
+				}
+			},
+			{
+				"id": 44,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_15",
+				"props":
+				{
+					"SliderMax": 5,
+					"ParameterName": "Dirt Maks Intensity (B)",
+					"Group": "02 - Mask"
+				}
+			},
+			{
+				"id": 45,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_16",
+				"props":
+				{
+					"SliderMax": 1,
+					"ParameterName": "Text Mask Contrast (R)",
+					"Group": "02 - Mask",
+					"SortPriority": 13
+				}
+			},
+			{
+				"id": 46,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_17",
+				"props":
+				{
+					"SliderMax": 1,
+					"ParameterName": "Edge Mask Contrast (G)",
+					"Group": "02 - Mask",
+					"SortPriority": 23
+				}
+			},
+			{
+				"id": 47,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_18",
+				"props":
+				{
+					"SliderMax": 1,
+					"ParameterName": "Dirt Mask Contrast (B)",
+					"Group": "02 - Mask",
+					"SortPriority": 33
+				}
+			},
+			{
+				"id": 48,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_16",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.000000,G=1.000000,B=0.000000,A=1.000000)",
+					"ParameterName": "Edge Color (Global)",
+					"Group": "01 - Global",
+					"SortPriority": 351
+				}
+			},
+			{
+				"id": 49,
+				"class": "MaterialFunctionCall",
+				"name": "MaterialExpressionMaterialFunctionCall_13",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Original Value (V3)",
+						"node": 51,
+						"output": 1
+					},
+					{
+						"index": 2,
+						"name": "New Value (V3)",
+						"node": 48,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 3,
+						"name": "Mask (S)",
+						"node": 41,
+						"output": 1
+					}
+				],
+				"props":
+				{
+					"MaterialFunction": "/BookMenu/Materials/Functions/MF_Repace_Value_V3_Masked.MF_Repace_Value_V3_Masked"
+				}
+			},
+			{
+				"id": 50,
+				"class": "SetMaterialAttributes",
+				"name": "MaterialExpressionSetMaterialAttributes_6",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "MaterialAttributes",
+						"node": 51,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "Base Color",
+						"node": 49,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"AttributeSetTypes": [
+						"69B8D33616ED4D499AA497292F050F7A"
+					]
+				}
+			},
+			{
+				"id": 51,
+				"class": "GetMaterialAttributes",
+				"name": "MaterialExpressionGetMaterialAttributes_6",
+				"inputs": [
+					{
+						"index": 0,
+						"node": 34,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"MaterialAttributes",
+					"Base Color"
+				],
+				"props":
+				{
+					"AttributeGetTypes": [
+						"69B8D33616ED4D499AA497292F050F7A"
+					]
+				}
+			},
+			{
+				"id": 52,
+				"class": "StaticBoolParameter",
+				"name": "MaterialExpressionStaticBoolParameter_68",
+				"props":
+				{
+					"ParameterName": "Use Global Edges",
+					"Group": "01 - Global",
+					"SortPriority": 350
+				}
+			},
+			{
+				"id": 53,
+				"class": "StaticSwitch",
+				"name": "MaterialExpressionStaticSwitch_37",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "True",
+						"node": 50,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "False",
+						"node": 34,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "Value",
+						"node": 52,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 54,
+				"class": "MaterialFunctionCall",
+				"name": "MaterialExpressionMaterialFunctionCall_20",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Dirt_Color (V3)",
+						"node": 56,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 1,
+						"name": "Roughness (S)",
+						"node": 57,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "Intensity (S)",
+						"node": 58,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "Metallic_Reduction (S)",
+						"node": 59,
+						"output": 0
+					},
+					{
+						"index": 4,
+						"name": "Mask (S)",
+						"node": 41,
+						"output": 2
+					},
+					{
+						"index": 5,
+						"name": "Base_Material (MA)",
+						"node": 53,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"MaterialFunction": "/BookMenu/Materials/Functions/MF_Add_Dirt.MF_Add_Dirt"
+				}
+			},
+			{
+				"id": 55,
+				"class": "StaticBoolParameter",
+				"name": "MaterialExpressionStaticBoolParameter_69",
+				"props":
+				{
+					"ParameterName": "Add Dirt",
+					"Group": "01 - Global",
+					"SortPriority": 360
+				}
+			},
+			{
+				"id": 56,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_17",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.000000,G=0.000000,B=1.000000,A=1.000000)",
+					"ParameterName": "Dirt Color (Global)",
+					"Group": "01 - Global",
+					"SortPriority": 361
+				}
+			},
+			{
+				"id": 57,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_29",
+				"props":
+				{
+					"DefaultValue": 1,
+					"SliderMax": 5,
+					"ParameterName": "Dirt Roughness",
+					"Group": "01 - Global",
+					"SortPriority": 362
+				}
+			},
+			{
+				"id": 58,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_30",
+				"props":
+				{
+					"DefaultValue": 1,
+					"SliderMax": 1,
+					"ParameterName": "Dirt Intensity",
+					"Group": "01 - Global",
+					"SortPriority": 263
+				}
+			},
+			{
+				"id": 59,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_31",
+				"props":
+				{
+					"DefaultValue": 0.5,
+					"SliderMax": 1,
+					"ParameterName": "Dirt Reduce Metallic",
+					"Group": "01 - Global",
+					"SortPriority": 264
+				}
+			},
+			{
+				"id": 60,
+				"class": "StaticBoolParameter",
+				"name": "MaterialExpressionStaticBoolParameter_0",
+				"props":
+				{
+					"DefaultValue": true,
+					"ParameterName": "Is Page",
+					"Group": "01 - Global",
+					"SortPriority": 800
+				}
+			},
+			{
+				"id": 61,
+				"class": "StaticSwitch",
+				"name": "MaterialExpressionStaticSwitch_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "True",
+						"node": 63,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "False",
+						"node": 62,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "Value",
+						"node": 60,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 62,
+				"class": "TextureCoordinate",
+				"name": "MaterialExpressionTextureCoordinate_3",
+				"props":
+				{
+					"CoordinateIndex": 2
+				}
+			},
+			{
+				"id": 63,
+				"class": "TextureCoordinate",
+				"name": "MaterialExpressionTextureCoordinate_0"
+			},
+			{
+				"id": 64,
+				"class": "TextureCoordinate",
+				"name": "MaterialExpressionTextureCoordinate_1",
+				"props":
+				{
+					"CoordinateIndex": 3
+				}
+			},
+			{
+				"id": 65,
+				"class": "TextureSampleParameter2D",
+				"name": "MaterialExpressionTextureSampleParameter2D_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Coordinates",
+						"node": 64,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"ParameterName": "Stain BC",
+					"Group": "Stains",
+					"SamplerSource": "SSM_Wrap_WorldGroupSettings",
+					"Texture": "/Game/Mars/Gameplay/PlayerCookbook/Textures/PlayerCookbook_PagesStain_Mars_T.PlayerCookbook_PagesStain_Mars_T"
+				}
+			},
+			{
+				"id": 66,
+				"class": "TextureSampleParameter2D",
+				"name": "MaterialExpressionTextureSampleParameter2D_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Coordinates",
+						"node": 64,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"ParameterName": "Stain Mask",
+					"Group": "Stains",
+					"SamplerSource": "SSM_Wrap_WorldGroupSettings",
+					"Texture": "/Game/Mars/Gameplay/PlayerCookbook/Textures/PlayerCookbook_PagesStainMask_Mars_T.PlayerCookbook_PagesStainMask_Mars_T",
+					"SamplerType": "SAMPLERTYPE_LinearColor"
+				}
+			},
+			{
+				"id": 67,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_4",
+				"props":
+				{
+					"DefaultValue": 1,
+					"ParameterName": "Stain Intensity",
+					"Group": "Stains"
+				}
+			},
+			{
+				"id": 68,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_6",
+				"props":
+				{
+					"DefaultValue": 0.10000000149011612,
+					"ParameterName": "Stain Roughness",
+					"Group": "Stains"
+				}
+			},
+			{
+				"id": 69,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_7",
+				"props":
+				{
+					"DefaultValue": -0.44999998807907104,
+					"ParameterName": "Grease Roughness",
+					"Group": "Stains"
+				}
+			},
+			{
+				"id": 70,
+				"class": "Multiply",
+				"name": "MaterialExpressionMultiply_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 69,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 66,
+						"output": 2,
+						"mask": "g"
+					}
+				]
+			},
+			{
+				"id": 71,
+				"class": "Add",
+				"name": "MaterialExpressionAdd_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 68,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 70,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 72,
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_0"
+			},
+			{
+				"id": 73,
+				"class": "MaterialFunctionCall",
+				"name": "MaterialExpressionMaterialFunctionCall_2",
+				"desc": "PlayerCookbook stain overlay (StainUV = UV3)",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Dirt_Color (V3)",
+						"node": 65,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 1,
+						"name": "Roughness (S)",
+						"node": 71,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "Intensity (S)",
+						"node": 67,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "Metallic_Reduction (S)",
+						"node": 72,
+						"output": 0
+					},
+					{
+						"index": 4,
+						"name": "Mask (S)",
+						"node": 65,
+						"output": 4,
+						"mask": "a"
+					},
+					{
+						"index": 5,
+						"name": "Base_Material (MA)",
+						"node": 0,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"MaterialFunction": "/BookMenu/Materials/Functions/MF_Add_Dirt.MF_Add_Dirt"
+				}
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_MaterialAttributes",
+				"node": 73,
+				"output": 0
+			}
+		]
+	},
+	"scalarParams": [
+		{
+			"name": "Rotation (UV0)",
+			"value": 0
+		},
+		{
+			"name": "Rotation  (UV2)",
+			"value": 0
+		},
+		{
+			"name": "Tiling (UV0)",
+			"value": 1
+		},
+		{
+			"name": "Tiling (UV2)",
+			"value": 1
+		},
+		{
+			"name": "AO",
+			"value": 1
+		},
+		{
+			"name": "MT",
+			"value": 1
+		},
+		{
+			"name": "R",
+			"value": 1
+		},
+		{
+			"name": "N Intensity",
+			"value": 1
+		},
+		{
+			"name": "Text Roughness",
+			"value": 1
+		},
+		{
+			"name": "Text Mask Intensity",
+			"value": 1
+		},
+		{
+			"name": "Text Metallic",
+			"value": 0
+		},
+		{
+			"name": "Text Mask Intensity (R)",
+			"value": 1
+		},
+		{
+			"name": "Edge MaskIntensity (G)",
+			"value": 0
+		},
+		{
+			"name": "Dirt Maks Intensity (B)",
+			"value": 0
+		},
+		{
+			"name": "Text Mask Contrast (R)",
+			"value": 0
+		},
+		{
+			"name": "Edge Mask Contrast (G)",
+			"value": 0
+		},
+		{
+			"name": "Dirt Mask Contrast (B)",
+			"value": 0
+		},
+		{
+			"name": "Dirt Roughness",
+			"value": 1
+		},
+		{
+			"name": "Dirt Intensity",
+			"value": 1
+		},
+		{
+			"name": "Dirt Reduce Metallic",
+			"value": 0.5
+		},
+		{
+			"name": "Stain Intensity",
+			"value": 1
+		},
+		{
+			"name": "Stain Roughness",
+			"value": 0.10000000149011612
+		},
+		{
+			"name": "Grease Roughness",
+			"value": -0.44999998807907104
+		}
+	],
+	"vectorParams": [
+		{
+			"name": "Tint",
+			"value": "RGBA(0.401042, 0.303281, 0.216001, 1)"
+		},
+		{
+			"name": "Text Color",
+			"value": "RGBA(0, 0, 0, 1)"
+		},
+		{
+			"name": "Edge Color (Global)",
+			"value": "RGBA(0, 1, 0, 1)"
+		},
+		{
+			"name": "Dirt Color (Global)",
+			"value": "RGBA(0, 0, 1, 1)"
+		}
+	],
+	"textureParams": [
+		{
+			"name": "N",
+			"value": "/BookMenu/Textures/T_Paper_02_N_1k.T_Paper_02_N_1k"
+		},
+		{
+			"name": "BC",
+			"value": "/BookMenu/Textures/T_Paper_02_BC_R_2k.T_Paper_02_BC_R_2k"
+		},
+		{
+			"name": "ORM",
+			"value": "/BookMenu/Textures/T_Paper_02_ORM_1k.T_Paper_02_ORM_1k"
+		},
+		{
+			"name": "Mask",
+			"value": "/BookMenu/Textures/Basic/T_Basic_01_Op.T_Basic_01_Op"
+		},
+		{
+			"name": "Stain BC",
+			"value": "/Game/Mars/Gameplay/PlayerCookbook/Textures/PlayerCookbook_PagesStain_Mars_T.PlayerCookbook_PagesStain_Mars_T"
+		},
+		{
+			"name": "Stain Mask",
+			"value": "/Game/Mars/Gameplay/PlayerCookbook/Textures/PlayerCookbook_PagesStainMask_Mars_T.PlayerCookbook_PagesStainMask_Mars_T"
+		}
+	],
+	"usedTextures": [
+		"/BookMenu/Textures/T_Paper_02_N_1k.T_Paper_02_N_1k",
+		"/BookMenu/Textures/T_Paper_02_BC_R_2k.T_Paper_02_BC_R_2k",
+		"/Game/Mars/Gameplay/PlayerCookbook/Textures/PlayerCookbook_PagesStain_Mars_T.PlayerCookbook_PagesStain_Mars_T",
+		"/Game/Mars/Gameplay/PlayerCookbook/Textures/PlayerCookbook_PagesStainMask_Mars_T.PlayerCookbook_PagesStainMask_Mars_T"
+	]
+}

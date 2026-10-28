@@ -1,0 +1,120 @@
+{
+  "label": "04-reopened-new-targets",
+  "world": "/Game/Mars/Maps/UEDPIE_0_Sandbox_Mars_MAP.Sandbox_Mars_MAP",
+  "game_time": 152.58212779462337,
+  "rotation_tuple_order": [
+    "roll",
+    "pitch",
+    "yaw"
+  ],
+  "camera_location": [
+    -600.0,
+    -225.0,
+    112.39793182785351
+  ],
+  "camera_rotation": [
+    -8.703928453901531e-16,
+    -62.82112503051758,
+    5.119117736816406
+  ],
+  "control_rotation": [
+    -8.703928453901531e-16,
+    -62.82112503051758,
+    5.119117736816406
+  ],
+  "events": [
+    {
+      "key": "LeftMouseButton",
+      "pressed": true,
+      "game_time": 33.53101211413741
+    },
+    {
+      "key": "LeftMouseButton",
+      "pressed": false,
+      "game_time": 33.68984271213412
+    },
+    {
+      "key": "LeftMouseButton",
+      "pressed": true,
+      "game_time": 44.88632061332464
+    },
+    {
+      "key": "LeftMouseButton",
+      "pressed": false,
+      "game_time": 45.05828821286559
+    },
+    {
+      "key": "E",
+      "pressed": true,
+      "game_time": 63.0610461011529
+    },
+    {
+      "key": "E",
+      "pressed": false,
+      "game_time": 63.211937103420496
+    },
+    {
+      "key": "R",
+      "pressed": true,
+      "game_time": 85.16137589141726
+    },
+    {
+      "key": "R",
+      "pressed": false,
+      "game_time": 85.32377519086003
+    },
+    {
+      "key": "LeftMouseButton",
+      "pressed": true,
+      "game_time": 131.9275032952428
+    },
+    {
+      "key": "LeftMouseButton",
+      "pressed": false,
+      "game_time": 132.0855374969542
+    },
+    {
+      "key": "LeftMouseButton",
+      "pressed": true,
+      "game_time": 142.65258889645338
+    },
+    {
+      "key": "LeftMouseButton",
+      "pressed": false,
+      "game_time": 142.81914639472961
+    }
+  ],
+  "books": [
+    {
+      "name": "Mars_CookbookPresentationComponent_0",
+      "location": [
+        -587.6408969088905,
+        -223.89288156125377,
+        78.32858375726312
+      ],
+      "rotation": [
+        27.178876876831055,
+        0.0,
+        95.1191177368164
+      ],
+      "visible": true,
+      "engine_tick_enabled": false,
+      "state": "<Mars_CookbookState.OPEN: 2>",
+      "section": 1,
+      "sections": 3,
+      "position": 0.0,
+      "page_materials": [
+        "/Game/Mars/Maps/UEDPIE_0_Sandbox_Mars_MAP.Sandbox_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host.Mars_CookbookPresentationComponent_0.MID_Cookbook_PageA_M_1",
+        "/Game/Mars/Maps/UEDPIE_0_Sandbox_Mars_MAP.Sandbox_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host.Mars_CookbookPresentationComponent_0.MID_Cookbook_PageB_M_1",
+        "/Game/Mars/Maps/UEDPIE_0_Sandbox_Mars_MAP.Sandbox_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host.Mars_CookbookPresentationComponent_0.MID_Cookbook_PageC_M_1",
+        "/Game/Mars/Maps/UEDPIE_0_Sandbox_Mars_MAP.Sandbox_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host.Mars_CookbookPresentationComponent_0.MID_Cookbook_PageD_M_1"
+      ],
+      "page_targets": [
+        "<Object '/Engine/Transient.TextureRenderTarget2D_26' (0x000001CF67C4A800) Class 'TextureRenderTarget2D'>",
+        "<Object '/Engine/Transient.TextureRenderTarget2D_27' (0x000001CF67C44800) Class 'TextureRenderTarget2D'>",
+        "<Object '/Engine/Transient.TextureRenderTarget2D_26' (0x000001CF67C4A800) Class 'TextureRenderTarget2D'>",
+        "<Object '/Engine/Transient.TextureRenderTarget2D_27' (0x000001CF67C44800) Class 'TextureRenderTarget2D'>"
+      ]
+    }
+  ]
+}

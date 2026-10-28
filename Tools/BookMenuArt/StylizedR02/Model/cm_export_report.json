@@ -1,0 +1,114 @@
+{
+  "source_blend": "D:\\Repositories\\CkRepos\\Orion\\Tools\\BookMenuArt\\StylizedR02\\Model\\Cookbook_StylizedR02_WidgetReady.blend",
+  "export_coordinate_unit": "centimetres",
+  "export_scene_scale_length": 0.01,
+  "mesh_object_scale": [
+    1.0,
+    1.0,
+    1.0
+  ],
+  "armature_object_scale": [
+    1.0,
+    1.0,
+    1.0
+  ],
+  "source_scene_scale_length": 1.0,
+  "files": {
+    "SK_Cookbook_StylizedR02.fbx": {
+      "bytes": 760908,
+      "kind": "skeletal mesh"
+    },
+    "Book_Lying_Open_01.fbx": {
+      "bytes": 861884,
+      "frames": [
+        1,
+        24
+      ],
+      "root_pose_scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    "Book_Lying_Open_Page_Turn_L_to_R_02.fbx": {
+      "bytes": 915004,
+      "frames": [
+        1,
+        108
+      ],
+      "root_pose_scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    "Book_Lying_Open_Page_Turn_R_to_L_02.fbx": {
+      "bytes": 915020,
+      "frames": [
+        1,
+        108
+      ],
+      "root_pose_scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    "Book_Lying_Open_to_R_01.fbx": {
+      "bytes": 869820,
+      "frames": [
+        1,
+        48
+      ],
+      "root_pose_scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    "Book_Lying_R_01.fbx": {
+      "bytes": 861884,
+      "frames": [
+        1,
+        24
+      ],
+      "root_pose_scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    "Book_Lying_R_to_Open_01.fbx": {
+      "bytes": 869836,
+      "frames": [
+        1,
+        48
+      ],
+      "root_pose_scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  "root_rest_local_scale": [
+    1.0,
+    1.0,
+    1.0
+  ],
+  "cover_hinge_local_cm": [
+    0.0,
+    0.0,
+    0.952000081539154
+  ],
+  "page_turn_hinge_local_cm": [
+    0.476000040769577,
+    0.0,
+    1.0063999891281128
+  ],
+  "source_data_restored": true,
+  "location_keys_restored": true,
+  "source_blend_sha256_before": "ec22559937274f099efd7a03f80494c4628ad144e1e544b3bc0e85c5b342f767",
+  "source_blend_sha256_after": "ec22559937274f099efd7a03f80494c4628ad144e1e544b3bc0e85c5b342f767",
+  "source_file_unchanged": true
+}

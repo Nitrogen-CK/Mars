@@ -1,0 +1,27 @@
+{
+  "label": "09-reopened-after-gc",
+  "state": "<Mars_CookbookState.OPEN: 2>",
+  "section": 1,
+  "textures": [
+    "/Engine/Transient.Texture2D_15",
+    "/Engine/Transient.Texture2D_16",
+    "/Engine/Transient.Texture2D_15",
+    "/Engine/Transient.Texture2D_16"
+  ],
+  "widget_classes": [
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Widgets/Cookbook_Index_Left_WBP.Cookbook_Index_Left_WBP_C",
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Widgets/Cookbook_Notes_Right_WBP.Cookbook_Notes_Right_WBP_C",
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Widgets/Cookbook_Notes_Left_WBP.Cookbook_Notes_Left_WBP_C",
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Widgets/Cookbook_Sample_Right_WBP.Cookbook_Sample_Right_WBP_C",
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Widgets/Cookbook_Sample_Left_WBP.Cookbook_Sample_Left_WBP_C",
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Widgets/Cookbook_Index_Right_WBP.Cookbook_Index_Right_WBP_C"
+  ],
+  "all_ck_widgets": true,
+  "all_texture2d": true,
+  "material_textures": [
+    "/Engine/Transient.Texture2D_15",
+    "/Engine/Transient.Texture2D_16",
+    "/Engine/Transient.Texture2D_15",
+    "/Engine/Transient.Texture2D_16"
+  ]
+}

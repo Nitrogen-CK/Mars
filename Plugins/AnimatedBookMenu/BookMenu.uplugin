@@ -1,0 +1,35 @@
+{
+	"FileVersion": 3,
+	"Version": 5,
+	"VersionName": "1.5",
+	"FriendlyName": "Animated Book Menu",
+	"Description": "Plugin to create interactive books with custom UMG Widgets rendered onto the pages.",
+	"Category": "Advanced Gameplay",
+	"CreatedBy": "Suricoon",
+	"CreatedByURL": "https://suricoon.com",
+	"DocsURL": "https://docs.suricoon.com/",
+	"MarketplaceURL": "https://publish.unrealengine.com/v3/edit-product/a88c635f71bd42a680592c8ec2e91e32",
+	"SupportURL": "https://suricoon.com",
+	"CanContainContent": true,
+	"Installed": true,
+	"Modules": [
+		{
+			"Name": "BookMenu",
+			"Type": "Runtime",
+			"LoadingPhase": "Default",
+			"PlatformAllowList": [
+				"Win64",
+				"Mac"
+			]
+		},
+		{
+			"Name": "BookMenuEditor",
+			"Type": "Editor",
+			"LoadingPhase": "PreDefault",
+			"PlatformAllowList": [
+				"Win64",
+				"Mac"
+			]
+		}
+	]
+}

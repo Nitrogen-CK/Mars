@@ -1,0 +1,92 @@
+{
+  "label": "01-placed-book",
+  "world": "/Game/Mars/Maps/UEDPIE_0_Sandbox_Mars_MAP.Sandbox_Mars_MAP",
+  "game_time": 47.95634289458394,
+  "rotation_tuple_order": [
+    "roll",
+    "pitch",
+    "yaw"
+  ],
+  "camera_location": [
+    -600.0,
+    -75.0,
+    112.39697519203698
+  ],
+  "camera_rotation": [
+    0.0,
+    0.0,
+    0.0
+  ],
+  "control_rotation": [
+    0.0,
+    0.0,
+    0.0
+  ],
+  "events": [
+    {
+      "key": "LeftMouseButton",
+      "pressed": true,
+      "game_time": 31.78767481073737
+    },
+    {
+      "key": "LeftMouseButton",
+      "pressed": false,
+      "game_time": 31.939190112054348
+    },
+    {
+      "key": "LeftMouseButton",
+      "pressed": true,
+      "game_time": 22.3607143945992
+    },
+    {
+      "key": "LeftMouseButton",
+      "pressed": false,
+      "game_time": 22.513413097709417
+    }
+  ],
+  "books": [
+    {
+      "name": "Mars_CookbookPresentationComponent_0",
+      "location": [
+        -449.9459228515625,
+        -0.03713324499005921,
+        0.6337114012401912
+      ],
+      "rotation": [
+        0.004569194279611111,
+        0.002174347871914506,
+        0.05656277760863304
+      ],
+      "scale": [
+        1.2,
+        1.2,
+        1.2
+      ],
+      "reading_hand_offset": [
+        -25.0,
+        0.0,
+        18.0
+      ],
+      "reading_grip_below_centre": 16.0,
+      "animation_speed": 1.5,
+      "visible": true,
+      "engine_tick_enabled": false,
+      "state": "<Mars_CookbookState.CLOSED: 0>",
+      "section": 0,
+      "sections": 3,
+      "position": 0.0,
+      "page_materials": [
+        "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_PageA_M.Cookbook_PageA_M",
+        "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_PageB_M.Cookbook_PageB_M",
+        "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_PageC_M.Cookbook_PageC_M",
+        "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_PageD_M.Cookbook_PageD_M"
+      ],
+      "page_targets": [
+        null,
+        null,
+        null,
+        null
+      ]
+    }
+  ]
+}

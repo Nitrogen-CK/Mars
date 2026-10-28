@@ -1,0 +1,129 @@
+UnrealToolbox — Unreal Engine project launcher
+Usage: D:\Repositories\CkRepos\Orion\CkAuto\UnrealToolbox.exe [OPTIONS]
+
+Options:
+  -h,--help                   Print usage
+  --version                   Display program version information and exit
+  --build Excludes: --run-scheduled --measure-compare --warm-server --launch-editor --staged-client --analyze-trace --package --build-status
+                              Run a headless build and exit
+  --run-scheduled Excludes: --build --test --measure-compare --warm-server --gauntlet --launch-editor --staged-client --analyze-trace --package --build-status
+                              Run the scheduled combined pipeline and exit
+  --test Excludes: --run-scheduled --measure-compare --warm-server --gauntlet --launch-editor --staged-client --analyze-trace --package --build-status
+                              Run a headless test pass and exit (composable with --build)
+  --generate Needs: --build Excludes: --measure-compare
+                              Run Generate Project Files before building
+  --target TEXT:{Editor,Game,Server,Client} Needs: --build
+                              Build target override: Editor, Game, Server, Client
+  --config TEXT:{Development,DebugGame,Shipping,Test,Auto} Needs: --build
+                              Build config override: Development, DebugGame, Shipping, Test, Auto (Auto = build whatever config was last built / the IDE uses)
+  --platform TEXT:{Win64,Linux,Android} Needs: --build
+                              Platform override: Win64, Linux, Android
+  --allow-config-flip Needs: --build
+                              Proceed even when the explicit --config differs from the last-built config on a Unique-build-environment target. Such a flip relinks every module DLL (and the next IDE build relinks them back), so without this flag it is refused with exit 79. Prefer omitting --config (or --config Auto) to follow the last-built config.
+  --test-pattern TEXT Needs: --test
+                              Narrow the run WITHIN the gate population. Tokens (split on '.') must each appear as case-insensitive substrings somewhere in the test's full dotted path. Examples: 'Goap' matches every project test mentioning Goap; 'CkTests.Goap' matches tests with both substrings. Engine tests are only matched with --include-engine. Default (no pattern): the whole gate population.
+  --include-engine Needs: --test
+                              With --test: widen the population to engine tests too (alone: run everything; with --test-pattern: let the pattern match engine tests)
+  --project-prefix TEXT ... Needs: --test
+                              With --test: add a dotted test root to the gate population for this run (repeatable; widen-only). The durable roots live in the project's AutomationGate.json -- a plain --test already runs them, so this is only for a one-off widening. A root that matches no discovered test fails the run.
+  --print-population Needs: --test
+                              With --test: resolve the test list, print which roots are in and out of the gate population (and what a --test-pattern selects), then exit without running anything. Use it to check coverage before a long gate.
+  --known-reds TEXT:{on,off,prune} Needs: --test
+                              With --test, when AutomationGate.json has a "knownReds" list: 'on' (default) passes the run when every failure is listed and fails it on any NEW failure; 'off' gives the raw verdict (every failure fails); 'prune' judges as 'on', then removes listed-red tests that passed and entries naming tests that no longer exist from the file.
+  --skip-renderer-tests Needs: --test
+                              With --test: do not run the renderer-only tests (flagged NonNullRHI; they need a real renderer and run in a real-renderer editor after the headless lanes). Without this flag a run that cannot run them (no GPU, or they could not be discovered) exits 81. No effect with --no-nullrhi, where they run in the main run.
+  --include-deferred Needs: --test
+                              With --test: also run the tests the project's AutomationGate.json lists under "deferred" (benchmarks, stress runs, tests that cost time without gating a merge). A plain --test leaves them out and says how many; a scheduled full gate passes this flag.
+  --measure Needs: --test     With --test: after tests run, parse the run log and emit a JSON startup-timing snapshot next to the --output file (or to stdout if --output is not set).
+  --no-nullrhi Needs: --test  With --test: drop `-nullrhi` from the editor cmdline so the test pass runs under a real RHI. Other headless flags (-unattended/-nopause/-nosplash) stay. Useful when a feature under test only ticks with rendering active.
+  --no-progress-window Excludes: --launch-editor
+                              With --build, --test, or --gauntlet: do NOT spawn the ftxc LogViewer progress window. By default a run with --output pops a labeled LogViewer that live-tails the run log (one window, reused across runs — a combined --build --test/--gauntlet invocation reuses the SAME window across both phases). Pass this on a machine with no interactive desktop (true-headless / CI).
+  --progress-window TEXT:{focus,background,minimized,minimized-flash} Excludes: --launch-editor
+                              Controls how the LogViewer progress window spawns: focus (legacy: fronts + takes focus), background (visible, focus stays put), minimized (taskbar only, silent), minimized-flash (default: taskbar + brief flash). Overrides the persisted per-project setting (settings.json progressWindow.mode) for this run. Ignored with --no-progress-window.
+  --progress-window-close TEXT:{on-success,never,always} Excludes: --launch-editor
+                              What happens to this run's LogViewer progress window when the run ends: on-success (default: closes on exit code 0, stays open on anything else), never (always stays open), always (always closes). Overrides the persisted per-project setting (settings.json progressWindow.close) for this run. The warm-server window is never affected.
+  --discover-fresh Needs: --test
+                              With --test: force a fresh discovery editor launch even if a cached test list exists. Use after adding or removing tests without a --build, or to reset a stale cache.
+  --live Needs: --test Excludes: --no-live
+                              With --test: route the run into a live bridge-serving editor (the CkTestsBridge warm server or your open editor) instead of booting a fresh headless editor — zero boot cost. If none is serving, LAUNCH a headless warm server and route into it (falls back to a fresh boot if it can't come up). Live results are for ITERATION; re-run without --live (fresh boot) for gate evidence.
+  --no-live Needs: --test Excludes: --live
+                              With --test: never route to a live editor; always boot a fresh headless editor (today's behavior). Use to force gate-fidelity runs.
+  --parallel INT:INT in [1 - 8] Needs: --test
+                              With --test: run editor batches on up to N concurrent editors. USUALLY UNNECESSARY — omit it and the toolbox sizes the lane count to this machine (physical cores and free RAM; each editor holds ~6 GB), and says which width it picked and why. Pass this only to pin a run for measurement, or --parallel 1 to force serial. Tests matching a serial lane (net / multi-PIE suites) stay pinned to one editor chain regardless. Overrides BOTH the auto-sizing and the persisted tests.maxParallel setting for this run; it is also ignored on the live/warm path, which is single-editor (--live warns, a plain --test with an explicit width declines the warm server instead).
+  --engine-path TEXT          With --build, --test, --gauntlet, --warm-server, --launch-editor, --package or --staged-client: the Unreal Engine root folder to run against (the folder that contains Engine/). Overrides the engine saved for this project and the .uproject's EngineAssociation. For machines whose engine is not registered (a CI agent); it is not saved.
+  --net-batch-size INT:INT in [1 - 1000] Needs: --test
+                              With --test: the most serial-lane (net / multi-PIE) tests one editor is given before the next editor boots (default: no cap, they are one group). A cap costs one editor boot per batch. It exists to bisect an editor that hangs after too many multi-client PIE sessions; such a hang costs a watchdog timeout and the run resumes in a fresh editor, losing no test.
+  --serial-lane TEXT ... Needs: --test
+                              With --test: dotted segment pattern naming tests that must NOT run concurrently (repeatable). 'Net' matches any test with a whole segment Net; '*Snapshot*' matches a segment containing snapshot. When passed, REPLACES the persisted tests.serialLanePatterns for this run.
+  --isolate-lanes Needs: --test
+                              With --test (experimental): give every concurrent editor but the first its own Saved folder (Saved_utb<N>/), so tests that write under Saved/ cannot collide across editors. Those editors decline Script/Generated regeneration; the first editor keeps Saved/ and that role. Those editors write their log under Saved_utb<N>/ too, so a check for an open editor that looks at Saved/Logs does not see them.
+  --renderer-editor-args TEXT Needs: --test
+                              With --test (diagnostic): extra editor arguments for the real-renderer editors only (the renderer-only tests), e.g. "-warp" to try them on the software adapter of a machine with no GPU. The headless editors do not get them.
+  --editor-args TEXT Needs: --test
+                              With --test (diagnostic): extra editor arguments for every test editor, headless and real-renderer, e.g. "-cvarsini=<file>" to run them with different console variables.
+  --own-game-settings Needs: --test
+                              With --test: give every test editor a GameUserSettings.ini of its own, started empty each run (Saved/UnrealToolbox/TestGameSettings/), instead of this machine's. A saved frame-rate limit or quality level then does not change how tests run, and a test that changes a setting does not change the developer's game. Off by default: a project whose tests happen to depend on the saved values has to be fixed first.
+  --gauntlet TEXT Excludes: --run-scheduled --test --measure-compare --warm-server --launch-editor --staged-client --analyze-trace --package --build-status
+                              Run process-level Gauntlet tests (real -game editor boot driven by the CkTests AS-bridge controller). Pass a test name from the project's GauntletTests.json manifest, or 'all' for the full expected-PASS suite. Composable with --build. Exit 0 = all green.
+  --gauntlet-repeat INT:POSITIVE Needs: --gauntlet
+                              With --gauntlet: run each selected test N times (flake measurement). Default 1.
+  --gauntlet-map TEXT Needs: --gauntlet
+                              With --gauntlet: /Game/... map path overriding every selected test's manifest map.
+  --gauntlet-include-xfail Needs: --gauntlet
+                              With --gauntlet all: also run the manifest's expected-FAIL tests (reported, never gated; a green one is flagged so its status gets flipped).
+  --gauntlet-manifest TEXT Needs: --gauntlet
+                              With --gauntlet: path to the manifest JSON. Default: <project-root>/GauntletTests.json.
+  --gauntlet-visual Needs: --gauntlet
+                              With --gauntlet: run the gauntlet editor with a real rendered window (drops -nullrhi/-nosound, adds -windowed 1280x720) and disables the idle/wall-clock watchdogs so a human can watch or pause the run.
+  --build-status Excludes: --build --run-scheduled --test --measure-compare --warm-server --gauntlet --launch-editor --staged-client --analyze-trace --package
+                              Report machine-wide build-lock state: who is building, which project/target/config, started when, owning PID. Exits 0 when idle, 10 when a build is in progress.
+  --no-wait Excludes: --launch-editor
+                              When another session holds this engine's build lock, fail fast (exit 75) instead of waiting. Also fail-fasts the --build editor-open gate (exit 77) instead of waiting for the editor to close. Default: wait, with live status of who holds the lock / whether the editor is up.
+  --serialize-builds Excludes: --launch-editor --staged-client --analyze-trace --package
+                              With --build: hold this engine's writers lock EXCLUSIVELY, so builds on other worktrees of the same engine wait for this one (the pre-v1.57 behaviour). Default: Unique-build-environment builds share it and UnrealBuildTool arbitrates engine writes itself. Same as UNREAL_TOOLBOX_SERIALIZE_BUILDS=1.
+  --allow-live-editor Excludes: --launch-editor --staged-client --analyze-trace --package
+                              With --build: build even if an editor is OPEN for this project. DANGER: building while the editor holds its module DLLs corrupts hot-reload state and both editors fight over Saved/Intermediate. Only pass this if you know the editor isn't loading the modules being built. Default: wait for the editor to close (or --no-wait to fail fast, exit 77). No-op with --test/--gauntlet, which coexist with an open editor.
+  --measure-compare TEXT x 2 Excludes: --build --run-scheduled --test --generate --warm-server --gauntlet --launch-editor --staged-client --analyze-trace --package --build-status
+                              Diff two startup snapshot JSONs (produced by --measure). Pass two paths: <before.json> <after.json>. Exits 0 on success, 2 if the snapshots' --config differ.
+  --warm-server TEXT:{start,stop,status} Excludes: --build --run-scheduled --test --measure-compare --gauntlet --launch-editor --staged-client --analyze-trace --package --build-status
+                              Manage the resident CkTestsBridge warm server (a headless -CkTestBridgeServe editor that serves test runs so --test never boots per-run). 'start' launches it detached and waits until it arms (idempotent); 'status' prints its state; 'stop' terminates an idle one. The build-test skill pre-warms with 'start' so the ~45s boot overlaps edit time.
+  --output TEXT Excludes: --launch-editor
+                              Write all output to this file (also always goes to stdout)
+  --project TEXT              Project directory or .uproject path (default: cwd)
+  --launch-editor Needs: --project Excludes: --build --run-scheduled --test --progress-window --no-progress-window --progress-window-close --serialize-builds --no-wait --measure-compare --warm-server --gauntlet --output --staged-client --allow-live-editor --analyze-trace --package --build-status
+                              Launch the specified project's normal rendered editor. Requires --project; does not build or run tests.
+  --package Needs: --project --output --reuse-game-build --game-build-log --stage-dir --package-map Excludes: --build --run-scheduled --test --serialize-builds --measure-compare --warm-server --gauntlet --launch-editor --staged-client --allow-live-editor --analyze-trace --build-status
+                              Incrementally cook and stage a Win64 Game client; build missing UnrealPak only, never clean or archive
+  --staged-client Needs: --project --output --stage-dir Excludes: --build --run-scheduled --test --serialize-builds --measure-compare --warm-server --gauntlet --launch-editor --allow-live-editor --analyze-trace --package --build-status
+                              Run a fresh rendered client from a successful Toolbox stage receipt
+  --analyze-trace TEXT Needs: --project --report Excludes: --build --run-scheduled --test --serialize-builds --measure-compare --warm-server --gauntlet --launch-editor --staged-client --allow-live-editor --package --build-status
+                              Analyze an existing .utrace offline with CkInsightsAnalyzer; never builds
+  --report TEXT Needs: --analyze-trace
+                              New analyzer report path (--output is the Toolbox log)
+  --frame INT:NONNEGATIVE Needs: --analyze-trace Excludes: --frames --all --worst
+                              Single frame index
+  --frames TEXT:N-M Needs: --analyze-trace Excludes: --frame --all --worst
+                              Inclusive frame range N-M
+  --worst INT:POSITIVE Needs: --analyze-trace Excludes: --frame --frames --all
+                              N worst frames
+  --all Needs: --analyze-trace Excludes: --frame --frames --worst
+                              All frames
+  --json Needs: --analyze-trace
+                              JSON report
+  --noscreenshots Needs: --analyze-trace
+                              Exclude screenshot frames
+  --depth TEXT:{full,standard,concise,hotpaths} Needs: --analyze-trace
+                              Report depth
+  --timertop INT:NONNEGATIVE Needs: --analyze-trace
+                              Per-timer rows (0 disables)
+  --stage-dir TEXT            Absolute new stage below the project's real Saved directory; client mode requires its receipt
+  --reuse-game-build Needs: --package
+                              With --package: require a matching successful Toolbox Game build and skip UAT builds
+  --game-build-log TEXT Needs: --package
+                              With --package: successful Toolbox --build --target Game log matching this project/engine/config
+  --package-map TEXT Needs: --package
+                              With --package: one cooked map package path, e.g. /Game/Maps/Main
+  --package-config TEXT:{Auto,Development,DebugGame,Shipping,Test} Needs: --package
+                              With --package: matching Game configuration; Auto follows the existing receipt without fallback
+  --staged-test TEXT Needs: --staged-client
+                              With --staged-client: named Gauntlet manifest test; otherwise manual launch, never an automated pass

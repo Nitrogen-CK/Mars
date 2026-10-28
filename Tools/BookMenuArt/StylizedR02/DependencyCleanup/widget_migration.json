@@ -1,0 +1,160 @@
+{
+  "widgets": [
+    {
+      "asset": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Widgets/Cookbook_Index_Left_WBP",
+      "parent": "/Script/CkUICore.Ck_UserWidget_UE",
+      "saved_dependencies": [
+        "/Script/SlateCore",
+        "/Script/UMGEditor",
+        "/Script/UMG",
+        "/Script/CkUICore"
+      ],
+      "original_parent": "/Script/BookMenu.BookPageWidget"
+    },
+    {
+      "asset": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Widgets/Cookbook_Index_Right_WBP",
+      "parent": "/Script/CkUICore.Ck_UserWidget_UE",
+      "saved_dependencies": [
+        "/Script/SlateCore",
+        "/Script/UMGEditor",
+        "/Script/UMG",
+        "/Script/CkUICore"
+      ],
+      "original_parent": "/Script/BookMenu.BookPageWidget"
+    },
+    {
+      "asset": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Widgets/Cookbook_Sample_Left_WBP",
+      "parent": "/Script/CkUICore.Ck_UserWidget_UE",
+      "saved_dependencies": [
+        "/Script/SlateCore",
+        "/Script/UMGEditor",
+        "/Script/UMG",
+        "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Textures/Cookbook_Sample_Left_T",
+        "/Script/CkUICore"
+      ],
+      "original_parent": "/Script/BookMenu.BookPageWidget"
+    },
+    {
+      "asset": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Widgets/Cookbook_Sample_Right_WBP",
+      "parent": "/Script/CkUICore.Ck_UserWidget_UE",
+      "saved_dependencies": [
+        "/Script/SlateCore",
+        "/Script/UMGEditor",
+        "/Script/UMG",
+        "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Textures/Cookbook_Sample_Right_T",
+        "/Script/CkUICore"
+      ],
+      "original_parent": "/Script/BookMenu.BookPageWidget"
+    },
+    {
+      "asset": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Widgets/Cookbook_Notes_Left_WBP",
+      "parent": "/Script/CkUICore.Ck_UserWidget_UE",
+      "saved_dependencies": [
+        "/Script/SlateCore",
+        "/Script/UMGEditor",
+        "/Script/UMG",
+        "/Script/CkUICore"
+      ],
+      "original_parent": "/Script/BookMenu.BookPageWidget"
+    },
+    {
+      "asset": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Widgets/Cookbook_Notes_Right_WBP",
+      "parent": "/Script/CkUICore.Ck_UserWidget_UE",
+      "saved_dependencies": [
+        "/Script/SlateCore",
+        "/Script/UMGEditor",
+        "/Script/UMG",
+        "/Script/CkUICore"
+      ],
+      "original_parent": "/Script/BookMenu.BookPageWidget"
+    }
+  ],
+  "remaining_prototype_dependencies": {
+    "/Game/Mars/Gameplay/PlayerCookbook/SK_Book_Worn": [
+      "/BookMenu/Meshes/Anim_Book_Skeleton",
+      "/BookMenu/Meshes/PA_Book_01"
+    ],
+    "/Game/Mars/Gameplay/PlayerCookbook/Materials/PlayerCookbook_Cover_Mars_M": [
+      "/BookMenu/Textures/ID_Maps/T_Book_01_Cover_ID_512",
+      "/BookMenu/Textures/Masks/T_Book_01_Cover_M_1k",
+      "/BookMenu/Textures/T_Cover_02_BC_R_2k",
+      "/BookMenu/Textures/T_Cover_02_N_1k",
+      "/BookMenu/Textures/T_Cover_02_ORM_1k",
+      "/BookMenu/Textures/T_Pages_Side_02_BC_R_1k",
+      "/BookMenu/Textures/T_Pages_Side_02_N_1k",
+      "/BookMenu/Textures/T_Pages_Side_02_ORM_512",
+      "/BookMenu/Textures/T_Stylized_Gold_01_BC_R_1k",
+      "/BookMenu/Textures/T_Stylized_Gold_01_N_1k",
+      "/BookMenu/Textures/T_Stylized_Gold_01_ORM_512",
+      "/BookMenu/Materials/Functions/MF_Add_Dirt",
+      "/BookMenu/Textures/Basic/T_Basic_01_BC",
+      "/BookMenu/Textures/Basic/T_Basic_01_N",
+      "/BookMenu/Textures/Basic/T_Basic_01_ORM",
+      "/BookMenu/Materials/Functions/MF_BC_Simple",
+      "/BookMenu/Materials/Functions/MF_Opacity_01",
+      "/BookMenu/Materials/Functions/MF_Mask_Splitter_Simple",
+      "/BookMenu/Textures/Basic/T_Basic_01_Op",
+      "/BookMenu/Materials/Functions/MF_MatLayer_Lerp_BC_ORM_N",
+      "/BookMenu/Materials/Functions/MF_N_Simple",
+      "/BookMenu/Materials/Functions/MF_ORM_Simple",
+      "/BookMenu/Materials/Functions/MF_PBR_Shader_01",
+      "/BookMenu/Textures/Basic/T_Basic_01_BC_R",
+      "/BookMenu/Materials/Functions/MF_Repace_Value_V3_Masked",
+      "/BookMenu/Materials/Functions/MF_Simple_Base_Color_Overlay"
+    ],
+    "/Game/Mars/Gameplay/PlayerCookbook/Materials/PlayerCookbook_Cover_Mars_MI": [
+      "/BookMenu/Textures/ID_Maps/T_Book_01_Cover_ID_512",
+      "/BookMenu/Textures/Masks/T_Book_01_Cover_M_1k",
+      "/BookMenu/Textures/T_Cover_02_BC_R_2k",
+      "/BookMenu/Textures/T_Cover_02_N_1k",
+      "/BookMenu/Textures/T_Cover_02_ORM_1k",
+      "/BookMenu/Textures/T_Paper_01_BC_R_1k",
+      "/BookMenu/Textures/T_Paper_01_N_1k",
+      "/BookMenu/Textures/ExampleCovers/T_Book_01_Cover_Design_01_BC",
+      "/BookMenu/Textures/ExampleCovers/T_Book_01_Cover_Design_01_N",
+      "/BookMenu/Textures/ExampleCovers/T_Book_01_Cover_Design_01_ORM"
+    ],
+    "/Game/Mars/Gameplay/PlayerCookbook/Materials/PlayerCookbook_PageA_Mars_MI": [
+      "/BookMenu/Textures/T_Paper_02_BC_R_2k",
+      "/BookMenu/Textures/T_Paper_02_N_1k",
+      "/BookMenu/Textures/T_Paper_02_ORM_1k"
+    ],
+    "/Game/Mars/Gameplay/PlayerCookbook/Materials/PlayerCookbook_PageB_Mars_MI": [
+      "/BookMenu/Textures/T_Paper_02_BC_R_2k",
+      "/BookMenu/Textures/T_Paper_02_N_1k",
+      "/BookMenu/Textures/T_Paper_01_BC_R_2k"
+    ],
+    "/Game/Mars/Gameplay/PlayerCookbook/Materials/PlayerCookbook_PageC_Mars_MI": [
+      "/BookMenu/Textures/T_Paper_02_BC_R_2k",
+      "/BookMenu/Textures/T_Paper_02_N_1k"
+    ],
+    "/Game/Mars/Gameplay/PlayerCookbook/Materials/PlayerCookbook_PageD_Mars_MI": [
+      "/BookMenu/Textures/T_Paper_02_BC_R_2k",
+      "/BookMenu/Textures/T_Paper_02_N_1k"
+    ],
+    "/Game/Mars/Gameplay/PlayerCookbook/Materials/PlayerCookbook_PagesBase_Mars_MI": [
+      "/BookMenu/Textures/T_Pages_Side_02_BC_R_1k",
+      "/BookMenu/Textures/T_Pages_Side_02_N_1k",
+      "/BookMenu/Textures/Masks/T_Book_01_Pages_M_2k"
+    ],
+    "/Game/Mars/Gameplay/PlayerCookbook/Materials/PlayerCookbook_Pages_Mars_M": [
+      "/BookMenu/Textures/T_Paper_02_BC_R_2k",
+      "/BookMenu/Textures/T_Paper_02_N_1k",
+      "/BookMenu/Textures/T_Paper_02_ORM_1k",
+      "/BookMenu/Materials/Functions/MF_Add_Dirt",
+      "/BookMenu/Textures/Basic/T_Basic_01_BC",
+      "/BookMenu/Textures/Basic/T_Basic_01_N",
+      "/BookMenu/Textures/Basic/T_Basic_01_ORM",
+      "/BookMenu/Materials/Functions/MF_BC_Simple",
+      "/BookMenu/Materials/Functions/MF_Opacity_01",
+      "/BookMenu/Materials/Functions/MF_Mask_Splitter_Simple",
+      "/BookMenu/Textures/Basic/T_Basic_01_Op",
+      "/BookMenu/Materials/Functions/MF_Mask_to_BC_R_M",
+      "/BookMenu/Materials/Functions/MF_N_Simple",
+      "/BookMenu/Materials/Functions/MF_ORM_Simple",
+      "/BookMenu/Materials/Functions/MF_Repace_Value_V3_Masked",
+      "/BookMenu/Materials/Functions/MF_Simple_Base_Color_Overlay",
+      "/BookMenu/Materials/Functions/MF_UV_Rotation"
+    ]
+  }
+}

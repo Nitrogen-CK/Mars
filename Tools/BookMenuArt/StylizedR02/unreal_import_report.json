@@ -1,0 +1,117 @@
+{
+  "mesh": {
+    "path": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Meshes/SK_Cookbook_Field.SK_Cookbook_Field",
+    "skeleton": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Meshes/SK_Cookbook_Field_Skeleton.SK_Cookbook_Field_Skeleton",
+    "slots": [
+      "Cover",
+      "PagesBase",
+      "PageA",
+      "PageB",
+      "PageC",
+      "PageD",
+      "PageFirst",
+      "PageLast",
+      "CoverDark",
+      "Brass",
+      "BrassLight",
+      "Scuff",
+      "Patch",
+      "Thread",
+      "Emblem",
+      "Leather",
+      "LeatherLight",
+      "PageEdgeLight",
+      "Bookmark",
+      "BookmarkLight"
+    ],
+    "morphs": [
+      "PageBend_01",
+      "PageBend_02",
+      "PageBend_03",
+      "PageBend_04"
+    ],
+    "reference_bounds_cm": [
+      36.3120002746582,
+      26.695972442626953,
+      2.256304055452347
+    ]
+  },
+  "animations": [
+    {
+      "path": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Animations/Cookbook_Closed_AS.Cookbook_Closed_AS",
+      "seconds": 0.38333332538604736,
+      "frames": 23,
+      "bone_tracks": 12,
+      "float_curves": 4
+    },
+    {
+      "path": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Animations/Cookbook_Open_AS.Cookbook_Open_AS",
+      "seconds": 0.38333332538604736,
+      "frames": 23,
+      "bone_tracks": 12,
+      "float_curves": 4
+    },
+    {
+      "path": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Animations/Cookbook_Opening_AS.Cookbook_Opening_AS",
+      "seconds": 0.7833333611488342,
+      "frames": 47,
+      "bone_tracks": 12,
+      "float_curves": 4
+    },
+    {
+      "path": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Animations/Cookbook_Closing_AS.Cookbook_Closing_AS",
+      "seconds": 0.7833333611488342,
+      "frames": 47,
+      "bone_tracks": 12,
+      "float_curves": 4
+    },
+    {
+      "path": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Animations/Cookbook_TurnForward_AS.Cookbook_TurnForward_AS",
+      "seconds": 1.7833333015441895,
+      "frames": 107,
+      "bone_tracks": 12,
+      "float_curves": 4
+    },
+    {
+      "path": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Animations/Cookbook_TurnReverse_AS.Cookbook_TurnReverse_AS",
+      "seconds": 1.7833333015441895,
+      "frames": 107,
+      "bone_tracks": 12,
+      "float_curves": 4
+    }
+  ],
+  "materials": {
+    "Cover": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_Cover_M.Cookbook_Cover_M",
+    "PagesBase": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_PagesBase_M.Cookbook_PagesBase_M",
+    "PageA": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_PageA_M.Cookbook_PageA_M",
+    "PageB": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_PageB_M.Cookbook_PageB_M",
+    "PageC": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_PageC_M.Cookbook_PageC_M",
+    "PageD": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_PageD_M.Cookbook_PageD_M",
+    "PageFirst": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_PageFirst_M.Cookbook_PageFirst_M",
+    "PageLast": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_PageLast_M.Cookbook_PageLast_M",
+    "CoverDark": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_CoverDark_M.Cookbook_CoverDark_M",
+    "Brass": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_Brass_M.Cookbook_Brass_M",
+    "BrassLight": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_BrassLight_M.Cookbook_BrassLight_M",
+    "Scuff": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_Scuff_M.Cookbook_Scuff_M",
+    "Patch": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_Patch_M.Cookbook_Patch_M",
+    "Thread": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_Thread_M.Cookbook_Thread_M",
+    "Emblem": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_Emblem_M.Cookbook_Emblem_M",
+    "Leather": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_Leather_M.Cookbook_Leather_M",
+    "LeatherLight": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_LeatherLight_M.Cookbook_LeatherLight_M",
+    "PageEdgeLight": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_PageEdgeLight_M.Cookbook_PageEdgeLight_M",
+    "Bookmark": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_Bookmark_M.Cookbook_Bookmark_M",
+    "BookmarkLight": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_BookmarkLight_M.Cookbook_BookmarkLight_M"
+  },
+  "source_sha256": {
+    "Model\\FBX\\SK_Cookbook_StylizedR02.fbx": "d9db8ceccb256aca009578b8f4d61ee510978b6ecf3289a3e10bd85f071e5a9b",
+    "Model\\FBX\\Book_Lying_R_01.fbx": "7abd983356b433e1c8d44a9dd91efe0c6db6be388c005e86548c6cf6332495d8",
+    "Model\\FBX\\Book_Lying_Open_01.fbx": "2a08badaa19432b5fb1c98d7a5d61f924f16ddcd31977842482613f8c25f742d",
+    "Model\\FBX\\Book_Lying_R_to_Open_01.fbx": "decd0e68aa57a9b12a8a17ef3b6587d16654760add84cff7f493ecfffa1c18fe",
+    "Model\\FBX\\Book_Lying_Open_to_R_01.fbx": "6573d6ce6b93dacc66cec67a25cf73fa11581938aa548db7c40f27cf9d599d93",
+    "Model\\FBX\\Book_Lying_Open_Page_Turn_R_to_L_02.fbx": "ffba594d7e414debcfdc06a6a138c0d1644a72a528a5ca151e6e7744d67be2d4",
+    "Model\\FBX\\Book_Lying_Open_Page_Turn_L_to_R_02.fbx": "cbb205b2f2e65a52c0b6afffb736e54c174dd430d40ae1f38c3406412f47b308"
+  },
+  "original_skeleton_compatible": false,
+  "runtime_bookmenu_wired": false,
+  "current_world": "/Game/Mars/Maps/Warrens_Mars_MAP.Warrens_Mars_MAP"
+}

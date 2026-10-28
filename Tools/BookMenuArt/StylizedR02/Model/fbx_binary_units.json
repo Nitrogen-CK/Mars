@@ -1,0 +1,583 @@
+{
+  "Book_Lying_Open_01.fbx": {
+    "unit_scale_factor": [
+      1.0
+    ],
+    "models": {
+      "Master": {
+        "Lcl Translation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "Lcl Rotation": [
+          0.0,
+          -0.0,
+          0.0
+        ],
+        "Lcl Scaling": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "DefaultAttributeIndex": [
+          0
+        ],
+        "InheritType": [
+          1
+        ]
+      },
+      "Armature": {
+        "Lcl Translation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "Lcl Rotation": [
+          -90.00000933466734,
+          0.0,
+          0.0
+        ],
+        "Lcl Scaling": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "DefaultAttributeIndex": [
+          0
+        ],
+        "InheritType": [
+          1
+        ],
+        "PageBend_01": [
+          0.0
+        ],
+        "PageBend_02": [
+          0.0
+        ],
+        "PageBend_03": [
+          0.0
+        ],
+        "PageBend_04": [
+          0.0
+        ],
+        "page_width_cm": [
+          17.0
+        ],
+        "page_height_cm": [
+          23.0
+        ],
+        "rest_pose": [
+          "flat open"
+        ],
+        "units": [
+          "metres"
+        ]
+      }
+    },
+    "master_animation_scale_values_range": [
+      1.0,
+      1.0
+    ],
+    "checks": {
+      "cm_metadata": true,
+      "master_rest_scale1": true,
+      "dummy_rest_scale1": true,
+      "animated_master_scale1": true
+    }
+  },
+  "Book_Lying_Open_Page_Turn_L_to_R_02.fbx": {
+    "unit_scale_factor": [
+      1.0
+    ],
+    "models": {
+      "Master": {
+        "Lcl Translation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "Lcl Rotation": [
+          0.0,
+          -0.0,
+          0.0
+        ],
+        "Lcl Scaling": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "DefaultAttributeIndex": [
+          0
+        ],
+        "InheritType": [
+          1
+        ]
+      },
+      "Armature": {
+        "Lcl Translation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "Lcl Rotation": [
+          -90.00000933466734,
+          0.0,
+          0.0
+        ],
+        "Lcl Scaling": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "DefaultAttributeIndex": [
+          0
+        ],
+        "InheritType": [
+          1
+        ],
+        "PageBend_01": [
+          8.572527306351685e-17
+        ],
+        "PageBend_02": [
+          -6.613092606913212e-17
+        ],
+        "PageBend_03": [
+          0.0
+        ],
+        "PageBend_04": [
+          0.0
+        ],
+        "page_width_cm": [
+          17.0
+        ],
+        "page_height_cm": [
+          23.0
+        ],
+        "rest_pose": [
+          "flat open"
+        ],
+        "units": [
+          "metres"
+        ]
+      }
+    },
+    "master_animation_scale_values_range": [
+      1.0,
+      1.0
+    ],
+    "checks": {
+      "cm_metadata": true,
+      "master_rest_scale1": true,
+      "dummy_rest_scale1": true,
+      "animated_master_scale1": true
+    }
+  },
+  "Book_Lying_Open_Page_Turn_R_to_L_02.fbx": {
+    "unit_scale_factor": [
+      1.0
+    ],
+    "models": {
+      "Master": {
+        "Lcl Translation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "Lcl Rotation": [
+          0.0,
+          -0.0,
+          0.0
+        ],
+        "Lcl Scaling": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "DefaultAttributeIndex": [
+          0
+        ],
+        "InheritType": [
+          1
+        ]
+      },
+      "Armature": {
+        "Lcl Translation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "Lcl Rotation": [
+          -90.00000933466734,
+          0.0,
+          0.0
+        ],
+        "Lcl Scaling": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "DefaultAttributeIndex": [
+          0
+        ],
+        "InheritType": [
+          1
+        ],
+        "PageBend_01": [
+          0.0
+        ],
+        "PageBend_02": [
+          0.0
+        ],
+        "PageBend_03": [
+          0.0
+        ],
+        "PageBend_04": [
+          0.0
+        ],
+        "page_width_cm": [
+          17.0
+        ],
+        "page_height_cm": [
+          23.0
+        ],
+        "rest_pose": [
+          "flat open"
+        ],
+        "units": [
+          "metres"
+        ]
+      }
+    },
+    "master_animation_scale_values_range": [
+      1.0,
+      1.0
+    ],
+    "checks": {
+      "cm_metadata": true,
+      "master_rest_scale1": true,
+      "dummy_rest_scale1": true,
+      "animated_master_scale1": true
+    }
+  },
+  "Book_Lying_Open_to_R_01.fbx": {
+    "unit_scale_factor": [
+      1.0
+    ],
+    "models": {
+      "Master": {
+        "Lcl Translation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "Lcl Rotation": [
+          0.0,
+          -0.0,
+          0.0
+        ],
+        "Lcl Scaling": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "DefaultAttributeIndex": [
+          0
+        ],
+        "InheritType": [
+          1
+        ]
+      },
+      "Armature": {
+        "Lcl Translation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "Lcl Rotation": [
+          -90.00000933466734,
+          0.0,
+          0.0
+        ],
+        "Lcl Scaling": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "DefaultAttributeIndex": [
+          0
+        ],
+        "InheritType": [
+          1
+        ],
+        "PageBend_01": [
+          0.0
+        ],
+        "PageBend_02": [
+          0.0
+        ],
+        "PageBend_03": [
+          0.0
+        ],
+        "PageBend_04": [
+          0.0
+        ],
+        "page_width_cm": [
+          17.0
+        ],
+        "page_height_cm": [
+          23.0
+        ],
+        "rest_pose": [
+          "flat open"
+        ],
+        "units": [
+          "metres"
+        ]
+      }
+    },
+    "master_animation_scale_values_range": [
+      1.0,
+      1.0
+    ],
+    "checks": {
+      "cm_metadata": true,
+      "master_rest_scale1": true,
+      "dummy_rest_scale1": true,
+      "animated_master_scale1": true
+    }
+  },
+  "Book_Lying_R_01.fbx": {
+    "unit_scale_factor": [
+      1.0
+    ],
+    "models": {
+      "Master": {
+        "Lcl Translation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "Lcl Rotation": [
+          0.0,
+          -0.0,
+          0.0
+        ],
+        "Lcl Scaling": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "DefaultAttributeIndex": [
+          0
+        ],
+        "InheritType": [
+          1
+        ]
+      },
+      "Armature": {
+        "Lcl Translation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "Lcl Rotation": [
+          -90.00000933466734,
+          0.0,
+          0.0
+        ],
+        "Lcl Scaling": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "DefaultAttributeIndex": [
+          0
+        ],
+        "InheritType": [
+          1
+        ],
+        "PageBend_01": [
+          0.0
+        ],
+        "PageBend_02": [
+          0.0
+        ],
+        "PageBend_03": [
+          0.0
+        ],
+        "PageBend_04": [
+          0.0
+        ],
+        "page_width_cm": [
+          17.0
+        ],
+        "page_height_cm": [
+          23.0
+        ],
+        "rest_pose": [
+          "flat open"
+        ],
+        "units": [
+          "metres"
+        ]
+      }
+    },
+    "master_animation_scale_values_range": [
+      1.0,
+      1.0
+    ],
+    "checks": {
+      "cm_metadata": true,
+      "master_rest_scale1": true,
+      "dummy_rest_scale1": true,
+      "animated_master_scale1": true
+    }
+  },
+  "Book_Lying_R_to_Open_01.fbx": {
+    "unit_scale_factor": [
+      1.0
+    ],
+    "models": {
+      "Master": {
+        "Lcl Translation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "Lcl Rotation": [
+          0.0,
+          -0.0,
+          0.0
+        ],
+        "Lcl Scaling": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "DefaultAttributeIndex": [
+          0
+        ],
+        "InheritType": [
+          1
+        ]
+      },
+      "Armature": {
+        "Lcl Translation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "Lcl Rotation": [
+          -90.00000933466734,
+          0.0,
+          0.0
+        ],
+        "Lcl Scaling": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "DefaultAttributeIndex": [
+          0
+        ],
+        "InheritType": [
+          1
+        ],
+        "PageBend_01": [
+          0.0
+        ],
+        "PageBend_02": [
+          0.0
+        ],
+        "PageBend_03": [
+          0.0
+        ],
+        "PageBend_04": [
+          0.0
+        ],
+        "page_width_cm": [
+          17.0
+        ],
+        "page_height_cm": [
+          23.0
+        ],
+        "rest_pose": [
+          "flat open"
+        ],
+        "units": [
+          "metres"
+        ]
+      }
+    },
+    "master_animation_scale_values_range": [
+      1.0,
+      1.0
+    ],
+    "checks": {
+      "cm_metadata": true,
+      "master_rest_scale1": true,
+      "dummy_rest_scale1": true,
+      "animated_master_scale1": true
+    }
+  },
+  "SK_Cookbook_StylizedR02.fbx": {
+    "unit_scale_factor": [
+      1.0
+    ],
+    "models": {
+      "Master": {
+        "DefaultAttributeIndex": [
+          0
+        ],
+        "InheritType": [
+          1
+        ]
+      },
+      "Armature": {
+        "Lcl Rotation": [
+          -90.00000933466734,
+          0.0,
+          0.0
+        ],
+        "DefaultAttributeIndex": [
+          0
+        ],
+        "InheritType": [
+          1
+        ],
+        "PageBend_01": [
+          0.0
+        ],
+        "PageBend_02": [
+          0.0
+        ],
+        "PageBend_03": [
+          0.0
+        ],
+        "PageBend_04": [
+          0.0
+        ],
+        "page_width_cm": [
+          17.0
+        ],
+        "page_height_cm": [
+          23.0
+        ],
+        "rest_pose": [
+          "flat open"
+        ],
+        "units": [
+          "metres"
+        ]
+      }
+    },
+    "master_animation_scale_values_range": null,
+    "checks": {
+      "cm_metadata": true,
+      "master_rest_scale1": true,
+      "dummy_rest_scale1": true,
+      "animated_master_scale1": true
+    }
+  }
+}

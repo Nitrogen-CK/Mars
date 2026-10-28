@@ -1,0 +1,16 @@
+{
+  "map": "/Game/Mars/Maps/Sandbox_Mars_MAP",
+  "actor": "Item_Cookbook",
+  "authored_location_cm": [
+    -450,
+    0,
+    50
+  ],
+  "actors_before": 347,
+  "actors_after": 348,
+  "verification": "Exactly one cookbook added; existing actor records unchanged. Saved map survives reload and fresh editor restart; automatic WorldItem spawn falls onto floor and raw LMB picks it up.",
+  "placement": "Script/Editor/Mars_SandboxMapBuilder.as:459; Mars.Sandbox.PlaceCookbook refuses duplicate label.",
+  "deleted_maps": "Removed only the three orphaned service definitions/catalog entries from Script/Camp/Mars_ServiceDefinition.as. Remaining Sandbox/BrokenCistern destinations exist. User map deletions preserved.",
+  "camp_gate": "Saved/Logs/Cookbook-DeletedMaps-CampSession.log: 4/4, exit0, failed0, skipped0, contaminated0.",
+  "animation_revision": "../GutterFix/REPORT.json"
+}

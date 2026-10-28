@@ -1,0 +1,15 @@
+{
+  "label": "07-dropped-released",
+  "state": "<Mars_CookbookState.CLOSED: 0>",
+  "section": 1,
+  "textures": [],
+  "widget_classes": [],
+  "all_ck_widgets": true,
+  "all_texture2d": true,
+  "material_textures": [
+    null,
+    null,
+    null,
+    null
+  ]
+}

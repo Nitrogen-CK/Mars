@@ -1,0 +1,233 @@
+{
+  "sample_source": "evaluated mesh shape_keys.key_blocks[name].value after frame_set and depsgraph update; values include Blender driver/clamp evaluation",
+  "clips": {
+    "Book_Lying_Open_01": {
+      "curves_before": 4,
+      "curves_after": 4,
+      "verified": {
+        "PageBend_01": {
+          "keys": 24,
+          "minimum": 0.0,
+          "maximum": 0.0,
+          "max_value_error": 0.0,
+          "max_time_error": 1.390775045129189e-08,
+          "morph_metadata": true
+        },
+        "PageBend_02": {
+          "keys": 24,
+          "minimum": 0.0,
+          "maximum": 0.0,
+          "max_value_error": 0.0,
+          "max_time_error": 1.390775045129189e-08,
+          "morph_metadata": true
+        },
+        "PageBend_03": {
+          "keys": 24,
+          "minimum": 0.0,
+          "maximum": 0.0,
+          "max_value_error": 0.0,
+          "max_time_error": 1.390775045129189e-08,
+          "morph_metadata": true
+        },
+        "PageBend_04": {
+          "keys": 24,
+          "minimum": 0.0,
+          "maximum": 0.0,
+          "max_value_error": 0.0,
+          "max_time_error": 1.390775045129189e-08,
+          "morph_metadata": true
+        }
+      }
+    },
+    "Book_Lying_Open_Page_Turn_L_to_R_02": {
+      "curves_before": 4,
+      "curves_after": 4,
+      "verified": {
+        "PageBend_01": {
+          "keys": 108,
+          "minimum": 0.0,
+          "maximum": 0.6998303532600403,
+          "max_value_error": 0.0,
+          "max_time_error": 5.563100180516756e-08,
+          "morph_metadata": true
+        },
+        "PageBend_02": {
+          "keys": 108,
+          "minimum": 0.0,
+          "maximum": 0.2699947655200958,
+          "max_value_error": 0.0,
+          "max_time_error": 5.563100180516756e-08,
+          "morph_metadata": true
+        },
+        "PageBend_03": {
+          "keys": 108,
+          "minimum": 0.0,
+          "maximum": 0.0,
+          "max_value_error": 0.0,
+          "max_time_error": 5.563100180516756e-08,
+          "morph_metadata": true
+        },
+        "PageBend_04": {
+          "keys": 108,
+          "minimum": 0.0,
+          "maximum": 0.0,
+          "max_value_error": 0.0,
+          "max_time_error": 5.563100180516756e-08,
+          "morph_metadata": true
+        }
+      }
+    },
+    "Book_Lying_Open_Page_Turn_R_to_L_02": {
+      "curves_before": 4,
+      "curves_after": 4,
+      "verified": {
+        "PageBend_01": {
+          "keys": 108,
+          "minimum": 0.0,
+          "maximum": 0.6998303532600403,
+          "max_value_error": 0.0,
+          "max_time_error": 5.563100180516756e-08,
+          "morph_metadata": true
+        },
+        "PageBend_02": {
+          "keys": 108,
+          "minimum": 0.0,
+          "maximum": 0.2699947655200958,
+          "max_value_error": 0.0,
+          "max_time_error": 5.563100180516756e-08,
+          "morph_metadata": true
+        },
+        "PageBend_03": {
+          "keys": 108,
+          "minimum": 0.0,
+          "maximum": 0.0,
+          "max_value_error": 0.0,
+          "max_time_error": 5.563100180516756e-08,
+          "morph_metadata": true
+        },
+        "PageBend_04": {
+          "keys": 108,
+          "minimum": 0.0,
+          "maximum": 0.0,
+          "max_value_error": 0.0,
+          "max_time_error": 5.563100180516756e-08,
+          "morph_metadata": true
+        }
+      }
+    },
+    "Book_Lying_Open_to_R_01": {
+      "curves_before": 4,
+      "curves_after": 4,
+      "verified": {
+        "PageBend_01": {
+          "keys": 48,
+          "minimum": 0.0,
+          "maximum": 0.0,
+          "max_value_error": 0.0,
+          "max_time_error": 2.781550090258378e-08,
+          "morph_metadata": true
+        },
+        "PageBend_02": {
+          "keys": 48,
+          "minimum": 0.0,
+          "maximum": 0.0,
+          "max_value_error": 0.0,
+          "max_time_error": 2.781550090258378e-08,
+          "morph_metadata": true
+        },
+        "PageBend_03": {
+          "keys": 48,
+          "minimum": 0.0,
+          "maximum": 0.0,
+          "max_value_error": 0.0,
+          "max_time_error": 2.781550090258378e-08,
+          "morph_metadata": true
+        },
+        "PageBend_04": {
+          "keys": 48,
+          "minimum": 0.0,
+          "maximum": 0.0,
+          "max_value_error": 0.0,
+          "max_time_error": 2.781550090258378e-08,
+          "morph_metadata": true
+        }
+      }
+    },
+    "Book_Lying_R_01": {
+      "curves_before": 4,
+      "curves_after": 4,
+      "verified": {
+        "PageBend_01": {
+          "keys": 24,
+          "minimum": 0.0,
+          "maximum": 0.0,
+          "max_value_error": 0.0,
+          "max_time_error": 1.390775045129189e-08,
+          "morph_metadata": true
+        },
+        "PageBend_02": {
+          "keys": 24,
+          "minimum": 0.0,
+          "maximum": 0.0,
+          "max_value_error": 0.0,
+          "max_time_error": 1.390775045129189e-08,
+          "morph_metadata": true
+        },
+        "PageBend_03": {
+          "keys": 24,
+          "minimum": 0.0,
+          "maximum": 0.0,
+          "max_value_error": 0.0,
+          "max_time_error": 1.390775045129189e-08,
+          "morph_metadata": true
+        },
+        "PageBend_04": {
+          "keys": 24,
+          "minimum": 0.0,
+          "maximum": 0.0,
+          "max_value_error": 0.0,
+          "max_time_error": 1.390775045129189e-08,
+          "morph_metadata": true
+        }
+      }
+    },
+    "Book_Lying_R_to_Open_01": {
+      "curves_before": 4,
+      "curves_after": 4,
+      "verified": {
+        "PageBend_01": {
+          "keys": 48,
+          "minimum": 0.0,
+          "maximum": 0.0,
+          "max_value_error": 0.0,
+          "max_time_error": 2.781550090258378e-08,
+          "morph_metadata": true
+        },
+        "PageBend_02": {
+          "keys": 48,
+          "minimum": 0.0,
+          "maximum": 0.0,
+          "max_value_error": 0.0,
+          "max_time_error": 2.781550090258378e-08,
+          "morph_metadata": true
+        },
+        "PageBend_03": {
+          "keys": 48,
+          "minimum": 0.0,
+          "maximum": 0.0,
+          "max_value_error": 0.0,
+          "max_time_error": 2.781550090258378e-08,
+          "morph_metadata": true
+        },
+        "PageBend_04": {
+          "keys": 48,
+          "minimum": 0.0,
+          "maximum": 0.0,
+          "max_value_error": 0.0,
+          "max_time_error": 2.781550090258378e-08,
+          "morph_metadata": true
+        }
+      }
+    }
+  }
+}

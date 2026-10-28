@@ -1,0 +1,84 @@
+{
+  "label": "04-e-next-recipe",
+  "world": "/Game/Mars/Maps/UEDPIE_0_Sandbox_Mars_MAP.Sandbox_Mars_MAP",
+  "game_time": 68.98275175690651,
+  "rotation_tuple_order": [
+    "roll",
+    "pitch",
+    "yaw"
+  ],
+  "camera_location": [
+    -600.0,
+    225.0,
+    112.25451833171154
+  ],
+  "camera_rotation": [
+    0.0,
+    -45.5,
+    0.5272470116615295
+  ],
+  "control_rotation": [
+    0.0,
+    -45.5,
+    0.5272470116615295
+  ],
+  "events": [
+    {
+      "key": "LeftMouseButton",
+      "pressed": true,
+      "game_time": 34.68666407838464
+    },
+    {
+      "key": "LeftMouseButton",
+      "pressed": false,
+      "game_time": 34.84406307712197
+    },
+    {
+      "key": "LeftMouseButton",
+      "pressed": true,
+      "game_time": 48.24496417492628
+    },
+    {
+      "key": "LeftMouseButton",
+      "pressed": false,
+      "game_time": 48.40748457610607
+    },
+    {
+      "key": "E",
+      "pressed": true,
+      "game_time": 62.03699925541878
+    },
+    {
+      "key": "E",
+      "pressed": false,
+      "game_time": 62.20394405722618
+    }
+  ],
+  "books": [
+    {
+      "name": "Mars_CookbookPresentationComponent_0",
+      "location": [
+        -578.1485632733178,
+        225.20108732170422,
+        83.28622892092218
+      ],
+      "rotation": [
+        44.5,
+        0.0,
+        90.5272445678711
+      ],
+      "visible": true,
+      "engine_tick_enabled": false,
+      "state": "<Mars_CookbookState.OPEN: 2>",
+      "section": 1,
+      "sections": 3,
+      "position": 0.0,
+      "page_targets": [
+        "<Object '/Engine/Transient.TextureRenderTarget2D_8' (0x000001CEE6BA9600) Class 'TextureRenderTarget2D'>",
+        "<Object '/Engine/Transient.TextureRenderTarget2D_9' (0x000001CEE6BACC00) Class 'TextureRenderTarget2D'>",
+        "<Object '/Engine/Transient.TextureRenderTarget2D_8' (0x000001CEE6BA9600) Class 'TextureRenderTarget2D'>",
+        "<Object '/Engine/Transient.TextureRenderTarget2D_9' (0x000001CEE6BACC00) Class 'TextureRenderTarget2D'>"
+      ]
+    }
+  ]
+}

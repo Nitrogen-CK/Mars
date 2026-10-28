@@ -1,0 +1,186 @@
+{
+  "build_stylized.py": {
+    "bytes": 24001,
+    "sha256": "d438c69125378a3e3a4312c15edaa3e84ee68295d3fe297ebc740b5e3d3f06a3"
+  },
+  "check_gutter.py": {
+    "bytes": 1971,
+    "sha256": "c1aae7fa1b8fa3253531816e5f59f40b4d44b9b50b2b20897b6411e02f5690c2"
+  },
+  "closed_proxy_report.json": {
+    "bytes": 486,
+    "sha256": "ec9c9ced4afa1366a123efa5b68b7ec86db31e4f9bb651a21cdacf50817154bf"
+  },
+  "cm_export_report.json": {
+    "bytes": 2265,
+    "sha256": "05f1db84676f7d4546f36daee6571863d7206cc795e250f0b348cf3d83c55bb4"
+  },
+  "convert_widget_captures.py": {
+    "bytes": 646,
+    "sha256": "661fb95480ce11807e65045fa822c9f9e8e7aa0689e35a367d12dde71a1475f4"
+  },
+  "Cookbook_StylizedR02.blend": {
+    "bytes": 3862674,
+    "sha256": "333f49a5cf983653cfd02d69a7a1857c232929bf40504a162f4852eb66df407b"
+  },
+  "Cookbook_StylizedR02_WidgetReady.blend": {
+    "bytes": 503916,
+    "sha256": "ec22559937274f099efd7a03f80494c4628ad144e1e544b3bc0e85c5b342f767"
+  },
+  "cover_arc_before.json": {
+    "bytes": 9615,
+    "sha256": "3462fe207ff0f131f0add1bdbb395aff2c8f8199b7f78e24c64375fbd4fd728b"
+  },
+  "export_centimetres.py": {
+    "bytes": 6516,
+    "sha256": "71968e81c5b5441bdad1595e096ca2c917e1a54edfefde43adfb3ee8ce828711"
+  },
+  "export_closed_proxy.py": {
+    "bytes": 1882,
+    "sha256": "ac28283ff7ccdff20a374135201f77d96632421c0328dacf1ba843543ecae4ec"
+  },
+  "export_morph_curves.py": {
+    "bytes": 2368,
+    "sha256": "2791db5038a9d024a682274d50e6e47dc94e869912ed013e269fa59abc0de245"
+  },
+  "FBX/Book_Lying_Open_01.fbx": {
+    "bytes": 861884,
+    "sha256": "7d97689fc16ca1cad26972c6a967b73aa8b60f9e3d7bde513e366670768b1328"
+  },
+  "FBX/Book_Lying_Open_Page_Turn_L_to_R_02.fbx": {
+    "bytes": 915004,
+    "sha256": "c5a92bae529f3f37d6bb2d56578d532a796435d26d17f6a09d96ad3d7a5237d9"
+  },
+  "FBX/Book_Lying_Open_Page_Turn_R_to_L_02.fbx": {
+    "bytes": 915020,
+    "sha256": "083cf207386f5c5a0de259bbbf1061cc367a8788dab0085619798920309ad372"
+  },
+  "FBX/Book_Lying_Open_to_R_01.fbx": {
+    "bytes": 869820,
+    "sha256": "ec83c2ee4cc8f22159e9401c088ae83eeab94e48569e64b048c280272f8abf41"
+  },
+  "FBX/Book_Lying_R_01.fbx": {
+    "bytes": 861884,
+    "sha256": "59ca75da445356867d7dd14a4732a611b378d5958f1c8bea1e42ee8ae144b26d"
+  },
+  "FBX/Book_Lying_R_to_Open_01.fbx": {
+    "bytes": 869836,
+    "sha256": "dab518c58716d07ff3aa311845df49e25a90c942659f2d59343b9272042b52a4"
+  },
+  "FBX/SK_Cookbook_StylizedR02.fbx": {
+    "bytes": 760908,
+    "sha256": "790bc3cd67cb60f58e30c235f29108b0862c50baab480d42a6c4aff930a05458"
+  },
+  "FBX/SM_Cookbook_Closed.fbx": {
+    "bytes": 500652,
+    "sha256": "8e8d579823b2b02b945f4f29af8aac667bb3def4eedb291b3fa038fcf384c3b0"
+  },
+  "fbx_binary_units.json": {
+    "bytes": 10810,
+    "sha256": "088db9fc172b4d216d68eece5bd6a273e15c598f5ca59793335804019358c3dc"
+  },
+  "fix_gutter_actions.py": {
+    "bytes": 1201,
+    "sha256": "07abcc6c86ee63cc5edd2d884018e0a9eb71a17f668f9b7f17b38742fa3a9d1a"
+  },
+  "gutter_before.json": {
+    "bytes": 3435,
+    "sha256": "5ef2bc2d6fb12d6be734018d693e882a96ce761421ceeb001941736082e22088"
+  },
+  "gutter_validation.json": {
+    "bytes": 3417,
+    "sha256": "d437732d12ad736778c920f9aa643c415b17fbfbba78caa932474103726c4432"
+  },
+  "inspect_fbx_units.py": {
+    "bytes": 2292,
+    "sha256": "990c94b9f285f82ddf0bae72939ad329302bb77cdc7a3bfe6a4ed49e89177f63"
+  },
+  "inspect_source.py": {
+    "bytes": 1930,
+    "sha256": "8b1fafdef417067b577ff692854b8f40bd6f4eb9c19d8800d3bf08d1304b676d"
+  },
+  "make_contact_sheet.py": {
+    "bytes": 945,
+    "sha256": "7a93f52cc6723263da08886b2c3b2ee8710b1cc4649fbd330b03ce2f901f4726"
+  },
+  "make_motion_gif.py": {
+    "bytes": 785,
+    "sha256": "60c3ffc34567908193dab4065132f1204b84d0992fbfb8f490f217e0bf6dca07"
+  },
+  "materials.json": {
+    "bytes": 1623,
+    "sha256": "87b710c31dc6fa1517eb1df60742ef8ac332564fc33d7ab1a88bed47a5770f93"
+  },
+  "morph_curves.json": {
+    "bytes": 48226,
+    "sha256": "7697c04af3e52d9234973d64da9f89db354c5e79b841e039eacedbcaaffb76a5"
+  },
+  "package_manifest.py": {
+    "bytes": 903,
+    "sha256": "01da8452ceab2ca2a5f72c3a527db8f8057f1ec05e4fb44e52488309ece1e3c6"
+  },
+  "README.md": {
+    "bytes": 9111,
+    "sha256": "25b2a34699c81cc629874944426bb432c8a631b34b77dab1ce0552e6e63e3444"
+  },
+  "render_motion.py": {
+    "bytes": 1310,
+    "sha256": "bd4b67e324551d920178b9eea4598b9ad148b285b621ca480e416639ff991258"
+  },
+  "Renders/01-closed.png": {
+    "bytes": 1631479,
+    "sha256": "96687a6fd928496a1aab7eb93af98ad0d26854c0c627aeadc04d55c1f03ad955"
+  },
+  "Renders/02-open.png": {
+    "bytes": 2087306,
+    "sha256": "b991441d0ae692297e3e1f9ad9b6cc39e76221014d10476130c45c0f0cb48aa4"
+  },
+  "Renders/03-rear.png": {
+    "bytes": 1599640,
+    "sha256": "e701907f9c7afecb0946e5de5536b4d1d3ca244d92c3499da654aa8e3d131f10"
+  },
+  "Renders/04-side.png": {
+    "bytes": 1592765,
+    "sha256": "316aecd4f6ba1158dc152c1a039578367a77b704a1b705a6991a2b1fd2cb549d"
+  },
+  "Renders/05-page-turn.png": {
+    "bytes": 2012562,
+    "sha256": "55f6df6d0118611570588af3589a400f83bb8c4a712a6c525e0a5c991c1e9070"
+  },
+  "Renders/06-turn-early.png": {
+    "bytes": 2032896,
+    "sha256": "d8b598667f41045712b04603db847f60b2298baa0fe36d53143886b71cc0ddae"
+  },
+  "Renders/07-turn-late.png": {
+    "bytes": 2046376,
+    "sha256": "c742d2748eb2fc25a7ee4fc2e16fb93895550277b1387ed1cd1c57109c56a33f"
+  },
+  "Renders/08-opening.png": {
+    "bytes": 1921772,
+    "sha256": "453556d637a140c9104143767f09747bb7019942152adb49b9918de7b9fcfdd3"
+  },
+  "Renders/ContactSheet.png": {
+    "bytes": 1893304,
+    "sha256": "23842ca9715cd714f278d14a382734e80ebaa3d56875039bd2fd9076e58ba5da"
+  },
+  "Renders/CookbookMotion.gif": {
+    "bytes": 9570541,
+    "sha256": "26ce849ec1f5a8cb227dc197d8d278d5f71281c4e0e0fa237feecf1d6579394c"
+  },
+  "roundtrip_validation.json": {
+    "bytes": 9621,
+    "sha256": "be2706497476d9c298927da9de1ff5865e5ee31a5375377f661ecf5eef67553c"
+  },
+  "source_inspection.json": {
+    "bytes": 44099,
+    "sha256": "dcb56eae86bf206c1950eeb3c5277c09db907d724e91548c947c8c1942701358"
+  },
+  "validate_and_roundtrip.py": {
+    "bytes": 6869,
+    "sha256": "0a35807535248fa934c54046a6022c1d4b67064bff75cbbee81ca5298bbdc2d7"
+  },
+  "validation.json": {
+    "bytes": 5004,
+    "sha256": "aa98497d30ff75897749b34bfdeb2972f1dcfc294b4ee49c6b55c8d38cc4fb4a"
+  }
+}

@@ -1,0 +1,161 @@
+{
+	"assetName": "Cookbook_PosePreview_ABP",
+	"assetPath": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Validation/Cookbook_PosePreview_ABP.Cookbook_PosePreview_ABP",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "b7e809b15160f814f911bc151d8050ac",
+		"exporterVersion": 3
+	},
+	"blueprintType": "AnimBlueprint",
+	"parentClass": "AnimInstance",
+	"parentClassPath": "/Script/Engine.AnimInstance",
+	"implementedInterfaces": [],
+	"variables": [],
+	"classDefaults": [
+		{
+			"name": "RootMotionMode",
+			"type": "TEnumAsByte<ERootMotionMode::Type>",
+			"category": "RootMotion",
+			"value": "RootMotionFromMontagesOnly",
+			"tooltip": "Sets where this blueprint pulls Root Motion from"
+		},
+		{
+			"name": "bReceiveNotifiesFromLinkedInstances",
+			"type": "uint8",
+			"category": "Notifies",
+			"value": false,
+			"tooltip": "Whether to process notifies from any linked anim instances"
+		},
+		{
+			"name": "bPropagateNotifiesToLinkedInstances",
+			"type": "uint8",
+			"category": "Notifies",
+			"value": false,
+			"tooltip": "Whether to propagate notifies to any linked anim instances"
+		},
+		{
+			"name": "bUseMainInstanceMontageEvaluationData",
+			"type": "uint8",
+			"category": "Montage",
+			"value": false,
+			"tooltip": "If true, linked instances will use the main instance's montage data. (i.e. playing a montage on a main instance will play it on the linked layer too.)"
+		}
+	],
+	"components": [],
+	"eventGraphs": [
+		{
+			"graphName": "EventGraph",
+			"graphCategory": "EventGraph",
+			"executionFlows": [
+				{
+					"entryPoint": "Event BlueprintUpdateAnimation",
+					"entryNodeId": "Node_CedfHUtoNYQR01ypscL_ZQ",
+					"steps": [
+						{
+							"nodeId": "Node_CedfHUtoNYQR01ypscL_ZQ",
+							"title": "Event BlueprintUpdateAnimation"
+						}
+					]
+				}
+			],
+			"nodes": [
+				{
+					"nodeId": "Node_CedfHUtoNYQR01ypscL_ZQ",
+					"nodeClass": "K2Node_Event",
+					"nodeTitle": "Event BlueprintUpdateAnimation",
+					"nodeComment": "This node is disabled and will not be called.\nDrag off pins to build functionality.",
+					"inputPins": [],
+					"outputPins": [
+						{
+							"pinName": "OutputDelegate",
+							"pinType": "Delegate",
+							"direction": "Output"
+						},
+						{
+							"pinName": "then",
+							"pinType": "exec",
+							"direction": "Output"
+						},
+						{
+							"pinName": "DeltaTimeX",
+							"pinType": "float",
+							"direction": "Output",
+							"defaultValue": "0.0"
+						}
+					]
+				},
+				{
+					"nodeId": "Node_DgiuN0MmTMwAlNm4fIdL0g",
+					"nodeClass": "K2Node_CallFunction",
+					"nodeTitle": "Try Get Pawn Owner\nTarget is Anim Instance",
+					"nodeComment": "This node is disabled and will not be called.\nDrag off pins to build functionality.",
+					"inputPins": [
+						{
+							"pinName": "self",
+							"pinType": "AnimInstance",
+							"direction": "Input"
+						}
+					],
+					"outputPins": [
+						{
+							"pinName": "ReturnValue",
+							"pinType": "Pawn",
+							"direction": "Output"
+						}
+					]
+				}
+			]
+		}
+	],
+	"functionGraphs": [
+		{
+			"graphName": "AnimGraph",
+			"graphCategory": "Function",
+			"executionFlows": [],
+			"nodes": [
+				{
+					"nodeId": "Node_zB28KkS26HyWVeKnhjEwhA",
+					"nodeClass": "AnimGraphNode_Root",
+					"nodeTitle": "Output Pose\nAnimGraph",
+					"inputPins": [
+						{
+							"pinName": "Result",
+							"pinType": "PoseLink",
+							"direction": "Input",
+							"defaultValue": "(LinkID=-1,SourceLinkID=-1)",
+							"connections": [
+								"Node_R1w4QUH_0RUCu06Gv8QWTQ.Pose"
+							]
+						}
+					],
+					"outputPins": []
+				},
+				{
+					"nodeId": "Node_R1w4QUH_0RUCu06Gv8QWTQ",
+					"nodeClass": "AnimGraphNode_SequenceEvaluator",
+					"nodeTitle": "Cookbook_Closed_AS\nSequence Evaluator (by time)",
+					"inputPins": [
+						{
+							"pinName": "ExplicitTime",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "0.000000"
+						}
+					],
+					"outputPins": [
+						{
+							"pinName": "Pose",
+							"pinType": "PoseLink",
+							"direction": "Output",
+							"connections": [
+								"Node_zB28KkS26HyWVeKnhjEwhA.Result"
+							]
+						}
+					]
+				}
+			]
+		}
+	],
+	"macroGraphs": []
+}

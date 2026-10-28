@@ -1,0 +1,166 @@
+{
+  "status": "Local Unreal item integration implemented and observed in PIE",
+  "date": "2026-10-23",
+  "base_commit": "c665086cb3adf57479ba540e07fbb2a2cdd0bd9e",
+  "implementation_model": "gpt-6.1-sol",
+  "reasoning_effort": "high",
+  "controls": {
+    "LMB": "Pick up focused loose book; toggle held book open/closed when no world prompt takes priority",
+    "Q": "Previous spread while open",
+    "E": "Next spread while open",
+    "R tap": "Drop",
+    "R hold/release": "Throw"
+  },
+  "spawn_in_gameplay_pie": "Mars_SpawnCookbook",
+  "item_definition": "mars_items::Cookbook() / Mars_ItemDef_Cookbook",
+  "page_widget_pairs": 3,
+  "build": {
+    "exit_code": 0,
+    "log": "Saved/Logs/Cookbook-Integration-Build.log",
+    "native_changes_after_build": false
+  },
+  "gates": [
+    {
+      "name": "Cookbook",
+      "baseline_passed": 0,
+      "final": {
+        "Total": 5,
+        "Passed": 5,
+        "Failed": 0,
+        "Skipped": 0,
+        "Contaminated": 0
+      },
+      "exit_code": 0,
+      "log": "Saved/Logs/Cookbook-Final-MaterialCleanup.log",
+      "duration": "48s"
+    },
+    {
+      "name": "Item",
+      "baseline_passed": 59,
+      "final": {
+        "Total": 60,
+        "Passed": 60,
+        "Failed": 0,
+        "Skipped": 0,
+        "Contaminated": 0
+      },
+      "exit_code": 0,
+      "log": "Saved/Logs/Cookbook-Final-Regression-Item.log",
+      "duration": "2m 29s"
+    },
+    {
+      "name": "Player",
+      "baseline_passed": 31,
+      "final": {
+        "Total": 32,
+        "Passed": 32,
+        "Failed": 0,
+        "Skipped": 0,
+        "Contaminated": 0
+      },
+      "exit_code": 0,
+      "log": "Saved/Logs/Cookbook-Final-Regression-Player.log",
+      "duration": "2m 19s"
+    },
+    {
+      "name": "Emote",
+      "baseline_passed": 5,
+      "final": {
+        "Total": 5,
+        "Passed": 5,
+        "Failed": 0,
+        "Skipped": 0,
+        "Contaminated": 0
+      },
+      "exit_code": 0,
+      "log": "Saved/Logs/Cookbook-Final-Regression-Emote.log",
+      "duration": "42s"
+    },
+    {
+      "name": "FPHands",
+      "baseline_passed": 26,
+      "final": {
+        "Total": 27,
+        "Passed": 27,
+        "Failed": 0,
+        "Skipped": 0,
+        "Contaminated": 0
+      },
+      "exit_code": 0,
+      "log": "Saved/Logs/Cookbook-Final-Regression-FPHands.log",
+      "duration": "49s"
+    }
+  ],
+  "gate_scope": "Shared-system gates ran on the final input/item/FPHands changes. The subsequent presentation-only material cleanup was checked by a fresh five-test Cookbook run and rendered release/reopen observation. Test groups overlap; do not sum counts.",
+  "expected_added_tests": {
+    "Item": [
+      "Mars_AutoTest_FPHands_HoldOverrideRequiresAnItemAndDefaultRestores"
+    ],
+    "Player": [
+      "Mars_AutoTest_Cookbook_PlayerInputPagesAndFocusedPromptWins"
+    ],
+    "FPHands": [
+      "Mars_AutoTest_FPHands_HoldOverrideRequiresAnItemAndDefaultRestores"
+    ]
+  },
+  "runtime_evidence": {
+    "journey": "UnrealGameplay/FinalVerified/01..15 JSON/PNG pairs; raw input into real local player, not direct book calls",
+    "latest_recipe": "UnrealGameplay/FinalCleanup/02-recipe-final.png",
+    "material_release": "UnrealGameplay/FinalCleanup/03-dropped-base-materials.json",
+    "material_reopen": "UnrealGameplay/FinalCleanup/04-reopened-new-targets.json",
+    "confirmed": [
+      "Physical loose book pickup, equip, open, E next/Q previous, LMB close",
+      "Correct front-facing reading pose and native mid-turn/closing geometry",
+      "R tap drops and automatically closes; same component picked up again",
+      "R hold/release throws open book; closes on release and physically travels/settles",
+      "Released component restores original four materials; reopen creates fresh MIDs/RTs and preserves recipe section"
+    ]
+  },
+  "corrections": [
+    "Held roll +90 makes pages face camera",
+    "Existing Ck component tick synchronizes native visual from committed child transform, including stationary carrier; exact native-position assertion retained",
+    "Restore original materials on release: Unreal ignores null texture overrides"
+  ],
+  "limitations": [
+    "Raw input injection does not prove physical keyboard/Slate focus",
+    "Remote multiplayer and packaged build not verified",
+    "Sample recipe content remains illustrative; final recipe content design is separate",
+    "20 material sections; no performance claim"
+  ],
+  "editor_return": {
+    "world": "/Game/Mars/Maps/Warrens_VariantC_Mars_MAP",
+    "pie_stopped": true,
+    "dirty_packages": 0
+  },
+  "git": "Uncommitted and not pushed; unrelated changes preserved",
+  "source_sha256": {
+    "Script/Items/Presentation/Mars_CookbookPresentationComponent.as": "3c46d1d973f5bd63cc128fdaf1c91ae1fdd44a4790dad4c38c261a962ef21595",
+    "Script/Items/Mars_Item_Cookbook.as": "e1d7f1627dc49afa0657ba09bc4ef615c6e2075f2e271cf419a89513bc5edd30",
+    "Script/WorldObjects/Items/Mars_Cookbook_EntityScript.as": "4f639b6c8eb85fc6da73d2ad9fd057ce08b0b314f83fdfe512b63485cc48ed60",
+    "Script/PlayerCharacter/HFSM/Mars_PlayerCharacter_Hfsm_Cookbook.as": "6ea92106f91614cf895510ac222409d9bae89eaa26b9db274cbf3df99c99df7e",
+    "Script/Items/Hfsm/Mars_ItemUse_Cookbook_Hfsm.as": "82df3c0ccbc601c84d087efb77e0b864273bf73cb6732c9fa77fcea8d3fce219",
+    "Config/Tags/Mars_CookbookTags.ini": "4ad8ff594ed4d189be6312f82450b49657a3755b11f2b0e4f75daee55dea2e4a",
+    "Script/Tests/Cookbook/Mars_AutoTestRig_Cookbook.as": "e2b7a034f6fa4df41ba50c115c948fe281cfdb9ec069e2a3a87e14bb447e0a9d",
+    "Script/Tests/Cookbook/Mars_AutoTest_Cookbook_LaunchClosesAndStowResets.as": "7510f9e408d46bd02d7748d09b9c7ad4e5a1c573a4e4189292fd802a55babb8e",
+    "Script/Tests/Cookbook/Mars_AutoTest_Cookbook_LeavingControlsUnbindsAndCloses.as": "47c66d9b50877f21cd8e5b3b2391988a63ee99367f6c185739a5e0fe2d78f996",
+    "Script/Tests/Cookbook/Mars_AutoTest_Cookbook_PlayerInputPagesAndFocusedPromptWins.as": "16de6e7e985545f666ced4310aa0fd15d55a355d9663c6b5db720528dd8858b1",
+    "Script/Tests/Cookbook/Mars_AutoTest_Cookbook_TransitionsReverseAndPageBoundsHold.as": "708dc830a71556721e6dc8703292d31cc3d60fcb8a4c7acba52ec84af0e46589",
+    "Script/ECS/FPHands/Mars_FPHands_Feature.as": "e5586b167f9b8d8f9692be4bc4f5441822a407cd210ac922fb7910e97d34d6ef",
+    "Script/ECS/FPHands/Mars_FPHands_Processor_Requests.as": "9c96d109e39f6a9b261d20f8f9c31b2c6ad993dbbeaf8bd762b936e06ace9e9d",
+    "Script/ECS/HeldItemUse/Mars_HeldItemUse_Utils.as": "4b47091e74b93889520f58869b3ffccfda410bec1ac72f8eec4a2bf4e4d5333d",
+    "Script/Inputs/Mars_InputAction_Assets.as": "176cf7de44fddbcfdd37ce181e2f676866551568a2724ee790020fcb04d3fb0d",
+    "Script/Inputs/Profiles/Mars_Gameplay_InputProfile.as": "7afab1bc3a641fbad3f71db2e493d958c1baa362c910969a770c9653f9de15c1",
+    "Script/PlayerCharacter/HFSM/Mars_PlayerCharacter_Hfsm.as": "fda79bc64d57a0fffd344a8653e8746bfe0a19ef0f032f9141c2e8c92fa60bc6",
+    "Script/PlayerCharacter/HFSM/Mars_PlayerCharacter_Hfsm_Emotes.as": "5b2a1ac601e3ff5546a67f10fe0ac41ebf4b74cef3de05e40a4273e1b493f812",
+    "Script/WorldSettings/Gameplay/Mars_Gameplay_CheatManager.as": "b15f708cceb836db96a2781f5abb11837bb513d68f1ce7095245a3e582c8aae6",
+    "Script/Tests/FPHands/Mars_AutoTest_FPHands_HoldOverrideRequiresAnItemAndDefaultRestores.as": "20ddb637f8ff1c7d85b9edc409acb0f474021a4774714d1af6adb8b3ab6d625c",
+    "Script/Camp/Mars_ServiceDefinition.as": "b3dc51f446ef4be5d3fdce860c4f6f689d527ac9bacdffbfd459721e796a62b5",
+    "Script/Editor/Mars_SandboxMapBuilder.as": "d0b2eda94433bf74d627426f1cc475d5987f34192b7b31a3f5b1fba68cd05c17"
+  },
+  "latest_revision": {
+    "name": "Ck page widgets and BookMenu dependency cleanup",
+    "evidence": "DependencyCleanup/REPORT.json",
+    "removal_notes": "DependencyCleanup/README.md",
+    "focused_gate": "Saved/Logs/Cookbook-WithoutBookMenu-Final.log:5/5,exit0,-DisablePlugins=BookMenu"
+  }
+}

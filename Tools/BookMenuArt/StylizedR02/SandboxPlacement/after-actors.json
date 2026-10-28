@@ -1,0 +1,3484 @@
+{
+  "actors": [
+    {
+      "label": "Floor",
+      "name": "StaticMeshActor_0",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        0.0,
+        0.0,
+        -10.0
+      ]
+    },
+    {
+      "label": "Ledge_Step",
+      "name": "StaticMeshActor_1",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        300.0,
+        -600.0,
+        30.0
+      ]
+    },
+    {
+      "label": "Ledge_Platform",
+      "name": "StaticMeshActor_2",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        500.0,
+        -600.0,
+        60.0
+      ]
+    },
+    {
+      "label": "Tunnel_WallLeft",
+      "name": "StaticMeshActor_3",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        500.0,
+        300.0,
+        65.0
+      ]
+    },
+    {
+      "label": "Tunnel_WallRight",
+      "name": "StaticMeshActor_4",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        500.0,
+        600.0,
+        65.0
+      ]
+    },
+    {
+      "label": "Tunnel_Roof",
+      "name": "StaticMeshActor_5",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        500.0,
+        450.0,
+        140.0
+      ]
+    },
+    {
+      "label": "Sun",
+      "name": "DirectionalLight_0",
+      "class": "/Script/Engine.DirectionalLight",
+      "location": [
+        0.0,
+        0.0,
+        800.0
+      ]
+    },
+    {
+      "label": "SkyLight",
+      "name": "SkyLight_0",
+      "class": "/Script/Engine.SkyLight",
+      "location": [
+        0.0,
+        0.0,
+        900.0
+      ]
+    },
+    {
+      "label": "SkyAtmosphere",
+      "name": "SkyAtmosphere_0",
+      "class": "/Script/Engine.SkyAtmosphere",
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "label": "PlayerStart_0",
+      "name": "PlayerStart_0",
+      "class": "/Script/Engine.PlayerStart",
+      "location": [
+        -600.0,
+        -225.0,
+        100.0
+      ]
+    },
+    {
+      "label": "PlayerStart_1",
+      "name": "PlayerStart_1",
+      "class": "/Script/Engine.PlayerStart",
+      "location": [
+        -600.0,
+        -75.0,
+        100.0
+      ]
+    },
+    {
+      "label": "PlayerStart_2",
+      "name": "PlayerStart_2",
+      "class": "/Script/Engine.PlayerStart",
+      "location": [
+        -600.0,
+        75.0,
+        100.0
+      ]
+    },
+    {
+      "label": "PlayerStart_3",
+      "name": "PlayerStart_3",
+      "class": "/Script/Engine.PlayerStart",
+      "location": [
+        -600.0,
+        225.0,
+        100.0
+      ]
+    },
+    {
+      "label": "TestLamp_A",
+      "name": "Mars_TestLamp_0",
+      "class": "/Script/Angelscript.Mars_TestLamp",
+      "location": [
+        0.0,
+        300.0,
+        50.0
+      ]
+    },
+    {
+      "label": "TestLamp_B",
+      "name": "Mars_TestLamp_1",
+      "class": "/Script/Angelscript.Mars_TestLamp",
+      "location": [
+        0.0,
+        -300.0,
+        50.0
+      ]
+    },
+    {
+      "label": "Room2_Floor",
+      "name": "StaticMeshActor_6",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        3000.0,
+        0.0,
+        -10.0
+      ]
+    },
+    {
+      "label": "Room2_WallWest_South",
+      "name": "StaticMeshActor_7",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        2000.0,
+        -425.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Room2_WallWest_North",
+      "name": "StaticMeshActor_8",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        2000.0,
+        425.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Room2_WallEast",
+      "name": "StaticMeshActor_9",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        4000.0,
+        0.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Room2_WallSouth",
+      "name": "StaticMeshActor_10",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        3000.0,
+        -700.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Room2_Partition_0",
+      "name": "StaticMeshActor_12",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        3500.0,
+        -640.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Room2_Partition_1",
+      "name": "StaticMeshActor_13",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        3500.0,
+        -230.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Room2_Partition_2",
+      "name": "StaticMeshActor_14",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        3500.0,
+        230.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Room2_Partition_3",
+      "name": "StaticMeshActor_15",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        3500.0,
+        640.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Room2_AlcoveDivider_South",
+      "name": "StaticMeshActor_16",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        3750.0,
+        -230.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Room2_AlcoveDivider_North",
+      "name": "StaticMeshActor_17",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        3750.0,
+        230.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Room2_GateHeader_A",
+      "name": "StaticMeshActor_18",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        3500.0,
+        -460.0,
+        270.0
+      ]
+    },
+    {
+      "label": "Mech_GateA",
+      "name": "Ck_EntitySpawner_UE_0",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        3500.0,
+        -460.0,
+        0.0
+      ]
+    },
+    {
+      "label": "Mech_LeverA",
+      "name": "Ck_EntitySpawner_UE_1",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        3250.0,
+        -460.0,
+        0.0
+      ]
+    },
+    {
+      "label": "Room2_GateHeader_B",
+      "name": "StaticMeshActor_19",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        3500.0,
+        0.0,
+        270.0
+      ]
+    },
+    {
+      "label": "Mech_GateB",
+      "name": "Ck_EntitySpawner_UE_2",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        3500.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "label": "Mech_LeverB1",
+      "name": "Ck_EntitySpawner_UE_3",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        3250.0,
+        -80.0,
+        0.0
+      ]
+    },
+    {
+      "label": "Mech_LeverB2",
+      "name": "Ck_EntitySpawner_UE_4",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        3250.0,
+        80.0,
+        0.0
+      ]
+    },
+    {
+      "label": "Room2_GateHeader_C",
+      "name": "StaticMeshActor_20",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        3500.0,
+        460.0,
+        270.0
+      ]
+    },
+    {
+      "label": "Mech_GateC",
+      "name": "Ck_EntitySpawner_UE_5",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        3500.0,
+        460.0,
+        0.0
+      ]
+    },
+    {
+      "label": "Room2_SwitchPedestal_C",
+      "name": "StaticMeshActor_21",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        3250.0,
+        460.0,
+        50.0
+      ]
+    },
+    {
+      "label": "Mech_SwitchC",
+      "name": "Ck_EntitySpawner_UE_6",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        3250.0,
+        460.0,
+        100.0
+      ]
+    },
+    {
+      "label": "Room3_Floor",
+      "name": "StaticMeshActor_22",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        3000.0,
+        1400.0,
+        -10.0
+      ]
+    },
+    {
+      "label": "Room3_WallSouth_West",
+      "name": "StaticMeshActor_23",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        2425.0,
+        700.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Room3_WallSouth_East",
+      "name": "StaticMeshActor_24",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        3575.0,
+        700.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Room3_WallWest",
+      "name": "StaticMeshActor_25",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        2000.0,
+        1400.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Room3_WallEast",
+      "name": "StaticMeshActor_26",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        4000.0,
+        1400.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Room3_WallNorth",
+      "name": "StaticMeshActor_27",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        3000.0,
+        2100.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Room3_Partition_0",
+      "name": "StaticMeshActor_28",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        2065.0,
+        1600.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Room3_Partition_1",
+      "name": "StaticMeshActor_29",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        2425.0,
+        1600.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Room3_Partition_2",
+      "name": "StaticMeshActor_30",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        2785.0,
+        1600.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Room3_AlcoveDivider",
+      "name": "StaticMeshActor_31",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        2425.0,
+        1850.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Room3_AlcoveWall_East",
+      "name": "StaticMeshActor_32",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        2850.0,
+        1850.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Room3_GateHeader_F",
+      "name": "StaticMeshActor_33",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        2600.0,
+        1600.0,
+        270.0
+      ]
+    },
+    {
+      "label": "Mech3_GateF",
+      "name": "Ck_EntitySpawner_UE_7",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        2600.0,
+        1600.0,
+        0.0
+      ]
+    },
+    {
+      "label": "Mech3_Plate",
+      "name": "Ck_EntitySpawner_UE_8",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        2600.0,
+        1250.0,
+        0.0
+      ]
+    },
+    {
+      "label": "Mech3_Seal1",
+      "name": "Ck_EntitySpawner_UE_9",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        2010.0,
+        1000.0,
+        120.0
+      ]
+    },
+    {
+      "label": "Mech3_Seal2",
+      "name": "Ck_EntitySpawner_UE_10",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        2010.0,
+        1200.0,
+        120.0
+      ]
+    },
+    {
+      "label": "Mech3_SeqNode",
+      "name": "Ck_EntitySpawner_UE_11",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        2100.0,
+        1400.0,
+        0.0
+      ]
+    },
+    {
+      "label": "Room3_GateHeader_I",
+      "name": "StaticMeshActor_34",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        2250.0,
+        1600.0,
+        270.0
+      ]
+    },
+    {
+      "label": "Mech3_GateI",
+      "name": "Ck_EntitySpawner_UE_12",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        2250.0,
+        1600.0,
+        0.0
+      ]
+    },
+    {
+      "label": "Room3_CorridorWall_0",
+      "name": "StaticMeshActor_35",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        3575.0,
+        1050.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Room3_CorridorWall_1",
+      "name": "StaticMeshActor_36",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        3575.0,
+        1270.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Room3_CorridorWall_2",
+      "name": "StaticMeshActor_37",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        3575.0,
+        1590.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Mech3_Wheel",
+      "name": "Ck_EntitySpawner_UE_13",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        3300.0,
+        710.0,
+        110.0
+      ]
+    },
+    {
+      "label": "Mech3_Vent",
+      "name": "Ck_EntitySpawner_UE_14",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        3600.0,
+        710.0,
+        0.0
+      ]
+    },
+    {
+      "label": "Mech3_LeverK",
+      "name": "Ck_EntitySpawner_UE_15",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        3280.0,
+        1215.0,
+        0.0
+      ]
+    },
+    {
+      "label": "Mech3_Spikes1",
+      "name": "Ck_EntitySpawner_UE_16",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        3500.0,
+        1160.0,
+        0.0
+      ]
+    },
+    {
+      "label": "Mech3_Spikes2",
+      "name": "Ck_EntitySpawner_UE_17",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        3700.0,
+        1160.0,
+        0.0
+      ]
+    },
+    {
+      "label": "Mech3_Pendulum",
+      "name": "Ck_EntitySpawner_UE_18",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        3600.0,
+        1430.0,
+        0.0
+      ]
+    },
+    {
+      "label": "Item_Rock_0",
+      "name": "Ck_EntitySpawner_UE_19",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -450.0,
+        -300.0,
+        50.0
+      ]
+    },
+    {
+      "label": "Item_Rock_1",
+      "name": "Ck_EntitySpawner_UE_20",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -450.0,
+        -100.0,
+        50.0
+      ]
+    },
+    {
+      "label": "Item_Ration",
+      "name": "Ck_EntitySpawner_UE_21",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -450.0,
+        100.0,
+        50.0
+      ]
+    },
+    {
+      "label": "Item_Cog",
+      "name": "Ck_EntitySpawner_UE_22",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -450.0,
+        300.0,
+        50.0
+      ]
+    },
+    {
+      "label": "Item_Backpack",
+      "name": "Ck_EntitySpawner_UE_23",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -450.0,
+        500.0,
+        60.0
+      ]
+    },
+    {
+      "label": "Room4_Floor",
+      "name": "StaticMeshActor_11",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        3000.0,
+        -1400.0,
+        -10.0
+      ]
+    },
+    {
+      "label": "Room4_WallWest_South",
+      "name": "StaticMeshActor_38",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        2000.0,
+        -1825.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Room4_WallWest_North",
+      "name": "StaticMeshActor_39",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        2000.0,
+        -975.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Room4_WallSouth",
+      "name": "StaticMeshActor_40",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        3000.0,
+        -2100.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Room4_WallEast",
+      "name": "StaticMeshActor_41",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        4000.0,
+        -1400.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Room4_Partition_South",
+      "name": "StaticMeshActor_42",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        3200.0,
+        -1810.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Room4_Partition_North",
+      "name": "StaticMeshActor_43",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        3200.0,
+        -990.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Room4_GateHeader_M",
+      "name": "StaticMeshActor_44",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        3200.0,
+        -1400.0,
+        270.0
+      ]
+    },
+    {
+      "label": "Mech4_GateM",
+      "name": "Ck_EntitySpawner_UE_24",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        3200.0,
+        -1400.0,
+        0.0
+      ]
+    },
+    {
+      "label": "Mech4_Lamps",
+      "name": "Ck_EntitySpawner_UE_25",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        3190.0,
+        -1400.0,
+        270.0
+      ]
+    },
+    {
+      "label": "Mech4_ChainOutside",
+      "name": "Ck_EntitySpawner_UE_26",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        3190.0,
+        -1650.0,
+        260.0
+      ]
+    },
+    {
+      "label": "Mech4_ChainInside",
+      "name": "Ck_EntitySpawner_UE_27",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        3210.0,
+        -1150.0,
+        260.0
+      ]
+    },
+    {
+      "label": "Room4_Plinth",
+      "name": "StaticMeshActor_45",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        3700.0,
+        -1400.0,
+        40.0
+      ]
+    },
+    {
+      "label": "Sandbox_LadderPlatform",
+      "name": "StaticMeshActor_46",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -1200.0,
+        1200.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Sandbox_Ladder",
+      "name": "Ck_EntitySpawner_UE_28",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -1200.0,
+        1000.0,
+        0.0
+      ]
+    },
+    {
+      "label": "Sandbox_Workbench",
+      "name": "Ck_EntitySpawner_UE_29",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -1200.0,
+        -1200.0,
+        0.0
+      ]
+    },
+    {
+      "label": "Room5_Floor",
+      "name": "StaticMeshActor_47",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -3000.0,
+        0.0,
+        -10.0
+      ]
+    },
+    {
+      "label": "Room5_WallEast_South",
+      "name": "StaticMeshActor_48",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -2000.0,
+        -425.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Room5_WallEast_North",
+      "name": "StaticMeshActor_49",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -2000.0,
+        425.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Room5_WallWest",
+      "name": "StaticMeshActor_50",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -4000.0,
+        0.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Room5_WallSouth",
+      "name": "StaticMeshActor_51",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -3000.0,
+        -700.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Room5_WallNorth",
+      "name": "StaticMeshActor_52",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -3000.0,
+        700.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Room5_Pillar",
+      "name": "StaticMeshActor_53",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -3300.0,
+        250.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Room5_Step",
+      "name": "StaticMeshActor_54",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -2700.0,
+        -300.0,
+        20.0
+      ]
+    },
+    {
+      "label": "Mech5_Dummy",
+      "name": "Ck_EntitySpawner_UE_31",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -2400.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "label": "Item_Cleaver",
+      "name": "Ck_EntitySpawner_UE_32",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -2250.0,
+        -120.0,
+        30.0
+      ]
+    },
+    {
+      "label": "Item_Tenderizer",
+      "name": "Ck_EntitySpawner_UE_33",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -2250.0,
+        120.0,
+        30.0
+      ]
+    },
+    {
+      "label": "Mech5_Crawler4",
+      "name": "Ck_EntitySpawner_UE_34",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -3400.0,
+        -300.0,
+        80.0
+      ]
+    },
+    {
+      "label": "Mech5_Crawler6",
+      "name": "Ck_EntitySpawner_UE_35",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -3400.0,
+        300.0,
+        80.0
+      ]
+    },
+    {
+      "label": "Mech5_NavField",
+      "name": "Ck_EntitySpawner_UE_36",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -3000.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "label": "Mech3_BackpackPlate",
+      "name": "Ck_EntitySpawner_UE_37",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        2600.0,
+        950.0,
+        0.0
+      ]
+    },
+    {
+      "label": "EyesDummy",
+      "name": "Ck_EntitySpawner_UE_38",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -150.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "label": "Forage_FigVine",
+      "name": "Ck_EntitySpawner_UE_68",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -800.0,
+        -500.0,
+        0.0
+      ]
+    },
+    {
+      "label": "Forage_Censer",
+      "name": "Ck_EntitySpawner_UE_69",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -800.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "label": "Forage_BellnutVine",
+      "name": "Ck_EntitySpawner_UE_70",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -800.0,
+        500.0,
+        0.0
+      ]
+    },
+    {
+      "label": "Forage_Slab",
+      "name": "StaticMeshActor_55",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -1000.0,
+        500.0,
+        25.0
+      ]
+    },
+    {
+      "label": "Item_Pan",
+      "name": "Ck_EntitySpawner_UE_71",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -800.0,
+        -250.0,
+        50.0
+      ]
+    },
+    {
+      "label": "Item_ForageRock",
+      "name": "Ck_EntitySpawner_UE_72",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -800.0,
+        250.0,
+        50.0
+      ]
+    },
+    {
+      "label": "Sandbox_SearingStation",
+      "name": "Ck_EntitySpawner_UE_73",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -800.0,
+        -1600.0,
+        0.0
+      ]
+    },
+    {
+      "label": "Sandbox_FryStation",
+      "name": "Ck_EntitySpawner_UE_75",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -400.0,
+        -1600.0,
+        0.0
+      ]
+    },
+    {
+      "label": "Sandbox_TumblerStation",
+      "name": "Ck_EntitySpawner_UE_74",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        0.0,
+        -1600.0,
+        0.0
+      ]
+    },
+    {
+      "label": "Sandbox_Platter_Large",
+      "name": "Ck_EntitySpawner_UE_79",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -1320.0,
+        -1800.0,
+        75.0
+      ]
+    },
+    {
+      "label": "Sandbox_Platter_Small",
+      "name": "Ck_EntitySpawner_UE_80",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -1320.0,
+        -1440.0,
+        75.0
+      ]
+    },
+    {
+      "label": "Sandbox_Food_MeatSlab",
+      "name": "Ck_EntitySpawner_UE_81",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -1410.0,
+        -1890.0,
+        20.0
+      ]
+    },
+    {
+      "label": "Sandbox_Food_MushroomSlice",
+      "name": "Ck_EntitySpawner_UE_82",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -1320.0,
+        -1890.0,
+        20.0
+      ]
+    },
+    {
+      "label": "Sandbox_CuttingStation",
+      "name": "Ck_EntitySpawner_UE_76",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -1200.0,
+        -1600.0,
+        0.0
+      ]
+    },
+    {
+      "label": "Mars_BatterStation_EntityScript",
+      "name": "Ck_EntitySpawner_UE_77",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -663.365676854821,
+        -1197.476358879381,
+        1.2579984058902483e-06
+      ]
+    },
+    {
+      "label": "Mech5_AggressionLever",
+      "name": "Ck_EntitySpawner_UE_30",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -3978.0,
+        0.0,
+        110.0
+      ]
+    },
+    {
+      "label": "Mars_FoodItem_Pickle_EntityScript",
+      "name": "Ck_EntitySpawner_UE_83",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -1391.8634777952623,
+        -1779.7908937186378,
+        21.01587062395768
+      ]
+    },
+    {
+      "label": "Mars_MortarStation_EntityScript",
+      "name": "Ck_EntitySpawner_UE_85",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -986.6275310224768,
+        -1218.2137553602417,
+        -9.67758126080298e-07
+      ]
+    },
+    {
+      "label": "Steward",
+      "name": "Ck_EntitySpawner_UE_86",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -700.0,
+        -309.0,
+        2.0
+      ]
+    },
+    {
+      "label": "FailSwitch_Pedestal",
+      "name": "StaticMeshActor_56",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -900.0,
+        -180.0,
+        50.0
+      ]
+    },
+    {
+      "label": "Mech_FailSwitch",
+      "name": "Ck_EntitySpawner_UE_78",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -900.0,
+        -180.0,
+        100.0
+      ]
+    },
+    {
+      "label": "Room6_Floor",
+      "name": "StaticMeshActor_194",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        500.0,
+        -2700.0,
+        -10.0
+      ]
+    },
+    {
+      "label": "Room6_WallNorth_West",
+      "name": "StaticMeshActor_195",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -25.0,
+        -2000.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Room6_WallNorth_East",
+      "name": "StaticMeshActor_196",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        1525.0,
+        -2000.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Room6_WallWest",
+      "name": "StaticMeshActor_197",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -900.0,
+        -2700.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Room6_WallEast",
+      "name": "StaticMeshActor_198",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        1900.0,
+        -2700.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Room6_WallSouth",
+      "name": "StaticMeshActor_199",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        500.0,
+        -3400.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Room6_Partition_0",
+      "name": "StaticMeshActor_200",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -785.0,
+        -2500.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Room6_Partition_1",
+      "name": "StaticMeshActor_201",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -200.0,
+        -2500.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Room6_Partition_2",
+      "name": "StaticMeshActor_202",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        500.0,
+        -2500.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Room6_Partition_3",
+      "name": "StaticMeshActor_203",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        1200.0,
+        -2500.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Room6_Partition_4",
+      "name": "StaticMeshActor_204",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        1785.0,
+        -2500.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Room6_GateHeader_K1",
+      "name": "StaticMeshActor_205",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -550.0,
+        -2500.0,
+        270.0
+      ]
+    },
+    {
+      "label": "Room6_GateHeader_K2",
+      "name": "StaticMeshActor_206",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        150.0,
+        -2500.0,
+        270.0
+      ]
+    },
+    {
+      "label": "Room6_GateHeader_K3",
+      "name": "StaticMeshActor_207",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        850.0,
+        -2500.0,
+        270.0
+      ]
+    },
+    {
+      "label": "Room6_GateHeader_K4",
+      "name": "StaticMeshActor_208",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        1550.0,
+        -2500.0,
+        270.0
+      ]
+    },
+    {
+      "label": "Room6_Divider_0",
+      "name": "StaticMeshActor_209",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -200.0,
+        -2950.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Room6_Divider_1",
+      "name": "StaticMeshActor_210",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        500.0,
+        -2950.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Room6_Divider_2",
+      "name": "StaticMeshActor_211",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        1200.0,
+        -2950.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Mech6_DoorRed",
+      "name": "Ck_EntitySpawner_UE_84",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -550.0,
+        -2500.0,
+        0.0
+      ]
+    },
+    {
+      "label": "Mech6_DoorBlueYellow",
+      "name": "Ck_EntitySpawner_UE_87",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        150.0,
+        -2500.0,
+        0.0
+      ]
+    },
+    {
+      "label": "Mech6_DoorGreen",
+      "name": "Ck_EntitySpawner_UE_88",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        850.0,
+        -2500.0,
+        0.0
+      ]
+    },
+    {
+      "label": "Mech6_DoorPurple",
+      "name": "Ck_EntitySpawner_UE_89",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        1550.0,
+        -2500.0,
+        0.0
+      ]
+    },
+    {
+      "label": "Mech6_LockRed",
+      "name": "Ck_EntitySpawner_UE_90",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -350.0,
+        -2490.0,
+        120.0
+      ]
+    },
+    {
+      "label": "Mech6_LockBlue",
+      "name": "Ck_EntitySpawner_UE_91",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -50.0,
+        -2490.0,
+        120.0
+      ]
+    },
+    {
+      "label": "Mech6_LockYellow",
+      "name": "Ck_EntitySpawner_UE_92",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        350.0,
+        -2490.0,
+        120.0
+      ]
+    },
+    {
+      "label": "Mech6_LockGreen_West",
+      "name": "Ck_EntitySpawner_UE_93",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        650.0,
+        -2490.0,
+        120.0
+      ]
+    },
+    {
+      "label": "Mech6_LockGreen_East",
+      "name": "Ck_EntitySpawner_UE_94",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        1050.0,
+        -2490.0,
+        120.0
+      ]
+    },
+    {
+      "label": "Mech6_LockPurple_Outside",
+      "name": "Ck_EntitySpawner_UE_95",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        1350.0,
+        -2490.0,
+        120.0
+      ]
+    },
+    {
+      "label": "Mech6_LockPurple_Inside",
+      "name": "Ck_EntitySpawner_UE_96",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        1300.0,
+        -2510.0,
+        120.0
+      ]
+    },
+    {
+      "label": "Item_Key_Red",
+      "name": "Ck_EntitySpawner_UE_97",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -550.0,
+        -2250.0,
+        30.0
+      ]
+    },
+    {
+      "label": "Item_Key_Green_0",
+      "name": "Ck_EntitySpawner_UE_98",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        750.0,
+        -2250.0,
+        30.0
+      ]
+    },
+    {
+      "label": "Item_Key_Green_1",
+      "name": "Ck_EntitySpawner_UE_99",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        950.0,
+        -2250.0,
+        30.0
+      ]
+    },
+    {
+      "label": "Item_Key_Purple",
+      "name": "Ck_EntitySpawner_UE_100",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        1550.0,
+        -2250.0,
+        30.0
+      ]
+    },
+    {
+      "label": "Item_Key_Yellow",
+      "name": "Ck_EntitySpawner_UE_101",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -550.0,
+        -3000.0,
+        30.0
+      ]
+    },
+    {
+      "label": "Item_Key_Blue",
+      "name": "Ck_EntitySpawner_UE_102",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        850.0,
+        -3000.0,
+        30.0
+      ]
+    },
+    {
+      "label": "Room6_Plinth_K2",
+      "name": "StaticMeshActor_212",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        150.0,
+        -3000.0,
+        40.0
+      ]
+    },
+    {
+      "label": "Room6_Plinth_K4",
+      "name": "StaticMeshActor_213",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        1550.0,
+        -3100.0,
+        40.0
+      ]
+    },
+    {
+      "label": "Room7_Floor",
+      "name": "StaticMeshActor_214",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -1750.0,
+        -2650.0,
+        -10.0
+      ]
+    },
+    {
+      "label": "Room7_WallWest",
+      "name": "StaticMeshActor_215",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -2500.0,
+        -2650.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Room7_WallEast",
+      "name": "StaticMeshActor_216",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -1000.0,
+        -2650.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Room7_WallSouth",
+      "name": "StaticMeshActor_217",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -1750.0,
+        -3300.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Room7_WallNorth_West",
+      "name": "StaticMeshActor_218",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -2185.0,
+        -2000.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Room7_WallNorth_East",
+      "name": "StaticMeshActor_219",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -1315.0,
+        -2000.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Room7_DoorHeader",
+      "name": "StaticMeshActor_220",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -1750.0,
+        -2000.0,
+        270.0
+      ]
+    },
+    {
+      "label": "Room7_Baffle",
+      "name": "StaticMeshActor_221",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -1750.0,
+        -2250.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Room7_Roof",
+      "name": "StaticMeshActor_222",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -1750.0,
+        -2650.0,
+        310.0
+      ]
+    },
+    {
+      "label": "Mech7_LightSwitch",
+      "name": "Ck_EntitySpawner_UE_103",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -1560.0,
+        -2010.0,
+        120.0
+      ]
+    },
+    {
+      "label": "Mech7_CeilingLight_0",
+      "name": "Ck_EntitySpawner_UE_104",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -2125.0,
+        -2550.0,
+        300.0
+      ]
+    },
+    {
+      "label": "Mech7_CeilingLight_1",
+      "name": "Ck_EntitySpawner_UE_105",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -1375.0,
+        -2550.0,
+        300.0
+      ]
+    },
+    {
+      "label": "Mech7_CeilingLight_2",
+      "name": "Ck_EntitySpawner_UE_106",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -2125.0,
+        -3000.0,
+        300.0
+      ]
+    },
+    {
+      "label": "Mech7_CeilingLight_3",
+      "name": "Ck_EntitySpawner_UE_107",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -1375.0,
+        -3000.0,
+        300.0
+      ]
+    },
+    {
+      "label": "Room7_Plinth_Lanterns",
+      "name": "StaticMeshActor_223",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -2300.0,
+        -2130.0,
+        40.0
+      ]
+    },
+    {
+      "label": "Room7_Plinth_Tallow",
+      "name": "StaticMeshActor_224",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -1200.0,
+        -2130.0,
+        40.0
+      ]
+    },
+    {
+      "label": "Item_Room7_Lantern_0",
+      "name": "Ck_EntitySpawner_UE_108",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -2350.0,
+        -2130.0,
+        90.0
+      ]
+    },
+    {
+      "label": "Item_Room7_Lantern_1",
+      "name": "Ck_EntitySpawner_UE_109",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -2250.0,
+        -2130.0,
+        90.0
+      ]
+    },
+    {
+      "label": "Item_Room7_Tallow_0",
+      "name": "Ck_EntitySpawner_UE_110",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -1250.0,
+        -2130.0,
+        90.0
+      ]
+    },
+    {
+      "label": "Item_Room7_Tallow_1",
+      "name": "Ck_EntitySpawner_UE_111",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -1200.0,
+        -2130.0,
+        90.0
+      ]
+    },
+    {
+      "label": "Item_Room7_Tallow_2",
+      "name": "Ck_EntitySpawner_UE_112",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -1150.0,
+        -2130.0,
+        90.0
+      ]
+    },
+    {
+      "label": "Item_Room7_Tallow_Back",
+      "name": "Ck_EntitySpawner_UE_113",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -2400.0,
+        -3200.0,
+        30.0
+      ]
+    },
+    {
+      "label": "Item_Room7_Ration",
+      "name": "Ck_EntitySpawner_UE_114",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -1100.0,
+        -3200.0,
+        30.0
+      ]
+    },
+    {
+      "label": "Item_Room7_Cog",
+      "name": "Ck_EntitySpawner_UE_115",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -1750.0,
+        -2900.0,
+        30.0
+      ]
+    },
+    {
+      "label": "GauntletHall_Floor",
+      "name": "StaticMeshActor_225",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -850.0,
+        2300.0,
+        -10.0
+      ]
+    },
+    {
+      "label": "GauntletHall_WallSouth",
+      "name": "StaticMeshActor_226",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -2850.0,
+        2000.0,
+        150.0
+      ]
+    },
+    {
+      "label": "GauntletHall_WallWest",
+      "name": "StaticMeshActor_227",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -3700.0,
+        2300.0,
+        150.0
+      ]
+    },
+    {
+      "label": "GauntletHall_WallEast",
+      "name": "StaticMeshActor_228",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        2000.0,
+        2300.0,
+        150.0
+      ]
+    },
+    {
+      "label": "GauntletHall_Filler_3_6",
+      "name": "StaticMeshActor_229",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -2150.0,
+        2600.0,
+        150.0
+      ]
+    },
+    {
+      "label": "GauntletHall_Filler_6_1",
+      "name": "StaticMeshActor_230",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -850.0,
+        2600.0,
+        150.0
+      ]
+    },
+    {
+      "label": "GauntletHall_Filler_1_5",
+      "name": "StaticMeshActor_231",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        50.0,
+        2600.0,
+        150.0
+      ]
+    },
+    {
+      "label": "GauntletHall_Filler_5_4",
+      "name": "StaticMeshActor_232",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        750.0,
+        2600.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Gauntlet3_Floor",
+      "name": "StaticMeshActor_233",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -2950.0,
+        3300.0,
+        -10.0
+      ]
+    },
+    {
+      "label": "Gauntlet3_WallSouth_West",
+      "name": "StaticMeshActor_234",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -3175.0,
+        2600.0,
+        350.0
+      ]
+    },
+    {
+      "label": "Gauntlet3_WallSouth_East",
+      "name": "StaticMeshActor_235",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -2425.0,
+        2600.0,
+        350.0
+      ]
+    },
+    {
+      "label": "Gauntlet3_WallWest",
+      "name": "StaticMeshActor_236",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -3700.0,
+        3300.0,
+        350.0
+      ]
+    },
+    {
+      "label": "Gauntlet3_WallEast",
+      "name": "StaticMeshActor_237",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -2200.0,
+        3300.0,
+        350.0
+      ]
+    },
+    {
+      "label": "Gauntlet3_WallNorth",
+      "name": "StaticMeshActor_238",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -2950.0,
+        4000.0,
+        350.0
+      ]
+    },
+    {
+      "label": "Gauntlet3_CorridorWall",
+      "name": "StaticMeshActor_239",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -3400.0,
+        3150.0,
+        350.0
+      ]
+    },
+    {
+      "label": "Gauntlet3_ReliquaryWall_West_South",
+      "name": "StaticMeshActor_240",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -3400.0,
+        3715.0,
+        350.0
+      ]
+    },
+    {
+      "label": "Gauntlet3_ReliquaryWall_West_North",
+      "name": "StaticMeshActor_241",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -3400.0,
+        3985.0,
+        350.0
+      ]
+    },
+    {
+      "label": "Gauntlet3_ReliquaryWall_West_Header",
+      "name": "StaticMeshActor_242",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -3400.0,
+        3850.0,
+        470.0
+      ]
+    },
+    {
+      "label": "Gauntlet3_ReliquaryWall_East",
+      "name": "StaticMeshActor_243",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -2950.0,
+        3850.0,
+        350.0
+      ]
+    },
+    {
+      "label": "Gauntlet3_ReliquaryFront_West",
+      "name": "StaticMeshActor_244",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -3347.5,
+        3700.0,
+        350.0
+      ]
+    },
+    {
+      "label": "Gauntlet3_ReliquaryFront_East",
+      "name": "StaticMeshActor_245",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -3002.5,
+        3700.0,
+        350.0
+      ]
+    },
+    {
+      "label": "Gauntlet3_ReliquaryFront_Header",
+      "name": "StaticMeshActor_246",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -3175.0,
+        3700.0,
+        470.0
+      ]
+    },
+    {
+      "label": "Gauntlet3_Gallery",
+      "name": "StaticMeshActor_247",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -2375.0,
+        3625.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Gauntlet3_Stair_0",
+      "name": "StaticMeshActor_248",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -2350.0,
+        2815.0,
+        10.0
+      ]
+    },
+    {
+      "label": "Gauntlet3_Stair_1",
+      "name": "StaticMeshActor_249",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -2350.0,
+        2845.0,
+        20.0
+      ]
+    },
+    {
+      "label": "Gauntlet3_Stair_2",
+      "name": "StaticMeshActor_250",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -2350.0,
+        2875.0,
+        30.0
+      ]
+    },
+    {
+      "label": "Gauntlet3_Stair_3",
+      "name": "StaticMeshActor_251",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -2350.0,
+        2905.0,
+        40.0
+      ]
+    },
+    {
+      "label": "Gauntlet3_Stair_4",
+      "name": "StaticMeshActor_252",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -2350.0,
+        2935.0,
+        50.0
+      ]
+    },
+    {
+      "label": "Gauntlet3_Stair_5",
+      "name": "StaticMeshActor_253",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -2350.0,
+        2965.0,
+        60.0
+      ]
+    },
+    {
+      "label": "Gauntlet3_Stair_6",
+      "name": "StaticMeshActor_254",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -2350.0,
+        2995.0,
+        70.0
+      ]
+    },
+    {
+      "label": "Gauntlet3_Stair_7",
+      "name": "StaticMeshActor_255",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -2350.0,
+        3025.0,
+        80.0
+      ]
+    },
+    {
+      "label": "Gauntlet3_Stair_8",
+      "name": "StaticMeshActor_256",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -2350.0,
+        3055.0,
+        90.0
+      ]
+    },
+    {
+      "label": "Gauntlet3_Stair_9",
+      "name": "StaticMeshActor_257",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -2350.0,
+        3085.0,
+        100.0
+      ]
+    },
+    {
+      "label": "Gauntlet3_Stair_10",
+      "name": "StaticMeshActor_258",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -2350.0,
+        3115.0,
+        110.0
+      ]
+    },
+    {
+      "label": "Gauntlet3_Stair_11",
+      "name": "StaticMeshActor_259",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -2350.0,
+        3145.0,
+        120.0
+      ]
+    },
+    {
+      "label": "Gauntlet3_Stair_12",
+      "name": "StaticMeshActor_260",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -2350.0,
+        3175.0,
+        130.0
+      ]
+    },
+    {
+      "label": "Gauntlet3_Stair_13",
+      "name": "StaticMeshActor_261",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -2350.0,
+        3205.0,
+        140.0
+      ]
+    },
+    {
+      "label": "Gauntlet3_Stair_14",
+      "name": "StaticMeshActor_262",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -2350.0,
+        3235.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Gauntlet3_GalleryRail_West_Post0",
+      "name": "StaticMeshActor_263",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -2540.0,
+        3255.0,
+        340.0
+      ]
+    },
+    {
+      "label": "Gauntlet3_GalleryRail_West_Post1",
+      "name": "StaticMeshActor_264",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -2540.0,
+        3329.0,
+        340.0
+      ]
+    },
+    {
+      "label": "Gauntlet3_GalleryRail_West_Post2",
+      "name": "StaticMeshActor_265",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -2540.0,
+        3403.0,
+        340.0
+      ]
+    },
+    {
+      "label": "Gauntlet3_GalleryRail_West_Post3",
+      "name": "StaticMeshActor_266",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -2540.0,
+        3477.0,
+        340.0
+      ]
+    },
+    {
+      "label": "Gauntlet3_GalleryRail_West_Post4",
+      "name": "StaticMeshActor_267",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -2540.0,
+        3551.0,
+        340.0
+      ]
+    },
+    {
+      "label": "Gauntlet3_GalleryRail_West_Post5",
+      "name": "StaticMeshActor_268",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -2540.0,
+        3625.0,
+        340.0
+      ]
+    },
+    {
+      "label": "Gauntlet3_GalleryRail_West_Post6",
+      "name": "StaticMeshActor_269",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -2540.0,
+        3699.0,
+        340.0
+      ]
+    },
+    {
+      "label": "Gauntlet3_GalleryRail_West_Post7",
+      "name": "StaticMeshActor_270",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -2540.0,
+        3773.0,
+        340.0
+      ]
+    },
+    {
+      "label": "Gauntlet3_GalleryRail_West_Post8",
+      "name": "StaticMeshActor_271",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -2540.0,
+        3847.0,
+        340.0
+      ]
+    },
+    {
+      "label": "Gauntlet3_GalleryRail_West_Post9",
+      "name": "StaticMeshActor_272",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -2540.0,
+        3921.0,
+        340.0
+      ]
+    },
+    {
+      "label": "Gauntlet3_GalleryRail_West_Post10",
+      "name": "StaticMeshActor_273",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -2540.0,
+        3995.0,
+        340.0
+      ]
+    },
+    {
+      "label": "Gauntlet3_GalleryRail_West_Bar",
+      "name": "StaticMeshActor_274",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -2540.0,
+        3625.0,
+        390.0
+      ]
+    },
+    {
+      "label": "Gauntlet3_GalleryRail_South_Post0",
+      "name": "StaticMeshActor_275",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -2540.0,
+        3260.0,
+        340.0
+      ]
+    },
+    {
+      "label": "Gauntlet3_GalleryRail_South_Post1",
+      "name": "StaticMeshActor_276",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -2505.0,
+        3260.0,
+        340.0
+      ]
+    },
+    {
+      "label": "Gauntlet3_GalleryRail_South_Bar",
+      "name": "StaticMeshActor_277",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -2522.5,
+        3260.0,
+        390.0
+      ]
+    },
+    {
+      "label": "Gauntlet3_Mech_Clue",
+      "name": "Ck_EntitySpawner_UE_116",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -3175.0,
+        3690.0,
+        300.0
+      ]
+    },
+    {
+      "label": "Gauntlet3_Mech_DialPanel",
+      "name": "Ck_EntitySpawner_UE_117",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -3390.0,
+        3200.0,
+        120.0
+      ]
+    },
+    {
+      "label": "Gauntlet3_Mech_CommitChain",
+      "name": "Ck_EntitySpawner_UE_118",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -2210.0,
+        3600.0,
+        530.0
+      ]
+    },
+    {
+      "label": "Gauntlet3_Mech_CommitVent",
+      "name": "Ck_EntitySpawner_UE_119",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -2260.0,
+        3450.0,
+        300.0
+      ]
+    },
+    {
+      "label": "Gauntlet3_Mech_ReliquaryGate",
+      "name": "Ck_EntitySpawner_UE_120",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -3175.0,
+        3700.0,
+        0.0
+      ]
+    },
+    {
+      "label": "Gauntlet3_Mech_ReturnWheel",
+      "name": "Ck_EntitySpawner_UE_121",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -3280.0,
+        3990.0,
+        110.0
+      ]
+    },
+    {
+      "label": "Gauntlet3_Mech_ReturnDoor",
+      "name": "Ck_EntitySpawner_UE_122",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -3400.0,
+        3850.0,
+        0.0
+      ]
+    },
+    {
+      "label": "Gauntlet3_Item_Root",
+      "name": "Ck_EntitySpawner_UE_123",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -3100.0,
+        3960.0,
+        30.0
+      ]
+    },
+    {
+      "label": "Gauntlet6_Floor",
+      "name": "StaticMeshActor_278",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -1500.0,
+        3100.0,
+        -10.0
+      ]
+    },
+    {
+      "label": "Gauntlet6_WallSouth_West",
+      "name": "StaticMeshActor_279",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -1875.0,
+        2600.0,
+        350.0
+      ]
+    },
+    {
+      "label": "Gauntlet6_WallSouth_East",
+      "name": "StaticMeshActor_280",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -1125.0,
+        2600.0,
+        350.0
+      ]
+    },
+    {
+      "label": "Gauntlet6_WallWest",
+      "name": "StaticMeshActor_281",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -2100.0,
+        3100.0,
+        350.0
+      ]
+    },
+    {
+      "label": "Gauntlet6_WallEast",
+      "name": "StaticMeshActor_282",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -900.0,
+        3100.0,
+        350.0
+      ]
+    },
+    {
+      "label": "Gauntlet6_WallNorth_West",
+      "name": "StaticMeshActor_283",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -1860.0,
+        3600.0,
+        350.0
+      ]
+    },
+    {
+      "label": "Gauntlet6_WallNorth_East",
+      "name": "StaticMeshActor_284",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -1140.0,
+        3600.0,
+        350.0
+      ]
+    },
+    {
+      "label": "Gauntlet6_WallNorth_Sill",
+      "name": "StaticMeshActor_285",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -1500.0,
+        3600.0,
+        280.0
+      ]
+    },
+    {
+      "label": "Gauntlet6_WallNorth_Header",
+      "name": "StaticMeshActor_286",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -1500.0,
+        3600.0,
+        620.0
+      ]
+    },
+    {
+      "label": "Gauntlet6_Gallery_West",
+      "name": "StaticMeshActor_287",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -1875.0,
+        3475.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Gauntlet6_Gallery_East",
+      "name": "StaticMeshActor_288",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -1125.0,
+        3475.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Gauntlet6_Gallery_VaultRoof",
+      "name": "StaticMeshActor_289",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -1500.0,
+        3475.0,
+        280.0
+      ]
+    },
+    {
+      "label": "Gauntlet6_VaultFront_West",
+      "name": "StaticMeshActor_290",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -1635.0,
+        3350.0,
+        130.0
+      ]
+    },
+    {
+      "label": "Gauntlet6_VaultFront_East",
+      "name": "StaticMeshActor_291",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -1365.0,
+        3350.0,
+        130.0
+      ]
+    },
+    {
+      "label": "Gauntlet6_VaultFront_Header",
+      "name": "StaticMeshActor_292",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -1500.0,
+        3350.0,
+        250.0
+      ]
+    },
+    {
+      "label": "Gauntlet6_VaultBack_West",
+      "name": "StaticMeshActor_293",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -1630.0,
+        3700.0,
+        140.0
+      ]
+    },
+    {
+      "label": "Gauntlet6_VaultBack_East",
+      "name": "StaticMeshActor_294",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -1370.0,
+        3700.0,
+        140.0
+      ]
+    },
+    {
+      "label": "Gauntlet6_VaultBack_North",
+      "name": "StaticMeshActor_295",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -1500.0,
+        3810.0,
+        140.0
+      ]
+    },
+    {
+      "label": "Gauntlet6_Stair_0",
+      "name": "StaticMeshActor_296",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -1950.0,
+        2915.0,
+        10.0
+      ]
+    },
+    {
+      "label": "Gauntlet6_Stair_1",
+      "name": "StaticMeshActor_297",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -1950.0,
+        2945.0,
+        20.0
+      ]
+    },
+    {
+      "label": "Gauntlet6_Stair_2",
+      "name": "StaticMeshActor_298",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -1950.0,
+        2975.0,
+        30.0
+      ]
+    },
+    {
+      "label": "Gauntlet6_Stair_3",
+      "name": "StaticMeshActor_299",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -1950.0,
+        3005.0,
+        40.0
+      ]
+    },
+    {
+      "label": "Gauntlet6_Stair_4",
+      "name": "StaticMeshActor_300",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -1950.0,
+        3035.0,
+        50.0
+      ]
+    },
+    {
+      "label": "Gauntlet6_Stair_5",
+      "name": "StaticMeshActor_301",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -1950.0,
+        3065.0,
+        60.0
+      ]
+    },
+    {
+      "label": "Gauntlet6_Stair_6",
+      "name": "StaticMeshActor_302",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -1950.0,
+        3095.0,
+        70.0
+      ]
+    },
+    {
+      "label": "Gauntlet6_Stair_7",
+      "name": "StaticMeshActor_303",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -1950.0,
+        3125.0,
+        80.0
+      ]
+    },
+    {
+      "label": "Gauntlet6_Stair_8",
+      "name": "StaticMeshActor_304",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -1950.0,
+        3155.0,
+        90.0
+      ]
+    },
+    {
+      "label": "Gauntlet6_Stair_9",
+      "name": "StaticMeshActor_305",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -1950.0,
+        3185.0,
+        100.0
+      ]
+    },
+    {
+      "label": "Gauntlet6_Stair_10",
+      "name": "StaticMeshActor_306",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -1950.0,
+        3215.0,
+        110.0
+      ]
+    },
+    {
+      "label": "Gauntlet6_Stair_11",
+      "name": "StaticMeshActor_307",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -1950.0,
+        3245.0,
+        120.0
+      ]
+    },
+    {
+      "label": "Gauntlet6_Stair_12",
+      "name": "StaticMeshActor_308",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -1950.0,
+        3275.0,
+        130.0
+      ]
+    },
+    {
+      "label": "Gauntlet6_Stair_13",
+      "name": "StaticMeshActor_309",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -1950.0,
+        3305.0,
+        140.0
+      ]
+    },
+    {
+      "label": "Gauntlet6_Stair_14",
+      "name": "StaticMeshActor_310",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -1950.0,
+        3335.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Gauntlet6_GalleryParapet",
+      "name": "StaticMeshActor_311",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -1350.0,
+        3360.0,
+        350.0
+      ]
+    },
+    {
+      "label": "Gauntlet6_LoftFloor",
+      "name": "StaticMeshActor_312",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -1500.0,
+        3750.0,
+        290.0
+      ]
+    },
+    {
+      "label": "Gauntlet6_LoftWall_West",
+      "name": "StaticMeshActor_313",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -1800.0,
+        3750.0,
+        350.0
+      ]
+    },
+    {
+      "label": "Gauntlet6_LoftWall_East",
+      "name": "StaticMeshActor_314",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -1200.0,
+        3750.0,
+        350.0
+      ]
+    },
+    {
+      "label": "Gauntlet6_LoftWall_North",
+      "name": "StaticMeshActor_315",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -1500.0,
+        3900.0,
+        350.0
+      ]
+    },
+    {
+      "label": "Gauntlet6_Bell",
+      "name": "StaticMeshActor_316",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -1500.0,
+        3770.0,
+        480.0
+      ]
+    },
+    {
+      "label": "Gauntlet6_BellChain",
+      "name": "StaticMeshActor_317",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -1500.0,
+        3770.0,
+        650.0
+      ]
+    },
+    {
+      "label": "Gauntlet6_BellPlaque",
+      "name": "StaticMeshActor_318",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -1500.0,
+        3640.0,
+        470.0
+      ]
+    },
+    {
+      "label": "Gauntlet6_Glyph_BellCircle",
+      "name": "StaticMeshActor_319",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -1440.0,
+        3632.0,
+        470.0
+      ]
+    },
+    {
+      "label": "Gauntlet6_Glyph_BellArrowShaft",
+      "name": "StaticMeshActor_320",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -1495.0,
+        3632.0,
+        470.0
+      ]
+    },
+    {
+      "label": "Gauntlet6_Glyph_BellArrowHead",
+      "name": "StaticMeshActor_321",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -1520.0,
+        3632.0,
+        470.0
+      ]
+    },
+    {
+      "label": "Gauntlet6_Glyph_BellTriangle",
+      "name": "StaticMeshActor_322",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -1560.0,
+        3632.0,
+        470.0
+      ]
+    },
+    {
+      "label": "Gauntlet6_Mech_Wheel",
+      "name": "Ck_EntitySpawner_UE_124",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -2090.0,
+        2750.0,
+        110.0
+      ]
+    },
+    {
+      "label": "Gauntlet6_Mech_Shutter",
+      "name": "Ck_EntitySpawner_UE_125",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -1500.0,
+        3600.0,
+        300.0
+      ]
+    },
+    {
+      "label": "Gauntlet6_Mech_TriangleSeal",
+      "name": "Ck_EntitySpawner_UE_126",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -910.0,
+        2850.0,
+        120.0
+      ]
+    },
+    {
+      "label": "Gauntlet6_Mech_CircleSeal",
+      "name": "Ck_EntitySpawner_UE_127",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -910.0,
+        3100.0,
+        120.0
+      ]
+    },
+    {
+      "label": "Gauntlet6_Mech_Sequence",
+      "name": "Ck_EntitySpawner_UE_128",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -1200.0,
+        3280.0,
+        0.0
+      ]
+    },
+    {
+      "label": "Gauntlet6_Mech_VaultGate",
+      "name": "Ck_EntitySpawner_UE_129",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -1500.0,
+        3350.0,
+        0.0
+      ]
+    },
+    {
+      "label": "Gauntlet6_Item_Fungus",
+      "name": "Ck_EntitySpawner_UE_130",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -1500.0,
+        3750.0,
+        30.0
+      ]
+    },
+    {
+      "label": "Gauntlet1_Floor",
+      "name": "StaticMeshActor_323",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -400.0,
+        3000.0,
+        -10.0
+      ]
+    },
+    {
+      "label": "Gauntlet1_AlcoveFloor",
+      "name": "StaticMeshActor_324",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -400.0,
+        3550.0,
+        -10.0
+      ]
+    },
+    {
+      "label": "Gauntlet1_WallSouth_West",
+      "name": "StaticMeshActor_325",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -675.0,
+        2600.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Gauntlet1_WallSouth_East",
+      "name": "StaticMeshActor_326",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -125.0,
+        2600.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Gauntlet1_WallWest",
+      "name": "StaticMeshActor_327",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -800.0,
+        3000.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Gauntlet1_WallEast",
+      "name": "StaticMeshActor_328",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        0.0,
+        3000.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Gauntlet1_WallNorth_West",
+      "name": "StaticMeshActor_329",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -660.0,
+        3400.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Gauntlet1_WallNorth_East",
+      "name": "StaticMeshActor_330",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -140.0,
+        3400.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Gauntlet1_WallNorth_Header",
+      "name": "StaticMeshActor_331",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -400.0,
+        3400.0,
+        270.0
+      ]
+    },
+    {
+      "label": "Gauntlet1_AlcoveWall_West",
+      "name": "StaticMeshActor_332",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -550.0,
+        3550.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Gauntlet1_AlcoveWall_East",
+      "name": "StaticMeshActor_333",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -250.0,
+        3550.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Gauntlet1_AlcoveWall_North",
+      "name": "StaticMeshActor_334",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        -400.0,
+        3700.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Gauntlet1_Mech_AlcoveGate",
+      "name": "Ck_EntitySpawner_UE_131",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -400.0,
+        3400.0,
+        0.0
+      ]
+    },
+    {
+      "label": "Gauntlet1_Mech_ChefPlate",
+      "name": "Ck_EntitySpawner_UE_132",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -580.0,
+        3020.0,
+        0.0
+      ]
+    },
+    {
+      "label": "Gauntlet1_Mech_PackPlate",
+      "name": "Ck_EntitySpawner_UE_133",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -220.0,
+        3020.0,
+        0.0
+      ]
+    },
+    {
+      "label": "Gauntlet1_Item_Truffle",
+      "name": "Ck_EntitySpawner_UE_134",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -400.0,
+        3650.0,
+        30.0
+      ]
+    },
+    {
+      "label": "Gauntlet5_Floor",
+      "name": "StaticMeshActor_335",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        400.0,
+        3150.0,
+        -10.0
+      ]
+    },
+    {
+      "label": "Gauntlet5_WallSouth_West",
+      "name": "StaticMeshActor_336",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        175.0,
+        2600.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Gauntlet5_WallSouth_East",
+      "name": "StaticMeshActor_337",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        625.0,
+        2600.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Gauntlet5_WallWest",
+      "name": "StaticMeshActor_338",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        100.0,
+        3150.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Gauntlet5_WallEast",
+      "name": "StaticMeshActor_339",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        700.0,
+        3150.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Gauntlet5_WallNorth",
+      "name": "StaticMeshActor_340",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        400.0,
+        3700.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Gauntlet5_Partition_West",
+      "name": "StaticMeshActor_341",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        190.0,
+        3100.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Gauntlet5_Partition_East",
+      "name": "StaticMeshActor_342",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        610.0,
+        3100.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Gauntlet5_Partition_Header",
+      "name": "StaticMeshActor_343",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        400.0,
+        3100.0,
+        270.0
+      ]
+    },
+    {
+      "label": "Gauntlet5_Plinth",
+      "name": "StaticMeshActor_344",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        400.0,
+        3635.0,
+        30.0
+      ]
+    },
+    {
+      "label": "Gauntlet5_Mech_Slab",
+      "name": "Ck_EntitySpawner_UE_135",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        400.0,
+        2900.0,
+        0.0
+      ]
+    },
+    {
+      "label": "Gauntlet5_Mech_FreightGate",
+      "name": "Ck_EntitySpawner_UE_136",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        400.0,
+        3100.0,
+        0.0
+      ]
+    },
+    {
+      "label": "Gauntlet5_Mech_Lamps",
+      "name": "Ck_EntitySpawner_UE_137",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        400.0,
+        3090.0,
+        270.0
+      ]
+    },
+    {
+      "label": "Gauntlet5_Mech_ChainInside",
+      "name": "Ck_EntitySpawner_UE_138",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        600.0,
+        3110.0,
+        260.0
+      ]
+    },
+    {
+      "label": "Gauntlet5_Mech_PackInside",
+      "name": "Ck_EntitySpawner_UE_139",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        400.0,
+        3405.0,
+        0.0
+      ]
+    },
+    {
+      "label": "Gauntlet5_Item_Salt",
+      "name": "Ck_EntitySpawner_UE_140",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        400.0,
+        3635.0,
+        90.0
+      ]
+    },
+    {
+      "label": "Gauntlet4_Floor",
+      "name": "StaticMeshActor_345",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        1400.0,
+        3050.0,
+        -10.0
+      ]
+    },
+    {
+      "label": "Gauntlet4_WallSouth_West",
+      "name": "StaticMeshActor_346",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        1025.0,
+        2600.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Gauntlet4_WallSouth_East",
+      "name": "StaticMeshActor_347",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        1775.0,
+        2600.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Gauntlet4_WallWest",
+      "name": "StaticMeshActor_348",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        800.0,
+        3050.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Gauntlet4_WallEast",
+      "name": "StaticMeshActor_349",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        2000.0,
+        3050.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Gauntlet4_WallNorth",
+      "name": "StaticMeshActor_350",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        1400.0,
+        3500.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Gauntlet4_Divider",
+      "name": "StaticMeshActor_351",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        1400.0,
+        3050.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Gauntlet4_LaneEnd_West",
+      "name": "StaticMeshActor_352",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        875.0,
+        3250.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Gauntlet4_LaneEnd_East",
+      "name": "StaticMeshActor_353",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        1265.0,
+        3250.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Gauntlet4_LaneEnd_Header",
+      "name": "StaticMeshActor_354",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        1070.0,
+        3250.0,
+        270.0
+      ]
+    },
+    {
+      "label": "Gauntlet4_Baffle_South",
+      "name": "StaticMeshActor_355",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        1630.0,
+        2980.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Gauntlet4_Baffle_North",
+      "name": "StaticMeshActor_356",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        1830.0,
+        3120.0,
+        150.0
+      ]
+    },
+    {
+      "label": "Gauntlet4_Plinth",
+      "name": "StaticMeshActor_357",
+      "class": "/Script/Engine.StaticMeshActor",
+      "location": [
+        1400.0,
+        3410.0,
+        40.0
+      ]
+    },
+    {
+      "label": "Gauntlet4_Mech_Censer",
+      "name": "Ck_EntitySpawner_UE_141",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        1070.0,
+        3050.0,
+        0.0
+      ]
+    },
+    {
+      "label": "Gauntlet4_Mech_Shutter",
+      "name": "Ck_EntitySpawner_UE_142",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        1070.0,
+        3250.0,
+        0.0
+      ]
+    },
+    {
+      "label": "Gauntlet4_Mech_Lamps",
+      "name": "Ck_EntitySpawner_UE_143",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        1070.0,
+        3240.0,
+        270.0
+      ]
+    },
+    {
+      "label": "Gauntlet4_Mech_ChainNear",
+      "name": "Ck_EntitySpawner_UE_144",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        1400.0,
+        2850.0,
+        260.0
+      ]
+    },
+    {
+      "label": "Gauntlet4_Mech_ChainFar",
+      "name": "Ck_EntitySpawner_UE_145",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        1250.0,
+        3260.0,
+        260.0
+      ]
+    },
+    {
+      "label": "Item_Cookbook",
+      "name": "Ck_EntitySpawner_UE_39",
+      "class": "/Script/CkEntitySpawner.Ck_EntitySpawner_UE",
+      "location": [
+        -450.0,
+        0.0,
+        50.0
+      ]
+    }
+  ]
+}

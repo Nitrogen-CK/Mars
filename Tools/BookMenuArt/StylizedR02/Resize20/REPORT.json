@@ -1,0 +1,96 @@
+{
+  "status": "20 percent larger physical cookbook, matched grips and collision; raised reading pose verified in actual Unreal PIE",
+  "physical_mesh_scale": [
+    1.2,
+    1.2,
+    1.2
+  ],
+  "physical_page_size_cm": [
+    20.4,
+    27.6
+  ],
+  "physical_closed_dimensions_cm": [
+    22.8888,
+    32.0352,
+    3.3696
+  ],
+  "reading_hand_offset_cm": [
+    -25,
+    0,
+    18
+  ],
+  "reading_grip_below_centre_cm": 16,
+  "opening_behavior": "Existing cubic cover progress blends from closed carry to recentered camera-facing book 25cm closer and 18cm higher. Physical scale stays 1.2 in every state. Hands interpolate to lower outer corners.",
+  "collision": "Presentation.Visual.MeshScale is passed unchanged by existing WorldItem AddBody to BodySpec.Set_ShapeScale and by Make_BoundsFit to pickup fit; native skeletal child uses the same scale. No framework changes.",
+  "camera_match": {
+    "before": "01-before-open-recipe.json",
+    "after": "07-final-open-recipe.json",
+    "xy": [
+      -600.0,
+      -225.0
+    ],
+    "rotation_roll_pitch_yaw": [
+      0.0,
+      -45.5,
+      0.5272470116615295
+    ],
+    "idle_breathing_z_delta_cm": 0.03481559972249215,
+    "resolution": [
+      1280,
+      720
+    ]
+  },
+  "tests": {
+    "baseline": {
+      "passed": 5,
+      "failed": 0,
+      "source_hashes_matched": true,
+      "log": "Saved/Logs/Cookbook-Final-MaterialCleanup.log"
+    },
+    "final": {
+      "passed": 5,
+      "failed": 0,
+      "skipped": 0,
+      "contaminated": 0,
+      "exit_code": 0,
+      "duration": "46s",
+      "log": "Saved/Logs/Cookbook-Resize20-Final.log"
+    },
+    "new_assertions": [
+      "Closed grip half-width 11.4444cm",
+      "Physical pickup bounds 11.4444 x 16.0175832 x 1.684704cm half-extents",
+      "Native skeletal world scale and finger contact scale 1.2",
+      "Open grip half-width 21.7872cm",
+      "Scaled recenter offset and existing camera-facing normal"
+    ],
+    "scope": "Cookbook only. No native code changed; test-only Toolbox compiles final AngelScript in fresh editors. Existing shared-system integration gates were not rerun for this item-specific change."
+  },
+  "captures": [
+    "01-before-open-recipe.png",
+    "05-final-held-closed.png",
+    "06-final-opening-mid.png",
+    "07-final-open-recipe.png",
+    "08-final-closing-mid.png",
+    "09-final-closed.png",
+    "10-final-dropped.png"
+  ],
+  "native_observations": [
+    "Raw LMB pickup, opening, E recipe, closing and R drop",
+    "Scale 1.2 while held/open and after physical settling",
+    "Recipe text/footer clear of thumbs in final view",
+    "Original page materials restored on drop"
+  ],
+  "source_sha256": {
+    "Script/Items/Mars_Item_Cookbook.as": "c47cbadf8a5205d5622996723d258ecb3d58c9a513ae3f9fe4d08ddc646f2d88",
+    "Script/Items/Presentation/Mars_CookbookPresentationComponent.as": "2f86d94f6f0e4b9684a728554873d5f6cab073b49b8641517708577d837d6bcb",
+    "Script/WorldObjects/Items/Mars_Cookbook_EntityScript.as": "fcfb609790f0591bf2ea7f87d01063dcb2f9c638fe58d263ec0a7952e8780b5c",
+    "Script/PlayerCharacter/HFSM/Mars_PlayerCharacter_Hfsm_Cookbook.as": "16e27cb52da0d2f33c7a547e0374105ee8b4327bb706cd004cf20449f2bfd3dd",
+    "Script/Tests/Cookbook/Mars_AutoTestRig_Cookbook.as": "d2df58dfe63347d5565aa5ad834c9dfc572b31b13c060255f42c79cb4580e3d4"
+  },
+  "limitations": [
+    "Injected raw input, not physical-keyboard/focus proof",
+    "Multiplayer and packaged runtime not verified"
+  ],
+  "return_state": "PIE stopped, CrawlerDoorway restored, native dirty packages 0",
+  "git": "Uncommitted and unpushed; unrelated dirty work preserved"
+}

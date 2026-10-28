@@ -1,0 +1,149 @@
+{
+  "label": "13-r-held-charge",
+  "world": "/Game/Mars/Maps/UEDPIE_0_Sandbox_Mars_MAP.Sandbox_Mars_MAP",
+  "game_time": 233.41889276355505,
+  "rotation_tuple_order": [
+    "roll",
+    "pitch",
+    "yaw"
+  ],
+  "camera_location": [
+    -600.0,
+    225.0,
+    111.90197602826429
+  ],
+  "camera_rotation": [
+    0.0,
+    0.0,
+    1.1674070358276367
+  ],
+  "control_rotation": [
+    0.0,
+    0.0,
+    1.1674070358276367
+  ],
+  "events": [
+    {
+      "key": "LeftMouseButton",
+      "pressed": true,
+      "game_time": 34.68666407838464
+    },
+    {
+      "key": "LeftMouseButton",
+      "pressed": false,
+      "game_time": 34.84406307712197
+    },
+    {
+      "key": "LeftMouseButton",
+      "pressed": true,
+      "game_time": 48.24496417492628
+    },
+    {
+      "key": "LeftMouseButton",
+      "pressed": false,
+      "game_time": 48.40748457610607
+    },
+    {
+      "key": "E",
+      "pressed": true,
+      "game_time": 62.03699925541878
+    },
+    {
+      "key": "E",
+      "pressed": false,
+      "game_time": 62.20394405722618
+    },
+    {
+      "key": "Q",
+      "pressed": true,
+      "game_time": 90.18507066741586
+    },
+    {
+      "key": "Q",
+      "pressed": false,
+      "game_time": 90.36242636665702
+    },
+    {
+      "key": "LeftMouseButton",
+      "pressed": true,
+      "game_time": 110.17733276635408
+    },
+    {
+      "key": "LeftMouseButton",
+      "pressed": false,
+      "game_time": 110.33268006891012
+    },
+    {
+      "key": "LeftMouseButton",
+      "pressed": true,
+      "game_time": 131.6074223704636
+    },
+    {
+      "key": "LeftMouseButton",
+      "pressed": false,
+      "game_time": 131.7756418697536
+    },
+    {
+      "key": "R",
+      "pressed": true,
+      "game_time": 148.52541298791766
+    },
+    {
+      "key": "R",
+      "pressed": false,
+      "game_time": 148.69619478657842
+    },
+    {
+      "key": "LeftMouseButton",
+      "pressed": true,
+      "game_time": 188.3424694761634
+    },
+    {
+      "key": "LeftMouseButton",
+      "pressed": false,
+      "game_time": 188.49998637661338
+    },
+    {
+      "key": "LeftMouseButton",
+      "pressed": true,
+      "game_time": 212.59864946827292
+    },
+    {
+      "key": "LeftMouseButton",
+      "pressed": false,
+      "game_time": 212.7517472691834
+    },
+    {
+      "key": "R",
+      "pressed": true,
+      "game_time": 226.55977446213365
+    }
+  ],
+  "books": [
+    {
+      "name": "Mars_CookbookPresentationComponent_0",
+      "location": [
+        -564.0328670802154,
+        225.73293566603397,
+        106.58594755395245
+      ],
+      "rotation": [
+        90.00003051757812,
+        9.541664367526768e-15,
+        91.16740417480469
+      ],
+      "visible": true,
+      "engine_tick_enabled": false,
+      "state": "<Mars_CookbookState.OPEN: 2>",
+      "section": 0,
+      "sections": 3,
+      "position": 0.0,
+      "page_targets": [
+        "<Object '/Engine/Transient.TextureRenderTarget2D_12' (0x000001CEE5016C00) Class 'TextureRenderTarget2D'>",
+        "<Object '/Engine/Transient.TextureRenderTarget2D_13' (0x000001CEE5010C00) Class 'TextureRenderTarget2D'>",
+        "<Object '/Engine/Transient.TextureRenderTarget2D_12' (0x000001CEE5016C00) Class 'TextureRenderTarget2D'>",
+        "<Object '/Engine/Transient.TextureRenderTarget2D_13' (0x000001CEE5010C00) Class 'TextureRenderTarget2D'>"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,402 @@
+{
+  "source_blend": "D:\\Repositories\\CkRepos\\Orion\\Tools\\BookMenuArt\\StylizedR02\\Model\\Cookbook_StylizedR02_WidgetReady.blend",
+  "scales": {
+    "mesh": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "armature": [
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  "turn_surface_intersections": {
+    "Book_Lying_Open_Page_Turn_L_to_R_02": [],
+    "Book_Lying_Open_Page_Turn_R_to_L_02": []
+  },
+  "animation_samples": 216,
+  "checks": {
+    "Book_Lying_R_to_Open_01_travels_above_book": true,
+    "Book_Lying_Open_to_R_01_travels_above_book": true,
+    "opening_and_closing_are_exact_reverse_poses": true,
+    "turning_page_does_not_cross_fixed_page_surfaces": true,
+    "unit_object_scales": true,
+    "zero_unweighted_vertices": true,
+    "fbx_12_bones": true,
+    "fbx_4_morphs": true,
+    "fbx_actual_dimensions_match_portable_mesh": true,
+    "fbx_first_8_slots": true,
+    "six_clip_files_with_importable_animation": true,
+    "all_clip_motion_bounds_match_source": true
+  },
+  "cover_arc": {
+    "Book_Lying_R_to_Open_01": {
+      "sampled_frames": 48,
+      "minimum_z_cm": -0.4745353478938341,
+      "midpoint_mean_z_cm": 10.323894550277041
+    },
+    "Book_Lying_Open_to_R_01": {
+      "sampled_frames": 48,
+      "minimum_z_cm": -0.4745353478938341,
+      "midpoint_mean_z_cm": 10.2481412340745
+    },
+    "opening_closing_reverse_pose_error_metres": 0.0
+  },
+  "fbx_mesh_roundtrip": {
+    "armatures": 1,
+    "meshes": 1,
+    "bones": 12,
+    "bone_names": [
+      "Master",
+      "Cover_L",
+      "Cover_R",
+      "Spine",
+      "PageTurn_01",
+      "PageTurn_02",
+      "PageTurn_03",
+      "PageTurn_04",
+      "PageTurn_05",
+      "PageTurn_06",
+      "PageTurn_07",
+      "PageTurn_08"
+    ],
+    "materials": [
+      "Cover.001",
+      "PagesBase.001",
+      "PageA.001",
+      "PageB.001",
+      "PageC.001",
+      "PageD.001",
+      "PageFirst.001",
+      "PageLast.001",
+      "CoverDark.001",
+      "Brass.001",
+      "BrassLight.001",
+      "Scuff.001",
+      "Patch.001",
+      "Thread.001",
+      "Emblem.001",
+      "Leather.001",
+      "LeatherLight.001",
+      "PageEdgeLight.001",
+      "Bookmark.001",
+      "BookmarkLight.001"
+    ],
+    "morphs": [
+      "Basis",
+      "PageBend_01",
+      "PageBend_02",
+      "PageBend_03",
+      "PageBend_04"
+    ],
+    "bounds_metres": [
+      0.3631199896335602,
+      0.2669597268104553,
+      0.022563017904758453
+    ],
+    "armature_object_scale": [
+      0.009999999776482582,
+      0.009999999776482582,
+      0.009999999776482582
+    ],
+    "mesh_object_scale": [
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  "fbx_clip_roundtrip": {
+    "Book_Lying_Open_01.fbx": [
+      {
+        "action": "Armature|Scene",
+        "range": [
+          2.0,
+          25.0
+        ]
+      },
+      {
+        "action": "Key.002|Scene",
+        "range": [
+          2.0,
+          25.0
+        ]
+      }
+    ],
+    "Book_Lying_Open_Page_Turn_L_to_R_02.fbx": [
+      {
+        "action": "Armature|Scene.001",
+        "range": [
+          2.0,
+          109.0
+        ]
+      },
+      {
+        "action": "Key.003|Scene",
+        "range": [
+          2.0,
+          109.0
+        ]
+      }
+    ],
+    "Book_Lying_Open_Page_Turn_R_to_L_02.fbx": [
+      {
+        "action": "Armature|Scene.002",
+        "range": [
+          2.0,
+          109.0
+        ]
+      },
+      {
+        "action": "Key.004|Scene",
+        "range": [
+          2.0,
+          109.0
+        ]
+      }
+    ],
+    "Book_Lying_Open_to_R_01.fbx": [
+      {
+        "action": "Armature|Scene.003",
+        "range": [
+          2.0,
+          49.0
+        ]
+      },
+      {
+        "action": "Key.005|Scene",
+        "range": [
+          2.0,
+          49.0
+        ]
+      }
+    ],
+    "Book_Lying_R_01.fbx": [
+      {
+        "action": "Armature|Scene.004",
+        "range": [
+          2.0,
+          25.0
+        ]
+      },
+      {
+        "action": "Key.006|Scene",
+        "range": [
+          2.0,
+          25.0
+        ]
+      }
+    ],
+    "Book_Lying_R_to_Open_01.fbx": [
+      {
+        "action": "Armature|Scene.005",
+        "range": [
+          2.0,
+          49.0
+        ]
+      },
+      {
+        "action": "Key.007|Scene",
+        "range": [
+          2.0,
+          49.0
+        ]
+      }
+    ]
+  },
+  "fbx_clip_motion_bounds": {
+    "Book_Lying_Open_01.fbx": [
+      {
+        "source_frame": 1,
+        "fbx_frame": 2,
+        "dimensions_metres": [
+          0.3631199896335602,
+          0.2669597268104553,
+          0.02256304072216153
+        ],
+        "max_source_error_metres": 2.0489096641540527e-08
+      },
+      {
+        "source_frame": 12,
+        "fbx_frame": 13,
+        "dimensions_metres": [
+          0.3631199896335602,
+          0.2669597268104553,
+          0.02256304072216153
+        ],
+        "max_source_error_metres": 2.0489096641540527e-08
+      },
+      {
+        "source_frame": 24,
+        "fbx_frame": 25,
+        "dimensions_metres": [
+          0.3631199896335602,
+          0.2669597268104553,
+          0.02256304072216153
+        ],
+        "max_source_error_metres": 2.0489096641540527e-08
+      }
+    ],
+    "Book_Lying_Open_Page_Turn_L_to_R_02.fbx": [
+      {
+        "source_frame": 1,
+        "fbx_frame": 2,
+        "dimensions_metres": [
+          0.3631199896335602,
+          0.2669597268104553,
+          0.02256304072216153
+        ],
+        "max_source_error_metres": 2.0489096641540527e-08
+      },
+      {
+        "source_frame": 54,
+        "fbx_frame": 55,
+        "dimensions_metres": [
+          0.3631199896335602,
+          0.2669597268104553,
+          0.1840761979110539
+        ],
+        "max_source_error_metres": 4.0978193283081055e-08
+      },
+      {
+        "source_frame": 108,
+        "fbx_frame": 109,
+        "dimensions_metres": [
+          0.3631199896335602,
+          0.2669597268104553,
+          0.02256304072216153
+        ],
+        "max_source_error_metres": 2.0489096641540527e-08
+      }
+    ],
+    "Book_Lying_Open_Page_Turn_R_to_L_02.fbx": [
+      {
+        "source_frame": 1,
+        "fbx_frame": 2,
+        "dimensions_metres": [
+          0.3631199896335602,
+          0.2669597268104553,
+          0.02256304072216153
+        ],
+        "max_source_error_metres": 2.0489096641540527e-08
+      },
+      {
+        "source_frame": 54,
+        "fbx_frame": 55,
+        "dimensions_metres": [
+          0.3631199896335602,
+          0.2669597268104553,
+          0.18210239009931684
+        ],
+        "max_source_error_metres": 2.60770320892334e-08
+      },
+      {
+        "source_frame": 108,
+        "fbx_frame": 109,
+        "dimensions_metres": [
+          0.3631199896335602,
+          0.2669597268104553,
+          0.02256304072216153
+        ],
+        "max_source_error_metres": 2.0489096641540527e-08
+      }
+    ],
+    "Book_Lying_Open_to_R_01.fbx": [
+      {
+        "source_frame": 1,
+        "fbx_frame": 2,
+        "dimensions_metres": [
+          0.3631199896335602,
+          0.2669597268104553,
+          0.02256304072216153
+        ],
+        "max_source_error_metres": 2.0489096641540527e-08
+      },
+      {
+        "source_frame": 24,
+        "fbx_frame": 25,
+        "dimensions_metres": [
+          0.2036958821117878,
+          0.2669597566127777,
+          0.19462376926094294
+        ],
+        "max_source_error_metres": 3.119930624961853e-08
+      },
+      {
+        "source_frame": 48,
+        "fbx_frame": 49,
+        "dimensions_metres": [
+          0.19073999486863613,
+          0.2669597268104553,
+          0.02807838562875986
+        ],
+        "max_source_error_metres": 2.3283064365386963e-09
+      }
+    ],
+    "Book_Lying_R_01.fbx": [
+      {
+        "source_frame": 1,
+        "fbx_frame": 2,
+        "dimensions_metres": [
+          0.19073999486863613,
+          0.2669597268104553,
+          0.028078381903469563
+        ],
+        "max_source_error_metres": 6.05359673500061e-09
+      },
+      {
+        "source_frame": 12,
+        "fbx_frame": 13,
+        "dimensions_metres": [
+          0.19073999486863613,
+          0.2669597268104553,
+          0.028078381903469563
+        ],
+        "max_source_error_metres": 6.05359673500061e-09
+      },
+      {
+        "source_frame": 24,
+        "fbx_frame": 25,
+        "dimensions_metres": [
+          0.19073999486863613,
+          0.2669597268104553,
+          0.028078381903469563
+        ],
+        "max_source_error_metres": 6.05359673500061e-09
+      }
+    ],
+    "Book_Lying_R_to_Open_01.fbx": [
+      {
+        "source_frame": 1,
+        "fbx_frame": 2,
+        "dimensions_metres": [
+          0.19073999486863613,
+          0.2669597268104553,
+          0.028078381903469563
+        ],
+        "max_source_error_metres": 6.05359673500061e-09
+      },
+      {
+        "source_frame": 24,
+        "fbx_frame": 25,
+        "dimensions_metres": [
+          0.19430546090006828,
+          0.2669597566127777,
+          0.19567993376404047
+        ],
+        "max_source_error_metres": 3.119930624961853e-08
+      },
+      {
+        "source_frame": 48,
+        "fbx_frame": 49,
+        "dimensions_metres": [
+          0.3631199896335602,
+          0.2669597268104553,
+          0.022563064470887184
+        ],
+        "max_source_error_metres": 4.423782229423523e-08
+      }
+    ]
+  }
+}

@@ -1,0 +1,100 @@
+{
+  "label": "03-dropped-base-materials",
+  "world": "/Game/Mars/Maps/UEDPIE_0_Sandbox_Mars_MAP.Sandbox_Mars_MAP",
+  "game_time": 92.86335778981447,
+  "rotation_tuple_order": [
+    "roll",
+    "pitch",
+    "yaw"
+  ],
+  "camera_location": [
+    -600.0,
+    -225.0,
+    111.93466414658025
+  ],
+  "camera_rotation": [
+    0.0,
+    -45.5,
+    0.5272470116615295
+  ],
+  "control_rotation": [
+    0.0,
+    -45.5,
+    0.5272470116615295
+  ],
+  "events": [
+    {
+      "key": "LeftMouseButton",
+      "pressed": true,
+      "game_time": 33.53101211413741
+    },
+    {
+      "key": "LeftMouseButton",
+      "pressed": false,
+      "game_time": 33.68984271213412
+    },
+    {
+      "key": "LeftMouseButton",
+      "pressed": true,
+      "game_time": 44.88632061332464
+    },
+    {
+      "key": "LeftMouseButton",
+      "pressed": false,
+      "game_time": 45.05828821286559
+    },
+    {
+      "key": "E",
+      "pressed": true,
+      "game_time": 63.0610461011529
+    },
+    {
+      "key": "E",
+      "pressed": false,
+      "game_time": 63.211937103420496
+    },
+    {
+      "key": "R",
+      "pressed": true,
+      "game_time": 85.16137589141726
+    },
+    {
+      "key": "R",
+      "pressed": false,
+      "game_time": 85.32377519086003
+    }
+  ],
+  "books": [
+    {
+      "name": "Mars_CookbookPresentationComponent_0",
+      "location": [
+        -546.5992431640625,
+        -227.94268483267751,
+        0.40187397644186973
+      ],
+      "rotation": [
+        -0.5562294125556946,
+        0.7768694162368774,
+        60.578468322753906
+      ],
+      "visible": true,
+      "engine_tick_enabled": false,
+      "state": "<Mars_CookbookState.CLOSED: 0>",
+      "section": 1,
+      "sections": 3,
+      "position": 0.0,
+      "page_materials": [
+        "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_PageA_M.Cookbook_PageA_M",
+        "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_PageB_M.Cookbook_PageB_M",
+        "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_PageC_M.Cookbook_PageC_M",
+        "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_PageD_M.Cookbook_PageD_M"
+      ],
+      "page_targets": [
+        null,
+        null,
+        null,
+        null
+      ]
+    }
+  ]
+}

@@ -1,0 +1,103 @@
+{
+  "status": "Model, rig and six animations delivered; Unreal physical item and local reading controls integrated and observed in PIE.",
+  "selected_direction": "A stitched field cookbook + D illustrated recipe",
+  "model_effort": {
+    "implementation": "gpt-6.1-sol",
+    "effort": "high",
+    "review": "Main thread inspected rendered artifacts, reran FBX validation, corrected and checked Unreal imports."
+  },
+  "source_blend": "Model/Cookbook_StylizedR02.blend",
+  "blank_page_blend": "Model/Cookbook_StylizedR02_WidgetReady.blend",
+  "fbx_mesh": "Model/FBX/SK_Cookbook_StylizedR02.fbx",
+  "page_size_cm": [
+    17,
+    23
+  ],
+  "closed_overall_cm": [
+    19.074,
+    26.696,
+    2.808
+  ],
+  "bones": 12,
+  "triangles": 20204,
+  "morphs": 4,
+  "material_sections": 20,
+  "unreal_mesh": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Meshes/SK_Cookbook_Field",
+  "unreal_skeleton": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Meshes/SK_Cookbook_Field_Skeleton",
+  "unreal_animations": [
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Animations/Cookbook_Closed_AS",
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Animations/Cookbook_Open_AS",
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Animations/Cookbook_Opening_AS",
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Animations/Cookbook_Closing_AS",
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Animations/Cookbook_TurnForward_AS",
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Animations/Cookbook_TurnReverse_AS"
+  ],
+  "unreal_widgets": [
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Widgets/Cookbook_Sample_Left_WBP",
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Widgets/Cookbook_Sample_Right_WBP",
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Widgets/Cookbook_Index_Left_WBP",
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Widgets/Cookbook_Index_Right_WBP",
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Widgets/Cookbook_Notes_Left_WBP",
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Widgets/Cookbook_Notes_Right_WBP"
+  ],
+  "proof": {
+    "blender_fbx_roundtrip": "Model/roundtrip_validation.json; 12/12 checks, 96 cover-arc frames and 216 turn frames",
+    "fbx_units": "Model/fbx_binary_units.json; normalized centimetres, root scale 1",
+    "unreal_import": "unreal_import_report.json; 12 bone tracks and 4 float curves in all six clips",
+    "unreal_morphs": "unreal_morph_report.json; evaluated Blender key values/times verified to 1e-6",
+    "unreal_pose_previews": "unreal_pose_captures.json; rendered explicit-time sequence evaluator, all six clips represented",
+    "widgets": "All six Ck_UserWidget_UE page children compile with zero errors/warnings",
+    "gameplay": "unreal_gameplay_report.json; real-player raw-input journey and final focused gates"
+  },
+  "limitations": [
+    "Dedicated 12-bone rig; not compatible with original 87-bone BookMenu skeleton or AnimBP.",
+    "Sample recipe artwork uses raster text and is illustrative; content design and final editable page widgets remain.",
+    "Endpaper-only first/last-page choreography not authored; the six primary clips expose A/B/C/D.",
+    "Current mesh has 20 material sections; no game performance claim.",
+    "Failed import diagnostics are under Unreal Validation/PreNormalization; final assets are SK_Cookbook_Field and Cookbook_*_AS.",
+    "Direct Monolith sequence capture returned reference pose; final pose observations use a compiled SequenceEvaluator preview ABP instead.",
+    "Physical keyboard/Slate focus, remote multiplayer and packaged runtime have not been verified. Recipe content remains illustrative."
+  ],
+  "git": "Uncommitted and unpushed; unrelated changes preserved.",
+  "cover_arc_correction": {
+    "date": "2026-10-23",
+    "cause": "Negative Y rotation moved the left cover through the lower half-space.",
+    "fix": "Positive Y rotation moves the cover above the book for opening and closing.",
+    "baseline": "2 failing cover arc checks, 10 passing checks; validator exited 1.",
+    "after": "12/12 checks passing; validator exited 0.",
+    "evidence": {
+      "Book_Lying_R_to_Open_01": {
+        "sampled_frames": 48,
+        "minimum_z_cm": -0.4745353478938341,
+        "midpoint_mean_z_cm": 10.323894550277041
+      },
+      "Book_Lying_Open_to_R_01": {
+        "sampled_frames": 48,
+        "minimum_z_cm": -0.4745353478938341,
+        "midpoint_mean_z_cm": 10.2481412340745
+      },
+      "opening_closing_reverse_pose_error_metres": 0.0
+    }
+  },
+  "runtime_size_revision": {
+    "physical_scale": 1.2,
+    "page_size_cm": [
+      20.4,
+      27.6
+    ],
+    "reading_offset_cm": [
+      -25,
+      0,
+      18
+    ],
+    "grip_below_centre_cm": 16,
+    "evidence": "Resize20/REPORT.json",
+    "comparison": "Resize20/COMPARE.html"
+  },
+  "latest_revision": {
+    "name": "Ck page widgets and BookMenu dependency cleanup",
+    "evidence": "DependencyCleanup/REPORT.json",
+    "removal_notes": "DependencyCleanup/README.md",
+    "focused_gate": "Saved/Logs/Cookbook-WithoutBookMenu-Final.log:5/5,exit0,-DisablePlugins=BookMenu"
+  }
+}

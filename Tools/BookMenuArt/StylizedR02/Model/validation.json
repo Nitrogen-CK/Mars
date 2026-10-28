@@ -1,0 +1,274 @@
+{
+  "skeleton_compatible_with_original": false,
+  "reason": "Physical slim hinge rest transforms and new 12-bone skeleton; use supplied six animations. Original thick-tome clips are not interchangeable.",
+  "bones": 12,
+  "bone_names": [
+    "Master",
+    "Cover_L",
+    "Cover_R",
+    "Spine",
+    "PageTurn_01",
+    "PageTurn_02",
+    "PageTurn_03",
+    "PageTurn_04",
+    "PageTurn_05",
+    "PageTurn_06",
+    "PageTurn_07",
+    "PageTurn_08"
+  ],
+  "vertices": 10512,
+  "polygons": 9586,
+  "triangles": 20204,
+  "material_slots": [
+    "Cover",
+    "PagesBase",
+    "PageA",
+    "PageB",
+    "PageC",
+    "PageD",
+    "PageFirst",
+    "PageLast",
+    "CoverDark",
+    "Brass",
+    "BrassLight",
+    "Scuff",
+    "Patch",
+    "Thread",
+    "Emblem",
+    "Leather",
+    "LeatherLight",
+    "PageEdgeLight",
+    "Bookmark",
+    "BookmarkLight"
+  ],
+  "morphs": [
+    "Basis",
+    "PageBend_01",
+    "PageBend_02",
+    "PageBend_03",
+    "PageBend_04"
+  ],
+  "unweighted_vertices": 0,
+  "max_vertex_influences": 2,
+  "actions": {
+    "Book_Lying_R_01": {
+      "frames": 24,
+      "fps": 60,
+      "nonfinite_samples": 0,
+      "max_dimensions_cm": [
+        19.074,
+        26.696,
+        2.808
+      ]
+    },
+    "Book_Lying_Open_01": {
+      "frames": 24,
+      "fps": 60,
+      "nonfinite_samples": 0,
+      "max_dimensions_cm": [
+        36.312,
+        26.696,
+        2.256
+      ]
+    },
+    "Book_Lying_R_to_Open_01": {
+      "frames": 48,
+      "fps": 60,
+      "nonfinite_samples": 0,
+      "max_dimensions_cm": [
+        36.343,
+        26.696,
+        19.568
+      ]
+    },
+    "Book_Lying_Open_to_R_01": {
+      "frames": 48,
+      "fps": 60,
+      "nonfinite_samples": 0,
+      "max_dimensions_cm": [
+        36.343,
+        26.696,
+        19.568
+      ]
+    },
+    "Book_Lying_Open_Page_Turn_R_to_L_02": {
+      "frames": 108,
+      "fps": 60,
+      "nonfinite_samples": 0,
+      "max_dimensions_cm": [
+        36.312,
+        26.696,
+        18.458
+      ]
+    },
+    "Book_Lying_Open_Page_Turn_L_to_R_02": {
+      "frames": 108,
+      "fps": 60,
+      "nonfinite_samples": 0,
+      "max_dimensions_cm": [
+        36.312,
+        26.696,
+        18.458
+      ]
+    }
+  },
+  "states_cm": {
+    "closed": [
+      19.074,
+      26.696,
+      2.808
+    ],
+    "open": [
+      36.312,
+      26.696,
+      2.256
+    ],
+    "opening": [
+      19.074,
+      26.696,
+      2.808
+    ],
+    "closing": [
+      36.312,
+      26.696,
+      2.256
+    ],
+    "rtl": [
+      36.312,
+      26.696,
+      2.256
+    ],
+    "ltr": [
+      36.312,
+      26.696,
+      2.256
+    ],
+    "01-closed": [
+      19.074,
+      26.696,
+      2.808
+    ],
+    "02-open": [
+      36.312,
+      26.696,
+      2.256
+    ],
+    "03-rear": [
+      19.074,
+      26.696,
+      2.808
+    ],
+    "04-side": [
+      19.074,
+      26.696,
+      2.808
+    ],
+    "05-page-turn": [
+      36.312,
+      26.696,
+      17.932
+    ],
+    "06-turn-early": [
+      36.312,
+      26.696,
+      8.546
+    ],
+    "07-turn-late": [
+      36.312,
+      26.696,
+      12.149
+    ],
+    "08-opening": [
+      23.864,
+      26.696,
+      18.717
+    ]
+  },
+  "page_uv0": {
+    "PageA": {
+      "min": [
+        0.0,
+        0.0
+      ],
+      "max": [
+        1.0,
+        1.0
+      ]
+    },
+    "PageB": {
+      "min": [
+        0.0,
+        0.0
+      ],
+      "max": [
+        1.0,
+        1.0
+      ]
+    },
+    "PageC": {
+      "min": [
+        0.0,
+        0.0
+      ],
+      "max": [
+        1.0,
+        1.0
+      ]
+    },
+    "PageD": {
+      "min": [
+        0.0,
+        0.0
+      ],
+      "max": [
+        1.0,
+        1.0
+      ]
+    },
+    "PageFirst": {
+      "min": [
+        1.7930857909576048e-09,
+        -1.9868215517249155e-08
+      ],
+      "max": [
+        1.0,
+        1.0
+      ]
+    },
+    "PageLast": {
+      "min": [
+        1.978577479633259e-08,
+        -1.9868215517249155e-08
+      ],
+      "max": [
+        1.0,
+        1.0
+      ]
+    }
+  },
+  "units": "metres; apply component scale 1.0. FBX exported in centimetres automatically.",
+  "page_dimensions_cm": [
+    17,
+    23
+  ],
+  "author_scale_baked_into_geometry_and_bone_rest": [
+    0.6800000071525574,
+    0.6388888955116272,
+    0.6800000071525574
+  ],
+  "clearances_mm": {
+    "closed_left_right_page_gap": 1.3600000143051159,
+    "open_turning_leaf_gap": 1.12200001180172
+  },
+  "intersection_test": "Analytical rigid hinge/page clearance plus sampled-frame finite/bounds check. No exhaustive triangle collision proof; rounded spine and sewn-band overlaps are intentional.",
+  "textures": {
+    "PagesBase": false,
+    "PageA": true,
+    "PageB": true,
+    "PageC": true,
+    "PageD": true,
+    "PageFirst": true,
+    "PageLast": true
+  },
+  "unreal_runtime_verified": false
+}

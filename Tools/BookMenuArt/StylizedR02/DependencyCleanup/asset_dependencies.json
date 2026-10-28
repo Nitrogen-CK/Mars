@@ -1,0 +1,307 @@
+{
+  "active_assets": 50,
+  "bookmenu_references": 0,
+  "dependencies": {
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Widgets/Cookbook_Index_Left_WBP": [
+      "/Script/SlateCore",
+      "/Script/UMGEditor",
+      "/Script/UMG",
+      "/Script/CkUICore"
+    ],
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Widgets/Cookbook_Index_Right_WBP": [
+      "/Script/SlateCore",
+      "/Script/UMGEditor",
+      "/Script/UMG",
+      "/Script/CkUICore"
+    ],
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Widgets/Cookbook_Notes_Left_WBP": [
+      "/Script/SlateCore",
+      "/Script/UMGEditor",
+      "/Script/UMG",
+      "/Script/CkUICore"
+    ],
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Widgets/Cookbook_Notes_Right_WBP": [
+      "/Script/SlateCore",
+      "/Script/UMGEditor",
+      "/Script/UMG",
+      "/Script/CkUICore"
+    ],
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Textures/Cookbook_Sample_Left_T": [
+      "/Script/InterchangeEngine"
+    ],
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Widgets/Cookbook_Sample_Left_WBP": [
+      "/Script/SlateCore",
+      "/Script/UMGEditor",
+      "/Script/UMG",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Textures/Cookbook_Sample_Left_T",
+      "/Script/CkUICore"
+    ],
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Textures/Cookbook_Sample_Right_T": [
+      "/Script/InterchangeEngine"
+    ],
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Widgets/Cookbook_Sample_Right_WBP": [
+      "/Script/SlateCore",
+      "/Script/UMGEditor",
+      "/Script/UMG",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Textures/Cookbook_Sample_Right_T",
+      "/Script/CkUICore"
+    ],
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Meshes/SM_Cookbook_Closed": [
+      "/Script/NavigationSystem",
+      "/Engine/EngineMaterials/WorldGridMaterial"
+    ],
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_Bookmark_M": [],
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_BookmarkLight_M": [],
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_Brass_M": [],
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_BrassLight_M": [],
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_Cover_M": [],
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_CoverDark_M": [],
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_Emblem_M": [],
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_Leather_M": [],
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_LeatherLight_M": [],
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_PageA_M": [
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Textures/Cookbook_Sample_Left_T"
+    ],
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_PageB_M": [
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Textures/Cookbook_Sample_Right_T"
+    ],
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_PageC_M": [
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Textures/Cookbook_Sample_Left_T"
+    ],
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_PageD_M": [
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Textures/Cookbook_Sample_Right_T"
+    ],
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_PageEdgeLight_M": [],
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_PageFirst_M": [
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Textures/Cookbook_Sample_Right_T"
+    ],
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_PageLast_M": [
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Textures/Cookbook_Sample_Left_T"
+    ],
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_PagesBase_M": [],
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_Patch_M": [],
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_Scuff_M": [],
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_Thread_M": [],
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Meshes/SK_Cookbook_Field_Skeleton": [
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Meshes/SK_Cookbook_Field"
+    ],
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Meshes/SK_Cookbook_Field": [
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_BookmarkLight_M",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_Bookmark_M",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_BrassLight_M",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_Brass_M",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_CoverDark_M",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_Cover_M",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_Emblem_M",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_LeatherLight_M",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_Leather_M",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_PageA_M",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_PageB_M",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_PageC_M",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_PageD_M",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_PageEdgeLight_M",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_PageFirst_M",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_PageLast_M",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_PagesBase_M",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_Patch_M",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_Scuff_M",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_Thread_M",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Meshes/SK_Cookbook_Field_Skeleton"
+    ],
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Animations/Cookbook_Closed_AS": [
+      "/Script/MovieScene",
+      "/Script/AnimationModifiers",
+      "/ACLPlugin/ACLAnimBoneCompressionSettings",
+      "/ACLPlugin/ACLAnimCurveCompressionSettings",
+      "/Engine/Animation/DefaultVariableFrameStrippingSettings",
+      "/Script/ControlRig",
+      "/Script/AnimationData",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Meshes/SK_Cookbook_Field_Skeleton"
+    ],
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Animations/Cookbook_Open_AS": [
+      "/Script/MovieScene",
+      "/Script/AnimationModifiers",
+      "/ACLPlugin/ACLAnimBoneCompressionSettings",
+      "/ACLPlugin/ACLAnimCurveCompressionSettings",
+      "/Engine/Animation/DefaultVariableFrameStrippingSettings",
+      "/Script/ControlRig",
+      "/Script/AnimationData",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Meshes/SK_Cookbook_Field_Skeleton"
+    ],
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Animations/Cookbook_Opening_AS": [
+      "/Script/MovieScene",
+      "/Script/AnimationModifiers",
+      "/ACLPlugin/ACLAnimBoneCompressionSettings",
+      "/ACLPlugin/ACLAnimCurveCompressionSettings",
+      "/Engine/Animation/DefaultVariableFrameStrippingSettings",
+      "/Script/ControlRig",
+      "/Script/AnimationData",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Meshes/SK_Cookbook_Field_Skeleton"
+    ],
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Animations/Cookbook_Closing_AS": [
+      "/Script/MovieScene",
+      "/Script/AnimationModifiers",
+      "/ACLPlugin/ACLAnimBoneCompressionSettings",
+      "/ACLPlugin/ACLAnimCurveCompressionSettings",
+      "/Engine/Animation/DefaultVariableFrameStrippingSettings",
+      "/Script/ControlRig",
+      "/Script/AnimationData",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Meshes/SK_Cookbook_Field_Skeleton"
+    ],
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Animations/Cookbook_TurnForward_AS": [
+      "/Script/MovieScene",
+      "/Script/AnimationModifiers",
+      "/ACLPlugin/ACLAnimBoneCompressionSettings",
+      "/ACLPlugin/ACLAnimCurveCompressionSettings",
+      "/Engine/Animation/DefaultVariableFrameStrippingSettings",
+      "/Script/ControlRig",
+      "/Script/AnimationData",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Meshes/SK_Cookbook_Field_Skeleton"
+    ],
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Animations/Cookbook_TurnReverse_AS": [
+      "/Script/MovieScene",
+      "/Script/AnimationModifiers",
+      "/ACLPlugin/ACLAnimBoneCompressionSettings",
+      "/ACLPlugin/ACLAnimCurveCompressionSettings",
+      "/Engine/Animation/DefaultVariableFrameStrippingSettings",
+      "/Script/ControlRig",
+      "/Script/AnimationData",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Meshes/SK_Cookbook_Field_Skeleton"
+    ],
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Validation/Closed_PreserveTransform": [
+      "/Script/MovieScene",
+      "/Script/AnimationModifiers",
+      "/ACLPlugin/ACLAnimBoneCompressionSettings",
+      "/ACLPlugin/ACLAnimCurveCompressionSettings",
+      "/Engine/Animation/DefaultVariableFrameStrippingSettings",
+      "/Script/ControlRig",
+      "/Script/AnimationData",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Validation/PreNormalization/SK_Cookbook_StylizedR02_Skeleton"
+    ],
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Validation/Cookbook_FieldPreview_ABP": [
+      "/Script/AnimGraph",
+      "/Script/AnimGraphRuntime",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Meshes/SK_Cookbook_Field_Skeleton",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Animations/Cookbook_Opening_AS"
+    ],
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Validation/Cookbook_PosePreview_ABP": [
+      "/Script/AnimGraph",
+      "/Script/AnimGraphRuntime",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Meshes/SK_Cookbook_Field_Skeleton",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Animations/Cookbook_Closed_AS"
+    ],
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Validation/PreNormalization/Book_Lying_Open_01": [
+      "/Script/InterchangeEngine",
+      "/Script/MovieScene",
+      "/Script/AnimationModifiers",
+      "/ACLPlugin/ACLAnimBoneCompressionSettings",
+      "/ACLPlugin/ACLAnimCurveCompressionSettings",
+      "/Engine/Animation/DefaultVariableFrameStrippingSettings",
+      "/Script/ControlRig",
+      "/Script/AnimationData",
+      "/Script/InterchangePipelines",
+      "/Script/InterchangeImport",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Meshes/SK_Cookbook_StylizedR02_Skeleton"
+    ],
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Validation/PreNormalization/Book_Lying_Open_Page_Turn_L_to_R_02": [
+      "/Script/InterchangeEngine",
+      "/Script/MovieScene",
+      "/Script/AnimationModifiers",
+      "/ACLPlugin/ACLAnimBoneCompressionSettings",
+      "/ACLPlugin/ACLAnimCurveCompressionSettings",
+      "/Engine/Animation/DefaultVariableFrameStrippingSettings",
+      "/Script/ControlRig",
+      "/Script/AnimationData",
+      "/Script/InterchangePipelines",
+      "/Script/InterchangeImport",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Meshes/SK_Cookbook_StylizedR02_Skeleton"
+    ],
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Validation/PreNormalization/Book_Lying_Open_Page_Turn_R_to_L_02": [
+      "/Script/InterchangeEngine",
+      "/Script/MovieScene",
+      "/Script/AnimationModifiers",
+      "/ACLPlugin/ACLAnimBoneCompressionSettings",
+      "/ACLPlugin/ACLAnimCurveCompressionSettings",
+      "/Engine/Animation/DefaultVariableFrameStrippingSettings",
+      "/Script/ControlRig",
+      "/Script/AnimationData",
+      "/Script/InterchangePipelines",
+      "/Script/InterchangeImport",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Meshes/SK_Cookbook_StylizedR02_Skeleton"
+    ],
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Validation/PreNormalization/Book_Lying_Open_to_R_01": [
+      "/Script/InterchangeEngine",
+      "/Script/MovieScene",
+      "/Script/AnimationModifiers",
+      "/ACLPlugin/ACLAnimBoneCompressionSettings",
+      "/ACLPlugin/ACLAnimCurveCompressionSettings",
+      "/Engine/Animation/DefaultVariableFrameStrippingSettings",
+      "/Script/ControlRig",
+      "/Script/AnimationData",
+      "/Script/InterchangePipelines",
+      "/Script/InterchangeImport",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Meshes/SK_Cookbook_StylizedR02_Skeleton"
+    ],
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Validation/PreNormalization/Book_Lying_R_01": [
+      "/Script/InterchangeEngine",
+      "/Script/MovieScene",
+      "/Script/AnimationModifiers",
+      "/ACLPlugin/ACLAnimBoneCompressionSettings",
+      "/ACLPlugin/ACLAnimCurveCompressionSettings",
+      "/Engine/Animation/DefaultVariableFrameStrippingSettings",
+      "/Script/ControlRig",
+      "/Script/AnimationData",
+      "/Script/InterchangePipelines",
+      "/Script/InterchangeImport",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Meshes/SK_Cookbook_StylizedR02_Skeleton"
+    ],
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Validation/PreNormalization/Book_Lying_R_to_Open_01": [
+      "/Script/InterchangeEngine",
+      "/Script/MovieScene",
+      "/Script/AnimationModifiers",
+      "/ACLPlugin/ACLAnimBoneCompressionSettings",
+      "/ACLPlugin/ACLAnimCurveCompressionSettings",
+      "/Engine/Animation/DefaultVariableFrameStrippingSettings",
+      "/Script/ControlRig",
+      "/Script/AnimationData",
+      "/Script/InterchangePipelines",
+      "/Script/InterchangeImport",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Meshes/SK_Cookbook_StylizedR02_Skeleton"
+    ],
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Validation/PreNormalization/SK_Cookbook_StylizedR02": [
+      "/Script/InterchangeEngine",
+      "/Script/InterchangePipelines",
+      "/Script/InterchangeImport",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_BookmarkLight_M",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_Bookmark_M",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_BrassLight_M",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_Brass_M",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_CoverDark_M",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_Cover_M",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_Emblem_M",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_LeatherLight_M",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_Leather_M",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_PageA_M",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_PageB_M",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_PageC_M",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_PageD_M",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_PageEdgeLight_M",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_PageFirst_M",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_PageLast_M",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_PagesBase_M",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_Patch_M",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_Scuff_M",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_Thread_M",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Meshes/SK_Cookbook_StylizedR02_Skeleton"
+    ],
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Validation/PreNormalization/SK_Cookbook_StylizedR02_Skeleton": [
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Validation/PreNormalization/SK_Cookbook_StylizedR02"
+    ],
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Validation/UnitProbeLegacy/SK_Cookbook_UnitProbe": [
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Validation/UnitProbeLegacy/SK_Cookbook_UnitProbe_Skeleton"
+    ],
+    "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Validation/UnitProbeLegacy/SK_Cookbook_UnitProbe_Skeleton": [
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Validation/UnitProbeLegacy/SK_Cookbook_UnitProbe"
+    ]
+  }
+}

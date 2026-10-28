@@ -1,0 +1,12 @@
+00:02.218  blend            | Read blend: "D:\Repositories\CkRepos\Orion\Tools\BookMenuArt\StylizedR02\Model\Cookbook_StylizedR02.blend"
+Extensions: writing cache failed ([Errno 13] Permission denied: 'C:\\Users\\Adam\\AppData\\Roaming\\Blender Foundation\\Blender\\5.2\\extensions\\.cache\\compat.dat').
+MORPH_CURVES_EXPORTED D:\Repositories\CkRepos\Orion\Tools\BookMenuArt\StylizedR02\Model\morph_curves.json
+Book_Lying_Open_01 {"PageBend_01": {"min": 0.0, "max": 0.0, "nonzero_samples": 0}, "PageBend_02": {"min": 0.0, "max": 0.0, "nonzero_samples": 0}, "PageBend_03": {"min": 0.0, "max": 0.0, "nonzero_samples": 0}, "PageBend_04": {"min": 0.0, "max": 0.0, "nonzero_samples": 0}}
+Book_Lying_Open_Page_Turn_L_to_R_02 {"PageBend_01": {"min": 0.0, "max": 0.6998303532600403, "nonzero_samples": 106}, "PageBend_02": {"min": 0.0, "max": 0.2699947655200958, "nonzero_samples": 53}, "PageBend_03": {"min": 0.0, "max": 0.0, "nonzero_samples": 0}, "PageBend_04": {"min": 0.0, "max": 0.0, "nonzero_samples": 0}}
+Book_Lying_Open_Page_Turn_R_to_L_02 {"PageBend_01": {"min": 0.0, "max": 0.6998303532600403, "nonzero_samples": 106}, "PageBend_02": {"min": 0.0, "max": 0.2699947655200958, "nonzero_samples": 53}, "PageBend_03": {"min": 0.0, "max": 0.0, "nonzero_samples": 0}, "PageBend_04": {"min": 0.0, "max": 0.0, "nonzero_samples": 0}}
+Book_Lying_Open_to_R_01 {"PageBend_01": {"min": 0.0, "max": 0.0, "nonzero_samples": 0}, "PageBend_02": {"min": 0.0, "max": 0.0, "nonzero_samples": 0}, "PageBend_03": {"min": 0.0, "max": 0.0, "nonzero_samples": 0}, "PageBend_04": {"min": 0.0, "max": 0.0, "nonzero_samples": 0}}
+Book_Lying_R_01 {"PageBend_01": {"min": 0.0, "max": 0.0, "nonzero_samples": 0}, "PageBend_02": {"min": 0.0, "max": 0.0, "nonzero_samples": 0}, "PageBend_03": {"min": 0.0, "max": 0.0, "nonzero_samples": 0}, "PageBend_04": {"min": 0.0, "max": 0.0, "nonzero_samples": 0}}
+Book_Lying_R_to_Open_01 {"PageBend_01": {"min": 0.0, "max": 0.0, "nonzero_samples": 0}, "PageBend_02": {"min": 0.0, "max": 0.0, "nonzero_samples": 0}, "PageBend_03": {"min": 0.0, "max": 0.0, "nonzero_samples": 0}, "PageBend_04": {"min": 0.0, "max": 0.0, "nonzero_samples": 0}}
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+
+Blender quit

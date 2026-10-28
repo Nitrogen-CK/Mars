@@ -1,0 +1,90 @@
+{
+  "status": "Live cookbook uses Ck widgets and rasterizer; BookMenu remains enabled only as an existing project plugin.",
+  "widget_parent": "/Script/CkUICore.Ck_UserWidget_UE",
+  "widget_compile": {
+    "total": 6,
+    "errors": 0,
+    "warnings": 0
+  },
+  "rendering": "utils_widget_rasterizer::RenderWidgetToTexture, 1024x1536, GammaCorrection::Disabled. Cached UTexture2D pages, retained by AngelScript UObject members; restore base materials and release page arrays on drop/stow/destruction.",
+  "assets_audited": 50,
+  "active_bookmenu_asset_references": 0,
+  "outside_active_game_asset_dependencies": [],
+  "handwritten_or_generated_as_bookmenu_references": 0,
+  "baseline": {
+    "cookbook": "5/5",
+    "log": "Saved/Logs/Cookbook-Gutter-Final.log"
+  },
+  "final": {
+    "cookbook": "5/5",
+    "exit": 0,
+    "failed": 0,
+    "skipped": 0,
+    "contaminated": 0,
+    "seconds": 50,
+    "log": "Saved/Logs/Cookbook-WithoutBookMenu-Final.log",
+    "test_editor_args": "-DisablePlugins=BookMenu",
+    "plugin_check": "All3 lane command lines contain DisablePlugins; no BookMenu mount/import messages."
+  },
+  "runtime": "Actual Sandbox raw pickup/open/E/E/Q/drop/re-pickup/open; six Ck page widgets and native Texture2D material inputs. Forced GC preserves cached spreads; after drop and deferred GC all page widgets are collected and base materials restored. Reopen creates new textures.",
+  "runtime_records": [
+    "01-open-index.json",
+    "02-index-after-gc.json",
+    "03-recipe-after-gc.json",
+    "04-ck-recipe.json",
+    "05-notes-after-gc.json",
+    "06-reverse-recipe.json",
+    "07-dropped-released.json",
+    "08-reopened-new-textures.json",
+    "09-reopened-after-gc.json"
+  ],
+  "limitations": [
+    "Rendered PIE is plugin-enabled; disabled-plugin automation is NullRHI.",
+    "Hardware key focus, network and packaged runtime remain unverified."
+  ],
+  "legacy_prototype_assets_requiring_cleanup_before_plugin_removal": 9,
+  "legacy_details": "widget_migration.json / remaining_prototype_dependencies",
+  "guideline_review": {
+    "reviewed": [
+      "Script/Items/Mars_Item_Cookbook.as",
+      "Script/Items/Hfsm/Mars_ItemUse_Cookbook_Hfsm.as",
+      "Script/Items/Presentation/Mars_CookbookPresentationComponent.as",
+      "Script/WorldObjects/Items/Mars_Cookbook_EntityScript.as",
+      "Script/PlayerCharacter/HFSM/Mars_PlayerCharacter_Hfsm_Cookbook.as",
+      "Script/Tests/FPHands/Mars_AutoTest_FPHands_HoldOverrideRequiresAnItemAndDefaultRestores.as",
+      "Script/Tests/Cookbook/Mars_AutoTestRig_Cookbook.as",
+      "Script/Tests/Cookbook/Mars_AutoTest_Cookbook_LaunchClosesAndStowResets.as",
+      "Script/Tests/Cookbook/Mars_AutoTest_Cookbook_LeavingControlsUnbindsAndCloses.as",
+      "Script/Tests/Cookbook/Mars_AutoTest_Cookbook_PlayerInputPagesAndFocusedPromptWins.as",
+      "Script/Tests/Cookbook/Mars_AutoTest_Cookbook_TransitionsReverseAndPageBoundsHold.as"
+    ],
+    "changes": "Do private helpers, Request mutator, In parameters, inferred locals, early guards, shared constants_cookbook; no raw Ck utils classes, FMath, unsupported casts or non-ASCII source. Existing compatibility, signal scope and geometry preserved."
+  },
+  "source_sha256": {
+    "Script/Items/Mars_Item_Cookbook.as": "e1d7f1627dc49afa0657ba09bc4ef615c6e2075f2e271cf419a89513bc5edd30",
+    "Script/Items/Hfsm/Mars_ItemUse_Cookbook_Hfsm.as": "82df3c0ccbc601c84d087efb77e0b864273bf73cb6732c9fa77fcea8d3fce219",
+    "Script/Items/Presentation/Mars_CookbookPresentationComponent.as": "3c46d1d973f5bd63cc128fdaf1c91ae1fdd44a4790dad4c38c261a962ef21595",
+    "Script/WorldObjects/Items/Mars_Cookbook_EntityScript.as": "4f639b6c8eb85fc6da73d2ad9fd057ce08b0b314f83fdfe512b63485cc48ed60",
+    "Script/PlayerCharacter/HFSM/Mars_PlayerCharacter_Hfsm_Cookbook.as": "6ea92106f91614cf895510ac222409d9bae89eaa26b9db274cbf3df99c99df7e",
+    "Script/Tests/FPHands/Mars_AutoTest_FPHands_HoldOverrideRequiresAnItemAndDefaultRestores.as": "20ddb637f8ff1c7d85b9edc409acb0f474021a4774714d1af6adb8b3ab6d625c",
+    "Script/Tests/Cookbook/Mars_AutoTestRig_Cookbook.as": "e2b7a034f6fa4df41ba50c115c948fe281cfdb9ec069e2a3a87e14bb447e0a9d",
+    "Script/Tests/Cookbook/Mars_AutoTest_Cookbook_LaunchClosesAndStowResets.as": "7510f9e408d46bd02d7748d09b9c7ad4e5a1c573a4e4189292fd802a55babb8e",
+    "Script/Tests/Cookbook/Mars_AutoTest_Cookbook_LeavingControlsUnbindsAndCloses.as": "47c66d9b50877f21cd8e5b3b2391988a63ee99367f6c185739a5e0fe2d78f996",
+    "Script/Tests/Cookbook/Mars_AutoTest_Cookbook_PlayerInputPagesAndFocusedPromptWins.as": "16de6e7e985545f666ced4310aa0fd15d55a355d9663c6b5db720528dd8858b1",
+    "Script/Tests/Cookbook/Mars_AutoTest_Cookbook_TransitionsReverseAndPageBoundsHold.as": "708dc830a71556721e6dc8703292d31cc3d60fcb8a4c7acba52ec84af0e46589"
+  },
+  "native_widget_sha256": {
+    "Content/Mars/Gameplay/PlayerCookbook/StylizedR02/Widgets/Cookbook_Index_Left_WBP.uasset": "7324da2a88b81d7cae5d3f5bf09bf660cc79fe209276ea741ddbec980f02ae2c",
+    "Content/Mars/Gameplay/PlayerCookbook/StylizedR02/Widgets/Cookbook_Index_Right_WBP.uasset": "e2c5d27f62e0cd3278b36da0ea788c036f0653e65ccdd766b4942482f840050f",
+    "Content/Mars/Gameplay/PlayerCookbook/StylizedR02/Widgets/Cookbook_Notes_Left_WBP.uasset": "a58bd1e6460bc2c6e41012af7cd5570dd94fe6cee09ec730f7923d886c0940e8",
+    "Content/Mars/Gameplay/PlayerCookbook/StylizedR02/Widgets/Cookbook_Notes_Right_WBP.uasset": "1cbc1a83431c4d5c3707fadb6cf4e343b7fea1f936c7e6840f23b72343de4fa4",
+    "Content/Mars/Gameplay/PlayerCookbook/StylizedR02/Widgets/Cookbook_Sample_Left_WBP.uasset": "25c6d287281a698f27b870c82fc8041b8f07d3603aaae8e9ea13d0d3269ca1bd",
+    "Content/Mars/Gameplay/PlayerCookbook/StylizedR02/Widgets/Cookbook_Sample_Right_WBP.uasset": "714560a8103a06c5c36bf22ec78f5e53eb248c6a55de1379e37b97d45d30d584"
+  },
+  "editor_return": {
+    "world": "/Game/Mars/Maps/Warrens_VariantC_Mars_MAP",
+    "pie_stopped": true,
+    "dirty_packages": 0
+  },
+  "git": "Uncommitted/unpushed; plugin entry, prototype assets and unrelated work left untouched."
+}

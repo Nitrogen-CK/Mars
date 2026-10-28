@@ -1,0 +1,56 @@
+{
+  "label": "02-held-closed",
+  "world": "/Game/Mars/Maps/UEDPIE_0_Sandbox_Mars_MAP.Sandbox_Mars_MAP",
+  "camera_location": [
+    -600.0,
+    -225.0,
+    112.38823710523387
+  ],
+  "camera_rotation": [
+    -3.549844937026828e-17,
+    -45.57487487792969,
+    0.5272470116615295
+  ],
+  "control_rotation": [
+    -3.549844937026828e-17,
+    -45.57487487792969,
+    0.5272470116615295
+  ],
+  "events": [
+    {
+      "key": "LeftMouseButton",
+      "pressed": true
+    },
+    {
+      "key": "LeftMouseButton",
+      "pressed": false
+    }
+  ],
+  "books": [
+    {
+      "name": "Mars_CookbookPresentationComponent_0",
+      "location": [
+        -570.4716258871065,
+        -233.34763137718167,
+        55.87223949864434
+      ],
+      "rotation": [
+        -135.5748748779297,
+        -3.1805547185895103e-15,
+        90.5272445678711
+      ],
+      "visible": true,
+      "engine_tick_enabled": false,
+      "state": "<Mars_CookbookState.CLOSED: 0>",
+      "section": 0,
+      "sections": 3,
+      "position": 0.0,
+      "page_targets": [
+        "<Object '/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Textures/Cookbook_Sample_Left_T.Cookbook_Sample_Left_T' (0x0000023BCB832400) Class 'Texture2D'>",
+        "<Object '/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Textures/Cookbook_Sample_Right_T.Cookbook_Sample_Right_T' (0x0000023BCB834200) Class 'Texture2D'>",
+        "<Object '/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Textures/Cookbook_Sample_Left_T.Cookbook_Sample_Left_T' (0x0000023BCB832400) Class 'Texture2D'>",
+        "<Object '/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Textures/Cookbook_Sample_Right_T.Cookbook_Sample_Right_T' (0x0000023BCB834200) Class 'Texture2D'>"
+      ]
+    }
+  ]
+}

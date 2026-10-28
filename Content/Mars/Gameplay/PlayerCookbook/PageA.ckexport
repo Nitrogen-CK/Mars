@@ -1,0 +1,1047 @@
+{
+	"material": "PageA",
+	"packagePath": "/Game/Mars/Gameplay/PlayerCookbook/PageA",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "bc87915efbb734adbeae39aa8f465f02",
+		"exporterVersion": 3
+	},
+	"parentChain": [
+		"/InterchangeAssets/Materials/FBXLegacyPhongSurfaceMaterial.FBXLegacyPhongSurfaceMaterial"
+	],
+	"blendMode": "BLEND_Opaque",
+	"twoSided": false,
+	"unlit": false,
+	"shadingModel": "MSM_DefaultLit",
+	"domain": "MD_Surface",
+	"connectedOutputs": [
+		"EmissiveColor",
+		"BaseColor",
+		"Opacity",
+		"OpacityMask",
+		"Normal"
+	],
+	"expressions":
+	{
+		"Constant": 3,
+		"Constant3Vector": 1,
+		"LinearInterpolate": 6,
+		"MaterialFunctionCall": 2,
+		"Multiply": 3,
+		"ScalarParameter": 13,
+		"StaticSwitchParameter": 7,
+		"TextureObjectParameter": 1,
+		"TextureSampleParameter2D": 9,
+		"VectorParameter": 4
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "MaterialFunctionCall",
+				"name": "MaterialExpressionMaterialFunctionCall_8",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "AmbientColor (V3)",
+						"node": 25,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "DiffuseColor (V3)",
+						"node": 22,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "SpecularColor (V3)",
+						"node": 27,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "Shininess (S)",
+						"node": 30,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"BaseColor",
+					"Metallic",
+					"Specular",
+					"Roughness"
+				],
+				"props":
+				{
+					"MaterialFunction": "/InterchangeAssets/Functions/MF_PhongToMetalRoughness.MF_PhongToMetalRoughness"
+				}
+			},
+			{
+				"id": 1,
+				"class": "StaticSwitchParameter",
+				"name": "MaterialExpressionStaticSwitchParameter_6",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "True",
+						"node": 0,
+						"output": 1
+					},
+					{
+						"index": 1,
+						"name": "False",
+						"node": 45,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"ParameterName": "bIsPhong"
+				}
+			},
+			{
+				"id": 2,
+				"class": "StaticSwitchParameter",
+				"name": "MaterialExpressionStaticSwitchParameter_4",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "True",
+						"node": 0,
+						"output": 2
+					},
+					{
+						"index": 1,
+						"name": "False",
+						"node": 44,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"ParameterName": "bIsPhong"
+				}
+			},
+			{
+				"id": 3,
+				"class": "StaticSwitchParameter",
+				"name": "MaterialExpressionStaticSwitchParameter_5",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "True",
+						"node": 0,
+						"output": 3
+					},
+					{
+						"index": 1,
+						"name": "False",
+						"node": 44,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"ParameterName": "bIsPhong"
+				}
+			},
+			{
+				"id": 4,
+				"class": "StaticSwitchParameter",
+				"name": "MaterialExpressionStaticSwitchParameter_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "True",
+						"node": 17,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "False",
+						"node": 34,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"ParameterName": "bHasBump"
+				}
+			},
+			{
+				"id": 5,
+				"class": "LinearInterpolate",
+				"name": "MaterialExpressionLinearInterpolate_3",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 31,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 33,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 2,
+						"name": "Alpha",
+						"node": 32,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 6,
+				"class": "StaticSwitchParameter",
+				"name": "MaterialExpressionStaticSwitchParameter_3",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "True",
+						"node": 43,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "False",
+						"node": 40,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"ParameterName": "bHasOpacityMap"
+				}
+			},
+			{
+				"id": 7,
+				"class": "StaticSwitchParameter",
+				"name": "MaterialExpressionStaticSwitchParameter_2",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "True",
+						"node": 38,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "False",
+						"node": 39,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"ParameterName": "bHasOpacityMaskMap"
+				}
+			},
+			{
+				"id": 8,
+				"class": "LinearInterpolate",
+				"name": "MaterialExpressionLinearInterpolate_5",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 48,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 47,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 2,
+						"name": "Alpha",
+						"node": 46,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 9,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_0",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"ParameterName": "DiffuseColor"
+				}
+			},
+			{
+				"id": 10,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_0",
+				"props":
+				{
+					"ParameterName": "DiffuseColorMapWeight"
+				}
+			},
+			{
+				"id": 11,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_2",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"ParameterName": "SpecularColor"
+				}
+			},
+			{
+				"id": 12,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_1",
+				"props":
+				{
+					"ParameterName": "SpecularColorMapWeight"
+				}
+			},
+			{
+				"id": 13,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_2",
+				"props":
+				{
+					"DefaultValue": 20,
+					"ParameterName": "Shininess"
+				}
+			},
+			{
+				"id": 14,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_6",
+				"props":
+				{
+					"ParameterName": "NormalMapWeight"
+				}
+			},
+			{
+				"id": 15,
+				"class": "Constant3Vector",
+				"name": "MaterialExpressionConstant3Vector_0",
+				"outputs": [
+					"None",
+					"None",
+					"None",
+					"None"
+				],
+				"props":
+				{
+					"Constant": "(R=0.000000,G=0.000000,B=1.000000,A=0.000000)"
+				}
+			},
+			{
+				"id": 16,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_9",
+				"props":
+				{
+					"ParameterName": "ShininessMapWeight"
+				}
+			},
+			{
+				"id": 17,
+				"class": "MaterialFunctionCall",
+				"name": "MaterialExpressionMaterialFunctionCall_7",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Height Map (T2d)",
+						"node": 19,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "Normal Map Intensity (S)",
+						"node": 18,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"MaterialFunction": "/Engine/Functions/Engine_MaterialFunctions03/Procedurals/NormalFromHeightmap.NormalFromHeightmap"
+				}
+			},
+			{
+				"id": 18,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_4",
+				"props":
+				{
+					"ParameterName": "NormalMapWeight"
+				}
+			},
+			{
+				"id": 19,
+				"class": "TextureObjectParameter",
+				"name": "MaterialExpressionTextureObjectParameter_5",
+				"props":
+				{
+					"ParameterName": "NormalMap",
+					"Texture": "/Engine/EngineMaterials/DefaultNormal.DefaultNormal",
+					"SamplerType": "SAMPLERTYPE_Normal"
+				}
+			},
+			{
+				"id": 20,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_3",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"ParameterName": "AmbientColor"
+				}
+			},
+			{
+				"id": 21,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_7",
+				"props":
+				{
+					"ParameterName": "AmbientColorMapWeight"
+				}
+			},
+			{
+				"id": 22,
+				"class": "LinearInterpolate",
+				"name": "MaterialExpressionLinearInterpolate_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 9,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 23,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 2,
+						"name": "Alpha",
+						"node": 10,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 23,
+				"class": "TextureSampleParameter2D",
+				"name": "MaterialExpressionTextureSampleParameter2D_0",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"ParameterName": "DiffuseColorMap"
+				}
+			},
+			{
+				"id": 24,
+				"class": "TextureSampleParameter2D",
+				"name": "MaterialExpressionTextureSampleParameter2D_1",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"ParameterName": "AmbientColorMap"
+				}
+			},
+			{
+				"id": 25,
+				"class": "LinearInterpolate",
+				"name": "MaterialExpressionLinearInterpolate_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 20,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 24,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 2,
+						"name": "Alpha",
+						"node": 21,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 26,
+				"class": "TextureSampleParameter2D",
+				"name": "MaterialExpressionTextureSampleParameter2D_2",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"ParameterName": "SpecularColorMap"
+				}
+			},
+			{
+				"id": 27,
+				"class": "LinearInterpolate",
+				"name": "MaterialExpressionLinearInterpolate_2",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 11,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 26,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 2,
+						"name": "Alpha",
+						"node": 12,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 28,
+				"class": "TextureSampleParameter2D",
+				"name": "MaterialExpressionTextureSampleParameter2D_3",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"ParameterName": "ShininessMap",
+					"Texture": "/Engine/EngineMaterials/BaseFlattenLinearColor.BaseFlattenLinearColor",
+					"SamplerType": "SAMPLERTYPE_LinearColor"
+				}
+			},
+			{
+				"id": 29,
+				"class": "Multiply",
+				"name": "MaterialExpressionMultiply_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 28,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 16,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 30,
+				"class": "StaticSwitchParameter",
+				"name": "MaterialExpressionStaticSwitchParameter_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "True",
+						"node": 29,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "False",
+						"node": 13,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"ParameterName": "bHasShininessMap"
+				}
+			},
+			{
+				"id": 31,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_4",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"ParameterName": "EmissiveColor"
+				}
+			},
+			{
+				"id": 32,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_8",
+				"props":
+				{
+					"ParameterName": "EmissiveColorMapWeight"
+				}
+			},
+			{
+				"id": 33,
+				"class": "TextureSampleParameter2D",
+				"name": "MaterialExpressionTextureSampleParameter2D_4",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"ParameterName": "EmissiveColorMap"
+				}
+			},
+			{
+				"id": 34,
+				"class": "LinearInterpolate",
+				"name": "MaterialExpressionLinearInterpolate_4",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 15,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 35,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 2,
+						"name": "Alpha",
+						"node": 14,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 35,
+				"class": "TextureSampleParameter2D",
+				"name": "MaterialExpressionTextureSampleParameter2D_6",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"ParameterName": "NormalMap",
+					"Texture": "/Engine/EngineMaterials/DefaultNormal.DefaultNormal",
+					"SamplerType": "SAMPLERTYPE_Normal"
+				}
+			},
+			{
+				"id": 36,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_5",
+				"props":
+				{
+					"ParameterName": "OpacityMaskMapWeight"
+				}
+			},
+			{
+				"id": 37,
+				"class": "TextureSampleParameter2D",
+				"name": "MaterialExpressionTextureSampleParameter2D_5",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"ParameterName": "OpacityMaskMap",
+					"Texture": "/Engine/EngineMaterials/BaseFlattenLinearColor.BaseFlattenLinearColor",
+					"SamplerType": "SAMPLERTYPE_LinearColor"
+				}
+			},
+			{
+				"id": 38,
+				"class": "Multiply",
+				"name": "MaterialExpressionMultiply_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 37,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 36,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 39,
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_0"
+			},
+			{
+				"id": 40,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_3",
+				"props":
+				{
+					"DefaultValue": 1,
+					"ParameterName": "Opacity"
+				}
+			},
+			{
+				"id": 41,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_10",
+				"props":
+				{
+					"ParameterName": "OpacityMapWeight"
+				}
+			},
+			{
+				"id": 42,
+				"class": "TextureSampleParameter2D",
+				"name": "MaterialExpressionTextureSampleParameter2D_7",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"ParameterName": "OpacityMap",
+					"Texture": "/Engine/EngineMaterials/BaseFlattenLinearColor.BaseFlattenLinearColor",
+					"SamplerType": "SAMPLERTYPE_LinearColor"
+				}
+			},
+			{
+				"id": 43,
+				"class": "Multiply",
+				"name": "MaterialExpressionMultiply_2",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 42,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 41,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 44,
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_1",
+				"props":
+				{
+					"R": 0.5
+				}
+			},
+			{
+				"id": 45,
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_2"
+			},
+			{
+				"id": 46,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_11",
+				"props":
+				{
+					"ParameterName": "AmbientOcclusionMapWeight"
+				}
+			},
+			{
+				"id": 47,
+				"class": "TextureSampleParameter2D",
+				"name": "MaterialExpressionTextureSampleParameter2D_8",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"ParameterName": "AmbientOcclusionMap",
+					"Texture": "/Engine/EngineMaterials/BaseFlattenLinearColor.BaseFlattenLinearColor",
+					"SamplerType": "SAMPLERTYPE_LinearColor"
+				}
+			},
+			{
+				"id": 48,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_12",
+				"props":
+				{
+					"DefaultValue": 1,
+					"ParameterName": "AmbientOcclusion"
+				}
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_EmissiveColor",
+				"node": 5,
+				"output": 0
+			},
+			{
+				"property": "MP_Opacity",
+				"node": 6,
+				"output": 0
+			},
+			{
+				"property": "MP_OpacityMask",
+				"node": 7,
+				"output": 0
+			},
+			{
+				"property": "MP_BaseColor",
+				"node": 0,
+				"output": 0
+			},
+			{
+				"property": "MP_Metallic",
+				"node": 1,
+				"output": 0
+			},
+			{
+				"property": "MP_Specular",
+				"node": 2,
+				"output": 0
+			},
+			{
+				"property": "MP_Roughness",
+				"node": 3,
+				"output": 0
+			},
+			{
+				"property": "MP_Normal",
+				"node": 4,
+				"output": 0
+			},
+			{
+				"property": "MP_AmbientOcclusion",
+				"node": 8,
+				"output": 0
+			}
+		]
+	},
+	"scalarParams": [
+		{
+			"name": "one",
+			"value": 1
+		},
+		{
+			"name": "DiffuseColorMapWeight",
+			"value": 0
+		},
+		{
+			"name": "SpecularColorMapWeight",
+			"value": 0
+		},
+		{
+			"name": "Shininess",
+			"value": 25
+		},
+		{
+			"name": "NormalMapWeight",
+			"value": 0
+		},
+		{
+			"name": "ShininessMapWeight",
+			"value": 0
+		},
+		{
+			"name": "AmbientColorMapWeight",
+			"value": 0
+		},
+		{
+			"name": "EmissiveColorMapWeight",
+			"value": 0
+		},
+		{
+			"name": "OpacityMaskMapWeight",
+			"value": 0
+		},
+		{
+			"name": "Opacity",
+			"value": 1
+		},
+		{
+			"name": "OpacityMapWeight",
+			"value": 0
+		},
+		{
+			"name": "AmbientOcclusionMapWeight",
+			"value": 0
+		},
+		{
+			"name": "AmbientOcclusion",
+			"value": 1
+		}
+	],
+	"vectorParams": [
+		{
+			"name": "DiffuseColor",
+			"value": "RGBA(0.8, 0.8, 0.8, 1)"
+		},
+		{
+			"name": "SpecularColor",
+			"value": "RGBA(0.2, 0.2, 0.2, 1)"
+		},
+		{
+			"name": "AmbientColor",
+			"value": "RGBA(0, 0, 0, 1)"
+		},
+		{
+			"name": "EmissiveColor",
+			"value": "RGBA(0, 0, 0, 1)"
+		}
+	],
+	"textureParams": [
+		{
+			"name": "NormalMap",
+			"value": "/Engine/EngineMaterials/DefaultNormal.DefaultNormal"
+		},
+		{
+			"name": "DiffuseColorMap",
+			"value": "/Engine/EngineResources/DefaultTexture.DefaultTexture"
+		},
+		{
+			"name": "AmbientColorMap",
+			"value": "/Engine/EngineResources/DefaultTexture.DefaultTexture"
+		},
+		{
+			"name": "SpecularColorMap",
+			"value": "/Engine/EngineResources/DefaultTexture.DefaultTexture"
+		},
+		{
+			"name": "ShininessMap",
+			"value": "/Engine/EngineMaterials/BaseFlattenLinearColor.BaseFlattenLinearColor"
+		},
+		{
+			"name": "EmissiveColorMap",
+			"value": "/Engine/EngineResources/DefaultTexture.DefaultTexture"
+		},
+		{
+			"name": "OpacityMaskMap",
+			"value": "/Engine/EngineMaterials/BaseFlattenLinearColor.BaseFlattenLinearColor"
+		},
+		{
+			"name": "OpacityMap",
+			"value": "/Engine/EngineMaterials/BaseFlattenLinearColor.BaseFlattenLinearColor"
+		},
+		{
+			"name": "AmbientOcclusionMap",
+			"value": "/Engine/EngineMaterials/BaseFlattenLinearColor.BaseFlattenLinearColor"
+		}
+	],
+	"usedTextures": [
+		"/Engine/EngineMaterials/DefaultNormal.DefaultNormal",
+		"/Engine/EngineResources/DefaultTexture.DefaultTexture",
+		"/Engine/EngineMaterials/BaseFlattenLinearColor.BaseFlattenLinearColor"
+	]
+}

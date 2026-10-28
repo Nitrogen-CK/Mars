@@ -1,0 +1,91 @@
+{
+  "cause": "PageTurn_01 rest head is +0.476cm from the spine. Rotating the leaf 180 degrees around that fixed head offsets the left landing by +0.952cm (1.1424cm at runtime scale1.2).",
+  "correction": "Compensate the bend-chain root translation so its rotation is around spine X=0. Applied to both saved Blender sources, reproducible generator, centimetre FBX exporter, and both native turn clips. Fixed mesh and bind skeleton stay compatible.",
+  "gutter_baseline": {
+    "passed": 2,
+    "failed": 2,
+    "exit": 1,
+    "max_error_cm": 0.9520001243799925
+  },
+  "gutter_final": {
+    "passed": 4,
+    "failed": 0,
+    "exit": 0,
+    "max_error_cm": 0.0
+  },
+  "fbx_gate": {
+    "passed": 12,
+    "failed": 0,
+    "exit": 0,
+    "turn_frames_without_page_intersection": 216
+  },
+  "cookbook_gate": {
+    "before": "5/5 in Cookbook-SpeedAndHandoff-Final.log",
+    "after": "5/5, exit0, failed0, skipped0, contaminated0, 1m18s",
+    "log": "Saved/Logs/Cookbook-Gutter-Final.log"
+  },
+  "native_traces": {
+    "03-forward-recipe": {
+      "samples": 68,
+      "first_open_seconds": 1.2182126007974148,
+      "section": 1,
+      "handoff_angle_degrees": 0.0035060424511120427,
+      "handoff_translation_cm": 0.0,
+      "terminal_translation_cm": [
+        -0.47600004076958025,
+        -7.586524001605237e-15,
+        1.0063998699188126
+      ]
+    },
+    "05-forward-notes": {
+      "samples": 75,
+      "first_open_seconds": 1.2094478979706764,
+      "section": 2,
+      "handoff_angle_degrees": 0.016839259682234455,
+      "handoff_translation_cm": 0.0,
+      "terminal_translation_cm": [
+        -0.47600004076958025,
+        -7.586524001605237e-15,
+        1.0063998699188126
+      ]
+    },
+    "07-reverse-recipe": {
+      "samples": 87,
+      "first_open_seconds": 1.2043031975626945,
+      "section": 1,
+      "handoff_angle_degrees": 0.046199159907947714,
+      "handoff_translation_cm": 0.0,
+      "terminal_translation_cm": [
+        0.47546675801277494,
+        4.718447854656915e-15,
+        1.006399869918832
+      ]
+    }
+  },
+  "native_curves": "Both native clips retain all four PageBend curves, each with108 keys. Root rotations differ only by float normalization (max quaternion component delta9.52e-7).",
+  "speed": {
+    "tuner": "GlobalAnimRateScale",
+    "value": 1.5,
+    "file": "Script/Items/Presentation/Mars_CookbookPresentationComponent.as:20",
+    "opening_seconds": 0.5222222222222223,
+    "turn_seconds": 1.1888888888888889
+  },
+  "prior_handoff_fix": "Retain the terminal turn pose instead of resetting to idle: old forward handoff jumped179.993 degrees. This was separate from the offset hinge corrected here.",
+  "images": [
+    "04-after-forward-recipe.png",
+    "06-after-forward-notes.png",
+    "08-after-reverse-recipe.png",
+    "Middle-comparison.png"
+  ],
+  "excluded_evidence": "09-reverse-index / 10-after-reverse-index include concurrent user camera/close input; not used as stable endpoint or matched-view proof.",
+  "limits": [
+    "Raw-event inbox injection does not prove physical keyboard/focus.",
+    "Remote multiplayer and packaged runtime remain unverified."
+  ],
+  "editor_return": {
+    "pie_stopped": true,
+    "world": "/Game/Mars/Maps/Warrens_VariantC_Mars_MAP",
+    "dirty_packages": 0
+  },
+  "git": "Uncommitted and unpushed; unrelated changes preserved."
+}

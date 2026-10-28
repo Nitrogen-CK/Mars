@@ -1,0 +1,79 @@
+{
+	"material": "Cookbook_PageA_M",
+	"packagePath": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_PageA_M",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "2c84f03f541b0aab06bb92a640d2b07b",
+		"exporterVersion": 3
+	},
+	"blendMode": "BLEND_Opaque",
+	"twoSided": false,
+	"unlit": false,
+	"shadingModel": "MSM_DefaultLit",
+	"domain": "MD_Surface",
+	"connectedOutputs": [
+		"BaseColor"
+	],
+	"expressions":
+	{
+		"Constant": 1,
+		"TextureSampleParameter2D": 1
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "TextureSampleParameter2D",
+				"name": "MaterialExpressionTextureSampleParameter2D_0",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"ParameterName": "BC",
+					"Texture": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Textures/Cookbook_Sample_Left_T.Cookbook_Sample_Left_T"
+				}
+			},
+			{
+				"id": 1,
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_0",
+				"props":
+				{
+					"R": 0.86000001430511475
+				}
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_BaseColor",
+				"node": 0,
+				"output": 0,
+				"mask": "rgb"
+			},
+			{
+				"property": "MP_Roughness",
+				"node": 1,
+				"output": 0
+			}
+		]
+	},
+	"scalarParams": [],
+	"vectorParams": [],
+	"textureParams": [
+		{
+			"name": "BC",
+			"value": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Textures/Cookbook_Sample_Left_T.Cookbook_Sample_Left_T"
+		}
+	],
+	"usedTextures": [
+		"/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Textures/Cookbook_Sample_Left_T.Cookbook_Sample_Left_T"
+	]
+}

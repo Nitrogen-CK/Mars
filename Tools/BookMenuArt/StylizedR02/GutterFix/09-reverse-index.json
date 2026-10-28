@@ -1,0 +1,1277 @@
+[
+  {
+    "time": 0.029735799878835678,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 0.06627950072288513,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 0.09978049993515015,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 0.1395696997642517,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 0.1719750016927719,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 0.2070804014801979,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 0.23728880286216736,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 0.26604440063238144,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 0.2940190024673939,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 0.32554690167307854,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 0.3554676026105881,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 0.38375210016965866,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 0.4081711024045944,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 0.4376235008239746,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 0.4676814004778862,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 0.49617649987339973,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 0.5240655019879341,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 0.5532335005700588,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 0.5804524011909962,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 0.6118043027818203,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 0.6386775001883507,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 0.6743927001953125,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 0.7039847001433372,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 0.7328671030700207,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 0.7601586021482944,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 0.7895360998809338,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 0.8191012032330036,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 0.8461023010313511,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 0.8748008012771606,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 0.9048967026174068,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 0.9348479025065899,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 0.9639411009848118,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 0.9909069016575813,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 1.01734010130167,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 1.0440994016826153,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 1.0702784024178982,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 1.097663503140211,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 1.1267950013279915,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 1.154337402433157,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 1.181240402162075,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 1.2048610001802444,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 1.2316872999072075,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 1.2621438018977642,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 1.2896704003214836,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 1.319070503115654,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 1.3486768007278442,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 1.3794883005321026,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 1.4098454006016254,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 1.4393860027194023,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 1.4684504009783268,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 1.497910000383854,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 1.5257355011999607,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 1.5569687001407146,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 1.583067201077938,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 1.6101837009191513,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 1.6383794024586678,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 1.6661000028252602,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 1.6992137022316456,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 1.7274728007614613,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 1.7609839998185635,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 1.7937948033213615,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 1.8218835033476353,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 1.8505817018449306,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 1.8818763010203838,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 1.9139987006783485,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 1.9452578015625477,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 1.9719736017286777,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 2.000941801816225,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 2.032540701329708,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 2.0655029006302357,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 2.09405380114913,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 2.127155501395464,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 2.155101001262665,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 2.1820663027465343,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  },
+  {
+    "time": 2.2069685012102127,
+    "position": 0.0,
+    "state": "<Mars_CookbookState.CLOSED: 0>",
+    "section": 0,
+    "leaf_translation_cm": [
+      0.4760000407695809,
+      -5.3660779523549235e-15,
+      1.0063999891280972
+    ],
+    "leaf_quaternion": [
+      0.0,
+      0.0,
+      0.0,
+      -1.0000000000000002
+    ]
+  }
+]

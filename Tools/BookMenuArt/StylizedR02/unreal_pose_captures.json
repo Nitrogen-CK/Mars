@@ -1,0 +1,163 @@
+[
+  {
+    "label": "Open",
+    "clip": "Cookbook_Open_AS",
+    "explicit_time": 0,
+    "capture": {
+      "success": true,
+      "asset_kind": "anim_blueprint",
+      "asset_path": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Validation/Cookbook_FieldPreview_ABP",
+      "skeleton": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Meshes/SK_Cookbook_Field_Skeleton.SK_Cookbook_Field_Skeleton",
+      "preview_mesh": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Meshes/SK_Cookbook_Field.SK_Cookbook_Field",
+      "live_anim_class": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Validation/Cookbook_FieldPreview_ABP.Cookbook_FieldPreview_ABP_C",
+      "output_dir": "D:/Repositories/CkRepos/Orion/Tools/BookMenuArt/StylizedR02/UnrealPreview/VerifiedOpen",
+      "resolved_output_dir": "D:/Repositories/CkRepos/Orion/Tools/BookMenuArt/StylizedR02/UnrealPreview/VerifiedOpen",
+      "frames": [
+        {
+          "time": 0.01600000075995922,
+          "file": "D:/Repositories/CkRepos/Orion/Tools/BookMenuArt/StylizedR02/UnrealPreview/VerifiedOpen/Open_000_t0.02.png",
+          "success": true
+        }
+      ],
+      "total_capture_time_ms": 114.06210064888
+    }
+  },
+  {
+    "label": "Opening",
+    "clip": "Cookbook_Opening_AS",
+    "explicit_time": 0.4,
+    "capture": {
+      "success": true,
+      "asset_kind": "anim_blueprint",
+      "asset_path": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Validation/Cookbook_FieldPreview_ABP",
+      "skeleton": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Meshes/SK_Cookbook_Field_Skeleton.SK_Cookbook_Field_Skeleton",
+      "preview_mesh": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Meshes/SK_Cookbook_Field.SK_Cookbook_Field",
+      "live_anim_class": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Validation/Cookbook_FieldPreview_ABP.Cookbook_FieldPreview_ABP_C",
+      "output_dir": "D:/Repositories/CkRepos/Orion/Tools/BookMenuArt/StylizedR02/UnrealPreview/VerifiedOpening",
+      "resolved_output_dir": "D:/Repositories/CkRepos/Orion/Tools/BookMenuArt/StylizedR02/UnrealPreview/VerifiedOpening",
+      "frames": [
+        {
+          "time": 0.01600000075995922,
+          "file": "D:/Repositories/CkRepos/Orion/Tools/BookMenuArt/StylizedR02/UnrealPreview/VerifiedOpening/Opening_000_t0.02.png",
+          "success": true
+        }
+      ]
+    },
+    "refreshed_after_cover_arc_correction": "2026-10-23"
+  },
+  {
+    "label": "Closing",
+    "clip": "Cookbook_Closing_AS",
+    "explicit_time": 0.4,
+    "capture": {
+      "success": true,
+      "asset_kind": "anim_blueprint",
+      "asset_path": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Validation/Cookbook_FieldPreview_ABP",
+      "skeleton": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Meshes/SK_Cookbook_Field_Skeleton.SK_Cookbook_Field_Skeleton",
+      "preview_mesh": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Meshes/SK_Cookbook_Field.SK_Cookbook_Field",
+      "live_anim_class": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Validation/Cookbook_FieldPreview_ABP.Cookbook_FieldPreview_ABP_C",
+      "output_dir": "D:/Repositories/CkRepos/Orion/Tools/BookMenuArt/StylizedR02/UnrealPreview/VerifiedClosing",
+      "resolved_output_dir": "D:/Repositories/CkRepos/Orion/Tools/BookMenuArt/StylizedR02/UnrealPreview/VerifiedClosing",
+      "frames": [
+        {
+          "time": 0.01600000075995922,
+          "file": "D:/Repositories/CkRepos/Orion/Tools/BookMenuArt/StylizedR02/UnrealPreview/VerifiedClosing/Closing_000_t0.02.png",
+          "success": true
+        }
+      ]
+    },
+    "refreshed_after_cover_arc_correction": "2026-10-23"
+  },
+  {
+    "label": "TurnEarly",
+    "clip": "Cookbook_TurnForward_AS",
+    "explicit_time": 0.4,
+    "capture": {
+      "success": true,
+      "asset_kind": "anim_blueprint",
+      "asset_path": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Validation/Cookbook_FieldPreview_ABP",
+      "skeleton": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Meshes/SK_Cookbook_Field_Skeleton.SK_Cookbook_Field_Skeleton",
+      "preview_mesh": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Meshes/SK_Cookbook_Field.SK_Cookbook_Field",
+      "live_anim_class": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Validation/Cookbook_FieldPreview_ABP.Cookbook_FieldPreview_ABP_C",
+      "output_dir": "D:/Repositories/CkRepos/Orion/Tools/BookMenuArt/StylizedR02/UnrealPreview/VerifiedTurnEarly",
+      "resolved_output_dir": "D:/Repositories/CkRepos/Orion/Tools/BookMenuArt/StylizedR02/UnrealPreview/VerifiedTurnEarly",
+      "frames": [
+        {
+          "time": 0.01600000075995922,
+          "file": "D:/Repositories/CkRepos/Orion/Tools/BookMenuArt/StylizedR02/UnrealPreview/VerifiedTurnEarly/TurnEarly_000_t0.02.png",
+          "success": true
+        }
+      ],
+      "total_capture_time_ms": 128.00069898366928
+    }
+  },
+  {
+    "label": "TurnMid",
+    "clip": "Cookbook_TurnForward_AS",
+    "explicit_time": 0.9,
+    "capture": {
+      "success": true,
+      "asset_kind": "anim_blueprint",
+      "asset_path": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Validation/Cookbook_FieldPreview_ABP",
+      "skeleton": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Meshes/SK_Cookbook_Field_Skeleton.SK_Cookbook_Field_Skeleton",
+      "preview_mesh": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Meshes/SK_Cookbook_Field.SK_Cookbook_Field",
+      "live_anim_class": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Validation/Cookbook_FieldPreview_ABP.Cookbook_FieldPreview_ABP_C",
+      "output_dir": "D:/Repositories/CkRepos/Orion/Tools/BookMenuArt/StylizedR02/UnrealPreview/VerifiedTurnMid",
+      "resolved_output_dir": "D:/Repositories/CkRepos/Orion/Tools/BookMenuArt/StylizedR02/UnrealPreview/VerifiedTurnMid",
+      "frames": [
+        {
+          "time": 0.01600000075995922,
+          "file": "D:/Repositories/CkRepos/Orion/Tools/BookMenuArt/StylizedR02/UnrealPreview/VerifiedTurnMid/TurnMid_000_t0.02.png",
+          "success": true
+        }
+      ],
+      "total_capture_time_ms": 121.8079999089241
+    }
+  },
+  {
+    "label": "TurnLate",
+    "clip": "Cookbook_TurnForward_AS",
+    "explicit_time": 1.4,
+    "capture": {
+      "success": true,
+      "asset_kind": "anim_blueprint",
+      "asset_path": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Validation/Cookbook_FieldPreview_ABP",
+      "skeleton": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Meshes/SK_Cookbook_Field_Skeleton.SK_Cookbook_Field_Skeleton",
+      "preview_mesh": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Meshes/SK_Cookbook_Field.SK_Cookbook_Field",
+      "live_anim_class": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Validation/Cookbook_FieldPreview_ABP.Cookbook_FieldPreview_ABP_C",
+      "output_dir": "D:/Repositories/CkRepos/Orion/Tools/BookMenuArt/StylizedR02/UnrealPreview/VerifiedTurnLate",
+      "resolved_output_dir": "D:/Repositories/CkRepos/Orion/Tools/BookMenuArt/StylizedR02/UnrealPreview/VerifiedTurnLate",
+      "frames": [
+        {
+          "time": 0.01600000075995922,
+          "file": "D:/Repositories/CkRepos/Orion/Tools/BookMenuArt/StylizedR02/UnrealPreview/VerifiedTurnLate/TurnLate_000_t0.02.png",
+          "success": true
+        }
+      ],
+      "total_capture_time_ms": 122.40839749574661
+    }
+  },
+  {
+    "label": "TurnReverse",
+    "clip": "Cookbook_TurnReverse_AS",
+    "explicit_time": 0.9,
+    "capture": {
+      "success": true,
+      "asset_kind": "anim_blueprint",
+      "asset_path": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Validation/Cookbook_FieldPreview_ABP",
+      "skeleton": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Meshes/SK_Cookbook_Field_Skeleton.SK_Cookbook_Field_Skeleton",
+      "preview_mesh": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Meshes/SK_Cookbook_Field.SK_Cookbook_Field",
+      "live_anim_class": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Validation/Cookbook_FieldPreview_ABP.Cookbook_FieldPreview_ABP_C",
+      "output_dir": "D:/Repositories/CkRepos/Orion/Tools/BookMenuArt/StylizedR02/UnrealPreview/VerifiedTurnReverse",
+      "resolved_output_dir": "D:/Repositories/CkRepos/Orion/Tools/BookMenuArt/StylizedR02/UnrealPreview/VerifiedTurnReverse",
+      "frames": [
+        {
+          "time": 0.01600000075995922,
+          "file": "D:/Repositories/CkRepos/Orion/Tools/BookMenuArt/StylizedR02/UnrealPreview/VerifiedTurnReverse/TurnReverse_000_t0.02.png",
+          "success": true
+        }
+      ],
+      "total_capture_time_ms": 123.64070117473602
+    }
+  }
+]

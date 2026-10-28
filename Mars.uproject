@@ -279,6 +279,10 @@
 		{
 			"Name": "RiderSourceCodeAccess",
 			"Enabled": false
+		},
+		{
+			"Name": "BookMenu",
+			"Enabled": true
 		}
 	]
 }
