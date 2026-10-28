@@ -61,6 +61,7 @@ class UMars_Sandbox_FlameLight_EntityScript : UMars_LightFixture_EntityScript
     UFUNCTION(BlueprintOverride)
     ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
     {
+        Sink.InputChannels.Empty();
         Sink.InputChannels.Add(utils_flame_fixture::Get_SandboxChannel());
         Sink.Rule = EMars_MechanismSink_Rule::AllSources;
         return Super::DoConstruct(InHandle);
