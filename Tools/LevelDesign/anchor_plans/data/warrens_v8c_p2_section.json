@@ -1,0 +1,1660 @@
+{
+ "id": "P2_SlidingSpan",
+ "basis_sha256": "a2397c64ddbee04f615ed0079c29345a66698645f809427722714411deb9afa7",
+ "splits": [
+  {
+   "source": {
+    "index": 2320,
+    "source_group_index": 0,
+    "kind": "wall",
+    "centre": [
+     78.25,
+     12.75,
+     2.1
+    ],
+    "size": [
+     0.5,
+     21.5,
+     5.0
+    ],
+    "yaw": 0.0,
+    "pitch": 0.0,
+    "tile": "Canal"
+   },
+   "replacements": [
+    {
+     "index": 2320,
+     "source_group_index": 0,
+     "kind": "wall",
+     "centre": [
+      78.25,
+      10.325,
+      2.0999999999999996
+     ],
+     "size": [
+      0.5,
+      16.65,
+      5.0
+     ],
+     "yaw": 0.0,
+     "pitch": 0.0,
+     "tile": "Canal"
+    },
+    {
+     "index": 2320,
+     "source_group_index": 0,
+     "kind": "wall",
+     "centre": [
+      78.25,
+      22.425,
+      2.0999999999999996
+     ],
+     "size": [
+      0.5,
+      2.1499999999999986,
+      5.0
+     ],
+     "yaw": 0.0,
+     "pitch": 0.0,
+     "tile": "Canal"
+    },
+    {
+     "index": 2320,
+     "source_group_index": 0,
+     "kind": "wall",
+     "centre": [
+      78.25,
+      20.0,
+      3.3499999999999996
+     ],
+     "size": [
+      0.5,
+      2.700000000000003,
+      2.5
+     ],
+     "yaw": 0.0,
+     "pitch": 0.0,
+     "tile": "Canal"
+    }
+   ]
+  },
+  {
+   "source": {
+    "index": 2328,
+    "source_group_index": 2,
+    "kind": "wall",
+    "centre": [
+     87.0,
+     15.25,
+     2.1
+    ],
+    "size": [
+     17.0,
+     14.5,
+     5.0
+    ],
+    "yaw": 0.0,
+    "pitch": 0.0,
+    "tile": "Canal"
+   },
+   "replacements": [
+    {
+     "index": 2328,
+     "source_group_index": 2,
+     "kind": "wall",
+     "centre": [
+      87.0,
+      13.325,
+      2.0999999999999996
+     ],
+     "size": [
+      17.0,
+      10.649999999999999,
+      5.0
+     ],
+     "yaw": 0.0,
+     "pitch": 0.0,
+     "tile": "Canal"
+    },
+    {
+     "index": 2328,
+     "source_group_index": 2,
+     "kind": "wall",
+     "centre": [
+      87.0,
+      21.925,
+      2.0999999999999996
+     ],
+     "size": [
+      17.0,
+      1.1499999999999986,
+      5.0
+     ],
+     "yaw": 0.0,
+     "pitch": 0.0,
+     "tile": "Canal"
+    },
+    {
+     "index": 2328,
+     "source_group_index": 2,
+     "kind": "wall",
+     "centre": [
+      87.0,
+      20.0,
+      3.3499999999999996
+     ],
+     "size": [
+      17.0,
+      2.700000000000003,
+      2.5
+     ],
+     "yaw": 0.0,
+     "pitch": 0.0,
+     "tile": "Canal"
+    }
+   ]
+  },
+  {
+   "source": {
+    "index": 2336,
+    "source_group_index": 3,
+    "kind": "wall",
+    "centre": [
+     77.75,
+     18.25,
+     2.1
+    ],
+    "size": [
+     0.5,
+     8.5,
+     5.0
+    ],
+    "yaw": 0.0,
+    "pitch": 0.0,
+    "tile": "Canal"
+   },
+   "replacements": [
+    {
+     "index": 2336,
+     "source_group_index": 3,
+     "kind": "wall",
+     "centre": [
+      77.75,
+      16.325,
+      2.0999999999999996
+     ],
+     "size": [
+      0.5,
+      4.649999999999999,
+      5.0
+     ],
+     "yaw": 0.0,
+     "pitch": 0.0,
+     "tile": "Canal"
+    },
+    {
+     "index": 2336,
+     "source_group_index": 3,
+     "kind": "wall",
+     "centre": [
+      77.75,
+      21.925,
+      2.0999999999999996
+     ],
+     "size": [
+      0.5,
+      1.1499999999999986,
+      5.0
+     ],
+     "yaw": 0.0,
+     "pitch": 0.0,
+     "tile": "Canal"
+    },
+    {
+     "index": 2336,
+     "source_group_index": 3,
+     "kind": "wall",
+     "centre": [
+      77.75,
+      20.0,
+      3.3499999999999996
+     ],
+     "size": [
+      0.5,
+      2.700000000000003,
+      2.5
+     ],
+     "yaw": 0.0,
+     "pitch": 0.0,
+     "tile": "Canal"
+    }
+   ]
+  },
+  {
+   "source": {
+    "index": 2343,
+    "source_group_index": 4,
+    "kind": "wall",
+    "centre": [
+     67.5,
+     21.0,
+     2.1
+    ],
+    "size": [
+     2.0,
+     6.0,
+     5.0
+    ],
+    "yaw": 0.0,
+    "pitch": 0.0,
+    "tile": "Waterworks-W"
+   },
+   "replacements": [
+    {
+     "index": 2343,
+     "source_group_index": 4,
+     "kind": "wall",
+     "centre": [
+      67.925,
+      18.325,
+      2.0999999999999996
+     ],
+     "size": [
+      1.1500000000000057,
+      0.6499999999999986,
+      5.0
+     ],
+     "yaw": 0.0,
+     "pitch": 0.0,
+     "tile": "Waterworks-W"
+    },
+    {
+     "index": 2343,
+     "source_group_index": 4,
+     "kind": "wall",
+     "centre": [
+      67.925,
+      22.675,
+      2.0999999999999996
+     ],
+     "size": [
+      1.1500000000000057,
+      2.6499999999999986,
+      5.0
+     ],
+     "yaw": 0.0,
+     "pitch": 0.0,
+     "tile": "Waterworks-W"
+    },
+    {
+     "index": 2343,
+     "source_group_index": 4,
+     "kind": "wall",
+     "centre": [
+      67.925,
+      20.0,
+      3.3499999999999996
+     ],
+     "size": [
+      1.1500000000000057,
+      2.700000000000003,
+      2.5
+     ],
+     "yaw": 0.0,
+     "pitch": 0.0,
+     "tile": "Waterworks-W"
+    },
+    {
+     "index": 2343,
+     "source_group_index": 4,
+     "kind": "wall",
+     "centre": [
+      66.925,
+      18.325,
+      2.0999999999999996
+     ],
+     "size": [
+      0.8499999999999943,
+      0.6499999999999986,
+      5.0
+     ],
+     "yaw": 0.0,
+     "pitch": 0.0,
+     "tile": "Waterworks-W"
+    },
+    {
+     "index": 2343,
+     "source_group_index": 4,
+     "kind": "wall",
+     "centre": [
+      66.925,
+      21.325,
+      3.3499999999999996
+     ],
+     "size": [
+      0.8499999999999943,
+      5.350000000000001,
+      2.5
+     ],
+     "yaw": 0.0,
+     "pitch": 0.0,
+     "tile": "Waterworks-W"
+    }
+   ]
+  },
+  {
+   "source": {
+    "index": 2346,
+    "source_group_index": 5,
+    "kind": "wall",
+    "centre": [
+     68.75,
+     21.25,
+     2.1
+    ],
+    "size": [
+     0.5,
+     5.5,
+     5.0
+    ],
+    "yaw": 0.0,
+    "pitch": 0.0,
+    "tile": "Waterworks-W"
+   },
+   "replacements": [
+    {
+     "index": 2346,
+     "source_group_index": 5,
+     "kind": "wall",
+     "centre": [
+      68.75,
+      18.575,
+      2.0999999999999996
+     ],
+     "size": [
+      0.5,
+      0.14999999999999858,
+      5.0
+     ],
+     "yaw": 0.0,
+     "pitch": 0.0,
+     "tile": "Waterworks-W"
+    },
+    {
+     "index": 2346,
+     "source_group_index": 5,
+     "kind": "wall",
+     "centre": [
+      68.75,
+      22.675,
+      2.0999999999999996
+     ],
+     "size": [
+      0.5,
+      2.6499999999999986,
+      5.0
+     ],
+     "yaw": 0.0,
+     "pitch": 0.0,
+     "tile": "Waterworks-W"
+    },
+    {
+     "index": 2346,
+     "source_group_index": 5,
+     "kind": "wall",
+     "centre": [
+      68.75,
+      20.0,
+      3.3499999999999996
+     ],
+     "size": [
+      0.5,
+      2.700000000000003,
+      2.5
+     ],
+     "yaw": 0.0,
+     "pitch": 0.0,
+     "tile": "Waterworks-W"
+    }
+   ]
+  },
+  {
+   "source": {
+    "index": 3102,
+    "source_group_index": 96,
+    "kind": "wall",
+    "centre": [
+     77.25,
+     18.25,
+     -0.15
+    ],
+    "size": [
+     0.5,
+     8.5,
+     9.5
+    ],
+    "yaw": 0.0,
+    "pitch": 0.0,
+    "tile": "Canal"
+   },
+   "replacements": [
+    {
+     "index": 3102,
+     "source_group_index": 96,
+     "kind": "wall",
+     "centre": [
+      77.25,
+      16.325,
+      -0.15000000000000036
+     ],
+     "size": [
+      0.5,
+      4.649999999999999,
+      9.5
+     ],
+     "yaw": 0.0,
+     "pitch": 0.0,
+     "tile": "Canal"
+    },
+    {
+     "index": 3102,
+     "source_group_index": 96,
+     "kind": "wall",
+     "centre": [
+      77.25,
+      21.925,
+      -0.15000000000000036
+     ],
+     "size": [
+      0.5,
+      1.1499999999999986,
+      9.5
+     ],
+     "yaw": 0.0,
+     "pitch": 0.0,
+     "tile": "Canal"
+    },
+    {
+     "index": 3102,
+     "source_group_index": 96,
+     "kind": "wall",
+     "centre": [
+      77.25,
+      20.0,
+      -3.7
+     ],
+     "size": [
+      0.5,
+      2.700000000000003,
+      2.4000000000000004
+     ],
+     "yaw": 0.0,
+     "pitch": 0.0,
+     "tile": "Canal"
+    },
+    {
+     "index": 3102,
+     "source_group_index": 96,
+     "kind": "wall",
+     "centre": [
+      77.25,
+      20.0,
+      3.3499999999999996
+     ],
+     "size": [
+      0.5,
+      2.700000000000003,
+      2.5
+     ],
+     "yaw": 0.0,
+     "pitch": 0.0,
+     "tile": "Canal"
+    }
+   ]
+  },
+  {
+   "source": {
+    "index": 3103,
+    "source_group_index": 74,
+    "kind": "wall",
+    "centre": [
+     69.25,
+     21.0,
+     -0.15
+    ],
+    "size": [
+     0.5,
+     5.0,
+     9.5
+    ],
+    "yaw": 0.0,
+    "pitch": 0.0,
+    "tile": "Waterworks-W"
+   },
+   "replacements": [
+    {
+     "index": 3103,
+     "source_group_index": 74,
+     "kind": "wall",
+     "centre": [
+      69.25,
+      18.575,
+      -0.15000000000000036
+     ],
+     "size": [
+      0.5,
+      0.14999999999999858,
+      9.5
+     ],
+     "yaw": 0.0,
+     "pitch": 0.0,
+     "tile": "Waterworks-W"
+    },
+    {
+     "index": 3103,
+     "source_group_index": 74,
+     "kind": "wall",
+     "centre": [
+      69.25,
+      22.425,
+      -0.15000000000000036
+     ],
+     "size": [
+      0.5,
+      2.1499999999999986,
+      9.5
+     ],
+     "yaw": 0.0,
+     "pitch": 0.0,
+     "tile": "Waterworks-W"
+    },
+    {
+     "index": 3103,
+     "source_group_index": 74,
+     "kind": "wall",
+     "centre": [
+      69.25,
+      20.0,
+      -3.7
+     ],
+     "size": [
+      0.5,
+      2.700000000000003,
+      2.4000000000000004
+     ],
+     "yaw": 0.0,
+     "pitch": 0.0,
+     "tile": "Waterworks-W"
+    },
+    {
+     "index": 3103,
+     "source_group_index": 74,
+     "kind": "wall",
+     "centre": [
+      69.25,
+      20.0,
+      3.3499999999999996
+     ],
+     "size": [
+      0.5,
+      2.700000000000003,
+      2.5
+     ],
+     "yaw": 0.0,
+     "pitch": 0.0,
+     "tile": "Waterworks-W"
+    }
+   ]
+  },
+  {
+   "source": {
+    "index": 3151,
+    "source_group_index": 72,
+    "kind": "wall",
+    "centre": [
+     95.75,
+     15.5,
+     0.85
+    ],
+    "size": [
+     0.5,
+     15.0,
+     7.5
+    ],
+    "yaw": 0.0,
+    "pitch": 0.0,
+    "tile": "Brineworks"
+   },
+   "replacements": [
+    {
+     "index": 3151,
+     "source_group_index": 72,
+     "kind": "wall",
+     "centre": [
+      95.75,
+      13.325,
+      0.8499999999999999
+     ],
+     "size": [
+      0.5,
+      10.649999999999999,
+      7.5
+     ],
+     "yaw": 0.0,
+     "pitch": 0.0,
+     "tile": "Brineworks"
+    },
+    {
+     "index": 3151,
+     "source_group_index": 72,
+     "kind": "wall",
+     "centre": [
+      95.75,
+      22.175,
+      0.8499999999999999
+     ],
+     "size": [
+      0.5,
+      1.6499999999999986,
+      7.5
+     ],
+     "yaw": 0.0,
+     "pitch": 0.0,
+     "tile": "Brineworks"
+    },
+    {
+     "index": 3151,
+     "source_group_index": 72,
+     "kind": "wall",
+     "centre": [
+      95.75,
+      20.0,
+      -2.7
+     ],
+     "size": [
+      0.5,
+      2.700000000000003,
+      0.3999999999999999
+     ],
+     "yaw": 0.0,
+     "pitch": 0.0,
+     "tile": "Brineworks"
+    },
+    {
+     "index": 3151,
+     "source_group_index": 72,
+     "kind": "wall",
+     "centre": [
+      95.75,
+      20.0,
+      3.3499999999999996
+     ],
+     "size": [
+      0.5,
+      2.700000000000003,
+      2.5
+     ],
+     "yaw": 0.0,
+     "pitch": 0.0,
+     "tile": "Brineworks"
+    }
+   ]
+  },
+  {
+   "source": {
+    "index": 3167,
+    "source_group_index": 82,
+    "kind": "wall",
+    "centre": [
+     66.25,
+     21.25,
+     0.85
+    ],
+    "size": [
+     0.5,
+     6.5,
+     7.5
+    ],
+    "yaw": 0.0,
+    "pitch": 0.0,
+    "tile": "Waterworks-W"
+   },
+   "replacements": [
+    {
+     "index": 3167,
+     "source_group_index": 82,
+     "kind": "wall",
+     "centre": [
+      66.25,
+      18.325,
+      0.8499999999999999
+     ],
+     "size": [
+      0.5,
+      0.6499999999999986,
+      7.5
+     ],
+     "yaw": 0.0,
+     "pitch": 0.0,
+     "tile": "Waterworks-W"
+    },
+    {
+     "index": 3167,
+     "source_group_index": 82,
+     "kind": "wall",
+     "centre": [
+      66.25,
+      21.575,
+      -2.7
+     ],
+     "size": [
+      0.5,
+      5.850000000000001,
+      0.3999999999999999
+     ],
+     "yaw": 0.0,
+     "pitch": 0.0,
+     "tile": "Waterworks-W"
+    },
+    {
+     "index": 3167,
+     "source_group_index": 82,
+     "kind": "wall",
+     "centre": [
+      66.25,
+      21.575,
+      3.3499999999999996
+     ],
+     "size": [
+      0.5,
+      5.850000000000001,
+      2.5
+     ],
+     "yaw": 0.0,
+     "pitch": 0.0,
+     "tile": "Waterworks-W"
+    }
+   ]
+  },
+  {
+   "source": {
+    "index": 3183,
+    "source_group_index": 85,
+    "kind": "wall",
+    "centre": [
+     68.0,
+     24.25,
+     0.85
+    ],
+    "size": [
+     3.0,
+     0.5,
+     7.5
+    ],
+    "yaw": 0.0,
+    "pitch": 0.0,
+    "tile": "Waterworks-W"
+   },
+   "replacements": [
+    {
+     "index": 3183,
+     "source_group_index": 85,
+     "kind": "wall",
+     "centre": [
+      68.425,
+      24.25,
+      0.8499999999999999
+     ],
+     "size": [
+      2.1500000000000057,
+      0.5,
+      7.5
+     ],
+     "yaw": 0.0,
+     "pitch": 0.0,
+     "tile": "Waterworks-W"
+    },
+    {
+     "index": 3183,
+     "source_group_index": 85,
+     "kind": "wall",
+     "centre": [
+      66.925,
+      24.25,
+      -2.7
+     ],
+     "size": [
+      0.8499999999999943,
+      0.5,
+      0.3999999999999999
+     ],
+     "yaw": 0.0,
+     "pitch": 0.0,
+     "tile": "Waterworks-W"
+    },
+    {
+     "index": 3183,
+     "source_group_index": 85,
+     "kind": "wall",
+     "centre": [
+      66.925,
+      24.25,
+      3.3499999999999996
+     ],
+     "size": [
+      0.8499999999999943,
+      0.5,
+      2.5
+     ],
+     "yaw": 0.0,
+     "pitch": 0.0,
+     "tile": "Waterworks-W"
+    }
+   ]
+  },
+  {
+   "source": {
+    "index": 3199,
+    "source_group_index": 91,
+    "kind": "wall",
+    "centre": [
+     68.25,
+     27.5,
+     0.85
+    ],
+    "size": [
+     2.5,
+     1.0,
+     7.5
+    ],
+    "yaw": 0.0,
+    "pitch": 0.0,
+    "tile": "Waterworks-W"
+   },
+   "replacements": [
+    {
+     "index": 3199,
+     "source_group_index": 91,
+     "kind": "wall",
+     "centre": [
+      68.425,
+      27.5,
+      0.8499999999999999
+     ],
+     "size": [
+      2.1500000000000057,
+      1.0,
+      7.5
+     ],
+     "yaw": 0.0,
+     "pitch": 0.0,
+     "tile": "Waterworks-W"
+    },
+    {
+     "index": 3199,
+     "source_group_index": 91,
+     "kind": "wall",
+     "centre": [
+      67.175,
+      27.675,
+      0.8499999999999999
+     ],
+     "size": [
+      0.3499999999999943,
+      0.6499999999999986,
+      7.5
+     ],
+     "yaw": 0.0,
+     "pitch": 0.0,
+     "tile": "Waterworks-W"
+    },
+    {
+     "index": 3199,
+     "source_group_index": 91,
+     "kind": "wall",
+     "centre": [
+      67.175,
+      27.175,
+      -2.7
+     ],
+     "size": [
+      0.3499999999999943,
+      0.3500000000000014,
+      0.3999999999999999
+     ],
+     "yaw": 0.0,
+     "pitch": 0.0,
+     "tile": "Waterworks-W"
+    },
+    {
+     "index": 3199,
+     "source_group_index": 91,
+     "kind": "wall",
+     "centre": [
+      67.175,
+      27.175,
+      3.3499999999999996
+     ],
+     "size": [
+      0.3499999999999943,
+      0.3500000000000014,
+      2.5
+     ],
+     "yaw": 0.0,
+     "pitch": 0.0,
+     "tile": "Waterworks-W"
+    }
+   ]
+  },
+  {
+   "source": {
+    "index": 6205,
+    "source_group_index": 246,
+    "kind": "wall",
+    "centre": [
+     86.5,
+     18.5,
+     -2.9
+    ],
+    "size": [
+     18.0,
+     5.0,
+     5.0
+    ],
+    "yaw": 0.0,
+    "pitch": 0.0,
+    "tile": "Canal"
+   },
+   "replacements": [
+    {
+     "index": 6205,
+     "source_group_index": 246,
+     "kind": "wall",
+     "centre": [
+      86.5,
+      17.325,
+      -2.9000000000000004
+     ],
+     "size": [
+      18.0,
+      2.6499999999999986,
+      5.0
+     ],
+     "yaw": 0.0,
+     "pitch": 0.0,
+     "tile": "Canal"
+    },
+    {
+     "index": 6205,
+     "source_group_index": 246,
+     "kind": "wall",
+     "centre": [
+      86.5,
+      19.825,
+      -3.95
+     ],
+     "size": [
+      18.0,
+      2.3500000000000014,
+      2.9000000000000004
+     ],
+     "yaw": 0.0,
+     "pitch": 0.0,
+     "tile": "Canal"
+    }
+   ]
+  },
+  {
+   "source": {
+    "index": 6211,
+    "source_group_index": 661,
+    "kind": "wall",
+    "centre": [
+     67.5,
+     21.0,
+     -2.9
+    ],
+    "size": [
+     2.0,
+     6.0,
+     5.0
+    ],
+    "yaw": 0.0,
+    "pitch": 0.0,
+    "tile": "Waterworks-W"
+   },
+   "replacements": [
+    {
+     "index": 6211,
+     "source_group_index": 661,
+     "kind": "wall",
+     "centre": [
+      67.925,
+      18.325,
+      -2.9000000000000004
+     ],
+     "size": [
+      1.1500000000000057,
+      0.6499999999999986,
+      5.0
+     ],
+     "yaw": 0.0,
+     "pitch": 0.0,
+     "tile": "Waterworks-W"
+    },
+    {
+     "index": 6211,
+     "source_group_index": 661,
+     "kind": "wall",
+     "centre": [
+      67.925,
+      22.675,
+      -2.9000000000000004
+     ],
+     "size": [
+      1.1500000000000057,
+      2.6499999999999986,
+      5.0
+     ],
+     "yaw": 0.0,
+     "pitch": 0.0,
+     "tile": "Waterworks-W"
+    },
+    {
+     "index": 6211,
+     "source_group_index": 661,
+     "kind": "wall",
+     "centre": [
+      67.925,
+      20.0,
+      -3.95
+     ],
+     "size": [
+      1.1500000000000057,
+      2.700000000000003,
+      2.9000000000000004
+     ],
+     "yaw": 0.0,
+     "pitch": 0.0,
+     "tile": "Waterworks-W"
+    },
+    {
+     "index": 6211,
+     "source_group_index": 661,
+     "kind": "wall",
+     "centre": [
+      66.925,
+      18.325,
+      -2.9000000000000004
+     ],
+     "size": [
+      0.8499999999999943,
+      0.6499999999999986,
+      5.0
+     ],
+     "yaw": 0.0,
+     "pitch": 0.0,
+     "tile": "Waterworks-W"
+    },
+    {
+     "index": 6211,
+     "source_group_index": 661,
+     "kind": "wall",
+     "centre": [
+      66.925,
+      21.325,
+      -3.95
+     ],
+     "size": [
+      0.8499999999999943,
+      5.350000000000001,
+      2.9000000000000004
+     ],
+     "yaw": 0.0,
+     "pitch": 0.0,
+     "tile": "Waterworks-W"
+    }
+   ]
+  },
+  {
+   "source": {
+    "index": 6213,
+    "source_group_index": 662,
+    "kind": "wall",
+    "centre": [
+     68.75,
+     21.25,
+     -2.9
+    ],
+    "size": [
+     0.5,
+     5.5,
+     5.0
+    ],
+    "yaw": 0.0,
+    "pitch": 0.0,
+    "tile": "Waterworks-W"
+   },
+   "replacements": [
+    {
+     "index": 6213,
+     "source_group_index": 662,
+     "kind": "wall",
+     "centre": [
+      68.75,
+      18.575,
+      -2.9000000000000004
+     ],
+     "size": [
+      0.5,
+      0.14999999999999858,
+      5.0
+     ],
+     "yaw": 0.0,
+     "pitch": 0.0,
+     "tile": "Waterworks-W"
+    },
+    {
+     "index": 6213,
+     "source_group_index": 662,
+     "kind": "wall",
+     "centre": [
+      68.75,
+      22.675,
+      -2.9000000000000004
+     ],
+     "size": [
+      0.5,
+      2.6499999999999986,
+      5.0
+     ],
+     "yaw": 0.0,
+     "pitch": 0.0,
+     "tile": "Waterworks-W"
+    },
+    {
+     "index": 6213,
+     "source_group_index": 662,
+     "kind": "wall",
+     "centre": [
+      68.75,
+      20.0,
+      -3.95
+     ],
+     "size": [
+      0.5,
+      2.700000000000003,
+      2.9000000000000004
+     ],
+     "yaw": 0.0,
+     "pitch": 0.0,
+     "tile": "Waterworks-W"
+    }
+   ]
+  },
+  {
+   "source": {
+    "index": 6221,
+    "source_group_index": 247,
+    "kind": "wall",
+    "centre": [
+     83.75,
+     21.25,
+     -2.9
+    ],
+    "size": [
+     12.5,
+     0.5,
+     5.0
+    ],
+    "yaw": 0.0,
+    "pitch": 0.0,
+    "tile": "Canal"
+   },
+   "replacements": [
+    {
+     "index": 6221,
+     "source_group_index": 247,
+     "kind": "wall",
+     "centre": [
+      83.75,
+      21.425,
+      -2.9000000000000004
+     ],
+     "size": [
+      12.5,
+      0.14999999999999858,
+      5.0
+     ],
+     "yaw": 0.0,
+     "pitch": 0.0,
+     "tile": "Canal"
+    },
+    {
+     "index": 6221,
+     "source_group_index": 247,
+     "kind": "wall",
+     "centre": [
+      83.75,
+      21.175,
+      -3.95
+     ],
+     "size": [
+      12.5,
+      0.3500000000000014,
+      2.9000000000000004
+     ],
+     "yaw": 0.0,
+     "pitch": 0.0,
+     "tile": "Canal"
+    }
+   ]
+  },
+  {
+   "source": {
+    "index": 6222,
+    "source_group_index": 325,
+    "kind": "wall",
+    "centre": [
+     94.5,
+     21.25,
+     -2.9
+    ],
+    "size": [
+     2.0,
+     0.5,
+     5.0
+    ],
+    "yaw": 0.0,
+    "pitch": 0.0,
+    "tile": "Brineworks"
+   },
+   "replacements": [
+    {
+     "index": 6222,
+     "source_group_index": 325,
+     "kind": "wall",
+     "centre": [
+      94.5,
+      21.425,
+      -2.9000000000000004
+     ],
+     "size": [
+      2.0,
+      0.14999999999999858,
+      5.0
+     ],
+     "yaw": 0.0,
+     "pitch": 0.0,
+     "tile": "Brineworks"
+    },
+    {
+     "index": 6222,
+     "source_group_index": 325,
+     "kind": "wall",
+     "centre": [
+      94.5,
+      21.175,
+      -3.95
+     ],
+     "size": [
+      2.0,
+      0.3500000000000014,
+      2.9000000000000004
+     ],
+     "yaw": 0.0,
+     "pitch": 0.0,
+     "tile": "Brineworks"
+    }
+   ]
+  },
+  {
+   "source": {
+    "index": 7376,
+    "source_group_index": 491,
+    "kind": "wall",
+    "centre": [
+     91.75,
+     21.75,
+     -1.6
+    ],
+    "size": [
+     3.5,
+     1.5,
+     2.4
+    ],
+    "yaw": 0.0,
+    "pitch": 0.0,
+    "tile": "Brineworks"
+   },
+   "replacements": [
+    {
+     "index": 7376,
+     "source_group_index": 491,
+     "kind": "wall",
+     "centre": [
+      91.75,
+      21.925,
+      -1.6
+     ],
+     "size": [
+      3.5,
+      1.1499999999999986,
+      2.3999999999999995
+     ],
+     "yaw": 0.0,
+     "pitch": 0.0,
+     "tile": "Brineworks"
+    },
+    {
+     "index": 7376,
+     "source_group_index": 491,
+     "kind": "wall",
+     "centre": [
+      91.75,
+      21.175,
+      -2.65
+     ],
+     "size": [
+      3.5,
+      0.3500000000000014,
+      0.2999999999999998
+     ],
+     "yaw": 0.0,
+     "pitch": 0.0,
+     "tile": "Brineworks"
+    }
+   ]
+  }
+ ],
+ "removed_boxes": [
+  {
+   "kind": "ramp",
+   "centre": [
+    81.0,
+    25.0,
+    -2.7
+   ],
+   "size": [
+    30.0666,
+    2.5,
+    0.4
+   ],
+   "yaw": 176.1859,
+   "pitch": 0.0,
+   "tile": "Canal"
+  }
+ ],
+ "added_boxes": [
+  {
+   "name": "west_dogleg_floor",
+   "kind": "floor",
+   "centre": [
+    66,
+    23,
+    -2.7
+   ],
+   "size": [
+    2.7,
+    8.7,
+    0.4
+   ],
+   "yaw": 0,
+   "pitch": 0
+  },
+  {
+   "name": "west_landing_floor",
+   "kind": "floor",
+   "centre": [
+    67.5,
+    20,
+    -2.7
+   ],
+   "size": [
+    3,
+    2.7,
+    0.4
+   ],
+   "yaw": 0,
+   "pitch": 0
+  },
+  {
+   "name": "east_approach_floor",
+   "kind": "floor",
+   "centre": [
+    86.75,
+    20,
+    -2.7
+   ],
+   "size": [
+    18.5,
+    2.7,
+    0.4
+   ],
+   "yaw": 0,
+   "pitch": 0
+  },
+  {
+   "name": "obsolete_roof_west_masonry",
+   "kind": "wall",
+   "centre": [
+    68.8,
+    25.75,
+    -0.3
+   ],
+   "size": [
+    0.4,
+    3.5,
+    4.8
+   ],
+   "yaw": 0,
+   "pitch": 0
+  },
+  {
+   "name": "obsolete_roof_east_masonry",
+   "kind": "wall",
+   "centre": [
+    80,
+    25.25,
+    -0.3
+   ],
+   "size": [
+    0.4,
+    3.5,
+    4.8
+   ],
+   "yaw": 0,
+   "pitch": 0
+  },
+  {
+   "name": "east_corridor_side",
+   "kind": "wall",
+   "centre": [
+    86.75,
+    18.525,
+    -0.2
+   ],
+   "size": [
+    18.5,
+    0.25,
+    4.6
+   ],
+   "yaw": 0,
+   "pitch": 0
+  },
+  {
+   "name": "east_corridor_side",
+   "kind": "wall",
+   "centre": [
+    86.75,
+    21.475,
+    -0.2
+   ],
+   "size": [
+    18.5,
+    0.25,
+    4.6
+   ],
+   "yaw": 0,
+   "pitch": 0
+  },
+  {
+   "name": "west_landing_south",
+   "kind": "wall",
+   "centre": [
+    67.5,
+    18.525,
+    -0.2
+   ],
+   "size": [
+    3,
+    0.25,
+    4.6
+   ],
+   "yaw": 0,
+   "pitch": 0
+  },
+  {
+   "name": "west_landing_north",
+   "kind": "wall",
+   "centre": [
+    68.175,
+    21.475,
+    -0.2
+   ],
+   "size": [
+    1.65,
+    0.25,
+    4.6
+   ],
+   "yaw": 0,
+   "pitch": 0
+  },
+  {
+   "name": "west_dogleg_bank_side",
+   "kind": "wall",
+   "centre": [
+    67.475,
+    22.75,
+    -0.2
+   ],
+   "size": [
+    0.25,
+    2.5,
+    4.6
+   ],
+   "yaw": 0,
+   "pitch": 0
+  },
+  {
+   "name": "guard_jamb",
+   "kind": "wall",
+   "centre": [
+    68.15,
+    18.75,
+    -0.2
+   ],
+   "size": [
+    0.3,
+    0.2,
+    4.6
+   ],
+   "yaw": 0,
+   "pitch": 0
+  },
+  {
+   "name": "guard_jamb",
+   "kind": "wall",
+   "centre": [
+    68.15,
+    21.25,
+    -0.2
+   ],
+   "size": [
+    0.3,
+    0.2,
+    4.6
+   ],
+   "yaw": 0,
+   "pitch": 0
+  },
+  {
+   "name": "guard_transom",
+   "kind": "wall",
+   "centre": [
+    67.9,
+    20,
+    0.9
+   ],
+   "size": [
+    0.1,
+    2.7,
+    2.4
+   ],
+   "yaw": 0,
+   "pitch": 0
+  },
+  {
+   "name": "guard_jamb",
+   "kind": "wall",
+   "centre": [
+    90.0,
+    18.75,
+    -0.2
+   ],
+   "size": [
+    0.3,
+    0.2,
+    4.6
+   ],
+   "yaw": 0,
+   "pitch": 0
+  },
+  {
+   "name": "guard_jamb",
+   "kind": "wall",
+   "centre": [
+    90.0,
+    21.25,
+    -0.2
+   ],
+   "size": [
+    0.3,
+    0.2,
+    4.6
+   ],
+   "yaw": 0,
+   "pitch": 0
+  },
+  {
+   "name": "guard_transom",
+   "kind": "wall",
+   "centre": [
+    90.25,
+    20,
+    0.9
+   ],
+   "size": [
+    0.1,
+    2.7,
+    2.4
+   ],
+   "yaw": 0,
+   "pitch": 0
+  }
+ ],
+ "remove_entity": {
+  "manifest_entity_index": 8,
+  "cls": "Mars_Shortcut_EntityScript",
+  "at": [
+   67,
+   26,
+   0
+  ],
+  "tag": "Shortcut.Mars.Warrens.ChainCrossing"
+ },
+ "replaced_walk_lines": [
+  "chain-crossing"
+ ],
+ "proof_boundary": "Exact reviewed static section; moving support and guards require runtime acceptance."
+}

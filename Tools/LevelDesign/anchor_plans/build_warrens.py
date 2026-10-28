@@ -499,6 +499,10 @@ def unbuilt_puzzle(d, pz):
     """A puzzle row no builder branch places (its gate stays unwalled): a dial lock without its bellkeeper encounter, or a
     kind the builder does not know. Key doors (locks[]) and SC barred doors (shortcuts[]) are built from their own tables."""
     kind = pz['kind']
+    if any(entry.get('puzzleId') == pz['id']
+           and entry['entity']['cls'] == 'Mars_SlidingBridge_EntityScript'
+           for entry in d.get('sectionOverrides', [])):
+        return False  # The reviewed section places this owner after tile assignment.
     if kind.startswith('Bellkeeper') and not kind.startswith('Bellkeeper seal pair'):
         return 'bellkeeper' not in d
     return not (kind.startswith(PUZZLE_BUILT_BY) or 'key door' in kind or kind.startswith('SC'))
@@ -1566,6 +1570,10 @@ def walk_lines(d, R):
         if link['kind'] == 'walk' and abs(za - zb) < 0.01:
             raw.append((link['a'] + '-' + link['b'], [p + (za,) for p in polyline(d, link)]))
     for tr in R['treads']:
+        # A reviewed stateful section replaces this legacy static flight. Its
+        # missing moving support must be accepted in the owner/runtime gate.
+        if any(tr['id'] in entry.get('replacedWalkLines', []) for entry in d.get('sectionOverrides', [])):
+            continue
         raw.append((tr['id'], [tr['segments'][0][0]] + [q for p, q in tr['segments']]))
     for r in R['ramps']:
         raw.append((r['link']['a'] + '-' + r['link']['b'], [r['upper'] + (r['top'],), r['start'] + (r['top'],), r['descent_end'] + (r['bottom'],), r['end'] + (r['bottom'],)]))
@@ -2261,18 +2269,41 @@ def manifest(write=True, data=None):
             rewards = [dict(struct='Mars_Bellkeeper_Reward', fields=dict(
                 Definition=dict(asset='/Script/AngelscriptAssets.' + reward['definition']),
                 Transform=dict(transform=dict(location=offset(reward['at']))))) for reward in encounter['rewards']]
+            def material_overrides(owner, supported, label):
+                values = owner.get('materials', {})
+                if not isinstance(values, dict):
+                    raise ValueError(f'Bellkeeper {label} materials must be a dictionary')
+                unknown = sorted(set(values) - set(supported))
+                if unknown:
+                    raise ValueError(f'Bellkeeper {label} has unsupported material override fields: {unknown}')
+                if any(not isinstance(path, str) or not path.startswith('/Game/') for path in values.values()):
+                    raise ValueError(f'Bellkeeper {label} material overrides must be /Game asset paths')
+                return {key: dict(asset=path) for key, path in values.items()}
+
+            panel_props = dict(Phrase=glyph_array(phrase), StartGlyphs=glyph_array(start_glyphs), Rewards=dict(array=rewards),
+                               CommitChannel=puzzle_channel('P4.Commit'), VentChannel=puzzle_channel('P4.Vent'),
+                               Source=dict(fields=dict(OutputChannel=puzzle_channel('P4'))),
+                               BellOffsetWorld=dict(vector=offset(encounter['bellAt'])),
+                               OwnedVent=dict(fields=dict(Enabled=True, OffsetWorld=dict(vector=offset(vent['at'])),
+                                   Rotation=dict(rotator=[0, vent['yaw'], 0]), PushImpulse=dict(vector=vent['pushImpulseLocalCmS']))))
+            panel_materials = material_overrides(panel, ('BodyMaterialOverride', 'FaceMaterialOverride',
+                'ControlMaterialOverride', 'GlyphMaterialOverride', 'IndicatorMaterialOverride'), 'panel')
+            if set(panel_props) & set(panel_materials):
+                raise ValueError('Bellkeeper panel material overrides collide with gameplay fields')
+            panel_props.update(panel_materials)
             entity('Mars_Bellkeeper_EntityScript', panel['at'], panel['yaw'],
-                   dict(Phrase=glyph_array(phrase), StartGlyphs=glyph_array(start_glyphs), Rewards=dict(array=rewards),
-                        CommitChannel=puzzle_channel('P4.Commit'), VentChannel=puzzle_channel('P4.Vent'),
-                        Source=dict(fields=dict(OutputChannel=puzzle_channel('P4'))),
-                        BellOffsetWorld=dict(vector=offset(encounter['bellAt'])),
-                        OwnedVent=dict(fields=dict(Enabled=True, OffsetWorld=dict(vector=offset(vent['at'])),
-                            Rotation=dict(rotator=[0, vent['yaw'], 0]), PushImpulse=dict(vector=vent['pushImpulseLocalCmS'])))),
+                   panel_props,
                    'P4 dial lock', pitch=panel['pitch'])
             entity('Mars_PullChain_EntityScript', chain['at'], chain['yaw'],
                    dict(Source=dict(fields=dict(OutputChannel=puzzle_channel('P4.Commit')))), 'P4 commit chain')
+            clue_props = dict(Phrase=glyph_array(phrase), GlyphSize=clue['glyphSizeCm'])
+            clue_materials = material_overrides(clue, ('BodyMaterialOverride', 'FaceMaterialOverride',
+                'GlyphMaterialOverride'), 'clue')
+            if set(clue_props) & set(clue_materials):
+                raise ValueError('Bellkeeper clue material overrides collide with gameplay fields')
+            clue_props.update(clue_materials)
             entity('Mars_BellkeeperClue_EntityScript', clue['at'], clue['yaw'],
-                   dict(Phrase=glyph_array(phrase), GlyphSize=clue['glyphSizeCm']), 'P4 Bridge clue', pitch=clue['pitch'])
+                   clue_props, 'P4 Bridge clue', pitch=clue['pitch'])
         elif kind.startswith('Bellkeeper seal pair'):  # Frozen v5/v6 composition remains available.
             m = mouths_by_id[pz['id']]
             sz = m['z']
@@ -2334,6 +2365,19 @@ def manifest(write=True, data=None):
         entity('Mars_WorldItem_Backpack_EntityScript', [cx - uy * 2.8, cy + ux * 2.8, sz + 0.3], 0.0, {}, f'{group} pack')
         if d.get('entryKitPan'):
             entity('Mars_WorldItem_Pan_EntityScript', [cx - uy * 2.8 + 0.8, cy + ux * 2.8, sz + 0.3], 0.0, {}, f'{group} entry Pan')
+        if d.get('entryKitTools'):
+            for tool, side in (('Cleaver', -0.8), ('Tenderizer', 0.8)):
+                entity('Mars_Sandbox_' + tool + '_EntityScript',
+                       [cx - uy * 2.0 + ux * side, cy + ux * 2.0 + uy * side, sz + 0.3],
+                       0.0, {}, f'{group} entry {tool}')
+        if d.get('entryKitLight'):
+            pack_at = [cx - uy * 2.8, cy + ux * 2.8, sz + 0.6]
+            tallow_side=d.get('placedPickupStartup',{}).get('entryTallowSideOffsetM',1.0)
+            tallow_side=d.get('placedPickupStartup',{}).get('entryTallowSideOffsetByEntryM',{}).get(group,tallow_side)
+            for item, offset, suffix in (('Lantern', (0, .9), ''), ('Tallow', (.2, tallow_side), '_0'), ('Tallow', (-.2, tallow_side), '_1')):
+                entity('Mars_WorldItem_' + item + '_EntityScript',
+                       [pack_at[0]+offset[0], pack_at[1]+offset[1], pack_at[2]],
+                       0.0, {}, f'{group} entry {item}{suffix}')
         lights.append(dict(at=[cx, cy, sz + 2.6], kind='foyer'))
         # The mouth gate stands on the corridor past the pad: the first point along the link, from FOYER/2 + 0.5 on, where
         # the walkable run across the link is no wider than the link itself (walls close both ends of the leaf), so the
@@ -2541,6 +2585,21 @@ def manifest(write=True, data=None):
     tile_counts = assign_tiles(result, d['instances']) if TILES and d.get('instances') else None
     if tile_counts:
         result['tiles'] = [dict(t, pivot=list(shape_bounds(t)[:2]) + [t['z']]) for t in d['instances']]
+    if d.get('placedPickupStartup'):
+        import placed_pickups
+        placed_pickups.apply(result,d['placedPickupStartup'])
+    if d.get('sectionOverrides'):
+        import section_overrides
+        section_overrides.apply(result, d['sectionOverrides'])
+    if d.get('sectionOverrides') or d.get('placedPickupStartup'):
+        # Report current ownership after inserting reviewed local fragments or
+        # relocating opt-in placed-pickup proxies into the persistent world.
+        tile_counts = {}
+        for kind in ('boxes', 'lights', 'starts', 'entities', 'pockets'):
+            for row in result[kind]:
+                counts = tile_counts.setdefault(row.get('tile') or 'assembly',
+                    dict(boxes=0, lights=0, starts=0, entities=0, pockets=0))
+                counts[kind] += 1
     summary = dict(boxes=len(boxes), starts=len(starts),
                    anchors=sum(1 for e in entities if (e['cls'].startswith('Mars_Anchor_') or e['cls'] == 'Mars_Warrens_Anchor_Route_EntityScript') and 'NavField' not in e['cls']),
                    navfields=sum(1 for e in entities if 'NavField' in e['cls']),
@@ -2698,7 +2757,10 @@ def apply():
                 pitch, yaw, roll = value['rotator']
                 return u.Rotator(pitch=pitch, yaw=yaw, roll=roll)
             if isinstance(value, dict) and 'transform' in value:
-                return u.Transform(location=coerce(dict(vector=value['transform']['location'])))
+                transform = value['transform']
+                pitch, yaw, roll = transform.get('rotation', [0, 0, 0])
+                return u.Transform(location=u.Vector(*transform['location']),
+                                   rotation=u.Rotator(pitch=pitch, yaw=yaw, roll=roll))
             if isinstance(value, dict) and 'asset' in value:
                 asset = u.load_asset(value['asset'])
                 assert asset, value['asset']

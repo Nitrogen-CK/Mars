@@ -1,0 +1,40 @@
+[
+  {
+    "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+    "component": "StaticMeshComponent_275",
+    "at": [
+      1002.0,
+      3650.0,
+      390.0
+    ],
+    "rotation": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "scale": [
+      0.04,
+      0.14,
+      0.26
+    ]
+  },
+  {
+    "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+    "component": "StaticMeshComponent_282",
+    "at": [
+      2800.0,
+      5798.0,
+      640.0
+    ],
+    "rotation": [
+      0.0,
+      0.0,
+      -90.0
+    ],
+    "scale": [
+      0.04,
+      0.14,
+      0.26
+    ]
+  }
+]

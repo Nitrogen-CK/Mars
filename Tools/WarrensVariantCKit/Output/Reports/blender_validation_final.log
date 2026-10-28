@@ -1,0 +1,4 @@
+00:01.922  blend            | Read blend: "D:\Repositories\CkRepos\Orion\Tools\WarrensVariantCKit\Output\WarrensVariantC_Diorama.blend"
+Extensions: writing cache failed ([Errno 13] Permission denied: 'C:\\Users\\Adam\\AppData\\Roaming\\Blender Foundation\\Blender\\5.2\\extensions\\.cache\\compat.dat').
+VARIANT_C_FRESH_BLENDER_AUDIT failed errors 1
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)

@@ -1,0 +1,6 @@
+00:02.516  blend            | Read blend: "D:\Repositories\CkRepos\Orion\Tools\ChainCrossingKit\Output\ChainCrossing_KitLibrary.blend"
+Extensions: writing cache failed ([Errno 13] Permission denied: 'C:\\Users\\Adam\\AppData\\Roaming\\Blender Foundation\\Blender\\5.2\\extensions\\.cache\\compat.dat').
+FRESH_BLENDER_AUDIT_PASSED 88 26686 {'01_KitLibrary': {'linked_collection_instances': 88, 'unique_collections': 88}, '02_ChainCrossingDiorama': {'linked_collection_instances': 259, 'unique_collections': 37}}
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+
+Blender quit

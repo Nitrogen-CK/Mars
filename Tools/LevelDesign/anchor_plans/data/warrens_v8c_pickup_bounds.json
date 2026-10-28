@@ -1,0 +1,135 @@
+{
+  "Key_Red": {
+    "definition": "/Script/AngelscriptAssets.Mars_ItemDef_Key_Red",
+    "mesh": "/Engine/BasicShapes/Cube.Cube",
+    "scale": [
+      0.3,
+      0.08,
+      0.05
+    ],
+    "min": [
+      -50.0,
+      -50.0,
+      -50.0
+    ],
+    "max": [
+      50.0,
+      50.0,
+      50.0
+    ]
+  },
+  "Backpack": {
+    "definition": "/Script/AngelscriptAssets.Mars_ItemDef_Backpack",
+    "mesh": "/Game/Mars/Gameplay/PlayerBackpack/Meshes/SM_PlayerBackpack.SM_PlayerBackpack",
+    "scale": [
+      1.25,
+      1.25,
+      1.25
+    ],
+    "min": [
+      -33.24409866333008,
+      -47.14690017700195,
+      -9.933846013154835e-05
+    ],
+    "max": [
+      35.657901763916016,
+      45.85820007324219,
+      96.79080200195312
+    ]
+  },
+  "Lantern": {
+    "definition": "/Script/AngelscriptAssets.Mars_ItemDef_Lantern",
+    "mesh": "/Game/Mars/Environment/Meshes/Camp/CampLantern_Mars_SM.CampLantern_Mars_SM",
+    "scale": [
+      0.55,
+      0.55,
+      0.55
+    ],
+    "min": [
+      -12.999999046325684,
+      -12.999999046325684,
+      0.0
+    ],
+    "max": [
+      12.999999046325684,
+      12.999999046325684,
+      58.26084518432617
+    ]
+  },
+  "Tallow": {
+    "definition": "/Script/AngelscriptAssets.Mars_ItemDef_Tallow",
+    "mesh": "/Engine/BasicShapes/Cylinder.Cylinder",
+    "scale": [
+      0.09,
+      0.09,
+      0.07
+    ],
+    "min": [
+      -50.0,
+      -50.0,
+      -50.0
+    ],
+    "max": [
+      50.0,
+      50.0,
+      50.0
+    ]
+  },
+  "Cleaver": {
+    "definition": "/Script/AngelscriptAssets.Mars_ItemDef_Cleaver",
+    "mesh": "/Game/Mars/Gameplay/Cooking/Stations/Meshes/MeatCleaver_Mars_SM.MeatCleaver_Mars_SM",
+    "scale": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "min": [
+      -7.400000095367432,
+      -2.0787291526794434,
+      -12.017878532409668
+    ],
+    "max": [
+      55.5,
+      2.0787291526794434,
+      3.6500000953674316
+    ]
+  },
+  "Tenderizer": {
+    "definition": "/Script/AngelscriptAssets.Mars_ItemDef_Tenderizer",
+    "mesh": "/Game/Mars/Gameplay/Cooking/Stations/Meshes/MeatTenderizer_Mars_SM.MeatTenderizer_Mars_SM",
+    "scale": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "min": [
+      -8.199999809265137,
+      -6.7300004959106445,
+      -9.579595565795898
+    ],
+    "max": [
+      51.230003356933594,
+      6.7300004959106445,
+      8.000000953674316
+    ]
+  },
+  "Ration": {
+    "definition": "/Script/AngelscriptAssets.Mars_ItemDef_Ration",
+    "mesh": "/Engine/BasicShapes/Cube.Cube",
+    "scale": [
+      0.3,
+      0.3,
+      0.3
+    ],
+    "min": [
+      -50.0,
+      -50.0,
+      -50.0
+    ],
+    "max": [
+      50.0,
+      50.0,
+      50.0
+    ]
+  }
+}

@@ -1,0 +1,188 @@
+{
+	"material": "M_WVC_BelfryStone",
+	"packagePath": "/Game/Mars/Environment/WarrensVariantCKit/Materials/M_WVC_BelfryStone",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "4a924ab023b6df337c6c0638c756036f",
+		"exporterVersion": 3
+	},
+	"blendMode": "BLEND_Opaque",
+	"twoSided": false,
+	"unlit": false,
+	"shadingModel": "MSM_DefaultLit",
+	"domain": "MD_Surface",
+	"connectedOutputs": [
+		"BaseColor"
+	],
+	"expressions":
+	{
+		"Constant": 3,
+		"Constant3Vector": 1,
+		"LinearInterpolate": 1,
+		"TextureSample": 4
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "TextureSample",
+				"name": "MaterialExpressionTextureSample_3",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"Texture": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX01_LimestoneAshlar_BaseColor.T_CCK_TX01_LimestoneAshlar_BaseColor"
+				}
+			},
+			{
+				"id": 1,
+				"class": "TextureSample",
+				"name": "MaterialExpressionTextureSample_0",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"Texture": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX01_LimestoneAshlar_BaseColor.T_CCK_TX01_LimestoneAshlar_BaseColor"
+				}
+			},
+			{
+				"id": 2,
+				"class": "TextureSample",
+				"name": "MaterialExpressionTextureSample_2",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"Texture": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX01_LimestoneAshlar_ORM.T_CCK_TX01_LimestoneAshlar_ORM",
+					"SamplerType": "SAMPLERTYPE_Masks"
+				}
+			},
+			{
+				"id": 3,
+				"class": "TextureSample",
+				"name": "MaterialExpressionTextureSample_6",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"Texture": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX01_LimestoneAshlar_NormalDX.T_CCK_TX01_LimestoneAshlar_NormalDX",
+					"SamplerType": "SAMPLERTYPE_Normal"
+				}
+			},
+			{
+				"id": 4,
+				"class": "Constant3Vector",
+				"name": "MaterialExpressionConstant3Vector_0",
+				"outputs": [
+					"None",
+					"None",
+					"None",
+					"None"
+				],
+				"props":
+				{
+					"Constant": "(R=0.219526,G=0.323143,B=0.337164,A=1.000000)"
+				}
+			},
+			{
+				"id": 5,
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_0",
+				"props":
+				{
+					"R": 0.11999999731779099
+				}
+			},
+			{
+				"id": 6,
+				"class": "LinearInterpolate",
+				"name": "MaterialExpressionLinearInterpolate_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 4,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 1,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 2,
+						"name": "Alpha",
+						"node": 5,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 7,
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_1",
+				"props":
+				{
+					"R": 0.87999999523162842
+				}
+			},
+			{
+				"id": 8,
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_2"
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_BaseColor",
+				"node": 6,
+				"output": 0
+			},
+			{
+				"property": "MP_Metallic",
+				"node": 8,
+				"output": 0
+			},
+			{
+				"property": "MP_Roughness",
+				"node": 7,
+				"output": 0
+			}
+		]
+	},
+	"scalarParams": [],
+	"vectorParams": [],
+	"textureParams": [],
+	"usedTextures": [
+		"/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX01_LimestoneAshlar_BaseColor.T_CCK_TX01_LimestoneAshlar_BaseColor"
+	]
+}

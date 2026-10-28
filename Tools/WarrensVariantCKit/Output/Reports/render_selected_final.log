@@ -1,0 +1,7 @@
+00:02.031  blend            | Read blend: "D:\Repositories\CkRepos\Orion\Tools\WarrensVariantCKit\Output\WarrensVariantC_KitLibrary.blend"
+00:03.922  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\WarrensVariantCKit\Output\Previews\CCS18.png'
+Extensions: writing cache failed ([Errno 13] Permission denied: 'C:\\Users\\Adam\\AppData\\Roaming\\Blender Foundation\\Blender\\5.2\\extensions\\.cache\\compat.dat').
+SELECTED_SAVED_MODELS_RENDERED ['CCS18']
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+
+Blender quit

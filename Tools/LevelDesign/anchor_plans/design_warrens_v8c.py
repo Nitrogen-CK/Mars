@@ -3,11 +3,11 @@
 Well, the Pit under it, the Court, the Ossuary, the waterworks) and the wet east bank (the Belfry, the Reliquary, the
 brine stores). It is crossed at exactly three places, each a different beat: the Bone Bridge (north, +2.5, R5), the
 Ford (centre, knee-deep, always open: the one place both landmarks are seen at once), and the Undercroft (south, -5,
-a low winding tunnel under the water, R7). The Chain Crossing (south, -2.5) is a one-way shortcut lowered from the east.
+a low winding tunnel under the water, R7). The Chain Crossing (south, -2.2) is a sliding cargo shortcut extended from the east.
 
 Landmarks: the Well (west: hoist, shaft light, the Pit glow below) and the Bell Tower (east: 22 m tall, cold-lit bell,
 heard across the map). Lynch's rule: from anywhere you are between the two or beyond one, and the canal tells you
-which bank. The horizontal variant: 156 x 108 m, three floor levels (+2.5 / 0 / -2.5) plus the Pit at -5, but the
+which bank. The horizontal variant: 178 x 130 m, three main floor levels (+2.5 / 0 / -2.5), the Mill at +5 and Pit at -5; the
 connectors between them wind up and down (the cave-and-dungeon mix): built rooms are orthogonal, grown spaces are not.
 """
 import design_warrens_v8_common as common
@@ -165,13 +165,13 @@ LOW_LINKS = [('ut1', 'ut2'), ('ut2', 'ls'), ('p0w', 'tm'), ('tm', 'ci1'), ('d2',
 LOW_ROOF = 2.2
 LOCKS = [
     dict(id='vault', door=dict(at=(57, 60), yaw=0.0, spanCm=250.0, level='deep'), lock=dict(at=(56, 58.3), yaw=90.0, level='deep'),
-         key='Red', keyAt=(104, 60, UP), channel='Mechanism.Channel.Keys.Red', note='the key under the bell on the Belfry loft, across the canal from the Vault'),
+         key='Red', keyAt=(104, 60, 2.85), channel='Mechanism.Channel.Keys.Red', note='the key atop the 30cm plinth under the bell on the Belfry loft, across the canal from the Vault'),
 ]
 PUZZLES = [
     dict(id='P1', kind='Red key door', at=(57, 60, DEEPZ), needsAt=(104, 60, UP), needsNote='the key under the bell on the Belfry loft: other bank, other landmark'),
-    dict(id='P2', kind='the Chain Crossing\'s latched bars (Pump end)', at=(67, 26, DOWN), needsAt=(122, 12, DOWN), needsNote='the Sluice hand-wheel on the east bank lowers the chain causeway; the chain runs along the Cellar floor to the wheel: the tell', existing='hand-wheel + latched Bars gate'),
+    dict(id='P2', kind='sliding cage span section', at=(68.15, 20, DOWN), needsAt=(122, 12, DOWN), needsNote='the Sluice windlass extends the stored east-bank cage across the gap; both end screens remain closed until the span is seated, then latch open for cargo return', existing='FreeTurn windlass + translating cage + terminal end guards'),
     dict(id='P3', kind='Mourner cache gate (latched)', at=(100, 76, UP), needsAt=(42, 66, UP), needsNote='the pack plate at the Ossuary\'s west end: set the pack down west, the gate latches east, cross the Bone Bridge', latch=True),
-    dict(id='P4', kind='Bellkeeper dial lock', at=(108, 46, 0), needsAt=(48.5, 50, 0), needsNote='the three glyphs painted on the Bell Tower\'s west face, read from the Well\'s east rim across the canal'),
+    dict(id='P4', kind='Bellkeeper dial lock', at=(106, 44, 0), needsAt=(48.5, 50, 0), needsNote='the three glyphs painted on the Bell Tower\'s west face, read from the Well\'s east rim across the canal'),
     dict(id='P5', kind='barred ladder foot (Belfry)', at=(104, 56, 0), needsAt=(102, 60, UP), needsNote='the lever on the loft; the loft is first reached by the Reliquary stair\'s rail drop'),
     dict(id='P6', kind='SC2 barred closet door', at=(19, 42, 0), needsAt=(19, 40, DEEPZ), needsNote='climb the closet ladder out of the Pit'),
     dict(id='P7', kind='Curing Room (support objective)', at=(88, 106, 5), needsAt=(98, 54, 0), needsNote='the Curing Room: the hunted part is brined here before it travels (the run\'s second required stop); the vat, the drying racks, a plinth for the pack'),
@@ -184,7 +184,7 @@ NICHES = [
     dict(id='ossuary-husk', rect=(44, 80, 48, 83), z=UP, family='F', note='husk spill in the north niche'),
     dict(id='ossuary-rest', rect=(36, 72, 40, 75), z=UP, family='N', note='lantern rest by the court stair'),
     dict(id='bridge-omen', rect=(72, 77, 74, 79), z=UP, family='O', note='chains swaying under the Bone Bridge'),
-    dict(id='mourner', rect=(100, 74, 106, 78), z=UP, family='C', note='Mourner cache behind the pack-plate gate (P3)'),
+    dict(id='mourner', rect=(100, 74, 106, 78), z=UP, family='C', authoredReward=True, note='Mourner: guaranteed authored Tallow behind the occupancy-plate gate (P3)'),
     dict(id='reliquary-rest', rect=(80, 90, 84, 93), z=UP, family='N', note='lantern rest by the S2 mouth'),
     dict(id='bellkeeper', rect=(103, 40, 109, 44), z=0, family='C', note='Bellkeeper\'s Confession behind the dial lock (P4)'),
     dict(id='belfry-threat', rect=(86, 40, 90, 44), z=0, family='T', note='sentry niche south of the tower'),
@@ -306,7 +306,7 @@ TRANSITIONS = [
     dict(id='t-ford', at=(74, 49, -2.5), kind='reveal', label='the Ford: open air, both landmarks'),
     dict(id='t-ford-e', at=(85, 49, -1.2), kind='stair', label='Ford -> Belfry: up the east step'),
     dict(id='t-bridge', at=(73, 74, 2.5), kind='bridge', label='the Bone Bridge, 22 m over the canal (R5)'),
-    dict(id='t-chain', at=(81, 25, -2.5), kind='bridge', label='the Chain Crossing: barred until the Sluice wheel lowers it (P2)'),
+    dict(id='t-chain', at=(74, 20, -2.2), kind='bridge', label='the Chain Crossing: sliding cage spans the gap after the Sluice windlass is hauled (P2)'),
     dict(id='t-sump', at=(46, 30, -3.8), kind='stair', label='Pump -> Pit: the Sump Stair, the waterworks\' own way down'),
     dict(id='t-undercroft', at=(80, 26, -5), kind='squeeze', label='the Undercroft: low winding tunnel under the canal (R7)'),
     dict(id='t-wetstair', at=(5, 56, -1.2), kind='stair', label='Court -> Cistern: the long wet stair (R6)'),
@@ -333,20 +333,87 @@ NOTES = dict(
                 'Thresholds: every crossing is a beat (a long bridge, a wade, a low tunnel); bank-internal connectors wind and change height (the hump tunnel, the wet stair)',
                 'Cavern and dungeon: built rooms (Ossuary, Reliquary, Cellar, Pump) are orthogonal; grown ones (Court, Cistern, Larder, Pit, the canal) are not',
                 'Sound as weenie: the bell and the pump are the two audio landmarks, one per bank',
-                'Deep Dish / Tunic: the Chain Crossing is seen barred from the Pump long before the Sluice wheel is found (P2)',
+                'Deep Dish / Tunic: the missing Chain Crossing span and its far-bank socket are seen from the Pump before the Sluice windlass is found (P2)',
                 'Lunacid rule: every loop\'s far point is unique (loft with the bell, Brine Larder wade, Sealed Burial)'],
-    changes=['Footprint 156 x 108 m, flatter: +2.5 / 0 / -2.5 and the Pit at -5; no +5 galleries except the Belfry loft',
+    changes=['Footprint 178 x 130 m: +2.5 / 0 / -2.5, the Pit at -5 and Salt Mill at +5; Belfry loft is +2.5',
              'Chime Hall becomes the Belfry (H3) under a 22 m tower; the Reliquary and the brine stores move to the east bank',
              'P4\'s glyphs move onto the tower, read from the Well rim: the two landmarks exchange information',
              'The Drowned Gallery becomes the Undercroft under the canal (graph link, R7); the Sump Stair is open; P2 is the Chain Crossing',
              'Two ledge hops (Larder shelf, Pit root shelf) as pocket rewards off the main floors',
-             'Nine Level Instance tiles; the canal is its own tile (water, Ford, both bridges)'],
-    sizing='15-20 min: hunt court + Curing Room (Salt Mill, east bank +5) + forage + return; a Belfry contract crosses the canal, cures on the same bank and returns by the bridge or the Ford',
-    risks=['Bigger map, longer walks: the Ford is the only always-open crossing; a pack crossing anywhere else needs R5 open or the chain lowered',
+             'Eleven Level Instance tiles; the canal is its own tile (water, Ford, both bridges)'],
+    sizing='Target 15-20 min inside Warrens; not yet established by timed play. Current manual diagnostic is combat quarry + Mill Mushroom/Cellar Bellnut + living chef/cargo return; edible quarry anatomy and extraction enforcement remain absent.',
+    risks=['Bigger map, longer walks: the Ford is the always-open crossing; other cargo crossings require R5 or the seated P2 sliding span',
            'Two hunt courts (Court, Pit) on the west bank and one (Belfry) on the east: a Belfry contract means crossing twice with cargo',
            'Water as an edge needs real impassability (depth, no climb-out) that the viewer only labels',
            'The Bell Tower\'s height needs the Belfry tile to be 24 m tall; roof breaks for the Larder view are art'],
 )
+
+ENTRY_KIT_TOOLS = True
+ENTRY_KIT_LIGHT = True
+
+# Persistent, one-shot fixture proxies wait for their actual Jolt support. All
+# subsequent item pickup/drop/forage behavior stays in the original compositions.
+PLACED_PICKUP_STARTUP = dict(
+    boundsFile='data/warrens_v8c_pickup_bounds.json', expectedCount=34,
+    # Existing editor supply authoring puts tallow 130cm beside the pack
+    # (lantern90cm +40cm); preserve those saved fixtures exactly.
+    entryTallowSideOffsetM=1.3,
+    # At S1, +130cm lies inside the north foyer wall. The intended +100cm
+    # positions retain clear body envelopes; no source wall is changed.
+    entryTallowSideOffsetByEntryM=dict(S1=1.0),
+    existingAtById=dict(vault_key=[104,60,2.5],
+        S1_entry_Tallow_0=[-1.8,54.1,0.6],S1_entry_Tallow_1=[-2.2,54.1,0.6]),
+    supportById=dict(vault_key=2.8,C_Vault_Ration=-5,C_Vault_Tallow=-5,C_Mourner_Tallow=2.5),
+    entrySupportZ=dict(S1=0,S2=2.5,S3=-2.5,S4=-2.5,S5=-2.5),
+)
+
+# Local prototype fixtures. Crawler quarry has no edible-part output; the
+# Mushroom/Bellnut cargo-return contract is an explicitly manual diagnostic.
+LOCAL_FIXTURES = [
+    dict(id='C_Vault_Ration', cls='Mars_WorldItem_Ration_EntityScript', at=[62, 59, -4.6]),
+    dict(id='C_Vault_Tallow', cls='Mars_WorldItem_Tallow_EntityScript', at=[63, 61, -4.6]),
+    dict(id='C_Mourner_Tallow', cls='Mars_WorldItem_Tallow_EntityScript', at=[103, 76, 2.9]),
+    dict(id='C_Mill_Mushroom', cls='Mars_Expedition_MushroomBed_EntityScript', at=[92, 102, 5]),
+    dict(id='C_Cellar_Bellnut', cls='Mars_Forage_BellnutVine_EntityScript', at=[99, 18, -2.5]),
+]
+
+BELLKEEPER = dict(
+    phrase=['Diamond', 'Triangle', 'Cross'], startGlyphs=['Square', 'Square', 'Square'],
+    panel=dict(at=[108, 46.22, 1.2], pitch=-90, yaw=90, materials=dict(
+        BodyMaterialOverride='/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX10',
+        FaceMaterialOverride='/Game/Mars/Environment/WarrensVariantCKit/Materials/M_WVC_BellkeeperPrimaryColor',
+        ControlMaterialOverride='/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX10',
+        GlyphMaterialOverride='/Game/Mars/Environment/WarrensVariantCKit/Materials/M_WVC_BellkeeperPrimaryColor',
+        IndicatorMaterialOverride='/Game/Mars/Environment/WarrensVariantCKit/Materials/M_WVC_BellkeeperPrimaryColor')),
+    chain=dict(at=[106.5, 46.22, 2.3], yaw=90), bellAt=[106.5, 46.45, 2.45],
+    vent=dict(at=[108.8, 45.8, -0.35], yaw=90, pushImpulseLocalCmS=[400, 0, 120]),
+    clue=dict(at=[101.82, 50, 3], pitch=-90, yaw=180, glyphSizeCm=65, materials=dict(
+        BodyMaterialOverride='/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX01',
+        FaceMaterialOverride='/Game/Mars/Environment/WarrensVariantCKit/Materials/M_WVC_BellkeeperPrimaryColor',
+        GlyphMaterialOverride='/Game/Mars/Environment/WarrensVariantCKit/Materials/M_WVC_BellkeeperPrimaryColor')),
+    rewards=[dict(definition='Mars_ItemDef_Tallow', at=[x, 42, 0.5]) for x in (104.8, 106, 107.2)],
+)
+
+# Preserve the raster's source basis, then replace its obsolete static causeway
+# by exact transform-matched section fragments. This prevents a rebuild from
+# restoring either the old ramp or its upper-roof bypass.
+SECTION_OVERRIDES = [dict(
+    file='data/warrens_v8c_p2_section.json', puzzleId='P2', replacedWalkLines=['chain-crossing'],
+    entity=dict(cls='Mars_SlidingBridge_EntityScript', at=[79, 20, -2.2], yaw=90, pitch=0,
+                level='main', tile='Canal', note='P2 sliding cargo crossing',
+                props=dict(Bridge=dict(fields=dict(
+                    WheelOffset=dict(transform=dict(location=[-800, -4300, -30], rotation=[0, -180, 0])),
+                    DrivePath=dict(array=[dict(vector=[(y-20)*100, (79-x)*100, -22])
+                                          for x,y in [(122,12),(122,15),(112,16),(104,19),(96,20),(90,20)]]))),
+                    Source=dict(fields=dict(OutputChannel=dict(tag='Mechanism.Channel.Warrens.Shortcut.Chain'))),
+                    DeckMeshOverride=dict(asset='/Game/Mars/Environment/WarrensVariantCKit/P2SlidingSpan/WarrensC_P2S01_Deck_Mars_SM'),
+                    CageMeshOverride=dict(asset='/Game/Mars/Environment/WarrensVariantCKit/P2SlidingSpan/WarrensC_P2S02_Cage_Mars_SM'),
+                    GuardMeshOverride=dict(asset='/Game/Mars/Environment/WarrensVariantCKit/P2SlidingSpan/WarrensC_P2S03_Guard_Mars_SM'),
+                    MaterialOverride=dict(asset='/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX09'),
+                    WheelMeshOverride=dict(asset='/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS21_HandwheelBody_Mars_SM'),
+                    WheelMeshLocalTransform=dict(transform=dict(location=[2.5, 0, 0], rotation=[0, 90, 0])),
+                    WheelMaterialOverride=dict(asset='/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX09')))),
+]
 
 if __name__ == '__main__':
     import sys

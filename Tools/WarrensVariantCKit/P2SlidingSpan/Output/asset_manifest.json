@@ -1,0 +1,189 @@
+{
+  "assets": [
+    {
+      "id": "P2S01",
+      "name": "WarrensC_P2S01_Deck_Mars_SM",
+      "fbx": "FBX\\WarrensC_P2S01_Deck_Mars_SM.fbx",
+      "dimensions_cm": [
+        250.0,
+        1050.0,
+        19.999998807907104
+      ],
+      "actual_dimensions_cm": [
+        250.0,
+        1050.0,
+        19.999998807907104
+      ],
+      "bounds_min_cm": [
+        -125.0,
+        -1050.0,
+        -19.999998807907104
+      ],
+      "bounds_max_cm": [
+        125.0,
+        0.0,
+        0.0
+      ],
+      "materials": [
+        "WarrensC_BlackIron_Mars_MI",
+        "WarrensC_DarkTimber_Mars_MI"
+      ],
+      "material_keys": [
+        "TX09",
+        "TX08"
+      ],
+      "triangles": 1332,
+      "collision_boxes_blender": [
+        {
+          "centre_m": [
+            0,
+            -5.25,
+            -0.1
+          ],
+          "size_m": [
+            2.5,
+            10.5,
+            0.2
+          ]
+        }
+      ],
+      "expected_convex_count": 1,
+      "source_sha256": "afd2b2222ddb69212cc5eaf5a1fa05d2c19be7aebd976be95b5728e2bbe60853",
+      "flags": {}
+    },
+    {
+      "id": "P2S02",
+      "name": "WarrensC_P2S02_Cage_Mars_SM",
+      "fbx": "FBX\\WarrensC_P2S02_Cage_Mars_SM.fbx",
+      "dimensions_cm": [
+        250.0,
+        1050.0,
+        220.00000476837158
+      ],
+      "actual_dimensions_cm": [
+        250.0,
+        1050.0,
+        220.00000476837158
+      ],
+      "bounds_min_cm": [
+        -125.0,
+        -1050.0,
+        0.0
+      ],
+      "bounds_max_cm": [
+        125.0,
+        0.0,
+        220.00000476837158
+      ],
+      "materials": [
+        "WarrensC_BlackIron_Mars_MI",
+        "WarrensC_DarkTimber_Mars_MI"
+      ],
+      "material_keys": [
+        "TX09",
+        "TX08"
+      ],
+      "triangles": 3900,
+      "collision_boxes_blender": [
+        {
+          "centre_m": [
+            -1.2,
+            -5.25,
+            1.1
+          ],
+          "size_m": [
+            0.1,
+            10.5,
+            2.2
+          ]
+        },
+        {
+          "centre_m": [
+            1.2,
+            -5.25,
+            1.1
+          ],
+          "size_m": [
+            0.1,
+            10.5,
+            2.2
+          ]
+        },
+        {
+          "centre_m": [
+            0,
+            -5.25,
+            2.16
+          ],
+          "size_m": [
+            2.5,
+            10.5,
+            0.08
+          ]
+        }
+      ],
+      "expected_convex_count": 3,
+      "source_sha256": "12e95686f039336bdd87c8b4a54ff3447fc97e953981fa60852e074ce4901c8f",
+      "flags": {}
+    },
+    {
+      "id": "P2S03",
+      "name": "WarrensC_P2S03_Guard_Mars_SM",
+      "fbx": "FBX\\WarrensC_P2S03_Guard_Mars_SM.fbx",
+      "dimensions_cm": [
+        230.00000715255737,
+        7.999999821186066,
+        220.00000476837158
+      ],
+      "actual_dimensions_cm": [
+        230.00000715255737,
+        7.999999821186066,
+        220.00000476837158
+      ],
+      "bounds_min_cm": [
+        -114.99999761581421,
+        -3.999999910593033,
+        0.0
+      ],
+      "bounds_max_cm": [
+        115.00000953674316,
+        3.999999910593033,
+        220.00000476837158
+      ],
+      "materials": [
+        "WarrensC_BlackIron_Mars_MI"
+      ],
+      "material_keys": [
+        "TX09"
+      ],
+      "triangles": 968,
+      "collision_boxes_blender": [
+        {
+          "centre_m": [
+            0,
+            0,
+            1.1
+          ],
+          "size_m": [
+            2.3,
+            0.08,
+            2.2
+          ]
+        }
+      ],
+      "expected_convex_count": 1,
+      "source_sha256": "34f1ddf3059af6a438910f71b298d75fcb522be78c17532856ff04a25f077b9b",
+      "flags": {}
+    }
+  ],
+  "parameters_metres": {
+    "length": 10.5,
+    "width": 2.5,
+    "thickness": 0.2,
+    "height": 2.2,
+    "screen": 0.1,
+    "canopy": 0.08
+  },
+  "collision": "Authored UCX: deck1, cage3, guard1. Import must preserve/verify them; no generated hull.",
+  "source_axes": "Blender X,-Y,Z to Unreal X,Y,Z; pivot is seated near edge, deck top Z0"
+}

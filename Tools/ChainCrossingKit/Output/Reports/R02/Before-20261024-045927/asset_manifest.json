@@ -1,0 +1,3246 @@
+{
+  "units": "metres in Blender; explicit centimetre FBX vertices with unit scale .01",
+  "catalog_sha256": "fd5a1cb411630443c257fe56fc7965b1114ef430b30ca4b540e148caa2af89a1",
+  "assets": [
+    {
+      "id": "CCS01",
+      "name": "WarrensC_CCS01_CausewayDeckBay_Mars_SM",
+      "dimensions_cm": [
+        250.0,
+        200.0,
+        20.0
+      ],
+      "actual_dimensions_cm": [
+        250.0,
+        200.0,
+        20.0
+      ],
+      "bounds_min_cm": [
+        -125.0,
+        -100.0,
+        -20.000000298023224
+      ],
+      "bounds_max_cm": [
+        125.0,
+        100.0,
+        1.490116141589226e-07
+      ],
+      "vertices": 164,
+      "triangles": 280,
+      "materials": [
+        "WarrensC_BroadFlagstone_Mars_MI"
+      ],
+      "material_keys": [
+        "TX02"
+      ],
+      "flags": {
+        "axis": "walking plane Z=0; thickness below"
+      },
+      "pivot": "top contact",
+      "fbx": "FBX\\WarrensC_CCS01_CausewayDeckBay_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS02",
+      "name": "WarrensC_CCS02_CausewayEndClosure_Mars_SM",
+      "dimensions_cm": [
+        250.0,
+        100.0,
+        20.0
+      ],
+      "actual_dimensions_cm": [
+        250.0,
+        100.0,
+        20.0
+      ],
+      "bounds_min_cm": [
+        -125.0,
+        -50.0,
+        -20.000000298023224
+      ],
+      "bounds_max_cm": [
+        125.0,
+        50.0,
+        1.490116141589226e-07
+      ],
+      "vertices": 128,
+      "triangles": 220,
+      "materials": [
+        "WarrensC_BroadFlagstone_Mars_MI"
+      ],
+      "material_keys": [
+        "TX02"
+      ],
+      "flags": {
+        "axis": "walking plane Z=0; thickness below"
+      },
+      "pivot": "top contact",
+      "fbx": "FBX\\WarrensC_CCS02_CausewayEndClosure_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS03",
+      "name": "WarrensC_CCS03_DeckEdgeFascia_Mars_SM",
+      "dimensions_cm": [
+        200.0,
+        20.0,
+        60.0
+      ],
+      "actual_dimensions_cm": [
+        199.99999,
+        20.0,
+        60.0
+      ],
+      "bounds_min_cm": [
+        -99.99999403953552,
+        -10.000000149011612,
+        -1.1920929132713809e-06
+      ],
+      "bounds_max_cm": [
+        99.99999403953552,
+        10.000000149011612,
+        60.00000238418579
+      ],
+      "vertices": 72,
+      "triangles": 132,
+      "materials": [
+        "WarrensC_LimestoneAshlar_Mars_MI"
+      ],
+      "material_keys": [
+        "TX01"
+      ],
+      "flags": {},
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS03_DeckEdgeFascia_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS04",
+      "name": "WarrensC_CCS04_DeckUndersideRib_Mars_SM",
+      "dimensions_cm": [
+        250.0,
+        40.0,
+        50.0
+      ],
+      "actual_dimensions_cm": [
+        250.0,
+        40.0,
+        50.0
+      ],
+      "bounds_min_cm": [
+        -125.0,
+        -20.000000298023224,
+        0.0
+      ],
+      "bounds_max_cm": [
+        125.0,
+        20.000000298023224,
+        50.0
+      ],
+      "vertices": 72,
+      "triangles": 108,
+      "materials": [
+        "WarrensC_LimestoneAshlar_Mars_MI"
+      ],
+      "material_keys": [
+        "TX01"
+      ],
+      "flags": {},
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS04_DeckUndersideRib_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS05",
+      "name": "WarrensC_CCS05_BankAbutment_Mars_SM",
+      "dimensions_cm": [
+        300.0,
+        100.0,
+        300.0
+      ],
+      "actual_dimensions_cm": [
+        300.0,
+        100.0,
+        300.0
+      ],
+      "bounds_min_cm": [
+        -150.0,
+        -50.0,
+        0.0
+      ],
+      "bounds_max_cm": [
+        150.0,
+        50.0,
+        300.0
+      ],
+      "vertices": 426,
+      "triangles": 780,
+      "materials": [
+        "WarrensC_LimestoneAshlar_Mars_MI"
+      ],
+      "material_keys": [
+        "TX01"
+      ],
+      "flags": {},
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS05_BankAbutment_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS06",
+      "name": "WarrensC_CCS06_SupportPierShell_Mars_SM",
+      "dimensions_cm": [
+        120.0,
+        120.0,
+        300.0
+      ],
+      "actual_dimensions_cm": [
+        120.0,
+        120.0,
+        300.0
+      ],
+      "bounds_min_cm": [
+        -60.00000238418579,
+        -60.00000238418579,
+        0.0
+      ],
+      "bounds_max_cm": [
+        60.00000238418579,
+        60.00000238418579,
+        300.0
+      ],
+      "vertices": 360,
+      "triangles": 660,
+      "materials": [
+        "WarrensC_LimestoneAshlar_Mars_MI"
+      ],
+      "material_keys": [
+        "TX01"
+      ],
+      "flags": {},
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS06_SupportPierShell_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS07",
+      "name": "WarrensC_CCS07_PierWaterlineCollar_Mars_SM",
+      "dimensions_cm": [
+        140.0,
+        140.0,
+        40.0
+      ],
+      "actual_dimensions_cm": [
+        140.0,
+        140.0,
+        40.0
+      ],
+      "bounds_min_cm": [
+        -69.9999988079071,
+        -69.9999988079071,
+        -2.980232283178452e-07
+      ],
+      "bounds_max_cm": [
+        69.9999988079071,
+        69.9999988079071,
+        40.00000059604645
+      ],
+      "vertices": 32,
+      "triangles": 64,
+      "materials": [
+        "WarrensC_DampStone_Mars_MI"
+      ],
+      "material_keys": [
+        "TX17"
+      ],
+      "flags": {},
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS07_PierWaterlineCollar_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS08",
+      "name": "WarrensC_CCS08_BankCopingStrip_Mars_SM",
+      "dimensions_cm": [
+        200.0,
+        35.0,
+        30.0
+      ],
+      "actual_dimensions_cm": [
+        199.99999,
+        35.0,
+        30.0
+      ],
+      "bounds_min_cm": [
+        -99.99999403953552,
+        -17.499999701976776,
+        -5.960464566356904e-07
+      ],
+      "bounds_max_cm": [
+        99.99999403953552,
+        17.499999701976776,
+        30.000001192092896
+      ],
+      "vertices": 144,
+      "triangles": 264,
+      "materials": [
+        "WarrensC_LimestoneAshlar_Mars_MI"
+      ],
+      "material_keys": [
+        "TX01"
+      ],
+      "flags": {},
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS08_BankCopingStrip_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS09",
+      "name": "WarrensC_CCS09_RailPost_Mars_SM",
+      "dimensions_cm": [
+        30.0,
+        30.0,
+        100.0
+      ],
+      "actual_dimensions_cm": [
+        30.0,
+        30.0,
+        100.0
+      ],
+      "bounds_min_cm": [
+        -15.000000596046448,
+        -15.000000596046448,
+        0.0
+      ],
+      "bounds_max_cm": [
+        15.000000596046448,
+        15.000000596046448,
+        100.0
+      ],
+      "vertices": 144,
+      "triangles": 264,
+      "materials": [
+        "WarrensC_LimestoneAshlar_Mars_MI"
+      ],
+      "material_keys": [
+        "TX01"
+      ],
+      "flags": {},
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS09_RailPost_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS10",
+      "name": "WarrensC_CCS10_RailCap_Mars_SM",
+      "dimensions_cm": [
+        40.0,
+        40.0,
+        15.0
+      ],
+      "actual_dimensions_cm": [
+        40.0,
+        40.0,
+        15.0
+      ],
+      "bounds_min_cm": [
+        -20.000000298023224,
+        -20.000000298023224,
+        -2.980232283178452e-07
+      ],
+      "bounds_max_cm": [
+        20.000000298023224,
+        20.000000298023224,
+        15.000000596046448
+      ],
+      "vertices": 48,
+      "triangles": 88,
+      "materials": [
+        "WarrensC_LimestoneAshlar_Mars_MI"
+      ],
+      "material_keys": [
+        "TX01"
+      ],
+      "flags": {},
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS10_RailCap_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS11",
+      "name": "WarrensC_CCS11_RailInfillBay_Mars_SM",
+      "dimensions_cm": [
+        200.0,
+        12.0,
+        80.0
+      ],
+      "actual_dimensions_cm": [
+        200.0,
+        12.0,
+        80.0
+      ],
+      "bounds_min_cm": [
+        -100.0,
+        -5.999999865889549,
+        -5.960464566356904e-07
+      ],
+      "bounds_max_cm": [
+        100.0,
+        5.999999865889549,
+        80.0000011920929
+      ],
+      "vertices": 216,
+      "triangles": 396,
+      "materials": [
+        "WarrensC_BlackIron_Mars_MI"
+      ],
+      "material_keys": [
+        "TX09"
+      ],
+      "flags": {},
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS11_RailInfillBay_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS12",
+      "name": "WarrensC_CCS12_RailEndTerminal_Mars_SM",
+      "dimensions_cm": [
+        40.0,
+        35.0,
+        100.0
+      ],
+      "actual_dimensions_cm": [
+        40.0,
+        35.0,
+        100.0
+      ],
+      "bounds_min_cm": [
+        -20.000000298023224,
+        -17.499999701976776,
+        0.0
+      ],
+      "bounds_max_cm": [
+        20.000000298023224,
+        17.499999701976776,
+        100.0
+      ],
+      "vertices": 200,
+      "triangles": 372,
+      "materials": [
+        "WarrensC_LimestoneAshlar_Mars_MI",
+        "WarrensC_BlackIron_Mars_MI"
+      ],
+      "material_keys": [
+        "TX01",
+        "TX09"
+      ],
+      "flags": {},
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS12_RailEndTerminal_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS13",
+      "name": "WarrensC_CCS13_RoomFloorBay_Mars_SM",
+      "dimensions_cm": [
+        200.0,
+        200.0,
+        5.0
+      ],
+      "actual_dimensions_cm": [
+        200.0,
+        200.0,
+        5.0
+      ],
+      "bounds_min_cm": [
+        -100.0,
+        -100.0,
+        -5.000000074505806
+      ],
+      "bounds_max_cm": [
+        100.0,
+        100.0,
+        3.725290353973065e-08
+      ],
+      "vertices": 116,
+      "triangles": 192,
+      "materials": [
+        "WarrensC_BroadFlagstone_Mars_MI"
+      ],
+      "material_keys": [
+        "TX02"
+      ],
+      "flags": {
+        "axis": "walking plane Z=0; thickness below"
+      },
+      "pivot": "top contact",
+      "fbx": "FBX\\WarrensC_CCS13_RoomFloorBay_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS14",
+      "name": "WarrensC_CCS14_FloorFillerBay_Mars_SM",
+      "dimensions_cm": [
+        100.0,
+        200.0,
+        5.0
+      ],
+      "actual_dimensions_cm": [
+        100.0,
+        200.0,
+        5.0
+      ],
+      "bounds_min_cm": [
+        -50.0,
+        -100.0,
+        -5.000000074505806
+      ],
+      "bounds_max_cm": [
+        50.0,
+        100.0,
+        3.725290353973065e-08
+      ],
+      "vertices": 80,
+      "triangles": 132,
+      "materials": [
+        "WarrensC_BroadFlagstone_Mars_MI"
+      ],
+      "material_keys": [
+        "TX02"
+      ],
+      "flags": {
+        "axis": "walking plane Z=0; thickness below"
+      },
+      "pivot": "top contact",
+      "fbx": "FBX\\WarrensC_CCS14_FloorFillerBay_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS15",
+      "name": "WarrensC_CCS15_RoomWallBay_Mars_SM",
+      "dimensions_cm": [
+        200.0,
+        35.0,
+        300.0
+      ],
+      "actual_dimensions_cm": [
+        200.0,
+        35.0,
+        299.99999
+      ],
+      "bounds_min_cm": [
+        -100.0,
+        -17.499999701976776,
+        1.1920928955078125e-05
+      ],
+      "bounds_max_cm": [
+        100.0,
+        17.499999701976776,
+        300.0
+      ],
+      "vertices": 360,
+      "triangles": 660,
+      "materials": [
+        "WarrensC_LimestoneAshlar_Mars_MI"
+      ],
+      "material_keys": [
+        "TX01"
+      ],
+      "flags": {},
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS15_RoomWallBay_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS16",
+      "name": "WarrensC_CCS16_WallCornerPier_Mars_SM",
+      "dimensions_cm": [
+        60.0,
+        60.0,
+        300.0
+      ],
+      "actual_dimensions_cm": [
+        60.0,
+        60.0,
+        300.0
+      ],
+      "bounds_min_cm": [
+        -30.000001192092896,
+        -30.000001192092896,
+        0.0
+      ],
+      "bounds_max_cm": [
+        30.000001192092896,
+        30.000001192092896,
+        300.0
+      ],
+      "vertices": 144,
+      "triangles": 264,
+      "materials": [
+        "WarrensC_LimestoneAshlar_Mars_MI"
+      ],
+      "material_keys": [
+        "TX01"
+      ],
+      "flags": {},
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS16_WallCornerPier_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS17",
+      "name": "WarrensC_CCS17_ArchSurround_Mars_SM",
+      "dimensions_cm": [
+        300.0,
+        40.0,
+        350.0
+      ],
+      "actual_dimensions_cm": [
+        300.0,
+        40.0,
+        350.0
+      ],
+      "bounds_min_cm": [
+        -150.0,
+        -20.000000298023224,
+        0.0
+      ],
+      "bounds_max_cm": [
+        150.0,
+        20.000000298023224,
+        350.0
+      ],
+      "vertices": 264,
+      "triangles": 460,
+      "materials": [
+        "WarrensC_LimestoneAshlar_Mars_MI"
+      ],
+      "material_keys": [
+        "TX01"
+      ],
+      "flags": {},
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS17_ArchSurround_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS18",
+      "name": "WarrensC_CCS18_VaultCeilingBay_Mars_SM",
+      "dimensions_cm": [
+        200.0,
+        200.0,
+        30.0
+      ],
+      "actual_dimensions_cm": [
+        200.0,
+        200.0,
+        30.0
+      ],
+      "bounds_min_cm": [
+        -100.0,
+        -100.0,
+        -5.960464566356904e-07
+      ],
+      "bounds_max_cm": [
+        100.0,
+        100.0,
+        30.000001192092896
+      ],
+      "vertices": 210,
+      "triangles": 368,
+      "materials": [
+        "WarrensC_LimestoneAshlar_Mars_MI"
+      ],
+      "material_keys": [
+        "TX01"
+      ],
+      "flags": {},
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS18_VaultCeilingBay_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS19",
+      "name": "WarrensC_CCS19_PlasterRepairPatch_Mars_SM",
+      "dimensions_cm": [
+        150.0,
+        3.0,
+        160.0
+      ],
+      "actual_dimensions_cm": [
+        150.0,
+        3.0,
+        160.0
+      ],
+      "bounds_min_cm": [
+        -75.0,
+        -1.4999999664723873,
+        -1.1920929132713809e-06
+      ],
+      "bounds_max_cm": [
+        75.0,
+        1.4999999664723873,
+        160.0000023841858
+      ],
+      "vertices": 24,
+      "triangles": 44,
+      "materials": [
+        "WarrensC_LimePlaster_Mars_MI"
+      ],
+      "material_keys": [
+        "TX03"
+      ],
+      "flags": {},
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS19_PlasterRepairPatch_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS20",
+      "name": "WarrensC_CCS20_StairAndThresholdFascia_Mars_SM",
+      "dimensions_cm": [
+        250.0,
+        5.0,
+        30.0
+      ],
+      "actual_dimensions_cm": [
+        250.0,
+        5.0,
+        30.0
+      ],
+      "bounds_min_cm": [
+        -125.0,
+        -2.500000037252903,
+        -30.000001192092896
+      ],
+      "bounds_max_cm": [
+        125.0,
+        2.500000037252903,
+        5.960464566356904e-07
+      ],
+      "vertices": 16,
+      "triangles": 28,
+      "materials": [
+        "WarrensC_LimestoneAshlar_Mars_MI"
+      ],
+      "material_keys": [
+        "TX01"
+      ],
+      "flags": {},
+      "pivot": "top contact",
+      "fbx": "FBX\\WarrensC_CCS20_StairAndThresholdFascia_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS21",
+      "name": "WarrensC_CCS21_HandwheelBody_Mars_SM",
+      "dimensions_cm": [
+        50.0,
+        5.0,
+        50.0
+      ],
+      "actual_dimensions_cm": [
+        50.0,
+        5.0,
+        50.0
+      ],
+      "bounds_min_cm": [
+        -25.0,
+        -2.500000037252903,
+        -25.0
+      ],
+      "bounds_max_cm": [
+        25.0,
+        2.500000037252903,
+        25.0
+      ],
+      "vertices": 192,
+      "triangles": 360,
+      "materials": [
+        "WarrensC_BlackIron_Mars_MI"
+      ],
+      "material_keys": [
+        "TX09"
+      ],
+      "flags": {
+        "moving_part": true,
+        "axis": "+X",
+        "mesh_axis": "-Y",
+        "mesh_adapter": "+90deg about Z: mesh -Y -> actor +X; preserve source Grip_L/Grip_R"
+      },
+      "pivot": "center",
+      "fbx": "FBX\\WarrensC_CCS21_HandwheelBody_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS22",
+      "name": "WarrensC_CCS22_WheelAxleStub_Mars_SM",
+      "dimensions_cm": [
+        12.0,
+        30.0,
+        12.0
+      ],
+      "actual_dimensions_cm": [
+        12.0,
+        30.0,
+        12.0
+      ],
+      "bounds_min_cm": [
+        -5.999999865889549,
+        -15.000000596046448,
+        -5.999999865889549
+      ],
+      "bounds_max_cm": [
+        5.999999865889549,
+        15.000000596046448,
+        5.999999865889549
+      ],
+      "vertices": 72,
+      "triangles": 132,
+      "materials": [
+        "WarrensC_BlackIron_Mars_MI"
+      ],
+      "material_keys": [
+        "TX09"
+      ],
+      "flags": {
+        "moving_part": true,
+        "axis": "+X",
+        "mesh_axis": "-Y",
+        "mesh_adapter": "+90deg about Z: mesh -Y -> actor +X; preserve source Grip_L/Grip_R"
+      },
+      "pivot": "center",
+      "fbx": "FBX\\WarrensC_CCS22_WheelAxleStub_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS23",
+      "name": "WarrensC_CCS23_WheelMountHousing_Mars_SM",
+      "dimensions_cm": [
+        100.0,
+        100.0,
+        160.0
+      ],
+      "actual_dimensions_cm": [
+        100.0,
+        100.0,
+        160.0
+      ],
+      "bounds_min_cm": [
+        -50.0,
+        -50.0,
+        -1.1920929132713809e-06
+      ],
+      "bounds_max_cm": [
+        50.0,
+        50.0,
+        160.0000023841858
+      ],
+      "vertices": 166,
+      "triangles": 324,
+      "materials": [
+        "WarrensC_LimestoneAshlar_Mars_MI",
+        "WarrensC_BlackIron_Mars_MI"
+      ],
+      "material_keys": [
+        "TX01",
+        "TX09"
+      ],
+      "flags": {
+        "moving_part": false,
+        "axis": "+X",
+        "mesh_axis": "-Y",
+        "mesh_adapter": "+90deg about Z: mesh -Y -> actor +X; preserve source Grip_L/Grip_R"
+      },
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS23_WheelMountHousing_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS24",
+      "name": "WarrensC_CCS24_ChainDrum_Mars_SM",
+      "dimensions_cm": [
+        60.0,
+        80.0,
+        60.0
+      ],
+      "actual_dimensions_cm": [
+        60.0,
+        80.0,
+        60.0
+      ],
+      "bounds_min_cm": [
+        -30.000001192092896,
+        -40.00000059604645,
+        -30.000001192092896
+      ],
+      "bounds_max_cm": [
+        30.000001192092896,
+        40.00000059604645,
+        30.000001192092896
+      ],
+      "vertices": 528,
+      "triangles": 1036,
+      "materials": [
+        "WarrensC_BlackIron_Mars_MI"
+      ],
+      "material_keys": [
+        "TX09"
+      ],
+      "flags": {
+        "moving_part": false,
+        "axis": "+X",
+        "mesh_axis": "-Y",
+        "mesh_adapter": "+90deg about Z: mesh -Y -> actor +X; preserve source Grip_L/Grip_R",
+        "hookup": "static cosmetic drum; no added mover"
+      },
+      "pivot": "center",
+      "fbx": "FBX\\WarrensC_CCS24_ChainDrum_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS25",
+      "name": "WarrensC_CCS25_AxleBearingBlock_Mars_SM",
+      "dimensions_cm": [
+        30.0,
+        25.0,
+        35.0
+      ],
+      "actual_dimensions_cm": [
+        30.0,
+        25.0,
+        35.0
+      ],
+      "bounds_min_cm": [
+        -15.000000596046448,
+        -12.5,
+        -17.499999701976776
+      ],
+      "bounds_max_cm": [
+        15.000000596046448,
+        12.5,
+        17.499999701976776
+      ],
+      "vertices": 192,
+      "triangles": 364,
+      "materials": [
+        "WarrensC_BlackIron_Mars_MI"
+      ],
+      "material_keys": [
+        "TX09"
+      ],
+      "flags": {
+        "moving_part": false,
+        "axis": "+X",
+        "mesh_axis": "-Y",
+        "mesh_adapter": "+90deg about Z: mesh -Y -> actor +X; preserve source Grip_L/Grip_R"
+      },
+      "pivot": "center",
+      "fbx": "FBX\\WarrensC_CCS25_AxleBearingBlock_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS26",
+      "name": "WarrensC_CCS26_PawlCover_Mars_SM",
+      "dimensions_cm": [
+        45.0,
+        20.0,
+        40.0
+      ],
+      "actual_dimensions_cm": [
+        45.0,
+        20.0,
+        40.0
+      ],
+      "bounds_min_cm": [
+        -22.499999403953552,
+        -10.000000149011612,
+        -2.980232283178452e-07
+      ],
+      "bounds_max_cm": [
+        22.499999403953552,
+        10.000000149011612,
+        40.00000059604645
+      ],
+      "vertices": 60,
+      "triangles": 104,
+      "materials": [
+        "WarrensC_BlackIron_Mars_MI"
+      ],
+      "material_keys": [
+        "TX09"
+      ],
+      "flags": {
+        "moving_part": false
+      },
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS26_PawlCover_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS27",
+      "name": "WarrensC_CCS27_HeavyChainLink_Mars_SM",
+      "dimensions_cm": [
+        32.0,
+        20.0,
+        8.0
+      ],
+      "actual_dimensions_cm": [
+        32.0,
+        20.0,
+        8.0
+      ],
+      "bounds_min_cm": [
+        -15.999999642372131,
+        -10.000000149011612,
+        -3.999999910593033
+      ],
+      "bounds_max_cm": [
+        15.999999642372131,
+        10.000000149011612,
+        3.999999910593033
+      ],
+      "vertices": 128,
+      "triangles": 256,
+      "materials": [
+        "WarrensC_BlackIron_Mars_MI"
+      ],
+      "material_keys": [
+        "TX09"
+      ],
+      "flags": {
+        "moving_part": false,
+        "instancing": "alternate link planes by 90deg around chain tangent"
+      },
+      "pivot": "center",
+      "fbx": "FBX\\WarrensC_CCS27_HeavyChainLink_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS28",
+      "name": "WarrensC_CCS28_ChainCornerGuide_Mars_SM",
+      "dimensions_cm": [
+        60.0,
+        60.0,
+        40.0
+      ],
+      "actual_dimensions_cm": [
+        60.0,
+        60.0,
+        40.0
+      ],
+      "bounds_min_cm": [
+        -30.000001192092896,
+        -30.000001192092896,
+        -2.980232283178452e-07
+      ],
+      "bounds_max_cm": [
+        30.000001192092896,
+        30.000001192092896,
+        40.00000059604645
+      ],
+      "vertices": 408,
+      "triangles": 788,
+      "materials": [
+        "WarrensC_BlackIron_Mars_MI"
+      ],
+      "material_keys": [
+        "TX09"
+      ],
+      "flags": {
+        "moving_part": false
+      },
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS28_ChainCornerGuide_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS29",
+      "name": "WarrensC_CCS29_FloorChainGuide_Mars_SM",
+      "dimensions_cm": [
+        200.0,
+        40.0,
+        20.0
+      ],
+      "actual_dimensions_cm": [
+        200.0,
+        40.0,
+        20.0
+      ],
+      "bounds_min_cm": [
+        -100.0,
+        -20.000000298023224,
+        -1.490116141589226e-07
+      ],
+      "bounds_max_cm": [
+        100.0,
+        20.000000298023224,
+        20.000000298023224
+      ],
+      "vertices": 216,
+      "triangles": 396,
+      "materials": [
+        "WarrensC_BlackIron_Mars_MI"
+      ],
+      "material_keys": [
+        "TX09"
+      ],
+      "flags": {
+        "moving_part": false,
+        "route": "continuous open channel; chain links instanced separately"
+      },
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS29_FloorChainGuide_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS30",
+      "name": "WarrensC_CCS30_ChainEndAnchor_Mars_SM",
+      "dimensions_cm": [
+        35.0,
+        25.0,
+        40.0
+      ],
+      "actual_dimensions_cm": [
+        35.0,
+        25.0,
+        40.0
+      ],
+      "bounds_min_cm": [
+        -17.499999701976776,
+        -12.5,
+        -2.980232283178452e-07
+      ],
+      "bounds_max_cm": [
+        17.499999701976776,
+        12.5,
+        40.00000059604645
+      ],
+      "vertices": 400,
+      "triangles": 768,
+      "materials": [
+        "WarrensC_BlackIron_Mars_MI"
+      ],
+      "material_keys": [
+        "TX09"
+      ],
+      "flags": {
+        "moving_part": false
+      },
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS30_ChainEndAnchor_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS31",
+      "name": "WarrensC_CCS31_WallFairlead_Mars_SM",
+      "dimensions_cm": [
+        45.0,
+        25.0,
+        45.0
+      ],
+      "actual_dimensions_cm": [
+        45.0,
+        25.0,
+        45.0
+      ],
+      "bounds_min_cm": [
+        -22.499999403953552,
+        -12.5,
+        5.960464566356904e-07
+      ],
+      "bounds_max_cm": [
+        22.499999403953552,
+        12.5,
+        44.999998807907104
+      ],
+      "vertices": 240,
+      "triangles": 448,
+      "materials": [
+        "WarrensC_BlackIron_Mars_MI"
+      ],
+      "material_keys": [
+        "TX09"
+      ],
+      "flags": {
+        "moving_part": false
+      },
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS31_WallFairlead_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS32",
+      "name": "WarrensC_CCS32_OverheadChainHanger_Mars_SM",
+      "dimensions_cm": [
+        30.0,
+        35.0,
+        50.0
+      ],
+      "actual_dimensions_cm": [
+        30.0,
+        35.0,
+        50.0
+      ],
+      "bounds_min_cm": [
+        -15.000000596046448,
+        -17.499999701976776,
+        1.4901161193847656e-06
+      ],
+      "bounds_max_cm": [
+        15.000000596046448,
+        17.499999701976776,
+        50.0
+      ],
+      "vertices": 200,
+      "triangles": 384,
+      "materials": [
+        "WarrensC_BlackIron_Mars_MI"
+      ],
+      "material_keys": [
+        "TX09"
+      ],
+      "flags": {
+        "moving_part": false
+      },
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS32_OverheadChainHanger_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS33",
+      "name": "WarrensC_CCS33_RisingBarGateLeaf_Mars_SM",
+      "dimensions_cm": [
+        200.0,
+        12.0,
+        220.0
+      ],
+      "actual_dimensions_cm": [
+        200.0,
+        12.0,
+        220.00001
+      ],
+      "bounds_min_cm": [
+        -100.0,
+        -5.999999865889549,
+        -2.3841858265427618e-06
+      ],
+      "bounds_max_cm": [
+        100.0,
+        5.999999865889549,
+        220.00000476837158
+      ],
+      "vertices": 480,
+      "triangles": 844,
+      "materials": [
+        "WarrensC_BlackIron_Mars_MI"
+      ],
+      "material_keys": [
+        "TX09"
+      ],
+      "flags": {
+        "moving_part": true,
+        "axis": "+Z",
+        "travel_m": 2.2,
+        "clear_opening_m": "2.0 x 2.2"
+      },
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS33_RisingBarGateLeaf_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS34",
+      "name": "WarrensC_CCS34_GateFramePost_Mars_SM",
+      "dimensions_cm": [
+        20.0,
+        40.0,
+        240.0
+      ],
+      "actual_dimensions_cm": [
+        20.0,
+        40.0,
+        240.00001
+      ],
+      "bounds_min_cm": [
+        -10.000000149011612,
+        -20.000000298023224,
+        -4.7683716530855236e-06
+      ],
+      "bounds_max_cm": [
+        10.000000149011612,
+        20.000000298023224,
+        240.00000953674316
+      ],
+      "vertices": 120,
+      "triangles": 220,
+      "materials": [
+        "WarrensC_LimestoneAshlar_Mars_MI",
+        "WarrensC_BlackIron_Mars_MI"
+      ],
+      "material_keys": [
+        "TX01",
+        "TX09"
+      ],
+      "flags": {
+        "moving_part": false,
+        "placement": "post inner face at opening edge +/-1.0m; no inward cap"
+      },
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS34_GateFramePost_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS35",
+      "name": "WarrensC_CCS35_GateLintel_Mars_SM",
+      "dimensions_cm": [
+        240.0,
+        40.0,
+        20.0
+      ],
+      "actual_dimensions_cm": [
+        239.99999,
+        40.0,
+        20.0
+      ],
+      "bounds_min_cm": [
+        -119.99999284744263,
+        -20.000000298023224,
+        -1.490116141589226e-07
+      ],
+      "bounds_max_cm": [
+        119.99999284744263,
+        20.000000298023224,
+        20.000000298023224
+      ],
+      "vertices": 96,
+      "triangles": 176,
+      "materials": [
+        "WarrensC_LimestoneAshlar_Mars_MI"
+      ],
+      "material_keys": [
+        "TX01"
+      ],
+      "flags": {
+        "moving_part": false,
+        "placement": "static above clear opening z=2.2m; offset in depth to keep leaf travel clear"
+      },
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS35_GateLintel_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS36",
+      "name": "WarrensC_CCS36_GateGuideChannel_Mars_SM",
+      "dimensions_cm": [
+        15.0,
+        20.0,
+        440.0
+      ],
+      "actual_dimensions_cm": [
+        15.0,
+        20.0,
+        440.00001
+      ],
+      "bounds_min_cm": [
+        -7.500000298023224,
+        -10.000000149011612,
+        -4.7683716530855236e-06
+      ],
+      "bounds_max_cm": [
+        7.500000298023224,
+        10.000000149011612,
+        440.00000953674316
+      ],
+      "vertices": 168,
+      "triangles": 308,
+      "materials": [
+        "WarrensC_BlackIron_Mars_MI"
+      ],
+      "material_keys": [
+        "TX09"
+      ],
+      "flags": {
+        "moving_part": false,
+        "placement": "static; mouth +X; mirror for opposite jamb outside clear width",
+        "travel_m": 2.2
+      },
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS36_GateGuideChannel_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS37",
+      "name": "WarrensC_CCS37_GateTopHood_Mars_SM",
+      "dimensions_cm": [
+        240.0,
+        50.0,
+        80.0
+      ],
+      "actual_dimensions_cm": [
+        240.00001,
+        50.0,
+        80.0
+      ],
+      "bounds_min_cm": [
+        -120.00000476837158,
+        -25.0,
+        -5.960464566356904e-07
+      ],
+      "bounds_max_cm": [
+        120.00000476837158,
+        25.0,
+        80.0000011920929
+      ],
+      "vertices": 144,
+      "triangles": 264,
+      "materials": [
+        "WarrensC_LimestoneAshlar_Mars_MI",
+        "WarrensC_BlackIron_Mars_MI"
+      ],
+      "material_keys": [
+        "TX01",
+        "TX09"
+      ],
+      "flags": {
+        "moving_part": false,
+        "pocket": "open vertical slot: minimum width 2.06m; all rails outside leaf depth"
+      },
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS37_GateTopHood_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS38",
+      "name": "WarrensC_CCS38_GateStopShoe_Mars_SM",
+      "dimensions_cm": [
+        25.0,
+        30.0,
+        15.0
+      ],
+      "actual_dimensions_cm": [
+        25.0,
+        30.0,
+        15.0
+      ],
+      "bounds_min_cm": [
+        -12.5,
+        -15.000000596046448,
+        -2.980232283178452e-07
+      ],
+      "bounds_max_cm": [
+        12.5,
+        15.000000596046448,
+        15.000000596046448
+      ],
+      "vertices": 56,
+      "triangles": 96,
+      "materials": [
+        "WarrensC_BlackIron_Mars_MI"
+      ],
+      "material_keys": [
+        "TX09"
+      ],
+      "flags": {
+        "moving_part": false,
+        "placement": "outside clear walk strip at jamb; no central threshold"
+      },
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS38_GateStopShoe_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS39",
+      "name": "WarrensC_CCS39_CounterweightCase_Mars_SM",
+      "dimensions_cm": [
+        45.0,
+        40.0,
+        240.0
+      ],
+      "actual_dimensions_cm": [
+        45.0,
+        40.0,
+        240.00001
+      ],
+      "bounds_min_cm": [
+        -22.499999403953552,
+        -20.000000298023224,
+        -4.7683716530855236e-06
+      ],
+      "bounds_max_cm": [
+        22.499999403953552,
+        20.000000298023224,
+        240.00000953674316
+      ],
+      "vertices": 264,
+      "triangles": 468,
+      "materials": [
+        "WarrensC_BlackIron_Mars_MI"
+      ],
+      "material_keys": [
+        "TX09"
+      ],
+      "flags": {
+        "moving_part": false,
+        "hookup": "closed static cosmetic case; no moving counterweight"
+      },
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS39_CounterweightCase_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS40",
+      "name": "WarrensC_CCS40_ExistingShortcutLeverHandle_Mars_SM",
+      "dimensions_cm": [
+        15.0,
+        20.0,
+        80.0
+      ],
+      "actual_dimensions_cm": [
+        15.0,
+        20.0,
+        80.0
+      ],
+      "bounds_min_cm": [
+        -7.500000298023224,
+        -9.999999403953552,
+        -5.960464566356904e-07
+      ],
+      "bounds_max_cm": [
+        7.500000298023224,
+        9.999999403953552,
+        80.0000011920929
+      ],
+      "vertices": 144,
+      "triangles": 276,
+      "materials": [
+        "WarrensC_BlackIron_Mars_MI"
+      ],
+      "material_keys": [
+        "TX09"
+      ],
+      "flags": {
+        "moving_part": true,
+        "axis": "+X; fit existing measured hinge",
+        "compatibility": "existing shortcut lever skin only; no added control"
+      },
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS40_ExistingShortcutLeverHandle_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS41",
+      "name": "WarrensC_CCS41_LeverMountBase_Mars_SM",
+      "dimensions_cm": [
+        40.0,
+        40.0,
+        50.0
+      ],
+      "actual_dimensions_cm": [
+        40.0,
+        40.0,
+        50.0
+      ],
+      "bounds_min_cm": [
+        -20.000000298023224,
+        -20.000000298023224,
+        0.0
+      ],
+      "bounds_max_cm": [
+        20.000000298023224,
+        20.000000298023224,
+        50.0
+      ],
+      "vertices": 312,
+      "triangles": 596,
+      "materials": [
+        "WarrensC_LimestoneAshlar_Mars_MI",
+        "WarrensC_BlackIron_Mars_MI"
+      ],
+      "material_keys": [
+        "TX01",
+        "TX09"
+      ],
+      "flags": {
+        "moving_part": false,
+        "axis": "+X; fit existing measured hinge"
+      },
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS41_LeverMountBase_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS42",
+      "name": "WarrensC_CCS42_FastenerAndPinKit_Mars_SM",
+      "dimensions_cm": [
+        20.0,
+        20.0,
+        20.0
+      ],
+      "actual_dimensions_cm": [
+        20.0,
+        20.0,
+        20.0
+      ],
+      "bounds_min_cm": [
+        -10.000000149011612,
+        -10.000000149011612,
+        -1.490116141589226e-07
+      ],
+      "bounds_max_cm": [
+        10.000000149011612,
+        10.000000149011612,
+        20.000000298023224
+      ],
+      "vertices": 180,
+      "triangles": 340,
+      "materials": [
+        "WarrensC_BlackIron_Mars_MI"
+      ],
+      "material_keys": [
+        "TX09"
+      ],
+      "flags": {
+        "moving_part": false
+      },
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS42_FastenerAndPinKit_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS43",
+      "name": "WarrensC_CCS43_LargeBankRock_Mars_SM",
+      "dimensions_cm": [
+        300.0,
+        200.0,
+        250.0
+      ],
+      "actual_dimensions_cm": [
+        300.0,
+        199.99999,
+        250.0
+      ],
+      "bounds_min_cm": [
+        -150.0,
+        -99.99999403953552,
+        0.0
+      ],
+      "bounds_max_cm": [
+        150.0,
+        99.99999403953552,
+        250.0
+      ],
+      "vertices": 21,
+      "triangles": 38,
+      "materials": [
+        "WarrensC_CaveRock_Mars_MI"
+      ],
+      "material_keys": [
+        "TX04"
+      ],
+      "flags": {},
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS43_LargeBankRock_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS44",
+      "name": "WarrensC_CCS44_MediumRockWedge_Mars_SM",
+      "dimensions_cm": [
+        160.0,
+        120.0,
+        130.0
+      ],
+      "actual_dimensions_cm": [
+        160.0,
+        120.0,
+        129.99999
+      ],
+      "bounds_min_cm": [
+        -80.0000011920929,
+        -60.00000238418579,
+        2.3841858265427618e-06
+      ],
+      "bounds_max_cm": [
+        80.0000011920929,
+        60.00000238418579,
+        129.99999523162842
+      ],
+      "vertices": 21,
+      "triangles": 38,
+      "materials": [
+        "WarrensC_CaveRock_Mars_MI"
+      ],
+      "material_keys": [
+        "TX04"
+      ],
+      "flags": {},
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS44_MediumRockWedge_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS45",
+      "name": "WarrensC_CCS45_CaveWallPanel_Mars_SM",
+      "dimensions_cm": [
+        400.0,
+        100.0,
+        400.0
+      ],
+      "actual_dimensions_cm": [
+        400.0,
+        100.0,
+        400.0
+      ],
+      "bounds_min_cm": [
+        -200.0,
+        -50.0,
+        0.0
+      ],
+      "bounds_max_cm": [
+        200.0,
+        50.0,
+        400.0
+      ],
+      "vertices": 48,
+      "triangles": 92,
+      "materials": [
+        "WarrensC_CaveRock_Mars_MI"
+      ],
+      "material_keys": [
+        "TX04"
+      ],
+      "flags": {},
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS45_CaveWallPanel_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS46",
+      "name": "WarrensC_CCS46_CaveInsideCorner_Mars_SM",
+      "dimensions_cm": [
+        300.0,
+        300.0,
+        400.0
+      ],
+      "actual_dimensions_cm": [
+        300.0,
+        300.0,
+        400.0
+      ],
+      "bounds_min_cm": [
+        -150.0,
+        -150.0,
+        0.0
+      ],
+      "bounds_max_cm": [
+        150.0,
+        150.0,
+        400.0
+      ],
+      "vertices": 96,
+      "triangles": 184,
+      "materials": [
+        "WarrensC_CaveRock_Mars_MI"
+      ],
+      "material_keys": [
+        "TX04"
+      ],
+      "flags": {},
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS46_CaveInsideCorner_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS47",
+      "name": "WarrensC_CCS47_CaveCeilingCap_Mars_SM",
+      "dimensions_cm": [
+        400.0,
+        400.0,
+        100.0
+      ],
+      "actual_dimensions_cm": [
+        400.0,
+        400.0,
+        100.0
+      ],
+      "bounds_min_cm": [
+        -200.0,
+        -200.0,
+        0.0
+      ],
+      "bounds_max_cm": [
+        200.0,
+        200.0,
+        100.0
+      ],
+      "vertices": 21,
+      "triangles": 38,
+      "materials": [
+        "WarrensC_CaveRock_Mars_MI"
+      ],
+      "material_keys": [
+        "TX04"
+      ],
+      "flags": {},
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS47_CaveCeilingCap_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS48",
+      "name": "WarrensC_CCS48_WetBankSkirt_Mars_SM",
+      "dimensions_cm": [
+        400.0,
+        120.0,
+        200.0
+      ],
+      "actual_dimensions_cm": [
+        400.0,
+        119.99999,
+        200.0
+      ],
+      "bounds_min_cm": [
+        -200.0,
+        -59.99999642372131,
+        0.0
+      ],
+      "bounds_max_cm": [
+        200.0,
+        59.99999642372131,
+        200.0
+      ],
+      "vertices": 60,
+      "triangles": 102,
+      "materials": [
+        "WarrensC_CaveRock_Mars_MI",
+        "WarrensC_DampStone_Mars_MI"
+      ],
+      "material_keys": [
+        "TX04",
+        "TX17"
+      ],
+      "flags": {},
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS48_WetBankSkirt_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS49",
+      "name": "WarrensC_CCS49_TallCliffFace_Mars_SM",
+      "dimensions_cm": [
+        400.0,
+        150.0,
+        600.0
+      ],
+      "actual_dimensions_cm": [
+        400.0,
+        150.0,
+        600.0
+      ],
+      "bounds_min_cm": [
+        -200.0,
+        -75.0,
+        0.0
+      ],
+      "bounds_max_cm": [
+        200.0,
+        75.0,
+        600.0
+      ],
+      "vertices": 48,
+      "triangles": 92,
+      "materials": [
+        "WarrensC_CaveRock_Mars_MI"
+      ],
+      "material_keys": [
+        "TX04"
+      ],
+      "flags": {},
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS49_TallCliffFace_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS50",
+      "name": "WarrensC_CCS50_WallToeRubble_Mars_SM",
+      "dimensions_cm": [
+        200.0,
+        60.0,
+        30.0
+      ],
+      "actual_dimensions_cm": [
+        200.0,
+        60.0,
+        30.0
+      ],
+      "bounds_min_cm": [
+        -100.0,
+        -30.000001192092896,
+        -5.960464566356904e-07
+      ],
+      "bounds_max_cm": [
+        100.0,
+        30.000001192092896,
+        30.000001192092896
+      ],
+      "vertices": 147,
+      "triangles": 266,
+      "materials": [
+        "WarrensC_CaveRock_Mars_MI"
+      ],
+      "material_keys": [
+        "TX04"
+      ],
+      "flags": {},
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS50_WallToeRubble_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS51",
+      "name": "WarrensC_CCS51_DeepCanalSurface_Mars_SM",
+      "dimensions_cm": [
+        400.0,
+        400.0,
+        1.0
+      ],
+      "actual_dimensions_cm": [
+        400.0,
+        400.0,
+        0.0
+      ],
+      "bounds_min_cm": [
+        -200.0,
+        -200.0,
+        0.0
+      ],
+      "bounds_max_cm": [
+        200.0,
+        200.0,
+        0.0
+      ],
+      "vertices": 4,
+      "triangles": 2,
+      "materials": [
+        "WarrensC_Water_Mars_MI"
+      ],
+      "material_keys": [
+        "FX_Water"
+      ],
+      "flags": {
+        "card": true
+      },
+      "pivot": "top contact",
+      "fbx": "FBX\\WarrensC_CCS51_DeepCanalSurface_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS52",
+      "name": "WarrensC_CCS52_FoamEdgeStrip_Mars_SM",
+      "dimensions_cm": [
+        200.0,
+        50.0,
+        1.0
+      ],
+      "actual_dimensions_cm": [
+        200.0,
+        50.0,
+        0.0
+      ],
+      "bounds_min_cm": [
+        -100.0,
+        -25.0,
+        0.0
+      ],
+      "bounds_max_cm": [
+        100.0,
+        25.0,
+        0.0
+      ],
+      "vertices": 26,
+      "triangles": 24,
+      "materials": [
+        "CCK_Foam"
+      ],
+      "material_keys": [
+        "Foam"
+      ],
+      "flags": {
+        "card": true
+      },
+      "pivot": "top contact",
+      "fbx": "FBX\\WarrensC_CCS52_FoamEdgeStrip_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS53",
+      "name": "WarrensC_CCS53_WallWaterlineCard_Mars_SM",
+      "dimensions_cm": [
+        200.0,
+        60.0,
+        1.0
+      ],
+      "actual_dimensions_cm": [
+        200.0,
+        0.0,
+        1.0
+      ],
+      "bounds_min_cm": [
+        -100.0,
+        0.0,
+        1.1175870645585562e-08
+      ],
+      "bounds_max_cm": [
+        100.0,
+        0.0,
+        0.9999999776482582
+      ],
+      "vertices": 4,
+      "triangles": 2,
+      "materials": [
+        "WarrensC_Wear_DampLeak_Mars_MI"
+      ],
+      "material_keys": [
+        "Wear_DampLeak"
+      ],
+      "flags": {
+        "card": true
+      },
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS53_WallWaterlineCard_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS54",
+      "name": "WarrensC_CCS54_BrineGutter_Mars_SM",
+      "dimensions_cm": [
+        200.0,
+        45.0,
+        30.0
+      ],
+      "actual_dimensions_cm": [
+        200.0,
+        45.0,
+        30.0
+      ],
+      "bounds_min_cm": [
+        -100.0,
+        -22.499999403953552,
+        -5.960464566356904e-07
+      ],
+      "bounds_max_cm": [
+        100.0,
+        22.499999403953552,
+        30.000001192092896
+      ],
+      "vertices": 72,
+      "triangles": 132,
+      "materials": [
+        "WarrensC_DampStone_Mars_MI"
+      ],
+      "material_keys": [
+        "TX17"
+      ],
+      "flags": {
+        "card": true
+      },
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS54_BrineGutter_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS55",
+      "name": "WarrensC_CCS55_WallSpout_Mars_SM",
+      "dimensions_cm": [
+        60.0,
+        80.0,
+        60.0
+      ],
+      "actual_dimensions_cm": [
+        60.0,
+        80.0,
+        60.0
+      ],
+      "bounds_min_cm": [
+        -30.000001192092896,
+        -40.00000059604645,
+        -1.1920929132713809e-06
+      ],
+      "bounds_max_cm": [
+        30.000001192092896,
+        40.00000059604645,
+        60.00000238418579
+      ],
+      "vertices": 32,
+      "triangles": 64,
+      "materials": [
+        "WarrensC_DampStone_Mars_MI"
+      ],
+      "material_keys": [
+        "TX17"
+      ],
+      "flags": {},
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS55_WallSpout_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS56",
+      "name": "WarrensC_CCS56_OutletFlowRibbon_Mars_SM",
+      "dimensions_cm": [
+        40.0,
+        35.0,
+        100.0
+      ],
+      "actual_dimensions_cm": [
+        40.0,
+        35.0,
+        100.0
+      ],
+      "bounds_min_cm": [
+        -20.000000298023224,
+        -17.499999701976776,
+        0.0
+      ],
+      "bounds_max_cm": [
+        20.000000298023224,
+        17.499999701976776,
+        100.0
+      ],
+      "vertices": 14,
+      "triangles": 12,
+      "materials": [
+        "CCK_Drip"
+      ],
+      "material_keys": [
+        "Drip"
+      ],
+      "flags": {
+        "card": true
+      },
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS56_OutletFlowRibbon_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS57",
+      "name": "WarrensC_CCS57_DripRippleCard_Mars_SM",
+      "dimensions_cm": [
+        80.0,
+        80.0,
+        1.0
+      ],
+      "actual_dimensions_cm": [
+        80.0,
+        80.0,
+        1.0
+      ],
+      "bounds_min_cm": [
+        -40.00000059604645,
+        -40.00000059604645,
+        -0.9999999776482582
+      ],
+      "bounds_max_cm": [
+        40.00000059604645,
+        40.00000059604645,
+        -1.1175870645585562e-08
+      ],
+      "vertices": 192,
+      "triangles": 384,
+      "materials": [
+        "CCK_Ripple"
+      ],
+      "material_keys": [
+        "Ripple"
+      ],
+      "flags": {
+        "card": true
+      },
+      "pivot": "top contact",
+      "fbx": "FBX\\WarrensC_CCS57_DripRippleCard_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS58",
+      "name": "WarrensC_CCS58_VerticalDripCard_Mars_SM",
+      "dimensions_cm": [
+        30.0,
+        1.0,
+        120.0
+      ],
+      "actual_dimensions_cm": [
+        30.0,
+        0.0,
+        119.99999
+      ],
+      "bounds_min_cm": [
+        -15.000000596046448,
+        0.0,
+        3.5762788286319847e-06
+      ],
+      "bounds_max_cm": [
+        15.000000596046448,
+        0.0,
+        119.99999284744263
+      ],
+      "vertices": 20,
+      "triangles": 10,
+      "materials": [
+        "CCK_Drip"
+      ],
+      "material_keys": [
+        "Drip"
+      ],
+      "flags": {
+        "card": true
+      },
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS58_VerticalDripCard_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS59",
+      "name": "WarrensC_CCS59_FloorPuddleCard_Mars_SM",
+      "dimensions_cm": [
+        150.0,
+        100.0,
+        1.0
+      ],
+      "actual_dimensions_cm": [
+        150.00001,
+        100.0,
+        0.0
+      ],
+      "bounds_min_cm": [
+        -75.00000596046448,
+        -50.0,
+        0.0
+      ],
+      "bounds_max_cm": [
+        75.00000596046448,
+        50.0,
+        0.0
+      ],
+      "vertices": 12,
+      "triangles": 10,
+      "materials": [
+        "CCK_Puddle"
+      ],
+      "material_keys": [
+        "Puddle"
+      ],
+      "flags": {
+        "card": true
+      },
+      "pivot": "top contact",
+      "fbx": "FBX\\WarrensC_CCS59_FloorPuddleCard_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS60",
+      "name": "WarrensC_CCS60_LanternHousing_Mars_SM",
+      "dimensions_cm": [
+        35.0,
+        25.0,
+        55.0
+      ],
+      "actual_dimensions_cm": [
+        35.0,
+        25.0,
+        55.0
+      ],
+      "bounds_min_cm": [
+        -17.499999701976776,
+        -12.5,
+        -5.960464566356904e-07
+      ],
+      "bounds_max_cm": [
+        17.499999701976776,
+        12.5,
+        55.000001192092896
+      ],
+      "vertices": 528,
+      "triangles": 972,
+      "materials": [
+        "WarrensC_BlackIron_Mars_MI"
+      ],
+      "material_keys": [
+        "TX09"
+      ],
+      "flags": {},
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS60_LanternHousing_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS61",
+      "name": "WarrensC_CCS61_LanternGlass_Mars_SM",
+      "dimensions_cm": [
+        25.0,
+        20.0,
+        35.0
+      ],
+      "actual_dimensions_cm": [
+        25.0,
+        20.0,
+        35.0
+      ],
+      "bounds_min_cm": [
+        -12.5,
+        -10.000000149011612,
+        2.980232283178452e-07
+      ],
+      "bounds_max_cm": [
+        12.5,
+        10.000000149011612,
+        34.99999940395355
+      ],
+      "vertices": 24,
+      "triangles": 44,
+      "materials": [
+        "WarrensC_OliveCeramic_Mars_MI"
+      ],
+      "material_keys": [
+        "TX15"
+      ],
+      "flags": {},
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS61_LanternGlass_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS62",
+      "name": "WarrensC_CCS62_WallLanternHook_Mars_SM",
+      "dimensions_cm": [
+        15.0,
+        25.0,
+        25.0
+      ],
+      "actual_dimensions_cm": [
+        15.0,
+        25.0,
+        25.0
+      ],
+      "bounds_min_cm": [
+        -7.500000298023224,
+        -12.5,
+        0.0
+      ],
+      "bounds_max_cm": [
+        7.500000298023224,
+        12.5,
+        25.0
+      ],
+      "vertices": 110,
+      "triangles": 196,
+      "materials": [
+        "WarrensC_BlackIron_Mars_MI"
+      ],
+      "material_keys": [
+        "TX09"
+      ],
+      "flags": {},
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS62_WallLanternHook_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS63",
+      "name": "WarrensC_CCS63_SconceFixture_Mars_SM",
+      "dimensions_cm": [
+        30.0,
+        35.0,
+        60.0
+      ],
+      "actual_dimensions_cm": [
+        30.0,
+        35.0,
+        60.0
+      ],
+      "bounds_min_cm": [
+        -15.000000596046448,
+        -17.499999701976776,
+        -1.1920929132713809e-06
+      ],
+      "bounds_max_cm": [
+        15.000000596046448,
+        17.499999701976776,
+        60.00000238418579
+      ],
+      "vertices": 152,
+      "triangles": 284,
+      "materials": [
+        "WarrensC_BlackIron_Mars_MI"
+      ],
+      "material_keys": [
+        "TX09"
+      ],
+      "flags": {},
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS63_SconceFixture_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS64",
+      "name": "WarrensC_CCS64_FlameCard_Mars_SM",
+      "dimensions_cm": [
+        25.0,
+        1.0,
+        50.0
+      ],
+      "actual_dimensions_cm": [
+        25.0,
+        1.0,
+        50.0
+      ],
+      "bounds_min_cm": [
+        -12.5,
+        -0.4999999888241291,
+        0.0
+      ],
+      "bounds_max_cm": [
+        12.5,
+        0.4999999888241291,
+        50.0
+      ],
+      "vertices": 22,
+      "triangles": 40,
+      "materials": [
+        "WarrensC_FlameCard_Mars_MI"
+      ],
+      "material_keys": [
+        "FX_Flame"
+      ],
+      "flags": {
+        "card": true
+      },
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS64_FlameCard_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS65",
+      "name": "WarrensC_CCS65_LanternRestSet_Mars_SM",
+      "dimensions_cm": [
+        45.0,
+        40.0,
+        60.0
+      ],
+      "actual_dimensions_cm": [
+        45.0,
+        40.0,
+        60.0
+      ],
+      "bounds_min_cm": [
+        -22.499999403953552,
+        -20.000000298023224,
+        -1.1920929132713809e-06
+      ],
+      "bounds_max_cm": [
+        22.499999403953552,
+        20.000000298023224,
+        60.00000238418579
+      ],
+      "vertices": 160,
+      "triangles": 288,
+      "materials": [
+        "WarrensC_LimestoneAshlar_Mars_MI",
+        "WarrensC_DarkTimber_Mars_MI",
+        "WarrensC_BlackIron_Mars_MI"
+      ],
+      "material_keys": [
+        "TX01",
+        "TX08",
+        "TX09"
+      ],
+      "flags": {},
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS65_LanternRestSet_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS66",
+      "name": "WarrensC_CCS66_BrineBarrel_Mars_SM",
+      "dimensions_cm": [
+        90.0,
+        90.0,
+        120.0
+      ],
+      "actual_dimensions_cm": [
+        90.0,
+        90.0,
+        120.00001
+      ],
+      "bounds_min_cm": [
+        -44.999998807907104,
+        -44.999998807907104,
+        -2.3841858265427618e-06
+      ],
+      "bounds_max_cm": [
+        44.999998807907104,
+        44.999998807907104,
+        120.00000476837158
+      ],
+      "vertices": 408,
+      "triangles": 748,
+      "materials": [
+        "WarrensC_DarkTimber_Mars_MI",
+        "WarrensC_BlackIron_Mars_MI",
+        "WarrensC_OakPlank_Mars_MI"
+      ],
+      "material_keys": [
+        "TX08",
+        "TX09",
+        "TX07"
+      ],
+      "flags": {},
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS66_BrineBarrel_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS67",
+      "name": "WarrensC_CCS67_CrateBodyAndLid_Mars_SM",
+      "dimensions_cm": [
+        100.0,
+        80.0,
+        80.0
+      ],
+      "actual_dimensions_cm": [
+        100.0,
+        80.0,
+        80.0
+      ],
+      "bounds_min_cm": [
+        -50.0,
+        -40.00000059604645,
+        -5.960464566356904e-07
+      ],
+      "bounds_max_cm": [
+        50.0,
+        40.00000059604645,
+        80.0000011920929
+      ],
+      "vertices": 664,
+      "triangles": 1212,
+      "materials": [
+        "WarrensC_DarkTimber_Mars_MI"
+      ],
+      "material_keys": [
+        "TX08"
+      ],
+      "flags": {
+        "variation": "body_and_reusable_lid"
+      },
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS67_CrateBodyAndLid_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS68",
+      "name": "WarrensC_CCS68_ClothSack_Mars_SM",
+      "dimensions_cm": [
+        70.0,
+        60.0,
+        100.0
+      ],
+      "actual_dimensions_cm": [
+        70.0,
+        60.0,
+        100.0
+      ],
+      "bounds_min_cm": [
+        -35.00000238418579,
+        -29.999998211860657,
+        0.0
+      ],
+      "bounds_max_cm": [
+        35.00000238418579,
+        29.999998211860657,
+        100.0
+      ],
+      "vertices": 168,
+      "triangles": 320,
+      "materials": [
+        "WarrensC_LinenCanvas_Mars_MI",
+        "WarrensC_RopeFibre_Mars_MI"
+      ],
+      "material_keys": [
+        "TX12",
+        "TX14"
+      ],
+      "flags": {},
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS68_ClothSack_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS69",
+      "name": "WarrensC_CCS69_StorageShelf_Mars_SM",
+      "dimensions_cm": [
+        200.0,
+        50.0,
+        220.0
+      ],
+      "actual_dimensions_cm": [
+        200.0,
+        50.0,
+        220.00001
+      ],
+      "bounds_min_cm": [
+        -100.0,
+        -25.0,
+        -2.3841858265427618e-06
+      ],
+      "bounds_max_cm": [
+        100.0,
+        25.0,
+        220.00000476837158
+      ],
+      "vertices": 528,
+      "triangles": 968,
+      "materials": [
+        "WarrensC_DarkTimber_Mars_MI"
+      ],
+      "material_keys": [
+        "TX08"
+      ],
+      "flags": {},
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS69_StorageShelf_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS70",
+      "name": "WarrensC_CCS70_SaltChunkCluster_Mars_SM",
+      "dimensions_cm": [
+        80.0,
+        70.0,
+        40.0
+      ],
+      "actual_dimensions_cm": [
+        80.0,
+        70.0,
+        40.0
+      ],
+      "bounds_min_cm": [
+        -40.00000059604645,
+        -34.99999940395355,
+        -2.980232283178452e-07
+      ],
+      "bounds_max_cm": [
+        40.00000059604645,
+        34.99999940395355,
+        40.00000059604645
+      ],
+      "vertices": 120,
+      "triangles": 220,
+      "materials": [
+        "WarrensC_SaltCrust_Mars_MI"
+      ],
+      "material_keys": [
+        "TX05"
+      ],
+      "flags": {},
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS70_SaltChunkCluster_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS71",
+      "name": "WarrensC_CCS71_RopeCoil_Mars_SM",
+      "dimensions_cm": [
+        60.0,
+        60.0,
+        20.0
+      ],
+      "actual_dimensions_cm": [
+        60.0,
+        60.0,
+        20.0
+      ],
+      "bounds_min_cm": [
+        -30.000001192092896,
+        -29.999998211860657,
+        -1.490116141589226e-07
+      ],
+      "bounds_max_cm": [
+        30.000001192092896,
+        29.999998211860657,
+        20.000000298023224
+      ],
+      "vertices": 564,
+      "triangles": 1120,
+      "materials": [
+        "WarrensC_RopeFibre_Mars_MI"
+      ],
+      "material_keys": [
+        "TX14"
+      ],
+      "flags": {},
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS71_RopeCoil_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS72",
+      "name": "WarrensC_CCS72_RepairPlank_Mars_SM",
+      "dimensions_cm": [
+        150.0,
+        25.0,
+        6.0
+      ],
+      "actual_dimensions_cm": [
+        150.0,
+        25.0,
+        6.0
+      ],
+      "bounds_min_cm": [
+        -75.0,
+        -12.5,
+        6.705522803684971e-08
+      ],
+      "bounds_max_cm": [
+        75.0,
+        12.5,
+        5.999999865889549
+      ],
+      "vertices": 30,
+      "triangles": 48,
+      "materials": [
+        "WarrensC_OakPlank_Mars_MI",
+        "WarrensC_DarkTimber_Mars_MI"
+      ],
+      "material_keys": [
+        "TX07",
+        "TX08"
+      ],
+      "flags": {},
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS72_RepairPlank_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS73",
+      "name": "WarrensC_CCS73_BoltedRepairPlate_Mars_SM",
+      "dimensions_cm": [
+        70.0,
+        40.0,
+        4.0
+      ],
+      "actual_dimensions_cm": [
+        70.0,
+        40.0,
+        4.0
+      ],
+      "bounds_min_cm": [
+        -34.99999940395355,
+        -20.000000298023224,
+        4.4703482582342247e-08
+      ],
+      "bounds_max_cm": [
+        34.99999940395355,
+        20.000000298023224,
+        3.999999910593033
+      ],
+      "vertices": 64,
+      "triangles": 108,
+      "materials": [
+        "WarrensC_BlackIron_Mars_MI"
+      ],
+      "material_keys": [
+        "TX09"
+      ],
+      "flags": {},
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS73_BoltedRepairPlate_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS74",
+      "name": "WarrensC_CCS74_ClothScrap_Mars_SM",
+      "dimensions_cm": [
+        50.0,
+        50.0,
+        2.0
+      ],
+      "actual_dimensions_cm": [
+        50.0,
+        50.0,
+        2.0
+      ],
+      "bounds_min_cm": [
+        -24.99999850988388,
+        -25.0,
+        2.2351741291171123e-08
+      ],
+      "bounds_max_cm": [
+        24.99999850988388,
+        25.0,
+        1.9999999552965164
+      ],
+      "vertices": 50,
+      "triangles": 96,
+      "materials": [
+        "WarrensC_LinenCanvas_Mars_MI"
+      ],
+      "material_keys": [
+        "TX12"
+      ],
+      "flags": {},
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS74_ClothScrap_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS75",
+      "name": "WarrensC_CCS75_MaintenanceBucket_Mars_SM",
+      "dimensions_cm": [
+        50.0,
+        45.0,
+        55.0
+      ],
+      "actual_dimensions_cm": [
+        50.0,
+        45.0,
+        55.0
+      ],
+      "bounds_min_cm": [
+        -25.0,
+        -22.499999403953552,
+        -5.960464566356904e-07
+      ],
+      "bounds_max_cm": [
+        25.0,
+        22.499999403953552,
+        55.000001192092896
+      ],
+      "vertices": 222,
+      "triangles": 428,
+      "materials": [
+        "WarrensC_DarkTimber_Mars_MI",
+        "WarrensC_BlackIron_Mars_MI"
+      ],
+      "material_keys": [
+        "TX08",
+        "TX09"
+      ],
+      "flags": {},
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS75_MaintenanceBucket_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS76",
+      "name": "WarrensC_CCS76_LongLadle_Mars_SM",
+      "dimensions_cm": [
+        25.0,
+        15.0,
+        90.0
+      ],
+      "actual_dimensions_cm": [
+        25.0,
+        15.0,
+        90.0
+      ],
+      "bounds_min_cm": [
+        -12.5,
+        -7.500000298023224,
+        1.1920929132713809e-06
+      ],
+      "bounds_max_cm": [
+        12.5,
+        7.500000298023224,
+        89.99999761581421
+      ],
+      "vertices": 64,
+      "triangles": 116,
+      "materials": [
+        "WarrensC_DarkTimber_Mars_MI"
+      ],
+      "material_keys": [
+        "TX08"
+      ],
+      "flags": {},
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS76_LongLadle_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS77",
+      "name": "WarrensC_CCS77_ReedBasket_Mars_SM",
+      "dimensions_cm": [
+        70.0,
+        60.0,
+        60.0
+      ],
+      "actual_dimensions_cm": [
+        70.0,
+        60.0,
+        60.0
+      ],
+      "bounds_min_cm": [
+        -34.99999940395355,
+        -30.000001192092896,
+        -1.1920929132713809e-06
+      ],
+      "bounds_max_cm": [
+        34.99999940395355,
+        30.000001192092896,
+        60.00000238418579
+      ],
+      "vertices": 568,
+      "triangles": 1076,
+      "materials": [
+        "WarrensC_DarkTimber_Mars_MI"
+      ],
+      "material_keys": [
+        "TX08"
+      ],
+      "flags": {},
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS77_ReedBasket_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS78",
+      "name": "WarrensC_CCS78_MaintenanceNoticeBoard_Mars_SM",
+      "dimensions_cm": [
+        70.0,
+        3.0,
+        100.0
+      ],
+      "actual_dimensions_cm": [
+        70.0,
+        3.0,
+        100.0
+      ],
+      "bounds_min_cm": [
+        -34.99999940395355,
+        -1.4999999664723873,
+        0.0
+      ],
+      "bounds_max_cm": [
+        34.99999940395355,
+        1.4999999664723873,
+        100.0
+      ],
+      "vertices": 144,
+      "triangles": 256,
+      "materials": [
+        "WarrensC_DarkTimber_Mars_MI",
+        "WarrensC_Parchment_Mars_MI",
+        "WarrensC_BlackIron_Mars_MI"
+      ],
+      "material_keys": [
+        "TX08",
+        "TX16",
+        "TX09"
+      ],
+      "flags": {
+        "variation": "blank_authored_notice_backing"
+      },
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS78_MaintenanceNoticeBoard_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS79",
+      "name": "WarrensC_CCS79_SluiceIdentityPlaque_Mars_SM",
+      "dimensions_cm": [
+        60.0,
+        3.0,
+        60.0
+      ],
+      "actual_dimensions_cm": [
+        60.0,
+        3.0,
+        60.0
+      ],
+      "bounds_min_cm": [
+        -30.000001192092896,
+        -1.5000000596046448,
+        -1.1920929132713809e-06
+      ],
+      "bounds_max_cm": [
+        30.000001192092896,
+        1.5000000596046448,
+        60.00000238418579
+      ],
+      "vertices": 348,
+      "triangles": 648,
+      "materials": [
+        "WarrensC_Parchment_Mars_MI",
+        "WarrensC_BlackIron_Mars_MI"
+      ],
+      "material_keys": [
+        "TX16",
+        "TX09"
+      ],
+      "flags": {},
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS79_SluiceIdentityPlaque_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS80",
+      "name": "WarrensC_CCS80_RouteMarkerPlate_Mars_SM",
+      "dimensions_cm": [
+        50.0,
+        3.0,
+        40.0
+      ],
+      "actual_dimensions_cm": [
+        50.0,
+        3.0,
+        40.0
+      ],
+      "bounds_min_cm": [
+        -25.0,
+        -1.4999999664723873,
+        -2.980232283178452e-07
+      ],
+      "bounds_max_cm": [
+        25.0,
+        1.4999999664723873,
+        40.00000059604645
+      ],
+      "vertices": 12,
+      "triangles": 20,
+      "materials": [
+        "WarrensC_Parchment_Mars_MI"
+      ],
+      "material_keys": [
+        "TX16"
+      ],
+      "flags": {
+        "variation": "blank_route_backing_no_arrow"
+      },
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS80_RouteMarkerPlate_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS81",
+      "name": "WarrensC_CCS81_BankClothMarker_Mars_SM",
+      "dimensions_cm": [
+        60.0,
+        4.0,
+        140.0
+      ],
+      "actual_dimensions_cm": [
+        60.0,
+        4.0,
+        140.0
+      ],
+      "bounds_min_cm": [
+        -30.000001192092896,
+        -1.9999999552965164,
+        1.1920929132713809e-06
+      ],
+      "bounds_max_cm": [
+        30.000001192092896,
+        1.9999999552965164,
+        139.9999976158142
+      ],
+      "vertices": 124,
+      "triangles": 224,
+      "materials": [
+        "WarrensC_BlackIron_Mars_MI",
+        "WarrensC_LinenCanvas_Mars_MI"
+      ],
+      "material_keys": [
+        "TX09",
+        "TX12"
+      ],
+      "flags": {},
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS81_BankClothMarker_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS82",
+      "name": "WarrensC_CCS82_SaltWearDecalCarrier_Mars_SM",
+      "dimensions_cm": [
+        120.0,
+        1.0,
+        70.0
+      ],
+      "actual_dimensions_cm": [
+        120.0,
+        0.0,
+        70.0
+      ],
+      "bounds_min_cm": [
+        -60.00000238418579,
+        0.0,
+        -69.9999988079071
+      ],
+      "bounds_max_cm": [
+        60.00000238418579,
+        0.0,
+        -5.960464566356904e-07
+      ],
+      "vertices": 4,
+      "triangles": 2,
+      "materials": [
+        "WarrensC_Wear_SaltResidue_Mars_MI"
+      ],
+      "material_keys": [
+        "Wear_SaltResidue"
+      ],
+      "flags": {
+        "card": true,
+        "variation": "surface_mask_only"
+      },
+      "pivot": "top contact",
+      "fbx": "FBX\\WarrensC_CCS82_SaltWearDecalCarrier_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS83",
+      "name": "WarrensC_CCS83_DampStreakDecalCarrier_Mars_SM",
+      "dimensions_cm": [
+        150.0,
+        1.0,
+        120.0
+      ],
+      "actual_dimensions_cm": [
+        150.0,
+        0.0,
+        120.00001
+      ],
+      "bounds_min_cm": [
+        -75.0,
+        0.0,
+        -2.3841858265427618e-06
+      ],
+      "bounds_max_cm": [
+        75.0,
+        0.0,
+        120.00000476837158
+      ],
+      "vertices": 4,
+      "triangles": 2,
+      "materials": [
+        "WarrensC_Wear_DampLeak_Mars_MI"
+      ],
+      "material_keys": [
+        "Wear_DampLeak"
+      ],
+      "flags": {
+        "card": true,
+        "variation": "surface_mask_only"
+      },
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS83_DampStreakDecalCarrier_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS84",
+      "name": "WarrensC_CCS84_CobwebCorner_Mars_SM",
+      "dimensions_cm": [
+        80.0,
+        5.0,
+        80.0
+      ],
+      "actual_dimensions_cm": [
+        80.0,
+        5.0,
+        80.0
+      ],
+      "bounds_min_cm": [
+        -40.00000059604645,
+        -2.500000037252903,
+        -5.960464566356904e-07
+      ],
+      "bounds_max_cm": [
+        40.00000059604645,
+        2.500000037252903,
+        80.0000011920929
+      ],
+      "vertices": 120,
+      "triangles": 204,
+      "materials": [
+        "WarrensC_FlatPalette_Mars_MI"
+      ],
+      "material_keys": [
+        "AT01"
+      ],
+      "flags": {},
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS84_CobwebCorner_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS85",
+      "name": "WarrensC_CCS85_BrokenFloorTile_Mars_SM",
+      "dimensions_cm": [
+        80.0,
+        60.0,
+        20.0
+      ],
+      "actual_dimensions_cm": [
+        80.0,
+        60.0,
+        20.0
+      ],
+      "bounds_min_cm": [
+        -40.00000059604645,
+        -30.000001192092896,
+        -1.490116141589226e-07
+      ],
+      "bounds_max_cm": [
+        40.00000059604645,
+        30.000001192092896,
+        20.000000298023224
+      ],
+      "vertices": 44,
+      "triangles": 72,
+      "materials": [
+        "WarrensC_LimestoneAshlar_Mars_MI"
+      ],
+      "material_keys": [
+        "TX01"
+      ],
+      "flags": {},
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS85_BrokenFloorTile_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS86",
+      "name": "WarrensC_CCS86_TimberSupportBeam_Mars_SM",
+      "dimensions_cm": [
+        200.0,
+        30.0,
+        35.0
+      ],
+      "actual_dimensions_cm": [
+        200.0,
+        30.0,
+        35.0
+      ],
+      "bounds_min_cm": [
+        -100.0,
+        -15.000000596046448,
+        2.980232283178452e-07
+      ],
+      "bounds_max_cm": [
+        100.0,
+        15.000000596046448,
+        34.99999940395355
+      ],
+      "vertices": 40,
+      "triangles": 68,
+      "materials": [
+        "WarrensC_DarkTimber_Mars_MI"
+      ],
+      "material_keys": [
+        "TX08"
+      ],
+      "flags": {
+        "axis": "flat structural end joints"
+      },
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS86_TimberSupportBeam_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS87",
+      "name": "WarrensC_CCS87_DiagonalTimberBrace_Mars_SM",
+      "dimensions_cm": [
+        120.0,
+        25.0,
+        120.0
+      ],
+      "actual_dimensions_cm": [
+        120.0,
+        25.0,
+        119.99999
+      ],
+      "bounds_min_cm": [
+        -60.00000238418579,
+        -12.49999925494194,
+        3.5762788286319847e-06
+      ],
+      "bounds_max_cm": [
+        60.00000238418579,
+        12.49999925494194,
+        119.99999284744263
+      ],
+      "vertices": 124,
+      "triangles": 220,
+      "materials": [
+        "WarrensC_DarkTimber_Mars_MI",
+        "WarrensC_BlackIron_Mars_MI"
+      ],
+      "material_keys": [
+        "TX08",
+        "TX09"
+      ],
+      "flags": {
+        "axis": "flat structural end joints"
+      },
+      "pivot": "bottom center",
+      "fbx": "FBX\\WarrensC_CCS87_DiagonalTimberBrace_Mars_SM.fbx"
+    },
+    {
+      "id": "CCS88",
+      "name": "WarrensC_CCS88_FloorDrainAndGrille_Mars_SM",
+      "dimensions_cm": [
+        80.0,
+        80.0,
+        15.0
+      ],
+      "actual_dimensions_cm": [
+        80.0,
+        80.0,
+        15.0
+      ],
+      "bounds_min_cm": [
+        -40.00000059604645,
+        -40.00000059604645,
+        -15.000000596046448
+      ],
+      "bounds_max_cm": [
+        40.00000059604645,
+        40.00000059604645,
+        2.980232283178452e-07
+      ],
+      "vertices": 256,
+      "triangles": 472,
+      "materials": [
+        "WarrensC_LimestoneAshlar_Mars_MI",
+        "WarrensC_BlackIron_Mars_MI",
+        "WarrensC_DampStone_Mars_MI"
+      ],
+      "material_keys": [
+        "TX01",
+        "TX09",
+        "TX17"
+      ],
+      "flags": {
+        "axis": "flush rim Z=0; shallow recessed grille below floor"
+      },
+      "pivot": "top contact",
+      "fbx": "FBX\\WarrensC_CCS88_FloorDrainAndGrille_Mars_SM.fbx"
+    }
+  ],
+  "count": 88
+}

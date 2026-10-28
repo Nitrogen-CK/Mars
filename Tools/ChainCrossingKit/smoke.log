@@ -1,0 +1,43 @@
+D:\Repositories\CkRepos\Orion\Tools\ChainCrossingKit\build_kit.py:178: DeprecationWarning: 'World.use_nodes' is expected to be removed in Blender 6.0
+  scene.world=bpy.data.worlds.new(name);scene.world.use_nodes=True;scene.world.node_tree.nodes['Background'].inputs[1].default_value=ambient
+D:\Repositories\CkRepos\Orion\Tools\ChainCrossingKit\build_kit.py:26: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m=bpy.data.materials.new('CCK_'+key);m.use_nodes=True;m.diffuse_color=(*color,alpha)
+Extensions: writing cache failed ([Errno 13] Permission denied: 'C:\\Users\\Adam\\AppData\\Roaming\\Blender Foundation\\Blender\\5.2\\extensions\\.cache\\compat.dat').
+Extensions: writing cache failed ([Errno 13] Permission denied: 'C:\\Users\\Adam\\AppData\\Roaming\\Blender Foundation\\Blender\\5.2\\extensions\\.cache\\compat.dat').
+addon_utils.disable: bl_ext.lab_blender_org.mcp not enabled
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS01_CausewayDeckBay_Mars_SM.fbx'
+export finished in 0.0156 sec.
+ASSET_COMPLETE CCS01 280
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS21_HandwheelBody_Mars_SM.fbx'
+export finished in 0.0084 sec.
+ASSET_COMPLETE CCS21 360
+Warning: No mesh data to join
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS27_HeavyChainLink_Mars_SM.fbx'
+export finished in 0.0062 sec.
+ASSET_COMPLETE CCS27 256
+Warning: No mesh data to join
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS51_DeepCanalSurface_Mars_SM.fbx'
+export finished in 0.0047 sec.
+ASSET_COMPLETE CCS51 2
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS60_LanternHousing_Mars_SM.fbx'
+export finished in 0.0144 sec.
+ASSET_COMPLETE CCS60 972
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS88_FloorDrainAndGrille_Mars_SM.fbx'
+export finished in 0.0119 sec.
+ASSET_COMPLETE CCS88 472
+D:\Repositories\CkRepos\Orion\Tools\ChainCrossingKit\build_kit.py:178: DeprecationWarning: 'World.use_nodes' is expected to be removed in Blender 6.0
+  scene.world=bpy.data.worlds.new(name);scene.world.use_nodes=True;scene.world.node_tree.nodes['Background'].inputs[1].default_value=ambient
+00:09.000  image.write      | ERROR OpenImageIO write failed: Could not open file "C:\Users\Adam\.thumbnails\large\blender_20872_07f70e115b18cdad6667710c2991a435.png.png"
+00:09.047  image.write      | ERROR OpenImageIO write failed: Could not open file "C:\Users\Adam\.thumbnails\large\blender_20872_9ce67e28e0a15cc952d9b8b93e89fe59.png.png"
+Info: Saved as "ChainCrossing_KitLibrary.blend"
+Info: Saved as "ChainCrossing_Diorama.blend"
+CHAIN_KIT_BUILD_COMPLETE 6
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+
+Blender quit

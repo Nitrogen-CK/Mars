@@ -1,0 +1,393 @@
+[
+  {
+    "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+    "component": "StaticMeshComponent_0",
+    "mesh": "/Engine/BasicShapes/Cube.Cube",
+    "location": [
+      -300.0,
+      -2900.0,
+      88.0
+    ],
+    "rotation": [
+      0.0,
+      0.0,
+      90.0
+    ],
+    "scale": [
+      0.12,
+      2.0,
+      0.1
+    ],
+    "materials": [
+      "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+    ]
+  },
+  {
+    "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+    "component": "StaticMeshComponent_1",
+    "mesh": "/Engine/BasicShapes/Cube.Cube",
+    "location": [
+      -300.0,
+      -2900.0,
+      215.0
+    ],
+    "rotation": [
+      0.0,
+      0.0,
+      90.0
+    ],
+    "scale": [
+      0.12,
+      2.0,
+      0.1
+    ],
+    "materials": [
+      "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+    ]
+  },
+  {
+    "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+    "component": "StaticMeshComponent_2",
+    "mesh": "/Engine/BasicShapes/Cube.Cube",
+    "location": [
+      -387.5,
+      -2900.0,
+      110.0
+    ],
+    "rotation": [
+      0.0,
+      0.0,
+      90.0
+    ],
+    "scale": [
+      0.08,
+      0.08,
+      2.2
+    ],
+    "materials": [
+      "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+    ]
+  },
+  {
+    "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+    "component": "StaticMeshComponent_3",
+    "mesh": "/Engine/BasicShapes/Cube.Cube",
+    "location": [
+      -362.5,
+      -2900.0,
+      110.0
+    ],
+    "rotation": [
+      0.0,
+      0.0,
+      90.0
+    ],
+    "scale": [
+      0.08,
+      0.08,
+      2.2
+    ],
+    "materials": [
+      "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+    ]
+  },
+  {
+    "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+    "component": "StaticMeshComponent_4",
+    "mesh": "/Engine/BasicShapes/Cube.Cube",
+    "location": [
+      -337.5,
+      -2900.0,
+      110.0
+    ],
+    "rotation": [
+      0.0,
+      0.0,
+      90.0
+    ],
+    "scale": [
+      0.08,
+      0.08,
+      2.2
+    ],
+    "materials": [
+      "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+    ]
+  },
+  {
+    "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+    "component": "StaticMeshComponent_5",
+    "mesh": "/Engine/BasicShapes/Cube.Cube",
+    "location": [
+      -312.5,
+      -2900.0,
+      110.0
+    ],
+    "rotation": [
+      0.0,
+      0.0,
+      90.0
+    ],
+    "scale": [
+      0.08,
+      0.08,
+      2.2
+    ],
+    "materials": [
+      "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+    ]
+  },
+  {
+    "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+    "component": "StaticMeshComponent_6",
+    "mesh": "/Engine/BasicShapes/Cube.Cube",
+    "location": [
+      -287.5,
+      -2900.0,
+      110.0
+    ],
+    "rotation": [
+      0.0,
+      0.0,
+      90.0
+    ],
+    "scale": [
+      0.08,
+      0.08,
+      2.2
+    ],
+    "materials": [
+      "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+    ]
+  },
+  {
+    "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+    "component": "StaticMeshComponent_7",
+    "mesh": "/Engine/BasicShapes/Cube.Cube",
+    "location": [
+      -262.5,
+      -2900.0,
+      110.0
+    ],
+    "rotation": [
+      0.0,
+      0.0,
+      90.0
+    ],
+    "scale": [
+      0.08,
+      0.08,
+      2.2
+    ],
+    "materials": [
+      "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+    ]
+  },
+  {
+    "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+    "component": "StaticMeshComponent_8",
+    "mesh": "/Engine/BasicShapes/Cube.Cube",
+    "location": [
+      -237.5,
+      -2900.0,
+      110.0
+    ],
+    "rotation": [
+      0.0,
+      0.0,
+      90.0
+    ],
+    "scale": [
+      0.08,
+      0.08,
+      2.2
+    ],
+    "materials": [
+      "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+    ]
+  },
+  {
+    "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+    "component": "StaticMeshComponent_9",
+    "mesh": "/Engine/BasicShapes/Cube.Cube",
+    "location": [
+      -212.5,
+      -2900.0,
+      110.0
+    ],
+    "rotation": [
+      0.0,
+      0.0,
+      90.0
+    ],
+    "scale": [
+      0.08,
+      0.08,
+      2.2
+    ],
+    "materials": [
+      "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+    ]
+  },
+  {
+    "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+    "component": "StaticMeshComponent_10",
+    "mesh": "/Engine/BasicShapes/Cube.Cube",
+    "location": [
+      -300.0,
+      -2900.0,
+      230.0
+    ],
+    "rotation": [
+      0.0,
+      0.0,
+      90.0
+    ],
+    "scale": [
+      0.4,
+      2.4,
+      0.2
+    ],
+    "materials": [
+      "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+    ]
+  },
+  {
+    "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+    "component": "StaticMeshComponent_11",
+    "mesh": "/Engine/BasicShapes/Cube.Cube",
+    "location": [
+      -410.0,
+      -2900.0,
+      120.0
+    ],
+    "rotation": [
+      0.0,
+      0.0,
+      90.0
+    ],
+    "scale": [
+      0.4,
+      0.2,
+      2.4
+    ],
+    "materials": [
+      "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+    ]
+  },
+  {
+    "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+    "component": "StaticMeshComponent_12",
+    "mesh": "/Engine/BasicShapes/Cube.Cube",
+    "location": [
+      -190.0,
+      -2900.0,
+      120.0
+    ],
+    "rotation": [
+      0.0,
+      0.0,
+      90.0
+    ],
+    "scale": [
+      0.4,
+      0.2,
+      2.4
+    ],
+    "materials": [
+      "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+    ]
+  },
+  {
+    "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+    "component": "StaticMeshComponent_13",
+    "mesh": "/Game/Mars/Gameplay/Mechanisms/LeverHandle_Mars_SM.LeverHandle_Mars_SM",
+    "location": [
+      -204.99999999999997,
+      -2750.0,
+      45.0
+    ],
+    "rotation": [
+      0.0,
+      0.0,
+      -90.0
+    ],
+    "scale": [
+      0.08,
+      0.08,
+      0.9
+    ],
+    "materials": [
+      "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Interactable_Mars_MI.ProtoGrid_Interactable_Mars_MI"
+    ]
+  },
+  {
+    "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+    "component": "StaticMeshComponent_14",
+    "mesh": "/Engine/BasicShapes/Cylinder.Cylinder",
+    "location": [
+      -204.99999999999997,
+      -2750.0,
+      0.0
+    ],
+    "rotation": [
+      90.0,
+      -6.361109437179021e-15,
+      -90.0
+    ],
+    "scale": [
+      0.24,
+      0.24,
+      0.5
+    ],
+    "materials": [
+      "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Interactable_Mars_MI.ProtoGrid_Interactable_Mars_MI"
+    ]
+  },
+  {
+    "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+    "component": "StaticMeshComponent_95",
+    "mesh": "/Engine/BasicShapes/Cube.Cube",
+    "location": [
+      -422.5,
+      -2900.0,
+      130.0
+    ],
+    "rotation": [
+      0.0,
+      0.0,
+      90.0
+    ],
+    "scale": [
+      0.4,
+      0.05,
+      2.6
+    ],
+    "materials": [
+      "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+    ]
+  },
+  {
+    "actor": "/Game/Mars/Maps/UEDPIE_0_Warrens_VariantC_Mars_MAP.Warrens_VariantC_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host",
+    "component": "StaticMeshComponent_96",
+    "mesh": "/Engine/BasicShapes/Cube.Cube",
+    "location": [
+      -177.5,
+      -2900.0,
+      130.0
+    ],
+    "rotation": [
+      0.0,
+      0.0,
+      90.0
+    ],
+    "scale": [
+      0.4,
+      0.05,
+      2.6
+    ],
+    "materials": [
+      "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI"
+    ]
+  }
+]

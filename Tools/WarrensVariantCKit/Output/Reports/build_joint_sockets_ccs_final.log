@@ -1,0 +1,390 @@
+D:\Repositories\CkRepos\Orion\Tools\ChainCrossingKit\build_kit.py:222: DeprecationWarning: 'World.use_nodes' is expected to be removed in Blender 6.0
+  scene.world=bpy.data.worlds.new(name);scene.world.use_nodes=True;scene.world.node_tree.nodes['Background'].inputs[1].default_value=ambient
+D:\Repositories\CkRepos\Orion\Tools\ChainCrossingKit\build_kit.py:28: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m=bpy.data.materials.new('CCK_'+key);m.use_nodes=True;m.diffuse_color=(*color,alpha)
+Extensions: writing cache failed ([Errno 13] Permission denied: 'C:\\Users\\Adam\\AppData\\Roaming\\Blender Foundation\\Blender\\5.2\\extensions\\.cache\\compat.dat').
+Extensions: writing cache failed ([Errno 13] Permission denied: 'C:\\Users\\Adam\\AppData\\Roaming\\Blender Foundation\\Blender\\5.2\\extensions\\.cache\\compat.dat').
+addon_utils.disable: bl_ext.lab_blender_org.mcp not enabled
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS01_CausewayDeckBay_Mars_SM.fbx'
+export finished in 0.0045 sec.
+ASSET_COMPLETE CCS01 280
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS02_CausewayEndClosure_Mars_SM.fbx'
+export finished in 0.0040 sec.
+ASSET_COMPLETE CCS02 220
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS03_DeckEdgeFascia_Mars_SM.fbx'
+export finished in 0.0035 sec.
+ASSET_COMPLETE CCS03 132
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS04_DeckUndersideRib_Mars_SM.fbx'
+export finished in 0.0039 sec.
+ASSET_COMPLETE CCS04 108
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS05_BankAbutment_Mars_SM.fbx'
+export finished in 0.0053 sec.
+ASSET_COMPLETE CCS05 780
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS06_SupportPierShell_Mars_SM.fbx'
+export finished in 0.0079 sec.
+ASSET_COMPLETE CCS06 660
+Warning: No mesh data to join
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS07_PierWaterlineCollar_Mars_SM.fbx'
+export finished in 0.0046 sec.
+ASSET_COMPLETE CCS07 64
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS08_BankCopingStrip_Mars_SM.fbx'
+export finished in 0.0041 sec.
+ASSET_COMPLETE CCS08 264
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS09_RailPost_Mars_SM.fbx'
+export finished in 0.0046 sec.
+ASSET_COMPLETE CCS09 264
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS10_RailCap_Mars_SM.fbx'
+export finished in 0.0052 sec.
+ASSET_COMPLETE CCS10 88
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS11_RailInfillBay_Mars_SM.fbx'
+export finished in 0.0067 sec.
+ASSET_COMPLETE CCS11 396
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS12_RailEndTerminal_Mars_SM.fbx'
+export finished in 0.0082 sec.
+ASSET_COMPLETE CCS12 372
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS13_RoomFloorBay_Mars_SM.fbx'
+export finished in 0.0042 sec.
+ASSET_COMPLETE CCS13 192
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS14_FloorFillerBay_Mars_SM.fbx'
+export finished in 0.0044 sec.
+ASSET_COMPLETE CCS14 132
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS15_RoomWallBay_Mars_SM.fbx'
+export finished in 0.0062 sec.
+ASSET_COMPLETE CCS15 660
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS16_WallCornerPier_Mars_SM.fbx'
+export finished in 0.0043 sec.
+ASSET_COMPLETE CCS16 264
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS17_ArchSurround_Mars_SM.fbx'
+export finished in 0.0057 sec.
+ASSET_COMPLETE CCS17 460
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS18_VaultCeilingBay_Mars_SM.fbx'
+export finished in 0.0052 sec.
+ASSET_COMPLETE CCS18 272
+Warning: No mesh data to join
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS19_PlasterRepairPatch_Mars_SM.fbx'
+export finished in 0.0044 sec.
+ASSET_COMPLETE CCS19 44
+Warning: No mesh data to join
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS20_StairAndThresholdFascia_Mars_SM.fbx'
+export finished in 0.0038 sec.
+ASSET_COMPLETE CCS20 28
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS21_HandwheelBody_Mars_SM.fbx'
+export finished in 0.0062 sec.
+ASSET_COMPLETE CCS21 360
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS22_WheelAxleStub_Mars_SM.fbx'
+export finished in 0.0057 sec.
+ASSET_COMPLETE CCS22 132
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS23_WheelMountHousing_Mars_SM.fbx'
+export finished in 0.0054 sec.
+ASSET_COMPLETE CCS23 324
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS24_ChainDrum_Mars_SM.fbx'
+export finished in 0.0080 sec.
+ASSET_COMPLETE CCS24 1036
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS25_AxleBearingBlock_Mars_SM.fbx'
+export finished in 0.0069 sec.
+ASSET_COMPLETE CCS25 364
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS26_PawlCover_Mars_SM.fbx'
+export finished in 0.0058 sec.
+ASSET_COMPLETE CCS26 104
+Warning: No mesh data to join
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS27_HeavyChainLink_Mars_SM.fbx'
+export finished in 0.0046 sec.
+ASSET_COMPLETE CCS27 256
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS28_ChainCornerGuide_Mars_SM.fbx'
+export finished in 0.0057 sec.
+ASSET_COMPLETE CCS28 788
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS29_FloorChainGuide_Mars_SM.fbx'
+export finished in 0.0051 sec.
+ASSET_COMPLETE CCS29 396
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS30_ChainEndAnchor_Mars_SM.fbx'
+export finished in 0.0060 sec.
+ASSET_COMPLETE CCS30 768
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS31_WallFairlead_Mars_SM.fbx'
+export finished in 0.0063 sec.
+ASSET_COMPLETE CCS31 448
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS32_OverheadChainHanger_Mars_SM.fbx'
+export finished in 0.0067 sec.
+ASSET_COMPLETE CCS32 384
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS33_RisingBarGateLeaf_Mars_SM.fbx'
+export finished in 0.0077 sec.
+ASSET_COMPLETE CCS33 844
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS34_GateFramePost_Mars_SM.fbx'
+export finished in 0.0065 sec.
+ASSET_COMPLETE CCS34 220
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS35_GateLintel_Mars_SM.fbx'
+export finished in 0.0052 sec.
+ASSET_COMPLETE CCS35 176
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS36_GateGuideChannel_Mars_SM.fbx'
+export finished in 0.0070 sec.
+ASSET_COMPLETE CCS36 308
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS37_GateTopHood_Mars_SM.fbx'
+export finished in 0.0069 sec.
+ASSET_COMPLETE CCS37 264
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS38_GateStopShoe_Mars_SM.fbx'
+export finished in 0.0043 sec.
+ASSET_COMPLETE CCS38 96
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS39_CounterweightCase_Mars_SM.fbx'
+export finished in 0.0057 sec.
+ASSET_COMPLETE CCS39 468
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS40_ExistingShortcutLeverHandle_Mars_SM.fbx'
+export finished in 0.0053 sec.
+ASSET_COMPLETE CCS40 276
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS41_LeverMountBase_Mars_SM.fbx'
+export finished in 0.0062 sec.
+ASSET_COMPLETE CCS41 596
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS42_FastenerAndPinKit_Mars_SM.fbx'
+export finished in 0.0054 sec.
+ASSET_COMPLETE CCS42 340
+Warning: No mesh data to join
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS43_LargeBankRock_Mars_SM.fbx'
+export finished in 0.0038 sec.
+ASSET_COMPLETE CCS43 38
+Warning: No mesh data to join
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS44_MediumRockWedge_Mars_SM.fbx'
+export finished in 0.0038 sec.
+ASSET_COMPLETE CCS44 38
+Warning: No mesh data to join
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS45_CaveWallPanel_Mars_SM.fbx'
+export finished in 0.0049 sec.
+ASSET_COMPLETE CCS45 92
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS46_CaveInsideCorner_Mars_SM.fbx'
+export finished in 0.0057 sec.
+ASSET_COMPLETE CCS46 184
+Warning: No mesh data to join
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS47_CaveCeilingCap_Mars_SM.fbx'
+export finished in 0.0038 sec.
+ASSET_COMPLETE CCS47 38
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS48_WetBankSkirt_Mars_SM.fbx'
+export finished in 0.0047 sec.
+ASSET_COMPLETE CCS48 102
+Warning: No mesh data to join
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS49_TallCliffFace_Mars_SM.fbx'
+export finished in 0.0034 sec.
+ASSET_COMPLETE CCS49 92
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS50_WallToeRubble_Mars_SM.fbx'
+export finished in 0.0041 sec.
+ASSET_COMPLETE CCS50 266
+Warning: No mesh data to join
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS51_DeepCanalSurface_Mars_SM.fbx'
+export finished in 0.0047 sec.
+ASSET_COMPLETE CCS51 2
+Warning: No mesh data to join
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS52_FoamEdgeStrip_Mars_SM.fbx'
+export finished in 0.0037 sec.
+ASSET_COMPLETE CCS52 24
+Warning: No mesh data to join
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS53_WallWaterlineCard_Mars_SM.fbx'
+export finished in 0.0039 sec.
+ASSET_COMPLETE CCS53 2
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS54_BrineGutter_Mars_SM.fbx'
+export finished in 0.0037 sec.
+ASSET_COMPLETE CCS54 132
+Warning: No mesh data to join
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS55_WallSpout_Mars_SM.fbx'
+export finished in 0.0041 sec.
+ASSET_COMPLETE CCS55 64
+Warning: No mesh data to join
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS56_OutletFlowRibbon_Mars_SM.fbx'
+export finished in 0.0034 sec.
+ASSET_COMPLETE CCS56 12
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS57_DripRippleCard_Mars_SM.fbx'
+export finished in 0.0050 sec.
+ASSET_COMPLETE CCS57 384
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS58_VerticalDripCard_Mars_SM.fbx'
+export finished in 0.0043 sec.
+ASSET_COMPLETE CCS58 10
+Warning: No mesh data to join
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS59_FloorPuddleCard_Mars_SM.fbx'
+export finished in 0.0045 sec.
+ASSET_COMPLETE CCS59 10
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS60_LanternHousing_Mars_SM.fbx'
+export finished in 0.0068 sec.
+ASSET_COMPLETE CCS60 972
+Warning: No mesh data to join
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS61_LanternGlass_Mars_SM.fbx'
+export finished in 0.0046 sec.
+ASSET_COMPLETE CCS61 44
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS62_WallLanternHook_Mars_SM.fbx'
+export finished in 0.0055 sec.
+ASSET_COMPLETE CCS62 196
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS63_SconceFixture_Mars_SM.fbx'
+export finished in 0.0051 sec.
+ASSET_COMPLETE CCS63 284
+Warning: No mesh data to join
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS64_FlameCard_Mars_SM.fbx'
+export finished in 0.0050 sec.
+ASSET_COMPLETE CCS64 40
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS65_LanternRestSet_Mars_SM.fbx'
+export finished in 0.0056 sec.
+ASSET_COMPLETE CCS65 288
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS66_BrineBarrel_Mars_SM.fbx'
+export finished in 0.0077 sec.
+ASSET_COMPLETE CCS66 748
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS67_CrateBodyAndLid_Mars_SM.fbx'
+export finished in 0.0084 sec.
+ASSET_COMPLETE CCS67 1212
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS68_ClothSack_Mars_SM.fbx'
+export finished in 0.0057 sec.
+ASSET_COMPLETE CCS68 320
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS69_StorageShelf_Mars_SM.fbx'
+export finished in 0.0069 sec.
+ASSET_COMPLETE CCS69 968
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS70_SaltChunkCluster_Mars_SM.fbx'
+export finished in 0.0066 sec.
+ASSET_COMPLETE CCS70 220
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS71_RopeCoil_Mars_SM.fbx'
+export finished in 0.0072 sec.
+ASSET_COMPLETE CCS71 1120
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS72_RepairPlank_Mars_SM.fbx'
+export finished in 0.0050 sec.
+ASSET_COMPLETE CCS72 48
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS73_BoltedRepairPlate_Mars_SM.fbx'
+export finished in 0.0049 sec.
+ASSET_COMPLETE CCS73 108
+Warning: No mesh data to join
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS74_ClothScrap_Mars_SM.fbx'
+export finished in 0.0051 sec.
+ASSET_COMPLETE CCS74 96
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS75_MaintenanceBucket_Mars_SM.fbx'
+export finished in 0.0068 sec.
+ASSET_COMPLETE CCS75 428
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS76_LongLadle_Mars_SM.fbx'
+export finished in 0.0053 sec.
+ASSET_COMPLETE CCS76 116
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS77_ReedBasket_Mars_SM.fbx'
+export finished in 0.0084 sec.
+ASSET_COMPLETE CCS77 1076
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS78_MaintenanceNoticeBoard_Mars_SM.fbx'
+export finished in 0.0072 sec.
+ASSET_COMPLETE CCS78 256
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS79_SluiceIdentityPlaque_Mars_SM.fbx'
+export finished in 0.0069 sec.
+ASSET_COMPLETE CCS79 648
+Warning: No mesh data to join
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS80_RouteMarkerPlate_Mars_SM.fbx'
+export finished in 0.0047 sec.
+ASSET_COMPLETE CCS80 20
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS81_BankClothMarker_Mars_SM.fbx'
+export finished in 0.0060 sec.
+ASSET_COMPLETE CCS81 224
+Warning: No mesh data to join
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS82_SaltWearDecalCarrier_Mars_SM.fbx'
+export finished in 0.0033 sec.
+ASSET_COMPLETE CCS82 2
+Warning: No mesh data to join
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS83_DampStreakDecalCarrier_Mars_SM.fbx'
+export finished in 0.0037 sec.
+ASSET_COMPLETE CCS83 2
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS84_CobwebCorner_Mars_SM.fbx'
+export finished in 0.0046 sec.
+ASSET_COMPLETE CCS84 204
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS85_BrokenFloorTile_Mars_SM.fbx'
+export finished in 0.0034 sec.
+ASSET_COMPLETE CCS85 72
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS86_TimberSupportBeam_Mars_SM.fbx'
+export finished in 0.0050 sec.
+ASSET_COMPLETE CCS86 68
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS87_DiagonalTimberBrace_Mars_SM.fbx'
+export finished in 0.0060 sec.
+ASSET_COMPLETE CCS87 220
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\ChainCrossingKit\\Output\\FBX\\WarrensC_CCS88_FloorDrainAndGrille_Mars_SM.fbx'
+export finished in 0.0063 sec.
+ASSET_COMPLETE CCS88 472
+D:\Repositories\CkRepos\Orion\Tools\ChainCrossingKit\build_kit.py:222: DeprecationWarning: 'World.use_nodes' is expected to be removed in Blender 6.0
+  scene.world=bpy.data.worlds.new(name);scene.world.use_nodes=True;scene.world.node_tree.nodes['Background'].inputs[1].default_value=ambient
+00:04.718  image.write      | ERROR OpenImageIO write failed: Could not open file "C:\Users\Adam\.thumbnails\large\blender_29200_07f70e115b18cdad6667710c2991a435.png.png"
+00:04.750  image.write      | ERROR OpenImageIO write failed: Could not open file "C:\Users\Adam\.thumbnails\large\blender_29200_9ce67e28e0a15cc952d9b8b93e89fe59.png.png"
+Info: Saved as "ChainCrossing_KitLibrary.blend"
+Info: Saved as "ChainCrossing_Diorama.blend"
+CHAIN_KIT_BUILD_COMPLETE 88
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+
+Blender quit

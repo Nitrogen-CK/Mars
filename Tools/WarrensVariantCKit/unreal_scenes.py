@@ -7,6 +7,7 @@ import importlib.util,json
 from pathlib import Path
 import unreal as u
 HERE=Path(__file__).resolve().parent
+ROOT=HERE.parents[1]
 OUT=HERE/'Output'
 DEST='/Game/Mars/Environment/WarrensVariantCKit'
 SHARED='/Game/Mars/Environment/ChainCrossingKit'
@@ -14,6 +15,24 @@ OWNER='Mars.WarrensVariantCKit.Authoring.v1'
 OLD_OWNERS={'Mars.ChainCrossingKit.Authoring.v1','Mars.PumpCisternKit.Authoring.v1'}
 s=importlib.util.spec_from_file_location('full_world_scene_core',HERE.parent/'ChainCrossingKit/unreal_scenes.py');core=importlib.util.module_from_spec(s);s.loader.exec_module(core)
 core.OWNER=OWNER;core.PREFIX='WVC_';core.FOLDER='WarrensVariantCKit'
+
+def refuse_retained_scene_rebuild(operation):
+    """Refuse every legacy C rebuild once retained art has been promoted."""
+    promotion=ROOT/'Saved/WarrensCGameplay-20261024/ArtLibrarySyncCheckpoint/promoted-v3/promotion.json'
+    if not promotion.is_file():return
+    try:receipt=json.loads(promotion.read_text(encoding='utf-8-sig'))
+    except Exception as error:raise RuntimeError('Cannot validate retained-art promotion receipt; refusing legacy rebuild.') from error
+    expected={'KitLibrary':DEST+'/Maps/WarrensVariantC_KitLibrary_Mars_MAP',
+              'Diorama':DEST+'/Maps/WarrensVariantC_Diorama_Mars_MAP'}
+    targets=receipt.get('targets') if isinstance(receipt,dict) else None
+    valid=(isinstance(receipt,dict) and receipt.get('status')=='PROMOTED' and isinstance(targets,dict) and set(targets)==set(expected)
+           and all(isinstance(targets[name],dict) and targets[name].get('source')=='Tools/WarrensVariantCKit/Output/WarrensVariantC_'+name+'.blend'
+                   and isinstance(targets[name].get('after_sha256'),str) and len(targets[name]['after_sha256'])==64
+                   and all(c in '0123456789abcdef' for c in targets[name]['after_sha256'])
+                   for name in expected))
+    if not valid:raise RuntimeError('Retained-art promotion receipt is malformed or has an unexpected status; inspect before rebuilding.')
+    raise RuntimeError('Refusing legacy C '+operation+': promoted-v3 retained art can be erased by this raw-ledger rebuild. Use the scoped art-sync and Belfry palette staging tools with explicit review.')
+
 def save_visual_level():
     # This pass changes only NoCollision art, materials and lights. On-save
     # collision cooking of streamed temp worlds is unrelated and raises the
@@ -37,7 +56,9 @@ def registry():
     return result
 
 def dress(tile):
-    core.clean();data=json.loads((OUT/'fitted_instances.json').read_text());base=json.loads((OUT/'Reports/full_source_baseline.json').read_text())[tile]
+    data=json.loads((OUT/'fitted_instances.json').read_text());base=json.loads((OUT/'Reports/full_source_baseline.json').read_text())[tile]
+    refuse_retained_scene_rebuild('source-level dressing rebuild')
+    core.clean()
     paths=registry()
     for r in data['placements']:
         if r['tile']!=tile:continue
@@ -99,7 +120,9 @@ def dress(tile):
     (OUT/'Reports'/('dressed_'+tile+'.json')).write_text(json.dumps(report,indent=2));print('VARIANT_C_DRESSED',tile,report['instances'],report['hism_groups']);return report
 
 def update_glass_shadows(tile):
-    core.clean();base=json.loads((OUT/'Reports/full_source_baseline.json').read_text())[tile]
+    base=json.loads((OUT/'Reports/full_source_baseline.json').read_text())[tile]
+    refuse_retained_scene_rebuild('glass-shadow rebuild')
+    core.clean()
     assert core.ED.get_editor_world().get_path_name().split('.')[0]==base['asset']
     count=0
     for a in core.EA.get_all_level_actors():
@@ -110,8 +133,10 @@ def update_glass_shadows(tile):
     print('VARIANT_C_GLASS_SHADOWS',tile,count)
 
 def preview_world(kind):
-    core.clean();assert kind in ['KitLibrary','Diorama']
+    assert kind in ['KitLibrary','Diorama']
     path=DEST+'/Maps/WarrensVariantC_'+kind+'_Mars_MAP'
+    refuse_retained_scene_rebuild('static-review-map rebuild')
+    core.clean()
     assert core.ED.get_editor_world().get_path_name().split('.')[0]==path
     assert all(OWNER in [str(t) for t in a.tags] for a in core.EA.get_all_level_actors()),'Foreign review-map content'
     core.clear_owned();core.review_lighting()

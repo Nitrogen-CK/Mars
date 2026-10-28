@@ -1,0 +1,171 @@
+{
+	"material": "M_CCK_TX01",
+	"packagePath": "/Game/Mars/Environment/WarrensVariantCKit/Lookdev/BrushR03/Materials/M_CCK_TX01",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "af7fcfc42630ec09974598641718f062",
+		"exporterVersion": 3
+	},
+	"blendMode": "BLEND_Opaque",
+	"twoSided": false,
+	"unlit": false,
+	"shadingModel": "MSM_DefaultLit",
+	"domain": "MD_Surface",
+	"connectedOutputs": [
+		"BaseColor"
+	],
+	"expressions":
+	{
+		"Constant": 3,
+		"Constant3Vector": 1,
+		"LinearInterpolate": 1,
+		"TextureSample": 3
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "TextureSample",
+				"name": "MaterialExpressionTextureSample_0",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"Texture": "/Game/Mars/Environment/WarrensVariantCKit/Lookdev/BrushR03/Textures/T_CCK_TX01_Brush_BaseColor.T_CCK_TX01_Brush_BaseColor"
+				}
+			},
+			{
+				"id": 1,
+				"class": "TextureSample",
+				"name": "MaterialExpressionTextureSample_1",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"Texture": "/Game/Mars/Environment/WarrensVariantCKit/Lookdev/BrushR03/Textures/T_CCK_TX01_Brush_ORM.T_CCK_TX01_Brush_ORM",
+					"SamplerType": "SAMPLERTYPE_Masks"
+				}
+			},
+			{
+				"id": 2,
+				"class": "TextureSample",
+				"name": "MaterialExpressionTextureSample_2",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"Texture": "/Game/Mars/Environment/WarrensVariantCKit/Lookdev/BrushR03/Textures/T_CCK_TX01_Brush_NormalDX.T_CCK_TX01_Brush_NormalDX",
+					"SamplerType": "SAMPLERTYPE_Normal"
+				}
+			},
+			{
+				"id": 3,
+				"class": "Constant3Vector",
+				"name": "MaterialExpressionConstant3Vector_0",
+				"outputs": [
+					"None",
+					"None",
+					"None",
+					"None"
+				],
+				"props":
+				{
+					"Constant": "(R=0.234551,G=0.230740,B=0.171441,A=1.000000)"
+				}
+			},
+			{
+				"id": 4,
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_0",
+				"props":
+				{
+					"R": 0.60000002384185791
+				}
+			},
+			{
+				"id": 5,
+				"class": "LinearInterpolate",
+				"name": "MaterialExpressionLinearInterpolate_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 3,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 0,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 2,
+						"name": "Alpha",
+						"node": 4,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 6,
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_1",
+				"props":
+				{
+					"R": 0.87999999523162842
+				}
+			},
+			{
+				"id": 7,
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_2"
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_BaseColor",
+				"node": 5,
+				"output": 0
+			},
+			{
+				"property": "MP_Metallic",
+				"node": 7,
+				"output": 0
+			},
+			{
+				"property": "MP_Roughness",
+				"node": 6,
+				"output": 0
+			}
+		]
+	},
+	"scalarParams": [],
+	"vectorParams": [],
+	"textureParams": [],
+	"usedTextures": [
+		"/Game/Mars/Environment/WarrensVariantCKit/Lookdev/BrushR03/Textures/T_CCK_TX01_Brush_BaseColor.T_CCK_TX01_Brush_BaseColor"
+	]
+}

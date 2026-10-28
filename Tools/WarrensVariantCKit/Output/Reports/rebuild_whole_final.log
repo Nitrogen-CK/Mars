@@ -1,0 +1,357 @@
+Extensions: writing cache failed ([Errno 13] Permission denied: 'C:\\Users\\Adam\\AppData\\Roaming\\Blender Foundation\\Blender\\5.2\\extensions\\.cache\\compat.dat').
+Extensions: writing cache failed ([Errno 13] Permission denied: 'C:\\Users\\Adam\\AppData\\Roaming\\Blender Foundation\\Blender\\5.2\\extensions\\.cache\\compat.dat').
+addon_utils.disable: bl_ext.lab_blender_org.mcp not enabled
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC001_PierBase_Mars_SM.fbx'
+export finished in 0.0058 sec.
+VARIANT_C_ASSET_COMPLETE WVC001 A05 132
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC002_PierCapital_Mars_SM.fbx'
+export finished in 0.0046 sec.
+VARIANT_C_ASSET_COMPLETE WVC002 A06 176
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC003_ArchSurround300_Mars_SM.fbx'
+export finished in 0.0054 sec.
+VARIANT_C_ASSET_COMPLETE WVC003 A07 484
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC004_ArchSurround250_Mars_SM.fbx'
+export finished in 0.0057 sec.
+VARIANT_C_ASSET_COMPLETE WVC004 A08 484
+Warning: No mesh data to join
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC005_ArchKeystone_Mars_SM.fbx'
+export finished in 0.0037 sec.
+VARIANT_C_ASSET_COMPLETE WVC005 A09 12
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC006_BoneArchRib_Mars_SM.fbx'
+export finished in 0.0052 sec.
+VARIANT_C_ASSET_COMPLETE WVC006 A11 84
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC007_BoneBridgePost_Mars_SM.fbx'
+export finished in 0.0049 sec.
+VARIANT_C_ASSET_COMPLETE WVC007 A12 100
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC008_BoneCoping200_Mars_SM.fbx'
+export finished in 0.0046 sec.
+VARIANT_C_ASSET_COMPLETE WVC008 A13 132
+Warning: No mesh data to join
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC009_ThresholdCover_Mars_SM.fbx'
+export finished in 0.0046 sec.
+VARIANT_C_ASSET_COMPLETE WVC009 A19 44
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC010_BurialNicheFrame_Mars_SM.fbx'
+export finished in 0.0059 sec.
+VARIANT_C_ASSET_COMPLETE WVC010 A20 172
+Warning: No mesh data to join
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC011_CrackCoverStrip_Mars_SM.fbx'
+export finished in 0.0036 sec.
+VARIANT_C_ASSET_COMPLETE WVC011 A23 28
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC012_WindowSurround_Mars_SM.fbx'
+export finished in 0.0055 sec.
+VARIANT_C_ASSET_COMPLETE WVC012 A24 308
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC013_WellHoistFrame_Mars_SM.fbx'
+export finished in 0.0073 sec.
+VARIANT_C_ASSET_COMPLETE WVC013 H01 800
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC014_HoistPulley_Mars_SM.fbx'
+export finished in 0.0073 sec.
+VARIANT_C_ASSET_COMPLETE WVC014 H02 404
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC015_HoistDrum_Mars_SM.fbx'
+export finished in 0.0073 sec.
+VARIANT_C_ASSET_COMPLETE WVC015 H03 788
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC016_HoistHook_Mars_SM.fbx'
+export finished in 0.0051 sec.
+VARIANT_C_ASSET_COMPLETE WVC016 H04 136
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC017_HoistCage_Mars_SM.fbx'
+export finished in 0.0093 sec.
+VARIANT_C_ASSET_COMPLETE WVC017 H05 1228
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC018_BellTowerCrownModule_Mars_SM.fbx'
+export finished in 0.0097 sec.
+VARIANT_C_ASSET_COMPLETE WVC018 H06 1528
+Warning: No mesh data to join
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC019_HighLandmarkBell_Mars_SM.fbx'
+export finished in 0.0055 sec.
+VARIANT_C_ASSET_COMPLETE WVC019 H07 356
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC020_BellYoke_Mars_SM.fbx'
+export finished in 0.0064 sec.
+VARIANT_C_ASSET_COMPLETE WVC020 H08 196
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC021_BellClapper_Mars_SM.fbx'
+export finished in 0.0050 sec.
+VARIANT_C_ASSET_COMPLETE WVC021 H09 180
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC022_BoneBridgeKeystone_Mars_SM.fbx'
+export finished in 0.0050 sec.
+VARIANT_C_ASSET_COMPLETE WVC022 H10 148
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC023_MillstoneDrum_Mars_SM.fbx'
+export finished in 0.0067 sec.
+VARIANT_C_ASSET_COMPLETE WVC023 H11 576
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC024_SaltChute_Mars_SM.fbx'
+export finished in 0.0065 sec.
+VARIANT_C_ASSET_COMPLETE WVC024 H12 104
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC025_SplitMourner_Mars_SM.fbx'
+export finished in 0.0059 sec.
+VARIANT_C_ASSET_COMPLETE WVC025 H14 249
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC026_Sarcophagus_Mars_SM.fbx'
+export finished in 0.0069 sec.
+VARIANT_C_ASSET_COMPLETE WVC026 H15 748
+Warning: No mesh data to join
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC027_VatLiquidInsert_Mars_SM.fbx'
+export finished in 0.0036 sec.
+VARIANT_C_ASSET_COMPLETE WVC027 W11 2
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC028_KeyLoftPlinth_Mars_SM.fbx'
+export finished in 0.0063 sec.
+VARIANT_C_ASSET_COMPLETE WVC028 I01 220
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC029_BellkeeperPanelHousing_Mars_SM.fbx'
+export finished in 0.0075 sec.
+VARIANT_C_ASSET_COMPLETE WVC029 I02 508
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC030_WheelAxle_Mars_SM.fbx'
+export finished in 0.0051 sec.
+VARIANT_C_ASSET_COMPLETE WVC030 I04 108
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC031_ChainCrossingBarsSkin_Mars_SM.fbx'
+export finished in 0.0059 sec.
+VARIANT_C_ASSET_COMPLETE WVC031 I05 556
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC032_PackPlateHousing_Mars_SM.fbx'
+export finished in 0.0054 sec.
+VARIANT_C_ASSET_COMPLETE WVC032 I06 220
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC033_DialBlank_Mars_SM.fbx'
+export finished in 0.0052 sec.
+VARIANT_C_ASSET_COMPLETE WVC033 I08 140
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC034_LadderFootBarsSkin_Mars_SM.fbx'
+export finished in 0.0048 sec.
+VARIANT_C_ASSET_COMPLETE WVC034 I09 264
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC035_LoftLeverSkin_Mars_SM.fbx'
+export finished in 0.0054 sec.
+VARIANT_C_ASSET_COMPLETE WVC035 I10 100
+Warning: No mesh data to join
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC036_RedKeyEscutcheon_Mars_SM.fbx'
+export finished in 0.0049 sec.
+VARIANT_C_ASSET_COMPLETE WVC036 I11 96
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC037_CuringVat_Mars_SM.fbx'
+export finished in 0.0080 sec.
+VARIANT_C_ASSET_COMPLETE WVC037 I12 290
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC038_CuringVatLid_Mars_SM.fbx'
+export finished in 0.0063 sec.
+VARIANT_C_ASSET_COMPLETE WVC038 I13 248
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC039_BacksideBarLeverSkin_Mars_SM.fbx'
+export finished in 0.0059 sec.
+VARIANT_C_ASSET_COMPLETE WVC039 I15 100
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC040_ScoutLadder100Segment_Mars_SM.fbx'
+export finished in 0.0071 sec.
+VARIANT_C_ASSET_COMPLETE WVC040 I16 396
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC041_LoftLadder125Segment_Mars_SM.fbx'
+export finished in 0.0073 sec.
+VARIANT_C_ASSET_COMPLETE WVC041 I17 440
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC042_MournerCacheGateSkin_Mars_SM.fbx'
+export finished in 0.0063 sec.
+VARIANT_C_ASSET_COMPLETE WVC042 I18 484
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC043_VaultDoorSkin_Mars_SM.fbx'
+export finished in 0.0064 sec.
+VARIANT_C_ASSET_COMPLETE WVC043 I19 312
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC044_CampPackPlinth_Mars_SM.fbx'
+export finished in 0.0040 sec.
+VARIANT_C_ASSET_COMPLETE WVC044 I20 132
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC045_PreparationBench_Mars_SM.fbx'
+export finished in 0.0083 sec.
+VARIANT_C_ASSET_COMPLETE WVC045 P02 484
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC046_StorageCrateBody_Mars_SM.fbx'
+export finished in 0.0075 sec.
+VARIANT_C_ASSET_COMPLETE WVC046 P03 396
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC047_StorageCrateLid_Mars_SM.fbx'
+export finished in 0.0061 sec.
+VARIANT_C_ASSET_COMPLETE WVC047 P04 132
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC048_OliveStorageJar_Mars_SM.fbx'
+export finished in 0.0063 sec.
+VARIANT_C_ASSET_COMPLETE WVC048 P06 292
+Warning: No mesh data to join
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC049_ServingBowl_Mars_SM.fbx'
+export finished in 0.0050 sec.
+VARIANT_C_ASSET_COMPLETE WVC049 P07 116
+Warning: No mesh data to join
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC050_SaltCrystalChunk_Mars_SM.fbx'
+export finished in 0.0050 sec.
+VARIANT_C_ASSET_COMPLETE WVC050 P09 66
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC051_SaltHeap_Mars_SM.fbx'
+export finished in 0.0069 sec.
+VARIANT_C_ASSET_COMPLETE WVC051 P10 504
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC052_BoneBundle_Mars_SM.fbx'
+export finished in 0.0070 sec.
+VARIANT_C_ASSET_COMPLETE WVC052 P11 448
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC053_OssuaryUrn_Mars_SM.fbx'
+export finished in 0.0056 sec.
+VARIANT_C_ASSET_COMPLETE WVC053 P12 296
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC054_ReliquaryBox_Mars_SM.fbx'
+export finished in 0.0059 sec.
+VARIANT_C_ASSET_COMPLETE WVC054 P13 176
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC055_HerbDryingRod_Mars_SM.fbx'
+export finished in 0.0061 sec.
+VARIANT_C_ASSET_COMPLETE WVC055 P14 156
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC056_DryingRack_Mars_SM.fbx'
+export finished in 0.0063 sec.
+VARIANT_C_ASSET_COMPLETE WVC056 P15 324
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC057_TallowPot_Mars_SM.fbx'
+export finished in 0.0072 sec.
+VARIANT_C_ASSET_COMPLETE WVC057 P16 268
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC058_Cup_Mars_SM.fbx'
+export finished in 0.0049 sec.
+VARIANT_C_ASSET_COMPLETE WVC058 P17 164
+Warning: No mesh data to join
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC059_Platter_Mars_SM.fbx'
+export finished in 0.0049 sec.
+VARIANT_C_ASSET_COMPLETE WVC059 P18 116
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC060_FoldedCloth_Mars_SM.fbx'
+export finished in 0.0058 sec.
+VARIANT_C_ASSET_COMPLETE WVC060 P19 176
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC061_MortarPestle_Mars_SM.fbx'
+export finished in 0.0045 sec.
+VARIANT_C_ASSET_COMPLETE WVC061 P21 188
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC062_MillHopper_Mars_SM.fbx'
+export finished in 0.0091 sec.
+VARIANT_C_ASSET_COMPLETE WVC062 P22 624
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC063_WindowShutter_Mars_SM.fbx'
+export finished in 0.0077 sec.
+VARIANT_C_ASSET_COMPLETE WVC063 P24 484
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC064_CandleHolder_Mars_SM.fbx'
+export finished in 0.0066 sec.
+VARIANT_C_ASSET_COMPLETE WVC064 L04 216
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC065_EmberBrazier_Mars_SM.fbx'
+export finished in 0.0055 sec.
+VARIANT_C_ASSET_COMPLETE WVC065 L08 200
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC066_ShaftLightFrame_Mars_SM.fbx'
+export finished in 0.0039 sec.
+VARIANT_C_ASSET_COMPLETE WVC066 L09 176
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC067_RootShort_Mars_SM.fbx'
+export finished in 0.0054 sec.
+VARIANT_C_ASSET_COMPLETE WVC067 D01 232
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC068_RootLong_Mars_SM.fbx'
+export finished in 0.0053 sec.
+VARIANT_C_ASSET_COMPLETE WVC068 D02 232
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC069_DryHerbBunch_Mars_SM.fbx'
+export finished in 0.0074 sec.
+VARIANT_C_ASSET_COMPLETE WVC069 D03 276
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC070_MushroomCluster_Mars_SM.fbx'
+export finished in 0.0055 sec.
+VARIANT_C_ASSET_COMPLETE WVC070 D04 300
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC071_BoneFragment_Mars_SM.fbx'
+export finished in 0.0054 sec.
+VARIANT_C_ASSET_COMPLETE WVC071 D07 72
+Warning: No mesh data to join
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC072_DustCardPlane_Mars_SM.fbx'
+export finished in 0.0033 sec.
+VARIANT_C_ASSET_COMPLETE WVC072 D12 2
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC073_CobwebCorner_Mars_SM.fbx'
+export finished in 0.0059 sec.
+VARIANT_C_ASSET_COMPLETE WVC073 D14 156
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC074_ShelfDivider_Mars_SM.fbx'
+export finished in 0.0054 sec.
+VARIANT_C_ASSET_COMPLETE WVC074 D16 132
+Warning: No mesh data to join
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC075_RockButtressLarge_Mars_SM.fbx'
+export finished in 0.0045 sec.
+VARIANT_C_ASSET_COMPLETE WVC075 E01 16
+Warning: No mesh data to join
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC076_BellLipDamageInsert_Mars_SM.fbx'
+export finished in 0.0046 sec.
+VARIANT_C_ASSET_COMPLETE WVC076 E16 20
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC077_ServiceBellSmall_Mars_SM.fbx'
+export finished in 0.0065 sec.
+VARIANT_C_ASSET_COMPLETE WVC077 E17 384
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC078_BellBracket_Mars_SM.fbx'
+export finished in 0.0055 sec.
+VARIANT_C_ASSET_COMPLETE WVC078 E18 204
+Warning: No mesh data to join
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC079_LowMistCard_Mars_SM.fbx'
+export finished in 0.0045 sec.
+VARIANT_C_ASSET_COMPLETE WVC079 E21 2
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC080_BrokenBeamEnd_Mars_SM.fbx'
+export finished in 0.0046 sec.
+VARIANT_C_ASSET_COMPLETE WVC080 E24 68
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC081_SarcophagusLid_Mars_SM.fbx'
+export finished in 0.0045 sec.
+VARIANT_C_ASSET_COMPLETE WVC081 H15_Lid 88
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC082_SingleChimeBone_Mars_SM.fbx'
+export finished in 0.0053 sec.
+VARIANT_C_ASSET_COMPLETE WVC082 P11_Single 120
+Warning: No mesh data to join
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\WarrensVariantCKit\\Output\\FBX\\WarrensC_WVC083_EmblemSurfaceCarrier_Mars_SM.fbx'
+export finished in 0.0037 sec.
+VARIANT_C_ASSET_COMPLETE WVC083 GraphicCarrier 2
+00:26.562  image.write      | ERROR OpenImageIO write failed: Could not open file "C:\Users\Adam\.thumbnails\large\blender_29128_695f82706cad8d6a41d43fe988a1a875.png.png"
+00:28.203  image.write      | ERROR OpenImageIO write failed: Could not open file "C:\Users\Adam\.thumbnails\large\blender_29128_b895a9b196de45d51ad959d2cdfb228a.png.png"
+Info: Saved as "WarrensVariantC_KitLibrary.blend"
+Info: Saved as "WarrensVariantC_Diorama.blend"
+VARIANT_C_KIT_BUILD_COMPLETE 83 113 assembled
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+
+Blender quit

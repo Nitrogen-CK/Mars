@@ -1,0 +1,140 @@
+Extensions: writing cache failed ([Errno 13] Permission denied: 'C:\\Users\\Adam\\AppData\\Roaming\\Blender Foundation\\Blender\\5.2\\extensions\\.cache\\compat.dat').
+Extensions: writing cache failed ([Errno 13] Permission denied: 'C:\\Users\\Adam\\AppData\\Roaming\\Blender Foundation\\Blender\\5.2\\extensions\\.cache\\compat.dat').
+addon_utils.disable: bl_ext.lab_blender_org.mcp not enabled
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\PumpCisternKit\\Output\\FBX\\WarrensC_PWC01_PumpTowerBody_Mars_SM.fbx'
+export finished in 0.0083 sec.
+PUMP_ASSET_COMPLETE PWC01 492
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\PumpCisternKit\\Output\\FBX\\WarrensC_PWC02_PumpFlywheel_Mars_SM.fbx'
+export finished in 0.0084 sec.
+PUMP_ASSET_COMPLETE PWC02 344
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\PumpCisternKit\\Output\\FBX\\WarrensC_PWC03_PistonRod_Mars_SM.fbx'
+export finished in 0.0055 sec.
+PUMP_ASSET_COMPLETE PWC03 84
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\PumpCisternKit\\Output\\FBX\\WarrensC_PWC04_PumpDiagonalBrace_Mars_SM.fbx'
+export finished in 0.0059 sec.
+PUMP_ASSET_COMPLETE PWC04 108
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\PumpCisternKit\\Output\\FBX\\WarrensC_PWC05_PipeStraight_Mars_SM.fbx'
+export finished in 0.0064 sec.
+PUMP_ASSET_COMPLETE PWC05 288
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\PumpCisternKit\\Output\\FBX\\WarrensC_PWC06_PipeElbow_Mars_SM.fbx'
+export finished in 0.0088 sec.
+PUMP_ASSET_COMPLETE PWC06 552
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\PumpCisternKit\\Output\\FBX\\WarrensC_PWC07_PipeCollar_Mars_SM.fbx'
+export finished in 0.0058 sec.
+PUMP_ASSET_COMPLETE PWC07 216
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\PumpCisternKit\\Output\\FBX\\WarrensC_PWC08_PipeWallBracket_Mars_SM.fbx'
+export finished in 0.0078 sec.
+PUMP_ASSET_COMPLETE PWC08 128
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\PumpCisternKit\\Output\\FBX\\WarrensC_PWC09_PipeEndCap_Mars_SM.fbx'
+export finished in 0.0076 sec.
+PUMP_ASSET_COMPLETE PWC09 88
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\PumpCisternKit\\Output\\FBX\\WarrensC_PWC10_CisternRimStraight_Mars_SM.fbx'
+export finished in 0.0061 sec.
+PUMP_ASSET_COMPLETE PWC10 88
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\PumpCisternKit\\Output\\FBX\\WarrensC_PWC11_CisternRimInnerCorner_Mars_SM.fbx'
+export finished in 0.0044 sec.
+PUMP_ASSET_COMPLETE PWC11 88
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\PumpCisternKit\\Output\\FBX\\WarrensC_PWC12_CisternRimEnd_Mars_SM.fbx'
+export finished in 0.0043 sec.
+PUMP_ASSET_COMPLETE PWC12 88
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\PumpCisternKit\\Output\\FBX\\WarrensC_PWC13_WaterGaugeBoard_Mars_SM.fbx'
+export finished in 0.0071 sec.
+PUMP_ASSET_COMPLETE PWC13 308
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\PumpCisternKit\\Output\\FBX\\WarrensC_PWC14_RootFork_Mars_SM.fbx'
+export finished in 0.0058 sec.
+PUMP_ASSET_COMPLETE PWC14 264
+Warning: No mesh data to join
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\PumpCisternKit\\Output\\FBX\\WarrensC_PWC15_RootTendril_Mars_SM.fbx'
+export finished in 0.0064 sec.
+PUMP_ASSET_COMPLETE PWC15 80
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\PumpCisternKit\\Output\\FBX\\WarrensC_PWC16_RootSocketCollar_Mars_SM.fbx'
+export finished in 0.0070 sec.
+PUMP_ASSET_COMPLETE PWC16 272
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\PumpCisternKit\\Output\\FBX\\WarrensC_PWC17_CisternBedPebbleCluster_Mars_SM.fbx'
+export finished in 0.0151 sec.
+PUMP_ASSET_COMPLETE PWC17 140
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\PumpCisternKit\\Output\\FBX\\WarrensC_PWC18_PipeRepairWrap_Mars_SM.fbx'
+export finished in 0.0079 sec.
+PUMP_ASSET_COMPLETE PWC18 280
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\PumpCisternKit\\Output\\FBX\\WarrensC_PWC19_ToolRack_Mars_SM.fbx'
+export finished in 0.0064 sec.
+PUMP_ASSET_COMPLETE PWC19 220
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\PumpCisternKit\\Output\\FBX\\WarrensC_PWC20_Spanner_Mars_SM.fbx'
+export finished in 0.0061 sec.
+PUMP_ASSET_COMPLETE PWC20 152
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\PumpCisternKit\\Output\\FBX\\WarrensC_PWC21_Bucket_Mars_SM.fbx'
+export finished in 0.0063 sec.
+PUMP_ASSET_COMPLETE PWC21 248
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\PumpCisternKit\\Output\\FBX\\WarrensC_PWC22_TallowDripTray_Mars_SM.fbx'
+export finished in 0.0065 sec.
+PUMP_ASSET_COMPLETE PWC22 220
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\PumpCisternKit\\Output\\FBX\\WarrensC_PWC23_CandleStub_Mars_SM.fbx'
+export finished in 0.0067 sec.
+PUMP_ASSET_COMPLETE PWC23 104
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\PumpCisternKit\\Output\\FBX\\WarrensC_PWC24_ClothBanner_Mars_SM.fbx'
+export finished in 0.0066 sec.
+PUMP_ASSET_COMPLETE PWC24 96
+Warning: No mesh data to join
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\PumpCisternKit\\Output\\FBX\\WarrensC_PWC25_CisternWaterSurface_Mars_SM.fbx'
+export finished in 0.0046 sec.
+PUMP_ASSET_COMPLETE PWC25 4
+00:06.031  image.write      | ERROR OpenImageIO write failed: Could not open file "C:\Users\Adam\.thumbnails\large\blender_49368_d4db34b0bf1742a1daa3c6b2ee8d6575.png.png"
+00:06.265  image.write      | ERROR OpenImageIO write failed: Could not open file "C:\Users\Adam\.thumbnails\large\blender_49368_165a2cb422f5a1c8fc995a42bf4a64e9.png.png"
+00:12.125  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\PumpCisternKit\Output\Renders\KIT_LIBRARY.png'
+00:19.422  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\PumpCisternKit\Output\Renders\DIORAMA.png'
+00:20.328  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\PumpCisternKit\Output\Previews\PWC01.png'
+00:21.265  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\PumpCisternKit\Output\Previews\PWC02.png'
+00:22.109  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\PumpCisternKit\Output\Previews\PWC03.png'
+00:22.922  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\PumpCisternKit\Output\Previews\PWC04.png'
+00:23.750  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\PumpCisternKit\Output\Previews\PWC05.png'
+00:24.687  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\PumpCisternKit\Output\Previews\PWC06.png'
+00:25.609  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\PumpCisternKit\Output\Previews\PWC07.png'
+00:26.484  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\PumpCisternKit\Output\Previews\PWC08.png'
+00:27.390  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\PumpCisternKit\Output\Previews\PWC09.png'
+00:28.218  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\PumpCisternKit\Output\Previews\PWC10.png'
+00:29.218  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\PumpCisternKit\Output\Previews\PWC11.png'
+00:30.297  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\PumpCisternKit\Output\Previews\PWC12.png'
+00:31.218  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\PumpCisternKit\Output\Previews\PWC13.png'
+00:32.125  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\PumpCisternKit\Output\Previews\PWC14.png'
+00:32.953  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\PumpCisternKit\Output\Previews\PWC15.png'
+00:33.797  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\PumpCisternKit\Output\Previews\PWC16.png'
+00:34.672  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\PumpCisternKit\Output\Previews\PWC17.png'
+00:35.578  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\PumpCisternKit\Output\Previews\PWC18.png'
+00:36.500  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\PumpCisternKit\Output\Previews\PWC19.png'
+00:37.375  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\PumpCisternKit\Output\Previews\PWC20.png'
+00:38.343  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\PumpCisternKit\Output\Previews\PWC21.png'
+00:39.234  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\PumpCisternKit\Output\Previews\PWC22.png'
+00:40.109  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\PumpCisternKit\Output\Previews\PWC23.png'
+00:40.953  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\PumpCisternKit\Output\Previews\PWC24.png'
+00:41.843  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\PumpCisternKit\Output\Previews\PWC25.png'
+Info: Saved as "PumpCistern_KitLibrary.blend"
+Info: Saved as "PumpCistern_Diorama.blend"
+PUMP_KIT_BUILD_COMPLETE 25 13 3569
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+
+Blender quit

@@ -1,0 +1,168 @@
+{
+  "instances": 37511,
+  "removed_exact_duplicates": 37,
+  "by_tile": {
+    "Hub": 4345,
+    "Court": 4142,
+    "Ossuary": 2218,
+    "WaterworksW": 5689,
+    "Pit": 3874,
+    "Canal": 2184,
+    "Belfry": 2984,
+    "Reliquary": 1565,
+    "Mill": 806,
+    "Catacomb": 3671,
+    "Brineworks": 4432,
+    "Main": 1601
+  },
+  "source_gallery_instances": 63,
+  "rooms": [
+    {
+      "room": "hall",
+      "tile": "Hub",
+      "candidate_closed_bays": 3,
+      "selected_bays": 3
+    },
+    {
+      "room": "closet",
+      "tile": "Hub",
+      "candidate_closed_bays": 2,
+      "selected_bays": 1
+    },
+    {
+      "room": "court",
+      "tile": "Court",
+      "candidate_closed_bays": 9,
+      "selected_bays": 4
+    },
+    {
+      "room": "court-pit",
+      "tile": "Court",
+      "candidate_closed_bays": 7,
+      "selected_bays": 2
+    },
+    {
+      "room": "rimW",
+      "tile": "Hub",
+      "candidate_closed_bays": 0,
+      "selected_bays": 0
+    },
+    {
+      "room": "rimE",
+      "tile": "Hub",
+      "candidate_closed_bays": 1,
+      "selected_bays": 1
+    },
+    {
+      "room": "rimN",
+      "tile": "Hub",
+      "candidate_closed_bays": 0,
+      "selected_bays": 0
+    },
+    {
+      "room": "rimS",
+      "tile": "Hub",
+      "candidate_closed_bays": 1,
+      "selected_bays": 1
+    },
+    {
+      "room": "ossuary",
+      "tile": "Ossuary",
+      "candidate_closed_bays": 2,
+      "selected_bays": 2
+    },
+    {
+      "room": "bridgehead",
+      "tile": "Ossuary",
+      "candidate_closed_bays": 0,
+      "selected_bays": 0
+    },
+    {
+      "room": "ford-w",
+      "tile": "Canal",
+      "candidate_closed_bays": 0,
+      "selected_bays": 0
+    },
+    {
+      "room": "ford-e",
+      "tile": "Canal",
+      "candidate_closed_bays": 2,
+      "selected_bays": 1
+    },
+    {
+      "room": "reliquary",
+      "tile": "Reliquary",
+      "candidate_closed_bays": 4,
+      "selected_bays": 3
+    },
+    {
+      "room": "mill",
+      "tile": "Mill",
+      "candidate_closed_bays": 3,
+      "selected_bays": 3
+    },
+    {
+      "room": "catacomb",
+      "tile": "Catacomb",
+      "candidate_closed_bays": 2,
+      "selected_bays": 2
+    },
+    {
+      "room": "belfry",
+      "tile": "Belfry",
+      "candidate_closed_bays": 13,
+      "selected_bays": 4
+    },
+    {
+      "room": "bell-loft",
+      "tile": "Belfry",
+      "candidate_closed_bays": 1,
+      "selected_bays": 1
+    },
+    {
+      "room": "cellar",
+      "tile": "Brineworks",
+      "candidate_closed_bays": 6,
+      "selected_bays": 3
+    },
+    {
+      "room": "sluice",
+      "tile": "Brineworks",
+      "candidate_closed_bays": 8,
+      "selected_bays": 4
+    },
+    {
+      "room": "larder",
+      "tile": "Brineworks",
+      "candidate_closed_bays": 11,
+      "selected_bays": 4
+    },
+    {
+      "room": "pump",
+      "tile": "WaterworksW",
+      "candidate_closed_bays": 5,
+      "selected_bays": 4
+    },
+    {
+      "room": "cistern",
+      "tile": "WaterworksW",
+      "candidate_closed_bays": 1,
+      "selected_bays": 1
+    },
+    {
+      "room": "lair",
+      "tile": "Pit",
+      "candidate_closed_bays": 13,
+      "selected_bays": 4
+    },
+    {
+      "room": "vault",
+      "tile": "Pit",
+      "candidate_closed_bays": 2,
+      "selected_bays": 2
+    }
+  ],
+  "source_instance_count": 7481,
+  "invalid_dimensions": 0,
+  "missing_floor_samples": 0
+}

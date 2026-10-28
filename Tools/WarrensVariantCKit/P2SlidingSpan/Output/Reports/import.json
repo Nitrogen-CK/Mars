@@ -1,0 +1,113 @@
+[
+  {
+    "path": "/Game/Mars/Environment/WarrensVariantCKit/P2SlidingSpan/WarrensC_P2S01_Deck_Mars_SM",
+    "convex_hulls": 1,
+    "imported_hull_bounds_cm": [
+      [
+        [
+          -125.0,
+          -1.1e-05,
+          -20.0
+        ],
+        [
+          125.000092,
+          1050.0,
+          0.0
+        ]
+      ]
+    ],
+    "bounds_origin_cm": [
+      4.57763671875e-05,
+      524.9999945360764,
+      -9.999999046325684
+    ],
+    "bounds_extent_cm": [
+      125.00004577636719,
+      525.0000054639236,
+      9.999999046325684
+    ],
+    "source_sha256": "afd2b2222ddb69212cc5eaf5a1fa05d2c19be7aebd976be95b5728e2bbe60853"
+  },
+  {
+    "path": "/Game/Mars/Environment/WarrensVariantCKit/P2SlidingSpan/WarrensC_P2S02_Cage_Mars_SM",
+    "convex_hulls": 3,
+    "imported_hull_bounds_cm": [
+      [
+        [
+          -125.0,
+          1e-05,
+          0.0
+        ],
+        [
+          -114.999916,
+          1050.0,
+          220.0
+        ]
+      ],
+      [
+        [
+          115.000008,
+          -1.1e-05,
+          0.0
+        ],
+        [
+          125.000092,
+          1050.0,
+          220.0
+        ]
+      ],
+      [
+        [
+          -125.0,
+          -1.1e-05,
+          212.000015
+        ],
+        [
+          125.000092,
+          1050.0,
+          220.0
+        ]
+      ]
+    ],
+    "bounds_origin_cm": [
+      4.57763671875e-05,
+      524.9999945360764,
+      110.0
+    ],
+    "bounds_extent_cm": [
+      125.00004577636719,
+      525.0000054639236,
+      110.0
+    ],
+    "source_sha256": "12e95686f039336bdd87c8b4a54ff3447fc97e953981fa60852e074ce4901c8f"
+  },
+  {
+    "path": "/Game/Mars/Environment/WarrensVariantCKit/P2SlidingSpan/WarrensC_P2S03_Guard_Mars_SM",
+    "convex_hulls": 1,
+    "imported_hull_bounds_cm": [
+      [
+        [
+          -115.0,
+          -4.00001,
+          0.0
+        ],
+        [
+          115.0,
+          4.00001,
+          220.0
+        ]
+      ]
+    ],
+    "bounds_origin_cm": [
+      3.814697265625e-06,
+      0.0,
+      110.0
+    ],
+    "bounds_extent_cm": [
+      115.00000381469727,
+      4.000010013580322,
+      110.0
+    ],
+    "source_sha256": "34f1ddf3059af6a438910f71b298d75fcb522be78c17532856ff04a25f077b9b"
+  }
+]

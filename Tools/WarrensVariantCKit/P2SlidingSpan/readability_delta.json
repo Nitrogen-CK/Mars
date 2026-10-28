@@ -1,0 +1,958 @@
+{
+  "schema": 1,
+  "status": "UNAPPLIED_STATIC_VISUAL_CANDIDATE",
+  "purpose": "Sole Sluice windlass -> existing passive routed drive -> single span; show the fixed opposite landing.",
+  "axes": [
+    {
+      "stage": 0,
+      "name": "current",
+      "fixture_delta": false,
+      "light_delta": false
+    },
+    {
+      "stage": 1,
+      "name": "static fixture placement only",
+      "fixture_delta": true,
+      "light_delta": false,
+      "note": "Existing flame material remains unchanged; no added PointLight contribution. This stage isolates fixture/emissive presence from practical-light activation."
+    },
+    {
+      "stage": 2,
+      "name": "practical light only",
+      "fixture_delta": "identical to stage1",
+      "light_delta": true,
+      "note": "No changes to geometry, materials, exposure, global lighting or moving membership between stages1 and2."
+    }
+  ],
+  "coordinate_contract": {
+    "at_plan_m": "Absolute authored plan metres, positive Y. Package-local UE centimetres =100*(plan-pivot). Assembled runtime UE cm =100*(plan-[70,55,0]).",
+    "bounds": "Catalog Blender bounds reflected Y then yawed into plan, using exact catalog mesh bounds; rounded to1 micrometre for readable ledger.",
+    "tile_pivots_m": {
+      "Brineworks": [
+        88,
+        4,
+        -2.5
+      ],
+      "WaterworksW": [
+        4,
+        14,
+        -2.5
+      ],
+      "Canal": [
+        66,
+        -4,
+        -2.5
+      ]
+    }
+  },
+  "source_guards": {
+    "Tools/WarrensVariantCKit/P2SlidingSpan/Output/art_delta.json": "4e56f203770f01b50c8a8518ff192b8f2c61531c76fb22fc23ae3cc1c1fb2d3d",
+    "Tools/WarrensVariantCKit/Output/fitted_instances.json": "67f8e8d87ab166ab7fd0cd5e285a08e02b8643c856de3bf028130271021b9d34",
+    "Tools/ChainCrossingKit/Output/asset_manifest.json": "ce72a4b704030059e82abad4cd4e40a331386b9e9667ccf701810883b6f975b4",
+    "Tools/WarrensVariantCKit/P2SlidingSpan/Output/asset_manifest.json": "44f5237f8633c1b7f38cdd1916d2d4dc6acab12ffd22fac41970b8a270daac8a",
+    "Tools/LevelDesign/anchor_plans/data/warrens_v8c_p2_section.json": "d2bd0e699c07164f9e5e512177e8ed917efe35f1da8b4a60f92701a644810bd2",
+    "Script/WorldObjects/Mechanisms/Mars_SlidingBridge_EntityScript.as": "ecdd718092dfacf6641157a01b94f3fb18e035ff20f706e40295a605ab175b22",
+    "Tools/LevelDesign/anchor_plans/design_warrens_v8c.py": "ad45ee9976ec17ef7a47729222b06ffb7a1c63af8df47e2aa6daab5532402ab5",
+    "Saved/WarrensCGameplay-20261024/p2_applied_Canal.json": "5777cb47f34799834ad26e596850764d64e150ea58e576b86d06cdce5dd75a8f",
+    "Saved/WarrensCGameplay-20261024/p2_applied_Brineworks.json": "20b538903eec4cb9f500cae390b3df335f058b6fd3d0d2161370823d8e73cd11",
+    "Saved/WarrensCGameplay-20261024/p2_applied_Waterworks-W.json": "79a82c814904efd7f9c37bceb90f1097af5c8e674bbc1e2050d73c331efb8a06",
+    "Saved/WarrensCGameplay-20261024/P2_seated_lantern.png": "bd525f195c5917e591cbba37c1657b2823d24fc0f2ffbfe86781ddb823230d87",
+    "docs/art/warrens-c-gameplay-review-20261024/P2_windlass_grip.png": "374c920a0ae43a094a2ad11268e4c8fd981439a1992086ef383fdc58d9b7a31f"
+  },
+  "baseline_art_delta": {
+    "removed": 226,
+    "added": 616,
+    "removed_lights": [
+      {
+        "index": 0,
+        "tile": "Canal",
+        "at": [
+          77.75,
+          24.362000002980235,
+          -0.72
+        ],
+        "intensity": 30
+      },
+      {
+        "index": 1,
+        "tile": "Canal",
+        "at": [
+          83.0,
+          23.862000002980235,
+          -0.72
+        ],
+        "intensity": 30
+      }
+    ],
+    "note": "Append only to the reviewed applied P2 delta. Never reapply the old fitted ledger or restore the two removed old-span lamps."
+  },
+  "required_mechanism": {
+    "class": "Mars_SlidingBridge_EntityScript",
+    "root_plan_m": [
+      79,
+      20,
+      -2.2
+    ],
+    "root_yaw": 90,
+    "wheel_offset_local_cm": [
+      -800,
+      -4300,
+      -30
+    ],
+    "wheel_offset_rotation_pitch_yaw_roll": [
+      0,
+      -180,
+      0
+    ],
+    "actual_wheel_center_plan_m": [
+      122,
+      11.5,
+      -1.5
+    ],
+    "drive_path_plan_m": [
+      [
+        122,
+        12,
+        -2.42
+      ],
+      [
+        122,
+        15,
+        -2.42
+      ],
+      [
+        112,
+        16,
+        -2.42
+      ],
+      [
+        104,
+        19,
+        -2.42
+      ],
+      [
+        96,
+        20,
+        -2.42
+      ],
+      [
+        90,
+        20,
+        -2.42
+      ]
+    ],
+    "policy": "No wheel/drive/guard/deck/cage transform, component, mesh, material or interaction changes."
+  },
+  "placements": [
+    {
+      "key": "wheel_cage",
+      "assembly": "windlass",
+      "operation": "add_static_no_collision",
+      "tile": "Brineworks",
+      "package": "/Game/Mars/Maps/Variants/v8c/LI_Warrens_Brineworks",
+      "mesh_id": "CCS60",
+      "mesh": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS60_LanternHousing_Mars_SM",
+      "at_plan_m": [
+        122,
+        11.85,
+        -1.3
+      ],
+      "scale": [
+        0.4,
+        0.4,
+        0.4
+      ],
+      "rotation_pitch_yaw_roll": [
+        0,
+        180,
+        0
+      ],
+      "package_local_cm": [
+        3400,
+        785.0,
+        120.0
+      ],
+      "collision_profile": "NoCollision",
+      "generate_overlap_events": false,
+      "material_override": null,
+      "owner_tag": "Mars.WarrensC.P2Readability.Candidate.v1",
+      "support": "Existing fixed windlass mount top Z=-1.30, plan X[121.8,122.2],Y[11.8,12.2]. Do not attach to turning wheel node.",
+      "bounds_plan_m": {
+        "min": [
+          121.93,
+          11.8,
+          -1.3
+        ],
+        "max": [
+          122.07,
+          11.9,
+          -1.08
+        ]
+      }
+    },
+    {
+      "key": "wheel_glass",
+      "assembly": "windlass",
+      "operation": "add_static_no_collision",
+      "tile": "Brineworks",
+      "package": "/Game/Mars/Maps/Variants/v8c/LI_Warrens_Brineworks",
+      "mesh_id": "CCS61",
+      "mesh": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS61_LanternGlass_Mars_SM",
+      "at_plan_m": [
+        122,
+        11.85,
+        -1.268
+      ],
+      "scale": [
+        0.4,
+        0.4,
+        0.4
+      ],
+      "rotation_pitch_yaw_roll": [
+        0,
+        180,
+        0
+      ],
+      "package_local_cm": [
+        3400,
+        785.0,
+        123.2
+      ],
+      "collision_profile": "NoCollision",
+      "generate_overlap_events": false,
+      "material_override": null,
+      "owner_tag": "Mars.WarrensC.P2Readability.Candidate.v1",
+      "support": "Inside wheel_cage; inherited glass material and no-shadow handling.",
+      "bounds_plan_m": {
+        "min": [
+          121.95,
+          11.81,
+          -1.268
+        ],
+        "max": [
+          122.05,
+          11.89,
+          -1.128
+        ]
+      }
+    },
+    {
+      "key": "wheel_flame",
+      "assembly": "windlass",
+      "operation": "add_static_no_collision",
+      "tile": "Brineworks",
+      "package": "/Game/Mars/Maps/Variants/v8c/LI_Warrens_Brineworks",
+      "mesh_id": "CCS64",
+      "mesh": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS64_FlameCard_Mars_SM",
+      "at_plan_m": [
+        122,
+        11.85,
+        -1.252
+      ],
+      "scale": [
+        0.18,
+        0.18,
+        0.2
+      ],
+      "rotation_pitch_yaw_roll": [
+        0,
+        180,
+        0
+      ],
+      "package_local_cm": [
+        3400,
+        785.0,
+        124.8
+      ],
+      "collision_profile": "NoCollision",
+      "generate_overlap_events": false,
+      "material_override": null,
+      "owner_tag": "Mars.WarrensC.P2Readability.Candidate.v1",
+      "support": "Inside wheel_cage; existing flame mesh/material only.",
+      "bounds_plan_m": {
+        "min": [
+          121.9775,
+          11.8491,
+          -1.252
+        ],
+        "max": [
+          122.0225,
+          11.8509,
+          -1.152
+        ]
+      }
+    },
+    {
+      "key": "west_hook",
+      "assembly": "west",
+      "operation": "add_static_no_collision",
+      "tile": "WaterworksW",
+      "package": "/Game/Mars/Maps/Variants/v8c/LI_Warrens_WaterworksW",
+      "mesh_id": "CCS62",
+      "mesh": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS62_WallLanternHook_Mars_SM",
+      "at_plan_m": [
+        67.5,
+        21.34,
+        -0.85325
+      ],
+      "scale": [
+        0.5,
+        0.5,
+        0.5
+      ],
+      "rotation_pitch_yaw_roll": [
+        0,
+        180,
+        0
+      ],
+      "package_local_cm": [
+        6350.0,
+        734.0,
+        164.675
+      ],
+      "collision_profile": "NoCollision",
+      "generate_overlap_events": false,
+      "material_override": null,
+      "owner_tag": "Mars.WarrensC.P2Readability.Candidate.v1",
+      "support": "Fixed west_landing_north inner face Y=21.35; use scaled existing closed-bay hook/cage offsets.",
+      "bounds_plan_m": {
+        "min": [
+          67.4625,
+          21.2775,
+          -0.85325
+        ],
+        "max": [
+          67.5375,
+          21.4025,
+          -0.72825
+        ]
+      }
+    },
+    {
+      "key": "west_cage",
+      "assembly": "west",
+      "operation": "add_static_no_collision",
+      "tile": "WaterworksW",
+      "package": "/Game/Mars/Maps/Variants/v8c/LI_Warrens_WaterworksW",
+      "mesh_id": "CCS60",
+      "mesh": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS60_LanternHousing_Mars_SM",
+      "at_plan_m": [
+        67.5,
+        21.28,
+        -1.05
+      ],
+      "scale": [
+        0.5,
+        0.5,
+        0.5
+      ],
+      "rotation_pitch_yaw_roll": [
+        0,
+        180,
+        0
+      ],
+      "package_local_cm": [
+        6350.0,
+        728.0,
+        145.0
+      ],
+      "collision_profile": "NoCollision",
+      "generate_overlap_events": false,
+      "material_override": null,
+      "owner_tag": "Mars.WarrensC.P2Readability.Candidate.v1",
+      "support": "Hangs from west_hook; never parent to guard, deck or cage.",
+      "bounds_plan_m": {
+        "min": [
+          67.4125,
+          21.2175,
+          -1.05
+        ],
+        "max": [
+          67.5875,
+          21.3425,
+          -0.775
+        ]
+      }
+    },
+    {
+      "key": "west_glass",
+      "assembly": "west",
+      "operation": "add_static_no_collision",
+      "tile": "WaterworksW",
+      "package": "/Game/Mars/Maps/Variants/v8c/LI_Warrens_WaterworksW",
+      "mesh_id": "CCS61",
+      "mesh": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS61_LanternGlass_Mars_SM",
+      "at_plan_m": [
+        67.5,
+        21.28,
+        -1.01
+      ],
+      "scale": [
+        0.5,
+        0.5,
+        0.5
+      ],
+      "rotation_pitch_yaw_roll": [
+        0,
+        180,
+        0
+      ],
+      "package_local_cm": [
+        6350.0,
+        728.0,
+        149.0
+      ],
+      "collision_profile": "NoCollision",
+      "generate_overlap_events": false,
+      "material_override": null,
+      "owner_tag": "Mars.WarrensC.P2Readability.Candidate.v1",
+      "support": "Inside west_cage; inherited glass material and no-shadow handling.",
+      "bounds_plan_m": {
+        "min": [
+          67.4375,
+          21.23,
+          -1.01
+        ],
+        "max": [
+          67.5625,
+          21.33,
+          -0.835
+        ]
+      }
+    },
+    {
+      "key": "west_flame",
+      "assembly": "west",
+      "operation": "add_static_no_collision",
+      "tile": "WaterworksW",
+      "package": "/Game/Mars/Maps/Variants/v8c/LI_Warrens_WaterworksW",
+      "mesh_id": "CCS64",
+      "mesh": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS64_FlameCard_Mars_SM",
+      "at_plan_m": [
+        67.5,
+        21.28,
+        -0.99
+      ],
+      "scale": [
+        0.225,
+        0.225,
+        0.25
+      ],
+      "rotation_pitch_yaw_roll": [
+        0,
+        180,
+        0
+      ],
+      "package_local_cm": [
+        6350.0,
+        728.0,
+        151.0
+      ],
+      "collision_profile": "NoCollision",
+      "generate_overlap_events": false,
+      "material_override": null,
+      "owner_tag": "Mars.WarrensC.P2Readability.Candidate.v1",
+      "support": "Inside west_cage; existing flame mesh/material only.",
+      "bounds_plan_m": {
+        "min": [
+          67.471875,
+          21.278875,
+          -0.99
+        ],
+        "max": [
+          67.528125,
+          21.281125,
+          -0.865
+        ]
+      }
+    },
+    {
+      "key": "east_hook",
+      "assembly": "east",
+      "operation": "add_static_no_collision",
+      "tile": "Canal",
+      "package": "/Game/Mars/Maps/Variants/v8c/LI_Warrens_Canal",
+      "mesh_id": "CCS62",
+      "mesh": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS62_WallLanternHook_Mars_SM",
+      "at_plan_m": [
+        90.6,
+        21.34,
+        -0.85325
+      ],
+      "scale": [
+        0.5,
+        0.5,
+        0.5
+      ],
+      "rotation_pitch_yaw_roll": [
+        0,
+        180,
+        0
+      ],
+      "package_local_cm": [
+        2460.0,
+        2534.0,
+        164.675
+      ],
+      "collision_profile": "NoCollision",
+      "generate_overlap_events": false,
+      "material_override": null,
+      "owner_tag": "Mars.WarrensC.P2Readability.Candidate.v1",
+      "support": "Fixed east_corridor_side north inner face Y=21.35; use scaled existing closed-bay hook/cage offsets.",
+      "bounds_plan_m": {
+        "min": [
+          90.5625,
+          21.2775,
+          -0.85325
+        ],
+        "max": [
+          90.6375,
+          21.4025,
+          -0.72825
+        ]
+      }
+    },
+    {
+      "key": "east_cage",
+      "assembly": "east",
+      "operation": "add_static_no_collision",
+      "tile": "Canal",
+      "package": "/Game/Mars/Maps/Variants/v8c/LI_Warrens_Canal",
+      "mesh_id": "CCS60",
+      "mesh": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS60_LanternHousing_Mars_SM",
+      "at_plan_m": [
+        90.6,
+        21.28,
+        -1.05
+      ],
+      "scale": [
+        0.5,
+        0.5,
+        0.5
+      ],
+      "rotation_pitch_yaw_roll": [
+        0,
+        180,
+        0
+      ],
+      "package_local_cm": [
+        2460.0,
+        2528.0,
+        145.0
+      ],
+      "collision_profile": "NoCollision",
+      "generate_overlap_events": false,
+      "material_override": null,
+      "owner_tag": "Mars.WarrensC.P2Readability.Candidate.v1",
+      "support": "Hangs from east_hook; never parent to guard, deck or cage.",
+      "bounds_plan_m": {
+        "min": [
+          90.5125,
+          21.2175,
+          -1.05
+        ],
+        "max": [
+          90.6875,
+          21.3425,
+          -0.775
+        ]
+      }
+    },
+    {
+      "key": "east_glass",
+      "assembly": "east",
+      "operation": "add_static_no_collision",
+      "tile": "Canal",
+      "package": "/Game/Mars/Maps/Variants/v8c/LI_Warrens_Canal",
+      "mesh_id": "CCS61",
+      "mesh": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS61_LanternGlass_Mars_SM",
+      "at_plan_m": [
+        90.6,
+        21.28,
+        -1.01
+      ],
+      "scale": [
+        0.5,
+        0.5,
+        0.5
+      ],
+      "rotation_pitch_yaw_roll": [
+        0,
+        180,
+        0
+      ],
+      "package_local_cm": [
+        2460.0,
+        2528.0,
+        149.0
+      ],
+      "collision_profile": "NoCollision",
+      "generate_overlap_events": false,
+      "material_override": null,
+      "owner_tag": "Mars.WarrensC.P2Readability.Candidate.v1",
+      "support": "Inside east_cage; inherited glass material and no-shadow handling.",
+      "bounds_plan_m": {
+        "min": [
+          90.5375,
+          21.23,
+          -1.01
+        ],
+        "max": [
+          90.6625,
+          21.33,
+          -0.835
+        ]
+      }
+    },
+    {
+      "key": "east_flame",
+      "assembly": "east",
+      "operation": "add_static_no_collision",
+      "tile": "Canal",
+      "package": "/Game/Mars/Maps/Variants/v8c/LI_Warrens_Canal",
+      "mesh_id": "CCS64",
+      "mesh": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS64_FlameCard_Mars_SM",
+      "at_plan_m": [
+        90.6,
+        21.28,
+        -0.99
+      ],
+      "scale": [
+        0.225,
+        0.225,
+        0.25
+      ],
+      "rotation_pitch_yaw_roll": [
+        0,
+        180,
+        0
+      ],
+      "package_local_cm": [
+        2460.0,
+        2528.0,
+        151.0
+      ],
+      "collision_profile": "NoCollision",
+      "generate_overlap_events": false,
+      "material_override": null,
+      "owner_tag": "Mars.WarrensC.P2Readability.Candidate.v1",
+      "support": "Inside east_cage; existing flame mesh/material only.",
+      "bounds_plan_m": {
+        "min": [
+          90.571875,
+          21.278875,
+          -0.99
+        ],
+        "max": [
+          90.628125,
+          21.281125,
+          -0.865
+        ]
+      }
+    }
+  ],
+  "lights": [
+    {
+      "key": "wheel_practical",
+      "operation": "add_point_light",
+      "tile": "Brineworks",
+      "package": "/Game/Mars/Maps/Variants/v8c/LI_Warrens_Brineworks",
+      "at_plan_m": [
+        122,
+        11.818,
+        -1.2
+      ],
+      "package_local_cm": [
+        3400,
+        781.8,
+        130.0
+      ],
+      "intensity": 18,
+      "attenuation_radius_cm": 450,
+      "linear_color": [
+        1,
+        0.66,
+        0.34
+      ],
+      "mobility": "Movable",
+      "copy_template_actor": "WVC_Practical_54",
+      "copy_template_package": "/Game/Mars/Maps/Variants/v8c/LI_Warrens_Brineworks",
+      "unchanged_template_properties": [
+        "intensity_units",
+        "use_inverse_squared_falloff",
+        "cast_shadows",
+        "source_radius",
+        "source_length"
+      ],
+      "ies_profile": null,
+      "light_function": null,
+      "owner_tag": "Mars.WarrensC.P2Readability.Candidate.v1",
+      "stage_1_visible": false,
+      "stage_2_visible": true
+    },
+    {
+      "key": "west_practical",
+      "operation": "add_point_light",
+      "tile": "WaterworksW",
+      "package": "/Game/Mars/Maps/Variants/v8c/LI_Warrens_WaterworksW",
+      "at_plan_m": [
+        67.5,
+        21.24,
+        -0.925
+      ],
+      "package_local_cm": [
+        6350.0,
+        724.0,
+        157.5
+      ],
+      "intensity": 18,
+      "attenuation_radius_cm": 450,
+      "linear_color": [
+        1,
+        0.66,
+        0.34
+      ],
+      "mobility": "Movable",
+      "copy_template_actor": "WVC_Practical_54",
+      "copy_template_package": "/Game/Mars/Maps/Variants/v8c/LI_Warrens_Brineworks",
+      "unchanged_template_properties": [
+        "intensity_units",
+        "use_inverse_squared_falloff",
+        "cast_shadows",
+        "source_radius",
+        "source_length"
+      ],
+      "ies_profile": null,
+      "light_function": null,
+      "owner_tag": "Mars.WarrensC.P2Readability.Candidate.v1",
+      "stage_1_visible": false,
+      "stage_2_visible": true
+    },
+    {
+      "key": "east_practical",
+      "operation": "add_point_light",
+      "tile": "Canal",
+      "package": "/Game/Mars/Maps/Variants/v8c/LI_Warrens_Canal",
+      "at_plan_m": [
+        90.6,
+        21.24,
+        -0.925
+      ],
+      "package_local_cm": [
+        2460.0,
+        2524.0,
+        157.5
+      ],
+      "intensity": 18,
+      "attenuation_radius_cm": 450,
+      "linear_color": [
+        1,
+        0.66,
+        0.34
+      ],
+      "mobility": "Movable",
+      "copy_template_actor": "WVC_Practical_54",
+      "copy_template_package": "/Game/Mars/Maps/Variants/v8c/LI_Warrens_Brineworks",
+      "unchanged_template_properties": [
+        "intensity_units",
+        "use_inverse_squared_falloff",
+        "cast_shadows",
+        "source_radius",
+        "source_length"
+      ],
+      "ies_profile": null,
+      "light_function": null,
+      "owner_tag": "Mars.WarrensC.P2Readability.Candidate.v1",
+      "stage_1_visible": false,
+      "stage_2_visible": true
+    },
+    {
+      "key": "existing_chain_bend_practical",
+      "operation": "modify_existing_light_only",
+      "tile": "Brineworks",
+      "package": "/Game/Mars/Maps/Variants/v8c/LI_Warrens_Brineworks",
+      "actor_label": "WVC_Practical_54",
+      "required_owner_tag": "Mars.WarrensVariantCKit.Authoring.v1",
+      "at_plan_m": [
+        109.78,
+        13.5,
+        -0.8
+      ],
+      "before": {
+        "intensity": 18,
+        "attenuation_radius_cm": 550
+      },
+      "after": {
+        "intensity": 24,
+        "attenuation_radius_cm": 600
+      },
+      "preserve": [
+        "transform",
+        "light_color",
+        "intensity_units",
+        "use_inverse_squared_falloff",
+        "cast_shadows",
+        "source_radius",
+        "source_length",
+        "all fixture mesh placements/materials"
+      ]
+    }
+  ],
+  "clearance_checks": {
+    "method": "Conservative transformed mesh AABB intersection against approved route/sweep/probe AABBs; source-body support contact is separate. Not a capsule/triangle/PIE proof.",
+    "volumes_plan_m": {
+      "full_cage_sweep": {
+        "min": [
+          68.5,
+          18.75,
+          -2.4
+        ],
+        "max": [
+          89.5,
+          21.25,
+          0
+        ]
+      },
+      "west_guard_sweep": {
+        "min": [
+          68.11,
+          18.85,
+          -2.5
+        ],
+        "max": [
+          68.19,
+          21.15,
+          1.9
+        ]
+      },
+      "east_guard_sweep": {
+        "min": [
+          89.96,
+          18.85,
+          -2.5
+        ],
+        "max": [
+          90.04,
+          21.15,
+          1.9
+        ]
+      },
+      "wheel_interaction_probe": {
+        "min": [
+          121.7,
+          11.3,
+          -1.8
+        ],
+        "max": [
+          122.3,
+          11.7,
+          -1.2
+        ]
+      },
+      "west_dogleg": {
+        "min": [
+          64.85,
+          20.0,
+          -2.48
+        ],
+        "max": [
+          67.15,
+          26.0,
+          -0.48
+        ]
+      },
+      "west_approach": {
+        "min": [
+          66.0,
+          18.85,
+          -2.48
+        ],
+        "max": [
+          68.5,
+          21.15,
+          -0.48
+        ]
+      },
+      "extended_crossing": {
+        "min": [
+          68.5,
+          18.85,
+          -2.1799999999999997
+        ],
+        "max": [
+          79.0,
+          21.15,
+          -0.17999999999999994
+        ]
+      },
+      "east_storage_walk": {
+        "min": [
+          79.0,
+          18.85,
+          -2.48
+        ],
+        "max": [
+          90.0,
+          21.15,
+          -0.48
+        ]
+      },
+      "east_approach": {
+        "min": [
+          90.0,
+          18.85,
+          -2.48
+        ],
+        "max": [
+          96.5,
+          21.15,
+          -0.48
+        ]
+      }
+    },
+    "intersection_keys": {
+      "full_cage_sweep": [],
+      "west_guard_sweep": [],
+      "east_guard_sweep": [],
+      "wheel_interaction_probe": [],
+      "west_dogleg": [],
+      "west_approach": [],
+      "extended_crossing": [],
+      "east_storage_walk": [],
+      "east_approach": []
+    },
+    "authored_view_eye_offset_m": 1.1,
+    "authored_view_count": 10,
+    "new_view_ray_aabb_hits": [],
+    "retained_crossing_interior_m": {
+      "width": 2.3,
+      "height": 2.12
+    },
+    "landing_fixture_min_clearance_to_2p3m_lane_m": 0.0675,
+    "west_fixture_x_gap_to_guard_sweep_m": 0.5225,
+    "east_fixture_x_gap_to_guard_sweep_m": 0.4725,
+    "west_fixture_x_gap_to_full_cage_sweep_m": 0.9125,
+    "east_fixture_x_gap_to_full_cage_sweep_m": 1.0125,
+    "windlass_fixture_y_gap_to_interaction_probe_m": 0.1,
+    "windlass_lantern_base_to_fixed_mount_top_m": 0,
+    "lowest_new_visual_z_m": -1.3,
+    "source_gap_and_undercroft": "All source solids/UCX/ports remain untouched. Added visuals stay above approach floor -2.5m; no new crossing/support or obstruction below that floor."
+  },
+  "integration_preflight": [
+    "Require current P2 owner class/root/offsets and meshes; no class-name fallbacks or stale transform guesses.",
+    "Match support wall boxes by full transform, not saved HISM index. West north wall center[68.175,21.475,-.2] size[1.65,.25,4.6]; east north wall center[86.75,21.475,-.2] size[18.5,.25,4.6].",
+    "Require fixed windlass mount at expected current pose; lantern contact top -1.30 is source-derived. Refuse if it differs. Never add another housing/support/control.",
+    "Match existing WVC_Practical_54 by package, owner tag, full transform and before values. Snapshot actual units/falloff/shadow/source size; preserve/copy them exactly. Intensity18/24 are engine property values in the established pipeline units, not a measured photometric claim.",
+    "Require all referenced assets already imported. No imports, reimport, material override or UCX editing in this delta.",
+    "New NoCollision HISM groups use only the new owner tag. Do not clear prior art-owner actors. Keep glass no-shadow behavior from existing add_instances.",
+    "Check current package snapshots/collision hashes and active fixture roster before root integration; receipt after_sha values are historical provenance, not permission to overwrite newer maps."
+  ],
+  "preview_acceptance": [
+    "Same actual source camera/FOV90/exposure/held lantern across stages0,1,2. Compare from both banks and Sluice approach, not only focused wheel grip.",
+    "Stored, half-extended and seated silhouettes: render only one owner-consistent span; guards remain closed until real seat/guard-open contract. Do not freeze duplicate skins across the opening.",
+    "New practicals should reveal approach landing/fixed threshold, not wash the whole canal or advertise the gap as walkable when retracted.",
+    "Confirm sole wheel remains the only prompt/control; passive drive never gets another prompt. The existing legacy straight-chain dressing is not repositioned or treated as a second route by this delta.",
+    "Recheck approaching/returning with the real pack, guard sweeps and wheel access after integration. Keep Ford and full Undercroft/R7/crawl alternatives unchanged."
+  ],
+  "evidence_boundary": "Offline specification and source/AABB checks only. No map, asset, material, source, native or test mutation. No Unreal lighting/visibility, novice comprehension, loaded traversal, packaged or co-op acceptance claimed."
+}

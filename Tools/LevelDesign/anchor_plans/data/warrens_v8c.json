@@ -2110,10 +2110,10 @@
    "keyAt": [
     104,
     60,
-    2.5
+    2.85
    ],
    "channel": "Mechanism.Channel.Keys.Red",
-   "note": "the key under the bell on the Belfry loft, across the canal from the Vault"
+   "note": "the key atop the 30cm plinth under the bell on the Belfry loft, across the canal from the Vault"
   }
  ],
  "puzzles": [
@@ -2134,10 +2134,10 @@
   },
   {
    "id": "P2",
-   "kind": "the Chain Crossing's latched bars (Pump end)",
+   "kind": "sliding cage span section",
    "at": [
-    67,
-    26,
+    68.15,
+    20,
     -2.5
    ],
    "needsAt": [
@@ -2145,8 +2145,8 @@
     12,
     -2.5
    ],
-   "needsNote": "the Sluice hand-wheel on the east bank lowers the chain causeway; the chain runs along the Cellar floor to the wheel: the tell",
-   "existing": "hand-wheel + latched Bars gate"
+   "needsNote": "the Sluice windlass extends the stored east-bank cage across the gap; both end screens remain closed until the span is seated, then latch open for cargo return",
+   "existing": "FreeTurn windlass + translating cage + terminal end guards"
   },
   {
    "id": "P3",
@@ -2168,8 +2168,8 @@
    "id": "P4",
    "kind": "Bellkeeper dial lock",
    "at": [
-    108,
-    46,
+    106,
+    44,
     0
    ],
    "needsAt": [
@@ -2489,7 +2489,8 @@
    ],
    "z": 2.5,
    "family": "C",
-   "note": "Mourner cache behind the pack-plate gate (P3)",
+   "authoredReward": true,
+   "note": "Mourner: guaranteed authored Tallow behind the occupancy-plate gate (P3)",
    "anchorId": "Mourner"
   },
   {
@@ -2794,7 +2795,6 @@
   }
  ],
  "caches": [
-  "Mourner",
   "SealedBurial",
   "Porter",
   "CatacombCache"
@@ -4495,12 +4495,12 @@
   {
    "id": "t-chain",
    "at": [
-    81,
-    25,
-    -2.5
+    74,
+    20,
+    -2.2
    ],
    "kind": "bridge",
-   "label": "the Chain Crossing: barred until the Sluice wheel lowers it (P2)"
+   "label": "the Chain Crossing: sliding cage spans the gap after the Sluice windlass is hauled (P2)"
   },
   {
    "id": "t-sump",
@@ -4678,20 +4678,20 @@
    "Thresholds: every crossing is a beat (a long bridge, a wade, a low tunnel); bank-internal connectors wind and change height (the hump tunnel, the wet stair)",
    "Cavern and dungeon: built rooms (Ossuary, Reliquary, Cellar, Pump) are orthogonal; grown ones (Court, Cistern, Larder, Pit, the canal) are not",
    "Sound as weenie: the bell and the pump are the two audio landmarks, one per bank",
-   "Deep Dish / Tunic: the Chain Crossing is seen barred from the Pump long before the Sluice wheel is found (P2)",
+   "Deep Dish / Tunic: the missing Chain Crossing span and its far-bank socket are seen from the Pump before the Sluice windlass is found (P2)",
    "Lunacid rule: every loop's far point is unique (loft with the bell, Brine Larder wade, Sealed Burial)"
   ],
   "changes": [
-   "Footprint 156 x 108 m, flatter: +2.5 / 0 / -2.5 and the Pit at -5; no +5 galleries except the Belfry loft",
+   "Footprint 178 x 130 m: +2.5 / 0 / -2.5, the Pit at -5 and Salt Mill at +5; Belfry loft is +2.5",
    "Chime Hall becomes the Belfry (H3) under a 22 m tower; the Reliquary and the brine stores move to the east bank",
    "P4's glyphs move onto the tower, read from the Well rim: the two landmarks exchange information",
    "The Drowned Gallery becomes the Undercroft under the canal (graph link, R7); the Sump Stair is open; P2 is the Chain Crossing",
    "Two ledge hops (Larder shelf, Pit root shelf) as pocket rewards off the main floors",
-   "Nine Level Instance tiles; the canal is its own tile (water, Ford, both bridges)"
+   "Eleven Level Instance tiles; the canal is its own tile (water, Ford, both bridges)"
   ],
-  "sizing": "15-20 min: hunt court + Curing Room (Salt Mill, east bank +5) + forage + return; a Belfry contract crosses the canal, cures on the same bank and returns by the bridge or the Ford",
+  "sizing": "Target 15-20 min inside Warrens; not yet established by timed play. Current manual diagnostic is combat quarry + Mill Mushroom/Cellar Bellnut + living chef/cargo return; edible quarry anatomy and extraction enforcement remain absent.",
   "risks": [
-   "Bigger map, longer walks: the Ford is the only always-open crossing; a pack crossing anywhere else needs R5 open or the chain lowered",
+   "Bigger map, longer walks: the Ford is the always-open crossing; other cargo crossings require R5 or the seated P2 sliding span",
    "Two hunt courts (Court, Pit) on the west bank and one (Belfry) on the east: a Belfry contract means crossing twice with cargo",
    "Water as an edge needs real impassability (depth, no climb-out) that the viewer only labels",
    "The Bell Tower's height needs the Belfry tile to be 24 m tall; roof breaks for the Larder view are art"
@@ -4819,6 +4819,315 @@
  "ledgeRail": 0.6,
  "deepWaterRail": 1.0,
  "flightMouthsOpen": true,
+ "bellkeeper": {
+  "phrase": [
+   "Diamond",
+   "Triangle",
+   "Cross"
+  ],
+  "startGlyphs": [
+   "Square",
+   "Square",
+   "Square"
+  ],
+  "panel": {
+   "at": [
+    108,
+    46.22,
+    1.2
+   ],
+   "pitch": -90,
+   "yaw": 90,
+   "materials": {
+    "BodyMaterialOverride": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX10",
+    "FaceMaterialOverride": "/Game/Mars/Environment/WarrensVariantCKit/Materials/M_WVC_BellkeeperPrimaryColor",
+    "ControlMaterialOverride": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX10",
+    "GlyphMaterialOverride": "/Game/Mars/Environment/WarrensVariantCKit/Materials/M_WVC_BellkeeperPrimaryColor",
+    "IndicatorMaterialOverride": "/Game/Mars/Environment/WarrensVariantCKit/Materials/M_WVC_BellkeeperPrimaryColor"
+   }
+  },
+  "chain": {
+   "at": [
+    106.5,
+    46.22,
+    2.3
+   ],
+   "yaw": 90
+  },
+  "bellAt": [
+   106.5,
+   46.45,
+   2.45
+  ],
+  "vent": {
+   "at": [
+    108.8,
+    45.8,
+    -0.35
+   ],
+   "yaw": 90,
+   "pushImpulseLocalCmS": [
+    400,
+    0,
+    120
+   ]
+  },
+  "clue": {
+   "at": [
+    101.82,
+    50,
+    3
+   ],
+   "pitch": -90,
+   "yaw": 180,
+   "glyphSizeCm": 65,
+   "materials": {
+    "BodyMaterialOverride": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX01",
+    "FaceMaterialOverride": "/Game/Mars/Environment/WarrensVariantCKit/Materials/M_WVC_BellkeeperPrimaryColor",
+    "GlyphMaterialOverride": "/Game/Mars/Environment/WarrensVariantCKit/Materials/M_WVC_BellkeeperPrimaryColor"
+   }
+  },
+  "rewards": [
+   {
+    "definition": "Mars_ItemDef_Tallow",
+    "at": [
+     104.8,
+     42,
+     0.5
+    ]
+   },
+   {
+    "definition": "Mars_ItemDef_Tallow",
+    "at": [
+     106,
+     42,
+     0.5
+    ]
+   },
+   {
+    "definition": "Mars_ItemDef_Tallow",
+    "at": [
+     107.2,
+     42,
+     0.5
+    ]
+   }
+  ]
+ },
+ "localFixtures": [
+  {
+   "id": "C_Vault_Ration",
+   "cls": "Mars_WorldItem_Ration_EntityScript",
+   "at": [
+    62,
+    59,
+    -4.6
+   ]
+  },
+  {
+   "id": "C_Vault_Tallow",
+   "cls": "Mars_WorldItem_Tallow_EntityScript",
+   "at": [
+    63,
+    61,
+    -4.6
+   ]
+  },
+  {
+   "id": "C_Mourner_Tallow",
+   "cls": "Mars_WorldItem_Tallow_EntityScript",
+   "at": [
+    103,
+    76,
+    2.9
+   ]
+  },
+  {
+   "id": "C_Mill_Mushroom",
+   "cls": "Mars_Expedition_MushroomBed_EntityScript",
+   "at": [
+    92,
+    102,
+    5
+   ]
+  },
+  {
+   "id": "C_Cellar_Bellnut",
+   "cls": "Mars_Forage_BellnutVine_EntityScript",
+   "at": [
+    99,
+    18,
+    -2.5
+   ]
+  }
+ ],
+ "entryKitTools": true,
+ "entryKitLight": true,
+ "sectionOverrides": [
+  {
+   "file": "data/warrens_v8c_p2_section.json",
+   "puzzleId": "P2",
+   "replacedWalkLines": [
+    "chain-crossing"
+   ],
+   "entity": {
+    "cls": "Mars_SlidingBridge_EntityScript",
+    "at": [
+     79,
+     20,
+     -2.2
+    ],
+    "yaw": 90,
+    "pitch": 0,
+    "level": "main",
+    "tile": "Canal",
+    "note": "P2 sliding cargo crossing",
+    "props": {
+     "Bridge": {
+      "fields": {
+       "WheelOffset": {
+        "transform": {
+         "location": [
+          -800,
+          -4300,
+          -30
+         ],
+         "rotation": [
+          0,
+          -180,
+          0
+         ]
+        }
+       },
+       "DrivePath": {
+        "array": [
+         {
+          "vector": [
+           -800,
+           -4300,
+           -22
+          ]
+         },
+         {
+          "vector": [
+           -500,
+           -4300,
+           -22
+          ]
+         },
+         {
+          "vector": [
+           -400,
+           -3300,
+           -22
+          ]
+         },
+         {
+          "vector": [
+           -100,
+           -2500,
+           -22
+          ]
+         },
+         {
+          "vector": [
+           0,
+           -1700,
+           -22
+          ]
+         },
+         {
+          "vector": [
+           0,
+           -1100,
+           -22
+          ]
+         }
+        ]
+       }
+      }
+     },
+     "Source": {
+      "fields": {
+       "OutputChannel": {
+        "tag": "Mechanism.Channel.Warrens.Shortcut.Chain"
+       }
+      }
+     },
+     "DeckMeshOverride": {
+      "asset": "/Game/Mars/Environment/WarrensVariantCKit/P2SlidingSpan/WarrensC_P2S01_Deck_Mars_SM"
+     },
+     "CageMeshOverride": {
+      "asset": "/Game/Mars/Environment/WarrensVariantCKit/P2SlidingSpan/WarrensC_P2S02_Cage_Mars_SM"
+     },
+     "GuardMeshOverride": {
+      "asset": "/Game/Mars/Environment/WarrensVariantCKit/P2SlidingSpan/WarrensC_P2S03_Guard_Mars_SM"
+     },
+     "MaterialOverride": {
+      "asset": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX09"
+     },
+     "WheelMeshOverride": {
+      "asset": "/Game/Mars/Environment/ChainCrossingKit/Meshes/WarrensC_CCS21_HandwheelBody_Mars_SM"
+     },
+     "WheelMeshLocalTransform": {
+      "transform": {
+       "location": [
+        2.5,
+        0,
+        0
+       ],
+       "rotation": [
+        0,
+        90,
+        0
+       ]
+      }
+     },
+     "WheelMaterialOverride": {
+      "asset": "/Game/Mars/Environment/ChainCrossingKit/Materials/M_CCK_TX09"
+     }
+    }
+   }
+  }
+ ],
+ "placedPickupStartup": {
+  "boundsFile": "data/warrens_v8c_pickup_bounds.json",
+  "expectedCount": 34,
+  "entryTallowSideOffsetM": 1.3,
+  "entryTallowSideOffsetByEntryM": {
+   "S1": 1.0
+  },
+  "existingAtById": {
+   "vault_key": [
+    104,
+    60,
+    2.5
+   ],
+   "S1_entry_Tallow_0": [
+    -1.8,
+    54.1,
+    0.6
+   ],
+   "S1_entry_Tallow_1": [
+    -2.2,
+    54.1,
+    0.6
+   ]
+  },
+  "supportById": {
+   "vault_key": 2.8,
+   "C_Vault_Ration": -5,
+   "C_Vault_Tallow": -5,
+   "C_Mourner_Tallow": 2.5
+  },
+  "entrySupportZ": {
+   "S1": 0,
+   "S2": 2.5,
+   "S3": -2.5,
+   "S4": -2.5,
+   "S5": -2.5
+  }
+ },
  "_checks": {
   "closureSetsChecked": 64,
   "stranded": 0,

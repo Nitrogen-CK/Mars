@@ -9,9 +9,28 @@ OUT=HERE/'Output'
 def module(name,path):
     spec=importlib.util.spec_from_file_location(name,path);m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m);return m
 
+def refuse_promoted_art_overwrite():
+    """Refuse the legacy C rebuild once retained art has been promoted."""
+    promotion=ROOT/'Saved/WarrensCGameplay-20261024/ArtLibrarySyncCheckpoint/promoted-v3/promotion.json'
+    if not promotion.is_file():return
+    try:receipt=json.loads(promotion.read_text(encoding='utf-8-sig'))
+    except Exception as error:raise RuntimeError('Cannot validate retained-art promotion receipt; refusing legacy rebuild.') from error
+    expected={name:'Tools/WarrensVariantCKit/Output/WarrensVariantC_'+name+'.blend' for name in ('KitLibrary','Diorama')}
+    targets=receipt.get('targets') if isinstance(receipt,dict) else None
+    valid=(isinstance(receipt,dict) and receipt.get('status')=='PROMOTED' and isinstance(targets,dict) and set(targets)==set(expected)
+           and all(isinstance(targets[name],dict) and targets[name].get('source')==path
+                   and isinstance(targets[name].get('after_sha256'),str) and len(targets[name]['after_sha256'])==64
+                   and all(c in '0123456789abcdef' for c in targets[name]['after_sha256'])
+                   for name,path in expected.items()))
+    if not valid:raise RuntimeError('Retained-art promotion receipt is malformed or has an unexpected status; inspect before rebuilding.')
+    raise RuntimeError('Refusing legacy full Blender rebuild: promoted-v3 C art outputs are retained. Use the scoped art-sync and Belfry palette staging tools with explicit review.')
+
 def main():
     p=argparse.ArgumentParser();p.add_argument('--models-only',action='store_true');p.add_argument('--no-render',action='store_true');p.add_argument('--skip-previews',action='store_true');p.add_argument('--render-scenes',help='Comma-separated output scene names; all scenes are still assembled/saved');p.add_argument('--seed',type=int,default=1031)
     args=p.parse_args(sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else [])
+    # --models-only still saves the KitLibrary blend, so it is also destructive
+    # to a promoted retained output and must stop before scene/output mutation.
+    refuse_promoted_art_overwrite()
     core=module('variant_c_blender_core',HERE.parent/'ChainCrossingKit/build_kit.py');core.OUT=OUT;core.SEED=args.seed
     core.CATEGORIES={k:str(uuid.uuid5(uuid.NAMESPACE_URL,'WarrensVariantCKit/'+k)) for k in core.CATEGORIES}
     for d in ['FBX','Previews','Renders','Reports']:(OUT/d).mkdir(parents=True,exist_ok=True)

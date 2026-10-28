@@ -1,0 +1,116 @@
+{
+  "title": "Mill source-grounded composition delta",
+  "status": "Astra-approved bounded composition; original envelope placement rejected after actual mesh contact measurement; refitted candidate pending visual recheck.",
+  "source_ledger": "Tools/WarrensVariantCKit/Output/fitted_instances.json",
+  "source_ledger_sha256": "67f8e8d87ab166ab7fd0cd5e285a08e02b8643c856de3bf028130271021b9d34",
+  "tile": "Mill",
+  "remove": [],
+  "move": [],
+  "add": [
+    {
+      "tile": "Mill",
+      "id": "WVC062",
+      "mesh_id": "WVC062",
+      "at": [
+        95,
+        100.5,
+        6.9210524439811705
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "yaw": 0,
+      "role": "static visual hopper seated on the millstone top; visual landmark only",
+      "collision": "NoCollision"
+    }
+  ],
+  "lights": [],
+  "composition_notes": {
+    "support_contact": "Actual bottom-foot vertex raycasts against WVC023 give support local Z=1.9210524559m, not its 2m trim envelope. WVC062 bottom at plan Z=6.921052444m seats all four feet; original envelope-based Z7 proposal had a 7.8948cm gap and was restored before refit.",
+    "approach_clearance": "The addition stays inside the existing WVC023 footprint, adds no floor footprint and does not change the route around the east stair, Mushroom at [92,102,5], or the one-way drop at [90,96,5].",
+    "forage_readability": "Keep the MushroomBed at its existing [92,102,5] and leave its approach open. The hopper makes the adjacent millstone read as the Mill landmark; no new food prop or forage marker is introduced.",
+    "runtime_boundary": "WVC062 is visual-only and NoCollision. It does not implement grinding, curing, a vat interaction, or a cargo objective. The fitted vat mesh is likewise a static skin over the existing P7 station."
+  },
+  "review_views": [
+    {
+      "id": "Mill_player_forage_to_mill",
+      "basis": "root-reported current player shot; screenshot/file provenance not independently present in local route review",
+      "eye_plan_m": [
+        91.1439,
+        103.1008,
+        6.123
+      ],
+      "existing_yaw_degrees": -40,
+      "existing_pitch_degrees": -12,
+      "look_at_plan_m": [
+        94.5,
+        101.0,
+        6.3
+      ],
+      "purpose": "show the actual forage approach in foreground and the grouped millstone/hopper beyond; proposed framing target, not a captured view"
+    },
+    {
+      "id": "Mill_east_stair_arrival",
+      "basis": "authored mill-stair landing ml0",
+      "eye_plan_m": [
+        98,
+        106,
+        6.6
+      ],
+      "look_at_plan_m": [
+        93,
+        102,
+        6.0
+      ],
+      "purpose": "show arrival, unchanged mushroom location, vat and central mill landmark; proposed framing target, not a captured view"
+    }
+  ],
+  "evidence_paths": [
+    "Tools/WarrensVariantCKit/Output/fitted_instances.json",
+    "Tools/WarrensVariantCKit/Output/asset_manifest.json",
+    "Tools/WarrensVariantCKit/zone_plan.json",
+    "Tools/LevelDesign/anchor_plans/design_warrens_v8c.py",
+    "docs/art/warrens-c-gameplay-review-20261024/A1_ROUTE_REVIEW.md"
+  ],
+  "preview_views": [
+    {
+      "id": "overview",
+      "existing_camera": "ROOM_mill_A_Overview",
+      "target_plan": [
+        95,
+        104,
+        6
+      ]
+    },
+    {
+      "id": "player",
+      "eye_plan": [
+        91.1439,
+        103.1008,
+        6.123
+      ],
+      "target_plan": [
+        94.9739,
+        99.8868,
+        5.06
+      ],
+      "fov_degrees": 90
+    },
+    {
+      "id": "stair",
+      "eye_plan": [
+        98,
+        106,
+        6.12
+      ],
+      "target_plan": [
+        93,
+        102,
+        6.0
+      ],
+      "fov_degrees": 90
+    }
+  ]
+}

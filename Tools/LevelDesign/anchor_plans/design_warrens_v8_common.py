@@ -130,6 +130,12 @@ def build(V):
         **({'deepWaterRail': V.DEEP_WATER_RAIL} if hasattr(V, 'DEEP_WATER_RAIL') else {}),  # build_warrens: the deep-water rail height (default ledgeRail)
         flightMouthsOpen=True,  # build_warrens: no gallery rail across a flight's head where it meets an upper floor
     )
+    # Optional authored encounters stay local to the declaring variant.
+    for attr, key in (('BELLKEEPER', 'bellkeeper'), ('LOCAL_FIXTURES', 'localFixtures'),
+                      ('ENTRY_KIT_TOOLS', 'entryKitTools'), ('ENTRY_KIT_LIGHT', 'entryKitLight'),
+                      ('SECTION_OVERRIDES', 'sectionOverrides'), ('PLACED_PICKUP_STARTUP', 'placedPickupStartup')):
+        if hasattr(V, attr):
+            out[key] = getattr(V, attr)
     check(out)
     return out
 
