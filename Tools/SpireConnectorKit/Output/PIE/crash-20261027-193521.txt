@@ -1,0 +1,7 @@
+Crash during acceptance-map preparation, after all10 baseline chef traversals passed.
+Fatal: World Memory Leaks:1, EditorServer.cpp:1938.
+Old Package Spire_PIEAcceptance_Mars_MAP retained by FPyReferenceCollector.
+Cause: top-level packages array from save_packages was still alive when build_harness called LevelEditorSubsystem.NewLevel.
+Correction: scoped save helper returns and drops all Package/World wrappers before any level switch. No engine/framework changes.
+All five owned dirty maps saved before NewLevel; no unrelated dirty packages existed.
+Raw crash: Saved/Crashes/UECC-Windows-DF545DD54D0973F6F8ADAE84A688441C_0001.

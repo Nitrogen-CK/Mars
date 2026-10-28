@@ -1,0 +1,8 @@
+00:02.625  blend            | Read blend: "D:\Repositories\CkRepos\Orion\Tools\SpireConnectorKit\Output\Blender\Spire_Diorama.blend"
+Extensions: writing cache failed ([Errno 13] Permission denied: 'C:\\Users\\Adam\\AppData\\Roaming\\Blender Foundation\\Blender\\5.2\\extensions\\.cache\\compat.dat').
+SPIRE_FRESH_BLENDER_AUDIT {"status": "failed", "assets": 102, "surface_rays": 405, "errors": [["HL-BORE-11", "chain bore not open"], ["HL-BORE-15", "chain bore not open"]], "scenes": {"HS": {"mesh_instances": 163, "unique_meshes": 32}, "BW": {"mesh_instances": 166, "unique_meshes": 22}, "RW": {"mesh_instances": 156, "unique_meshes": 32}, "HL": {"mesh_instances": 1874, "unique_meshes": 36}}, "scope": "fresh reopened Blender meshes, not Unreal physics or packaged collision"}
+BORE_HIT HL-BORE-11 (5.119406700134277, -1.3717409372329712, -0.34999996423721313) 339
+BORE_HIT HL-BORE-15 (5.234748363494873, 0.829102635383606, -0.34999996423721313) 287
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+
+Blender quit

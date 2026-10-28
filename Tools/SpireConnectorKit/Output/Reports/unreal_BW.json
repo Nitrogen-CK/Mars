@@ -1,0 +1,33 @@
+{
+  "map": "/Game/Mars/Maps/Spire/LI_Spire_BraidedWell_Mars_MAP",
+  "visual_instances": 166,
+  "hism_groups": 24,
+  "counts": {
+    "BW_Yoke|Deck": 4,
+    "PR_P02|Props": 4,
+    "PR_P05|Props": 12,
+    "PR_P08|Props": 8,
+    "PR_P09|Props": 8,
+    "PR_P16|Props": 6,
+    "PortalCollar|Architecture": 2,
+    "R700_Foundation|Foundation": 12,
+    "R700_Roof|Roof": 12,
+    "R700_ST_Flight|Deck": 6,
+    "R700_ST_FlightGuard|Guards": 6,
+    "R700_ST_Joist|Supports": 18,
+    "R700_ST_Landing|Deck": 6,
+    "R700_ST_LandingGuard|Guards": 8,
+    "R700_ST_PortLanding|Deck": 2,
+    "R700_Wall360|ShellBack": 6,
+    "R700_Wall360|ShellFront": 5,
+    "R700_Wall360_Portal|ShellFront": 1,
+    "R700_Wall400|ShellBack": 17,
+    "R700_Wall400|ShellFront": 18,
+    "R700_Wall400_Portal|ShellBack": 1,
+    "VestFloor|Vestibule": 1,
+    "VestRoof|Vestibule": 1,
+    "VestWall|Vestibule": 2
+  },
+  "collision": "Separate stable proxies in Diorama; NoCollision visual components",
+  "status": "saved"
+}

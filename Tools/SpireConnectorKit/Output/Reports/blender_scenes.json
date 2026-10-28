@@ -1,0 +1,38 @@
+{
+  "HS": {
+    "scene": "Spire_HS",
+    "objects": 175,
+    "mesh_instances": 163,
+    "unique_meshes": 32
+  },
+  "BW": {
+    "scene": "Spire_BW",
+    "objects": 179,
+    "mesh_instances": 166,
+    "unique_meshes": 22
+  },
+  "RW": {
+    "scene": "Spire_RW",
+    "objects": 168,
+    "mesh_instances": 156,
+    "unique_meshes": 32
+  },
+  "HL": {
+    "scene": "Spire_HL",
+    "objects": 1886,
+    "mesh_instances": 1874,
+    "unique_meshes": 36
+  },
+  "KitLibrary": {
+    "scene": "Spire_KitLibrary",
+    "objects": 213,
+    "mesh_instances": 105,
+    "unique_meshes": 105
+  },
+  "Diorama": {
+    "scene": "Spire_Diorama",
+    "objects": 2230,
+    "mesh_instances": 2219,
+    "unique_meshes": 71
+  }
+}

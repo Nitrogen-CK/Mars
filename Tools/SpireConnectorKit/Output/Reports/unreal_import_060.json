@@ -1,0 +1,462 @@
+[
+  {
+    "id": "COL_R700_ST_LandingGuard",
+    "asset": "/Game/Mars/Environment/SpireConnectorKit/Meshes/Spire_COL_R700_ST_LandingGuard_Mars_SM.Spire_COL_R700_ST_LandingGuard_Mars_SM",
+    "hulls": 4,
+    "bounds_min_cm": [
+      271.2023620605469,
+      -292.4818115234375,
+      0.0
+    ],
+    "bounds_max_cm": [
+      594.0587768554688,
+      292.481689453125,
+      110.0
+    ],
+    "materials": [
+      "M05"
+    ]
+  },
+  {
+    "id": "R700_ST_PortLanding",
+    "asset": "/Game/Mars/Environment/SpireConnectorKit/Meshes/Spire_R700_ST_PortLanding_Mars_SM.Spire_R700_ST_PortLanding_Mars_SM",
+    "hulls": 0,
+    "bounds_min_cm": [
+      278.62615966796875,
+      -306.85986328125,
+      -35.0
+    ],
+    "bounds_max_cm": [
+      700.0,
+      306.8597412109375,
+      0.0
+    ],
+    "materials": [
+      "M01",
+      "M00"
+    ]
+  },
+  {
+    "id": "COL_R700_ST_PortLanding",
+    "asset": "/Game/Mars/Environment/SpireConnectorKit/Meshes/Spire_COL_R700_ST_PortLanding_Mars_SM.Spire_COL_R700_ST_PortLanding_Mars_SM",
+    "hulls": 5,
+    "bounds_min_cm": [
+      278.62615966796875,
+      -306.85986328125,
+      -40.0
+    ],
+    "bounds_max_cm": [
+      700.0,
+      306.8597412109375,
+      0.0
+    ],
+    "materials": [
+      "M01"
+    ]
+  },
+  {
+    "id": "R700_ST_Landing",
+    "asset": "/Game/Mars/Environment/SpireConnectorKit/Meshes/Spire_R700_ST_Landing_Mars_SM.Spire_R700_ST_Landing_Mars_SM",
+    "hulls": 0,
+    "bounds_min_cm": [
+      278.62615966796875,
+      -306.85986328125,
+      -35.0
+    ],
+    "bounds_max_cm": [
+      700.0,
+      306.8597412109375,
+      0.0
+    ],
+    "materials": [
+      "M01",
+      "M00"
+    ]
+  },
+  {
+    "id": "COL_R700_ST_Landing",
+    "asset": "/Game/Mars/Environment/SpireConnectorKit/Meshes/Spire_COL_R700_ST_Landing_Mars_SM.Spire_COL_R700_ST_Landing_Mars_SM",
+    "hulls": 4,
+    "bounds_min_cm": [
+      278.62615966796875,
+      -306.85986328125,
+      -35.0
+    ],
+    "bounds_max_cm": [
+      700.0,
+      306.8597412109375,
+      0.0
+    ],
+    "materials": [
+      "M01"
+    ]
+  },
+  {
+    "id": "R700_Wall400_Portal",
+    "asset": "/Game/Mars/Environment/SpireConnectorKit/Meshes/Spire_R700_Wall400_Portal_Mars_SM.Spire_R700_Wall400_Portal_Mars_SM",
+    "hulls": 0,
+    "bounds_min_cm": [
+      637.9833984375,
+      -179.75686645507812,
+      0.0
+    ],
+    "bounds_max_cm": [
+      699.9984741210938,
+      179.75674438476562,
+      400.0
+    ],
+    "materials": [
+      "M02",
+      "M01"
+    ]
+  },
+  {
+    "id": "COL_R700_Wall400_Portal",
+    "asset": "/Game/Mars/Environment/SpireConnectorKit/Meshes/Spire_COL_R700_Wall400_Portal_Mars_SM.Spire_COL_R700_Wall400_Portal_Mars_SM",
+    "hulls": 7,
+    "bounds_min_cm": [
+      637.626953125,
+      -181.17340087890625,
+      0.0
+    ],
+    "bounds_max_cm": [
+      699.8933715820312,
+      181.17327880859375,
+      400.0
+    ],
+    "materials": [
+      "M02"
+    ]
+  },
+  {
+    "id": "R700_Wall400",
+    "asset": "/Game/Mars/Environment/SpireConnectorKit/Meshes/Spire_R700_Wall400_Mars_SM.Spire_R700_Wall400_Mars_SM",
+    "hulls": 0,
+    "bounds_min_cm": [
+      637.9833984375,
+      -179.75686645507812,
+      0.0
+    ],
+    "bounds_max_cm": [
+      699.9984741210938,
+      179.75674438476562,
+      400.0
+    ],
+    "materials": [
+      "M02",
+      "M01"
+    ]
+  },
+  {
+    "id": "COL_R700_Wall400",
+    "asset": "/Game/Mars/Environment/SpireConnectorKit/Meshes/Spire_COL_R700_Wall400_Mars_SM.Spire_COL_R700_Wall400_Mars_SM",
+    "hulls": 5,
+    "bounds_min_cm": [
+      637.626953125,
+      -181.17340087890625,
+      0.0
+    ],
+    "bounds_max_cm": [
+      699.8933715820312,
+      181.17327880859375,
+      400.0
+    ],
+    "materials": [
+      "M02"
+    ]
+  },
+  {
+    "id": "R700_Wall360",
+    "asset": "/Game/Mars/Environment/SpireConnectorKit/Meshes/Spire_R700_Wall360_Mars_SM.Spire_R700_Wall360_Mars_SM",
+    "hulls": 0,
+    "bounds_min_cm": [
+      637.9833984375,
+      -179.75686645507812,
+      0.0
+    ],
+    "bounds_max_cm": [
+      699.9984741210938,
+      179.75674438476562,
+      360.0
+    ],
+    "materials": [
+      "M02",
+      "M01"
+    ]
+  },
+  {
+    "id": "COL_R700_Wall360",
+    "asset": "/Game/Mars/Environment/SpireConnectorKit/Meshes/Spire_COL_R700_Wall360_Mars_SM.Spire_COL_R700_Wall360_Mars_SM",
+    "hulls": 5,
+    "bounds_min_cm": [
+      637.626953125,
+      -181.17340087890625,
+      0.0
+    ],
+    "bounds_max_cm": [
+      699.8933715820312,
+      181.17327880859375,
+      360.0
+    ],
+    "materials": [
+      "M02"
+    ]
+  },
+  {
+    "id": "R700_Wall360_Portal",
+    "asset": "/Game/Mars/Environment/SpireConnectorKit/Meshes/Spire_R700_Wall360_Portal_Mars_SM.Spire_R700_Wall360_Portal_Mars_SM",
+    "hulls": 0,
+    "bounds_min_cm": [
+      637.9833984375,
+      -179.75686645507812,
+      0.0
+    ],
+    "bounds_max_cm": [
+      699.9984741210938,
+      179.75674438476562,
+      360.0
+    ],
+    "materials": [
+      "M02",
+      "M01"
+    ]
+  },
+  {
+    "id": "COL_R700_Wall360_Portal",
+    "asset": "/Game/Mars/Environment/SpireConnectorKit/Meshes/Spire_COL_R700_Wall360_Portal_Mars_SM.Spire_COL_R700_Wall360_Portal_Mars_SM",
+    "hulls": 7,
+    "bounds_min_cm": [
+      637.626953125,
+      -181.17340087890625,
+      0.0
+    ],
+    "bounds_max_cm": [
+      699.8933715820312,
+      181.17327880859375,
+      360.0
+    ],
+    "materials": [
+      "M02"
+    ]
+  },
+  {
+    "id": "R700_Roof",
+    "asset": "/Game/Mars/Environment/SpireConnectorKit/Meshes/Spire_R700_Roof_Mars_SM.Spire_R700_Roof_Mars_SM",
+    "hulls": 0,
+    "bounds_min_cm": [
+      0.0,
+      -181.17340087890625,
+      320.0
+    ],
+    "bounds_max_cm": [
+      699.8933715820312,
+      181.17327880859375,
+      360.0
+    ],
+    "materials": [
+      "M02"
+    ]
+  },
+  {
+    "id": "R700_Foundation",
+    "asset": "/Game/Mars/Environment/SpireConnectorKit/Meshes/Spire_R700_Foundation_Mars_SM.Spire_R700_Foundation_Mars_SM",
+    "hulls": 0,
+    "bounds_min_cm": [
+      637.5110473632812,
+      -181.17340087890625,
+      -1240.0
+    ],
+    "bounds_max_cm": [
+      699.8933715820312,
+      181.17327880859375,
+      -1200.0
+    ],
+    "materials": [
+      "M02"
+    ]
+  },
+  {
+    "id": "R700_ST_Joist",
+    "asset": "/Game/Mars/Environment/SpireConnectorKit/Meshes/Spire_R700_ST_Joist_Mars_SM.Spire_R700_ST_Joist_Mars_SM",
+    "hulls": 0,
+    "bounds_min_cm": [
+      310.0,
+      -9.000049591064453,
+      -34.0
+    ],
+    "bounds_max_cm": [
+      570.0,
+      8.99997329711914,
+      -10.0
+    ],
+    "materials": [
+      "M02"
+    ]
+  },
+  {
+    "id": "BW_Yoke",
+    "asset": "/Game/Mars/Environment/SpireConnectorKit/Meshes/Spire_BW_Yoke_Mars_SM.Spire_BW_Yoke_Mars_SM",
+    "hulls": 0,
+    "bounds_min_cm": [
+      -360.0,
+      -128.00003051757812,
+      -35.0
+    ],
+    "bounds_max_cm": [
+      360.0,
+      128.00003051757812,
+      110.0
+    ],
+    "materials": [
+      "M01",
+      "M05"
+    ]
+  },
+  {
+    "id": "COL_BW_Yoke",
+    "asset": "/Game/Mars/Environment/SpireConnectorKit/Meshes/Spire_COL_BW_Yoke_Mars_SM.Spire_COL_BW_Yoke_Mars_SM",
+    "hulls": 4,
+    "bounds_min_cm": [
+      -360.0,
+      -128.00003051757812,
+      -35.0
+    ],
+    "bounds_max_cm": [
+      360.0,
+      128.00003051757812,
+      110.0
+    ],
+    "materials": [
+      "M01",
+      "M05"
+    ]
+  },
+  {
+    "id": "R600_WD_Flight",
+    "asset": "/Game/Mars/Environment/SpireConnectorKit/Meshes/Spire_R600_WD_Flight_Mars_SM.Spire_R600_WD_Flight_Mars_SM",
+    "hulls": 0,
+    "bounds_min_cm": [
+      -65.41132354736328,
+      -0.4500353932380676,
+      -234.99998474121094
+    ],
+    "bounds_max_cm": [
+      469.9999694824219,
+      469.9980163574219,
+      -16.666667938232422
+    ],
+    "materials": [
+      "M04",
+      "M05"
+    ]
+  },
+  {
+    "id": "COL_R600_WD_Flight",
+    "asset": "/Game/Mars/Environment/SpireConnectorKit/Meshes/Spire_COL_R600_WD_Flight_Mars_SM.Spire_COL_R600_WD_Flight_Mars_SM",
+    "hulls": 12,
+    "bounds_min_cm": [
+      -65.41132354736328,
+      -4.108870416530408e-05,
+      -234.99998474121094
+    ],
+    "bounds_max_cm": [
+      469.9999694824219,
+      469.9980163574219,
+      -16.666667938232422
+    ],
+    "materials": [
+      "M01"
+    ]
+  },
+  {
+    "id": "R600_WD_FlightGuard",
+    "asset": "/Game/Mars/Environment/SpireConnectorKit/Meshes/Spire_R600_WD_FlightGuard_Mars_SM.Spire_R600_WD_FlightGuard_Mars_SM",
+    "hulls": 0,
+    "bounds_min_cm": [
+      -67.03528594970703,
+      -1.7447524070739746,
+      -183.33334350585938
+    ],
+    "bounds_max_cm": [
+      477.9993896484375,
+      477.9993896484375,
+      109.36326599121094
+    ],
+    "materials": [
+      "M04"
+    ]
+  },
+  {
+    "id": "COL_R600_WD_FlightGuard",
+    "asset": "/Game/Mars/Environment/SpireConnectorKit/Meshes/Spire_COL_R600_WD_FlightGuard_Mars_SM.Spire_COL_R600_WD_FlightGuard_Mars_SM",
+    "hulls": 98,
+    "bounds_min_cm": [
+      -66.9517593383789,
+      -0.5697745084762573,
+      -197.9591827392578
+    ],
+    "bounds_max_cm": [
+      478.00811767578125,
+      478.00811767578125,
+      107.95919036865234
+    ],
+    "materials": [
+      "M05"
+    ]
+  },
+  {
+    "id": "R600_WD_LandingGuard",
+    "asset": "/Game/Mars/Environment/SpireConnectorKit/Meshes/Spire_R600_WD_LandingGuard_Mars_SM.Spire_R600_WD_LandingGuard_Mars_SM",
+    "hulls": 0,
+    "bounds_min_cm": [
+      179.8029022216797,
+      -250.39817810058594,
+      0.0
+    ],
+    "bounds_max_cm": [
+      507.7745666503906,
+      250.39808654785156,
+      110.0
+    ],
+    "materials": [
+      "M04"
+    ]
+  },
+  {
+    "id": "COL_R600_WD_LandingGuard",
+    "asset": "/Game/Mars/Environment/SpireConnectorKit/Meshes/Spire_COL_R600_WD_LandingGuard_Mars_SM.Spire_COL_R600_WD_LandingGuard_Mars_SM",
+    "hulls": 28,
+    "bounds_min_cm": [
+      181.3150177001953,
+      -248.64468383789062,
+      0.0
+    ],
+    "bounds_max_cm": [
+      504.1793518066406,
+      248.64459228515625,
+      110.0
+    ],
+    "materials": [
+      "M05"
+    ]
+  },
+  {
+    "id": "R600_WD_PortLanding",
+    "asset": "/Game/Mars/Environment/SpireConnectorKit/Meshes/Spire_R600_WD_PortLanding_Mars_SM.Spire_R600_WD_PortLanding_Mars_SM",
+    "hulls": 0,
+    "bounds_min_cm": [
+      188.74673461914062,
+      -263.0227355957031,
+      -35.0
+    ],
+    "bounds_max_cm": [
+      600.0,
+      263.0226135253906,
+      0.0
+    ],
+    "materials": [
+      "M04",
+      "M00"
+    ]
+  }
+]

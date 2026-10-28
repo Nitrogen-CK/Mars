@@ -1,0 +1,8 @@
+VERSION 1
+
+c322a4f1-d48b-517f-a197-553f356fe31c:Spire/Architecture:Architecture
+d28c5f2e-c7ce-59d8-94f6-5f9c74f0bc7e:Spire/Props:Props
+1576233a-0cb0-54ef-8108-de130bb28405:Spire/Hero:Hero
+2f6162a3-0bdc-5be3-95d4-702a5b0b50b4:Spire/Supports:Supports
+8448c079-c055-5515-b7a4-83fc882332da:Spire/Collision:Collision
+a7f1477f-b3fe-5b89-a7e9-ff521023ec33:Spire/Presentation:Presentation

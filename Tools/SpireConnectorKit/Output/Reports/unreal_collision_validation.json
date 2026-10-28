@@ -1,0 +1,6 @@
+{
+  "status": "passed",
+  "simple_collision_rays": 389,
+  "errors": [],
+  "scope": "Native editor Chaos simple-collision queries against stable Diorama HISM proxies. Not CkJolt packaged lookup or pawn traversal."
+}

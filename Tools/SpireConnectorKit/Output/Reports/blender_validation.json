@@ -1,0 +1,26 @@
+{
+  "status": "passed",
+  "assets": 105,
+  "marked_asset_browser_objects": 105,
+  "surface_rays": 405,
+  "errors": [],
+  "scenes": {
+    "HS": {
+      "mesh_instances": 163,
+      "unique_meshes": 32
+    },
+    "BW": {
+      "mesh_instances": 166,
+      "unique_meshes": 22
+    },
+    "RW": {
+      "mesh_instances": 156,
+      "unique_meshes": 32
+    },
+    "HL": {
+      "mesh_instances": 1874,
+      "unique_meshes": 36
+    }
+  },
+  "scope": "fresh reopened Blender meshes, not Unreal physics or packaged collision"
+}

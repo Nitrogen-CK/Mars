@@ -1,0 +1,459 @@
+Extensions: writing cache failed ([Errno 13] Permission denied: 'C:\\Users\\Adam\\AppData\\Roaming\\Blender Foundation\\Blender\\5.2\\extensions\\.cache\\compat.dat').
+Extensions: writing cache failed ([Errno 13] Permission denied: 'C:\\Users\\Adam\\AppData\\Roaming\\Blender Foundation\\Blender\\5.2\\extensions\\.cache\\compat.dat').
+addon_utils.disable: bl_ext.lab_blender_org.mcp not enabled
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_AxisGauge_Mars_SM.fbx'
+export finished in 0.0072 sec.
+SPIRE_AXIS_FIXTURE_EXPORTED {"name": "Spire_AxisGauge_Mars_SM", "bounds_min_cm": [-50.0, -50.0, -50.0], "bounds_max_cm": [160.0000023841858, 209.99999046325684, 259.99999046325684], "dimensions_cm": [210.0000023841858, 259.99999046325684, 309.99999046325684], "vertices": 32, "triangles": 48, "material_keys": ["M01", "M06", "M07", "M04"], "id": "AxisGauge", "fbx": "FBX/Spire_AxisGauge_Mars_SM.fbx"}
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_PR_P01_Mars_SM.fbx'
+export finished in 0.0116 sec.
+SPIRE_ASSET PR_P01 120
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_PR_P02_Mars_SM.fbx'
+export finished in 0.0044 sec.
+SPIRE_ASSET PR_P02 84
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_PR_P03_Mars_SM.fbx'
+export finished in 0.0075 sec.
+SPIRE_ASSET PR_P03 368
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_PR_P04_Mars_SM.fbx'
+export finished in 0.0063 sec.
+SPIRE_ASSET PR_P04 72
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_PR_P05_Mars_SM.fbx'
+export finished in 0.0056 sec.
+SPIRE_ASSET PR_P05 184
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_PR_P06_Mars_SM.fbx'
+export finished in 0.0062 sec.
+SPIRE_ASSET PR_P06 232
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_PR_P07_Mars_SM.fbx'
+export finished in 0.0062 sec.
+SPIRE_ASSET PR_P07 300
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_PR_P08_Mars_SM.fbx'
+export finished in 0.0058 sec.
+SPIRE_ASSET PR_P08 176
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_PR_P09_Mars_SM.fbx'
+export finished in 0.0051 sec.
+SPIRE_ASSET PR_P09 37
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_PR_P10_Mars_SM.fbx'
+export finished in 0.0060 sec.
+SPIRE_ASSET PR_P10 192
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_PR_P11_Mars_SM.fbx'
+export finished in 0.0054 sec.
+SPIRE_ASSET PR_P11 120
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_PR_P12_Mars_SM.fbx'
+export finished in 0.0066 sec.
+SPIRE_ASSET PR_P12 84
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_PR_P13_Mars_SM.fbx'
+export finished in 0.0064 sec.
+SPIRE_ASSET PR_P13 332
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_PR_P14_Mars_SM.fbx'
+export finished in 0.0057 sec.
+SPIRE_ASSET PR_P14 156
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_PR_P15_Mars_SM.fbx'
+export finished in 0.0064 sec.
+SPIRE_ASSET PR_P15 104
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_PR_P16_Mars_SM.fbx'
+export finished in 0.0052 sec.
+SPIRE_ASSET PR_P16 16
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_PR_P17_Mars_SM.fbx'
+export finished in 0.0061 sec.
+SPIRE_ASSET PR_P17 684
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_PR_P18_Mars_SM.fbx'
+export finished in 0.0053 sec.
+SPIRE_ASSET PR_P18 92
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_PR_P19_Mars_SM.fbx'
+export finished in 0.0053 sec.
+SPIRE_ASSET PR_P19 52
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_PR_P20_Mars_SM.fbx'
+export finished in 0.0049 sec.
+SPIRE_ASSET PR_P20 120
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_ReviewPlinth_Mars_SM.fbx'
+export finished in 0.0044 sec.
+SPIRE_ASSET ReviewPlinth 12
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_ChainLink_Mars_SM.fbx'
+export finished in 0.0045 sec.
+SPIRE_ASSET ChainLink 120
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_DeckGrommet_Mars_SM.fbx'
+export finished in 0.0086 sec.
+SPIRE_ASSET DeckGrommet 1456
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_PortalCollar_Mars_SM.fbx'
+export finished in 0.0057 sec.
+SPIRE_ASSET PortalCollar 156
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_VestFloor_Mars_SM.fbx'
+export finished in 0.0047 sec.
+SPIRE_ASSET VestFloor 12
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_COL_VestFloor_Mars_SM.fbx'
+export finished in 0.0055 sec.
+SPIRE_ASSET COL_VestFloor 12
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_VestWall_Mars_SM.fbx'
+export finished in 0.0066 sec.
+SPIRE_ASSET VestWall 12
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_COL_VestWall_Mars_SM.fbx'
+export finished in 0.0066 sec.
+SPIRE_ASSET COL_VestWall 12
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_VestRoof_Mars_SM.fbx'
+export finished in 0.0058 sec.
+SPIRE_ASSET VestRoof 12
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_COL_VestRoof_Mars_SM.fbx'
+export finished in 0.0058 sec.
+SPIRE_ASSET COL_VestRoof 12
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_R600_ST_Flight_Mars_SM.fbx'
+export finished in 0.0069 sec.
+SPIRE_ASSET R600_ST_Flight 528
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_COL_R600_ST_Flight_Mars_SM.fbx'
+export finished in 0.0202 sec.
+SPIRE_ASSET COL_R600_ST_Flight 528
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_R600_ST_FlightGuard_Mars_SM.fbx'
+export finished in 0.0241 sec.
+SPIRE_ASSET R600_ST_FlightGuard 4064
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_COL_R600_ST_FlightGuard_Mars_SM.fbx'
+export finished in 0.0900 sec.
+SPIRE_ASSET COL_R600_ST_FlightGuard 1176
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_R600_ST_LandingGuard_Mars_SM.fbx'
+export finished in 0.0106 sec.
+SPIRE_ASSET R600_ST_LandingGuard 1236
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_COL_R600_ST_LandingGuard_Mars_SM.fbx'
+export finished in 0.0406 sec.
+SPIRE_ASSET COL_R600_ST_LandingGuard 336
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_R600_ST_PortLanding_Mars_SM.fbx'
+export finished in 0.0067 sec.
+SPIRE_ASSET R600_ST_PortLanding 280
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_COL_R600_ST_PortLanding_Mars_SM.fbx'
+export finished in 0.0094 sec.
+SPIRE_ASSET COL_R600_ST_PortLanding 252
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_R600_ST_Landing_Mars_SM.fbx'
+export finished in 0.0093 sec.
+SPIRE_ASSET R600_ST_Landing 248
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_COL_R600_ST_Landing_Mars_SM.fbx'
+export finished in 0.0113 sec.
+SPIRE_ASSET COL_R600_ST_Landing 240
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_R600_Wall400_Portal_Mars_SM.fbx'
+export finished in 0.0102 sec.
+SPIRE_ASSET R600_Wall400_Portal 1060
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_COL_R600_Wall400_Portal_Mars_SM.fbx'
+export finished in 0.0147 sec.
+SPIRE_ASSET COL_R600_Wall400_Portal 180
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_R600_Wall400_Mars_SM.fbx'
+export finished in 0.0104 sec.
+SPIRE_ASSET R600_Wall400 1564
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_COL_R600_Wall400_Mars_SM.fbx'
+export finished in 0.0095 sec.
+SPIRE_ASSET COL_R600_Wall400 140
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_R600_Wall360_Mars_SM.fbx'
+export finished in 0.0104 sec.
+SPIRE_ASSET R600_Wall360 1276
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_COL_R600_Wall360_Mars_SM.fbx'
+export finished in 0.0100 sec.
+SPIRE_ASSET COL_R600_Wall360 140
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_R600_Wall360_Portal_Mars_SM.fbx'
+export finished in 0.0088 sec.
+SPIRE_ASSET R600_Wall360_Portal 772
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_COL_R600_Wall360_Portal_Mars_SM.fbx'
+export finished in 0.0125 sec.
+SPIRE_ASSET COL_R600_Wall360_Portal 180
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_R600_Roof_Mars_SM.fbx'
+export finished in 0.0063 sec.
+SPIRE_ASSET R600_Roof 64
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_COL_R600_Roof_Mars_SM.fbx'
+export finished in 0.0065 sec.
+SPIRE_ASSET COL_R600_Roof 64
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_R600_Foundation_Mars_SM.fbx'
+export finished in 0.0054 sec.
+SPIRE_ASSET R600_Foundation 124
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_R600_ST_Joist_Mars_SM.fbx'
+export finished in 0.0056 sec.
+SPIRE_ASSET R600_ST_Joist 12
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_HS_Flue400_Mars_SM.fbx'
+export finished in 0.0112 sec.
+SPIRE_ASSET HS_Flue400 1824
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_HS_Flue300_Mars_SM.fbx'
+export finished in 0.0107 sec.
+SPIRE_ASSET HS_Flue300 1440
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_HS_Duct_Mars_SM.fbx'
+export finished in 0.0056 sec.
+SPIRE_ASSET HS_Duct 44
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_R700_ST_Flight_Mars_SM.fbx'
+export finished in 0.0070 sec.
+SPIRE_ASSET R700_ST_Flight 672
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_COL_R700_ST_Flight_Mars_SM.fbx'
+export finished in 0.0322 sec.
+SPIRE_ASSET COL_R700_ST_Flight 672
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_R700_ST_FlightGuard_Mars_SM.fbx'
+export finished in 0.0206 sec.
+SPIRE_ASSET R700_ST_FlightGuard 5408
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_COL_R700_ST_FlightGuard_Mars_SM.fbx'
+export finished in 0.1767 sec.
+SPIRE_ASSET COL_R700_ST_FlightGuard 1536
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_R700_ST_LandingGuard_Mars_SM.fbx'
+export finished in 0.0070 sec.
+SPIRE_ASSET R700_ST_LandingGuard 312
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_COL_R700_ST_LandingGuard_Mars_SM.fbx'
+export finished in 0.0079 sec.
+SPIRE_ASSET COL_R700_ST_LandingGuard 48
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_R700_ST_PortLanding_Mars_SM.fbx'
+export finished in 0.0059 sec.
+SPIRE_ASSET R700_ST_PortLanding 280
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_COL_R700_ST_PortLanding_Mars_SM.fbx'
+export finished in 0.0099 sec.
+SPIRE_ASSET COL_R700_ST_PortLanding 252
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_R700_ST_Landing_Mars_SM.fbx'
+export finished in 0.0070 sec.
+SPIRE_ASSET R700_ST_Landing 248
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_COL_R700_ST_Landing_Mars_SM.fbx'
+export finished in 0.0101 sec.
+SPIRE_ASSET COL_R700_ST_Landing 240
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_R700_Wall400_Portal_Mars_SM.fbx'
+export finished in 0.0086 sec.
+SPIRE_ASSET R700_Wall400_Portal 1204
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_COL_R700_Wall400_Portal_Mars_SM.fbx'
+export finished in 0.0126 sec.
+SPIRE_ASSET COL_R700_Wall400_Portal 196
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_R700_Wall400_Mars_SM.fbx'
+export finished in 0.0123 sec.
+SPIRE_ASSET R700_Wall400 1564
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_COL_R700_Wall400_Mars_SM.fbx'
+export finished in 0.0094 sec.
+SPIRE_ASSET COL_R700_Wall400 140
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_R700_Wall360_Mars_SM.fbx'
+export finished in 0.0102 sec.
+SPIRE_ASSET R700_Wall360 1276
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_COL_R700_Wall360_Mars_SM.fbx'
+export finished in 0.0102 sec.
+SPIRE_ASSET COL_R700_Wall360 140
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_R700_Wall360_Portal_Mars_SM.fbx'
+export finished in 0.0073 sec.
+SPIRE_ASSET R700_Wall360_Portal 916
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_COL_R700_Wall360_Portal_Mars_SM.fbx'
+export finished in 0.0123 sec.
+SPIRE_ASSET COL_R700_Wall360_Portal 196
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_R700_Roof_Mars_SM.fbx'
+export finished in 0.0050 sec.
+SPIRE_ASSET R700_Roof 64
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_COL_R700_Roof_Mars_SM.fbx'
+export finished in 0.0066 sec.
+SPIRE_ASSET COL_R700_Roof 64
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_R700_Foundation_Mars_SM.fbx'
+export finished in 0.0052 sec.
+SPIRE_ASSET R700_Foundation 124
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_R700_ST_Joist_Mars_SM.fbx'
+export finished in 0.0044 sec.
+SPIRE_ASSET R700_ST_Joist 12
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_BW_Yoke_Mars_SM.fbx'
+export finished in 0.0069 sec.
+SPIRE_ASSET BW_Yoke 408
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_COL_BW_Yoke_Mars_SM.fbx'
+export finished in 0.0107 sec.
+SPIRE_ASSET COL_BW_Yoke 200
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_R600_WD_Flight_Mars_SM.fbx'
+export finished in 0.0077 sec.
+SPIRE_ASSET R600_WD_Flight 960
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_COL_R600_WD_Flight_Mars_SM.fbx'
+export finished in 0.0182 sec.
+SPIRE_ASSET COL_R600_WD_Flight 528
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_R600_WD_FlightGuard_Mars_SM.fbx'
+export finished in 0.0160 sec.
+SPIRE_ASSET R600_WD_FlightGuard 4064
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_COL_R600_WD_FlightGuard_Mars_SM.fbx'
+export finished in 0.0985 sec.
+SPIRE_ASSET COL_R600_WD_FlightGuard 1176
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_R600_WD_LandingGuard_Mars_SM.fbx'
+export finished in 0.0090 sec.
+SPIRE_ASSET R600_WD_LandingGuard 1236
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_COL_R600_WD_LandingGuard_Mars_SM.fbx'
+export finished in 0.0523 sec.
+SPIRE_ASSET COL_R600_WD_LandingGuard 336
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_R600_WD_PortLanding_Mars_SM.fbx'
+export finished in 0.0056 sec.
+SPIRE_ASSET R600_WD_PortLanding 280
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_COL_R600_WD_PortLanding_Mars_SM.fbx'
+export finished in 0.0106 sec.
+SPIRE_ASSET COL_R600_WD_PortLanding 252
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_R600_WD_Landing_Mars_SM.fbx'
+export finished in 0.0066 sec.
+SPIRE_ASSET R600_WD_Landing 248
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_COL_R600_WD_Landing_Mars_SM.fbx'
+export finished in 0.0097 sec.
+SPIRE_ASSET COL_R600_WD_Landing 240
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_R600_WD_Joist_Mars_SM.fbx'
+export finished in 0.0057 sec.
+SPIRE_ASSET R600_WD_Joist 12
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_RW_RootCourse1_Mars_SM.fbx'
+export finished in 0.0065 sec.
+SPIRE_ASSET RW_RootCourse1 308
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_RW_RootCourse2_Mars_SM.fbx'
+export finished in 0.0057 sec.
+SPIRE_ASSET RW_RootCourse2 308
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_RW_RootCourse3_Mars_SM.fbx'
+export finished in 0.0066 sec.
+SPIRE_ASSET RW_RootCourse3 308
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_RW_RootCourse4_Mars_SM.fbx'
+export finished in 0.0065 sec.
+SPIRE_ASSET RW_RootCourse4 260
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_RW_RootArch_Mars_SM.fbx'
+export finished in 0.0067 sec.
+SPIRE_ASSET RW_RootArch 216
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_RW_RoofClamp_Mars_SM.fbx'
+export finished in 0.0060 sec.
+SPIRE_ASSET RW_RoofClamp 44
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_HL_Landing0_Mars_SM.fbx'
+export finished in 0.0069 sec.
+SPIRE_ASSET HL_Landing0 484
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_HL_Landing1_Mars_SM.fbx'
+export finished in 0.0086 sec.
+SPIRE_ASSET HL_Landing1 452
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_HL_Landing2_Mars_SM.fbx'
+export finished in 0.0067 sec.
+SPIRE_ASSET HL_Landing2 384
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_HL_Landing3_Mars_SM.fbx'
+export finished in 0.0071 sec.
+SPIRE_ASSET HL_Landing3 384
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_HL_Landing4_Mars_SM.fbx'
+export finished in 0.0061 sec.
+SPIRE_ASSET HL_Landing4 384
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_HL_Landing5_Mars_SM.fbx'
+export finished in 0.0064 sec.
+SPIRE_ASSET HL_Landing5 384
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_HL_Landing6_Mars_SM.fbx'
+export finished in 0.0070 sec.
+SPIRE_ASSET HL_Landing6 416
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_HL_BasketRope_Mars_SM.fbx'
+export finished in 0.0056 sec.
+SPIRE_ASSET HL_BasketRope 28
+00:08.219  image.write      | ERROR OpenImageIO write failed: Could not open file "C:\Users\Adam\.thumbnails\large\blender_39216_291db2511865987ac737c9f75b00acec.png.png"
+00:08.282  image.write      | ERROR OpenImageIO write failed: Could not open file "C:\Users\Adam\.thumbnails\large\blender_39216_492899886c53baef37a29186391fc1d4.png.png"
+00:08.344  image.write      | ERROR OpenImageIO write failed: Could not open file "C:\Users\Adam\.thumbnails\large\blender_39216_deb124334a50ddcacd48f022b97b6fb5.png.png"
+00:08.578  image.write      | ERROR OpenImageIO write failed: Could not open file "C:\Users\Adam\.thumbnails\large\blender_39216_f0952c0108f25f407e0d9804a035b84d.png.png"
+00:08.688  image.write      | ERROR OpenImageIO write failed: Could not open file "C:\Users\Adam\.thumbnails\large\blender_39216_2ec8d11a2891ad98d9ff38d3240af599.png.png"
+00:09.078  image.write      | ERROR OpenImageIO write failed: Could not open file "C:\Users\Adam\.thumbnails\large\blender_39216_5b451c146ccc98fb91afaf992de15ae5.png.png"
+00:09.141  image.write      | ERROR OpenImageIO write failed: Could not open file "C:\Users\Adam\.thumbnails\large\blender_39216_0b9af14b02a2237ef35e3b6fa1a1701b.png.png"
+Info: Saved copy as "Spire_HS.blend"
+Info: Saved copy as "Spire_BW.blend"
+Info: Saved copy as "Spire_RW.blend"
+Info: Saved copy as "Spire_HL.blend"
+Info: Saved copy as "Spire_KitLibrary.blend"
+Info: Saved copy as "Spire_Diorama.blend"
+Info: Saved copy as "Spire_Assets.blend"
+SPIRE_PRODUCTION_COMPLETE 105 {'HS': 163, 'BW': 166, 'RW': 156, 'HL': 1874}
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+
+Blender quit
+00:02.813  blend            | Read blend: "D:\Repositories\CkRepos\Orion\Tools\SpireConnectorKit\Output\Blender\Spire_Diorama.blend"
+Extensions: writing cache failed ([Errno 13] Permission denied: 'C:\\Users\\Adam\\AppData\\Roaming\\Blender Foundation\\Blender\\5.2\\extensions\\.cache\\compat.dat').
+SPIRE_FRESH_BLENDER_AUDIT {"status": "passed", "assets": 105, "marked_asset_browser_objects": 105, "surface_rays": 405, "errors": [], "scenes": {"HS": {"mesh_instances": 163, "unique_meshes": 32}, "BW": {"mesh_instances": 166, "unique_meshes": 22}, "RW": {"mesh_instances": 156, "unique_meshes": 32}, "HL": {"mesh_instances": 1874, "unique_meshes": 36}}, "scope": "fresh reopened Blender meshes, not Unreal physics or packaged collision"}
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+
+Blender quit
+00:02.579  blend            | Read blend: "D:\Repositories\CkRepos\Orion\Tools\SpireConnectorKit\Output\Blender\Spire_Diorama.blend"
+Extensions: writing cache failed ([Errno 13] Permission denied: 'C:\\Users\\Adam\\AppData\\Roaming\\Blender Foundation\\Blender\\5.2\\extensions\\.cache\\compat.dat').
+SPIRE_HEADROOM_AUDIT {"status": "passed", "headroom_rays": 1167, "height_cm": 220, "errors": [], "scope": "Upward rays at three radial stations per tread/landing on complete saved visual meshes. Does not establish capsule sweeps, continuous traversal or PIE."}
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+
+Blender quit
+00:02.687  blend            | Read blend: "D:\Repositories\CkRepos\Orion\Tools\SpireConnectorKit\Output\Blender\Spire_Diorama.blend"
+Extensions: writing cache failed ([Errno 13] Permission denied: 'C:\\Users\\Adam\\AppData\\Roaming\\Blender Foundation\\Blender\\5.2\\extensions\\.cache\\compat.dat').
+SPIRE_CATALOG_WRITTEN 105
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+
+Blender quit

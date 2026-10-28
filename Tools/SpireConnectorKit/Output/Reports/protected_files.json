@@ -1,0 +1,17 @@
+[
+  {
+    "path": "Content/Mars/Maps/Camp_Mars_MAP.umap",
+    "unchanged": true,
+    "sha256": "73860d63dbd23059fa3b428881fc13116c5ac4048808a6f9fee5da502c0fa6a9"
+  },
+  {
+    "path": "Content/Mars/Maps/Warrens_VariantC_Mars_MAP.umap",
+    "unchanged": true,
+    "sha256": "2d4e7e514ae63403b3ab7fc6a71acb7f076a686efa289124d56b77869a35f959"
+  },
+  {
+    "path": "Docs/design/spire-blender-handoff-20261026/spire_spec.json",
+    "unchanged": true,
+    "sha256": "ea6356dcd01f974f53e26fae7bb78f5a5224c1427521e9c6316be249bb714184"
+  }
+]

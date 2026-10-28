@@ -1,0 +1,134 @@
+{
+	"material": "M_Spire_M00",
+	"packagePath": "/Game/Mars/Environment/SpireConnectorKit/Materials/M_Spire_M00",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "5838ab9e871e1c3ac3c291e759db4151",
+		"exporterVersion": 3
+	},
+	"blendMode": "BLEND_Opaque",
+	"twoSided": false,
+	"unlit": false,
+	"shadingModel": "MSM_DefaultLit",
+	"domain": "MD_Surface",
+	"connectedOutputs": [
+		"BaseColor"
+	],
+	"expressions":
+	{
+		"Constant": 3,
+		"Constant3Vector": 1,
+		"Multiply": 1,
+		"VertexColor": 2
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "VertexColor",
+				"name": "MaterialExpressionVertexColor_0",
+				"outputs": [
+					"None",
+					"None",
+					"None",
+					"None",
+					"None"
+				]
+			},
+			{
+				"id": 1,
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_0",
+				"props":
+				{
+					"R": 0.89999997615814209
+				}
+			},
+			{
+				"id": 2,
+				"class": "Constant3Vector",
+				"name": "MaterialExpressionConstant3Vector_1",
+				"outputs": [
+					"None",
+					"None",
+					"None",
+					"None"
+				],
+				"props":
+				{
+					"Constant": "(R=0.009134,G=0.012286,B=0.014444,A=1.000000)"
+				}
+			},
+			{
+				"id": 3,
+				"class": "VertexColor",
+				"name": "MaterialExpressionVertexColor_1",
+				"outputs": [
+					"None",
+					"None",
+					"None",
+					"None",
+					"None"
+				]
+			},
+			{
+				"id": 4,
+				"class": "Multiply",
+				"name": "MaterialExpressionMultiply_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 2,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 3,
+						"output": 0,
+						"mask": "rgb"
+					}
+				]
+			},
+			{
+				"id": 5,
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_2",
+				"props":
+				{
+					"R": 0.89999997615814209
+				}
+			},
+			{
+				"id": 6,
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_3"
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_BaseColor",
+				"node": 4,
+				"output": 0
+			},
+			{
+				"property": "MP_Metallic",
+				"node": 6,
+				"output": 0
+			},
+			{
+				"property": "MP_Roughness",
+				"node": 5,
+				"output": 0
+			}
+		]
+	},
+	"scalarParams": [],
+	"vectorParams": [],
+	"textureParams": [],
+	"usedTextures": []
+}

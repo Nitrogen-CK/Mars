@@ -1,0 +1,5101 @@
+{
+  "cid": "BW",
+  "route": "Y3",
+  "direction": "down",
+  "radial_offset": 0,
+  "gauge": false,
+  "points": [
+    {
+      "at": [
+        4260.0,
+        0,
+        -1200
+      ],
+      "label": "cross-yoke 3"
+    },
+    {
+      "at": [
+        4296.666666666667,
+        0,
+        -1200
+      ],
+      "label": "cross-yoke 3"
+    },
+    {
+      "at": [
+        4333.333333333333,
+        0,
+        -1200
+      ],
+      "label": "cross-yoke 3"
+    },
+    {
+      "at": [
+        4370.0,
+        0,
+        -1200
+      ],
+      "label": "cross-yoke 3"
+    },
+    {
+      "at": [
+        4406.666666666667,
+        0,
+        -1200
+      ],
+      "label": "cross-yoke 3"
+    },
+    {
+      "at": [
+        4443.333333333333,
+        0,
+        -1200
+      ],
+      "label": "cross-yoke 3"
+    },
+    {
+      "at": [
+        4480.0,
+        0,
+        -1200
+      ],
+      "label": "cross-yoke 3"
+    },
+    {
+      "at": [
+        4516.666666666667,
+        0,
+        -1200
+      ],
+      "label": "cross-yoke 3"
+    },
+    {
+      "at": [
+        4553.333333333333,
+        0,
+        -1200
+      ],
+      "label": "cross-yoke 3"
+    },
+    {
+      "at": [
+        4590.0,
+        0,
+        -1200
+      ],
+      "label": "cross-yoke 3"
+    },
+    {
+      "at": [
+        4626.666666666667,
+        0,
+        -1200
+      ],
+      "label": "cross-yoke 3"
+    },
+    {
+      "at": [
+        4663.333333333333,
+        0,
+        -1200
+      ],
+      "label": "cross-yoke 3"
+    },
+    {
+      "at": [
+        4700.0,
+        0,
+        -1200
+      ],
+      "label": "cross-yoke 3"
+    },
+    {
+      "at": [
+        4736.666666666667,
+        0,
+        -1200
+      ],
+      "label": "cross-yoke 3"
+    },
+    {
+      "at": [
+        4773.333333333333,
+        0,
+        -1200
+      ],
+      "label": "cross-yoke 3"
+    },
+    {
+      "at": [
+        4810.0,
+        0,
+        -1200
+      ],
+      "label": "cross-yoke 3"
+    },
+    {
+      "at": [
+        4846.666666666667,
+        0,
+        -1200
+      ],
+      "label": "cross-yoke 3"
+    },
+    {
+      "at": [
+        4883.333333333333,
+        0,
+        -1200
+      ],
+      "label": "cross-yoke 3"
+    },
+    {
+      "at": [
+        4920.0,
+        0,
+        -1200
+      ],
+      "label": "cross-yoke 3"
+    },
+    {
+      "at": [
+        4956.666666666667,
+        0,
+        -1200
+      ],
+      "label": "cross-yoke 3"
+    },
+    {
+      "at": [
+        4993.333333333333,
+        0,
+        -1200
+      ],
+      "label": "cross-yoke 3"
+    },
+    {
+      "at": [
+        5030.0,
+        0,
+        -1200
+      ],
+      "label": "cross-yoke 3"
+    },
+    {
+      "at": [
+        5066.666666666666,
+        0,
+        -1200
+      ],
+      "label": "cross-yoke 3"
+    },
+    {
+      "at": [
+        5103.333333333334,
+        0,
+        -1200
+      ],
+      "label": "cross-yoke 3"
+    },
+    {
+      "at": [
+        5140.0,
+        0,
+        -1200
+      ],
+      "label": "cross-yoke 3"
+    }
+  ],
+  "index": 25,
+  "status": "passed",
+  "samples": [
+    {
+      "t": 0.524,
+      "at": [
+        4260.0,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 1,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 0.0
+    },
+    {
+      "t": 0.541,
+      "at": [
+        4260.444456921771,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 1,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 26.66704138121492
+    },
+    {
+      "t": 0.558,
+      "at": [
+        4261.327991211156,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 1,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 53.01099412352058
+    },
+    {
+      "t": 0.574,
+      "at": [
+        4262.639879768418,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 1,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 78.71220973369923
+    },
+    {
+      "t": 0.591,
+      "at": [
+        4264.36422579938,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 1,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 103.4593111520098
+    },
+    {
+      "t": 0.608,
+      "at": [
+        4266.480097288778,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 1,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 126.9520415468882
+    },
+    {
+      "t": 0.624,
+      "at": [
+        4268.961902392482,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 1,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 148.90621826037145
+    },
+    {
+      "t": 0.641,
+      "at": [
+        4271.779550552954,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 1,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 169.05553667450474
+    },
+    {
+      "t": 0.658,
+      "at": [
+        4274.8988321736015,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 1,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 187.15540242446448
+    },
+    {
+      "t": 0.674,
+      "at": [
+        4277.669339349741,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 1,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 166.22709655763765
+    },
+    {
+      "t": 0.691,
+      "at": [
+        4280.08725887525,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 1,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 145.07051086424417
+    },
+    {
+      "t": 0.708,
+      "at": [
+        4282.197407257712,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 1,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 126.60639190675704
+    },
+    {
+      "t": 0.724,
+      "at": [
+        4284.0389533173375,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 1,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 110.49252319334573
+    },
+    {
+      "t": 0.741,
+      "at": [
+        4285.64613934581,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 1,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 96.42980957028522
+    },
+    {
+      "t": 0.758,
+      "at": [
+        4286.158054581469,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 2,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 30.714668820750557
+    },
+    {
+      "t": 0.774,
+      "at": [
+        4287.241800520648,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 2,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 65.02423700073898
+    },
+    {
+      "t": 0.791,
+      "at": [
+        4288.884253934543,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 2,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 98.54582302489386
+    },
+    {
+      "t": 0.808,
+      "at": [
+        4291.065482756536,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 2,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 130.87268403649648
+    },
+    {
+      "t": 0.824,
+      "at": [
+        4293.759133994229,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 2,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 161.6139182303631
+    },
+    {
+      "t": 0.841,
+      "at": [
+        4296.932437781934,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 2,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 190.39555753717048
+    },
+    {
+      "t": 0.858,
+      "at": [
+        4300.546927967981,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 2,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 216.86898782325804
+    },
+    {
+      "t": 0.874,
+      "at": [
+        4304.558883914973,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 2,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 240.71398152984435
+    },
+    {
+      "t": 0.891,
+      "at": [
+        4308.2211156186795,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 2,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 219.73214721679688
+    },
+    {
+      "t": 0.908,
+      "at": [
+        4311.417299373259,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 2,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 191.7660217285361
+    },
+    {
+      "t": 0.924,
+      "at": [
+        4314.20668503546,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 2,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 167.3588104247774
+    },
+    {
+      "t": 0.941,
+      "at": [
+        4316.641049291633,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 2,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 146.0580444336074
+    },
+    {
+      "t": 0.958,
+      "at": [
+        4318.76553868721,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 2,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 127.46834564210349
+    },
+    {
+      "t": 0.974,
+      "at": [
+        4320.619658872124,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 2,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 111.24497985839162
+    },
+    {
+      "t": 0.991,
+      "at": [
+        4322.237775840554,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 2,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 97.08624267578125
+    },
+    {
+      "t": 1.008,
+      "at": [
+        4322.75771418828,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 3,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 31.196051700030218
+    },
+    {
+      "t": 1.024,
+      "at": [
+        4323.850305517754,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 3,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 65.55456056287679
+    },
+    {
+      "t": 1.041,
+      "at": [
+        4325.502276064682,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 3,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 99.11803933205712
+    },
+    {
+      "t": 1.058,
+      "at": [
+        4327.69366452704,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 3,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 131.48067063854958
+    },
+    {
+      "t": 1.074,
+      "at": [
+        4330.398938996408,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 3,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 162.2596823565775
+    },
+    {
+      "t": 1.091,
+      "at": [
+        4333.583353401124,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 3,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 191.0610321789333
+    },
+    {
+      "t": 1.108,
+      "at": [
+        4337.209150308123,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 3,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 217.54607687451517
+    },
+    {
+      "t": 1.124,
+      "at": [
+        4341.232470775898,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 3,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 241.39444038302238
+    },
+    {
+      "t": 1.141,
+      "at": [
+        4344.893843882096,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 3,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 219.67930603025638
+    },
+    {
+      "t": 1.158,
+      "at": [
+        4348.089236746729,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 3,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 191.7197265625
+    },
+    {
+      "t": 1.174,
+      "at": [
+        4350.877901648668,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 3,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 167.3185577392851
+    },
+    {
+      "t": 1.191,
+      "at": [
+        4353.31165744381,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 3,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 146.02330017088138
+    },
+    {
+      "t": 1.208,
+      "at": [
+        4355.435658147949,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 3,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 127.43825531004325
+    },
+    {
+      "t": 1.224,
+      "at": [
+        4357.289316370398,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 3,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 111.21860504149026
+    },
+    {
+      "t": 1.241,
+      "at": [
+        4358.907062519071,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 3,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 97.06340789794069
+    },
+    {
+      "t": 1.258,
+      "at": [
+        4359.42672177365,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 4,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 31.17930624492157
+    },
+    {
+      "t": 1.274,
+      "at": [
+        4360.51903540391,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 4,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 65.53672697209002
+    },
+    {
+      "t": 1.291,
+      "at": [
+        4362.1707371115235,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 4,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 99.09951675885988
+    },
+    {
+      "t": 1.308,
+      "at": [
+        4364.361762122833,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 4,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 131.46045070101445
+    },
+    {
+      "t": 1.324,
+      "at": [
+        4367.0656208525625,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 4,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 162.2282699773543
+    },
+    {
+      "t": 1.341,
+      "at": [
+        4370.249489424819,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 4,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 191.02943572206217
+    },
+    {
+      "t": 1.358,
+      "at": [
+        4373.874766147413,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 4,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 217.51486605949037
+    },
+    {
+      "t": 1.374,
+      "at": [
+        4377.897579161258,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 4,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 241.3639937511165
+    },
+    {
+      "t": 1.391,
+      "at": [
+        4381.559150888813,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 4,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 219.6912231445449
+    },
+    {
+      "t": 1.408,
+      "at": [
+        4384.754697659416,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 4,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 191.73011779786862
+    },
+    {
+      "t": 1.424,
+      "at": [
+        4387.543549574011,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 4,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 167.3277587890625
+    },
+    {
+      "t": 1.441,
+      "at": [
+        4389.977434816363,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 4,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 146.0310668945449
+    },
+    {
+      "t": 1.458,
+      "at": [
+        4392.10157372708,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 4,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 127.44503784179688
+    },
+    {
+      "t": 1.474,
+      "at": [
+        4393.955338759299,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 4,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 111.22434234620675
+    },
+    {
+      "t": 1.491,
+      "at": [
+        4395.573157034547,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 4,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 97.06832122804099
+    },
+    {
+      "t": 1.508,
+      "at": [
+        4396.092876341243,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 5,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 31.18290934316823
+    },
+    {
+      "t": 1.524,
+      "at": [
+        4397.185246548172,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 5,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 65.54050233729994
+    },
+    {
+      "t": 1.541,
+      "at": [
+        4398.836990018553,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 5,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 99.10321859825433
+    },
+    {
+      "t": 1.558,
+      "at": [
+        4401.02809824884,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 5,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 131.4646504208946
+    },
+    {
+      "t": 1.574,
+      "at": [
+        4403.732011568402,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 5,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 162.23252435046024
+    },
+    {
+      "t": 1.591,
+      "at": [
+        4406.915910168874,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 5,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 191.03354312084983
+    },
+    {
+      "t": 1.608,
+      "at": [
+        4410.541258322752,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 5,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 217.519151902335
+    },
+    {
+      "t": 1.624,
+      "at": [
+        4414.564119190695,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 5,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 241.36826761253135
+    },
+    {
+      "t": 1.641,
+      "at": [
+        4418.225728783148,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 5,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 219.69216918946677
+    },
+    {
+      "t": 1.658,
+      "at": [
+        4421.421305568579,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 5,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 191.7308044433662
+    },
+    {
+      "t": 1.674,
+      "at": [
+        4424.210717397438,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 5,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 167.3282165527071
+    },
+    {
+      "t": 1.691,
+      "at": [
+        4426.64453906061,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 5,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 146.02725219727245
+    },
+    {
+      "t": 1.708,
+      "at": [
+        4428.768609931617,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 5,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 127.44169616701265
+    },
+    {
+      "t": 1.724,
+      "at": [
+        4430.622328042401,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 5,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 111.22152709960255
+    },
+    {
+      "t": 1.741,
+      "at": [
+        4432.240143936786,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 5,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 97.06585693358011
+    },
+    {
+      "t": 1.758,
+      "at": [
+        4432.759833124174,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 6,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 31.181102199141936
+    },
+    {
+      "t": 1.774,
+      "at": [
+        4433.852169676489,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 6,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 65.5384831131684
+    },
+    {
+      "t": 1.791,
+      "at": [
+        4435.5038892369175,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 6,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 99.1012081072843
+    },
+    {
+      "t": 1.808,
+      "at": [
+        4437.694928800642,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 6,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 131.46208781853815
+    },
+    {
+      "t": 1.824,
+      "at": [
+        4440.398874351052,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 6,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 162.23057826310452
+    },
+    {
+      "t": 1.841,
+      "at": [
+        4443.582782339625,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 6,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 191.0318006678737
+    },
+    {
+      "t": 1.858,
+      "at": [
+        4447.208098995248,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 6,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 217.51726202216375
+    },
+    {
+      "t": 1.874,
+      "at": [
+        4451.230952929863,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 6,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 241.3663950000199
+    },
+    {
+      "t": 1.891,
+      "at": [
+        4454.8925403411695,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 6,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 219.6908874511514
+    },
+    {
+      "t": 1.908,
+      "at": [
+        4458.08809927562,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 6,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 191.72969055173735
+    },
+    {
+      "t": 1.924,
+      "at": [
+        4460.876942543395,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 6,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 167.32723999022073
+    },
+    {
+      "t": 1.941,
+      "at": [
+        4463.310805722387,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 6,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 146.03062438967572
+    },
+    {
+      "t": 1.958,
+      "at": [
+        4465.434901946693,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 6,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 127.44475555421286
+    },
+    {
+      "t": 1.974,
+      "at": [
+        4467.288689989231,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 6,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 111.22438049318794
+    },
+    {
+      "t": 1.991,
+      "at": [
+        4468.906515377429,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 6,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 97.06818389894966
+    },
+    {
+      "t": 2.008,
+      "at": [
+        4469.4262295151275,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 7,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 31.18241102236654
+    },
+    {
+      "t": 2.024,
+      "at": [
+        4470.518561035424,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 7,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 65.53936775337873
+    },
+    {
+      "t": 2.041,
+      "at": [
+        4472.1703392048985,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 7,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 99.10290821580433
+    },
+    {
+      "t": 2.058,
+      "at": [
+        4474.361442058001,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 7,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 131.4643277942875
+    },
+    {
+      "t": 2.074,
+      "at": [
+        4477.065368579566,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 7,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 162.23237366697074
+    },
+    {
+      "t": 2.091,
+      "at": [
+        4480.249330681369,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 7,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 191.0338945484583
+    },
+    {
+      "t": 2.108,
+      "at": [
+        4483.874708200931,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 7,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 217.51960111545748
+    },
+    {
+      "t": 2.124,
+      "at": [
+        4487.897628536803,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 7,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 241.36892237046538
+    },
+    {
+      "t": 2.141,
+      "at": [
+        4491.559259379412,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 7,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 219.69084167480128
+    },
+    {
+      "t": 2.158,
+      "at": [
+        4494.754773132236,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 7,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 191.72929382326947
+    },
+    {
+      "t": 2.174,
+      "at": [
+        4497.543565146323,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 7,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 167.3271942138433
+    },
+    {
+      "t": 2.191,
+      "at": [
+        4499.977492673082,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 7,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 146.03096008299417
+    },
+    {
+      "t": 2.208,
+      "at": [
+        4502.101586354236,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 7,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 127.44460296632224
+    },
+    {
+      "t": 2.224,
+      "at": [
+        4503.955338673303,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 7,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 111.22425079344339
+    },
+    {
+      "t": 2.241,
+      "at": [
+        4505.573147185144,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 7,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 97.06832122802905
+    },
+    {
+      "t": 2.258,
+      "at": [
+        4506.092863001324,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 8,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 31.182511729848446
+    },
+    {
+      "t": 2.309,
+      "at": [
+        4511.708173013263,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 8,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 136.3546393756662
+    },
+    {
+      "t": 2.325,
+      "at": [
+        4514.485363566066,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 8,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 166.62809111469693
+    },
+    {
+      "t": 2.342,
+      "at": [
+        4517.733412617307,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 8,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 194.88138655249935
+    },
+    {
+      "t": 2.359,
+      "at": [
+        4521.413032380867,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 8,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 220.77275778254054
+    },
+    {
+      "t": 2.375,
+      "at": [
+        4525.475697787302,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 8,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 243.75503540040427
+    },
+    {
+      "t": 2.392,
+      "at": [
+        4529.021221930423,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 8,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 212.7310333251919
+    },
+    {
+      "t": 2.409,
+      "at": [
+        4532.115570773083,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 8,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 185.6561279296875
+    },
+    {
+      "t": 2.425,
+      "at": [
+        4534.816034846461,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 8,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 162.02655029296875
+    },
+    {
+      "t": 2.442,
+      "at": [
+        4537.172814820646,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 8,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 141.40481567380766
+    },
+    {
+      "t": 2.459,
+      "at": [
+        4539.229723430111,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 8,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 123.40760040280647
+    },
+    {
+      "t": 2.475,
+      "at": [
+        4541.024764467861,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 8,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 107.70030212401662
+    },
+    {
+      "t": 2.492,
+      "at": [
+        4542.591331538925,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 8,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 93.99270629880766
+    },
+    {
+      "t": 2.509,
+      "at": [
+        4543.073452535587,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 9,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 28.92667961838779
+    },
+    {
+      "t": 2.525,
+      "at": [
+        4544.124402635743,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 9,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 63.05575539642111
+    },
+    {
+      "t": 2.542,
+      "at": [
+        4545.7314044628365,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 9,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 96.41989985743626
+    },
+    {
+      "t": 2.559,
+      "at": [
+        4547.875061150587,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 9,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 128.61607417091545
+    },
+    {
+      "t": 2.575,
+      "at": [
+        4550.529273898634,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 9,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 159.2524540137319
+    },
+    {
+      "t": 2.592,
+      "at": [
+        4553.661943365877,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 9,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 187.95866680452386
+    },
+    {
+      "t": 2.609,
+      "at": [
+        4557.2351538062385,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 9,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 214.3870326495405
+    },
+    {
+      "t": 2.625,
+      "at": [
+        4561.205481913856,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 9,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 238.21634618916906
+    },
+    {
+      "t": 2.642,
+      "at": [
+        4564.870245842554,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 9,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 219.8854064941338
+    },
+    {
+      "t": 2.659,
+      "at": [
+        4568.068718698217,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 9,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 191.8999328613213
+    },
+    {
+      "t": 2.675,
+      "at": [
+        4570.860011753582,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 9,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 167.47523498536862
+    },
+    {
+      "t": 2.692,
+      "at": [
+        4573.29605914747,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 9,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 146.159912109375
+    },
+    {
+      "t": 2.709,
+      "at": [
+        4575.422032217821,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 9,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 127.55736541749411
+    },
+    {
+      "t": 2.725,
+      "at": [
+        4577.277435939805,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 9,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 111.32266235352245
+    },
+    {
+      "t": 2.742,
+      "at": [
+        4578.8967039005565,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 9,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 97.15412902829985
+    },
+    {
+      "t": 2.759,
+      "at": [
+        4579.417475460995,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 10,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 31.246232632025492
+    },
+    {
+      "t": 2.775,
+      "at": [
+        4580.510966726116,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 10,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 65.60934783439217
+    },
+    {
+      "t": 2.792,
+      "at": [
+        4582.163976599949,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 10,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 99.17800468410611
+    },
+    {
+      "t": 2.809,
+      "at": [
+        4584.3564405707775,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 10,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 131.54443540356127
+    },
+    {
+      "t": 2.825,
+      "at": [
+        4587.06172476488,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 10,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 162.31575522655947
+    },
+    {
+      "t": 2.842,
+      "at": [
+        4590.247054397539,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 10,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 191.11940488449983
+    },
+    {
+      "t": 2.859,
+      "at": [
+        4593.87390923872,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 10,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 217.60692593684948
+    },
+    {
+      "t": 2.875,
+      "at": [
+        4597.898294651532,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 10,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 241.4568246933175
+    },
+    {
+      "t": 2.892,
+      "at": [
+        4601.559753237084,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 10,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 219.68576049804688
+    },
+    {
+      "t": 2.909,
+      "at": [
+        4604.7552803426925,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 10,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 191.72550964355128
+    },
+    {
+      "t": 2.925,
+      "at": [
+        4607.5440075068,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 10,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 167.3233032226426
+    },
+    {
+      "t": 2.942,
+      "at": [
+        4609.97782036675,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 10,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 146.02757263181206
+    },
+    {
+      "t": 2.959,
+      "at": [
+        4612.101872340214,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 10,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 127.44210052491599
+    },
+    {
+      "t": 2.975,
+      "at": [
+        4613.955632498841,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 10,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 111.22206115724362
+    },
+    {
+      "t": 2.992,
+      "at": [
+        4615.573403626576,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 10,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 97.06607818606074
+    },
+    {
+      "t": 3.009,
+      "at": [
+        4616.093081555209,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 11,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 31.179674011626467
+    },
+    {
+      "t": 3.025,
+      "at": [
+        4617.185384916262,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 11,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 65.53690184057425
+    },
+    {
+      "t": 3.042,
+      "at": [
+        4618.837053363749,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 11,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 99.09931534078547
+    },
+    {
+      "t": 3.059,
+      "at": [
+        4621.0280957374325,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 11,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 131.46069908005285
+    },
+    {
+      "t": 3.075,
+      "at": [
+        4623.731923826493,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 11,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 162.22838962182735
+    },
+    {
+      "t": 3.092,
+      "at": [
+        4626.9157987693725,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 11,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 191.029817954079
+    },
+    {
+      "t": 3.109,
+      "at": [
+        4630.541086192196,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 11,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 217.51550806820057
+    },
+    {
+      "t": 3.125,
+      "at": [
+        4634.563941780116,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 11,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 241.36503759471208
+    },
+    {
+      "t": 3.142,
+      "at": [
+        4638.225617637589,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 11,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 219.6935424804551
+    },
+    {
+      "t": 3.159,
+      "at": [
+        4641.42117055495,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 11,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 191.73164367673053
+    },
+    {
+      "t": 3.175,
+      "at": [
+        4644.210030307966,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 11,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 167.32923889161862
+    },
+    {
+      "t": 3.192,
+      "at": [
+        4646.6439688328155,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 11,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 146.0325012206963
+    },
+    {
+      "t": 3.209,
+      "at": [
+        4648.768137474681,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 11,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 127.4460525512917
+    },
+    {
+      "t": 3.225,
+      "at": [
+        4650.621926791549,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 11,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 111.22512817384177
+    },
+    {
+      "t": 3.242,
+      "at": [
+        4652.239745348779,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 11,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 97.0689239501919
+    },
+    {
+      "t": 3.259,
+      "at": [
+        4652.759475383252,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 12,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 31.183734225971396
+    },
+    {
+      "t": 3.275,
+      "at": [
+        4653.851829991385,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 12,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 65.54075301252144
+    },
+    {
+      "t": 3.292,
+      "at": [
+        4655.503551947791,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 12,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 99.10312392987971
+    },
+    {
+      "t": 3.309,
+      "at": [
+        4657.6947086632035,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 12,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 131.46520873946142
+    },
+    {
+      "t": 3.325,
+      "at": [
+        4660.3986125650745,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 12,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 162.23293835414404
+    },
+    {
+      "t": 3.342,
+      "at": [
+        4663.582540967524,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 12,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 191.03417835273623
+    },
+    {
+      "t": 3.359,
+      "at": [
+        4667.207924701097,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 12,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 217.5199739508705
+    },
+    {
+      "t": 3.375,
+      "at": [
+        4671.230799274322,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 12,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 241.36908991787075
+    },
+    {
+      "t": 3.392,
+      "at": [
+        4674.892340794793,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 12,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 219.6920623779331
+    },
+    {
+      "t": 3.409,
+      "at": [
+        4678.089842934242,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 12,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 191.7312164306811
+    },
+    {
+      "t": 3.426,
+      "at": [
+        4680.878463558891,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 12,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 167.3139190674067
+    },
+    {
+      "t": 3.442,
+      "at": [
+        4683.3121329497135,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 12,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 146.01899719235553
+    },
+    {
+      "t": 3.459,
+      "at": [
+        4685.436098761946,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 12,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 127.43462371823614
+    },
+    {
+      "t": 3.476,
+      "at": [
+        4687.2897120942425,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 12,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 111.21524047852245
+    },
+    {
+      "t": 3.492,
+      "at": [
+        4688.907426924685,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 12,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 97.06037902829303
+    },
+    {
+      "t": 3.509,
+      "at": [
+        4689.42703868665,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 13,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 31.17589227861642
+    },
+    {
+      "t": 3.526,
+      "at": [
+        4690.519251744019,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 13,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 65.5322600345117
+    },
+    {
+      "t": 3.542,
+      "at": [
+        4692.170849683292,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 13,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 99.09448685418072
+    },
+    {
+      "t": 3.559,
+      "at": [
+        4694.361838947339,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 13,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 131.45592590357282
+    },
+    {
+      "t": 3.576,
+      "at": [
+        4697.065563131786,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 13,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 162.22313439882578
+    },
+    {
+      "t": 3.592,
+      "at": [
+        4700.249390173171,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 13,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 191.02468097724727
+    },
+    {
+      "t": 3.609,
+      "at": [
+        4703.874565235097,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 13,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 217.51003050735233
+    },
+    {
+      "t": 3.626,
+      "at": [
+        4707.8973534264505,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 13,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 241.35959129296756
+    },
+    {
+      "t": 3.642,
+      "at": [
+        4711.558998086474,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 13,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 219.69294738770554
+    },
+    {
+      "t": 3.659,
+      "at": [
+        4714.754525869709,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 13,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 191.7312927246162
+    },
+    {
+      "t": 3.676,
+      "at": [
+        4717.543416117078,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 13,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 167.32908630373822
+    },
+    {
+      "t": 3.692,
+      "at": [
+        4719.977318652966,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 13,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 146.03210449216022
+    },
+    {
+      "t": 3.709,
+      "at": [
+        4722.101485735034,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 13,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 127.4459304809775
+    },
+    {
+      "t": 3.726,
+      "at": [
+        4723.955261957188,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 13,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 111.22501373291186
+    },
+    {
+      "t": 3.742,
+      "at": [
+        4725.573080260104,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 13,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 97.06890869139261
+    },
+    {
+      "t": 3.759,
+      "at": [
+        4726.092799765886,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 14,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 31.18254491980925
+    },
+    {
+      "t": 3.776,
+      "at": [
+        4727.185154393052,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 14,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 65.5399777463291
+    },
+    {
+      "t": 3.792,
+      "at": [
+        4728.836943604529,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 14,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 99.1035707106645
+    },
+    {
+      "t": 3.809,
+      "at": [
+        4731.028025300996,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 14,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 131.46464516220132
+    },
+    {
+      "t": 3.826,
+      "at": [
+        4733.731920006306,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 14,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 162.23238656487783
+    },
+    {
+      "t": 3.842,
+      "at": [
+        4736.915949275161,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 14,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 191.03450859607256
+    },
+    {
+      "t": 3.859,
+      "at": [
+        4740.541337611015,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 14,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 217.5202500838327
+    },
+    {
+      "t": 3.876,
+      "at": [
+        4744.564242505972,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 14,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 241.3694525592918
+    },
+    {
+      "t": 3.892,
+      "at": [
+        4748.225879960934,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 14,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 219.69123840332372
+    },
+    {
+      "t": 3.909,
+      "at": [
+        4751.421438132431,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 14,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 191.72964477540427
+    },
+    {
+      "t": 3.926,
+      "at": [
+        4754.210247231078,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 14,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 167.32720947265625
+    },
+    {
+      "t": 3.942,
+      "at": [
+        4756.644128658679,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 14,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 146.03083801269872
+    },
+    {
+      "t": 3.959,
+      "at": [
+        4758.768239100481,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 14,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 127.44483947752883
+    },
+    {
+      "t": 3.976,
+      "at": [
+        4760.621993199755,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 14,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 111.22435760499411
+    },
+    {
+      "t": 3.992,
+      "at": [
+        4762.239803364634,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 14,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 97.06842041014261
+    },
+    {
+      "t": 4.009,
+      "at": [
+        4762.759516902459,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 15,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 31.18218684952279
+    },
+    {
+      "t": 4.057,
+      "at": [
+        4769.050091420869,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 15,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 130.52799337017285
+    },
+    {
+      "t": 4.074,
+      "at": [
+        4771.721927411335,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 15,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 160.30981066283226
+    },
+    {
+      "t": 4.09,
+      "at": [
+        4774.857827340104,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 15,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 188.14912860627294
+    },
+    {
+      "t": 4.107,
+      "at": [
+        4778.419715934944,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 15,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 213.7077396423059
+    },
+    {
+      "t": 4.124,
+      "at": [
+        4782.364414844391,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 15,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 236.67581213847868
+    },
+    {
+      "t": 4.14,
+      "at": [
+        4785.881720582199,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 15,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 211.03538513184617
+    },
+    {
+      "t": 4.157,
+      "at": [
+        4788.951325725828,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 15,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 184.1759490966831
+    },
+    {
+      "t": 4.174,
+      "at": [
+        4791.6303014742825,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 15,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 160.73532104490823
+    },
+    {
+      "t": 4.19,
+      "at": [
+        4793.968324054589,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 15,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 140.27769470215185
+    },
+    {
+      "t": 4.207,
+      "at": [
+        4796.00877193729,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 15,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 122.4237060546875
+    },
+    {
+      "t": 4.224,
+      "at": [
+        4797.789509480763,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 15,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 106.8421096801519
+    },
+    {
+      "t": 4.24,
+      "at": [
+        4799.343593670089,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 15,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 93.24374389647755
+    },
+    {
+      "t": 4.257,
+      "at": [
+        4799.814873846668,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 16,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 28.198417582834324
+    },
+    {
+      "t": 4.274,
+      "at": [
+        4800.852779859941,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 16,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 62.273125705716055
+    },
+    {
+      "t": 4.29,
+      "at": [
+        4802.446028205042,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 16,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 95.59298340116374
+    },
+    {
+      "t": 4.307,
+      "at": [
+        4804.575305782085,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 16,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 127.75409226345606
+    },
+    {
+      "t": 4.324,
+      "at": [
+        4807.214764117874,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 16,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 158.36623527270996
+    },
+    {
+      "t": 4.34,
+      "at": [
+        4810.332478394241,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 16,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 187.05910474444235
+    },
+    {
+      "t": 4.357,
+      "at": [
+        4813.8905523176345,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 16,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 213.48401867169449
+    },
+    {
+      "t": 4.374,
+      "at": [
+        4817.845940288515,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 16,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 237.32138276160654
+    },
+    {
+      "t": 4.39,
+      "at": [
+        4821.514040049327,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 16,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 220.0855560302905
+    },
+    {
+      "t": 4.407,
+      "at": [
+        4824.715289635316,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 16,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 192.0746002197095
+    },
+    {
+      "t": 4.424,
+      "at": [
+        4827.509157214474,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 16,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 167.62869262696677
+    },
+    {
+      "t": 4.44,
+      "at": [
+        4829.9474347251125,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 16,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 146.29371643067088
+    },
+    {
+      "t": 4.457,
+      "at": [
+        4832.075379753207,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 16,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 127.6741409301519
+    },
+    {
+      "t": 4.474,
+      "at": [
+        4833.93251195748,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 16,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 111.42437744141989
+    },
+    {
+      "t": 4.49,
+      "at": [
+        4835.553264872191,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 16,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 97.24263763427223
+    },
+    {
+      "t": 4.507,
+      "at": [
+        4836.07510440531,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 17,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 31.309562058394267
+    },
+    {
+      "t": 4.524,
+      "at": [
+        4837.170711690166,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 17,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 65.69884782502913
+    },
+    {
+      "t": 4.54,
+      "at": [
+        4838.825310065299,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 17,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 99.27273537157213
+    },
+    {
+      "t": 4.557,
+      "at": [
+        4841.019434652274,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 17,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 131.64324592862482
+    },
+    {
+      "t": 4.574,
+      "at": [
+        4843.726467794747,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 17,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 162.41778705752205
+    },
+    {
+      "t": 4.59,
+      "at": [
+        4846.913609819217,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 17,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 191.22353207654848
+    },
+    {
+      "t": 4.607,
+      "at": [
+        4850.542200587088,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 17,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 217.71112811046564
+    },
+    {
+      "t": 4.624,
+      "at": [
+        4854.568197284527,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 17,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 241.55927631734016
+    },
+    {
+      "t": 4.64,
+      "at": [
+        4858.229243625168,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 17,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 219.66102600094928
+    },
+    {
+      "t": 4.657,
+      "at": [
+        4861.424392347022,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 17,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 191.70396423337115
+    },
+    {
+      "t": 4.674,
+      "at": [
+        4864.212892625417,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 17,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 167.30464172361917
+    },
+    {
+      "t": 4.69,
+      "at": [
+        4866.64640821967,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 17,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 146.0106506347588
+    },
+    {
+      "t": 4.707,
+      "at": [
+        4868.770202852073,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 17,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 127.42742919923239
+    },
+    {
+      "t": 4.724,
+      "at": [
+        4870.623706959523,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 17,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 111.20935821531839
+    },
+    {
+      "t": 4.74,
+      "at": [
+        4872.241308685393,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 17,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 97.05532836914062
+    },
+    {
+      "t": 4.757,
+      "at": [
+        4872.760869189673,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 18,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 31.17338127430427
+    },
+    {
+      "t": 4.774,
+      "at": [
+        4873.853084592979,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 18,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 65.53042343460967
+    },
+    {
+      "t": 4.79,
+      "at": [
+        4875.50464589404,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 18,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 99.092288592291
+    },
+    {
+      "t": 4.807,
+      "at": [
+        4877.695543470959,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 18,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 131.45280469866051
+    },
+    {
+      "t": 4.824,
+      "at": [
+        4880.3993074670425,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 18,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 162.22066437652322
+    },
+    {
+      "t": 4.84,
+      "at": [
+        4883.583067077272,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 18,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 191.021745297703
+    },
+    {
+      "t": 4.857,
+      "at": [
+        4887.20818814313,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 18,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 217.50683936681585
+    },
+    {
+      "t": 4.874,
+      "at": [
+        4891.230893967501,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 18,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 241.3560520162528
+    },
+    {
+      "t": 4.89,
+      "at": [
+        4894.89244563241,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 18,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 219.69134521484375
+    },
+    {
+      "t": 4.907,
+      "at": [
+        4898.088015805568,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 18,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 191.7304077148574
+    },
+    {
+      "t": 4.924,
+      "at": [
+        4900.876819887115,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 18,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 167.327880859375
+    },
+    {
+      "t": 4.94,
+      "at": [
+        4903.310698579333,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 18,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 146.03155517578125
+    },
+    {
+      "t": 4.957,
+      "at": [
+        4905.43479571782,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 18,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 127.44557952879666
+    },
+    {
+      "t": 4.974,
+      "at": [
+        4907.288574864616,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 18,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 111.22518920897755
+    },
+    {
+      "t": 4.99,
+      "at": [
+        4908.906425001113,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 18,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 97.06906127928323
+    },
+    {
+      "t": 5.007,
+      "at": [
+        4909.426153352926,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 19,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 31.183452045836404
+    },
+    {
+      "t": 5.024,
+      "at": [
+        4910.51853291052,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 19,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 65.54107801175775
+    },
+    {
+      "t": 5.04,
+      "at": [
+        4912.170286524224,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 19,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 99.10382718912344
+    },
+    {
+      "t": 5.057,
+      "at": [
+        4914.3613888607215,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 19,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 131.46509017522106
+    },
+    {
+      "t": 5.074,
+      "at": [
+        4917.065310032326,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 19,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 162.2329954664026
+    },
+    {
+      "t": 5.09,
+      "at": [
+        4920.249305333174,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 19,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 191.03473358533444
+    },
+    {
+      "t": 5.107,
+      "at": [
+        4923.874648029875,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 19,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 217.5201371914404
+    },
+    {
+      "t": 5.124,
+      "at": [
+        4927.897524658512,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 19,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 241.3692132408946
+    },
+    {
+      "t": 5.14,
+      "at": [
+        4931.559146374299,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 19,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 219.69161987304688
+    },
+    {
+      "t": 5.157,
+      "at": [
+        4934.754656052574,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 19,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 191.73016357419147
+    },
+    {
+      "t": 5.174,
+      "at": [
+        4937.543462816854,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 19,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 167.3280792236567
+    },
+    {
+      "t": 5.19,
+      "at": [
+        4939.977373937428,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 19,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 146.03173828125
+    },
+    {
+      "t": 5.207,
+      "at": [
+        4942.101469804346,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 19,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 127.44550323485475
+    },
+    {
+      "t": 5.224,
+      "at": [
+        4943.955281335869,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 19,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 111.22514343264106
+    },
+    {
+      "t": 5.24,
+      "at": [
+        4945.573106986257,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 19,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 97.06876373289651
+    },
+    {
+      "t": 5.257,
+      "at": [
+        4946.092831701373,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 20,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 31.183233845794
+    },
+    {
+      "t": 5.274,
+      "at": [
+        4947.185187736795,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 20,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 65.54044311771808
+    },
+    {
+      "t": 5.29,
+      "at": [
+        4948.836917587512,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 20,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 99.10299950513989
+    },
+    {
+      "t": 5.307,
+      "at": [
+        4951.027990079541,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 20,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 131.464092896978
+    },
+    {
+      "t": 5.324,
+      "at": [
+        4953.731876024018,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 20,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 162.23186091908266
+    },
+    {
+      "t": 5.34,
+      "at": [
+        4956.915853625227,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 20,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 191.03367163475124
+    },
+    {
+      "t": 5.357,
+      "at": [
+        4960.54118011318,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 20,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 217.51916466845324
+    },
+    {
+      "t": 5.374,
+      "at": [
+        4964.564122182256,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 20,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 241.36876971336284
+    },
+    {
+      "t": 5.39,
+      "at": [
+        4968.225687580185,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 20,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 219.69216918945312
+    },
+    {
+      "t": 5.407,
+      "at": [
+        4971.421270166234,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 20,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 191.73110961915427
+    },
+    {
+      "t": 5.424,
+      "at": [
+        4974.210116580067,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 20,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 167.32847595215526
+    },
+    {
+      "t": 5.44,
+      "at": [
+        4976.64402922655,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 20,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 146.03182983397073
+    },
+    {
+      "t": 5.457,
+      "at": [
+        4978.768152129871,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 20,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 127.44558715818266
+    },
+    {
+      "t": 5.474,
+      "at": [
+        4980.62195072668,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 20,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 111.22501373288799
+    },
+    {
+      "t": 5.49,
+      "at": [
+        4982.239785759045,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 20,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 97.06874084474362
+    },
+    {
+      "t": 5.507,
+      "at": [
+        4982.759513684832,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 21,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 31.183614675194885
+    },
+    {
+      "t": 5.524,
+      "at": [
+        4983.851855814005,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 21,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 65.54039981208709
+    },
+    {
+      "t": 5.54,
+      "at": [
+        4985.503571553875,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 21,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 99.10275093848145
+    },
+    {
+      "t": 5.557,
+      "at": [
+        4987.6946565101625,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 21,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 131.46404737094932
+    },
+    {
+      "t": 5.574,
+      "at": [
+        4990.398561107773,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 21,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 162.23200104071307
+    },
+    {
+      "t": 5.59,
+      "at": [
+        4993.5824965764605,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 21,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 191.03344945160126
+    },
+    {
+      "t": 5.607,
+      "at": [
+        4997.207868710012,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 21,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 217.51927795936817
+    },
+    {
+      "t": 5.624,
+      "at": [
+        5001.230705669291,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 21,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 241.36828974278643
+    },
+    {
+      "t": 5.64,
+      "at": [
+        5004.892325688792,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 21,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 219.69279479982515
+    },
+    {
+      "t": 5.657,
+      "at": [
+        5008.087912089614,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 21,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 191.73133850098338
+    },
+    {
+      "t": 5.674,
+      "at": [
+        5010.876761809564,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 21,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 167.32867431643353
+    },
+    {
+      "t": 5.69,
+      "at": [
+        5013.310677253548,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 21,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 146.03199768067088
+    },
+    {
+      "t": 5.707,
+      "at": [
+        5015.434802700037,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 21,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 127.44573974608011
+    },
+    {
+      "t": 5.724,
+      "at": [
+        5017.2886034585645,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 21,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 111.22514343263424
+    },
+    {
+      "t": 5.74,
+      "at": [
+        5018.906430507686,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 21,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 97.06884765625
+    },
+    {
+      "t": 5.757,
+      "at": [
+        5019.426145906108,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 22,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 31.182117273331524
+    },
+    {
+      "t": 5.81,
+      "at": [
+        5025.46817496119,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 22,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 140.92717167225175
+    },
+    {
+      "t": 5.827,
+      "at": [
+        5028.31634334735,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 22,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 170.88976958386775
+    },
+    {
+      "t": 5.844,
+      "at": [
+        5031.629388762286,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 22,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 198.78113722675914
+    },
+    {
+      "t": 5.86,
+      "at": [
+        5035.367135234544,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 22,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 224.2629971418768
+    },
+    {
+      "t": 5.877,
+      "at": [
+        5039.350744652877,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 22,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 239.01460266111576
+    },
+    {
+      "t": 5.894,
+      "at": [
+        5042.827344329922,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 22,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 208.5943145752226
+    },
+    {
+      "t": 5.91,
+      "at": [
+        5045.861481959978,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 22,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 182.04574584962302
+    },
+    {
+      "t": 5.927,
+      "at": [
+        5048.5094675035425,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 22,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 158.87594604490823
+    },
+    {
+      "t": 5.944,
+      "at": [
+        5050.820402352892,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 22,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 138.6549835205351
+    },
+    {
+      "t": 5.96,
+      "at": [
+        5052.837252231501,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 22,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 121.00783538816484
+    },
+    {
+      "t": 5.977,
+      "at": [
+        5054.597394828626,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 22,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 105.60643768310206
+    },
+    {
+      "t": 5.994,
+      "at": [
+        5056.133505565453,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 22,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 92.16535186768431
+    },
+    {
+      "t": 6.01,
+      "at": [
+        5056.593295803652,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 23,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 27.587033632955286
+    },
+    {
+      "t": 6.027,
+      "at": [
+        5057.620307795305,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 23,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 61.59434481502355
+    },
+    {
+      "t": 6.044,
+      "at": [
+        5059.200994554781,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 23,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 94.84044807575349
+    },
+    {
+      "t": 6.06,
+      "at": [
+        5061.316658677023,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 23,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 126.93732972992538
+    },
+    {
+      "t": 6.077,
+      "at": [
+        5063.941580702904,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 23,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 157.4949789115551
+    },
+    {
+      "t": 6.094,
+      "at": [
+        5067.044022219114,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 23,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 186.1439224702955
+    },
+    {
+      "t": 6.11,
+      "at": [
+        5070.586371230248,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 23,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 212.53667782778288
+    },
+    {
+      "t": 6.127,
+      "at": [
+        5074.52566905372,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 23,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 236.35312888235856
+    },
+    {
+      "t": 6.144,
+      "at": [
+        5078.192150365496,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 23,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 219.98579406735894
+    },
+    {
+      "t": 6.16,
+      "at": [
+        5081.392001683401,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 23,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 191.98722839357515
+    },
+    {
+      "t": 6.177,
+      "at": [
+        5084.184607033381,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 23,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 167.55198669436322
+    },
+    {
+      "t": 6.194,
+      "at": [
+        5086.621766560985,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 23,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 146.22663879392485
+    },
+    {
+      "t": 6.21,
+      "at": [
+        5088.748735769947,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 23,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 127.61559295653956
+    },
+    {
+      "t": 6.227,
+      "at": [
+        5090.605005304385,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 23,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 111.373291015625
+    },
+    {
+      "t": 6.244,
+      "at": [
+        5092.2250068461335,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 23,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 97.19814300538133
+    },
+    {
+      "t": 6.26,
+      "at": [
+        5092.746305902581,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 24,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 31.277316058897366
+    },
+    {
+      "t": 6.277,
+      "at": [
+        5093.840369821065,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 24,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 65.64370696908477
+    },
+    {
+      "t": 6.294,
+      "at": [
+        5095.493959948662,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 24,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 99.21461522649302
+    },
+    {
+      "t": 6.31,
+      "at": [
+        5097.687091181281,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 24,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 131.58367599230178
+    },
+    {
+      "t": 6.327,
+      "at": [
+        5100.39308133209,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 24,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 162.35713247802573
+    },
+    {
+      "t": 6.344,
+      "at": [
+        5103.579257308547,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 24,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 191.1632634390809
+    },
+    {
+      "t": 6.36,
+      "at": [
+        5107.206880519985,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 24,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 217.65176237997338
+    },
+    {
+      "t": 6.377,
+      "at": [
+        5111.231990967776,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 24,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 241.50178307514767
+    },
+    {
+      "t": 6.394,
+      "at": [
+        5114.893403267965,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 24,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 219.6829833984375
+    },
+    {
+      "t": 6.41,
+      "at": [
+        5118.088833052878,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 24,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 191.72309875485894
+    },
+    {
+      "t": 6.427,
+      "at": [
+        5120.8775661561685,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 24,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 167.32164001463138
+    },
+    {
+      "t": 6.444,
+      "at": [
+        5123.311379364215,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 24,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 146.02586364745412
+    },
+    {
+      "t": 6.46,
+      "at": [
+        5125.4354024729055,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 24,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 127.44036865234375
+    },
+    {
+      "t": 6.477,
+      "at": [
+        5127.289115207129,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 24,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 111.22055816651584
+    },
+    {
+      "t": 6.494,
+      "at": [
+        5128.906886914631,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "target": 24,
+      "label": "cross-yoke 3",
+      "mode": "<MovementMode.MOVE_WALKING: 1>",
+      "speed_cm_s": 97.06494140625
+    }
+  ],
+  "events": [
+    {
+      "kind": "waypoint",
+      "index": 1,
+      "label": "cross-yoke 3",
+      "at": [
+        4285.64613934581,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "expected_z": -1200
+    },
+    {
+      "kind": "waypoint",
+      "index": 2,
+      "label": "cross-yoke 3",
+      "at": [
+        4322.237775840554,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "expected_z": -1200
+    },
+    {
+      "kind": "waypoint",
+      "index": 3,
+      "label": "cross-yoke 3",
+      "at": [
+        4358.907062519071,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "expected_z": -1200
+    },
+    {
+      "kind": "waypoint",
+      "index": 4,
+      "label": "cross-yoke 3",
+      "at": [
+        4395.573157034547,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "expected_z": -1200
+    },
+    {
+      "kind": "waypoint",
+      "index": 5,
+      "label": "cross-yoke 3",
+      "at": [
+        4432.240143936786,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "expected_z": -1200
+    },
+    {
+      "kind": "waypoint",
+      "index": 6,
+      "label": "cross-yoke 3",
+      "at": [
+        4468.906515377429,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "expected_z": -1200
+    },
+    {
+      "kind": "waypoint",
+      "index": 7,
+      "label": "cross-yoke 3",
+      "at": [
+        4505.573147185144,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "expected_z": -1200
+    },
+    {
+      "kind": "waypoint",
+      "index": 8,
+      "label": "cross-yoke 3",
+      "at": [
+        4542.591331538925,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "expected_z": -1200
+    },
+    {
+      "kind": "waypoint",
+      "index": 9,
+      "label": "cross-yoke 3",
+      "at": [
+        4578.8967039005565,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "expected_z": -1200
+    },
+    {
+      "kind": "waypoint",
+      "index": 10,
+      "label": "cross-yoke 3",
+      "at": [
+        4615.573403626576,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "expected_z": -1200
+    },
+    {
+      "kind": "waypoint",
+      "index": 11,
+      "label": "cross-yoke 3",
+      "at": [
+        4652.239745348779,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "expected_z": -1200
+    },
+    {
+      "kind": "waypoint",
+      "index": 12,
+      "label": "cross-yoke 3",
+      "at": [
+        4688.907426924685,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "expected_z": -1200
+    },
+    {
+      "kind": "waypoint",
+      "index": 13,
+      "label": "cross-yoke 3",
+      "at": [
+        4725.573080260104,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "expected_z": -1200
+    },
+    {
+      "kind": "waypoint",
+      "index": 14,
+      "label": "cross-yoke 3",
+      "at": [
+        4762.239803364634,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "expected_z": -1200
+    },
+    {
+      "kind": "waypoint",
+      "index": 15,
+      "label": "cross-yoke 3",
+      "at": [
+        4799.343593670089,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "expected_z": -1200
+    },
+    {
+      "kind": "waypoint",
+      "index": 16,
+      "label": "cross-yoke 3",
+      "at": [
+        4835.553264872191,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "expected_z": -1200
+    },
+    {
+      "kind": "waypoint",
+      "index": 17,
+      "label": "cross-yoke 3",
+      "at": [
+        4872.241308685393,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "expected_z": -1200
+    },
+    {
+      "kind": "waypoint",
+      "index": 18,
+      "label": "cross-yoke 3",
+      "at": [
+        4908.906425001113,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "expected_z": -1200
+    },
+    {
+      "kind": "waypoint",
+      "index": 19,
+      "label": "cross-yoke 3",
+      "at": [
+        4945.573106986257,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "expected_z": -1200
+    },
+    {
+      "kind": "waypoint",
+      "index": 20,
+      "label": "cross-yoke 3",
+      "at": [
+        4982.239785759045,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "expected_z": -1200
+    },
+    {
+      "kind": "waypoint",
+      "index": 21,
+      "label": "cross-yoke 3",
+      "at": [
+        5018.906430507686,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "expected_z": -1200
+    },
+    {
+      "kind": "waypoint",
+      "index": 22,
+      "label": "cross-yoke 3",
+      "at": [
+        5056.133505565453,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "expected_z": -1200
+    },
+    {
+      "kind": "waypoint",
+      "index": 23,
+      "label": "cross-yoke 3",
+      "at": [
+        5092.2250068461335,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "expected_z": -1200
+    },
+    {
+      "kind": "waypoint",
+      "index": 24,
+      "label": "cross-yoke 3",
+      "at": [
+        5128.906886914631,
+        0.0,
+        -1122.8499975204468
+      ],
+      "feet_z": -1197.8499975204468,
+      "expected_z": -1200
+    }
+  ],
+  "elapsed": 6.493710000067949,
+  "stalled": 0,
+  "settle": -0.007752999663352966,
+  "capsule_radius_cm": 39,
+  "capsule_half_height_cm": 75,
+  "max_step_height_cm": 45.0,
+  "max_walk_speed_cm": 420.0,
+  "teleports_during_route": 0,
+  "folder": "D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\PIE\\final-chef\\BW_Y3_down"
+}

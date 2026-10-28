@@ -1,0 +1,7 @@
+00:02.875  blend            | Read blend: "D:\Repositories\CkRepos\Orion\Tools\SpireConnectorKit\Output\Blender\Spire_Diorama.blend"
+00:10.688  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\SpireConnectorKit\Output\Renders\BW_Overview.png'
+Extensions: writing cache failed ([Errno 13] Permission denied: 'C:\\Users\\Adam\\AppData\\Roaming\\Blender Foundation\\Blender\\5.2\\extensions\\.cache\\compat.dat').
+SPIRE_RENDER_COMPLETE D:\Repositories\CkRepos\Orion\Tools\SpireConnectorKit\Output\Renders\BW_Overview.png
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+
+Blender quit

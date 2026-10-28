@@ -1,0 +1,7 @@
+{
+  "map": "/Game/Mars/Environment/SpireConnectorKit/Maps/Spire_PIEAcceptance_R02_Mars_MAP",
+  "visual_level_instances": 4,
+  "collision_instances": 366,
+  "approach_pads": 8,
+  "mode": "/Script/Angelscript.Mars_Gameplay_GameMode"
+}

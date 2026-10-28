@@ -1,0 +1,5 @@
+Extensions: writing cache failed ([Errno 13] Permission denied: 'C:\\Users\\Adam\\AppData\\Roaming\\Blender Foundation\\Blender\\5.2\\extensions\\.cache\\compat.dat').
+SPIRE_DELIVERY_VALIDATED 6 105 {'Total': 40, 'Passed': 40, 'Failed': 0, 'Skipped': 0, 'Contaminated': 0}
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+
+Blender quit

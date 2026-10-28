@@ -1,0 +1,28 @@
+{
+  "name": "Spire_AxisGauge_Mars_SM",
+  "bounds_min_cm": [
+    -50.0,
+    -50.0,
+    -50.0
+  ],
+  "bounds_max_cm": [
+    160.0000023841858,
+    209.99999046325684,
+    259.99999046325684
+  ],
+  "dimensions_cm": [
+    210.0000023841858,
+    259.99999046325684,
+    309.99999046325684
+  ],
+  "vertices": 32,
+  "triangles": 48,
+  "material_keys": [
+    "M01",
+    "M06",
+    "M07",
+    "M04"
+  ],
+  "id": "AxisGauge",
+  "fbx": "FBX/Spire_AxisGauge_Mars_SM.fbx"
+}

@@ -1,0 +1,37 @@
+[
+  {
+    "path": "Content\\Mars\\Maps\\Spire\\LI_Spire_BraidedWell_Mars_MAP.umap",
+    "unchanged": false,
+    "sha256": "85cde6cc7d4d1cfd0e56443f073bc51f05f3cf3abe09671a7d074d72cd77edcb"
+  },
+  {
+    "path": "Content\\Mars\\Maps\\Spire\\LI_Spire_HangingLarder_Mars_MAP.umap",
+    "unchanged": false,
+    "sha256": "cf3cce66adedd706f56ae24bc0585f5d96eafe2f25addf540990f8104ff1a5f6"
+  },
+  {
+    "path": "Content\\Mars\\Maps\\Spire\\LI_Spire_Hearthscrew_Mars_MAP.umap",
+    "unchanged": false,
+    "sha256": "6c4baba07e5e7fa38c2ae5c556ab4a5afaa08d5afca9b0d0d180540cd273c015"
+  },
+  {
+    "path": "Content\\Mars\\Maps\\Spire\\LI_Spire_Rootwinder_Mars_MAP.umap",
+    "unchanged": false,
+    "sha256": "2f0add02c0ba690e6d852b6f2ff0c736113bb318ab1133c36aef13cd278f4c78"
+  },
+  {
+    "path": "Content\\Mars\\Maps\\Camp_Mars_MAP.umap",
+    "unchanged": true,
+    "sha256": "73860d63dbd23059fa3b428881fc13116c5ac4048808a6f9fee5da502c0fa6a9"
+  },
+  {
+    "path": "Content\\Mars\\Maps\\Warrens_VariantC_Mars_MAP.umap",
+    "unchanged": true,
+    "sha256": "2d4e7e514ae63403b3ab7fc6a71acb7f076a686efa289124d56b77869a35f959"
+  },
+  {
+    "path": "Tools\\SpireConnectorKit\\Output\\asset_manifest.json",
+    "unchanged": false,
+    "sha256": "9786025660356a49a80b14a3a29af1536cd28c7083c45f9ddd061bd49a73db56"
+  }
+]

@@ -1,0 +1,7 @@
+{
+  "status": "passed",
+  "headroom_rays": 1167,
+  "height_cm": 220,
+  "errors": [],
+  "scope": "Upward rays at three radial stations per tread/landing on complete saved visual meshes. Does not establish capsule sweeps, continuous traversal or PIE."
+}

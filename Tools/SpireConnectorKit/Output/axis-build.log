@@ -1,0 +1,10 @@
+Extensions: writing cache failed ([Errno 13] Permission denied: 'C:\\Users\\Adam\\AppData\\Roaming\\Blender Foundation\\Blender\\5.2\\extensions\\.cache\\compat.dat').
+Extensions: writing cache failed ([Errno 13] Permission denied: 'C:\\Users\\Adam\\AppData\\Roaming\\Blender Foundation\\Blender\\5.2\\extensions\\.cache\\compat.dat').
+addon_utils.disable: bl_ext.lab_blender_org.mcp not enabled
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\FBX\\Spire_AxisGauge_Mars_SM.fbx'
+export finished in 0.0103 sec.
+SPIRE_AXIS_FIXTURE_EXPORTED {"name": "Spire_AxisGauge_Mars_SM", "bounds_min_cm": [-50.0, -50.0, -50.0], "bounds_max_cm": [160.0000023841858, 209.99999046325684, 259.99999046325684], "dimensions_cm": [210.0000023841858, 259.99999046325684, 309.99999046325684], "vertices": 32, "triangles": 48, "material_keys": ["M01", "M06", "M07", "M04"], "id": "AxisGauge", "fbx": "FBX/Spire_AxisGauge_Mars_SM.fbx"}
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+
+Blender quit

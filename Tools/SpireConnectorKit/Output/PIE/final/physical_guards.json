@@ -1,0 +1,314 @@
+{
+  "status": "passed",
+  "index": 16,
+  "jobs": [
+    {
+      "cid": "HS",
+      "flight": "HS-A-F01",
+      "angle": 255.0,
+      "floor": -100.0,
+      "side": "inner"
+    },
+    {
+      "cid": "HS",
+      "flight": "HS-A-F01",
+      "angle": 255.0,
+      "floor": -100.0,
+      "side": "outer"
+    },
+    {
+      "cid": "HS",
+      "flight": "HS-A-F06",
+      "angle": 1005.0,
+      "floor": -1100.0,
+      "side": "inner"
+    },
+    {
+      "cid": "HS",
+      "flight": "HS-A-F06",
+      "angle": 1005.0,
+      "floor": -1100.0,
+      "side": "outer"
+    },
+    {
+      "cid": "BW",
+      "flight": "BW-A-F01",
+      "angle": 270.0,
+      "floor": -200.0,
+      "side": "inner"
+    },
+    {
+      "cid": "BW",
+      "flight": "BW-A-F01",
+      "angle": 270.0,
+      "floor": -200.0,
+      "side": "outer"
+    },
+    {
+      "cid": "BW",
+      "flight": "BW-A-F03",
+      "angle": 630.0,
+      "floor": -1000.0,
+      "side": "inner"
+    },
+    {
+      "cid": "BW",
+      "flight": "BW-A-F03",
+      "angle": 630.0,
+      "floor": -1000.0,
+      "side": "outer"
+    },
+    {
+      "cid": "RW",
+      "flight": "RW-A-F01",
+      "angle": 255.0,
+      "floor": -100.0,
+      "side": "inner"
+    },
+    {
+      "cid": "RW",
+      "flight": "RW-A-F01",
+      "angle": 255.0,
+      "floor": -100.0,
+      "side": "outer"
+    },
+    {
+      "cid": "RW",
+      "flight": "RW-A-F06",
+      "angle": 1005.0,
+      "floor": -1100.0,
+      "side": "inner"
+    },
+    {
+      "cid": "RW",
+      "flight": "RW-A-F06",
+      "angle": 1005.0,
+      "floor": -1100.0,
+      "side": "outer"
+    },
+    {
+      "cid": "HL",
+      "flight": "HL-A-F01",
+      "angle": 255.0,
+      "floor": -100.0,
+      "side": "inner"
+    },
+    {
+      "cid": "HL",
+      "flight": "HL-A-F01",
+      "angle": 255.0,
+      "floor": -100.0,
+      "side": "outer"
+    },
+    {
+      "cid": "HL",
+      "flight": "HL-A-F06",
+      "angle": 1005.0,
+      "floor": -1100.0,
+      "side": "inner"
+    },
+    {
+      "cid": "HL",
+      "flight": "HL-A-F06",
+      "angle": 1005.0,
+      "floor": -1100.0,
+      "side": "outer"
+    }
+  ],
+  "results": [
+    {
+      "cid": "HS",
+      "flight": "HS-A-F01",
+      "angle": 255.0,
+      "floor": -100.0,
+      "side": "inner",
+      "status": "passed",
+      "radius_cm": 249.0692908730315,
+      "boundary_cm": 249,
+      "feet_z": -97.84997755626136,
+      "mode": "<MovementMode.MOVE_WALKING: 1>"
+    },
+    {
+      "cid": "HS",
+      "flight": "HS-A-F01",
+      "angle": 255.0,
+      "floor": -100.0,
+      "side": "outer",
+      "status": "passed",
+      "radius_cm": 430.8271283923411,
+      "boundary_cm": 431,
+      "feet_z": -97.8499737415641,
+      "mode": "<MovementMode.MOVE_WALKING: 1>"
+    },
+    {
+      "cid": "HS",
+      "flight": "HS-A-F06",
+      "angle": 1005.0,
+      "floor": -1100.0,
+      "side": "inner",
+      "status": "passed",
+      "radius_cm": 249.06930506768023,
+      "boundary_cm": 249,
+      "feet_z": -1097.8499919686644,
+      "mode": "<MovementMode.MOVE_WALKING: 1>"
+    },
+    {
+      "cid": "HS",
+      "flight": "HS-A-F06",
+      "angle": 1005.0,
+      "floor": -1100.0,
+      "side": "outer",
+      "status": "passed",
+      "radius_cm": 430.8271811787627,
+      "boundary_cm": 431,
+      "feet_z": -1097.8499923978177,
+      "mode": "<MovementMode.MOVE_WALKING: 1>"
+    },
+    {
+      "cid": "BW",
+      "flight": "BW-A-F01",
+      "angle": 270.0,
+      "floor": -200.0,
+      "side": "inner",
+      "status": "passed",
+      "radius_cm": 349.1036692424476,
+      "boundary_cm": 349,
+      "feet_z": -197.85000209558302,
+      "mode": "<MovementMode.MOVE_WALKING: 1>"
+    },
+    {
+      "cid": "BW",
+      "flight": "BW-A-F01",
+      "angle": 270.0,
+      "floor": -200.0,
+      "side": "outer",
+      "status": "passed",
+      "radius_cm": 530.9000516941276,
+      "boundary_cm": 531,
+      "feet_z": -197.8499999199239,
+      "mode": "<MovementMode.MOVE_WALKING: 1>"
+    },
+    {
+      "cid": "BW",
+      "flight": "BW-A-F03",
+      "angle": 630.0,
+      "floor": -1000.0,
+      "side": "inner",
+      "status": "passed",
+      "radius_cm": 349.1035747767604,
+      "boundary_cm": 349,
+      "feet_z": -997.8499954566131,
+      "mode": "<MovementMode.MOVE_WALKING: 1>"
+    },
+    {
+      "cid": "BW",
+      "flight": "BW-A-F03",
+      "angle": 630.0,
+      "floor": -1000.0,
+      "side": "outer",
+      "status": "passed",
+      "radius_cm": 530.9000504989217,
+      "boundary_cm": 531,
+      "feet_z": -997.8500058565464,
+      "mode": "<MovementMode.MOVE_WALKING: 1>"
+    },
+    {
+      "cid": "RW",
+      "flight": "RW-A-F01",
+      "angle": 255.0,
+      "floor": -100.0,
+      "side": "inner",
+      "status": "passed",
+      "radius_cm": 249.06928943794622,
+      "boundary_cm": 249,
+      "feet_z": -97.84997924903337,
+      "mode": "<MovementMode.MOVE_WALKING: 1>"
+    },
+    {
+      "cid": "RW",
+      "flight": "RW-A-F01",
+      "angle": 255.0,
+      "floor": -100.0,
+      "side": "outer",
+      "status": "passed",
+      "radius_cm": 430.8271346582687,
+      "boundary_cm": 431,
+      "feet_z": -97.84997161963884,
+      "mode": "<MovementMode.MOVE_WALKING: 1>"
+    },
+    {
+      "cid": "RW",
+      "flight": "RW-A-F06",
+      "angle": 1005.0,
+      "floor": -1100.0,
+      "side": "inner",
+      "status": "passed",
+      "radius_cm": 249.0693097678956,
+      "boundary_cm": 249,
+      "feet_z": -1097.8499894295064,
+      "mode": "<MovementMode.MOVE_WALKING: 1>"
+    },
+    {
+      "cid": "RW",
+      "flight": "RW-A-F06",
+      "angle": 1005.0,
+      "floor": -1100.0,
+      "side": "outer",
+      "status": "passed",
+      "radius_cm": 430.8271656772045,
+      "boundary_cm": 431,
+      "feet_z": -1097.8499923978177,
+      "mode": "<MovementMode.MOVE_WALKING: 1>"
+    },
+    {
+      "cid": "HL",
+      "flight": "HL-A-F01",
+      "angle": 255.0,
+      "floor": -100.0,
+      "side": "inner",
+      "status": "passed",
+      "radius_cm": 249.06928491653133,
+      "boundary_cm": 249,
+      "feet_z": -97.84998264649789,
+      "mode": "<MovementMode.MOVE_WALKING: 1>"
+    },
+    {
+      "cid": "HL",
+      "flight": "HL-A-F01",
+      "angle": 255.0,
+      "floor": -100.0,
+      "side": "outer",
+      "status": "passed",
+      "radius_cm": 430.82715593227135,
+      "boundary_cm": 431,
+      "feet_z": -97.84999451974295,
+      "mode": "<MovementMode.MOVE_WALKING: 1>"
+    },
+    {
+      "cid": "HL",
+      "flight": "HL-A-F06",
+      "angle": 1005.0,
+      "floor": -1100.0,
+      "side": "inner",
+      "status": "passed",
+      "radius_cm": 249.06930505119618,
+      "boundary_cm": 249,
+      "feet_z": -1097.8499919686644,
+      "mode": "<MovementMode.MOVE_WALKING: 1>"
+    },
+    {
+      "cid": "HL",
+      "flight": "HL-A-F06",
+      "angle": 1005.0,
+      "floor": -1100.0,
+      "side": "outer",
+      "status": "passed",
+      "radius_cm": 430.8271658851664,
+      "boundary_cm": 431,
+      "feet_z": -1097.8499890003532,
+      "mode": "<MovementMode.MOVE_WALKING: 1>"
+    }
+  ],
+  "phase": "setup",
+  "seconds": 1.5012535005807877
+}

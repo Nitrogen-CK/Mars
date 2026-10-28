@@ -1,0 +1,15 @@
+{
+  "status": "passed",
+  "asset": "/Game/Mars/Environment/SpireConnectorKit/Meshes/Spire_AxisGauge_Mars_SM.Spire_AxisGauge_Mars_SM",
+  "bounds_min_cm": [
+    -50.000003814697266,
+    -50.000003814697266,
+    -50.0
+  ],
+  "bounds_max_cm": [
+    160.0,
+    209.99998474121094,
+    260.0
+  ],
+  "identity_import_scale": true
+}

@@ -1,0 +1,52 @@
+[
+  {
+    "case": "HS_A_down",
+    "max_waypoint_height_error_cm": 16.808432420094846,
+    "movement_modes": "<MovementMode.MOVE_WALKING: 1>"
+  },
+  {
+    "case": "HS_A_up",
+    "max_waypoint_height_error_cm": 2.1500040656846977,
+    "movement_modes": "<MovementMode.MOVE_WALKING: 1>"
+  },
+  {
+    "case": "BW_A_down",
+    "max_waypoint_height_error_cm": 17.884290541856387,
+    "movement_modes": "<MovementMode.MOVE_WALKING: 1>"
+  },
+  {
+    "case": "BW_A_up",
+    "max_waypoint_height_error_cm": 3.571398939805249,
+    "movement_modes": "<MovementMode.MOVE_WALKING: 1>"
+  },
+  {
+    "case": "BW_B_down",
+    "max_waypoint_height_error_cm": 17.88121763865155,
+    "movement_modes": "<MovementMode.MOVE_WALKING: 1>"
+  },
+  {
+    "case": "BW_B_up",
+    "max_waypoint_height_error_cm": 17.579076042731458,
+    "movement_modes": "<MovementMode.MOVE_WALKING: 1>"
+  },
+  {
+    "case": "RW_A_down",
+    "max_waypoint_height_error_cm": 16.822697321573855,
+    "movement_modes": "<MovementMode.MOVE_WALKING: 1>"
+  },
+  {
+    "case": "RW_A_up",
+    "max_waypoint_height_error_cm": 2.150016510609703,
+    "movement_modes": "<MovementMode.MOVE_WALKING: 1>"
+  },
+  {
+    "case": "HL_A_down",
+    "max_waypoint_height_error_cm": 16.831550757090326,
+    "movement_modes": "<MovementMode.MOVE_WALKING: 1>"
+  },
+  {
+    "case": "HL_A_up",
+    "max_waypoint_height_error_cm": 16.611447701195402,
+    "movement_modes": "<MovementMode.MOVE_WALKING: 1>"
+  }
+]

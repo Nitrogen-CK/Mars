@@ -1,0 +1,20 @@
+00:02.735  blend            | Read blend: "D:\Repositories\CkRepos\Orion\Tools\SpireConnectorKit\Output\Blender\Spire_Diorama.blend"
+00:03.156  image.write      | ERROR OpenImageIO write failed: Could not open file "C:\Users\Adam\.thumbnails\large\blender_41536_291db2511865987ac737c9f75b00acec.png.png"
+00:03.219  image.write      | ERROR OpenImageIO write failed: Could not open file "C:\Users\Adam\.thumbnails\large\blender_41536_492899886c53baef37a29186391fc1d4.png.png"
+00:03.281  image.write      | ERROR OpenImageIO write failed: Could not open file "C:\Users\Adam\.thumbnails\large\blender_41536_deb124334a50ddcacd48f022b97b6fb5.png.png"
+00:03.438  image.write      | ERROR OpenImageIO write failed: Could not open file "C:\Users\Adam\.thumbnails\large\blender_41536_f0952c0108f25f407e0d9804a035b84d.png.png"
+00:03.531  image.write      | ERROR OpenImageIO write failed: Could not open file "C:\Users\Adam\.thumbnails\large\blender_41536_2ec8d11a2891ad98d9ff38d3240af599.png.png"
+00:03.578  image.write      | ERROR OpenImageIO write failed: Could not open file "C:\Users\Adam\.thumbnails\large\blender_41536_5b451c146ccc98fb91afaf992de15ae5.png.png"
+Extensions: writing cache failed ([Errno 13] Permission denied: 'C:\\Users\\Adam\\AppData\\Roaming\\Blender Foundation\\Blender\\5.2\\extensions\\.cache\\compat.dat').
+Info: Saved copy as "Spire_HS.blend"
+Info: Saved copy as "Spire_BW.blend"
+Info: Saved copy as "Spire_RW.blend"
+Info: Saved copy as "Spire_HL.blend"
+Info: Saved copy as "Spire_KitLibrary.blend"
+Info: Saved copy as "Spire_Diorama.blend"
+SPIRE_LIBRARY_METADATA_REFRESHED
+00:03.625  image.write      | ERROR OpenImageIO write failed: Could not open file "C:\Users\Adam\.thumbnails\large\blender_41536_0b9af14b02a2237ef35e3b6fa1a1701b.png.png"
+Info: Saved copy as "Spire_Assets.blend"
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+
+Blender quit

@@ -1,0 +1,599 @@
+{
+  "status": "validated_in_single_player_PIE",
+  "utc": "2026-10-28T00:11:59.025798+00:00",
+  "assets": 105,
+  "props": 20,
+  "collision_meshes": 29,
+  "materials": 11,
+  "maps": [
+    {
+      "key": "HS",
+      "asset": "/Game/Mars/Maps/Spire/LI_Spire_Hearthscrew_Mars_MAP",
+      "sha256": "6c4baba07e5e7fa38c2ae5c556ab4a5afaa08d5afca9b0d0d180540cd273c015",
+      "instances": 163,
+      "groups": 34,
+      "transforms_checked": 163
+    },
+    {
+      "key": "BW",
+      "asset": "/Game/Mars/Maps/Spire/LI_Spire_BraidedWell_Mars_MAP",
+      "sha256": "85cde6cc7d4d1cfd0e56443f073bc51f05f3cf3abe09671a7d074d72cd77edcb",
+      "instances": 166,
+      "groups": 24,
+      "transforms_checked": 166
+    },
+    {
+      "key": "RW",
+      "asset": "/Game/Mars/Maps/Spire/LI_Spire_Rootwinder_Mars_MAP",
+      "sha256": "2f0add02c0ba690e6d852b6f2ff0c736113bb318ab1133c36aef13cd278f4c78",
+      "instances": 156,
+      "groups": 34,
+      "transforms_checked": 156
+    },
+    {
+      "key": "HL",
+      "asset": "/Game/Mars/Maps/Spire/LI_Spire_HangingLarder_Mars_MAP",
+      "sha256": "cf3cce66adedd706f56ae24bc0585f5d96eafe2f25addf540990f8104ff1a5f6",
+      "instances": 1874,
+      "groups": 38,
+      "transforms_checked": 1874
+    },
+    {
+      "key": "KitLibrary",
+      "asset": "/Game/Mars/Environment/SpireConnectorKit/Maps/Spire_KitLibrary_Mars_MAP",
+      "sha256": "01fedefc8c6a7417b4fed94cb4a6b7049d8c3b8f1bc62b4954a556316ad660d8",
+      "instances": 105,
+      "groups": 105,
+      "transforms_checked": 0
+    },
+    {
+      "key": "Diorama",
+      "asset": "/Game/Mars/Environment/SpireConnectorKit/Maps/Spire_Diorama_Mars_MAP",
+      "sha256": "ba82865ec1e237842778ecfe9d49155ef0f4654a8ff07e5c3eef91896b018e5b",
+      "instances": 2219,
+      "groups": 71,
+      "transforms_checked": 0
+    }
+  ],
+  "blends": [
+    {
+      "file": "Blender\\Spire_HS.blend",
+      "sha256": "9cf0e631efafb71bc3ddcd383dd128fb76e02aa87612efdfb954a41924f8249a"
+    },
+    {
+      "file": "Blender\\Spire_BW.blend",
+      "sha256": "3ce03c5c320831b264ebce62df77d750dd9fa969fe6bc0a30e18530b63b72f93"
+    },
+    {
+      "file": "Blender\\Spire_RW.blend",
+      "sha256": "c5897bb2c7432c9b7e4f5a0ceb9268fc8794bd269cf6f28ea4e0ee40fec00599"
+    },
+    {
+      "file": "Blender\\Spire_HL.blend",
+      "sha256": "294dae5a30b01db6f17bc2ca4b5c708c821892ee7b3645f1f0bcb2b7d30e17a2"
+    },
+    {
+      "file": "Blender\\Spire_KitLibrary.blend",
+      "sha256": "c6272899deed863efc32b8671375f46812d967553550b636d911220f55f75c48"
+    },
+    {
+      "file": "Blender\\Spire_Diorama.blend",
+      "sha256": "bb31311ce8bba48d8aec6687b386c4bbf1287dc13777cd743802e756a5cbb9ec"
+    },
+    {
+      "file": "AssetLibrary\\Spire_Assets.blend",
+      "sha256": "73cb7b67c5d4b11a01852212af5710463e79d8fda06d1823891c12ab80a28560"
+    }
+  ],
+  "reports": {
+    "blender_validation": {
+      "status": "passed",
+      "assets": 105,
+      "marked_asset_browser_objects": 105,
+      "surface_rays": 405,
+      "errors": [],
+      "scenes": {
+        "HS": {
+          "mesh_instances": 163,
+          "unique_meshes": 32
+        },
+        "BW": {
+          "mesh_instances": 166,
+          "unique_meshes": 22
+        },
+        "RW": {
+          "mesh_instances": 156,
+          "unique_meshes": 32
+        },
+        "HL": {
+          "mesh_instances": 1874,
+          "unique_meshes": 36
+        }
+      },
+      "scope": "fresh reopened Blender meshes, not Unreal physics or packaged collision"
+    },
+    "blender_clearance": {
+      "status": "passed",
+      "headroom_rays": 1167,
+      "height_cm": 220,
+      "errors": [],
+      "scope": "Upward rays at three radial stations per tread/landing on complete saved visual meshes. Does not establish capsule sweeps, continuous traversal or PIE."
+    },
+    "unreal_mesh_validation": {
+      "status": "passed",
+      "assets": 105,
+      "convex_hulls": 516,
+      "errors": []
+    },
+    "unreal_collision_validation": {
+      "status": "passed",
+      "simple_collision_rays": 389,
+      "errors": [],
+      "scope": "Native editor Chaos simple-collision queries against stable Diorama HISM proxies. Not CkJolt packaged lookup or pawn traversal."
+    }
+  },
+  "pie": {
+    "status": "passed",
+    "cases": 27,
+    "chef_cases": 18,
+    "gauge_cases": 9,
+    "physical_guard_contacts": 16,
+    "stair_waypoints": 1080,
+    "frame_samples": 39700,
+    "movement_modes": {
+      "<MovementMode.MOVE_WALKING: 1>": 39700
+    },
+    "safety_sweeps": {
+      "rails": 741,
+      "doors": 24,
+      "ceilings": 4,
+      "baseline_failed": 4,
+      "final_failed": 0
+    },
+    "fix": "Added shared persistent roof collision proxies to all four assemblies",
+    "case_reports": [
+      {
+        "concept": "HS",
+        "route": "A",
+        "direction": "down",
+        "gauge": false,
+        "status": "passed",
+        "game_seconds": 42.30783310905099,
+        "waypoints": 166,
+        "stair_waypoints": 72,
+        "frame_samples": 2436,
+        "max_waypoint_height_error_cm": 16.848713397979736,
+        "report": "Tools\\SpireConnectorKit\\Output\\PIE\\final-chef\\HS_A_down\\run.json",
+        "sha256": "080019f3ec6ec73727cf35d995e438b86af63f75b11c8328318dfc758656b33e",
+        "screenshots": 14
+      },
+      {
+        "concept": "HS",
+        "route": "A",
+        "direction": "up",
+        "gauge": false,
+        "status": "passed",
+        "game_seconds": 41.87914449721575,
+        "waypoints": 166,
+        "stair_waypoints": 72,
+        "frame_samples": 2437,
+        "max_waypoint_height_error_cm": 2.1500038498259073,
+        "report": "Tools\\SpireConnectorKit\\Output\\PIE\\final-chef\\HS_A_up\\run.json",
+        "sha256": "e3af0479291786c3b2b6489c787be28954ddd74176412698dc056f50dfff0090",
+        "screenshots": 13
+      },
+      {
+        "concept": "BW",
+        "route": "A",
+        "direction": "down",
+        "gauge": false,
+        "status": "passed",
+        "game_seconds": 33.13200959935784,
+        "waypoints": 124,
+        "stair_waypoints": 72,
+        "frame_samples": 1930,
+        "max_waypoint_height_error_cm": 17.884752432505366,
+        "report": "Tools\\SpireConnectorKit\\Output\\PIE\\final-chef\\BW_A_down\\run.json",
+        "sha256": "263bc909c106ae22a0a32a395b992d544306772b7b87d76d44ad9a2e6bae98a1",
+        "screenshots": 8
+      },
+      {
+        "concept": "BW",
+        "route": "A",
+        "direction": "up",
+        "gauge": false,
+        "status": "passed",
+        "game_seconds": 33.16509240120649,
+        "waypoints": 124,
+        "stair_waypoints": 72,
+        "frame_samples": 1934,
+        "max_waypoint_height_error_cm": 3.9079630124832647,
+        "report": "Tools\\SpireConnectorKit\\Output\\PIE\\final-chef\\BW_A_up\\run.json",
+        "sha256": "e3d4e5f198b2982461e7f5200caf1aec8e283e3559e33f915a3e329fb3dd3821",
+        "screenshots": 7
+      },
+      {
+        "concept": "BW",
+        "route": "B",
+        "direction": "down",
+        "gauge": false,
+        "status": "passed",
+        "game_seconds": 44.242269698530436,
+        "waypoints": 170,
+        "stair_waypoints": 72,
+        "frame_samples": 2575,
+        "max_waypoint_height_error_cm": 17.88106807072961,
+        "report": "Tools\\SpireConnectorKit\\Output\\PIE\\final-chef\\BW_B_down\\run.json",
+        "sha256": "d7126ad85bb03b1868da120f23b05caa86f9e3f013cb57df823a711f7cffebb0",
+        "screenshots": 14
+      },
+      {
+        "concept": "BW",
+        "route": "B",
+        "direction": "up",
+        "gauge": false,
+        "status": "passed",
+        "game_seconds": 44.2230728007853,
+        "waypoints": 170,
+        "stair_waypoints": 72,
+        "frame_samples": 2574,
+        "max_waypoint_height_error_cm": 4.5722763738531285,
+        "report": "Tools\\SpireConnectorKit\\Output\\PIE\\final-chef\\BW_B_up\\run.json",
+        "sha256": "4d6c38770e2c099dc88237c6655cfcaf8fc3b1dc48a732aafa1aef5b5a6c4ba1",
+        "screenshots": 15
+      },
+      {
+        "concept": "RW",
+        "route": "A",
+        "direction": "down",
+        "gauge": false,
+        "status": "passed",
+        "game_seconds": 41.96959479898214,
+        "waypoints": 166,
+        "stair_waypoints": 72,
+        "frame_samples": 2435,
+        "max_waypoint_height_error_cm": 16.842670917510986,
+        "report": "Tools\\SpireConnectorKit\\Output\\PIE\\final-chef\\RW_A_down\\run.json",
+        "sha256": "59d5037e1a51f1aa508fd89fbf57aa379fc89e379193f716bc366f9f844721f7",
+        "screenshots": 14
+      },
+      {
+        "concept": "RW",
+        "route": "A",
+        "direction": "up",
+        "gauge": false,
+        "status": "passed",
+        "game_seconds": 41.99500119686127,
+        "waypoints": 166,
+        "stair_waypoints": 72,
+        "frame_samples": 2442,
+        "max_waypoint_height_error_cm": 2.150008086697504,
+        "report": "Tools\\SpireConnectorKit\\Output\\PIE\\final-chef\\RW_A_up\\run.json",
+        "sha256": "d2d3ea567126840992f2e3bffda98532d88705c7674f3376632ebbe146b4c661",
+        "screenshots": 13
+      },
+      {
+        "concept": "HL",
+        "route": "A",
+        "direction": "down",
+        "gauge": false,
+        "status": "passed",
+        "game_seconds": 41.943943198770285,
+        "waypoints": 166,
+        "stair_waypoints": 72,
+        "frame_samples": 2437,
+        "max_waypoint_height_error_cm": 16.85039409001672,
+        "report": "Tools\\SpireConnectorKit\\Output\\PIE\\final-chef\\HL_A_down\\run.json",
+        "sha256": "e2976027de88571ba1c60a9ecc9a063fb901c595aace43d91cb4c58ceaee8725",
+        "screenshots": 14
+      },
+      {
+        "concept": "HL",
+        "route": "A",
+        "direction": "up",
+        "gauge": false,
+        "status": "passed",
+        "game_seconds": 42.00052660703659,
+        "waypoints": 166,
+        "stair_waypoints": 72,
+        "frame_samples": 2440,
+        "max_waypoint_height_error_cm": 2.150005605491515,
+        "report": "Tools\\SpireConnectorKit\\Output\\PIE\\final-chef\\HL_A_up\\run.json",
+        "sha256": "705644089d20edcca365e9fc45910b53c39bcb307213d6c061b2ed82af719a9a",
+        "screenshots": 13
+      },
+      {
+        "concept": "BW",
+        "route": "Y0",
+        "direction": "down",
+        "gauge": false,
+        "status": "passed",
+        "game_seconds": 6.49057499691844,
+        "waypoints": 24,
+        "stair_waypoints": 0,
+        "frame_samples": 353,
+        "max_waypoint_height_error_cm": 2.1500024795532227,
+        "report": "Tools\\SpireConnectorKit\\Output\\PIE\\final-chef\\BW_Y0_down\\run.json",
+        "sha256": "a2710594769407506d395be108ab4a6a041d7e7a10136334bc8997a0a67e50b4",
+        "screenshots": 4
+      },
+      {
+        "concept": "BW",
+        "route": "Y0",
+        "direction": "up",
+        "gauge": false,
+        "status": "passed",
+        "game_seconds": 6.4884804002940655,
+        "waypoints": 24,
+        "stair_waypoints": 0,
+        "frame_samples": 351,
+        "max_waypoint_height_error_cm": 2.1500024795532227,
+        "report": "Tools\\SpireConnectorKit\\Output\\PIE\\final-chef\\BW_Y0_up\\run.json",
+        "sha256": "33281cd863b694560354452505f4bdb0be84511d546c87f43b6cf372a96ce760",
+        "screenshots": 4
+      },
+      {
+        "concept": "BW",
+        "route": "Y1",
+        "direction": "down",
+        "gauge": false,
+        "status": "passed",
+        "game_seconds": 6.486001402139664,
+        "waypoints": 24,
+        "stair_waypoints": 0,
+        "frame_samples": 352,
+        "max_waypoint_height_error_cm": 2.1500024795532227,
+        "report": "Tools\\SpireConnectorKit\\Output\\PIE\\final-chef\\BW_Y1_down\\run.json",
+        "sha256": "426971c6df3a1c41ff60823d1616b64857b79923bc21a9b3233923d4fa63b44e",
+        "screenshots": 4
+      },
+      {
+        "concept": "BW",
+        "route": "Y1",
+        "direction": "up",
+        "gauge": false,
+        "status": "passed",
+        "game_seconds": 6.490738298743963,
+        "waypoints": 24,
+        "stair_waypoints": 0,
+        "frame_samples": 353,
+        "max_waypoint_height_error_cm": 2.1500024795532227,
+        "report": "Tools\\SpireConnectorKit\\Output\\PIE\\final-chef\\BW_Y1_up\\run.json",
+        "sha256": "c17c44c289f6de079f0d7326d4f9055e6630a14095a453678c3ef2a585c1b2c3",
+        "screenshots": 4
+      },
+      {
+        "concept": "BW",
+        "route": "Y2",
+        "direction": "down",
+        "gauge": false,
+        "status": "passed",
+        "game_seconds": 6.497535899281502,
+        "waypoints": 24,
+        "stair_waypoints": 0,
+        "frame_samples": 352,
+        "max_waypoint_height_error_cm": 2.1500024795532227,
+        "report": "Tools\\SpireConnectorKit\\Output\\PIE\\final-chef\\BW_Y2_down\\run.json",
+        "sha256": "ba88124a04c155e2198844ca5860626a404efaa3cd793ed2cdde8b79630aef3f",
+        "screenshots": 4
+      },
+      {
+        "concept": "BW",
+        "route": "Y2",
+        "direction": "up",
+        "gauge": false,
+        "status": "passed",
+        "game_seconds": 6.487625800073147,
+        "waypoints": 24,
+        "stair_waypoints": 0,
+        "frame_samples": 352,
+        "max_waypoint_height_error_cm": 2.1500024795532227,
+        "report": "Tools\\SpireConnectorKit\\Output\\PIE\\final-chef\\BW_Y2_up\\run.json",
+        "sha256": "7f53fbb8f7209565d5de032ed71d8feb461ee9fb325cb180f7e8de2623afa110",
+        "screenshots": 4
+      },
+      {
+        "concept": "BW",
+        "route": "Y3",
+        "direction": "down",
+        "gauge": false,
+        "status": "passed",
+        "game_seconds": 6.493710000067949,
+        "waypoints": 24,
+        "stair_waypoints": 0,
+        "frame_samples": 353,
+        "max_waypoint_height_error_cm": 2.1500024795532227,
+        "report": "Tools\\SpireConnectorKit\\Output\\PIE\\final-chef\\BW_Y3_down\\run.json",
+        "sha256": "944f159c9c3bc0dc4f76629ef60d96f2ecc6fa2cf532bc28c16edb74104f710d",
+        "screenshots": 4
+      },
+      {
+        "concept": "BW",
+        "route": "Y3",
+        "direction": "up",
+        "gauge": false,
+        "status": "passed",
+        "game_seconds": 6.493242401629686,
+        "waypoints": 24,
+        "stair_waypoints": 0,
+        "frame_samples": 353,
+        "max_waypoint_height_error_cm": 2.1500024795532227,
+        "report": "Tools\\SpireConnectorKit\\Output\\PIE\\final-chef\\BW_Y3_up\\run.json",
+        "sha256": "6e63bf45fab7f5da1cf1b07a1e93d4b87d84d54f66a98d3c978ce6c5dcfa6023",
+        "screenshots": 5
+      },
+      {
+        "concept": "HS",
+        "route": "A",
+        "direction": "up",
+        "gauge": true,
+        "status": "passed",
+        "game_seconds": 42.018768697977066,
+        "waypoints": 166,
+        "stair_waypoints": 72,
+        "frame_samples": 2443,
+        "max_waypoint_height_error_cm": 6.56858487340341,
+        "report": "Tools\\SpireConnectorKit\\Output\\PIE\\final-gauge\\HS_A_up_gauge\\run.json",
+        "sha256": "e05e38dd52d9b336bd5fdc01c3b954134d8b4ff0b2d2399226571e93c739d73e",
+        "screenshots": 13
+      },
+      {
+        "concept": "BW",
+        "route": "A",
+        "direction": "up",
+        "gauge": true,
+        "status": "passed",
+        "game_seconds": 33.21957590058446,
+        "waypoints": 124,
+        "stair_waypoints": 72,
+        "frame_samples": 1937,
+        "max_waypoint_height_error_cm": 9.305115592314792,
+        "report": "Tools\\SpireConnectorKit\\Output\\PIE\\final-gauge\\BW_A_up_gauge\\run.json",
+        "sha256": "6b6e643be2508703e9ed42e01b7b54672df9a70979cf4d0569f610603b52bde4",
+        "screenshots": 7
+      },
+      {
+        "concept": "BW",
+        "route": "B",
+        "direction": "up",
+        "gauge": true,
+        "status": "passed",
+        "game_seconds": 44.279029700905085,
+        "waypoints": 170,
+        "stair_waypoints": 72,
+        "frame_samples": 2574,
+        "max_waypoint_height_error_cm": 11.247623129165845,
+        "report": "Tools\\SpireConnectorKit\\Output\\PIE\\final-gauge\\BW_B_up_gauge\\run.json",
+        "sha256": "9937cf55aed73a6fabce25c9ccb6a3acb3b6feb5705cf7a37888180b414a926a",
+        "screenshots": 15
+      },
+      {
+        "concept": "RW",
+        "route": "A",
+        "direction": "up",
+        "gauge": true,
+        "status": "passed",
+        "game_seconds": 42.041004698723555,
+        "waypoints": 166,
+        "stair_waypoints": 72,
+        "frame_samples": 2443,
+        "max_waypoint_height_error_cm": 6.577435334523557,
+        "report": "Tools\\SpireConnectorKit\\Output\\PIE\\final-gauge\\RW_A_up_gauge\\run.json",
+        "sha256": "1eb7ad070850a2bd5b4ca3868f84892d45e3d7e1d4b770297c6d8f4c03b8b3d6",
+        "screenshots": 13
+      },
+      {
+        "concept": "HL",
+        "route": "A",
+        "direction": "up",
+        "gauge": true,
+        "status": "passed",
+        "game_seconds": 41.982359901070595,
+        "waypoints": 166,
+        "stair_waypoints": 72,
+        "frame_samples": 2440,
+        "max_waypoint_height_error_cm": 6.893421318609398,
+        "report": "Tools\\SpireConnectorKit\\Output\\PIE\\final-gauge\\HL_A_up_gauge\\run.json",
+        "sha256": "c0c332e8bdf85e3f08db02a9de60adc1627a41aeff244e6734f3ab9499f68436",
+        "screenshots": 13
+      },
+      {
+        "concept": "BW",
+        "route": "Y0",
+        "direction": "up",
+        "gauge": true,
+        "status": "passed",
+        "game_seconds": 6.48425630107522,
+        "waypoints": 24,
+        "stair_waypoints": 0,
+        "frame_samples": 352,
+        "max_waypoint_height_error_cm": 2.1500015258789062,
+        "report": "Tools\\SpireConnectorKit\\Output\\PIE\\final-gauge\\BW_Y0_up_gauge\\run.json",
+        "sha256": "41ba1b344039b916f6e3a47a819698b019fd298c49684b07e5e5079835fd587e",
+        "screenshots": 4
+      },
+      {
+        "concept": "BW",
+        "route": "Y1",
+        "direction": "up",
+        "gauge": true,
+        "status": "passed",
+        "game_seconds": 6.485215499997139,
+        "waypoints": 24,
+        "stair_waypoints": 0,
+        "frame_samples": 352,
+        "max_waypoint_height_error_cm": 2.1500015258789062,
+        "report": "Tools\\SpireConnectorKit\\Output\\PIE\\final-gauge\\BW_Y1_up_gauge\\run.json",
+        "sha256": "72a1c97aeaa6398043c9e3396883a033cdf8917d06a9b5479898500c9e6697ea",
+        "screenshots": 4
+      },
+      {
+        "concept": "BW",
+        "route": "Y2",
+        "direction": "up",
+        "gauge": true,
+        "status": "passed",
+        "game_seconds": 6.4888046979904175,
+        "waypoints": 24,
+        "stair_waypoints": 0,
+        "frame_samples": 352,
+        "max_waypoint_height_error_cm": 2.1500015258789062,
+        "report": "Tools\\SpireConnectorKit\\Output\\PIE\\final-gauge\\BW_Y2_up_gauge\\run.json",
+        "sha256": "a84886c6963e28681d19eac8e6a4006dcda7137cbe68618e45c8db23a9e38f92",
+        "screenshots": 4
+      },
+      {
+        "concept": "BW",
+        "route": "Y3",
+        "direction": "up",
+        "gauge": true,
+        "status": "passed",
+        "game_seconds": 6.460792001336813,
+        "waypoints": 24,
+        "stair_waypoints": 0,
+        "frame_samples": 348,
+        "max_waypoint_height_error_cm": 2.1500015258789062,
+        "report": "Tools\\SpireConnectorKit\\Output\\PIE\\final-gauge\\BW_Y3_up_gauge\\run.json",
+        "sha256": "4029a0d9c8b9c1bc05a1be332c3d209d99013d11e61d7a1635f1e379082f4f07",
+        "screenshots": 5
+      }
+    ],
+    "asset_manifest_sha256": "9786025660356a49a80b14a3a29af1536cd28c7083c45f9ddd061bd49a73db56",
+    "native_meshes": 105,
+    "scope": "Automated single-player PIE with actual Mars chef, real movement/collision, and a separate enlarged design-envelope capsule. Setup relocations occur between cases only. Not packaged, co-op or manual keyboard-feel acceptance."
+  },
+  "toolbox": {
+    "Total": 40,
+    "Passed": 40,
+    "Failed": 0,
+    "Skipped": 0,
+    "Contaminated": 0,
+    "log": "Saved\\Logs\\Spire-PIE-CkJolt-Test.log",
+    "sha256": "dee6c2c0e9dd95c699bff160f824f0791743e48d03c543de31479911af4c1c14",
+    "process_exit_code": 0
+  },
+  "protected_files": [
+    {
+      "path": "Content/Mars/Maps/Camp_Mars_MAP.umap",
+      "sha256": "73860d63dbd23059fa3b428881fc13116c5ac4048808a6f9fee5da502c0fa6a9",
+      "unchanged": true
+    },
+    {
+      "path": "Content/Mars/Maps/Warrens_VariantC_Mars_MAP.umap",
+      "sha256": "2d4e7e514ae63403b3ab7fc6a71acb7f076a686efa289124d56b77869a35f959",
+      "unchanged": true
+    },
+    {
+      "path": "Docs/design/spire-blender-handoff-20261026/spire_spec.json",
+      "sha256": "ea6356dcd01f974f53e26fae7bb78f5a5224c1427521e9c6316be249bb714184",
+      "unchanged": true
+    }
+  ],
+  "unverified": [
+    "co-op playtest",
+    "packaged CkJolt collision",
+    "performance",
+    "manual keyboard feel"
+  ],
+  "changes": "New owned content and tools only; no live map integration, commit or push by this task."
+}

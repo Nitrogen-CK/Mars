@@ -1,0 +1,6 @@
+00:02.562  blend            | Read blend: "D:\Repositories\CkRepos\Orion\Tools\SpireConnectorKit\Output\Blender\Spire_Diorama.blend"
+Extensions: writing cache failed ([Errno 13] Permission denied: 'C:\\Users\\Adam\\AppData\\Roaming\\Blender Foundation\\Blender\\5.2\\extensions\\.cache\\compat.dat').
+SPIRE_HEADROOM_AUDIT {"status": "passed", "headroom_rays": 1167, "height_cm": 220, "errors": [], "scope": "Upward rays at three radial stations per tread/landing on complete saved visual meshes. Does not establish capsule sweeps, continuous traversal or PIE."}
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+
+Blender quit

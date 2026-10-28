@@ -1,0 +1,200 @@
+{
+  "label": "final-gauge",
+  "gauge": true,
+  "status": "passed",
+  "jobs": [
+    {
+      "cid": "HS",
+      "route": "A",
+      "direction": "up",
+      "gauge": true,
+      "label": "final-gauge"
+    },
+    {
+      "cid": "BW",
+      "route": "A",
+      "direction": "up",
+      "gauge": true,
+      "label": "final-gauge"
+    },
+    {
+      "cid": "BW",
+      "route": "B",
+      "direction": "up",
+      "gauge": true,
+      "label": "final-gauge"
+    },
+    {
+      "cid": "RW",
+      "route": "A",
+      "direction": "up",
+      "gauge": true,
+      "label": "final-gauge"
+    },
+    {
+      "cid": "HL",
+      "route": "A",
+      "direction": "up",
+      "gauge": true,
+      "label": "final-gauge"
+    },
+    {
+      "cid": "BW",
+      "route": "Y0",
+      "direction": "up",
+      "gauge": true,
+      "label": "final-gauge"
+    },
+    {
+      "cid": "BW",
+      "route": "Y1",
+      "direction": "up",
+      "gauge": true,
+      "label": "final-gauge"
+    },
+    {
+      "cid": "BW",
+      "route": "Y2",
+      "direction": "up",
+      "gauge": true,
+      "label": "final-gauge"
+    },
+    {
+      "cid": "BW",
+      "route": "Y3",
+      "direction": "up",
+      "gauge": true,
+      "label": "final-gauge"
+    }
+  ],
+  "index": 9,
+  "results": [
+    {
+      "job": {
+        "cid": "HS",
+        "route": "A",
+        "direction": "up",
+        "gauge": true,
+        "label": "final-gauge"
+      },
+      "status": "passed",
+      "seconds": 42.018768697977066,
+      "waypoints": 167,
+      "samples": 2443,
+      "report": "D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\PIE\\final-gauge\\HS_A_up_gauge\\run.json"
+    },
+    {
+      "job": {
+        "cid": "BW",
+        "route": "A",
+        "direction": "up",
+        "gauge": true,
+        "label": "final-gauge"
+      },
+      "status": "passed",
+      "seconds": 33.21957590058446,
+      "waypoints": 125,
+      "samples": 1937,
+      "report": "D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\PIE\\final-gauge\\BW_A_up_gauge\\run.json"
+    },
+    {
+      "job": {
+        "cid": "BW",
+        "route": "B",
+        "direction": "up",
+        "gauge": true,
+        "label": "final-gauge"
+      },
+      "status": "passed",
+      "seconds": 44.279029700905085,
+      "waypoints": 171,
+      "samples": 2574,
+      "report": "D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\PIE\\final-gauge\\BW_B_up_gauge\\run.json"
+    },
+    {
+      "job": {
+        "cid": "RW",
+        "route": "A",
+        "direction": "up",
+        "gauge": true,
+        "label": "final-gauge"
+      },
+      "status": "passed",
+      "seconds": 42.041004698723555,
+      "waypoints": 167,
+      "samples": 2443,
+      "report": "D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\PIE\\final-gauge\\RW_A_up_gauge\\run.json"
+    },
+    {
+      "job": {
+        "cid": "HL",
+        "route": "A",
+        "direction": "up",
+        "gauge": true,
+        "label": "final-gauge"
+      },
+      "status": "passed",
+      "seconds": 41.982359901070595,
+      "waypoints": 167,
+      "samples": 2440,
+      "report": "D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\PIE\\final-gauge\\HL_A_up_gauge\\run.json"
+    },
+    {
+      "job": {
+        "cid": "BW",
+        "route": "Y0",
+        "direction": "up",
+        "gauge": true,
+        "label": "final-gauge"
+      },
+      "status": "passed",
+      "seconds": 6.48425630107522,
+      "waypoints": 25,
+      "samples": 352,
+      "report": "D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\PIE\\final-gauge\\BW_Y0_up_gauge\\run.json"
+    },
+    {
+      "job": {
+        "cid": "BW",
+        "route": "Y1",
+        "direction": "up",
+        "gauge": true,
+        "label": "final-gauge"
+      },
+      "status": "passed",
+      "seconds": 6.485215499997139,
+      "waypoints": 25,
+      "samples": 352,
+      "report": "D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\PIE\\final-gauge\\BW_Y1_up_gauge\\run.json"
+    },
+    {
+      "job": {
+        "cid": "BW",
+        "route": "Y2",
+        "direction": "up",
+        "gauge": true,
+        "label": "final-gauge"
+      },
+      "status": "passed",
+      "seconds": 6.4888046979904175,
+      "waypoints": 25,
+      "samples": 352,
+      "report": "D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\PIE\\final-gauge\\BW_Y2_up_gauge\\run.json"
+    },
+    {
+      "job": {
+        "cid": "BW",
+        "route": "Y3",
+        "direction": "up",
+        "gauge": true,
+        "label": "final-gauge"
+      },
+      "status": "passed",
+      "seconds": 6.460792001336813,
+      "waypoints": 25,
+      "samples": 348,
+      "report": "D:\\Repositories\\CkRepos\\Orion\\Tools\\SpireConnectorKit\\Output\\PIE\\final-gauge\\BW_Y3_up_gauge\\run.json"
+    }
+  ],
+  "wait": 0.0
+}
