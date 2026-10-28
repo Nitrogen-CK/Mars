@@ -1,0 +1,317 @@
+{
+	"material": "MI_Hall_PainterlyWall_NormalX_R01",
+	"packagePath": "/Game/Mars/ArtReview/Lookdev/StaticPainterlyWalls_20261026/Materials/MI_Hall_PainterlyWall_NormalX_R01",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "7e520ac291671052b1edf6b5ec149220",
+		"exporterVersion": 3
+	},
+	"parentChain": [
+		"/Game/Mars/ArtReview/Lookdev/StaticPainterlyWalls_20261026/Materials/M_Hall_PainterlyWall_R01.M_Hall_PainterlyWall_R01"
+	],
+	"blendMode": "BLEND_Opaque",
+	"twoSided": false,
+	"unlit": false,
+	"shadingModel": "MSM_DefaultLit",
+	"domain": "MD_Surface",
+	"connectedOutputs": [
+		"BaseColor"
+	],
+	"expressions":
+	{
+		"AppendVector": 1,
+		"ComponentMask": 1,
+		"Constant": 4,
+		"Constant3Vector": 1,
+		"Divide": 1,
+		"DotProduct": 1,
+		"LinearInterpolate": 1,
+		"Multiply": 1,
+		"ScalarParameter": 1,
+		"TextureSampleParameter2D": 1,
+		"VectorParameter": 1,
+		"WorldPosition": 1
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "TextureSampleParameter2D",
+				"name": "MaterialExpressionTextureSampleParameter2D_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Coordinates",
+						"node": 9,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"ParameterName": "WallAlbedo",
+					"Texture": "/Game/Mars/ArtReview/Lookdev/HallPainterly_20261026/Textures/T_Hall_Quiet_R01_Albedo.T_Hall_Quiet_R01_Albedo"
+				}
+			},
+			{
+				"id": 1,
+				"class": "WorldPosition",
+				"name": "MaterialExpressionWorldPosition_0",
+				"outputs": [
+					"XYZ",
+					"XY",
+					"Z"
+				],
+				"props":
+				{
+					"WorldPositionShaderOffset": "WPT_ExcludeAllShaderOffsets"
+				}
+			},
+			{
+				"id": 2,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_0",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=1.000000,G=0.000000,B=0.000000,A=1.000000)",
+					"ParameterName": "WallTangent"
+				}
+			},
+			{
+				"id": 3,
+				"class": "DotProduct",
+				"name": "MaterialExpressionDotProduct_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 1,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 2,
+						"output": 0,
+						"mask": "rgb"
+					}
+				]
+			},
+			{
+				"id": 4,
+				"class": "ComponentMask",
+				"name": "MaterialExpressionComponentMask_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Input",
+						"node": 1,
+						"output": 0,
+						"mask": "rgb"
+					}
+				],
+				"props":
+				{
+					"B": true
+				}
+			},
+			{
+				"id": 5,
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_0",
+				"props":
+				{
+					"R": -1
+				}
+			},
+			{
+				"id": 6,
+				"class": "Multiply",
+				"name": "MaterialExpressionMultiply_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 4,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 5,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 7,
+				"class": "AppendVector",
+				"name": "MaterialExpressionAppendVector_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 3,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 6,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 8,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_0",
+				"props":
+				{
+					"DefaultValue": 200,
+					"ParameterName": "RepeatCm"
+				}
+			},
+			{
+				"id": 9,
+				"class": "Divide",
+				"name": "MaterialExpressionDivide_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 7,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 8,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 10,
+				"class": "Constant3Vector",
+				"name": "MaterialExpressionConstant3Vector_0",
+				"outputs": [
+					"None",
+					"None",
+					"None",
+					"None"
+				],
+				"props":
+				{
+					"Constant": "(R=0.234551,G=0.230740,B=0.171441,A=1.000000)"
+				}
+			},
+			{
+				"id": 11,
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_1",
+				"props":
+				{
+					"R": 0.60000002384185791
+				}
+			},
+			{
+				"id": 12,
+				"class": "LinearInterpolate",
+				"name": "MaterialExpressionLinearInterpolate_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 10,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 0,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 2,
+						"name": "Alpha",
+						"node": 11,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 13,
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_2",
+				"props":
+				{
+					"R": 0.87999999523162842
+				}
+			},
+			{
+				"id": 14,
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_3"
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_BaseColor",
+				"node": 12,
+				"output": 0
+			},
+			{
+				"property": "MP_Metallic",
+				"node": 14,
+				"output": 0
+			},
+			{
+				"property": "MP_Roughness",
+				"node": 13,
+				"output": 0
+			}
+		]
+	},
+	"scalarParams": [
+		{
+			"name": "RepeatCm",
+			"value": 200
+		}
+	],
+	"vectorParams": [
+		{
+			"name": "WallTangent",
+			"value": "RGBA(0, -1, 0, 1)"
+		}
+	],
+	"textureParams": [
+		{
+			"name": "WallAlbedo",
+			"value": "/Game/Mars/ArtReview/Lookdev/HallPainterly_20261026/Textures/T_Hall_Quiet_R01_Albedo.T_Hall_Quiet_R01_Albedo"
+		}
+	],
+	"usedTextures": [
+		"/Game/Mars/ArtReview/Lookdev/HallPainterly_20261026/Textures/T_Hall_Quiet_R01_Albedo.T_Hall_Quiet_R01_Albedo"
+	]
+}

@@ -1,0 +1,53 @@
+{
+	"assetName": "DA_CP_ForagePresentation_R01",
+	"assetPath": "/Game/Mars/ArtReview/Lookdev/CatacombCompleteRoom_20261026R02/Forage_R04/DA_CP_ForagePresentation_R01.DA_CP_ForagePresentation_R01",
+	"assetClass": "Mars_ForagePresentation_Def",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "2b95d00d3b6233fcfa6c629b201c425f",
+		"exporterVersion": 2
+	},
+	"parentClasses": [
+		"DataAsset"
+	],
+	"properties": [
+		{
+			"name": "Censer",
+			"type": "FMars_ForageCenser_Presentation",
+			"value":
+			{
+				"BobMesh": "/Game/Mars/ArtReview/Lookdev/CatacombCompleteRoom_20261026R02/Forage_R04/Meshes/WVC_Forage_CenserBob_R01_SM.WVC_Forage_CenserBob_R01_SM",
+				"ChainMesh": "/Game/Mars/ArtReview/Lookdev/CatacombCompleteRoom_20261026R02/Forage_R04/Meshes/WVC_Forage_Chain_R01_SM.WVC_Forage_Chain_R01_SM",
+				"ContentsMesh": "/Game/Mars/ArtReview/Lookdev/CatacombCompleteRoom_20261026R02/Forage_R04/Meshes/WVC_Forage_PepperContents_R01_SM.WVC_Forage_PepperContents_R01_SM",
+				"CeilingHeightCm": 460
+			}
+		},
+		{
+			"name": "Vine",
+			"type": "FMars_ForageVine_Presentation",
+			"value":
+			{
+				"FigMesh": "/Game/Mars/ArtReview/Lookdev/CatacombCompleteRoom_20261026R02/Forage_R04/Meshes/WVC_Forage_Fig_R01_SM.WVC_Forage_Fig_R01_SM",
+				"BellnutMesh": "/Game/Mars/ArtReview/Lookdev/CatacombCompleteRoom_20261026R02/Forage_R04/Meshes/WVC_Forage_Bellnut_R01_SM.WVC_Forage_Bellnut_R01_SM",
+				"ConnectorLengthCm": 12,
+				"ConnectorWidthCm": 2.5
+			}
+		},
+		{
+			"name": "StoneMaterial",
+			"type": "UMaterialInterface*",
+			"value": "/Game/Mars/ArtReview/Lookdev/CatacombCompleteRoom_20261026R02/PBR_R09/Materials/M_CP_Prop_PBR_R09.M_CP_Prop_PBR_R09"
+		},
+		{
+			"name": "TimberPostMaterial",
+			"type": "UMaterialInterface*",
+			"value": "/Game/Mars/ArtReview/Lookdev/CatacombCompleteRoom_20261026R02/Forage_R04/Materials/M_CP_ForageTimberPost_R01.M_CP_ForageTimberPost_R01"
+		},
+		{
+			"name": "TimberArmMaterial",
+			"type": "UMaterialInterface*",
+			"value": "/Game/Mars/ArtReview/Lookdev/CatacombCompleteRoom_20261026R02/Forage_R04/Materials/M_CP_ForageTimberArm_R01.M_CP_ForageTimberArm_R01"
+		}
+	]
+}

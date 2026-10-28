@@ -301,11 +301,22 @@ struct FMars_Request_FPHands_SetHold
     UPROPERTY()
     FCk_Handle_Item Item;
 
+    // Opt-in presentation geometry for the same real item. Invalid/empty items still clear the hold; the override
+    // never starts a reach or changes its bookkeeping. Omitted requests retain the item's ordinary presentation.
+    UPROPERTY()
+    TOptional<FMars_FPHands_Hold> HoldOverride;
+
     FMars_Request_FPHands_SetHold() {}
 
     FMars_Request_FPHands_SetHold(FCk_Handle_Item InItem)
     {
         Item = InItem;
+    }
+
+    FMars_Request_FPHands_SetHold(FCk_Handle_Item InItem, FMars_FPHands_Hold InHoldOverride)
+    {
+        Item = InItem;
+        HoldOverride = TOptional<FMars_FPHands_Hold>(InHoldOverride);
     }
 }
 

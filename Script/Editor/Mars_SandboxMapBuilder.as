@@ -110,6 +110,14 @@ void Mars_PlaceSandboxItemsFunc(const TArray<FString>& Args)
 const FConsoleCommand Mars_PlaceSandboxItemsCommand("Mars.Sandbox.PlaceItems", n"Mars_PlaceSandboxItemsFunc");
 
 UFUNCTION()
+void Mars_PlaceSandboxCookbookFunc(const TArray<FString>& Args)
+{
+    utils_mars_sandbox::PlaceCookbook();
+}
+
+const FConsoleCommand Mars_PlaceSandboxCookbookCommand("Mars.Sandbox.PlaceCookbook", n"Mars_PlaceSandboxCookbookFunc");
+
+UFUNCTION()
 void Mars_PlaceSandboxBackpackFunc(const TArray<FString>& Args)
 {
     utils_mars_sandbox::PlaceBackpack();
@@ -404,7 +412,7 @@ namespace utils_mars_sandbox
         utils_mars_map_builder::SaveOpenLevel(Command);
     }
 
-    // Four World-mode items in front of the player starts, enough to fill three bag slots and the overflow slot; they drop
+    // World-mode items in front of the player starts, enough to fill three bag slots and the overflow slot; they drop
     // the 50uu onto the floor. Only their own labels block a re-place: Build (room 5's melee items) and PlaceBackpack also
     // place Item_ actors.
     void PlaceItems()
@@ -416,7 +424,7 @@ namespace utils_mars_sandbox
         for (const auto& Item : Get_Items())
         {
             auto Blocker = utils_mars_map_builder::TryGet_LevelActor(Item.Placement.Label);
-            if (utils_mars_map_builder::Get_IsUnblocked(Command, Blocker, "Delete the four sandbox items first to re-place.") == false)
+            if (utils_mars_map_builder::Get_IsUnblocked(Command, Blocker, "Delete the sandbox item row first to re-place.") == false)
             { return; }
         }
 
@@ -433,6 +441,8 @@ namespace utils_mars_sandbox
             FMars_MapBuilder_Placement(f"{k_ItemLabelPrefix}Rock_0", FVector(ItemX, -300.0, ItemZ))));
         Items.Add(FMars_Sandbox_ItemPlacement(UMars_WorldItem_Rock_EntityScript,
             FMars_MapBuilder_Placement(f"{k_ItemLabelPrefix}Rock_1", FVector(ItemX, -100.0, ItemZ))));
+        Items.Add(FMars_Sandbox_ItemPlacement(UMars_Cookbook_EntityScript,
+            FMars_MapBuilder_Placement(f"{k_ItemLabelPrefix}Cookbook", FVector(ItemX, 0.0, ItemZ))));
         Items.Add(FMars_Sandbox_ItemPlacement(UMars_WorldItem_Ration_EntityScript,
             FMars_MapBuilder_Placement(f"{k_ItemLabelPrefix}Ration", FVector(ItemX, 100.0, ItemZ))));
         Items.Add(FMars_Sandbox_ItemPlacement(UMars_WorldItem_Cog_EntityScript,
@@ -444,6 +454,23 @@ namespace utils_mars_sandbox
     {
         for (const auto& Item : Get_Items())
         { utils_mars_map_builder::Spawn_EntityScript(Item.ScriptClass, Item.Placement); }
+    }
+
+    void PlaceCookbook()
+    {
+        const FString Command = "Mars.Sandbox.PlaceCookbook";
+        const FString Label = f"{k_ItemLabelPrefix}Cookbook";
+        if (Get_CanAdd(Command, Label, "The cookbook is already placed.") == false)
+        { return; }
+
+        for (const auto& Item : Get_Items())
+        {
+            if (Item.Placement.Label != Label)
+            { continue; }
+            if (ck::IsValid(utils_mars_map_builder::Spawn_EntityScript(Item.ScriptClass, Item.Placement)))
+            { utils_mars_map_builder::SaveOpenLevel(Command); }
+            return;
+        }
     }
 
     void PlaceBackpack()

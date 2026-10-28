@@ -21,6 +21,13 @@ mixin bool Get_ThrowArmed(const FCk_Handle_HeldItemUse& Self)
     return Self.Get_Fragment(FMars_Fragment_HeldItemUse).ThrowArmed;
 }
 
+// Launch precedes the inventory transfer; local held-item controls stop on the launch's own frame.
+mixin bool Get_IsCurrentItemLaunched(const FCk_Handle_HeldItemUse& Self)
+{
+    const auto Item = Self.As_HeldItem().Get_CurrentItem();
+    return ck::IsValid(Item) && Item == Self.Get_Fragment(FMars_Fragment_HeldItemUse).LaunchedItem;
+}
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Requests
 //--------------------------------------------------------------------------------------------------------------------------

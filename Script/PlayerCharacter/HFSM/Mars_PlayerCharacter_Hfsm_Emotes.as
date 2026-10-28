@@ -158,6 +158,10 @@ class UMars_SmTask_EmoteWheelIntent : UMars_SmTask_IntentEdges
         if (_IsOpen || Get_IsControlEngaged())
         { return; }
 
+        const auto Book = utils_cookbook::TryGet_HeldBook(_Player);
+        if (ck::IsValid(Book) && Book.Get_IsOpen())
+        { return; }
+
         _IsOpen = true;
         // The delta drained before the press is not a pointer move.
         _SeenLookSequence = _InputIntents.Get_LookDeltaSequence();

@@ -25,6 +25,9 @@ struct FMars_Bellkeeper_GlyphPlacement
     // Across, in cm.
     float64 Size = 6.0;
     FLinearColor Color = FLinearColor(0.9f, 0.85f, 0.7f, 1.0f);
+    // Optional override; when unset Add_BellkeeperGlyph keeps the existing ProtoGrid material.
+    UPROPERTY()
+    UMaterialInterface Material;
 
     FMars_Bellkeeper_GlyphPlacement() {}
 
@@ -75,7 +78,10 @@ mixin void Add_BellkeeperGlyph(FCk_Handle_Transform& Self, UObject InOuter, cons
 
     for (const auto& Bar : Bars)
     {
-        auto Part = FMars_MeshPart(Bar, Mesh, assets::load::ProtoGrid_Interactable_Mars_MI(), collision::profile::NoCollision, n"Bellkeeper_Glyph");
+        UMaterialInterface GlyphMaterial = assets::load::ProtoGrid_Interactable_Mars_MI();
+        if (ck::IsValid(InPlacement.Material))
+        { GlyphMaterial = InPlacement.Material; }
+        auto Part = FMars_MeshPart(Bar, Mesh, GlyphMaterial, collision::profile::NoCollision, n"Bellkeeper_Glyph");
         Part.PrimaryColor = TOptional<FLinearColor>(InPlacement.Color);
         Part.CastShadow = false;
         Self.Add_MeshPart(InOuter, Part);

@@ -1,0 +1,224 @@
+{
+	"material": "M_CP_ForageTimberArm_R01",
+	"packagePath": "/Game/Mars/ArtReview/Lookdev/CatacombCompleteRoom_20261026R02/Forage_R04/Materials/M_CP_ForageTimberArm_R01",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "e268f1611d4af19f1d7fbf49d5e9a00e",
+		"exporterVersion": 3
+	},
+	"blendMode": "BLEND_Opaque",
+	"twoSided": false,
+	"unlit": false,
+	"shadingModel": "MSM_DefaultLit",
+	"domain": "MD_Surface",
+	"connectedOutputs": [
+		"BaseColor"
+	],
+	"expressions":
+	{
+		"Add": 1,
+		"Constant": 3,
+		"Constant3Vector": 2,
+		"Custom": 1,
+		"Multiply": 2,
+		"Noise": 1,
+		"PreSkinnedPosition": 1,
+		"VertexInterpolator": 1
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "PreSkinnedPosition",
+				"name": "MaterialExpressionPreSkinnedPosition_0"
+			},
+			{
+				"id": 1,
+				"class": "VertexInterpolator",
+				"name": "MaterialExpressionVertexInterpolator_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "VS",
+						"node": 0,
+						"output": 0,
+						"mask": "rgb"
+					}
+				]
+			},
+			{
+				"id": 2,
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_0",
+				"props":
+				{
+					"R": 0.0099999997764825821
+				}
+			},
+			{
+				"id": 3,
+				"class": "Multiply",
+				"name": "MaterialExpressionMultiply_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 1,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 2,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 4,
+				"class": "Constant3Vector",
+				"name": "MaterialExpressionConstant3Vector_0",
+				"outputs": [
+					"None",
+					"None",
+					"None",
+					"None"
+				],
+				"props":
+				{
+					"Constant": "(R=0.500000,G=0.500000,B=0.500000,A=1.000000)"
+				}
+			},
+			{
+				"id": 5,
+				"class": "Add",
+				"name": "MaterialExpressionAdd_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 3,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 4,
+						"output": 0,
+						"mask": "rgb"
+					}
+				]
+			},
+			{
+				"id": 6,
+				"class": "Constant3Vector",
+				"name": "MaterialExpressionConstant3Vector_1",
+				"outputs": [
+					"None",
+					"None",
+					"None",
+					"None"
+				],
+				"props":
+				{
+					"Constant": "(R=0.350000,G=8.000000,B=8.000000,A=1.000000)"
+				}
+			},
+			{
+				"id": 7,
+				"class": "Multiply",
+				"name": "MaterialExpressionMultiply_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 5,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 6,
+						"output": 0,
+						"mask": "rgb"
+					}
+				]
+			},
+			{
+				"id": 8,
+				"class": "Noise",
+				"name": "MaterialExpressionNoise_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "World Position",
+						"node": 7,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Scale": 2,
+					"bTurbulence": false,
+					"Levels": 1,
+					"OutputMin": 0
+				}
+			},
+			{
+				"id": 9,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "V",
+						"node": 8,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "return V<0.38?float3(0.035,0.018,0.008):V<0.53?float3(0.075,0.036,0.014):V<0.67?float3(0.12,0.058,0.021):float3(0.17,0.085,0.029);",
+					"Description": "Four dry timber tones; broad lengthwise bands, no normal from paint"
+				}
+			},
+			{
+				"id": 10,
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_1"
+			},
+			{
+				"id": 11,
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_2",
+				"props":
+				{
+					"R": 0.86000001430511475
+				}
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_BaseColor",
+				"node": 9,
+				"output": 0
+			},
+			{
+				"property": "MP_Metallic",
+				"node": 10,
+				"output": 0
+			},
+			{
+				"property": "MP_Roughness",
+				"node": 11,
+				"output": 0
+			}
+		]
+	},
+	"scalarParams": [],
+	"vectorParams": [],
+	"textureParams": [],
+	"usedTextures": []
+}

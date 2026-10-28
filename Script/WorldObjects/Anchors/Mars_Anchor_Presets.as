@@ -183,6 +183,9 @@ class UMars_Anchor_EntityScript : UCk_GenericEntityScript_UE
     protected UMars_AnchorTable_Def Get_Table() const
     { return nullptr; }
 
+    protected UMars_ForagePresentation_Def Get_ForagePresentation() const
+    { return nullptr; }
+
     UFUNCTION(BlueprintOverride)
     ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
     {
@@ -201,6 +204,7 @@ class UMars_Anchor_EntityScript : UCk_GenericEntityScript_UE
         { Spec.CrawlOffsetCm = TOptional<FVector2D>(FVector2D(CrawlAlongCm, CrawlOffsetCm)); }
         Spec.PinnedRow = PinnedRow;
         Spec.GateMaterialOverride = GateMaterialOverride;
+        Spec.ForagePresentation = Get_ForagePresentation();
         utils_anchor::Add(InHandle, Spec);
 
         return ECk_EntityScript_ConstructionFlow::Finished;
@@ -245,6 +249,13 @@ class UMars_Anchor_Spawn_EntityScript : UMars_Anchor_EntityScript
 class UMars_Anchor_Forage_EntityScript : UMars_Anchor_EntityScript
 {
     default _ShowInPlaceActors = true;
+
+    // Strong reflected owner survives deferred candidate construction and clear/re-resolve.
+    UPROPERTY(ExposeOnSpawn)
+    UMars_ForagePresentation_Def ForagePresentation = nullptr;
+
+    protected UMars_ForagePresentation_Def Get_ForagePresentation() const override
+    { return ForagePresentation; }
 
     protected EMars_Anchor_Family Get_Family() const override
     { return EMars_Anchor_Family::Forage; }

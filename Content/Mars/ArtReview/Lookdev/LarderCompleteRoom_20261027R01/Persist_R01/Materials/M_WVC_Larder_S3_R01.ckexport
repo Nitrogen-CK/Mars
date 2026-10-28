@@ -1,0 +1,865 @@
+{
+	"material": "M_WVC_Larder_S3_R01",
+	"packagePath": "/Game/Mars/ArtReview/Lookdev/LarderCompleteRoom_20261027R01/Persist_R01/Materials/M_WVC_Larder_S3_R01",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "f2e4b81b6c594cba263e9e981a760e1f",
+		"exporterVersion": 3
+	},
+	"blendMode": "BLEND_Opaque",
+	"twoSided": false,
+	"unlit": false,
+	"shadingModel": "MSM_DefaultLit",
+	"domain": "MD_Surface",
+	"connectedOutputs": [
+		"BaseColor",
+		"Normal"
+	],
+	"expressions":
+	{
+		"Constant": 1,
+		"Custom": 9,
+		"ScalarParameter": 8,
+		"TextureSample": 9,
+		"VectorParameter": 3,
+		"VertexInterpolator": 1,
+		"VertexNormalWS": 1,
+		"WorldPosition": 1
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_0"
+			},
+			{
+				"id": 1,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "P",
+						"node": 32,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 1,
+						"name": "N",
+						"node": 30,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "Tile",
+						"node": 10,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "float s=N.x>=0?1:-1; return float2(P.y,P.z*s)/Tile;",
+					"OutputType": "CMOT_Float2",
+					"Description": "Physical signed world projection axis0"
+				}
+			},
+			{
+				"id": 2,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "P",
+						"node": 32,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 1,
+						"name": "N",
+						"node": 30,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "Tile",
+						"node": 10,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "float s=N.y>=0?1:-1; return float2(P.x,-P.z*s)/Tile;",
+					"OutputType": "CMOT_Float2",
+					"Description": "Physical signed world projection axis1"
+				}
+			},
+			{
+				"id": 3,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_2",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "P",
+						"node": 32,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 1,
+						"name": "N",
+						"node": 30,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "Tile",
+						"node": 10,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "float s=N.z>=0?1:-1; return float2(P.x,P.y*s)/Tile;",
+					"OutputType": "CMOT_Float2",
+					"Description": "Physical signed world projection axis2"
+				}
+			},
+			{
+				"id": 4,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_3",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "N",
+						"node": 30,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "X",
+						"node": 18,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 2,
+						"name": "Y",
+						"node": 19,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 3,
+						"name": "Z",
+						"node": 20,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 4,
+						"name": "Base",
+						"node": 27,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 5,
+						"name": "Tint",
+						"node": 28,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 6,
+						"name": "Mix",
+						"node": 13,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "float3 W=pow(abs(normalize(N)),8); W/=max(dot(W,float3(1,1,1)),.0001); float3 C=X*W.x+Y*W.y+Z*W.z; return lerp(Base.rgb,C,Mix)*Tint.rgb;",
+					"Description": "Broad accepted angular pigment at physical world scale"
+				}
+			},
+			{
+				"id": 5,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_4",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "N",
+						"node": 30,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "X",
+						"node": 24,
+						"output": 1,
+						"mask": "r"
+					},
+					{
+						"index": 2,
+						"name": "Y",
+						"node": 25,
+						"output": 1,
+						"mask": "r"
+					},
+					{
+						"index": 3,
+						"name": "Z",
+						"node": 26,
+						"output": 1,
+						"mask": "r"
+					},
+					{
+						"index": 4,
+						"name": "Blend",
+						"node": 12,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "float3 W=pow(abs(normalize(N)),8); W/=max(dot(W,float3(1,1,1)),.0001); return lerp(.88,X*W.x+Y*W.y+Z*W.z,Blend);",
+					"OutputType": "CMOT_Float1",
+					"Description": "Independent periodic roughness at identical physical scale"
+				}
+			},
+			{
+				"id": 6,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_5",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "N",
+						"node": 30,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "X",
+						"node": 21,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 2,
+						"name": "Y",
+						"node": 22,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 3,
+						"name": "Z",
+						"node": 23,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 4,
+						"name": "Strength",
+						"node": 11,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "float3 W=pow(abs(normalize(N)),8); W/=max(dot(W,float3(1,1,1)),.0001); N=normalize(N);\nfloat3 S=float3(N.x>=0?1:-1,N.y>=0?1:-1,N.z>=0?1:-1);\nfloat2 A=X.xy/max(X.z,.1), B=Y.xy/max(Y.z,.1), C=Z.xy/max(Z.z,.1);\nfloat3 D=float3(0,A.x,A.y*S.x)*W.x+float3(B.x,0,-B.y*S.y)*W.y+float3(C.x,C.y*S.z,0)*W.z;\nreturn normalize(N+(D-N*dot(N,D))*Strength);",
+					"Description": "Decoded independent normal slopes in signed world tangent bases; original geometry normal retained"
+				}
+			},
+			{
+				"id": 7,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_6",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "P",
+						"node": 32,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 1,
+						"name": "N",
+						"node": 30,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "Width",
+						"node": 14,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "Height",
+						"node": 15,
+						"output": 0
+					},
+					{
+						"index": 4,
+						"name": "Joint",
+						"node": 16,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "float3 A=abs(normalize(N));\nfloat2 Q=A.z>=max(A.x,A.y)?float2(P.x+7000,P.y+5500):float2(A.x>=A.y?P.y+5500:P.x+7000,P.z);\nfloat row=floor(Q.y/Height); Q.x+=fmod(row,2)*Width*.5;\nfloat2 cell=float2(Q.x/Width,Q.y/Height); float2 f=frac(cell);\nfloat d=min(min(f.x*Width,(1-f.x)*Width),min(f.y*Height,(1-f.y)*Height));\nfloat mortar=1-smoothstep(Joint*.35,Joint*.65,d);\nfloat tone=.90+.16*frac(sin(dot(floor(cell),float2(17.17,23.71)))*43758.5453);\nreturn float2(mortar,tone);",
+					"OutputType": "CMOT_Float2",
+					"Description": "Physical90x50cm staggered courses; source-plan offsets align existing masonry"
+				}
+			},
+			{
+				"id": 8,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_7",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "C",
+						"node": 4,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "Pattern",
+						"node": 7,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "Mortar",
+						"node": 29,
+						"output": 0,
+						"mask": "rgb"
+					}
+				],
+				"props":
+				{
+					"Code": "return lerp(C*Pattern.y,Mortar.rgb,Pattern.x);",
+					"Description": "Quiet course tint and existing approved mortar colour, no baked light"
+				}
+			},
+			{
+				"id": 9,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_8",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "R",
+						"node": 5,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "Mortar",
+						"node": 17,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "Pattern",
+						"node": 7,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "return lerp(R,Mortar,Pattern.x);",
+					"OutputType": "CMOT_Float1",
+					"Description": "Independent stone finish and existing mortar roughness"
+				}
+			},
+			{
+				"id": 10,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_0",
+				"props":
+				{
+					"DefaultValue": 180,
+					"ParameterName": "WorldTileCm"
+				}
+			},
+			{
+				"id": 11,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_1",
+				"props":
+				{
+					"DefaultValue": 0.60000002384185791,
+					"ParameterName": "NormalStrength"
+				}
+			},
+			{
+				"id": 12,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_2",
+				"props":
+				{
+					"DefaultValue": 0.64999997615814209,
+					"ParameterName": "RoughnessBlend"
+				}
+			},
+			{
+				"id": 13,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_3",
+				"props":
+				{
+					"DefaultValue": 0.44999998807907104,
+					"ParameterName": "PigmentMix"
+				}
+			},
+			{
+				"id": 14,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_4",
+				"props":
+				{
+					"DefaultValue": 90,
+					"ParameterName": "BlockWidthCm"
+				}
+			},
+			{
+				"id": 15,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_5",
+				"props":
+				{
+					"DefaultValue": 50,
+					"ParameterName": "CourseHeightCm"
+				}
+			},
+			{
+				"id": 16,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_6",
+				"props":
+				{
+					"DefaultValue": 1.2000000476837158,
+					"ParameterName": "JointWidthCm"
+				}
+			},
+			{
+				"id": 17,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_7",
+				"props":
+				{
+					"DefaultValue": 0.89999997615814209,
+					"ParameterName": "MortarRoughness"
+				}
+			},
+			{
+				"id": 18,
+				"class": "TextureSample",
+				"name": "MaterialExpressionTextureSample_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Coordinates",
+						"node": 1,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"Texture": "/Game/Mars/ArtReview/Lookdev/CatacombCompleteRoom_20261026R02/Textures/T_CP_AngularPigment_R02.T_CP_AngularPigment_R02"
+				}
+			},
+			{
+				"id": 19,
+				"class": "TextureSample",
+				"name": "MaterialExpressionTextureSample_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Coordinates",
+						"node": 2,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"Texture": "/Game/Mars/ArtReview/Lookdev/CatacombCompleteRoom_20261026R02/Textures/T_CP_AngularPigment_R02.T_CP_AngularPigment_R02"
+				}
+			},
+			{
+				"id": 20,
+				"class": "TextureSample",
+				"name": "MaterialExpressionTextureSample_2",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Coordinates",
+						"node": 3,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"Texture": "/Game/Mars/ArtReview/Lookdev/CatacombCompleteRoom_20261026R02/Textures/T_CP_AngularPigment_R02.T_CP_AngularPigment_R02"
+				}
+			},
+			{
+				"id": 21,
+				"class": "TextureSample",
+				"name": "MaterialExpressionTextureSample_3",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Coordinates",
+						"node": 1,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"Texture": "/Game/Mars/ArtReview/Lookdev/CatacombCompleteRoom_20261026R02/PBR_R08/Textures/T_CP_BroadPlanes_NormalDX_R03.T_CP_BroadPlanes_NormalDX_R03",
+					"SamplerType": "SAMPLERTYPE_Normal"
+				}
+			},
+			{
+				"id": 22,
+				"class": "TextureSample",
+				"name": "MaterialExpressionTextureSample_4",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Coordinates",
+						"node": 2,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"Texture": "/Game/Mars/ArtReview/Lookdev/CatacombCompleteRoom_20261026R02/PBR_R08/Textures/T_CP_BroadPlanes_NormalDX_R03.T_CP_BroadPlanes_NormalDX_R03",
+					"SamplerType": "SAMPLERTYPE_Normal"
+				}
+			},
+			{
+				"id": 23,
+				"class": "TextureSample",
+				"name": "MaterialExpressionTextureSample_5",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Coordinates",
+						"node": 3,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"Texture": "/Game/Mars/ArtReview/Lookdev/CatacombCompleteRoom_20261026R02/PBR_R08/Textures/T_CP_BroadPlanes_NormalDX_R03.T_CP_BroadPlanes_NormalDX_R03",
+					"SamplerType": "SAMPLERTYPE_Normal"
+				}
+			},
+			{
+				"id": 24,
+				"class": "TextureSample",
+				"name": "MaterialExpressionTextureSample_6",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Coordinates",
+						"node": 1,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"Texture": "/Game/Mars/ArtReview/Lookdev/CatacombCompleteRoom_20261026R02/PBR_R08/Textures/T_CP_BroadPlanes_Roughness_R03.T_CP_BroadPlanes_Roughness_R03",
+					"SamplerType": "SAMPLERTYPE_Masks"
+				}
+			},
+			{
+				"id": 25,
+				"class": "TextureSample",
+				"name": "MaterialExpressionTextureSample_7",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Coordinates",
+						"node": 2,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"Texture": "/Game/Mars/ArtReview/Lookdev/CatacombCompleteRoom_20261026R02/PBR_R08/Textures/T_CP_BroadPlanes_Roughness_R03.T_CP_BroadPlanes_Roughness_R03",
+					"SamplerType": "SAMPLERTYPE_Masks"
+				}
+			},
+			{
+				"id": 26,
+				"class": "TextureSample",
+				"name": "MaterialExpressionTextureSample_8",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Coordinates",
+						"node": 3,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"Texture": "/Game/Mars/ArtReview/Lookdev/CatacombCompleteRoom_20261026R02/PBR_R08/Textures/T_CP_BroadPlanes_Roughness_R03.T_CP_BroadPlanes_Roughness_R03",
+					"SamplerType": "SAMPLERTYPE_Masks"
+				}
+			},
+			{
+				"id": 27,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_0",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.200000,G=0.180000,B=0.140000,A=1.000000)",
+					"ParameterName": "BaseColour"
+				}
+			},
+			{
+				"id": 28,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_1",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.950000,G=0.920000,B=0.860000,A=1.000000)",
+					"ParameterName": "PigmentTint"
+				}
+			},
+			{
+				"id": 29,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_2",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.120000,G=0.105000,B=0.080000,A=1.000000)",
+					"ParameterName": "MortarColour"
+				}
+			},
+			{
+				"id": 30,
+				"class": "VertexInterpolator",
+				"name": "MaterialExpressionVertexInterpolator_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "VS",
+						"node": 31,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 31,
+				"class": "VertexNormalWS",
+				"name": "MaterialExpressionVertexNormalWS_0"
+			},
+			{
+				"id": 32,
+				"class": "WorldPosition",
+				"name": "MaterialExpressionWorldPosition_0",
+				"outputs": [
+					"XYZ",
+					"XY",
+					"Z"
+				],
+				"props":
+				{
+					"WorldPositionShaderOffset": "WPT_ExcludeAllShaderOffsets"
+				}
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_BaseColor",
+				"node": 8,
+				"output": 0
+			},
+			{
+				"property": "MP_Metallic",
+				"node": 0,
+				"output": 0
+			},
+			{
+				"property": "MP_Roughness",
+				"node": 9,
+				"output": 0
+			},
+			{
+				"property": "MP_Normal",
+				"node": 6,
+				"output": 0
+			}
+		]
+	},
+	"scalarParams": [
+		{
+			"name": "WorldTileCm",
+			"value": 180
+		},
+		{
+			"name": "NormalStrength",
+			"value": 0.60000002384185791
+		},
+		{
+			"name": "RoughnessBlend",
+			"value": 0.64999997615814209
+		},
+		{
+			"name": "PigmentMix",
+			"value": 0.44999998807907104
+		},
+		{
+			"name": "BlockWidthCm",
+			"value": 90
+		},
+		{
+			"name": "CourseHeightCm",
+			"value": 50
+		},
+		{
+			"name": "JointWidthCm",
+			"value": 1.2000000476837158
+		},
+		{
+			"name": "MortarRoughness",
+			"value": 0.89999997615814209
+		}
+	],
+	"vectorParams": [
+		{
+			"name": "BaseColour",
+			"value": "RGBA(0.2, 0.18, 0.14, 1)"
+		},
+		{
+			"name": "PigmentTint",
+			"value": "RGBA(0.95, 0.92, 0.86, 1)"
+		},
+		{
+			"name": "MortarColour",
+			"value": "RGBA(0.12, 0.105, 0.08, 1)"
+		}
+	],
+	"textureParams": [],
+	"usedTextures": [
+		"/Game/Mars/ArtReview/Lookdev/CatacombCompleteRoom_20261026R02/PBR_R08/Textures/T_CP_BroadPlanes_NormalDX_R03.T_CP_BroadPlanes_NormalDX_R03",
+		"/Game/Mars/ArtReview/Lookdev/CatacombCompleteRoom_20261026R02/Textures/T_CP_AngularPigment_R02.T_CP_AngularPigment_R02",
+		"/Game/Mars/ArtReview/Lookdev/CatacombCompleteRoom_20261026R02/PBR_R08/Textures/T_CP_BroadPlanes_Roughness_R03.T_CP_BroadPlanes_Roughness_R03"
+	]
+}

@@ -1,0 +1,100 @@
+{
+	"material": "M_CP_ForageBronze_R01",
+	"packagePath": "/Game/Mars/ArtReview/Lookdev/CatacombCompleteRoom_20261026R02/Forage_R04/Materials/M_CP_ForageBronze_R01",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "19db7d1823ea1760bc3969030216a7f1",
+		"exporterVersion": 3
+	},
+	"blendMode": "BLEND_Opaque",
+	"twoSided": false,
+	"unlit": false,
+	"shadingModel": "MSM_DefaultLit",
+	"domain": "MD_Surface",
+	"connectedOutputs": [
+		"BaseColor"
+	],
+	"expressions":
+	{
+		"ComponentMask": 1,
+		"Constant": 2,
+		"VertexColor": 1
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "VertexColor",
+				"name": "MaterialExpressionVertexColor_0",
+				"outputs": [
+					"None",
+					"None",
+					"None",
+					"None",
+					"None"
+				]
+			},
+			{
+				"id": 1,
+				"class": "ComponentMask",
+				"name": "MaterialExpressionComponentMask_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Input",
+						"node": 0,
+						"output": 0,
+						"mask": "rgb"
+					}
+				],
+				"props":
+				{
+					"R": true,
+					"G": true,
+					"B": true
+				}
+			},
+			{
+				"id": 2,
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_0",
+				"props":
+				{
+					"R": 0.75
+				}
+			},
+			{
+				"id": 3,
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_1",
+				"props":
+				{
+					"R": 0.72000002861022949
+				}
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_BaseColor",
+				"node": 1,
+				"output": 0
+			},
+			{
+				"property": "MP_Metallic",
+				"node": 2,
+				"output": 0
+			},
+			{
+				"property": "MP_Roughness",
+				"node": 3,
+				"output": 0
+			}
+		]
+	},
+	"scalarParams": [],
+	"vectorParams": [],
+	"textureParams": [],
+	"usedTextures": []
+}

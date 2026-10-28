@@ -70,6 +70,23 @@ class UMars_Bellkeeper_EntityScript : UCk_GenericEntityScript_UE
     UPROPERTY(ExposeOnSpawn)
     FVector BellOffsetWorld = FVector(0.0, 0.0, 70.0);
 
+    // Optional appearances. Unset values retain the existing ProtoGrid materials. GlyphMaterialOverride and
+    // IndicatorMaterialOverride must expose PrimaryColor for the existing ivory glyphs and state repaint.
+    UPROPERTY(ExposeOnSpawn)
+    UMaterialInterface BodyMaterialOverride;
+
+    UPROPERTY(ExposeOnSpawn)
+    UMaterialInterface FaceMaterialOverride;
+
+    UPROPERTY(ExposeOnSpawn)
+    UMaterialInterface ControlMaterialOverride;
+
+    UPROPERTY(ExposeOnSpawn)
+    UMaterialInterface GlyphMaterialOverride;
+
+    UPROPERTY(ExposeOnSpawn)
+    UMaterialInterface IndicatorMaterialOverride;
+
     // A detent's click (greybox: a metal punch pitched up and quiet).
     private const float32 ClickVolume = 0.25f;
     private const float32 ClickPitch = 2.2f;
@@ -111,9 +128,12 @@ class UMars_Bellkeeper_EntityScript : UCk_GenericEntityScript_UE
         { AddDial(Root, Index); }
 
         const auto BellLocal = SpawnTransform.InverseTransformPosition(SpawnTransform.GetLocation() + BellOffsetWorld);
-        _BellPart = Root.Add_MeshPart(this, FMars_MeshPart(
+        auto BellPart = FMars_MeshPart(
             FTransform(FRotator(90.0, 0.0, 0.0), BellLocal, FVector(0.35, 0.35, 0.4)),
-            engine::load::Cone(), assets::load::ProtoGrid_Interactable_Mars_MI(), collision::profile::NoCollision, n"Bellkeeper_Bell"));
+            engine::load::Cone(), assets::load::ProtoGrid_Interactable_Mars_MI(), collision::profile::NoCollision, n"Bellkeeper_Bell");
+        if (ck::IsValid(ControlMaterialOverride))
+        { BellPart.Material = ControlMaterialOverride; }
+        _BellPart = Root.Add_MeshPart(this, BellPart);
 
         if (OwnedVent.Enabled)
         {
@@ -216,9 +236,12 @@ class UMars_Bellkeeper_EntityScript : UCk_GenericEntityScript_UE
         const auto Height = 90.0;
 
         // Engine cube is 100 uu with a centered pivot. The plate runs from X -45 (top, above the candles) to +45.
-        InRoot.Add_MeshPart(this, FMars_MeshPart(
+        auto PlatePart = FMars_MeshPart(
             FTransform(FRotator::ZeroRotator, FVector(-5.0, 0.0, PlateThickness * 0.5), FVector(Height, Width, PlateThickness) * 0.01),
-            engine::load::Cube(), assets::load::ProtoGrid_Wall_Mars_MI(), collision::profile::BlockAll, n"Bellkeeper_Plate"));
+            engine::load::Cube(), assets::load::ProtoGrid_Wall_Mars_MI(), collision::profile::BlockAll, n"Bellkeeper_Plate");
+        if (ck::IsValid(BodyMaterialOverride))
+        { PlatePart.Material = BodyMaterialOverride; }
+        InRoot.Add_MeshPart(this, PlatePart);
     }
 
     private void AddDial(FCk_Handle_Transform& InRoot, int32 InIndex)
@@ -236,6 +259,8 @@ class UMars_Bellkeeper_EntityScript : UCk_GenericEntityScript_UE
         auto Face = DialNode.As_Transform();
         auto FacePart = FMars_MeshPart(FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, 0.5), FVector(0.4, 0.4, 0.01)),
             engine::load::Cylinder(), assets::load::ProtoGrid_Wall_Mars_MI(), collision::profile::NoCollision, n"Bellkeeper_DialFace");
+        if (ck::IsValid(FaceMaterialOverride))
+        { FacePart.Material = FaceMaterialOverride; }
         FacePart.PrimaryColor = TOptional<FLinearColor>(FLinearColor(0.08f, 0.07f, 0.06f, 1.0f));
         Face.Add_MeshPart(this, FacePart);
 
@@ -243,7 +268,9 @@ class UMars_Bellkeeper_EntityScript : UCk_GenericEntityScript_UE
         {
             const auto Yaw = Math::DegreesToRadians(Get_GlyphYaw(Glyph));
             const auto Center = FVector(Math::Cos(Yaw) * RingRadius, Math::Sin(Yaw) * RingRadius, 1.0);
-            Face.Add_BellkeeperGlyph(this, FMars_Bellkeeper_GlyphPlacement(EMars_Bellkeeper_Glyph(Glyph), Center, GlyphSize));
+            auto GlyphPlacement = FMars_Bellkeeper_GlyphPlacement(EMars_Bellkeeper_Glyph(Glyph), Center, GlyphSize);
+            GlyphPlacement.Material = GlyphMaterialOverride;
+            Face.Add_BellkeeperGlyph(this, GlyphPlacement);
         }
 
         const auto StartYaw = Get_GlyphYaw(DialSpec.StartIndex);
@@ -251,14 +278,19 @@ class UMars_Bellkeeper_EntityScript : UCk_GenericEntityScript_UE
         _Knobs.Add(Knob);
 
         auto KnobTransform = Knob.As_Transform();
-        KnobTransform.Add_MeshPart(this, FMars_MeshPart(
+        auto KnobPart = FMars_MeshPart(
             FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, 3.0), FVector(0.14, 0.14, 0.05)),
-            engine::load::Cylinder(), assets::load::ProtoGrid_Interactable_Mars_MI(), collision::profile::NoCollision, n"Bellkeeper_Knob"));
+            engine::load::Cylinder(), assets::load::ProtoGrid_Interactable_Mars_MI(), collision::profile::NoCollision, n"Bellkeeper_Knob");
+        if (ck::IsValid(ControlMaterialOverride))
+        { KnobPart.Material = ControlMaterialOverride; }
+        KnobTransform.Add_MeshPart(this, KnobPart);
 
         // The pointer is the knob's grip: a lever handle lying along the knob's +X (which the knob's yaw turns onto the glyph
         // it points at), off centre so it reads one way; its Grip socket is where the gloves take hold and turn with it.
         auto PointerPart = FMars_MeshPart(FTransform(FRotator(90.0, 0.0, 0.0), FVector(4.0, 0.0, 7.0), FVector(0.035, 0.035, 0.11)),
             assets::load::LeverHandle_Mars_SM(), assets::load::ProtoGrid_Interactable_Mars_MI(), collision::profile::NoCollision, n"Bellkeeper_Pointer");
+        if (ck::IsValid(GlyphMaterialOverride))
+        { PointerPart.Material = GlyphMaterialOverride; }
         PointerPart.PrimaryColor = TOptional<FLinearColor>(FLinearColor(0.9f, 0.85f, 0.7f, 1.0f));
         KnobTransform.Add_MeshPart(this, PointerPart);
 
@@ -298,18 +330,24 @@ class UMars_Bellkeeper_EntityScript : UCk_GenericEntityScript_UE
         const auto FirstY = (Rewards.Num() - 1) * CandleSpacing * 0.5;
         for (int32 Index = 0; Index < Rewards.Num(); ++Index)
         {
-            auto Candle = InRoot.Add_MeshPart(this, FMars_MeshPart(
+            auto CandlePart = FMars_MeshPart(
                 FTransform(FRotator::ZeroRotator, FVector(CandleRowX, FirstY - Index * CandleSpacing, PlateThickness + 2.0), FVector(0.05, 0.05, 0.04)),
-                engine::load::Cylinder(), assets::load::ProtoGrid_Interactable_Mars_MI(), collision::profile::NoCollision, n"Bellkeeper_Candle"));
+                engine::load::Cylinder(), assets::load::ProtoGrid_Interactable_Mars_MI(), collision::profile::NoCollision, n"Bellkeeper_Candle");
+            if (ck::IsValid(IndicatorMaterialOverride))
+            { CandlePart.Material = IndicatorMaterialOverride; }
+            auto Candle = InRoot.Add_MeshPart(this, CandlePart);
             _Candles.Add(Candle);
             if (ck::IsValid(Candle))
             { utils_unreal_component::BindTo_OnAdded(Candle, FCk_Delegate_UnrealComponent_OnAdded(this, n"OnLightAdded")); }
         }
 
         const auto LampY = -(FirstY + CandleSpacing * 1.5);
-        _Lamp = InRoot.Add_MeshPart(this, FMars_MeshPart(
+        auto LampPart = FMars_MeshPart(
             FTransform(FRotator::ZeroRotator, FVector(CandleRowX, LampY, PlateThickness + 2.0), FVector(0.06, 0.06, 0.04)),
-            engine::load::Cube(), assets::load::ProtoGrid_Interactable_Mars_MI(), collision::profile::NoCollision, n"Bellkeeper_Lamp"));
+            engine::load::Cube(), assets::load::ProtoGrid_Interactable_Mars_MI(), collision::profile::NoCollision, n"Bellkeeper_Lamp");
+        if (ck::IsValid(IndicatorMaterialOverride))
+        { LampPart.Material = IndicatorMaterialOverride; }
+        _Lamp = InRoot.Add_MeshPart(this, LampPart);
         if (ck::IsValid(_Lamp))
         { utils_unreal_component::BindTo_OnAdded(_Lamp, FCk_Delegate_UnrealComponent_OnAdded(this, n"OnLightAdded")); }
     }

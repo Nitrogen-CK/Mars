@@ -114,6 +114,24 @@ namespace mars
         Cast<UCk_PlayerMappableKeySettings_UE>(PlayerMappableKeySettings).Set_ScopeTags(GameplayTag::MakeContainerFromTag(GameplayTags::Input_Scope_Gameplay));
     }
 
+    asset Mars_IA_CookbookPrevious of UCk_Boolean_InputAction
+    {
+        PlayerMappableKeySettings = NewObject(Mars_IA_CookbookPrevious, UCk_PlayerMappableKeySettings_UE);
+        PlayerMappableKeySettings.Name = n"IA_CookbookPrevious";
+        PlayerMappableKeySettings.DisplayName = NSLOCTEXT("MarsSettingsUI", "KeybindCookbookPrevious", "Cookbook: Previous Page");
+        PlayerMappableKeySettings.DisplayCategory = NSLOCTEXT("MarsSettingsUI", "KeybindCategoryGameplay", "Gameplay");
+        Cast<UCk_PlayerMappableKeySettings_UE>(PlayerMappableKeySettings).Set_ScopeTags(GameplayTag::MakeContainerFromTag(GameplayTags::Input_Scope_Gameplay));
+    }
+
+    asset Mars_IA_CookbookNext of UCk_Boolean_InputAction
+    {
+        PlayerMappableKeySettings = NewObject(Mars_IA_CookbookNext, UCk_PlayerMappableKeySettings_UE);
+        PlayerMappableKeySettings.Name = n"IA_CookbookNext";
+        PlayerMappableKeySettings.DisplayName = NSLOCTEXT("MarsSettingsUI", "KeybindCookbookNext", "Cookbook: Next Page");
+        PlayerMappableKeySettings.DisplayCategory = NSLOCTEXT("MarsSettingsUI", "KeybindCategoryGameplay", "Gameplay");
+        Cast<UCk_PlayerMappableKeySettings_UE>(PlayerMappableKeySettings).Set_ScopeTags(GameplayTag::MakeContainerFromTag(GameplayTags::Input_Scope_Gameplay));
+    }
+
     // Leaves a station.
     asset Mars_IA_Back of UCk_Boolean_InputAction
     {

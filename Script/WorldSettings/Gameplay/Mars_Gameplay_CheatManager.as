@@ -78,6 +78,21 @@ class UMars_Gameplay_CheatManager : UCheatManager
         Hotbar.Request_Select(FMars_Request_Hotbar_Select(Index.GetValue()));
     }
 
+    // A loose cookbook in front of the chef, using the same physical spawn/pickup path as a dropped item.
+    UFUNCTION(Exec)
+    void Mars_SpawnCookbook()
+    {
+        auto Character = TryGet_LocalCharacter("Mars_SpawnCookbook");
+        if (ck::Is_NOT_Valid(Character))
+        { return; }
+
+        auto Owner = ck::TransientEntity();
+        const auto Location = Character.GetActorLocation() + Character.GetActorForwardVector() * 100.0;
+        auto Spec = FMars_WorldItem_WorldSpec(utils_held_item::Make_DefinitionSoft(mars_items::Cookbook()),
+            FTransform(FRotator::ZeroRotator, Location));
+        utils_world_item::Request_SpawnWorld(Owner, Spec);
+    }
+
     // Presses (1) or releases (0) the Primary interaction intent on the local player's resolver, as the Primary key does.
     UFUNCTION(Exec)
     void Mars_Primary(bool InPressed)

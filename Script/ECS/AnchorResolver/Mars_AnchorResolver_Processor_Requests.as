@@ -77,6 +77,7 @@ class UMars_Processor_AnchorResolver_HandleRequests : UCk_Processor_Script_Base_
             Context.LeverSide = Anchor.Get_LeverSide();
             Context.CrawlOffsetCm = Anchor.Get_CrawlOffsetCm();
             Context.GateMaterialOverride = Anchor.Get_GateMaterialOverride();
+            Context.ForagePresentation = Anchor.Get_ForagePresentation();
             Anchor.Request_Resolve(FMars_Request_Anchor_Resolve(RowIndex, Role, Context));
 
             auto Entry = FMars_AnchorLedger_Entry();

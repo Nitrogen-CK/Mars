@@ -134,6 +134,9 @@ struct FMars_Anchor_Context
     // Weak: the context is retained in resolve request fragments.
     UPROPERTY()
     TWeakObjectPtr<UMaterialInterface> GateMaterialOverride;
+
+    UPROPERTY()
+    TWeakObjectPtr<UMars_ForagePresentation_Def> ForagePresentation;
 }
 
 // Spawn params passed to every candidate. Injection matches by property name; an AngelScript class ignores a field it
@@ -196,6 +199,10 @@ struct FMars_Anchor_Spec
     // Optional presentation only; unset preserves the prototype gate material.
     UPROPERTY()
     UMaterialInterface GateMaterialOverride = nullptr;
+
+    // Assembly-only forwarding; the placed script retains the strong owner.
+    UPROPERTY()
+    UMars_ForagePresentation_Def ForagePresentation = nullptr;
 }
 
 mixin FMars_Validation Validate(const FMars_Anchor_Spec& Self)
@@ -259,6 +266,9 @@ struct FMars_Fragment_Anchor_Params
 
     UPROPERTY()
     TWeakObjectPtr<UMaterialInterface> GateMaterialOverride;
+
+    UPROPERTY()
+    TWeakObjectPtr<UMars_ForagePresentation_Def> ForagePresentation;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

@@ -1,0 +1,120 @@
+{
+	"assetName": "JoltIndex",
+	"assetPath": "/Game/CkJoltData/Mars/Environment/SpireConnectorKit/Maps/Spire_PIEAcceptance_Mars_MAP/JoltIndex.JoltIndex",
+	"assetClass": "Ck_Jolt_CookedWorldIndex_UE",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "c81efaff12dc446f97b9dc5ca991e5c1",
+		"exporterVersion": 2
+	},
+	"parentClasses": [
+		"DataAsset"
+	],
+	"properties": [
+		{
+			"name": "_CookVersion",
+			"type": "uint32",
+			"category": "Ck_Jolt_CookedWorldIndex_UE",
+			"value": 7
+		},
+		{
+			"name": "_JoltVersionId",
+			"type": "uint32",
+			"category": "Ck_Jolt_CookedWorldIndex_UE",
+			"value": 537199105
+		},
+		{
+			"name": "_SourceMapPackage",
+			"type": "FName",
+			"category": "Ck_Jolt_CookedWorldIndex_UE",
+			"value": "/Game/Mars/Environment/SpireConnectorKit/Maps/Spire_PIEAcceptance_Mars_MAP"
+		},
+		{
+			"name": "_BakeFilterHash",
+			"type": "uint64",
+			"category": "Ck_Jolt_CookedWorldIndex_UE",
+			"value": 3.2379971469817421e+18,
+			"tooltip": "Fingerprint of the bake filter the cook ran under. Compared against the CURRENT settings-built\nfilter at load: cooked data baked under different filter settings is stale for the whole map."
+		},
+		{
+			"name": "_Cells",
+			"type": "TArray",
+			"category": "Ck_Jolt_CookedWorldIndex_UE",
+			"value": [
+				{
+					"_CellId":
+					{
+						"X": 0,
+						"Y": 0
+					},
+					"_Bounds":
+					{
+						"Min":
+						{
+							"X": 0,
+							"Y": 0,
+							"Z": -1225
+						},
+						"Max":
+						{
+							"X": 5900,
+							"Y": 4135,
+							"Z": 0
+						},
+						"IsValid": true
+					},
+					"_CellAsset": "/Game/CkJoltData/Mars/Environment/SpireConnectorKit/Maps/Spire_PIEAcceptance_Mars_MAP/JoltCell_0_0.JoltCell_0_0"
+				},
+				{
+					"_CellId":
+					{
+						"X": 0,
+						"Y": -1
+					},
+					"_Bounds":
+					{
+						"Min":
+						{
+							"X": 1200,
+							"Y": -135,
+							"Z": -1200
+						},
+						"Max":
+						{
+							"X": 5400,
+							"Y": 135,
+							"Z": -1200
+						},
+						"IsValid": true
+					},
+					"_CellAsset": "/Game/CkJoltData/Mars/Environment/SpireConnectorKit/Maps/Spire_PIEAcceptance_Mars_MAP/JoltCell_0_-1.JoltCell_0_-1"
+				},
+				{
+					"_CellId":
+					{
+						"X": -1,
+						"Y": 0
+					},
+					"_Bounds":
+					{
+						"Min":
+						{
+							"X": -200,
+							"Y": 0,
+							"Z": -25
+						},
+						"Max":
+						{
+							"X": -200,
+							"Y": 4000,
+							"Z": -25
+						},
+						"IsValid": true
+					},
+					"_CellAsset": "/Game/CkJoltData/Mars/Environment/SpireConnectorKit/Maps/Spire_PIEAcceptance_Mars_MAP/JoltCell_-1_0.JoltCell_-1_0"
+				}
+			]
+		}
+	]
+}

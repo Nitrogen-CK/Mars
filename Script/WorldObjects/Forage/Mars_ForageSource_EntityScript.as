@@ -26,6 +26,9 @@ struct FMars_ForageSource_KnockBody
 UCLASS(Abstract)
 class UMars_ForageSource_EntityScript : UCk_GenericEntityScript_UE
 {
+    UPROPERTY(ExposeOnSpawn)
+    FMars_Anchor_Context Anchor;
+
     protected FCk_Handle_Forage _Forage;
     protected FCk_Handle_Health _Health;
     protected FCk_Handle_HitZone _Zone;

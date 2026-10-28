@@ -28,10 +28,12 @@ struct FMars_ForageBasin_Spec
 
 // Adds the four walls under Self. They block: a collision-bearing mesh part bakes into the Jolt static world, so a
 // dropped yield lands inside the ring. InOuter is the entity script building them (the Add_MeshPart archetype outer).
-mixin void Add_ForageBasinRing(FCk_Handle_Transform& Self, UObject InOuter, const FMars_ForageBasin_Spec& InSpec)
+mixin void Add_ForageBasinRing(FCk_Handle_Transform& Self, UObject InOuter, const FMars_ForageBasin_Spec& InSpec, UMaterialInterface InMaterialOverride = nullptr)
 {
     auto CubeMesh = engine::load::Cube();
-    auto PlatformMaterial = assets::load::ProtoGrid_Platform_Mars_MI();
+    UMaterialInterface PlatformMaterial = assets::load::ProtoGrid_Platform_Mars_MI();
+    if (ck::IsValid(InMaterialOverride))
+    { PlatformMaterial = InMaterialOverride; }
     const float64 HalfWidth = InSpec.HalfWidth;
     const float64 WallZ = InSpec.WallHeight * 0.5;
     const float64 WallLength = HalfWidth * 2.0 + InSpec.WallThickness;

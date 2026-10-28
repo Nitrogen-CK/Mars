@@ -1,0 +1,168 @@
+{
+	"material": "M_CP_ForageTimberPost_R02",
+	"packagePath": "/Game/Mars/ArtReview/Lookdev/CatacombCompleteRoom_20261026R02/Forage_R04/Timber_R02/Materials/M_CP_ForageTimberPost_R02",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "dfbf76c872a40d40207e56f4d673e2f1",
+		"exporterVersion": 3
+	},
+	"blendMode": "BLEND_Opaque",
+	"twoSided": false,
+	"unlit": false,
+	"shadingModel": "MSM_DefaultLit",
+	"domain": "MD_Surface",
+	"connectedOutputs": [
+		"BaseColor"
+	],
+	"expressions":
+	{
+		"Add": 1,
+		"Constant": 3,
+		"Constant3Vector": 1,
+		"Custom": 1,
+		"Multiply": 1,
+		"PreSkinnedPosition": 1,
+		"VertexInterpolator": 1
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "PreSkinnedPosition",
+				"name": "MaterialExpressionPreSkinnedPosition_0"
+			},
+			{
+				"id": 1,
+				"class": "VertexInterpolator",
+				"name": "MaterialExpressionVertexInterpolator_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "VS",
+						"node": 0,
+						"output": 0,
+						"mask": "rgb"
+					}
+				]
+			},
+			{
+				"id": 2,
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_0",
+				"props":
+				{
+					"R": 0.0099999997764825821
+				}
+			},
+			{
+				"id": 3,
+				"class": "Multiply",
+				"name": "MaterialExpressionMultiply_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 1,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 2,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 4,
+				"class": "Constant3Vector",
+				"name": "MaterialExpressionConstant3Vector_0",
+				"outputs": [
+					"None",
+					"None",
+					"None",
+					"None"
+				],
+				"props":
+				{
+					"Constant": "(R=0.500000,G=0.500000,B=0.500000,A=1.000000)"
+				}
+			},
+			{
+				"id": 5,
+				"class": "Add",
+				"name": "MaterialExpressionAdd_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 3,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 4,
+						"output": 0,
+						"mask": "rgb"
+					}
+				]
+			},
+			{
+				"id": 6,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "P",
+						"node": 5,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "float L=P.z; float Q=abs(P.x-.5)>abs(P.y-.5)?P.y:P.x;\nfloat3 C=float3(.100,.052,.024);\n// Unequal interrupted wedges, with broad straight edges and no fractal/grain noise.\nif(L<.76 && Q<(.12+.26*L)) C=float3(.082,.040,.018);\nif(L>.20 && Q>(.64+.10*abs(L-.37))) C=float3(.118,.064,.030);\nif(L>.72 && Q>.24 && Q<(.55+.12*(L-.72))) C=float3(.106,.050,.023);\nreturn C;",
+					"Description": "Quiet timber with broad unequal interrupted painted planes"
+				}
+			},
+			{
+				"id": 7,
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_1"
+			},
+			{
+				"id": 8,
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_2",
+				"props":
+				{
+					"R": 0.86000001430511475
+				}
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_BaseColor",
+				"node": 6,
+				"output": 0
+			},
+			{
+				"property": "MP_Metallic",
+				"node": 7,
+				"output": 0
+			},
+			{
+				"property": "MP_Roughness",
+				"node": 8,
+				"output": 0
+			}
+		]
+	},
+	"scalarParams": [],
+	"vectorParams": [],
+	"textureParams": [],
+	"usedTextures": []
+}

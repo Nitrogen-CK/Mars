@@ -187,6 +187,9 @@ class UMars_InputProfile_Gameplay : UMars_InputProfile
         Context.MapKey(mars::Mars_IA_EmoteWheel, EKeys::Q);
         // Shares Q: the wheel only runs in Locomotion, this row is read only while operating a feeding station.
         Context.MapKey(mars::Mars_IA_StationAddFood, EKeys::Q);
+        // The open held book consumes Q before the emote wheel; station feeding keeps its own Locomotion-free mode.
+        Context.MapKey(mars::Mars_IA_CookbookPrevious, EKeys::Q);
+        Context.MapKey(mars::Mars_IA_CookbookNext, EKeys::E);
         Context.MapKey(mars::Mars_IA_Emote_Wave, EKeys::Five);
         Context.MapKey(mars::Mars_IA_Emote_ThumbsUp, EKeys::Six);
         Context.MapKey(mars::Mars_IA_Emote_Point, EKeys::Seven);
@@ -334,6 +337,8 @@ class UMars_InputProfile_Gameplay : UMars_InputProfile
         Rows.Add(FMars_Gameplay_IntentRow("BK", n"IA_Back", GameplayTags::Mars_Intent_Back));
         Rows.Add(FMars_Gameplay_IntentRow("EM", n"IA_EmoteWheel", GameplayTags::Mars_Intent_EmoteWheel));
         Rows.Add(FMars_Gameplay_IntentRow("AF", n"IA_StationAddFood", GameplayTags::Mars_Intent_StationAddFood));
+        Rows.Add(FMars_Gameplay_IntentRow("BP", n"IA_CookbookPrevious", utils_cookbook::Get_PreviousIntent()));
+        Rows.Add(FMars_Gameplay_IntentRow("BN", n"IA_CookbookNext", utils_cookbook::Get_NextIntent()));
         Rows.Add(FMars_Gameplay_IntentRow("EW", n"IA_Emote_Wave", GameplayTags::Mars_Intent_Emote_Wave));
         Rows.Add(FMars_Gameplay_IntentRow("ET", n"IA_Emote_ThumbsUp", GameplayTags::Mars_Intent_Emote_ThumbsUp));
         Rows.Add(FMars_Gameplay_IntentRow("EP", n"IA_Emote_Point", GameplayTags::Mars_Intent_Emote_Point));

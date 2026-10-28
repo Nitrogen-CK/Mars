@@ -92,6 +92,12 @@ class UMars_Processor_FPHands_HandleRequests : UCk_Processor_Script_Base_UE
     {
         const auto& Item = InRequest.Item;
         InState.Hold = utils_fphands::Make_Hold(Item);
+        if (InRequest.HoldOverride.IsSet() && ck::IsValid(Item) && InState.Hold.Kind != EMars_FPHands_HoldKind::Empty)
+        {
+            InState.Hold = InRequest.HoldOverride.GetValue();
+            return;
+        }
+
         InState.Carry.Reset();
         Refresh_Focus(InParams, InState);
 

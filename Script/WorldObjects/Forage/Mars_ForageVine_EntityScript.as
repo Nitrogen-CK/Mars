@@ -114,12 +114,36 @@ class UMars_ForageVine_EntityScript : UMars_ForageSource_EntityScript
     // Visuals
     //----------------------------------------------------------------------------------------------------------------------
 
+    protected UStaticMesh Get_PresentationYieldMesh(UMars_ForagePresentation_Def InPresentation) const
+    { return nullptr; }
+
     // Engine cube and sphere are 100 uu with their pivot at the centre. The post and the basin walls are solid (a
     // collision-bearing mesh part bakes into the Jolt static world), so a dropped fruit lands inside the ring.
     protected void AddVisuals(FCk_Handle_Transform& InRoot, FCk_Handle_Transform& InFruit)
     {
         auto CubeMesh = engine::load::Cube();
-        auto WallMaterial = assets::load::ProtoGrid_Wall_Mars_MI();
+        UMaterialInterface WallMaterial = assets::load::ProtoGrid_Wall_Mars_MI();
+        UMaterialInterface ArmMaterial = WallMaterial;
+        UMaterialInterface BasinMaterial = nullptr;
+        auto FruitMesh = engine::load::Sphere();
+        UMaterialInterface FruitMaterial = assets::load::ProtoGrid_Interactable_Mars_MI();
+        auto Presentation = Anchor.ForagePresentation.Get();
+        if (ck::IsValid(Presentation))
+        {
+            if (ck::IsValid(Presentation.TimberPostMaterial))
+            { WallMaterial = Presentation.TimberPostMaterial; }
+            if (ck::IsValid(Presentation.TimberArmMaterial))
+            { ArmMaterial = Presentation.TimberArmMaterial; }
+            if (ck::IsValid(Presentation.StoneMaterial))
+            { BasinMaterial = Presentation.StoneMaterial; }
+
+            auto OverrideMesh = Get_PresentationYieldMesh(Presentation);
+            if (ck::IsValid(OverrideMesh))
+            {
+                FruitMesh = OverrideMesh;
+                FruitMaterial = nullptr;
+            }
+        }
 
         const auto PostHeight = HangHeight + PostOverhang;
         InRoot.Add_MeshPart(this, FMars_MeshPart(
@@ -128,18 +152,31 @@ class UMars_ForageVine_EntityScript : UMars_ForageSource_EntityScript
 
         InRoot.Add_MeshPart(this, FMars_MeshPart(
             FTransform(FRotator::ZeroRotator, FVector(PostOffsetX * 0.5, 0.0, PostHeight), FVector(Math::Abs(PostOffsetX), ArmThickness, ArmThickness) * 0.01),
-            CubeMesh, WallMaterial, collision::profile::NoCollision, n"ForageVine_Arm"));
+            CubeMesh, ArmMaterial, collision::profile::NoCollision, n"ForageVine_Arm"));
+
+        if (ck::IsValid(Presentation) && ck::IsValid(Presentation.TimberPostMaterial)
+            && Presentation.Vine.ConnectorLengthCm > 0.0f && Presentation.Vine.ConnectorWidthCm > 0.0f)
+        {
+            const auto Length = Presentation.Vine.ConnectorLengthCm;
+            const auto Width = Presentation.Vine.ConnectorWidthCm;
+            InRoot.Add_MeshPart(this, FMars_MeshPart(
+                FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, HangHeight + FruitRadius + Length * 0.5), FVector(Width, Width, Length) * 0.01),
+                CubeMesh, Presentation.TimberPostMaterial, collision::profile::NoCollision, n"ForageVine_Twine"));
+        }
 
         _YieldMesh = InFruit.Add_MeshPart(this, FMars_MeshPart(
             FTransform(FRotator::ZeroRotator, FVector::ZeroVector, FVector::OneVector * (FruitRadius * 2.0 * 0.01)),
-            engine::load::Sphere(), assets::load::ProtoGrid_Interactable_Mars_MI(), collision::profile::NoCollision, n"ForageVine_Fruit"));
+            FruitMesh, FruitMaterial, collision::profile::NoCollision, n"ForageVine_Fruit"));
 
-        InRoot.Add_ForageBasinRing(this, FMars_ForageBasin_Spec(BasinHalfWidth));
+        InRoot.Add_ForageBasinRing(this, FMars_ForageBasin_Spec(BasinHalfWidth), BasinMaterial);
     }
 }
 
 class UMars_Forage_FigVine_EntityScript : UMars_ForageVine_EntityScript
 {
+    protected UStaticMesh Get_PresentationYieldMesh(UMars_ForagePresentation_Def InPresentation) const override
+    { return InPresentation.Vine.FigMesh; }
+
     protected TSoftObjectPtr<UCk_InventoryItem_Definition> Get_YieldDefinition() const override
     {
         return TSoftObjectPtr<UCk_InventoryItem_Definition>(mars_items::Fig());
@@ -148,6 +185,9 @@ class UMars_Forage_FigVine_EntityScript : UMars_ForageVine_EntityScript
 
 class UMars_Forage_BellnutVine_EntityScript : UMars_ForageVine_EntityScript
 {
+    protected UStaticMesh Get_PresentationYieldMesh(UMars_ForagePresentation_Def InPresentation) const override
+    { return InPresentation.Vine.BellnutMesh; }
+
     protected TSoftObjectPtr<UCk_InventoryItem_Definition> Get_YieldDefinition() const override
     {
         return TSoftObjectPtr<UCk_InventoryItem_Definition>(mars_items::Bellnut());

@@ -20,6 +20,7 @@ namespace utils_anchor
         Params.CrawlOffsetCm = InSpec.CrawlOffsetCm;
         Params.PinnedRow = InSpec.PinnedRow;
         Params.GateMaterialOverride = InSpec.GateMaterialOverride;
+        Params.ForagePresentation = InSpec.ForagePresentation;
 
         InHandle.Add_Fragment(FMars_Feature_Anchor());
         InHandle.Add_Fragment(Params);
@@ -65,6 +66,9 @@ mixin TOptional<FVector2D> Get_CrawlOffsetCm(const FCk_Handle_Anchor& Self)
 
 mixin UMaterialInterface Get_GateMaterialOverride(const FCk_Handle_Anchor& Self)
 { return Self.Get_Fragment(FMars_Fragment_Anchor_Params).GateMaterialOverride.Get(); }
+
+mixin UMars_ForagePresentation_Def Get_ForagePresentation(const FCk_Handle_Anchor& Self)
+{ return Self.Get_Fragment(FMars_Fragment_Anchor_Params).ForagePresentation.Get(); }
 
 mixin EMars_Anchor_State Get_State(const FCk_Handle_Anchor& Self)
 { return Self.Get_Fragment(FMars_Fragment_Anchor).State; }

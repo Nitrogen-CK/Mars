@@ -168,7 +168,6 @@ asset Mars_AnchorPlan_WarrensC of UMars_AnchorPlan_Def
     Groups[0].AnchorIds.Add(GameplayTags::Anchor_Mars_Warrens_R7);
 
     MaxActiveCaches = 2;
-    Caches.Add(GameplayTags::Anchor_Mars_Warrens_Mourner);
     Caches.Add(GameplayTags::Anchor_Mars_Warrens_SealedBurial);
     Caches.Add(GameplayTags::Anchor_Mars_Warrens_Porter);
     Caches.Add(GameplayTags::Anchor_Mars_Warrens_CatacombCache);

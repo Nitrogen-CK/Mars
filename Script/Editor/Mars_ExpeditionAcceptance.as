@@ -148,6 +148,52 @@ class UMars_ExpeditionAcceptance : UObject
     }
 
     UFUNCTION()
+    FString InspectCrawlerCombat(AMars_PlayerCharacter InCharacter)
+    {
+        if (ck::Is_NOT_Valid(InCharacter) || InCharacter.GetWorld().IsGameWorld() == false)
+        { return "no live character"; }
+        auto Player = InCharacter.TryGet_ActorEntityHandle();
+        if (ck::Is_NOT_Valid(Player))
+        { return "no live player entity"; }
+        FString Result = f"frame={utils_time::Get_FrameCounter()}";
+        for (auto Entity : utils_entity_tag::ForEach_Entity(Player, n"TAG_MarsCrawler"))
+        {
+            auto Crawler = Entity.As_Crawler(ECk_SanityCheck::UnChecked);
+            auto Root = Entity.As_Transform(ECk_SanityCheck::UnChecked);
+            if (ck::Is_NOT_Valid(Crawler) || ck::Is_NOT_Valid(Root))
+            { continue; }
+            const auto At = utils_transform::Get_EntityCurrentLocation(Root);
+            const auto Target = Crawler.Get_CombatTarget();
+            const auto Decision = Crawler.Get_AttackDecision();
+            const auto Evaluation = Crawler.Get_AttackEvaluation();
+            const auto Admission = Crawler.Get_AttackAdmission();
+            const auto Preparation = Crawler.Get_AttackPreparation();
+            Result += f"\ncrawler={Entity.ToString()} at={At} player_cm={At.Distance(InCharacter.GetActorLocation())} armed={Crawler.Get_IsCombatArmed()} aggressive={Crawler.Get_IsAggressive()} dead={Crawler.Get_IsCombatDead()} target={Target.ToString()} target_is_player={Target == Player} target_valid={Crawler.Get_IsCombatTargetValid(Target)} target_generation={Crawler.Get_CombatTargetGeneration()} warded={Crawler.Get_IsWarded(Target)} engage={Crawler.Get_EngageStage() :n} phase={Crawler.Get_AttackPhase() :n} attack_generation={Crawler.Get_AttackGeneration()} cooldown={Crawler.Get_AttackCooldownRemaining()}";
+            if (ck::IsValid(Target))
+            {
+                auto TargetPose = Target.As_Transform(ECk_SanityCheck::UnChecked);
+                if (ck::IsValid(TargetPose))
+                {
+                    const auto Delta = utils_transform::Get_EntityCurrentLocation(TargetPose) - At;
+                    Result += f" target_xy_cm={Delta.Size2D()} target_dz_cm={Delta.Z} target_xyz_cm={Delta.Size()}";
+                }
+            }
+            Result += f"\n decision_frame={Evaluation.ObservationFrame} selection_generation={Evaluation.SelectionGeneration} disposition={Evaluation.Selection.Disposition :n} reason={Decision.LastReason.ToString()} signature={Decision.Signature} selection_signature={Decision.SelectionSignature}";
+            Result += f"\n admission_id={Admission.AttackId.ToString()} accepted={Admission.Accepted} attempt_generation={Admission.AttemptGeneration} selection_generation={Admission.SelectionGeneration} sample={Admission.SampleId} preparation={Preparation.State :n} preferred={Preparation.Preferred.ToString()} target_identity={Preparation.TargetIdentity} target_generation={Preparation.TargetGeneration} readiness_wait={Preparation.ElapsedReadinessWait}";
+            for (const auto Entry : Evaluation.Evaluations)
+            {
+                Result += f"\n  attack={Entry.AttackId.ToString()} availability={Entry.Availability :n} capable={Entry.Capable} support_enabled={Entry.EnabledSupport} support_standing={Entry.StandingSupport}";
+                for (const auto Blocker : Entry.Blockers)
+                { Result += f"\n   blocker={Blocker.Code :n} kind={Blocker.Kind :n} field={Blocker.Field} role={Blocker.Role.ToString()} slot={Blocker.Slot.ToString()} expected={Blocker.Expected} actual={Blocker.Actual}"; }
+            }
+            auto Navigator = Crawler.Get_Navigator();
+            if (ck::IsValid(Navigator))
+            { Result += f"\n nav={Navigator.Get_Status() :n} nav_fail={Navigator.Get_FailReason() :n} pending_nav={Navigator.Get_HasPendingRequests()}"; }
+        }
+        return Result;
+    }
+
+    UFUNCTION()
     FString WorldItems(AMars_PlayerCharacter InCharacter)
     {
         if (ck::Is_NOT_Valid(InCharacter) || InCharacter.GetWorld().IsGameWorld() == false)

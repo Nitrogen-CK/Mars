@@ -551,13 +551,14 @@ class UMars_Crawler_EntityScript : UCk_GenericEntityScript_UE
     // (Length/2 x 6 x 6, centred, +X along the segment) and a foot box; with a look, the look's pieces instead, each
     // part's half extents the box enclosing the piece it wears (a leg's first segment wears its upper piece, the rest its
     // lower).
-    private FMars_Crawler_Rig BuildRig(FCk_Handle& InRoot, UCk_ProceduralRig_Data InRigData)
+    protected FMars_Crawler_Rig BuildRig(FCk_Handle& InRoot, UCk_ProceduralRig_Data InRigData,
+        FVector InBodyHalfExtents = FVector::ZeroVector)
     {
         const TArray<FCk_ProceduralLeg_Spec> LegSpecs = InRigData.Get_Legs();
         const auto WearsLook = _LookMeshes.Get_IsComplete();
 
         auto Rig = FMars_Crawler_Rig();
-        Rig.BodyHalfExtents = Get_BodyHalfExtents(InRigData);
+        Rig.BodyHalfExtents = InBodyHalfExtents.IsNearlyZero() ? Get_BodyHalfExtents(InRigData) : InBodyHalfExtents;
         Rig.Presentation = AddVisual(InRoot, FMars_Crawler_PartVisual(Rig.BodyHalfExtents, Color, _LookMeshes.Body));
 
         const auto FootHalfExtents = WearsLook ? Get_MeshHalfExtents(_LookMeshes.Foot) : FVector(FootHalfExtent, FootHalfExtent, FootHalfExtent);
@@ -592,7 +593,7 @@ class UMars_Crawler_EntityScript : UCk_GenericEntityScript_UE
     // A direct lifetime child of InRoot with a transform at the spawn and an ISM visual: the part's mesh at its authored
     // size, or an engine-cube box of its half extents. The visual is optional: without a renderer (no world, no RHI) the
     // entity still exists for the rig.
-    private FCk_Handle_Transform AddVisual(FCk_Handle& InRoot, const FMars_Crawler_PartVisual& InVisual)
+    protected FCk_Handle_Transform AddVisual(FCk_Handle& InRoot, const FMars_Crawler_PartVisual& InVisual)
     {
         auto Entity = utils_entity_lifetime::Request_CreateEntity(InRoot);
         auto Transform = utils_transform::Add(Entity, SpawnTransform, ECk_Replication::DoesNotReplicate);
@@ -611,6 +612,27 @@ class UMars_Crawler_EntityScript : UCk_GenericEntityScript_UE
         }
 
         return Transform;
+    }
+
+    // A rigid body attachment follows the same presentation node as the crawler's fangs. It is deliberately outside
+    // the solved leg bindings: the procedural action remains the only writer of those bindings.
+    protected FCk_Handle_SceneNode AddRigAttachment(FCk_Handle_Transform InParent,
+        const FMars_Crawler_PartVisual& InVisual, FTransform InOffset)
+    {
+        auto Node = utils_scene_node::Create(InParent, InOffset);
+        if (WithVisuals)
+        {
+            FCk_Handle Owner = InParent;
+            auto Renderer = GetOrCreate_Renderer(Owner, InVisual.Color);
+            if (ck::IsValid(Renderer))
+            {
+                auto ProxySpec = FCk_IsmProxy_Spec(Renderer);
+                ProxySpec.Set_ScaleMultiplier(InVisual.HalfExtents / 50.0);
+                auto Transform = Node.As_Transform();
+                utils_ism_proxy::Add(Transform, ProxySpec);
+            }
+        }
+        return Node;
     }
 
     // Look's pieces, loaded; empty (every part a box) without visuals or without a look. A look with a leg count other

@@ -1,0 +1,272 @@
+{
+	"material": "M_CP_Walls_R02",
+	"packagePath": "/Game/Mars/ArtReview/Lookdev/CatacombCompleteRoom_20261026R02/Materials/M_CP_Walls_R02",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "3c94428adacc74b5737ab4b9b5adde54",
+		"exporterVersion": 3
+	},
+	"blendMode": "BLEND_Opaque",
+	"twoSided": false,
+	"unlit": false,
+	"shadingModel": "MSM_DefaultLit",
+	"domain": "MD_Surface",
+	"connectedOutputs": [
+		"BaseColor"
+	],
+	"expressions":
+	{
+		"ComponentMask": 1,
+		"Constant": 5,
+		"Constant3Vector": 2,
+		"LinearInterpolate": 1,
+		"Multiply": 2,
+		"TextureCoordinate": 2,
+		"TextureSample": 1,
+		"VertexColor": 2
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "Constant3Vector",
+				"name": "MaterialExpressionConstant3Vector_1",
+				"outputs": [
+					"None",
+					"None",
+					"None",
+					"None"
+				],
+				"props":
+				{
+					"Constant": "(R=0.180000,G=0.160000,B=0.120000,A=1.000000)"
+				}
+			},
+			{
+				"id": 1,
+				"class": "TextureCoordinate",
+				"name": "MaterialExpressionTextureCoordinate_1"
+			},
+			{
+				"id": 2,
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_0",
+				"props":
+				{
+					"R": 0.85000002384185791
+				}
+			},
+			{
+				"id": 3,
+				"class": "VertexColor",
+				"name": "MaterialExpressionVertexColor_0",
+				"outputs": [
+					"None",
+					"None",
+					"None",
+					"None",
+					"None"
+				]
+			},
+			{
+				"id": 4,
+				"class": "Constant3Vector",
+				"name": "MaterialExpressionConstant3Vector_2",
+				"outputs": [
+					"None",
+					"None",
+					"None",
+					"None"
+				],
+				"props":
+				{
+					"Constant": "(R=0.180000,G=0.160000,B=0.120000,A=1.000000)"
+				}
+			},
+			{
+				"id": 5,
+				"class": "TextureSample",
+				"name": "MaterialExpressionTextureSample_2",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Coordinates",
+						"node": 6,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"Texture": "/Game/Mars/ArtReview/Lookdev/CatacombCompleteRoom_20261026R02/Textures/T_CP_AngularPigment_R02.T_CP_AngularPigment_R02"
+				}
+			},
+			{
+				"id": 6,
+				"class": "TextureCoordinate",
+				"name": "MaterialExpressionTextureCoordinate_2"
+			},
+			{
+				"id": 7,
+				"class": "LinearInterpolate",
+				"name": "MaterialExpressionLinearInterpolate_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 4,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 5,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 2,
+						"name": "Alpha",
+						"node": 8,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 8,
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_1",
+				"props":
+				{
+					"R": 0.85000002384185791
+				}
+			},
+			{
+				"id": 9,
+				"class": "Multiply",
+				"name": "MaterialExpressionMultiply_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 7,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 11,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 10,
+				"class": "VertexColor",
+				"name": "MaterialExpressionVertexColor_1",
+				"outputs": [
+					"None",
+					"None",
+					"None",
+					"None",
+					"None"
+				]
+			},
+			{
+				"id": 11,
+				"class": "ComponentMask",
+				"name": "MaterialExpressionComponentMask_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Input",
+						"node": 10,
+						"output": 0,
+						"mask": "rgb"
+					}
+				],
+				"props":
+				{
+					"R": true,
+					"G": true,
+					"B": true
+				}
+			},
+			{
+				"id": 12,
+				"class": "Multiply",
+				"name": "MaterialExpressionMultiply_2",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 9,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 13,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 13,
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_2",
+				"props":
+				{
+					"R": 1.2000000476837158
+				}
+			},
+			{
+				"id": 14,
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_3",
+				"props":
+				{
+					"R": 0.87999999523162842
+				}
+			},
+			{
+				"id": 15,
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_4"
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_BaseColor",
+				"node": 12,
+				"output": 0
+			},
+			{
+				"property": "MP_Metallic",
+				"node": 15,
+				"output": 0
+			},
+			{
+				"property": "MP_Roughness",
+				"node": 14,
+				"output": 0
+			}
+		]
+	},
+	"scalarParams": [],
+	"vectorParams": [],
+	"textureParams": [],
+	"usedTextures": [
+		"/Game/Mars/ArtReview/Lookdev/CatacombCompleteRoom_20261026R02/Textures/T_CP_AngularPigment_R02.T_CP_AngularPigment_R02"
+	]
+}

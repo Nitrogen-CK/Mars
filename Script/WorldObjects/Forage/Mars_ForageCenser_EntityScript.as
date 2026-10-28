@@ -223,24 +223,73 @@ class UMars_ForageCenser_EntityScript : UMars_ForageSource_EntityScript
         auto CubeMesh = engine::load::Cube();
         auto SphereMesh = engine::load::Sphere();
         auto InteractableMaterial = assets::load::ProtoGrid_Interactable_Mars_MI();
+        auto Presentation = Anchor.ForagePresentation.Get();
+        UMaterialInterface StoneMaterial = assets::load::ProtoGrid_Wall_Mars_MI();
+        UMaterialInterface BasinMaterial = nullptr;
+        auto ChainMesh = CubeMesh;
+        auto BobMesh = SphereMesh;
+        auto ContentsMesh = SphereMesh;
+        UMaterialInterface ChainMaterial = InteractableMaterial;
+        UMaterialInterface BobMaterial = InteractableMaterial;
+        UMaterialInterface ContentsMaterial = assets::load::ProtoGrid_Item_Mars_MI();
+        float64 ChainLength = ArmLength;
+
+        if (ck::IsValid(Presentation))
+        {
+            if (ck::IsValid(Presentation.StoneMaterial))
+            {
+                StoneMaterial = Presentation.StoneMaterial;
+                BasinMaterial = Presentation.StoneMaterial;
+            }
+
+            // A missing optional mesh keeps the original cube, material AND full-length transform.
+            if (ck::IsValid(Presentation.Censer.ChainMesh) && ArmLength > BobRadius)
+            {
+                ChainMesh = Presentation.Censer.ChainMesh;
+                ChainMaterial = nullptr;
+                ChainLength = ArmLength - BobRadius;
+            }
+            if (ck::IsValid(Presentation.Censer.BobMesh))
+            {
+                BobMesh = Presentation.Censer.BobMesh;
+                BobMaterial = nullptr;
+            }
+            if (ck::IsValid(Presentation.Censer.ContentsMesh))
+            {
+                ContentsMesh = Presentation.Censer.ContentsMesh;
+                ContentsMaterial = nullptr;
+            }
+        }
 
         const auto PivotHeight = ArmLength + PivotClearance + BobRadius;
         InRoot.Add_MeshPart(this, FMars_MeshPart(
             FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, PivotHeight), FVector(40.0, 40.0, 30.0) * 0.01),
-            CubeMesh, assets::load::ProtoGrid_Wall_Mars_MI(), collision::profile::BlockAll, n"ForageCenser_PivotBlock"));
+            CubeMesh, StoneMaterial, collision::profile::BlockAll, n"ForageCenser_PivotBlock"));
+
+        if (ck::IsValid(Presentation) && ck::IsValid(Presentation.TimberPostMaterial))
+        {
+            const auto SupportBottom = PivotHeight + 15.0;
+            const auto SupportHeight = Presentation.Censer.CeilingHeightCm - SupportBottom;
+            if (SupportHeight > 0.0)
+            {
+                InRoot.Add_MeshPart(this, FMars_MeshPart(
+                    FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, SupportBottom + SupportHeight * 0.5), FVector(8.0, 8.0, SupportHeight) * 0.01),
+                    CubeMesh, Presentation.TimberPostMaterial, collision::profile::NoCollision, n"ForageCenser_CeilingSupport"));
+            }
+        }
 
         InPivot.Add_MeshPart(this, FMars_MeshPart(
-            FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, -ArmLength * 0.5), FVector(ChainWidth, ChainWidth, ArmLength) * 0.01),
-            CubeMesh, InteractableMaterial, collision::profile::NoCollision, n"ForageCenser_Chain"));
+            FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, -ChainLength * 0.5), FVector(ChainWidth, ChainWidth, ChainLength) * 0.01),
+            ChainMesh, ChainMaterial, collision::profile::NoCollision, n"ForageCenser_Chain"));
 
         InBob.Add_MeshPart(this, FMars_MeshPart(
             FTransform(FRotator::ZeroRotator, FVector::ZeroVector, FVector::OneVector * (BobRadius * 2.0 * 0.01)),
-            SphereMesh, InteractableMaterial, collision::profile::NoCollision, n"ForageCenser_Bob"));
+            BobMesh, BobMaterial, collision::profile::NoCollision, n"ForageCenser_Bob"));
 
         _YieldMesh = InBob.Add_MeshPart(this, FMars_MeshPart(
             FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, BobRadius + ClusterLift), FVector::OneVector * ClusterScale),
-            SphereMesh, assets::load::ProtoGrid_Item_Mars_MI(), collision::profile::NoCollision, n"ForageCenser_Cluster"));
+            ContentsMesh, ContentsMaterial, collision::profile::NoCollision, n"ForageCenser_Cluster"));
 
-        InRoot.Add_ForageBasinRing(this, FMars_ForageBasin_Spec(BasinHalfWidth));
+        InRoot.Add_ForageBasinRing(this, FMars_ForageBasin_Spec(BasinHalfWidth), BasinMaterial);
     }
 }

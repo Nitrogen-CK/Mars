@@ -16,6 +16,16 @@ class UMars_BellkeeperClue_EntityScript : UCk_GenericEntityScript_UE
     UPROPERTY(ExposeOnSpawn)
     float32 GlyphSize = 40.0f;
 
+    // Optional appearances. Unset values retain the existing ProtoGrid materials; glyphs must expose PrimaryColor.
+    UPROPERTY(ExposeOnSpawn)
+    UMaterialInterface BodyMaterialOverride;
+
+    UPROPERTY(ExposeOnSpawn)
+    UMaterialInterface FaceMaterialOverride;
+
+    UPROPERTY(ExposeOnSpawn)
+    UMaterialInterface GlyphMaterialOverride;
+
     UFUNCTION(BlueprintOverride)
     ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
     {
@@ -27,9 +37,12 @@ class UMars_BellkeeperClue_EntityScript : UCk_GenericEntityScript_UE
         const auto Width = Math::Max(Phrase.Num(), 1) * Spacing + GlyphSize * 0.4;
 
         // Engine shapes are 100 uu with centered pivots.
-        Root.Add_MeshPart(this, FMars_MeshPart(
+        auto PlaquePart = FMars_MeshPart(
             FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, Thickness * 0.5), FVector(Disc + GlyphSize * 0.3, Width, Thickness) * 0.01),
-            engine::load::Cube(), assets::load::ProtoGrid_Wall_Mars_MI(), collision::profile::NoCollision, n"BellkeeperClue_Plaque"));
+            engine::load::Cube(), assets::load::ProtoGrid_Wall_Mars_MI(), collision::profile::NoCollision, n"BellkeeperClue_Plaque");
+        if (ck::IsValid(BodyMaterialOverride))
+        { PlaquePart.Material = BodyMaterialOverride; }
+        Root.Add_MeshPart(this, PlaquePart);
 
         const auto FirstY = (Phrase.Num() - 1) * Spacing * 0.5;
         for (int32 Index = 0; Index < Phrase.Num(); ++Index)
@@ -38,11 +51,15 @@ class UMars_BellkeeperClue_EntityScript : UCk_GenericEntityScript_UE
 
             auto DiscPart = FMars_MeshPart(FTransform(FRotator::ZeroRotator, Center + FVector(0.0, 0.0, 0.5), FVector(Disc, Disc, 1.0) * 0.01),
                 engine::load::Cylinder(), assets::load::ProtoGrid_Wall_Mars_MI(), collision::profile::NoCollision, n"BellkeeperClue_Disc");
+            if (ck::IsValid(FaceMaterialOverride))
+            { DiscPart.Material = FaceMaterialOverride; }
             DiscPart.PrimaryColor = TOptional<FLinearColor>(FLinearColor(0.08f, 0.07f, 0.06f, 1.0f));
             DiscPart.Tint = EMars_MeshPart_Tint::ProtoGrid;
             Root.Add_MeshPart(this, DiscPart);
 
-            Root.Add_BellkeeperGlyph(this, FMars_Bellkeeper_GlyphPlacement(Phrase[Index], Center + FVector(0.0, 0.0, 1.0), GlyphSize));
+            auto GlyphPlacement = FMars_Bellkeeper_GlyphPlacement(Phrase[Index], Center + FVector(0.0, 0.0, 1.0), GlyphSize);
+            GlyphPlacement.Material = GlyphMaterialOverride;
+            Root.Add_BellkeeperGlyph(this, GlyphPlacement);
         }
 
         return ECk_EntityScript_ConstructionFlow::Finished;

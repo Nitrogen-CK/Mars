@@ -1,0 +1,254 @@
+{
+	"material": "MI_CP_Bone_R01",
+	"packagePath": "/Game/Mars/ArtReview/Lookdev/CatacombCompleteRoom_20261026R02/Materials/MI_CP_Bone_R01",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "4050a764720e68a6c6a0c7b59e530031",
+		"exporterVersion": 3
+	},
+	"parentChain": [
+		"/Game/Mars/ArtReview/Lookdev/CatacombCompleteRoom_20261026R02/Materials/M_CP_Ivory_R01.M_CP_Ivory_R01"
+	],
+	"blendMode": "BLEND_Opaque",
+	"twoSided": false,
+	"unlit": false,
+	"shadingModel": "MSM_DefaultLit",
+	"domain": "MD_Surface",
+	"connectedOutputs": [
+		"BaseColor",
+		"Normal"
+	],
+	"expressions":
+	{
+		"Constant": 1,
+		"Custom": 1,
+		"PreSkinnedNormal": 1,
+		"PreSkinnedPosition": 1,
+		"ScalarParameter": 3,
+		"TextureObject": 1,
+		"TextureSample": 1,
+		"VectorParameter": 1,
+		"VertexInterpolator": 2
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "TextureObject",
+				"name": "MaterialExpressionTextureObject_0",
+				"props":
+				{
+					"Texture": "/Game/Mars/ArtReview/Lookdev/CatacombCompleteRoom_20261026R02/Textures/T_CP_AngularPigment_R02.T_CP_AngularPigment_R02"
+				}
+			},
+			{
+				"id": 1,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_0",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.360000,G=0.320000,B=0.240000,A=1.000000)",
+					"ParameterName": "IvoryBase"
+				}
+			},
+			{
+				"id": 2,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_0",
+				"props":
+				{
+					"DefaultValue": 0.55000001192092896,
+					"ParameterName": "PigmentStrength"
+				}
+			},
+			{
+				"id": 3,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_1",
+				"props":
+				{
+					"DefaultValue": 0.64999997615814209,
+					"ParameterName": "RepeatMetres"
+				}
+			},
+			{
+				"id": 4,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_2",
+				"props":
+				{
+					"DefaultValue": 0.93000000715255737,
+					"ParameterName": "Roughness"
+				}
+			},
+			{
+				"id": 5,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Pos",
+						"node": 7,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "Normal",
+						"node": 9,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "PigmentTex",
+						"node": 0,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "Base",
+						"node": 1,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 4,
+						"name": "RepeatMetres",
+						"node": 3,
+						"output": 0
+					},
+					{
+						"index": 5,
+						"name": "Strength",
+						"node": 2,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "float3 P=Pos*0.01/max(RepeatMetres,0.01); float3 N=pow(abs(Normal),8); N/=max(dot(N,float3(1,1,1)),0.0001); float3 c=Texture2DSample(PigmentTex,PigmentTexSampler,P.yz).rgb*N.x+Texture2DSample(PigmentTex,PigmentTexSampler,P.xz).rgb*N.y+Texture2DSample(PigmentTex,PigmentTexSampler,P.xy).rgb*N.z; float value=clamp(dot(c,float3(0.2126,0.7152,0.0722))/0.18,0.5,1.5); return Base.xyz*lerp(1.0,value,Strength);",
+					"Description": "Ivory hue with bounded angular pigment value; no color-derived normals or roughness"
+				}
+			},
+			{
+				"id": 6,
+				"class": "PreSkinnedPosition",
+				"name": "MaterialExpressionPreSkinnedPosition_0"
+			},
+			{
+				"id": 7,
+				"class": "VertexInterpolator",
+				"name": "MaterialExpressionVertexInterpolator_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "VS",
+						"node": 6,
+						"output": 0,
+						"mask": "rgb"
+					}
+				]
+			},
+			{
+				"id": 8,
+				"class": "PreSkinnedNormal",
+				"name": "MaterialExpressionPreSkinnedNormal_0"
+			},
+			{
+				"id": 9,
+				"class": "VertexInterpolator",
+				"name": "MaterialExpressionVertexInterpolator_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "VS",
+						"node": 8,
+						"output": 0,
+						"mask": "rgb"
+					}
+				]
+			},
+			{
+				"id": 10,
+				"class": "TextureSample",
+				"name": "MaterialExpressionTextureSample_0",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"Texture": "/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX06_BoneIvory_NormalDX.T_CCK_TX06_BoneIvory_NormalDX",
+					"SamplerType": "SAMPLERTYPE_Normal"
+				}
+			},
+			{
+				"id": 11,
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_0"
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_BaseColor",
+				"node": 5,
+				"output": 0
+			},
+			{
+				"property": "MP_Metallic",
+				"node": 11,
+				"output": 0
+			},
+			{
+				"property": "MP_Roughness",
+				"node": 4,
+				"output": 0
+			},
+			{
+				"property": "MP_Normal",
+				"node": 10,
+				"output": 0,
+				"mask": "rgb"
+			}
+		]
+	},
+	"scalarParams": [
+		{
+			"name": "PigmentStrength",
+			"value": 0.55000001192092896
+		},
+		{
+			"name": "RepeatMetres",
+			"value": 0.64999997615814209
+		},
+		{
+			"name": "Roughness",
+			"value": 0.93000000715255737
+		}
+	],
+	"vectorParams": [
+		{
+			"name": "IvoryBase",
+			"value": "RGBA(0.36, 0.32, 0.24, 1)"
+		}
+	],
+	"textureParams": [],
+	"usedTextures": [
+		"/Game/Mars/Environment/ChainCrossingKit/Textures/T_CCK_TX06_BoneIvory_NormalDX.T_CCK_TX06_BoneIvory_NormalDX",
+		"/Game/Mars/ArtReview/Lookdev/CatacombCompleteRoom_20261026R02/Textures/T_CP_AngularPigment_R02.T_CP_AngularPigment_R02"
+	]
+}
