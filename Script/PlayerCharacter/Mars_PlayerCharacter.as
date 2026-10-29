@@ -1,3 +1,5 @@
+event void FMars_PlayerCharacter_OnGameplayComposed(FCk_Handle InEntity);
+
 class AMars_PlayerCharacter : AMars_Character
 {
     default bUseControllerRotationYaw = true;
@@ -102,6 +104,15 @@ class AMars_PlayerCharacter : AMars_Character
     private bool _SmStarted = false;
     // The player's entity and whether this copy composed its local damage receiver (TryConstructCombatReceiver).
     private FCk_Handle _PlayerEntity;
+
+    // Native actor linkage precedes this pawn's gameplay assembly. Consumers of Mars features wait for this edge,
+    // or read its cached handle after binding, rather than treating Promise_OnActorEcsReady as feature readiness.
+    private FCk_Handle _GameplayComposedEntity;
+    FMars_PlayerCharacter_OnGameplayComposed OnGameplayComposed;
+
+    UFUNCTION()
+    FCk_Handle Get_GameplayComposedEntity() const
+    { return _GameplayComposedEntity; }
     private bool _ReceiverConstructed = false;
     // The body emote montage last played on this machine (Request_StopEmote ends it); null when none.
     private UAnimMontage _BodyEmoteMontage;
@@ -367,6 +378,10 @@ class AMars_PlayerCharacter : AMars_Character
         ConstructEyes(PlayerTransform);
 
         TryStartPlayerSm();
+
+        // Last: every feature the HUD consumes has now been added, regardless of actor-link/possession ordering.
+        _GameplayComposedEntity = Player;
+        OnGameplayComposed.Broadcast(Player);
     }
 
     // The local damage receiver, on the local host's own pawn only (utils_local_session; never a client's or a remote
