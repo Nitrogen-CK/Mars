@@ -1,0 +1,547 @@
+{
+  "map": "/Game/Mars/Maps/Camp_Mars_MAP",
+  "placed": [
+    {
+      "label": "StewardService_Steward",
+      "cls": "Ck_EntitySpawner_UE",
+      "at": [
+        0.0,
+        -1110.0,
+        0.0
+      ]
+    },
+    {
+      "label": "SP_StableCollision_HS_Collision_COL_R600_Roof",
+      "cls": "Actor",
+      "at": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "label": "SP_StableCollision_HS_Collision_COL_R600_ST_Flight",
+      "cls": "Actor",
+      "at": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "label": "SP_StableCollision_HS_Collision_COL_R600_ST_FlightGuard",
+      "cls": "Actor",
+      "at": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "label": "SP_StableCollision_HS_Collision_COL_R600_ST_Landing",
+      "cls": "Actor",
+      "at": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "label": "SP_StableCollision_HS_Collision_COL_R600_ST_LandingGuard",
+      "cls": "Actor",
+      "at": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "label": "SP_StableCollision_HS_Collision_COL_R600_ST_PortLanding",
+      "cls": "Actor",
+      "at": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "label": "SP_StableCollision_HS_Collision_COL_R600_Wall360",
+      "cls": "Actor",
+      "at": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "label": "SP_StableCollision_HS_Collision_COL_R600_Wall360_Portal",
+      "cls": "Actor",
+      "at": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "label": "SP_StableCollision_HS_Collision_COL_R600_Wall400",
+      "cls": "Actor",
+      "at": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "label": "SP_StableCollision_HS_Collision_COL_R600_Wall400_Portal",
+      "cls": "Actor",
+      "at": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "label": "SP_StableCollision_HS_Collision_COL_VestFloor",
+      "cls": "Actor",
+      "at": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "label": "SP_StableCollision_HS_Collision_COL_VestRoof",
+      "cls": "Actor",
+      "at": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "label": "SP_StableCollision_HS_Collision_COL_VestWall",
+      "cls": "Actor",
+      "at": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "label": "StewardService_MissionGate",
+      "cls": "Ck_EntitySpawner_UE",
+      "at": [
+        1220.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "label": "StewardService_LowerExitSign",
+      "cls": "TextRenderActor",
+      "at": [
+        3090.0,
+        0.0,
+        -990.0
+      ]
+    },
+    {
+      "label": "StewardService_ReadingLight",
+      "cls": "PointLight",
+      "at": [
+        0.0,
+        -905.0,
+        225.0
+      ]
+    },
+    {
+      "label": "SP_StewardVisual_HS_Architecture_HS_Duct",
+      "cls": "Actor",
+      "at": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "label": "SP_StewardVisual_HS_Hero_HS_Flue300",
+      "cls": "Actor",
+      "at": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "label": "SP_StewardVisual_HS_Hero_HS_Flue400",
+      "cls": "Actor",
+      "at": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "label": "SP_StewardVisual_HS_Props_PR_P01",
+      "cls": "Actor",
+      "at": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "label": "SP_StewardVisual_HS_Props_PR_P02",
+      "cls": "Actor",
+      "at": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "label": "SP_StewardVisual_HS_Props_PR_P03",
+      "cls": "Actor",
+      "at": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "label": "SP_StewardVisual_HS_Props_PR_P04",
+      "cls": "Actor",
+      "at": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "label": "SP_StewardVisual_HS_Props_PR_P05",
+      "cls": "Actor",
+      "at": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "label": "SP_StewardVisual_HS_Props_PR_P06",
+      "cls": "Actor",
+      "at": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "label": "SP_StewardVisual_HS_Props_PR_P08",
+      "cls": "Actor",
+      "at": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "label": "SP_StewardVisual_HS_Props_PR_P09",
+      "cls": "Actor",
+      "at": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "label": "SP_StewardVisual_HS_Props_PR_P10",
+      "cls": "Actor",
+      "at": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "label": "SP_StewardVisual_HS_Props_PR_P11",
+      "cls": "Actor",
+      "at": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "label": "SP_StewardVisual_HS_Props_PR_P12",
+      "cls": "Actor",
+      "at": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "label": "SP_StewardVisual_HS_Props_PR_P13",
+      "cls": "Actor",
+      "at": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "label": "SP_StewardVisual_HS_Props_PR_P20",
+      "cls": "Actor",
+      "at": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "label": "SP_StewardVisual_HS_Architecture_PortalCollar",
+      "cls": "Actor",
+      "at": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "label": "SP_StewardVisual_HS_Foundation_R600_Foundation",
+      "cls": "Actor",
+      "at": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "label": "SP_StewardVisual_HS_Roof_R600_Roof",
+      "cls": "Actor",
+      "at": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "label": "SP_StewardVisual_HS_Deck_R600_ST_Flight",
+      "cls": "Actor",
+      "at": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "label": "SP_StewardVisual_HS_Guards_R600_ST_FlightGuard",
+      "cls": "Actor",
+      "at": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "label": "SP_StewardVisual_HS_Supports_R600_ST_Joist",
+      "cls": "Actor",
+      "at": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "label": "SP_StewardVisual_HS_Deck_R600_ST_Landing",
+      "cls": "Actor",
+      "at": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "label": "SP_StewardVisual_HS_Guards_R600_ST_LandingGuard",
+      "cls": "Actor",
+      "at": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "label": "SP_StewardVisual_HS_Deck_R600_ST_PortLanding",
+      "cls": "Actor",
+      "at": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "label": "SP_StewardVisual_HS_ShellBack_R600_Wall360",
+      "cls": "Actor",
+      "at": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "label": "SP_StewardVisual_HS_ShellFront_R600_Wall360",
+      "cls": "Actor",
+      "at": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "label": "SP_StewardVisual_HS_ShellFront_R600_Wall360_Portal",
+      "cls": "Actor",
+      "at": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "label": "SP_StewardVisual_HS_ShellBack_R600_Wall400",
+      "cls": "Actor",
+      "at": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "label": "SP_StewardVisual_HS_ShellFront_R600_Wall400",
+      "cls": "Actor",
+      "at": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "label": "SP_StewardVisual_HS_ShellBack_R600_Wall400_Portal",
+      "cls": "Actor",
+      "at": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "label": "SP_StewardVisual_HS_Vestibule_VestFloor",
+      "cls": "Actor",
+      "at": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "label": "SP_StewardVisual_HS_Vestibule_VestRoof",
+      "cls": "Actor",
+      "at": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "label": "SP_StewardVisual_HS_Vestibule_VestWall",
+      "cls": "Actor",
+      "at": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "label": "StewardService_SpireLamp_HS-P001",
+      "cls": "PointLight",
+      "at": [
+        1739.143833121111,
+        182.2967363925815,
+        230.0
+      ]
+    },
+    {
+      "label": "StewardService_SpireLamp_HS-P003",
+      "cls": "PointLight",
+      "at": [
+        2582.605795962925,
+        -408.3016881824154,
+        30.0
+      ]
+    },
+    {
+      "label": "StewardService_SpireLamp_HS-P005",
+      "cls": "PointLight",
+      "at": [
+        2147.4455213035267,
+        524.902532355507,
+        -170.0
+      ]
+    },
+    {
+      "label": "StewardService_SpireLamp_HS-P007",
+      "cls": "PointLight",
+      "at": [
+        2057.703263607418,
+        -500.85616687888916,
+        -370.0
+      ]
+    },
+    {
+      "label": "StewardService_SpireLamp_HS-P009",
+      "cls": "PointLight",
+      "at": [
+        2648.301688182415,
+        342.60579596292564,
+        -570.0
+      ]
+    },
+    {
+      "label": "StewardService_SpireLamp_HS-P011",
+      "cls": "PointLight",
+      "at": [
+        1715.097467644493,
+        -92.55447869647345,
+        -770.0
+      ]
+    },
+    {
+      "label": "StewardService_SpireLamp_HS-P013",
+      "cls": "PointLight",
+      "at": [
+        2740.856166878889,
+        -182.2967363925816,
+        -970.0
+      ]
+    },
+    {
+      "label": "StewardService_LowerExitBackWall",
+      "cls": "StaticMeshActor",
+      "at": [
+        3140.0,
+        -200.0,
+        -1200.0
+      ]
+    },
+    {
+      "label": "StewardService_CampArchTrim",
+      "cls": "StaticMeshActor",
+      "at": [
+        1200.0,
+        -200.0,
+        0.0
+      ]
+    }
+  ],
+  "count": 60,
+  "source_level": "/Game/Mars/Maps/Spire/LI_Spire_Hearthscrew_Mars_MAP"
+}

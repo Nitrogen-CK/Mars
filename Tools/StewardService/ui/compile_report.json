@@ -1,0 +1,51 @@
+{
+  "compiledAfterStyleSetup": true,
+  "results": [
+    {
+      "asset_path": "/Game/Mars/UI/Widgets/Steward/ServiceParchmentRow_Mars_WBP",
+      "compiled": true,
+      "status": "up_to_date",
+      "errors": [],
+      "warnings": [],
+      "notes": [
+        {
+          "message": "An optional widget binding \"Text\" of type  Common Text  is available."
+        },
+        {
+          "message": "An optional widget binding \"SpoonFocus\" of type  Widget  is available."
+        },
+        {
+          "message": "An optional widget binding \"BusyMarker\" of type  Widget  is available."
+        },
+        {
+          "message": "An optional widget binding \"InputActionWidget\" of type  Common Action Widget  is available."
+        },
+        {
+          "message": "An optional widget binding \"Text\" of type  Common Text  is available."
+        },
+        {
+          "message": "An optional widget binding \"SpoonFocus\" of type  Widget  is available."
+        },
+        {
+          "message": "An optional widget binding \"BusyMarker\" of type  Widget  is available."
+        },
+        {
+          "message": "An optional widget binding \"InputActionWidget\" of type  Common Action Widget  is available."
+        }
+      ],
+      "error_count": 0,
+      "warning_count": 0
+    },
+    {
+      "asset_path": "/Game/Mars/UI/Widgets/Steward/ServiceParchment_Mars_WBP",
+      "compiled": true,
+      "status": "up_to_date",
+      "errors": [],
+      "warnings": [],
+      "notes": [],
+      "error_count": 0,
+      "warning_count": 0
+    }
+  ],
+  "layoutRevision": "800x900_four155px_rows"
+}

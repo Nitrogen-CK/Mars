@@ -1,0 +1,20 @@
+{
+  "status": "passed",
+  "trigger": "Production Mars_Devour cheat while reading",
+  "before": {
+    "hit_testing": true,
+    "camera": [
+      0,
+      -910,
+      192
+    ]
+  },
+  "after": {
+    "hit_testing": false,
+    "camera": [
+      0.0,
+      -850.0,
+      112.25217416980264
+    ]
+  }
+}

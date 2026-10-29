@@ -1,0 +1,70 @@
+{
+  "asset": "/Game/Mars/Gameplay/Steward/Service/CampOpenArch_Mars_SM",
+  "convex_count": 3,
+  "convex_bounds_cm": [
+    {
+      "vertices": 8,
+      "min": [
+        44.999998807907104,
+        -6.20701769094012e-05,
+        0.0
+      ],
+      "max": [
+        354.9999952316284,
+        34.999990463256836,
+        30.000001192092896
+      ]
+    },
+    {
+      "vertices": 8,
+      "min": [
+        14.000000059604645,
+        -1.3288261868638074e-05,
+        0.0
+      ],
+      "max": [
+        75.99999904632568,
+        34.99999940395355,
+        189.9999976158142
+      ]
+    },
+    {
+      "vertices": 8,
+      "min": [
+        324.0000009536743,
+        -6.749038448106148e-05,
+        0.0
+      ],
+      "max": [
+        385.9999895095825,
+        34.999942779541016,
+        189.9999976158142
+      ]
+    }
+  ],
+  "bounds": {
+    "origin": [
+      199.99999952316284,
+      32.999958515167236,
+      147.4535369873047
+    ],
+    "extent": [
+      187.00000047683716,
+      37.0000262260437,
+      186.9535369873047
+    ]
+  },
+  "material": "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI",
+  "source_hashes_before": {
+    "D:\\Repositories\\CkRepos\\Orion\\Content\\Mars\\Environment\\Meshes\\Crypt\\CryptExtractionArch_Mars_SM.uasset": "b586b346c384efb0c41e8ef3fdc44a23a602943a770d7124e615bd59ed6bc486",
+    "D:\\Repositories\\CkRepos\\Orion\\Content\\Mars\\Environment\\Meshes\\Crypt\\CryptArchBarred2m4_Mars_SM.uasset": "a6109b58de4875557d5a2ce81ae68526d1ae9463234a8db3cdd4e97700d85826"
+  },
+  "source_hashes_after": {
+    "D:\\Repositories\\CkRepos\\Orion\\Content\\Mars\\Environment\\Meshes\\Crypt\\CryptExtractionArch_Mars_SM.uasset": "b586b346c384efb0c41e8ef3fdc44a23a602943a770d7124e615bd59ed6bc486",
+    "D:\\Repositories\\CkRepos\\Orion\\Content\\Mars\\Environment\\Meshes\\Crypt\\CryptArchBarred2m4_Mars_SM.uasset": "a6109b58de4875557d5a2ce81ae68526d1ae9463234a8db3cdd4e97700d85826"
+  },
+  "source_hashes_unchanged": true,
+  "convex_bounds_evidence": "Verified saved asset FBX export: saved_asset_verification.json, all three hull bounds match source within 0.01 cm",
+  "no_central_convex": true,
+  "auto_generate_collision": false
+}

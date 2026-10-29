@@ -1,0 +1,26 @@
+{
+  "status": "imported",
+  "prop_only": true,
+  "imports": {
+    "imported": [
+      "ServiceParchment_Mars_SM"
+    ],
+    "failed": [],
+    "skipped": [],
+    "error": null
+  },
+  "animation_seconds": 6.0,
+  "service_mesh": "/Game/Mars/Gameplay/Steward/Service/Steward_Service_Mars_SK.Steward_Service_Mars_SK",
+  "skeleton": "/Game/Mars/Gameplay/Steward/Meshes/Steward_Mars_SKEL.Steward_Mars_SKEL",
+  "prop_dimensions_cm": [
+    70.86210086941719,
+    84.0,
+    209.39209365844727
+  ],
+  "protected_sha256": {
+    "D:\\Repositories\\CkRepos\\Orion\\Content\\Mars\\Gameplay\\Steward\\Meshes\\Steward_Mars_SK.uasset": "aa64886c3138973fa6c553c1a81cbdaf77a04e4c0b198e3be9529fad406e55f3",
+    "D:\\Repositories\\CkRepos\\Orion\\Content\\Mars\\Gameplay\\Steward\\Meshes\\Steward_Mars_SKEL.uasset": "1ed667cd26b7689dd8ca38c513ab1faa252785030869b1f2745b0a541712ba80",
+    "D:\\Repositories\\CkRepos\\Orion\\Content\\Mars\\Gameplay\\Steward\\Service\\Steward_Service_Mars_SK.uasset": "0035aed0f1e9a1b7e69f8299d9d203bb56c81b2886038ea8758e1affddd4cf25",
+    "D:\\Repositories\\CkRepos\\Orion\\Content\\Mars\\Gameplay\\Steward\\Anims\\Steward_Present_Mars_AS.uasset": "2edcf3a61d90f179493dc289ba56c63901e6ee1b4b7d9310742cd7e8cec929bb"
+  }
+}

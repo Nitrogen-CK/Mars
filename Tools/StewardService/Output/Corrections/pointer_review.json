@@ -1,0 +1,9 @@
+{
+  "status": "passed",
+  "input": "One Enhanced Input pointer press/release per row and Confirm; clicks separated by several seconds. SceneViewport policy observed separately as CaptureDuringMouseDown. No OS hardware claim.",
+  "preview": "Pan-seared roots",
+  "committed": "PanSearedRoots",
+  "gate_open": true,
+  "gate_alpha": 1.0,
+  "surface_visibility": "<SlateVisibility.HIT_TEST_INVISIBLE: 3>"
+}

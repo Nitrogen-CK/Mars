@@ -1,0 +1,4 @@
+{
+  "False": "(bIgnoreMoveInput=False,bIgnoreLookInput=False,InputMode=All,MouseCaptureMode=NoCapture,MouseLockMode=DoNotLock,bHideCursorDuringViewportCapture=False)",
+  "True": "(bIgnoreMoveInput=False,bIgnoreLookInput=False,InputMode=All,MouseCaptureMode=CaptureDuringMouseDown,MouseLockMode=DoNotLock,bHideCursorDuringViewportCapture=False)"
+}

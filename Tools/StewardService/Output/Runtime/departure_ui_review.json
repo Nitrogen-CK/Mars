@@ -1,0 +1,6 @@
+{
+  "status": "passed",
+  "source": "Continuous 166-waypoint Spire descent, raw injected gameplay Use, Slate Depart click and confirmation click",
+  "destination": "/Game/Mars/Maps/UEDPIE_0_Warrens_Mars_MAP.Warrens_Mars_MAP",
+  "pawn": "Mars_PlayerCharacter"
+}

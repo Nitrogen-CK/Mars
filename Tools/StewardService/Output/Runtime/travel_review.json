@@ -1,0 +1,30 @@
+{
+  "status": "passed",
+  "stage": 5,
+  "elapsed": 10.099988799542189,
+  "events": [
+    {
+      "event": "host_committed",
+      "world": "/Game/Mars/Maps/UEDPIE_0_Camp_Mars_MAP.Camp_Mars_MAP",
+      "flow": "<Mars_LanFlowState.CONNECTED: 3>"
+    },
+    {
+      "event": "arrived_warrens_with_service",
+      "world": "/Game/Mars/Maps/UEDPIE_0_Warrens_Mars_MAP.Warrens_Mars_MAP",
+      "flow": "<Mars_LanFlowState.CONNECTED: 3>"
+    },
+    {
+      "event": "hosted_return_retained_service_and_open_gate",
+      "world": "/Game/Mars/Maps/UEDPIE_0_Camp_Mars_MAP.Camp_Mars_MAP",
+      "flow": "<Mars_LanFlowState.CONNECTED: 3>"
+    },
+    {
+      "event": "return_to_menu_cleared_service_and_closed_gate",
+      "world": "/Game/Mars/Maps/UEDPIE_0_Camp_Mars_MAP.Camp_Mars_MAP",
+      "flow": "<Mars_LanFlowState.IDLE: 0>",
+      "pawn": "Mars_Camp_ViewerPawn"
+    }
+  ],
+  "scope": "PIE production host controller RPC commit/depart/return/reset; no menu input or traversal claim.",
+  "ready_at": 5.050907500088215
+}

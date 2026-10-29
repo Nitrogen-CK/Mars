@@ -1,0 +1,554 @@
+{
+  "purpose": "New-only cream parchment mission list for the Steward, using existing service behavior.",
+  "action": "ui::build_ui_from_spec",
+  "boardUse": {
+    "drawSize": [
+      800,
+      900
+    ],
+    "renderedSafeAreaCm": [
+      76,
+      85.5
+    ],
+    "widgetWorldScale": 0.095,
+    "anchorCenterZCm": 156.0,
+    "topZCm": 198.75,
+    "bottomZCm": 113.25,
+    "visibleRows": 4,
+    "rowHeightPx": 155,
+    "listHeightPx": 620
+  },
+  "assets": [
+    {
+      "asset_path": "/Game/Mars/UI/Widgets/Steward/ServiceParchmentRow_Mars_WBP",
+      "buildParams": {
+        "mode": "rebuild",
+        "overwrite": false,
+        "treat_warnings_as_errors": false,
+        "raw_mode": true
+      },
+      "spec": {
+        "version": 1,
+        "name": "ServiceParchmentRow_Mars_WBP",
+        "parentClass": "/Script/Angelscript.Mars_ChalkServiceRow_Widget",
+        "metadata": {
+          "authoringTool": "Monolith UISpec",
+          "sourceFile": "Tools/StewardService/ui/parchment_specs.py",
+          "description": "New Steward parchment; preserves old chalk WBPs."
+        },
+        "rootWidget": {
+          "type": "SizeBox",
+          "id": "DesignSize",
+          "style": {
+            "width": 680,
+            "height": 155
+          },
+          "children": [
+            {
+              "type": "CanvasPanel",
+              "id": "Root",
+              "children": [
+                {
+                  "type": "Image",
+                  "id": "RowRule",
+                  "slot": {
+                    "position": {
+                      "x": 34,
+                      "y": 148
+                    },
+                    "size": {
+                      "x": 612,
+                      "y": 7
+                    }
+                  },
+                  "style": {
+                    "visibility": "HitTestInvisible"
+                  },
+                  "content": {
+                    "brushPath": "/Game/Mars/UI/Textures/ChalkParchment/DividerDiamond_Mars_T"
+                  }
+                },
+                {
+                  "type": "CommonTextBlock",
+                  "customClassPath": "/Script/CommonUI.CommonTextBlock",
+                  "id": "Title",
+                  "slot": {
+                    "position": {
+                      "x": 52,
+                      "y": 14
+                    },
+                    "size": {
+                      "x": 568,
+                      "y": 50
+                    }
+                  },
+                  "style": {
+                    "visibility": "HitTestInvisible"
+                  },
+                  "content": {
+                    "text": "Service",
+                    "fontSize": 34,
+                    "fontColor": "#241F1B",
+                    "wrapMode": "Wrap"
+                  }
+                },
+                {
+                  "type": "CommonTextBlock",
+                  "customClassPath": "/Script/CommonUI.CommonTextBlock",
+                  "id": "Summary",
+                  "slot": {
+                    "position": {
+                      "x": 52,
+                      "y": 66
+                    },
+                    "size": {
+                      "x": 568,
+                      "y": 78
+                    }
+                  },
+                  "style": {
+                    "visibility": "HitTestInvisible"
+                  },
+                  "content": {
+                    "text": "Explore together",
+                    "fontSize": 22,
+                    "fontColor": "#241F1B",
+                    "wrapMode": "Wrap"
+                  }
+                },
+                {
+                  "type": "Image",
+                  "id": "SelectedMarker",
+                  "slot": {
+                    "position": {
+                      "x": 8,
+                      "y": 28
+                    },
+                    "size": {
+                      "x": 32,
+                      "y": 32
+                    }
+                  },
+                  "style": {
+                    "visibility": "Collapsed"
+                  },
+                  "content": {
+                    "brushPath": "/Game/Mars/UI/Textures/ChalkParchment/Checkmark_Mars_T"
+                  }
+                },
+                {
+                  "type": "Image",
+                  "id": "FocusCorners",
+                  "slot": {
+                    "position": {
+                      "x": 12,
+                      "y": 73
+                    },
+                    "size": {
+                      "x": 28,
+                      "y": 28
+                    }
+                  },
+                  "style": {
+                    "visibility": "Collapsed"
+                  },
+                  "content": {
+                    "brushPath": "/Game/Mars/UI/Textures/ChalkParchment/CategoryPointer_Mars_T"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "styles": {
+        "Title": "/Game/Mars/UI/Styles/ChalkParchment/TextInk_Mars_STYLE.TextInk_Mars_STYLE_C",
+        "Summary": "/Game/Mars/UI/Styles/ChalkParchment/TextInk_Mars_STYLE.TextInk_Mars_STYLE_C"
+      },
+      "requiredBindings": {
+        "Title": "UCommonTextBlock",
+        "Summary": "UCommonTextBlock"
+      },
+      "optionalBindingsAuthored": {
+        "SelectedMarker": "UWidget",
+        "FocusCorners": "UWidget"
+      },
+      "postBuild": {
+        "cdo": {
+          "bToggleable": true,
+          "bSelectable": true,
+          "Style": "/Game/Mars/UI/Styles/ChalkParchment/ButtonPaper_Mars_STYLE.ButtonPaper_Mars_STYLE_C"
+        },
+        "fontSizes": {
+          "Title": 34,
+          "Summary": 22
+        }
+      }
+    },
+    {
+      "asset_path": "/Game/Mars/UI/Widgets/Steward/ServiceParchment_Mars_WBP",
+      "buildParams": {
+        "mode": "rebuild",
+        "overwrite": false,
+        "treat_warnings_as_errors": false,
+        "raw_mode": true
+      },
+      "spec": {
+        "version": 1,
+        "name": "ServiceParchment_Mars_WBP",
+        "parentClass": "/Script/Angelscript.Mars_ChalkService_Widget",
+        "metadata": {
+          "authoringTool": "Monolith UISpec",
+          "sourceFile": "Tools/StewardService/ui/parchment_specs.py",
+          "description": "New Steward parchment; preserves old chalk WBPs."
+        },
+        "rootWidget": {
+          "type": "SizeBox",
+          "id": "DesignSize",
+          "style": {
+            "width": 800,
+            "height": 900
+          },
+          "children": [
+            {
+              "type": "CanvasPanel",
+              "id": "Root",
+              "children": [
+                {
+                  "type": "CommonBorder",
+                  "id": "Paper",
+                  "slot": {
+                    "position": {
+                      "x": 0,
+                      "y": 0
+                    },
+                    "size": {
+                      "x": 800,
+                      "y": 900
+                    }
+                  },
+                  "style": {
+                    "visibility": "HitTestInvisible"
+                  }
+                },
+                {
+                  "type": "CommonTextBlock",
+                  "customClassPath": "/Script/CommonUI.CommonTextBlock",
+                  "id": "Heading",
+                  "slot": {
+                    "position": {
+                      "x": 55,
+                      "y": 20
+                    },
+                    "size": {
+                      "x": 690,
+                      "y": 55
+                    }
+                  },
+                  "style": {
+                    "visibility": "HitTestInvisible"
+                  },
+                  "content": {
+                    "text": "AVAILABLE SERVICES",
+                    "fontSize": 38,
+                    "fontColor": "#241F1B",
+                    "wrapMode": "Wrap"
+                  }
+                },
+                {
+                  "type": "Image",
+                  "id": "HeadingRule",
+                  "slot": {
+                    "position": {
+                      "x": 80,
+                      "y": 76
+                    },
+                    "size": {
+                      "x": 640,
+                      "y": 10
+                    }
+                  },
+                  "style": {
+                    "visibility": "HitTestInvisible"
+                  },
+                  "content": {
+                    "brushPath": "/Game/Mars/UI/Textures/ChalkParchment/DividerDiamond_Mars_T"
+                  }
+                },
+                {
+                  "type": "CommonTextBlock",
+                  "customClassPath": "/Script/CommonUI.CommonTextBlock",
+                  "id": "Instructions",
+                  "slot": {
+                    "position": {
+                      "x": 70,
+                      "y": 158
+                    },
+                    "size": {
+                      "x": 660,
+                      "y": 44
+                    }
+                  },
+                  "style": {
+                    "visibility": "Collapsed"
+                  },
+                  "content": {
+                    "text": "Choose a service for your party",
+                    "fontSize": 25,
+                    "fontColor": "#241F1B",
+                    "wrapMode": "Wrap"
+                  }
+                },
+                {
+                  "type": "ScrollBox",
+                  "id": "ServicesScroll",
+                  "slot": {
+                    "position": {
+                      "x": 60,
+                      "y": 90
+                    },
+                    "size": {
+                      "x": 680,
+                      "y": 620
+                    }
+                  },
+                  "children": [
+                    {
+                      "type": "VerticalBox",
+                      "id": "ServiceRows"
+                    }
+                  ]
+                },
+                {
+                  "type": "CommonTextBlock",
+                  "customClassPath": "/Script/CommonUI.CommonTextBlock",
+                  "id": "PreviewTitle",
+                  "slot": {
+                    "position": {
+                      "x": 76,
+                      "y": 620
+                    },
+                    "size": {
+                      "x": 648,
+                      "y": 48
+                    }
+                  },
+                  "style": {
+                    "visibility": "Collapsed"
+                  },
+                  "content": {
+                    "text": "Choose a service",
+                    "fontSize": 30,
+                    "fontColor": "#241F1B",
+                    "wrapMode": "Wrap"
+                  }
+                },
+                {
+                  "type": "CommonTextBlock",
+                  "customClassPath": "/Script/CommonUI.CommonTextBlock",
+                  "id": "PreviewSummary",
+                  "slot": {
+                    "position": {
+                      "x": 76,
+                      "y": 674
+                    },
+                    "size": {
+                      "x": 648,
+                      "y": 88
+                    }
+                  },
+                  "style": {
+                    "visibility": "Collapsed"
+                  },
+                  "content": {
+                    "text": "Browse a service to see its details.",
+                    "fontSize": 25,
+                    "fontColor": "#241F1B",
+                    "wrapMode": "Wrap"
+                  }
+                },
+                {
+                  "type": "CommonTextBlock",
+                  "customClassPath": "/Script/CommonUI.CommonTextBlock",
+                  "id": "CurrentLabel",
+                  "slot": {
+                    "position": {
+                      "x": 76,
+                      "y": 768
+                    },
+                    "size": {
+                      "x": 224,
+                      "y": 30
+                    }
+                  },
+                  "style": {
+                    "visibility": "Collapsed"
+                  },
+                  "content": {
+                    "text": "CURRENT SERVICE",
+                    "fontSize": 20,
+                    "fontColor": "#241F1B",
+                    "wrapMode": "Wrap"
+                  }
+                },
+                {
+                  "type": "CommonTextBlock",
+                  "customClassPath": "/Script/CommonUI.CommonTextBlock",
+                  "id": "CurrentSelection",
+                  "slot": {
+                    "position": {
+                      "x": 300,
+                      "y": 766
+                    },
+                    "size": {
+                      "x": 424,
+                      "y": 40
+                    }
+                  },
+                  "style": {
+                    "visibility": "Collapsed"
+                  },
+                  "content": {
+                    "text": "No service selected",
+                    "fontSize": 23,
+                    "fontColor": "#241F1B",
+                    "wrapMode": "Wrap"
+                  }
+                },
+                {
+                  "type": "UserWidget",
+                  "id": "Confirm",
+                  "customClassPath": "/Game/Mars/UI/Widgets/ChalkParchment/ButtonPaper_Mars_WBP.ButtonPaper_Mars_WBP_C",
+                  "slot": {
+                    "position": {
+                      "x": 70,
+                      "y": 752
+                    },
+                    "size": {
+                      "x": 388,
+                      "y": 58
+                    }
+                  }
+                },
+                {
+                  "type": "UserWidget",
+                  "id": "Back",
+                  "customClassPath": "/Game/Mars/UI/Widgets/ChalkParchment/ButtonPaper_Mars_WBP.ButtonPaper_Mars_WBP_C",
+                  "slot": {
+                    "position": {
+                      "x": 478,
+                      "y": 752
+                    },
+                    "size": {
+                      "x": 252,
+                      "y": 58
+                    }
+                  }
+                },
+                {
+                  "type": "CommonTextBlock",
+                  "customClassPath": "/Script/CommonUI.CommonTextBlock",
+                  "id": "Status",
+                  "slot": {
+                    "position": {
+                      "x": 76,
+                      "y": 834
+                    },
+                    "size": {
+                      "x": 648,
+                      "y": 32
+                    }
+                  },
+                  "style": {
+                    "visibility": "HitTestInvisible"
+                  },
+                  "content": {
+                    "text": "",
+                    "fontSize": 18,
+                    "fontColor": "#241F1B",
+                    "wrapMode": "Wrap"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "styles": {
+        "Paper": "/Game/Mars/UI/Styles/ChalkParchment/BorderPaper_Mars_STYLE.BorderPaper_Mars_STYLE_C",
+        "Heading": "/Game/Mars/UI/Styles/ChalkParchment/TextInk_Mars_STYLE.TextInk_Mars_STYLE_C",
+        "Instructions": "/Game/Mars/UI/Styles/ChalkParchment/TextInk_Mars_STYLE.TextInk_Mars_STYLE_C",
+        "PreviewTitle": "/Game/Mars/UI/Styles/ChalkParchment/TextInk_Mars_STYLE.TextInk_Mars_STYLE_C",
+        "PreviewSummary": "/Game/Mars/UI/Styles/ChalkParchment/TextInk_Mars_STYLE.TextInk_Mars_STYLE_C",
+        "CurrentLabel": "/Game/Mars/UI/Styles/ChalkParchment/TextInk_Mars_STYLE.TextInk_Mars_STYLE_C",
+        "CurrentSelection": "/Game/Mars/UI/Styles/ChalkParchment/TextInk_Mars_STYLE.TextInk_Mars_STYLE_C",
+        "Status": "/Game/Mars/UI/Styles/ChalkParchment/TextInk_Mars_STYLE.TextInk_Mars_STYLE_C"
+      },
+      "requiredBindings": {
+        "ServiceRows": "UPanelWidget (VerticalBox within ServicesScroll)",
+        "PreviewTitle": "UCommonTextBlock",
+        "PreviewSummary": "UCommonTextBlock",
+        "CurrentSelection": "UCommonTextBlock",
+        "Status": "UCommonTextBlock",
+        "Confirm": "UMars_Button_Widget (ButtonPaper_Mars_WBP)",
+        "Back": "UMars_Button_Widget (ButtonPaper_Mars_WBP)"
+      },
+      "labels": {
+        "Confirm": "Confirm & open gate",
+        "Back": "Back"
+      },
+      "postBuild": {
+        "cdo": {
+          "RowClass": "/Game/Mars/UI/Widgets/Steward/ServiceParchmentRow_Mars_WBP.ServiceParchmentRow_Mars_WBP_C"
+        },
+        "fontSizes": {
+          "Heading": 38,
+          "Instructions": 25,
+          "PreviewTitle": 30,
+          "PreviewSummary": 25,
+          "CurrentLabel": 20,
+          "CurrentSelection": 23,
+          "Status": 18
+        },
+        "collapsed": [
+          "Instructions",
+          "PreviewTitle",
+          "PreviewSummary",
+          "CurrentLabel",
+          "CurrentSelection"
+        ],
+        "paperBrushTint": [
+          0.86,
+          0.78,
+          0.62,
+          1.0
+        ],
+        "ServicesScroll": {
+          "orientation": "Vertical",
+          "scrollBarVisibility": "Visible",
+          "allowOverscroll": false,
+          "navigationDestination": "IntoView"
+        }
+      }
+    }
+  ],
+  "setup": [
+    "Assert both destinations absent. dry_run each spec with buildParams, inspect warnings, then create in manifest order with overwrite=false.",
+    "raw_mode=true is deliberate: the live Monolith allowlist only exposes generic properties for CommonTextBlock. Keep it confined to these new destinations.",
+    "Apply each external styles map via apply_style_to_widget; UISpec styleRef is for value styles and cannot reference an existing CommonUI style class.",
+    "After styles apply, reapply postBuild.fontSizes and wrapping (styles can override font size). Keep ink dark on cream. Set Confirm/Back ButtonText, call RefreshLabel, compile/save.",
+    "Set main CDO RowClass to the new row generated class. Row bToggleable=true is inherited; verify it remains true.",
+    "Set ServicesScroll vertical/visible scrollbar/no overscroll. Verify focused rows scroll into view with navigation. No catalog preview children belong in ServiceRows: SetCatalog clears it.",
+    "Compile both WBPs; read back requiredBindings, RowClass, button class/labels, styles/font sizes and 800x900 desired size.",
+    "Render with a real catalog containing four services; verify four readable rows, wheel scrolling when catalog grows, keyboard/gamepad navigation, selection marker, status, Confirm and Back.",
+    "Do not alter existing ChalkParchment WBPs or shared style classes. New dependencies only; no catalog icons are authored because service data has no icon binding."
+  ],
+  "sources": [
+    "Script/UI/Camp/Mars_ChalkCampWidgets.as: UMars_ChalkService_Widget / UMars_ChalkServiceRow_Widget",
+    "Script/UI/Common/Mars_Button_Widget.as: optional SelectedMarker / FocusCorners bindings and indicator visibility",
+    "docs/campaigns/2026-10-03-mars-ui-flow/tools/vestibule_widgets.py: new-only UISpec authoring pattern",
+    "Content/Mars/UI/Styles/ChalkParchment/BorderPaper_Mars_STYLE.ckexport: parchment texture brush",
+    "Content/Mars/UI/Styles/ChalkParchment/TextInk_Mars_STYLE.ckexport: Alegreya font / dark ink",
+    "Live Monolith ui::dump_ui_spec_schema (2026-10-28): document/node fields and CommonTextBlock allowlist"
+  ]
+}

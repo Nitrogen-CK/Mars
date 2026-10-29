@@ -1,0 +1,174 @@
+{
+  "source_sha256": "a118cb66029bb3ea1e22b4e976a5a6f6ab5c641f60ef4556223a9cbfdac3b016",
+  "skeleton_bones": [
+    "pelvis",
+    "spine_01",
+    "spine_02",
+    "spine_03",
+    "clavicle_l",
+    "upperarm_l",
+    "lowerarm_l",
+    "hand_l",
+    "index_01_l",
+    "index_02_l",
+    "index_03_l",
+    "middle_01_l",
+    "middle_02_l",
+    "middle_03_l",
+    "pinky_01_l",
+    "pinky_02_l",
+    "pinky_03_l",
+    "ring_01_l",
+    "ring_02_l",
+    "ring_03_l",
+    "thumb_01_l",
+    "thumb_02_l",
+    "thumb_03_l",
+    "lowerarm_twist_01_l",
+    "upperarm_twist_01_l",
+    "clavicle_r",
+    "upperarm_r",
+    "lowerarm_r",
+    "hand_r",
+    "index_01_r",
+    "index_02_r",
+    "index_03_r",
+    "middle_01_r",
+    "middle_02_r",
+    "middle_03_r",
+    "pinky_01_r",
+    "pinky_02_r",
+    "pinky_03_r",
+    "ring_01_r",
+    "ring_02_r",
+    "ring_03_r",
+    "thumb_01_r",
+    "thumb_02_r",
+    "thumb_03_r",
+    "lowerarm_twist_01_r",
+    "upperarm_twist_01_r",
+    "neck_01",
+    "head",
+    "thigh_l",
+    "calf_l",
+    "calf_twist_01_l",
+    "foot_l",
+    "ball_l",
+    "thigh_twist_01_l",
+    "thigh_r",
+    "calf_r",
+    "calf_twist_01_r",
+    "foot_r",
+    "ball_r",
+    "thigh_twist_01_r"
+  ],
+  "source_height_cm": 289.858,
+  "animation": {
+    "file": "Steward_Present_Mars_AS.fbx",
+    "fps": 30,
+    "frames": 180,
+    "duration_seconds": 6,
+    "root_motion": false
+  },
+  "prop": {
+    "file": "ServiceParchment_Mars_SM.fbx",
+    "local_front_ue": "+X",
+    "width_cm": 84.0,
+    "reading_size_cm": [
+      80.0,
+      90.0
+    ],
+    "component_relative_location_cm": [
+      0,
+      55.00000000000001,
+      175.0
+    ],
+    "component_relative_rotation_pyr": [
+      0,
+      90,
+      0
+    ],
+    "assembly_root_relative_location_cm": [
+      55.00000000000001,
+      0,
+      175.0
+    ],
+    "assembly_root_relative_rotation_pyr": [
+      0,
+      0,
+      0
+    ],
+    "tail_floor_height_cm": 2.0,
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  "widget": {
+    "parent": "parchment",
+    "location_cm": [
+      0.25,
+      0,
+      -19.0
+    ],
+    "rotation_pyr": [
+      0,
+      0,
+      0
+    ],
+    "size_cm": [
+      76.0,
+      85.5
+    ],
+    "draw_size": [
+      800,
+      900
+    ],
+    "scale": 0.095
+  },
+  "hold_sockets_component_cm": {
+    "l": [
+      50.0,
+      55.0,
+      196.0
+    ],
+    "r": [
+      -50.0,
+      55.0,
+      196.0
+    ]
+  },
+  "hold_sockets_assembly_root_cm": {
+    "l": [
+      55.0,
+      -50.0,
+      196.0
+    ],
+    "r": [
+      55.0,
+      50.0,
+      196.0
+    ]
+  },
+  "service_mesh": {
+    "file": "Steward_Service_Mars_SK.fbx",
+    "skeleton": "existing Steward_Mars_SKEL",
+    "material_slots": [
+      "M_Steward",
+      "M_EyePlate"
+    ],
+    "garment_weight_vertices": 363
+  },
+  "validation": {
+    "bones_preserved": true,
+    "rest_matrices_preserved": true,
+    "max_wrist_error_cm": 6.848052318737542e-05,
+    "source_preserved": true
+  },
+  "limits": [
+    "Body preview uses exported base color when available",
+    "Hand skin contact requires Unreal review",
+    "Animation skeleton compatibility requires Unreal import and playback review"
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "status": "passed",
+  "bones": 60,
+  "limb_length_error_cm": 2.0402921946383046e-05,
+  "prop_dimensions_metres": [
+    0.7086210250854492,
+    0.8399999737739563,
+    2.093920946121216
+  ],
+  "new_service_mesh_rest_head_error_cm": 8.085510670641178e-05,
+  "independently_reimported_hand_vertices_unchanged": 886,
+  "floor_min_height_cm": 1.002669334411621,
+  "floor_region_vertices": 512,
+  "hierarchy_preserved": true,
+  "hold_positions_preserved": true,
+  "static_identity_import_scale": true,
+  "animation_default_pose": "holding pose; import animation only on existing skeleton",
+  "animation_frames": [
+    1,
+    181
+  ],
+  "sampled_frames": 181,
+  "max_roundtrip_contact_error_cm": 0.0002275149188517608,
+  "loop_matrix_error": 0.0,
+  "max_wrist_bend_deg": 59.79081346594213,
+  "top_curl_min_local_z_cm": 25.0,
+  "reading_top_local_z_cm": 25.0,
+  "top_curl_reading_overlap": false,
+  "flat_reading_bounds_cm": [
+    -65.0,
+    25.0
+  ],
+  "drape_profile_non_crossing": true
+}

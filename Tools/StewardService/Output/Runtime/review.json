@@ -1,0 +1,188 @@
+{
+  "status": "passed",
+  "setup": "Teleports only between review shots; actual gate crossings use CharacterMovement.",
+  "input": "Gameplay Use through InputSource raw events; menu selection/Back/Confirm through WidgetInteraction Slate keys.",
+  "observations": [
+    {
+      "label": "initial",
+      "seconds": 0.0,
+      "pawn": [
+        850.0,
+        0.0,
+        82.0
+      ],
+      "camera": [
+        850.0,
+        0.0,
+        117.0361515911114
+      ],
+      "service": "None",
+      "gate_open": false,
+      "gate_alpha": 0.0,
+      "gloves_hidden": false,
+      "parchment_visible": true,
+      "parchment_component": "/Game/Mars/Maps/UEDPIE_0_Camp_Mars_MAP.Camp_Mars_MAP:WidgetComponent_0"
+    },
+    {
+      "label": "closed_gate_blocks_movement",
+      "seconds": 1.4418205991387367,
+      "pawn": [
+        1174.8993334210331,
+        0.0,
+        106.91249943403659
+      ],
+      "camera": [
+        1174.8993334210331,
+        0.05678836618991522,
+        141.60065830303884
+      ],
+      "service": "None",
+      "gate_open": false,
+      "gate_alpha": 0.0,
+      "gloves_hidden": false,
+      "parchment_visible": true,
+      "parchment_component": "/Game/Mars/Maps/UEDPIE_0_Camp_Mars_MAP.Camp_Mars_MAP:WidgetComponent_0"
+    },
+    {
+      "label": "idle_parchment_prompt_and_outline",
+      "seconds": 2.612072601914406,
+      "pawn": [
+        0.0,
+        -850.0,
+        77.15000534057617
+      ],
+      "camera": [
+        8.615309207782084e-08,
+        -850.0,
+        112.3443295837548
+      ],
+      "service": "None",
+      "gate_open": false,
+      "gate_alpha": 0.0,
+      "gloves_hidden": false,
+      "parchment_visible": true,
+      "parchment_component": "/Game/Mars/Maps/UEDPIE_0_Camp_Mars_MAP.Camp_Mars_MAP:WidgetComponent_0"
+    },
+    {
+      "label": "raw_use_opened_reading_view",
+      "seconds": 4.116547103971243,
+      "pawn": [
+        0.0,
+        -850.0,
+        77.15000534057617
+      ],
+      "camera": [
+        -3.552713678800501e-15,
+        -865.0,
+        179.0
+      ],
+      "service": "None",
+      "gate_open": false,
+      "gate_alpha": 0.0,
+      "gloves_hidden": true,
+      "parchment_visible": true,
+      "parchment_component": "/Game/Mars/Maps/UEDPIE_0_Camp_Mars_MAP.Camp_Mars_MAP:WidgetComponent_0"
+    },
+    {
+      "label": "fourth_dish_preview_only",
+      "seconds": 6.381266105920076,
+      "pawn": [
+        0.0,
+        -850.0,
+        77.15000534057617
+      ],
+      "camera": [
+        -3.552713678800501e-15,
+        -865.0,
+        179.0
+      ],
+      "service": "None",
+      "gate_open": false,
+      "gate_alpha": 0.0,
+      "gloves_hidden": true,
+      "parchment_visible": true,
+      "parchment_component": "/Game/Mars/Maps/UEDPIE_0_Camp_Mars_MAP.Camp_Mars_MAP:WidgetComponent_0"
+    },
+    {
+      "label": "back_restored_chef_without_commit",
+      "seconds": 8.1679826118052,
+      "pawn": [
+        0.0,
+        -850.0,
+        77.15000534057617
+      ],
+      "camera": [
+        2.0738668980629534e-35,
+        -850.0,
+        111.93080371719451
+      ],
+      "service": "None",
+      "gate_open": false,
+      "gate_alpha": 0.0,
+      "gloves_hidden": false,
+      "parchment_visible": true,
+      "parchment_component": "/Game/Mars/Maps/UEDPIE_0_Camp_Mars_MAP.Camp_Mars_MAP:WidgetComponent_0"
+    },
+    {
+      "label": "slate_confirm_committed_dill_broth",
+      "seconds": 11.652587611228228,
+      "pawn": [
+        0.0,
+        -850.0,
+        77.15000534057617
+      ],
+      "camera": [
+        -6.076424418250184e-57,
+        -850.0,
+        112.35797048582349
+      ],
+      "service": "DillBroth",
+      "gate_open": true,
+      "gate_alpha": 0.5735572576522827,
+      "gloves_hidden": false,
+      "parchment_visible": true,
+      "parchment_component": "/Game/Mars/Maps/UEDPIE_0_Camp_Mars_MAP.Camp_Mars_MAP:WidgetComponent_0"
+    },
+    {
+      "label": "gate_fully_open",
+      "seconds": 13.004048708826303,
+      "pawn": [
+        850.0,
+        0.0,
+        77.15000247955322
+      ],
+      "camera": [
+        850.0,
+        -3.222622627021996e-70,
+        111.9024618730709
+      ],
+      "service": "DillBroth",
+      "gate_open": true,
+      "gate_alpha": 1.0,
+      "gloves_hidden": false,
+      "parchment_visible": true,
+      "parchment_component": "/Game/Mars/Maps/UEDPIE_0_Camp_Mars_MAP.Camp_Mars_MAP:WidgetComponent_0"
+    },
+    {
+      "label": "physical_walk_through_open_gate",
+      "seconds": 17.216569617390633,
+      "pawn": [
+        1990.8989387327672,
+        0.0006129363497848067,
+        77.14999832236708
+      ],
+      "camera": [
+        1990.8989387327672,
+        0.0009076550343255889,
+        112.22378591069008
+      ],
+      "service": "DillBroth",
+      "gate_open": true,
+      "gate_alpha": 1.0,
+      "gloves_hidden": false,
+      "parchment_visible": true,
+      "parchment_component": "/Game/Mars/Maps/UEDPIE_0_Camp_Mars_MAP.Camp_Mars_MAP:WidgetComponent_0"
+    }
+  ],
+  "wall_seconds": 30.03200000000652
+}

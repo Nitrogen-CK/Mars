@@ -1,0 +1,299 @@
+{
+  "scope": [
+    "/Game/Mars/UI/Widgets/Steward/ServiceParchmentRow_Mars_WBP",
+    "/Game/Mars/UI/Widgets/Steward/ServiceParchment_Mars_WBP"
+  ],
+  "assets": [
+    {
+      "asset": "/Game/Mars/UI/Widgets/Steward/ServiceParchmentRow_Mars_WBP",
+      "bindings": {
+        "Title": "/Script/CommonUI.CommonTextBlock",
+        "Summary": "/Script/CommonUI.CommonTextBlock"
+      },
+      "rootWidthOverride": 680.0,
+      "rootHeightOverride": 155.0,
+      "styles": {
+        "Title": "/Game/Mars/UI/Styles/ChalkParchment/TextInk_Mars_STYLE.TextInk_Mars_STYLE_C",
+        "Summary": "/Game/Mars/UI/Styles/ChalkParchment/TextInk_Mars_STYLE.TextInk_Mars_STYLE_C"
+      },
+      "fontSizes": {
+        "Title": 34.0,
+        "Summary": 22.0
+      },
+      "labels": {},
+      "cdo": {
+        "bToggleable": true,
+        "bSelectable": true,
+        "Style": "/Game/Mars/UI/Styles/ChalkParchment/ButtonPaper_Mars_STYLE.ButtonPaper_Mars_STYLE_C"
+      },
+      "collapsed": {},
+      "widgetNames": [
+        "DesignSize",
+        "Root",
+        "RowRule",
+        "Title",
+        "Summary",
+        "SelectedMarker",
+        "FocusCorners"
+      ],
+      "canvasSlots": {
+        "RowRule": {
+          "position": [
+            34.0,
+            148.0
+          ],
+          "size": [
+            612.0,
+            7.0
+          ]
+        },
+        "Title": {
+          "position": [
+            52.0,
+            14.0
+          ],
+          "size": [
+            568.0,
+            50.0
+          ]
+        },
+        "Summary": {
+          "position": [
+            52.0,
+            66.0
+          ],
+          "size": [
+            568.0,
+            78.0
+          ]
+        },
+        "SelectedMarker": {
+          "position": [
+            8.0,
+            28.0
+          ],
+          "size": [
+            32.0,
+            32.0
+          ]
+        },
+        "FocusCorners": {
+          "position": [
+            12.0,
+            73.0
+          ],
+          "size": [
+            28.0,
+            28.0
+          ]
+        }
+      },
+      "postCompileCDO": {
+        "bToggleable": true,
+        "bSelectable": true,
+        "Style": "/Game/Mars/UI/Styles/ChalkParchment/ButtonPaper_Mars_STYLE.ButtonPaper_Mars_STYLE_C"
+      },
+      "savedAfterCompile": true
+    },
+    {
+      "asset": "/Game/Mars/UI/Widgets/Steward/ServiceParchment_Mars_WBP",
+      "bindings": {
+        "ServiceRows": "/Script/UMG.VerticalBox",
+        "PreviewTitle": "/Script/CommonUI.CommonTextBlock",
+        "PreviewSummary": "/Script/CommonUI.CommonTextBlock",
+        "CurrentSelection": "/Script/CommonUI.CommonTextBlock",
+        "Status": "/Script/CommonUI.CommonTextBlock",
+        "Confirm": "/Game/Mars/UI/Widgets/ChalkParchment/ButtonPaper_Mars_WBP.ButtonPaper_Mars_WBP_C",
+        "Back": "/Game/Mars/UI/Widgets/ChalkParchment/ButtonPaper_Mars_WBP.ButtonPaper_Mars_WBP_C"
+      },
+      "rootWidthOverride": 800.0,
+      "rootHeightOverride": 900.0,
+      "styles": {
+        "Paper": "/Game/Mars/UI/Styles/ChalkParchment/BorderPaper_Mars_STYLE.BorderPaper_Mars_STYLE_C",
+        "Heading": "/Game/Mars/UI/Styles/ChalkParchment/TextInk_Mars_STYLE.TextInk_Mars_STYLE_C",
+        "Instructions": "/Game/Mars/UI/Styles/ChalkParchment/TextInk_Mars_STYLE.TextInk_Mars_STYLE_C",
+        "PreviewTitle": "/Game/Mars/UI/Styles/ChalkParchment/TextInk_Mars_STYLE.TextInk_Mars_STYLE_C",
+        "PreviewSummary": "/Game/Mars/UI/Styles/ChalkParchment/TextInk_Mars_STYLE.TextInk_Mars_STYLE_C",
+        "CurrentLabel": "/Game/Mars/UI/Styles/ChalkParchment/TextInk_Mars_STYLE.TextInk_Mars_STYLE_C",
+        "CurrentSelection": "/Game/Mars/UI/Styles/ChalkParchment/TextInk_Mars_STYLE.TextInk_Mars_STYLE_C",
+        "Status": "/Game/Mars/UI/Styles/ChalkParchment/TextInk_Mars_STYLE.TextInk_Mars_STYLE_C"
+      },
+      "fontSizes": {
+        "Heading": 38.0,
+        "Instructions": 25.0,
+        "PreviewTitle": 30.0,
+        "PreviewSummary": 25.0,
+        "CurrentLabel": 20.0,
+        "CurrentSelection": 23.0,
+        "Status": 18.0
+      },
+      "labels": {
+        "Confirm": "Confirm & open gate",
+        "Back": "Back"
+      },
+      "cdo": {
+        "RowClass": "/Game/Mars/UI/Widgets/Steward/ServiceParchmentRow_Mars_WBP.ServiceParchmentRow_Mars_WBP_C"
+      },
+      "collapsed": {
+        "Instructions": "<SlateVisibility.COLLAPSED: 1>",
+        "PreviewTitle": "<SlateVisibility.COLLAPSED: 1>",
+        "PreviewSummary": "<SlateVisibility.COLLAPSED: 1>",
+        "CurrentLabel": "<SlateVisibility.COLLAPSED: 1>",
+        "CurrentSelection": "<SlateVisibility.COLLAPSED: 1>"
+      },
+      "widgetNames": [
+        "DesignSize",
+        "Root",
+        "Paper",
+        "Heading",
+        "HeadingRule",
+        "Instructions",
+        "ServicesScroll",
+        "ServiceRows",
+        "PreviewTitle",
+        "PreviewSummary",
+        "CurrentLabel",
+        "CurrentSelection",
+        "Confirm",
+        "Back",
+        "Status"
+      ],
+      "canvasSlots": {
+        "Paper": {
+          "position": [
+            0.0,
+            0.0
+          ],
+          "size": [
+            800.0,
+            900.0
+          ]
+        },
+        "Heading": {
+          "position": [
+            55.0,
+            20.0
+          ],
+          "size": [
+            690.0,
+            55.0
+          ]
+        },
+        "HeadingRule": {
+          "position": [
+            80.0,
+            76.0
+          ],
+          "size": [
+            640.0,
+            10.0
+          ]
+        },
+        "Instructions": {
+          "position": [
+            70.0,
+            158.0
+          ],
+          "size": [
+            660.0,
+            44.0
+          ]
+        },
+        "ServicesScroll": {
+          "position": [
+            60.0,
+            90.0
+          ],
+          "size": [
+            680.0,
+            620.0
+          ]
+        },
+        "PreviewTitle": {
+          "position": [
+            76.0,
+            620.0
+          ],
+          "size": [
+            648.0,
+            48.0
+          ]
+        },
+        "PreviewSummary": {
+          "position": [
+            76.0,
+            674.0
+          ],
+          "size": [
+            648.0,
+            88.0
+          ]
+        },
+        "CurrentLabel": {
+          "position": [
+            76.0,
+            768.0
+          ],
+          "size": [
+            224.0,
+            30.0
+          ]
+        },
+        "CurrentSelection": {
+          "position": [
+            300.0,
+            766.0
+          ],
+          "size": [
+            424.0,
+            40.0
+          ]
+        },
+        "Confirm": {
+          "position": [
+            70.0,
+            752.0
+          ],
+          "size": [
+            388.0,
+            58.0
+          ]
+        },
+        "Back": {
+          "position": [
+            478.0,
+            752.0
+          ],
+          "size": [
+            252.0,
+            58.0
+          ]
+        },
+        "Status": {
+          "position": [
+            76.0,
+            834.0
+          ],
+          "size": [
+            648.0,
+            32.0
+          ]
+        }
+      },
+      "scroll": {
+        "orientation": "<Orientation.ORIENT_VERTICAL: 1>",
+        "scrollBarVisibility": "<SlateVisibility.VISIBLE: 0>",
+        "allowOverscroll": false,
+        "navigationDestination": "<DescendantScrollDestination.INTO_VIEW: 0>",
+        "contentClass": "/Script/UMG.VerticalBox",
+        "contentParent": "ServicesScroll"
+      },
+      "postCompileCDO": {
+        "RowClass": "/Game/Mars/UI/Widgets/Steward/ServiceParchmentRow_Mars_WBP.ServiceParchmentRow_Mars_WBP_C"
+      },
+      "savedAfterCompile": true
+    }
+  ],
+  "runtimePopulated": false,
+  "evidenceBoundary": "Authored widget templates only; main requires SetCatalog on a live instance."
+}

@@ -1,0 +1,86 @@
+{
+  "session_id": "pie_smoke_5_213703",
+  "status": "complete",
+  "marker": "STEWARD_REVISION3_FINAL",
+  "map": "UEDPIE_0_Camp_Mars_MAP",
+  "duration": 120,
+  "pie_active": true,
+  "pie_ready": true,
+  "lifecycle": "teardown-complete",
+  "sample_count": 4351,
+  "elapsed_seconds": 120.01267839968204,
+  "var_summary": {},
+  "output_dir": "D:/Repositories/CkRepos/Orion/Saved/StewardServiceCaptureArchive/Revision3_Final",
+  "frame_count": 158,
+  "capture_validity": {
+    "valid_frames": 157,
+    "invalid_frames": 0,
+    "captured_ok": true,
+    "uniformity_checked": true
+  },
+  "view_target": {
+    "active_actor": "Mars_MenuBoardStation_0",
+    "active_class": "Mars_MenuBoardStation"
+  },
+  "runtime_identity": {
+    "actor": "Mars_PlayerCharacter_0",
+    "actor_class": "Mars_PlayerCharacter",
+    "skel_comp": "CharacterMesh0",
+    "anim_instance_class": "/Game/Mars/Gameplay/PlayerCharacter/Chef/ABP_Chef.ABP_Chef_C",
+    "mesh_anim_class": "/Game/Mars/Gameplay/PlayerCharacter/Chef/ABP_Chef.ABP_Chef_C",
+    "animation_mode": "anim_blueprint",
+    "anim_class_changed": false
+  },
+  "stages": {
+    "after_n_ticks": {
+      "fired": true,
+      "fired_at_seconds": 0.3350684978067875,
+      "python_ok": true,
+      "python_output": "None"
+    }
+  },
+  "grouped_counts": {
+    "active_runtime": {
+      "must_absent": {
+        "Blueprint Runtime Error": 0,
+        "Accessed None": 0,
+        "LogChooser": 0,
+        "Steward review failed": 0,
+        "Script callstack:": 0,
+        "Ensure condition failed": 0
+      },
+      "must_present": {
+        "STEWARD_REVIEW_FINISHED passed": 1
+      },
+      "observe_only": {},
+      "warn": {},
+      "entry_count": 324
+    },
+    "teardown": {
+      "must_absent": {
+        "Blueprint Runtime Error": 0,
+        "Accessed None": 0,
+        "LogChooser": 0,
+        "Steward review failed": 0,
+        "Script callstack:": 0,
+        "Ensure condition failed": 0
+      },
+      "entry_count": 17,
+      "allowed": true
+    },
+    "ignore_after_pattern": "BeginTearingDown"
+  },
+  "warnings": [],
+  "missing_must_present": [],
+  "post_marker_counts": {
+    "Blueprint Runtime Error": 0,
+    "Accessed None": 0,
+    "LogChooser": 0,
+    "Steward review failed": 0,
+    "Script callstack:": 0,
+    "Ensure condition failed": 0,
+    "STEWARD_REVIEW_FINISHED passed": 1
+  },
+  "total_matches": 0,
+  "ok": true
+}
