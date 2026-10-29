@@ -84,7 +84,9 @@ enum EMars_PlayerViewpoint_ViewHolder
     // A station whose look control is captured: the station reads the look input.
     Station,
     // Held by a devourer: the view is the devourer's to move.
-    Devour
+    Devour,
+    // The camp parchment or departure board owns the local view until it closes.
+    CampMenu
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

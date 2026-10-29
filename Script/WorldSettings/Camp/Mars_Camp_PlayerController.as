@@ -17,7 +17,7 @@ class AMars_Camp_PlayerController : AMars_Master_PlayerController
         if (ck::Is_NOT_Valid(ContractsAnchor) || ck::Is_NOT_Valid(DepartureAnchor))
         { return; }
 
-        SpawnStationTarget(InEntity, ContractsAnchor, EMars_CampStation::Contracts);
+        // Contracts belongs to the Steward's visible entity; a separate target cannot outline him.
         SpawnStationTarget(InEntity, DepartureAnchor, EMars_CampStation::Departure);
     }
 

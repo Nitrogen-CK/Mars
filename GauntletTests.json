@@ -10,6 +10,11 @@
       "name": "HostServiceTravelReturn",
       "timeoutSec": 300,
       "note": "Single-process LAN host: reject invalid address and service, host camp, commit Sandbox, close admission on departure, travel to Sandbox and back, then leave to standalone camp. Does not exercise a remote client."
+    },
+    {
+      "name": "StewardMissionTravelReturn",
+      "timeoutSec": 300,
+      "note": "Single-process real LAN host: open/back the Steward service camera, verify initially closed mission gate, commit DillBroth, verify raised gate, travel to canonical Warrens and return with selection/gate restored, then leave to standalone camp with gate closed. Inherits invalid address/service and admission/revision assertions; no remote client or physical traversal proof."
     }
   ]
 }

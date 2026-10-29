@@ -61,6 +61,9 @@ class UMars_ChalkService_Widget : UMars_WorldBoard_Widget
     UPROPERTY(meta = (BindWidget))
     UPanelWidget ServiceRows;
 
+    UPROPERTY(meta = (BindWidgetOptional))
+    UScrollBox ServicesScroll;
+
     UPROPERTY(EditDefaultsOnly, Category = "Mars|Widgets")
     TSubclassOf<UMars_ChalkServiceRow_Widget> RowClass;
 
@@ -136,6 +139,7 @@ class UMars_ChalkService_Widget : UMars_WorldBoard_Widget
                 auto Row = Cast<UMars_ChalkServiceRow_Widget>(WidgetBlueprint::CreateWidget(RowClass, GetOwningPlayer()));
                 Row.SetService(Service);
                 Row.OnButtonBaseHovered.AddUFunction(this, n"OnButtonHovered");
+                Row.OnButtonBaseFocused.AddUFunction(this, n"OnRowFocused");
                 ServiceRows.AddChild(Row);
                 _RowGroup.AddWidget(Row);
                 _Rows.Add(Row);
@@ -216,7 +220,15 @@ class UMars_ChalkService_Widget : UMars_WorldBoard_Widget
 
         _HasBrowsed = true;
         _PreviewServiceId = Row.GetService().Id;
+        OnRowFocused(Row);
         RefreshPreview();
+    }
+
+    UFUNCTION()
+    private void OnRowFocused(UCommonButtonBase InButton)
+    {
+        if (ck::IsValid(ServicesScroll))
+        { ServicesScroll.ScrollWidgetIntoView(InButton, true, EDescendantScrollDestination::IntoView); }
     }
 
     UFUNCTION()

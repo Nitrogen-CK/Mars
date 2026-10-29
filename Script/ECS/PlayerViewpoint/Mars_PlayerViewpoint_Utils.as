@@ -97,6 +97,12 @@ mixin bool Get_IsViewHeld(const FCk_Handle_PlayerViewpoint& Self)
     return Self.Get_Fragment(FMars_Fragment_PlayerViewpoint).ViewHolders.Num() > 0;
 }
 
+// Ownership-specific queries keep menu focus suppression separate from physical control/ladder holds.
+mixin bool Get_IsViewHeldBy(const FCk_Handle_PlayerViewpoint& Self, EMars_PlayerViewpoint_ViewHolder InHolder)
+{
+    return Self.Get_Fragment(FMars_Fragment_PlayerViewpoint).ViewHolders.Contains(InHolder);
+}
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Requests
 //--------------------------------------------------------------------------------------------------------------------------

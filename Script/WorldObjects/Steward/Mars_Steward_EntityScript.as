@@ -227,6 +227,10 @@ class UMars_Steward_EntityScript : UCk_GenericEntityScript_UE
     UPROPERTY(ExposeOnSpawn)
     FTransform SpawnTransform = FTransform::Identity;
 
+    // Opt-in camp assembly; existing sandbox Stewards retain their original idle and maw.
+    UPROPERTY(ExposeOnSpawn)
+    bool PresentsServices = false;
+
     private UMars_Steward_Config _Config = mars::Mars_Steward_Config;
 
     // The scene node the body mesh sits on (the config's MeshOffset and Scale under the root).
@@ -266,6 +270,15 @@ class UMars_Steward_EntityScript : UCk_GenericEntityScript_UE
         const auto Validation = _Config.Validate();
         if (ck::EnsureIfNot(Validation.IsValid(), f"[Steward] [{InHandle.ToString()}] rejected its config: {Validation.Get_Error()}"))
         { return ECk_EntityScript_ConstructionFlow::Finished; }
+
+        if (PresentsServices)
+        {
+            const auto ServiceValidation = mars::Mars_StewardService_Config.Validate();
+            if (ck::EnsureIfNot(ServiceValidation.IsValid(), f"[Steward] rejected service presentation: {ServiceValidation.Get_Error()}"))
+            { return ECk_EntityScript_ConstructionFlow::Finished; }
+            utils_camp_ui_station::Create(Root, EMars_CampStation::Contracts,
+                FVector(50.0, 55.0, 150.0), FTransform(FVector(25.0, 0.0, 150.0)));
+        }
 
         utils_entity_tag::Add(InHandle, constants_steward::k_EntityTag);
 
@@ -334,15 +347,32 @@ class UMars_Steward_EntityScript : UCk_GenericEntityScript_UE
 
         // Nothing on the steward collides yet.
         Mesh.SetCollisionEnabled(ECollisionEnabled::NoCollision);
-        Mesh.SetSkeletalMeshAsset(System::LoadAsset_Blocking(Body.Mesh));
+        const auto BodyMesh = PresentsServices ? mars::Mars_StewardService_Config.Parchment.BodyMesh : Body.Mesh;
+        Mesh.SetSkeletalMeshAsset(System::LoadAsset_Blocking(BodyMesh));
 
-        if (Body.Idle.IsNull() == false)
+        const auto Animation = PresentsServices ? mars::Mars_StewardService_Config.Parchment.PresentLoop : Body.Idle;
+        if (Animation.IsNull() == false)
         {
+            auto LoadedAnimation = System::LoadAsset_Blocking(Animation);
+            if (ck::EnsureIfNot(ck::IsValid(LoadedAnimation), "[Steward] configured body animation did not load"))
+            { return; }
             const auto Looping = true;
-            Mesh.PlayAnimation(System::LoadAsset_Blocking(Body.Idle), Looping);
+            Mesh.PlayAnimation(LoadedAnimation, Looping);
         }
 
         ConstructEyes(Mesh);
+        if (PresentsServices)
+        { ConstructServiceParchment(); }
+    }
+
+    private void ConstructServiceParchment()
+    {
+        const auto& Parchment = mars::Mars_StewardService_Config.Parchment;
+        auto Mesh = System::LoadAsset_Blocking(Parchment.Mesh);
+        if (ck::EnsureIfNot(ck::IsValid(Mesh), "[Steward] service parchment mesh did not load"))
+        { return; }
+        _Root.Add_MeshPart(this, FMars_MeshPart(Parchment.Offset, Mesh, nullptr,
+            collision::profile::NoCollision, n"Steward_ServiceParchment"));
     }
 
     //----------------------------------------------------------------------------------------------------------------------

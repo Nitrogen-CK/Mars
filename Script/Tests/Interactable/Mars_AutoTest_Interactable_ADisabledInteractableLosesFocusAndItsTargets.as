@@ -48,6 +48,10 @@ class UMars_AutoTest_Interactable_ADisabledInteractableLosesFocusAndItsTargets :
         Add_Step_WaitUntil("the carrier's SM runs the focus task", n"Check_RigReady", 0, 0);
         Add_Step("open Use on the carrier's resolver", n"Step_OpenUse");
         Add_Step_WaitUntil("the trace focused the lever: its target is the best Use target and its prompt shows", n"Check_FocusedAndOffered", 0, 0);
+        Add_Step("a camp menu captures the carrier's world interaction", n"Step_OpenCampMenu");
+        Add_Step_WaitUntil("the menu clears focus, resolver target and prompt even under the trace", n"Check_LostFocusAndOffer", 0, 0);
+        Add_Step("Back releases only the camp menu hold", n"Step_CloseCampMenu");
+        Add_Step_WaitUntil("Back restores world focus and the prompt", n"Check_FocusedAndOffered", 0, 0);
         Add_Step("a ledger claims the lever", n"Step_Claim");
         Add_Step_WaitUntil("the lever lost the focus, its target and its prompt", n"Check_LostFocusAndOffer", 0, 0);
         Add_Step("the lever is Disabled under the trace, its framework target with it", n"Step_AssertDisabledUnderTheTrace");
@@ -178,6 +182,20 @@ class UMars_AutoTest_Interactable_ADisabledInteractableLosesFocusAndItsTargets :
     private void Step_Claim(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         _Lever.Request_Disable(FMars_Request_Interactable_Disable(EMars_Interactable_DisableReason::Ledger));
+    }
+
+    UFUNCTION()
+    private void Step_OpenCampMenu(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        auto View = _Carrier.As_PlayerViewpoint();
+        View.Request_HoldView(FMars_Request_PlayerViewpoint_HoldView(EMars_PlayerViewpoint_ViewHolder::CampMenu));
+    }
+
+    UFUNCTION()
+    private void Step_CloseCampMenu(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        auto View = _Carrier.As_PlayerViewpoint();
+        View.Request_ReleaseView(FMars_Request_PlayerViewpoint_ReleaseView(EMars_PlayerViewpoint_ViewHolder::CampMenu));
     }
 
     UFUNCTION()

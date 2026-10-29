@@ -16,6 +16,9 @@ class UMars_GauntletAsTest_HostServiceTravelReturn : UCk_GauntletAsTest_Base
     default _RequirePlayerControllerOnInit = true;
     default _TimeoutSeconds = 270.0f;
 
+    protected FName _ServiceId = n"Sandbox";
+    protected TSoftObjectPtr<UWorld> _ServiceDestination = assets::Sandbox_Mars_MAP();
+
     private EMars_GauntletHostFlowStage _Stage = EMars_GauntletHostFlowStage::InitialCamp;
     private float64 _StageStarted = 0.0;
     private float32 _StageTimeout = 15.0f;
@@ -104,6 +107,9 @@ class UMars_GauntletAsTest_HostServiceTravelReturn : UCk_GauntletAsTest_Base
         if (Sessions.Num() != 1 || !Sessions[0].IsAdmissionOpen())
         { Fail("hosted camp admission is not open"); return; }
 
+        if (CheckHostedPresentation(PC) == false)
+        { return; }
+
         _InitialRevision = Party.Revision;
         PC.Server_CommitService(n"NotAService");
         Next(EMars_GauntletHostFlowStage::InvalidService, 5.0f, "invalid service submitted");
@@ -121,8 +127,8 @@ class UMars_GauntletAsTest_HostServiceTravelReturn : UCk_GauntletAsTest_Base
             !InFlow.GetCommittedServiceId().IsNone())
         { Fail("unknown service changed the committed party state"); return; }
 
-        PC.Server_CommitService(n"Sandbox");
-        Next(EMars_GauntletHostFlowStage::ServiceCommitted, 10.0f, "Sandbox service submitted");
+        PC.Server_CommitService(_ServiceId);
+        Next(EMars_GauntletHostFlowStage::ServiceCommitted, 10.0f, f"{_ServiceId} service submitted");
     }
 
     private void CheckCommittedService(UMars_LanFlow_Subsystem InFlow)
@@ -132,16 +138,19 @@ class UMars_GauntletAsTest_HostServiceTravelReturn : UCk_GauntletAsTest_Base
         if (ck::Is_NOT_Valid(State) || ck::Is_NOT_Valid(PC))
         { Fail("hosted camp disappeared while committing service"); return; }
         const auto Party = State.Get_PartyState();
-        if (Party.ServiceId != n"Sandbox")
+        if (Party.ServiceId != _ServiceId)
         { return; }
         if (Party.Revision != _InitialRevision + 1 || Party.Departure == EMars_PartyDeparture::Departing ||
-            InFlow.GetCommittedServiceId() != n"Sandbox")
-        { Fail("Sandbox commit has inconsistent service or revision"); return; }
+            InFlow.GetCommittedServiceId() != _ServiceId)
+        { Fail(f"{_ServiceId} commit has inconsistent service or revision"); return; }
 
         TArray<AMars_GameSession> Sessions;
         GetAllActorsOfClass(Sessions);
         if (Sessions.Num() != 1 || !Sessions[0].IsAdmissionOpen())
         { Fail("admission closed before departure"); return; }
+
+        if (CheckCommittedPresentation(PC) == false)
+        { return; }
 
         PC.Server_RequestDepart();
         const auto DepartingParty = State.Get_PartyState();
@@ -173,18 +182,18 @@ class UMars_GauntletAsTest_HostServiceTravelReturn : UCk_GauntletAsTest_Base
             return;
         }
         if (CurrentWorld.GetNetMode() != ENetMode::NM_ListenServer ||
-            IsMap(CurrentWorld, assets::Sandbox_Mars_MAP()) == false ||
+            IsMap(CurrentWorld, _ServiceDestination) == false ||
             ck::Is_NOT_Valid(Cast<AMars_Gameplay_PlayerController>(PC)) ||
             ck::Is_NOT_Valid(Cast<AMars_PlayerCharacter>(PC.GetControlledPawn())) ||
             InFlow.GetState() != EMars_LanFlowState::Connected)
         { return; }
-        if (InFlow.GetCommittedServiceId() != n"Sandbox")
-        { Fail("service selection did not survive Sandbox travel"); return; }
+        if (InFlow.GetCommittedServiceId() != _ServiceId)
+        { Fail(f"service selection did not survive {_ServiceId} travel"); return; }
 
         TArray<AMars_GameSession> Sessions;
         GetAllActorsOfClass(Sessions);
         if (Sessions.Num() != 1 || Sessions[0].GetWorld() != CurrentWorld || Sessions[0].IsAdmissionOpen())
-        { Fail("Sandbox admission is not closed"); return; }
+        { Fail("service-world admission is not closed"); return; }
 
         Cast<AMars_Gameplay_PlayerController>(PC).Server_ReturnToCamp();
         Next(EMars_GauntletHostFlowStage::CampReturn, 45.0f, "return to camp requested");
@@ -200,14 +209,17 @@ class UMars_GauntletAsTest_HostServiceTravelReturn : UCk_GauntletAsTest_Base
             InFlow.GetState() != EMars_LanFlowState::Connected)
         { return; }
         auto State = Cast<AMars_Camp_GameState>(Gameplay::GetGameState());
-        if (ck::Is_NOT_Valid(State) || State.Get_PartyState().ServiceId != n"Sandbox" ||
-            State.Get_PartyState().Departure == EMars_PartyDeparture::Departing || InFlow.GetCommittedServiceId() != n"Sandbox")
+        if (ck::Is_NOT_Valid(State) || State.Get_PartyState().ServiceId != _ServiceId ||
+            State.Get_PartyState().Departure == EMars_PartyDeparture::Departing || InFlow.GetCommittedServiceId() != _ServiceId)
         { Fail("returned camp did not restore committed service"); return; }
 
         TArray<AMars_GameSession> Sessions;
         GetAllActorsOfClass(Sessions);
         if (Sessions.Num() != 1 || Sessions[0].GetWorld() != PC.GetWorld() || !Sessions[0].IsAdmissionOpen())
         { Fail("returned camp admission is not open"); return; }
+
+        if (CheckReturnedPresentation(PC) == false)
+        { return; }
 
         InFlow.ReturnToMenu();
         Next(EMars_GauntletHostFlowStage::StandaloneRecovery, 45.0f, "leaving session");
@@ -223,6 +235,9 @@ class UMars_GauntletAsTest_HostServiceTravelReturn : UCk_GauntletAsTest_Base
         { return; }
         if (!InFlow.GetCommittedServiceId().IsNone() || InFlow.IsSessionActive())
         { Fail("standalone camp retained session state"); return; }
+
+        if (CheckResetPresentation(PC) == false)
+        { return; }
 
         _Ended = true;
         Controller.Request_MarkHeartbeat("[MarsGauntletAs] HostServiceTravelReturn: passed");
@@ -243,7 +258,20 @@ class UMars_GauntletAsTest_HostServiceTravelReturn : UCk_GauntletAsTest_Base
         Controller.Request_MarkHeartbeat(f"[MarsGauntletAs] HostServiceTravelReturn: {InMessage}");
     }
 
-    private void Fail(FString InReason)
+    // Optional process-level presentation checks. Sandbox retains its existing flow without extra dependencies.
+    protected bool CheckHostedPresentation(AMars_Camp_PlayerController InPC)
+    { return true; }
+
+    protected bool CheckCommittedPresentation(AMars_Camp_PlayerController InPC)
+    { return true; }
+
+    protected bool CheckReturnedPresentation(AMars_Camp_PlayerController InPC)
+    { return true; }
+
+    protected bool CheckResetPresentation(AMars_Camp_PlayerController InPC)
+    { return true; }
+
+    protected void Fail(FString InReason)
     {
         _Ended = true;
         Controller.Request_MarkHeartbeat(f"[MarsGauntletAs] HostServiceTravelReturn: FAIL {InReason}");

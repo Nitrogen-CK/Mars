@@ -9,8 +9,25 @@ class UMars_WorldBoardHost_Widget : UCk_ActivatableWidget_UE
     default bSupportsActivationFocus = false;
     default bIsBackHandler = true;
 
+    // Stations forward physical mouse buttons through Enhanced Input to WidgetInteraction.
+    // NoCapture drops ordinary viewport mouse-down events before that bridge sees them.
+    UPROPERTY()
+    bool bCaptureStationPointer = false;
+
     FMars_WorldBoardHost_Event OnClosed;
     FMars_WorldBoardHost_Event OnBackRequested;
+
+    UFUNCTION(BlueprintOverride)
+    FUIInputConfig GetDesiredInputConfig() const
+    {
+        FUIInputConfig Config;
+        Config.InputMode = ECommonInputMode::All;
+        Config.MouseCaptureMode = bCaptureStationPointer
+            ? EMouseCaptureMode::CaptureDuringMouseDown
+            : EMouseCaptureMode::NoCapture;
+        Config.bHideCursorDuringViewportCapture = false;
+        return Config;
+    }
 
     UFUNCTION(BlueprintOverride)
     void OnDeactivated()
@@ -22,4 +39,12 @@ class UMars_WorldBoardHost_Widget : UCk_ActivatableWidget_UE
         OnBackRequested.Broadcast();
         return true;
     }
+}
+
+// CommonUI selects desired input config only from activation-focus nodes. This
+// station host participates without taking widget focus; the viewport receives it.
+class UMars_StationWorldBoardHost_Widget : UMars_WorldBoardHost_Widget
+{
+    default bSupportsActivationFocus = true;
+    default bCaptureStationPointer = true;
 }

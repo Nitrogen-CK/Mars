@@ -30,19 +30,30 @@ class UMars_CampUiStation_EntityScript : UCk_GenericEntityScript_UE
         if (ck::EnsureIfNot(ck::IsValid(Root), "[CampUiStation] could not compose its transform"))
         { return ECk_EntityScript_ConstructionFlow::Finished; }
 
+        utils_camp_ui_station::Create(Root, Station, ProbeDimensions);
+        return ECk_EntityScript_ConstructionFlow::Finished;
+    }
+}
+
+namespace utils_camp_ui_station
+{
+    // Compose on the visible object so its existing focus task outlines that object's render tree.
+    FCk_Handle_Interactable Create(FCk_Handle_Transform& InOwner, EMars_CampStation InStation,
+        FVector InHalfExtents, FTransform InOffset = FTransform::Identity)
+    {
         auto Metadata = FMars_Fragment_CampUiStation();
-        Metadata.Station = Station;
-        InHandle.Add_Fragment(Metadata);
+        Metadata.Station = InStation;
+        InOwner.Add_Fragment(Metadata);
 
         auto Probe = FMars_Interactable_ProbeInfo();
         Probe.ProbeSpec = FCk_Probe_Spec(GameplayTags::Probe_Mars_Interact);
-        Probe.ProbeShape = utils_shapes::Make_Box(FCk_ShapeBox_Dimensions(ProbeDimensions));
-        Probe.ProbeOffset = FTransform::Identity;
+        Probe.ProbeShape = utils_shapes::Make_Box(FCk_ShapeBox_Dimensions(InHalfExtents));
+        Probe.ProbeOffset = InOffset;
 
         auto Prompt = FMars_InteractPrompt_Spec();
         Prompt.InputAction = mars::Mars_IA_Interact_Use;
-        Prompt.PromptText = Station == EMars_CampStation::Contracts
-            ? NSLOCTEXT("MarsCamp", "OpenContracts", "Open contracts")
+        Prompt.PromptText = InStation == EMars_CampStation::Contracts
+            ? NSLOCTEXT("MarsCamp", "OpenSteward", "Speak to the Steward")
             : NSLOCTEXT("MarsCamp", "OpenDeparture", "Open departure");
 
         // WhileLive: the open state reads who interacts from the live interaction, and ends it once the UI opened.
@@ -57,8 +68,7 @@ class UMars_CampUiStation_EntityScript : UCk_GenericEntityScript_UE
         auto Spec = FMars_Interactable_Spec();
         Spec.ProbeInfo = Probe;
         Spec.Targets.Add(Target);
-        utils_interactable::Create(Root, Spec);
-        return ECk_EntityScript_ConstructionFlow::Finished;
+        return utils_interactable::Create(InOwner, Spec);
     }
 }
 

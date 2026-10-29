@@ -2153,6 +2153,58 @@ namespace UMars_AutoTest_Brain_SettledGoalSatisfies
 }
 
 USTRUCT()
+struct FMars_AutoTest_CampMissionGate_InvalidSpecRejectsUnsafeGeometry_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CampMissionGate_InvalidSpecRejectsUnsafeGeometry
+{
+    FMars_AutoTest_CampMissionGate_InvalidSpecRejectsUnsafeGeometry_SpawnParams Params()
+    {
+        return FMars_AutoTest_CampMissionGate_InvalidSpecRejectsUnsafeGeometry_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CampMissionGate_ProjectsOnlyCommittedCatalogServices_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CampMissionGate_ProjectsOnlyCommittedCatalogServices
+{
+    FMars_AutoTest_CampMissionGate_ProjectsOnlyCommittedCatalogServices_SpawnParams Params()
+    {
+        return FMars_AutoTest_CampMissionGate_ProjectsOnlyCommittedCatalogServices_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CampServiceView_ConfigRejectsInvalidPresentation_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CampServiceView_ConfigRejectsInvalidPresentation
+{
+    FMars_AutoTest_CampServiceView_ConfigRejectsInvalidPresentation_SpawnParams Params()
+    {
+        return FMars_AutoTest_CampServiceView_ConfigRejectsInvalidPresentation_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CampServiceView_TargetBlendsAndCampMenuHoldsUntilRelease_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CampServiceView_TargetBlendsAndCampMenuHoldsUntilRelease
+{
+    FMars_AutoTest_CampServiceView_TargetBlendsAndCampMenuHoldsUntilRelease_SpawnParams Params()
+    {
+        return FMars_AutoTest_CampServiceView_TargetBlendsAndCampMenuHoldsUntilRelease_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_CampSession_PlayBroadcastsOnceLobbyToLive_SpawnParams
 {
 }
@@ -11048,6 +11100,19 @@ namespace UMars_BellkeeperClue_EntityScript
 }
 
 USTRUCT()
+struct FMars_CameraLayer_CampService_SpawnParams
+{
+}
+
+namespace UMars_CameraLayer_CampService
+{
+    FMars_CameraLayer_CampService_SpawnParams Params()
+    {
+        return FMars_CameraLayer_CampService_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_CameraLayer_Devour_SpawnParams
 {
 }
@@ -11070,6 +11135,35 @@ namespace UMars_CameraLayer_Station
     FMars_CameraLayer_Station_SpawnParams Params()
     {
         return FMars_CameraLayer_Station_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_CampMissionGate_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_CampMissionGate_Spec Spec = FMars_CampMissionGate_Spec();
+
+    FMars_CampMissionGate_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_CampMissionGate_Spec InSpec)
+    {
+        SpawnTransform = InSpawnTransform;
+        Spec = InSpec;
+    }
+}
+
+namespace UMars_CampMissionGate_EntityScript
+{
+    FMars_CampMissionGate_EntityScript_SpawnParams Params()
+    {
+        return FMars_CampMissionGate_EntityScript_SpawnParams();
+    }
+
+    FMars_CampMissionGate_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_CampMissionGate_Spec InSpec)
+    {
+        return FMars_CampMissionGate_EntityScript_SpawnParams(InSpawnTransform, InSpec);
     }
 }
 
@@ -20357,9 +20451,13 @@ struct FMars_Steward_EntityScript_SpawnParams
     UPROPERTY()
     FTransform SpawnTransform = FTransform::Identity;
 
-    FMars_Steward_EntityScript_SpawnParams(FTransform InSpawnTransform)
+    UPROPERTY()
+    bool PresentsServices = false;
+
+    FMars_Steward_EntityScript_SpawnParams(FTransform InSpawnTransform, bool InPresentsServices)
     {
         SpawnTransform = InSpawnTransform;
+        PresentsServices = InPresentsServices;
     }
 }
 
@@ -20370,9 +20468,9 @@ namespace UMars_Steward_EntityScript
         return FMars_Steward_EntityScript_SpawnParams();
     }
 
-    FMars_Steward_EntityScript_SpawnParams Params(FTransform InSpawnTransform)
+    FMars_Steward_EntityScript_SpawnParams Params(FTransform InSpawnTransform, bool InPresentsServices)
     {
-        return FMars_Steward_EntityScript_SpawnParams(InSpawnTransform);
+        return FMars_Steward_EntityScript_SpawnParams(InSpawnTransform, InPresentsServices);
     }
 }
 

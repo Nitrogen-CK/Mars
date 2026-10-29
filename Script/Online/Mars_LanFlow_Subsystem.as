@@ -106,10 +106,32 @@ class UMars_LanFlow_Subsystem : UScriptGameInstanceSubsystem
         }
 
         if (_State == EMars_LanFlowState::Idle)
-        { return; }
+        { TryAdoptEditorSession(); return; }
         if (_State == EMars_LanFlowState::Connected)
         { WatchSession(); return; }
         WatchTravel(DeltaTime);
+    }
+
+    // PIE may create an already-listening camp directly, without the front-end Host travel.
+    // Adopt that real network session only after its local chef and camp state exist.
+    private void TryAdoptEditorSession()
+    {
+        auto CurrentWorld = GetWorld();
+        if (ck::Is_NOT_Valid(CurrentWorld) || CurrentWorld.WorldType != EWorldType::PIE ||
+            IsMap(CurrentWorld, assets::Camp_Mars_MAP()) == false)
+        { return; }
+        const auto Mode = CurrentWorld.GetNetMode();
+        if (Mode != ENetMode::NM_ListenServer && Mode != ENetMode::NM_Client)
+        { return; }
+        auto PC = Gameplay::GetPlayerController(0);
+        auto State = Cast<AMars_Camp_GameState>(Gameplay::GetGameState());
+        if (ck::Is_NOT_Valid(PC) || PC.GetWorld() != CurrentWorld || PC.IsLocalController() == false ||
+            ck::Is_NOT_Valid(Cast<AMars_PlayerCharacter>(PC.GetControlledPawn())) ||
+            ck::Is_NOT_Valid(State) || State.GetWorld() != CurrentWorld)
+        { return; }
+        _CommittedServiceId = State.Get_PartyState().ServiceId;
+        SetState(EMars_LanFlowState::Connected, Mode == ENetMode::NM_ListenServer
+            ? EMars_LanFlowStatus::SessionActive : EMars_LanFlowStatus::JoinedCamp);
     }
 
     UFUNCTION()

@@ -149,6 +149,17 @@ class UMars_SmTask_InteractionFocus : UCk_SmTask_EntityScript
 
     private void Recompute_Focus()
     {
+        auto ViewSource = _Player.As_PlayerViewpoint(ECk_SanityCheck::UnChecked);
+        if (ck::IsValid(ViewSource) && ViewSource.Get_IsViewHeldBy(EMars_PlayerViewpoint_ViewHolder::CampMenu))
+        {
+            // The board owns input now. Releasing world focus removes its prompt, outline and resolver targets;
+            // keep tracking candidates so Back can reacquire normally without rebuilding the trace.
+            if (ck::IsValid(_Focused))
+            { DoUnfocus(_Focused); }
+            _Focused = FCk_Handle_Interactable();
+            return;
+        }
+
         for (int32 Index = _Candidates.Num() - 1; Index >= 0; --Index)
         {
             if (ck::Is_NOT_Valid(_Candidates[Index].Interactable))
