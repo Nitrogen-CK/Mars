@@ -270,7 +270,8 @@ class UMars_SmTask_InteractionFocus : UCk_SmTask_EntityScript
         for (auto Target : InInteractable.Get_AllInteractTargets())
         { _Resolver.Request_AddInteractTarget(FCk_Request_InteractionResolver_AddInteractTarget(Target)); }
 
-        if (ck::IsValid(_Hands))
+        // An interactable the hands do not touch (every target ReachKind None) gets no lean.
+        if (ck::IsValid(_Hands) && InInteractable.Get_WantsHandsLean())
         { _Hands.Request_SetFocus(FMars_Request_FPHands_SetFocus(InInteractable, Get_InteractableOwner(InInteractable))); }
     }
 

@@ -194,6 +194,13 @@ class UMars_Processor_FPHands_HandleRequests : UCk_Processor_Script_Base_UE
 
         const auto& Params = InHandle.Get_Fragment(FMars_Fragment_FPHands_Params);
         const auto Kind = utils_fphands::Get_RequestedKind(InRequest);
+        if (ck::EnsureIfNot(Kind != EMars_FPHands_ReachKind::None,
+            f"[FPHands] a reach for [{utils_fphands::Get_RequestedInteractTarget(InRequest).ToString()}] asks for no gesture: a None target is never reached for"))
+        {
+            Refuse_Reach(InHandle, InRequest, EMars_FPHands_ReachRefusal::Malformed);
+            return;
+        }
+
         if (ck::EnsureIfNot(InRequest.PlaceAtWorld.IsSet() == false || Kind == EMars_FPHands_ReachKind::Place,
             f"[FPHands] a [{Kind :n}] reach names a place spot: only a Place reach sets something down"))
         {

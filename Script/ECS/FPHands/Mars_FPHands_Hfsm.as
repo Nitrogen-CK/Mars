@@ -197,7 +197,8 @@ class UMars_SmTask_HandsResolverBinds : UCk_SmTask_EntityScript
             return;
         }
 
-        // Grab targets are never re-reached - a grab always finishes on its own. Use first, then Operate.
+        // Grab targets are never re-reached - a grab always finishes on its own - and None targets are never reached for.
+        // Use first, then Operate.
         if (TryResync(GameplayTags::InteractionIntent_Mars_Use))
         { return; }
 
@@ -226,7 +227,8 @@ class UMars_SmTask_HandsResolverBinds : UCk_SmTask_EntityScript
             if (ck::Is_NOT_Valid(Target) || Target.Has_Fragment(FMars_Fragment_InteractionContext) == false)
             { continue; }
 
-            if (Target.Get_Fragment(FMars_Fragment_InteractionContext).ReachKind == EMars_FPHands_ReachKind::Grab)
+            const auto ReachKind = Target.Get_Fragment(FMars_Fragment_InteractionContext).ReachKind;
+            if (ReachKind == EMars_FPHands_ReachKind::Grab || ReachKind == EMars_FPHands_ReachKind::None)
             { continue; }
 
             if (ck::Is_NOT_Valid(utils_interact_target::TryGet_Interaction(Target, _Player)))
@@ -288,6 +290,10 @@ class UMars_SmTask_HandsResolverBinds : UCk_SmTask_EntityScript
         for (auto Target : InNewTargets)
         {
             if (ck::Is_NOT_Valid(Target) || Target.Has_Fragment(FMars_Fragment_InteractionContext) == false)
+            { continue; }
+
+            // A target the hands do not touch: no gesture.
+            if (Target.Get_Fragment(FMars_Fragment_InteractionContext).ReachKind == EMars_FPHands_ReachKind::None)
             { continue; }
 
             Request_Reach(Target);
@@ -385,6 +391,13 @@ class UMars_SmTask_ActAtGrip : UMars_SmTask_InteractionWork
 
         const auto HasContext = ck::IsValid(_GripTarget) && _GripTarget.Has_Fragment(FMars_Fragment_InteractionContext);
         if (ck::EnsureIfNot(HasContext, f"[ActAtGrip] [{GetClass().GetName()}] awaits the gloves for [{_GripTarget.ToString()}], which is no interact target with an interaction context: acting without the grip"))
+        {
+            Act_AtGrip();
+            return;
+        }
+
+        // A None target is never reached for: the work happens at once, as it does without gloves.
+        if (_GripTarget.Get_Fragment(FMars_Fragment_InteractionContext).ReachKind == EMars_FPHands_ReachKind::None)
         {
             Act_AtGrip();
             return;

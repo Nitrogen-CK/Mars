@@ -726,13 +726,22 @@ namespace utils_fphands
         Target.Layout = EMars_FPHands_GripLayout::Point;
         Shared.Grip = FTransform(FRotator::ZeroRotator, Shared.AnchorWorld.InverseTransformPosition(PointWorld), FVector::OneVector);
 
+        // The glove that will hold a one-handed item (Get_HoldsWith: the right) is the glove that reaches for it, whatever
+        // side it lies on; only a target that never enters the hand is taken by the glove on its side.
         auto PointHand = EMars_Hand::Left;
         if (BothFree)
         {
-            PointHand = Hand.PreferredHand;
-            const auto SideY = Hand.HandWorld.InverseTransformPosition(PointWorld).Y;
-            if (Math::Abs(SideY) > InSpec.Focus.SideSwitchMarginCm)
-            { PointHand = SideY > 0.0 ? EMars_Hand::Right : EMars_Hand::Left; }
+            const auto IsOneHandedItem = Subject.Owner.Has_ReachHint()
+                && Subject.Owner.Get_ReachHint().Handedness == EMars_ItemPresentation_Handedness::OneHanded;
+            if (IsOneHandedItem)
+            { PointHand = EMars_Hand::Right; }
+            else
+            {
+                PointHand = Hand.PreferredHand;
+                const auto SideY = Hand.HandWorld.InverseTransformPosition(PointWorld).Y;
+                if (Math::Abs(SideY) > InSpec.Focus.SideSwitchMarginCm)
+                { PointHand = SideY > 0.0 ? EMars_Hand::Right : EMars_Hand::Left; }
+            }
         }
 
         if (PointHand == EMars_Hand::Right)

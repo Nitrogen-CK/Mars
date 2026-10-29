@@ -215,6 +215,24 @@ mixin TArray<FCk_Handle_InteractTarget> Get_AllInteractTargets(const FCk_Handle_
     return Result;
 }
 
+// The gloves lean toward it while focused, unless every one of its targets is one the hands do not touch (ReachKind None:
+// a conversation, a board that opens a screen). An interactable with no targets keeps the lean.
+mixin bool Get_WantsHandsLean(const FCk_Handle_Interactable& Self)
+{
+    auto HasTarget = false;
+    for (auto Target : Self.Get_AllInteractTargets())
+    {
+        if (Target.Has_Fragment(FMars_Fragment_InteractionContext) == false)
+        { continue; }
+
+        HasTarget = true;
+        if (Target.Get_Fragment(FMars_Fragment_InteractionContext).ReachKind != EMars_FPHands_ReachKind::None)
+        { return true; }
+    }
+
+    return HasTarget == false;
+}
+
 mixin int32 Get_FocusPriority(const FCk_Handle_Interactable& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_Interactable_Params).FocusPriority;

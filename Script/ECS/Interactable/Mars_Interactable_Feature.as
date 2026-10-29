@@ -188,7 +188,7 @@ struct FMars_Interactable_TargetEntry
     // When InteractionStateClass runs. WhileLive makes the target ManuallyCompleted whatever InteractTargetSpec says.
     EMars_Interactable_Work Work = EMars_Interactable_Work::AfterCompletion;
 
-    // The gesture the gloves make for this target.
+    // The gesture the gloves make for this target; None for one the hands do not touch (no lean, no reach).
     EMars_FPHands_ReachKind ReachKind = EMars_FPHands_ReachKind::Grab;
 }
 

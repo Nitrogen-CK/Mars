@@ -64,6 +64,8 @@ namespace utils_camp_ui_station
         Target.InteractPromptSpec = Prompt;
         Target.InteractionStateClass = UMars_SmState_CampUiStation_Open;
         Target.Work = EMars_Interactable_Work::WhileLive;
+        // Opening a screen is no hands gesture: no lean at the Steward or the board, no grab as it opens.
+        Target.ReachKind = EMars_FPHands_ReachKind::None;
 
         auto Spec = FMars_Interactable_Spec();
         Spec.ProbeInfo = Probe;

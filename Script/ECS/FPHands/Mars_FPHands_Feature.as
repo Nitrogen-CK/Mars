@@ -32,7 +32,10 @@ enum EMars_FPHands_ReachKind
 {
     Grab,
     Hold,
-    Place
+    Place,
+    // No gesture and no focus lean: the target is nothing the hands touch (a conversation, a board that opens a screen).
+    // Never asked of the gloves: the control layer skips such a target, and a StartReach that names it is Malformed.
+    None
 }
 
 // Why the gloves did not take a StartReach (OnReachRefused).
@@ -50,7 +53,8 @@ enum EMars_FPHands_ReachRefusal
     SubjectGone,
     // Nothing on the subject is within the gloves' reach.
     OutOfReach,
-    // The request contradicts itself (a place spot on a reach that sets nothing down, a Place with no subject): a defect,
+    // The request contradicts itself (a place spot on a reach that sets nothing down, a Place with no subject, a None
+    // gesture): a defect,
     // ensured where it is refused.
     Malformed
 }

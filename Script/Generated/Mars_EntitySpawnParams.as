@@ -5962,6 +5962,19 @@ namespace UMars_AutoTest_FPHands_AHoldWhoseTargetDiesReleases
 }
 
 USTRUCT()
+struct FMars_AutoTest_FPHands_ANoneTargetIsNeverReachedFor_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_FPHands_ANoneTargetIsNeverReachedFor
+{
+    FMars_AutoTest_FPHands_ANoneTargetIsNeverReachedFor_SpawnParams Params()
+    {
+        return FMars_AutoTest_FPHands_ANoneTargetIsNeverReachedFor_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_FPHands_AOneHandedHoldKeepsBothGlovesWhereTheyRested_SpawnParams
 {
 }
@@ -5971,6 +5984,19 @@ namespace UMars_AutoTest_FPHands_AOneHandedHoldKeepsBothGlovesWhereTheyRested
     FMars_AutoTest_FPHands_AOneHandedHoldKeepsBothGlovesWhereTheyRested_SpawnParams Params()
     {
         return FMars_AutoTest_FPHands_AOneHandedHoldKeepsBothGlovesWhereTheyRested_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_FPHands_AOneHandedPickupReachesWithTheGloveThatHoldsIt_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_FPHands_AOneHandedPickupReachesWithTheGloveThatHoldsIt
+{
+    FMars_AutoTest_FPHands_AOneHandedPickupReachesWithTheGloveThatHoldsIt_SpawnParams Params()
+    {
+        return FMars_AutoTest_FPHands_AOneHandedPickupReachesWithTheGloveThatHoldsIt_SpawnParams();
     }
 }
 
