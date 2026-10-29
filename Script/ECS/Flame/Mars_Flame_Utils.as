@@ -175,7 +175,8 @@ namespace utils_flame
     }
 
     // The ignite row of a flame's interactable: Use with the caller's prompt (a placeholder the control layer rewrites while
-    // focused), run once the press completes. It needs no free hand: the point is a hand holding a flame.
+    // focused), run once the press completes. It needs no free hand: the point is a hand holding a flame, and that hand
+    // is the one that reaches, carrying its flame to this one.
     FMars_Interactable_TargetEntry Make_IgniteTarget(FMars_InteractPrompt_Spec InPrompt)
     {
         auto TargetSpec = FCk_InteractTarget_Spec(GameplayTags::InteractionChannel_Mars_Use);
@@ -187,6 +188,7 @@ namespace utils_flame
         Target.InteractionStateClass = UMars_SmState_Flame_Ignite;
         Target.Work = EMars_Interactable_Work::AfterCompletion;
         Target.ReachKind = EMars_FPHands_ReachKind::Grab;
+        Target.ReachHand = EMars_FPHands_ReachHand::Holding;
         Target.RequiresFreeHands = false;
         return Target;
     }

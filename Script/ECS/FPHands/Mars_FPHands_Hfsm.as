@@ -20,7 +20,9 @@ namespace utils_fphands
     {
         const auto& Context = InTarget.Get_Fragment(FMars_Fragment_InteractionContext);
         const auto Subject = FMars_FPHands_ReachSubject(InTarget, Context.Interactable, Context.InteractableOwner);
-        return FMars_Request_FPHands_StartReach(Subject, InTarget.Get_InteractionCompletionPolicy(), Context.ReachKind);
+        auto Request = FMars_Request_FPHands_StartReach(Subject, InTarget.Get_InteractionCompletionPolicy(), Context.ReachKind);
+        Request.ReachHand = Context.ReachHand;
+        return Request;
     }
 }
 

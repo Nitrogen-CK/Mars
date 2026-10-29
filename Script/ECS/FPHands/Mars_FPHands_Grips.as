@@ -272,6 +272,10 @@ struct FMars_FPHands_ReachQuery
     UPROPERTY()
     TOptional<FTransform> PlaceAtWorld;
 
+    // Grab and Hold while a one-handed item is held: which glove reaches.
+    UPROPERTY()
+    EMars_FPHands_ReachHand ReachHand = EMars_FPHands_ReachHand::Free;
+
     FMars_FPHands_ReachQuery() {}
 
     FMars_FPHands_ReachQuery(FMars_FPHands_ReachSubject InSubject, FMars_FPHands_HandState InHand)
@@ -601,6 +605,11 @@ namespace utils_fphands
         if (Hand.Hold.Kind == EMars_FPHands_HoldKind::TwoHanded)
         { return TOptional<FMars_FPHands_ReachTarget>(); }
 
+        // The holding glove carries its item to the target (a torch to a candle): a point grip for the right glove, its
+        // fingers still closed on the item, whatever the target would offer a free hand.
+        if (Hand.Hold.Kind == EMars_FPHands_HoldKind::OneHanded && InQuery.ReachHand == EMars_FPHands_ReachHand::Holding)
+        { return Resolve_PointTarget(Subject, EMars_Hand::Right); }
+
         // The glove a single-glove grip goes to: the right while both are free, the left while the right holds an item.
         const auto BothFree = Hand.Hold.Kind == EMars_FPHands_HoldKind::Empty;
         if (Subject.Owner.Has_Fragment(FMars_Fragment_FPHands_Grips))
@@ -718,14 +727,6 @@ namespace utils_fphands
         }
 
         // Plain interactable: one glove to its interaction point (the owner itself when there is no interactable).
-        auto PointEntity = Subject.Interactable.As_Transform(ECk_SanityCheck::UnChecked);
-        const auto PointWorld = ck::IsValid(PointEntity)
-            ? utils_transform::Get_EntityCurrentTransform(PointEntity).GetLocation()
-            : Shared.AnchorWorld.GetLocation();
-
-        Target.Layout = EMars_FPHands_GripLayout::Point;
-        Shared.Grip = FTransform(FRotator::ZeroRotator, Shared.AnchorWorld.InverseTransformPosition(PointWorld), FVector::OneVector);
-
         // The glove that will hold a one-handed item (Get_HoldsWith: the right) is the glove that reaches for it, whatever
         // side it lies on; only a target that never enters the hand is taken by the glove on its side.
         auto PointHand = EMars_Hand::Left;
@@ -738,13 +739,46 @@ namespace utils_fphands
             else
             {
                 PointHand = Hand.PreferredHand;
-                const auto SideY = Hand.HandWorld.InverseTransformPosition(PointWorld).Y;
+                const auto SideY = Hand.HandWorld.InverseTransformPosition(Get_PointWorld(Subject, Shared.AnchorWorld)).Y;
                 if (Math::Abs(SideY) > InSpec.Focus.SideSwitchMarginCm)
                 { PointHand = SideY > 0.0 ? EMars_Hand::Right : EMars_Hand::Left; }
             }
         }
 
-        if (PointHand == EMars_Hand::Right)
+        return Resolve_PointTarget(Subject, PointHand);
+    }
+
+    // The subject's interaction point in world: its interactable's transform, else its owner's (InAnchorWorld).
+    FVector Get_PointWorld(const FMars_FPHands_ReachSubject& InSubject, const FTransform& InAnchorWorld)
+    {
+        auto PointEntity = InSubject.Interactable.As_Transform(ECk_SanityCheck::UnChecked);
+        if (ck::Is_NOT_Valid(PointEntity))
+        { return InAnchorWorld.GetLocation(); }
+
+        return utils_transform::Get_EntityCurrentTransform(PointEntity).GetLocation();
+    }
+
+    // One glove (InHand) to the subject's interaction point, anchored to its owner (the owner itself when there is no
+    // interactable). Unset when neither has a transform.
+    TOptional<FMars_FPHands_ReachTarget> Resolve_PointTarget(const FMars_FPHands_ReachSubject& InSubject, EMars_Hand InHand)
+    {
+        auto Anchor = InSubject.Owner.As_Transform(ECk_SanityCheck::UnChecked);
+        if (ck::Is_NOT_Valid(Anchor))
+        { Anchor = InSubject.Interactable.As_Transform(ECk_SanityCheck::UnChecked); }
+
+        if (ck::EnsureIfNot(ck::IsValid(Anchor),
+            f"[FPHands] neither the reach's owner [{InSubject.Owner.ToString()}] nor its interactable has a transform"))
+        { return TOptional<FMars_FPHands_ReachTarget>(); }
+
+        auto Shared = FMars_FPHands_HandGrip();
+        Shared.Anchor = Anchor;
+        Shared.AnchorWorld = utils_transform::Get_EntityCurrentTransform(Anchor);
+        Shared.Grip = FTransform(FRotator::ZeroRotator,
+            Shared.AnchorWorld.InverseTransformPosition(Get_PointWorld(InSubject, Shared.AnchorWorld)), FVector::OneVector);
+
+        auto Target = FMars_FPHands_ReachTarget();
+        Target.Layout = EMars_FPHands_GripLayout::Point;
+        if (InHand == EMars_Hand::Right)
         { Target.Right = TOptional<FMars_FPHands_HandGrip>(Shared); }
         else
         { Target.Left = TOptional<FMars_FPHands_HandGrip>(Shared); }

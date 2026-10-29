@@ -170,6 +170,7 @@ namespace utils_interactable
             Context.InteractableOwner = InOwner;
             Context.Work = Entry.Work;
             Context.ReachKind = Entry.ReachKind;
+            Context.ReachHand = Entry.ReachHand;
 
             auto InteractTarget = utils_interact_target::Add(InteractableHandle, TargetSpec);
             InteractTarget.Request_OverrideToSelf();
@@ -231,6 +232,22 @@ mixin bool Get_WantsHandsLean(const FCk_Handle_Interactable& Self)
     }
 
     return HasTarget == false;
+}
+
+// Which glove leans toward it while a one-handed item is held: the holding glove when any of its targets is made with
+// the held item (ReachHand Holding), else the free one.
+mixin EMars_FPHands_ReachHand Get_FocusReachHand(const FCk_Handle_Interactable& Self)
+{
+    for (auto Target : Self.Get_AllInteractTargets())
+    {
+        if (Target.Has_Fragment(FMars_Fragment_InteractionContext) == false)
+        { continue; }
+
+        if (Target.Get_Fragment(FMars_Fragment_InteractionContext).ReachHand == EMars_FPHands_ReachHand::Holding)
+        { return EMars_FPHands_ReachHand::Holding; }
+    }
+
+    return EMars_FPHands_ReachHand::Free;
 }
 
 mixin int32 Get_FocusPriority(const FCk_Handle_Interactable& Self)

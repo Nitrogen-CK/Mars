@@ -204,10 +204,14 @@ namespace mars
 
         // Channel order is priority: a focused world prompt outranks the held item's use, so a Primary press while
         // looking at a hook hangs the lantern instead of working its shutter; with nothing focused it uses the item.
+        // The prompt keeps the key even while it is blocked (ByOfferedTargets: an unlit torch at an unlit candle, full
+        // hands at a station): the press does nothing rather than falling through to the item's own use.
         TArray<FGameplayTag> PrimaryChannels;
         PrimaryChannels.Add(GameplayTags::InteractionChannel_Mars_Use);
         PrimaryChannels.Add(GameplayTags::InteractionChannel_Mars_Primary_UsableItem);
-        Mappings.Add(FCk_InteractionResolver_IntentChannelMapping(GameplayTags::InteractionIntent_Mars_Primary, PrimaryChannels));
+        auto PrimaryMapping = FCk_InteractionResolver_IntentChannelMapping(GameplayTags::InteractionIntent_Mars_Primary, PrimaryChannels);
+        PrimaryMapping.Set_ChannelPrecedence(ECk_InteractionResolver_ChannelPrecedence::ByOfferedTargets);
+        Mappings.Add(PrimaryMapping);
 
         // A station's grip: opened and closed only by the Operating state (UMars_SmTask_Operating_Grip), never by a key.
         TArray<FGameplayTag> OperateChannels;

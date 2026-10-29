@@ -4651,6 +4651,19 @@ class AMars_AutoTest_Forage_VineStrikeDepletesThenRegrows_Actor : ACk_AutoTestRu
     }
 }
 
+class AMars_AutoTest_FPHands_AHoldingReachCarriesTheItemGloveToTheTarget_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 20.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_FPHands_AHoldingReachCarriesTheItemGloveToTheTarget");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
 class AMars_AutoTest_FPHands_AHoldWhoseTargetDiesReleases_Actor : ACk_AutoTestRunner
 {
     UFUNCTION(BlueprintOverride)
@@ -7050,6 +7063,19 @@ class AMars_AutoTest_Player_AFocusedLiveInteractionIsPinned_Actor : ACk_AutoTest
     TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
     {
         auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Player_AFocusedLiveInteractionIsPinned");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_Player_AFocusedPromptPressDoesNotAlsoUseTheHeldItem_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 30.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Player_AFocusedPromptPressDoesNotAlsoUseTheHeldItem");
         TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
         ResolvedClass = Path.TryLoadClass();
         return ResolvedClass;

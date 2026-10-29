@@ -446,6 +446,18 @@ namespace utils_fphands
         return FTransform(Lean * Stand, InPivot, FVector::OneVector);
     }
 
+    // A HeldOffset for a shaft-along-+Z item (a torch) gripped in the right fist at rest: the shaft runs along the fist's
+    // closing axis (the grip frame's X, toward the index finger, so the shaft's +Z is the thumb's side: up for a torch),
+    // with the shaft's point InGripHeight over its pivot at the grip bone. An item definition cannot read the player's
+    // spec, so this reads the default rest grip; the player keeps the default grip rotations (it overrides only
+    // PalmSurfaceOffset), and a changed GripRotation_R moves every shaft with it.
+    FTransform Make_ShaftHeldOffset(float64 InGripHeight)
+    {
+        const auto ShaftAlongGrip = FQuat::FindBetweenNormals(FVector::UpVector, FVector::ForwardVector);
+        const auto Rotation = FMars_FPHands_RestSpec().GripRotation_R * ShaftAlongGrip;
+        return FTransform(Rotation, -Rotation.RotateVector(FVector(0.0, 0.0, InGripHeight)), FVector::OneVector);
+    }
+
     // A socket grip turned InDegrees about its own X (the handle), in place: the glove keeps its spot on the handle and
     // the forearm swings round it (FMars_ItemPresentation_Grip::SocketTwist_R / _L).
     FTransform Twist_AboutHandle(const FTransform& InSocket, float32 InDegrees)

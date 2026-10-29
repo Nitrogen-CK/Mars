@@ -1,7 +1,8 @@
 // A Primary press while a world prompt is focused runs that prompt's interaction, not the held item's use: the player
 // config's Primary intent lists the world Use channel before the held item's channel, and the resolver's channel order is
-// its priority order (a lantern held in front of a hook hangs on Primary instead of working its shutter). Reordering
-// or dropping either channel fails this.
+// its priority order (a lantern held in front of a hook hangs on Primary instead of working its shutter). The prompt
+// keeps the key while blocked too (ByOfferedTargets), so a press at a blocked prompt does nothing rather than using the
+// item. Reordering or dropping either channel, or the precedence, fails this.
 class UMars_AutoTest_Player_PrimaryPrefersTheFocusedPromptOverTheHeldItemsUse : UCk_AutoTest_Base
 {
     UFUNCTION(BlueprintOverride)
@@ -32,6 +33,8 @@ class UMars_AutoTest_Player_PrimaryPrefersTheFocusedPromptOverTheHeldItemsUse : 
                 "the world Use channel comes first, so a focused prompt outranks the held item");
             Assert_True(Channels[1] == GameplayTags::InteractionChannel_Mars_Primary_UsableItem,
                 "the held item's use channel comes last");
+            Assert_True(Mapping.Get_ChannelPrecedence() == ECk_InteractionResolver_ChannelPrecedence::ByOfferedTargets,
+                "a focused prompt claims the key even while blocked: no fall-through to the held item's use");
         }
 
         Assert_True(Found, "the player config maps the Primary intent");

@@ -131,6 +131,7 @@ class UMars_Processor_FPHands_HandleRequests : UCk_Processor_Script_Base_UE
 
         InState.Focus.FocusedFor = InRequest.Interactable;
         InState.Focus.FocusedOwner = InRequest.Owner;
+        InState.Focus.ReachHand = InRequest.ReachHand;
         Refresh_Focus(InParams, InState);
     }
 
@@ -152,7 +153,9 @@ class UMars_Processor_FPHands_HandleRequests : UCk_Processor_Script_Base_UE
         Focus.Alpha_R = 0.0f;
         Focus.Alpha_L = 0.0f;
         const auto Subject = FMars_FPHands_ReachSubject(Focus.FocusedFor, Focus.FocusedOwner);
-        Focus.Target = Resolve_Target(InParams, InState, FMars_FPHands_ReachQuery(Subject, Make_HandState(InParams, InState)));
+        auto Query = FMars_FPHands_ReachQuery(Subject, Make_HandState(InParams, InState));
+        Query.ReachHand = Focus.ReachHand;
+        Focus.Target = Resolve_Target(InParams, InState, Query);
     }
 
     // Last wins per glove.
@@ -226,6 +229,7 @@ class UMars_Processor_FPHands_HandleRequests : UCk_Processor_Script_Base_UE
             auto Query = FMars_FPHands_ReachQuery(Subject, Make_HandState(Params, InState));
             Query.Kind = Kind;
             Query.PlaceAtWorld = InRequest.PlaceAtWorld;
+            Query.ReachHand = InRequest.ReachHand;
             Target = Resolve_Target(Params, InState, Query);
         }
         else

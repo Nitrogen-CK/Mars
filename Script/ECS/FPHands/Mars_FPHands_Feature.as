@@ -38,6 +38,16 @@ enum EMars_FPHands_ReachKind
     None
 }
 
+// Which glove reaches for a target while the gloves hold a one-handed item.
+enum EMars_FPHands_ReachHand
+{
+    // The free glove (the left), as for a pickup or a lever; the holding glove keeps the item where it is.
+    Free,
+    // The holding glove (the right), carrying the item to the target: a torch to a candle. Its fingers stay closed on the
+    // item. With both gloves free it is the same as Free; with both holding, nothing reaches.
+    Holding
+}
+
 // Why the gloves did not take a StartReach (OnReachRefused).
 enum EMars_FPHands_ReachRefusal
 {
@@ -94,6 +104,10 @@ struct FMars_FPHands_ReachState
     // Single-handed targets near the centre line stay with this glove; every resolve (focus included) updates it.
     UPROPERTY()
     EMars_Hand PreferredHand = EMars_Hand::Right;
+
+    // Which glove the current reach asked for (FMars_Request_FPHands_StartReach.ReachHand).
+    UPROPERTY()
+    EMars_FPHands_ReachHand ReachHand = EMars_FPHands_ReachHand::Free;
 }
 
 // The lean toward what is looked at.
@@ -109,6 +123,10 @@ struct FMars_FPHands_FocusState
     // FocusedFor's owner: the focus target is re-resolved from both when the hold changes.
     UPROPERTY()
     FCk_Handle FocusedOwner;
+
+    // Which glove leans while a one-handed item is held (FMars_Request_FPHands_SetFocus.ReachHand).
+    UPROPERTY()
+    EMars_FPHands_ReachHand ReachHand = EMars_FPHands_ReachHand::Free;
 
     // Smoothed lean per glove toward Target.
     UPROPERTY()
@@ -251,6 +269,10 @@ struct FMars_Request_FPHands_StartReach
     UPROPERTY()
     TOptional<FTransform> PlaceAtWorld;
 
+    // Grab and Hold while a one-handed item is held: which glove reaches (the interaction context's ReachHand).
+    UPROPERTY()
+    EMars_FPHands_ReachHand ReachHand = EMars_FPHands_ReachHand::Free;
+
     FMars_Request_FPHands_StartReach() {}
 
     FMars_Request_FPHands_StartReach(ECk_Interaction_CompletionPolicy InCompletionPolicy)
@@ -290,12 +312,23 @@ struct FMars_Request_FPHands_SetFocus
     UPROPERTY()
     FCk_Handle Owner;
 
+    // Which glove leans while a one-handed item is held (the interactable's Get_FocusReachHand).
+    UPROPERTY()
+    EMars_FPHands_ReachHand ReachHand = EMars_FPHands_ReachHand::Free;
+
     FMars_Request_FPHands_SetFocus() {}
 
     FMars_Request_FPHands_SetFocus(FCk_Handle_Interactable InInteractable, FCk_Handle InOwner)
     {
         Interactable = InInteractable;
         Owner = InOwner;
+    }
+
+    FMars_Request_FPHands_SetFocus(FCk_Handle_Interactable InInteractable, FCk_Handle InOwner, EMars_FPHands_ReachHand InReachHand)
+    {
+        Interactable = InInteractable;
+        Owner = InOwner;
+        ReachHand = InReachHand;
     }
 }
 

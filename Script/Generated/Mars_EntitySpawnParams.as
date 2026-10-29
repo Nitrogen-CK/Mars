@@ -5949,6 +5949,19 @@ namespace UMars_AutoTest_Forage_VineStrikeDepletesThenRegrows
 }
 
 USTRUCT()
+struct FMars_AutoTest_FPHands_AHoldingReachCarriesTheItemGloveToTheTarget_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_FPHands_AHoldingReachCarriesTheItemGloveToTheTarget
+{
+    FMars_AutoTest_FPHands_AHoldingReachCarriesTheItemGloveToTheTarget_SpawnParams Params()
+    {
+        return FMars_AutoTest_FPHands_AHoldingReachCarriesTheItemGloveToTheTarget_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_FPHands_AHoldWhoseTargetDiesReleases_SpawnParams
 {
 }
@@ -8692,6 +8705,19 @@ namespace UMars_AutoTest_Player_AFocusedLiveInteractionIsPinned
 }
 
 USTRUCT()
+struct FMars_AutoTest_Player_AFocusedPromptPressDoesNotAlsoUseTheHeldItem_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Player_AFocusedPromptPressDoesNotAlsoUseTheHeldItem
+{
+    FMars_AutoTest_Player_AFocusedPromptPressDoesNotAlsoUseTheHeldItem_SpawnParams Params()
+    {
+        return FMars_AutoTest_Player_AFocusedPromptPressDoesNotAlsoUseTheHeldItem_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_Player_AHeldRowAtEntryIsNotAPress_SpawnParams
 {
 }
@@ -10851,6 +10877,19 @@ namespace UMars_AutoTestState_PlayerPathRig
     FMars_AutoTestState_PlayerPathRig_SpawnParams Params()
     {
         return FMars_AutoTestState_PlayerPathRig_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTestState_UseAndPrimaryIntentRig_SpawnParams
+{
+}
+
+namespace UMars_AutoTestState_UseAndPrimaryIntentRig
+{
+    FMars_AutoTestState_UseAndPrimaryIntentRig_SpawnParams Params()
+    {
+        return FMars_AutoTestState_UseAndPrimaryIntentRig_SpawnParams();
     }
 }
 

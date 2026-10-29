@@ -272,7 +272,10 @@ class UMars_SmTask_InteractionFocus : UCk_SmTask_EntityScript
 
         // An interactable the hands do not touch (every target ReachKind None) gets no lean.
         if (ck::IsValid(_Hands) && InInteractable.Get_WantsHandsLean())
-        { _Hands.Request_SetFocus(FMars_Request_FPHands_SetFocus(InInteractable, Get_InteractableOwner(InInteractable))); }
+        {
+            _Hands.Request_SetFocus(FMars_Request_FPHands_SetFocus(InInteractable, Get_InteractableOwner(InInteractable),
+                InInteractable.Get_FocusReachHand()));
+        }
     }
 
     private void DoUnfocus(FCk_Handle_Interactable& InInteractable)
@@ -588,8 +591,7 @@ class UMars_SmTask_ManipulateControl : UCk_SmTask_EntityScript
         _TicksSinceAsked = TOptional<int32>(0);
 
         const auto& Context = _Target.Get_Fragment(FMars_Fragment_InteractionContext);
-        const auto Subject = FMars_FPHands_ReachSubject(_Target, Context.Interactable, Context.InteractableOwner);
-        _Hands.Request_StartReach(FMars_Request_FPHands_StartReach(Subject, _Target.Get_InteractionCompletionPolicy(), Context.ReachKind));
+        _Hands.Request_StartReach(utils_fphands::Make_TargetReach(_Target));
     }
 
     // A push still running k_PushEndGraceTicks ticks past its own seconds: the reach is asked for now, and the gloves take or
@@ -1116,8 +1118,9 @@ class UMars_SmTask_UseIntentToResolver : UMars_SmTask_IntentToResolver
     default ResolverIntent = GameplayTags::InteractionIntent_Mars_Use;
 }
 
-// Primary resolves the Use channel first (a focused world prompt outranks the held item's use); where Use shares Primary's
-// key, the press that starts a Use target is Use's, and Primary joins it.
+// Primary resolves the Use channel first (a focused world prompt outranks the held item's use, and keeps the key while
+// blocked: the config's ByOfferedTargets precedence resolves nothing then); where Use shares Primary's key, the press
+// that starts a Use target is Use's, and Primary joins it.
 class UMars_SmTask_PrimaryIntentToResolver : UMars_SmTask_IntentToResolver
 {
     default InputIntent = GameplayTags::Mars_Intent_Interact_Primary;

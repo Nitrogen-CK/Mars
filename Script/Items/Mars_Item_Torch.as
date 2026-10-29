@@ -23,7 +23,9 @@ asset Mars_ItemDef_Torch of UCk_InventoryItem_Definition
     auto Presentation = mars_items::Add_BlockoutTraits(this, Blockout);
     Presentation.Mounting.Persistence = EMars_WorldItem_Persistence::Persistent;
     Presentation.Mounting.CarryPoint = GameplayTags::AttachPoint_Mars_Belt;
-    Presentation.Mounting.HeldOffset = FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, -constants_torch_item::k_GripHeight));
+    // In the hand the shaft follows the fist (the grip frame's X), its grip point at the grip bone; on the belt it hangs
+    // straight.
+    Presentation.Mounting.HeldOffset = utils_fphands::Make_ShaftHeldOffset(constants_torch_item::k_GripHeight);
     Presentation.Mounting.CarryOffset = FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, -constants_torch_item::k_GripHeight));
     Presentation.WorldItem.ScriptClass = UMars_Torch_EntityScript;
 

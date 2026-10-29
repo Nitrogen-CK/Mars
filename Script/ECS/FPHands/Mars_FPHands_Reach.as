@@ -299,7 +299,8 @@ mixin bool Get_IsReaching(const FCk_Handle_FPHands& Self, EMars_Hand InHand)
 }
 
 // One glove's finger pose while reaching; unset = keep the glove's own pose. The contact pose is the glove's grip's
-// (a grip-table row), else the target's (a pickup's), else the spec's.
+// (a grip-table row), else the target's (a pickup's), else the spec's. A glove carrying its held item to the target
+// (a Holding reach) keeps its hold pose: its fingers never leave the item.
 mixin TOptional<EMars_HandGripPose> TryGet_ReachPose(const FCk_Handle_FPHands& Self, EMars_Hand InHand)
 {
     const auto& Spec = Self.Get_Spec();
@@ -309,6 +310,10 @@ mixin TOptional<EMars_HandGripPose> TryGet_ReachPose(const FCk_Handle_FPHands& S
 
     auto Contact = Poses.Contact;
     const auto MaybeTarget = Self.Get_Target();
+    const auto IsPlace = MaybeTarget.IsSet() && MaybeTarget.GetValue().PlaceAt.IsSet();
+    if (IsPlace == false && Self.Get_Hold().Get_HoldsWith(InHand))
+    { return TOptional<EMars_HandGripPose>(); }
+
     if (MaybeTarget.IsSet())
     {
         const auto Target = MaybeTarget.GetValue();

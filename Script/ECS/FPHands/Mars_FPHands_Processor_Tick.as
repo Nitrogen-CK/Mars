@@ -37,7 +37,59 @@ class UMars_Processor_FPHands_Tick : UCk_Processor_Script_Base_UE
         Tick_FocusLean(Params.Spec.Reach.Focus, InState.Focus, DeltaSeconds);
         Tick_Carry(InHandle, Params, InState);
         Tick_Place(InHandle, Params, InState);
+        Tick_HoldFollow(InHandle, Params, InState);
         Tick_Pitch(Params.Spec.Pitch, InState, DeltaSeconds);
+    }
+
+    // A one-handed item rides its glove: while the right glove reaches or leans with the item in it (a Holding reach: a
+    // torch carried to a candle), the item's offset from the hand moves rigidly with the glove's grip, from its rest grip
+    // to where the glove is this frame, and back to the hold offset as the glove returns. Only while the item is Held by
+    // this carrier and settled there; a carry (a pickup riding in) or a Place (both gloves setting it down) owns the offset
+    // instead. One offset request per frame, as those.
+    private void Tick_HoldFollow(FCk_Handle& InHandle, const FMars_Fragment_FPHands_Params& InParams, const FMars_Fragment_FPHands& InState)
+    {
+        if (InState.Hold.Kind != EMars_FPHands_HoldKind::OneHanded || InState.Carry.IsSet())
+        { return; }
+
+        if (InState.Reach.Target.IsSet() && InState.Reach.Target.GetValue().PlaceAt.IsSet())
+        { return; }
+
+        auto HeldItem = InHandle.As_HeldItem(ECk_SanityCheck::UnChecked);
+        if (ck::Is_NOT_Valid(HeldItem))
+        { return; }
+
+        auto Presentation = HeldItem.Get_PresentationEntity();
+        if (ck::Is_NOT_Valid(Presentation))
+        { return; }
+
+        auto WorldItem = Presentation.As_WorldItem(ECk_SanityCheck::UnChecked);
+        if (ck::Is_NOT_Valid(WorldItem) || WorldItem.Get_Mount() != EMars_WorldItem_Mount::Held || WorldItem.Get_Carrier() != InHandle
+            || WorldItem.Get_IsSettled() == false)
+        { return; }
+
+        auto Node = WorldItem.As_SceneNode(ECk_SanityCheck::UnChecked);
+        if (ck::Is_NOT_Valid(Node))
+        { return; }
+
+        const auto HandWorld = utils_transform::Get_EntityCurrentTransform(InParams.Spec.HandNode);
+        auto Targets = FMars_FPHands_HandTargets();
+        InHandle.As_FPHands().Get_HandTargets(FMars_FPHands_TargetFrame(HandWorld, FVector::ZeroVector, FVector::ZeroVector), Targets);
+        const auto& Right = Targets.Right;
+
+        auto Offset = InState.Hold.HeldOffset;
+        if (Right.ReachAlpha > 0.001f)
+        {
+            // The glove's grip this frame, hand node space, and the item moved by the same rigid motion from the rest grip.
+            const auto Rest = Right.GripInHand;
+            const auto Current = FTransform(FQuat::Slerp(Rest.GetRotation(), Right.ReachGrip.GetRotation(), Right.ReachAlpha),
+                Math::Lerp(Rest.GetLocation(), Right.ReachGrip.GetLocation(), float64(Right.ReachAlpha)), FVector::OneVector);
+            Offset = InState.Hold.HeldOffset * Rest.Inverse() * Current;
+        }
+
+        if (Offset.Equals(utils_scene_node::Get_Offset(Node)))
+        { return; }
+
+        utils_scene_node::Request_UpdateOffset(Node, FCk_Request_SceneNode_UpdateRelativeTransform(Offset));
     }
 
     // The Grip ends on its own seconds, here rather than a sub-SM step later, and the time past them carries into the

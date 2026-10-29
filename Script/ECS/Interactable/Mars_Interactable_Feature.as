@@ -190,6 +190,10 @@ struct FMars_Interactable_TargetEntry
 
     // The gesture the gloves make for this target; None for one the hands do not touch (no lean, no reach).
     EMars_FPHands_ReachKind ReachKind = EMars_FPHands_ReachKind::Grab;
+
+    // Which glove makes it while a one-handed item is held: the free one, or the holding one carrying its item to the
+    // target (a lit torch to a candle).
+    EMars_FPHands_ReachHand ReachHand = EMars_FPHands_ReachHand::Free;
 }
 
 struct FMars_Interactable_Spec
@@ -313,6 +317,9 @@ struct FMars_Fragment_InteractionContext
 
     UPROPERTY()
     EMars_FPHands_ReachKind ReachKind = EMars_FPHands_ReachKind::Grab;
+
+    UPROPERTY()
+    EMars_FPHands_ReachHand ReachHand = EMars_FPHands_ReachHand::Free;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
