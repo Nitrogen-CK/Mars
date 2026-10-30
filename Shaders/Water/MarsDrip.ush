@@ -1,0 +1,140 @@
+// Mars drips: the shared drip clock (virtual path /Project/Water/MarsDrip.ush).
+//
+// Every moving part of a drip strand (the bead swelling at its source, the drop falling faster and faster, the splash,
+// the rings on the puddle) is closed-form maths of game time evaluated here, so the drop cards and the ring decal under
+// them run the SAME schedule from the same five sync floats and never need to talk to each other.
+//
+// Script/WorldObjects/Dressing/Water/Mars_DripSchedule.as is a line-for-line AngelScript mirror of this file and
+// Tools/Blender/mars_water/check_drip_parity.py diffs the constants below against it. Change both together.
+//
+// Pure functions, no Parameters. Units: cm, s.
+#pragma once
+
+#define MARS_DRIP_GRAVITY          980.0      // cm/s^2
+#define MARS_DRIP_TERMINAL         750.0      // cm/s, quadratic-drag terminal speed (stylised)
+#define MARS_DRIP_MAX_JITTER       0.45       // x period; below 0.5 releases stay ordered
+#define MARS_DRIP_SKIP_PER_JITTER  0.25       // skip probability = 0.25 x Jitter
+#define MARS_DRIP_SLOTS            4          // falling-drop / splash cards per strand
+#define MARS_DRIP_WRAP             3600.0     // s; the Time node wraps here (bOverride_Period, Period = 3600)
+#define MARS_DRIP_SPLASH_S         0.28       // s a slot stays busy after impact (the water jet; the floor crown is shorter)
+#define MARS_DRIP_CROWN_S          0.16       // s the floor crown shows
+#define MARS_DRIP_RING_SPEED       22.0       // cm/s, minimum phase speed of capillary-gravity waves
+#define MARS_DRIP_RING_LIFE        1.4        // s
+#define MARS_DRIP_RING_LAMBDA      2.4        // cm
+
+struct FMarsDrip
+{
+	float Length;   // cm from the source down to the impact; < 0 = Air (no impact, fades out)
+	float Rate;     // drops per second (0 = a static bead)
+	float Seed;     // [0, 1)
+	float Jitter;   // 0..1
+	float Mode;     // EMars_DripMode: 0 Drops, 1 DropsWithThread, 2 Stream, 3 HangingBead, 4 SittingBead
+};
+
+struct FMarsClock
+{
+	float P;        // period, divides the wrap exactly
+	int   N;        // drops per wrap, a multiple of MARS_DRIP_SLOTS
+	float Y0;       // cm below the source where a drop starts falling (bead centre, or the thread tip)
+	float TFall;    // s from release to impact
+	uint  Key;      // per-strand hash key
+	bool  Impact;   // false in Air mode
+};
+
+uint MarsDrip_Hash(uint X)
+{
+	X ^= X >> 16; X *= 0x7feb352du; X ^= X >> 15; X *= 0x846ca68bu; X ^= X >> 16;
+	return X;
+}
+
+// [0, 1) for drop K; K wraps with the period, so drop -1 is drop N - 1 one wrap earlier.
+float MarsDrip_Rand(FMarsClock C, int K, uint Salt)
+{
+	uint k = (uint)(((K % C.N) + C.N) % C.N);
+	return float(MarsDrip_Hash((k * 2654435761u) ^ C.Key ^ MarsDrip_Hash(Salt))) * (1.0 / 4294967296.0);
+}
+
+// Quadratic drag from rest: y = vT^2 / g ln cosh(g a / vT), written overflow-free. AgeAt is its exact inverse.
+float MarsDrip_DistanceAt(float A)
+{
+	float X = MARS_DRIP_GRAVITY * max(A, 0.0) / MARS_DRIP_TERMINAL;
+	return (MARS_DRIP_TERMINAL * MARS_DRIP_TERMINAL / MARS_DRIP_GRAVITY) * (X + log(0.5 + 0.5 * exp(-2.0 * X)));
+}
+
+float MarsDrip_SpeedAt(float A)
+{
+	return MARS_DRIP_TERMINAL * tanh(MARS_DRIP_GRAVITY * max(A, 0.0) / MARS_DRIP_TERMINAL);
+}
+
+float MarsDrip_AgeAt(float Y)
+{
+	float C = exp(MARS_DRIP_GRAVITY * max(Y, 0.0) / (MARS_DRIP_TERMINAL * MARS_DRIP_TERMINAL));
+	return (MARS_DRIP_TERMINAL / MARS_DRIP_GRAVITY) * log(C + sqrt(max(C * C - 1.0, 0.0)));
+}
+
+// The seed key is exact in float32 and float64 alike (a power-of-two scale), so the AS mirror hashes the same uint.
+FMarsClock MarsDrip_Clock(FMarsDrip D, float DropRadius)
+{
+	FMarsClock C;
+	C.Impact = D.Length > 0.0;
+	float L = abs(D.Length);
+	C.Key = MarsDrip_Hash((uint)(saturate(D.Seed) * 16777216.0));
+	C.Y0 = (D.Mode > 0.5 && D.Mode < 1.5) ? min(14.0 + 30.0 * frac(D.Seed * 7.13), 0.5 * L)    // thread tip
+	                                      : 1.6 * DropRadius;                                   // bead centre at detach
+	C.TFall = MarsDrip_AgeAt(max(L - C.Y0 - DropRadius, 1.0));
+	float Busy = C.TFall + MARS_DRIP_SPLASH_S;
+	float P1 = max(1.0 / max(D.Rate, 1e-3), Busy / (MARS_DRIP_SLOTS - 2.0 * MARS_DRIP_MAX_JITTER));   // slots never overlap
+	C.N = MARS_DRIP_SLOTS * max(1, (int)floor(MARS_DRIP_WRAP / (P1 * MARS_DRIP_SLOTS)));
+	C.P = MARS_DRIP_WRAP / C.N;                                      // divides the wrap: seamless at T = 3600 -> 0
+	return C;
+}
+
+float MarsDrip_Release(FMarsDrip D, FMarsClock C, int K)
+{
+	return (K + D.Seed + saturate(D.Jitter) * MARS_DRIP_MAX_JITTER * (2.0 * MarsDrip_Rand(C, K, 0u) - 1.0)) * C.P;
+}
+
+bool MarsDrip_Skipped(FMarsDrip D, FMarsClock C, int K)
+{
+	return MarsDrip_Rand(C, K, 1u) < MARS_DRIP_SKIP_PER_JITTER * saturate(D.Jitter);
+}
+
+float MarsDrip_Impact(FMarsDrip D, FMarsClock C, int K)
+{
+	return MarsDrip_Release(D, C, K) + C.TFall;
+}
+
+// The newest drop on slot S (S = K mod 4) released at or before T. Jitter can pull K0 + 4 early or push K0 late.
+int MarsDrip_SlotDrop(FMarsDrip D, FMarsClock C, float T, int S)
+{
+	int M = (int)floor(T / C.P - D.Seed);
+	int K0 = M - ((((M - S) % MARS_DRIP_SLOTS) + MARS_DRIP_SLOTS) % MARS_DRIP_SLOTS);
+	if (MarsDrip_Release(D, C, K0 + MARS_DRIP_SLOTS) <= T) { return K0 + MARS_DRIP_SLOTS; }
+	if (MarsDrip_Release(D, C, K0) <= T) { return K0; }
+	return K0 - MARS_DRIP_SLOTS;
+}
+
+// The newest drop (any slot) released at or before T.
+int MarsDrip_LastDrop(FMarsDrip D, FMarsClock C, float T)
+{
+	int M = (int)floor(T / C.P - D.Seed);
+	if (MarsDrip_Release(D, C, M + 1) <= T) { return M + 1; }
+	if (MarsDrip_Release(D, C, M) <= T) { return M; }
+	return M - 1;
+}
+
+// Bead growth 0..1 between the previous and the next non-skipped release (3 skips in a row: a full bead waiting).
+float MarsDrip_BeadGrowth(FMarsDrip D, FMarsClock C, float T)
+{
+	if (D.Rate <= 0.0 || D.Mode > 2.5) { return 0.75 + 0.05 * sin(0.7 * T + 40.0 * D.Seed); }    // breathing bead
+	int K = MarsDrip_LastDrop(D, C, T);
+	int Kp = K;
+	int Kn = K + 1;
+	int Skips = 0;
+	for (int i = 0; i < 3; ++i) { if (MarsDrip_Skipped(D, C, Kp)) { Kp -= 1; Skips += 1; } }
+	for (int j = 0; j < 3; ++j) { if (MarsDrip_Skipped(D, C, Kn)) { Kn += 1; Skips += 1; } }
+	if (Skips >= 3) { return 1.0; }
+	float Tp = MarsDrip_Release(D, C, Kp);
+	float Tn = MarsDrip_Release(D, C, Kn);
+	return saturate((T - Tp - 0.05) / max(Tn - Tp - 0.05, 1e-3));
+}

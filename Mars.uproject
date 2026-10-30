@@ -177,6 +177,10 @@
 			"Enabled": true
 		},
 		{
+			"Name": "PCG",
+			"Enabled": true
+		},
+		{
 			"Name": "StructUtils",
 			"Enabled": true
 		},

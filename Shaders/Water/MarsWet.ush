@@ -1,0 +1,585 @@
+// Mars wet surfaces: drop cards, splashes, impact rings, puddles, wet streaks and still water
+// (virtual path /Project/Water/MarsWet.ush; DRIPS_PLAN §3). Every material Custom node includes this file and calls one
+// function with a 1-6 line body. No textures are sampled anywhere: all breakup is hashed per instance and anchored in
+// world space.
+#pragma once
+#include "/Project/Water/MarsDrip.ush"
+
+#ifndef MARS_WET_DEBUG
+#define MARS_WET_DEBUG 0          // 1: every live card draws solid; 2: the drop VS also leaves the mesh where it is
+#endif
+#define MARS_WET_ROLE_COLLAPSED  -1.0
+#define MARS_WET_ROLE_FALLING    0.0
+#define MARS_WET_ROLE_CROWN      1.0
+#define MARS_WET_ROLE_JET        2.0
+#define MARS_WET_ROLE_BEAD       3.0
+#define MARS_WET_ROLE_SITTING    4.0
+#define MARS_WET_ROLE_THREAD     5.0
+#define MARS_WET_ROLE_STREAM     6.0
+
+// ------------------------------------------------------------------------------------------------ noise
+float MarsWet_Hash21(float2 P)
+{
+	uint2 Q = (uint2)(int2)floor(P) + uint2(0x8000u, 0x8000u);
+	return float(MarsDrip_Hash(Q.x * 1597334677u ^ MarsDrip_Hash(Q.y * 3812015801u))) * (1.0 / 4294967296.0);
+}
+
+float2 MarsWet_Hash22(float2 P)
+{
+	return float2(MarsWet_Hash21(P), MarsWet_Hash21(P + 71.3));
+}
+
+// Value noise in [0, 1], C1 smooth.
+float MarsWet_Value2(float2 P)
+{
+	float2 I = floor(P);
+	float2 F = P - I;
+	float2 U = F * F * (3.0 - 2.0 * F);
+	float A = MarsWet_Hash21(I);
+	float B = MarsWet_Hash21(I + float2(1, 0));
+	float C = MarsWet_Hash21(I + float2(0, 1));
+	float D = MarsWet_Hash21(I + float2(1, 1));
+	return lerp(lerp(A, B, U.x), lerp(C, D, U.x), U.y);
+}
+
+// Value noise and its gradient (for slope normals).
+float3 MarsWet_Value2Grad(float2 P)
+{
+	float2 I = floor(P);
+	float2 F = P - I;
+	float2 U = F * F * (3.0 - 2.0 * F);
+	float2 DU = 6.0 * F * (1.0 - F);
+	float A = MarsWet_Hash21(I);
+	float B = MarsWet_Hash21(I + float2(1, 0));
+	float C = MarsWet_Hash21(I + float2(0, 1));
+	float D = MarsWet_Hash21(I + float2(1, 1));
+	float V = A + (B - A) * U.x + (C - A) * U.y + (A - B - C + D) * U.x * U.y;
+	float2 G = DU * float2((B - A) + (A - B - C + D) * U.y, (C - A) + (A - B - C + D) * U.x);
+	return float3(V, G);
+}
+
+float MarsWet_Fbm2(float2 P)
+{
+	return 0.5 * MarsWet_Value2(P) + 0.3 * MarsWet_Value2(P * 2.03 + 17.0) + 0.2 * MarsWet_Value2(P * 4.11 + 41.0);
+}
+
+// ------------------------------------------------------------------------------------------------ drop cards (VS)
+struct FMarsDropBasis
+{
+	float3 F;     // toward the camera
+	float3 Dn;    // the fall direction projected onto the card plane (down on screen)
+	float3 Rt;    // across
+};
+
+// Velocity-aligned camera-facing basis: the card's long axis follows the fall, so a streak reads from any angle and a
+// drop seen from straight below stays round (Dn falls back to world X projected).
+FMarsDropBasis MarsWet_DropBasis(float3 Centre, float3 Cam, float3 Fall)
+{
+	FMarsDropBasis B;
+	B.F = normalize(Cam - Centre);
+	float3 Dn = Fall - dot(Fall, B.F) * B.F;
+	if (dot(Dn, Dn) < 1e-6)
+	{
+		float3 X = float3(1, 0, 0);
+		Dn = X - dot(X, B.F) * B.F;
+	}
+	B.Dn = normalize(Dn);
+	B.Rt = normalize(cross(B.Dn, B.F));
+	return B;
+}
+
+// Vertical cylindrical basis for threads and streams (a vertical line about world Z).
+FMarsDropBasis MarsWet_ThreadBasis(float3 Centre, float3 Cam)
+{
+	FMarsDropBasis B;
+	B.F = normalize(Cam - Centre);
+	float3 Flat = float3(B.F.x, B.F.y, 0.0);
+	if (dot(Flat, Flat) < 1e-6) { Flat = float3(1, 0, 0); }
+	B.Rt = normalize(cross(float3(0, 0, 1), normalize(Flat)));
+	B.Dn = float3(0, 0, -1);
+	return B;
+}
+
+// One drop card of a strand. D0 = (Length, Rate, Seed, Jitter), D1 = (Mode, Slot, DropScale, Surface) from per-instance
+// custom data; Origin = the instance origin (the impact, or the Air end); Up = the instance's local Z in world space (a
+// sitting bead's surface normal); Shape = (DropRadiusCm, TearK, Shutter, MinPixels); Thread = (ThreadWidthCm,
+// ThreadBreakCm, FadeStartCm, FadeEndCm); View = (TanHalfFovY, ViewSizeY). Returns the world position offset that moves
+// this vertex onto its card (all four corners onto one point when the card is idle: zero pixels).
+// I0 = (W, H, R, Alpha), I1 = (Role, Param, Seed, Length) go to the pixel shader through vertex interpolators.
+float3 MarsWet_DropVS(float4 D0, float4 D1, float T, float2 UV, float3 Origin, float3 Up, float3 Cam, float3 WP,
+	float4 Shape, float4 Thread, float2 View, out float4 I0, out float4 I1)
+{
+	FMarsDrip D;
+	D.Length = D0.x; D.Rate = D0.y; D.Seed = D0.z; D.Jitter = D0.w; D.Mode = D1.x;
+	float Slot = D1.y;
+	float Surface = D1.w;
+	float R = Shape.x * max(D1.z, 0.05);
+	FMarsClock C = MarsDrip_Clock(D, R);
+	float L = abs(D.Length);
+	float3 Src = Origin + float3(0, 0, L);
+	float3 Fall = float3(0, 0, -1);
+	float MinPx = Shape.w;
+
+	I0 = float4(0, 0, 0, 0);
+	I1 = float4(MARS_WET_ROLE_COLLAPSED, 0, D.Seed, D.Length);
+	float3 Collapsed = Origin - WP;
+#if MARS_WET_DEBUG >= 2
+	I0 = float4(100, 100, 50, 1);
+	I1 = float4(MARS_WET_ROLE_BEAD, 1, D.Seed, D.Length);
+	return float3(0, 0, 0);
+#endif
+
+	float Dist = length(Cam - Origin);
+	float Fade = 1.0 - saturate((Dist - Thread.z) / max(Thread.w - Thread.z, 1.0));
+	if (Fade <= 0.0) { return Collapsed; }
+
+	float Role = MARS_WET_ROLE_COLLAPSED;
+	float3 Centre = Origin;
+	float W = 0, H = 0, Rk = R, Alpha = Fade, Param = 0;
+
+	if (Slot < 3.5)
+	{
+		if (D.Mode > 2.5) { return Collapsed; }                                  // beads have no falling drops
+		int K = MarsDrip_SlotDrop(D, C, T, (int)round(Slot));
+		if (MarsDrip_Skipped(D, C, K)) { return Collapsed; }
+		float A = T - MarsDrip_Release(D, C, K);
+		Rk = R * (0.8 + 0.4 * MarsDrip_Rand(C, K, 2u));
+		if (A < C.TFall && D.Mode < 1.5)
+		{
+			float Y = C.Y0 + MarsDrip_DistanceAt(A);
+			float V = MarsDrip_SpeedAt(A);
+			float3 Pd = Src - float3(0, 0, Y);
+			if (!C.Impact) { Alpha *= 1.0 - smoothstep(0.75 * L, L, Y); }
+			FMarsDropBasis B = MarsWet_DropBasis(Pd, Cam, Fall);
+			float PxCm = length(Cam - Pd) * 2.0 * View.x / max(View.y, 1.0);
+			// the streak is the fall seen side-on: looking along the fall (straight up or down a strand) it shortens to a
+			// round drop
+			float Side = length(Fall - dot(Fall, B.F) * B.F);
+			float Hraw = 2.0 * Rk * (1.0 + Shape.y * saturate(V / 400.0) * Side) + V * Shape.z * Side;
+			W = max(2.0 * Rk, MinPx * PxCm);
+			H = max(Hraw, MinPx * PxCm);
+			Alpha *= clamp((2.0 * Rk * Hraw) / (W * H), 0.35, 1.0);
+			Centre = Pd - B.Dn * (0.5 * H - 0.5 * W);                             // the round head leads, the streak trails up
+			Role = MARS_WET_ROLE_FALLING;
+			Param = V;
+			float3 Vtx = Centre + B.Rt * (UV.x - 0.5) * W + B.Dn * (UV.y - 0.5) * H;
+			I0 = float4(W, H, Rk, Alpha);
+			I1 = float4(Role, Param, MarsDrip_Rand(C, K, 3u), D.Length);
+			return Vtx - WP;
+		}
+		float Splash = A - C.TFall;
+		bool Water = Surface > 0.5 && Surface < 1.5;
+		float Dur = Water ? MARS_DRIP_SPLASH_S : MARS_DRIP_CROWN_S;
+		if (!C.Impact || Splash < 0.0 || Splash >= Dur) { return Collapsed; }
+		float Small = (Surface > 1.5) ? 0.6 : 1.0;                               // a dry slope: a smaller crown
+		float Sz = max(D1.z, 0.05) * Small;
+		W = 16.0 * Sz;
+		H = (Water ? 9.0 : 8.0) * Sz;
+		Centre = Origin + float3(0, 0, 0.5 * H);
+		Role = Water ? MARS_WET_ROLE_JET : MARS_WET_ROLE_CROWN;
+		Param = Splash / Dur;
+		Rk = Sz;
+		I1 = float4(Role, Param, MarsDrip_Rand(C, K, 4u), D.Length);
+	}
+	else if (Slot < 4.5)
+	{
+		if (D.Mode > 1.5 && D.Mode < 2.5) { return Collapsed; }                 // a stream has no bead
+		float G = MarsDrip_BeadGrowth(D, C, T);
+		float Rb = R * (0.35 + 0.65 * pow(saturate(G), 1.0 / 3.0));
+		float E = 1.0 + 0.6 * smoothstep(0.7, 1.0, G);
+		if (D.Mode > 3.5)
+		{
+			// a sitting bead: a dome on the surface the instance stands on
+			float3 N = normalize(Up);
+			Rb = R * (0.8 + 0.4 * frac(D.Seed * 13.7));
+			Centre = Origin + N * (0.35 * Rb);
+			Role = MARS_WET_ROLE_SITTING;
+			Param = 1.0;
+			Fall = -N;
+		}
+		else
+		{
+			Centre = Src - float3(0, 0, C.Y0 - 1.6 * R + Rb * E);                // at detach the bead centre is where the drop starts
+			Role = MARS_WET_ROLE_BEAD;
+			Param = E;
+		}
+		FMarsDropBasis B = MarsWet_DropBasis(Centre, Cam, Fall);
+		float PxCm = length(Cam - Centre) * 2.0 * View.x / max(View.y, 1.0);
+		float Wraw = 2.4 * Rb;
+		W = max(Wraw, MinPx * PxCm);
+		H = max(Wraw * (Role == MARS_WET_ROLE_BEAD ? E : 0.8), MinPx * PxCm);
+		Alpha *= clamp((Wraw * Wraw) / (W * H), 0.35, 1.0);
+		Rk = Rb;
+		float3 Vtx = Centre + B.Rt * (UV.x - 0.5) * W + B.Dn * (UV.y - 0.5) * H;
+		I0 = float4(W, H, Rk, Alpha);
+		I1 = float4(Role, Param, D.Seed, D.Length);
+		return Vtx - WP;
+	}
+	else
+	{
+		bool Stream = D.Mode > 1.5 && D.Mode < 2.5;
+		bool WithThread = D.Mode > 0.5 && D.Mode < 1.5;
+		if (!Stream && !WithThread) { return Collapsed; }
+		float Len = Stream ? L : C.Y0;
+		H = Len;
+		Centre = Src - float3(0, 0, 0.5 * Len);
+		FMarsDropBasis B = MarsWet_ThreadBasis(Centre, Cam);
+		float PxCm = length(Cam - Centre) * 2.0 * View.x / max(View.y, 1.0);
+		float Wraw = (Stream ? 4.4 : 2.0) * Thread.x * max(D1.z, 0.05);
+		W = max(Wraw, MinPx * PxCm);
+		Alpha *= clamp(Wraw / W, 0.35, 1.0) * (1.0 - smoothstep(0.85, 0.97, abs(B.F.z)));
+		Role = Stream ? MARS_WET_ROLE_STREAM : MARS_WET_ROLE_THREAD;
+		Param = Len;
+		Rk = Thread.x * max(D1.z, 0.05);
+		float3 Vtx = Centre + B.Rt * (UV.x - 0.5) * W + B.Dn * (UV.y - 0.5) * H;
+		I0 = float4(W, H, Rk, Alpha);
+		I1 = float4(Role, Thread.y, D.Seed, D.Length);
+		return Vtx - WP;
+	}
+
+	// splash cards: camera-facing, upright
+	FMarsDropBasis B = MarsWet_ThreadBasis(Centre, Cam);
+	float3 Vtx = Centre + B.Rt * (UV.x - 0.5) * W + B.Dn * (UV.y - 0.5) * H;
+	I0 = float4(W, H, Rk, Alpha);
+	return Vtx - WP;
+}
+
+// ------------------------------------------------------------------------------------------------ drop cards (PS)
+// Round head leading (down), tapered tail up. q in cm, card centred; r = head radius; H = card height.
+float MarsWet_DropSdf(float2 Q, float R, float H, out float2 E)
+{
+	float2 C = Q - float2(0, -0.5 * H + R);
+	float K = C.y > 0 ? max((H - R) / R, 1.0) : 1.0;
+	E = float2(C.x * (1.0 + 0.35 * saturate(C.y / (R * K))), C.y / K);
+	return length(E) - R;
+}
+
+float MarsWet_Circle(float2 Q, float2 C, float R, out float2 E)
+{
+	E = Q - C;
+	return length(E) - R;
+}
+
+// Shading of every card role. I0/I1 from the VS; UV = TexCoord0; Cam/WP = camera and pixel world positions;
+// View = (TanHalfFovY, ViewSizeY, 1 / ViewSizeX, 1 / ViewSizeY); Look = (RefractPx, Transmission, OpacityScale, -).
+// Returns the opacity; NormalWS (world-space normal), Refract (scene-colour UV offset fraction) and Body (0..1 body
+// gradient for the no-refraction path) are extra outputs.
+float MarsWet_DropPS(float4 I0, float4 I1, float2 UV, float T, float3 Cam, float3 WP, float4 View, float4 Look,
+	out float3 NormalWS, out float2 Refract, out float Body)
+{
+	float Role = I1.x;
+	float W = max(I0.x, 1e-4), H = max(I0.y, 1e-4), R = I0.z, Alpha = I0.w;
+	float2 Q = float2((UV.x - 0.5) * W, (0.5 - UV.y) * H);
+	float PxCm = max(length(Cam - WP) * 2.0 * View.x / max(View.y, 1.0), 1e-4);
+	NormalWS = normalize(Cam - WP);
+	Refract = float2(0, 0);
+	Body = 0.0;
+	if (Role < -0.5) { return 0.0; }
+#if MARS_WET_DEBUG
+	return 1.0;
+#endif
+
+	bool Vertical = (Role > 0.5 && Role < 2.5) || (Role > 4.5);
+	FMarsDropBasis B;
+	if (Vertical) { B = MarsWet_ThreadBasis(WP, Cam); } else { B = MarsWet_DropBasis(WP, Cam, float3(0, 0, -1)); }
+	float3 UpW = -B.Dn;
+	float Mask = 0.0;
+	float3 N = float3(0, 0, 1);
+
+	if (Role < 0.5)
+	{
+		float Rd = 0.5 * W;
+		float2 E;
+		float Dd = MarsWet_DropSdf(Q, Rd, H, E);
+		Mask = saturate(0.5 - Dd / PxCm);
+		float2 En = E / Rd;
+		N = float3(En, sqrt(saturate(1.0 - dot(En, En))));
+	}
+	else if (Role < 1.5)
+	{
+		// floor crown: a 9-spike sheet ring rising and collapsing, plus three ballistic crown droplets
+		float U = I1.y;
+		float Sz = R;
+		float2 P = Q + float2(0, 0.5 * H);                                    // P.y = height above the impact
+		float Ring = (1.0 + 3.0 * U) * Sz;
+		float Hc = 3.0 * Sz * sin(3.14159 * saturate(U * 1.4)) * (1.0 - 0.6 * U);
+		float Ax = abs(P.x) / max(Ring, 1e-3);
+		float Theta = acos(saturate(Ax));
+		float Spike = 0.55 + 0.45 * cos(9.0 * Theta + 6.2831 * I1.z);
+		float Wall = (Ax < 1.0) ? smoothstep(0.55, 1.0, Ax) * 0.8 + 0.2 : 0.0;
+		float Sheet = saturate((Hc * Spike - P.y) / PxCm + 0.5) * saturate(P.y / PxCm + 0.5) * Wall;
+		Mask = Sheet * (1.0 - U);
+		N = float3(clamp(P.x / max(Ring, 1e-3), -1.0, 1.0) * 0.8, 0.3, 0.5);
+		float Tt = U * MARS_DRIP_CROWN_S * 1.6;
+		for (int i = 0; i < 3; ++i)
+		{
+			float Hs = frac(I1.z * (7.1 + 3.3 * i) + 0.37 * i);
+			float V0 = (70.0 + 50.0 * (Hs - 0.5)) * Sz;
+			float Vx = (Hs > 0.5 ? 1.0 : -1.0) * (10.0 + 15.0 * frac(Hs * 5.3)) * Sz;
+			float2 C = float2(Vx * Tt + sign(Vx) * Ring * 0.8, V0 * Tt - 490.0 * Tt * Tt);
+			if (C.y <= 0.0) { continue; }
+			float2 E;
+			float Rr = max(0.22 * Sz, 0.6 * PxCm);
+			float Dd = MarsWet_Circle(P, C, Rr, E);
+			float M = saturate(0.5 - Dd / PxCm);
+			if (M > Mask) { Mask = M; float2 En = E / Rr; N = float3(En, sqrt(saturate(1.0 - dot(En, En)))); }
+		}
+	}
+	else if (Role < 2.5)
+	{
+		// water: a low crown ring, then the Worthington jet throwing one droplet up and back
+		float U = I1.y;
+		float Sz = R;
+		float2 P = Q + float2(0, 0.5 * H);
+		float Hj = 6.0 * Sz * 4.0 * U * (1.0 - U);
+		float Rj = max(0.38 * Sz, 0.6 * PxCm);
+		float2 E;
+		float Dd = MarsWet_Circle(P, float2(0, Hj + Rj), Rj, E);
+		Mask = saturate(0.5 - Dd / PxCm);
+		float2 En = E / Rj;
+		N = float3(En, sqrt(saturate(1.0 - dot(En, En))));
+		float Column = (U < 0.45) ? saturate(0.5 - (abs(P.x) - max(0.22 * Sz * (1.0 - U), 0.4 * PxCm)) / PxCm)
+		                            * saturate((Hj - P.y) / PxCm) : 0.0;
+		float Ring = (1.2 + 5.0 * U) * Sz;
+		float Lip = (U < 0.5) ? saturate(0.5 - (abs(P.y - 0.25 * Sz) - 0.2 * Sz) / PxCm) * smoothstep(0.6, 1.0, abs(P.x) / Ring)
+		                        * step(abs(P.x), Ring) * (1.0 - 2.0 * U) : 0.0;
+		if (max(Column, Lip) > Mask) { Mask = max(Column, Lip); N = float3(P.x / max(Ring, 1.0), 0.2, 0.6); }
+	}
+	else if (Role < 4.5)
+	{
+		// a hanging bead (sagging as it fills) or a dome sitting on a surface
+		float Rb = R;
+		float2 E;
+		float Dd;
+		if (Role < 3.5)
+		{
+			float Sag = I1.y;
+			float2 C = Q;
+			float K = C.y < 0.0 ? Sag : 0.85;
+			E = float2(C.x * (1.0 + 0.25 * saturate(-C.y / (Rb * K)) * (Sag - 1.0)), C.y / K);
+			Dd = length(E) - Rb;
+		}
+		else
+		{
+			float Base = Q.y + 0.35 * Rb;                                     // height above the surface
+			E = float2(Q.x, Base / 0.7);
+			Dd = max(length(E) - Rb, -Base);
+		}
+		Mask = saturate(0.5 - Dd / PxCm);
+		float2 En = E / Rb;
+		N = float3(En, sqrt(saturate(1.0 - dot(En, En))));
+	}
+	else
+	{
+		// a thread (pipe joint: source to the bead) or a stream (source to the floor, breaking into beads below the
+		// break depth). Y = cm below the source; the flux narrows the thread as it accelerates.
+		float Len = max(H, 1e-3);
+		float Y = UV.y * Len;
+		float W0 = R;
+		float Wy = W0 * pow(1.0 + 2.0 * MARS_DRIP_GRAVITY * Y / (30.0 * 30.0), -0.25) * (Role > 5.5 ? 2.2 : 1.0);
+		float Ww = max(Wy, 0.5 * PxCm);
+		float Comp = saturate(Wy / Ww);
+		float Dx = abs(Q.x) - Ww;
+		float Line = saturate(0.5 - Dx / PxCm) * Comp;
+		Mask = Line;
+		float Nx = clamp(Q.x / max(Ww, 1e-3), -1.0, 1.0);
+		N = float3(Nx, 0.0, sqrt(saturate(1.0 - Nx * Nx)));
+		float Tau = T - MarsDrip_AgeAt(Y);
+		float Band = 0.75 + 0.25 * sin(6.2831 * (9.0 * Tau + I1.z));
+		if (Role > 5.5)
+		{
+			float Break = I1.y * (0.85 + 0.15 * sin(7.1 * T + 40.0 * I1.z));
+			if (Y > Break)
+			{
+				// Rayleigh-Plateau beads in departure time
+				float Phi = 9.0 * Tau + I1.z;
+				float Tc = (floor(Phi) + 0.5 - I1.z) / 9.0;
+				float Yc = MarsDrip_DistanceAt(T - Tc);
+				float Rb = max(1.6 * Wy, 0.6 * PxCm);
+				float2 E;
+				float Dd = MarsWet_Circle(float2(Q.x, Y), float2(0, Yc), Rb, E);
+				Mask = saturate(0.5 - Dd / PxCm) * saturate(1.6 * Wy / Rb + 0.35);
+				float2 En = E / Rb;
+				N = float3(En.x, -En.y, sqrt(saturate(1.0 - dot(En, En))));
+				Band = 1.0;
+			}
+		}
+		Mask *= Band;
+	}
+
+	NormalWS = normalize(B.Rt * N.x + UpW * N.y + B.F * max(N.z, 0.05));
+	Refract = float2(-N.x, N.y) * Look.x * View.zw;
+	Body = saturate(0.35 + 0.65 * N.z);
+	return saturate(Mask * Alpha * lerp(0.92, 0.6, saturate(N.z)) * Look.z);
+}
+
+// ------------------------------------------------------------------------------------------------ impact rings
+// Mesh decal at the impact. DA = (Length, Rate, Seed, Jitter), DB = (Mode, RingAmp); P = cm from the decal centre on
+// the plane; Ring = (RingWidthCm, Decay, RingAlphaGain, Dimple); DropRadius = the drop material's radius (so the clock
+// matches the cards). Returns the opacity; Normal (tangent space) and Gloss (0..1 crest mask) are extra outputs.
+float MarsWet_ImpactRings(float4 DA, float2 DB, float2 P, float T, float4 Ring, float DropRadius, out float3 Normal)
+{
+	FMarsDrip D;
+	D.Length = DA.x; D.Rate = DA.y; D.Seed = DA.z; D.Jitter = DA.w; D.Mode = DB.x;
+	float Amp = DB.y;
+	Normal = float3(0, 0, 1);
+	FMarsClock C = MarsDrip_Clock(D, DropRadius);
+	if (!C.Impact || Amp <= 0.0 || D.Mode > 2.5) { return 0.0; }
+	float Rr = length(P);
+	float2 Dir = P / max(Rr, 1e-3);
+	float Wd = max(Ring.x, 0.1);
+	float K2 = 6.2831853 / MARS_DRIP_RING_LAMBDA;
+	float2 G = float2(0, 0);
+	// constant cost: the crest at radius r belongs to the drop that landed r / RING_SPEED ago
+	int K0 = (int)floor((T - C.TFall - Rr / MARS_DRIP_RING_SPEED) / C.P - D.Seed);
+	for (int i = -1; i <= 1; ++i)
+	{
+		int K = K0 + i;
+		if (MarsDrip_Skipped(D, C, K)) { continue; }
+		float Age = T - MarsDrip_Impact(D, C, K);
+		if (Age <= 0.0 || Age > MARS_DRIP_RING_LIFE) { continue; }
+		float U = Rr - MARS_DRIP_RING_SPEED * Age;
+		float Env = exp(-U * U / (Wd * Wd)) * exp(-Age / max(Ring.y, 0.05)) * saturate(20.0 * Age) / (1.0 + 0.08 * Rr);
+		G += Amp * Env * (-K2 * sin(K2 * U) - (2.0 * U / (Wd * Wd)) * cos(K2 * U)) * Dir;
+		if (Age < 0.12) { G += Ring.w * Amp * saturate(1.0 - Rr / 2.0) * (1.0 - Age / 0.12) * Dir; }
+	}
+	if (D.Mode > 1.5)
+	{
+		// a stream: a steady noisy disturbance within 3 cm of the centre
+		float3 Ng = MarsWet_Value2Grad(P * 0.9 + float2(T * 7.0, T * 5.3));
+		G += 0.6 * Amp * saturate(1.0 - Rr / 3.0) * (Ng.yz - 0.5 * Dir);
+	}
+	Normal = normalize(float3(-G, 1.0));
+	return saturate(length(G) * Ring.z);
+}
+
+// ------------------------------------------------------------------------------------------------ rain rings
+// World-anchored rain rings: cells of CellCm, each with a hashed centre and its own period (Rate rings per m^2 per s).
+// Returns the slope (dh/dx, dh/dy).
+float2 MarsWet_RainSlope(float2 WorldXY, float T, float Rate, float CellCm)
+{
+	float2 G = float2(0, 0);
+	if (Rate <= 0.0) { return G; }
+	float CellArea = CellCm * CellCm * 1e-4;
+	float Period = 1.0 / max(Rate * CellArea, 1e-4);
+	float2 Cell = WorldXY / CellCm;
+	float2 Base = floor(Cell - 0.5);
+	float K2 = 6.2831853 / MARS_DRIP_RING_LAMBDA;
+	for (int y = 0; y < 2; ++y)
+	{
+		for (int x = 0; x < 2; ++x)
+		{
+			float2 Id = Base + float2(x, y);
+			float2 H2 = MarsWet_Hash22(Id);
+			float2 Centre = (Id + 0.5 + 0.6 * (H2 - 0.5)) * CellCm;
+			float Phase = frac(T / Period + H2.x * 7.31);
+			float Age = Phase * Period;
+			if (Age > 0.8) { continue; }
+			float2 Pp = WorldXY - Centre;
+			float Rr = length(Pp);
+			float U = Rr - 18.0 * Age;
+			float Env = exp(-U * U / 1.2) * (1.0 - Age / 0.8) / (1.0 + 0.1 * Rr);
+			G += 0.5 * Env * (-K2 * sin(K2 * U)) * Pp / max(Rr, 1e-3);
+		}
+	}
+	return G;
+}
+
+// ------------------------------------------------------------------------------------------------ puddles
+// Puddle-local P in [-1, 1]^2 (UV), world XY for the wobble and dry islands. Shape = (Seed, Aspect01, Facets,
+// LobeAmount); returns (deep, rim) masks. Both puddle layers call this with identical inputs, so their edges coincide.
+float2 MarsWet_PuddleShape(float2 P, float2 WorldXY, float4 Shape, float IslandThreshold)
+{
+	float Seed = Shape.x;
+	float2 Q = P * float2(1.0, 1.0 + 0.8 * Shape.y);                         // aspect along X: squeeze Y
+	float S = length(Q);
+	int Facets = (int)Shape.z;
+	if (Facets > 2)
+	{
+		float Facet = 0.0;
+		for (int i = 0; i < 12; ++i)
+		{
+			if (i >= Facets) { break; }
+			float A = 6.2831853 * (i + 0.6 * frac(Seed * 17.3 + i * 0.618)) / Facets;
+			Facet = max(Facet, dot(Q, float2(cos(A), sin(A))) * (1.0 + 0.12 * frac(Seed * 31.1 + i * 0.37)));
+		}
+		S = lerp(S, Facet, 0.65);
+	}
+	S += Shape.w * (MarsWet_Value2(P * 1.7 + Seed * 13.1) - 0.5) * 2.0;
+	S += 0.12 * (MarsWet_Value2(WorldXY * 0.02) - 0.5) * 2.0;
+	float Island = smoothstep(IslandThreshold, IslandThreshold + 0.08, MarsWet_Value2(WorldXY * 0.067 + Seed * 5.0));
+	float Deep = smoothstep(0.92, 0.70, S) * (1.0 - Island);
+	float Rim = smoothstep(1.18, 0.88, S) * (1.0 - 0.5 * Island);
+	return float2(Deep, Rim);
+}
+
+// Wet layer (BaseColor only): Wet = (Wetness, DeepDarken, RimDarken, -). Returns the opacity.
+float MarsWet_PuddleWet(float2 Masks, float4 Wet)
+{
+	return saturate(max(Masks.x * Wet.y, Masks.y * Wet.z) * Wet.x);
+}
+
+// Gloss layer (Normal + Roughness/Specular/Metallic): Gloss = (Wetness, DeepOpacity, RimOpacity, MicroRippleAmp),
+// Rough = (DeepRoughness, RimRoughness, RainRate, RainCellCm). Returns the opacity; Normal (tangent) and Roughness.
+float MarsWet_PuddleGloss(float2 Masks, float2 WorldXY, float T, float4 Gloss, float4 Rough, out float3 Normal,
+	out float Roughness)
+{
+	float2 G = MarsWet_RainSlope(WorldXY, T, Rough.z, max(Rough.w, 4.0));
+	float3 Micro = MarsWet_Value2Grad(WorldXY / 9.0 + float2(T * 0.11, -T * 0.07));
+	G += Gloss.w * Micro.yz * Masks.x;
+	Normal = normalize(float3(-G, 1.0));
+	Roughness = lerp(Rough.y, Rough.x, Masks.x);
+	return saturate(max(Masks.x * Gloss.y, Masks.y * Gloss.z) * Gloss.x);
+}
+
+// ------------------------------------------------------------------------------------------------ wet streaks
+// Projected decal down a wall. UV = decal UV (U across, V along the length; FlipV flips V); DC = DecalColor (Seed,
+// Dampness, Flow (cm/s / 100), Mineral); LenCm = the streak length; Streak = (Rivulets, RivuletWidth, HaloOpacity,
+// CoreOpacity); FaceMask = the receiver-facet mask. Returns the opacity; Rivulet (0..1) and Mineral (0..1) extra.
+float MarsWet_Streak(float2 UV, float4 DC, float LenCm, float T, float4 Streak, float FaceMask, out float Rivulet,
+	out float Mineral)
+{
+	float U = 1.0 - UV.y;                                                     // 1 at the source, 0 at the bottom
+	float X = UV.x - 0.5;
+	float Seed = DC.x;
+	float Wb = 0.5 * (0.35 + 0.65 * pow(saturate(1.0 - U), 0.6));
+	float Edge = Wb * (0.82 + 0.36 * MarsWet_Value2(float2(U * LenCm * 0.05, Seed * 31.0)));
+	float Band = saturate((Edge - abs(X)) / 0.06) * smoothstep(1.0, 0.93, U) * smoothstep(0.0, 0.08, U);
+	Rivulet = 0.0;
+	int Count = clamp((int)Streak.x, 1, 6);
+	for (int i = 0; i < 6; ++i)
+	{
+		if (i >= Count) { break; }
+		float X0 = (frac(Seed * 7.7 + i * 0.618) - 0.5) * 0.7 * Wb * 2.0;
+		float Xi = X0 + 0.03 * (MarsWet_Value2(float2(U * LenCm * 0.04, i * 3.1 + Seed * 9.0)) - 0.5) * 2.0;
+		float Wr = Streak.y * (0.6 + 0.6 * frac(Seed * 3.3 + i * 0.41));
+		float R = saturate(1.0 - abs(X - Xi) / max(Wr, 1e-3));
+		float Beads = 1.0;
+		if (DC.z > 0.0)
+		{
+			float S = (1.0 - U) * LenCm - T * DC.z * 100.0 * (0.67 + 0.33 * frac(i * 0.73 + Seed));
+			Beads = 0.65 + 0.35 * smoothstep(0.6, 0.95, frac(S / 9.0 + i * 0.29));
+		}
+		Rivulet = max(Rivulet, R * R * Beads * smoothstep(0.97, 0.85, U));
+	}
+	Mineral = DC.w * U * U;                                                   // gathers under the source
+	return saturate((DC.y * Band * Streak.z / 0.35 + Streak.w * 0.6 * Rivulet) * FaceMask);
+}
+
+// ------------------------------------------------------------------------------------------------ still water
+// Cpd = (SizeX, SizeY, Seed, Murk), RainRate separate; UV over the surface; returns the depth fade 0 (edge) .. 1 (deep)
+// and the slope (swell + rain) through Normal (tangent space), plus the scum mask.
+float MarsWet_StillWater(float2 UV, float2 WorldXY, float T, float4 Cpd, float4 Swell, out float3 Normal, out float Scum)
+{
+	float2 Size = max(Cpd.xy, float2(1, 1));
+	float Edge = min(min(UV.x, 1.0 - UV.x) * Size.x, min(UV.y, 1.0 - UV.y) * Size.y);
+	Edge += 12.0 * (MarsWet_Value2(WorldXY * 0.03 + Cpd.z * 17.0) - 0.5);
+	float Depth = saturate(Edge / max(Swell.x * max(Cpd.w, 0.05), 1.0));
+	Scum = smoothstep(Swell.y, Swell.y * 0.35, Edge) * (0.6 + 0.4 * MarsWet_Value2(WorldXY * 0.11 + Cpd.z * 3.0));
+	float3 A = MarsWet_Value2Grad(WorldXY / 37.0 + float2(T * 0.031, T * 0.017) + Cpd.z * 9.0);
+	float3 B = MarsWet_Value2Grad(WorldXY / 91.0 - float2(T * 0.013, -T * 0.021));
+	float2 G = Swell.z * (A.yz * 2.0 + B.yz);
+	G += MarsWet_RainSlope(WorldXY, T, Swell.w, 16.0);
+	Normal = normalize(float3(-G, 1.0));
+	return Depth;
+}
