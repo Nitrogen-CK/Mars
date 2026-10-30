@@ -141,18 +141,19 @@ mixin FMars_Validation Validate(const FMars_Flame_Fuel& Self)
     return FMars_Validation();
 }
 
-// The lit radius by pool.
+// The lit radius by pool. Every Mars flame lights the same 800 pool wherever it is (a maintainer ruling: the belt dims a
+// flame, it does not shrink it); the pools stay separate so a flame can still differ by where it is.
 struct FMars_Flame_Radius
 {
     UPROPERTY()
-    float32 Held = 700.0f;
+    float32 Held = 800.0f;
 
     // Read only while OnStow is StaysLit.
     UPROPERTY()
-    float32 Stowed = 350.0f;
+    float32 Stowed = 800.0f;
 
     UPROPERTY()
-    float32 World = 900.0f;
+    float32 World = 800.0f;
 }
 
 // The defaults are a bare flame; a lantern names its glass.

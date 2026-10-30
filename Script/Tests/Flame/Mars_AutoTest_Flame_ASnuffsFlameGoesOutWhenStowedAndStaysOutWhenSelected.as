@@ -51,7 +51,7 @@ class UMars_AutoTest_Flame_ASnuffsFlameGoesOutWhenStowedAndStaysOutWhenSelected 
     private void Step_AssertLitInHand(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         const auto Flame = Get_Flame();
-        Assert_Equals_Float(Flame.Get_LightRadius(), 600.0f, 0.01f, "it lights its Held radius");
+        Assert_Equals_Float(Flame.Get_LightRadius(), 800.0f, 0.01f, "it lights its Held radius");
         Assert_True(Get_OnlyProbeEnabled(EMars_Flame_Pool::Held), "its Held probe is the only one enabled");
         Assert_False(ck::IsValid(Flame.Get_LightProbe(EMars_Flame_Pool::Stowed)), "a flame that snuffs when stowed has no Stowed probe");
 
@@ -116,7 +116,7 @@ class UMars_AutoTest_Flame_ASnuffsFlameGoesOutWhenStowedAndStaysOutWhenSelected 
         const auto Flame = Get_Flame();
         Assert_True(Flame.Get_IsLit(), "it lights again");
         Assert_Equals_Int(Flame.Get_MeasuresLeft(), _MeasuresInHand, "on the fuel it kept");
-        Assert_Equals_Float(Flame.Get_LightRadius(), 600.0f, 0.01f, "at its Held radius");
+        Assert_Equals_Float(Flame.Get_LightRadius(), 800.0f, 0.01f, "at its Held radius");
         Assert_Equals_Int(_Lit.Num(), 3, "OnLitChanged fired once more, for the relighting");
         if (_Lit.Num() == 3)
         { Assert_True(_Lit[2], "the last edge is the relighting"); }

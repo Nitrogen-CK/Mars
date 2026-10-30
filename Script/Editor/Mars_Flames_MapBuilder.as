@@ -1,7 +1,8 @@
 // Editor-only: Mars.Sandbox.PlaceFlames adds the flame fixtures to room 7 of the sandbox map (/Game/Mars/Maps/Sandbox_Mars_MAP,
 // room built by Mars.Sandbox.BuildRoom7): a torch on a plinth by the doorway, two unlit candles at the foot of the south
-// wall whose sources light one more ceiling lamp once both burn, and an unlit torch on the west wall. Open the map, run the
-// command, and it saves the level. It refuses to run twice; delete the Flame7_ actors to re-place.
+// wall whose sources light one more ceiling lamp once both burn, an unlit torch on the west wall, a torch sconce beside it
+// and an unlit brazier on the floor. Open the map, run the command, and it saves the level. It refuses to run twice;
+// delete the Flame7_ actors to re-place.
 
 #if EDITOR
 UFUNCTION()
@@ -40,6 +41,14 @@ namespace utils_mars_sandbox_flames
         // On the west wall's inner face, its bracket (local +X) reaching into the room.
         utils_mars_map_builder::Spawn_EntityScript(UMars_WallTorch_EntityScript,
             FMars_MapBuilder_Placement("Flame7_WallTorch", FVector(-2490.0, -2650.0, 170.0)));
+
+        // The real sconce mesh further along the same wall, at the same height and facing.
+        utils_mars_map_builder::Spawn_EntityScript(UMars_TorchSconce_EntityScript,
+            FMars_MapBuilder_Placement("Flame7_TorchSconce", FVector(-2490.0, -2950.0, 170.0)));
+
+        // On the floor between the plinth and the candles: a torch held to its coals lights it.
+        utils_mars_map_builder::Spawn_EntityScript(UMars_Brazier_EntityScript,
+            FMars_MapBuilder_Placement("Flame7_Brazier", FVector(-1750.0, -2750.0, 0.0)));
 
         // Hung from the roof's underside; dark until both candles burn.
         utils_mars_map_builder::Spawn_EntityScript(UMars_Sandbox_FlameLight_EntityScript,

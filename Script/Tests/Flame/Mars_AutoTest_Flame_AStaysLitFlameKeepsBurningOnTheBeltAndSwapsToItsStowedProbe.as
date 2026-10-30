@@ -85,7 +85,7 @@ class UMars_AutoTest_Flame_AStaysLitFlameKeepsBurningOnTheBeltAndSwapsToItsStowe
         Assert_True(Flame.Get_IsLit(), f"a lantern stays lit on the belt ({Get_FlameStateText()})");
         Assert_True(Flame.Get_Ignition() == EMars_Flame_Ignition::Lit, "stowing did not snuff it");
         Assert_True(Shown.IsSet() && Shown.GetValue() == EMars_Flame_Pool::Stowed, "its Stowed probe is the one shown");
-        Assert_Equals_Float(Flame.Get_LightRadius(), 350.0f, 0.01f, "it lights its Stowed radius");
+        Assert_Equals_Float(Flame.Get_LightRadius(), 800.0f, 0.01f, "it lights its Stowed radius");
         Assert_True(ck::Is_NOT_Valid(_HeldItem.Get_CurrentItem()), "the carrier's hands are empty");
 
         Assert_Equals_Int(_Lit.Num(), 1, "OnLitChanged fired once, for the lighting");

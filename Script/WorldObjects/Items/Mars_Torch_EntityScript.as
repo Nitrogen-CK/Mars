@@ -21,6 +21,9 @@ class UMars_Torch_EntityScript : UMars_FlameItem_EntityScript
         Look.IntensityWorld = 9000.0f;
         Look.ShadowsHeld = true;
         Look.ShadowsWorld = true;
+        Look.FxSize = 18.0f;
+        Look.FxEmberRate = 6.0f;
+        Look.FxEnclosed = false;
         return Look;
     }
 

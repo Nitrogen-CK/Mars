@@ -28,7 +28,7 @@ namespace mars_test_items
     // Assets are file-local: other test files reach this one through here.
     UCk_InventoryItem_Definition LowLantern() { return Mars_TestItemDef_LowLantern; }
 
-    // Mars_ItemDef_Lantern's flame (glass, self-lighting, lit on the belt, radii 700 / 350 / 900) burning InFuel.
+    // Mars_ItemDef_Lantern's flame (glass, self-lighting, lit on the belt, radii 800 / 800 / 800) burning InFuel.
     FMars_Flame_Spec Make_LanternFlameSpec(FMars_Flame_Fuel InFuel)
     {
         auto Spec = FMars_Flame_Spec();

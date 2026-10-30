@@ -21,7 +21,7 @@ asset Mars_TestItemDef_ShortTorch of UCk_InventoryItem_Definition
     Flame.Spec.Enclosure = EMars_Flame_Enclosure::Open;
     Flame.Spec.Lighting = EMars_Flame_Lighting::SelfLighting;
     Flame.Spec.OnStow = EMars_Flame_OnStow::Snuffs;
-    Flame.Spec.Radius.Held = 600.0f;
+    Flame.Spec.Radius.Held = 800.0f;
     Flame.Spec.Radius.World = 800.0f;
     _ItemTraits.Add(Flame);
 }

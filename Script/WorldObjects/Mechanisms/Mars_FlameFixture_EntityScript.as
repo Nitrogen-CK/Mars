@@ -28,6 +28,9 @@ class UMars_FlameFixture_EntityScript : UCk_GenericEntityScript_UE
 
     private FCk_Handle_Flame _Flame;
     private UMars_FlameDressing _Dressing;
+    // Set by a subclass's AddVisuals: the part whose mesh bakes a flame on CandleFlame_Mars_M (the candle's wick flame, the
+    // brazier's tongues); the dressing drives it dark through custom primitive data 1 while the flame is out.
+    protected FCk_Handle_UnrealComponent _BakedFlamePart;
 
     UFUNCTION(BlueprintOverride)
     ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
@@ -59,6 +62,7 @@ class UMars_FlameFixture_EntityScript : UCk_GenericEntityScript_UE
 
         _Dressing = Cast<UMars_FlameDressing>(NewObject(this, UMars_FlameDressing));
         _Dressing.Setup(_Flame, FlameNode, Get_Look());
+        _Dressing.Set_BakedFlame(_BakedFlamePart);
 
         return ECk_EntityScript_ConstructionFlow::Finished;
     }

@@ -1,0 +1,1444 @@
+{
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "64d60873acae4aad9324e266a588a244",
+		"exporterVersion": 3
+	},
+	"system": "Flame_Mars_NS",
+	"packagePath": "/Game/Mars/Fx/Flame/Flame_Mars_NS",
+	"userParameters": [
+		{
+			"name": "User.Colour",
+			"type": "LinearColor",
+			"value": "RGBA(1, 0.55, 0.25, 1)"
+		},
+		{
+			"name": "User.EmberRate",
+			"type": "NiagaraFloat",
+			"value": "6"
+		},
+		{
+			"name": "User.Enclosed",
+			"type": "NiagaraFloat",
+			"value": "0"
+		},
+		{
+			"name": "User.Intensity",
+			"type": "NiagaraFloat",
+			"value": "1"
+		},
+		{
+			"name": "User.Size",
+			"type": "NiagaraFloat",
+			"value": "18"
+		},
+		{
+			"name": "User.Wind",
+			"type": "Vector3f",
+			"value": "(0, 0, 0)"
+		}
+	],
+	"systemState":
+	{
+		"stacks": [
+			{
+				"stage": "System Update",
+				"modules": [
+					{
+						"name": "System State",
+						"id": "SystemState",
+						"inputs": [
+							{
+								"name": "Inactive Response",
+								"value": "NewEnumerator0 (Complete (Let Emitters Finish then Kill The System))"
+							},
+							{
+								"name": "Loop Behavior",
+								"value": "NewEnumerator0 (Infinite)"
+							},
+							{
+								"name": "UseLoopDelay",
+								"value": "false"
+							}
+						]
+					}
+				],
+				"values": [
+					{
+						"name": "Embers.EmitterState.Loop Delay",
+						"value": "0"
+					},
+					{
+						"name": "Embers.EmitterState.Loop Duration",
+						"value": "1"
+					},
+					{
+						"name": "Embers.EmitterState.MaxDistance",
+						"value": "5000"
+					},
+					{
+						"name": "Embers.EmitterState.MinDistance",
+						"value": "0"
+					},
+					{
+						"name": "Embers.SpawnRate.Spawn Probability",
+						"value": "1"
+					},
+					{
+						"name": "Embers.SpawnRate.SpawnGroup",
+						"value": "0"
+					},
+					{
+						"name": "Embers.SpawnRate.SpawnRate",
+						"value": "1"
+					},
+					{
+						"name": "Glow.EmitterState.Loop Delay",
+						"value": "0"
+					},
+					{
+						"name": "Glow.EmitterState.Loop Duration",
+						"value": "1"
+					},
+					{
+						"name": "Glow.EmitterState.MaxDistance",
+						"value": "5000"
+					},
+					{
+						"name": "Glow.EmitterState.MinDistance",
+						"value": "0"
+					},
+					{
+						"name": "Glow.SpawnRate.Spawn Probability",
+						"value": "1"
+					},
+					{
+						"name": "Glow.SpawnRate.SpawnGroup",
+						"value": "0"
+					},
+					{
+						"name": "Glow.SpawnRate.SpawnRate",
+						"value": "1"
+					},
+					{
+						"name": "SystemState.Loop Delay",
+						"value": "0"
+					},
+					{
+						"name": "SystemState.Loop Duration",
+						"value": "5"
+					},
+					{
+						"name": "Tongues.EmitterState.Loop Delay",
+						"value": "0"
+					},
+					{
+						"name": "Tongues.EmitterState.Loop Duration",
+						"value": "1"
+					},
+					{
+						"name": "Tongues.EmitterState.MaxDistance",
+						"value": "5000"
+					},
+					{
+						"name": "Tongues.EmitterState.MinDistance",
+						"value": "0"
+					},
+					{
+						"name": "Tongues.SpawnRate.Spawn Probability",
+						"value": "1"
+					},
+					{
+						"name": "Tongues.SpawnRate.SpawnGroup",
+						"value": "0"
+					},
+					{
+						"name": "Tongues.SpawnRate.SpawnRate",
+						"value": "1"
+					}
+				]
+			}
+		],
+		"systemStateModule":
+		{
+			"found": true,
+			"module": "SystemState",
+			"name": "System State",
+			"enabled": true,
+			"inputs": [
+				{
+					"name": "Inactive Response",
+					"value": "NewEnumerator0 (Complete (Let Emitters Finish then Kill The System))"
+				},
+				{
+					"name": "Loop Behavior",
+					"value": "NewEnumerator0 (Infinite)"
+				},
+				{
+					"name": "UseLoopDelay",
+					"value": "false"
+				}
+			],
+			"values": [
+				{
+					"name": "Loop Delay",
+					"value": "0"
+				},
+				{
+					"name": "Loop Duration",
+					"value": "5"
+				}
+			]
+		}
+	},
+	"emitters": [
+		{
+			"name": "Tongues",
+			"enabled": true,
+			"sim": "CPU",
+			"localSpace": true,
+			"determinism": false,
+			"boundsMode": "Dynamic",
+			"stacks": [
+				{
+					"stage": "Emitter Update",
+					"modules": [
+						{
+							"name": "Emitter State",
+							"id": "EmitterState",
+							"inputs": [
+								{
+									"name": "ScaleSpawnCountCurve",
+									"value": ""
+								},
+								{
+									"name": "Enable Distance Culling",
+									"value": "false"
+								},
+								{
+									"name": "Enable Visibility Culling",
+									"value": "false"
+								},
+								{
+									"name": "Inactive Response",
+									"value": "NewEnumerator0 (Complete (Let Particles Finish then Kill Emitter))"
+								},
+								{
+									"name": "Life Cycle Mode",
+									"value": "NewEnumerator0 (System)"
+								},
+								{
+									"name": "Loop Behavior",
+									"value": "NewEnumerator0 (Infinite)"
+								},
+								{
+									"name": "Loop Duration Mode",
+									"value": "NewEnumerator0 (Fixed)"
+								},
+								{
+									"name": "Scalability Mode",
+									"value": "NewEnumerator0 (System)"
+								},
+								{
+									"name": "Scale Spawn Count",
+									"value": "false"
+								},
+								{
+									"name": "UseLoopDelay",
+									"value": "false"
+								}
+							]
+						},
+						{
+							"name": "Spawn Rate",
+							"id": "SpawnRate",
+							"inputs": [
+								{
+									"name": "Use Spawn Probability",
+									"value": "false"
+								}
+							],
+							"overrides": [
+								{
+									"path": "SpawnRate",
+									"kind": "value",
+									"value": "22.0"
+								}
+							]
+						}
+					],
+					"values": [
+						{
+							"name": "Tongues.EmitterState.Loop Delay",
+							"value": "0"
+						},
+						{
+							"name": "Tongues.EmitterState.Loop Duration",
+							"value": "1"
+						},
+						{
+							"name": "Tongues.EmitterState.MaxDistance",
+							"value": "5000"
+						},
+						{
+							"name": "Tongues.EmitterState.MinDistance",
+							"value": "0"
+						},
+						{
+							"name": "Tongues.SpawnRate.Spawn Probability",
+							"value": "1"
+						},
+						{
+							"name": "Tongues.SpawnRate.SpawnGroup",
+							"value": "0"
+						},
+						{
+							"name": "Tongues.SpawnRate.SpawnRate",
+							"value": "1"
+						}
+					]
+				},
+				{
+					"stage": "Particle Spawn",
+					"modules": [
+						{
+							"name": "Initialize Particle",
+							"id": "InitializeParticle",
+							"inputs": [
+								{
+									"name": "AdjustAlpha",
+									"value": "false"
+								},
+								{
+									"name": "AdjustHue",
+									"value": "true"
+								},
+								{
+									"name": "AdjustSaturation",
+									"value": "false"
+								},
+								{
+									"name": "AdjustValue",
+									"value": "false"
+								},
+								{
+									"name": "Color Channel Mode",
+									"value": "NewEnumerator1 (Link RGB / Link A)"
+								},
+								{
+									"name": "Color Mode",
+									"value": "NewEnumerator0 (Unset)"
+								},
+								{
+									"name": "Color Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "Lifetime Mode",
+									"value": "NewEnumerator0 (Direct Set)"
+								},
+								{
+									"name": "Lifetime Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "Mass Mode",
+									"value": "NewEnumerator0 (Unset / (Mass of 1))"
+								},
+								{
+									"name": "Mass Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "Mesh Renderer Array Visibility Mode",
+									"value": "NewEnumerator0 (Unset)"
+								},
+								{
+									"name": "Mesh Scale Mode",
+									"value": "NewEnumerator0 (Unset)"
+								},
+								{
+									"name": "Mesh Scale Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "Position Mode",
+									"value": "NewEnumerator2 (Simulation Position)"
+								},
+								{
+									"name": "Ribbon Facing Mode",
+									"value": "NewEnumerator0 (Unset)"
+								},
+								{
+									"name": "Ribbon Twist Mode",
+									"value": "NewEnumerator0 (Unset)"
+								},
+								{
+									"name": "Ribbon Width Mode",
+									"value": "NewEnumerator0 (Unset)"
+								},
+								{
+									"name": "Sprite Rotation Mode",
+									"value": "NewEnumerator3 (Unset)"
+								},
+								{
+									"name": "Sprite Rotation Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "Sprite Size Mode",
+									"value": "NewEnumerator0 (Unset)"
+								},
+								{
+									"name": "Sprite Size Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "Sprite UV Mode",
+									"value": "NewEnumerator0 (Unset)"
+								},
+								{
+									"name": "Sprite UV Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "UsePositionOffset",
+									"value": "false"
+								},
+								{
+									"name": "Wrap Index By Mesh Count",
+									"value": "true"
+								},
+								{
+									"name": "Write Material Random",
+									"value": "true"
+								}
+							]
+						},
+						{
+							"name": "Mars Tongue Spawn Mars NM",
+							"id": "MarsTongueSpawn_Mars_NM",
+							"inputs": [],
+							"overrides": [
+								{
+									"path": "Size",
+									"kind": "linked",
+									"value": "User.Size"
+								},
+								{
+									"path": "Colour",
+									"kind": "linked",
+									"value": "User.Colour"
+								},
+								{
+									"path": "Enclosed",
+									"kind": "linked",
+									"value": "User.Enclosed"
+								}
+							]
+						}
+					],
+					"values": [
+						{
+							"name": "Tongues.DynamicMaterialParameters.Index 0 Param 1",
+							"value": "0"
+						},
+						{
+							"name": "Tongues.DynamicMaterialParameters.Index 0 Param 2",
+							"value": "0"
+						},
+						{
+							"name": "Tongues.DynamicMaterialParameters.Index 0 Param 3",
+							"value": "0"
+						},
+						{
+							"name": "Tongues.DynamicMaterialParameters.Index 0 Param 4",
+							"value": "0"
+						},
+						{
+							"name": "Tongues.InitializeParticle.Lifetime",
+							"value": "5"
+						},
+						{
+							"name": "Tongues.InitializeParticle.Position Offset",
+							"value": "(0, 0, 0)"
+						},
+						{
+							"name": "Tongues.MarsTongueSpawn_Mars_NM.Colour",
+							"value": "RGBA(1, 1, 1, 1)"
+						},
+						{
+							"name": "Tongues.MarsTongueSpawn_Mars_NM.Enclosed",
+							"value": "0"
+						},
+						{
+							"name": "Tongues.MarsTongueSpawn_Mars_NM.Size",
+							"value": "0"
+						},
+						{
+							"name": "Tongues.MarsTongueUpdate_Mars_NM.Enclosed",
+							"value": "0"
+						},
+						{
+							"name": "Tongues.MarsTongueUpdate_Mars_NM.Intensity",
+							"value": "0"
+						},
+						{
+							"name": "Tongues.MarsTongueUpdate_Mars_NM.Size",
+							"value": "0"
+						},
+						{
+							"name": "Tongues.MarsTongueUpdate_Mars_NM.Wind",
+							"value": "(0, 0, 0)"
+						}
+					]
+				},
+				{
+					"stage": "Particle Update",
+					"modules": [
+						{
+							"name": "Particle State",
+							"id": "ParticleState",
+							"inputs": [
+								{
+									"name": "Kill Particles When Lifetime Has Elapsed",
+									"value": "true"
+								}
+							]
+						},
+						{
+							"name": "Dynamic Material Parameters",
+							"id": "DynamicMaterialParameters",
+							"inputs": [
+								{
+									"name": "Write Parameter Index 0",
+									"value": "NewEnumerator1 (Float)"
+								},
+								{
+									"name": "Write Parameter Index 1",
+									"value": "NewEnumerator0 (Off)"
+								},
+								{
+									"name": "Write Parameter Index 2",
+									"value": "NewEnumerator0 (Off)"
+								},
+								{
+									"name": "Write Parameter Index 3",
+									"value": "NewEnumerator0 (Off)"
+								}
+							]
+						},
+						{
+							"name": "Mars Tongue Update Mars NM",
+							"id": "MarsTongueUpdate_Mars_NM",
+							"inputs": [],
+							"overrides": [
+								{
+									"path": "Size",
+									"kind": "linked",
+									"value": "User.Size"
+								},
+								{
+									"path": "Intensity",
+									"kind": "linked",
+									"value": "User.Intensity"
+								},
+								{
+									"path": "Wind",
+									"kind": "linked",
+									"value": "User.Wind"
+								},
+								{
+									"path": "Enclosed",
+									"kind": "linked",
+									"value": "User.Enclosed"
+								}
+							]
+						}
+					],
+					"values": [
+						{
+							"name": "Tongues.DynamicMaterialParameters.Index 0 Param 1",
+							"value": "0"
+						},
+						{
+							"name": "Tongues.DynamicMaterialParameters.Index 0 Param 2",
+							"value": "0"
+						},
+						{
+							"name": "Tongues.DynamicMaterialParameters.Index 0 Param 3",
+							"value": "0"
+						},
+						{
+							"name": "Tongues.DynamicMaterialParameters.Index 0 Param 4",
+							"value": "0"
+						},
+						{
+							"name": "Tongues.MarsTongueUpdate_Mars_NM.Enclosed",
+							"value": "0"
+						},
+						{
+							"name": "Tongues.MarsTongueUpdate_Mars_NM.Intensity",
+							"value": "0"
+						},
+						{
+							"name": "Tongues.MarsTongueUpdate_Mars_NM.Size",
+							"value": "0"
+						},
+						{
+							"name": "Tongues.MarsTongueUpdate_Mars_NM.Wind",
+							"value": "(0, 0, 0)"
+						}
+					]
+				}
+			],
+			"eventHandlers": [],
+			"lifetimeResolved":
+			{
+				"module": "InitializeParticle",
+				"mode": "NewEnumerator0 (Direct Set)",
+				"source": "direct",
+				"values": [
+					{
+						"name": "Lifetime",
+						"value": "5"
+					}
+				]
+			},
+			"renderers": [
+				{
+					"type": "NiagaraSpriteRendererProperties",
+					"material": "/Game/Mars/Fx/Flame/Materials/FlameSprite_Mars_MI.FlameSprite_Mars_MI",
+					"alignment": "VelocityAligned",
+					"facing": "Automatic",
+					"sortMode": "None"
+				}
+			]
+		},
+		{
+			"name": "Embers",
+			"enabled": true,
+			"sim": "CPU",
+			"localSpace": true,
+			"determinism": false,
+			"boundsMode": "Dynamic",
+			"stacks": [
+				{
+					"stage": "Emitter Update",
+					"modules": [
+						{
+							"name": "Emitter State",
+							"id": "EmitterState",
+							"inputs": [
+								{
+									"name": "ScaleSpawnCountCurve",
+									"value": ""
+								},
+								{
+									"name": "Enable Distance Culling",
+									"value": "false"
+								},
+								{
+									"name": "Enable Visibility Culling",
+									"value": "false"
+								},
+								{
+									"name": "Inactive Response",
+									"value": "NewEnumerator0 (Complete (Let Particles Finish then Kill Emitter))"
+								},
+								{
+									"name": "Life Cycle Mode",
+									"value": "NewEnumerator0 (System)"
+								},
+								{
+									"name": "Loop Behavior",
+									"value": "NewEnumerator0 (Infinite)"
+								},
+								{
+									"name": "Loop Duration Mode",
+									"value": "NewEnumerator0 (Fixed)"
+								},
+								{
+									"name": "Scalability Mode",
+									"value": "NewEnumerator0 (System)"
+								},
+								{
+									"name": "Scale Spawn Count",
+									"value": "false"
+								},
+								{
+									"name": "UseLoopDelay",
+									"value": "false"
+								}
+							]
+						},
+						{
+							"name": "Spawn Rate",
+							"id": "SpawnRate",
+							"inputs": [
+								{
+									"name": "Use Spawn Probability",
+									"value": "false"
+								}
+							],
+							"overrides": [
+								{
+									"path": "SpawnRate",
+									"kind": "linked",
+									"value": "User.EmberRate"
+								}
+							]
+						}
+					],
+					"values": [
+						{
+							"name": "Embers.EmitterState.Loop Delay",
+							"value": "0"
+						},
+						{
+							"name": "Embers.EmitterState.Loop Duration",
+							"value": "1"
+						},
+						{
+							"name": "Embers.EmitterState.MaxDistance",
+							"value": "5000"
+						},
+						{
+							"name": "Embers.EmitterState.MinDistance",
+							"value": "0"
+						},
+						{
+							"name": "Embers.SpawnRate.Spawn Probability",
+							"value": "1"
+						},
+						{
+							"name": "Embers.SpawnRate.SpawnGroup",
+							"value": "0"
+						},
+						{
+							"name": "Embers.SpawnRate.SpawnRate",
+							"value": "1"
+						}
+					]
+				},
+				{
+					"stage": "Particle Spawn",
+					"modules": [
+						{
+							"name": "Initialize Particle",
+							"id": "InitializeParticle",
+							"inputs": [
+								{
+									"name": "AdjustAlpha",
+									"value": "false"
+								},
+								{
+									"name": "AdjustHue",
+									"value": "true"
+								},
+								{
+									"name": "AdjustSaturation",
+									"value": "false"
+								},
+								{
+									"name": "AdjustValue",
+									"value": "false"
+								},
+								{
+									"name": "Color Channel Mode",
+									"value": "NewEnumerator1 (Link RGB / Link A)"
+								},
+								{
+									"name": "Color Mode",
+									"value": "NewEnumerator0 (Unset)"
+								},
+								{
+									"name": "Color Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "Lifetime Mode",
+									"value": "NewEnumerator0 (Direct Set)"
+								},
+								{
+									"name": "Lifetime Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "Mass Mode",
+									"value": "NewEnumerator0 (Unset / (Mass of 1))"
+								},
+								{
+									"name": "Mass Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "Mesh Renderer Array Visibility Mode",
+									"value": "NewEnumerator0 (Unset)"
+								},
+								{
+									"name": "Mesh Scale Mode",
+									"value": "NewEnumerator0 (Unset)"
+								},
+								{
+									"name": "Mesh Scale Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "Position Mode",
+									"value": "NewEnumerator2 (Simulation Position)"
+								},
+								{
+									"name": "Ribbon Facing Mode",
+									"value": "NewEnumerator0 (Unset)"
+								},
+								{
+									"name": "Ribbon Twist Mode",
+									"value": "NewEnumerator0 (Unset)"
+								},
+								{
+									"name": "Ribbon Width Mode",
+									"value": "NewEnumerator0 (Unset)"
+								},
+								{
+									"name": "Sprite Rotation Mode",
+									"value": "NewEnumerator3 (Unset)"
+								},
+								{
+									"name": "Sprite Rotation Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "Sprite Size Mode",
+									"value": "NewEnumerator0 (Unset)"
+								},
+								{
+									"name": "Sprite Size Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "Sprite UV Mode",
+									"value": "NewEnumerator0 (Unset)"
+								},
+								{
+									"name": "Sprite UV Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "UsePositionOffset",
+									"value": "false"
+								},
+								{
+									"name": "Wrap Index By Mesh Count",
+									"value": "true"
+								},
+								{
+									"name": "Write Material Random",
+									"value": "true"
+								}
+							]
+						},
+						{
+							"name": "Mars Ember Spawn Mars NM",
+							"id": "MarsEmberSpawn_Mars_NM",
+							"inputs": [],
+							"overrides": [
+								{
+									"path": "Size",
+									"kind": "linked",
+									"value": "User.Size"
+								},
+								{
+									"path": "Colour",
+									"kind": "linked",
+									"value": "User.Colour"
+								},
+								{
+									"path": "Enclosed",
+									"kind": "linked",
+									"value": "User.Enclosed"
+								}
+							]
+						}
+					],
+					"values": [
+						{
+							"name": "Embers.DynamicMaterialParameters.Index 0 Param 1",
+							"value": "0"
+						},
+						{
+							"name": "Embers.DynamicMaterialParameters.Index 0 Param 2",
+							"value": "0"
+						},
+						{
+							"name": "Embers.DynamicMaterialParameters.Index 0 Param 3",
+							"value": "0"
+						},
+						{
+							"name": "Embers.DynamicMaterialParameters.Index 0 Param 4",
+							"value": "0"
+						},
+						{
+							"name": "Embers.InitializeParticle.Lifetime",
+							"value": "5"
+						},
+						{
+							"name": "Embers.InitializeParticle.Position Offset",
+							"value": "(0, 0, 0)"
+						},
+						{
+							"name": "Embers.MarsEmberSpawn_Mars_NM.Colour",
+							"value": "RGBA(1, 1, 1, 1)"
+						},
+						{
+							"name": "Embers.MarsEmberSpawn_Mars_NM.Enclosed",
+							"value": "0"
+						},
+						{
+							"name": "Embers.MarsEmberSpawn_Mars_NM.Size",
+							"value": "0"
+						},
+						{
+							"name": "Embers.MarsEmberUpdate_Mars_NM.DeltaTime",
+							"value": "0"
+						},
+						{
+							"name": "Embers.MarsEmberUpdate_Mars_NM.Intensity",
+							"value": "0"
+						},
+						{
+							"name": "Embers.MarsEmberUpdate_Mars_NM.Size",
+							"value": "0"
+						},
+						{
+							"name": "Embers.MarsEmberUpdate_Mars_NM.Wind",
+							"value": "(0, 0, 0)"
+						}
+					]
+				},
+				{
+					"stage": "Particle Update",
+					"modules": [
+						{
+							"name": "Particle State",
+							"id": "ParticleState",
+							"inputs": [
+								{
+									"name": "Kill Particles When Lifetime Has Elapsed",
+									"value": "true"
+								}
+							]
+						},
+						{
+							"name": "Dynamic Material Parameters",
+							"id": "DynamicMaterialParameters",
+							"inputs": [
+								{
+									"name": "Write Parameter Index 0",
+									"value": "NewEnumerator1 (Float)"
+								},
+								{
+									"name": "Write Parameter Index 1",
+									"value": "NewEnumerator0 (Off)"
+								},
+								{
+									"name": "Write Parameter Index 2",
+									"value": "NewEnumerator0 (Off)"
+								},
+								{
+									"name": "Write Parameter Index 3",
+									"value": "NewEnumerator0 (Off)"
+								}
+							]
+						},
+						{
+							"name": "Mars Ember Update Mars NM",
+							"id": "MarsEmberUpdate_Mars_NM",
+							"inputs": [],
+							"overrides": [
+								{
+									"path": "Size",
+									"kind": "linked",
+									"value": "User.Size"
+								},
+								{
+									"path": "Intensity",
+									"kind": "linked",
+									"value": "User.Intensity"
+								},
+								{
+									"path": "Wind",
+									"kind": "linked",
+									"value": "User.Wind"
+								},
+								{
+									"path": "DeltaTime",
+									"kind": "linked",
+									"value": "Engine.DeltaTime"
+								}
+							]
+						}
+					],
+					"values": [
+						{
+							"name": "Embers.DynamicMaterialParameters.Index 0 Param 1",
+							"value": "0"
+						},
+						{
+							"name": "Embers.DynamicMaterialParameters.Index 0 Param 2",
+							"value": "0"
+						},
+						{
+							"name": "Embers.DynamicMaterialParameters.Index 0 Param 3",
+							"value": "0"
+						},
+						{
+							"name": "Embers.DynamicMaterialParameters.Index 0 Param 4",
+							"value": "0"
+						},
+						{
+							"name": "Embers.MarsEmberUpdate_Mars_NM.DeltaTime",
+							"value": "0"
+						},
+						{
+							"name": "Embers.MarsEmberUpdate_Mars_NM.Intensity",
+							"value": "0"
+						},
+						{
+							"name": "Embers.MarsEmberUpdate_Mars_NM.Size",
+							"value": "0"
+						},
+						{
+							"name": "Embers.MarsEmberUpdate_Mars_NM.Wind",
+							"value": "(0, 0, 0)"
+						}
+					]
+				}
+			],
+			"eventHandlers": [],
+			"lifetimeResolved":
+			{
+				"module": "InitializeParticle",
+				"mode": "NewEnumerator0 (Direct Set)",
+				"source": "direct",
+				"values": [
+					{
+						"name": "Lifetime",
+						"value": "5"
+					}
+				]
+			},
+			"renderers": [
+				{
+					"type": "NiagaraSpriteRendererProperties",
+					"material": "/Game/Mars/Fx/Flame/Materials/EmberSprite_Mars_MI.EmberSprite_Mars_MI",
+					"alignment": "Automatic",
+					"facing": "Automatic",
+					"sortMode": "None"
+				}
+			]
+		},
+		{
+			"name": "Glow",
+			"enabled": true,
+			"sim": "CPU",
+			"localSpace": true,
+			"determinism": false,
+			"boundsMode": "Dynamic",
+			"stacks": [
+				{
+					"stage": "Emitter Update",
+					"modules": [
+						{
+							"name": "Emitter State",
+							"id": "EmitterState",
+							"inputs": [
+								{
+									"name": "ScaleSpawnCountCurve",
+									"value": ""
+								},
+								{
+									"name": "Enable Distance Culling",
+									"value": "false"
+								},
+								{
+									"name": "Enable Visibility Culling",
+									"value": "false"
+								},
+								{
+									"name": "Inactive Response",
+									"value": "NewEnumerator0 (Complete (Let Particles Finish then Kill Emitter))"
+								},
+								{
+									"name": "Life Cycle Mode",
+									"value": "NewEnumerator0 (System)"
+								},
+								{
+									"name": "Loop Behavior",
+									"value": "NewEnumerator0 (Infinite)"
+								},
+								{
+									"name": "Loop Duration Mode",
+									"value": "NewEnumerator0 (Fixed)"
+								},
+								{
+									"name": "Scalability Mode",
+									"value": "NewEnumerator0 (System)"
+								},
+								{
+									"name": "Scale Spawn Count",
+									"value": "false"
+								},
+								{
+									"name": "UseLoopDelay",
+									"value": "false"
+								}
+							]
+						},
+						{
+							"name": "Spawn Rate",
+							"id": "SpawnRate",
+							"inputs": [
+								{
+									"name": "Use Spawn Probability",
+									"value": "false"
+								}
+							],
+							"overrides": [
+								{
+									"path": "SpawnRate",
+									"kind": "value",
+									"value": "2.0"
+								}
+							]
+						}
+					],
+					"values": [
+						{
+							"name": "Glow.EmitterState.Loop Delay",
+							"value": "0"
+						},
+						{
+							"name": "Glow.EmitterState.Loop Duration",
+							"value": "1"
+						},
+						{
+							"name": "Glow.EmitterState.MaxDistance",
+							"value": "5000"
+						},
+						{
+							"name": "Glow.EmitterState.MinDistance",
+							"value": "0"
+						},
+						{
+							"name": "Glow.SpawnRate.Spawn Probability",
+							"value": "1"
+						},
+						{
+							"name": "Glow.SpawnRate.SpawnGroup",
+							"value": "0"
+						},
+						{
+							"name": "Glow.SpawnRate.SpawnRate",
+							"value": "1"
+						}
+					]
+				},
+				{
+					"stage": "Particle Spawn",
+					"modules": [
+						{
+							"name": "Initialize Particle",
+							"id": "InitializeParticle",
+							"inputs": [
+								{
+									"name": "AdjustAlpha",
+									"value": "false"
+								},
+								{
+									"name": "AdjustHue",
+									"value": "true"
+								},
+								{
+									"name": "AdjustSaturation",
+									"value": "false"
+								},
+								{
+									"name": "AdjustValue",
+									"value": "false"
+								},
+								{
+									"name": "Color Channel Mode",
+									"value": "NewEnumerator1 (Link RGB / Link A)"
+								},
+								{
+									"name": "Color Mode",
+									"value": "NewEnumerator0 (Unset)"
+								},
+								{
+									"name": "Color Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "Lifetime Mode",
+									"value": "NewEnumerator0 (Direct Set)"
+								},
+								{
+									"name": "Lifetime Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "Mass Mode",
+									"value": "NewEnumerator0 (Unset / (Mass of 1))"
+								},
+								{
+									"name": "Mass Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "Mesh Renderer Array Visibility Mode",
+									"value": "NewEnumerator0 (Unset)"
+								},
+								{
+									"name": "Mesh Scale Mode",
+									"value": "NewEnumerator0 (Unset)"
+								},
+								{
+									"name": "Mesh Scale Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "Position Mode",
+									"value": "NewEnumerator2 (Simulation Position)"
+								},
+								{
+									"name": "Ribbon Facing Mode",
+									"value": "NewEnumerator0 (Unset)"
+								},
+								{
+									"name": "Ribbon Twist Mode",
+									"value": "NewEnumerator0 (Unset)"
+								},
+								{
+									"name": "Ribbon Width Mode",
+									"value": "NewEnumerator0 (Unset)"
+								},
+								{
+									"name": "Sprite Rotation Mode",
+									"value": "NewEnumerator3 (Unset)"
+								},
+								{
+									"name": "Sprite Rotation Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "Sprite Size Mode",
+									"value": "NewEnumerator0 (Unset)"
+								},
+								{
+									"name": "Sprite Size Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "Sprite UV Mode",
+									"value": "NewEnumerator0 (Unset)"
+								},
+								{
+									"name": "Sprite UV Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "UsePositionOffset",
+									"value": "false"
+								},
+								{
+									"name": "Wrap Index By Mesh Count",
+									"value": "true"
+								},
+								{
+									"name": "Write Material Random",
+									"value": "true"
+								}
+							]
+						},
+						{
+							"name": "Mars Glow Spawn Mars NM",
+							"id": "MarsGlowSpawn_Mars_NM",
+							"inputs": [],
+							"overrides": [
+								{
+									"path": "Size",
+									"kind": "linked",
+									"value": "User.Size"
+								},
+								{
+									"path": "Colour",
+									"kind": "linked",
+									"value": "User.Colour"
+								}
+							]
+						}
+					],
+					"values": [
+						{
+							"name": "Glow.DynamicMaterialParameters.Index 0 Param 1",
+							"value": "0"
+						},
+						{
+							"name": "Glow.DynamicMaterialParameters.Index 0 Param 2",
+							"value": "0"
+						},
+						{
+							"name": "Glow.DynamicMaterialParameters.Index 0 Param 3",
+							"value": "0"
+						},
+						{
+							"name": "Glow.DynamicMaterialParameters.Index 0 Param 4",
+							"value": "0"
+						},
+						{
+							"name": "Glow.InitializeParticle.Lifetime",
+							"value": "5"
+						},
+						{
+							"name": "Glow.InitializeParticle.Position Offset",
+							"value": "(0, 0, 0)"
+						},
+						{
+							"name": "Glow.MarsGlowSpawn_Mars_NM.Colour",
+							"value": "RGBA(1, 1, 1, 1)"
+						},
+						{
+							"name": "Glow.MarsGlowSpawn_Mars_NM.Size",
+							"value": "0"
+						},
+						{
+							"name": "Glow.MarsGlowUpdate_Mars_NM.Intensity",
+							"value": "0"
+						},
+						{
+							"name": "Glow.MarsGlowUpdate_Mars_NM.Size",
+							"value": "0"
+						},
+						{
+							"name": "Glow.MarsGlowUpdate_Mars_NM.Wind",
+							"value": "(0, 0, 0)"
+						}
+					]
+				},
+				{
+					"stage": "Particle Update",
+					"modules": [
+						{
+							"name": "Particle State",
+							"id": "ParticleState",
+							"inputs": [
+								{
+									"name": "Kill Particles When Lifetime Has Elapsed",
+									"value": "true"
+								}
+							]
+						},
+						{
+							"name": "Dynamic Material Parameters",
+							"id": "DynamicMaterialParameters",
+							"inputs": [
+								{
+									"name": "Write Parameter Index 0",
+									"value": "NewEnumerator1 (Float)"
+								},
+								{
+									"name": "Write Parameter Index 1",
+									"value": "NewEnumerator0 (Off)"
+								},
+								{
+									"name": "Write Parameter Index 2",
+									"value": "NewEnumerator0 (Off)"
+								},
+								{
+									"name": "Write Parameter Index 3",
+									"value": "NewEnumerator0 (Off)"
+								}
+							]
+						},
+						{
+							"name": "Mars Glow Update Mars NM",
+							"id": "MarsGlowUpdate_Mars_NM",
+							"inputs": [],
+							"overrides": [
+								{
+									"path": "Size",
+									"kind": "linked",
+									"value": "User.Size"
+								},
+								{
+									"path": "Intensity",
+									"kind": "linked",
+									"value": "User.Intensity"
+								},
+								{
+									"path": "Wind",
+									"kind": "linked",
+									"value": "User.Wind"
+								}
+							]
+						}
+					],
+					"values": [
+						{
+							"name": "Glow.DynamicMaterialParameters.Index 0 Param 1",
+							"value": "0"
+						},
+						{
+							"name": "Glow.DynamicMaterialParameters.Index 0 Param 2",
+							"value": "0"
+						},
+						{
+							"name": "Glow.DynamicMaterialParameters.Index 0 Param 3",
+							"value": "0"
+						},
+						{
+							"name": "Glow.DynamicMaterialParameters.Index 0 Param 4",
+							"value": "0"
+						},
+						{
+							"name": "Glow.MarsGlowUpdate_Mars_NM.Intensity",
+							"value": "0"
+						},
+						{
+							"name": "Glow.MarsGlowUpdate_Mars_NM.Size",
+							"value": "0"
+						},
+						{
+							"name": "Glow.MarsGlowUpdate_Mars_NM.Wind",
+							"value": "(0, 0, 0)"
+						}
+					]
+				}
+			],
+			"eventHandlers": [],
+			"lifetimeResolved":
+			{
+				"module": "InitializeParticle",
+				"mode": "NewEnumerator0 (Direct Set)",
+				"source": "direct",
+				"values": [
+					{
+						"name": "Lifetime",
+						"value": "5"
+					}
+				]
+			},
+			"renderers": [
+				{
+					"type": "NiagaraSpriteRendererProperties",
+					"material": "/Game/Mars/Fx/Flame/Materials/FlameGlow_Mars_MI.FlameGlow_Mars_MI",
+					"alignment": "Automatic",
+					"facing": "Automatic",
+					"sortMode": "None"
+				}
+			]
+		}
+	]
+}

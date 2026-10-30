@@ -74,6 +74,8 @@ class UMars_WallTorch_EntityScript : UMars_FlameFixture_EntityScript
         Look.Color = FLinearColor(1.0f, 0.55f, 0.25f, 1.0f);
         Look.IntensityWorld = 7000.0f;
         Look.ShadowsWorld = true;
+        Look.FxSize = 18.0f;
+        Look.FxEmberRate = 6.0f;
         return Look;
     }
 

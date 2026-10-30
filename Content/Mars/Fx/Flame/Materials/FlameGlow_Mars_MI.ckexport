@@ -1,0 +1,186 @@
+{
+	"material": "FlameGlow_Mars_MI",
+	"packagePath": "/Game/Mars/Fx/Flame/Materials/FlameGlow_Mars_MI",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "933d8585703f8da306c9fc35e9961c2f",
+		"exporterVersion": 3
+	},
+	"parentChain": [
+		"/Game/Mars/Fx/Flame/Materials/FlameGlow_Mars_M.FlameGlow_Mars_M"
+	],
+	"blendMode": "BLEND_Additive",
+	"twoSided": true,
+	"unlit": true,
+	"shadingModel": "MSM_Unlit",
+	"domain": "MD_Surface",
+	"connectedOutputs": [],
+	"expressions":
+	{
+		"Custom": 1,
+		"DynamicParameter": 1,
+		"MakeMaterialAttributes": 1,
+		"ParticleColor": 1,
+		"ScalarParameter": 2,
+		"TextureCoordinate": 1
+	},
+	"dynamicParameters": [
+		"Phase",
+		"Age",
+		"Intensity",
+		"Enclosed"
+	],
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_0",
+				"desc": "Emissive strength of the glow's centre.",
+				"props":
+				{
+					"DefaultValue": 0.80000001192092896,
+					"SliderMax": 10,
+					"ParameterName": "Strength",
+					"Group": "Glow",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 1,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_1",
+				"desc": "Higher keeps the glow nearer the flame.",
+				"props":
+				{
+					"DefaultValue": 2.2000000476837158,
+					"SliderMin": 0.5,
+					"SliderMax": 8,
+					"ParameterName": "Falloff",
+					"Group": "Glow",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 2,
+				"class": "TextureCoordinate",
+				"name": "MaterialExpressionTextureCoordinate_0"
+			},
+			{
+				"id": 3,
+				"class": "DynamicParameter",
+				"name": "MaterialExpressionDynamicParameter_0",
+				"outputs": [
+					"Phase",
+					"Age",
+					"Intensity",
+					"Enclosed",
+					"RGB",
+					"RGBA"
+				],
+				"props":
+				{
+					"ParamNames": [
+						"Phase",
+						"Age",
+						"Intensity",
+						"Enclosed"
+					],
+					"DefaultValue": "(R=0.000000,G=0.000000,B=1.000000,A=0.000000)"
+				}
+			},
+			{
+				"id": 4,
+				"class": "ParticleColor",
+				"name": "MaterialExpressionParticleColor_0",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				]
+			},
+			{
+				"id": 5,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "UV",
+						"node": 2,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "Dyn",
+						"node": 3,
+						"output": 0,
+						"mask": "r"
+					},
+					{
+						"index": 2,
+						"name": "PC",
+						"node": 4,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 3,
+						"name": "Strength",
+						"node": 0,
+						"output": 0
+					},
+					{
+						"index": 4,
+						"name": "Falloff",
+						"node": 1,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "float2 q = (UV - 0.5) * 2.0;\nfloat r = saturate(length(q));\nfloat g = pow(saturate(1.0 - r), Falloff);\nfloat age = Dyn.y;\nfloat s = sin(age * 3.14159265);\nreturn PC * g * Strength * s * s * Dyn.z;",
+					"Description": "Flame Glow"
+				}
+			},
+			{
+				"id": 6,
+				"class": "MakeMaterialAttributes",
+				"name": "MaterialExpressionMakeMaterialAttributes_0",
+				"inputs": [
+					{
+						"index": 5,
+						"name": "EmissiveColor",
+						"node": 5,
+						"output": 0
+					}
+				]
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_MaterialAttributes",
+				"node": 6,
+				"output": 0
+			}
+		]
+	},
+	"scalarParams": [
+		{
+			"name": "Strength",
+			"value": 0.80000001192092896
+		},
+		{
+			"name": "Falloff",
+			"value": 2.2000000476837158
+		}
+	],
+	"vectorParams": [],
+	"textureParams": [],
+	"usedTextures": []
+}

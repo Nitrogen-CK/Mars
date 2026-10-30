@@ -9,6 +9,28 @@ namespace constants_lantern_item
     const float64 k_MeshScale = 0.55;
     // The bail's top over the pivot at k_MeshScale: hanging the lantern from a hand or a belt drops it by this much.
     const float64 k_BailHeight = 32.0;
+
+    // The lantern dangles: UMars_Lantern_EntityScript puts a CkSway node (the Bail) at the hang point and hangs the body,
+    // the flame and the light k_BailHeight under it, so the hand's or the belt's motion swings it about the bail. A pendulum
+    // of 32 cm swings at about 0.9 Hz; the spring runs a little faster and underdamped so a step sets it rocking and a
+    // stop lets it settle in a few swings. Rotation only (the bail is a hinge: no location spring), pitch and roll
+    // (the carrier's forward and lateral velocity, lagging it), capped at 25 degrees so a sprint cannot put the lantern on
+    // its side. A mount change is a teleport, not a stimulus (Request_Reset backs it up).
+    FCk_Sway_Spec Make_BailSway()
+    {
+        auto Spec = FCk_Sway_Spec();
+        Spec.Set_Location(FCk_Sway_Response(FVector::ZeroVector, 3.5f, 1.0f));
+        Spec.Set_Rotation(FCk_Sway_Response(FVector(25.0, 25.0, 0.0), 1.4f, 0.25f));
+        Spec.Set_RotationFromAngularVelocity(FVector(0.02, 0.02, 0.0));
+        Spec.Set_LocationFromLinearVelocity(FVector::ZeroVector);
+        Spec.Set_LateralCmFromYawRate(0.0f);
+        Spec.Set_VerticalCmFromPitchRate(0.0f);
+        Spec.Set_RollDegFromLateralVelocity(0.06f);
+        Spec.Set_PitchDegFromForwardVelocity(0.06f);
+        Spec.Set_TeleportDistanceCm(150.0f);
+        Spec.Set_TeleportAngleDeg(90.0f);
+        return Spec;
+    }
 }
 
 asset Mars_ItemDef_Lantern of UCk_InventoryItem_Definition
@@ -46,9 +68,10 @@ asset Mars_ItemDef_Lantern of UCk_InventoryItem_Definition
     Flame.Spec.Enclosure = EMars_Flame_Enclosure::Enclosed;
     Flame.Spec.Lighting = EMars_Flame_Lighting::SelfLighting;
     Flame.Spec.OnStow = EMars_Flame_OnStow::StaysLit;
-    Flame.Spec.Radius.Held = 700.0f;
-    Flame.Spec.Radius.Stowed = 350.0f;
-    Flame.Spec.Radius.World = 900.0f;
+    // Every Mars flame lights the same 800 pool, wherever it is: the belt dims it (IntensityStowed), it does not shrink it.
+    Flame.Spec.Radius.Held = 800.0f;
+    Flame.Spec.Radius.Stowed = 800.0f;
+    Flame.Spec.Radius.World = 800.0f;
     _ItemTraits.Add(Flame);
 
     auto Lantern = Cast<UMars_ItemTrait_Lantern>(NewObject(this, UMars_ItemTrait_Lantern));

@@ -36,7 +36,8 @@ class UMars_FlameItem_EntityScript : UMars_WorldItem_EntityScript
         { return ECk_EntityScript_ConstructionFlow::Finished; }
 
         auto Root = InHandle.As_Transform();
-        auto FlameNode = utils_scene_node::Create(Root, FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, Get_FlameHeight()))).As_Transform();
+        auto FlameParent = Make_FlameParent(Root);
+        auto FlameNode = utils_scene_node::Create(FlameParent, FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, Get_FlameHeight()))).As_Transform();
         utils_handle::Set_DebugName(FlameNode.H(), n"FlameItem.Flame");
 
         _Dressing = Cast<UMars_FlameDressing>(NewObject(this, UMars_FlameDressing));
@@ -61,6 +62,13 @@ class UMars_FlameItem_EntityScript : UMars_WorldItem_EntityScript
     protected float64 Get_FlameHeight() const
     {
         return 0.0;
+    }
+
+    // The transform the flame node (and so the light and the flame effect) hangs under: the item's root, unless a subclass
+    // puts a moving node between them (the lantern's swinging bail). Called before the flame node exists.
+    protected FCk_Handle_Transform Make_FlameParent(FCk_Handle_Transform& InRoot)
+    {
+        return InRoot;
     }
 
     protected FMars_FlameLook Get_Look() const
