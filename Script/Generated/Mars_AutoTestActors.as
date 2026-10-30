@@ -1043,6 +1043,19 @@ class AMars_AutoTest_Brain_SettledGoalSatisfies_Actor : ACk_AutoTestRunner
     }
 }
 
+class AMars_AutoTest_Brazier_AHeldTorchLightsItAndItStaysLit_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 45.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Brazier_AHeldTorchLightsItAndItStaysLit");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
 class AMars_AutoTest_CampMissionGate_InvalidSpecRejectsUnsafeGeometry_Actor : ACk_AutoTestRunner
 {
     UFUNCTION(BlueprintOverride)
@@ -3716,6 +3729,132 @@ class AMars_AutoTest_Dial_TurnFollowsAndSettlesOnTheNearestDetent_Actor : ACk_Au
     }
 }
 
+class AMars_AutoTest_DripLeak_AirModePacksNegativeLength_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 8.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_DripLeak_AirModePacksNegativeLength");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_DripLeak_AMissKeepsTheLastTracedLength_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 8.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_DripLeak_AMissKeepsTheLastTracedLength");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_DripLeak_AttachesUpToTheCeiling_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 8.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_DripLeak_AttachesUpToTheCeiling");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_DripLeak_LandsOnStillWaterAsRingsOnly_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 8.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_DripLeak_LandsOnStillWaterAsRingsOnly");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_DripLeak_StaysOutOfTheJoltBake_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 8.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_DripLeak_StaysOutOfTheJoltBake");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_DripLeak_TracesStrandsDownToTheFloor_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 8.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_DripLeak_TracesStrandsDownToTheFloor");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_DripSchedule_ADropLandsAtTheImpactTime_Actor : ACk_AutoTestRunner
+{
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_DripSchedule_ADropLandsAtTheImpactTime");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_DripSchedule_MatchesTheReferenceTable_Actor : ACk_AutoTestRunner
+{
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_DripSchedule_MatchesTheReferenceTable");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_DripSchedule_ReleasesStayOrderedAndAverageTheRate_Actor : ACk_AutoTestRunner
+{
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_DripSchedule_ReleasesStayOrderedAndAverageTheRate");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_DripSchedule_SlotsNeverOverlapAndWrapSeamlessly_Actor : ACk_AutoTestRunner
+{
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_DripSchedule_SlotsNeverOverlapAndWrapSeamlessly");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
 class AMars_AutoTest_Emote_TagsMapToEveryEmoteAndBack_Actor : ACk_AutoTestRunner
 {
     UFUNCTION(BlueprintOverride)
@@ -3955,6 +4094,135 @@ class AMars_AutoTest_EyesDummy_ComposesAndWrites_Actor : ACk_AutoTestRunner
     TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
     {
         auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_EyesDummy_ComposesAndWrites");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_Fishing_ABiteArrivesInsideTheWaitWindow_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 15.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Fishing_ABiteArrivesInsideTheWaitWindow");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_Fishing_ACastLandsOnTheSurfaceInsideMaxDistance_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 15.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Fishing_ACastLandsOnTheSurfaceInsideMaxDistance");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_Fishing_DisengageDropsTheLine_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 15.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Fishing_DisengageDropsTheLine");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_Fishing_HoldingTheReelShortensTheLineAndARunRaisesTension_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 20.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Fishing_HoldingTheReelShortensTheLineAndARunRaisesTension");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_Fishing_HookInsideTheWindowHooksAndOutsideMisses_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 20.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Fishing_HookInsideTheWindowHooksAndOutsideMisses");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_Fishing_LeaveFadesToGoneAndRefusesACast_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 15.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Fishing_LeaveFadesToGoneAndRefusesACast");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_Fishing_SpecValidateRejectsInvalid_Actor : ACk_AutoTestRunner
+{
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Fishing_SpecValidateRejectsInvalid");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_Fishing_TensionPastSnapSnapsTheLine_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 20.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Fishing_TensionPastSnapSnapsTheLine");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_Fishing_ZeroLineLandsAndCollectTallies_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 20.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Fishing_ZeroLineLandsAndCollectTallies");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_FishingStation_AnOperatorCastsHooksAndReelsThroughTheIntentReader_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 60.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_FishingStation_AnOperatorCastsHooksAndReelsThroughTheIntentReader");
         TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
         ResolvedClass = Path.TryLoadClass();
         return ResolvedClass;
@@ -5439,19 +5707,6 @@ class AMars_AutoTest_Gaze_TargetDestroyedClears_Actor : ACk_AutoTestRunner
     }
 }
 
-class AMars_AutoTest_GroundNavBuildOutcome_DuplicateRestartAndTeardown_Actor : ACk_AutoTestRunner
-{
-    default _TimeoutSeconds = 45.0f;
-    UFUNCTION(BlueprintOverride)
-    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
-    {
-        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_GroundNavBuildOutcome_DuplicateRestartAndTeardown");
-        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
-        ResolvedClass = Path.TryLoadClass();
-        return ResolvedClass;
-    }
-}
-
 class AMars_AutoTest_HandSwing_CancelRecoversFromTheCurrentPose_Actor : ACk_AutoTestRunner
 {
     UFUNCTION(BlueprintOverride)
@@ -5662,6 +5917,19 @@ class AMars_AutoTest_HeldView_MakeMatchesFPHold_Actor : ACk_AutoTestRunner
     TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
     {
         auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_HeldView_MakeMatchesFPHold");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_HeroRoot_StacksModulesToTheFloor_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 15.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_HeroRoot_StacksModulesToTheFloor");
         TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
         ResolvedClass = Path.TryLoadClass();
         return ResolvedClass;
@@ -6135,19 +6403,6 @@ class AMars_AutoTest_InteractPromptDisplay_RefreshAndNonTopRemoval_Actor : ACk_A
     TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
     {
         auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_InteractPromptDisplay_RefreshAndNonTopRemoval");
-        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
-        ResolvedClass = Path.TryLoadClass();
-        return ResolvedClass;
-    }
-}
-
-class AMars_AutoTest_JoltComponentAdmission_TracksRegisteredBodies_Actor : ACk_AutoTestRunner
-{
-    default _TimeoutSeconds = 20.0f;
-    UFUNCTION(BlueprintOverride)
-    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
-    {
-        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_JoltComponentAdmission_TracksRegisteredBodies");
         TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
         ResolvedClass = Path.TryLoadClass();
         return ResolvedClass;
@@ -7196,6 +7451,19 @@ class AMars_AutoTest_PlayerViewpoint_EachHolderKeepsItsOwnHold_Actor : ACk_AutoT
     }
 }
 
+class AMars_AutoTest_Puddle_ReseedChangesShapesNotCount_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 8.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Puddle_ReseedChangesShapesNotCount");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
 class AMars_AutoTest_Resting_BoxOnAKinematicPlateRestsHopsAndSleeps_Actor : ACk_AutoTestRunner
 {
     default _TimeoutSeconds = 12.0f;
@@ -7488,6 +7756,19 @@ class AMars_AutoTest_Station_ViewLocalMakesAViewNode_Actor : ACk_AutoTestRunner
     TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
     {
         auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Station_ViewLocalMakesAViewNode");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_StillWater_WritesSerializedCustomData_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 8.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_StillWater_WritesSerializedCustomData");
         TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
         ResolvedClass = Path.TryLoadClass();
         return ResolvedClass;
@@ -7904,6 +8185,188 @@ class AMars_AutoTest_TumblerStation_LeavingMidGripSendsTheDrumHome_Actor : ACk_A
     TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
     {
         auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_TumblerStation_LeavingMidGripSendsTheDrumHome");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_Vine_AirDropEndsInsideItsClearance_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 15.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Vine_AirDropEndsInsideItsClearance");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_Vine_CurtainWrapsTheLipAndHangsEveryStrand_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 15.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Vine_CurtainWrapsTheLipAndHangsEveryStrand");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_Vine_GroundedDropReachesAndCreepsAlongTheFloor_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 15.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Vine_GroundedDropReachesAndCreepsAlongTheFloor");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_Vine_PatchHangsStrandsFromTheUnderside_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 15.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Vine_PatchHangsStrandsFromTheUnderside");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_Vine_ProfileValidateRejectsEachBadRange_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 15.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Vine_ProfileValidateRejectsEachBadRange");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_Vine_RebuildReplacesItsComponentsInsteadOfAddingThem_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 15.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Vine_RebuildReplacesItsComponentsInsteadOfAddingThem");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_Vine_RootFramesNeverFlipBetweenSegments_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 15.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Vine_RootFramesNeverFlipBetweenSegments");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_Vine_SameSeedSameVineOtherSeedOtherVine_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 15.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Vine_SameSeedSameVineOtherSeedOtherVine");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_Vine_SplineClingsToANearWallAndStaysFreeFarFromIt_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 15.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Vine_SplineClingsToANearWallAndStaysFreeFarFromIt");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_Vine_TwinStrandRootTwistsAndStaysInsideItsBudgets_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 15.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Vine_TwinStrandRootTwistsAndStaysInsideItsBudgets");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_Vine_UnchangedInputsReuseTheSolveWithoutTracing_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 15.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Vine_UnchangedInputsReuseTheSolveWithoutTracing");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_Vine_UncollidingVineCarriesTheJoltNoBakeTag_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 15.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Vine_UncollidingVineCarriesTheJoltNoBakeTag");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_Vine_WrapCoilsRoundThePierAtItsStandOff_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 15.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Vine_WrapCoilsRoundThePierAtItsStandOff");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_WetStreak_TracesWallToFloor_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 8.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_WetStreak_TracesWallToFloor");
         TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
         ResolvedClass = Path.TryLoadClass();
         return ResolvedClass;

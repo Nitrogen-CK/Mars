@@ -2153,6 +2153,19 @@ namespace UMars_AutoTest_Brain_SettledGoalSatisfies
 }
 
 USTRUCT()
+struct FMars_AutoTest_Brazier_AHeldTorchLightsItAndItStaysLit_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Brazier_AHeldTorchLightsItAndItStaysLit
+{
+    FMars_AutoTest_Brazier_AHeldTorchLightsItAndItStaysLit_SpawnParams Params()
+    {
+        return FMars_AutoTest_Brazier_AHeldTorchLightsItAndItStaysLit_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_CampMissionGate_InvalidSpecRejectsUnsafeGeometry_SpawnParams
 {
 }
@@ -4922,6 +4935,136 @@ namespace UMars_AutoTest_Dial_TurnFollowsAndSettlesOnTheNearestDetent
 }
 
 USTRUCT()
+struct FMars_AutoTest_DripLeak_AirModePacksNegativeLength_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_DripLeak_AirModePacksNegativeLength
+{
+    FMars_AutoTest_DripLeak_AirModePacksNegativeLength_SpawnParams Params()
+    {
+        return FMars_AutoTest_DripLeak_AirModePacksNegativeLength_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_DripLeak_AMissKeepsTheLastTracedLength_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_DripLeak_AMissKeepsTheLastTracedLength
+{
+    FMars_AutoTest_DripLeak_AMissKeepsTheLastTracedLength_SpawnParams Params()
+    {
+        return FMars_AutoTest_DripLeak_AMissKeepsTheLastTracedLength_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_DripLeak_AttachesUpToTheCeiling_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_DripLeak_AttachesUpToTheCeiling
+{
+    FMars_AutoTest_DripLeak_AttachesUpToTheCeiling_SpawnParams Params()
+    {
+        return FMars_AutoTest_DripLeak_AttachesUpToTheCeiling_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_DripLeak_LandsOnStillWaterAsRingsOnly_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_DripLeak_LandsOnStillWaterAsRingsOnly
+{
+    FMars_AutoTest_DripLeak_LandsOnStillWaterAsRingsOnly_SpawnParams Params()
+    {
+        return FMars_AutoTest_DripLeak_LandsOnStillWaterAsRingsOnly_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_DripLeak_StaysOutOfTheJoltBake_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_DripLeak_StaysOutOfTheJoltBake
+{
+    FMars_AutoTest_DripLeak_StaysOutOfTheJoltBake_SpawnParams Params()
+    {
+        return FMars_AutoTest_DripLeak_StaysOutOfTheJoltBake_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_DripLeak_TracesStrandsDownToTheFloor_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_DripLeak_TracesStrandsDownToTheFloor
+{
+    FMars_AutoTest_DripLeak_TracesStrandsDownToTheFloor_SpawnParams Params()
+    {
+        return FMars_AutoTest_DripLeak_TracesStrandsDownToTheFloor_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_DripSchedule_ADropLandsAtTheImpactTime_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_DripSchedule_ADropLandsAtTheImpactTime
+{
+    FMars_AutoTest_DripSchedule_ADropLandsAtTheImpactTime_SpawnParams Params()
+    {
+        return FMars_AutoTest_DripSchedule_ADropLandsAtTheImpactTime_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_DripSchedule_MatchesTheReferenceTable_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_DripSchedule_MatchesTheReferenceTable
+{
+    FMars_AutoTest_DripSchedule_MatchesTheReferenceTable_SpawnParams Params()
+    {
+        return FMars_AutoTest_DripSchedule_MatchesTheReferenceTable_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_DripSchedule_ReleasesStayOrderedAndAverageTheRate_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_DripSchedule_ReleasesStayOrderedAndAverageTheRate
+{
+    FMars_AutoTest_DripSchedule_ReleasesStayOrderedAndAverageTheRate_SpawnParams Params()
+    {
+        return FMars_AutoTest_DripSchedule_ReleasesStayOrderedAndAverageTheRate_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_DripSchedule_SlotsNeverOverlapAndWrapSeamlessly_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_DripSchedule_SlotsNeverOverlapAndWrapSeamlessly
+{
+    FMars_AutoTest_DripSchedule_SlotsNeverOverlapAndWrapSeamlessly_SpawnParams Params()
+    {
+        return FMars_AutoTest_DripSchedule_SlotsNeverOverlapAndWrapSeamlessly_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_Emote_TagsMapToEveryEmoteAndBack_SpawnParams
 {
 }
@@ -5230,6 +5373,136 @@ namespace UMars_AutoTest_EyesDummy_ComposesAndWrites
     FMars_AutoTest_EyesDummy_ComposesAndWrites_SpawnParams Params()
     {
         return FMars_AutoTest_EyesDummy_ComposesAndWrites_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Fishing_ABiteArrivesInsideTheWaitWindow_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Fishing_ABiteArrivesInsideTheWaitWindow
+{
+    FMars_AutoTest_Fishing_ABiteArrivesInsideTheWaitWindow_SpawnParams Params()
+    {
+        return FMars_AutoTest_Fishing_ABiteArrivesInsideTheWaitWindow_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Fishing_ACastLandsOnTheSurfaceInsideMaxDistance_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Fishing_ACastLandsOnTheSurfaceInsideMaxDistance
+{
+    FMars_AutoTest_Fishing_ACastLandsOnTheSurfaceInsideMaxDistance_SpawnParams Params()
+    {
+        return FMars_AutoTest_Fishing_ACastLandsOnTheSurfaceInsideMaxDistance_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Fishing_DisengageDropsTheLine_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Fishing_DisengageDropsTheLine
+{
+    FMars_AutoTest_Fishing_DisengageDropsTheLine_SpawnParams Params()
+    {
+        return FMars_AutoTest_Fishing_DisengageDropsTheLine_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Fishing_HoldingTheReelShortensTheLineAndARunRaisesTension_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Fishing_HoldingTheReelShortensTheLineAndARunRaisesTension
+{
+    FMars_AutoTest_Fishing_HoldingTheReelShortensTheLineAndARunRaisesTension_SpawnParams Params()
+    {
+        return FMars_AutoTest_Fishing_HoldingTheReelShortensTheLineAndARunRaisesTension_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Fishing_HookInsideTheWindowHooksAndOutsideMisses_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Fishing_HookInsideTheWindowHooksAndOutsideMisses
+{
+    FMars_AutoTest_Fishing_HookInsideTheWindowHooksAndOutsideMisses_SpawnParams Params()
+    {
+        return FMars_AutoTest_Fishing_HookInsideTheWindowHooksAndOutsideMisses_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Fishing_LeaveFadesToGoneAndRefusesACast_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Fishing_LeaveFadesToGoneAndRefusesACast
+{
+    FMars_AutoTest_Fishing_LeaveFadesToGoneAndRefusesACast_SpawnParams Params()
+    {
+        return FMars_AutoTest_Fishing_LeaveFadesToGoneAndRefusesACast_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Fishing_SpecValidateRejectsInvalid_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Fishing_SpecValidateRejectsInvalid
+{
+    FMars_AutoTest_Fishing_SpecValidateRejectsInvalid_SpawnParams Params()
+    {
+        return FMars_AutoTest_Fishing_SpecValidateRejectsInvalid_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Fishing_TensionPastSnapSnapsTheLine_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Fishing_TensionPastSnapSnapsTheLine
+{
+    FMars_AutoTest_Fishing_TensionPastSnapSnapsTheLine_SpawnParams Params()
+    {
+        return FMars_AutoTest_Fishing_TensionPastSnapSnapsTheLine_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Fishing_ZeroLineLandsAndCollectTallies_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Fishing_ZeroLineLandsAndCollectTallies
+{
+    FMars_AutoTest_Fishing_ZeroLineLandsAndCollectTallies_SpawnParams Params()
+    {
+        return FMars_AutoTest_Fishing_ZeroLineLandsAndCollectTallies_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_FishingStation_AnOperatorCastsHooksAndReelsThroughTheIntentReader_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_FishingStation_AnOperatorCastsHooksAndReelsThroughTheIntentReader
+{
+    FMars_AutoTest_FishingStation_AnOperatorCastsHooksAndReelsThroughTheIntentReader_SpawnParams Params()
+    {
+        return FMars_AutoTest_FishingStation_AnOperatorCastsHooksAndReelsThroughTheIntentReader_SpawnParams();
     }
 }
 
@@ -6820,45 +7093,6 @@ namespace UMars_AutoTest_Gaze_TargetWithoutHeadEnsures
 }
 
 USTRUCT()
-struct FMars_AutoTest_GroundNavBuildOutcome_DuplicateRestartAndTeardown_SpawnParams
-{
-}
-
-namespace UMars_AutoTest_GroundNavBuildOutcome_DuplicateRestartAndTeardown
-{
-    FMars_AutoTest_GroundNavBuildOutcome_DuplicateRestartAndTeardown_SpawnParams Params()
-    {
-        return FMars_AutoTest_GroundNavBuildOutcome_DuplicateRestartAndTeardown_SpawnParams();
-    }
-}
-
-USTRUCT()
-struct FMars_AutoTest_GroundNavBuildOutcome_NonStaleFailure_SpawnParams
-{
-}
-
-namespace UMars_AutoTest_GroundNavBuildOutcome_NonStaleFailure
-{
-    FMars_AutoTest_GroundNavBuildOutcome_NonStaleFailure_SpawnParams Params()
-    {
-        return FMars_AutoTest_GroundNavBuildOutcome_NonStaleFailure_SpawnParams();
-    }
-}
-
-USTRUCT()
-struct FMars_AutoTest_GroundNavBuildOutcome_StaleAndRetry_SpawnParams
-{
-}
-
-namespace UMars_AutoTest_GroundNavBuildOutcome_StaleAndRetry
-{
-    FMars_AutoTest_GroundNavBuildOutcome_StaleAndRetry_SpawnParams Params()
-    {
-        return FMars_AutoTest_GroundNavBuildOutcome_StaleAndRetry_SpawnParams();
-    }
-}
-
-USTRUCT()
 struct FMars_AutoTest_HandSwing_CancelRecoversFromTheCurrentPose_SpawnParams
 {
 }
@@ -7102,6 +7336,19 @@ namespace UMars_AutoTest_HeldView_MakeMatchesFPHold
     FMars_AutoTest_HeldView_MakeMatchesFPHold_SpawnParams Params()
     {
         return FMars_AutoTest_HeldView_MakeMatchesFPHold_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_HeroRoot_StacksModulesToTheFloor_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_HeroRoot_StacksModulesToTheFloor
+{
+    FMars_AutoTest_HeroRoot_StacksModulesToTheFloor_SpawnParams Params()
+    {
+        return FMars_AutoTest_HeroRoot_StacksModulesToTheFloor_SpawnParams();
     }
 }
 
@@ -7648,19 +7895,6 @@ namespace UMars_AutoTest_InteractPromptDisplay_RefreshAndNonTopRemoval
     FMars_AutoTest_InteractPromptDisplay_RefreshAndNonTopRemoval_SpawnParams Params()
     {
         return FMars_AutoTest_InteractPromptDisplay_RefreshAndNonTopRemoval_SpawnParams();
-    }
-}
-
-USTRUCT()
-struct FMars_AutoTest_JoltComponentAdmission_TracksRegisteredBodies_SpawnParams
-{
-}
-
-namespace UMars_AutoTest_JoltComponentAdmission_TracksRegisteredBodies
-{
-    FMars_AutoTest_JoltComponentAdmission_TracksRegisteredBodies_SpawnParams Params()
-    {
-        return FMars_AutoTest_JoltComponentAdmission_TracksRegisteredBodies_SpawnParams();
     }
 }
 
@@ -8952,6 +9186,19 @@ namespace UMars_AutoTest_PlayerViewpoint_EachHolderKeepsItsOwnHold
 }
 
 USTRUCT()
+struct FMars_AutoTest_Puddle_ReseedChangesShapesNotCount_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Puddle_ReseedChangesShapesNotCount
+{
+    FMars_AutoTest_Puddle_ReseedChangesShapesNotCount_SpawnParams Params()
+    {
+        return FMars_AutoTest_Puddle_ReseedChangesShapesNotCount_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_Resting_BoxOnAKinematicPlateRestsHopsAndSleeps_SpawnParams
 {
 }
@@ -9784,6 +10031,19 @@ namespace UMars_AutoTest_Station_ViewLocalMakesAViewNode
 }
 
 USTRUCT()
+struct FMars_AutoTest_StillWater_WritesSerializedCustomData_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_StillWater_WritesSerializedCustomData
+{
+    FMars_AutoTest_StillWater_WritesSerializedCustomData_SpawnParams Params()
+    {
+        return FMars_AutoTest_StillWater_WritesSerializedCustomData_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_SurfaceFx_GaitEmitsOncePerIncrement_SpawnParams
 {
 }
@@ -10209,6 +10469,188 @@ namespace UMars_AutoTest_TumblerStation_LeavingMidGripSendsTheDrumHome
     FMars_AutoTest_TumblerStation_LeavingMidGripSendsTheDrumHome_SpawnParams Params()
     {
         return FMars_AutoTest_TumblerStation_LeavingMidGripSendsTheDrumHome_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Vine_AirDropEndsInsideItsClearance_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Vine_AirDropEndsInsideItsClearance
+{
+    FMars_AutoTest_Vine_AirDropEndsInsideItsClearance_SpawnParams Params()
+    {
+        return FMars_AutoTest_Vine_AirDropEndsInsideItsClearance_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Vine_CurtainWrapsTheLipAndHangsEveryStrand_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Vine_CurtainWrapsTheLipAndHangsEveryStrand
+{
+    FMars_AutoTest_Vine_CurtainWrapsTheLipAndHangsEveryStrand_SpawnParams Params()
+    {
+        return FMars_AutoTest_Vine_CurtainWrapsTheLipAndHangsEveryStrand_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Vine_GroundedDropReachesAndCreepsAlongTheFloor_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Vine_GroundedDropReachesAndCreepsAlongTheFloor
+{
+    FMars_AutoTest_Vine_GroundedDropReachesAndCreepsAlongTheFloor_SpawnParams Params()
+    {
+        return FMars_AutoTest_Vine_GroundedDropReachesAndCreepsAlongTheFloor_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Vine_PatchHangsStrandsFromTheUnderside_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Vine_PatchHangsStrandsFromTheUnderside
+{
+    FMars_AutoTest_Vine_PatchHangsStrandsFromTheUnderside_SpawnParams Params()
+    {
+        return FMars_AutoTest_Vine_PatchHangsStrandsFromTheUnderside_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Vine_ProfileValidateRejectsEachBadRange_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Vine_ProfileValidateRejectsEachBadRange
+{
+    FMars_AutoTest_Vine_ProfileValidateRejectsEachBadRange_SpawnParams Params()
+    {
+        return FMars_AutoTest_Vine_ProfileValidateRejectsEachBadRange_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Vine_RebuildReplacesItsComponentsInsteadOfAddingThem_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Vine_RebuildReplacesItsComponentsInsteadOfAddingThem
+{
+    FMars_AutoTest_Vine_RebuildReplacesItsComponentsInsteadOfAddingThem_SpawnParams Params()
+    {
+        return FMars_AutoTest_Vine_RebuildReplacesItsComponentsInsteadOfAddingThem_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Vine_RootFramesNeverFlipBetweenSegments_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Vine_RootFramesNeverFlipBetweenSegments
+{
+    FMars_AutoTest_Vine_RootFramesNeverFlipBetweenSegments_SpawnParams Params()
+    {
+        return FMars_AutoTest_Vine_RootFramesNeverFlipBetweenSegments_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Vine_SameSeedSameVineOtherSeedOtherVine_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Vine_SameSeedSameVineOtherSeedOtherVine
+{
+    FMars_AutoTest_Vine_SameSeedSameVineOtherSeedOtherVine_SpawnParams Params()
+    {
+        return FMars_AutoTest_Vine_SameSeedSameVineOtherSeedOtherVine_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Vine_SplineClingsToANearWallAndStaysFreeFarFromIt_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Vine_SplineClingsToANearWallAndStaysFreeFarFromIt
+{
+    FMars_AutoTest_Vine_SplineClingsToANearWallAndStaysFreeFarFromIt_SpawnParams Params()
+    {
+        return FMars_AutoTest_Vine_SplineClingsToANearWallAndStaysFreeFarFromIt_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Vine_TwinStrandRootTwistsAndStaysInsideItsBudgets_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Vine_TwinStrandRootTwistsAndStaysInsideItsBudgets
+{
+    FMars_AutoTest_Vine_TwinStrandRootTwistsAndStaysInsideItsBudgets_SpawnParams Params()
+    {
+        return FMars_AutoTest_Vine_TwinStrandRootTwistsAndStaysInsideItsBudgets_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Vine_UnchangedInputsReuseTheSolveWithoutTracing_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Vine_UnchangedInputsReuseTheSolveWithoutTracing
+{
+    FMars_AutoTest_Vine_UnchangedInputsReuseTheSolveWithoutTracing_SpawnParams Params()
+    {
+        return FMars_AutoTest_Vine_UnchangedInputsReuseTheSolveWithoutTracing_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Vine_UncollidingVineCarriesTheJoltNoBakeTag_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Vine_UncollidingVineCarriesTheJoltNoBakeTag
+{
+    FMars_AutoTest_Vine_UncollidingVineCarriesTheJoltNoBakeTag_SpawnParams Params()
+    {
+        return FMars_AutoTest_Vine_UncollidingVineCarriesTheJoltNoBakeTag_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Vine_WrapCoilsRoundThePierAtItsStandOff_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Vine_WrapCoilsRoundThePierAtItsStandOff
+{
+    FMars_AutoTest_Vine_WrapCoilsRoundThePierAtItsStandOff_SpawnParams Params()
+    {
+        return FMars_AutoTest_Vine_WrapCoilsRoundThePierAtItsStandOff_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_WetStreak_TracesWallToFloor_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_WetStreak_TracesWallToFloor
+{
+    FMars_AutoTest_WetStreak_TracesWallToFloor_SpawnParams Params()
+    {
+        return FMars_AutoTest_WetStreak_TracesWallToFloor_SpawnParams();
     }
 }
 
@@ -11165,6 +11607,47 @@ namespace UMars_BellkeeperClue_EntityScript
 }
 
 USTRUCT()
+struct FMars_Brazier_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_Flame_Spec Flame;
+
+    UPROPERTY()
+    FMars_MechanismSource_Spec Source = FMars_MechanismSource_Spec();
+
+    UPROPERTY()
+    FText Name = FText::FromString("");
+
+    UPROPERTY()
+    EMars_Flame_Ignition StartLit = EMars_Flame_Ignition::Snuffed;
+
+    FMars_Brazier_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Flame_Spec InFlame, FMars_MechanismSource_Spec InSource, FText InName, EMars_Flame_Ignition InStartLit)
+    {
+        SpawnTransform = InSpawnTransform;
+        Flame = InFlame;
+        Source = InSource;
+        Name = InName;
+        StartLit = InStartLit;
+    }
+}
+
+namespace UMars_Brazier_EntityScript
+{
+    FMars_Brazier_EntityScript_SpawnParams Params()
+    {
+        return FMars_Brazier_EntityScript_SpawnParams();
+    }
+
+    FMars_Brazier_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Flame_Spec InFlame, FMars_MechanismSource_Spec InSource, FText InName, EMars_Flame_Ignition InStartLit)
+    {
+        return FMars_Brazier_EntityScript_SpawnParams(InSpawnTransform, InFlame, InSource, InName, InStartLit);
+    }
+}
+
+USTRUCT()
 struct FMars_CameraLayer_CampService_SpawnParams
 {
 }
@@ -11983,6 +12466,39 @@ namespace UMars_EyesDummy_EntityScript
 }
 
 USTRUCT()
+struct FMars_FishingStation_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_Station_Spec Station;
+
+    UPROPERTY()
+    FMars_Fishing_Spec Fishing;
+
+    FMars_FishingStation_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Station_Spec InStation, FMars_Fishing_Spec InFishing)
+    {
+        SpawnTransform = InSpawnTransform;
+        Station = InStation;
+        Fishing = InFishing;
+    }
+}
+
+namespace UMars_FishingStation_EntityScript
+{
+    FMars_FishingStation_EntityScript_SpawnParams Params()
+    {
+        return FMars_FishingStation_EntityScript_SpawnParams();
+    }
+
+    FMars_FishingStation_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Station_Spec InStation, FMars_Fishing_Spec InFishing)
+    {
+        return FMars_FishingStation_EntityScript_SpawnParams(InSpawnTransform, InStation, InFishing);
+    }
+}
+
+USTRUCT()
 struct FMars_FlameItem_EntityScript_SpawnParams
 {
     UPROPERTY()
@@ -12162,6 +12678,67 @@ namespace UMars_FoodItem_EntityScript
     FMars_FoodItem_EntityScript_SpawnParams Params(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg, FMars_WorldItem_Arrival InArriveFrom)
     {
         return FMars_FoodItem_EntityScript_SpawnParams(InSpawnTransform, InDefinition, InMode, InAttachTo, InAttachOffset, InSourceItem, InSourceInventory, InLaunchVelocity, InAngularVelocityDeg, InArriveFrom);
+    }
+}
+
+USTRUCT()
+struct FMars_FoodItem_Fish_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    TSoftObjectPtr<UCk_InventoryItem_Definition> Definition = nullptr;
+
+    UPROPERTY()
+    EMars_WorldItem_Mode Mode = EMars_WorldItem_Mode::World;
+
+    UPROPERTY()
+    FCk_Handle AttachTo = FCk_Handle();
+
+    UPROPERTY()
+    FTransform AttachOffset = FTransform::Identity;
+
+    UPROPERTY()
+    FCk_Handle_Item SourceItem = FCk_Handle_Item();
+
+    UPROPERTY()
+    FCk_Handle_Inventory SourceInventory = FCk_Handle_Inventory();
+
+    UPROPERTY()
+    FVector LaunchVelocity = FVector::ZeroVector;
+
+    UPROPERTY()
+    FVector AngularVelocityDeg = FVector::ZeroVector;
+
+    UPROPERTY()
+    FMars_WorldItem_Arrival ArriveFrom = FMars_WorldItem_Arrival();
+
+    FMars_FoodItem_Fish_EntityScript_SpawnParams(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg, FMars_WorldItem_Arrival InArriveFrom)
+    {
+        SpawnTransform = InSpawnTransform;
+        Definition = InDefinition;
+        Mode = InMode;
+        AttachTo = InAttachTo;
+        AttachOffset = InAttachOffset;
+        SourceItem = InSourceItem;
+        SourceInventory = InSourceInventory;
+        LaunchVelocity = InLaunchVelocity;
+        AngularVelocityDeg = InAngularVelocityDeg;
+        ArriveFrom = InArriveFrom;
+    }
+}
+
+namespace UMars_FoodItem_Fish_EntityScript
+{
+    FMars_FoodItem_Fish_EntityScript_SpawnParams Params()
+    {
+        return FMars_FoodItem_Fish_EntityScript_SpawnParams();
+    }
+
+    FMars_FoodItem_Fish_EntityScript_SpawnParams Params(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg, FMars_WorldItem_Arrival InArriveFrom)
+    {
+        return FMars_FoodItem_Fish_EntityScript_SpawnParams(InSpawnTransform, InDefinition, InMode, InAttachTo, InAttachOffset, InSourceItem, InSourceInventory, InLaunchVelocity, InAngularVelocityDeg, InArriveFrom);
     }
 }
 
@@ -17506,6 +18083,97 @@ namespace UMars_SmCondition_CrouchPressed
 }
 
 USTRUCT()
+struct FMars_SmCondition_FishingIsBite_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_FishingIsBite
+{
+    FMars_SmCondition_FishingIsBite_SpawnParams Params()
+    {
+        return FMars_SmCondition_FishingIsBite_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmCondition_FishingIsCasting_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_FishingIsCasting
+{
+    FMars_SmCondition_FishingIsCasting_SpawnParams Params()
+    {
+        return FMars_SmCondition_FishingIsCasting_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmCondition_FishingIsFighting_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_FishingIsFighting
+{
+    FMars_SmCondition_FishingIsFighting_SpawnParams Params()
+    {
+        return FMars_SmCondition_FishingIsFighting_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmCondition_FishingIsIdle_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_FishingIsIdle
+{
+    FMars_SmCondition_FishingIsIdle_SpawnParams Params()
+    {
+        return FMars_SmCondition_FishingIsIdle_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmCondition_FishingIsLanded_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_FishingIsLanded
+{
+    FMars_SmCondition_FishingIsLanded_SpawnParams Params()
+    {
+        return FMars_SmCondition_FishingIsLanded_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmCondition_FishingIsSnapped_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_FishingIsSnapped
+{
+    FMars_SmCondition_FishingIsSnapped_SpawnParams Params()
+    {
+        return FMars_SmCondition_FishingIsSnapped_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmCondition_FishingIsWaiting_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_FishingIsWaiting
+{
+    FMars_SmCondition_FishingIsWaiting_SpawnParams Params()
+    {
+        return FMars_SmCondition_FishingIsWaiting_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_SmCondition_HandsPhaseElapsed_SpawnParams
 {
 }
@@ -18399,6 +19067,123 @@ namespace UMars_SmState_ExitAndTerminate
     FMars_SmState_ExitAndTerminate_SpawnParams Params()
     {
         return FMars_SmState_ExitAndTerminate_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmState_Fishing_Aiming_SpawnParams
+{
+}
+
+namespace UMars_SmState_Fishing_Aiming
+{
+    FMars_SmState_Fishing_Aiming_SpawnParams Params()
+    {
+        return FMars_SmState_Fishing_Aiming_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmState_Fishing_Bite_SpawnParams
+{
+}
+
+namespace UMars_SmState_Fishing_Bite
+{
+    FMars_SmState_Fishing_Bite_SpawnParams Params()
+    {
+        return FMars_SmState_Fishing_Bite_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmState_Fishing_Casting_SpawnParams
+{
+}
+
+namespace UMars_SmState_Fishing_Casting
+{
+    FMars_SmState_Fishing_Casting_SpawnParams Params()
+    {
+        return FMars_SmState_Fishing_Casting_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmState_Fishing_Fighting_SpawnParams
+{
+}
+
+namespace UMars_SmState_Fishing_Fighting
+{
+    FMars_SmState_Fishing_Fighting_SpawnParams Params()
+    {
+        return FMars_SmState_Fishing_Fighting_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmState_Fishing_Idle_SpawnParams
+{
+}
+
+namespace UMars_SmState_Fishing_Idle
+{
+    FMars_SmState_Fishing_Idle_SpawnParams Params()
+    {
+        return FMars_SmState_Fishing_Idle_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmState_Fishing_Landing_SpawnParams
+{
+}
+
+namespace UMars_SmState_Fishing_Landing
+{
+    FMars_SmState_Fishing_Landing_SpawnParams Params()
+    {
+        return FMars_SmState_Fishing_Landing_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmState_Fishing_Operated_SpawnParams
+{
+}
+
+namespace UMars_SmState_Fishing_Operated
+{
+    FMars_SmState_Fishing_Operated_SpawnParams Params()
+    {
+        return FMars_SmState_Fishing_Operated_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmState_Fishing_Snapped_SpawnParams
+{
+}
+
+namespace UMars_SmState_Fishing_Snapped
+{
+    FMars_SmState_Fishing_Snapped_SpawnParams Params()
+    {
+        return FMars_SmState_Fishing_Snapped_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmState_Fishing_Waiting_SpawnParams
+{
+}
+
+namespace UMars_SmState_Fishing_Waiting
+{
+    FMars_SmState_Fishing_Waiting_SpawnParams Params()
+    {
+        return FMars_SmState_Fishing_Waiting_SpawnParams();
     }
 }
 
@@ -19465,6 +20250,84 @@ namespace UMars_SmTask_EndInteraction_Succeeded
     FMars_SmTask_EndInteraction_Succeeded_SpawnParams Params()
     {
         return FMars_SmTask_EndInteraction_Succeeded_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_Fishing_Engage_SpawnParams
+{
+}
+
+namespace UMars_SmTask_Fishing_Engage
+{
+    FMars_SmTask_Fishing_Engage_SpawnParams Params()
+    {
+        return FMars_SmTask_Fishing_Engage_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_Fishing_Land_SpawnParams
+{
+}
+
+namespace UMars_SmTask_Fishing_Land
+{
+    FMars_SmTask_Fishing_Land_SpawnParams Params()
+    {
+        return FMars_SmTask_Fishing_Land_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_Fishing_OperatorHints_SpawnParams
+{
+}
+
+namespace UMars_SmTask_Fishing_OperatorHints
+{
+    FMars_SmTask_Fishing_OperatorHints_SpawnParams Params()
+    {
+        return FMars_SmTask_Fishing_OperatorHints_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_Fishing_OperatorInput_SpawnParams
+{
+}
+
+namespace UMars_SmTask_Fishing_OperatorInput
+{
+    FMars_SmTask_Fishing_OperatorInput_SpawnParams Params()
+    {
+        return FMars_SmTask_Fishing_OperatorInput_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_Fishing_Phases_SpawnParams
+{
+}
+
+namespace UMars_SmTask_Fishing_Phases
+{
+    FMars_SmTask_Fishing_Phases_SpawnParams Params()
+    {
+        return FMars_SmTask_Fishing_Phases_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_Fishing_SnapBeat_SpawnParams
+{
+}
+
+namespace UMars_SmTask_Fishing_SnapBeat
+{
+    FMars_SmTask_Fishing_SnapBeat_SpawnParams Params()
+    {
+        return FMars_SmTask_Fishing_SnapBeat_SpawnParams();
     }
 }
 
@@ -21187,6 +22050,47 @@ namespace UMars_Torch_EntityScript
     FMars_Torch_EntityScript_SpawnParams Params(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg, FMars_WorldItem_Arrival InArriveFrom)
     {
         return FMars_Torch_EntityScript_SpawnParams(InSpawnTransform, InDefinition, InMode, InAttachTo, InAttachOffset, InSourceItem, InSourceInventory, InLaunchVelocity, InAngularVelocityDeg, InArriveFrom);
+    }
+}
+
+USTRUCT()
+struct FMars_TorchSconce_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_Flame_Spec Flame;
+
+    UPROPERTY()
+    FMars_MechanismSource_Spec Source = FMars_MechanismSource_Spec();
+
+    UPROPERTY()
+    FText Name = FText::FromString("");
+
+    UPROPERTY()
+    EMars_Flame_Ignition StartLit = EMars_Flame_Ignition::Snuffed;
+
+    FMars_TorchSconce_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Flame_Spec InFlame, FMars_MechanismSource_Spec InSource, FText InName, EMars_Flame_Ignition InStartLit)
+    {
+        SpawnTransform = InSpawnTransform;
+        Flame = InFlame;
+        Source = InSource;
+        Name = InName;
+        StartLit = InStartLit;
+    }
+}
+
+namespace UMars_TorchSconce_EntityScript
+{
+    FMars_TorchSconce_EntityScript_SpawnParams Params()
+    {
+        return FMars_TorchSconce_EntityScript_SpawnParams();
+    }
+
+    FMars_TorchSconce_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Flame_Spec InFlame, FMars_MechanismSource_Spec InSource, FText InName, EMars_Flame_Ignition InStartLit)
+    {
+        return FMars_TorchSconce_EntityScript_SpawnParams(InSpawnTransform, InFlame, InSource, InName, InStartLit);
     }
 }
 
