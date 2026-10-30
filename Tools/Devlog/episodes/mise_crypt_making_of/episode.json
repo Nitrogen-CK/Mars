@@ -1,0 +1,702 @@
+{
+ "version": 1,
+ "title": "Mise en Monstre - Making of: the crypt kit",
+ "output": {
+  "width": 1920,
+  "height": 1080,
+  "fps": 30,
+  "crf": 18,
+  "preset": "slow",
+  "progress_bar": true
+ },
+ "theme": "default",
+ "media_root": "D:/Repo/Content/Devlog/mise_crypt",
+ "transitions": {
+  "default": {
+   "type": "fade",
+   "duration": 0.4
+  }
+ },
+ "audio": {
+  "music": null
+ },
+ "segments": [
+  {
+   "id": "title",
+   "type": "title",
+   "title": "Mise en Monstre",
+   "subtitle": "Making of: the crypt kit",
+   "duration": 5.5,
+   "background": {
+    "src": "unreal/showcase_fly/00170.png",
+    "blur": 8,
+    "darken": 0.5
+   }
+  },
+  {
+   "id": "hook",
+   "type": "clip",
+   "src": "unreal/showcase_fly/%05d.png",
+   "in": 1.5,
+   "out": 10.0,
+   "_note": "gallery row, crane over the plaza, look down into the open nave",
+   "captions": [
+    {
+     "at": 1.0,
+     "duration": 3.0,
+     "text": "Every stone here\nwas *placed by code*"
+    },
+    {
+     "at": 4.5,
+     "duration": 3.0,
+     "text": "No hand modelling.\n*Just rules and a seed.*"
+    }
+   ]
+  },
+  {
+   "id": "ch1",
+   "type": "chapter",
+   "number": 1,
+   "title": "One wall",
+   "subtitle": "a 4 m crypt wall, start to finish",
+   "duration": 3.5,
+   "transition": {
+    "type": "fadeblack",
+    "duration": 0.6
+   }
+  },
+  {
+   "id": "wall_build",
+   "type": "clip",
+   "src": "blender/wall4m_build/%05d.png",
+   "in": 0.0,
+   "out": 5.7,
+   "speed": 1.5,
+   "_note": "frames 0-170: intro + blockout_build",
+   "zoom": {
+    "from": 1.0,
+    "to": 1.03,
+    "anchor": "center"
+   },
+   "lower_third": {
+    "title": "CryptWall4m",
+    "subtitle": "39 primitives, built in 0.03 s",
+    "at": 0.3,
+    "duration": 3.3
+   },
+   "captions": [
+    {
+     "at": 0.4,
+     "duration": 2.8,
+     "text": "Every block is\n*placed by a script*",
+     "position": "top"
+    }
+   ]
+  },
+  {
+   "id": "wall_stages",
+   "type": "clip",
+   "src": "blender/wall4m_build/%05d.png",
+   "in": 5.7,
+   "out": 11.5,
+   "speed": 0.5,
+   "transition": "none",
+   "_note": "frames 171-344 at half speed: bevel 0.8-2.8, finished 2.8-3.6, categories 3.6-6.0, uv 6.0-8.4, atlas 8.4-11.6",
+   "zoom": {
+    "from": 1.03,
+    "to": 1.12,
+    "anchor": "center"
+   },
+   "captions": [
+    {
+     "at": 0.6,
+     "duration": 2.9,
+     "text": "Bevels, tilt and wobble:\n*a hand-cut look, no hand edits*",
+     "style": "small"
+    },
+    {
+     "at": 3.7,
+     "duration": 2.2,
+     "text": "Every face *knows what it is*",
+     "style": "small"
+    },
+    {
+     "at": 6.1,
+     "duration": 2.2,
+     "text": "Faces snap into *atlas strips*",
+     "style": "small"
+    },
+    {
+     "at": 8.5,
+     "duration": 2.6,
+     "text": "Then the *trim sheet* goes on",
+     "style": "small"
+    }
+   ]
+  },
+  {
+   "id": "wall_wipe",
+   "type": "compare",
+   "mode": "wipe",
+   "duration": 6.0,
+   "left": {
+    "src": "blender/wall_raw/%05d.png",
+    "speed": 0.5
+   },
+   "right": {
+    "src": "blender/wall_painted/%05d.png",
+    "speed": 0.5
+   },
+   "labels": [
+    "Blocked",
+    "Painted"
+   ],
+   "captions": [
+    {
+     "at": 0.8,
+     "duration": 2.4,
+     "text": "Same mesh, *one material*",
+     "style": "small"
+    },
+    {
+     "at": 3.4,
+     "duration": 2.0,
+     "text": "Atlas plus a *painterly wash*",
+     "style": "small"
+    }
+   ]
+  },
+  {
+   "id": "ch2",
+   "type": "chapter",
+   "number": 2,
+   "title": "Rules, not models",
+   "subtitle": "one builder, many pieces",
+   "duration": 3.5,
+   "transition": {
+    "type": "fadeblack",
+    "duration": 0.6
+   }
+  },
+  {
+   "id": "ossuary_build",
+   "type": "clip",
+   "src": "blender/ossuary4m_build/%05d.png",
+   "in": 0.1,
+   "out": 6.25,
+   "speed": 1.25,
+   "_note": "frames 3-187: blockout, bevel, finished geometry",
+   "zoom": {
+    "from": 1.0,
+    "to": 1.05,
+    "anchor": "center"
+   },
+   "lower_third": {
+    "title": "CryptWallOssuary4m",
+    "subtitle": "45 primitives, six skull niches",
+    "at": 0.3,
+    "duration": 3.4
+   },
+   "captions": [
+    {
+     "at": 0.4,
+     "duration": 2.8,
+     "text": "Same builder,\n*different course rules*",
+     "position": "top"
+    }
+   ]
+  },
+  {
+   "id": "ossuary_wipe",
+   "type": "compare",
+   "mode": "wipe",
+   "duration": 6.0,
+   "left": {
+    "src": "blender/ossuary_raw/%05d.png",
+    "speed": 0.5
+   },
+   "right": {
+    "src": "blender/ossuary_painted/%05d.png",
+    "speed": 0.5
+   },
+   "labels": [
+    "Blocked",
+    "Painted"
+   ],
+   "captions": [
+    {
+     "at": 2.6,
+     "duration": 2.8,
+     "text": "Ready for *bones and candles*",
+     "style": "small"
+    }
+   ]
+  },
+  {
+   "id": "portal_build",
+   "type": "clip",
+   "src": "blender/portal6m_build/%05d.png",
+   "in": 0.1,
+   "out": 6.45,
+   "speed": 1.25,
+   "_note": "frames 3-193: jambs, voussoirs, spandrels, bevel, finished geometry",
+   "zoom": {
+    "from": 1.0,
+    "to": 1.05,
+    "anchor": "center"
+   },
+   "captions": [
+    {
+     "at": 0.3,
+     "duration": 2.9,
+     "text": "Jambs first,\n*then eleven voussoirs*",
+     "position": "bottom"
+    }
+   ]
+  },
+  {
+   "id": "portal_paint",
+   "type": "clip",
+   "src": "blender/portal6m_build/%05d.png",
+   "in": 8.0667,
+   "out": 9.2667,
+   "speed": 0.33333,
+   "transition": {
+    "type": "fade",
+    "duration": 0.8
+   },
+   "_note": "frames 242-277 atlas_material; the 0.8 s fade from the grey finished frame reads as the paint dissolving on",
+   "zoom": {
+    "from": 1.05,
+    "to": 1.07,
+    "anchor": "center"
+   },
+   "captions": [
+    {
+     "at": 0.8,
+     "duration": 2.3,
+     "text": "8 m wide, *6 m clear*",
+     "style": "small"
+    }
+   ]
+  },
+  {
+   "id": "piers",
+   "type": "clip",
+   "src": "blender/pier_family/%05d.png",
+   "_note": "piers 0-2.13 s, half columns 2.17-3.87, vertex columns 3.9-5.97, orbit 6-8",
+   "captions": [
+    {
+     "at": 0.5,
+     "duration": 2.0,
+     "text": "One pier, *five heights*",
+     "position": "top"
+    },
+    {
+     "at": 2.4,
+     "duration": 2.9,
+     "text": "Half columns, *vertex columns*",
+     "style": "small"
+    },
+    {
+     "at": 5.4,
+     "duration": 2.0,
+     "text": "Each step: *one 4 m storey*",
+     "style": "small"
+    }
+   ]
+  },
+  {
+   "id": "ch3",
+   "type": "chapter",
+   "number": 3,
+   "title": "The atlas",
+   "subtitle": "one trim sheet, painted by code",
+   "duration": 3.5,
+   "transition": {
+    "type": "fadeblack",
+    "duration": 0.6
+   }
+  },
+  {
+   "id": "atlas",
+   "type": "clip",
+   "src": "blender/atlas_paint/%05d.png",
+   "speed": 0.5,
+   "_note": "x2 stage times: stones 0.07-5.0, other strips 5.07-6.33, authored 6.4-7.0, height 7.07-8.73, normal 8.8-10.47, ao 10.53-12.2, cavity 12.27-13.93, final 14.0-16.67",
+   "zoom": {
+    "from": 1.0,
+    "to": 1.04,
+    "anchor": "center"
+   },
+   "captions": [
+    {
+     "at": 0.4,
+     "duration": 2.6,
+     "text": "The texture is *code too*",
+     "position": "bottom"
+    },
+    {
+     "at": 3.1,
+     "duration": 2.0,
+     "text": "Stone by stone, *facet by facet*",
+     "style": "small"
+    },
+    {
+     "at": 5.2,
+     "duration": 2.0,
+     "text": "Wood, iron and *a flat palette*",
+     "style": "small",
+     "position": "top"
+    },
+    {
+     "at": 7.2,
+     "duration": 2.0,
+     "text": "Every stroke is *real height*",
+     "style": "small"
+    },
+    {
+     "at": 9.4,
+     "duration": 4.4,
+     "text": "Then *normals, AO and cavity*",
+     "style": "small"
+    },
+    {
+     "at": 14.1,
+     "duration": 2.1,
+     "text": "Rim light and grime, *painted in*",
+     "style": "small"
+    }
+   ]
+  },
+  {
+   "id": "atlas_pair",
+   "type": "compare",
+   "mode": "sidebyside",
+   "duration": 6.0,
+   "_note": "the finished sheet beside a piece wearing it",
+   "left": {
+    "src": "blender/atlas_paint/00249.png"
+   },
+   "right": {
+    "src": "blender/ossuary_painted/%05d.png",
+    "speed": 0.5
+   },
+   "labels": [
+    "MISE atlas",
+    "CryptWallOssuary4m"
+   ],
+   "captions": [
+    {
+     "at": 0.8,
+     "duration": 4.4,
+     "text": "One sheet, *every stone in the kit*",
+     "style": "small"
+    }
+   ]
+  },
+  {
+   "id": "lineup",
+   "type": "clip",
+   "src": "blender/kit_lineup/%05d.png",
+   "_note": "group centres: wall 18, portal 67, support 120, floor 171, box 245, camp 289",
+   "lower_third": {
+    "title": "Crypt_Kit_Library.blend",
+    "subtitle": "every SM_ piece, one section per group",
+    "at": 0.3,
+    "duration": 3.5
+   },
+   "captions": [
+    {
+     "at": 0.4,
+     "duration": 2.9,
+     "text": "116 pieces,\n*one library file*",
+     "position": "top"
+    },
+    {
+     "at": 4.2,
+     "duration": 2.4,
+     "text": "Walls, portals, *floors, stairs*",
+     "style": "small"
+    },
+    {
+     "at": 7.3,
+     "duration": 2.0,
+     "text": "Boxes are the *climbing kit*",
+     "style": "small"
+    }
+   ]
+  },
+  {
+   "id": "ch4",
+   "type": "chapter",
+   "number": 4,
+   "title": "A room in 12 ms",
+   "subtitle": "planned by code on a 1 m grid",
+   "duration": 3.5,
+   "transition": {
+    "type": "fadeblack",
+    "duration": 0.6
+   }
+  },
+  {
+   "id": "room_build",
+   "type": "clip",
+   "src": "blender/room_assembly/%05d.png",
+   "in": 0.0,
+   "out": 10.4,
+   "speed": 1.25,
+   "_note": "frames 0-311 at 1.25x: walls 0.48-3.89, columns 3.92-4.61, ribs 4.64-5.25, boxes 5.28-6.21, ornament 6.24-8.27",
+   "zoom": {
+    "from": 1.0,
+    "to": 1.1,
+    "anchor": "center"
+   },
+   "lower_third": {
+    "title": "crypt_octagon_16_T2",
+    "subtitle": "16 x 16 m, octagon hub, two tiers",
+    "at": 0.2,
+    "duration": 3.2
+   },
+   "captions": [
+    {
+     "at": 0.4,
+     "duration": 2.8,
+     "text": "One call plans\n*the whole room*",
+     "position": "top"
+    },
+    {
+     "at": 4.25,
+     "duration": 2.0,
+     "text": "Vault ribs, then *boxes to climb*",
+     "style": "small"
+    },
+    {
+     "at": 6.3,
+     "duration": 2.0,
+     "text": "Then the *kitchen carvings*",
+     "style": "small"
+    }
+   ]
+  },
+  {
+   "id": "room_orbit",
+   "type": "clip",
+   "src": "blender/room_assembly/%05d.png",
+   "in": 10.4,
+   "out": 13.5,
+   "transition": "none",
+   "zoom": {
+    "from": 1.1,
+    "to": 1.14,
+    "anchor": "center"
+   },
+   "captions": [
+    {
+     "at": 0.2,
+     "duration": 2.4,
+     "text": "101 pieces,\n*12 milliseconds*",
+     "position": "top"
+    }
+   ]
+  },
+  {
+   "id": "room_unreal",
+   "type": "compare",
+   "mode": "sidebyside",
+   "duration": 6.0,
+   "_note": "left: the planned room's final orbit frame; right: CryptRooms octagon hub, built by the same planner (build_rooms_map)",
+   "left": {
+    "src": "blender/room_assembly/00404.png"
+   },
+   "right": {
+    "src": "unreal/rooms_octagon_orbit/%05d.png",
+    "in": 0.0,
+    "out": 6.0
+   },
+   "labels": [
+    "Planned in Blender",
+    "Octagon hub in Unreal"
+   ],
+   "captions": [
+    {
+     "at": 0.8,
+     "duration": 4.0,
+     "text": "The same planner *builds the game's rooms*",
+     "style": "small",
+     "position": "top"
+    }
+   ]
+  },
+  {
+   "id": "ch5",
+   "type": "chapter",
+   "number": 5,
+   "title": "Into Unreal",
+   "subtitle": "instanced, lit and painted",
+   "duration": 3.5,
+   "transition": {
+    "type": "fadeblack",
+    "duration": 0.6
+   }
+  },
+  {
+   "id": "gallery",
+   "type": "clip",
+   "src": "unreal/kit_gallery_dolly/%05d.png",
+   "_note": "in-world name labels sit along the bottom edge: captions go top",
+   "lower_third": {
+    "title": "CryptShowcase",
+    "subtitle": "the kit as HISM instances",
+    "at": 0.4,
+    "duration": 3.4
+   },
+   "captions": [
+    {
+     "at": 0.5,
+     "duration": 3.0,
+     "text": "The same pieces,\n*instanced in Unreal*",
+     "position": "top"
+    },
+    {
+     "at": 4.0,
+     "duration": 3.1,
+     "text": "Stone materials,\n*world-aligned*",
+     "position": "top"
+    }
+   ]
+  },
+  {
+   "id": "material_stages",
+   "type": "clip",
+   "src": "unreal/material_stages/%05d.png",
+   "_note": "speed 0.85: stage k spans 2.353k .. 2.353(k+1) s; one 2 s caption per stage",
+   "zoom": {
+    "from": 1.0,
+    "to": 1.05,
+    "anchor": "center"
+   },
+   "captions": [
+    {
+     "at": 0.25,
+     "duration": 2.0,
+     "text": "1/6 Base colour: *the atlas, unlit*",
+     "style": "small"
+    },
+    {
+     "at": 2.55,
+     "duration": 2.0,
+     "text": "2/6 Normals: kit maps *plus paint detail*",
+     "style": "small"
+    },
+    {
+     "at": 4.9,
+     "duration": 2.0,
+     "text": "3/6 Lit, with *no paint wash*",
+     "style": "small"
+    },
+    {
+     "at": 7.26,
+     "duration": 2.0,
+     "text": "4/6 The *paint wash* fades in",
+     "style": "small"
+    },
+    {
+     "at": 9.61,
+     "duration": 2.0,
+     "text": "5/6 *Fog and glow* fade in",
+     "style": "small"
+    },
+    {
+     "at": 11.9,
+     "duration": 2.0,
+     "text": "6/6 *Final:* every layer on",
+     "style": "small"
+    }
+   ],
+   "speed": 0.85
+  },
+  {
+   "id": "material_wipe",
+   "type": "compare",
+   "mode": "wipe",
+   "duration": 6.0,
+   "left": {
+    "src": "unreal/material_stages/%05d.png",
+    "in": 4.0,
+    "out": 6.0,
+    "speed": 0.33333
+   },
+   "right": {
+    "src": "unreal/material_stages/%05d.png",
+    "in": 10.0,
+    "out": 12.0,
+    "speed": 0.33333
+   },
+   "labels": [
+    "Lit only",
+    "Wash, fog, glow"
+   ],
+   "captions": [
+    {
+     "at": 1.2,
+     "duration": 3.6,
+     "text": "A painterly layer over *every stone*",
+     "style": "small"
+    }
+   ]
+  },
+  {
+   "id": "octagon",
+   "type": "clip",
+   "src": "unreal/rooms_octagon_orbit/%05d.png",
+   "captions": [
+    {
+     "at": 1.9,
+     "duration": 2.7,
+     "text": "Vault ribs: paths for\n*ceiling crawlers*",
+     "position": "bottom"
+    }
+   ],
+   "in": 3.0,
+   "out": 8.0
+  },
+  {
+   "id": "vignette",
+   "type": "clip",
+   "src": "unreal/vignette_pan/%05d.png",
+   "captions": [
+    {
+     "at": 0.5,
+     "duration": 3.2,
+     "text": "Code lays the stones.\n*Light and paint set the mood.*",
+     "position": "top"
+    },
+    {
+     "at": 4.1,
+     "duration": 2.7,
+     "text": "Next: *the materials, up close*",
+     "style": "small"
+    }
+   ]
+  },
+  {
+   "id": "end",
+   "type": "end",
+   "lines": [
+    "Mise en Monstre",
+    "devlog 01 · making of the crypt kit"
+   ],
+   "duration": 5.5,
+   "transition": {
+    "type": "fadeblack",
+    "duration": 1.0
+   },
+   "background": {
+    "src": "unreal/vignette_pan/00239.png",
+    "blur": 10,
+    "darken": 0.6
+   }
+  }
+ ]
+}

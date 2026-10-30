@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "title": "Feature showcase: the pan",
+  "output": {"width": 1920, "height": 1080, "fps": 30, "crf": 18, "preset": "slow", "progress_bar": true},
+  "theme": "default",
+  "media_root": "D:/Repo/Content/Devlog/pan_showcase",
+  "transitions": {"default": {"type": "fade", "duration": 0.4}},
+  "audio": {"music": null, "gain_db": -16, "fade": 1.0},
+  "_note": "Storyboard APPROVED 2026-10-25 (STORYBOARD_PROPOSAL.md), beat 6 (fryer) cut. Footage: kernel replay on the devlog stage (Tools/Devlog/footage/unreal/devlog_pan_shots.py via run_pan.py) and the Blender bench insert (footage/blender/devlog_pan_cut.py). Each clip runs 0.4 s longer than its beat so the 0.4 s fades do not eat the beat.",
+  "segments": [
+    {"id": "title", "type": "title", "title": "Mise en Monstre", "subtitle": "The pan", "duration": 2.0,
+     "background": {"src": "title_still.png", "blur": 8, "darken": 0.5}},
+
+    {"id": "oil_land", "type": "clip", "src": "oil_land/%05d.png", "fps": 30, "in": 0.4, "out": 5.8, "duration": 5.4,
+     "_note": "beat 1, no caption: the cube lands at source 1.50 s (output 1.1 s), the sizzle ramp is full by 2.0 s"},
+
+    {"id": "sear_flip", "type": "clip", "src": "sear_flip/%05d.png", "fps": 30, "in": 0.4, "out": 8.8, "duration": 8.4,
+     "_note": "beat 2: -Z sears to 1 at source 3.0 s, flip 3.6-4.0 s (output 3.2-3.6), -Y done at 7.0 s. The cube sits centre-frame, so the caption sits top and ends before the flip",
+     "captions": [{"at": 0.6, "duration": 2.5, "text": "Six faces. Three seconds each.", "style": "big", "position": "top"}]},
+
+    {"id": "bench_cut", "type": "clip", "src": "bench_cut/%05d.png", "fps": 30, "in": 0.3, "out": 4.7, "duration": 4.4,
+     "_note": "beat 3 (Blender insert): cut 1 at source 0.8-1.2 s, cut 2 at 2.2-2.6 s, four pieces from 3.2 s; the slab is centre-frame, caption top",
+     "captions": [{"at": 0.8, "duration": 2.5, "text": "Cut first, then cook", "style": "big", "position": "top"}]},
+
+    {"id": "five_pieces", "type": "clip", "src": "five_pieces/%05d.png", "fps": 30, "in": 0.0, "out": 10.4, "duration": 10.4,
+     "_note": "beat 4: five cubes land 0.25-2.65 s, toss 5.40-5.85 s (two cubes hop 5.6 cm screen-right and turn a quarter over, their pools close and re-form, the trails lag); the pan fills the middle, caption top",
+     "captions": [{"at": 4.9, "duration": 2.5, "text": "Every piece keeps its own pool", "style": "big", "position": "top"}]},
+
+    {"id": "char_fond", "type": "clip", "src": "char_fond/%05d.png", "fps": 30, "in": 0.4, "out": 6.8, "duration": 6.4,
+     "_note": "beat 5: the -Z face runs past 1.0 to 1.9 by source 3.0 s while the fond builds; turned over 4.0-4.6 s (output 3.6-4.2) to show the charred face; caption top over the reveal",
+     "captions": [{"at": 3.3, "duration": 2.5, "text": "Leave it, and it chars", "style": "big", "position": "top"}]},
+
+    {"id": "ready_lineup", "type": "clip", "src": "ready_lineup/%05d.png", "fps": 30, "in": 0.4, "out": 5.8, "duration": 5.4,
+     "_note": "beat 7 (no caption): raw, half, seared, charred side by side, slow push in the footage itself"},
+
+    {"id": "end", "type": "end", "lines": ["Mise en Monstre", "devlog 02"], "duration": 2.0,
+     "background": {"src": "end_still.png", "blur": 8, "darken": 0.55}}
+  ]
+}

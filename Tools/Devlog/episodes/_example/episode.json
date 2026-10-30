@@ -1,0 +1,226 @@
+{
+  "version": 1,
+  "title": "devlog_kit self-test",
+  "output": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 30,
+    "crf": 18,
+    "preset": "slow",
+    "progress_bar": true
+  },
+  "theme": "default",
+  "media_root": "C:/Users/Stephen/AppData/Local/Temp/claude/D--Repo-Mars/5f3efb8e-b134-46b6-83b7-6ce0a5233bff/scratchpad/devlog_selftest",
+  "transitions": {
+    "default": {
+      "type": "fade",
+      "duration": 0.4
+    }
+  },
+  "audio": {
+    "music": "music.wav",
+    "gain_db": -16,
+    "fade": 1.0
+  },
+  "segments": [
+    {
+      "id": "intro",
+      "type": "title",
+      "title": "Devlog Kit",
+      "subtitle": "Self-test: every segment type",
+      "duration": 3.0,
+      "background": {
+        "src": "title_bg.png",
+        "blur": 8,
+        "darken": 0.5
+      }
+    },
+    {
+      "id": "chapter1",
+      "type": "chapter",
+      "number": 1,
+      "title": "Clips and captions",
+      "subtitle": "frames, speed, zoom, lower third",
+      "duration": 2.2
+    },
+    {
+      "id": "build",
+      "type": "clip",
+      "src": "build_a/%05d.png",
+      "fps": 30,
+      "in": 0.0,
+      "out": 12.0,
+      "speed": 2.0,
+      "lower_third": {
+        "title": "BuildA_Sequence",
+        "subtitle": "360 frames, played at 2x",
+        "at": 0.4,
+        "duration": 3.6
+      },
+      "captions": [
+        {
+          "at": 0.6,
+          "duration": 2.6,
+          "text": "Every piece is *built by a script*",
+          "style": "big"
+        },
+        {
+          "at": 3.4,
+          "duration": 2.0,
+          "text": "blocks, then bevels",
+          "style": "small",
+          "position": "bottom"
+        }
+      ],
+      "zoom": {
+        "from": 1.0,
+        "to": 1.08,
+        "anchor": "center"
+      }
+    },
+    {
+      "id": "wipe",
+      "type": "compare",
+      "mode": "wipe",
+      "duration": 4.5,
+      "left": {
+        "src": "wall_raw/%05d.png"
+      },
+      "right": {
+        "src": "wall_painted/%05d.png"
+      },
+      "labels": [
+        "Blocked",
+        "Painted"
+      ],
+      "transition": {
+        "type": "wipeleft",
+        "duration": 0.5
+      },
+      "captions": [
+        {
+          "at": 0.6,
+          "duration": 2.6,
+          "text": "The divider sweeps left to right",
+          "style": "small"
+        }
+      ]
+    },
+    {
+      "id": "split",
+      "type": "compare",
+      "mode": "split",
+      "duration": 3.0,
+      "left": {
+        "src": "wall_painted_preview.mp4"
+      },
+      "right": {
+        "src": "wall_raw_still.png"
+      },
+      "labels": [
+        "Video file",
+        "Still image"
+      ],
+      "transition": {
+        "type": "smoothleft",
+        "duration": 0.5
+      },
+      "captions": [
+        {
+          "at": 0.5,
+          "duration": 2.0,
+          "text": "Split: *video* and *still*",
+          "style": "big",
+          "position": "bottom"
+        }
+      ]
+    },
+    {
+      "id": "sidebyside",
+      "type": "compare",
+      "mode": "sidebyside",
+      "duration": 3.0,
+      "left": {
+        "src": "wall_raw/%05d.png",
+        "in": 1.0,
+        "out": 4.0
+      },
+      "right": {
+        "src": "wall_painted/%05d.png",
+        "in": 1.0,
+        "out": 4.0
+      },
+      "labels": [
+        "Blocked",
+        "Painted"
+      ],
+      "transition": "none"
+    },
+    {
+      "id": "pip",
+      "type": "overlay",
+      "duration": 4.5,
+      "base": {
+        "src": "build_a/%05d.png",
+        "in": 4.0
+      },
+      "inset": {
+        "src": "diagram/%05d.png",
+        "position": "right",
+        "width": 0.42,
+        "margin": 0.04,
+        "label": "drip clock"
+      },
+      "captions": [
+        {
+          "at": 0.5,
+          "duration": 3.4,
+          "text": "Every drop *keeps time*",
+          "style": "big",
+          "position": "top"
+        }
+      ]
+    },
+    {
+      "id": "pip_alpha",
+      "type": "overlay",
+      "duration": 3.4,
+      "base": {
+        "src": "wall_painted/%05d.png",
+        "in": 1.0,
+        "out": 4.4
+      },
+      "inset": {
+        "src": "diagram_rgba/%05d.png",
+        "in": 1.0,
+        "out": 4.4,
+        "position": "top-left",
+        "width": 0.36,
+        "margin": 0.05
+      },
+      "captions": [
+        {
+          "at": 0.4,
+          "duration": 2.6,
+          "text": "An RGBA inset keeps\nits own panel",
+          "style": "big",
+          "position": "bottom"
+        }
+      ]
+    },
+    {
+      "id": "end",
+      "type": "end",
+      "lines": [
+        "Devlog Kit",
+        "self-test render",
+        "made with devlog_kit"
+      ],
+      "duration": 2.6,
+      "transition": {
+        "type": "fadeblack",
+        "duration": 0.6
+      }
+    }
+  ]
+}

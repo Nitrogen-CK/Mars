@@ -1,0 +1,186 @@
+{
+  "name": "default",
+  "_units": "Every pixel value below is authored for a 1080 px tall 16:9 frame and is scaled by min(width, height) / 1080.",
+
+  "colors": {
+    "background": "#0b0b0f",
+    "text": "#f3efe6",
+    "accent": "#e0a84a",
+    "secondary": "#4aa3e0",
+    "muted": "#b8b1a4",
+    "shadow": [0, 0, 0, 0.65]
+  },
+
+  "fonts": {
+    "caption": {
+      "paths": ["C:/Windows/Fonts/bahnschrift.ttf",
+                "/System/Library/Fonts/Supplemental/DIN Alternate Bold.ttf",
+                "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"],
+      "variation": "Bold"
+    },
+    "caption_light": {
+      "paths": ["C:/Windows/Fonts/bahnschrift.ttf",
+                "/System/Library/Fonts/Supplemental/DIN Alternate Bold.ttf",
+                "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"],
+      "variation": "SemiBold"
+    },
+    "body": {
+      "paths": ["C:/Windows/Fonts/bahnschrift.ttf",
+                "/System/Library/Fonts/Supplemental/Arial.ttf",
+                "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"],
+      "variation": "Regular"
+    },
+    "title": {
+      "paths": ["C:/Windows/Fonts/georgiab.ttf",
+                "/System/Library/Fonts/Supplemental/Georgia Bold.ttf",
+                "/usr/share/fonts/truetype/dejavu/DejaVuSerif-Bold.ttf"]
+    },
+    "code": {
+      "paths": ["C:/Windows/Fonts/consola.ttf",
+                "/System/Library/Fonts/Menlo.ttc",
+                "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf"]
+    }
+  },
+
+  "safe_margin": 0.05,
+
+  "caption": {
+    "fade": 0.2,
+    "box": [0, 0, 0, 0.55],
+    "radius": 24,
+    "shadow": true,
+    "accent_markup": true,
+    "accent_color": "accent",
+    "color": "text",
+    "big": {
+      "font": "caption",
+      "size": 72,
+      "min_size": 52,
+      "max_lines": 2,
+      "column": 1080,
+      "padding": [40, 22],
+      "line_spacing": 1.12,
+      "rise": 16,
+      "default_position": "center"
+    },
+    "small": {
+      "font": "caption_light",
+      "size": 44,
+      "min_size": 34,
+      "max_lines": 2,
+      "column": 1500,
+      "padding": [28, 14],
+      "line_spacing": 1.15,
+      "rise": 0,
+      "default_position": "bottom"
+    }
+  },
+
+  "lower_third": {
+    "title_font": "caption",
+    "title_size": 46,
+    "subtitle_font": "body",
+    "subtitle_size": 30,
+    "title_color": "text",
+    "subtitle_color": "muted",
+    "bar_color": "accent",
+    "bar_width": 8,
+    "padding": [30, 18],
+    "gap": 6,
+    "box": [11, 11, 15, 0.82],
+    "radius": 10,
+    "max_width": 1100,
+    "slide": 0.35,
+    "fade": 0.15
+  },
+
+  "title_card": {
+    "title_font": "title",
+    "title_size": 112,
+    "title_min_size": 72,
+    "subtitle_font": "body",
+    "subtitle_size": 44,
+    "subtitle_color": "muted",
+    "rule_color": "accent",
+    "rule_width": 220,
+    "rule_height": 4,
+    "gap": 34,
+    "fade": 0.5,
+    "rise": 18,
+    "background_zoom": [1.0, 1.06]
+  },
+
+  "chapter_card": {
+    "number_font": "title",
+    "number_size": 120,
+    "number_color": "accent",
+    "number_format": "{n:02d}",
+    "title_font": "title",
+    "title_size": 84,
+    "title_min_size": 60,
+    "subtitle_font": "body",
+    "subtitle_size": 38,
+    "subtitle_color": "muted",
+    "rule_color": "accent",
+    "rule_width": 260,
+    "rule_height": 4,
+    "rule_start": 0.15,
+    "rule_time": 0.55,
+    "gap": 30,
+    "fade": 0.4,
+    "rise": 14,
+    "background_zoom": [1.0, 1.04]
+  },
+
+  "end_card": {
+    "first_font": "title",
+    "first_size": 96,
+    "line_font": "body",
+    "line_size": 44,
+    "line_color": "muted",
+    "line_gap": 26,
+    "fade": 0.5,
+    "stagger": 0.25,
+    "rise": 14,
+    "background_zoom": [1.0, 1.04]
+  },
+
+  "label": {
+    "font": "caption",
+    "size": 30,
+    "color": "text",
+    "box": [0, 0, 0, 0.62],
+    "radius": 14,
+    "padding": [20, 10],
+    "dot_color": "accent",
+    "fade": 0.15
+  },
+
+  "inset": {
+    "radius": 18,
+    "shadow_blur": 22,
+    "shadow_offset": [0, 10],
+    "shadow": [0, 0, 0, 0.6],
+    "border": 2,
+    "border_color": [243, 239, 230, 0.35],
+    "label_gap": 14
+  },
+
+  "compare": {
+    "divider_width": 3,
+    "divider_color": "text",
+    "sweep": [0.1, 0.9],
+    "gap": 28,
+    "label_fade": 0.15
+  },
+
+  "progress_bar": {
+    "height": 6,
+    "color": "accent",
+    "track": [0, 0, 0, 0.45]
+  },
+
+  "zoom": {
+    "ease": "linear"
+  }
+}

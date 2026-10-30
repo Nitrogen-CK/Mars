@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "title": "Material breakdown: drips and droplets",
+  "output": {"width": 1920, "height": 1080, "fps": 30, "crf": 18, "preset": "slow"},
+  "theme": "default",
+  "media_root": "D:/Repo/Content/Devlog/materials",
+  "transitions": {"default": {"type": "fade", "duration": 0.4}},
+  "audio": {"music": null, "gain_db": -16, "fade": 1.0},
+  "segments": [
+    {"id": "intro", "type": "title", "title": "Mise en Monstre", "subtitle": "Material breakdown: drips",
+     "duration": 1.5, "background": {"src": "unreal/drip_bead_macro/00060.png", "blur": 8, "darken": 0.5}},
+
+    {"id": "hook", "type": "clip", "src": "unreal/drip_bead_macro/%05d.png", "fps": 30,
+     "in": 0.0, "out": 4.4, "duration": 4.4,
+     "_note": "bead releases at 0.57, 1.96, 2.70, 3.32, 3.98 s (UNREAL_SHOTS.md B); 2 s clean before the caption",
+     "captions": [{"at": 2.0, "duration": 2.0, "text": "No particles. *No simulation.*", "style": "big", "position": "bottom"}]},
+
+    {"id": "clock", "type": "overlay", "duration": 6.0,
+     "_note": "footage 2.0-8.0: releases at beat 0.70, 1.32, 1.98, 2.70, 3.39, 4.17, 5.49 s; drip_clock rendered --sync drip_bead_macro --offset 2.0 (t0 14.0), the 85 cm thread strand; inset 0.40 wide so it clears the swollen bead",
+     "base": {"src": "unreal/drip_bead_macro/%05d.png", "in": 2.0, "out": 8.0},
+     "inset": {"src": "diagrams/drip_clock/%05d.png", "in": 0.0, "out": 6.0, "position": "right", "width": 0.40, "margin": 0.04},
+     "captions": [{"at": 0.4, "duration": 2.5, "text": "The bead swells *until it lets go*", "style": "big", "position": "bottom"},
+                  {"at": 3.1, "duration": 2.4, "text": "*Four cards* per strand take turns", "style": "big", "position": "bottom"}]},
+
+    {"id": "fall", "type": "overlay", "duration": 6.0,
+     "_note": "drip_strand_side 1.0-7.0 (85 cm pipe-joint strand; impacts at beat 1.33, 2.06, 2.69, 3.34, 4.07, 4.76, 5.53 s). Captions on top so the basin splash at the frame bottom stays clear. fall_curve is a self-timed 350 cm example and is labelled so",
+     "base": {"src": "unreal/drip_strand_side/%05d.png", "in": 1.0, "out": 7.0},
+     "inset": {"src": "diagrams/fall_curve/%05d.png", "in": 0.0, "out": 6.0, "position": "right", "width": 0.42, "margin": 0.04,
+               "label": "Example: a 3.5 m strand"},
+     "captions": [{"at": 0.4, "duration": 2.4, "text": "Each drop is a *formula of time*", "style": "big", "position": "top"},
+                  {"at": 3.0, "duration": 2.5, "text": "Run it backwards:\n*when does it land?*", "style": "big", "position": "top"}]},
+
+    {"id": "slots", "type": "clip", "src": "diagrams/slots_wrap/%05d.png", "fps": 30,
+     "in": 0.0, "out": 5.5, "duration": 5.5,
+     "captions": [{"at": 0.4, "duration": 2.5, "text": "A card waits out *its own splash*", "style": "big", "position": "bottom"},
+                  {"at": 3.2, "duration": 2.0, "text": "Loops every hour *without a seam*", "style": "big", "position": "bottom"}]},
+
+    {"id": "trace", "type": "overlay", "duration": 5.5,
+     "_note": "drip_splash_floor 0.5-6.0 (Leak_VaultLine #1, 349.5 cm, traced up to the vault and down to the floor): impacts at beat 0.74, 2.45, 3.92, 5.26 s. strand_trace rendered --sync drip_splash_floor --offset 0.5 (t0 13.0); its live-drop phase starts at 3.04 s. The zoom anchored right moves the impact point left of the inset",
+     "base": {"src": "unreal/drip_splash_floor/%05d.png", "in": 0.5, "out": 6.0},
+     "zoom": {"from": 1.2, "to": 1.26, "anchor": [1.0, 0.5]},
+     "inset": {"src": "diagrams/strand_trace/%05d.png", "in": 0.0, "out": 5.5, "position": "right", "width": 0.42, "margin": 0.04},
+     "captions": [{"at": 0.4, "duration": 2.2, "text": "Each strand is *traced to the floor*", "style": "big", "position": "bottom"},
+                  {"at": 3.1, "duration": 2.2, "text": "Every drop *lands exactly* on it", "style": "big", "position": "bottom"}]},
+
+    {"id": "end", "type": "end", "lines": ["Mise en Monstre", "Material breakdown: drips"], "duration": 1.5}
+  ]
+}

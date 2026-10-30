@@ -1,0 +1,123 @@
+{
+	"material": "DevlogGrey18_Mars_MI",
+	"packagePath": "/Game/Mars/Devlog/Materials/DevlogGrey18_Mars_MI",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "294bf8ab73e728dc4abf1f79869577e0",
+		"exporterVersion": 3
+	},
+	"parentChain": [
+		"/Game/Mars/Devlog/Materials/DevlogSurface_Mars_M.DevlogSurface_Mars_M"
+	],
+	"blendMode": "BLEND_Opaque",
+	"twoSided": false,
+	"unlit": false,
+	"shadingModel": "MSM_DefaultLit",
+	"domain": "MD_Surface",
+	"connectedOutputs": [
+		"BaseColor"
+	],
+	"expressions":
+	{
+		"ScalarParameter": 3,
+		"VectorParameter": 1
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_0",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.180000,G=0.180000,B=0.180000,A=1.000000)",
+					"ParameterName": "BaseColor"
+				}
+			},
+			{
+				"id": 1,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_0",
+				"props":
+				{
+					"ParameterName": "Metallic"
+				}
+			},
+			{
+				"id": 2,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_1",
+				"props":
+				{
+					"DefaultValue": 0.60000002384185791,
+					"ParameterName": "Roughness"
+				}
+			},
+			{
+				"id": 3,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_2",
+				"props":
+				{
+					"DefaultValue": 0.5,
+					"ParameterName": "Specular"
+				}
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_BaseColor",
+				"node": 0,
+				"output": 0,
+				"mask": "rgb"
+			},
+			{
+				"property": "MP_Metallic",
+				"node": 1,
+				"output": 0
+			},
+			{
+				"property": "MP_Specular",
+				"node": 3,
+				"output": 0
+			},
+			{
+				"property": "MP_Roughness",
+				"node": 2,
+				"output": 0
+			}
+		]
+	},
+	"scalarParams": [
+		{
+			"name": "Metallic",
+			"value": 0
+		},
+		{
+			"name": "Roughness",
+			"value": 0.69999998807907104
+		},
+		{
+			"name": "Specular",
+			"value": 0.5
+		}
+	],
+	"vectorParams": [
+		{
+			"name": "BaseColor",
+			"value": "RGBA(0.18, 0.18, 0.18, 1)"
+		}
+	],
+	"textureParams": [],
+	"usedTextures": []
+}

@@ -1,0 +1,310 @@
+{
+	"material": "DevlogFloor_Mars_MI",
+	"packagePath": "/Game/Mars/Devlog/Materials/DevlogFloor_Mars_MI",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "20ec29b5b8e702fd8b178856764c0d3b",
+		"exporterVersion": 3
+	},
+	"parentChain": [
+		"/Game/Mars/Devlog/Materials/DevlogFloor_Mars_M.DevlogFloor_Mars_M"
+	],
+	"blendMode": "BLEND_Opaque",
+	"twoSided": false,
+	"unlit": false,
+	"shadingModel": "MSM_DefaultLit",
+	"domain": "MD_Surface",
+	"connectedOutputs": [
+		"EmissiveColor",
+		"BaseColor"
+	],
+	"expressions":
+	{
+		"Custom": 1,
+		"EyeAdaptationInverse": 1,
+		"LinearInterpolate": 2,
+		"ScalarParameter": 4,
+		"TextureCoordinate": 1,
+		"VectorParameter": 4
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "TextureCoordinate",
+				"name": "MaterialExpressionTextureCoordinate_0"
+			},
+			{
+				"id": 1,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_0",
+				"props":
+				{
+					"DefaultValue": 2000,
+					"ParameterName": "Cells"
+				}
+			},
+			{
+				"id": 2,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_1",
+				"props":
+				{
+					"DefaultValue": 0.017999999225139618,
+					"ParameterName": "LineWidth"
+				}
+			},
+			{
+				"id": 3,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "UV",
+						"node": 0,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "Cells",
+						"node": 1,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "LineWidth",
+						"node": 2,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "\nfloat2 uv = UV * Cells;\nfloat4 dd = float4(ddx(uv), ddy(uv));\nfloat2 deriv = max(float2(length(dd.xz), length(dd.yw)), 1e-6);\nfloat2 lw = float2(LineWidth, LineWidth);\nfloat2 drawWidth = clamp(lw, deriv, 0.5);\nfloat2 lineAA = deriv * 1.5;\nfloat2 gridUV = 1.0 - abs(frac(uv) * 2.0 - 1.0);\nfloat2 g2 = smoothstep(drawWidth + lineAA, drawWidth - lineAA, gridUV);\ng2 *= saturate(lw / drawWidth);\ng2 = lerp(g2, lw, saturate(deriv * 2.0 - 1.0));\nreturn lerp(g2.x, 1.0, g2.y);\n",
+					"OutputType": "CMOT_Float1",
+					"Description": "Grid"
+				}
+			},
+			{
+				"id": 4,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_0",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.020000,G=0.020000,B=0.020000,A=1.000000)",
+					"ParameterName": "FloorAlbedo"
+				}
+			},
+			{
+				"id": 5,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_1",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.060000,G=0.060000,B=0.070000,A=1.000000)",
+					"ParameterName": "LineAlbedo"
+				}
+			},
+			{
+				"id": 6,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_2",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.013500,G=0.012800,B=0.016500,A=1.000000)",
+					"ParameterName": "FloorGlow"
+				}
+			},
+			{
+				"id": 7,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_3",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.050000,G=0.050000,B=0.060000,A=1.000000)",
+					"ParameterName": "LineGlow"
+				}
+			},
+			{
+				"id": 8,
+				"class": "LinearInterpolate",
+				"name": "MaterialExpressionLinearInterpolate_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 4,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 5,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 2,
+						"name": "Alpha",
+						"node": 3,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 9,
+				"class": "LinearInterpolate",
+				"name": "MaterialExpressionLinearInterpolate_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 6,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 7,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 2,
+						"name": "Alpha",
+						"node": 3,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 10,
+				"class": "EyeAdaptationInverse",
+				"name": "MaterialExpressionEyeAdaptationInverse_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "LightValueInput",
+						"node": 9,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 11,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_2",
+				"props":
+				{
+					"DefaultValue": 0.89999997615814209,
+					"ParameterName": "Roughness"
+				}
+			},
+			{
+				"id": 12,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_3",
+				"props":
+				{
+					"ParameterName": "Specular"
+				}
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_EmissiveColor",
+				"node": 10,
+				"output": 0
+			},
+			{
+				"property": "MP_BaseColor",
+				"node": 8,
+				"output": 0
+			},
+			{
+				"property": "MP_Specular",
+				"node": 12,
+				"output": 0
+			},
+			{
+				"property": "MP_Roughness",
+				"node": 11,
+				"output": 0
+			}
+		]
+	},
+	"scalarParams": [
+		{
+			"name": "Cells",
+			"value": 2000
+		},
+		{
+			"name": "LineWidth",
+			"value": 0.017999999225139618
+		},
+		{
+			"name": "Roughness",
+			"value": 0.89999997615814209
+		},
+		{
+			"name": "Specular",
+			"value": 0
+		}
+	],
+	"vectorParams": [
+		{
+			"name": "FloorAlbedo",
+			"value": "RGBA(0.02, 0.02, 0.02, 1)"
+		},
+		{
+			"name": "LineAlbedo",
+			"value": "RGBA(0.06, 0.06, 0.07, 1)"
+		},
+		{
+			"name": "FloorGlow",
+			"value": "RGBA(0.128, 0.124, 0.142, 1)"
+		},
+		{
+			"name": "LineGlow",
+			"value": "RGBA(0.26, 0.26, 0.29, 1)"
+		}
+	],
+	"textureParams": [],
+	"usedTextures": []
+}

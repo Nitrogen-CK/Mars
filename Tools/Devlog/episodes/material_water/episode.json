@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "title": "Material breakdown: water",
+  "output": {"width": 1920, "height": 1080, "fps": 30, "crf": 18, "preset": "slow"},
+  "theme": "default",
+  "media_root": "D:/Repo/Content/Devlog/materials",
+  "transitions": {"default": {"type": "fade", "duration": 0.4}},
+  "audio": {"music": null, "gain_db": -16, "fade": 1.0},
+  "segments": [
+    {"id": "intro", "type": "title", "title": "Mise en Monstre", "subtitle": "Material breakdown: water",
+     "duration": 1.5, "background": {"src": "unreal/cistern_rings_wide/00090.png", "blur": 8, "darken": 0.5}},
+
+    {"id": "hook", "type": "clip", "src": "unreal/cistern_rings_wide/%05d.png", "fps": 30,
+     "in": 0.0, "out": 4.4, "duration": 4.4,
+     "_note": "the rings and the lamp glints sit in the lower half, so the caption goes on top",
+     "captions": [{"at": 2.0, "duration": 2.0, "text": "No textures.\n*Every ripple is maths.*", "style": "big", "position": "top"}]},
+
+    {"id": "mask", "type": "compare", "mode": "wipe", "duration": 5.0,
+     "_note": "the right side is the SCS_BASE_COLOR capture of the same frames (there is no roughness capture), so it is labelled Base colour, not Mask",
+     "left": {"src": "unreal/puddle_wet_floor/%05d.png", "in": 0.0, "out": 5.0},
+     "right": {"src": "unreal/puddle_wet_floor_mask/%05d.png", "in": 0.0, "out": 5.0},
+     "labels": ["Final", "Base colour"],
+     "captions": [{"at": 0.4, "duration": 2.2, "text": "Each puddle *draws its own outline*", "style": "big", "position": "bottom"},
+                  {"at": 2.8, "duration": 2.0, "text": "A *deep core* and a *damp rim*", "style": "big", "position": "bottom"}]},
+
+    {"id": "layers", "type": "clip", "src": "diagrams/wet_layers/%05d.png", "fps": 30,
+     "in": 0.0, "out": 6.5, "duration": 6.5,
+     "_note": "full-frame diagram (its bottom 22 % kept clear); cards appear: Stone 0.4, Mask 1.2, Darker 2.0, Glossy 2.8, Ripples 3.6, Rings 4.4 s. Replaces the planned base colour vs normals wipe",
+     "captions": [{"at": 0.6, "duration": 2.6, "text": "Wet stone: *darker* and far *glossier*", "style": "big", "position": "bottom"},
+                  {"at": 3.6, "duration": 2.4, "text": "Roughness drops from *0.35 to 0.03*", "style": "big", "position": "bottom"}]},
+
+    {"id": "rings", "type": "overlay", "duration": 5.5,
+     "_note": "drip_splash_floor 2.0-7.5 (Leak_VaultLine #1): impacts at beat 0.95, 2.42, 3.76 s. ring_timing rendered --sync drip_splash_floor --offset 2.0 (t0 14.5). The zoom anchored right moves the impact left of the inset",
+     "base": {"src": "unreal/drip_splash_floor/%05d.png", "in": 2.0, "out": 7.5},
+     "zoom": {"from": 1.2, "to": 1.26, "anchor": [1.0, 0.5]},
+     "inset": {"src": "diagrams/ring_timing/%05d.png", "in": 0.0, "out": 5.5, "position": "right", "width": 0.42, "margin": 0.04},
+     "captions": [{"at": 0.8, "duration": 2.2, "text": "Each ring starts *when its drop lands*", "style": "big", "position": "bottom"},
+                  {"at": 3.2, "duration": 2.1, "text": "Spreading at *22 cm/s,*\nlike real ripples", "style": "big", "position": "bottom"}]},
+
+    {"id": "streak", "type": "clip", "src": "unreal/wetstreak_wall/%05d.png", "fps": 30,
+     "in": 0.0, "out": 5.0, "duration": 5.0,
+     "zoom": {"from": 1.0, "to": 1.15, "anchor": [0.5, 0.2], "ease": "inout"},
+     "_note": "the push anchored high keeps the streak in frame while the camera tilts down. ossuary Streak_2 runs about 1.3 m and stops at the first niche row, so no caption says it reaches the floor",
+     "captions": [{"at": 0.4, "duration": 2.2, "text": "Each streak *finds the wall* behind it", "style": "big", "position": "bottom"},
+                  {"at": 2.8, "duration": 2.0, "text": "then *traces its run* down the wall", "style": "big", "position": "bottom"}]},
+
+    {"id": "end", "type": "end", "lines": ["Mise en Monstre", "Material breakdown: water"], "duration": 1.5}
+  ]
+}
