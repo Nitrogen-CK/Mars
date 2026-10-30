@@ -1,16 +1,36 @@
-# Flame_Mars_NS: the one flame effect
+# The flame card and Flame_Mars_NS
 
-Every Mars flame (torch, lantern, wall torch, brazier, torch sconce; the hearth later) is drawn by one Niagara system,
-`/Game/Mars/Fx/Flame/Flame_Mars_NS`, scaled per use through user parameters. The dressing that owns it is
-`Script/WorldObjects/Items/Mars_FlameDressing.as` (`constants_flame_fx`): an archetype `UNiagaraComponent` on the flame
-node, created inactive, `Activate(true)` on the kernel's lit edge and `Deactivate()` on the dark one, parameters below.
-The candle draws no Niagara (`FxSize 0`): its mesh bakes a flame on `CandleFlame_Mars_M` and the dressing darkens that
-through custom primitive data 1 (`Set_BakedFlame`), as it does the brazier's and the sconce's baked tongues under the
-effect.
+Every Mars flame (torch, lantern, wall torch, brazier, torch sconce; the hearth later) is drawn by **one flame card**
+plus one Niagara system for what rises off it, scaled per use. The dressing that owns both is
+`Script/WorldObjects/Items/Mars_FlameDressing.as` (`constants_flame_fx`).
 
-**Until the asset exists** the dressing falls back to the CkParticles behaviours Fire (3) and SmokePlume (12), spawned at
-the flame node and moved with it each tick, Fire scaled by `FxSize / 45`, brightness through `Request_ApplyTuningValues`.
-Nothing else needs to change when the asset lands: the dressing finds it by path at construction.
+**The card** (`FlameCard_Mars_M`, instance `FlameCard_Mars_MI`, mesh `FlameCard_Mars_SM`, all from `mars_flame_ue.py`):
+a 48-row strip (the engine Plane has four vertices and cannot curl) on the flame node, rolled upright and scaled W x H
+(its scale only sizes the bounds, `BoundsScale` 3). Unlit and **translucent** (a masked card's moving vertices smeared
+under motion blur; translucency writes no velocity), with a soft outline (`Edge Feather`) and an exposure-independent
+emissive (`Exposure Independence` 1 routes it through EyeAdaptationInverse, so it reads the same in daylight and in a
+crypt; `Strength` is its on-screen brightness). The vertex shader rebuilds the strip from its UVs as a billboard about
+the vertical axis with its **base pinned at the flame node**; the tip is bent by `Lean` (the card's own world velocity,
+negated, on an underdamped spring in the dressing: it trails, overshoots and settles), the part of the lean pointing at
+the camera shows as an outward bend (`Toward Camera Bend`), the flame swings rather than stretches (it lowers as it
+leans), and a ripple travels up a trailing flame (`Trail Ripple`, `Cycles`, `Speed`). The pixel shader is a round-footed
+teardrop SDF warped and eroded by a coarse noise and torn into licks near the tip by a fine one (`Warp`, `Erode`, `Tear`,
+`Detail Scale` / `Speed`), white-hot core through the flame `Colour` (the dressing sets the light's colour here) to a
+dark-red tip. Custom primitive data per card:
+
+| Slot | Meaning | Written |
+|---|---|---|
+| 0 | Phase, this flame's random number | once |
+| 1 | Intensity 0..1 (the kernel's brightness; 0 dark) | every flicker tick |
+| 2-4 | Lean, world cm the tip is pushed | every flicker tick |
+| 5 | Enclosed 0 / 1 (1 caps the bend at 0.4 H instead of 1.2 H) | once |
+| 6, 7 | Height, Width, cm | once |
+
+**The system** `/Game/Mars/Fx/Flame/Flame_Mars_NS` (`mars_flame_niagara.py`): Embers and Glow only; an archetype
+`UNiagaraComponent` on the flame node, created inactive, `Activate(true)` on the kernel's lit edge and `Deactivate()` on
+the dark one. The candle draws neither (`FxSize 0`): its mesh bakes a flame on `CandleFlame_Mars_M` and the dressing
+darkens that through custom primitive data 1 (`Set_BakedFlame`), as it does the brazier's and the sconce's baked tongues
+under the card. The light sits on its own node half the flame height over the flame node (mid-flame).
 
 ## User parameters (the contract script relies on)
 
@@ -26,11 +46,10 @@ Nothing else needs to change when the asset lands: the dressing finds it by path
 Looping and persistent: no one-shot effect type, no `EFT_DistanceCulledOneShot_Mars`. Local-space emitters: the system
 rides the flame node, so everything is in flame-node centimetres with the tongues rooted at the origin.
 
-## Emitters (what `mars_flame_niagara.py` builds)
+## Emitters (what `mars_flame_niagara.py` builds; the flame itself is the card)
 
 | Emitter | Spawn | Life | Motion | Material |
 |---|---|---|---|---|
-| Tongues | 22/s in a disc of 0.18 Size at the root | 0.35-0.7 s | rise with ease-out to Size (0.8 Size enclosed), two-sine curl capped at 0.3 Size (0.12 enclosed), Wind lean, sprite narrows and shortens | `FlameSprite_Mars_MI` |
 | Embers | `User.EmberRate` in the upper third | 1-2.5 s (0 when enclosed) | rise ~1.2 Size/s slowing, three-sine turbulence, Wind drift, point shrinks | `EmberSprite_Mars_MI` |
 | Glow | 2/s at 0.45 Size | 1 s | still; two overlap and cross-fade on age (sin^2) | `FlameGlow_Mars_MI` |
 
@@ -46,7 +65,7 @@ randoms (only attributes the stack already registered can be used; a new one fai
 All three: unlit, additive, two-sided, `Used with Niagara Sprites`, one `Dynamic Parameter` node (slot 0, names
 Phase / Age / Intensity / Enclosed) and `Particle Color`.
 
-- `FlameSprite_Mars_M`: a teardrop SDF (round foot, narrowing tip, the width profile `0.62 * sqrt(1 - h) * (1 - 0.3 h)`)
+- `FlameSprite_Mars_M` (unused by the system since the card took over the flame; kept for a particle flame): a teardrop SDF (round foot, narrowing tip, the width profile `0.62 * sqrt(1 - h) * (1 - 0.3 h)`)
   eroded by a scrolling two-octave value noise so the edge licks; `CkUsf_SdfEdgeAA` (include `/CkUsf/Common.ush`) for
   the hard edge plus a soft haze outside it; the candle's flicker idea per sprite with the phase from `Dyn.x`; colour
   ramps Core (white-hot) at the foot of a young tongue, the particle colour in the body, Tip (dark red) at the tip and
@@ -75,13 +94,10 @@ Make the same asset by hand in the Niagara editor and the dressing picks it up u
    needs no Monolith, only `import sys; sys.path.insert(0, r"D:\Repo\Mars\Tools\Blender\mars_environment\unreal")`).
 2. Empty Niagara system `Flame_Mars_NS` under `/Game/Mars/Fx/Flame`; user parameters exactly as the table (names,
    types; `Enclosed` is a float, `Wind` a vector, `Colour` a linear color).
-3. Three empty CPU emitters named Tongues / Embers / Glow, Local Space on; per emitter: Spawn Rate (22 / `User.EmberRate`
-   / 2), Initialize Particle, a Scratch Pad module in Particle Spawn with the `NS_*_SPAWN` body and inputs bound to the
+3. Two empty CPU emitters named Embers / Glow, Local Space on; per emitter: Spawn Rate (`User.EmberRate` / 2), Initialize Particle, a Scratch Pad module in Particle Spawn with the `NS_*_SPAWN` body and inputs bound to the
    User parameters, Particle State, Dynamic Material Parameters, a Scratch Pad module in Particle Update with the
-   `NS_*_UPDATE` body (Embers also reads `Engine.DeltaTime`), a Sprite Renderer on the emitter's `_MI` (Tongues:
-   Velocity Aligned if the look wants the stretch; the update module does not write Velocity, so Camera facing is
-   also fine).
-4. Save; place a torch in PIE, light it: tongues, embers and glow should appear and dip with a gutter; stow it and the
+   `NS_*_UPDATE` body (Embers also reads `Engine.DeltaTime`), a Sprite Renderer on the emitter's `_MI`.
+4. Save; place a torch in PIE, light it: the card, embers and glow should appear and dip with a gutter; stow it and the
    effect stops (the dressing deactivates on the dark edge).
 
 ## PIE checklist (no lane sees any of this)
@@ -90,3 +106,18 @@ Tongues, embers and glow on the torch, the wall torch, the sconce and the brazie
 glass with no embers; running streams the torch flame back (Wind); the lantern swings in hand and on the belt and
 settles in a few swings; a stow does not whip it (sway Reset on mount change); the candle shows one flame that goes dark
 when snuffed; the brazier's baked tongues read as coals until lit.
+
+## Gotchas met building it (Monolith / editor Python)
+
+- A `DynamicParameter` or `VectorParameter` node's first output pin is a scalar / RGB: link `"RGBA"` to read `.w`.
+- There is no `MaterialExpressionObjectScale` in Python: sizes go through custom primitive data.
+- Monolith's constant setter is `set_module_input_value`; `set_module_input` does not exist.
+- The editor caches `mars_flame_hlsl`: `mars_flame_ue` reloads it on import so a module reload picks up new bodies.
+- Rebuilding through Stephen's editor (9316) needs `--force` on `env_drive.py` whenever a map is dirty; the build saves
+  only the flame assets.
+
+- Build the card mesh only in the hidden editor: `env_drive.py --port 9317 --module mars_flame_ue --alias mf --call
+  "mf.build_card_mesh()"`. It writes `Saved/FlameFx/FlameCard_Mars_SM.obj` and imports it as a NEW asset. Never rebuild
+  a live mesh's geometry from Python: on 2026-10-30 that shut down the interactive editor.
+- `Mars.Flame.DebugLean 1` prints each lit flame's tick rate, step, speed, lean and node / card positions once a second.
+- Keep per-tick history in plain members: a `TOptional<FVector>` member read back the current value, and the lean never moved.

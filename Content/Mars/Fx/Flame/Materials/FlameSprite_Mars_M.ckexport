@@ -4,7 +4,7 @@
 	"_meta":
 	{
 		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
-		"sourceHash": "c86e8357580bb649efbcf7d2dc6cb888",
+		"sourceHash": "dd4a7854fac46bbe757969c101a4e66d",
 		"exporterVersion": 3
 	},
 	"blendMode": "BLEND_Additive",
@@ -36,7 +36,7 @@
 			{
 				"id": 0,
 				"class": "ScalarParameter",
-				"name": "MaterialExpressionScalarParameter_0",
+				"name": "MaterialExpressionScalarParameter_36",
 				"desc": "How far each tongue's brightness swings round its mean.",
 				"props":
 				{
@@ -50,7 +50,7 @@
 			{
 				"id": 1,
 				"class": "ScalarParameter",
-				"name": "MaterialExpressionScalarParameter_1",
+				"name": "MaterialExpressionScalarParameter_37",
 				"desc": "The haze outside the hard edge, in sprite half-widths.",
 				"props":
 				{
@@ -65,7 +65,7 @@
 			{
 				"id": 2,
 				"class": "VectorParameter",
-				"name": "MaterialExpressionVectorParameter_0",
+				"name": "MaterialExpressionVectorParameter_18",
 				"desc": "White-hot: the foot of a young tongue.",
 				"outputs": [
 					"RGB",
@@ -86,7 +86,7 @@
 			{
 				"id": 3,
 				"class": "VectorParameter",
-				"name": "MaterialExpressionVectorParameter_1",
+				"name": "MaterialExpressionVectorParameter_19",
 				"desc": "Dark red: the tip of an old tongue.",
 				"outputs": [
 					"RGB",
@@ -107,7 +107,7 @@
 			{
 				"id": 4,
 				"class": "ScalarParameter",
-				"name": "MaterialExpressionScalarParameter_2",
+				"name": "MaterialExpressionScalarParameter_38",
 				"desc": "Cells across the sprite.",
 				"props":
 				{
@@ -122,7 +122,7 @@
 			{
 				"id": 5,
 				"class": "ScalarParameter",
-				"name": "MaterialExpressionScalarParameter_3",
+				"name": "MaterialExpressionScalarParameter_39",
 				"desc": "How fast the erosion scrolls up the tongue.",
 				"props":
 				{
@@ -136,12 +136,12 @@
 			{
 				"id": 6,
 				"class": "TextureCoordinate",
-				"name": "MaterialExpressionTextureCoordinate_0"
+				"name": "MaterialExpressionTextureCoordinate_9"
 			},
 			{
 				"id": 7,
 				"class": "DynamicParameter",
-				"name": "MaterialExpressionDynamicParameter_0",
+				"name": "MaterialExpressionDynamicParameter_9",
 				"outputs": [
 					"Phase",
 					"Age",
@@ -164,7 +164,7 @@
 			{
 				"id": 8,
 				"class": "ParticleColor",
-				"name": "MaterialExpressionParticleColor_0",
+				"name": "MaterialExpressionParticleColor_9",
 				"outputs": [
 					"RGB",
 					"R",
@@ -177,12 +177,12 @@
 			{
 				"id": 9,
 				"class": "Time",
-				"name": "MaterialExpressionTime_0"
+				"name": "MaterialExpressionTime_9"
 			},
 			{
 				"id": 10,
 				"class": "Custom",
-				"name": "MaterialExpressionCustom_0",
+				"name": "MaterialExpressionCustom_18",
 				"inputs": [
 					{
 						"index": 0,
@@ -211,7 +211,7 @@
 				],
 				"props":
 				{
-					"Code": "float2 p = UV * Scale + float2(0.0, -Time * Speed);\nfloat2 i = floor(p); float2 f = frac(p); f = f * f * (3.0 - 2.0 * f);\nfloat n00 = frac(sin(dot(i + float2(0.0, 0.0), float2(127.1, 311.7))) * 43758.5453);\nfloat n10 = frac(sin(dot(i + float2(1.0, 0.0), float2(127.1, 311.7))) * 43758.5453);\nfloat n01 = frac(sin(dot(i + float2(0.0, 1.0), float2(127.1, 311.7))) * 43758.5453);\nfloat n11 = frac(sin(dot(i + float2(1.0, 1.0), float2(127.1, 311.7))) * 43758.5453);\nfloat n = lerp(lerp(n00, n10, f.x), lerp(n01, n11, f.x), f.y);\np *= 2.17; i = floor(p); f = frac(p); f = f * f * (3.0 - 2.0 * f);\nn00 = frac(sin(dot(i + float2(0.0, 0.0), float2(127.1, 311.7))) * 43758.5453);\nn10 = frac(sin(dot(i + float2(1.0, 0.0), float2(127.1, 311.7))) * 43758.5453);\nn01 = frac(sin(dot(i + float2(0.0, 1.0), float2(127.1, 311.7))) * 43758.5453);\nn11 = frac(sin(dot(i + float2(1.0, 1.0), float2(127.1, 311.7))) * 43758.5453);\nreturn n * 0.65 + lerp(lerp(n00, n10, f.x), lerp(n01, n11, f.x), f.y) * 0.35;",
+					"Code": "float2 p = UV * Scale + float2(0.0, Time * Speed);\nfloat2 i = floor(p); float2 f = frac(p); f = f * f * (3.0 - 2.0 * f);\nfloat n00 = frac(sin(dot(i + float2(0.0, 0.0), float2(127.1, 311.7))) * 43758.5453);\nfloat n10 = frac(sin(dot(i + float2(1.0, 0.0), float2(127.1, 311.7))) * 43758.5453);\nfloat n01 = frac(sin(dot(i + float2(0.0, 1.0), float2(127.1, 311.7))) * 43758.5453);\nfloat n11 = frac(sin(dot(i + float2(1.0, 1.0), float2(127.1, 311.7))) * 43758.5453);\nfloat n = lerp(lerp(n00, n10, f.x), lerp(n01, n11, f.x), f.y);\np *= 2.17; i = floor(p); f = frac(p); f = f * f * (3.0 - 2.0 * f);\nn00 = frac(sin(dot(i + float2(0.0, 0.0), float2(127.1, 311.7))) * 43758.5453);\nn10 = frac(sin(dot(i + float2(1.0, 0.0), float2(127.1, 311.7))) * 43758.5453);\nn01 = frac(sin(dot(i + float2(0.0, 1.0), float2(127.1, 311.7))) * 43758.5453);\nn11 = frac(sin(dot(i + float2(1.0, 1.0), float2(127.1, 311.7))) * 43758.5453);\nreturn n * 0.65 + lerp(lerp(n00, n10, f.x), lerp(n01, n11, f.x), f.y) * 0.35;",
 					"OutputType": "CMOT_Float1",
 					"Description": "Erosion Noise"
 				}
@@ -219,7 +219,7 @@
 			{
 				"id": 11,
 				"class": "Custom",
-				"name": "MaterialExpressionCustom_1",
+				"name": "MaterialExpressionCustom_19",
 				"inputs": [
 					{
 						"index": 0,
@@ -231,8 +231,8 @@
 						"index": 1,
 						"name": "Dyn",
 						"node": 7,
-						"output": 0,
-						"mask": "r"
+						"output": 5,
+						"mask": "rgba"
 					},
 					{
 						"index": 2,
@@ -292,7 +292,7 @@
 			{
 				"id": 12,
 				"class": "MakeMaterialAttributes",
-				"name": "MaterialExpressionMakeMaterialAttributes_0",
+				"name": "MaterialExpressionMakeMaterialAttributes_9",
 				"inputs": [
 					{
 						"index": 5,

@@ -1,0 +1,996 @@
+{
+	"material": "FlameCard_Mars_M",
+	"packagePath": "/Game/Mars/Fx/Flame/Materials/FlameCard_Mars_M",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "9e37287c915e91613ff33c2c1e460cf8",
+		"exporterVersion": 3
+	},
+	"blendMode": "BLEND_Translucent",
+	"twoSided": true,
+	"unlit": true,
+	"shadingModel": "MSM_Unlit",
+	"domain": "MD_Surface",
+	"connectedOutputs": [],
+	"expressions":
+	{
+		"CameraPositionWS": 1,
+		"Custom": 8,
+		"EyeAdaptationInverse": 1,
+		"MakeMaterialAttributes": 1,
+		"ObjectPositionWS": 1,
+		"ScalarParameter": 21,
+		"TextureCoordinate": 1,
+		"Time": 1,
+		"VectorParameter": 4,
+		"WorldPosition": 1
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_44",
+				"desc": "The flame's body colour (the dressing sets the light's colour here).",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=1.000000,G=0.550000,B=0.250000,A=1.000000)",
+					"ParameterName": "Colour",
+					"Group": "Flame",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 1,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_45",
+				"desc": "White-hot: the foot of the flame.",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=1.000000,G=0.930000,B=0.780000,A=1.000000)",
+					"ParameterName": "Core Color",
+					"Group": "Flame",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 2,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_46",
+				"desc": "Dark red: the tip.",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.550000,G=0.080000,B=0.010000,A=1.000000)",
+					"ParameterName": "Tip Color",
+					"Group": "Flame",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 3,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_130",
+				"desc": "Brightness on screen (exposure-independent: 1 is about white, the core blooms above about 2).",
+				"props":
+				{
+					"DefaultValue": 1.6000000238418579,
+					"SliderMax": 10,
+					"ParameterName": "Strength",
+					"Group": "Flame",
+					"SortPriority": 3
+				}
+			},
+			{
+				"id": 4,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_131",
+				"desc": "1: the flame looks equally bright in daylight and in a dark crypt (through EyeAdaptationInverse); 0: it follows the scene's exposure like any emissive.",
+				"props":
+				{
+					"DefaultValue": 1,
+					"SliderMax": 1,
+					"ParameterName": "Exposure Independence",
+					"Group": "Flame",
+					"SortPriority": 4
+				}
+			},
+			{
+				"id": 5,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_132",
+				"desc": "How soft the flame's outline is, in card half-widths.",
+				"props":
+				{
+					"DefaultValue": 0.05000000074505806,
+					"SliderMax": 0.5,
+					"ParameterName": "Edge Feather",
+					"Group": "Flame",
+					"SortPriority": 5
+				}
+			},
+			{
+				"id": 6,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_133",
+				"desc": "How far in from the edge the flame darkens, in card half-widths.",
+				"props":
+				{
+					"DefaultValue": 0.30000001192092896,
+					"SliderMin": 0.0099999997764825821,
+					"SliderMax": 1,
+					"ParameterName": "Edge Softness",
+					"Group": "Flame",
+					"SortPriority": 6
+				}
+			},
+			{
+				"id": 7,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_134",
+				"desc": "How fast the flame dances.",
+				"props":
+				{
+					"DefaultValue": 1.7999999523162842,
+					"SliderMax": 4,
+					"ParameterName": "Flicker Speed",
+					"Group": "Flicker",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 8,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_135",
+				"desc": "How far the brightness swings round its mean.",
+				"props":
+				{
+					"DefaultValue": 0.18000000715255737,
+					"SliderMax": 1,
+					"ParameterName": "Flicker Amount",
+					"Group": "Flicker",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 9,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_136",
+				"desc": "Coarse cells across the card: the body's warp and erosion.",
+				"props":
+				{
+					"DefaultValue": 2.5999999046325684,
+					"SliderMin": 0.5,
+					"SliderMax": 12,
+					"ParameterName": "Noise Scale",
+					"Group": "Erosion",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 10,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_137",
+				"desc": "How fast the coarse noise scrolls up the flame.",
+				"props":
+				{
+					"DefaultValue": 4.5,
+					"SliderMax": 12,
+					"ParameterName": "Noise Speed",
+					"Group": "Erosion",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 11,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_138",
+				"desc": "Fine cells across the card: the licking edge and the torn tip.",
+				"props":
+				{
+					"DefaultValue": 7,
+					"SliderMin": 1,
+					"SliderMax": 24,
+					"ParameterName": "Detail Scale",
+					"Group": "Erosion",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 12,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_139",
+				"desc": "How fast the fine noise scrolls up the flame.",
+				"props":
+				{
+					"DefaultValue": 9,
+					"SliderMax": 24,
+					"ParameterName": "Detail Speed",
+					"Group": "Erosion",
+					"SortPriority": 3
+				}
+			},
+			{
+				"id": 13,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_140",
+				"desc": "How far the upper flame wavers side to side.",
+				"props":
+				{
+					"DefaultValue": 0.30000001192092896,
+					"SliderMax": 1,
+					"ParameterName": "Warp",
+					"Group": "Erosion",
+					"SortPriority": 4
+				}
+			},
+			{
+				"id": 14,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_141",
+				"desc": "How deep the noise eats into the edge.",
+				"props":
+				{
+					"DefaultValue": 0.55000001192092896,
+					"SliderMax": 1.5,
+					"ParameterName": "Erode",
+					"Group": "Erosion",
+					"SortPriority": 5
+				}
+			},
+			{
+				"id": 15,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_142",
+				"desc": "Above mid-height, fine noise below this is cut out: the top tears into licks.",
+				"props":
+				{
+					"DefaultValue": 0.37999999523162842,
+					"SliderMax": 1,
+					"ParameterName": "Tear",
+					"Group": "Erosion",
+					"SortPriority": 6
+				}
+			},
+			{
+				"id": 16,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_143",
+				"desc": "How far the ripple travelling up a trailing flame swings, as a share of the trail.",
+				"props":
+				{
+					"DefaultValue": 0.34999999403953552,
+					"SliderMax": 1,
+					"ParameterName": "Trail Ripple",
+					"Group": "Motion",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 17,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_144",
+				"desc": "Ripple waves along the flame's height.",
+				"props":
+				{
+					"DefaultValue": 1.2999999523162842,
+					"SliderMin": 0.25,
+					"SliderMax": 4,
+					"ParameterName": "Trail Ripple Cycles",
+					"Group": "Motion",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 18,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_145",
+				"desc": "How fast the ripple travels up the flame (radians/s).",
+				"props":
+				{
+					"DefaultValue": 11,
+					"SliderMax": 30,
+					"ParameterName": "Trail Ripple Speed",
+					"Group": "Motion",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 19,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_146",
+				"desc": "How much of a lean straight at the camera shows as an outward bend on screen (first person squashes depth, so it would otherwise vanish).",
+				"props":
+				{
+					"DefaultValue": 0.40000000596046448,
+					"SliderMax": 3,
+					"ParameterName": "Toward Camera Bend",
+					"Group": "Motion",
+					"SortPriority": 3
+				}
+			},
+			{
+				"id": 20,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_147",
+				"desc": "Custom primitive data 0: this flame's random phase.",
+				"props":
+				{
+					"SliderMax": 1,
+					"bUseCustomPrimitiveData": true,
+					"ParameterName": "Phase",
+					"Group": "Per Flame (Custom Primitive Data)",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 21,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_148",
+				"desc": "Custom primitive data 1: the kernel's brightness, 0 dark.",
+				"props":
+				{
+					"DefaultValue": 1,
+					"SliderMax": 1,
+					"bUseCustomPrimitiveData": true,
+					"PrimitiveDataIndex": 1,
+					"ParameterName": "Intensity",
+					"Group": "Per Flame (Custom Primitive Data)",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 22,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_47",
+				"desc": "Custom primitive data 2-5: where the tip is pushed, world cm (xyz); w = 1 behind glass (a smaller bend).",
+				"outputs": [
+					"RGB",
+					"X",
+					"Y",
+					"Z",
+					"Enclosed",
+					"RGBA"
+				],
+				"props":
+				{
+					"bUseCustomPrimitiveData": true,
+					"PrimitiveDataIndex": 2,
+					"ParameterName": "Lean",
+					"Group": "Per Flame (Custom Primitive Data)",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 23,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_149",
+				"desc": "Custom primitive data 6: the flame's height, cm.",
+				"props":
+				{
+					"DefaultValue": 100,
+					"SliderMin": 1,
+					"SliderMax": 200,
+					"bUseCustomPrimitiveData": true,
+					"PrimitiveDataIndex": 6,
+					"ParameterName": "Height",
+					"Group": "Per Flame (Custom Primitive Data)",
+					"SortPriority": 3
+				}
+			},
+			{
+				"id": 24,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_150",
+				"desc": "Custom primitive data 7: the flame's width, cm.",
+				"props":
+				{
+					"DefaultValue": 62,
+					"SliderMin": 1,
+					"SliderMax": 200,
+					"bUseCustomPrimitiveData": true,
+					"PrimitiveDataIndex": 7,
+					"ParameterName": "Width",
+					"Group": "Per Flame (Custom Primitive Data)",
+					"SortPriority": 4
+				}
+			},
+			{
+				"id": 25,
+				"class": "TextureCoordinate",
+				"name": "MaterialExpressionTextureCoordinate_11"
+			},
+			{
+				"id": 26,
+				"class": "Time",
+				"name": "MaterialExpressionTime_11"
+			},
+			{
+				"id": 27,
+				"class": "WorldPosition",
+				"name": "MaterialExpressionWorldPosition_11",
+				"outputs": [
+					"XYZ",
+					"XY",
+					"Z"
+				],
+				"props":
+				{
+					"WorldPositionShaderOffset": "WPT_ExcludeAllShaderOffsets"
+				}
+			},
+			{
+				"id": 28,
+				"class": "ObjectPositionWS",
+				"name": "MaterialExpressionObjectPositionWS_11"
+			},
+			{
+				"id": 29,
+				"class": "CameraPositionWS",
+				"name": "MaterialExpressionCameraPositionWS_11"
+			},
+			{
+				"id": 30,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_40",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Time",
+						"node": 26,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "Speed",
+						"node": 7,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "Phase",
+						"node": 20,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "Amount",
+						"node": 8,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "float t = Time * Speed + Phase * 61.0;\nfloat n = sin(t * 6.1) * 0.5 + sin(t * 13.7 + 1.3) * 0.3 + sin(t * 23.3 + 2.1) * 0.2;\nfloat i = 1.0 + n * Amount;\nfloat sx = sin(t * 2.3) * 0.6 + sin(t * 5.9 + 0.7) * 0.4;\nfloat sy = sin(t * 1.9 + 1.1) * 0.6 + sin(t * 4.7 + 2.3) * 0.4;\nreturn float3(max(i, 0.05), sx, sy);",
+					"Description": "Flicker"
+				}
+			},
+			{
+				"id": 31,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_41",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "UV",
+						"node": 25,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "Phase",
+						"node": 20,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "return UV + float2(Phase * 17.31, Phase * 5.17);",
+					"OutputType": "CMOT_Float2",
+					"Description": "Phased UV"
+				}
+			},
+			{
+				"id": 32,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_42",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "UV",
+						"node": 31,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "Time",
+						"node": 26,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "Scale",
+						"node": 9,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "Speed",
+						"node": 10,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "float2 p = UV * Scale + float2(0.0, Time * Speed);\nfloat2 i = floor(p); float2 f = frac(p); f = f * f * (3.0 - 2.0 * f);\nfloat n00 = frac(sin(dot(i + float2(0.0, 0.0), float2(127.1, 311.7))) * 43758.5453);\nfloat n10 = frac(sin(dot(i + float2(1.0, 0.0), float2(127.1, 311.7))) * 43758.5453);\nfloat n01 = frac(sin(dot(i + float2(0.0, 1.0), float2(127.1, 311.7))) * 43758.5453);\nfloat n11 = frac(sin(dot(i + float2(1.0, 1.0), float2(127.1, 311.7))) * 43758.5453);\nfloat n = lerp(lerp(n00, n10, f.x), lerp(n01, n11, f.x), f.y);\np *= 2.17; i = floor(p); f = frac(p); f = f * f * (3.0 - 2.0 * f);\nn00 = frac(sin(dot(i + float2(0.0, 0.0), float2(127.1, 311.7))) * 43758.5453);\nn10 = frac(sin(dot(i + float2(1.0, 0.0), float2(127.1, 311.7))) * 43758.5453);\nn01 = frac(sin(dot(i + float2(0.0, 1.0), float2(127.1, 311.7))) * 43758.5453);\nn11 = frac(sin(dot(i + float2(1.0, 1.0), float2(127.1, 311.7))) * 43758.5453);\nreturn n * 0.65 + lerp(lerp(n00, n10, f.x), lerp(n01, n11, f.x), f.y) * 0.35;",
+					"OutputType": "CMOT_Float1",
+					"Description": "Erosion Noise"
+				}
+			},
+			{
+				"id": 33,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_43",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "UV",
+						"node": 31,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "Time",
+						"node": 26,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "Scale",
+						"node": 11,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "Speed",
+						"node": 12,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "float2 p = UV * Scale + float2(0.0, Time * Speed);\nfloat2 i = floor(p); float2 f = frac(p); f = f * f * (3.0 - 2.0 * f);\nfloat n00 = frac(sin(dot(i + float2(0.0, 0.0), float2(127.1, 311.7))) * 43758.5453);\nfloat n10 = frac(sin(dot(i + float2(1.0, 0.0), float2(127.1, 311.7))) * 43758.5453);\nfloat n01 = frac(sin(dot(i + float2(0.0, 1.0), float2(127.1, 311.7))) * 43758.5453);\nfloat n11 = frac(sin(dot(i + float2(1.0, 1.0), float2(127.1, 311.7))) * 43758.5453);\nfloat n = lerp(lerp(n00, n10, f.x), lerp(n01, n11, f.x), f.y);\np *= 2.17; i = floor(p); f = frac(p); f = f * f * (3.0 - 2.0 * f);\nn00 = frac(sin(dot(i + float2(0.0, 0.0), float2(127.1, 311.7))) * 43758.5453);\nn10 = frac(sin(dot(i + float2(1.0, 0.0), float2(127.1, 311.7))) * 43758.5453);\nn01 = frac(sin(dot(i + float2(0.0, 1.0), float2(127.1, 311.7))) * 43758.5453);\nn11 = frac(sin(dot(i + float2(1.0, 1.0), float2(127.1, 311.7))) * 43758.5453);\nreturn n * 0.65 + lerp(lerp(n00, n10, f.x), lerp(n01, n11, f.x), f.y) * 0.35;",
+					"OutputType": "CMOT_Float1",
+					"Description": "Detail Noise"
+				}
+			},
+			{
+				"id": 34,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_44",
+				"props":
+				{
+					"Code": "return ResolvedView.ViewForward;",
+					"Description": "View Forward",
+					"Inputs": []
+				}
+			},
+			{
+				"id": 35,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_45",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "UV",
+						"node": 25,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "WP",
+						"node": 27,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 2,
+						"name": "ObjPos",
+						"node": 28,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "Cam",
+						"node": 29,
+						"output": 0
+					},
+					{
+						"index": 4,
+						"name": "ViewFwd",
+						"node": 34,
+						"output": 0
+					},
+					{
+						"index": 5,
+						"name": "Height",
+						"node": 23,
+						"output": 0
+					},
+					{
+						"index": 6,
+						"name": "Width",
+						"node": 24,
+						"output": 0
+					},
+					{
+						"index": 7,
+						"name": "Exaggerate",
+						"node": 19,
+						"output": 0
+					},
+					{
+						"index": 8,
+						"name": "Time",
+						"node": 26,
+						"output": 0
+					},
+					{
+						"index": 9,
+						"name": "Phase",
+						"node": 20,
+						"output": 0
+					},
+					{
+						"index": 10,
+						"name": "WaveAmount",
+						"node": 16,
+						"output": 0
+					},
+					{
+						"index": 11,
+						"name": "WaveCycles",
+						"node": 17,
+						"output": 0
+					},
+					{
+						"index": 12,
+						"name": "WaveSpeed",
+						"node": 18,
+						"output": 0
+					},
+					{
+						"index": 13,
+						"name": "Lean",
+						"node": 22,
+						"output": 5,
+						"mask": "rgba"
+					},
+					{
+						"index": 14,
+						"name": "Flicker",
+						"node": 30,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "float H = max(Height, 0.1);\nfloat W = max(Width, 0.1);\nfloat u = UV.x - 0.5;\nfloat v = saturate(1.0 - UV.y);\nfloat3 up = float3(0.0, 0.0, 1.0);\nfloat3 toCam = Cam - ObjPos;\nfloat3 toCamFlat = float3(toCam.xy, 0.0);\nfloat3 fwd = normalize(toCamFlat + float3(1e-3, 0.0, 0.0));\nfloat3 right = normalize(cross(up, fwd));\n// The trail is the push opposite the carrier's motion. The part of it across the view shows as is; the part straight at\n// the camera (walking forward with the torch ahead) would only foreshorten - and first-person rendering squashes depth -\n// so it is turned into what perspective shows of a tip coming at the eye: a bend outward from the view's centre.\nfloat3 lean = Lean.xyz;\nfloat3 viewDir = normalize(ObjPos - Cam);\nfloat along = dot(lean, viewDir);\nfloat3 across = lean - viewDir * along;\nfloat3 off = ObjPos - Cam;\nfloat3 radial = off - ViewFwd * dot(off, ViewFwd);\nfloat rl = length(radial);\nfloat3 outward = rl > 1e-3 ? radial / rl : right;\noutward = normalize(outward - viewDir * dot(outward, viewDir) + float3(0.0, 0.0, 1e-4));\nlean = across + outward * max(-along, 0.0) * Exaggerate - outward * max(along, 0.0) * 0.5 * Exaggerate;\nfloat lmax = H * lerp(0.45, 0.2, saturate(Lean.w));\nfloat ll = length(lean);\nlean = ll > lmax ? lean * (lmax / ll) : lean;\nll = length(lean);\n// the trail curls: the foot barely moves, the tip most\nfloat bend = pow(v, 1.6);\n// a ripple travels up the trailing flame, across the trail as seen from the camera, growing with the trail and toward the\n// tip, like a flag's edge in the wind\nfloat3 perp = normalize(cross(ll > 1e-3 ? lean / ll : right, viewDir) + float3(1e-4, 0.0, 0.0));\nfloat ripple = sin(v * WaveCycles * 6.2831853 - Time * WaveSpeed + Phase * 6.2831853) * WaveAmount * ll * v;\nfloat3 sway = (right * Flicker.y + fwd * Flicker.z) * H * 0.08 * v * v;\nfloat stretch = 1.0 + (Flicker.x - 1.0) * 0.3;\n// the flame swings rather than stretches: the further the tip leans, the lower it stands, so its length stays about H\nfloat keep = sqrt(max(1.0 - (ll * ll) / (H * H), 0.5));\nfloat3 p = ObjPos + right * (u * W) + up * (v * H * stretch * lerp(1.0, keep, bend)) + lean * bend + perp * ripple + sway;\nreturn p - WP;",
+					"Description": "Flame Card VS"
+				}
+			},
+			{
+				"id": 36,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_46",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "UV",
+						"node": 25,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "Noise",
+						"node": 32,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "Detail",
+						"node": 33,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "Flicker",
+						"node": 30,
+						"output": 0
+					},
+					{
+						"index": 4,
+						"name": "Intensity",
+						"node": 21,
+						"output": 0
+					},
+					{
+						"index": 5,
+						"name": "Softness",
+						"node": 6,
+						"output": 0
+					},
+					{
+						"index": 6,
+						"name": "Strength",
+						"node": 3,
+						"output": 0
+					},
+					{
+						"index": 7,
+						"name": "Core",
+						"node": 1,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 8,
+						"name": "Tip",
+						"node": 2,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 9,
+						"name": "Colour",
+						"node": 0,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 10,
+						"name": "Warp",
+						"node": 13,
+						"output": 0
+					},
+					{
+						"index": 11,
+						"name": "Erode",
+						"node": 14,
+						"output": 0
+					},
+					{
+						"index": 12,
+						"name": "Tear",
+						"node": 15,
+						"output": 0
+					},
+					{
+						"index": 13,
+						"name": "Feather",
+						"node": 5,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"return",
+					"Mask"
+				],
+				"props":
+				{
+					"Code": "float2 q = float2(UV.x - 0.5, 0.5 - UV.y) * 2.0;\n// the flame spans q.y -0.9 (foot) .. 0.8 (tip); the card is about twice the flame's width\nfloat h = saturate((q.y + 0.9) / 1.7);\n// the upper flame wavers side to side on the coarse noise\nq.x += (Noise - 0.5) * Warp * h * h;\n// a round foot (a quarter circle over the lowest fifth) narrowing to the tip: no flat bottom\nfloat foot = h < 0.2 ? sqrt(saturate(h * (0.4 - h))) / 0.2 : 1.0;\nfloat wide = 0.42 * foot * sqrt(max(1.0 - h, 0.0)) * (1.0 - 0.3 * h);\nfloat erode = (Noise - 0.5) * Erode * (0.2 + h) * 0.7 + (Detail - 0.5) * Erode * h * h;\nfloat d = abs(q.x) - wide + erode;\nd += max(q.y - 0.8, 0.0) * 3.0 + max(-0.9 - q.y, 0.0) * 3.0;\n// above mid-height the flame tears into licks wherever the fine noise is low (blended in by height: a plain max with 0\n// below it would push the whole lower flame onto its edge)\nd = lerp(d, max(d, (Tear - Detail) * 0.6), smoothstep(0.35, 0.85, h));\n// a guttering flame (Intensity dipping) shrinks a little as well as dimming\nd += (1.0 - saturate(Intensity)) * 0.12;\n// nothing ever reaches the quad's border, whatever the noise does\nfloat border = saturate((1.0 - abs(q.x)) / 0.25) * saturate((1.0 - q.y) / 0.2) * saturate((q.y + 1.0) / 0.1);\n// translucent coverage: a soft edge Feather wide (never sharper than a pixel)\nMask = saturate(0.5 - d / max(Feather, fwidth(d))) * border;\n// solid inside: hot core, the flame colour toward the edge, darker at the very edge and the foot\nfloat inner = saturate(-d / max(Softness, 1e-3));\nfloat hot = saturate(1.0 - h * 1.4) * inner;\nfloat3 col = lerp(Colour, Core, hot * hot);\ncol = lerp(col, Tip, saturate(h * 0.8 - 0.4));\ncol *= lerp(0.55, 1.0, inner) * lerp(0.8, 1.15, Detail) * lerp(0.6, 1.0, smoothstep(0.0, 0.18, h));\nreturn col * Flicker.x * lerp(0.35, 1.0, saturate(Intensity)) * Strength;",
+					"Description": "Flame Card PS",
+					"IncludeFilePaths": [
+						"/CkUsf/Common.ush"
+					]
+				}
+			},
+			{
+				"id": 37,
+				"class": "EyeAdaptationInverse",
+				"name": "MaterialExpressionEyeAdaptationInverse_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "LightValueInput",
+						"node": 36,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 38,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_47",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Scene",
+						"node": 36,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "Adapted",
+						"node": 37,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "K",
+						"node": 4,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "return lerp(Scene, Adapted, saturate(K));",
+					"Description": "Exposure Blend"
+				}
+			},
+			{
+				"id": 39,
+				"class": "MakeMaterialAttributes",
+				"name": "MaterialExpressionMakeMaterialAttributes_7",
+				"inputs": [
+					{
+						"index": 5,
+						"name": "EmissiveColor",
+						"node": 38,
+						"output": 0
+					},
+					{
+						"index": 6,
+						"name": "Opacity",
+						"node": 36,
+						"output": 1
+					},
+					{
+						"index": 10,
+						"name": "WorldPositionOffset",
+						"node": 35,
+						"output": 0
+					}
+				]
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_MaterialAttributes",
+				"node": 39,
+				"output": 0
+			}
+		]
+	},
+	"scalarParams": [
+		{
+			"name": "Strength",
+			"value": 1.6000000238418579
+		},
+		{
+			"name": "Exposure Independence",
+			"value": 1
+		},
+		{
+			"name": "Edge Feather",
+			"value": 0.05000000074505806
+		},
+		{
+			"name": "Edge Softness",
+			"value": 0.30000001192092896
+		},
+		{
+			"name": "Flicker Speed",
+			"value": 1.7999999523162842
+		},
+		{
+			"name": "Flicker Amount",
+			"value": 0.18000000715255737
+		},
+		{
+			"name": "Noise Scale",
+			"value": 2.5999999046325684
+		},
+		{
+			"name": "Noise Speed",
+			"value": 4.5
+		},
+		{
+			"name": "Detail Scale",
+			"value": 7
+		},
+		{
+			"name": "Detail Speed",
+			"value": 9
+		},
+		{
+			"name": "Warp",
+			"value": 0.30000001192092896
+		},
+		{
+			"name": "Erode",
+			"value": 0.55000001192092896
+		},
+		{
+			"name": "Tear",
+			"value": 0.37999999523162842
+		},
+		{
+			"name": "Trail Ripple",
+			"value": 0.34999999403953552
+		},
+		{
+			"name": "Trail Ripple Cycles",
+			"value": 1.2999999523162842
+		},
+		{
+			"name": "Trail Ripple Speed",
+			"value": 11
+		},
+		{
+			"name": "Toward Camera Bend",
+			"value": 0.40000000596046448
+		},
+		{
+			"name": "Phase",
+			"value": 0
+		},
+		{
+			"name": "Intensity",
+			"value": 1
+		},
+		{
+			"name": "Height",
+			"value": 100
+		},
+		{
+			"name": "Width",
+			"value": 62
+		}
+	],
+	"vectorParams": [
+		{
+			"name": "Colour",
+			"value": "RGBA(1, 0.55, 0.25, 1)"
+		},
+		{
+			"name": "Core Color",
+			"value": "RGBA(1, 0.93, 0.78, 1)"
+		},
+		{
+			"name": "Tip Color",
+			"value": "RGBA(0.55, 0.08, 0.01, 1)"
+		},
+		{
+			"name": "Lean",
+			"value": "RGBA(0, 0, 0, 0)"
+		}
+	],
+	"textureParams": [],
+	"usedTextures": []
+}

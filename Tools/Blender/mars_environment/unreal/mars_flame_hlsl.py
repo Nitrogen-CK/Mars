@@ -73,11 +73,11 @@ Particles.SpriteSize = float2(Size * 0.035 * (1.0 - 0.6 * t), Size * 0.035 * (1.
 Particles.DynamicMaterialParameter = float4(ph, t, Intensity, 0.0);"""
 
 # ====================================================================================== glow
-# Spawn: at the core, 1 s; three times the flame wide. Two overlap (SpawnRate 2) and the material cross-fades them on age.
+# Spawn: at the core, 1 s; 1.6 times the flame wide (a halo round the card, not a blob over it). Two overlap (SpawnRate 2) and the material cross-fades them on age.
 NS_GLOW_SPAWN = """Particles.Position = float3(0.0, 0.0, Size * 0.45);
 Particles.Lifetime = 1.0;
 Particles.Color = float4(Colour.rgb, rand(1.0f));
-Particles.SpriteSize = float2(Size * 3.0, Size * 3.0);
+Particles.SpriteSize = float2(Size * 1.6, Size * 1.6);
 Particles.SpriteRotation = 0.0;"""
 
 NS_GLOW_UPDATE = """float t = saturate(Particles.NormalizedAge);
@@ -86,7 +86,7 @@ Particles.DynamicMaterialParameter = float4(Particles.Color.a, t, Intensity, 0.0
 
 # ====================================================================================== materials
 # A cheap value noise (two octaves) for the erosion: UV-space, scrolled by time. Inputs UV (float2), Time, Scale, Speed.
-NOISE_HLSL = """float2 p = UV * Scale + float2(0.0, -Time * Speed);
+NOISE_HLSL = """float2 p = UV * Scale + float2(0.0, Time * Speed);
 float2 i = floor(p); float2 f = frac(p); f = f * f * (3.0 - 2.0 * f);
 float n00 = frac(sin(dot(i + float2(0.0, 0.0), float2(127.1, 311.7))) * 43758.5453);
 float n10 = frac(sin(dot(i + float2(1.0, 0.0), float2(127.1, 311.7))) * 43758.5453);
@@ -144,3 +144,103 @@ float g = pow(saturate(1.0 - r), Falloff);
 float age = Dyn.y;
 float s = sin(age * 3.14159265);
 return PC * g * Strength * s * s * Dyn.z;"""
+
+# ====================================================================================== the flame card
+# One static-mesh card per flame (the engine Plane on the flame node, rolled upright, scaled W x H), fully procedural in the
+# vertex shader: the quad is rebuilt from its UVs as a billboard about the vertical axis, its base pinned at the flame
+# node and its tip bent by Lean (custom primitive data 2-4, world cm at the tip: the dressing's smoothed, negated carrier
+# velocity, so the flame trails the motion and rights itself when it stops) plus the flicker sway. Lean.w = 1 behind
+# glass caps the bend at 0.4 H instead of 1.2 H. Height / Width are custom primitive data 6 / 7 (cm; the Plane's own
+# scale only sizes its bounds). The part of the lean straight along the view becomes an outward bend on screen
+# (Exaggerate). A ripple (WaveAmount x the trail, WaveCycles along the flame, WaveSpeed) travels up a trailing flame.
+# Inputs: UV, WP (world position without offsets), ObjPos, Cam, ViewFwd, Height, Width, Exaggerate, Time, Phase,
+# WaveAmount, WaveCycles, WaveSpeed, Lean (float4),
+# Flicker (float3: brightness, sway x, sway y).
+FLAME_CARD_VS_HLSL = """float H = max(Height, 0.1);
+float W = max(Width, 0.1);
+float u = UV.x - 0.5;
+float v = saturate(1.0 - UV.y);
+float3 up = float3(0.0, 0.0, 1.0);
+float3 toCam = Cam - ObjPos;
+float3 toCamFlat = float3(toCam.xy, 0.0);
+float3 fwd = normalize(toCamFlat + float3(1e-3, 0.0, 0.0));
+float3 right = normalize(cross(up, fwd));
+// The trail is the push opposite the carrier's motion. The part of it across the view shows as is; the part straight at
+// the camera (walking forward with the torch ahead) would only foreshorten - and first-person rendering squashes depth -
+// so it is turned into what perspective shows of a tip coming at the eye: a bend outward from the view's centre.
+float3 lean = Lean.xyz;
+float3 viewDir = normalize(ObjPos - Cam);
+float along = dot(lean, viewDir);
+float3 across = lean - viewDir * along;
+float3 off = ObjPos - Cam;
+float3 radial = off - ViewFwd * dot(off, ViewFwd);
+float rl = length(radial);
+float3 outward = rl > 1e-3 ? radial / rl : right;
+outward = normalize(outward - viewDir * dot(outward, viewDir) + float3(0.0, 0.0, 1e-4));
+lean = across + outward * max(-along, 0.0) * Exaggerate - outward * max(along, 0.0) * 0.5 * Exaggerate;
+float lmax = H * lerp(0.45, 0.2, saturate(Lean.w));
+float ll = length(lean);
+lean = ll > lmax ? lean * (lmax / ll) : lean;
+ll = length(lean);
+// the trail curls: the foot barely moves, the tip most
+float bend = pow(v, 1.6);
+// a ripple travels up the trailing flame, across the trail as seen from the camera, growing with the trail and toward the
+// tip, like a flag's edge in the wind
+float3 perp = normalize(cross(ll > 1e-3 ? lean / ll : right, viewDir) + float3(1e-4, 0.0, 0.0));
+float ripple = sin(v * WaveCycles * 6.2831853 - Time * WaveSpeed + Phase * 6.2831853) * WaveAmount * ll * v;
+float3 sway = (right * Flicker.y + fwd * Flicker.z) * H * 0.08 * v * v;
+float stretch = 1.0 + (Flicker.x - 1.0) * 0.3;
+// the flame swings rather than stretches: the further the tip leans, the lower it stands, so its length stays about H
+float keep = sqrt(max(1.0 - (ll * ll) / (H * H), 0.5));
+float3 p = ObjPos + right * (u * W) + up * (v * H * stretch * lerp(1.0, keep, bend)) + lean * bend + perp * ripple + sway;
+return p - WP;"""
+
+# The candle's flicker (mars_candle_ue.FLICKER_HLSL): x = brightness about 1, y / z = sideways sway in -1..1. Phase is
+# custom primitive data 0 (one random number per flame, set by the dressing). Inputs: Time, Speed, Phase, Amount.
+FLAME_CARD_FLICKER_HLSL = """float t = Time * Speed + Phase * 61.0;
+float n = sin(t * 6.1) * 0.5 + sin(t * 13.7 + 1.3) * 0.3 + sin(t * 23.3 + 2.1) * 0.2;
+float i = 1.0 + n * Amount;
+float sx = sin(t * 2.3) * 0.6 + sin(t * 5.9 + 0.7) * 0.4;
+float sy = sin(t * 1.9 + 1.1) * 0.6 + sin(t * 4.7 + 2.3) * 0.4;
+return float3(max(i, 0.05), sx, sy);"""
+
+# The card's pixel shader: the teardrop SDF of the sprite eroded by the scrolling noise, white-hot at the foot through the
+# flame Colour to the Tip colour, times the flicker and Intensity (custom primitive data 1, the kernel's brightness: 0 is
+# dark). Two noises: Noise (coarse) warps and erodes the body, Detail (fine, faster) eats the edge and tears the top into
+# licks (Tear). TRANSLUCENT: the additional output Mask is the opacity (soft edge Feather wide), the return is the
+# emissive colour.
+# Needs /CkUsf/Common.ush. Inputs: UV, Noise, Detail, Flicker, Intensity, Softness, Strength, Core, Tip,
+# Colour, Warp, Erode, Tear, Feather.
+FLAME_CARD_PS_HLSL = """float2 q = float2(UV.x - 0.5, 0.5 - UV.y) * 2.0;
+// the flame spans q.y -0.9 (foot) .. 0.8 (tip); the card is about twice the flame's width
+float h = saturate((q.y + 0.9) / 1.7);
+// the upper flame wavers side to side on the coarse noise
+q.x += (Noise - 0.5) * Warp * h * h;
+// a round foot (a quarter circle over the lowest fifth) narrowing to the tip: no flat bottom
+float foot = h < 0.2 ? sqrt(saturate(h * (0.4 - h))) / 0.2 : 1.0;
+float wide = 0.42 * foot * sqrt(max(1.0 - h, 0.0)) * (1.0 - 0.3 * h);
+float erode = (Noise - 0.5) * Erode * (0.2 + h) * 0.7 + (Detail - 0.5) * Erode * h * h;
+float d = abs(q.x) - wide + erode;
+d += max(q.y - 0.8, 0.0) * 3.0 + max(-0.9 - q.y, 0.0) * 3.0;
+// above mid-height the flame tears into licks wherever the fine noise is low (blended in by height: a plain max with 0
+// below it would push the whole lower flame onto its edge)
+d = lerp(d, max(d, (Tear - Detail) * 0.6), smoothstep(0.35, 0.85, h));
+// a guttering flame (Intensity dipping) shrinks a little as well as dimming
+d += (1.0 - saturate(Intensity)) * 0.12;
+// nothing ever reaches the quad's border, whatever the noise does
+float border = saturate((1.0 - abs(q.x)) / 0.25) * saturate((1.0 - q.y) / 0.2) * saturate((q.y + 1.0) / 0.1);
+// translucent coverage: a soft edge Feather wide (never sharper than a pixel)
+Mask = saturate(0.5 - d / max(Feather, fwidth(d))) * border;
+// solid inside: hot core, the flame colour toward the edge, darker at the very edge and the foot
+float inner = saturate(-d / max(Softness, 1e-3));
+float hot = saturate(1.0 - h * 1.4) * inner;
+float3 col = lerp(Colour, Core, hot * hot);
+col = lerp(col, Tip, saturate(h * 0.8 - 0.4));
+col *= lerp(0.55, 1.0, inner) * lerp(0.8, 1.15, Detail) * lerp(0.6, 1.0, smoothstep(0.0, 0.18, h));
+return col * Flicker.x * lerp(0.35, 1.0, saturate(Intensity)) * Strength;"""
+
+# Each flame's noise lives in its own place (Phase, custom primitive data 0), so two torches never tear alike.
+PHASED_UV_HLSL = """return UV + float2(Phase * 17.31, Phase * 5.17);"""
+
+# ResolvedView.ViewForward as a node output (no material expression exposes it).
+VIEW_FORWARD_HLSL = """return ResolvedView.ViewForward;"""

@@ -4,7 +4,7 @@
 	"_meta":
 	{
 		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
-		"sourceHash": "20972b383184e306162893716f0b420b",
+		"sourceHash": "53821058bb3368b45dceacf598b412b4",
 		"exporterVersion": 3
 	},
 	"blendMode": "BLEND_Additive",
@@ -35,7 +35,7 @@
 			{
 				"id": 0,
 				"class": "ScalarParameter",
-				"name": "MaterialExpressionScalarParameter_0",
+				"name": "MaterialExpressionScalarParameter_9",
 				"desc": "Emissive strength before EyeAdaptationInverse: keep it low, an ember is exposure-independent and blooms in a dark room.",
 				"props":
 				{
@@ -49,12 +49,12 @@
 			{
 				"id": 1,
 				"class": "TextureCoordinate",
-				"name": "MaterialExpressionTextureCoordinate_0"
+				"name": "MaterialExpressionTextureCoordinate_9"
 			},
 			{
 				"id": 2,
 				"class": "DynamicParameter",
-				"name": "MaterialExpressionDynamicParameter_0",
+				"name": "MaterialExpressionDynamicParameter_9",
 				"outputs": [
 					"Phase",
 					"Age",
@@ -77,7 +77,7 @@
 			{
 				"id": 3,
 				"class": "ParticleColor",
-				"name": "MaterialExpressionParticleColor_0",
+				"name": "MaterialExpressionParticleColor_9",
 				"outputs": [
 					"RGB",
 					"R",
@@ -90,7 +90,7 @@
 			{
 				"id": 4,
 				"class": "Custom",
-				"name": "MaterialExpressionCustom_0",
+				"name": "MaterialExpressionCustom_9",
 				"inputs": [
 					{
 						"index": 0,
@@ -102,8 +102,8 @@
 						"index": 1,
 						"name": "Dyn",
 						"node": 2,
-						"output": 0,
-						"mask": "r"
+						"output": 5,
+						"mask": "rgba"
 					},
 					{
 						"index": 2,
@@ -128,7 +128,7 @@
 			{
 				"id": 5,
 				"class": "EyeAdaptationInverse",
-				"name": "MaterialExpressionEyeAdaptationInverse_0",
+				"name": "MaterialExpressionEyeAdaptationInverse_9",
 				"inputs": [
 					{
 						"index": 0,
@@ -141,7 +141,7 @@
 			{
 				"id": 6,
 				"class": "MakeMaterialAttributes",
-				"name": "MaterialExpressionMakeMaterialAttributes_0",
+				"name": "MaterialExpressionMakeMaterialAttributes_9",
 				"inputs": [
 					{
 						"index": 5,

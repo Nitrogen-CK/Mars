@@ -4,7 +4,7 @@
 	"_meta":
 	{
 		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
-		"sourceHash": "933d8585703f8da306c9fc35e9961c2f",
+		"sourceHash": "4cc66998aa77d8642512ab476032081a",
 		"exporterVersion": 3
 	},
 	"parentChain": [
@@ -37,11 +37,11 @@
 			{
 				"id": 0,
 				"class": "ScalarParameter",
-				"name": "MaterialExpressionScalarParameter_0",
-				"desc": "Emissive strength of the glow's centre.",
+				"name": "MaterialExpressionScalarParameter_18",
+				"desc": "Emissive strength of the glow's centre (low: it is additive over the card).",
 				"props":
 				{
-					"DefaultValue": 0.80000001192092896,
+					"DefaultValue": 0.25,
 					"SliderMax": 10,
 					"ParameterName": "Strength",
 					"Group": "Glow",
@@ -51,7 +51,7 @@
 			{
 				"id": 1,
 				"class": "ScalarParameter",
-				"name": "MaterialExpressionScalarParameter_1",
+				"name": "MaterialExpressionScalarParameter_19",
 				"desc": "Higher keeps the glow nearer the flame.",
 				"props":
 				{
@@ -66,12 +66,12 @@
 			{
 				"id": 2,
 				"class": "TextureCoordinate",
-				"name": "MaterialExpressionTextureCoordinate_0"
+				"name": "MaterialExpressionTextureCoordinate_9"
 			},
 			{
 				"id": 3,
 				"class": "DynamicParameter",
-				"name": "MaterialExpressionDynamicParameter_0",
+				"name": "MaterialExpressionDynamicParameter_9",
 				"outputs": [
 					"Phase",
 					"Age",
@@ -94,7 +94,7 @@
 			{
 				"id": 4,
 				"class": "ParticleColor",
-				"name": "MaterialExpressionParticleColor_0",
+				"name": "MaterialExpressionParticleColor_9",
 				"outputs": [
 					"RGB",
 					"R",
@@ -107,7 +107,7 @@
 			{
 				"id": 5,
 				"class": "Custom",
-				"name": "MaterialExpressionCustom_0",
+				"name": "MaterialExpressionCustom_9",
 				"inputs": [
 					{
 						"index": 0,
@@ -119,8 +119,8 @@
 						"index": 1,
 						"name": "Dyn",
 						"node": 3,
-						"output": 0,
-						"mask": "r"
+						"output": 5,
+						"mask": "rgba"
 					},
 					{
 						"index": 2,
@@ -151,7 +151,7 @@
 			{
 				"id": 6,
 				"class": "MakeMaterialAttributes",
-				"name": "MaterialExpressionMakeMaterialAttributes_0",
+				"name": "MaterialExpressionMakeMaterialAttributes_9",
 				"inputs": [
 					{
 						"index": 5,
@@ -173,7 +173,7 @@
 	"scalarParams": [
 		{
 			"name": "Strength",
-			"value": 0.80000001192092896
+			"value": 0.25
 		},
 		{
 			"name": "Falloff",

@@ -1,4 +1,4 @@
-"""Builds Flame_Mars_NS (the one looping flame + glow + embers effect every Mars flame wears: torch, lantern, wall torch,
+"""Builds Flame_Mars_NS (the looping glow + embers that ride every Mars flame card every Mars flame wears: torch, lantern, wall torch,
 brazier, sconce) in a running editor through Monolith's niagara_query actions, on the mars_food_niagara model. Runs
 OUTSIDE the editor (plain Python 3, no `unreal`):
 
@@ -14,7 +14,8 @@ recipe for when Monolith is down):
     User.EmberRate  float   embers per second (torch 6, lantern 0, brazier 20)
     User.Wind       vec3    world cm/s the flame streams against (the carrier's velocity negated)
     User.Enclosed   float   0 open, 1 behind glass: tongues clamp inside the lantern, no embers
-Three CPU, local-space emitters: Tongues (SpawnRate 22, MarsTongueSpawn / MarsTongueUpdate), Embers (SpawnRate bound to
+The flame itself is ONE card mesh on the flame node (FlameCard_Mars_M, mars_flame_ue): this system is only what
+rises off it. Two CPU, local-space emitters: Embers (SpawnRate bound to
 User.EmberRate, MarsEmberSpawn / MarsEmberUpdate), Glow (SpawnRate 2, MarsGlowSpawn / MarsGlowUpdate); each a sprite
 renderer on its material instance, the stock Dynamic Material Parameters module registering the attribute the update
 module overwrites (x phase, y age, z Intensity, w Enclosed). Looping, persistent: no one-shot effect type. Re-running
@@ -47,9 +48,6 @@ TYPES = {"float": "float", "vec3": "vec3", "color": "color"}
 
 # emitter: (spawn-rate binding or constant, spawn module, update module, spawn inputs, update inputs, material instance)
 EMITTERS = {
-    "Tongues": dict(rate=22.0, spawn=("MarsTongueSpawn", hlsl.NS_TONGUE_SPAWN, ("Size", "Colour", "Enclosed")),
-                    update=("MarsTongueUpdate", hlsl.NS_TONGUE_UPDATE, ("Size", "Intensity", "Wind", "Enclosed")),
-                    material="FlameSprite_Mars_MI", align="velocity"),
     "Embers": dict(rate="User.EmberRate", spawn=("MarsEmberSpawn", hlsl.NS_EMBER_SPAWN, ("Size", "Colour", "Enclosed")),
                    update=("MarsEmberUpdate", hlsl.NS_EMBER_UPDATE, ("Size", "Intensity", "Wind")),
                    material="EmberSprite_Mars_MI", align="camera", delta=True),
