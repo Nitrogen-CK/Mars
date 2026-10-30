@@ -235,6 +235,15 @@
 			]
 		},
 		{
+			"TypeName": "FCk_Handle_Fishing",
+			"ShortName": "Fishing",
+			"Description": "A fishing spot: a bait cast onto the water, a bite to hook inside a window, a line reeled in against tension, a fish landed",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_FishingHandle",
+			"RequiredFragments": [
+				"Mars_Feature_Fishing"
+			]
+		},
+		{
 			"TypeName": "FCk_Handle_Flame",
 			"ShortName": "Flame",
 			"Description": "A flame, bare or behind glass: lit or snuffed, burning measures of fuel or none, lighting a pool that follows where it is carried",

@@ -251,6 +251,47 @@ class UMars_Gameplay_CheatManager : UCheatManager
         { Mortar.Request_Release(FMars_Request_Mortar_Release()); }
     }
 
+    // A bite now at the fishing spot the local player operates (while its bait waits on the water).
+    UFUNCTION(Exec)
+    void Mars_FishingBite()
+    {
+        auto Fishing = TryGet_OperatedFishing("Mars_FishingBite");
+        if (ck::IsValid(Fishing))
+        { Fishing.Request_ForceBite(FMars_Request_Fishing_ForceBite()); }
+    }
+
+    // The line runs out now at the fishing spot the local player operates (while a fish is being reeled): it lands.
+    UFUNCTION(Exec)
+    void Mars_FishingLand()
+    {
+        auto Fishing = TryGet_OperatedFishing("Mars_FishingLand");
+        if (ck::IsValid(Fishing))
+        { Fishing.Request_ForceLand(FMars_Request_Fishing_ForceLand()); }
+    }
+
+    // Casts at the fishing spot the local player operates with InPower 0..1 of the distance range, down the current aim.
+    UFUNCTION(Exec)
+    void Mars_FishingCast(float32 InPower)
+    {
+        auto Fishing = TryGet_OperatedFishing("Mars_FishingCast");
+        if (ck::IsValid(Fishing))
+        { Fishing.Request_Cast(FMars_Request_Fishing_Cast(InPower)); }
+    }
+
+    // Logs the Fishing ledger of the spot the local player operates: the phase, the presence, the aim, the line and the catch.
+    UFUNCTION(Exec)
+    void Mars_FishingState()
+    {
+        const auto Fishing = TryGet_OperatedFishing("Mars_FishingState");
+        if (ck::Is_NOT_Valid(Fishing))
+        { return; }
+
+        const auto Aim = Fishing.Get_Aim();
+        const auto Line = Fishing.Get_Line();
+        const auto Catch = Fishing.Get_Catch();
+        ck::Trace(f"[Mars_FishingState] engaged [{Fishing.Get_IsEngaged()}] phase [{Fishing.Get_Phase() :n}] presence [{Fishing.Get_Presence() :n}] aim yaw [{Aim.YawDeg}] pitch [{Aim.PitchDeg}] line [{Line.LengthCm}] tension [{Line.Tension}] running [{Fishing.Get_IsRunning()}] reel [{Fishing.Get_Reel() :n}] bait [{Fishing.Get_BaitWorld()}] catch [{Catch.Item.ToString()}] tally [{Fishing.Get_Tally()}]");
+    }
+
     // Logs the Mortar ledger of the station the local player operates: the batch, the pestle and the timing window.
     UFUNCTION(Exec)
     void Mars_MortarState()
@@ -294,5 +335,27 @@ class UMars_Gameplay_CheatManager : UCheatManager
         { ck::Trace(f"[{InCheat}] the operated station has no Mortar"); }
 
         return Mortar;
+    }
+
+    // The Fishing of the station the local player operates; invalid (and said so, as InCheat) when there is none.
+    private FCk_Handle_Fishing TryGet_OperatedFishing(FString InCheat) const
+    {
+        auto Character = TryGet_LocalCharacter(InCheat);
+        if (ck::Is_NOT_Valid(Character))
+        { return FCk_Handle_Fishing(); }
+
+        auto Operator = Character.TryGet_ActorEntityHandle().As_Operator(ECk_SanityCheck::UnChecked);
+        FCk_Handle Station = ck::IsValid(Operator) ? Operator.Get_Station() : FCk_Handle_Station();
+        if (ck::Is_NOT_Valid(Station))
+        {
+            ck::Trace(f"[{InCheat}] the player operates no station");
+            return FCk_Handle_Fishing();
+        }
+
+        const auto Fishing = Station.As_Fishing(ECk_SanityCheck::UnChecked);
+        if (ck::Is_NOT_Valid(Fishing))
+        { ck::Trace(f"[{InCheat}] the operated station has no Fishing"); }
+
+        return Fishing;
     }
 }

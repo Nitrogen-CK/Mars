@@ -214,6 +214,14 @@ void Mars_PlaceSandboxMortarStationFunc(const TArray<FString>& Args)
 const FConsoleCommand Mars_PlaceSandboxMortarStationCommand("Mars.Sandbox.PlaceMortarStation", n"Mars_PlaceSandboxMortarStationFunc");
 
 UFUNCTION()
+void Mars_PlaceSandboxFishingStationFunc(const TArray<FString>& Args)
+{
+    utils_mars_sandbox::PlaceFishingStation();
+}
+
+const FConsoleCommand Mars_PlaceSandboxFishingStationCommand("Mars.Sandbox.PlaceFishingStation", n"Mars_PlaceSandboxFishingStationFunc");
+
+UFUNCTION()
 void Mars_PlaceSandboxPlattersFunc(const TArray<FString>& Args)
 {
     utils_mars_sandbox::PlacePlatters();
@@ -260,6 +268,8 @@ namespace utils_mars_sandbox
     const FString k_TumblerStationLabel = "Sandbox_TumblerStation";
     const FString k_BatterStationLabel = "Sandbox_BatterStation";
     const FString k_MortarStationLabel = "Sandbox_MortarStation";
+    const FString k_FishingStationLabel = "Sandbox_FishingStation";
+    const FString k_FishingPoolLabel = "Sandbox_FishingPool";
     const FString k_PlatterLargeLabel = "Sandbox_Platter_Large";
     const FString k_PlatterSmallLabel = "Sandbox_Platter_Small";
     const FString k_FoodMeatSlabLabel = "Sandbox_Food_MeatSlab";
@@ -685,6 +695,37 @@ namespace utils_mars_sandbox
     void Spawn_MortarStation()
     {
         utils_mars_map_builder::Spawn_EntityScript(UMars_MortarStation_EntityScript, FMars_MapBuilder_Placement(k_MortarStationLabel, FVector(400.0, -1600.0, 0.0)));
+    }
+
+    // The fishing spot past the end of the station row with a still-water pool in front of it (the pool's surface 1 uu over
+    // the floor, where the spot's water plane defaults). Not part of Build: an opt-in part of the sandbox.
+    void PlaceFishingStation()
+    {
+        const FString Command = "Mars.Sandbox.PlaceFishingStation";
+        if (Get_CanAdd(Command, k_FishingStationLabel, "Delete it and the pool first to re-place.") == false)
+        { return; }
+
+        Spawn_FishingStation();
+        utils_mars_map_builder::SaveOpenLevel(Command);
+    }
+
+    // Beside the mortar station, 800 uu toward +X; unrotated, it faces +X: the player walks up from -X and the pool lies
+    // out along +X from the bank, k_FishingPoolSize wide, inside the floor's edge.
+    void Spawn_FishingStation()
+    {
+        const auto Bank = FVector(1200.0, -1600.0, 0.0);
+        const auto PoolSize = FVector2D(700.0, 400.0);
+        const auto PoolCentre = Bank + FVector(PoolSize.X * 0.5 + 50.0, 0.0, 1.0);
+
+        auto Pool = Cast<AMars_StillWater>(UEditorActorSubsystem::Get().SpawnActorFromClass(AMars_StillWater, PoolCentre, FRotator::ZeroRotator));
+        if (ck::EnsureIfNot(ck::IsValid(Pool), "[Mars.Sandbox] Failed to place the fishing pool"))
+        { return; }
+
+        Pool.Size = PoolSize;
+        Pool.SetActorLabel(k_FishingPoolLabel);
+        Pool.Rebuild();
+
+        utils_mars_map_builder::Spawn_EntityScript(UMars_FishingStation_EntityScript, FMars_MapBuilder_Placement(k_FishingStationLabel, Bank));
     }
 
     void PlacePlatters()
