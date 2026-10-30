@@ -230,9 +230,26 @@ def build_curves(export_dir=None, refresh=False):
 _RETIRED = []
 
 
+def _reset_material(name):
+    """The master at F_MAT, emptied IN PLACE if it exists, so every instance (and any live dynamic instance) keeps its
+    parent; finish() recompiles it, which refreshes them all as the material editor's Apply does. Replacing a master
+    with live instances asserts in the renderer (UniformExpressionCache should be up to date).
+    delete_all_material_expressions skips nodes: loop to 0."""
+    m = _asset(F_MAT, name)
+    if m is None:
+        return _tools().create_asset(name, F_MAT, unreal.Material, unreal.MaterialFactoryNew())
+    for _ in range(8):
+        if MEL.get_num_material_expressions(m) == 0:
+            break
+        MEL.delete_all_material_expressions(m)
+    if MEL.get_num_material_expressions(m):
+        raise RuntimeError("%s: %d expressions survived the in-place reset" % (name, MEL.get_num_material_expressions(m)))
+    return m
+
+
 def _fresh_material(name):
-    """A brand-new master at the path (wiping a graph in place leaves Custom nodes behind). An existing master is
-    renamed aside; build_instances re-parents its instances and then deletes it."""
+    """Retired pattern, kept only for reference: a brand-new master at the path, the old one renamed aside. Not used:
+    replacing a live master asserts in the renderer. Use _reset_material."""
     m = _asset(F_MAT, name)
     if m is not None:
         aside = "%s/%s_retired" % (F_MAT, name)
@@ -396,7 +413,7 @@ FINISH = ("Glaze", "Shape", "-", "-")
 
 
 def build_meat_master(atlas, curves):
-    m = _fresh_material("Meat_Mars_M")
+    m = _reset_material("Meat_Mars_M")
     m.set_editor_property("shading_model", unreal.MaterialShadingModel.MSM_CLEAR_COAT)
     g = _Graph(m, x0=-5200)
 
@@ -493,7 +510,7 @@ def build_meat_master(atlas, curves):
 
 # ------------------------------------------------------------------ Pan_Mars_M
 def build_pan_master():
-    m = _fresh_material("Pan_Mars_M")
+    m = _reset_material("Pan_Mars_M")
     m.set_editor_property("shading_model", unreal.MaterialShadingModel.MSM_CLEAR_COAT)
     m.set_editor_property("tangent_space_normal", False)       # the normal is built in pan-local space
     g = _Graph(m, x0=-6500)
@@ -568,17 +585,32 @@ def build_pan_master():
     drop_normal = g.scalar("Drop Normal", 1.2, 0.0, 3.0)
 
     g.group("08 Oil Beads")
-    bead_cell = g.scalar("Bead Cell", 1.1, 0.2, 5.0, "Spacing of the still beads, cm.")
-    bead_density = g.scalar("Bead Density", 0.3, 0.0, 1.0)
-    bead_size = g.scalar("Bead Size", 0.5, 0.0, 1.0)
+    bead_cell = g.scalar("Bead Cell", 1.1, 0.2, 5.0, "Spacing of the still beads, cm (a second layer runs at 0.46 x this).")
+    bead_density = g.scalar("Bead Density", 0.3, 0.0, 1.0, "Bead chance per cell; a patch's core holds 4 x this (capped "
+                            "at 1), the steel between patches Bead Stray x this.")
+    bead_size = g.scalar("Bead Size", 0.5, 0.0, 1.0, "Bead radius scale: radii spread evenly over 0.4-1.6 x 0.19 x this x the cell.")
+    bead_cluster = g.scalar("Bead Cluster Scale", 3.0, 1.0, 12.0, "Spacing of the bead patches as a multiple of Bead Cell "
+                            "(static, warped noise, so no lattice shows).")
+    bead_cover = g.scalar("Bead Cluster Cover", 0.2, 0.0, 1.0, "Roughly the share of the pan inside a bead patch; 1 = beads "
+                          "everywhere.")
+    bead_stray = g.scalar("Bead Stray", 0.05, 0.0, 1.0, "Lone beads on the clean steel between patches, as a share of Bead Density.")
     bead_normal = g.scalar("Bead Normal", 1.0, 0.0, 3.0)
 
     g.group("09 Oil Simmer")
-    sim_density = g.scalar("Simmer Density", 0.5, 0.0, 1.0, "Share of the simmer cells alive at Sizzle 1. The whole oil "
-                           "film bubbles; Sizzle scales the count and the rate.")
+    sim_density = g.scalar("Simmer Density", 0.5, 0.0, 1.0, "Share of the bead cells alive in a patch's core at Sizzle 1. "
+                           "Bubbles come in patches (the Simmer Cluster parameters); Sizzle scales the count and the rate.")
     sim_w = g.scalar("Simmer Width", 0.8, 0.1, 6.0, "Width of the band around the meat that bubbles harder, cm.")
-    sim_near = g.scalar("Simmer Near Meat", 0.5, 0.0, 2.0, "Extra bubbling in the band around the meat.")
-    sim_cell = g.scalar("Simmer Cell", 0.55, 0.1, 3.0, "Bubble spacing, cm (the largest bead radius is 0.3 x this).")
+    sim_near = g.scalar("Simmer Near Meat", 0.5, 0.0, 2.0, "Extra bubbling in the band around the meat; the band bubbles "
+                        "outside the patches too.")
+    sim_cell = g.scalar("Simmer Cell", 0.55, 0.1, 3.0, "Bubble size scale, cm: the largest bead radius is 0.3 x this. Beads "
+                        "sit on a 0.65 x this grid so a patch's beads crowd; sizes spread evenly over 0.4-1.6 x 0.19 x this.")
+    sim_cluster = g.scalar("Simmer Cluster Scale", 2.5, 1.0, 12.0, "Spacing of the bubble patches as a multiple of Simmer "
+                           "Cell (the cluster layer's coarse cell; warped, so no lattice shows).")
+    sim_cover = g.scalar("Simmer Cluster Cover", 0.4, 0.0, 1.0, "Roughly the share of the oil film inside a patch; the rest is "
+                         "calm apart from Simmer Stray. 1 = the whole film bubbles.")
+    sim_crate = g.scalar("Simmer Cluster Rate", 0.15, 0.0, 2.0, "How often a patch re-rolls, per second: patches swell, drift "
+                         "and fade on their own clocks.")
+    sim_stray = g.scalar("Simmer Stray", 0.02, 0.0, 1.0, "Lone bubbles between the patches (alive share of the bead cells).")
     sim_rate = g.scalar("Simmer Rate", 2.2, 0.0, 10.0, "Bubble cycles per second at Sizzle 0.5 (Sizzle 1 runs 1.25x).")
     sim_strength = g.scalar("Simmer Strength", 1.4, 0.0, 3.0, "Dome tilt of a bead: where its highlight lands.")
     sim_rim = g.scalar("Simmer Rim Darken", 0.75, 0.0, 1.0, "Dark outline of a bead.")
@@ -595,7 +627,8 @@ def build_pan_master():
         ("Sizzle", sizzle, ""), ("BaseR", base_r, ""), ("RimR", rim_r, ""), ("WallReach", wall_reach, ""), ("PoolR", pool_r, ""), ("Margin", margin, ""), ("Blend", blend, ""),
         ("EdgeSoft", edge_soft, ""), ("Wobble", wobble, ""), ("Meniscus", meniscus, ""), ("SimW", sim_w, ""),
         ("SimCell", sim_cell, ""), ("SimRate", sim_rate, ""), ("SimStrength", sim_strength, ""),
-        ("SimDensity", sim_density, ""), ("SimNear", sim_near, ""))
+        ("SimDensity", sim_density, ""), ("SimNear", sim_near, ""), ("ClusterScale", sim_cluster, ""),
+        ("ClusterCover", sim_cover, ""), ("ClusterRate", sim_crate, ""), ("SimStray", sim_stray, ""))
         + tuple(("Meat%d" % i, e, "RGBA") for i, e in enumerate(meats, 1))
         + tuple(("Trail%d" % i, e, "RGBA") for i, e in enumerate(trails, 1)), x, -1100, FLOAT3,
         (("Bubble", FLOAT1), ("BubbleRim", FLOAT1)))
@@ -603,7 +636,8 @@ def build_pan_master():
         ("P", lp, ""), ("N", ln, ""), ("T", time, ""), ("OilAmount", oil, ""), ("BaseR", base_r, ""), ("RimR", rim_r, ""),
         ("Cols", cols, ""), ("RowLen", row_len, ""), ("Density", density, ""), ("Size", drop_size, ""), ("Speed", speed, ""),
         ("Trail", drop_trail, ""), ("BeadCell", bead_cell, ""), ("BeadDensity", bead_density, ""),
-        ("BeadSize", bead_size, ""), ("BeadNormal", bead_normal, "")), x, -300, FLOAT3)
+        ("BeadSize", bead_size, ""), ("BeadNormal", bead_normal, ""), ("BeadCluster", bead_cluster, ""),
+        ("BeadCover", bead_cover, ""), ("BeadStray", bead_stray, "")), x, -300, FLOAT3)
     surf = g.custom("PanSurface: metal + seasoning + oil", hlsl.PAN_SURFACE, (
         ("P", lp, ""), ("N", ln, ""), ("Pool", pool, ""), ("Bubble", pool, "Bubble"), ("BubbleRim", pool, "BubbleRim"),
         ("SimRimDark", sim_rim, ""), ("Drops", drops, ""),
@@ -705,6 +739,28 @@ def _release_masters():
                            % (current, ", ".join(sorted(users)[:5])))
     unreal.EditorLoadingAndSavingUtils.new_blank_map(False)
     unreal.SystemLibrary.collect_garbage()
+
+
+def rebuild_pan():
+    """Rebuild Pan_Mars_M alone, in place (its instances keep their parent and overrides; the recompile refreshes them).
+    Returns the compile report: expression count, errors and the statistics."""
+    if _in_pie():
+        raise RuntimeError("stop PIE before rebuilding the pan master")
+    m = build_pan_master()
+    report = {"expressions": MEL.get_num_material_expressions(m),
+              "instances": sorted(d.get_asset().get_path_name() for d in MEL.get_child_instances(m))}
+    try:
+        st = MEL.get_statistics(m)
+        report["stats"] = {k: st.get_editor_property(k) for k in ("num_vertex_shader_instructions",
+                                                                    "num_pixel_shader_instructions", "num_samplers")}
+    except Exception as exc:
+        report["stats"] = "unavailable: %s" % exc
+    try:
+        report["errors"] = [str(e) for e in MEL.get_material_compile_errors(m)] if hasattr(MEL, "get_material_compile_errors") else "n/a"
+    except Exception as exc:
+        report["errors"] = "unavailable: %s" % exc
+    _log("Pan_Mars_M rebuilt in place: %s" % report)
+    return report
 
 
 def build_materials(export_dir=None, refresh_curves=False):

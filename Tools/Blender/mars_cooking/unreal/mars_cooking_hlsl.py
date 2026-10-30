@@ -125,15 +125,34 @@ PAN_POOL = """struct FPanPool
         // against the flare drag their blob up the slope, but nothing reaches the lip or the outside of the pan.
         return max(d, length(p) - Reach());
     }
-    // the simmer near one meat: the band around it bubbles harder (the strongest band wins), nothing bubbles under it
-    void Near(float2 p, float4 M, float SimW, inout float nearMeat, inout float under)
+    // the simmer near one meat: the band around it bubbles harder (the strongest band wins), nothing bubbles under it.
+    // The band is read at the bead's own centre (pc) so a bead is never cut by it; "under" is per pixel.
+    void Near(float2 p, float2 pc, float4 M, float SimW, inout float nearMeat, inout float under)
     {
         if (M.z > 0.01)
         {
-            float dm = length(p - M.xy) - M.z;
-            nearMeat = max(nearMeat, smoothstep(-0.4, 0.0, dm) * (1.0 - smoothstep(SimW * 0.4, SimW, dm)));
-            under = min(under, smoothstep(-0.5, 0.0, dm));
+            float dc = length(pc - M.xy) - M.z;
+            nearMeat = max(nearMeat, smoothstep(-0.4, 0.0, dc) * (1.0 - smoothstep(SimW * 0.4, SimW, dc)));
+            under = min(under, smoothstep(-0.5, 0.0, length(p - M.xy) - M.z));
         }
+    }
+    // The simmer's cluster layer: value noise on coarse cells whose lattice values each re-roll on their own slow
+    // clock (t = time x Simmer Cluster Rate), so patches swell, drift and fade instead of sitting still.
+    float Corner(float2 i, float t)
+    {
+        float ph = t + Hash(i + 61.7);
+        float c = floor(ph);
+        float u = ph - c;
+        u = u * u * (3.0 - 2.0 * u);
+        return lerp(Hash(i + c * 7.31), Hash(i + (c + 1.0) * 7.31), u);
+    }
+    float Cluster(float2 q, float t)
+    {
+        float2 i = floor(q);
+        float2 f = frac(q);
+        f = f * f * (3.0 - 2.0 * f);
+        return lerp(lerp(Corner(i, t), Corner(i + float2(1.0, 0.0), t), f.x),
+                    lerp(Corner(i + float2(0.0, 1.0), t), Corner(i + float2(1.0, 1.0), t), f.x), f.y);
     }
 };
 FPanPool pool;
@@ -156,31 +175,48 @@ g /= max(length(g), 1e-4);
 float rim = smoothstep(-soft * 2.5, -soft * 0.5, d) * (1.0 - smoothstep(-soft * 0.5, soft * 0.5, d)) * on;
 float2 nxy = g * rim * Meniscus;
 
-// simmer: small domes that swell and pop wherever there is oil. Sizzle sets how many cells are alive and speeds
-// them up; a band around each meat (Simmer Width) bubbles harder; nothing bubbles under a meat.
+// simmer: small domes that swell and pop in irregular groups with calm oil between them. A cluster layer (value noise
+// on cells Simmer Cluster Scale x Simmer Cell wide, warped so no lattice shows, re-rolled at Simmer Cluster Rate) marks
+// the patches; Simmer Cluster Cover is roughly the share of the film inside one. Beads sit on a grid 0.65 x Simmer Cell
+// so a patch's beads crowd; each bead cell is alive with Sizzle x Simmer Density x (patch + Simmer Stray + the meat band),
+// one value per bead (never a cut dome). Sizes spread evenly over 0.4-1.6 x the base, positions jitter as far as
+// the bead's size allows, and every bead runs its own rate and phase. A band around each meat (Simmer Width) bubbles
+// harder even outside the patches; nothing bubbles under a meat.
 float bubble = 0.0;
 float bubbleRim = 0.0;
 if (Sizzle > 0.001)
 {
+    float fine = SimCell * 0.65;
+    float2 gc = p / fine;
+    float2 id = floor(gc);
+    float2 pc = (id + 0.5) * fine;                                    // this bead cell's centre, cm
     float nearMeat = 0.0;
     float under = 1.0;
-    pool.Near(p, Meat, SimW, nearMeat, under);
-    pool.Near(p, Meat1, SimW, nearMeat, under);
-    pool.Near(p, Meat2, SimW, nearMeat, under);
-    pool.Near(p, Meat3, SimW, nearMeat, under);
-    pool.Near(p, Meat4, SimW, nearMeat, under);
-    pool.Near(p, Meat5, SimW, nearMeat, under);
+    pool.Near(p, pc, Meat, SimW, nearMeat, under);
+    pool.Near(p, pc, Meat1, SimW, nearMeat, under);
+    pool.Near(p, pc, Meat2, SimW, nearMeat, under);
+    pool.Near(p, pc, Meat3, SimW, nearMeat, under);
+    pool.Near(p, pc, Meat4, SimW, nearMeat, under);
+    pool.Near(p, pc, Meat5, SimW, nearMeat, under);
     float gate = film * under * saturate(0.75 + 0.25 * Sizzle + SimNear * nearMeat);
-    float2 gc = p / SimCell;
-    float2 id = floor(gc);
+    float2 q = pc / max(SimCell * ClusterScale, 0.05);
+    float wa = pool.Noise(q * 0.61 + float2(13.1, 7.7)) * 6.2831853;
+    q += float2(cos(wa), sin(wa)) * 0.45;                             // patch outlines and spacing off the lattice
+    float n = pool.Cluster(q, T * ClusterRate);
+    float thr = 0.52 + 0.4 * (0.5 - ClusterCover);                    // the noise's quantile for that cover
+    float patch = smoothstep(thr - 0.03, thr + 0.12, n);              // dense core, thinning edge
     float r1 = pool.Hash(id + 3.7);
     float ph = T * SimRate * (0.75 + 0.5 * saturate(Sizzle)) * (0.6 + 0.8 * r1) + pool.Hash(id + 11.3);
     float cyc = floor(ph);
     ph -= cyc;
-    float2 c = 0.3 + 0.4 * float2(pool.Hash(id + cyc * 1.37), pool.Hash(id.yx + cyc * 2.11 + 5.0));
-    float alive = step(pool.Hash(id + cyc * 0.73 + 9.0), saturate(Sizzle * SimDensity * (1.0 + SimNear * nearMeat)));
-    float rad = max(SimCell * 0.3 * (0.4 + 0.6 * r1) * sqrt(ph), 1e-3);
-    float2 dv = (frac(gc) - c) * SimCell;
+    float k = pool.Hash(id + cyc * 1.91 + 17.0);
+    float rf = min(0.2923 * (0.4 + 1.2 * k), 0.46);                   // full radius / bead cell: 0.4-1.6 x 0.19 Simmer Cell
+    float m = rf + 0.02;
+    float2 c = m + (1.0 - 2.0 * m) * float2(pool.Hash(id + cyc * 1.37), pool.Hash(id.yx + cyc * 2.11 + 5.0));
+    float want = Sizzle * SimDensity * saturate(patch * 1.15 + SimStray + SimNear * nearMeat * (0.5 + n));
+    float alive = step(pool.Hash(id + cyc * 0.73 + 9.0), saturate(want));
+    float rad = max(fine * rf * sqrt(ph), 1e-3);
+    float2 dv = (frac(gc) - c) * fine;
     float dist = length(dv);
     float x = saturate(dist / rad);                                   // 0 at the dome's top, 1 at its foot
     float live = (1.0 - smoothstep(0.8, 1.0, ph)) * alive * gate;
@@ -195,26 +231,52 @@ return float3(nxy, film);"""
 # Drops running down the wall toward the centre plus still beads. Returns (normal tilt xy, coverage 0..1).
 PAN_DROPS = """struct FPanDrops
 {
+    float PatchCell; float Cover; float Stray;                            // the still beads' patch layer (see Patch)
+
     float Hash(float2 p) { return frac(sin(dot(p, float2(127.1, 311.7))) * 43758.5453); }
     float2 Hash2(float2 p)
     {
         return frac(sin(float2(dot(p, float2(127.1, 311.7)), dot(p, float2(269.5, 183.3)))) * 43758.5453);
     }
-    // one layer of still beads on a jittered grid: xy = normal tilt, z = mask
+    float Noise(float2 p)
+    {
+        float2 i = floor(p);
+        float2 f = frac(p);
+        f = f * f * (3.0 - 2.0 * f);
+        return lerp(lerp(Hash(i), Hash(i + float2(1.0, 0.0)), f.x),
+                    lerp(Hash(i + float2(0.0, 1.0)), Hash(i + float2(1.0, 1.0)), f.x), f.y);
+    }
+    // Where the still beads gather (static): value noise on PatchCell-wide cells, its lookup warped so no lattice
+    // shows, thresholded so about Cover of the pan lies in a patch (dense core, thinning edge). 0..1.
+    float Patch(float2 pc)
+    {
+        float2 q = pc / max(PatchCell, 0.05);
+        float wa = Noise(q * 0.61 + float2(13.1, 7.7)) * 6.2831853;
+        q += float2(cos(wa), sin(wa)) * 0.45;
+        float thr = 0.52 + 0.4 * (0.5 - Cover);                           // the noise's quantile for that cover
+        return smoothstep(thr - 0.03, thr + 0.12, Noise(q + 31.7));
+    }
+    // one layer of still beads on a jittered grid: xy = normal tilt, z = mask. A cell holds a bead with chance
+    // density x (4 x patch + Stray), read at the cell centre so no bead is cut by a patch edge; radius 0.4-1.6 x
+    // 0.19 x size x cell, centre jittered as far as that radius allows.
     float3 Beads(float2 p, float cell, float density, float size)
     {
         float2 g = p / cell;
         float2 id = floor(g);
         float2 k = Hash2(id + cell * 13.0);
-        float2 c = 0.32 + 0.36 * Hash2(id + 5.3);
-        float rad = max(cell * 0.3 * size * (0.35 + 0.65 * k.y), 1e-3);
+        float rf = min(0.19 * size * (0.4 + 1.2 * k.y), 0.46);           // radius / cell
+        float mg = rf + 0.03;
+        float2 c = mg + (1.0 - 2.0 * mg) * Hash2(id + 5.3);
+        float rad = max(cell * rf, 1e-3);
         float2 dv = (frac(g) - c) * cell;
         float dist = length(dv);
-        float m = smoothstep(0.0, 0.3, saturate(1.0 - dist / rad)) * step(k.x, density);
+        float want = density * saturate(4.0 * Patch((id + 0.5) * cell) + Stray);
+        float m = smoothstep(0.0, 0.3, saturate(1.0 - dist / rad)) * step(k.x, saturate(want));
         return float3(dv / max(dist, 1e-4) * (dist / rad) * m, m);
     }
 };
 FPanDrops o;
+o.PatchCell = BeadCell * BeadCluster; o.Cover = BeadCover; o.Stray = BeadStray;
 float2 p = P.xy;
 float r = length(p);
 float2 rdir = p / max(r, 1e-3);

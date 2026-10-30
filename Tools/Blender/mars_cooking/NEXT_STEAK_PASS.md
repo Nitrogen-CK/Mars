@@ -33,3 +33,41 @@ Stephen's request 2026-10-07 after the Mario Party frame review.
 
 Run against Stephen's editor on Monolith 9316 (never a hidden instance while he might build); his map must not be
 left dirty. Use Opus agents at high effort, one for 1-5 then one for 6-7 (same editor, so sequential).
+
+## 2026-10-25: simmer bubbles come in groups (Stephen: "the bubbles look really uniform")
+
+`PAN_POOL`'s simmer used to put one bead in every cell of a jittered 0.55-0.6 cm grid, about 85 % of them alive at
+Sizzle 1, so the film read as an even lattice. It now has a cluster layer on top:
+
+- **Patches:** value noise on coarse cells `Simmer Cluster Scale` x `Simmer Cell` wide (default 2.5), its lookup warped
+  by a second noise so no lattice shows, each lattice value re-rolling on its own clock (`Simmer Cluster Rate`, default
+  0.15 per second) so patches swell, drift and fade. It is thresholded so that about `Simmer Cluster Cover` (default
+  0.4) of the film lies in a patch: dense core, thinning edge.
+- **Beads:** a grid 0.65 x `Simmer Cell` (so a patch's beads crowd), each cell alive with Sizzle x `Simmer Density` x
+  (patch x 1.15 + `Simmer Stray` + the meat band), evaluated once per bead (no dome is ever cut). Radius 0.4-1.6 x
+  0.19 x `Simmer Cell` (the largest is still 0.3 x `Simmer Cell`), centre jittered as far as the bead's size allows,
+  own rate and phase per bead, as before.
+- **Between patches:** `Simmer Stray` (default 0.02) lone bubbles; otherwise calm oil.
+- **Near the meat:** the `Simmer Width` band adds `Simmer Near Meat` x near x (0.5 + patch noise), so it bubbles
+  outside the patches too (and unevenly along the meat); nothing bubbles under a meat. The band is read at the bead's
+  centre.
+- Measured on `cook_empty_sizzle1` (Sizzle 1, Density 0.85): about 0.45 x the old bubble count on the open film.
+- Existing instance overrides (`Simmer Cell` 0.6, `Simmer Density` 0.85 on the lookdev and Devlog pans) keep working;
+  the four new scalars are master defaults only.
+- Rebuild the pan alone, in place: `mc.rebuild_pan()` (`_reset_material` empties the same UMaterial; the recompile
+  refreshes every instance). Before/after: `D:\Repo\Content\Devlog\stage_review\oil_bubbles_before_after.png`.
+
+### Same day: the still oil beads on the dry pan gather in patches too
+
+`PAN_DROPS`'s still beads (`Beads()`, two layers: `Bead Cell` and 0.46 x it) were one bead per jittered cell with chance
+`Bead Density`. They now share a static patch layer (no clock: the beads do not move):
+
+- **Patches:** value noise on cells `Bead Cluster Scale` x `Bead Cell` wide (default 3.0), its lookup warped, thresholded
+  so about `Bead Cluster Cover` (default 0.2) of the pan lies in a patch, dense core thinning to the edge. Both bead
+  layers read the same field, so big and small beads gather together.
+- **Chance per cell:** `Bead Density` x (4 x patch + `Bead Stray`), capped at 1, read at the cell centre (no bead is cut
+  by a patch edge). `Bead Stray` (default 0.05) leaves a few lone beads on the clean steel.
+- **Beads:** radius spread evenly over 0.4-1.6 x 0.19 x `Bead Size` x the cell (mean about the old one), centre
+  jittered as far as the radius allows, so no rows. The running drops and the two-size merge are unchanged.
+- Measured on `cook_empty_sizzle1` (the dry ring between the pool and the rim): about 0.32 x the old bead count.
+  Before/after: `D:\Repo\Content\Devlog\stage_review\dry_beads_before_after.png`.
