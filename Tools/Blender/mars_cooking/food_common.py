@@ -897,9 +897,12 @@ def _cook_attr_report(mesh, tri_loops, fbx_path):
 
 def cook_standard_of(name):
     """True for a hero mesh whose ingredient carries food_spec INGREDIENTS[...]['cook_standard'], or is cuttable meat
-    (category meats with cpu_access: the standard applies whether or not the flag was remembered)."""
+    (category meats with cpu_access: the standard applies whether or not the flag was remembered). An explicit
+    cook_standard=False opts a meat out (Stephen 2026-10-29, the Fish: a rounded fish over a per-face sear)."""
     ing = spec.INGREDIENTS.get(name.replace("_Mars_SM", ""))
-    return bool(ing and (ing.get("cook_standard") or (ing.get("category") == "meats" and ing.get("cpu_access"))))
+    if ing and "cook_standard" in ing:
+        return bool(ing["cook_standard"])
+    return bool(ing and ing.get("category") == "meats" and ing.get("cpu_access"))
 
 
 def cook_standard_problems(rep):

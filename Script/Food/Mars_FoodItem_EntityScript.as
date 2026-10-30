@@ -159,3 +159,8 @@ class UMars_FoodItem_Pickle_EntityScript : UMars_FoodItem_EntityScript
 {
     default Definition = mars_items::Food_Pickle();
 }
+
+class UMars_FoodItem_Fish_EntityScript : UMars_FoodItem_EntityScript
+{
+    default Definition = mars_items::Food_Fish();
+}

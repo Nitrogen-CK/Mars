@@ -1,4 +1,4 @@
-"""Builds the MEATS of the Mars food library (food_spec category "meats"): RoastHorned, Drumstick, Tentacle.
+"""Builds the MEATS of the Mars food library (food_spec category "meats"): RoastHorned, Drumstick, Tentacle, MeatSlab, Fish.
 
     blender -b --factory-startup --python build_food_meats.py -- [--export] [--save] [--sheets] [--only A,B]
                                                                   [--review_dir <dir>] [--nobake]
@@ -25,6 +25,12 @@ as real geometry. Geometry is procedural numpy / bmesh with fixed seeds, so a re
                counter, the thin tip curling up at +X), a 10-sided tapering tube, an oblique cut face at -X and
                lathed sucker cups wrapped onto the oral side. The cooked shape re-evaluates the same parameters on
                a tighter, 8 % shorter spine.
+  MeatSlab     a radial (direction, radius) map of a boxy super-ellipsoid clamped by butcher-cut planes; the fat cap
+               and sinews are locked rings / lines of fixed directions (the cook-look standard's reference joint).
+  Fish         the same radial map on a union of implicit solids (a plump tapering body, dorsal and anal fin ridges,
+               a forked tail fan) flattened only where it rests; the fins and the tail are structured rings of fixed
+               points, the eyes fixed octagons, the gills and mouth fixed line pairs. NOT held to the cook-look
+               standard (food_spec cook_standard=False, Stephen's ruling): a rounded fish over a per-face sear.
 
 Morph (UV1 / UV2 via food_common.write_morph_uvs): cooked = shrink + sag + crust bulge on the cooking slot; Horn and
 Bone vertices have offset 0 (the meat shrinks away from them). Prints FOOD_MEATS_OK when every mechanical check passes.
@@ -46,7 +52,7 @@ if HERE not in sys.path:
 import food_common as fc  # noqa: E402
 
 spec = fc.spec
-NAMES = ("RoastHorned", "Drumstick", "Tentacle", "MeatSlab")
+NAMES = ("RoastHorned", "Drumstick", "Tentacle", "MeatSlab", "Fish")
 BLEND_PATH = os.path.join(spec.BLEND_DIR, spec.CATEGORIES["meats"][0])
 UP = np.array([0.0, 0.0, 1.0])
 TRI_RANGE = (600, 2500)
@@ -175,10 +181,13 @@ def _dart(pos, sp, fpos, fsp):
     return np.array(chosen, dtype=np.int64)
 
 
-def blue_noise_dirs(map_fn, spacing_fn, n_target, seed, fixed=None, n_cand=36000, fixed_spacing=None, reject=None):
+def blue_noise_dirs(map_fn, spacing_fn, n_target, seed, fixed=None, n_cand=36000, fixed_spacing=None, reject=None,
+                    weight_clip=None):
     """Unit-sphere directions whose images under map_fn are spread like blue noise with the local spacing
     spacing_fn(pos) (cm), about n_target of them (plus the fixed directions, kept first; they keep candidates
-    fixed_spacing cm away when given). reject(pos) -> bool mask drops candidates outright."""
+    fixed_spacing cm away when given). reject(pos) -> bool mask drops candidates outright. weight_clip (a quantile
+    in 0..1) caps the area weight of the candidate thinning, for a map with thin ridges seen at a grazing angle
+    (fins) whose Jacobian would otherwise starve the rest of the surface of candidates."""
     rng = np.random.default_rng(seed)
     cand = unit(rng.normal(size=(n_cand, 3)))
     if reject is not None:
@@ -190,6 +199,8 @@ def blue_noise_dirs(map_fn, spacing_fn, n_target, seed, fixed=None, n_cand=36000
                                    map_fn(unit(cand + eps * t2)) - pos), axis=1) / eps ** 2
     sp = spacing_fn(pos)
     w = area / sp ** 2
+    if weight_clip is not None:
+        w = np.minimum(w, np.quantile(w, weight_clip))
     keep = rng.random(len(cand)) < w / w.max()
     cand, pos, sp = cand[keep], pos[keep], sp[keep]
     fixed = np.zeros((0, 3)) if fixed is None else unit(np.asarray(fixed, float))
@@ -1175,28 +1186,31 @@ def slab_ring_dirs(n_phi=1440):
     return unit(out)
 
 
-def slab_sinew_dirs(ctrl, width, step=0.7):
-    """Two staggered lines of directions `width` cm apart along a surface curve through ctrl (centred cm)."""
+def slab_sinew_dirs(ctrl, width, step=0.7, surface=None, centre=None):
+    """Two staggered lines of directions `width` cm apart along a surface curve through ctrl (centred cm).
+    surface / centre: the radial map and its centre (the slab's by default; the fish passes its own)."""
+    surface = slab_surface if surface is None else surface
+    centre = np.zeros(3) if centre is None else np.asarray(centre, float)
     ctrl = np.asarray(ctrl, float)
     u = np.linspace(0.0, 1.0, len(ctrl))
     uu = np.linspace(0.0, 1.0, 400)
     q = np.stack([np.interp(uu, u, ctrl[:, k]) for k in range(3)], axis=1)
     k = np.ones(9) / 9.0                                                     # soften the polyline corners
     q = np.stack([np.convolve(np.pad(q[:, j], 4, mode="edge"), k, mode="valid") for j in range(3)], axis=1)
-    dq = unit(q)
-    p = slab_surface(dq)
+    dq = unit(q - centre)
+    p = surface(dq)
     s = np.concatenate([[0.0], np.cumsum(np.linalg.norm(np.diff(p, axis=0), axis=1))])
     n = max(int(s[-1] / step), 2)
     ta = np.linspace(0.0, s[-1], n + 1)
     da = unit(np.stack([np.interp(ta, s, dq[:, j]) for j in range(3)], axis=1))
-    pa = slab_surface(da)
-    nrm = surface_normal(slab_surface, da)
+    pa = surface(da)
+    nrm = surface_normal(surface, da)
     tan = unit(np.gradient(pa, axis=0))
     side = unit(np.cross(nrm, tan))
     tb = 0.5 * (ta[:-1] + ta[1:])
     db = unit(np.stack([np.interp(tb, s, dq[:, j]) for j in range(3)], axis=1))
-    pb = slab_surface(db) + 0.5 * (side[:-1] + side[1:]) * width
-    return da, unit(pb)
+    pb = surface(db) + 0.5 * (side[:-1] + side[1:]) * width
+    return da, unit(pb - centre)
 
 
 def slab_constraint_fix(P, faces, edges, max_iter=400):
@@ -1515,6 +1529,402 @@ def slab_parity_half(obj, out_dir, keep="nx", x_cut_cm=0.0):
     return half, path
 
 
+# ================================================================ Fish
+# The fishing minigame's catch: a plump, round-bodied fish lying on its flank, head toward +X. Stephen's ruling (2026-10-29,
+# "too blocky"): it is NOT held to the six-face cook-look standard (food_spec cook_standard=False), so its body is a real
+# rounded fish and the pan's per-axis sear slots will mis-bucket on its curved flanks; it still meets the runtime-mesh
+# contract (one closed solid, <= 2048 render verts, CPU access) so the bench cuts it. Every vertex is (direction, radius)
+# from FISH_CENTRE: the radius is bisected on the union of four implicit solids (the tapering body, the dorsal fin, the
+# anal fin, the forked tail fan), lumped on the body, then clamped by the floor plane alone (the flank it rests on is
+# flattened, as a fish on a counter is). The eyes are fixed octagons, the gill slits and the mouth fixed line pairs (the
+# slab's sinew mechanism), and the fins and the tail are structured rings of fixed points (their flanks graze the rays,
+# so blue noise never samples them). One closed shell, ~640 triangles.
+FISH_CENTRE = np.array([-8.2, 0.0, 0.0])  # the radial map's centre: back enough that the tail's flare (0.43 / cm) stays under the rays' slope (0.5 / cm)
+FISH_X_NOSE = 16.2                        # the snout's tip
+FISH_X_ROOT = -10.5                       # where the body's profile reaches the caudal peduncle's height (it runs on into it)
+FISH_X_TAIL = -17.9                       # the tail lobes' tips
+FISH_NOTCH = 2.2                          # the fork: the trailing edge sits this far ahead of the tips at the centre line
+FISH_Z_FLOOR = 4.4                        # the lower flank plane z = -FISH_Z_FLOOR (flat: the fish lies on it)
+FISH_P, FISH_M = 2.4, 2.4                 # superellipse exponents (y, z): a rounded body, a touch fuller than an ellipse
+FISH_SP_EDGE, FISH_SP_FACE, FISH_SP_FIN = 1.5, 2.6, 1.3
+FISH_FREE_DIRS = 170
+FISH_FIXED_SP = 1.55
+FISH_EYE = (12.3, 0.9, 1.0, 8)            # x, y, ring radius, ring points (on each flank; the head is ~5.5 cm tall here)
+FISH_GILL = (((8.2, 4.4), (9.1, 1.8), (9.1, -1.5), (8.2, -4.0)), 0.5)       # control points (x, y) on a flank, width
+FISH_MOUTH = (-0.9, 2.6)                  # the mouth line: y, and the half-span in z it runs across the snout
+FISH_PLANES = ((np.array([0.0, 0.0, -1.0]), FISH_Z_FLOOR, "floor"),)
+
+
+def fish_back(x):
+    """The back line y_top(x): rises from the nose over a forehead to a hump over the front third, eases to the peduncle."""
+    x = np.asarray(x, float)
+    nose = fc.smoothstep(0.0, 1.0, (FISH_X_NOSE - x) / 12.0) ** 0.85
+    rear = fc.smoothstep(0.0, 1.0, (x - FISH_X_ROOT) / 14.0) ** 0.7
+    return 2.0 + 5.0 * np.minimum(nose, rear) + 0.1 * np.sin(0.6 * x + 1.0)      # 2.0 = the peduncle's top
+
+
+def fish_belly(x):
+    """The belly line y_bottom(x): a rounder, fuller curve than the back (the fish is deepest under the hump)."""
+    x = np.asarray(x, float)
+    nose = fc.smoothstep(0.0, 1.0, (FISH_X_NOSE - x) / 10.0) ** 0.8
+    rear = fc.smoothstep(0.0, 1.0, (x - FISH_X_ROOT) / 12.0) ** 0.75
+    return -1.8 - 4.8 * np.minimum(nose, rear)                                      # -1.8 = the peduncle's bottom
+
+
+def fish_thick(x):
+    """Half thickness T(x) of the body: fullest behind the head, thinning to the nose and the peduncle."""
+    x = np.asarray(x, float)
+    nose = fc.smoothstep(0.0, 1.0, (FISH_X_NOSE - x) / 8.5) ** 0.6
+    rear = fc.smoothstep(0.0, 1.0, (x - FISH_X_ROOT) / 13.0) ** 0.6
+    return 1.2 + 4.1 * np.minimum(nose, rear)                                       # 1.2 = the peduncle's half thickness
+
+
+def _super(p, yc, H, T, px=FISH_P, mz=FISH_M):
+    g = np.abs((p[:, 1] - yc) / np.maximum(H, 0.05)) ** px + np.abs(p[:, 2] / np.maximum(T, 0.05)) ** mz
+    return g ** (1.0 / mz) - 1.0
+
+
+def fish_body_F(p):
+    x = p[:, 0]
+    back, belly = fish_back(x), fish_belly(x)
+    s = _super(p, 0.5 * (back + belly), 0.5 * (back - belly), fish_thick(x))
+    return np.maximum.reduce([s, (x - FISH_X_NOSE) / 3.0, (FISH_X_ROOT - 2.5 - x) / 3.0])   # nose; runs 2.5 cm into the tail
+
+
+def fish_tail_params(x):
+    """(yc, H, T) of the tail's section at x: the caudal peduncle, then the fan flaring to the lobes."""
+    x = np.asarray(x, float)
+    x0 = FISH_X_ROOT                                               # overlaps the body (which runs 2.5 cm past the root)
+    u = np.clip((x0 - x) / (x0 - FISH_X_TAIL), 0.0, 1.0)           # 0 at the root, 1 at the tips
+    H = 1.9 + 2.9 * np.clip((u - 0.1) / 0.9, 0.0, 1.0)             # peduncle 3.8 tall, lobes 9.6 tall (a linear flare)
+    T = 1.2 - 0.3 * u
+    return 0.1 + 0.2 * u, H, T
+
+
+def fish_tail_edge_x(y):
+    """x of the trailing edge at y: the lobe tips at FISH_X_TAIL, the notch FISH_NOTCH ahead on the centre line."""
+    y = np.asarray(y, float)
+    return FISH_X_TAIL + FISH_NOTCH * np.clip(1.0 - np.abs(y - 0.3) / 4.8, 0.0, 1.0)
+
+
+def fish_tail_F(p):
+    x = p[:, 0]
+    yc, H, T = fish_tail_params(x)
+    s = _super(p, yc, H, T, 4.0, 4.0)
+    front = (x - FISH_X_ROOT) / 3.0
+    edge = (fish_tail_edge_x(p[:, 1]) - x) / 3.0                   # the forked trailing edge
+    return np.maximum.reduce([s, front, edge])
+
+
+def fish_dfin_params(x):
+    """(yc, H, T) of the dorsal fin's section at x: a long ridge along the back, tallest toward its front, rooted 1.5 cm in."""
+    x = np.asarray(x, float)
+    u = np.clip((x + 7.0) / 14.0, 0.0, 1.0)
+    h = (0.9 + 1.6 * u ** 1.3) * fc.smoothstep(0.0, 1.5, x + 7.0) * fc.smoothstep(0.0, 2.0, 7.0 - x)
+    back = fish_back(x)
+    return back + 0.5 * (h - 1.5), 0.5 * (h + 1.5), np.full_like(u, 0.8)
+
+
+def fish_afin_params(x):
+    """(yc, H, T) of the anal fin's section at x: a shorter ridge under the belly ahead of the peduncle."""
+    x = np.asarray(x, float)
+    u = np.clip((x + 8.0) / 5.5, 0.0, 1.0)
+    h = (1.0 + 1.0 * u ** 1.3) * fc.smoothstep(0.0, 1.2, x + 8.0) * fc.smoothstep(0.0, 2.0, -2.5 - x)
+    belly = fish_belly(x)
+    return belly + 0.5 * (1.5 - h), 0.5 * (h + 1.5), np.full_like(u, 0.7)
+
+
+def fish_dfin_F(p):
+    x = p[:, 0]
+    yc, H, T = fish_dfin_params(x)
+    return np.maximum.reduce([_super(p, yc, H, T, 4.0, 4.0), (-7.0 - x) / 2.0, (x - 7.0) / 2.0])   # ends: no rod beyond
+
+
+def fish_afin_F(p):
+    x = p[:, 0]
+    yc, H, T = fish_afin_params(x)
+    return np.maximum.reduce([_super(p, yc, H, T, 4.0, 4.0), (-8.0 - x) / 2.0, (x + 2.5) / 2.0])
+
+
+FISH_PARTS = (fish_body_F, fish_tail_F, fish_dfin_F, fish_afin_F)
+
+
+def fish_F(p):
+    """Signed inside/outside of the whole fish: the union (min) of its parts."""
+    return np.minimum.reduce([f(p) for f in FISH_PARTS])
+
+
+def fish_radius(d, with_planes=True):
+    """Radius along unit directions d (n, 3) from FISH_CENTRE, the clamping plane index (-1 = free surface) and the
+    part that owns each point (0 body, 1 tail, 2 dorsal fin, 3 anal fin)."""
+    d = unit(np.atleast_2d(d))
+    lo, hi = np.full(len(d), 0.3), np.full(len(d), 40.0)
+    for _ in range(44):
+        mid = 0.5 * (lo + hi)
+        inside = fish_F(FISH_CENTRE + mid[:, None] * d) < 0.0
+        lo = np.where(inside, mid, lo)
+        hi = np.where(inside, hi, mid)
+    t = 0.5 * (lo + hi)
+    p0 = FISH_CENTRE + t[:, None] * d
+    part = np.argmin(np.stack([f(p0) for f in FISH_PARTS], axis=1), axis=1)
+    on_body = (part == 0) * fc.smoothstep(0.0, 2.0, FISH_X_NOSE - p0[:, 0])              # fades out at the nose
+    t = t + on_body * (0.22 * fc.lumps(p0, 91, 0.17) + 0.06 * fc.lumps(p0, 92, 0.45))     # hand-cut lumps, body only
+    which = np.full(len(d), -1)
+    if with_planes:
+        for k, (n, h, _) in enumerate(FISH_PLANES):
+            nd = d @ n
+            lim = np.where(nd > 1e-6, (h - FISH_CENTRE @ n) / np.maximum(nd, 1e-6), np.inf)
+            hit = lim < t
+            t = np.where(hit, lim, t)
+            which[hit] = k
+    return t, which, part
+
+
+def fish_surface(d):
+    d = unit(np.atleast_2d(d))
+    return FISH_CENTRE + fish_radius(d)[0][:, None] * d
+
+
+def fish_top_z(x, y):
+    """Height z >= 0 of the body's surface over (x, y) (bisected on the body implicit), before the floor clamp."""
+    x, y = np.atleast_1d(np.asarray(x, float)), np.atleast_1d(np.asarray(y, float))
+    lo, hi = np.zeros(len(x)), np.full(len(x), 9.0)
+    for _ in range(40):
+        mid = 0.5 * (lo + hi)
+        inside = fish_body_F(np.stack([x, y, mid], axis=1)) < 0.0
+        lo = np.where(inside, mid, lo)
+        hi = np.where(inside, hi, mid)
+    return 0.5 * (lo + hi)
+
+
+def fish_flank_z(x, zsign, y=0.0):
+    """z of the flank's surface at (x, y): the rounded upper flank, or the floor plane where the lower flank is clamped."""
+    z = float(fish_top_z(x, y)[0])
+    return z if zsign > 0 else -min(z, FISH_Z_FLOOR)
+
+
+def fish_eye_dirs(zsign):
+    """Centre + ring directions of one eye on a flank."""
+    ex, ey, r, m = FISH_EYE
+    psi = np.arange(m) * math.tau / m + 0.2
+    pts = [np.array([ex, ey, fish_flank_z(ex, zsign, ey)])]
+    pts += [np.array([ex + r * math.cos(a), ey + r * math.sin(a), fish_flank_z(ex + r * math.cos(a), zsign, ey + r * math.sin(a))])
+            for a in psi]
+    return unit(np.array(pts) - FISH_CENTRE)
+
+
+def _fish_section(yc, H, T, phis_deg, jitter=0.0, seed=0, exp=4.0):
+    """Points of a superellipse section (exponent exp) at angles phis_deg: 90 = top (y = yc + H, z = 0), 0 = +Z
+    flank, 45 = the top +Z corner."""
+    rng = np.random.default_rng(seed)
+    ph = np.radians(np.asarray(phis_deg, float) + (rng.uniform(-jitter, jitter, len(phis_deg)) if jitter else 0.0))
+    sy, cz = np.sin(ph), np.cos(ph)
+    e = 2.0 / exp
+    return np.stack([yc + H * np.sign(sy) * np.abs(sy) ** e, T * np.sign(cz) * np.abs(cz) ** e], axis=1)
+
+
+def fish_tail_points():
+    """Fixed directions that structure the tail: rings round its sections at stations from the root to the lobes (the
+    last ring follows the forked trailing edge), plus the notch's centre. Blue noise never samples the tail (its
+    flanks graze the rays), so these rings ARE its vertices."""
+    pts = []
+    stations = [FISH_X_ROOT - 2.0, 0.5 * (FISH_X_ROOT - 2.0 + FISH_X_TAIL + FISH_NOTCH + 0.8), FISH_X_TAIL + FISH_NOTCH + 0.8, FISH_X_TAIL + 0.4]
+    for i, x in enumerate(stations):
+        yc, H, T = (float(v) for v in fish_tail_params(x))
+        sec = _fish_section(yc, H, T, np.arange(8) * 45.0)        # no jitter: the section moves fast near the top
+        if i == len(stations) - 1:                                  # the edge ring: each point back on the trailing edge
+            pts += [(float(fish_tail_edge_x(y)) - 0.02, y, z) for y, z in sec]
+        else:
+            pts += [(x, y, z) for y, z in sec]
+    yc, H, T = (float(v) for v in fish_tail_params(FISH_X_TAIL))
+    pts.append((FISH_X_TAIL + FISH_NOTCH - 0.02, yc, 0.0))         # the notch's centre (the ring's top / bottom are the tips)
+    return unit(np.array(pts) - FISH_CENTRE)
+
+
+def fish_fin_points(params_fn, x0, x1, n_stations, seed, below=False):
+    """Fixed directions along a fin ridge: at each station the ridge's two shoulders and one foot point a side, where
+    the fin's section stands clear of the body, so each flank is one strip of facets. params_fn(x) -> (yc, H, T);
+    below = the fin hangs under the belly (its edge is the section's bottom)."""
+    pts = []
+    sgn = -1.0 if below else 1.0
+    phis = np.array((50.0, 130.0)) + (180.0 if below else 0.0)
+    for i, x in enumerate(np.linspace(x0, x1, n_stations)):
+        yc, H, T = (float(v) for v in params_fn(x))
+        y_foot = float(fish_belly(x) if below else fish_back(x)) + sgn * 0.35           # just clear of the body
+        z_foot = T * max(1.0 - (abs(y_foot - yc) / H) ** 4, 0.1) ** 0.25
+        pts += [(x, y_foot, z_foot), (x, y_foot, -z_foot)]
+        sec = _fish_section(yc, H, T, phis, jitter=4.0, seed=seed + i)                 # the ridge's two shoulders
+        pts += [(x, y, z) for y, z in sec]
+    return unit(np.array(pts) - FISH_CENTRE)
+
+
+def _fish_cell_hash(a, b):
+    h = (a.astype(np.int64) * 73856093) ^ (b.astype(np.int64) * 19349663) ^ 0x5bd1e995
+    return ((h * 2654435761) % 4294967296) / 4294967296.0
+
+
+def build_fish():
+    name = "Fish"
+    width = FISH_GILL[1]
+    eyes = [fish_eye_dirs(1.0), fish_eye_dirs(-1.0)]
+    gills = []
+    for zs in (1.0, -1.0):
+        ctrl = [(x, y, fish_flank_z(x, zs, y)) for x, y in FISH_GILL[0]]
+        gills.append(slab_sinew_dirs(ctrl, width, step=1.0, surface=fish_surface, centre=FISH_CENTRE))
+    my, mz = FISH_MOUTH
+    mouth_ctrl = [(FISH_X_NOSE - 2.4, my, -fish_flank_z(FISH_X_NOSE - 2.4, 1.0, my)),
+                  (FISH_X_NOSE - 0.8, my, -fish_flank_z(FISH_X_NOSE - 0.8, 1.0, my)), (FISH_X_NOSE + 0.5, my, 0.0),
+                  (FISH_X_NOSE - 0.8, my, fish_flank_z(FISH_X_NOSE - 0.8, 1.0, my)),
+                  (FISH_X_NOSE - 2.4, my, fish_flank_z(FISH_X_NOSE - 2.4, 1.0, my))]   # a line round the snout, on its surface
+    mouth = slab_sinew_dirs(mouth_ctrl, width, step=1.0, surface=fish_surface, centre=FISH_CENTRE)
+    strips = gills + [mouth]
+    tail_pts = fish_tail_points()
+    dfin_pts = fish_fin_points(fish_dfin_params, -5.6, 5.6, 8, 400)
+    afin_pts = fish_fin_points(fish_afin_params, -6.4, -3.7, 4, 450, below=True)
+    fixed = np.concatenate(eyes + [np.concatenate([a, b]) for a, b in strips] + [tail_pts, dfin_pts, afin_pts])
+    eye_idx = []
+    k = 0
+    for e in eyes:
+        eye_idx.append((k, np.arange(k + 1, k + len(e))))        # centre, ring
+        k += len(e)
+    strip_sets = []
+    for a, b in strips:
+        ia = np.arange(k, k + len(a))
+        ib = np.arange(k + len(a), k + len(a) + len(b))
+        strip_sets.append((ia, ib))
+        k += len(a) + len(b)
+
+    planes = [(n, h) for n, h, _ in FISH_PLANES]
+
+    def spacing(p):
+        # dense along plane creases and in the thin parts (fins, tail), sparse inside the flats
+        x, y = p[:, 0], p[:, 1]
+        back, belly = fish_back(x), fish_belly(x)
+        d_floor = np.abs(p @ planes[0][0] - planes[0][1])                               # dense along the floor's rim
+        d_y = np.abs(np.abs(y - 0.5 * (back + belly)) - 0.5 * (back - belly))
+        s = FISH_SP_EDGE + (FISH_SP_FACE - FISH_SP_EDGE) * fc.smoothstep(0.3, 3.0, np.maximum(d_floor, d_y))
+        s = s * (1.0 - 0.25 * fc.smoothstep(2.5, 0.5, FISH_X_NOSE - x))                    # finer round the snout
+        thin = (y > back + 0.4) | (y < belly - 0.4) | (x < FISH_X_ROOT - 2.5)
+        return np.where(thin, FISH_SP_FIN, s)
+
+    def reject(p):                                                  # the tail and the fin ridges are structured, not sampled
+        return (p[:, 0] < FISH_X_ROOT - 2.5) | (p[:, 1] > fish_back(p[:, 0]) + 0.25) | (p[:, 1] < fish_belly(p[:, 0]) - 0.25)
+
+    dirs = blue_noise_dirs(fish_surface, spacing, FISH_FREE_DIRS, seed=73, fixed=fixed, fixed_spacing=FISH_FIXED_SP,
+                           n_cand=60000, weight_clip=0.9, reject=reject)
+    t, which, part = fish_radius(dirs)
+    body = FISH_CENTRE + t[:, None] * unit(dirs)
+    on_wall = (part == 1) & (np.abs(body[:, 0] - fish_tail_edge_x(body[:, 1])) < 0.05)   # the trailing edge is a crease
+
+    locks = []
+    for c, ring in eye_idx:
+        locks += [(int(ring[i]), int(ring[(i + 1) % len(ring)])) for i in range(len(ring))]
+        locks += [(int(c), int(i)) for i in ring]
+    for ia, ib in strip_sets:
+        locks += [(int(ia[i]), int(ia[i + 1])) for i in range(len(ia) - 1)]
+        locks += [(int(ib[i]), int(ib[i + 1])) for i in range(len(ib) - 1)]
+    hull = hull_faces(dirs)
+    hull, _ = delaunay_flips(body, hull, (), max_pass=80, fold_cos=0.3)
+    hull, missing = slab_constraint_fix(body, hull, locks)
+    hull, _ = delaunay_flips(body, hull, locks, max_pass=80, fold_cos=0.3)
+    hull, n_crease = slab_crease_flips(body, hull, locks, (which >= 0) | on_wall)
+    print("fish: %d crease flips" % n_crease)
+    print("fish: %d dirs (%d fixed), constraint edges missing %d" % (len(dirs), len(fixed), len(missing)))
+    if missing:
+        raise RuntimeError("Fish: eye / gill / mouth edges missing after flips: %s" % missing[:8])
+
+    # ---- slots: Flesh = the pale belly band of the body, Skin = everything else (head, back, flanks, fins, tail)
+    fcent0 = np.array([body[f].mean(axis=0) for f in hull])
+    fpart = np.array([np.bincount(part[f], minlength=4).argmax() for f in hull])
+    belly_line = fish_belly(fcent0[:, 0])
+    is_belly = (fpart == 0) & (fcent0[:, 1] < belly_line + 1.4) & (fcent0[:, 0] < FISH_X_NOSE - 3.0)
+    slots = np.where(is_belly, 1, 0)                                # 0 Skin, 1 Flesh (spec slot order)
+
+    shift = rest_shift(body)
+    raw = body + shift
+    obj = fc.new_object(spec.mesh_name(name), raw, hull, slots=spec.INGREDIENTS[name]["slots"], face_slots=slots)
+
+    # ---- paint: dark teal back to a silver belly with staggered scale cells, amber rayed fins, eyes, gills, mouth
+    faces = [list(p.vertices) for p in obj.data.polygons]           # new_object may re-wind, keep its order
+    fslot = np.array([p.material_index for p in obj.data.polygons])
+    fcent, fnrm, farea = face_geo(raw, faces)
+    pc = fcent - shift                                               # centred frame
+    fpart = np.array([np.bincount(part[f], minlength=4).argmax() for f in faces])
+    vplane = which
+    fplane = np.array([vplane[f[0]] if vplane[f[0]] == vplane[f[1]] == vplane[f[2]] else -1 for f in faces])
+    head = (fpart == 0) & (pc[:, 0] > FISH_X_NOSE - 2.8) & (np.abs(fnrm[:, 2]) < 0.75)   # the snout, bar its flanks
+    tail_cut = (fpart == 1) & (np.abs(pc[:, 0] - fish_tail_edge_x(pc[:, 1])) < 0.3)
+    flank = np.abs(fnrm[:, 2]) > 0.6
+    x, y = pc[:, 0], pc[:, 1]
+    back, belly = fish_back(x), fish_belly(x)
+
+    skin_dark, skin_mid, skin_low = col(40, 76, 72), col(92, 134, 116), col(168, 184, 158)
+    belly_c, fin, fin_dark = col(226, 220, 198), col(180, 120, 62), col(130, 80, 44)
+    up = np.clip((y - belly) / np.maximum(back - belly, 0.1), 0.0, 1.0)           # 0 belly .. 1 back
+    rgb = lerp(skin_low, skin_mid, fc.smoothstep(0.2, 0.55, up))
+    rgb = lerp(rgb, skin_dark, fc.smoothstep(0.55, 0.95, up))
+    rgb = np.where((fslot == 1)[:, None], lerp(belly_c, skin_low, fc.smoothstep(0.08, 0.2, up)), rgb)
+    # scale cells: staggered rows along the body, one value per cell, on the body skin only
+    row = np.floor((y + 7.5) / 1.9)
+    colx = np.floor((x + 20.0 + 1.15 * (row % 2)) / 2.3)
+    cell = _fish_cell_hash(row, colx)
+    scaled = (fpart == 0) & (fslot == 0) & ~head
+    rgb = np.where(scaled[:, None], rgb * (0.78 + 0.42 * cell)[:, None], rgb)
+    lateral = 1.0 - fc.smoothstep(0.35, 0.8, np.abs(y - (0.9 - 0.04 * x)))
+    rgb = lerp(rgb, col(150, 176, 150), lateral * flank * (fpart == 0) * 0.45)
+    # fins and the tail: amber with darker rays
+    ray_x = (np.floor(x / 1.25) % 2) == 0
+    ray_y = (np.floor((y - 0.6) / 1.1) % 2) == 0
+    fin_rgb = np.where(np.where(fpart == 1, ray_y, ray_x)[:, None], fin, fin_dark)
+    rgb = np.where((fpart > 0)[:, None], fin_rgb, rgb)
+    notch = tail_cut & (np.abs(y - 0.3) < 1.6)
+    rgb[notch] = fin_dark * 0.55
+    # pectoral fin: a painted amber patch on each flank behind the gill
+    pect = flank & (fpart == 0) & (((x - 5.6) / 3.4) ** 2 + ((y + 2.0) / 1.7) ** 2 < 1.0)
+    rgb = np.where(pect[:, None], np.where(ray_x[:, None], fin, fin_dark) * 0.95, rgb)
+    # the head plane: greyer green, a paler chin under the mouth
+    rgb[head] = lerp(rgb[head], belly_c, fc.smoothstep(FISH_MOUTH[0] - 0.4, FISH_MOUTH[0] - 2.5, y[head]))
+    # gill slits (the strip faces) and the silvery gill cover ahead of them
+    strip_v = np.zeros(len(raw), int)
+    strip_of = np.zeros(len(raw), int)
+    for si, (ia, ib) in enumerate(strip_sets):
+        strip_v[ia] = 1
+        strip_v[ib] = 2
+        strip_of[np.concatenate([ia, ib])] = si + 1
+    strip = np.array([all(strip_v[v] > 0 for v in f) and {1, 2} <= {int(strip_v[v]) for v in f} for f in faces])
+    strip_id = np.array([max(strip_of[v] for v in f) for f in faces])
+    gill = strip & (strip_id <= 2)
+    mouth_f = strip & (strip_id == 3)
+    gx = np.interp(y, [c[1] for c in FISH_GILL[0]][::-1], [c[0] for c in FISH_GILL[0]][::-1])
+    cover = flank & (fpart == 0) & (x > gx - 3.6) & (x < gx + 0.2) & ~strip
+    rgb = lerp(rgb, col(146, 168, 156), cover * 0.55)
+    rgb[gill] = col(42, 34, 38)
+    rgb[mouth_f] = col(72, 28, 36)
+    # eyes: the spokes black, the ring of facets round them yellow
+    for c, ring in eye_idx:
+        ring_set = set(int(i) for i in ring)
+        spoke = np.array([c in f for f in faces])
+        rim = np.array([(c not in f) and sum(v in ring_set for v in f) >= 2 for f in faces])
+        rgb[rim] = col(226, 176, 52)
+        rgb[spoke] = col(14, 12, 12)
+    paint_object(obj, rgb, seed=19, value=0.05, hue=0.025, cavity_darken=0.3)
+    finish_object(obj)
+    obj["rest_shift_cm"] = [float(v) for v in shift]
+    obj["belly_faces"] = int((fslot == 1).sum())
+    obj["fin_faces"] = int((fpart > 0).sum())
+    obj["head_faces"] = int(head.sum())
+    obj["snout_faces"] = int(head.sum())
+
+    def masks(fields):
+        p, nrm, ao = fields["position_cm"], fields["normal"], fields["ao"]
+        skin = fc.smoothstep(-6.0, -2.5, p[..., 1] - shift[1])            # the belly cooks a touch later than the skin
+        edges = edge_raster(obj, ao.shape[0])
+        r = (0.5 + 0.35 * skin) * fc.smoothstep(0.25, 0.9, ao)
+        return assemble_masks(fields, r + 0.2 * edges, edges, grain_freq=0.9, seed=340)
+
+    return dict(obj=obj, raw=raw, cooked=raw.copy(), masks=masks, static=np.ones(len(raw), bool))
+
+
 # ================================================================ masks
 def _segment(img, a, b, w, val):
     h, wd = img.shape
@@ -1580,7 +1990,7 @@ def assemble_masks(fields, r, edges, grain_freq, seed):
 
 # ================================================================ verification / output
 BUILDERS = {"RoastHorned": build_roast, "Drumstick": build_drumstick, "Tentacle": build_tentacle,
-            "MeatSlab": build_meatslab}
+            "MeatSlab": build_meatslab, "Fish": build_fish}
 
 
 def mesh_stats(obj):

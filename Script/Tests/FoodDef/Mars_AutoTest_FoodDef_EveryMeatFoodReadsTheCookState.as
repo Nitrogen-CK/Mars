@@ -26,6 +26,7 @@ class UMars_AutoTest_FoodDef_EveryMeatFoodReadsTheCookState : UCk_AutoTest_Base
         Foods.Add(mars::Food_Puffer_Mars);
         Foods.Add(mars::Food_SpikedBerry_Mars);
         Foods.Add(mars::Food_Mushroom_Mars);
+        Foods.Add(mars::Food_Fish_Mars);
         return Foods;
     }
 
@@ -77,7 +78,7 @@ class UMars_AutoTest_FoodDef_EveryMeatFoodReadsTheCookState : UCk_AutoTest_Base
             }
         }
 
-        Assert_True(MeatCount >= 4, f"the roster holds the slab and the three prep meats (found {MeatCount} meat foods)");
+        Assert_True(MeatCount >= 5, f"the roster holds the slab, the three prep meats and the fish (found {MeatCount} meat foods)");
     }
 
     UFUNCTION()

@@ -75,6 +75,14 @@ INGREDIENTS = {
     "MeatSlab": dict(category="meats", size_cm=36.0, slots=("Flesh", "Skin"), morph=False, fryable=False, cpu_access=True,
                      cook_standard=True,
                      ref="a large raw joint for the cutting board: a thick loin / brisket slab with a fat cap, chopped into pieces at runtime"),
+    # Stephen 2026-10-28/29: the fishing minigame's catch, a cuttable meat (one closed runtime-mesh solid, CPU access) that
+    # lies on its flank, head toward +X. cook_standard=False is Stephen's ruling ("too blocky"): a rounded fish body over
+    # the six-face sear read, so the pan's per-axis sear slots mis-bucket on its curved flanks (the cook-look numbers are
+    # still printed as information). The fins and the tail fan are thin ridges on the same closed shell. Skin = the scaled
+    # body, head and fins, Flesh = the pale belly band (paint-driven; the slot split lets a dressing tint it apart).
+    "Fish": dict(category="meats", size_cm=34.0, slots=("Skin", "Flesh"), morph=False, fryable=False, cpu_access=True,
+                 cook_standard=False,
+                 ref="a plump round-bodied fish lying on its side, 34 x 15 x 10 cm: pointed snout with a painted mouth toward +X, eye and gill slit on the flanks, painted scale facets over a dark teal back, pale belly, amber dorsal / anal fins and a forked tail fan at -X"),
     # produce: same cook model (the sear ramp browns anything); morph where the reference shows a shape change
     "Puffer": dict(category="produce", size_cm=14.0, slots=("Skin", "Horn"), morph=True, fryable=True,
                    prep=dict(shells="union", cpu_access=True),

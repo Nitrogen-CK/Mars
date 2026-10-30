@@ -81,7 +81,7 @@ DRESSING_MATERIALS = {"MeatSlab_Mars_SM": {"Flesh": "MeatSlabFlesh_Mars_MI", "Sk
 # Script/Food/Mars_Food_Def.as has a row; a new food gets one here and a Mars_FoodItem_<Name>_EntityScript class.
 INGREDIENTS = (("MeatSlab", "Meat slab"), ("Drumstick", "Drumstick"), ("Tentacle", "Tentacle"), ("Puffer", "Puffer"),
                ("SpikedBerry", "Spiked berry"), ("Mushroom", "Mushroom"), ("MushroomSlice", "Mushroom slice"),
-               ("Pickle", "Pickle"))
+               ("Pickle", "Pickle"), ("Fish", "Fish"))
 # Unreal cm.  Three PrepTable_Mars_SM (160 wide, 80 deep, 70 high) end to end along X, in front and to the left of the
 # player starts (which face -Y): the foods on the first two, 40 cm apart, the platters on the third.  Labels stand along
 # the far edge, facing the starts.

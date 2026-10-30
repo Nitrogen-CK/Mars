@@ -455,4 +455,35 @@ namespace mars
 
         Layout.YawDegrees = 90.0;
     }
+
+    // Fish_Mars_SM: the fishing minigame's catch, a plump round-bodied fish lying on its flank, 34.0 x 15.5 x 9.7 cm (the body
+    // 13 tall at the hump; the fins stand past it), snout toward +X, 1921 cm3, one closed solid of 638 triangles (its own prep
+    // mesh, CPU access). 2.02 kg = 1921 cm3 at 1.05 g/cm3. Stephen's ruling (2026-10-29): it is NOT held to the six-face
+    // cook-look standard (food_spec cook_standard=False; the slab is), so the pan's per-axis sear slots mis-bucket on its
+    // rounded flanks; it still goes to the bench and the pan like any meat. Slots Skin = the scaled body, head and fins (0),
+    // Flesh = the pale belly band (1); the cap is slot 2. One Food instance (Fish_Mars_MI, on Food_Mars_M, so every slot
+    // reads the cook state) wears all three; the cap is pale pink-cream fish flesh, C(232, 214, 200) linear. Yawed 90 so the
+    // long axis runs along the cleaver's travel; the UVs span about 34 cm.
+    asset Food_Fish_Mars of UMars_Food_Def
+    {
+        Data.Mesh = assets::Fish_Mars_SM();
+        Data.MassKg = 2.02;
+        Data.Kind.AddTag(GameplayTags::Food_Meat_Fish);
+
+        // A 50 g, 1 cm portion, like the slab: thinner shavings are refused and the chop only knocks.
+        Tuners = FMars_FoodPiece_Tuners(0.05, 1.0);
+
+        const auto Fish = TSoftObjectPtr<UMaterialInterface>(assets::Fish_Mars_MI().ToSoftObjectPath());
+        TArray<TSoftObjectPtr<UMaterialInterface>> Materials;
+        Materials.Add(Fish);
+        Materials.Add(Fish);
+        Materials.Add(Fish);
+        Visuals.Display.Set_Materials(Materials);
+        Visuals.Cap.Set_MaterialID(2);
+        Visuals.Cap.Set_Color(FLinearColor(0.807f, 0.672f, 0.578f, 1.0f));
+        Visuals.Cap.Set_CmPerUVUnit(34.0);
+        Visuals.Cap.Set_UVPolicy(ECk_RuntimeMesh_CapUVPolicy::PlanarOnLayer0_KeepInterpolated);
+
+        Layout.YawDegrees = 90.0;
+    }
 }
