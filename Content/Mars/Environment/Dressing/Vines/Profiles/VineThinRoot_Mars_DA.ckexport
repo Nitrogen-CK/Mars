@@ -1,0 +1,270 @@
+{
+	"assetName": "VineThinRoot_Mars_DA",
+	"assetPath": "/Game/Mars/Environment/Dressing/Vines/Profiles/VineThinRoot_Mars_DA.VineThinRoot_Mars_DA",
+	"assetClass": "Mars_VineProfile",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "26deaaf337e0e34f9bdae61e2adf1fd9",
+		"exporterVersion": 2
+	},
+	"parentClasses": [
+		"DataAsset"
+	],
+	"properties": [
+		{
+			"name": "Stem",
+			"type": "FMars_VineProfile_Stem",
+			"category": "Vine",
+			"value":
+			{
+				"Render": "SplineMesh",
+				"Meshes":
+				{
+					"Mesh": "/Game/Mars/Environment/Dressing/Meshes/Vines/VineBark_B_Mars_SM.VineBark_B_Mars_SM",
+					"AltMesh": "/Game/Mars/Environment/Dressing/Meshes/Vines/VineBark_A_Mars_SM.VineBark_A_Mars_SM",
+					"TipMesh": "/Game/Mars/Environment/Dressing/Meshes/Vines/VineTip_Mars_SM.VineTip_Mars_SM",
+					"KnotMesh": "None",
+					"ForwardAxis": "X"
+				},
+				"Radius":
+				{
+					"StartCm": 4,
+					"EndFrac": 0.20000000298023224,
+					"TaperPower": 1.5,
+					"JitterFrac": 0.10000000149011612,
+					"DrawFrac": 0.20000000298023224
+				},
+				"SegmentLengthCm": 40,
+				"RollJitterDeg": 40
+			}
+		},
+		{
+			"name": "Twist",
+			"type": "FMars_VineProfile_Twist",
+			"category": "Vine",
+			"value":
+			{
+				"Strands": 1,
+				"PitchCm": 220,
+				"StrandFrac": 0.62000000476837158,
+				"OffsetFrac": 0.41999998688697815,
+				"SplitLengthCm": 90
+			}
+		},
+		{
+			"name": "Attach",
+			"type": "FMars_VineProfile_Attach",
+			"category": "Vine",
+			"value":
+			{
+				"ClingRadiusCm": 60,
+				"StandOffCm": 0.5,
+				"StepCm": 20,
+				"SmoothPasses": 2,
+				"TraceComplex": false,
+				"Meander":
+				{
+					"AmpCm": 10,
+					"WavelengthCm": 120,
+					"CreepDeg": 8,
+					"LeanCm": 0
+				}
+			}
+		},
+		{
+			"name": "Ends",
+			"type": "FMars_VineProfile_Ends",
+			"category": "Vine",
+			"value":
+			{
+				"Ground":
+				{
+					"CreepCm":
+					{
+						"X": 20,
+						"Y": 60
+					},
+					"Fingers":
+					{
+						"Count":
+						{
+							"X": 2,
+							"Y": 3
+						},
+						"LengthCm":
+						{
+							"X": 20,
+							"Y": 60
+						},
+						"RadiusFrac": 0.30000001192092896
+					},
+					"SinkFrac": 0,
+					"ContactBendCm": 15,
+					"CoilCm":
+					{
+						"X": 0,
+						"Y": 0
+					},
+					"LitterChance": 0
+				},
+				"Air":
+				{
+					"ClearanceCm":
+					{
+						"X": 40,
+						"Y": 180
+					},
+					"LengthFrac":
+					{
+						"X": 0,
+						"Y": 0
+					},
+					"LengthCm":
+					{
+						"X": 30,
+						"Y": 0
+					},
+					"TipCurlDeg": 50,
+					"MaxDropCm": 3000,
+					"SwayCm": 4
+				},
+				"Ceiling":
+				{
+					"Fingers":
+					{
+						"Count":
+						{
+							"X": 0,
+							"Y": 2
+						},
+						"LengthCm":
+						{
+							"X": 20,
+							"Y": 40
+						},
+						"RadiusFrac": 0.30000001192092896
+					},
+					"BuryCm": 5
+				}
+			}
+		},
+		{
+			"name": "Branches",
+			"type": "FMars_VineProfile_Branches",
+			"category": "Vine",
+			"value":
+			{
+				"SpacingCm": 80,
+				"Chance": 0.20000000298023224,
+				"AngleDeg":
+				{
+					"X": 25,
+					"Y": 60
+				},
+				"LengthCm":
+				{
+					"X": 20,
+					"Y": 60
+				},
+				"Depth": 1,
+				"TipTendrils":
+				{
+					"X": 0,
+					"Y": 0
+				}
+			}
+		},
+		{
+			"name": "Leaves",
+			"type": "FMars_VineProfile_Leaves",
+			"category": "Vine",
+			"value":
+			{
+				"Meshes": [],
+				"Weights": [],
+				"SpacingCm": 7,
+				"Scale":
+				{
+					"X": 0.80000000000000004,
+					"Y": 1.25
+				},
+				"Falloff":
+				{
+					"Density": 1,
+					"HoldFrac": 0.64999997615814209,
+					"TipDensity": 0.30000001192092896,
+					"TipScale": 0.60000002384185791
+				},
+				"TiltDeg": 25,
+				"DroopDeg": 40
+			}
+		},
+		{
+			"name": "Strands",
+			"type": "FMars_VineProfile_Strands",
+			"category": "Vine",
+			"value":
+			{
+				"Meshes": [],
+				"PerSquareMetre": 6,
+				"ClumpSigmaCm": 18,
+				"PerMetre": 0,
+				"Width":
+				{
+					"X": 0.69999999999999996,
+					"Y": 1.3999999999999999
+				},
+				"LitterMesh": "None"
+			}
+		},
+		{
+			"name": "Curtain",
+			"type": "FMars_VineProfile_Curtain",
+			"category": "Vine",
+			"value":
+			{
+				"StrandsRange":
+				{
+					"X": 6,
+					"Y": 10
+				},
+				"TopInsetCm":
+				{
+					"X": 10,
+					"Y": 25
+				},
+				"StragglerChance": 0.11999999731779099
+			}
+		},
+		{
+			"name": "Rendering",
+			"type": "FMars_VineProfile_Rendering",
+			"category": "Vine",
+			"value":
+			{
+				"StemMaterial": "/Game/Mars/Environment/Dressing/Materials/Instances/VineBarkRoot_Mars_MI.VineBarkRoot_Mars_MI",
+				"LeafMaterial": "None",
+				"StrandMaterial": "None",
+				"Shadows":
+				{
+					"Stems": true,
+					"Leaves": true,
+					"Strands": false
+				},
+				"CullCm":
+				{
+					"X": 3500,
+					"Y": 5000
+				},
+				"Collision": false,
+				"Data":
+				{
+					"MossScale": 1,
+					"WetAdd": 0,
+					"Dryness": 0
+				}
+			}
+		}
+	]
+}

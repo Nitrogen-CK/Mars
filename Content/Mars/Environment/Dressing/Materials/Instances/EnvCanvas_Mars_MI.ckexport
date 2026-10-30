@@ -1,0 +1,759 @@
+{
+	"material": "EnvCanvas_Mars_MI",
+	"packagePath": "/Game/Mars/Environment/Dressing/Materials/Instances/EnvCanvas_Mars_MI",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "3fa17a190c80e8c49f4c7c00d76bb678",
+		"exporterVersion": 3
+	},
+	"parentChain": [
+		"/Game/Mars/Environment/Dressing/Materials/EnvPaint_Mars_M.EnvPaint_Mars_M"
+	],
+	"blendMode": "BLEND_Opaque",
+	"twoSided": false,
+	"unlit": false,
+	"shadingModel": "MSM_DefaultLit",
+	"domain": "MD_Surface",
+	"connectedOutputs": [],
+	"expressions":
+	{
+		"Custom": 4,
+		"MakeMaterialAttributes": 1,
+		"ObjectPositionWS": 1,
+		"PerInstanceCustomData": 4,
+		"PerInstanceRandom": 1,
+		"ScalarParameter": 16,
+		"VectorParameter": 3,
+		"VertexColor": 1,
+		"VertexNormalWS": 1,
+		"WorldPosition": 1
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_3",
+				"desc": "Multiplies the painted vertex colour.",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=1.000000,G=1.000000,B=1.000000,A=1.000000)",
+					"ParameterName": "Tint",
+					"Group": "Surface",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 1,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_12",
+				"desc": "How far the painted cavity (vertex alpha) darkens the colour.",
+				"props":
+				{
+					"DefaultValue": 0.55000001192092896,
+					"SliderMax": 1,
+					"ParameterName": "Cavity AO",
+					"Group": "Surface",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 2,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_13",
+				"props":
+				{
+					"DefaultValue": 0.69999998807907104,
+					"SliderMax": 1,
+					"ParameterName": "Roughness",
+					"Group": "Surface",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 3,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_14",
+				"props":
+				{
+					"DefaultValue": 0.44999998807907104,
+					"SliderMax": 1,
+					"ParameterName": "Specular",
+					"Group": "Surface",
+					"SortPriority": 3
+				}
+			},
+			{
+				"id": 4,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_15",
+				"props":
+				{
+					"SliderMax": 1,
+					"ParameterName": "Metallic",
+					"Group": "Surface",
+					"SortPriority": 4
+				}
+			},
+			{
+				"id": 5,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_16",
+				"desc": "Warm/cool shift per instance and per placed actor.",
+				"props":
+				{
+					"DefaultValue": 0.05000000074505806,
+					"SliderMax": 0.30000001192092896,
+					"ParameterName": "Hue Variation",
+					"Group": "Variation",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 6,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_17",
+				"desc": "Brighter/darker per instance and per placed actor.",
+				"props":
+				{
+					"DefaultValue": 0.14000000059604645,
+					"SliderMax": 0.5,
+					"ParameterName": "Value Variation",
+					"Group": "Variation",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 7,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_18",
+				"desc": "Share of the surface under darker world-space grime patches.",
+				"props":
+				{
+					"DefaultValue": 0.30000001192092896,
+					"SliderMax": 1,
+					"ParameterName": "Grime Amount",
+					"Group": "Grime",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 8,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_19",
+				"desc": "Grime patch size in metres.",
+				"props":
+				{
+					"DefaultValue": 0.80000001192092896,
+					"SliderMin": 0.05000000074505806,
+					"SliderMax": 10,
+					"ParameterName": "Grime Scale",
+					"Group": "Grime",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 9,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_4",
+				"desc": "Multiplies the colour under grime.",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.550000,G=0.500000,B=0.460000,A=1.000000)",
+					"ParameterName": "Grime Color",
+					"Group": "Grime",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 10,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_20",
+				"desc": "Moss on up-facing faces (0 = none).",
+				"props":
+				{
+					"SliderMax": 1,
+					"ParameterName": "Moss Amount",
+					"Group": "Moss",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 11,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_5",
+				"desc": "Linear moss colour.",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.075000,G=0.105000,B=0.030000,A=1.000000)",
+					"ParameterName": "Moss Color",
+					"Group": "Moss",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 12,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_21",
+				"desc": "Moss patch size in metres.",
+				"props":
+				{
+					"DefaultValue": 0.5,
+					"SliderMin": 0.05000000074505806,
+					"SliderMax": 10,
+					"ParameterName": "Moss Scale",
+					"Group": "Moss",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 13,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_22",
+				"desc": "How far from straight up a face may tilt and still grow moss.",
+				"props":
+				{
+					"DefaultValue": 0.44999998807907104,
+					"SliderMin": 0.05000000074505806,
+					"SliderMax": 1,
+					"ParameterName": "Moss Facing",
+					"Group": "Moss",
+					"SortPriority": 3
+				}
+			},
+			{
+				"id": 14,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_23",
+				"desc": "Darker and glossier (puddle splash zones, leaking walls).",
+				"props":
+				{
+					"SliderMax": 1,
+					"ParameterName": "Wetness",
+					"Group": "Wet",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 15,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_24",
+				"desc": "VarSeed: shifts the per-instance hue / value pick (0 = none).",
+				"props":
+				{
+					"SliderMin": -1,
+					"SliderMax": 4,
+					"bUseCustomPrimitiveData": true,
+					"ParameterName": "Env Data 0",
+					"Group": "Env Data",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 16,
+				"class": "PerInstanceCustomData",
+				"name": "MaterialExpressionPerInstanceCustomData_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "DefaultValue",
+						"node": 15,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 17,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_25",
+				"desc": "MossAdd: moss amount x (1 + this); MossScale - 1 (0 = as authored).",
+				"props":
+				{
+					"SliderMin": -1,
+					"SliderMax": 4,
+					"bUseCustomPrimitiveData": true,
+					"PrimitiveDataIndex": 1,
+					"ParameterName": "Env Data 1",
+					"Group": "Env Data",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 18,
+				"class": "PerInstanceCustomData",
+				"name": "MaterialExpressionPerInstanceCustomData_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "DefaultValue",
+						"node": 17,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"DataIndex": 1
+				}
+			},
+			{
+				"id": 19,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_26",
+				"desc": "WetAdd: added to Wetness (0 = none).",
+				"props":
+				{
+					"SliderMin": -1,
+					"SliderMax": 4,
+					"bUseCustomPrimitiveData": true,
+					"PrimitiveDataIndex": 2,
+					"ParameterName": "Env Data 2",
+					"Group": "Env Data",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 20,
+				"class": "PerInstanceCustomData",
+				"name": "MaterialExpressionPerInstanceCustomData_2",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "DefaultValue",
+						"node": 19,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"DataIndex": 2
+				}
+			},
+			{
+				"id": 21,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_27",
+				"desc": "Reserved (0).",
+				"props":
+				{
+					"SliderMin": -1,
+					"SliderMax": 4,
+					"bUseCustomPrimitiveData": true,
+					"PrimitiveDataIndex": 3,
+					"ParameterName": "Env Data 3",
+					"Group": "Env Data",
+					"SortPriority": 3
+				}
+			},
+			{
+				"id": 22,
+				"class": "PerInstanceCustomData",
+				"name": "MaterialExpressionPerInstanceCustomData_3",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "DefaultValue",
+						"node": 21,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"DataIndex": 3
+				}
+			},
+			{
+				"id": 23,
+				"class": "VertexColor",
+				"name": "MaterialExpressionVertexColor_1",
+				"outputs": [
+					"None",
+					"None",
+					"None",
+					"None",
+					"None"
+				]
+			},
+			{
+				"id": 24,
+				"class": "PerInstanceRandom",
+				"name": "MaterialExpressionPerInstanceRandom_1"
+			},
+			{
+				"id": 25,
+				"class": "ObjectPositionWS",
+				"name": "MaterialExpressionObjectPositionWS_1"
+			},
+			{
+				"id": 26,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_2",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Col",
+						"node": 23,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 1,
+						"name": "Alpha",
+						"node": 23,
+						"output": 4,
+						"mask": "a"
+					},
+					{
+						"index": 2,
+						"name": "Tint",
+						"node": 0,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 3,
+						"name": "Cavity",
+						"node": 1,
+						"output": 0
+					},
+					{
+						"index": 4,
+						"name": "Rand",
+						"node": 24,
+						"output": 0
+					},
+					{
+						"index": 5,
+						"name": "ObjPos",
+						"node": 25,
+						"output": 0
+					},
+					{
+						"index": 6,
+						"name": "Extra",
+						"node": 16,
+						"output": 0
+					},
+					{
+						"index": 7,
+						"name": "HueVar",
+						"node": 5,
+						"output": 0
+					},
+					{
+						"index": 8,
+						"name": "ValueVar",
+						"node": 6,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "float h = frac(sin(dot(floor(ObjPos * 0.01), float3(12.9898, 78.233, 37.719))) * 43758.5453);\nfloat r = frac(h + Rand * 7.137 + Extra * 3.31);\nfloat v = r * 2.0 - 1.0;\nfloat hv = frac(r * 13.17 + 0.37) * 2.0 - 1.0;\nfloat3 c = Col * Tint.rgb;\nc *= lerp(1.0, Alpha, Cavity);\nc *= 1.0 + v * ValueVar;\nc *= float3(1.0 + hv * HueVar, 1.0 + hv * HueVar * 0.25, 1.0 - hv * HueVar);\nreturn max(c, 0.0);",
+					"Description": "Painted Colour + Variation"
+				}
+			},
+			{
+				"id": 27,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_3",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Moss",
+						"node": 10,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "D1",
+						"node": 18,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "return saturate(Moss * (1.0 + D1));",
+					"OutputType": "CMOT_Float1",
+					"Description": "Moss x Env Data"
+				}
+			},
+			{
+				"id": 28,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_4",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Wet",
+						"node": 14,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "D2",
+						"node": 20,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "return saturate(Wet + D2);",
+					"OutputType": "CMOT_Float1",
+					"Description": "Wet + Env Data"
+				}
+			},
+			{
+				"id": 29,
+				"class": "WorldPosition",
+				"name": "MaterialExpressionWorldPosition_1",
+				"outputs": [
+					"XYZ",
+					"XY",
+					"Z"
+				]
+			},
+			{
+				"id": 30,
+				"class": "VertexNormalWS",
+				"name": "MaterialExpressionVertexNormalWS_1"
+			},
+			{
+				"id": 31,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_5",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Base",
+						"node": 26,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "WP",
+						"node": 29,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 2,
+						"name": "N",
+						"node": 30,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "GrimeAmount",
+						"node": 7,
+						"output": 0
+					},
+					{
+						"index": 4,
+						"name": "GrimeScale",
+						"node": 8,
+						"output": 0
+					},
+					{
+						"index": 5,
+						"name": "GrimeColor",
+						"node": 9,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 6,
+						"name": "MossAmount",
+						"node": 27,
+						"output": 0
+					},
+					{
+						"index": 7,
+						"name": "MossColor",
+						"node": 11,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 8,
+						"name": "MossScale",
+						"node": 12,
+						"output": 0
+					},
+					{
+						"index": 9,
+						"name": "MossFacing",
+						"node": 13,
+						"output": 0
+					},
+					{
+						"index": 10,
+						"name": "Wetness",
+						"node": 28,
+						"output": 0
+					},
+					{
+						"index": 11,
+						"name": "Roughness",
+						"node": 2,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"return",
+					"Rough"
+				],
+				"props":
+				{
+					"Code": "float3 q_ng = WP * 0.01 / max(GrimeScale, 0.05);\nfloat ng = 0.0, amp_ng = 0.5;\n[unroll] for (int oct_ng = 0; oct_ng < 3; oct_ng++)\n{\n    float3 i_ng = floor(q_ng);\n    float3 f_ng = frac(q_ng);\n    f_ng = f_ng * f_ng * (3.0 - 2.0 * f_ng);\n    float s_ng = 0.0;\n    [unroll] for (int c_ng = 0; c_ng < 8; c_ng++)\n    {\n        float3 k_ng = float3(c_ng & 1, (c_ng >> 1) & 1, (c_ng >> 2) & 1);\n        float h_ng = frac(sin(dot(i_ng + k_ng, float3(127.1, 311.7, 74.7))) * 43758.5453);\n        float3 w_ng = lerp(1.0 - f_ng, f_ng, k_ng);\n        s_ng += h_ng * w_ng.x * w_ng.y * w_ng.z;\n    }\n    ng += s_ng * amp_ng;\n    amp_ng *= 0.5;\n    q_ng = q_ng * 2.03 + 17.1;\n}\nng /= 0.875;\nfloat3 q_nm = WP * 0.01 / max(MossScale, 0.05) + 31.7;\nfloat nm = 0.0, amp_nm = 0.5;\n[unroll] for (int oct_nm = 0; oct_nm < 3; oct_nm++)\n{\n    float3 i_nm = floor(q_nm);\n    float3 f_nm = frac(q_nm);\n    f_nm = f_nm * f_nm * (3.0 - 2.0 * f_nm);\n    float s_nm = 0.0;\n    [unroll] for (int c_nm = 0; c_nm < 8; c_nm++)\n    {\n        float3 k_nm = float3(c_nm & 1, (c_nm >> 1) & 1, (c_nm >> 2) & 1);\n        float h_nm = frac(sin(dot(i_nm + k_nm, float3(127.1, 311.7, 74.7))) * 43758.5453);\n        float3 w_nm = lerp(1.0 - f_nm, f_nm, k_nm);\n        s_nm += h_nm * w_nm.x * w_nm.y * w_nm.z;\n    }\n    nm += s_nm * amp_nm;\n    amp_nm *= 0.5;\n    q_nm = q_nm * 2.03 + 17.1;\n}\nnm /= 0.875;\nfloat grime = saturate((ng - (1.0 - GrimeAmount)) * 3.0);\nfloat3 c = lerp(Base, Base * GrimeColor.rgb, grime);\nfloat up = saturate((N.z - (1.0 - MossFacing)) / max(MossFacing, 0.05));\nfloat moss = saturate((up * nm - (1.0 - MossAmount)) * 4.0) * step(0.001, MossAmount);\nc = lerp(c, MossColor.rgb * (0.75 + 0.5 * nm), moss);\nfloat wet = saturate(Wetness);\nc *= lerp(1.0, 0.5, wet);\nRough = lerp(lerp(Roughness, 0.95, moss), 0.1, wet * (1.0 - moss * 0.6));\nreturn c;",
+					"Description": "Grime / Moss / Wet"
+				}
+			},
+			{
+				"id": 32,
+				"class": "MakeMaterialAttributes",
+				"name": "MaterialExpressionMakeMaterialAttributes_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "BaseColor",
+						"node": 31,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "Metallic",
+						"node": 4,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "Specular",
+						"node": 3,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "Roughness",
+						"node": 31,
+						"output": 1
+					}
+				]
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_MaterialAttributes",
+				"node": 32,
+				"output": 0
+			}
+		]
+	},
+	"scalarParams": [
+		{
+			"name": "Cavity AO",
+			"value": 0.55000001192092896
+		},
+		{
+			"name": "Roughness",
+			"value": 0.92000001668930054
+		},
+		{
+			"name": "Specular",
+			"value": 0.30000001192092896
+		},
+		{
+			"name": "Metallic",
+			"value": 0
+		},
+		{
+			"name": "Hue Variation",
+			"value": 0.05000000074505806
+		},
+		{
+			"name": "Value Variation",
+			"value": 0.14000000059604645
+		},
+		{
+			"name": "Grime Amount",
+			"value": 0.40000000596046448
+		},
+		{
+			"name": "Grime Scale",
+			"value": 0.80000001192092896
+		},
+		{
+			"name": "Moss Amount",
+			"value": 0
+		},
+		{
+			"name": "Moss Scale",
+			"value": 0.5
+		},
+		{
+			"name": "Moss Facing",
+			"value": 0.44999998807907104
+		},
+		{
+			"name": "Wetness",
+			"value": 0
+		},
+		{
+			"name": "Env Data 0",
+			"value": 0
+		},
+		{
+			"name": "Env Data 1",
+			"value": 0
+		},
+		{
+			"name": "Env Data 2",
+			"value": 0
+		},
+		{
+			"name": "Env Data 3",
+			"value": 0
+		}
+	],
+	"vectorParams": [
+		{
+			"name": "Tint",
+			"value": "RGBA(1, 1, 1, 1)"
+		},
+		{
+			"name": "Grime Color",
+			"value": "RGBA(0.55, 0.5, 0.46, 1)"
+		},
+		{
+			"name": "Moss Color",
+			"value": "RGBA(0.075, 0.105, 0.03, 1)"
+		}
+	],
+	"textureParams": [],
+	"usedTextures": []
+}

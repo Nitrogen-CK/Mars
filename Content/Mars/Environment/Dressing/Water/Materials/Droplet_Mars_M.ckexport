@@ -1,0 +1,1642 @@
+{
+	"material": "Droplet_Mars_M",
+	"packagePath": "/Game/Mars/Environment/Dressing/Water/Materials/Droplet_Mars_M",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "80d168c5d4e4a3e03ee404a8bf635bea",
+		"exporterVersion": 3
+	},
+	"blendMode": "BLEND_Translucent",
+	"twoSided": true,
+	"unlit": false,
+	"shadingModel": "MSM_DefaultLit",
+	"domain": "MD_Surface",
+	"connectedOutputs": [
+		"EmissiveColor",
+		"BaseColor",
+		"Opacity",
+		"Normal"
+	],
+	"expressions":
+	{
+		"CameraPositionWS": 1,
+		"Constant3Vector": 2,
+		"Custom": 16,
+		"EyeAdaptationInverse": 1,
+		"PerInstanceCustomData": 8,
+		"ScalarParameter": 23,
+		"SceneColor": 1,
+		"StaticSwitchParameter": 1,
+		"TextureCoordinate": 1,
+		"Time": 1,
+		"Transform": 1,
+		"TransformPosition": 1,
+		"VectorParameter": 3,
+		"VertexInterpolator": 2,
+		"ViewProperty": 2,
+		"WorldPosition": 1
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_0",
+				"desc": "Custom primitive data 0: the value a plain component (no instances) uses.",
+				"props":
+				{
+					"DefaultValue": 100,
+					"SliderMin": -10000,
+					"SliderMax": 10000,
+					"bUseCustomPrimitiveData": true,
+					"ParameterName": "Length (CPD 0)",
+					"Group": "Custom Primitive Data",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 1,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_1",
+				"desc": "Custom primitive data 1: the value a plain component (no instances) uses.",
+				"props":
+				{
+					"DefaultValue": 0.80000001192092896,
+					"SliderMin": -10000,
+					"SliderMax": 10000,
+					"bUseCustomPrimitiveData": true,
+					"PrimitiveDataIndex": 1,
+					"ParameterName": "Rate (CPD 1)",
+					"Group": "Custom Primitive Data",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 2,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_2",
+				"desc": "Custom primitive data 2: the value a plain component (no instances) uses.",
+				"props":
+				{
+					"SliderMin": -10000,
+					"SliderMax": 10000,
+					"bUseCustomPrimitiveData": true,
+					"PrimitiveDataIndex": 2,
+					"ParameterName": "Seed (CPD 2)",
+					"Group": "Custom Primitive Data",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 3,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_3",
+				"desc": "Custom primitive data 3: the value a plain component (no instances) uses.",
+				"props":
+				{
+					"DefaultValue": 0.60000002384185791,
+					"SliderMin": -10000,
+					"SliderMax": 10000,
+					"bUseCustomPrimitiveData": true,
+					"PrimitiveDataIndex": 3,
+					"ParameterName": "Jitter (CPD 3)",
+					"Group": "Custom Primitive Data",
+					"SortPriority": 3
+				}
+			},
+			{
+				"id": 4,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_4",
+				"desc": "Custom primitive data 4: the value a plain component (no instances) uses.",
+				"props":
+				{
+					"SliderMin": -10000,
+					"SliderMax": 10000,
+					"bUseCustomPrimitiveData": true,
+					"PrimitiveDataIndex": 4,
+					"ParameterName": "Mode (CPD 4)",
+					"Group": "Custom Primitive Data",
+					"SortPriority": 4
+				}
+			},
+			{
+				"id": 5,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_5",
+				"desc": "Custom primitive data 5: the value a plain component (no instances) uses.",
+				"props":
+				{
+					"SliderMin": -10000,
+					"SliderMax": 10000,
+					"bUseCustomPrimitiveData": true,
+					"PrimitiveDataIndex": 5,
+					"ParameterName": "Slot (CPD 5)",
+					"Group": "Custom Primitive Data",
+					"SortPriority": 5
+				}
+			},
+			{
+				"id": 6,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_6",
+				"desc": "Custom primitive data 6: the value a plain component (no instances) uses.",
+				"props":
+				{
+					"DefaultValue": 1,
+					"SliderMin": -10000,
+					"SliderMax": 10000,
+					"bUseCustomPrimitiveData": true,
+					"PrimitiveDataIndex": 6,
+					"ParameterName": "DropScale (CPD 6)",
+					"Group": "Custom Primitive Data",
+					"SortPriority": 6
+				}
+			},
+			{
+				"id": 7,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_7",
+				"desc": "Custom primitive data 7: the value a plain component (no instances) uses.",
+				"props":
+				{
+					"SliderMin": -10000,
+					"SliderMax": 10000,
+					"bUseCustomPrimitiveData": true,
+					"PrimitiveDataIndex": 7,
+					"ParameterName": "Surface (CPD 7)",
+					"Group": "Custom Primitive Data",
+					"SortPriority": 7
+				}
+			},
+			{
+				"id": 8,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_8",
+				"desc": "Drop radius (cm) before the per-instance DropScale.",
+				"props":
+				{
+					"DefaultValue": 0.44999998807907104,
+					"SliderMin": 0.10000000149011612,
+					"SliderMax": 2,
+					"ParameterName": "DropRadiusCm",
+					"Group": "Shape",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 9,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_9",
+				"desc": "How much a fast drop stretches into a teardrop.",
+				"props":
+				{
+					"DefaultValue": 1.6000000238418579,
+					"SliderMax": 4,
+					"ParameterName": "TearK",
+					"Group": "Shape",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 10,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_10",
+				"desc": "Motion-streak seconds (speed x Shutter adds to the streak length).",
+				"props":
+				{
+					"DefaultValue": 0.010999999940395355,
+					"SliderMax": 0.05000000074505806,
+					"ParameterName": "Shutter",
+					"Group": "Shape",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 11,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_11",
+				"desc": "Cards never shrink below this many pixels (alpha keeps the energy).",
+				"props":
+				{
+					"DefaultValue": 2,
+					"SliderMin": 0.5,
+					"SliderMax": 4,
+					"ParameterName": "MinPixels",
+					"Group": "Shape",
+					"SortPriority": 3
+				}
+			},
+			{
+				"id": 12,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_12",
+				"desc": "Pipe-joint thread / stream half width at the source (cm).",
+				"props":
+				{
+					"DefaultValue": 0.15999999642372131,
+					"SliderMin": 0.019999999552965164,
+					"SliderMax": 1,
+					"ParameterName": "ThreadWidthCm",
+					"Group": "Shape",
+					"SortPriority": 4
+				}
+			},
+			{
+				"id": 13,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_13",
+				"desc": "A stream breaks into beads this far below its source (cm).",
+				"props":
+				{
+					"DefaultValue": 14,
+					"SliderMin": 1,
+					"SliderMax": 100,
+					"ParameterName": "ThreadBreakCm",
+					"Group": "Shape",
+					"SortPriority": 5
+				}
+			},
+			{
+				"id": 14,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_0",
+				"desc": "Lit base colour of the water body.",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.020000,G=0.025000,B=0.030000,A=1.000000)",
+					"ParameterName": "BodyTint",
+					"Group": "Look",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 15,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_1",
+				"desc": "Tint of the refracted scene through the drop.",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.920000,G=0.960000,B=1.000000,A=1.000000)",
+					"ParameterName": "WaterTint",
+					"Group": "Look",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 16,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_14",
+				"desc": "How much of the refracted scene comes through.",
+				"props":
+				{
+					"DefaultValue": 0.85000002384185791,
+					"SliderMax": 1,
+					"ParameterName": "Transmission",
+					"Group": "Look",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 17,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_15",
+				"desc": "Inverted-lens refraction offset in pixels at the drop rim.",
+				"props":
+				{
+					"DefaultValue": 6,
+					"SliderMax": 30,
+					"ParameterName": "RefractPx",
+					"Group": "Look",
+					"SortPriority": 3
+				}
+			},
+			{
+				"id": 18,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_16",
+				"desc": "0.05-0.15: lower = sharper but rarer torch glints on 1-3 px drops.",
+				"props":
+				{
+					"DefaultValue": 0.11999999731779099,
+					"SliderMax": 1,
+					"ParameterName": "Roughness",
+					"Group": "Look",
+					"SortPriority": 4
+				}
+			},
+			{
+				"id": 19,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_17",
+				"desc": "Stylised sparkle (water is 0.25).",
+				"props":
+				{
+					"DefaultValue": 0.5,
+					"SliderMax": 1,
+					"ParameterName": "Specular",
+					"Group": "Look",
+					"SortPriority": 5
+				}
+			},
+			{
+				"id": 20,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_2",
+				"desc": "Display-referred rim on every drop (reads in any room).",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.750000,G=0.850000,B=1.000000,A=1.000000)",
+					"ParameterName": "SparkleTint",
+					"Group": "Look",
+					"SortPriority": 6
+				}
+			},
+			{
+				"id": 21,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_18",
+				"desc": "Screen brightness of the thin edge rim (exposure-independent).",
+				"props":
+				{
+					"DefaultValue": 0.15000000596046448,
+					"SliderMax": 2,
+					"ParameterName": "SparkleStrength",
+					"Group": "Look",
+					"SortPriority": 7
+				}
+			},
+			{
+				"id": 22,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_19",
+				"desc": "Below 1 the drop reads as clear water over the refracted scene.",
+				"props":
+				{
+					"DefaultValue": 0.80000001192092896,
+					"SliderMax": 2,
+					"ParameterName": "OpacityScale",
+					"Group": "Look",
+					"SortPriority": 8
+				}
+			},
+			{
+				"id": 23,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_20",
+				"props":
+				{
+					"DefaultValue": 2500,
+					"SliderMax": 10000,
+					"ParameterName": "FadeStartCm",
+					"Group": "Distance",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 24,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_21",
+				"desc": "Cards collapse beyond this camera distance.",
+				"props":
+				{
+					"DefaultValue": 3500,
+					"SliderMax": 10000,
+					"ParameterName": "FadeEndCm",
+					"Group": "Distance",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 25,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_22",
+				"desc": ">= 0 freezes the drip clock at this time (frozen-time captures).",
+				"props":
+				{
+					"DefaultValue": -1,
+					"SliderMin": -1,
+					"SliderMax": 3600,
+					"ParameterName": "DebugTime",
+					"Group": "Debug",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 26,
+				"class": "StaticSwitchParameter",
+				"name": "MaterialExpressionStaticSwitchParameter_0",
+				"desc": "On: the drop shows the refracted scene (one scene-colour copy per frame). Off: a body gradient.",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "True",
+						"node": 60,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "False",
+						"node": 61,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"DefaultValue": true,
+					"ParameterName": "UseSceneRefraction",
+					"Group": "Switches",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 27,
+				"class": "Time",
+				"name": "MaterialExpressionTime_0",
+				"props":
+				{
+					"bOverride_Period": true,
+					"Period": 3600
+				}
+			},
+			{
+				"id": 28,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "DebugTime",
+						"node": 25,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "Time",
+						"node": 27,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "return DebugTime >= 0 ? DebugTime : Time;",
+					"OutputType": "CMOT_Float1",
+					"Description": "Drip Time"
+				}
+			},
+			{
+				"id": 29,
+				"class": "PerInstanceCustomData",
+				"name": "MaterialExpressionPerInstanceCustomData_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "DefaultValue",
+						"node": 0,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 30,
+				"class": "PerInstanceCustomData",
+				"name": "MaterialExpressionPerInstanceCustomData_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "DefaultValue",
+						"node": 1,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"DataIndex": 1
+				}
+			},
+			{
+				"id": 31,
+				"class": "PerInstanceCustomData",
+				"name": "MaterialExpressionPerInstanceCustomData_2",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "DefaultValue",
+						"node": 2,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"DataIndex": 2
+				}
+			},
+			{
+				"id": 32,
+				"class": "PerInstanceCustomData",
+				"name": "MaterialExpressionPerInstanceCustomData_3",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "DefaultValue",
+						"node": 3,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"DataIndex": 3
+				}
+			},
+			{
+				"id": 33,
+				"class": "PerInstanceCustomData",
+				"name": "MaterialExpressionPerInstanceCustomData_4",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "DefaultValue",
+						"node": 4,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"DataIndex": 4
+				}
+			},
+			{
+				"id": 34,
+				"class": "PerInstanceCustomData",
+				"name": "MaterialExpressionPerInstanceCustomData_5",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "DefaultValue",
+						"node": 5,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"DataIndex": 5
+				}
+			},
+			{
+				"id": 35,
+				"class": "PerInstanceCustomData",
+				"name": "MaterialExpressionPerInstanceCustomData_6",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "DefaultValue",
+						"node": 6,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"DataIndex": 6
+				}
+			},
+			{
+				"id": 36,
+				"class": "PerInstanceCustomData",
+				"name": "MaterialExpressionPerInstanceCustomData_7",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "DefaultValue",
+						"node": 7,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"DataIndex": 7
+				}
+			},
+			{
+				"id": 37,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 29,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 30,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "C",
+						"node": 31,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "D",
+						"node": 32,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "return float4(A, B, C, D);",
+					"OutputType": "CMOT_Float4",
+					"Description": "D0 Length Rate Seed Jitter"
+				}
+			},
+			{
+				"id": 38,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_2",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 33,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 34,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "C",
+						"node": 35,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "D",
+						"node": 36,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "return float4(A, B, C, D);",
+					"OutputType": "CMOT_Float4",
+					"Description": "D1 Mode Slot DropScale Surface"
+				}
+			},
+			{
+				"id": 39,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_3",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 8,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 9,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "C",
+						"node": 10,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "D",
+						"node": 11,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "return float4(A, B, C, D);",
+					"OutputType": "CMOT_Float4",
+					"Description": "Shape"
+				}
+			},
+			{
+				"id": 40,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_4",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 12,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 13,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "C",
+						"node": 23,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "D",
+						"node": 24,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "return float4(A, B, C, D);",
+					"OutputType": "CMOT_Float4",
+					"Description": "Thread"
+				}
+			},
+			{
+				"id": 41,
+				"class": "ViewProperty",
+				"name": "MaterialExpressionViewProperty_0",
+				"outputs": [
+					"Property",
+					"InvProperty"
+				],
+				"props":
+				{
+					"Property": "MEVP_TanHalfFieldOfView"
+				}
+			},
+			{
+				"id": 42,
+				"class": "ViewProperty",
+				"name": "MaterialExpressionViewProperty_1",
+				"outputs": [
+					"Property",
+					"InvProperty"
+				],
+				"props":
+				{
+					"Property": "MEVP_ViewSize"
+				}
+			},
+			{
+				"id": 43,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_5",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Tan",
+						"node": 41,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "Size",
+						"node": 42,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "return float2(Tan.y, Size.y);",
+					"OutputType": "CMOT_Float2",
+					"Description": "View2"
+				}
+			},
+			{
+				"id": 44,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_6",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Tan",
+						"node": 41,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "Size",
+						"node": 42,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "return float4(Tan.y, Size.y, 1.0 / max(Size.x, 1.0), 1.0 / max(Size.y, 1.0));",
+					"OutputType": "CMOT_Float4",
+					"Description": "View4"
+				}
+			},
+			{
+				"id": 45,
+				"class": "TransformPosition",
+				"name": "MaterialExpressionTransformPosition_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Input",
+						"node": 46,
+						"output": 0,
+						"mask": "rgb"
+					}
+				],
+				"props":
+				{
+					"TransformType": "TRANSFORMPOSSOURCE_World"
+				}
+			},
+			{
+				"id": 46,
+				"class": "Constant3Vector",
+				"name": "MaterialExpressionConstant3Vector_0",
+				"outputs": [
+					"None",
+					"None",
+					"None",
+					"None"
+				],
+				"props":
+				{
+					"Constant": "(R=0.000000,G=0.000000,B=0.000000,A=1.000000)"
+				}
+			},
+			{
+				"id": 47,
+				"class": "Transform",
+				"name": "MaterialExpressionTransform_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Input",
+						"node": 48,
+						"output": 0,
+						"mask": "rgb"
+					}
+				],
+				"props":
+				{
+					"TransformSourceType": "TRANSFORMSOURCE_Local"
+				}
+			},
+			{
+				"id": 48,
+				"class": "Constant3Vector",
+				"name": "MaterialExpressionConstant3Vector_1",
+				"outputs": [
+					"None",
+					"None",
+					"None",
+					"None"
+				],
+				"props":
+				{
+					"Constant": "(R=0.000000,G=0.000000,B=1.000000,A=1.000000)"
+				}
+			},
+			{
+				"id": 49,
+				"class": "CameraPositionWS",
+				"name": "MaterialExpressionCameraPositionWS_0"
+			},
+			{
+				"id": 50,
+				"class": "WorldPosition",
+				"name": "MaterialExpressionWorldPosition_0",
+				"outputs": [
+					"XYZ",
+					"XY",
+					"Z"
+				],
+				"props":
+				{
+					"WorldPositionShaderOffset": "WPT_ExcludeAllShaderOffsets"
+				}
+			},
+			{
+				"id": 51,
+				"class": "TextureCoordinate",
+				"name": "MaterialExpressionTextureCoordinate_0"
+			},
+			{
+				"id": 52,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_7",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "D0",
+						"node": 37,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "D1",
+						"node": 38,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "T",
+						"node": 28,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "UV",
+						"node": 51,
+						"output": 0
+					},
+					{
+						"index": 4,
+						"name": "Origin",
+						"node": 45,
+						"output": 0
+					},
+					{
+						"index": 5,
+						"name": "Up",
+						"node": 47,
+						"output": 0
+					},
+					{
+						"index": 6,
+						"name": "Cam",
+						"node": 49,
+						"output": 0
+					},
+					{
+						"index": 7,
+						"name": "WP",
+						"node": 50,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 8,
+						"name": "Shape",
+						"node": 39,
+						"output": 0
+					},
+					{
+						"index": 9,
+						"name": "Thread",
+						"node": 40,
+						"output": 0
+					},
+					{
+						"index": 10,
+						"name": "View",
+						"node": 43,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"return",
+					"I0",
+					"I1"
+				],
+				"props":
+				{
+					"Code": "return MarsWet_DropVS(D0, D1, T, UV, Origin, Up, Cam, WP, Shape, Thread, View, I0, I1);",
+					"Description": "DropVS",
+					"IncludeFilePaths": [
+						"/Project/Water/MarsWet.ush"
+					]
+				}
+			},
+			{
+				"id": 53,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_8",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "D0",
+						"node": 37,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "D1",
+						"node": 38,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "T",
+						"node": 28,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "UV",
+						"node": 51,
+						"output": 0
+					},
+					{
+						"index": 4,
+						"name": "Origin",
+						"node": 45,
+						"output": 0
+					},
+					{
+						"index": 5,
+						"name": "Up",
+						"node": 47,
+						"output": 0
+					},
+					{
+						"index": 6,
+						"name": "Cam",
+						"node": 49,
+						"output": 0
+					},
+					{
+						"index": 7,
+						"name": "WP",
+						"node": 50,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 8,
+						"name": "Shape",
+						"node": 39,
+						"output": 0
+					},
+					{
+						"index": 9,
+						"name": "Thread",
+						"node": 40,
+						"output": 0
+					},
+					{
+						"index": 10,
+						"name": "View",
+						"node": 43,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "float4 I0, I1; MarsWet_DropVS(D0, D1, T, UV, Origin, Up, Cam, WP, Shape, Thread, View, I0, I1); return I0;",
+					"OutputType": "CMOT_Float4",
+					"Description": "DropVS I0",
+					"IncludeFilePaths": [
+						"/Project/Water/MarsWet.ush"
+					]
+				}
+			},
+			{
+				"id": 54,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_9",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "D0",
+						"node": 37,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "D1",
+						"node": 38,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "T",
+						"node": 28,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "UV",
+						"node": 51,
+						"output": 0
+					},
+					{
+						"index": 4,
+						"name": "Origin",
+						"node": 45,
+						"output": 0
+					},
+					{
+						"index": 5,
+						"name": "Up",
+						"node": 47,
+						"output": 0
+					},
+					{
+						"index": 6,
+						"name": "Cam",
+						"node": 49,
+						"output": 0
+					},
+					{
+						"index": 7,
+						"name": "WP",
+						"node": 50,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 8,
+						"name": "Shape",
+						"node": 39,
+						"output": 0
+					},
+					{
+						"index": 9,
+						"name": "Thread",
+						"node": 40,
+						"output": 0
+					},
+					{
+						"index": 10,
+						"name": "View",
+						"node": 43,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "float4 I0, I1; MarsWet_DropVS(D0, D1, T, UV, Origin, Up, Cam, WP, Shape, Thread, View, I0, I1); return I1;",
+					"OutputType": "CMOT_Float4",
+					"Description": "DropVS I1",
+					"IncludeFilePaths": [
+						"/Project/Water/MarsWet.ush"
+					]
+				}
+			},
+			{
+				"id": 55,
+				"class": "VertexInterpolator",
+				"name": "MaterialExpressionVertexInterpolator_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "VS",
+						"node": 53,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 56,
+				"class": "VertexInterpolator",
+				"name": "MaterialExpressionVertexInterpolator_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "VS",
+						"node": 54,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 57,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_10",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 17,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 16,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "C",
+						"node": 22,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "D",
+						"node": 16,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "return float4(A, B, C, D);",
+					"OutputType": "CMOT_Float4",
+					"Description": "Look"
+				}
+			},
+			{
+				"id": 58,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_11",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "I0",
+						"node": 55,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "I1",
+						"node": 56,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "UV",
+						"node": 51,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "T",
+						"node": 28,
+						"output": 0
+					},
+					{
+						"index": 4,
+						"name": "Cam",
+						"node": 49,
+						"output": 0
+					},
+					{
+						"index": 5,
+						"name": "WP",
+						"node": 50,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 6,
+						"name": "View",
+						"node": 44,
+						"output": 0
+					},
+					{
+						"index": 7,
+						"name": "Look",
+						"node": 57,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"return",
+					"NormalWS",
+					"Refract",
+					"Body"
+				],
+				"props":
+				{
+					"Code": "return MarsWet_DropPS(I0, I1, UV, T, Cam, WP, View, Look, NormalWS, Refract, Body);",
+					"OutputType": "CMOT_Float1",
+					"Description": "DropPS",
+					"IncludeFilePaths": [
+						"/Project/Water/MarsWet.ush"
+					]
+				}
+			},
+			{
+				"id": 59,
+				"class": "SceneColor",
+				"name": "MaterialExpressionSceneColor_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "OffsetFraction",
+						"node": 58,
+						"output": 2
+					}
+				],
+				"outputs": [
+					"RGB",
+					"A"
+				],
+				"props":
+				{
+					"InputMode": "OffsetFraction"
+				}
+			},
+			{
+				"id": 60,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_12",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Scene",
+						"node": 59,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 1,
+						"name": "Transmission",
+						"node": 16,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "WaterTint",
+						"node": 15,
+						"output": 0,
+						"mask": "rgb"
+					}
+				],
+				"props":
+				{
+					"Code": "return Scene.rgb * Transmission * WaterTint.rgb;",
+					"Description": "Refracted"
+				}
+			},
+			{
+				"id": 61,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_13",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Body",
+						"node": 58,
+						"output": 3
+					},
+					{
+						"index": 1,
+						"name": "WaterTint",
+						"node": 15,
+						"output": 0,
+						"mask": "rgb"
+					}
+				],
+				"props":
+				{
+					"Code": "return lerp(0.15, 1.0, Body) * WaterTint.rgb * 0.02;",
+					"Description": "Body Gradient"
+				}
+			},
+			{
+				"id": 62,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_14",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Body",
+						"node": 58,
+						"output": 3
+					},
+					{
+						"index": 1,
+						"name": "Tint",
+						"node": 20,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 2,
+						"name": "Strength",
+						"node": 21,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "float R = saturate((1.0 - Body) / 0.65); R *= R; return Tint.rgb * Strength * R * R;",
+					"Description": "Sparkle Rim"
+				}
+			},
+			{
+				"id": 63,
+				"class": "EyeAdaptationInverse",
+				"name": "MaterialExpressionEyeAdaptationInverse_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "LightValueInput",
+						"node": 62,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 64,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_15",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Base",
+						"node": 26,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "Rim",
+						"node": 63,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "return Base + Rim;",
+					"Description": "Emissive"
+				}
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_EmissiveColor",
+				"node": 64,
+				"output": 0
+			},
+			{
+				"property": "MP_Opacity",
+				"node": 58,
+				"output": 0
+			},
+			{
+				"property": "MP_BaseColor",
+				"node": 14,
+				"output": 0,
+				"mask": "rgb"
+			},
+			{
+				"property": "MP_Specular",
+				"node": 19,
+				"output": 0
+			},
+			{
+				"property": "MP_Roughness",
+				"node": 18,
+				"output": 0
+			},
+			{
+				"property": "MP_Normal",
+				"node": 58,
+				"output": 1
+			},
+			{
+				"property": "MP_WorldPositionOffset",
+				"node": 52,
+				"output": 0
+			}
+		]
+	},
+	"scalarParams": [
+		{
+			"name": "Length (CPD 0)",
+			"value": 100
+		},
+		{
+			"name": "Rate (CPD 1)",
+			"value": 0.80000001192092896
+		},
+		{
+			"name": "Seed (CPD 2)",
+			"value": 0
+		},
+		{
+			"name": "Jitter (CPD 3)",
+			"value": 0.60000002384185791
+		},
+		{
+			"name": "Mode (CPD 4)",
+			"value": 0
+		},
+		{
+			"name": "Slot (CPD 5)",
+			"value": 0
+		},
+		{
+			"name": "DropScale (CPD 6)",
+			"value": 1
+		},
+		{
+			"name": "Surface (CPD 7)",
+			"value": 0
+		},
+		{
+			"name": "DropRadiusCm",
+			"value": 0.44999998807907104
+		},
+		{
+			"name": "TearK",
+			"value": 1.6000000238418579
+		},
+		{
+			"name": "Shutter",
+			"value": 0.010999999940395355
+		},
+		{
+			"name": "MinPixels",
+			"value": 2
+		},
+		{
+			"name": "ThreadWidthCm",
+			"value": 0.15999999642372131
+		},
+		{
+			"name": "ThreadBreakCm",
+			"value": 14
+		},
+		{
+			"name": "Transmission",
+			"value": 0.85000002384185791
+		},
+		{
+			"name": "RefractPx",
+			"value": 6
+		},
+		{
+			"name": "Roughness",
+			"value": 0.11999999731779099
+		},
+		{
+			"name": "Specular",
+			"value": 0.5
+		},
+		{
+			"name": "SparkleStrength",
+			"value": 0.15000000596046448
+		},
+		{
+			"name": "OpacityScale",
+			"value": 0.80000001192092896
+		},
+		{
+			"name": "FadeStartCm",
+			"value": 2500
+		},
+		{
+			"name": "FadeEndCm",
+			"value": 3500
+		},
+		{
+			"name": "DebugTime",
+			"value": -1
+		}
+	],
+	"vectorParams": [
+		{
+			"name": "BodyTint",
+			"value": "RGBA(0.02, 0.025, 0.03, 1)"
+		},
+		{
+			"name": "WaterTint",
+			"value": "RGBA(0.92, 0.96, 1, 1)"
+		},
+		{
+			"name": "SparkleTint",
+			"value": "RGBA(0.75, 0.85, 1, 1)"
+		}
+	],
+	"textureParams": [],
+	"usedTextures": []
+}

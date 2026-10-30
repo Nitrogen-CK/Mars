@@ -1,0 +1,762 @@
+{
+	"material": "DripRingCard_Mars_MI",
+	"packagePath": "/Game/Mars/Environment/Dressing/Water/Materials/DripRingCard_Mars_MI",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "37455d351b5947e7793743debcd93532",
+		"exporterVersion": 3
+	},
+	"parentChain": [
+		"/Game/Mars/Environment/Dressing/Water/Materials/DripRingCard_Mars_M.DripRingCard_Mars_M"
+	],
+	"blendMode": "BLEND_Translucent",
+	"twoSided": false,
+	"unlit": false,
+	"shadingModel": "MSM_DefaultLit",
+	"domain": "MD_Surface",
+	"connectedOutputs": [
+		"BaseColor",
+		"Opacity",
+		"Normal"
+	],
+	"expressions":
+	{
+		"Constant3Vector": 2,
+		"Custom": 5,
+		"PerInstanceCustomData": 6,
+		"ScalarParameter": 14,
+		"TextureCoordinate": 1,
+		"Time": 1,
+		"Transform": 2,
+		"VectorParameter": 1,
+		"VertexInterpolator": 2
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_0",
+				"desc": "Custom primitive data 0: the value a plain component (no instances) uses.",
+				"props":
+				{
+					"DefaultValue": 100,
+					"SliderMin": -10000,
+					"SliderMax": 10000,
+					"bUseCustomPrimitiveData": true,
+					"ParameterName": "Length (CPD 0)",
+					"Group": "Custom Primitive Data",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 1,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_1",
+				"desc": "Custom primitive data 1: the value a plain component (no instances) uses.",
+				"props":
+				{
+					"DefaultValue": 0.80000001192092896,
+					"SliderMin": -10000,
+					"SliderMax": 10000,
+					"bUseCustomPrimitiveData": true,
+					"PrimitiveDataIndex": 1,
+					"ParameterName": "Rate (CPD 1)",
+					"Group": "Custom Primitive Data",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 2,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_2",
+				"desc": "Custom primitive data 2: the value a plain component (no instances) uses.",
+				"props":
+				{
+					"SliderMin": -10000,
+					"SliderMax": 10000,
+					"bUseCustomPrimitiveData": true,
+					"PrimitiveDataIndex": 2,
+					"ParameterName": "Seed (CPD 2)",
+					"Group": "Custom Primitive Data",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 3,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_3",
+				"desc": "Custom primitive data 3: the value a plain component (no instances) uses.",
+				"props":
+				{
+					"DefaultValue": 0.60000002384185791,
+					"SliderMin": -10000,
+					"SliderMax": 10000,
+					"bUseCustomPrimitiveData": true,
+					"PrimitiveDataIndex": 3,
+					"ParameterName": "Jitter (CPD 3)",
+					"Group": "Custom Primitive Data",
+					"SortPriority": 3
+				}
+			},
+			{
+				"id": 4,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_4",
+				"desc": "Custom primitive data 4: the value a plain component (no instances) uses.",
+				"props":
+				{
+					"SliderMin": -10000,
+					"SliderMax": 10000,
+					"bUseCustomPrimitiveData": true,
+					"PrimitiveDataIndex": 4,
+					"ParameterName": "Mode (CPD 4)",
+					"Group": "Custom Primitive Data",
+					"SortPriority": 4
+				}
+			},
+			{
+				"id": 5,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_5",
+				"desc": "Custom primitive data 5: the value a plain component (no instances) uses.",
+				"props":
+				{
+					"DefaultValue": 1,
+					"SliderMin": -10000,
+					"SliderMax": 10000,
+					"bUseCustomPrimitiveData": true,
+					"PrimitiveDataIndex": 5,
+					"ParameterName": "RingAmp (CPD 5)",
+					"Group": "Custom Primitive Data",
+					"SortPriority": 5
+				}
+			},
+			{
+				"id": 6,
+				"class": "PerInstanceCustomData",
+				"name": "MaterialExpressionPerInstanceCustomData_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "DefaultValue",
+						"node": 0,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 7,
+				"class": "PerInstanceCustomData",
+				"name": "MaterialExpressionPerInstanceCustomData_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "DefaultValue",
+						"node": 1,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"DataIndex": 1
+				}
+			},
+			{
+				"id": 8,
+				"class": "PerInstanceCustomData",
+				"name": "MaterialExpressionPerInstanceCustomData_2",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "DefaultValue",
+						"node": 2,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"DataIndex": 2
+				}
+			},
+			{
+				"id": 9,
+				"class": "PerInstanceCustomData",
+				"name": "MaterialExpressionPerInstanceCustomData_3",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "DefaultValue",
+						"node": 3,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"DataIndex": 3
+				}
+			},
+			{
+				"id": 10,
+				"class": "PerInstanceCustomData",
+				"name": "MaterialExpressionPerInstanceCustomData_4",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "DefaultValue",
+						"node": 4,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"DataIndex": 4
+				}
+			},
+			{
+				"id": 11,
+				"class": "PerInstanceCustomData",
+				"name": "MaterialExpressionPerInstanceCustomData_5",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "DefaultValue",
+						"node": 5,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"DataIndex": 5
+				}
+			},
+			{
+				"id": 12,
+				"class": "Transform",
+				"name": "MaterialExpressionTransform_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Input",
+						"node": 13,
+						"output": 0,
+						"mask": "rgb"
+					}
+				],
+				"props":
+				{
+					"TransformSourceType": "TRANSFORMSOURCE_Local"
+				}
+			},
+			{
+				"id": 13,
+				"class": "Constant3Vector",
+				"name": "MaterialExpressionConstant3Vector_0",
+				"outputs": [
+					"None",
+					"None",
+					"None",
+					"None"
+				],
+				"props":
+				{
+					"Constant": "(R=100.000000,G=0.000000,B=0.000000,A=1.000000)"
+				}
+			},
+			{
+				"id": 14,
+				"class": "Transform",
+				"name": "MaterialExpressionTransform_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Input",
+						"node": 15,
+						"output": 0,
+						"mask": "rgb"
+					}
+				],
+				"props":
+				{
+					"TransformSourceType": "TRANSFORMSOURCE_Local"
+				}
+			},
+			{
+				"id": 15,
+				"class": "Constant3Vector",
+				"name": "MaterialExpressionConstant3Vector_1",
+				"outputs": [
+					"None",
+					"None",
+					"None",
+					"None"
+				],
+				"props":
+				{
+					"Constant": "(R=0.000000,G=100.000000,B=0.000000,A=1.000000)"
+				}
+			},
+			{
+				"id": 16,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 6,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 7,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "C",
+						"node": 8,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "D",
+						"node": 9,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "return float4(A, B, C, D);",
+					"OutputType": "CMOT_Float4",
+					"Description": "A"
+				}
+			},
+			{
+				"id": 17,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "E",
+						"node": 10,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "F",
+						"node": 11,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "AX",
+						"node": 12,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "AY",
+						"node": 14,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "return float4(E, F, length(AX), length(AY));",
+					"OutputType": "CMOT_Float4",
+					"Description": "B"
+				}
+			},
+			{
+				"id": 18,
+				"class": "VertexInterpolator",
+				"name": "MaterialExpressionVertexInterpolator_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "VS",
+						"node": 16,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 19,
+				"class": "VertexInterpolator",
+				"name": "MaterialExpressionVertexInterpolator_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "VS",
+						"node": 17,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 20,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_6",
+				"props":
+				{
+					"DefaultValue": 1.2000000476837158,
+					"SliderMin": 0.10000000149011612,
+					"SliderMax": 5,
+					"ParameterName": "RingWidthCm",
+					"Group": "Rings",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 21,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_7",
+				"desc": "Ring amplitude e-folding time (s).",
+				"props":
+				{
+					"DefaultValue": 0.80000001192092896,
+					"SliderMin": 0.05000000074505806,
+					"SliderMax": 3,
+					"ParameterName": "Decay",
+					"Group": "Rings",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 22,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_8",
+				"desc": "Opacity per unit slope.",
+				"props":
+				{
+					"DefaultValue": 0.80000001192092896,
+					"SliderMax": 4,
+					"ParameterName": "RingAlphaGain",
+					"Group": "Rings",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 23,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_9",
+				"props":
+				{
+					"DefaultValue": 0.40000000596046448,
+					"SliderMax": 2,
+					"ParameterName": "Dimple",
+					"Group": "Rings",
+					"SortPriority": 3
+				}
+			},
+			{
+				"id": 24,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_10",
+				"desc": "Must match the drop material (same clock).",
+				"props":
+				{
+					"DefaultValue": 0.44999998807907104,
+					"SliderMin": 0.10000000149011612,
+					"SliderMax": 2,
+					"ParameterName": "DropRadiusCm",
+					"Group": "Rings",
+					"SortPriority": 4
+				}
+			},
+			{
+				"id": 25,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_11",
+				"props":
+				{
+					"DefaultValue": 0.039999999105930328,
+					"SliderMax": 1,
+					"ParameterName": "Roughness",
+					"Group": "Rings",
+					"SortPriority": 5
+				}
+			},
+			{
+				"id": 26,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_12",
+				"props":
+				{
+					"DefaultValue": 0.5,
+					"SliderMax": 1,
+					"ParameterName": "Specular",
+					"Group": "Rings",
+					"SortPriority": 6
+				}
+			},
+			{
+				"id": 27,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_0",
+				"desc": "Lit colour of the ring crests.",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.006000,G=0.009000,B=0.007000,A=1.000000)",
+					"ParameterName": "WaterColour",
+					"Group": "Rings",
+					"SortPriority": 7
+				}
+			},
+			{
+				"id": 28,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_13",
+				"props":
+				{
+					"DefaultValue": -1,
+					"SliderMin": -1,
+					"SliderMax": 3600,
+					"ParameterName": "DebugTime",
+					"Group": "Debug",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 29,
+				"class": "Time",
+				"name": "MaterialExpressionTime_0",
+				"props":
+				{
+					"bOverride_Period": true,
+					"Period": 3600
+				}
+			},
+			{
+				"id": 30,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_2",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "DebugTime",
+						"node": 28,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "Time",
+						"node": 29,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "return DebugTime >= 0 ? DebugTime : Time;",
+					"OutputType": "CMOT_Float1",
+					"Description": "Drip Time"
+				}
+			},
+			{
+				"id": 31,
+				"class": "TextureCoordinate",
+				"name": "MaterialExpressionTextureCoordinate_0"
+			},
+			{
+				"id": 32,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_3",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 20,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 21,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "C",
+						"node": 22,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "D",
+						"node": 23,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "return float4(A, B, C, D);",
+					"OutputType": "CMOT_Float4",
+					"Description": "Ring"
+				}
+			},
+			{
+				"id": 33,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_4",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 18,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 19,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "UV",
+						"node": 31,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "T",
+						"node": 30,
+						"output": 0
+					},
+					{
+						"index": 4,
+						"name": "Ring",
+						"node": 32,
+						"output": 0
+					},
+					{
+						"index": 5,
+						"name": "Radius",
+						"node": 24,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"return",
+					"Normal"
+				],
+				"props":
+				{
+					"Code": "float2 P = (UV - 0.5) * B.zw * float2(1, -1);\nreturn MarsWet_ImpactRings(A, B.xy, P, T, Ring, Radius, Normal);",
+					"OutputType": "CMOT_Float1",
+					"Description": "Rings",
+					"IncludeFilePaths": [
+						"/Project/Water/MarsWet.ush"
+					]
+				}
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_Opacity",
+				"node": 33,
+				"output": 0
+			},
+			{
+				"property": "MP_BaseColor",
+				"node": 27,
+				"output": 0,
+				"mask": "rgb"
+			},
+			{
+				"property": "MP_Specular",
+				"node": 26,
+				"output": 0
+			},
+			{
+				"property": "MP_Roughness",
+				"node": 25,
+				"output": 0
+			},
+			{
+				"property": "MP_Normal",
+				"node": 33,
+				"output": 1
+			}
+		]
+	},
+	"scalarParams": [
+		{
+			"name": "Length (CPD 0)",
+			"value": 100
+		},
+		{
+			"name": "Rate (CPD 1)",
+			"value": 0.80000001192092896
+		},
+		{
+			"name": "Seed (CPD 2)",
+			"value": 0
+		},
+		{
+			"name": "Jitter (CPD 3)",
+			"value": 0.60000002384185791
+		},
+		{
+			"name": "Mode (CPD 4)",
+			"value": 0
+		},
+		{
+			"name": "RingAmp (CPD 5)",
+			"value": 1
+		},
+		{
+			"name": "RingWidthCm",
+			"value": 1.2000000476837158
+		},
+		{
+			"name": "Decay",
+			"value": 0.80000001192092896
+		},
+		{
+			"name": "RingAlphaGain",
+			"value": 0.80000001192092896
+		},
+		{
+			"name": "Dimple",
+			"value": 0.40000000596046448
+		},
+		{
+			"name": "DropRadiusCm",
+			"value": 0.44999998807907104
+		},
+		{
+			"name": "Roughness",
+			"value": 0.039999999105930328
+		},
+		{
+			"name": "Specular",
+			"value": 0.5
+		},
+		{
+			"name": "DebugTime",
+			"value": -1
+		}
+	],
+	"vectorParams": [
+		{
+			"name": "WaterColour",
+			"value": "RGBA(0.006, 0.009, 0.007, 1)"
+		}
+	],
+	"textureParams": [],
+	"usedTextures": []
+}

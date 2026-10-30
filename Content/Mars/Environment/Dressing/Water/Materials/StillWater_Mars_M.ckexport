@@ -1,0 +1,666 @@
+{
+	"material": "StillWater_Mars_M",
+	"packagePath": "/Game/Mars/Environment/Dressing/Water/Materials/StillWater_Mars_M",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "f1d280c4d585b61b63d900d3c7ac9b2d",
+		"exporterVersion": 3
+	},
+	"blendMode": "BLEND_Opaque",
+	"twoSided": false,
+	"unlit": false,
+	"shadingModel": "MSM_DefaultLit",
+	"domain": "MD_Surface",
+	"connectedOutputs": [
+		"BaseColor",
+		"Normal"
+	],
+	"expressions":
+	{
+		"Constant": 1,
+		"Custom": 7,
+		"ScalarParameter": 12,
+		"StaticSwitchParameter": 1,
+		"TextureCoordinate": 1,
+		"Time": 1,
+		"VectorParameter": 3,
+		"WorldPosition": 1
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_0",
+				"desc": "Custom primitive data 0: the value a plain component (no instances) uses.",
+				"props":
+				{
+					"DefaultValue": 200,
+					"SliderMin": -10000,
+					"SliderMax": 10000,
+					"bUseCustomPrimitiveData": true,
+					"ParameterName": "SizeX (CPD 0)",
+					"Group": "Custom Primitive Data",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 1,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_1",
+				"desc": "Custom primitive data 1: the value a plain component (no instances) uses.",
+				"props":
+				{
+					"DefaultValue": 200,
+					"SliderMin": -10000,
+					"SliderMax": 10000,
+					"bUseCustomPrimitiveData": true,
+					"PrimitiveDataIndex": 1,
+					"ParameterName": "SizeY (CPD 1)",
+					"Group": "Custom Primitive Data",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 2,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_2",
+				"desc": "Custom primitive data 2: the value a plain component (no instances) uses.",
+				"props":
+				{
+					"SliderMin": -10000,
+					"SliderMax": 10000,
+					"bUseCustomPrimitiveData": true,
+					"PrimitiveDataIndex": 2,
+					"ParameterName": "Seed (CPD 2)",
+					"Group": "Custom Primitive Data",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 3,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_3",
+				"desc": "Custom primitive data 3: the value a plain component (no instances) uses.",
+				"props":
+				{
+					"DefaultValue": 1,
+					"SliderMin": -10000,
+					"SliderMax": 10000,
+					"bUseCustomPrimitiveData": true,
+					"PrimitiveDataIndex": 3,
+					"ParameterName": "Murk (CPD 3)",
+					"Group": "Custom Primitive Data",
+					"SortPriority": 3
+				}
+			},
+			{
+				"id": 4,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_4",
+				"desc": "Custom primitive data 4: the value a plain component (no instances) uses.",
+				"props":
+				{
+					"SliderMin": -10000,
+					"SliderMax": 10000,
+					"bUseCustomPrimitiveData": true,
+					"PrimitiveDataIndex": 4,
+					"ParameterName": "RainRate (CPD 4)",
+					"Group": "Custom Primitive Data",
+					"SortPriority": 4
+				}
+			},
+			{
+				"id": 5,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_0",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.006000,G=0.009000,B=0.007000,A=1.000000)",
+					"ParameterName": "DeepColour",
+					"Group": "Water",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 6,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_1",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.030000,G=0.035000,B=0.020000,A=1.000000)",
+					"ParameterName": "EdgeColour",
+					"Group": "Water",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 7,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_2",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.035000,G=0.040000,B=0.022000,A=1.000000)",
+					"ParameterName": "ScumColour",
+					"Group": "Water",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 8,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_5",
+				"desc": "Edge-to-deep colour distance, times Murk (CPD 3).",
+				"props":
+				{
+					"DefaultValue": 180,
+					"SliderMin": 1,
+					"SliderMax": 1000,
+					"ParameterName": "DepthFadeCm",
+					"Group": "Water",
+					"SortPriority": 3
+				}
+			},
+			{
+				"id": 9,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_6",
+				"props":
+				{
+					"DefaultValue": 15,
+					"SliderMax": 100,
+					"ParameterName": "ScumWidthCm",
+					"Group": "Water",
+					"SortPriority": 4
+				}
+			},
+			{
+				"id": 10,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_7",
+				"props":
+				{
+					"DefaultValue": 0.34999999403953552,
+					"SliderMax": 1,
+					"ParameterName": "ScumRoughness",
+					"Group": "Water",
+					"SortPriority": 5
+				}
+			},
+			{
+				"id": 11,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_8",
+				"props":
+				{
+					"DefaultValue": 0.029999999329447746,
+					"SliderMax": 1,
+					"ParameterName": "Roughness",
+					"Group": "Water",
+					"SortPriority": 6
+				}
+			},
+			{
+				"id": 12,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_9",
+				"props":
+				{
+					"DefaultValue": 0.30000001192092896,
+					"SliderMax": 1,
+					"ParameterName": "Specular",
+					"Group": "Water",
+					"SortPriority": 7
+				}
+			},
+			{
+				"id": 13,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_10",
+				"desc": "Slope of the drifting swell.",
+				"props":
+				{
+					"DefaultValue": 0.019999999552965164,
+					"SliderMax": 0.20000000298023224,
+					"ParameterName": "Swell",
+					"Group": "Water",
+					"SortPriority": 8
+				}
+			},
+			{
+				"id": 14,
+				"class": "StaticSwitchParameter",
+				"name": "MaterialExpressionStaticSwitchParameter_0",
+				"desc": "Ambient rain rings.",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "True",
+						"node": 15,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "False",
+						"node": 16,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"ParameterName": "RainRipples",
+					"Group": "Rain",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 15,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "R",
+						"node": 4,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "return max(R, 0.6);",
+					"OutputType": "CMOT_Float1",
+					"Description": "Rain On"
+				}
+			},
+			{
+				"id": 16,
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_0"
+			},
+			{
+				"id": 17,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_11",
+				"props":
+				{
+					"DefaultValue": -1,
+					"SliderMin": -1,
+					"SliderMax": 3600,
+					"ParameterName": "DebugTime",
+					"Group": "Debug",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 18,
+				"class": "Time",
+				"name": "MaterialExpressionTime_0",
+				"props":
+				{
+					"bOverride_Period": true,
+					"Period": 3600
+				}
+			},
+			{
+				"id": 19,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "DebugTime",
+						"node": 17,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "Time",
+						"node": 18,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "return DebugTime >= 0 ? DebugTime : Time;",
+					"OutputType": "CMOT_Float1",
+					"Description": "Drip Time"
+				}
+			},
+			{
+				"id": 20,
+				"class": "TextureCoordinate",
+				"name": "MaterialExpressionTextureCoordinate_0"
+			},
+			{
+				"id": 21,
+				"class": "WorldPosition",
+				"name": "MaterialExpressionWorldPosition_0",
+				"outputs": [
+					"XYZ",
+					"XY",
+					"Z"
+				],
+				"props":
+				{
+					"WorldPositionShaderOffset": "WPT_ExcludeAllShaderOffsets"
+				}
+			},
+			{
+				"id": 22,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_2",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 0,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 1,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "C",
+						"node": 2,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "D",
+						"node": 3,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "return float4(A, B, C, D);",
+					"OutputType": "CMOT_Float4",
+					"Description": "Cpd"
+				}
+			},
+			{
+				"id": 23,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_3",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 8,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 9,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "C",
+						"node": 13,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "D",
+						"node": 14,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "return float4(A, B, C, D);",
+					"OutputType": "CMOT_Float4",
+					"Description": "Swell In"
+				}
+			},
+			{
+				"id": 24,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_4",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "UV",
+						"node": 20,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "WP",
+						"node": 21,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 2,
+						"name": "T",
+						"node": 19,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "Cpd",
+						"node": 22,
+						"output": 0
+					},
+					{
+						"index": 4,
+						"name": "Swell",
+						"node": 23,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"return",
+					"Normal",
+					"Scum"
+				],
+				"props":
+				{
+					"Code": "return MarsWet_StillWater(UV, WP.xy, T, Cpd, Swell, Normal, Scum);",
+					"OutputType": "CMOT_Float1",
+					"Description": "Still Water",
+					"IncludeFilePaths": [
+						"/Project/Water/MarsWet.ush"
+					]
+				}
+			},
+			{
+				"id": 25,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_5",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Edge",
+						"node": 6,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 1,
+						"name": "Deep",
+						"node": 5,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 2,
+						"name": "Depth",
+						"node": 24,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "Scum",
+						"node": 7,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 4,
+						"name": "S",
+						"node": 24,
+						"output": 2
+					}
+				],
+				"props":
+				{
+					"Code": "return lerp(lerp(Edge.rgb, Deep.rgb, Depth), Scum.rgb, saturate(S));",
+					"Description": "Water Colour"
+				}
+			},
+			{
+				"id": 26,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_6",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "R",
+						"node": 11,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "SR",
+						"node": 10,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "S",
+						"node": 24,
+						"output": 2
+					}
+				],
+				"props":
+				{
+					"Code": "return lerp(R, SR, saturate(S));",
+					"OutputType": "CMOT_Float1",
+					"Description": "Water Roughness"
+				}
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_BaseColor",
+				"node": 25,
+				"output": 0
+			},
+			{
+				"property": "MP_Specular",
+				"node": 12,
+				"output": 0
+			},
+			{
+				"property": "MP_Roughness",
+				"node": 26,
+				"output": 0
+			},
+			{
+				"property": "MP_Normal",
+				"node": 24,
+				"output": 1
+			}
+		]
+	},
+	"scalarParams": [
+		{
+			"name": "SizeX (CPD 0)",
+			"value": 200
+		},
+		{
+			"name": "SizeY (CPD 1)",
+			"value": 200
+		},
+		{
+			"name": "Seed (CPD 2)",
+			"value": 0
+		},
+		{
+			"name": "Murk (CPD 3)",
+			"value": 1
+		},
+		{
+			"name": "RainRate (CPD 4)",
+			"value": 0
+		},
+		{
+			"name": "DepthFadeCm",
+			"value": 180
+		},
+		{
+			"name": "ScumWidthCm",
+			"value": 15
+		},
+		{
+			"name": "ScumRoughness",
+			"value": 0.34999999403953552
+		},
+		{
+			"name": "Roughness",
+			"value": 0.029999999329447746
+		},
+		{
+			"name": "Specular",
+			"value": 0.30000001192092896
+		},
+		{
+			"name": "Swell",
+			"value": 0.019999999552965164
+		},
+		{
+			"name": "DebugTime",
+			"value": -1
+		}
+	],
+	"vectorParams": [
+		{
+			"name": "DeepColour",
+			"value": "RGBA(0.006, 0.009, 0.007, 1)"
+		},
+		{
+			"name": "EdgeColour",
+			"value": "RGBA(0.03, 0.035, 0.02, 1)"
+		},
+		{
+			"name": "ScumColour",
+			"value": "RGBA(0.035, 0.04, 0.022, 1)"
+		}
+	],
+	"textureParams": [],
+	"usedTextures": []
+}

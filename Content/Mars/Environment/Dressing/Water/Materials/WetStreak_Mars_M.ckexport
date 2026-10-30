@@ -1,0 +1,611 @@
+{
+	"material": "WetStreak_Mars_M",
+	"packagePath": "/Game/Mars/Environment/Dressing/Water/Materials/WetStreak_Mars_M",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "185544bb3629f3170ef899d454aa41d9",
+		"exporterVersion": 3
+	},
+	"blendMode": "BLEND_Translucent",
+	"twoSided": false,
+	"unlit": false,
+	"shadingModel": "MSM_DefaultLit",
+	"domain": "MD_DeferredDecal",
+	"connectedOutputs": [
+		"BaseColor",
+		"Opacity",
+		"Normal"
+	],
+	"expressions":
+	{
+		"Constant": 1,
+		"Constant3Vector": 2,
+		"Custom": 7,
+		"DecalColor": 1,
+		"ScalarParameter": 8,
+		"TextureCoordinate": 1,
+		"Time": 1,
+		"Transform": 2,
+		"VectorParameter": 2,
+		"WorldPosition": 1
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_16",
+				"props":
+				{
+					"DefaultValue": 4,
+					"SliderMin": 1,
+					"SliderMax": 6,
+					"ParameterName": "Rivulets",
+					"Group": "Streak",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 1,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_17",
+				"desc": "Rivulet half width (fraction of the decal width).",
+				"props":
+				{
+					"DefaultValue": 0.059999998658895493,
+					"SliderMin": 0.0099999997764825821,
+					"SliderMax": 0.30000001192092896,
+					"ParameterName": "RivuletWidth",
+					"Group": "Streak",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 2,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_18",
+				"props":
+				{
+					"DefaultValue": 0.34999999403953552,
+					"SliderMax": 1,
+					"ParameterName": "HaloOpacity",
+					"Group": "Streak",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 3,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_19",
+				"props":
+				{
+					"DefaultValue": 0.85000002384185791,
+					"SliderMax": 1,
+					"ParameterName": "CoreOpacity",
+					"Group": "Streak",
+					"SortPriority": 3
+				}
+			},
+			{
+				"id": 4,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_20",
+				"props":
+				{
+					"DefaultValue": 0.059999998658895493,
+					"SliderMax": 1,
+					"ParameterName": "CoreRoughness",
+					"Group": "Streak",
+					"SortPriority": 4
+				}
+			},
+			{
+				"id": 5,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_21",
+				"props":
+				{
+					"DefaultValue": 0.25,
+					"SliderMax": 1,
+					"ParameterName": "HaloRoughness",
+					"Group": "Streak",
+					"SortPriority": 5
+				}
+			},
+			{
+				"id": 6,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_4",
+				"desc": "Rust or calcite gathered under the source.",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.090000,G=0.040000,B=0.015000,A=1.000000)",
+					"ParameterName": "MineralTint",
+					"Group": "Streak",
+					"SortPriority": 6
+				}
+			},
+			{
+				"id": 7,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_5",
+				"desc": "What the wall darkens toward.",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.012000,G=0.011000,B=0.009000,A=1.000000)",
+					"ParameterName": "DampTint",
+					"Group": "Streak",
+					"SortPriority": 7
+				}
+			},
+			{
+				"id": 8,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_22",
+				"desc": "1 flips the decal V (if the streak runs up from the source).",
+				"props":
+				{
+					"SliderMax": 1,
+					"ParameterName": "FlipV",
+					"Group": "Streak",
+					"SortPriority": 8
+				}
+			},
+			{
+				"id": 9,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_23",
+				"props":
+				{
+					"DefaultValue": -1,
+					"SliderMin": -1,
+					"SliderMax": 3600,
+					"ParameterName": "DebugTime",
+					"Group": "Debug",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 10,
+				"class": "Time",
+				"name": "MaterialExpressionTime_2",
+				"props":
+				{
+					"bOverride_Period": true,
+					"Period": 3600
+				}
+			},
+			{
+				"id": 11,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_14",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "DebugTime",
+						"node": 9,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "Time",
+						"node": 10,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "return DebugTime >= 0 ? DebugTime : Time;",
+					"OutputType": "CMOT_Float1",
+					"Description": "Drip Time"
+				}
+			},
+			{
+				"id": 12,
+				"class": "TextureCoordinate",
+				"name": "MaterialExpressionTextureCoordinate_2"
+			},
+			{
+				"id": 13,
+				"class": "DecalColor",
+				"name": "MaterialExpressionDecalColor_2",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				]
+			},
+			{
+				"id": 14,
+				"class": "WorldPosition",
+				"name": "MaterialExpressionWorldPosition_2",
+				"outputs": [
+					"XYZ",
+					"XY",
+					"Z"
+				],
+				"props":
+				{
+					"WorldPositionShaderOffset": "WPT_ExcludeAllShaderOffsets"
+				}
+			},
+			{
+				"id": 15,
+				"class": "Transform",
+				"name": "MaterialExpressionTransform_4",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Input",
+						"node": 16,
+						"output": 0,
+						"mask": "rgb"
+					}
+				],
+				"props":
+				{
+					"TransformSourceType": "TRANSFORMSOURCE_Local"
+				}
+			},
+			{
+				"id": 16,
+				"class": "Constant3Vector",
+				"name": "MaterialExpressionConstant3Vector_4",
+				"outputs": [
+					"None",
+					"None",
+					"None",
+					"None"
+				],
+				"props":
+				{
+					"Constant": "(R=1.000000,G=0.000000,B=0.000000,A=1.000000)"
+				}
+			},
+			{
+				"id": 17,
+				"class": "Transform",
+				"name": "MaterialExpressionTransform_5",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Input",
+						"node": 18,
+						"output": 0,
+						"mask": "rgb"
+					}
+				],
+				"props":
+				{
+					"TransformSourceType": "TRANSFORMSOURCE_Local"
+				}
+			},
+			{
+				"id": 18,
+				"class": "Constant3Vector",
+				"name": "MaterialExpressionConstant3Vector_5",
+				"outputs": [
+					"None",
+					"None",
+					"None",
+					"None"
+				],
+				"props":
+				{
+					"Constant": "(R=0.000000,G=1.000000,B=0.000000,A=1.000000)"
+				}
+			},
+			{
+				"id": 19,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_15",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 0,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 1,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "C",
+						"node": 2,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "D",
+						"node": 3,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "return float4(A, B, C, D);",
+					"OutputType": "CMOT_Float4",
+					"Description": "Streak In"
+				}
+			},
+			{
+				"id": 20,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_16",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "WP",
+						"node": 14,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 1,
+						"name": "Axis",
+						"node": 15,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "float3 N = normalize(cross(ddx(WP), ddy(WP)));\nreturn smoothstep(0.6, 0.85, abs(dot(N, normalize(Axis))));",
+					"OutputType": "CMOT_Float1",
+					"Description": "Face Mask"
+				}
+			},
+			{
+				"id": 21,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_17",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "UV",
+						"node": 12,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "Flip",
+						"node": 8,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "DC",
+						"node": 13,
+						"output": 5,
+						"mask": "rgba"
+					},
+					{
+						"index": 3,
+						"name": "Along",
+						"node": 17,
+						"output": 0
+					},
+					{
+						"index": 4,
+						"name": "T",
+						"node": 11,
+						"output": 0
+					},
+					{
+						"index": 5,
+						"name": "P",
+						"node": 19,
+						"output": 0
+					},
+					{
+						"index": 6,
+						"name": "Face",
+						"node": 20,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"return",
+					"Rivulet",
+					"Mineral"
+				],
+				"props":
+				{
+					"Code": "float2 U = float2(UV.x, lerp(UV.y, 1.0 - UV.y, Flip));\nfloat4 Dc = DC; float Len = 2.0 * length(Along); float Tt = T; float4 Pp = P; float Fm = Face;\nfloat Rv = 0; float Mn = 0;\nfloat Op = MarsWet_Streak(U, Dc, Len, Tt, Pp, Fm, Rv, Mn);\nRivulet = Rv; Mineral = Mn; return Op;",
+					"OutputType": "CMOT_Float1",
+					"Description": "Streak",
+					"IncludeFilePaths": [
+						"/Project/Water/MarsWet.ush"
+					]
+				}
+			},
+			{
+				"id": 22,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_18",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Damp",
+						"node": 7,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 1,
+						"name": "MineralTint",
+						"node": 6,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 2,
+						"name": "Mineral",
+						"node": 21,
+						"output": 2
+					}
+				],
+				"props":
+				{
+					"Code": "return lerp(Damp.rgb, MineralTint.rgb, saturate(Mineral));",
+					"Description": "Streak Colour"
+				}
+			},
+			{
+				"id": 23,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_19",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "HaloR",
+						"node": 5,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "CoreR",
+						"node": 4,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "Rivulet",
+						"node": 21,
+						"output": 1
+					}
+				],
+				"props":
+				{
+					"Code": "return lerp(HaloR, CoreR, saturate(Rivulet));",
+					"OutputType": "CMOT_Float1",
+					"Description": "Streak Roughness"
+				}
+			},
+			{
+				"id": 24,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_20",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Rivulet",
+						"node": 21,
+						"output": 1
+					}
+				],
+				"props":
+				{
+					"Code": "return normalize(float3(0.0, 0.0, 1.0) + float3(0.0, 0.25 * Rivulet, 0.0));",
+					"Description": "Streak Normal"
+				}
+			},
+			{
+				"id": 25,
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_2",
+				"props":
+				{
+					"R": 0.34999999403953552
+				}
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_Opacity",
+				"node": 21,
+				"output": 0
+			},
+			{
+				"property": "MP_BaseColor",
+				"node": 22,
+				"output": 0
+			},
+			{
+				"property": "MP_Specular",
+				"node": 25,
+				"output": 0
+			},
+			{
+				"property": "MP_Roughness",
+				"node": 23,
+				"output": 0
+			},
+			{
+				"property": "MP_Normal",
+				"node": 24,
+				"output": 0
+			}
+		]
+	},
+	"scalarParams": [
+		{
+			"name": "Rivulets",
+			"value": 4
+		},
+		{
+			"name": "RivuletWidth",
+			"value": 0.059999998658895493
+		},
+		{
+			"name": "HaloOpacity",
+			"value": 0.34999999403953552
+		},
+		{
+			"name": "CoreOpacity",
+			"value": 0.85000002384185791
+		},
+		{
+			"name": "CoreRoughness",
+			"value": 0.059999998658895493
+		},
+		{
+			"name": "HaloRoughness",
+			"value": 0.25
+		},
+		{
+			"name": "FlipV",
+			"value": 0
+		},
+		{
+			"name": "DebugTime",
+			"value": -1
+		}
+	],
+	"vectorParams": [
+		{
+			"name": "MineralTint",
+			"value": "RGBA(0.09, 0.04, 0.015, 1)"
+		},
+		{
+			"name": "DampTint",
+			"value": "RGBA(0.012, 0.011, 0.009, 1)"
+		}
+	],
+	"textureParams": [],
+	"usedTextures": []
+}

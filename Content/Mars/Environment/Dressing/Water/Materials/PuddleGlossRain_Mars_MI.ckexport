@@ -1,0 +1,909 @@
+{
+	"material": "PuddleGlossRain_Mars_MI",
+	"packagePath": "/Game/Mars/Environment/Dressing/Water/Materials/PuddleGlossRain_Mars_MI",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "cea94ee20f6b0fad64557754670331da",
+		"exporterVersion": 3
+	},
+	"parentChain": [
+		"/Game/Mars/Environment/Dressing/Water/Materials/PuddleGloss_Mars_M.PuddleGloss_Mars_M"
+	],
+	"blendMode": "BLEND_Translucent",
+	"twoSided": false,
+	"unlit": false,
+	"shadingModel": "MSM_DefaultLit",
+	"domain": "MD_DeferredDecal",
+	"connectedOutputs": [
+		"Opacity",
+		"Normal"
+	],
+	"expressions":
+	{
+		"Constant": 2,
+		"Constant3Vector": 2,
+		"Custom": 9,
+		"PerInstanceCustomData": 4,
+		"ScalarParameter": 16,
+		"StaticSwitchParameter": 1,
+		"TextureCoordinate": 1,
+		"Time": 1,
+		"Transform": 2,
+		"VertexInterpolator": 2,
+		"WorldPosition": 1
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_0",
+				"desc": "Custom primitive data 0: the value a plain component (no instances) uses.",
+				"props":
+				{
+					"DefaultValue": 0.30000001192092896,
+					"SliderMin": -10000,
+					"SliderMax": 10000,
+					"bUseCustomPrimitiveData": true,
+					"ParameterName": "Seed (CPD 0)",
+					"Group": "Custom Primitive Data",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 1,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_1",
+				"desc": "Custom primitive data 1: the value a plain component (no instances) uses.",
+				"props":
+				{
+					"DefaultValue": 0.85000002384185791,
+					"SliderMin": -10000,
+					"SliderMax": 10000,
+					"bUseCustomPrimitiveData": true,
+					"PrimitiveDataIndex": 1,
+					"ParameterName": "Wetness (CPD 1)",
+					"Group": "Custom Primitive Data",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 2,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_2",
+				"desc": "Custom primitive data 2: the value a plain component (no instances) uses.",
+				"props":
+				{
+					"SliderMin": -10000,
+					"SliderMax": 10000,
+					"bUseCustomPrimitiveData": true,
+					"PrimitiveDataIndex": 2,
+					"ParameterName": "RainRate (CPD 2)",
+					"Group": "Custom Primitive Data",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 3,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_3",
+				"desc": "Custom primitive data 3: the value a plain component (no instances) uses.",
+				"props":
+				{
+					"DefaultValue": 0.30000001192092896,
+					"SliderMin": -10000,
+					"SliderMax": 10000,
+					"bUseCustomPrimitiveData": true,
+					"PrimitiveDataIndex": 3,
+					"ParameterName": "Aspect (CPD 3)",
+					"Group": "Custom Primitive Data",
+					"SortPriority": 3
+				}
+			},
+			{
+				"id": 4,
+				"class": "PerInstanceCustomData",
+				"name": "MaterialExpressionPerInstanceCustomData_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "DefaultValue",
+						"node": 0,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 5,
+				"class": "PerInstanceCustomData",
+				"name": "MaterialExpressionPerInstanceCustomData_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "DefaultValue",
+						"node": 1,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"DataIndex": 1
+				}
+			},
+			{
+				"id": 6,
+				"class": "PerInstanceCustomData",
+				"name": "MaterialExpressionPerInstanceCustomData_2",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "DefaultValue",
+						"node": 2,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"DataIndex": 2
+				}
+			},
+			{
+				"id": 7,
+				"class": "PerInstanceCustomData",
+				"name": "MaterialExpressionPerInstanceCustomData_3",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "DefaultValue",
+						"node": 3,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"DataIndex": 3
+				}
+			},
+			{
+				"id": 8,
+				"class": "Transform",
+				"name": "MaterialExpressionTransform_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Input",
+						"node": 9,
+						"output": 0,
+						"mask": "rgb"
+					}
+				],
+				"props":
+				{
+					"TransformSourceType": "TRANSFORMSOURCE_Local"
+				}
+			},
+			{
+				"id": 9,
+				"class": "Constant3Vector",
+				"name": "MaterialExpressionConstant3Vector_0",
+				"outputs": [
+					"None",
+					"None",
+					"None",
+					"None"
+				],
+				"props":
+				{
+					"Constant": "(R=100.000000,G=0.000000,B=0.000000,A=1.000000)"
+				}
+			},
+			{
+				"id": 10,
+				"class": "Transform",
+				"name": "MaterialExpressionTransform_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Input",
+						"node": 11,
+						"output": 0,
+						"mask": "rgb"
+					}
+				],
+				"props":
+				{
+					"TransformSourceType": "TRANSFORMSOURCE_Local"
+				}
+			},
+			{
+				"id": 11,
+				"class": "Constant3Vector",
+				"name": "MaterialExpressionConstant3Vector_1",
+				"outputs": [
+					"None",
+					"None",
+					"None",
+					"None"
+				],
+				"props":
+				{
+					"Constant": "(R=0.000000,G=100.000000,B=0.000000,A=1.000000)"
+				}
+			},
+			{
+				"id": 12,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 4,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 5,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "C",
+						"node": 6,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "D",
+						"node": 7,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "return float4(A, B, C, D);",
+					"OutputType": "CMOT_Float4",
+					"Description": "A"
+				}
+			},
+			{
+				"id": 13,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "E",
+						"node": 0,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "F",
+						"node": 0,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "AX",
+						"node": 8,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "AY",
+						"node": 10,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "return float4(E, F, length(AX), length(AY));",
+					"OutputType": "CMOT_Float4",
+					"Description": "B"
+				}
+			},
+			{
+				"id": 14,
+				"class": "VertexInterpolator",
+				"name": "MaterialExpressionVertexInterpolator_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "VS",
+						"node": 12,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 15,
+				"class": "VertexInterpolator",
+				"name": "MaterialExpressionVertexInterpolator_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "VS",
+						"node": 13,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 16,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_4",
+				"desc": "Half-planes cut into the outline (0 = round).",
+				"props":
+				{
+					"DefaultValue": 9,
+					"SliderMax": 12,
+					"ParameterName": "Facets",
+					"Group": "Shape",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 17,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_5",
+				"props":
+				{
+					"DefaultValue": 0.30000001192092896,
+					"SliderMax": 1,
+					"ParameterName": "LobeAmount",
+					"Group": "Shape",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 18,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_6",
+				"desc": "Higher = fewer dry islands.",
+				"props":
+				{
+					"DefaultValue": 0.62000000476837158,
+					"SliderMin": 0.30000001192092896,
+					"SliderMax": 1,
+					"ParameterName": "IslandThreshold",
+					"Group": "Shape",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 19,
+				"class": "TextureCoordinate",
+				"name": "MaterialExpressionTextureCoordinate_0"
+			},
+			{
+				"id": 20,
+				"class": "WorldPosition",
+				"name": "MaterialExpressionWorldPosition_0",
+				"outputs": [
+					"XYZ",
+					"XY",
+					"Z"
+				],
+				"props":
+				{
+					"WorldPositionShaderOffset": "WPT_ExcludeAllShaderOffsets"
+				}
+			},
+			{
+				"id": 21,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_2",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 14,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "Facets",
+						"node": 16,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "Lobes",
+						"node": 17,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "return float4(A.x, A.w, Facets, Lobes);",
+					"OutputType": "CMOT_Float4",
+					"Description": "Shape In"
+				}
+			},
+			{
+				"id": 22,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_3",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "UV",
+						"node": 19,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "WP",
+						"node": 20,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 2,
+						"name": "Shape",
+						"node": 21,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "Island",
+						"node": 18,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "return MarsWet_PuddleShape((UV - 0.5) * 2.0, WP.xy, Shape, Island);",
+					"OutputType": "CMOT_Float2",
+					"Description": "Puddle Shape",
+					"IncludeFilePaths": [
+						"/Project/Water/MarsWet.ush"
+					]
+				}
+			},
+			{
+				"id": 23,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_7",
+				"desc": ">= 0.91 pushes the core below the capture fade start (0.1).",
+				"props":
+				{
+					"DefaultValue": 0.94999998807907104,
+					"SliderMax": 1,
+					"ParameterName": "DeepOpacity",
+					"Group": "Gloss",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 24,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_8",
+				"props":
+				{
+					"DefaultValue": 0.5,
+					"SliderMax": 1,
+					"ParameterName": "RimOpacity",
+					"Group": "Gloss",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 25,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_9",
+				"props":
+				{
+					"DefaultValue": 0.029999999329447746,
+					"SliderMax": 1,
+					"ParameterName": "DeepRoughness",
+					"Group": "Gloss",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 26,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_10",
+				"props":
+				{
+					"DefaultValue": 0.34999999403953552,
+					"SliderMax": 1,
+					"ParameterName": "RimRoughness",
+					"Group": "Gloss",
+					"SortPriority": 3
+				}
+			},
+			{
+				"id": 27,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_11",
+				"props":
+				{
+					"DefaultValue": 0.30000001192092896,
+					"SliderMax": 1,
+					"ParameterName": "Specular",
+					"Group": "Gloss",
+					"SortPriority": 4
+				}
+			},
+			{
+				"id": 28,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_12",
+				"props":
+				{
+					"DefaultValue": 0.029999999329447746,
+					"SliderMax": 0.30000001192092896,
+					"ParameterName": "MicroRippleAmp",
+					"Group": "Gloss",
+					"SortPriority": 5
+				}
+			},
+			{
+				"id": 29,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_13",
+				"desc": "Rain rings per m^2 per s when RainRipples is on (the instance's custom data 2 raises it).",
+				"props":
+				{
+					"DefaultValue": 0.60000002384185791,
+					"SliderMax": 10,
+					"ParameterName": "RainRate",
+					"Group": "Rain",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 30,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_14",
+				"props":
+				{
+					"DefaultValue": 16,
+					"SliderMin": 4,
+					"SliderMax": 64,
+					"ParameterName": "RainCellCm",
+					"Group": "Rain",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 31,
+				"class": "StaticSwitchParameter",
+				"name": "MaterialExpressionStaticSwitchParameter_0",
+				"desc": "Ambient rain rings.",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "True",
+						"node": 33,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "False",
+						"node": 32,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"ParameterName": "RainRipples",
+					"Group": "Rain",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 32,
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_0"
+			},
+			{
+				"id": 33,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_4",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 14,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "RainMin",
+						"node": 29,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "return max(A.z, RainMin);",
+					"OutputType": "CMOT_Float1",
+					"Description": "Rain On"
+				}
+			},
+			{
+				"id": 34,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_15",
+				"props":
+				{
+					"DefaultValue": -1,
+					"SliderMin": -1,
+					"SliderMax": 3600,
+					"ParameterName": "DebugTime",
+					"Group": "Debug",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 35,
+				"class": "Time",
+				"name": "MaterialExpressionTime_0",
+				"props":
+				{
+					"bOverride_Period": true,
+					"Period": 3600
+				}
+			},
+			{
+				"id": 36,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_5",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "DebugTime",
+						"node": 34,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "Time",
+						"node": 35,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "return DebugTime >= 0 ? DebugTime : Time;",
+					"OutputType": "CMOT_Float1",
+					"Description": "Drip Time"
+				}
+			},
+			{
+				"id": 37,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_6",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 14,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "Deep",
+						"node": 23,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "Rim",
+						"node": 24,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "Micro",
+						"node": 28,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "return float4(A.y, Deep, Rim, Micro);",
+					"OutputType": "CMOT_Float4",
+					"Description": "Gloss In"
+				}
+			},
+			{
+				"id": 38,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_7",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 25,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 26,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "C",
+						"node": 31,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "D",
+						"node": 30,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "return float4(A, B, C, D);",
+					"OutputType": "CMOT_Float4",
+					"Description": "Rough In"
+				}
+			},
+			{
+				"id": 39,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_8",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Masks",
+						"node": 22,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "WP",
+						"node": 20,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 2,
+						"name": "T",
+						"node": 36,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "Gloss",
+						"node": 37,
+						"output": 0
+					},
+					{
+						"index": 4,
+						"name": "Rough",
+						"node": 38,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"return",
+					"Normal",
+					"Roughness"
+				],
+				"props":
+				{
+					"Code": "return MarsWet_PuddleGloss(Masks, WP.xy, T, Gloss, Rough, Normal, Roughness);",
+					"OutputType": "CMOT_Float1",
+					"Description": "Puddle Gloss",
+					"IncludeFilePaths": [
+						"/Project/Water/MarsWet.ush"
+					]
+				}
+			},
+			{
+				"id": 40,
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_1"
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_Opacity",
+				"node": 39,
+				"output": 0
+			},
+			{
+				"property": "MP_Metallic",
+				"node": 40,
+				"output": 0
+			},
+			{
+				"property": "MP_Specular",
+				"node": 27,
+				"output": 0
+			},
+			{
+				"property": "MP_Roughness",
+				"node": 39,
+				"output": 2
+			},
+			{
+				"property": "MP_Normal",
+				"node": 39,
+				"output": 1
+			}
+		]
+	},
+	"scalarParams": [
+		{
+			"name": "Seed (CPD 0)",
+			"value": 0.30000001192092896
+		},
+		{
+			"name": "Wetness (CPD 1)",
+			"value": 0.85000002384185791
+		},
+		{
+			"name": "RainRate (CPD 2)",
+			"value": 0
+		},
+		{
+			"name": "Aspect (CPD 3)",
+			"value": 0.30000001192092896
+		},
+		{
+			"name": "Facets",
+			"value": 9
+		},
+		{
+			"name": "LobeAmount",
+			"value": 0.30000001192092896
+		},
+		{
+			"name": "IslandThreshold",
+			"value": 0.62000000476837158
+		},
+		{
+			"name": "DeepOpacity",
+			"value": 0.94999998807907104
+		},
+		{
+			"name": "RimOpacity",
+			"value": 0.5
+		},
+		{
+			"name": "DeepRoughness",
+			"value": 0.029999999329447746
+		},
+		{
+			"name": "RimRoughness",
+			"value": 0.34999999403953552
+		},
+		{
+			"name": "Specular",
+			"value": 0.30000001192092896
+		},
+		{
+			"name": "MicroRippleAmp",
+			"value": 0.029999999329447746
+		},
+		{
+			"name": "RainRate",
+			"value": 0.60000002384185791
+		},
+		{
+			"name": "RainCellCm",
+			"value": 16
+		},
+		{
+			"name": "DebugTime",
+			"value": -1
+		}
+	],
+	"vectorParams": [],
+	"textureParams": [],
+	"usedTextures": []
+}
