@@ -1,0 +1,263 @@
+{
+	"material": "PotionGlass_Mars_M",
+	"packagePath": "/Game/Mars/Gameplay/Items/Potion/Materials/PotionGlass_Mars_M",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "83189a0249eb725f421eb5b47d8767c1",
+		"exporterVersion": 3
+	},
+	"blendMode": "BLEND_Translucent",
+	"twoSided": false,
+	"unlit": false,
+	"shadingModel": "MSM_DefaultLit",
+	"domain": "MD_Surface",
+	"connectedOutputs": [],
+	"expressions":
+	{
+		"CameraVectorWS": 1,
+		"Custom": 2,
+		"MakeMaterialAttributes": 1,
+		"PixelNormalWS": 1,
+		"ScalarParameter": 5,
+		"VectorParameter": 1
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_1",
+				"desc": "The glass's colour.",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.900000,G=0.970000,B=1.000000,A=1.000000)",
+					"ParameterName": "Tint",
+					"Group": "Glass",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 1,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_5",
+				"desc": "Opacity where the glass faces the camera.",
+				"props":
+				{
+					"DefaultValue": 0.059999998658895493,
+					"SliderMax": 1,
+					"ParameterName": "Opacity Facing",
+					"Group": "Glass",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 2,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_6",
+				"desc": "Opacity at the silhouette, where the light skims the glass.",
+				"props":
+				{
+					"DefaultValue": 0.34999999403953552,
+					"SliderMax": 1,
+					"ParameterName": "Opacity Edge",
+					"Group": "Glass",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 3,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_7",
+				"desc": "How fast the edge opacity falls off toward the facing.",
+				"props":
+				{
+					"DefaultValue": 4,
+					"SliderMin": 0.5,
+					"SliderMax": 10,
+					"ParameterName": "Fresnel Exponent",
+					"Group": "Glass",
+					"SortPriority": 3
+				}
+			},
+			{
+				"id": 4,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_8",
+				"desc": "Low: sharp highlights.",
+				"props":
+				{
+					"DefaultValue": 0.039999999105930328,
+					"SliderMax": 1,
+					"ParameterName": "Roughness",
+					"Group": "Glass",
+					"SortPriority": 4
+				}
+			},
+			{
+				"id": 5,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_9",
+				"desc": "Highlight strength.",
+				"props":
+				{
+					"DefaultValue": 0.80000001192092896,
+					"SliderMax": 1,
+					"ParameterName": "Specular",
+					"Group": "Glass",
+					"SortPriority": 5
+				}
+			},
+			{
+				"id": 6,
+				"class": "PixelNormalWS",
+				"name": "MaterialExpressionPixelNormalWS_1"
+			},
+			{
+				"id": 7,
+				"class": "CameraVectorWS",
+				"name": "MaterialExpressionCameraVectorWS_1"
+			},
+			{
+				"id": 8,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_2",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "N",
+						"node": 6,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "V",
+						"node": 7,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "E",
+						"node": 3,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "return pow(1.0 - saturate(abs(dot(normalize(N), normalize(V)))), E);",
+					"OutputType": "CMOT_Float1",
+					"Description": "Fresnel"
+				}
+			},
+			{
+				"id": 9,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_3",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Lo",
+						"node": 1,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "Hi",
+						"node": 2,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "F",
+						"node": 8,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "return lerp(Lo, Hi, F);",
+					"OutputType": "CMOT_Float1",
+					"Description": "Opacity"
+				}
+			},
+			{
+				"id": 10,
+				"class": "MakeMaterialAttributes",
+				"name": "MaterialExpressionMakeMaterialAttributes_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "BaseColor",
+						"node": 0,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 2,
+						"name": "Specular",
+						"node": 5,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "Roughness",
+						"node": 4,
+						"output": 0
+					},
+					{
+						"index": 6,
+						"name": "Opacity",
+						"node": 9,
+						"output": 0
+					}
+				]
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_MaterialAttributes",
+				"node": 10,
+				"output": 0
+			}
+		]
+	},
+	"scalarParams": [
+		{
+			"name": "Opacity Facing",
+			"value": 0.059999998658895493
+		},
+		{
+			"name": "Opacity Edge",
+			"value": 0.34999999403953552
+		},
+		{
+			"name": "Fresnel Exponent",
+			"value": 4
+		},
+		{
+			"name": "Roughness",
+			"value": 0.039999999105930328
+		},
+		{
+			"name": "Specular",
+			"value": 0.80000001192092896
+		}
+	],
+	"vectorParams": [
+		{
+			"name": "Tint",
+			"value": "RGBA(0.9, 0.97, 1, 1)"
+		}
+	],
+	"textureParams": [],
+	"usedTextures": []
+}

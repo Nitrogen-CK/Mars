@@ -1,0 +1,836 @@
+{
+	"material": "PotionLiquid_Mars_M",
+	"packagePath": "/Game/Mars/Gameplay/Items/Potion/Materials/PotionLiquid_Mars_M",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "d702cb4c1d49ee197822e3a136f7cf7c",
+		"exporterVersion": 3
+	},
+	"blendMode": "BLEND_Masked",
+	"twoSided": true,
+	"unlit": false,
+	"shadingModel": "MSM_DefaultLit",
+	"domain": "MD_Surface",
+	"connectedOutputs": [],
+	"expressions":
+	{
+		"CameraPositionWS": 1,
+		"Constant3Vector": 2,
+		"Custom": 1,
+		"MakeMaterialAttributes": 1,
+		"ScalarParameter": 15,
+		"Subtract": 1,
+		"Time": 1,
+		"Transform": 2,
+		"TransformPosition": 2,
+		"TwoSidedSign": 1,
+		"VectorParameter": 5,
+		"VertexInterpolator": 1,
+		"VertexNormalWS": 1,
+		"WorldPosition": 1
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_5",
+				"desc": "The liquid where it is thin: the edge of the volume.",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.300000,G=1.000000,B=0.420000,A=1.000000)",
+					"ParameterName": "Liquid Color",
+					"Group": "Liquid",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 1,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_6",
+				"desc": "The liquid where it is thick: the middle of the flask.",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.010000,G=0.160000,B=0.050000,A=1.000000)",
+					"ParameterName": "Deep Color",
+					"Group": "Liquid",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 2,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_15",
+				"desc": "How fast the colour goes from Liquid to Deep with the depth looked through (per radius).",
+				"props":
+				{
+					"DefaultValue": 2.5999999046325684,
+					"SliderMax": 8,
+					"ParameterName": "Density",
+					"Group": "Liquid",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 3,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_16",
+				"desc": "Emissive strength: the potion's own light (it still takes the scene's).",
+				"props":
+				{
+					"DefaultValue": 0.89999997615814209,
+					"SliderMax": 10,
+					"ParameterName": "Glow",
+					"Group": "Liquid",
+					"SortPriority": 3
+				}
+			},
+			{
+				"id": 4,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_17",
+				"desc": "Light through the thin edge of the volume.",
+				"props":
+				{
+					"DefaultValue": 1.3999999761581421,
+					"SliderMax": 4,
+					"ParameterName": "Rim Light",
+					"Group": "Liquid",
+					"SortPriority": 4
+				}
+			},
+			{
+				"id": 5,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_18",
+				"desc": "Wall and surface roughness: low for a glossy liquid.",
+				"props":
+				{
+					"DefaultValue": 0.059999998658895493,
+					"SliderMax": 1,
+					"ParameterName": "Roughness",
+					"Group": "Liquid",
+					"SortPriority": 5
+				}
+			},
+			{
+				"id": 6,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_7",
+				"desc": "The top of the liquid, mixed over the depth colour.",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.450000,G=0.950000,B=0.550000,A=1.000000)",
+					"ParameterName": "Surface Color",
+					"Group": "Surface",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 7,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_19",
+				"desc": "How much of the top is Surface Color (0: only the depth under it).",
+				"props":
+				{
+					"DefaultValue": 0.20000000298023224,
+					"SliderMax": 1,
+					"ParameterName": "Surface Mix",
+					"Group": "Surface",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 8,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_8",
+				"desc": "The line where the liquid meets the glass (and the motes).",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.800000,G=1.000000,B=0.780000,A=1.000000)",
+					"ParameterName": "Foam Color",
+					"Group": "Surface",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 9,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_20",
+				"desc": "The meniscus line's width, in radii.",
+				"props":
+				{
+					"DefaultValue": 0.035000000149011612,
+					"SliderMax": 0.30000001192092896,
+					"ParameterName": "Foam Width",
+					"Group": "Surface",
+					"SortPriority": 3
+				}
+			},
+			{
+				"id": 10,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_21",
+				"desc": "Ripple height at full slosh, in radii.",
+				"props":
+				{
+					"DefaultValue": 0.059999998658895493,
+					"SliderMax": 0.30000001192092896,
+					"ParameterName": "Ripple Amount",
+					"Group": "Ripples",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 11,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_22",
+				"desc": "Waves across the surface.",
+				"props":
+				{
+					"DefaultValue": 2.2000000476837158,
+					"SliderMin": 0.20000000298023224,
+					"SliderMax": 8,
+					"ParameterName": "Ripple Scale",
+					"Group": "Ripples",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 12,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_23",
+				"desc": "How fast the waves travel (radians/s).",
+				"props":
+				{
+					"DefaultValue": 3.5,
+					"SliderMax": 12,
+					"ParameterName": "Ripple Speed",
+					"Group": "Ripples",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 13,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_24",
+				"desc": "Brightness of the sparks rising through the liquid (0: none).",
+				"props":
+				{
+					"DefaultValue": 0.60000002384185791,
+					"SliderMax": 4,
+					"ParameterName": "Mote Amount",
+					"Group": "Motes",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 14,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_25",
+				"desc": "Cells per radius: more, smaller motes.",
+				"props":
+				{
+					"DefaultValue": 2.5999999046325684,
+					"SliderMin": 0.5,
+					"SliderMax": 10,
+					"ParameterName": "Mote Scale",
+					"Group": "Motes",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 15,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_26",
+				"desc": "How fast the motes rise (cells per second).",
+				"props":
+				{
+					"DefaultValue": 0.34999999403953552,
+					"SliderMax": 3,
+					"ParameterName": "Mote Speed",
+					"Group": "Motes",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 16,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_27",
+				"desc": "The liquid sphere's local radius, cm (the mesh's).",
+				"props":
+				{
+					"DefaultValue": 4.3600001335144043,
+					"SliderMin": 0.10000000149011612,
+					"SliderMax": 50,
+					"ParameterName": "Radius",
+					"Group": "Shape",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 17,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_9",
+				"desc": "Custom primitive data 0-3: the surface normal (world) and the level (radii from the centre).",
+				"outputs": [
+					"RGB",
+					"Nx",
+					"Ny",
+					"Nz",
+					"Level",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.000000,G=0.000000,B=1.000000,A=0.000000)",
+					"bUseCustomPrimitiveData": true,
+					"ParameterName": "Surface",
+					"Group": "Per Potion (Custom Primitive Data)",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 18,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_28",
+				"desc": "Custom primitive data 4: ripple energy, 0 still.",
+				"props":
+				{
+					"SliderMax": 1,
+					"bUseCustomPrimitiveData": true,
+					"PrimitiveDataIndex": 4,
+					"ParameterName": "Slosh",
+					"Group": "Per Potion (Custom Primitive Data)",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 19,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_29",
+				"desc": "Custom primitive data 5: this potion's random phase.",
+				"props":
+				{
+					"SliderMax": 1,
+					"bUseCustomPrimitiveData": true,
+					"PrimitiveDataIndex": 5,
+					"ParameterName": "Phase",
+					"Group": "Per Potion (Custom Primitive Data)",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 20,
+				"class": "WorldPosition",
+				"name": "MaterialExpressionWorldPosition_1",
+				"outputs": [
+					"XYZ",
+					"XY",
+					"Z"
+				],
+				"props":
+				{
+					"WorldPositionShaderOffset": "WPT_ExcludeAllShaderOffsets"
+				}
+			},
+			{
+				"id": 21,
+				"class": "TransformPosition",
+				"name": "MaterialExpressionTransformPosition_2",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Input",
+						"node": 20,
+						"output": 0,
+						"mask": "rgb"
+					}
+				],
+				"props":
+				{
+					"TransformSourceType": "TRANSFORMPOSSOURCE_World"
+				}
+			},
+			{
+				"id": 22,
+				"class": "VertexInterpolator",
+				"name": "MaterialExpressionVertexInterpolator_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "VS",
+						"node": 21,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 23,
+				"class": "Transform",
+				"name": "MaterialExpressionTransform_2",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Input",
+						"node": 22,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"TransformSourceType": "TRANSFORMSOURCE_Local"
+				}
+			},
+			{
+				"id": 24,
+				"class": "TransformPosition",
+				"name": "MaterialExpressionTransformPosition_3",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Input",
+						"node": 25,
+						"output": 0,
+						"mask": "rgb"
+					}
+				],
+				"props":
+				{
+					"TransformType": "TRANSFORMPOSSOURCE_World"
+				}
+			},
+			{
+				"id": 25,
+				"class": "Constant3Vector",
+				"name": "MaterialExpressionConstant3Vector_2",
+				"outputs": [
+					"None",
+					"None",
+					"None",
+					"None"
+				],
+				"props":
+				{
+					"Constant": "(R=0.000000,G=0.000000,B=0.000000,A=1.000000)"
+				}
+			},
+			{
+				"id": 26,
+				"class": "CameraPositionWS",
+				"name": "MaterialExpressionCameraPositionWS_1"
+			},
+			{
+				"id": 27,
+				"class": "Subtract",
+				"name": "MaterialExpressionSubtract_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 26,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 24,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 28,
+				"class": "Transform",
+				"name": "MaterialExpressionTransform_3",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Input",
+						"node": 29,
+						"output": 0,
+						"mask": "rgb"
+					}
+				],
+				"props":
+				{
+					"TransformSourceType": "TRANSFORMSOURCE_Local"
+				}
+			},
+			{
+				"id": 29,
+				"class": "Constant3Vector",
+				"name": "MaterialExpressionConstant3Vector_3",
+				"outputs": [
+					"None",
+					"None",
+					"None",
+					"None"
+				],
+				"props":
+				{
+					"Constant": "(R=1.000000,G=0.000000,B=0.000000,A=1.000000)"
+				}
+			},
+			{
+				"id": 30,
+				"class": "Time",
+				"name": "MaterialExpressionTime_1"
+			},
+			{
+				"id": 31,
+				"class": "TwoSidedSign",
+				"name": "MaterialExpressionTwoSidedSign_1"
+			},
+			{
+				"id": 32,
+				"class": "VertexNormalWS",
+				"name": "MaterialExpressionVertexNormalWS_1"
+			},
+			{
+				"id": 33,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "D",
+						"node": 23,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "CamRel",
+						"node": 27,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "Unit",
+						"node": 28,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "Radius",
+						"node": 16,
+						"output": 0
+					},
+					{
+						"index": 4,
+						"name": "Surface",
+						"node": 17,
+						"output": 5,
+						"mask": "rgba"
+					},
+					{
+						"index": 5,
+						"name": "Slosh",
+						"node": 18,
+						"output": 0
+					},
+					{
+						"index": 6,
+						"name": "Phase",
+						"node": 19,
+						"output": 0
+					},
+					{
+						"index": 7,
+						"name": "Time",
+						"node": 30,
+						"output": 0
+					},
+					{
+						"index": 8,
+						"name": "Sign",
+						"node": 31,
+						"output": 0
+					},
+					{
+						"index": 9,
+						"name": "Nw",
+						"node": 32,
+						"output": 0
+					},
+					{
+						"index": 10,
+						"name": "LiquidColor",
+						"node": 0,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 11,
+						"name": "DeepColor",
+						"node": 1,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 12,
+						"name": "Density",
+						"node": 2,
+						"output": 0
+					},
+					{
+						"index": 13,
+						"name": "Glow",
+						"node": 3,
+						"output": 0
+					},
+					{
+						"index": 14,
+						"name": "RimLight",
+						"node": 4,
+						"output": 0
+					},
+					{
+						"index": 15,
+						"name": "Roughness",
+						"node": 5,
+						"output": 0
+					},
+					{
+						"index": 16,
+						"name": "SurfaceColor",
+						"node": 6,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 17,
+						"name": "SurfaceMix",
+						"node": 7,
+						"output": 0
+					},
+					{
+						"index": 18,
+						"name": "FoamColor",
+						"node": 8,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 19,
+						"name": "FoamWidth",
+						"node": 9,
+						"output": 0
+					},
+					{
+						"index": 20,
+						"name": "RippleAmount",
+						"node": 10,
+						"output": 0
+					},
+					{
+						"index": 21,
+						"name": "RippleScale",
+						"node": 11,
+						"output": 0
+					},
+					{
+						"index": 22,
+						"name": "RippleSpeed",
+						"node": 12,
+						"output": 0
+					},
+					{
+						"index": 23,
+						"name": "MoteAmount",
+						"node": 13,
+						"output": 0
+					},
+					{
+						"index": 24,
+						"name": "MoteScale",
+						"node": 14,
+						"output": 0
+					},
+					{
+						"index": 25,
+						"name": "MoteSpeed",
+						"node": 15,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"return",
+					"OutNormal",
+					"OutEmissive",
+					"OutMask",
+					"OutRough"
+				],
+				"props":
+				{
+					"Code": "\nfloat S = max(length(Unit), 1e-4);\nfloat R = max(Radius * S, 1e-3);\nfloat3 N = normalize(Surface.xyz + float3(0.0, 0.0, 1e-4));\nfloat h = Surface.w * R;\n\n// the surface's own frame, for the ripples\nfloat3 T1 = normalize(cross(abs(N.x) < 0.9 ? float3(1.0, 0.0, 0.0) : float3(0.0, 1.0, 0.0), N));\nfloat3 T2 = cross(N, T1);\n\n// the camera ray through this pixel and where it crosses the flat surface (0 at the camera, 1 at this pixel)\nfloat3 V = D - CamRel;\nfloat vN = dot(V, N);\nfloat tPlane = (h - dot(CamRel, N)) / (abs(vN) > 1e-5 ? vN : 1e-5);\nfloat3 Sflat = CamRel + V * saturate(tPlane);\n\n// ripples: three travelling waves on the surface's frame, at rest a faint shimmer, louder while it sloshes.\n// [0] at this pixel (the clip), [1] at the surface crossing (the surface's normal)\nfloat amp = RippleAmount * R * (0.04 + Slosh);\nfloat ripH[2];\nfloat3 ripG[2];\n[unroll] for (int k = 0; k < 2; ++k)\n{\n    float3 X = k == 0 ? D : Sflat;\n    float2 uv = float2(dot(X, T1), dot(X, T2)) / R * RippleScale;\n    float tt = Time * RippleSpeed + Phase * 17.0;\n    float2 d0 = float2(0.96, 0.28);\n    float2 d1 = float2(-0.53, 0.85);\n    float2 d2 = float2(-0.39, -0.92);\n    float a0 = dot(uv, d0) + tt;\n    float a1 = dot(uv, d1) * 1.7 + tt * 1.31;\n    float a2 = dot(uv, d2) * 2.9 + tt * 1.87;\n    ripH[k] = amp * (sin(a0) + 0.6 * sin(a1) + 0.35 * sin(a2)) / 1.95;\n    float2 g = d0 * cos(a0) + (0.6 * 1.7) * d1 * cos(a1) + (0.35 * 2.9) * d2 * cos(a2);\n    ripG[k] = (amp * RippleScale / (1.95 * R)) * (g.x * T1 + g.y * T2);\n}\n\n// signed height of this pixel over the rippled surface: above it is air\nfloat s = dot(D, N) - h - ripH[0];\nOutMask = s <= 0.0 ? 1.0 : 0.0;\n\nfloat3 Vn = normalize(V);\nbool front = Sign > 0.0;\nfloat path;\nfloat3 n;\nfloat3 col;\nfloat3 glow;\nif (front)\n{\n    // the wall: the liquid between here and where the ray leaves it (the far side of the sphere, or the surface if the\n    // ray rises through it first), in radii\n    float b = dot(D, Vn);\n    float c = dot(D, D) - R * R;\n    float tS = -b + sqrt(max(b * b - c, 0.0));\n    float vnN = dot(Vn, N);\n    float tP = vnN > 1e-4 ? (h - dot(D, N)) / vnN : 1e9;\n    path = max(min(tS, tP), 0.0) / R;\n    float depth = 1.0 - exp(-path * Density);\n    n = normalize(Nw);\n    col = lerp(LiquidColor, DeepColor, depth);\n\n    // a bright line where the liquid meets the glass, under the surface\n    float foam = 1.0 - smoothstep(0.0, FoamWidth * R, -s);\n    // light through the thin edge of the volume\n    float rim = pow(1.0 - saturate(dot(n, -Vn)), 3.0) * RimLight;\n    // motes: two layers of rising sparks inside the volume, along the ray (parallax: they sit in the liquid, not on the\n    // glass)\n    float motes = 0.0;\n    [unroll] for (int m = 0; m < 2; ++m)\n    {\n        float3 Q = (D + Vn * (path * R * (m == 0 ? 0.3 : 0.7))) / R * MoteScale + N * (Time * MoteSpeed) + Phase * 31.0 + m * 7.31;\n        float3 cell = floor(Q);\n        float3 f = frac(Q) - 0.5;\n        float3 hsh = frac(sin(float3(dot(cell, float3(127.1, 311.7, 74.7)), dot(cell, float3(269.5, 183.3, 246.1)),\n                                     dot(cell, float3(113.5, 271.9, 124.6)))) * 43758.5453);\n        float3 off = (hsh - 0.5) * 0.6;\n        float on = step(0.55, hsh.x);\n        float r = length(f - off);\n        motes += on * (1.0 - smoothstep(0.02, 0.09, r));\n    }\n    col = lerp(col, FoamColor, foam * 0.6);\n    glow = col * Glow * (1.0 - 0.5 * depth) + LiquidColor * (rim * Glow) + FoamColor * (motes * MoteAmount * Glow);\n}\nelse\n{\n    // the surface, seen at the point the ray crosses it: lit with the rippled normal, coloured by the depth of liquid\n    // under it along the ray (the crossing to this back face)\n    float3 Sp = Sflat;\n    path = length(D - Sp) / R;\n    float depth = 1.0 - exp(-path * Density);\n    n = normalize(N - ripG[1]);\n    // the meniscus: a pale ring where the surface meets the glass (the cut circle's radius is sqrt(R^2 - h^2))\n    float3 toS = Sp - N * h;\n    float radial = length(toS - N * dot(toS, N)) / sqrt(max(R * R - h * h, 1e-4));\n    float meniscus = smoothstep(1.0 - FoamWidth * 2.5, 1.0, radial);\n    col = lerp(lerp(LiquidColor, DeepColor, depth), SurfaceColor, SurfaceMix);\n    col = lerp(col, FoamColor, meniscus * 0.85);\n    glow = col * (Glow * 0.6);\n}\n\nOutNormal = n;\nOutEmissive = glow;\nOutRough = Roughness;\nreturn col;\n",
+					"Description": "Liquid"
+				}
+			},
+			{
+				"id": 34,
+				"class": "MakeMaterialAttributes",
+				"name": "MaterialExpressionMakeMaterialAttributes_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "BaseColor",
+						"node": 33,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "Roughness",
+						"node": 33,
+						"output": 4
+					},
+					{
+						"index": 5,
+						"name": "EmissiveColor",
+						"node": 33,
+						"output": 2
+					},
+					{
+						"index": 7,
+						"name": "OpacityMask",
+						"node": 33,
+						"output": 3
+					},
+					{
+						"index": 8,
+						"name": "Normal",
+						"node": 33,
+						"output": 1
+					}
+				]
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_MaterialAttributes",
+				"node": 34,
+				"output": 0
+			}
+		]
+	},
+	"scalarParams": [
+		{
+			"name": "Density",
+			"value": 2.5999999046325684
+		},
+		{
+			"name": "Glow",
+			"value": 0.89999997615814209
+		},
+		{
+			"name": "Rim Light",
+			"value": 1.3999999761581421
+		},
+		{
+			"name": "Roughness",
+			"value": 0.059999998658895493
+		},
+		{
+			"name": "Surface Mix",
+			"value": 0.20000000298023224
+		},
+		{
+			"name": "Foam Width",
+			"value": 0.035000000149011612
+		},
+		{
+			"name": "Ripple Amount",
+			"value": 0.059999998658895493
+		},
+		{
+			"name": "Ripple Scale",
+			"value": 2.2000000476837158
+		},
+		{
+			"name": "Ripple Speed",
+			"value": 3.5
+		},
+		{
+			"name": "Mote Amount",
+			"value": 0.60000002384185791
+		},
+		{
+			"name": "Mote Scale",
+			"value": 2.5999999046325684
+		},
+		{
+			"name": "Mote Speed",
+			"value": 0.34999999403953552
+		},
+		{
+			"name": "Radius",
+			"value": 4.3600001335144043
+		},
+		{
+			"name": "Slosh",
+			"value": 0
+		},
+		{
+			"name": "Phase",
+			"value": 0
+		}
+	],
+	"vectorParams": [
+		{
+			"name": "Liquid Color",
+			"value": "RGBA(0.3, 1, 0.42, 1)"
+		},
+		{
+			"name": "Deep Color",
+			"value": "RGBA(0.01, 0.16, 0.05, 1)"
+		},
+		{
+			"name": "Surface Color",
+			"value": "RGBA(0.45, 0.95, 0.55, 1)"
+		},
+		{
+			"name": "Foam Color",
+			"value": "RGBA(0.8, 1, 0.78, 1)"
+		},
+		{
+			"name": "Surface",
+			"value": "RGBA(0, 0, 1, 0)"
+		}
+	],
+	"textureParams": [],
+	"usedTextures": []
+}

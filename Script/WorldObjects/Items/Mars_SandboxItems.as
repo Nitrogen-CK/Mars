@@ -45,3 +45,9 @@ class UMars_WorldItem_Torch_EntityScript : UMars_Torch_EntityScript
 {
     default Definition = mars_items::Torch();
 }
+
+// The potion hangs its liquid in the flask (UMars_Potion_EntityScript).
+class UMars_WorldItem_Potion_EntityScript : UMars_Potion_EntityScript
+{
+    default Definition = mars_items::Potion();
+}
