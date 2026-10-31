@@ -11,7 +11,11 @@ enum EMars_FPHands_GripShape
     // Radius = the largest bounds extent.
     Sphere,
     // Along the bounds' longest axis.
-    Capsule
+    Capsule,
+    // Authored socket grips only: the fingers close on the socket's handle (a capsule along its X axis, sized by
+    // FMars_FPHands_ContactSpec), not on the whole mesh. For an item held by a narrow part of a wide mesh (a flask by its
+    // neck); without a socket it falls back to the bounds box.
+    Handle
 }
 
 // A mesh whose bounds the fingers close on.
@@ -124,8 +128,15 @@ mixin FCk_Hands_ContactShape Get_ContactShape(const FCk_Handle_FPHands& Self, co
     }
 
     const auto Hold = Self.Get_Hold();
-    if (Hold.Get_HoldsWith(InHand))
-    { return utils_fphands::Make_BoundsShape(Hold.Shape, Hold.HeldOffset * InHandWorld); }
+    if (Hold.Get_HoldsWith(InHand) == false)
+    { return FCk_Hands_ContactShape(); }
 
-    return FCk_Hands_ContactShape();
+    if (Hold.Shape.Type == EMars_FPHands_GripShape::Handle && Hold.SocketGrips.IsSet())
+    {
+        const auto& Sockets = Hold.SocketGrips.GetValue();
+        const auto Grip = InHand == EMars_Hand::Left ? Sockets.Left : Sockets.Right;
+        return utils_fphands::Make_SocketShape(Spec.Contact, Grip * InHandWorld);
+    }
+
+    return utils_fphands::Make_BoundsShape(Hold.Shape, Hold.HeldOffset * InHandWorld);
 }

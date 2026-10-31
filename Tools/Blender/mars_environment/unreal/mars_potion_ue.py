@@ -5,7 +5,8 @@ live mesh is never rebuilt in an editor someone is using):
     python env_drive.py --port 9318 --module mars_potion_ue --alias mp --call "mp.run_all()"
 
     PotionFlask_Mars_SM    the item's Presentation mesh: slot 0 the glass (a closed shell with a wall, so the far wall
-                           shows through the near one), slot 1 the cork; pivot at its flat base; one convex hull
+                           shows through the near one), slot 1 the cork; pivot at its flat base; one convex hull; a
+                           "Grip" socket on the neck for the right glove (add_grip_socket)
     PotionLiquid_Mars_SM   the liquid: the body's sphere and the neck as one closed solid, pivot at the sphere's centre
                            (the shader cuts it with a plane about that centre); the entity script hangs it
                            BODY_CENTRE_CM over the flask's pivot
@@ -508,6 +509,31 @@ def _import(obj, name, slots):
     return mesh, stray
 
 
+# The right glove's grip on the neck (Mars_FPHands_Grips.as): a "Grip" socket at the neck's middle, X up the neck (across the
+# palm toward the index finger: the thumb on top), Z out of the palm, which faces -X: held up to be looked at, the palm
+# toward the viewer, the glove behind the neck and its fingers curled round the front, so the body hangs clear under it.
+# (Palm toward -Y put the back of the fist between the camera and the flask.) Mesh space, unscaled.
+GRIP_SOCKET = "Grip"
+GRIP_HEIGHT_CM = 10.4
+
+
+def add_grip_socket(mesh=None):
+    """Writes (or rewrites) the flask's Grip socket in place: socket data only, the geometry is untouched."""
+    mesh = mesh or mc._asset(F_MESH, FLASK)
+    existing = mesh.find_socket(GRIP_SOCKET)
+    if existing is not None:
+        mesh.remove_socket(existing)
+    socket = unreal.StaticMeshSocket(mesh)
+    socket.set_editor_property("socket_name", GRIP_SOCKET)
+    socket.set_editor_property("relative_location", unreal.Vector(0.0, 0.0, GRIP_HEIGHT_CM))
+    rotation = unreal.MathLibrary.make_rot_from_xz(unreal.Vector(0.0, 0.0, 1.0), unreal.Vector(-1.0, 0.0, 0.0))
+    socket.set_editor_property("relative_rotation", rotation)
+    mesh.add_socket(socket)
+    EAL.save_loaded_asset(mesh)
+    found = mesh.find_socket(GRIP_SOCKET)
+    return {"socket": GRIP_SOCKET, "location": str(found.relative_location), "rotation": str(found.relative_rotation)}
+
+
 def build_meshes():
     if mc._in_pie():
         raise RuntimeError("stop PIE before importing")
@@ -521,6 +547,7 @@ def build_meshes():
     sme.remove_collisions(flask)
     sme.set_convex_decomposition_collisions(flask, 1, 32, 100000)
     EAL.save_loaded_asset(flask)
+    report["grip"] = add_grip_socket(flask)
     liquid, stray2 = _import(liquid_obj, LIQUID, (INSTANCES["PotionLiquid_Mars_M"],))
     sme.remove_collisions(liquid)
     EAL.save_loaded_asset(liquid)

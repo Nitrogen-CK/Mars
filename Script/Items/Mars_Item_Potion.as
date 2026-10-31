@@ -8,10 +8,11 @@ namespace constants_potion_item
     // 16.6 x 16.6 x 27 cm, sized to the gloves rather than to a real hand.
     const FString k_FlaskMeshPath = "/Game/Mars/Gameplay/Items/Potion/Meshes/PotionFlask_Mars_SM.PotionFlask_Mars_SM";
     const float64 k_MeshScale = 1.8;
-    // The fist cups the base, the flask standing up out of it along the fist's closing axis (as the torch's shaft does),
-    // so the body, the surface and the cork stand clear of the fingers. Held by the neck it would hang below the resting
-    // fist, off the bottom of the screen. Over the pivot, at k_MeshScale.
-    const float64 k_GripHeight = 1.0 * k_MeshScale;
+    // Held upright by the neck: the right glove takes the mesh's Grip socket (mars_potion_ue.add_grip_socket: thumb up the
+    // neck, palm toward the viewer, fingers round the front) and closes on it as a handle, while the flask stands where this puts it in
+    // the hand node's space: the body about level with the node and a little in, so it hangs in view under the fist (the
+    // glove rises to the neck, about 10 cm over the node).
+    const FVector k_HeldLocation = FVector(2.0, -3.0, -8.0);
 
     const FString k_BubblingMaterialPath = "/Game/Mars/Gameplay/Items/Potion/Materials/PotionBubbling_Mars_MI.PotionBubbling_Mars_MI";
     const FString k_BrineMaterialPath = "/Game/Mars/Gameplay/Items/Potion/Materials/PickleBrine_Mars_MI.PickleBrine_Mars_MI";
@@ -27,7 +28,8 @@ namespace mars_items
         Presentation.Visual.MeshScale = FVector(constants_potion_item::k_MeshScale, constants_potion_item::k_MeshScale, constants_potion_item::k_MeshScale);
         Presentation.Grip.Pose = EMars_HandGripPose::Power;
         Presentation.Grip.Handedness = EMars_ItemPresentation_Handedness::OneHanded;
-        Presentation.Mounting.HeldOffset = utils_fphands::Make_ShaftHeldOffset(constants_potion_item::k_GripHeight);
+        Presentation.Grip.Shape = EMars_FPHands_GripShape::Handle;
+        Presentation.Mounting.HeldOffset = FTransform(FRotator::ZeroRotator, constants_potion_item::k_HeldLocation);
         Presentation.WorldItem.ScriptClass = UMars_Potion_EntityScript;
         InDefinition._ItemTraits.Add(Presentation);
 
