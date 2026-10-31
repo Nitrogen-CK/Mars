@@ -4,7 +4,7 @@
 	"_meta":
 	{
 		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
-		"sourceHash": "a9301d80b0298f075a5ee3db91cba2d6",
+		"sourceHash": "27888d0988445699eb563c1c27358006",
 		"exporterVersion": 3
 	},
 	"parentChain": [
@@ -31,7 +31,7 @@
 			{
 				"id": 0,
 				"class": "VectorParameter",
-				"name": "MaterialExpressionVectorParameter_1",
+				"name": "MaterialExpressionVectorParameter_0",
 				"desc": "The glass's colour.",
 				"outputs": [
 					"RGB",
@@ -52,7 +52,7 @@
 			{
 				"id": 1,
 				"class": "ScalarParameter",
-				"name": "MaterialExpressionScalarParameter_5",
+				"name": "MaterialExpressionScalarParameter_0",
 				"desc": "Opacity where the glass faces the camera.",
 				"props":
 				{
@@ -66,7 +66,7 @@
 			{
 				"id": 2,
 				"class": "ScalarParameter",
-				"name": "MaterialExpressionScalarParameter_6",
+				"name": "MaterialExpressionScalarParameter_1",
 				"desc": "Opacity at the silhouette, where the light skims the glass.",
 				"props":
 				{
@@ -80,7 +80,7 @@
 			{
 				"id": 3,
 				"class": "ScalarParameter",
-				"name": "MaterialExpressionScalarParameter_7",
+				"name": "MaterialExpressionScalarParameter_2",
 				"desc": "How fast the edge opacity falls off toward the facing.",
 				"props":
 				{
@@ -95,7 +95,7 @@
 			{
 				"id": 4,
 				"class": "ScalarParameter",
-				"name": "MaterialExpressionScalarParameter_8",
+				"name": "MaterialExpressionScalarParameter_3",
 				"desc": "Low: sharp highlights.",
 				"props":
 				{
@@ -109,7 +109,7 @@
 			{
 				"id": 5,
 				"class": "ScalarParameter",
-				"name": "MaterialExpressionScalarParameter_9",
+				"name": "MaterialExpressionScalarParameter_4",
 				"desc": "Highlight strength.",
 				"props":
 				{
@@ -123,17 +123,17 @@
 			{
 				"id": 6,
 				"class": "PixelNormalWS",
-				"name": "MaterialExpressionPixelNormalWS_1"
+				"name": "MaterialExpressionPixelNormalWS_0"
 			},
 			{
 				"id": 7,
 				"class": "CameraVectorWS",
-				"name": "MaterialExpressionCameraVectorWS_1"
+				"name": "MaterialExpressionCameraVectorWS_0"
 			},
 			{
 				"id": 8,
 				"class": "Custom",
-				"name": "MaterialExpressionCustom_2",
+				"name": "MaterialExpressionCustom_0",
 				"inputs": [
 					{
 						"index": 0,
@@ -164,7 +164,7 @@
 			{
 				"id": 9,
 				"class": "Custom",
-				"name": "MaterialExpressionCustom_3",
+				"name": "MaterialExpressionCustom_1",
 				"inputs": [
 					{
 						"index": 0,
@@ -195,7 +195,7 @@
 			{
 				"id": 10,
 				"class": "MakeMaterialAttributes",
-				"name": "MaterialExpressionMakeMaterialAttributes_1",
+				"name": "MaterialExpressionMakeMaterialAttributes_0",
 				"inputs": [
 					{
 						"index": 0,

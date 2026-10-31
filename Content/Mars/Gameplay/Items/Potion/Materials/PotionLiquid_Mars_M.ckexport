@@ -4,7 +4,7 @@
 	"_meta":
 	{
 		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
-		"sourceHash": "d702cb4c1d49ee197822e3a136f7cf7c",
+		"sourceHash": "dd05722df109229c06e9ab2249ad32a0",
 		"exporterVersion": 3
 	},
 	"blendMode": "BLEND_Masked",
@@ -17,15 +17,16 @@
 	{
 		"CameraPositionWS": 1,
 		"Constant3Vector": 2,
-		"Custom": 1,
-		"MakeMaterialAttributes": 1,
-		"ScalarParameter": 15,
+		"Custom": 4,
+		"MakeMaterialAttributes": 4,
+		"ScalarParameter": 31,
+		"StaticSwitchParameter": 3,
 		"Subtract": 1,
 		"Time": 1,
 		"Transform": 2,
 		"TransformPosition": 2,
 		"TwoSidedSign": 1,
-		"VectorParameter": 5,
+		"VectorParameter": 6,
 		"VertexInterpolator": 1,
 		"VertexNormalWS": 1,
 		"WorldPosition": 1
@@ -36,7 +37,7 @@
 			{
 				"id": 0,
 				"class": "VectorParameter",
-				"name": "MaterialExpressionVectorParameter_5",
+				"name": "MaterialExpressionVectorParameter_6",
 				"desc": "The liquid where it is thin: the edge of the volume.",
 				"outputs": [
 					"RGB",
@@ -57,7 +58,7 @@
 			{
 				"id": 1,
 				"class": "VectorParameter",
-				"name": "MaterialExpressionVectorParameter_6",
+				"name": "MaterialExpressionVectorParameter_7",
 				"desc": "The liquid where it is thick: the middle of the flask.",
 				"outputs": [
 					"RGB",
@@ -78,7 +79,7 @@
 			{
 				"id": 2,
 				"class": "ScalarParameter",
-				"name": "MaterialExpressionScalarParameter_15",
+				"name": "MaterialExpressionScalarParameter_31",
 				"desc": "How fast the colour goes from Liquid to Deep with the depth looked through (per radius).",
 				"props":
 				{
@@ -92,7 +93,7 @@
 			{
 				"id": 3,
 				"class": "ScalarParameter",
-				"name": "MaterialExpressionScalarParameter_16",
+				"name": "MaterialExpressionScalarParameter_32",
 				"desc": "Emissive strength: the potion's own light (it still takes the scene's).",
 				"props":
 				{
@@ -106,7 +107,7 @@
 			{
 				"id": 4,
 				"class": "ScalarParameter",
-				"name": "MaterialExpressionScalarParameter_17",
+				"name": "MaterialExpressionScalarParameter_33",
 				"desc": "Light through the thin edge of the volume.",
 				"props":
 				{
@@ -120,7 +121,7 @@
 			{
 				"id": 5,
 				"class": "ScalarParameter",
-				"name": "MaterialExpressionScalarParameter_18",
+				"name": "MaterialExpressionScalarParameter_34",
 				"desc": "Wall and surface roughness: low for a glossy liquid.",
 				"props":
 				{
@@ -134,7 +135,7 @@
 			{
 				"id": 6,
 				"class": "VectorParameter",
-				"name": "MaterialExpressionVectorParameter_7",
+				"name": "MaterialExpressionVectorParameter_8",
 				"desc": "The top of the liquid, mixed over the depth colour.",
 				"outputs": [
 					"RGB",
@@ -155,7 +156,7 @@
 			{
 				"id": 7,
 				"class": "ScalarParameter",
-				"name": "MaterialExpressionScalarParameter_19",
+				"name": "MaterialExpressionScalarParameter_35",
 				"desc": "How much of the top is Surface Color (0: only the depth under it).",
 				"props":
 				{
@@ -169,7 +170,7 @@
 			{
 				"id": 8,
 				"class": "VectorParameter",
-				"name": "MaterialExpressionVectorParameter_8",
+				"name": "MaterialExpressionVectorParameter_9",
 				"desc": "The line where the liquid meets the glass (and the motes).",
 				"outputs": [
 					"RGB",
@@ -190,7 +191,7 @@
 			{
 				"id": 9,
 				"class": "ScalarParameter",
-				"name": "MaterialExpressionScalarParameter_20",
+				"name": "MaterialExpressionScalarParameter_36",
 				"desc": "The meniscus line's width, in radii.",
 				"props":
 				{
@@ -204,7 +205,7 @@
 			{
 				"id": 10,
 				"class": "ScalarParameter",
-				"name": "MaterialExpressionScalarParameter_21",
+				"name": "MaterialExpressionScalarParameter_37",
 				"desc": "Ripple height at full slosh, in radii.",
 				"props":
 				{
@@ -218,7 +219,7 @@
 			{
 				"id": 11,
 				"class": "ScalarParameter",
-				"name": "MaterialExpressionScalarParameter_22",
+				"name": "MaterialExpressionScalarParameter_38",
 				"desc": "Waves across the surface.",
 				"props":
 				{
@@ -233,7 +234,7 @@
 			{
 				"id": 12,
 				"class": "ScalarParameter",
-				"name": "MaterialExpressionScalarParameter_23",
+				"name": "MaterialExpressionScalarParameter_39",
 				"desc": "How fast the waves travel (radians/s).",
 				"props":
 				{
@@ -247,7 +248,78 @@
 			{
 				"id": 13,
 				"class": "ScalarParameter",
-				"name": "MaterialExpressionScalarParameter_24",
+				"name": "MaterialExpressionScalarParameter_40",
+				"desc": "Height of the chop at full Agitation, in radii: how far a jolt tears the flat cap.",
+				"props":
+				{
+					"DefaultValue": 0.14000000059604645,
+					"SliderMax": 0.5,
+					"ParameterName": "Breakup Amount",
+					"Group": "Breakup",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 14,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_41",
+				"desc": "The chop's frequency over the swell's; it climbs further with Agitation, so a hard jolt breaks the cap finer.",
+				"props":
+				{
+					"DefaultValue": 1.2999999523162842,
+					"SliderMin": 0.5,
+					"SliderMax": 10,
+					"ParameterName": "Breakup Frequency",
+					"Group": "Breakup",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 15,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_42",
+				"desc": "How fast the chop churns (radians/s at rest; faster as it agitates).",
+				"props":
+				{
+					"DefaultValue": 7,
+					"SliderMax": 20,
+					"ParameterName": "Breakup Speed",
+					"Group": "Breakup",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 16,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_43",
+				"desc": "Depth of the white, bubbly band under the surface at full Agitation, in radii.",
+				"props":
+				{
+					"DefaultValue": 0.34999999403953552,
+					"SliderMax": 1.5,
+					"ParameterName": "Aeration",
+					"Group": "Breakup",
+					"SortPriority": 3
+				}
+			},
+			{
+				"id": 17,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_44",
+				"desc": "Whitecaps on the crests and the foam sizzle over the cap while it churns.",
+				"props":
+				{
+					"DefaultValue": 1,
+					"SliderMax": 2,
+					"ParameterName": "Foam Cap",
+					"Group": "Breakup",
+					"SortPriority": 4
+				}
+			},
+			{
+				"id": 18,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_45",
 				"desc": "Brightness of the sparks rising through the liquid (0: none).",
 				"props":
 				{
@@ -259,9 +331,9 @@
 				}
 			},
 			{
-				"id": 14,
+				"id": 19,
 				"class": "ScalarParameter",
-				"name": "MaterialExpressionScalarParameter_25",
+				"name": "MaterialExpressionScalarParameter_46",
 				"desc": "Cells per radius: more, smaller motes.",
 				"props":
 				{
@@ -274,9 +346,9 @@
 				}
 			},
 			{
-				"id": 15,
+				"id": 20,
 				"class": "ScalarParameter",
-				"name": "MaterialExpressionScalarParameter_26",
+				"name": "MaterialExpressionScalarParameter_47",
 				"desc": "How fast the motes rise (cells per second).",
 				"props":
 				{
@@ -288,9 +360,225 @@
 				}
 			},
 			{
-				"id": 16,
+				"id": 21,
+				"class": "StaticSwitchParameter",
+				"name": "MaterialExpressionStaticSwitchParameter_3",
+				"desc": "A boil: bubbles rising through the liquid and popping on its top.",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "True",
+						"node": 55,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "False",
+						"node": 53,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"ParameterName": "Bubbling",
+					"Group": "Bubbling",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 22,
 				"class": "ScalarParameter",
-				"name": "MaterialExpressionScalarParameter_27",
+				"name": "MaterialExpressionScalarParameter_48",
+				"desc": "How hard it boils: the surface's churn, the froth and the bubbles' brightness.",
+				"props":
+				{
+					"DefaultValue": 1,
+					"SliderMax": 2,
+					"ParameterName": "Boil",
+					"Group": "Bubbling",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 23,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_49",
+				"desc": "Cells per radius: more, smaller bubbles.",
+				"props":
+				{
+					"DefaultValue": 3,
+					"SliderMin": 0.5,
+					"SliderMax": 10,
+					"ParameterName": "Bubble Scale",
+					"Group": "Bubbling",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 24,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_50",
+				"desc": "How fast the bubbles rise (cells per second) and how often they pop.",
+				"props":
+				{
+					"DefaultValue": 1.2000000476837158,
+					"SliderMax": 6,
+					"ParameterName": "Bubble Speed",
+					"Group": "Bubbling",
+					"SortPriority": 3
+				}
+			},
+			{
+				"id": 25,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_51",
+				"desc": "Share of cells that hold a bubble.",
+				"props":
+				{
+					"DefaultValue": 0.44999998807907104,
+					"SliderMax": 1,
+					"ParameterName": "Bubble Density",
+					"Group": "Bubbling",
+					"SortPriority": 4
+				}
+			},
+			{
+				"id": 26,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_52",
+				"desc": "How far the froth beads swell the band round the rim (0: an even band).",
+				"props":
+				{
+					"DefaultValue": 1,
+					"SliderMax": 3,
+					"ParameterName": "Rim Froth",
+					"Group": "Bubbling",
+					"SortPriority": 5
+				}
+			},
+			{
+				"id": 27,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_53",
+				"desc": "Froth beads round the rim at Boil 1 and Bubble Density 0.5; more as it boils harder or bubbles more.",
+				"props":
+				{
+					"DefaultValue": 16,
+					"SliderMin": 3,
+					"SliderMax": 64,
+					"ParameterName": "Rim Froth Frequency",
+					"Group": "Bubbling",
+					"SortPriority": 6
+				}
+			},
+			{
+				"id": 28,
+				"class": "StaticSwitchParameter",
+				"name": "MaterialExpressionStaticSwitchParameter_4",
+				"desc": "A pickling brine: cloudy, with sediment and suspended spices.",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "True",
+						"node": 60,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "False",
+						"node": 21,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"ParameterName": "Brine",
+					"Group": "Brine",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 29,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_10",
+				"desc": "The brine's cloud, which the depth looked through fades toward.",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.860000,G=0.850000,B=0.550000,A=1.000000)",
+					"ParameterName": "Haze Color",
+					"Group": "Brine",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 30,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_54",
+				"desc": "How cloudy: haze per radius looked through.",
+				"props":
+				{
+					"DefaultValue": 1.1000000238418579,
+					"SliderMax": 8,
+					"ParameterName": "Turbidity",
+					"Group": "Brine",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 31,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_55",
+				"desc": "Extra cloud hanging low in the vessel.",
+				"props":
+				{
+					"DefaultValue": 0.60000002384185791,
+					"SliderMax": 3,
+					"ParameterName": "Sediment",
+					"Group": "Brine",
+					"SortPriority": 3
+				}
+			},
+			{
+				"id": 32,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_56",
+				"desc": "Share of cells holding a peppercorn, a mustard seed or a fleck of dill.",
+				"props":
+				{
+					"DefaultValue": 0.34999999403953552,
+					"SliderMax": 1,
+					"ParameterName": "Speck Amount",
+					"Group": "Brine",
+					"SortPriority": 4
+				}
+			},
+			{
+				"id": 33,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_57",
+				"desc": "Cells per radius: more, smaller spices.",
+				"props":
+				{
+					"DefaultValue": 4,
+					"SliderMin": 1,
+					"SliderMax": 16,
+					"ParameterName": "Speck Scale",
+					"Group": "Brine",
+					"SortPriority": 5
+				}
+			},
+			{
+				"id": 34,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_58",
 				"desc": "The liquid sphere's local radius, cm (the mesh's).",
 				"props":
 				{
@@ -303,9 +591,9 @@
 				}
 			},
 			{
-				"id": 17,
+				"id": 35,
 				"class": "VectorParameter",
-				"name": "MaterialExpressionVectorParameter_9",
+				"name": "MaterialExpressionVectorParameter_11",
 				"desc": "Custom primitive data 0-3: the surface normal (world) and the level (radii from the centre).",
 				"outputs": [
 					"RGB",
@@ -325,9 +613,9 @@
 				}
 			},
 			{
-				"id": 18,
+				"id": 36,
 				"class": "ScalarParameter",
-				"name": "MaterialExpressionScalarParameter_28",
+				"name": "MaterialExpressionScalarParameter_59",
 				"desc": "Custom primitive data 4: ripple energy, 0 still.",
 				"props":
 				{
@@ -340,9 +628,9 @@
 				}
 			},
 			{
-				"id": 19,
+				"id": 37,
 				"class": "ScalarParameter",
-				"name": "MaterialExpressionScalarParameter_29",
+				"name": "MaterialExpressionScalarParameter_60",
 				"desc": "Custom primitive data 5: this potion's random phase.",
 				"props":
 				{
@@ -355,7 +643,22 @@
 				}
 			},
 			{
-				"id": 20,
+				"id": 38,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_61",
+				"desc": "Custom primitive data 6: the lagged slosh energy that breaks the cap up, 0 calm.",
+				"props":
+				{
+					"SliderMax": 1,
+					"bUseCustomPrimitiveData": true,
+					"PrimitiveDataIndex": 6,
+					"ParameterName": "Agitation",
+					"Group": "Per Potion (Custom Primitive Data)",
+					"SortPriority": 3
+				}
+			},
+			{
+				"id": 39,
 				"class": "WorldPosition",
 				"name": "MaterialExpressionWorldPosition_1",
 				"outputs": [
@@ -369,14 +672,14 @@
 				}
 			},
 			{
-				"id": 21,
+				"id": 40,
 				"class": "TransformPosition",
 				"name": "MaterialExpressionTransformPosition_2",
 				"inputs": [
 					{
 						"index": 0,
 						"name": "Input",
-						"node": 20,
+						"node": 39,
 						"output": 0,
 						"mask": "rgb"
 					}
@@ -387,27 +690,27 @@
 				}
 			},
 			{
-				"id": 22,
+				"id": 41,
 				"class": "VertexInterpolator",
 				"name": "MaterialExpressionVertexInterpolator_1",
 				"inputs": [
 					{
 						"index": 0,
 						"name": "VS",
-						"node": 21,
+						"node": 40,
 						"output": 0
 					}
 				]
 			},
 			{
-				"id": 23,
+				"id": 42,
 				"class": "Transform",
 				"name": "MaterialExpressionTransform_2",
 				"inputs": [
 					{
 						"index": 0,
 						"name": "Input",
-						"node": 22,
+						"node": 41,
 						"output": 0
 					}
 				],
@@ -417,14 +720,14 @@
 				}
 			},
 			{
-				"id": 24,
+				"id": 43,
 				"class": "TransformPosition",
 				"name": "MaterialExpressionTransformPosition_3",
 				"inputs": [
 					{
 						"index": 0,
 						"name": "Input",
-						"node": 25,
+						"node": 44,
 						"output": 0,
 						"mask": "rgb"
 					}
@@ -435,7 +738,7 @@
 				}
 			},
 			{
-				"id": 25,
+				"id": 44,
 				"class": "Constant3Vector",
 				"name": "MaterialExpressionConstant3Vector_2",
 				"outputs": [
@@ -450,38 +753,38 @@
 				}
 			},
 			{
-				"id": 26,
+				"id": 45,
 				"class": "CameraPositionWS",
 				"name": "MaterialExpressionCameraPositionWS_1"
 			},
 			{
-				"id": 27,
+				"id": 46,
 				"class": "Subtract",
 				"name": "MaterialExpressionSubtract_1",
 				"inputs": [
 					{
 						"index": 0,
 						"name": "A",
-						"node": 26,
+						"node": 45,
 						"output": 0
 					},
 					{
 						"index": 1,
 						"name": "B",
-						"node": 24,
+						"node": 43,
 						"output": 0
 					}
 				]
 			},
 			{
-				"id": 28,
+				"id": 47,
 				"class": "Transform",
 				"name": "MaterialExpressionTransform_3",
 				"inputs": [
 					{
 						"index": 0,
 						"name": "Input",
-						"node": 29,
+						"node": 48,
 						"output": 0,
 						"mask": "rgb"
 					}
@@ -492,7 +795,7 @@
 				}
 			},
 			{
-				"id": 29,
+				"id": 48,
 				"class": "Constant3Vector",
 				"name": "MaterialExpressionConstant3Vector_3",
 				"outputs": [
@@ -507,184 +810,287 @@
 				}
 			},
 			{
-				"id": 30,
+				"id": 49,
 				"class": "Time",
 				"name": "MaterialExpressionTime_1"
 			},
 			{
-				"id": 31,
+				"id": 50,
 				"class": "TwoSidedSign",
 				"name": "MaterialExpressionTwoSidedSign_1"
 			},
 			{
-				"id": 32,
+				"id": 51,
 				"class": "VertexNormalWS",
 				"name": "MaterialExpressionVertexNormalWS_1"
 			},
 			{
-				"id": 33,
+				"id": 52,
 				"class": "Custom",
-				"name": "MaterialExpressionCustom_1",
+				"name": "MaterialExpressionCustom_4",
 				"inputs": [
 					{
 						"index": 0,
 						"name": "D",
-						"node": 23,
+						"node": 42,
 						"output": 0
 					},
 					{
 						"index": 1,
 						"name": "CamRel",
-						"node": 27,
+						"node": 46,
 						"output": 0
 					},
 					{
 						"index": 2,
 						"name": "Unit",
-						"node": 28,
+						"node": 47,
 						"output": 0
 					},
 					{
 						"index": 3,
 						"name": "Radius",
-						"node": 16,
+						"node": 34,
 						"output": 0
 					},
 					{
 						"index": 4,
 						"name": "Surface",
-						"node": 17,
+						"node": 35,
 						"output": 5,
 						"mask": "rgba"
 					},
 					{
 						"index": 5,
 						"name": "Slosh",
-						"node": 18,
+						"node": 36,
 						"output": 0
 					},
 					{
 						"index": 6,
-						"name": "Phase",
-						"node": 19,
+						"name": "Agitation",
+						"node": 38,
 						"output": 0
 					},
 					{
 						"index": 7,
-						"name": "Time",
-						"node": 30,
+						"name": "Phase",
+						"node": 37,
 						"output": 0
 					},
 					{
 						"index": 8,
-						"name": "Sign",
-						"node": 31,
+						"name": "Time",
+						"node": 49,
 						"output": 0
 					},
 					{
 						"index": 9,
-						"name": "Nw",
-						"node": 32,
+						"name": "Sign",
+						"node": 50,
 						"output": 0
 					},
 					{
 						"index": 10,
+						"name": "Nw",
+						"node": 51,
+						"output": 0
+					},
+					{
+						"index": 11,
 						"name": "LiquidColor",
 						"node": 0,
 						"output": 0,
 						"mask": "rgb"
 					},
 					{
-						"index": 11,
+						"index": 12,
 						"name": "DeepColor",
 						"node": 1,
 						"output": 0,
 						"mask": "rgb"
 					},
 					{
-						"index": 12,
+						"index": 13,
 						"name": "Density",
 						"node": 2,
 						"output": 0
 					},
 					{
-						"index": 13,
+						"index": 14,
 						"name": "Glow",
 						"node": 3,
 						"output": 0
 					},
 					{
-						"index": 14,
+						"index": 15,
 						"name": "RimLight",
 						"node": 4,
 						"output": 0
 					},
 					{
-						"index": 15,
+						"index": 16,
 						"name": "Roughness",
 						"node": 5,
 						"output": 0
 					},
 					{
-						"index": 16,
+						"index": 17,
 						"name": "SurfaceColor",
 						"node": 6,
 						"output": 0,
 						"mask": "rgb"
 					},
 					{
-						"index": 17,
+						"index": 18,
 						"name": "SurfaceMix",
 						"node": 7,
 						"output": 0
 					},
 					{
-						"index": 18,
+						"index": 19,
 						"name": "FoamColor",
 						"node": 8,
 						"output": 0,
 						"mask": "rgb"
 					},
 					{
-						"index": 19,
+						"index": 20,
 						"name": "FoamWidth",
 						"node": 9,
 						"output": 0
 					},
 					{
-						"index": 20,
+						"index": 21,
 						"name": "RippleAmount",
 						"node": 10,
 						"output": 0
 					},
 					{
-						"index": 21,
+						"index": 22,
 						"name": "RippleScale",
 						"node": 11,
 						"output": 0
 					},
 					{
-						"index": 22,
+						"index": 23,
 						"name": "RippleSpeed",
 						"node": 12,
 						"output": 0
 					},
 					{
-						"index": 23,
-						"name": "MoteAmount",
-						"node": 13,
-						"output": 0
-					},
-					{
 						"index": 24,
-						"name": "MoteScale",
-						"node": 14,
+						"name": "MoteAmount",
+						"node": 18,
 						"output": 0
 					},
 					{
 						"index": 25,
+						"name": "MoteScale",
+						"node": 19,
+						"output": 0
+					},
+					{
+						"index": 26,
 						"name": "MoteSpeed",
+						"node": 20,
+						"output": 0
+					},
+					{
+						"index": 27,
+						"name": "Boil",
+						"node": 22,
+						"output": 0
+					},
+					{
+						"index": 28,
+						"name": "BubbleScale",
+						"node": 23,
+						"output": 0
+					},
+					{
+						"index": 29,
+						"name": "BubbleSpeed",
+						"node": 24,
+						"output": 0
+					},
+					{
+						"index": 30,
+						"name": "BubbleDensity",
+						"node": 25,
+						"output": 0
+					},
+					{
+						"index": 31,
+						"name": "RimFroth",
+						"node": 26,
+						"output": 0
+					},
+					{
+						"index": 32,
+						"name": "RimFrothFrequency",
+						"node": 27,
+						"output": 0
+					},
+					{
+						"index": 33,
+						"name": "BreakupAmount",
+						"node": 13,
+						"output": 0
+					},
+					{
+						"index": 34,
+						"name": "BreakupFrequency",
+						"node": 14,
+						"output": 0
+					},
+					{
+						"index": 35,
+						"name": "BreakupSpeed",
 						"node": 15,
+						"output": 0
+					},
+					{
+						"index": 36,
+						"name": "Aeration",
+						"node": 16,
+						"output": 0
+					},
+					{
+						"index": 37,
+						"name": "FoamCap",
+						"node": 17,
+						"output": 0
+					},
+					{
+						"index": 38,
+						"name": "HazeColor",
+						"node": 29,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 39,
+						"name": "Turbidity",
+						"node": 30,
+						"output": 0
+					},
+					{
+						"index": 40,
+						"name": "Sediment",
+						"node": 31,
+						"output": 0
+					},
+					{
+						"index": 41,
+						"name": "SpeckAmount",
+						"node": 32,
+						"output": 0
+					},
+					{
+						"index": 42,
+						"name": "SpeckScale",
+						"node": 33,
 						"output": 0
 					}
 				],
@@ -697,52 +1103,1036 @@
 				],
 				"props":
 				{
-					"Code": "\nfloat S = max(length(Unit), 1e-4);\nfloat R = max(Radius * S, 1e-3);\nfloat3 N = normalize(Surface.xyz + float3(0.0, 0.0, 1e-4));\nfloat h = Surface.w * R;\n\n// the surface's own frame, for the ripples\nfloat3 T1 = normalize(cross(abs(N.x) < 0.9 ? float3(1.0, 0.0, 0.0) : float3(0.0, 1.0, 0.0), N));\nfloat3 T2 = cross(N, T1);\n\n// the camera ray through this pixel and where it crosses the flat surface (0 at the camera, 1 at this pixel)\nfloat3 V = D - CamRel;\nfloat vN = dot(V, N);\nfloat tPlane = (h - dot(CamRel, N)) / (abs(vN) > 1e-5 ? vN : 1e-5);\nfloat3 Sflat = CamRel + V * saturate(tPlane);\n\n// ripples: three travelling waves on the surface's frame, at rest a faint shimmer, louder while it sloshes.\n// [0] at this pixel (the clip), [1] at the surface crossing (the surface's normal)\nfloat amp = RippleAmount * R * (0.04 + Slosh);\nfloat ripH[2];\nfloat3 ripG[2];\n[unroll] for (int k = 0; k < 2; ++k)\n{\n    float3 X = k == 0 ? D : Sflat;\n    float2 uv = float2(dot(X, T1), dot(X, T2)) / R * RippleScale;\n    float tt = Time * RippleSpeed + Phase * 17.0;\n    float2 d0 = float2(0.96, 0.28);\n    float2 d1 = float2(-0.53, 0.85);\n    float2 d2 = float2(-0.39, -0.92);\n    float a0 = dot(uv, d0) + tt;\n    float a1 = dot(uv, d1) * 1.7 + tt * 1.31;\n    float a2 = dot(uv, d2) * 2.9 + tt * 1.87;\n    ripH[k] = amp * (sin(a0) + 0.6 * sin(a1) + 0.35 * sin(a2)) / 1.95;\n    float2 g = d0 * cos(a0) + (0.6 * 1.7) * d1 * cos(a1) + (0.35 * 2.9) * d2 * cos(a2);\n    ripG[k] = (amp * RippleScale / (1.95 * R)) * (g.x * T1 + g.y * T2);\n}\n\n// signed height of this pixel over the rippled surface: above it is air\nfloat s = dot(D, N) - h - ripH[0];\nOutMask = s <= 0.0 ? 1.0 : 0.0;\n\nfloat3 Vn = normalize(V);\nbool front = Sign > 0.0;\nfloat path;\nfloat3 n;\nfloat3 col;\nfloat3 glow;\nif (front)\n{\n    // the wall: the liquid between here and where the ray leaves it (the far side of the sphere, or the surface if the\n    // ray rises through it first), in radii\n    float b = dot(D, Vn);\n    float c = dot(D, D) - R * R;\n    float tS = -b + sqrt(max(b * b - c, 0.0));\n    float vnN = dot(Vn, N);\n    float tP = vnN > 1e-4 ? (h - dot(D, N)) / vnN : 1e9;\n    path = max(min(tS, tP), 0.0) / R;\n    float depth = 1.0 - exp(-path * Density);\n    n = normalize(Nw);\n    col = lerp(LiquidColor, DeepColor, depth);\n\n    // a bright line where the liquid meets the glass, under the surface\n    float foam = 1.0 - smoothstep(0.0, FoamWidth * R, -s);\n    // light through the thin edge of the volume\n    float rim = pow(1.0 - saturate(dot(n, -Vn)), 3.0) * RimLight;\n    // motes: two layers of rising sparks inside the volume, along the ray (parallax: they sit in the liquid, not on the\n    // glass)\n    float motes = 0.0;\n    [unroll] for (int m = 0; m < 2; ++m)\n    {\n        float3 Q = (D + Vn * (path * R * (m == 0 ? 0.3 : 0.7))) / R * MoteScale + N * (Time * MoteSpeed) + Phase * 31.0 + m * 7.31;\n        float3 cell = floor(Q);\n        float3 f = frac(Q) - 0.5;\n        float3 hsh = frac(sin(float3(dot(cell, float3(127.1, 311.7, 74.7)), dot(cell, float3(269.5, 183.3, 246.1)),\n                                     dot(cell, float3(113.5, 271.9, 124.6)))) * 43758.5453);\n        float3 off = (hsh - 0.5) * 0.6;\n        float on = step(0.55, hsh.x);\n        float r = length(f - off);\n        motes += on * (1.0 - smoothstep(0.02, 0.09, r));\n    }\n    col = lerp(col, FoamColor, foam * 0.6);\n    glow = col * Glow * (1.0 - 0.5 * depth) + LiquidColor * (rim * Glow) + FoamColor * (motes * MoteAmount * Glow);\n}\nelse\n{\n    // the surface, seen at the point the ray crosses it: lit with the rippled normal, coloured by the depth of liquid\n    // under it along the ray (the crossing to this back face)\n    float3 Sp = Sflat;\n    path = length(D - Sp) / R;\n    float depth = 1.0 - exp(-path * Density);\n    n = normalize(N - ripG[1]);\n    // the meniscus: a pale ring where the surface meets the glass (the cut circle's radius is sqrt(R^2 - h^2))\n    float3 toS = Sp - N * h;\n    float radial = length(toS - N * dot(toS, N)) / sqrt(max(R * R - h * h, 1e-4));\n    float meniscus = smoothstep(1.0 - FoamWidth * 2.5, 1.0, radial);\n    col = lerp(lerp(LiquidColor, DeepColor, depth), SurfaceColor, SurfaceMix);\n    col = lerp(col, FoamColor, meniscus * 0.85);\n    glow = col * (Glow * 0.6);\n}\n\nOutNormal = n;\nOutEmissive = glow;\nOutRough = Roughness;\nreturn col;\n",
+					"Code": "\n#ifndef MARS_LIQ_HASH3\n#define MARS_LIQ_HASH3(c) frac(sin(float3(dot(c, float3(127.1, 311.7, 74.7)), dot(c, float3(269.5, 183.3, 246.1)), dot(c, float3(113.5, 271.9, 124.6)))) * 43758.5453)\n#endif\nfloat S = max(length(Unit), 1e-4);\nfloat R = max(Radius * S, 1e-3);\nfloat3 N = normalize(Surface.xyz + float3(0.0, 0.0, 1e-4));\nfloat h = Surface.w * R;\n\n// the surface's own frame, for the ripples\nfloat3 T1 = normalize(cross(abs(N.x) < 0.9 ? float3(1.0, 0.0, 0.0) : float3(0.0, 1.0, 0.0), N));\nfloat3 T2 = cross(N, T1);\n\n// the camera ray through this pixel and where it crosses the flat surface (0 at the camera, 1 at this pixel)\nfloat3 V = D - CamRel;\nfloat vN = dot(V, N);\nfloat tPlane = (h - dot(CamRel, N)) / (abs(vN) > 1e-5 ? vN : 1e-5);\nfloat3 Sflat = CamRel + V * saturate(tPlane);\n\n// the surface is a height field over the plane, in its own frame (T1, T2), measured along N:\n//   swell  three long travelling waves, a faint shimmer at rest, louder while it sloshes (and while it boils);\n//   chop   the breakup: crossed products of shorter waves, sharpened into crests, whose height grows with Agitation (the\n//          script's lagged slosh energy) and whose frequency climbs with it, so a jolt tears the flat cap into a churn\n//          that calms back into long swell as Agitation decays.\nfloat churn = 0.04 + Slosh;\nfloat rippleSpeed = RippleSpeed;\nfloat agit = saturate(Agitation);\n#if MARS_LIQ_BUBBLING\nchurn += 0.5 * Boil;\nrippleSpeed *= 1.0 + Boil;\nagit = saturate(agit + 0.35 * Boil);\n#endif\nfloat swellAmp = RippleAmount * R * churn;\nfloat chopAmp = BreakupAmount * R * agit;\nfloat chopFreq = RippleScale * BreakupFrequency * (0.5 + agit) / R;\nfloat tSwell = Time * rippleSpeed + Phase * 17.0;\nfloat tChop = Time * BreakupSpeed * (0.6 + agit) + Phase * 5.0;\n#define MARS_LIQ_HEIGHT(X, OUT) \\\n{ \\\n    float2 _p = float2(dot(X, T1), dot(X, T2)); \\\n    float2 _a = _p * (RippleScale / R); \\\n    OUT = swellAmp * (sin(dot(_a, float2(0.96, 0.28)) + tSwell) + 0.6 * sin(dot(_a, float2(-0.53, 0.85)) * 1.7 + tSwell * 1.31) \\\n        + 0.35 * sin(dot(_a, float2(-0.39, -0.92)) * 2.9 + tSwell * 1.87)) / 1.95; \\\n    float2 _c = _p * chopFreq; \\\n    float _w = sin(dot(_c, float2(0.8, 0.6)) + tChop) * sin(dot(_c, float2(-0.6, 0.8)) * 1.3 - tChop * 1.2) \\\n        + 0.5 * sin(dot(_c, float2(0.31, -0.95)) * 2.3 + tChop * 1.7) * sin(dot(_c, float2(0.95, 0.31)) * 1.9 - tChop * 0.9); \\\n    OUT += chopAmp * sign(_w) * pow(abs(_w) / 1.5, 0.6); \\\n}\n\n// signed height of this pixel over the surface: above it is air\nfloat hereH;\nMARS_LIQ_HEIGHT(D, hereH);\nfloat s = dot(D, N) - h - hereH;\nOutMask = s <= 0.0 ? 1.0 : 0.0;\n\n// where the camera ray first meets the surface: march from where the ray enters the sphere, or comes down past the\n// highest crest, to this pixel (which is under the surface: the clip kept it), then refine by bisection. A front face\n// only needs the flat crossing for its rim measure; a back face shades the hit.\nfloat3 Ssurf = Sflat;\nfloat3 surfN = N;\nfloat surfH = 0.0;\nif (Sign <= 0.0)\n{\n    float hiCrest = abs(swellAmp) + chopAmp * 1.1 + 1e-3;\n    float va = dot(V, V);\n    float vb = dot(CamRel, V);\n    float vc = dot(CamRel, CamRel) - R * R;\n    float disc = vb * vb - va * vc;\n    float tIn = disc > 0.0 ? (-vb - sqrt(disc)) / va : 0.0;\n    float t0 = max(tIn, 0.0);\n    if (vN < -1e-5)\n    { t0 = max(t0, (h + hiCrest - dot(CamRel, N)) / vN); }\n    t0 = min(t0, 1.0);\n    float tLo = t0;\n    float tHi = 1.0;\n    bool found = false;\n    [unroll] for (int m = 1; m <= 12; ++m)\n    {\n        float t = lerp(t0, 1.0, m / 12.0);\n        float3 X = CamRel + V * t;\n        float hh;\n        MARS_LIQ_HEIGHT(X, hh);\n        if (!found && dot(X, N) - h - hh <= 0.0)\n        {\n            tHi = t;\n            found = true;\n        }\n        if (!found)\n        { tLo = t; }\n    }\n    [unroll] for (int b = 0; b < 4; ++b)\n    {\n        float t = 0.5 * (tLo + tHi);\n        float3 X = CamRel + V * t;\n        float hh;\n        MARS_LIQ_HEIGHT(X, hh);\n        if (dot(X, N) - h - hh <= 0.0)\n        { tHi = t; }\n        else\n        { tLo = t; }\n    }\n    Ssurf = CamRel + V * tHi;\n    // the normal from the height field's slope (central differences along the surface's frame)\n    float e = 0.02 * R;\n    float hx0, hx1, hy0, hy1;\n    float3 Sx0 = Ssurf - T1 * e;\n    float3 Sx1 = Ssurf + T1 * e;\n    float3 Sy0 = Ssurf - T2 * e;\n    float3 Sy1 = Ssurf + T2 * e;\n    MARS_LIQ_HEIGHT(Sx0, hx0);\n    MARS_LIQ_HEIGHT(Sx1, hx1);\n    MARS_LIQ_HEIGHT(Sy0, hy0);\n    MARS_LIQ_HEIGHT(Sy1, hy1);\n    surfN = normalize(N - ((hx1 - hx0) * T1 + (hy1 - hy0) * T2) / (2.0 * e));\n    MARS_LIQ_HEIGHT(Ssurf, surfH);\n}\n\nfloat foamWidth = FoamWidth;\n// how far the rim bands swell here (0: even); only the boil sets it\nfloat rimFroth = 0.0;\n#if MARS_LIQ_BUBBLING\nfoamWidth *= 1.0 + 1.5 * Boil;\n// the rim froth: round the vessel's axis the band breaks into beads of froth, each swelling and popping on its own clock\n// as the bubbles reach the edge, over a wobble travelling round the rim. The beads' count round the rim (the band's\n// frequency) rises with the boil and the bubbles' density; both rim bands (the line on the glass, the meniscus on the\n// top) swell by it, the top's capped so the froth never floods the surface. Measured at this pixel on the glass, at the\n// surface crossing on the top.\n{\n    float3 Xr = Sign > 0.0 ? D : Ssurf;\n    float theta = atan2(dot(Xr, T2), dot(Xr, T1)) * (0.5 / 3.14159265) + 0.5;\n    float beads = max(3.0, round(RimFrothFrequency * (0.5 + 0.5 * Boil) * (0.5 + BubbleDensity)));\n    float u = theta * beads;\n    float3 rh = MARS_LIQ_HASH3(float3(fmod(floor(u), beads), 5.3, Phase * 11.0));\n    float rf = frac(u) - 0.5 - (rh.z - 0.5) * 0.3;\n    float rlife = frac(Time * BubbleSpeed * 0.7 + rh.x);\n    float rsize = lerp(0.18, 0.45, rh.y) * smoothstep(0.0, 0.7, rlife) * (1.0 - step(0.9, rlife));\n    float bead = sqrt(saturate(1.0 - (rf * rf) / max(rsize * rsize, 1e-4)));\n    float wobble = 0.5 + 0.5 * sin(theta * 6.2831853 * beads * 0.5 + Time * rippleSpeed);\n    rimFroth = saturate(RimFroth * Boil * (bead + 0.25 * wobble));\n}\n#endif\n\nfloat3 Vn = normalize(V);\nbool front = Sign > 0.0;\nfloat path;\nfloat3 n;\nfloat3 col;\nfloat3 glow;\nif (front)\n{\n    // the wall: the liquid between here and where the ray leaves it (the far side of the sphere, or the surface if the\n    // ray rises through it first), in radii\n    float b = dot(D, Vn);\n    float c = dot(D, D) - R * R;\n    float tS = -b + sqrt(max(b * b - c, 0.0));\n    float vnN = dot(Vn, N);\n    float tP = vnN > 1e-4 ? (h - dot(D, N)) / vnN : 1e9;\n    path = max(min(tS, tP), 0.0) / R;\n    float depth = 1.0 - exp(-path * Density);\n    n = normalize(Nw);\n    col = lerp(LiquidColor, DeepColor, depth);\n#if MARS_LIQ_BRINE\n    // cloudy: the haze thickens with the depth looked through, and thicker still low down where the sediment hangs\n    float3 mid = D + Vn * (path * R * 0.5);\n    float low = 1.0 - smoothstep(-0.9, 0.1, dot(mid, N) / R);\n    float haze = 1.0 - exp(-path * (Turbidity + Sediment * low * 3.0));\n    col = lerp(col, HazeColor, haze);\n#endif\n\n    // a bright line where the liquid meets the glass, under the surface\n    float foam = 1.0 - smoothstep(0.0, foamWidth * (1.0 + 1.5 * rimFroth) * R, -s);\n    // light through the thin edge of the volume\n    float rim = pow(1.0 - saturate(dot(n, -Vn)), 3.0) * RimLight;\n    // motes: two layers of rising sparks inside the volume, along the ray (parallax: they sit in the liquid, not on the\n    // glass)\n    float motes = 0.0;\n    [unroll] for (int m = 0; m < 2; ++m)\n    {\n        float3 Q = (D + Vn * (path * R * (m == 0 ? 0.3 : 0.7))) / R * MoteScale - N * (Time * MoteSpeed) + Phase * 31.0 + m * 7.31;\n        float3 cell = floor(Q);\n        float3 f = frac(Q) - 0.5;\n        float3 hsh = MARS_LIQ_HASH3(cell);\n        float3 off = (hsh - 0.5) * 0.6;\n        float on = step(0.55, hsh.x);\n        float r = length(f - off);\n        motes += on * (1.0 - smoothstep(0.02, 0.09, r));\n    }\n#if MARS_LIQ_BUBBLING\n    // bubbles: three layers along the ray, each bubble a bright rim round a lighter core, rising and weaving\n    float bubbles = 0.0;\n    [unroll] for (int q = 0; q < 3; ++q)\n    {\n        float along = 0.15 + 0.35 * q;\n        float3 Q = (D + Vn * (path * R * along)) / R * BubbleScale - N * (Time * BubbleSpeed * (1.0 + 0.3 * q)) + Phase * 13.0 + q * 5.17;\n        float3 cell = floor(Q);\n        float3 f = frac(Q) - 0.5;\n        float3 hsh = MARS_LIQ_HASH3(cell);\n        float on = step(1.0 - BubbleDensity, hsh.x);\n        float rad = lerp(0.1, 0.24, hsh.z);\n        float3 off = (hsh - 0.5) * (0.9 - 2.0 * rad) + (T1 * sin(Time * 5.0 + hsh.y * 6.28) + T2 * cos(Time * 4.1 + hsh.z * 6.28)) * 0.05;\n        float r = length(f - off);\n        float rimB = smoothstep(rad - 0.06, rad - 0.01, r) * (1.0 - smoothstep(rad - 0.01, rad + 0.015, r));\n        float core = 1.0 - smoothstep(rad - 0.08, rad - 0.02, r);\n        bubbles += on * (rimB + 0.2 * core) * (1.0 - 0.25 * q);\n    }\n    col = lerp(col, FoamColor, saturate(bubbles) * 0.6);\n    motes += bubbles * Boil;\n#endif\n#if MARS_LIQ_BRINE\n    // the pickling spices: peppercorns (dark, round), mustard seeds (yellow, round) and dill (green, long flecks),\n    // five layers along the ray; they sink slowly, sway, and swirl round the surface's normal when it sloshes\n    float specks = 0.0;\n    float3 speckCol = 0.0;\n    float swirl = Slosh * 2.0 + 0.15;\n    [unroll] for (int p = 0; p < 5; ++p)\n    {\n        float along = 0.1 + 0.2 * p;\n        float3 X = (D + Vn * (path * R * along)) / R;\n        float a = swirl * sin(Time * 0.6 + p * 2.1);\n        float2 xy = float2(dot(X, T1), dot(X, T2));\n        xy = float2(xy.x * cos(a) - xy.y * sin(a), xy.x * sin(a) + xy.y * cos(a));\n        float3 Q = (T1 * xy.x + T2 * xy.y + N * dot(X, N)) * SpeckScale + N * (Time * 0.04) + Phase * 23.0 + p * 3.71;\n        float3 cell = floor(Q);\n        float3 f = frac(Q) - 0.5;\n        float3 hsh = MARS_LIQ_HASH3(cell);\n        float on = step(1.0 - SpeckAmount, hsh.x);\n        float3 off = (hsh - 0.5) * 0.5;\n        float3 e = f - off;\n        float3 tint;\n        float r;\n        if (hsh.y < 0.4)\n        {   // peppercorn\n            r = length(e) / 0.12;\n            tint = float3(0.06, 0.045, 0.03);\n        }\n        else if (hsh.y < 0.75)\n        {   // mustard seed\n            r = length(e) / 0.09;\n            tint = float3(0.75, 0.55, 0.15);\n        }\n        else\n        {   // dill: a thin fleck along a random direction\n            float3 dir = normalize(hsh * 2.0 - 1.0 + 1e-3);\n            float t = dot(e, dir);\n            r = max(length(e - dir * t) / 0.035, abs(t) / 0.3);\n            tint = float3(0.18, 0.32, 0.08);\n        }\n        float hit = on * (1.0 - smoothstep(0.7, 1.0, r)) * (1.0 - 0.12 * p);\n        speckCol = lerp(speckCol, tint, hit * (1.0 - specks));\n        specks = saturate(specks + hit);\n    }\n    col = lerp(col, speckCol, specks);\n#endif\n    // the aeration: while it churns, the water under the surface turns white and fills with small bubbles (three layers\n    // along the ray), in a band deeper the harder it was jolted\n    if (agit > 0.01)\n    {\n        float bandDepth = Aeration * agit * R + 1e-3;\n        float aer = 0.4 * (1.0 - smoothstep(0.0, bandDepth, -s));\n        [unroll] for (int w = 0; w < 3; ++w)\n        {\n            float3 X = D + Vn * (path * R * (0.08 + 0.3 * w));\n            float hh;\n            MARS_LIQ_HEIGHT(X, hh);\n            float band = 1.0 - smoothstep(0.0, bandDepth, h + hh - dot(X, N));\n            float3 Q = X / R * 9.0 - N * (Time * 2.0) + Phase * 3.1 + w * 1.7;\n            float3 hsh = MARS_LIQ_HASH3(floor(Q));\n            float rad = lerp(0.12, 0.3, hsh.z);\n            float r = length(frac(Q) - 0.5 - (hsh - 0.5) * (0.9 - 2.0 * rad));\n            float ring = smoothstep(rad - 0.08, rad - 0.01, r) * (1.0 - smoothstep(rad - 0.01, rad + 0.02, r));\n            float core = 1.0 - smoothstep(rad - 0.1, rad, r);\n            aer += band * step(0.35, hsh.x) * (ring + 0.35 * core);\n        }\n        col = lerp(col, FoamColor, saturate(aer) * 0.75);\n    }\n    col = lerp(col, FoamColor, foam * 0.6);\n    glow = col * Glow * (1.0 - 0.5 * depth) + LiquidColor * (rim * Glow) + FoamColor * (motes * MoteAmount * Glow);\n}\nelse\n{\n    // the surface, seen at the point the ray crosses it: lit with the rippled normal, coloured by the depth of liquid\n    // under it along the ray (the crossing to this back face)\n    float3 Sp = Ssurf;\n    path = length(D - Sp) / R;\n    float depth = 1.0 - exp(-path * Density);\n    n = surfN;\n    // the meniscus: a pale ring where the surface meets the glass (the cut circle's radius is sqrt(R^2 - h^2))\n    float3 toS = Sp - N * h;\n    float radial = length(toS - N * dot(toS, N)) / sqrt(max(R * R - h * h, 1e-4));\n    float meniscus = smoothstep(1.0 - min(foamWidth * 2.5 * (1.0 + rimFroth), 0.3), 1.0, radial);\n    col = lerp(lerp(LiquidColor, DeepColor, depth), SurfaceColor, SurfaceMix);\n#if MARS_LIQ_BRINE\n    col = lerp(col, HazeColor, 1.0 - exp(-path * Turbidity));\n#endif\n#if MARS_LIQ_BUBBLING\n    // domes: each cell of the surface grows a bubble that swells, then pops into an expanding ring\n    float2 suv = float2(dot(Sp, T1), dot(Sp, T2)) / R * BubbleScale * 1.4 + Phase * 7.0;\n    float3 sh = MARS_LIQ_HASH3(float3(floor(suv), 3.7));\n    float2 sf = frac(suv) - 0.5;\n    float life = frac(Time * BubbleSpeed * 0.9 + sh.x);\n    float on = step(1.0 - BubbleDensity, sh.y);\n    float rad = lerp(0.12, 0.32, sh.z) * smoothstep(0.0, 0.8, life);\n    float2 e = sf - (sh.xy - 0.5) * 0.3;\n    float d = length(e) / max(rad, 1e-3);\n    float dome = on * step(life, 0.85) * (1.0 - step(1.0, d));\n    // the dome's slope bends the normal; its rim catches light\n    float slope = d / sqrt(max(1.0 - d * d, 0.02));\n    float2 dirE = e / max(length(e), 1e-3);\n    n = normalize(n - dome * slope * 0.6 * (T1 * dirE.x + T2 * dirE.y));\n    float domeRim = dome * smoothstep(0.7, 1.0, d);\n    // the pop: a thin ring racing out after the bubble bursts\n    float pop = on * step(0.85, life) * (1.0 - smoothstep(0.0, 0.05, abs(length(e) - (life - 0.85) * 3.0))) * (1.0 - life) * 6.0;\n    col = lerp(col, FoamColor, saturate((domeRim * 0.8 + pop + dome * 0.15) * Boil));\n#endif\n#if MARS_LIQ_BRINE\n    // a few seeds float on the top\n    float2 fuv = float2(dot(Sp, T1), dot(Sp, T2)) / R * SpeckScale * 0.8 + Phase * 5.0;\n    float3 fh = MARS_LIQ_HASH3(float3(floor(fuv), 9.1));\n    float fr = length(frac(fuv) - 0.5 - (fh.xy - 0.5) * 0.5);\n    float floater = step(1.0 - SpeckAmount * 0.5, fh.x) * (1.0 - smoothstep(0.04, 0.07, fr));\n    col = lerp(col, fh.z < 0.5 ? float3(0.75, 0.55, 0.15) : float3(0.18, 0.32, 0.08), floater);\n#endif\n    // whitecaps on the churned crests, and a sizzle of foam cells over the cap while it settles\n    if (agit > 0.01)\n    {\n        float crest = smoothstep(0.3, 1.0, surfH / max(chopAmp + abs(swellAmp), 1e-3)) * FoamCap * agit;\n        float2 fz = float2(dot(Sp, T1), dot(Sp, T2)) / R * 8.0 + Phase * 3.0 + float2(Time * 0.3, -Time * 0.2);\n        float3 zh = MARS_LIQ_HASH3(float3(floor(fz), 7.7));\n        float zr = length(frac(fz) - 0.5 - (zh.xy - 0.5) * 0.4);\n        float zrad = lerp(0.08, 0.22, zh.z);\n        float zring = smoothstep(zrad - 0.06, zrad, zr) * (1.0 - smoothstep(zrad, zrad + 0.03, zr));\n        float sizzle = step(1.0 - agit * 0.8, zh.x) * (zring + 0.4 * (1.0 - smoothstep(zrad - 0.06, zrad, zr)));\n        col = lerp(col, FoamColor, saturate(crest + sizzle * 0.8 * FoamCap));\n    }\n    col = lerp(col, FoamColor, meniscus * 0.85);\n    glow = col * (Glow * 0.6);\n}\n\nOutNormal = n;\nOutEmissive = glow;\nOutRough = Roughness;\nreturn col;\n",
 					"Description": "Liquid"
 				}
 			},
 			{
-				"id": 34,
+				"id": 53,
 				"class": "MakeMaterialAttributes",
-				"name": "MaterialExpressionMakeMaterialAttributes_1",
+				"name": "MaterialExpressionMakeMaterialAttributes_4",
 				"inputs": [
 					{
 						"index": 0,
 						"name": "BaseColor",
-						"node": 33,
+						"node": 52,
 						"output": 0
 					},
 					{
 						"index": 3,
 						"name": "Roughness",
-						"node": 33,
+						"node": 52,
 						"output": 4
 					},
 					{
 						"index": 5,
 						"name": "EmissiveColor",
-						"node": 33,
+						"node": 52,
 						"output": 2
 					},
 					{
 						"index": 7,
 						"name": "OpacityMask",
-						"node": 33,
+						"node": 52,
 						"output": 3
 					},
 					{
 						"index": 8,
 						"name": "Normal",
-						"node": 33,
+						"node": 52,
 						"output": 1
 					}
 				]
+			},
+			{
+				"id": 54,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_5",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "D",
+						"node": 42,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "CamRel",
+						"node": 46,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "Unit",
+						"node": 47,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "Radius",
+						"node": 34,
+						"output": 0
+					},
+					{
+						"index": 4,
+						"name": "Surface",
+						"node": 35,
+						"output": 5,
+						"mask": "rgba"
+					},
+					{
+						"index": 5,
+						"name": "Slosh",
+						"node": 36,
+						"output": 0
+					},
+					{
+						"index": 6,
+						"name": "Agitation",
+						"node": 38,
+						"output": 0
+					},
+					{
+						"index": 7,
+						"name": "Phase",
+						"node": 37,
+						"output": 0
+					},
+					{
+						"index": 8,
+						"name": "Time",
+						"node": 49,
+						"output": 0
+					},
+					{
+						"index": 9,
+						"name": "Sign",
+						"node": 50,
+						"output": 0
+					},
+					{
+						"index": 10,
+						"name": "Nw",
+						"node": 51,
+						"output": 0
+					},
+					{
+						"index": 11,
+						"name": "LiquidColor",
+						"node": 0,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 12,
+						"name": "DeepColor",
+						"node": 1,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 13,
+						"name": "Density",
+						"node": 2,
+						"output": 0
+					},
+					{
+						"index": 14,
+						"name": "Glow",
+						"node": 3,
+						"output": 0
+					},
+					{
+						"index": 15,
+						"name": "RimLight",
+						"node": 4,
+						"output": 0
+					},
+					{
+						"index": 16,
+						"name": "Roughness",
+						"node": 5,
+						"output": 0
+					},
+					{
+						"index": 17,
+						"name": "SurfaceColor",
+						"node": 6,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 18,
+						"name": "SurfaceMix",
+						"node": 7,
+						"output": 0
+					},
+					{
+						"index": 19,
+						"name": "FoamColor",
+						"node": 8,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 20,
+						"name": "FoamWidth",
+						"node": 9,
+						"output": 0
+					},
+					{
+						"index": 21,
+						"name": "RippleAmount",
+						"node": 10,
+						"output": 0
+					},
+					{
+						"index": 22,
+						"name": "RippleScale",
+						"node": 11,
+						"output": 0
+					},
+					{
+						"index": 23,
+						"name": "RippleSpeed",
+						"node": 12,
+						"output": 0
+					},
+					{
+						"index": 24,
+						"name": "MoteAmount",
+						"node": 18,
+						"output": 0
+					},
+					{
+						"index": 25,
+						"name": "MoteScale",
+						"node": 19,
+						"output": 0
+					},
+					{
+						"index": 26,
+						"name": "MoteSpeed",
+						"node": 20,
+						"output": 0
+					},
+					{
+						"index": 27,
+						"name": "Boil",
+						"node": 22,
+						"output": 0
+					},
+					{
+						"index": 28,
+						"name": "BubbleScale",
+						"node": 23,
+						"output": 0
+					},
+					{
+						"index": 29,
+						"name": "BubbleSpeed",
+						"node": 24,
+						"output": 0
+					},
+					{
+						"index": 30,
+						"name": "BubbleDensity",
+						"node": 25,
+						"output": 0
+					},
+					{
+						"index": 31,
+						"name": "RimFroth",
+						"node": 26,
+						"output": 0
+					},
+					{
+						"index": 32,
+						"name": "RimFrothFrequency",
+						"node": 27,
+						"output": 0
+					},
+					{
+						"index": 33,
+						"name": "BreakupAmount",
+						"node": 13,
+						"output": 0
+					},
+					{
+						"index": 34,
+						"name": "BreakupFrequency",
+						"node": 14,
+						"output": 0
+					},
+					{
+						"index": 35,
+						"name": "BreakupSpeed",
+						"node": 15,
+						"output": 0
+					},
+					{
+						"index": 36,
+						"name": "Aeration",
+						"node": 16,
+						"output": 0
+					},
+					{
+						"index": 37,
+						"name": "FoamCap",
+						"node": 17,
+						"output": 0
+					},
+					{
+						"index": 38,
+						"name": "HazeColor",
+						"node": 29,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 39,
+						"name": "Turbidity",
+						"node": 30,
+						"output": 0
+					},
+					{
+						"index": 40,
+						"name": "Sediment",
+						"node": 31,
+						"output": 0
+					},
+					{
+						"index": 41,
+						"name": "SpeckAmount",
+						"node": 32,
+						"output": 0
+					},
+					{
+						"index": 42,
+						"name": "SpeckScale",
+						"node": 33,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"return",
+					"OutNormal",
+					"OutEmissive",
+					"OutMask",
+					"OutRough"
+				],
+				"props":
+				{
+					"Code": "\n#ifndef MARS_LIQ_HASH3\n#define MARS_LIQ_HASH3(c) frac(sin(float3(dot(c, float3(127.1, 311.7, 74.7)), dot(c, float3(269.5, 183.3, 246.1)), dot(c, float3(113.5, 271.9, 124.6)))) * 43758.5453)\n#endif\nfloat S = max(length(Unit), 1e-4);\nfloat R = max(Radius * S, 1e-3);\nfloat3 N = normalize(Surface.xyz + float3(0.0, 0.0, 1e-4));\nfloat h = Surface.w * R;\n\n// the surface's own frame, for the ripples\nfloat3 T1 = normalize(cross(abs(N.x) < 0.9 ? float3(1.0, 0.0, 0.0) : float3(0.0, 1.0, 0.0), N));\nfloat3 T2 = cross(N, T1);\n\n// the camera ray through this pixel and where it crosses the flat surface (0 at the camera, 1 at this pixel)\nfloat3 V = D - CamRel;\nfloat vN = dot(V, N);\nfloat tPlane = (h - dot(CamRel, N)) / (abs(vN) > 1e-5 ? vN : 1e-5);\nfloat3 Sflat = CamRel + V * saturate(tPlane);\n\n// the surface is a height field over the plane, in its own frame (T1, T2), measured along N:\n//   swell  three long travelling waves, a faint shimmer at rest, louder while it sloshes (and while it boils);\n//   chop   the breakup: crossed products of shorter waves, sharpened into crests, whose height grows with Agitation (the\n//          script's lagged slosh energy) and whose frequency climbs with it, so a jolt tears the flat cap into a churn\n//          that calms back into long swell as Agitation decays.\nfloat churn = 0.04 + Slosh;\nfloat rippleSpeed = RippleSpeed;\nfloat agit = saturate(Agitation);\n#if MARS_LIQ_BUBBLING\nchurn += 0.5 * Boil;\nrippleSpeed *= 1.0 + Boil;\nagit = saturate(agit + 0.35 * Boil);\n#endif\nfloat swellAmp = RippleAmount * R * churn;\nfloat chopAmp = BreakupAmount * R * agit;\nfloat chopFreq = RippleScale * BreakupFrequency * (0.5 + agit) / R;\nfloat tSwell = Time * rippleSpeed + Phase * 17.0;\nfloat tChop = Time * BreakupSpeed * (0.6 + agit) + Phase * 5.0;\n#define MARS_LIQ_HEIGHT(X, OUT) \\\n{ \\\n    float2 _p = float2(dot(X, T1), dot(X, T2)); \\\n    float2 _a = _p * (RippleScale / R); \\\n    OUT = swellAmp * (sin(dot(_a, float2(0.96, 0.28)) + tSwell) + 0.6 * sin(dot(_a, float2(-0.53, 0.85)) * 1.7 + tSwell * 1.31) \\\n        + 0.35 * sin(dot(_a, float2(-0.39, -0.92)) * 2.9 + tSwell * 1.87)) / 1.95; \\\n    float2 _c = _p * chopFreq; \\\n    float _w = sin(dot(_c, float2(0.8, 0.6)) + tChop) * sin(dot(_c, float2(-0.6, 0.8)) * 1.3 - tChop * 1.2) \\\n        + 0.5 * sin(dot(_c, float2(0.31, -0.95)) * 2.3 + tChop * 1.7) * sin(dot(_c, float2(0.95, 0.31)) * 1.9 - tChop * 0.9); \\\n    OUT += chopAmp * sign(_w) * pow(abs(_w) / 1.5, 0.6); \\\n}\n\n// signed height of this pixel over the surface: above it is air\nfloat hereH;\nMARS_LIQ_HEIGHT(D, hereH);\nfloat s = dot(D, N) - h - hereH;\nOutMask = s <= 0.0 ? 1.0 : 0.0;\n\n// where the camera ray first meets the surface: march from where the ray enters the sphere, or comes down past the\n// highest crest, to this pixel (which is under the surface: the clip kept it), then refine by bisection. A front face\n// only needs the flat crossing for its rim measure; a back face shades the hit.\nfloat3 Ssurf = Sflat;\nfloat3 surfN = N;\nfloat surfH = 0.0;\nif (Sign <= 0.0)\n{\n    float hiCrest = abs(swellAmp) + chopAmp * 1.1 + 1e-3;\n    float va = dot(V, V);\n    float vb = dot(CamRel, V);\n    float vc = dot(CamRel, CamRel) - R * R;\n    float disc = vb * vb - va * vc;\n    float tIn = disc > 0.0 ? (-vb - sqrt(disc)) / va : 0.0;\n    float t0 = max(tIn, 0.0);\n    if (vN < -1e-5)\n    { t0 = max(t0, (h + hiCrest - dot(CamRel, N)) / vN); }\n    t0 = min(t0, 1.0);\n    float tLo = t0;\n    float tHi = 1.0;\n    bool found = false;\n    [unroll] for (int m = 1; m <= 12; ++m)\n    {\n        float t = lerp(t0, 1.0, m / 12.0);\n        float3 X = CamRel + V * t;\n        float hh;\n        MARS_LIQ_HEIGHT(X, hh);\n        if (!found && dot(X, N) - h - hh <= 0.0)\n        {\n            tHi = t;\n            found = true;\n        }\n        if (!found)\n        { tLo = t; }\n    }\n    [unroll] for (int b = 0; b < 4; ++b)\n    {\n        float t = 0.5 * (tLo + tHi);\n        float3 X = CamRel + V * t;\n        float hh;\n        MARS_LIQ_HEIGHT(X, hh);\n        if (dot(X, N) - h - hh <= 0.0)\n        { tHi = t; }\n        else\n        { tLo = t; }\n    }\n    Ssurf = CamRel + V * tHi;\n    // the normal from the height field's slope (central differences along the surface's frame)\n    float e = 0.02 * R;\n    float hx0, hx1, hy0, hy1;\n    float3 Sx0 = Ssurf - T1 * e;\n    float3 Sx1 = Ssurf + T1 * e;\n    float3 Sy0 = Ssurf - T2 * e;\n    float3 Sy1 = Ssurf + T2 * e;\n    MARS_LIQ_HEIGHT(Sx0, hx0);\n    MARS_LIQ_HEIGHT(Sx1, hx1);\n    MARS_LIQ_HEIGHT(Sy0, hy0);\n    MARS_LIQ_HEIGHT(Sy1, hy1);\n    surfN = normalize(N - ((hx1 - hx0) * T1 + (hy1 - hy0) * T2) / (2.0 * e));\n    MARS_LIQ_HEIGHT(Ssurf, surfH);\n}\n\nfloat foamWidth = FoamWidth;\n// how far the rim bands swell here (0: even); only the boil sets it\nfloat rimFroth = 0.0;\n#if MARS_LIQ_BUBBLING\nfoamWidth *= 1.0 + 1.5 * Boil;\n// the rim froth: round the vessel's axis the band breaks into beads of froth, each swelling and popping on its own clock\n// as the bubbles reach the edge, over a wobble travelling round the rim. The beads' count round the rim (the band's\n// frequency) rises with the boil and the bubbles' density; both rim bands (the line on the glass, the meniscus on the\n// top) swell by it, the top's capped so the froth never floods the surface. Measured at this pixel on the glass, at the\n// surface crossing on the top.\n{\n    float3 Xr = Sign > 0.0 ? D : Ssurf;\n    float theta = atan2(dot(Xr, T2), dot(Xr, T1)) * (0.5 / 3.14159265) + 0.5;\n    float beads = max(3.0, round(RimFrothFrequency * (0.5 + 0.5 * Boil) * (0.5 + BubbleDensity)));\n    float u = theta * beads;\n    float3 rh = MARS_LIQ_HASH3(float3(fmod(floor(u), beads), 5.3, Phase * 11.0));\n    float rf = frac(u) - 0.5 - (rh.z - 0.5) * 0.3;\n    float rlife = frac(Time * BubbleSpeed * 0.7 + rh.x);\n    float rsize = lerp(0.18, 0.45, rh.y) * smoothstep(0.0, 0.7, rlife) * (1.0 - step(0.9, rlife));\n    float bead = sqrt(saturate(1.0 - (rf * rf) / max(rsize * rsize, 1e-4)));\n    float wobble = 0.5 + 0.5 * sin(theta * 6.2831853 * beads * 0.5 + Time * rippleSpeed);\n    rimFroth = saturate(RimFroth * Boil * (bead + 0.25 * wobble));\n}\n#endif\n\nfloat3 Vn = normalize(V);\nbool front = Sign > 0.0;\nfloat path;\nfloat3 n;\nfloat3 col;\nfloat3 glow;\nif (front)\n{\n    // the wall: the liquid between here and where the ray leaves it (the far side of the sphere, or the surface if the\n    // ray rises through it first), in radii\n    float b = dot(D, Vn);\n    float c = dot(D, D) - R * R;\n    float tS = -b + sqrt(max(b * b - c, 0.0));\n    float vnN = dot(Vn, N);\n    float tP = vnN > 1e-4 ? (h - dot(D, N)) / vnN : 1e9;\n    path = max(min(tS, tP), 0.0) / R;\n    float depth = 1.0 - exp(-path * Density);\n    n = normalize(Nw);\n    col = lerp(LiquidColor, DeepColor, depth);\n#if MARS_LIQ_BRINE\n    // cloudy: the haze thickens with the depth looked through, and thicker still low down where the sediment hangs\n    float3 mid = D + Vn * (path * R * 0.5);\n    float low = 1.0 - smoothstep(-0.9, 0.1, dot(mid, N) / R);\n    float haze = 1.0 - exp(-path * (Turbidity + Sediment * low * 3.0));\n    col = lerp(col, HazeColor, haze);\n#endif\n\n    // a bright line where the liquid meets the glass, under the surface\n    float foam = 1.0 - smoothstep(0.0, foamWidth * (1.0 + 1.5 * rimFroth) * R, -s);\n    // light through the thin edge of the volume\n    float rim = pow(1.0 - saturate(dot(n, -Vn)), 3.0) * RimLight;\n    // motes: two layers of rising sparks inside the volume, along the ray (parallax: they sit in the liquid, not on the\n    // glass)\n    float motes = 0.0;\n    [unroll] for (int m = 0; m < 2; ++m)\n    {\n        float3 Q = (D + Vn * (path * R * (m == 0 ? 0.3 : 0.7))) / R * MoteScale - N * (Time * MoteSpeed) + Phase * 31.0 + m * 7.31;\n        float3 cell = floor(Q);\n        float3 f = frac(Q) - 0.5;\n        float3 hsh = MARS_LIQ_HASH3(cell);\n        float3 off = (hsh - 0.5) * 0.6;\n        float on = step(0.55, hsh.x);\n        float r = length(f - off);\n        motes += on * (1.0 - smoothstep(0.02, 0.09, r));\n    }\n#if MARS_LIQ_BUBBLING\n    // bubbles: three layers along the ray, each bubble a bright rim round a lighter core, rising and weaving\n    float bubbles = 0.0;\n    [unroll] for (int q = 0; q < 3; ++q)\n    {\n        float along = 0.15 + 0.35 * q;\n        float3 Q = (D + Vn * (path * R * along)) / R * BubbleScale - N * (Time * BubbleSpeed * (1.0 + 0.3 * q)) + Phase * 13.0 + q * 5.17;\n        float3 cell = floor(Q);\n        float3 f = frac(Q) - 0.5;\n        float3 hsh = MARS_LIQ_HASH3(cell);\n        float on = step(1.0 - BubbleDensity, hsh.x);\n        float rad = lerp(0.1, 0.24, hsh.z);\n        float3 off = (hsh - 0.5) * (0.9 - 2.0 * rad) + (T1 * sin(Time * 5.0 + hsh.y * 6.28) + T2 * cos(Time * 4.1 + hsh.z * 6.28)) * 0.05;\n        float r = length(f - off);\n        float rimB = smoothstep(rad - 0.06, rad - 0.01, r) * (1.0 - smoothstep(rad - 0.01, rad + 0.015, r));\n        float core = 1.0 - smoothstep(rad - 0.08, rad - 0.02, r);\n        bubbles += on * (rimB + 0.2 * core) * (1.0 - 0.25 * q);\n    }\n    col = lerp(col, FoamColor, saturate(bubbles) * 0.6);\n    motes += bubbles * Boil;\n#endif\n#if MARS_LIQ_BRINE\n    // the pickling spices: peppercorns (dark, round), mustard seeds (yellow, round) and dill (green, long flecks),\n    // five layers along the ray; they sink slowly, sway, and swirl round the surface's normal when it sloshes\n    float specks = 0.0;\n    float3 speckCol = 0.0;\n    float swirl = Slosh * 2.0 + 0.15;\n    [unroll] for (int p = 0; p < 5; ++p)\n    {\n        float along = 0.1 + 0.2 * p;\n        float3 X = (D + Vn * (path * R * along)) / R;\n        float a = swirl * sin(Time * 0.6 + p * 2.1);\n        float2 xy = float2(dot(X, T1), dot(X, T2));\n        xy = float2(xy.x * cos(a) - xy.y * sin(a), xy.x * sin(a) + xy.y * cos(a));\n        float3 Q = (T1 * xy.x + T2 * xy.y + N * dot(X, N)) * SpeckScale + N * (Time * 0.04) + Phase * 23.0 + p * 3.71;\n        float3 cell = floor(Q);\n        float3 f = frac(Q) - 0.5;\n        float3 hsh = MARS_LIQ_HASH3(cell);\n        float on = step(1.0 - SpeckAmount, hsh.x);\n        float3 off = (hsh - 0.5) * 0.5;\n        float3 e = f - off;\n        float3 tint;\n        float r;\n        if (hsh.y < 0.4)\n        {   // peppercorn\n            r = length(e) / 0.12;\n            tint = float3(0.06, 0.045, 0.03);\n        }\n        else if (hsh.y < 0.75)\n        {   // mustard seed\n            r = length(e) / 0.09;\n            tint = float3(0.75, 0.55, 0.15);\n        }\n        else\n        {   // dill: a thin fleck along a random direction\n            float3 dir = normalize(hsh * 2.0 - 1.0 + 1e-3);\n            float t = dot(e, dir);\n            r = max(length(e - dir * t) / 0.035, abs(t) / 0.3);\n            tint = float3(0.18, 0.32, 0.08);\n        }\n        float hit = on * (1.0 - smoothstep(0.7, 1.0, r)) * (1.0 - 0.12 * p);\n        speckCol = lerp(speckCol, tint, hit * (1.0 - specks));\n        specks = saturate(specks + hit);\n    }\n    col = lerp(col, speckCol, specks);\n#endif\n    // the aeration: while it churns, the water under the surface turns white and fills with small bubbles (three layers\n    // along the ray), in a band deeper the harder it was jolted\n    if (agit > 0.01)\n    {\n        float bandDepth = Aeration * agit * R + 1e-3;\n        float aer = 0.4 * (1.0 - smoothstep(0.0, bandDepth, -s));\n        [unroll] for (int w = 0; w < 3; ++w)\n        {\n            float3 X = D + Vn * (path * R * (0.08 + 0.3 * w));\n            float hh;\n            MARS_LIQ_HEIGHT(X, hh);\n            float band = 1.0 - smoothstep(0.0, bandDepth, h + hh - dot(X, N));\n            float3 Q = X / R * 9.0 - N * (Time * 2.0) + Phase * 3.1 + w * 1.7;\n            float3 hsh = MARS_LIQ_HASH3(floor(Q));\n            float rad = lerp(0.12, 0.3, hsh.z);\n            float r = length(frac(Q) - 0.5 - (hsh - 0.5) * (0.9 - 2.0 * rad));\n            float ring = smoothstep(rad - 0.08, rad - 0.01, r) * (1.0 - smoothstep(rad - 0.01, rad + 0.02, r));\n            float core = 1.0 - smoothstep(rad - 0.1, rad, r);\n            aer += band * step(0.35, hsh.x) * (ring + 0.35 * core);\n        }\n        col = lerp(col, FoamColor, saturate(aer) * 0.75);\n    }\n    col = lerp(col, FoamColor, foam * 0.6);\n    glow = col * Glow * (1.0 - 0.5 * depth) + LiquidColor * (rim * Glow) + FoamColor * (motes * MoteAmount * Glow);\n}\nelse\n{\n    // the surface, seen at the point the ray crosses it: lit with the rippled normal, coloured by the depth of liquid\n    // under it along the ray (the crossing to this back face)\n    float3 Sp = Ssurf;\n    path = length(D - Sp) / R;\n    float depth = 1.0 - exp(-path * Density);\n    n = surfN;\n    // the meniscus: a pale ring where the surface meets the glass (the cut circle's radius is sqrt(R^2 - h^2))\n    float3 toS = Sp - N * h;\n    float radial = length(toS - N * dot(toS, N)) / sqrt(max(R * R - h * h, 1e-4));\n    float meniscus = smoothstep(1.0 - min(foamWidth * 2.5 * (1.0 + rimFroth), 0.3), 1.0, radial);\n    col = lerp(lerp(LiquidColor, DeepColor, depth), SurfaceColor, SurfaceMix);\n#if MARS_LIQ_BRINE\n    col = lerp(col, HazeColor, 1.0 - exp(-path * Turbidity));\n#endif\n#if MARS_LIQ_BUBBLING\n    // domes: each cell of the surface grows a bubble that swells, then pops into an expanding ring\n    float2 suv = float2(dot(Sp, T1), dot(Sp, T2)) / R * BubbleScale * 1.4 + Phase * 7.0;\n    float3 sh = MARS_LIQ_HASH3(float3(floor(suv), 3.7));\n    float2 sf = frac(suv) - 0.5;\n    float life = frac(Time * BubbleSpeed * 0.9 + sh.x);\n    float on = step(1.0 - BubbleDensity, sh.y);\n    float rad = lerp(0.12, 0.32, sh.z) * smoothstep(0.0, 0.8, life);\n    float2 e = sf - (sh.xy - 0.5) * 0.3;\n    float d = length(e) / max(rad, 1e-3);\n    float dome = on * step(life, 0.85) * (1.0 - step(1.0, d));\n    // the dome's slope bends the normal; its rim catches light\n    float slope = d / sqrt(max(1.0 - d * d, 0.02));\n    float2 dirE = e / max(length(e), 1e-3);\n    n = normalize(n - dome * slope * 0.6 * (T1 * dirE.x + T2 * dirE.y));\n    float domeRim = dome * smoothstep(0.7, 1.0, d);\n    // the pop: a thin ring racing out after the bubble bursts\n    float pop = on * step(0.85, life) * (1.0 - smoothstep(0.0, 0.05, abs(length(e) - (life - 0.85) * 3.0))) * (1.0 - life) * 6.0;\n    col = lerp(col, FoamColor, saturate((domeRim * 0.8 + pop + dome * 0.15) * Boil));\n#endif\n#if MARS_LIQ_BRINE\n    // a few seeds float on the top\n    float2 fuv = float2(dot(Sp, T1), dot(Sp, T2)) / R * SpeckScale * 0.8 + Phase * 5.0;\n    float3 fh = MARS_LIQ_HASH3(float3(floor(fuv), 9.1));\n    float fr = length(frac(fuv) - 0.5 - (fh.xy - 0.5) * 0.5);\n    float floater = step(1.0 - SpeckAmount * 0.5, fh.x) * (1.0 - smoothstep(0.04, 0.07, fr));\n    col = lerp(col, fh.z < 0.5 ? float3(0.75, 0.55, 0.15) : float3(0.18, 0.32, 0.08), floater);\n#endif\n    // whitecaps on the churned crests, and a sizzle of foam cells over the cap while it settles\n    if (agit > 0.01)\n    {\n        float crest = smoothstep(0.3, 1.0, surfH / max(chopAmp + abs(swellAmp), 1e-3)) * FoamCap * agit;\n        float2 fz = float2(dot(Sp, T1), dot(Sp, T2)) / R * 8.0 + Phase * 3.0 + float2(Time * 0.3, -Time * 0.2);\n        float3 zh = MARS_LIQ_HASH3(float3(floor(fz), 7.7));\n        float zr = length(frac(fz) - 0.5 - (zh.xy - 0.5) * 0.4);\n        float zrad = lerp(0.08, 0.22, zh.z);\n        float zring = smoothstep(zrad - 0.06, zrad, zr) * (1.0 - smoothstep(zrad, zrad + 0.03, zr));\n        float sizzle = step(1.0 - agit * 0.8, zh.x) * (zring + 0.4 * (1.0 - smoothstep(zrad - 0.06, zrad, zr)));\n        col = lerp(col, FoamColor, saturate(crest + sizzle * 0.8 * FoamCap));\n    }\n    col = lerp(col, FoamColor, meniscus * 0.85);\n    glow = col * (Glow * 0.6);\n}\n\nOutNormal = n;\nOutEmissive = glow;\nOutRough = Roughness;\nreturn col;\n",
+					"Description": "Liquid Bubbling"
+				}
+			},
+			{
+				"id": 55,
+				"class": "MakeMaterialAttributes",
+				"name": "MaterialExpressionMakeMaterialAttributes_5",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "BaseColor",
+						"node": 54,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "Roughness",
+						"node": 54,
+						"output": 4
+					},
+					{
+						"index": 5,
+						"name": "EmissiveColor",
+						"node": 54,
+						"output": 2
+					},
+					{
+						"index": 7,
+						"name": "OpacityMask",
+						"node": 54,
+						"output": 3
+					},
+					{
+						"index": 8,
+						"name": "Normal",
+						"node": 54,
+						"output": 1
+					}
+				]
+			},
+			{
+				"id": 56,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_6",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "D",
+						"node": 42,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "CamRel",
+						"node": 46,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "Unit",
+						"node": 47,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "Radius",
+						"node": 34,
+						"output": 0
+					},
+					{
+						"index": 4,
+						"name": "Surface",
+						"node": 35,
+						"output": 5,
+						"mask": "rgba"
+					},
+					{
+						"index": 5,
+						"name": "Slosh",
+						"node": 36,
+						"output": 0
+					},
+					{
+						"index": 6,
+						"name": "Agitation",
+						"node": 38,
+						"output": 0
+					},
+					{
+						"index": 7,
+						"name": "Phase",
+						"node": 37,
+						"output": 0
+					},
+					{
+						"index": 8,
+						"name": "Time",
+						"node": 49,
+						"output": 0
+					},
+					{
+						"index": 9,
+						"name": "Sign",
+						"node": 50,
+						"output": 0
+					},
+					{
+						"index": 10,
+						"name": "Nw",
+						"node": 51,
+						"output": 0
+					},
+					{
+						"index": 11,
+						"name": "LiquidColor",
+						"node": 0,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 12,
+						"name": "DeepColor",
+						"node": 1,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 13,
+						"name": "Density",
+						"node": 2,
+						"output": 0
+					},
+					{
+						"index": 14,
+						"name": "Glow",
+						"node": 3,
+						"output": 0
+					},
+					{
+						"index": 15,
+						"name": "RimLight",
+						"node": 4,
+						"output": 0
+					},
+					{
+						"index": 16,
+						"name": "Roughness",
+						"node": 5,
+						"output": 0
+					},
+					{
+						"index": 17,
+						"name": "SurfaceColor",
+						"node": 6,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 18,
+						"name": "SurfaceMix",
+						"node": 7,
+						"output": 0
+					},
+					{
+						"index": 19,
+						"name": "FoamColor",
+						"node": 8,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 20,
+						"name": "FoamWidth",
+						"node": 9,
+						"output": 0
+					},
+					{
+						"index": 21,
+						"name": "RippleAmount",
+						"node": 10,
+						"output": 0
+					},
+					{
+						"index": 22,
+						"name": "RippleScale",
+						"node": 11,
+						"output": 0
+					},
+					{
+						"index": 23,
+						"name": "RippleSpeed",
+						"node": 12,
+						"output": 0
+					},
+					{
+						"index": 24,
+						"name": "MoteAmount",
+						"node": 18,
+						"output": 0
+					},
+					{
+						"index": 25,
+						"name": "MoteScale",
+						"node": 19,
+						"output": 0
+					},
+					{
+						"index": 26,
+						"name": "MoteSpeed",
+						"node": 20,
+						"output": 0
+					},
+					{
+						"index": 27,
+						"name": "Boil",
+						"node": 22,
+						"output": 0
+					},
+					{
+						"index": 28,
+						"name": "BubbleScale",
+						"node": 23,
+						"output": 0
+					},
+					{
+						"index": 29,
+						"name": "BubbleSpeed",
+						"node": 24,
+						"output": 0
+					},
+					{
+						"index": 30,
+						"name": "BubbleDensity",
+						"node": 25,
+						"output": 0
+					},
+					{
+						"index": 31,
+						"name": "RimFroth",
+						"node": 26,
+						"output": 0
+					},
+					{
+						"index": 32,
+						"name": "RimFrothFrequency",
+						"node": 27,
+						"output": 0
+					},
+					{
+						"index": 33,
+						"name": "BreakupAmount",
+						"node": 13,
+						"output": 0
+					},
+					{
+						"index": 34,
+						"name": "BreakupFrequency",
+						"node": 14,
+						"output": 0
+					},
+					{
+						"index": 35,
+						"name": "BreakupSpeed",
+						"node": 15,
+						"output": 0
+					},
+					{
+						"index": 36,
+						"name": "Aeration",
+						"node": 16,
+						"output": 0
+					},
+					{
+						"index": 37,
+						"name": "FoamCap",
+						"node": 17,
+						"output": 0
+					},
+					{
+						"index": 38,
+						"name": "HazeColor",
+						"node": 29,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 39,
+						"name": "Turbidity",
+						"node": 30,
+						"output": 0
+					},
+					{
+						"index": 40,
+						"name": "Sediment",
+						"node": 31,
+						"output": 0
+					},
+					{
+						"index": 41,
+						"name": "SpeckAmount",
+						"node": 32,
+						"output": 0
+					},
+					{
+						"index": 42,
+						"name": "SpeckScale",
+						"node": 33,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"return",
+					"OutNormal",
+					"OutEmissive",
+					"OutMask",
+					"OutRough"
+				],
+				"props":
+				{
+					"Code": "\n#ifndef MARS_LIQ_HASH3\n#define MARS_LIQ_HASH3(c) frac(sin(float3(dot(c, float3(127.1, 311.7, 74.7)), dot(c, float3(269.5, 183.3, 246.1)), dot(c, float3(113.5, 271.9, 124.6)))) * 43758.5453)\n#endif\nfloat S = max(length(Unit), 1e-4);\nfloat R = max(Radius * S, 1e-3);\nfloat3 N = normalize(Surface.xyz + float3(0.0, 0.0, 1e-4));\nfloat h = Surface.w * R;\n\n// the surface's own frame, for the ripples\nfloat3 T1 = normalize(cross(abs(N.x) < 0.9 ? float3(1.0, 0.0, 0.0) : float3(0.0, 1.0, 0.0), N));\nfloat3 T2 = cross(N, T1);\n\n// the camera ray through this pixel and where it crosses the flat surface (0 at the camera, 1 at this pixel)\nfloat3 V = D - CamRel;\nfloat vN = dot(V, N);\nfloat tPlane = (h - dot(CamRel, N)) / (abs(vN) > 1e-5 ? vN : 1e-5);\nfloat3 Sflat = CamRel + V * saturate(tPlane);\n\n// the surface is a height field over the plane, in its own frame (T1, T2), measured along N:\n//   swell  three long travelling waves, a faint shimmer at rest, louder while it sloshes (and while it boils);\n//   chop   the breakup: crossed products of shorter waves, sharpened into crests, whose height grows with Agitation (the\n//          script's lagged slosh energy) and whose frequency climbs with it, so a jolt tears the flat cap into a churn\n//          that calms back into long swell as Agitation decays.\nfloat churn = 0.04 + Slosh;\nfloat rippleSpeed = RippleSpeed;\nfloat agit = saturate(Agitation);\n#if MARS_LIQ_BUBBLING\nchurn += 0.5 * Boil;\nrippleSpeed *= 1.0 + Boil;\nagit = saturate(agit + 0.35 * Boil);\n#endif\nfloat swellAmp = RippleAmount * R * churn;\nfloat chopAmp = BreakupAmount * R * agit;\nfloat chopFreq = RippleScale * BreakupFrequency * (0.5 + agit) / R;\nfloat tSwell = Time * rippleSpeed + Phase * 17.0;\nfloat tChop = Time * BreakupSpeed * (0.6 + agit) + Phase * 5.0;\n#define MARS_LIQ_HEIGHT(X, OUT) \\\n{ \\\n    float2 _p = float2(dot(X, T1), dot(X, T2)); \\\n    float2 _a = _p * (RippleScale / R); \\\n    OUT = swellAmp * (sin(dot(_a, float2(0.96, 0.28)) + tSwell) + 0.6 * sin(dot(_a, float2(-0.53, 0.85)) * 1.7 + tSwell * 1.31) \\\n        + 0.35 * sin(dot(_a, float2(-0.39, -0.92)) * 2.9 + tSwell * 1.87)) / 1.95; \\\n    float2 _c = _p * chopFreq; \\\n    float _w = sin(dot(_c, float2(0.8, 0.6)) + tChop) * sin(dot(_c, float2(-0.6, 0.8)) * 1.3 - tChop * 1.2) \\\n        + 0.5 * sin(dot(_c, float2(0.31, -0.95)) * 2.3 + tChop * 1.7) * sin(dot(_c, float2(0.95, 0.31)) * 1.9 - tChop * 0.9); \\\n    OUT += chopAmp * sign(_w) * pow(abs(_w) / 1.5, 0.6); \\\n}\n\n// signed height of this pixel over the surface: above it is air\nfloat hereH;\nMARS_LIQ_HEIGHT(D, hereH);\nfloat s = dot(D, N) - h - hereH;\nOutMask = s <= 0.0 ? 1.0 : 0.0;\n\n// where the camera ray first meets the surface: march from where the ray enters the sphere, or comes down past the\n// highest crest, to this pixel (which is under the surface: the clip kept it), then refine by bisection. A front face\n// only needs the flat crossing for its rim measure; a back face shades the hit.\nfloat3 Ssurf = Sflat;\nfloat3 surfN = N;\nfloat surfH = 0.0;\nif (Sign <= 0.0)\n{\n    float hiCrest = abs(swellAmp) + chopAmp * 1.1 + 1e-3;\n    float va = dot(V, V);\n    float vb = dot(CamRel, V);\n    float vc = dot(CamRel, CamRel) - R * R;\n    float disc = vb * vb - va * vc;\n    float tIn = disc > 0.0 ? (-vb - sqrt(disc)) / va : 0.0;\n    float t0 = max(tIn, 0.0);\n    if (vN < -1e-5)\n    { t0 = max(t0, (h + hiCrest - dot(CamRel, N)) / vN); }\n    t0 = min(t0, 1.0);\n    float tLo = t0;\n    float tHi = 1.0;\n    bool found = false;\n    [unroll] for (int m = 1; m <= 12; ++m)\n    {\n        float t = lerp(t0, 1.0, m / 12.0);\n        float3 X = CamRel + V * t;\n        float hh;\n        MARS_LIQ_HEIGHT(X, hh);\n        if (!found && dot(X, N) - h - hh <= 0.0)\n        {\n            tHi = t;\n            found = true;\n        }\n        if (!found)\n        { tLo = t; }\n    }\n    [unroll] for (int b = 0; b < 4; ++b)\n    {\n        float t = 0.5 * (tLo + tHi);\n        float3 X = CamRel + V * t;\n        float hh;\n        MARS_LIQ_HEIGHT(X, hh);\n        if (dot(X, N) - h - hh <= 0.0)\n        { tHi = t; }\n        else\n        { tLo = t; }\n    }\n    Ssurf = CamRel + V * tHi;\n    // the normal from the height field's slope (central differences along the surface's frame)\n    float e = 0.02 * R;\n    float hx0, hx1, hy0, hy1;\n    float3 Sx0 = Ssurf - T1 * e;\n    float3 Sx1 = Ssurf + T1 * e;\n    float3 Sy0 = Ssurf - T2 * e;\n    float3 Sy1 = Ssurf + T2 * e;\n    MARS_LIQ_HEIGHT(Sx0, hx0);\n    MARS_LIQ_HEIGHT(Sx1, hx1);\n    MARS_LIQ_HEIGHT(Sy0, hy0);\n    MARS_LIQ_HEIGHT(Sy1, hy1);\n    surfN = normalize(N - ((hx1 - hx0) * T1 + (hy1 - hy0) * T2) / (2.0 * e));\n    MARS_LIQ_HEIGHT(Ssurf, surfH);\n}\n\nfloat foamWidth = FoamWidth;\n// how far the rim bands swell here (0: even); only the boil sets it\nfloat rimFroth = 0.0;\n#if MARS_LIQ_BUBBLING\nfoamWidth *= 1.0 + 1.5 * Boil;\n// the rim froth: round the vessel's axis the band breaks into beads of froth, each swelling and popping on its own clock\n// as the bubbles reach the edge, over a wobble travelling round the rim. The beads' count round the rim (the band's\n// frequency) rises with the boil and the bubbles' density; both rim bands (the line on the glass, the meniscus on the\n// top) swell by it, the top's capped so the froth never floods the surface. Measured at this pixel on the glass, at the\n// surface crossing on the top.\n{\n    float3 Xr = Sign > 0.0 ? D : Ssurf;\n    float theta = atan2(dot(Xr, T2), dot(Xr, T1)) * (0.5 / 3.14159265) + 0.5;\n    float beads = max(3.0, round(RimFrothFrequency * (0.5 + 0.5 * Boil) * (0.5 + BubbleDensity)));\n    float u = theta * beads;\n    float3 rh = MARS_LIQ_HASH3(float3(fmod(floor(u), beads), 5.3, Phase * 11.0));\n    float rf = frac(u) - 0.5 - (rh.z - 0.5) * 0.3;\n    float rlife = frac(Time * BubbleSpeed * 0.7 + rh.x);\n    float rsize = lerp(0.18, 0.45, rh.y) * smoothstep(0.0, 0.7, rlife) * (1.0 - step(0.9, rlife));\n    float bead = sqrt(saturate(1.0 - (rf * rf) / max(rsize * rsize, 1e-4)));\n    float wobble = 0.5 + 0.5 * sin(theta * 6.2831853 * beads * 0.5 + Time * rippleSpeed);\n    rimFroth = saturate(RimFroth * Boil * (bead + 0.25 * wobble));\n}\n#endif\n\nfloat3 Vn = normalize(V);\nbool front = Sign > 0.0;\nfloat path;\nfloat3 n;\nfloat3 col;\nfloat3 glow;\nif (front)\n{\n    // the wall: the liquid between here and where the ray leaves it (the far side of the sphere, or the surface if the\n    // ray rises through it first), in radii\n    float b = dot(D, Vn);\n    float c = dot(D, D) - R * R;\n    float tS = -b + sqrt(max(b * b - c, 0.0));\n    float vnN = dot(Vn, N);\n    float tP = vnN > 1e-4 ? (h - dot(D, N)) / vnN : 1e9;\n    path = max(min(tS, tP), 0.0) / R;\n    float depth = 1.0 - exp(-path * Density);\n    n = normalize(Nw);\n    col = lerp(LiquidColor, DeepColor, depth);\n#if MARS_LIQ_BRINE\n    // cloudy: the haze thickens with the depth looked through, and thicker still low down where the sediment hangs\n    float3 mid = D + Vn * (path * R * 0.5);\n    float low = 1.0 - smoothstep(-0.9, 0.1, dot(mid, N) / R);\n    float haze = 1.0 - exp(-path * (Turbidity + Sediment * low * 3.0));\n    col = lerp(col, HazeColor, haze);\n#endif\n\n    // a bright line where the liquid meets the glass, under the surface\n    float foam = 1.0 - smoothstep(0.0, foamWidth * (1.0 + 1.5 * rimFroth) * R, -s);\n    // light through the thin edge of the volume\n    float rim = pow(1.0 - saturate(dot(n, -Vn)), 3.0) * RimLight;\n    // motes: two layers of rising sparks inside the volume, along the ray (parallax: they sit in the liquid, not on the\n    // glass)\n    float motes = 0.0;\n    [unroll] for (int m = 0; m < 2; ++m)\n    {\n        float3 Q = (D + Vn * (path * R * (m == 0 ? 0.3 : 0.7))) / R * MoteScale - N * (Time * MoteSpeed) + Phase * 31.0 + m * 7.31;\n        float3 cell = floor(Q);\n        float3 f = frac(Q) - 0.5;\n        float3 hsh = MARS_LIQ_HASH3(cell);\n        float3 off = (hsh - 0.5) * 0.6;\n        float on = step(0.55, hsh.x);\n        float r = length(f - off);\n        motes += on * (1.0 - smoothstep(0.02, 0.09, r));\n    }\n#if MARS_LIQ_BUBBLING\n    // bubbles: three layers along the ray, each bubble a bright rim round a lighter core, rising and weaving\n    float bubbles = 0.0;\n    [unroll] for (int q = 0; q < 3; ++q)\n    {\n        float along = 0.15 + 0.35 * q;\n        float3 Q = (D + Vn * (path * R * along)) / R * BubbleScale - N * (Time * BubbleSpeed * (1.0 + 0.3 * q)) + Phase * 13.0 + q * 5.17;\n        float3 cell = floor(Q);\n        float3 f = frac(Q) - 0.5;\n        float3 hsh = MARS_LIQ_HASH3(cell);\n        float on = step(1.0 - BubbleDensity, hsh.x);\n        float rad = lerp(0.1, 0.24, hsh.z);\n        float3 off = (hsh - 0.5) * (0.9 - 2.0 * rad) + (T1 * sin(Time * 5.0 + hsh.y * 6.28) + T2 * cos(Time * 4.1 + hsh.z * 6.28)) * 0.05;\n        float r = length(f - off);\n        float rimB = smoothstep(rad - 0.06, rad - 0.01, r) * (1.0 - smoothstep(rad - 0.01, rad + 0.015, r));\n        float core = 1.0 - smoothstep(rad - 0.08, rad - 0.02, r);\n        bubbles += on * (rimB + 0.2 * core) * (1.0 - 0.25 * q);\n    }\n    col = lerp(col, FoamColor, saturate(bubbles) * 0.6);\n    motes += bubbles * Boil;\n#endif\n#if MARS_LIQ_BRINE\n    // the pickling spices: peppercorns (dark, round), mustard seeds (yellow, round) and dill (green, long flecks),\n    // five layers along the ray; they sink slowly, sway, and swirl round the surface's normal when it sloshes\n    float specks = 0.0;\n    float3 speckCol = 0.0;\n    float swirl = Slosh * 2.0 + 0.15;\n    [unroll] for (int p = 0; p < 5; ++p)\n    {\n        float along = 0.1 + 0.2 * p;\n        float3 X = (D + Vn * (path * R * along)) / R;\n        float a = swirl * sin(Time * 0.6 + p * 2.1);\n        float2 xy = float2(dot(X, T1), dot(X, T2));\n        xy = float2(xy.x * cos(a) - xy.y * sin(a), xy.x * sin(a) + xy.y * cos(a));\n        float3 Q = (T1 * xy.x + T2 * xy.y + N * dot(X, N)) * SpeckScale + N * (Time * 0.04) + Phase * 23.0 + p * 3.71;\n        float3 cell = floor(Q);\n        float3 f = frac(Q) - 0.5;\n        float3 hsh = MARS_LIQ_HASH3(cell);\n        float on = step(1.0 - SpeckAmount, hsh.x);\n        float3 off = (hsh - 0.5) * 0.5;\n        float3 e = f - off;\n        float3 tint;\n        float r;\n        if (hsh.y < 0.4)\n        {   // peppercorn\n            r = length(e) / 0.12;\n            tint = float3(0.06, 0.045, 0.03);\n        }\n        else if (hsh.y < 0.75)\n        {   // mustard seed\n            r = length(e) / 0.09;\n            tint = float3(0.75, 0.55, 0.15);\n        }\n        else\n        {   // dill: a thin fleck along a random direction\n            float3 dir = normalize(hsh * 2.0 - 1.0 + 1e-3);\n            float t = dot(e, dir);\n            r = max(length(e - dir * t) / 0.035, abs(t) / 0.3);\n            tint = float3(0.18, 0.32, 0.08);\n        }\n        float hit = on * (1.0 - smoothstep(0.7, 1.0, r)) * (1.0 - 0.12 * p);\n        speckCol = lerp(speckCol, tint, hit * (1.0 - specks));\n        specks = saturate(specks + hit);\n    }\n    col = lerp(col, speckCol, specks);\n#endif\n    // the aeration: while it churns, the water under the surface turns white and fills with small bubbles (three layers\n    // along the ray), in a band deeper the harder it was jolted\n    if (agit > 0.01)\n    {\n        float bandDepth = Aeration * agit * R + 1e-3;\n        float aer = 0.4 * (1.0 - smoothstep(0.0, bandDepth, -s));\n        [unroll] for (int w = 0; w < 3; ++w)\n        {\n            float3 X = D + Vn * (path * R * (0.08 + 0.3 * w));\n            float hh;\n            MARS_LIQ_HEIGHT(X, hh);\n            float band = 1.0 - smoothstep(0.0, bandDepth, h + hh - dot(X, N));\n            float3 Q = X / R * 9.0 - N * (Time * 2.0) + Phase * 3.1 + w * 1.7;\n            float3 hsh = MARS_LIQ_HASH3(floor(Q));\n            float rad = lerp(0.12, 0.3, hsh.z);\n            float r = length(frac(Q) - 0.5 - (hsh - 0.5) * (0.9 - 2.0 * rad));\n            float ring = smoothstep(rad - 0.08, rad - 0.01, r) * (1.0 - smoothstep(rad - 0.01, rad + 0.02, r));\n            float core = 1.0 - smoothstep(rad - 0.1, rad, r);\n            aer += band * step(0.35, hsh.x) * (ring + 0.35 * core);\n        }\n        col = lerp(col, FoamColor, saturate(aer) * 0.75);\n    }\n    col = lerp(col, FoamColor, foam * 0.6);\n    glow = col * Glow * (1.0 - 0.5 * depth) + LiquidColor * (rim * Glow) + FoamColor * (motes * MoteAmount * Glow);\n}\nelse\n{\n    // the surface, seen at the point the ray crosses it: lit with the rippled normal, coloured by the depth of liquid\n    // under it along the ray (the crossing to this back face)\n    float3 Sp = Ssurf;\n    path = length(D - Sp) / R;\n    float depth = 1.0 - exp(-path * Density);\n    n = surfN;\n    // the meniscus: a pale ring where the surface meets the glass (the cut circle's radius is sqrt(R^2 - h^2))\n    float3 toS = Sp - N * h;\n    float radial = length(toS - N * dot(toS, N)) / sqrt(max(R * R - h * h, 1e-4));\n    float meniscus = smoothstep(1.0 - min(foamWidth * 2.5 * (1.0 + rimFroth), 0.3), 1.0, radial);\n    col = lerp(lerp(LiquidColor, DeepColor, depth), SurfaceColor, SurfaceMix);\n#if MARS_LIQ_BRINE\n    col = lerp(col, HazeColor, 1.0 - exp(-path * Turbidity));\n#endif\n#if MARS_LIQ_BUBBLING\n    // domes: each cell of the surface grows a bubble that swells, then pops into an expanding ring\n    float2 suv = float2(dot(Sp, T1), dot(Sp, T2)) / R * BubbleScale * 1.4 + Phase * 7.0;\n    float3 sh = MARS_LIQ_HASH3(float3(floor(suv), 3.7));\n    float2 sf = frac(suv) - 0.5;\n    float life = frac(Time * BubbleSpeed * 0.9 + sh.x);\n    float on = step(1.0 - BubbleDensity, sh.y);\n    float rad = lerp(0.12, 0.32, sh.z) * smoothstep(0.0, 0.8, life);\n    float2 e = sf - (sh.xy - 0.5) * 0.3;\n    float d = length(e) / max(rad, 1e-3);\n    float dome = on * step(life, 0.85) * (1.0 - step(1.0, d));\n    // the dome's slope bends the normal; its rim catches light\n    float slope = d / sqrt(max(1.0 - d * d, 0.02));\n    float2 dirE = e / max(length(e), 1e-3);\n    n = normalize(n - dome * slope * 0.6 * (T1 * dirE.x + T2 * dirE.y));\n    float domeRim = dome * smoothstep(0.7, 1.0, d);\n    // the pop: a thin ring racing out after the bubble bursts\n    float pop = on * step(0.85, life) * (1.0 - smoothstep(0.0, 0.05, abs(length(e) - (life - 0.85) * 3.0))) * (1.0 - life) * 6.0;\n    col = lerp(col, FoamColor, saturate((domeRim * 0.8 + pop + dome * 0.15) * Boil));\n#endif\n#if MARS_LIQ_BRINE\n    // a few seeds float on the top\n    float2 fuv = float2(dot(Sp, T1), dot(Sp, T2)) / R * SpeckScale * 0.8 + Phase * 5.0;\n    float3 fh = MARS_LIQ_HASH3(float3(floor(fuv), 9.1));\n    float fr = length(frac(fuv) - 0.5 - (fh.xy - 0.5) * 0.5);\n    float floater = step(1.0 - SpeckAmount * 0.5, fh.x) * (1.0 - smoothstep(0.04, 0.07, fr));\n    col = lerp(col, fh.z < 0.5 ? float3(0.75, 0.55, 0.15) : float3(0.18, 0.32, 0.08), floater);\n#endif\n    // whitecaps on the churned crests, and a sizzle of foam cells over the cap while it settles\n    if (agit > 0.01)\n    {\n        float crest = smoothstep(0.3, 1.0, surfH / max(chopAmp + abs(swellAmp), 1e-3)) * FoamCap * agit;\n        float2 fz = float2(dot(Sp, T1), dot(Sp, T2)) / R * 8.0 + Phase * 3.0 + float2(Time * 0.3, -Time * 0.2);\n        float3 zh = MARS_LIQ_HASH3(float3(floor(fz), 7.7));\n        float zr = length(frac(fz) - 0.5 - (zh.xy - 0.5) * 0.4);\n        float zrad = lerp(0.08, 0.22, zh.z);\n        float zring = smoothstep(zrad - 0.06, zrad, zr) * (1.0 - smoothstep(zrad, zrad + 0.03, zr));\n        float sizzle = step(1.0 - agit * 0.8, zh.x) * (zring + 0.4 * (1.0 - smoothstep(zrad - 0.06, zrad, zr)));\n        col = lerp(col, FoamColor, saturate(crest + sizzle * 0.8 * FoamCap));\n    }\n    col = lerp(col, FoamColor, meniscus * 0.85);\n    glow = col * (Glow * 0.6);\n}\n\nOutNormal = n;\nOutEmissive = glow;\nOutRough = Roughness;\nreturn col;\n",
+					"Description": "Liquid Brine"
+				}
+			},
+			{
+				"id": 57,
+				"class": "MakeMaterialAttributes",
+				"name": "MaterialExpressionMakeMaterialAttributes_6",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "BaseColor",
+						"node": 56,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "Roughness",
+						"node": 56,
+						"output": 4
+					},
+					{
+						"index": 5,
+						"name": "EmissiveColor",
+						"node": 56,
+						"output": 2
+					},
+					{
+						"index": 7,
+						"name": "OpacityMask",
+						"node": 56,
+						"output": 3
+					},
+					{
+						"index": 8,
+						"name": "Normal",
+						"node": 56,
+						"output": 1
+					}
+				]
+			},
+			{
+				"id": 58,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_7",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "D",
+						"node": 42,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "CamRel",
+						"node": 46,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "Unit",
+						"node": 47,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "Radius",
+						"node": 34,
+						"output": 0
+					},
+					{
+						"index": 4,
+						"name": "Surface",
+						"node": 35,
+						"output": 5,
+						"mask": "rgba"
+					},
+					{
+						"index": 5,
+						"name": "Slosh",
+						"node": 36,
+						"output": 0
+					},
+					{
+						"index": 6,
+						"name": "Agitation",
+						"node": 38,
+						"output": 0
+					},
+					{
+						"index": 7,
+						"name": "Phase",
+						"node": 37,
+						"output": 0
+					},
+					{
+						"index": 8,
+						"name": "Time",
+						"node": 49,
+						"output": 0
+					},
+					{
+						"index": 9,
+						"name": "Sign",
+						"node": 50,
+						"output": 0
+					},
+					{
+						"index": 10,
+						"name": "Nw",
+						"node": 51,
+						"output": 0
+					},
+					{
+						"index": 11,
+						"name": "LiquidColor",
+						"node": 0,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 12,
+						"name": "DeepColor",
+						"node": 1,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 13,
+						"name": "Density",
+						"node": 2,
+						"output": 0
+					},
+					{
+						"index": 14,
+						"name": "Glow",
+						"node": 3,
+						"output": 0
+					},
+					{
+						"index": 15,
+						"name": "RimLight",
+						"node": 4,
+						"output": 0
+					},
+					{
+						"index": 16,
+						"name": "Roughness",
+						"node": 5,
+						"output": 0
+					},
+					{
+						"index": 17,
+						"name": "SurfaceColor",
+						"node": 6,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 18,
+						"name": "SurfaceMix",
+						"node": 7,
+						"output": 0
+					},
+					{
+						"index": 19,
+						"name": "FoamColor",
+						"node": 8,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 20,
+						"name": "FoamWidth",
+						"node": 9,
+						"output": 0
+					},
+					{
+						"index": 21,
+						"name": "RippleAmount",
+						"node": 10,
+						"output": 0
+					},
+					{
+						"index": 22,
+						"name": "RippleScale",
+						"node": 11,
+						"output": 0
+					},
+					{
+						"index": 23,
+						"name": "RippleSpeed",
+						"node": 12,
+						"output": 0
+					},
+					{
+						"index": 24,
+						"name": "MoteAmount",
+						"node": 18,
+						"output": 0
+					},
+					{
+						"index": 25,
+						"name": "MoteScale",
+						"node": 19,
+						"output": 0
+					},
+					{
+						"index": 26,
+						"name": "MoteSpeed",
+						"node": 20,
+						"output": 0
+					},
+					{
+						"index": 27,
+						"name": "Boil",
+						"node": 22,
+						"output": 0
+					},
+					{
+						"index": 28,
+						"name": "BubbleScale",
+						"node": 23,
+						"output": 0
+					},
+					{
+						"index": 29,
+						"name": "BubbleSpeed",
+						"node": 24,
+						"output": 0
+					},
+					{
+						"index": 30,
+						"name": "BubbleDensity",
+						"node": 25,
+						"output": 0
+					},
+					{
+						"index": 31,
+						"name": "RimFroth",
+						"node": 26,
+						"output": 0
+					},
+					{
+						"index": 32,
+						"name": "RimFrothFrequency",
+						"node": 27,
+						"output": 0
+					},
+					{
+						"index": 33,
+						"name": "BreakupAmount",
+						"node": 13,
+						"output": 0
+					},
+					{
+						"index": 34,
+						"name": "BreakupFrequency",
+						"node": 14,
+						"output": 0
+					},
+					{
+						"index": 35,
+						"name": "BreakupSpeed",
+						"node": 15,
+						"output": 0
+					},
+					{
+						"index": 36,
+						"name": "Aeration",
+						"node": 16,
+						"output": 0
+					},
+					{
+						"index": 37,
+						"name": "FoamCap",
+						"node": 17,
+						"output": 0
+					},
+					{
+						"index": 38,
+						"name": "HazeColor",
+						"node": 29,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 39,
+						"name": "Turbidity",
+						"node": 30,
+						"output": 0
+					},
+					{
+						"index": 40,
+						"name": "Sediment",
+						"node": 31,
+						"output": 0
+					},
+					{
+						"index": 41,
+						"name": "SpeckAmount",
+						"node": 32,
+						"output": 0
+					},
+					{
+						"index": 42,
+						"name": "SpeckScale",
+						"node": 33,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"return",
+					"OutNormal",
+					"OutEmissive",
+					"OutMask",
+					"OutRough"
+				],
+				"props":
+				{
+					"Code": "\n#ifndef MARS_LIQ_HASH3\n#define MARS_LIQ_HASH3(c) frac(sin(float3(dot(c, float3(127.1, 311.7, 74.7)), dot(c, float3(269.5, 183.3, 246.1)), dot(c, float3(113.5, 271.9, 124.6)))) * 43758.5453)\n#endif\nfloat S = max(length(Unit), 1e-4);\nfloat R = max(Radius * S, 1e-3);\nfloat3 N = normalize(Surface.xyz + float3(0.0, 0.0, 1e-4));\nfloat h = Surface.w * R;\n\n// the surface's own frame, for the ripples\nfloat3 T1 = normalize(cross(abs(N.x) < 0.9 ? float3(1.0, 0.0, 0.0) : float3(0.0, 1.0, 0.0), N));\nfloat3 T2 = cross(N, T1);\n\n// the camera ray through this pixel and where it crosses the flat surface (0 at the camera, 1 at this pixel)\nfloat3 V = D - CamRel;\nfloat vN = dot(V, N);\nfloat tPlane = (h - dot(CamRel, N)) / (abs(vN) > 1e-5 ? vN : 1e-5);\nfloat3 Sflat = CamRel + V * saturate(tPlane);\n\n// the surface is a height field over the plane, in its own frame (T1, T2), measured along N:\n//   swell  three long travelling waves, a faint shimmer at rest, louder while it sloshes (and while it boils);\n//   chop   the breakup: crossed products of shorter waves, sharpened into crests, whose height grows with Agitation (the\n//          script's lagged slosh energy) and whose frequency climbs with it, so a jolt tears the flat cap into a churn\n//          that calms back into long swell as Agitation decays.\nfloat churn = 0.04 + Slosh;\nfloat rippleSpeed = RippleSpeed;\nfloat agit = saturate(Agitation);\n#if MARS_LIQ_BUBBLING\nchurn += 0.5 * Boil;\nrippleSpeed *= 1.0 + Boil;\nagit = saturate(agit + 0.35 * Boil);\n#endif\nfloat swellAmp = RippleAmount * R * churn;\nfloat chopAmp = BreakupAmount * R * agit;\nfloat chopFreq = RippleScale * BreakupFrequency * (0.5 + agit) / R;\nfloat tSwell = Time * rippleSpeed + Phase * 17.0;\nfloat tChop = Time * BreakupSpeed * (0.6 + agit) + Phase * 5.0;\n#define MARS_LIQ_HEIGHT(X, OUT) \\\n{ \\\n    float2 _p = float2(dot(X, T1), dot(X, T2)); \\\n    float2 _a = _p * (RippleScale / R); \\\n    OUT = swellAmp * (sin(dot(_a, float2(0.96, 0.28)) + tSwell) + 0.6 * sin(dot(_a, float2(-0.53, 0.85)) * 1.7 + tSwell * 1.31) \\\n        + 0.35 * sin(dot(_a, float2(-0.39, -0.92)) * 2.9 + tSwell * 1.87)) / 1.95; \\\n    float2 _c = _p * chopFreq; \\\n    float _w = sin(dot(_c, float2(0.8, 0.6)) + tChop) * sin(dot(_c, float2(-0.6, 0.8)) * 1.3 - tChop * 1.2) \\\n        + 0.5 * sin(dot(_c, float2(0.31, -0.95)) * 2.3 + tChop * 1.7) * sin(dot(_c, float2(0.95, 0.31)) * 1.9 - tChop * 0.9); \\\n    OUT += chopAmp * sign(_w) * pow(abs(_w) / 1.5, 0.6); \\\n}\n\n// signed height of this pixel over the surface: above it is air\nfloat hereH;\nMARS_LIQ_HEIGHT(D, hereH);\nfloat s = dot(D, N) - h - hereH;\nOutMask = s <= 0.0 ? 1.0 : 0.0;\n\n// where the camera ray first meets the surface: march from where the ray enters the sphere, or comes down past the\n// highest crest, to this pixel (which is under the surface: the clip kept it), then refine by bisection. A front face\n// only needs the flat crossing for its rim measure; a back face shades the hit.\nfloat3 Ssurf = Sflat;\nfloat3 surfN = N;\nfloat surfH = 0.0;\nif (Sign <= 0.0)\n{\n    float hiCrest = abs(swellAmp) + chopAmp * 1.1 + 1e-3;\n    float va = dot(V, V);\n    float vb = dot(CamRel, V);\n    float vc = dot(CamRel, CamRel) - R * R;\n    float disc = vb * vb - va * vc;\n    float tIn = disc > 0.0 ? (-vb - sqrt(disc)) / va : 0.0;\n    float t0 = max(tIn, 0.0);\n    if (vN < -1e-5)\n    { t0 = max(t0, (h + hiCrest - dot(CamRel, N)) / vN); }\n    t0 = min(t0, 1.0);\n    float tLo = t0;\n    float tHi = 1.0;\n    bool found = false;\n    [unroll] for (int m = 1; m <= 12; ++m)\n    {\n        float t = lerp(t0, 1.0, m / 12.0);\n        float3 X = CamRel + V * t;\n        float hh;\n        MARS_LIQ_HEIGHT(X, hh);\n        if (!found && dot(X, N) - h - hh <= 0.0)\n        {\n            tHi = t;\n            found = true;\n        }\n        if (!found)\n        { tLo = t; }\n    }\n    [unroll] for (int b = 0; b < 4; ++b)\n    {\n        float t = 0.5 * (tLo + tHi);\n        float3 X = CamRel + V * t;\n        float hh;\n        MARS_LIQ_HEIGHT(X, hh);\n        if (dot(X, N) - h - hh <= 0.0)\n        { tHi = t; }\n        else\n        { tLo = t; }\n    }\n    Ssurf = CamRel + V * tHi;\n    // the normal from the height field's slope (central differences along the surface's frame)\n    float e = 0.02 * R;\n    float hx0, hx1, hy0, hy1;\n    float3 Sx0 = Ssurf - T1 * e;\n    float3 Sx1 = Ssurf + T1 * e;\n    float3 Sy0 = Ssurf - T2 * e;\n    float3 Sy1 = Ssurf + T2 * e;\n    MARS_LIQ_HEIGHT(Sx0, hx0);\n    MARS_LIQ_HEIGHT(Sx1, hx1);\n    MARS_LIQ_HEIGHT(Sy0, hy0);\n    MARS_LIQ_HEIGHT(Sy1, hy1);\n    surfN = normalize(N - ((hx1 - hx0) * T1 + (hy1 - hy0) * T2) / (2.0 * e));\n    MARS_LIQ_HEIGHT(Ssurf, surfH);\n}\n\nfloat foamWidth = FoamWidth;\n// how far the rim bands swell here (0: even); only the boil sets it\nfloat rimFroth = 0.0;\n#if MARS_LIQ_BUBBLING\nfoamWidth *= 1.0 + 1.5 * Boil;\n// the rim froth: round the vessel's axis the band breaks into beads of froth, each swelling and popping on its own clock\n// as the bubbles reach the edge, over a wobble travelling round the rim. The beads' count round the rim (the band's\n// frequency) rises with the boil and the bubbles' density; both rim bands (the line on the glass, the meniscus on the\n// top) swell by it, the top's capped so the froth never floods the surface. Measured at this pixel on the glass, at the\n// surface crossing on the top.\n{\n    float3 Xr = Sign > 0.0 ? D : Ssurf;\n    float theta = atan2(dot(Xr, T2), dot(Xr, T1)) * (0.5 / 3.14159265) + 0.5;\n    float beads = max(3.0, round(RimFrothFrequency * (0.5 + 0.5 * Boil) * (0.5 + BubbleDensity)));\n    float u = theta * beads;\n    float3 rh = MARS_LIQ_HASH3(float3(fmod(floor(u), beads), 5.3, Phase * 11.0));\n    float rf = frac(u) - 0.5 - (rh.z - 0.5) * 0.3;\n    float rlife = frac(Time * BubbleSpeed * 0.7 + rh.x);\n    float rsize = lerp(0.18, 0.45, rh.y) * smoothstep(0.0, 0.7, rlife) * (1.0 - step(0.9, rlife));\n    float bead = sqrt(saturate(1.0 - (rf * rf) / max(rsize * rsize, 1e-4)));\n    float wobble = 0.5 + 0.5 * sin(theta * 6.2831853 * beads * 0.5 + Time * rippleSpeed);\n    rimFroth = saturate(RimFroth * Boil * (bead + 0.25 * wobble));\n}\n#endif\n\nfloat3 Vn = normalize(V);\nbool front = Sign > 0.0;\nfloat path;\nfloat3 n;\nfloat3 col;\nfloat3 glow;\nif (front)\n{\n    // the wall: the liquid between here and where the ray leaves it (the far side of the sphere, or the surface if the\n    // ray rises through it first), in radii\n    float b = dot(D, Vn);\n    float c = dot(D, D) - R * R;\n    float tS = -b + sqrt(max(b * b - c, 0.0));\n    float vnN = dot(Vn, N);\n    float tP = vnN > 1e-4 ? (h - dot(D, N)) / vnN : 1e9;\n    path = max(min(tS, tP), 0.0) / R;\n    float depth = 1.0 - exp(-path * Density);\n    n = normalize(Nw);\n    col = lerp(LiquidColor, DeepColor, depth);\n#if MARS_LIQ_BRINE\n    // cloudy: the haze thickens with the depth looked through, and thicker still low down where the sediment hangs\n    float3 mid = D + Vn * (path * R * 0.5);\n    float low = 1.0 - smoothstep(-0.9, 0.1, dot(mid, N) / R);\n    float haze = 1.0 - exp(-path * (Turbidity + Sediment * low * 3.0));\n    col = lerp(col, HazeColor, haze);\n#endif\n\n    // a bright line where the liquid meets the glass, under the surface\n    float foam = 1.0 - smoothstep(0.0, foamWidth * (1.0 + 1.5 * rimFroth) * R, -s);\n    // light through the thin edge of the volume\n    float rim = pow(1.0 - saturate(dot(n, -Vn)), 3.0) * RimLight;\n    // motes: two layers of rising sparks inside the volume, along the ray (parallax: they sit in the liquid, not on the\n    // glass)\n    float motes = 0.0;\n    [unroll] for (int m = 0; m < 2; ++m)\n    {\n        float3 Q = (D + Vn * (path * R * (m == 0 ? 0.3 : 0.7))) / R * MoteScale - N * (Time * MoteSpeed) + Phase * 31.0 + m * 7.31;\n        float3 cell = floor(Q);\n        float3 f = frac(Q) - 0.5;\n        float3 hsh = MARS_LIQ_HASH3(cell);\n        float3 off = (hsh - 0.5) * 0.6;\n        float on = step(0.55, hsh.x);\n        float r = length(f - off);\n        motes += on * (1.0 - smoothstep(0.02, 0.09, r));\n    }\n#if MARS_LIQ_BUBBLING\n    // bubbles: three layers along the ray, each bubble a bright rim round a lighter core, rising and weaving\n    float bubbles = 0.0;\n    [unroll] for (int q = 0; q < 3; ++q)\n    {\n        float along = 0.15 + 0.35 * q;\n        float3 Q = (D + Vn * (path * R * along)) / R * BubbleScale - N * (Time * BubbleSpeed * (1.0 + 0.3 * q)) + Phase * 13.0 + q * 5.17;\n        float3 cell = floor(Q);\n        float3 f = frac(Q) - 0.5;\n        float3 hsh = MARS_LIQ_HASH3(cell);\n        float on = step(1.0 - BubbleDensity, hsh.x);\n        float rad = lerp(0.1, 0.24, hsh.z);\n        float3 off = (hsh - 0.5) * (0.9 - 2.0 * rad) + (T1 * sin(Time * 5.0 + hsh.y * 6.28) + T2 * cos(Time * 4.1 + hsh.z * 6.28)) * 0.05;\n        float r = length(f - off);\n        float rimB = smoothstep(rad - 0.06, rad - 0.01, r) * (1.0 - smoothstep(rad - 0.01, rad + 0.015, r));\n        float core = 1.0 - smoothstep(rad - 0.08, rad - 0.02, r);\n        bubbles += on * (rimB + 0.2 * core) * (1.0 - 0.25 * q);\n    }\n    col = lerp(col, FoamColor, saturate(bubbles) * 0.6);\n    motes += bubbles * Boil;\n#endif\n#if MARS_LIQ_BRINE\n    // the pickling spices: peppercorns (dark, round), mustard seeds (yellow, round) and dill (green, long flecks),\n    // five layers along the ray; they sink slowly, sway, and swirl round the surface's normal when it sloshes\n    float specks = 0.0;\n    float3 speckCol = 0.0;\n    float swirl = Slosh * 2.0 + 0.15;\n    [unroll] for (int p = 0; p < 5; ++p)\n    {\n        float along = 0.1 + 0.2 * p;\n        float3 X = (D + Vn * (path * R * along)) / R;\n        float a = swirl * sin(Time * 0.6 + p * 2.1);\n        float2 xy = float2(dot(X, T1), dot(X, T2));\n        xy = float2(xy.x * cos(a) - xy.y * sin(a), xy.x * sin(a) + xy.y * cos(a));\n        float3 Q = (T1 * xy.x + T2 * xy.y + N * dot(X, N)) * SpeckScale + N * (Time * 0.04) + Phase * 23.0 + p * 3.71;\n        float3 cell = floor(Q);\n        float3 f = frac(Q) - 0.5;\n        float3 hsh = MARS_LIQ_HASH3(cell);\n        float on = step(1.0 - SpeckAmount, hsh.x);\n        float3 off = (hsh - 0.5) * 0.5;\n        float3 e = f - off;\n        float3 tint;\n        float r;\n        if (hsh.y < 0.4)\n        {   // peppercorn\n            r = length(e) / 0.12;\n            tint = float3(0.06, 0.045, 0.03);\n        }\n        else if (hsh.y < 0.75)\n        {   // mustard seed\n            r = length(e) / 0.09;\n            tint = float3(0.75, 0.55, 0.15);\n        }\n        else\n        {   // dill: a thin fleck along a random direction\n            float3 dir = normalize(hsh * 2.0 - 1.0 + 1e-3);\n            float t = dot(e, dir);\n            r = max(length(e - dir * t) / 0.035, abs(t) / 0.3);\n            tint = float3(0.18, 0.32, 0.08);\n        }\n        float hit = on * (1.0 - smoothstep(0.7, 1.0, r)) * (1.0 - 0.12 * p);\n        speckCol = lerp(speckCol, tint, hit * (1.0 - specks));\n        specks = saturate(specks + hit);\n    }\n    col = lerp(col, speckCol, specks);\n#endif\n    // the aeration: while it churns, the water under the surface turns white and fills with small bubbles (three layers\n    // along the ray), in a band deeper the harder it was jolted\n    if (agit > 0.01)\n    {\n        float bandDepth = Aeration * agit * R + 1e-3;\n        float aer = 0.4 * (1.0 - smoothstep(0.0, bandDepth, -s));\n        [unroll] for (int w = 0; w < 3; ++w)\n        {\n            float3 X = D + Vn * (path * R * (0.08 + 0.3 * w));\n            float hh;\n            MARS_LIQ_HEIGHT(X, hh);\n            float band = 1.0 - smoothstep(0.0, bandDepth, h + hh - dot(X, N));\n            float3 Q = X / R * 9.0 - N * (Time * 2.0) + Phase * 3.1 + w * 1.7;\n            float3 hsh = MARS_LIQ_HASH3(floor(Q));\n            float rad = lerp(0.12, 0.3, hsh.z);\n            float r = length(frac(Q) - 0.5 - (hsh - 0.5) * (0.9 - 2.0 * rad));\n            float ring = smoothstep(rad - 0.08, rad - 0.01, r) * (1.0 - smoothstep(rad - 0.01, rad + 0.02, r));\n            float core = 1.0 - smoothstep(rad - 0.1, rad, r);\n            aer += band * step(0.35, hsh.x) * (ring + 0.35 * core);\n        }\n        col = lerp(col, FoamColor, saturate(aer) * 0.75);\n    }\n    col = lerp(col, FoamColor, foam * 0.6);\n    glow = col * Glow * (1.0 - 0.5 * depth) + LiquidColor * (rim * Glow) + FoamColor * (motes * MoteAmount * Glow);\n}\nelse\n{\n    // the surface, seen at the point the ray crosses it: lit with the rippled normal, coloured by the depth of liquid\n    // under it along the ray (the crossing to this back face)\n    float3 Sp = Ssurf;\n    path = length(D - Sp) / R;\n    float depth = 1.0 - exp(-path * Density);\n    n = surfN;\n    // the meniscus: a pale ring where the surface meets the glass (the cut circle's radius is sqrt(R^2 - h^2))\n    float3 toS = Sp - N * h;\n    float radial = length(toS - N * dot(toS, N)) / sqrt(max(R * R - h * h, 1e-4));\n    float meniscus = smoothstep(1.0 - min(foamWidth * 2.5 * (1.0 + rimFroth), 0.3), 1.0, radial);\n    col = lerp(lerp(LiquidColor, DeepColor, depth), SurfaceColor, SurfaceMix);\n#if MARS_LIQ_BRINE\n    col = lerp(col, HazeColor, 1.0 - exp(-path * Turbidity));\n#endif\n#if MARS_LIQ_BUBBLING\n    // domes: each cell of the surface grows a bubble that swells, then pops into an expanding ring\n    float2 suv = float2(dot(Sp, T1), dot(Sp, T2)) / R * BubbleScale * 1.4 + Phase * 7.0;\n    float3 sh = MARS_LIQ_HASH3(float3(floor(suv), 3.7));\n    float2 sf = frac(suv) - 0.5;\n    float life = frac(Time * BubbleSpeed * 0.9 + sh.x);\n    float on = step(1.0 - BubbleDensity, sh.y);\n    float rad = lerp(0.12, 0.32, sh.z) * smoothstep(0.0, 0.8, life);\n    float2 e = sf - (sh.xy - 0.5) * 0.3;\n    float d = length(e) / max(rad, 1e-3);\n    float dome = on * step(life, 0.85) * (1.0 - step(1.0, d));\n    // the dome's slope bends the normal; its rim catches light\n    float slope = d / sqrt(max(1.0 - d * d, 0.02));\n    float2 dirE = e / max(length(e), 1e-3);\n    n = normalize(n - dome * slope * 0.6 * (T1 * dirE.x + T2 * dirE.y));\n    float domeRim = dome * smoothstep(0.7, 1.0, d);\n    // the pop: a thin ring racing out after the bubble bursts\n    float pop = on * step(0.85, life) * (1.0 - smoothstep(0.0, 0.05, abs(length(e) - (life - 0.85) * 3.0))) * (1.0 - life) * 6.0;\n    col = lerp(col, FoamColor, saturate((domeRim * 0.8 + pop + dome * 0.15) * Boil));\n#endif\n#if MARS_LIQ_BRINE\n    // a few seeds float on the top\n    float2 fuv = float2(dot(Sp, T1), dot(Sp, T2)) / R * SpeckScale * 0.8 + Phase * 5.0;\n    float3 fh = MARS_LIQ_HASH3(float3(floor(fuv), 9.1));\n    float fr = length(frac(fuv) - 0.5 - (fh.xy - 0.5) * 0.5);\n    float floater = step(1.0 - SpeckAmount * 0.5, fh.x) * (1.0 - smoothstep(0.04, 0.07, fr));\n    col = lerp(col, fh.z < 0.5 ? float3(0.75, 0.55, 0.15) : float3(0.18, 0.32, 0.08), floater);\n#endif\n    // whitecaps on the churned crests, and a sizzle of foam cells over the cap while it settles\n    if (agit > 0.01)\n    {\n        float crest = smoothstep(0.3, 1.0, surfH / max(chopAmp + abs(swellAmp), 1e-3)) * FoamCap * agit;\n        float2 fz = float2(dot(Sp, T1), dot(Sp, T2)) / R * 8.0 + Phase * 3.0 + float2(Time * 0.3, -Time * 0.2);\n        float3 zh = MARS_LIQ_HASH3(float3(floor(fz), 7.7));\n        float zr = length(frac(fz) - 0.5 - (zh.xy - 0.5) * 0.4);\n        float zrad = lerp(0.08, 0.22, zh.z);\n        float zring = smoothstep(zrad - 0.06, zrad, zr) * (1.0 - smoothstep(zrad, zrad + 0.03, zr));\n        float sizzle = step(1.0 - agit * 0.8, zh.x) * (zring + 0.4 * (1.0 - smoothstep(zrad - 0.06, zrad, zr)));\n        col = lerp(col, FoamColor, saturate(crest + sizzle * 0.8 * FoamCap));\n    }\n    col = lerp(col, FoamColor, meniscus * 0.85);\n    glow = col * (Glow * 0.6);\n}\n\nOutNormal = n;\nOutEmissive = glow;\nOutRough = Roughness;\nreturn col;\n",
+					"Description": "Liquid Bubbling Brine"
+				}
+			},
+			{
+				"id": 59,
+				"class": "MakeMaterialAttributes",
+				"name": "MaterialExpressionMakeMaterialAttributes_7",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "BaseColor",
+						"node": 58,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "Roughness",
+						"node": 58,
+						"output": 4
+					},
+					{
+						"index": 5,
+						"name": "EmissiveColor",
+						"node": 58,
+						"output": 2
+					},
+					{
+						"index": 7,
+						"name": "OpacityMask",
+						"node": 58,
+						"output": 3
+					},
+					{
+						"index": 8,
+						"name": "Normal",
+						"node": 58,
+						"output": 1
+					}
+				]
+			},
+			{
+				"id": 60,
+				"class": "StaticSwitchParameter",
+				"name": "MaterialExpressionStaticSwitchParameter_5",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "True",
+						"node": 59,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "False",
+						"node": 57,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"ParameterName": "Bubbling",
+					"Group": "Bubbling"
+				}
 			}
 		],
 		"outputs": [
 			{
 				"property": "MP_MaterialAttributes",
-				"node": 34,
+				"node": 28,
 				"output": 0
 			}
 		]
@@ -785,6 +2175,26 @@
 			"value": 3.5
 		},
 		{
+			"name": "Breakup Amount",
+			"value": 0.14000000059604645
+		},
+		{
+			"name": "Breakup Frequency",
+			"value": 1.2999999523162842
+		},
+		{
+			"name": "Breakup Speed",
+			"value": 7
+		},
+		{
+			"name": "Aeration",
+			"value": 0.34999999403953552
+		},
+		{
+			"name": "Foam Cap",
+			"value": 1
+		},
+		{
 			"name": "Mote Amount",
 			"value": 0.60000002384185791
 		},
@@ -797,6 +2207,46 @@
 			"value": 0.34999999403953552
 		},
 		{
+			"name": "Boil",
+			"value": 1
+		},
+		{
+			"name": "Bubble Scale",
+			"value": 3
+		},
+		{
+			"name": "Bubble Speed",
+			"value": 1.2000000476837158
+		},
+		{
+			"name": "Bubble Density",
+			"value": 0.44999998807907104
+		},
+		{
+			"name": "Rim Froth",
+			"value": 1
+		},
+		{
+			"name": "Rim Froth Frequency",
+			"value": 16
+		},
+		{
+			"name": "Turbidity",
+			"value": 1.1000000238418579
+		},
+		{
+			"name": "Sediment",
+			"value": 0.60000002384185791
+		},
+		{
+			"name": "Speck Amount",
+			"value": 0.34999999403953552
+		},
+		{
+			"name": "Speck Scale",
+			"value": 4
+		},
+		{
 			"name": "Radius",
 			"value": 4.3600001335144043
 		},
@@ -806,6 +2256,10 @@
 		},
 		{
 			"name": "Phase",
+			"value": 0
+		},
+		{
+			"name": "Agitation",
 			"value": 0
 		}
 	],
@@ -825,6 +2279,10 @@
 		{
 			"name": "Foam Color",
 			"value": "RGBA(0.8, 1, 0.78, 1)"
+		},
+		{
+			"name": "Haze Color",
+			"value": "RGBA(0.86, 0.85, 0.55, 1)"
 		},
 		{
 			"name": "Surface",

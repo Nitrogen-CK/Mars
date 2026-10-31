@@ -1,27 +1,30 @@
 // A potion's assembly: the flask is the item's ordinary Presentation mesh (glass and cork); this script hangs the liquid
-// inside it (from the item's root: the visual's component entity carries no transform to hang from) and keeps its surface level and sloshing, in the world and in the hand. Nothing here is simulation: the slosh is
-// a drawing (a spring on the surface's tilt, driven by the flask's own motion), so it lives in the assembly and runs only
-// where something can render.
+// inside it (from the item's root: the visual's component entity carries no transform to hang from) and keeps its surface
+// level and sloshing, in the world and in the hand. Nothing here is simulation: the slosh is a drawing (a spring on the
+// surface's tilt, driven by the flask's own motion), so it lives in the assembly and runs only where something can render.
 //
-// The liquid (PotionLiquid_Mars_SM on PotionLiquid_Mars_MI, Tools/Blender/mars_environment/unreal/mars_potion_ue.py) is the
-// flask body's sphere and neck as one solid, pivot at the sphere's centre. Its material clips every pixel above the plane
-// dot(X - centre, Normal) = Level * radius and draws the surface on the back faces under it. Because the body is a sphere,
-// a plane at a fixed distance from its centre holds the same volume however the flask is turned, so the level is set once
-// from the fill and only the normal moves: up, plus the slosh tilt.
+// The liquid (PotionLiquid_Mars_SM, Tools/Blender/mars_environment/unreal/mars_potion_ue.py) wears the instance the item's
+// Potion Look trait names (PotionLiquid_Mars_MI by default); it is the flask body's sphere and neck as one solid, pivot at
+// the sphere's centre. Its material clips every pixel above the plane dot(X - centre, Normal) = Level * radius and draws
+// the surface on the back faces under it. Because the body is a sphere, a plane at a fixed distance from its centre holds
+// the same volume however the flask is turned, so the level is set once from the fill and only the normal moves: up, plus
+// the slosh tilt.
 
 namespace constants_potion
 {
     const FString k_LiquidMeshPath = "/Game/Mars/Gameplay/Items/Potion/Meshes/PotionLiquid_Mars_SM.PotionLiquid_Mars_SM";
+    // The liquid's instance when the item's Potion Look names none.
     const FString k_LiquidMaterialPath = "/Game/Mars/Gameplay/Items/Potion/Materials/PotionLiquid_Mars_MI.PotionLiquid_Mars_MI";
 
     // The body sphere's centre over the flask's pivot (its flat base), cm at MeshScale 1 (mars_potion_ue.BODY_CENTRE_CM).
     const float64 k_BodyCentreHeight = 4.05;
 
     // The liquid's custom primitive data: 0-2 the surface normal (world, unit), 3 the level (radii from the centre), 4 Slosh
-    // (0..1, the ripples' energy), 5 Phase (0..1, this potion's own).
+    // (0..1, the ripples' energy), 5 Phase (0..1, this potion's own), 6 Agitation (0..1, the cap's breakup).
     const int32 k_Cpd_Surface = 0;
     const int32 k_Cpd_Slosh = 4;
     const int32 k_Cpd_Phase = 5;
+    const int32 k_Cpd_Agitation = 6;
 
     // The surface is a pendulum: its tilt (the normal's horizontal part) is pulled back to level by a spring of this
     // frequency, lightly damped, so a jolt sets it rocking for a few swings. A 9 cm flask of water sloshes at about 3 Hz.
@@ -40,23 +43,9 @@ namespace constants_potion
     const float32 k_MaxSpeedCmPerS = 600.0f;
     // The ripples follow how hard the surface is moving; this tilt rate (per second) is full energy.
     const float32 k_FullSloshRate = 2.0f;
-}
-
-// How a potion looks: its liquid's colours and how full the flask is. Colours go on the liquid's own instance.
-struct FMars_PotionLook
-{
-    // Share of the body's volume the liquid fills, 0..1 (past about 0.85 it reaches the neck).
-    UPROPERTY()
-    float32 Fill = 0.65f;
-
-    UPROPERTY()
-    FLinearColor LiquidColor = FLinearColor(0.35f, 1.0f, 0.45f, 1.0f);
-
-    UPROPERTY()
-    FLinearColor DeepColor = FLinearColor(0.02f, 0.32f, 0.12f, 1.0f);
-
-    UPROPERTY()
-    FLinearColor SurfaceColor = FLinearColor(0.55f, 1.0f, 0.6f, 1.0f);
+    // Agitation is the slosh with a slow tail: it jumps with every jolt and eases back at this rate (per second, as an
+    // FInterpTo), so a shaken flask keeps its churned cap and its bubbles for a moment after the surface stops rocking.
+    const float32 k_AgitationSettleRate = 1.2f;
 }
 
 // `Mars.Potion.DebugSlosh 1`: every potion prints its speed, tilt and slosh once a second.
@@ -80,6 +69,7 @@ class UMars_Potion_EntityScript : UMars_WorldItem_EntityScript
     // The surface normal's horizontal part (world) and its rate.
     private FVector _Tilt = FVector::ZeroVector;
     private FVector _TiltRate = FVector::ZeroVector;
+    private float32 _Agitation = 0.0f;
     private float32 _DebugClock = 0.0f;
 
     UFUNCTION(BlueprintOverride)
@@ -109,9 +99,16 @@ class UMars_Potion_EntityScript : UMars_WorldItem_EntityScript
         _Liquid = nullptr;
     }
 
-    // A subclass's potion: its colours and fill.
-    protected FMars_PotionLook Get_Look() const
+    // The definition's Potion Look trait, else the defaults (the green potion, two thirds full).
+    private FMars_PotionLook Get_Look() const
     {
+        const UCk_InventoryItem_Definition ItemDefinition = Definition.Get();
+        if (ck::IsValid(ItemDefinition))
+        {
+            const UMars_ItemTrait_PotionLook Trait = ItemDefinition.Get_ItemTraitByClass(UMars_ItemTrait_PotionLook);
+            if (ck::IsValid(Trait))
+            { return Trait.Look; }
+        }
         return FMars_PotionLook();
     }
 
@@ -123,7 +120,10 @@ class UMars_Potion_EntityScript : UMars_WorldItem_EntityScript
         { return; }
 
         UStaticMesh Mesh = System::LoadAsset_Blocking(TSoftObjectPtr<UStaticMesh>(FSoftObjectPath(constants_potion::k_LiquidMeshPath)));
-        UMaterialInterface Material = System::LoadAsset_Blocking(TSoftObjectPtr<UMaterialInterface>(FSoftObjectPath(constants_potion::k_LiquidMaterialPath)));
+        auto MaterialPath = Get_Look().LiquidMaterial;
+        if (MaterialPath.IsNull())
+        { MaterialPath = TSoftObjectPtr<UMaterialInterface>(FSoftObjectPath(constants_potion::k_LiquidMaterialPath)); }
+        UMaterialInterface Material = System::LoadAsset_Blocking(MaterialPath);
         auto Root = _Self.As_Transform(ECk_SanityCheck::UnChecked);
         if (ck::Is_NOT_Valid(Mesh) || ck::Is_NOT_Valid(Material) || ck::Is_NOT_Valid(Root))
         { return; }
@@ -159,15 +159,6 @@ class UMars_Potion_EntityScript : UMars_WorldItem_EntityScript
 
     private void Apply_Look(UStaticMeshComponent InLiquid)
     {
-        const auto Look = Get_Look();
-        auto Material = InLiquid.CreateDynamicMaterialInstance(0);
-        if (ck::IsValid(Material))
-        {
-            Material.SetVectorParameterValue(n"Liquid Color", Look.LiquidColor);
-            Material.SetVectorParameterValue(n"Deep Color", Look.DeepColor);
-            Material.SetVectorParameterValue(n"Surface Color", Look.SurfaceColor);
-        }
-
         InLiquid.SetCustomPrimitiveDataFloat(constants_potion::k_Cpd_Phase, Math::RandRange(0.0f, 1.0f));
         Write_Surface(0.0f);
     }
@@ -180,6 +171,7 @@ class UMars_Potion_EntityScript : UMars_WorldItem_EntityScript
         const auto Normal = (FVector::UpVector + _Tilt).GetSafeNormal();
         _Liquid.SetCustomPrimitiveDataVector4(constants_potion::k_Cpd_Surface, FVector4(Normal.X, Normal.Y, Normal.Z, _Level));
         _Liquid.SetCustomPrimitiveDataFloat(constants_potion::k_Cpd_Slosh, InSlosh);
+        _Liquid.SetCustomPrimitiveDataFloat(constants_potion::k_Cpd_Agitation, _Agitation);
     }
 
     // The flask's motion feeds the spring: its change of velocity tips the surface toward the acceleration (the liquid piles
@@ -229,6 +221,7 @@ class UMars_Potion_EntityScript : UMars_WorldItem_EntityScript
         Advance_Spring(InDeltaSeconds);
 
         const auto Slosh = Math::Clamp(float32(_TiltRate.Size()) / constants_potion::k_FullSloshRate, 0.0f, 1.0f);
+        _Agitation = Math::Max(Slosh, Math::FInterpTo(_Agitation, Slosh, InDeltaSeconds, constants_potion::k_AgitationSettleRate));
         Write_Surface(Slosh);
         Print_DebugSlosh(Velocity, Slosh, InDeltaSeconds);
     }
@@ -262,6 +255,7 @@ class UMars_Potion_EntityScript : UMars_WorldItem_EntityScript
         _PrevVelocity = FVector::ZeroVector;
         _Tilt = FVector::ZeroVector;
         _TiltRate = FVector::ZeroVector;
+        _Agitation = 0.0f;
         Write_Surface(0.0f);
     }
 
@@ -285,7 +279,7 @@ class UMars_Potion_EntityScript : UMars_WorldItem_EntityScript
         { return; }
 
         _DebugClock = 0.0f;
-        Print(f"[Potion] [{_Self.ToString()}] speed [{InVelocity.Size() :.0}] cm/s tilt [{_Tilt}] rate [{_TiltRate.Size() :.2}] slosh [{InSlosh :.2}] level [{_Level :.2}]", 1.0f);
+        Print(f"[Potion] [{_Self.ToString()}] speed [{InVelocity.Size() :.0}] cm/s tilt [{_Tilt}] rate [{_TiltRate.Size() :.2}] slosh [{InSlosh :.2}] agitation [{_Agitation :.2}] level [{_Level :.2}]", 1.0f);
     }
 
     //--------------------------------------------------------------------------------------------------------------------------

@@ -16,7 +16,7 @@ live mesh is never rebuilt in an editor someone is using):
 
 Liquid contract (custom primitive data, written by UMars_Potion_EntityScript every tick): 0-2 the surface normal (world,
 unit), 3 the level (the plane's distance from the sphere's centre in radii, -1 empty .. 1 full), 4 Slosh (0..1, ripple
-energy), 5 Phase (0..1, per potion). "Radius" on the instance is the sphere's local radius, LIQUID_RADIUS_CM.
+energy), 5 Phase (0..1, per potion), 6 Agitation (0..1, Slosh with a slow decay: the cap's breakup). "Radius" on the instance is the sphere's local radius, LIQUID_RADIUS_CM.
 Masters are rebuilt IN PLACE (emptied and refilled), never replaced (see mars_flame_ue).
 """
 import math
@@ -221,6 +221,12 @@ def _const3(g, v, x, y):
     return c
 
 
+def _static_switch(g, name, value, desc):
+    e = g._param(unreal.MaterialExpressionStaticSwitchParameter, 100, name, desc)
+    e.set_editor_property("default_value", value)
+    return e
+
+
 def _cpd_scalar(g, name, value, index, desc):
     e = g.scalar(name, value, 0.0, 1.0, desc)
     e.set_editor_property("use_custom_primitive_data", True)
@@ -253,10 +259,35 @@ def build_liquid():
     rip_amt = g.scalar("Ripple Amount", 0.06, 0.0, 0.3, "Ripple height at full slosh, in radii.")
     rip_scale = g.scalar("Ripple Scale", 2.2, 0.2, 8.0, "Waves across the surface.")
     rip_speed = g.scalar("Ripple Speed", 3.5, 0.0, 12.0, "How fast the waves travel (radians/s).")
+    g.group("Breakup")
+    brk_amt = g.scalar("Breakup Amount", 0.14, 0.0, 0.5, "Height of the chop at full Agitation, in radii: how far a jolt "
+                                                          "tears the flat cap.")
+    brk_freq = g.scalar("Breakup Frequency", 1.3, 0.5, 10.0, "The chop's frequency over the swell's; it climbs further with "
+                                                              "Agitation, so a hard jolt breaks the cap finer.")
+    brk_speed = g.scalar("Breakup Speed", 7.0, 0.0, 20.0, "How fast the chop churns (radians/s at rest; faster as it agitates).")
+    aeration = g.scalar("Aeration", 0.35, 0.0, 1.5, "Depth of the white, bubbly band under the surface at full Agitation, "
+                                                    "in radii.")
+    foam_cap = g.scalar("Foam Cap", 1.0, 0.0, 2.0, "Whitecaps on the crests and the foam sizzle over the cap while it churns.")
     g.group("Motes")
     mote_amt = g.scalar("Mote Amount", 0.6, 0.0, 4.0, "Brightness of the sparks rising through the liquid (0: none).")
     mote_scale = g.scalar("Mote Scale", 2.6, 0.5, 10.0, "Cells per radius: more, smaller motes.")
     mote_speed = g.scalar("Mote Speed", 0.35, 0.0, 3.0, "How fast the motes rise (cells per second).")
+    g.group("Bubbling")
+    bubbling_on = _static_switch(g, "Bubbling", False, "A boil: bubbles rising through the liquid and popping on its top.")
+    boil = g.scalar("Boil", 1.0, 0.0, 2.0, "How hard it boils: the surface's churn, the froth and the bubbles' brightness.")
+    bub_scale = g.scalar("Bubble Scale", 3.0, 0.5, 10.0, "Cells per radius: more, smaller bubbles.")
+    bub_speed = g.scalar("Bubble Speed", 1.2, 0.0, 6.0, "How fast the bubbles rise (cells per second) and how often they pop.")
+    bub_density = g.scalar("Bubble Density", 0.45, 0.0, 1.0, "Share of cells that hold a bubble.")
+    rim_froth = g.scalar("Rim Froth", 1.0, 0.0, 3.0, "How far the froth beads swell the band round the rim (0: an even band).")
+    rim_freq = g.scalar("Rim Froth Frequency", 16.0, 3.0, 64.0, "Froth beads round the rim at Boil 1 and Bubble Density 0.5; "
+                                                                 "more as it boils harder or bubbles more.")
+    g.group("Brine")
+    brine_on = _static_switch(g, "Brine", False, "A pickling brine: cloudy, with sediment and suspended spices.")
+    haze = g.vector("Haze Color", (0.86, 0.85, 0.55, 1.0), "The brine's cloud, which the depth looked through fades toward.")
+    turbidity = g.scalar("Turbidity", 1.1, 0.0, 8.0, "How cloudy: haze per radius looked through.")
+    sediment = g.scalar("Sediment", 0.6, 0.0, 3.0, "Extra cloud hanging low in the vessel.")
+    speck_amt = g.scalar("Speck Amount", 0.35, 0.0, 1.0, "Share of cells holding a peppercorn, a mustard seed or a fleck of dill.")
+    speck_scale = g.scalar("Speck Scale", 4.0, 1.0, 16.0, "Cells per radius: more, smaller spices.")
     g.group("Shape")
     radius = g.scalar("Radius", LIQUID_RADIUS_CM, 0.1, 50.0, "The liquid sphere's local radius, cm (the mesh's).")
     g.group("Per Potion (Custom Primitive Data)")
@@ -264,6 +295,8 @@ def build_liquid():
                     "level (radii from the centre).", ("Nx", "Ny", "Nz", "Level"), cpd=0)
     slosh = _cpd_scalar(g, "Slosh", 0.0, 4, "Custom primitive data 4: ripple energy, 0 still.")
     phase = _cpd_scalar(g, "Phase", 0.0, 5, "Custom primitive data 5: this potion's random phase.")
+    agitation = _cpd_scalar(g, "Agitation", 0.0, 6, "Custom primitive data 6: the lagged slosh energy that breaks the "
+                                                    "cap up, 0 calm.")
 
     x, y = -1900, -900
     # D: the local position from the vertex shader (before the first-person transform), as a world vector
@@ -296,18 +329,51 @@ def build_liquid():
     sign = g.expr(unreal.MaterialExpressionTwoSidedSign, x + 520, y + 660)
     nw = g.expr(unreal.MaterialExpressionVertexNormalWS, x + 520, y + 760)
 
-    ps = g.custom("Liquid", hlsl.LIQUID_PS,
-                  [("D", d, ""), ("CamRel", camrel, ""), ("Unit", unit, ""), ("Radius", radius, ""), ("Surface", surf, "RGBA"),
-                   ("Slosh", slosh, ""), ("Phase", phase, ""), ("Time", time, ""), ("Sign", sign, ""), ("Nw", nw, ""),
-                   ("LiquidColor", liquid, ""), ("DeepColor", deep, ""), ("Density", density, ""), ("Glow", glow, ""),
-                   ("RimLight", rim, ""), ("Roughness", rough, ""), ("SurfaceColor", surface, ""), ("SurfaceMix", surface_mix, ""),
-                   ("FoamColor", foam, ""), ("FoamWidth", foam_w, ""), ("RippleAmount", rip_amt, ""), ("RippleScale", rip_scale, ""),
-                   ("RippleSpeed", rip_speed, ""), ("MoteAmount", mote_amt, ""), ("MoteScale", mote_scale, ""),
-                   ("MoteSpeed", mote_speed, "")],
-                  -600, y, out=FLOAT3,
-                  extra=(("OutNormal", FLOAT3), ("OutEmissive", FLOAT3), ("OutMask", FLOAT1), ("OutRough", FLOAT1)))
-    g.finish({"BaseColor": (ps, ""), "Normal": (ps, "OutNormal"), "EmissiveColor": (ps, "OutEmissive"),
-              "OpacityMask": (ps, "OutMask"), "Roughness": (ps, "OutRough")}, -200, y)
+    inputs = [("D", d, ""), ("CamRel", camrel, ""), ("Unit", unit, ""), ("Radius", radius, ""), ("Surface", surf, "RGBA"),
+              ("Slosh", slosh, ""), ("Agitation", agitation, ""), ("Phase", phase, ""), ("Time", time, ""), ("Sign", sign, ""), ("Nw", nw, ""),
+              ("LiquidColor", liquid, ""), ("DeepColor", deep, ""), ("Density", density, ""), ("Glow", glow, ""),
+              ("RimLight", rim, ""), ("Roughness", rough, ""), ("SurfaceColor", surface, ""), ("SurfaceMix", surface_mix, ""),
+              ("FoamColor", foam, ""), ("FoamWidth", foam_w, ""), ("RippleAmount", rip_amt, ""), ("RippleScale", rip_scale, ""),
+              ("RippleSpeed", rip_speed, ""), ("MoteAmount", mote_amt, ""), ("MoteScale", mote_scale, ""),
+              ("MoteSpeed", mote_speed, ""), ("Boil", boil, ""), ("BubbleScale", bub_scale, ""), ("BubbleSpeed", bub_speed, ""),
+              ("BubbleDensity", bub_density, ""), ("RimFroth", rim_froth, ""), ("RimFrothFrequency", rim_freq, ""),
+              ("BreakupAmount", brk_amt, ""), ("BreakupFrequency", brk_freq, ""), ("BreakupSpeed", brk_speed, ""),
+              ("Aeration", aeration, ""), ("FoamCap", foam_cap, ""), ("HazeColor", haze, ""), ("Turbidity", turbidity, ""),
+              ("Sediment", sediment, ""), ("SpeckAmount", speck_amt, ""), ("SpeckScale", speck_scale, "")]
+    # one Custom node per switch combination (the static switches prune the others from each instance's shader)
+    variants = {}
+    for row, (bubbling, brine) in enumerate(((False, False), (True, False), (False, True), (True, True))):
+        vy = y + row * 520
+        ps = g.custom("Liquid%s%s" % (" Bubbling" if bubbling else "", " Brine" if brine else ""), hlsl.LIQUID_PS, inputs,
+                      -900, vy, out=FLOAT3,
+                      extra=(("OutNormal", FLOAT3), ("OutEmissive", FLOAT3), ("OutMask", FLOAT1), ("OutRough", FLOAT1)))
+        defines = []
+        for name, on in (("MARS_LIQ_BUBBLING", bubbling), ("MARS_LIQ_BRINE", brine)):
+            cd = unreal.CustomDefine()
+            cd.set_editor_property("define_name", name)
+            cd.set_editor_property("define_value", "1" if on else "0")
+            defines.append(cd)
+        ps.set_editor_property("additional_defines", defines)
+        mma = g.expr(unreal.MaterialExpressionMakeMaterialAttributes, -600, vy)
+        for pin, out in (("BaseColor", ""), ("Normal", "OutNormal"), ("EmissiveColor", "OutEmissive"),
+                         ("OpacityMask", "OutMask"), ("Roughness", "OutRough")):
+            g.link(ps, out, mma, pin)
+        variants[(bubbling, brine)] = mma
+    # Bubbling picks within each Brine branch (the column's node for the clear branch, a twin of it for the brine one),
+    # then Brine picks the branch
+    twin = g.expr(unreal.MaterialExpressionStaticSwitchParameter, -350, y + 1040)
+    twin.set_editor_property("parameter_name", "Bubbling")
+    twin.set_editor_property("group", unreal.Name("Bubbling"))
+    for sw, brine in ((bubbling_on, False), (twin, True)):
+        g.link(variants[(True, brine)], "", sw, "True")
+        g.link(variants[(False, brine)], "", sw, "False")
+    g.link(twin, "", brine_on, "True")
+    g.link(bubbling_on, "", brine_on, "False")
+    top = brine_on
+    m.set_editor_property("use_material_attributes", True)
+    MEL.connect_material_property(top, "", unreal.MaterialProperty.MP_MATERIAL_ATTRIBUTES)
+    MEL.recompile_material(m)
+    EAL.save_loaded_asset(m)
     return m
 
 
@@ -375,7 +441,46 @@ def build_materials():
         EAL.save_loaded_asset(mi)
         stats = MEL.get_statistics(m)
         made.append((master, MEL.get_num_material_expressions(m), stats.num_pixel_shader_instructions))
+    made += build_variants()
     _log("potion materials: %s" % made)
+    return made
+
+
+# Liquid instances beside PotionLiquid_Mars_MI: (name, static switches, parameter values). The values are written only
+# when the instance is created, so a hand-tuned instance survives a rebuild (its switches are always re-applied).
+VARIANTS = (
+    ("PotionBubbling_Mars_MI", {"Bubbling": True},
+     {"Liquid Color": (0.85, 0.3, 1.0, 1.0), "Deep Color": (0.16, 0.02, 0.3, 1.0), "Surface Color": (0.85, 0.5, 1.0, 1.0),
+      "Foam Color": (1.0, 0.86, 1.0, 1.0), "Glow": 1.0, "Mote Amount": 0.3}),
+    ("PickleBrine_Mars_MI", {"Brine": True},
+     {"Liquid Color": (0.55, 0.63, 0.2, 1.0), "Deep Color": (0.28, 0.33, 0.06, 1.0), "Surface Color": (0.7, 0.72, 0.35, 1.0),
+      "Haze Color": (0.62, 0.64, 0.32, 1.0), "Foam Color": (0.9, 0.9, 0.7, 1.0), "Surface Mix": 0.2, "Density": 1.4,
+      "Turbidity": 0.45, "Sediment": 0.5, "Speck Amount": 0.55, "Speck Scale": 3.2, "Glow": 0.08, "Rim Light": 0.3,
+      "Mote Amount": 0.0, "Roughness": 0.04}),
+)
+
+
+def build_variants(reset=False):
+    """reset: write VARIANTS' values over an existing instance's too (discards hand tuning)."""
+    master = mc._asset(F_MAT, "PotionLiquid_Mars_M")
+    made = []
+    for name, switches, values in VARIANTS:
+        mi = mc._asset(F_MAT, name)
+        fresh = mi is None
+        if fresh:
+            mi = mc._tools().create_asset(name, F_MAT, unreal.MaterialInstanceConstant, unreal.MaterialInstanceConstantFactoryNew())
+        MEL.set_material_instance_parent(mi, master)
+        for key, on in switches.items():
+            MEL.set_material_instance_static_switch_parameter_value(mi, key, on)
+        if fresh or reset:
+            for key, v in values.items():
+                if isinstance(v, tuple):
+                    MEL.set_material_instance_vector_parameter_value(mi, key, unreal.LinearColor(*v))
+                else:
+                    MEL.set_material_instance_scalar_parameter_value(mi, key, v)
+        MEL.update_material_instance(mi)
+        EAL.save_loaded_asset(mi)
+        made.append((name, "created" if fresh else "kept"))
     return made
 
 
@@ -458,13 +563,17 @@ def level_for_fill(fill):
     return 0.5 * (lo + hi) - 1.0
 
 
-# (label, location cm, rotation (pitch, yaw, roll), surface normal tilt (x, y), fill)
+# (label, location cm, rotation (pitch, yaw, roll), surface normal tilt (x, y), fill, liquid instance)
 LOOKDEV_POSES = (
-    ("upright", (-36.0, 60.0, 0.0), (0.0, 0.0, 0.0), (0.0, 0.0), 0.5),
-    ("tipped", (-12.0, 60.0, 4.0), (0.0, 0.0, 50.0), (0.0, 0.0), 0.5),
-    ("slosh", (12.0, 60.0, 0.0), (0.0, 0.0, 0.0), (0.0, 0.35), 0.5),
-    ("full", (36.0, 60.0, 0.0), (0.0, 0.0, 0.0), (0.0, 0.0), 0.8),
-    ("side", (60.0, 60.0, 4.7), (90.0, 0.0, 0.0), (0.0, 0.0), 0.35),
+    ("upright", (-36.0, 60.0, 0.0), (0.0, 0.0, 0.0), (0.0, 0.0), 0.5, "PotionLiquid_Mars_MI"),
+    ("tipped", (-12.0, 60.0, 4.0), (0.0, 0.0, 50.0), (0.0, 0.0), 0.5, "PotionLiquid_Mars_MI"),
+    ("slosh", (12.0, 60.0, 0.0), (0.0, 0.0, 0.0), (0.0, 0.35), 0.5, "PotionLiquid_Mars_MI"),
+    ("full", (36.0, 60.0, 0.0), (0.0, 0.0, 0.0), (0.0, 0.0), 0.8, "PotionLiquid_Mars_MI"),
+    ("side", (60.0, 60.0, 4.7), (90.0, 0.0, 0.0), (0.0, 0.0), 0.35, "PotionLiquid_Mars_MI"),
+    ("bubbling", (-36.0, 90.0, 0.0), (0.0, 0.0, 0.0), (0.0, 0.0), 0.65, "PotionBubbling_Mars_MI"),
+    ("brine", (-12.0, 90.0, 0.0), (0.0, 0.0, 0.0), (0.0, 0.0), 0.75, "PickleBrine_Mars_MI"),
+    ("brine_tipped", (12.0, 90.0, 4.0), (0.0, 0.0, 40.0), (0.0, 0.0), 0.6, "PickleBrine_Mars_MI"),
+    ("churn", (36.0, 90.0, 0.0), (0.0, 0.0, 0.0), (0.25, 0.1), 0.55, "PotionLiquid_Mars_MI"),
 )
 
 SHOTS = {
@@ -474,6 +583,13 @@ SHOTS = {
     "potion_slosh": ((12.0, 36.0, 12.0), (12.0, 60.0, 6.0), 40),
     "potion_full_top": ((36.0, 44.0, 26.0), (36.0, 60.0, 6.0), 40),
     "potion_side": ((60.0, 38.0, 14.0), (60.0, 60.0, 5.0), 40),
+    "variant_row": ((-12.0, 50.0, 18.0), (-12.0, 90.0, 6.0), 62),
+    "bubbling_close": ((-36.0, 68.0, 16.0), (-36.0, 90.0, 6.0), 40),
+    "bubbling_rim": ((-36.0, 76.0, 15.0), (-36.0, 90.0, 6.5), 28),
+    "brine_close": ((-12.0, 68.0, 12.0), (-12.0, 90.0, 6.0), 40),
+    "brine_top": ((-12.0, 78.0, 24.0), (-12.0, 90.0, 6.0), 40),
+    "churn_side": ((36.0, 66.0, 9.0), (36.0, 90.0, 5.0), 40),
+    "churn_top": ((36.0, 76.0, 18.0), (36.0, 90.0, 5.0), 40),
 }
 
 
@@ -543,7 +659,7 @@ def build_lookdev():
     flask = mc._asset(F_MESH, FLASK)
     liquid = mc._asset(F_MESH, LIQUID)
     made = []
-    for label, loc, rot, tilt, fill in LOOKDEV_POSES:
+    for label, loc, rot, tilt, fill, material in LOOKDEV_POSES:
         fa = _spawn(unreal.StaticMeshActor, loc, rot)
         fa.static_mesh_component.set_static_mesh(flask)
         fa.set_actor_label("Potion_%s" % label)
@@ -553,12 +669,15 @@ def build_lookdev():
         la = _spawn(unreal.StaticMeshActor, (centre.x, centre.y, centre.z), rot)
         la.static_mesh_component.set_static_mesh(liquid)
         la.static_mesh_component.set_cast_shadow(False)
+        la.static_mesh_component.set_material(0, mc._asset(F_MAT, material))
         la.set_actor_label("PotionLiquid_%s" % label)
         la.tags = [unreal.Name(LOOKDEV_TAG)]
         n = unreal.Vector(tilt[0], tilt[1], 1.0)
         n = n.normal()
         c = la.static_mesh_component
-        for i, v in enumerate((n.x, n.y, n.z, level_for_fill(fill), 0.6 if label == "slosh" else 0.0, 0.37 * len(made))):
+        slosh = {"slosh": 0.6, "churn": 0.8}.get(label, 0.0)
+        agitation = {"churn": 1.0}.get(label, 0.0)
+        for i, v in enumerate((n.x, n.y, n.z, level_for_fill(fill), slosh, 0.37 * len(made), agitation)):
             c.set_custom_primitive_data_float(i, v)
         made.append(label)
     les.save_current_level()

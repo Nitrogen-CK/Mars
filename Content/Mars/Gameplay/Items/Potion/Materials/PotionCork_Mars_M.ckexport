@@ -4,7 +4,7 @@
 	"_meta":
 	{
 		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
-		"sourceHash": "72cc5f191ac20ee313f9680ececcfa54",
+		"sourceHash": "2d693e027061f1407419e5c61970e8ac",
 		"exporterVersion": 3
 	},
 	"blendMode": "BLEND_Opaque",
@@ -28,7 +28,7 @@
 			{
 				"id": 0,
 				"class": "VectorParameter",
-				"name": "MaterialExpressionVectorParameter_2",
+				"name": "MaterialExpressionVectorParameter_0",
 				"desc": "Cork between the grains.",
 				"outputs": [
 					"RGB",
@@ -49,7 +49,7 @@
 			{
 				"id": 1,
 				"class": "VectorParameter",
-				"name": "MaterialExpressionVectorParameter_3",
+				"name": "MaterialExpressionVectorParameter_1",
 				"desc": "Cork on the grains.",
 				"outputs": [
 					"RGB",
@@ -70,7 +70,7 @@
 			{
 				"id": 2,
 				"class": "ScalarParameter",
-				"name": "MaterialExpressionScalarParameter_2",
+				"name": "MaterialExpressionScalarParameter_0",
 				"desc": "Grains per cm.",
 				"props":
 				{
@@ -85,7 +85,7 @@
 			{
 				"id": 3,
 				"class": "ScalarParameter",
-				"name": "MaterialExpressionScalarParameter_3",
+				"name": "MaterialExpressionScalarParameter_1",
 				"props":
 				{
 					"DefaultValue": 0.85000002384185791,
@@ -98,7 +98,7 @@
 			{
 				"id": 4,
 				"class": "WorldPosition",
-				"name": "MaterialExpressionWorldPosition_1",
+				"name": "MaterialExpressionWorldPosition_0",
 				"outputs": [
 					"XYZ",
 					"XY",
@@ -112,7 +112,7 @@
 			{
 				"id": 5,
 				"class": "TransformPosition",
-				"name": "MaterialExpressionTransformPosition_1",
+				"name": "MaterialExpressionTransformPosition_0",
 				"inputs": [
 					{
 						"index": 0,
@@ -130,7 +130,7 @@
 			{
 				"id": 6,
 				"class": "Custom",
-				"name": "MaterialExpressionCustom_1",
+				"name": "MaterialExpressionCustom_0",
 				"inputs": [
 					{
 						"index": 0,
@@ -168,7 +168,7 @@
 			{
 				"id": 7,
 				"class": "MakeMaterialAttributes",
-				"name": "MaterialExpressionMakeMaterialAttributes_1",
+				"name": "MaterialExpressionMakeMaterialAttributes_0",
 				"inputs": [
 					{
 						"index": 0,
