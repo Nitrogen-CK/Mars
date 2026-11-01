@@ -1,0 +1,168 @@
+{
+	"material": "PickleMimicGlass_Mars_M",
+	"packagePath": "/Game/Mars/Gameplay/Monsters/PickleMimic/Materials/PickleMimicGlass_Mars_M",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "47d211339aed9a76348776abbd4ff1c3",
+		"exporterVersion": 3
+	},
+	"blendMode": "BLEND_Translucent",
+	"twoSided": false,
+	"unlit": false,
+	"shadingModel": "MSM_DefaultLit",
+	"domain": "MD_Surface",
+	"connectedOutputs": [
+		"BaseColor",
+		"Opacity"
+	],
+	"expressions":
+	{
+		"Fresnel": 1,
+		"LinearInterpolate": 1,
+		"ScalarParameter": 4,
+		"VectorParameter": 1
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_1",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.800000,G=0.920000,B=0.860000,A=1.000000)",
+					"ParameterName": "Color"
+				}
+			},
+			{
+				"id": 1,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_4",
+				"props":
+				{
+					"DefaultValue": 0.10000000149011612,
+					"ParameterName": "Opacity"
+				}
+			},
+			{
+				"id": 2,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_5",
+				"props":
+				{
+					"DefaultValue": 0.44999998807907104,
+					"ParameterName": "EdgeOpacity"
+				}
+			},
+			{
+				"id": 3,
+				"class": "Fresnel",
+				"name": "MaterialExpressionFresnel_1"
+			},
+			{
+				"id": 4,
+				"class": "LinearInterpolate",
+				"name": "MaterialExpressionLinearInterpolate_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 1,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 2,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "Alpha",
+						"node": 3,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 5,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_6",
+				"props":
+				{
+					"DefaultValue": 0.059999998658895493,
+					"ParameterName": "Roughness"
+				}
+			},
+			{
+				"id": 6,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_7",
+				"props":
+				{
+					"DefaultValue": 0.60000002384185791,
+					"ParameterName": "Specular"
+				}
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_Opacity",
+				"node": 4,
+				"output": 0
+			},
+			{
+				"property": "MP_BaseColor",
+				"node": 0,
+				"output": 0,
+				"mask": "rgb"
+			},
+			{
+				"property": "MP_Specular",
+				"node": 6,
+				"output": 0
+			},
+			{
+				"property": "MP_Roughness",
+				"node": 5,
+				"output": 0
+			}
+		]
+	},
+	"scalarParams": [
+		{
+			"name": "Opacity",
+			"value": 0.10000000149011612
+		},
+		{
+			"name": "EdgeOpacity",
+			"value": 0.44999998807907104
+		},
+		{
+			"name": "Roughness",
+			"value": 0.059999998658895493
+		},
+		{
+			"name": "Specular",
+			"value": 0.60000002384185791
+		}
+	],
+	"vectorParams": [
+		{
+			"name": "Color",
+			"value": "RGBA(0.8, 0.92, 0.86, 1)"
+		}
+	],
+	"textureParams": [],
+	"usedTextures": []
+}

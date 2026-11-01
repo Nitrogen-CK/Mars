@@ -1,0 +1,178 @@
+{
+	"material": "PickleMimicEye_Mars_MI",
+	"packagePath": "/Game/Mars/Gameplay/Monsters/PickleMimic/Materials/PickleMimicEye_Mars_MI",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "f13aa53176586ac8b71b6d8198b0ed25",
+		"exporterVersion": 3
+	},
+	"parentChain": [
+		"/Game/Mars/Gameplay/Monsters/PickleMimic/Materials/PickleMimic_Mars_M.PickleMimic_Mars_M"
+	],
+	"blendMode": "BLEND_Opaque",
+	"twoSided": false,
+	"unlit": false,
+	"shadingModel": "MSM_DefaultLit",
+	"domain": "MD_Surface",
+	"connectedOutputs": [
+		"EmissiveColor",
+		"BaseColor"
+	],
+	"expressions":
+	{
+		"Multiply": 2,
+		"ScalarParameter": 4,
+		"VectorParameter": 1
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_1",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.460000,G=0.160000,B=0.045000,A=1.000000)",
+					"ParameterName": "Color"
+				}
+			},
+			{
+				"id": 1,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_4",
+				"props":
+				{
+					"ParameterName": "Emissive"
+				}
+			},
+			{
+				"id": 2,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_5",
+				"props":
+				{
+					"DefaultValue": 1,
+					"bUseCustomPrimitiveData": true,
+					"ParameterName": "Glow"
+				}
+			},
+			{
+				"id": 3,
+				"class": "Multiply",
+				"name": "MaterialExpressionMultiply_2",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 0,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 1,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 4,
+				"class": "Multiply",
+				"name": "MaterialExpressionMultiply_3",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 3,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 2,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 5,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_6",
+				"props":
+				{
+					"DefaultValue": 0.69999998807907104,
+					"ParameterName": "Roughness"
+				}
+			},
+			{
+				"id": 6,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_7",
+				"props":
+				{
+					"ParameterName": "Metallic"
+				}
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_EmissiveColor",
+				"node": 4,
+				"output": 0
+			},
+			{
+				"property": "MP_BaseColor",
+				"node": 0,
+				"output": 0,
+				"mask": "rgb"
+			},
+			{
+				"property": "MP_Metallic",
+				"node": 6,
+				"output": 0
+			},
+			{
+				"property": "MP_Roughness",
+				"node": 5,
+				"output": 0
+			}
+		]
+	},
+	"scalarParams": [
+		{
+			"name": "Emissive",
+			"value": 6
+		},
+		{
+			"name": "Glow",
+			"value": 1
+		},
+		{
+			"name": "Roughness",
+			"value": 0.40000000596046448
+		},
+		{
+			"name": "Metallic",
+			"value": 0
+		}
+	],
+	"vectorParams": [
+		{
+			"name": "Color",
+			"value": "RGBA(1, 0.8, 0.35, 1)"
+		}
+	],
+	"textureParams": [],
+	"usedTextures": []
+}

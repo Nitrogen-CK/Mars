@@ -1,0 +1,2918 @@
+{
+	"material": "PickleMimicBrine_Mars_MI",
+	"packagePath": "/Game/Mars/Gameplay/Monsters/PickleMimic/Materials/PickleMimicBrine_Mars_MI",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "6cd74c1a95adf71f72eddfcf23aa7d87",
+		"exporterVersion": 3
+	},
+	"parentChain": [
+		"/Game/Mars/Gameplay/Items/Potion/Materials/PickleJarBrine_Mars_MI.PickleJarBrine_Mars_MI",
+		"/Game/Mars/Gameplay/Items/Potion/Materials/PotionLiquid_Mars_M.PotionLiquid_Mars_M"
+	],
+	"blendMode": "BLEND_Masked",
+	"twoSided": true,
+	"unlit": false,
+	"shadingModel": "MSM_DefaultLit",
+	"domain": "MD_Surface",
+	"connectedOutputs": [],
+	"expressions":
+	{
+		"CameraPositionWS": 1,
+		"Constant": 2,
+		"Constant3Vector": 3,
+		"Custom": 4,
+		"MakeMaterialAttributes": 4,
+		"ScalarParameter": 39,
+		"StaticSwitchParameter": 4,
+		"Subtract": 1,
+		"Time": 1,
+		"Transform": 3,
+		"TransformPosition": 2,
+		"TwoSidedSign": 1,
+		"VectorParameter": 9,
+		"VertexInterpolator": 1,
+		"VertexNormalWS": 1,
+		"WorldPosition": 1
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_6",
+				"desc": "The liquid where it is thin: the edge of the volume.",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.300000,G=1.000000,B=0.420000,A=1.000000)",
+					"ParameterName": "Liquid Color",
+					"Group": "Liquid",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 1,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_7",
+				"desc": "The liquid where it is thick: the middle of the flask.",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.010000,G=0.160000,B=0.050000,A=1.000000)",
+					"ParameterName": "Deep Color",
+					"Group": "Liquid",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 2,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_31",
+				"desc": "How fast the colour goes from Liquid to Deep with the depth looked through (per radius).",
+				"props":
+				{
+					"DefaultValue": 2.5999999046325684,
+					"SliderMax": 8,
+					"ParameterName": "Density",
+					"Group": "Liquid",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 3,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_32",
+				"desc": "Emissive strength: the potion's own light (it still takes the scene's).",
+				"props":
+				{
+					"DefaultValue": 0.89999997615814209,
+					"SliderMax": 10,
+					"ParameterName": "Glow",
+					"Group": "Liquid",
+					"SortPriority": 3
+				}
+			},
+			{
+				"id": 4,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_33",
+				"desc": "Light through the thin edge of the volume.",
+				"props":
+				{
+					"DefaultValue": 1.3999999761581421,
+					"SliderMax": 4,
+					"ParameterName": "Rim Light",
+					"Group": "Liquid",
+					"SortPriority": 4
+				}
+			},
+			{
+				"id": 5,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_34",
+				"desc": "Wall and surface roughness: low for a glossy liquid.",
+				"props":
+				{
+					"DefaultValue": 0.059999998658895493,
+					"SliderMax": 1,
+					"ParameterName": "Roughness",
+					"Group": "Liquid",
+					"SortPriority": 5
+				}
+			},
+			{
+				"id": 6,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_8",
+				"desc": "The top of the liquid, mixed over the depth colour.",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.450000,G=0.950000,B=0.550000,A=1.000000)",
+					"ParameterName": "Surface Color",
+					"Group": "Surface",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 7,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_35",
+				"desc": "How much of the top is Surface Color (0: only the depth under it).",
+				"props":
+				{
+					"DefaultValue": 0.20000000298023224,
+					"SliderMax": 1,
+					"ParameterName": "Surface Mix",
+					"Group": "Surface",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 8,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_9",
+				"desc": "The line where the liquid meets the glass (and the motes).",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.800000,G=1.000000,B=0.780000,A=1.000000)",
+					"ParameterName": "Foam Color",
+					"Group": "Surface",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 9,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_36",
+				"desc": "The meniscus line's width, in radii.",
+				"props":
+				{
+					"DefaultValue": 0.035000000149011612,
+					"SliderMax": 0.30000001192092896,
+					"ParameterName": "Foam Width",
+					"Group": "Surface",
+					"SortPriority": 3
+				}
+			},
+			{
+				"id": 10,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_37",
+				"desc": "Ripple height at full slosh, in radii.",
+				"props":
+				{
+					"DefaultValue": 0.059999998658895493,
+					"SliderMax": 0.30000001192092896,
+					"ParameterName": "Ripple Amount",
+					"Group": "Ripples",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 11,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_38",
+				"desc": "Waves across the surface.",
+				"props":
+				{
+					"DefaultValue": 2.2000000476837158,
+					"SliderMin": 0.20000000298023224,
+					"SliderMax": 8,
+					"ParameterName": "Ripple Scale",
+					"Group": "Ripples",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 12,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_39",
+				"desc": "How fast the waves travel (radians/s).",
+				"props":
+				{
+					"DefaultValue": 3.5,
+					"SliderMax": 12,
+					"ParameterName": "Ripple Speed",
+					"Group": "Ripples",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 13,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_40",
+				"desc": "Height of the chop at full Agitation, in radii: how far a jolt tears the flat cap.",
+				"props":
+				{
+					"DefaultValue": 0.14000000059604645,
+					"SliderMax": 0.5,
+					"ParameterName": "Breakup Amount",
+					"Group": "Breakup",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 14,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_41",
+				"desc": "The chop's frequency over the swell's; it climbs further with Agitation, so a hard jolt breaks the cap finer.",
+				"props":
+				{
+					"DefaultValue": 1.2999999523162842,
+					"SliderMin": 0.5,
+					"SliderMax": 10,
+					"ParameterName": "Breakup Frequency",
+					"Group": "Breakup",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 15,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_42",
+				"desc": "How fast the chop churns (radians/s at rest; faster as it agitates).",
+				"props":
+				{
+					"DefaultValue": 7,
+					"SliderMax": 20,
+					"ParameterName": "Breakup Speed",
+					"Group": "Breakup",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 16,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_43",
+				"desc": "Depth of the white, bubbly band under the surface at full Agitation, in radii.",
+				"props":
+				{
+					"DefaultValue": 0.34999999403953552,
+					"SliderMax": 1.5,
+					"ParameterName": "Aeration",
+					"Group": "Breakup",
+					"SortPriority": 3
+				}
+			},
+			{
+				"id": 17,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_44",
+				"desc": "Whitecaps on the crests and the foam sizzle over the cap while it churns.",
+				"props":
+				{
+					"DefaultValue": 1,
+					"SliderMax": 2,
+					"ParameterName": "Foam Cap",
+					"Group": "Breakup",
+					"SortPriority": 4
+				}
+			},
+			{
+				"id": 18,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_45",
+				"desc": "Brightness of the sparks rising through the liquid (0: none).",
+				"props":
+				{
+					"DefaultValue": 0.60000002384185791,
+					"SliderMax": 4,
+					"ParameterName": "Mote Amount",
+					"Group": "Motes",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 19,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_46",
+				"desc": "Cells per radius: more, smaller motes.",
+				"props":
+				{
+					"DefaultValue": 2.5999999046325684,
+					"SliderMin": 0.5,
+					"SliderMax": 10,
+					"ParameterName": "Mote Scale",
+					"Group": "Motes",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 20,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_47",
+				"desc": "How fast the motes rise (cells per second).",
+				"props":
+				{
+					"DefaultValue": 0.34999999403953552,
+					"SliderMax": 3,
+					"ParameterName": "Mote Speed",
+					"Group": "Motes",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 21,
+				"class": "StaticSwitchParameter",
+				"name": "MaterialExpressionStaticSwitchParameter_3",
+				"desc": "A boil: bubbles rising through the liquid and popping on its top.",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "True",
+						"node": 71,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "False",
+						"node": 69,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"ParameterName": "Bubbling",
+					"Group": "Bubbling",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 22,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_48",
+				"desc": "How hard it boils: the surface's churn, the froth and the bubbles' brightness.",
+				"props":
+				{
+					"DefaultValue": 1,
+					"SliderMax": 2,
+					"ParameterName": "Boil",
+					"Group": "Bubbling",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 23,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_49",
+				"desc": "Cells per radius: more, smaller bubbles.",
+				"props":
+				{
+					"DefaultValue": 3,
+					"SliderMin": 0.5,
+					"SliderMax": 10,
+					"ParameterName": "Bubble Scale",
+					"Group": "Bubbling",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 24,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_50",
+				"desc": "How fast the bubbles rise (cells per second) and how often they pop.",
+				"props":
+				{
+					"DefaultValue": 1.2000000476837158,
+					"SliderMax": 6,
+					"ParameterName": "Bubble Speed",
+					"Group": "Bubbling",
+					"SortPriority": 3
+				}
+			},
+			{
+				"id": 25,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_51",
+				"desc": "Share of cells that hold a bubble.",
+				"props":
+				{
+					"DefaultValue": 0.44999998807907104,
+					"SliderMax": 1,
+					"ParameterName": "Bubble Density",
+					"Group": "Bubbling",
+					"SortPriority": 4
+				}
+			},
+			{
+				"id": 26,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_52",
+				"desc": "How far the froth beads swell the band round the rim (0: an even band).",
+				"props":
+				{
+					"DefaultValue": 1,
+					"SliderMax": 3,
+					"ParameterName": "Rim Froth",
+					"Group": "Bubbling",
+					"SortPriority": 5
+				}
+			},
+			{
+				"id": 27,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_53",
+				"desc": "Froth beads round the rim at Boil 1 and Bubble Density 0.5; more as it boils harder or bubbles more.",
+				"props":
+				{
+					"DefaultValue": 16,
+					"SliderMin": 3,
+					"SliderMax": 64,
+					"ParameterName": "Rim Froth Frequency",
+					"Group": "Bubbling",
+					"SortPriority": 6
+				}
+			},
+			{
+				"id": 28,
+				"class": "StaticSwitchParameter",
+				"name": "MaterialExpressionStaticSwitchParameter_4",
+				"desc": "A pickling brine: cloudy, with sediment and suspended spices.",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "True",
+						"node": 76,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "False",
+						"node": 21,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"ParameterName": "Brine",
+					"Group": "Brine",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 29,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_10",
+				"desc": "The brine's cloud, which the depth looked through fades toward.",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.860000,G=0.850000,B=0.550000,A=1.000000)",
+					"ParameterName": "Haze Color",
+					"Group": "Brine",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 30,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_54",
+				"desc": "How cloudy: haze per radius looked through.",
+				"props":
+				{
+					"DefaultValue": 1.1000000238418579,
+					"SliderMax": 8,
+					"ParameterName": "Turbidity",
+					"Group": "Brine",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 31,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_55",
+				"desc": "Extra cloud hanging low in the vessel.",
+				"props":
+				{
+					"DefaultValue": 0.60000002384185791,
+					"SliderMax": 3,
+					"ParameterName": "Sediment",
+					"Group": "Brine",
+					"SortPriority": 3
+				}
+			},
+			{
+				"id": 32,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_56",
+				"desc": "Share of cells holding a peppercorn, a mustard seed or a fleck of dill.",
+				"props":
+				{
+					"DefaultValue": 0.34999999403953552,
+					"SliderMax": 1,
+					"ParameterName": "Speck Amount",
+					"Group": "Brine",
+					"SortPriority": 4
+				}
+			},
+			{
+				"id": 33,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_57",
+				"desc": "Cells per radius: more, smaller spices.",
+				"props":
+				{
+					"DefaultValue": 4,
+					"SliderMin": 1,
+					"SliderMax": 16,
+					"ParameterName": "Speck Scale",
+					"Group": "Brine",
+					"SortPriority": 5
+				}
+			},
+			{
+				"id": 34,
+				"class": "StaticSwitchParameter",
+				"name": "MaterialExpressionStaticSwitchParameter_5",
+				"desc": "The vessel is a cylinder (Radius, Half Height) packed with upright low-poly pickles: wear it on PickleJarLiquid_Mars_SM.",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "True",
+						"node": 63,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "False",
+						"node": 64,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"ParameterName": "Pickle Jar",
+					"Group": "Pickle Jar",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 35,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_58",
+				"desc": "Pickles in the jar: a ring round the wall, and one in the middle from four up.",
+				"props":
+				{
+					"DefaultValue": 8,
+					"SliderMax": 12,
+					"ParameterName": "Pickle Count",
+					"Group": "Pickle Jar",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 36,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_59",
+				"desc": "A pickle's radius, in the jar's radii.",
+				"props":
+				{
+					"DefaultValue": 0.27000001072883606,
+					"SliderMin": 0.05000000074505806,
+					"SliderMax": 0.5,
+					"ParameterName": "Pickle Radius",
+					"Group": "Pickle Jar",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 37,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_60",
+				"desc": "The longest pickle's length, in the jar's height (each is 84-100% of it).",
+				"props":
+				{
+					"DefaultValue": 0.85000002384185791,
+					"SliderMin": 0.10000000149011612,
+					"SliderMax": 1,
+					"ParameterName": "Pickle Length",
+					"Group": "Pickle Jar",
+					"SortPriority": 3
+				}
+			},
+			{
+				"id": 38,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_11",
+				"desc": "The pickles' darkest facets.",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.100000,G=0.280000,B=0.020000,A=1.000000)",
+					"ParameterName": "Pickle Color",
+					"Group": "Pickle Jar",
+					"SortPriority": 4
+				}
+			},
+			{
+				"id": 39,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_15",
+				"desc": "The pickles' lightest facets and their ends.",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.420000,G=0.660000,B=0.080000,A=1.000000)",
+					"ParameterName": "Pickle Light",
+					"Group": "Pickle Jar",
+					"SortPriority": 5
+				}
+			},
+			{
+				"id": 40,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_16",
+				"desc": "The pale dots on the pickles.",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.850000,G=0.860000,B=0.550000,A=1.000000)",
+					"ParameterName": "Wart Color",
+					"Group": "Pickle Jar",
+					"SortPriority": 6
+				}
+			},
+			{
+				"id": 41,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_61",
+				"desc": "Share of the pickles' cells holding a wart.",
+				"props":
+				{
+					"DefaultValue": 0.30000001192092896,
+					"SliderMax": 1,
+					"ParameterName": "Wart Amount",
+					"Group": "Pickle Jar",
+					"SortPriority": 7
+				}
+			},
+			{
+				"id": 42,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_69",
+				"desc": "How fast the liquid in front veils a pickle (per radius; the brine adds its Turbidity and Sediment).",
+				"props":
+				{
+					"DefaultValue": 0.34999999403953552,
+					"SliderMax": 6,
+					"ParameterName": "Pickle Veil",
+					"Group": "Pickle Jar",
+					"SortPriority": 8
+				}
+			},
+			{
+				"id": 43,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_70",
+				"desc": "The pickles' own light, so they read in a backlit or shaded jar (faded by the veil).",
+				"props":
+				{
+					"DefaultValue": 0.25,
+					"SliderMax": 2,
+					"ParameterName": "Pickle Glow",
+					"Group": "Pickle Jar",
+					"SortPriority": 9
+				}
+			},
+			{
+				"id": 44,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_71",
+				"desc": "The pickles' skin where it shows clear of the veil.",
+				"props":
+				{
+					"DefaultValue": 0.34999999403953552,
+					"SliderMax": 1,
+					"ParameterName": "Pickle Roughness",
+					"Group": "Pickle Jar",
+					"SortPriority": 10
+				}
+			},
+			{
+				"id": 45,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_72",
+				"desc": "The liquid sphere's local radius, cm (the mesh's); a jar's cylinder's.",
+				"props":
+				{
+					"DefaultValue": 4.3600001335144043,
+					"SliderMin": 0.10000000149011612,
+					"SliderMax": 50,
+					"ParameterName": "Radius",
+					"Group": "Shape",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 46,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_73",
+				"desc": "A jar's liquid cylinder's half height, cm (the mesh's; Pickle Jar only).",
+				"props":
+				{
+					"DefaultValue": 4.1599998474121094,
+					"SliderMin": 0.10000000149011612,
+					"SliderMax": 50,
+					"ParameterName": "Half Height",
+					"Group": "Shape",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 47,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_17",
+				"desc": "Custom primitive data 0-3: the surface normal (world) and the level (radii from the centre).",
+				"outputs": [
+					"RGB",
+					"Nx",
+					"Ny",
+					"Nz",
+					"Level",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.000000,G=0.000000,B=1.000000,A=0.000000)",
+					"bUseCustomPrimitiveData": true,
+					"ParameterName": "Surface",
+					"Group": "Per Potion (Custom Primitive Data)",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 48,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_74",
+				"desc": "Custom primitive data 4: ripple energy, 0 still.",
+				"props":
+				{
+					"SliderMax": 1,
+					"bUseCustomPrimitiveData": true,
+					"PrimitiveDataIndex": 4,
+					"ParameterName": "Slosh",
+					"Group": "Per Potion (Custom Primitive Data)",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 49,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_75",
+				"desc": "Custom primitive data 5: this potion's random phase.",
+				"props":
+				{
+					"SliderMax": 1,
+					"bUseCustomPrimitiveData": true,
+					"PrimitiveDataIndex": 5,
+					"ParameterName": "Phase",
+					"Group": "Per Potion (Custom Primitive Data)",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 50,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_76",
+				"desc": "Custom primitive data 6: the lagged slosh energy that breaks the cap up, 0 calm.",
+				"props":
+				{
+					"SliderMax": 1,
+					"bUseCustomPrimitiveData": true,
+					"PrimitiveDataIndex": 6,
+					"ParameterName": "Agitation",
+					"Group": "Per Potion (Custom Primitive Data)",
+					"SortPriority": 3
+				}
+			},
+			{
+				"id": 51,
+				"class": "WorldPosition",
+				"name": "MaterialExpressionWorldPosition_1",
+				"outputs": [
+					"XYZ",
+					"XY",
+					"Z"
+				],
+				"props":
+				{
+					"WorldPositionShaderOffset": "WPT_ExcludeAllShaderOffsets"
+				}
+			},
+			{
+				"id": 52,
+				"class": "TransformPosition",
+				"name": "MaterialExpressionTransformPosition_2",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Input",
+						"node": 51,
+						"output": 0,
+						"mask": "rgb"
+					}
+				],
+				"props":
+				{
+					"TransformSourceType": "TRANSFORMPOSSOURCE_World"
+				}
+			},
+			{
+				"id": 53,
+				"class": "VertexInterpolator",
+				"name": "MaterialExpressionVertexInterpolator_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "VS",
+						"node": 52,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 54,
+				"class": "Transform",
+				"name": "MaterialExpressionTransform_2",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Input",
+						"node": 53,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"TransformSourceType": "TRANSFORMSOURCE_Local"
+				}
+			},
+			{
+				"id": 55,
+				"class": "TransformPosition",
+				"name": "MaterialExpressionTransformPosition_3",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Input",
+						"node": 56,
+						"output": 0,
+						"mask": "rgb"
+					}
+				],
+				"props":
+				{
+					"TransformType": "TRANSFORMPOSSOURCE_World"
+				}
+			},
+			{
+				"id": 56,
+				"class": "Constant3Vector",
+				"name": "MaterialExpressionConstant3Vector_2",
+				"outputs": [
+					"None",
+					"None",
+					"None",
+					"None"
+				],
+				"props":
+				{
+					"Constant": "(R=0.000000,G=0.000000,B=0.000000,A=1.000000)"
+				}
+			},
+			{
+				"id": 57,
+				"class": "CameraPositionWS",
+				"name": "MaterialExpressionCameraPositionWS_1"
+			},
+			{
+				"id": 58,
+				"class": "Subtract",
+				"name": "MaterialExpressionSubtract_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 57,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 55,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 59,
+				"class": "Transform",
+				"name": "MaterialExpressionTransform_3",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Input",
+						"node": 60,
+						"output": 0,
+						"mask": "rgb"
+					}
+				],
+				"props":
+				{
+					"TransformSourceType": "TRANSFORMSOURCE_Local"
+				}
+			},
+			{
+				"id": 60,
+				"class": "Constant3Vector",
+				"name": "MaterialExpressionConstant3Vector_3",
+				"outputs": [
+					"None",
+					"None",
+					"None",
+					"None"
+				],
+				"props":
+				{
+					"Constant": "(R=1.000000,G=0.000000,B=0.000000,A=1.000000)"
+				}
+			},
+			{
+				"id": 61,
+				"class": "Transform",
+				"name": "MaterialExpressionTransform_5",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Input",
+						"node": 62,
+						"output": 0,
+						"mask": "rgb"
+					}
+				],
+				"props":
+				{
+					"TransformSourceType": "TRANSFORMSOURCE_Local"
+				}
+			},
+			{
+				"id": 62,
+				"class": "Constant3Vector",
+				"name": "MaterialExpressionConstant3Vector_5",
+				"outputs": [
+					"None",
+					"None",
+					"None",
+					"None"
+				],
+				"props":
+				{
+					"Constant": "(R=0.000000,G=0.000000,B=1.000000,A=1.000000)"
+				}
+			},
+			{
+				"id": 63,
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_2",
+				"props":
+				{
+					"R": 1
+				}
+			},
+			{
+				"id": 64,
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_3"
+			},
+			{
+				"id": 65,
+				"class": "Time",
+				"name": "MaterialExpressionTime_1"
+			},
+			{
+				"id": 66,
+				"class": "TwoSidedSign",
+				"name": "MaterialExpressionTwoSidedSign_1"
+			},
+			{
+				"id": 67,
+				"class": "VertexNormalWS",
+				"name": "MaterialExpressionVertexNormalWS_1"
+			},
+			{
+				"id": 68,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_4",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "D",
+						"node": 54,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "CamRel",
+						"node": 58,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "Unit",
+						"node": 59,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "Radius",
+						"node": 45,
+						"output": 0
+					},
+					{
+						"index": 4,
+						"name": "Surface",
+						"node": 47,
+						"output": 5,
+						"mask": "rgba"
+					},
+					{
+						"index": 5,
+						"name": "Slosh",
+						"node": 48,
+						"output": 0
+					},
+					{
+						"index": 6,
+						"name": "Agitation",
+						"node": 50,
+						"output": 0
+					},
+					{
+						"index": 7,
+						"name": "Phase",
+						"node": 49,
+						"output": 0
+					},
+					{
+						"index": 8,
+						"name": "Time",
+						"node": 65,
+						"output": 0
+					},
+					{
+						"index": 9,
+						"name": "Sign",
+						"node": 66,
+						"output": 0
+					},
+					{
+						"index": 10,
+						"name": "Nw",
+						"node": 67,
+						"output": 0
+					},
+					{
+						"index": 11,
+						"name": "LiquidColor",
+						"node": 0,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 12,
+						"name": "DeepColor",
+						"node": 1,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 13,
+						"name": "Density",
+						"node": 2,
+						"output": 0
+					},
+					{
+						"index": 14,
+						"name": "Glow",
+						"node": 3,
+						"output": 0
+					},
+					{
+						"index": 15,
+						"name": "RimLight",
+						"node": 4,
+						"output": 0
+					},
+					{
+						"index": 16,
+						"name": "Roughness",
+						"node": 5,
+						"output": 0
+					},
+					{
+						"index": 17,
+						"name": "SurfaceColor",
+						"node": 6,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 18,
+						"name": "SurfaceMix",
+						"node": 7,
+						"output": 0
+					},
+					{
+						"index": 19,
+						"name": "FoamColor",
+						"node": 8,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 20,
+						"name": "FoamWidth",
+						"node": 9,
+						"output": 0
+					},
+					{
+						"index": 21,
+						"name": "RippleAmount",
+						"node": 10,
+						"output": 0
+					},
+					{
+						"index": 22,
+						"name": "RippleScale",
+						"node": 11,
+						"output": 0
+					},
+					{
+						"index": 23,
+						"name": "RippleSpeed",
+						"node": 12,
+						"output": 0
+					},
+					{
+						"index": 24,
+						"name": "MoteAmount",
+						"node": 18,
+						"output": 0
+					},
+					{
+						"index": 25,
+						"name": "MoteScale",
+						"node": 19,
+						"output": 0
+					},
+					{
+						"index": 26,
+						"name": "MoteSpeed",
+						"node": 20,
+						"output": 0
+					},
+					{
+						"index": 27,
+						"name": "Boil",
+						"node": 22,
+						"output": 0
+					},
+					{
+						"index": 28,
+						"name": "BubbleScale",
+						"node": 23,
+						"output": 0
+					},
+					{
+						"index": 29,
+						"name": "BubbleSpeed",
+						"node": 24,
+						"output": 0
+					},
+					{
+						"index": 30,
+						"name": "BubbleDensity",
+						"node": 25,
+						"output": 0
+					},
+					{
+						"index": 31,
+						"name": "RimFroth",
+						"node": 26,
+						"output": 0
+					},
+					{
+						"index": 32,
+						"name": "RimFrothFrequency",
+						"node": 27,
+						"output": 0
+					},
+					{
+						"index": 33,
+						"name": "BreakupAmount",
+						"node": 13,
+						"output": 0
+					},
+					{
+						"index": 34,
+						"name": "BreakupFrequency",
+						"node": 14,
+						"output": 0
+					},
+					{
+						"index": 35,
+						"name": "BreakupSpeed",
+						"node": 15,
+						"output": 0
+					},
+					{
+						"index": 36,
+						"name": "Aeration",
+						"node": 16,
+						"output": 0
+					},
+					{
+						"index": 37,
+						"name": "FoamCap",
+						"node": 17,
+						"output": 0
+					},
+					{
+						"index": 38,
+						"name": "HazeColor",
+						"node": 29,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 39,
+						"name": "Turbidity",
+						"node": 30,
+						"output": 0
+					},
+					{
+						"index": 40,
+						"name": "Sediment",
+						"node": 31,
+						"output": 0
+					},
+					{
+						"index": 41,
+						"name": "SpeckAmount",
+						"node": 32,
+						"output": 0
+					},
+					{
+						"index": 42,
+						"name": "SpeckScale",
+						"node": 33,
+						"output": 0
+					},
+					{
+						"index": 43,
+						"name": "UnitZ",
+						"node": 61,
+						"output": 0
+					},
+					{
+						"index": 44,
+						"name": "Jar",
+						"node": 34,
+						"output": 0
+					},
+					{
+						"index": 45,
+						"name": "HalfHeight",
+						"node": 46,
+						"output": 0
+					},
+					{
+						"index": 46,
+						"name": "PickleCount",
+						"node": 35,
+						"output": 0
+					},
+					{
+						"index": 47,
+						"name": "PickleRadius",
+						"node": 36,
+						"output": 0
+					},
+					{
+						"index": 48,
+						"name": "PickleLength",
+						"node": 37,
+						"output": 0
+					},
+					{
+						"index": 49,
+						"name": "PickleColor",
+						"node": 38,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 50,
+						"name": "PickleLight",
+						"node": 39,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 51,
+						"name": "WartColor",
+						"node": 40,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 52,
+						"name": "WartAmount",
+						"node": 41,
+						"output": 0
+					},
+					{
+						"index": 53,
+						"name": "PickleVeil",
+						"node": 42,
+						"output": 0
+					},
+					{
+						"index": 54,
+						"name": "PickleRoughness",
+						"node": 44,
+						"output": 0
+					},
+					{
+						"index": 55,
+						"name": "PickleGlow",
+						"node": 43,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"return",
+					"OutNormal",
+					"OutEmissive",
+					"OutMask",
+					"OutRough"
+				],
+				"props":
+				{
+					"Code": "\n#ifndef MARS_LIQ_HASH3\n#define MARS_LIQ_HASH3(c) frac(sin(float3(dot(c, float3(127.1, 311.7, 74.7)), dot(c, float3(269.5, 183.3, 246.1)), dot(c, float3(113.5, 271.9, 124.6)))) * 43758.5453)\n#endif\nfloat S = max(length(Unit), 1e-4);\nfloat R = max(Radius * S, 1e-3);\nfloat3 N = normalize(Surface.xyz + float3(0.0, 0.0, 1e-4));\nfloat h = Surface.w * R;\n\n// the vessel's frame (the mesh's local axes in world); a jar's plane passes through its axis at the fill height\nfloat3 Ax = Unit / S;\nfloat3 Az = normalize(UnitZ);\nfloat3 Ay = cross(Az, Ax);\nbool jar = Jar > 0.5;\nfloat HH = max(HalfHeight * S, 1e-3);\nif (jar)\n{ h = Surface.w * HH * dot(Az, N); }\n// where a ray O + V t enters and leaves the jar's cylinder (t in V's units; TIN > TOUT: a miss)\n#define MARS_LIQ_CYL(O, V, TIN, TOUT) \\\n{ \\\n    float3 _or = O - Az * dot(O, Az); \\\n    float3 _vr = V - Az * dot(V, Az); \\\n    float _a = max(dot(_vr, _vr), 1e-8); \\\n    float _b = dot(_or, _vr); \\\n    float _d = _b * _b - _a * (dot(_or, _or) - R * R); \\\n    float _sq = sqrt(max(_d, 0.0)); \\\n    float _vz = dot(V, Az); \\\n    _vz = abs(_vz) > 1e-6 ? _vz : 1e-6; \\\n    float _z0 = (-HH - dot(O, Az)) / _vz; \\\n    float _z1 = (HH - dot(O, Az)) / _vz; \\\n    TIN = _d < 0.0 ? 1e9 : max((-_b - _sq) / _a, min(_z0, _z1)); \\\n    TOUT = _d < 0.0 ? -1e9 : min((-_b + _sq) / _a, max(_z0, _z1)); \\\n}\n\n// the surface's own frame, for the ripples\nfloat3 T1 = normalize(cross(abs(N.x) < 0.9 ? float3(1.0, 0.0, 0.0) : float3(0.0, 1.0, 0.0), N));\nfloat3 T2 = cross(N, T1);\n\n// the camera ray through this pixel and where it crosses the flat surface (0 at the camera, 1 at this pixel)\nfloat3 V = D - CamRel;\nfloat vN = dot(V, N);\nfloat tPlane = (h - dot(CamRel, N)) / (abs(vN) > 1e-5 ? vN : 1e-5);\nfloat3 Sflat = CamRel + V * saturate(tPlane);\n\n// the surface is a height field over the plane, in its own frame (T1, T2), measured along N:\n//   swell  three long travelling waves, a faint shimmer at rest, louder while it sloshes (and while it boils);\n//   chop   the breakup: crossed products of shorter waves, sharpened into crests, whose height grows with Agitation (the\n//          script's lagged slosh energy) and whose frequency climbs with it, so a jolt tears the flat cap into a churn\n//          that calms back into long swell as Agitation decays.\nfloat churn = 0.04 + Slosh;\nfloat rippleSpeed = RippleSpeed;\nfloat agit = saturate(Agitation);\n#if MARS_LIQ_BUBBLING\nchurn += 0.5 * Boil;\nrippleSpeed *= 1.0 + Boil;\nagit = saturate(agit + 0.35 * Boil);\n#endif\nfloat swellAmp = RippleAmount * R * churn;\nfloat chopAmp = BreakupAmount * R * agit;\nfloat chopFreq = RippleScale * BreakupFrequency * (0.5 + agit) / R;\nfloat tSwell = Time * rippleSpeed + Phase * 17.0;\nfloat tChop = Time * BreakupSpeed * (0.6 + agit) + Phase * 5.0;\n#define MARS_LIQ_HEIGHT(X, OUT) \\\n{ \\\n    float2 _p = float2(dot(X, T1), dot(X, T2)); \\\n    float2 _a = _p * (RippleScale / R); \\\n    OUT = swellAmp * (sin(dot(_a, float2(0.96, 0.28)) + tSwell) + 0.6 * sin(dot(_a, float2(-0.53, 0.85)) * 1.7 + tSwell * 1.31) \\\n        + 0.35 * sin(dot(_a, float2(-0.39, -0.92)) * 2.9 + tSwell * 1.87)) / 1.95; \\\n    float2 _c = _p * chopFreq; \\\n    float _w = sin(dot(_c, float2(0.8, 0.6)) + tChop) * sin(dot(_c, float2(-0.6, 0.8)) * 1.3 - tChop * 1.2) \\\n        + 0.5 * sin(dot(_c, float2(0.31, -0.95)) * 2.3 + tChop * 1.7) * sin(dot(_c, float2(0.95, 0.31)) * 1.9 - tChop * 0.9); \\\n    OUT += chopAmp * sign(_w) * pow(abs(_w) / 1.5, 0.6); \\\n}\n\n// signed height of this pixel over the surface: above it is air\nfloat hereH;\nMARS_LIQ_HEIGHT(D, hereH);\nfloat s = dot(D, N) - h - hereH;\nOutMask = s <= 0.0 ? 1.0 : 0.0;\n\n// where the camera ray first meets the surface: march from where the ray enters the sphere, or comes down past the\n// highest crest, to this pixel (which is under the surface: the clip kept it), then refine by bisection. A front face\n// only needs the flat crossing for its rim measure; a back face shades the hit.\nfloat3 Ssurf = Sflat;\nfloat3 surfN = N;\nfloat surfH = 0.0;\nif (Sign <= 0.0)\n{\n    float hiCrest = abs(swellAmp) + chopAmp * 1.1 + 1e-3;\n    float va = dot(V, V);\n    float vb = dot(CamRel, V);\n    float vc = dot(CamRel, CamRel) - R * R;\n    float disc = vb * vb - va * vc;\n    float tIn = disc > 0.0 ? (-vb - sqrt(disc)) / va : 0.0;\n    if (jar)\n    {\n        float tOut;\n        MARS_LIQ_CYL(CamRel, V, tIn, tOut);\n        tIn = tIn < tOut ? tIn : 0.0;\n    }\n    float t0 = max(tIn, 0.0);\n    if (vN < -1e-5)\n    { t0 = max(t0, (h + hiCrest - dot(CamRel, N)) / vN); }\n    t0 = min(t0, 1.0);\n    float tLo = t0;\n    float tHi = 1.0;\n    bool found = false;\n    [unroll] for (int m = 1; m <= 12; ++m)\n    {\n        float t = lerp(t0, 1.0, m / 12.0);\n        float3 X = CamRel + V * t;\n        float hh;\n        MARS_LIQ_HEIGHT(X, hh);\n        if (!found && dot(X, N) - h - hh <= 0.0)\n        {\n            tHi = t;\n            found = true;\n        }\n        if (!found)\n        { tLo = t; }\n    }\n    [unroll] for (int b = 0; b < 4; ++b)\n    {\n        float t = 0.5 * (tLo + tHi);\n        float3 X = CamRel + V * t;\n        float hh;\n        MARS_LIQ_HEIGHT(X, hh);\n        if (dot(X, N) - h - hh <= 0.0)\n        { tHi = t; }\n        else\n        { tLo = t; }\n    }\n    Ssurf = CamRel + V * tHi;\n    // the normal from the height field's slope (central differences along the surface's frame)\n    float e = 0.02 * R;\n    float hx0, hx1, hy0, hy1;\n    float3 Sx0 = Ssurf - T1 * e;\n    float3 Sx1 = Ssurf + T1 * e;\n    float3 Sy0 = Ssurf - T2 * e;\n    float3 Sy1 = Ssurf + T2 * e;\n    MARS_LIQ_HEIGHT(Sx0, hx0);\n    MARS_LIQ_HEIGHT(Sx1, hx1);\n    MARS_LIQ_HEIGHT(Sy0, hy0);\n    MARS_LIQ_HEIGHT(Sy1, hy1);\n    surfN = normalize(N - ((hx1 - hx0) * T1 + (hy1 - hy0) * T2) / (2.0 * e));\n    MARS_LIQ_HEIGHT(Ssurf, surfH);\n}\n\nfloat foamWidth = FoamWidth;\n// how far the rim bands swell here (0: even); only the boil sets it\nfloat rimFroth = 0.0;\n#if MARS_LIQ_BUBBLING\nfoamWidth *= 1.0 + 1.5 * Boil;\n// the rim froth: round the vessel's axis the band breaks into beads of froth, each swelling and popping on its own clock\n// as the bubbles reach the edge, over a wobble travelling round the rim. The beads' count round the rim (the band's\n// frequency) rises with the boil and the bubbles' density; both rim bands (the line on the glass, the meniscus on the\n// top) swell by it, the top's capped so the froth never floods the surface. Measured at this pixel on the glass, at the\n// surface crossing on the top.\n{\n    float3 Xr = Sign > 0.0 ? D : Ssurf;\n    float theta = atan2(dot(Xr, T2), dot(Xr, T1)) * (0.5 / 3.14159265) + 0.5;\n    float beads = max(3.0, round(RimFrothFrequency * (0.5 + 0.5 * Boil) * (0.5 + BubbleDensity)));\n    float u = theta * beads;\n    float3 rh = MARS_LIQ_HASH3(float3(fmod(floor(u), beads), 5.3, Phase * 11.0));\n    float rf = frac(u) - 0.5 - (rh.z - 0.5) * 0.3;\n    float rlife = frac(Time * BubbleSpeed * 0.7 + rh.x);\n    float rsize = lerp(0.18, 0.45, rh.y) * smoothstep(0.0, 0.7, rlife) * (1.0 - step(0.9, rlife));\n    float bead = sqrt(saturate(1.0 - (rf * rf) / max(rsize * rsize, 1e-4)));\n    float wobble = 0.5 + 0.5 * sin(theta * 6.2831853 * beads * 0.5 + Time * rippleSpeed);\n    rimFroth = saturate(RimFroth * Boil * (bead + 0.25 * wobble));\n}\n#endif\n\nfloat3 Vn = normalize(V);\nbool front = Sign > 0.0;\n\n// a front face: the liquid between here and where the ray leaves it (the far wall, or the surface if the ray rises through\n// it first), cm\nfloat frontRun = 0.0;\nif (front)\n{\n    float b = dot(D, Vn);\n    float tS = -b + sqrt(max(b * b - (dot(D, D) - R * R), 0.0));\n    if (jar)\n    {\n        float tIn;\n        MARS_LIQ_CYL(D, Vn, tIn, tS);\n    }\n    float vnN = dot(Vn, N);\n    float tP = vnN > 1e-4 ? (h - dot(D, N)) / vnN : 1e9;\n    frontRun = max(min(tS, tP), 0.0);\n}\n\n// the pickles (Pickle Jar): the first one the ray meets in the liquid, from where it enters (this front face, or the\n// surface over a back face) to where it leaves. Over the surface (a pixel the clip drops) the trace runs through the jar's\n// air instead, and a tip it meets there keeps the pixel, dry. Each pickle stands on the floor round the axis (a ring and\n// one in the middle), leans a little in, and is a convex solid of planes in its own frame: a lower and an upper band of\n// seven facets (twisted half a facet, each bulging to the middle), a bevel at each end, and the end caps.\nbool pkHit = false;\nfloat pkT = 0.0;\nfloat3 pkN = -Vn;\nfloat3 pkCol = PickleColor;\nfloat3 pkX = D;\nif (jar && PickleCount >= 1.0)\n{\n    float3 O = front ? D : Ssurf;\n    float tMax = front ? frontRun : length(D - Ssurf);\n    if (s > 0.0)\n    {\n        float tA, tB;\n        MARS_LIQ_CYL(CamRel, Vn, tA, tB);\n        O = front ? D : CamRel + Vn * max(tA, 0.0);\n        tMax = max(tB - dot(O - CamRel, Vn), 0.0);\n    }\n    #define MARS_LIQ_PLANE(NP, DP, ID) \\\n    { \\\n        float3 _n = NP; \\\n        float _dn = dot(v, _n); \\\n        float _t = ((DP) - dot(o, _n)) / (_dn < 0.0 ? min(_dn, -1e-6) : max(_dn, 1e-6)); \\\n        if (_dn < 0.0) \\\n        { \\\n            if (_t > tE) { tE = _t; nE = _n; fE = ID; } \\\n        } \\\n        else \\\n        { tX = min(tX, _t); } \\\n    }\n    int count = (int)min(PickleCount, 12.0);\n    int ring = count >= 4 ? count - 1 : count;\n    float seed = floor(Phase * 97.0);\n    float pr = PickleRadius * R;\n    float ringR = max(R - pr * 1.15 - 0.03 * R, 0.0);\n    float bestT = tMax;\n    float3 bestL = 0.0;\n    float bestFace = 0.0;\n    float bestI = 0.0;\n    float bestRad = 1.0;\n    [loop] for (int i = 0; i < count; ++i)\n    {\n        float3 ph = MARS_LIQ_HASH3(float3(i, seed, 2.9));\n        bool centre = i >= ring;\n        float ang = (i + (ph.x - 0.5) * 0.3) / ring * 6.2831853 + Phase * 6.2831853;\n        float3 out2 = Ax * cos(ang) + Ay * sin(ang);\n        float rad = pr * (centre ? 1.15 : 0.9 + 0.2 * ph.z);\n        float len = PickleLength * 2.0 * HH * (0.84 + 0.16 * ph.y);\n        float3 base = out2 * (centre ? 0.0 : ringR * (0.96 + 0.04 * ph.y)) - Az * (HH - 0.02 * R);\n        float3 pz = normalize(Az - out2 * (centre ? 0.0 : 0.02 + 0.05 * ph.z) + Ay * ((ph.x - 0.5) * 0.04));\n        float3 px0 = normalize(Ax - pz * dot(Ax, pz));\n        float3 py0 = cross(pz, px0);\n        float tw = ph.x * 6.2831853;\n        float3 px = px0 * cos(tw) + py0 * sin(tw);\n        float3 py = cross(pz, px);\n        float3 rel = O - base;\n        float3 o = float3(dot(rel, px), dot(rel, py), dot(rel, pz));\n        float3 v = float3(dot(Vn, px), dot(Vn, py), dot(Vn, pz));\n        // skip a pickle whose bounding sphere the ray misses, or meets only past the best so far\n        float3 bc = o - float3(0.0, 0.0, 0.5 * len);\n        float bb = dot(bc, v);\n        float bd = bb * bb - (dot(bc, bc) - (0.25 * len * len + 1.2 * rad * rad));\n        if (bd < 0.0 || -bb - sqrt(bd) > bestT || -bb + sqrt(bd) < 0.0)\n        { continue; }\n\n        float tE = -1e9;\n        float tX = 1e9;\n        float3 nE = float3(0.0, 0.0, -1.0);\n        float fE = 0.0;\n        float eps = 0.16 * rad / (0.5 * len);   // the bands' bulge: radius lost from the middle to an end, per height\n        float kb = 0.7;                         // the bevels' slope\n        float ib = rsqrt(1.0 + eps * eps);\n        float ik = rsqrt(1.0 + kb * kb);\n        [unroll] for (int k = 0; k < 7; ++k)\n        {\n            float3 kh = MARS_LIQ_HASH3(float3(i, k, seed + 4.1));\n            float a0 = (k + 0.15 * (kh.x - 0.5)) * 0.8975979;\n            float a1 = a0 + 0.4487990;\n            float2 c0 = float2(cos(a0), sin(a0));\n            float2 c1 = float2(cos(a1), sin(a1));\n            MARS_LIQ_PLANE(float3(c0, -eps) * ib, (rad * (0.95 + 0.1 * kh.y) - eps * 0.5 * len) * ib, k)\n            MARS_LIQ_PLANE(float3(c1, eps) * ib, (rad * (0.95 + 0.1 * kh.z) + eps * 0.5 * len) * ib, 7 + k)\n            MARS_LIQ_PLANE(float3(c0, kb) * ik, (0.6 * rad + kb * len) * ik, 14 + k)\n            MARS_LIQ_PLANE(float3(c1, -kb) * ik, 0.6 * rad * ik, 21 + k)\n        }\n        MARS_LIQ_PLANE(float3(0.0, 0.0, 1.0), len, 28)\n        MARS_LIQ_PLANE(float3(0.0, 0.0, -1.0), 0.0, 29)\n        if (tE <= tX && tX > 0.0 && tE < bestT)\n        {\n            bestT = max(tE, 0.0);\n            pkHit = true;\n            pkN = px * nE.x + py * nE.y + pz * nE.z;\n            bestL = o + v * bestT;\n            bestFace = fE;\n            bestI = i;\n            bestRad = rad;\n        }\n    }\n    pkT = bestT;\n    pkX = O + Vn * bestT;\n    if (pkHit)\n    {\n        // flat-shaded facets, each its own shade between Pickle Color and Pickle Light, the ends lighter; pale warts on\n        // the bands\n        float3 fh = MARS_LIQ_HASH3(float3(bestI, bestFace, seed + 8.3));\n        pkCol = lerp(PickleColor, PickleLight, 0.1 + 0.6 * fh.x + (bestFace >= 14.0 ? 0.3 : 0.0));\n        float th = atan2(bestL.y, bestL.x) * (0.5 / 3.14159265) + 0.5;\n        float2 wq = float2(th * 14.0, bestL.z / max(bestRad * 0.8, 1e-3)) + bestI * 3.7;\n        float3 wh = MARS_LIQ_HASH3(float3(floor(wq), bestI + 1.3));\n        float wr = length(frac(wq) - 0.5 - (wh.xy - 0.5) * 0.5);\n        float wart = (bestFace < 14.0 ? 1.0 : 0.0) * step(1.0 - WartAmount, wh.z) * (1.0 - smoothstep(0.1, 0.15, wr));\n        pkCol = lerp(pkCol, WartColor, wart);\n    }\n}\nif (jar && s > 0.0)\n{\n    // over the surface: only a dry tip keeps the pixel\n    bool dry = false;\n    if (pkHit)\n    {\n        float hx;\n        MARS_LIQ_HEIGHT(pkX, hx);\n        dry = dot(pkX, N) - h - hx > 0.0;\n    }\n    OutMask = dry ? 1.0 : 0.0;\n    OutNormal = pkN;\n    OutEmissive = pkCol * PickleGlow;\n    OutRough = PickleRoughness;\n    return pkCol;\n}\n// how fast the liquid veils a pickle behind it (per radius; the brine adds its haze)\nfloat pkFog = PickleVeil;\nfloat rough = Roughness;\n// a pickle's own light (Pickle Glow), so it reads in a backlit jar\nfloat3 pkGlow = 0.0;\n\nfloat path;\nfloat3 n;\nfloat3 col;\nfloat3 glow;\nif (front)\n{\n    path = (pkHit ? pkT : frontRun) / R;\n    float depth = 1.0 - exp(-path * Density);\n    n = normalize(Nw);\n    col = lerp(LiquidColor, DeepColor, depth);\n#if MARS_LIQ_BRINE\n    // cloudy: the haze thickens with the depth looked through, and thicker still low down where the sediment hangs\n    float3 mid = D + Vn * (path * R * 0.5);\n    float low = 1.0 - smoothstep(-0.9, 0.1, dot(mid, N) / (jar ? HH : R));\n    float haze = 1.0 - exp(-path * (Turbidity + Sediment * low * 3.0));\n    col = lerp(col, HazeColor, haze);\n    pkFog += Turbidity + Sediment * low * 3.0;\n#endif\n    if (pkHit)\n    {\n        // the pickle through the liquid in front of it: tinted by it, veiled by it, lit with its own facets while it shows\n        float veil = 1.0 - exp(-path * pkFog);\n        float3 seen = pkCol * lerp(1.0, min(LiquidColor * 1.6, 1.0), saturate(path * 2.0));\n        col = lerp(seen, col, veil);\n        n = normalize(lerp(pkN, n, veil));\n        rough = lerp(PickleRoughness, Roughness, veil);\n        pkGlow = seen * (PickleGlow * (1.0 - veil));\n    }\n\n    // a bright line where the liquid meets the glass, under the surface\n    float foam = 1.0 - smoothstep(0.0, foamWidth * (1.0 + 1.5 * rimFroth) * R, -s);\n    // light through the thin edge of the volume\n    float rim = pow(1.0 - saturate(dot(n, -Vn)), 3.0) * RimLight;\n    // motes: two layers of rising sparks inside the volume, along the ray (parallax: they sit in the liquid, not on the\n    // glass)\n    float motes = 0.0;\n    [unroll] for (int m = 0; m < 2; ++m)\n    {\n        float3 Q = (D + Vn * (path * R * (m == 0 ? 0.3 : 0.7))) / R * MoteScale - N * (Time * MoteSpeed) + Phase * 31.0 + m * 7.31;\n        float3 cell = floor(Q);\n        float3 f = frac(Q) - 0.5;\n        float3 hsh = MARS_LIQ_HASH3(cell);\n        float3 off = (hsh - 0.5) * 0.6;\n        float on = step(0.55, hsh.x);\n        float r = length(f - off);\n        motes += on * (1.0 - smoothstep(0.02, 0.09, r));\n    }\n#if MARS_LIQ_BUBBLING\n    // bubbles: three layers along the ray, each bubble a bright rim round a lighter core, rising and weaving\n    float bubbles = 0.0;\n    [unroll] for (int q = 0; q < 3; ++q)\n    {\n        float along = 0.15 + 0.35 * q;\n        float3 Q = (D + Vn * (path * R * along)) / R * BubbleScale - N * (Time * BubbleSpeed * (1.0 + 0.3 * q)) + Phase * 13.0 + q * 5.17;\n        float3 cell = floor(Q);\n        float3 f = frac(Q) - 0.5;\n        float3 hsh = MARS_LIQ_HASH3(cell);\n        float on = step(1.0 - BubbleDensity, hsh.x);\n        float rad = lerp(0.1, 0.24, hsh.z);\n        float3 off = (hsh - 0.5) * (0.9 - 2.0 * rad) + (T1 * sin(Time * 5.0 + hsh.y * 6.28) + T2 * cos(Time * 4.1 + hsh.z * 6.28)) * 0.05;\n        float r = length(f - off);\n        float rimB = smoothstep(rad - 0.06, rad - 0.01, r) * (1.0 - smoothstep(rad - 0.01, rad + 0.015, r));\n        float core = 1.0 - smoothstep(rad - 0.08, rad - 0.02, r);\n        bubbles += on * (rimB + 0.2 * core) * (1.0 - 0.25 * q);\n    }\n    col = lerp(col, FoamColor, saturate(bubbles) * 0.6);\n    motes += bubbles * Boil;\n#endif\n#if MARS_LIQ_BRINE\n    // the pickling spices: peppercorns (dark, round), mustard seeds (yellow, round) and dill (green, long flecks),\n    // five layers along the ray; they sink slowly, sway, and swirl round the surface's normal when it sloshes\n    float specks = 0.0;\n    float3 speckCol = 0.0;\n    float swirl = Slosh * 2.0 + 0.15;\n    [unroll] for (int p = 0; p < 5; ++p)\n    {\n        float along = 0.1 + 0.2 * p;\n        float3 X = (D + Vn * (path * R * along)) / R;\n        float a = swirl * sin(Time * 0.6 + p * 2.1);\n        float2 xy = float2(dot(X, T1), dot(X, T2));\n        xy = float2(xy.x * cos(a) - xy.y * sin(a), xy.x * sin(a) + xy.y * cos(a));\n        float3 Q = (T1 * xy.x + T2 * xy.y + N * dot(X, N)) * SpeckScale + N * (Time * 0.04) + Phase * 23.0 + p * 3.71;\n        float3 cell = floor(Q);\n        float3 f = frac(Q) - 0.5;\n        float3 hsh = MARS_LIQ_HASH3(cell);\n        float on = step(1.0 - SpeckAmount, hsh.x);\n        float3 off = (hsh - 0.5) * 0.5;\n        float3 e = f - off;\n        float3 tint;\n        float r;\n        if (hsh.y < 0.4)\n        {   // peppercorn\n            r = length(e) / 0.12;\n            tint = float3(0.06, 0.045, 0.03);\n        }\n        else if (hsh.y < 0.75)\n        {   // mustard seed\n            r = length(e) / 0.09;\n            tint = float3(0.75, 0.55, 0.15);\n        }\n        else\n        {   // dill: a thin fleck along a random direction\n            float3 dir = normalize(hsh * 2.0 - 1.0 + 1e-3);\n            float t = dot(e, dir);\n            r = max(length(e - dir * t) / 0.035, abs(t) / 0.3);\n            tint = float3(0.18, 0.32, 0.08);\n        }\n        float hit = on * (1.0 - smoothstep(0.7, 1.0, r)) * (1.0 - 0.12 * p);\n        speckCol = lerp(speckCol, tint, hit * (1.0 - specks));\n        specks = saturate(specks + hit);\n    }\n    col = lerp(col, speckCol, specks);\n#endif\n    // the aeration: while it churns, the water under the surface turns white and fills with small bubbles (three layers\n    // along the ray), in a band deeper the harder it was jolted\n    if (agit > 0.01)\n    {\n        float bandDepth = Aeration * agit * R + 1e-3;\n        float aer = 0.4 * (1.0 - smoothstep(0.0, bandDepth, -s));\n        [unroll] for (int w = 0; w < 3; ++w)\n        {\n            float3 X = D + Vn * (path * R * (0.08 + 0.3 * w));\n            float hh;\n            MARS_LIQ_HEIGHT(X, hh);\n            float band = 1.0 - smoothstep(0.0, bandDepth, h + hh - dot(X, N));\n            float3 Q = X / R * 9.0 - N * (Time * 2.0) + Phase * 3.1 + w * 1.7;\n            float3 hsh = MARS_LIQ_HASH3(floor(Q));\n            float rad = lerp(0.12, 0.3, hsh.z);\n            float r = length(frac(Q) - 0.5 - (hsh - 0.5) * (0.9 - 2.0 * rad));\n            float ring = smoothstep(rad - 0.08, rad - 0.01, r) * (1.0 - smoothstep(rad - 0.01, rad + 0.02, r));\n            float core = 1.0 - smoothstep(rad - 0.1, rad, r);\n            aer += band * step(0.35, hsh.x) * (ring + 0.35 * core);\n        }\n        col = lerp(col, FoamColor, saturate(aer) * 0.75);\n    }\n    col = lerp(col, FoamColor, foam * 0.6);\n    glow = col * Glow * (1.0 - 0.5 * depth) + LiquidColor * (rim * Glow) + FoamColor * (motes * MoteAmount * Glow);\n}\nelse\n{\n    // the surface, seen at the point the ray crosses it: lit with the rippled normal, coloured by the depth of liquid\n    // under it along the ray (the crossing to this back face)\n    float3 Sp = Ssurf;\n    path = (pkHit ? pkT : length(D - Sp)) / R;\n    float depth = 1.0 - exp(-path * Density);\n    n = surfN;\n    // the meniscus: a pale ring where the surface meets the glass (the sphere's cut circle has radius sqrt(R^2 - h^2); a\n    // jar's wall is R from its axis)\n    float3 toS = Sp - N * h;\n    float radial = jar ? length(Sp - Az * dot(Sp, Az)) / R : length(toS - N * dot(toS, N)) / sqrt(max(R * R - h * h, 1e-4));\n    float meniscus = smoothstep(1.0 - min(foamWidth * 2.5 * (1.0 + rimFroth), 0.3), 1.0, radial);\n    col = lerp(lerp(LiquidColor, DeepColor, depth), SurfaceColor, SurfaceMix);\n#if MARS_LIQ_BRINE\n    col = lerp(col, HazeColor, 1.0 - exp(-path * Turbidity));\n    pkFog += Turbidity;\n#endif\n    if (pkHit)\n    {\n        // a pickle under the top, veiled by the liquid over it, the top's own colour and gloss over both\n        float veil = 1.0 - exp(-path * pkFog);\n        float3 seen = pkCol * lerp(1.0, min(LiquidColor * 1.6, 1.0), saturate(path * 2.0));\n        col = lerp(lerp(seen, col, veil), SurfaceColor, SurfaceMix * 0.5 * (1.0 - veil));\n        pkGlow = seen * (PickleGlow * (1.0 - veil));\n    }\n#if MARS_LIQ_BUBBLING\n    // domes: each cell of the surface grows a bubble that swells, then pops into an expanding ring\n    float2 suv = float2(dot(Sp, T1), dot(Sp, T2)) / R * BubbleScale * 1.4 + Phase * 7.0;\n    float3 sh = MARS_LIQ_HASH3(float3(floor(suv), 3.7));\n    float2 sf = frac(suv) - 0.5;\n    float life = frac(Time * BubbleSpeed * 0.9 + sh.x);\n    float on = step(1.0 - BubbleDensity, sh.y);\n    float rad = lerp(0.12, 0.32, sh.z) * smoothstep(0.0, 0.8, life);\n    float2 e = sf - (sh.xy - 0.5) * 0.3;\n    float d = length(e) / max(rad, 1e-3);\n    float dome = on * step(life, 0.85) * (1.0 - step(1.0, d));\n    // the dome's slope bends the normal; its rim catches light\n    float slope = d / sqrt(max(1.0 - d * d, 0.02));\n    float2 dirE = e / max(length(e), 1e-3);\n    n = normalize(n - dome * slope * 0.6 * (T1 * dirE.x + T2 * dirE.y));\n    float domeRim = dome * smoothstep(0.7, 1.0, d);\n    // the pop: a thin ring racing out after the bubble bursts\n    float pop = on * step(0.85, life) * (1.0 - smoothstep(0.0, 0.05, abs(length(e) - (life - 0.85) * 3.0))) * (1.0 - life) * 6.0;\n    col = lerp(col, FoamColor, saturate((domeRim * 0.8 + pop + dome * 0.15) * Boil));\n#endif\n#if MARS_LIQ_BRINE\n    // a few seeds float on the top\n    float2 fuv = float2(dot(Sp, T1), dot(Sp, T2)) / R * SpeckScale * 0.8 + Phase * 5.0;\n    float3 fh = MARS_LIQ_HASH3(float3(floor(fuv), 9.1));\n    float fr = length(frac(fuv) - 0.5 - (fh.xy - 0.5) * 0.5);\n    float floater = step(1.0 - SpeckAmount * 0.5, fh.x) * (1.0 - smoothstep(0.04, 0.07, fr));\n    col = lerp(col, fh.z < 0.5 ? float3(0.75, 0.55, 0.15) : float3(0.18, 0.32, 0.08), floater);\n#endif\n    // whitecaps on the churned crests, and a sizzle of foam cells over the cap while it settles\n    if (agit > 0.01)\n    {\n        float crest = smoothstep(0.3, 1.0, surfH / max(chopAmp + abs(swellAmp), 1e-3)) * FoamCap * agit;\n        float2 fz = float2(dot(Sp, T1), dot(Sp, T2)) / R * 8.0 + Phase * 3.0 + float2(Time * 0.3, -Time * 0.2);\n        float3 zh = MARS_LIQ_HASH3(float3(floor(fz), 7.7));\n        float zr = length(frac(fz) - 0.5 - (zh.xy - 0.5) * 0.4);\n        float zrad = lerp(0.08, 0.22, zh.z);\n        float zring = smoothstep(zrad - 0.06, zrad, zr) * (1.0 - smoothstep(zrad, zrad + 0.03, zr));\n        float sizzle = step(1.0 - agit * 0.8, zh.x) * (zring + 0.4 * (1.0 - smoothstep(zrad - 0.06, zrad, zr)));\n        col = lerp(col, FoamColor, saturate(crest + sizzle * 0.8 * FoamCap));\n    }\n    col = lerp(col, FoamColor, meniscus * 0.85);\n    glow = col * (Glow * 0.6);\n}\n\nOutNormal = n;\nOutEmissive = glow + pkGlow;\nOutRough = rough;\nreturn col;\n",
+					"Description": "Liquid"
+				}
+			},
+			{
+				"id": 69,
+				"class": "MakeMaterialAttributes",
+				"name": "MaterialExpressionMakeMaterialAttributes_4",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "BaseColor",
+						"node": 68,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "Roughness",
+						"node": 68,
+						"output": 4
+					},
+					{
+						"index": 5,
+						"name": "EmissiveColor",
+						"node": 68,
+						"output": 2
+					},
+					{
+						"index": 7,
+						"name": "OpacityMask",
+						"node": 68,
+						"output": 3
+					},
+					{
+						"index": 8,
+						"name": "Normal",
+						"node": 68,
+						"output": 1
+					}
+				]
+			},
+			{
+				"id": 70,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_5",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "D",
+						"node": 54,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "CamRel",
+						"node": 58,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "Unit",
+						"node": 59,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "Radius",
+						"node": 45,
+						"output": 0
+					},
+					{
+						"index": 4,
+						"name": "Surface",
+						"node": 47,
+						"output": 5,
+						"mask": "rgba"
+					},
+					{
+						"index": 5,
+						"name": "Slosh",
+						"node": 48,
+						"output": 0
+					},
+					{
+						"index": 6,
+						"name": "Agitation",
+						"node": 50,
+						"output": 0
+					},
+					{
+						"index": 7,
+						"name": "Phase",
+						"node": 49,
+						"output": 0
+					},
+					{
+						"index": 8,
+						"name": "Time",
+						"node": 65,
+						"output": 0
+					},
+					{
+						"index": 9,
+						"name": "Sign",
+						"node": 66,
+						"output": 0
+					},
+					{
+						"index": 10,
+						"name": "Nw",
+						"node": 67,
+						"output": 0
+					},
+					{
+						"index": 11,
+						"name": "LiquidColor",
+						"node": 0,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 12,
+						"name": "DeepColor",
+						"node": 1,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 13,
+						"name": "Density",
+						"node": 2,
+						"output": 0
+					},
+					{
+						"index": 14,
+						"name": "Glow",
+						"node": 3,
+						"output": 0
+					},
+					{
+						"index": 15,
+						"name": "RimLight",
+						"node": 4,
+						"output": 0
+					},
+					{
+						"index": 16,
+						"name": "Roughness",
+						"node": 5,
+						"output": 0
+					},
+					{
+						"index": 17,
+						"name": "SurfaceColor",
+						"node": 6,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 18,
+						"name": "SurfaceMix",
+						"node": 7,
+						"output": 0
+					},
+					{
+						"index": 19,
+						"name": "FoamColor",
+						"node": 8,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 20,
+						"name": "FoamWidth",
+						"node": 9,
+						"output": 0
+					},
+					{
+						"index": 21,
+						"name": "RippleAmount",
+						"node": 10,
+						"output": 0
+					},
+					{
+						"index": 22,
+						"name": "RippleScale",
+						"node": 11,
+						"output": 0
+					},
+					{
+						"index": 23,
+						"name": "RippleSpeed",
+						"node": 12,
+						"output": 0
+					},
+					{
+						"index": 24,
+						"name": "MoteAmount",
+						"node": 18,
+						"output": 0
+					},
+					{
+						"index": 25,
+						"name": "MoteScale",
+						"node": 19,
+						"output": 0
+					},
+					{
+						"index": 26,
+						"name": "MoteSpeed",
+						"node": 20,
+						"output": 0
+					},
+					{
+						"index": 27,
+						"name": "Boil",
+						"node": 22,
+						"output": 0
+					},
+					{
+						"index": 28,
+						"name": "BubbleScale",
+						"node": 23,
+						"output": 0
+					},
+					{
+						"index": 29,
+						"name": "BubbleSpeed",
+						"node": 24,
+						"output": 0
+					},
+					{
+						"index": 30,
+						"name": "BubbleDensity",
+						"node": 25,
+						"output": 0
+					},
+					{
+						"index": 31,
+						"name": "RimFroth",
+						"node": 26,
+						"output": 0
+					},
+					{
+						"index": 32,
+						"name": "RimFrothFrequency",
+						"node": 27,
+						"output": 0
+					},
+					{
+						"index": 33,
+						"name": "BreakupAmount",
+						"node": 13,
+						"output": 0
+					},
+					{
+						"index": 34,
+						"name": "BreakupFrequency",
+						"node": 14,
+						"output": 0
+					},
+					{
+						"index": 35,
+						"name": "BreakupSpeed",
+						"node": 15,
+						"output": 0
+					},
+					{
+						"index": 36,
+						"name": "Aeration",
+						"node": 16,
+						"output": 0
+					},
+					{
+						"index": 37,
+						"name": "FoamCap",
+						"node": 17,
+						"output": 0
+					},
+					{
+						"index": 38,
+						"name": "HazeColor",
+						"node": 29,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 39,
+						"name": "Turbidity",
+						"node": 30,
+						"output": 0
+					},
+					{
+						"index": 40,
+						"name": "Sediment",
+						"node": 31,
+						"output": 0
+					},
+					{
+						"index": 41,
+						"name": "SpeckAmount",
+						"node": 32,
+						"output": 0
+					},
+					{
+						"index": 42,
+						"name": "SpeckScale",
+						"node": 33,
+						"output": 0
+					},
+					{
+						"index": 43,
+						"name": "UnitZ",
+						"node": 61,
+						"output": 0
+					},
+					{
+						"index": 44,
+						"name": "Jar",
+						"node": 34,
+						"output": 0
+					},
+					{
+						"index": 45,
+						"name": "HalfHeight",
+						"node": 46,
+						"output": 0
+					},
+					{
+						"index": 46,
+						"name": "PickleCount",
+						"node": 35,
+						"output": 0
+					},
+					{
+						"index": 47,
+						"name": "PickleRadius",
+						"node": 36,
+						"output": 0
+					},
+					{
+						"index": 48,
+						"name": "PickleLength",
+						"node": 37,
+						"output": 0
+					},
+					{
+						"index": 49,
+						"name": "PickleColor",
+						"node": 38,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 50,
+						"name": "PickleLight",
+						"node": 39,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 51,
+						"name": "WartColor",
+						"node": 40,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 52,
+						"name": "WartAmount",
+						"node": 41,
+						"output": 0
+					},
+					{
+						"index": 53,
+						"name": "PickleVeil",
+						"node": 42,
+						"output": 0
+					},
+					{
+						"index": 54,
+						"name": "PickleRoughness",
+						"node": 44,
+						"output": 0
+					},
+					{
+						"index": 55,
+						"name": "PickleGlow",
+						"node": 43,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"return",
+					"OutNormal",
+					"OutEmissive",
+					"OutMask",
+					"OutRough"
+				],
+				"props":
+				{
+					"Code": "\n#ifndef MARS_LIQ_HASH3\n#define MARS_LIQ_HASH3(c) frac(sin(float3(dot(c, float3(127.1, 311.7, 74.7)), dot(c, float3(269.5, 183.3, 246.1)), dot(c, float3(113.5, 271.9, 124.6)))) * 43758.5453)\n#endif\nfloat S = max(length(Unit), 1e-4);\nfloat R = max(Radius * S, 1e-3);\nfloat3 N = normalize(Surface.xyz + float3(0.0, 0.0, 1e-4));\nfloat h = Surface.w * R;\n\n// the vessel's frame (the mesh's local axes in world); a jar's plane passes through its axis at the fill height\nfloat3 Ax = Unit / S;\nfloat3 Az = normalize(UnitZ);\nfloat3 Ay = cross(Az, Ax);\nbool jar = Jar > 0.5;\nfloat HH = max(HalfHeight * S, 1e-3);\nif (jar)\n{ h = Surface.w * HH * dot(Az, N); }\n// where a ray O + V t enters and leaves the jar's cylinder (t in V's units; TIN > TOUT: a miss)\n#define MARS_LIQ_CYL(O, V, TIN, TOUT) \\\n{ \\\n    float3 _or = O - Az * dot(O, Az); \\\n    float3 _vr = V - Az * dot(V, Az); \\\n    float _a = max(dot(_vr, _vr), 1e-8); \\\n    float _b = dot(_or, _vr); \\\n    float _d = _b * _b - _a * (dot(_or, _or) - R * R); \\\n    float _sq = sqrt(max(_d, 0.0)); \\\n    float _vz = dot(V, Az); \\\n    _vz = abs(_vz) > 1e-6 ? _vz : 1e-6; \\\n    float _z0 = (-HH - dot(O, Az)) / _vz; \\\n    float _z1 = (HH - dot(O, Az)) / _vz; \\\n    TIN = _d < 0.0 ? 1e9 : max((-_b - _sq) / _a, min(_z0, _z1)); \\\n    TOUT = _d < 0.0 ? -1e9 : min((-_b + _sq) / _a, max(_z0, _z1)); \\\n}\n\n// the surface's own frame, for the ripples\nfloat3 T1 = normalize(cross(abs(N.x) < 0.9 ? float3(1.0, 0.0, 0.0) : float3(0.0, 1.0, 0.0), N));\nfloat3 T2 = cross(N, T1);\n\n// the camera ray through this pixel and where it crosses the flat surface (0 at the camera, 1 at this pixel)\nfloat3 V = D - CamRel;\nfloat vN = dot(V, N);\nfloat tPlane = (h - dot(CamRel, N)) / (abs(vN) > 1e-5 ? vN : 1e-5);\nfloat3 Sflat = CamRel + V * saturate(tPlane);\n\n// the surface is a height field over the plane, in its own frame (T1, T2), measured along N:\n//   swell  three long travelling waves, a faint shimmer at rest, louder while it sloshes (and while it boils);\n//   chop   the breakup: crossed products of shorter waves, sharpened into crests, whose height grows with Agitation (the\n//          script's lagged slosh energy) and whose frequency climbs with it, so a jolt tears the flat cap into a churn\n//          that calms back into long swell as Agitation decays.\nfloat churn = 0.04 + Slosh;\nfloat rippleSpeed = RippleSpeed;\nfloat agit = saturate(Agitation);\n#if MARS_LIQ_BUBBLING\nchurn += 0.5 * Boil;\nrippleSpeed *= 1.0 + Boil;\nagit = saturate(agit + 0.35 * Boil);\n#endif\nfloat swellAmp = RippleAmount * R * churn;\nfloat chopAmp = BreakupAmount * R * agit;\nfloat chopFreq = RippleScale * BreakupFrequency * (0.5 + agit) / R;\nfloat tSwell = Time * rippleSpeed + Phase * 17.0;\nfloat tChop = Time * BreakupSpeed * (0.6 + agit) + Phase * 5.0;\n#define MARS_LIQ_HEIGHT(X, OUT) \\\n{ \\\n    float2 _p = float2(dot(X, T1), dot(X, T2)); \\\n    float2 _a = _p * (RippleScale / R); \\\n    OUT = swellAmp * (sin(dot(_a, float2(0.96, 0.28)) + tSwell) + 0.6 * sin(dot(_a, float2(-0.53, 0.85)) * 1.7 + tSwell * 1.31) \\\n        + 0.35 * sin(dot(_a, float2(-0.39, -0.92)) * 2.9 + tSwell * 1.87)) / 1.95; \\\n    float2 _c = _p * chopFreq; \\\n    float _w = sin(dot(_c, float2(0.8, 0.6)) + tChop) * sin(dot(_c, float2(-0.6, 0.8)) * 1.3 - tChop * 1.2) \\\n        + 0.5 * sin(dot(_c, float2(0.31, -0.95)) * 2.3 + tChop * 1.7) * sin(dot(_c, float2(0.95, 0.31)) * 1.9 - tChop * 0.9); \\\n    OUT += chopAmp * sign(_w) * pow(abs(_w) / 1.5, 0.6); \\\n}\n\n// signed height of this pixel over the surface: above it is air\nfloat hereH;\nMARS_LIQ_HEIGHT(D, hereH);\nfloat s = dot(D, N) - h - hereH;\nOutMask = s <= 0.0 ? 1.0 : 0.0;\n\n// where the camera ray first meets the surface: march from where the ray enters the sphere, or comes down past the\n// highest crest, to this pixel (which is under the surface: the clip kept it), then refine by bisection. A front face\n// only needs the flat crossing for its rim measure; a back face shades the hit.\nfloat3 Ssurf = Sflat;\nfloat3 surfN = N;\nfloat surfH = 0.0;\nif (Sign <= 0.0)\n{\n    float hiCrest = abs(swellAmp) + chopAmp * 1.1 + 1e-3;\n    float va = dot(V, V);\n    float vb = dot(CamRel, V);\n    float vc = dot(CamRel, CamRel) - R * R;\n    float disc = vb * vb - va * vc;\n    float tIn = disc > 0.0 ? (-vb - sqrt(disc)) / va : 0.0;\n    if (jar)\n    {\n        float tOut;\n        MARS_LIQ_CYL(CamRel, V, tIn, tOut);\n        tIn = tIn < tOut ? tIn : 0.0;\n    }\n    float t0 = max(tIn, 0.0);\n    if (vN < -1e-5)\n    { t0 = max(t0, (h + hiCrest - dot(CamRel, N)) / vN); }\n    t0 = min(t0, 1.0);\n    float tLo = t0;\n    float tHi = 1.0;\n    bool found = false;\n    [unroll] for (int m = 1; m <= 12; ++m)\n    {\n        float t = lerp(t0, 1.0, m / 12.0);\n        float3 X = CamRel + V * t;\n        float hh;\n        MARS_LIQ_HEIGHT(X, hh);\n        if (!found && dot(X, N) - h - hh <= 0.0)\n        {\n            tHi = t;\n            found = true;\n        }\n        if (!found)\n        { tLo = t; }\n    }\n    [unroll] for (int b = 0; b < 4; ++b)\n    {\n        float t = 0.5 * (tLo + tHi);\n        float3 X = CamRel + V * t;\n        float hh;\n        MARS_LIQ_HEIGHT(X, hh);\n        if (dot(X, N) - h - hh <= 0.0)\n        { tHi = t; }\n        else\n        { tLo = t; }\n    }\n    Ssurf = CamRel + V * tHi;\n    // the normal from the height field's slope (central differences along the surface's frame)\n    float e = 0.02 * R;\n    float hx0, hx1, hy0, hy1;\n    float3 Sx0 = Ssurf - T1 * e;\n    float3 Sx1 = Ssurf + T1 * e;\n    float3 Sy0 = Ssurf - T2 * e;\n    float3 Sy1 = Ssurf + T2 * e;\n    MARS_LIQ_HEIGHT(Sx0, hx0);\n    MARS_LIQ_HEIGHT(Sx1, hx1);\n    MARS_LIQ_HEIGHT(Sy0, hy0);\n    MARS_LIQ_HEIGHT(Sy1, hy1);\n    surfN = normalize(N - ((hx1 - hx0) * T1 + (hy1 - hy0) * T2) / (2.0 * e));\n    MARS_LIQ_HEIGHT(Ssurf, surfH);\n}\n\nfloat foamWidth = FoamWidth;\n// how far the rim bands swell here (0: even); only the boil sets it\nfloat rimFroth = 0.0;\n#if MARS_LIQ_BUBBLING\nfoamWidth *= 1.0 + 1.5 * Boil;\n// the rim froth: round the vessel's axis the band breaks into beads of froth, each swelling and popping on its own clock\n// as the bubbles reach the edge, over a wobble travelling round the rim. The beads' count round the rim (the band's\n// frequency) rises with the boil and the bubbles' density; both rim bands (the line on the glass, the meniscus on the\n// top) swell by it, the top's capped so the froth never floods the surface. Measured at this pixel on the glass, at the\n// surface crossing on the top.\n{\n    float3 Xr = Sign > 0.0 ? D : Ssurf;\n    float theta = atan2(dot(Xr, T2), dot(Xr, T1)) * (0.5 / 3.14159265) + 0.5;\n    float beads = max(3.0, round(RimFrothFrequency * (0.5 + 0.5 * Boil) * (0.5 + BubbleDensity)));\n    float u = theta * beads;\n    float3 rh = MARS_LIQ_HASH3(float3(fmod(floor(u), beads), 5.3, Phase * 11.0));\n    float rf = frac(u) - 0.5 - (rh.z - 0.5) * 0.3;\n    float rlife = frac(Time * BubbleSpeed * 0.7 + rh.x);\n    float rsize = lerp(0.18, 0.45, rh.y) * smoothstep(0.0, 0.7, rlife) * (1.0 - step(0.9, rlife));\n    float bead = sqrt(saturate(1.0 - (rf * rf) / max(rsize * rsize, 1e-4)));\n    float wobble = 0.5 + 0.5 * sin(theta * 6.2831853 * beads * 0.5 + Time * rippleSpeed);\n    rimFroth = saturate(RimFroth * Boil * (bead + 0.25 * wobble));\n}\n#endif\n\nfloat3 Vn = normalize(V);\nbool front = Sign > 0.0;\n\n// a front face: the liquid between here and where the ray leaves it (the far wall, or the surface if the ray rises through\n// it first), cm\nfloat frontRun = 0.0;\nif (front)\n{\n    float b = dot(D, Vn);\n    float tS = -b + sqrt(max(b * b - (dot(D, D) - R * R), 0.0));\n    if (jar)\n    {\n        float tIn;\n        MARS_LIQ_CYL(D, Vn, tIn, tS);\n    }\n    float vnN = dot(Vn, N);\n    float tP = vnN > 1e-4 ? (h - dot(D, N)) / vnN : 1e9;\n    frontRun = max(min(tS, tP), 0.0);\n}\n\n// the pickles (Pickle Jar): the first one the ray meets in the liquid, from where it enters (this front face, or the\n// surface over a back face) to where it leaves. Over the surface (a pixel the clip drops) the trace runs through the jar's\n// air instead, and a tip it meets there keeps the pixel, dry. Each pickle stands on the floor round the axis (a ring and\n// one in the middle), leans a little in, and is a convex solid of planes in its own frame: a lower and an upper band of\n// seven facets (twisted half a facet, each bulging to the middle), a bevel at each end, and the end caps.\nbool pkHit = false;\nfloat pkT = 0.0;\nfloat3 pkN = -Vn;\nfloat3 pkCol = PickleColor;\nfloat3 pkX = D;\nif (jar && PickleCount >= 1.0)\n{\n    float3 O = front ? D : Ssurf;\n    float tMax = front ? frontRun : length(D - Ssurf);\n    if (s > 0.0)\n    {\n        float tA, tB;\n        MARS_LIQ_CYL(CamRel, Vn, tA, tB);\n        O = front ? D : CamRel + Vn * max(tA, 0.0);\n        tMax = max(tB - dot(O - CamRel, Vn), 0.0);\n    }\n    #define MARS_LIQ_PLANE(NP, DP, ID) \\\n    { \\\n        float3 _n = NP; \\\n        float _dn = dot(v, _n); \\\n        float _t = ((DP) - dot(o, _n)) / (_dn < 0.0 ? min(_dn, -1e-6) : max(_dn, 1e-6)); \\\n        if (_dn < 0.0) \\\n        { \\\n            if (_t > tE) { tE = _t; nE = _n; fE = ID; } \\\n        } \\\n        else \\\n        { tX = min(tX, _t); } \\\n    }\n    int count = (int)min(PickleCount, 12.0);\n    int ring = count >= 4 ? count - 1 : count;\n    float seed = floor(Phase * 97.0);\n    float pr = PickleRadius * R;\n    float ringR = max(R - pr * 1.15 - 0.03 * R, 0.0);\n    float bestT = tMax;\n    float3 bestL = 0.0;\n    float bestFace = 0.0;\n    float bestI = 0.0;\n    float bestRad = 1.0;\n    [loop] for (int i = 0; i < count; ++i)\n    {\n        float3 ph = MARS_LIQ_HASH3(float3(i, seed, 2.9));\n        bool centre = i >= ring;\n        float ang = (i + (ph.x - 0.5) * 0.3) / ring * 6.2831853 + Phase * 6.2831853;\n        float3 out2 = Ax * cos(ang) + Ay * sin(ang);\n        float rad = pr * (centre ? 1.15 : 0.9 + 0.2 * ph.z);\n        float len = PickleLength * 2.0 * HH * (0.84 + 0.16 * ph.y);\n        float3 base = out2 * (centre ? 0.0 : ringR * (0.96 + 0.04 * ph.y)) - Az * (HH - 0.02 * R);\n        float3 pz = normalize(Az - out2 * (centre ? 0.0 : 0.02 + 0.05 * ph.z) + Ay * ((ph.x - 0.5) * 0.04));\n        float3 px0 = normalize(Ax - pz * dot(Ax, pz));\n        float3 py0 = cross(pz, px0);\n        float tw = ph.x * 6.2831853;\n        float3 px = px0 * cos(tw) + py0 * sin(tw);\n        float3 py = cross(pz, px);\n        float3 rel = O - base;\n        float3 o = float3(dot(rel, px), dot(rel, py), dot(rel, pz));\n        float3 v = float3(dot(Vn, px), dot(Vn, py), dot(Vn, pz));\n        // skip a pickle whose bounding sphere the ray misses, or meets only past the best so far\n        float3 bc = o - float3(0.0, 0.0, 0.5 * len);\n        float bb = dot(bc, v);\n        float bd = bb * bb - (dot(bc, bc) - (0.25 * len * len + 1.2 * rad * rad));\n        if (bd < 0.0 || -bb - sqrt(bd) > bestT || -bb + sqrt(bd) < 0.0)\n        { continue; }\n\n        float tE = -1e9;\n        float tX = 1e9;\n        float3 nE = float3(0.0, 0.0, -1.0);\n        float fE = 0.0;\n        float eps = 0.16 * rad / (0.5 * len);   // the bands' bulge: radius lost from the middle to an end, per height\n        float kb = 0.7;                         // the bevels' slope\n        float ib = rsqrt(1.0 + eps * eps);\n        float ik = rsqrt(1.0 + kb * kb);\n        [unroll] for (int k = 0; k < 7; ++k)\n        {\n            float3 kh = MARS_LIQ_HASH3(float3(i, k, seed + 4.1));\n            float a0 = (k + 0.15 * (kh.x - 0.5)) * 0.8975979;\n            float a1 = a0 + 0.4487990;\n            float2 c0 = float2(cos(a0), sin(a0));\n            float2 c1 = float2(cos(a1), sin(a1));\n            MARS_LIQ_PLANE(float3(c0, -eps) * ib, (rad * (0.95 + 0.1 * kh.y) - eps * 0.5 * len) * ib, k)\n            MARS_LIQ_PLANE(float3(c1, eps) * ib, (rad * (0.95 + 0.1 * kh.z) + eps * 0.5 * len) * ib, 7 + k)\n            MARS_LIQ_PLANE(float3(c0, kb) * ik, (0.6 * rad + kb * len) * ik, 14 + k)\n            MARS_LIQ_PLANE(float3(c1, -kb) * ik, 0.6 * rad * ik, 21 + k)\n        }\n        MARS_LIQ_PLANE(float3(0.0, 0.0, 1.0), len, 28)\n        MARS_LIQ_PLANE(float3(0.0, 0.0, -1.0), 0.0, 29)\n        if (tE <= tX && tX > 0.0 && tE < bestT)\n        {\n            bestT = max(tE, 0.0);\n            pkHit = true;\n            pkN = px * nE.x + py * nE.y + pz * nE.z;\n            bestL = o + v * bestT;\n            bestFace = fE;\n            bestI = i;\n            bestRad = rad;\n        }\n    }\n    pkT = bestT;\n    pkX = O + Vn * bestT;\n    if (pkHit)\n    {\n        // flat-shaded facets, each its own shade between Pickle Color and Pickle Light, the ends lighter; pale warts on\n        // the bands\n        float3 fh = MARS_LIQ_HASH3(float3(bestI, bestFace, seed + 8.3));\n        pkCol = lerp(PickleColor, PickleLight, 0.1 + 0.6 * fh.x + (bestFace >= 14.0 ? 0.3 : 0.0));\n        float th = atan2(bestL.y, bestL.x) * (0.5 / 3.14159265) + 0.5;\n        float2 wq = float2(th * 14.0, bestL.z / max(bestRad * 0.8, 1e-3)) + bestI * 3.7;\n        float3 wh = MARS_LIQ_HASH3(float3(floor(wq), bestI + 1.3));\n        float wr = length(frac(wq) - 0.5 - (wh.xy - 0.5) * 0.5);\n        float wart = (bestFace < 14.0 ? 1.0 : 0.0) * step(1.0 - WartAmount, wh.z) * (1.0 - smoothstep(0.1, 0.15, wr));\n        pkCol = lerp(pkCol, WartColor, wart);\n    }\n}\nif (jar && s > 0.0)\n{\n    // over the surface: only a dry tip keeps the pixel\n    bool dry = false;\n    if (pkHit)\n    {\n        float hx;\n        MARS_LIQ_HEIGHT(pkX, hx);\n        dry = dot(pkX, N) - h - hx > 0.0;\n    }\n    OutMask = dry ? 1.0 : 0.0;\n    OutNormal = pkN;\n    OutEmissive = pkCol * PickleGlow;\n    OutRough = PickleRoughness;\n    return pkCol;\n}\n// how fast the liquid veils a pickle behind it (per radius; the brine adds its haze)\nfloat pkFog = PickleVeil;\nfloat rough = Roughness;\n// a pickle's own light (Pickle Glow), so it reads in a backlit jar\nfloat3 pkGlow = 0.0;\n\nfloat path;\nfloat3 n;\nfloat3 col;\nfloat3 glow;\nif (front)\n{\n    path = (pkHit ? pkT : frontRun) / R;\n    float depth = 1.0 - exp(-path * Density);\n    n = normalize(Nw);\n    col = lerp(LiquidColor, DeepColor, depth);\n#if MARS_LIQ_BRINE\n    // cloudy: the haze thickens with the depth looked through, and thicker still low down where the sediment hangs\n    float3 mid = D + Vn * (path * R * 0.5);\n    float low = 1.0 - smoothstep(-0.9, 0.1, dot(mid, N) / (jar ? HH : R));\n    float haze = 1.0 - exp(-path * (Turbidity + Sediment * low * 3.0));\n    col = lerp(col, HazeColor, haze);\n    pkFog += Turbidity + Sediment * low * 3.0;\n#endif\n    if (pkHit)\n    {\n        // the pickle through the liquid in front of it: tinted by it, veiled by it, lit with its own facets while it shows\n        float veil = 1.0 - exp(-path * pkFog);\n        float3 seen = pkCol * lerp(1.0, min(LiquidColor * 1.6, 1.0), saturate(path * 2.0));\n        col = lerp(seen, col, veil);\n        n = normalize(lerp(pkN, n, veil));\n        rough = lerp(PickleRoughness, Roughness, veil);\n        pkGlow = seen * (PickleGlow * (1.0 - veil));\n    }\n\n    // a bright line where the liquid meets the glass, under the surface\n    float foam = 1.0 - smoothstep(0.0, foamWidth * (1.0 + 1.5 * rimFroth) * R, -s);\n    // light through the thin edge of the volume\n    float rim = pow(1.0 - saturate(dot(n, -Vn)), 3.0) * RimLight;\n    // motes: two layers of rising sparks inside the volume, along the ray (parallax: they sit in the liquid, not on the\n    // glass)\n    float motes = 0.0;\n    [unroll] for (int m = 0; m < 2; ++m)\n    {\n        float3 Q = (D + Vn * (path * R * (m == 0 ? 0.3 : 0.7))) / R * MoteScale - N * (Time * MoteSpeed) + Phase * 31.0 + m * 7.31;\n        float3 cell = floor(Q);\n        float3 f = frac(Q) - 0.5;\n        float3 hsh = MARS_LIQ_HASH3(cell);\n        float3 off = (hsh - 0.5) * 0.6;\n        float on = step(0.55, hsh.x);\n        float r = length(f - off);\n        motes += on * (1.0 - smoothstep(0.02, 0.09, r));\n    }\n#if MARS_LIQ_BUBBLING\n    // bubbles: three layers along the ray, each bubble a bright rim round a lighter core, rising and weaving\n    float bubbles = 0.0;\n    [unroll] for (int q = 0; q < 3; ++q)\n    {\n        float along = 0.15 + 0.35 * q;\n        float3 Q = (D + Vn * (path * R * along)) / R * BubbleScale - N * (Time * BubbleSpeed * (1.0 + 0.3 * q)) + Phase * 13.0 + q * 5.17;\n        float3 cell = floor(Q);\n        float3 f = frac(Q) - 0.5;\n        float3 hsh = MARS_LIQ_HASH3(cell);\n        float on = step(1.0 - BubbleDensity, hsh.x);\n        float rad = lerp(0.1, 0.24, hsh.z);\n        float3 off = (hsh - 0.5) * (0.9 - 2.0 * rad) + (T1 * sin(Time * 5.0 + hsh.y * 6.28) + T2 * cos(Time * 4.1 + hsh.z * 6.28)) * 0.05;\n        float r = length(f - off);\n        float rimB = smoothstep(rad - 0.06, rad - 0.01, r) * (1.0 - smoothstep(rad - 0.01, rad + 0.015, r));\n        float core = 1.0 - smoothstep(rad - 0.08, rad - 0.02, r);\n        bubbles += on * (rimB + 0.2 * core) * (1.0 - 0.25 * q);\n    }\n    col = lerp(col, FoamColor, saturate(bubbles) * 0.6);\n    motes += bubbles * Boil;\n#endif\n#if MARS_LIQ_BRINE\n    // the pickling spices: peppercorns (dark, round), mustard seeds (yellow, round) and dill (green, long flecks),\n    // five layers along the ray; they sink slowly, sway, and swirl round the surface's normal when it sloshes\n    float specks = 0.0;\n    float3 speckCol = 0.0;\n    float swirl = Slosh * 2.0 + 0.15;\n    [unroll] for (int p = 0; p < 5; ++p)\n    {\n        float along = 0.1 + 0.2 * p;\n        float3 X = (D + Vn * (path * R * along)) / R;\n        float a = swirl * sin(Time * 0.6 + p * 2.1);\n        float2 xy = float2(dot(X, T1), dot(X, T2));\n        xy = float2(xy.x * cos(a) - xy.y * sin(a), xy.x * sin(a) + xy.y * cos(a));\n        float3 Q = (T1 * xy.x + T2 * xy.y + N * dot(X, N)) * SpeckScale + N * (Time * 0.04) + Phase * 23.0 + p * 3.71;\n        float3 cell = floor(Q);\n        float3 f = frac(Q) - 0.5;\n        float3 hsh = MARS_LIQ_HASH3(cell);\n        float on = step(1.0 - SpeckAmount, hsh.x);\n        float3 off = (hsh - 0.5) * 0.5;\n        float3 e = f - off;\n        float3 tint;\n        float r;\n        if (hsh.y < 0.4)\n        {   // peppercorn\n            r = length(e) / 0.12;\n            tint = float3(0.06, 0.045, 0.03);\n        }\n        else if (hsh.y < 0.75)\n        {   // mustard seed\n            r = length(e) / 0.09;\n            tint = float3(0.75, 0.55, 0.15);\n        }\n        else\n        {   // dill: a thin fleck along a random direction\n            float3 dir = normalize(hsh * 2.0 - 1.0 + 1e-3);\n            float t = dot(e, dir);\n            r = max(length(e - dir * t) / 0.035, abs(t) / 0.3);\n            tint = float3(0.18, 0.32, 0.08);\n        }\n        float hit = on * (1.0 - smoothstep(0.7, 1.0, r)) * (1.0 - 0.12 * p);\n        speckCol = lerp(speckCol, tint, hit * (1.0 - specks));\n        specks = saturate(specks + hit);\n    }\n    col = lerp(col, speckCol, specks);\n#endif\n    // the aeration: while it churns, the water under the surface turns white and fills with small bubbles (three layers\n    // along the ray), in a band deeper the harder it was jolted\n    if (agit > 0.01)\n    {\n        float bandDepth = Aeration * agit * R + 1e-3;\n        float aer = 0.4 * (1.0 - smoothstep(0.0, bandDepth, -s));\n        [unroll] for (int w = 0; w < 3; ++w)\n        {\n            float3 X = D + Vn * (path * R * (0.08 + 0.3 * w));\n            float hh;\n            MARS_LIQ_HEIGHT(X, hh);\n            float band = 1.0 - smoothstep(0.0, bandDepth, h + hh - dot(X, N));\n            float3 Q = X / R * 9.0 - N * (Time * 2.0) + Phase * 3.1 + w * 1.7;\n            float3 hsh = MARS_LIQ_HASH3(floor(Q));\n            float rad = lerp(0.12, 0.3, hsh.z);\n            float r = length(frac(Q) - 0.5 - (hsh - 0.5) * (0.9 - 2.0 * rad));\n            float ring = smoothstep(rad - 0.08, rad - 0.01, r) * (1.0 - smoothstep(rad - 0.01, rad + 0.02, r));\n            float core = 1.0 - smoothstep(rad - 0.1, rad, r);\n            aer += band * step(0.35, hsh.x) * (ring + 0.35 * core);\n        }\n        col = lerp(col, FoamColor, saturate(aer) * 0.75);\n    }\n    col = lerp(col, FoamColor, foam * 0.6);\n    glow = col * Glow * (1.0 - 0.5 * depth) + LiquidColor * (rim * Glow) + FoamColor * (motes * MoteAmount * Glow);\n}\nelse\n{\n    // the surface, seen at the point the ray crosses it: lit with the rippled normal, coloured by the depth of liquid\n    // under it along the ray (the crossing to this back face)\n    float3 Sp = Ssurf;\n    path = (pkHit ? pkT : length(D - Sp)) / R;\n    float depth = 1.0 - exp(-path * Density);\n    n = surfN;\n    // the meniscus: a pale ring where the surface meets the glass (the sphere's cut circle has radius sqrt(R^2 - h^2); a\n    // jar's wall is R from its axis)\n    float3 toS = Sp - N * h;\n    float radial = jar ? length(Sp - Az * dot(Sp, Az)) / R : length(toS - N * dot(toS, N)) / sqrt(max(R * R - h * h, 1e-4));\n    float meniscus = smoothstep(1.0 - min(foamWidth * 2.5 * (1.0 + rimFroth), 0.3), 1.0, radial);\n    col = lerp(lerp(LiquidColor, DeepColor, depth), SurfaceColor, SurfaceMix);\n#if MARS_LIQ_BRINE\n    col = lerp(col, HazeColor, 1.0 - exp(-path * Turbidity));\n    pkFog += Turbidity;\n#endif\n    if (pkHit)\n    {\n        // a pickle under the top, veiled by the liquid over it, the top's own colour and gloss over both\n        float veil = 1.0 - exp(-path * pkFog);\n        float3 seen = pkCol * lerp(1.0, min(LiquidColor * 1.6, 1.0), saturate(path * 2.0));\n        col = lerp(lerp(seen, col, veil), SurfaceColor, SurfaceMix * 0.5 * (1.0 - veil));\n        pkGlow = seen * (PickleGlow * (1.0 - veil));\n    }\n#if MARS_LIQ_BUBBLING\n    // domes: each cell of the surface grows a bubble that swells, then pops into an expanding ring\n    float2 suv = float2(dot(Sp, T1), dot(Sp, T2)) / R * BubbleScale * 1.4 + Phase * 7.0;\n    float3 sh = MARS_LIQ_HASH3(float3(floor(suv), 3.7));\n    float2 sf = frac(suv) - 0.5;\n    float life = frac(Time * BubbleSpeed * 0.9 + sh.x);\n    float on = step(1.0 - BubbleDensity, sh.y);\n    float rad = lerp(0.12, 0.32, sh.z) * smoothstep(0.0, 0.8, life);\n    float2 e = sf - (sh.xy - 0.5) * 0.3;\n    float d = length(e) / max(rad, 1e-3);\n    float dome = on * step(life, 0.85) * (1.0 - step(1.0, d));\n    // the dome's slope bends the normal; its rim catches light\n    float slope = d / sqrt(max(1.0 - d * d, 0.02));\n    float2 dirE = e / max(length(e), 1e-3);\n    n = normalize(n - dome * slope * 0.6 * (T1 * dirE.x + T2 * dirE.y));\n    float domeRim = dome * smoothstep(0.7, 1.0, d);\n    // the pop: a thin ring racing out after the bubble bursts\n    float pop = on * step(0.85, life) * (1.0 - smoothstep(0.0, 0.05, abs(length(e) - (life - 0.85) * 3.0))) * (1.0 - life) * 6.0;\n    col = lerp(col, FoamColor, saturate((domeRim * 0.8 + pop + dome * 0.15) * Boil));\n#endif\n#if MARS_LIQ_BRINE\n    // a few seeds float on the top\n    float2 fuv = float2(dot(Sp, T1), dot(Sp, T2)) / R * SpeckScale * 0.8 + Phase * 5.0;\n    float3 fh = MARS_LIQ_HASH3(float3(floor(fuv), 9.1));\n    float fr = length(frac(fuv) - 0.5 - (fh.xy - 0.5) * 0.5);\n    float floater = step(1.0 - SpeckAmount * 0.5, fh.x) * (1.0 - smoothstep(0.04, 0.07, fr));\n    col = lerp(col, fh.z < 0.5 ? float3(0.75, 0.55, 0.15) : float3(0.18, 0.32, 0.08), floater);\n#endif\n    // whitecaps on the churned crests, and a sizzle of foam cells over the cap while it settles\n    if (agit > 0.01)\n    {\n        float crest = smoothstep(0.3, 1.0, surfH / max(chopAmp + abs(swellAmp), 1e-3)) * FoamCap * agit;\n        float2 fz = float2(dot(Sp, T1), dot(Sp, T2)) / R * 8.0 + Phase * 3.0 + float2(Time * 0.3, -Time * 0.2);\n        float3 zh = MARS_LIQ_HASH3(float3(floor(fz), 7.7));\n        float zr = length(frac(fz) - 0.5 - (zh.xy - 0.5) * 0.4);\n        float zrad = lerp(0.08, 0.22, zh.z);\n        float zring = smoothstep(zrad - 0.06, zrad, zr) * (1.0 - smoothstep(zrad, zrad + 0.03, zr));\n        float sizzle = step(1.0 - agit * 0.8, zh.x) * (zring + 0.4 * (1.0 - smoothstep(zrad - 0.06, zrad, zr)));\n        col = lerp(col, FoamColor, saturate(crest + sizzle * 0.8 * FoamCap));\n    }\n    col = lerp(col, FoamColor, meniscus * 0.85);\n    glow = col * (Glow * 0.6);\n}\n\nOutNormal = n;\nOutEmissive = glow + pkGlow;\nOutRough = rough;\nreturn col;\n",
+					"Description": "Liquid Bubbling"
+				}
+			},
+			{
+				"id": 71,
+				"class": "MakeMaterialAttributes",
+				"name": "MaterialExpressionMakeMaterialAttributes_5",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "BaseColor",
+						"node": 70,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "Roughness",
+						"node": 70,
+						"output": 4
+					},
+					{
+						"index": 5,
+						"name": "EmissiveColor",
+						"node": 70,
+						"output": 2
+					},
+					{
+						"index": 7,
+						"name": "OpacityMask",
+						"node": 70,
+						"output": 3
+					},
+					{
+						"index": 8,
+						"name": "Normal",
+						"node": 70,
+						"output": 1
+					}
+				]
+			},
+			{
+				"id": 72,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_6",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "D",
+						"node": 54,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "CamRel",
+						"node": 58,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "Unit",
+						"node": 59,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "Radius",
+						"node": 45,
+						"output": 0
+					},
+					{
+						"index": 4,
+						"name": "Surface",
+						"node": 47,
+						"output": 5,
+						"mask": "rgba"
+					},
+					{
+						"index": 5,
+						"name": "Slosh",
+						"node": 48,
+						"output": 0
+					},
+					{
+						"index": 6,
+						"name": "Agitation",
+						"node": 50,
+						"output": 0
+					},
+					{
+						"index": 7,
+						"name": "Phase",
+						"node": 49,
+						"output": 0
+					},
+					{
+						"index": 8,
+						"name": "Time",
+						"node": 65,
+						"output": 0
+					},
+					{
+						"index": 9,
+						"name": "Sign",
+						"node": 66,
+						"output": 0
+					},
+					{
+						"index": 10,
+						"name": "Nw",
+						"node": 67,
+						"output": 0
+					},
+					{
+						"index": 11,
+						"name": "LiquidColor",
+						"node": 0,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 12,
+						"name": "DeepColor",
+						"node": 1,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 13,
+						"name": "Density",
+						"node": 2,
+						"output": 0
+					},
+					{
+						"index": 14,
+						"name": "Glow",
+						"node": 3,
+						"output": 0
+					},
+					{
+						"index": 15,
+						"name": "RimLight",
+						"node": 4,
+						"output": 0
+					},
+					{
+						"index": 16,
+						"name": "Roughness",
+						"node": 5,
+						"output": 0
+					},
+					{
+						"index": 17,
+						"name": "SurfaceColor",
+						"node": 6,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 18,
+						"name": "SurfaceMix",
+						"node": 7,
+						"output": 0
+					},
+					{
+						"index": 19,
+						"name": "FoamColor",
+						"node": 8,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 20,
+						"name": "FoamWidth",
+						"node": 9,
+						"output": 0
+					},
+					{
+						"index": 21,
+						"name": "RippleAmount",
+						"node": 10,
+						"output": 0
+					},
+					{
+						"index": 22,
+						"name": "RippleScale",
+						"node": 11,
+						"output": 0
+					},
+					{
+						"index": 23,
+						"name": "RippleSpeed",
+						"node": 12,
+						"output": 0
+					},
+					{
+						"index": 24,
+						"name": "MoteAmount",
+						"node": 18,
+						"output": 0
+					},
+					{
+						"index": 25,
+						"name": "MoteScale",
+						"node": 19,
+						"output": 0
+					},
+					{
+						"index": 26,
+						"name": "MoteSpeed",
+						"node": 20,
+						"output": 0
+					},
+					{
+						"index": 27,
+						"name": "Boil",
+						"node": 22,
+						"output": 0
+					},
+					{
+						"index": 28,
+						"name": "BubbleScale",
+						"node": 23,
+						"output": 0
+					},
+					{
+						"index": 29,
+						"name": "BubbleSpeed",
+						"node": 24,
+						"output": 0
+					},
+					{
+						"index": 30,
+						"name": "BubbleDensity",
+						"node": 25,
+						"output": 0
+					},
+					{
+						"index": 31,
+						"name": "RimFroth",
+						"node": 26,
+						"output": 0
+					},
+					{
+						"index": 32,
+						"name": "RimFrothFrequency",
+						"node": 27,
+						"output": 0
+					},
+					{
+						"index": 33,
+						"name": "BreakupAmount",
+						"node": 13,
+						"output": 0
+					},
+					{
+						"index": 34,
+						"name": "BreakupFrequency",
+						"node": 14,
+						"output": 0
+					},
+					{
+						"index": 35,
+						"name": "BreakupSpeed",
+						"node": 15,
+						"output": 0
+					},
+					{
+						"index": 36,
+						"name": "Aeration",
+						"node": 16,
+						"output": 0
+					},
+					{
+						"index": 37,
+						"name": "FoamCap",
+						"node": 17,
+						"output": 0
+					},
+					{
+						"index": 38,
+						"name": "HazeColor",
+						"node": 29,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 39,
+						"name": "Turbidity",
+						"node": 30,
+						"output": 0
+					},
+					{
+						"index": 40,
+						"name": "Sediment",
+						"node": 31,
+						"output": 0
+					},
+					{
+						"index": 41,
+						"name": "SpeckAmount",
+						"node": 32,
+						"output": 0
+					},
+					{
+						"index": 42,
+						"name": "SpeckScale",
+						"node": 33,
+						"output": 0
+					},
+					{
+						"index": 43,
+						"name": "UnitZ",
+						"node": 61,
+						"output": 0
+					},
+					{
+						"index": 44,
+						"name": "Jar",
+						"node": 34,
+						"output": 0
+					},
+					{
+						"index": 45,
+						"name": "HalfHeight",
+						"node": 46,
+						"output": 0
+					},
+					{
+						"index": 46,
+						"name": "PickleCount",
+						"node": 35,
+						"output": 0
+					},
+					{
+						"index": 47,
+						"name": "PickleRadius",
+						"node": 36,
+						"output": 0
+					},
+					{
+						"index": 48,
+						"name": "PickleLength",
+						"node": 37,
+						"output": 0
+					},
+					{
+						"index": 49,
+						"name": "PickleColor",
+						"node": 38,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 50,
+						"name": "PickleLight",
+						"node": 39,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 51,
+						"name": "WartColor",
+						"node": 40,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 52,
+						"name": "WartAmount",
+						"node": 41,
+						"output": 0
+					},
+					{
+						"index": 53,
+						"name": "PickleVeil",
+						"node": 42,
+						"output": 0
+					},
+					{
+						"index": 54,
+						"name": "PickleRoughness",
+						"node": 44,
+						"output": 0
+					},
+					{
+						"index": 55,
+						"name": "PickleGlow",
+						"node": 43,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"return",
+					"OutNormal",
+					"OutEmissive",
+					"OutMask",
+					"OutRough"
+				],
+				"props":
+				{
+					"Code": "\n#ifndef MARS_LIQ_HASH3\n#define MARS_LIQ_HASH3(c) frac(sin(float3(dot(c, float3(127.1, 311.7, 74.7)), dot(c, float3(269.5, 183.3, 246.1)), dot(c, float3(113.5, 271.9, 124.6)))) * 43758.5453)\n#endif\nfloat S = max(length(Unit), 1e-4);\nfloat R = max(Radius * S, 1e-3);\nfloat3 N = normalize(Surface.xyz + float3(0.0, 0.0, 1e-4));\nfloat h = Surface.w * R;\n\n// the vessel's frame (the mesh's local axes in world); a jar's plane passes through its axis at the fill height\nfloat3 Ax = Unit / S;\nfloat3 Az = normalize(UnitZ);\nfloat3 Ay = cross(Az, Ax);\nbool jar = Jar > 0.5;\nfloat HH = max(HalfHeight * S, 1e-3);\nif (jar)\n{ h = Surface.w * HH * dot(Az, N); }\n// where a ray O + V t enters and leaves the jar's cylinder (t in V's units; TIN > TOUT: a miss)\n#define MARS_LIQ_CYL(O, V, TIN, TOUT) \\\n{ \\\n    float3 _or = O - Az * dot(O, Az); \\\n    float3 _vr = V - Az * dot(V, Az); \\\n    float _a = max(dot(_vr, _vr), 1e-8); \\\n    float _b = dot(_or, _vr); \\\n    float _d = _b * _b - _a * (dot(_or, _or) - R * R); \\\n    float _sq = sqrt(max(_d, 0.0)); \\\n    float _vz = dot(V, Az); \\\n    _vz = abs(_vz) > 1e-6 ? _vz : 1e-6; \\\n    float _z0 = (-HH - dot(O, Az)) / _vz; \\\n    float _z1 = (HH - dot(O, Az)) / _vz; \\\n    TIN = _d < 0.0 ? 1e9 : max((-_b - _sq) / _a, min(_z0, _z1)); \\\n    TOUT = _d < 0.0 ? -1e9 : min((-_b + _sq) / _a, max(_z0, _z1)); \\\n}\n\n// the surface's own frame, for the ripples\nfloat3 T1 = normalize(cross(abs(N.x) < 0.9 ? float3(1.0, 0.0, 0.0) : float3(0.0, 1.0, 0.0), N));\nfloat3 T2 = cross(N, T1);\n\n// the camera ray through this pixel and where it crosses the flat surface (0 at the camera, 1 at this pixel)\nfloat3 V = D - CamRel;\nfloat vN = dot(V, N);\nfloat tPlane = (h - dot(CamRel, N)) / (abs(vN) > 1e-5 ? vN : 1e-5);\nfloat3 Sflat = CamRel + V * saturate(tPlane);\n\n// the surface is a height field over the plane, in its own frame (T1, T2), measured along N:\n//   swell  three long travelling waves, a faint shimmer at rest, louder while it sloshes (and while it boils);\n//   chop   the breakup: crossed products of shorter waves, sharpened into crests, whose height grows with Agitation (the\n//          script's lagged slosh energy) and whose frequency climbs with it, so a jolt tears the flat cap into a churn\n//          that calms back into long swell as Agitation decays.\nfloat churn = 0.04 + Slosh;\nfloat rippleSpeed = RippleSpeed;\nfloat agit = saturate(Agitation);\n#if MARS_LIQ_BUBBLING\nchurn += 0.5 * Boil;\nrippleSpeed *= 1.0 + Boil;\nagit = saturate(agit + 0.35 * Boil);\n#endif\nfloat swellAmp = RippleAmount * R * churn;\nfloat chopAmp = BreakupAmount * R * agit;\nfloat chopFreq = RippleScale * BreakupFrequency * (0.5 + agit) / R;\nfloat tSwell = Time * rippleSpeed + Phase * 17.0;\nfloat tChop = Time * BreakupSpeed * (0.6 + agit) + Phase * 5.0;\n#define MARS_LIQ_HEIGHT(X, OUT) \\\n{ \\\n    float2 _p = float2(dot(X, T1), dot(X, T2)); \\\n    float2 _a = _p * (RippleScale / R); \\\n    OUT = swellAmp * (sin(dot(_a, float2(0.96, 0.28)) + tSwell) + 0.6 * sin(dot(_a, float2(-0.53, 0.85)) * 1.7 + tSwell * 1.31) \\\n        + 0.35 * sin(dot(_a, float2(-0.39, -0.92)) * 2.9 + tSwell * 1.87)) / 1.95; \\\n    float2 _c = _p * chopFreq; \\\n    float _w = sin(dot(_c, float2(0.8, 0.6)) + tChop) * sin(dot(_c, float2(-0.6, 0.8)) * 1.3 - tChop * 1.2) \\\n        + 0.5 * sin(dot(_c, float2(0.31, -0.95)) * 2.3 + tChop * 1.7) * sin(dot(_c, float2(0.95, 0.31)) * 1.9 - tChop * 0.9); \\\n    OUT += chopAmp * sign(_w) * pow(abs(_w) / 1.5, 0.6); \\\n}\n\n// signed height of this pixel over the surface: above it is air\nfloat hereH;\nMARS_LIQ_HEIGHT(D, hereH);\nfloat s = dot(D, N) - h - hereH;\nOutMask = s <= 0.0 ? 1.0 : 0.0;\n\n// where the camera ray first meets the surface: march from where the ray enters the sphere, or comes down past the\n// highest crest, to this pixel (which is under the surface: the clip kept it), then refine by bisection. A front face\n// only needs the flat crossing for its rim measure; a back face shades the hit.\nfloat3 Ssurf = Sflat;\nfloat3 surfN = N;\nfloat surfH = 0.0;\nif (Sign <= 0.0)\n{\n    float hiCrest = abs(swellAmp) + chopAmp * 1.1 + 1e-3;\n    float va = dot(V, V);\n    float vb = dot(CamRel, V);\n    float vc = dot(CamRel, CamRel) - R * R;\n    float disc = vb * vb - va * vc;\n    float tIn = disc > 0.0 ? (-vb - sqrt(disc)) / va : 0.0;\n    if (jar)\n    {\n        float tOut;\n        MARS_LIQ_CYL(CamRel, V, tIn, tOut);\n        tIn = tIn < tOut ? tIn : 0.0;\n    }\n    float t0 = max(tIn, 0.0);\n    if (vN < -1e-5)\n    { t0 = max(t0, (h + hiCrest - dot(CamRel, N)) / vN); }\n    t0 = min(t0, 1.0);\n    float tLo = t0;\n    float tHi = 1.0;\n    bool found = false;\n    [unroll] for (int m = 1; m <= 12; ++m)\n    {\n        float t = lerp(t0, 1.0, m / 12.0);\n        float3 X = CamRel + V * t;\n        float hh;\n        MARS_LIQ_HEIGHT(X, hh);\n        if (!found && dot(X, N) - h - hh <= 0.0)\n        {\n            tHi = t;\n            found = true;\n        }\n        if (!found)\n        { tLo = t; }\n    }\n    [unroll] for (int b = 0; b < 4; ++b)\n    {\n        float t = 0.5 * (tLo + tHi);\n        float3 X = CamRel + V * t;\n        float hh;\n        MARS_LIQ_HEIGHT(X, hh);\n        if (dot(X, N) - h - hh <= 0.0)\n        { tHi = t; }\n        else\n        { tLo = t; }\n    }\n    Ssurf = CamRel + V * tHi;\n    // the normal from the height field's slope (central differences along the surface's frame)\n    float e = 0.02 * R;\n    float hx0, hx1, hy0, hy1;\n    float3 Sx0 = Ssurf - T1 * e;\n    float3 Sx1 = Ssurf + T1 * e;\n    float3 Sy0 = Ssurf - T2 * e;\n    float3 Sy1 = Ssurf + T2 * e;\n    MARS_LIQ_HEIGHT(Sx0, hx0);\n    MARS_LIQ_HEIGHT(Sx1, hx1);\n    MARS_LIQ_HEIGHT(Sy0, hy0);\n    MARS_LIQ_HEIGHT(Sy1, hy1);\n    surfN = normalize(N - ((hx1 - hx0) * T1 + (hy1 - hy0) * T2) / (2.0 * e));\n    MARS_LIQ_HEIGHT(Ssurf, surfH);\n}\n\nfloat foamWidth = FoamWidth;\n// how far the rim bands swell here (0: even); only the boil sets it\nfloat rimFroth = 0.0;\n#if MARS_LIQ_BUBBLING\nfoamWidth *= 1.0 + 1.5 * Boil;\n// the rim froth: round the vessel's axis the band breaks into beads of froth, each swelling and popping on its own clock\n// as the bubbles reach the edge, over a wobble travelling round the rim. The beads' count round the rim (the band's\n// frequency) rises with the boil and the bubbles' density; both rim bands (the line on the glass, the meniscus on the\n// top) swell by it, the top's capped so the froth never floods the surface. Measured at this pixel on the glass, at the\n// surface crossing on the top.\n{\n    float3 Xr = Sign > 0.0 ? D : Ssurf;\n    float theta = atan2(dot(Xr, T2), dot(Xr, T1)) * (0.5 / 3.14159265) + 0.5;\n    float beads = max(3.0, round(RimFrothFrequency * (0.5 + 0.5 * Boil) * (0.5 + BubbleDensity)));\n    float u = theta * beads;\n    float3 rh = MARS_LIQ_HASH3(float3(fmod(floor(u), beads), 5.3, Phase * 11.0));\n    float rf = frac(u) - 0.5 - (rh.z - 0.5) * 0.3;\n    float rlife = frac(Time * BubbleSpeed * 0.7 + rh.x);\n    float rsize = lerp(0.18, 0.45, rh.y) * smoothstep(0.0, 0.7, rlife) * (1.0 - step(0.9, rlife));\n    float bead = sqrt(saturate(1.0 - (rf * rf) / max(rsize * rsize, 1e-4)));\n    float wobble = 0.5 + 0.5 * sin(theta * 6.2831853 * beads * 0.5 + Time * rippleSpeed);\n    rimFroth = saturate(RimFroth * Boil * (bead + 0.25 * wobble));\n}\n#endif\n\nfloat3 Vn = normalize(V);\nbool front = Sign > 0.0;\n\n// a front face: the liquid between here and where the ray leaves it (the far wall, or the surface if the ray rises through\n// it first), cm\nfloat frontRun = 0.0;\nif (front)\n{\n    float b = dot(D, Vn);\n    float tS = -b + sqrt(max(b * b - (dot(D, D) - R * R), 0.0));\n    if (jar)\n    {\n        float tIn;\n        MARS_LIQ_CYL(D, Vn, tIn, tS);\n    }\n    float vnN = dot(Vn, N);\n    float tP = vnN > 1e-4 ? (h - dot(D, N)) / vnN : 1e9;\n    frontRun = max(min(tS, tP), 0.0);\n}\n\n// the pickles (Pickle Jar): the first one the ray meets in the liquid, from where it enters (this front face, or the\n// surface over a back face) to where it leaves. Over the surface (a pixel the clip drops) the trace runs through the jar's\n// air instead, and a tip it meets there keeps the pixel, dry. Each pickle stands on the floor round the axis (a ring and\n// one in the middle), leans a little in, and is a convex solid of planes in its own frame: a lower and an upper band of\n// seven facets (twisted half a facet, each bulging to the middle), a bevel at each end, and the end caps.\nbool pkHit = false;\nfloat pkT = 0.0;\nfloat3 pkN = -Vn;\nfloat3 pkCol = PickleColor;\nfloat3 pkX = D;\nif (jar && PickleCount >= 1.0)\n{\n    float3 O = front ? D : Ssurf;\n    float tMax = front ? frontRun : length(D - Ssurf);\n    if (s > 0.0)\n    {\n        float tA, tB;\n        MARS_LIQ_CYL(CamRel, Vn, tA, tB);\n        O = front ? D : CamRel + Vn * max(tA, 0.0);\n        tMax = max(tB - dot(O - CamRel, Vn), 0.0);\n    }\n    #define MARS_LIQ_PLANE(NP, DP, ID) \\\n    { \\\n        float3 _n = NP; \\\n        float _dn = dot(v, _n); \\\n        float _t = ((DP) - dot(o, _n)) / (_dn < 0.0 ? min(_dn, -1e-6) : max(_dn, 1e-6)); \\\n        if (_dn < 0.0) \\\n        { \\\n            if (_t > tE) { tE = _t; nE = _n; fE = ID; } \\\n        } \\\n        else \\\n        { tX = min(tX, _t); } \\\n    }\n    int count = (int)min(PickleCount, 12.0);\n    int ring = count >= 4 ? count - 1 : count;\n    float seed = floor(Phase * 97.0);\n    float pr = PickleRadius * R;\n    float ringR = max(R - pr * 1.15 - 0.03 * R, 0.0);\n    float bestT = tMax;\n    float3 bestL = 0.0;\n    float bestFace = 0.0;\n    float bestI = 0.0;\n    float bestRad = 1.0;\n    [loop] for (int i = 0; i < count; ++i)\n    {\n        float3 ph = MARS_LIQ_HASH3(float3(i, seed, 2.9));\n        bool centre = i >= ring;\n        float ang = (i + (ph.x - 0.5) * 0.3) / ring * 6.2831853 + Phase * 6.2831853;\n        float3 out2 = Ax * cos(ang) + Ay * sin(ang);\n        float rad = pr * (centre ? 1.15 : 0.9 + 0.2 * ph.z);\n        float len = PickleLength * 2.0 * HH * (0.84 + 0.16 * ph.y);\n        float3 base = out2 * (centre ? 0.0 : ringR * (0.96 + 0.04 * ph.y)) - Az * (HH - 0.02 * R);\n        float3 pz = normalize(Az - out2 * (centre ? 0.0 : 0.02 + 0.05 * ph.z) + Ay * ((ph.x - 0.5) * 0.04));\n        float3 px0 = normalize(Ax - pz * dot(Ax, pz));\n        float3 py0 = cross(pz, px0);\n        float tw = ph.x * 6.2831853;\n        float3 px = px0 * cos(tw) + py0 * sin(tw);\n        float3 py = cross(pz, px);\n        float3 rel = O - base;\n        float3 o = float3(dot(rel, px), dot(rel, py), dot(rel, pz));\n        float3 v = float3(dot(Vn, px), dot(Vn, py), dot(Vn, pz));\n        // skip a pickle whose bounding sphere the ray misses, or meets only past the best so far\n        float3 bc = o - float3(0.0, 0.0, 0.5 * len);\n        float bb = dot(bc, v);\n        float bd = bb * bb - (dot(bc, bc) - (0.25 * len * len + 1.2 * rad * rad));\n        if (bd < 0.0 || -bb - sqrt(bd) > bestT || -bb + sqrt(bd) < 0.0)\n        { continue; }\n\n        float tE = -1e9;\n        float tX = 1e9;\n        float3 nE = float3(0.0, 0.0, -1.0);\n        float fE = 0.0;\n        float eps = 0.16 * rad / (0.5 * len);   // the bands' bulge: radius lost from the middle to an end, per height\n        float kb = 0.7;                         // the bevels' slope\n        float ib = rsqrt(1.0 + eps * eps);\n        float ik = rsqrt(1.0 + kb * kb);\n        [unroll] for (int k = 0; k < 7; ++k)\n        {\n            float3 kh = MARS_LIQ_HASH3(float3(i, k, seed + 4.1));\n            float a0 = (k + 0.15 * (kh.x - 0.5)) * 0.8975979;\n            float a1 = a0 + 0.4487990;\n            float2 c0 = float2(cos(a0), sin(a0));\n            float2 c1 = float2(cos(a1), sin(a1));\n            MARS_LIQ_PLANE(float3(c0, -eps) * ib, (rad * (0.95 + 0.1 * kh.y) - eps * 0.5 * len) * ib, k)\n            MARS_LIQ_PLANE(float3(c1, eps) * ib, (rad * (0.95 + 0.1 * kh.z) + eps * 0.5 * len) * ib, 7 + k)\n            MARS_LIQ_PLANE(float3(c0, kb) * ik, (0.6 * rad + kb * len) * ik, 14 + k)\n            MARS_LIQ_PLANE(float3(c1, -kb) * ik, 0.6 * rad * ik, 21 + k)\n        }\n        MARS_LIQ_PLANE(float3(0.0, 0.0, 1.0), len, 28)\n        MARS_LIQ_PLANE(float3(0.0, 0.0, -1.0), 0.0, 29)\n        if (tE <= tX && tX > 0.0 && tE < bestT)\n        {\n            bestT = max(tE, 0.0);\n            pkHit = true;\n            pkN = px * nE.x + py * nE.y + pz * nE.z;\n            bestL = o + v * bestT;\n            bestFace = fE;\n            bestI = i;\n            bestRad = rad;\n        }\n    }\n    pkT = bestT;\n    pkX = O + Vn * bestT;\n    if (pkHit)\n    {\n        // flat-shaded facets, each its own shade between Pickle Color and Pickle Light, the ends lighter; pale warts on\n        // the bands\n        float3 fh = MARS_LIQ_HASH3(float3(bestI, bestFace, seed + 8.3));\n        pkCol = lerp(PickleColor, PickleLight, 0.1 + 0.6 * fh.x + (bestFace >= 14.0 ? 0.3 : 0.0));\n        float th = atan2(bestL.y, bestL.x) * (0.5 / 3.14159265) + 0.5;\n        float2 wq = float2(th * 14.0, bestL.z / max(bestRad * 0.8, 1e-3)) + bestI * 3.7;\n        float3 wh = MARS_LIQ_HASH3(float3(floor(wq), bestI + 1.3));\n        float wr = length(frac(wq) - 0.5 - (wh.xy - 0.5) * 0.5);\n        float wart = (bestFace < 14.0 ? 1.0 : 0.0) * step(1.0 - WartAmount, wh.z) * (1.0 - smoothstep(0.1, 0.15, wr));\n        pkCol = lerp(pkCol, WartColor, wart);\n    }\n}\nif (jar && s > 0.0)\n{\n    // over the surface: only a dry tip keeps the pixel\n    bool dry = false;\n    if (pkHit)\n    {\n        float hx;\n        MARS_LIQ_HEIGHT(pkX, hx);\n        dry = dot(pkX, N) - h - hx > 0.0;\n    }\n    OutMask = dry ? 1.0 : 0.0;\n    OutNormal = pkN;\n    OutEmissive = pkCol * PickleGlow;\n    OutRough = PickleRoughness;\n    return pkCol;\n}\n// how fast the liquid veils a pickle behind it (per radius; the brine adds its haze)\nfloat pkFog = PickleVeil;\nfloat rough = Roughness;\n// a pickle's own light (Pickle Glow), so it reads in a backlit jar\nfloat3 pkGlow = 0.0;\n\nfloat path;\nfloat3 n;\nfloat3 col;\nfloat3 glow;\nif (front)\n{\n    path = (pkHit ? pkT : frontRun) / R;\n    float depth = 1.0 - exp(-path * Density);\n    n = normalize(Nw);\n    col = lerp(LiquidColor, DeepColor, depth);\n#if MARS_LIQ_BRINE\n    // cloudy: the haze thickens with the depth looked through, and thicker still low down where the sediment hangs\n    float3 mid = D + Vn * (path * R * 0.5);\n    float low = 1.0 - smoothstep(-0.9, 0.1, dot(mid, N) / (jar ? HH : R));\n    float haze = 1.0 - exp(-path * (Turbidity + Sediment * low * 3.0));\n    col = lerp(col, HazeColor, haze);\n    pkFog += Turbidity + Sediment * low * 3.0;\n#endif\n    if (pkHit)\n    {\n        // the pickle through the liquid in front of it: tinted by it, veiled by it, lit with its own facets while it shows\n        float veil = 1.0 - exp(-path * pkFog);\n        float3 seen = pkCol * lerp(1.0, min(LiquidColor * 1.6, 1.0), saturate(path * 2.0));\n        col = lerp(seen, col, veil);\n        n = normalize(lerp(pkN, n, veil));\n        rough = lerp(PickleRoughness, Roughness, veil);\n        pkGlow = seen * (PickleGlow * (1.0 - veil));\n    }\n\n    // a bright line where the liquid meets the glass, under the surface\n    float foam = 1.0 - smoothstep(0.0, foamWidth * (1.0 + 1.5 * rimFroth) * R, -s);\n    // light through the thin edge of the volume\n    float rim = pow(1.0 - saturate(dot(n, -Vn)), 3.0) * RimLight;\n    // motes: two layers of rising sparks inside the volume, along the ray (parallax: they sit in the liquid, not on the\n    // glass)\n    float motes = 0.0;\n    [unroll] for (int m = 0; m < 2; ++m)\n    {\n        float3 Q = (D + Vn * (path * R * (m == 0 ? 0.3 : 0.7))) / R * MoteScale - N * (Time * MoteSpeed) + Phase * 31.0 + m * 7.31;\n        float3 cell = floor(Q);\n        float3 f = frac(Q) - 0.5;\n        float3 hsh = MARS_LIQ_HASH3(cell);\n        float3 off = (hsh - 0.5) * 0.6;\n        float on = step(0.55, hsh.x);\n        float r = length(f - off);\n        motes += on * (1.0 - smoothstep(0.02, 0.09, r));\n    }\n#if MARS_LIQ_BUBBLING\n    // bubbles: three layers along the ray, each bubble a bright rim round a lighter core, rising and weaving\n    float bubbles = 0.0;\n    [unroll] for (int q = 0; q < 3; ++q)\n    {\n        float along = 0.15 + 0.35 * q;\n        float3 Q = (D + Vn * (path * R * along)) / R * BubbleScale - N * (Time * BubbleSpeed * (1.0 + 0.3 * q)) + Phase * 13.0 + q * 5.17;\n        float3 cell = floor(Q);\n        float3 f = frac(Q) - 0.5;\n        float3 hsh = MARS_LIQ_HASH3(cell);\n        float on = step(1.0 - BubbleDensity, hsh.x);\n        float rad = lerp(0.1, 0.24, hsh.z);\n        float3 off = (hsh - 0.5) * (0.9 - 2.0 * rad) + (T1 * sin(Time * 5.0 + hsh.y * 6.28) + T2 * cos(Time * 4.1 + hsh.z * 6.28)) * 0.05;\n        float r = length(f - off);\n        float rimB = smoothstep(rad - 0.06, rad - 0.01, r) * (1.0 - smoothstep(rad - 0.01, rad + 0.015, r));\n        float core = 1.0 - smoothstep(rad - 0.08, rad - 0.02, r);\n        bubbles += on * (rimB + 0.2 * core) * (1.0 - 0.25 * q);\n    }\n    col = lerp(col, FoamColor, saturate(bubbles) * 0.6);\n    motes += bubbles * Boil;\n#endif\n#if MARS_LIQ_BRINE\n    // the pickling spices: peppercorns (dark, round), mustard seeds (yellow, round) and dill (green, long flecks),\n    // five layers along the ray; they sink slowly, sway, and swirl round the surface's normal when it sloshes\n    float specks = 0.0;\n    float3 speckCol = 0.0;\n    float swirl = Slosh * 2.0 + 0.15;\n    [unroll] for (int p = 0; p < 5; ++p)\n    {\n        float along = 0.1 + 0.2 * p;\n        float3 X = (D + Vn * (path * R * along)) / R;\n        float a = swirl * sin(Time * 0.6 + p * 2.1);\n        float2 xy = float2(dot(X, T1), dot(X, T2));\n        xy = float2(xy.x * cos(a) - xy.y * sin(a), xy.x * sin(a) + xy.y * cos(a));\n        float3 Q = (T1 * xy.x + T2 * xy.y + N * dot(X, N)) * SpeckScale + N * (Time * 0.04) + Phase * 23.0 + p * 3.71;\n        float3 cell = floor(Q);\n        float3 f = frac(Q) - 0.5;\n        float3 hsh = MARS_LIQ_HASH3(cell);\n        float on = step(1.0 - SpeckAmount, hsh.x);\n        float3 off = (hsh - 0.5) * 0.5;\n        float3 e = f - off;\n        float3 tint;\n        float r;\n        if (hsh.y < 0.4)\n        {   // peppercorn\n            r = length(e) / 0.12;\n            tint = float3(0.06, 0.045, 0.03);\n        }\n        else if (hsh.y < 0.75)\n        {   // mustard seed\n            r = length(e) / 0.09;\n            tint = float3(0.75, 0.55, 0.15);\n        }\n        else\n        {   // dill: a thin fleck along a random direction\n            float3 dir = normalize(hsh * 2.0 - 1.0 + 1e-3);\n            float t = dot(e, dir);\n            r = max(length(e - dir * t) / 0.035, abs(t) / 0.3);\n            tint = float3(0.18, 0.32, 0.08);\n        }\n        float hit = on * (1.0 - smoothstep(0.7, 1.0, r)) * (1.0 - 0.12 * p);\n        speckCol = lerp(speckCol, tint, hit * (1.0 - specks));\n        specks = saturate(specks + hit);\n    }\n    col = lerp(col, speckCol, specks);\n#endif\n    // the aeration: while it churns, the water under the surface turns white and fills with small bubbles (three layers\n    // along the ray), in a band deeper the harder it was jolted\n    if (agit > 0.01)\n    {\n        float bandDepth = Aeration * agit * R + 1e-3;\n        float aer = 0.4 * (1.0 - smoothstep(0.0, bandDepth, -s));\n        [unroll] for (int w = 0; w < 3; ++w)\n        {\n            float3 X = D + Vn * (path * R * (0.08 + 0.3 * w));\n            float hh;\n            MARS_LIQ_HEIGHT(X, hh);\n            float band = 1.0 - smoothstep(0.0, bandDepth, h + hh - dot(X, N));\n            float3 Q = X / R * 9.0 - N * (Time * 2.0) + Phase * 3.1 + w * 1.7;\n            float3 hsh = MARS_LIQ_HASH3(floor(Q));\n            float rad = lerp(0.12, 0.3, hsh.z);\n            float r = length(frac(Q) - 0.5 - (hsh - 0.5) * (0.9 - 2.0 * rad));\n            float ring = smoothstep(rad - 0.08, rad - 0.01, r) * (1.0 - smoothstep(rad - 0.01, rad + 0.02, r));\n            float core = 1.0 - smoothstep(rad - 0.1, rad, r);\n            aer += band * step(0.35, hsh.x) * (ring + 0.35 * core);\n        }\n        col = lerp(col, FoamColor, saturate(aer) * 0.75);\n    }\n    col = lerp(col, FoamColor, foam * 0.6);\n    glow = col * Glow * (1.0 - 0.5 * depth) + LiquidColor * (rim * Glow) + FoamColor * (motes * MoteAmount * Glow);\n}\nelse\n{\n    // the surface, seen at the point the ray crosses it: lit with the rippled normal, coloured by the depth of liquid\n    // under it along the ray (the crossing to this back face)\n    float3 Sp = Ssurf;\n    path = (pkHit ? pkT : length(D - Sp)) / R;\n    float depth = 1.0 - exp(-path * Density);\n    n = surfN;\n    // the meniscus: a pale ring where the surface meets the glass (the sphere's cut circle has radius sqrt(R^2 - h^2); a\n    // jar's wall is R from its axis)\n    float3 toS = Sp - N * h;\n    float radial = jar ? length(Sp - Az * dot(Sp, Az)) / R : length(toS - N * dot(toS, N)) / sqrt(max(R * R - h * h, 1e-4));\n    float meniscus = smoothstep(1.0 - min(foamWidth * 2.5 * (1.0 + rimFroth), 0.3), 1.0, radial);\n    col = lerp(lerp(LiquidColor, DeepColor, depth), SurfaceColor, SurfaceMix);\n#if MARS_LIQ_BRINE\n    col = lerp(col, HazeColor, 1.0 - exp(-path * Turbidity));\n    pkFog += Turbidity;\n#endif\n    if (pkHit)\n    {\n        // a pickle under the top, veiled by the liquid over it, the top's own colour and gloss over both\n        float veil = 1.0 - exp(-path * pkFog);\n        float3 seen = pkCol * lerp(1.0, min(LiquidColor * 1.6, 1.0), saturate(path * 2.0));\n        col = lerp(lerp(seen, col, veil), SurfaceColor, SurfaceMix * 0.5 * (1.0 - veil));\n        pkGlow = seen * (PickleGlow * (1.0 - veil));\n    }\n#if MARS_LIQ_BUBBLING\n    // domes: each cell of the surface grows a bubble that swells, then pops into an expanding ring\n    float2 suv = float2(dot(Sp, T1), dot(Sp, T2)) / R * BubbleScale * 1.4 + Phase * 7.0;\n    float3 sh = MARS_LIQ_HASH3(float3(floor(suv), 3.7));\n    float2 sf = frac(suv) - 0.5;\n    float life = frac(Time * BubbleSpeed * 0.9 + sh.x);\n    float on = step(1.0 - BubbleDensity, sh.y);\n    float rad = lerp(0.12, 0.32, sh.z) * smoothstep(0.0, 0.8, life);\n    float2 e = sf - (sh.xy - 0.5) * 0.3;\n    float d = length(e) / max(rad, 1e-3);\n    float dome = on * step(life, 0.85) * (1.0 - step(1.0, d));\n    // the dome's slope bends the normal; its rim catches light\n    float slope = d / sqrt(max(1.0 - d * d, 0.02));\n    float2 dirE = e / max(length(e), 1e-3);\n    n = normalize(n - dome * slope * 0.6 * (T1 * dirE.x + T2 * dirE.y));\n    float domeRim = dome * smoothstep(0.7, 1.0, d);\n    // the pop: a thin ring racing out after the bubble bursts\n    float pop = on * step(0.85, life) * (1.0 - smoothstep(0.0, 0.05, abs(length(e) - (life - 0.85) * 3.0))) * (1.0 - life) * 6.0;\n    col = lerp(col, FoamColor, saturate((domeRim * 0.8 + pop + dome * 0.15) * Boil));\n#endif\n#if MARS_LIQ_BRINE\n    // a few seeds float on the top\n    float2 fuv = float2(dot(Sp, T1), dot(Sp, T2)) / R * SpeckScale * 0.8 + Phase * 5.0;\n    float3 fh = MARS_LIQ_HASH3(float3(floor(fuv), 9.1));\n    float fr = length(frac(fuv) - 0.5 - (fh.xy - 0.5) * 0.5);\n    float floater = step(1.0 - SpeckAmount * 0.5, fh.x) * (1.0 - smoothstep(0.04, 0.07, fr));\n    col = lerp(col, fh.z < 0.5 ? float3(0.75, 0.55, 0.15) : float3(0.18, 0.32, 0.08), floater);\n#endif\n    // whitecaps on the churned crests, and a sizzle of foam cells over the cap while it settles\n    if (agit > 0.01)\n    {\n        float crest = smoothstep(0.3, 1.0, surfH / max(chopAmp + abs(swellAmp), 1e-3)) * FoamCap * agit;\n        float2 fz = float2(dot(Sp, T1), dot(Sp, T2)) / R * 8.0 + Phase * 3.0 + float2(Time * 0.3, -Time * 0.2);\n        float3 zh = MARS_LIQ_HASH3(float3(floor(fz), 7.7));\n        float zr = length(frac(fz) - 0.5 - (zh.xy - 0.5) * 0.4);\n        float zrad = lerp(0.08, 0.22, zh.z);\n        float zring = smoothstep(zrad - 0.06, zrad, zr) * (1.0 - smoothstep(zrad, zrad + 0.03, zr));\n        float sizzle = step(1.0 - agit * 0.8, zh.x) * (zring + 0.4 * (1.0 - smoothstep(zrad - 0.06, zrad, zr)));\n        col = lerp(col, FoamColor, saturate(crest + sizzle * 0.8 * FoamCap));\n    }\n    col = lerp(col, FoamColor, meniscus * 0.85);\n    glow = col * (Glow * 0.6);\n}\n\nOutNormal = n;\nOutEmissive = glow + pkGlow;\nOutRough = rough;\nreturn col;\n",
+					"Description": "Liquid Brine"
+				}
+			},
+			{
+				"id": 73,
+				"class": "MakeMaterialAttributes",
+				"name": "MaterialExpressionMakeMaterialAttributes_6",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "BaseColor",
+						"node": 72,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "Roughness",
+						"node": 72,
+						"output": 4
+					},
+					{
+						"index": 5,
+						"name": "EmissiveColor",
+						"node": 72,
+						"output": 2
+					},
+					{
+						"index": 7,
+						"name": "OpacityMask",
+						"node": 72,
+						"output": 3
+					},
+					{
+						"index": 8,
+						"name": "Normal",
+						"node": 72,
+						"output": 1
+					}
+				]
+			},
+			{
+				"id": 74,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_7",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "D",
+						"node": 54,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "CamRel",
+						"node": 58,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "Unit",
+						"node": 59,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "Radius",
+						"node": 45,
+						"output": 0
+					},
+					{
+						"index": 4,
+						"name": "Surface",
+						"node": 47,
+						"output": 5,
+						"mask": "rgba"
+					},
+					{
+						"index": 5,
+						"name": "Slosh",
+						"node": 48,
+						"output": 0
+					},
+					{
+						"index": 6,
+						"name": "Agitation",
+						"node": 50,
+						"output": 0
+					},
+					{
+						"index": 7,
+						"name": "Phase",
+						"node": 49,
+						"output": 0
+					},
+					{
+						"index": 8,
+						"name": "Time",
+						"node": 65,
+						"output": 0
+					},
+					{
+						"index": 9,
+						"name": "Sign",
+						"node": 66,
+						"output": 0
+					},
+					{
+						"index": 10,
+						"name": "Nw",
+						"node": 67,
+						"output": 0
+					},
+					{
+						"index": 11,
+						"name": "LiquidColor",
+						"node": 0,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 12,
+						"name": "DeepColor",
+						"node": 1,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 13,
+						"name": "Density",
+						"node": 2,
+						"output": 0
+					},
+					{
+						"index": 14,
+						"name": "Glow",
+						"node": 3,
+						"output": 0
+					},
+					{
+						"index": 15,
+						"name": "RimLight",
+						"node": 4,
+						"output": 0
+					},
+					{
+						"index": 16,
+						"name": "Roughness",
+						"node": 5,
+						"output": 0
+					},
+					{
+						"index": 17,
+						"name": "SurfaceColor",
+						"node": 6,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 18,
+						"name": "SurfaceMix",
+						"node": 7,
+						"output": 0
+					},
+					{
+						"index": 19,
+						"name": "FoamColor",
+						"node": 8,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 20,
+						"name": "FoamWidth",
+						"node": 9,
+						"output": 0
+					},
+					{
+						"index": 21,
+						"name": "RippleAmount",
+						"node": 10,
+						"output": 0
+					},
+					{
+						"index": 22,
+						"name": "RippleScale",
+						"node": 11,
+						"output": 0
+					},
+					{
+						"index": 23,
+						"name": "RippleSpeed",
+						"node": 12,
+						"output": 0
+					},
+					{
+						"index": 24,
+						"name": "MoteAmount",
+						"node": 18,
+						"output": 0
+					},
+					{
+						"index": 25,
+						"name": "MoteScale",
+						"node": 19,
+						"output": 0
+					},
+					{
+						"index": 26,
+						"name": "MoteSpeed",
+						"node": 20,
+						"output": 0
+					},
+					{
+						"index": 27,
+						"name": "Boil",
+						"node": 22,
+						"output": 0
+					},
+					{
+						"index": 28,
+						"name": "BubbleScale",
+						"node": 23,
+						"output": 0
+					},
+					{
+						"index": 29,
+						"name": "BubbleSpeed",
+						"node": 24,
+						"output": 0
+					},
+					{
+						"index": 30,
+						"name": "BubbleDensity",
+						"node": 25,
+						"output": 0
+					},
+					{
+						"index": 31,
+						"name": "RimFroth",
+						"node": 26,
+						"output": 0
+					},
+					{
+						"index": 32,
+						"name": "RimFrothFrequency",
+						"node": 27,
+						"output": 0
+					},
+					{
+						"index": 33,
+						"name": "BreakupAmount",
+						"node": 13,
+						"output": 0
+					},
+					{
+						"index": 34,
+						"name": "BreakupFrequency",
+						"node": 14,
+						"output": 0
+					},
+					{
+						"index": 35,
+						"name": "BreakupSpeed",
+						"node": 15,
+						"output": 0
+					},
+					{
+						"index": 36,
+						"name": "Aeration",
+						"node": 16,
+						"output": 0
+					},
+					{
+						"index": 37,
+						"name": "FoamCap",
+						"node": 17,
+						"output": 0
+					},
+					{
+						"index": 38,
+						"name": "HazeColor",
+						"node": 29,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 39,
+						"name": "Turbidity",
+						"node": 30,
+						"output": 0
+					},
+					{
+						"index": 40,
+						"name": "Sediment",
+						"node": 31,
+						"output": 0
+					},
+					{
+						"index": 41,
+						"name": "SpeckAmount",
+						"node": 32,
+						"output": 0
+					},
+					{
+						"index": 42,
+						"name": "SpeckScale",
+						"node": 33,
+						"output": 0
+					},
+					{
+						"index": 43,
+						"name": "UnitZ",
+						"node": 61,
+						"output": 0
+					},
+					{
+						"index": 44,
+						"name": "Jar",
+						"node": 34,
+						"output": 0
+					},
+					{
+						"index": 45,
+						"name": "HalfHeight",
+						"node": 46,
+						"output": 0
+					},
+					{
+						"index": 46,
+						"name": "PickleCount",
+						"node": 35,
+						"output": 0
+					},
+					{
+						"index": 47,
+						"name": "PickleRadius",
+						"node": 36,
+						"output": 0
+					},
+					{
+						"index": 48,
+						"name": "PickleLength",
+						"node": 37,
+						"output": 0
+					},
+					{
+						"index": 49,
+						"name": "PickleColor",
+						"node": 38,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 50,
+						"name": "PickleLight",
+						"node": 39,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 51,
+						"name": "WartColor",
+						"node": 40,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 52,
+						"name": "WartAmount",
+						"node": 41,
+						"output": 0
+					},
+					{
+						"index": 53,
+						"name": "PickleVeil",
+						"node": 42,
+						"output": 0
+					},
+					{
+						"index": 54,
+						"name": "PickleRoughness",
+						"node": 44,
+						"output": 0
+					},
+					{
+						"index": 55,
+						"name": "PickleGlow",
+						"node": 43,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"return",
+					"OutNormal",
+					"OutEmissive",
+					"OutMask",
+					"OutRough"
+				],
+				"props":
+				{
+					"Code": "\n#ifndef MARS_LIQ_HASH3\n#define MARS_LIQ_HASH3(c) frac(sin(float3(dot(c, float3(127.1, 311.7, 74.7)), dot(c, float3(269.5, 183.3, 246.1)), dot(c, float3(113.5, 271.9, 124.6)))) * 43758.5453)\n#endif\nfloat S = max(length(Unit), 1e-4);\nfloat R = max(Radius * S, 1e-3);\nfloat3 N = normalize(Surface.xyz + float3(0.0, 0.0, 1e-4));\nfloat h = Surface.w * R;\n\n// the vessel's frame (the mesh's local axes in world); a jar's plane passes through its axis at the fill height\nfloat3 Ax = Unit / S;\nfloat3 Az = normalize(UnitZ);\nfloat3 Ay = cross(Az, Ax);\nbool jar = Jar > 0.5;\nfloat HH = max(HalfHeight * S, 1e-3);\nif (jar)\n{ h = Surface.w * HH * dot(Az, N); }\n// where a ray O + V t enters and leaves the jar's cylinder (t in V's units; TIN > TOUT: a miss)\n#define MARS_LIQ_CYL(O, V, TIN, TOUT) \\\n{ \\\n    float3 _or = O - Az * dot(O, Az); \\\n    float3 _vr = V - Az * dot(V, Az); \\\n    float _a = max(dot(_vr, _vr), 1e-8); \\\n    float _b = dot(_or, _vr); \\\n    float _d = _b * _b - _a * (dot(_or, _or) - R * R); \\\n    float _sq = sqrt(max(_d, 0.0)); \\\n    float _vz = dot(V, Az); \\\n    _vz = abs(_vz) > 1e-6 ? _vz : 1e-6; \\\n    float _z0 = (-HH - dot(O, Az)) / _vz; \\\n    float _z1 = (HH - dot(O, Az)) / _vz; \\\n    TIN = _d < 0.0 ? 1e9 : max((-_b - _sq) / _a, min(_z0, _z1)); \\\n    TOUT = _d < 0.0 ? -1e9 : min((-_b + _sq) / _a, max(_z0, _z1)); \\\n}\n\n// the surface's own frame, for the ripples\nfloat3 T1 = normalize(cross(abs(N.x) < 0.9 ? float3(1.0, 0.0, 0.0) : float3(0.0, 1.0, 0.0), N));\nfloat3 T2 = cross(N, T1);\n\n// the camera ray through this pixel and where it crosses the flat surface (0 at the camera, 1 at this pixel)\nfloat3 V = D - CamRel;\nfloat vN = dot(V, N);\nfloat tPlane = (h - dot(CamRel, N)) / (abs(vN) > 1e-5 ? vN : 1e-5);\nfloat3 Sflat = CamRel + V * saturate(tPlane);\n\n// the surface is a height field over the plane, in its own frame (T1, T2), measured along N:\n//   swell  three long travelling waves, a faint shimmer at rest, louder while it sloshes (and while it boils);\n//   chop   the breakup: crossed products of shorter waves, sharpened into crests, whose height grows with Agitation (the\n//          script's lagged slosh energy) and whose frequency climbs with it, so a jolt tears the flat cap into a churn\n//          that calms back into long swell as Agitation decays.\nfloat churn = 0.04 + Slosh;\nfloat rippleSpeed = RippleSpeed;\nfloat agit = saturate(Agitation);\n#if MARS_LIQ_BUBBLING\nchurn += 0.5 * Boil;\nrippleSpeed *= 1.0 + Boil;\nagit = saturate(agit + 0.35 * Boil);\n#endif\nfloat swellAmp = RippleAmount * R * churn;\nfloat chopAmp = BreakupAmount * R * agit;\nfloat chopFreq = RippleScale * BreakupFrequency * (0.5 + agit) / R;\nfloat tSwell = Time * rippleSpeed + Phase * 17.0;\nfloat tChop = Time * BreakupSpeed * (0.6 + agit) + Phase * 5.0;\n#define MARS_LIQ_HEIGHT(X, OUT) \\\n{ \\\n    float2 _p = float2(dot(X, T1), dot(X, T2)); \\\n    float2 _a = _p * (RippleScale / R); \\\n    OUT = swellAmp * (sin(dot(_a, float2(0.96, 0.28)) + tSwell) + 0.6 * sin(dot(_a, float2(-0.53, 0.85)) * 1.7 + tSwell * 1.31) \\\n        + 0.35 * sin(dot(_a, float2(-0.39, -0.92)) * 2.9 + tSwell * 1.87)) / 1.95; \\\n    float2 _c = _p * chopFreq; \\\n    float _w = sin(dot(_c, float2(0.8, 0.6)) + tChop) * sin(dot(_c, float2(-0.6, 0.8)) * 1.3 - tChop * 1.2) \\\n        + 0.5 * sin(dot(_c, float2(0.31, -0.95)) * 2.3 + tChop * 1.7) * sin(dot(_c, float2(0.95, 0.31)) * 1.9 - tChop * 0.9); \\\n    OUT += chopAmp * sign(_w) * pow(abs(_w) / 1.5, 0.6); \\\n}\n\n// signed height of this pixel over the surface: above it is air\nfloat hereH;\nMARS_LIQ_HEIGHT(D, hereH);\nfloat s = dot(D, N) - h - hereH;\nOutMask = s <= 0.0 ? 1.0 : 0.0;\n\n// where the camera ray first meets the surface: march from where the ray enters the sphere, or comes down past the\n// highest crest, to this pixel (which is under the surface: the clip kept it), then refine by bisection. A front face\n// only needs the flat crossing for its rim measure; a back face shades the hit.\nfloat3 Ssurf = Sflat;\nfloat3 surfN = N;\nfloat surfH = 0.0;\nif (Sign <= 0.0)\n{\n    float hiCrest = abs(swellAmp) + chopAmp * 1.1 + 1e-3;\n    float va = dot(V, V);\n    float vb = dot(CamRel, V);\n    float vc = dot(CamRel, CamRel) - R * R;\n    float disc = vb * vb - va * vc;\n    float tIn = disc > 0.0 ? (-vb - sqrt(disc)) / va : 0.0;\n    if (jar)\n    {\n        float tOut;\n        MARS_LIQ_CYL(CamRel, V, tIn, tOut);\n        tIn = tIn < tOut ? tIn : 0.0;\n    }\n    float t0 = max(tIn, 0.0);\n    if (vN < -1e-5)\n    { t0 = max(t0, (h + hiCrest - dot(CamRel, N)) / vN); }\n    t0 = min(t0, 1.0);\n    float tLo = t0;\n    float tHi = 1.0;\n    bool found = false;\n    [unroll] for (int m = 1; m <= 12; ++m)\n    {\n        float t = lerp(t0, 1.0, m / 12.0);\n        float3 X = CamRel + V * t;\n        float hh;\n        MARS_LIQ_HEIGHT(X, hh);\n        if (!found && dot(X, N) - h - hh <= 0.0)\n        {\n            tHi = t;\n            found = true;\n        }\n        if (!found)\n        { tLo = t; }\n    }\n    [unroll] for (int b = 0; b < 4; ++b)\n    {\n        float t = 0.5 * (tLo + tHi);\n        float3 X = CamRel + V * t;\n        float hh;\n        MARS_LIQ_HEIGHT(X, hh);\n        if (dot(X, N) - h - hh <= 0.0)\n        { tHi = t; }\n        else\n        { tLo = t; }\n    }\n    Ssurf = CamRel + V * tHi;\n    // the normal from the height field's slope (central differences along the surface's frame)\n    float e = 0.02 * R;\n    float hx0, hx1, hy0, hy1;\n    float3 Sx0 = Ssurf - T1 * e;\n    float3 Sx1 = Ssurf + T1 * e;\n    float3 Sy0 = Ssurf - T2 * e;\n    float3 Sy1 = Ssurf + T2 * e;\n    MARS_LIQ_HEIGHT(Sx0, hx0);\n    MARS_LIQ_HEIGHT(Sx1, hx1);\n    MARS_LIQ_HEIGHT(Sy0, hy0);\n    MARS_LIQ_HEIGHT(Sy1, hy1);\n    surfN = normalize(N - ((hx1 - hx0) * T1 + (hy1 - hy0) * T2) / (2.0 * e));\n    MARS_LIQ_HEIGHT(Ssurf, surfH);\n}\n\nfloat foamWidth = FoamWidth;\n// how far the rim bands swell here (0: even); only the boil sets it\nfloat rimFroth = 0.0;\n#if MARS_LIQ_BUBBLING\nfoamWidth *= 1.0 + 1.5 * Boil;\n// the rim froth: round the vessel's axis the band breaks into beads of froth, each swelling and popping on its own clock\n// as the bubbles reach the edge, over a wobble travelling round the rim. The beads' count round the rim (the band's\n// frequency) rises with the boil and the bubbles' density; both rim bands (the line on the glass, the meniscus on the\n// top) swell by it, the top's capped so the froth never floods the surface. Measured at this pixel on the glass, at the\n// surface crossing on the top.\n{\n    float3 Xr = Sign > 0.0 ? D : Ssurf;\n    float theta = atan2(dot(Xr, T2), dot(Xr, T1)) * (0.5 / 3.14159265) + 0.5;\n    float beads = max(3.0, round(RimFrothFrequency * (0.5 + 0.5 * Boil) * (0.5 + BubbleDensity)));\n    float u = theta * beads;\n    float3 rh = MARS_LIQ_HASH3(float3(fmod(floor(u), beads), 5.3, Phase * 11.0));\n    float rf = frac(u) - 0.5 - (rh.z - 0.5) * 0.3;\n    float rlife = frac(Time * BubbleSpeed * 0.7 + rh.x);\n    float rsize = lerp(0.18, 0.45, rh.y) * smoothstep(0.0, 0.7, rlife) * (1.0 - step(0.9, rlife));\n    float bead = sqrt(saturate(1.0 - (rf * rf) / max(rsize * rsize, 1e-4)));\n    float wobble = 0.5 + 0.5 * sin(theta * 6.2831853 * beads * 0.5 + Time * rippleSpeed);\n    rimFroth = saturate(RimFroth * Boil * (bead + 0.25 * wobble));\n}\n#endif\n\nfloat3 Vn = normalize(V);\nbool front = Sign > 0.0;\n\n// a front face: the liquid between here and where the ray leaves it (the far wall, or the surface if the ray rises through\n// it first), cm\nfloat frontRun = 0.0;\nif (front)\n{\n    float b = dot(D, Vn);\n    float tS = -b + sqrt(max(b * b - (dot(D, D) - R * R), 0.0));\n    if (jar)\n    {\n        float tIn;\n        MARS_LIQ_CYL(D, Vn, tIn, tS);\n    }\n    float vnN = dot(Vn, N);\n    float tP = vnN > 1e-4 ? (h - dot(D, N)) / vnN : 1e9;\n    frontRun = max(min(tS, tP), 0.0);\n}\n\n// the pickles (Pickle Jar): the first one the ray meets in the liquid, from where it enters (this front face, or the\n// surface over a back face) to where it leaves. Over the surface (a pixel the clip drops) the trace runs through the jar's\n// air instead, and a tip it meets there keeps the pixel, dry. Each pickle stands on the floor round the axis (a ring and\n// one in the middle), leans a little in, and is a convex solid of planes in its own frame: a lower and an upper band of\n// seven facets (twisted half a facet, each bulging to the middle), a bevel at each end, and the end caps.\nbool pkHit = false;\nfloat pkT = 0.0;\nfloat3 pkN = -Vn;\nfloat3 pkCol = PickleColor;\nfloat3 pkX = D;\nif (jar && PickleCount >= 1.0)\n{\n    float3 O = front ? D : Ssurf;\n    float tMax = front ? frontRun : length(D - Ssurf);\n    if (s > 0.0)\n    {\n        float tA, tB;\n        MARS_LIQ_CYL(CamRel, Vn, tA, tB);\n        O = front ? D : CamRel + Vn * max(tA, 0.0);\n        tMax = max(tB - dot(O - CamRel, Vn), 0.0);\n    }\n    #define MARS_LIQ_PLANE(NP, DP, ID) \\\n    { \\\n        float3 _n = NP; \\\n        float _dn = dot(v, _n); \\\n        float _t = ((DP) - dot(o, _n)) / (_dn < 0.0 ? min(_dn, -1e-6) : max(_dn, 1e-6)); \\\n        if (_dn < 0.0) \\\n        { \\\n            if (_t > tE) { tE = _t; nE = _n; fE = ID; } \\\n        } \\\n        else \\\n        { tX = min(tX, _t); } \\\n    }\n    int count = (int)min(PickleCount, 12.0);\n    int ring = count >= 4 ? count - 1 : count;\n    float seed = floor(Phase * 97.0);\n    float pr = PickleRadius * R;\n    float ringR = max(R - pr * 1.15 - 0.03 * R, 0.0);\n    float bestT = tMax;\n    float3 bestL = 0.0;\n    float bestFace = 0.0;\n    float bestI = 0.0;\n    float bestRad = 1.0;\n    [loop] for (int i = 0; i < count; ++i)\n    {\n        float3 ph = MARS_LIQ_HASH3(float3(i, seed, 2.9));\n        bool centre = i >= ring;\n        float ang = (i + (ph.x - 0.5) * 0.3) / ring * 6.2831853 + Phase * 6.2831853;\n        float3 out2 = Ax * cos(ang) + Ay * sin(ang);\n        float rad = pr * (centre ? 1.15 : 0.9 + 0.2 * ph.z);\n        float len = PickleLength * 2.0 * HH * (0.84 + 0.16 * ph.y);\n        float3 base = out2 * (centre ? 0.0 : ringR * (0.96 + 0.04 * ph.y)) - Az * (HH - 0.02 * R);\n        float3 pz = normalize(Az - out2 * (centre ? 0.0 : 0.02 + 0.05 * ph.z) + Ay * ((ph.x - 0.5) * 0.04));\n        float3 px0 = normalize(Ax - pz * dot(Ax, pz));\n        float3 py0 = cross(pz, px0);\n        float tw = ph.x * 6.2831853;\n        float3 px = px0 * cos(tw) + py0 * sin(tw);\n        float3 py = cross(pz, px);\n        float3 rel = O - base;\n        float3 o = float3(dot(rel, px), dot(rel, py), dot(rel, pz));\n        float3 v = float3(dot(Vn, px), dot(Vn, py), dot(Vn, pz));\n        // skip a pickle whose bounding sphere the ray misses, or meets only past the best so far\n        float3 bc = o - float3(0.0, 0.0, 0.5 * len);\n        float bb = dot(bc, v);\n        float bd = bb * bb - (dot(bc, bc) - (0.25 * len * len + 1.2 * rad * rad));\n        if (bd < 0.0 || -bb - sqrt(bd) > bestT || -bb + sqrt(bd) < 0.0)\n        { continue; }\n\n        float tE = -1e9;\n        float tX = 1e9;\n        float3 nE = float3(0.0, 0.0, -1.0);\n        float fE = 0.0;\n        float eps = 0.16 * rad / (0.5 * len);   // the bands' bulge: radius lost from the middle to an end, per height\n        float kb = 0.7;                         // the bevels' slope\n        float ib = rsqrt(1.0 + eps * eps);\n        float ik = rsqrt(1.0 + kb * kb);\n        [unroll] for (int k = 0; k < 7; ++k)\n        {\n            float3 kh = MARS_LIQ_HASH3(float3(i, k, seed + 4.1));\n            float a0 = (k + 0.15 * (kh.x - 0.5)) * 0.8975979;\n            float a1 = a0 + 0.4487990;\n            float2 c0 = float2(cos(a0), sin(a0));\n            float2 c1 = float2(cos(a1), sin(a1));\n            MARS_LIQ_PLANE(float3(c0, -eps) * ib, (rad * (0.95 + 0.1 * kh.y) - eps * 0.5 * len) * ib, k)\n            MARS_LIQ_PLANE(float3(c1, eps) * ib, (rad * (0.95 + 0.1 * kh.z) + eps * 0.5 * len) * ib, 7 + k)\n            MARS_LIQ_PLANE(float3(c0, kb) * ik, (0.6 * rad + kb * len) * ik, 14 + k)\n            MARS_LIQ_PLANE(float3(c1, -kb) * ik, 0.6 * rad * ik, 21 + k)\n        }\n        MARS_LIQ_PLANE(float3(0.0, 0.0, 1.0), len, 28)\n        MARS_LIQ_PLANE(float3(0.0, 0.0, -1.0), 0.0, 29)\n        if (tE <= tX && tX > 0.0 && tE < bestT)\n        {\n            bestT = max(tE, 0.0);\n            pkHit = true;\n            pkN = px * nE.x + py * nE.y + pz * nE.z;\n            bestL = o + v * bestT;\n            bestFace = fE;\n            bestI = i;\n            bestRad = rad;\n        }\n    }\n    pkT = bestT;\n    pkX = O + Vn * bestT;\n    if (pkHit)\n    {\n        // flat-shaded facets, each its own shade between Pickle Color and Pickle Light, the ends lighter; pale warts on\n        // the bands\n        float3 fh = MARS_LIQ_HASH3(float3(bestI, bestFace, seed + 8.3));\n        pkCol = lerp(PickleColor, PickleLight, 0.1 + 0.6 * fh.x + (bestFace >= 14.0 ? 0.3 : 0.0));\n        float th = atan2(bestL.y, bestL.x) * (0.5 / 3.14159265) + 0.5;\n        float2 wq = float2(th * 14.0, bestL.z / max(bestRad * 0.8, 1e-3)) + bestI * 3.7;\n        float3 wh = MARS_LIQ_HASH3(float3(floor(wq), bestI + 1.3));\n        float wr = length(frac(wq) - 0.5 - (wh.xy - 0.5) * 0.5);\n        float wart = (bestFace < 14.0 ? 1.0 : 0.0) * step(1.0 - WartAmount, wh.z) * (1.0 - smoothstep(0.1, 0.15, wr));\n        pkCol = lerp(pkCol, WartColor, wart);\n    }\n}\nif (jar && s > 0.0)\n{\n    // over the surface: only a dry tip keeps the pixel\n    bool dry = false;\n    if (pkHit)\n    {\n        float hx;\n        MARS_LIQ_HEIGHT(pkX, hx);\n        dry = dot(pkX, N) - h - hx > 0.0;\n    }\n    OutMask = dry ? 1.0 : 0.0;\n    OutNormal = pkN;\n    OutEmissive = pkCol * PickleGlow;\n    OutRough = PickleRoughness;\n    return pkCol;\n}\n// how fast the liquid veils a pickle behind it (per radius; the brine adds its haze)\nfloat pkFog = PickleVeil;\nfloat rough = Roughness;\n// a pickle's own light (Pickle Glow), so it reads in a backlit jar\nfloat3 pkGlow = 0.0;\n\nfloat path;\nfloat3 n;\nfloat3 col;\nfloat3 glow;\nif (front)\n{\n    path = (pkHit ? pkT : frontRun) / R;\n    float depth = 1.0 - exp(-path * Density);\n    n = normalize(Nw);\n    col = lerp(LiquidColor, DeepColor, depth);\n#if MARS_LIQ_BRINE\n    // cloudy: the haze thickens with the depth looked through, and thicker still low down where the sediment hangs\n    float3 mid = D + Vn * (path * R * 0.5);\n    float low = 1.0 - smoothstep(-0.9, 0.1, dot(mid, N) / (jar ? HH : R));\n    float haze = 1.0 - exp(-path * (Turbidity + Sediment * low * 3.0));\n    col = lerp(col, HazeColor, haze);\n    pkFog += Turbidity + Sediment * low * 3.0;\n#endif\n    if (pkHit)\n    {\n        // the pickle through the liquid in front of it: tinted by it, veiled by it, lit with its own facets while it shows\n        float veil = 1.0 - exp(-path * pkFog);\n        float3 seen = pkCol * lerp(1.0, min(LiquidColor * 1.6, 1.0), saturate(path * 2.0));\n        col = lerp(seen, col, veil);\n        n = normalize(lerp(pkN, n, veil));\n        rough = lerp(PickleRoughness, Roughness, veil);\n        pkGlow = seen * (PickleGlow * (1.0 - veil));\n    }\n\n    // a bright line where the liquid meets the glass, under the surface\n    float foam = 1.0 - smoothstep(0.0, foamWidth * (1.0 + 1.5 * rimFroth) * R, -s);\n    // light through the thin edge of the volume\n    float rim = pow(1.0 - saturate(dot(n, -Vn)), 3.0) * RimLight;\n    // motes: two layers of rising sparks inside the volume, along the ray (parallax: they sit in the liquid, not on the\n    // glass)\n    float motes = 0.0;\n    [unroll] for (int m = 0; m < 2; ++m)\n    {\n        float3 Q = (D + Vn * (path * R * (m == 0 ? 0.3 : 0.7))) / R * MoteScale - N * (Time * MoteSpeed) + Phase * 31.0 + m * 7.31;\n        float3 cell = floor(Q);\n        float3 f = frac(Q) - 0.5;\n        float3 hsh = MARS_LIQ_HASH3(cell);\n        float3 off = (hsh - 0.5) * 0.6;\n        float on = step(0.55, hsh.x);\n        float r = length(f - off);\n        motes += on * (1.0 - smoothstep(0.02, 0.09, r));\n    }\n#if MARS_LIQ_BUBBLING\n    // bubbles: three layers along the ray, each bubble a bright rim round a lighter core, rising and weaving\n    float bubbles = 0.0;\n    [unroll] for (int q = 0; q < 3; ++q)\n    {\n        float along = 0.15 + 0.35 * q;\n        float3 Q = (D + Vn * (path * R * along)) / R * BubbleScale - N * (Time * BubbleSpeed * (1.0 + 0.3 * q)) + Phase * 13.0 + q * 5.17;\n        float3 cell = floor(Q);\n        float3 f = frac(Q) - 0.5;\n        float3 hsh = MARS_LIQ_HASH3(cell);\n        float on = step(1.0 - BubbleDensity, hsh.x);\n        float rad = lerp(0.1, 0.24, hsh.z);\n        float3 off = (hsh - 0.5) * (0.9 - 2.0 * rad) + (T1 * sin(Time * 5.0 + hsh.y * 6.28) + T2 * cos(Time * 4.1 + hsh.z * 6.28)) * 0.05;\n        float r = length(f - off);\n        float rimB = smoothstep(rad - 0.06, rad - 0.01, r) * (1.0 - smoothstep(rad - 0.01, rad + 0.015, r));\n        float core = 1.0 - smoothstep(rad - 0.08, rad - 0.02, r);\n        bubbles += on * (rimB + 0.2 * core) * (1.0 - 0.25 * q);\n    }\n    col = lerp(col, FoamColor, saturate(bubbles) * 0.6);\n    motes += bubbles * Boil;\n#endif\n#if MARS_LIQ_BRINE\n    // the pickling spices: peppercorns (dark, round), mustard seeds (yellow, round) and dill (green, long flecks),\n    // five layers along the ray; they sink slowly, sway, and swirl round the surface's normal when it sloshes\n    float specks = 0.0;\n    float3 speckCol = 0.0;\n    float swirl = Slosh * 2.0 + 0.15;\n    [unroll] for (int p = 0; p < 5; ++p)\n    {\n        float along = 0.1 + 0.2 * p;\n        float3 X = (D + Vn * (path * R * along)) / R;\n        float a = swirl * sin(Time * 0.6 + p * 2.1);\n        float2 xy = float2(dot(X, T1), dot(X, T2));\n        xy = float2(xy.x * cos(a) - xy.y * sin(a), xy.x * sin(a) + xy.y * cos(a));\n        float3 Q = (T1 * xy.x + T2 * xy.y + N * dot(X, N)) * SpeckScale + N * (Time * 0.04) + Phase * 23.0 + p * 3.71;\n        float3 cell = floor(Q);\n        float3 f = frac(Q) - 0.5;\n        float3 hsh = MARS_LIQ_HASH3(cell);\n        float on = step(1.0 - SpeckAmount, hsh.x);\n        float3 off = (hsh - 0.5) * 0.5;\n        float3 e = f - off;\n        float3 tint;\n        float r;\n        if (hsh.y < 0.4)\n        {   // peppercorn\n            r = length(e) / 0.12;\n            tint = float3(0.06, 0.045, 0.03);\n        }\n        else if (hsh.y < 0.75)\n        {   // mustard seed\n            r = length(e) / 0.09;\n            tint = float3(0.75, 0.55, 0.15);\n        }\n        else\n        {   // dill: a thin fleck along a random direction\n            float3 dir = normalize(hsh * 2.0 - 1.0 + 1e-3);\n            float t = dot(e, dir);\n            r = max(length(e - dir * t) / 0.035, abs(t) / 0.3);\n            tint = float3(0.18, 0.32, 0.08);\n        }\n        float hit = on * (1.0 - smoothstep(0.7, 1.0, r)) * (1.0 - 0.12 * p);\n        speckCol = lerp(speckCol, tint, hit * (1.0 - specks));\n        specks = saturate(specks + hit);\n    }\n    col = lerp(col, speckCol, specks);\n#endif\n    // the aeration: while it churns, the water under the surface turns white and fills with small bubbles (three layers\n    // along the ray), in a band deeper the harder it was jolted\n    if (agit > 0.01)\n    {\n        float bandDepth = Aeration * agit * R + 1e-3;\n        float aer = 0.4 * (1.0 - smoothstep(0.0, bandDepth, -s));\n        [unroll] for (int w = 0; w < 3; ++w)\n        {\n            float3 X = D + Vn * (path * R * (0.08 + 0.3 * w));\n            float hh;\n            MARS_LIQ_HEIGHT(X, hh);\n            float band = 1.0 - smoothstep(0.0, bandDepth, h + hh - dot(X, N));\n            float3 Q = X / R * 9.0 - N * (Time * 2.0) + Phase * 3.1 + w * 1.7;\n            float3 hsh = MARS_LIQ_HASH3(floor(Q));\n            float rad = lerp(0.12, 0.3, hsh.z);\n            float r = length(frac(Q) - 0.5 - (hsh - 0.5) * (0.9 - 2.0 * rad));\n            float ring = smoothstep(rad - 0.08, rad - 0.01, r) * (1.0 - smoothstep(rad - 0.01, rad + 0.02, r));\n            float core = 1.0 - smoothstep(rad - 0.1, rad, r);\n            aer += band * step(0.35, hsh.x) * (ring + 0.35 * core);\n        }\n        col = lerp(col, FoamColor, saturate(aer) * 0.75);\n    }\n    col = lerp(col, FoamColor, foam * 0.6);\n    glow = col * Glow * (1.0 - 0.5 * depth) + LiquidColor * (rim * Glow) + FoamColor * (motes * MoteAmount * Glow);\n}\nelse\n{\n    // the surface, seen at the point the ray crosses it: lit with the rippled normal, coloured by the depth of liquid\n    // under it along the ray (the crossing to this back face)\n    float3 Sp = Ssurf;\n    path = (pkHit ? pkT : length(D - Sp)) / R;\n    float depth = 1.0 - exp(-path * Density);\n    n = surfN;\n    // the meniscus: a pale ring where the surface meets the glass (the sphere's cut circle has radius sqrt(R^2 - h^2); a\n    // jar's wall is R from its axis)\n    float3 toS = Sp - N * h;\n    float radial = jar ? length(Sp - Az * dot(Sp, Az)) / R : length(toS - N * dot(toS, N)) / sqrt(max(R * R - h * h, 1e-4));\n    float meniscus = smoothstep(1.0 - min(foamWidth * 2.5 * (1.0 + rimFroth), 0.3), 1.0, radial);\n    col = lerp(lerp(LiquidColor, DeepColor, depth), SurfaceColor, SurfaceMix);\n#if MARS_LIQ_BRINE\n    col = lerp(col, HazeColor, 1.0 - exp(-path * Turbidity));\n    pkFog += Turbidity;\n#endif\n    if (pkHit)\n    {\n        // a pickle under the top, veiled by the liquid over it, the top's own colour and gloss over both\n        float veil = 1.0 - exp(-path * pkFog);\n        float3 seen = pkCol * lerp(1.0, min(LiquidColor * 1.6, 1.0), saturate(path * 2.0));\n        col = lerp(lerp(seen, col, veil), SurfaceColor, SurfaceMix * 0.5 * (1.0 - veil));\n        pkGlow = seen * (PickleGlow * (1.0 - veil));\n    }\n#if MARS_LIQ_BUBBLING\n    // domes: each cell of the surface grows a bubble that swells, then pops into an expanding ring\n    float2 suv = float2(dot(Sp, T1), dot(Sp, T2)) / R * BubbleScale * 1.4 + Phase * 7.0;\n    float3 sh = MARS_LIQ_HASH3(float3(floor(suv), 3.7));\n    float2 sf = frac(suv) - 0.5;\n    float life = frac(Time * BubbleSpeed * 0.9 + sh.x);\n    float on = step(1.0 - BubbleDensity, sh.y);\n    float rad = lerp(0.12, 0.32, sh.z) * smoothstep(0.0, 0.8, life);\n    float2 e = sf - (sh.xy - 0.5) * 0.3;\n    float d = length(e) / max(rad, 1e-3);\n    float dome = on * step(life, 0.85) * (1.0 - step(1.0, d));\n    // the dome's slope bends the normal; its rim catches light\n    float slope = d / sqrt(max(1.0 - d * d, 0.02));\n    float2 dirE = e / max(length(e), 1e-3);\n    n = normalize(n - dome * slope * 0.6 * (T1 * dirE.x + T2 * dirE.y));\n    float domeRim = dome * smoothstep(0.7, 1.0, d);\n    // the pop: a thin ring racing out after the bubble bursts\n    float pop = on * step(0.85, life) * (1.0 - smoothstep(0.0, 0.05, abs(length(e) - (life - 0.85) * 3.0))) * (1.0 - life) * 6.0;\n    col = lerp(col, FoamColor, saturate((domeRim * 0.8 + pop + dome * 0.15) * Boil));\n#endif\n#if MARS_LIQ_BRINE\n    // a few seeds float on the top\n    float2 fuv = float2(dot(Sp, T1), dot(Sp, T2)) / R * SpeckScale * 0.8 + Phase * 5.0;\n    float3 fh = MARS_LIQ_HASH3(float3(floor(fuv), 9.1));\n    float fr = length(frac(fuv) - 0.5 - (fh.xy - 0.5) * 0.5);\n    float floater = step(1.0 - SpeckAmount * 0.5, fh.x) * (1.0 - smoothstep(0.04, 0.07, fr));\n    col = lerp(col, fh.z < 0.5 ? float3(0.75, 0.55, 0.15) : float3(0.18, 0.32, 0.08), floater);\n#endif\n    // whitecaps on the churned crests, and a sizzle of foam cells over the cap while it settles\n    if (agit > 0.01)\n    {\n        float crest = smoothstep(0.3, 1.0, surfH / max(chopAmp + abs(swellAmp), 1e-3)) * FoamCap * agit;\n        float2 fz = float2(dot(Sp, T1), dot(Sp, T2)) / R * 8.0 + Phase * 3.0 + float2(Time * 0.3, -Time * 0.2);\n        float3 zh = MARS_LIQ_HASH3(float3(floor(fz), 7.7));\n        float zr = length(frac(fz) - 0.5 - (zh.xy - 0.5) * 0.4);\n        float zrad = lerp(0.08, 0.22, zh.z);\n        float zring = smoothstep(zrad - 0.06, zrad, zr) * (1.0 - smoothstep(zrad, zrad + 0.03, zr));\n        float sizzle = step(1.0 - agit * 0.8, zh.x) * (zring + 0.4 * (1.0 - smoothstep(zrad - 0.06, zrad, zr)));\n        col = lerp(col, FoamColor, saturate(crest + sizzle * 0.8 * FoamCap));\n    }\n    col = lerp(col, FoamColor, meniscus * 0.85);\n    glow = col * (Glow * 0.6);\n}\n\nOutNormal = n;\nOutEmissive = glow + pkGlow;\nOutRough = rough;\nreturn col;\n",
+					"Description": "Liquid Bubbling Brine"
+				}
+			},
+			{
+				"id": 75,
+				"class": "MakeMaterialAttributes",
+				"name": "MaterialExpressionMakeMaterialAttributes_7",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "BaseColor",
+						"node": 74,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "Roughness",
+						"node": 74,
+						"output": 4
+					},
+					{
+						"index": 5,
+						"name": "EmissiveColor",
+						"node": 74,
+						"output": 2
+					},
+					{
+						"index": 7,
+						"name": "OpacityMask",
+						"node": 74,
+						"output": 3
+					},
+					{
+						"index": 8,
+						"name": "Normal",
+						"node": 74,
+						"output": 1
+					}
+				]
+			},
+			{
+				"id": 76,
+				"class": "StaticSwitchParameter",
+				"name": "MaterialExpressionStaticSwitchParameter_7",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "True",
+						"node": 75,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "False",
+						"node": 73,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"ParameterName": "Bubbling",
+					"Group": "Bubbling"
+				}
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_MaterialAttributes",
+				"node": 28,
+				"output": 0
+			}
+		]
+	},
+	"scalarParams": [
+		{
+			"name": "Density",
+			"value": 1.2000000476837158
+		},
+		{
+			"name": "Glow",
+			"value": 0.079999998211860657
+		},
+		{
+			"name": "Rim Light",
+			"value": 0.25
+		},
+		{
+			"name": "Roughness",
+			"value": 0.039999999105930328
+		},
+		{
+			"name": "Surface Mix",
+			"value": 0.20000000298023224
+		},
+		{
+			"name": "Foam Width",
+			"value": 0.035000000149011612
+		},
+		{
+			"name": "Ripple Amount",
+			"value": 0.059999998658895493
+		},
+		{
+			"name": "Ripple Scale",
+			"value": 2.2000000476837158
+		},
+		{
+			"name": "Ripple Speed",
+			"value": 3.5
+		},
+		{
+			"name": "Breakup Amount",
+			"value": 0.14000000059604645
+		},
+		{
+			"name": "Breakup Frequency",
+			"value": 1.2999999523162842
+		},
+		{
+			"name": "Breakup Speed",
+			"value": 7
+		},
+		{
+			"name": "Aeration",
+			"value": 0.34999999403953552
+		},
+		{
+			"name": "Foam Cap",
+			"value": 1
+		},
+		{
+			"name": "Mote Amount",
+			"value": 0
+		},
+		{
+			"name": "Mote Scale",
+			"value": 2.5999999046325684
+		},
+		{
+			"name": "Mote Speed",
+			"value": 0.34999999403953552
+		},
+		{
+			"name": "Boil",
+			"value": 1
+		},
+		{
+			"name": "Bubble Scale",
+			"value": 3
+		},
+		{
+			"name": "Bubble Speed",
+			"value": 1.2000000476837158
+		},
+		{
+			"name": "Bubble Density",
+			"value": 0.44999998807907104
+		},
+		{
+			"name": "Rim Froth",
+			"value": 1
+		},
+		{
+			"name": "Rim Froth Frequency",
+			"value": 16
+		},
+		{
+			"name": "Turbidity",
+			"value": 0.25
+		},
+		{
+			"name": "Sediment",
+			"value": 0.20000000298023224
+		},
+		{
+			"name": "Speck Amount",
+			"value": 0.30000001192092896
+		},
+		{
+			"name": "Speck Scale",
+			"value": 3.2000000476837158
+		},
+		{
+			"name": "Pickle Count",
+			"value": 8
+		},
+		{
+			"name": "Pickle Radius",
+			"value": 0.27000001072883606
+		},
+		{
+			"name": "Pickle Length",
+			"value": 0.85000002384185791
+		},
+		{
+			"name": "Wart Amount",
+			"value": 0.30000001192092896
+		},
+		{
+			"name": "Pickle Veil",
+			"value": 0.34999999403953552
+		},
+		{
+			"name": "Pickle Glow",
+			"value": 0.25
+		},
+		{
+			"name": "Pickle Roughness",
+			"value": 0.34999999403953552
+		},
+		{
+			"name": "Radius",
+			"value": 27
+		},
+		{
+			"name": "Half Height",
+			"value": 23.399999618530273
+		},
+		{
+			"name": "Slosh",
+			"value": 0
+		},
+		{
+			"name": "Phase",
+			"value": 0
+		},
+		{
+			"name": "Agitation",
+			"value": 0
+		}
+	],
+	"vectorParams": [
+		{
+			"name": "Liquid Color",
+			"value": "RGBA(0.62, 0.72, 0.22, 1)"
+		},
+		{
+			"name": "Deep Color",
+			"value": "RGBA(0.3, 0.4, 0.06, 1)"
+		},
+		{
+			"name": "Surface Color",
+			"value": "RGBA(0.72, 0.76, 0.36, 1)"
+		},
+		{
+			"name": "Foam Color",
+			"value": "RGBA(0.92, 0.92, 0.72, 1)"
+		},
+		{
+			"name": "Haze Color",
+			"value": "RGBA(0.6, 0.66, 0.3, 1)"
+		},
+		{
+			"name": "Pickle Color",
+			"value": "RGBA(0.1, 0.28, 0.02, 1)"
+		},
+		{
+			"name": "Pickle Light",
+			"value": "RGBA(0.42, 0.66, 0.08, 1)"
+		},
+		{
+			"name": "Wart Color",
+			"value": "RGBA(0.85, 0.86, 0.55, 1)"
+		},
+		{
+			"name": "Surface",
+			"value": "RGBA(0, 0, 1, 0)"
+		}
+	],
+	"textureParams": [],
+	"usedTextures": []
+}
