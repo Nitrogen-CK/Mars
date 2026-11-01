@@ -104,11 +104,11 @@ class UMars_FishingStation_EntityScript : UMars_CounterStation_EntityScript
     private TOptional<bool> _LineShown;
     private TOptional<bool> _FishShown;
 
-    // A placed spot with no catch table fishes meat slabs (the fish food lands later); a spec with one keeps it.
+    // A placed spot with no catch table fishes the fish food; a spec with one keeps it.
     protected void Prepare_Kernel() override
     {
         if (Fishing.Fish.Table.Num() == 0)
-        { Fishing.Fish.Table.Add(FMars_Fishing_FishEntry(utils_held_item::Make_DefinitionSoft(mars_items::Food_MeatSlab()), 1.0f, 1.0f)); }
+        { Fishing.Fish.Table.Add(FMars_Fishing_FishEntry(utils_held_item::Make_DefinitionSoft(mars_items::Food_Fish()), 1.0f, 1.0f)); }
     }
 
     // A rejected Fishing spec already ensured in utils_fishing::Add: the station stands with nothing to fish.
