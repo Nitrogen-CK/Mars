@@ -16,7 +16,7 @@ camera ray through D in true space is the ray through the pixel.
 
 # ====================================================================================== liquid
 # Inputs: D (pixel - centre, world cm, true space), CamRel (camera - centre), Unit (local X axis in world: its length is the
-# component's scale), Radius (the sphere's local radius, cm), Surface (xyz the surface normal, w the level in radii), Slosh
+# component's scale), UnitZ (local Z axis in world), Radius (the sphere's local radius, cm; a jar's), HalfHeight (a jar's), Surface (xyz the surface normal, w the level in radii), Slosh
 # (0..1 ripple energy), Agitation (0..1, the script's lagged slosh: the cap's breakup, the aeration band, the whitecaps),
 # Phase (0..1 per potion), Time, Sign (TwoSidedSign), Nw (vertex normal, world), the look.
 # The surface is a height field (MARS_LIQ_HEIGHT: long swell plus an agitation-driven chop); a back face marches the camera
@@ -31,6 +31,15 @@ camera ray through D in true space is the ray through the pixel.
 #   MARS_LIQ_BRINE     a pickling brine: cloudy rather than glowing (Haze Color by Turbidity along the ray), a sediment
 #                      cloud low in the vessel, and suspended peppercorns, mustard seeds and dill (five layers along the
 #                      ray) that drift and settle and swirl when the liquid sloshes. Haze Color, Turbidity, Sediment, Speck Amount / Scale.
+# And one static switch that reaches the code as a constant input (Jar, 1 or 0; the compiler drops the dead branch):
+#   Pickle Jar         the vessel is a cylinder (Radius, Half Height; its axis the mesh's local Z, pivot at its middle), so
+#                      the level is the plane through the axis at the fill height (Surface.w in half-heights, -1 empty ..
+#                      1 full): it holds the volume while the surface stays clear of the floor and the lid. And it is
+#                      packed with upright low-poly pickles, traced along the ray (each a convex solid: two bands of seven
+#                      facets that bulge to the middle, bevelled ends, pale warts), seen through the brine's veil, a tip
+#                      over the surface drawn dry. Pickle Count / Radius / Length / Color / Light / Glow, Wart Color, Pickle Veil.
+#                      They move with the slosh: Pickle Sway leans the tops back against the surface's tilt, Pickle Bob
+#                      lifts and rocks each one while the liquid churns.
 LIQUID_PS = r"""
 #ifndef MARS_LIQ_HASH3
 #define MARS_LIQ_HASH3(c) frac(sin(float3(dot(c, float3(127.1, 311.7, 74.7)), dot(c, float3(269.5, 183.3, 246.1)), dot(c, float3(113.5, 271.9, 124.6)))) * 43758.5453)
@@ -39,6 +48,31 @@ float S = max(length(Unit), 1e-4);
 float R = max(Radius * S, 1e-3);
 float3 N = normalize(Surface.xyz + float3(0.0, 0.0, 1e-4));
 float h = Surface.w * R;
+
+// the vessel's frame (the mesh's local axes in world); a jar's plane passes through its axis at the fill height
+float3 Ax = Unit / S;
+float3 Az = normalize(UnitZ);
+float3 Ay = cross(Az, Ax);
+bool jar = Jar > 0.5;
+float HH = max(HalfHeight * S, 1e-3);
+if (jar)
+{ h = Surface.w * HH * dot(Az, N); }
+// where a ray O + V t enters and leaves the jar's cylinder (t in V's units; TIN > TOUT: a miss)
+#define MARS_LIQ_CYL(O, V, TIN, TOUT) \
+{ \
+    float3 _or = O - Az * dot(O, Az); \
+    float3 _vr = V - Az * dot(V, Az); \
+    float _a = max(dot(_vr, _vr), 1e-8); \
+    float _b = dot(_or, _vr); \
+    float _d = _b * _b - _a * (dot(_or, _or) - R * R); \
+    float _sq = sqrt(max(_d, 0.0)); \
+    float _vz = dot(V, Az); \
+    _vz = abs(_vz) > 1e-6 ? _vz : 1e-6; \
+    float _z0 = (-HH - dot(O, Az)) / _vz; \
+    float _z1 = (HH - dot(O, Az)) / _vz; \
+    TIN = _d < 0.0 ? 1e9 : max((-_b - _sq) / _a, min(_z0, _z1)); \
+    TOUT = _d < 0.0 ? -1e9 : min((-_b + _sq) / _a, max(_z0, _z1)); \
+}
 
 // the surface's own frame, for the ripples
 float3 T1 = normalize(cross(abs(N.x) < 0.9 ? float3(1.0, 0.0, 0.0) : float3(0.0, 1.0, 0.0), N));
@@ -100,6 +134,12 @@ if (Sign <= 0.0)
     float vc = dot(CamRel, CamRel) - R * R;
     float disc = vb * vb - va * vc;
     float tIn = disc > 0.0 ? (-vb - sqrt(disc)) / va : 0.0;
+    if (jar)
+    {
+        float tOut;
+        MARS_LIQ_CYL(CamRel, V, tIn, tOut);
+        tIn = tIn < tOut ? tIn : 0.0;
+    }
     float t0 = max(tIn, 0.0);
     if (vN < -1e-5)
     { t0 = max(t0, (h + hiCrest - dot(CamRel, N)) / vN); }
@@ -175,30 +215,203 @@ foamWidth *= 1.0 + 1.5 * Boil;
 
 float3 Vn = normalize(V);
 bool front = Sign > 0.0;
+
+// a front face: the liquid between here and where the ray leaves it (the far wall, or the surface if the ray rises through
+// it first), cm
+float frontRun = 0.0;
+if (front)
+{
+    float b = dot(D, Vn);
+    float tS = -b + sqrt(max(b * b - (dot(D, D) - R * R), 0.0));
+    if (jar)
+    {
+        float tIn;
+        MARS_LIQ_CYL(D, Vn, tIn, tS);
+    }
+    float vnN = dot(Vn, N);
+    float tP = vnN > 1e-4 ? (h - dot(D, N)) / vnN : 1e9;
+    frontRun = max(min(tS, tP), 0.0);
+}
+
+// the pickles (Pickle Jar): the first one the ray meets in the liquid, from where it enters (this front face, or the
+// surface over a back face) to where it leaves. Over the surface (a pixel the clip drops) the trace runs through the jar's
+// air instead, and a tip it meets there keeps the pixel, dry. Each pickle stands on the floor round the axis (a ring and
+// one in the middle), leans a little in, and is a convex solid of planes in its own frame: a lower and an upper band of
+// seven facets (twisted half a facet, each bulging to the middle), a bevel at each end, and the end caps.
+bool pkHit = false;
+float pkT = 0.0;
+float3 pkN = -Vn;
+float3 pkCol = PickleColor;
+float3 pkX = D;
+if (jar && PickleCount >= 1.0)
+{
+    float3 O = front ? D : Ssurf;
+    float tMax = front ? frontRun : length(D - Ssurf);
+    if (s > 0.0)
+    {
+        float tA, tB;
+        MARS_LIQ_CYL(CamRel, Vn, tA, tB);
+        O = front ? D : CamRel + Vn * max(tA, 0.0);
+        tMax = max(tB - dot(O - CamRel, Vn), 0.0);
+    }
+    #define MARS_LIQ_PLANE(NP, DP, ID) \
+    { \
+        float3 _n = NP; \
+        float _dn = dot(v, _n); \
+        float _t = ((DP) - dot(o, _n)) / (_dn < 0.0 ? min(_dn, -1e-6) : max(_dn, 1e-6)); \
+        if (_dn < 0.0) \
+        { \
+            if (_t > tE) { tE = _t; nE = _n; fE = ID; } \
+        } \
+        else \
+        { tX = min(tX, _t); } \
+    }
+    int count = (int)min(PickleCount, 12.0);
+    int ring = count >= 4 ? count - 1 : count;
+    float seed = floor(Phase * 97.0);
+    float pr = PickleRadius * R;
+    float ringR = max(R - pr * 1.15 - 0.03 * R, 0.0);
+    float bestT = tMax;
+    float3 bestL = 0.0;
+    float bestFace = 0.0;
+    float bestI = 0.0;
+    float bestRad = 1.0;
+    // the slosh carries them: a top leans back against the surface's tilt from level (the script's slosh spring, which tips
+    // the surface toward the acceleration, so the pickles lag behind it and swing and settle with it), each pickle its own
+    // share (Pickle Sway, lean per unit of tilt); and while the liquid churns (Agitation) each lifts off the floor and rocks
+    // at its own rate (Pickle Bob: 1 lifts up to a tenth of the radius and rocks about 0.08 rad)
+    float3 lag = float3(0.0, 0.0, 1.0) - N;
+    lag -= Az * dot(lag, Az);
+    lag *= min(1.0, 0.5 / max(length(lag), 1e-4));
+    float bobW = PickleBob * agit;
+    [loop] for (int i = 0; i < count; ++i)
+    {
+        float3 ph = MARS_LIQ_HASH3(float3(i, seed, 2.9));
+        bool centre = i >= ring;
+        float ang = (i + (ph.x - 0.5) * 0.3) / ring * 6.2831853 + Phase * 6.2831853;
+        float3 out2 = Ax * cos(ang) + Ay * sin(ang);
+        float rad = pr * (centre ? 1.15 : 0.9 + 0.2 * ph.z);
+        float len = PickleLength * 2.0 * HH * (0.84 + 0.16 * ph.y);
+        float wob = Time * (4.0 + 3.0 * ph.z) + ph.x * 6.2831853;
+        float3 base = out2 * (centre ? 0.0 : ringR * (0.96 + 0.04 * ph.y)) - Az * (HH - 0.02 * R)
+            + Az * (bobW * 0.1 * R * (0.5 + 0.5 * sin(wob)));
+        float3 pz = normalize(Az - out2 * (centre ? 0.0 : 0.02 + 0.05 * ph.z) + Ay * ((ph.x - 0.5) * 0.04)
+            + lag * (PickleSway * (0.6 + 0.8 * ph.y))
+            + (Ax * sin(wob * 0.7 + 1.3) + Ay * cos(wob * 0.9)) * (bobW * 0.08));
+        float3 px0 = normalize(Ax - pz * dot(Ax, pz));
+        float3 py0 = cross(pz, px0);
+        float tw = ph.x * 6.2831853;
+        float3 px = px0 * cos(tw) + py0 * sin(tw);
+        float3 py = cross(pz, px);
+        float3 rel = O - base;
+        float3 o = float3(dot(rel, px), dot(rel, py), dot(rel, pz));
+        float3 v = float3(dot(Vn, px), dot(Vn, py), dot(Vn, pz));
+        // skip a pickle whose bounding sphere the ray misses, or meets only past the best so far
+        float3 bc = o - float3(0.0, 0.0, 0.5 * len);
+        float bb = dot(bc, v);
+        float bd = bb * bb - (dot(bc, bc) - (0.25 * len * len + 1.2 * rad * rad));
+        if (bd < 0.0 || -bb - sqrt(bd) > bestT || -bb + sqrt(bd) < 0.0)
+        { continue; }
+
+        float tE = -1e9;
+        float tX = 1e9;
+        float3 nE = float3(0.0, 0.0, -1.0);
+        float fE = 0.0;
+        float eps = 0.16 * rad / (0.5 * len);   // the bands' bulge: radius lost from the middle to an end, per height
+        float kb = 0.7;                         // the bevels' slope
+        float ib = rsqrt(1.0 + eps * eps);
+        float ik = rsqrt(1.0 + kb * kb);
+        [unroll] for (int k = 0; k < 7; ++k)
+        {
+            float3 kh = MARS_LIQ_HASH3(float3(i, k, seed + 4.1));
+            float a0 = (k + 0.15 * (kh.x - 0.5)) * 0.8975979;
+            float a1 = a0 + 0.4487990;
+            float2 c0 = float2(cos(a0), sin(a0));
+            float2 c1 = float2(cos(a1), sin(a1));
+            MARS_LIQ_PLANE(float3(c0, -eps) * ib, (rad * (0.95 + 0.1 * kh.y) - eps * 0.5 * len) * ib, k)
+            MARS_LIQ_PLANE(float3(c1, eps) * ib, (rad * (0.95 + 0.1 * kh.z) + eps * 0.5 * len) * ib, 7 + k)
+            MARS_LIQ_PLANE(float3(c0, kb) * ik, (0.6 * rad + kb * len) * ik, 14 + k)
+            MARS_LIQ_PLANE(float3(c1, -kb) * ik, 0.6 * rad * ik, 21 + k)
+        }
+        MARS_LIQ_PLANE(float3(0.0, 0.0, 1.0), len, 28)
+        MARS_LIQ_PLANE(float3(0.0, 0.0, -1.0), 0.0, 29)
+        if (tE <= tX && tX > 0.0 && tE < bestT)
+        {
+            bestT = max(tE, 0.0);
+            pkHit = true;
+            pkN = px * nE.x + py * nE.y + pz * nE.z;
+            bestL = o + v * bestT;
+            bestFace = fE;
+            bestI = i;
+            bestRad = rad;
+        }
+    }
+    pkT = bestT;
+    pkX = O + Vn * bestT;
+    if (pkHit)
+    {
+        // flat-shaded facets, each its own shade between Pickle Color and Pickle Light, the ends lighter; pale warts on
+        // the bands
+        float3 fh = MARS_LIQ_HASH3(float3(bestI, bestFace, seed + 8.3));
+        pkCol = lerp(PickleColor, PickleLight, 0.1 + 0.6 * fh.x + (bestFace >= 14.0 ? 0.3 : 0.0));
+        float th = atan2(bestL.y, bestL.x) * (0.5 / 3.14159265) + 0.5;
+        float2 wq = float2(th * 14.0, bestL.z / max(bestRad * 0.8, 1e-3)) + bestI * 3.7;
+        float3 wh = MARS_LIQ_HASH3(float3(floor(wq), bestI + 1.3));
+        float wr = length(frac(wq) - 0.5 - (wh.xy - 0.5) * 0.5);
+        float wart = (bestFace < 14.0 ? 1.0 : 0.0) * step(1.0 - WartAmount, wh.z) * (1.0 - smoothstep(0.1, 0.15, wr));
+        pkCol = lerp(pkCol, WartColor, wart);
+    }
+}
+if (jar && s > 0.0)
+{
+    // over the surface: only a dry tip keeps the pixel
+    bool dry = false;
+    if (pkHit)
+    {
+        float hx;
+        MARS_LIQ_HEIGHT(pkX, hx);
+        dry = dot(pkX, N) - h - hx > 0.0;
+    }
+    OutMask = dry ? 1.0 : 0.0;
+    OutNormal = pkN;
+    OutEmissive = pkCol * PickleGlow;
+    OutRough = PickleRoughness;
+    return pkCol;
+}
+// how fast the liquid veils a pickle behind it (per radius; the brine adds its haze)
+float pkFog = PickleVeil;
+float rough = Roughness;
+// a pickle's own light (Pickle Glow), so it reads in a backlit jar
+float3 pkGlow = 0.0;
+
 float path;
 float3 n;
 float3 col;
 float3 glow;
 if (front)
 {
-    // the wall: the liquid between here and where the ray leaves it (the far side of the sphere, or the surface if the
-    // ray rises through it first), in radii
-    float b = dot(D, Vn);
-    float c = dot(D, D) - R * R;
-    float tS = -b + sqrt(max(b * b - c, 0.0));
-    float vnN = dot(Vn, N);
-    float tP = vnN > 1e-4 ? (h - dot(D, N)) / vnN : 1e9;
-    path = max(min(tS, tP), 0.0) / R;
+    path = (pkHit ? pkT : frontRun) / R;
     float depth = 1.0 - exp(-path * Density);
     n = normalize(Nw);
     col = lerp(LiquidColor, DeepColor, depth);
 #if MARS_LIQ_BRINE
     // cloudy: the haze thickens with the depth looked through, and thicker still low down where the sediment hangs
     float3 mid = D + Vn * (path * R * 0.5);
-    float low = 1.0 - smoothstep(-0.9, 0.1, dot(mid, N) / R);
+    float low = 1.0 - smoothstep(-0.9, 0.1, dot(mid, N) / (jar ? HH : R));
     float haze = 1.0 - exp(-path * (Turbidity + Sediment * low * 3.0));
     col = lerp(col, HazeColor, haze);
+    pkFog += Turbidity + Sediment * low * 3.0;
 #endif
+    if (pkHit)
+    {
+        // the pickle through the liquid in front of it: tinted by it, veiled by it, lit with its own facets while it shows
+        float veil = 1.0 - exp(-path * pkFog);
+        float3 seen = pkCol * lerp(1.0, min(LiquidColor * 1.6, 1.0), saturate(path * 2.0));
+        col = lerp(seen, col, veil);
+        n = normalize(lerp(pkN, n, veil));
+        rough = lerp(PickleRoughness, Roughness, veil);
+        pkGlow = seen * (PickleGlow * (1.0 - veil));
+    }
 
     // a bright line where the liquid meets the glass, under the surface
     float foam = 1.0 - smoothstep(0.0, foamWidth * (1.0 + 1.5 * rimFroth) * R, -s);
@@ -314,17 +527,27 @@ else
     // the surface, seen at the point the ray crosses it: lit with the rippled normal, coloured by the depth of liquid
     // under it along the ray (the crossing to this back face)
     float3 Sp = Ssurf;
-    path = length(D - Sp) / R;
+    path = (pkHit ? pkT : length(D - Sp)) / R;
     float depth = 1.0 - exp(-path * Density);
     n = surfN;
-    // the meniscus: a pale ring where the surface meets the glass (the cut circle's radius is sqrt(R^2 - h^2))
+    // the meniscus: a pale ring where the surface meets the glass (the sphere's cut circle has radius sqrt(R^2 - h^2); a
+    // jar's wall is R from its axis)
     float3 toS = Sp - N * h;
-    float radial = length(toS - N * dot(toS, N)) / sqrt(max(R * R - h * h, 1e-4));
+    float radial = jar ? length(Sp - Az * dot(Sp, Az)) / R : length(toS - N * dot(toS, N)) / sqrt(max(R * R - h * h, 1e-4));
     float meniscus = smoothstep(1.0 - min(foamWidth * 2.5 * (1.0 + rimFroth), 0.3), 1.0, radial);
     col = lerp(lerp(LiquidColor, DeepColor, depth), SurfaceColor, SurfaceMix);
 #if MARS_LIQ_BRINE
     col = lerp(col, HazeColor, 1.0 - exp(-path * Turbidity));
+    pkFog += Turbidity;
 #endif
+    if (pkHit)
+    {
+        // a pickle under the top, veiled by the liquid over it, the top's own colour and gloss over both
+        float veil = 1.0 - exp(-path * pkFog);
+        float3 seen = pkCol * lerp(1.0, min(LiquidColor * 1.6, 1.0), saturate(path * 2.0));
+        col = lerp(lerp(seen, col, veil), SurfaceColor, SurfaceMix * 0.5 * (1.0 - veil));
+        pkGlow = seen * (PickleGlow * (1.0 - veil));
+    }
 #if MARS_LIQ_BUBBLING
     // domes: each cell of the surface grows a bubble that swells, then pops into an expanding ring
     float2 suv = float2(dot(Sp, T1), dot(Sp, T2)) / R * BubbleScale * 1.4 + Phase * 7.0;
@@ -370,8 +593,8 @@ else
 }
 
 OutNormal = n;
-OutEmissive = glow;
-OutRough = Roughness;
+OutEmissive = glow + pkGlow;
+OutRough = rough;
 return col;
 """
 

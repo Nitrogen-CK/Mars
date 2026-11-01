@@ -14,6 +14,10 @@ live mesh is never rebuilt in an editor someone is using):
     PotionGlass_Mars_M     translucent lit glass, fresnel opacity
     PotionCork_Mars_M      opaque speckled cork
     and one instance of each master (*_MI): tune those, a rebuild keeps their values.
+    PickleJar_Mars_SM      the pickle jar (build_jar_meshes): slot 0 the glass, slot 1 the wooden lid; pivot at its base;
+                           a "Grip" socket under its base
+    PickleJarLiquid_Mars_SM  its brine: a cylinder, pivot at its middle (JAR_LIQUID_CENTRE_CM over the jar's pivot), wearing
+                           PickleJarBrine_Mars_MI (the Brine and Pickle Jar switches: upright low-poly pickles traced in it)
 
 Liquid contract (custom primitive data, written by UMars_Potion_EntityScript every tick): 0-2 the surface normal (world,
 unit), 3 the level (the plane's distance from the sphere's centre in radii, -1 empty .. 1 full), 4 Slosh (0..1, ripple
@@ -67,6 +71,28 @@ LIQUID_RADIUS_CM = BODY_RADIUS_CM - GLASS_CM - 0.04
 LIQUID_FLOOR_CM = INNER_FLOOR_CM + 0.04
 CORK_BOTTOM_CM = 11.4
 SEGMENTS = 48
+
+# The pickle jar: a straight-walled glass jar (a rounded foot, a short shoulder into the mouth) under a wooden lid, and its
+# liquid, a cylinder from the inner floor to under the shoulder, pivot at its middle (the shader's Pickle Jar switch).
+JAR = "PickleJar_Mars_SM"
+JAR_LIQUID = "PickleJarLiquid_Mars_SM"
+JAR_RADIUS_CM = 4.4
+JAR_GLASS_CM = 0.25
+JAR_FOOT_CM = 0.5            # the foot's rounding
+JAR_FLOOR_CM = 0.3
+JAR_WALL_TOP_CM = 8.6        # where the outside wall turns into the shoulder
+JAR_MOUTH_OUTER_CM = 3.9
+JAR_MOUTH_INNER_CM = 3.65
+JAR_SHOULDER_CM = 9.3
+JAR_RIM_CM = 9.9
+JAR_LID_BOTTOM_CM = 9.2
+JAR_LID_TOP_CM = 10.65
+JAR_LID_RADIUS_CM = 4.12
+JAR_LIQUID_RADIUS_CM = JAR_RADIUS_CM - JAR_GLASS_CM - 0.04
+JAR_LIQUID_FLOOR_CM = JAR_FLOOR_CM + 0.04
+JAR_LIQUID_TOP_CM = 8.66
+JAR_LIQUID_HALF_CM = 0.5 * (JAR_LIQUID_TOP_CM - JAR_LIQUID_FLOOR_CM)
+JAR_LIQUID_CENTRE_CM = 0.5 * (JAR_LIQUID_TOP_CM + JAR_LIQUID_FLOOR_CM)
 
 
 def _log(msg):
@@ -134,6 +160,49 @@ def liquid_strips():
         _arc(R, 0.0, psi_floor, psi_shoulder, 32),
         [(neck, shoulder_z), (neck, (shoulder_z + top_z) * 0.5), (neck, top_z)],
         [(neck, top_z), (neck * 0.5, top_z), (0.0, top_z)],
+    ]
+
+
+def jar_strips():
+    """The jar's glass: outside from the base's centre round the foot, up the wall, over the shoulder to the rim; inside
+    down the mouth and the wall to the floor's centre."""
+    R, Ri, f = JAR_RADIUS_CM, JAR_RADIUS_CM - JAR_GLASS_CM, JAR_FOOT_CM
+    foot = [(R - f + f * math.sin(a), f - f * math.cos(a)) for a in [i * 0.5 * math.pi / 6 for i in range(7)]]
+    return [
+        [(0.0, 0.0), ((R - f) * 0.5, 0.0), (R - f, 0.0)],
+        foot,
+        [(R, f), (R, 0.5 * (f + JAR_WALL_TOP_CM)), (R, JAR_WALL_TOP_CM)],
+        [(R, JAR_WALL_TOP_CM), (R - 0.18, JAR_WALL_TOP_CM + 0.42), (JAR_MOUTH_OUTER_CM, JAR_SHOULDER_CM)],
+        [(JAR_MOUTH_OUTER_CM, JAR_SHOULDER_CM), (JAR_MOUTH_OUTER_CM, JAR_RIM_CM)],
+        [(JAR_MOUTH_OUTER_CM, JAR_RIM_CM), (JAR_MOUTH_INNER_CM, JAR_RIM_CM)],
+        [(JAR_MOUTH_INNER_CM, JAR_RIM_CM), (JAR_MOUTH_INNER_CM, JAR_SHOULDER_CM)],
+        [(JAR_MOUTH_INNER_CM, JAR_SHOULDER_CM), (Ri - 0.18, JAR_LIQUID_TOP_CM + 0.3), (Ri, JAR_LIQUID_TOP_CM + 0.04)],
+        [(Ri, JAR_LIQUID_TOP_CM + 0.04), (Ri, 0.5 * (JAR_LIQUID_TOP_CM + JAR_FLOOR_CM)), (Ri, JAR_FLOOR_CM)],
+        [(Ri, JAR_FLOOR_CM), (Ri * 0.5, JAR_FLOOR_CM), (0.0, JAR_FLOOR_CM)],
+    ]
+
+
+def jar_lid_strips():
+    """The lid: a band over the mouth and a low dome, closed underneath (a ring under the band, a disc over the rim)."""
+    Rl, b, t = JAR_LID_RADIUS_CM, JAR_LID_BOTTOM_CM, JAR_LID_TOP_CM
+    inner = JAR_MOUTH_OUTER_CM + 0.05
+    return [
+        [(inner, b), (Rl, b)],
+        [(Rl, b), (Rl, t - 0.35)],
+        [(Rl, t - 0.35), (Rl - 0.1, t - 0.13), (Rl - 0.42, t - 0.05)],
+        [(Rl - 0.42, t - 0.05), (1.8, t - 0.01), (0.0, t)],
+        [(0.0, JAR_RIM_CM + 0.05), (inner, JAR_RIM_CM + 0.05)],
+        [(inner, JAR_RIM_CM + 0.05), (inner, b)],
+    ]
+
+
+def jar_liquid_strips():
+    """The jar's liquid about its middle (z 0 there): floor, wall, top."""
+    R, H = JAR_LIQUID_RADIUS_CM, JAR_LIQUID_HALF_CM
+    return [
+        [(0.0, -H), (R * 0.5, -H), (R, -H)],
+        [(R, -H), (R, 0.0), (R, H)],
+        [(R, H), (R * 0.5, H), (0.0, H)],
     ]
 
 
@@ -289,8 +358,32 @@ def build_liquid():
     sediment = g.scalar("Sediment", 0.6, 0.0, 3.0, "Extra cloud hanging low in the vessel.")
     speck_amt = g.scalar("Speck Amount", 0.35, 0.0, 1.0, "Share of cells holding a peppercorn, a mustard seed or a fleck of dill.")
     speck_scale = g.scalar("Speck Scale", 4.0, 1.0, 16.0, "Cells per radius: more, smaller spices.")
+    g.group("Pickle Jar")
+    jar_on = _static_switch(g, "Pickle Jar", False, "The vessel is a cylinder (Radius, Half Height) packed with upright "
+                                                    "low-poly pickles: wear it on PickleJarLiquid_Mars_SM.")
+    pk_count = g.scalar("Pickle Count", 8.0, 0.0, 12.0, "Pickles in the jar: a ring round the wall, and one in the middle "
+                                                          "from four up.")
+    pk_radius = g.scalar("Pickle Radius", 0.27, 0.05, 0.5, "A pickle's radius, in the jar's radii.")
+    pk_length = g.scalar("Pickle Length", 0.85, 0.1, 1.0, "The longest pickle's length, in the jar's height (each is "
+                                                          "84-100% of it).")
+    pk_color = g.vector("Pickle Color", (0.1, 0.28, 0.02, 1.0), "The pickles' darkest facets.")
+    pk_light = g.vector("Pickle Light", (0.42, 0.66, 0.08, 1.0), "The pickles' lightest facets and their ends.")
+    wart_color = g.vector("Wart Color", (0.85, 0.86, 0.55, 1.0), "The pale dots on the pickles.")
+    wart_amt = g.scalar("Wart Amount", 0.3, 0.0, 1.0, "Share of the pickles' cells holding a wart.")
+    pk_veil = g.scalar("Pickle Veil", 0.35, 0.0, 6.0, "How fast the liquid in front veils a pickle (per radius; the brine "
+                                                     "adds its Turbidity and Sediment).")
+    pk_glow = g.scalar("Pickle Glow", 0.25, 0.0, 2.0, "The pickles' own light, so they read in a backlit or shaded jar "
+                                                       "(faded by the veil).")
+    pk_rough = g.scalar("Pickle Roughness", 0.35, 0.0, 1.0, "The pickles' skin where it shows clear of the veil.")
+    pk_sway = g.scalar("Pickle Sway", 0.25, 0.0, 2.0, "How far a pickle's top leans back against the slosh (lean per unit "
+                                                       "of surface tilt; each pickle 60-140% of it). 0: they stand still.")
+    pk_bob = g.scalar("Pickle Bob", 0.5, 0.0, 3.0, "How much each pickle lifts and rocks while the liquid churns (1: up to "
+                                                    "a tenth of the radius, about 0.08 rad), fading as it calms.")
     g.group("Shape")
-    radius = g.scalar("Radius", LIQUID_RADIUS_CM, 0.1, 50.0, "The liquid sphere's local radius, cm (the mesh's).")
+    radius = g.scalar("Radius", LIQUID_RADIUS_CM, 0.1, 50.0, "The liquid sphere's local radius, cm (the mesh's); a jar's "
+                                                             "cylinder's.")
+    half_height = g.scalar("Half Height", JAR_LIQUID_HALF_CM, 0.1, 50.0, "A jar's liquid cylinder's half height, cm (the "
+                                                                         "mesh's; Pickle Jar only).")
     g.group("Per Potion (Custom Primitive Data)")
     surf = g.vector("Surface", (0.0, 0.0, 1.0, 0.0), "Custom primitive data 0-3: the surface normal (world) and the "
                     "level (radii from the centre).", ("Nx", "Ny", "Nz", "Level"), cpd=0)
@@ -326,6 +419,18 @@ def build_liquid():
     unit.set_editor_property("transform_source_type", unreal.MaterialVectorCoordTransformSource.TRANSFORMSOURCE_LOCAL)
     unit.set_editor_property("transform_type", unreal.MaterialVectorCoordTransform.TRANSFORM_WORLD)
     g.link(_const3(g, (1.0, 0.0, 0.0), x, y + 460), "", unit, "")
+    unit_z = g.expr(unreal.MaterialExpressionTransform, x + 260, y + 900)
+    unit_z.set_editor_property("transform_source_type", unreal.MaterialVectorCoordTransformSource.TRANSFORMSOURCE_LOCAL)
+    unit_z.set_editor_property("transform_type", unreal.MaterialVectorCoordTransform.TRANSFORM_WORLD)
+    g.link(_const3(g, (0.0, 0.0, 1.0), x, y + 900), "", unit_z, "")
+    # Pickle Jar reaches the code as a constant (1 or 0), so the dead branch compiles out of each instance's shader
+    jar = []
+    for value, yy in ((1.0, y + 1040), (0.0, y + 1120)):
+        c = g.expr(unreal.MaterialExpressionConstant, x + 260, yy)
+        c.set_editor_property("r", value)
+        jar.append(c)
+    g.link(jar[0], "", jar_on, "True")
+    g.link(jar[1], "", jar_on, "False")
     time = g.expr(unreal.MaterialExpressionTime, x + 520, y + 560)
     sign = g.expr(unreal.MaterialExpressionTwoSidedSign, x + 520, y + 660)
     nw = g.expr(unreal.MaterialExpressionVertexNormalWS, x + 520, y + 760)
@@ -340,7 +445,12 @@ def build_liquid():
               ("BubbleDensity", bub_density, ""), ("RimFroth", rim_froth, ""), ("RimFrothFrequency", rim_freq, ""),
               ("BreakupAmount", brk_amt, ""), ("BreakupFrequency", brk_freq, ""), ("BreakupSpeed", brk_speed, ""),
               ("Aeration", aeration, ""), ("FoamCap", foam_cap, ""), ("HazeColor", haze, ""), ("Turbidity", turbidity, ""),
-              ("Sediment", sediment, ""), ("SpeckAmount", speck_amt, ""), ("SpeckScale", speck_scale, "")]
+              ("Sediment", sediment, ""), ("SpeckAmount", speck_amt, ""), ("SpeckScale", speck_scale, ""),
+              ("UnitZ", unit_z, ""), ("Jar", jar_on, ""), ("HalfHeight", half_height, ""), ("PickleCount", pk_count, ""),
+              ("PickleRadius", pk_radius, ""), ("PickleLength", pk_length, ""), ("PickleColor", pk_color, ""),
+              ("PickleLight", pk_light, ""), ("WartColor", wart_color, ""), ("WartAmount", wart_amt, ""),
+              ("PickleVeil", pk_veil, ""), ("PickleRoughness", pk_rough, ""), ("PickleGlow", pk_glow, ""),
+              ("PickleSway", pk_sway, ""), ("PickleBob", pk_bob, "")]
     # one Custom node per switch combination (the static switches prune the others from each instance's shader)
     variants = {}
     for row, (bubbling, brine) in enumerate(((False, False), (True, False), (False, True), (True, True))):
@@ -458,14 +568,30 @@ VARIANTS = (
       "Haze Color": (0.62, 0.64, 0.32, 1.0), "Foam Color": (0.9, 0.9, 0.7, 1.0), "Surface Mix": 0.2, "Density": 1.4,
       "Turbidity": 0.45, "Sediment": 0.5, "Speck Amount": 0.55, "Speck Scale": 3.2, "Glow": 0.08, "Rim Light": 0.3,
       "Mote Amount": 0.0, "Roughness": 0.04}),
+    ("PickleJarBrine_Mars_MI", {"Brine": True, "Pickle Jar": True},
+     {"Liquid Color": (0.62, 0.72, 0.22, 1.0), "Deep Color": (0.3, 0.4, 0.06, 1.0), "Surface Color": (0.72, 0.76, 0.36, 1.0),
+      "Haze Color": (0.6, 0.66, 0.3, 1.0), "Foam Color": (0.92, 0.92, 0.72, 1.0), "Surface Mix": 0.2, "Density": 1.2,
+      "Turbidity": 0.25, "Sediment": 0.2, "Speck Amount": 0.3, "Speck Scale": 3.2, "Glow": 0.08, "Rim Light": 0.25,
+      "Mote Amount": 0.0, "Roughness": 0.04, "Radius": JAR_LIQUID_RADIUS_CM, "Half Height": JAR_LIQUID_HALF_CM}),
+)
+
+# Other instances the jar wears: (name, master, parameter values), written only when created (as VARIANTS).
+JAR_INSTANCES = (
+    ("PickleJarLid_Mars_MI", "PotionCork_Mars_M",
+     {"Dark": (0.2, 0.09, 0.03, 1.0), "Light": (0.52, 0.27, 0.1, 1.0), "Grain Scale": 3.0, "Roughness": 0.7}),
 )
 
 
-def build_variants(reset=False):
-    """reset: write VARIANTS' values over an existing instance's too (discards hand tuning)."""
-    master = mc._asset(F_MAT, "PotionLiquid_Mars_M")
+def build_variants(reset=False, names=None):
+    """reset: write VARIANTS' (and JAR_INSTANCES') values over an existing instance's too (discards hand tuning); names:
+    only these instances (all when None)."""
     made = []
-    for name, switches, values in VARIANTS:
+    rows = [(name, "PotionLiquid_Mars_M", switches, values) for name, switches, values in VARIANTS]
+    rows += [(name, master, {}, values) for name, master, values in JAR_INSTANCES]
+    for name, master_name, switches, values in rows:
+        if names is not None and name not in names:
+            continue
+        master = mc._asset(F_MAT, master_name)
         mi = mc._asset(F_MAT, name)
         fresh = mi is None
         if fresh:
@@ -561,8 +687,57 @@ def build_meshes():
     return report
 
 
+# The right glove's grip on the jar: carried on the palm, under the base (the jar is too wide to wrap from the side: the
+# fingers ended inside the glass), the fingers forward (+X: the viewer looks down +X) and the thumb to the left (-Y),
+# closing up round the foot on the jar's bounds box.
+JAR_GRIP_OUT_CM = 1.0        # the palm's thickness under the glass
+
+
+def add_jar_grip_socket(mesh=None):
+    mesh = mesh or mc._asset(F_MESH, JAR)
+    existing = mesh.find_socket(GRIP_SOCKET)
+    if existing is not None:
+        mesh.remove_socket(existing)
+    socket = unreal.StaticMeshSocket(mesh)
+    socket.set_editor_property("socket_name", GRIP_SOCKET)
+    socket.set_editor_property("relative_location", unreal.Vector(0.0, 0.0, -JAR_GRIP_OUT_CM))
+    rotation = unreal.MathLibrary.make_rot_from_xz(unreal.Vector(0.0, -1.0, 0.0), unreal.Vector(0.0, 0.0, 1.0))
+    socket.set_editor_property("relative_rotation", rotation)
+    mesh.add_socket(socket)
+    EAL.save_loaded_asset(mesh)
+    found = mesh.find_socket(GRIP_SOCKET)
+    return {"socket": GRIP_SOCKET, "location": str(found.relative_location), "rotation": str(found.relative_rotation)}
+
+
+def build_jar_meshes():
+    """PickleJar_Mars_SM (slot 0 glass, slot 1 the lid; pivot at its base; one convex hull; the Grip socket) and
+    PickleJarLiquid_Mars_SM (the liquid cylinder, pivot at its middle, wearing PickleJarBrine_Mars_MI)."""
+    if mc._in_pie():
+        raise RuntimeError("stop PIE before importing")
+    jar_obj = os.path.join(OBJ_DIR, JAR + ".obj")
+    liquid_obj = os.path.join(OBJ_DIR, JAR_LIQUID + ".obj")
+    report = {"jar_obj": write_obj(jar_obj, [("Glass", jar_strips()), ("Lid", jar_lid_strips())]),
+              "liquid_obj": write_obj(liquid_obj, [("Liquid", jar_liquid_strips())])}
+    sme = unreal.get_editor_subsystem(unreal.StaticMeshEditorSubsystem)
+    jar, stray = _import(jar_obj, JAR, (INSTANCES["PotionGlass_Mars_M"], "PickleJarLid_Mars_MI"))
+    sme.remove_collisions(jar)
+    sme.set_convex_decomposition_collisions(jar, 1, 32, 100000)
+    EAL.save_loaded_asset(jar)
+    report["grip"] = add_jar_grip_socket(jar)
+    liquid, stray2 = _import(liquid_obj, JAR_LIQUID, ("PickleJarBrine_Mars_MI",))
+    sme.remove_collisions(liquid)
+    EAL.save_loaded_asset(liquid)
+    for mesh, key in ((jar, "jar"), (liquid, "liquid")):
+        b = mesh.get_bounds()
+        report[key] = {"verts": sme.get_number_verts(mesh, 0), "slots": sme.get_number_materials(mesh),
+                       "origin": str(b.origin), "extent": str(b.box_extent)}
+    report["stray_deleted"] = stray + stray2
+    _log("pickle jar meshes: %s" % report)
+    return report
+
+
 def run_all():
-    return {"materials": build_materials(), "meshes": build_meshes()}
+    return {"materials": build_materials(), "meshes": build_meshes(), "jar": build_jar_meshes()}
 
 
 def asset_path(folder, name):
@@ -603,6 +778,15 @@ LOOKDEV_POSES = (
     ("churn", (36.0, 90.0, 0.0), (0.0, 0.0, 0.0), (0.25, 0.1), 0.55, "PotionLiquid_Mars_MI"),
 )
 
+# The pickle jars, a row behind the flasks: (label, location, rotation, surface tilt, fill, slosh, agitation); the level
+# is the fill in half-heights (2 fill - 1), as the entity script writes it for a jar.
+JAR_POSES = (
+    ("jar_full", (-30.0, 125.0, 0.0), (0.0, 0.0, 0.0), (0.0, 0.0), 0.9, 0.0, 0.0),
+    ("jar_low", (-6.0, 125.0, 0.0), (0.0, 30.0, 0.0), (0.0, 0.0), 0.55, 0.0, 0.0),
+    ("jar_tipped", (18.0, 125.0, 2.0), (0.0, 0.0, 25.0), (0.0, 0.0), 0.8, 0.0, 0.0),
+    ("jar_slosh", (42.0, 125.0, 0.0), (0.0, 0.0, 0.0), (0.2, 0.1), 0.8, 0.5, 0.7),
+)
+
 SHOTS = {
     "potion_row": ((12.0, 14.0, 16.0), (12.0, 60.0, 6.0), 70),
     "potion_upright": ((-36.0, 36.0, 10.0), (-36.0, 60.0, 6.0), 40),
@@ -617,6 +801,11 @@ SHOTS = {
     "brine_top": ((-12.0, 78.0, 24.0), (-12.0, 90.0, 6.0), 40),
     "churn_side": ((36.0, 66.0, 9.0), (36.0, 90.0, 5.0), 40),
     "churn_top": ((36.0, 76.0, 18.0), (36.0, 90.0, 5.0), 40),
+    "jar_row": ((6.0, 98.0, 20.0), (6.0, 125.0, 6.0), 70),
+    "jar_close": ((-30.0, 100.0, 9.0), (-30.0, 125.0, 8.0), 40),
+    "jar_top": ((-6.0, 105.0, 30.0), (-6.0, 125.0, 6.0), 40),
+    "jar_tipped": ((18.0, 101.0, 12.0), (18.0, 125.0, 8.0), 40),
+    "jar_slosh": ((42.0, 101.0, 14.0), (42.0, 125.0, 8.0), 40),
 }
 
 
@@ -705,6 +894,24 @@ def build_lookdev():
         slosh = {"slosh": 0.6, "churn": 0.8}.get(label, 0.0)
         agitation = {"churn": 1.0}.get(label, 0.0)
         for i, v in enumerate((n.x, n.y, n.z, level_for_fill(fill), slosh, 0.37 * len(made), agitation)):
+            c.set_custom_primitive_data_float(i, v)
+        made.append(label)
+    jar = mc._asset(F_MESH, JAR)
+    jar_liquid = mc._asset(F_MESH, JAR_LIQUID)
+    for label, loc, rot, tilt, fill, slosh, agitation in JAR_POSES:
+        ja = _spawn(unreal.StaticMeshActor, loc, rot)
+        ja.static_mesh_component.set_static_mesh(jar)
+        ja.set_actor_label("Jar_%s" % label)
+        ja.tags = [unreal.Name(LOOKDEV_TAG)]
+        centre = unreal.MathLibrary.transform_location(ja.get_actor_transform(), unreal.Vector(0.0, 0.0, JAR_LIQUID_CENTRE_CM))
+        la = _spawn(unreal.StaticMeshActor, (centre.x, centre.y, centre.z), rot)
+        la.static_mesh_component.set_static_mesh(jar_liquid)
+        la.static_mesh_component.set_cast_shadow(False)
+        la.set_actor_label("JarLiquid_%s" % label)
+        la.tags = [unreal.Name(LOOKDEV_TAG)]
+        n = unreal.Vector(tilt[0], tilt[1], 1.0).normal()
+        c = la.static_mesh_component
+        for i, v in enumerate((n.x, n.y, n.z, 2.0 * fill - 1.0, slosh, 0.23 + 0.31 * len(made), agitation)):
             c.set_custom_primitive_data_float(i, v)
         made.append(label)
     les.save_current_level()

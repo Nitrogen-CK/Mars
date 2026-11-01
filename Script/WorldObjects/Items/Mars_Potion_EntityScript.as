@@ -9,6 +9,10 @@
 // the surface on the back faces under it. Because the body is a sphere, a plane at a fixed distance from its centre holds
 // the same volume however the flask is turned, so the level is set once from the fill and only the normal moves: up, plus
 // the slosh tilt.
+//
+// A pickle jar (the look's Vessel) is the same with a cylinder: PickleJarLiquid_Mars_SM, pivot at its middle, and the plane
+// passes through the jar's axis at the fill height (the level is the fill in half-heights), which holds the volume while
+// the surface stays clear of the floor and the lid.
 
 namespace constants_potion
 {
@@ -19,7 +23,13 @@ namespace constants_potion
     // The body sphere's centre over the flask's pivot (its flat base), cm at MeshScale 1 (mars_potion_ue.BODY_CENTRE_CM).
     const float64 k_BodyCentreHeight = 4.05;
 
-    // The liquid's custom primitive data: 0-2 the surface normal (world, unit), 3 the level (radii from the centre), 4 Slosh
+    // The pickle jar's liquid cylinder, and its middle over the jar's pivot (its base), cm at MeshScale 1
+    // (mars_potion_ue.JAR_LIQUID_CENTRE_CM).
+    const FString k_JarLiquidMeshPath = "/Game/Mars/Gameplay/Items/Potion/Meshes/PickleJarLiquid_Mars_SM.PickleJarLiquid_Mars_SM";
+    const float64 k_JarLiquidCentreHeight = 4.5;
+
+    // The liquid's custom primitive data: 0-2 the surface normal (world, unit), 3 the level (radii from the centre; a jar's
+    // in half-heights), 4 Slosh
     // (0..1, the ripples' energy), 5 Phase (0..1, this potion's own), 6 Agitation (0..1, the cap's breakup).
     const int32 k_Cpd_Surface = 0;
     const int32 k_Cpd_Slosh = 4;
@@ -77,7 +87,8 @@ class UMars_Potion_EntityScript : UMars_WorldItem_EntityScript
     {
         _Self = InHandle;
         const auto Flow = Super::DoConstruct(InHandle);
-        _Level = Get_LevelForFill(Get_Look().Fill);
+        const auto Look = Get_Look();
+        _Level = Look.Vessel == EMars_PotionVessel::Jar ? Math::Clamp(Look.Fill, 0.0f, 1.0f) * 2.0f - 1.0f : Get_LevelForFill(Look.Fill);
         return Flow;
     }
 
@@ -112,15 +123,18 @@ class UMars_Potion_EntityScript : UMars_WorldItem_EntityScript
         return FMars_PotionLook();
     }
 
-    // The liquid hangs from the item's root at the body's centre, at the flask's scale (the root is unit scale; the
-    // Presentation's MeshScale lives on the flask's component). Headless, there is nothing to slosh.
+    // The liquid hangs from the item's root at the body's centre (the jar's middle), at the vessel's scale (the root is
+    // unit scale; the Presentation's MeshScale lives on the vessel's component). Headless, there is nothing to slosh.
     protected void DoOnVisualMeshAdded(UStaticMeshComponent InMesh) override
     {
         if (FApp::CanEverRender() == false)
         { return; }
 
-        UStaticMesh Mesh = System::LoadAsset_Blocking(TSoftObjectPtr<UStaticMesh>(FSoftObjectPath(constants_potion::k_LiquidMeshPath)));
-        auto MaterialPath = Get_Look().LiquidMaterial;
+        const auto Look = Get_Look();
+        const auto IsJar = Look.Vessel == EMars_PotionVessel::Jar;
+        UStaticMesh Mesh = System::LoadAsset_Blocking(TSoftObjectPtr<UStaticMesh>(FSoftObjectPath(
+            IsJar ? constants_potion::k_JarLiquidMeshPath : constants_potion::k_LiquidMeshPath)));
+        auto MaterialPath = Look.LiquidMaterial;
         if (MaterialPath.IsNull())
         { MaterialPath = TSoftObjectPtr<UMaterialInterface>(FSoftObjectPath(constants_potion::k_LiquidMaterialPath)); }
         UMaterialInterface Material = System::LoadAsset_Blocking(MaterialPath);
@@ -129,7 +143,8 @@ class UMars_Potion_EntityScript : UMars_WorldItem_EntityScript
         { return; }
 
         const auto Scale = InMesh.GetWorldScale();
-        auto Part = FMars_MeshPart(FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, constants_potion::k_BodyCentreHeight * Scale.Z), Scale),
+        const auto CentreHeight = IsJar ? constants_potion::k_JarLiquidCentreHeight : constants_potion::k_BodyCentreHeight;
+        auto Part = FMars_MeshPart(FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, CentreHeight * Scale.Z), Scale),
             Mesh, Material, collision::profile::NoCollision, n"Potion_Liquid");
         Part.CastShadow = false;
         Part.ReceivesDecals = false;

@@ -18,7 +18,7 @@ class UMars_Gameplay_CheatManager : UCheatManager
         Character.Request_Strike(FMars_Request_HandSwing_Start(utils_hand_swing::Make_ChopArc(), InImpactSeconds, InRecoverySeconds));
     }
 
-    // Puts one sandbox item (Rock, Ration, Cog, Backpack, Cleaver, Tenderizer, Pan, Lantern, Tallow, Torch, Potion, BoilingPotion, Brine) into the local player's selected
+    // Puts one sandbox item (Rock, Ration, Cog, Backpack, Cleaver, Tenderizer, Pan, Lantern, Tallow, Torch, Potion, BoilingPotion, Brine, PickleJar) into the local player's selected
     // hotbar slot, so a held item can be tested without finding one in the level.
     UFUNCTION(Exec)
     void Mars_Give(FString InItemName)
@@ -41,6 +41,7 @@ class UMars_Gameplay_CheatManager : UCheatManager
         else if (InItemName == "Potion") { Definition = mars_items::Potion(); }
         else if (InItemName == "BoilingPotion") { Definition = mars_items::BoilingPotion(); }
         else if (InItemName == "Brine") { Definition = mars_items::Brine(); }
+        else if (InItemName == "PickleJar") { Definition = mars_items::PickleJar(); }
         // Foods: the bench takes whole meat (MeatSlab); the batter station takes the whole fryables.
         else if (InItemName == "MeatSlab") { Definition = mars_items::Food_MeatSlab(); }
         else if (InItemName == "MushroomSlice") { Definition = mars_items::Food_MushroomSlice(); }
