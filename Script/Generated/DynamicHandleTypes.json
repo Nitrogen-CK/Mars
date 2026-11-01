@@ -541,6 +541,15 @@
 			]
 		},
 		{
+			"TypeName": "FCk_Handle_PickleMimic",
+			"ShortName": "PickleMimic",
+			"Description": "The pickle-jar mimic: a jar that sits disguised, stands up on four floating feet (a diagonal trot) to chase, and bites with its hinged lid",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_PickleMimicHandle",
+			"RequiredFragments": [
+				"Mars_Feature_PickleMimic"
+			]
+		},
+		{
 			"TypeName": "FCk_Handle_Platter",
 			"ShortName": "Platter",
 			"Description": "A tray of food: a ledger of FoodPiece handles dropped between its walls, settled with physics and frozen into a pile that rides the platter root",

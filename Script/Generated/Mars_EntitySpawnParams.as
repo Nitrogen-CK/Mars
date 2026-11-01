@@ -8315,6 +8315,71 @@ namespace UMars_AutoTest_Pendulum_SinkPowerGatesTheSwing
 }
 
 USTRUCT()
+struct FMars_AutoTest_PickleMimic_BitesATargetInReach_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_PickleMimic_BitesATargetInReach
+{
+    FMars_AutoTest_PickleMimic_BitesATargetInReach_SpawnParams Params()
+    {
+        return FMars_AutoTest_PickleMimic_BitesATargetInReach_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_PickleMimic_DiesAndSitsDown_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_PickleMimic_DiesAndSitsDown
+{
+    FMars_AutoTest_PickleMimic_DiesAndSitsDown_SpawnParams Params()
+    {
+        return FMars_AutoTest_PickleMimic_DiesAndSitsDown_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_PickleMimic_ReturnsHomeAndSitsBackDown_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_PickleMimic_ReturnsHomeAndSitsBackDown
+{
+    FMars_AutoTest_PickleMimic_ReturnsHomeAndSitsBackDown_SpawnParams Params()
+    {
+        return FMars_AutoTest_PickleMimic_ReturnsHomeAndSitsBackDown_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_PickleMimic_SitsDisguisedUntilATargetComesNear_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_PickleMimic_SitsDisguisedUntilATargetComesNear
+{
+    FMars_AutoTest_PickleMimic_SitsDisguisedUntilATargetComesNear_SpawnParams Params()
+    {
+        return FMars_AutoTest_PickleMimic_SitsDisguisedUntilATargetComesNear_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_PickleMimic_TrotsOnDiagonalPairs_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_PickleMimic_TrotsOnDiagonalPairs
+{
+    FMars_AutoTest_PickleMimic_TrotsOnDiagonalPairs_SpawnParams Params()
+    {
+        return FMars_AutoTest_PickleMimic_TrotsOnDiagonalPairs_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_PlacedPickup_BackpackKeepsItsCargoAndIdentityAcrossPickupAndDrop_SpawnParams
 {
 }
@@ -15525,6 +15590,43 @@ namespace UMars_Pendulum_EntityScript
 }
 
 USTRUCT()
+struct FMars_PickleMimic_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_PickleMimic_Spec Spec;
+
+    UPROPERTY()
+    bool WithVisuals = true;
+
+    UPROPERTY()
+    bool DebugDraw = false;
+
+    FMars_PickleMimic_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_PickleMimic_Spec InSpec, bool InWithVisuals, bool InDebugDraw)
+    {
+        SpawnTransform = InSpawnTransform;
+        Spec = InSpec;
+        WithVisuals = InWithVisuals;
+        DebugDraw = InDebugDraw;
+    }
+}
+
+namespace UMars_PickleMimic_EntityScript
+{
+    FMars_PickleMimic_EntityScript_SpawnParams Params()
+    {
+        return FMars_PickleMimic_EntityScript_SpawnParams();
+    }
+
+    FMars_PickleMimic_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_PickleMimic_Spec InSpec, bool InWithVisuals, bool InDebugDraw)
+    {
+        return FMars_PickleMimic_EntityScript_SpawnParams(InSpawnTransform, InSpec, InWithVisuals, InDebugDraw);
+    }
+}
+
+USTRUCT()
 struct FMars_PlacedPickup_EntityScript_SpawnParams
 {
     UPROPERTY()
@@ -18642,6 +18744,123 @@ namespace UMars_SmCondition_NoMoveIntent
 }
 
 USTRUCT()
+struct FMars_SmCondition_PickleMimic_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_PickleMimic
+{
+    FMars_SmCondition_PickleMimic_SpawnParams Params()
+    {
+        return FMars_SmCondition_PickleMimic_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmCondition_PickleMimic_ActionDone_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_PickleMimic_ActionDone
+{
+    FMars_SmCondition_PickleMimic_ActionDone_SpawnParams Params()
+    {
+        return FMars_SmCondition_PickleMimic_ActionDone_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmCondition_PickleMimic_AtHome_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_PickleMimic_AtHome
+{
+    FMars_SmCondition_PickleMimic_AtHome_SpawnParams Params()
+    {
+        return FMars_SmCondition_PickleMimic_AtHome_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmCondition_PickleMimic_CanBite_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_PickleMimic_CanBite
+{
+    FMars_SmCondition_PickleMimic_CanBite_SpawnParams Params()
+    {
+        return FMars_SmCondition_PickleMimic_CanBite_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmCondition_PickleMimic_HasTarget_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_PickleMimic_HasTarget
+{
+    FMars_SmCondition_PickleMimic_HasTarget_SpawnParams Params()
+    {
+        return FMars_SmCondition_PickleMimic_HasTarget_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmCondition_PickleMimic_IsDead_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_PickleMimic_IsDead
+{
+    FMars_SmCondition_PickleMimic_IsDead_SpawnParams Params()
+    {
+        return FMars_SmCondition_PickleMimic_IsDead_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmCondition_PickleMimic_IsStanding_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_PickleMimic_IsStanding
+{
+    FMars_SmCondition_PickleMimic_IsStanding_SpawnParams Params()
+    {
+        return FMars_SmCondition_PickleMimic_IsStanding_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmCondition_PickleMimic_NoTarget_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_PickleMimic_NoTarget
+{
+    FMars_SmCondition_PickleMimic_NoTarget_SpawnParams Params()
+    {
+        return FMars_SmCondition_PickleMimic_NoTarget_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmCondition_PickleMimic_TargetNear_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_PickleMimic_TargetNear
+{
+    FMars_SmCondition_PickleMimic_TargetNear_SpawnParams Params()
+    {
+        return FMars_SmCondition_PickleMimic_TargetNear_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_SmCondition_SprintEnds_SpawnParams
 {
 }
@@ -19652,6 +19871,97 @@ namespace UMars_SmState_Operating
     FMars_SmState_Operating_SpawnParams Params()
     {
         return FMars_SmState_Operating_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmState_PickleMimic_Alive_SpawnParams
+{
+}
+
+namespace UMars_SmState_PickleMimic_Alive
+{
+    FMars_SmState_PickleMimic_Alive_SpawnParams Params()
+    {
+        return FMars_SmState_PickleMimic_Alive_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmState_PickleMimic_Bite_SpawnParams
+{
+}
+
+namespace UMars_SmState_PickleMimic_Bite
+{
+    FMars_SmState_PickleMimic_Bite_SpawnParams Params()
+    {
+        return FMars_SmState_PickleMimic_Bite_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmState_PickleMimic_Dead_SpawnParams
+{
+}
+
+namespace UMars_SmState_PickleMimic_Dead
+{
+    FMars_SmState_PickleMimic_Dead_SpawnParams Params()
+    {
+        return FMars_SmState_PickleMimic_Dead_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmState_PickleMimic_Disguised_SpawnParams
+{
+}
+
+namespace UMars_SmState_PickleMimic_Disguised
+{
+    FMars_SmState_PickleMimic_Disguised_SpawnParams Params()
+    {
+        return FMars_SmState_PickleMimic_Disguised_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmState_PickleMimic_Hunt_SpawnParams
+{
+}
+
+namespace UMars_SmState_PickleMimic_Hunt
+{
+    FMars_SmState_PickleMimic_Hunt_SpawnParams Params()
+    {
+        return FMars_SmState_PickleMimic_Hunt_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmState_PickleMimic_Return_SpawnParams
+{
+}
+
+namespace UMars_SmState_PickleMimic_Return
+{
+    FMars_SmState_PickleMimic_Return_SpawnParams Params()
+    {
+        return FMars_SmState_PickleMimic_Return_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmState_PickleMimic_Waking_SpawnParams
+{
+}
+
+namespace UMars_SmState_PickleMimic_Waking
+{
+    FMars_SmState_PickleMimic_Waking_SpawnParams Params()
+    {
+        return FMars_SmState_PickleMimic_Waking_SpawnParams();
     }
 }
 
@@ -21069,6 +21379,97 @@ namespace UMars_SmTask_PerformInteractionSubSm
     FMars_SmTask_PerformInteractionSubSm_SpawnParams Params()
     {
         return FMars_SmTask_PerformInteractionSubSm_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_PickleMimic_BehaviorSubSm_SpawnParams
+{
+}
+
+namespace UMars_SmTask_PickleMimic_BehaviorSubSm
+{
+    FMars_SmTask_PickleMimic_BehaviorSubSm_SpawnParams Params()
+    {
+        return FMars_SmTask_PickleMimic_BehaviorSubSm_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_PickleMimic_Bite_SpawnParams
+{
+}
+
+namespace UMars_SmTask_PickleMimic_Bite
+{
+    FMars_SmTask_PickleMimic_Bite_SpawnParams Params()
+    {
+        return FMars_SmTask_PickleMimic_Bite_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_PickleMimic_Die_SpawnParams
+{
+}
+
+namespace UMars_SmTask_PickleMimic_Die
+{
+    FMars_SmTask_PickleMimic_Die_SpawnParams Params()
+    {
+        return FMars_SmTask_PickleMimic_Die_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_PickleMimic_Disguise_SpawnParams
+{
+}
+
+namespace UMars_SmTask_PickleMimic_Disguise
+{
+    FMars_SmTask_PickleMimic_Disguise_SpawnParams Params()
+    {
+        return FMars_SmTask_PickleMimic_Disguise_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_PickleMimic_Hunt_SpawnParams
+{
+}
+
+namespace UMars_SmTask_PickleMimic_Hunt
+{
+    FMars_SmTask_PickleMimic_Hunt_SpawnParams Params()
+    {
+        return FMars_SmTask_PickleMimic_Hunt_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_PickleMimic_Return_SpawnParams
+{
+}
+
+namespace UMars_SmTask_PickleMimic_Return
+{
+    FMars_SmTask_PickleMimic_Return_SpawnParams Params()
+    {
+        return FMars_SmTask_PickleMimic_Return_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_PickleMimic_Wake_SpawnParams
+{
+}
+
+namespace UMars_SmTask_PickleMimic_Wake
+{
+    FMars_SmTask_PickleMimic_Wake_SpawnParams Params()
+    {
+        return FMars_SmTask_PickleMimic_Wake_SpawnParams();
     }
 }
 
