@@ -4,7 +4,7 @@
 	"_meta":
 	{
 		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
-		"sourceHash": "5fbf033647b160994475d2f829e8e248",
+		"sourceHash": "18d47b4aafd11472700031e12954a769",
 		"exporterVersion": 3
 	},
 	"parentChain": [
@@ -35,7 +35,7 @@
 			{
 				"id": 0,
 				"class": "VertexColor",
-				"name": "MaterialExpressionVertexColor_1",
+				"name": "MaterialExpressionVertexColor_0",
 				"outputs": [
 					"None",
 					"None",
@@ -47,7 +47,7 @@
 			{
 				"id": 1,
 				"class": "VectorParameter",
-				"name": "MaterialExpressionVectorParameter_1",
+				"name": "MaterialExpressionVectorParameter_0",
 				"outputs": [
 					"RGB",
 					"R",
@@ -65,7 +65,7 @@
 			{
 				"id": 2,
 				"class": "Multiply",
-				"name": "MaterialExpressionMultiply_4",
+				"name": "MaterialExpressionMultiply_0",
 				"inputs": [
 					{
 						"index": 0,
@@ -86,7 +86,7 @@
 			{
 				"id": 3,
 				"class": "ScalarParameter",
-				"name": "MaterialExpressionScalarParameter_5",
+				"name": "MaterialExpressionScalarParameter_0",
 				"props":
 				{
 					"DefaultValue": 0.059999998658895493,
@@ -96,7 +96,7 @@
 			{
 				"id": 4,
 				"class": "Multiply",
-				"name": "MaterialExpressionMultiply_5",
+				"name": "MaterialExpressionMultiply_1",
 				"inputs": [
 					{
 						"index": 0,
@@ -115,12 +115,12 @@
 			{
 				"id": 5,
 				"class": "TwoSidedSign",
-				"name": "MaterialExpressionTwoSidedSign_1"
+				"name": "MaterialExpressionTwoSidedSign_0"
 			},
 			{
 				"id": 6,
 				"class": "ConstantBiasScale",
-				"name": "MaterialExpressionConstantBiasScale_1",
+				"name": "MaterialExpressionConstantBiasScale_0",
 				"inputs": [
 					{
 						"index": 0,
@@ -133,7 +133,7 @@
 			{
 				"id": 7,
 				"class": "LinearInterpolate",
-				"name": "MaterialExpressionLinearInterpolate_1",
+				"name": "MaterialExpressionLinearInterpolate_0",
 				"inputs": [
 					{
 						"index": 0,
@@ -158,7 +158,7 @@
 			{
 				"id": 8,
 				"class": "ScalarParameter",
-				"name": "MaterialExpressionScalarParameter_6",
+				"name": "MaterialExpressionScalarParameter_1",
 				"props":
 				{
 					"ParameterName": "Emissive"
@@ -167,7 +167,7 @@
 			{
 				"id": 9,
 				"class": "ScalarParameter",
-				"name": "MaterialExpressionScalarParameter_7",
+				"name": "MaterialExpressionScalarParameter_2",
 				"props":
 				{
 					"DefaultValue": 1,
@@ -178,7 +178,7 @@
 			{
 				"id": 10,
 				"class": "Multiply",
-				"name": "MaterialExpressionMultiply_6",
+				"name": "MaterialExpressionMultiply_2",
 				"inputs": [
 					{
 						"index": 0,
@@ -198,7 +198,7 @@
 			{
 				"id": 11,
 				"class": "Multiply",
-				"name": "MaterialExpressionMultiply_7",
+				"name": "MaterialExpressionMultiply_3",
 				"inputs": [
 					{
 						"index": 0,
@@ -217,7 +217,7 @@
 			{
 				"id": 12,
 				"class": "ScalarParameter",
-				"name": "MaterialExpressionScalarParameter_8",
+				"name": "MaterialExpressionScalarParameter_3",
 				"props":
 				{
 					"DefaultValue": 0.75,
@@ -227,7 +227,7 @@
 			{
 				"id": 13,
 				"class": "ScalarParameter",
-				"name": "MaterialExpressionScalarParameter_9",
+				"name": "MaterialExpressionScalarParameter_4",
 				"props":
 				{
 					"DefaultValue": 0.34999999403953552,

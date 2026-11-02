@@ -4,7 +4,7 @@
 	"_meta":
 	{
 		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
-		"sourceHash": "c78dab56c4b35960dd09da72e30b5363",
+		"sourceHash": "5e0648207ade83d513640f0141a47a9a",
 		"exporterVersion": 3
 	},
 	"blendMode": "BLEND_Opaque",
@@ -32,12 +32,12 @@
 			{
 				"id": 0,
 				"class": "TextureCoordinate",
-				"name": "MaterialExpressionTextureCoordinate_0"
+				"name": "MaterialExpressionTextureCoordinate_1"
 			},
 			{
 				"id": 1,
 				"class": "ComponentMask",
-				"name": "MaterialExpressionComponentMask_0",
+				"name": "MaterialExpressionComponentMask_1",
 				"inputs": [
 					{
 						"index": 0,
@@ -54,7 +54,7 @@
 			{
 				"id": 2,
 				"class": "ScalarParameter",
-				"name": "MaterialExpressionScalarParameter_2",
+				"name": "MaterialExpressionScalarParameter_0",
 				"props":
 				{
 					"DefaultValue": 0.80000001192092896,
@@ -64,7 +64,7 @@
 			{
 				"id": 3,
 				"class": "Power",
-				"name": "MaterialExpressionPower_0",
+				"name": "MaterialExpressionPower_1",
 				"inputs": [
 					{
 						"index": 0,
@@ -77,7 +77,7 @@
 			{
 				"id": 4,
 				"class": "LinearInterpolate",
-				"name": "MaterialExpressionLinearInterpolate_0",
+				"name": "MaterialExpressionLinearInterpolate_1",
 				"inputs": [
 					{
 						"index": 0,
@@ -104,7 +104,7 @@
 			{
 				"id": 5,
 				"class": "VectorParameter",
-				"name": "MaterialExpressionVectorParameter_0",
+				"name": "MaterialExpressionVectorParameter_2",
 				"outputs": [
 					"RGB",
 					"R",
@@ -122,7 +122,7 @@
 			{
 				"id": 6,
 				"class": "VectorParameter",
-				"name": "MaterialExpressionVectorParameter_1",
+				"name": "MaterialExpressionVectorParameter_3",
 				"outputs": [
 					"RGB",
 					"R",
@@ -140,7 +140,7 @@
 			{
 				"id": 7,
 				"class": "VertexColor",
-				"name": "MaterialExpressionVertexColor_1",
+				"name": "MaterialExpressionVertexColor_0",
 				"outputs": [
 					"None",
 					"None",
@@ -152,7 +152,7 @@
 			{
 				"id": 8,
 				"class": "Multiply",
-				"name": "MaterialExpressionMultiply_1",
+				"name": "MaterialExpressionMultiply_0",
 				"inputs": [
 					{
 						"index": 0,
@@ -172,7 +172,7 @@
 			{
 				"id": 9,
 				"class": "ScalarParameter",
-				"name": "MaterialExpressionScalarParameter_3",
+				"name": "MaterialExpressionScalarParameter_1",
 				"props":
 				{
 					"DefaultValue": 0.85000002384185791,
@@ -182,7 +182,7 @@
 			{
 				"id": 10,
 				"class": "ScalarParameter",
-				"name": "MaterialExpressionScalarParameter_4",
+				"name": "MaterialExpressionScalarParameter_5",
 				"props":
 				{
 					"DefaultValue": 0.30000001192092896,

@@ -1,5 +1,4 @@
-"""Mars Root Maw pieces: the rigid static meshes the Root Maw (a turnip plant monster) is drawn with, cut from Stephen's
-supplied model (a Tripo low-poly FBX, 28 textured parts, 2026-11-01), plus the procedural root shapes its Niagara trail
+"""Mars Root Maw pieces: the meshes the Root Maw (a turnip plant monster) is drawn with, made from Stephen's supplied model (a Tripo low-poly FBX, 28 textured parts, 2026-11-01), plus the procedural root shapes its Niagara trail
 grows, as a re-runnable headless Blender 5.2 build, the way build_pickle_mimic_pieces.py builds the pickle mimic.
 
 The look is Stephen's concept (2026-11-02): a faceted turnip bulb, pink/purple on top and cream below, a crown of big green
@@ -18,20 +17,24 @@ particle's colour, not the mesh's vertex colours, so RootMawRoot_Mars_M grades b
 Every piece is in UNREAL cm in its own frame (+X the maw's direction, +Y right, +Z up); the source is turned to face +X,
 scaled by SIZE and moved so the bulb's axis stands on the origin, the ground (where the roots met it) at z 0. Pieces:
 
-  RootMaw_Lower_Mars_SM    the body below the mouth's corners (CUT_Z): the bulb's cream underside, the lower lip and its
-                           teeth, the skirt of leaves. Origin: the ground under the bulb's axis.
-  RootMaw_Upper_Mars_SM    the body above CUT_Z: the bulb's pink top, the upper lip and its teeth, the crown of leaves. Pivot
-                           at the HINGE on the back of the bulb (+X toward the maw): the jaw turns about its +Y axis (a
-                           positive pitch in Unreal lifts it), JAW_SHUT_DEG (teeth meeting) .. JAW_WIDE_DEG (gaping); 0 is
-                           the model's own mouth (JawOpen JAW_REST).
-  RootMaw_Throat_Mars_SM   the black cavity behind the teeth with the eyes on it (slot RootMawEye: the glow), body frame;
-                           it stays with the lower body, so the eyes hold still in the gaping maw.
+  RootMaw_Head_Mars_SKM    the whole head as ONE skinned mesh on two bones (a first cut split it into rigid upper and
+                           lower pieces at the mouth's corners; Stephen 2026-11-02: the opening "looks like its tearing
+                           ... its not skinned or modelled for a binary open/close"): the bulb, the lips and their teeth,
+                           the crown and the skirt of leaves. Bones: `root` at the origin (the ground under the bulb) and
+                           `jaw` at the HINGE on the back of the bulb (+X toward the maw), turning about its +Y (a
+                           positive pitch in Unreal lifts it), JAW_SHUT_DEG (teeth meeting) .. JAW_WIDE_DEG (gaping); its
+                           rest is the model's own mouth (JawOpen JAW_REST). Weights (jaw_weight): the crown rides the jaw,
+                           the skirt the root; the lips blend over LIP_BAND at the mouth's corners (CUT_Z); the bulb blends
+                           over a band BULB_BAND wide at the back by the hinge narrowing toward the maw, so its sides
+                           stretch like cheeks as it gapes instead of tearing.
+  RootMaw_Throat_Mars_SM   the black cavity behind the teeth with the eyes on it (slot RootMawEye: the glow), body frame,
+                           rigid and unskinned: the eyes hold still in the gaping maw.
   RootMaw_Root0..3_Mars_SM four procedural roots (ROOT_SPECS): a faceted six-sided tube tapering along a curve that
                            comes up out of the ground at the pivot (the origin, on the ground), arches outward along +X
                            and dips back into the ground at its tip, some forked. Grown from scale 0 about the pivot it
                            pushes out of the ground and reaches outward.
 
-Material slots (Unreal binds <Slot>_Mars_MI): RootMawSkin (vertex colour, two-sided: the cut bulb shows its dark inside),
+Material slots (Unreal binds <Slot>_Mars_MI): RootMawSkin (vertex colour, two-sided: the bulb's inside shows dark),
 RootMawEye (vertex colour x Emissive x Glow, custom primitive data 0), RootMawRoot (the roots: base -> tip colour from UV0.x,
 for Niagara mesh particles).
 
@@ -39,9 +42,10 @@ Run:
   blender -b --factory-startup --python build_root_maw_pieces.py -- [--export] [--sheets] [--save]
     --export   one FBX and a .json sidecar per piece into EXPORT_DIR, the rest layout JSON,
                then a re-import check of every FBX
-    --sheets   review renders into REVIEW_DIR: every piece alone (front / side / top / iso), the assembled Maw at rest, gaping,
+    --sheets   review renders into REVIEW_DIR: every piece alone (front / side / top / iso), the jaw sheet (the skinned head
+               shut, at rest, half open and gaping, from the 3/4 front and the side), the assembled Maw at rest, gaping,
                shut and buried, and the root trail as the particles would grow it
-    --save     BLEND_FILE (the pieces at the origin + the posed previews)
+    --save     BLEND_FILE (the pieces and the head's rig at the origin + the posed previews)
 Prints ROOT_MAW_PIECES_OK when every check passed (ROOT_MAW_PIECES_FAIL + the reasons otherwise).
 """
 import json
@@ -71,7 +75,7 @@ ROOTS = (7, 9, 10, 11, 12, 17, 19, 22, 23, 24, 25, 26, 27)   # dropped; 7 is the
 
 # ---------------------------------------------------------------- the body (Unreal cm; origin = the ground under the bulb)
 SIZE = 1.3                                          # the source stands 1 m (roots to leaf tip): the Maw stands 130 cm
-CUT_Z = 57.5                                        # the mouth's corners: above is the jaw, below the body
+CUT_Z = 57.5                                        # the mouth's corners: the jaw's skin blends across this height
 HINGE = np.array([-27.0, 0.0, CUT_Z])               # on the back of the bulb (its back is x -29.5)
 JAW_SHUT_DEG = -10.0                                # the teeth meet (the jaw turns down about the hinge)
 JAW_WIDE_DEG = 32.0                                 # gaping
@@ -80,7 +84,13 @@ BURY_DROP = 78.0                                    # buried: only the bulb's pi
 BITE_MOUTH = np.array([40.0, 0.0, CUT_Z])           # the maw's front edge: the bite's blow centre
 EYE_LUMA = 0.45                                     # a throat face this bright (sRGB luma) is an eye
 
-TRIS_MAX = {"Lower": 6000, "Upper": 9600, "Throat": 800}
+# The jaw's weights: the lips blend over +-LIP_BAND cm about CUT_Z; the bulb over +-BULB_BAND (back, front) cm, the band
+# narrowing from the hinge (x HINGE) to BULB_BAND_FRONT_X.
+LIP_BAND = 3.0
+BULB_BAND = (14.0, 6.0)
+BULB_BAND_FRONT_X = 28.0
+BONES = ("root", "jaw")
+TRIS_MAX = {"Head": 15000, "Throat": 800}
 ROOT_TRIS_MAX = 600
 # The particle roots (Unreal cm, pivot on the ground, +X outward): length along X, the arch's height, where the tip ends
 # (below 0: back into the ground), the base and tip radii, the sideways wander, and forks (where along the root, the yaw off
@@ -97,7 +107,8 @@ ROOT_BASE_DEPTH = 2.5                               # the base starts this far u
 # base -> tip colours (sRGB), the concept's wooden roots; RootMawRoot_Mars_M carries the same numbers (linear)
 ROOT_BASE_SRGB = (74, 46, 28)
 ROOT_TIP_SRGB = (198, 140, 82)
-PIECES = ("Lower", "Upper", "Throat")
+PIECES = ("Throat",)                                 # rigid static meshes (the Head is skinned: HEAD)
+HEAD = "Head"
 ROOT_NAMES = tuple("Root%d" % k for k in range(len(ROOT_SPECS)))
 SLOTS = ("RootMawSkin", "RootMawEye", "RootMawRoot")
 PREVIEW = {"RootMawSkin": ((0.6, 0.5, 0.4), 0.7, 0.0), "RootMawEye": ((1.0, 0.8, 0.35), 0.4, 6.0)}
@@ -105,7 +116,7 @@ MIRROR = np.diag([1.0, -1.0, 1.0])
 
 
 def piece_name(part):
-    return "RootMaw_%s_Mars_SM" % part
+    return "RootMaw_%s_Mars_SKM" % part if part == HEAD else "RootMaw_%s_Mars_SM" % part
 
 
 # ---------------------------------------------------------------- CLI / scene
@@ -218,9 +229,10 @@ class Geo:
     """Faces gathered from source parts: Blender-metre vertices, per-face slot and sRGB colour, per-corner UVs."""
 
     def __init__(self):
-        self.v, self.f, self.s, self.c, self.uv = [], [], [], [], []
+        self.v, self.f, self.s, self.c, self.uv, self.w = [], [], [], [], [], []
 
-    def add(self, obj, faces, slots, colours, offset=(0.0, 0.0, 0.0), matrix=None):
+    def add(self, obj, faces, slots, colours, offset=(0.0, 0.0, 0.0), matrix=None, weight=None):
+        """weight: Unreal cm position -> the vertex's jaw weight (0 when None)."""
         me = obj.data
         co = np.array([v.co[:] for v in me.vertices]) - np.asarray(offset, float)
         if matrix is not None:
@@ -234,6 +246,7 @@ class Geo:
                 if vi not in remap:
                     remap[vi] = len(self.v)
                     self.v.append(co[vi])
+                    self.w.append(0.0 if weight is None else float(weight(_ue_to_bl(co[vi]) * 100.0)))
                 idx.append(remap[vi])
             self.f.append(idx)
             self.s.append(slots[k] if isinstance(slots, (list, tuple)) else slots)
@@ -241,8 +254,9 @@ class Geo:
             self.uv.append([tuple(uvl[li].uv) if uvl else (0.0, 0.0) for li in p.loop_indices])
 
 
-def to_object(name, geo, slot_order):
-    """A flat-shaded triangulated mesh object at the origin: the used slots in slot_order, UVMap from the source, "Col"."""
+def to_object(name, geo, slot_order, skinned=False):
+    """A flat-shaded triangulated mesh object at the origin: the used slots in slot_order, UVMap from the source, "Col";
+    skinned, vertex groups `root` / `jaw` from geo.w (the jaw's weight; bmesh keeps them through the triangulation)."""
     mesh = bpy.data.meshes.new(name)
     mesh.from_pydata(np.asarray(geo.v, float).tolist(), [], geo.f)
     used = [s for s in slot_order if s in set(geo.s)]
@@ -254,6 +268,13 @@ def to_object(name, geo, slot_order):
     obj = bpy.data.objects.new(name, mesh)
     bpy.context.scene.collection.objects.link(obj)
     paint(obj, np.asarray(geo.c, float))
+    if skinned:
+        groups = {b: obj.vertex_groups.new(name=b) for b in BONES}
+        for i, w in enumerate(geo.w):
+            if w < 1.0:
+                groups["root"].add([i], 1.0 - w, "REPLACE")
+            if w > 0.0:
+                groups["jaw"].add([i], w, "REPLACE")
     bm = bmesh.new()
     bm.from_mesh(mesh)
     bmesh.ops.triangulate(bm, faces=bm.faces[:], quad_method="BEAUTY", ngon_method="BEAUTY")
@@ -297,32 +318,96 @@ def face_centres(obj):
     return c.reshape(-1, 3) * 100.0
 
 
+def _smooth(e0, e1, x):
+    t = min(max((x - e0) / (e1 - e0), 0.0), 1.0)
+    return t * t * (3.0 - 2.0 * t)
+
+
+def jaw_weight(part):
+    """The jaw's weight for a vertex of source part `part` at Unreal cm p (see the module docstring)."""
+    if part in CROWN:
+        return lambda p: 1.0
+    if part in SKIRT:
+        return lambda p: 0.0
+    if part == LIPS:
+        return lambda p: _smooth(CUT_Z - LIP_BAND, CUT_Z + LIP_BAND, p[2])
+
+    def bulb(p):
+        a = _smooth(HINGE[0], BULB_BAND_FRONT_X, p[0])
+        band = BULB_BAND[0] + (BULB_BAND[1] - BULB_BAND[0]) * a
+        return _smooth(CUT_Z - band, CUT_Z + band, p[2])
+    return bulb
+
+
 def build_body(parts, colours):
-    """Lower, Upper (in the hinge's frame) and Throat Geos, and what went where."""
-    lower, upper, throat = Geo(), Geo(), Geo()
-    hinge_bl = _ue_to_bl(HINGE) * 0.01
+    """The Head (uncut, with its jaw weights) and Throat Geos, and what went where."""
+    head, throat = Geo(), Geo()
     split = {}
-    for idx in (LIPS, BULB):
+    for idx in (LIPS, BULB) + CROWN + SKIRT:
         o = parts[idx]
-        z = face_centres(o)[:, 2]
-        up = [i for i in range(len(z)) if z[i] >= CUT_Z]
-        down = [i for i in range(len(z)) if z[i] < CUT_Z]
-        upper.add(o, up, "RootMawSkin", colours[idx], offset=hinge_bl)
-        lower.add(o, down, "RootMawSkin", colours[idx])
-        split[idx] = {"upper": len(up), "lower": len(down)}
-    for idx in CROWN:
-        o = parts[idx]
-        upper.add(o, range(len(o.data.polygons)), "RootMawSkin", colours[idx], offset=hinge_bl)
-    for idx in SKIRT:
-        o = parts[idx]
-        lower.add(o, range(len(o.data.polygons)), "RootMawSkin", colours[idx])
+        head.add(o, range(len(o.data.polygons)), "RootMawSkin", colours[idx], weight=jaw_weight(idx))
+    w = np.asarray(head.w)
+    split["head"] = {"verts": len(w), "jaw_only": int((w >= 1.0).sum()), "root_only": int((w <= 0.0).sum()),
+                     "blended": int(((w > 0.0) & (w < 1.0)).sum())}
     o = parts[CAVITY]
     col = colours[CAVITY]
     luma = col @ np.array([0.2126, 0.7152, 0.0722])
     eyes = [bool(l >= EYE_LUMA) for l in luma]
     throat.add(o, range(len(o.data.polygons)), ["RootMawEye" if e else "RootMawSkin" for e in eyes], col)
     split["eyes"] = int(sum(eyes))
-    return {"Lower": lower, "Upper": upper, "Throat": throat}, split
+    return {HEAD: head, "Throat": throat}, split
+
+
+# ---------------------------------------------------------------- the head's rig
+def build_rig(head):
+    """The head's armature (`root` at the origin, `jaw` at HINGE pointing +X, child of root), the head parented to it with
+    an Armature modifier."""
+    arm_data = bpy.data.armatures.new("RootMaw_Head_Rig")
+    arm = bpy.data.objects.new("RootMaw_Head_Rig", arm_data)
+    bpy.context.scene.collection.objects.link(arm)
+    view = bpy.context.view_layer
+    for o in bpy.context.scene.objects:
+        o.select_set(False)
+    arm.select_set(True)
+    view.objects.active = arm
+    bpy.ops.object.mode_set(mode="EDIT")
+    try:
+        root = arm_data.edit_bones.new("root")
+        root.head = (0.0, 0.0, 0.0)
+        root.tail = tuple(_ue_to_bl((0.0, 0.0, 10.0)) * 0.01)
+        jaw = arm_data.edit_bones.new("jaw")
+        jaw.head = tuple(_ue_to_bl(HINGE) * 0.01)
+        jaw.tail = tuple(_ue_to_bl(HINGE + np.array([20.0, 0.0, 0.0])) * 0.01)
+        jaw.roll = 0.0
+        jaw.parent = root
+    finally:
+        bpy.ops.object.mode_set(mode="OBJECT")
+    head.parent = arm
+    mod = head.modifiers.new("Armature", "ARMATURE")
+    mod.object = arm
+    return arm
+
+
+def set_jaw(arm, jaw_open):
+    """Poses the jaw at JawOpen jaw_open (its rest is the model's mouth): a turn about the frame's Y that lifts +X."""
+    pb = arm.pose.bones["jaw"]
+    pb.rotation_mode = "QUATERNION"
+    world = Matrix.Rotation(math.radians(-(jaw_degrees(jaw_open))), 3, "Y")
+    rest = arm.data.bones["jaw"].matrix_local.to_3x3()
+    pb.rotation_quaternion = (rest.inverted() @ world @ rest).to_quaternion()
+    bpy.context.view_layer.update()
+
+
+def baked_head(objs, name, jaw_open):
+    """A static copy of the skinned head posed at jaw_open (the rig goes back to rest)."""
+    arm = objs["_rig"]
+    set_jaw(arm, jaw_open)
+    dg = bpy.context.evaluated_depsgraph_get()
+    mesh = bpy.data.meshes.new_from_object(objs[HEAD].evaluated_get(dg), preserve_all_data_layers=True, depsgraph=dg)
+    o = bpy.data.objects.new(name, mesh)
+    bpy.context.scene.collection.objects.link(o)
+    set_jaw(arm, JAW_REST)
+    return o
 
 
 def _root_curve(spec, n):
@@ -456,6 +541,76 @@ def export_fbx(obj, extra=None):
     return path
 
 
+def export_head(arm, head, extra=None):
+    """RootMaw_Head_Mars_SKM.fbx: the rig (renamed `Armature` for the export, so Unreal drops that node and `root` is the
+    skeleton's root) and the skinned head, at rest; plus its .json sidecar."""
+    os.makedirs(EXPORT_DIR, exist_ok=True)
+    path = os.path.join(EXPORT_DIR, head.name + ".fbx")
+    other = bpy.data.objects.get("Armature")
+    name = arm.name
+    if other is not None and other is not arm:
+        other.name = "__root_maw_other_armature"
+    set_jaw(arm, JAW_REST)
+    try:
+        arm.name = "Armature"
+        for o in bpy.context.scene.objects:
+            o.select_set(o in (arm, head))
+        bpy.context.view_layer.objects.active = arm
+        bpy.ops.export_scene.fbx(filepath=path, use_selection=True, object_types={"ARMATURE", "MESH"},
+                                 mesh_smooth_type="FACE", use_mesh_modifiers=False, add_leaf_bones=False, bake_anim=False,
+                                 use_tspace=False, apply_unit_scale=True, apply_scale_options="FBX_SCALE_NONE",
+                                 global_scale=1.0, axis_forward="-Z", axis_up="Y", primary_bone_axis="X",
+                                 secondary_bone_axis="-Y", use_armature_deform_only=False, armature_nodetype="NULL",
+                                 use_triangles=True, path_mode="STRIP", colors_type="LINEAR")
+    finally:
+        arm.name = name
+        if other is not None and other is not arm:
+            other.name = "Armature"
+    lo, hi = ue_bounds(head)
+    meta = {"name": head.name, "builder": BUILDER, "ue_folder": UE_MESH_FOLDER, "kind": "skeletal",
+            "bones": {b.name: {"head_cm": [round(float(x), 3) for x in MIRROR @ np.array(b.head_local[:]) * 100.0],
+                               "parent": b.parent.name if b.parent else None} for b in arm.data.bones},
+            "slots": [m.name for m in head.data.materials], "tris": tri_count(head),
+            "bounds_cm": {"min": [round(float(x), 3) for x in lo], "max": [round(float(x), 3) for x in hi]},
+            "frame": "Unreal local cm: +X the maw's direction, +Y right, +Z up"}
+    meta.update(extra or {})
+    with open(os.path.splitext(path)[0] + ".json", "w") as fh:
+        json.dump(meta, fh, indent=1)
+    print("exported %-28s tris %5d  bones %s" % (head.name, meta["tris"], sorted(meta["bones"])))
+    return path
+
+
+def reimport_head_check(path, head):
+    """Imports the head's FBX: one armature with BONES, one mesh with the same tris, skinned to both bones."""
+    fails = []
+    before = set(bpy.data.objects)
+    bpy.ops.import_scene.fbx(filepath=path)
+    new = [o for o in bpy.data.objects if o not in before]
+    arms = [o for o in new if o.type == "ARMATURE"]
+    meshes = [o for o in new if o.type == "MESH"]
+    if len(arms) != 1 or len(meshes) != 1:
+        fails.append("%s reimport: %d armatures, %d meshes" % (head.name, len(arms), len(meshes)))
+    else:
+        bones = sorted(b.name for b in arms[0].data.bones)
+        if bones != sorted(BONES):
+            fails.append("%s reimport bones %s" % (head.name, bones))
+        m = meshes[0]
+        m.data.calc_loop_triangles()
+        if len(m.data.loop_triangles) != tri_count(head):
+            fails.append("%s reimport tris %d != %d" % (head.name, len(m.data.loop_triangles), tri_count(head)))
+        if sorted(g.name for g in m.vertex_groups) != sorted(BONES):
+            fails.append("%s reimport vertex groups %s" % (head.name, [g.name for g in m.vertex_groups]))
+    for o in new:
+        data = o.data
+        bpy.data.objects.remove(o, do_unlink=True)
+        if data is not None and data.users == 0:
+            if isinstance(data, bpy.types.Mesh):
+                bpy.data.meshes.remove(data)
+            elif isinstance(data, bpy.types.Armature):
+                bpy.data.armatures.remove(data)
+    return fails
+
+
 def reimport_check(path, obj):
     fails = []
     before = set(bpy.data.objects)
@@ -507,18 +662,15 @@ def ue_matrix(yaw_deg=0.0, pitch_up_deg=0.0, loc_cm=(0.0, 0.0, 0.0), scale=1.0):
 
 
 def pose(objs, name, jaw_open=JAW_REST, drop=0.0, offset=(0.0, 0.0, 0.0)):
-    out = []
+    """The head baked at jaw_open and the throat, placed at offset (Unreal cm), sunk drop."""
     base = np.asarray(offset, float) + np.array([0.0, 0.0, -drop])
-    for part in PIECES:
-        o = objs[part].copy()
-        o.name = "%s_%s" % (name, part)
-        bpy.context.scene.collection.objects.link(o)
-        if part == "Upper":
-            o.matrix_world = ue_matrix(loc_cm=base + HINGE) @ ue_matrix(pitch_up_deg=jaw_degrees(jaw_open))
-        else:
-            o.matrix_world = ue_matrix(loc_cm=base)
-        out.append(o)
-    return out
+    head = baked_head(objs, "%s_%s" % (name, HEAD), jaw_open)
+    throat = objs["Throat"].copy()
+    throat.name = "%s_Throat" % name
+    bpy.context.scene.collection.objects.link(throat)
+    for o in (head, throat):
+        o.matrix_world = ue_matrix(loc_cm=base)
+    return [head, throat]
 
 
 def ground(name, centre_cm, half_cm, z_cm=0.0):
@@ -660,7 +812,7 @@ PIECE_VIEWS = (("front", (1.0, 0.0, 0.0)), ("side", (0.0, 1.0, 0.0)), ("top", (0
 def render_piece_sheets(objs):
     os.makedirs(REVIEW_DIR, exist_ok=True)
     out = []
-    for part in PIECES:
+    for part in PIECES + (HEAD,):
         o = objs[part]
         lo, hi = ue_bounds(o)
         c = 0.5 * (lo + hi)
@@ -680,6 +832,19 @@ def render_piece_sheets(objs):
     return out
 
 
+def render_jaw_sheet(objs):
+    """The skinned head and the throat at JawOpen 0 (teeth meeting), rest, 0.6 and 1 (gaping): 3/4 front, side, back 3/4."""
+    paths = []
+    for k, jaw in enumerate((0.0, JAW_REST, 0.6, 1.0)):
+        group = pose(objs, "Jaw%d" % k, jaw_open=jaw)
+        for v, view in (("q", (1.0, -0.7, 0.35)), ("s", (0.05, -1.0, 0.1)), ("b", (-0.6, -1.0, 0.3))):
+            paths.append(render_workbench(group, os.path.join(REVIEW_DIR, "_jaw_%d_%s.png" % (k, v)), view,
+                                          (0.0, 0.0, 62.0), 80.0, size=(520, 480), ortho=False))
+        for o in group:
+            bpy.data.objects.remove(o, do_unlink=True)
+    return tile_images(paths, os.path.join(REVIEW_DIR, "RootMaw_jaw_sheet.png"), cols=3)
+
+
 def render_layout_sheet(groups):
     paths = []
     for name, objs, view, target, half in groups:
@@ -691,14 +856,18 @@ def render_layout_sheet(groups):
 # ---------------------------------------------------------------- checks
 def contract_checks(objs, split):
     fails = []
-    lo, hi = ue_bounds(objs["Lower"])
-    if hi[2] > CUT_Z + 25.0:
-        fails.append("Lower reaches z %.1f: something above the cut stayed on the body" % hi[2])
+    lo, hi = ue_bounds(objs[HEAD])
     if lo[2] < 0.0:
-        fails.append("Lower dips below the ground (z %.1f)" % lo[2])
-    ulo, uhi = ue_bounds(objs["Upper"])
-    if ulo[2] < -12.0:
-        fails.append("Upper hangs %.1f below its hinge: something under the cut went with the jaw" % ulo[2])
+        fails.append("the head dips below the ground (z %.1f)" % lo[2])
+    head = split.get("head", {})
+    if head.get("jaw_only", 0) == 0 or head.get("root_only", 0) == 0 or head.get("blended", 0) < 50:
+        fails.append("the head's jaw weights look wrong: %s" % head)
+    me = objs[HEAD].data
+    for v in me.vertices:
+        total = sum(g.weight for g in v.groups)
+        if abs(total - 1.0) > 1e-4:
+            fails.append("head vertex %d weighs %.4f in all" % (v.index, total))
+            break
     if split.get("eyes", 0) < 4:
         fails.append("the throat has %d eye faces (EYE_LUMA %.2f)" % (split.get("eyes", 0), EYE_LUMA))
     for name in ROOT_NAMES:
@@ -730,9 +899,11 @@ def main():
     objs, report = {}, {}
     for part in PIECES:
         objs[part] = to_object(piece_name(part), body[part], SLOTS)
+    objs[HEAD] = to_object(piece_name(HEAD), body[HEAD], SLOTS, skinned=True)
+    rig = build_rig(objs[HEAD])
     for name in ROOT_NAMES:
         objs[name] = to_object(piece_name(name), root_geos[name], SLOTS)
-    for name, o in objs.items():
+    for name, o in list(objs.items()):
         lo, hi = ue_bounds(o)
         tris = tri_count(o)
         report[name] = {"tris": tris, "min": np.round(lo, 2).tolist(), "max": np.round(hi, 2).tolist(),
@@ -744,15 +915,18 @@ def main():
             fails.append("%s has %d tris > %d" % (o.name, tris, cap))
     print("split", split)
     fails += contract_checks(objs, split)
+    objs["_rig"] = rig
 
     exported = []
     if args["export"]:
         for part in PIECES:
             exported.append((export_fbx(objs[part]), part))
+        head_path = export_head(rig, objs[HEAD], {"jaw_weights": {"lip_band": LIP_BAND, "bulb_band": list(BULB_BAND),
+                                                                  "bulb_band_front_x": BULB_BAND_FRONT_X}})
         for name in ROOT_NAMES:
             exported.append((export_fbx(objs[name], {"spec": root_frames[name]}), name))
         lay = {"builder": BUILDER, "source": SOURCE_FBX, "size": SIZE,
-               "frame": "Unreal cm; the ground under the bulb's axis at the origin; the Upper piece pivots at hinge",
+               "frame": "Unreal cm; the ground under the bulb's axis at the origin; the head's jaw bone at hinge",
                "cut_z": CUT_Z, "hinge": HINGE.tolist(), "jaw_shut_deg": JAW_SHUT_DEG, "jaw_wide_deg": JAW_WIDE_DEG,
                "jaw_rest": JAW_REST, "bury_drop": BURY_DROP, "bite_mouth": BITE_MOUTH.tolist(), "split": split,
                "roots": root_frames, "pieces": report}
@@ -776,6 +950,7 @@ def main():
         trail.append(ground("TrailGround", (-110.0, 0.0, 0.0), 190.0, z_cm=-0.3))
         if args["sheets"]:
             sheets = render_piece_sheets(objs)
+            sheets.append(render_jaw_sheet(objs))
             sheets.append(render_layout_sheet((
                 ("rest", rest, (1.0, -0.75, 0.45), (0.0, 0.0, 60.0), 85.0),
                 ("gape", gape, (1.0, 0.6, 0.3), (0.0, 0.0, 65.0), 85.0),
@@ -789,6 +964,8 @@ def main():
         print("saved", BLEND_FILE)
     for path, part in exported:
         fails += reimport_check(path, objs[part])
+    if args["export"]:
+        fails += reimport_head_check(head_path, objs[HEAD])
     print("ROOT_MAW_REPORT " + json.dumps(report))
     if sheets:
         print("sheets:", *sheets, sep="\n  ")

@@ -1,11 +1,14 @@
 """Editor side of the Root Maw pieces (build_root_maw_pieces.py): builds the vertex-colour master RootMaw_Mars_M (two-sided:
-the cut bulb shows a dark inside; VertexColor x Tint into BaseColor, darkened by BackfaceShade on back faces; VertexColor x
+the bulb's inside shows dark through the gaping maw; for skeletal and instanced static meshes; VertexColor x Tint into BaseColor, darkened by BackfaceShade on back faces; VertexColor x
 Emissive x Glow into Emissive, Glow = custom primitive data 0, default 1: the entity script dims the eyes through it), the
 root master RootMawRoot_Mars_M (BaseColour -> TipColour along UV0.x, the builder's procedural roots' base -> tip, x the
 Niagara particle's colour; flagged for Niagara mesh particles), one instance per slot (RootMawSkin_Mars_MI,
-RootMawEye_Mars_MI, RootMawRoot_Mars_MI), and imports the RootMaw_<Part>_Mars_SM FBXs through the Send to Unreal prop
-importer (each slot bound to <Slot>_Mars_MI). Re-runnable: masters rebuilt IN PLACE (expressions emptied, never deleted),
-instances updated, meshes re-imported. The Niagara root trail is mars_root_maw_niagara.py.
+RootMawEye_Mars_MI, RootMawRoot_Mars_MI), imports the RootMaw_<Part>_Mars_SM FBXs through the Send to Unreal prop
+importer (each slot bound to <Slot>_Mars_MI) and the skinned head RootMaw_Head_Mars_SKM (bones root and jaw, its own
+skeleton RootMaw_Head_Mars_SKEL) through the Send to Unreal character importer, its slot bound by name. Removes the rigid
+RootMaw_Lower/Upper_Mars_SM a first cut used (the head is skinned since Stephen's 2026-11-02 ruling). Re-runnable:
+masters rebuilt IN PLACE (expressions emptied, never deleted), instances updated, meshes re-imported. The Niagara root
+trail is mars_root_maw_niagara.py.
 
 Run in a hidden editor (never during PIE):
     python ../../mars_environment/unreal/env_drive.py --port 9317 --module mars_root_maw_ue --alias rm \
@@ -22,6 +25,7 @@ SEND_TO_UNREAL = os.path.join(os.path.dirname(os.path.dirname(HERE)), "mars_send
 for _p in (SEND_TO_UNREAL, HERE):
     if _p not in sys.path:
         sys.path.insert(0, _p)
+import mars_character_ue  # noqa: E402
 import mars_prop_ue  # noqa: E402
 
 EAL = unreal.EditorAssetLibrary
@@ -34,7 +38,10 @@ F_MAT = F_ROOT + "/Materials"
 MASTER = "RootMaw_Mars_M"
 ROOT_MASTER = "RootMawRoot_Mars_M"
 ROOTS = tuple("Root%d" % k for k in range(4))
-PIECES = ("Lower", "Upper", "Throat") + ROOTS
+PIECES = ("Throat",) + ROOTS
+HEAD = "RootMaw_Head_Mars_SKM"
+SKELETON = "RootMaw_Head_Mars_SKEL"
+RETIRED = ("RootMaw_Lower_Mars_SM", "RootMaw_Upper_Mars_SM")
 # the roots' base -> tip colours: build_root_maw_pieces.ROOT_BASE_SRGB / ROOT_TIP_SRGB (74, 46, 28) / (198, 140, 82), linear
 ROOT_BASE = (0.069, 0.027, 0.011)
 ROOT_TIP = (0.565, 0.262, 0.085)
@@ -92,6 +99,8 @@ def build_master():
     m, created = _empty(MASTER)
     m.set_editor_property("two_sided", True)
     MEL.set_material_usage(m, unreal.MaterialUsage.MATUSAGE_INSTANCED_STATIC_MESHES)
+    MEL.set_material_usage(m, unreal.MaterialUsage.MATUSAGE_SKELETAL_MESH)
+    m.set_editor_property("used_with_skeletal_mesh", True)
     m.set_editor_property("used_with_instanced_static_meshes", True)
     vc = MEL.create_material_expression(m, unreal.MaterialExpressionVertexColor, -1200, -100)
     tint = _vector(m, "Tint", (1.0, 1.0, 1.0), -1200, 50)
@@ -205,6 +214,59 @@ def import_meshes():
     return res
 
 
+def import_head():
+    """The skinned head through the character importer; on first import its skeleton is renamed SKELETON and its physics
+    asset deleted (nothing on the Maw collides); its slot is bound to <slot>_Mars_MI by name."""
+    first = _load(F_MESH, HEAD) is None
+    job = {"fbx": os.path.join(EXPORT_DIR, HEAD + ".fbx").replace("\\", "/"), "folder": F_MESH, "name": HEAD,
+           "kind": "skeletal", "skeleton": _path(F_MESH, SKELETON) if _load(F_MESH, SKELETON) else None}
+    res = mars_character_ue.import_character([job], save=False)
+    mesh = _load(F_MESH, HEAD)
+    if mesh is None:
+        return res
+    if first:
+        skel = mesh.skeleton
+        if skel is not None and skel.get_name() != SKELETON:
+            EAL.rename_asset(skel.get_path_name().split(".")[0], "%s/%s" % (F_MESH, SKELETON))
+        phys = mesh.physics_asset
+        if phys is not None:
+            mesh.set_editor_property("physics_asset", None)
+            EAL.delete_asset(phys.get_path_name().split(".")[0])
+    mats = list(mesh.materials)
+    for k, m in enumerate(mats):
+        mi = _load(F_MAT, "%s_Mars_MI" % m.material_slot_name)
+        if mi is not None:
+            m.material_interface = mi
+            mats[k] = m
+    mesh.set_editor_property("materials", mats)
+    EAL.save_loaded_asset(mesh)
+    if mesh.skeleton is not None:
+        EAL.save_loaded_asset(mesh.skeleton)
+    return res
+
+
+def retire_cut_pieces():
+    """Deletes the rigid upper/lower pieces the first cut used (nothing references them since the head is skinned)."""
+    gone = []
+    for name in RETIRED:
+        path = "%s/%s" % (F_MESH, name)
+        if EAL.does_asset_exist(path) and EAL.delete_asset(path):
+            gone.append(name)
+    return gone
+
+
+def head_report():
+    mesh = _load(F_MESH, HEAD)
+    if mesh is None:
+        return None
+    box = mesh.get_bounds().box_extent if hasattr(mesh, "get_bounds") else None
+    return {"skeleton": mesh.skeleton.get_name() if mesh.skeleton else None,
+            "physics": mesh.physics_asset.get_name() if mesh.physics_asset else None,
+            "materials": {str(m.material_slot_name): (m.material_interface.get_name() if m.material_interface else None)
+                          for m in mesh.materials},
+            "extent": [round(box.x, 2), round(box.y, 2), round(box.z, 2)] if box is not None else None}
+
+
 def mesh_report():
     out = {}
     for p in PIECES:
@@ -229,5 +291,6 @@ def run_all():
     root_master, root_info = build_root_master()
     instances = build_instances(master, root_master)
     res = import_meshes()
-    return {"master": master_info, "root_master": root_info, "instances": instances, "import": res,
-            "meshes": mesh_report()}
+    head = import_head()
+    return {"master": master_info, "root_master": root_info, "instances": instances, "import": res, "head": head,
+            "retired": retire_cut_pieces(), "meshes": mesh_report(), "head_mesh": head_report()}

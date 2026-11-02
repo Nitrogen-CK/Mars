@@ -129,30 +129,31 @@ def cvar(command):
 _MAW = {"last": MAW_XY}
 
 
-def _piece_isms(world, piece="Lower"):
+def _heads(world):
+    """Every Root Maw head (its poseable mesh component) in world."""
     out = []
-    for a in unreal.GameplayStatics.get_all_actors_of_class(world, unreal.Actor):
-        if "RootMaw_%s_Mars_SM" % piece in a.get_name():
-            out += list(a.get_components_by_class(unreal.InstancedStaticMeshComponent))
+    for c in _all_components(world, unreal.PoseableMeshComponent):
+        mesh = c.get_skinned_asset() if hasattr(c, "get_skinned_asset") else None
+        if mesh is not None and "RootMaw_Head" in mesh.get_name():
+            out.append(c)
     return out
 
 
-def _nearest_instance(isms, near):
+def _nearest_head(heads, near):
     best, at = 1e18, None
-    for c in isms:
-        for i in range(c.get_instance_count()):
-            t = c.get_instance_transform(i, True).translation
-            d = (t.x - near[0]) ** 2 + (t.y - near[1]) ** 2
-            if d < best:
-                best, at = d, t
+    for c in heads:
+        t = c.get_world_location()
+        d = (t.x - near[0]) ** 2 + (t.y - near[1]) ** 2
+        if d < best:
+            best, at = d, t
     return at
 
 
 def maw_location():
-    """The review Maw's body origin now (world cm: the ground under its bulb when it is up), from its lower body's ISM
-    instance nearest where it was last seen."""
+    """The review Maw's body origin now (world cm: the ground under its bulb when it is up), from its head component
+    nearest where it was last seen."""
     world, _ = _pie_client()
-    at = _nearest_instance(_piece_isms(world), _MAW["last"])
+    at = _nearest_head(_heads(world), _MAW["last"])
     if at is None:
         return None
     _MAW["last"] = (at.x, at.y)
@@ -234,9 +235,9 @@ def chase_sequence(prefix, path, count=16, gap=0.25, offset=(60.0, -260.0, 120.0
     Frames: Saved/Screenshots/RootMaw/<prefix>_NN.png."""
     stop_follow()
     world, pc = _pie_client()
-    isms = _piece_isms(world)
-    if not isms:
-        raise RuntimeError("no Maw lower-body instance")
+    heads = _heads(world)
+    if not heads:
+        raise RuntimeError("no Maw head component")
     _capture_actor(world, res)
     start = time.time()
     seq = {"next": start, "done": 0, "log": [], "last": _MAW["last"], "steps": list(path)}
@@ -257,7 +258,7 @@ def chase_sequence(prefix, path, count=16, gap=0.25, offset=(60.0, -260.0, 120.0
             if seq["steps"] and seq["done"] % step_every == 0:
                 stepped = seq["steps"].pop(0)
                 place_player(stepped, yaw=0.0)
-            t = _nearest_instance(isms, seq["last"])
+            t = _nearest_head(heads, seq["last"])
             if t is None:
                 finish()
                 return
