@@ -56,6 +56,9 @@ SLOTS = {
     "PickleMimicCloth":    ((0.60, 0.016, 0.022), 0.85, 0.0, 0.0),
 }
 GLASS = {"Color": (0.80, 0.92, 0.86), "Opacity": 0.10, "EdgeOpacity": 0.45, "Roughness": 0.06, "Specular": 0.6}
+# the cracked glass (the shards standing in place while the mimic is hurt): paler and more opaque at grazing angles, so the
+# breaks' faces, seen edge-on, read as white lines
+GLASS_CRACKED = {"Color": (0.93, 0.98, 0.95), "Opacity": 0.16, "EdgeOpacity": 0.9}
 # the brine cylinder (build_pickle_mimic_pieces LIQUID_RADIUS / LIQUID_HALF), cm
 BRINE_SIZE = {"Radius": 27.0, "Half Height": 23.4}
 
@@ -173,6 +176,14 @@ def build_instances(master, glass_master):
         EAL.save_loaded_asset(mi)
         out[mi.get_name()] = {"created": created}
     mi, created = _instance("PickleMimicGlass_Mars_MI", glass_master)
+    MEL.update_material_instance(mi)
+    EAL.save_loaded_asset(mi)
+    out[mi.get_name()] = {"created": created}
+    mi, created = _instance("PickleMimicGlassCracked_Mars_MI", glass_master)
+    rgb = GLASS_CRACKED["Color"]
+    MEL.set_material_instance_vector_parameter_value(mi, "Color", unreal.LinearColor(rgb[0], rgb[1], rgb[2], 1.0))
+    MEL.set_material_instance_scalar_parameter_value(mi, "Opacity", GLASS_CRACKED["Opacity"])
+    MEL.set_material_instance_scalar_parameter_value(mi, "EdgeOpacity", GLASS_CRACKED["EdgeOpacity"])
     MEL.update_material_instance(mi)
     EAL.save_loaded_asset(mi)
     out[mi.get_name()] = {"created": created}
