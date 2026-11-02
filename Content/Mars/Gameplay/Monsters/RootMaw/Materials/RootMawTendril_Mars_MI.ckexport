@@ -1,0 +1,392 @@
+{
+	"material": "RootMawTendril_Mars_MI",
+	"packagePath": "/Game/Mars/Gameplay/Monsters/RootMaw/Materials/RootMawTendril_Mars_MI",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "29e4e9e6ac148678ed8f145d525b80b7",
+		"exporterVersion": 3
+	},
+	"parentChain": [
+		"/Game/Mars/Gameplay/Monsters/RootMaw/Materials/RootMawTendril_Mars_M.RootMawTendril_Mars_M"
+	],
+	"blendMode": "BLEND_Opaque",
+	"twoSided": true,
+	"unlit": false,
+	"shadingModel": "MSM_DefaultLit",
+	"domain": "MD_Surface",
+	"connectedOutputs": [
+		"BaseColor"
+	],
+	"expressions":
+	{
+		"ComponentMask": 2,
+		"ConstantBiasScale": 1,
+		"DynamicParameter": 1,
+		"LinearInterpolate": 2,
+		"Multiply": 3,
+		"ScalarParameter": 4,
+		"Sine": 1,
+		"Subtract": 1,
+		"TextureCoordinate": 1,
+		"VectorParameter": 2,
+		"VertexColor": 1
+	},
+	"dynamicParameters": [
+		"Param1",
+		"Param2",
+		"Param3",
+		"Param4"
+	],
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "TextureCoordinate",
+				"name": "MaterialExpressionTextureCoordinate_1"
+			},
+			{
+				"id": 1,
+				"class": "ComponentMask",
+				"name": "MaterialExpressionComponentMask_2",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Input",
+						"node": 0,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"R": true
+				}
+			},
+			{
+				"id": 2,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_4",
+				"props":
+				{
+					"DefaultValue": 1,
+					"ParameterName": "GrooveTiles"
+				}
+			},
+			{
+				"id": 3,
+				"class": "Multiply",
+				"name": "MaterialExpressionMultiply_3",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 1,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 2,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 4,
+				"class": "DynamicParameter",
+				"name": "MaterialExpressionDynamicParameter_1",
+				"outputs": [
+					"Param1",
+					"Param2",
+					"Param3",
+					"Param4",
+					"RGB",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.000000,G=0.000000,B=0.000000,A=0.000000)"
+				}
+			},
+			{
+				"id": 5,
+				"class": "Subtract",
+				"name": "MaterialExpressionSubtract_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 3,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 4,
+						"output": 0,
+						"mask": "r"
+					}
+				]
+			},
+			{
+				"id": 6,
+				"class": "Sine",
+				"name": "MaterialExpressionSine_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Input",
+						"node": 5,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 7,
+				"class": "ConstantBiasScale",
+				"name": "MaterialExpressionConstantBiasScale_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Input",
+						"node": 6,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 8,
+				"class": "LinearInterpolate",
+				"name": "MaterialExpressionLinearInterpolate_2",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 9,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 10,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 2,
+						"name": "Alpha",
+						"node": 7,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 9,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_2",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.069000,G=0.027000,B=0.011000,A=1.000000)",
+					"ParameterName": "BaseColour"
+				}
+			},
+			{
+				"id": 10,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_3",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.565000,G=0.262000,B=0.085000,A=1.000000)",
+					"ParameterName": "TipColour"
+				}
+			},
+			{
+				"id": 11,
+				"class": "ComponentMask",
+				"name": "MaterialExpressionComponentMask_3",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Input",
+						"node": 4,
+						"output": 5,
+						"mask": "rgba"
+					}
+				],
+				"props":
+				{
+					"G": true
+				}
+			},
+			{
+				"id": 12,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_5",
+				"props":
+				{
+					"DefaultValue": 0.44999998807907104,
+					"ParameterName": "AgeShade"
+				}
+			},
+			{
+				"id": 13,
+				"class": "LinearInterpolate",
+				"name": "MaterialExpressionLinearInterpolate_3",
+				"inputs": [
+					{
+						"index": 1,
+						"name": "B",
+						"node": 12,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "Alpha",
+						"node": 11,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"ConstA": 1
+				}
+			},
+			{
+				"id": 14,
+				"class": "VertexColor",
+				"name": "MaterialExpressionVertexColor_1",
+				"outputs": [
+					"None",
+					"None",
+					"None",
+					"None",
+					"None"
+				]
+			},
+			{
+				"id": 15,
+				"class": "Multiply",
+				"name": "MaterialExpressionMultiply_4",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 13,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 14,
+						"output": 0,
+						"mask": "rgb"
+					}
+				]
+			},
+			{
+				"id": 16,
+				"class": "Multiply",
+				"name": "MaterialExpressionMultiply_5",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 8,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 15,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 17,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_6",
+				"props":
+				{
+					"DefaultValue": 0.85000002384185791,
+					"ParameterName": "Roughness"
+				}
+			},
+			{
+				"id": 18,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_7",
+				"props":
+				{
+					"DefaultValue": 0.30000001192092896,
+					"ParameterName": "Specular"
+				}
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_BaseColor",
+				"node": 16,
+				"output": 0
+			},
+			{
+				"property": "MP_Specular",
+				"node": 18,
+				"output": 0
+			},
+			{
+				"property": "MP_Roughness",
+				"node": 17,
+				"output": 0
+			}
+		]
+	},
+	"scalarParams": [
+		{
+			"name": "GrooveTiles",
+			"value": 1
+		},
+		{
+			"name": "AgeShade",
+			"value": 0.44999998807907104
+		},
+		{
+			"name": "Roughness",
+			"value": 0.85000002384185791
+		},
+		{
+			"name": "Specular",
+			"value": 0.30000001192092896
+		}
+	],
+	"vectorParams": [
+		{
+			"name": "BaseColour",
+			"value": "RGBA(0.069, 0.027, 0.011, 1)"
+		},
+		{
+			"name": "TipColour",
+			"value": "RGBA(0.565, 0.262, 0.085, 1)"
+		}
+	],
+	"textureParams": [],
+	"usedTextures": []
+}

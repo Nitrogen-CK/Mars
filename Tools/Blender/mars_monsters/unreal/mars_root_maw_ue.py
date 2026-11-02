@@ -2,8 +2,10 @@
 the bulb's inside shows dark through the gaping maw; for skeletal and instanced static meshes; VertexColor x Tint into BaseColor, darkened by BackfaceShade on back faces; VertexColor x
 Emissive x Glow into Emissive, Glow = custom primitive data 0, default 1: the entity script dims the eyes through it), the
 root master RootMawRoot_Mars_M (BaseColour -> TipColour along UV0.x, the builder's procedural roots' base -> tip, x the
-Niagara particle's colour; flagged for Niagara mesh particles), one instance per slot (RootMawSkin_Mars_MI,
-RootMawEye_Mars_MI, RootMawRoot_Mars_MI), imports the RootMaw_<Part>_Mars_SM FBXs through the Send to Unreal prop
+Niagara particle's colour; flagged for Niagara mesh particles; World Position Offset grows the root along its length from
+the particle's dynamic parameter x, see build_root_master), the tendril master RootMawTendril_Mars_M (the trail's tube
+ribbons: bark grooves along the ribbon panned by dynamic parameter x, darkened by y), one instance per slot (RootMawSkin_Mars_MI,
+RootMawEye_Mars_MI, RootMawRoot_Mars_MI, RootMawTendril_Mars_MI), imports the RootMaw_<Part>_Mars_SM FBXs through the Send to Unreal prop
 importer (each slot bound to <Slot>_Mars_MI) and the skinned head RootMaw_Head_Mars_SKM (bones root and jaw, its own
 skeleton RootMaw_Head_Mars_SKEL) through the Send to Unreal character importer, its slot bound by name. Removes the rigid
 RootMaw_Lower/Upper_Mars_SM a first cut used (the head is skinned since Stephen's 2026-11-02 ruling). Re-runnable:
@@ -37,6 +39,8 @@ F_MESH = F_ROOT + "/Meshes"
 F_MAT = F_ROOT + "/Materials"
 MASTER = "RootMaw_Mars_M"
 ROOT_MASTER = "RootMawRoot_Mars_M"
+TENDRIL_MASTER = "RootMawTendril_Mars_M"
+GROW_FRONT = 0.15                               # build_root_maw_pieces.GROW_FRONT
 ROOTS = tuple("Root%d" % k for k in range(4))
 PIECES = ("Throat",) + ROOTS
 HEAD = "RootMaw_Head_Mars_SKM"
@@ -140,21 +144,36 @@ def build_master():
     return m, {"created": created, "expressions": MEL.get_num_material_expressions(m)}
 
 
+def _expr(m, cls, x, y, **props):
+    e = MEL.create_material_expression(m, cls, x, y)
+    for k, v in props.items():
+        e.set_editor_property(k, v)
+    return e
+
+
+def _dynamic(m, x, y, default):
+    """A DynamicParameter (index 0, the Niagara particle's DynamicMaterialParameter); its first output pin is x."""
+    return _expr(m, unreal.MaterialExpressionDynamicParameter, x, y,
+                 default_value=unreal.LinearColor(default[0], default[1], default[2], default[3]))
+
+
 def build_root_master():
     """RootMawRoot_Mars_M: lerp(BaseColour, TipColour, UV0.x ^ TipFalloff) x the particle's colour (VertexColor on a Niagara
     mesh is Particles.Color: the system tints and darkens each root through it) -> BaseColor; Roughness, Specular. For
-    Niagara mesh particles."""
+    Niagara mesh particles. World Position Offset grows it along its length (Stephen: "splines that grow"): the particle's
+    DynamicMaterialParameter x is Grow (0 .. 1, default 1); a vertex at u (UV0.x) keeps
+    saturate((Grow * (1 + GrowFront) - u) / GrowFront) of its offset from the root's centre line and is pulled the rest of
+    the way onto it (the offset to the centre, mesh space, is UV1.xy + UV2.x; TransformVector local -> world applies the
+    particle's turn and scale), so past the front the root is a zero-width line and the front tapers to a tip."""
     m, created = _empty(ROOT_MASTER)
     MEL.set_material_usage(m, unreal.MaterialUsage.MATUSAGE_NIAGARA_MESH_PARTICLES)
     m.set_editor_property("used_with_niagara_mesh_particles", True)
-    uv = MEL.create_material_expression(m, unreal.MaterialExpressionTextureCoordinate, -1100, 0)
-    mask = MEL.create_material_expression(m, unreal.MaterialExpressionComponentMask, -900, 0)
-    mask.set_editor_property("r", True)
-    mask.set_editor_property("g", False)
-    MEL.connect_material_expressions(uv, "", mask, "")
+    uv = MEL.create_material_expression(m, unreal.MaterialExpressionTextureCoordinate, -1300, 0)
+    u = _expr(m, unreal.MaterialExpressionComponentMask, -1100, 0, r=True, g=False)
+    MEL.connect_material_expressions(uv, "", u, "")
     falloff = _scalar(m, "TipFalloff", 0.8, -900, 120)
     power = MEL.create_material_expression(m, unreal.MaterialExpressionPower, -700, 40)
-    MEL.connect_material_expressions(mask, "", power, "Base")
+    MEL.connect_material_expressions(u, "", power, "Base")
     MEL.connect_material_expressions(falloff, "", power, "Exponent")
     lerp = MEL.create_material_expression(m, unreal.MaterialExpressionLinearInterpolate, -500, -100)
     MEL.connect_material_expressions(_vector(m, "BaseColour", ROOT_BASE, -800, -300), "", lerp, "A")
@@ -168,6 +187,91 @@ def build_root_master():
     for name, value, y, prop in (("Roughness", 0.85, 300, unreal.MaterialProperty.MP_ROUGHNESS),
                                  ("Specular", 0.3, 400, unreal.MaterialProperty.MP_SPECULAR)):
         MEL.connect_material_property(_scalar(m, name, value, -300, y), "", prop)
+
+    # the grow: keep = saturate((Grow * (1 + Front) - u) / Front); WPO = local->world(centre offset) * (1 - keep)
+    grow = _dynamic(m, -1300, 600, (1.0, 0.0, 0.0, 0.0))
+    front = _scalar(m, "GrowFront", GROW_FRONT, -1300, 760)
+    one_plus = _expr(m, unreal.MaterialExpressionAdd, -1100, 720, const_a=1.0)
+    MEL.connect_material_expressions(front, "", one_plus, "B")
+    reach = MEL.create_material_expression(m, unreal.MaterialExpressionMultiply, -950, 640)
+    MEL.connect_material_expressions(grow, "", reach, "A")
+    MEL.connect_material_expressions(one_plus, "", reach, "B")
+    ahead = MEL.create_material_expression(m, unreal.MaterialExpressionSubtract, -800, 640)
+    MEL.connect_material_expressions(reach, "", ahead, "A")
+    MEL.connect_material_expressions(u, "", ahead, "B")
+    share = MEL.create_material_expression(m, unreal.MaterialExpressionDivide, -650, 660)
+    MEL.connect_material_expressions(ahead, "", share, "A")
+    MEL.connect_material_expressions(front, "", share, "B")
+    keep = MEL.create_material_expression(m, unreal.MaterialExpressionSaturate, -500, 660)
+    MEL.connect_material_expressions(share, "", keep, "")
+    pull = _expr(m, unreal.MaterialExpressionOneMinus, -350, 660)
+    MEL.connect_material_expressions(keep, "", pull, "")
+    uv1 = _expr(m, unreal.MaterialExpressionTextureCoordinate, -1300, 900, coordinate_index=1)
+    uv2 = _expr(m, unreal.MaterialExpressionTextureCoordinate, -1300, 1020, coordinate_index=2)
+    z = _expr(m, unreal.MaterialExpressionComponentMask, -1100, 1020, r=True, g=False)
+    MEL.connect_material_expressions(uv2, "", z, "")
+    offset = MEL.create_material_expression(m, unreal.MaterialExpressionAppendVector, -950, 940)
+    MEL.connect_material_expressions(uv1, "", offset, "A")
+    MEL.connect_material_expressions(z, "", offset, "B")
+    world = _expr(m, unreal.MaterialExpressionTransform, -750, 940,
+                  transform_source_type=unreal.MaterialVectorCoordTransformSource.TRANSFORMSOURCE_LOCAL,
+                  transform_type=unreal.MaterialVectorCoordTransform.TRANSFORM_WORLD)
+    MEL.connect_material_expressions(offset, "", world, "")
+    wpo = MEL.create_material_expression(m, unreal.MaterialExpressionMultiply, -250, 860)
+    MEL.connect_material_expressions(world, "", wpo, "A")
+    MEL.connect_material_expressions(pull, "", wpo, "B")
+    MEL.connect_material_property(wpo, "", unreal.MaterialProperty.MP_WORLD_POSITION_OFFSET)
+    MEL.recompile_material(m)
+    EAL.save_loaded_asset(m)
+    return m, {"created": created, "expressions": MEL.get_num_material_expressions(m)}
+
+
+def build_tendril_master():
+    """RootMawTendril_Mars_M, the trail's tube ribbons (Niagara ribbons, UV0.x tiled along the ribbon's length): bark grooves
+    0.5 + 0.5 sin(2 pi (u * GrooveTiles - Phase)) shade BaseColour -> TipColour; Phase is the particle's dynamic parameter x
+    (the system writes the distance the Maw has glided times PanRate: the grooves stream along the roots at its speed), y
+    its age (0 .. 1: an older stretch darkens toward AgeShade); times the particle's colour."""
+    m, created = _empty(TENDRIL_MASTER)
+    MEL.set_material_usage(m, unreal.MaterialUsage.MATUSAGE_NIAGARA_RIBBONS)
+    m.set_editor_property("used_with_niagara_ribbons", True)
+    m.set_editor_property("two_sided", True)
+    uv = MEL.create_material_expression(m, unreal.MaterialExpressionTextureCoordinate, -1300, 0)
+    u = _expr(m, unreal.MaterialExpressionComponentMask, -1100, 0, r=True, g=False)
+    MEL.connect_material_expressions(uv, "", u, "")
+    tiles = _scalar(m, "GrooveTiles", 1.0, -1100, 120)
+    scaled = MEL.create_material_expression(m, unreal.MaterialExpressionMultiply, -900, 40)
+    MEL.connect_material_expressions(u, "", scaled, "A")
+    MEL.connect_material_expressions(tiles, "", scaled, "B")
+    dyn = _dynamic(m, -1100, 260, (0.0, 0.0, 0.0, 0.0))
+    shifted = MEL.create_material_expression(m, unreal.MaterialExpressionSubtract, -750, 80)
+    MEL.connect_material_expressions(scaled, "", shifted, "A")
+    MEL.connect_material_expressions(dyn, "", shifted, "B")
+    wave = _expr(m, unreal.MaterialExpressionSine, -600, 80, period=1.0)
+    MEL.connect_material_expressions(shifted, "", wave, "")
+    groove = _expr(m, unreal.MaterialExpressionConstantBiasScale, -450, 80, bias=1.0, scale=0.5)
+    MEL.connect_material_expressions(wave, "", groove, "")
+    lerp = MEL.create_material_expression(m, unreal.MaterialExpressionLinearInterpolate, -300, -100)
+    MEL.connect_material_expressions(_vector(m, "BaseColour", ROOT_BASE, -600, -300), "", lerp, "A")
+    MEL.connect_material_expressions(_vector(m, "TipColour", ROOT_TIP, -600, -180), "", lerp, "B")
+    MEL.connect_material_expressions(groove, "", lerp, "Alpha")
+    age = _expr(m, unreal.MaterialExpressionComponentMask, -900, 380, r=False, g=True)
+    MEL.connect_material_expressions(dyn, "RGBA", age, "")
+    age_shade = _scalar(m, "AgeShade", 0.45, -900, 480)
+    shade = MEL.create_material_expression(m, unreal.MaterialExpressionLinearInterpolate, -600, 400)
+    shade.set_editor_property("const_a", 1.0)
+    MEL.connect_material_expressions(age_shade, "", shade, "B")
+    MEL.connect_material_expressions(age, "", shade, "Alpha")
+    particle = MEL.create_material_expression(m, unreal.MaterialExpressionVertexColor, -450, 260)
+    tint = MEL.create_material_expression(m, unreal.MaterialExpressionMultiply, -300, 300)
+    MEL.connect_material_expressions(shade, "", tint, "A")
+    MEL.connect_material_expressions(particle, "", tint, "B")
+    colour = MEL.create_material_expression(m, unreal.MaterialExpressionMultiply, -150, 0)
+    MEL.connect_material_expressions(lerp, "", colour, "A")
+    MEL.connect_material_expressions(tint, "", colour, "B")
+    MEL.connect_material_property(colour, "", unreal.MaterialProperty.MP_BASE_COLOR)
+    for name, value, y, prop in (("Roughness", 0.85, 300, unreal.MaterialProperty.MP_ROUGHNESS),
+                                 ("Specular", 0.3, 400, unreal.MaterialProperty.MP_SPECULAR)):
+        MEL.connect_material_property(_scalar(m, name, value, -150, y), "", prop)
     MEL.recompile_material(m)
     EAL.save_loaded_asset(m)
     return m, {"created": created, "expressions": MEL.get_num_material_expressions(m)}
@@ -183,7 +287,7 @@ def _instance(name, parent):
     return mi, created
 
 
-def build_instances(master, root_master):
+def build_instances(master, root_master, tendril_master):
     out = {}
     for slot, (tint, rough, emissive) in SLOTS.items():
         mi, created = _instance("%s_Mars_MI" % slot, master)
@@ -193,10 +297,11 @@ def build_instances(master, root_master):
         MEL.update_material_instance(mi)
         EAL.save_loaded_asset(mi)
         out[mi.get_name()] = {"created": created}
-    mi, created = _instance("RootMawRoot_Mars_MI", root_master)
-    MEL.update_material_instance(mi)
-    EAL.save_loaded_asset(mi)
-    out[mi.get_name()] = {"created": created}
+    for name, parent in (("RootMawRoot_Mars_MI", root_master), ("RootMawTendril_Mars_MI", tendril_master)):
+        mi, created = _instance(name, parent)
+        MEL.update_material_instance(mi)
+        EAL.save_loaded_asset(mi)
+        out[mi.get_name()] = {"created": created}
     return out
 
 
@@ -289,8 +394,10 @@ def run_all():
         EAL.make_directory(folder)
     master, master_info = build_master()
     root_master, root_info = build_root_master()
-    instances = build_instances(master, root_master)
+    tendril_master, tendril_info = build_tendril_master()
+    instances = build_instances(master, root_master, tendril_master)
     res = import_meshes()
     head = import_head()
-    return {"master": master_info, "root_master": root_info, "instances": instances, "import": res, "head": head,
+    return {"master": master_info, "root_master": root_info, "tendril_master": tendril_info, "instances": instances,
+            "import": res, "head": head,
             "retired": retire_cut_pieces(), "meshes": mesh_report(), "head_mesh": head_report()}

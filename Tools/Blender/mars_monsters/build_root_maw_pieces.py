@@ -12,7 +12,10 @@ mesh I provided".)
 The source is untrusted data: the FBX is imported (geometry, UVs, image paths) and nothing in its folder is run. Each part's
 basecolor JPG is sampled into per-face vertex colours for the body (one master, flat faceted colour like the concept). The
 roots carry their colour in UV0.x instead (0 at the base, 1 at the tip): a Niagara mesh particle's material reads the
-particle's colour, not the mesh's vertex colours, so RootMawRoot_Mars_M grades base -> tip from UV0.x.
+particle's colour, not the mesh's vertex colours, so RootMawRoot_Mars_M grades base -> tip from UV0.x. Each root vertex
+also carries its offset to the root's centre line (Unreal cm, the mesh's frame) in UV1 (x, y) and UV2.x (z), V written
+as 1 - value because the Unreal importer flips V: the material grows a root along its length by collapsing every vertex
+past the particle's grow front onto that centre line (Stephen 2026-11-02: "have them as splines that grow").
 
 Every piece is in UNREAL cm in its own frame (+X the maw's direction, +Y right, +Z up); the source is turned to face +X,
 scaled by SIZE and moved so the bulb's axis stands on the origin, the ground (where the roots met it) at z 0. Pieces:
@@ -56,7 +59,7 @@ import sys
 import bmesh
 import bpy
 import numpy as np
-from mathutils import Matrix
+from mathutils import Matrix, Vector
 
 # ---------------------------------------------------------------- locations
 SOURCE_DIR = r"D:\Repo\Content\Monsters\RootMaw"           # off-repo art, like D:\Repo\Content\Monsters\PickleMimic
@@ -101,6 +104,9 @@ ROOT_SPECS = (
     dict(length=55.0, rise=8.0, dip=-2.0, r0=5.0, r1=1.0, wander=6.0, phase=4.0, forks=((0.33, -42.0, 0.4), (0.6, 30.0, 0.28))),
     dict(length=27.0, rise=10.0, dip=-3.0, r0=4.6, r1=1.0, wander=5.0, phase=5.2, forks=((0.5, -35.0, 0.35),)),
 )
+# The grow front (RootMawRoot_Mars_M's Front): a vertex at u thins from full radius to the centre line over this share of
+# the root's length ahead of the front; the material grows Grow * (1 + GROW_FRONT) so the tip ends full.
+GROW_FRONT = 0.15
 ROOT_SIDES = 6
 ROOT_SEGMENTS = 12
 ROOT_BASE_DEPTH = 2.5                               # the base starts this far under the ground
@@ -230,6 +236,7 @@ class Geo:
 
     def __init__(self):
         self.v, self.f, self.s, self.c, self.uv, self.w = [], [], [], [], [], []
+        self.d, self.vu = [], []                        # roots only: per vertex, the offset to the centre line and u
 
     def add(self, obj, faces, slots, colours, offset=(0.0, 0.0, 0.0), matrix=None, weight=None):
         """weight: Unreal cm position -> the vertex's jaw weight (0 when None)."""
@@ -265,6 +272,14 @@ def to_object(name, geo, slot_order, skinned=False):
     mesh.polygons.foreach_set("material_index", [used.index(s) for s in geo.s])
     uv = mesh.uv_layers.new(name="UVMap")
     uv.data.foreach_set("uv", np.array([c for face in geo.uv for c in face], float).ravel())
+    if geo.d and len(geo.d) == len(geo.v):
+        corner = np.array([i for face in geo.f for i in face], np.int64)
+        d = np.asarray(geo.d, float)[corner]
+        for name, cols in (("Centre", (0, 1)), ("CentreZ", (2, None))):
+            layer = mesh.uv_layers.new(name=name)
+            v = d[:, cols[1]] if cols[1] is not None else np.zeros(len(d))
+            uvs = np.stack([d[:, cols[0]], 1.0 - v], axis=1)
+            layer.data.foreach_set("uv", uvs.ravel())
     obj = bpy.data.objects.new(name, mesh)
     bpy.context.scene.collection.objects.link(obj)
     paint(obj, np.asarray(geo.c, float))
@@ -439,13 +454,18 @@ def _tube(geo, pts, radii, u, rng, base_cap):
         if i == n - 1:
             rings.append([len(geo.v)])
             geo.v.append(_ue_to_bl(pts[i]) * 0.01)
+            geo.d.append(np.zeros(3))
+            geo.vu.append(float(u[i]))
             continue
         ring = []
         for k in range(ROOT_SIDES):
             a = 2.0 * np.pi * k / ROOT_SIDES
             r = radii[i] * (1.0 + rng.normal(0.0, 0.08))
+            offset = r * (np.cos(a) * normal + np.sin(a) * binormal)
             ring.append(len(geo.v))
-            geo.v.append(_ue_to_bl(pts[i] + r * (np.cos(a) * normal + np.sin(a) * binormal)) * 0.01)
+            geo.v.append(_ue_to_bl(pts[i] + offset) * 0.01)
+            geo.d.append(-offset)
+            geo.vu.append(float(u[i]))
         rings.append(ring)
     base = np.array(ROOT_BASE_SRGB, float) / 255.0
     tip = np.array(ROOT_TIP_SRGB, float) / 255.0
@@ -458,7 +478,7 @@ def _tube(geo, pts, radii, u, rng, base_cap):
         geo.f.append(idx)
         geo.s.append("RootMawRoot")
         geo.c.append(np.clip((base + (tip - base) * uu ** 0.8) * rng.uniform(0.93, 1.06), 0.0, 1.0))
-        geo.uv.append([(uu, 0.5)] * len(idx))
+        geo.uv.append([(geo.vu[j], 0.5) for j in idx])
 
     for i in range(n - 1):
         r0, r1 = rings[i], rings[i + 1]
@@ -845,6 +865,62 @@ def render_jaw_sheet(objs):
     return tile_images(paths, os.path.join(REVIEW_DIR, "RootMaw_jaw_sheet.png"), cols=3)
 
 
+def grown_root(obj, name, grow):
+    """A static copy of a particle root as RootMawRoot_Mars_M grows it to `grow` (0..1): every vertex pulled toward its
+    centre line by 1 - saturate((grow * (1 + GROW_FRONT) - u) / GROW_FRONT), from its UV0.x and Centre / CentreZ."""
+    me = obj.data.copy()
+    o = bpy.data.objects.new(name, me)
+    bpy.context.scene.collection.objects.link(o)
+    uv0, c1, c2 = me.uv_layers["UVMap"].data, me.uv_layers["Centre"].data, me.uv_layers["CentreZ"].data
+    target = {}
+    for loop in me.loops:
+        if loop.vertex_index in target:
+            continue
+        u = uv0[loop.index].uv[0]
+        d_ue = np.array([c1[loop.index].uv[0], 1.0 - c1[loop.index].uv[1], c2[loop.index].uv[0]])
+        keep = min(max((grow * (1.0 + GROW_FRONT) - u) / GROW_FRONT, 0.0), 1.0)
+        target[loop.vertex_index] = _ue_to_bl(d_ue) * 0.01 * (1.0 - keep)
+    for vi, delta in target.items():
+        me.vertices[vi].co = me.vertices[vi].co + Vector(delta)
+    me.update()
+    return o
+
+
+def render_grow_sheet(objs):
+    """Every particle root grown to 0.2, 0.45, 0.7 and 1 (side 3/4 views), as the material grows it."""
+    paths = []
+    for name in ROOT_NAMES:
+        for k, g in enumerate((0.2, 0.45, 0.7, 1.0)):
+            o = grown_root(objs[name], "_grow_%s_%d" % (name, k), g)
+            paths.append(render_workbench([o], os.path.join(REVIEW_DIR, "_grow_%s_%d.png" % (name, k)), (0.5, -1.0, 0.6),
+                                          (28.0, 0.0, 6.0), 34.0, size=(360, 300)))
+            data = o.data
+            bpy.data.objects.remove(o, do_unlink=True)
+            bpy.data.meshes.remove(data)
+    return tile_images(paths, os.path.join(REVIEW_DIR, "RootMaw_RootGrow_sheet.png"), cols=4)
+
+
+def contract_root_centres(objs):
+    """Every root vertex plus its stored offset lands on its root's centre line, so a ring collapses to one place: a cheap
+    check that the Centre UVs were written in Unreal's frame."""
+    fails = []
+    for name in ROOT_NAMES:
+        me = objs[name].data
+        if "Centre" not in me.uv_layers or "CentreZ" not in me.uv_layers:
+            fails.append("%s has no Centre / CentreZ UVs" % name)
+            continue
+        c1, c2 = me.uv_layers["Centre"].data, me.uv_layers["CentreZ"].data
+        collapsed = set()
+        for loop in me.loops:
+            co = MIRROR @ np.array(me.vertices[loop.vertex_index].co[:]) * 100.0
+            d = np.array([c1[loop.index].uv[0], 1.0 - c1[loop.index].uv[1], c2[loop.index].uv[0]])
+            collapsed.add(tuple(np.round((co + d) * 4.0).astype(int)))          # 0.25 cm cells
+        if len(collapsed) * (ROOT_SIDES - 1) > len(me.vertices):
+            fails.append("%s: %d vertices collapse to %d places, not ring by ring (Centre UVs wrong)" % (
+                name, len(me.vertices), len(collapsed)))
+    return fails
+
+
 def render_layout_sheet(groups):
     paths = []
     for name, objs, view, target, half in groups:
@@ -915,6 +991,7 @@ def main():
             fails.append("%s has %d tris > %d" % (o.name, tris, cap))
     print("split", split)
     fails += contract_checks(objs, split)
+    fails += contract_root_centres(objs)
     objs["_rig"] = rig
 
     exported = []
@@ -951,6 +1028,7 @@ def main():
         if args["sheets"]:
             sheets = render_piece_sheets(objs)
             sheets.append(render_jaw_sheet(objs))
+            sheets.append(render_grow_sheet(objs))
             sheets.append(render_layout_sheet((
                 ("rest", rest, (1.0, -0.75, 0.45), (0.0, 0.0, 60.0), 85.0),
                 ("gape", gape, (1.0, 0.6, 0.3), (0.0, 0.0, 65.0), 85.0),

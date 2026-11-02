@@ -2,7 +2,7 @@
 	"_meta":
 	{
 		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
-		"sourceHash": "7f10f8cf5004e772e9ed1d170f03900e",
+		"sourceHash": "75cd138850e1430c61a40be34f5fb7c2",
 		"exporterVersion": 3
 	},
 	"system": "RootMawRoots_Mars_NS",
@@ -12,6 +12,11 @@
 			"name": "User.BedRadius",
 			"type": "NiagaraFloat",
 			"value": "24"
+		},
+		{
+			"name": "User.Distance",
+			"type": "NiagaraFloat",
+			"value": "0"
 		},
 		{
 			"name": "User.FarRadius",
@@ -69,6 +74,11 @@
 			"value": "1.5"
 		},
 		{
+			"name": "User.PanRate",
+			"type": "NiagaraFloat",
+			"value": "0.03"
+		},
+		{
 			"name": "User.RootScale",
 			"type": "NiagaraFloat",
 			"value": "1"
@@ -97,6 +107,36 @@
 			"name": "User.Speed",
 			"type": "NiagaraFloat",
 			"value": "0"
+		},
+		{
+			"name": "User.TendrilCount",
+			"type": "NiagaraFloat",
+			"value": "5"
+		},
+		{
+			"name": "User.TendrilLife",
+			"type": "NiagaraFloat",
+			"value": "2.2"
+		},
+		{
+			"name": "User.TendrilSpacing",
+			"type": "NiagaraFloat",
+			"value": "4"
+		},
+		{
+			"name": "User.TendrilSpread",
+			"type": "NiagaraFloat",
+			"value": "20"
+		},
+		{
+			"name": "User.TendrilWidth",
+			"type": "NiagaraFloat",
+			"value": "14"
+		},
+		{
+			"name": "User.TendrilWiggle",
+			"type": "NiagaraFloat",
+			"value": "8"
 		},
 		{
 			"name": "User.TipDegrees",
@@ -195,6 +235,42 @@
 					{
 						"name": "SystemState.Loop Duration",
 						"value": "5"
+					},
+					{
+						"name": "Tendrils.EmitterState.Loop Delay",
+						"value": "0"
+					},
+					{
+						"name": "Tendrils.EmitterState.Loop Duration",
+						"value": "1"
+					},
+					{
+						"name": "Tendrils.EmitterState.MaxDistance",
+						"value": "5000"
+					},
+					{
+						"name": "Tendrils.EmitterState.MinDistance",
+						"value": "0"
+					},
+					{
+						"name": "Tendrils.SpawnPerUnit.Max Movement Threshold",
+						"value": "5000"
+					},
+					{
+						"name": "Tendrils.SpawnPerUnit.Movement Tolerance",
+						"value": "0.5"
+					},
+					{
+						"name": "Tendrils.SpawnPerUnit.Spawn Group",
+						"value": "0"
+					},
+					{
+						"name": "Tendrils.SpawnPerUnit.Spawn Probability",
+						"value": "0.5"
+					},
+					{
+						"name": "Tendrils.SpawnPerUnit.Spawn Spacing",
+						"value": "20"
 					}
 				]
 			}
@@ -577,6 +653,22 @@
 					],
 					"values": [
 						{
+							"name": "Roots.DynamicMaterialParameters.Index 0 Param 1",
+							"value": "0"
+						},
+						{
+							"name": "Roots.DynamicMaterialParameters.Index 0 Param 2",
+							"value": "0"
+						},
+						{
+							"name": "Roots.DynamicMaterialParameters.Index 0 Param 3",
+							"value": "0"
+						},
+						{
+							"name": "Roots.DynamicMaterialParameters.Index 0 Param 4",
+							"value": "0"
+						},
+						{
 							"name": "Roots.InitializeParticle.Lifetime",
 							"value": "5"
 						},
@@ -696,6 +788,28 @@
 							]
 						},
 						{
+							"name": "Dynamic Material Parameters",
+							"id": "DynamicMaterialParameters",
+							"inputs": [
+								{
+									"name": "Write Parameter Index 0",
+									"value": "NewEnumerator1 (Float)"
+								},
+								{
+									"name": "Write Parameter Index 1",
+									"value": "NewEnumerator0 (Off)"
+								},
+								{
+									"name": "Write Parameter Index 2",
+									"value": "NewEnumerator0 (Off)"
+								},
+								{
+									"name": "Write Parameter Index 3",
+									"value": "NewEnumerator0 (Off)"
+								}
+							]
+						},
+						{
 							"name": "Mars Root Update Mars NM",
 							"id": "MarsRootUpdate_Mars_NM",
 							"inputs": [],
@@ -759,6 +873,22 @@
 						}
 					],
 					"values": [
+						{
+							"name": "Roots.DynamicMaterialParameters.Index 0 Param 1",
+							"value": "0"
+						},
+						{
+							"name": "Roots.DynamicMaterialParameters.Index 0 Param 2",
+							"value": "0"
+						},
+						{
+							"name": "Roots.DynamicMaterialParameters.Index 0 Param 3",
+							"value": "0"
+						},
+						{
+							"name": "Roots.DynamicMaterialParameters.Index 0 Param 4",
+							"value": "0"
+						},
 						{
 							"name": "Roots.MarsRootUpdate_Mars_NM.BedRadius",
 							"value": "0"
@@ -842,6 +972,537 @@
 							"scale": "(1, 1, 1)"
 						}
 					]
+				}
+			]
+		},
+		{
+			"name": "Tendrils",
+			"enabled": true,
+			"sim": "CPU",
+			"localSpace": false,
+			"determinism": false,
+			"boundsMode": "Dynamic",
+			"stacks": [
+				{
+					"stage": "Emitter Update",
+					"modules": [
+						{
+							"name": "Emitter State",
+							"id": "EmitterState",
+							"inputs": [
+								{
+									"name": "ScaleSpawnCountCurve",
+									"value": ""
+								},
+								{
+									"name": "Enable Distance Culling",
+									"value": "false"
+								},
+								{
+									"name": "Enable Visibility Culling",
+									"value": "false"
+								},
+								{
+									"name": "Inactive Response",
+									"value": "NewEnumerator0 (Complete (Let Particles Finish then Kill Emitter))"
+								},
+								{
+									"name": "Life Cycle Mode",
+									"value": "NewEnumerator0 (System)"
+								},
+								{
+									"name": "Loop Behavior",
+									"value": "NewEnumerator0 (Infinite)"
+								},
+								{
+									"name": "Loop Duration Mode",
+									"value": "NewEnumerator0 (Fixed)"
+								},
+								{
+									"name": "Scalability Mode",
+									"value": "NewEnumerator0 (System)"
+								},
+								{
+									"name": "Scale Spawn Count",
+									"value": "false"
+								},
+								{
+									"name": "UseLoopDelay",
+									"value": "false"
+								}
+							]
+						},
+						{
+							"name": "Spawn Per Unit",
+							"id": "SpawnPerUnit",
+							"inputs": [
+								{
+									"name": "Use Spawn Probability",
+									"value": "false"
+								}
+							],
+							"overrides": [
+								{
+									"path": "Spawn Spacing",
+									"kind": "linked",
+									"value": "User.TendrilSpacing"
+								},
+								{
+									"path": "Use Max Movement Threshold",
+									"kind": "value",
+									"value": "true"
+								},
+								{
+									"path": "Max Movement Threshold",
+									"kind": "value",
+									"value": "600.0"
+								}
+							]
+						}
+					],
+					"values": [
+						{
+							"name": "Tendrils.EmitterState.Loop Delay",
+							"value": "0"
+						},
+						{
+							"name": "Tendrils.EmitterState.Loop Duration",
+							"value": "1"
+						},
+						{
+							"name": "Tendrils.EmitterState.MaxDistance",
+							"value": "5000"
+						},
+						{
+							"name": "Tendrils.EmitterState.MinDistance",
+							"value": "0"
+						},
+						{
+							"name": "Tendrils.SpawnPerUnit.Max Movement Threshold",
+							"value": "5000"
+						},
+						{
+							"name": "Tendrils.SpawnPerUnit.Movement Tolerance",
+							"value": "0.5"
+						},
+						{
+							"name": "Tendrils.SpawnPerUnit.Spawn Group",
+							"value": "0"
+						},
+						{
+							"name": "Tendrils.SpawnPerUnit.Spawn Probability",
+							"value": "0.5"
+						},
+						{
+							"name": "Tendrils.SpawnPerUnit.Spawn Spacing",
+							"value": "20"
+						}
+					]
+				},
+				{
+					"stage": "Particle Spawn",
+					"modules": [
+						{
+							"name": "Initialize Particle",
+							"id": "InitializeParticle",
+							"inputs": [
+								{
+									"name": "AdjustAlpha",
+									"value": "false"
+								},
+								{
+									"name": "AdjustHue",
+									"value": "true"
+								},
+								{
+									"name": "AdjustSaturation",
+									"value": "false"
+								},
+								{
+									"name": "AdjustValue",
+									"value": "false"
+								},
+								{
+									"name": "Color Channel Mode",
+									"value": "NewEnumerator1 (Link RGB / Link A)"
+								},
+								{
+									"name": "Color Mode",
+									"value": "NewEnumerator0 (Unset)"
+								},
+								{
+									"name": "Color Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "Lifetime Mode",
+									"value": "NewEnumerator0 (Direct Set)"
+								},
+								{
+									"name": "Lifetime Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "Mass Mode",
+									"value": "NewEnumerator0 (Unset / (Mass of 1))"
+								},
+								{
+									"name": "Mass Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "Mesh Renderer Array Visibility Mode",
+									"value": "NewEnumerator0 (Unset)"
+								},
+								{
+									"name": "Mesh Scale Mode",
+									"value": "NewEnumerator0 (Unset)"
+								},
+								{
+									"name": "Mesh Scale Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "Position Mode",
+									"value": "NewEnumerator2 (Simulation Position)"
+								},
+								{
+									"name": "Ribbon Facing Mode",
+									"value": "NewEnumerator0 (Unset)"
+								},
+								{
+									"name": "Ribbon Twist Mode",
+									"value": "NewEnumerator0 (Unset)"
+								},
+								{
+									"name": "Ribbon Width Mode",
+									"value": "NewEnumerator0 (Unset)"
+								},
+								{
+									"name": "Sprite Rotation Mode",
+									"value": "NewEnumerator3 (Unset)"
+								},
+								{
+									"name": "Sprite Rotation Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "Sprite Size Mode",
+									"value": "NewEnumerator0 (Unset)"
+								},
+								{
+									"name": "Sprite Size Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "Sprite UV Mode",
+									"value": "NewEnumerator0 (Unset)"
+								},
+								{
+									"name": "Sprite UV Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "UsePositionOffset",
+									"value": "false"
+								},
+								{
+									"name": "Wrap Index By Mesh Count",
+									"value": "true"
+								},
+								{
+									"name": "Write Material Random",
+									"value": "true"
+								}
+							]
+						},
+						{
+							"name": "Mars Tendril Spawn Mars NM",
+							"id": "MarsTendrilSpawn_Mars_NM",
+							"inputs": [],
+							"overrides": [
+								{
+									"path": "Heading",
+									"kind": "linked",
+									"value": "User.Heading"
+								},
+								{
+									"path": "TendrilCount",
+									"kind": "linked",
+									"value": "User.TendrilCount"
+								},
+								{
+									"path": "TendrilSpread",
+									"kind": "linked",
+									"value": "User.TendrilSpread"
+								},
+								{
+									"path": "TendrilLife",
+									"kind": "linked",
+									"value": "User.TendrilLife"
+								},
+								{
+									"path": "TendrilWiggle",
+									"kind": "linked",
+									"value": "User.TendrilWiggle"
+								},
+								{
+									"path": "TendrilWidth",
+									"kind": "linked",
+									"value": "User.TendrilWidth"
+								},
+								{
+									"path": "RootScale",
+									"kind": "linked",
+									"value": "User.RootScale"
+								},
+								{
+									"path": "Distance",
+									"kind": "linked",
+									"value": "User.Distance"
+								},
+								{
+									"path": "Origin",
+									"kind": "linked",
+									"value": "Engine.Owner.Position"
+								}
+							]
+						}
+					],
+					"values": [
+						{
+							"name": "Tendrils.DynamicMaterialParameters.Index 0 Param 1",
+							"value": "0"
+						},
+						{
+							"name": "Tendrils.DynamicMaterialParameters.Index 0 Param 2",
+							"value": "0"
+						},
+						{
+							"name": "Tendrils.DynamicMaterialParameters.Index 0 Param 3",
+							"value": "0"
+						},
+						{
+							"name": "Tendrils.DynamicMaterialParameters.Index 0 Param 4",
+							"value": "0"
+						},
+						{
+							"name": "Tendrils.InitializeParticle.Lifetime",
+							"value": "5"
+						},
+						{
+							"name": "Tendrils.InitializeParticle.Position Offset",
+							"value": "(0, 0, 0)"
+						},
+						{
+							"name": "Tendrils.MarsTendrilSpawn_Mars_NM.Distance",
+							"value": "0"
+						},
+						{
+							"name": "Tendrils.MarsTendrilSpawn_Mars_NM.Heading",
+							"value": "(0, 0, 0)"
+						},
+						{
+							"name": "Tendrils.MarsTendrilSpawn_Mars_NM.Origin",
+							"value": "(0, 0, 0)"
+						},
+						{
+							"name": "Tendrils.MarsTendrilSpawn_Mars_NM.RootScale",
+							"value": "0"
+						},
+						{
+							"name": "Tendrils.MarsTendrilSpawn_Mars_NM.TendrilCount",
+							"value": "0"
+						},
+						{
+							"name": "Tendrils.MarsTendrilSpawn_Mars_NM.TendrilLife",
+							"value": "0"
+						},
+						{
+							"name": "Tendrils.MarsTendrilSpawn_Mars_NM.TendrilSpread",
+							"value": "0"
+						},
+						{
+							"name": "Tendrils.MarsTendrilSpawn_Mars_NM.TendrilWidth",
+							"value": "0"
+						},
+						{
+							"name": "Tendrils.MarsTendrilSpawn_Mars_NM.TendrilWiggle",
+							"value": "0"
+						},
+						{
+							"name": "Tendrils.MarsTendrilUpdate_Mars_NM.BedRadius",
+							"value": "0"
+						},
+						{
+							"name": "Tendrils.MarsTendrilUpdate_Mars_NM.Distance",
+							"value": "0"
+						},
+						{
+							"name": "Tendrils.MarsTendrilUpdate_Mars_NM.FarRadius",
+							"value": "0"
+						},
+						{
+							"name": "Tendrils.MarsTendrilUpdate_Mars_NM.Owner",
+							"value": "(0, 0, 0)"
+						},
+						{
+							"name": "Tendrils.MarsTendrilUpdate_Mars_NM.PanRate",
+							"value": "0"
+						},
+						{
+							"name": "Tendrils.MarsTendrilUpdate_Mars_NM.RootScale",
+							"value": "0"
+						},
+						{
+							"name": "Tendrils.MarsTendrilUpdate_Mars_NM.TendrilWidth",
+							"value": "0"
+						}
+					]
+				},
+				{
+					"stage": "Particle Update",
+					"modules": [
+						{
+							"name": "Particle State",
+							"id": "ParticleState",
+							"inputs": [
+								{
+									"name": "Kill Particles When Lifetime Has Elapsed",
+									"value": "true"
+								}
+							]
+						},
+						{
+							"name": "Dynamic Material Parameters",
+							"id": "DynamicMaterialParameters",
+							"inputs": [
+								{
+									"name": "Write Parameter Index 0",
+									"value": "NewEnumerator1 (Float)"
+								},
+								{
+									"name": "Write Parameter Index 1",
+									"value": "NewEnumerator0 (Off)"
+								},
+								{
+									"name": "Write Parameter Index 2",
+									"value": "NewEnumerator0 (Off)"
+								},
+								{
+									"name": "Write Parameter Index 3",
+									"value": "NewEnumerator0 (Off)"
+								}
+							]
+						},
+						{
+							"name": "Mars Tendril Update Mars NM",
+							"id": "MarsTendrilUpdate_Mars_NM",
+							"inputs": [],
+							"overrides": [
+								{
+									"path": "TendrilWidth",
+									"kind": "linked",
+									"value": "User.TendrilWidth"
+								},
+								{
+									"path": "RootScale",
+									"kind": "linked",
+									"value": "User.RootScale"
+								},
+								{
+									"path": "BedRadius",
+									"kind": "linked",
+									"value": "User.BedRadius"
+								},
+								{
+									"path": "FarRadius",
+									"kind": "linked",
+									"value": "User.FarRadius"
+								},
+								{
+									"path": "Distance",
+									"kind": "linked",
+									"value": "User.Distance"
+								},
+								{
+									"path": "PanRate",
+									"kind": "linked",
+									"value": "User.PanRate"
+								},
+								{
+									"path": "Owner",
+									"kind": "linked",
+									"value": "Engine.Owner.Position"
+								}
+							]
+						}
+					],
+					"values": [
+						{
+							"name": "Tendrils.DynamicMaterialParameters.Index 0 Param 1",
+							"value": "0"
+						},
+						{
+							"name": "Tendrils.DynamicMaterialParameters.Index 0 Param 2",
+							"value": "0"
+						},
+						{
+							"name": "Tendrils.DynamicMaterialParameters.Index 0 Param 3",
+							"value": "0"
+						},
+						{
+							"name": "Tendrils.DynamicMaterialParameters.Index 0 Param 4",
+							"value": "0"
+						},
+						{
+							"name": "Tendrils.MarsTendrilUpdate_Mars_NM.BedRadius",
+							"value": "0"
+						},
+						{
+							"name": "Tendrils.MarsTendrilUpdate_Mars_NM.Distance",
+							"value": "0"
+						},
+						{
+							"name": "Tendrils.MarsTendrilUpdate_Mars_NM.FarRadius",
+							"value": "0"
+						},
+						{
+							"name": "Tendrils.MarsTendrilUpdate_Mars_NM.Owner",
+							"value": "(0, 0, 0)"
+						},
+						{
+							"name": "Tendrils.MarsTendrilUpdate_Mars_NM.PanRate",
+							"value": "0"
+						},
+						{
+							"name": "Tendrils.MarsTendrilUpdate_Mars_NM.RootScale",
+							"value": "0"
+						},
+						{
+							"name": "Tendrils.MarsTendrilUpdate_Mars_NM.TendrilWidth",
+							"value": "0"
+						}
+					]
+				}
+			],
+			"eventHandlers": [],
+			"lifetimeResolved":
+			{
+				"module": "InitializeParticle",
+				"mode": "NewEnumerator0 (Direct Set)",
+				"source": "direct",
+				"values": [
+					{
+						"name": "Lifetime",
+						"value": "5"
+					}
+				]
+			},
+			"renderers": [
+				{
+					"type": "NiagaraRibbonRendererProperties",
+					"material": "/Game/Mars/Gameplay/Monsters/RootMaw/Materials/RootMawTendril_Mars_MI.RootMawTendril_Mars_MI"
 				}
 			]
 		}

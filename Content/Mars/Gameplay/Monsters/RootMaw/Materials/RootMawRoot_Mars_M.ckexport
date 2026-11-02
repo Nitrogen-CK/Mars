@@ -4,7 +4,7 @@
 	"_meta":
 	{
 		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
-		"sourceHash": "5e0648207ade83d513640f0141a47a9a",
+		"sourceHash": "50f565ceeadb919a981b28fa41f74df7",
 		"exporterVersion": 3
 	},
 	"blendMode": "BLEND_Opaque",
@@ -17,27 +17,41 @@
 	],
 	"expressions":
 	{
-		"ComponentMask": 1,
+		"Add": 1,
+		"AppendVector": 1,
+		"ComponentMask": 2,
+		"Divide": 1,
+		"DynamicParameter": 1,
 		"LinearInterpolate": 1,
-		"Multiply": 1,
+		"Multiply": 3,
+		"OneMinus": 1,
 		"Power": 1,
-		"ScalarParameter": 3,
-		"TextureCoordinate": 1,
+		"Saturate": 1,
+		"ScalarParameter": 4,
+		"Subtract": 1,
+		"TextureCoordinate": 3,
+		"Transform": 1,
 		"VectorParameter": 2,
 		"VertexColor": 1
 	},
+	"dynamicParameters": [
+		"Param1",
+		"Param2",
+		"Param3",
+		"Param4"
+	],
 	"graph":
 	{
 		"nodes": [
 			{
 				"id": 0,
 				"class": "TextureCoordinate",
-				"name": "MaterialExpressionTextureCoordinate_1"
+				"name": "MaterialExpressionTextureCoordinate_0"
 			},
 			{
 				"id": 1,
 				"class": "ComponentMask",
-				"name": "MaterialExpressionComponentMask_1",
+				"name": "MaterialExpressionComponentMask_0",
 				"inputs": [
 					{
 						"index": 0,
@@ -54,7 +68,7 @@
 			{
 				"id": 2,
 				"class": "ScalarParameter",
-				"name": "MaterialExpressionScalarParameter_0",
+				"name": "MaterialExpressionScalarParameter_2",
 				"props":
 				{
 					"DefaultValue": 0.80000001192092896,
@@ -64,7 +78,7 @@
 			{
 				"id": 3,
 				"class": "Power",
-				"name": "MaterialExpressionPower_1",
+				"name": "MaterialExpressionPower_0",
 				"inputs": [
 					{
 						"index": 0,
@@ -77,7 +91,7 @@
 			{
 				"id": 4,
 				"class": "LinearInterpolate",
-				"name": "MaterialExpressionLinearInterpolate_1",
+				"name": "MaterialExpressionLinearInterpolate_0",
 				"inputs": [
 					{
 						"index": 0,
@@ -104,7 +118,7 @@
 			{
 				"id": 5,
 				"class": "VectorParameter",
-				"name": "MaterialExpressionVectorParameter_2",
+				"name": "MaterialExpressionVectorParameter_0",
 				"outputs": [
 					"RGB",
 					"R",
@@ -122,7 +136,7 @@
 			{
 				"id": 6,
 				"class": "VectorParameter",
-				"name": "MaterialExpressionVectorParameter_3",
+				"name": "MaterialExpressionVectorParameter_1",
 				"outputs": [
 					"RGB",
 					"R",
@@ -140,7 +154,7 @@
 			{
 				"id": 7,
 				"class": "VertexColor",
-				"name": "MaterialExpressionVertexColor_0",
+				"name": "MaterialExpressionVertexColor_1",
 				"outputs": [
 					"None",
 					"None",
@@ -152,7 +166,7 @@
 			{
 				"id": 8,
 				"class": "Multiply",
-				"name": "MaterialExpressionMultiply_0",
+				"name": "MaterialExpressionMultiply_1",
 				"inputs": [
 					{
 						"index": 0,
@@ -172,7 +186,7 @@
 			{
 				"id": 9,
 				"class": "ScalarParameter",
-				"name": "MaterialExpressionScalarParameter_1",
+				"name": "MaterialExpressionScalarParameter_3",
 				"props":
 				{
 					"DefaultValue": 0.85000002384185791,
@@ -182,12 +196,230 @@
 			{
 				"id": 10,
 				"class": "ScalarParameter",
-				"name": "MaterialExpressionScalarParameter_5",
+				"name": "MaterialExpressionScalarParameter_4",
 				"props":
 				{
 					"DefaultValue": 0.30000001192092896,
 					"ParameterName": "Specular"
 				}
+			},
+			{
+				"id": 11,
+				"class": "DynamicParameter",
+				"name": "MaterialExpressionDynamicParameter_0",
+				"outputs": [
+					"Param1",
+					"Param2",
+					"Param3",
+					"Param4",
+					"RGB",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=1.000000,G=0.000000,B=0.000000,A=0.000000)"
+				}
+			},
+			{
+				"id": 12,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_6",
+				"props":
+				{
+					"DefaultValue": 0.15000000596046448,
+					"ParameterName": "GrowFront"
+				}
+			},
+			{
+				"id": 13,
+				"class": "Add",
+				"name": "MaterialExpressionAdd_0",
+				"inputs": [
+					{
+						"index": 1,
+						"name": "B",
+						"node": 12,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"ConstA": 1
+				}
+			},
+			{
+				"id": 14,
+				"class": "Multiply",
+				"name": "MaterialExpressionMultiply_2",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 11,
+						"output": 0,
+						"mask": "r"
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 13,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 15,
+				"class": "Subtract",
+				"name": "MaterialExpressionSubtract_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 14,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 1,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 16,
+				"class": "Divide",
+				"name": "MaterialExpressionDivide_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 15,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 12,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 17,
+				"class": "Saturate",
+				"name": "MaterialExpressionSaturate_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Input",
+						"node": 16,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 18,
+				"class": "OneMinus",
+				"name": "MaterialExpressionOneMinus_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Input",
+						"node": 17,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 19,
+				"class": "TextureCoordinate",
+				"name": "MaterialExpressionTextureCoordinate_2",
+				"props":
+				{
+					"CoordinateIndex": 1
+				}
+			},
+			{
+				"id": 20,
+				"class": "TextureCoordinate",
+				"name": "MaterialExpressionTextureCoordinate_3",
+				"props":
+				{
+					"CoordinateIndex": 2
+				}
+			},
+			{
+				"id": 21,
+				"class": "ComponentMask",
+				"name": "MaterialExpressionComponentMask_2",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Input",
+						"node": 20,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"R": true
+				}
+			},
+			{
+				"id": 22,
+				"class": "AppendVector",
+				"name": "MaterialExpressionAppendVector_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 19,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 21,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 23,
+				"class": "Transform",
+				"name": "MaterialExpressionTransform_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Input",
+						"node": 22,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"TransformSourceType": "TRANSFORMSOURCE_Local"
+				}
+			},
+			{
+				"id": 24,
+				"class": "Multiply",
+				"name": "MaterialExpressionMultiply_3",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 23,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 18,
+						"output": 0
+					}
+				]
 			}
 		],
 		"outputs": [
@@ -205,6 +437,11 @@
 				"property": "MP_Roughness",
 				"node": 9,
 				"output": 0
+			},
+			{
+				"property": "MP_WorldPositionOffset",
+				"node": 24,
+				"output": 0
 			}
 		]
 	},
@@ -220,6 +457,10 @@
 		{
 			"name": "Specular",
 			"value": 0.30000001192092896
+		},
+		{
+			"name": "GrowFront",
+			"value": 0.15000000596046448
 		}
 	],
 	"vectorParams": [

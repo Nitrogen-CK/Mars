@@ -26,6 +26,9 @@ namespace utils_root_maw
     const FName RootsParam_Heading = n"Heading";
     const FName RootsParam_Speed = n"Speed";
     const FName RootsParam_RootScale = n"RootScale";
+    const FName RootsParam_Distance = n"Distance";
+    // The distance fed to the trail wraps here (its tendrils pan and sway on it; float precision stays fine).
+    const float64 RootsDistanceWrap = 100000.0;
 
     // The throat's custom primitive data 0 is the eyes' Glow (RootMaw_Mars_M).
     const int32 ThroatCpd_Glow = 0;
@@ -305,9 +308,10 @@ class UMars_RootMaw_EntityScript : UCk_GenericEntityScript_UE
         }
     }
 
-    // The trail: roots per unit of glide come from the system's own SpawnPerUnit (its component rides the ground node);
-    // this writes the idle bed's rate (none buried or dead, a burst while it comes up, Trail.IdleRate once up) and the
-    // kernel's ground velocity as the heading and speed the roots lead by.
+    // The trail: roots and tendril points per unit of glide come from the system's own SpawnPerUnit (its component rides
+    // the ground node); this writes the idle bed's rate (none buried or dead, a burst while it comes up, Trail.IdleRate once
+    // up), the kernel's ground velocity as the heading and speed the roots lead by, and the distance it has glided (the
+    // tendrils' bark pans and sways on it, so it streams at the Maw's speed).
     private void FeedRoots()
     {
         if (ck::Is_NOT_Valid(_Roots))
@@ -324,6 +328,7 @@ class UMars_RootMaw_EntityScript : UCk_GenericEntityScript_UE
         _Roots.SetVariableFloat(utils_root_maw::RootsParam_IdleRate, Rate);
         _Roots.SetVariableVec3(utils_root_maw::RootsParam_Heading, Velocity.GetSafeNormal());
         _Roots.SetVariableFloat(utils_root_maw::RootsParam_Speed, float32(Velocity.Size()));
+        _Roots.SetVariableFloat(utils_root_maw::RootsParam_Distance, float32(Math::Fmod(_Maw.Get_DistanceTravelled(), utils_root_maw::RootsDistanceWrap)));
     }
 
     private void DebugStrike()
