@@ -2,9 +2,10 @@
 geometry, fixed seeds) as a re-runnable headless Blender 5.2 build, the way build_centipede_pieces.py builds the centipede.
 
 The look is Stephen's concept (2026-10-31): a faceted low-poly glass pickle jar on four blocky wooden legs, two wooden
-hoops with blocky clasps round it, a hinged wooden lid that is the mouth (square bone teeth on the lid and in the jar's
-mouth, dark red gums), a black eye cavity with two glowing oval eyes that rises when the lid lifts, a red cloth bow tied at
-each side. The brine and the pickles in it are NOT modelled: the jar's liquid is a plain cylinder that wears the pickle
+hoops with blocky clasps round it, a mouth like a treasure chest's (2026-11-02, Stephen: "the top be a band with the teeth
+on it"): a solid wooden jaw band round the jar's top with square bone teeth along it and a deep hinged wooden lid whose
+skirt meets the band, its own teeth hanging inside, so that shut the eyes and the inside of the mouth are hidden; a black
+eye cavity with two glowing oval eyes inside the band that rises when the lid lifts, a red cloth bow tied at each side. The brine and the pickles in it are NOT modelled: the jar's liquid is a plain cylinder that wears the pickle
 brine shader's Pickle Jar instance (mars_potion_ue / mars_potion_hlsl), which traces the pickles inside it. A pre-fractured
 copy of the glass (ten shards that fit together exactly) is the death's shatter.
 
@@ -14,18 +15,21 @@ frame's origin is the jar's base centre; standing, it rides CLEARANCE over the g
 the gameplay rig's contract, utils_pickle_mimic):
 
   PickleMimic_Glass_Mars_SM      the jar: a 12-sided glass shell (a facet faces +X), base z 0, wall r 30 from z 3 to 50, a
-                                 shoulder into the neck (r 26), a lip bead, top z 64, 1.6 thick; SOCKET_LiquidCentre.
+                                 shoulder up to its open top at z 55 (inside the jaw band), 1.6 thick; SOCKET_LiquidCentre.
   PickleMimic_Liquid_Mars_SM     the brine: a 32-sided cylinder r LIQUID_RADIUS, half height LIQUID_HALF, pivot at its
                                  middle (LIQUID_CENTRE over the base); wears PickleMimicBrine_Mars_MI.
-  PickleMimic_Frame_Mars_SM      the wooden hoops (z 7..16 and 40..49) with their clasps, the four hip brackets on the
-                                 diagonals, the neck strap and the hinge knuckles at the back; SOCKET_Hinge, SOCKET_Hip*.
-  PickleMimic_Mouth_Mars_SM      the gum ring in the jar's neck (z 55..59) and the seven big bevelled rim teeth in it.
+  PickleMimic_Frame_Mars_SM      the wooden hoops (z 7..16 and 40..49) with their clasps and the hinge knuckles at the
+                                 back; SOCKET_Hinge.
+  PickleMimic_Mouth_Mars_SM      the lower jaw: the opaque wooden band round the jar's top (z BAND_Z0..BAND_Z1, red inside)
+                                 with its clasps and the hasp's staple, the gum floor over the glass's open top, a gum
+                                 ledge and the seven big bevelled teeth standing on it along the band.
   PickleMimic_Face_Mars_SM       the black eye cavity (a dome, pivot at its base centre, FACE_BASE over the jar base) and
                                  the two oval eyes on its front (slot PickleMimicEye: the glow); it rises FACE_RISE when the
                                  lid is wide open.
-  PickleMimic_Lid_Mars_SM        pivot at the hinge (HINGE), +X toward the front: the faceted wooden lid (r 31 about
-                                 (LID_CENTRE_X, 0)), its knob and strap, the red gum under it and six big bevelled teeth
-                                 hanging from it between the rim teeth. Closed, its underside lies at body z 64.5.
+  PickleMimic_Lid_Mars_SM        pivot at the hinge (HINGE), +X toward the front: the upper jaw, a deep wooden cap (the
+                                 band's radius about (LID_CENTRE_X, 0)) whose skirt meets the band at the seam (body z
+                                 BAND_Z1) when shut, red inside, its knob, clasps, hinge leaf and the hasp hanging over the
+                                 seam at the front, and six big bevelled teeth hanging from its ceiling between the band's.
   PickleMimic_Bow_Mars_SM        the red bow on the jar's right side at the top hoop (the left one is the same mesh turned
                                  180 degrees about Z).
   There are no legs (Stephen 2026-10-31: "it just needs to be the foot that can be magically floating and moving up and
@@ -100,15 +104,13 @@ JAR_SIDES = 12
 JAR_PHASE = math.pi / JAR_SIDES         # a facet centred on +X (the face)
 GLASS_T = 1.6
 # the glass profile (r = the 12-gon's circumradius, z): outside from the base up to the lip, inside from the lip down
-GLASS_OUT = [(27.0, 0.0), (30.0, 3.0), (30.0, 50.0), (28.5, 53.0), (27.0, 56.0), (26.0, 58.0), (26.0, 62.0),
-             (27.0, 62.5), (27.0, 64.0)]
-GLASS_IN = [(24.4, 64.0), (24.4, 58.0), (25.4, 55.6), (26.9, 52.6), (28.4, 50.0), (28.4, 3.0), (26.6, 2.0)]
-# the wall's rows for the shards (outer, inner), from the foot's top (z 3) to the lip's top
+GLASS_TOP = 55.0                        # the glass's open top, hidden inside the jaw band
+GLASS_OUT = [(27.0, 0.0), (30.0, 3.0), (30.0, 50.0), (28.5, 53.0), (27.5, GLASS_TOP)]
+GLASS_IN = [(25.9, GLASS_TOP), (26.9, 52.6), (28.4, 50.0), (28.4, 3.0), (26.6, 2.0)]
+# the wall's rows for the shards (outer, inner), from the foot's top (z 3) to the glass's top
 WALL_ROWS = [((30.0, 3.0), (28.4, 3.0))] + \
     [((30.0, 3.0 + 47.0 * k / 6.0), (28.4, 3.0 + 47.0 * k / 6.0)) for k in range(1, 7)] + \
-    [((28.5, 53.0), (26.9, 52.6)), ((27.0, 56.0), (25.4, 55.6)), ((26.0, 58.0), (24.4, 58.0)),
-     ((26.0, 60.0), (24.4, 60.0)), ((26.0, 62.0), (24.4, 62.0)), ((27.0, 62.5), (24.4, 62.5)),
-     ((27.0, 64.0), (24.4, 64.0))]
+    [((28.5, 53.0), (26.9, 52.6)), ((27.5, GLASS_TOP), (25.9, GLASS_TOP))]
 WALL_COLUMNS = JAR_SIDES * 4            # each facet split in four (the splits lie on the flat facet)
 # the brine cylinder: inside the glass's inner apothem (28.4 cos 15 = 27.4), floor to under the shoulder
 LIQUID_RADIUS = 27.0
@@ -118,20 +120,28 @@ LIQUID_CENTRE = 0.5 * (LIQUID_TOP + LIQUID_FLOOR)
 BRINE_SURFACE = 45.0                    # the concept's fill: brine nearly up to the top hoop
 HOOPS = ((7.0, 16.0), (40.0, 49.0))
 HOOP_IN, HOOP_OUT = 30.2, 32.6
-# the mouth: gums and teeth, the lid on its hinge, the face dome
-GUM_TOP = 59.2
-TOOTH_RING = 20.5
+# the mouth, a chest's: the lower jaw is a wooden band round the jar's top (12-gon circumradii, like the hoops), its
+# inside lined red, a gum floor over the glass's open top and a gum ledge the band's teeth stand on; the lid is a deep cap
+# of the same radius whose skirt sits on the band (the seam at BAND_Z1), red inside, its teeth hanging from its ceiling
+BAND_Z0, BAND_Z1 = 51.0, 64.0
+BAND_IN, BAND_OUT = 30.4, 32.6
+MOUTH_FLOOR = (55.2, 56.4)              # the gum floor's underside and top (over the glass's top, z 55)
+LEDGE = (21.0, 58.0)                    # the teeth's gum ledge: inner radius and top
+LID_SKIRT = 8.0                         # the lid's skirt, closed body z BAND_Z1 .. + LID_SKIRT
+LID_CEILING = 7.5                       # the lid's inside ceiling over the seam (lid frame z)
+LID_CROWN = 12.4                        # the lid's top over the seam
+TOOTH_RING = 25.5
 TOOTH_HALF = (3.4, 3.6, 4.0)            # radial, tangential, vertical: big bevelled cubes like the concept's
 TOOTH_BEVEL = 1.1
 RIM_TEETH_DEG = [-135.0 + 45.0 * k for k in range(7)]
 LID_TEETH_DEG = [-112.5 + 45.0 * k for k in range(6)]
-HINGE = np.array([-29.5, 0.0, 65.5])
-LID_CENTRE_X = 29.5                     # the lid's centre in its own frame (over the jar's axis when closed)
-LID_RADIUS = 31.0
-LID_UNDER = -1.0                        # the lid's underside below the hinge (body z 64.5 closed)
+HINGE = np.array([-33.4, 0.0, BAND_Z1])  # just behind the band's back facet (apothem 31.5), on the seam
+LID_CENTRE_X = 33.4                     # the lid's centre in its own frame (over the jar's axis when closed)
+LID_RADIUS = BAND_OUT
 LID_OPEN_DEG = 80.0                     # LidOpen 1
-FACE_BASE = 51.5
+FACE_BASE = MOUTH_FLOOR[1]              # the eye dome stands on the mouth's floor; its eyes sit just over the band's rim
 FACE_RISE = 10.0
+FACE_EYE_Z = 9.0                        # the eyes' centres over the dome's base (body z 65.4: just over the band's rim)
 # the feet, front-right built (the others mirror X and/or Y): on the diagonal just outside the jar's base, on the ground,
 # each turned to face out along its diagonal (its +X)
 LEG_FOOT = np.array([28.28, 28.28, -CLEARANCE])
@@ -395,11 +405,9 @@ def build_frame(rng):
     for deg in (0.0, 90.0, -90.0, 180.0):
         clasp(g, deg, *HOOPS[0], rng)
     sockets = {}
-    # the neck strap from the top hoop up the back to the hinge knuckles
-    g.add(bevel_box(np.array([-27.6, 0.0, 57.0]), (1.3, 3.2, 8.0), radial_frame(180.0), bevel=0.5),
-          "PickleMimicWoodDark")
+    # the hinge knuckles on the band's back, either side of the lid's leaf
     for side in (1.0, -1.0):
-        g.add(bevel_box(HINGE + np.array([0.6, 7.0 * side, -0.6]), (2.6, 2.8, 2.5), bevel=0.8), "PickleMimicWoodDark")
+        g.add(bevel_box(HINGE + np.array([0.6, 7.0 * side, -1.8]), (2.6, 2.8, 2.6), bevel=0.8), "PickleMimicWoodDark")
     g.add(sweep([HINGE + np.array([0.0, -10.5, 0.0]), HINGE + np.array([0.0, 10.5, 0.0])], [1.1, 1.1], 6,
                 up=(0.0, 0.0, 1.0)), "PickleMimicWoodDark")
     sockets["Hinge"] = HINGE.tolist()
@@ -449,24 +457,47 @@ def tooth(g, centre, deg, rng, down=False):
     return hz
 
 
+def band_clasp(g, deg, z0, z1, centre=(0.0, 0.0, 0.0)):
+    """A dark wooden plate across a band at bearing deg (round centre), z0..z1, with a peg."""
+    apo = BAND_OUT * math.cos(math.pi / JAR_SIDES)
+    c = np.asarray(centre, float) + vert_dir(deg) * (apo + 0.9) + np.array([0.0, 0.0, 0.5 * (z0 + z1)])
+    g.add(bevel_box(c, (1.2, 3.4, 0.5 * (z1 - z0)), radial_frame(deg), bevel=0.6), "PickleMimicWoodDark")
+    g.add(bevel_box(c + vert_dir(deg) * 1.6, (0.8, 1.3, 1.3), radial_frame(deg), bevel=0.35), "PickleMimicWood")
+
+
 def build_mouth(rng):
+    """The lower jaw: the band (wood outside, gum inside), the gum floor over the glass's top, the ledge and its teeth."""
     g = Geo()
-    prof = [(24.3, 55.0), (24.3, 58.4), (22.0, GUM_TOP), (15.0, 58.8), (13.6, 57.0), (13.6, 55.0)]
-    g.add(vrevolve(prof, JAR_SIDES, closed=True, jitter=0.2, rng=rng), "PickleMimicGum")
+    c = 0.8
+    prof = [(BAND_IN, BAND_Z0), (BAND_OUT - c, BAND_Z0), (BAND_OUT, BAND_Z0 + c), (BAND_OUT, BAND_Z1 - c),
+            (BAND_OUT - c, BAND_Z1), (BAND_IN, BAND_Z1)]
+    wood = "PickleMimicWood"
+    g.add(vrevolve(prof, JAR_SIDES, closed=True, jitter=[0.0, 0.2, 0.2, 0.2, 0.2, 0.0], rng=rng,
+                   band_slots=[wood] * 5 + ["PickleMimicGum"]))
+    f0, f1 = MOUTH_FLOOR
+    g.add(vrevolve([(0.0, f0), (BAND_IN - 0.1, f0), (BAND_IN - 0.1, f1), (0.0, f1)], JAR_SIDES), "PickleMimicGum")
+    r_in, top = LEDGE
+    g.add(vrevolve([(r_in, f1 - 0.2), (BAND_IN - 0.1, f1 - 0.2), (BAND_IN - 0.1, top), (r_in + 1.2, top + 0.3),
+                    (r_in, top - 0.6)], JAR_SIDES, closed=True, jitter=0.15, rng=rng), "PickleMimicGum")
     for deg in RIM_TEETH_DEG:
-        # tops at about the lip (64): rooted in the gum, hidden under the shut lid
-        tooth(g, vert_dir(deg) * TOOTH_RING + np.array([0.0, 0.0, 63.6 - TOOTH_HALF[2]]), deg, rng)
+        # standing on the ledge, their tips over the band's rim (inside the shut lid's skirt)
+        tooth(g, vert_dir(deg) * TOOTH_RING + np.array([0.0, 0.0, top - 0.3 + TOOTH_HALF[2]]), deg, rng)
+    for deg in (50.0, -50.0, 130.0, -130.0):
+        band_clasp(g, deg, BAND_Z0 - 0.6, BAND_Z1 - 1.0)
+    # the hasp's staple under the lid's latch, at the front
+    g.add(bevel_box(vert_dir(0.0) * (BAND_OUT * math.cos(math.pi / JAR_SIDES) + 0.9) + np.array([0.0, 0.0, 57.5]),
+                    (0.9, 2.2, 1.6), radial_frame(0.0), bevel=0.4), "PickleMimicWoodDark")
     return g, {}
 
 
 def build_face(rng):
     g = Geo()
-    prof = [(0.0, 0.0), (12.5, 0.0), (13.2, 4.0), (12.0, 8.5), (8.5, 11.2), (0.0, 12.2)]
+    prof = [(0.0, 0.0), (12.5, 0.0), (13.2, 5.0), (12.7, 9.5), (9.5, 13.0), (0.0, 14.0)]
     g.add(vrevolve(prof, 10, phase=0.0, jitter=[0.0, 0.0, 0.3, 0.3, 0.2, 0.0], rng=rng), "PickleMimicVoid")
     for side in (1.0, -1.0):
         deg = 20.0 * side
         n = vert_dir(deg)
-        c = n * 12.4 + np.array([0.0, 0.0, 7.0])
+        c = n * 12.4 + np.array([0.0, 0.0, FACE_EYE_Z])
         ry, rz = 1.9, 3.1
         pts = [c - n * 0.6, c + n * 0.9, c + n * 1.25]
         g.add(sweep(pts, [(ry, rz), (ry, rz), (ry * 0.78, rz * 0.82)], 10, up=(0.0, 0.0, 1.0)), "PickleMimicEye")
@@ -474,25 +505,33 @@ def build_face(rng):
 
 
 def build_lid(rng):
+    """The upper jaw, in the hinge's frame (z 0 the seam): a cap of the band's radius, its skirt down to the seam, red
+    inside under a ceiling at LID_CEILING, a crowned top, the knob, clasps on the skirt, the hinge leaf at the back and the
+    hasp's latch hanging over the seam at the front; its teeth hang from the ceiling."""
     g = Geo()
     centre = np.array([LID_CENTRE_X, 0.0, 0.0])
-    u = LID_UNDER
-    prof = [(0.0, u), (LID_RADIUS - 1.0, u), (LID_RADIUS, u + 1.0), (LID_RADIUS, u + 5.0), (LID_RADIUS - 1.5, u + 6.5),
-            (20.0, u + 7.8), (8.0, u + 8.5), (0.0, u + 8.5)]
-    g.add(vrevolve(prof, JAR_SIDES, centre=centre, jitter=[0.0, 0.3, 0.3, 0.3, 0.3, 0.4, 0.3, 0.0], rng=rng),
-          "PickleMimicWood")
+    c = 0.8
+    wood, gum = "PickleMimicWood", "PickleMimicGum"
+    prof = [(0.0, LID_CEILING), (BAND_IN, LID_CEILING), (BAND_IN, 0.0), (BAND_OUT - c, 0.0), (BAND_OUT, c),
+            (BAND_OUT, LID_SKIRT + 1.0), (BAND_OUT - 1.6, LID_SKIRT + 2.6), (22.0, LID_CROWN - 0.6), (8.0, LID_CROWN),
+            (0.0, LID_CROWN)]
+    g.add(vrevolve(prof, JAR_SIDES, centre=centre, rng=rng,
+                   jitter=[0.0, 0.0, 0.0, 0.2, 0.2, 0.2, 0.3, 0.4, 0.3, 0.0],
+                   band_slots=[gum, gum] + [wood] * 7))
     # the knob: an octagonal prism on the crown
-    g.add(vrevolve([(0.0, u + 8.0), (5.2, u + 8.0), (5.2, u + 10.8), (4.2, u + 11.8), (0.0, u + 11.8)], 8,
-                   centre=centre, phase=math.pi / 8.0), "PickleMimicWoodDark")
-    # the hinge leaf and its strap running forward over the lid
-    g.add(bevel_box(np.array([0.2, 0.0, 0.0]), (2.4, 4.0, 2.2), bevel=0.6), "PickleMimicWoodDark")
-    g.add(bevel_box(np.array([7.0, 0.0, u + 7.0]), (8.0, 3.2, 0.7), bevel=0.4), "PickleMimicWoodDark")
-    # the gum under it, proud of the wood
-    g.add(vrevolve([(0.0, u - 0.7), (23.5, u - 0.7), (24.5, u + 0.3), (0.0, u + 0.3)], JAR_SIDES, centre=centre),
-          "PickleMimicGum")
+    g.add(vrevolve([(0.0, LID_CROWN - 0.5), (5.2, LID_CROWN - 0.5), (5.2, LID_CROWN + 2.3), (4.2, LID_CROWN + 3.3),
+                    (0.0, LID_CROWN + 3.3)], 8, centre=centre, phase=math.pi / 8.0), "PickleMimicWoodDark")
+    # the hinge leaf between the band's knuckles
+    g.add(bevel_box(np.array([0.6, 0.0, 1.8]), (2.4, 4.0, 2.6), bevel=0.6), "PickleMimicWoodDark")
+    for deg in (50.0, -50.0, 130.0, -130.0):
+        band_clasp(g, deg, 0.8, LID_SKIRT + 0.6, centre)
+    # the hasp: a latch plate hanging from the skirt's front down over the seam onto the band's staple
+    apo = BAND_OUT * math.cos(math.pi / JAR_SIDES)
+    g.add(bevel_box(centre + vert_dir(0.0) * (apo + 0.8) + np.array([0.0, 0.0, 1.6]), (0.8, 3.6, 5.6),
+                    radial_frame(0.0), bevel=0.5), "PickleMimicWoodDark")
     for deg in LID_TEETH_DEG:
-        tooth(g, centre + vert_dir(deg) * TOOTH_RING + np.array([0.0, 0.0, u + 0.6 - TOOTH_HALF[2]]), deg, rng,
-              down=True)
+        tooth(g, centre + vert_dir(deg) * TOOTH_RING + np.array([0.0, 0.0, LID_CEILING + 0.3 - TOOTH_HALF[2]]), deg,
+              rng, down=True)
     return g, {}
 
 
@@ -1184,9 +1223,21 @@ def contract_checks(objs):
         return abs(float(a) - float(b)) <= tol
 
     lo, hi = ue_bounds(objs["Glass"])
-    if not (near(lo[2], 0.0, 0.01) and near(hi[2], 64.0, 0.01) and near(hi[0], 30.0 * math.cos(math.pi / 12), 0.05)):
-        fails.append("Glass z %.2f..%.2f, front face at x %.2f (want 0..64, %.2f)" % (lo[2], hi[2], hi[0],
-                                                                                     30.0 * math.cos(math.pi / 12)))
+    if not (near(lo[2], 0.0, 0.01) and near(hi[2], GLASS_TOP, 0.01) and near(hi[0], 30.0 * math.cos(math.pi / 12), 0.05)):
+        fails.append("Glass z %.2f..%.2f, front face at x %.2f (want 0..%.0f, %.2f)" % (lo[2], hi[2], hi[0], GLASS_TOP,
+                                                                                       30.0 * math.cos(math.pi / 12)))
+    # the band hides the glass's top: every glass vertex at or over the band's foot lies inside the band
+    gv = ue_verts(objs["Glass"])
+    band_inner = BAND_IN * math.cos(math.pi / JAR_SIDES)
+    over = gv[gv[:, 2] >= BAND_Z0 - 1e-6]
+    if over.size and np.linalg.norm(over[:, :2], axis=1).max() > band_inner - 0.2:
+        fails.append("the glass reaches r %.2f inside the band (its inner face at %.2f)"
+                     % (np.linalg.norm(over[:, :2], axis=1).max(), band_inner))
+    if GLASS_TOP > MOUTH_FLOOR[0] - 0.1:
+        fails.append("the glass's top %.1f pokes through the mouth's floor %.1f" % (GLASS_TOP, MOUTH_FLOOR[0]))
+    if abs(HINGE[2] - BAND_Z1) > 1e-6:
+        fails.append("the hinge (z %.1f) is not on the seam (z %.1f): the shut lid would not sit on the band"
+                     % (HINGE[2], BAND_Z1))
     lo, hi = ue_bounds(objs["Liquid"])
     if not (near(hi[2], LIQUID_HALF, 0.01) and near(lo[2], -LIQUID_HALF, 0.01) and near(hi[0], LIQUID_RADIUS, 0.05)):
         fails.append("Liquid z %.2f..%.2f r %.2f (want +-%.2f, r %.1f)" % (lo[2], hi[2], hi[0], LIQUID_HALF,
@@ -1203,11 +1254,24 @@ def contract_checks(objs):
         lo, hi = ue_bounds(objs[s])
         if (lo < glo - 0.05).any() or (hi > ghi + 0.05).any():
             fails.append("%s pokes out of the glass (%s .. %s)" % (s, np.round(lo, 2), np.round(hi, 2)))
-    # the face dome clears the shut lid; open, the eyes stand over the rim
+    # the face dome clears the shut lid's ceiling, and its eyes sit over the band's rim (a peek shows them)
     lo, hi = ue_bounds(objs["Face"])
-    lid_under = HINGE[2] + LID_UNDER
-    if FACE_BASE + hi[2] > lid_under - 0.3:
-        fails.append("the face dome's top %.1f reaches the shut lid's underside %.1f" % (FACE_BASE + hi[2], lid_under))
+    ceiling = HINGE[2] + LID_CEILING
+    if FACE_BASE + hi[2] > ceiling - 0.3:
+        fails.append("the face dome's top %.1f reaches the shut lid's ceiling %.1f" % (FACE_BASE + hi[2], ceiling))
+    if FACE_BASE + FACE_EYE_Z < BAND_Z1:
+        fails.append("the eyes (z %.1f) sit under the band's rim (z %.1f)" % (FACE_BASE + FACE_EYE_Z, BAND_Z1))
+    # the teeth: the band's stand on the ledge and stop under the shut lid's ceiling; the lid's hang to below the seam
+    # and stop over the ledge; both rings clear the band's inside and the dome
+    low_top = LEDGE[1] - 0.3 + 2.0 * TOOTH_HALF[2]
+    lid_bottom = HINGE[2] + LID_CEILING + 0.3 - 2.0 * TOOTH_HALF[2]
+    if low_top > ceiling - 0.5 or lid_bottom < LEDGE[1] + 0.5 or lid_bottom > BAND_Z1:
+        fails.append("the teeth do not close: the band's reach z %.1f (ceiling %.1f), the lid's down to z %.1f (ledge %.1f,"
+                     " seam %.1f)" % (low_top, ceiling, lid_bottom, LEDGE[1], BAND_Z1))
+    reach = math.hypot(TOOTH_RING + TOOTH_HALF[0], TOOTH_HALF[1])
+    if reach > band_inner - 0.2 or TOOTH_RING - TOOTH_HALF[0] < hi[0] + 1.0:
+        fails.append("the tooth ring (r %.1f .. %.1f) does not fit between the dome (r %.1f) and the band (%.1f)"
+                     % (TOOTH_RING - TOOTH_HALF[0], reach, hi[0], band_inner))
     eyes = ue_verts(objs["Face"])
     if FACE_BASE + FACE_RISE + eyes[:, 2].min() < 0.0:
         fails.append("Face has no vertices")
@@ -1217,8 +1281,9 @@ def contract_checks(objs):
     if arc < 2.0 * 2.3 + 0.4:
         fails.append("the lid's and the rim's teeth are only %.1f cm apart round the ring" % arc)
     lo, hi = ue_bounds(objs["Lid"])
-    if not (near(lo[0], LID_CENTRE_X - LID_RADIUS, 1.5) and hi[2] > 9.0):
-        fails.append("Lid x from %.1f (want about %.1f) / top %.1f" % (lo[0], LID_CENTRE_X - LID_RADIUS, hi[2]))
+    if not (lo[0] > -2.5 and lo[2] >= -4.5 and hi[2] > LID_CROWN + 2.0):
+        fails.append("Lid x from %.1f, z %.1f .. %.1f (want x > -2.5, z >= -4.5, knob over %.1f)"
+                     % (lo[0], lo[2], hi[2], LID_CROWN + 2.0))
     lo, hi = ue_bounds(objs["Foot"])
     if not (near(lo[2], 0.0, 0.01) and FOOT_HEIGHT <= hi[2] <= FOOT_HEIGHT + 1.6):
         fails.append("Foot z %.2f..%.2f (want 0..%.1f + its cap)" % (lo[2], hi[2], FOOT_HEIGHT))

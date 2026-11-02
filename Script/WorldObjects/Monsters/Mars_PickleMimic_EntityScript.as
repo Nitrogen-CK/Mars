@@ -1,15 +1,16 @@
 // The pickle mimic's pieces (Tools/Blender/mars_monsters/build_pickle_mimic_pieces.py, imported by its
 // unreal/mars_pickle_mimic_ue.py), each modelled in the frame the assembly places it in: the jar's pieces (glass, liquid,
 // frame, mouth, bow, shards) in the walker body's frame, the jar's base centre at the origin; the lid pivoting at its
-// hinge, +X toward the front; the face dome at its base centre; a foot at its sole's centre. Change the art and these
-// together.
+// hinge, +X toward the front; the face dome at its base centre; a foot at its sole's centre. The mouth is a chest's: a
+// wooden jaw band round the jar's top (z 51..64) and a deep lid whose skirt sits on it, so shut they hide the eye dome.
+// Change the art and these together.
 namespace utils_pickle_mimic
 {
     const FString PieceFolder = "/Game/Mars/Gameplay/Monsters/PickleMimic/Meshes";
 
-    const FVector Hinge = FVector(-29.5, 0.0, 65.5);
+    const FVector Hinge = FVector(-33.4, 0.0, 64.0);
     const float64 LidOpenDegrees = 80.0;
-    const float64 FaceBase = 51.5;
+    const float64 FaceBase = 56.4;
     // The face dome rises this far as the lid opens wide (the eyes peek over the rim).
     const float64 FaceRise = 10.0;
 
@@ -31,15 +32,15 @@ namespace utils_pickle_mimic
     {
         auto Centres = TArray<FVector>();
         Centres.Add(FVector(0.0, 0.0, 1.5));
-        Centres.Add(FVector(12.55, -14.49, 33.5));
-        Centres.Add(FVector(17.65, -9.55, 45.25));
-        Centres.Add(FVector(9.67, 7.24, 33.5));
-        Centres.Add(FVector(14.49, 10.61, 28.0));
-        Centres.Add(FVector(-9.83, 19.76, 32.75));
-        Centres.Add(FVector(-16.33, 3.88, 18.67));
-        Centres.Add(FVector(-14.49, 4.11, 41.33));
-        Centres.Add(FVector(-12.02, -15.34, 49.17));
-        Centres.Add(FVector(-6.27, -19.76, 33.5));
+        Centres.Add(FVector(14.49, -18.16, 29.0));
+        Centres.Add(FVector(16.23, -4.41, 40.75));
+        Centres.Add(FVector(19.29, 6.27, 29.0));
+        Centres.Add(FVector(10.61, 21.35, 29.0));
+        Centres.Add(FVector(-6.01, 22.94, 29.0));
+        Centres.Add(FVector(-22.94, 6.01, 14.75));
+        Centres.Add(FVector(-19.29, 3.92, 29.0));
+        Centres.Add(FVector(-10.8, -14.49, 36.83));
+        Centres.Add(FVector(-11.58, -19.76, 28.0));
         return Centres;
     }
 
@@ -126,7 +127,7 @@ namespace utils_pickle_mimic
     const float32 FlinchSloshKick = 1.4f;
 
     // The lid's half width: a crooked lid tips up off its edge on one side.
-    const float64 LidHalfWidth = 31.0;
+    const float64 LidHalfWidth = 32.6;
 
     // A cracked jar wears its ten shards in place of the glass, in the paler cracked glass (PickleMimicGlassCracked_Mars_MI:
     // the breaks' faces, seen edge-on, read as white lines), each pushed out from the jar's axis and tipped about its
@@ -170,9 +171,10 @@ struct FMars_PickleMimic_Tell
     UPROPERTY()
     float32 Seconds = 0.7f;
 
-    // At a tell's height: the lid's lift (share of its widest), the eyes' glow, and the brine's kick (tilt a second).
+    // At a tell's height: the lid's lift (share of its widest: 0.1 lifts its teeth clear of the eyes over the band's rim),
+    // the eyes' glow, and the brine's kick (tilt a second).
     UPROPERTY()
-    float32 PeekLid = 0.06f;
+    float32 PeekLid = 0.1f;
 
     UPROPERTY()
     float32 GlintGlow = 0.45f;
@@ -180,9 +182,10 @@ struct FMars_PickleMimic_Tell
     UPROPERTY()
     float32 SloshKick = 0.35f;
 
-    // The shut lid's tilt off one edge (degrees, eased out as it opens; 0: straight).
+    // The shut lid's tilt off one edge (degrees, eased out as it opens; 0: straight). Kept small: more opens a slit at the
+    // seam that shows the teeth the shut mouth should hide.
     UPROPERTY()
-    float32 CrookedDegrees = 2.5f;
+    float32 CrookedDegrees = 1.0f;
 }
 
 // `Mars.PickleMimic.DebugKill 1`: every living mimic deals itself a lethal blow once (to watch the shatter in PIE).
