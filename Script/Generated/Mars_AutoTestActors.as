@@ -7619,6 +7619,84 @@ class AMars_AutoTest_Resting_TwoTargetsAreToldApart_Actor : ACk_AutoTestRunner
     }
 }
 
+class AMars_AutoTest_RootMaw_ABlowFromAfarWakesItOntoTheAttacker_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 30.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_RootMaw_ABlowFromAfarWakesItOntoTheAttacker");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_RootMaw_BitesATargetInReach_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 30.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_RootMaw_BitesATargetInReach");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_RootMaw_DiesAndSinksBackIn_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 30.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_RootMaw_DiesAndSinksBackIn");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_RootMaw_GlidesAfterItsPreyAndLogsItsTravel_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 30.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_RootMaw_GlidesAfterItsPreyAndLogsItsTravel");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_RootMaw_LiesBuriedUntilATargetComesNear_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 30.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_RootMaw_LiesBuriedUntilATargetComesNear");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_RootMaw_ReturnsHomeAndBurrows_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 40.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_RootMaw_ReturnsHomeAndBurrows");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
 class AMars_AutoTest_Searing_SpecValidateRejectsBadPans_Actor : ACk_AutoTestRunner
 {
     UFUNCTION(BlueprintOverride)

@@ -586,6 +586,15 @@
 			]
 		},
 		{
+			"TypeName": "FCk_Handle_RootMaw",
+			"ShortName": "RootMaw",
+			"Description": "The Root Maw: a turnip-headed plant that lies buried with only its leaves showing, bursts up to glide after its prey on a bed of roots, and bites with its hinged maw",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_RootMawHandle",
+			"RequiredFragments": [
+				"Mars_Feature_RootMaw"
+			]
+		},
+		{
 			"TypeName": "FCk_Handle_Searing",
 			"ShortName": "Searing",
 			"Description": "A searing minigame on a station: adopted food pieces (dynamic bodies keyed by their feed identity) on a hot pan (a kinematic body the operator's look tilts and lifts); each piece's face on the pan sears",

@@ -2784,6 +2784,94 @@ class UMars_Processor_Resting_Tick_Driver : UMars_Processor_Resting_Tick
     }
 }
 
+class UMars_Processor_RootMaw_HandleRequests_Driver : UMars_Processor_RootMaw_HandleRequests
+{
+    UFUNCTION(BlueprintOverride)
+    void Configure(FCk_ScriptProcessorQuery& Query)
+    {
+        Query.ReadWrite(FMars_Fragment_RootMaw_Requests);
+        Super::Configure(Query);
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void ForEachBatch(FCk_ScriptQueryBatch Batch, FCk_Time InDeltaT)
+    {
+        auto _CkPerfScope = ck::ScopedStat("UMars_Processor_RootMaw_HandleRequests_Driver::ForEachBatch");
+        const int32 NumEntities = Batch.Num();
+        for (int32 i = 0; i < NumEntities; ++i)
+        {
+            auto Handle = Batch.GetHandle(i);
+            FMars_Fragment_RootMaw_Requests& P0 = Batch.Get(i, FMars_Fragment_RootMaw_Requests);
+            ForEachEntity(InDeltaT, Handle, P0);
+        }
+    }
+}
+
+class UMars_Processor_RootMaw_Setup_Driver : UMars_Processor_RootMaw_Setup
+{
+    UFUNCTION(BlueprintOverride)
+    void Configure(FCk_ScriptProcessorQuery& Query)
+    {
+        Super::Configure(Query);
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void ForEachBatch(FCk_ScriptQueryBatch Batch, FCk_Time InDeltaT)
+    {
+        auto _CkPerfScope = ck::ScopedStat("UMars_Processor_RootMaw_Setup_Driver::ForEachBatch");
+        const int32 NumEntities = Batch.Num();
+        for (int32 i = 0; i < NumEntities; ++i)
+        {
+            auto Handle = Batch.GetHandle(i);
+            ForEachEntity(InDeltaT, Handle);
+        }
+    }
+}
+
+class UMars_Processor_RootMaw_Targeting_Driver : UMars_Processor_RootMaw_Targeting
+{
+    UFUNCTION(BlueprintOverride)
+    void Configure(FCk_ScriptProcessorQuery& Query)
+    {
+        Query.ReadWrite(FMars_Fragment_RootMaw_Targeting);
+        Super::Configure(Query);
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void ForEachBatch(FCk_ScriptQueryBatch Batch, FCk_Time InDeltaT)
+    {
+        auto _CkPerfScope = ck::ScopedStat("UMars_Processor_RootMaw_Targeting_Driver::ForEachBatch");
+        const int32 NumEntities = Batch.Num();
+        for (int32 i = 0; i < NumEntities; ++i)
+        {
+            auto Handle = Batch.GetHandle(i);
+            FMars_Fragment_RootMaw_Targeting& P0 = Batch.Get(i, FMars_Fragment_RootMaw_Targeting);
+            ForEachEntity(InDeltaT, Handle, P0);
+        }
+    }
+}
+
+class UMars_Processor_RootMaw_Tick_Driver : UMars_Processor_RootMaw_Tick
+{
+    UFUNCTION(BlueprintOverride)
+    void Configure(FCk_ScriptProcessorQuery& Query)
+    {
+        Super::Configure(Query);
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void ForEachBatch(FCk_ScriptQueryBatch Batch, FCk_Time InDeltaT)
+    {
+        auto _CkPerfScope = ck::ScopedStat("UMars_Processor_RootMaw_Tick_Driver::ForEachBatch");
+        const int32 NumEntities = Batch.Num();
+        for (int32 i = 0; i < NumEntities; ++i)
+        {
+            auto Handle = Batch.GetHandle(i);
+            ForEachEntity(InDeltaT, Handle);
+        }
+    }
+}
+
 class UMars_Processor_Searing_HandleRequests_Driver : UMars_Processor_Searing_HandleRequests
 {
     UFUNCTION(BlueprintOverride)

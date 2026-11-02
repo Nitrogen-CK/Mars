@@ -9368,6 +9368,84 @@ namespace UMars_AutoTest_Resting_TwoTargetsAreToldApart
 }
 
 USTRUCT()
+struct FMars_AutoTest_RootMaw_ABlowFromAfarWakesItOntoTheAttacker_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_RootMaw_ABlowFromAfarWakesItOntoTheAttacker
+{
+    FMars_AutoTest_RootMaw_ABlowFromAfarWakesItOntoTheAttacker_SpawnParams Params()
+    {
+        return FMars_AutoTest_RootMaw_ABlowFromAfarWakesItOntoTheAttacker_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_RootMaw_BitesATargetInReach_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_RootMaw_BitesATargetInReach
+{
+    FMars_AutoTest_RootMaw_BitesATargetInReach_SpawnParams Params()
+    {
+        return FMars_AutoTest_RootMaw_BitesATargetInReach_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_RootMaw_DiesAndSinksBackIn_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_RootMaw_DiesAndSinksBackIn
+{
+    FMars_AutoTest_RootMaw_DiesAndSinksBackIn_SpawnParams Params()
+    {
+        return FMars_AutoTest_RootMaw_DiesAndSinksBackIn_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_RootMaw_GlidesAfterItsPreyAndLogsItsTravel_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_RootMaw_GlidesAfterItsPreyAndLogsItsTravel
+{
+    FMars_AutoTest_RootMaw_GlidesAfterItsPreyAndLogsItsTravel_SpawnParams Params()
+    {
+        return FMars_AutoTest_RootMaw_GlidesAfterItsPreyAndLogsItsTravel_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_RootMaw_LiesBuriedUntilATargetComesNear_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_RootMaw_LiesBuriedUntilATargetComesNear
+{
+    FMars_AutoTest_RootMaw_LiesBuriedUntilATargetComesNear_SpawnParams Params()
+    {
+        return FMars_AutoTest_RootMaw_LiesBuriedUntilATargetComesNear_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_RootMaw_ReturnsHomeAndBurrows_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_RootMaw_ReturnsHomeAndBurrows
+{
+    FMars_AutoTest_RootMaw_ReturnsHomeAndBurrows_SpawnParams Params()
+    {
+        return FMars_AutoTest_RootMaw_ReturnsHomeAndBurrows_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_Searing_ACutSlabHalfSearsEverySideAndIsReady_SpawnParams
 {
 }
@@ -15947,6 +16025,47 @@ namespace UMars_PullChain_EntityScript
 }
 
 USTRUCT()
+struct FMars_RootMaw_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_RootMaw_Spec Spec;
+
+    UPROPERTY()
+    bool WithVisuals = true;
+
+    UPROPERTY()
+    bool DebugDraw = false;
+
+    UPROPERTY()
+    FMars_RootMaw_Trail Trail = FMars_RootMaw_Trail();
+
+    FMars_RootMaw_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_RootMaw_Spec InSpec, bool InWithVisuals, bool InDebugDraw, FMars_RootMaw_Trail InTrail)
+    {
+        SpawnTransform = InSpawnTransform;
+        Spec = InSpec;
+        WithVisuals = InWithVisuals;
+        DebugDraw = InDebugDraw;
+        Trail = InTrail;
+    }
+}
+
+namespace UMars_RootMaw_EntityScript
+{
+    FMars_RootMaw_EntityScript_SpawnParams Params()
+    {
+        return FMars_RootMaw_EntityScript_SpawnParams();
+    }
+
+    FMars_RootMaw_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_RootMaw_Spec InSpec, bool InWithVisuals, bool InDebugDraw, FMars_RootMaw_Trail InTrail)
+    {
+        return FMars_RootMaw_EntityScript_SpawnParams(InSpawnTransform, InSpec, InWithVisuals, InDebugDraw, InTrail);
+    }
+}
+
+USTRUCT()
 struct FMars_Sandbox_AggressionLever_EntityScript_SpawnParams
 {
     UPROPERTY()
@@ -18916,6 +19035,123 @@ namespace UMars_SmCondition_PickleMimic_ShouldWake
 }
 
 USTRUCT()
+struct FMars_SmCondition_RootMaw_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_RootMaw
+{
+    FMars_SmCondition_RootMaw_SpawnParams Params()
+    {
+        return FMars_SmCondition_RootMaw_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmCondition_RootMaw_ActionDone_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_RootMaw_ActionDone
+{
+    FMars_SmCondition_RootMaw_ActionDone_SpawnParams Params()
+    {
+        return FMars_SmCondition_RootMaw_ActionDone_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmCondition_RootMaw_AtHome_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_RootMaw_AtHome
+{
+    FMars_SmCondition_RootMaw_AtHome_SpawnParams Params()
+    {
+        return FMars_SmCondition_RootMaw_AtHome_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmCondition_RootMaw_CanBite_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_RootMaw_CanBite
+{
+    FMars_SmCondition_RootMaw_CanBite_SpawnParams Params()
+    {
+        return FMars_SmCondition_RootMaw_CanBite_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmCondition_RootMaw_HasTarget_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_RootMaw_HasTarget
+{
+    FMars_SmCondition_RootMaw_HasTarget_SpawnParams Params()
+    {
+        return FMars_SmCondition_RootMaw_HasTarget_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmCondition_RootMaw_IsDead_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_RootMaw_IsDead
+{
+    FMars_SmCondition_RootMaw_IsDead_SpawnParams Params()
+    {
+        return FMars_SmCondition_RootMaw_IsDead_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmCondition_RootMaw_IsEmerged_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_RootMaw_IsEmerged
+{
+    FMars_SmCondition_RootMaw_IsEmerged_SpawnParams Params()
+    {
+        return FMars_SmCondition_RootMaw_IsEmerged_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmCondition_RootMaw_NoTarget_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_RootMaw_NoTarget
+{
+    FMars_SmCondition_RootMaw_NoTarget_SpawnParams Params()
+    {
+        return FMars_SmCondition_RootMaw_NoTarget_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmCondition_RootMaw_ShouldWake_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_RootMaw_ShouldWake
+{
+    FMars_SmCondition_RootMaw_ShouldWake_SpawnParams Params()
+    {
+        return FMars_SmCondition_RootMaw_ShouldWake_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_SmCondition_SprintEnds_SpawnParams
 {
 }
@@ -20043,6 +20279,97 @@ namespace UMars_SmState_PlatterDock_Interact
     FMars_SmState_PlatterDock_Interact_SpawnParams Params()
     {
         return FMars_SmState_PlatterDock_Interact_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmState_RootMaw_Alive_SpawnParams
+{
+}
+
+namespace UMars_SmState_RootMaw_Alive
+{
+    FMars_SmState_RootMaw_Alive_SpawnParams Params()
+    {
+        return FMars_SmState_RootMaw_Alive_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmState_RootMaw_Bite_SpawnParams
+{
+}
+
+namespace UMars_SmState_RootMaw_Bite
+{
+    FMars_SmState_RootMaw_Bite_SpawnParams Params()
+    {
+        return FMars_SmState_RootMaw_Bite_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmState_RootMaw_Buried_SpawnParams
+{
+}
+
+namespace UMars_SmState_RootMaw_Buried
+{
+    FMars_SmState_RootMaw_Buried_SpawnParams Params()
+    {
+        return FMars_SmState_RootMaw_Buried_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmState_RootMaw_Dead_SpawnParams
+{
+}
+
+namespace UMars_SmState_RootMaw_Dead
+{
+    FMars_SmState_RootMaw_Dead_SpawnParams Params()
+    {
+        return FMars_SmState_RootMaw_Dead_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmState_RootMaw_Emerging_SpawnParams
+{
+}
+
+namespace UMars_SmState_RootMaw_Emerging
+{
+    FMars_SmState_RootMaw_Emerging_SpawnParams Params()
+    {
+        return FMars_SmState_RootMaw_Emerging_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmState_RootMaw_Hunt_SpawnParams
+{
+}
+
+namespace UMars_SmState_RootMaw_Hunt
+{
+    FMars_SmState_RootMaw_Hunt_SpawnParams Params()
+    {
+        return FMars_SmState_RootMaw_Hunt_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmState_RootMaw_Return_SpawnParams
+{
+}
+
+namespace UMars_SmState_RootMaw_Return
+{
+    FMars_SmState_RootMaw_Return_SpawnParams Params()
+    {
+        return FMars_SmState_RootMaw_Return_SpawnParams();
     }
 }
 
@@ -21577,6 +21904,97 @@ namespace UMars_SmTask_PrimaryIntentToResolver
     FMars_SmTask_PrimaryIntentToResolver_SpawnParams Params()
     {
         return FMars_SmTask_PrimaryIntentToResolver_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_RootMaw_BehaviorSubSm_SpawnParams
+{
+}
+
+namespace UMars_SmTask_RootMaw_BehaviorSubSm
+{
+    FMars_SmTask_RootMaw_BehaviorSubSm_SpawnParams Params()
+    {
+        return FMars_SmTask_RootMaw_BehaviorSubSm_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_RootMaw_Bite_SpawnParams
+{
+}
+
+namespace UMars_SmTask_RootMaw_Bite
+{
+    FMars_SmTask_RootMaw_Bite_SpawnParams Params()
+    {
+        return FMars_SmTask_RootMaw_Bite_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_RootMaw_Burrow_SpawnParams
+{
+}
+
+namespace UMars_SmTask_RootMaw_Burrow
+{
+    FMars_SmTask_RootMaw_Burrow_SpawnParams Params()
+    {
+        return FMars_SmTask_RootMaw_Burrow_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_RootMaw_Die_SpawnParams
+{
+}
+
+namespace UMars_SmTask_RootMaw_Die
+{
+    FMars_SmTask_RootMaw_Die_SpawnParams Params()
+    {
+        return FMars_SmTask_RootMaw_Die_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_RootMaw_Emerge_SpawnParams
+{
+}
+
+namespace UMars_SmTask_RootMaw_Emerge
+{
+    FMars_SmTask_RootMaw_Emerge_SpawnParams Params()
+    {
+        return FMars_SmTask_RootMaw_Emerge_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_RootMaw_Hunt_SpawnParams
+{
+}
+
+namespace UMars_SmTask_RootMaw_Hunt
+{
+    FMars_SmTask_RootMaw_Hunt_SpawnParams Params()
+    {
+        return FMars_SmTask_RootMaw_Hunt_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_RootMaw_Return_SpawnParams
+{
+}
+
+namespace UMars_SmTask_RootMaw_Return
+{
+    FMars_SmTask_RootMaw_Return_SpawnParams Params()
+    {
+        return FMars_SmTask_RootMaw_Return_SpawnParams();
     }
 }
 
