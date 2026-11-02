@@ -91,8 +91,8 @@ namespace utils_pickle_mimic
     // Composes the mimic on InRoot (the jar: the SurfaceMotion body, Clearance over the ground; the entity script built
     // the rig's body node at Get_BodyOffset(0) with every visual on it): surface motion -> the walker on the body node
     // (four floating feet, the trot) -> monster -> damage dealer -> the body-zone hurtbox round the jar -> the mimic's
-    // fragments, tucked -> LAST the state machine (Mars_PickleMimic_Hfsm.as). A rejected spec or sub-feature ensures and
-    // returns an invalid handle.
+    // fragments, tucked (UMars_Processor_PickleMimic_Setup then binds the body zone's hits to TakeHit) -> LAST the state
+    // machine (Mars_PickleMimic_Hfsm.as). A rejected spec or sub-feature ensures and returns an invalid handle.
     FCk_Handle_PickleMimic Add(FCk_Handle_Transform& InRoot, FMars_PickleMimic_Spec InSpec)
     {
         FCk_Handle RootEntity = InRoot;
@@ -142,6 +142,8 @@ namespace utils_pickle_mimic
         RootEntity.Add_Fragment(FMars_Fragment_PickleMimic_Mouth());
         RootEntity.Add_Fragment(FMars_Fragment_PickleMimic_Action());
         RootEntity.Add_Fragment(FMars_Fragment_PickleMimic_Targeting());
+        RootEntity.Add_Fragment(FMars_Fragment_PickleMimic_Hurt());
+        RootEntity.Add_Fragment(FMars_Tag_PickleMimic_NeedsSetup());
 
         // Last: Alive's condition reads the Dead attribute as the machine enters its initial state.
         utils_state_machine::Add(RootEntity, FCk_StateMachine_Spec(UMars_SmState_PickleMimic_Alive));
@@ -208,6 +210,15 @@ namespace utils_pickle_mimic
         const auto Seconds = Get_PhaseSeconds(InSpec.Bite.Timing, InAction.Phase);
         const auto Alpha = Seconds > 0.0f ? Math::Clamp(InAction.PhaseElapsed / Seconds, 0.0f, 1.0f) : 0.0f;
         return FMars_PickleMimic_ActionFrame(InAction.Kind, InAction.Phase, Alpha);
+    }
+
+    // The crack stage InHealthShare (current / max body health) has reached: 0 intact, 1 cracked, 2 heavily cracked.
+    int32 Get_CrackStageFor(FMars_PickleMimic_Vitals InVitals, float32 InHealthShare)
+    {
+        if (InHealthShare <= InVitals.HeavilyCrackedBelow)
+        { return 2; }
+
+        return InHealthShare <= InVitals.CrackedBelow ? 1 : 0;
     }
 
     // A target the mimic may act on: alive as an entity and placed in the world.
@@ -396,6 +407,36 @@ mixin bool Get_HasPendingRequests(const FCk_Handle_PickleMimic& Self)
     return Self.Has_Fragment(FMars_Fragment_PickleMimic_Requests);
 }
 
+mixin FMars_Fragment_PickleMimic_Hurt Get_Hurt(const FCk_Handle_PickleMimic& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_PickleMimic_Hurt);
+}
+
+mixin bool Get_IsFlinching(const FCk_Handle_PickleMimic& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_PickleMimic_Hurt).FlinchLeft > 0.0f;
+}
+
+// How far through the current flinch [0, 1] (1 when not flinching).
+mixin float32 Get_FlinchAlpha(const FCk_Handle_PickleMimic& Self)
+{
+    const auto Seconds = Self.Get_Spec().Vitals.FlinchSeconds;
+    const auto Left = Self.Get_Fragment(FMars_Fragment_PickleMimic_Hurt).FlinchLeft;
+    return Seconds > 0.0f ? Math::Clamp(1.0f - Left / Seconds, 0.0f, 1.0f) : 1.0f;
+}
+
+// A blow found it disguised and it has not stood up since.
+mixin bool Get_IsStartled(const FCk_Handle_PickleMimic& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_PickleMimic_Hurt).Startled;
+}
+
+// 0 intact, 1 cracked, 2 heavily cracked.
+mixin int32 Get_CrackStage(const FCk_Handle_PickleMimic& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_PickleMimic_Hurt).CrackStage;
+}
+
 // An action runs, or a Start is queued.
 mixin bool Get_IsActionBusy(const FCk_Handle_PickleMimic& Self)
 {
@@ -418,6 +459,9 @@ mixin EMars_PickleMimic_Admission Get_Admission(const FCk_Handle_PickleMimic& Se
     const auto& Action = Self.Get_Fragment(FMars_Fragment_PickleMimic_Action);
     if (Action.Kind != EMars_PickleMimic_Action::None)
     { return EMars_PickleMimic_Admission::Busy; }
+
+    if (Self.Get_IsFlinching())
+    { return EMars_PickleMimic_Admission::Flinching; }
 
     if (Action.BiteCooldown > 0.0f)
     { return EMars_PickleMimic_Admission::Cooldown; }
@@ -446,6 +490,11 @@ mixin EMars_PickleMimic_Admission Get_Admission(const FCk_Handle_PickleMimic& Se
 //--------------------------------------------------------------------------------------------------------------------------
 // Requests
 //--------------------------------------------------------------------------------------------------------------------------
+
+mixin void Request_TakeHit(FCk_Handle_PickleMimic& Self, const FMars_Request_PickleMimic_TakeHit& InRequest)
+{
+    Self.AddOrGet_Fragment(FMars_Fragment_PickleMimic_Requests).TakeHitRequests.Add(InRequest);
+}
 
 mixin void Request_Drive(FCk_Handle_PickleMimic& Self, const FMars_Request_PickleMimic_Drive& InRequest)
 {
@@ -509,6 +558,18 @@ mixin void BindTo_OnStance(FCk_Handle_PickleMimic& Self, FMars_Delegate_PickleMi
 {
     auto& Signals = Self.AddOrGet_Fragment(FMars_Fragment_PickleMimic_Signals);
     Signals.OnStance.AddUFunction(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void BindTo_OnSpill(FCk_Handle_PickleMimic& Self, FMars_Delegate_PickleMimic_OnSpill InDelegate)
+{
+    auto& Signals = Self.AddOrGet_Fragment(FMars_Fragment_PickleMimic_Signals);
+    Signals.OnSpill.AddUFunction(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void UnbindFrom_OnSpill(FCk_Handle_PickleMimic& Self, FMars_Delegate_PickleMimic_OnSpill InDelegate)
+{
+    if (Self.Has_Fragment(FMars_Fragment_PickleMimic_Signals))
+    { Self.Get_Fragment(FMars_Fragment_PickleMimic_Signals).OnSpill.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName()); }
 }
 
 mixin void UnbindFrom_OnStance(FCk_Handle_PickleMimic& Self, FMars_Delegate_PickleMimic_OnStance InDelegate)

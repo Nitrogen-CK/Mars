@@ -62,6 +62,30 @@ class UMars_AutoTestRig_PickleMimic : UCk_AutoTest_Base
         utils_transform::Request_SetLocation(_TargetRoot, FCk_Request_Transform_SetLocation(Get_TargetLocation(InOffset)));
     }
 
+    // The world items (spilled pickles) within InRadius of the origin, not being destroyed.
+    protected TArray<FCk_Handle> Get_WorldItemsNearOrigin(float64 InRadius)
+    {
+        auto Found = TArray<FCk_Handle>();
+        for (auto Entity : utils_entity_tag::ForEach_Entity(_Mimic, n"TAG_MarsWorldItem"))
+        {
+            if (utils_entity_lifetime::Get_IsPendingDestroy(Entity, ECk_EntityLifetime_DestructionPhase::BeginDestroy))
+            { continue; }
+
+            const auto Transform = Entity.As_Transform(ECk_SanityCheck::UnChecked);
+            if (ck::IsValid(Transform) && (utils_transform::Get_EntityCurrentLocation(Transform) - _Origin).Size() <= InRadius)
+            { Found.Add(Entity); }
+        }
+
+        return Found;
+    }
+
+    // A dead mimic's spilled pickles belong to the world, not to this test: hand them to the harness to destroy.
+    protected void Track_SpilledPickles()
+    {
+        for (auto Entity : Get_WorldItemsNearOrigin(1500.0))
+        { Track_ForCleanup(Entity); }
+    }
+
     // False until the mimic is constructed; a failed gait or surface motion fails the test.
     protected bool Get_IsWalkerReady()
     {

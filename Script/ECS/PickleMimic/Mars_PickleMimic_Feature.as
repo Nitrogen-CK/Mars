@@ -11,6 +11,9 @@ asset Mars_PickleMimicHandle of UCkDynamic_HandleDefinition
 
 struct FMars_Feature_PickleMimic {}
 
+// Until UMars_Processor_PickleMimic_Setup has bound the body zone's hits to TakeHit.
+struct FMars_Tag_PickleMimic_NeedsSetup {}
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Spec
 //--------------------------------------------------------------------------------------------------------------------------
@@ -184,6 +187,10 @@ mixin FMars_Validation Validate(const FMars_PickleMimic_Senses& Self)
     return FMars_Validation();
 }
 
+// Health, and what a blow that does not kill does: the mimic flinches for FlinchSeconds (it stops, the lid slams, a bite's
+// windup starts over once it passes; an active bite runs on), and its glass cracks in stages as BodyHealth falls: stage 1
+// at or below CrackedBelow of its maximum, stage 2 at or below HeavilyCrackedBelow (it never mends). On death its jar
+// spills SpilledPickles pickles (OnSpill, once).
 struct FMars_PickleMimic_Vitals
 {
     UPROPERTY()
@@ -192,6 +199,33 @@ struct FMars_PickleMimic_Vitals
     // From death to despawn.
     UPROPERTY()
     float32 CorpseSeconds = 6.0f;
+
+    UPROPERTY()
+    float32 FlinchSeconds = 0.3f;
+
+    UPROPERTY()
+    float32 CrackedBelow = 0.7f;
+
+    UPROPERTY()
+    float32 HeavilyCrackedBelow = 0.35f;
+
+    // The brine shader's Pickle Jar draws eight (a ring of seven round the wall and one in the middle).
+    UPROPERTY()
+    int32 SpilledPickles = 8;
+}
+
+mixin FMars_Validation Validate(const FMars_PickleMimic_Vitals& Self)
+{
+    if (utils_pickle_mimic::Get_IsPositiveFinite(Self.BodyHealth) == false || Self.CorpseSeconds < 0.0f || Self.FlinchSeconds < 0.0f)
+    { return FMars_Validation(f"PickleMimic has a non-positive BodyHealth [{Self.BodyHealth}] or a negative CorpseSeconds [{Self.CorpseSeconds}] or FlinchSeconds [{Self.FlinchSeconds}]"); }
+
+    if (Self.HeavilyCrackedBelow <= 0.0f || Self.HeavilyCrackedBelow >= Self.CrackedBelow || Self.CrackedBelow >= 1.0f)
+    { return FMars_Validation(f"PickleMimic needs 0 < HeavilyCrackedBelow [{Self.HeavilyCrackedBelow}] < CrackedBelow [{Self.CrackedBelow}] < 1"); }
+
+    if (Self.SpilledPickles < 0 || Self.SpilledPickles > 12)
+    { return FMars_Validation(f"PickleMimic spills [{Self.SpilledPickles}] pickles (0 .. 12, what its jar can hold)"); }
+
+    return FMars_Validation();
 }
 
 // The transform the kernel moves, built by the entity script (features own no visuals): the walker body, a scene node on
@@ -242,8 +276,9 @@ mixin FMars_Validation Validate(const FMars_PickleMimic_Spec& Self)
     if (Validation.IsValid() == false)
     { return Validation; }
 
-    if (utils_pickle_mimic::Get_IsPositiveFinite(Self.Vitals.BodyHealth) == false || Self.Vitals.CorpseSeconds < 0.0f)
-    { return FMars_Validation(f"PickleMimic has a non-positive BodyHealth [{Self.Vitals.BodyHealth}] or a negative CorpseSeconds [{Self.Vitals.CorpseSeconds}]"); }
+    Validation = Self.Vitals.Validate();
+    if (Validation.IsValid() == false)
+    { return Validation; }
 
     if (ck::Is_NOT_Valid(Self.Rig.Body))
     { return FMars_Validation("PickleMimic rig has no Body"); }
@@ -349,6 +384,7 @@ enum EMars_PickleMimic_Admission
     Dead,
     NotStanding,
     Busy,
+    Flinching,
     Cooldown,
     NoTarget,
     Ungrounded,
@@ -396,6 +432,34 @@ struct FMars_Fragment_PickleMimic_Action
     float32 LidAtStart = 0.0f;
 }
 
+// What blows have done to it. Written only by the request drain (a TakeHit) and the tick (the clocks, the crack stage).
+struct FMars_Fragment_PickleMimic_Hurt
+{
+    // Seconds of flinch left (0: not flinching).
+    UPROPERTY()
+    float32 FlinchLeft = 0.0f;
+
+    // Bumped by every flinch, so a reader sees each one.
+    UPROPERTY()
+    int32 FlinchCount = 0;
+
+    // Along the ground, from the jar toward where the last flinching blow came from (zero when it cannot tell).
+    UPROPERTY()
+    FVector FlinchFrom = FVector::ZeroVector;
+
+    // A blow found it disguised: it wakes whatever the distance. Held until it next stands fully up (or dies).
+    UPROPERTY()
+    bool Startled = false;
+
+    // 0 intact, 1 cracked, 2 heavily cracked (Vitals' thresholds); it only rises.
+    UPROPERTY()
+    int32 CrackStage = 0;
+
+    // Its death spilled the jar's pickles (OnSpill went out).
+    UPROPERTY()
+    bool Spilled = false;
+}
+
 struct FMars_Fragment_PickleMimic_Targeting
 {
     UPROPERTY()
@@ -421,11 +485,16 @@ event void FMars_Delegate_PickleMimic_OnBlowLanded_MC(FCk_Handle_PickleMimic InM
 delegate void FMars_Delegate_PickleMimic_OnStance(FCk_Handle_PickleMimic InMimic, EMars_PickleMimic_Stance InStance);
 event void FMars_Delegate_PickleMimic_OnStance_MC(FCk_Handle_PickleMimic InMimic, EMars_PickleMimic_Stance InStance);
 
+// It died and its jar broke: InCount pickles (Vitals.SpilledPickles) spill out. Once, the frame it is first seen dead.
+delegate void FMars_Delegate_PickleMimic_OnSpill(FCk_Handle_PickleMimic InMimic, int32 InCount);
+event void FMars_Delegate_PickleMimic_OnSpill_MC(FCk_Handle_PickleMimic InMimic, int32 InCount);
+
 struct FMars_Fragment_PickleMimic_Signals
 {
     FMars_Delegate_PickleMimic_OnActionPhase_MC OnActionPhase;
     FMars_Delegate_PickleMimic_OnBlowLanded_MC OnBlowLanded;
     FMars_Delegate_PickleMimic_OnStance_MC OnStance;
+    FMars_Delegate_PickleMimic_OnSpill_MC OnSpill;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -447,6 +516,22 @@ struct FMars_Request_PickleMimic_Drive
     {
         Direction = InDirection;
         Speed = InSpeed;
+    }
+}
+
+// A blow landed on its body zone (fed from the zone's OnHit with the scaled event). Unless it is dead the mimic flinches;
+// found disguised it is startled awake (the lid pops) and takes the blow's instigator as its target when that is Hostile;
+// up and holding no target it takes the instigator too.
+struct FMars_Request_PickleMimic_TakeHit
+{
+    UPROPERTY()
+    FMars_DamageEvent Event;
+
+    FMars_Request_PickleMimic_TakeHit() {}
+
+    FMars_Request_PickleMimic_TakeHit(FMars_DamageEvent InEvent)
+    {
+        Event = InEvent;
     }
 }
 
@@ -509,11 +594,14 @@ struct FMars_Request_PickleMimic_Cancel
     bool _Placeholder = false;
 }
 
-// Applied Cancel -> Stop -> Drive -> SetStance -> Gape -> Start, each kind in arrival order.
+// Applied Cancel -> TakeHit -> Stop -> Drive -> SetStance -> Gape -> Start, each kind in arrival order.
 struct FMars_Fragment_PickleMimic_Requests
 {
     UPROPERTY()
     TArray<FMars_Request_PickleMimic_Cancel> CancelRequests;
+
+    UPROPERTY()
+    TArray<FMars_Request_PickleMimic_TakeHit> TakeHitRequests;
 
     UPROPERTY()
     TArray<FMars_Request_PickleMimic_Stop> StopRequests;

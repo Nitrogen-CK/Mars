@@ -8315,6 +8315,32 @@ namespace UMars_AutoTest_Pendulum_SinkPowerGatesTheSwing
 }
 
 USTRUCT()
+struct FMars_AutoTest_PickleMimic_ABlowFromAfarWakesItOntoTheAttacker_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_PickleMimic_ABlowFromAfarWakesItOntoTheAttacker
+{
+    FMars_AutoTest_PickleMimic_ABlowFromAfarWakesItOntoTheAttacker_SpawnParams Params()
+    {
+        return FMars_AutoTest_PickleMimic_ABlowFromAfarWakesItOntoTheAttacker_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_PickleMimic_AFlinchRestartsTheWindupButNotTheBite_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_PickleMimic_AFlinchRestartsTheWindupButNotTheBite
+{
+    FMars_AutoTest_PickleMimic_AFlinchRestartsTheWindupButNotTheBite_SpawnParams Params()
+    {
+        return FMars_AutoTest_PickleMimic_AFlinchRestartsTheWindupButNotTheBite_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_PickleMimic_BitesATargetInReach_SpawnParams
 {
 }
@@ -8341,6 +8367,19 @@ namespace UMars_AutoTest_PickleMimic_DiesAndSitsDown
 }
 
 USTRUCT()
+struct FMars_AutoTest_PickleMimic_FlinchesAndCracksAsItIsHurt_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_PickleMimic_FlinchesAndCracksAsItIsHurt
+{
+    FMars_AutoTest_PickleMimic_FlinchesAndCracksAsItIsHurt_SpawnParams Params()
+    {
+        return FMars_AutoTest_PickleMimic_FlinchesAndCracksAsItIsHurt_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_PickleMimic_ReturnsHomeAndSitsBackDown_SpawnParams
 {
 }
@@ -8363,6 +8402,19 @@ namespace UMars_AutoTest_PickleMimic_SitsDisguisedUntilATargetComesNear
     FMars_AutoTest_PickleMimic_SitsDisguisedUntilATargetComesNear_SpawnParams Params()
     {
         return FMars_AutoTest_PickleMimic_SitsDisguisedUntilATargetComesNear_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_PickleMimic_SpillsItsPicklesOnDeath_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_PickleMimic_SpillsItsPicklesOnDeath
+{
+    FMars_AutoTest_PickleMimic_SpillsItsPicklesOnDeath_SpawnParams Params()
+    {
+        return FMars_AutoTest_PickleMimic_SpillsItsPicklesOnDeath_SpawnParams();
     }
 }
 
@@ -15604,7 +15656,10 @@ struct FMars_PickleMimic_EntityScript_SpawnParams
     UPROPERTY()
     bool DebugDraw = false;
 
-    FMars_PickleMimic_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_PickleMimic_Spec InSpec, bool InWithVisuals, bool InDebugDraw)
+    UPROPERTY()
+    FMars_PickleMimic_Tell Tell = FMars_PickleMimic_Tell();
+
+    FMars_PickleMimic_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_PickleMimic_Spec InSpec, bool InWithVisuals, bool InDebugDraw, FMars_PickleMimic_Tell InTell)
     {
         SpawnTransform = InSpawnTransform;
         Spec = InSpec;
@@ -15620,9 +15675,9 @@ namespace UMars_PickleMimic_EntityScript
         return FMars_PickleMimic_EntityScript_SpawnParams();
     }
 
-    FMars_PickleMimic_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_PickleMimic_Spec InSpec, bool InWithVisuals, bool InDebugDraw)
+    FMars_PickleMimic_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_PickleMimic_Spec InSpec, bool InWithVisuals, bool InDebugDraw, FMars_PickleMimic_Tell InTell)
     {
-        return FMars_PickleMimic_EntityScript_SpawnParams(InSpawnTransform, InSpec, InWithVisuals, InDebugDraw);
+        return FMars_PickleMimic_EntityScript_SpawnParams(InSpawnTransform, InSpec, InWithVisuals, InDebugDraw, InTell);
     }
 }
 
@@ -18848,15 +18903,15 @@ namespace UMars_SmCondition_PickleMimic_NoTarget
 }
 
 USTRUCT()
-struct FMars_SmCondition_PickleMimic_TargetNear_SpawnParams
+struct FMars_SmCondition_PickleMimic_ShouldWake_SpawnParams
 {
 }
 
-namespace UMars_SmCondition_PickleMimic_TargetNear
+namespace UMars_SmCondition_PickleMimic_ShouldWake
 {
-    FMars_SmCondition_PickleMimic_TargetNear_SpawnParams Params()
+    FMars_SmCondition_PickleMimic_ShouldWake_SpawnParams Params()
     {
-        return FMars_SmCondition_PickleMimic_TargetNear_SpawnParams();
+        return FMars_SmCondition_PickleMimic_ShouldWake_SpawnParams();
     }
 }
 

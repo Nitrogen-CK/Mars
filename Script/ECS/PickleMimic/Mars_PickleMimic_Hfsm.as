@@ -2,7 +2,7 @@
 // |- Alive            ->Dead [IsDead: ByteAttribute.Mars.Monster.Dead == 1]
 // |    tasks: BehaviorSubSm
 // |    `- Behavior sub-SM (initial = Disguised)
-// |         Disguised ->Waking [TargetNear]                      tasks: Disguise (EnterExitOnly): stop, sit down, lid shut
+// |         Disguised ->Waking [ShouldWake]                      tasks: Disguise (EnterExitOnly): stop, sit down, lid shut
 // |         Waking    ->Hunt [IsStanding]                        tasks: Wake (EnterExitOnly): stand up, lid ajar
 // |         Hunt      ->Bite [CanBite] ->Return [NoTarget]       tasks: Hunt (Tick): chase on its feet, lid ajar
 // |         Bite      ->Hunt [ActionDone]                        tasks: Bite (EnterExitOnly): Start(Bite)
@@ -12,7 +12,9 @@
 // The control layer over the kernel (Mars_PickleMimic_Processor_Tick.as): it moves the jar only through Drive / Stop,
 // stands and sits only through SetStance, opens the lid only through Gape and bites only through Start; the kernel owns
 // the posture's and the bite's clocks, the steering during a bite and the blow. A condition that admits the bite asks the
-// kernel's own admission (Get_Admission), so the Start it leads to is admitted.
+// kernel's own admission (Get_Admission), so the Start it leads to is admitted. ShouldWake is a target within WakeRadius,
+// or a blow that found it disguised (the kernel's startle, fed from the body zone's hits; it also took the attacker as its
+// target, so a blow from beyond WakeRadius wakes it onto whoever struck).
 
 namespace utils_pickle_mimic
 {
@@ -55,11 +57,12 @@ class UMars_SmCondition_PickleMimic : UCk_SmCondition_Polled
     }
 }
 
-class UMars_SmCondition_PickleMimic_TargetNear : UMars_SmCondition_PickleMimic
+// A target within WakeRadius, or a blow found it disguised.
+class UMars_SmCondition_PickleMimic_ShouldWake : UMars_SmCondition_PickleMimic
 {
     protected bool Evaluate(const FCk_Handle_PickleMimic& InMimic) const override
     {
-        return InMimic.Get_IsTargetNear();
+        return InMimic.Get_IsStartled() || InMimic.Get_IsTargetNear();
     }
 }
 
@@ -189,7 +192,7 @@ class UMars_SmState_PickleMimic_Disguised : UCk_SmState_EntityScript
     void DoDefineState(FCk_Handle_SmState_UnderConstruction& InHandle)
     {
         auto ToWaking = AddTransition(InHandle, UMars_SmState_PickleMimic_Waking);
-        AddCondition(ToWaking, UMars_SmCondition_PickleMimic_TargetNear);
+        AddCondition(ToWaking, UMars_SmCondition_PickleMimic_ShouldWake);
 
         AddTask(InHandle, UMars_SmTask_PickleMimic_Disguise);
     }

@@ -1,6 +1,6 @@
-// The pickle mimic's arbiter: Cancel -> Stop -> Drive -> SetStance -> Gape -> Start, each kind in arrival order. A Start is
-// admitted only when Get_Admission answers Admitted at drain time (so a second Start in one drain finds the first running
-// and is dropped). Phase changes broadcast OnActionPhase after the state is written.
+// The pickle mimic's arbiter: Cancel -> TakeHit -> Stop -> Drive -> SetStance -> Gape -> Start, each kind in arrival order.
+// A Start is admitted only when Get_Admission answers Admitted at drain time (so a second Start in one drain finds the first
+// running and is dropped). Phase changes broadcast OnActionPhase after the state is written.
 class UMars_Processor_PickleMimic_HandleRequests : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -17,6 +17,7 @@ class UMars_Processor_PickleMimic_HandleRequests : UCk_Processor_Script_Base_UE
         auto Self = InHandle.As_PickleMimic();
 
         TArray<FMars_Request_PickleMimic_Cancel> CancelRequests = InRequests.CancelRequests;
+        TArray<FMars_Request_PickleMimic_TakeHit> TakeHitRequests = InRequests.TakeHitRequests;
         TArray<FMars_Request_PickleMimic_Stop> StopRequests = InRequests.StopRequests;
         TArray<FMars_Request_PickleMimic_Drive> DriveRequests = InRequests.DriveRequests;
         TArray<FMars_Request_PickleMimic_SetStance> SetStanceRequests = InRequests.SetStanceRequests;
@@ -28,6 +29,9 @@ class UMars_Processor_PickleMimic_HandleRequests : UCk_Processor_Script_Base_UE
 
         for (const auto& Request : CancelRequests)
         { HandleCancel(Self); }
+
+        for (const auto& Request : TakeHitRequests)
+        { HandleTakeHit(Self, Request); }
 
         for (const auto& Request : StopRequests)
         { Self.Get_Fragment(FMars_Fragment_PickleMimic_Drive) = FMars_Fragment_PickleMimic_Drive(); }
@@ -64,6 +68,59 @@ class UMars_Processor_PickleMimic_HandleRequests : UCk_Processor_Script_Base_UE
         const auto Ended = utils_pickle_mimic::End_Action(InSelf);
         if (Ended != EMars_PickleMimic_Action::None)
         { utils_pickle_mimic::Broadcast_ActionPhase(InSelf, Ended, EMars_PickleMimic_ActionPhase::None); }
+    }
+
+    // Unless dead: a flinch (the lid slams shut, or pops open if the blow found it disguised; a bite's windup starts over,
+    // an active or recovering bite runs on); disguised it is startled awake; and the blow's instigator becomes its target
+    // when that is a valid Hostile entity and it was disguised or held no target.
+    private void HandleTakeHit(FCk_Handle_PickleMimic& InSelf, const FMars_Request_PickleMimic_TakeHit& InRequest)
+    {
+        if (InSelf.Get_IsDead())
+        { return; }
+
+        const auto Disguised = InSelf.Get_Stance() == EMars_PickleMimic_Stance::Tucked;
+        const auto From = Get_BlowFrom(InSelf, InRequest.Event);
+
+        auto& Hurt = InSelf.Get_Fragment(FMars_Fragment_PickleMimic_Hurt);
+        Hurt.FlinchLeft = InSelf.Get_Spec().Vitals.FlinchSeconds;
+        Hurt.FlinchCount += 1;
+        Hurt.FlinchFrom = From;
+        Hurt.Startled = Hurt.Startled || Disguised;
+
+        InSelf.Get_Fragment(FMars_Fragment_PickleMimic_Mouth).LidOpen = Disguised ? 1.0f : 0.0f;
+
+        auto& Action = InSelf.Get_Fragment(FMars_Fragment_PickleMimic_Action);
+        if (Action.Phase == EMars_PickleMimic_ActionPhase::Windup)
+        {
+            Action.PhaseElapsed = 0.0f;
+            Action.LidAtStart = 0.0f;
+        }
+
+        const auto Instigator = InRequest.Event.Source.Instigator;
+        const auto Provoked = utils_pickle_mimic::Get_IsTargetValid(Instigator) &&
+            utils_relationship::Get_AttitudeTowards(InSelf, Instigator) == ECk_RelationshipAttitude::Hostile;
+        if (Provoked && (Disguised || InSelf.Get_HasTarget() == false))
+        {
+            auto& Targeting = InSelf.Get_Fragment(FMars_Fragment_PickleMimic_Targeting);
+            Targeting.Target = Instigator;
+            Targeting.SenseClock = 0.0f;
+        }
+    }
+
+    // Along the ground from the jar toward the blow: its hit location when it has one, else its instigator.
+    private FVector Get_BlowFrom(const FCk_Handle_PickleMimic& InSelf, FMars_DamageEvent InEvent) const
+    {
+        auto Source = InEvent.Hit.Location;
+        if (Source.IsNearlyZero())
+        {
+            const auto Instigator = InEvent.Source.Instigator;
+            if (utils_pickle_mimic::Get_IsTargetValid(Instigator) == false)
+            { return FVector::ZeroVector; }
+
+            Source = utils_transform::Get_EntityCurrentLocation(Instigator.As_Transform());
+        }
+
+        return utils_pickle_mimic::Get_Tangent(Source - InSelf.Get_Location(), InSelf.Get_SurfaceUp());
     }
 
     private void HandleStart(FCk_Handle_PickleMimic& InSelf, const FMars_Request_PickleMimic_Start& InRequest)

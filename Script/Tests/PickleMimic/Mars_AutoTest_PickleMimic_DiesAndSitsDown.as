@@ -55,5 +55,6 @@ class UMars_AutoTest_PickleMimic_DiesAndSitsDown : UMars_AutoTestRig_PickleMimic
         Assert_True(_Mimic.Get_Admission(EMars_PickleMimic_Action::Bite, _Mimic.Get_Target()) == EMars_PickleMimic_Admission::Dead,
             "a bite is refused as Dead");
         Assert_True(_Mimic.Get_IsActionBusy() == false, "no bite runs");
+        Track_SpilledPickles();
     }
 }

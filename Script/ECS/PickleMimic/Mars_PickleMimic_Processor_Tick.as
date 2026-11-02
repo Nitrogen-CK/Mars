@@ -1,11 +1,16 @@
 // The pickle mimic's one clock, after the request drain, every frame:
+// 0. hurt: the flinch runs down (a dead mimic has none), the crack stage rises with the body health lost, and the first
+//    frame it is dead its jar spills (OnSpill, Vitals.SpilledPickles);
 // 1. posture: Rise runs toward the stance (StandSeconds up, TuckSeconds down) and the walker body node sinks or rises
-//    with it (moved only when its drop changes); reaching the stance broadcasts OnStance;
+//    with it (moved only when its drop changes); reaching the stance broadcasts OnStance, and standing fully up ends a
+//    startle;
 // 2. the cooldown runs down, and the running bite advances (Windup -> Active -> Recover -> over) and steers the root: it
 //    turns in place toward the target through the windup, lunges along the line it faced through the active phase and
 //    stands through the recovery; with no bite it follows the latched Drive, but only once it stands. The mouth sweeps
-//    the bite's blow through the frame while Active, each zone hurt at most once a bite;
-// 3. the lid: the bite sets it (gape wide, slam shut, stay shut); otherwise it eases toward the latched Gape.
+//    the bite's blow through the frame while Active, each zone hurt at most once a bite. A flinch stops it where it
+//    stands and holds a windup at its start (the drain restarted it); an active or recovering bite runs on;
+// 3. the lid: the bite sets it (gape wide, slam shut, stay shut); otherwise it eases toward the latched Gape, except
+//    through a flinch, which holds it where the blow left it.
 // This processor writes no root transform: steering goes through SurfaceMotion.
 class UMars_Processor_PickleMimic_Tick : UCk_Processor_Script_Base_UE
 {
@@ -26,8 +31,35 @@ class UMars_Processor_PickleMimic_Tick : UCk_Processor_Script_Base_UE
         auto Self = InHandle.As_PickleMimic();
         const auto DeltaSeconds = float32(InDeltaT.Get_Seconds());
 
+        TickHurt(Self, DeltaSeconds);
         TickPosture(Self, DeltaSeconds);
         TickAction(Self, DeltaSeconds);
+    }
+
+    //----------------------------------------------------------------------------------------------------------------------
+    // Hurt
+    //----------------------------------------------------------------------------------------------------------------------
+
+    private void TickHurt(FCk_Handle_PickleMimic& InSelf, float32 InDeltaSeconds)
+    {
+        auto Hurt = InSelf.Get_Hurt();
+        Hurt.FlinchLeft = Math::Max(Hurt.FlinchLeft - InDeltaSeconds, 0.0f);
+        if (InSelf.Get_IsDead())
+        {
+            Hurt.FlinchLeft = 0.0f;
+            Hurt.Startled = false;
+        }
+
+        const auto Health = InSelf.Get_Monster().Get_BodyHealth();
+        const auto Max = Health.Get_Max();
+        if (Max > 0.0f)
+        { Hurt.CrackStage = Math::Max(Hurt.CrackStage, utils_pickle_mimic::Get_CrackStageFor(InSelf.Get_Spec().Vitals, Health.Get_Current() / Max)); }
+
+        const auto Spill = InSelf.Get_IsDead() && Hurt.Spilled == false;
+        Hurt.Spilled = Hurt.Spilled || Spill;
+        InSelf.Get_Fragment(FMars_Fragment_PickleMimic_Hurt) = Hurt;
+        if (Spill && InSelf.Has_Fragment(FMars_Fragment_PickleMimic_Signals))
+        { InSelf.Get_Fragment(FMars_Fragment_PickleMimic_Signals).OnSpill.Broadcast(InSelf, InSelf.Get_Spec().Vitals.SpilledPickles); }
     }
 
     //----------------------------------------------------------------------------------------------------------------------
@@ -54,6 +86,9 @@ class UMars_Processor_PickleMimic_Tick : UCk_Processor_Script_Base_UE
         }
 
         InSelf.Get_Fragment(FMars_Fragment_PickleMimic_Posture) = Posture;
+        if (Reached && Posture.Stance == EMars_PickleMimic_Stance::Standing)
+        { InSelf.Get_Fragment(FMars_Fragment_PickleMimic_Hurt).Startled = false; }
+
         if (Reached && InSelf.Has_Fragment(FMars_Fragment_PickleMimic_Signals))
         { InSelf.Get_Fragment(FMars_Fragment_PickleMimic_Signals).OnStance.Broadcast(InSelf, Posture.Stance); }
     }
@@ -76,13 +111,24 @@ class UMars_Processor_PickleMimic_Tick : UCk_Processor_Script_Base_UE
             Action = InSelf.Get_Action();
         }
 
+        const auto Flinching = InSelf.Get_IsFlinching();
         if (Action.Kind == EMars_PickleMimic_Action::None)
         {
             InSelf.Get_Fragment(FMars_Fragment_PickleMimic_Action) = Action;
             const auto Drive = InSelf.Get_Fragment(FMars_Fragment_PickleMimic_Drive);
-            const auto CanWalk = InSelf.Get_IsDead() == false && InSelf.Get_IsStanding();
+            const auto CanWalk = InSelf.Get_IsDead() == false && InSelf.Get_IsStanding() && Flinching == false;
             Steer(InSelf, Drive.Direction, CanWalk ? Drive.Speed : 0.0f);
-            EaseLid(InSelf, InDeltaSeconds);
+            if (Flinching == false)
+            { EaseLid(InSelf, InDeltaSeconds); }
+
+            return;
+        }
+
+        // A flinch holds the windup at its start, the lid where the blow slammed it.
+        if (Flinching && Action.Phase == EMars_PickleMimic_ActionPhase::Windup)
+        {
+            InSelf.Get_Fragment(FMars_Fragment_PickleMimic_Action) = Action;
+            Steer(InSelf, Action.CommittedDirection, 0.0f);
             return;
         }
 
