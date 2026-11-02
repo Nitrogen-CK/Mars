@@ -19,6 +19,7 @@ SCRIPT_CLASS = "/Script/Angelscript.Mars_PickleMimic_EntityScript"
 SHOT_DIR = r"D:\Repo\Mars\Saved\Screenshots\PickleMimic"
 LABEL = "PickleMimic_Review"
 CAMERA = "PickleMimic_ReviewCamera"
+CAPTURE = "PickleMimic_ReviewCapture"
 CLEARANCE = 30.0                        # utils_pickle_mimic::Clearance
 # Room 5 (x -3850 .. -2150, y -550 .. 550; its crawlers stand in the west half): the mimic near the east end facing -X,
 # the player starts beyond WakeRadius toward the middle
@@ -55,7 +56,7 @@ def prepare():
         _les().load_level(MAP)
         world = unreal.get_editor_subsystem(unreal.UnrealEditorSubsystem).get_editor_world()
     for a in _eas().get_all_level_actors():
-        if a.get_actor_label() in (LABEL, CAMERA):
+        if a.get_actor_label() in (LABEL, CAMERA, CAPTURE):
             a.destroy_actor()
     z = _floor_z(world, *MIMIC_XY)
     floor = 0.0 if z is None else z
@@ -68,6 +69,12 @@ def prepare():
     cam = _eas().spawn_actor_from_class(unreal.CameraActor, unreal.Vector(-2550.0, -300.0, floor + 160.0),
                                         unreal.Rotator(roll=0.0, pitch=0.0, yaw=0.0))
     cam.set_actor_label(CAMERA)
+    capture_actor = _eas().spawn_actor_from_class(unreal.SceneCapture2D, unreal.Vector(-2550.0, -300.0, floor + 160.0),
+                                                  unreal.Rotator(roll=0.0, pitch=0.0, yaw=0.0))
+    capture_actor.set_actor_label(CAPTURE)
+    comp = capture_actor.capture_component2d
+    comp.set_editor_property("capture_every_frame", False)
+    comp.set_editor_property("capture_on_movement", False)
     return {"floor": floor, "floor_hit": z is not None, "spawner": spawner.get_name()}
 
 
@@ -143,18 +150,18 @@ def mimics():
     return out
 
 
-def jar_location(piece="Glass"):
-    """The jar's base now (world cm): instance 0 of the client world's ISM renderer for PickleMimic_<piece>_Mars_SM (the
-    glass sits on the walker body; after the shatter use a shard or the frame)."""
+_JAR = {"last": MIMIC_XY}
+
+
+def jar_location(piece="Frame"):
+    """The review mimic's jar base now (world cm): the instance of PickleMimic_<piece>_Mars_SM nearest where it was last
+    asked (other mimics may be placed in the map; the frame stands from the start to the topple)."""
     world, _ = _pie_client()
-    for a in unreal.GameplayStatics.get_all_actors_of_class(world, unreal.Actor):
-        if "PickleMimic_%s_Mars_SM" % piece not in a.get_name():
-            continue
-        for c in a.get_components_by_class(unreal.InstancedStaticMeshComponent):
-            if c.get_instance_count() > 0:
-                t = c.get_instance_transform(0, True)
-                return (t.translation.x, t.translation.y, t.translation.z)
-    return None
+    at = _nearest_instance(_piece_isms(world, piece), _JAR["last"])
+    if at is None:
+        return None
+    _JAR["last"] = (at.x, at.y)
+    return (at.x, at.y, at.z)
 
 
 def shot_jar(name, offset=(260.0, -230.0, 110.0), piece="Frame", aim_up=35.0):
@@ -242,14 +249,24 @@ def shatter_sequence(times=(0.0, 0.12, 0.3, 0.6, 1.0, 2.0, 4.0), eye=(-2660.0, 4
 _FOLLOW = {}
 
 
-def _glass_ism(world):
+def _piece_isms(world, piece="Frame"):
+    out = []
     for a in unreal.GameplayStatics.get_all_actors_of_class(world, unreal.Actor):
-        if "PickleMimic_Glass_Mars_SM" not in a.get_name():
-            continue
-        for c in a.get_components_by_class(unreal.InstancedStaticMeshComponent):
-            if c.get_instance_count() > 0:
-                return c
-    return None
+        if "PickleMimic_%s_Mars_SM" % piece in a.get_name():
+            out += list(a.get_components_by_class(unreal.InstancedStaticMeshComponent))
+    return out
+
+
+def _nearest_instance(isms, near):
+    """The world location of the instance nearest `near` (x, y) among isms, or None."""
+    best, at = 1e18, None
+    for c in isms:
+        for i in range(c.get_instance_count()):
+            t = c.get_instance_transform(i, True).translation
+            d = (t.x - near[0]) ** 2 + (t.y - near[1]) ** 2
+            if d < best:
+                best, at = d, t
+    return at
 
 
 def stop_follow():
@@ -259,25 +276,30 @@ def stop_follow():
     return h is not None
 
 
-def follow_sequence(prefix, count=12, gap=0.2, offset=(0.0, -170.0, 45.0), aim_up=35.0, res=(1280, 720), max_seconds=60.0):
-    """Shoots `count` frames of the client view, at least `gap` s apart (one high-res shot at a time), through the review
-    camera re-placed each frame at `offset` (world cm) off the jar's current base: a side-on burst that reads the brine
-    and its pickles leaning while the mimic trots or bites. Stops after `count` shots or `max_seconds`, whichever is
-    first (stop_follow() stops it early) and writes <prefix>_log.json (time and jar base per shot).
-    Shots: Saved/Screenshots/PickleMimic/<prefix>_NN.png."""
+def cvar(command):
+    """Runs a console command in the PIE client world (e.g. "Mars.PickleMimic.DebugHit 3")."""
+    world, _ = _pie_client()
+    unreal.SystemLibrary.execute_console_command(world, command)
+    return command
+
+
+def follow_sequence(prefix, count=12, gap=0.2, offset=(-150.0, -170.0, 80.0), aim_up=40.0, res=(1280, 720), max_seconds=60.0,
+                    command=None, fixed=False):
+    """Captures `count` frames (the review SceneCapture2D, synchronous), at least `gap` s apart, from `offset` (world cm) off
+    the review mimic's jar (its frame, followed frame to frame; `fixed` keeps the pose from the first frame), aimed `aim_up`
+    over its base. `command` (a console command) runs right after the first capture. Stops after `count` frames or
+    `max_seconds` (stop_follow() stops it early) and writes <prefix>_log.json (time and jar base per frame).
+    Frames: Saved/Screenshots/PickleMimic/<prefix>_NN.png."""
     import json
     import time
     stop_follow()
-    world, pc = _pie_client()
-    cam = [c for c in unreal.GameplayStatics.get_all_actors_of_class(world, unreal.CameraActor)
-           if c.get_actor_label() == CAMERA][0]
-    ism = _glass_ism(world)
-    if ism is None:
-        raise RuntimeError("no jar glass instance")
-    pc.set_view_target_with_blend(cam, 0.0)
-    os.makedirs(SHOT_DIR, exist_ok=True)
+    world, _ = _pie_client()
+    isms = _piece_isms(world)
+    if not isms:
+        raise RuntimeError("no jar frame instance")
+    _capture_actor(world, res)
     start = time.time()
-    seq = {"next": start, "done": [], "log": []}
+    seq = {"next": start, "done": 0, "log": [], "last": MIMIC_XY, "pose": None}
 
     def finish():
         stop_follow()
@@ -286,24 +308,23 @@ def follow_sequence(prefix, count=12, gap=0.2, offset=(0.0, -170.0, 45.0), aim_u
 
     def tick(dt):
         try:
-            if len(seq["done"]) >= count or time.time() - start > max_seconds:
+            if seq["done"] >= count or time.time() - start > max_seconds:
                 finish()
                 return
-            if (seq["done"] and not os.path.exists(seq["done"][-1])) or time.time() < seq["next"]:
+            if time.time() < seq["next"]:
                 return
-            if ism.get_instance_count() == 0:
+            t = _nearest_instance(isms, seq["last"])
+            if t is None:
                 finish()
                 return
-            t = ism.get_instance_transform(0, True).translation
-            e = unreal.Vector(t.x + offset[0], t.y + offset[1], t.z + offset[2])
-            cam.set_actor_location(e, False, False)
-            cam.set_actor_rotation(unreal.MathLibrary.find_look_at_rotation(e, unreal.Vector(t.x, t.y, t.z + aim_up)), False)
-            path = os.path.join(SHOT_DIR, "%s_%02d.png" % (prefix, len(seq["done"])))
-            if os.path.exists(path):
-                os.remove(path)
-            unreal.AutomationLibrary.take_high_res_screenshot(res[0], res[1], path, cam)
+            seq["last"] = (t.x, t.y)
+            if seq["pose"] is None or not fixed:
+                seq["pose"] = ((t.x + offset[0], t.y + offset[1], t.z + offset[2]), (t.x, t.y, t.z + aim_up))
+            capture("%s_%02d" % (prefix, seq["done"]), seq["pose"][0], seq["pose"][1], res)
+            if command and seq["done"] == 0:
+                unreal.SystemLibrary.execute_console_command(world, command)
             seq["log"].append({"t": round(time.time() - start, 3), "jar": [round(t.x), round(t.y), round(t.z)]})
-            seq["done"].append(path)
+            seq["done"] += 1
             seq["next"] = time.time() + gap
         except Exception as ex:
             seq["log"].append({"error": str(ex)})
@@ -311,3 +332,41 @@ def follow_sequence(prefix, count=12, gap=0.2, offset=(0.0, -170.0, 45.0), aim_u
 
     _FOLLOW["handle"] = unreal.register_slate_post_tick_callback(tick)
     return {"scheduled": count}
+
+
+_CAPTURE = {}
+
+
+def _capture_actor(world, res):
+    """The review SceneCapture2D (placed by prepare) in the PIE client world, rendering final tonemapped colour into a
+    render target of its own, so a capture never depends on whose view the player controller holds."""
+    actor = [a for a in unreal.GameplayStatics.get_all_actors_of_class(world, unreal.SceneCapture2D)
+             if a.get_actor_label() == CAPTURE][0]
+    comp = actor.capture_component2d
+    rt = comp.get_editor_property("texture_target")
+    if rt is None or rt.get_editor_property("size_x") != res[0]:
+        rt = unreal.RenderingLibrary.create_render_target2d(world, res[0], res[1], unreal.TextureRenderTargetFormat.RTF_RGBA8_SRGB)
+        comp.set_editor_property("texture_target", rt)
+        comp.set_editor_property("capture_source", unreal.SceneCaptureSource.SCS_FINAL_TONE_CURVE_HDR)
+        comp.set_editor_property("fov_angle", 70.0)
+    _CAPTURE["rt"] = rt
+    return actor
+
+
+def capture(name, eye, target, res=(1280, 720)):
+    """Renders the PIE client world from eye toward target (world cm) into Saved/Screenshots/PickleMimic/<name>.png now."""
+    world, _ = _pie_client()
+    actor = _capture_actor(world, res)
+    e = unreal.Vector(*eye)
+    actor.set_actor_location_and_rotation(e, unreal.MathLibrary.find_look_at_rotation(e, unreal.Vector(*target)), False, False)
+    actor.capture_component2d.capture_scene()
+    os.makedirs(SHOT_DIR, exist_ok=True)
+    unreal.RenderingLibrary.export_render_target(world, _CAPTURE["rt"], SHOT_DIR, name + ".png")
+    return os.path.join(SHOT_DIR, name + ".png")
+
+
+def capture_jar(name, offset=(-150.0, -170.0, 80.0), aim_up=40.0, res=(1280, 720)):
+    at = jar_location("Frame")
+    if at is None:
+        raise RuntimeError("no jar found")
+    return capture(name, (at[0] + offset[0], at[1] + offset[1], at[2] + offset[2]), (at[0], at[1], at[2] + aim_up), res)
