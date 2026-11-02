@@ -1,0 +1,849 @@
+{
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "7f10f8cf5004e772e9ed1d170f03900e",
+		"exporterVersion": 3
+	},
+	"system": "RootMawRoots_Mars_NS",
+	"packagePath": "/Game/Mars/Gameplay/Monsters/RootMaw/Fx/RootMawRoots_Mars_NS",
+	"userParameters": [
+		{
+			"name": "User.BedRadius",
+			"type": "NiagaraFloat",
+			"value": "24"
+		},
+		{
+			"name": "User.FarRadius",
+			"type": "NiagaraFloat",
+			"value": "110"
+		},
+		{
+			"name": "User.FarScale",
+			"type": "NiagaraFloat",
+			"value": "0.45"
+		},
+		{
+			"name": "User.FrontBias",
+			"type": "NiagaraFloat",
+			"value": "0.6"
+		},
+		{
+			"name": "User.FrontSpread",
+			"type": "NiagaraFloat",
+			"value": "70"
+		},
+		{
+			"name": "User.GrowFraction",
+			"type": "NiagaraFloat",
+			"value": "0.15"
+		},
+		{
+			"name": "User.Heading",
+			"type": "Vector3f",
+			"value": "(0, 0, 0)"
+		},
+		{
+			"name": "User.IdleRate",
+			"type": "NiagaraFloat",
+			"value": "6"
+		},
+		{
+			"name": "User.LeadShare",
+			"type": "NiagaraFloat",
+			"value": "0.6"
+		},
+		{
+			"name": "User.LifeJitter",
+			"type": "NiagaraFloat",
+			"value": "0.25"
+		},
+		{
+			"name": "User.Lifetime",
+			"type": "NiagaraFloat",
+			"value": "3"
+		},
+		{
+			"name": "User.NearScale",
+			"type": "NiagaraFloat",
+			"value": "1.5"
+		},
+		{
+			"name": "User.RootScale",
+			"type": "NiagaraFloat",
+			"value": "1"
+		},
+		{
+			"name": "User.RootSpacing",
+			"type": "NiagaraFloat",
+			"value": "8"
+		},
+		{
+			"name": "User.ScaleJitter",
+			"type": "NiagaraFloat",
+			"value": "0.25"
+		},
+		{
+			"name": "User.ShrinkStart",
+			"type": "NiagaraFloat",
+			"value": "0.55"
+		},
+		{
+			"name": "User.SinkDepth",
+			"type": "NiagaraFloat",
+			"value": "10"
+		},
+		{
+			"name": "User.Speed",
+			"type": "NiagaraFloat",
+			"value": "0"
+		},
+		{
+			"name": "User.TipDegrees",
+			"type": "NiagaraFloat",
+			"value": "30"
+		},
+		{
+			"name": "User.TwistDegrees",
+			"type": "NiagaraFloat",
+			"value": "80"
+		},
+		{
+			"name": "User.YawJitter",
+			"type": "NiagaraFloat",
+			"value": "30"
+		}
+	],
+	"systemState":
+	{
+		"stacks": [
+			{
+				"stage": "System Update",
+				"modules": [
+					{
+						"name": "System State",
+						"id": "SystemState",
+						"inputs": [
+							{
+								"name": "Inactive Response",
+								"value": "NewEnumerator0 (Complete (Let Emitters Finish then Kill The System))"
+							},
+							{
+								"name": "Loop Behavior",
+								"value": "NewEnumerator0 (Infinite)"
+							},
+							{
+								"name": "UseLoopDelay",
+								"value": "false"
+							}
+						]
+					}
+				],
+				"values": [
+					{
+						"name": "Roots.EmitterState.Loop Delay",
+						"value": "0"
+					},
+					{
+						"name": "Roots.EmitterState.Loop Duration",
+						"value": "1"
+					},
+					{
+						"name": "Roots.EmitterState.MaxDistance",
+						"value": "5000"
+					},
+					{
+						"name": "Roots.EmitterState.MinDistance",
+						"value": "0"
+					},
+					{
+						"name": "Roots.SpawnPerUnit.Max Movement Threshold",
+						"value": "5000"
+					},
+					{
+						"name": "Roots.SpawnPerUnit.Movement Tolerance",
+						"value": "0.5"
+					},
+					{
+						"name": "Roots.SpawnPerUnit.Spawn Group",
+						"value": "0"
+					},
+					{
+						"name": "Roots.SpawnPerUnit.Spawn Probability",
+						"value": "0.5"
+					},
+					{
+						"name": "Roots.SpawnPerUnit.Spawn Spacing",
+						"value": "20"
+					},
+					{
+						"name": "Roots.SpawnRate.Spawn Probability",
+						"value": "1"
+					},
+					{
+						"name": "Roots.SpawnRate.SpawnGroup",
+						"value": "0"
+					},
+					{
+						"name": "Roots.SpawnRate.SpawnRate",
+						"value": "1"
+					},
+					{
+						"name": "SystemState.Loop Delay",
+						"value": "0"
+					},
+					{
+						"name": "SystemState.Loop Duration",
+						"value": "5"
+					}
+				]
+			}
+		],
+		"systemStateModule":
+		{
+			"found": true,
+			"module": "SystemState",
+			"name": "System State",
+			"enabled": true,
+			"inputs": [
+				{
+					"name": "Inactive Response",
+					"value": "NewEnumerator0 (Complete (Let Emitters Finish then Kill The System))"
+				},
+				{
+					"name": "Loop Behavior",
+					"value": "NewEnumerator0 (Infinite)"
+				},
+				{
+					"name": "UseLoopDelay",
+					"value": "false"
+				}
+			],
+			"values": [
+				{
+					"name": "Loop Delay",
+					"value": "0"
+				},
+				{
+					"name": "Loop Duration",
+					"value": "5"
+				}
+			]
+		}
+	},
+	"emitters": [
+		{
+			"name": "Roots",
+			"enabled": true,
+			"sim": "CPU",
+			"localSpace": false,
+			"determinism": false,
+			"boundsMode": "Dynamic",
+			"stacks": [
+				{
+					"stage": "Emitter Update",
+					"modules": [
+						{
+							"name": "Emitter State",
+							"id": "EmitterState",
+							"inputs": [
+								{
+									"name": "ScaleSpawnCountCurve",
+									"value": ""
+								},
+								{
+									"name": "Enable Distance Culling",
+									"value": "false"
+								},
+								{
+									"name": "Enable Visibility Culling",
+									"value": "false"
+								},
+								{
+									"name": "Inactive Response",
+									"value": "NewEnumerator0 (Complete (Let Particles Finish then Kill Emitter))"
+								},
+								{
+									"name": "Life Cycle Mode",
+									"value": "NewEnumerator0 (System)"
+								},
+								{
+									"name": "Loop Behavior",
+									"value": "NewEnumerator0 (Infinite)"
+								},
+								{
+									"name": "Loop Duration Mode",
+									"value": "NewEnumerator0 (Fixed)"
+								},
+								{
+									"name": "Scalability Mode",
+									"value": "NewEnumerator0 (System)"
+								},
+								{
+									"name": "Scale Spawn Count",
+									"value": "false"
+								},
+								{
+									"name": "UseLoopDelay",
+									"value": "false"
+								}
+							]
+						},
+						{
+							"name": "Spawn Rate",
+							"id": "SpawnRate",
+							"inputs": [
+								{
+									"name": "Use Spawn Probability",
+									"value": "false"
+								}
+							],
+							"overrides": [
+								{
+									"path": "SpawnRate",
+									"kind": "linked",
+									"value": "User.IdleRate"
+								}
+							]
+						},
+						{
+							"name": "Spawn Per Unit",
+							"id": "SpawnPerUnit",
+							"inputs": [
+								{
+									"name": "Use Spawn Probability",
+									"value": "false"
+								}
+							],
+							"overrides": [
+								{
+									"path": "Spawn Spacing",
+									"kind": "linked",
+									"value": "User.RootSpacing"
+								},
+								{
+									"path": "Use Max Movement Threshold",
+									"kind": "value",
+									"value": "true"
+								},
+								{
+									"path": "Max Movement Threshold",
+									"kind": "value",
+									"value": "600.0"
+								}
+							]
+						}
+					],
+					"values": [
+						{
+							"name": "Roots.EmitterState.Loop Delay",
+							"value": "0"
+						},
+						{
+							"name": "Roots.EmitterState.Loop Duration",
+							"value": "1"
+						},
+						{
+							"name": "Roots.EmitterState.MaxDistance",
+							"value": "5000"
+						},
+						{
+							"name": "Roots.EmitterState.MinDistance",
+							"value": "0"
+						},
+						{
+							"name": "Roots.SpawnPerUnit.Max Movement Threshold",
+							"value": "5000"
+						},
+						{
+							"name": "Roots.SpawnPerUnit.Movement Tolerance",
+							"value": "0.5"
+						},
+						{
+							"name": "Roots.SpawnPerUnit.Spawn Group",
+							"value": "0"
+						},
+						{
+							"name": "Roots.SpawnPerUnit.Spawn Probability",
+							"value": "0.5"
+						},
+						{
+							"name": "Roots.SpawnPerUnit.Spawn Spacing",
+							"value": "20"
+						},
+						{
+							"name": "Roots.SpawnRate.Spawn Probability",
+							"value": "1"
+						},
+						{
+							"name": "Roots.SpawnRate.SpawnGroup",
+							"value": "0"
+						},
+						{
+							"name": "Roots.SpawnRate.SpawnRate",
+							"value": "1"
+						}
+					]
+				},
+				{
+					"stage": "Particle Spawn",
+					"modules": [
+						{
+							"name": "Initialize Particle",
+							"id": "InitializeParticle",
+							"inputs": [
+								{
+									"name": "AdjustAlpha",
+									"value": "false"
+								},
+								{
+									"name": "AdjustHue",
+									"value": "true"
+								},
+								{
+									"name": "AdjustSaturation",
+									"value": "false"
+								},
+								{
+									"name": "AdjustValue",
+									"value": "false"
+								},
+								{
+									"name": "Color Channel Mode",
+									"value": "NewEnumerator1 (Link RGB / Link A)"
+								},
+								{
+									"name": "Color Mode",
+									"value": "NewEnumerator0 (Unset)"
+								},
+								{
+									"name": "Color Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "Lifetime Mode",
+									"value": "NewEnumerator0 (Direct Set)"
+								},
+								{
+									"name": "Lifetime Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "Mass Mode",
+									"value": "NewEnumerator0 (Unset / (Mass of 1))"
+								},
+								{
+									"name": "Mass Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "Mesh Renderer Array Visibility Mode",
+									"value": "NewEnumerator0 (Unset)"
+								},
+								{
+									"name": "Mesh Scale Mode",
+									"value": "NewEnumerator0 (Unset)"
+								},
+								{
+									"name": "Mesh Scale Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "Position Mode",
+									"value": "NewEnumerator2 (Simulation Position)"
+								},
+								{
+									"name": "Ribbon Facing Mode",
+									"value": "NewEnumerator0 (Unset)"
+								},
+								{
+									"name": "Ribbon Twist Mode",
+									"value": "NewEnumerator0 (Unset)"
+								},
+								{
+									"name": "Ribbon Width Mode",
+									"value": "NewEnumerator0 (Unset)"
+								},
+								{
+									"name": "Sprite Rotation Mode",
+									"value": "NewEnumerator3 (Unset)"
+								},
+								{
+									"name": "Sprite Rotation Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "Sprite Size Mode",
+									"value": "NewEnumerator0 (Unset)"
+								},
+								{
+									"name": "Sprite Size Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "Sprite UV Mode",
+									"value": "NewEnumerator0 (Unset)"
+								},
+								{
+									"name": "Sprite UV Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "UsePositionOffset",
+									"value": "false"
+								},
+								{
+									"name": "Wrap Index By Mesh Count",
+									"value": "true"
+								},
+								{
+									"name": "Write Material Random",
+									"value": "true"
+								}
+							]
+						},
+						{
+							"name": "Mars Root Spawn Mars NM",
+							"id": "MarsRootSpawn_Mars_NM",
+							"inputs": [],
+							"overrides": [
+								{
+									"path": "Heading",
+									"kind": "linked",
+									"value": "User.Heading"
+								},
+								{
+									"path": "Speed",
+									"kind": "linked",
+									"value": "User.Speed"
+								},
+								{
+									"path": "Lifetime",
+									"kind": "linked",
+									"value": "User.Lifetime"
+								},
+								{
+									"path": "LifeJitter",
+									"kind": "linked",
+									"value": "User.LifeJitter"
+								},
+								{
+									"path": "GrowFraction",
+									"kind": "linked",
+									"value": "User.GrowFraction"
+								},
+								{
+									"path": "RootScale",
+									"kind": "linked",
+									"value": "User.RootScale"
+								},
+								{
+									"path": "ScaleJitter",
+									"kind": "linked",
+									"value": "User.ScaleJitter"
+								},
+								{
+									"path": "BedRadius",
+									"kind": "linked",
+									"value": "User.BedRadius"
+								},
+								{
+									"path": "FrontBias",
+									"kind": "linked",
+									"value": "User.FrontBias"
+								},
+								{
+									"path": "FrontSpread",
+									"kind": "linked",
+									"value": "User.FrontSpread"
+								},
+								{
+									"path": "LeadShare",
+									"kind": "linked",
+									"value": "User.LeadShare"
+								},
+								{
+									"path": "YawJitter",
+									"kind": "linked",
+									"value": "User.YawJitter"
+								},
+								{
+									"path": "Origin",
+									"kind": "linked",
+									"value": "Engine.Owner.Position"
+								}
+							]
+						}
+					],
+					"values": [
+						{
+							"name": "Roots.InitializeParticle.Lifetime",
+							"value": "5"
+						},
+						{
+							"name": "Roots.InitializeParticle.Position Offset",
+							"value": "(0, 0, 0)"
+						},
+						{
+							"name": "Roots.MarsRootSpawn_Mars_NM.BedRadius",
+							"value": "0"
+						},
+						{
+							"name": "Roots.MarsRootSpawn_Mars_NM.FrontBias",
+							"value": "0"
+						},
+						{
+							"name": "Roots.MarsRootSpawn_Mars_NM.FrontSpread",
+							"value": "0"
+						},
+						{
+							"name": "Roots.MarsRootSpawn_Mars_NM.GrowFraction",
+							"value": "0"
+						},
+						{
+							"name": "Roots.MarsRootSpawn_Mars_NM.Heading",
+							"value": "(0, 0, 0)"
+						},
+						{
+							"name": "Roots.MarsRootSpawn_Mars_NM.LeadShare",
+							"value": "0"
+						},
+						{
+							"name": "Roots.MarsRootSpawn_Mars_NM.LifeJitter",
+							"value": "0"
+						},
+						{
+							"name": "Roots.MarsRootSpawn_Mars_NM.Lifetime",
+							"value": "0"
+						},
+						{
+							"name": "Roots.MarsRootSpawn_Mars_NM.Origin",
+							"value": "(0, 0, 0)"
+						},
+						{
+							"name": "Roots.MarsRootSpawn_Mars_NM.RootScale",
+							"value": "0"
+						},
+						{
+							"name": "Roots.MarsRootSpawn_Mars_NM.ScaleJitter",
+							"value": "0"
+						},
+						{
+							"name": "Roots.MarsRootSpawn_Mars_NM.Speed",
+							"value": "0"
+						},
+						{
+							"name": "Roots.MarsRootSpawn_Mars_NM.YawJitter",
+							"value": "0"
+						},
+						{
+							"name": "Roots.MarsRootUpdate_Mars_NM.BedRadius",
+							"value": "0"
+						},
+						{
+							"name": "Roots.MarsRootUpdate_Mars_NM.FarRadius",
+							"value": "0"
+						},
+						{
+							"name": "Roots.MarsRootUpdate_Mars_NM.FarScale",
+							"value": "0"
+						},
+						{
+							"name": "Roots.MarsRootUpdate_Mars_NM.GrowFraction",
+							"value": "0"
+						},
+						{
+							"name": "Roots.MarsRootUpdate_Mars_NM.NearScale",
+							"value": "0"
+						},
+						{
+							"name": "Roots.MarsRootUpdate_Mars_NM.Owner",
+							"value": "(0, 0, 0)"
+						},
+						{
+							"name": "Roots.MarsRootUpdate_Mars_NM.RootScale",
+							"value": "0"
+						},
+						{
+							"name": "Roots.MarsRootUpdate_Mars_NM.ShrinkStart",
+							"value": "0"
+						},
+						{
+							"name": "Roots.MarsRootUpdate_Mars_NM.SinkDepth",
+							"value": "0"
+						},
+						{
+							"name": "Roots.MarsRootUpdate_Mars_NM.TipDegrees",
+							"value": "0"
+						},
+						{
+							"name": "Roots.MarsRootUpdate_Mars_NM.TwistDegrees",
+							"value": "0"
+						}
+					]
+				},
+				{
+					"stage": "Particle Update",
+					"modules": [
+						{
+							"name": "Particle State",
+							"id": "ParticleState",
+							"inputs": [
+								{
+									"name": "Kill Particles When Lifetime Has Elapsed",
+									"value": "true"
+								}
+							]
+						},
+						{
+							"name": "Mars Root Update Mars NM",
+							"id": "MarsRootUpdate_Mars_NM",
+							"inputs": [],
+							"overrides": [
+								{
+									"path": "GrowFraction",
+									"kind": "linked",
+									"value": "User.GrowFraction"
+								},
+								{
+									"path": "ShrinkStart",
+									"kind": "linked",
+									"value": "User.ShrinkStart"
+								},
+								{
+									"path": "RootScale",
+									"kind": "linked",
+									"value": "User.RootScale"
+								},
+								{
+									"path": "TwistDegrees",
+									"kind": "linked",
+									"value": "User.TwistDegrees"
+								},
+								{
+									"path": "TipDegrees",
+									"kind": "linked",
+									"value": "User.TipDegrees"
+								},
+								{
+									"path": "SinkDepth",
+									"kind": "linked",
+									"value": "User.SinkDepth"
+								},
+								{
+									"path": "BedRadius",
+									"kind": "linked",
+									"value": "User.BedRadius"
+								},
+								{
+									"path": "NearScale",
+									"kind": "linked",
+									"value": "User.NearScale"
+								},
+								{
+									"path": "FarScale",
+									"kind": "linked",
+									"value": "User.FarScale"
+								},
+								{
+									"path": "FarRadius",
+									"kind": "linked",
+									"value": "User.FarRadius"
+								},
+								{
+									"path": "Owner",
+									"kind": "linked",
+									"value": "Engine.Owner.Position"
+								}
+							]
+						}
+					],
+					"values": [
+						{
+							"name": "Roots.MarsRootUpdate_Mars_NM.BedRadius",
+							"value": "0"
+						},
+						{
+							"name": "Roots.MarsRootUpdate_Mars_NM.FarRadius",
+							"value": "0"
+						},
+						{
+							"name": "Roots.MarsRootUpdate_Mars_NM.FarScale",
+							"value": "0"
+						},
+						{
+							"name": "Roots.MarsRootUpdate_Mars_NM.GrowFraction",
+							"value": "0"
+						},
+						{
+							"name": "Roots.MarsRootUpdate_Mars_NM.NearScale",
+							"value": "0"
+						},
+						{
+							"name": "Roots.MarsRootUpdate_Mars_NM.Owner",
+							"value": "(0, 0, 0)"
+						},
+						{
+							"name": "Roots.MarsRootUpdate_Mars_NM.RootScale",
+							"value": "0"
+						},
+						{
+							"name": "Roots.MarsRootUpdate_Mars_NM.ShrinkStart",
+							"value": "0"
+						},
+						{
+							"name": "Roots.MarsRootUpdate_Mars_NM.SinkDepth",
+							"value": "0"
+						},
+						{
+							"name": "Roots.MarsRootUpdate_Mars_NM.TipDegrees",
+							"value": "0"
+						},
+						{
+							"name": "Roots.MarsRootUpdate_Mars_NM.TwistDegrees",
+							"value": "0"
+						}
+					]
+				}
+			],
+			"eventHandlers": [],
+			"lifetimeResolved":
+			{
+				"module": "InitializeParticle",
+				"mode": "NewEnumerator0 (Direct Set)",
+				"source": "direct",
+				"values": [
+					{
+						"name": "Lifetime",
+						"value": "5"
+					}
+				]
+			},
+			"renderers": [
+				{
+					"type": "NiagaraMeshRendererProperties",
+					"facingMode": "Default",
+					"sortMode": "None",
+					"meshes": [
+						{
+							"mesh": "/Game/Mars/Gameplay/Monsters/RootMaw/Meshes/RootMaw_Root0_Mars_SM.RootMaw_Root0_Mars_SM",
+							"scale": "(1, 1, 1)"
+						},
+						{
+							"mesh": "/Game/Mars/Gameplay/Monsters/RootMaw/Meshes/RootMaw_Root1_Mars_SM.RootMaw_Root1_Mars_SM",
+							"scale": "(1, 1, 1)"
+						},
+						{
+							"mesh": "/Game/Mars/Gameplay/Monsters/RootMaw/Meshes/RootMaw_Root2_Mars_SM.RootMaw_Root2_Mars_SM",
+							"scale": "(1, 1, 1)"
+						},
+						{
+							"mesh": "/Game/Mars/Gameplay/Monsters/RootMaw/Meshes/RootMaw_Root3_Mars_SM.RootMaw_Root3_Mars_SM",
+							"scale": "(1, 1, 1)"
+						}
+					]
+				}
+			]
+		}
+	]
+}

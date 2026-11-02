@@ -1,0 +1,240 @@
+{
+	"material": "RootMawRoot_Mars_MI",
+	"packagePath": "/Game/Mars/Gameplay/Monsters/RootMaw/Materials/RootMawRoot_Mars_MI",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "5667e24d247429c7ff063a8961faa7a6",
+		"exporterVersion": 3
+	},
+	"parentChain": [
+		"/Game/Mars/Gameplay/Monsters/RootMaw/Materials/RootMawRoot_Mars_M.RootMawRoot_Mars_M"
+	],
+	"blendMode": "BLEND_Opaque",
+	"twoSided": false,
+	"unlit": false,
+	"shadingModel": "MSM_DefaultLit",
+	"domain": "MD_Surface",
+	"connectedOutputs": [
+		"BaseColor"
+	],
+	"expressions":
+	{
+		"ComponentMask": 1,
+		"LinearInterpolate": 1,
+		"Multiply": 1,
+		"Power": 1,
+		"ScalarParameter": 3,
+		"TextureCoordinate": 1,
+		"VectorParameter": 2,
+		"VertexColor": 1
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "TextureCoordinate",
+				"name": "MaterialExpressionTextureCoordinate_0"
+			},
+			{
+				"id": 1,
+				"class": "ComponentMask",
+				"name": "MaterialExpressionComponentMask_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Input",
+						"node": 0,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"R": true
+				}
+			},
+			{
+				"id": 2,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_2",
+				"props":
+				{
+					"DefaultValue": 0.80000001192092896,
+					"ParameterName": "TipFalloff"
+				}
+			},
+			{
+				"id": 3,
+				"class": "Power",
+				"name": "MaterialExpressionPower_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Base",
+						"node": 1,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 4,
+				"class": "LinearInterpolate",
+				"name": "MaterialExpressionLinearInterpolate_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 5,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 6,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 2,
+						"name": "Alpha",
+						"node": 3,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 5,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_0",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.069000,G=0.027000,B=0.011000,A=1.000000)",
+					"ParameterName": "BaseColour"
+				}
+			},
+			{
+				"id": 6,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_1",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.565000,G=0.262000,B=0.085000,A=1.000000)",
+					"ParameterName": "TipColour"
+				}
+			},
+			{
+				"id": 7,
+				"class": "VertexColor",
+				"name": "MaterialExpressionVertexColor_1",
+				"outputs": [
+					"None",
+					"None",
+					"None",
+					"None",
+					"None"
+				]
+			},
+			{
+				"id": 8,
+				"class": "Multiply",
+				"name": "MaterialExpressionMultiply_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 4,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 7,
+						"output": 0,
+						"mask": "rgb"
+					}
+				]
+			},
+			{
+				"id": 9,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_3",
+				"props":
+				{
+					"DefaultValue": 0.85000002384185791,
+					"ParameterName": "Roughness"
+				}
+			},
+			{
+				"id": 10,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_4",
+				"props":
+				{
+					"DefaultValue": 0.30000001192092896,
+					"ParameterName": "Specular"
+				}
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_BaseColor",
+				"node": 8,
+				"output": 0
+			},
+			{
+				"property": "MP_Specular",
+				"node": 10,
+				"output": 0
+			},
+			{
+				"property": "MP_Roughness",
+				"node": 9,
+				"output": 0
+			}
+		]
+	},
+	"scalarParams": [
+		{
+			"name": "TipFalloff",
+			"value": 0.80000001192092896
+		},
+		{
+			"name": "Roughness",
+			"value": 0.85000002384185791
+		},
+		{
+			"name": "Specular",
+			"value": 0.30000001192092896
+		}
+	],
+	"vectorParams": [
+		{
+			"name": "BaseColour",
+			"value": "RGBA(0.069, 0.027, 0.011, 1)"
+		},
+		{
+			"name": "TipColour",
+			"value": "RGBA(0.565, 0.262, 0.085, 1)"
+		}
+	],
+	"textureParams": [],
+	"usedTextures": []
+}

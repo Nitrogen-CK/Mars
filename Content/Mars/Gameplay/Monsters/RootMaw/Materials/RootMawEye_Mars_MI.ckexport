@@ -1,0 +1,291 @@
+{
+	"material": "RootMawEye_Mars_MI",
+	"packagePath": "/Game/Mars/Gameplay/Monsters/RootMaw/Materials/RootMawEye_Mars_MI",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "5fbf033647b160994475d2f829e8e248",
+		"exporterVersion": 3
+	},
+	"parentChain": [
+		"/Game/Mars/Gameplay/Monsters/RootMaw/Materials/RootMaw_Mars_M.RootMaw_Mars_M"
+	],
+	"blendMode": "BLEND_Opaque",
+	"twoSided": true,
+	"unlit": false,
+	"shadingModel": "MSM_DefaultLit",
+	"domain": "MD_Surface",
+	"connectedOutputs": [
+		"EmissiveColor",
+		"BaseColor"
+	],
+	"expressions":
+	{
+		"ConstantBiasScale": 1,
+		"LinearInterpolate": 1,
+		"Multiply": 4,
+		"ScalarParameter": 5,
+		"TwoSidedSign": 1,
+		"VectorParameter": 1,
+		"VertexColor": 1
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "VertexColor",
+				"name": "MaterialExpressionVertexColor_1",
+				"outputs": [
+					"None",
+					"None",
+					"None",
+					"None",
+					"None"
+				]
+			},
+			{
+				"id": 1,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_1",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=1.000000,G=1.000000,B=1.000000,A=1.000000)",
+					"ParameterName": "Tint"
+				}
+			},
+			{
+				"id": 2,
+				"class": "Multiply",
+				"name": "MaterialExpressionMultiply_4",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 0,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 1,
+						"output": 0,
+						"mask": "rgb"
+					}
+				]
+			},
+			{
+				"id": 3,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_5",
+				"props":
+				{
+					"DefaultValue": 0.059999998658895493,
+					"ParameterName": "BackfaceShade"
+				}
+			},
+			{
+				"id": 4,
+				"class": "Multiply",
+				"name": "MaterialExpressionMultiply_5",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 2,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 3,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 5,
+				"class": "TwoSidedSign",
+				"name": "MaterialExpressionTwoSidedSign_1"
+			},
+			{
+				"id": 6,
+				"class": "ConstantBiasScale",
+				"name": "MaterialExpressionConstantBiasScale_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Input",
+						"node": 5,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 7,
+				"class": "LinearInterpolate",
+				"name": "MaterialExpressionLinearInterpolate_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 4,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 2,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "Alpha",
+						"node": 6,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 8,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_6",
+				"props":
+				{
+					"ParameterName": "Emissive"
+				}
+			},
+			{
+				"id": 9,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_7",
+				"props":
+				{
+					"DefaultValue": 1,
+					"bUseCustomPrimitiveData": true,
+					"ParameterName": "Glow"
+				}
+			},
+			{
+				"id": 10,
+				"class": "Multiply",
+				"name": "MaterialExpressionMultiply_6",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 0,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 8,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 11,
+				"class": "Multiply",
+				"name": "MaterialExpressionMultiply_7",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 10,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 9,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 12,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_8",
+				"props":
+				{
+					"DefaultValue": 0.75,
+					"ParameterName": "Roughness"
+				}
+			},
+			{
+				"id": 13,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_9",
+				"props":
+				{
+					"DefaultValue": 0.34999999403953552,
+					"ParameterName": "Specular"
+				}
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_EmissiveColor",
+				"node": 11,
+				"output": 0
+			},
+			{
+				"property": "MP_BaseColor",
+				"node": 7,
+				"output": 0
+			},
+			{
+				"property": "MP_Specular",
+				"node": 13,
+				"output": 0
+			},
+			{
+				"property": "MP_Roughness",
+				"node": 12,
+				"output": 0
+			}
+		]
+	},
+	"scalarParams": [
+		{
+			"name": "BackfaceShade",
+			"value": 0.059999998658895493
+		},
+		{
+			"name": "Emissive",
+			"value": 6
+		},
+		{
+			"name": "Glow",
+			"value": 1
+		},
+		{
+			"name": "Roughness",
+			"value": 0.40000000596046448
+		},
+		{
+			"name": "Specular",
+			"value": 0.34999999403953552
+		}
+	],
+	"vectorParams": [
+		{
+			"name": "Tint",
+			"value": "RGBA(1, 1, 1, 1)"
+		}
+	],
+	"textureParams": [],
+	"usedTextures": []
+}
