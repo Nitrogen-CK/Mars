@@ -10,6 +10,7 @@
 #include <EdGraph/EdGraph.h>
 #include <K2Node.h>
 #include <Kismet2/BlueprintEditorUtils.h>
+#include <Misc/EngineVersionComparison.h>
 #include <RigVMCore/RigVMExternalVariable.h>
 #include <RigVMDeveloperTypeUtils.h>
 #include <ScopedTransaction.h>
@@ -56,7 +57,12 @@ namespace ck_hands_utils_editor
         auto ProbePins = TArray<FOptionalPinFromProperty>{};
         const auto Probe = MakeShared<FControlRigIOMapping>(ProbeInputMapping, ProbeOutputMapping, ProbePins);
 
+        // UE 5.8 replaced the target-class delegate with a target-asset-reference one; bind what the node itself binds.
+#if UE_VERSION_OLDER_THAN(5, 8, 0)
         Probe->GetOnGetTargetClassDelegate().BindLambda([&InNode]() -> UClass* { return InNode.GetTargetClass(); });
+#else
+        Probe->GetOnGetTargetAssetReferenceDelegate().BindLambda([&InNode]() { return InNode.GetTargetAssetReference(); });
+#endif
         Probe->RebuildExposedProperties();
 
         const auto* Variable = Probe->GetInputVariables().Find(InVariableName);
