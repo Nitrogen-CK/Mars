@@ -115,9 +115,9 @@
 			"Enabled": false
 		},
 		{
+			"Comment": "Retired (CkPlugins removed it too). Stays listed as disabled so an existing checkout that still has Plugins/AutoSizeComments on disk does not load it.",
 			"Name": "AutoSizeComments",
-			"Enabled": true,
-			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/content/ae89a2c4ab384de0a3f213b23de324f3"
+			"Enabled": false
 		},
 		{
 			"Name": "CommonUI",

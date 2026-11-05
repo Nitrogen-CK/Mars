@@ -7,9 +7,6 @@
 [submodule "Plugins/CkTests"]
 	path = Plugins/CkTests
 	url = https://github.com/CommitAndChill/CkTests.git
-[submodule "Plugins/AutoSizeComments"]
-	path = Plugins/AutoSizeComments
-	url = https://github.com/chainkemists/AutoSizeComments.git
 [submodule "Plugins/GitSourceControl"]
 	path = Plugins/GitSourceControl
 	url = https://github.com/chainkemists/UEGitPlugin.git
