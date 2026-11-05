@@ -50,6 +50,7 @@ struct CKHANDS_API FCk_RigUnit_Hands_ContactCurl : public FRigUnit_HighlevelBase
     UPROPERTY(meta = (Input))
     FCk_Hands_ContactShape Shape;
 
+    // How the digit is tested against Shape: its thickness, the curl search resolution and the tip length.
     UPROPERTY(meta = (Input))
     FCk_Hands_DigitContactSettings Settings;
 
