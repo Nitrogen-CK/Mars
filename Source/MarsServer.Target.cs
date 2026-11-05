@@ -12,6 +12,9 @@ public class MarsServerTarget : TargetRules
 		bWithPushModel = true;
 		DefaultBuildSettings = BuildSettingsVersion.Latest;
 
+		// Same as Mars.Target.cs: a monolithic target with full debug info outgrows the linker's default 4 GB PDB.
+		WindowsPlatform.PdbPageSize = 16384;
+
 		ExtraModuleNames.Add("Mars");
 	}
 }
