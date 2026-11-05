@@ -116,8 +116,10 @@ CkAuto/SubmodulesCustomCommand.bat "git status"
 
 ### Third-party dev tools
 
-- **AutoSizeComments** — Comment node enhancements in the Blueprint editor.
-- **GitSourceControl** (chainkemists fork of UEGitPlugin) — Git source control provider for the editor.
+- **Monolith** — MCP server for editor automation by AI agents (editor-only).
+- **EmmsUI** (Hazelight) — immediate-mode editor UI used by the Mars debugger scripts.
+
+AutoSizeComments and GitSourceControl were retired (as in CkPlugins); GitLink is the source-control provider.
 
 ## CkFoundation Architecture Notes
 
