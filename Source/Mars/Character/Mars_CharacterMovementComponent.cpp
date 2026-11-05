@@ -73,7 +73,7 @@ bool UMars_CharacterMovementComponent::ServerShouldUseAuthoritativePosition(
 	const FVector& Accel,
 	const FVector& ClientWorldLocation,
 	const FVector& RelativeClientLocation,
-	UPrimitiveComponent* ClientMovementBase,
+	FMars_ClientMovementBase* ClientMovementBase,
 	FName ClientBaseBoneName,
 	uint8 ClientMovementMode)
 {
@@ -94,7 +94,7 @@ bool UMars_CharacterMovementComponent::ServerExceedsAllowablePositionError(
 	const FVector& Accel,
 	const FVector& ClientWorldLocation,
 	const FVector& RelativeClientLocation,
-	UPrimitiveComponent* ClientMovementBase,
+	FMars_ClientMovementBase* ClientMovementBase,
 	FName ClientBaseBoneName,
 	uint8 ClientMovementMode)
 {
