@@ -1,0 +1,209 @@
+{
+	"material": "ScreamingTurnip_R01_Teeth_Mars_MI",
+	"packagePath": "/Game/ArtCandidates/ScreamingTurnip/R01/Materials/ScreamingTurnip_R01_Teeth_Mars_MI",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "746d57f5832e081b72d0c8a79afca023",
+		"exporterVersion": 3
+	},
+	"parentChain": [
+		"/Game/ArtCandidates/ScreamingTurnip/R01/Materials/ScreamingTurnip_R01_Mars_M.ScreamingTurnip_R01_Mars_M"
+	],
+	"blendMode": "BLEND_Opaque",
+	"twoSided": false,
+	"unlit": false,
+	"shadingModel": "MSM_DefaultLit",
+	"domain": "MD_Surface",
+	"connectedOutputs": [
+		"BaseColor"
+	],
+	"expressions":
+	{
+		"Constant": 2,
+		"LinearInterpolate": 1,
+		"Multiply": 1,
+		"Power": 1,
+		"ScalarParameter": 4,
+		"VertexColor": 1
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "VertexColor",
+				"name": "MaterialExpressionVertexColor_8",
+				"outputs": [
+					"None",
+					"None",
+					"None",
+					"None",
+					"None"
+				]
+			},
+			{
+				"id": 1,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_32",
+				"props":
+				{
+					"DefaultValue": 2.2000000476837158,
+					"ParameterName": "VertexColorGamma"
+				}
+			},
+			{
+				"id": 2,
+				"class": "Power",
+				"name": "MaterialExpressionPower_8",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Base",
+						"node": 0,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 1,
+						"name": "Exponent",
+						"node": 1,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 3,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_33",
+				"props":
+				{
+					"DefaultValue": 0.44999998807907104,
+					"ParameterName": "CavityFloor"
+				}
+			},
+			{
+				"id": 4,
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_16",
+				"props":
+				{
+					"R": 1
+				}
+			},
+			{
+				"id": 5,
+				"class": "LinearInterpolate",
+				"name": "MaterialExpressionLinearInterpolate_8",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 3,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 4,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "Alpha",
+						"node": 0,
+						"output": 4,
+						"mask": "a"
+					}
+				]
+			},
+			{
+				"id": 6,
+				"class": "Multiply",
+				"name": "MaterialExpressionMultiply_8",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 2,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 5,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 7,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_34",
+				"props":
+				{
+					"DefaultValue": 0.85000002384185791,
+					"ParameterName": "Roughness"
+				}
+			},
+			{
+				"id": 8,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_35",
+				"props":
+				{
+					"DefaultValue": 0.25,
+					"ParameterName": "Specular"
+				}
+			},
+			{
+				"id": 9,
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_17"
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_BaseColor",
+				"node": 6,
+				"output": 0
+			},
+			{
+				"property": "MP_Metallic",
+				"node": 9,
+				"output": 0
+			},
+			{
+				"property": "MP_Specular",
+				"node": 8,
+				"output": 0
+			},
+			{
+				"property": "MP_Roughness",
+				"node": 7,
+				"output": 0
+			}
+		]
+	},
+	"scalarParams": [
+		{
+			"name": "VertexColorGamma",
+			"value": 2.2000000476837158
+		},
+		{
+			"name": "CavityFloor",
+			"value": 0.44999998807907104
+		},
+		{
+			"name": "Roughness",
+			"value": 0.5
+		},
+		{
+			"name": "Specular",
+			"value": 0.40000000596046448
+		}
+	],
+	"vectorParams": [],
+	"textureParams": [],
+	"usedTextures": []
+}
