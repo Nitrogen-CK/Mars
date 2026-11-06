@@ -50,7 +50,8 @@ namespace utils_lantern_hook
     }
 
     // The hook's one interact target: Use with the caller's prompt (a placeholder the hook's prompt processor rewrites
-    // while focused), and WhileLive: a hang or a take lives until the hook reports it.
+    // while focused), and WhileLive: a hang or a take lives until the hook reports it. The glove holding the lantern or
+    // the tallow carries it to the hook (ReachHand Holding); a take, with the hands empty, reaches as a free glove does.
     FMars_Interactable_TargetEntry Make_InteractTarget(FMars_InteractPrompt_Spec InPrompt)
     {
         auto Target = FMars_Interactable_TargetEntry();
@@ -58,6 +59,7 @@ namespace utils_lantern_hook
         Target.InteractPromptSpec = InPrompt;
         Target.InteractionStateClass = UMars_SmState_LanternHook_Interact;
         Target.Work = EMars_Interactable_Work::WhileLive;
+        Target.ReachHand = EMars_FPHands_ReachHand::Holding;
         return Target;
     }
 

@@ -5,12 +5,17 @@ class UMars_SmState_KeyLock_Interact : UMars_SmState_InteractTarget_RunTask
     default TaskClass = UMars_SmTask_KeyLock_InsertOrTake;
 }
 
-// Re-evaluates Get_ActionFor for the initiator, requests the Insert / Take with where the moving key visually is (so its
+// Moves the key at the Grip of the initiator's gloves on the lock (UMars_SmTask_ActAtGrip: at once without gloves, or when
+// they do not reach for it), so the key goes where the hand is: an insert leaves the hand once the glove carrying it closes
+// on the keyhole (the key rides that glove there, UMars_Processor_FPHands_Tick's hold follow), a take leaves the keyhole
+// once the glove closes on it and rides the glove home (TryGet_RideHome times the held visual's arrival). Re-evaluates
+// Get_ActionFor for the initiator at the Grip, requests the Insert / Take with where the moving key visually is (so its
 // next visual lerps from there) and runs until the lock reports the expected content, or that the transfer was refused.
 // A Blocked_ action fails (ActionBlocked): the prompt processor disables the target for it, but can lag the initiator's
 // hands by a frame.
-class UMars_SmTask_KeyLock_InsertOrTake : UMars_SmTask_InteractionWork
+class UMars_SmTask_KeyLock_InsertOrTake : UMars_SmTask_MoveItemAtGrip
 {
+    private FCk_Handle _Initiator;
     private FCk_Handle_KeyLock _Lock;
     private FCk_Handle_Item _Item;
     private EMars_KeyLock_Action _Action = EMars_KeyLock_Action::Insert;
@@ -19,6 +24,7 @@ class UMars_SmTask_KeyLock_InsertOrTake : UMars_SmTask_InteractionWork
     void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
     {
         _Outcome = ECk_SmTaskResult::Running;
+        _Initiator = FCk_Handle();
         _Lock = FCk_Handle_KeyLock();
         _Item = FCk_Handle_Item();
 
@@ -36,38 +42,48 @@ class UMars_SmTask_KeyLock_InsertOrTake : UMars_SmTask_InteractionWork
         }
 
         const auto Action = Lock.Get_ActionFor(Initiator);
-        if (Action == EMars_KeyLock_Action::Insert)
+        if (Action != EMars_KeyLock_Action::Insert && Action != EMars_KeyLock_Action::Take)
         {
-            auto HeldItem = Initiator.As_HeldItem();
-            auto Item = HeldItem.Get_CurrentItem();
-            const auto From = utils_world_item::Get_WorldOf(HeldItem.Get_PresentationEntity(), HeldItem.Get_HandAttachPoint());
-
-            DoStart(Lock, Item, Action);
-            Lock.Request_Insert(FMars_Request_KeyLock_Insert(Item, From));
+            DoFail(EMars_Interaction_FailReason::ActionBlocked);
             return;
         }
 
-        if (Action == EMars_KeyLock_Action::Take)
-        {
-            auto Item = Lock.Get_Key();
-            const auto From = utils_world_item::Get_WorldOf(Lock.Get_Visual(), Lock.Get_KeyMount());
-            const auto Target = Initiator.As_Hotbar().TryGet_TakeTarget(Item);
-
-            auto HeldItem = Initiator.As_HeldItem();
-            HeldItem.Request_SetNextArrival(FMars_Request_HeldItem_SetNextArrival(Item, From));
-
-            DoStart(Lock, Item, Action);
-            Lock.Request_Take(FMars_Request_KeyLock_Take(Item, Target));
-            return;
-        }
-
-        DoFail(EMars_Interaction_FailReason::ActionBlocked);
+        _Initiator = Initiator;
+        _Lock = Lock;
+        Await_Grip(Initiator);
     }
 
     UFUNCTION(BlueprintOverride)
     void DoExitTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
     {
+        Super::DoExitTask(InHandle, InNetContext);
         DoUnbind();
+    }
+
+    // The lock is asked again: the hands may have changed while the gloves reached.
+    protected void DoAtGrip() override
+    {
+        const auto Action = _Lock.Get_ActionFor(_Initiator);
+        if (Action == EMars_KeyLock_Action::Insert)
+        {
+            auto Item = _Initiator.As_HeldItem().Get_CurrentItem();
+            DoStart(Item, Action);
+            _Lock.Request_Insert(FMars_Request_KeyLock_Insert(Item, Get_HeldVisualWorld(_Initiator)));
+            return;
+        }
+
+        if (Action == EMars_KeyLock_Action::Take)
+        {
+            auto Item = _Lock.Get_Key();
+            const auto Target = _Initiator.As_Hotbar().TryGet_TakeTarget(Item);
+            Ride_IntoHand(_Initiator, Item, utils_world_item::Get_WorldOf(_Lock.Get_Visual(), _Lock.Get_KeyMount()));
+
+            DoStart(Item, Action);
+            _Lock.Request_Take(FMars_Request_KeyLock_Take(Item, Target));
+            return;
+        }
+
+        DoFail(EMars_Interaction_FailReason::ActionBlocked);
     }
 
     UFUNCTION()
@@ -91,9 +107,8 @@ class UMars_SmTask_KeyLock_InsertOrTake : UMars_SmTask_InteractionWork
         DoFail(EMars_Interaction_FailReason::TransferRefused);
     }
 
-    private void DoStart(FCk_Handle_KeyLock& InLock, const FCk_Handle_Item& InItem, EMars_KeyLock_Action InAction)
+    private void DoStart(const FCk_Handle_Item& InItem, EMars_KeyLock_Action InAction)
     {
-        _Lock = InLock;
         _Item = InItem;
         _Action = InAction;
         _Lock.BindTo_OnKeyChanged(FMars_Delegate_KeyLock_OnKeyChanged(this, n"OnLockKeyChanged"));
@@ -102,12 +117,12 @@ class UMars_SmTask_KeyLock_InsertOrTake : UMars_SmTask_InteractionWork
 
     private void DoUnbind()
     {
-        if (ck::IsValid(_Lock))
+        if (ck::IsValid(_Lock) && ck::IsValid(_Item))
         {
             _Lock.UnbindFrom_OnKeyChanged(FMars_Delegate_KeyLock_OnKeyChanged(this, n"OnLockKeyChanged"));
             _Lock.UnbindFrom_OnTransferFailed(FMars_Delegate_KeyLock_OnTransferFailed(this, n"OnLockTransferFailed"));
         }
 
-        _Lock = FCk_Handle_KeyLock();
+        _Item = FCk_Handle_Item();
     }
 }

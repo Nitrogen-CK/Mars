@@ -21,7 +21,7 @@ class UMars_SmState_PlatterDock_Interact : UMars_SmState_InteractTarget_RunTask
 // docked or undocked, or that the dock or the undock was refused (the task fails).
 // PlaceFood succeeds at once (UMars_SmTask_PlaceHeldFood places the food). A Blocked_ action fails (ActionBlocked): the
 // prompt processor disables the target for it, but can lag the initiator's hands by a frame.
-class UMars_SmTask_PlatterDock_PlaceOrTake : UMars_SmTask_ActAtGrip
+class UMars_SmTask_PlatterDock_PlaceOrTake : UMars_SmTask_MoveItemAtGrip
 {
     private FCk_Handle_PlatterDock _Dock;
     private FCk_Handle _Initiator;
@@ -114,11 +114,9 @@ class UMars_SmTask_PlatterDock_PlaceOrTake : UMars_SmTask_ActAtGrip
             return;
         }
 
-        // The take reaches the hands through the hotbar: the platter's next mount rides the gloves home.
-        const auto Ride = TryGet_RideHome();
-        auto WorldItem = _Item.Get_PersistentWorldItem();
-        if (Ride.IsSet() && ck::IsValid(WorldItem))
-        { WorldItem.Request_ArriveNextMount(FMars_Request_WorldItem_ArriveNextMount(Ride.GetValue())); }
+        // The take reaches the hands through the hotbar: the platter rides the gloves home from the dock.
+        FCk_Handle DockEntity = _Dock;
+        Ride_IntoHand(_Initiator, _Item, utils_transform::Get_EntityCurrentTransform(DockEntity.As_Transform()));
 
         _Dock.Request_Undock(FMars_Request_PlatterDock_Undock(_Item, Target));
     }

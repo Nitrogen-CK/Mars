@@ -47,7 +47,8 @@ namespace utils_key_lock
     }
 
     // The lock's one interact target: Use with the caller's prompt (a placeholder the lock's prompt processor rewrites
-    // while focused), and WhileLive: an insert or a removal lives until the lock reports it.
+    // while focused), and WhileLive: an insert or a removal lives until the lock reports it. The glove holding the key
+    // carries it to the keyhole (ReachHand Holding); a take, with the hands empty, reaches as a free glove does.
     FMars_Interactable_TargetEntry Make_InteractTarget(FMars_InteractPrompt_Spec InPrompt)
     {
         auto Target = FMars_Interactable_TargetEntry();
@@ -55,6 +56,7 @@ namespace utils_key_lock
         Target.InteractPromptSpec = InPrompt;
         Target.InteractionStateClass = UMars_SmState_KeyLock_Interact;
         Target.Work = EMars_Interactable_Work::WhileLive;
+        Target.ReachHand = EMars_FPHands_ReachHand::Holding;
         return Target;
     }
 }
