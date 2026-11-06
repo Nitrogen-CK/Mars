@@ -604,6 +604,15 @@
 			]
 		},
 		{
+			"TypeName": "FCk_Handle_ScreamingTurnip",
+			"ShortName": "ScreamingTurnip",
+			"Description": "A screaming root on a persistent world item: placement derived from its mount and its body's settle, and a repeating warning -> scream cycle while held or settled on the ground",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_ScreamingTurnipHandle",
+			"RequiredFragments": [
+				"Mars_Feature_ScreamingTurnip"
+			]
+		},
+		{
 			"TypeName": "FCk_Handle_Searing",
 			"ShortName": "Searing",
 			"Description": "A searing minigame on a station: adopted food pieces (dynamic bodies keyed by their feed identity) on a hot pan (a kinematic body the operator's look tilts and lifts); each piece's face on the pan sears",
