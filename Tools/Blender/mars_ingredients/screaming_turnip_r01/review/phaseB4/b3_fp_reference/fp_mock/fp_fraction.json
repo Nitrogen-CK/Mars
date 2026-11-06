@@ -1,0 +1,33 @@
+{
+ "unit": 1.0,
+ "neutral": {
+  "area_fraction": 0.0217,
+  "bbox_width_fraction": 0.1396,
+  "bbox_height_fraction": 0.3185,
+  "frame_px": [
+   960,
+   540
+  ],
+  "camera": "perspective, 90 deg horizontal FOV, 16:9, eye 45 cm in front of the bulb centre at its height (z 6.82)"
+ },
+ "inhale": {
+  "area_fraction": 0.0265,
+  "bbox_width_fraction": 0.1542,
+  "bbox_height_fraction": 0.3389,
+  "frame_px": [
+   960,
+   540
+  ],
+  "camera": "perspective, 90 deg horizontal FOV, 16:9, eye 45 cm in front of the bulb centre at its height (z 6.82)"
+ },
+ "scream": {
+  "area_fraction": 0.0274,
+  "bbox_width_fraction": 0.1187,
+  "bbox_height_fraction": 0.413,
+  "frame_px": [
+   960,
+   540
+  ],
+  "camera": "perspective, 90 deg horizontal FOV, 16:9, eye 45 cm in front of the bulb centre at its height (z 6.82)"
+ }
+}

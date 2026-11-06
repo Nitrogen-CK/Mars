@@ -1,0 +1,25 @@
+00:01.875  blend            | Read blend: "D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\source\ScreamingTurnip_R01.blend"
+D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\scripts\render_screaming_turnip.py:69: DeprecationWarning: 'World.use_nodes' is expected to be removed in Blender 6.0
+  w.use_nodes = True
+00:03.234  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB2b\mouth\neutral_m_front.png'
+00:03.344  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB2b\mouth\neutral_m_threequarter.png'
+00:03.422  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB2b\mouth\neutral_m_side.png'
+00:03.484  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB2b\mouth\inhale_m_front.png'
+00:03.547  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB2b\mouth\inhale_m_threequarter.png'
+00:03.594  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB2b\mouth\inhale_m_side.png'
+00:03.687  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB2b\mouth\scream_m_front.png'
+00:03.750  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB2b\mouth\scream_m_threequarter.png'
+00:03.797  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB2b\mouth\scream_m_side.png'
+MOUTH D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB2b\mouth\neutral_m_front.png
+MOUTH D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB2b\mouth\neutral_m_threequarter.png
+MOUTH D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB2b\mouth\neutral_m_side.png
+MOUTH D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB2b\mouth\inhale_m_front.png
+MOUTH D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB2b\mouth\inhale_m_threequarter.png
+MOUTH D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB2b\mouth\inhale_m_side.png
+MOUTH D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB2b\mouth\scream_m_front.png
+MOUTH D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB2b\mouth\scream_m_threequarter.png
+MOUTH D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB2b\mouth\scream_m_side.png
+TURNIP_OK
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+
+Blender quit

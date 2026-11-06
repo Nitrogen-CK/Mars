@@ -1,0 +1,4161 @@
+{
+ "stage": "readback",
+ "error": null,
+ "expected_source": "export/ScreamingTurnip_R01_Manifest.json + export/expected.json + export/anims/expected_anims.json",
+ "preflight": {
+  "project": "D:/Repositories/CkRepos/Orion/Mars.uproject",
+  "pie": false,
+  "engine": "5.7.4-0+UE5",
+  "dirty": [],
+  "foreign_dirty": [],
+  "ok": true
+ },
+ "material_readback": {
+  "master": {
+   "path": "/Game/ArtCandidates/ScreamingTurnip/R01/Materials/ScreamingTurnip_R01_Mars_M.ScreamingTurnip_R01_Mars_M",
+   "used_with_skeletal_mesh": true,
+   "used_with_instanced_static_meshes": true,
+   "two_sided": false,
+   "expressions": 10,
+   "scalar_params": [
+    "CavityFloor",
+    "Roughness",
+    "Specular",
+    "VertexColorGamma"
+   ]
+  },
+  "instances": {
+   "ScreamingTurnip_R01_Skin_Mars_MI": {
+    "parent": "ScreamingTurnip_R01_Mars_M",
+    "Roughness": 0.85,
+    "Specular": 0.25,
+    "CavityFloor": 0.45,
+    "VertexColorGamma": 2.2,
+    "two_sided_override": [
+     false,
+     false
+    ]
+   },
+   "ScreamingTurnip_R01_Leaf_Mars_MI": {
+    "parent": "ScreamingTurnip_R01_Mars_M",
+    "Roughness": 0.7,
+    "Specular": 0.3,
+    "CavityFloor": 0.45,
+    "VertexColorGamma": 2.2,
+    "two_sided_override": [
+     true,
+     true
+    ]
+   },
+   "ScreamingTurnip_R01_Mouth_Mars_MI": {
+    "parent": "ScreamingTurnip_R01_Mars_M",
+    "Roughness": 0.9,
+    "Specular": 0.1,
+    "CavityFloor": 0.45,
+    "VertexColorGamma": 2.2,
+    "two_sided_override": [
+     false,
+     false
+    ]
+   },
+   "ScreamingTurnip_R01_Teeth_Mars_MI": {
+    "parent": "ScreamingTurnip_R01_Mars_M",
+    "Roughness": 0.5,
+    "Specular": 0.4,
+    "CavityFloor": 0.45,
+    "VertexColorGamma": 2.2,
+    "two_sided_override": [
+     false,
+     false
+    ]
+   },
+   "TurnipBed_R01_Mars_MI": {
+    "parent": "ScreamingTurnip_R01_Mars_M",
+    "Roughness": 0.95,
+    "Specular": 0.1,
+    "CavityFloor": 0.45,
+    "VertexColorGamma": 2.2,
+    "two_sided_override": [
+     false,
+     false
+    ]
+   }
+  },
+  "checks": {
+   "master": [
+    true,
+    {
+     "path": "/Game/ArtCandidates/ScreamingTurnip/R01/Materials/ScreamingTurnip_R01_Mars_M.ScreamingTurnip_R01_Mars_M",
+     "used_with_skeletal_mesh": true,
+     "used_with_instanced_static_meshes": true,
+     "two_sided": false,
+     "expressions": 10,
+     "scalar_params": [
+      "CavityFloor",
+      "Roughness",
+      "Specular",
+      "VertexColorGamma"
+     ]
+    }
+   ],
+   "ScreamingTurnip_R01_Skin_Mars_MI": [
+    true,
+    {
+     "want": {
+      "Roughness": 0.85,
+      "Specular": 0.25,
+      "two_sided": false
+     },
+     "got": {
+      "parent": "ScreamingTurnip_R01_Mars_M",
+      "Roughness": 0.85,
+      "Specular": 0.25,
+      "CavityFloor": 0.45,
+      "VertexColorGamma": 2.2,
+      "two_sided_override": [
+       false,
+       false
+      ]
+     }
+    }
+   ],
+   "ScreamingTurnip_R01_Leaf_Mars_MI": [
+    true,
+    {
+     "want": {
+      "Roughness": 0.7,
+      "Specular": 0.3,
+      "two_sided": true
+     },
+     "got": {
+      "parent": "ScreamingTurnip_R01_Mars_M",
+      "Roughness": 0.7,
+      "Specular": 0.3,
+      "CavityFloor": 0.45,
+      "VertexColorGamma": 2.2,
+      "two_sided_override": [
+       true,
+       true
+      ]
+     }
+    }
+   ],
+   "ScreamingTurnip_R01_Mouth_Mars_MI": [
+    true,
+    {
+     "want": {
+      "Roughness": 0.9,
+      "Specular": 0.1,
+      "two_sided": false
+     },
+     "got": {
+      "parent": "ScreamingTurnip_R01_Mars_M",
+      "Roughness": 0.9,
+      "Specular": 0.1,
+      "CavityFloor": 0.45,
+      "VertexColorGamma": 2.2,
+      "two_sided_override": [
+       false,
+       false
+      ]
+     }
+    }
+   ],
+   "ScreamingTurnip_R01_Teeth_Mars_MI": [
+    true,
+    {
+     "want": {
+      "Roughness": 0.5,
+      "Specular": 0.4,
+      "two_sided": false
+     },
+     "got": {
+      "parent": "ScreamingTurnip_R01_Mars_M",
+      "Roughness": 0.5,
+      "Specular": 0.4,
+      "CavityFloor": 0.45,
+      "VertexColorGamma": 2.2,
+      "two_sided_override": [
+       false,
+       false
+      ]
+     }
+    }
+   ],
+   "TurnipBed_R01_Mars_MI": [
+    true,
+    {
+     "want": {
+      "Roughness": 0.95,
+      "Specular": 0.1,
+      "two_sided": false
+     },
+     "got": {
+      "parent": "ScreamingTurnip_R01_Mars_M",
+      "Roughness": 0.95,
+      "Specular": 0.1,
+      "CavityFloor": 0.45,
+      "VertexColorGamma": 2.2,
+      "two_sided_override": [
+       false,
+       false
+      ]
+     }
+    }
+   ]
+  },
+  "pass": true
+ },
+ "mesh_readback": {
+  "checks": {
+   "dedicated_skeleton": [
+    true,
+    "/Game/ArtCandidates/ScreamingTurnip/R01/Meshes/ScreamingTurnip_R01_Mars_SKEL.ScreamingTurnip_R01_Mars_SKEL"
+   ],
+   "bind_bounds_vs_manifest": [
+    true,
+    {
+     "err_cm": 0.0001,
+     "got": {
+      "min": [
+       -5.8966,
+       -6.6803,
+       0.0
+      ],
+      "max": [
+       5.4047,
+       6.6802,
+       16.0
+      ]
+     },
+     "want": {
+      "min": [
+       -5.8966,
+       -6.6803,
+       0.0
+      ],
+      "max": [
+       5.4047,
+       6.6803,
+       16.0
+      ]
+     }
+    }
+   ],
+   "mouth_at_plus_x": [
+    true,
+    5.4047
+   ],
+   "bounds_contain_clip_envelope_2cm": [
+    true,
+    2.4
+   ],
+   "bone_count_17": [
+    true,
+    17
+   ],
+   "bone_names_exact": [
+    true,
+    []
+   ],
+   "parents_exact": [
+    true,
+    []
+   ],
+   "root_identity": [
+    true,
+    {
+     "t": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "q": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "s": [
+      1.0,
+      1.0,
+      1.0
+     ]
+    }
+   ],
+   "bone_scales_1": [
+    true,
+    2e-07
+   ],
+   "bone_heads_vs_blender": [
+    true,
+    0.0
+   ],
+   "handedness_cheek_l_minus_y": [
+    true,
+    [
+     -3.25,
+     3.25
+    ]
+   ],
+   "slots_in_order": [
+    true,
+    [
+     "Skin",
+     "Leaf",
+     "Mouth",
+     "Teeth"
+    ]
+   ],
+   "slots_bound_to_instances": [
+    true,
+    [
+     "ScreamingTurnip_R01_Skin_Mars_MI",
+     "ScreamingTurnip_R01_Leaf_Mars_MI",
+     "ScreamingTurnip_R01_Mouth_Mars_MI",
+     "ScreamingTurnip_R01_Teeth_Mars_MI"
+    ]
+   ],
+   "lod_count_1": [
+    true,
+    1
+   ],
+   "morph_count_0": [
+    true,
+    []
+   ],
+   "no_physics_asset": [
+    true,
+    null
+   ],
+   "sockets_6": [
+    true,
+    {
+     "Grip_L": 0.0,
+     "Grip_R": 0.0,
+     "HarvestGrip_L": 0.0,
+     "HarvestGrip_R": 0.0,
+     "MouthCue": 0.0,
+     "SoilLine": 0.0
+    }
+   ],
+   "import_normals_vcolor_scale1": [
+    true,
+    {
+     "normal_import_method": "<FBXNormalImportMethod.FBXNIM_IMPORT_NORMALS: 1>",
+     "vertex_color_import_option": "<VertexColorImportOption.REPLACE: 0>",
+     "import_morph_targets": "False",
+     "convert_scene": "True",
+     "force_front_x_axis": "False",
+     "convert_scene_unit": "False",
+     "import_uniform_scale": "1.0",
+     "use_t0_as_ref_pose": "False",
+     "source_files": [
+      "D:/Repositories/CkRepos/Orion/Tools/Blender/mars_ingredients/screaming_turnip_r01/export/ScreamingTurnip_R01_Mars_SK.fbx"
+     ]
+    }
+   ]
+  },
+  "mesh": "/Game/ArtCandidates/ScreamingTurnip/R01/Meshes/ScreamingTurnip_R01_Mars_SK.ScreamingTurnip_R01_Mars_SK",
+  "skeleton": "/Game/ArtCandidates/ScreamingTurnip/R01/Meshes/ScreamingTurnip_R01_Mars_SKEL.ScreamingTurnip_R01_Mars_SKEL",
+  "imported_bounds": {
+   "min": [
+    -5.8966,
+    -6.6803,
+    0.0
+   ],
+   "max": [
+    5.4047,
+    6.6802,
+    16.0
+   ]
+  },
+  "bounds_with_extension": {
+   "min": [
+    -9.8966,
+    -9.6803,
+    -3.0
+   ],
+   "max": [
+    8.4047,
+    9.6802,
+    23.0
+   ],
+   "positive_extension": [
+    3.0,
+    3.0,
+    7.0
+   ],
+   "negative_extension": [
+    4.0,
+    3.0,
+    3.0
+   ]
+  },
+  "bone_order": [
+   "root",
+   "body",
+   "jaw",
+   "cheek_l",
+   "cheek_r",
+   "crown",
+   "leaf_01_a",
+   "leaf_01_b",
+   "leaf_02_a",
+   "leaf_02_b",
+   "leaf_03_a",
+   "leaf_03_b",
+   "leaf_04_a",
+   "leaf_04_b",
+   "leaf_05_a",
+   "leaf_05_b",
+   "taproot"
+  ],
+  "bone_heads": {
+   "root": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "body": [
+    0.0,
+    0.0,
+    6.825
+   ],
+   "jaw": [
+    -0.5,
+    0.0,
+    4.2
+   ],
+   "cheek_l": [
+    1.7,
+    -3.25,
+    6.4
+   ],
+   "cheek_r": [
+    1.7,
+    3.25,
+    6.4
+   ],
+   "crown": [
+    0.0,
+    0.0,
+    11.55
+   ],
+   "leaf_01_a": [
+    0.9072,
+    -0.6591,
+    12.0
+   ],
+   "leaf_01_b": [
+    1.2763,
+    -0.9273,
+    12.9353
+   ],
+   "leaf_02_a": [
+    -0.3762,
+    -1.1578,
+    12.0
+   ],
+   "leaf_02_b": [
+    -0.539,
+    -1.6588,
+    12.843
+   ],
+   "leaf_03_a": [
+    -1.0074,
+    0.0,
+    12.0
+   ],
+   "leaf_03_b": [
+    -1.3422,
+    0.0,
+    13.0304
+   ],
+   "leaf_04_a": [
+    -0.3762,
+    1.1578,
+    12.0
+   ],
+   "leaf_04_b": [
+    -0.539,
+    1.6588,
+    12.843
+   ],
+   "leaf_05_a": [
+    0.9072,
+    0.6591,
+    12.0
+   ],
+   "leaf_05_b": [
+    1.2763,
+    0.9273,
+    12.9353
+   ],
+   "taproot": [
+    0.0,
+    0.0,
+    1.9
+   ]
+  },
+  "slots": [
+   [
+    "Skin",
+    "ScreamingTurnip_R01_Skin_Mars_MI"
+   ],
+   [
+    "Leaf",
+    "ScreamingTurnip_R01_Leaf_Mars_MI"
+   ],
+   [
+    "Mouth",
+    "ScreamingTurnip_R01_Mouth_Mars_MI"
+   ],
+   [
+    "Teeth",
+    "ScreamingTurnip_R01_Teeth_Mars_MI"
+   ]
+  ],
+  "lods": {
+   "0": {
+    "render_verts": 5812,
+    "sections": 4
+   }
+  },
+  "physics_asset": null,
+  "sockets": {
+   "Grip_L": {
+    "bone": "root",
+    "relative_cm": [
+     0.0,
+     -3.94,
+     4.0
+    ],
+    "relative_rot_pyr": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "component_cm": [
+     0.0,
+     -3.94,
+     4.0
+    ],
+    "target_cm": [
+     0.0,
+     -3.94,
+     4.0
+    ],
+    "err_cm": 0.0
+   },
+   "Grip_R": {
+    "bone": "root",
+    "relative_cm": [
+     0.0,
+     3.94,
+     4.0
+    ],
+    "relative_rot_pyr": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "component_cm": [
+     0.0,
+     3.94,
+     4.0
+    ],
+    "target_cm": [
+     0.0,
+     3.94,
+     4.0
+    ],
+    "err_cm": 0.0
+   },
+   "HarvestGrip_L": {
+    "bone": "crown",
+    "relative_cm": [
+     -0.507,
+     -1.561,
+     1.128
+    ],
+    "relative_rot_pyr": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "component_cm": [
+     -0.507,
+     -1.561,
+     12.678
+    ],
+    "target_cm": [
+     -0.507,
+     -1.561,
+     12.678
+    ],
+    "err_cm": 0.0
+   },
+   "HarvestGrip_R": {
+    "bone": "crown",
+    "relative_cm": [
+     -0.507,
+     1.561,
+     1.128
+    ],
+    "relative_rot_pyr": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "component_cm": [
+     -0.507,
+     1.561,
+     12.678
+    ],
+    "target_cm": [
+     -0.507,
+     1.561,
+     12.678
+    ],
+    "err_cm": 0.0
+   },
+   "MouthCue": {
+    "bone": "jaw",
+    "relative_cm": [
+     3.93,
+     0.0,
+     2.2
+    ],
+    "relative_rot_pyr": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "component_cm": [
+     3.43,
+     0.0,
+     6.4
+    ],
+    "target_cm": [
+     3.43,
+     -0.0,
+     6.4
+    ],
+    "err_cm": 0.0
+   },
+   "SoilLine": {
+    "bone": "body",
+    "relative_cm": [
+     0.0,
+     0.0,
+     2.775
+    ],
+    "relative_rot_pyr": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "component_cm": [
+     0.0,
+     0.0,
+     9.6
+    ],
+    "target_cm": [
+     0.0,
+     -0.0,
+     9.6
+    ],
+    "err_cm": 0.0
+   }
+  },
+  "import_data": {
+   "normal_import_method": "<FBXNormalImportMethod.FBXNIM_IMPORT_NORMALS: 1>",
+   "vertex_color_import_option": "<VertexColorImportOption.REPLACE: 0>",
+   "import_morph_targets": "False",
+   "convert_scene": "True",
+   "force_front_x_axis": "False",
+   "convert_scene_unit": "False",
+   "import_uniform_scale": "1.0",
+   "use_t0_as_ref_pose": "False",
+   "source_files": [
+    "D:/Repositories/CkRepos/Orion/Tools/Blender/mars_ingredients/screaming_turnip_r01/export/ScreamingTurnip_R01_Mars_SK.fbx"
+   ]
+  },
+  "pass": true
+ },
+ "statics_readback": {
+  "meshes": {
+   "ScreamingTurnip_R01_Collision_Mars_SM": {
+    "bounds": {
+     "min": [
+      -4.4,
+      -4.95,
+      1.8
+     ],
+     "max": [
+      4.4,
+      4.95,
+      11.7
+     ]
+    },
+    "bounds_err_cm": 0.0,
+    "tris": 40,
+    "verts": 120,
+    "slots": [
+     [
+      "WorldGridMaterial",
+      "ScreamingTurnip_R01_Skin_Mars_MI"
+     ]
+    ],
+    "collision": {
+     "body_setup": true,
+     "elems": {
+      "convex_elems": 1,
+      "box_elems": 0,
+      "sphere_elems": 0,
+      "sphyl_elems": 0
+     },
+     "trace": "CTF_USE_DEFAULT"
+    },
+    "sockets": {
+     "Grip_L": {
+      "location": [
+       0.0,
+       -3.94,
+       4.0
+      ],
+      "rotation_pyr": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "err_cm": 0.0
+     },
+     "Grip_R": {
+      "location": [
+       0.0,
+       3.94,
+       4.0
+      ],
+      "rotation_pyr": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "err_cm": 0.0
+     }
+    },
+    "import_data": {
+     "normal_import_method": "<FBXNormalImportMethod.FBXNIM_IMPORT_NORMALS: 1>",
+     "vertex_color_import_option": "<VertexColorImportOption.REPLACE: 0>",
+     "import_uniform_scale": "1.0",
+     "remove_degenerates": "False",
+     "auto_generate_collision": "False"
+    },
+    "ok": {
+     "bounds": true,
+     "tris": true,
+     "material": true,
+     "collision": true,
+     "socket_Grip_L": true,
+     "socket_Grip_R": true
+    }
+   },
+   "TurnipBed_R01_Mars_SM": {
+    "bounds": {
+     "min": [
+      -12.0,
+      -12.0,
+      -3.4
+     ],
+     "max": [
+      12.0,
+      12.0,
+      0.6866
+     ]
+    },
+    "bounds_err_cm": 0.0,
+    "tris": 224,
+    "verts": 666,
+    "slots": [
+     [
+      "Soil",
+      "TurnipBed_R01_Mars_MI"
+     ]
+    ],
+    "collision": {
+     "body_setup": true,
+     "elems": {
+      "convex_elems": 0,
+      "box_elems": 1,
+      "sphere_elems": 0,
+      "sphyl_elems": 0
+     },
+     "trace": "CTF_USE_DEFAULT"
+    },
+    "sockets": {},
+    "import_data": {
+     "normal_import_method": "<FBXNormalImportMethod.FBXNIM_IMPORT_NORMALS: 1>",
+     "vertex_color_import_option": "<VertexColorImportOption.REPLACE: 0>",
+     "import_uniform_scale": "1.0",
+     "remove_degenerates": "False",
+     "auto_generate_collision": "False"
+    },
+    "ok": {
+     "bounds": true,
+     "tris": true,
+     "material": true,
+     "collision": true
+    }
+   },
+   "TurnipBedEmpty_R01_Mars_SM": {
+    "bounds": {
+     "min": [
+      -12.0,
+      -12.0,
+      -3.4
+     ],
+     "max": [
+      12.0,
+      12.0,
+      0.6866
+     ]
+    },
+    "bounds_err_cm": 0.0,
+    "tris": 288,
+    "verts": 832,
+    "slots": [
+     [
+      "Soil",
+      "TurnipBed_R01_Mars_MI"
+     ]
+    ],
+    "collision": {
+     "body_setup": true,
+     "elems": {
+      "convex_elems": 0,
+      "box_elems": 1,
+      "sphere_elems": 0,
+      "sphyl_elems": 0
+     },
+     "trace": "CTF_USE_DEFAULT"
+    },
+    "sockets": {},
+    "import_data": {
+     "normal_import_method": "<FBXNormalImportMethod.FBXNIM_IMPORT_NORMALS: 1>",
+     "vertex_color_import_option": "<VertexColorImportOption.REPLACE: 0>",
+     "import_uniform_scale": "1.0",
+     "remove_degenerates": "False",
+     "auto_generate_collision": "False"
+    },
+    "ok": {
+     "bounds": true,
+     "tris": true,
+     "material": true,
+     "collision": true
+    }
+   },
+   "Cube10_Mars_SM": {
+    "bounds": {
+     "min": [
+      -5.0,
+      -5.0,
+      -5.0
+     ],
+     "max": [
+      5.0,
+      5.0,
+      5.0
+     ]
+    },
+    "bounds_err_cm": 0.0,
+    "tris": 12,
+    "verts": 24,
+    "slots": [
+     [
+      "WorldGridMaterial",
+      "WorldGridMaterial"
+     ]
+    ],
+    "collision": {
+     "body_setup": true,
+     "elems": {
+      "convex_elems": 0,
+      "box_elems": 0,
+      "sphere_elems": 0,
+      "sphyl_elems": 0
+     },
+     "trace": "CTF_USE_DEFAULT"
+    },
+    "sockets": {},
+    "import_data": {
+     "normal_import_method": "<FBXNormalImportMethod.FBXNIM_IMPORT_NORMALS: 1>",
+     "vertex_color_import_option": "<VertexColorImportOption.REPLACE: 0>",
+     "import_uniform_scale": "1.0",
+     "remove_degenerates": "False",
+     "auto_generate_collision": "False"
+    },
+    "ok": {
+     "bounds": true
+    }
+   }
+  },
+  "checks": {
+   "ScreamingTurnip_R01_Collision_Mars_SM": [
+    true,
+    []
+   ],
+   "TurnipBed_R01_Mars_SM": [
+    true,
+    []
+   ],
+   "TurnipBedEmpty_R01_Mars_SM": [
+    true,
+    []
+   ],
+   "Cube10_Mars_SM": [
+    true,
+    []
+   ]
+  },
+  "pass": true
+ },
+ "clip_readback": {
+  "clips": {
+   "ROOT_AirborneLeafTrail": {
+    "num_frames": 30,
+    "length_s": 1.0,
+    "num_keys": 31,
+    "track_count": 17,
+    "skeleton": "/Game/ArtCandidates/ScreamingTurnip/R01/Meshes/ScreamingTurnip_R01_Mars_SKEL.ScreamingTurnip_R01_Mars_SKEL",
+    "loop": true,
+    "root_motion": false,
+    "rate_scale": 1.0,
+    "frame_rate": null,
+    "root_samples": [
+     {
+      "f": 0,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     {
+      "f": 8,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     {
+      "f": 15,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     {
+      "f": 22,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     {
+      "f": 30,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     }
+    ],
+    "loop_seam": {
+     "t_cm": 0.0,
+     "rot_deg": 0.0,
+     "scale": 0.0
+    },
+    "landmark_worst_cm": [
+     8e-05,
+     [
+      1,
+      "leaf_01_b"
+     ]
+    ],
+    "scale_peak": {
+     "frame": 0,
+     "got": {
+      "body": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "cheek_l": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "cheek_r": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "crown": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "taproot": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     "want": {
+      "body": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "cheek_l": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "cheek_r": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "crown": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "taproot": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     "max_err": 0.0
+    },
+    "ok": {
+     "keys_N+1": true,
+     "length_N/30": true,
+     "tracks_17": true,
+     "skeleton": true,
+     "root_identity_5": true,
+     "loop_flag": true,
+     "no_root_motion": true,
+     "rate_1": true,
+     "seam": true,
+     "landmarks": true,
+     "scale_peak": true
+    }
+   },
+   "ROOT_Anticipate": {
+    "num_frames": 9,
+    "length_s": 0.3,
+    "num_keys": 10,
+    "track_count": 17,
+    "skeleton": "/Game/ArtCandidates/ScreamingTurnip/R01/Meshes/ScreamingTurnip_R01_Mars_SKEL.ScreamingTurnip_R01_Mars_SKEL",
+    "loop": false,
+    "root_motion": false,
+    "rate_scale": 1.0,
+    "frame_rate": null,
+    "root_samples": [
+     {
+      "f": 0,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     {
+      "f": 2,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     {
+      "f": 4,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     {
+      "f": 7,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     {
+      "f": 9,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     }
+    ],
+    "loop_seam": null,
+    "landmark_worst_cm": [
+     7.6e-05,
+     [
+      4,
+      "leaf_01_b"
+     ]
+    ],
+    "scale_peak": {
+     "frame": 9,
+     "got": {
+      "body": [
+       0.9,
+       1.1,
+       0.9
+      ],
+      "cheek_l": [
+       1.0,
+       1.1,
+       1.08
+      ],
+      "cheek_r": [
+       1.0,
+       1.1,
+       1.08
+      ],
+      "crown": [
+       1.111111,
+       0.909091,
+       1.111111
+      ],
+      "taproot": [
+       1.111111,
+       0.909091,
+       1.111111
+      ]
+     },
+     "want": {
+      "body": [
+       0.9,
+       1.1,
+       0.9
+      ],
+      "cheek_l": [
+       1.0,
+       1.1,
+       1.08
+      ],
+      "cheek_r": [
+       1.0,
+       1.1,
+       1.08
+      ],
+      "crown": [
+       1.111111,
+       0.909091,
+       1.111111
+      ],
+      "taproot": [
+       1.111111,
+       0.909091,
+       1.111111
+      ]
+     },
+     "max_err": 0.0
+    },
+    "ok": {
+     "keys_N+1": true,
+     "length_N/30": true,
+     "tracks_17": true,
+     "skeleton": true,
+     "root_identity_5": true,
+     "loop_flag": true,
+     "no_root_motion": true,
+     "rate_1": true,
+     "seam": true,
+     "landmarks": true,
+     "scale_peak": true
+    }
+   },
+   "ROOT_ImpactSquash": {
+    "num_frames": 7,
+    "length_s": 0.23333,
+    "num_keys": 8,
+    "track_count": 17,
+    "skeleton": "/Game/ArtCandidates/ScreamingTurnip/R01/Meshes/ScreamingTurnip_R01_Mars_SKEL.ScreamingTurnip_R01_Mars_SKEL",
+    "loop": false,
+    "root_motion": false,
+    "rate_scale": 1.0,
+    "frame_rate": null,
+    "root_samples": [
+     {
+      "f": 0,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     {
+      "f": 2,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     {
+      "f": 4,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     {
+      "f": 5,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     {
+      "f": 7,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     }
+    ],
+    "loop_seam": null,
+    "landmark_worst_cm": [
+     6.4e-05,
+     [
+      5,
+      "leaf_05_b"
+     ]
+    ],
+    "scale_peak": {
+     "frame": 2,
+     "got": {
+      "body": [
+       0.8,
+       1.2,
+       0.8
+      ],
+      "cheek_l": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "cheek_r": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "crown": [
+       1.25,
+       0.833333,
+       1.25
+      ],
+      "taproot": [
+       1.25,
+       0.833333,
+       1.25
+      ]
+     },
+     "want": {
+      "body": [
+       0.8,
+       1.2,
+       0.8
+      ],
+      "cheek_l": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "cheek_r": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "crown": [
+       1.25,
+       0.833333,
+       1.25
+      ],
+      "taproot": [
+       1.25,
+       0.833333,
+       1.25
+      ]
+     },
+     "max_err": 0.0
+    },
+    "ok": {
+     "keys_N+1": true,
+     "length_N/30": true,
+     "tracks_17": true,
+     "skeleton": true,
+     "root_identity_5": true,
+     "loop_flag": true,
+     "no_root_motion": true,
+     "rate_1": true,
+     "seam": true,
+     "landmarks": true,
+     "scale_peak": true
+    }
+   },
+   "ROOT_Inhale": {
+    "num_frames": 36,
+    "length_s": 1.2,
+    "num_keys": 37,
+    "track_count": 17,
+    "skeleton": "/Game/ArtCandidates/ScreamingTurnip/R01/Meshes/ScreamingTurnip_R01_Mars_SKEL.ScreamingTurnip_R01_Mars_SKEL",
+    "loop": false,
+    "root_motion": false,
+    "rate_scale": 1.0,
+    "frame_rate": null,
+    "root_samples": [
+     {
+      "f": 0,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     {
+      "f": 9,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     {
+      "f": 18,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     {
+      "f": 27,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     {
+      "f": 36,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     }
+    ],
+    "loop_seam": null,
+    "landmark_worst_cm": [
+     8.3e-05,
+     [
+      7,
+      "leaf_01_b"
+     ]
+    ],
+    "scale_peak": {
+     "frame": 30,
+     "got": {
+      "body": [
+       0.92,
+       1.08,
+       0.92
+      ],
+      "cheek_l": [
+       1.04,
+       1.4,
+       1.3
+      ],
+      "cheek_r": [
+       1.04,
+       1.4,
+       1.3
+      ],
+      "crown": [
+       1.086957,
+       0.925926,
+       1.086957
+      ],
+      "taproot": [
+       1.086957,
+       0.925926,
+       1.086957
+      ]
+     },
+     "want": {
+      "body": [
+       0.92,
+       1.08,
+       0.92
+      ],
+      "cheek_l": [
+       1.04,
+       1.4,
+       1.3
+      ],
+      "cheek_r": [
+       1.04,
+       1.4,
+       1.3
+      ],
+      "crown": [
+       1.086957,
+       0.925926,
+       1.086957
+      ],
+      "taproot": [
+       1.086957,
+       0.925926,
+       1.086957
+      ]
+     },
+     "max_err": 0.0
+    },
+    "ok": {
+     "keys_N+1": true,
+     "length_N/30": true,
+     "tracks_17": true,
+     "skeleton": true,
+     "root_identity_5": true,
+     "loop_flag": true,
+     "no_root_motion": true,
+     "rate_1": true,
+     "seam": true,
+     "landmarks": true,
+     "scale_peak": true
+    }
+   },
+   "ROOT_PlaceSettle": {
+    "num_frames": 7,
+    "length_s": 0.23333,
+    "num_keys": 8,
+    "track_count": 17,
+    "skeleton": "/Game/ArtCandidates/ScreamingTurnip/R01/Meshes/ScreamingTurnip_R01_Mars_SKEL.ScreamingTurnip_R01_Mars_SKEL",
+    "loop": false,
+    "root_motion": false,
+    "rate_scale": 1.0,
+    "frame_rate": null,
+    "root_samples": [
+     {
+      "f": 0,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     {
+      "f": 2,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     {
+      "f": 4,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     {
+      "f": 5,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     {
+      "f": 7,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     }
+    ],
+    "loop_seam": null,
+    "landmark_worst_cm": [
+     7.2e-05,
+     [
+      6,
+      "cheek_l"
+     ]
+    ],
+    "scale_peak": {
+     "frame": 3,
+     "got": {
+      "body": [
+       0.92,
+       1.04,
+       0.92
+      ],
+      "cheek_l": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "cheek_r": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "crown": [
+       1.086957,
+       0.961538,
+       1.086957
+      ],
+      "taproot": [
+       1.086957,
+       0.961538,
+       1.086957
+      ]
+     },
+     "want": {
+      "body": [
+       0.92,
+       1.04,
+       0.92
+      ],
+      "cheek_l": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "cheek_r": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "crown": [
+       1.086957,
+       0.961538,
+       1.086957
+      ],
+      "taproot": [
+       1.086957,
+       0.961538,
+       1.086957
+      ]
+     },
+     "max_err": 0.0
+    },
+    "ok": {
+     "keys_N+1": true,
+     "length_N/30": true,
+     "tracks_17": true,
+     "skeleton": true,
+     "root_identity_5": true,
+     "loop_flag": true,
+     "no_root_motion": true,
+     "rate_1": true,
+     "seam": true,
+     "landmarks": true,
+     "scale_peak": true
+    }
+   },
+   "ROOT_QuietIdle": {
+    "num_frames": 60,
+    "length_s": 2.0,
+    "num_keys": 61,
+    "track_count": 17,
+    "skeleton": "/Game/ArtCandidates/ScreamingTurnip/R01/Meshes/ScreamingTurnip_R01_Mars_SKEL.ScreamingTurnip_R01_Mars_SKEL",
+    "loop": true,
+    "root_motion": false,
+    "rate_scale": 1.0,
+    "frame_rate": null,
+    "root_samples": [
+     {
+      "f": 0,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     {
+      "f": 15,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     {
+      "f": 30,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     {
+      "f": 45,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     {
+      "f": 60,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     }
+    ],
+    "loop_seam": {
+     "t_cm": 0.0,
+     "rot_deg": 0.0,
+     "scale": 0.0
+    },
+    "landmark_worst_cm": [
+     0.000194,
+     [
+      51,
+      "leaf_05_b"
+     ]
+    ],
+    "scale_peak": {
+     "frame": 30,
+     "got": {
+      "body": [
+       1.015,
+       1.0,
+       1.015
+      ],
+      "cheek_l": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "cheek_r": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "crown": [
+       0.985222,
+       1.0,
+       0.985222
+      ],
+      "taproot": [
+       0.985222,
+       1.0,
+       0.985222
+      ]
+     },
+     "want": {
+      "body": [
+       1.015,
+       1.0,
+       1.015
+      ],
+      "cheek_l": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "cheek_r": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "crown": [
+       0.985222,
+       1.0,
+       0.985222
+      ],
+      "taproot": [
+       0.985222,
+       1.0,
+       0.985222
+      ]
+     },
+     "max_err": 0.0
+    },
+    "ok": {
+     "keys_N+1": true,
+     "length_N/30": true,
+     "tracks_17": true,
+     "skeleton": true,
+     "root_identity_5": true,
+     "loop_flag": true,
+     "no_root_motion": true,
+     "rate_1": true,
+     "seam": true,
+     "landmarks": true,
+     "scale_peak": true
+    }
+   },
+   "ROOT_Recover": {
+    "num_frames": 30,
+    "length_s": 1.0,
+    "num_keys": 31,
+    "track_count": 17,
+    "skeleton": "/Game/ArtCandidates/ScreamingTurnip/R01/Meshes/ScreamingTurnip_R01_Mars_SKEL.ScreamingTurnip_R01_Mars_SKEL",
+    "loop": false,
+    "root_motion": false,
+    "rate_scale": 1.0,
+    "frame_rate": null,
+    "root_samples": [
+     {
+      "f": 0,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     {
+      "f": 8,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     {
+      "f": 15,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     {
+      "f": 22,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     {
+      "f": 30,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     }
+    ],
+    "loop_seam": null,
+    "landmark_worst_cm": [
+     7.6e-05,
+     [
+      27,
+      "leaf_04_b"
+     ]
+    ],
+    "scale_peak": {
+     "frame": 0,
+     "got": {
+      "body": [
+       1.3,
+       0.9,
+       1.3
+      ],
+      "cheek_l": [
+       1.0,
+       0.3,
+       1.0
+      ],
+      "cheek_r": [
+       1.0,
+       0.3,
+       1.0
+      ],
+      "crown": [
+       0.769231,
+       1.111111,
+       0.769231
+      ],
+      "taproot": [
+       0.769231,
+       1.111111,
+       0.769231
+      ]
+     },
+     "want": {
+      "body": [
+       1.3,
+       0.9,
+       1.3
+      ],
+      "cheek_l": [
+       1.0,
+       0.3,
+       1.0
+      ],
+      "cheek_r": [
+       1.0,
+       0.3,
+       1.0
+      ],
+      "crown": [
+       0.769231,
+       1.111111,
+       0.769231
+      ],
+      "taproot": [
+       0.769231,
+       1.111111,
+       0.769231
+      ]
+     },
+     "max_err": 0.0
+    },
+    "ok": {
+     "keys_N+1": true,
+     "length_N/30": true,
+     "tracks_17": true,
+     "skeleton": true,
+     "root_identity_5": true,
+     "loop_flag": true,
+     "no_root_motion": true,
+     "rate_1": true,
+     "seam": true,
+     "landmarks": true,
+     "scale_peak": true
+    }
+   },
+   "ROOT_RecoveryIdle": {
+    "num_frames": 60,
+    "length_s": 2.0,
+    "num_keys": 61,
+    "track_count": 17,
+    "skeleton": "/Game/ArtCandidates/ScreamingTurnip/R01/Meshes/ScreamingTurnip_R01_Mars_SKEL.ScreamingTurnip_R01_Mars_SKEL",
+    "loop": true,
+    "root_motion": false,
+    "rate_scale": 1.0,
+    "frame_rate": null,
+    "root_samples": [
+     {
+      "f": 0,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     {
+      "f": 15,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     {
+      "f": 30,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     {
+      "f": 45,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     {
+      "f": 60,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     }
+    ],
+    "loop_seam": {
+     "t_cm": 0.0,
+     "rot_deg": 0.0,
+     "scale": 0.0
+    },
+    "landmark_worst_cm": [
+     8.3e-05,
+     [
+      57,
+      "leaf_02_b"
+     ]
+    ],
+    "scale_peak": {
+     "frame": 45,
+     "got": {
+      "body": [
+       0.97,
+       1.01,
+       0.97
+      ],
+      "cheek_l": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "cheek_r": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "crown": [
+       1.030928,
+       0.990099,
+       1.030928
+      ],
+      "taproot": [
+       1.030928,
+       0.990099,
+       1.030928
+      ]
+     },
+     "want": {
+      "body": [
+       0.97,
+       1.01,
+       0.97
+      ],
+      "cheek_l": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "cheek_r": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "crown": [
+       1.030928,
+       0.990099,
+       1.030928
+      ],
+      "taproot": [
+       1.030928,
+       0.990099,
+       1.030928
+      ]
+     },
+     "max_err": 0.0
+    },
+    "ok": {
+     "keys_N+1": true,
+     "length_N/30": true,
+     "tracks_17": true,
+     "skeleton": true,
+     "root_identity_5": true,
+     "loop_flag": true,
+     "no_root_motion": true,
+     "rate_1": true,
+     "seam": true,
+     "landmarks": true,
+     "scale_peak": true
+    }
+   },
+   "ROOT_Scream": {
+    "num_frames": 18,
+    "length_s": 0.6,
+    "num_keys": 19,
+    "track_count": 17,
+    "skeleton": "/Game/ArtCandidates/ScreamingTurnip/R01/Meshes/ScreamingTurnip_R01_Mars_SKEL.ScreamingTurnip_R01_Mars_SKEL",
+    "loop": false,
+    "root_motion": false,
+    "rate_scale": 1.0,
+    "frame_rate": null,
+    "root_samples": [
+     {
+      "f": 0,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     {
+      "f": 4,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     {
+      "f": 9,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     {
+      "f": 14,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     {
+      "f": 18,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     }
+    ],
+    "loop_seam": null,
+    "landmark_worst_cm": [
+     7.7e-05,
+     [
+      5,
+      "leaf_05_b"
+     ]
+    ],
+    "scale_peak": {
+     "frame": 3,
+     "got": {
+      "body": [
+       1.3,
+       0.9,
+       1.3
+      ],
+      "cheek_l": [
+       1.0,
+       0.3,
+       1.0
+      ],
+      "cheek_r": [
+       1.0,
+       0.3,
+       1.0
+      ],
+      "crown": [
+       0.769231,
+       1.111111,
+       0.769231
+      ],
+      "taproot": [
+       0.769231,
+       1.111111,
+       0.769231
+      ]
+     },
+     "want": {
+      "body": [
+       1.3,
+       0.9,
+       1.3
+      ],
+      "cheek_l": [
+       1.0,
+       0.3,
+       1.0
+      ],
+      "cheek_r": [
+       1.0,
+       0.3,
+       1.0
+      ],
+      "crown": [
+       0.769231,
+       1.111111,
+       0.769231
+      ],
+      "taproot": [
+       0.769231,
+       1.111111,
+       0.769231
+      ]
+     },
+     "max_err": 0.0
+    },
+    "ok": {
+     "keys_N+1": true,
+     "length_N/30": true,
+     "tracks_17": true,
+     "skeleton": true,
+     "root_identity_5": true,
+     "loop_flag": true,
+     "no_root_motion": true,
+     "rate_1": true,
+     "seam": true,
+     "landmarks": true,
+     "scale_peak": true
+    }
+   },
+   "ROOT_SettleRock": {
+    "num_frames": 12,
+    "length_s": 0.4,
+    "num_keys": 13,
+    "track_count": 17,
+    "skeleton": "/Game/ArtCandidates/ScreamingTurnip/R01/Meshes/ScreamingTurnip_R01_Mars_SKEL.ScreamingTurnip_R01_Mars_SKEL",
+    "loop": false,
+    "root_motion": false,
+    "rate_scale": 1.0,
+    "frame_rate": null,
+    "root_samples": [
+     {
+      "f": 0,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     {
+      "f": 3,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     {
+      "f": 6,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     {
+      "f": 9,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     {
+      "f": 12,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     }
+    ],
+    "loop_seam": null,
+    "landmark_worst_cm": [
+     6.8e-05,
+     [
+      4,
+      "leaf_04_b"
+     ]
+    ],
+    "scale_peak": {
+     "frame": 0,
+     "got": {
+      "body": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "cheek_l": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "cheek_r": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "crown": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "taproot": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     "want": {
+      "body": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "cheek_l": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "cheek_r": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "crown": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "taproot": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     "max_err": 0.0
+    },
+    "ok": {
+     "keys_N+1": true,
+     "length_N/30": true,
+     "tracks_17": true,
+     "skeleton": true,
+     "root_identity_5": true,
+     "loop_flag": true,
+     "no_root_motion": true,
+     "rate_1": true,
+     "seam": true,
+     "landmarks": true,
+     "scale_peak": true
+    }
+   },
+   "SRC_Cancel": {
+    "num_frames": 7,
+    "length_s": 0.23333,
+    "num_keys": 8,
+    "track_count": 17,
+    "skeleton": "/Game/ArtCandidates/ScreamingTurnip/R01/Meshes/ScreamingTurnip_R01_Mars_SKEL.ScreamingTurnip_R01_Mars_SKEL",
+    "loop": false,
+    "root_motion": false,
+    "rate_scale": 1.0,
+    "frame_rate": null,
+    "root_samples": [
+     {
+      "f": 0,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     {
+      "f": 2,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     {
+      "f": 4,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     {
+      "f": 5,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     {
+      "f": 7,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     }
+    ],
+    "loop_seam": null,
+    "landmark_worst_cm": [
+     7.4e-05,
+     [
+      2,
+      "leaf_01_b"
+     ]
+    ],
+    "scale_peak": {
+     "frame": 0,
+     "got": {
+      "body": [
+       0.9,
+       1.1,
+       0.9
+      ],
+      "cheek_l": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "cheek_r": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "crown": [
+       1.111111,
+       0.909091,
+       1.111111
+      ],
+      "taproot": [
+       1.111111,
+       0.909091,
+       1.111111
+      ]
+     },
+     "want": {
+      "body": [
+       0.9,
+       1.1,
+       0.9
+      ],
+      "cheek_l": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "cheek_r": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "crown": [
+       1.111111,
+       0.909091,
+       1.111111
+      ],
+      "taproot": [
+       1.111111,
+       0.909091,
+       1.111111
+      ]
+     },
+     "max_err": 0.0
+    },
+    "ok": {
+     "keys_N+1": true,
+     "length_N/30": true,
+     "tracks_17": true,
+     "skeleton": true,
+     "root_identity_5": true,
+     "loop_flag": true,
+     "no_root_motion": true,
+     "rate_1": true,
+     "seam": true,
+     "landmarks": true,
+     "scale_peak": true
+    }
+   },
+   "SRC_Grip": {
+    "num_frames": 6,
+    "length_s": 0.2,
+    "num_keys": 7,
+    "track_count": 17,
+    "skeleton": "/Game/ArtCandidates/ScreamingTurnip/R01/Meshes/ScreamingTurnip_R01_Mars_SKEL.ScreamingTurnip_R01_Mars_SKEL",
+    "loop": false,
+    "root_motion": false,
+    "rate_scale": 1.0,
+    "frame_rate": null,
+    "root_samples": [
+     {
+      "f": 0,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     {
+      "f": 2,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     {
+      "f": 3,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     {
+      "f": 4,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     {
+      "f": 6,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     }
+    ],
+    "loop_seam": null,
+    "landmark_worst_cm": [
+     7.8e-05,
+     [
+      2,
+      "leaf_04_b"
+     ]
+    ],
+    "scale_peak": {
+     "frame": 0,
+     "got": {
+      "body": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "cheek_l": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "cheek_r": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "crown": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "taproot": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     "want": {
+      "body": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "cheek_l": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "cheek_r": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "crown": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "taproot": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     "max_err": 0.0
+    },
+    "ok": {
+     "keys_N+1": true,
+     "length_N/30": true,
+     "tracks_17": true,
+     "skeleton": true,
+     "root_identity_5": true,
+     "loop_flag": true,
+     "no_root_motion": true,
+     "rate_1": true,
+     "seam": true,
+     "landmarks": true,
+     "scale_peak": true
+    }
+   },
+   "SRC_Idle": {
+    "num_frames": 60,
+    "length_s": 2.0,
+    "num_keys": 61,
+    "track_count": 17,
+    "skeleton": "/Game/ArtCandidates/ScreamingTurnip/R01/Meshes/ScreamingTurnip_R01_Mars_SKEL.ScreamingTurnip_R01_Mars_SKEL",
+    "loop": true,
+    "root_motion": false,
+    "rate_scale": 1.0,
+    "frame_rate": null,
+    "root_samples": [
+     {
+      "f": 0,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     {
+      "f": 15,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     {
+      "f": 30,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     {
+      "f": 45,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     {
+      "f": 60,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     }
+    ],
+    "loop_seam": {
+     "t_cm": 0.0,
+     "rot_deg": 0.0,
+     "scale": 0.0
+    },
+    "landmark_worst_cm": [
+     0.00014,
+     [
+      5,
+      "leaf_02_b"
+     ]
+    ],
+    "scale_peak": {
+     "frame": 0,
+     "got": {
+      "body": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "cheek_l": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "cheek_r": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "crown": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "taproot": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     "want": {
+      "body": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "cheek_l": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "cheek_r": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "crown": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "taproot": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     "max_err": 0.0
+    },
+    "ok": {
+     "keys_N+1": true,
+     "length_N/30": true,
+     "tracks_17": true,
+     "skeleton": true,
+     "root_identity_5": true,
+     "loop_flag": true,
+     "no_root_motion": true,
+     "rate_1": true,
+     "seam": true,
+     "landmarks": true,
+     "scale_peak": true
+    }
+   },
+   "SRC_Release": {
+    "num_frames": 6,
+    "length_s": 0.2,
+    "num_keys": 7,
+    "track_count": 17,
+    "skeleton": "/Game/ArtCandidates/ScreamingTurnip/R01/Meshes/ScreamingTurnip_R01_Mars_SKEL.ScreamingTurnip_R01_Mars_SKEL",
+    "loop": false,
+    "root_motion": false,
+    "rate_scale": 1.0,
+    "frame_rate": null,
+    "root_samples": [
+     {
+      "f": 0,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     {
+      "f": 2,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     {
+      "f": 3,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     {
+      "f": 4,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     {
+      "f": 6,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     }
+    ],
+    "loop_seam": null,
+    "landmark_worst_cm": [
+     7.2e-05,
+     [
+      4,
+      "leaf_01_b"
+     ]
+    ],
+    "scale_peak": {
+     "frame": 2,
+     "got": {
+      "body": [
+       1.1,
+       0.95,
+       1.1
+      ],
+      "cheek_l": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "cheek_r": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "crown": [
+       0.909091,
+       1.052632,
+       0.909091
+      ],
+      "taproot": [
+       0.909091,
+       1.052632,
+       0.909091
+      ]
+     },
+     "want": {
+      "body": [
+       1.1,
+       0.95,
+       1.1
+      ],
+      "cheek_l": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "cheek_r": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "crown": [
+       0.909091,
+       1.052632,
+       0.909091
+      ],
+      "taproot": [
+       0.909091,
+       1.052632,
+       0.909091
+      ]
+     },
+     "max_err": 0.0
+    },
+    "ok": {
+     "keys_N+1": true,
+     "length_N/30": true,
+     "tracks_17": true,
+     "skeleton": true,
+     "root_identity_5": true,
+     "loop_flag": true,
+     "no_root_motion": true,
+     "rate_1": true,
+     "seam": true,
+     "landmarks": true,
+     "scale_peak": true
+    }
+   },
+   "SRC_Tug": {
+    "num_frames": 15,
+    "length_s": 0.5,
+    "num_keys": 16,
+    "track_count": 17,
+    "skeleton": "/Game/ArtCandidates/ScreamingTurnip/R01/Meshes/ScreamingTurnip_R01_Mars_SKEL.ScreamingTurnip_R01_Mars_SKEL",
+    "loop": false,
+    "root_motion": false,
+    "rate_scale": 1.0,
+    "frame_rate": null,
+    "root_samples": [
+     {
+      "f": 0,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     {
+      "f": 4,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     {
+      "f": 8,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     {
+      "f": 11,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     },
+     {
+      "f": 15,
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     }
+    ],
+    "loop_seam": null,
+    "landmark_worst_cm": [
+     8e-05,
+     [
+      3,
+      "leaf_01_b"
+     ]
+    ],
+    "scale_peak": {
+     "frame": 15,
+     "got": {
+      "body": [
+       0.9,
+       1.1,
+       0.9
+      ],
+      "cheek_l": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "cheek_r": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "crown": [
+       1.111111,
+       0.909091,
+       1.111111
+      ],
+      "taproot": [
+       1.111111,
+       0.909091,
+       1.111111
+      ]
+     },
+     "want": {
+      "body": [
+       0.9,
+       1.1,
+       0.9
+      ],
+      "cheek_l": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "cheek_r": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "crown": [
+       1.111111,
+       0.909091,
+       1.111111
+      ],
+      "taproot": [
+       1.111111,
+       0.909091,
+       1.111111
+      ]
+     },
+     "max_err": 0.0
+    },
+    "ok": {
+     "keys_N+1": true,
+     "length_N/30": true,
+     "tracks_17": true,
+     "skeleton": true,
+     "root_identity_5": true,
+     "loop_flag": true,
+     "no_root_motion": true,
+     "rate_1": true,
+     "seam": true,
+     "landmarks": true,
+     "scale_peak": true
+    }
+   }
+  },
+  "checks": {
+   "ROOT_AirborneLeafTrail": [
+    true,
+    []
+   ],
+   "ROOT_Anticipate": [
+    true,
+    []
+   ],
+   "ROOT_ImpactSquash": [
+    true,
+    []
+   ],
+   "ROOT_Inhale": [
+    true,
+    []
+   ],
+   "ROOT_PlaceSettle": [
+    true,
+    []
+   ],
+   "ROOT_QuietIdle": [
+    true,
+    []
+   ],
+   "ROOT_Recover": [
+    true,
+    []
+   ],
+   "ROOT_RecoveryIdle": [
+    true,
+    []
+   ],
+   "ROOT_Scream": [
+    true,
+    []
+   ],
+   "ROOT_SettleRock": [
+    true,
+    []
+   ],
+   "SRC_Cancel": [
+    true,
+    []
+   ],
+   "SRC_Grip": [
+    true,
+    []
+   ],
+   "SRC_Idle": [
+    true,
+    []
+   ],
+   "SRC_Release": [
+    true,
+    []
+   ],
+   "SRC_Tug": [
+    true,
+    []
+   ],
+   "chain": [
+    true,
+    11
+   ]
+  },
+  "chain": {
+   "ROOT_Anticipate.from <- ROOT_QuietIdle f0": {
+    "t_cm": 0.0,
+    "rot_deg": 0.0,
+    "scale": 0.0
+   },
+   "ROOT_Inhale.from <- ROOT_Anticipate f9": {
+    "t_cm": 2e-06,
+    "rot_deg": 1e-05,
+    "scale": 0.0
+   },
+   "ROOT_Recover.from <- ROOT_Scream f18": {
+    "t_cm": 3e-06,
+    "rot_deg": 1e-05,
+    "scale": 0.0
+   },
+   "ROOT_Recover.to <- ROOT_RecoveryIdle f0": {
+    "t_cm": 3e-06,
+    "rot_deg": 1e-05,
+    "scale": 0.0
+   },
+   "ROOT_Scream.from <- ROOT_Inhale f36": {
+    "t_cm": 2e-06,
+    "rot_deg": 1e-05,
+    "scale": 0.0
+   },
+   "SRC_Cancel.from <- SRC_Tug f15": {
+    "t_cm": 1e-06,
+    "rot_deg": 1e-05,
+    "scale": 0.0
+   },
+   "SRC_Grip.from <- SRC_Idle f0": {
+    "t_cm": 0.0,
+    "rot_deg": 0.0,
+    "scale": 0.0
+   },
+   "SRC_Release.from <- SRC_Tug f15": {
+    "t_cm": 1e-06,
+    "rot_deg": 1e-05,
+    "scale": 0.0
+   },
+   "SRC_Tug.from <- SRC_Grip f6": {
+    "t_cm": 1e-06,
+    "rot_deg": 1e-05,
+    "scale": 0.0
+   },
+   "SRC_Release.end <- ROOT_QuietIdle f0 (notes)": {
+    "t_cm": 0.0,
+    "rot_deg": 0.0,
+    "scale": 0.0
+   },
+   "SRC_Cancel.end <- SRC_Idle f0 (notes)": {
+    "t_cm": 0.0,
+    "rot_deg": 0.0,
+    "scale": 0.0
+   }
+  },
+  "hard_cuts": {
+   "ROOT_RecoveryIdle -> ROOT_Anticipate f0": {
+    "blender": {
+     "f0": [
+      0.652,
+      42.5
+     ],
+     "worst": [
+      0.785,
+      42.0
+     ]
+    },
+    "f0": [
+     0.6517,
+     42.462
+    ],
+    "worst_head": [
+     0.7854,
+     41.993,
+     44
+    ]
+   },
+   "ROOT_QuietIdle -> ROOT_Anticipate f0": {
+    "blender": {
+     "f0": [
+      0.0,
+      0.0
+     ],
+     "worst": [
+      0.16,
+      4.1
+     ]
+    },
+    "f0": [
+     0.0,
+     0.0
+    ],
+    "worst_head": [
+     0.1603,
+     4.131,
+     30
+    ]
+   }
+  },
+  "loops_brief": {
+   "ROOT_QuietIdle": {
+    "t_cm": 0.0,
+    "rot_deg": 0.0,
+    "scale": 0.0
+   },
+   "ROOT_RecoveryIdle": {
+    "t_cm": 0.0,
+    "rot_deg": 0.0,
+    "scale": 0.0
+   },
+   "SRC_Idle": {
+    "t_cm": 0.0,
+    "rot_deg": 0.0,
+    "scale": 0.0
+   },
+   "ROOT_AirborneLeafTrail": {
+    "t_cm": 0.0,
+    "rot_deg": 0.0,
+    "scale": 0.0
+   }
+  },
+  "pass": true
+ },
+ "owned_assets": [
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_ROOT_AirborneLeafTrail_Mars_ANIM",
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_ROOT_Anticipate_Mars_ANIM",
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_ROOT_ImpactSquash_Mars_ANIM",
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_ROOT_Inhale_Mars_ANIM",
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_ROOT_PlaceSettle_Mars_ANIM",
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_ROOT_QuietIdle_Mars_ANIM",
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_ROOT_Recover_Mars_ANIM",
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_ROOT_RecoveryIdle_Mars_ANIM",
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_ROOT_Scream_Mars_ANIM",
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_ROOT_SettleRock_Mars_ANIM",
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_SRC_Cancel_Mars_ANIM",
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_SRC_Grip_Mars_ANIM",
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_SRC_Idle_Mars_ANIM",
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_SRC_Release_Mars_ANIM",
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_SRC_Tug_Mars_ANIM",
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Materials/ScreamingTurnip_R01_Leaf_Mars_MI",
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Materials/ScreamingTurnip_R01_Mars_M",
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Materials/ScreamingTurnip_R01_Mouth_Mars_MI",
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Materials/ScreamingTurnip_R01_Skin_Mars_MI",
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Materials/ScreamingTurnip_R01_Teeth_Mars_MI",
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Materials/TurnipBed_R01_Mars_MI",
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Meshes/ScreamingTurnip_R01_Collision_Mars_SM",
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Meshes/ScreamingTurnip_R01_Mars_SK",
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Meshes/ScreamingTurnip_R01_Mars_SKEL",
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Meshes/TurnipBedEmpty_R01_Mars_SM",
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Meshes/TurnipBed_R01_Mars_SM",
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Validation/Cube10_Mars_SM"
+ ],
+ "root_assets": [
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_ROOT_AirborneLeafTrail_Mars_ANIM",
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_ROOT_Anticipate_Mars_ANIM",
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_ROOT_ImpactSquash_Mars_ANIM",
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_ROOT_Inhale_Mars_ANIM",
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_ROOT_PlaceSettle_Mars_ANIM",
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_ROOT_QuietIdle_Mars_ANIM",
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_ROOT_Recover_Mars_ANIM",
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_ROOT_RecoveryIdle_Mars_ANIM",
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_ROOT_Scream_Mars_ANIM",
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_ROOT_SettleRock_Mars_ANIM",
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_SRC_Cancel_Mars_ANIM",
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_SRC_Grip_Mars_ANIM",
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_SRC_Idle_Mars_ANIM",
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_SRC_Release_Mars_ANIM",
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_SRC_Tug_Mars_ANIM",
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Materials/ScreamingTurnip_R01_Leaf_Mars_MI",
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Materials/ScreamingTurnip_R01_Mars_M",
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Materials/ScreamingTurnip_R01_Mouth_Mars_MI",
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Materials/ScreamingTurnip_R01_Skin_Mars_MI",
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Materials/ScreamingTurnip_R01_Teeth_Mars_MI",
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Materials/TurnipBed_R01_Mars_MI",
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Meshes/ScreamingTurnip_R01_Collision_Mars_SM",
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Meshes/ScreamingTurnip_R01_Mars_SK",
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Meshes/ScreamingTurnip_R01_Mars_SKEL",
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Meshes/TurnipBedEmpty_R01_Mars_SM",
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Meshes/TurnipBed_R01_Mars_SM",
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Validation/Cube10_Mars_SM"
+ ],
+ "hashes": {
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_ROOT_AirborneLeafTrail_Mars_ANIM": {
+   ".uasset": {
+    "size": 38852,
+    "sha256": "0ff1b525a89cf035ed9b29b8d27398b28c32bc6a09f3e11c882c7b3f3283aeb3"
+   }
+  },
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_ROOT_Anticipate_Mars_ANIM": {
+   ".uasset": {
+    "size": 37515,
+    "sha256": "85085bd959300252a2438a7dc965cfcabef5e707f1aabd8ddc7cc61a692cbe0d"
+   }
+  },
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_ROOT_ImpactSquash_Mars_ANIM": {
+   ".uasset": {
+    "size": 34000,
+    "sha256": "06841d74eb5a5b2ab17164957bf64eb838f15711ee719a98bee4e64f95f65f2d"
+   }
+  },
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_ROOT_Inhale_Mars_ANIM": {
+   ".uasset": {
+    "size": 65524,
+    "sha256": "41be9cc5e56c438d3c4501fc355d640aa184d206ae00618731b605c4e3569d59"
+   }
+  },
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_ROOT_PlaceSettle_Mars_ANIM": {
+   ".uasset": {
+    "size": 31369,
+    "sha256": "d2898da37498978fc2c8fa1b4f2d387b2f6b4bd2c176b1bb0c5e6eb36ff0b646"
+   }
+  },
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_ROOT_QuietIdle_Mars_ANIM": {
+   ".uasset": {
+    "size": 62173,
+    "sha256": "4504036c4a366e90aef8dc9274ae41939edeef9c9bd2095caccb87fe26c6a425"
+   }
+  },
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_ROOT_Recover_Mars_ANIM": {
+   ".uasset": {
+    "size": 61529,
+    "sha256": "7d0039742f82c34b0e5597ac74ec5beba09eb65c9ed72e06505239cd8234c449"
+   }
+  },
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_ROOT_RecoveryIdle_Mars_ANIM": {
+   ".uasset": {
+    "size": 62121,
+    "sha256": "68b26045d4dc557823cda3b51831ecf17ab26282c6945eb137b27756cb601d0f"
+   }
+  },
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_ROOT_Scream_Mars_ANIM": {
+   ".uasset": {
+    "size": 52992,
+    "sha256": "9ffd622c1538829ca3f1fb940177678194f5ce669d7f24a06b56c07509483983"
+   }
+  },
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_ROOT_SettleRock_Mars_ANIM": {
+   ".uasset": {
+    "size": 33043,
+    "sha256": "5e70534fdb358436083fd0ccd20a3b4e0bf4f5590718b4c2a33f3ea297652a32"
+   }
+  },
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_SRC_Cancel_Mars_ANIM": {
+   ".uasset": {
+    "size": 34209,
+    "sha256": "96a74fc794be8d57e30d363bcf201f071ceb4aac03c8ccbc4f217d4b1d0d3f94"
+   }
+  },
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_SRC_Grip_Mars_ANIM": {
+   ".uasset": {
+    "size": 31278,
+    "sha256": "a05439b6a2d22b319d3786a1750b6d781b71282f5cb379da50eca01a8c1db0a8"
+   }
+  },
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_SRC_Idle_Mars_ANIM": {
+   ".uasset": {
+    "size": 48467,
+    "sha256": "80c14ceea74ec04336d9f5c356460b394cdc855d4e2b19d162f4bbcf19f8e00f"
+   }
+  },
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_SRC_Release_Mars_ANIM": {
+   ".uasset": {
+    "size": 33646,
+    "sha256": "d3e4a51b7acd519beb57ae0e6910090d8d6a9c7f738abb66104f131fc7481808"
+   }
+  },
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_SRC_Tug_Mars_ANIM": {
+   ".uasset": {
+    "size": 39506,
+    "sha256": "6f56f51f7fe2ec6f5dedd8e193a0eac35ba2d8a418fd7d7840a2e5710565bb37"
+   }
+  },
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Materials/ScreamingTurnip_R01_Leaf_Mars_MI": {
+   ".uasset": {
+    "size": 8642,
+    "sha256": "dc214feb4d716336e203151e606bd1c51e05f7a5704eb2bbad16c90831dfd5ba"
+   }
+  },
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Materials/ScreamingTurnip_R01_Mars_M": {
+   ".uasset": {
+    "size": 14305,
+    "sha256": "d779d0bdff52d876ad7c3c22c2428c1ccf709d69e5150e19265edecedab5527b"
+   }
+  },
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Materials/ScreamingTurnip_R01_Mouth_Mars_MI": {
+   ".uasset": {
+    "size": 8636,
+    "sha256": "12e410605d6056e6ccf17ed0fb3898c9fc83acb7505791555f285badbf249783"
+   }
+  },
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Materials/ScreamingTurnip_R01_Skin_Mars_MI": {
+   ".uasset": {
+    "size": 8629,
+    "sha256": "4495f6133b0cbd973f85a495aec7ba8c456411c676aa7f60b1dc7b03ea78a53a"
+   }
+  },
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Materials/ScreamingTurnip_R01_Teeth_Mars_MI": {
+   ".uasset": {
+    "size": 8635,
+    "sha256": "db28404ba29ac83ad7bcc247177c4baff105f4ee7d6cb266d1459ddfacec8dc9"
+   }
+  },
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Materials/TurnipBed_R01_Mars_MI": {
+   ".uasset": {
+    "size": 8567,
+    "sha256": "92c404dc2027fcfd8a2b5ad33e22c1e5867b69ff65edd3e92709627e341e1883"
+   }
+  },
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Meshes/ScreamingTurnip_R01_Collision_Mars_SM": {
+   ".uasset": {
+    "size": 19010,
+    "sha256": "eebbd3435b33e0ec0c756f6b8c73db708786c873d6e75c3d52fb2dc376c3e28b"
+   }
+  },
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Meshes/ScreamingTurnip_R01_Mars_SK": {
+   ".uasset": {
+    "size": 1141007,
+    "sha256": "b3b8ba4ca68492f9b106b80dae110118875a6f085805f6637be36596ca16ce60"
+   }
+  },
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Meshes/ScreamingTurnip_R01_Mars_SKEL": {
+   ".uasset": {
+    "size": 12959,
+    "sha256": "8bc4b86bce84b6c7be6b2868a5565ba79252a4c8e231577f30e3547324a44fad"
+   }
+  },
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Meshes/TurnipBedEmpty_R01_Mars_SM": {
+   ".uasset": {
+    "size": 23450,
+    "sha256": "99af2122996ff6e740690ea4870b717de13aa258d84c089bc6256bdb7bdb2658"
+   }
+  },
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Meshes/TurnipBed_R01_Mars_SM": {
+   ".uasset": {
+    "size": 21400,
+    "sha256": "101ce3226e4fab70b2967d3a26398ec42595e617aa24cd434d92ebe2be760957"
+   }
+  },
+  "/Game/ArtCandidates/ScreamingTurnip/R01/Validation/Cube10_Mars_SM": {
+   ".uasset": {
+    "size": 14715,
+    "sha256": "a657a1c7a4f22478297eef90cfe21061b4cfc12870440f925720c9f1a8632912"
+   }
+  }
+ }
+}

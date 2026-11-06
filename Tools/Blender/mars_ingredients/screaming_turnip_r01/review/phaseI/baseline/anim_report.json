@@ -1,0 +1,1884 @@
+{
+ "clips": {
+  "SRC_Idle": {
+   "root_max_dev": 0.0,
+   "ue_dev_max_cm": 2e-05,
+   "isect_max": {},
+   "isect_frames": {},
+   "action_vs_authored_max": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "shape_keys": {
+    "peaks": {
+     "Inhale": {
+      "max": 0.0,
+      "frames_at_max": []
+     },
+     "Scream": {
+      "max": 0.0,
+      "frames_at_max": []
+     }
+    },
+    "per_frame": {
+     "Inhale": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "Scream": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "clip_bounds": {
+    "min": [
+     -18.331,
+     -20.703,
+     -1.8
+    ],
+    "max": [
+     16.812,
+     20.048,
+     47.209
+    ],
+    "h_z": 49.009,
+    "w_y": 40.751,
+    "d_x": 35.143
+   },
+   "seam": {
+    "pose_delta_cm_deg": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "velocity_delta_cm_per_frame": 0.00082
+   },
+   "frames": [
+    0,
+    60
+   ],
+   "samples": 61
+  },
+  "SRC_Grip": {
+   "root_max_dev": 0.0,
+   "ue_dev_max_cm": 2e-05,
+   "isect_max": {},
+   "isect_frames": {},
+   "action_vs_authored_max": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "shape_keys": {
+    "peaks": {
+     "Inhale": {
+      "max": 0.0,
+      "frames_at_max": []
+     },
+     "Scream": {
+      "max": 0.0,
+      "frames_at_max": []
+     }
+    },
+    "per_frame": {
+     "Inhale": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "Scream": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "clip_bounds": {
+    "min": [
+     -17.69,
+     -20.041,
+     -1.8
+    ],
+    "max": [
+     16.214,
+     20.041,
+     47.475
+    ],
+    "h_z": 49.275,
+    "w_y": 40.082,
+    "d_x": 33.904
+   },
+   "seam": {
+    "pose_delta_cm_deg": [
+     1.05,
+     10.0,
+     0.0
+    ]
+   },
+   "frames": [
+    0,
+    6
+   ],
+   "samples": 7
+  },
+  "SRC_Tug": {
+   "root_max_dev": 0.0,
+   "ue_dev_max_cm": 2e-05,
+   "isect_max": {},
+   "isect_frames": {},
+   "action_vs_authored_max": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "shape_keys": {
+    "peaks": {
+     "Inhale": {
+      "max": 0.0,
+      "frames_at_max": []
+     },
+     "Scream": {
+      "max": 0.0,
+      "frames_at_max": []
+     }
+    },
+    "per_frame": {
+     "Inhale": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "Scream": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "clip_bounds": {
+    "min": [
+     -15.607,
+     -18.679,
+     -1.8
+    ],
+    "max": [
+     15.184,
+     18.679,
+     49.839
+    ],
+    "h_z": 51.639,
+    "w_y": 37.358,
+    "d_x": 30.791
+   },
+   "seam": {
+    "pose_delta_cm_deg": [
+     1.73352,
+     9.0,
+     0.0
+    ]
+   },
+   "frames": [
+    0,
+    15
+   ],
+   "samples": 16
+  },
+  "SRC_Release": {
+   "root_max_dev": 0.0,
+   "ue_dev_max_cm": 1e-05,
+   "isect_max": {},
+   "isect_frames": {},
+   "action_vs_authored_max": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "shape_keys": {
+    "peaks": {
+     "Inhale": {
+      "max": 0.0,
+      "frames_at_max": []
+     },
+     "Scream": {
+      "max": 0.0,
+      "frames_at_max": []
+     }
+    },
+    "per_frame": {
+     "Inhale": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "Scream": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "clip_bounds": {
+    "min": [
+     -20.85,
+     -21.32,
+     -1.8
+    ],
+    "max": [
+     17.757,
+     21.32,
+     49.839
+    ],
+    "h_z": 51.639,
+    "w_y": 42.64,
+    "d_x": 38.607
+   },
+   "seam": {
+    "pose_delta_cm_deg": [
+     3.33243,
+     19.0,
+     0.0
+    ]
+   },
+   "frames": [
+    0,
+    6
+   ],
+   "samples": 7
+  },
+  "SRC_Cancel": {
+   "root_max_dev": 0.0,
+   "ue_dev_max_cm": 1e-05,
+   "isect_max": {},
+   "isect_frames": {},
+   "action_vs_authored_max": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "shape_keys": {
+    "peaks": {
+     "Inhale": {
+      "max": 0.0,
+      "frames_at_max": []
+     },
+     "Scream": {
+      "max": 0.0,
+      "frames_at_max": []
+     }
+    },
+    "per_frame": {
+     "Inhale": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "Scream": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "clip_bounds": {
+    "min": [
+     -17.69,
+     -20.041,
+     -1.8
+    ],
+    "max": [
+     16.214,
+     20.041,
+     49.839
+    ],
+    "h_z": 51.639,
+    "w_y": 40.082,
+    "d_x": 33.904
+   },
+   "seam": {
+    "pose_delta_cm_deg": [
+     1.73352,
+     19.0,
+     0.0
+    ]
+   },
+   "frames": [
+    0,
+    7
+   ],
+   "samples": 8
+  },
+  "ROOT_QuietIdle": {
+   "root_max_dev": 0.0,
+   "ue_dev_max_cm": 2e-05,
+   "isect_max": {},
+   "isect_frames": {},
+   "action_vs_authored_max": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "shape_keys": {
+    "peaks": {
+     "Inhale": {
+      "max": 0.0,
+      "frames_at_max": []
+     },
+     "Scream": {
+      "max": 0.0,
+      "frames_at_max": []
+     }
+    },
+    "per_frame": {
+     "Inhale": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "Scream": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "clip_bounds": {
+    "min": [
+     -18.024,
+     -20.42,
+     0.0
+    ],
+    "max": [
+     16.543,
+     20.044,
+     48.795
+    ],
+    "h_z": 48.795,
+    "w_y": 40.464,
+    "d_x": 34.567
+   },
+   "seam": {
+    "pose_delta_cm_deg": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "velocity_delta_cm_per_frame": 0.00264
+   },
+   "frames": [
+    0,
+    60
+   ],
+   "samples": 61
+  },
+  "ROOT_Anticipate": {
+   "root_max_dev": 0.0,
+   "ue_dev_max_cm": 1e-05,
+   "isect_max": {},
+   "isect_frames": {},
+   "action_vs_authored_max": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "shape_keys": {
+    "peaks": {
+     "Inhale": {
+      "max": 0.0,
+      "frames_at_max": []
+     },
+     "Scream": {
+      "max": 0.0,
+      "frames_at_max": []
+     }
+    },
+    "per_frame": {
+     "Inhale": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "Scream": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "clip_bounds": {
+    "min": [
+     -17.69,
+     -20.041,
+     -0.0
+    ],
+    "max": [
+     16.214,
+     20.041,
+     49.14
+    ],
+    "h_z": 49.14,
+    "w_y": 40.082,
+    "d_x": 33.904
+   },
+   "seam": {
+    "pose_delta_cm_deg": [
+     2.51937,
+     13.0,
+     0.0
+    ]
+   },
+   "frames": [
+    0,
+    9
+   ],
+   "samples": 10
+  },
+  "ROOT_AnticipateTired": {
+   "root_max_dev": 0.0,
+   "ue_dev_max_cm": 1e-05,
+   "isect_max": {},
+   "isect_frames": {},
+   "action_vs_authored_max": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "shape_keys": {
+    "peaks": {
+     "Inhale": {
+      "max": 0.0,
+      "frames_at_max": []
+     },
+     "Scream": {
+      "max": 0.0,
+      "frames_at_max": []
+     }
+    },
+    "per_frame": {
+     "Inhale": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "Scream": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "clip_bounds": {
+    "min": [
+     -20.803,
+     -21.165,
+     -0.0
+    ],
+    "max": [
+     17.683,
+     21.165,
+     49.14
+    ],
+    "h_z": 49.14,
+    "w_y": 42.33,
+    "d_x": 38.486
+   },
+   "seam": {
+    "pose_delta_cm_deg": [
+     2.32023,
+     55.4531,
+     0.0
+    ]
+   },
+   "frames": [
+    0,
+    9
+   ],
+   "samples": 10
+  },
+  "ROOT_Inhale": {
+   "root_max_dev": 0.0,
+   "ue_dev_max_cm": 2e-05,
+   "isect_max": {},
+   "isect_frames": {},
+   "action_vs_authored_max": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "subframe_isect_info": {},
+   "shape_keys": {
+    "peaks": {
+     "Inhale": {
+      "max": 1.0,
+      "frames_at_max": [
+       30,
+       36
+      ]
+     },
+     "Scream": {
+      "max": 0.0,
+      "frames_at_max": []
+     }
+    },
+    "per_frame": {
+     "Inhale": [
+      0.0,
+      0.0073,
+      0.0278,
+      0.0599,
+      0.1017,
+      0.1512,
+      0.2069,
+      0.2667,
+      0.3289,
+      0.3916,
+      0.4531,
+      0.5115,
+      0.565,
+      0.6118,
+      0.65,
+      0.6832,
+      0.7161,
+      0.7483,
+      0.7797,
+      0.81,
+      0.8389,
+      0.8662,
+      0.8917,
+      0.9151,
+      0.9361,
+      0.9546,
+      0.9703,
+      0.9829,
+      0.9923,
+      0.998,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     "Scream": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "clip_bounds": {
+    "min": [
+     -14.896,
+     -19.348,
+     0.0
+    ],
+    "max": [
+     16.665,
+     19.348,
+     50.622
+    ],
+    "h_z": 50.622,
+    "w_y": 38.696,
+    "d_x": 31.561
+   },
+   "seam": {
+    "pose_delta_cm_deg": [
+     4.5142,
+     11.0,
+     1.0
+    ]
+   },
+   "frames": [
+    0,
+    36
+   ],
+   "samples": 37
+  },
+  "ROOT_Scream": {
+   "root_max_dev": 0.0,
+   "ue_dev_max_cm": 2e-05,
+   "isect_max": {},
+   "isect_frames": {},
+   "action_vs_authored_max": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "subframe_isect_info": {
+    "1.5": {
+     "teeth_vs_mouth": 3,
+     "sk": [
+      0.5,
+      0.5
+     ]
+    }
+   },
+   "shape_keys": {
+    "peaks": {
+     "Inhale": {
+      "max": 1.0,
+      "frames_at_max": [
+       0,
+       0
+      ]
+     },
+     "Scream": {
+      "max": 1.0,
+      "frames_at_max": [
+       3,
+       18
+      ]
+     }
+    },
+    "per_frame": {
+     "Inhale": [
+      1.0,
+      0.7407,
+      0.2593,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "Scream": [
+      0.0,
+      0.2593,
+      0.7407,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "clip_bounds": {
+    "min": [
+     -20.9,
+     -20.63,
+     0.0
+    ],
+    "max": [
+     20.036,
+     20.63,
+     61.789
+    ],
+    "h_z": 61.789,
+    "w_y": 41.26,
+    "d_x": 40.936
+   },
+   "seam": {
+    "pose_delta_cm_deg": [
+     11.27917,
+     34.0,
+     1.0
+    ]
+   },
+   "frames": [
+    0,
+    18
+   ],
+   "samples": 19
+  },
+  "ROOT_Recover": {
+   "root_max_dev": 0.0,
+   "ue_dev_max_cm": 2e-05,
+   "isect_max": {},
+   "isect_frames": {},
+   "action_vs_authored_max": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "subframe_isect_info": {
+    "3.5": {
+     "teeth_vs_mouth": 4,
+     "sk": [
+      0.0,
+      0.5
+     ]
+    }
+   },
+   "shape_keys": {
+    "peaks": {
+     "Inhale": {
+      "max": 0.0,
+      "frames_at_max": []
+     },
+     "Scream": {
+      "max": 1.0,
+      "frames_at_max": [
+       0,
+       0
+      ],
+      "zero_from_frame": 8
+     }
+    },
+    "per_frame": {
+     "Inhale": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "Scream": [
+      1.0,
+      0.94,
+      0.82,
+      0.7,
+      0.3,
+      0.15,
+      0.07,
+      0.02,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "clip_bounds": {
+    "min": [
+     -20.926,
+     -21.152,
+     0.0
+    ],
+    "max": [
+     19.709,
+     21.152,
+     59.574
+    ],
+    "h_z": 59.574,
+    "w_y": 42.304,
+    "d_x": 40.635
+   },
+   "seam": {
+    "pose_delta_cm_deg": [
+     10.98043,
+     65.7413,
+     1.0
+    ]
+   },
+   "frames": [
+    0,
+    30
+   ],
+   "samples": 31
+  },
+  "ROOT_RecoveryIdle": {
+   "root_max_dev": 0.0,
+   "ue_dev_max_cm": 2e-05,
+   "isect_max": {},
+   "isect_frames": {},
+   "action_vs_authored_max": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "shape_keys": {
+    "peaks": {
+     "Inhale": {
+      "max": 0.0,
+      "frames_at_max": []
+     },
+     "Scream": {
+      "max": 0.0,
+      "frames_at_max": []
+     }
+    },
+    "per_frame": {
+     "Inhale": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "Scream": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "clip_bounds": {
+    "min": [
+     -20.825,
+     -21.152,
+     0.0
+    ],
+    "max": [
+     17.442,
+     21.182,
+     40.593
+    ],
+    "h_z": 40.593,
+    "w_y": 42.334,
+    "d_x": 38.267
+   },
+   "seam": {
+    "pose_delta_cm_deg": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "velocity_delta_cm_per_frame": 0.00032
+   },
+   "frames": [
+    0,
+    60
+   ],
+   "samples": 61
+  },
+  "ROOT_AirborneLeafTrail": {
+   "root_max_dev": 0.0,
+   "ue_dev_max_cm": 1e-05,
+   "isect_max": {},
+   "isect_frames": {},
+   "action_vs_authored_max": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "shape_keys": {
+    "peaks": {
+     "Inhale": {
+      "max": 0.0,
+      "frames_at_max": []
+     },
+     "Scream": {
+      "max": 0.0,
+      "frames_at_max": []
+     }
+    },
+    "per_frame": {
+     "Inhale": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "Scream": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "clip_bounds": {
+    "min": [
+     -21.665,
+     -21.319,
+     0.0
+    ],
+    "max": [
+     16.602,
+     21.053,
+     47.613
+    ],
+    "h_z": 47.613,
+    "w_y": 42.372,
+    "d_x": 38.267
+   },
+   "seam": {
+    "pose_delta_cm_deg": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "velocity_delta_cm_per_frame": 0.00665
+   },
+   "frames": [
+    0,
+    30
+   ],
+   "samples": 31
+  },
+  "ROOT_ImpactSquash": {
+   "root_max_dev": 0.0,
+   "ue_dev_max_cm": 2e-05,
+   "isect_max": {},
+   "isect_frames": {},
+   "action_vs_authored_max": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "shape_keys": {
+    "peaks": {
+     "Inhale": {
+      "max": 0.0,
+      "frames_at_max": []
+     },
+     "Scream": {
+      "max": 0.0,
+      "frames_at_max": []
+     }
+    },
+    "per_frame": {
+     "Inhale": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "Scream": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "clip_bounds": {
+    "min": [
+     -20.653,
+     -21.173,
+     0.0
+    ],
+    "max": [
+     17.738,
+     21.173,
+     48.0
+    ],
+    "h_z": 48.0,
+    "w_y": 42.346,
+    "d_x": 38.391
+   },
+   "seam": {
+    "pose_delta_cm_deg": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   "frames": [
+    0,
+    7
+   ],
+   "samples": 8
+  },
+  "ROOT_SettleRock": {
+   "root_max_dev": 0.0,
+   "ue_dev_max_cm": 1e-05,
+   "isect_max": {},
+   "isect_frames": {},
+   "action_vs_authored_max": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "shape_keys": {
+    "peaks": {
+     "Inhale": {
+      "max": 0.0,
+      "frames_at_max": []
+     },
+     "Scream": {
+      "max": 0.0,
+      "frames_at_max": []
+     }
+    },
+    "per_frame": {
+     "Inhale": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "Scream": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "clip_bounds": {
+    "min": [
+     -19.908,
+     -20.928,
+     0.0
+    ],
+    "max": [
+     17.518,
+     20.928,
+     49.488
+    ],
+    "h_z": 49.488,
+    "w_y": 41.856,
+    "d_x": 37.426
+   },
+   "seam": {
+    "pose_delta_cm_deg": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   "frames": [
+    0,
+    12
+   ],
+   "samples": 13
+  },
+  "ROOT_PlaceSettle": {
+   "root_max_dev": 0.0,
+   "ue_dev_max_cm": 2e-05,
+   "isect_max": {},
+   "isect_frames": {},
+   "action_vs_authored_max": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "shape_keys": {
+    "peaks": {
+     "Inhale": {
+      "max": 0.0,
+      "frames_at_max": []
+     },
+     "Scream": {
+      "max": 0.0,
+      "frames_at_max": []
+     }
+    },
+    "per_frame": {
+     "Inhale": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "Scream": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "clip_bounds": {
+    "min": [
+     -17.69,
+     -20.041,
+     0.0
+    ],
+    "max": [
+     16.214,
+     20.041,
+     48.0
+    ],
+    "h_z": 48.0,
+    "w_y": 40.082,
+    "d_x": 33.904
+   },
+   "seam": {
+    "pose_delta_cm_deg": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   "frames": [
+    0,
+    7
+   ],
+   "samples": 8
+  }
+ },
+ "chain": [
+  {
+   "from": "ROOT_QuietIdle f0",
+   "to": "ROOT_Anticipate f0",
+   "max_head_delta_cm": 0.0,
+   "max_rot_delta_deg": 0.0,
+   "max_shape_key_delta": 0.0,
+   "hard_cut": false
+  },
+  {
+   "from": "ROOT_Anticipate fN",
+   "to": "ROOT_Inhale f0",
+   "max_head_delta_cm": 0.0,
+   "max_rot_delta_deg": 0.0,
+   "max_shape_key_delta": 0.0,
+   "hard_cut": false
+  },
+  {
+   "from": "ROOT_Inhale fN",
+   "to": "ROOT_Scream f0",
+   "max_head_delta_cm": 0.0,
+   "max_rot_delta_deg": 0.0,
+   "max_shape_key_delta": 0.0,
+   "hard_cut": false
+  },
+  {
+   "from": "ROOT_Scream fN",
+   "to": "ROOT_Recover f0",
+   "max_head_delta_cm": 0.0,
+   "max_rot_delta_deg": 0.0,
+   "max_shape_key_delta": 0.0,
+   "hard_cut": false
+  },
+  {
+   "from": "ROOT_Recover fN",
+   "to": "ROOT_RecoveryIdle f0",
+   "max_head_delta_cm": 0.0,
+   "max_rot_delta_deg": 0.0,
+   "max_shape_key_delta": 0.0,
+   "hard_cut": false
+  },
+  {
+   "from": "ROOT_RecoveryIdle f0",
+   "to": "ROOT_AnticipateTired f0",
+   "max_head_delta_cm": 0.0,
+   "max_rot_delta_deg": 0.0,
+   "max_shape_key_delta": 0.0,
+   "hard_cut": false
+  },
+  {
+   "from": "ROOT_AnticipateTired fN",
+   "to": "ROOT_Inhale f0",
+   "max_head_delta_cm": 0.0,
+   "max_rot_delta_deg": 0.0,
+   "max_shape_key_delta": 0.0,
+   "hard_cut": false
+  },
+  {
+   "from": "ROOT_RecoveryIdle fany",
+   "to": "ROOT_AnticipateTired f0",
+   "max_head_delta_cm": 0.44542,
+   "max_rot_delta_deg": 2.2985,
+   "max_shape_key_delta": 0.0,
+   "hard_cut": true
+  },
+  {
+   "from": "ROOT_RecoveryIdle f0",
+   "to": "ROOT_Anticipate f0",
+   "max_head_delta_cm": 1.95521,
+   "max_rot_delta_deg": 42.4622,
+   "max_shape_key_delta": 0.0,
+   "hard_cut": true
+  },
+  {
+   "from": "ROOT_QuietIdle fany",
+   "to": "ROOT_Anticipate f0",
+   "max_head_delta_cm": 0.48077,
+   "max_rot_delta_deg": 4.1313,
+   "max_shape_key_delta": 0.0,
+   "hard_cut": true
+  },
+  {
+   "from": "ROOT_RecoveryIdle fany",
+   "to": "ROOT_Anticipate f0",
+   "max_head_delta_cm": 2.35608,
+   "max_rot_delta_deg": 41.993,
+   "max_shape_key_delta": 0.0,
+   "hard_cut": true
+  },
+  {
+   "from": "SRC_Idle f0",
+   "to": "SRC_Grip f0",
+   "max_head_delta_cm": 0.0,
+   "max_rot_delta_deg": 0.0,
+   "max_shape_key_delta": 0.0,
+   "hard_cut": false
+  },
+  {
+   "from": "SRC_Grip fN",
+   "to": "SRC_Tug f0",
+   "max_head_delta_cm": 0.0,
+   "max_rot_delta_deg": 0.0,
+   "max_shape_key_delta": 0.0,
+   "hard_cut": false
+  },
+  {
+   "from": "SRC_Tug fN",
+   "to": "SRC_Release f0",
+   "max_head_delta_cm": 0.0,
+   "max_rot_delta_deg": 0.0,
+   "max_shape_key_delta": 0.0,
+   "hard_cut": false
+  },
+  {
+   "from": "SRC_Tug fN",
+   "to": "SRC_Cancel f0",
+   "max_head_delta_cm": 0.0,
+   "max_rot_delta_deg": 0.0,
+   "max_shape_key_delta": 0.0,
+   "hard_cut": false
+  },
+  {
+   "from": "SRC_Cancel fN",
+   "to": "SRC_Idle f0",
+   "max_head_delta_cm": 0.0,
+   "max_rot_delta_deg": 0.0,
+   "max_shape_key_delta": 0.0,
+   "hard_cut": false
+  },
+  {
+   "from": "SRC_Release fN",
+   "to": "ROOT_QuietIdle f0",
+   "max_head_delta_cm": 0.0,
+   "max_rot_delta_deg": 0.0,
+   "max_shape_key_delta": 0.0,
+   "hard_cut": false
+  }
+ ],
+ "envelope": {
+  "min": [
+   -21.665,
+   -21.32,
+   -1.8
+  ],
+  "max": [
+   20.036,
+   21.32,
+   61.789
+  ],
+  "h_z": 63.589,
+  "w_y": 42.641,
+  "d_x": 41.702,
+  "limit_h_w_d": [
+   66.0,
+   42.0,
+   39.0
+  ],
+  "exceeds": {
+   "w": 0.641,
+   "d": 2.702
+  }
+ },
+ "planted": {
+  "body_offset_z_cm": -1.8,
+  "seam_top_z": 20.4,
+  "bulb_top_z": 33.3,
+  "soil_line_z": 28.8,
+  "shoulder_above_soil_cm": 4.5,
+  "taproot_tip_z": -1.8
+ },
+ "fails": [],
+ "seconds": 12.0
+}

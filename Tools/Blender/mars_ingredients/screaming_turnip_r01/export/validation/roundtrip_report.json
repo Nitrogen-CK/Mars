@@ -1,0 +1,215 @@
+{
+ "cube": {
+  "object_scale": [
+   1.0,
+   1.0,
+   1.0
+  ],
+  "bounds_min": [
+   -5.0,
+   -5.0,
+   -5.0
+  ],
+  "bounds_max": [
+   5.0,
+   5.0,
+   5.0
+  ]
+ },
+ "sk": {
+  "armature_object": "Armature",
+  "armature_scale": [
+   1.0,
+   1.0,
+   1.0
+  ],
+  "bone_count": 17,
+  "extra_bones": [],
+  "missing_bones": [],
+  "wrong_parents": [],
+  "max_bind_head_error_cm": 6.5e-05,
+  "max_bind_rest_rotation_error_deg": 0.0,
+  "tris": 1276,
+  "slots": [
+   "Skin",
+   "Leaf",
+   "Mouth",
+   "Teeth"
+  ],
+  "bounds_error_cm": 2.9e-05,
+  "colour_attributes": [
+   [
+    "Col",
+    "BYTE_COLOR",
+    "CORNER"
+   ]
+  ],
+  "weights": {
+   "max_influences": 3,
+   "unnormalized": 0,
+   "unweighted": 0,
+   "non_bone_groups": [],
+   "root_weighted_verts": 0
+  }
+ },
+ "clip": {
+  "actions": [
+   "Armature|Scene"
+  ],
+  "armature_object": "Armature",
+  "armature_scale": [
+   1.0,
+   1.0,
+   1.0
+  ],
+  "bone_count": 17,
+  "extra_bones": [],
+  "missing_bones": [],
+  "wrong_parents": [],
+  "max_bind_head_error_cm": 6.5e-05,
+  "max_bind_rest_rotation_error_deg": 0.0,
+  "frame_range": [
+   0.0,
+   18.0
+  ],
+  "keyed_frames": [
+   0,
+   18,
+   19
+  ],
+  "bones_with_non_unit_scale_keys": [
+   "body",
+   "cheek_l",
+   "cheek_r",
+   "crown",
+   "taproot"
+  ],
+  "root_max_deviation_all_frames": 0.0,
+  "keys": {
+   "0": {
+    "landmark_err_cm": 6.5e-05,
+    "mesh_bounds_err_cm": 3e-05,
+    "cheek_l_scale": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "cheek_l_scale_authored": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "body_scale": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "body_scale_authored": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "scale_err": 0.0
+   },
+   "9": {
+    "landmark_err_cm": 6.6e-05,
+    "mesh_bounds_err_cm": 4.6e-05,
+    "cheek_l_scale": [
+     0.95,
+     0.95,
+     0.95
+    ],
+    "cheek_l_scale_authored": [
+     0.95,
+     0.95,
+     0.95
+    ],
+    "body_scale": [
+     1.3,
+     0.9,
+     1.3
+    ],
+    "body_scale_authored": [
+     1.3,
+     0.9,
+     1.3
+    ],
+    "scale_err": 0.0
+   },
+   "18": {
+    "landmark_err_cm": 6.5e-05,
+    "mesh_bounds_err_cm": 3e-05,
+    "cheek_l_scale": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "cheek_l_scale_authored": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "body_scale": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "body_scale_authored": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "scale_err": 0.0
+   }
+  },
+  "max_landmark_err_cm": 6.6e-05,
+  "max_mesh_bounds_err_cm": 4.6e-05,
+  "max_scale_key_err": 0.0
+ },
+ "statics": {
+  "TurnipBed_R01": {
+   "object_scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "tris": 224,
+   "slots": [
+    "Soil"
+   ],
+   "bounds_error_cm": 2.9e-05,
+   "boundary_edges": 0
+  },
+  "TurnipBedEmpty_R01": {
+   "object_scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "tris": 288,
+   "slots": [
+    "Soil"
+   ],
+   "bounds_error_cm": 2.9e-05,
+   "boundary_edges": 0
+  },
+  "ScreamingTurnip_R01_Collision": {
+   "object_scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "tris": 36,
+   "slots": [],
+   "bounds_error_cm": 1.1e-05,
+   "boundary_edges": 0
+  }
+ },
+ "tolerances": {
+  "pos_cm": 0.1,
+  "cube_cm": 0.01,
+  "scale": 0.01,
+  "rest_rot_deg": 0.01
+ },
+ "fails": []
+}

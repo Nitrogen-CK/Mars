@@ -1,0 +1,55 @@
+00:01.625  blend            | Read blend: "D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\source\ScreamingTurnip_R01.blend"
+PAIR measurements    lengths    222 areas   4 zero    63 skipped    364 worst_rel 0.00000 fails 0 missing 0
+PAIR pose_report     lengths    361 areas   0 zero    13 skipped    172 worst_rel 0.00287 fails 0 missing 0
+PAIR anim_report     lengths    166 areas   0 zero    31 skipped   1022 worst_rel 0.00005 fails 0 missing 0
+PAIR expected        lengths     76 areas   0 zero    19 skipped     88 worst_rel 0.00000 fails 0 missing 0
+PAIR expected_anims  lengths 107682 areas   0 zero  4890 skipped   7090 worst_rel 0.00000 fails 0 missing 0
+BLEND {"ScreamingTurnip_R01_Body": {"verts": [1624, 1624], "polys": [3188, 3188], "vertex_err_cm": 1.9073486328125e-06, "polygons_identical": true, "material_index_identical": true, "vertex_colour_max_diff": 0.0, "shape_keys": {"Basis": 1.9073486328125e-06, "Inhale": 1.9073486328125e-06, "Scream": 1.9073486328125e-06}, "weights_max_diff": 0.0, "location": [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0]], "location_err_cm": 0.0}, "TurnipBed_R01": {"verts": [114, 114], "polys": [224, 224], "vertex_err_cm": 1.9073486328125e-06, "polygons_identical": true, "material_index_identical": true, "vertex_colour_max_diff": 0.0, "location": [[0.0, 0.0, 9.600000381469727], [0.0, 0.0, 28.80000114440918]], "location_err_cm": 0.0}, "TurnipBedEmpty_R01": {"verts": [144, 144], "polys": [288, 288], "vertex_err_cm": 1.9073486328125e-06, "polygons_identical": true, "material_index_identical": true, "vertex_colour_max_diff": 0.0, "location": [[0.0, 0.0, 9.600000381469727], [0.0, 0.0, 28.80000114440918]], "location_err_cm": 0.0}, "ScreamingTurnip_R01_Collision": {"verts": [22, 22], "polys": [40, 40], "vertex_err_cm": 9.5367431640625e-07, "polygons_identical": true, "material_index_identical": true, "vertex_colour_max_diff": 0.0, "location": [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0]], "location_err_cm": 0.0}, "bones": {"count": [17, 17], "head_err_cm": 0.0, "tail_err_cm": 0.0, "rest_rot_err_deg": 0.0, "parents_identical": true}}
+RATIO neutral height (tip to highest leaf)         B3       16.0  B4       48.0  x3.0
+RATIO neutral width w_y                            B3     13.361  B4     40.082  x2.9999
+RATIO neutral depth d_x                            B3     11.301  B4     33.904  x3.0001
+RATIO bulb h_z                                     B3        9.9  B4       29.7  x3.0
+RATIO bulb w_y                                     B3      9.338  B4     28.013  x2.9999
+RATIO bulb d_x                                     B3      7.944  B4     23.832  x3.0
+RATIO body bone head z                             B3      6.825  B4     20.475  x3.0
+RATIO jaw hinge x                                  B3       -0.5  B4       -1.5  x3.0
+RATIO jaw hinge z                                  B3        4.2  B4       12.6  x3.0
+RATIO crown base z                                 B3      11.55  B4      34.65  x3.0
+RATIO cheek_l head y                               B3        3.3  B4        9.9  x3.0
+RATIO Grip_L y (UE)                                B3      -3.94  B4     -11.82  x3.0
+RATIO Grip_L z                                     B3        4.0  B4       12.0  x3.0
+RATIO MouthCue x                                   B3      4.136  B4     12.407  x2.9998
+RATIO MouthCue z                                   B3        6.4  B4       19.2  x3.0
+RATIO SoilLine z                                   B3        9.6  B4       28.8  x3.0
+RATIO HarvestGrip_L z                              B3     12.678  B4     38.035  x3.0001
+RATIO hull extents d_x                             B3      9.461  B4     28.384  x3.0001
+RATIO hull extents w_y                             B3        9.9  B4       29.7  x3.0
+RATIO hull extents h_z                             B3        9.9  B4       29.7  x3.0
+RATIO hull front x (widened)                       B3      5.061  B4     15.184  x3.0002
+RATIO hull centre offset x                         B3      0.331  B4      0.992  x2.997
+RATIO hull centre offset z                         B3       6.75  B4      20.25  x3.0
+RATIO bed outer w                                  B3       24.0  B4       72.0  x3.0
+RATIO bed h                                        B3      4.087  B4      12.26  x2.9998
+RATIO bed top z (above soil line)                  B3      0.687  B4       2.06  x2.9985
+RATIO bed scene z                                  B3        9.6  B4       28.8  x3.0
+RATIO muzzle protrusion max                        B3       1.04  B4       3.12  x3.0
+RATIO seam floor x_c                               B3      3.349  B4     10.047  x3.0
+RATIO Inhale key max rest delta                    B3      2.266  B4      6.798  x3.0
+RATIO Scream key max rest delta                    B3      3.532  B4     10.596  x3.0
+RATIO scream pose height                           B3     19.858  B4     59.574  x3.0
+RATIO scream side lip separation                   B3      5.976  B4     17.929  x3.0002
+RATIO scream cavity depth                          B3      3.635  B4     10.904  x2.9997
+RATIO inhale lobe forward (l)                      B3      1.906  B4      5.717  x2.9995
+RATIO recover width                                B3     13.831  B4     41.494  x3.0001
+RATIO clip envelope h                              B3     21.196  B4     63.589  x3.0
+RATIO clip envelope w                              B3     14.214  B4     42.641  x2.9999
+RATIO clip envelope d                              B3     13.901  B4     41.702  x2.9999
+RATIO ROOT_Scream clip height                      B3     20.596  B4     61.789  x3.0
+RATIO planted seam top z                           B3        6.8  B4       20.4  x3.0
+RATIO planted shoulder above soil                  B3        1.5  B4        4.5  x3.0
+RATIO QuietIdle->Anticipate hard cut (cm)          B3    0.16026  B4    0.48077  x2.9999
+RATIO RecoveryIdle any->AnticipateTired cut (cm)   B3    0.14847  B4    0.44542  x3.0001
+TURNIP_OK
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+
+Blender quit

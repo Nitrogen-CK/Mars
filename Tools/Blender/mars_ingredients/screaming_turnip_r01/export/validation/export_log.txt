@@ -1,0 +1,30 @@
+00:01.532  blend            | Read blend: "D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\source\ScreamingTurnip_R01.blend"
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_ingredients\\screaming_turnip_r01\\export\\validation\\Cube10_Mars_SM.fbx'
+export finished in 0.0035 sec.
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_ingredients\\screaming_turnip_r01\\export\\validation\\TurnipBed_R01_Mars_SM.fbx'
+export finished in 0.0043 sec.
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_ingredients\\screaming_turnip_r01\\export\\validation\\TurnipBedEmpty_R01_Mars_SM.fbx'
+export finished in 0.0034 sec.
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_ingredients\\screaming_turnip_r01\\export\\validation\\ScreamingTurnip_R01_Collision_Mars_SM.fbx'
+export finished in 0.0023 sec.
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_ingredients\\screaming_turnip_r01\\export\\validation\\ScreamingTurnip_R01_Blockout_Mars_SK.fbx'
+export finished in 0.0116 sec.
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_ingredients\\screaming_turnip_r01\\export\\validation\\ScreamingTurnip_R01_Blockout_ScreamTest_Mars_ANIM.fbx'
+export finished in 0.0362 sec.
+EXPORTED cube                          12204 bytes  header {"magic": "Kaydara FBX Binary", "file_version": 7400, "FBXHeaderVersion": 1003, "FBXVersion": 7400, "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"}
+EXPORTED TurnipBed_R01                 22412 bytes  header {"magic": "Kaydara FBX Binary", "file_version": 7400, "FBXHeaderVersion": 1003, "FBXVersion": 7400, "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"}
+EXPORTED TurnipBedEmpty_R01            24428 bytes  header {"magic": "Kaydara FBX Binary", "file_version": 7400, "FBXHeaderVersion": 1003, "FBXVersion": 7400, "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"}
+EXPORTED ScreamingTurnip_R01_Collision    12748 bytes  header {"magic": "Kaydara FBX Binary", "file_version": 7400, "FBXHeaderVersion": 1003, "FBXVersion": 7400, "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"}
+EXPORTED sk                            92156 bytes  header {"magic": "Kaydara FBX Binary", "file_version": 7400, "FBXHeaderVersion": 1003, "FBXVersion": 7400, "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"}
+EXPORTED clip                         210924 bytes  header {"magic": "Kaydara FBX Binary", "file_version": 7400, "FBXHeaderVersion": 1003, "FBXVersion": 7400, "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"}
+CLIPKEYS {"0": {"cheek_l.scale": [1.0, 1.0, 1.0], "body.scale": [1.0, 1.0, 1.0]}, "9": {"cheek_l.scale": [0.95, 0.95, 0.95], "body.scale": [1.3, 0.9, 1.3]}, "18": {"cheek_l.scale": [1.0, 1.0, 1.0], "body.scale": [1.0, 1.0, 1.0]}}
+TURNIP_OK
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+
+Blender quit

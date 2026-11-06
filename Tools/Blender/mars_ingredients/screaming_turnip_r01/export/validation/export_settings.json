@@ -1,0 +1,164 @@
+{
+ "blender_version": "5.2.2 LTS",
+ "fbx_addon_version": "5.15.0",
+ "scene_unit_settings": {
+  "system": "METRIC",
+  "scale_length": 0.009999999776482582,
+  "length_unit": "CENTIMETERS"
+ },
+ "frame_map": "Blender (x, y, z) BU=cm  ->  Unreal (x, -y, z) cm",
+ "armature_export_name": "Armature (renamed during export only; Unreal drops this root node)",
+ "static_mesh_args": {
+  "use_selection": true,
+  "apply_unit_scale": true,
+  "apply_scale_options": "FBX_SCALE_NONE",
+  "global_scale": 1.0,
+  "axis_forward": "-Z",
+  "axis_up": "Y",
+  "use_mesh_modifiers": false,
+  "mesh_smooth_type": "FACE",
+  "use_triangles": true,
+  "use_tspace": false,
+  "add_leaf_bones": false,
+  "path_mode": "STRIP",
+  "colors_type": "SRGB",
+  "use_custom_props": false,
+  "bake_space_transform": false,
+  "object_types": [
+   "MESH"
+  ],
+  "bake_anim": false
+ },
+ "bind_args": {
+  "use_selection": true,
+  "apply_unit_scale": true,
+  "apply_scale_options": "FBX_SCALE_NONE",
+  "global_scale": 1.0,
+  "axis_forward": "-Z",
+  "axis_up": "Y",
+  "use_mesh_modifiers": false,
+  "mesh_smooth_type": "FACE",
+  "use_triangles": true,
+  "use_tspace": false,
+  "add_leaf_bones": false,
+  "path_mode": "STRIP",
+  "colors_type": "SRGB",
+  "use_custom_props": false,
+  "bake_space_transform": false,
+  "object_types": [
+   "ARMATURE",
+   "MESH"
+  ],
+  "primary_bone_axis": "Y",
+  "secondary_bone_axis": "X",
+  "use_armature_deform_only": true,
+  "armature_nodetype": "NULL",
+  "bake_anim": false
+ },
+ "clip_args": {
+  "use_selection": true,
+  "apply_unit_scale": true,
+  "apply_scale_options": "FBX_SCALE_NONE",
+  "global_scale": 1.0,
+  "axis_forward": "-Z",
+  "axis_up": "Y",
+  "use_mesh_modifiers": false,
+  "mesh_smooth_type": "FACE",
+  "use_triangles": true,
+  "use_tspace": false,
+  "add_leaf_bones": false,
+  "path_mode": "STRIP",
+  "colors_type": "SRGB",
+  "use_custom_props": false,
+  "bake_space_transform": false,
+  "object_types": [
+   "ARMATURE",
+   "MESH"
+  ],
+  "primary_bone_axis": "Y",
+  "secondary_bone_axis": "X",
+  "use_armature_deform_only": true,
+  "armature_nodetype": "NULL",
+  "bake_anim": true,
+  "bake_anim_use_all_bones": true,
+  "bake_anim_use_nla_strips": false,
+  "bake_anim_use_all_actions": false,
+  "bake_anim_force_startend_keying": true,
+  "bake_anim_step": 1.0,
+  "bake_anim_simplify_factor": 0.0
+ },
+ "clip_action": "ScreamingTurnip_R01_ScreamTest",
+ "actions_in_blend": [
+  "ScreamingTurnip_R01_ScreamTest"
+ ],
+ "static_location_note": "TurnipBed_R01 / TurnipBedEmpty_R01 sit at SoilLine z in the scene; location zeroed for export so the FBX origin is the soil-line centre",
+ "vertex_colour": "corner attribute `Col` (BYTE_COLOR) exported with colors_type=SRGB: RGB = albedo as sRGB bytes, A = 1.0 (cavity bake is Phase B)",
+ "files": {
+  "cube": {
+   "path": "export\\validation\\Cube10_Mars_SM.fbx",
+   "bytes": 12204,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "FBXHeaderVersion": 1003,
+    "FBXVersion": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "TurnipBed_R01": {
+   "path": "export\\validation\\TurnipBed_R01_Mars_SM.fbx",
+   "bytes": 22412,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "FBXHeaderVersion": 1003,
+    "FBXVersion": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "TurnipBedEmpty_R01": {
+   "path": "export\\validation\\TurnipBedEmpty_R01_Mars_SM.fbx",
+   "bytes": 24428,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "FBXHeaderVersion": 1003,
+    "FBXVersion": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "ScreamingTurnip_R01_Collision": {
+   "path": "export\\validation\\ScreamingTurnip_R01_Collision_Mars_SM.fbx",
+   "bytes": 12748,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "FBXHeaderVersion": 1003,
+    "FBXVersion": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "sk": {
+   "path": "export\\validation\\ScreamingTurnip_R01_Blockout_Mars_SK.fbx",
+   "bytes": 92156,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "FBXHeaderVersion": 1003,
+    "FBXVersion": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "clip": {
+   "path": "export\\validation\\ScreamingTurnip_R01_Blockout_ScreamTest_Mars_ANIM.fbx",
+   "bytes": 210924,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "FBXHeaderVersion": 1003,
+    "FBXVersion": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  }
+ }
+}

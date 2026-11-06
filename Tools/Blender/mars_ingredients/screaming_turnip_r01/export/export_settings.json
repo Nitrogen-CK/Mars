@@ -1,0 +1,305 @@
+{
+ "blender_version": "5.2.2 LTS",
+ "fbx_addon_version": "5.15.0",
+ "recipe_change_DEV_13": {
+  "what": "use_triangles=False for the bind SK and every clip (statics unchanged: use_triangles=True)",
+  "why": "with use_triangles=True the exporter writes the mesh from a temporary triangulated copy whose Key is not animated: every baked shape-key value is 0.0 (BlendShapeChannel / DeformPercent curves present but all zero); the mesh is already all triangles, so False writes the same polygons and keeps the animated Key",
+  "proof": [
+   "review/phaseB2b/shapekey_roundtrip.json (False: value 1.0 at the peak, verts 8e-6 cm)",
+   "review/phaseB2b/shapekey_roundtrip_verbatim.json (True: value 0.0, peak mesh off 3.53 cm)",
+   "export/anims/roundtrip_report.json (B3: every clip's curves read back)"
+  ],
+  "guard": "export asserts the body mesh is all triangles before every skeletal export"
+ },
+ "static_mesh_args": {
+  "use_selection": true,
+  "apply_unit_scale": true,
+  "apply_scale_options": "FBX_SCALE_NONE",
+  "global_scale": 1.0,
+  "axis_forward": "-Z",
+  "axis_up": "Y",
+  "use_mesh_modifiers": false,
+  "mesh_smooth_type": "FACE",
+  "use_triangles": true,
+  "use_tspace": false,
+  "add_leaf_bones": false,
+  "path_mode": "STRIP",
+  "colors_type": "SRGB",
+  "use_custom_props": false,
+  "bake_space_transform": false,
+  "object_types": [
+   "MESH"
+  ],
+  "bake_anim": false
+ },
+ "bind_args": {
+  "use_selection": true,
+  "apply_unit_scale": true,
+  "apply_scale_options": "FBX_SCALE_NONE",
+  "global_scale": 1.0,
+  "axis_forward": "-Z",
+  "axis_up": "Y",
+  "use_mesh_modifiers": false,
+  "mesh_smooth_type": "FACE",
+  "use_triangles": false,
+  "use_tspace": false,
+  "add_leaf_bones": false,
+  "path_mode": "STRIP",
+  "colors_type": "SRGB",
+  "use_custom_props": false,
+  "bake_space_transform": false,
+  "object_types": [
+   "ARMATURE",
+   "MESH"
+  ],
+  "primary_bone_axis": "Y",
+  "secondary_bone_axis": "X",
+  "use_armature_deform_only": true,
+  "armature_nodetype": "NULL",
+  "bake_anim": false
+ },
+ "clip_args": {
+  "use_selection": true,
+  "apply_unit_scale": true,
+  "apply_scale_options": "FBX_SCALE_NONE",
+  "global_scale": 1.0,
+  "axis_forward": "-Z",
+  "axis_up": "Y",
+  "use_mesh_modifiers": false,
+  "mesh_smooth_type": "FACE",
+  "use_triangles": false,
+  "use_tspace": false,
+  "add_leaf_bones": false,
+  "path_mode": "STRIP",
+  "colors_type": "SRGB",
+  "use_custom_props": false,
+  "bake_space_transform": false,
+  "object_types": [
+   "ARMATURE",
+   "MESH"
+  ],
+  "primary_bone_axis": "Y",
+  "secondary_bone_axis": "X",
+  "use_armature_deform_only": true,
+  "armature_nodetype": "NULL",
+  "bake_anim": true,
+  "bake_anim_use_all_bones": true,
+  "bake_anim_use_nla_strips": false,
+  "bake_anim_use_all_actions": false,
+  "bake_anim_force_startend_keying": true,
+  "bake_anim_step": 1.0,
+  "bake_anim_simplify_factor": 0.0
+ },
+ "files": {
+  "export\\validation\\Cube10_Mars_SM.fbx": {
+   "bytes": 12204,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "FBXHeaderVersion": 1003,
+    "FBXVersion": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "export\\TurnipBed_R01_Mars_SM.fbx": {
+   "bytes": 22428,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "FBXHeaderVersion": 1003,
+    "FBXVersion": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "export\\TurnipBedEmpty_R01_Mars_SM.fbx": {
+   "bytes": 24412,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "FBXHeaderVersion": 1003,
+    "FBXVersion": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "export\\ScreamingTurnip_R01_Collision_Mars_SM.fbx": {
+   "bytes": 12956,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "FBXHeaderVersion": 1003,
+    "FBXVersion": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "export\\ScreamingTurnip_R01_Mars_SK.fbx": {
+   "bytes": 227628,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "FBXHeaderVersion": 1003,
+    "FBXVersion": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "export\\anims\\ScreamingTurnip_R01_SRC_Idle_Mars_ANIM.fbx": {
+   "bytes": 390076,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "FBXHeaderVersion": 1003,
+    "FBXVersion": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "export\\anims\\ScreamingTurnip_R01_SRC_Grip_Mars_ANIM.fbx": {
+   "bytes": 330716,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "FBXHeaderVersion": 1003,
+    "FBXVersion": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "export\\anims\\ScreamingTurnip_R01_SRC_Tug_Mars_ANIM.fbx": {
+   "bytes": 348652,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "FBXHeaderVersion": 1003,
+    "FBXVersion": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "export\\anims\\ScreamingTurnip_R01_SRC_Release_Mars_ANIM.fbx": {
+   "bytes": 330716,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "FBXHeaderVersion": 1003,
+    "FBXVersion": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "export\\anims\\ScreamingTurnip_R01_SRC_Cancel_Mars_ANIM.fbx": {
+   "bytes": 332716,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "FBXHeaderVersion": 1003,
+    "FBXVersion": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "export\\anims\\ScreamingTurnip_R01_ROOT_QuietIdle_Mars_ANIM.fbx": {
+   "bytes": 391948,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "FBXHeaderVersion": 1003,
+    "FBXVersion": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "export\\anims\\ScreamingTurnip_R01_ROOT_Anticipate_Mars_ANIM.fbx": {
+   "bytes": 336700,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "FBXHeaderVersion": 1003,
+    "FBXVersion": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "export\\anims\\ScreamingTurnip_R01_ROOT_AnticipateTired_Mars_ANIM.fbx": {
+   "bytes": 336700,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "FBXHeaderVersion": 1003,
+    "FBXVersion": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "export\\anims\\ScreamingTurnip_R01_ROOT_Inhale_Mars_ANIM.fbx": {
+   "bytes": 366540,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "FBXHeaderVersion": 1003,
+    "FBXVersion": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "export\\anims\\ScreamingTurnip_R01_ROOT_Scream_Mars_ANIM.fbx": {
+   "bytes": 349804,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "FBXHeaderVersion": 1003,
+    "FBXVersion": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "export\\anims\\ScreamingTurnip_R01_ROOT_Recover_Mars_ANIM.fbx": {
+   "bytes": 370060,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "FBXHeaderVersion": 1003,
+    "FBXVersion": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "export\\anims\\ScreamingTurnip_R01_ROOT_RecoveryIdle_Mars_ANIM.fbx": {
+   "bytes": 392460,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "FBXHeaderVersion": 1003,
+    "FBXVersion": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "export\\anims\\ScreamingTurnip_R01_ROOT_AirborneLeafTrail_Mars_ANIM.fbx": {
+   "bytes": 370060,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "FBXHeaderVersion": 1003,
+    "FBXVersion": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "export\\anims\\ScreamingTurnip_R01_ROOT_ImpactSquash_Mars_ANIM.fbx": {
+   "bytes": 332716,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "FBXHeaderVersion": 1003,
+    "FBXVersion": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "export\\anims\\ScreamingTurnip_R01_ROOT_SettleRock_Mars_ANIM.fbx": {
+   "bytes": 342668,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "FBXHeaderVersion": 1003,
+    "FBXVersion": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "export\\anims\\ScreamingTurnip_R01_ROOT_PlaceSettle_Mars_ANIM.fbx": {
+   "bytes": 332716,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "FBXHeaderVersion": 1003,
+    "FBXVersion": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  }
+ }
+}

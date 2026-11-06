@@ -1,0 +1,418 @@
+{
+ "bones": [
+  {
+   "name": "root",
+   "parent": null,
+   "head_ue_cm": [
+    0.0,
+    -0.0,
+    0.0
+   ],
+   "length_cm": 6.0,
+   "rest_quat_blender": [
+    1.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "body",
+   "parent": "root",
+   "head_ue_cm": [
+    0.0,
+    -0.0,
+    20.475
+   ],
+   "length_cm": 9.0,
+   "rest_quat_blender": [
+    1.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "jaw",
+   "parent": "body",
+   "head_ue_cm": [
+    -1.5,
+    -0.0,
+    12.6
+   ],
+   "length_cm": 6.0,
+   "rest_quat_blender": [
+    1.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "cheek_l",
+   "parent": "body",
+   "head_ue_cm": [
+    4.5,
+    -9.9,
+    19.2
+   ],
+   "length_cm": 4.5,
+   "rest_quat_blender": [
+    1.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "cheek_r",
+   "parent": "body",
+   "head_ue_cm": [
+    4.5,
+    9.9,
+    19.2
+   ],
+   "length_cm": 4.5,
+   "rest_quat_blender": [
+    1.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "crown",
+   "parent": "body",
+   "head_ue_cm": [
+    0.0,
+    -0.0,
+    34.65
+   ],
+   "length_cm": 4.5,
+   "rest_quat_blender": [
+    1.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "leaf_01_a",
+   "parent": "crown",
+   "head_ue_cm": [
+    2.7217,
+    -1.9774,
+    36.0
+   ],
+   "length_cm": 3.12197,
+   "rest_quat_blender": [
+    0.755616,
+    0.472162,
+    -0.240578,
+    -0.385006
+   ]
+  },
+  {
+   "name": "leaf_01_b",
+   "parent": "leaf_01_a",
+   "head_ue_cm": [
+    3.8289,
+    -2.7819,
+    38.806
+   ],
+   "length_cm": 16.58296,
+   "rest_quat_blender": [
+    0.873727,
+    0.174625,
+    -0.088976,
+    -0.445186
+   ]
+  },
+  {
+   "name": "leaf_02_a",
+   "parent": "crown",
+   "head_ue_cm": [
+    -1.1286,
+    -3.4735,
+    36.0
+   ],
+   "length_cm": 2.98216,
+   "rest_quat_blender": [
+    0.863852,
+    0.478841,
+    0.075841,
+    0.136821
+   ]
+  },
+  {
+   "name": "leaf_02_b",
+   "parent": "leaf_02_a",
+   "head_ue_cm": [
+    -1.6169,
+    -4.9764,
+    38.529
+   ],
+   "length_cm": 16.69839,
+   "rest_quat_blender": [
+    0.974906,
+    0.158388,
+    0.025086,
+    0.15441
+   ]
+  },
+  {
+   "name": "leaf_03_a",
+   "parent": "crown",
+   "head_ue_cm": [
+    -3.0223,
+    -0.0,
+    36.0
+   ],
+   "length_cm": 3.25037,
+   "rest_quat_blender": [
+    0.572061,
+    0.415627,
+    0.415627,
+    0.572061
+   ]
+  },
+  {
+   "name": "leaf_03_b",
+   "parent": "leaf_03_a",
+   "head_ue_cm": [
+    -4.0267,
+    -0.0,
+    39.0913
+   ],
+   "length_cm": 16.3108,
+   "rest_quat_blender": [
+    0.677802,
+    0.201454,
+    0.201455,
+    0.677802
+   ]
+  },
+  {
+   "name": "leaf_04_a",
+   "parent": "crown",
+   "head_ue_cm": [
+    -1.1286,
+    3.4735,
+    36.0
+   ],
+   "length_cm": 2.98216,
+   "rest_quat_blender": [
+    0.136821,
+    0.075841,
+    0.478841,
+    0.863852
+   ]
+  },
+  {
+   "name": "leaf_04_b",
+   "parent": "leaf_04_a",
+   "head_ue_cm": [
+    -1.6169,
+    4.9764,
+    38.529
+   ],
+   "length_cm": 16.69839,
+   "rest_quat_blender": [
+    0.15441,
+    0.025087,
+    0.158388,
+    0.974906
+   ]
+  },
+  {
+   "name": "leaf_05_a",
+   "parent": "crown",
+   "head_ue_cm": [
+    2.7217,
+    1.9774,
+    36.0
+   ],
+   "length_cm": 3.12197,
+   "rest_quat_blender": [
+    0.385006,
+    0.240578,
+    -0.472162,
+    -0.755616
+   ]
+  },
+  {
+   "name": "leaf_05_b",
+   "parent": "leaf_05_a",
+   "head_ue_cm": [
+    3.8289,
+    2.7819,
+    38.806
+   ],
+   "length_cm": 16.58296,
+   "rest_quat_blender": [
+    0.445186,
+    0.088976,
+    -0.174625,
+    -0.873727
+   ]
+  },
+  {
+   "name": "taproot",
+   "parent": "body",
+   "head_ue_cm": [
+    0.0,
+    -0.0,
+    5.7
+   ],
+   "length_cm": 3.0,
+   "rest_quat_blender": [
+    1.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  }
+ ],
+ "statics": {
+  "TurnipBed_R01": {
+   "object": "TurnipBed_R01",
+   "tris": 224,
+   "verts": 114,
+   "slots": [
+    "Soil"
+   ],
+   "bounds_ue_cm": {
+    "min": [
+     -36.0,
+     -36.0,
+     -10.2
+    ],
+    "max": [
+     36.0,
+     36.0,
+     2.0597
+    ]
+   },
+   "color_attribute": {
+    "name": "Col",
+    "type": "BYTE_COLOR",
+    "domain": "CORNER"
+   },
+   "file": "TurnipBed_R01_Mars_SM.fbx",
+   "scene_location_restored": [
+    0.0,
+    0.0,
+    28.80000114440918
+   ]
+  },
+  "TurnipBedEmpty_R01": {
+   "object": "TurnipBedEmpty_R01",
+   "tris": 288,
+   "verts": 144,
+   "slots": [
+    "Soil"
+   ],
+   "bounds_ue_cm": {
+    "min": [
+     -36.0,
+     -36.0,
+     -10.2
+    ],
+    "max": [
+     36.0,
+     36.0,
+     2.0597
+    ]
+   },
+   "color_attribute": {
+    "name": "Col",
+    "type": "BYTE_COLOR",
+    "domain": "CORNER"
+   },
+   "file": "TurnipBedEmpty_R01_Mars_SM.fbx",
+   "scene_location_restored": [
+    0.0,
+    0.0,
+    28.80000114440918
+   ]
+  },
+  "ScreamingTurnip_R01_Collision": {
+   "object": "ScreamingTurnip_R01_Collision",
+   "tris": 40,
+   "verts": 22,
+   "slots": [],
+   "bounds_ue_cm": {
+    "min": [
+     -13.2,
+     -14.85,
+     5.4
+    ],
+    "max": [
+     15.1839,
+     14.85,
+     35.1
+    ]
+   },
+   "color_attribute": {
+    "name": "Col",
+    "type": "BYTE_COLOR",
+    "domain": "CORNER"
+   },
+   "file": "ScreamingTurnip_R01_Collision_Mars_SM.fbx",
+   "scene_location_restored": [
+    0.0,
+    0.0,
+    0.0
+   ]
+  }
+ },
+ "cube": {
+  "file": "validation/Cube10_Mars_SM.fbx",
+  "bounds_ue_cm": {
+   "min": [
+    -5.0,
+    -5.0,
+    -5.0
+   ],
+   "max": [
+    5.0,
+    5.0,
+    5.0
+   ]
+  }
+ },
+ "sk": {
+  "object": "ScreamingTurnip_R01_Body",
+  "tris": 3188,
+  "verts": 1624,
+  "slots": [
+   "Skin",
+   "Leaf",
+   "Mouth",
+   "Teeth"
+  ],
+  "bounds_ue_cm": {
+   "min": [
+    -17.6897,
+    -20.0408,
+    0.0
+   ],
+   "max": [
+    16.2142,
+    20.0408,
+    48.0
+   ]
+  },
+  "color_attribute": {
+   "name": "Col",
+   "type": "BYTE_COLOR",
+   "domain": "CORNER"
+  },
+  "file": "ScreamingTurnip_R01_Mars_SK.fbx",
+  "shape_keys": [
+   "Basis",
+   "Inhale",
+   "Scream"
+  ]
+ }
+}

@@ -1,0 +1,2201 @@
+"""Screaming Turnip R01 - Phase A builder: faceted blockout, 17-bone export rig with explicit weights, four posed
+extremes (+ impact squash), statics, landmarks, the 19-frame scream test action (headless, reproducible, cm).
+
+Builds source/ScreamingTurnip_R01.blend from nothing:
+  Authoring  per-part editable solids `AUTH_*` (hidden, never exported)
+  Rig        empty (no control armature in Phase A: poses are rotations/scales of the export bones)
+  Export     `ScreamingTurnip_R01_Body` skinned to `ScreamingTurnip_R01_Armature` (17 bones),
+             `TurnipBed_R01`, `TurnipBedEmpty_R01`, `ScreamingTurnip_R01_Collision`
+  Review     camera, 10 cm rulers, label (render_screaming_turnip.py places them per shot)
+Action (fake user, not assigned): `ScreamingTurnip_R01_ScreamTest` frames 0..18 keyed on every export bone.
+
+Frame. 1 BU = 1 cm (scale_length 0.01), 30 fps. Mouth faces +X, +Z up, Blender (x, y, z) == Unreal (x, -y, z), so the
+turnip's LEFT (`_l`) is Blender +Y. Root bone at the origin = neutral taproot tip, rest matrix identity; it never moves.
+
+Rig contract that makes Blender and Unreal agree (see PROGRESS Phase A, D-A1): every non-leaf bone (root, body, jaw,
+cheek_l/_r, crown, taproot) has an IDENTITY rest rotation (points +Y, roll 0); body scale keeps depth == height factor
+(X == Z), the jaw and crown only rotate about Y, crown and taproot counter-scale the body. Under those rules the
+Unreal FTransform composition (per-axis scale, no shear) equals Blender's matrix composition exactly; the builder
+measures the difference per pose (`ue_dev_cm`).
+
+Phase B4 (size x3.0): every part, the rig, the shape keys and the statics are built in the 16 cm DESIGN frame (all the
+numbers below), then ONE global scale `P["SCALE"]` (3.0) multiplies every length: mesh vertices and every shape-key
+block, bone heads/tails (rest rotations and rolls unchanged), the statics and their scene location. Pose translations
+(body z, crown z, cheek offsets) scale through `unit()` in `bone_targets` (design -> world factor read off the rig, so
+every script that opens the blend agrees); rotations, scale factors, key values, timings and topology do not change.
+The builder proves it: every pose's evaluated mesh == SCALE x the design-frame mesh (`scale_check`).
+
+Run (from the screaming_turnip_r01 folder):
+  "$B" -b --factory-startup --python scripts/build_screaming_turnip.py -- [--no-save]
+Prints TURNIP_OK or TURNIP_FAIL <reason>; exits non-zero on failure. Renders: render_screaming_turnip.py.
+"""
+import json
+import math
+import os
+import sys
+import traceback
+
+import bmesh
+import bpy
+import numpy as np
+from mathutils import Matrix, Quaternion, Vector
+from mathutils.bvhtree import BVHTree
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+if HERE not in sys.path:
+    sys.path.insert(0, HERE)
+import turnip_audit  # noqa: E402
+
+ROOT = os.path.dirname(HERE)
+BLEND_FILE = os.path.join(ROOT, "source", "ScreamingTurnip_R01.blend")
+REVIEW = os.path.join(ROOT, "review", "phaseB4")
+MEASURE_JSON = os.path.join(REVIEW, "measurements.json")
+POSE_JSON = os.path.join(REVIEW, "pose_report.json")
+
+ARM_NAME = "ScreamingTurnip_R01_Armature"
+MESH_NAME = "ScreamingTurnip_R01_Body"
+BED_NAME = "TurnipBed_R01"
+BED_EMPTY_NAME = "TurnipBedEmpty_R01"
+COLL_NAME = "ScreamingTurnip_R01_Collision"
+CLIP_ACTION = "ScreamingTurnip_R01_ScreamTest"
+SLOTS = ("Skin", "Leaf", "Mouth", "Teeth")
+STATIC_SLOTS = ("Soil",)
+BONES = [("root", None), ("body", "root"), ("jaw", "body"), ("cheek_l", "body"), ("cheek_r", "body"),
+         ("crown", "body"), ("taproot", "body")]
+for _i in range(1, 6):
+    BONES += [("leaf_%02d_a" % _i, "crown"), ("leaf_%02d_b" % _i, "leaf_%02d_a" % _i)]
+BONE_NAMES = [b for b, _ in BONES]
+PART = {"bulb": 0, "lip": 1, "cavity": 2, "tooth": 3, "tooth_root": 4, "taproot": 5, "taproot_root": 6,
+        "stem": 7, "stem_root": 8, "blade": 9, "soil": 10, "hull": 11, "pad": 12, "gum": 13}
+
+
+def hexcol(h):
+    h = h.lstrip("#")
+    return tuple(int(h[i:i + 2], 16) / 255.0 for i in (0, 2, 4))
+
+
+PAL = {"ivory": hexcol("#F3E6D2"), "magenta": hexcol("#C0477E"), "leaf": hexcol("#7FA93C"),
+       "stem": hexcol("#5E8230"), "mouth": hexcol("#6B2A44"), "teeth": hexcol("#EFE4CC"),
+       "pad": hexcol("#F1C3AE"), "crease": hexcol("#C27C83"), "gum": hexcol("#8E3E5C"),
+       "soil": hexcol("#7A4F33"), "soil_top": hexcol("#8A5C3B"), "soil_pit": hexcol("#5A3A24")}
+
+
+def mix(a, b, t):
+    return tuple(x + (y - x) * t for x, y in zip(a, b))
+
+
+# ---------------------------------------------------------------- parameters (cm, degrees)
+P = {
+    # bulb profile (z, half-width along Y) sampled onto RING_Z; half-depth along X = half-width * DEPTH_RATIO
+    "PROFILE": [(1.95, 1.25), (2.5, 2.35), (3.2, 3.3), (4.05, 3.98), (4.85, 4.33), (5.4, 4.47), (5.9, 4.5),
+                (6.4, 4.5), (6.95, 4.47), (7.6, 4.34), (8.4, 4.04), (9.2, 3.6), (10.0, 3.0), (10.7, 2.3),
+                (11.25, 1.55), (11.7, 0.85)],
+    "RING_Z": [1.95, 2.5, 3.15, 3.8, 4.4, 4.95, 5.45, 5.95, 6.4, 6.85, 7.3, 7.8, 8.3, 8.85, 9.45, 10.05, 10.65,
+               11.2, 11.7],
+    "MOUTH_Z": 6.4,
+    "BOTTOM_Z": 1.8,               # bulb bottom cap centre
+    "TOP_DIP_Z": 11.55,            # crown dimple (crown bone head)
+    "DEPTH_RATIO": 8.0 / 9.0,
+    # azimuth of the shell columns, 0 = +X (mouth), +90 = +Y (turnip left); 11 deg over the face patch
+    "PHI": [-165, -150, -135, -120, -106, -92, -79, -66, -55, -44, -33, -22, -11, 0, 11, 22, 33, 44, 55, 66, 79,
+            92, 106, 120, 135, 150, 165, 180],
+    # face patch (Phase B2): the grid rectangle |phi| <= 66, z 3.8..8.85 is replaced by concentric loops around the
+    # seam centre: loop 0 = the lip edge on the crease floor (the closed X), then the lip wall / roll / crest / outer
+    # slope / outer crease edge / muzzle-to-bulb blend out to the rectangle (LOOP_F = fraction of the way from the X to
+    # the rectangle boundary along each spoke).
+    # B2b: the patch grew (|phi| <= 92, z 2.5..10.05, 60 spokes) so the scream rim fits inside it
+    "PATCH_PHI": 92, "PATCH_Z": (2.5, 10.05),
+    "LOOP_F": (0.0, 0.045, 0.10, 0.17, 0.26, 0.33, 0.41, 0.49, 0.58, 0.68, 0.79, 0.90, 1.0),   # B2b r07: denser outside the lips (round lobes)
+    # X seam: four lip pads (upper U, lower L, side S+/S-) meet on four arms from the centre to the tips
+    "X_TIP": (1.95, 1.0),          # B2b: (|y|, |dz|) of an arm tip from the seam centre (cm); span ~45% of the bulb
+    "X_BOW": 0.14,                 # B2b: arms bow toward the side wedge (flat at the centre, steep at the tips)
+    "X_GAP": 0.012,                 # gap between opposite pads at the closure line (L1)
+    "X_GROOVE": (0.08, 0.03),       # U / L pads: half-width of the crease opening at the lip edge, centre -> tip
+    "X_S_APEX": 0.75,               # B2b: the side pads end in a point this far from the centre (sheet 01 arrowheads);
+                                    # their edges run straight from it to the tips, the dark wedge opens between
+    "X_ROLL": 0.28,                # depth of the closure line behind the lip edge (along -X)
+    "X_S_ROLL_K": 1.0,
+    "SOCK0_BLEND": 1.0,            # B2b r08: gum level 0 (y, z) = lerp(closure line, pocket ellipse, this)             # B2b r08: the side pads' closure sits this x deeper (the dark wedge, no fold)
+    # muzzle field (2D in (y, dz) about the seam centre, offset along the bulb normal):
+    #   dome = H * (1 - smooth((r_e - r0) / (r1 - r0))), r_e = |(y / ay, dz / az)|
+    #   crease = D(s) * (1 - d / w(s))^2 within w of the nearest arm (d = distance to the arm, s = position along it)
+    #   pinch = P * (1 - smooth(r / pr)) around the centre;  h = dome - crease - pinch
+    "MUZZLE": {"h": 1.05, "ay": 2.45, "az": 1.9, "r0": 0.45, "r1": 1.30,
+               "crease": (1.0, 0.6), "cw": (0.70, 0.40), "slope": 1.2, "slope_drop": 0.30,
+               "pinch": 0.42, "pr": 0.9},
+    "PINCH": (0.0, 0.0),           # legacy (Phase B), unused
+    "LOBE": {"y": 3.3, "amp": 0.60, "sigma": 1.30},     # neutral cheek-lobe bump either side of the muzzle
+    # mouth pocket behind the closure: (depth behind the seam centre, half-width, half-height) of the open levels;
+    # the first two levels are the gum band, the rest the cavity, closed by BACK_DEPTH
+    "SOCK": [(0.55, 1.95, 0.85), (1.30, 2.15, 0.88), (2.15, 1.90, 0.78), (2.90, 1.30, 0.55)],
+    "BACK_DEPTH": 3.40,
+    "GUM_LEVELS": 2,
+    "POCKET_ALPHA_FLOOR": 0.70,    # B2b r14: cavity-bake floor on the pocket faces (open at the scream)
+    "JAW_HINGE": (-0.5, 4.2),      # (x, z); low hinge: the dropping lower lip swings forward, not into the bulb
+    "JAW_PHI_FULL": 30, "JAW_PHI_ZERO": 72,      # jaw field 1 inside |phi| <= FULL, 0 beyond ZERO
+    "JAW_Z_FULL": 5.5, "JAW_Z_ZERO": 2.7, "JAW_Z_TOP": 6.2,   # jaw field band below the seam
+    "CHEEK_HEAD": (1.5, 3.3),      # cheek bone head (x, |y|) at MOUTH_Z: the lobe centre, forward of the bulb centre
+    "CHEEK_R0": 1.6, "CHEEK_R1": 3.4, "CHEEK_ZSQ": 0.8,   # lobe weight 1 inside R0, 0 beyond R1; z distances x0.8
+    # B2b weights (decision 1): lips decoupled from the cheeks. Patch loops 0..LIP_LOOPS-1 (lips, crease floor, outer
+    # slope), the closure line and the pocket carry body (upper) / jaw (lower) only, split by height about the seam
+    # (jaw = smooth((-dz + j_band) / (2 j_band))); the cheek (lobe) weight ramps in over the muzzle's outer loops
+    # (CHEEK_RAMP loops) and the jaw hands over to the jaw field there; the grid is lobe + jaw field.
+    "W": {"lip_loops": 5, "cheek_ramp": 2.0, "j_band": 0.35},
+    "U_CENTRE_CHEEK": 0.25,        # legacy (Phase B), unused
+    # colour: magenta shoulders, two blended facet rows whose lower edge random-walks +-1 row per column, ivory
+    "BAND_ROW": 12, "BAND_SEED": 11, "BAND_TONES": (0.30, 0.66, 0.90),
+    # leaves: azimuth, stem tilt from vertical, blade tilt from vertical (deg)
+    "LEAF_AZ": [36, 108, 180, 252, 324],
+    "LEAF_STEM_TILT": [26, 32, 18, 32, 26],
+    "LEAF_BLADE_TILT": [62, 66, 52, 66, 62],
+    "LEAF_STEM_LEN": 1.7, "LEAF_BLADE_LEN": 5.4, "LEAF_BASE_R": 0.78, "LEAF_BASE_Z": 11.3,
+    "LEAF_TOP_Z": 16.0,
+    "BLADE": [(0.0, 0.36, 0.30, 0.00), (0.14, 0.92, 0.27, 0.18), (0.32, 1.55, 0.25, 0.36),
+              (0.52, 1.82, 0.23, 0.42), (0.72, 1.45, 0.19, 0.30), (0.88, 0.80, 0.12, 0.16), (1.0, 0.0, 0.0, 0.0)],          # (t, half-width, half-thick, fold)
+    "BLADE_DROOP": 0.55,
+    "STEM_R": 0.36,
+    "TAPROOT": [(2.55, 0.75), (1.7, 0.85), (0.85, 0.45), (0.0, 0.0)],   # (z, radius) along the axis, 6 sides
+    "SOIL_Z": 9.6,
+    "GRIP_Z": 4.0,
+    "TEETH_Y": (-1.1, -0.38, 0.38, 1.1), "TEETH_DEPTH": {True: 0.72, False: 1.02},
+    "TOOTH_H": {True: 0.72, False: 0.62},
+    "TOOTH": {"hw": 0.30, "hd": 0.21, "h": 0.50, "top_hw": 0.09, "embed": 0.22, "collar": 0.30},
+}
+# B4 (maintainer, 2026-11-06: "at least 2.5x / 3x bigger", "the size of the rock sphere"): ONE global factor on every
+# length; everything above is the 16 cm design frame (see the module docstring)
+P["SCALE"] = 3.0
+P["RINGS"] = [(z, float(np.interp(z, [a for a, _ in P["PROFILE"]], [b for _, b in P["PROFILE"]])))
+              for z in P["RING_Z"]]
+P["MOUTH_RING"] = P["RING_Z"].index(P["MOUTH_Z"])
+ZB = P["RINGS"][0][0]
+ZT = P["RINGS"][-1][0]
+ZC = 0.5 * (ZB + ZT)
+ZM = P["MOUTH_Z"]
+X, Y, Z = Vector((1, 0, 0)), Vector((0, 1, 0)), Vector((0, 0, 1))
+
+
+def unit(arm=None):
+    """Design -> world length factor: 1.0 while the builder works in the 16 cm design frame, P["SCALE"] once
+    apply_global_scale has run. Read off the rig (body bone head z / ZC), so any script that opens the blend agrees."""
+    arm = arm if arm is not None else bpy.data.objects.get(ARM_NAME)
+    if arm is None or arm.type != "ARMATURE" or "body" not in arm.data.bones:
+        return 1.0
+    return round(float(arm.data.bones["body"].head_local.z) / ZC, 6)      # float32 bone heads: 2.9999998 -> 3.0
+
+
+def nrm(v):
+    v = Vector(v)
+    return v.normalized() if v.length > 1e-12 else v
+
+
+def smooth(t):
+    t = max(0.0, min(1.0, t))
+    return t * t * (3 - 2 * t)
+
+
+def lerp(a, b, t):
+    return a + (b - a) * t
+
+
+def norm_w(w, maxinf=4):
+    items = sorted(((k, v) for k, v in w.items() if v > 1e-4), key=lambda kv: -kv[1])[:maxinf]
+    s = sum(v for _, v in items)
+    return {k: v / s for k, v in items}
+
+
+def facet_jitter(col, seed, amt=0.05):
+    r = (math.sin(seed * 12.9898) * 43758.5453) % 1.0
+    k = 1.0 + (r - 0.5) * 2 * amt
+    return tuple(min(1.0, c * k) for c in col)
+
+
+def ry_at(z):
+    R = P["PROFILE"]
+    return float(np.interp(z, [a for a, _ in R], [b for _, b in R]))
+
+
+def surf(z, phi_deg, ry=None):
+    ry = ry_at(z) if ry is None else ry
+    rx = ry * P["DEPTH_RATIO"]
+    f = math.radians(phi_deg)
+    p = Vector((rx * math.cos(f), ry * math.sin(f), z))
+    n = nrm(Vector((math.cos(f) / rx, math.sin(f) / ry, 0.0)))
+    return p, n
+
+
+def phi_of(y, z):
+    return math.degrees(math.asin(max(-1.0, min(1.0, y / ry_at(z)))))
+
+
+# ---------------------------------------------------------------- mesh builder
+MATS = {}
+
+
+class MB:
+    def __init__(self, slots=SLOTS):
+        self.slots = slots
+        self.v, self.w, self.f, self.fm, self.fc, self.fp, self.fl = [], [], [], [], [], [], []
+
+    def vert(self, p, w):
+        self.v.append(Vector(p))
+        self.w.append(norm_w(w) if w else {})
+        return len(self.v) - 1
+
+    def face(self, idx, mat, col, part, leaf=0, jitter=0.05):
+        self.f.append(list(idx))
+        self.fm.append(self.slots.index(mat))
+        self.fc.append(facet_jitter(col, len(self.f) * 1.37 + len(self.v) * 0.11, jitter) if jitter else col)
+        self.fp.append(PART[part])
+        self.fl.append(leaf)
+
+    def extend(self, other):
+        off = len(self.v)
+        self.v += [Vector(p) for p in other.v]
+        self.w += [dict(w) for w in other.w]
+        self.f += [[i + off for i in f] for f in other.f]
+        self.fm += list(other.fm)
+        self.fc += list(other.fc)
+        self.fp += list(other.fp)
+        self.fl += list(other.fl)
+
+    def to_object(self, name, coll, groups=True):
+        me = bpy.data.meshes.new(name)
+        me.from_pydata([tuple(p) for p in self.v], [], self.f)
+        me.update()
+        for s in self.slots:
+            if s is not None:
+                me.materials.append(MATS[s])
+        me.polygons.foreach_set("material_index", self.fm)
+        a = me.attributes.new("part", "INT", "FACE")
+        a.data.foreach_set("value", self.fp)
+        a = me.attributes.new("leaf", "INT", "FACE")
+        a.data.foreach_set("value", self.fl)
+        col = me.color_attributes.new("Col", "BYTE_COLOR", "CORNER")
+        cols = []
+        for poly in me.polygons:
+            c = self.fc[poly.index]
+            cols.extend([c[0], c[1], c[2], 1.0] * poly.loop_total)
+        col.data.foreach_set("color_srgb", cols)
+        me.color_attributes.active_color = col
+        me.color_attributes.render_color_index = 0
+        me.shade_flat()
+        ob = bpy.data.objects.new(name, me)
+        coll.objects.link(ob)
+        if groups:
+            names = [n for n in BONE_NAMES if any(n in w for w in self.w)]
+            vg = {n: ob.vertex_groups.new(name=n) for n in names}
+            for i, w in enumerate(self.w):
+                for k, x in w.items():
+                    vg[k].add([i], x, "REPLACE")
+        return ob
+
+
+def triangulate(ob):
+    bm = bmesh.new()
+    bm.from_mesh(ob.data)
+    bmesh.ops.triangulate(bm, faces=bm.faces[:], quad_method="FIXED", ngon_method="BEAUTY")
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces[:])      # closed islands: consistent outward winding
+    bm.to_mesh(ob.data)
+    bm.free()
+    ob.data.shade_flat()
+
+
+def orient_islands(mb, start_face=0):
+    """Flip any closed island (faces from start_face on) with negative signed volume. Returns flip count."""
+    parent = list(range(len(mb.v)))
+
+    def find(a):
+        while parent[a] != a:
+            parent[a] = parent[parent[a]]
+            a = parent[a]
+        return a
+
+    for f in mb.f[start_face:]:
+        r0 = find(f[0])
+        for i in f[1:]:
+            ri = find(i)
+            if ri != r0:
+                parent[ri] = r0
+    vol, faces = {}, {}
+    for fi in range(start_face, len(mb.f)):
+        f = mb.f[fi]
+        r = find(f[0])
+        p0 = mb.v[f[0]]
+        for a, b in zip(f[1:-1], f[2:]):
+            vol[r] = vol.get(r, 0.0) + p0.dot(mb.v[a].cross(mb.v[b])) / 6.0
+        faces.setdefault(r, []).append(fi)
+    flips = 0
+    for r, v in vol.items():
+        if v < 0:
+            flips += 1
+            for fi in faces[r]:
+                mb.f[fi] = mb.f[fi][::-1]
+    return flips
+
+
+# ---------------------------------------------------------------- weights
+def cheek_head(side):
+    hx, hy = P["CHEEK_HEAD"]
+    return Vector((hx, side * hy, ZM))
+
+
+def cheek_radial(p, side):
+    dv = Vector(p) - cheek_head(side)
+    dv.z *= P["CHEEK_ZSQ"]
+    d = dv.length
+    return smooth((P["CHEEK_R1"] - d) / (P["CHEEK_R1"] - P["CHEEK_R0"]))
+
+
+def jaw_field(phi, z):
+    a = 1.0 - smooth((abs(phi) - P["JAW_PHI_FULL"]) / (P["JAW_PHI_ZERO"] - P["JAW_PHI_FULL"]))
+    b = smooth((z - P["JAW_Z_ZERO"]) / (P["JAW_Z_FULL"] - P["JAW_Z_ZERO"]))
+    b *= 1.0 - smooth((z - P["JAW_Z_TOP"]) / 0.6)
+    return a * b
+
+
+def make_w(c_l, c_r, j, crown=0.0):
+    c = c_l + c_r
+    if c > 1.0:
+        c_l, c_r, c = c_l / c, c_r / c, 1.0
+    rem = 1.0 - c
+    w = {"cheek_l": c_l, "cheek_r": c_r, "jaw": j * rem, "crown": crown * rem * (1.0 - j)}
+    w["body"] = max(0.0, 1.0 - sum(w.values()))
+    return w
+
+
+def grid_w(p, phi, crown=0.0):
+    return make_w(cheek_radial(p, 1), cheek_radial(p, -1), jaw_field(phi, p.z), crown)
+
+
+# ---------------------------------------------------------------- X seam loop + muzzle field (Phase B2)
+def arms2d():
+    YT, ZT = P["X_TIP"]
+    return {"pp": Vector((YT, ZT)), "pm": Vector((YT, -ZT)), "mm": Vector((-YT, -ZT)), "mp": Vector((-YT, ZT))}
+
+
+ARM_N = 40
+_ARM_CACHE = {}
+
+
+def arm_curve(k):
+    """B2b: arm k as a polyline (ARM_N + 1 points, uniform in s) from the centre to its tip: the chord bowed by
+    X_BOW * sin(pi s) toward the side wedge, so the arm leaves the centre flat and rises steeply into the tip (the
+    upper / lower pads' edges are convex, sheet 01)."""
+    if k not in _ARM_CACHE:
+        A = arms2d()[k]
+        perp = Vector((A.y, -A.x)).normalized()
+        if perp.x * A.x < 0:
+            perp = -perp
+        _ARM_CACHE[k] = [A * t + perp * P["X_BOW"] * math.sin(math.pi * t)
+                         for t in (i / float(ARM_N) for i in range(ARM_N + 1))]
+    return _ARM_CACHE[k]
+
+
+def arm_pt(k, s):
+    pts = arm_curve(k)
+    u = max(0.0, min(1.0, s)) * ARM_N
+    i = min(ARM_N - 1, int(u))
+    return pts[i].lerp(pts[i + 1], u - i)
+
+
+def s_edge(sg, tz_sign, s):
+    """B2b: a side pad's lip edge at s (0 = its apex, 1 = the tip on the tz_sign side; tz_sign 0 = the apex)."""
+    YT, ZT = P["X_TIP"]
+    apex = Vector((sg * P["X_S_APEX"], 0.0))
+    if tz_sign == 0.0:
+        return apex
+    return apex.lerp(Vector((sg * YT, math.copysign(ZT, tz_sign))), s)
+
+
+def s_edge_dist(q):
+    """(inside the side-pad arrowhead, distance to its nearest edge) for a 2D point q (y, dz)."""
+    YT, ZT = P["X_TIP"]
+    sg = 1.0 if q.x >= 0 else -1.0
+    ay = sg * P["X_S_APEX"]
+    k = ZT / (YT - P["X_S_APEX"])
+    inside = sg * (q.x - ay) >= -1e-3 and abs(q.y) <= sg * (q.x - ay) * k + 1e-3      # the edge counts as inside
+    best = 1e9
+    for tz in (ZT, -ZT):
+        a, b = Vector((ay, 0.0)), Vector((sg * YT, tz))
+        ab = b - a
+        t = max(0.0, min(1.0, (q - a).dot(ab) / ab.length_squared))
+        best = min(best, (q - a - ab * t).length)
+    return inside, best
+
+
+def arm_tan(k, s):
+    e = 1.0 / ARM_N
+    return (arm_pt(k, min(1.0, s + e)) - arm_pt(k, max(0.0, s - e))).normalized()
+
+
+def seam_loop():
+    """The closed X seam as one loop of M = 2*(patch columns) + 2*(patch rings) entries, in the order of the patch
+    rectangle boundary: tip(-,+), upper pad U, tip(+,+), side pad S+ (turnip left, +Y), tip(+,-), lower pad L,
+    tip(-,-), side pad S-. Each entry: flap, s (0 at the centre, 1 at a tip), side (sign of y), arm (the X arm the
+    entry lies on; None at a pad centre), 2D (y, dz) of the lip edge (l0, the crease floor) and of the closure line."""
+    arms = arms2d()
+    bis = {"U": Vector((0, 1)), "S+": Vector((1, 0)), "L": Vector((0, -1)), "S-": Vector((-1, 0))}
+    cols = P["PHI"].index(P["PATCH_PHI"]) - P["PHI"].index(-P["PATCH_PHI"])
+    rows = P["RING_Z"].index(P["PATCH_Z"][1]) - P["RING_Z"].index(P["PATCH_Z"][0])
+    g = P["X_GAP"] * 0.5
+    gc, gt = P["X_GROOVE"]
+    out = []
+
+    def tip(k):
+        out.append({"flap": "tip", "tip": k, "arm": k, "s": 1.0, "side": 1 if k[0] == "p" else -1,
+                    "l0": arms[k].copy(), "l1": arms[k].copy()})
+
+    def flap(name, arm_a, arm_b, n):
+        half = (n - 1) // 2
+        b = bis[name]
+        seq = [(arm_a, k / (half + 1.0)) for k in range(half, 0, -1)] + [(None, 0.0)] + \
+              [(arm_b, k / (half + 1.0)) for k in range(1, half + 1)]
+        for arm, s in seq:
+            if arm is None:
+                base, n2 = Vector((0, 0)), b
+            else:
+                base = arm_pt(arm, s)
+                tg = arm_tan(arm, s)
+                n2 = Vector((-tg.y, tg.x)).normalized()
+                if n2.dot(b) < 0:
+                    n2 = -n2
+            groove = gt + (gc - gt) * (1.0 - s) ** 1.3
+            l0 = base + n2 * (g + groove)
+            if name in ("S+", "S-"):      # B2b: arrowhead side pad, apex X_S_APEX from the centre, straight edges
+                sg = 1.0 if name == "S+" else -1.0
+                tipk = arm if arm is not None else ("pp" if sg > 0 else "mp")
+                l0 = s_edge(sg, 0.0, 0.0)
+                if arm is not None:       # r08: the lip edge sits across the arm from its closure point (no skew)
+                    a_ = l0
+                    b_ = Vector((sg * P["X_TIP"][0], arms[tipk].y))
+                    ab = b_ - a_
+                    den = ab.x * n2.y - ab.y * n2.x
+                    u = ((base.x - a_.x) * n2.y - (base.y - a_.y) * n2.x) / den if abs(den) > 1e-9 else 0.0
+                    l0 = a_ + ab * max(u, 0.03 * s)
+            if name == "S+":
+                side = 1
+            elif name == "S-":
+                side = -1
+            else:
+                side = 0 if arm is None else (1 if base.x > 0 else -1)
+            out.append({"flap": name, "s": s, "side": side, "arm": arm,
+                        "l0": l0, "l1": base + n2 * g})
+
+    tip("mp")
+    flap("U", "mp", "pp", cols - 1)
+    tip("pp")
+    flap("S+", "pp", "pm", rows - 1)
+    tip("pm")
+    flap("L", "pm", "mm", cols - 1)
+    tip("mm")
+    flap("S-", "mm", "mp", rows - 1)
+    return out
+
+
+def rect_loop():
+    """Grid (ring k, column j) indices of the patch rectangle boundary, same order and count as seam_loop()."""
+    PHI, RZ = P["PHI"], P["RING_Z"]
+    j0, j1 = PHI.index(-P["PATCH_PHI"]), PHI.index(P["PATCH_PHI"])
+    k0, k1 = RZ.index(P["PATCH_Z"][0]), RZ.index(P["PATCH_Z"][1])
+    out = [(k1, j0)] + [(k1, j) for j in range(j0 + 1, j1)] + [(k1, j1)] + \
+          [(k, j1) for k in range(k1 - 1, k0, -1)] + [(k0, j1)] + [(k0, j) for j in range(j1 - 1, j0, -1)] + \
+          [(k0, j0)] + [(k, j0) for k in range(k0 + 1, k1)]
+    return out, (j0, j1, k0, k1)
+
+
+def arm_dist(q):
+    """(distance, s along the arm clipped to [0, 1], arm) from a 2D point (y, dz) to the nearest X arm."""
+    best = (1e9, 0.0, None)
+    for k in arms2d():
+        pts = arm_curve(k)
+        for i in range(ARM_N):
+            a, b = pts[i], pts[i + 1]
+            ab = b - a
+            t = max(0.0, min(1.0, (q - a).dot(ab) / max(1e-12, ab.length_squared)))
+            d = (q - a - ab * t).length
+            if d < best[0]:
+                best = (d, (i + t) / ARM_N, k)
+    return best
+
+
+def muzzle_prof(q):
+    M = P["MUZZLE"]
+    re = math.hypot(q.x / M["ay"], q.y / M["az"])
+    return 1.0 - smooth((re - M["r0"]) / (M["r1"] - M["r0"]))
+
+
+def muzzle_h(q):
+    """Offset along the bulb normal of the muzzle surface at 2D (y, dz): (h, dome, crease, pinch).
+    r03: a rolled lip - each pad rises in a steep sine wall over cw(s) from the crease floor to its crest AT the lip
+    edge, then slopes back over `slope` cm toward the muzzle edge (the dome fades too), so the crest line follows the
+    X and the pads shade like lips, not a plateau; the crease weakens toward the tips."""
+    M = P["MUZZLE"]
+    re = math.hypot(q.x / M["ay"], q.y / M["az"])
+    dome = M["h"] * muzzle_prof(q)
+    d, s, _arm = arm_dist(q)
+    wp = lerp(M["cw"][0], M["cw"][1], s)
+    # B2b pillow: the rise starts AT the lip edge (the slit's half-width from the arm), so the lip edge sits on the
+    # crease floor and the pad rounds over a wide shoulder to its crest wp inside the edge (a pillow, not a ridge)
+    gc, gt = P["X_GROOVE"]
+    d_edge = 0.5 * P["X_GAP"] + gt + (gc - gt) * (1.0 - s) ** 1.3
+    dr = max(0.0, d - d_edge)
+    ins, ds = s_edge_dist(q)
+    if ins and abs(q.x) <= P["X_TIP"][0]:          # B2b: inside a side-pad arrowhead: rise from its own edges
+        dr = ds
+    rise = math.sin(min(1.0, dr / wp) * math.pi * 0.5)
+    fall = 1.0 - M["slope_drop"] * smooth((dr - wp) / M["slope"])
+    ck = lerp(M["crease"][0], M["crease"][1], s)
+    lip = dome * (1.0 - ck * (1.0 - rise)) * fall
+    pinch = M["pinch"] * (1.0 - smooth(q.length / M["pr"]))
+    return lip - pinch, dome, dome - lip, pinch
+
+
+def lip_jaw(dz):
+    """B2b (decision 1): jaw share of a lip / closure / pocket vertex by its height dz about the seam centre: body
+    above, jaw below, a +-j_band blend across the side pads. No cheek weight ever reaches the lips."""
+    jb = P["W"]["j_band"]
+    return smooth((-dz + jb) / (2.0 * jb))
+
+
+def field_cheeks(p, q=None):
+    """(cheek_l, cheek_r) of the surrounding field: the lobe radial weights only (B2b: the r06 side-pad wedge is gone)."""
+    return cheek_radial(p, 1), cheek_radial(p, -1)
+
+
+# ---------------------------------------------------------------- bulb shell + face patch + mouth pocket
+def lobe_bump(p):
+    L = P["LOBE"]
+    out = 0.0
+    for side in (1, -1):
+        d2 = (p.y - side * L["y"]) ** 2 + (p.z - ZM) ** 2
+        out += L["amp"] * math.exp(-d2 / (2 * L["sigma"] ** 2))
+    return out * smooth(p.x / 1.5)
+
+
+def band_rows():
+    """Per column: the ring row of the lower blended row (BAND_ROW + a seeded random walk clamped to [-1, 1])."""
+    rng = np.random.default_rng(P["BAND_SEED"])
+    w, out = 0, []
+    for _j in P["PHI"]:
+        w = int(max(-1, min(1, w + int(rng.integers(-1, 2)))))
+        out.append(P["BAND_ROW"] + w)
+    return out
+
+
+BAND = []
+
+
+def shell_col(zc, phi, upper_tri):
+    """Stepped faceted transition: magenta rows >= b+2, tone rows b+1 / b, the row under b tinted on its upper
+    triangles only (the zig-zag lower edge), ivory below."""
+    RZ, PHI = P["RING_Z"], P["PHI"]
+    k = int(np.searchsorted(RZ, zc) - 1)
+    ph = (phi + 180) % 360 - 180
+    j = min(range(len(PHI)), key=lambda i: abs(((PHI[i] - ph) + 180) % 360 - 180))
+    b = BAND[j]
+    t1, t2, t3 = P["BAND_TONES"]
+    if k >= b + 2:
+        return PAL["magenta"]
+    if k == b + 1:
+        return mix(PAL["magenta"], PAL["ivory"], t1)
+    if k == b:
+        return mix(PAL["magenta"], PAL["ivory"], t2)
+    if k == b - 1 and upper_tri:
+        return mix(PAL["magenta"], PAL["ivory"], t3)
+    return PAL["ivory"]
+
+
+def q_of(p):
+    """2D muzzle coordinates (y, dz) of a 3D point."""
+    return Vector((p.y, p.z - ZM))
+
+
+def build_bulb(ids):
+    """Shell of revolution (elliptical rings) with the face patch cut out of the grid and rebuilt as concentric
+    loops around the closed X seam (lip edge on the crease floor -> lip wall -> crest -> outer slope -> muzzle edge
+    -> blend), the muzzle field applied along the bulb normal; the mouth pocket (gum band + rounded cavity) closed
+    behind the seam; bottom cap and crown dimple. Fills ids with landmark vertex indices."""
+    BAND[:] = band_rows()
+    mb = MB()
+    R, PHI = P["RINGS"], P["PHI"]
+    N = len(PHI)
+    rect, (j0, j1, k0, k1) = rect_loop()
+    seam = seam_loop()
+    M = len(seam)
+    if M != len(rect):
+        raise RuntimeError("seam loop %d != patch boundary %d" % (M, len(rect)))
+
+    grid = {}
+    for k, (z, ry) in enumerate(R):
+        for j, phi in enumerate(PHI):
+            if k0 < k < k1 and j0 < j < j1:
+                continue
+            p, n = surf(z, phi, ry)
+            p = p + n * lobe_bump(p)
+            crown = 0.35 if k == len(R) - 1 else 0.0
+            cl, cr = field_cheeks(p)
+            grid[(k, j)] = mb.vert(p, make_w(cl, cr, jaw_field(phi, p.z), crown))
+    bottom = mb.vert((0, 0, P["BOTTOM_Z"]), make_w(0, 0, 0))
+    top = mb.vert((0, 0, P["TOP_DIP_Z"]), {"crown": 0.6, "body": 0.4})
+    ids["bottom"], ids["top_dip"] = bottom, top
+    qv = {}                       # vertex -> rest 2D muzzle coordinate (patch vertices only)
+
+    def tri(a, b, c, part="bulb", slot="Skin", col=None):
+        if col is None:
+            pc = (mb.v[a] + mb.v[b] + mb.v[c]) / 3.0
+            phi_c = math.degrees(math.atan2(pc.y, pc.x))
+            zs = sorted(mb.v[i].z for i in (a, b, c))
+            col = shell_col(pc.z, phi_c, zs[1] > pc.z)
+            if a in qv and b in qv and c in qv:
+                q = (qv[a] + qv[b] + qv[c]) / 3.0
+                _h, _dome, cr, pin = muzzle_h(q)
+                prof = muzzle_prof(q)
+                if prof > 0.05:
+                    col = mix(col, PAL["pad"], 0.42 * smooth(prof / 0.6))
+                    part = "pad" if prof > 0.15 else part
+                Mz = P["MUZZLE"]
+                cf = (cr + pin) / (Mz["h"] + Mz["pinch"])
+                if cf > 0.55:          # r01: tint only the crease walls, not the pads' flanks
+                    col = mix(col, PAL["crease"], 0.6 * smooth((cf - 0.55) / 0.35))
+        jit = 0.015 if (a in qv and b in qv and c in qv) else 0.05      # r12: calmer muzzle facets
+        mb.face((a, b, c), slot, col, part, jitter=jit)
+
+    # ---- grid faces outside the patch (two triangles per quad, alternating diagonal)
+    for k in range(len(R) - 1):
+        for j in range(N):
+            jn = (j + 1) % N
+            if k0 <= k < k1 and j0 <= j < j1:
+                continue
+            q = (grid[(k, j)], grid[(k, jn)], grid[(k + 1, jn)], grid[(k + 1, j)])
+            if (k + j) % 2:
+                tri(q[0], q[1], q[2])
+                tri(q[0], q[2], q[3])
+            else:
+                tri(q[0], q[1], q[3])
+                tri(q[1], q[2], q[3])
+    for j in range(N):
+        mb.face((grid[(0, (j + 1) % N)], grid[(0, j)], bottom), "Skin", PAL["ivory"], "bulb")
+        mb.face((grid[(len(R) - 1, j)], grid[(len(R) - 1, (j + 1) % N)], top), "Skin", PAL["magenta"], "bulb")
+
+    # ---- face patch: loops from the seam (f = 0) to the rectangle (f = 1), muzzle field along the normal
+    W = P["W"]
+    seam_param = []
+    for e in seam:
+        z = ZM + e["l0"].y
+        seam_param.append((phi_of(e["l0"].x, z), z))
+    rect_param = [(PHI[j], R[k][0]) for k, j in rect]
+    for kj in rect:
+        qv[grid[kj]] = q_of(mb.v[grid[kj]])
+    loops = []
+    for li, f in enumerate(P["LOOP_F"]):
+        if li == len(P["LOOP_F"]) - 1:
+            loops.append([grid[kj] for kj in rect])
+            break
+        row = []
+        for i, e in enumerate(seam):
+            ph = lerp(seam_param[i][0], rect_param[i][0], f)
+            z = lerp(seam_param[i][1], rect_param[i][1], f)
+            p0, n = surf(z, ph)
+            q = q_of(p0)
+            h = muzzle_h(q)[0] * (1.0 - smooth((f - 0.80) / 0.20))
+            p = p0 + n * (h + lobe_bump(p0))
+            # B2b weights: loops < lip_loops are lips (body / jaw only); the cheek weight and the jaw field ramp in
+            # over the next cheek_ramp loops (the muzzle's outer rings), so no lip vertex carries cheek weight
+            tc = smooth((li - (W["lip_loops"] - 1)) / W["cheek_ramp"])
+            gcl, gcr = field_cheeks(p0)
+            v = mb.vert(p, make_w(gcl * tc, gcr * tc, lerp(lip_jaw(z - ZM), jaw_field(ph, z), tc)))
+            qv[v] = q
+            row.append(v)
+        loops.append(row)
+    def flat_split(q):
+        """r12: split a patch quad along the diagonal that leaves the two triangles flattest (no saw-tooth)."""
+        V = [mb.v[k] for k in q]
+
+        def bend(t1, t2):
+            n1 = (V[t1[1]] - V[t1[0]]).cross(V[t1[2]] - V[t1[0]])
+            n2 = (V[t2[1]] - V[t2[0]]).cross(V[t2[2]] - V[t2[0]])
+            if n1.length < 1e-12 or n2.length < 1e-12:
+                return 0.0
+            return n1.normalized().angle(n2.normalized())
+        if bend((0, 1, 2), (0, 2, 3)) <= bend((0, 1, 3), (1, 2, 3)):
+            return (q[0], q[1], q[2]), (q[0], q[2], q[3])
+        return (q[0], q[1], q[3]), (q[1], q[2], q[3])
+
+    for a, b in zip(loops, loops[1:]):
+        for i in range(M):
+            i1 = (i + 1) % M
+            for t3 in flat_split((a[i], a[i1], b[i1], b[i])):
+                tri(*t3)
+    L0 = loops[0]
+
+    # ---- mouth pocket: L1 (closure line, the closed X), open levels (gum band, then the cavity), back
+    centre = {e["flap"]: i for i, e in enumerate(seam) if e["flap"] != "tip" and e["s"] == 0.0}
+    tips = {e["tip"]: i for i, e in enumerate(seam) if e["flap"] == "tip"}
+    x_lip = max(mb.v[L0[i]].x for i in centre.values())
+    YT, ZT = P["X_TIP"]
+    L1 = []
+    for i, e in enumerate(seam):
+        z = ZM + e["l1"].y
+        ph = phi_of(e["l1"].x, z)
+        p, n = surf(z, ph)
+        h = muzzle_h(q_of(p))[0]
+        roll = P["X_ROLL"] * (P["X_S_ROLL_K"] if e["flap"] in ("S+", "S-") else 1.0)     # r08: deeper S wedge
+        p = p + n * (h + lobe_bump(p)) - X * roll * (1.0 - 0.5 * e["s"])
+        L1.append(mb.vert(p, make_w(0.0, 0.0, lip_jaw(e["l1"].y))))
+    x_c = max(mb.v[L1[i]].x for i in centre.values())      # the closure centre: the pocket and teeth hang off it
+    alpha = math.degrees(math.atan2(ZT, YT))
+    anchors = [(tips["mp"], 180 - alpha), (centre["U"], 90), (tips["pp"], alpha), (centre["S+"], 0),
+               (tips["pm"], -alpha), (centre["L"], -90), (tips["mm"], -180 + alpha), (centre["S-"], -180),
+               (M, -180 - alpha)]
+    theta = [float(np.interp(i, [a for a, _ in anchors], [b for _, b in anchors])) for i in range(M)]
+    levels = [L0, L1]
+    nlev = len(P["SOCK"])
+    for li, (depth, ha, hb) in enumerate(P["SOCK"]):
+        ring = []
+        for i, e in enumerate(seam):
+            th = math.radians(theta[i])
+            p = Vector((x_c - depth, ha * math.cos(th), ZM + hb * math.sin(th)))
+            if li == 0:                    # B2b r08: the first gum level hangs straight back off the closure line
+                q1 = mb.v[L1[i]]
+                p = Vector((p.x, lerp(q1.y, p.y, P["SOCK0_BLEND"]), lerp(q1.z, p.z, P["SOCK0_BLEND"])))
+            je = lip_jaw(e["l1"].y)
+            jj = smooth((-math.sin(th) + 0.3) / 0.6) * lerp(1.0, 0.8, li / max(1, nlev - 1))
+            u = smooth((li + 1.0) / nlev)          # r05: near the lips the pocket follows the lip edge's jaw share
+            ring.append(mb.vert(p, make_w(0.0, 0.0, lerp(je, jj, u))))
+        levels.append(ring)
+    back = mb.vert((x_c - P["BACK_DEPTH"], 0.0, ZM), {"jaw": 0.5, "body": 0.5})
+    lipcol = mix(PAL["mouth"], PAL["crease"], 0.15)
+    gumcol = mix(PAL["gum"], PAL["magenta"], 0.10)
+    for li in range(len(levels) - 1):
+        a, b = levels[li], levels[li + 1]
+        for i in range(M):
+            i1 = (i + 1) % M
+            q = (a[i1], a[i], b[i], b[i1])
+            if li == 0:
+                part, col = "lip", lipcol
+            elif li <= P["GUM_LEVELS"]:
+                part, col = "gum", gumcol
+            else:
+                part, col = "cavity", PAL["mouth"]
+            mb.face((q[0], q[1], q[2]), "Mouth", col, part)
+            mb.face((q[0], q[2], q[3]), "Mouth", col, part)
+    last = levels[-1]
+    for i in range(M):
+        mb.face((last[(i + 1) % M], last[i], back), "Mouth", PAL["mouth"], "cavity")
+
+    ids["L0"], ids["L1"] = list(L0), list(L1)
+    ids["loops"] = [list(r) for r in loops]
+    ids["sock"] = [list(r) for r in levels[2:]] + [[back]]
+    ids["seam"] = [{"flap": e["flap"], "s": round(e["s"], 4), "side": e["side"], "arm": e["arm"]} for e in seam]
+    ids["centre_l0"] = {k: L0[i] for k, i in centre.items()}
+    ids["centre_l1"] = {k: L1[i] for k, i in centre.items()}
+    ids["tips"] = {k: L0[i] for k, i in tips.items()}
+    ids["x_c"] = x_c
+    ids["x_lip"] = x_lip
+    for side, nm in ((1, "lobe_l"), (-1, "lobe_r")):       # lobe apex: the shell vertex nearest the lobe centre
+        tgt, _n = surf(ZM, math.degrees(math.asin(P["LOBE"]["y"] / ry_at(ZM))) * side)
+        tgt = tgt + _n * lobe_bump(tgt)
+        ids[nm] = min(list(grid.values()) + [v for r in loops[1:-1] for v in r], key=lambda i: (mb.v[i] - tgt).length)
+    return mb
+
+
+def build_teeth(mb):
+    """Eight blunt wedges, rooted 0.14 cm into the roof (upper, body) and the floor (lower, jaw) of the sock."""
+    sock = [i for i, p in enumerate(mb.fp) if p in (PART["lip"], PART["cavity"], PART["gum"])]
+    tris = []
+    for fi in sock:
+        f = mb.f[fi]
+        for a, b in zip(f[1:-1], f[2:]):
+            tris.append((f[0], a, b))
+    bvh = BVHTree.FromPolygons([tuple(v) for v in mb.v], tris, all_triangles=True)
+    T = P["TOOTH"]
+    x_c = mb_ids["x_c"]
+    out = MB()
+    placed = []
+    for upper in (True, False):
+        for y in P["TEETH_Y"]:
+            o = Vector((x_c - P["TEETH_DEPTH"][upper], y, ZM))
+            hit, nrmv, _i, _d = bvh.ray_cast(o, Z if upper else -Z, 5.0)
+            if hit is None:
+                raise RuntimeError("tooth ray missed the sock at y=%.2f upper=%s" % (y, upper))
+            a = nrm(nrmv)
+            if a.dot(-Z if upper else Z) < 0:      # sock normals face the cavity air: down on the roof
+                a = -a
+            e = nrm(Y - a * Y.dot(a))
+            e2 = a.cross(e)
+            sock_v = {i for fi in sock for i in mb.f[fi]}
+            near_v = min(sock_v, key=lambda i: (mb.v[i] - hit).length)
+            w = dict(mb.w[near_v])
+            base = [hit - a * T["embed"] + e * sx * T["hw"] + e2 * sy * T["hd"] for sx, sy in
+                    ((-1, -1), (1, -1), (1, 1), (-1, 1))]
+            coll = [hit + a * T["collar"] + e * sx * T["hw"] * 0.98 + e2 * sy * T["hd"] * 0.98 for sx, sy in
+                    ((-1, -1), (1, -1), (1, 1), (-1, 1))]
+            top = [hit + a * P["TOOTH_H"][upper] + e * sx * T["top_hw"] for sx in (-1, 1)]
+            b = [out.vert(p, w) for p in base]
+            c = [out.vert(p, w) for p in coll]
+            t = [out.vert(p, w) for p in top]
+            col = PAL["teeth"]
+            for i in range(4):
+                out.face((b[i], b[(i + 1) % 4], c[(i + 1) % 4], c[i]), "Teeth", col, "tooth_root")
+            out.face((b[3], b[2], b[1], b[0]), "Teeth", col, "tooth_root")
+            out.face((c[0], c[1], t[1], t[0]), "Teeth", col, "tooth")
+            out.face((c[1], c[2], t[1]), "Teeth", col, "tooth")
+            out.face((c[2], c[3], t[0], t[1]), "Teeth", col, "tooth")
+            out.face((c[3], c[0], t[0]), "Teeth", col, "tooth")
+            placed.append({"upper": upper, "y": y, "gum": list(hit), "axis": list(a)})
+    orient_islands(out)
+    return out, placed
+
+
+def ring_frame(axis, ref=None):
+    a = nrm(axis)
+    ref = Vector(ref) if ref is not None else (Z if abs(a.dot(Z)) < 0.9 else X)
+    e1 = nrm(ref - a * ref.dot(a))
+    return e1, a.cross(e1)
+
+
+def build_taproot():
+    mb = MB()
+    st = P["TAPROOT"]
+    sides = 6
+    rings = []
+    for k, (z, r) in enumerate(st):
+        c = Vector((0, 0, z))
+        if r <= 1e-6:
+            rings.append(mb.vert(c, {"taproot": 1.0}))
+        else:
+            rings.append([mb.vert(c + Vector((math.cos(2 * math.pi * (j + 0.5) / sides) * r,
+                                               math.sin(2 * math.pi * (j + 0.5) / sides) * r, 0)),
+                                  {"taproot": 1.0}) for j in range(sides)])
+    for k in range(len(rings) - 1):
+        a, b = rings[k], rings[k + 1]
+        part = "taproot_root" if k == 0 else "taproot"
+        for j in range(sides):
+            j1 = (j + 1) % sides
+            if isinstance(b, int):
+                mb.face((a[j], a[j1], b), "Skin", PAL["ivory"], part)
+            else:
+                mb.face((a[j], a[j1], b[j1], b[j]), "Skin", PAL["ivory"], part)
+    mb.face(list(reversed(rings[0])), "Skin", PAL["ivory"], "taproot_root")
+    orient_islands(mb)
+    return mb
+
+
+# ---------------------------------------------------------------- leaves
+def leaf_layout():
+    """Per leaf: azimuth, stem base (embedded), emergence point (leaf_a head), blade base (leaf_b head), tip, frame.
+    Lengths are scaled by one factor so the highest leaf tip lands at LEAF_TOP_Z."""
+    out = []
+    for i, az in enumerate(P["LEAF_AZ"]):
+        a = math.radians(az)
+        radial = Vector((math.cos(a), math.sin(a), 0))
+        ts, tb = math.radians(P["LEAF_STEM_TILT"][i]), math.radians(P["LEAF_BLADE_TILT"][i])
+        ds = nrm(radial * math.sin(ts) + Z * math.cos(ts))
+        db = nrm(radial * math.sin(tb) + Z * math.cos(tb))
+        out.append({"i": i + 1, "az": az, "radial": radial, "ds": ds, "db": db,
+                    "ew": nrm(Vector((-math.sin(a), math.cos(a), 0)))})
+    base_z = P["LEAF_BASE_Z"]
+
+    def tip_z(k, L):
+        s0 = Vector((L["radial"].x * P["LEAF_BASE_R"], L["radial"].y * P["LEAF_BASE_R"], base_z))
+        b1 = s0 + L["ds"] * P["LEAF_STEM_LEN"] * k
+        tip = b1 + L["db"] * P["LEAF_BLADE_LEN"] * k - Z * P["BLADE_DROOP"] * k
+        return tip.z
+
+    lo, hi = 0.3, 3.0
+    for _ in range(60):
+        mid = 0.5 * (lo + hi)
+        if max(tip_z(mid, L) for L in out) < P["LEAF_TOP_Z"]:
+            lo = mid
+        else:
+            hi = mid
+    k = 0.5 * (lo + hi)
+    for L in out:
+        s0 = Vector((L["radial"].x * P["LEAF_BASE_R"], L["radial"].y * P["LEAF_BASE_R"], base_z))
+        # emergence: where the stem axis crosses the crown dimple height + a little
+        t_em = (P["TOP_DIP_Z"] + 0.45 - base_z) / L["ds"].z
+        L.update({"k": k, "s0": s0, "s1": s0 + L["ds"] * t_em, "b1": s0 + L["ds"] * P["LEAF_STEM_LEN"] * k,
+                  "Ls": P["LEAF_STEM_LEN"] * k, "Lb": P["LEAF_BLADE_LEN"] * k})
+        L["tip"] = L["b1"] + L["db"] * L["Lb"] - Z * P["BLADE_DROOP"] * k
+    return out
+
+
+def blade_point(L, t):
+    return L["b1"] + L["db"] * L["Lb"] * t - Z * P["BLADE_DROOP"] * L["k"] * t * t
+
+
+def build_leaf(L):
+    mb = MB()
+    i = L["i"]
+    na, nb = "leaf_%02d_a" % i, "leaf_%02d_b" % i
+    sr = P["STEM_R"]
+    # stations: (centre, axis dir, hw, ht, fold, weights, part of the segment that ENDS here)
+    # Phase I (coordinator ruling): the stem's embedded base ring rides the BODY and the emergence ring blends body /
+    # leaf_a, so the stalk stretches elastically between the bulb and the crown when the crown lifts (SRC_Tug) instead
+    # of pulling out of the bulb (was {leaf_a: 1.0} on both rings). The emergence ring's 0.5 crown share matches the bulb
+    # top ring's crown weight (0.35 ring / 0.6 dimple), so the stalk leaves the bulb where the surface is. Blades unchanged.
+    st = [(L["s0"], L["ds"], sr * 0.55, sr * 0.55, 0.0, {"body": 1.0}, None),
+          (L["s1"], L["ds"], sr, sr, 0.0, {"body": 0.5, na: 0.5}, "stem_root"),
+          (L["b1"], nrm(L["ds"] + L["db"]), sr, P["BLADE"][0][2], 0.0, {na: 0.5, nb: 0.5}, "stem")]
+    for t, hw, ht, fold in P["BLADE"][1:]:
+        c = blade_point(L, t)
+        d = nrm(blade_point(L, min(1.0, t + 0.05)) - blade_point(L, max(0.0, t - 0.05)))
+        w = {nb: 1.0} if t > 0.3 else {nb: 0.85, na: 0.15}
+        st.append((c, d, hw, ht, fold, w, "blade"))
+    rings = []
+    for c, d, hw, ht, fold, w, _part in st:
+        if hw <= 1e-6:
+            rings.append(mb.vert(c, w))
+            continue
+        ew = nrm(L["ew"] - d * L["ew"].dot(d))
+        en = d.cross(ew)
+        if en.dot(Z) < 0:
+            en = -en
+        rings.append([mb.vert(c + ew * hw + en * fold, w), mb.vert(c + en * ht, w),
+                      mb.vert(c - ew * hw + en * fold, w), mb.vert(c - en * ht, w)])
+    for k in range(len(rings) - 1):
+        a, b = rings[k], rings[k + 1]
+        part = st[k + 1][6]
+        col = PAL["stem"] if part != "blade" else PAL["leaf"]
+        slot = "Leaf"
+        for j in range(4):
+            j1 = (j + 1) % 4
+            if isinstance(b, int):
+                mb.face((a[j], a[j1], b), slot, col, part, leaf=i)
+            else:
+                mb.face((a[j], a[j1], b[j1], b[j]), slot, col, part, leaf=i)
+    mb.face(list(reversed(rings[0])), "Leaf", PAL["stem"], "stem_root", leaf=i)
+    orient_islands(mb)
+    return mb
+
+
+# ---------------------------------------------------------------- statics
+def build_bed(empty):
+    """Soil cap + rim, 24 cm across x 4 cm tall, origin at the soil line centre (the object sits at SOIL_Z)."""
+    mb = MB(STATIC_SLOTS)
+    N = 16
+    jit = lambda j, s: ((math.sin((j + 1) * 7.31 + s * 3.17) * 43758.5453) % 1.0) - 0.5
+    # (radius, z) profile from the outside bottom over the rim to the inside
+    outer = [(12.0, -3.4), (12.0, -1.6), (11.2, 0.15), (9.6, 0.55)]
+    if not empty:
+        inner = [(7.0, 0.35), (4.6, 0.05), (3.35, -0.12)]
+        centre_z = -0.35
+    else:
+        inner = [(7.0, 0.35), (5.2, 0.15), (4.3, -0.6), (3.6, -2.0), (3.2, -3.4)]
+    prof = outer + inner
+    rings = []
+    for k, (r, z) in enumerate(prof):
+        row = []
+        for j in range(N):
+            a = 2 * math.pi * (j + 0.5 * (k % 2)) / N
+            rr = r * (1.0 + 0.045 * jit(j, k)) if 0 < k < len(prof) - 1 else r
+            zz = z + (0.35 * jit(j, k + 7) if k in (2, 3, 4) else 0.0)
+            row.append(mb.vert((rr * math.cos(a), rr * math.sin(a), zz), {}))
+        rings.append(row)
+    for k in range(len(rings) - 1):
+        for j in range(N):
+            a, b = rings[k], rings[k + 1]
+            q = (a[j], a[(j + 1) % N], b[(j + 1) % N], b[j])
+            zc = sum(mb.v[i].z for i in q) / 4
+            col = PAL["soil_top"] if zc > 0.1 else (PAL["soil_pit"] if (empty and k >= len(outer)) else PAL["soil"])
+            mb.face(q, "Soil", col, "soil", jitter=0.08)
+    if not empty:
+        c = mb.vert((0, 0, centre_z), {})
+        for j in range(N):
+            mb.face((rings[-1][j], rings[-1][(j + 1) % N], c), "Soil", PAL["soil"], "soil", jitter=0.08)
+    else:
+        # bottom annulus from the socket wall foot back to the outer wall foot
+        a, b = rings[-1], rings[0]
+        for j in range(N):
+            mb.face((a[j], a[(j + 1) % N], b[(j + 1) % N], b[j]), "Soil", PAL["soil_pit"], "soil", jitter=0.08)
+    cb = None
+    if not empty:
+        cb = mb.vert((0, 0, -3.4), {})
+        for j in range(N):
+            mb.face((rings[0][(j + 1) % N], rings[0][j], cb), "Soil", PAL["soil"], "soil", jitter=0.08)
+    orient_islands(mb)
+    return mb
+
+
+def build_collision_points():
+    """Decimated neutral bulb: bottom + hexagon / octagon (face + cheek-lobe height, x1.10) / hexagon + top, so the
+    hull bounds the facets, the puffed seam flaps and the cheek lobes (40 tris)."""
+    pts = [Vector((0, 0, P["BOTTOM_Z"])), Vector((0, 0, ZT))]
+    for k, z in enumerate((3.35, 6.15, 9.45)):
+        n = 8 if k == 1 else 6
+        for j in range(n):
+            p, _n = surf(z, j * 360.0 / n + (0 if k == 1 else 30))
+            s = 1.10 if k == 1 else 1.07
+            pts.append(Vector((p.x * s, p.y * s, z)))
+    return pts
+
+
+def build_hull(pts):
+    mb = MB((None,))
+    bm = bmesh.new()
+    vs = [bm.verts.new(p) for p in pts]
+    bmesh.ops.convex_hull(bm, input=vs, use_existing_faces=False)
+    for v in [v for v in bm.verts if not v.link_faces]:
+        bm.verts.remove(v)
+    bmesh.ops.triangulate(bm, faces=bm.faces[:])
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces[:])
+    bm.verts.index_update()
+    ids = {v.index: mb.vert(v.co, {}) for v in bm.verts}
+    for f in bm.faces:
+        mb.f.append([ids[v.index] for v in f.verts])
+        mb.fm.append(0)
+        mb.fc.append((0.3, 0.7, 0.9))
+        mb.fp.append(PART["hull"])
+        mb.fl.append(0)
+    bm.free()
+    return mb
+
+
+# ---------------------------------------------------------------- scene, materials, armature
+def make_material(name, rough=0.85, spec=0.25):
+    m = bpy.data.materials.new(name)
+    m.use_nodes = True
+    nt = m.node_tree
+    for n in list(nt.nodes):
+        nt.nodes.remove(n)
+    out = nt.nodes.new("ShaderNodeOutputMaterial")
+    bsdf = nt.nodes.new("ShaderNodeBsdfPrincipled")
+    ca = nt.nodes.new("ShaderNodeVertexColor")
+    ca.layer_name = "Col"
+    # base colour = RGB * lerp(0.45, 1, A) (A = cavity, 1.0 in Phase A); same graph as the bat's make_material
+    mr = nt.nodes.new("ShaderNodeMapRange")
+    mr.inputs["To Min"].default_value = 0.45
+    mr.inputs["To Max"].default_value = 1.0
+    mul = nt.nodes.new("ShaderNodeMix")
+    mul.data_type = "RGBA"
+    mul.blend_type = "MULTIPLY"
+    mul.inputs["Factor"].default_value = 1.0
+    nt.links.new(ca.outputs["Alpha"], mr.inputs["Value"])
+    nt.links.new(ca.outputs["Color"], mul.inputs["A"])
+    nt.links.new(mr.outputs["Result"], mul.inputs["B"])
+    nt.links.new(mul.outputs["Result"], bsdf.inputs["Base Color"])
+    bsdf.inputs["Roughness"].default_value = rough
+    bsdf.inputs["Metallic"].default_value = 0.0
+    bsdf.inputs["Specular IOR Level"].default_value = spec
+    nt.links.new(bsdf.outputs["BSDF"], out.inputs["Surface"])
+    m.use_backface_culling = True
+    m["mars_roughness"] = rough
+    m["mars_specular"] = spec
+    return m
+
+
+def reset_scene():
+    for o in list(bpy.data.objects):
+        bpy.data.objects.remove(o, do_unlink=True)
+    for c in list(bpy.data.collections):
+        bpy.data.collections.remove(c)
+    for coll in (bpy.data.meshes, bpy.data.materials, bpy.data.armatures, bpy.data.cameras, bpy.data.lights,
+                 bpy.data.actions, bpy.data.curves):
+        for d in list(coll):
+            coll.remove(d)
+    sc = bpy.context.scene
+    sc.unit_settings.system = "METRIC"
+    sc.unit_settings.scale_length = 0.01
+    sc.unit_settings.length_unit = "CENTIMETERS"
+    sc.render.fps = 30
+    sc.render.fps_base = 1.0
+    sc.frame_start, sc.frame_end = 0, 18
+    colls = {}
+    for n in ("Authoring", "Rig", "Export", "Review"):
+        c = bpy.data.collections.new(n)
+        sc.collection.children.link(c)
+        colls[n] = c
+    MATS["Skin"] = make_material("Skin", 0.85)
+    MATS["Leaf"] = make_material("Leaf", 0.8)
+    MATS["Mouth"] = make_material("Mouth", 0.9, 0.15)
+    MATS["Teeth"] = make_material("Teeth", 0.6, 0.35)
+    MATS["Soil"] = make_material("Soil", 0.95, 0.1)
+    return colls
+
+
+def bone_layout(leaves):
+    lay = {}
+    ident = lambda h, L=2.0: (Vector(h), Vector(h) + Y * L, None)
+    lay["root"] = ident((0, 0, 0), 2.0)
+    lay["body"] = ident((0, 0, ZC), 3.0)
+    hx, hz = P["JAW_HINGE"]
+    lay["jaw"] = ident((hx, 0, hz), 2.0)
+    for side, n in ((1, "cheek_l"), (-1, "cheek_r")):
+        lay[n] = ident(cheek_head(side), 1.5)
+    lay["crown"] = ident((0, 0, P["TOP_DIP_Z"]), 1.5)
+    lay["taproot"] = ident((0, 0, 1.9), 1.0)
+    for L in leaves:
+        lay["leaf_%02d_a" % L["i"]] = (L["s1"], L["b1"], L["ds"].cross(L["ew"]))
+        lay["leaf_%02d_b" % L["i"]] = (L["b1"], L["tip"], L["db"].cross(L["ew"]))
+    return lay
+
+
+def build_armature(coll, lay):
+    arm_data = bpy.data.armatures.new(ARM_NAME)
+    arm = bpy.data.objects.new(ARM_NAME, arm_data)
+    coll.objects.link(arm)
+    bpy.context.view_layer.objects.active = arm
+    for o in bpy.context.view_layer.objects:
+        o.select_set(o is arm)
+    bpy.ops.object.mode_set(mode="EDIT")
+    eb = arm_data.edit_bones
+    for name, _parent in BONES:
+        h, t, roll_axis = lay[name]
+        e = eb.new(name)
+        e.head, e.tail = Vector(h), Vector(t)
+        e.use_deform = True
+        if roll_axis is None:
+            e.roll = 0.0
+        else:
+            e.align_roll(Vector(roll_axis))
+    for name, parent in BONES:
+        if parent:
+            eb[name].parent = eb[parent]
+            eb[name].use_connect = False
+    bpy.ops.object.mode_set(mode="OBJECT")
+    arm_data.display_type = "STICK"
+    for pb in arm.pose.bones:
+        pb.rotation_mode = "QUATERNION"
+    return arm
+
+
+# ---------------------------------------------------------------- poses (parameter vectors on the export bones)
+# A pose is a flat parameter vector (PKEYS); clips spline these scalars, so the rig contract (body X == Z scale,
+# crown/taproot exact counter-scale, jaw/crown rotate about Y only) holds on every interpolated frame.
+PKEYS = (["bh", "bw", "bpiv", "bdz", "brot", "jaw", "csx", "csy", "csz", "clx", "cly", "clz", "cr_y", "cr_dz"] +
+         ["la%d" % i for i in range(1, 6)] + ["lb%d" % i for i in range(1, 6)] + ["lf%d" % i for i in range(1, 6)] +
+         ["k_inhale", "k_scream"])      # B2b: shape-key values (the B2 `jx` jaw-forward key is gone)
+SHAPE_KEYS = {"k_inhale": "Inhale", "k_scream": "Scream"}
+PIDX = {k: i for i, k in enumerate(PKEYS)}
+NEUTRAL = np.zeros(len(PKEYS))
+for _k in ("bh", "bw", "bpiv", "csx", "csy", "csz"):
+    NEUTRAL[PIDX[_k]] = 1.0
+
+
+def cheek_params(s, pivot, dl=(0.0, 0.0, 0.0)):
+    """Cheek scale `s` (per axis) about a `pivot` point (rest armature cm, given for the LEFT cheek; the right is
+    mirrored): local location = (s - 1) * (head - pivot). Identity rest rotation, so no rotation is ever keyed."""
+    h = cheek_head(1)
+    s = Vector(s)
+    q = Vector(pivot)
+    return [s.x, s.y, s.z, (s.x - 1) * (h.x - q.x) + dl[0], (s.y - 1) * (h.y - q.y) + dl[1],
+            (s.z - 1) * (h.z - q.z) + dl[2]]
+
+
+def params_of(spec):
+    """Pose spec dict -> parameter vector. Keys: bh, bw (body height/width scale), pivot ('bottom'|'centre'), bdz
+    (extra body z, cm), brot (body about Y, deg), jaw (deg), cheek {'s': (x, y, z), 'pivot': (x, y, z)}, cr_y (crown
+    about Y, deg), cr_dz (crown z, cm), la / lb (leaf_a / leaf_b tilt, deg, scalar or 5-list), lf (leaf_a fan about
+    Z, deg), leaf_k (5 multipliers on la/lb)."""
+    v = NEUTRAL.copy()
+    spec = spec or {}
+    if "body_s" in spec:            # legacy (x, y, z)
+        spec = dict(spec, bh=spec["body_s"][0], bw=spec["body_s"][1])
+    for k in ("bh", "bw", "bdz", "brot", "jaw", "cr_y", "cr_dz"):
+        if k in spec:
+            v[PIDX[k]] = spec[k]
+    for k, nm in SHAPE_KEYS.items():          # B2b: {"sk": {"Inhale": 1.0}} -> k_inhale
+        v[PIDX[k]] = float(spec.get("sk", {}).get(nm, 0.0))
+    v[PIDX["bpiv"]] = 0.0 if spec.get("pivot") == "centre" else 1.0
+    if "cheek" in spec:
+        c = spec["cheek"]
+        for k, x in zip(("csx", "csy", "csz", "clx", "cly", "clz"), cheek_params(c["s"], c["pivot"], c.get("dl", (0, 0, 0)))):
+            v[PIDX[k]] = x
+    kk = spec.get("leaf_k", (1.0,) * 5)
+    for pre, key in (("la", "la"), ("lb", "lb"), ("lf", "lf")):
+        val = spec.get(key, 0.0)
+        vals = list(val) if isinstance(val, (list, tuple)) else [val] * 5
+        for i in range(5):
+            v[PIDX["%s%d" % (pre, i + 1)]] = vals[i] * (kk[i] if pre != "lf" else 1.0)
+    return v
+
+
+def qaxis(axis, deg):
+    return Quaternion(nrm(axis), math.radians(deg))
+
+
+LEAF_REST = {}
+
+
+def bone_targets(arm, v):
+    """Local (rotation quaternion, location, scale) per bone for a parameter vector."""
+    g = lambda k: float(v[PIDX[k]])
+    out = {n: (Quaternion(), Vector(), Vector((1, 1, 1))) for n in BONE_NAMES}
+    bh, bw = g("bh"), g("bw")
+    s = Vector((bh, bw, bh))
+    inv = Vector((1 / s.x, 1 / s.y, 1 / s.z))
+    u = unit(arm)               # B4: pose translations are design-frame cm -> world cm
+    out["body"] = (qaxis(Y, g("brot")), Vector((0, 0, g("bpiv") * (ZC - 1.9) * (bh - 1.0) + g("bdz"))) * u, s)
+    out["taproot"] = (Quaternion(), Vector(), inv)
+    out["crown"] = (qaxis(Y, g("cr_y")), Vector((0, 0, g("cr_dz"))) * u, inv)
+    out["jaw"] = (qaxis(Y, g("jaw")), Vector(), Vector((1, 1, 1)))
+    cs = Vector((g("csx"), g("csy"), g("csz")))
+    out["cheek_l"] = (Quaternion(), Vector((g("clx"), g("cly"), g("clz"))) * u, cs)
+    out["cheek_r"] = (Quaternion(), Vector((g("clx"), -g("cly"), g("clz"))) * u, cs)
+    for i in range(1, 6):
+        a = math.radians(P["LEAF_AZ"][i - 1])
+        tilt = Vector((-math.sin(a), math.cos(a), 0.0))      # + tilts the leaf outward / down
+        for part, keys in (("a", ("la", "lf")), ("b", ("lb", None))):
+            n = "leaf_%02d_%s" % (i, part)
+            if n not in LEAF_REST:
+                LEAF_REST[n] = arm.data.bones[n].matrix_local.to_quaternion()
+            r = LEAF_REST[n]
+            q = qaxis(tilt, g("%s%d" % (keys[0], i)))
+            if keys[1]:
+                q = qaxis(Z, g("%s%d" % (keys[1], i))) @ q
+            out[n] = (r.inverted() @ q @ r, Vector(), Vector((1, 1, 1)))
+    return out
+
+
+def set_shape_values(v, ob=None):
+    ob = ob or bpy.data.objects.get(MESH_NAME)
+    kb = ob.data.shape_keys.key_blocks if (ob is not None and ob.data.shape_keys) else None
+    for k, nm in SHAPE_KEYS.items():
+        if kb is not None and nm in kb:
+            kb[nm].value = float(v[PIDX[k]])
+
+
+def apply_params(arm, v):
+    tg = bone_targets(arm, v)
+    for pb in arm.pose.bones:
+        pb.rotation_mode = "QUATERNION"
+        q, l, s = tg[pb.name]
+        pb.rotation_quaternion, pb.location, pb.scale = q, l, s
+    set_shape_values(v)
+    bpy.context.view_layer.update()
+
+
+def apply_pose(arm, spec, t=1.0, leaves=None):
+    apply_params(arm, NEUTRAL + (params_of(spec) - NEUTRAL) * t)
+
+
+MOUTH_PIVOT = (0.0, 0.0, ZM)          # (Phase B / animate ANT) cheeks scale about the seam centre line
+SEAM_PIVOT = (3.37, 0.0, ZM)          # B2: the closed seam's centre (crease floor, measured x_c): zero inhale drift there
+SIDE_PIVOT = (0.0, 4.5, ZM)           # (Phase B) cheeks squash toward the bulb side
+SCREAM_PIVOT = (3.3, 4.5, ZM)         # B2 r08: squash toward the bulb side AND flatten X about the closure line
+CHEEK_PIVOT = (P["CHEEK_HEAD"][0], P["CHEEK_HEAD"][1], ZM)     # B2b: the lobe scales about its own centre
+INHALE_CHEEK_T = (1.6, 1.25, 0.0)     # B2b decision 1: lobes translate forward >= 1.5 and outward >= 1.2
+POSES = {
+    "neutral": {},
+    "planted": {"bdz": -0.6},
+    "inhale": {"bh": 0.92, "bw": 0.88, "jaw": 0.0,
+               "cheek": {"s": (1.3, 1.3, 1.3), "pivot": CHEEK_PIVOT, "dl": INHALE_CHEEK_T},
+               "sk": {"Inhale": 1.0},
+               "la": -14.0, "lb": -10.0},
+    "scream": {"bh": 1.30, "bw": 1.0, "jaw": 34.0,          # B2b: bw 0.90 -> 1.0 (room for the rim, sheet 04)
+               "sk": {"Scream": 1.0},
+               "cr_y": -6.0, "la": -4.0, "lb": -14.0, "lf": (10, 5, 0, -5, -10)},
+    "recover": {"bh": 0.75, "bw": 1.25, "jaw": 0.0,
+                "cr_y": 4.0, "la": 22.0, "lb": 34.0, "leaf_k": (1.0, 0.62, 0.85, 0.62, 1.0)},
+    "impact_squash": {"bh": 0.80, "bw": 1.20, "pivot": "centre", "la": 14.0, "lb": 12.0,
+                      "leaf_k": (1.0, 0.6, 0.85, 0.6, 1.0)},
+}
+POSE_ORDER = ("neutral", "inhale", "scream", "recover", "impact_squash")
+
+
+def key_pose(arm, frame):
+    for pb in arm.pose.bones:
+        for path in ("rotation_quaternion", "location", "scale"):
+            pb.keyframe_insert(path, frame=frame, group=pb.name)
+
+
+# ---------------------------------------------------------------- shape keys (Phase B2b, decision 2)
+# Shape keys sculpt only what the bones cannot. Each key is authored in POSED space at its full pose (bones at the
+# pose, key value 1): a target position T per affected vertex; the rest-space delta is A_v^-1 (T - P0), A_v / P0 the
+# vertex's linear-blend skinning matrix / bone-only posed position (Blender and Unreal both apply morphs before
+# skinning, so the key plays the same on both sides). Two keys: `Inhale` (spherical lobes + purse), `Scream` (the
+# rolled elliptical rim, gum band, pocket and seated teeth).
+SK = {
+    "scream": {
+        "gape": 0.64,               # inner opening width (side lip edges) / neutral bulb width
+        "aspect": 1.10,             # inner opening height / width
+        "zc": 0.0,                  # opening centre z offset from the body-posed seam centre (cm)
+        # rim profile, patch loops 0..5: (o = outward offset past the inner ellipse, h = height along the shell
+        # normal) - loop 0 the inner lip edge, 1-3 the roll and crest, 4 the outer slope, 5 the outer crease
+        "rim": [(0.00, 0.30), (0.22, 0.72), (0.50, 0.90), (0.80, 0.74), (1.02, 0.38), (1.18, 0.02)],
+        "rim_side_k": 0.82,         # the rim's outward offsets x this at the sides (theta 0 / 180), 1 at top / bottom
+        "l1": (-0.16, 0.42),        # closure line: (inward offset, depth behind the lip edge)
+        # pocket levels (SOCK): (ellipse scale, depth behind the lip edge); first GUM_LEVELS are the gum band
+        "pocket": [(0.93, 0.70), (0.87, 1.30), (0.70, 2.30), (0.42, 3.05)],
+        "back": 3.55,
+        "tooth_tilt": 0.45,         # forward (+x) component of the tooth axis (tips show from the front)
+        "tooth_spread": 1.30,       # tooth row y x this at the scream
+        "tooth_scale": (1.7, 1.3),  # tooth length / width x these at the scream (sheet 04 fangs)
+    },
+    "inhale": {
+        "lobe_off": (-0.05, -0.30, -0.24),  # sphere centre offset from the posed cheek-bone head (left side)
+        "lobe_r": 2.75,
+        "proj_o": (0.0, 0.8),       # union-ray origin (x, |y|) inside the bulb, at the sphere centre's height
+        "union_soft": 0.30,         # soft-max width (cm) of the bulb / sphere union
+        "union_from_loop": 3,       # lip loops 0..2 only purse; loops 3.. fade the purse out and join the union
+        "purse": 0.97,              # lip region (y, z) about the mouth centre (x the body squash: tips 0.85 / 0.89)
+        "mask_full": 0.45,          # lobe mask = smooth(cheek weight / mask_full)
+    },
+}
+
+
+def weight_matrix(ob):
+    gi = {g.index: g.name for g in ob.vertex_groups}
+    col = {n: i for i, n in enumerate(BONE_NAMES)}
+    W = np.zeros((len(ob.data.vertices), len(BONE_NAMES)))
+    for v in ob.data.vertices:
+        for g in v.groups:
+            W[v.index, col[gi[g.group]]] = g.weight
+    return W
+
+
+def skin_stack(arm):
+    return np.array([np.array(arm.matrix_world @ arm.pose.bones[n].matrix @ arm.data.bones[n].matrix_local.inverted())
+                     for n in BONE_NAMES])
+
+
+def skin_affine(W, S):
+    M = np.einsum("vb,bij->vij", W, S)
+    return M[:, :3, :3], M[:, :3, 3]
+
+
+def w_vec(d):
+    w = np.zeros(len(BONE_NAMES))
+    for k, x in d.items():
+        w[BONE_NAMES.index(k)] = x
+    return w
+
+
+class PosedShell:
+    """The plain bulb ellipsoid (no muzzle, no lobe bump) skinned with the grid's body / jaw field at the current
+    pose; ray-cast along -X for the posed face surface and its (smoothed) normal at a front-view (y, z)."""
+
+    def __init__(self, arm):
+        zs = np.linspace(P["RING_Z"][0], P["RING_Z"][-1], 79)
+        phis = np.linspace(-120.0, 120.0, 121)
+        pts, ws = [], []
+        for z in zs:
+            for ph in phis:
+                p, _n = surf(float(z), float(ph))
+                pts.append(tuple(p))
+                ws.append(w_vec(make_w(0.0, 0.0, jaw_field(float(ph), float(z)))))
+        A, t = skin_affine(np.array(ws), skin_stack(arm))
+        posed = np.einsum("vij,vj->vi", A, np.array(pts)) + t
+        nz, nphi = len(zs), len(phis)
+        tris = []
+        for i in range(nz - 1):
+            for j in range(nphi - 1):
+                a, b, c, d = i * nphi + j, i * nphi + j + 1, (i + 1) * nphi + j + 1, (i + 1) * nphi + j
+                tris += [(a, b, c), (a, c, d)]
+        self.bvh = BVHTree.FromPolygons([Vector(p) for p in posed], tris, all_triangles=True)
+
+    def point(self, y, z):
+        hit, _n, _i, _d = self.bvh.ray_cast(Vector((40.0, y, z)), Vector((-1.0, 0.0, 0.0)), 200.0)
+        if hit is None:
+            raise RuntimeError("posed shell miss at y %.2f z %.2f" % (y, z))
+        return hit
+
+    def nearest(self, p):
+        return self.bvh.find_nearest(Vector(p))[0]
+
+    def normal(self, y, z, e=0.3):
+        dy = self.point(y + e, z) - self.point(y - e, z)
+        dz = self.point(y, z + e) - self.point(y, z - e)
+        n = dy.cross(dz).normalized()
+        return n if n.x > 0 else -n
+
+    def offset(self, y, z, h):
+        """The shell point whose normal offset by h lands at front-view (y, z) (fixed-point passes)."""
+        yy, zz = y, z
+        for _ in range(3):
+            n = self.normal(yy, zz)
+            yy, zz = y - n.y * h, z - n.z * h
+        return self.point(yy, zz) + self.normal(yy, zz) * h
+
+
+def scream_targets(ob, arm, P0, info, teeth_verts, nbw):
+    """Posed-space targets of the Scream key: the lip loop as a rounded ellipse with a rolled rim (loops 0..5),
+    loops 6..8 blending to the bone-posed patch boundary, the closure line rolled inside the lip, the gum band and
+    the rounded pocket, the teeth re-seated in the gum band. Returns ({vertex: Vector}, info)."""
+    C = SK["scream"]
+    shell = PosedShell(arm)
+    loops, L1, sock, seam = info["loops"], info["L1"], info["sock"], info["seam"]
+    M = len(seam)
+    iu = next(i for i, e in enumerate(seam) if e["flap"] == "U" and e["s"] == 0.0)
+    theta = [math.radians(90.0 - (i - iu) * 360.0 / M) for i in range(M)]
+    body_m = arm.pose.bones["body"].matrix @ arm.data.bones["body"].matrix_local.inverted()
+    zc = (body_m @ Vector((0.0, 0.0, ZM))).z + C["zc"]
+    a = 0.5 * C["gape"] * nbw
+    b = C["aspect"] * a
+    T = {}
+    xl0 = []
+
+    def ell(i, o):
+        k = lerp(C["rim_side_k"], 1.0, abs(math.sin(theta[i])))
+        return (a + o * k) * math.cos(theta[i]), zc + (b + o * k) * math.sin(theta[i])
+
+    for k, (o, h) in enumerate(C["rim"]):
+        for i in range(M):
+            y, z = ell(i, o)
+            T[loops[k][i]] = shell.offset(y, z, h)
+            if k == 0:
+                xl0.append(T[loops[k][i]].x)
+    f5 = P["LOOP_F"][5]
+    for k in range(6, len(loops) - 1):
+        t = (P["LOOP_F"][k] - f5) / (1.0 - f5)
+        for i in range(M):
+            p5, p9 = T[loops[5][i]], Vector(P0[loops[-1][i]])
+            q = shell.nearest(p5.lerp(p9, t))         # the chord pulled back onto the posed shell
+            T[loops[k][i]] = q + (p5 - shell.nearest(p5)) * (1.0 - t) + (p9 - shell.nearest(p9)) * t
+    for i in range(M):
+        y, z = ell(i, C["l1"][0])
+        T[L1[i]] = Vector((xl0[i] - C["l1"][1], y, z))
+    rings = sock[:-1]
+    for j, ring in enumerate(rings):
+        sc, dep = C["pocket"][j]
+        for i in range(M):
+            T[ring[i]] = Vector((xl0[i] - dep, a * sc * math.cos(theta[i]), zc + b * sc * math.sin(theta[i])))
+    T[sock[-1][0]] = Vector((float(np.mean(xl0)) - C["back"], 0.0, zc))
+    # teeth: rigid placement on the first gum ring at the tooth's y, axis toward the opening centre, tilted forward
+    g0 = rings[0]
+    sc0 = C["pocket"][0][0]
+    angs = [math.degrees(theta[i]) % 360.0 for i in range(M)]
+    for upper, ty, idx, root_rest, axis_rest in teeth_verts:
+        ty = ty * C["tooth_spread"]                   # r11: the bigger gape spreads the rows
+        th = math.acos(max(-1.0, min(1.0, ty / (a * sc0))))
+        th = th if upper else -th
+        tdeg = math.degrees(th) % 360.0
+        near = sorted(range(M), key=lambda i: abs(((angs[i] - tdeg) + 180) % 360 - 180))[:2]
+        gx = float(np.mean([T[g0[i]].x for i in near]))
+        root = Vector((gx, a * sc0 * math.cos(th), zc + b * sc0 * math.sin(th)))
+        inward = Vector((0.0, -root.y * 0.25, zc - root.z)).normalized()
+        ax = (inward + X * C["tooth_tilt"]).normalized()
+        a0 = Vector(axis_rest).normalized()
+        R = a0.rotation_difference(ax).to_matrix()
+        kl, kw = C["tooth_scale"]                     # r11: longer (axis) and wider fangs at the scream
+        for v in idx:
+            d = Vector(ob.data.vertices[v].co) - Vector(root_rest)
+            along = a0 * d.dot(a0)
+            T[v] = root + R @ (along * kl + (d - along) * kw)
+    return T, {"zc": round(zc, 3), "a": round(a, 3), "b": round(b, 3)}
+
+
+def inhale_targets(ob, arm, P0, W, info, lip_set, n_shell_v):
+    """Posed-space targets of the Inhale key (r05): the face is the body-posed bulb (the cheek bones' displacement
+    replaced) UNION two spheres, taken along rays from an origin O inside the bulb on each side (star-shaped from O,
+    so it cannot fold; the union leaves a crease where each sphere emerges from the bulb); the lips (loops 0..4,
+    closure, pocket, teeth) pursed toward the mouth centre in (y, z), fading over loops 5-6 (which also join the
+    union, forming the crease wall between the pucker and the lobe)."""
+    C = SK["inhale"]
+    T = {}
+    il, ir, ib = BONE_NAMES.index("cheek_l"), BONE_NAMES.index("cheek_r"), BONE_NAMES.index("body")
+    loops = info["loops"]
+    nl = P["W"]["lip_loops"]
+    Wb = W.copy()
+    Wb[:, ib] += Wb[:, il] + Wb[:, ir]
+    Wb[:, il] = Wb[:, ir] = 0.0
+    Ab, tb = skin_affine(Wb, skin_stack(arm))
+    rest = np.array([tuple(v.co) for v in ob.data.vertices])
+    PB = np.einsum("vij,vj->vi", Ab, rest) + tb
+    centre = Vector(np.mean([P0[i] for i in info["L1"]], axis=0))
+    purse_w = {v: 1.0 for v in lip_set}
+    ku = C["union_from_loop"]            # r10: the lips' outer slope (loops ku..) joins the lobe union too
+    for k in range(ku, len(loops) - 1):
+        f = 1.0 - smooth((k - (ku - 1)) / (nl + 1 - ku))
+        for v in loops[k]:
+            purse_w[v] = f if f > 0 else purse_w.pop(v, 0.0) * 0.0
+    purse_w = {v: f for v, f in purse_w.items() if f > 0}
+    for v, f in purse_w.items():
+        p = Vector(PB[v])
+        d = Vector((0.0, p.y - centre.y, p.z - centre.z))
+        T[v] = p + d * ((C["purse"] - 1.0) * f)
+    heads = {}
+    for side, nm in ((1, "cheek_l"), (-1, "cheek_r")):
+        h = arm.pose.bones[nm].head
+        o = C["lobe_off"]
+        heads[side] = Vector((h.x + o[0], h.y + side * o[1], h.z + o[2]))
+    for v in range(n_shell_v):           # r09: every shell vertex but the lips joins the union (fold-free from O)
+        if purse_w.get(v, 0.0) >= 1.0:
+            continue
+        p = T.get(v, Vector(PB[v]))
+        side = 1 if p.y >= 0 else -1
+        c = heads[side]
+        o = Vector((C["proj_o"][0], side * C["proj_o"][1], c.z))
+        u = (p - o).normalized()
+        d = o - c
+        bq = d.dot(u)
+        disc = bq * bq - (d.length_squared - C["lobe_r"] ** 2)
+        tf = -bq + math.sqrt(disc) if disc > 0.0 else -1.0
+        a_, k_ = (p - o).length, C["union_soft"]          # r13: soft max - rounds the crease, ends it smoothly
+        rad = 0.5 * (a_ + tf + math.sqrt((a_ - tf) ** 2 + k_ * k_)) if tf > 0.0 else a_
+        T[v] = o + u * rad
+    return T, {"lobe_centre_l": [round(x, 3) for x in heads[1]], "r": C["lobe_r"]}
+
+
+def add_shape_key(ob, arm, name, spec, targets_fn, *args):
+    """Pose the bones (keys at 0), build the posed targets, store the rest-space deltas as a relative key; verify the
+    evaluated mesh at the pose with the key at 1 lands on the targets."""
+    for kb in ob.data.shape_keys.key_blocks:
+        kb.value = 0.0
+    apply_params(arm, params_of(dict(spec, sk={})))
+    W = weight_matrix(ob)
+    A, t = skin_affine(W, skin_stack(arm))
+    rest = np.array([tuple(v.co) for v in ob.data.vertices])
+    P0 = np.einsum("vij,vj->vi", A, rest) + t
+    ev = turnip_audit.evaluated(ob)[0]
+    skin_err = float(np.abs(ev - P0).max())
+    T, extra = targets_fn(ob, arm, P0, *args)
+    kb = ob.shape_key_add(name=name, from_mix=False)
+    kb.relative_key = ob.data.shape_keys.key_blocks["Basis"]
+    co = rest.copy()
+    for v, tp in T.items():
+        co[v] = rest[v] + np.linalg.solve(A[v], np.array(tp) - P0[v])
+    kb.data.foreach_set("co", co.ravel())
+    kb.value = 1.0
+    bpy.context.view_layer.update()
+    ev = turnip_audit.evaluated(ob)[0]
+    want = P0.copy()
+    for v, tp in T.items():
+        want[v] = np.array(tp)
+    err = float(np.abs(ev - want).max())
+    kb.value = 0.0
+    apply_params(arm, NEUTRAL)
+    moved = int(sum(1 for v in T if np.linalg.norm(np.array(T[v]) - P0[v]) > 1e-4))
+    out = {"name": name, "vertices_moved": moved, "max_rest_delta_cm": round(float(np.abs(co - rest).max()), 3),
+           "bone_skin_model_err_cm": round(skin_err, 6), "posed_target_err_cm": round(err, 6)}
+    out.update(extra)
+    return out
+
+
+def build_shape_keys(ob, arm, info, teeth_info, n_bulb_v, nbw):
+    ob.shape_key_add(name="Basis", from_mix=False)
+    ob.data.shape_keys.use_relative = True
+    teeth_verts = []
+    for k, tinfo in enumerate(teeth_info):
+        idx = list(range(n_bulb_v + 10 * k, n_bulb_v + 10 * k + 10))
+        teeth_verts.append((tinfo["upper"], tinfo["y"], idx, tinfo["gum"], tinfo["axis"]))
+    nl = P["W"]["lip_loops"]
+    lip_set = set(info["L1"]) | {v for r in info["sock"] for v in r} | {v for r in info["loops"][:nl] for v in r}
+    lip_set |= {v for t in teeth_verts for v in t[2]}
+    W = weight_matrix(ob)
+    return [add_shape_key(ob, arm, "Inhale", POSES["inhale"], inhale_targets, W, info, lip_set, n_bulb_v),
+            add_shape_key(ob, arm, "Scream", POSES["scream"], scream_targets, info, teeth_verts, nbw)]
+
+
+# ---------------------------------------------------------------- measurements
+def parts_mask(tp, *names):
+    return np.isin(tp, [PART[n] for n in names])
+
+
+def bounds(co):
+    mn, mx = co.min(0), co.max(0)
+    return {"min": mn.round(3).tolist(), "max": mx.round(3).tolist(), "h_z": round(float(mx[2] - mn[2]), 3),
+            "w_y": round(float(mx[1] - mn[1]), 3), "d_x": round(float(mx[0] - mn[0]), 3)}
+
+
+def mesh_points(obj):
+    co, tris, tp, tl = turnip_audit.evaluated(obj)
+    return co, tris, tp, tl
+
+
+def used(tris, mask):
+    return np.unique(tris[mask].ravel())
+
+
+def ue(v):
+    v = Vector(v)
+    return [round(v.x, 3), round(-v.y, 3), round(v.z, 3)]
+
+
+def bl(v):
+    v = Vector(v)
+    return [round(v.x, 3), round(v.y, 3), round(v.z, 3)]
+
+
+def mouth_metrics(co, ob, neutral_w):
+    """Seam metrics: the opening width at mid-height (side-flap centre lips S+ / S-), the vertical lip separation
+    (U / L centre lips), the closure-line aperture (largest distance between the four L1 centre points), the tip span
+    and the Y extent of the opening outline (L0)."""
+    c0 = {k: co[i] for k, i in zip(("U", "S+", "L", "S-"), ob["mouth_centre_l0"])}
+    c1 = [co[i] for i in ob["mouth_centre_l1"]]
+    l0 = co[list(ob["mouth_L0"])]
+    tips = co[list(ob["mouth_tips"])]
+    side = float(np.linalg.norm(c0["S+"] - c0["S-"]))
+    ap = max(float(np.linalg.norm(a - b)) for a in c1 for b in c1)
+    return {"side_lip_separation_cm": round(side, 3),
+            "open_width_over_neutral_bulb_width": round(side / neutral_w, 3),
+            "vertical_lip_separation_cm": round(float(np.linalg.norm(c0["U"] - c0["L"])), 3),
+            "closure_aperture_l1_cm": round(ap, 3),
+            "tip_span_y_cm": round(float(tips[:, 1].max() - tips[:, 1].min()), 3),
+            "outline_extent_y_cm": round(float(l0[:, 1].max() - l0[:, 1].min()), 3),
+            "outline_extent_y_over_neutral_bulb_width": round(float(l0[:, 1].max() - l0[:, 1].min()) / neutral_w, 3)}
+
+
+def prot_of(p):
+    """Rest-pose protrusion (cm) of a point over the plain bulb ellipse at its height, minus the cheek-lobe bump:
+    (rho - 1) * |(x, y)| / rho with rho the point's elliptical radius in units of the ring (x <-> rx, y <-> ry).
+    B4: evaluated in the design frame (p / unit()), returned in world cm."""
+    u = unit()
+    p = Vector(p) / u
+    ry = ry_at(float(p[2]))
+    rx = ry * P["DEPTH_RATIO"]
+    rho = math.hypot(float(p[0]) / rx, float(p[1]) / ry)
+    return u * ((rho - 1.0) * math.hypot(float(p[0]), float(p[1])) / max(rho, 1e-9) - lobe_bump(p))
+
+
+CREST_K = {}
+
+
+def b2_metrics(co, ob, neutral=None):
+    """Phase B2 mouth numbers on a posed (or rest) evaluated mesh. Lengths cm; the mouth faces +X.
+    pad_thickness  per pad: max over its spokes (s <= 0.5) of (crest x on loops 1..5) - (closure L1 x)
+    crease_depth   per arm at s ~ 0.25 / 0.5 / 0.75: mean crest x of the two pads either side - mean lip-edge (floor) x
+    centre_pinch   mean floor x at s ~ 0.5 - mean floor x of the four pad centres
+    gap            max distance from a closure-line vertex to the opposite pad's closure polyline on the same arm,
+                   minus the authored X_GAP (0 = closed as built); the centre aperture separately
+    rim            (front projection, y-z) distance from each lip-edge vertex to its spoke's outer crease edge
+                   (loop 5, f 0.37); min / mean, tips excluded
+    cavity_depth   mean lip-edge x - deepest pocket x
+    lobes          apex displacement vs neutral (forward = +x, outward = +|y|); lobe apex x - lip crest x"""
+    info = json.loads(ob["mouth_info"])
+    loops, L1, seam = info["loops"], info["L1"], info["seam"]
+    L0 = loops[0]
+    x = co[:, 0]
+    out = {}
+    ref = neutral if neutral is not None else co
+    if not CREST_K:          # per spoke: the loop (1..6) standing proudest in the rest pose = the pad crest
+        for i in range(len(seam)):
+            CREST_K[i] = max(range(1, 7), key=lambda k: prot_of(ref[loops[k][i]]))
+
+    def crest(i):
+        return float(x[loops[CREST_K[i]][i]])
+
+    def chord_depth(ia, ib):
+        """Depth of the crease floor (mid of the two lip edges) below the chord joining the two pads' crests."""
+        a, b = co[loops[CREST_K[ia]][ia]], co[loops[CREST_K[ib]][ib]]
+        f = 0.5 * (co[L0[ia]] + co[L0[ib]])
+        ab = b - a
+        t = max(0.0, min(1.0, float(np.dot(f - a, ab) / max(1e-12, np.dot(ab, ab)))))
+        return float(np.linalg.norm(f - (a + ab * t)))
+
+    pads = {}
+    for F in ("U", "L", "S+", "S-"):
+        idx = [i for i, e in enumerate(seam) if e["flap"] == F and e["s"] <= 0.5]
+        pads[F] = round(max(crest(i) - float(x[L1[i]]) for i in idx), 3)
+    out["pad_thickness_cm"] = pads
+    out["pad_crest_x_max"] = round(max(crest(i) for i, e in enumerate(seam) if e["flap"] != "tip"), 3)
+
+    def near(F, arm, s):
+        c = [i for i, e in enumerate(seam) if e["flap"] == F and (e["arm"] == arm or e["s"] == 0.0)]
+        return min(c, key=lambda i: (round(abs(seam[i]["s"] - s), 6), seam[i]["s"]))
+
+    pair = {"pp": ("U", "S+"), "pm": ("S+", "L"), "mm": ("L", "S-"), "mp": ("S-", "U")}
+    crease = {}
+    for arm, (A, B) in pair.items():
+        row = {}
+        for s in (0.25, 0.5, 0.75):
+            ia, ib = near(A, arm, s), near(B, arm, s)
+            row["s%.2f" % s] = round(chord_depth(ia, ib), 3)
+        crease[arm] = row
+    out["crease_depth_cm"] = crease
+    out["crease_depth_min_at_s0.5"] = round(min(r["s0.50"] for r in crease.values()), 3)
+    mids = [L0[near(F, arm, 0.5)] for arm, fl in pair.items() for F in fl]
+    cen = [L0[i] for i, e in enumerate(seam) if e["s"] == 0.0]
+    out["centre_pinch_cm"] = round(float(np.mean(x[mids]) - np.mean(x[cen])), 3)
+    # the centre's depth below the four pad crests next to it (what the eye reads as the pinch)
+    cc = [loops[CREST_K[i]][i] for i, e in enumerate(seam) if e["s"] == 0.0]
+    out["centre_below_pad_crests_cm"] = round(float(np.mean(x[cc]) - np.mean(x[cen])), 3)
+
+    def seg_dist(p, a, b):
+        ab = b - a
+        t = max(0.0, min(1.0, float(np.dot(p - a, ab) / max(1e-12, np.dot(ab, ab)))))
+        return float(np.linalg.norm(p - (a + ab * t)))
+
+    gap = 0.0
+    for arm, (A, B) in pair.items():
+        def poly(F):
+            c = [i for i, e in enumerate(seam) if e["flap"] == F and (e["arm"] == arm or e["s"] == 0.0)]
+            c.sort(key=lambda i: seam[i]["s"])
+            tip_i = [i for i, e in enumerate(seam) if e["flap"] == "tip" and e["arm"] == arm]
+            return [co[L1[i]] for i in c + tip_i], c
+        pa, ca = poly(A)
+        pb, cb = poly(B)
+        for pts_from, idx_from, pts_to in ((pa, ca, pb), (pb, cb, pa)):
+            for i in idx_from:
+                if seam[i]["s"] == 0.0:
+                    continue
+                p = co[L1[i]]
+                d = min(seg_dist(p, pts_to[k], pts_to[k + 1]) for k in range(len(pts_to) - 1))
+                gap = max(gap, d)
+    out["gap_closure_cm"] = round(max(0.0, gap - P["X_GAP"] * unit()), 3)
+    c1 = [co[L1[i]] for i, e in enumerate(seam) if e["s"] == 0.0]
+    out["centre_aperture_cm"] = round(max(float(np.linalg.norm(a - b)) for a in c1 for b in c1) - P["X_GAP"] * unit(), 3)
+
+    rim = [float(np.linalg.norm(co[L0[i], 1:] - co[loops[5][i], 1:])) for i, e in enumerate(seam)
+           if e["flap"] != "tip"]
+    out["rim_front_cm"] = {"min": round(min(rim), 3), "mean": round(float(np.mean(rim)), 3)}
+    rim_by = {}
+    for F in ("U", "L", "S+", "S-"):
+        r = [float(np.linalg.norm(co[L0[i], 1:] - co[loops[5][i], 1:])) for i, e in enumerate(seam) if e["flap"] == F]
+        rim_by[F] = round(min(r), 3)
+    out["rim_front_min_by_pad_cm"] = rim_by
+    sock = [v for r in info["sock"] for v in r]
+    lip_x = float(np.mean([x[L0[i]] for i, e in enumerate(seam) if e["flap"] != "tip"]))
+    out["cavity_depth_cm"] = round(lip_x - float(x[sock].min()), 3)
+    lo = {}
+    for nm in ("lobe_l", "lobe_r"):
+        a = co[info[nm]]
+        lo[nm] = {"apex": [round(float(v), 3) for v in a]}
+        if neutral is not None:
+            b = neutral[info[nm]]
+            lo[nm]["forward_cm"] = round(float(a[0] - b[0]), 3)
+            lo[nm]["outward_cm"] = round(float(abs(a[1]) - abs(b[1])), 3)
+        lo[nm]["apex_x_minus_lip_crest_x"] = round(float(a[0]) - out["pad_crest_x_max"], 3)
+    out["lobes"] = lo
+    if "lobe_masks" in info:          # B2b: the lobe's most forward vertex (cheek weight >= 0.5) vs the lip crest
+        for nm in ("lobe_l", "lobe_r"):
+            m = info["lobe_masks"][nm]
+            fx = float(x[m].max())
+            lo[nm]["front_x"] = round(fx, 3)
+            lo[nm]["front_x_minus_lip_crest_x"] = round(fx - out["pad_crest_x_max"], 3)
+    # lip outline span (tip to tip in y, upper tips to lower tips in z) and its ratio to neutral: the pucker
+    tips = [L0[i] for i, e in enumerate(seam) if e["flap"] == "tip"]
+    out["tip_span_y_cm"] = round(float(co[tips, 1].max() - co[tips, 1].min()), 3)
+    out["tip_span_z_cm"] = round(float(co[tips, 2].max() - co[tips, 2].min()), 3)
+    if neutral is not None:
+        out["tip_span_y_ratio"] = round(out["tip_span_y_cm"] / float(neutral[tips, 1].max() - neutral[tips, 1].min()), 3)
+        out["tip_span_z_ratio"] = round(out["tip_span_z_cm"] / float(neutral[tips, 2].max() - neutral[tips, 2].min()), 3)
+        crestv = [loops[3][i] for i, e in enumerate(seam) if e["flap"] != "tip"]
+        out["crest_ring_span_y_ratio"] = round(float(co[crestv, 1].max() - co[crestv, 1].min()) /
+                                               float(neutral[crestv, 1].max() - neutral[crestv, 1].min()), 3)
+    return out
+
+
+def muzzle_rest_metrics(co, ob):
+    """Rest-pose muzzle: protrusion of the patch loops over the plain bulb (x - base_x), the muzzle extent where
+    it stands >= 0.25 cm proud, and the fade at the rectangle (loop 8)."""
+    info = json.loads(ob["mouth_info"])
+    loops = info["loops"]
+    pr = {}
+    ext = []
+    for k in range(1, len(loops)):
+        vals = []
+        for v in loops[k]:
+            p = co[v]
+            d = prot_of(p)
+            vals.append(d)
+            if d >= 0.25 * unit():          # B4: the design-frame 0.25 cm threshold, scaled
+                ext.append(p)
+        pr["loop%d" % k] = {"max": round(max(vals), 3), "mean": round(float(np.mean(vals)), 3)}
+    ext = np.array(ext)
+    return {"protrusion_by_loop_cm": pr,
+            "muzzle_protrusion_max_cm": round(max(v["max"] for v in pr.values()), 3),
+            "muzzle_extent_proud_0.25_w_y_cm": round(float(ext[:, 1].max() - ext[:, 1].min()), 3),
+            "muzzle_extent_proud_0.25_h_z_cm": round(float(ext[:, 2].max() - ext[:, 2].min()), 3),
+            "x_c_seam_floor": round(float(info["x_c"]), 3)}
+
+
+def cheek_metrics(co, tris, tp, arm):
+    """Width (Y) of the bulb shell within +-0.8 cm of the posed cheek-bone height."""
+    band = co[used(tris, parts_mask(tp, "bulb"))]
+    hz = arm.pose.bones["cheek_l"].head.z
+    band = band[np.abs(band[:, 2] - hz) < 0.8 * unit(arm)]
+    return {"bulb_width_at_cheek_height_cm": round(float(band[:, 1].max() - band[:, 1].min()), 3),
+            "cheek_head_z": round(hz, 3)}
+
+
+def apply_global_scale(S, arm, meshes, located):
+    """B4: one global scale of everything built in the design frame. Every mesh vertex and every shape-key block (a
+    relative key's deltas scale with it), every bone head / tail (roll kept: rest rotations unchanged), the scene
+    location of `located`. Returns the largest rest-rotation change (deg) over the bones."""
+    rest_q = {b.name: b.matrix_local.to_quaternion() for b in arm.data.bones}
+    for o in meshes:
+        me = o.data
+        co = np.empty(len(me.vertices) * 3)
+        if me.shape_keys:
+            for kb in me.shape_keys.key_blocks:
+                kb.data.foreach_get("co", co)
+                kb.data.foreach_set("co", co * S)
+        me.vertices.foreach_get("co", co)
+        me.vertices.foreach_set("co", co * S)
+        me.update()
+    for o in located:
+        o.location = o.location * S
+    bpy.context.view_layer.objects.active = arm
+    for o in bpy.context.view_layer.objects:
+        o.select_set(o is arm)
+    bpy.ops.object.mode_set(mode="EDIT")
+    for e in arm.data.edit_bones:
+        roll = e.roll
+        h, t = e.head * S, e.tail * S
+        e.head, e.tail = h, t
+        e.roll = roll
+    bpy.ops.object.mode_set(mode="OBJECT")
+    arm["turnip_scale"] = S
+    bpy.context.view_layer.update()
+    return max(math.degrees(rest_q[b.name].rotation_difference(b.matrix_local.to_quaternion()).angle)
+               for b in arm.data.bones)
+
+
+mb_ids = {}
+
+
+# ---------------------------------------------------------------- main
+def main():
+    argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
+    do_save = "--no-save" not in argv
+    fails = []
+    colls = reset_scene()
+
+    # ---- parts
+    bulb = build_bulb(mb_ids)
+    teeth, teeth_info = build_teeth(bulb)
+    tap = build_taproot()
+    leaves = leaf_layout()
+    leaf_mbs = [build_leaf(L) for L in leaves]
+    for name, mb in [("Bulb", bulb), ("Teeth", teeth), ("Taproot", tap)] + \
+            [("Leaf_%02d" % L["i"], m) for L, m in zip(leaves, leaf_mbs)]:
+        mb.to_object("AUTH_" + name, colls["Authoring"], groups=False)
+    colls["Authoring"].hide_render = True
+    colls["Authoring"].hide_viewport = True
+
+    full = MB()
+    full.extend(bulb)
+    n_bulb_faces = len(full.f)
+    for mb in [teeth, tap] + leaf_mbs:
+        full.extend(mb)
+    ob = full.to_object(MESH_NAME, colls["Export"])
+    triangulate(ob)
+    FLAPS = ("U", "S+", "L", "S-")
+    ob["mouth_L0"] = mb_ids["L0"]
+    ob["mouth_L1"] = mb_ids["L1"]
+    ob["mouth_centre_l0"] = [mb_ids["centre_l0"][k] for k in FLAPS]
+    ob["mouth_centre_l1"] = [mb_ids["centre_l1"][k] for k in FLAPS]
+    ob["mouth_tips"] = [mb_ids["tips"][k] for k in ("mp", "pp", "pm", "mm")]
+    gl = {g.name: g.index for g in ob.vertex_groups}
+    mb_ids["lobe_masks"] = {nm: [v.index for v in ob.data.vertices
+                                 if any(g.group == gl[bn] and g.weight >= 0.5 for g in v.groups)]
+                            for nm, bn in (("lobe_l", "cheek_l"), ("lobe_r", "cheek_r"))}
+    ob["mouth_info"] = json.dumps({k: mb_ids[k] for k in ("loops", "L1", "sock", "seam", "lobe_l", "lobe_r", "x_c",
+                                                          "lobe_masks")})
+    print("MOUTH_TOPOLOGY", json.dumps({"M_spokes": len(mb_ids["seam"]), "loops": len(mb_ids["loops"]),
+                                        "pocket_levels": len(mb_ids["sock"]), "x_c": round(mb_ids["x_c"], 3)}))
+    cav = turnip_audit.bake_cavity(ob)
+    # B2b r14: the pocket is baked closed (rest pose) but seen open at the scream: floor its cavity alpha so the gum
+    # band and cavity read mid plum (sheet 04), not black
+    pocket_parts = {PART["cavity"], PART["gum"], PART["lip"]}
+    pa = [d.value for d in ob.data.attributes["part"].data]
+    cattr = ob.data.color_attributes["Col"]
+    for poly in ob.data.polygons:
+        if pa[poly.index] in pocket_parts:
+            for li in range(poly.loop_start, poly.loop_start + poly.loop_total):
+                c = cattr.data[li].color_srgb
+                cattr.data[li].color_srgb = (c[0], c[1], c[2], max(c[3], P["POCKET_ALPHA_FLOOR"]))
+    print("CAVITY", json.dumps({"min_alpha": cav[0], "mean_alpha": cav[1]}))
+    lay = bone_layout(leaves)
+    arm = build_armature(colls["Export"], lay)
+    ob.parent = arm
+    mod = ob.modifiers.new("Armature", "ARMATURE")
+    mod.object = arm
+
+    # statics
+    bed = build_bed(False).to_object(BED_NAME, colls["Export"], groups=False)
+    bede = build_bed(True).to_object(BED_EMPTY_NAME, colls["Export"], groups=False)
+    for o in (bed, bede):
+        triangulate(o)
+        o.location = (0, 0, P["SOIL_Z"])
+    hull_pts = build_collision_points()
+    # B2b decision 5: the lip crest stands proud of the hull's +X face -> widen the front half of the hull by that much
+    crest_x = max(bulb.v[i].x for r in mb_ids["loops"][1:7] for i in r)
+    hull_fx = max(p.x for p in hull_pts)
+    hull_widen = crest_x - hull_fx
+    if hull_widen > 0.5:
+        k_ = crest_x / hull_fx
+        hull_pts = [Vector((p.x * k_, p.y, p.z)) if p.x > 0 else p for p in hull_pts]
+    print("HULL_FRONT", json.dumps({"lip_crest_x": round(crest_x, 3), "hull_front_x_before": round(hull_fx, 3),
+                                    "widened_by": round(hull_widen, 3) if hull_widen > 0.5 else 0.0}))
+    hull = build_hull(hull_pts).to_object(COLL_NAME, colls["Export"], groups=False)
+    hull.display_type = "WIRE"
+    hull.hide_render = True
+    bede.hide_render = True
+    bed.hide_render = True
+
+    # ---- B4: shape keys in the 16 cm design frame (as B2b), then ONE global scale of everything
+    apply_pose(arm, {})
+    co_d, tris_d, tp_d, _tl = mesh_points(ob)
+    nbw_design = bounds(co_d[used(tris_d, parts_mask(tp_d, "bulb"))])["w_y"]
+    sk_rep = build_shape_keys(ob, arm, json.loads(ob["mouth_info"]), teeth_info, len(bulb.v), nbw_design)
+    for r in sk_rep:
+        if r["posed_target_err_cm"] > 1e-3 or r["bone_skin_model_err_cm"] > 1e-3:
+            fails.append("shape key %s does not land on its targets %s" % (r["name"], r))
+    design = {}
+    for name in POSE_ORDER + ("planted",):
+        apply_pose(arm, POSES[name])
+        design[name] = mesh_points(ob)[0].copy()
+    apply_pose(arm, {})
+    S = float(P["SCALE"])
+    auth = list(colls["Authoring"].objects)
+    rot_err = apply_global_scale(S, arm, [ob, bed, bede, hull] + auth, [bed, bede])
+    _info = json.loads(ob["mouth_info"])
+    _info["x_c"] = _info["x_c"] * S
+    ob["mouth_info"] = json.dumps(_info)
+    scale_check = {"scale": S, "unit_read_back": round(unit(arm), 9), "rest_rotation_change_deg": rot_err,
+                   "pose_vertex_err_cm": {}}
+    for name, cd in design.items():
+        apply_pose(arm, POSES[name])
+        scale_check["pose_vertex_err_cm"][name] = float(np.abs(mesh_points(ob)[0] - S * cd).max())
+    apply_pose(arm, {})
+    for r in sk_rep:            # report the scaled key deltas (re-read from the scaled key blocks)
+        kb = ob.data.shape_keys.key_blocks
+        n3 = len(ob.data.vertices) * 3
+        a_, b_ = np.empty(n3), np.empty(n3)
+        kb[r["name"]].data.foreach_get("co", a_)
+        kb["Basis"].data.foreach_get("co", b_)
+        r["max_rest_delta_cm_design"] = r["max_rest_delta_cm"]
+        r["max_rest_delta_cm"] = round(float(np.abs(a_ - b_).max()), 3)
+        for k_ in ("zc", "a", "b", "r"):
+            if k_ in r:
+                r[k_] = round(r[k_] * S, 3)
+        if "lobe_centre_l" in r:
+            r["lobe_centre_l"] = [round(x * S, 3) for x in r["lobe_centre_l"]]
+    print("SCALE_CHECK", json.dumps(scale_check))
+    if abs(scale_check["unit_read_back"] - S) > 1e-6 or rot_err > 1e-4 or \
+            max(scale_check["pose_vertex_err_cm"].values()) > 1e-4 * S:
+        fails.append("global scale %s" % scale_check)
+
+    # ---- hierarchy check
+    got = {b.name: (b.parent.name if b.parent else None) for b in arm.data.bones}
+    want = dict(BONES)
+    bone_check = {"count": len(got), "names_parents_exact": got == want,
+                  "use_connect_any": any(b.use_connect for b in arm.data.bones),
+                  "deform_all": all(b.use_deform for b in arm.data.bones),
+                  "rotation_modes": sorted({pb.rotation_mode for pb in arm.pose.bones})}
+    rootm = arm.data.bones["root"].matrix_local
+    bone_check["root_rest_identity"] = (rootm - Matrix.Identity(4)).to_3x3().to_quaternion().angle < 1e-6 and \
+        rootm.translation.length < 1e-6 and (rootm.to_3x3() - Matrix.Identity(3)).median_scale < 1e-6
+    bone_check["identity_rest_rotation"] = {
+        n: round(math.degrees(arm.data.bones[n].matrix_local.to_quaternion().angle), 6)
+        for n in ("root", "body", "jaw", "cheek_l", "cheek_r", "crown", "taproot")}
+    bone_check["heads_cm"] = {b.name: bl(b.head_local) for b in arm.data.bones}
+    print("BONES", json.dumps(bone_check))
+    if len(got) != 17 or got != want:
+        fails.append("bones %s" % got)
+    if bone_check["use_connect_any"] or not bone_check["deform_all"] or not bone_check["root_rest_identity"]:
+        fails.append("bone flags %s" % bone_check)
+    if any(v > 1e-4 for v in bone_check["identity_rest_rotation"].values()):
+        fails.append("non-leaf rest rotation not identity %s" % bone_check["identity_rest_rotation"])
+
+    # ---- mesh facts
+    me = ob.data
+    me.calc_loop_triangles()
+    wc = turnip_audit.weights_check(ob, set(BONE_NAMES))
+    au = turnip_audit.defect_audit(ob)
+    per_slot = {s: int(sum(1 for p in me.polygons if p.material_index == i)) for i, s in enumerate(SLOTS)}
+    per_part = {k: int(sum(1 for p in me.attributes["part"].data if p.value == v)) for k, v in PART.items()}
+    mesh_info = {"tris": len(me.loop_triangles), "verts": len(me.vertices),
+                 "slots": [m.name for m in me.materials], "tris_per_slot": per_slot,
+                 "tris_per_part": {k: v for k, v in per_part.items() if v}, "weights": wc, "audit": au,
+                 "color_attribute": {"name": me.color_attributes[0].name, "type": me.color_attributes[0].data_type,
+                                     "domain": me.color_attributes[0].domain}}
+    print("MESH", json.dumps(mesh_info))
+    if wc["max_influences"] > 4 or wc["unnormalized"] or wc["unweighted"] or wc["non_bone_groups"] or \
+            wc["root_weighted_verts"]:
+        fails.append("weights %s" % wc)
+    if turnip_audit.defects_total(au):
+        fails.append("defects %s" % au)
+    if [m.name for m in me.materials] != list(SLOTS):
+        fails.append("slots")
+    if not 1500 <= mesh_info["tris"] <= 4000:
+        fails.append("tri count %d outside 1.5-4k" % mesh_info["tris"])
+    # anatomy counts
+    co0, tris0, tp0, tl0 = mesh_points(ob)
+    n_leaves = len(set(int(x) for x in tl0 if x))
+    n_teeth = len(teeth_info)
+    anatomy = {"leaves": n_leaves, "teeth_upper": sum(1 for t in teeth_info if t["upper"]),
+               "teeth_lower": sum(1 for t in teeth_info if not t["upper"]), "taproots": 1, "eyes": 0, "limbs": 0,
+               "mouth_closed_backed": True}
+    if n_leaves != 5 or n_teeth != 8:
+        fails.append("anatomy %s" % anatomy)
+
+    statics = {}
+    for o in (bed, bede, hull):
+        o.data.calc_loop_triangles()
+        a = turnip_audit.defect_audit(o)
+        v = np.array([tuple(x.co) for x in o.data.vertices])
+        statics[o.name] = {"tris": len(o.data.loop_triangles), "slots": [m.name for m in o.data.materials],
+                           "bounds_local": bounds(v), "audit": a, "object_location": bl(o.location)}
+        if turnip_audit.defects_total(a):
+            fails.append("%s defects %s" % (o.name, a))
+    hv = np.array([tuple(x.co) for x in hull.data.vertices])
+    statics[COLL_NAME]["centre_offset_from_root_cm"] = bl(0.5 * (hv.min(0) + hv.max(0)))
+    if not 24 <= statics[COLL_NAME]["tris"] <= 40:
+        fails.append("hull tris %d" % statics[COLL_NAME]["tris"])
+    print("STATICS", json.dumps(statics))
+
+    # ---- neutral landmarks
+    apply_pose(arm, {})
+    co, tris, tp, tl = mesh_points(ob)
+    bulb_v = co[used(tris, parts_mask(tp, "bulb"))]
+    tips = []
+    for L in leaves:
+        lv = co[used(tris, tl == L["i"])]
+        tips.append(lv[np.argmax(lv[:, 2])])
+    hi = max(tips, key=lambda p: p[2])
+    sl = [co[i] for i in ob["mouth_centre_l0"]]
+    mouth_cue = Vector(np.mean(np.array(sl), axis=0))
+    mouth_cue.x = max(p[0] for p in sl)
+    grips = {}
+    for side, n in ((1, "Grip_L"), (-1, "Grip_R")):
+        p, _n = surf(P["GRIP_Z"], side * 90)
+        grips[n] = p * S
+    harvest = {}
+    for n, i in (("HarvestGrip_L", 2), ("HarvestGrip_R", 4)):          # leaves at az 108 (+Y) and 252 (-Y)
+        L = leaves[i - 1]
+        harvest[n] = (L["s1"] + L["ds"] * 0.8) * S
+    soil_r = ry_at(P["SOIL_Z"]) * S
+    landmarks = {
+        "root": [0.0, 0.0, 0.0],
+        "body_centre_bone_head": bl(arm.data.bones["body"].head_local),
+        "bulb_bounds_centre": bl(0.5 * (bulb_v.min(0) + bulb_v.max(0))),
+        "crown_base": bl(arm.data.bones["crown"].head_local),
+        "highest_leaf_tip": bl(hi),
+        "jaw_hinge": bl(arm.data.bones["jaw"].head_local),
+        "cheek_l_head": bl(arm.data.bones["cheek_l"].head_local),
+        "cheek_r_head": bl(arm.data.bones["cheek_r"].head_local),
+        "taproot_head": bl(arm.data.bones["taproot"].head_local),
+        "sockets_blender_cm": {"Grip_L": bl(grips["Grip_L"]), "Grip_R": bl(grips["Grip_R"]),
+                               "MouthCue": bl(mouth_cue), "SoilLine": [0.0, 0.0, round(P["SOIL_Z"] * S, 3)],
+                               "HarvestGrip_L": bl(harvest["HarvestGrip_L"]),
+                               "HarvestGrip_R": bl(harvest["HarvestGrip_R"])},
+    }
+    landmarks["sockets_unreal_cm"] = {k: ue(v) for k, v in landmarks["sockets_blender_cm"].items()}
+    landmarks["soil_line_bulb_half_width_cm"] = round(soil_r, 3)
+    meas = {
+        "overall": bounds(co),
+        "overall_height_tip_to_highest_leaf_cm": round(float(co[:, 2].max() - co[:, 2].min()), 3),
+        "taproot_tip_z": round(float(co[:, 2].min()), 4),
+        "bulb": bounds(bulb_v),
+        "leaf_tips": [bl(t) for t in tips],
+        "landmarks": landmarks,
+        "anatomy": anatomy,
+        "teeth": [dict(t, y=round(t["y"] * S, 4), gum=[round(x * S, 4) for x in t["gum"]]) for t in teeth_info],
+        "scale_factor": S,
+        "scale_check": scale_check,
+        "mesh": mesh_info,
+        "statics": statics,
+        "collision_hull": {"tris": statics[COLL_NAME]["tris"], "extents_cm": statics[COLL_NAME]["bounds_local"],
+                           "centre_offset_from_root_cm": statics[COLL_NAME]["centre_offset_from_root_cm"]},
+        "bones": bone_check,
+        "params": {k: v for k, v in P.items()},
+        "leaf_length_scale": leaves[0]["k"],
+    }
+    print("MEASURE", json.dumps({k: meas[k] for k in ("overall", "overall_height_tip_to_highest_leaf_cm", "bulb",
+                                                      "taproot_tip_z")}))
+    print("LANDMARKS", json.dumps(landmarks))
+    if abs(meas["overall_height_tip_to_highest_leaf_cm"] - 16.0 * S) > 0.05 * S:
+        fails.append("neutral height %.3f" % meas["overall_height_tip_to_highest_leaf_cm"])
+    if abs(meas["taproot_tip_z"]) > 1e-3:
+        fails.append("taproot tip not at root z %.4f" % meas["taproot_tip_z"])
+
+    # ---- poses: bounds, envelope, intersections, root identity, Unreal composition deviation
+    nb = meas["bulb"]
+    meas["muzzle_rest"] = muzzle_rest_metrics(co, ob)
+    print("MUZZLE_REST", json.dumps(meas["muzzle_rest"]))
+    neutral_co = co.copy()
+    # ---- shape keys: built in the design frame before the global scale (B4), reported scaled
+    meas["shape_keys"] = sk_rep
+    print("SHAPE_KEYS", json.dumps(sk_rep))
+    neutral_cheek = {}
+    poses = {}
+    for name in POSE_ORDER:
+        apply_pose(arm, POSES[name])
+        co, tris, tp, tl = mesh_points(ob)
+        bd = bounds(co)
+        isect = turnip_audit.intersections(ob, PART)
+        dev, dev_v = turnip_audit.ue_composition_deviation(arm, ob)
+        rootpb = arm.pose.bones["root"]
+        root_dev = (rootpb.matrix - Matrix.Identity(4))
+        gape = mouth_metrics(co, ob, nb["w_y"])
+        ch = cheek_metrics(co, tris, tp, arm)
+        b2 = b2_metrics(co, ob, neutral_co)
+        if name == "neutral":
+            neutral_cheek["w"] = ch["bulb_width_at_cheek_height_cm"]
+        ch["width_ratio_vs_neutral"] = round(ch["bulb_width_at_cheek_height_cm"] / neutral_cheek["w"], 3)
+        teeth_v = co[used(tris, parts_mask(tp, "tooth", "tooth_root"))]
+        env = {"h": 22.0 * S, "w": 14.0 * S, "d": 13.0 * S}
+        over = {k: round(bd[a] - env[k], 3) for k, a in (("h", "h_z"), ("w", "w_y"), ("d", "d_x"))
+                if bd[a] > env[k]}
+        bulb_p = co[used(tris, parts_mask(tp, "bulb"))]
+        poses[name] = {"spec": POSES[name], "bounds": bd, "envelope_exceeded_by_cm": over,
+                       "bulb_bounds": bounds(bulb_p),
+                       "bulb_h_ratio": round(bounds(bulb_p)["h_z"] / nb["h_z"], 3),
+                       "bulb_w_ratio": round(bounds(bulb_p)["w_y"] / nb["w_y"], 3),
+                       "intersections": isect, "gape": gape, "cheeks": ch, "mouth_b2": b2,
+                       "root_matrix_max_abs_dev": round(float(np.abs(np.array(root_dev)).max()), 8),
+                       "taproot_tip_z": round(float(co[:, 2].min()), 3),
+                       "teeth_min_z": round(float(teeth_v[:, 2].min()), 3),
+                       "ue_dev_cm": dev, "ue_dev_worst_vertex": dev_v}
+        print("POSE %-14s bounds h%.2f w%.2f d%.2f over %s | gape %s | cheeks %s | ue_dev %.5f" % (
+            name, bd["h_z"], bd["w_y"], bd["d_x"], over, json.dumps(gape), json.dumps(ch), dev))
+        print("ISECT %-14s %s" % (name, json.dumps(isect)))
+        print("B2 %-14s %s" % (name, json.dumps(b2)))
+        if poses[name]["root_matrix_max_abs_dev"] > 1e-6:
+            fails.append("%s root moved" % name)
+        if dev > 1e-3:
+            fails.append("%s Unreal composition deviation %.4f cm" % (name, dev))
+    apply_pose(arm, {})
+
+    clip_keys = {}
+
+    # ---- review objects: camera, rulers, label (render script places them)
+    rv = colls["Review"]
+    cam = bpy.data.objects.new("ReviewCam", bpy.data.cameras.new("ReviewCam"))
+    rv.objects.link(cam)
+    bpy.context.scene.camera = cam
+
+    def ruler(name, length, seg=1.0, thick=0.18):
+        mb = MB(("Skin",))
+        for k in range(int(round(length / seg))):
+            p0 = Vector((0, 0, k * seg))
+            colr = (0.12, 0.12, 0.12) if k % 2 == 0 else (0.85, 0.2, 0.15)
+            e = [Vector((sx * thick, sy * thick, 0)) for sx, sy in ((-1, -1), (1, -1), (1, 1), (-1, 1))]
+            a = [mb.vert(p0 + d, {}) for d in e]
+            b = [mb.vert(p0 + Z * seg + d, {}) for d in e]
+            for j in range(4):
+                mb.face((a[j], a[(j + 1) % 4], b[(j + 1) % 4], b[j]), "Skin", colr, "bulb", jitter=0)
+            mb.face((a[3], a[2], a[1], a[0]), "Skin", colr, "bulb", jitter=0)
+            mb.face((b[0], b[1], b[2], b[3]), "Skin", colr, "bulb", jitter=0)
+        o = mb.to_object(name, rv, groups=False)
+        o["review"] = "ruler"
+        return o
+
+    ruler("Ruler_10cm_V", 10.0)
+    ruler("Ruler_10cm_H", 10.0)
+    cu = bpy.data.curves.new("Label", "FONT")
+    cu.body = "label"
+    cu.size = 1.0
+    txt = bpy.data.objects.new("Label", cu)
+    rv.objects.link(txt)
+
+    # ---- write reports
+    os.makedirs(REVIEW, exist_ok=True)
+    with open(MEASURE_JSON, "w") as fh:
+        json.dump(meas, fh, indent=1, default=lambda o: list(o))
+    with open(POSE_JSON, "w") as fh:
+        json.dump({"poses": poses, "envelope_cm": [22 * S, 14 * S, 13 * S], "scale_factor": S,
+                   "clip_keys": clip_keys}, fh, indent=1,
+                  default=lambda o: list(o))
+    bpy.context.scene.frame_set(0)
+    if do_save:
+        os.makedirs(os.path.dirname(BLEND_FILE), exist_ok=True)
+        bpy.ops.wm.save_as_mainfile(filepath=BLEND_FILE)
+    if fails:
+        print("TURNIP_FAIL " + "; ".join(fails))
+        sys.exit(1)
+    print("TURNIP_OK")
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except SystemExit:
+        raise
+    except Exception:
+        traceback.print_exc()
+        print("TURNIP_FAIL exception")
+        sys.exit(1)

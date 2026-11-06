@@ -1,0 +1,114 @@
+{
+ "cube": {
+  "object_scale": [
+   1.0,
+   1.0,
+   1.0
+  ],
+  "bounds_min": [
+   -5.0,
+   -5.0,
+   -5.0
+  ],
+  "bounds_max": [
+   5.0,
+   5.0,
+   5.0
+  ]
+ },
+ "sk": {
+  "armature_object": "Armature",
+  "armature_scale": [
+   1.0,
+   1.0,
+   1.0
+  ],
+  "bone_count": 17,
+  "extra_bones": [],
+  "missing_bones": [],
+  "wrong_parents": [],
+  "max_bind_head_error_cm": 6.1e-05,
+  "max_bind_rest_rotation_error_deg": 0.0,
+  "tris": 3188,
+  "slots": [
+   "Skin",
+   "Leaf",
+   "Mouth",
+   "Teeth"
+  ],
+  "bounds_error_cm": 5.5e-05,
+  "colour_attributes": [
+   [
+    "Col",
+    "BYTE_COLOR",
+    "CORNER"
+   ]
+  ],
+  "col_alpha_min_mean": [
+   0.173,
+   0.86
+  ],
+  "shape_keys": [
+   "Basis",
+   "Inhale",
+   "Scream"
+  ],
+  "weights": {
+   "max_influences": 3,
+   "unnormalized": 0,
+   "unweighted": 0,
+   "non_bone_groups": [],
+   "root_weighted_verts": 0
+  }
+ },
+ "statics": {
+  "TurnipBed_R01": {
+   "object_scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "tris": 224,
+   "slots": [
+    "Soil"
+   ],
+   "bounds_error_cm": 1.4e-05,
+   "boundary_edges": 0
+  },
+  "TurnipBedEmpty_R01": {
+   "object_scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "tris": 288,
+   "slots": [
+    "Soil"
+   ],
+   "bounds_error_cm": 1.4e-05,
+   "boundary_edges": 0
+  },
+  "ScreamingTurnip_R01_Collision": {
+   "object_scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "tris": 40,
+   "slots": [],
+   "bounds_error_cm": 4.9e-05,
+   "boundary_edges": 0
+  }
+ },
+ "tolerances": {
+  "pos_cm": 0.1,
+  "cube_cm": 0.01,
+  "scale": 0.01,
+  "rest_rot_deg": 0.01,
+  "root": 0.0001,
+  "loop_seam_cm": 0.001,
+  "shape_key_value": 0.001,
+  "shape_key_peak_mesh_cm": 0.01
+ },
+ "fails": []
+}

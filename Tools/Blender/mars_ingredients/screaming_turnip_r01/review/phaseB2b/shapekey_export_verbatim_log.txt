@@ -1,0 +1,9 @@
+00:01.859  blend            | Read blend: "D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\source\ScreamingTurnip_R01.blend"
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_ingredients\\screaming_turnip_r01\\export\\validation\\ScreamingTurnip_R01_ShapeKeyTest_Mars_ANIM.fbx'
+export finished in 0.0427 sec.
+SHAPEKEY_EXPORT {"file": "export/validation/ScreamingTurnip_R01_ShapeKeyTest_Mars_ANIM.fbx", "bytes": 339036, "key": "Scream", "keys": ["Basis", "Inhale", "Scream"], "value": {"0": 0.0, "1": 0.2, "2": 0.4, "3": 0.6, "4": 0.8, "5": 1.0, "6": 0.8, "7": 0.6, "8": 0.4, "9": 0.2, "10": 0.0}, "header": {"magic": "Kaydara FBX Binary", "file_version": 7400, "FBXHeaderVersion": 1003, "FBXVersion": 7400, "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"}}
+TURNIP_OK
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+
+Blender quit

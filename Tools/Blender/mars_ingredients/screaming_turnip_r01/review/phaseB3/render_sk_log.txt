@@ -1,0 +1,24 @@
+00:01.859  blend            | Read blend: "D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\source\ScreamingTurnip_R01.blend"
+00:03.250  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB3\clips\_frames\sk_front_Inhale_000.png'
+00:03.328  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB3\clips\_frames\sk_front_Inhale_050.png'
+00:03.375  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB3\clips\_frames\sk_front_Inhale_100.png'
+00:03.422  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB3\clips\_frames\sk_front_Scream_000.png'
+00:03.469  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB3\clips\_frames\sk_front_Scream_050.png'
+00:03.516  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB3\clips\_frames\sk_front_Scream_100.png'
+00:03.562  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB3\clips\_frames\sk_threequarter_Inhale_000.png'
+00:03.609  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB3\clips\_frames\sk_threequarter_Inhale_050.png'
+00:03.672  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB3\clips\_frames\sk_threequarter_Inhale_100.png'
+00:03.719  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB3\clips\_frames\sk_threequarter_Scream_000.png'
+00:03.750  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB3\clips\_frames\sk_threequarter_Scream_050.png'
+00:03.797  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB3\clips\_frames\sk_threequarter_Scream_100.png'
+00:03.844  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB3\clips\_frames\sk_mouth_Inhale_000.png'
+00:03.891  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB3\clips\_frames\sk_mouth_Inhale_050.png'
+00:03.953  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB3\clips\_frames\sk_mouth_Inhale_100.png'
+00:04.000  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB3\clips\_frames\sk_mouth_Scream_000.png'
+00:04.047  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB3\clips\_frames\sk_mouth_Scream_050.png'
+00:04.094  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB3\clips\_frames\sk_mouth_Scream_100.png'
+SHEET D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB3\clips\shapekey_sheet.png
+TURNIP_OK
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+
+Blender quit

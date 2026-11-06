@@ -1,0 +1,967 @@
+{
+ "anims": {
+  "SRC_Idle": {
+   "actions": [
+    "Armature|Scene",
+    "Key|Scene"
+   ],
+   "bones_ok": true,
+   "armature_action": "Armature|Scene",
+   "key_action": "Key|Scene",
+   "key_action_curves": [
+    "key_blocks[\"Inhale\"].value",
+    "key_blocks[\"Scream\"].value"
+   ],
+   "keyed_first_last_count": [
+    0,
+    60,
+    61
+   ],
+   "root_max_deviation_all_frames": 0.0,
+   "max_landmark_err_cm": 8.5e-05,
+   "max_extremes_err_cm": 5.2e-05,
+   "shape_key_value_max_err": 0.0,
+   "shape_key_peaks": {
+    "Inhale": {
+     "max": 0.0,
+     "frames_at_max": []
+    },
+    "Scream": {
+     "max": 0.0,
+     "frames_at_max": []
+    }
+   },
+   "peak_vertex_max_err_cm": {
+    "0": 8e-06
+   },
+   "loop_seam_cm": 0.0,
+   "scale_peak": {
+    "frame": 0,
+    "body": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "cheek_l": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "authored_body": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "authored_cheek_l": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "err": 0.0
+   }
+  },
+  "SRC_Grip": {
+   "actions": [
+    "Armature|Scene",
+    "Key|Scene"
+   ],
+   "bones_ok": true,
+   "armature_action": "Armature|Scene",
+   "key_action": "Key|Scene",
+   "key_action_curves": [
+    "key_blocks[\"Inhale\"].value",
+    "key_blocks[\"Scream\"].value"
+   ],
+   "keyed_first_last_count": [
+    0,
+    6,
+    7
+   ],
+   "root_max_deviation_all_frames": 0.0,
+   "max_landmark_err_cm": 8e-05,
+   "max_extremes_err_cm": 5.2e-05,
+   "shape_key_value_max_err": 0.0,
+   "shape_key_peaks": {
+    "Inhale": {
+     "max": 0.0,
+     "frames_at_max": []
+    },
+    "Scream": {
+     "max": 0.0,
+     "frames_at_max": []
+    }
+   },
+   "peak_vertex_max_err_cm": {},
+   "scale_peak": {
+    "frame": 0,
+    "body": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "cheek_l": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "authored_body": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "authored_cheek_l": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "err": 0.0
+   }
+  },
+  "SRC_Tug": {
+   "actions": [
+    "Armature|Scene",
+    "Key|Scene"
+   ],
+   "bones_ok": true,
+   "armature_action": "Armature|Scene",
+   "key_action": "Key|Scene",
+   "key_action_curves": [
+    "key_blocks[\"Inhale\"].value",
+    "key_blocks[\"Scream\"].value"
+   ],
+   "keyed_first_last_count": [
+    0,
+    15,
+    16
+   ],
+   "root_max_deviation_all_frames": 0.0,
+   "max_landmark_err_cm": 8e-05,
+   "max_extremes_err_cm": 5.3e-05,
+   "shape_key_value_max_err": 0.0,
+   "shape_key_peaks": {
+    "Inhale": {
+     "max": 0.0,
+     "frames_at_max": []
+    },
+    "Scream": {
+     "max": 0.0,
+     "frames_at_max": []
+    }
+   },
+   "peak_vertex_max_err_cm": {},
+   "scale_peak": {
+    "frame": 15,
+    "body": [
+     0.9,
+     1.1,
+     0.9
+    ],
+    "cheek_l": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "authored_body": [
+     0.9,
+     1.1,
+     0.9
+    ],
+    "authored_cheek_l": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "err": 0.0
+   }
+  },
+  "SRC_Release": {
+   "actions": [
+    "Armature|Scene",
+    "Key|Scene"
+   ],
+   "bones_ok": true,
+   "armature_action": "Armature|Scene",
+   "key_action": "Key|Scene",
+   "key_action_curves": [
+    "key_blocks[\"Inhale\"].value",
+    "key_blocks[\"Scream\"].value"
+   ],
+   "keyed_first_last_count": [
+    0,
+    6,
+    7
+   ],
+   "root_max_deviation_all_frames": 0.0,
+   "max_landmark_err_cm": 7.2e-05,
+   "max_extremes_err_cm": 5.2e-05,
+   "shape_key_value_max_err": 0.0,
+   "shape_key_peaks": {
+    "Inhale": {
+     "max": 0.0,
+     "frames_at_max": []
+    },
+    "Scream": {
+     "max": 0.0,
+     "frames_at_max": []
+    }
+   },
+   "peak_vertex_max_err_cm": {},
+   "scale_peak": {
+    "frame": 2,
+    "body": [
+     1.1,
+     0.95,
+     1.1
+    ],
+    "cheek_l": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "authored_body": [
+     1.1,
+     0.95,
+     1.1
+    ],
+    "authored_cheek_l": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "err": 0.0
+   }
+  },
+  "SRC_Cancel": {
+   "actions": [
+    "Armature|Scene",
+    "Key|Scene"
+   ],
+   "bones_ok": true,
+   "armature_action": "Armature|Scene",
+   "key_action": "Key|Scene",
+   "key_action_curves": [
+    "key_blocks[\"Inhale\"].value",
+    "key_blocks[\"Scream\"].value"
+   ],
+   "keyed_first_last_count": [
+    0,
+    7,
+    8
+   ],
+   "root_max_deviation_all_frames": 0.0,
+   "max_landmark_err_cm": 7.5e-05,
+   "max_extremes_err_cm": 5.3e-05,
+   "shape_key_value_max_err": 0.0,
+   "shape_key_peaks": {
+    "Inhale": {
+     "max": 0.0,
+     "frames_at_max": []
+    },
+    "Scream": {
+     "max": 0.0,
+     "frames_at_max": []
+    }
+   },
+   "peak_vertex_max_err_cm": {},
+   "scale_peak": {
+    "frame": 0,
+    "body": [
+     0.9,
+     1.1,
+     0.9
+    ],
+    "cheek_l": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "authored_body": [
+     0.9,
+     1.1,
+     0.9
+    ],
+    "authored_cheek_l": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "err": 0.0
+   }
+  },
+  "ROOT_QuietIdle": {
+   "actions": [
+    "Armature|Scene",
+    "Key|Scene"
+   ],
+   "bones_ok": true,
+   "armature_action": "Armature|Scene",
+   "key_action": "Key|Scene",
+   "key_action_curves": [
+    "key_blocks[\"Inhale\"].value",
+    "key_blocks[\"Scream\"].value"
+   ],
+   "keyed_first_last_count": [
+    0,
+    60,
+    61
+   ],
+   "root_max_deviation_all_frames": 0.0,
+   "max_landmark_err_cm": 7.8e-05,
+   "max_extremes_err_cm": 5.2e-05,
+   "shape_key_value_max_err": 0.0,
+   "shape_key_peaks": {
+    "Inhale": {
+     "max": 0.0,
+     "frames_at_max": []
+    },
+    "Scream": {
+     "max": 0.0,
+     "frames_at_max": []
+    }
+   },
+   "peak_vertex_max_err_cm": {
+    "0": 8e-06
+   },
+   "loop_seam_cm": 0.0,
+   "scale_peak": {
+    "frame": 30,
+    "body": [
+     1.015,
+     1.0,
+     1.015
+    ],
+    "cheek_l": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "authored_body": [
+     1.015,
+     1.0,
+     1.015
+    ],
+    "authored_cheek_l": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "err": 0.0
+   }
+  },
+  "ROOT_Anticipate": {
+   "actions": [
+    "Armature|Scene",
+    "Key|Scene"
+   ],
+   "bones_ok": true,
+   "armature_action": "Armature|Scene",
+   "key_action": "Key|Scene",
+   "key_action_curves": [
+    "key_blocks[\"Inhale\"].value",
+    "key_blocks[\"Scream\"].value"
+   ],
+   "keyed_first_last_count": [
+    0,
+    9,
+    10
+   ],
+   "root_max_deviation_all_frames": 0.0,
+   "max_landmark_err_cm": 7.7e-05,
+   "max_extremes_err_cm": 5.2e-05,
+   "shape_key_value_max_err": 0.0,
+   "shape_key_peaks": {
+    "Inhale": {
+     "max": 0.0,
+     "frames_at_max": []
+    },
+    "Scream": {
+     "max": 0.0,
+     "frames_at_max": []
+    }
+   },
+   "peak_vertex_max_err_cm": {},
+   "scale_peak": {
+    "frame": 9,
+    "body": [
+     0.9,
+     1.1,
+     0.9
+    ],
+    "cheek_l": [
+     1.0,
+     1.1,
+     1.08
+    ],
+    "authored_body": [
+     0.9,
+     1.1,
+     0.9
+    ],
+    "authored_cheek_l": [
+     1.0,
+     1.1,
+     1.08
+    ],
+    "err": 0.0
+   }
+  },
+  "ROOT_AnticipateTired": {
+   "actions": [
+    "Armature|Scene",
+    "Key|Scene"
+   ],
+   "bones_ok": true,
+   "armature_action": "Armature|Scene",
+   "key_action": "Key|Scene",
+   "key_action_curves": [
+    "key_blocks[\"Inhale\"].value",
+    "key_blocks[\"Scream\"].value"
+   ],
+   "keyed_first_last_count": [
+    0,
+    9,
+    10
+   ],
+   "root_max_deviation_all_frames": 0.0,
+   "max_landmark_err_cm": 7.3e-05,
+   "max_extremes_err_cm": 4.8e-05,
+   "shape_key_value_max_err": 0.0,
+   "shape_key_peaks": {
+    "Inhale": {
+     "max": 0.0,
+     "frames_at_max": []
+    },
+    "Scream": {
+     "max": 0.0,
+     "frames_at_max": []
+    }
+   },
+   "peak_vertex_max_err_cm": {},
+   "scale_peak": {
+    "frame": 9,
+    "body": [
+     0.9,
+     1.1,
+     0.9
+    ],
+    "cheek_l": [
+     1.0,
+     1.1,
+     1.08
+    ],
+    "authored_body": [
+     0.9,
+     1.1,
+     0.9
+    ],
+    "authored_cheek_l": [
+     1.0,
+     1.1,
+     1.08
+    ],
+    "err": 0.0
+   }
+  },
+  "ROOT_Inhale": {
+   "actions": [
+    "Armature|Scene",
+    "Key|Scene"
+   ],
+   "bones_ok": true,
+   "armature_action": "Armature|Scene",
+   "key_action": "Key|Scene",
+   "key_action_curves": [
+    "key_blocks[\"Inhale\"].value",
+    "key_blocks[\"Scream\"].value"
+   ],
+   "keyed_first_last_count": [
+    0,
+    36,
+    37
+   ],
+   "root_max_deviation_all_frames": 0.0,
+   "max_landmark_err_cm": 8.2e-05,
+   "max_extremes_err_cm": 5.2e-05,
+   "shape_key_value_max_err": 5e-07,
+   "shape_key_peaks": {
+    "Inhale": {
+     "max": 1.0,
+     "frames_at_max": [
+      30,
+      36
+     ]
+    },
+    "Scream": {
+     "max": 0.0,
+     "frames_at_max": []
+    }
+   },
+   "peak_vertex_max_err_cm": {
+    "0": 8e-06,
+    "36": 1e-05
+   },
+   "scale_peak": {
+    "frame": 30,
+    "body": [
+     0.92,
+     0.88,
+     0.92
+    ],
+    "cheek_l": [
+     1.3,
+     1.3,
+     1.3
+    ],
+    "authored_body": [
+     0.92,
+     0.88,
+     0.92
+    ],
+    "authored_cheek_l": [
+     1.3,
+     1.3,
+     1.3
+    ],
+    "err": 0.0
+   }
+  },
+  "ROOT_Scream": {
+   "actions": [
+    "Armature|Scene",
+    "Key|Scene"
+   ],
+   "bones_ok": true,
+   "armature_action": "Armature|Scene",
+   "key_action": "Key|Scene",
+   "key_action_curves": [
+    "key_blocks[\"Inhale\"].value",
+    "key_blocks[\"Scream\"].value"
+   ],
+   "keyed_first_last_count": [
+    0,
+    18,
+    19
+   ],
+   "root_max_deviation_all_frames": 0.0,
+   "max_landmark_err_cm": 7.7e-05,
+   "max_extremes_err_cm": 4.7e-05,
+   "shape_key_value_max_err": 3e-07,
+   "shape_key_peaks": {
+    "Inhale": {
+     "max": 1.0,
+     "frames_at_max": [
+      0,
+      0
+     ]
+    },
+    "Scream": {
+     "max": 1.0,
+     "frames_at_max": [
+      3,
+      18
+     ]
+    }
+   },
+   "peak_vertex_max_err_cm": {
+    "3": 9e-06,
+    "4": 9e-06,
+    "5": 1e-05,
+    "6": 9e-06,
+    "7": 1e-05,
+    "8": 1e-05,
+    "9": 9e-06,
+    "10": 9e-06,
+    "11": 9e-06,
+    "12": 9e-06,
+    "13": 8e-06,
+    "14": 1.1e-05,
+    "15": 1.1e-05,
+    "16": 9e-06,
+    "17": 9e-06,
+    "18": 9e-06
+   },
+   "scale_peak": {
+    "frame": 0,
+    "body": [
+     0.92,
+     0.88,
+     0.92
+    ],
+    "cheek_l": [
+     1.3,
+     1.3,
+     1.3
+    ],
+    "authored_body": [
+     0.92,
+     0.88,
+     0.92
+    ],
+    "authored_cheek_l": [
+     1.3,
+     1.3,
+     1.3
+    ],
+    "err": 0.0
+   }
+  },
+  "ROOT_Recover": {
+   "actions": [
+    "Armature|Scene",
+    "Key|Scene"
+   ],
+   "bones_ok": true,
+   "armature_action": "Armature|Scene",
+   "key_action": "Key|Scene",
+   "key_action_curves": [
+    "key_blocks[\"Inhale\"].value",
+    "key_blocks[\"Scream\"].value"
+   ],
+   "keyed_first_last_count": [
+    0,
+    30,
+    31
+   ],
+   "root_max_deviation_all_frames": 0.0,
+   "max_landmark_err_cm": 8.6e-05,
+   "max_extremes_err_cm": 4.9e-05,
+   "shape_key_value_max_err": 0.0,
+   "shape_key_peaks": {
+    "Inhale": {
+     "max": 0.0,
+     "frames_at_max": []
+    },
+    "Scream": {
+     "max": 1.0,
+     "frames_at_max": [
+      0,
+      0
+     ]
+    }
+   },
+   "peak_vertex_max_err_cm": {},
+   "scale_peak": {
+    "frame": 0,
+    "body": [
+     1.3,
+     1.0,
+     1.3
+    ],
+    "cheek_l": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "authored_body": [
+     1.3,
+     1.0,
+     1.3
+    ],
+    "authored_cheek_l": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "err": 0.0
+   }
+  },
+  "ROOT_RecoveryIdle": {
+   "actions": [
+    "Armature|Scene",
+    "Key|Scene"
+   ],
+   "bones_ok": true,
+   "armature_action": "Armature|Scene",
+   "key_action": "Key|Scene",
+   "key_action_curves": [
+    "key_blocks[\"Inhale\"].value",
+    "key_blocks[\"Scream\"].value"
+   ],
+   "keyed_first_last_count": [
+    0,
+    60,
+    61
+   ],
+   "root_max_deviation_all_frames": 0.0,
+   "max_landmark_err_cm": 8.2e-05,
+   "max_extremes_err_cm": 5e-05,
+   "shape_key_value_max_err": 0.0,
+   "shape_key_peaks": {
+    "Inhale": {
+     "max": 0.0,
+     "frames_at_max": []
+    },
+    "Scream": {
+     "max": 0.0,
+     "frames_at_max": []
+    }
+   },
+   "peak_vertex_max_err_cm": {},
+   "loop_seam_cm": 0.0,
+   "scale_peak": {
+    "frame": 45,
+    "body": [
+     0.97,
+     1.01,
+     0.97
+    ],
+    "cheek_l": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "authored_body": [
+     0.97,
+     1.01,
+     0.97
+    ],
+    "authored_cheek_l": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "err": 0.0
+   }
+  },
+  "ROOT_AirborneLeafTrail": {
+   "actions": [
+    "Armature|Scene",
+    "Key|Scene"
+   ],
+   "bones_ok": true,
+   "armature_action": "Armature|Scene",
+   "key_action": "Key|Scene",
+   "key_action_curves": [
+    "key_blocks[\"Inhale\"].value",
+    "key_blocks[\"Scream\"].value"
+   ],
+   "keyed_first_last_count": [
+    0,
+    30,
+    31
+   ],
+   "root_max_deviation_all_frames": 0.0,
+   "max_landmark_err_cm": 8e-05,
+   "max_extremes_err_cm": 5e-05,
+   "shape_key_value_max_err": 0.0,
+   "shape_key_peaks": {
+    "Inhale": {
+     "max": 0.0,
+     "frames_at_max": []
+    },
+    "Scream": {
+     "max": 0.0,
+     "frames_at_max": []
+    }
+   },
+   "peak_vertex_max_err_cm": {},
+   "loop_seam_cm": 0.0,
+   "scale_peak": {
+    "frame": 0,
+    "body": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "cheek_l": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "authored_body": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "authored_cheek_l": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "err": 0.0
+   }
+  },
+  "ROOT_ImpactSquash": {
+   "actions": [
+    "Armature|Scene",
+    "Key|Scene"
+   ],
+   "bones_ok": true,
+   "armature_action": "Armature|Scene",
+   "key_action": "Key|Scene",
+   "key_action_curves": [
+    "key_blocks[\"Inhale\"].value",
+    "key_blocks[\"Scream\"].value"
+   ],
+   "keyed_first_last_count": [
+    0,
+    7,
+    8
+   ],
+   "root_max_deviation_all_frames": 0.0,
+   "max_landmark_err_cm": 6.5e-05,
+   "max_extremes_err_cm": 5.3e-05,
+   "shape_key_value_max_err": 0.0,
+   "shape_key_peaks": {
+    "Inhale": {
+     "max": 0.0,
+     "frames_at_max": []
+    },
+    "Scream": {
+     "max": 0.0,
+     "frames_at_max": []
+    }
+   },
+   "peak_vertex_max_err_cm": {},
+   "scale_peak": {
+    "frame": 2,
+    "body": [
+     0.8,
+     1.2,
+     0.8
+    ],
+    "cheek_l": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "authored_body": [
+     0.8,
+     1.2,
+     0.8
+    ],
+    "authored_cheek_l": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "err": 0.0
+   }
+  },
+  "ROOT_SettleRock": {
+   "actions": [
+    "Armature|Scene",
+    "Key|Scene"
+   ],
+   "bones_ok": true,
+   "armature_action": "Armature|Scene",
+   "key_action": "Key|Scene",
+   "key_action_curves": [
+    "key_blocks[\"Inhale\"].value",
+    "key_blocks[\"Scream\"].value"
+   ],
+   "keyed_first_last_count": [
+    0,
+    12,
+    13
+   ],
+   "root_max_deviation_all_frames": 0.0,
+   "max_landmark_err_cm": 6.7e-05,
+   "max_extremes_err_cm": 5.2e-05,
+   "shape_key_value_max_err": 0.0,
+   "shape_key_peaks": {
+    "Inhale": {
+     "max": 0.0,
+     "frames_at_max": []
+    },
+    "Scream": {
+     "max": 0.0,
+     "frames_at_max": []
+    }
+   },
+   "peak_vertex_max_err_cm": {},
+   "scale_peak": {
+    "frame": 0,
+    "body": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "cheek_l": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "authored_body": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "authored_cheek_l": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "err": 0.0
+   }
+  },
+  "ROOT_PlaceSettle": {
+   "actions": [
+    "Armature|Scene",
+    "Key|Scene"
+   ],
+   "bones_ok": true,
+   "armature_action": "Armature|Scene",
+   "key_action": "Key|Scene",
+   "key_action_curves": [
+    "key_blocks[\"Inhale\"].value",
+    "key_blocks[\"Scream\"].value"
+   ],
+   "keyed_first_last_count": [
+    0,
+    7,
+    8
+   ],
+   "root_max_deviation_all_frames": 0.0,
+   "max_landmark_err_cm": 7.6e-05,
+   "max_extremes_err_cm": 5.2e-05,
+   "shape_key_value_max_err": 0.0,
+   "shape_key_peaks": {
+    "Inhale": {
+     "max": 0.0,
+     "frames_at_max": []
+    },
+    "Scream": {
+     "max": 0.0,
+     "frames_at_max": []
+    }
+   },
+   "peak_vertex_max_err_cm": {},
+   "scale_peak": {
+    "frame": 3,
+    "body": [
+     0.92,
+     1.04,
+     0.92
+    ],
+    "cheek_l": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "authored_body": [
+     0.92,
+     1.04,
+     0.92
+    ],
+    "authored_cheek_l": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "err": 0.0
+   }
+  }
+ },
+ "fails": [],
+ "tolerances": {
+  "pos_cm": 0.1,
+  "cube_cm": 0.01,
+  "scale": 0.01,
+  "rest_rot_deg": 0.01,
+  "root": 0.0001,
+  "loop_seam_cm": 0.001,
+  "shape_key_value": 0.001,
+  "shape_key_peak_mesh_cm": 0.01
+ }
+}

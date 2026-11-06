@@ -1,0 +1,418 @@
+{
+ "bones": [
+  {
+   "name": "root",
+   "parent": null,
+   "head_ue_cm": [
+    0.0,
+    -0.0,
+    0.0
+   ],
+   "length_cm": 2.0,
+   "rest_quat_blender": [
+    1.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "body",
+   "parent": "root",
+   "head_ue_cm": [
+    0.0,
+    -0.0,
+    6.825
+   ],
+   "length_cm": 3.0,
+   "rest_quat_blender": [
+    1.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "jaw",
+   "parent": "body",
+   "head_ue_cm": [
+    -0.5,
+    -0.0,
+    4.2
+   ],
+   "length_cm": 2.0,
+   "rest_quat_blender": [
+    1.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "cheek_l",
+   "parent": "body",
+   "head_ue_cm": [
+    1.5,
+    -3.3,
+    6.4
+   ],
+   "length_cm": 1.5,
+   "rest_quat_blender": [
+    1.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "cheek_r",
+   "parent": "body",
+   "head_ue_cm": [
+    1.5,
+    3.3,
+    6.4
+   ],
+   "length_cm": 1.5,
+   "rest_quat_blender": [
+    1.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "crown",
+   "parent": "body",
+   "head_ue_cm": [
+    0.0,
+    -0.0,
+    11.55
+   ],
+   "length_cm": 1.5,
+   "rest_quat_blender": [
+    1.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "leaf_01_a",
+   "parent": "crown",
+   "head_ue_cm": [
+    0.9072,
+    -0.6591,
+    12.0
+   ],
+   "length_cm": 1.04066,
+   "rest_quat_blender": [
+    0.755616,
+    0.472162,
+    -0.240578,
+    -0.385006
+   ]
+  },
+  {
+   "name": "leaf_01_b",
+   "parent": "leaf_01_a",
+   "head_ue_cm": [
+    1.2763,
+    -0.9273,
+    12.9353
+   ],
+   "length_cm": 5.52765,
+   "rest_quat_blender": [
+    0.873727,
+    0.174625,
+    -0.088976,
+    -0.445186
+   ]
+  },
+  {
+   "name": "leaf_02_a",
+   "parent": "crown",
+   "head_ue_cm": [
+    -0.3762,
+    -1.1578,
+    12.0
+   ],
+   "length_cm": 0.99405,
+   "rest_quat_blender": [
+    0.863852,
+    0.478841,
+    0.075841,
+    0.136821
+   ]
+  },
+  {
+   "name": "leaf_02_b",
+   "parent": "leaf_02_a",
+   "head_ue_cm": [
+    -0.539,
+    -1.6588,
+    12.843
+   ],
+   "length_cm": 5.56613,
+   "rest_quat_blender": [
+    0.974906,
+    0.158388,
+    0.025086,
+    0.15441
+   ]
+  },
+  {
+   "name": "leaf_03_a",
+   "parent": "crown",
+   "head_ue_cm": [
+    -1.0074,
+    -0.0,
+    12.0
+   ],
+   "length_cm": 1.08346,
+   "rest_quat_blender": [
+    0.572061,
+    0.415627,
+    0.415627,
+    0.572061
+   ]
+  },
+  {
+   "name": "leaf_03_b",
+   "parent": "leaf_03_a",
+   "head_ue_cm": [
+    -1.3422,
+    -0.0,
+    13.0304
+   ],
+   "length_cm": 5.43693,
+   "rest_quat_blender": [
+    0.677802,
+    0.201454,
+    0.201454,
+    0.677802
+   ]
+  },
+  {
+   "name": "leaf_04_a",
+   "parent": "crown",
+   "head_ue_cm": [
+    -0.3762,
+    1.1578,
+    12.0
+   ],
+   "length_cm": 0.99405,
+   "rest_quat_blender": [
+    0.136821,
+    0.075841,
+    0.478841,
+    0.863852
+   ]
+  },
+  {
+   "name": "leaf_04_b",
+   "parent": "leaf_04_a",
+   "head_ue_cm": [
+    -0.539,
+    1.6588,
+    12.843
+   ],
+   "length_cm": 5.56613,
+   "rest_quat_blender": [
+    0.15441,
+    0.025086,
+    0.158388,
+    0.974906
+   ]
+  },
+  {
+   "name": "leaf_05_a",
+   "parent": "crown",
+   "head_ue_cm": [
+    0.9072,
+    0.6591,
+    12.0
+   ],
+   "length_cm": 1.04066,
+   "rest_quat_blender": [
+    0.385006,
+    0.240578,
+    -0.472162,
+    -0.755616
+   ]
+  },
+  {
+   "name": "leaf_05_b",
+   "parent": "leaf_05_a",
+   "head_ue_cm": [
+    1.2763,
+    0.9273,
+    12.9353
+   ],
+   "length_cm": 5.52765,
+   "rest_quat_blender": [
+    0.445186,
+    0.088976,
+    -0.174625,
+    -0.873727
+   ]
+  },
+  {
+   "name": "taproot",
+   "parent": "body",
+   "head_ue_cm": [
+    0.0,
+    -0.0,
+    1.9
+   ],
+   "length_cm": 1.0,
+   "rest_quat_blender": [
+    1.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  }
+ ],
+ "statics": {
+  "TurnipBed_R01": {
+   "object": "TurnipBed_R01",
+   "tris": 224,
+   "verts": 114,
+   "slots": [
+    "Soil"
+   ],
+   "bounds_ue_cm": {
+    "min": [
+     -12.0,
+     -12.0,
+     -3.4
+    ],
+    "max": [
+     12.0,
+     12.0,
+     0.6866
+    ]
+   },
+   "color_attribute": {
+    "name": "Col",
+    "type": "BYTE_COLOR",
+    "domain": "CORNER"
+   },
+   "file": "TurnipBed_R01_Mars_SM.fbx",
+   "scene_location_restored": [
+    0.0,
+    0.0,
+    9.600000381469727
+   ]
+  },
+  "TurnipBedEmpty_R01": {
+   "object": "TurnipBedEmpty_R01",
+   "tris": 288,
+   "verts": 144,
+   "slots": [
+    "Soil"
+   ],
+   "bounds_ue_cm": {
+    "min": [
+     -12.0,
+     -12.0,
+     -3.4
+    ],
+    "max": [
+     12.0,
+     12.0,
+     0.6866
+    ]
+   },
+   "color_attribute": {
+    "name": "Col",
+    "type": "BYTE_COLOR",
+    "domain": "CORNER"
+   },
+   "file": "TurnipBedEmpty_R01_Mars_SM.fbx",
+   "scene_location_restored": [
+    0.0,
+    0.0,
+    9.600000381469727
+   ]
+  },
+  "ScreamingTurnip_R01_Collision": {
+   "object": "ScreamingTurnip_R01_Collision",
+   "tris": 40,
+   "verts": 22,
+   "slots": [],
+   "bounds_ue_cm": {
+    "min": [
+     -4.4,
+     -4.95,
+     1.8
+    ],
+    "max": [
+     5.0613,
+     4.95,
+     11.7
+    ]
+   },
+   "color_attribute": {
+    "name": "Col",
+    "type": "BYTE_COLOR",
+    "domain": "CORNER"
+   },
+   "file": "ScreamingTurnip_R01_Collision_Mars_SM.fbx",
+   "scene_location_restored": [
+    0.0,
+    0.0,
+    0.0
+   ]
+  }
+ },
+ "cube": {
+  "file": "validation/Cube10_Mars_SM.fbx",
+  "bounds_ue_cm": {
+   "min": [
+    -5.0,
+    -5.0,
+    -5.0
+   ],
+   "max": [
+    5.0,
+    5.0,
+    5.0
+   ]
+  }
+ },
+ "sk": {
+  "object": "ScreamingTurnip_R01_Body",
+  "tris": 3188,
+  "verts": 1624,
+  "slots": [
+   "Skin",
+   "Leaf",
+   "Mouth",
+   "Teeth"
+  ],
+  "bounds_ue_cm": {
+   "min": [
+    -5.8966,
+    -6.6803,
+    0.0
+   ],
+   "max": [
+    5.4047,
+    6.6803,
+    16.0
+   ]
+  },
+  "color_attribute": {
+   "name": "Col",
+   "type": "BYTE_COLOR",
+   "domain": "CORNER"
+  },
+  "file": "ScreamingTurnip_R01_Mars_SK.fbx",
+  "shape_keys": [
+   "Basis",
+   "Inhale",
+   "Scream"
+  ]
+ }
+}

@@ -1,0 +1,18 @@
+00:02.078  blend            | Read blend: "D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\source\ScreamingTurnip_R01_phaseB3.blend"
+D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\scripts\render_screaming_turnip.py:77: DeprecationWarning: 'World.use_nodes' is expected to be removed in Blender 6.0
+  w.use_nodes = True
+00:03.297  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\b3_fp_reference\fp_mock\fp_neutral_neutral.png'
+00:03.406  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\b3_fp_reference\fp_mock\fp_neutral_game.png'
+00:03.484  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\b3_fp_reference\fp_mock\fp_inhale_neutral.png'
+00:03.562  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\b3_fp_reference\fp_mock\fp_inhale_game.png'
+00:03.640  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\b3_fp_reference\fp_mock\fp_scream_neutral.png'
+00:03.718  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\b3_fp_reference\fp_mock\fp_scream_game.png'
+00:04.437  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\b3_fp_reference\fp_mock\fp_alpha_neutral.png'
+00:04.578  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\b3_fp_reference\fp_mock\fp_alpha_inhale.png'
+00:04.734  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\b3_fp_reference\fp_mock\fp_alpha_scream.png'
+RENDER_UNIT 1.0
+FP_FRACTION {"unit": 1.0, "neutral": {"area_fraction": 0.0217, "bbox_width_fraction": 0.1396, "bbox_height_fraction": 0.3185, "frame_px": [960, 540], "camera": "perspective, 90 deg horizontal FOV, 16:9, eye 45 cm in front of the bulb centre at its height (z 6.82)"}, "inhale": {"area_fraction": 0.0265, "bbox_width_fraction": 0.1542, "bbox_height_fraction": 0.3389, "frame_px": [960, 540], "camera": "perspective, 90 deg horizontal FOV, 16:9, eye 45 cm in front of the bulb centre at its height (z 6.82)"}, "scream": {"area_fraction": 0.0274, "bbox_width_fraction": 0.1187, "bbox_height_fraction": 0.413, "frame_px": [960, 540], "camera": "perspective, 90 deg horizontal FOV, 16:9, eye 45 cm in front of the bulb centre at its height (z 6.82)"}}
+TURNIP_OK
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+
+Blender quit

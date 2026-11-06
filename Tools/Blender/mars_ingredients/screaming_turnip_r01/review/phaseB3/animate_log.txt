@@ -1,0 +1,41 @@
+00:01.860  blend            | Read blend: "D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\source\ScreamingTurnip_R01.blend"
+CLIP SRC_Idle                 frames 0..60  loop True  isect_max {} ue_dev 0.000000 seam {"pose_delta_cm_deg": [0.0, 0.0, 0.0], "velocity_delta_cm_per_frame": 0.00027} sk_peaks {"Inhale": {"max": 0.0, "frames_at_max": []}, "Scream": {"max": 0.0, "frames_at_max": []}}
+CLIP SRC_Grip                 frames 0..6   loop False isect_max {} ue_dev 0.000000 seam {"pose_delta_cm_deg": [0.35, 10.0, 0.0]} sk_peaks {"Inhale": {"max": 0.0, "frames_at_max": []}, "Scream": {"max": 0.0, "frames_at_max": []}}
+CLIP SRC_Tug                  frames 0..15  loop False isect_max {} ue_dev 0.000010 seam {"pose_delta_cm_deg": [0.57784, 9.0, 0.0]} sk_peaks {"Inhale": {"max": 0.0, "frames_at_max": []}, "Scream": {"max": 0.0, "frames_at_max": []}}
+CLIP SRC_Release              frames 0..6   loop False isect_max {} ue_dev 0.000010 seam {"pose_delta_cm_deg": [1.11081, 19.0, 0.0]} sk_peaks {"Inhale": {"max": 0.0, "frames_at_max": []}, "Scream": {"max": 0.0, "frames_at_max": []}}
+CLIP SRC_Cancel               frames 0..7   loop False isect_max {} ue_dev 0.000000 seam {"pose_delta_cm_deg": [0.57784, 19.0, 0.0]} sk_peaks {"Inhale": {"max": 0.0, "frames_at_max": []}, "Scream": {"max": 0.0, "frames_at_max": []}}
+CLIP ROOT_QuietIdle           frames 0..60  loop True  isect_max {} ue_dev 0.000000 seam {"pose_delta_cm_deg": [0.0, 0.0, 0.0], "velocity_delta_cm_per_frame": 0.00088} sk_peaks {"Inhale": {"max": 0.0, "frames_at_max": []}, "Scream": {"max": 0.0, "frames_at_max": []}}
+CLIP ROOT_Anticipate          frames 0..9   loop False isect_max {} ue_dev 0.000000 seam {"pose_delta_cm_deg": [0.83979, 13.0, 0.0]} sk_peaks {"Inhale": {"max": 0.0, "frames_at_max": []}, "Scream": {"max": 0.0, "frames_at_max": []}}
+CLIP ROOT_AnticipateTired     frames 0..9   loop False isect_max {} ue_dev 0.000010 seam {"pose_delta_cm_deg": [0.77341, 55.4531, 0.0]} sk_peaks {"Inhale": {"max": 0.0, "frames_at_max": []}, "Scream": {"max": 0.0, "frames_at_max": []}}
+CLIP ROOT_Inhale              frames 0..36  loop False isect_max {} ue_dev 0.000010 seam {"pose_delta_cm_deg": [1.50473, 11.0, 1.0]} sk_peaks {"Inhale": {"max": 1.0, "frames_at_max": [30, 36]}, "Scream": {"max": 0.0, "frames_at_max": []}}
+CLIP ROOT_Scream              frames 0..18  loop False isect_max {} ue_dev 0.000010 seam {"pose_delta_cm_deg": [3.75973, 34.0, 1.0]} sk_peaks {"Inhale": {"max": 1.0, "frames_at_max": [0, 0]}, "Scream": {"max": 1.0, "frames_at_max": [3, 18]}}
+CLIP ROOT_Recover             frames 0..30  loop False isect_max {} ue_dev 0.000010 seam {"pose_delta_cm_deg": [3.66014, 65.7413, 1.0]} sk_peaks {"Inhale": {"max": 0.0, "frames_at_max": []}, "Scream": {"max": 1.0, "frames_at_max": [0, 0], "zero_from_frame": 8}}
+CLIP ROOT_RecoveryIdle        frames 0..60  loop True  isect_max {} ue_dev 0.000010 seam {"pose_delta_cm_deg": [0.0, 0.0, 0.0], "velocity_delta_cm_per_frame": 0.00011} sk_peaks {"Inhale": {"max": 0.0, "frames_at_max": []}, "Scream": {"max": 0.0, "frames_at_max": []}}
+CLIP ROOT_AirborneLeafTrail   frames 0..30  loop True  isect_max {} ue_dev 0.000010 seam {"pose_delta_cm_deg": [0.0, 0.0, 0.0], "velocity_delta_cm_per_frame": 0.00221} sk_peaks {"Inhale": {"max": 0.0, "frames_at_max": []}, "Scream": {"max": 0.0, "frames_at_max": []}}
+CLIP ROOT_ImpactSquash        frames 0..7   loop False isect_max {} ue_dev 0.000000 seam {"pose_delta_cm_deg": [0.0, 0.0, 0.0]} sk_peaks {"Inhale": {"max": 0.0, "frames_at_max": []}, "Scream": {"max": 0.0, "frames_at_max": []}}
+CLIP ROOT_SettleRock          frames 0..12  loop False isect_max {} ue_dev 0.000000 seam {"pose_delta_cm_deg": [0.0, 0.0, 0.0]} sk_peaks {"Inhale": {"max": 0.0, "frames_at_max": []}, "Scream": {"max": 0.0, "frames_at_max": []}}
+CLIP ROOT_PlaceSettle         frames 0..7   loop False isect_max {} ue_dev 0.000000 seam {"pose_delta_cm_deg": [0.0, 0.0, 0.0]} sk_peaks {"Inhale": {"max": 0.0, "frames_at_max": []}, "Scream": {"max": 0.0, "frames_at_max": []}}
+CHAIN ROOT_QuietIdle f0                  -> ROOT_Anticipate f0          0.0000 cm    0.000 deg sk 0.0000 
+CHAIN ROOT_Anticipate fN                 -> ROOT_Inhale f0              0.0000 cm    0.000 deg sk 0.0000 
+CHAIN ROOT_Inhale fN                     -> ROOT_Scream f0              0.0000 cm    0.000 deg sk 0.0000 
+CHAIN ROOT_Scream fN                     -> ROOT_Recover f0             0.0000 cm    0.000 deg sk 0.0000 
+CHAIN ROOT_Recover fN                    -> ROOT_RecoveryIdle f0        0.0000 cm    0.000 deg sk 0.0000 
+CHAIN ROOT_RecoveryIdle f0               -> ROOT_AnticipateTired f0     0.0000 cm    0.000 deg sk 0.0000 
+CHAIN ROOT_AnticipateTired fN            -> ROOT_Inhale f0              0.0000 cm    0.000 deg sk 0.0000 
+CHAIN ROOT_RecoveryIdle fany             -> ROOT_AnticipateTired f0     0.1485 cm    2.298 deg sk 0.0000 HARD CUT (reported)
+CHAIN ROOT_RecoveryIdle f0               -> ROOT_Anticipate f0          0.6517 cm   42.462 deg sk 0.0000 HARD CUT (reported)
+CHAIN ROOT_QuietIdle fany                -> ROOT_Anticipate f0          0.1603 cm    4.131 deg sk 0.0000 HARD CUT (reported)
+CHAIN ROOT_RecoveryIdle fany             -> ROOT_Anticipate f0          0.7854 cm   41.993 deg sk 0.0000 HARD CUT (reported)
+CHAIN SRC_Idle f0                        -> SRC_Grip f0                 0.0000 cm    0.000 deg sk 0.0000 
+CHAIN SRC_Grip fN                        -> SRC_Tug f0                  0.0000 cm    0.000 deg sk 0.0000 
+CHAIN SRC_Tug fN                         -> SRC_Release f0              0.0000 cm    0.000 deg sk 0.0000 
+CHAIN SRC_Tug fN                         -> SRC_Cancel f0               0.0000 cm    0.000 deg sk 0.0000 
+CHAIN SRC_Cancel fN                      -> SRC_Idle f0                 0.0000 cm    0.000 deg sk 0.0000 
+CHAIN SRC_Release fN                     -> ROOT_QuietIdle f0           0.0000 cm    0.000 deg sk 0.0000 
+ENVELOPE {"min": [-7.222, -7.107, -0.6], "max": [6.679, 7.107, 20.596], "h_z": 21.196, "w_y": 14.214, "d_x": 13.901, "limit_h_w_d": [22.0, 14.0, 13.0], "exceeds": {"w": 0.214, "d": 0.901}}
+PLANTED {"body_offset_z_cm": -0.6, "seam_top_z": 6.8, "bulb_top_z": 11.1, "soil_line_z": 9.6, "shoulder_above_soil_cm": 1.5, "taproot_tip_z": -0.6}
+Info: Saved as "ScreamingTurnip_R01.blend"
+TURNIP_OK (16 clips, 14 s)
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+
+Blender quit

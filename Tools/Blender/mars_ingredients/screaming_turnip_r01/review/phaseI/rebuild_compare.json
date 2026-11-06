@@ -1,0 +1,176 @@
+{
+ "verts": [
+  1624,
+  1624
+ ],
+ "tris": [
+  3188,
+  3188
+ ],
+ "polygons_identical": true,
+ "material_indices_identical": true,
+ "rest_vertex_max_cm": 0.0,
+ "shape_keys": {
+  "new": [
+   "Basis",
+   "Inhale",
+   "Scream"
+  ],
+  "ref": [
+   "Basis",
+   "Inhale",
+   "Scream"
+  ]
+ },
+ "shape_key_block_max_cm": {
+  "Basis": 0.0,
+  "Inhale": 0.0,
+  "Scream": 0.0
+ },
+ "shape_key_offset_max_cm": {
+  "Basis": 0.0,
+  "Inhale": 0.0,
+  "Scream": 0.0
+ },
+ "vertex_colour_max": {
+  "Col": 0.0
+ },
+ "bones": [
+  17,
+  17
+ ],
+ "bone_max_delta": 0.0,
+ "statics_max_cm": {
+  "TurnipBed_R01": 0.0,
+  "TurnipBedEmpty_R01": 0.0,
+  "ScreamingTurnip_R01_Collision": 0.0
+ },
+ "id_props_identical": {
+  "mouth_L0": true,
+  "mouth_L1": true,
+  "mouth_centre_l0": true,
+  "mouth_centre_l1": true,
+  "mouth_tips": true,
+  "mouth_info": true
+ },
+ "weights_changed_vertices": 40,
+ "weights_changed_by_part": {
+  "stem_root": 20,
+  "stem+stem_root": 20
+ },
+ "weights_examples": [
+  {
+   "v": 1459,
+   "new": {
+    "body": 1.0
+   },
+   "ref": {
+    "leaf_01_a": 1.0
+   }
+  },
+  {
+   "v": 1460,
+   "new": {
+    "body": 1.0
+   },
+   "ref": {
+    "leaf_01_a": 1.0
+   }
+  },
+  {
+   "v": 1461,
+   "new": {
+    "body": 1.0
+   },
+   "ref": {
+    "leaf_01_a": 1.0
+   }
+  },
+  {
+   "v": 1462,
+   "new": {
+    "body": 1.0
+   },
+   "ref": {
+    "leaf_01_a": 1.0
+   }
+  },
+  {
+   "v": 1463,
+   "new": {
+    "body": 0.5,
+    "leaf_01_a": 0.5
+   },
+   "ref": {
+    "leaf_01_a": 1.0
+   }
+  },
+  {
+   "v": 1464,
+   "new": {
+    "body": 0.5,
+    "leaf_01_a": 0.5
+   },
+   "ref": {
+    "leaf_01_a": 1.0
+   }
+  },
+  {
+   "v": 1465,
+   "new": {
+    "body": 0.5,
+    "leaf_01_a": 0.5
+   },
+   "ref": {
+    "leaf_01_a": 1.0
+   }
+  },
+  {
+   "v": 1466,
+   "new": {
+    "body": 0.5,
+    "leaf_01_a": 0.5
+   },
+   "ref": {
+    "leaf_01_a": 1.0
+   }
+  },
+  {
+   "v": 1492,
+   "new": {
+    "body": 1.0
+   },
+   "ref": {
+    "leaf_02_a": 1.0
+   }
+  },
+  {
+   "v": 1493,
+   "new": {
+    "body": 1.0
+   },
+   "ref": {
+    "leaf_02_a": 1.0
+   }
+  },
+  {
+   "v": 1494,
+   "new": {
+    "body": 1.0
+   },
+   "ref": {
+    "leaf_02_a": 1.0
+   }
+  },
+  {
+   "v": 1495,
+   "new": {
+    "body": 1.0
+   },
+   "ref": {
+    "leaf_02_a": 1.0
+   }
+  }
+ ],
+ "fails": []
+}

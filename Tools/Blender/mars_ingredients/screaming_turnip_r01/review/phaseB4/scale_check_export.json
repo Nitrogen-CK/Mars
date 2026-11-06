@@ -1,0 +1,496 @@
+{
+ "scale": 3.0,
+ "tolerance": {
+  "rel": 0.005,
+  "abs_slack_cm": 0.002
+ },
+ "pairs": [
+  {
+   "pair": "measurements",
+   "lengths": 222,
+   "areas": 4,
+   "skipped": 364,
+   "zero": 63,
+   "worst_rel": 0.0,
+   "fails": [],
+   "missing": []
+  },
+  {
+   "pair": "pose_report",
+   "lengths": 361,
+   "areas": 0,
+   "skipped": 172,
+   "zero": 13,
+   "worst_rel": 0.0028735632183908657,
+   "fails": [],
+   "missing": []
+  },
+  {
+   "pair": "anim_report",
+   "lengths": 166,
+   "areas": 0,
+   "skipped": 1022,
+   "zero": 31,
+   "worst_rel": 5.196964972453699e-05,
+   "fails": [],
+   "missing": []
+  },
+  {
+   "pair": "expected",
+   "lengths": 76,
+   "areas": 0,
+   "skipped": 88,
+   "zero": 19,
+   "worst_rel": 0.0,
+   "fails": [],
+   "missing": []
+  },
+  {
+   "pair": "expected_anims",
+   "lengths": 107682,
+   "areas": 0,
+   "skipped": 7090,
+   "zero": 4890,
+   "worst_rel": 0.0,
+   "fails": [],
+   "missing": []
+  }
+ ],
+ "headline": [
+  {
+   "quantity": "neutral height (tip to highest leaf)",
+   "path": "/overall_height_tip_to_highest_leaf_cm",
+   "b3": 16.0,
+   "b4": 48.0,
+   "ratio": 3.0
+  },
+  {
+   "quantity": "neutral width w_y",
+   "path": "/overall/w_y",
+   "b3": 13.361,
+   "b4": 40.082,
+   "ratio": 2.9999
+  },
+  {
+   "quantity": "neutral depth d_x",
+   "path": "/overall/d_x",
+   "b3": 11.301,
+   "b4": 33.904,
+   "ratio": 3.0001
+  },
+  {
+   "quantity": "bulb h_z",
+   "path": "/bulb/h_z",
+   "b3": 9.9,
+   "b4": 29.7,
+   "ratio": 3.0
+  },
+  {
+   "quantity": "bulb w_y",
+   "path": "/bulb/w_y",
+   "b3": 9.338,
+   "b4": 28.013,
+   "ratio": 2.9999
+  },
+  {
+   "quantity": "bulb d_x",
+   "path": "/bulb/d_x",
+   "b3": 7.944,
+   "b4": 23.832,
+   "ratio": 3.0
+  },
+  {
+   "quantity": "body bone head z",
+   "path": "/landmarks/body_centre_bone_head[2]",
+   "b3": 6.825,
+   "b4": 20.475,
+   "ratio": 3.0
+  },
+  {
+   "quantity": "jaw hinge x",
+   "path": "/landmarks/jaw_hinge[0]",
+   "b3": -0.5,
+   "b4": -1.5,
+   "ratio": 3.0
+  },
+  {
+   "quantity": "jaw hinge z",
+   "path": "/landmarks/jaw_hinge[2]",
+   "b3": 4.2,
+   "b4": 12.6,
+   "ratio": 3.0
+  },
+  {
+   "quantity": "crown base z",
+   "path": "/landmarks/crown_base[2]",
+   "b3": 11.55,
+   "b4": 34.65,
+   "ratio": 3.0
+  },
+  {
+   "quantity": "cheek_l head y",
+   "path": "/landmarks/cheek_l_head[1]",
+   "b3": 3.3,
+   "b4": 9.9,
+   "ratio": 3.0
+  },
+  {
+   "quantity": "Grip_L y (UE)",
+   "path": "/landmarks/sockets_unreal_cm/Grip_L[1]",
+   "b3": -3.94,
+   "b4": -11.82,
+   "ratio": 3.0
+  },
+  {
+   "quantity": "Grip_L z",
+   "path": "/landmarks/sockets_unreal_cm/Grip_L[2]",
+   "b3": 4.0,
+   "b4": 12.0,
+   "ratio": 3.0
+  },
+  {
+   "quantity": "MouthCue x",
+   "path": "/landmarks/sockets_unreal_cm/MouthCue[0]",
+   "b3": 4.136,
+   "b4": 12.407,
+   "ratio": 2.9998
+  },
+  {
+   "quantity": "MouthCue z",
+   "path": "/landmarks/sockets_unreal_cm/MouthCue[2]",
+   "b3": 6.4,
+   "b4": 19.2,
+   "ratio": 3.0
+  },
+  {
+   "quantity": "SoilLine z",
+   "path": "/landmarks/sockets_unreal_cm/SoilLine[2]",
+   "b3": 9.6,
+   "b4": 28.8,
+   "ratio": 3.0
+  },
+  {
+   "quantity": "HarvestGrip_L z",
+   "path": "/landmarks/sockets_unreal_cm/HarvestGrip_L[2]",
+   "b3": 12.678,
+   "b4": 38.035,
+   "ratio": 3.0001
+  },
+  {
+   "quantity": "hull extents d_x",
+   "path": "/collision_hull/extents_cm/d_x",
+   "b3": 9.461,
+   "b4": 28.384,
+   "ratio": 3.0001
+  },
+  {
+   "quantity": "hull extents w_y",
+   "path": "/collision_hull/extents_cm/w_y",
+   "b3": 9.9,
+   "b4": 29.7,
+   "ratio": 3.0
+  },
+  {
+   "quantity": "hull extents h_z",
+   "path": "/collision_hull/extents_cm/h_z",
+   "b3": 9.9,
+   "b4": 29.7,
+   "ratio": 3.0
+  },
+  {
+   "quantity": "hull front x (widened)",
+   "path": "/collision_hull/extents_cm/max[0]",
+   "b3": 5.061,
+   "b4": 15.184,
+   "ratio": 3.0002
+  },
+  {
+   "quantity": "hull centre offset x",
+   "path": "/collision_hull/centre_offset_from_root_cm[0]",
+   "b3": 0.331,
+   "b4": 0.992,
+   "ratio": 2.997
+  },
+  {
+   "quantity": "hull centre offset z",
+   "path": "/collision_hull/centre_offset_from_root_cm[2]",
+   "b3": 6.75,
+   "b4": 20.25,
+   "ratio": 3.0
+  },
+  {
+   "quantity": "bed outer w",
+   "path": "/statics/TurnipBed_R01/bounds_local/w_y",
+   "b3": 24.0,
+   "b4": 72.0,
+   "ratio": 3.0
+  },
+  {
+   "quantity": "bed h",
+   "path": "/statics/TurnipBed_R01/bounds_local/h_z",
+   "b3": 4.087,
+   "b4": 12.26,
+   "ratio": 2.9998
+  },
+  {
+   "quantity": "bed top z (above soil line)",
+   "path": "/statics/TurnipBed_R01/bounds_local/max[2]",
+   "b3": 0.687,
+   "b4": 2.06,
+   "ratio": 2.9985
+  },
+  {
+   "quantity": "bed scene z",
+   "path": "/statics/TurnipBed_R01/object_location[2]",
+   "b3": 9.6,
+   "b4": 28.8,
+   "ratio": 3.0
+  },
+  {
+   "quantity": "muzzle protrusion max",
+   "path": "/muzzle_rest/muzzle_protrusion_max_cm",
+   "b3": 1.04,
+   "b4": 3.12,
+   "ratio": 3.0
+  },
+  {
+   "quantity": "seam floor x_c",
+   "path": "/muzzle_rest/x_c_seam_floor",
+   "b3": 3.349,
+   "b4": 10.047,
+   "ratio": 3.0
+  },
+  {
+   "quantity": "Inhale key max rest delta",
+   "path": "/shape_keys[0]/max_rest_delta_cm",
+   "b3": 2.266,
+   "b4": 6.798,
+   "ratio": 3.0
+  },
+  {
+   "quantity": "Scream key max rest delta",
+   "path": "/shape_keys[1]/max_rest_delta_cm",
+   "b3": 3.532,
+   "b4": 10.596,
+   "ratio": 3.0
+  },
+  {
+   "quantity": "scream pose height",
+   "path": "/poses/scream/bounds/h_z",
+   "b3": 19.858,
+   "b4": 59.574,
+   "ratio": 3.0
+  },
+  {
+   "quantity": "scream side lip separation",
+   "path": "/poses/scream/gape/side_lip_separation_cm",
+   "b3": 5.976,
+   "b4": 17.929,
+   "ratio": 3.0002
+  },
+  {
+   "quantity": "scream cavity depth",
+   "path": "/poses/scream/mouth_b2/cavity_depth_cm",
+   "b3": 3.635,
+   "b4": 10.904,
+   "ratio": 2.9997
+  },
+  {
+   "quantity": "inhale lobe forward (l)",
+   "path": "/poses/inhale/mouth_b2/lobes/lobe_l/forward_cm",
+   "b3": 1.906,
+   "b4": 5.717,
+   "ratio": 2.9995
+  },
+  {
+   "quantity": "recover width",
+   "path": "/poses/recover/bounds/w_y",
+   "b3": 13.831,
+   "b4": 41.494,
+   "ratio": 3.0001
+  },
+  {
+   "quantity": "clip envelope h",
+   "path": "/envelope/h_z",
+   "b3": 21.196,
+   "b4": 63.589,
+   "ratio": 3.0
+  },
+  {
+   "quantity": "clip envelope w",
+   "path": "/envelope/w_y",
+   "b3": 14.214,
+   "b4": 42.641,
+   "ratio": 2.9999
+  },
+  {
+   "quantity": "clip envelope d",
+   "path": "/envelope/d_x",
+   "b3": 13.901,
+   "b4": 41.702,
+   "ratio": 2.9999
+  },
+  {
+   "quantity": "ROOT_Scream clip height",
+   "path": "/clips/ROOT_Scream/clip_bounds/h_z",
+   "b3": 20.596,
+   "b4": 61.789,
+   "ratio": 3.0
+  },
+  {
+   "quantity": "planted seam top z",
+   "path": "/planted/seam_top_z",
+   "b3": 6.8,
+   "b4": 20.4,
+   "ratio": 3.0
+  },
+  {
+   "quantity": "planted shoulder above soil",
+   "path": "/planted/shoulder_above_soil_cm",
+   "b3": 1.5,
+   "b4": 4.5,
+   "ratio": 3.0
+  },
+  {
+   "quantity": "QuietIdle->Anticipate hard cut (cm)",
+   "path": "/chain[9]/max_head_delta_cm",
+   "b3": 0.16026,
+   "b4": 0.48077,
+   "ratio": 2.9999
+  },
+  {
+   "quantity": "RecoveryIdle any->AnticipateTired cut (cm)",
+   "path": "/chain[7]/max_head_delta_cm",
+   "b3": 0.14847,
+   "b4": 0.44542,
+   "ratio": 3.0001
+  }
+ ],
+ "blend": {
+  "ScreamingTurnip_R01_Body": {
+   "verts": [
+    1624,
+    1624
+   ],
+   "polys": [
+    3188,
+    3188
+   ],
+   "vertex_err_cm": 1.9073486328125e-06,
+   "polygons_identical": true,
+   "material_index_identical": true,
+   "vertex_colour_max_diff": 0.0,
+   "shape_keys": {
+    "Basis": 1.9073486328125e-06,
+    "Inhale": 1.9073486328125e-06,
+    "Scream": 1.9073486328125e-06
+   },
+   "weights_max_diff": 0.0,
+   "location": [
+    [
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0
+    ]
+   ],
+   "location_err_cm": 0.0
+  },
+  "TurnipBed_R01": {
+   "verts": [
+    114,
+    114
+   ],
+   "polys": [
+    224,
+    224
+   ],
+   "vertex_err_cm": 1.9073486328125e-06,
+   "polygons_identical": true,
+   "material_index_identical": true,
+   "vertex_colour_max_diff": 0.0,
+   "location": [
+    [
+     0.0,
+     0.0,
+     9.600000381469727
+    ],
+    [
+     0.0,
+     0.0,
+     28.80000114440918
+    ]
+   ],
+   "location_err_cm": 0.0
+  },
+  "TurnipBedEmpty_R01": {
+   "verts": [
+    144,
+    144
+   ],
+   "polys": [
+    288,
+    288
+   ],
+   "vertex_err_cm": 1.9073486328125e-06,
+   "polygons_identical": true,
+   "material_index_identical": true,
+   "vertex_colour_max_diff": 0.0,
+   "location": [
+    [
+     0.0,
+     0.0,
+     9.600000381469727
+    ],
+    [
+     0.0,
+     0.0,
+     28.80000114440918
+    ]
+   ],
+   "location_err_cm": 0.0
+  },
+  "ScreamingTurnip_R01_Collision": {
+   "verts": [
+    22,
+    22
+   ],
+   "polys": [
+    40,
+    40
+   ],
+   "vertex_err_cm": 9.5367431640625e-07,
+   "polygons_identical": true,
+   "material_index_identical": true,
+   "vertex_colour_max_diff": 0.0,
+   "location": [
+    [
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0
+    ]
+   ],
+   "location_err_cm": 0.0
+  },
+  "bones": {
+   "count": [
+    17,
+    17
+   ],
+   "head_err_cm": 0.0,
+   "tail_err_cm": 0.0,
+   "rest_rot_err_deg": 0.0,
+   "parents_identical": true
+  }
+ },
+ "fails": []
+}

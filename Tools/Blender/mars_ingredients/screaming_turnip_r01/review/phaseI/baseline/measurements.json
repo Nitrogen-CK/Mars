@@ -1,0 +1,1125 @@
+{
+ "overall": {
+  "min": [
+   -17.69,
+   -20.041,
+   0.0
+  ],
+  "max": [
+   16.214,
+   20.041,
+   48.0
+  ],
+  "h_z": 48.0,
+  "w_y": 40.082,
+  "d_x": 33.904
+ },
+ "overall_height_tip_to_highest_leaf_cm": 48.0,
+ "taproot_tip_z": 0.0,
+ "bulb": {
+  "min": [
+   -12.0,
+   -14.006,
+   5.4
+  ],
+  "max": [
+   11.832,
+   14.006,
+   35.1
+  ],
+  "h_z": 29.7,
+  "w_y": 28.013,
+  "d_x": 23.832
+ },
+ "leaf_tips": [
+  [
+   16.214,
+   11.78,
+   45.18
+  ],
+  [
+   -8.171,
+   17.381,
+   43.833
+  ],
+  [
+   -17.69,
+   -0.0,
+   48.0
+  ],
+  [
+   -3.606,
+   -18.864,
+   43.833
+  ],
+  [
+   16.214,
+   -11.78,
+   45.18
+  ]
+ ],
+ "landmarks": {
+  "root": [
+   0.0,
+   0.0,
+   0.0
+  ],
+  "body_centre_bone_head": [
+   0.0,
+   0.0,
+   20.475
+  ],
+  "bulb_bounds_centre": [
+   -0.084,
+   0.0,
+   20.25
+  ],
+  "crown_base": [
+   0.0,
+   0.0,
+   34.65
+  ],
+  "highest_leaf_tip": [
+   -17.69,
+   -0.0,
+   48.0
+  ],
+  "jaw_hinge": [
+   -1.5,
+   0.0,
+   12.6
+  ],
+  "cheek_l_head": [
+   4.5,
+   9.9,
+   19.2
+  ],
+  "cheek_r_head": [
+   4.5,
+   -9.9,
+   19.2
+  ],
+  "taproot_head": [
+   0.0,
+   0.0,
+   5.7
+  ],
+  "sockets_blender_cm": {
+   "Grip_L": [
+    0.0,
+    11.82,
+    12.0
+   ],
+   "Grip_R": [
+    0.0,
+    -11.82,
+    12.0
+   ],
+   "MouthCue": [
+    12.407,
+    0.0,
+    19.2
+   ],
+   "SoilLine": [
+    0.0,
+    0.0,
+    28.8
+   ],
+   "HarvestGrip_L": [
+    -1.522,
+    4.683,
+    38.035
+   ],
+   "HarvestGrip_R": [
+    -1.522,
+    -4.683,
+    38.035
+   ]
+  },
+  "sockets_unreal_cm": {
+   "Grip_L": [
+    0.0,
+    -11.82,
+    12.0
+   ],
+   "Grip_R": [
+    0.0,
+    11.82,
+    12.0
+   ],
+   "MouthCue": [
+    12.407,
+    -0.0,
+    19.2
+   ],
+   "SoilLine": [
+    0.0,
+    -0.0,
+    28.8
+   ],
+   "HarvestGrip_L": [
+    -1.522,
+    -4.683,
+    38.035
+   ],
+   "HarvestGrip_R": [
+    -1.522,
+    4.683,
+    38.035
+   ]
+  },
+  "soil_line_bulb_half_width_cm": 9.9
+ },
+ "anatomy": {
+  "leaves": 5,
+  "teeth_upper": 4,
+  "teeth_lower": 4,
+  "taproots": 1,
+  "eyes": 0,
+  "limbs": 0,
+  "mouth_closed_backed": true
+ },
+ "teeth": [
+  {
+   "upper": true,
+   "y": -3.3,
+   "gum": [
+    7.887,
+    -3.3,
+    21.3411
+   ],
+   "axis": [
+    -0.07920978963375092,
+    0.29450955986976624,
+    -0.952360212802887
+   ]
+  },
+  {
+   "upper": true,
+   "y": -1.14,
+   "gum": [
+    7.887,
+    -1.14,
+    21.7181
+   ],
+   "axis": [
+    -0.04484258592128754,
+    0.09047596901655197,
+    -0.9948885440826416
+   ]
+  },
+  {
+   "upper": true,
+   "y": 1.14,
+   "gum": [
+    7.887,
+    1.14,
+    21.717
+   ],
+   "axis": [
+    -0.042723849415779114,
+    -0.0904843807220459,
+    -0.994981050491333
+   ]
+  },
+  {
+   "upper": true,
+   "y": 3.3,
+   "gum": [
+    7.887,
+    3.3,
+    21.338
+   ],
+   "axis": [
+    -0.07348625361919403,
+    -0.29463905096054077,
+    -0.9527788758277893
+   ]
+  },
+  {
+   "upper": false,
+   "y": -3.3,
+   "gum": [
+    6.987,
+    -3.3,
+    16.9926
+   ],
+   "axis": [
+    -0.07348684966564178,
+    0.2946390211582184,
+    0.9527788162231445
+   ]
+  },
+  {
+   "upper": false,
+   "y": -1.14,
+   "gum": [
+    6.987,
+    -1.14,
+    16.6443
+   ],
+   "axis": [
+    -0.04272378981113434,
+    0.09048258513212204,
+    0.9949812293052673
+   ]
+  },
+  {
+   "upper": false,
+   "y": 1.14,
+   "gum": [
+    6.987,
+    1.14,
+    16.6427
+   ],
+   "axis": [
+    -0.04254356771707535,
+    -0.08500487357378006,
+    0.9954718351364136
+   ]
+  },
+  {
+   "upper": false,
+   "y": 3.3,
+   "gum": [
+    6.987,
+    3.3,
+    16.9915
+   ],
+   "axis": [
+    -0.07136791944503784,
+    -0.27814555168151855,
+    0.9578839540481567
+   ]
+  }
+ ],
+ "scale_factor": 3.0,
+ "scale_check": {
+  "scale": 3.0,
+  "unit_read_back": 3.0,
+  "rest_rotation_change_deg": 0.0,
+  "pose_vertex_err_cm": {
+   "neutral": 8.58306884765625e-06,
+   "inhale": 1.52587890625e-05,
+   "scream": 1.52587890625e-05,
+   "recover": 1.33514404296875e-05,
+   "impact_squash": 1.1444091796875e-05,
+   "planted": 1.239776611328125e-05
+  }
+ },
+ "mesh": {
+  "tris": 3188,
+  "verts": 1624,
+  "slots": [
+   "Skin",
+   "Leaf",
+   "Mouth",
+   "Teeth"
+  ],
+  "tris_per_slot": {
+   "Skin": 2090,
+   "Leaf": 310,
+   "Mouth": 660,
+   "Teeth": 128
+  },
+  "tris_per_part": {
+   "bulb": 1525,
+   "lip": 120,
+   "cavity": 300,
+   "tooth": 48,
+   "tooth_root": 80,
+   "taproot": 18,
+   "taproot_root": 16,
+   "stem": 40,
+   "stem_root": 50,
+   "blade": 220,
+   "pad": 531,
+   "gum": 240
+  },
+  "weights": {
+   "max_influences": 3,
+   "unnormalized": 0,
+   "unweighted": 0,
+   "non_bone_groups": [],
+   "root_weighted_verts": 0
+  },
+  "audit": {
+   "tris": 3188,
+   "verts": 1624,
+   "islands": 15,
+   "boundary_edges (defect)": 0,
+   "edges_with_3plus_faces (defect)": 0,
+   "winding_flips (defect)": 0,
+   "inverted_islands (defect)": 0,
+   "zero_area_tris (<1e-6 cm2, defect)": 0,
+   "min_tri_area_cm2": 0.012696438981993404
+  },
+  "color_attribute": {
+   "name": "Col",
+   "type": "BYTE_COLOR",
+   "domain": "CORNER"
+  }
+ },
+ "statics": {
+  "TurnipBed_R01": {
+   "tris": 224,
+   "slots": [
+    "Soil"
+   ],
+   "bounds_local": {
+    "min": [
+     -36.0,
+     -36.0,
+     -10.2
+    ],
+    "max": [
+     36.0,
+     36.0,
+     2.06
+    ],
+    "h_z": 12.26,
+    "w_y": 72.0,
+    "d_x": 72.0
+   },
+   "audit": {
+    "tris": 224,
+    "verts": 114,
+    "islands": 1,
+    "boundary_edges (defect)": 0,
+    "edges_with_3plus_faces (defect)": 0,
+    "winding_flips (defect)": 0,
+    "inverted_islands (defect)": 0,
+    "zero_area_tris (<1e-6 cm2, defect)": 0,
+    "min_tri_area_cm2": 6.085294620760521
+   },
+   "object_location": [
+    0.0,
+    0.0,
+    28.8
+   ]
+  },
+  "TurnipBedEmpty_R01": {
+   "tris": 288,
+   "slots": [
+    "Soil"
+   ],
+   "bounds_local": {
+    "min": [
+     -36.0,
+     -36.0,
+     -10.2
+    ],
+    "max": [
+     36.0,
+     36.0,
+     2.06
+    ],
+    "h_z": 12.26,
+    "w_y": 72.0,
+    "d_x": 72.0
+   },
+   "audit": {
+    "tris": 288,
+    "verts": 144,
+    "islands": 1,
+    "boundary_edges (defect)": 0,
+    "edges_with_3plus_faces (defect)": 0,
+    "winding_flips (defect)": 0,
+    "inverted_islands (defect)": 0,
+    "zero_area_tris (<1e-6 cm2, defect)": 0,
+    "min_tri_area_cm2": 6.085294620760521
+   },
+   "object_location": [
+    0.0,
+    0.0,
+    28.8
+   ]
+  },
+  "ScreamingTurnip_R01_Collision": {
+   "tris": 40,
+   "slots": [],
+   "bounds_local": {
+    "min": [
+     -13.2,
+     -14.85,
+     5.4
+    ],
+    "max": [
+     15.184,
+     14.85,
+     35.1
+    ],
+    "h_z": 29.7,
+    "w_y": 29.7,
+    "d_x": 28.384
+   },
+   "audit": {
+    "tris": 40,
+    "verts": 22,
+    "islands": 1,
+    "boundary_edges (defect)": 0,
+    "edges_with_3plus_faces (defect)": 0,
+    "winding_flips (defect)": 0,
+    "inverted_islands (defect)": 0,
+    "zero_area_tris (<1e-6 cm2, defect)": 0,
+    "min_tri_area_cm2": 46.872252993489404
+   },
+   "object_location": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "centre_offset_from_root_cm": [
+    0.992,
+    0.0,
+    20.25
+   ]
+  }
+ },
+ "collision_hull": {
+  "tris": 40,
+  "extents_cm": {
+   "min": [
+    -13.2,
+    -14.85,
+    5.4
+   ],
+   "max": [
+    15.184,
+    14.85,
+    35.1
+   ],
+   "h_z": 29.7,
+   "w_y": 29.7,
+   "d_x": 28.384
+  },
+  "centre_offset_from_root_cm": [
+   0.992,
+   0.0,
+   20.25
+  ]
+ },
+ "bones": {
+  "count": 17,
+  "names_parents_exact": true,
+  "use_connect_any": false,
+  "deform_all": true,
+  "rotation_modes": [
+   "QUATERNION"
+  ],
+  "root_rest_identity": true,
+  "identity_rest_rotation": {
+   "root": 0.0,
+   "body": 0.0,
+   "jaw": 0.0,
+   "cheek_l": 0.0,
+   "cheek_r": 0.0,
+   "crown": 0.0,
+   "taproot": 0.0
+  },
+  "heads_cm": {
+   "root": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "body": [
+    0.0,
+    0.0,
+    20.475
+   ],
+   "jaw": [
+    -1.5,
+    0.0,
+    12.6
+   ],
+   "cheek_l": [
+    4.5,
+    9.9,
+    19.2
+   ],
+   "cheek_r": [
+    4.5,
+    -9.9,
+    19.2
+   ],
+   "crown": [
+    0.0,
+    0.0,
+    34.65
+   ],
+   "leaf_01_a": [
+    2.722,
+    1.977,
+    36.0
+   ],
+   "leaf_01_b": [
+    3.829,
+    2.782,
+    38.806
+   ],
+   "leaf_02_a": [
+    -1.129,
+    3.473,
+    36.0
+   ],
+   "leaf_02_b": [
+    -1.617,
+    4.976,
+    38.529
+   ],
+   "leaf_03_a": [
+    -3.022,
+    0.0,
+    36.0
+   ],
+   "leaf_03_b": [
+    -4.027,
+    0.0,
+    39.091
+   ],
+   "leaf_04_a": [
+    -1.129,
+    -3.473,
+    36.0
+   ],
+   "leaf_04_b": [
+    -1.617,
+    -4.976,
+    38.529
+   ],
+   "leaf_05_a": [
+    2.722,
+    -1.977,
+    36.0
+   ],
+   "leaf_05_b": [
+    3.829,
+    -2.782,
+    38.806
+   ],
+   "taproot": [
+    0.0,
+    0.0,
+    5.7
+   ]
+  }
+ },
+ "params": {
+  "PROFILE": [
+   [
+    1.95,
+    1.25
+   ],
+   [
+    2.5,
+    2.35
+   ],
+   [
+    3.2,
+    3.3
+   ],
+   [
+    4.05,
+    3.98
+   ],
+   [
+    4.85,
+    4.33
+   ],
+   [
+    5.4,
+    4.47
+   ],
+   [
+    5.9,
+    4.5
+   ],
+   [
+    6.4,
+    4.5
+   ],
+   [
+    6.95,
+    4.47
+   ],
+   [
+    7.6,
+    4.34
+   ],
+   [
+    8.4,
+    4.04
+   ],
+   [
+    9.2,
+    3.6
+   ],
+   [
+    10.0,
+    3.0
+   ],
+   [
+    10.7,
+    2.3
+   ],
+   [
+    11.25,
+    1.55
+   ],
+   [
+    11.7,
+    0.85
+   ]
+  ],
+  "RING_Z": [
+   1.95,
+   2.5,
+   3.15,
+   3.8,
+   4.4,
+   4.95,
+   5.45,
+   5.95,
+   6.4,
+   6.85,
+   7.3,
+   7.8,
+   8.3,
+   8.85,
+   9.45,
+   10.05,
+   10.65,
+   11.2,
+   11.7
+  ],
+  "MOUTH_Z": 6.4,
+  "BOTTOM_Z": 1.8,
+  "TOP_DIP_Z": 11.55,
+  "DEPTH_RATIO": 0.8888888888888888,
+  "PHI": [
+   -165,
+   -150,
+   -135,
+   -120,
+   -106,
+   -92,
+   -79,
+   -66,
+   -55,
+   -44,
+   -33,
+   -22,
+   -11,
+   0,
+   11,
+   22,
+   33,
+   44,
+   55,
+   66,
+   79,
+   92,
+   106,
+   120,
+   135,
+   150,
+   165,
+   180
+  ],
+  "PATCH_PHI": 92,
+  "PATCH_Z": [
+   2.5,
+   10.05
+  ],
+  "LOOP_F": [
+   0.0,
+   0.045,
+   0.1,
+   0.17,
+   0.26,
+   0.33,
+   0.41,
+   0.49,
+   0.58,
+   0.68,
+   0.79,
+   0.9,
+   1.0
+  ],
+  "X_TIP": [
+   1.95,
+   1.0
+  ],
+  "X_BOW": 0.14,
+  "X_GAP": 0.012,
+  "X_GROOVE": [
+   0.08,
+   0.03
+  ],
+  "X_S_APEX": 0.75,
+  "X_ROLL": 0.28,
+  "X_S_ROLL_K": 1.0,
+  "SOCK0_BLEND": 1.0,
+  "MUZZLE": {
+   "h": 1.05,
+   "ay": 2.45,
+   "az": 1.9,
+   "r0": 0.45,
+   "r1": 1.3,
+   "crease": [
+    1.0,
+    0.6
+   ],
+   "cw": [
+    0.7,
+    0.4
+   ],
+   "slope": 1.2,
+   "slope_drop": 0.3,
+   "pinch": 0.42,
+   "pr": 0.9
+  },
+  "PINCH": [
+   0.0,
+   0.0
+  ],
+  "LOBE": {
+   "y": 3.3,
+   "amp": 0.6,
+   "sigma": 1.3
+  },
+  "SOCK": [
+   [
+    0.55,
+    1.95,
+    0.85
+   ],
+   [
+    1.3,
+    2.15,
+    0.88
+   ],
+   [
+    2.15,
+    1.9,
+    0.78
+   ],
+   [
+    2.9,
+    1.3,
+    0.55
+   ]
+  ],
+  "BACK_DEPTH": 3.4,
+  "GUM_LEVELS": 2,
+  "POCKET_ALPHA_FLOOR": 0.7,
+  "JAW_HINGE": [
+   -0.5,
+   4.2
+  ],
+  "JAW_PHI_FULL": 30,
+  "JAW_PHI_ZERO": 72,
+  "JAW_Z_FULL": 5.5,
+  "JAW_Z_ZERO": 2.7,
+  "JAW_Z_TOP": 6.2,
+  "CHEEK_HEAD": [
+   1.5,
+   3.3
+  ],
+  "CHEEK_R0": 1.6,
+  "CHEEK_R1": 3.4,
+  "CHEEK_ZSQ": 0.8,
+  "W": {
+   "lip_loops": 5,
+   "cheek_ramp": 2.0,
+   "j_band": 0.35
+  },
+  "U_CENTRE_CHEEK": 0.25,
+  "BAND_ROW": 12,
+  "BAND_SEED": 11,
+  "BAND_TONES": [
+   0.3,
+   0.66,
+   0.9
+  ],
+  "LEAF_AZ": [
+   36,
+   108,
+   180,
+   252,
+   324
+  ],
+  "LEAF_STEM_TILT": [
+   26,
+   32,
+   18,
+   32,
+   26
+  ],
+  "LEAF_BLADE_TILT": [
+   62,
+   66,
+   52,
+   66,
+   62
+  ],
+  "LEAF_STEM_LEN": 1.7,
+  "LEAF_BLADE_LEN": 5.4,
+  "LEAF_BASE_R": 0.78,
+  "LEAF_BASE_Z": 11.3,
+  "LEAF_TOP_Z": 16.0,
+  "BLADE": [
+   [
+    0.0,
+    0.36,
+    0.3,
+    0.0
+   ],
+   [
+    0.14,
+    0.92,
+    0.27,
+    0.18
+   ],
+   [
+    0.32,
+    1.55,
+    0.25,
+    0.36
+   ],
+   [
+    0.52,
+    1.82,
+    0.23,
+    0.42
+   ],
+   [
+    0.72,
+    1.45,
+    0.19,
+    0.3
+   ],
+   [
+    0.88,
+    0.8,
+    0.12,
+    0.16
+   ],
+   [
+    1.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  ],
+  "BLADE_DROOP": 0.55,
+  "STEM_R": 0.36,
+  "TAPROOT": [
+   [
+    2.55,
+    0.75
+   ],
+   [
+    1.7,
+    0.85
+   ],
+   [
+    0.85,
+    0.45
+   ],
+   [
+    0.0,
+    0.0
+   ]
+  ],
+  "SOIL_Z": 9.6,
+  "GRIP_Z": 4.0,
+  "TEETH_Y": [
+   -1.1,
+   -0.38,
+   0.38,
+   1.1
+  ],
+  "TEETH_DEPTH": {
+   "true": 0.72,
+   "false": 1.02
+  },
+  "TOOTH_H": {
+   "true": 0.72,
+   "false": 0.62
+  },
+  "TOOTH": {
+   "hw": 0.3,
+   "hd": 0.21,
+   "h": 0.5,
+   "top_hw": 0.09,
+   "embed": 0.22,
+   "collar": 0.3
+  },
+  "SCALE": 3.0,
+  "RINGS": [
+   [
+    1.95,
+    1.25
+   ],
+   [
+    2.5,
+    2.35
+   ],
+   [
+    3.15,
+    3.2321428571428568
+   ],
+   [
+    3.8,
+    3.78
+   ],
+   [
+    4.4,
+    4.133125000000001
+   ],
+   [
+    4.95,
+    4.3554545454545455
+   ],
+   [
+    5.45,
+    4.473
+   ],
+   [
+    5.95,
+    4.5
+   ],
+   [
+    6.4,
+    4.5
+   ],
+   [
+    6.85,
+    4.475454545454546
+   ],
+   [
+    7.3,
+    4.3999999999999995
+   ],
+   [
+    7.8,
+    4.265
+   ],
+   [
+    8.3,
+    4.0775
+   ],
+   [
+    8.85,
+    3.7925
+   ],
+   [
+    9.45,
+    3.4125
+   ],
+   [
+    10.05,
+    2.9499999999999993
+   ],
+   [
+    10.65,
+    2.3499999999999988
+   ],
+   [
+    11.2,
+    1.618181818181819
+   ],
+   [
+    11.7,
+    0.85
+   ]
+  ],
+  "MOUTH_RING": 8
+ },
+ "leaf_length_scale": 1.070281445980072,
+ "muzzle_rest": {
+  "protrusion_by_loop_cm": {
+   "loop1": {
+    "max": 1.714,
+    "mean": 1.006
+   },
+   "loop2": {
+    "max": 2.597,
+    "mean": 1.495
+   },
+   "loop3": {
+    "max": 3.12,
+    "mean": 1.428
+   },
+   "loop4": {
+    "max": 2.974,
+    "mean": 0.856
+   },
+   "loop5": {
+    "max": 2.364,
+    "mean": 0.476
+   },
+   "loop6": {
+    "max": 1.501,
+    "mean": 0.226
+   },
+   "loop7": {
+    "max": 0.771,
+    "mean": 0.123
+   },
+   "loop8": {
+    "max": 0.302,
+    "mean": 0.08
+   },
+   "loop9": {
+    "max": 0.355,
+    "mean": 0.073
+   },
+   "loop10": {
+    "max": 0.136,
+    "mean": 0.022
+   },
+   "loop11": {
+    "max": 0.004,
+    "mean": 0.001
+   },
+   "loop12": {
+    "max": 0.0,
+    "mean": 0.0
+   }
+  },
+  "muzzle_protrusion_max_cm": 3.12,
+  "muzzle_extent_proud_0.25_w_y_cm": 16.203,
+  "muzzle_extent_proud_0.25_h_z_cm": 10.698,
+  "x_c_seam_floor": 10.047
+ },
+ "shape_keys": [
+  {
+   "name": "Inhale",
+   "vertices_moved": 1090,
+   "max_rest_delta_cm": 6.798,
+   "bone_skin_model_err_cm": 3e-06,
+   "posed_target_err_cm": 3e-06,
+   "lobe_centre_l": [
+    8.406,
+    11.112,
+    17.4
+   ],
+   "r": 8.25,
+   "max_rest_delta_cm_design": 2.266
+  },
+  {
+   "name": "Scream",
+   "vertices_moved": 1101,
+   "max_rest_delta_cm": 10.596,
+   "bone_skin_model_err_cm": 4e-06,
+   "posed_target_err_cm": 4e-06,
+   "zc": 23.25,
+   "a": 8.964,
+   "b": 9.861,
+   "max_rest_delta_cm_design": 3.532
+  }
+ ]
+}

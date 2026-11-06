@@ -1,0 +1,731 @@
+{
+ "bones": [
+  {
+   "name": "root",
+   "parent": null,
+   "head_ue_cm": [
+    0.0,
+    -0.0,
+    0.0
+   ],
+   "length_cm": 2.0,
+   "rest_quat_blender": [
+    1.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "body",
+   "parent": "root",
+   "head_ue_cm": [
+    0.0,
+    -0.0,
+    6.825
+   ],
+   "length_cm": 3.0,
+   "rest_quat_blender": [
+    1.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "jaw",
+   "parent": "body",
+   "head_ue_cm": [
+    -1.0,
+    -0.0,
+    6.65
+   ],
+   "length_cm": 2.0,
+   "rest_quat_blender": [
+    1.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "cheek_l",
+   "parent": "body",
+   "head_ue_cm": [
+    0.5838,
+    -1.7167,
+    6.1
+   ],
+   "length_cm": 1.5,
+   "rest_quat_blender": [
+    1.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "cheek_r",
+   "parent": "body",
+   "head_ue_cm": [
+    0.5838,
+    1.7167,
+    6.1
+   ],
+   "length_cm": 1.5,
+   "rest_quat_blender": [
+    1.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "crown",
+   "parent": "body",
+   "head_ue_cm": [
+    0.0,
+    -0.0,
+    11.55
+   ],
+   "length_cm": 1.5,
+   "rest_quat_blender": [
+    1.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "leaf_01_a",
+   "parent": "crown",
+   "head_ue_cm": [
+    0.9159,
+    -0.6654,
+    12.0
+   ],
+   "length_cm": 1.11602,
+   "rest_quat_blender": [
+    0.755616,
+    0.472161,
+    -0.240578,
+    -0.385006
+   ]
+  },
+  {
+   "name": "leaf_01_b",
+   "parent": "leaf_01_a",
+   "head_ue_cm": [
+    1.3117,
+    -0.953,
+    13.0031
+   ],
+   "length_cm": 4.71396,
+   "rest_quat_blender": [
+    0.868481,
+    0.19908,
+    -0.101436,
+    -0.442513
+   ]
+  },
+  {
+   "name": "leaf_02_a",
+   "parent": "crown",
+   "head_ue_cm": [
+    -0.3943,
+    -1.2137,
+    12.0
+   ],
+   "length_cm": 1.04612,
+   "rest_quat_blender": [
+    0.863852,
+    0.478841,
+    0.075841,
+    0.136821
+   ]
+  },
+  {
+   "name": "leaf_02_b",
+   "parent": "leaf_02_a",
+   "head_ue_cm": [
+    -0.5656,
+    -1.7409,
+    12.8872
+   ],
+   "length_cm": 4.7522,
+   "rest_quat_blender": [
+    0.970164,
+    0.185228,
+    0.029337,
+    0.153659
+   ]
+  },
+  {
+   "name": "leaf_03_a",
+   "parent": "crown",
+   "head_ue_cm": [
+    -0.9612,
+    -0.0,
+    12.0
+   ],
+   "length_cm": 1.18022,
+   "rest_quat_blender": [
+    0.572061,
+    0.415627,
+    0.415627,
+    0.572061
+   ]
+  },
+  {
+   "name": "leaf_03_b",
+   "parent": "leaf_03_a",
+   "head_ue_cm": [
+    -1.3259,
+    -0.0,
+    13.1225
+   ],
+   "length_cm": 4.60817,
+   "rest_quat_blender": [
+    0.667284,
+    0.23395,
+    0.23395,
+    0.667284
+   ]
+  },
+  {
+   "name": "leaf_04_a",
+   "parent": "crown",
+   "head_ue_cm": [
+    -0.3943,
+    1.2137,
+    12.0
+   ],
+   "length_cm": 1.04612,
+   "rest_quat_blender": [
+    0.136821,
+    0.075841,
+    0.478841,
+    0.863852
+   ]
+  },
+  {
+   "name": "leaf_04_b",
+   "parent": "leaf_04_a",
+   "head_ue_cm": [
+    -0.5656,
+    1.7409,
+    12.8872
+   ],
+   "length_cm": 4.7522,
+   "rest_quat_blender": [
+    0.153659,
+    0.029337,
+    0.185228,
+    0.970164
+   ]
+  },
+  {
+   "name": "leaf_05_a",
+   "parent": "crown",
+   "head_ue_cm": [
+    0.9159,
+    0.6654,
+    12.0
+   ],
+   "length_cm": 1.11602,
+   "rest_quat_blender": [
+    0.385006,
+    0.240578,
+    -0.472161,
+    -0.755616
+   ]
+  },
+  {
+   "name": "leaf_05_b",
+   "parent": "leaf_05_a",
+   "head_ue_cm": [
+    1.3117,
+    0.953,
+    13.0031
+   ],
+   "length_cm": 4.71396,
+   "rest_quat_blender": [
+    0.442513,
+    0.101436,
+    -0.19908,
+    -0.868481
+   ]
+  },
+  {
+   "name": "taproot",
+   "parent": "body",
+   "head_ue_cm": [
+    0.0,
+    -0.0,
+    1.9
+   ],
+   "length_cm": 1.0,
+   "rest_quat_blender": [
+    1.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  }
+ ],
+ "statics": {
+  "TurnipBed_R01": {
+   "object": "TurnipBed_R01",
+   "tris": 224,
+   "verts": 114,
+   "slots": [
+    "Soil"
+   ],
+   "bounds_ue_cm": {
+    "min": [
+     -12.0,
+     -12.0,
+     -3.4
+    ],
+    "max": [
+     12.0,
+     12.0,
+     0.6866
+    ]
+   },
+   "color_attribute": {
+    "name": "Col",
+    "type": "BYTE_COLOR",
+    "domain": "CORNER"
+   },
+   "file": "TurnipBed_R01_Mars_SM.fbx",
+   "scene_location_restored": [
+    0.0,
+    0.0,
+    9.600000381469727
+   ]
+  },
+  "TurnipBedEmpty_R01": {
+   "object": "TurnipBedEmpty_R01",
+   "tris": 288,
+   "verts": 144,
+   "slots": [
+    "Soil"
+   ],
+   "bounds_ue_cm": {
+    "min": [
+     -12.0,
+     -12.0,
+     -3.4
+    ],
+    "max": [
+     12.0,
+     12.0,
+     0.6866
+    ]
+   },
+   "color_attribute": {
+    "name": "Col",
+    "type": "BYTE_COLOR",
+    "domain": "CORNER"
+   },
+   "file": "TurnipBedEmpty_R01_Mars_SM.fbx",
+   "scene_location_restored": [
+    0.0,
+    0.0,
+    9.600000381469727
+   ]
+  },
+  "ScreamingTurnip_R01_Collision": {
+   "object": "ScreamingTurnip_R01_Collision",
+   "tris": 36,
+   "verts": 20,
+   "slots": [],
+   "bounds_ue_cm": {
+    "min": [
+     -3.7066,
+     -4.815,
+     1.8
+    ],
+    "max": [
+     3.7066,
+     4.815,
+     11.7
+    ]
+   },
+   "color_attribute": {
+    "name": "Col",
+    "type": "BYTE_COLOR",
+    "domain": "CORNER"
+   },
+   "file": "ScreamingTurnip_R01_Collision_Mars_SM.fbx",
+   "scene_location_restored": [
+    0.0,
+    0.0,
+    0.0
+   ]
+  }
+ },
+ "cube_bounds_ue_cm": {
+  "min": [
+   -5.0,
+   -5.0,
+   -5.0
+  ],
+  "max": [
+   5.0,
+   5.0,
+   5.0
+  ]
+ },
+ "sk": {
+  "object": "ScreamingTurnip_R01_Body",
+  "tris": 1276,
+  "verts": 668,
+  "slots": [
+   "Skin",
+   "Leaf",
+   "Mouth",
+   "Teeth"
+  ],
+  "bounds_ue_cm": {
+   "min": [
+    -4.9252,
+    -5.9426,
+    0.0
+   ],
+   "max": [
+    4.7446,
+    5.9426,
+    16.0
+   ]
+  },
+  "color_attribute": {
+   "name": "Col",
+   "type": "BYTE_COLOR",
+   "domain": "CORNER"
+  },
+  "file": "ScreamingTurnip_R01_Blockout_Mars_SK.fbx"
+ },
+ "clip": {
+  "file": "ScreamingTurnip_R01_Blockout_ScreamTest_Mars_ANIM.fbx",
+  "action": "ScreamingTurnip_R01_ScreamTest",
+  "first": 0,
+  "last": 18,
+  "fps": 30,
+  "keys": {
+   "0": {
+    "jaw.head": [
+     -1.0,
+     -0.0,
+     6.65
+    ],
+    "jaw.tip": [
+     -1.0,
+     -2.0,
+     6.65
+    ],
+    "cheek_l.head": [
+     0.5838,
+     -1.7167,
+     6.1
+    ],
+    "cheek_l.tip": [
+     0.5838,
+     -3.2167,
+     6.1
+    ],
+    "cheek_r.head": [
+     0.5838,
+     1.7167,
+     6.1
+    ],
+    "cheek_r.tip": [
+     0.5838,
+     0.2167,
+     6.1
+    ],
+    "leaf_01_b.head": [
+     1.3117,
+     -0.953,
+     13.0031
+    ],
+    "leaf_01_b.tip": [
+     4.7446,
+     -3.4472,
+     15.0563
+    ],
+    "leaf_02_b.head": [
+     -0.5656,
+     -1.7409,
+     12.8872
+    ],
+    "leaf_02_b.tip": [
+     -1.9309,
+     -5.9426,
+     14.638
+    ],
+    "leaf_03_b.head": [
+     -1.3259,
+     -0.0,
+     13.1225
+    ],
+    "leaf_03_b.tip": [
+     -4.9252,
+     0.0,
+     16.0
+    ],
+    "leaf_04_b.head": [
+     -0.5656,
+     1.7409,
+     12.8872
+    ],
+    "leaf_04_b.tip": [
+     -1.9309,
+     5.9426,
+     14.638
+    ],
+    "leaf_05_b.head": [
+     1.3117,
+     0.953,
+     13.0031
+    ],
+    "leaf_05_b.tip": [
+     4.7446,
+     3.4472,
+     15.0563
+    ],
+    "mesh_bounds": {
+     "min": [
+      -4.9252,
+      -5.9426,
+      0.0
+     ],
+     "max": [
+      4.7446,
+      5.9426,
+      16.0
+     ]
+    },
+    "cheek_l.scale": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "body.scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   },
+   "9": {
+    "jaw.head": [
+     -1.3,
+     -0.0,
+     8.075
+    ],
+    "jaw.tip": [
+     -1.3,
+     -1.8,
+     8.075
+    ],
+    "cheek_l.head": [
+     0.7589,
+     -1.545,
+     7.36
+    ],
+    "cheek_l.tip": [
+     0.7589,
+     -2.8275,
+     7.36
+    ],
+    "cheek_r.head": [
+     0.7589,
+     1.545,
+     7.36
+    ],
+    "cheek_r.tip": [
+     0.7589,
+     0.2625,
+     7.36
+    ],
+    "leaf_01_b.head": [
+     1.2469,
+     -1.0871,
+     15.9899
+    ],
+    "leaf_01_b.tip": [
+     4.5026,
+     -3.6937,
+     18.1871
+    ],
+    "leaf_02_b.head": [
+     -0.8217,
+     -1.9293,
+     15.495
+    ],
+    "leaf_02_b.tip": [
+     -2.4367,
+     -6.2821,
+     16.5093
+    ],
+    "leaf_03_b.head": [
+     -1.8144,
+     0.0,
+     15.5983
+    ],
+    "leaf_03_b.tip": [
+     -6.0675,
+     -0.0,
+     17.3723
+    ],
+    "leaf_04_b.head": [
+     -0.8217,
+     1.9293,
+     15.495
+    ],
+    "leaf_04_b.tip": [
+     -2.4367,
+     6.2821,
+     16.5093
+    ],
+    "leaf_05_b.head": [
+     1.2469,
+     1.0871,
+     15.9899
+    ],
+    "leaf_05_b.tip": [
+     4.5026,
+     3.6937,
+     18.1871
+    ],
+    "mesh_bounds": {
+     "min": [
+      -6.0675,
+      -6.2821,
+      0.0
+     ],
+     "max": [
+      5.0151,
+      6.2821,
+      18.2045
+     ]
+    },
+    "cheek_l.scale": [
+     0.95,
+     0.95,
+     0.95
+    ],
+    "body.scale": [
+     1.3,
+     0.9,
+     1.3
+    ]
+   },
+   "18": {
+    "jaw.head": [
+     -1.0,
+     -0.0,
+     6.65
+    ],
+    "jaw.tip": [
+     -1.0,
+     -2.0,
+     6.65
+    ],
+    "cheek_l.head": [
+     0.5838,
+     -1.7167,
+     6.1
+    ],
+    "cheek_l.tip": [
+     0.5838,
+     -3.2167,
+     6.1
+    ],
+    "cheek_r.head": [
+     0.5838,
+     1.7167,
+     6.1
+    ],
+    "cheek_r.tip": [
+     0.5838,
+     0.2167,
+     6.1
+    ],
+    "leaf_01_b.head": [
+     1.3117,
+     -0.953,
+     13.0031
+    ],
+    "leaf_01_b.tip": [
+     4.7446,
+     -3.4472,
+     15.0563
+    ],
+    "leaf_02_b.head": [
+     -0.5656,
+     -1.7409,
+     12.8872
+    ],
+    "leaf_02_b.tip": [
+     -1.9309,
+     -5.9426,
+     14.638
+    ],
+    "leaf_03_b.head": [
+     -1.3259,
+     -0.0,
+     13.1225
+    ],
+    "leaf_03_b.tip": [
+     -4.9252,
+     0.0,
+     16.0
+    ],
+    "leaf_04_b.head": [
+     -0.5656,
+     1.7409,
+     12.8872
+    ],
+    "leaf_04_b.tip": [
+     -1.9309,
+     5.9426,
+     14.638
+    ],
+    "leaf_05_b.head": [
+     1.3117,
+     0.953,
+     13.0031
+    ],
+    "leaf_05_b.tip": [
+     4.7446,
+     3.4472,
+     15.0563
+    ],
+    "mesh_bounds": {
+     "min": [
+      -4.9252,
+      -5.9426,
+      0.0
+     ],
+     "max": [
+      4.7446,
+      5.9426,
+      16.0
+     ]
+    },
+    "cheek_l.scale": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "body.scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   }
+  }
+ }
+}

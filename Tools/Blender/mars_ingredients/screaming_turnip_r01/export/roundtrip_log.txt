@@ -1,0 +1,46 @@
+FBX version: 7400
+FBX version: 7400
+FBX version: 7400
+FBX version: 7400
+FBX version: 7400
+FBX version: 7400
+ANIM SRC_Idle                 keyed [0, 60, 61] root 0.0e+00 landmark 0.000078 extremes 0.000061 seam 0.0 scale_err 0.000000 sk_err 0.000000 peaks {"Inhale": {"max": 0.0, "frames_at_max": []}, "Scream": {"max": 0.0, "frames_at_max": []}} verts 1.8e-05
+FBX version: 7400
+ANIM SRC_Grip                 keyed [0, 6, 7] root 0.0e+00 landmark 0.000069 extremes 0.000054 seam None scale_err 0.000000 sk_err 0.000000 peaks {"Inhale": {"max": 0.0, "frames_at_max": []}, "Scream": {"max": 0.0, "frames_at_max": []}} verts None
+FBX version: 7400
+ANIM SRC_Tug                  keyed [0, 15, 16] root 0.0e+00 landmark 0.000067 extremes 0.000053 seam None scale_err 0.000000 sk_err 0.000000 peaks {"Inhale": {"max": 0.0, "frames_at_max": []}, "Scream": {"max": 0.0, "frames_at_max": []}} verts None
+FBX version: 7400
+ANIM SRC_Release              keyed [0, 6, 7] root 0.0e+00 landmark 0.000067 extremes 0.000055 seam None scale_err 0.000000 sk_err 0.000000 peaks {"Inhale": {"max": 0.0, "frames_at_max": []}, "Scream": {"max": 0.0, "frames_at_max": []}} verts None
+FBX version: 7400
+ANIM SRC_Cancel               keyed [0, 7, 8] root 0.0e+00 landmark 0.000070 extremes 0.000059 seam None scale_err 0.000000 sk_err 0.000000 peaks {"Inhale": {"max": 0.0, "frames_at_max": []}, "Scream": {"max": 0.0, "frames_at_max": []}} verts None
+FBX version: 7400
+ANIM ROOT_QuietIdle           keyed [0, 60, 61] root 0.0e+00 landmark 0.000081 extremes 0.000067 seam 0.0 scale_err 0.000000 sk_err 0.000000 peaks {"Inhale": {"max": 0.0, "frames_at_max": []}, "Scream": {"max": 0.0, "frames_at_max": []}} verts 1.7e-05
+FBX version: 7400
+ANIM ROOT_Anticipate          keyed [0, 9, 10] root 0.0e+00 landmark 0.000073 extremes 0.000055 seam None scale_err 0.000000 sk_err 0.000000 peaks {"Inhale": {"max": 0.0, "frames_at_max": []}, "Scream": {"max": 0.0, "frames_at_max": []}} verts None
+FBX version: 7400
+ANIM ROOT_AnticipateTired     keyed [0, 9, 10] root 0.0e+00 landmark 0.000076 extremes 0.000054 seam None scale_err 0.000000 sk_err 0.000000 peaks {"Inhale": {"max": 0.0, "frames_at_max": []}, "Scream": {"max": 0.0, "frames_at_max": []}} verts None
+FBX version: 7400
+ANIM ROOT_Inhale              keyed [0, 36, 37] root 0.0e+00 landmark 0.000081 extremes 0.000056 seam None scale_err 0.000000 sk_err 0.000000 peaks {"Inhale": {"max": 1.0, "frames_at_max": [30, 36]}, "Scream": {"max": 0.0, "frames_at_max": []}} verts 1.6e-05
+FBX version: 7400
+ANIM ROOT_Scream              keyed [0, 18, 19] root 0.0e+00 landmark 0.000075 extremes 0.000058 seam None scale_err 0.000000 sk_err 0.000000 peaks {"Inhale": {"max": 1.0, "frames_at_max": [0, 0]}, "Scream": {"max": 1.0, "frames_at_max": [3, 18]}} verts 2.8e-05
+FBX version: 7400
+ANIM ROOT_Recover             keyed [0, 30, 31] root 0.0e+00 landmark 0.000087 extremes 0.000059 seam None scale_err 0.000000 sk_err 0.000000 peaks {"Inhale": {"max": 0.0, "frames_at_max": []}, "Scream": {"max": 1.0, "frames_at_max": [0, 0]}} verts None
+FBX version: 7400
+ANIM ROOT_RecoveryIdle        keyed [0, 60, 61] root 0.0e+00 landmark 0.000085 extremes 0.000064 seam 0.0 scale_err 0.000000 sk_err 0.000000 peaks {"Inhale": {"max": 0.0, "frames_at_max": []}, "Scream": {"max": 0.0, "frames_at_max": []}} verts None
+FBX version: 7400
+ANIM ROOT_AirborneLeafTrail   keyed [0, 30, 31] root 0.0e+00 landmark 0.000078 extremes 0.000062 seam 0.0 scale_err 0.000000 sk_err 0.000000 peaks {"Inhale": {"max": 0.0, "frames_at_max": []}, "Scream": {"max": 0.0, "frames_at_max": []}} verts None
+FBX version: 7400
+ANIM ROOT_ImpactSquash        keyed [0, 7, 8] root 0.0e+00 landmark 0.000073 extremes 0.000060 seam None scale_err 0.000000 sk_err 0.000000 peaks {"Inhale": {"max": 0.0, "frames_at_max": []}, "Scream": {"max": 0.0, "frames_at_max": []}} verts None
+FBX version: 7400
+ANIM ROOT_SettleRock          keyed [0, 12, 13] root 0.0e+00 landmark 0.000068 extremes 0.000055 seam None scale_err 0.000000 sk_err 0.000000 peaks {"Inhale": {"max": 0.0, "frames_at_max": []}, "Scream": {"max": 0.0, "frames_at_max": []}} verts None
+FBX version: 7400
+ANIM ROOT_PlaceSettle         keyed [0, 7, 8] root 0.0e+00 landmark 0.000074 extremes 0.000058 seam None scale_err 0.000000 sk_err 0.000000 peaks {"Inhale": {"max": 0.0, "frames_at_max": []}, "Scream": {"max": 0.0, "frames_at_max": []}} verts None
+ROUNDTRIP cube {"object_scale": [1.0, 1.0, 1.0], "bounds_min": [-5.0, -5.0, -5.0], "bounds_max": [5.0, 5.0, 5.0]}
+ROUNDTRIP sk {"armature_object": "Armature", "armature_scale": [1.0, 1.0, 1.0], "bone_count": 17, "extra_bones": [], "missing_bones": [], "wrong_parents": [], "max_bind_head_error_cm": 6.1e-05, "max_bind_rest_rotation_error_deg": 0.0, "tris": 3188, "slots": ["Skin", "Leaf", "Mouth", "Teeth"], "bounds_error_cm": 5.5e-05, "colour_attributes": [["Col", "BYTE_COLOR", "CORNER"]], "col_alpha_min_mean": [0.173, 0.86], "shape_keys": ["Basis", "Inhale", "Scream"], "weights": {"max_influences": 3, "unnormalized": 0, "unweighted": 0, "non_bone_groups": [], "root_weighted_verts": 0}}
+ROUNDTRIP TurnipBed_R01 {"object_scale": [1.0, 1.0, 1.0], "tris": 224, "slots": ["Soil"], "bounds_error_cm": 1.4e-05, "boundary_edges": 0}
+ROUNDTRIP TurnipBedEmpty_R01 {"object_scale": [1.0, 1.0, 1.0], "tris": 288, "slots": ["Soil"], "bounds_error_cm": 1.4e-05, "boundary_edges": 0}
+ROUNDTRIP ScreamingTurnip_R01_Collision {"object_scale": [1.0, 1.0, 1.0], "tris": 40, "slots": [], "bounds_error_cm": 4.9e-05, "boundary_edges": 0}
+TURNIP_OK
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+
+Blender quit

@@ -1,0 +1,67 @@
+00:01.610  blend            | Read blend: "D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\source\ScreamingTurnip_R01.blend"
+D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\scripts\render_screaming_turnip.py:77: DeprecationWarning: 'World.use_nodes' is expected to be removed in Blender 6.0
+  w.use_nodes = True
+00:02.844  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\neutral\neutral_front.png'
+00:02.922  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\neutral\neutral_side.png'
+00:02.985  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\neutral\neutral_threequarter.png'
+00:03.078  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\neutral\neutral_mouth.png'
+00:03.438  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\inhale\inhale_front.png'
+00:03.485  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\inhale\inhale_side.png'
+00:03.563  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\inhale\inhale_threequarter.png'
+00:03.625  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\inhale\inhale_mouth.png'
+00:03.985  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\scream\scream_front.png'
+00:04.047  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\scream\scream_side.png'
+00:04.110  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\scream\scream_threequarter.png'
+00:04.188  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\scream\scream_mouth.png'
+00:04.563  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\recover\recover_front.png'
+00:04.625  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\recover\recover_side.png'
+00:04.688  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\recover\recover_threequarter.png'
+00:04.766  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\recover\recover_mouth.png'
+00:05.094  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\impact_squash\impact_squash_front.png'
+00:05.156  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\impact_squash\impact_squash_side.png'
+00:05.219  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\impact_squash\impact_squash_threequarter.png'
+00:05.281  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\impact_squash\impact_squash_mouth.png'
+00:06.656  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\planted\planted_front.png'
+00:06.719  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\planted\planted_threequarter.png'
+00:06.781  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\planted\empty_bed_threequarter.png'
+00:07.031  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\lighting\neutral_neutral_front.png'
+00:07.094  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\lighting\neutral_neutral_threequarter.png'
+00:07.156  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\lighting\neutral_game_front.png'
+00:07.219  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\lighting\neutral_game_threequarter.png'
+00:07.297  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\lighting\inhale_neutral_front.png'
+00:07.344  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\lighting\inhale_neutral_threequarter.png'
+00:07.422  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\lighting\inhale_game_front.png'
+00:07.485  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\lighting\inhale_game_threequarter.png'
+00:07.547  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\lighting\scream_neutral_front.png'
+00:07.594  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\lighting\scream_neutral_threequarter.png'
+00:07.656  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\lighting\scream_game_front.png'
+00:07.735  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\lighting\scream_game_threequarter.png'
+00:08.688  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\fp_mock\fp_neutral_neutral.png'
+00:08.781  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\fp_mock\fp_neutral_game.png'
+00:08.875  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\fp_mock\fp_inhale_neutral.png'
+00:08.953  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\fp_mock\fp_inhale_game.png'
+00:09.031  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\fp_mock\fp_scream_neutral.png'
+00:09.125  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\fp_mock\fp_scream_game.png'
+00:09.844  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\fp_mock\fp_alpha_neutral.png'
+00:10.000  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\fp_mock\fp_alpha_inhale.png'
+00:10.156  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\fp_mock\fp_alpha_scream.png'
+RENDER_UNIT 3.0
+SHEET D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\neutral\neutral_sheet.png
+SHEET D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\inhale\inhale_sheet.png
+SHEET D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\scream\scream_sheet.png
+SHEET D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\recover\recover_sheet.png
+SHEET D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\impact_squash\impact_squash_sheet.png
+FP_FRACTION {"unit": 3.0, "neutral": {"area_fraction": 0.1937, "bbox_width_fraction": 0.3896, "bbox_height_fraction": 0.9019, "frame_px": [960, 540], "camera": "perspective, 90 deg horizontal FOV, 16:9, eye 45 cm in front of the bulb centre at its height (z 20.47)"}, "inhale": {"area_fraction": 0.2708, "bbox_width_fraction": 0.5625, "bbox_height_fraction": 0.9019, "frame_px": [960, 540], "camera": "perspective, 90 deg horizontal FOV, 16:9, eye 45 cm in front of the bulb centre at its height (z 20.47)"}, "scream": {"area_fraction": 0.2276, "bbox_width_fraction": 0.3458, "bbox_height_fraction": 0.9019, "frame_px": [960, 540], "camera": "perspective, 90 deg horizontal FOV, 16:9, eye 45 cm in front of the bulb centre at its height (z 20.47)"}}
+ITER D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\iterations\r01_neutral_sheet.png
+ITER D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\iterations\r01_inhale_sheet.png
+ITER D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\iterations\r01_scream_sheet.png
+ITER D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\iterations\r01_recover_sheet.png
+ITER D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\iterations\r01_impact_squash_sheet.png
+ITER D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\iterations\r01_poses_overview.png
+ITER D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\iterations\r01_planted_sheet.png
+ITER D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\iterations\r01_lighting_compare.png
+ITER D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseB4\iterations\r01_fp_sheet.png
+TURNIP_OK
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+
+Blender quit

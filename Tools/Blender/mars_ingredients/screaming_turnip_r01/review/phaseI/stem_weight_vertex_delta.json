@@ -1,0 +1,67 @@
+{
+ "SRC_Idle": {
+  "max_cm": 0.1308,
+  "frame": 33,
+  "verts_moved": 30
+ },
+ "SRC_Grip": {
+  "max_cm": 1.2456,
+  "frame": 6,
+  "verts_moved": 40
+ },
+ "ROOT_QuietIdle": {
+  "max_cm": 0.0955,
+  "frame": 27,
+  "verts_moved": 40
+ },
+ "ROOT_Anticipate": {
+  "max_cm": 1.1647,
+  "frame": 9,
+  "verts_moved": 40
+ },
+ "ROOT_AnticipateTired": {
+  "max_cm": 1.1647,
+  "frame": 9,
+  "verts_moved": 40
+ },
+ "ROOT_Inhale": {
+  "max_cm": 1.1647,
+  "frame": 0,
+  "verts_moved": 40
+ },
+ "ROOT_Scream": {
+  "max_cm": 1.2195,
+  "frame": 11,
+  "verts_moved": 40
+ },
+ "ROOT_Recover": {
+  "max_cm": 1.2015,
+  "frame": 8,
+  "verts_moved": 40
+ },
+ "ROOT_RecoveryIdle": {
+  "max_cm": 0.8392,
+  "frame": 18,
+  "verts_moved": 40
+ },
+ "ROOT_AirborneLeafTrail": {
+  "max_cm": 0.8424,
+  "frame": 23,
+  "verts_moved": 40
+ },
+ "ROOT_ImpactSquash": {
+  "max_cm": 0.8737,
+  "frame": 2,
+  "verts_moved": 40
+ },
+ "ROOT_SettleRock": {
+  "max_cm": 0.3834,
+  "frame": 1,
+  "verts_moved": 30
+ },
+ "ROOT_PlaceSettle": {
+  "max_cm": 0.2441,
+  "frame": 3,
+  "verts_moved": 40
+ }
+}
