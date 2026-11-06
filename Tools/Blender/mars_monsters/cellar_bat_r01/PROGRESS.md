@@ -1217,6 +1217,74 @@ cellar bat assembly, the test rig and three new tests; the review preset and dri
   scripts (`dummies=2` in every probe; the second reports 0 hits) - a leftover of a rebuild, harmless, clean up with the
   next `build_review_scene`.
 
+## Phase 9 - the review room runs itself (Fable, 2026-11-05 23:55)
+
+Asked whether the review map showcased everything: by hand it showed only the swoop cycle, the orbit and the return; the
+retreat, the search, the lead and the line-of-sight refusal needed the Python probes. Now it stages them itself, as class
+defaults on the review scripts (no map rebuild, no editor map operation):
+- `UMars_CellarBatReview_TargetDummy_EntityScript` walks a loop (`FMars_CellarBatReview_Walk`, default route from the post
+  at (600, 0): south to (600, -600), west to the pit at (0, -700) and 8 s 1200 cm under the floor, up to the cover spot
+  (160, 0) behind the pillar for 5 s, out to (600, 500), back; 160 cm/s, about 50 s a lap) and draws a dark plate at every
+  pit node. `Review_MoveTo` / `Review_MoveThenRetire` stay.
+- `UMars_CellarBatReview_Bat_EntityScript` swats back: every 3rd landed swoop, 0.5 s later (the pull-out), 5 damage through
+  its own body zone (`CounterBlowEveryNthLanding`, `CounterBlowDamage`). Preset radii 1300/1300 (acquire just over the
+  roost-to-post distance; lose equal so the pit is a loss inside the room).
+
+The walking target exposed four kernel faults, all fixed here (`Script/ECS/Bat/`):
+- **The remembered place must be flyable.** The voxel volume answers free for space it never rasterized inside its
+  power-of-two cube (probed in PIE: (0, -700, -960) under the floor free, (1100, 0, 300) past the east wall free,
+  (1300, 0, 300) outside the cube not free), so a target that dropped into the pit left a place under the floor. Now
+  `Try_RememberLastKnown` (shared by the losing sense and the route-failure drop, which remembered nothing before) takes
+  the target's location only when it is goal-free AND no static lies between the bat and it (a Jolt ray, game worlds
+  only), else where the previous sense saw it (the rim), else nothing.
+- **Goals need a body margin** (`Get_IsGoalFree`: free at the point and 2 x AgentRadius out along +-X/+-Y). A bare free
+  point next to the pillar's or a wall's clearance band gets `Unreachable` from the path (probed: (0, 151, 240) and
+  (-5, 145, 240) free, both Unreachable from 150 cm away - a CkVoxelNav limitation inside a partially occluded leaf,
+  recorded, not fixed here). Used by the strike point, the orbit goal and the retreat point.
+- **The strike point turns to the open side** when the natural one is not goal-free (45, -45, 90 ... 180 degrees round the
+  target), so a target hugging the pillar is attacked instead of dropped.
+- **A stranded bat climbs out.** After a retreat near the south wall the agent overshot into the wall's clearance band
+  (578, -983) where no path can start, and sat Hovering for 25 s. `TickUnstick`: after a route failure or while Hovering,
+  a bat whose own spot is not goal-free moves itself toward the nearest goal-free point (`Get_NearestGoalFree`, rings of
+  AgentRadius) at half cruise. Test `ClimbsOutOfBlockedSpaceAndGetsHome` (set down at 15 cm over the floor, a route
+  asked from there fails, it climbs clear and roosts).
+- **The lead follows the dive's acceleration profile** (`Get_DiveSeconds`: from rest at MaxAcceleration toward
+  SwoopSpeed over the distance to the aim less ContactRadius), not half a SwoopSeconds at full speed: landings on the
+  walking post went from 3/9 to 6/11 and 8/17 across the runs. Still under half on a target walking at 160 cm/s: the
+  misses are all mid-walk, the pauses are always hit. Left as the next tuning item (lead factor, ContactRadius, or a
+  wider blow).
+- Also: `Get_IsStaticBetween` now takes the bat and reads clear outside a game world (the review map's editor preview
+  composed the bat and the walking dummy, and the losing sense fired a Jolt ray there: `Calling a function that requires
+  WorldContext`, spammed every sense until gated).
+- Tests: `SearchesTheRimWhenTheTargetDropsOutOfReach` (target teleported 1200 under the floor after the first landing;
+  the remembered place is the rim) and `ClimbsOutOfBlockedSpaceWhileHovering` (a hovering bat set down 120 cm inside a
+  400 cube comes out through the nearest face on its own). A route failure from inside blocked space could not be
+  forced headless: the voxel planner snaps a start in the floor's band, and even one inside the solid cube, to a free
+  neighbour (two failed test drafts), so the test exercises the Hovering trigger of the climb-out; the route-failure
+  trigger is covered by the PIE stranding only. Route log lines now carry the goal.
+- Gates (test-only, quiescence kept): `Test-Bat-showcase.log` 12/12 and `Test-Monster-showcase.log` 3/3 after the first
+  three fixes; `Test-Bat-showcase2.log` 12/13 (the first strand draft) and `Test-Monster-showcase2.log` 3/3 after the
+  margin, the ray gate and the unstick; `Test-Bat-showcase3.log` 12/13 (the second draft); `Test-Bat-showcase4.log`:
+  SEE THE LINE BELOW.
+- PIE (`run_pie_smoke`, 100 s, no probes but the chase camera and a state readout every 15 s) **confirmed** from the
+  `[CellarBat]` lines:
+  - CELLARBAT_SHOWCASE1 (before the fixes): pit -> route Unreachable to z -960 -> target dropped, no search; cover spot ->
+    Unreachable strike points, target dropped, home and back twice; swat -> Hit -> Retreating -> second landing; 3/9 dives.
+  - CELLARBAT_SHOWCASE2 (lead, strike bearing, remember-on-drop): the pit still remembered under the floor (the volume's
+    free answer); retreat 31.3 s; after the second swat the bat overshot into the south wall's band at (578, -983) and
+    hovered from 72 s to the end; 6/11 dives.
+  - CELLARBAT_SHOWCASE3 (all fixes): pits at 7.6 / 40.5 / 72.4 s each -> Searching the rim for ~3 s -> Returning -> Perch
+    -> Roost -> re-launch when the dummy climbed out; cover spot at 18-23 / 50-55 / 83-88 s -> dives from the open side
+    landed (swoops 3, 9, 15 at (213, 44), (206, 49), (212, 50)); swats after landings 3 and 6 -> Hit -> Retreating ->
+    Approaching; no stranding; 8/17 dives landed, every miss on the walking legs.
+  - CELLARBAT_SHOWCASE4 (final code, with the carry-through margin and the wider climb-out rings): pits at 7.6 / 40.1 /
+    73.5 s -> Searching ~3 s -> home; swats after landings 3 and 6 -> Retreating; no Hovering at all; one `Unreachable`
+    to an orbit point at (124, -147, 240) beside the pillar (all four margin probes free there: the CkVoxelNav leaf
+    limitation again) from which it recovered within a second; 6/17 dives landed.
+- Open after this phase: landing rate on a walking target (35-47 %); the pillar-adjacent `Unreachable` from the voxel
+  planner for goal-free points (report to CkPlugins with the probe numbers above); `Get_IsFlyable`'s ray is a proxy for
+  "inside the volume" until the volume exposes its bounds.
+
 ## Incidents (this phase)
 - **I-1 force delete (19:41 local).** Changing the rebuild to delete-and-recreate made `EditorAssetLibrary.delete_asset`
   refuse the loaded ABP: "in use", 156 native GCObjectReferencer references (one per transition node). `ForceDeleteObject`
