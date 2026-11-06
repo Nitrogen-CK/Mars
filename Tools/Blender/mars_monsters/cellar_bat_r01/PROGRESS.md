@@ -1155,6 +1155,68 @@ travel; the next strike point was almost where the bat already was, and nothing 
   with smoothing off and exposes no knob - a framework change); jink/wobble presentation; GOAP is not needed for one
   attack and one home.
 
+## Phase 8 - search, hit-and-run, altitude bob (Fable, 2026-11-05 23:15)
+
+The three audit items left open by Phase 7, on the maintainer's go-ahead. All in `Script/ECS/Bat/` (kernel + HFSM), the
+cellar bat assembly, the test rig and three new tests; the review preset and driver gained hooks for the PIE proof.
+- **Last-known-position search.** Kernel: `Sensing.SearchSeconds` (TOptional, default 3 s); a hostile target lost by
+  distance (past LoseRadius, still within HomeRadius, still hostile; not dead, not ignored) leaves `LastKnown` in the
+  fragment (Targeting), cleared when a target is held again, by `Request_EndSearch` (the control layer's) or by the fall.
+  Readers `Get_LastKnown/Get_HasLastKnown/Get_SearchAim/Get_SearchPoint/Get_OrbitPointAround/Get_OrbitGoal`. Control:
+  new phase `Searching` and state `Search` (every flying state and Launch go `->Search [ShouldSearch]` before `->Return`;
+  Roost wakes on a last-known place too): FlyTo Swoop.Height over the place, then circle it (`FMars_Fragment_Bat_
+  SearchBlackboard.ArrivedClock`) for SearchSeconds, `->Approach [HasTarget]`, `->Return [SearchFailed | SearchDone]`
+  (SearchDone also after SearchSeconds + 6 s unreached); exit sends EndSearch. `Get_HasLastKnown` reads false while an
+  EndSearch is queued so Return is not bounced straight back.
+- **Hit-and-run.** Kernel: `Timing.RetreatDistance` (TOptional, default 450) + `RetreatSeconds` 1.5; `Get_RetreatPoint`
+  (RetreatDistance from the aim point along the ground away from the target, Height up; halved once when not free, then
+  the strike point). Control: phase `Retreating`, state `Retreat`: `Hurt ->Retreat [NotHurt + HasTarget + distance set]`
+  else `->Return`; `Retreat ->Approach [RetreatDone: reached | failed | RetreatSeconds]`, `->Search`, `->Return [NoTarget]`.
+- **Orbit goal fallback** (`Get_OrbitGoal`): an orbit point the volume does not have free (a target against a wall, the
+  search in a corner) falls back to the other way round, then to the strike/search point. Found by the first PIE smoke of
+  this phase: the search reached the corner and ended on `route 46 EndpointUnresolvable` (the orbit point in the wall)
+  instead of circling; the same path would have DROPPED a target standing against a wall while Approaching (the Phase 7
+  orbit had no check).
+- **Altitude bob** (assembly only, the look node): 4 cm at 1.9 Hz (near the Hover clip's beat) + 8 cm at 0.37 Hz along
+  world up while Patrolling/Approaching/Returning/Hovering/Searching/Retreating/Recovering, faded at 3/s; none while
+  hanging, braking, telegraphing, diving, falling or down. Not judged visually (no capture this phase).
+- **AnimBP:** the two new phases come after Screeching in the enum (earlier PhaseIndex values unchanged) and
+  `utils_bat::Get_AnimPhase` folds Searching -> Patrolling and Retreating -> Returning for `PhaseIndex/PhaseValue`, so
+  the saved ABP (built with the phases up to Screeching) draws them as locomotion with no rebuild. `Phase` itself stays
+  the kernel's.
+- **Tests** (`Script/Tests/Bat/`): `SearchesTheLastKnownPlaceThenGivesUp` (lose/acquire 900; target hops to
+  (-700, 700) after the first landing, is destroyed once Searching; asserts Swooping -> Searching -> Returning -> Roosting,
+  closest approach within Standoff + tolerance of the search point, memory forgotten), `SearchFindsTheTargetAgain` (same
+  hop, target stays; a second swoop lands via Searching -> Approaching), `RetreatsAfterABlowThenAttacksAgain` (5 damage
+  through the body zone while Telegraphing; Interrupted, Telegraphing -> Hit -> Retreating -> Approaching -> Swooping,
+  further from the target at the retreat's end by > 100, then one landing). Rig: `HitBat`, `Get_DistanceToTarget`,
+  `_FirstRetreatEnd`.
+- **Gates (test-only path, quiescence kept):** `Test-Bat-audit2.log` 11/11 (before the orbit fallback),
+  `Test-Bat-audit3.log` 11/11 and `Test-Monster-audit3.log` 3/3 after it, contaminated 0, exit 0 each **confirmed**.
+  The headless run added `Mars.SmState.Bat.Retreat` / `.Search` to `Config/DefaultGameplayTags.ini` and the live editor
+  regenerated `Script/Generated/Mars_AutoTestActors.as` with the three runners (both committed with the change).
+- **PIE** (`run_pie_smoke` on the review map, 62 s each, chase camera on, probes through `cellar_bat_review_ue`;
+  `[CellarBat]` timeline from `Saved/Logs/Mars.log`, script clock t about 1 s behind the session clock) **confirmed**:
+  - CELLARBAT_AUDIT2: `damage(5)` at 9 s in Approaching -> Hit t=8.17 -> Retreating 8.54 at (506,-168) -> Approaching
+    9.36 at (391,-376) (254 -> 459 cm from the dummy) -> Telegraph -> swoop 2 landed 11.58. Dummy to the corner at 21 s
+    -> Searching 20.27 -> reached (-836,-707) 24.9 -> `route 46 EndpointUnresolvable` -> Returning (the wall bug above).
+  - CELLARBAT_AUDIT3 (fallback in): retreat again (276 -> 460 cm); the corner dummy was re-sensed 0.2 s into the
+    search (AcquireRadius 1600 reaches the corner) -> Searching -> Approaching, i.e. the find-again branch; the retire
+    0.8 s later made the approach route fail -> Return -> Roost; dummy back at 42 s -> re-aggro, swoops 5-9 landed.
+  - CELLARBAT_AUDIT4 (`move_then_retire_dummy`, retire 0.45 s after the hop): retreat (Hit 8.18 -> Retreating 8.55 at
+    (469,-139) -> Approaching 9.35 at (303,-315)); Searching 20.36 at (595,199) -> in the corner at (-870,-721) by
+    the 27 s probe, circling -> Returning 27.52 at (-905,-814) with no route failure -> Braking 30.05 -> Perching 30.98
+    -> Roosting 31.60; dummy back at 44 s -> Patrolling -> Approaching 43.22 -> swoops 5-9 landed. 9/9 swoops landed
+    across the run.
+  Review hooks added for this: `Review_MoveTo`, `Review_MoveThenRetire` on the review dummy (`Mars_SandboxBat.as`), the
+  preset's LoseRadius 1900 -> 1600 (= AcquireRadius, so a hop to the far corner is a loss inside the room), driver
+  `move_dummy` / `move_then_retire_dummy`. The smokes reported ok, 0 must-absent hits; the review map was restored to
+  the Sandbox map afterwards.
+- **Not done / open:** the bob was not looked at (presentation only; tune `BobAmplitudeCm`/`DriftAmplitudeCm` in
+  `Mars_CellarBat_EntityScript.as`); path smoothing still needs a CkCrowd knob; the review map holds two dummy entity
+  scripts (`dummies=2` in every probe; the second reports 0 hits) - a leftover of a rebuild, harmless, clean up with the
+  next `build_review_scene`.
+
 ## Incidents (this phase)
 - **I-1 force delete (19:41 local).** Changing the rebuild to delete-and-recreate made `EditorAssetLibrary.delete_asset`
   refuse the loaded ABP: "in use", 156 native GCObjectReferencer references (one per transition node). `ForceDeleteObject`
