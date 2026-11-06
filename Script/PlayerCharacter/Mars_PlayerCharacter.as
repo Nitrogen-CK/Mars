@@ -319,24 +319,16 @@ class AMars_PlayerCharacter : AMars_Character
         auto HandBob = utils_bob::Create(HandTransform, FTransform::Identity, HandBobSpec);
         utils_handle::Set_DebugName(HandBob.H(), n"Player.HandBob");
 
-        // The hold's lateral under the bob: a one-handed item moves the swing node, the held item and both gloves' frame
-        // to the right glove (UMars_SmTask_HeldItemDrivesHands writes it, FPHands.SideNode). A plain node of its own rather
-        // than the sway's rest, so the gloves' anim instance can read the offset it actually carries each frame and hold
-        // the gloves still while it moves.
-        auto HandBobTransform = HandBob.As_Transform();
-        auto HandSide = utils_scene_node::Create(HandBobTransform, FTransform::Identity);
-        utils_handle::Set_DebugName(HandSide.H(), n"Player.HandSide");
-
-        // The melee swing under that: everything that hangs off the hand (both gloves and the held item) swings with it.
-        // HandSwing owns the node's offset; identity at rest.
-        auto HandSideTransform = HandSide.As_Transform();
-        auto SwingNode = utils_scene_node::Create(HandSideTransform, FTransform::Identity);
-        utils_handle::Set_DebugName(SwingNode.H(), n"Player.HandSwing");
-        _HandSwing = utils_hand_swing::Add(Player, FMars_HandSwing_Spec(SwingNode));
-        _HandNode = SwingNode.As_Transform();
+        // The hand chain under the bob (utils_fphands::Create_HandChain). Player.HandSide takes the hold's lateral
+        // (UMars_SmTask_HeldItemDrivesHands writes it): a plain node rather than the sway's rest, so the gloves' anim
+        // instance can read the offset it actually carries each frame and hold the gloves still while it moves.
+        // Player.HandSwing under it is the melee swing's (HandSwing owns its offset, identity at rest): both gloves and the
+        // held item hang off it.
+        const auto Chain = utils_fphands::Create_HandChain(HandBob.As_Transform(), "Player");
+        _HandSwing = utils_hand_swing::Add(Player, FMars_HandSwing_Spec(Chain.Swing));
+        _HandNode = Chain.Hand;
         auto HandsSpec = Config.FPHands;
-        HandsSpec.HandNode = _HandNode;
-        HandsSpec.SideNode = HandSide;
+        utils_fphands::Wire_HandChain(HandsSpec, Chain);
         HandsSpec.Pitch.Node = HandPitch;
         _Hands = utils_fphands::Add(Player, HandsSpec);
 

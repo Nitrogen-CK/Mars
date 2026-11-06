@@ -1,6 +1,8 @@
 // Holds a scene-node-attached world item's offset at FromOffset for DelaySeconds, then lerps it to ToOffset with Easing
 // over Duration, then removes the Arrival fragment; a World-mode world item has then settled on its mount
-// (OnMountSettled).
+// (OnMountSettled). With FromWorld set the start is re-read against the parent every pass, so a parent that moves under
+// the travelling item (the hand's lateral snapping on an equip) never displaces where it set out from; KeepFrom anchors
+// a no-travel spawn there in one pass and ends the arrival.
 //
 // Exactly ONE Request_UpdateOffset per frame: the scene-node request handler assigns the whole offset, so separate
 // location / rotation / scale requests (utils_tween::Create_TweenSceneNodeOffsetTransform) clobber each other.
@@ -29,15 +31,34 @@ class UMars_Processor_WorldItem_Arrive : UCk_Processor_Script_Base_UE
         InArrival.Elapsed += float32(InDeltaT.Get_Seconds());
 
         // Snapshot before a possible remove: InArrival is invalid once Request_TryRemove returns.
-        const auto From = InArrival.FromOffset;
+        auto From = InArrival.FromOffset;
         const auto To = InArrival.ToOffset;
         const auto Duration = InArrival.Duration;
         const auto Elapsed = InArrival.Elapsed - InArrival.DelaySeconds;
         const auto Easing = InArrival.Easing;
+        const auto KeepFrom = InArrival.KeepFrom;
 
-        // Still held where it was (the gloves' grip).
+        if (InArrival.FromWorld.IsSet())
+        {
+            const auto ParentWorld = utils_transform::Get_EntityCurrentTransform(utils_scene_node::Get_Parent(Node));
+            From = InArrival.FromWorld.GetValue().GetRelativeTransform(ParentWorld);
+        }
+
+        if (KeepFrom)
+        {
+            utils_scene_node::Request_UpdateOffset(Node, FCk_Request_SceneNode_UpdateRelativeTransform(From));
+            InHandle.Request_TryRemove(FMars_Fragment_WorldItem_Arrival);
+            return;
+        }
+
+        // Still where it set out from (the gloves' grip), re-anchored while the parent moves.
         if (Elapsed < 0.0f)
-        { return; }
+        {
+            if (InArrival.FromWorld.IsSet())
+            { utils_scene_node::Request_UpdateOffset(Node, FCk_Request_SceneNode_UpdateRelativeTransform(From)); }
+
+            return;
+        }
 
         const float32 Alpha = Duration <= 0.0f ? 1.0f : Math::Min(1.0f, Elapsed / Duration);
         const float32 Eased = utils_tween::Get_EasedProgress(Easing, FCk_FloatRange_0to1(Alpha));

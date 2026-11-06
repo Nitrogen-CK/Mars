@@ -283,12 +283,15 @@ namespace utils_world_item
         SpawnParams.SpawnTransform = InSpec.AttachOffset * AttachWorld;
         if (InSpec.ArriveFrom.IsSet)
         { SpawnParams.SpawnTransform = InSpec.ArriveFrom.World; }
+        else if (InSpec.SpawnAtWorld.IsSet())
+        { SpawnParams.SpawnTransform = InSpec.SpawnAtWorld.GetValue(); }
 
         SpawnParams.Definition = utils_held_item::Make_DefinitionSoft(Item.Get_Definition());
         SpawnParams.Mode = EMars_WorldItem_Mode::Visual;
         SpawnParams.AttachTo = InSpec.AttachTo;
         SpawnParams.AttachOffset = InSpec.AttachOffset;
         SpawnParams.ArriveFrom = InSpec.ArriveFrom;
+        SpawnParams.SpawnAtWorld = InSpec.SpawnAtWorld;
 
         auto Pending = utils_entity_script::Request_SpawnEntity(InOwner, Get_WorldItemScriptClass(Item), SpawnParams);
         return Pending.Get_EntityUnderConstruction();
@@ -322,7 +325,12 @@ namespace utils_world_item
         if (AgeSeconds > constants_world_item::k_ArriveFromMaxAgeSeconds)
         { return FMars_WorldItem_Arrival(); }
 
-        return FMars_WorldItem_Arrival(InPending.World);
+        auto Arrival = FMars_WorldItem_Arrival(InPending.World);
+        // The frames the visual took to spawn come off the travel's schedule, so it still turns with the gloves.
+        if (InPending.Arrive.IsSet())
+        { Arrival.Arrive = TOptional<FMars_WorldItem_ArriveSpec>(Get_ArriveSpecAfter(InPending.Arrive.GetValue(), float32(AgeSeconds))); }
+
+        return Arrival;
     }
 
     // For a container that recorded where a moving item visually was (FMars_WorldItem_PendingArrival) and reacts to what

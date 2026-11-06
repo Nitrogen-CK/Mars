@@ -106,7 +106,7 @@ class UMars_Processor_FPHands_HandleRequests : UCk_Processor_Script_Base_UE
 
         const auto Target = InState.Reach.Target.GetValue();
         const auto IsSpawnedVisual = ck::IsValid(Item) && Item.Has_Presentation() && Item.Has_PersistentWorldItem() == false;
-        if (ck::Is_NOT_Valid(Target.Shape.Mesh.Get()) || IsSpawnedVisual == false)
+        if (Target.Pickup.IsSet == false || IsSpawnedVisual == false)
         { return; }
 
         auto Carry = FMars_FPHands_Carry();
@@ -255,7 +255,7 @@ class UMars_Processor_FPHands_HandleRequests : UCk_Processor_Script_Base_UE
 
         // A pickup: if it lands in the hands, its held visual starts where the item lay. No HeldItem (tests): no visual.
         const auto Resolved = Target.GetValue();
-        if (ck::IsValid(Resolved.Shape.Mesh.Get()))
+        if (Resolved.Pickup.IsSet)
         {
             auto HeldItem = InHandle.As_HeldItem(ECk_SanityCheck::UnChecked);
             if (ck::IsValid(HeldItem))

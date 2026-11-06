@@ -106,12 +106,24 @@ struct FMars_Request_HeldItem_SetNextArrival
     UPROPERTY()
     FTransform World;
 
+    // Set: the travel's timing (an item taken at the gloves' Grip rides their return, UMars_SmTask_ActAtGrip's
+    // TryGet_RideHome). Unset: the item's Presentation.Mounting.ArriveSeconds, at once.
+    UPROPERTY()
+    TOptional<FMars_WorldItem_ArriveSpec> Arrive;
+
     FMars_Request_HeldItem_SetNextArrival() {}
 
     FMars_Request_HeldItem_SetNextArrival(const FCk_Handle_Item& InItem, const FTransform& InWorld)
     {
         Item = InItem;
         World = InWorld;
+    }
+
+    FMars_Request_HeldItem_SetNextArrival(const FCk_Handle_Item& InItem, const FTransform& InWorld, const TOptional<FMars_WorldItem_ArriveSpec>& InArrive)
+    {
+        Item = InItem;
+        World = InWorld;
+        Arrive = InArrive;
     }
 }
 

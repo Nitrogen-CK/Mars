@@ -115,8 +115,8 @@ mixin FCk_Hands_ContactShape Get_ContactShape(const FCk_Handle_FPHands& Self, co
         const auto Target = MaybeTarget.GetValue();
         const auto MaybeGrip = Target.Get_HandGrip(InHand);
         const auto HandGrip = MaybeGrip.GetValue();
-        if (ck::IsValid(Target.Shape.Mesh.Get()))
-        { return utils_fphands::Make_BoundsShape(Target.Shape, HandGrip.AnchorWorld); }
+        if (ck::IsValid(Target.Pickup.Shape.Mesh.Get()))
+        { return utils_fphands::Make_BoundsShape(Target.Pickup.Shape, HandGrip.AnchorWorld); }
 
         if (HandGrip.IsAuthored)
         {

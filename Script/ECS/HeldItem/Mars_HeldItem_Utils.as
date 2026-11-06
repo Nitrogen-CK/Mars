@@ -70,6 +70,38 @@ mixin FCk_Handle_Transform Get_HandAttachPoint(const FCk_Handle_HeldItem& Self)
     return Self.As_AttachPoints().Get_AttachPoint(GameplayTags::AttachPoint_Mars_Hand);
 }
 
+// The held presentation is in this carrier's hand: the Visual-mode world item HeldItem spawned for the item (always in the
+// hand; its mount reads World), or a Persistent body whose committed mount is Held on this carrier. False with no
+// presentation.
+mixin bool Get_IsPresentationInHand(const FCk_Handle_HeldItem& Self)
+{
+    auto Presentation = Self.Get_PresentationEntity();
+    auto WorldItem = Presentation.As_WorldItem(ECk_SanityCheck::UnChecked);
+    if (ck::Is_NOT_Valid(WorldItem))
+    { return false; }
+
+    if (WorldItem.Get_Mode() == EMars_WorldItem_Mode::Visual)
+    { return true; }
+
+    FCk_Handle Carrier = Self;
+    return WorldItem.Get_Mount() == EMars_WorldItem_Mount::Held && WorldItem.Get_Carrier() == Carrier;
+}
+
+// ...and nothing is moving it: no Arrival in flight; a body also reports settled on its mount (no mount pending, no release
+// waiting). False with no presentation.
+mixin bool Get_IsPresentationSettled(const FCk_Handle_HeldItem& Self)
+{
+    auto Presentation = Self.Get_PresentationEntity();
+    auto WorldItem = Presentation.As_WorldItem(ECk_SanityCheck::UnChecked);
+    if (ck::Is_NOT_Valid(WorldItem))
+    { return false; }
+
+    if (WorldItem.Get_Mode() == EMars_WorldItem_Mode::Visual)
+    { return WorldItem.Has_Fragment(FMars_Fragment_WorldItem_Arrival) == false; }
+
+    return WorldItem.Get_IsSettled();
+}
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Requests
 //--------------------------------------------------------------------------------------------------------------------------

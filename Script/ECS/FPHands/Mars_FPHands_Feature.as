@@ -69,6 +69,20 @@ enum EMars_FPHands_ReachRefusal
     Malformed
 }
 
+// Who writes the held item's offset from the hand this frame; one at a time, by rule (utils_fphands::Get_HeldOffsetOwner).
+enum EMars_FPHands_HeldOffsetOwner
+{
+    None,
+    // A world-item Arrival is in flight on the presentation (a socket take riding home): its processor owns the offset.
+    Arrival,
+    // The gloves' carry of a pickup riding in.
+    Carry,
+    // A Place reach setting the held item down.
+    Place,
+    // A one-handed item riding its glove on a reach or a lean.
+    Follow
+}
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Params
 //--------------------------------------------------------------------------------------------------------------------------

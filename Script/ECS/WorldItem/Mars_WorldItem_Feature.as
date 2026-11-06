@@ -92,7 +92,8 @@ namespace constants_world_item
 // Spawn params
 //--------------------------------------------------------------------------------------------------------------------------
 
-// One-shot world pose a Visual-mode item arrives from (hand -> slot, slot -> hand). Unset = spawn at rest.
+// One-shot world pose a Visual-mode item arrives from (hand -> slot, slot -> hand). Unset = spawn at rest. Arrive, when
+// set, times the travel (an item taken at the gloves' Grip rides their return); unset, the Presentation's ArriveSeconds do.
 struct FMars_WorldItem_Arrival
 {
     UPROPERTY()
@@ -100,6 +101,9 @@ struct FMars_WorldItem_Arrival
 
     UPROPERTY()
     FTransform World;
+
+    UPROPERTY()
+    TOptional<FMars_WorldItem_ArriveSpec> Arrive;
 
     FMars_WorldItem_Arrival() {}
 
@@ -111,7 +115,8 @@ struct FMars_WorldItem_Arrival
 }
 
 // Where an item visually was when someone started moving it, kept by whoever spawns its next visual (a cargo slot for a
-// stow, HeldItem for a take) until that visual spawns. utils_world_item::Get_FreshArrival ages it out.
+// stow, HeldItem for a take) until that visual spawns. utils_world_item::Get_FreshArrival ages it out, and ages Arrive
+// (the travel's timing, when the mover set one) by the time the visual took to spawn.
 struct FMars_WorldItem_PendingArrival
 {
     UPROPERTY()
@@ -122,6 +127,9 @@ struct FMars_WorldItem_PendingArrival
 
     UPROPERTY()
     float64 StampedAtSeconds = 0.0;
+
+    UPROPERTY()
+    TOptional<FMars_WorldItem_ArriveSpec> Arrive;
 
     FMars_WorldItem_PendingArrival() {}
 
@@ -148,6 +156,12 @@ struct FMars_WorldItem_VisualSpec
     // Unset = spawn at rest.
     UPROPERTY()
     FMars_WorldItem_Arrival ArriveFrom;
+
+    // Set: spawn at this world pose and keep the offset it makes from AttachTo (an item picked up where it lay, which the
+    // gloves' carry then brings in); anchored to the world for the spawn frame, so AttachTo moving that frame does not
+    // displace it. AttachOffset is then only the estimate the visual is first placed at. Ignored when ArriveFrom is set.
+    UPROPERTY()
+    TOptional<FTransform> SpawnAtWorld;
 
     FMars_WorldItem_VisualSpec() {}
 
@@ -381,6 +395,17 @@ struct FMars_Fragment_WorldItem_Arrival
 {
     UPROPERTY()
     FTransform FromOffset;
+
+    // Set: the start is this world pose, re-read against the parent every pass (the floor an item lay on, a keyhole): the
+    // parent moving under a travelling item (the hand's lateral snapping on an equip, the head bobbing) never displaces
+    // its start. FromOffset is then the estimate made at attach.
+    UPROPERTY()
+    TOptional<FTransform> FromWorld;
+
+    // The item spawned where it was (no travel): one pass anchors it to FromWorld once the parent's transform for the
+    // frame is final, then the arrival is over and whoever drives the offset (the gloves' carry) takes it from there.
+    UPROPERTY()
+    bool KeepFrom = false;
 
     UPROPERTY()
     FTransform ToOffset;

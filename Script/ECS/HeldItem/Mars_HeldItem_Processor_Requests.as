@@ -33,8 +33,9 @@ class UMars_Processor_HeldItem_HandleRequests : UCk_Processor_Script_Base_UE
         if (SetNextArrivalRequests.Num() > 0)
         {
             const auto& Request = SetNextArrivalRequests.Last();
-            InState.NextArrival = TOptional<FMars_WorldItem_PendingArrival>(
-                FMars_WorldItem_PendingArrival(Request.Item, Request.World, System::GetGameTimeInSeconds()));
+            auto Pending = FMars_WorldItem_PendingArrival(Request.Item, Request.World, System::GetGameTimeInSeconds());
+            Pending.Arrive = Request.Arrive;
+            InState.NextArrival = TOptional<FMars_WorldItem_PendingArrival>(Pending);
         }
     }
 }

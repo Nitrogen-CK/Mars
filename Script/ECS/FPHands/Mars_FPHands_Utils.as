@@ -79,6 +79,53 @@ namespace utils_fphands
         const auto Fingers = InGrip.GetRightVector();
         return InHand == EMars_Hand::Right ? -Fingers : Fingers;
     }
+
+    // Who writes the held item's offset from the hand this frame, the first that applies: nobody without a HeldItem
+    // presentation; the WorldItem processors while it is not settled (an Arrival in flight, a body not yet on its mount);
+    // the gloves' carry of a pickup riding in; once it is in the hand, a Place reach setting it down; then a one-handed item
+    // whose glove rides a reach or a lean, or that is not yet back at its hold offset after one. Nobody otherwise: the item
+    // rests at its hold offset.
+    EMars_FPHands_HeldOffsetOwner Get_HeldOffsetOwner(const FCk_Handle& InCarrier, const FMars_Fragment_FPHands& InState)
+    {
+        auto Carrier = InCarrier;
+        const auto HeldItem = Carrier.As_HeldItem(ECk_SanityCheck::UnChecked);
+        if (ck::Is_NOT_Valid(HeldItem))
+        { return EMars_FPHands_HeldOffsetOwner::None; }
+
+        auto Presentation = HeldItem.Get_PresentationEntity();
+        if (ck::Is_NOT_Valid(Presentation.As_WorldItem(ECk_SanityCheck::UnChecked)))
+        { return EMars_FPHands_HeldOffsetOwner::None; }
+
+        if (HeldItem.Get_IsPresentationSettled() == false)
+        { return EMars_FPHands_HeldOffsetOwner::Arrival; }
+
+        if (InState.Carry.IsSet())
+        { return EMars_FPHands_HeldOffsetOwner::Carry; }
+
+        if (HeldItem.Get_IsPresentationInHand() == false)
+        { return EMars_FPHands_HeldOffsetOwner::None; }
+
+        if (InState.Reach.Target.IsSet() && InState.Reach.Target.GetValue().PlaceAt.IsSet())
+        { return EMars_FPHands_HeldOffsetOwner::Place; }
+
+        if (InState.Hold.Kind != EMars_FPHands_HoldKind::OneHanded)
+        { return EMars_FPHands_HeldOffsetOwner::None; }
+
+        // The right glove's alpha as the anim instance reads it (reach or lean, whichever is larger).
+        const auto Hands = Carrier.As_FPHands();
+        const auto HandWorld = utils_transform::Get_EntityCurrentTransform(Hands.Get_HandNode());
+        auto Targets = FMars_FPHands_HandTargets();
+        Hands.Get_HandTargets(FMars_FPHands_TargetFrame(HandWorld, FVector::ZeroVector, FVector::ZeroVector), Targets);
+        if (Targets.Right.ReachAlpha > 0.001f)
+        { return EMars_FPHands_HeldOffsetOwner::Follow; }
+
+        // The glove is back, the item not yet: the follow sets it back on its hold offset.
+        auto Node = Presentation.As_SceneNode(ECk_SanityCheck::UnChecked);
+        if (ck::IsValid(Node) && InState.Hold.HeldOffset.Equals(utils_scene_node::Get_Offset(Node)) == false)
+        { return EMars_FPHands_HeldOffsetOwner::Follow; }
+
+        return EMars_FPHands_HeldOffsetOwner::None;
+    }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -195,6 +242,13 @@ mixin const FMars_FPHands_Spec& Get_Spec(const FCk_Handle_FPHands& Self)
 mixin FCk_Handle_SceneNode Get_SideNode(const FCk_Handle_FPHands& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_FPHands_Params).Spec.SideNode;
+}
+
+// Who writes the held item's offset this frame (utils_fphands::Get_HeldOffsetOwner).
+mixin EMars_FPHands_HeldOffsetOwner Get_HeldOffsetOwner(const FCk_Handle_FPHands& Self)
+{
+    FCk_Handle Carrier = Self;
+    return utils_fphands::Get_HeldOffsetOwner(Carrier, Self.Get_Fragment(FMars_Fragment_FPHands));
 }
 
 // A free glove's arm swing this frame in the hand node's frame: the gait's stride swing, opposite per glove; the glove
@@ -329,4 +383,68 @@ mixin void UnbindFrom_OnPhaseChanged(FCk_Handle_FPHands& Self, FMars_Delegate_FP
     { return; }
 
     Self.Get_Fragment(FMars_Fragment_FPHands_Signals).OnPhaseChanged.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+// The nodes the gloves need under whatever carries the hand (the player's bob node, a rig's hand mount): the HandSide
+// node that takes a one-handed hold's lateral, the HandSwing node a melee swing turns, and the Hand (the swing node) the
+// gloves and the held item hang off. Both the player and the test rigs build it here, so a rig's hand is the player's.
+struct FMars_FPHands_HandChain
+{
+    FCk_Handle_SceneNode Side;
+    FCk_Handle_SceneNode Swing;
+    FCk_Handle_Transform Hand;
+}
+
+namespace utils_fphands
+{
+    // The hand chain under InMount, every node at identity, debug-named <InDebugPrefix>.HandSide and
+    // <InDebugPrefix>.HandSwing.
+    FMars_FPHands_HandChain Create_HandChain(FCk_Handle_Transform InMount, const FString& InDebugPrefix)
+    {
+        auto Mount = InMount;
+        auto Chain = FMars_FPHands_HandChain();
+        Chain.Side = utils_scene_node::Create(Mount, FTransform::Identity);
+        utils_handle::Set_DebugName(Chain.Side.H(), FName(f"{InDebugPrefix}.HandSide"));
+
+        auto SideTransform = Chain.Side.As_Transform();
+        Chain.Swing = utils_scene_node::Create(SideTransform, FTransform::Identity);
+        utils_handle::Set_DebugName(Chain.Swing.H(), FName(f"{InDebugPrefix}.HandSwing"));
+
+        Chain.Hand = Chain.Swing.As_Transform();
+        return Chain;
+    }
+
+    // Names the chain's nodes on the gloves' spec.
+    void Wire_HandChain(FMars_FPHands_Spec& InOutSpec, const FMars_FPHands_HandChain& InChain)
+    {
+        InOutSpec.HandNode = InChain.Hand;
+        InOutSpec.SideNode = InChain.Side;
+    }
+
+    // The hand node's world transform once the side node carries the lateral of a hold of InHandedness (a one-handed
+    // item moves the hand node to the right glove, FMars_FPHands_RestSpec.OneHandedHandOffset). A visual attaching to the
+    // hand on the frame a hold changes is laid out against this, not the hand as it stands: the side node's offset is
+    // a request that applies in this frame's transform pass, after the attach. Without a side node, or with the lateral
+    // already carried, it is the hand's current transform. The hand's rotation stands in for the side node's (the
+    // swing between them is identity at rest).
+    FTransform Predict_HandWorldOnHold(const FCk_Handle_FPHands& InHands, EMars_ItemPresentation_Handedness InHandedness)
+    {
+        const auto& Spec = InHands.Get_Spec();
+        auto HandWorld = utils_transform::Get_EntityCurrentTransform(Spec.HandNode);
+
+        auto SideNode = Spec.SideNode;
+        if (ck::Is_NOT_Valid(SideNode))
+        { return HandWorld; }
+
+        auto Hold = FMars_FPHands_Hold();
+        Hold.Kind = InHandedness == EMars_ItemPresentation_Handedness::OneHanded
+            ? EMars_FPHands_HoldKind::OneHanded
+            : (InHandedness == EMars_ItemPresentation_Handedness::TwoHanded ? EMars_FPHands_HoldKind::TwoHanded : EMars_FPHands_HoldKind::Empty);
+        const auto Pending = Get_HandLateral(Spec.Rest, Hold) - utils_scene_node::Get_Offset(SideNode).GetLocation();
+        if (Pending.IsNearlyZero())
+        { return HandWorld; }
+
+        HandWorld.AddToTranslation(HandWorld.TransformVector(Pending));
+        return HandWorld;
+    }
 }

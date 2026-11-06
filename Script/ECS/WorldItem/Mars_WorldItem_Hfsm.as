@@ -32,13 +32,53 @@ class UMars_SmState_WorldItem_PickUp : UMars_SmState_InteractTarget_RunTask
     default TaskClass = UMars_SmTask_WorldItem_StowIntoInitiator;
 }
 
+// The base of every interaction task that moves an item at the gloves' Grip (UMars_SmTask_ActAtGrip): a pickup, a lock,
+// a cargo slot, a hook, a dock. It answers the two questions those share so no task answers them its own way: where the
+// moving item visually is (the pose a container's next visual of it arrives from), and how an item taken into the hand
+// rides the gloves home, the same for an item whose body is its own Persistent world item and for one whose held visual
+// is spawned for it.
+UCLASS(Abstract)
+class UMars_SmTask_MoveItemAtGrip : UMars_SmTask_ActAtGrip
+{
+    // Where InInitiator's held item visually is now: its held visual's root, else the hand attach point.
+    protected FTransform Get_HeldVisualWorld(FCk_Handle InInitiator) const
+    {
+        auto HeldItem = InInitiator.As_HeldItem();
+        return utils_world_item::Get_WorldOf(HeldItem.Get_PresentationEntity(), HeldItem.Get_HandAttachPoint());
+    }
+
+    // InItem, taken at this task's Grip and bound for InInitiator's hand, rides the gloves home from InFromWorld: still for
+    // what is left of their Grip, then over their return (TryGet_RideHome). A Persistent item's own body arrives on its
+    // next mount with that timing; any other item's next held visual starts at InFromWorld and arrives with it. Gloves that
+    // are not gripping (none, a refused reach): the held visual still starts at InFromWorld and arrives on its Presentation's
+    // ArriveSeconds; a body arrives as its mount does.
+    protected void Ride_IntoHand(FCk_Handle InInitiator, FCk_Handle_Item InItem, const FTransform& InFromWorld)
+    {
+        const auto Ride = TryGet_RideHome();
+        if (InItem.Has_PersistentWorldItem())
+        {
+            auto WorldItem = InItem.Get_PersistentWorldItem();
+            if (Ride.IsSet() && ck::IsValid(WorldItem))
+            { WorldItem.Request_ArriveNextMount(FMars_Request_WorldItem_ArriveNextMount(Ride.GetValue())); }
+
+            return;
+        }
+
+        auto HeldItem = InInitiator.As_HeldItem(ECk_SanityCheck::UnChecked);
+        if (ck::Is_NOT_Valid(HeldItem))
+        { return; }
+
+        HeldItem.Request_SetNextArrival(FMars_Request_HeldItem_SetNextArrival(InItem, InFromWorld, Ride));
+    }
+}
+
 // Transfers the world item's held item into the initiator's hotbar stow target at the Grip of the initiator's gloves on it
 // (UMars_SmTask_ActAtGrip: at once without gloves, or when they do not reach for it), and runs until the transfer reports:
 // the item lands when the gloves close on it, never before they get there. A Transient world item destroys itself once its
 // holder empties; a Persistent one mounts on the initiator from where its item lands (UMars_Processor_WorldItem_Reconcile),
 // riding the gloves home when they took it. A full hotbar fails (the pickup is normally disabled before it gets here); so
 // do gloves that return or lose it before their Grip.
-class UMars_SmTask_WorldItem_StowIntoInitiator : UMars_SmTask_ActAtGrip
+class UMars_SmTask_WorldItem_StowIntoInitiator : UMars_SmTask_MoveItemAtGrip
 {
     private FCk_Handle _Initiator;
     private FCk_Handle_WorldItem _WorldItem;
@@ -89,10 +129,10 @@ class UMars_SmTask_WorldItem_StowIntoInitiator : UMars_SmTask_ActAtGrip
             return;
         }
 
-        // A Persistent item taken at the grip rides the gloves home: its next mount is wherever the stow puts it.
-        const auto Ride = TryGet_RideHome();
-        if (Ride.IsSet() && _WorldItem.Get_Persistence() == EMars_WorldItem_Persistence::Persistent)
-        { _WorldItem.Request_ArriveNextMount(FMars_Request_WorldItem_ArriveNextMount(Ride.GetValue())); }
+        // Taken at the grip, the item rides the gloves home from where it lies (a Persistent body on its next mount; a held
+        // visual from here, unless the gloves' own carry already starts it there - the carry wins).
+        FCk_Handle LyingEntity = _WorldItem;
+        Ride_IntoHand(_Initiator, Item, utils_transform::Get_EntityCurrentTransform(LyingEntity.As_Transform()));
 
         auto Holder = _WorldItem.Get_Holder();
         Holder.Request_TransferItem_ToDataOnly(FCk_Request_Inventory_TransferItem_ToDataOnly(Item, Target),

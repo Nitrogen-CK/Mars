@@ -83,8 +83,10 @@ class UMars_Processor_HeldItem_Sync : UCk_Processor_Script_Base_UE
         auto Visual = FMars_WorldItem_VisualSpec(InItem, Hand, Presentation.Mounting.HeldOffset);
         if (InState.NextSpawnFrom.IsSet())
         {
+            // Where the item lay, anchored to the world for the spawn frame: the hand's lateral snaps on this very equip.
             const auto HandWorld = utils_transform::Get_EntityCurrentTransform(Hand);
             Visual.AttachOffset = InState.NextSpawnFrom.GetValue().GetRelativeTransform(HandWorld);
+            Visual.SpawnAtWorld = InState.NextSpawnFrom;
             InState.NextSpawnFrom.Reset();
         }
         else
