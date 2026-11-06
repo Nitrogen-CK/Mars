@@ -10,7 +10,10 @@
 // pose and lerps to AttachOffset.
 //
 // A World-mode subclass whose body is not the Presentation mesh builds its own body and probe fit, then runs the shared
-// tail through Compose_WorldItem.
+// tail through Compose_WorldItem. A subclass that only tunes the base body does it in DoConfigure_BodySpec.
+//
+// Grips: in both modes the item's grip points (Resolve_GripPoints) become its grip table, one scene node per point under
+// the root (utils_fphands::Add_Grips). This is the only place an item's grips are declared to the gloves.
 class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
 {
     default _Replication = ECk_Replication::DoesNotReplicate;
@@ -48,6 +51,11 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
     // Visual: when set, the visual starts at this world pose and lerps to AttachOffset over Presentation.Mounting.ArriveSeconds.
     UPROPERTY(ExposeOnSpawn)
     FMars_WorldItem_Arrival ArriveFrom;
+
+    // Visual: when set (and ArriveFrom is not), the visual spawns at this world pose and keeps the offset it makes from
+    // AttachTo, anchored to the world for the spawn frame (FMars_WorldItem_VisualSpec.SpawnAtWorld).
+    UPROPERTY(ExposeOnSpawn)
+    TOptional<FTransform> SpawnAtWorld;
 
     private const float32 k_MassKg = 2.0f;
     private const float32 k_LinearDamping = 0.2f;
@@ -127,21 +135,57 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
             return ECk_EntityScript_ConstructionFlow::Finished;
         }
 
+        // The attach node as it will stand once this frame's transform pass has run: a carrier's hand moves by the hold's
+        // lateral on the very equip that spawns this visual (utils_fphands::Predict_HandWorldOnHold); any other node, as it is.
+        auto AttachWorld = utils_transform::Get_EntityCurrentTransform(AttachTransform);
+        auto CarrierHands = utils_entity_lifetime::Get_LifetimeOwner(InHandle).As_FPHands(ECk_SanityCheck::UnChecked);
+        if (ck::IsValid(CarrierHands) && ck::IsValid(Presentation) && CarrierHands.Get_HandNode() == AttachTransform)
+        { AttachWorld = utils_fphands::Predict_HandWorldOnHold(CarrierHands, Presentation.Grip.Handedness); }
+
         if (ArriveFrom.IsSet)
         {
-            // Start where the item visually was and let the Arrive processor lerp the offset to AttachOffset.
-            const auto AttachWorld = utils_transform::Get_EntityCurrentTransform(AttachTransform);
+            // Start where the item visually was and let the Arrive processor lerp the offset to AttachOffset; the start
+            // stays anchored to that world pose while the attach node moves under it.
             const auto FromOffset = ArriveFrom.World.GetRelativeTransform(AttachWorld);
             utils_scene_node::Add(Root, AttachTransform, FromOffset);
 
             auto Arrival = FMars_Fragment_WorldItem_Arrival();
             Arrival.FromOffset = FromOffset;
+            Arrival.FromWorld = TOptional<FTransform>(ArriveFrom.World);
             Arrival.ToOffset = AttachOffset;
             Arrival.Duration = ck::IsValid(Presentation) ? Presentation.Mounting.ArriveSeconds : 0.0f;
+            // A timed arrival (an item taken at the gloves' Grip) holds where it was for the rest of the Grip, then travels
+            // over the gloves' return with its easing.
+            if (ArriveFrom.Arrive.IsSet())
+            {
+                const auto Timing = ArriveFrom.Arrive.GetValue();
+                Arrival.DelaySeconds = Timing.DelaySeconds;
+                Arrival.Duration = Timing.Seconds;
+                Arrival.Easing = Timing.Easing;
+            }
+
+            Spec.Arrival = TOptional<FMars_Fragment_WorldItem_Arrival>(Arrival);
+        }
+        else if (SpawnAtWorld.IsSet())
+        {
+            // Spawn where the item was, at the offset that makes against the predicted attach node; the Arrive processor
+            // re-anchors it to that world pose once (a swing between hand and side node would skew the prediction), then
+            // the arrival is over and the gloves' carry drives the offset.
+            const auto StartOffset = SpawnAtWorld.GetValue().GetRelativeTransform(AttachWorld);
+            utils_scene_node::Add(Root, AttachTransform, StartOffset);
+
+            auto Arrival = FMars_Fragment_WorldItem_Arrival();
+            Arrival.FromOffset = StartOffset;
+            Arrival.FromWorld = SpawnAtWorld;
+            Arrival.KeepFrom = true;
+            Arrival.ToOffset = StartOffset;
             Spec.Arrival = TOptional<FMars_Fragment_WorldItem_Arrival>(Arrival);
         }
         else
         { utils_scene_node::Add(Root, AttachTransform, AttachOffset); }
+
+        if (ck::IsValid(Presentation))
+        { Add_GripPoints(InHandle, Presentation); }
 
         auto WorldItem = utils_world_item::Add(InHandle, Spec);
         if (ck::Is_NOT_Valid(WorldItem))
@@ -196,6 +240,10 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
 
         auto Root = InHandle.As_Transform();
 
+        const UMars_ItemTrait_Presentation Presentation = _Definition.Get_ItemTraitByClass(UMars_ItemTrait_Presentation);
+        if (ck::IsValid(Presentation))
+        { Add_GripPoints(InHandle, Presentation); }
+
         const auto Holder = AddHolder(InHandle);
         _Pickup = AddPickup(Root, InComposition.ProbeFit);
 
@@ -232,6 +280,71 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
     protected FCk_Handle_Interactable Get_Pickup() const
     {
         return _Pickup;
+    }
+
+    //--------------------------------------------------------------------------------------------------------------------------
+    // Grip points
+    //--------------------------------------------------------------------------------------------------------------------------
+
+    // Where the gloves take hold of an item presented by this script class, in the item's own frame, the first that
+    // applies: the definition's Grip.Points as declared; else the grip sockets of the visual mesh asset
+    // (DoGet_VisualMeshSockets, MeshScale on their locations) turned by Grip.SocketTwist_R / _L; else none (the gloves fit
+    // the item's sides). Reads no instance state: the gloves' hold asks the class default object
+    // (utils_fphands::Make_Hold), so a held item's hold and a world item's grip nodes come from this one resolution.
+    FMars_ItemPresentation_GripPoints Resolve_GripPoints(const UMars_ItemTrait_Presentation InPresentation) const
+    {
+        if (InPresentation.Grip.Points.Right.IsSet())
+        { return InPresentation.Grip.Points; }
+
+        auto Points = FMars_ItemPresentation_GripPoints();
+        const auto Sockets = DoGet_VisualMeshSockets(InPresentation);
+        if (Sockets.IsSet() == false)
+        { return Points; }
+
+        const auto Found = Sockets.GetValue();
+        Points.Right = TOptional<FTransform>(utils_fphands::Twist_AboutHandle(Found.Right, InPresentation.Grip.SocketTwist_R));
+        if (Found.Left.IsSet())
+        { Points.Left = TOptional<FTransform>(utils_fphands::Twist_AboutHandle(Found.Left.GetValue(), InPresentation.Grip.SocketTwist_L)); }
+
+        return Points;
+    }
+
+    // The visual mesh asset's grip sockets (Grip_R or Grip, and Grip_L) in the item's frame, MeshScale on their locations;
+    // unset when it has none. The base reads the Presentation's static mesh. A subclass whose visual is another mesh (a
+    // skeletal one) returns that asset's sockets; it must read no instance state (Resolve_GripPoints).
+    protected TOptional<FMars_FPHands_MeshGrips> DoGet_VisualMeshSockets(const UMars_ItemTrait_Presentation InPresentation) const
+    {
+        return utils_fphands::Find_MeshSockets(utils_world_item::TryLoad_Mesh(InPresentation), InPresentation.Visual.MeshScale);
+    }
+
+    // The resolved grip points as this item's grip table: a scene node per point under the root, each the grip bone's
+    // target (Frame Node, Roll Fixed) with the Presentation's pose. A declaration that fails Validate ensures and adds none.
+    private void Add_GripPoints(FCk_Handle& InHandle, const UMars_ItemTrait_Presentation InPresentation)
+    {
+        const auto Validation = InPresentation.Grip.Points.Validate(InPresentation.Grip.Handedness);
+        if (ck::EnsureIfNot(Validation.IsValid(), f"[WorldItem] [{InHandle.ToString()}] declares no grips: {Validation.Get_Error()}"))
+        { return; }
+
+        const auto Points = Resolve_GripPoints(InPresentation);
+        if (Points.Right.IsSet() == false)
+        { return; }
+
+        auto Root = InHandle.As_Transform();
+        auto Entries = TArray<FMars_FPHands_GripEntry>();
+        Entries.Add(Make_GripEntry(Root, EMars_Hand::Right, Points.Right.GetValue(), InPresentation.Grip.Pose));
+        if (Points.Left.IsSet())
+        { Entries.Add(Make_GripEntry(Root, EMars_Hand::Left, Points.Left.GetValue(), InPresentation.Grip.Pose)); }
+
+        utils_fphands::Add_Grips(InHandle, Entries);
+    }
+
+    private FMars_FPHands_GripEntry Make_GripEntry(FCk_Handle_Transform& InRoot, EMars_Hand InHand, const FTransform& InPoint,
+                                                   EMars_HandGripPose InPose)
+    {
+        auto Node = utils_scene_node::Create(InRoot, InPoint).As_Transform();
+        utils_handle::Set_DebugName(Node.H(), InHand == EMars_Hand::Right ? n"WorldItem.Grip_R" : n"WorldItem.Grip_L");
+        return FMars_FPHands_GripEntry(InHand, Node, TOptional<FName>(), InPose, TOptional<float32>(),
+            EMars_FPHands_GripFrame::Node, EMars_FPHands_GripRoll::Fixed);
     }
 
     // A unit-scale child of the root that carries the mesh and the display scale.
@@ -284,8 +397,15 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
         BodySpec.Set_Friction(k_Friction);
         BodySpec.Set_Restitution(k_Restitution);
         BodySpec.Set_CollisionProfileName(constants_world_item::k_DefaultBodyProfile);
+        DoConfigure_BodySpec(BodySpec);
 
         return utils_jolt_body::Add(InHandle, BodySpec);
+    }
+
+    // The base body's spec with every base setting applied, before the body is added: a subclass that needs more of the
+    // same body (persisted contacts) sets it here instead of building its own.
+    protected void DoConfigure_BodySpec(FCk_JoltBody_Spec& InOutSpec)
+    {
     }
 
     // The probe carries Probe.Mars.Interact: the player's interaction trace only sees probes under that tag. It is

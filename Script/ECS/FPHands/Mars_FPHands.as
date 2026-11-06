@@ -484,14 +484,6 @@ namespace utils_fphands
         return Get_HandRestOffset(InRest, InHold).GetLocation() - InRest.CenteredHandOffset.GetLocation();
     }
 
-    // The item's sides along the Hand node's Y axis and its underside along Z: its mesh bounds x InMeshScale, placed by
-    // InHeldOffset.
-    FMars_FPHands_HoldFaces Measure_Faces(UStaticMesh InMesh, const FVector& InMeshScale, const FTransform& InHeldOffset)
-    {
-        const auto Bounds = InMesh.GetBounds();
-        return Measure_BoxFaces(Bounds.Origin * InMeshScale, Bounds.BoxExtent * InMeshScale, InHeldOffset);
-    }
-
     // A box (in the item's frame) placed by InHeldOffset: its extreme Y either side and its lowest Z, in the Hand node's space.
     FMars_FPHands_HoldFaces Measure_BoxFaces(const FVector& InCentre, const FVector& InHalfExtents, const FTransform& InHeldOffset)
     {
@@ -510,9 +502,12 @@ namespace utils_fphands
         return FMars_FPHands_HoldFaces(MaxY, MinY, MinZ);
     }
 
-    // How the gloves grip InItem: authored sockets win (and decide one- vs two-handed), then the presentation's
-    // Grip.HalfWidth, then the mesh bounds. An invalid item, or one without a presentation, is empty hands; a presentation
-    // that fails Validate (no handedness) ensures and is empty hands.
+    // How the gloves grip InItem: its grip points win (and decide one- vs two-handed), then the presentation's
+    // Grip.HalfWidth, then what the item spans (Bounds). The grip points are the ones its world item registers as grip
+    // nodes, resolved by the item's world item script class (UMars_WorldItem_EntityScript::Resolve_GripPoints) in the
+    // item's frame and placed by HeldOffset: the same for a persistent body and for a held visual not yet constructed. An
+    // invalid item, or one without a presentation, is empty hands; a presentation that fails Validate ensures and is empty
+    // hands.
     FMars_FPHands_Hold Make_Hold(const FCk_Handle_Item& InItem)
     {
         auto Hold = FMars_FPHands_Hold();
@@ -541,25 +536,25 @@ namespace utils_fphands
             Hold.Faces = FMars_FPHands_HoldFaces(HalfWidth, -HalfWidth, BottomZ);
         }
 
-        if (Presentation.Visual.Mesh.IsNull())
-        { return Hold; }
-
-        auto Mesh = System::LoadAsset_Blocking(Presentation.Visual.Mesh);
-        if (ck::EnsureIfNot(ck::IsValid(Mesh), f"[FPHands] the presentation mesh of [{InItem.ToString()}] does not load"))
-        { return Hold; }
-
-        Hold.Shape.Mesh = Mesh;
-
-        const auto Sockets = utils_fphands::Find_MeshSockets(Mesh, Presentation.Visual.MeshScale);
-        if (Sockets.IsSet())
+        if (Presentation.Visual.Mesh.IsNull() == false)
         {
-            const auto Grips = Sockets.GetValue();
+            auto Mesh = System::LoadAsset_Blocking(Presentation.Visual.Mesh);
+            if (ck::EnsureIfNot(ck::IsValid(Mesh), f"[FPHands] the presentation mesh of [{InItem.ToString()}] does not load"))
+            { return Hold; }
+
+            Hold.Shape.Mesh = Mesh;
+        }
+
+        const auto ScriptClass = utils_world_item::Get_WorldItemScriptClass(InItem);
+        const auto Points = ScriptClass.GetDefaultObject().Resolve_GripPoints(Presentation);
+        if (Points.Right.IsSet())
+        {
             auto SocketGrips = FMars_FPHands_SocketGrips();
-            SocketGrips.Right = Twist_AboutHandle(Grips.Right, Presentation.Grip.SocketTwist_R) * Presentation.Mounting.HeldOffset;
+            SocketGrips.Right = Points.Right.GetValue() * Presentation.Mounting.HeldOffset;
             Hold.Kind = EMars_FPHands_HoldKind::OneHanded;
-            if (Grips.Left.IsSet())
+            if (Points.Left.IsSet())
             {
-                SocketGrips.Left = Twist_AboutHandle(Grips.Left.GetValue(), Presentation.Grip.SocketTwist_L) * Presentation.Mounting.HeldOffset;
+                SocketGrips.Left = Points.Left.GetValue() * Presentation.Mounting.HeldOffset;
                 Hold.Kind = EMars_FPHands_HoldKind::TwoHanded;
             }
 
@@ -567,8 +562,10 @@ namespace utils_fphands
             return Hold;
         }
 
-        if (Presentation.Grip.HalfWidth.IsSet() == false)
-        { Hold.Faces = Measure_Faces(Mesh, Presentation.Visual.MeshScale, Presentation.Mounting.HeldOffset); }
+        // Fitted: the faces of what the item spans (Bounds: its mesh bounds x MeshScale, or its world item's own fit), placed
+        // by HeldOffset. A mesh-less item without an authored HalfWidth has none to fit.
+        if (Presentation.Grip.HalfWidth.IsSet() == false && Presentation.Visual.Mesh.IsNull() == false)
+        { Hold.Faces = Measure_BoxFaces(Hold.Bounds.Centre, Hold.Bounds.HalfExtents, Hold.HeldOffset); }
 
         return Hold;
     }

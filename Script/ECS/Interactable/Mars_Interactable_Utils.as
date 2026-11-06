@@ -18,13 +18,14 @@ namespace utils_interactable
     }
 
     // Whether holding InReason takes the interactable out of focus (the thing belongs to something else now: a carrier, a
-    // kernel's ledger, a holder's hands) or keeps it focusable with its targets disabled, so its prompt can say why the
-    // action is refused right now (a full hotbar, an operated station).
+    // kernel's ledger, a holder's hands; or it has nothing left to give) or keeps it focusable with its targets disabled,
+    // so its prompt can say why the action is refused right now (a full hotbar, an operated station).
     bool Get_ClaimRemovesFocus(EMars_Interactable_DisableReason InReason)
     {
         return InReason == EMars_Interactable_DisableReason::Mounted
             || InReason == EMars_Interactable_DisableReason::Ledger
-            || InReason == EMars_Interactable_DisableReason::HolderHeld;
+            || InReason == EMars_Interactable_DisableReason::HolderHeld
+            || InReason == EMars_Interactable_DisableReason::Exhausted;
     }
 
     // A live interaction on InTarget other than InExcluding (from any source); invalid when none is.

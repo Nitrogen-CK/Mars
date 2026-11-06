@@ -81,7 +81,9 @@ enum EMars_Interactable_DisableReason
     // A kernel's ledger (a pan, a fryer, a board) holds the item: it belongs to the kernel now, and leaves focus.
     Ledger,
     // An operator holds the station: it stays focused and its prompt says it is in use.
-    Operated
+    Operated,
+    // The source holds no charge any more (a harvested bed): nothing is left to interact with, and it leaves focus.
+    Exhausted
 }
 
 // What a target's interaction is for (FMars_Interactable_TargetEntry.Work).
