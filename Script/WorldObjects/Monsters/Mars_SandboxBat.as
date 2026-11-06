@@ -54,7 +54,109 @@ class UMars_CellarBatReview_Bat_EntityScript : UMars_CellarBat_EntityScript
         if (CounterBlowEveryNthLanding > 0 && ck::IsValid(Bat))
         { Bat.BindTo_OnSwoopLanded(FMars_Delegate_Bat_OnSwoopLanded(this, n"OnReviewSwoopLanded")); }
 
+        if (DiveDiagnostics && ck::IsValid(Bat))
+        {
+            Bat.BindTo_OnPhaseChanged(FMars_Delegate_Bat_OnPhaseChanged(this, n"OnDivePhaseChanged"));
+            utils_timer::Create_Tick(InHandle, FCk_Delegate_Timer(this, n"OnDiveTick"));
+        }
+
         return Flow;
+    }
+
+    //----------------------------------------------------------------------------------------------------------------------
+    // Dive diagnostics: one "[CellarBat] dive" line per committed swoop with the lead it used and the mouth's closest
+    // approach to the target's hurtbox centre (when, how far, and the miss split along the target's walk and across it).
+    //----------------------------------------------------------------------------------------------------------------------
+
+    UPROPERTY(ExposeOnSpawn)
+    bool DiveDiagnostics = true;
+
+    // The review dummy's hurtbox centre is this far over its root.
+    private const float64 DiveTargetCentreZ = 60.0;
+
+    private bool _DiveTracking = false;
+    private int32 _DiveGeneration = 0;
+    private float64 _DiveElapsed = 0.0;
+    private FVector _DiveTargetAt;
+    private FVector _DiveTargetVelocity;
+    private FVector _DiveGoal;
+    private FVector _DiveFrom;
+    private float64 _DiveClosest = 0.0;
+    private float64 _DiveClosestAt = 0.0;
+    private FVector _DiveClosestMouth;
+    private FVector _DiveClosestTarget;
+    private float64 _DiveMouthSpeedAtClosest = 0.0;
+    private FVector _DiveLastMouth;
+    private int32 _DiveLandedBefore = 0;
+
+    UFUNCTION()
+    private void OnDivePhaseChanged(FCk_Handle_Bat InBat, EMars_Bat_Phase InFrom, EMars_Bat_Phase InTo)
+    {
+        if (InTo == EMars_Bat_Phase::Swooping)
+        {
+            const auto Ledger = InBat.Get_SwoopLedger();
+            if (utils_bat::Get_IsTargetValid(Ledger.Target) == false)
+            { return; }
+
+            _DiveTracking = true;
+            _DiveGeneration = Ledger.Generation;
+            _DiveElapsed = 0.0;
+            _DiveTargetAt = utils_transform::Get_EntityCurrentLocation(Ledger.Target.As_Transform());
+            _DiveTargetVelocity = InBat.Get_TargetVelocity();
+            _DiveGoal = Ledger.Goal;
+            _DiveFrom = InBat.Get_Location();
+            _DiveClosest = 1.0e9;
+            _DiveClosestAt = 0.0;
+            _DiveLastMouth = InBat.Get_MouthLocation();
+            _DiveLandedBefore = Ledger.Landed;
+            return;
+        }
+
+        if (InFrom == EMars_Bat_Phase::Swooping && _DiveTracking)
+        {
+            _DiveTracking = false;
+            const auto Spec = InBat.Get_Spec();
+            const auto Aim = _DiveTargetAt + FVector(0.0, 0.0, Spec.Swoop.AimHeight);
+            const auto Lead = _DiveGoal - Aim;
+            const auto Speed = _DiveTargetVelocity.Size();
+            const auto LeadSeconds = Speed > 1.0 ? Lead.Size() / Speed : 0.0;
+            const auto Walk = _DiveTargetVelocity.GetSafeNormal();
+            auto Miss = _DiveClosestMouth - _DiveClosestTarget;
+            Miss.Z = 0.0;
+            const auto Along = Walk.IsNearlyZero() ? 0.0 : Miss.DotProduct(Walk);
+            const auto Across = Walk.IsNearlyZero() ? Miss.Size() : (Miss - Walk * Along).Size();
+            const auto Landed = InBat.Get_SwoopLedger().Landed > _DiveLandedBefore;
+            const auto Dist = (Aim - _DiveFrom).Size();
+            Log(f"[CellarBat] dive {_DiveGeneration} landed={Landed} targetSpeed={Speed :.0} leadCm={Lead.Size() :.0} leadSec={LeadSeconds :.2} startDist={Dist :.0} closest={_DiveClosest :.0} at={_DiveClosestAt :.2}s mouthSpeed={_DiveMouthSpeedAtClosest :.0} along={Along :.0} across={Across :.0} dz={(_DiveClosestMouth.Z - _DiveClosestTarget.Z) :.0} swoopSec={_DiveElapsed :.2}");
+        }
+    }
+
+    UFUNCTION()
+    private void OnDiveTick(FCk_Handle_Timer InHandle, FCk_Chrono InChrono, FCk_Time InDeltaT)
+    {
+        auto Bat = Get_Bat();
+        if (_DiveTracking == false || ck::Is_NOT_Valid(Bat))
+        { return; }
+
+        const auto Ledger = Bat.Get_SwoopLedger();
+        if (utils_bat::Get_IsTargetValid(Ledger.Target) == false)
+        { return; }
+
+        const auto Dt = InDeltaT.Get_Seconds();
+        _DiveElapsed += Dt;
+        const auto Mouth = Bat.Get_MouthLocation();
+        const auto Centre = utils_transform::Get_EntityCurrentLocation(Ledger.Target.As_Transform()) + FVector(0.0, 0.0, DiveTargetCentreZ);
+        const auto Distance = (Mouth - Centre).Size();
+        if (Distance < _DiveClosest)
+        {
+            _DiveClosest = Distance;
+            _DiveClosestAt = _DiveElapsed;
+            _DiveClosestMouth = Mouth;
+            _DiveClosestTarget = Centre;
+            _DiveMouthSpeedAtClosest = Dt > 0.0 ? (Mouth - _DiveLastMouth).Size() / Dt : 0.0;
+        }
+
+        _DiveLastMouth = Mouth;
     }
 
     // The dummy swats back: every CounterBlowEveryNthLanding-th landed swoop, CounterBlowSeconds later (the bat is pulling

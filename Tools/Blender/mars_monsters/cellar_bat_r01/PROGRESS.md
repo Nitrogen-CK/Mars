@@ -1285,6 +1285,31 @@ The walking target exposed four kernel faults, all fixed here (`Script/ECS/Bat/`
   planner for goal-free points (report to CkPlugins with the probe numbers above); `Get_IsFlyable`'s ray is a proxy for
   "inside the volume" until the volume exposes its bounds.
 
+## Phase 9b - dives on a walking target (Fable, 2026-11-06 00:25)
+
+Measured before changing anything: the review bat logs one `[CellarBat] dive` line per committed swoop (`DiveDiagnostics`
+on `UMars_CellarBatReview_Bat_EntityScript`): target speed, the lead used, the start distance, the mouth's closest
+approach to the hurtbox centre (distance, time, height) and the miss split along the walk and across it.
+- CELLARBAT_DIVE1 (before): 6/17 landed. Every miss had its closest approach on the LAST frame of the 0.7 s dive, the
+  mouth 45-183 cm behind the target and 57-131 cm above it: the dive was too short, not mis-aimed. A dive at a standing
+  target starts 225 cm out and lands at 0.6-0.68 s; at a walking one it started 290-410 cm out, because the target walks
+  ~96 cm away during the 0.6 s telegraph while the bat holds still, and from rest at 1400 cm/s^2 a 0.7 s dive covers 343 cm.
+- Changes (`Script/ECS/Bat/`): the strike point leads the aim by the target's velocity over TelegraphSeconds (capped at
+  Standoff), so the bat waits where the target will be at commit; the committed dive ends when its route reaches the aim
+  point (`Get_IsRouteReachedIn(Swooping)`), with `SwoopSeconds` now the cap (0.7 -> 1.2 s); `Swoop.LeadScale` (1.3)
+  scales the lead, measured: the agent reaches the aim 1.14-1.4x later than the from-rest acceleration model.
+- CELLARBAT_DIVE2 (lead + end on arrival): 12/16; closest approaches 36-65 cm, still 50-60 cm behind at 0.9 s on the
+  300+ cm dives. CELLARBAT_DIVE3 (+ LeadScale 1.3): 11/16, but on straight walking legs 8/8 with closest approaches
+  34-43 cm and the along error centred (-29..+25 cm); the misses were three dives whose target dropped into the pit
+  mid-dive (closest 150 at the cap, or a dive admitted the frame before the drop) and two at the dummy's corner turns
+  (across ~100 cm: the velocity estimate still points the old way). Standing-target dives unchanged (33-36 cm).
+- Gates: `Test-Bat-dive.log` 13/13 + `Test-Monster-dive.log` 3/3 after the strike lead and the arrival end;
+  `Test-Bat-dive2.log` 13/13 after LeadScale; exit 0 each **confirmed**.
+- One `Dynamic Fragment Get rejected invalid input` from the editor-world preview bat the frame after the full reload that
+  changed `FMars_Bat_Swoop`'s layout (one stack, did not repeat): a hot-reload transient, not runtime behaviour.
+- Open: a corner-turning target (the lead could decay with the estimate's age, or sample the velocity faster); the
+  SwoopAlpha the AnimBP reads still runs over SwoopSeconds (1.2) so the Swoop clip now plays slower than the dive.
+
 ## Incidents (this phase)
 - **I-1 force delete (19:41 local).** Changing the rebuild to delete-and-recreate made `EditorAssetLibrary.delete_asset`
   refuse the loaded ABP: "in use", 156 native GCObjectReferencer references (one per transition node). `ForceDeleteObject`
