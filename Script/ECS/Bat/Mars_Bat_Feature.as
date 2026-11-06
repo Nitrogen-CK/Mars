@@ -174,8 +174,10 @@ struct FMars_Bat_SwoopTiming
     UPROPERTY()
     float32 TelegraphSeconds = 0.6f;
 
+    // The committed dive's cap: it ends when the mouth reaches the aim point (the dive's route arrives) or after this long.
+    // A dive from the standoff takes about 0.6 s from rest; a target that walked away during the telegraph needs more.
     UPROPERTY()
-    float32 SwoopSeconds = 0.7f;
+    float32 SwoopSeconds = 1.2f;
 
     UPROPERTY()
     float32 RecoverSeconds = 0.8f;
@@ -221,6 +223,12 @@ struct FMars_Bat_Swoop
 
     UPROPERTY()
     float32 AimHeight = 0.0f;
+
+    // The lead on a moving target is its velocity times the dive's time to the aim point, times this. The time is modelled
+    // from rest at MaxAcceleration toward SwoopSpeed; the crowd agent ramps its speed through its own steering and arrives
+    // later than that model (measured 1.14 to 1.4x in the review room, 2026-11-06, dives of 220 to 330 cm).
+    UPROPERTY()
+    float32 LeadScale = 1.3f;
 }
 
 // Where it hangs. The hang point is the perch anchor plus HangOffset; the anchor is the claimed owner's location when it
@@ -359,8 +367,9 @@ mixin FMars_Validation Validate(const FMars_Bat_Swoop& Self)
     { return FMars_Validation(f"Bat swoop blow has a bad Damage [{Blow.Damage}], ContactRadius [{Blow.ContactRadius}], DamageType [{Blow.DamageType.ToString()}] or MouthOffset"); }
 
     if (utils_bat::Get_IsPositiveFinite(Self.Range) == false || Math::IsFinite(Self.Height) == false || Self.Height < 0.0f ||
-        Math::IsFinite(Self.Standoff) == false || Self.Standoff < 0.0f || Math::IsFinite(Self.AimHeight) == false)
-    { return FMars_Validation(f"Bat swoop has a bad Range [{Self.Range}], Height [{Self.Height}], Standoff [{Self.Standoff}] or AimHeight [{Self.AimHeight}]"); }
+        Math::IsFinite(Self.Standoff) == false || Self.Standoff < 0.0f || Math::IsFinite(Self.AimHeight) == false ||
+        Math::IsFinite(Self.LeadScale) == false || Self.LeadScale < 0.0f)
+    { return FMars_Validation(f"Bat swoop has a bad Range [{Self.Range}], Height [{Self.Height}], Standoff [{Self.Standoff}], AimHeight [{Self.AimHeight}] or LeadScale [{Self.LeadScale}]"); }
 
     return FMars_Validation();
 }

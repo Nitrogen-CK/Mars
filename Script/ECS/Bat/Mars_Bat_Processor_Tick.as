@@ -6,8 +6,9 @@
 // 2. the hurt clocks run down;
 // 3. the swoop: the cooldown runs down; a dead bat's swoop ends Died; Telegraphing holds (a target gone invalid ends it
 //    TargetLost) and commits when TelegraphSeconds pass, flying through the aim point at SwoopSpeed; Committed sweeps the
-//    mouth from its last place each frame until one result lands (the ledger's HitZones), and recovers after SwoopSeconds,
-//    flying back to where it committed; Recovering ends after RecoverSeconds and starts the cooldown;
+//    mouth from its last place each frame until one result lands (the ledger's HitZones), and recovers once the dive's
+//    route arrives at the aim point or SwoopSeconds pass, carrying through past it; Recovering ends after RecoverSeconds
+//    and starts the cooldown;
 // 4. the death fall (Falling): gravity on the fall velocity, a static-world ray from where it is to where it would be, and
 //    on contact it rests there (Landed) - or Landed where it is after MaxFallSeconds with no ground;
 // 5. a bat whose own spot is not goal-free after its route failed (the agent overshot into a wall's clearance band, where
@@ -211,7 +212,9 @@ class UMars_Processor_Bat_Tick : UCk_Processor_Script_Base_UE
         if (Stage == EMars_Bat_SwoopStage::Committed)
         {
             Sweep(InSelf);
-            if (Over)
+            // The dive is over when the mouth gets to the aim point (the route it was issued in Swooping arrived), or at the
+            // cap; a fixed length left a dive at a walking target short of it every time.
+            if (Over || InSelf.Get_IsRouteReachedIn(EMars_Bat_Phase::Swooping))
             { Recover(InSelf); }
 
             return;
@@ -233,7 +236,7 @@ class UMars_Processor_Bat_Tick : UCk_Processor_Script_Base_UE
         // contact (the aim point less the blow's reach) follows that profile, not a constant speed. The lead is capped at
         // Standoff so a sensing glitch cannot send the dive across the room.
         const auto AimNow = utils_transform::Get_EntityCurrentLocation(Ledger.Target.As_Transform()) + FVector(0.0, 0.0, Spec.Swoop.AimHeight);
-        const auto Lead = InSelf.Get_TargetVelocity().GetClampedToMaxSize(Spec.Swoop.Standoff) *
+        const auto Lead = InSelf.Get_TargetVelocity().GetClampedToMaxSize(Spec.Swoop.Standoff) * float64(Spec.Swoop.LeadScale) *
             Get_DiveSeconds(Spec, Math::Max((AimNow - InSelf.Get_Location()).Size() - float64(Spec.Swoop.Blow.ContactRadius), 0.0));
         Ledger.Goal = AimNow + Lead;
         Ledger.LastMouth = InSelf.Get_MouthLocation();

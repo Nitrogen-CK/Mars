@@ -412,14 +412,17 @@ mixin FVector Get_TargetAimPoint(const FCk_Handle_Bat& Self)
         FVector(0.0, 0.0, Self.Get_Spec().Swoop.AimHeight);
 }
 
-// Where it waits to swoop: Height over the aim point and Standoff back toward the bat along the ground. When that point is
-// not goal-free (a target against a wall or a pillar) the bearing turns round the target, nearest first (45, -45, 90, ...
-// 180 degrees), to the first goal-free point: it attacks from the open side. None free: the natural point (the route then
-// fails and the target is dropped, as before).
+// Where it waits to swoop: Height over the aim point and Standoff back toward the bat along the ground. The aim point is
+// led by the target's velocity over the telegraph (capped at Standoff): the bat holds still while it telegraphs, so it
+// waits where the target will be when the dive commits, not where it is now (a walking target used to be 90 cm further
+// out at every commit, out of the dive's reach). When that point is not goal-free (a target against a wall or a pillar)
+// the bearing turns round the target, nearest first (45, -45, 90, ... 180 degrees), to the first goal-free point: it
+// attacks from the open side. None free: the natural point (the route then fails and the target is dropped, as before).
 mixin FVector Get_StrikePoint(const FCk_Handle_Bat& Self)
 {
     const auto Swoop = Self.Get_Spec().Swoop;
-    const auto Aim = Self.Get_TargetAimPoint();
+    const auto Aim = Self.Get_TargetAimPoint() +
+        Self.Get_TargetVelocity().GetClampedToMaxSize(Swoop.Standoff) * float64(Swoop.Timing.TelegraphSeconds);
     auto Back = Self.Get_Location() - Aim;
     Back.Z = 0.0;
     Back = Back.GetSafeNormal();
