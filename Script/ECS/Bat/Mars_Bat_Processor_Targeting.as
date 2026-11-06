@@ -51,9 +51,24 @@ class UMars_Processor_Bat_Targeting : UCk_Processor_Script_Base_UE
 
         State.SenseClock = 0.0f;
         if (Get_IsKeepable(InSelf, State.Target, Spec.Sensing.LoseRadius))
-        { return State.Target; }
+        {
+            Sample_TargetMotion(State, Spec.Sensing.SenseInterval);
+            return State.Target;
+        }
 
+        State.TargetLastLocation.Reset();
+        State.TargetVelocity = FVector::ZeroVector;
         return Find_Nearest(InSelf, Spec.Sensing.AcquireRadius);
+    }
+
+    // The held target's velocity over the last sense interval, from its location now and at the previous sense.
+    private void Sample_TargetMotion(FMars_Fragment_Bat& InOutState, float32 InInterval) const
+    {
+        const auto Now = utils_transform::Get_EntityCurrentLocation(InOutState.Target.As_Transform());
+        if (InOutState.TargetLastLocation.IsSet() && InInterval > 0.0f)
+        { InOutState.TargetVelocity = (Now - InOutState.TargetLastLocation.GetValue()) / float64(InInterval); }
+
+        InOutState.TargetLastLocation = Now;
     }
 
     private bool Get_IsKeepable(const FCk_Handle_Bat& InSelf, FCk_Handle InTarget, float32 InRadius) const

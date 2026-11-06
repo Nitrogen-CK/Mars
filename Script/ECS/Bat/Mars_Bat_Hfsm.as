@@ -39,6 +39,10 @@ namespace utils_bat
 
     // Telegraph starts only this close to the strike point.
     const float64 StrikeTolerance = 70.0;
+
+    // While the swoop cools down the bat chases a point this far ahead of itself on the standoff circle, so it circles
+    // the target instead of hanging still, and the next telegraph comes from a new bearing.
+    const float64 OrbitLeadDeg = 45.0;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -739,21 +743,28 @@ class UMars_SmTask_Bat_Telegraph : UCk_SmTask_EntityScript
     }
 }
 
-// Flies to the strike point over the target, following it as it moves.
+// Flies to the strike point over the target, following it as it moves. While the swoop cools down (or the dive line is
+// blocked) it circles the target on the standoff circle instead, alternating direction every sortie, so it never hangs
+// still between attacks and each telegraph comes from a new bearing. The strike point lies on that same circle, so the
+// circling bat is always within tolerance of it when the cooldown ends.
 class UMars_SmTask_Bat_Approach : UCk_SmTask_EntityScript
 {
     default _TaskMode = ECk_SmTaskMode::Tick;
 
     private FCk_Handle_Bat _Bat;
     private TOptional<FVector> _Issued;
+    private int32 _OrbitSign = 1;
 
     UFUNCTION(BlueprintOverride)
     void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
     {
         _Bat = ck::Ctx(InHandle).As_Bat();
         _Issued.Reset();
-        if (ck::IsValid(_Bat))
-        { _Bat.Request_SetPhase(FMars_Request_Bat_SetPhase(EMars_Bat_Phase::Approaching)); }
+        if (ck::Is_NOT_Valid(_Bat))
+        { return; }
+
+        _OrbitSign = _Bat.Get_SwoopLedger().Generation % 2 == 0 ? 1 : -1;
+        _Bat.Request_SetPhase(FMars_Request_Bat_SetPhase(EMars_Bat_Phase::Approaching));
     }
 
     UFUNCTION(BlueprintOverride)
@@ -762,12 +773,14 @@ class UMars_SmTask_Bat_Approach : UCk_SmTask_EntityScript
         if (ck::Is_NOT_Valid(_Bat) || _Bat.Get_HasTarget() == false || _Bat.Get_Phase() != EMars_Bat_Phase::Approaching)
         { return ECk_SmTaskResult::Running; }
 
-        const auto Strike = _Bat.Get_StrikePoint();
-        if (_Issued.IsSet() && (_Issued.GetValue() - Strike).Size() < utils_bat::StrikeRepathDistance)
+        const auto Admission = _Bat.Get_SwoopAdmission(_Bat.Get_Target());
+        const auto Circle = Admission == EMars_Bat_SwoopAdmission::Cooldown || Admission == EMars_Bat_SwoopAdmission::NoLineOfSight;
+        const auto Goal = Circle ? _Bat.Get_OrbitPoint(_OrbitSign, utils_bat::OrbitLeadDeg) : _Bat.Get_StrikePoint();
+        if (_Issued.IsSet() && (_Issued.GetValue() - Goal).Size() < utils_bat::StrikeRepathDistance)
         { return ECk_SmTaskResult::Running; }
 
-        _Issued = Strike;
-        _Bat.Request_FlyTo(FMars_Request_Bat_FlyTo(Strike, _Bat.Get_Spec().Flight.CruiseSpeed));
+        _Issued = Goal;
+        _Bat.Request_FlyTo(FMars_Request_Bat_FlyTo(Goal, _Bat.Get_Spec().Flight.CruiseSpeed));
         return ECk_SmTaskResult::Running;
     }
 

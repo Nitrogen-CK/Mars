@@ -9,7 +9,9 @@ enum EMars_Bat_SwoopAdmission
     NoTarget,
     OutOfRange,
     // The point it would swoop through is not in the flight volume's free space.
-    GoalBlocked
+    GoalBlocked,
+    // Static geometry stands between its mouth and the aim point: it would dive into a wall.
+    NoLineOfSight
 }
 
 // The flight volume a bat flies in (utils_bat::Add_FlightVolume): world bounds, the finest cell edge (cm), the clearance
@@ -361,6 +363,12 @@ mixin FCk_Handle Get_Target(const FCk_Handle_Bat& Self)
     return Self.Get_Fragment(FMars_Fragment_Bat).Target;
 }
 
+// The target's velocity as the senses measured it (zero until two senses of the same target).
+mixin FVector Get_TargetVelocity(const FCk_Handle_Bat& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_Bat).TargetVelocity;
+}
+
 mixin bool Get_HasTarget(const FCk_Handle_Bat& Self)
 {
     return utils_bat::Get_IsTargetValid(Self.Get_Target());
@@ -503,7 +511,37 @@ mixin EMars_Bat_SwoopAdmission Get_SwoopAdmission(const FCk_Handle_Bat& Self, FC
         utils_voxel_nav_volume::Get_IsPointFree(Volume, Aim) == false)
     { return EMars_Bat_SwoopAdmission::GoalBlocked; }
 
+    if (utils_bat::Get_IsStaticBetween(Self.Get_MouthLocation(), Aim))
+    { return EMars_Bat_SwoopAdmission::NoLineOfSight; }
+
     return EMars_Bat_SwoopAdmission::Admitted;
+}
+
+// A point on the standoff circle round the aim point (Standoff out, Height up), InLeadDegrees ahead of the bat's current
+// bearing in the InSign direction (+1 counter-clockwise seen from above). Chasing it circles the target.
+mixin FVector Get_OrbitPoint(const FCk_Handle_Bat& Self, int32 InSign, float64 InLeadDegrees)
+{
+    const auto Swoop = Self.Get_Spec().Swoop;
+    const auto Aim = Self.Get_TargetAimPoint();
+    auto Out = Self.Get_Location() - Aim;
+    Out.Z = 0.0;
+    if (Out.IsNearlyZero())
+    { Out = -Self.Get_RootTransform().GetRotation().GetForwardVector(); }
+
+    const auto Bearing = Math::RadiansToDegrees(Math::Atan2(Out.Y, Out.X)) + float64(InSign >= 0 ? 1 : -1) * InLeadDegrees;
+    const auto Radians = Math::DegreesToRadians(Bearing);
+    return Aim + FVector(Math::Cos(Radians), Math::Sin(Radians), 0.0) * Swoop.Standoff + FVector(0.0, 0.0, Swoop.Height);
+}
+
+namespace utils_bat
+{
+    // Static world geometry between two points (a wall, a pillar), by a Jolt static-world ray.
+    bool Get_IsStaticBetween(FVector InFrom, FVector InTo)
+    {
+        auto Filter = FCk_Jolt_QueryFilter();
+        Filter.Set_BodySelection(ECk_Jolt_QueryBodySelection::StaticNonSensor);
+        return utils_jolt_query::Get_RayCast(InFrom, InTo, Filter).Get_HasHit();
+    }
 }
 
 mixin FMars_Bat_Telemetry Get_Telemetry(const FCk_Handle_Bat& Self)

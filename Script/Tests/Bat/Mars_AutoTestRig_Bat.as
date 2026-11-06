@@ -29,6 +29,10 @@ class UMars_AutoTestRig_Bat : UCk_AutoTest_Base
     protected TArray<EMars_Bat_SwoopCancel> _Cancels;
     protected TArray<EMars_Bat_RouteOutcome> _Outcomes;
     protected int32 _PerchLost = 0;
+    // How far (degrees of yaw) the bat was from facing the target's aim point when its first swoop committed, and where
+    // it was when its first recovery ended.
+    protected TOptional<float32> _FacingErrorAtCommit;
+    protected TOptional<FVector> _FirstRecoverEnd;
     protected bool _BuildSucceeded = false;
     protected int32 _BuildCompletions = 0;
 
@@ -237,6 +241,16 @@ class UMars_AutoTestRig_Bat : UCk_AutoTest_Base
     protected void OnPhaseChanged(FCk_Handle_Bat InBat, EMars_Bat_Phase InFrom, EMars_Bat_Phase InTo)
     {
         _Phases.Add(InTo);
+
+        if (InTo == EMars_Bat_Phase::Swooping && _FacingErrorAtCommit.IsSet() == false && ck::IsValid(_TargetRoot))
+        {
+            const auto ToAim = InBat.Get_TargetAimPoint() - InBat.Get_Location();
+            const auto Yaw = InBat.Get_RootTransform().GetRotation().Rotator().Yaw;
+            _FacingErrorAtCommit = float32(Math::Abs(Math::FindDeltaAngleDegrees(Yaw, ToAim.Rotation().Yaw)));
+        }
+
+        if (InFrom == EMars_Bat_Phase::Recovering && _FirstRecoverEnd.IsSet() == false)
+        { _FirstRecoverEnd = InBat.Get_Location(); }
     }
 
     UFUNCTION()

@@ -198,6 +198,7 @@ class UMars_Processor_Bat_Tick : UCk_Processor_Script_Base_UE
                 return;
             }
 
+            FaceAimPoint(InSelf, InDeltaSeconds);
             if (Over)
             { Commit(InSelf); }
 
@@ -217,14 +218,17 @@ class UMars_Processor_Bat_Tick : UCk_Processor_Script_Base_UE
         { utils_bat::End_Swoop(InSelf, EMars_Bat_SwoopCancel::Cancelled); }
     }
 
-    // Through the aim point as it is now, at SwoopSpeed; the line it flies is fixed from here on.
+    // Through the aim point (led by the target's velocity) at SwoopSpeed; the line it flies is fixed from here on.
     private void Commit(FCk_Handle_Bat& InSelf)
     {
         const auto Spec = InSelf.Get_Spec();
         auto& Ledger = InSelf.Get_Fragment(FMars_Fragment_Bat).Swoop;
         Ledger.Stage = EMars_Bat_SwoopStage::Committed;
         Ledger.StageElapsed = 0.0f;
-        Ledger.Goal = utils_transform::Get_EntityCurrentLocation(Ledger.Target.As_Transform()) + FVector(0.0, 0.0, Spec.Swoop.AimHeight);
+        // Through where the target will be half a swoop from now, not where it is: a walking target is still met.
+        // The lead is capped at Standoff so a sensing glitch cannot send the dive across the room.
+        const auto Lead = InSelf.Get_TargetVelocity().GetClampedToMaxSize(Spec.Swoop.Standoff) * float64(Spec.Swoop.Timing.SwoopSeconds) * 0.5;
+        Ledger.Goal = utils_transform::Get_EntityCurrentLocation(Ledger.Target.As_Transform()) + Lead + FVector(0.0, 0.0, Spec.Swoop.AimHeight);
         Ledger.LastMouth = InSelf.Get_MouthLocation();
         const auto Goal = Ledger.Goal;
 
@@ -232,6 +236,10 @@ class UMars_Processor_Bat_Tick : UCk_Processor_Script_Base_UE
         utils_bat::Issue_Move(InSelf, FMars_Request_Bat_FlyTo(Goal, Spec.Flight.SwoopSpeed));
     }
 
+    // Pulls out by carrying THROUGH: the mirror of the strike point on the far side of the aim point (Standoff past it along
+    // the dive line, Height up), so the bat keeps facing the way it flew and the next approach turns it back onto the
+    // target. Only when that point is not in the volume's free space (a wall behind the target) does it fly back to where
+    // it committed from, the way it came.
     private void Recover(FCk_Handle_Bat& InSelf)
     {
         const auto Spec = InSelf.Get_Spec();
@@ -239,10 +247,50 @@ class UMars_Processor_Bat_Tick : UCk_Processor_Script_Base_UE
         Ledger.Stage = EMars_Bat_SwoopStage::Recovering;
         Ledger.StageElapsed = 0.0f;
         const auto From = Ledger.From;
+        const auto Aim = Ledger.Goal;
+
+        auto Dive = Aim - From;
+        Dive.Z = 0.0;
+        Dive = Dive.GetSafeNormal();
+        const auto Through = Aim + Dive * Spec.Swoop.Standoff + FVector(0.0, 0.0, Spec.Swoop.Height);
+        const auto Volume = InSelf.Get_Volume();
+        const auto ThroughIsFree = Dive.IsNearlyZero() == false && ck::IsValid(Volume) &&
+            utils_voxel_nav_volume::Get_IsBuilt(Volume) && utils_voxel_nav_volume::Get_IsPointFree(Volume, Through);
 
         utils_bat::Set_Phase(InSelf, EMars_Bat_Phase::Recovering);
-        utils_bat::Issue_Move(InSelf, FMars_Request_Bat_FlyTo(From, Spec.Flight.CruiseSpeed));
+        utils_bat::Issue_Move(InSelf, FMars_Request_Bat_FlyTo(ThroughIsFree ? Through : From, Spec.Flight.CruiseSpeed));
     }
+
+    // While it telegraphs the agent is stopped, and CkCrowd's facing writer disengages below its speed floor (it holds the
+    // body), so the kernel may turn the root itself: yaw and a bounded pitch slew toward the aim point at MaxTurnRate.
+    // Without this the bat telegraphs facing whatever heading its last leg left it on (after a pull-out, away from the
+    // target).
+    private void FaceAimPoint(FCk_Handle_Bat& InSelf, float32 InDeltaSeconds)
+    {
+        if (InDeltaSeconds <= 0.0f)
+        { return; }
+
+        const auto Aim = InSelf.Get_TargetAimPoint();
+        const auto Here = InSelf.Get_Location();
+        const auto ToAim = Aim - Here;
+        if (ToAim.IsNearlyZero())
+        { return; }
+
+        const auto Wanted = ToAim.Rotation();
+        const auto Current = InSelf.Get_RootTransform().GetRotation().Rotator();
+        const float64 MaxStep = float64(InSelf.Get_Spec().Flight.MaxTurnRate) * float64(InDeltaSeconds);
+        const auto YawDelta = Math::Clamp(Math::FindDeltaAngleDegrees(Current.Yaw, Wanted.Yaw), -MaxStep, MaxStep);
+        const auto WantedPitch = Math::Clamp(Wanted.Pitch, TelegraphPitchMin, TelegraphPitchMax);
+        const auto PitchDelta = Math::Clamp(Math::FindDeltaAngleDegrees(Current.Pitch, WantedPitch), -MaxStep, MaxStep);
+
+        auto Root = InSelf.As_Transform();
+        utils_transform::Request_SetRotation(Root, FCk_Request_Transform_SetRotation(
+            FRotator(Current.Pitch + PitchDelta, Current.Yaw + YawDelta, 0.0)));
+    }
+
+    // The nose may dip toward a target below it while telegraphing, but never stand on its head.
+    private const float64 TelegraphPitchMin = -50.0;
+    private const float64 TelegraphPitchMax = 20.0;
 
     // The mouth through the frame: a swept sphere from its last place to this one, only while no result has landed this
     // generation. A zone hit is recorded and announced; the damage itself goes through the dealer.

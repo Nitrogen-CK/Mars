@@ -1126,6 +1126,35 @@ gave active state `Locomotion`, Phase 8 gave `Locomotion`. `wrist_l` rotation ch
   "never delete, force-delete or reload a Blueprint the live editor has loaded; PIE compiles every dirty Blueprint" is
   now part of this task's operating rules.
 
+## Phase 7 - attack-pattern fix and audit (Fable, 2026-11-05 21:45)
+
+Maintainer observation: after the first swoop the bat telegraphed facing away from the dummy. Cause (read in the code):
+Recover flew back to the commit point, so the pull-out travelled away from the target and the crowd agent faced its
+travel; the next strike point was almost where the bat already was, and nothing turned the root while it telegraphed
+(CkCrowd's facing writer disengages below its speed floor). Changes, all in `Script/ECS/Bat/` + the rig/test:
+- `FaceAimPoint` in the tick: while Telegraphing the kernel slews the root yaw (and a pitch clamped to -50..+20) toward
+  the aim point at `Flight.MaxTurnRate`; safe because the agent is stopped and its facing writer holds.
+- Recover carries THROUGH: the mirror of the strike point past the aim point along the dive line (fallback: back to the
+  commit point when that point is not free in the volume).
+- Orbit between swoops (control layer, `UMars_SmTask_Bat_Approach`): while the admission is Cooldown or NoLineOfSight
+  the bat chases a point 45 deg ahead on the standoff circle (direction alternates per sortie), so it circles the
+  target instead of hovering and each telegraph comes from a new bearing.
+- Target lead: the targeting processor samples the held target's velocity each sense; Commit aims half a swoop ahead
+  (lead capped at Standoff).
+- Line of sight: `Get_SwoopAdmission` refuses `NoLineOfSight` when a Jolt static ray from the mouth to the aim point
+  hits (no diving into a pillar); the orbit keeps moving until the line clears.
+- New test `Mars_AutoTest_Bat_TelegraphFacesTheTargetAndCarriesThrough` (facing within 15 deg at commit; first
+  recovery ends past the target). Gates: `Saved/Logs/Test-Bat-audit.log` 8/8, `Test-Monster-audit.log` 3/3,
+  contaminated 0 **confirmed**.
+- PIE (`run_pie_smoke` marker CELLARBAT_AUDIT, 45 s, review map): 6/6 swoops landed = 6 dummy hits in 26 s; every
+  recovery ended ~200 cm past the dummy (x ~790 vs 600); telegraph points alternated sides (y -82, +48, -77, +52);
+  facing error at the end of all 11 telegraphs 0.0-0.1 deg (first sample of each up to 94 deg before the slew)
+  **confirmed from the [CellarBat] log lines**. Not captured visually this time.
+- Not done (audit items for a later pass): last-known-position search when the target leaves LoseRadius; hit-and-run
+  retreat after taking damage; altitude bob / path smoothing (CkCrowd passes default refinement to the voxel search
+  with smoothing off and exposes no knob - a framework change); jink/wobble presentation; GOAP is not needed for one
+  attack and one home.
+
 ## Incidents (this phase)
 - **I-1 force delete (19:41 local).** Changing the rebuild to delete-and-recreate made `EditorAssetLibrary.delete_asset`
   refuse the loaded ABP: "in use", 156 native GCObjectReferencer references (one per transition node). `ForceDeleteObject`
@@ -1178,6 +1207,35 @@ gave active state `Locomotion`, Phase 8 gave `Locomotion`. `wrist_l` rotation ch
   dirty ABP killed the editor, no crash report) are recorded by the executor in the Phase 6b-2 prep section; the rule
   "never delete, force-delete or reload a Blueprint the live editor has loaded; PIE compiles every dirty Blueprint" is
   now part of this task's operating rules.
+
+## Phase 7 - attack-pattern fix and audit (Fable, 2026-11-05 21:45)
+
+Maintainer observation: after the first swoop the bat telegraphed facing away from the dummy. Cause (read in the code):
+Recover flew back to the commit point, so the pull-out travelled away from the target and the crowd agent faced its
+travel; the next strike point was almost where the bat already was, and nothing turned the root while it telegraphed
+(CkCrowd's facing writer disengages below its speed floor). Changes, all in `Script/ECS/Bat/` + the rig/test:
+- `FaceAimPoint` in the tick: while Telegraphing the kernel slews the root yaw (and a pitch clamped to -50..+20) toward
+  the aim point at `Flight.MaxTurnRate`; safe because the agent is stopped and its facing writer holds.
+- Recover carries THROUGH: the mirror of the strike point past the aim point along the dive line (fallback: back to the
+  commit point when that point is not free in the volume).
+- Orbit between swoops (control layer, `UMars_SmTask_Bat_Approach`): while the admission is Cooldown or NoLineOfSight
+  the bat chases a point 45 deg ahead on the standoff circle (direction alternates per sortie), so it circles the
+  target instead of hovering and each telegraph comes from a new bearing.
+- Target lead: the targeting processor samples the held target's velocity each sense; Commit aims half a swoop ahead
+  (lead capped at Standoff).
+- Line of sight: `Get_SwoopAdmission` refuses `NoLineOfSight` when a Jolt static ray from the mouth to the aim point
+  hits (no diving into a pillar); the orbit keeps moving until the line clears.
+- New test `Mars_AutoTest_Bat_TelegraphFacesTheTargetAndCarriesThrough` (facing within 15 deg at commit; first
+  recovery ends past the target). Gates: `Saved/Logs/Test-Bat-audit.log` 8/8, `Test-Monster-audit.log` 3/3,
+  contaminated 0 **confirmed**.
+- PIE (`run_pie_smoke` marker CELLARBAT_AUDIT, 45 s, review map): 6/6 swoops landed = 6 dummy hits in 26 s; every
+  recovery ended ~200 cm past the dummy (x ~790 vs 600); telegraph points alternated sides (y -82, +48, -77, +52);
+  facing error at the end of all 11 telegraphs 0.0-0.1 deg (first sample of each up to 94 deg before the slew)
+  **confirmed from the [CellarBat] log lines**. Not captured visually this time.
+- Not done (audit items for a later pass): last-known-position search when the target leaves LoseRadius; hit-and-run
+  retreat after taking damage; altitude bob / path smoothing (CkCrowd passes default refinement to the voxel search
+  with smoothing off and exposes no knob - a framework change); jink/wobble presentation; GOAP is not needed for one
+  attack and one home.
 
 ## Incidents
 

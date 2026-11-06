@@ -570,6 +570,14 @@ struct FMars_Fragment_Bat
     UPROPERTY()
     float32 SenseClock = 0.0f;
 
+    // The target's motion as the senses saw it: its location at the last sense and the velocity between the last two
+    // (zero until two senses of the same target), so a committed swoop can lead a moving target.
+    UPROPERTY()
+    TOptional<FVector> TargetLastLocation;
+
+    UPROPERTY()
+    FVector TargetVelocity = FVector::ZeroVector;
+
     // A target it could not fly to (an Approaching route failed) is passed over for IgnoreLeft seconds.
     UPROPERTY()
     FCk_Handle Ignored;
