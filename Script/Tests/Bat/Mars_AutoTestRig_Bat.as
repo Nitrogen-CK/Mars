@@ -33,6 +33,8 @@ class UMars_AutoTestRig_Bat : UCk_AutoTest_Base
     // it was when its first recovery ended.
     protected TOptional<float32> _FacingErrorAtCommit;
     protected TOptional<FVector> _FirstRecoverEnd;
+    // Where it was when its first retreat ended.
+    protected TOptional<FVector> _FirstRetreatEnd;
     protected bool _BuildSucceeded = false;
     protected int32 _BuildCompletions = 0;
 
@@ -118,6 +120,18 @@ class UMars_AutoTestRig_Bat : UCk_AutoTest_Base
     protected void MoveTarget(FVector InOffset)
     {
         utils_transform::Request_SetLocation(_TargetRoot, FCk_Request_Transform_SetLocation(Get_TargetLocation(InOffset)));
+    }
+
+    // A blow of InAmount on the bat's body zone (the route a weapon takes), under StunDamage a flinch.
+    protected void HitBat(float32 InAmount)
+    {
+        auto Zone = _Bat.Get_Monster().Get_BodyZone();
+        Zone.Request_Hit(FMars_Request_HitZone_Hit(FMars_DamageEvent(InAmount, GameplayTags::DamageType_Mars_Blunt)));
+    }
+
+    protected float64 Get_DistanceToTarget() const
+    {
+        return (utils_transform::Get_EntityCurrentLocation(_TargetRoot) - _Bat.Get_Location()).Size();
     }
 
     protected void DestroyTarget()
@@ -251,6 +265,9 @@ class UMars_AutoTestRig_Bat : UCk_AutoTest_Base
 
         if (InFrom == EMars_Bat_Phase::Recovering && _FirstRecoverEnd.IsSet() == false)
         { _FirstRecoverEnd = InBat.Get_Location(); }
+
+        if (InFrom == EMars_Bat_Phase::Retreating && _FirstRetreatEnd.IsSet() == false)
+        { _FirstRetreatEnd = InBat.Get_Location(); }
     }
 
     UFUNCTION()

@@ -2,7 +2,9 @@
 // to it and within HomeRadius of its hang point: a held target is kept while it stays valid, Hostile, near home and within
 // LoseRadius of the bat; otherwise the nearest within AcquireRadius wins (equal distances go to the lower handle string).
 // A target it could not fly to is passed over while IgnoreLeft runs. A bat that is down holds none. Every change of
-// target broadcasts OnTargetChanged (a target that went invalid is a change to none).
+// target broadcasts OnTargetChanged (a target that went invalid is a change to none). With Sensing.SearchSeconds set, a
+// hostile target lost only by distance (past LoseRadius, still within HomeRadius) leaves its last sensed location behind
+// (LastKnown) until a target is held again or the control layer ends its search.
 class UMars_Processor_Bat_Targeting : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -53,12 +55,36 @@ class UMars_Processor_Bat_Targeting : UCk_Processor_Script_Base_UE
         if (Get_IsKeepable(InSelf, State.Target, Spec.Sensing.LoseRadius))
         {
             Sample_TargetMotion(State, Spec.Sensing.SenseInterval);
+            State.LastKnown.Reset();
             return State.Target;
         }
 
+        if (Get_IsSearchable(InSelf, State.Target))
+        { State.LastKnown = utils_transform::Get_EntityCurrentLocation(State.Target.As_Transform()); }
+
         State.TargetLastLocation.Reset();
         State.TargetVelocity = FVector::ZeroVector;
-        return Find_Nearest(InSelf, Spec.Sensing.AcquireRadius);
+        const auto Next = Find_Nearest(InSelf, Spec.Sensing.AcquireRadius);
+        if (ck::IsValid(Next))
+        { State.LastKnown.Reset(); }
+
+        return Next;
+    }
+
+    // A held target that is no longer keepable but worth looking for: still a valid hostile within HomeRadius of home (it
+    // only got too far from the bat), with SearchSeconds set. Dead, friendly, ignored or out of the home range: forgotten.
+    private bool Get_IsSearchable(const FCk_Handle_Bat& InSelf, FCk_Handle InTarget) const
+    {
+        const auto Spec = InSelf.Get_Spec();
+        if (Spec.Sensing.SearchSeconds.IsSet() == false || utils_bat::Get_IsTargetValid(InTarget) == false)
+        { return false; }
+
+        if (InTarget == InSelf.Get_Fragment(FMars_Fragment_Bat).Ignored ||
+            utils_relationship::Get_AttitudeTowards(InSelf, InTarget) != ECk_RelationshipAttitude::Hostile)
+        { return false; }
+
+        const auto Location = utils_transform::Get_EntityCurrentLocation(InTarget.As_Transform());
+        return (Location - InSelf.Get_HangPoint()).Size() <= Spec.Sensing.HomeRadius;
     }
 
     // The held target's velocity over the last sense interval, from its location now and at the previous sense.

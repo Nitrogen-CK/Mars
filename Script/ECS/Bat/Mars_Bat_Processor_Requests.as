@@ -1,5 +1,5 @@
 // The bat's arbiter: Fall -> TakeHit -> CancelSwoop -> RouteResult -> Hold -> SetPhase -> FlyTo -> StartSwoop ->
-// ReleaseRoost, each kind in arrival order. SetPhase runs before FlyTo so a route issued by a state's enter task is stamped
+// ReleaseRoost -> EndSearch, each kind in arrival order. SetPhase runs before FlyTo so a route issued by a state's enter task is stamped
 // with that state's phase (Route.IssuedIn). A StartSwoop is admitted only when Get_SwoopAdmission answers Admitted at drain
 // time. Signals broadcast after the state they report is written.
 class UMars_Processor_Bat_HandleRequests : UCk_Processor_Script_Base_UE
@@ -26,6 +26,7 @@ class UMars_Processor_Bat_HandleRequests : UCk_Processor_Script_Base_UE
         TArray<FMars_Request_Bat_FlyTo> FlyToRequests = InRequests.FlyToRequests;
         TArray<FMars_Request_Bat_StartSwoop> StartSwoopRequests = InRequests.StartSwoopRequests;
         TArray<FMars_Request_Bat_ReleaseRoost> ReleaseRoostRequests = InRequests.ReleaseRoostRequests;
+        TArray<FMars_Request_Bat_EndSearch> EndSearchRequests = InRequests.EndSearchRequests;
 
         // InRequests is invalid past this line; removing before broadcasting lets re-entrant requests survive.
         Self.Request_TryRemove(FMars_Fragment_Bat_Requests);
@@ -59,6 +60,9 @@ class UMars_Processor_Bat_HandleRequests : UCk_Processor_Script_Base_UE
 
         for (const auto& Request : ReleaseRoostRequests)
         { HandleReleaseRoost(Self); }
+
+        for (const auto& Request : EndSearchRequests)
+        { Self.Get_Fragment(FMars_Fragment_Bat).LastKnown.Reset(); }
     }
 
     // Latched: the agent stops and leaves the crowd, the integrator stops (the tick writes the root from here on), a running
@@ -87,6 +91,7 @@ class UMars_Processor_Bat_HandleRequests : UCk_Processor_Script_Base_UE
         State.Fall.Elapsed = 0.0f;
         const auto HadTarget = ck::IsValid(State.Target);
         State.Target = FCk_Handle();
+        State.LastKnown.Reset();
 
         utils_bat::Set_Phase(InSelf, EMars_Bat_Phase::Falling);
         if (HadTarget)

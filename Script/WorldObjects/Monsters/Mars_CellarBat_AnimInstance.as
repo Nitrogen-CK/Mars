@@ -72,10 +72,11 @@ class UMars_CellarBat_AnimInstance : UAnimInstance
     UPROPERTY(BlueprintReadOnly, Category = "CellarBat")
     bool IsHanging = true;
 
+    // Phase is the kernel's; PhaseIndex / PhaseValue are the AnimBP's (utils_bat::Get_AnimPhase).
     void Apply(const FMars_CellarBat_AnimFrame& InFrame)
     {
         Phase = InFrame.Phase;
-        PhaseIndex = int32(InFrame.Phase);
+        PhaseIndex = int32(utils_bat::Get_AnimPhase(InFrame.Phase));
         PhaseValue = float32(PhaseIndex);
         Speed = InFrame.Speed;
         TurnRate = InFrame.TurnRate;
@@ -96,5 +97,18 @@ namespace utils_bat
     bool Get_IsHangingPhase(EMars_Bat_Phase InPhase)
     {
         return InPhase == EMars_Bat_Phase::Roosting || InPhase == EMars_Bat_Phase::Alert || InPhase == EMars_Bat_Phase::Perching;
+    }
+
+    // The phase the AnimBP shows for a kernel phase. The AnimBP (cellar_bat_animbp_ue.py's PHASES) was built with the
+    // phases up to Screeching; the behaviour phases added after it are flight and are drawn as the locomotion they are.
+    EMars_Bat_Phase Get_AnimPhase(EMars_Bat_Phase InPhase)
+    {
+        if (InPhase == EMars_Bat_Phase::Searching)
+        { return EMars_Bat_Phase::Patrolling; }
+
+        if (InPhase == EMars_Bat_Phase::Retreating)
+        { return EMars_Bat_Phase::Returning; }
+
+        return InPhase;
     }
 }

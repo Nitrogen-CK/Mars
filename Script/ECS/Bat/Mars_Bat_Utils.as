@@ -175,6 +175,7 @@ namespace utils_bat
         RootEntity.Add_Fragment(State);
         RootEntity.Add_Fragment(FMars_Fragment_Bat_PatrolBlackboard());
         RootEntity.Add_Fragment(FMars_Fragment_Bat_SortieBlackboard());
+        RootEntity.Add_Fragment(FMars_Fragment_Bat_SearchBlackboard());
         RootEntity.Add_Fragment(FMars_Tag_Bat_NeedsSetup());
 
         // Last: Alive's condition reads the Dead attribute as the machine enters its initial state.
@@ -374,6 +375,36 @@ mixin bool Get_HasTarget(const FCk_Handle_Bat& Self)
     return utils_bat::Get_IsTargetValid(Self.Get_Target());
 }
 
+// Where a target it lost by distance was last sensed (see FMars_Fragment_Bat.LastKnown).
+mixin TOptional<FVector> Get_LastKnown(const FCk_Handle_Bat& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_Bat).LastKnown;
+}
+
+// A last-known place is held and no EndSearch is queued against it (a state that just gave the search up must not be sent
+// straight back by the memory the drain has not cleared yet).
+mixin bool Get_HasLastKnown(const FCk_Handle_Bat& Self)
+{
+    if (Self.Get_LastKnown().IsSet() == false)
+    { return false; }
+
+    return Self.Has_Fragment(FMars_Fragment_Bat_Requests) == false ||
+        Self.Get_Fragment(FMars_Fragment_Bat_Requests).EndSearchRequests.Num() == 0;
+}
+
+// The last-known place raised by the swoop's AimHeight: what the search circles (the aim point a target there would have).
+mixin FVector Get_SearchAim(const FCk_Handle_Bat& Self)
+{
+    const auto LastKnown = Self.Get_LastKnown();
+    return (LastKnown.IsSet() ? LastKnown.GetValue() : Self.Get_Location()) + FVector(0.0, 0.0, Self.Get_Spec().Swoop.AimHeight);
+}
+
+// Where the search flies first: Swoop.Height over the search aim.
+mixin FVector Get_SearchPoint(const FCk_Handle_Bat& Self)
+{
+    return Self.Get_SearchAim() + FVector(0.0, 0.0, Self.Get_Spec().Swoop.Height);
+}
+
 // The target's location raised by the swoop's AimHeight (what the swoop flies through).
 mixin FVector Get_TargetAimPoint(const FCk_Handle_Bat& Self)
 {
@@ -521,16 +552,67 @@ mixin EMars_Bat_SwoopAdmission Get_SwoopAdmission(const FCk_Handle_Bat& Self, FC
 // bearing in the InSign direction (+1 counter-clockwise seen from above). Chasing it circles the target.
 mixin FVector Get_OrbitPoint(const FCk_Handle_Bat& Self, int32 InSign, float64 InLeadDegrees)
 {
+    return Self.Get_OrbitPointAround(Self.Get_TargetAimPoint(), InSign, InLeadDegrees);
+}
+
+// The same circle round any aim point InCentre (the search circles where the target was last sensed).
+mixin FVector Get_OrbitPointAround(const FCk_Handle_Bat& Self, FVector InCentre, int32 InSign, float64 InLeadDegrees)
+{
     const auto Swoop = Self.Get_Spec().Swoop;
-    const auto Aim = Self.Get_TargetAimPoint();
-    auto Out = Self.Get_Location() - Aim;
+    auto Out = Self.Get_Location() - InCentre;
     Out.Z = 0.0;
     if (Out.IsNearlyZero())
     { Out = -Self.Get_RootTransform().GetRotation().GetForwardVector(); }
 
     const auto Bearing = Math::RadiansToDegrees(Math::Atan2(Out.Y, Out.X)) + float64(InSign >= 0 ? 1 : -1) * InLeadDegrees;
     const auto Radians = Math::DegreesToRadians(Bearing);
-    return Aim + FVector(Math::Cos(Radians), Math::Sin(Radians), 0.0) * Swoop.Standoff + FVector(0.0, 0.0, Swoop.Height);
+    return InCentre + FVector(Math::Cos(Radians), Math::Sin(Radians), 0.0) * Swoop.Standoff + FVector(0.0, 0.0, Swoop.Height);
+}
+
+// The orbit goal the control layer flies while circling InCentre: the orbit point InSign round, else (when the flight volume
+// does not have it free: a target against a wall, a corner) the point the other way round, else InFallback (the strike or
+// search point it already holds). Without a check an orbit point in a wall fails the route, which while Approaching drops
+// the target (seen in PIE: a search in the room's corner ended on EndpointUnresolvable).
+mixin FVector Get_OrbitGoal(const FCk_Handle_Bat& Self, FVector InCentre, int32 InSign, FVector InFallback)
+{
+    const auto Volume = Self.Get_Volume();
+    if (ck::Is_NOT_Valid(Volume) || utils_voxel_nav_volume::Get_IsBuilt(Volume) == false)
+    { return InFallback; }
+
+    for (int32 Try = 0; Try < 2; ++Try)
+    {
+        const auto Point = Self.Get_OrbitPointAround(InCentre, Try == 0 ? InSign : -InSign, utils_bat::OrbitLeadDeg);
+        if (utils_voxel_nav_volume::Get_IsPointFree(Volume, Point))
+        { return Point; }
+    }
+
+    return InFallback;
+}
+
+// Where it pulls back to after a blow: Timing.RetreatDistance from the aim point along the ground away from the target,
+// Swoop.Height up. A point the flight volume does not have free is tried at half the distance, then the strike point stands
+// in (a retreat that cannot be flown ends as a route failure, which the control layer takes as done).
+mixin FVector Get_RetreatPoint(const FCk_Handle_Bat& Self)
+{
+    const auto Spec = Self.Get_Spec();
+    const auto Aim = Self.Get_TargetAimPoint();
+    auto Away = Self.Get_Location() - Aim;
+    Away.Z = 0.0;
+    Away = Away.GetSafeNormal();
+    if (Away.IsNearlyZero())
+    { Away = -Self.Get_RootTransform().GetRotation().GetForwardVector(); }
+
+    const auto Distance = Spec.Timing.RetreatDistance.IsSet() ? float64(Spec.Timing.RetreatDistance.GetValue()) : float64(Spec.Swoop.Standoff);
+    const auto Volume = Self.Get_Volume();
+    const auto Ready = ck::IsValid(Volume) && utils_voxel_nav_volume::Get_IsBuilt(Volume);
+    for (int32 Halving = 0; Halving < 2; ++Halving)
+    {
+        const auto Point = Aim + Away * (Distance / float64(1 << Halving)) + FVector(0.0, 0.0, Spec.Swoop.Height);
+        if (Ready == false || utils_voxel_nav_volume::Get_IsPointFree(Volume, Point))
+        { return Point; }
+    }
+
+    return Self.Get_StrikePoint();
 }
 
 namespace utils_bat
@@ -638,6 +720,11 @@ mixin void Request_Fall(FCk_Handle_Bat& Self, const FMars_Request_Bat_Fall& InRe
 mixin void Request_ReleaseRoost(FCk_Handle_Bat& Self, const FMars_Request_Bat_ReleaseRoost& InRequest)
 {
     Self.AddOrGet_Fragment(FMars_Fragment_Bat_Requests).ReleaseRoostRequests.Add(InRequest);
+}
+
+mixin void Request_EndSearch(FCk_Handle_Bat& Self, const FMars_Request_Bat_EndSearch& InRequest)
+{
+    Self.AddOrGet_Fragment(FMars_Fragment_Bat_Requests).EndSearchRequests.Add(InRequest);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

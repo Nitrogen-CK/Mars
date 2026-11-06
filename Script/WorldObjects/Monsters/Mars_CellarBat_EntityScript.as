@@ -38,6 +38,22 @@ namespace utils_bat
     // measured one (a frame-difference that drops to 0 on a frame the root did not move).
     const float32 BankSmoothRate = 8.0f;
     const float32 SpeedSmoothRate = 6.0f;
+
+    // The altitude bob (presentation only, on the look node, never the root): a wingbeat-rate lift (BobHz, near the Hover
+    // clip's 16 frames at 30 fps) plus a slow drift (DriftHz), both along world up, while it flies under its own wings;
+    // faded in and out at BobFadeRate, none while it hangs, brakes for the perch, dives, falls or lies.
+    const float64 BobAmplitudeCm = 4.0;
+    const float64 BobHz = 1.9;
+    const float64 DriftAmplitudeCm = 8.0;
+    const float64 DriftHz = 0.37;
+    const float32 BobFadeRate = 3.0f;
+
+    bool Get_IsBobbingPhase(EMars_Bat_Phase InPhase)
+    {
+        return InPhase == EMars_Bat_Phase::Patrolling || InPhase == EMars_Bat_Phase::Approaching || InPhase == EMars_Bat_Phase::Returning ||
+            InPhase == EMars_Bat_Phase::Hovering || InPhase == EMars_Bat_Phase::Searching || InPhase == EMars_Bat_Phase::Retreating ||
+            InPhase == EMars_Bat_Phase::Recovering;
+    }
 }
 
 // Placeable enemy: the cellar bat, composed by utils_bat::Add on the root at SpawnTransform (the body centre; place it at the
@@ -104,6 +120,8 @@ class UMars_CellarBat_EntityScript : UCk_GenericEntityScript_UE
     private float32 _Bank = 0.0f;
     private TOptional<float64> _TrailingYaw;
     private float32 _Speed = 0.0f;
+    private float32 _BobAlpha = 0.0f;
+    private float64 _BobClock = 0.0;
     private FTransform _WrittenLook = FTransform::Identity;
     private TOptional<FVector> _PerchSocketLocal;
     private float64 _NextBankLog = 0.0;
@@ -304,6 +322,8 @@ class UMars_CellarBat_EntityScript : UCk_GenericEntityScript_UE
         const auto Bank = UpdateBank(Phase, DeltaSeconds);
         _Speed = Math::FInterpTo(_Speed, Telemetry.Speed, DeltaSeconds, utils_bat::SpeedSmoothRate);
 
+        _BobClock += DeltaSeconds;
+        _BobAlpha = Math::FInterpTo(_BobAlpha, utils_bat::Get_IsBobbingPhase(Phase) ? 1.0f : 0.0f, DeltaSeconds, utils_bat::BobFadeRate);
         _Hang = Math::FInterpConstantTo(_Hang, utils_bat::Get_IsHangingPhase(Phase) ? 1.0f : 0.0f, DeltaSeconds, utils_bat::HangRate);
         const auto Down = Phase == EMars_Bat_Phase::Landed || Phase == EMars_Bat_Phase::Dead;
         _Down = Math::FInterpConstantTo(_Down, Down ? 1.0f : 0.0f, DeltaSeconds, utils_bat::HangRate);
@@ -363,8 +383,8 @@ class UMars_CellarBat_EntityScript : UCk_GenericEntityScript_UE
 
     // The presentation node under the root. As it hangs: levelled (the crowd agent leaves the root pitched along its last
     // climb; only the root's yaw is kept), turned over about the body (roll 180) unless the clips hang it themselves, and,
-    // when the mesh has a perch socket, shifted so that socket meets the perch anchor. The placeholder also banks into its
-    // turns.
+    // when the mesh has a perch socket, shifted so that socket meets the perch anchor. In flight it rides the altitude
+    // bob. The placeholder also banks into its turns.
     private void PoseLook(float32 InBank)
     {
         const auto Hang = utils_bat::Get_EaseInOut(_Hang);
@@ -385,6 +405,13 @@ class UMars_CellarBat_EntityScript : UCk_GenericEntityScript_UE
             const auto AnchorLocal = Root.InverseTransformPosition(_Bat.Get_PerchAnchor());
             const auto Pinned = AnchorLocal - LookRotation.RotateVector(_PerchSocketLocal.GetValue());
             Offset = Pinned * Hang;
+        }
+
+        if (_BobAlpha > 0.001f)
+        {
+            const auto Bob = utils_bat::BobAmplitudeCm * Math::Sin(2.0 * PI * utils_bat::BobHz * _BobClock) +
+                utils_bat::DriftAmplitudeCm * Math::Sin(2.0 * PI * utils_bat::DriftHz * _BobClock);
+            Offset += RootRotation.UnrotateVector(FVector::UpVector) * (Bob * float64(_BobAlpha));
         }
 
         const auto Look = FTransform(Rotation, Offset);

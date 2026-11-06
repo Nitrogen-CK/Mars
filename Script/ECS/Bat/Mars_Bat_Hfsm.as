@@ -4,27 +4,37 @@
 // |    `- Behaviour sub-SM (initial = Roost); every flying state also ->Hurt [IsHurt]
 // |         Roost      ->Hover [PerchLost] ->Alert [ShouldWake]                 SetPhase(Roosting), Hold
 // |         Alert      ->Launch [AlertDone]                                      SetPhase(Alert)
-// |         Launch     ->Roost [RouteFailed] ->Approach [LaunchDone + target] ->Patrol [LaunchDone]
-// |                                                                              SetPhase(Launching), FlyTo(below perch)
-// |         Patrol     ->Approach [HasTarget] ->Return [PatrolDone]              SetPhase(Patrolling), FlyTo(nodes in turn)
-// |         Approach   ->Telegraph [CanSwoop: at the strike point + admitted] ->Return [NoTarget]                SetPhase(Approaching), FlyTo(strike point)
-// |         Telegraph  ->Swoop [Committed] ->Approach [SwoopDone + target] ->Return [SwoopDone]   StartSwoop(target);
-// |                                                                              the sortie's first: SetPhase(Screeching)
-// |         Swoop      ->Recover [Recovering] ->Return [SwoopDone]               (the kernel flies it)
-// |         Recover    ->Approach [SwoopDone + target] ->Return [SwoopDone]      (the kernel flies it)
-// |         Return     ->Approach [HasTarget] ->Hover [PerchLost | RouteFailed] ->Brake [RouteReached]
+// |         Launch     ->Roost [RouteFailed] ->Approach [LaunchDone + target] ->Search [LaunchDone + ShouldSearch]
+// |                    ->Patrol [LaunchDone]                                     SetPhase(Launching), FlyTo(below perch)
+// |         Patrol     ->Approach [HasTarget] ->Search [ShouldSearch] ->Return [PatrolDone]
+// |                                                                              SetPhase(Patrolling), FlyTo(nodes in turn)
+// |         Approach   ->Telegraph [CanSwoop: at the strike point + admitted] ->Search [ShouldSearch] ->Return [NoTarget]
+// |                                                                              SetPhase(Approaching), FlyTo(strike point / orbit)
+// |         Telegraph  ->Swoop [Committed] ->Approach [SwoopDone + target] ->Search [SwoopDone + ShouldSearch]
+// |                    ->Return [SwoopDone]                                      StartSwoop(target); the sortie's first: SetPhase(Screeching)
+// |         Swoop      ->Recover [Recovering] ->Search [SwoopDone + ShouldSearch] ->Return [SwoopDone]   (the kernel flies it)
+// |         Recover    ->Approach [SwoopDone + target] ->Search [SwoopDone + ShouldSearch] ->Return [SwoopDone]   (the kernel flies it)
+// |         Search     ->Approach [HasTarget] ->Return [SearchFailed | SearchDone]
+// |                                                                              SetPhase(Searching), FlyTo(over the last-known place), then orbit it;
+// |                                                                              exit: EndSearch
+// |         Retreat    ->Search [ShouldSearch] ->Return [NoTarget] ->Approach [RetreatDone]
+// |                                                                              SetPhase(Retreating), FlyTo(retreat point)
+// |         Return     ->Approach [HasTarget] ->Search [ShouldSearch] ->Hover [PerchLost | RouteFailed] ->Brake [RouteReached]
 // |                                                                              SetPhase(Returning), FlyTo(under the perch)
-// |         Brake      ->Approach [HasTarget] ->Hover [PerchLost | RouteFailed] ->Perch [RouteReached]
+// |         Brake      ->Approach [HasTarget] ->Search [ShouldSearch] ->Hover [PerchLost | RouteFailed] ->Perch [RouteReached]
 // |                                                                              SetPhase(Braking), FlyTo(hang point, slow)
 // |         Perch      ->Hover [PerchLost] ->Roost [PerchDone]                   SetPhase(Perching), Hold
-// |         Hover      ->Approach [HasTarget] ->Return [HoverRetry]              SetPhase(Hovering), Hold
-// |         Hurt       ->Return [NotHurt]                                        (the kernel holds Hit / Stunned)
+// |         Hover      ->Approach [HasTarget] ->Search [ShouldSearch] ->Return [HoverRetry]   SetPhase(Hovering), Hold
+// |         Hurt       ->Retreat [NotHurt + ShouldRetreat] ->Return [NotHurt]    (the kernel holds Hit / Stunned)
 // `- Dead               (sink)  tasks: Die: CancelSwoop(Died), Fall, body zone off, ReleaseRoost, corpse timer -> despawn
 //
 // The control layer over the kernel (Mars_Bat_Processor_Tick.as): it moves the bat only through FlyTo / Hold, names its
 // behaviour only through SetPhase and swoops only through StartSwoop; the kernel owns the swoop's clocks and steering,
 // the blow, the hurt clocks and the fall. A route condition trusts only an answer to a route issued in the phase its
 // state set (Get_IsRouteFailedIn / Get_IsRouteReachedIn), so a stale answer from the previous state never moves it on.
+// A target lost by distance leaves a last-known place in the kernel (ShouldSearch): Search flies there and circles it for
+// SearchSeconds (a target that turns up is approached), then gives it up (EndSearch). A blow with a target still held is
+// answered hit-and-run: Retreat pulls back before the next approach.
 
 namespace utils_bat
 {
@@ -43,6 +53,9 @@ namespace utils_bat
     // While the swoop cools down the bat chases a point this far ahead of itself on the standoff circle, so it circles
     // the target instead of hanging still, and the next telegraph comes from a new bearing.
     const float64 OrbitLeadDeg = 45.0;
+
+    // A search that has not reached its point this long after SearchSeconds is given up where it is.
+    const float32 SearchTravelSeconds = 6.0f;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -115,12 +128,65 @@ class UMars_SmCondition_Bat_PerchLost : UMars_SmCondition_Bat
     }
 }
 
-// A target, or (with RoostIdleSeconds and flight nodes) it has hung long enough to patrol.
+// No target, but a last-known place to look for one.
+class UMars_SmCondition_Bat_ShouldSearch : UMars_SmCondition_Bat
+{
+    protected bool Evaluate(const FCk_Handle_Bat& InBat) const override
+    {
+        return InBat.Get_HasTarget() == false && InBat.Get_HasLastKnown();
+    }
+}
+
+// The search is over: it circled the search point for SearchSeconds, or never got there within SearchTravelSeconds more.
+class UMars_SmCondition_Bat_SearchDone : UMars_SmCondition_Bat
+{
+    protected bool Evaluate(const FCk_Handle_Bat& InBat) const override
+    {
+        if (InBat.Get_Phase() != EMars_Bat_Phase::Searching)
+        { return false; }
+
+        const auto SearchSeconds = InBat.Get_Spec().Sensing.SearchSeconds;
+        if (SearchSeconds.IsSet() == false)
+        { return true; }
+
+        const auto Clock = InBat.Get_PhaseClock();
+        const auto Arrived = InBat.Get_Fragment(FMars_Fragment_Bat_SearchBlackboard).ArrivedClock;
+        if (Arrived.IsSet() && Clock - Arrived.GetValue() >= SearchSeconds.GetValue())
+        { return true; }
+
+        return Clock >= SearchSeconds.GetValue() + utils_bat::SearchTravelSeconds;
+    }
+}
+
+// The hurt clocks ran out with a target still held and a retreat distance set: pull back before the next approach.
+class UMars_SmCondition_Bat_ShouldRetreat : UMars_SmCondition_Bat
+{
+    protected bool Evaluate(const FCk_Handle_Bat& InBat) const override
+    {
+        return InBat.Get_IsHurt() == false && InBat.Get_HasTarget() && InBat.Get_Spec().Timing.RetreatDistance.IsSet();
+    }
+}
+
+// The retreat leg arrived, failed or ran RetreatSeconds.
+class UMars_SmCondition_Bat_RetreatDone : UMars_SmCondition_Bat
+{
+    protected bool Evaluate(const FCk_Handle_Bat& InBat) const override
+    {
+        if (InBat.Get_Phase() != EMars_Bat_Phase::Retreating)
+        { return false; }
+
+        return InBat.Get_IsRouteReachedIn(EMars_Bat_Phase::Retreating) || InBat.Get_IsRouteFailedIn(EMars_Bat_Phase::Retreating) ||
+            InBat.Get_PhaseClock() >= InBat.Get_Spec().Timing.RetreatSeconds;
+    }
+}
+
+// A target, a last-known place to look for one, or (with RoostIdleSeconds and flight nodes) it has hung long enough to
+// patrol.
 class UMars_SmCondition_Bat_ShouldWake : UMars_SmCondition_Bat
 {
     protected bool Evaluate(const FCk_Handle_Bat& InBat) const override
     {
-        if (InBat.Get_HasTarget())
+        if (InBat.Get_HasTarget() || InBat.Get_HasLastKnown())
         { return true; }
 
         const auto Spec = InBat.Get_Spec();
@@ -165,6 +231,14 @@ class UMars_SmCondition_Bat_LaunchDoneWithTarget : UMars_SmCondition_Bat_LaunchD
     protected bool Evaluate(const FCk_Handle_Bat& InBat) const override
     {
         return InBat.Get_HasTarget() && Super::Evaluate(InBat);
+    }
+}
+
+class UMars_SmCondition_Bat_LaunchDoneToSearch : UMars_SmCondition_Bat_LaunchDone
+{
+    protected bool Evaluate(const FCk_Handle_Bat& InBat) const override
+    {
+        return InBat.Get_HasTarget() == false && InBat.Get_HasLastKnown() && Super::Evaluate(InBat);
     }
 }
 
@@ -218,6 +292,11 @@ class UMars_SmCondition_Bat_ReturnFailed : UMars_SmCondition_Bat_RouteFailed
 class UMars_SmCondition_Bat_BrakeFailed : UMars_SmCondition_Bat_RouteFailed
 {
     default Phase = EMars_Bat_Phase::Braking;
+}
+
+class UMars_SmCondition_Bat_SearchFailed : UMars_SmCondition_Bat_RouteFailed
+{
+    default Phase = EMars_Bat_Phase::Searching;
 }
 
 // The route this state issued (in Phase) arrived.
@@ -296,6 +375,14 @@ class UMars_SmCondition_Bat_SwoopDoneWithTarget : UMars_SmCondition_Bat
     protected bool Evaluate(const FCk_Handle_Bat& InBat) const override
     {
         return InBat.Get_IsSwoopBusy() == false && InBat.Get_HasTarget();
+    }
+}
+
+class UMars_SmCondition_Bat_SwoopDoneToSearch : UMars_SmCondition_Bat
+{
+    protected bool Evaluate(const FCk_Handle_Bat& InBat) const override
+    {
+        return InBat.Get_IsSwoopBusy() == false && InBat.Get_HasTarget() == false && InBat.Get_HasLastKnown();
     }
 }
 
@@ -418,6 +505,9 @@ class UMars_SmState_Bat_Launch : UCk_SmState_EntityScript
         auto ToApproach = AddTransition(InHandle, UMars_SmState_Bat_Approach);
         AddCondition(ToApproach, UMars_SmCondition_Bat_LaunchDoneWithTarget);
 
+        auto ToSearch = AddTransition(InHandle, UMars_SmState_Bat_Search);
+        AddCondition(ToSearch, UMars_SmCondition_Bat_LaunchDoneToSearch);
+
         auto ToPatrol = AddTransition(InHandle, UMars_SmState_Bat_Patrol);
         AddCondition(ToPatrol, UMars_SmCondition_Bat_LaunchDone);
 
@@ -435,6 +525,9 @@ class UMars_SmState_Bat_Patrol : UCk_SmState_EntityScript
 
         auto ToApproach = AddTransition(InHandle, UMars_SmState_Bat_Approach);
         AddCondition(ToApproach, UMars_SmCondition_Bat_HasTarget);
+
+        auto ToSearch = AddTransition(InHandle, UMars_SmState_Bat_Search);
+        AddCondition(ToSearch, UMars_SmCondition_Bat_ShouldSearch);
 
         auto ToReturn = AddTransition(InHandle, UMars_SmState_Bat_Return);
         AddCondition(ToReturn, UMars_SmCondition_Bat_PatrolDone);
@@ -454,6 +547,9 @@ class UMars_SmState_Bat_Approach : UCk_SmState_EntityScript
 
         auto ToTelegraph = AddTransition(InHandle, UMars_SmState_Bat_Telegraph);
         AddCondition(ToTelegraph, UMars_SmCondition_Bat_CanSwoop);
+
+        auto ToSearch = AddTransition(InHandle, UMars_SmState_Bat_Search);
+        AddCondition(ToSearch, UMars_SmCondition_Bat_ShouldSearch);
 
         auto ToReturn = AddTransition(InHandle, UMars_SmState_Bat_Return);
         AddCondition(ToReturn, UMars_SmCondition_Bat_NoTarget);
@@ -476,6 +572,9 @@ class UMars_SmState_Bat_Telegraph : UCk_SmState_EntityScript
         auto ToApproach = AddTransition(InHandle, UMars_SmState_Bat_Approach);
         AddCondition(ToApproach, UMars_SmCondition_Bat_SwoopDoneWithTarget);
 
+        auto ToSearch = AddTransition(InHandle, UMars_SmState_Bat_Search);
+        AddCondition(ToSearch, UMars_SmCondition_Bat_SwoopDoneToSearch);
+
         auto ToReturn = AddTransition(InHandle, UMars_SmState_Bat_Return);
         AddCondition(ToReturn, UMars_SmCondition_Bat_SwoopDone);
 
@@ -494,6 +593,9 @@ class UMars_SmState_Bat_Swoop : UCk_SmState_EntityScript
         auto ToRecover = AddTransition(InHandle, UMars_SmState_Bat_Recover);
         AddCondition(ToRecover, UMars_SmCondition_Bat_SwoopRecovering);
 
+        auto ToSearch = AddTransition(InHandle, UMars_SmState_Bat_Search);
+        AddCondition(ToSearch, UMars_SmCondition_Bat_SwoopDoneToSearch);
+
         auto ToReturn = AddTransition(InHandle, UMars_SmState_Bat_Return);
         AddCondition(ToReturn, UMars_SmCondition_Bat_SwoopDone);
     }
@@ -510,8 +612,56 @@ class UMars_SmState_Bat_Recover : UCk_SmState_EntityScript
         auto ToApproach = AddTransition(InHandle, UMars_SmState_Bat_Approach);
         AddCondition(ToApproach, UMars_SmCondition_Bat_SwoopDoneWithTarget);
 
+        auto ToSearch = AddTransition(InHandle, UMars_SmState_Bat_Search);
+        AddCondition(ToSearch, UMars_SmCondition_Bat_SwoopDoneToSearch);
+
         auto ToReturn = AddTransition(InHandle, UMars_SmState_Bat_Return);
         AddCondition(ToReturn, UMars_SmCondition_Bat_SwoopDone);
+    }
+}
+
+// Flies to where its target was last sensed and circles there until SearchDone (a target that turns up is approached). A
+// search point that cannot be flown to (a route failure) ends it at once.
+class UMars_SmState_Bat_Search : UCk_SmState_EntityScript
+{
+    UFUNCTION(BlueprintOverride)
+    void DoDefineState(FCk_Handle_SmState_UnderConstruction& InHandle)
+    {
+        auto ToHurt = AddTransition(InHandle, UMars_SmState_Bat_Hurt);
+        AddCondition(ToHurt, UMars_SmCondition_Bat_IsHurt);
+
+        auto ToApproach = AddTransition(InHandle, UMars_SmState_Bat_Approach);
+        AddCondition(ToApproach, UMars_SmCondition_Bat_HasTarget);
+
+        auto ToReturnFailed = AddTransition(InHandle, UMars_SmState_Bat_Return);
+        AddCondition(ToReturnFailed, UMars_SmCondition_Bat_SearchFailed);
+
+        auto ToReturnDone = AddTransition(InHandle, UMars_SmState_Bat_Return);
+        AddCondition(ToReturnDone, UMars_SmCondition_Bat_SearchDone);
+
+        AddTask(InHandle, UMars_SmTask_Bat_Search);
+    }
+}
+
+// Hit-and-run: after a blow it pulls back from its target before approaching again.
+class UMars_SmState_Bat_Retreat : UCk_SmState_EntityScript
+{
+    UFUNCTION(BlueprintOverride)
+    void DoDefineState(FCk_Handle_SmState_UnderConstruction& InHandle)
+    {
+        auto ToHurt = AddTransition(InHandle, UMars_SmState_Bat_Hurt);
+        AddCondition(ToHurt, UMars_SmCondition_Bat_IsHurt);
+
+        auto ToSearch = AddTransition(InHandle, UMars_SmState_Bat_Search);
+        AddCondition(ToSearch, UMars_SmCondition_Bat_ShouldSearch);
+
+        auto ToReturn = AddTransition(InHandle, UMars_SmState_Bat_Return);
+        AddCondition(ToReturn, UMars_SmCondition_Bat_NoTarget);
+
+        auto ToApproach = AddTransition(InHandle, UMars_SmState_Bat_Approach);
+        AddCondition(ToApproach, UMars_SmCondition_Bat_RetreatDone);
+
+        AddTask(InHandle, UMars_SmTask_Bat_Retreat);
     }
 }
 
@@ -525,6 +675,9 @@ class UMars_SmState_Bat_Return : UCk_SmState_EntityScript
 
         auto ToApproach = AddTransition(InHandle, UMars_SmState_Bat_Approach);
         AddCondition(ToApproach, UMars_SmCondition_Bat_HasTarget);
+
+        auto ToSearch = AddTransition(InHandle, UMars_SmState_Bat_Search);
+        AddCondition(ToSearch, UMars_SmCondition_Bat_ShouldSearch);
 
         auto ToHoverLost = AddTransition(InHandle, UMars_SmState_Bat_Hover);
         AddCondition(ToHoverLost, UMars_SmCondition_Bat_PerchLost);
@@ -549,6 +702,9 @@ class UMars_SmState_Bat_Brake : UCk_SmState_EntityScript
 
         auto ToApproach = AddTransition(InHandle, UMars_SmState_Bat_Approach);
         AddCondition(ToApproach, UMars_SmCondition_Bat_HasTarget);
+
+        auto ToSearch = AddTransition(InHandle, UMars_SmState_Bat_Search);
+        AddCondition(ToSearch, UMars_SmCondition_Bat_ShouldSearch);
 
         auto ToHoverLost = AddTransition(InHandle, UMars_SmState_Bat_Hover);
         AddCondition(ToHoverLost, UMars_SmCondition_Bat_PerchLost);
@@ -594,6 +750,9 @@ class UMars_SmState_Bat_Hover : UCk_SmState_EntityScript
         auto ToApproach = AddTransition(InHandle, UMars_SmState_Bat_Approach);
         AddCondition(ToApproach, UMars_SmCondition_Bat_HasTarget);
 
+        auto ToSearch = AddTransition(InHandle, UMars_SmState_Bat_Search);
+        AddCondition(ToSearch, UMars_SmCondition_Bat_ShouldSearch);
+
         auto ToReturn = AddTransition(InHandle, UMars_SmState_Bat_Return);
         AddCondition(ToReturn, UMars_SmCondition_Bat_HoverRetry);
 
@@ -601,11 +760,16 @@ class UMars_SmState_Bat_Hover : UCk_SmState_EntityScript
     }
 }
 
+// Leaves to Retreat (hit-and-run) when a target is still held and the spec retreats, else to Return (which approaches
+// again, or searches, as the kernel's target state says).
 class UMars_SmState_Bat_Hurt : UCk_SmState_EntityScript
 {
     UFUNCTION(BlueprintOverride)
     void DoDefineState(FCk_Handle_SmState_UnderConstruction& InHandle)
     {
+        auto ToRetreat = AddTransition(InHandle, UMars_SmState_Bat_Retreat);
+        AddCondition(ToRetreat, UMars_SmCondition_Bat_ShouldRetreat);
+
         auto ToReturn = AddTransition(InHandle, UMars_SmState_Bat_Return);
         AddCondition(ToReturn, UMars_SmCondition_Bat_NotHurt);
     }
@@ -702,6 +866,77 @@ class UMars_SmTask_Bat_Brake : UMars_SmTask_Bat_Phase
     }
 }
 
+// Pulls back from the target to the retreat point; RetreatDone (arrived, failed or RetreatSeconds) hands it to Approach.
+class UMars_SmTask_Bat_Retreat : UMars_SmTask_Bat_Phase
+{
+    default Phase = EMars_Bat_Phase::Retreating;
+
+    protected void DoEnter(FCk_Handle_Bat& InBat) override
+    {
+        InBat.Request_FlyTo(FMars_Request_Bat_FlyTo(InBat.Get_RetreatPoint(), InBat.Get_Spec().Flight.CruiseSpeed));
+    }
+}
+
+// Flies to the search point (Swoop.Height over where the target was last sensed); once within the standoff circle of it
+// (the blackboard's ArrivedClock) it circles that place the way Approach circles a target (Get_OrbitGoal: an orbit point
+// in a wall falls back to the other way round, then to the search point itself), so a target that stepped round a corner
+// is met from a new bearing. Exit forgets the place (EndSearch), whichever way it left.
+class UMars_SmTask_Bat_Search : UCk_SmTask_EntityScript
+{
+    default _TaskMode = ECk_SmTaskMode::Tick;
+
+    private FCk_Handle_Bat _Bat;
+    private TOptional<FVector> _Issued;
+    private int32 _OrbitSign = 1;
+
+    UFUNCTION(BlueprintOverride)
+    void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
+    {
+        _Bat = ck::Ctx(InHandle).As_Bat();
+        _Issued.Reset();
+        if (ck::Is_NOT_Valid(_Bat))
+        { return; }
+
+        _Bat.Get_Fragment(FMars_Fragment_Bat_SearchBlackboard).ArrivedClock.Reset();
+        _OrbitSign = _Bat.Get_SwoopLedger().Generation % 2 == 0 ? 1 : -1;
+        _Bat.Request_SetPhase(FMars_Request_Bat_SetPhase(EMars_Bat_Phase::Searching));
+    }
+
+    UFUNCTION(BlueprintOverride)
+    ECk_SmTaskResult DoTick(FCk_Handle_SmTask InHandle, FCk_Time InDeltaT, ECk_Sm_NetContext InNetContext)
+    {
+        if (ck::Is_NOT_Valid(_Bat) || _Bat.Get_HasLastKnown() == false || _Bat.Get_Phase() != EMars_Bat_Phase::Searching)
+        { return ECk_SmTaskResult::Running; }
+
+        const auto Spec = _Bat.Get_Spec();
+        const auto Point = _Bat.Get_SearchPoint();
+        auto& Board = _Bat.Get_Fragment(FMars_Fragment_Bat_SearchBlackboard);
+        if (Board.ArrivedClock.IsSet() == false && (Point - _Bat.Get_Location()).Size() <= float64(Spec.Swoop.Standoff) + utils_bat::StrikeTolerance)
+        { Board.ArrivedClock = _Bat.Get_PhaseClock(); }
+
+        const auto Goal = Board.ArrivedClock.IsSet() ? _Bat.Get_OrbitGoal(_Bat.Get_SearchAim(), _OrbitSign, Point) : Point;
+        if (_Issued.IsSet() && (_Issued.GetValue() - Goal).Size() < utils_bat::StrikeRepathDistance)
+        { return ECk_SmTaskResult::Running; }
+
+        _Issued = Goal;
+        _Bat.Request_FlyTo(FMars_Request_Bat_FlyTo(Goal, Spec.Flight.CruiseSpeed));
+        return ECk_SmTaskResult::Running;
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void DoExitTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
+    {
+        if (ck::IsValid(_Bat))
+        {
+            _Bat.Get_Fragment(FMars_Fragment_Bat_SearchBlackboard).ArrivedClock.Reset();
+            _Bat.Request_EndSearch(FMars_Request_Bat_EndSearch());
+        }
+
+        _Bat = FCk_Handle_Bat();
+        _Issued.Reset();
+    }
+}
+
 // Starts the swoop at the target as it enters; the kernel runs it out (or cancels it). The first telegraph of a sortie (since
 // the last Launch) is named Screeching once the kernel has admitted it: presentation only (the AnimBP's Screech), the
 // ledger runs the telegraph unchanged. It is asked for the frame after the admission because the drain applies SetPhase
@@ -775,7 +1010,8 @@ class UMars_SmTask_Bat_Approach : UCk_SmTask_EntityScript
 
         const auto Admission = _Bat.Get_SwoopAdmission(_Bat.Get_Target());
         const auto Circle = Admission == EMars_Bat_SwoopAdmission::Cooldown || Admission == EMars_Bat_SwoopAdmission::NoLineOfSight;
-        const auto Goal = Circle ? _Bat.Get_OrbitPoint(_OrbitSign, utils_bat::OrbitLeadDeg) : _Bat.Get_StrikePoint();
+        const auto Strike = _Bat.Get_StrikePoint();
+        const auto Goal = Circle ? _Bat.Get_OrbitGoal(_Bat.Get_TargetAimPoint(), _OrbitSign, Strike) : Strike;
         if (_Issued.IsSet() && (_Issued.GetValue() - Goal).Size() < utils_bat::StrikeRepathDistance)
         { return ECk_SmTaskResult::Running; }
 

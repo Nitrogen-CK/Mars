@@ -43,8 +43,14 @@ enum EMars_Bat_Phase
     Dead,
     // Presentation only (the AnimBP's Screech): the first telegraph of a sortie, set by the Telegraph task through
     // Request_SetPhase and accepted only while the swoop ledger is Telegraphing. The ledger, its clocks and its outcomes do
-    // not change; the commit names Swooping as usual. Last so the earlier enumerators keep their PhaseIndex.
-    Screeching
+    // not change; the commit names Swooping as usual.
+    Screeching,
+    // Flying to where its target was last sensed and circling there (the control layer's Search).
+    Searching,
+    // Pulling back from its target after a blow, before the next approach (the control layer's Retreat).
+    Retreating
+    // The enumerators from Screeching on were added after the AnimBP was built, in this order, so the earlier ones keep
+    // their PhaseIndex (the AnimBP compares it); utils_bat::Get_AnimPhase folds the later ones onto the states it has.
 }
 
 // The last thing its route did. Every FlyTo ends in exactly one of these (or is superseded by the next FlyTo).
@@ -154,6 +160,12 @@ struct FMars_Bat_Sensing
 
     UPROPERTY()
     float32 SenseInterval = 0.2f;
+
+    // Set: a hostile target that leaves LoseRadius while still within HomeRadius is remembered where it was last sensed
+    // (Get_LastKnown) and the control layer flies there and circles for this long before giving it up. Unset: a target
+    // that leaves is forgotten at once.
+    UPROPERTY()
+    TOptional<float32> SearchSeconds = 3.0f;
 }
 
 // The swoop's clocks (s): Telegraph (cancellable), Swoop (committed), Recover, then the cooldown before the next one.
@@ -265,6 +277,15 @@ struct FMars_Bat_Timing
     // A fall that meets no ground ends (Landed where it is) after this long.
     UPROPERTY()
     float32 MaxFallSeconds = 4.0f;
+
+    // The hurt reaction's second half. Set: once the hurt clocks run out with a target still held, it pulls back to this
+    // far from the aim point (Get_RetreatPoint, along the ground away from the target, Swoop.Height up) before it
+    // approaches again, RetreatSeconds at most. Unset: it approaches again at once.
+    UPROPERTY()
+    TOptional<float32> RetreatDistance = 450.0f;
+
+    UPROPERTY()
+    float32 RetreatSeconds = 1.5f;
 }
 
 struct FMars_Bat_Spec
@@ -319,6 +340,9 @@ mixin FMars_Validation Validate(const FMars_Bat_Sensing& Self)
         utils_bat::Get_IsPositiveFinite(Self.HomeRadius) == false || utils_bat::Get_IsPositiveFinite(Self.SenseInterval) == false)
     { return FMars_Validation(f"Bat sensing has a bad AcquireRadius [{Self.AcquireRadius}], LoseRadius [{Self.LoseRadius}], HomeRadius [{Self.HomeRadius}] or SenseInterval [{Self.SenseInterval}]"); }
 
+    if (Self.SearchSeconds.IsSet() && utils_bat::Get_IsPositiveFinite(Self.SearchSeconds.GetValue()) == false)
+    { return FMars_Validation(f"Bat sensing has a non-positive SearchSeconds [{Self.SearchSeconds.GetValue()}]"); }
+
     return FMars_Validation();
 }
 
@@ -365,6 +389,10 @@ mixin FMars_Validation Validate(const FMars_Bat_Timing& Self)
 
     if (Self.RoostIdleSeconds.IsSet() && utils_bat::Get_IsPositiveFinite(Self.RoostIdleSeconds.GetValue()) == false)
     { return FMars_Validation(f"Bat timing has a non-positive RoostIdleSeconds [{Self.RoostIdleSeconds.GetValue()}]"); }
+
+    if ((Self.RetreatDistance.IsSet() && utils_bat::Get_IsPositiveFinite(Self.RetreatDistance.GetValue()) == false) ||
+        utils_bat::Get_IsPositiveFinite(Self.RetreatSeconds) == false)
+    { return FMars_Validation(f"Bat timing has a non-positive RetreatDistance or RetreatSeconds [{Self.RetreatSeconds}]"); }
 
     return FMars_Validation();
 }
@@ -578,6 +606,12 @@ struct FMars_Fragment_Bat
     UPROPERTY()
     FVector TargetVelocity = FVector::ZeroVector;
 
+    // Where a hostile target it lost by distance (past LoseRadius, still within HomeRadius) was last sensed, with
+    // Sensing.SearchSeconds set: kept until a target is held again, the control layer ends its search (EndSearch) or it
+    // falls. A target that died or turned friendly leaves no memory.
+    UPROPERTY()
+    TOptional<FVector> LastKnown;
+
     // A target it could not fly to (an Approaching route failed) is passed over for IgnoreLeft seconds.
     UPROPERTY()
     FCk_Handle Ignored;
@@ -631,6 +665,14 @@ enum EMars_Bat_PatrolProgress
 {
     Flying,
     Finished
+}
+
+// The control layer's search memory, written only by UMars_SmTask_Bat_Search; no processor reads it.
+struct FMars_Fragment_Bat_SearchBlackboard
+{
+    // The kernel's phase clock when it came within reach of the search point (unset: still on its way).
+    UPROPERTY()
+    TOptional<float32> ArrivedClock;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -737,8 +779,8 @@ struct FMars_Fragment_Bat_Signals
 // Requests
 //--------------------------------------------------------------------------------------------------------------------------
 
-// A behaviour phase (Roosting .. Perching, Hovering). Dropped while a swoop runs, while hurt and once dead or falling:
-// the kernel's own phases win.
+// A behaviour phase (Roosting .. Perching, Hovering, Searching, Retreating). Dropped while a swoop runs, while hurt and
+// once dead or falling: the kernel's own phases win.
 struct FMars_Request_Bat_SetPhase
 {
     UPROPERTY()
@@ -861,8 +903,16 @@ struct FMars_Request_Bat_ReleaseRoost
     bool _Placeholder = false;
 }
 
-// Applied Fall -> TakeHit -> CancelSwoop -> RouteResult -> Hold -> FlyTo -> SetPhase -> StartSwoop -> ReleaseRoost,
-// each kind in arrival order.
+// The control layer is done looking where its target was last sensed: Get_LastKnown is forgotten. Nothing when none is
+// held.
+struct FMars_Request_Bat_EndSearch
+{
+    UPROPERTY()
+    bool _Placeholder = false;
+}
+
+// Applied Fall -> TakeHit -> CancelSwoop -> RouteResult -> Hold -> SetPhase -> FlyTo -> StartSwoop -> ReleaseRoost ->
+// EndSearch, each kind in arrival order.
 struct FMars_Fragment_Bat_Requests
 {
     UPROPERTY()
@@ -891,4 +941,7 @@ struct FMars_Fragment_Bat_Requests
 
     UPROPERTY()
     TArray<FMars_Request_Bat_ReleaseRoost> ReleaseRoostRequests;
+
+    UPROPERTY()
+    TArray<FMars_Request_Bat_EndSearch> EndSearchRequests;
 }
