@@ -1,0 +1,11 @@
+00:01.875  blend            | Read blend: "D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\cellar_bat_r01\source\CellarBat_R01.blend"
+AUDIT BankLeft        cross-frames [] worst {} LOD1 0 LOD2 0 pleat [75, 116] seam None
+CLIP BankLeft        keys [0] bake 2/1e-05 cm 0.0 deg root 0.0
+AUDIT BankRight       cross-frames [] worst {} LOD1 0 LOD2 0 pleat [116, 75] seam None
+CLIP BankRight       keys [0] bake 2/7e-06 cm 0.0 deg root 0.0
+Info: Saved as "CellarBat_R01.blend"
+SAVED D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\cellar_bat_r01\source\CellarBat_R01.blend
+CELLAR_BAT_OK 0.3s
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+
+Blender quit

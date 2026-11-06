@@ -1,0 +1,43 @@
+00:01.718  blend            | Read blend: "D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\cellar_bat_r01\source\CellarBat_R01.blend"
+AUDIT RoostIdle       cross-frames [] worst {} LOD1 0 LOD2 0 pleat [100, 82] seam {'pose_pos_err_cm': 5e-06, 'pose_rot_err_deg': 0.0, 'seam_velocity_change_cm_per_frame': 0.001, 'max_velocity_change_inside_clip_cm_per_frame': 0.0635, 'seam_ok': True}
+CLIP RoostIdle       keys [0] bake 61/9e-06 cm 0.0 deg root 0.0
+AUDIT RoostAlert      cross-frames [] worst {} LOD1 0 LOD2 0 pleat [98, 109] seam None
+CLIP RoostAlert      keys [0, 4, 11, 18] bake 19/1.2e-05 cm 0.0 deg root 0.0
+AUDIT Launch          cross-frames [] worst {} LOD1 0 LOD2 0 pleat [169, 169] seam None
+CLIP Launch          keys [0, 5, 10, 12, 15, 19, 21, 24] bake 25/1.3e-05 cm 0.0 deg root 0.0
+AUDIT Hover           cross-frames [] worst {} LOD1 0 LOD2 0 pleat [105, 105] seam {'pose_pos_err_cm': 5e-06, 'pose_rot_err_deg': 0.0, 'seam_velocity_change_cm_per_frame': 5.8118, 'max_velocity_change_inside_clip_cm_per_frame': 7.4816, 'seam_ok': True}
+CLIP Hover           keys [0, 4, 8, 12] bake 16/1e-05 cm 0.0 deg root 0.0
+AUDIT FlyForward      cross-frames [] worst {} LOD1 0 LOD2 0 pleat [197, 197] seam {'pose_pos_err_cm': 2e-06, 'pose_rot_err_deg': 0.0, 'seam_velocity_change_cm_per_frame': 5.1207, 'max_velocity_change_inside_clip_cm_per_frame': 6.3305, 'seam_ok': True}
+CLIP FlyForward      keys [0, 4, 8, 12] bake 16/1.2e-05 cm 0.0 deg root 0.0
+AUDIT Glide           cross-frames [] worst {} LOD1 0 LOD2 0 pleat [0, 0] seam {'pose_pos_err_cm': 2e-06, 'pose_rot_err_deg': 0.0, 'seam_velocity_change_cm_per_frame': 0.0101, 'max_velocity_change_inside_clip_cm_per_frame': 0.0451, 'seam_ok': True}
+CLIP Glide           keys [0] bake 31/1.2e-05 cm 0.0 deg root 0.0
+AUDIT BankLeft        cross-frames [] worst {} LOD1 0 LOD2 0 pleat [75, 116] seam None
+CLIP BankLeft        keys [0] bake 1/9e-06 cm 0.0 deg root 0.0
+AUDIT BankRight       cross-frames [] worst {} LOD1 0 LOD2 0 pleat [116, 75] seam None
+CLIP BankRight       keys [0] bake 1/7e-06 cm 0.0 deg root 0.0
+AUDIT Brake           cross-frames [] worst {} LOD1 0 LOD2 0 pleat [108, 108] seam None
+CLIP Brake           keys [0, 3, 6, 11, 14, 18] bake 19/1.7e-05 cm 0.0 deg root 0.0
+AUDIT Perch           cross-frames [] worst {} LOD1 0 LOD2 0 pleat [102, 115] seam None
+CLIP Perch           keys [0, 5, 7, 9, 12, 18, 24] bake 25/1.2e-05 cm 0.0 deg root 0.0
+AUDIT Screech         cross-frames [] worst {} LOD1 0 LOD2 0 pleat [114, 114] seam None
+CLIP Screech         keys [0, 4, 9, 16, 21, 24] bake 25/1.3e-05 cm 0.0 deg root 0.0
+AUDIT SwoopTelegraph  cross-frames [] worst {} LOD1 0 LOD2 0 pleat [108, 108] seam None
+CLIP SwoopTelegraph  keys [0, 3, 6, 9, 13, 18] bake 19/1.7e-05 cm 0.0 deg root 0.0
+AUDIT Swoop           cross-frames [] worst {} LOD1 0 LOD2 0 pleat [264, 264] seam None
+CLIP Swoop           keys [0, 2, 5, 9, 14, 18] bake 19/1.3e-05 cm 0.0 deg root 0.0
+AUDIT SwoopRecover    cross-frames [] worst {} LOD1 0 LOD2 0 pleat [117, 117] seam None
+CLIP SwoopRecover    keys [0, 3, 6, 10, 13, 18] bake 19/1.8e-05 cm 0.0 deg root 0.0
+AUDIT Hit             cross-frames [] worst {} LOD1 0 LOD2 0 pleat [130, 121] seam None
+CLIP Hit             keys [0, 2, 6, 12] bake 13/1.1e-05 cm 0.0 deg root 0.0
+AUDIT Stun            cross-frames [] worst {} LOD1 0 LOD2 0 pleat [50, 54] seam {'pose_pos_err_cm': 8e-06, 'pose_rot_err_deg': 0.0, 'seam_velocity_change_cm_per_frame': 0.8209, 'max_velocity_change_inside_clip_cm_per_frame': 1.8681, 'seam_ok': True}
+CLIP Stun            keys [0, 8, 15, 23] bake 31/1.6e-05 cm 0.0 deg root 0.0
+AUDIT DeathFall       cross-frames [] worst {} LOD1 0 LOD2 0 pleat [160, 146] seam None
+CLIP DeathFall       keys [0, 4, 10, 21] bake 22/1.6e-05 cm 0.0 deg root 0.0
+AUDIT DeathLand       cross-frames [] worst {} LOD1 0 LOD2 0 pleat [152, 144] seam None
+CLIP DeathLand       keys [0, 3, 7, 11, 18] bake 19/1.5e-05 cm 0.0 deg root 0.0
+Info: Saved as "CellarBat_R01.blend"
+SAVED D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\cellar_bat_r01\source\CellarBat_R01.blend
+CELLAR_BAT_OK 12.3s
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+
+Blender quit

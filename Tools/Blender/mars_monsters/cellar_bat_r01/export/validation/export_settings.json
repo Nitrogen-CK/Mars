@@ -1,0 +1,166 @@
+{
+ "blender_version": "5.2.2 LTS",
+ "fbx_addon_version": "5.15.0",
+ "scene_unit_settings": {
+  "system": "METRIC",
+  "scale_length": 0.009999999776482582,
+  "length_unit": "CENTIMETERS"
+ },
+ "frame_map": "Blender (x, y, z) BU=cm  ->  Unreal (x, -y, z) cm",
+ "armature_export_name": "Armature (renamed during export only; Unreal drops this root node)",
+ "static_mesh_args": {
+  "use_selection": true,
+  "apply_unit_scale": true,
+  "apply_scale_options": "FBX_SCALE_NONE",
+  "global_scale": 1.0,
+  "axis_forward": "-Z",
+  "axis_up": "Y",
+  "use_mesh_modifiers": false,
+  "mesh_smooth_type": "FACE",
+  "use_triangles": true,
+  "use_tspace": false,
+  "add_leaf_bones": false,
+  "path_mode": "STRIP",
+  "colors_type": "SRGB",
+  "use_custom_props": false,
+  "bake_space_transform": false,
+  "object_types": [
+   "MESH"
+  ],
+  "bake_anim": false
+ },
+ "bind_args": {
+  "use_selection": true,
+  "apply_unit_scale": true,
+  "apply_scale_options": "FBX_SCALE_NONE",
+  "global_scale": 1.0,
+  "axis_forward": "-Z",
+  "axis_up": "Y",
+  "use_mesh_modifiers": false,
+  "mesh_smooth_type": "FACE",
+  "use_triangles": true,
+  "use_tspace": false,
+  "add_leaf_bones": false,
+  "path_mode": "STRIP",
+  "colors_type": "SRGB",
+  "use_custom_props": false,
+  "bake_space_transform": false,
+  "object_types": [
+   "ARMATURE",
+   "MESH"
+  ],
+  "primary_bone_axis": "Y",
+  "secondary_bone_axis": "X",
+  "use_armature_deform_only": true,
+  "armature_nodetype": "NULL",
+  "bake_anim": false
+ },
+ "clip_args": {
+  "use_selection": true,
+  "apply_unit_scale": true,
+  "apply_scale_options": "FBX_SCALE_NONE",
+  "global_scale": 1.0,
+  "axis_forward": "-Z",
+  "axis_up": "Y",
+  "use_mesh_modifiers": false,
+  "mesh_smooth_type": "FACE",
+  "use_triangles": true,
+  "use_tspace": false,
+  "add_leaf_bones": false,
+  "path_mode": "STRIP",
+  "colors_type": "SRGB",
+  "use_custom_props": false,
+  "bake_space_transform": false,
+  "object_types": [
+   "ARMATURE",
+   "MESH"
+  ],
+  "primary_bone_axis": "Y",
+  "secondary_bone_axis": "X",
+  "use_armature_deform_only": true,
+  "armature_nodetype": "NULL",
+  "bake_anim": true,
+  "bake_anim_use_all_bones": true,
+  "bake_anim_use_nla_strips": false,
+  "bake_anim_use_all_actions": false,
+  "bake_anim_force_startend_keying": true,
+  "bake_anim_step": 1.0,
+  "bake_anim_simplify_factor": 0.0
+ },
+ "clip_action": "CellarBat_R01_FlapTest",
+ "clip_source_control_action": "CellarBat_R01_FlapTest_Ctl",
+ "actions_in_file_not_exported": [
+  "CellarBat_R01_FlapTest_Ctl",
+  "CellarBat_R01_Pose_BankLeft",
+  "CellarBat_R01_Pose_BankRight",
+  "CellarBat_R01_Pose_Down",
+  "CellarBat_R01_Pose_EarsFlat",
+  "CellarBat_R01_Pose_HalfFold",
+  "CellarBat_R01_Pose_Hang",
+  "CellarBat_R01_Pose_Recover",
+  "CellarBat_R01_Pose_Screech",
+  "CellarBat_R01_Pose_Spread",
+  "CellarBat_R01_Pose_Up",
+  "CellarBat_R01_Pose_Wrap"
+ ],
+ "vertex_colour": "corner attribute `Col` (BYTE_COLOR) exported with colors_type=SRGB: RGB = albedo palette as sRGB bytes, A = cavity/occlusion (linear 0..1)",
+ "uv0": "UV layer `UV0` (lightmap-packed, non-overlapping)",
+ "morph_targets": "none (no corrective shape keys were needed)",
+ "files": {
+  "cube": {
+   "path": "D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\cellar_bat_r01\\export\\validation\\Cube10_Mars_SM.fbx",
+   "bytes": 12188,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "FBXHeaderVersion": 1003,
+    "FBXVersion": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "lod0": {
+   "path": "D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\cellar_bat_r01\\export\\CellarBat_R01_Mars_SK.fbx",
+   "bytes": 422812,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "FBXHeaderVersion": 1003,
+    "FBXVersion": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "lod1": {
+   "path": "D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\cellar_bat_r01\\export\\CellarBat_R01_LOD1_Mars_SK.fbx",
+   "bytes": 230940,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "FBXHeaderVersion": 1003,
+    "FBXVersion": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "lod2": {
+   "path": "D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\cellar_bat_r01\\export\\CellarBat_R01_LOD2_Mars_SK.fbx",
+   "bytes": 163164,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "FBXHeaderVersion": 1003,
+    "FBXVersion": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "clip": {
+   "path": "D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\cellar_bat_r01\\export\\validation\\CellarBat_R01_FlapTest_Mars_ANIM.fbx",
+   "bytes": 698764,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "FBXHeaderVersion": 1003,
+    "FBXVersion": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  }
+ }
+}

@@ -1,0 +1,2873 @@
+{
+ "note": "pre-restart readbacks copied from export/unreal_readback_final.json at 01:10 UTC (editor pid 28740, died 01:09:29)",
+ "readback_a": {
+  "stage": "readback",
+  "preflight": {
+   "project": "D:/Repositories/CkRepos/Orion/Mars.uproject",
+   "pie": false,
+   "engine": "5.7.4-0+UE5",
+   "ok": true
+  },
+  "material_readback": {
+   "master": {
+    "path": "/Game/ArtCandidates/CellarBat/R01/Materials/CellarBat_R01_Mars_M.CellarBat_R01_Mars_M",
+    "used_with_skeletal_mesh": true,
+    "two_sided": false,
+    "expressions": 13,
+    "scalar_params": [
+     "CavityFloor",
+     "EmissiveIntensity",
+     "Roughness",
+     "Specular",
+     "VertexColorGamma"
+    ],
+    "vector_params": [
+     "EmissiveColor"
+    ]
+   },
+   "instances": {
+    "Body": {
+     "parent": "CellarBat_R01_Mars_M",
+     "Roughness": 0.85,
+     "Specular": 0.25,
+     "EmissiveIntensity": 0.0,
+     "CavityFloor": 0.45,
+     "VertexColorGamma": 2.2,
+     "EmissiveColor": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "two_sided_override": [
+      false,
+      false
+     ]
+    },
+    "Membrane": {
+     "parent": "CellarBat_R01_Mars_M",
+     "Roughness": 0.8,
+     "Specular": 0.25,
+     "EmissiveIntensity": 0.0,
+     "CavityFloor": 0.45,
+     "VertexColorGamma": 2.2,
+     "EmissiveColor": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "two_sided_override": [
+      true,
+      true
+     ]
+    },
+    "Eyes": {
+     "parent": "CellarBat_R01_Mars_M",
+     "Roughness": 0.4,
+     "Specular": 0.5,
+     "EmissiveIntensity": 3.0,
+     "CavityFloor": 0.45,
+     "VertexColorGamma": 2.2,
+     "EmissiveColor": [
+      1.0,
+      0.55834,
+      0.16203
+     ],
+     "two_sided_override": [
+      false,
+      false
+     ]
+    }
+   }
+  },
+  "mesh_readback": {
+   "checks": {
+    "dedicated_skeleton": [
+     true,
+     "/Game/ArtCandidates/CellarBat/R01/Meshes/CellarBat_R01_Mars_SKEL.CellarBat_R01_Mars_SKEL"
+    ],
+    "span_75": [
+     true,
+     75.0
+    ],
+    "bind_bounds_match_blender": [
+     true,
+     0.0004
+    ],
+    "nose_at_plus_x": [
+     true,
+     8.3526
+    ],
+    "bounds_contain_pose_union": [
+     true,
+     {
+      "min": [
+       -24.8892,
+       -43.5,
+       -26.3389
+      ],
+      "max": [
+       33.3526,
+       43.5,
+       31.023
+      ]
+     }
+    ],
+    "bone_count_42": [
+     true,
+     42
+    ],
+    "bone_order_matches_source": [
+     true,
+     null
+    ],
+    "parents_exact": [
+     true,
+     []
+    ],
+    "root_identity": [
+     true,
+     {
+      "t": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "q": [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "s": [
+       1.0,
+       1.0,
+       1.0
+      ]
+     }
+    ],
+    "bone_scales_1": [
+     true,
+     2e-07
+    ],
+    "bone_heads_match_blender": [
+     true,
+     6e-05
+    ],
+    "handedness_upperarm_r_plus_y": [
+     true,
+     [
+      5.0,
+      -5.0
+     ]
+    ],
+    "slots_in_order": [
+     true,
+     [
+      "Body",
+      "Membrane",
+      "Eyes"
+     ]
+    ],
+    "slots_bound_to_instances": [
+     true,
+     [
+      "CellarBat_R01_Body_Mars_MI",
+      "CellarBat_R01_Membrane_Mars_MI",
+      "CellarBat_R01_Eyes_Mars_MI"
+     ]
+    ],
+    "lod_count_3": [
+     true,
+     3
+    ],
+    "morph_count_0": [
+     true,
+     []
+    ],
+    "sockets": [
+     true,
+     [
+      "Mouth",
+      "Perch",
+      "RoostFootL",
+      "RoostFootR"
+     ]
+    ],
+    "physics_asset_assigned": [
+     true,
+     "/Game/ArtCandidates/CellarBat/R01/Physics/CellarBat_R01_Mars_PHYS.CellarBat_R01_Mars_PHYS"
+    ],
+    "physics_torso_bodies_collide": [
+     true,
+     {
+      "spine": {
+       "type": "PHYS_TYPE_DEFAULT",
+       "collision": "QUERY_AND_PHYSICS"
+      },
+      "pelvis": {
+       "type": "PHYS_TYPE_DEFAULT",
+       "collision": "QUERY_AND_PHYSICS"
+      }
+     }
+    ],
+    "physics_extra_bodies_off_or_absent": [
+     true,
+     {
+      "wrist_r": {
+       "type": "PHYS_TYPE_KINEMATIC",
+       "collision": "NO_COLLISION"
+      },
+      "wrist_l": {
+       "type": "PHYS_TYPE_KINEMATIC",
+       "collision": "NO_COLLISION"
+      },
+      "head": {
+       "type": "PHYS_TYPE_KINEMATIC",
+       "collision": "NO_COLLISION"
+      }
+     }
+    ],
+    "physics_no_finger_bodies": [
+     true,
+     [
+      "head",
+      "pelvis",
+      "spine",
+      "wrist_l",
+      "wrist_r"
+     ]
+    ],
+    "import_normals_and_vcolor": [
+     true,
+     {
+      "normal_import_method": "<FBXNormalImportMethod.FBXNIM_IMPORT_NORMALS: 1>",
+      "vertex_color_import_option": "<VertexColorImportOption.REPLACE: 0>",
+      "import_morph_targets": "True",
+      "convert_scene": "True",
+      "force_front_x_axis": "False",
+      "convert_scene_unit": "False",
+      "import_uniform_scale": "1.0",
+      "use_t0_as_ref_pose": "False",
+      "source_files": [
+       "D:/Repositories/CkRepos/Orion/Tools/Blender/mars_monsters/cellar_bat_r01/export/CellarBat_R01_Mars_SK.fbx"
+      ]
+     }
+    ]
+   },
+   "mesh": "/Game/ArtCandidates/CellarBat/R01/Meshes/CellarBat_R01_Mars_SK.CellarBat_R01_Mars_SK",
+   "skeleton": "/Game/ArtCandidates/CellarBat/R01/Meshes/CellarBat_R01_Mars_SKEL.CellarBat_R01_Mars_SKEL",
+   "imported_bounds": {
+    "min": [
+     -11.8892,
+     -37.5,
+     -16.3389
+    ],
+    "max": [
+     8.3526,
+     37.5,
+     17.023
+    ],
+    "span_y": 75.0
+   },
+   "bounds_with_extension": {
+    "origin": [
+     4.2317,
+     -0.0,
+     2.3421
+    ],
+    "extent": [
+     29.1209,
+     43.5,
+     28.6809
+    ],
+    "positive_extension": [
+     25.0,
+     6.0,
+     14.0
+    ],
+    "negative_extension": [
+     13.0,
+     6.0,
+     10.0
+    ]
+   },
+   "parents_source": "SkeletonModifier.get_parent_name (read only, never committed)",
+   "bone_order": [
+    "root",
+    "pelvis",
+    "spine",
+    "neck",
+    "head",
+    "jaw",
+    "ear_base_l",
+    "ear_tip_l",
+    "ear_base_r",
+    "ear_tip_r",
+    "upperarm_l",
+    "forearm_l",
+    "wrist_l",
+    "finger_01a_l",
+    "finger_01b_l",
+    "finger_02a_l",
+    "finger_02b_l",
+    "finger_03a_l",
+    "finger_03b_l",
+    "finger_04a_l",
+    "finger_04b_l",
+    "thumb_a_l",
+    "thumb_b_l",
+    "upperarm_r",
+    "forearm_r",
+    "wrist_r",
+    "finger_01a_r",
+    "finger_01b_r",
+    "finger_02a_r",
+    "finger_02b_r",
+    "finger_03a_r",
+    "finger_03b_r",
+    "finger_04a_r",
+    "finger_04b_r",
+    "thumb_a_r",
+    "thumb_b_r",
+    "thigh_l",
+    "shin_l",
+    "foot_l",
+    "thigh_r",
+    "shin_r",
+    "foot_r"
+   ],
+   "slots": [
+    [
+     "Body",
+     "CellarBat_R01_Body_Mars_MI"
+    ],
+    [
+     "Membrane",
+     "CellarBat_R01_Membrane_Mars_MI"
+    ],
+    [
+     "Eyes",
+     "CellarBat_R01_Eyes_Mars_MI"
+    ]
+   ],
+   "lods": {
+    "0": {
+     "render_verts": 19446,
+     "sections": 3
+    },
+    "1": {
+     "render_verts": 7944,
+     "sections": 3
+    },
+    "2": {
+     "render_verts": 3606,
+     "sections": 3
+    }
+   },
+   "sockets": {
+    "Mouth": {
+     "bone": "head",
+     "relative_cm": [
+      -4.4553,
+      1.0843,
+      0.0
+     ],
+     "component_cm": [
+      7.703,
+      0.0,
+      3.749
+     ],
+     "target_cm": [
+      7.703,
+      0.0,
+      3.749
+     ],
+     "err_cm": 0.0
+    },
+    "Perch": {
+     "bone": "pelvis",
+     "relative_cm": [
+      3.1148,
+      -18.7311,
+      0.0
+     ],
+     "component_cm": [
+      -6.6681,
+      0.0,
+      -17.779
+     ],
+     "target_cm": [
+      -6.668,
+      0.0,
+      -17.779
+     ],
+     "err_cm": 0.0001
+    },
+    "RoostFootL": {
+     "bone": "foot_l",
+     "relative_cm": [
+      0.0,
+      -2.4,
+      0.0
+     ],
+     "component_cm": [
+      -4.3882,
+      -5.3923,
+      -15.4025
+     ],
+     "target_cm": [
+      -4.3882,
+      -5.3923,
+      -15.4025
+     ],
+     "err_cm": 0.0
+    },
+    "RoostFootR": {
+     "bone": "foot_r",
+     "relative_cm": [
+      0.0,
+      -2.4,
+      0.0
+     ],
+     "component_cm": [
+      -4.3882,
+      5.3923,
+      -15.4025
+     ],
+     "target_cm": [
+      -4.3882,
+      5.3923,
+      -15.4025
+     ],
+     "err_cm": 0.0
+    }
+   },
+   "physics_asset": "/Game/ArtCandidates/CellarBat/R01/Physics/CellarBat_R01_Mars_PHYS.CellarBat_R01_Mars_PHYS",
+   "physics_bodies": {
+    "wrist_r": [
+     {
+      "center": [
+       -8.147,
+       -6.302,
+       0.716
+      ],
+      "rotation": "<Struct 'Rotator' (0x000001B3FE8BCA38) {pitch: 0.000000, yaw: -111.199197, roll: -87.527060}>",
+      "radius": 10.844,
+      "length": 15.89
+     }
+    ],
+    "wrist_l": [
+     {
+      "center": [
+       -8.147,
+       -6.302,
+       -0.716
+      ],
+      "rotation": "<Struct 'Rotator' (0x000001B3FE8BA0F8) {pitch: 0.000000, yaw: 68.800807, roll: -87.527073}>",
+      "radius": 10.844,
+      "length": 15.89
+     }
+    ],
+    "head": [
+     {
+      "center": [
+       0.778,
+       -2.338,
+       0.026
+      ],
+      "rotation": "<Struct 'Rotator' (0x000001B3FE8BFD78) {pitch: 0.000000, yaw: -149.799829, roll: -89.839273}>",
+      "radius": 8.757,
+      "length": 9.227
+     }
+    ],
+    "spine": [
+     {
+      "center": [
+       -0.0,
+       1.45,
+       0.0
+      ],
+      "rotation": "<Struct 'Rotator' (0x000001B3FE8B3E38) {pitch: -0.000000, yaw: -0.000017, roll: -90.000004}>",
+      "radius": 6.0,
+      "length": 6.0
+     }
+    ],
+    "pelvis": [
+     {
+      "center": [
+       -0.002,
+       -5.197,
+       0.0
+      ],
+      "rotation": "<Struct 'Rotator' (0x000001B3FE8B4478) {pitch: 0.000000, yaw: 179.999983, roll: -90.000004}>",
+      "radius": 4.5,
+      "length": 1.0
+     }
+    ]
+   },
+   "physics_collision": {
+    "wrist_r": {
+     "type": "PHYS_TYPE_KINEMATIC",
+     "collision": "NO_COLLISION"
+    },
+    "wrist_l": {
+     "type": "PHYS_TYPE_KINEMATIC",
+     "collision": "NO_COLLISION"
+    },
+    "head": {
+     "type": "PHYS_TYPE_KINEMATIC",
+     "collision": "NO_COLLISION"
+    },
+    "spine": {
+     "type": "PHYS_TYPE_DEFAULT",
+     "collision": "QUERY_AND_PHYSICS"
+    },
+    "pelvis": {
+     "type": "PHYS_TYPE_DEFAULT",
+     "collision": "QUERY_AND_PHYSICS"
+    }
+   },
+   "physics_clean_target_met": false,
+   "import_data": {
+    "normal_import_method": "<FBXNormalImportMethod.FBXNIM_IMPORT_NORMALS: 1>",
+    "vertex_color_import_option": "<VertexColorImportOption.REPLACE: 0>",
+    "import_morph_targets": "True",
+    "convert_scene": "True",
+    "force_front_x_axis": "False",
+    "convert_scene_unit": "False",
+    "import_uniform_scale": "1.0",
+    "use_t0_as_ref_pose": "False",
+    "source_files": [
+     "D:/Repositories/CkRepos/Orion/Tools/Blender/mars_monsters/cellar_bat_r01/export/CellarBat_R01_Mars_SK.fbx"
+    ]
+   },
+   "pass": true
+  },
+  "owned_assets": [
+   "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Brake_Mars_ANIM",
+   "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_DeathFall_Mars_ANIM",
+   "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_DeathLand_Mars_ANIM",
+   "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_FlyForward_Mars_ANIM",
+   "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Glide_Mars_ANIM",
+   "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Hit_Mars_ANIM",
+   "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Hover_Mars_ANIM",
+   "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Launch_Mars_ANIM",
+   "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Perch_Mars_ANIM",
+   "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_RoostAlert_Mars_ANIM",
+   "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_RoostIdle_Mars_ANIM",
+   "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Screech_Mars_ANIM",
+   "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Stun_Mars_ANIM",
+   "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_SwoopRecover_Mars_ANIM",
+   "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_SwoopTelegraph_Mars_ANIM",
+   "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Swoop_Mars_ANIM",
+   "/Game/ArtCandidates/CellarBat/R01/Materials/CellarBat_R01_Body_Mars_MI",
+   "/Game/ArtCandidates/CellarBat/R01/Materials/CellarBat_R01_Eyes_Mars_MI",
+   "/Game/ArtCandidates/CellarBat/R01/Materials/CellarBat_R01_Mars_M",
+   "/Game/ArtCandidates/CellarBat/R01/Materials/CellarBat_R01_Membrane_Mars_MI",
+   "/Game/ArtCandidates/CellarBat/R01/Meshes/CellarBat_R01_Mars_SK",
+   "/Game/ArtCandidates/CellarBat/R01/Meshes/CellarBat_R01_Mars_SKEL",
+   "/Game/ArtCandidates/CellarBat/R01/Physics/CellarBat_R01_Mars_PHYS"
+  ],
+  "seconds": 0.04
+ },
+ "part_b_pass1": {
+  "stage": "part_b",
+  "preflight": {
+   "project": "D:/Repositories/CkRepos/Orion/Mars.uproject",
+   "pie": false,
+   "engine": "5.7.4-0+UE5",
+   "ok": true
+  },
+  "error": null,
+  "expected_source": "export/CellarBat_R01_Manifest.json",
+  "collisions_outside_root": {},
+  "import": {
+   "clips": {
+    "BankLeft": null,
+    "BankRight": null,
+    "Brake": {
+     "path": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Brake_Mars_ANIM.CellarBat_R01_Brake_Mars_ANIM",
+     "notifies": []
+    },
+    "DeathFall": {
+     "path": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_DeathFall_Mars_ANIM.CellarBat_R01_DeathFall_Mars_ANIM",
+     "notifies": []
+    },
+    "DeathLand": {
+     "path": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_DeathLand_Mars_ANIM.CellarBat_R01_DeathLand_Mars_ANIM",
+     "notifies": []
+    },
+    "FlyForward": {
+     "path": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_FlyForward_Mars_ANIM.CellarBat_R01_FlyForward_Mars_ANIM",
+     "notifies": [
+      [
+       "Wingbeat_Silent",
+       6,
+       "AnimNotify_PlaySound"
+      ]
+     ]
+    },
+    "Glide": {
+     "path": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Glide_Mars_ANIM.CellarBat_R01_Glide_Mars_ANIM",
+     "notifies": []
+    },
+    "Hit": {
+     "path": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Hit_Mars_ANIM.CellarBat_R01_Hit_Mars_ANIM",
+     "notifies": []
+    },
+    "Hover": {
+     "path": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Hover_Mars_ANIM.CellarBat_R01_Hover_Mars_ANIM",
+     "notifies": [
+      [
+       "Wingbeat_Silent",
+       6,
+       "AnimNotify_PlaySound"
+      ]
+     ]
+    },
+    "Launch": {
+     "path": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Launch_Mars_ANIM.CellarBat_R01_Launch_Mars_ANIM",
+     "notifies": [
+      [
+       "ReleaseContact_Silent",
+       6,
+       "AnimNotify_PlaySound"
+      ]
+     ]
+    },
+    "Perch": {
+     "path": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Perch_Mars_ANIM.CellarBat_R01_Perch_Mars_ANIM",
+     "notifies": [
+      [
+       "FootContact_Silent",
+       12,
+       "AnimNotify_PlaySound"
+      ]
+     ]
+    },
+    "RoostAlert": {
+     "path": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_RoostAlert_Mars_ANIM.CellarBat_R01_RoostAlert_Mars_ANIM",
+     "notifies": []
+    },
+    "RoostIdle": {
+     "path": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_RoostIdle_Mars_ANIM.CellarBat_R01_RoostIdle_Mars_ANIM",
+     "notifies": []
+    },
+    "Screech": {
+     "path": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Screech_Mars_ANIM.CellarBat_R01_Screech_Mars_ANIM",
+     "notifies": [
+      [
+       "ScreechSound_Silent",
+       9,
+       "AnimNotify_PlaySound"
+      ]
+     ]
+    },
+    "Stun": {
+     "path": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Stun_Mars_ANIM.CellarBat_R01_Stun_Mars_ANIM",
+     "notifies": []
+    },
+    "Swoop": {
+     "path": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Swoop_Mars_ANIM.CellarBat_R01_Swoop_Mars_ANIM",
+     "notifies": [
+      [
+       "SwoopContact_Silent",
+       9,
+       "AnimNotify_PlaySound"
+      ]
+     ]
+    },
+    "SwoopRecover": {
+     "path": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_SwoopRecover_Mars_ANIM.CellarBat_R01_SwoopRecover_Mars_ANIM",
+     "notifies": []
+    },
+    "SwoopTelegraph": {
+     "path": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_SwoopTelegraph_Mars_ANIM.CellarBat_R01_SwoopTelegraph_Mars_ANIM",
+     "notifies": []
+    }
+   },
+   "missing": [],
+   "interchange_flag_before_after": [
+    true,
+    true
+   ]
+  },
+  "saved": [
+   "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_RoostIdle_Mars_ANIM.CellarBat_R01_RoostIdle_Mars_ANIM",
+   "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_RoostAlert_Mars_ANIM.CellarBat_R01_RoostAlert_Mars_ANIM",
+   "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Launch_Mars_ANIM.CellarBat_R01_Launch_Mars_ANIM",
+   "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Hover_Mars_ANIM.CellarBat_R01_Hover_Mars_ANIM",
+   "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_FlyForward_Mars_ANIM.CellarBat_R01_FlyForward_Mars_ANIM",
+   "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Glide_Mars_ANIM.CellarBat_R01_Glide_Mars_ANIM",
+   "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Brake_Mars_ANIM.CellarBat_R01_Brake_Mars_ANIM",
+   "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Perch_Mars_ANIM.CellarBat_R01_Perch_Mars_ANIM",
+   "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Screech_Mars_ANIM.CellarBat_R01_Screech_Mars_ANIM",
+   "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_SwoopTelegraph_Mars_ANIM.CellarBat_R01_SwoopTelegraph_Mars_ANIM",
+   "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Swoop_Mars_ANIM.CellarBat_R01_Swoop_Mars_ANIM",
+   "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_SwoopRecover_Mars_ANIM.CellarBat_R01_SwoopRecover_Mars_ANIM",
+   "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Hit_Mars_ANIM.CellarBat_R01_Hit_Mars_ANIM",
+   "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Stun_Mars_ANIM.CellarBat_R01_Stun_Mars_ANIM",
+   "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_DeathFall_Mars_ANIM.CellarBat_R01_DeathFall_Mars_ANIM",
+   "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_DeathLand_Mars_ANIM.CellarBat_R01_DeathLand_Mars_ANIM"
+  ],
+  "owned_assets": [
+   "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Brake_Mars_ANIM",
+   "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_DeathFall_Mars_ANIM",
+   "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_DeathLand_Mars_ANIM",
+   "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_FlyForward_Mars_ANIM",
+   "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Glide_Mars_ANIM",
+   "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Hit_Mars_ANIM",
+   "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Hover_Mars_ANIM",
+   "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Launch_Mars_ANIM",
+   "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Perch_Mars_ANIM",
+   "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_RoostAlert_Mars_ANIM",
+   "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_RoostIdle_Mars_ANIM",
+   "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Screech_Mars_ANIM",
+   "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Stun_Mars_ANIM",
+   "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_SwoopRecover_Mars_ANIM",
+   "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_SwoopTelegraph_Mars_ANIM",
+   "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Swoop_Mars_ANIM",
+   "/Game/ArtCandidates/CellarBat/R01/Materials/CellarBat_R01_Body_Mars_MI",
+   "/Game/ArtCandidates/CellarBat/R01/Materials/CellarBat_R01_Eyes_Mars_MI",
+   "/Game/ArtCandidates/CellarBat/R01/Materials/CellarBat_R01_Mars_M",
+   "/Game/ArtCandidates/CellarBat/R01/Materials/CellarBat_R01_Membrane_Mars_MI",
+   "/Game/ArtCandidates/CellarBat/R01/Meshes/CellarBat_R01_Mars_SK",
+   "/Game/ArtCandidates/CellarBat/R01/Meshes/CellarBat_R01_Mars_SKEL",
+   "/Game/ArtCandidates/CellarBat/R01/Physics/CellarBat_R01_Mars_PHYS"
+  ],
+  "clip_readback": {
+   "clips": {
+    "BankLeft": null,
+    "BankRight": null,
+    "Brake": {
+     "num_frames": 18,
+     "length_s": 0.6,
+     "num_keys": 19,
+     "track_count": 42,
+     "skeleton": "/Game/ArtCandidates/CellarBat/R01/Meshes/CellarBat_R01_Mars_SKEL.CellarBat_R01_Mars_SKEL",
+     "loop": false,
+     "root_motion": false,
+     "rate_scale": 1.0,
+     "additive": [
+      "<AdditiveAnimationType.AAT_NONE: 0>",
+      "<AdditiveBasePoseType.ABPT_NONE: 0>",
+      null,
+      0
+     ],
+     "notifies": [],
+     "root_samples": [
+      {
+       "f": 0,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      },
+      {
+       "f": 4,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      },
+      {
+       "f": 9,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      },
+      {
+       "f": 14,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      },
+      {
+       "f": 18,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      }
+     ],
+     "loop_seam_max_delta": null,
+     "ok": {
+      "frames": true,
+      "length": true,
+      "tracks_42": true,
+      "skeleton": true,
+      "root_stationary": true,
+      "loop_flag": true,
+      "no_root_motion": true,
+      "seam": true,
+      "notifies": true
+     }
+    },
+    "DeathFall": {
+     "num_frames": 21,
+     "length_s": 0.7,
+     "num_keys": 22,
+     "track_count": 42,
+     "skeleton": "/Game/ArtCandidates/CellarBat/R01/Meshes/CellarBat_R01_Mars_SKEL.CellarBat_R01_Mars_SKEL",
+     "loop": false,
+     "root_motion": false,
+     "rate_scale": 1.0,
+     "additive": [
+      "<AdditiveAnimationType.AAT_NONE: 0>",
+      "<AdditiveBasePoseType.ABPT_NONE: 0>",
+      null,
+      0
+     ],
+     "notifies": [],
+     "root_samples": [
+      {
+       "f": 0,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      },
+      {
+       "f": 5,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      },
+      {
+       "f": 10,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      },
+      {
+       "f": 16,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      },
+      {
+       "f": 21,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      }
+     ],
+     "loop_seam_max_delta": null,
+     "ok": {
+      "frames": true,
+      "length": true,
+      "tracks_42": true,
+      "skeleton": true,
+      "root_stationary": true,
+      "loop_flag": true,
+      "no_root_motion": true,
+      "seam": true,
+      "notifies": true
+     }
+    },
+    "DeathLand": {
+     "num_frames": 18,
+     "length_s": 0.6,
+     "num_keys": 19,
+     "track_count": 42,
+     "skeleton": "/Game/ArtCandidates/CellarBat/R01/Meshes/CellarBat_R01_Mars_SKEL.CellarBat_R01_Mars_SKEL",
+     "loop": false,
+     "root_motion": false,
+     "rate_scale": 1.0,
+     "additive": [
+      "<AdditiveAnimationType.AAT_NONE: 0>",
+      "<AdditiveBasePoseType.ABPT_NONE: 0>",
+      null,
+      0
+     ],
+     "notifies": [],
+     "root_samples": [
+      {
+       "f": 0,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      },
+      {
+       "f": 4,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      },
+      {
+       "f": 9,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      },
+      {
+       "f": 14,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      },
+      {
+       "f": 18,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      }
+     ],
+     "loop_seam_max_delta": null,
+     "ok": {
+      "frames": true,
+      "length": true,
+      "tracks_42": true,
+      "skeleton": true,
+      "root_stationary": true,
+      "loop_flag": true,
+      "no_root_motion": true,
+      "seam": true,
+      "notifies": true
+     }
+    },
+    "FlyForward": {
+     "num_frames": 15,
+     "length_s": 0.5,
+     "num_keys": 16,
+     "track_count": 42,
+     "skeleton": "/Game/ArtCandidates/CellarBat/R01/Meshes/CellarBat_R01_Mars_SKEL.CellarBat_R01_Mars_SKEL",
+     "loop": true,
+     "root_motion": false,
+     "rate_scale": 1.0,
+     "additive": [
+      "<AdditiveAnimationType.AAT_NONE: 0>",
+      "<AdditiveBasePoseType.ABPT_NONE: 0>",
+      null,
+      0
+     ],
+     "notifies": [
+      [
+       "Wingbeat_Silent",
+       0.2,
+       "AnimNotify_PlaySound",
+       null
+      ]
+     ],
+     "root_samples": [
+      {
+       "f": 0,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      },
+      {
+       "f": 4,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      },
+      {
+       "f": 8,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      },
+      {
+       "f": 11,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      },
+      {
+       "f": 15,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      }
+     ],
+     "loop_seam_max_delta": 1e-06,
+     "ok": {
+      "frames": true,
+      "length": true,
+      "tracks_42": true,
+      "skeleton": true,
+      "root_stationary": true,
+      "loop_flag": true,
+      "no_root_motion": true,
+      "seam": true,
+      "notifies": true
+     }
+    },
+    "Glide": {
+     "num_frames": 30,
+     "length_s": 1.0,
+     "num_keys": 31,
+     "track_count": 42,
+     "skeleton": "/Game/ArtCandidates/CellarBat/R01/Meshes/CellarBat_R01_Mars_SKEL.CellarBat_R01_Mars_SKEL",
+     "loop": true,
+     "root_motion": false,
+     "rate_scale": 1.0,
+     "additive": [
+      "<AdditiveAnimationType.AAT_NONE: 0>",
+      "<AdditiveBasePoseType.ABPT_NONE: 0>",
+      null,
+      0
+     ],
+     "notifies": [],
+     "root_samples": [
+      {
+       "f": 0,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      },
+      {
+       "f": 8,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      },
+      {
+       "f": 15,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      },
+      {
+       "f": 22,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      },
+      {
+       "f": 30,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      }
+     ],
+     "loop_seam_max_delta": 0.0,
+     "ok": {
+      "frames": true,
+      "length": true,
+      "tracks_42": true,
+      "skeleton": true,
+      "root_stationary": true,
+      "loop_flag": true,
+      "no_root_motion": true,
+      "seam": true,
+      "notifies": true
+     }
+    },
+    "Hit": {
+     "num_frames": 12,
+     "length_s": 0.4,
+     "num_keys": 13,
+     "track_count": 42,
+     "skeleton": "/Game/ArtCandidates/CellarBat/R01/Meshes/CellarBat_R01_Mars_SKEL.CellarBat_R01_Mars_SKEL",
+     "loop": false,
+     "root_motion": false,
+     "rate_scale": 1.0,
+     "additive": [
+      "<AdditiveAnimationType.AAT_NONE: 0>",
+      "<AdditiveBasePoseType.ABPT_NONE: 0>",
+      null,
+      0
+     ],
+     "notifies": [],
+     "root_samples": [
+      {
+       "f": 0,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      },
+      {
+       "f": 3,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      },
+      {
+       "f": 6,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      },
+      {
+       "f": 9,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      },
+      {
+       "f": 12,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      }
+     ],
+     "loop_seam_max_delta": null,
+     "ok": {
+      "frames": true,
+      "length": true,
+      "tracks_42": true,
+      "skeleton": true,
+      "root_stationary": true,
+      "loop_flag": true,
+      "no_root_motion": true,
+      "seam": true,
+      "notifies": true
+     }
+    },
+    "Hover": {
+     "num_frames": 15,
+     "length_s": 0.5,
+     "num_keys": 16,
+     "track_count": 42,
+     "skeleton": "/Game/ArtCandidates/CellarBat/R01/Meshes/CellarBat_R01_Mars_SKEL.CellarBat_R01_Mars_SKEL",
+     "loop": true,
+     "root_motion": false,
+     "rate_scale": 1.0,
+     "additive": [
+      "<AdditiveAnimationType.AAT_NONE: 0>",
+      "<AdditiveBasePoseType.ABPT_NONE: 0>",
+      null,
+      0
+     ],
+     "notifies": [
+      [
+       "Wingbeat_Silent",
+       0.2,
+       "AnimNotify_PlaySound",
+       null
+      ]
+     ],
+     "root_samples": [
+      {
+       "f": 0,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      },
+      {
+       "f": 4,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      },
+      {
+       "f": 8,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      },
+      {
+       "f": 11,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      },
+      {
+       "f": 15,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      }
+     ],
+     "loop_seam_max_delta": 1e-06,
+     "ok": {
+      "frames": true,
+      "length": true,
+      "tracks_42": true,
+      "skeleton": true,
+      "root_stationary": true,
+      "loop_flag": true,
+      "no_root_motion": true,
+      "seam": true,
+      "notifies": true
+     }
+    },
+    "Launch": {
+     "num_frames": 24,
+     "length_s": 0.8,
+     "num_keys": 25,
+     "track_count": 42,
+     "skeleton": "/Game/ArtCandidates/CellarBat/R01/Meshes/CellarBat_R01_Mars_SKEL.CellarBat_R01_Mars_SKEL",
+     "loop": false,
+     "root_motion": false,
+     "rate_scale": 1.0,
+     "additive": [
+      "<AdditiveAnimationType.AAT_NONE: 0>",
+      "<AdditiveBasePoseType.ABPT_NONE: 0>",
+      null,
+      0
+     ],
+     "notifies": [
+      [
+       "ReleaseContact_Silent",
+       0.2,
+       "AnimNotify_PlaySound",
+       null
+      ]
+     ],
+     "root_samples": [
+      {
+       "f": 0,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      },
+      {
+       "f": 6,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      },
+      {
+       "f": 12,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      },
+      {
+       "f": 18,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      },
+      {
+       "f": 24,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      }
+     ],
+     "loop_seam_max_delta": null,
+     "ok": {
+      "frames": true,
+      "length": true,
+      "tracks_42": true,
+      "skeleton": true,
+      "root_stationary": true,
+      "loop_flag": true,
+      "no_root_motion": true,
+      "seam": true,
+      "notifies": true
+     }
+    },
+    "Perch": {
+     "num_frames": 24,
+     "length_s": 0.8,
+     "num_keys": 25,
+     "track_count": 42,
+     "skeleton": "/Game/ArtCandidates/CellarBat/R01/Meshes/CellarBat_R01_Mars_SKEL.CellarBat_R01_Mars_SKEL",
+     "loop": false,
+     "root_motion": false,
+     "rate_scale": 1.0,
+     "additive": [
+      "<AdditiveAnimationType.AAT_NONE: 0>",
+      "<AdditiveBasePoseType.ABPT_NONE: 0>",
+      null,
+      0
+     ],
+     "notifies": [
+      [
+       "FootContact_Silent",
+       0.4,
+       "AnimNotify_PlaySound",
+       null
+      ]
+     ],
+     "root_samples": [
+      {
+       "f": 0,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      },
+      {
+       "f": 6,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      },
+      {
+       "f": 12,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      },
+      {
+       "f": 18,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      },
+      {
+       "f": 24,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      }
+     ],
+     "loop_seam_max_delta": null,
+     "ok": {
+      "frames": true,
+      "length": true,
+      "tracks_42": true,
+      "skeleton": true,
+      "root_stationary": true,
+      "loop_flag": true,
+      "no_root_motion": true,
+      "seam": true,
+      "notifies": true
+     }
+    },
+    "RoostAlert": {
+     "num_frames": 18,
+     "length_s": 0.6,
+     "num_keys": 19,
+     "track_count": 42,
+     "skeleton": "/Game/ArtCandidates/CellarBat/R01/Meshes/CellarBat_R01_Mars_SKEL.CellarBat_R01_Mars_SKEL",
+     "loop": false,
+     "root_motion": false,
+     "rate_scale": 1.0,
+     "additive": [
+      "<AdditiveAnimationType.AAT_NONE: 0>",
+      "<AdditiveBasePoseType.ABPT_NONE: 0>",
+      null,
+      0
+     ],
+     "notifies": [],
+     "root_samples": [
+      {
+       "f": 0,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      },
+      {
+       "f": 4,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      },
+      {
+       "f": 9,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      },
+      {
+       "f": 14,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      },
+      {
+       "f": 18,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      }
+     ],
+     "loop_seam_max_delta": null,
+     "ok": {
+      "frames": true,
+      "length": true,
+      "tracks_42": true,
+      "skeleton": true,
+      "root_stationary": true,
+      "loop_flag": true,
+      "no_root_motion": true,
+      "seam": true,
+      "notifies": true
+     }
+    },
+    "RoostIdle": {
+     "num_frames": 60,
+     "length_s": 2.0,
+     "num_keys": 61,
+     "track_count": 42,
+     "skeleton": "/Game/ArtCandidates/CellarBat/R01/Meshes/CellarBat_R01_Mars_SKEL.CellarBat_R01_Mars_SKEL",
+     "loop": true,
+     "root_motion": false,
+     "rate_scale": 1.0,
+     "additive": [
+      "<AdditiveAnimationType.AAT_NONE: 0>",
+      "<AdditiveBasePoseType.ABPT_NONE: 0>",
+      null,
+      0
+     ],
+     "notifies": [],
+     "root_samples": [
+      {
+       "f": 0,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      },
+      {
+       "f": 15,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      },
+      {
+       "f": 30,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      },
+      {
+       "f": 45,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      },
+      {
+       "f": 60,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      }
+     ],
+     "loop_seam_max_delta": 1e-06,
+     "ok": {
+      "frames": true,
+      "length": true,
+      "tracks_42": true,
+      "skeleton": true,
+      "root_stationary": true,
+      "loop_flag": true,
+      "no_root_motion": true,
+      "seam": true,
+      "notifies": true
+     }
+    },
+    "Screech": {
+     "num_frames": 24,
+     "length_s": 0.8,
+     "num_keys": 25,
+     "track_count": 42,
+     "skeleton": "/Game/ArtCandidates/CellarBat/R01/Meshes/CellarBat_R01_Mars_SKEL.CellarBat_R01_Mars_SKEL",
+     "loop": false,
+     "root_motion": false,
+     "rate_scale": 1.0,
+     "additive": [
+      "<AdditiveAnimationType.AAT_NONE: 0>",
+      "<AdditiveBasePoseType.ABPT_NONE: 0>",
+      null,
+      0
+     ],
+     "notifies": [
+      [
+       "ScreechSound_Silent",
+       0.3,
+       "AnimNotify_PlaySound",
+       null
+      ]
+     ],
+     "root_samples": [
+      {
+       "f": 0,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      },
+      {
+       "f": 6,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      },
+      {
+       "f": 12,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      },
+      {
+       "f": 18,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      },
+      {
+       "f": 24,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      }
+     ],
+     "loop_seam_max_delta": null,
+     "ok": {
+      "frames": true,
+      "length": true,
+      "tracks_42": true,
+      "skeleton": true,
+      "root_stationary": true,
+      "loop_flag": true,
+      "no_root_motion": true,
+      "seam": true,
+      "notifies": true
+     }
+    },
+    "Stun": {
+     "num_frames": 30,
+     "length_s": 1.0,
+     "num_keys": 31,
+     "track_count": 42,
+     "skeleton": "/Game/ArtCandidates/CellarBat/R01/Meshes/CellarBat_R01_Mars_SKEL.CellarBat_R01_Mars_SKEL",
+     "loop": true,
+     "root_motion": false,
+     "rate_scale": 1.0,
+     "additive": [
+      "<AdditiveAnimationType.AAT_NONE: 0>",
+      "<AdditiveBasePoseType.ABPT_NONE: 0>",
+      null,
+      0
+     ],
+     "notifies": [],
+     "root_samples": [
+      {
+       "f": 0,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      },
+      {
+       "f": 8,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      },
+      {
+       "f": 15,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      },
+      {
+       "f": 22,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      },
+      {
+       "f": 30,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      }
+     ],
+     "loop_seam_max_delta": 1e-06,
+     "ok": {
+      "frames": true,
+      "length": true,
+      "tracks_42": true,
+      "skeleton": true,
+      "root_stationary": true,
+      "loop_flag": true,
+      "no_root_motion": true,
+      "seam": true,
+      "notifies": true
+     }
+    },
+    "Swoop": {
+     "num_frames": 18,
+     "length_s": 0.6,
+     "num_keys": 19,
+     "track_count": 42,
+     "skeleton": "/Game/ArtCandidates/CellarBat/R01/Meshes/CellarBat_R01_Mars_SKEL.CellarBat_R01_Mars_SKEL",
+     "loop": false,
+     "root_motion": false,
+     "rate_scale": 1.0,
+     "additive": [
+      "<AdditiveAnimationType.AAT_NONE: 0>",
+      "<AdditiveBasePoseType.ABPT_NONE: 0>",
+      null,
+      0
+     ],
+     "notifies": [
+      [
+       "SwoopContact_Silent",
+       0.3,
+       "AnimNotify_PlaySound",
+       null
+      ]
+     ],
+     "root_samples": [
+      {
+       "f": 0,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      },
+      {
+       "f": 4,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      },
+      {
+       "f": 9,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      },
+      {
+       "f": 14,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      },
+      {
+       "f": 18,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      }
+     ],
+     "loop_seam_max_delta": null,
+     "ok": {
+      "frames": true,
+      "length": true,
+      "tracks_42": true,
+      "skeleton": true,
+      "root_stationary": true,
+      "loop_flag": true,
+      "no_root_motion": true,
+      "seam": true,
+      "notifies": true
+     }
+    },
+    "SwoopRecover": {
+     "num_frames": 18,
+     "length_s": 0.6,
+     "num_keys": 19,
+     "track_count": 42,
+     "skeleton": "/Game/ArtCandidates/CellarBat/R01/Meshes/CellarBat_R01_Mars_SKEL.CellarBat_R01_Mars_SKEL",
+     "loop": false,
+     "root_motion": false,
+     "rate_scale": 1.0,
+     "additive": [
+      "<AdditiveAnimationType.AAT_NONE: 0>",
+      "<AdditiveBasePoseType.ABPT_NONE: 0>",
+      null,
+      0
+     ],
+     "notifies": [],
+     "root_samples": [
+      {
+       "f": 0,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      },
+      {
+       "f": 4,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      },
+      {
+       "f": 9,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      },
+      {
+       "f": 14,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      },
+      {
+       "f": 18,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      }
+     ],
+     "loop_seam_max_delta": null,
+     "ok": {
+      "frames": true,
+      "length": true,
+      "tracks_42": true,
+      "skeleton": true,
+      "root_stationary": true,
+      "loop_flag": true,
+      "no_root_motion": true,
+      "seam": true,
+      "notifies": true
+     }
+    },
+    "SwoopTelegraph": {
+     "num_frames": 18,
+     "length_s": 0.6,
+     "num_keys": 19,
+     "track_count": 42,
+     "skeleton": "/Game/ArtCandidates/CellarBat/R01/Meshes/CellarBat_R01_Mars_SKEL.CellarBat_R01_Mars_SKEL",
+     "loop": false,
+     "root_motion": false,
+     "rate_scale": 1.0,
+     "additive": [
+      "<AdditiveAnimationType.AAT_NONE: 0>",
+      "<AdditiveBasePoseType.ABPT_NONE: 0>",
+      null,
+      0
+     ],
+     "notifies": [],
+     "root_samples": [
+      {
+       "f": 0,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      },
+      {
+       "f": 4,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      },
+      {
+       "f": 9,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      },
+      {
+       "f": 14,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      },
+      {
+       "f": 18,
+       "t": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "q": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      }
+     ],
+     "loop_seam_max_delta": null,
+     "ok": {
+      "frames": true,
+      "length": true,
+      "tracks_42": true,
+      "skeleton": true,
+      "root_stationary": true,
+      "loop_flag": true,
+      "no_root_motion": true,
+      "seam": true,
+      "notifies": true
+     }
+    }
+   },
+   "checks": {
+    "BankLeft": [
+     false,
+     "missing"
+    ],
+    "BankRight": [
+     false,
+     "missing"
+    ],
+    "Brake": [
+     true,
+     []
+    ],
+    "DeathFall": [
+     true,
+     []
+    ],
+    "DeathLand": [
+     true,
+     []
+    ],
+    "FlyForward": [
+     true,
+     []
+    ],
+    "Glide": [
+     true,
+     []
+    ],
+    "Hit": [
+     true,
+     []
+    ],
+    "Hover": [
+     true,
+     []
+    ],
+    "Launch": [
+     true,
+     []
+    ],
+    "Perch": [
+     true,
+     []
+    ],
+    "RoostAlert": [
+     true,
+     []
+    ],
+    "RoostIdle": [
+     true,
+     []
+    ],
+    "Screech": [
+     true,
+     []
+    ],
+    "Stun": [
+     true,
+     []
+    ],
+    "Swoop": [
+     true,
+     []
+    ],
+    "SwoopRecover": [
+     true,
+     []
+    ],
+    "SwoopTelegraph": [
+     true,
+     []
+    ],
+    "bounds_contain_clip_extents": [
+     true,
+     3.22
+    ]
+   },
+   "extents": {
+    "union": {
+     "min": [
+      -21.62,
+      -39.67,
+      -22.78
+     ],
+     "max": [
+      30.14,
+      39.77,
+      25.19
+     ]
+    },
+    "per_clip": {
+     "Brake": {
+      "min": [
+       -19.41,
+       -38.88,
+       -20.67
+      ],
+      "max": [
+       16.4,
+       38.88,
+       20.49
+      ]
+     },
+     "DeathFall": {
+      "min": [
+       -21.03,
+       -21.71,
+       -16.44
+      ],
+      "max": [
+       19.36,
+       35.97,
+       21.17
+      ]
+     },
+     "DeathLand": {
+      "min": [
+       -16.4,
+       -36.18,
+       -16.87
+      ],
+      "max": [
+       22.06,
+       31.21,
+       20.83
+      ]
+     },
+     "FlyForward": {
+      "min": [
+       -18.84,
+       -39.37,
+       -16.96
+      ],
+      "max": [
+       14.82,
+       39.37,
+       21.49
+      ]
+     },
+     "Glide": {
+      "min": [
+       -11.29,
+       -37.71,
+       -13.55
+      ],
+      "max": [
+       8.42,
+       37.71,
+       17.65
+      ]
+     },
+     "Hit": {
+      "min": [
+       -21.26,
+       -26.16,
+       -16.51
+      ],
+      "max": [
+       24.2,
+       38.39,
+       19.87
+      ]
+     },
+     "Hover": {
+      "min": [
+       -20.61,
+       -39.37,
+       -20.95
+      ],
+      "max": [
+       16.27,
+       39.37,
+       20.95
+      ]
+     },
+     "Launch": {
+      "min": [
+       -19.64,
+       -38.59,
+       -22.78
+      ],
+      "max": [
+       30.14,
+       38.59,
+       22.29
+      ]
+     },
+     "Perch": {
+      "min": [
+       -18.99,
+       -32.26,
+       -21.84
+      ],
+      "max": [
+       17.8,
+       32.26,
+       24.52
+      ]
+     },
+     "RoostAlert": {
+      "min": [
+       -7.83,
+       -13.18,
+       -18.15
+      ],
+      "max": [
+       13.54,
+       16.49,
+       16.79
+      ]
+     },
+     "RoostIdle": {
+      "min": [
+       -4.91,
+       -9.33,
+       -17.61
+      ],
+      "max": [
+       11.2,
+       9.4,
+       16.79
+      ]
+     },
+     "Screech": {
+      "min": [
+       -21.23,
+       -39.67,
+       -15.69
+      ],
+      "max": [
+       11.0,
+       39.67,
+       25.19
+      ]
+     },
+     "Stun": {
+      "min": [
+       -18.96,
+       -38.99,
+       -16.44
+      ],
+      "max": [
+       14.75,
+       39.77,
+       23.5
+      ]
+     },
+     "Swoop": {
+      "min": [
+       -21.62,
+       -38.17,
+       -15.39
+      ],
+      "max": [
+       11.96,
+       38.17,
+       21.58
+      ]
+     },
+     "SwoopRecover": {
+      "min": [
+       -20.14,
+       -38.79,
+       -21.89
+      ],
+      "max": [
+       16.77,
+       38.79,
+       21.8
+      ]
+     },
+     "SwoopTelegraph": {
+      "min": [
+       -21.62,
+       -38.88,
+       -20.67
+      ],
+      "max": [
+       16.27,
+       38.88,
+       20.49
+      ]
+     }
+    },
+    "mesh_bounds": {
+     "min": [
+      -24.89,
+      -43.5,
+      -26.34
+     ],
+     "max": [
+      33.35,
+      43.5,
+      31.02
+     ]
+    },
+    "min_margin_cm": 3.22
+   },
+   "pass": false
+  },
+  "seconds": 1.77
+ },
+ "physics": {
+  "stage": "physics",
+  "preflight": {
+   "project": "D:/Repositories/CkRepos/Orion/Mars.uproject",
+   "pie": false,
+   "engine": "5.7.4-0+UE5",
+   "ok": true
+  },
+  "physics": {
+   "new": false,
+   "shape": {
+    "before": {
+     "wrist_r": [
+      {
+       "center": [
+        -8.147,
+        -6.302,
+        0.716
+       ],
+       "rotation": "<Struct 'Rotator' (0x000001B3FE8BF0F8) {pitch: 0.000000, yaw: -111.199197, roll: -87.527060}>",
+       "radius": 10.844,
+       "length": 15.89
+      }
+     ],
+     "wrist_l": [
+      {
+       "center": [
+        -8.147,
+        -6.302,
+        -0.716
+       ],
+       "rotation": "<Struct 'Rotator' (0x000001B3FE8B0D78) {pitch: 0.000000, yaw: 68.800807, roll: -87.527073}>",
+       "radius": 10.844,
+       "length": 15.89
+      }
+     ],
+     "head": [
+      {
+       "center": [
+        0.778,
+        -2.338,
+        0.026
+       ],
+       "rotation": "<Struct 'Rotator' (0x000001B3FE8B8438) {pitch: 0.000000, yaw: -149.799829, roll: -89.839273}>",
+       "radius": 8.757,
+       "length": 9.227
+      }
+     ],
+     "spine": [
+      {
+       "center": [
+        -1.581,
+        -5.039,
+        -0.0
+       ],
+       "rotation": "<Struct 'Rotator' (0x000001B3FE8BF738) {pitch: 0.000004, yaw: -90.000000, roll: -0.000002}>",
+       "radius": 6.697,
+       "length": 24.947
+      }
+     ],
+     "pelvis": [
+      {
+       "center": [
+        1.773,
+        -8.498,
+        0.0
+       ],
+       "rotation": "<Struct 'Rotator' (0x000001B3FE8BE838) {pitch: 0.000072, yaw: -90.000000, roll: 0.000002}>",
+       "radius": 8.127,
+       "length": 12.027
+      }
+     ]
+    },
+    "after": {
+     "wrist_r": [
+      {
+       "center": [
+        -8.147,
+        -6.302,
+        0.716
+       ],
+       "rotation": "<Struct 'Rotator' (0x000001B3FE8B04B8) {pitch: 0.000000, yaw: -111.199197, roll: -87.527060}>",
+       "radius": 10.844,
+       "length": 15.89
+      }
+     ],
+     "wrist_l": [
+      {
+       "center": [
+        -8.147,
+        -6.302,
+        -0.716
+       ],
+       "rotation": "<Struct 'Rotator' (0x000001B3FE8B6C78) {pitch: 0.000000, yaw: 68.800807, roll: -87.527073}>",
+       "radius": 10.844,
+       "length": 15.89
+      }
+     ],
+     "head": [
+      {
+       "center": [
+        0.778,
+        -2.338,
+        0.026
+       ],
+       "rotation": "<Struct 'Rotator' (0x000001B3FE8BB278) {pitch: 0.000000, yaw: -149.799829, roll: -89.839273}>",
+       "radius": 8.757,
+       "length": 9.227
+      }
+     ],
+     "spine": [
+      {
+       "center": [
+        -0.0,
+        1.45,
+        0.0
+       ],
+       "rotation": "<Struct 'Rotator' (0x000001B3FE8BED38) {pitch: -0.000000, yaw: -0.000017, roll: -90.000004}>",
+       "radius": 6.0,
+       "length": 6.0
+      }
+     ],
+     "pelvis": [
+      {
+       "center": [
+        -0.002,
+        -5.197,
+        0.0
+       ],
+       "rotation": "<Struct 'Rotator' (0x000001B3FE8B46F8) {pitch: 0.000000, yaw: 179.999983, roll: -90.000004}>",
+       "radius": 4.5,
+       "length": 1.0
+      }
+     ]
+    }
+   },
+   "path": "/Game/ArtCandidates/CellarBat/R01/Physics/CellarBat_R01_Mars_PHYS.CellarBat_R01_Mars_PHYS"
+  },
+  "saved": [
+   "/Game/ArtCandidates/CellarBat/R01/Physics/CellarBat_R01_Mars_PHYS.CellarBat_R01_Mars_PHYS",
+   "/Game/ArtCandidates/CellarBat/R01/Meshes/CellarBat_R01_Mars_SK.CellarBat_R01_Mars_SK"
+  ],
+  "seconds": 0.18
+ },
+ "bounds": {
+  "stage": "bounds",
+  "preflight": {
+   "project": "D:/Repositories/CkRepos/Orion/Mars.uproject",
+   "pie": false,
+   "engine": "5.7.4-0+UE5",
+   "ok": true
+  },
+  "bounds_extension": {
+   "positive": [
+    25,
+    6,
+    14
+   ],
+   "negative": [
+    13,
+    6,
+    10
+   ]
+  },
+  "saved": [
+   "/Game/ArtCandidates/CellarBat/R01/Meshes/CellarBat_R01_Mars_SK.CellarBat_R01_Mars_SK"
+  ],
+  "seconds": 0.14
+ }
+}

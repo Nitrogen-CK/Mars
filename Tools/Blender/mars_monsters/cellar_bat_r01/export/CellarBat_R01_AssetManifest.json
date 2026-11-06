@@ -1,0 +1,548 @@
+{
+  "name": "CellarBat_R01 Unreal asset manifest",
+  "written_utc": "2026-11-06T01:56:11Z",
+  "written_by": "Phase 6b-2 executor",
+  "project": "D:/Repositories/CkRepos/Orion/Mars.uproject",
+  "engine": "5.7.4",
+  "candidate_root": "/Game/ArtCandidates/CellarBat/R01/",
+  "listing_source": "AssetRegistry get_assets_by_path(recursive) in the live editor, 2026-11-06 ~01:56 UTC; 36 packages under the root, 4 derived Jolt packages",
+  "runtime_wiring": {
+    "entity_script": "Script/WorldObjects/Monsters/Mars_CellarBat_EntityScript.as (UMars_CellarBat_EntityScript)",
+    "mesh": "/Game/ArtCandidates/CellarBat/R01/Meshes/CellarBat_R01_Mars_SK",
+    "anim_class": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Final_Mars_ABP.CellarBat_R01_Final_Mars_ABP_C",
+    "fallback_loop_clip_review": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Hover_Mars_ANIM",
+    "physics_asset": "/Game/ArtCandidates/CellarBat/R01/Physics/CellarBat_R01_Mars_PHYS",
+    "mouth_offset_from_socket": [
+      7.703,
+      0.0,
+      3.749
+    ]
+  },
+  "corrections": [
+    "Phase 4 manifest export/CellarBat_R01_Manifest.json unreal_paths lists the physics asset under Meshes/: the asset is Physics/CellarBat_R01_Mars_PHYS"
+  ],
+  "assets": [
+    {
+      "package": "/Game/ArtCandidates/CellarBat/R01/Meshes/CellarBat_R01_Mars_SK",
+      "class": "SkeletalMesh",
+      "produced_by": "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/cellar_bat_import_ue.py (Phase 5 importer)",
+      "status": "final",
+      "sources": [
+        "Tools/Blender/mars_monsters/cellar_bat_r01/export/CellarBat_R01_Mars_SK.fbx",
+        "Tools/Blender/mars_monsters/cellar_bat_r01/export/CellarBat_R01_LOD1_Mars_SK.fbx",
+        "Tools/Blender/mars_monsters/cellar_bat_r01/export/CellarBat_R01_LOD2_Mars_SK.fbx",
+        "Tools/Blender/mars_monsters/cellar_bat_r01/source/CellarBat_R01.blend",
+        "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/build_cellar_bat.py",
+        "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/export_cellar_bat.py"
+      ],
+      "note": "3 LODs (6482/2648/1202 tris), bounds extension +X25/+Y6/+Z14 -X13/-Y6/-Z10, physics asset Physics/CellarBat_R01_Mars_PHYS",
+      "on_disk": true,
+      "disk_bytes": 5977626,
+      "disk_mtime_utc": "2026-11-06T01:11:24Z"
+    },
+    {
+      "package": "/Game/ArtCandidates/CellarBat/R01/Meshes/CellarBat_R01_Mars_SKEL",
+      "class": "Skeleton",
+      "produced_by": "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/cellar_bat_import_ue.py (Phase 5 importer) + Monolith animation_query add_socket",
+      "status": "final",
+      "sources": [
+        "Tools/Blender/mars_monsters/cellar_bat_r01/export/CellarBat_R01_Mars_SK.fbx",
+        "Tools/Blender/mars_monsters/cellar_bat_r01/export/CellarBat_R01_LOD1_Mars_SK.fbx",
+        "Tools/Blender/mars_monsters/cellar_bat_r01/export/CellarBat_R01_LOD2_Mars_SK.fbx",
+        "Tools/Blender/mars_monsters/cellar_bat_r01/source/CellarBat_R01.blend",
+        "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/build_cellar_bat.py",
+        "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/export_cellar_bat.py"
+      ],
+      "note": "42 bones; sockets Mouth (head), Perch (pelvis), RoostFootL/R (foot_l/r)",
+      "on_disk": true,
+      "disk_bytes": 17053,
+      "disk_mtime_utc": "2026-11-06T01:11:24Z"
+    },
+    {
+      "package": "/Game/ArtCandidates/CellarBat/R01/Physics/CellarBat_R01_Mars_PHYS",
+      "class": "PhysicsAsset",
+      "produced_by": "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/cellar_bat_import_ue.py (Phase 5 importer) (physics stage) + Monolith set_body_properties",
+      "status": "final",
+      "sources": [
+        "Tools/Blender/mars_monsters/cellar_bat_r01/export/CellarBat_R01_Mars_SK.fbx",
+        "Tools/Blender/mars_monsters/cellar_bat_r01/export/CellarBat_R01_LOD1_Mars_SK.fbx",
+        "Tools/Blender/mars_monsters/cellar_bat_r01/export/CellarBat_R01_LOD2_Mars_SK.fbx",
+        "Tools/Blender/mars_monsters/cellar_bat_r01/source/CellarBat_R01.blend",
+        "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/build_cellar_bat.py",
+        "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/export_cellar_bat.py"
+      ],
+      "note": "Phase 4 manifest's unreal_paths says Meshes/ for this asset; the real path is Physics/. Stopgap: head/wrist_l/wrist_r bodies kinematic + no collision (maintainer deletes them by hand)",
+      "on_disk": true,
+      "disk_bytes": 14678,
+      "disk_mtime_utc": "2026-11-06T01:11:24Z"
+    },
+    {
+      "package": "/Game/ArtCandidates/CellarBat/R01/Materials/CellarBat_R01_Mars_M",
+      "class": "Material",
+      "produced_by": "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/cellar_bat_import_ue.py (Phase 5 importer)",
+      "status": "final",
+      "sources": [
+        "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/cellar_bat_import_ue.py"
+      ],
+      "note": "VertexColor master: BaseColor = VC.RGB^VertexColorGamma x lerp(CavityFloor,1,VC.A)",
+      "on_disk": true,
+      "disk_bytes": 15736,
+      "disk_mtime_utc": "2026-11-06T01:11:23Z"
+    },
+    {
+      "package": "/Game/ArtCandidates/CellarBat/R01/Materials/CellarBat_R01_Body_Mars_MI",
+      "class": "MaterialInstanceConstant",
+      "produced_by": "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/cellar_bat_import_ue.py (Phase 5 importer); Phase 6b-2 review set VertexColorGamma 2.2->1.9, CavityFloor 0.45->0.6",
+      "status": "final",
+      "sources": [
+        "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/cellar_bat_import_ue.py"
+      ],
+      "note": "rough 0.85 / spec 0.25",
+      "on_disk": true,
+      "disk_bytes": 9422,
+      "disk_mtime_utc": "2026-11-06T01:50:28Z"
+    },
+    {
+      "package": "/Game/ArtCandidates/CellarBat/R01/Materials/CellarBat_R01_Membrane_Mars_MI",
+      "class": "MaterialInstanceConstant",
+      "produced_by": "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/cellar_bat_import_ue.py (Phase 5 importer)",
+      "status": "final",
+      "sources": [
+        "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/cellar_bat_import_ue.py"
+      ],
+      "note": "two-sided override, rough 0.8 / spec 0.25",
+      "on_disk": true,
+      "disk_bytes": 8557,
+      "disk_mtime_utc": "2026-11-06T01:11:24Z"
+    },
+    {
+      "package": "/Game/ArtCandidates/CellarBat/R01/Materials/CellarBat_R01_Eyes_Mars_MI",
+      "class": "MaterialInstanceConstant",
+      "produced_by": "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/cellar_bat_import_ue.py (Phase 5 importer)",
+      "status": "final",
+      "sources": [
+        "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/cellar_bat_import_ue.py"
+      ],
+      "note": "emissive #FFC570 x3",
+      "on_disk": true,
+      "disk_bytes": 9287,
+      "disk_mtime_utc": "2026-11-06T01:11:24Z"
+    },
+    {
+      "package": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_RoostIdle_Mars_ANIM",
+      "class": "AnimSequence",
+      "produced_by": "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/cellar_bat_import_ue.py (Phase 5 importer)",
+      "status": "final",
+      "sources": [
+        "Tools/Blender/mars_monsters/cellar_bat_r01/export/anims/CellarBat_R01_RoostIdle_Mars_ANIM.fbx",
+        "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/animate_cellar_bat.py",
+        "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/export_anims_cellar_bat.py"
+      ],
+      "on_disk": true,
+      "disk_bytes": 126249,
+      "disk_mtime_utc": "2026-11-06T01:11:34Z"
+    },
+    {
+      "package": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_RoostAlert_Mars_ANIM",
+      "class": "AnimSequence",
+      "produced_by": "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/cellar_bat_import_ue.py (Phase 5 importer)",
+      "status": "final",
+      "sources": [
+        "Tools/Blender/mars_monsters/cellar_bat_r01/export/anims/CellarBat_R01_RoostAlert_Mars_ANIM.fbx",
+        "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/animate_cellar_bat.py",
+        "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/export_anims_cellar_bat.py"
+      ],
+      "on_disk": true,
+      "disk_bytes": 102458,
+      "disk_mtime_utc": "2026-11-06T01:11:34Z"
+    },
+    {
+      "package": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Launch_Mars_ANIM",
+      "class": "AnimSequence",
+      "produced_by": "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/cellar_bat_import_ue.py (Phase 5 importer)",
+      "status": "final",
+      "sources": [
+        "Tools/Blender/mars_monsters/cellar_bat_r01/export/anims/CellarBat_R01_Launch_Mars_ANIM.fbx",
+        "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/animate_cellar_bat.py",
+        "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/export_anims_cellar_bat.py"
+      ],
+      "on_disk": true,
+      "disk_bytes": 139261,
+      "disk_mtime_utc": "2026-11-06T01:11:34Z"
+    },
+    {
+      "package": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Hover_Mars_ANIM",
+      "class": "AnimSequence",
+      "produced_by": "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/cellar_bat_import_ue.py (Phase 5 importer)",
+      "status": "final",
+      "sources": [
+        "Tools/Blender/mars_monsters/cellar_bat_r01/export/anims/CellarBat_R01_Hover_Mars_ANIM.fbx",
+        "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/animate_cellar_bat.py",
+        "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/export_anims_cellar_bat.py"
+      ],
+      "on_disk": true,
+      "disk_bytes": 82365,
+      "disk_mtime_utc": "2026-11-06T01:11:34Z"
+    },
+    {
+      "package": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_FlyForward_Mars_ANIM",
+      "class": "AnimSequence",
+      "produced_by": "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/cellar_bat_import_ue.py (Phase 5 importer)",
+      "status": "final",
+      "sources": [
+        "Tools/Blender/mars_monsters/cellar_bat_r01/export/anims/CellarBat_R01_FlyForward_Mars_ANIM.fbx",
+        "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/animate_cellar_bat.py",
+        "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/export_anims_cellar_bat.py"
+      ],
+      "on_disk": true,
+      "disk_bytes": 79247,
+      "disk_mtime_utc": "2026-11-06T01:11:34Z"
+    },
+    {
+      "package": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Glide_Mars_ANIM",
+      "class": "AnimSequence",
+      "produced_by": "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/cellar_bat_import_ue.py (Phase 5 importer)",
+      "status": "final",
+      "sources": [
+        "Tools/Blender/mars_monsters/cellar_bat_r01/export/anims/CellarBat_R01_Glide_Mars_ANIM.fbx",
+        "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/animate_cellar_bat.py",
+        "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/export_anims_cellar_bat.py"
+      ],
+      "on_disk": true,
+      "disk_bytes": 70096,
+      "disk_mtime_utc": "2026-11-06T01:11:34Z"
+    },
+    {
+      "package": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_BankLeft_Mars_ANIM",
+      "class": "AnimSequence",
+      "produced_by": "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/cellar_bat_import_ue.py (Phase 5 importer)",
+      "status": "final",
+      "sources": [
+        "Tools/Blender/mars_monsters/cellar_bat_r01/export/anims/CellarBat_R01_BankLeft_Mars_ANIM.fbx",
+        "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/animate_cellar_bat.py",
+        "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/export_anims_cellar_bat.py"
+      ],
+      "note": "additive LocalSpaceBase vs Hover frame 0 (2 identical keys, DEV-10)",
+      "on_disk": true,
+      "disk_bytes": 50939,
+      "disk_mtime_utc": "2026-11-06T01:11:34Z"
+    },
+    {
+      "package": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_BankRight_Mars_ANIM",
+      "class": "AnimSequence",
+      "produced_by": "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/cellar_bat_import_ue.py (Phase 5 importer)",
+      "status": "final",
+      "sources": [
+        "Tools/Blender/mars_monsters/cellar_bat_r01/export/anims/CellarBat_R01_BankRight_Mars_ANIM.fbx",
+        "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/animate_cellar_bat.py",
+        "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/export_anims_cellar_bat.py"
+      ],
+      "note": "additive LocalSpaceBase vs Hover frame 0 (2 identical keys, DEV-10)",
+      "on_disk": true,
+      "disk_bytes": 50946,
+      "disk_mtime_utc": "2026-11-06T01:11:34Z"
+    },
+    {
+      "package": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Brake_Mars_ANIM",
+      "class": "AnimSequence",
+      "produced_by": "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/cellar_bat_import_ue.py (Phase 5 importer)",
+      "status": "final",
+      "sources": [
+        "Tools/Blender/mars_monsters/cellar_bat_r01/export/anims/CellarBat_R01_Brake_Mars_ANIM.fbx",
+        "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/animate_cellar_bat.py",
+        "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/export_anims_cellar_bat.py"
+      ],
+      "on_disk": true,
+      "disk_bytes": 95756,
+      "disk_mtime_utc": "2026-11-06T01:11:34Z"
+    },
+    {
+      "package": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Perch_Mars_ANIM",
+      "class": "AnimSequence",
+      "produced_by": "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/cellar_bat_import_ue.py (Phase 5 importer)",
+      "status": "final",
+      "sources": [
+        "Tools/Blender/mars_monsters/cellar_bat_r01/export/anims/CellarBat_R01_Perch_Mars_ANIM.fbx",
+        "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/animate_cellar_bat.py",
+        "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/export_anims_cellar_bat.py"
+      ],
+      "on_disk": true,
+      "disk_bytes": 138535,
+      "disk_mtime_utc": "2026-11-06T01:11:34Z"
+    },
+    {
+      "package": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Screech_Mars_ANIM",
+      "class": "AnimSequence",
+      "produced_by": "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/cellar_bat_import_ue.py (Phase 5 importer)",
+      "status": "final",
+      "sources": [
+        "Tools/Blender/mars_monsters/cellar_bat_r01/export/anims/CellarBat_R01_Screech_Mars_ANIM.fbx",
+        "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/animate_cellar_bat.py",
+        "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/export_anims_cellar_bat.py"
+      ],
+      "on_disk": true,
+      "disk_bytes": 89092,
+      "disk_mtime_utc": "2026-11-06T01:11:34Z"
+    },
+    {
+      "package": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_SwoopTelegraph_Mars_ANIM",
+      "class": "AnimSequence",
+      "produced_by": "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/cellar_bat_import_ue.py (Phase 5 importer)",
+      "status": "final",
+      "sources": [
+        "Tools/Blender/mars_monsters/cellar_bat_r01/export/anims/CellarBat_R01_SwoopTelegraph_Mars_ANIM.fbx",
+        "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/animate_cellar_bat.py",
+        "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/export_anims_cellar_bat.py"
+      ],
+      "on_disk": true,
+      "disk_bytes": 95308,
+      "disk_mtime_utc": "2026-11-06T01:11:34Z"
+    },
+    {
+      "package": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Swoop_Mars_ANIM",
+      "class": "AnimSequence",
+      "produced_by": "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/cellar_bat_import_ue.py (Phase 5 importer)",
+      "status": "final",
+      "sources": [
+        "Tools/Blender/mars_monsters/cellar_bat_r01/export/anims/CellarBat_R01_Swoop_Mars_ANIM.fbx",
+        "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/animate_cellar_bat.py",
+        "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/export_anims_cellar_bat.py"
+      ],
+      "on_disk": true,
+      "disk_bytes": 87557,
+      "disk_mtime_utc": "2026-11-06T01:11:34Z"
+    },
+    {
+      "package": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_SwoopRecover_Mars_ANIM",
+      "class": "AnimSequence",
+      "produced_by": "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/cellar_bat_import_ue.py (Phase 5 importer)",
+      "status": "final",
+      "sources": [
+        "Tools/Blender/mars_monsters/cellar_bat_r01/export/anims/CellarBat_R01_SwoopRecover_Mars_ANIM.fbx",
+        "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/animate_cellar_bat.py",
+        "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/export_anims_cellar_bat.py"
+      ],
+      "on_disk": true,
+      "disk_bytes": 84796,
+      "disk_mtime_utc": "2026-11-06T01:11:34Z"
+    },
+    {
+      "package": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Hit_Mars_ANIM",
+      "class": "AnimSequence",
+      "produced_by": "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/cellar_bat_import_ue.py (Phase 5 importer)",
+      "status": "final",
+      "sources": [
+        "Tools/Blender/mars_monsters/cellar_bat_r01/export/anims/CellarBat_R01_Hit_Mars_ANIM.fbx",
+        "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/animate_cellar_bat.py",
+        "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/export_anims_cellar_bat.py"
+      ],
+      "on_disk": true,
+      "disk_bytes": 75082,
+      "disk_mtime_utc": "2026-11-06T01:11:34Z"
+    },
+    {
+      "package": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Stun_Mars_ANIM",
+      "class": "AnimSequence",
+      "produced_by": "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/cellar_bat_import_ue.py (Phase 5 importer)",
+      "status": "final",
+      "sources": [
+        "Tools/Blender/mars_monsters/cellar_bat_r01/export/anims/CellarBat_R01_Stun_Mars_ANIM.fbx",
+        "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/animate_cellar_bat.py",
+        "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/export_anims_cellar_bat.py"
+      ],
+      "on_disk": true,
+      "disk_bytes": 104922,
+      "disk_mtime_utc": "2026-11-06T01:11:34Z"
+    },
+    {
+      "package": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_DeathFall_Mars_ANIM",
+      "class": "AnimSequence",
+      "produced_by": "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/cellar_bat_import_ue.py (Phase 5 importer)",
+      "status": "final",
+      "sources": [
+        "Tools/Blender/mars_monsters/cellar_bat_r01/export/anims/CellarBat_R01_DeathFall_Mars_ANIM.fbx",
+        "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/animate_cellar_bat.py",
+        "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/export_anims_cellar_bat.py"
+      ],
+      "on_disk": true,
+      "disk_bytes": 96687,
+      "disk_mtime_utc": "2026-11-06T01:11:34Z"
+    },
+    {
+      "package": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_DeathLand_Mars_ANIM",
+      "class": "AnimSequence",
+      "produced_by": "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/cellar_bat_import_ue.py (Phase 5 importer)",
+      "status": "final",
+      "sources": [
+        "Tools/Blender/mars_monsters/cellar_bat_r01/export/anims/CellarBat_R01_DeathLand_Mars_ANIM.fbx",
+        "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/animate_cellar_bat.py",
+        "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/export_anims_cellar_bat.py"
+      ],
+      "on_disk": true,
+      "disk_bytes": 88635,
+      "disk_mtime_utc": "2026-11-06T01:11:34Z"
+    },
+    {
+      "package": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Final_Mars_ABP",
+      "class": "AnimBlueprint",
+      "produced_by": "Tools/LevelDesign/cellar_bat_r01_review/cellar_bat_animbp_ue.py (AnimBP builder)",
+      "status": "final",
+      "sources": [
+        "Tools/LevelDesign/cellar_bat_r01_review/cellar_bat_animbp_manifest_final.json",
+        "Script/WorldObjects/Monsters/Mars_CellarBat_AnimInstance.as"
+      ],
+      "note": "Phase 6b-2 final AnimBP on Meshes/CellarBat_R01_Mars_SKEL, parent Mars_CellarBat_AnimInstance; readback cellar_bat_animbp_manifest_final_readback.json. The runtime default (utils_bat::CandidateAnimClassPath)",
+      "on_disk": true,
+      "disk_bytes": 2545816,
+      "disk_mtime_utc": "2026-11-06T01:38:19Z"
+    },
+    {
+      "package": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Locomotion_Final_Mars_BS1D",
+      "class": "BlendSpace1D",
+      "produced_by": "Tools/LevelDesign/cellar_bat_r01_review/cellar_bat_animbp_ue.py (AnimBP builder)",
+      "status": "final",
+      "sources": [
+        "Tools/LevelDesign/cellar_bat_r01_review/cellar_bat_animbp_manifest_final.json"
+      ],
+      "note": "Speed 0..900: Hover 0, FlyForward 380, Glide 620",
+      "on_disk": true,
+      "disk_bytes": 7789,
+      "disk_mtime_utc": "2026-11-06T01:38:19Z"
+    },
+    {
+      "package": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Mars_ABP",
+      "class": "AnimBlueprint",
+      "produced_by": "Tools/LevelDesign/cellar_bat_r01_review/cellar_bat_animbp_ue.py (AnimBP builder) (prep run)",
+      "status": "superseded",
+      "sources": [
+        "Tools/LevelDesign/cellar_bat_r01_review/cellar_bat_animbp_manifest_prep.json"
+      ],
+      "note": "SUPERSEDED: 6b-2 prep build on the blockout skeleton (orphaned sub-graphs). Nothing references it at runtime now; delete with the editor closed",
+      "on_disk": true,
+      "disk_bytes": 4289755,
+      "disk_mtime_utc": "2026-11-06T00:40:52Z"
+    },
+    {
+      "package": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Locomotion_Mars_BS1D",
+      "class": "BlendSpace1D",
+      "produced_by": "Tools/LevelDesign/cellar_bat_r01_review/cellar_bat_animbp_ue.py (AnimBP builder) (prep run)",
+      "status": "superseded",
+      "note": "SUPERSEDED with the prep ABP (blockout skeleton)",
+      "on_disk": true,
+      "disk_bytes": 7797,
+      "disk_mtime_utc": "2026-11-06T00:40:52Z"
+    },
+    {
+      "package": "/Game/ArtCandidates/CellarBat/R01/Animation/Additive/CellarBat_R01_BankLeft_Add_Mars_ANIM",
+      "class": "AnimSequence",
+      "produced_by": "Tools/LevelDesign/cellar_bat_r01_review/cellar_bat_animbp_ue.py (AnimBP builder) (prep run)",
+      "status": "superseded",
+      "note": "SUPERSEDED: additive copy of the blockout flap for the prep ABP; the final ABP uses the imported banks directly",
+      "on_disk": true,
+      "disk_bytes": 67642,
+      "disk_mtime_utc": "2026-11-06T00:40:52Z"
+    },
+    {
+      "package": "/Game/ArtCandidates/CellarBat/R01/Animation/Additive/CellarBat_R01_BankRight_Add_Mars_ANIM",
+      "class": "AnimSequence",
+      "produced_by": "Tools/LevelDesign/cellar_bat_r01_review/cellar_bat_animbp_ue.py (AnimBP builder) (prep run)",
+      "status": "superseded",
+      "note": "SUPERSEDED: additive copy of the blockout flap for the prep ABP; the final ABP uses the imported banks directly",
+      "on_disk": true,
+      "disk_bytes": 67647,
+      "disk_mtime_utc": "2026-11-06T00:40:52Z"
+    },
+    {
+      "package": "/Game/ArtCandidates/CellarBat/R01/Review/CellarBat_R01_Review_MAP",
+      "class": "World",
+      "produced_by": "Tools/LevelDesign/cellar_bat_r01_review/cellar_bat_review_ue.py build_review_scene (review map builder)",
+      "status": "final",
+      "sources": [
+        "Script/WorldObjects/Monsters/Mars_SandboxBat.as",
+        "Script/Editor/Mars_CellarBat_MapBuilder.as"
+      ],
+      "note": "review room; readback Tools/LevelDesign/cellar_bat_r01_review/review_map_readback.json",
+      "on_disk": true,
+      "disk_bytes": 57920,
+      "disk_mtime_utc": "2026-11-05T23:56:25Z"
+    },
+    {
+      "package": "/Game/ArtCandidates/CellarBat/R01/Validation/Cube10_Mars_SM",
+      "class": "StaticMesh",
+      "produced_by": "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/cellar_bat_validation_ue.py (Phase 2 validation importer)",
+      "status": "validation",
+      "sources": [
+        "Tools/Blender/mars_monsters/cellar_bat_r01/export/validation/"
+      ],
+      "note": "Phase 2 axis/scale proof; not used at runtime",
+      "on_disk": true,
+      "disk_bytes": 17029,
+      "disk_mtime_utc": "2026-11-05T23:02:40Z"
+    },
+    {
+      "package": "/Game/ArtCandidates/CellarBat/R01/Validation/CellarBat_R01_Blockout_Mars_SK",
+      "class": "SkeletalMesh",
+      "produced_by": "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/cellar_bat_validation_ue.py (Phase 2 validation importer)",
+      "status": "validation",
+      "sources": [
+        "Tools/Blender/mars_monsters/cellar_bat_r01/export/validation/"
+      ],
+      "note": "Phase 2 axis/scale proof; not used at runtime",
+      "on_disk": true,
+      "disk_bytes": 1092745,
+      "disk_mtime_utc": "2026-11-05T23:02:40Z"
+    },
+    {
+      "package": "/Game/ArtCandidates/CellarBat/R01/Validation/CellarBat_R01_Blockout_Mars_SKEL",
+      "class": "Skeleton",
+      "produced_by": "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/cellar_bat_validation_ue.py (Phase 2 validation importer)",
+      "status": "validation",
+      "sources": [
+        "Tools/Blender/mars_monsters/cellar_bat_r01/export/validation/"
+      ],
+      "note": "Phase 2 axis/scale proof; not used at runtime",
+      "on_disk": true,
+      "disk_bytes": 15054,
+      "disk_mtime_utc": "2026-11-05T23:02:40Z"
+    },
+    {
+      "package": "/Game/ArtCandidates/CellarBat/R01/Validation/CellarBat_R01_Blockout_Flap_Mars_ANIM",
+      "class": "AnimSequence",
+      "produced_by": "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/cellar_bat_validation_ue.py (Phase 2 validation importer)",
+      "status": "validation",
+      "sources": [
+        "Tools/Blender/mars_monsters/cellar_bat_r01/export/validation/"
+      ],
+      "note": "Phase 2 axis/scale proof; not used at runtime",
+      "on_disk": true,
+      "disk_bytes": 67369,
+      "disk_mtime_utc": "2026-11-05T23:02:40Z"
+    }
+  ],
+  "derived_outside_root": [
+    {
+      "package": "/Game/CkJoltData/ArtCandidates/CellarBat/R01/Review/CellarBat_R01_Review_MAP/JoltCell_-1_0",
+      "class": "Ck_Jolt_CookedCell_UE",
+      "produced_by": "CkJolt OnSave cook hook when the review map was saved",
+      "note": "derived data outside the candidate root; retire with the review map"
+    },
+    {
+      "package": "/Game/CkJoltData/ArtCandidates/CellarBat/R01/Review/CellarBat_R01_Review_MAP/JoltCell_0_-1",
+      "class": "Ck_Jolt_CookedCell_UE",
+      "produced_by": "CkJolt OnSave cook hook when the review map was saved",
+      "note": "derived data outside the candidate root; retire with the review map"
+    },
+    {
+      "package": "/Game/CkJoltData/ArtCandidates/CellarBat/R01/Review/CellarBat_R01_Review_MAP/JoltCell_0_0",
+      "class": "Ck_Jolt_CookedCell_UE",
+      "produced_by": "CkJolt OnSave cook hook when the review map was saved",
+      "note": "derived data outside the candidate root; retire with the review map"
+    },
+    {
+      "package": "/Game/CkJoltData/ArtCandidates/CellarBat/R01/Review/CellarBat_R01_Review_MAP/JoltIndex",
+      "class": "Ck_Jolt_CookedWorldIndex_UE",
+      "produced_by": "CkJolt OnSave cook hook when the review map was saved",
+      "note": "derived data outside the candidate root; retire with the review map"
+    }
+  ]
+}

@@ -1,0 +1,90 @@
+00:01.687  blend            | Read blend: "D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\cellar_bat_r01\source\CellarBat_R01.blend"
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\cellar_bat_r01\\export\\CellarBat_R01_Mars_SK.fbx'
+export finished in 0.0320 sec.
+EXPORTED LOD0 D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\cellar_bat_r01\export\CellarBat_R01_Mars_SK.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\cellar_bat_r01\\export\\CellarBat_R01_LOD1_Mars_SK.fbx'
+export finished in 0.0234 sec.
+EXPORTED LOD1 D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\cellar_bat_r01\export\CellarBat_R01_LOD1_Mars_SK.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\cellar_bat_r01\\export\\CellarBat_R01_LOD2_Mars_SK.fbx'
+export finished in 0.0177 sec.
+EXPORTED LOD2 D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\cellar_bat_r01\export\CellarBat_R01_LOD2_Mars_SK.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\cellar_bat_r01\\export\\anims\\CellarBat_R01_RoostIdle_Mars_ANIM.fbx'
+export finished in 0.1285 sec.
+EXPORTED clip RoostIdle       D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\cellar_bat_r01\export\anims\CellarBat_R01_RoostIdle_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\cellar_bat_r01\\export\\anims\\CellarBat_R01_RoostAlert_Mars_ANIM.fbx'
+export finished in 0.0760 sec.
+EXPORTED clip RoostAlert      D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\cellar_bat_r01\export\anims\CellarBat_R01_RoostAlert_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\cellar_bat_r01\\export\\anims\\CellarBat_R01_Launch_Mars_ANIM.fbx'
+export finished in 0.0818 sec.
+EXPORTED clip Launch          D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\cellar_bat_r01\export\anims\CellarBat_R01_Launch_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\cellar_bat_r01\\export\\anims\\CellarBat_R01_Hover_Mars_ANIM.fbx'
+export finished in 0.0711 sec.
+EXPORTED clip Hover           D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\cellar_bat_r01\export\anims\CellarBat_R01_Hover_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\cellar_bat_r01\\export\\anims\\CellarBat_R01_FlyForward_Mars_ANIM.fbx'
+export finished in 0.0694 sec.
+EXPORTED clip FlyForward      D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\cellar_bat_r01\export\anims\CellarBat_R01_FlyForward_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\cellar_bat_r01\\export\\anims\\CellarBat_R01_Glide_Mars_ANIM.fbx'
+export finished in 0.0885 sec.
+EXPORTED clip Glide           D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\cellar_bat_r01\export\anims\CellarBat_R01_Glide_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\cellar_bat_r01\\export\\anims\\CellarBat_R01_BankLeft_Mars_ANIM.fbx'
+export finished in 0.0529 sec.
+EXPORTED clip BankLeft        D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\cellar_bat_r01\export\anims\CellarBat_R01_BankLeft_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\cellar_bat_r01\\export\\anims\\CellarBat_R01_BankRight_Mars_ANIM.fbx'
+export finished in 0.0772 sec.
+EXPORTED clip BankRight       D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\cellar_bat_r01\export\anims\CellarBat_R01_BankRight_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\cellar_bat_r01\\export\\anims\\CellarBat_R01_Brake_Mars_ANIM.fbx'
+export finished in 0.0772 sec.
+EXPORTED clip Brake           D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\cellar_bat_r01\export\anims\CellarBat_R01_Brake_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\cellar_bat_r01\\export\\anims\\CellarBat_R01_Perch_Mars_ANIM.fbx'
+export finished in 0.0817 sec.
+EXPORTED clip Perch           D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\cellar_bat_r01\export\anims\CellarBat_R01_Perch_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\cellar_bat_r01\\export\\anims\\CellarBat_R01_Screech_Mars_ANIM.fbx'
+export finished in 0.0856 sec.
+EXPORTED clip Screech         D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\cellar_bat_r01\export\anims\CellarBat_R01_Screech_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\cellar_bat_r01\\export\\anims\\CellarBat_R01_SwoopTelegraph_Mars_ANIM.fbx'
+export finished in 0.0810 sec.
+EXPORTED clip SwoopTelegraph  D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\cellar_bat_r01\export\anims\CellarBat_R01_SwoopTelegraph_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\cellar_bat_r01\\export\\anims\\CellarBat_R01_Swoop_Mars_ANIM.fbx'
+export finished in 0.0802 sec.
+EXPORTED clip Swoop           D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\cellar_bat_r01\export\anims\CellarBat_R01_Swoop_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\cellar_bat_r01\\export\\anims\\CellarBat_R01_SwoopRecover_Mars_ANIM.fbx'
+export finished in 0.0822 sec.
+EXPORTED clip SwoopRecover    D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\cellar_bat_r01\export\anims\CellarBat_R01_SwoopRecover_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\cellar_bat_r01\\export\\anims\\CellarBat_R01_Hit_Mars_ANIM.fbx'
+export finished in 0.0658 sec.
+EXPORTED clip Hit             D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\cellar_bat_r01\export\anims\CellarBat_R01_Hit_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\cellar_bat_r01\\export\\anims\\CellarBat_R01_Stun_Mars_ANIM.fbx'
+export finished in 0.0937 sec.
+EXPORTED clip Stun            D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\cellar_bat_r01\export\anims\CellarBat_R01_Stun_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\cellar_bat_r01\\export\\anims\\CellarBat_R01_DeathFall_Mars_ANIM.fbx'
+export finished in 0.0861 sec.
+EXPORTED clip DeathFall       D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\cellar_bat_r01\export\anims\CellarBat_R01_DeathFall_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\cellar_bat_r01\\export\\anims\\CellarBat_R01_DeathLand_Mars_ANIM.fbx'
+export finished in 0.0863 sec.
+EXPORTED clip DeathLand       D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\cellar_bat_r01\export\anims\CellarBat_R01_DeathLand_Mars_ANIM.fbx
+MANIFEST D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\cellar_bat_r01\export\CellarBat_R01_Manifest.json
+CELLAR_BAT_OK
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+
+Blender quit

@@ -1,0 +1,14 @@
+00:01.578  blend            | Read blend: "D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\cellar_bat_r01\source\CellarBat_R01.blend"
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\cellar_bat_r01\\export\\anims\\CellarBat_R01_BankLeft_Mars_ANIM.fbx'
+export finished in 0.0607 sec.
+EXPORTED clip BankLeft        D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\cellar_bat_r01\export\anims\CellarBat_R01_BankLeft_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\cellar_bat_r01\\export\\anims\\CellarBat_R01_BankRight_Mars_ANIM.fbx'
+export finished in 0.0509 sec.
+EXPORTED clip BankRight       D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\cellar_bat_r01\export\anims\CellarBat_R01_BankRight_Mars_ANIM.fbx
+MERGED ['BankLeft', 'BankRight'] into D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\cellar_bat_r01\export\anims\expected_anims.json and D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\cellar_bat_r01\export\CellarBat_R01_Manifest.json
+CELLAR_BAT_OK
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+
+Blender quit

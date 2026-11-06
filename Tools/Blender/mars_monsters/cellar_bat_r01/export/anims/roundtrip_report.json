@@ -1,0 +1,389 @@
+{
+ "clips": {
+  "RoostIdle": {
+   "file": "CellarBat_R01_RoostIdle_Mars_ANIM.fbx",
+   "actions": [
+    "Armature|Scene"
+   ],
+   "bones": 42,
+   "bone_mismatch": [],
+   "frame_range": [
+    0.0,
+    60.0
+   ],
+   "keyed_frames": [
+    0,
+    60,
+    61
+   ],
+   "samples": 61,
+   "landmark_max_err_cm": 0.0008,
+   "mesh_extreme_max_err_cm": 0.00048,
+   "root_max_dev": 0.0,
+   "loop_seam_landmark_err_cm": 6e-06
+  },
+  "RoostAlert": {
+   "file": "CellarBat_R01_RoostAlert_Mars_ANIM.fbx",
+   "actions": [
+    "Armature|Scene"
+   ],
+   "bones": 42,
+   "bone_mismatch": [],
+   "frame_range": [
+    0.0,
+    18.0
+   ],
+   "keyed_frames": [
+    0,
+    18,
+    19
+   ],
+   "samples": 19,
+   "landmark_max_err_cm": 0.00082,
+   "mesh_extreme_max_err_cm": 0.00079,
+   "root_max_dev": 0.0
+  },
+  "Launch": {
+   "file": "CellarBat_R01_Launch_Mars_ANIM.fbx",
+   "actions": [
+    "Armature|Scene"
+   ],
+   "bones": 42,
+   "bone_mismatch": [],
+   "frame_range": [
+    0.0,
+    24.0
+   ],
+   "keyed_frames": [
+    0,
+    24,
+    25
+   ],
+   "samples": 25,
+   "landmark_max_err_cm": 0.00125,
+   "mesh_extreme_max_err_cm": 0.00095,
+   "root_max_dev": 0.0
+  },
+  "Hover": {
+   "file": "CellarBat_R01_Hover_Mars_ANIM.fbx",
+   "actions": [
+    "Armature|Scene"
+   ],
+   "bones": 42,
+   "bone_mismatch": [],
+   "frame_range": [
+    0.0,
+    15.0
+   ],
+   "keyed_frames": [
+    0,
+    15,
+    16
+   ],
+   "samples": 16,
+   "landmark_max_err_cm": 0.00101,
+   "mesh_extreme_max_err_cm": 0.00088,
+   "root_max_dev": 0.0,
+   "loop_seam_landmark_err_cm": 1.1e-05
+  },
+  "FlyForward": {
+   "file": "CellarBat_R01_FlyForward_Mars_ANIM.fbx",
+   "actions": [
+    "Armature|Scene"
+   ],
+   "bones": 42,
+   "bone_mismatch": [],
+   "frame_range": [
+    0.0,
+    15.0
+   ],
+   "keyed_frames": [
+    0,
+    15,
+    16
+   ],
+   "samples": 16,
+   "landmark_max_err_cm": 0.00106,
+   "mesh_extreme_max_err_cm": 0.00077,
+   "root_max_dev": 0.0,
+   "loop_seam_landmark_err_cm": 9e-06
+  },
+  "Glide": {
+   "file": "CellarBat_R01_Glide_Mars_ANIM.fbx",
+   "actions": [
+    "Armature|Scene"
+   ],
+   "bones": 42,
+   "bone_mismatch": [],
+   "frame_range": [
+    0.0,
+    30.0
+   ],
+   "keyed_frames": [
+    0,
+    30,
+    31
+   ],
+   "samples": 31,
+   "landmark_max_err_cm": 0.00012,
+   "mesh_extreme_max_err_cm": 0.00055,
+   "root_max_dev": 0.0,
+   "loop_seam_landmark_err_cm": 8e-06
+  },
+  "BankLeft": {
+   "file": "CellarBat_R01_BankLeft_Mars_ANIM.fbx",
+   "actions": [
+    "Armature|Scene"
+   ],
+   "bones": 42,
+   "bone_mismatch": [],
+   "frame_range": [
+    0.0,
+    1.0
+   ],
+   "keyed_frames": [
+    0,
+    1,
+    2
+   ],
+   "samples": 2,
+   "landmark_max_err_cm": 0.00098,
+   "mesh_extreme_max_err_cm": 0.00042,
+   "root_max_dev": 0.0
+  },
+  "BankRight": {
+   "file": "CellarBat_R01_BankRight_Mars_ANIM.fbx",
+   "actions": [
+    "Armature|Scene"
+   ],
+   "bones": 42,
+   "bone_mismatch": [],
+   "frame_range": [
+    0.0,
+    1.0
+   ],
+   "keyed_frames": [
+    0,
+    1,
+    2
+   ],
+   "samples": 2,
+   "landmark_max_err_cm": 0.00094,
+   "mesh_extreme_max_err_cm": 0.00048,
+   "root_max_dev": 0.0
+  },
+  "Brake": {
+   "file": "CellarBat_R01_Brake_Mars_ANIM.fbx",
+   "actions": [
+    "Armature|Scene"
+   ],
+   "bones": 42,
+   "bone_mismatch": [],
+   "frame_range": [
+    0.0,
+    18.0
+   ],
+   "keyed_frames": [
+    0,
+    18,
+    19
+   ],
+   "samples": 19,
+   "landmark_max_err_cm": 0.00096,
+   "mesh_extreme_max_err_cm": 0.00067,
+   "root_max_dev": 0.0
+  },
+  "Perch": {
+   "file": "CellarBat_R01_Perch_Mars_ANIM.fbx",
+   "actions": [
+    "Armature|Scene"
+   ],
+   "bones": 42,
+   "bone_mismatch": [],
+   "frame_range": [
+    0.0,
+    24.0
+   ],
+   "keyed_frames": [
+    0,
+    24,
+    25
+   ],
+   "samples": 25,
+   "landmark_max_err_cm": 0.00129,
+   "mesh_extreme_max_err_cm": 0.00088,
+   "root_max_dev": 0.0
+  },
+  "Screech": {
+   "file": "CellarBat_R01_Screech_Mars_ANIM.fbx",
+   "actions": [
+    "Armature|Scene"
+   ],
+   "bones": 42,
+   "bone_mismatch": [],
+   "frame_range": [
+    0.0,
+    24.0
+   ],
+   "keyed_frames": [
+    0,
+    24,
+    25
+   ],
+   "samples": 25,
+   "landmark_max_err_cm": 0.00096,
+   "mesh_extreme_max_err_cm": 0.00085,
+   "root_max_dev": 0.0
+  },
+  "SwoopTelegraph": {
+   "file": "CellarBat_R01_SwoopTelegraph_Mars_ANIM.fbx",
+   "actions": [
+    "Armature|Scene"
+   ],
+   "bones": 42,
+   "bone_mismatch": [],
+   "frame_range": [
+    0.0,
+    18.0
+   ],
+   "keyed_frames": [
+    0,
+    18,
+    19
+   ],
+   "samples": 19,
+   "landmark_max_err_cm": 0.00116,
+   "mesh_extreme_max_err_cm": 0.00063,
+   "root_max_dev": 0.0
+  },
+  "Swoop": {
+   "file": "CellarBat_R01_Swoop_Mars_ANIM.fbx",
+   "actions": [
+    "Armature|Scene"
+   ],
+   "bones": 42,
+   "bone_mismatch": [],
+   "frame_range": [
+    0.0,
+    18.0
+   ],
+   "keyed_frames": [
+    0,
+    18,
+    19
+   ],
+   "samples": 19,
+   "landmark_max_err_cm": 0.00114,
+   "mesh_extreme_max_err_cm": 0.0008,
+   "root_max_dev": 0.0
+  },
+  "SwoopRecover": {
+   "file": "CellarBat_R01_SwoopRecover_Mars_ANIM.fbx",
+   "actions": [
+    "Armature|Scene"
+   ],
+   "bones": 42,
+   "bone_mismatch": [],
+   "frame_range": [
+    0.0,
+    18.0
+   ],
+   "keyed_frames": [
+    0,
+    18,
+    19
+   ],
+   "samples": 19,
+   "landmark_max_err_cm": 0.00118,
+   "mesh_extreme_max_err_cm": 0.00113,
+   "root_max_dev": 0.0
+  },
+  "Hit": {
+   "file": "CellarBat_R01_Hit_Mars_ANIM.fbx",
+   "actions": [
+    "Armature|Scene"
+   ],
+   "bones": 42,
+   "bone_mismatch": [],
+   "frame_range": [
+    0.0,
+    12.0
+   ],
+   "keyed_frames": [
+    0,
+    12,
+    13
+   ],
+   "samples": 13,
+   "landmark_max_err_cm": 0.00111,
+   "mesh_extreme_max_err_cm": 0.00074,
+   "root_max_dev": 0.0
+  },
+  "Stun": {
+   "file": "CellarBat_R01_Stun_Mars_ANIM.fbx",
+   "actions": [
+    "Armature|Scene"
+   ],
+   "bones": 42,
+   "bone_mismatch": [],
+   "frame_range": [
+    0.0,
+    30.0
+   ],
+   "keyed_frames": [
+    0,
+    30,
+    31
+   ],
+   "samples": 31,
+   "landmark_max_err_cm": 0.00079,
+   "mesh_extreme_max_err_cm": 0.00088,
+   "root_max_dev": 0.0,
+   "loop_seam_landmark_err_cm": 7e-06
+  },
+  "DeathFall": {
+   "file": "CellarBat_R01_DeathFall_Mars_ANIM.fbx",
+   "actions": [
+    "Armature|Scene"
+   ],
+   "bones": 42,
+   "bone_mismatch": [],
+   "frame_range": [
+    0.0,
+    21.0
+   ],
+   "keyed_frames": [
+    0,
+    21,
+    22
+   ],
+   "samples": 22,
+   "landmark_max_err_cm": 0.00112,
+   "mesh_extreme_max_err_cm": 0.00115,
+   "root_max_dev": 0.0
+  },
+  "DeathLand": {
+   "file": "CellarBat_R01_DeathLand_Mars_ANIM.fbx",
+   "actions": [
+    "Armature|Scene"
+   ],
+   "bones": 42,
+   "bone_mismatch": [],
+   "frame_range": [
+    0.0,
+    18.0
+   ],
+   "keyed_frames": [
+    0,
+    18,
+    19
+   ],
+   "samples": 19,
+   "landmark_max_err_cm": 0.00089,
+   "mesh_extreme_max_err_cm": 0.00053,
+   "root_max_dev": 0.0
+  }
+ },
+ "fails": [],
+ "tolerance_cm": 0.1
+}

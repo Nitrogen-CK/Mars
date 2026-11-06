@@ -1,0 +1,704 @@
+{
+ "RoostIdle": {
+  "frames": [
+   0,
+   60
+  ],
+  "samples": 61,
+  "fps": 30,
+  "loop": true,
+  "markers": {},
+  "control_action": "CellarBat_R01_RoostIdle_Ctl",
+  "export_action": "RoostIdle",
+  "bake": {
+   "control_action": "CellarBat_R01_RoostIdle_Ctl",
+   "baked_action": "RoostIdle",
+   "frames": [
+    0,
+    60
+   ],
+   "frame_count": 61,
+   "keyed_bones": 42,
+   "max_head_err_cm": 9e-06,
+   "max_rot_err_deg": 0.0,
+   "root_max_deviation": 0.0,
+   "non_unit_scale_keys": 0,
+   "constraints_muted_for_export": true
+  },
+  "note": "Hang pose (fold 1, perch 1, feet IK on the bar); breath period 1 s; ear twitch 34-44",
+  "keys": [
+   0
+  ],
+  "lags": {}
+ },
+ "RoostAlert": {
+  "frames": [
+   0,
+   18
+  ],
+  "samples": 19,
+  "fps": 30,
+  "loop": false,
+  "markers": {},
+  "control_action": "CellarBat_R01_RoostAlert_Ctl",
+  "export_action": "RoostAlert",
+  "bake": {
+   "control_action": "CellarBat_R01_RoostAlert_Ctl",
+   "baked_action": "RoostAlert",
+   "frames": [
+    0,
+    18
+   ],
+   "frame_count": 19,
+   "keyed_bones": 42,
+   "max_head_err_cm": 1.2e-05,
+   "max_rot_err_deg": 0.0,
+   "root_max_deviation": 0.0,
+   "non_unit_scale_keys": 0,
+   "constraints_muted_for_export": true
+  },
+  "note": "fold 1 -> 0.82-0.90 (partial unwrap), ears alert, head lifts so the face points +X",
+  "keys": [
+   0,
+   4,
+   11,
+   18
+  ],
+  "lags": {
+   "ears": 1.0,
+   "fingers": 1.5
+  }
+ },
+ "Launch": {
+  "frames": [
+   0,
+   24
+  ],
+  "samples": 25,
+  "fps": 30,
+  "loop": false,
+  "markers": {
+   "ReleaseContact": 6
+  },
+  "control_action": "CellarBat_R01_Launch_Ctl",
+  "export_action": "Launch",
+  "bake": {
+   "control_action": "CellarBat_R01_Launch_Ctl",
+   "baked_action": "Launch",
+   "frames": [
+    0,
+    24
+   ],
+   "frame_count": 25,
+   "keyed_bones": 42,
+   "max_head_err_cm": 1.3e-05,
+   "max_rot_err_deg": 0.0,
+   "root_max_deviation": 0.0,
+   "non_unit_scale_keys": 0,
+   "constraints_muted_for_export": true
+  },
+  "note": "feet on the bar until 5, perch off by 10; pelvis hang -> half-turn -> dive -> flight",
+  "keys": [
+   0,
+   5,
+   10,
+   12,
+   15,
+   19,
+   21,
+   24
+  ],
+  "lags": {
+   "fingers": 1.5,
+   "ears": 2.0,
+   "legs": 1.5
+  }
+ },
+ "Hover": {
+  "frames": [
+   0,
+   15
+  ],
+  "samples": 16,
+  "fps": 30,
+  "loop": true,
+  "markers": {
+   "Wingbeat": 6
+  },
+  "control_action": "CellarBat_R01_Hover_Ctl",
+  "export_action": "Hover",
+  "bake": {
+   "control_action": "CellarBat_R01_Hover_Ctl",
+   "baked_action": "Hover",
+   "frames": [
+    0,
+    15
+   ],
+   "frame_count": 16,
+   "keyed_bones": 42,
+   "max_head_err_cm": 1e-05,
+   "max_rot_err_deg": 0.0,
+   "root_max_deviation": 0.0,
+   "non_unit_scale_keys": 0,
+   "constraints_muted_for_export": true
+  },
+  "note": "flap keys 0 Up / 4 Power / 8 Down / 12 Recover / 15 = 0",
+  "keys": [
+   0,
+   4,
+   8,
+   12
+  ],
+  "lags": {
+   "fingers": 1.5,
+   "ears": 2.0,
+   "legs": 2.5
+  }
+ },
+ "FlyForward": {
+  "frames": [
+   0,
+   15
+  ],
+  "samples": 16,
+  "fps": 30,
+  "loop": true,
+  "markers": {
+   "Wingbeat": 6
+  },
+  "control_action": "CellarBat_R01_FlyForward_Ctl",
+  "export_action": "FlyForward",
+  "bake": {
+   "control_action": "CellarBat_R01_FlyForward_Ctl",
+   "baked_action": "FlyForward",
+   "frames": [
+    0,
+    15
+   ],
+   "frame_count": 16,
+   "keyed_bones": 42,
+   "max_head_err_cm": 1.2e-05,
+   "max_rot_err_deg": 0.0,
+   "root_max_deviation": 0.0,
+   "non_unit_scale_keys": 0,
+   "constraints_muted_for_export": true
+  },
+  "note": "Hover cycle, body pitched +24 deg, downstroke -38 instead of -50",
+  "keys": [
+   0,
+   4,
+   8,
+   12
+  ],
+  "lags": {
+   "fingers": 1.5,
+   "ears": 2.0,
+   "legs": 2.5
+  }
+ },
+ "Glide": {
+  "frames": [
+   0,
+   30
+  ],
+  "samples": 31,
+  "fps": 30,
+  "loop": true,
+  "markers": {},
+  "control_action": "CellarBat_R01_Glide_Ctl",
+  "export_action": "Glide",
+  "bake": {
+   "control_action": "CellarBat_R01_Glide_Ctl",
+   "baked_action": "Glide",
+   "frames": [
+    0,
+    30
+   ],
+   "frame_count": 31,
+   "keyed_bones": 42,
+   "max_head_err_cm": 1.2e-05,
+   "max_rot_err_deg": 0.0,
+   "root_max_deviation": 0.0,
+   "non_unit_scale_keys": 0,
+   "constraints_muted_for_export": true
+  },
+  "note": "spread glide + 1 s breath (spine/wing elev) and finger flex, all sin(2 pi t/30)",
+  "keys": [
+   0
+  ],
+  "lags": {}
+ },
+ "BankLeft": {
+  "frames": [
+   0,
+   1
+  ],
+  "samples": 2,
+  "fps": 30,
+  "loop": false,
+  "markers": {},
+  "control_action": "CellarBat_R01_BankLeft_Ctl",
+  "export_action": "BankLeft",
+  "bake": {
+   "control_action": "CellarBat_R01_BankLeft_Ctl",
+   "baked_action": "BankLeft",
+   "frames": [
+    0,
+    1
+   ],
+   "frame_count": 2,
+   "keyed_bones": 42,
+   "max_head_err_cm": 1e-05,
+   "max_rot_err_deg": 0.0,
+   "root_max_deviation": 0.0,
+   "non_unit_scale_keys": 0,
+   "constraints_muted_for_export": true
+  },
+  "note": "full pose = Hover frame 0 + body roll -25 deg toward the bat's own left, inner wing -30, outer -4 (raised by the roll), head counter-roll; additive reference = Hover frame 0. CSV says 0-0; padded to 2 identical samples because the Unreal FBX importer rejects a zero-length take",
+  "keys": [
+   0
+  ],
+  "lags": {}
+ },
+ "BankRight": {
+  "frames": [
+   0,
+   1
+  ],
+  "samples": 2,
+  "fps": 30,
+  "loop": false,
+  "markers": {},
+  "control_action": "CellarBat_R01_BankRight_Ctl",
+  "export_action": "BankRight",
+  "bake": {
+   "control_action": "CellarBat_R01_BankRight_Ctl",
+   "baked_action": "BankRight",
+   "frames": [
+    0,
+    1
+   ],
+   "frame_count": 2,
+   "keyed_bones": 42,
+   "max_head_err_cm": 7e-06,
+   "max_rot_err_deg": 0.0,
+   "root_max_deviation": 0.0,
+   "non_unit_scale_keys": 0,
+   "constraints_muted_for_export": true
+  },
+  "note": "full pose = Hover frame 0 + body roll +25 deg toward the bat's own right, inner wing -30, outer -4 (raised by the roll), head counter-roll; additive reference = Hover frame 0. CSV says 0-0; padded to 2 identical samples because the Unreal FBX importer rejects a zero-length take",
+  "keys": [
+   0
+  ],
+  "lags": {}
+ },
+ "Brake": {
+  "frames": [
+   0,
+   18
+  ],
+  "samples": 19,
+  "fps": 30,
+  "loop": false,
+  "markers": {},
+  "control_action": "CellarBat_R01_Brake_Ctl",
+  "export_action": "Brake",
+  "bake": {
+   "control_action": "CellarBat_R01_Brake_Ctl",
+   "baked_action": "Brake",
+   "frames": [
+    0,
+    18
+   ],
+   "frame_count": 19,
+   "keyed_bones": 42,
+   "max_head_err_cm": 1.7e-05,
+   "max_rot_err_deg": 0.0,
+   "root_max_deviation": 0.0,
+   "non_unit_scale_keys": 0,
+   "constraints_muted_for_export": true
+  },
+  "note": "one braking beat, then wings cup forward",
+  "keys": [
+   0,
+   3,
+   6,
+   11,
+   14,
+   18
+  ],
+  "lags": {
+   "fingers": 1.5,
+   "ears": 2.0,
+   "legs": 2.0
+  }
+ },
+ "Perch": {
+  "frames": [
+   0,
+   24
+  ],
+  "samples": 25,
+  "fps": 30,
+  "loop": false,
+  "markers": {
+   "FootContact": 12
+  },
+  "control_action": "CellarBat_R01_Perch_Ctl",
+  "export_action": "Perch",
+  "bake": {
+   "control_action": "CellarBat_R01_Perch_Ctl",
+   "baked_action": "Perch",
+   "frames": [
+    0,
+    24
+   ],
+   "frame_count": 25,
+   "keyed_bones": 42,
+   "max_head_err_cm": 1.2e-05,
+   "max_rot_err_deg": 0.0,
+   "root_max_deviation": 0.0,
+   "non_unit_scale_keys": 0,
+   "constraints_muted_for_export": true
+  },
+  "note": "brake -> pitch back with feet reaching (5) -> swing (9) -> feet on the bar at 12 (perch 1, IK) -> wrap by 24 = RoostIdle frame 0",
+  "keys": [
+   0,
+   5,
+   7,
+   9,
+   12,
+   18,
+   24
+  ],
+  "lags": {
+   "fingers": 0.5,
+   "ears": 2.0
+  }
+ },
+ "Screech": {
+  "frames": [
+   0,
+   24
+  ],
+  "samples": 25,
+  "fps": 30,
+  "loop": false,
+  "markers": {
+   "ScreechSound": 9
+  },
+  "control_action": "CellarBat_R01_Screech_Ctl",
+  "export_action": "Screech",
+  "bake": {
+   "control_action": "CellarBat_R01_Screech_Ctl",
+   "baked_action": "Screech",
+   "frames": [
+    0,
+    24
+   ],
+   "frame_count": 25,
+   "keyed_bones": 42,
+   "max_head_err_cm": 1.3e-05,
+   "max_rot_err_deg": 0.0,
+   "root_max_deviation": 0.0,
+   "non_unit_scale_keys": 0,
+   "constraints_muted_for_export": true
+  },
+  "note": "anticipation dip 4, snap open 9, shudder 9-17, release by 24 (ends on Hover frame 0)",
+  "keys": [
+   0,
+   4,
+   9,
+   16,
+   21,
+   24
+  ],
+  "lags": {
+   "fingers": 1.5,
+   "ears": 1.0
+  }
+ },
+ "SwoopTelegraph": {
+  "frames": [
+   0,
+   18
+  ],
+  "samples": 19,
+  "fps": 30,
+  "loop": false,
+  "markers": {},
+  "control_action": "CellarBat_R01_SwoopTelegraph_Ctl",
+  "export_action": "SwoopTelegraph",
+  "bake": {
+   "control_action": "CellarBat_R01_SwoopTelegraph_Ctl",
+   "baked_action": "SwoopTelegraph",
+   "frames": [
+    0,
+    18
+   ],
+   "frame_count": 19,
+   "keyed_bones": 42,
+   "max_head_err_cm": 1.7e-05,
+   "max_rot_err_deg": 0.0,
+   "root_max_deviation": 0.0,
+   "non_unit_scale_keys": 0,
+   "constraints_muted_for_export": true
+  },
+  "note": "one beat down, rear up with wings high, hold quivering",
+  "keys": [
+   0,
+   3,
+   6,
+   9,
+   13,
+   18
+  ],
+  "lags": {
+   "fingers": 1.5,
+   "ears": 1.5
+  }
+ },
+ "Swoop": {
+  "frames": [
+   0,
+   18
+  ],
+  "samples": 19,
+  "fps": 30,
+  "loop": false,
+  "markers": {
+   "SwoopContact": 9
+  },
+  "control_action": "CellarBat_R01_Swoop_Ctl",
+  "export_action": "Swoop",
+  "bake": {
+   "control_action": "CellarBat_R01_Swoop_Ctl",
+   "baked_action": "Swoop",
+   "frames": [
+    0,
+    18
+   ],
+   "frame_count": 19,
+   "keyed_bones": 42,
+   "max_head_err_cm": 1.3e-05,
+   "max_rot_err_deg": 0.0,
+   "root_max_deviation": 0.0,
+   "non_unit_scale_keys": 0,
+   "constraints_muted_for_export": true
+  },
+  "note": "telegraph end -> tuck 5 -> feet/jaw strike 9 -> wings reopening into Hover frame 0 (pitched +6)",
+  "keys": [
+   0,
+   2,
+   5,
+   9,
+   14,
+   18
+  ],
+  "lags": {
+   "fingers": 1.0,
+   "ears": 1.5,
+   "legs": 1.0
+  }
+ },
+ "SwoopRecover": {
+  "frames": [
+   0,
+   18
+  ],
+  "samples": 19,
+  "fps": 30,
+  "loop": false,
+  "markers": {},
+  "control_action": "CellarBat_R01_SwoopRecover_Ctl",
+  "export_action": "SwoopRecover",
+  "bake": {
+   "control_action": "CellarBat_R01_SwoopRecover_Ctl",
+   "baked_action": "SwoopRecover",
+   "frames": [
+    0,
+    18
+   ],
+   "frame_count": 19,
+   "keyed_bones": 42,
+   "max_head_err_cm": 1.8e-05,
+   "max_rot_err_deg": 0.0,
+   "root_max_deviation": 0.0,
+   "non_unit_scale_keys": 0,
+   "constraints_muted_for_export": true
+  },
+  "note": "one hard pull-out beat, ends on Hover frame 0",
+  "keys": [
+   0,
+   3,
+   6,
+   10,
+   13,
+   18
+  ],
+  "lags": {
+   "fingers": 1.5,
+   "ears": 2.0,
+   "legs": 2.5
+  }
+ },
+ "Hit": {
+  "frames": [
+   0,
+   12
+  ],
+  "samples": 13,
+  "fps": 30,
+  "loop": false,
+  "markers": {},
+  "control_action": "CellarBat_R01_Hit_Ctl",
+  "export_action": "Hit",
+  "bake": {
+   "control_action": "CellarBat_R01_Hit_Ctl",
+   "baked_action": "Hit",
+   "frames": [
+    0,
+    12
+   ],
+   "frame_count": 13,
+   "keyed_bones": 42,
+   "max_head_err_cm": 1.1e-05,
+   "max_rot_err_deg": 0.0,
+   "root_max_deviation": 0.0,
+   "non_unit_scale_keys": 0,
+   "constraints_muted_for_export": true
+  },
+  "note": "snap at 2 (left wing flung up, right dropped, body rolled), settles to Hover frame 0",
+  "keys": [
+   0,
+   2,
+   6,
+   12
+  ],
+  "lags": {
+   "fingers": 1.0,
+   "ears": 1.5,
+   "legs": 1.5
+  }
+ },
+ "Stun": {
+  "frames": [
+   0,
+   30
+  ],
+  "samples": 31,
+  "fps": 30,
+  "loop": true,
+  "markers": {},
+  "control_action": "CellarBat_R01_Stun_Ctl",
+  "export_action": "Stun",
+  "bake": {
+   "control_action": "CellarBat_R01_Stun_Ctl",
+   "baked_action": "Stun",
+   "frames": [
+    0,
+    30
+   ],
+   "frame_count": 31,
+   "keyed_bones": 42,
+   "max_head_err_cm": 1.6e-05,
+   "max_rot_err_deg": 0.0,
+   "root_max_deviation": 0.0,
+   "non_unit_scale_keys": 0,
+   "constraints_muted_for_export": true
+  },
+  "note": "half-rate weak flap, lopsided body wobble, ears flat",
+  "keys": [
+   0,
+   8,
+   15,
+   23
+  ],
+  "lags": {
+   "fingers": 2.0,
+   "ears": 3.0,
+   "legs": 3.0,
+   "head": 2.0
+  }
+ },
+ "DeathFall": {
+  "frames": [
+   0,
+   21
+  ],
+  "samples": 22,
+  "fps": 30,
+  "loop": false,
+  "markers": {},
+  "control_action": "CellarBat_R01_DeathFall_Ctl",
+  "export_action": "DeathFall",
+  "bake": {
+   "control_action": "CellarBat_R01_DeathFall_Ctl",
+   "baked_action": "DeathFall",
+   "frames": [
+    0,
+    21
+   ],
+   "frame_count": 22,
+   "keyed_bones": 42,
+   "max_head_err_cm": 1.6e-05,
+   "max_rot_err_deg": 0.0,
+   "root_max_deviation": 0.0,
+   "non_unit_scale_keys": 0,
+   "constraints_muted_for_export": true
+  },
+  "note": "hit jolt then wings go limp",
+  "keys": [
+   0,
+   4,
+   10,
+   21
+  ],
+  "lags": {
+   "fingers": 0.5,
+   "ears": 2.5,
+   "legs": 2.0,
+   "head": 2.0
+  }
+ },
+ "DeathLand": {
+  "frames": [
+   0,
+   18
+  ],
+  "samples": 19,
+  "fps": 30,
+  "loop": false,
+  "markers": {},
+  "control_action": "CellarBat_R01_DeathLand_Ctl",
+  "export_action": "DeathLand",
+  "bake": {
+   "control_action": "CellarBat_R01_DeathLand_Ctl",
+   "baked_action": "DeathLand",
+   "frames": [
+    0,
+    18
+   ],
+   "frame_count": 19,
+   "keyed_bones": 42,
+   "max_head_err_cm": 1.5e-05,
+   "max_rot_err_deg": 0.0,
+   "root_max_deviation": 0.0,
+   "non_unit_scale_keys": 0,
+   "constraints_muted_for_export": true
+  },
+  "note": "impact at 3, one bounce, settled belly-down with wings flat by 18",
+  "keys": [
+   0,
+   3,
+   7,
+   11,
+   18
+  ],
+  "lags": {
+   "fingers": 1.5,
+   "ears": 2.0,
+   "head": 1.0
+  }
+ }
+}

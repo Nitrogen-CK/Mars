@@ -1,0 +1,58 @@
+D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\cellar_bat_r01\scripts\build_cellar_bat.py:960: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m.use_nodes = True
+WRAPSOLVE step 15.00 pass 0 cost 68.20 {"upperarm": -60.0, "forearm": -15.0, "wrist": 0.0, "finger_04a": 26.25, "finger_04b": 15.0, "finger_03a": -41.25, "finger_03b": -48.75, "finger_02a": -26.25, "finger_02b": -41.25, "finger_01a": -82.5, "finger_01b": -22.5, "thumb_a": -180.0}
+WRAPSOLVE step 15.00 pass 1 cost 68.20 {"upperarm": -60.0, "forearm": -15.0, "wrist": 0.0, "finger_04a": 26.25, "finger_04b": 15.0, "finger_03a": -41.25, "finger_03b": -48.75, "finger_02a": -26.25, "finger_02b": -41.25, "finger_01a": -82.5, "finger_01b": -22.5, "thumb_a": -180.0}
+WRAPSOLVE step 7.50 pass 0 cost 56.16 {"upperarm": -60.0, "forearm": -15.0, "wrist": 0.0, "finger_04a": 26.25, "finger_04b": 22.5, "finger_03a": -33.75, "finger_03b": -48.75, "finger_02a": -26.25, "finger_02b": -41.25, "finger_01a": -82.5, "finger_01b": -22.5, "thumb_a": -180.0}
+WRAPSOLVE step 7.50 pass 1 cost 56.11 {"upperarm": -60.0, "forearm": -15.0, "wrist": 0.0, "finger_04a": 11.25, "finger_04b": 22.5, "finger_03a": -41.25, "finger_03b": -48.75, "finger_02a": -26.25, "finger_02b": -41.25, "finger_01a": -82.5, "finger_01b": -22.5, "thumb_a": -180.0}
+WRAPSOLVE step 3.75 pass 0 cost 53.94 {"upperarm": -60.0, "forearm": -11.25, "wrist": 0.0, "finger_04a": 11.25, "finger_04b": 22.5, "finger_03a": -41.25, "finger_03b": -45.0, "finger_02a": -30.0, "finger_02b": -41.25, "finger_01a": -82.5, "finger_01b": -22.5, "thumb_a": -180.0}
+WRAPSOLVE step 3.75 pass 1 cost 53.62 {"upperarm": -60.0, "forearm": -7.5, "wrist": 0.0, "finger_04a": 11.25, "finger_04b": 22.5, "finger_03a": -41.25, "finger_03b": -45.0, "finger_02a": -30.0, "finger_02b": -41.25, "finger_01a": -82.5, "finger_01b": -22.5, "thumb_a": -180.0}
+WRAPSOLVE_RESULT {"memb_l_body": 0, "memb_l_legs": 0, "memb_l_self": 106, "ribs_l_body": 0, "ribs_l_legs": 0, "memb_r_body": 0, "memb_r_legs": 0, "memb_r_self": 76, "ribs_r_body": 0, "ribs_r_legs": 0, "memb_l_memb_r": 0, "ribs_l_ribs_r": 0, "memb_opp_ribs": 0, "attach_memroot_body": 66, "attach_ribroot_body": 48, "standoff_cm": 0.1755, "hang": {"memb_l_body": 0, "memb_l_legs": 0, "memb_l_self": 98, "ribs_l_body": 0, "ribs_l_legs": 0, "memb_r_body": 0, "memb_r_legs": 0, "memb_r_self": 78, "ribs_r_body": 0, "ribs_r_legs": 0, "memb_l_memb_r": 0, "ribs_l_ribs_r": 0, "memb_opp_ribs": 0, "attach_memroot_body": 66, "attach_ribroot_body": 48}}
+
+Starting unwrap
+	Generating lengths...done
+...done
+	Consolidating Boxes...Consolidated 0 boxes, done
+	Packing Boxes 3241...done
+	writing back UVsdone
+finished all 0.96 
+LOD0 {"object": "CellarBat_R01_Body", "tris": 6482, "verts": 3545, "render_verts": 19446, "slots": ["Body", "Membrane", "Eyes"], "tris_per_slot": {"Body": 3582, "Membrane": 2884, "Eyes": 16}, "weights": {"max_influences": 4, "unnormalized": 0, "unweighted": 0, "non_bone_groups": []}, "audit": {"tris": 6482, "verts": 3545, "islands": 106, "closed_islands": 104, "open_membrane_islands": 2, "open_non_membrane_islands (defect)": 0, "membrane_boundary_edges (intentional)": 188, "boundary_edges_non_membrane (defect)": 0, "edges_with_3plus_faces (defect)": 0, "winding_flips (defect)": 0, "inverted_closed_islands (defect)": 0, "zero_area_tris (<1e-6 cm2, defect)": 0, "duplicate_verts_same_island (defect)": 0, "coincident_verts_across_islands (info)": 38, "sliver_tris_min_angle_lt_2deg (info)": 38, "min_tri_area_cm2": 0.00938461131668639, "min_angle_deg": 0.9044262504549403}, "uv": {"uv0": true, "uv_layer": "UV0", "overlap_px": 0, "covered_px": 204769, "coverage_pct": 19.53, "raster": 1024, "out_of_range_loops": 0, "degenerate_uv_tris": 0}, "cavity_alpha_min_mean": [0.15, 0.747]}
+
+Starting unwrap
+	Generating lengths...done
+...done
+	Consolidating Boxes...Consolidated 0 boxes, done
+	Packing Boxes 1324...done
+	writing back UVsdone
+finished all 0.18 
+LOD1 {"object": "CellarBat_R01_Body_LOD1", "tris": 2648, "verts": 1561, "render_verts": 7944, "slots": ["Body", "Membrane", "Eyes"], "tris_per_slot": {"Body": 1958, "Membrane": 674, "Eyes": 16}, "weights": {"max_influences": 4, "unnormalized": 0, "unweighted": 0, "non_bone_groups": []}, "audit": {"tris": 2648, "verts": 1561, "islands": 97, "closed_islands": 95, "open_membrane_islands": 2, "open_non_membrane_islands (defect)": 0, "membrane_boundary_edges (intentional)": 90, "boundary_edges_non_membrane (defect)": 0, "edges_with_3plus_faces (defect)": 0, "winding_flips (defect)": 0, "inverted_closed_islands (defect)": 0, "zero_area_tris (<1e-6 cm2, defect)": 0, "duplicate_verts_same_island (defect)": 0, "coincident_verts_across_islands (info)": 36, "sliver_tris_min_angle_lt_2deg (info)": 18, "min_tri_area_cm2": 0.016950985429626142, "min_angle_deg": 0.3202110088952922}, "uv": {"uv0": true, "uv_layer": "UV0", "overlap_px": 0, "covered_px": 436670, "coverage_pct": 41.64, "raster": 1024, "out_of_range_loops": 0, "degenerate_uv_tris": 0}, "cavity_alpha_min_mean": [0.15, 0.725]}
+
+Starting unwrap
+	Generating lengths...done
+...done
+	Consolidating Boxes...Consolidated 0 boxes, done
+	Packing Boxes 601...done
+	writing back UVsdone
+finished all 0.04 
+LOD2 {"object": "CellarBat_R01_Body_LOD2", "tris": 1202, "verts": 757, "render_verts": 3606, "slots": ["Body", "Membrane", "Eyes"], "tris_per_slot": {"Body": 1054, "Membrane": 132, "Eyes": 16}, "weights": {"max_influences": 4, "unnormalized": 0, "unweighted": 0, "non_bone_groups": []}, "audit": {"tris": 1202, "verts": 757, "islands": 69, "closed_islands": 67, "open_membrane_islands": 2, "open_non_membrane_islands (defect)": 0, "membrane_boundary_edges (intentional)": 40, "boundary_edges_non_membrane (defect)": 0, "edges_with_3plus_faces (defect)": 0, "winding_flips (defect)": 0, "inverted_closed_islands (defect)": 0, "zero_area_tris (<1e-6 cm2, defect)": 0, "duplicate_verts_same_island (defect)": 0, "coincident_verts_across_islands (info)": 14, "sliver_tris_min_angle_lt_2deg (info)": 4, "min_tri_area_cm2": 0.016950985429626142, "min_angle_deg": 1.134979173735415}, "uv": {"uv0": true, "uv_layer": "UV0", "overlap_px": 0, "covered_px": 602209, "coverage_pct": 57.43, "raster": 1024, "out_of_range_loops": 0, "degenerate_uv_tris": 0}, "cavity_alpha_min_mean": [0.151, 0.708]}
+MEASURE {"span_y_cm": 75.0, "bounds_min_ue": [-11.889, -37.5, -16.339], "bounds_max_ue": [8.353, 37.5, 17.023], "nose_to_rump_along_body_axis_cm": 22.086, "nose_tip_to_rump_point_cm": 19.049, "torso_width_cm": 12.0, "torso_depth_cm": 11.9, "ear_base_to_tip_cm": 10.0, "nose_x_cm": 8.353}
+WRAPLAYER {"front_left_verts": 523, "over_right": 65, "gap_min_cm": 0.481, "gap_p10_cm": 0.719, "gap_median_cm": 1.323, "gap_p90_cm": 1.663}
+WRAPDETAIL standoff 0.179 ribs-body {}
+RIGCHECK {"Spread": {"max_head_cm": 2.1e-05, "max_rot_deg": 0.0}, "flap_00": {"max_head_cm": 1.4e-05, "max_rot_deg": 0.0}, "flap_04": {"max_head_cm": 1.4e-05, "max_rot_deg": 0.0}, "flap_08": {"max_head_cm": 1.7e-05, "max_rot_deg": 0.0}, "flap_12": {"max_head_cm": 1.8e-05, "max_rot_deg": 0.0}, "HalfFold (fold 0.5)": {"max_head_cm": 1.3e-05, "max_rot_deg": 0.0}, "Wrap (fold 1)": {"max_head_cm": 1.1e-05, "max_rot_deg": 0.0}, "BankLeft": {"max_head_cm": 3.4e-05, "max_rot_deg": 0.0}, "BankRight": {"max_head_cm": 1.1e-05, "max_rot_deg": 0.0}}
+ISECT Spread     {"memb_l_body": 0, "memb_l_legs": 0, "memb_l_self": 0, "ribs_l_body": 0, "ribs_l_legs": 0, "memb_r_body": 0, "memb_r_legs": 0, "memb_r_self": 0, "ribs_r_body": 0, "ribs_r_legs": 0, "memb_l_memb_r": 0, "ribs_l_ribs_r": 0, "memb_opp_ribs": 0, "attach_memroot_body": 70, "attach_ribroot_body": 54}
+ISECT Up         {"memb_l_body": 0, "memb_l_legs": 0, "memb_l_self": 44, "ribs_l_body": 0, "ribs_l_legs": 0, "memb_r_body": 0, "memb_r_legs": 0, "memb_r_self": 44, "ribs_r_body": 0, "ribs_r_legs": 0, "memb_l_memb_r": 0, "ribs_l_ribs_r": 0, "memb_opp_ribs": 0, "attach_memroot_body": 68, "attach_ribroot_body": 62}
+ISECT Down       {"memb_l_body": 0, "memb_l_legs": 0, "memb_l_self": 0, "ribs_l_body": 0, "ribs_l_legs": 0, "memb_r_body": 0, "memb_r_legs": 0, "memb_r_self": 0, "ribs_r_body": 0, "ribs_r_legs": 0, "memb_l_memb_r": 0, "ribs_l_ribs_r": 0, "memb_opp_ribs": 0, "attach_memroot_body": 80, "attach_ribroot_body": 56}
+ISECT Recover    {"memb_l_body": 0, "memb_l_legs": 0, "memb_l_self": 19, "ribs_l_body": 0, "ribs_l_legs": 0, "memb_r_body": 0, "memb_r_legs": 0, "memb_r_self": 19, "ribs_r_body": 0, "ribs_r_legs": 0, "memb_l_memb_r": 0, "ribs_l_ribs_r": 0, "memb_opp_ribs": 0, "attach_memroot_body": 76, "attach_ribroot_body": 54}
+ISECT HalfFold   {"memb_l_body": 0, "memb_l_legs": 0, "memb_l_self": 3, "ribs_l_body": 0, "ribs_l_legs": 0, "memb_r_body": 0, "memb_r_legs": 0, "memb_r_self": 3, "ribs_r_body": 0, "ribs_r_legs": 0, "memb_l_memb_r": 0, "ribs_l_ribs_r": 0, "memb_opp_ribs": 0, "attach_memroot_body": 88, "attach_ribroot_body": 62}
+ISECT Wrap       {"memb_l_body": 0, "memb_l_legs": 0, "memb_l_self": 106, "ribs_l_body": 0, "ribs_l_legs": 0, "memb_r_body": 0, "memb_r_legs": 0, "memb_r_self": 76, "ribs_r_body": 0, "ribs_r_legs": 0, "memb_l_memb_r": 0, "ribs_l_ribs_r": 0, "memb_opp_ribs": 0, "attach_memroot_body": 66, "attach_ribroot_body": 48}
+ISECT BankLeft   {"memb_l_body": 0, "memb_l_legs": 0, "memb_l_self": 0, "ribs_l_body": 0, "ribs_l_legs": 0, "memb_r_body": 0, "memb_r_legs": 0, "memb_r_self": 0, "ribs_r_body": 0, "ribs_r_legs": 0, "memb_l_memb_r": 0, "ribs_l_ribs_r": 0, "memb_opp_ribs": 0, "attach_memroot_body": 79, "attach_ribroot_body": 55}
+ISECT BankRight  {"memb_l_body": 0, "memb_l_legs": 0, "memb_l_self": 0, "ribs_l_body": 0, "ribs_l_legs": 0, "memb_r_body": 0, "memb_r_legs": 0, "memb_r_self": 0, "ribs_r_body": 0, "ribs_r_legs": 0, "memb_l_memb_r": 0, "ribs_l_ribs_r": 0, "memb_opp_ribs": 0, "attach_memroot_body": 79, "attach_ribroot_body": 55}
+ISECT Hang       {"memb_l_body": 0, "memb_l_legs": 0, "memb_l_self": 98, "ribs_l_body": 0, "ribs_l_legs": 0, "memb_r_body": 0, "memb_r_legs": 0, "memb_r_self": 76, "ribs_r_body": 0, "ribs_r_legs": 0, "memb_l_memb_r": 0, "ribs_l_ribs_r": 0, "memb_opp_ribs": 0, "attach_memroot_body": 66, "attach_ribroot_body": 48}
+HANG {"bar_centre_blender": [3.0, 0.0, 18.75], "bar_radius_cm": 1.0, "fk_to_bar_offset_cm": [0.0, 0.0, 0.004], "ik_ankle_error_cm": 0.0, "feet": {"l": {"min_surface_dist_cm": -0.12, "verts_within_0.25cm": 12, "verts_inside_bar": 1}, "r": {"min_surface_dist_cm": -0.12, "verts_within_0.25cm": 12, "verts_inside_bar": 1}}, "root_world": [0.0, 0.0, 0.0]}
+FOLDSLIDER 0.25 {"memb_l_body": 0, "memb_l_legs": 0, "memb_l_self": 0, "ribs_l_body": 0, "ribs_l_legs": 0, "memb_r_body": 0, "memb_r_legs": 0, "memb_r_self": 0, "ribs_r_body": 0, "ribs_r_legs": 0, "memb_l_memb_r": 0, "ribs_l_ribs_r": 0, "memb_opp_ribs": 0, "attach_memroot_body": 78, "attach_ribroot_body": 54}
+FOLDSLIDER 0.75 {"memb_l_body": 0, "memb_l_legs": 0, "memb_l_self": 42, "ribs_l_body": 0, "ribs_l_legs": 0, "memb_r_body": 0, "memb_r_legs": 0, "memb_r_self": 26, "ribs_r_body": 0, "ribs_r_legs": 0, "memb_l_memb_r": 0, "ribs_l_ribs_r": 0, "memb_opp_ribs": 0, "attach_memroot_body": 82, "attach_ribroot_body": 54}
+FLAPFRAMES worst over 16 frames {"memb_l_body": 0, "memb_r_body": 0, "memb_l_legs": 0, "memb_r_legs": 0, "ribs_l_body": 0, "ribs_r_body": 0, "memb_l_memb_r": 0, "ribs_l_ribs_r": 0, "memb_opp_ribs": 0}
+Info: Saved as "CellarBat_R01.blend"
+CELLAR_BAT_OK
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+
+Blender quit

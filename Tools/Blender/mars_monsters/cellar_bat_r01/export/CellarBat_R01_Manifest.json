@@ -1,0 +1,704 @@
+{
+ "asset": "CellarBat_R01",
+ "generated_by": "scripts/export_anims_cellar_bat.py (Phase 4)",
+ "versions": {
+  "blender": "5.2.2 LTS",
+  "fbx_exporter_addon": "5.15.0",
+  "fbx_file_version": 7400,
+  "fbx_note": "binary FBX written by the Blender exporter (file version above), not Autodesk FBX 2020.2; proven by the Blender round trip and the Phase 2 Unreal import"
+ },
+ "units_axes": {
+  "blender_scene": {
+   "system": "METRIC",
+   "scale_length": 0.009999999776482582,
+   "note": "1 BU = 1 cm"
+  },
+  "exporter_args_common": {
+   "use_selection": true,
+   "apply_unit_scale": true,
+   "apply_scale_options": "FBX_SCALE_NONE",
+   "global_scale": 1.0,
+   "axis_forward": "-Z",
+   "axis_up": "Y",
+   "use_mesh_modifiers": false,
+   "mesh_smooth_type": "FACE",
+   "use_triangles": true,
+   "use_tspace": false,
+   "add_leaf_bones": false,
+   "path_mode": "STRIP",
+   "colors_type": "SRGB",
+   "use_custom_props": false,
+   "bake_space_transform": false
+  },
+  "bind_args": {
+   "use_selection": true,
+   "apply_unit_scale": true,
+   "apply_scale_options": "FBX_SCALE_NONE",
+   "global_scale": 1.0,
+   "axis_forward": "-Z",
+   "axis_up": "Y",
+   "use_mesh_modifiers": false,
+   "mesh_smooth_type": "FACE",
+   "use_triangles": true,
+   "use_tspace": false,
+   "add_leaf_bones": false,
+   "path_mode": "STRIP",
+   "colors_type": "SRGB",
+   "use_custom_props": false,
+   "bake_space_transform": false,
+   "object_types": [
+    "ARMATURE",
+    "MESH"
+   ],
+   "primary_bone_axis": "Y",
+   "secondary_bone_axis": "X",
+   "use_armature_deform_only": true,
+   "armature_nodetype": "NULL",
+   "bake_anim": false
+  },
+  "clip_args": {
+   "use_selection": true,
+   "apply_unit_scale": true,
+   "apply_scale_options": "FBX_SCALE_NONE",
+   "global_scale": 1.0,
+   "axis_forward": "-Z",
+   "axis_up": "Y",
+   "use_mesh_modifiers": false,
+   "mesh_smooth_type": "FACE",
+   "use_triangles": true,
+   "use_tspace": false,
+   "add_leaf_bones": false,
+   "path_mode": "STRIP",
+   "colors_type": "SRGB",
+   "use_custom_props": false,
+   "bake_space_transform": false,
+   "object_types": [
+    "ARMATURE",
+    "MESH"
+   ],
+   "primary_bone_axis": "Y",
+   "secondary_bone_axis": "X",
+   "use_armature_deform_only": true,
+   "armature_nodetype": "NULL",
+   "bake_anim": true,
+   "bake_anim_use_all_bones": true,
+   "bake_anim_use_nla_strips": false,
+   "bake_anim_use_all_actions": false,
+   "bake_anim_force_startend_keying": true,
+   "bake_anim_step": 1.0,
+   "bake_anim_simplify_factor": 0.0
+  },
+  "frame_map": "Blender (x, y, z) cm -> Unreal (x, -y, z) cm; +X forward, +Z up; bat left (*_l) = Blender +Y = Unreal -Y",
+  "armature_export_name": "Armature (renamed only while exporting; Unreal drops the node)"
+ },
+ "dimensions_cm": {
+  "span_y_cm": 75.0,
+  "nose_to_rump_along_body_axis_cm": 22.086,
+  "nose_tip_to_rump_point_cm": 19.049,
+  "torso_width_cm": 12.0,
+  "torso_depth_cm": 11.9,
+  "ear_base_to_tip_cm": 10.0,
+  "nose_x_cm": 8.353,
+  "span_target": 75.0
+ },
+ "lods": {
+  "0": {
+   "file": "CellarBat_R01_Mars_SK.fbx",
+   "tris": 6482,
+   "verts": 3545,
+   "slots": [
+    "Body",
+    "Membrane",
+    "Eyes"
+   ],
+   "bounds_ue_cm": {
+    "min": [
+     -11.889,
+     -37.5,
+     -16.339
+    ],
+    "max": [
+     8.353,
+     37.5,
+     17.023
+    ]
+   },
+   "span_cm": 75.0,
+   "bytes": 422812
+  },
+  "1": {
+   "file": "CellarBat_R01_LOD1_Mars_SK.fbx",
+   "tris": 2648,
+   "verts": 1561,
+   "slots": [
+    "Body",
+    "Membrane",
+    "Eyes"
+   ],
+   "bounds_ue_cm": {
+    "min": [
+     -11.889,
+     -37.5,
+     -16.335
+    ],
+    "max": [
+     8.353,
+     37.5,
+     17.023
+    ]
+   },
+   "span_cm": 75.0,
+   "bytes": 230940
+  },
+  "2": {
+   "file": "CellarBat_R01_LOD2_Mars_SK.fbx",
+   "tris": 1202,
+   "verts": 757,
+   "slots": [
+    "Body",
+    "Membrane",
+    "Eyes"
+   ],
+   "bounds_ue_cm": {
+    "min": [
+     -11.889,
+     -37.5,
+     -16.147
+    ],
+    "max": [
+     8.353,
+     37.5,
+     17.023
+    ]
+   },
+   "span_cm": 75.0,
+   "bytes": 163164
+  }
+ },
+ "bone_count": 42,
+ "bones": [
+  {
+   "name": "root",
+   "parent": null
+  },
+  {
+   "name": "pelvis",
+   "parent": "root"
+  },
+  {
+   "name": "spine",
+   "parent": "pelvis"
+  },
+  {
+   "name": "neck",
+   "parent": "spine"
+  },
+  {
+   "name": "head",
+   "parent": "neck"
+  },
+  {
+   "name": "jaw",
+   "parent": "head"
+  },
+  {
+   "name": "ear_base_l",
+   "parent": "head"
+  },
+  {
+   "name": "ear_tip_l",
+   "parent": "ear_base_l"
+  },
+  {
+   "name": "ear_base_r",
+   "parent": "head"
+  },
+  {
+   "name": "ear_tip_r",
+   "parent": "ear_base_r"
+  },
+  {
+   "name": "upperarm_l",
+   "parent": "spine"
+  },
+  {
+   "name": "forearm_l",
+   "parent": "upperarm_l"
+  },
+  {
+   "name": "wrist_l",
+   "parent": "forearm_l"
+  },
+  {
+   "name": "finger_01a_l",
+   "parent": "wrist_l"
+  },
+  {
+   "name": "finger_01b_l",
+   "parent": "finger_01a_l"
+  },
+  {
+   "name": "finger_02a_l",
+   "parent": "wrist_l"
+  },
+  {
+   "name": "finger_02b_l",
+   "parent": "finger_02a_l"
+  },
+  {
+   "name": "finger_03a_l",
+   "parent": "wrist_l"
+  },
+  {
+   "name": "finger_03b_l",
+   "parent": "finger_03a_l"
+  },
+  {
+   "name": "finger_04a_l",
+   "parent": "wrist_l"
+  },
+  {
+   "name": "finger_04b_l",
+   "parent": "finger_04a_l"
+  },
+  {
+   "name": "thumb_a_l",
+   "parent": "wrist_l"
+  },
+  {
+   "name": "thumb_b_l",
+   "parent": "thumb_a_l"
+  },
+  {
+   "name": "upperarm_r",
+   "parent": "spine"
+  },
+  {
+   "name": "forearm_r",
+   "parent": "upperarm_r"
+  },
+  {
+   "name": "wrist_r",
+   "parent": "forearm_r"
+  },
+  {
+   "name": "finger_01a_r",
+   "parent": "wrist_r"
+  },
+  {
+   "name": "finger_01b_r",
+   "parent": "finger_01a_r"
+  },
+  {
+   "name": "finger_02a_r",
+   "parent": "wrist_r"
+  },
+  {
+   "name": "finger_02b_r",
+   "parent": "finger_02a_r"
+  },
+  {
+   "name": "finger_03a_r",
+   "parent": "wrist_r"
+  },
+  {
+   "name": "finger_03b_r",
+   "parent": "finger_03a_r"
+  },
+  {
+   "name": "finger_04a_r",
+   "parent": "wrist_r"
+  },
+  {
+   "name": "finger_04b_r",
+   "parent": "finger_04a_r"
+  },
+  {
+   "name": "thumb_a_r",
+   "parent": "wrist_r"
+  },
+  {
+   "name": "thumb_b_r",
+   "parent": "thumb_a_r"
+  },
+  {
+   "name": "thigh_l",
+   "parent": "pelvis"
+  },
+  {
+   "name": "shin_l",
+   "parent": "thigh_l"
+  },
+  {
+   "name": "foot_l",
+   "parent": "shin_l"
+  },
+  {
+   "name": "thigh_r",
+   "parent": "pelvis"
+  },
+  {
+   "name": "shin_r",
+   "parent": "thigh_r"
+  },
+  {
+   "name": "foot_r",
+   "parent": "shin_r"
+  }
+ ],
+ "material_slots": [
+  "Body",
+  "Membrane",
+  "Eyes"
+ ],
+ "vertex_colour": "corner attribute Col (sRGB bytes): RGB albedo, A cavity/occlusion",
+ "uv": "UV0 (lightmap-packed, non-overlapping)",
+ "morph_targets": [],
+ "clip_contract": {
+  "fps": 30,
+  "root": "root bone identity on every sample of every clip (asserted by the bake and the round trip); runtime owns travel, perch alignment and falling",
+  "loop_convention": "loops export N+1 samples on frames 0..N; frame N duplicates frame 0 in pose and slope (Hover/FlyForward 16 samples, Glide/Stun 31, RoostIdle 61); Unreal imports N+1 keys, length N/30 s, and must loop without holding the seam",
+  "file_content": "export armature + LOD0 mesh + exactly one action per clip FBX (bake_anim_use_all_actions=False, bake_anim_use_nla_strips=False)",
+  "additive_reference_pose": {
+   "clip": "Hover",
+   "frame": 0
+  },
+  "additive_note": "BankLeft/BankRight are full poses authored as Hover frame 0 + the bank intent, exported as 2 identical samples (frames 0..1; the Unreal FBX importer rejects a zero-length take); set them additive against Hover frame 0 in Unreal",
+  "markers": "presentation only (frame numbers in each clip's `markers`); gameplay owns damage/state"
+ },
+ "clips": {
+  "RoostIdle": {
+   "fps": 30,
+   "frames": [
+    0,
+    60
+   ],
+   "samples": 61,
+   "loop": true,
+   "markers": {},
+   "source_control_action": "CellarBat_R01_RoostIdle_Ctl",
+   "export_action": "RoostIdle",
+   "file": "export/anims/CellarBat_R01_RoostIdle_Mars_ANIM.fbx",
+   "bytes": 811884,
+   "unreal_path": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_RoostIdle_Mars_ANIM",
+   "note": "Hang pose (fold 1, perch 1, feet IK on the bar); breath period 1 s; ear twitch 34-44"
+  },
+  "RoostAlert": {
+   "fps": 30,
+   "frames": [
+    0,
+    18
+   ],
+   "samples": 19,
+   "loop": false,
+   "markers": {},
+   "source_control_action": "CellarBat_R01_RoostAlert_Ctl",
+   "export_action": "RoostAlert",
+   "file": "export/anims/CellarBat_R01_RoostAlert_Mars_ANIM.fbx",
+   "bytes": 701484,
+   "unreal_path": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_RoostAlert_Mars_ANIM",
+   "note": "fold 1 -> 0.82-0.90 (partial unwrap), ears alert, head lifts so the face points +X"
+  },
+  "Launch": {
+   "fps": 30,
+   "frames": [
+    0,
+    24
+   ],
+   "samples": 25,
+   "loop": false,
+   "markers": {
+    "ReleaseContact": 6
+   },
+   "source_control_action": "CellarBat_R01_Launch_Ctl",
+   "export_action": "Launch",
+   "file": "export/anims/CellarBat_R01_Launch_Mars_ANIM.fbx",
+   "bytes": 725084,
+   "unreal_path": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Launch_Mars_ANIM",
+   "note": "feet on the bar until 5, perch off by 10; pelvis hang -> half-turn -> dive -> flight"
+  },
+  "Hover": {
+   "fps": 30,
+   "frames": [
+    0,
+    15
+   ],
+   "samples": 16,
+   "loop": true,
+   "markers": {
+    "Wingbeat": 6
+   },
+   "source_control_action": "CellarBat_R01_Hover_Ctl",
+   "export_action": "Hover",
+   "file": "export/anims/CellarBat_R01_Hover_Mars_ANIM.fbx",
+   "bytes": 698764,
+   "unreal_path": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Hover_Mars_ANIM",
+   "note": "flap keys 0 Up / 4 Power / 8 Down / 12 Recover / 15 = 0"
+  },
+  "FlyForward": {
+   "fps": 30,
+   "frames": [
+    0,
+    15
+   ],
+   "samples": 16,
+   "loop": true,
+   "markers": {
+    "Wingbeat": 6
+   },
+   "source_control_action": "CellarBat_R01_FlyForward_Ctl",
+   "export_action": "FlyForward",
+   "file": "export/anims/CellarBat_R01_FlyForward_Mars_ANIM.fbx",
+   "bytes": 698764,
+   "unreal_path": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_FlyForward_Mars_ANIM",
+   "note": "Hover cycle, body pitched +24 deg, downstroke -38 instead of -50"
+  },
+  "Glide": {
+   "fps": 30,
+   "frames": [
+    0,
+    30
+   ],
+   "samples": 31,
+   "loop": true,
+   "markers": {},
+   "source_control_action": "CellarBat_R01_Glide_Ctl",
+   "export_action": "Glide",
+   "file": "export/anims/CellarBat_R01_Glide_Mars_ANIM.fbx",
+   "bytes": 748684,
+   "unreal_path": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Glide_Mars_ANIM",
+   "note": "spread glide + 1 s breath (spine/wing elev) and finger flex, all sin(2 pi t/30)"
+  },
+  "BankLeft": {
+   "fps": 30,
+   "frames": [
+    0,
+    1
+   ],
+   "samples": 2,
+   "loop": false,
+   "markers": {},
+   "source_control_action": "CellarBat_R01_BankLeft_Ctl",
+   "export_action": "BankLeft",
+   "file": "export/anims/CellarBat_R01_BankLeft_Mars_ANIM.fbx",
+   "bytes": 633756,
+   "unreal_path": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_BankLeft_Mars_ANIM",
+   "note": "full pose = Hover frame 0 + body roll -25 deg toward the bat's own left, inner wing -30, outer -4 (raised by the roll), head counter-roll; additive reference = Hover frame 0. CSV says 0-0; padded to 2 identical samples because the Unreal FBX importer rejects a zero-length take",
+   "additive": {
+    "type": "one held full pose (2 identical samples, frames 0..1), set additive in Unreal",
+    "reference_pose": {
+     "clip": "Hover",
+     "frame": 0
+    }
+   },
+   "csv_deviation": "CSV says 0-0; padded to 2 identical samples because the Unreal FBX importer rejects a zero-length take"
+  },
+  "BankRight": {
+   "fps": 30,
+   "frames": [
+    0,
+    1
+   ],
+   "samples": 2,
+   "loop": false,
+   "markers": {},
+   "source_control_action": "CellarBat_R01_BankRight_Ctl",
+   "export_action": "BankRight",
+   "file": "export/anims/CellarBat_R01_BankRight_Mars_ANIM.fbx",
+   "bytes": 633756,
+   "unreal_path": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_BankRight_Mars_ANIM",
+   "note": "full pose = Hover frame 0 + body roll +25 deg toward the bat's own right, inner wing -30, outer -4 (raised by the roll), head counter-roll; additive reference = Hover frame 0. CSV says 0-0; padded to 2 identical samples because the Unreal FBX importer rejects a zero-length take",
+   "additive": {
+    "type": "one held full pose (2 identical samples, frames 0..1), set additive in Unreal",
+    "reference_pose": {
+     "clip": "Hover",
+     "frame": 0
+    }
+   },
+   "csv_deviation": "CSV says 0-0; padded to 2 identical samples because the Unreal FBX importer rejects a zero-length take"
+  },
+  "Brake": {
+   "fps": 30,
+   "frames": [
+    0,
+    18
+   ],
+   "samples": 19,
+   "loop": false,
+   "markers": {},
+   "source_control_action": "CellarBat_R01_Brake_Ctl",
+   "export_action": "Brake",
+   "file": "export/anims/CellarBat_R01_Brake_Mars_ANIM.fbx",
+   "bytes": 701484,
+   "unreal_path": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Brake_Mars_ANIM",
+   "note": "one braking beat, then wings cup forward"
+  },
+  "Perch": {
+   "fps": 30,
+   "frames": [
+    0,
+    24
+   ],
+   "samples": 25,
+   "loop": false,
+   "markers": {
+    "FootContact": 12
+   },
+   "source_control_action": "CellarBat_R01_Perch_Ctl",
+   "export_action": "Perch",
+   "file": "export/anims/CellarBat_R01_Perch_Mars_ANIM.fbx",
+   "bytes": 725084,
+   "unreal_path": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Perch_Mars_ANIM",
+   "note": "brake -> pitch back with feet reaching (5) -> swing (9) -> feet on the bar at 12 (perch 1, IK) -> wrap by 24 = RoostIdle frame 0"
+  },
+  "Screech": {
+   "fps": 30,
+   "frames": [
+    0,
+    24
+   ],
+   "samples": 25,
+   "loop": false,
+   "markers": {
+    "ScreechSound": 9
+   },
+   "source_control_action": "CellarBat_R01_Screech_Ctl",
+   "export_action": "Screech",
+   "file": "export/anims/CellarBat_R01_Screech_Mars_ANIM.fbx",
+   "bytes": 725084,
+   "unreal_path": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Screech_Mars_ANIM",
+   "note": "anticipation dip 4, snap open 9, shudder 9-17, release by 24 (ends on Hover frame 0)"
+  },
+  "SwoopTelegraph": {
+   "fps": 30,
+   "frames": [
+    0,
+    18
+   ],
+   "samples": 19,
+   "loop": false,
+   "markers": {},
+   "source_control_action": "CellarBat_R01_SwoopTelegraph_Ctl",
+   "export_action": "SwoopTelegraph",
+   "file": "export/anims/CellarBat_R01_SwoopTelegraph_Mars_ANIM.fbx",
+   "bytes": 701484,
+   "unreal_path": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_SwoopTelegraph_Mars_ANIM",
+   "note": "one beat down, rear up with wings high, hold quivering"
+  },
+  "Swoop": {
+   "fps": 30,
+   "frames": [
+    0,
+    18
+   ],
+   "samples": 19,
+   "loop": false,
+   "markers": {
+    "SwoopContact": 9
+   },
+   "source_control_action": "CellarBat_R01_Swoop_Ctl",
+   "export_action": "Swoop",
+   "file": "export/anims/CellarBat_R01_Swoop_Mars_ANIM.fbx",
+   "bytes": 701484,
+   "unreal_path": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Swoop_Mars_ANIM",
+   "note": "telegraph end -> tuck 5 -> feet/jaw strike 9 -> wings reopening into Hover frame 0 (pitched +6)"
+  },
+  "SwoopRecover": {
+   "fps": 30,
+   "frames": [
+    0,
+    18
+   ],
+   "samples": 19,
+   "loop": false,
+   "markers": {},
+   "source_control_action": "CellarBat_R01_SwoopRecover_Ctl",
+   "export_action": "SwoopRecover",
+   "file": "export/anims/CellarBat_R01_SwoopRecover_Mars_ANIM.fbx",
+   "bytes": 701484,
+   "unreal_path": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_SwoopRecover_Mars_ANIM",
+   "note": "one hard pull-out beat, ends on Hover frame 0"
+  },
+  "Hit": {
+   "fps": 30,
+   "frames": [
+    0,
+    12
+   ],
+   "samples": 13,
+   "loop": false,
+   "markers": {},
+   "source_control_action": "CellarBat_R01_Hit_Ctl",
+   "export_action": "Hit",
+   "file": "export/anims/CellarBat_R01_Hit_Mars_ANIM.fbx",
+   "bytes": 684828,
+   "unreal_path": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Hit_Mars_ANIM",
+   "note": "snap at 2 (left wing flung up, right dropped, body rolled), settles to Hover frame 0"
+  },
+  "Stun": {
+   "fps": 30,
+   "frames": [
+    0,
+    30
+   ],
+   "samples": 31,
+   "loop": true,
+   "markers": {},
+   "source_control_action": "CellarBat_R01_Stun_Ctl",
+   "export_action": "Stun",
+   "file": "export/anims/CellarBat_R01_Stun_Mars_ANIM.fbx",
+   "bytes": 748684,
+   "unreal_path": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Stun_Mars_ANIM",
+   "note": "half-rate weak flap, lopsided body wobble, ears flat"
+  },
+  "DeathFall": {
+   "fps": 30,
+   "frames": [
+    0,
+    21
+   ],
+   "samples": 22,
+   "loop": false,
+   "markers": {},
+   "source_control_action": "CellarBat_R01_DeathFall_Ctl",
+   "export_action": "DeathFall",
+   "file": "export/anims/CellarBat_R01_DeathFall_Mars_ANIM.fbx",
+   "bytes": 713084,
+   "unreal_path": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_DeathFall_Mars_ANIM",
+   "note": "hit jolt then wings go limp"
+  },
+  "DeathLand": {
+   "fps": 30,
+   "frames": [
+    0,
+    18
+   ],
+   "samples": 19,
+   "loop": false,
+   "markers": {},
+   "source_control_action": "CellarBat_R01_DeathLand_Ctl",
+   "export_action": "DeathLand",
+   "file": "export/anims/CellarBat_R01_DeathLand_Mars_ANIM.fbx",
+   "bytes": 701484,
+   "unreal_path": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_DeathLand_Mars_ANIM",
+   "note": "impact at 3, one bounce, settled belly-down with wings flat by 18"
+  }
+ },
+ "export_paths": {
+  "bind": "export/CellarBat_R01_Mars_SK.fbx",
+  "lod1": "export/CellarBat_R01_LOD1_Mars_SK.fbx",
+  "lod2": "export/CellarBat_R01_LOD2_Mars_SK.fbx",
+  "anims_dir": "export/anims/"
+ },
+ "unreal_paths": {
+  "skeletal_mesh": "/Game/ArtCandidates/CellarBat/R01/Meshes/CellarBat_R01_Mars_SK",
+  "skeleton": "/Game/ArtCandidates/CellarBat/R01/Meshes/CellarBat_R01_Mars_SKEL",
+  "physics_asset": "/Game/ArtCandidates/CellarBat/R01/Meshes/CellarBat_R01_Mars_PHYS",
+  "animations": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_<Clip>_Mars_ANIM",
+  "material_instances": {
+   "Body": "/Game/ArtCandidates/CellarBat/R01/Materials/CellarBat_R01_Body_Mars_MI",
+   "Membrane": "/Game/ArtCandidates/CellarBat/R01/Materials/CellarBat_R01_Membrane_Mars_MI",
+   "Eyes": "/Game/ArtCandidates/CellarBat/R01/Materials/CellarBat_R01_Eyes_Mars_MI"
+  }
+ }
+}
