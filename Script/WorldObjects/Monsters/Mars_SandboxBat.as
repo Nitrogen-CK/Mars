@@ -1,7 +1,9 @@
 // The cellar bat review room presets (/Game/ArtCandidates/CellarBat/R01/Review/CellarBat_R01_Review_MAP, built by
 // Mars.CellarBat.BuildReviewMap in Script/Editor/Mars_CellarBat_MapBuilder.as). Not under Script/Editor: the saved map
 // references them at runtime. The room is 2000 x 2000 x 600 round the origin, floor top at Z 0; the perch beam runs along
-// X at (-600, 0), its underside at Z 530; a pillar stands at the centre; the target dummy at (600, 0).
+// X at (-600, 0), its underside at Z 530; a pillar stands at the centre; the target dummy at (600, 0). The room runs itself
+// in PIE: the dummy walks a loop that pauses behind the pillar (line-of-sight refusal, the orbit fallback) and drops into a
+// pit (a loss the bat searches for), and it swats the bat back every few landings (the hit-and-run retreat).
 namespace utils_bat
 {
     const FVector ReviewPerchAnchor = FVector(-600.0, 0.0, 530.0);
@@ -29,10 +31,11 @@ class UMars_CellarBatReview_Bat_EntityScript : UMars_CellarBat_EntityScript
         Spec.Timing.RoostIdleSeconds = 6.0f;
         // The dummy's base is on the floor: aim at its chest.
         Spec.Swoop.AimHeight = 80.0f;
-        Spec.Sensing.AcquireRadius = 1600.0f;
-        // Equal to AcquireRadius so a dummy moved to the far corner (Review_MoveTo) drops out of sense inside the room and
-        // leaves a last-known place for the search.
-        Spec.Sensing.LoseRadius = 1600.0f;
+        // Just over the roost-to-dummy distance (1256), so the dummy at its post wakes the bat; LoseRadius equal to it so the
+        // pit (HideDepth under the floor) and the far corner (Review_MoveTo) are losses inside the room that stay within
+        // HomeRadius: last-known places for the search.
+        Spec.Sensing.AcquireRadius = 1300.0f;
+        Spec.Sensing.LoseRadius = 1300.0f;
         Spec.FlightNodes.Empty();
         Spec.FlightNodes.Add(FVector(-450.0, -650.0, 380.0));
         Spec.FlightNodes.Add(FVector(450.0, -650.0, 320.0));
@@ -45,7 +48,48 @@ class UMars_CellarBatReview_Bat_EntityScript : UMars_CellarBat_EntityScript
         AnimClass = TSoftClassPtr<UAnimInstance>(FSoftObjectPath(utils_bat::CandidateAnimClassPath));
         LoopClip = TSoftObjectPtr<UAnimSequence>(FSoftObjectPath(utils_bat::ReviewFallbackLoopPath));
         LogPhases = true;
-        return Super::DoConstruct(InHandle);
+        const auto Flow = Super::DoConstruct(InHandle);
+
+        auto Bat = Get_Bat();
+        if (CounterBlowEveryNthLanding > 0 && ck::IsValid(Bat))
+        { Bat.BindTo_OnSwoopLanded(FMars_Delegate_Bat_OnSwoopLanded(this, n"OnReviewSwoopLanded")); }
+
+        return Flow;
+    }
+
+    // The dummy swats back: every CounterBlowEveryNthLanding-th landed swoop, CounterBlowSeconds later (the bat is pulling
+    // out), a blow of CounterBlowDamage through the bat's body zone, so the room shows the hit-and-run retreat on its own.
+    // 0 = never.
+    UPROPERTY(ExposeOnSpawn)
+    int32 CounterBlowEveryNthLanding = 3;
+
+    UPROPERTY(ExposeOnSpawn)
+    float32 CounterBlowDamage = 5.0f;
+
+    private const float32 CounterBlowSeconds = 0.5f;
+    private int32 _Landings = 0;
+
+    UFUNCTION()
+    private void OnReviewSwoopLanded(FCk_Handle_Bat InBat, int32 InGeneration, FCk_Handle_HitZone InZone)
+    {
+        _Landings += 1;
+        if (_Landings % CounterBlowEveryNthLanding != 0)
+        { return; }
+
+        FCk_Handle Self = InBat;
+        auto TimerSpec = FCk_Timer_Spec(FCk_Time(CounterBlowSeconds));
+        TimerSpec.Set_StartingState(ECk_Timer_State::Running)
+                 .Set_Behavior(ECk_Timer_Behavior::StopOnDone);
+        auto Timer = utils_timer::Add(Self, TimerSpec);
+        if (ck::IsValid(Timer))
+        { Timer.BindTo_OnDone(FCk_Delegate_Timer(this, n"OnCounterBlowDue")); }
+    }
+
+    UFUNCTION()
+    private void OnCounterBlowDue(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
+    {
+        Log(f"[CellarBat] dummy swats back after landing #{_Landings}");
+        Review_Damage(CounterBlowDamage);
     }
 
     // Review hooks, called from editor Python on the PIE instance (Tools/LevelDesign/cellar_bat_r01_review): a lethal
@@ -126,6 +170,52 @@ class UMars_CellarBatReview_Bat_EntityScript : UMars_CellarBat_EntityScript
     }
 }
 
+// One stop of the review dummy's walk: Offset from its spawn point (world axes, ground level); it holds there PauseSeconds,
+// and with HideSeconds set it drops HideDepth under the floor for that long first (the pit).
+struct FMars_CellarBatReview_WalkNode
+{
+    UPROPERTY()
+    FVector Offset;
+
+    UPROPERTY()
+    float32 PauseSeconds = 0.0f;
+
+    UPROPERTY()
+    float32 HideSeconds = 0.0f;
+
+    FMars_CellarBatReview_WalkNode() {}
+
+    FMars_CellarBatReview_WalkNode(FVector InOffset, float32 InPauseSeconds, float32 InHideSeconds)
+    {
+        Offset = InOffset;
+        PauseSeconds = InPauseSeconds;
+        HideSeconds = InHideSeconds;
+    }
+}
+
+// The walk the review dummy repeats at Speed (cm/s). Nodes empty: it stands at its post (the default route is filled in by
+// the dummy when WalksByDefault).
+struct FMars_CellarBatReview_Walk
+{
+    UPROPERTY()
+    TArray<FMars_CellarBatReview_WalkNode> Nodes;
+
+    UPROPERTY()
+    float32 Speed = 160.0f;
+
+    // Deep enough that the hidden dummy is past the bat's LoseRadius from where it circles, shallow enough to stay within
+    // HomeRadius of the perch (a searchable loss).
+    UPROPERTY()
+    float32 HideDepth = 1200.0f;
+}
+
+enum EMars_CellarBatReview_WalkStage
+{
+    Walking,
+    Paused,
+    Hidden
+}
+
 // The review dummy: a post the size of the room 5 target dummy (60 x 60 x 120, origin at its base) on team Two, a combat
 // target (TAG_MarsCombatTarget) with a Health, one Body zone and one hurtbox over the post. Unlike UMars_TargetDummy_EntityScript
 // its post draws without collision: a BlockAll post reaches the Jolt static world (LiveExtract takes runtime components),
@@ -143,18 +233,40 @@ class UMars_CellarBatReview_TargetDummy_EntityScript : UCk_GenericEntityScript_U
     UPROPERTY(ExposeOnSpawn)
     float32 MaxHealth = 100000.0f;
 
+    // Its walk (see FMars_CellarBatReview_Walk). Default route, from the post at (600, 0): south along the east wall, west
+    // to the pit at (0, -700) and 8 s under the floor, up to the cover spot (160, 0) right behind the pillar for 5 s, out
+    // to (600, 500), back to the post: a moving target (the lead), a loss to search for, a target behind cover (the
+    // line-of-sight refusal and the orbit fallback), about 50 s a lap.
+    UPROPERTY(ExposeOnSpawn)
+    FMars_CellarBatReview_Walk Walk;
+
+    UPROPERTY(ExposeOnSpawn)
+    bool WalksByDefault = true;
+
     private const float64 PostWidth = 60.0;
     private const float64 PostHeight = 120.0;
     private const float64 HurtboxMargin = 5.0;
 
     private int32 _Damaged = 0;
     private FCk_Handle_Transform _Root;
+    private EMars_CellarBatReview_WalkStage _Stage = EMars_CellarBatReview_WalkStage::Walking;
+    private int32 _NextNode = 0;
+    private float32 _StageLeft = 0.0f;
 
     UFUNCTION(BlueprintOverride)
     ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
     {
         auto Root = utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::DoesNotReplicate);
         _Root = Root;
+        if (Walk.Nodes.Num() == 0 && WalksByDefault)
+        { Walk.Nodes = Make_DefaultRoute(); }
+
+        if (Walk.Nodes.Num() > 0)
+        {
+            BuildPitMarkers(InHandle);
+            utils_timer::Create_Tick(InHandle, FCk_Delegate_Timer(this, n"OnWalkTick"));
+        }
+
         utils_team::Add(InHandle, ECk_Team_ID::Two, ECk_Replication::DoesNotReplicate);
         utils_entity_tag::Add(InHandle, n"TAG_MarsCombatTarget");
 
@@ -180,6 +292,108 @@ class UMars_CellarBatReview_TargetDummy_EntityScript : UCk_GenericEntityScript_U
         Health.BindTo_OnDamaged(FMars_Delegate_Health_OnDamaged(this, n"OnReviewDamaged"));
         return ECk_EntityScript_ConstructionFlow::Finished;
     }
+
+    //----------------------------------------------------------------------------------------------------------------------
+    // Walk
+    //----------------------------------------------------------------------------------------------------------------------
+
+    private TArray<FMars_CellarBatReview_WalkNode> Make_DefaultRoute() const
+    {
+        auto Route = TArray<FMars_CellarBatReview_WalkNode>();
+        Route.Add(FMars_CellarBatReview_WalkNode(FVector(0.0, -600.0, 0.0), 0.0f, 0.0f));
+        Route.Add(FMars_CellarBatReview_WalkNode(FVector(-600.0, -700.0, 0.0), 0.0f, 8.0f));
+        Route.Add(FMars_CellarBatReview_WalkNode(FVector(-440.0, 0.0, 0.0), 5.0f, 0.0f));
+        Route.Add(FMars_CellarBatReview_WalkNode(FVector(0.0, 500.0, 0.0), 0.0f, 0.0f));
+        Route.Add(FMars_CellarBatReview_WalkNode(FVector::ZeroVector, 0.0f, 0.0f));
+        return Route;
+    }
+
+    private FVector Get_NodeLocation(int32 InNode) const
+    {
+        return SpawnTransform.GetLocation() + Walk.Nodes[Math::Clamp(InNode, 0, Walk.Nodes.Num() - 1)].Offset;
+    }
+
+    // A dark plate on the floor at every pit node, so the drop reads as a hole: its own entity, since the post moves.
+    private void BuildPitMarkers(FCk_Handle& InHandle)
+    {
+        if (FApp::CanEverRender() == false)
+        { return; }
+
+        for (int32 Index = 0; Index < Walk.Nodes.Num(); ++Index)
+        {
+            if (Walk.Nodes[Index].HideSeconds <= 0.0f)
+            { continue; }
+
+            auto Pit = utils_entity_lifetime::Request_CreateEntity(InHandle);
+            auto PitRoot = utils_transform::Add(Pit, FTransform(FRotator::ZeroRotator, Get_NodeLocation(Index)), ECk_Replication::DoesNotReplicate);
+            auto Plate = FMars_MeshPart(FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, 1.5), FVector(1.4, 1.4, 0.03)),
+                engine::load::Cube(), assets::load::ProtoGrid_Interactable_Mars_MI(), collision::profile::NoCollision, n"CellarBatReviewDummy_Pit");
+            Plate.PrimaryColor = FLinearColor(0.02f, 0.02f, 0.025f, 1.0f);
+            Plate.Tint = EMars_MeshPart_Tint::ProtoGrid;
+            PitRoot.Add_MeshPart(this, Plate);
+        }
+    }
+
+    UFUNCTION()
+    private void OnWalkTick(FCk_Handle_Timer InHandle, FCk_Chrono InChrono, FCk_Time InDeltaT)
+    {
+        if (ck::Is_NOT_Valid(_Root) || Walk.Nodes.Num() == 0)
+        { return; }
+
+        const auto Dt = float32(InDeltaT.Get_Seconds());
+        if (_Stage != EMars_CellarBatReview_WalkStage::Walking)
+        {
+            _StageLeft -= Dt;
+            if (_StageLeft > 0.0f)
+            { return; }
+
+            if (_Stage == EMars_CellarBatReview_WalkStage::Hidden)
+            {
+                Log(f"[CellarBat] dummy climbs out of the pit at {Get_NodeLocation(_NextNode).ToString()}");
+                utils_transform::Request_SetLocation(_Root, FCk_Request_Transform_SetLocation(Get_NodeLocation(_NextNode)));
+            }
+
+            _Stage = EMars_CellarBatReview_WalkStage::Walking;
+            _NextNode = (_NextNode + 1) % Walk.Nodes.Num();
+            return;
+        }
+
+        const auto Node = Walk.Nodes[_NextNode];
+        const auto Target = Get_NodeLocation(_NextNode);
+        const auto Here = utils_transform::Get_EntityCurrentLocation(_Root);
+        const auto Delta = Target - Here;
+        const auto Distance = Delta.Size();
+        const auto Step = float64(Walk.Speed * Dt);
+        if (Distance > Step)
+        {
+            utils_transform::Request_SetLocation(_Root, FCk_Request_Transform_SetLocation(Here + Delta / Distance * Step));
+            return;
+        }
+
+        if (Node.HideSeconds > 0.0f)
+        {
+            Log(f"[CellarBat] dummy drops into the pit at {Target.ToString()} for {Node.HideSeconds} s");
+            utils_transform::Request_SetLocation(_Root, FCk_Request_Transform_SetLocation(Target - FVector(0.0, 0.0, Walk.HideDepth)));
+            _Stage = EMars_CellarBatReview_WalkStage::Hidden;
+            _StageLeft = Node.HideSeconds;
+            return;
+        }
+
+        utils_transform::Request_SetLocation(_Root, FCk_Request_Transform_SetLocation(Target));
+        if (Node.PauseSeconds > 0.0f)
+        {
+            Log(f"[CellarBat] dummy holds at {Target.ToString()} for {Node.PauseSeconds} s");
+            _Stage = EMars_CellarBatReview_WalkStage::Paused;
+            _StageLeft = Node.PauseSeconds;
+            return;
+        }
+
+        _NextNode = (_NextNode + 1) % Walk.Nodes.Num();
+    }
+
+    //----------------------------------------------------------------------------------------------------------------------
+    // Review hooks
+    //----------------------------------------------------------------------------------------------------------------------
 
     // Takes the dummy out of the bat's senses (drops it RetireDrop under the floor, past the bat's LoseRadius), so the review
     // sees the bat give up, return and perch.
