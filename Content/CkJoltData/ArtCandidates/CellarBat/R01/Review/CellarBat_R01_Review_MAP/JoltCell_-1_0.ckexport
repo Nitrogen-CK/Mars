@@ -1,0 +1,210 @@
+{
+	"assetName": "JoltCell_-1_0",
+	"assetPath": "/Game/CkJoltData/ArtCandidates/CellarBat/R01/Review/CellarBat_R01_Review_MAP/JoltCell_-1_0.JoltCell_-1_0",
+	"assetClass": "Ck_Jolt_CookedCell_UE",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "defdf3ece90af9d2587db22bf6359173",
+		"exporterVersion": 2
+	},
+	"parentClasses": [
+		"DataAsset"
+	],
+	"properties": [
+		{
+			"name": "_CookVersion",
+			"type": "uint32",
+			"category": "Ck_Jolt_CookedCell_UE",
+			"value": 7
+		},
+		{
+			"name": "_JoltVersionId",
+			"type": "uint32",
+			"category": "Ck_Jolt_CookedCell_UE",
+			"value": 537199105
+		},
+		{
+			"name": "_CellId",
+			"type": "FIntPoint",
+			"category": "Ck_Jolt_CookedCell_UE",
+			"value":
+			{
+				"X": -1,
+				"Y": 0
+			}
+		},
+		{
+			"name": "_ShapeCount",
+			"type": "int32",
+			"category": "Ck_Jolt_CookedCell_UE",
+			"value": 3
+		},
+		{
+			"name": "_ActorGroups",
+			"type": "TArray",
+			"category": "Ck_Jolt_CookedCell_UE",
+			"value": [
+				{
+					"_SourceActorName": "StaticMeshActor_41",
+					"_SourceLevelPackage": "/Game/ArtCandidates/CellarBat/R01/Review/CellarBat_R01_Review_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/ArtCandidates/CellarBat/R01/Review/CellarBat_R01_Review_MAP",
+							"AssetName": "CellarBat_R01_Review_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_41"
+					},
+					"_SourceHash": -3.0002537979314606e+18,
+					"_RuntimeCheckHash": 4.6323641168776059e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 0,
+							"_Position":
+							{
+								"X": -1020,
+								"Y": 0,
+								"Z": 300
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Game/Mars/Physics/Stone_Mars_PhysMat",
+									"AssetName": "Stone_Mars_PhysMat"
+								},
+								"SubPathString": ""
+							}
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_42",
+					"_SourceLevelPackage": "/Game/ArtCandidates/CellarBat/R01/Review/CellarBat_R01_Review_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/ArtCandidates/CellarBat/R01/Review/CellarBat_R01_Review_MAP",
+							"AssetName": "CellarBat_R01_Review_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_42"
+					},
+					"_SourceHash": 1.6469931714290168e+18,
+					"_RuntimeCheckHash": -4.3765153934584899e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 1,
+							"_Position":
+							{
+								"X": -600,
+								"Y": 0,
+								"Z": 540
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Game/Mars/Physics/Stone_Mars_PhysMat",
+									"AssetName": "Stone_Mars_PhysMat"
+								},
+								"SubPathString": ""
+							}
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_43",
+					"_SourceLevelPackage": "/Game/ArtCandidates/CellarBat/R01/Review/CellarBat_R01_Review_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/ArtCandidates/CellarBat/R01/Review/CellarBat_R01_Review_MAP",
+							"AssetName": "CellarBat_R01_Review_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_43"
+					},
+					"_SourceHash": 5.4760086337724826e+18,
+					"_RuntimeCheckHash": 2.3819342845560499e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 2,
+							"_Position":
+							{
+								"X": -600,
+								"Y": 0,
+								"Z": 575
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Game/Mars/Physics/Stone_Mars_PhysMat",
+									"AssetName": "Stone_Mars_PhysMat"
+								},
+								"SubPathString": ""
+							}
+						}
+					]
+				}
+			]
+		}
+	]
+}

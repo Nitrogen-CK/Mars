@@ -1,0 +1,231 @@
+{
+	"assetName": "CellarBat_R01_Final_Mars_ABP",
+	"assetPath": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Final_Mars_ABP.CellarBat_R01_Final_Mars_ABP",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "56405357f50c0d3a686d7989ccad6c7c",
+		"exporterVersion": 3
+	},
+	"blueprintType": "AnimBlueprint",
+	"parentClass": "Mars_CellarBat_AnimInstance",
+	"parentClassPath": "/Script/Angelscript.Mars_CellarBat_AnimInstance",
+	"implementedInterfaces": [],
+	"variables": [],
+	"classDefaults": [
+		{
+			"name": "Phase",
+			"type": "EMars_Bat_Phase",
+			"category": "CellarBat",
+			"value": "Roosting"
+		},
+		{
+			"name": "PhaseIndex",
+			"type": "int32",
+			"category": "CellarBat",
+			"value": 0,
+			"tooltip": "Phase as an integer, for blend-by-int nodes."
+		},
+		{
+			"name": "PhaseValue",
+			"type": "float",
+			"category": "CellarBat",
+			"value": 0,
+			"tooltip": "Tools/LevelDesign/cellar_bat_r01_review/cellar_bat_animbp_ue.py, whose rule authoring reads float members only)."
+		},
+		{
+			"name": "Speed",
+			"type": "float",
+			"category": "CellarBat",
+			"value": 0
+		},
+		{
+			"name": "TurnRate",
+			"type": "float",
+			"category": "CellarBat",
+			"value": 0
+		},
+		{
+			"name": "BankAlpha",
+			"type": "float",
+			"category": "CellarBat",
+			"value": 0
+		},
+		{
+			"name": "BankRightAlpha",
+			"type": "float",
+			"category": "CellarBat",
+			"value": 0,
+			"tooltip": "BankAlpha split by side for the AnimBP's two apply-additive layers: max(BankAlpha, 0) and max(-BankAlpha, 0)."
+		},
+		{
+			"name": "BankLeftAlpha",
+			"type": "float",
+			"category": "CellarBat",
+			"value": 0
+		},
+		{
+			"name": "Pitch",
+			"type": "float",
+			"category": "CellarBat",
+			"value": 0
+		},
+		{
+			"name": "SwoopAlpha",
+			"type": "float",
+			"category": "CellarBat",
+			"value": 0
+		},
+		{
+			"name": "IsFlying",
+			"type": "bool",
+			"category": "CellarBat",
+			"value": false,
+			"tooltip": "In the air under its own wings (not hanging, perching, falling, landed or dead)."
+		},
+		{
+			"name": "IsHanging",
+			"type": "bool",
+			"category": "CellarBat",
+			"value": true,
+			"tooltip": "Hanging inverted from its perch (Roosting, Alert, Perching)."
+		},
+		{
+			"name": "RootMotionMode",
+			"type": "TEnumAsByte<ERootMotionMode::Type>",
+			"category": "RootMotion",
+			"value": "RootMotionFromMontagesOnly",
+			"tooltip": "Sets where this blueprint pulls Root Motion from"
+		},
+		{
+			"name": "bReceiveNotifiesFromLinkedInstances",
+			"type": "uint8",
+			"category": "Notifies",
+			"value": false,
+			"tooltip": "Whether to process notifies from any linked anim instances"
+		},
+		{
+			"name": "bPropagateNotifiesToLinkedInstances",
+			"type": "uint8",
+			"category": "Notifies",
+			"value": false,
+			"tooltip": "Whether to propagate notifies to any linked anim instances"
+		},
+		{
+			"name": "bUseMainInstanceMontageEvaluationData",
+			"type": "uint8",
+			"category": "Montage",
+			"value": false,
+			"tooltip": "If true, linked instances will use the main instance's montage data. (i.e. playing a montage on a main instance will play it on the linked layer too.)"
+		}
+	],
+	"components": [],
+	"eventGraphs": [
+		{
+			"graphName": "EventGraph",
+			"graphCategory": "EventGraph",
+			"executionFlows": [
+				{
+					"entryPoint": "Event BlueprintUpdateAnimation",
+					"entryNodeId": "Node_ELZ4EkTCMIccHeSBG5Y79A",
+					"steps": [
+						{
+							"nodeId": "Node_ELZ4EkTCMIccHeSBG5Y79A",
+							"title": "Event BlueprintUpdateAnimation"
+						}
+					]
+				}
+			],
+			"nodes": [
+				{
+					"nodeId": "Node_ELZ4EkTCMIccHeSBG5Y79A",
+					"nodeClass": "K2Node_Event",
+					"nodeTitle": "Event BlueprintUpdateAnimation",
+					"nodeComment": "This node is disabled and will not be called.\nDrag off pins to build functionality.",
+					"inputPins": [],
+					"outputPins": [
+						{
+							"pinName": "OutputDelegate",
+							"pinType": "Delegate",
+							"direction": "Output"
+						},
+						{
+							"pinName": "then",
+							"pinType": "exec",
+							"direction": "Output"
+						},
+						{
+							"pinName": "DeltaTimeX",
+							"pinType": "float",
+							"direction": "Output",
+							"defaultValue": "0.0"
+						}
+					]
+				},
+				{
+					"nodeId": "Node_RnTA9U1TaWHyWxOqQrYuXw",
+					"nodeClass": "K2Node_CallFunction",
+					"nodeTitle": "Try Get Pawn Owner\nTarget is Anim Instance",
+					"nodeComment": "This node is disabled and will not be called.\nDrag off pins to build functionality.",
+					"inputPins": [
+						{
+							"pinName": "self",
+							"pinType": "AnimInstance",
+							"direction": "Input"
+						}
+					],
+					"outputPins": [
+						{
+							"pinName": "ReturnValue",
+							"pinType": "Pawn",
+							"direction": "Output"
+						}
+					]
+				}
+			]
+		}
+	],
+	"functionGraphs": [
+		{
+			"graphName": "AnimGraph",
+			"graphCategory": "Function",
+			"executionFlows": [],
+			"nodes": [
+				{
+					"nodeId": "Node_E2EOpEmEwrtO4_6JLVJo_Q",
+					"nodeClass": "AnimGraphNode_Root",
+					"nodeTitle": "Output Pose\nAnimGraph",
+					"inputPins": [
+						{
+							"pinName": "Result",
+							"pinType": "PoseLink",
+							"direction": "Input",
+							"defaultValue": "(LinkID=-1,SourceLinkID=-1)",
+							"connections": [
+								"Node_MVDRNEDhCeZLPSSjwZB6sA.Pose"
+							]
+						}
+					],
+					"outputPins": []
+				},
+				{
+					"nodeId": "Node_MVDRNEDhCeZLPSSjwZB6sA",
+					"nodeClass": "AnimGraphNode_StateMachine",
+					"nodeTitle": "Bat\nState Machine",
+					"inputPins": [],
+					"outputPins": [
+						{
+							"pinName": "Pose",
+							"pinType": "PoseLink",
+							"direction": "Output",
+							"connections": [
+								"Node_E2EOpEmEwrtO4_6JLVJo_Q.Result"
+							]
+						}
+					]
+				}
+			]
+		}
+	],
+	"macroGraphs": []
+}

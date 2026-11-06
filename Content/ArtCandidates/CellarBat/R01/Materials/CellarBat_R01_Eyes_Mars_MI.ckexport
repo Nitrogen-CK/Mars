@@ -1,0 +1,272 @@
+{
+	"material": "CellarBat_R01_Eyes_Mars_MI",
+	"packagePath": "/Game/ArtCandidates/CellarBat/R01/Materials/CellarBat_R01_Eyes_Mars_MI",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "f8078349a7a46e6d1ec70120612891fd",
+		"exporterVersion": 3
+	},
+	"parentChain": [
+		"/Game/ArtCandidates/CellarBat/R01/Materials/CellarBat_R01_Mars_M.CellarBat_R01_Mars_M"
+	],
+	"blendMode": "BLEND_Opaque",
+	"twoSided": false,
+	"unlit": false,
+	"shadingModel": "MSM_DefaultLit",
+	"domain": "MD_Surface",
+	"connectedOutputs": [
+		"EmissiveColor",
+		"BaseColor"
+	],
+	"expressions":
+	{
+		"Constant": 2,
+		"LinearInterpolate": 1,
+		"Multiply": 2,
+		"Power": 1,
+		"ScalarParameter": 5,
+		"VectorParameter": 1,
+		"VertexColor": 1
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "VertexColor",
+				"name": "MaterialExpressionVertexColor_1",
+				"outputs": [
+					"None",
+					"None",
+					"None",
+					"None",
+					"None"
+				]
+			},
+			{
+				"id": 1,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_5",
+				"props":
+				{
+					"DefaultValue": 2.2000000476837158,
+					"ParameterName": "VertexColorGamma"
+				}
+			},
+			{
+				"id": 2,
+				"class": "Power",
+				"name": "MaterialExpressionPower_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Base",
+						"node": 0,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 1,
+						"name": "Exponent",
+						"node": 1,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 3,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_6",
+				"props":
+				{
+					"DefaultValue": 0.44999998807907104,
+					"ParameterName": "CavityFloor"
+				}
+			},
+			{
+				"id": 4,
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_2",
+				"props":
+				{
+					"R": 1
+				}
+			},
+			{
+				"id": 5,
+				"class": "LinearInterpolate",
+				"name": "MaterialExpressionLinearInterpolate_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 3,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 4,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "Alpha",
+						"node": 0,
+						"output": 4,
+						"mask": "a"
+					}
+				]
+			},
+			{
+				"id": 6,
+				"class": "Multiply",
+				"name": "MaterialExpressionMultiply_2",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 2,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 5,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 7,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_7",
+				"props":
+				{
+					"DefaultValue": 0.85000002384185791,
+					"ParameterName": "Roughness"
+				}
+			},
+			{
+				"id": 8,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_8",
+				"props":
+				{
+					"DefaultValue": 0.25,
+					"ParameterName": "Specular"
+				}
+			},
+			{
+				"id": 9,
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_3"
+			},
+			{
+				"id": 10,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_1",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.000000,G=0.000000,B=0.000000,A=1.000000)",
+					"ParameterName": "EmissiveColor"
+				}
+			},
+			{
+				"id": 11,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_9",
+				"props":
+				{
+					"ParameterName": "EmissiveIntensity"
+				}
+			},
+			{
+				"id": 12,
+				"class": "Multiply",
+				"name": "MaterialExpressionMultiply_3",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 10,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 11,
+						"output": 0
+					}
+				]
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_EmissiveColor",
+				"node": 12,
+				"output": 0
+			},
+			{
+				"property": "MP_BaseColor",
+				"node": 6,
+				"output": 0
+			},
+			{
+				"property": "MP_Metallic",
+				"node": 9,
+				"output": 0
+			},
+			{
+				"property": "MP_Specular",
+				"node": 8,
+				"output": 0
+			},
+			{
+				"property": "MP_Roughness",
+				"node": 7,
+				"output": 0
+			}
+		]
+	},
+	"scalarParams": [
+		{
+			"name": "VertexColorGamma",
+			"value": 2.2000000476837158
+		},
+		{
+			"name": "CavityFloor",
+			"value": 0.44999998807907104
+		},
+		{
+			"name": "Roughness",
+			"value": 0.40000000596046448
+		},
+		{
+			"name": "Specular",
+			"value": 0.5
+		},
+		{
+			"name": "EmissiveIntensity",
+			"value": 3
+		}
+	],
+	"vectorParams": [
+		{
+			"name": "EmissiveColor",
+			"value": "RGBA(1, 0.55834, 0.162029, 1)"
+		}
+	],
+	"textureParams": [],
+	"usedTextures": []
+}
