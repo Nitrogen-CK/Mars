@@ -30,7 +30,9 @@ class UMars_CellarBatReview_Bat_EntityScript : UMars_CellarBat_EntityScript
         // The dummy's base is on the floor: aim at its chest.
         Spec.Swoop.AimHeight = 80.0f;
         Spec.Sensing.AcquireRadius = 1600.0f;
-        Spec.Sensing.LoseRadius = 1900.0f;
+        // Equal to AcquireRadius so a dummy moved to the far corner (Review_MoveTo) drops out of sense inside the room and
+        // leaves a last-known place for the search.
+        Spec.Sensing.LoseRadius = 1600.0f;
         Spec.FlightNodes.Empty();
         Spec.FlightNodes.Add(FVector(-450.0, -650.0, 380.0));
         Spec.FlightNodes.Add(FVector(450.0, -650.0, 320.0));
@@ -193,6 +195,40 @@ class UMars_CellarBatReview_TargetDummy_EntityScript : UCk_GenericEntityScript_U
     }
 
     private const float64 RetireDrop = 5000.0;
+
+    // Puts the dummy somewhere else in the room (its base at InLocation): a hop past the bat's LoseRadius that stays within
+    // its HomeRadius leaves a last-known place for the bat to search.
+    UFUNCTION()
+    void Review_MoveTo(FVector InLocation)
+    {
+        if (ck::Is_NOT_Valid(_Root))
+        { return; }
+
+        Log(f"[CellarBat] dummy moved to {InLocation.ToString()}");
+        utils_transform::Request_SetLocation(_Root, FCk_Request_Transform_SetLocation(InLocation));
+    }
+
+    // Review_MoveTo now, then Review_Retire InDelaySeconds later (a timer on the dummy): the bat senses the loss where the
+    // dummy went (a searchable last-known place) and finds nothing there, which the two calls from separate probes cannot
+    // stage (the next sense, 0.2 s on, finds the dummy again when the corner is within AcquireRadius).
+    UFUNCTION()
+    void Review_MoveThenRetire(FVector InLocation, float32 InDelaySeconds)
+    {
+        Review_MoveTo(InLocation);
+        FCk_Handle Self = _Root;
+        auto TimerSpec = FCk_Timer_Spec(FCk_Time(Math::Max(InDelaySeconds, 0.0f)));
+        TimerSpec.Set_StartingState(ECk_Timer_State::Running)
+                 .Set_Behavior(ECk_Timer_Behavior::StopOnDone);
+        auto Timer = utils_timer::Add(Self, TimerSpec);
+        if (ck::IsValid(Timer))
+        { Timer.BindTo_OnDone(FCk_Delegate_Timer(this, n"OnRetireDelayDone")); }
+    }
+
+    UFUNCTION()
+    private void OnRetireDelayDone(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
+    {
+        Review_Retire();
+    }
 
     // How many OnDamaged the dummy has broadcast (the review counts one per landed swoop).
     UFUNCTION()

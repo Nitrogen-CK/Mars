@@ -312,6 +312,28 @@ def retire_dummy(tag="retire"):
     return n
 
 
+def move_dummy(x, y, z, tag="move"):
+    """PIE only: Review_MoveTo on every live review dummy (a hop out of the bat's LoseRadius that stays inside its
+    HomeRadius leaves a last-known place for the bat to search)."""
+    n = 0
+    for o in _pie_scripts(DUMMY):
+        o.call_method("Review_MoveTo", (unreal.Vector(float(x), float(y), float(z)),))
+        n += 1
+    unreal.log("CELLARBAT_MOVE %s to=(%s,%s,%s) dummies=%d" % (tag, x, y, z, n))
+    return n
+
+
+def move_then_retire_dummy(x, y, z, delay=0.45, tag="vanish"):
+    """PIE only: Review_MoveThenRetire on every live review dummy: a hop to (x, y, z) that the bat senses as a loss, then
+    the drop under the floor `delay` s later, so the bat searches the place and finds nothing."""
+    n = 0
+    for o in _pie_scripts(DUMMY):
+        o.call_method("Review_MoveThenRetire", (unreal.Vector(float(x), float(y), float(z)), float(delay)))
+        n += 1
+    unreal.log("CELLARBAT_VANISH %s to=(%s,%s,%s) delay=%s dummies=%d" % (tag, x, y, z, delay, n))
+    return n
+
+
 def set_pillar_block(block):
     """Editor world: stretch the pillar into a full-width, full-height wall across X=0 (block=True) or put it back.
     Leaves the map dirty: rebuild (build_review_scene) to save the clean room again."""
