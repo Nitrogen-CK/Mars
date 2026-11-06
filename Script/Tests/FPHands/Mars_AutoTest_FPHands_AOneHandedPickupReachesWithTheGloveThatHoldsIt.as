@@ -39,6 +39,7 @@ class UMars_AutoTest_FPHands_AOneHandedPickupReachesWithTheGloveThatHoldsIt : UM
         Add_Step("grab the tallow lying on the left", n"Step_GrabTallow");
         Add_Step_WaitUntil("the gloves reach out", n"Check_IsReachingOut", k_SlowPolls, 0);
         Add_Step("the right glove alone reaches for the one-handed tallow", n"Step_AssertRightGloveOnly");
+        Add_Step("the point target carries the tallow's mesh and grip pose", n"Step_AssertTargetCarriesTheItem");
         Add_Step_WaitUntil("the grab ran back to rest", n"Check_RestListening", k_SlowPolls, 0);
         Add_Step("grab the bare interactable on the left", n"Step_GrabPoint");
         Add_Step_WaitUntil("the gloves reach out", n"Check_IsReachingOut", k_SlowPolls, 0);
@@ -79,6 +80,24 @@ class UMars_AutoTest_FPHands_AOneHandedPickupReachesWithTheGloveThatHoldsIt : UM
     {
         Assert_True(_Hands.Get_IsReaching(EMars_Hand::Right), "the right glove, which will hold the tallow, reaches for it");
         Assert_False(_Hands.Get_IsReaching(EMars_Hand::Left), "the left glove, on the tallow's side, stays at rest");
+    }
+
+    // The held visual's spawn-from pose and its carry home exist only for a target whose Pickup is set, and the grab closes
+    // with its ContactPose: a point target that dropped them would pop the tallow into the hand at the Grip.
+    UFUNCTION()
+    private void Step_AssertTargetCarriesTheItem(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        const auto Target = _Hands.Get_Target();
+        Assert_True(Target.IsSet(), "the gloves are on a reach target");
+        if (Target.IsSet() == false)
+        { return; }
+
+        const auto Resolved = Target.GetValue();
+        Assert_True(Resolved.Layout == EMars_FPHands_GripLayout::Point, "a socketless one-handed item is a point grip");
+        Assert_True(Resolved.Pickup.IsSet, "a socketless one-handed item is a pickup");
+        Assert_True(ck::IsValid(Resolved.Pickup.Shape.Mesh.Get()), "the point target carries the tallow's mesh (the contact shape reads it)");
+        Assert_True(Resolved.ContactPose.IsSet() && Resolved.ContactPose.GetValue() == EMars_HandGripPose::Power,
+            "the point target carries the tallow's Power grip pose");
     }
 
     UFUNCTION()

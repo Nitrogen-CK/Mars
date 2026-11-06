@@ -7,8 +7,8 @@ struct FMars_AutoTestRig_Hands_Lever
     FCk_Handle_InteractTarget Target;
 }
 
-// The FPHands tests' rig: FPHands on the test entity (the player) with its hand node on a transform root of its own at
-// the origin, the Hands state machine, and a log of the phases the gloves run.
+// The FPHands tests' rig: FPHands on the test entity (the player) with the player's hand chain on a transform root of its
+// own at the origin, the Hands state machine, and a log of the phases the gloves run.
 UCLASS(Abstract)
 class UMars_AutoTestRig_Hands : UCk_AutoTest_Base
 {
@@ -20,16 +20,18 @@ class UMars_AutoTestRig_Hands : UCk_AutoTest_Base
     protected FCk_Handle _Player;
     protected TArray<EMars_FPHands_Phase> _Phases;
 
-    // FPHands on InPlayer with InSpec, the hand node on a fresh root at the origin; returns that root.
+    // FPHands on InPlayer with InSpec, the hand chain (utils_fphands::Create_HandChain) on a mount at a fresh root at the
+    // origin; returns that root.
     protected FCk_Handle_Transform Add_Hands(FCk_Handle InPlayer, FMars_FPHands_Spec InSpec)
     {
         _Player = InPlayer;
         auto RootEntity = utils_entity_lifetime::Request_CreateEntity(InPlayer);
         auto Root = utils_transform::Add(RootEntity, FTransform::Identity, ECk_Replication::DoesNotReplicate);
-        auto HandNode = utils_scene_node::Create(Root, FTransform::Identity);
+        auto Mount = utils_scene_node::Create(Root, FTransform::Identity);
+        utils_handle::Set_DebugName(Mount.H(), n"Hands.HandMount");
 
         auto Spec = InSpec;
-        Spec.HandNode = HandNode.As_Transform();
+        utils_fphands::Wire_HandChain(Spec, utils_fphands::Create_HandChain(Mount.As_Transform(), "Hands"));
         _Hands = utils_fphands::Add(_Player, Spec);
         return Root;
     }

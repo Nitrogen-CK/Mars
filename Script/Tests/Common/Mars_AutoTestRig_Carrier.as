@@ -40,10 +40,12 @@ struct FMars_AutoTestHelper_CarrierBody
     }
 }
 
-// The nodes a carrier body was built with: the Hand, then one per extra point in the body's order.
+// The nodes a carrier body was built with: the Hand (HandChain.Hand), the player's hand chain it ends
+// (utils_fphands::Create_HandChain), then one per extra point in the body's order.
 struct FMars_AutoTestHelper_CarrierNodes
 {
     FCk_Handle_Transform Hand;
+    FMars_FPHands_HandChain HandChain;
     TArray<FCk_Handle_Transform> Extra;
 }
 
@@ -62,7 +64,11 @@ UCLASS(Abstract)
 class UMars_AutoTestRig_Carrier : UCk_AutoTest_Base
 {
     protected FCk_Handle _Carrier;
+    // The carrier's hand chain, built as the player's; the gloves' spec names it (Add_CarrierHands), so an equip snaps the
+    // hand sideways on _SideNode as it does on the player.
+    protected FMars_FPHands_HandChain _HandChain;
     protected FCk_Handle_Transform _HandNode;
+    protected FCk_Handle_SceneNode _SideNode;
     protected FCk_Handle_Transform _BackNode;
     protected FCk_Handle_Hotbar _Hotbar;
     protected FCk_Handle_HeldItem _HeldItem;
@@ -81,7 +87,8 @@ class UMars_AutoTestRig_Carrier : UCk_AutoTest_Base
     protected void Add_CarrierBody(FCk_Handle InHandle, FVector InLocation)
     {
         _Carrier = InHandle;
-        _HandNode = Build_CarrierBody(_Carrier, FMars_AutoTestHelper_CarrierBody(InLocation)).Hand;
+        const auto Nodes = Build_CarrierBody(_Carrier, FMars_AutoTestHelper_CarrierBody(InLocation));
+        Set_HandChain(Nodes.HandChain);
     }
 
     // Add_CarrierBody with a Back node as well, published as AttachPoint.Mars.Back.
@@ -92,8 +99,15 @@ class UMars_AutoTestRig_Carrier : UCk_AutoTest_Base
 
         _Carrier = InHandle;
         const auto Nodes = Build_CarrierBody(_Carrier, Body);
-        _HandNode = Nodes.Hand;
+        Set_HandChain(Nodes.HandChain);
         _BackNode = Nodes.Extra[0];
+    }
+
+    private void Set_HandChain(const FMars_FPHands_HandChain& InChain)
+    {
+        _HandChain = InChain;
+        _HandNode = InChain.Hand;
+        _SideNode = InChain.Side;
     }
 
     // The Back attach point where every test carrier wears it.
@@ -102,14 +116,19 @@ class UMars_AutoTestRig_Carrier : UCk_AutoTest_Base
         return FMars_AutoTestHelper_CarrierPoint(GameplayTags::AttachPoint_Mars_Back, FVector(-30.0, 0.0, 20.0));
     }
 
-    // InEntity's root at InBody's location, a Hand node and InBody's extra nodes, each published as its attach point.
+    // InEntity's root at InBody's location, a hand mount carrying the player's hand chain (its Hand published as
+    // AttachPoint.Mars.Hand) and InBody's extra nodes, each published as its attach point.
     protected FMars_AutoTestHelper_CarrierNodes Build_CarrierBody(FCk_Handle InEntity, FMars_AutoTestHelper_CarrierBody InBody)
     {
         auto Entity = InEntity;
         auto Root = utils_transform::Add(Entity, FTransform(FRotator::ZeroRotator, InBody.Location), ECk_Replication::DoesNotReplicate);
 
+        auto Mount = utils_scene_node::Create(Root, FTransform(FRotator::ZeroRotator, FVector(40.0, 20.0, 60.0)));
+        utils_handle::Set_DebugName(Mount.H(), n"Carrier.HandMount");
+
         auto Nodes = FMars_AutoTestHelper_CarrierNodes();
-        Nodes.Hand = utils_scene_node::Create(Root, FTransform(FRotator::ZeroRotator, FVector(40.0, 20.0, 60.0))).As_Transform();
+        Nodes.HandChain = utils_fphands::Create_HandChain(Mount.As_Transform(), "Carrier");
+        Nodes.Hand = Nodes.HandChain.Hand;
 
         auto AttachPointsSpec = FMars_AttachPoints_Spec();
         AttachPointsSpec.Points.Add(FMars_AttachPoint_Entry(GameplayTags::AttachPoint_Mars_Hand, Nodes.Hand));
@@ -131,7 +150,7 @@ class UMars_AutoTestRig_Carrier : UCk_AutoTest_Base
     protected void Add_CarrierHands(FMars_FPHands_Spec InSpec = FMars_FPHands_Spec())
     {
         auto Spec = InSpec;
-        Spec.HandNode = _HandNode;
+        utils_fphands::Wire_HandChain(Spec, _HandChain);
         _Hands = utils_fphands::Add(_Carrier, Spec);
         utils_interaction_resolver::Add(_Carrier, mars_test_interaction::Make_UseResolverSpec(), ECk_Replication::DoesNotReplicate);
         utils_input_intents::Add(_Carrier);
@@ -221,6 +240,26 @@ class UMars_AutoTestRig_Carrier : UCk_AutoTest_Base
             .Get_EntityUnderConstruction();
         Track_ForCleanup(Entity);
         return Entity;
+    }
+
+    // InRoot's transform tree carries a live, visible static mesh component with a mesh: what the renderer would draw of a
+    // world item or a held visual (a destroyed component is no longer valid). False for an invalid root.
+    protected bool Get_HasDrawnMesh(FCk_Handle InRoot) const
+    {
+        if (ck::Is_NOT_Valid(InRoot))
+        { return false; }
+
+        for (auto Entity : utils_fphands::Get_TransformTree(InRoot))
+        {
+            for (auto Component : utils_unreal_component::Get_ComponentsByType(Entity, UStaticMeshComponent))
+            {
+                auto Mesh = Cast<UStaticMeshComponent>(Component);
+                if (ck::IsValid(Mesh) && Mesh.IsVisible() && ck::IsValid(Mesh.GetStaticMesh()))
+                { return true; }
+            }
+        }
+
+        return false;
     }
 
     // InEntity as a world item once it is constructed and its holder holds its item; invalid until then.
