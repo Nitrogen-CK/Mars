@@ -59,9 +59,7 @@ class UMars_Processor_Bat_Targeting : UCk_Processor_Script_Base_UE
             return State.Target;
         }
 
-        if (Get_IsSearchable(InSelf, State.Target))
-        { State.LastKnown = utils_transform::Get_EntityCurrentLocation(State.Target.As_Transform()); }
-
+        utils_bat::Try_RememberLastKnown(InSelf, State.Target);
         State.TargetLastLocation.Reset();
         State.TargetVelocity = FVector::ZeroVector;
         const auto Next = Find_Nearest(InSelf, Spec.Sensing.AcquireRadius);
@@ -71,21 +69,6 @@ class UMars_Processor_Bat_Targeting : UCk_Processor_Script_Base_UE
         return Next;
     }
 
-    // A held target that is no longer keepable but worth looking for: still a valid hostile within HomeRadius of home (it
-    // only got too far from the bat), with SearchSeconds set. Dead, friendly, ignored or out of the home range: forgotten.
-    private bool Get_IsSearchable(const FCk_Handle_Bat& InSelf, FCk_Handle InTarget) const
-    {
-        const auto Spec = InSelf.Get_Spec();
-        if (Spec.Sensing.SearchSeconds.IsSet() == false || utils_bat::Get_IsTargetValid(InTarget) == false)
-        { return false; }
-
-        if (InTarget == InSelf.Get_Fragment(FMars_Fragment_Bat).Ignored ||
-            utils_relationship::Get_AttitudeTowards(InSelf, InTarget) != ECk_RelationshipAttitude::Hostile)
-        { return false; }
-
-        const auto Location = utils_transform::Get_EntityCurrentLocation(InTarget.As_Transform());
-        return (Location - InSelf.Get_HangPoint()).Size() <= Spec.Sensing.HomeRadius;
-    }
 
     // The held target's velocity over the last sense interval, from its location now and at the previous sense.
     private void Sample_TargetMotion(FMars_Fragment_Bat& InOutState, float32 InInterval) const
@@ -137,5 +120,47 @@ class UMars_Processor_Bat_Targeting : UCk_Processor_Script_Base_UE
         }
 
         return Best;
+    }
+}
+
+// The kernel's shared write of the last-known place (the sense that loses a target, and the route failure that drops one).
+namespace utils_bat
+{
+    // Remembers where a target the bat is losing was last sensed, when it is worth looking for: SearchSeconds set, the
+    // target still a valid hostile within HomeRadius of home and not the one being ignored. The place must be somewhere
+    // the bat can fly to: its location now when the flight volume has it free, else where the previous sense saw it (a
+    // target that dropped into a hole or stepped out of the flyable space is searched for at the rim), else nothing.
+    void Try_RememberLastKnown(FCk_Handle_Bat& InSelf, FCk_Handle InTarget)
+    {
+        const auto Spec = InSelf.Get_Spec();
+        if (Spec.Sensing.SearchSeconds.IsSet() == false || Get_IsTargetValid(InTarget) == false)
+        { return; }
+
+        auto& State = InSelf.Get_Fragment(FMars_Fragment_Bat);
+        if (InTarget == State.Ignored || utils_relationship::Get_AttitudeTowards(InSelf, InTarget) != ECk_RelationshipAttitude::Hostile)
+        { return; }
+
+        const auto Now = utils_transform::Get_EntityCurrentLocation(InTarget.As_Transform());
+        if ((Now - InSelf.Get_HangPoint()).Size() > Spec.Sensing.HomeRadius)
+        { return; }
+
+        const auto Lift = FVector(0.0, 0.0, Spec.Swoop.AimHeight + Spec.Swoop.Height);
+        if (Get_IsFlyable(InSelf, Now + Lift))
+        {
+            State.LastKnown = Now;
+            return;
+        }
+
+        if (State.TargetLastLocation.IsSet() && Get_IsFlyable(InSelf, State.TargetLastLocation.GetValue() + Lift))
+        { State.LastKnown = State.TargetLastLocation.GetValue(); }
+    }
+
+    // InPoint is goal-free in the flight volume AND no static geometry lies between the bat and it: the volume answers free
+    // for space it never rasterized (under the floor, past a wall, inside its power-of-two cube), so a target that dropped
+    // through the floor would otherwise leave a place beneath it. The ray is the cheap proxy for "inside the flyable space"
+    // the volume does not offer.
+    bool Get_IsFlyable(const FCk_Handle_Bat& InSelf, FVector InPoint)
+    {
+        return InSelf.Get_IsGoalFree(InPoint) && Get_IsStaticBetween(InSelf, InSelf.Get_Location(), InPoint) == false;
     }
 }

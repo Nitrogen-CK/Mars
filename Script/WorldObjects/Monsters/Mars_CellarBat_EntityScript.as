@@ -185,7 +185,8 @@ class UMars_CellarBat_EntityScript : UCk_GenericEntityScript_UE
     UFUNCTION()
     private void OnLogRouteOutcome(FCk_Handle_Bat InBat, int32 InGeneration, EMars_Bat_RouteOutcome InOutcome)
     {
-        Log(f"[CellarBat] route {InGeneration} {InOutcome} in {_Bat.Get_Phase()} {Get_LogStamp()}");
+        const auto Goal = _Bat.Get_Route().Goal;
+        Log(f"[CellarBat] route {InGeneration} {InOutcome} in {_Bat.Get_Phase()} to ({Goal.X :.0}, {Goal.Y :.0}, {Goal.Z :.0}) {Get_LogStamp()}");
     }
 
     UFUNCTION()

@@ -10,8 +10,10 @@
 //    flying back to where it committed; Recovering ends after RecoverSeconds and starts the cooldown;
 // 4. the death fall (Falling): gravity on the fall velocity, a static-world ray from where it is to where it would be, and
 //    on contact it rests there (Landed) - or Landed where it is after MaxFallSeconds with no ground;
-// 5. telemetry from the root's own motion (speed, signed turn rate, pitch);
-// 6. the phase clock.
+// 5. a bat whose own spot is not goal-free after its route failed (the agent overshot into a wall's clearance band, where
+//    no path can start) climbs toward the nearest goal-free point at half cruise, so the next route can be asked for;
+// 6. telemetry from the root's own motion (speed, signed turn rate, pitch);
+// 7. the phase clock.
 // The crowd agent writes the root transform while the bat flies; this processor writes it only while Falling, after the
 // agent was taken out of the crowd.
 class UMars_Processor_Bat_Tick : UCk_Processor_Script_Base_UE
@@ -41,6 +43,7 @@ class UMars_Processor_Bat_Tick : UCk_Processor_Script_Base_UE
         TickHurt(Self, DeltaSeconds);
         TickSwoop(Self, DeltaSeconds);
         TickFall(Self, DeltaSeconds);
+        TickUnstick(Self, DeltaSeconds);
         TickTelemetry(Self, DeltaSeconds);
 
         Self.Get_Fragment(FMars_Fragment_Bat).PhaseClock += DeltaSeconds;
@@ -225,10 +228,14 @@ class UMars_Processor_Bat_Tick : UCk_Processor_Script_Base_UE
         auto& Ledger = InSelf.Get_Fragment(FMars_Fragment_Bat).Swoop;
         Ledger.Stage = EMars_Bat_SwoopStage::Committed;
         Ledger.StageElapsed = 0.0f;
-        // Through where the target will be half a swoop from now, not where it is: a walking target is still met.
-        // The lead is capped at Standoff so a sensing glitch cannot send the dive across the room.
-        const auto Lead = InSelf.Get_TargetVelocity().GetClampedToMaxSize(Spec.Swoop.Standoff) * float64(Spec.Swoop.Timing.SwoopSeconds) * 0.5;
-        Ledger.Goal = utils_transform::Get_EntityCurrentLocation(Ledger.Target.As_Transform()) + Lead + FVector(0.0, 0.0, Spec.Swoop.AimHeight);
+        // Through where the target will be when the mouth gets there, not where it is: a walking target is still met.
+        // The dive starts from a standstill and the agent accelerates at MaxAcceleration toward SwoopSpeed, so the time to
+        // contact (the aim point less the blow's reach) follows that profile, not a constant speed. The lead is capped at
+        // Standoff so a sensing glitch cannot send the dive across the room.
+        const auto AimNow = utils_transform::Get_EntityCurrentLocation(Ledger.Target.As_Transform()) + FVector(0.0, 0.0, Spec.Swoop.AimHeight);
+        const auto Lead = InSelf.Get_TargetVelocity().GetClampedToMaxSize(Spec.Swoop.Standoff) *
+            Get_DiveSeconds(Spec, Math::Max((AimNow - InSelf.Get_Location()).Size() - float64(Spec.Swoop.Blow.ContactRadius), 0.0));
+        Ledger.Goal = AimNow + Lead;
         Ledger.LastMouth = InSelf.Get_MouthLocation();
         const auto Goal = Ledger.Goal;
 
@@ -236,10 +243,22 @@ class UMars_Processor_Bat_Tick : UCk_Processor_Script_Base_UE
         utils_bat::Issue_Move(InSelf, FMars_Request_Bat_FlyTo(Goal, Spec.Flight.SwoopSpeed));
     }
 
+    // Seconds a dive from rest covers InDistance: accelerating at MaxAcceleration, then at SwoopSpeed once it gets there.
+    private float64 Get_DiveSeconds(const FMars_Bat_Spec& InSpec, float64 InDistance) const
+    {
+        const float64 Speed = InSpec.Flight.SwoopSpeed;
+        const float64 Acceleration = InSpec.Flight.MaxAcceleration;
+        const auto AccelDistance = 0.5 * Speed * Speed / Acceleration;
+        if (InDistance <= AccelDistance)
+        { return Math::Sqrt(2.0 * InDistance / Acceleration); }
+
+        return Speed / Acceleration + (InDistance - AccelDistance) / Speed;
+    }
+
     // Pulls out by carrying THROUGH: the mirror of the strike point on the far side of the aim point (Standoff past it along
     // the dive line, Height up), so the bat keeps facing the way it flew and the next approach turns it back onto the
-    // target. Only when that point is not in the volume's free space (a wall behind the target) does it fly back to where
-    // it committed from, the way it came.
+    // target. Only when that point is not goal-free (a wall or a pillar behind the target) does it fly back to where it
+    // committed from, the way it came.
     private void Recover(FCk_Handle_Bat& InSelf)
     {
         const auto Spec = InSelf.Get_Spec();
@@ -253,9 +272,7 @@ class UMars_Processor_Bat_Tick : UCk_Processor_Script_Base_UE
         Dive.Z = 0.0;
         Dive = Dive.GetSafeNormal();
         const auto Through = Aim + Dive * Spec.Swoop.Standoff + FVector(0.0, 0.0, Spec.Swoop.Height);
-        const auto Volume = InSelf.Get_Volume();
-        const auto ThroughIsFree = Dive.IsNearlyZero() == false && ck::IsValid(Volume) &&
-            utils_voxel_nav_volume::Get_IsBuilt(Volume) && utils_voxel_nav_volume::Get_IsPointFree(Volume, Through);
+        const auto ThroughIsFree = Dive.IsNearlyZero() == false && InSelf.Get_IsNavReady() && InSelf.Get_IsGoalFree(Through);
 
         utils_bat::Set_Phase(InSelf, EMars_Bat_Phase::Recovering);
         utils_bat::Issue_Move(InSelf, FMars_Request_Bat_FlyTo(ThroughIsFree ? Through : From, Spec.Flight.CruiseSpeed));
@@ -377,6 +394,41 @@ class UMars_Processor_Bat_Tick : UCk_Processor_Script_Base_UE
 
     // A landed body rests this far off the ground along its normal (its belly).
     private const float64 LandLift = 10.0;
+
+    //----------------------------------------------------------------------------------------------------------------------
+    // Unstick
+    //----------------------------------------------------------------------------------------------------------------------
+
+    // Only while flying under its own wings between routes: the last route failed or it hovers with nowhere to go (the
+    // agent is stopped either way), no swoop runs, it is not hurt, hanging or down. Writes the root location itself, as the
+    // fall does, while the agent holds.
+    private void TickUnstick(FCk_Handle_Bat& InSelf, float32 InDeltaSeconds)
+    {
+        if (InDeltaSeconds <= 0.0f || InSelf.Get_IsDown() || InSelf.Get_IsHurt() || InSelf.Get_SwoopStage() != EMars_Bat_SwoopStage::None)
+        { return; }
+
+        const auto Phase = InSelf.Get_Phase();
+        if (Phase == EMars_Bat_Phase::Roosting || Phase == EMars_Bat_Phase::Alert || Phase == EMars_Bat_Phase::Perching)
+        { return; }
+
+        const auto Stranded = utils_bat::Get_IsRouteFailure(InSelf.Get_RouteOutcome()) || Phase == EMars_Bat_Phase::Hovering;
+        if (Stranded == false || InSelf.Get_IsNavReady() == false)
+        { return; }
+
+        const auto Here = InSelf.Get_Location();
+        if (InSelf.Get_IsGoalFree(Here))
+        { return; }
+
+        const auto Target = InSelf.Get_NearestGoalFree(Here);
+        if (Target.IsSet() == false)
+        { return; }
+
+        const auto Step = float64(InSelf.Get_Spec().Flight.CruiseSpeed) * 0.5 * float64(InDeltaSeconds);
+        const auto Delta = Target.GetValue() - Here;
+        const auto There = Delta.Size() <= Step ? Target.GetValue() : Here + Delta.GetSafeNormal() * Step;
+        auto Root = InSelf.As_Transform();
+        utils_transform::Request_SetLocation(Root, FCk_Request_Transform_SetLocation(There));
+    }
 
     //----------------------------------------------------------------------------------------------------------------------
     // Telemetry

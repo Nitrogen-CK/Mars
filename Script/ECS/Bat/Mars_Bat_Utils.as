@@ -412,7 +412,10 @@ mixin FVector Get_TargetAimPoint(const FCk_Handle_Bat& Self)
         FVector(0.0, 0.0, Self.Get_Spec().Swoop.AimHeight);
 }
 
-// Where it waits to swoop: Height over the aim point and Standoff back toward the bat along the ground.
+// Where it waits to swoop: Height over the aim point and Standoff back toward the bat along the ground. When that point is
+// not goal-free (a target against a wall or a pillar) the bearing turns round the target, nearest first (45, -45, 90, ...
+// 180 degrees), to the first goal-free point: it attacks from the open side. None free: the natural point (the route then
+// fails and the target is dropped, as before).
 mixin FVector Get_StrikePoint(const FCk_Handle_Bat& Self)
 {
     const auto Swoop = Self.Get_Spec().Swoop;
@@ -423,7 +426,26 @@ mixin FVector Get_StrikePoint(const FCk_Handle_Bat& Self)
     if (Back.IsNearlyZero())
     { Back = -Self.Get_RootTransform().GetRotation().GetForwardVector(); }
 
-    return Aim + Back * Swoop.Standoff + FVector(0.0, 0.0, Swoop.Height);
+    const auto Lift = FVector(0.0, 0.0, Swoop.Height);
+    const auto Natural = Aim + Back * Swoop.Standoff + Lift;
+    if (Self.Get_IsGoalFree(Natural))
+    { return Natural; }
+
+    for (int32 Step = 1; Step <= 4; ++Step)
+    {
+        for (int32 Sign = 1; Sign >= -1; Sign -= 2)
+        {
+            if (Step == 4 && Sign < 0)
+            { break; }
+
+            const auto Turned = Back.RotateAngleAxis(float64(Sign * Step) * 45.0, FVector::UpVector);
+            const auto Candidate = Aim + Turned * Swoop.Standoff + Lift;
+            if (Self.Get_IsGoalFree(Candidate))
+            { return Candidate; }
+        }
+    }
+
+    return Natural;
 }
 
 mixin FMars_Bat_Route Get_Route(const FCk_Handle_Bat& Self)
@@ -446,6 +468,65 @@ mixin bool Get_IsNavReady(const FCk_Handle_Bat& Self)
 {
     const auto Volume = Self.Get_Volume();
     return ck::IsValid(Volume) && utils_voxel_nav_volume::Get_IsBuilt(Volume);
+}
+
+// A point the bat can be sent to: free in the flight volume with a body's width (2 x AgentRadius) of free space on each
+// side along the ground. The volume's own answer is per finest cell and reads free for never-rasterized space, so a bare
+// free point may sit against the clearance band of a wall or a pillar, where the voxel path answers Unreachable (seen in
+// PIE) and the agent overshoots into the band. No volume or no bake: true (the route will say).
+mixin bool Get_IsGoalFree(const FCk_Handle_Bat& Self, FVector InPoint)
+{
+    const auto Volume = Self.Get_Volume();
+    if (ck::Is_NOT_Valid(Volume) || utils_voxel_nav_volume::Get_IsBuilt(Volume) == false)
+    { return true; }
+
+    if (utils_voxel_nav_volume::Get_IsPointFree(Volume, InPoint) == false)
+    { return false; }
+
+    const float64 Margin = float64(Self.Get_Spec().Flight.AgentRadius) * 2.0;
+    return utils_voxel_nav_volume::Get_IsPointFree(Volume, InPoint + FVector(Margin, 0.0, 0.0)) &&
+        utils_voxel_nav_volume::Get_IsPointFree(Volume, InPoint - FVector(Margin, 0.0, 0.0)) &&
+        utils_voxel_nav_volume::Get_IsPointFree(Volume, InPoint + FVector(0.0, Margin, 0.0)) &&
+        utils_voxel_nav_volume::Get_IsPointFree(Volume, InPoint - FVector(0.0, Margin, 0.0));
+}
+
+// The nearest goal-free point round InFrom (InFrom itself first, then the six axis directions and the four ground
+// diagonals at 1..8 x AgentRadius), for a bat that finds its own spot blocked. Unset: none within reach.
+mixin TOptional<FVector> Get_NearestGoalFree(const FCk_Handle_Bat& Self, FVector InFrom)
+{
+    auto Result = TOptional<FVector>();
+    if (Self.Get_IsGoalFree(InFrom))
+    {
+        Result = InFrom;
+        return Result;
+    }
+
+    const float64 Radius = Self.Get_Spec().Flight.AgentRadius;
+    auto Directions = TArray<FVector>();
+    Directions.Add(FVector(1.0, 0.0, 0.0));
+    Directions.Add(FVector(-1.0, 0.0, 0.0));
+    Directions.Add(FVector(0.0, 1.0, 0.0));
+    Directions.Add(FVector(0.0, -1.0, 0.0));
+    Directions.Add(FVector(0.0, 0.0, 1.0));
+    Directions.Add(FVector(0.0, 0.0, -1.0));
+    Directions.Add(FVector(0.7071, 0.7071, 0.0));
+    Directions.Add(FVector(-0.7071, 0.7071, 0.0));
+    Directions.Add(FVector(0.7071, -0.7071, 0.0));
+    Directions.Add(FVector(-0.7071, -0.7071, 0.0));
+    for (int32 Ring = 1; Ring <= 8; ++Ring)
+    {
+        for (const auto& Direction : Directions)
+        {
+            const auto Point = InFrom + Direction * (Radius * float64(Ring));
+            if (Self.Get_IsGoalFree(Point))
+            {
+                Result = Point;
+                return Result;
+            }
+        }
+    }
+
+    return Result;
 }
 
 // The route issued while the kernel was in InPhase (and still is) answered with a failure.
@@ -542,7 +623,7 @@ mixin EMars_Bat_SwoopAdmission Get_SwoopAdmission(const FCk_Handle_Bat& Self, FC
         utils_voxel_nav_volume::Get_IsPointFree(Volume, Aim) == false)
     { return EMars_Bat_SwoopAdmission::GoalBlocked; }
 
-    if (utils_bat::Get_IsStaticBetween(Self.Get_MouthLocation(), Aim))
+    if (utils_bat::Get_IsStaticBetween(Self, Self.Get_MouthLocation(), Aim))
     { return EMars_Bat_SwoopAdmission::NoLineOfSight; }
 
     return EMars_Bat_SwoopAdmission::Admitted;
@@ -575,14 +656,13 @@ mixin FVector Get_OrbitPointAround(const FCk_Handle_Bat& Self, FVector InCentre,
 // the target (seen in PIE: a search in the room's corner ended on EndpointUnresolvable).
 mixin FVector Get_OrbitGoal(const FCk_Handle_Bat& Self, FVector InCentre, int32 InSign, FVector InFallback)
 {
-    const auto Volume = Self.Get_Volume();
-    if (ck::Is_NOT_Valid(Volume) || utils_voxel_nav_volume::Get_IsBuilt(Volume) == false)
+    if (Self.Get_IsNavReady() == false)
     { return InFallback; }
 
     for (int32 Try = 0; Try < 2; ++Try)
     {
         const auto Point = Self.Get_OrbitPointAround(InCentre, Try == 0 ? InSign : -InSign, utils_bat::OrbitLeadDeg);
-        if (utils_voxel_nav_volume::Get_IsPointFree(Volume, Point))
+        if (Self.Get_IsGoalFree(Point))
         { return Point; }
     }
 
@@ -603,12 +683,10 @@ mixin FVector Get_RetreatPoint(const FCk_Handle_Bat& Self)
     { Away = -Self.Get_RootTransform().GetRotation().GetForwardVector(); }
 
     const auto Distance = Spec.Timing.RetreatDistance.IsSet() ? float64(Spec.Timing.RetreatDistance.GetValue()) : float64(Spec.Swoop.Standoff);
-    const auto Volume = Self.Get_Volume();
-    const auto Ready = ck::IsValid(Volume) && utils_voxel_nav_volume::Get_IsBuilt(Volume);
     for (int32 Halving = 0; Halving < 2; ++Halving)
     {
         const auto Point = Aim + Away * (Distance / float64(1 << Halving)) + FVector(0.0, 0.0, Spec.Swoop.Height);
-        if (Ready == false || utils_voxel_nav_volume::Get_IsPointFree(Volume, Point))
+        if (Self.Get_IsGoalFree(Point))
         { return Point; }
     }
 
@@ -617,9 +695,15 @@ mixin FVector Get_RetreatPoint(const FCk_Handle_Bat& Self)
 
 namespace utils_bat
 {
-    // Static world geometry between two points (a wall, a pillar), by a Jolt static-world ray.
-    bool Get_IsStaticBetween(FVector InFrom, FVector InTo)
+    // Static world geometry between two points (a wall, a pillar), by a Jolt static-world ray. Jolt runs only in a game
+    // world: in an editor's preview world (the review map open, its bat composed) the line reads clear.
+    bool Get_IsStaticBetween(const FCk_Handle_Bat& InSelf, FVector InFrom, FVector InTo)
     {
+        FCk_Handle Entity = InSelf;
+        const UWorld World = utils_entity_lifetime::Get_WorldForEntity(Entity);
+        if (ck::Is_NOT_Valid(World) || World.IsGameWorld() == false)
+        { return false; }
+
         auto Filter = FCk_Jolt_QueryFilter();
         Filter.Set_BodySelection(ECk_Jolt_QueryBodySelection::StaticNonSensor);
         return utils_jolt_query::Get_RayCast(InFrom, InTo, Filter).Get_HasHit();

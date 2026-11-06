@@ -330,14 +330,16 @@ namespace utils_bat
         utils_crowd_agent::Request_MoveTo(Agent, MoveTo);
     }
 
-    // A failed route while Approaching drops the target and ignores it for HoverRetrySeconds. True when it dropped one (the
-    // caller broadcasts OnTargetChanged after its route outcome).
+    // A failed route while Approaching drops the target and ignores it for HoverRetrySeconds, remembering where it was last
+    // sensed that the bat can fly to (Try_RememberLastKnown: a target that went where the bat cannot follow is searched for
+    // at the last reachable spot). True when it dropped one (the caller broadcasts OnTargetChanged after its route outcome).
     bool Try_DropApproachTarget(FCk_Handle_Bat& InSelf)
     {
         auto& State = InSelf.Get_Fragment(FMars_Fragment_Bat);
         if (State.Phase != EMars_Bat_Phase::Approaching || ck::Is_NOT_Valid(State.Target))
         { return false; }
 
+        Try_RememberLastKnown(InSelf, State.Target);
         State.Ignored = State.Target;
         State.IgnoreLeft = InSelf.Get_Spec().Timing.HoverRetrySeconds;
         State.Target = FCk_Handle();
