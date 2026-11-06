@@ -1,0 +1,42 @@
+{
+  "_comment": "Phase 6b-2 final manifest: the 18 Phase 5 clips on the final skeleton. Built as CellarBat_R01_Final_Mars_ABP because CellarBat_R01_Mars_ABP (the prep build on the blockout skeleton) exists on disk; it is never deleted from a live editor (PROGRESS incidents I-1/I-2). The banks are already additive (LocalSpaceBase vs Hover frame 0, Phase 5), so no copies are made.",
+  "abp": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Final_Mars_ABP",
+  "skeleton": "/Game/ArtCandidates/CellarBat/R01/Meshes/CellarBat_R01_Mars_SKEL",
+  "parent_class": "/Script/Angelscript.Mars_CellarBat_AnimInstance",
+  "blend_space": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Locomotion_Final_Mars_BS1D",
+  "additive_dir": "/Game/ArtCandidates/CellarBat/R01/Animation/Additive",
+  "banks_additive": true,
+  "locomotion_speeds": {
+    "Hover": 0.0,
+    "FlyForward": 380.0,
+    "Glide": 620.0,
+    "axis_max": 900.0
+  },
+  "loops": [
+    "RoostIdle",
+    "Hover",
+    "FlyForward",
+    "Glide",
+    "Stun"
+  ],
+  "clips": {
+    "RoostIdle": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_RoostIdle_Mars_ANIM",
+    "RoostAlert": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_RoostAlert_Mars_ANIM",
+    "Launch": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Launch_Mars_ANIM",
+    "Hover": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Hover_Mars_ANIM",
+    "FlyForward": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_FlyForward_Mars_ANIM",
+    "Glide": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Glide_Mars_ANIM",
+    "BankLeft": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_BankLeft_Mars_ANIM",
+    "BankRight": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_BankRight_Mars_ANIM",
+    "Telegraph": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_SwoopTelegraph_Mars_ANIM",
+    "Swoop": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Swoop_Mars_ANIM",
+    "Recover": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_SwoopRecover_Mars_ANIM",
+    "Brake": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Brake_Mars_ANIM",
+    "Perch": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Perch_Mars_ANIM",
+    "Screech": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Screech_Mars_ANIM",
+    "Hit": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Hit_Mars_ANIM",
+    "Stun": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_Stun_Mars_ANIM",
+    "DeathFall": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_DeathFall_Mars_ANIM",
+    "DeathLand": "/Game/ArtCandidates/CellarBat/R01/Animation/CellarBat_R01_DeathLand_Mars_ANIM"
+  }
+}

@@ -1,0 +1,427 @@
+{
+  "level": "/Game/ArtCandidates/CellarBat/R01/Review/CellarBat_R01_Review_MAP",
+  "count": 21,
+  "actors": [
+    {
+      "label": "CellarBatReview_AmberLight",
+      "class": "PointLight",
+      "location": [
+        750.0,
+        0.0,
+        300.0
+      ],
+      "rotation_pyr": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "label": "CellarBatReview_Bat",
+      "class": "Ck_EntitySpawner_UE",
+      "location": [
+        -600.0,
+        0.0,
+        450.0
+      ],
+      "rotation_pyr": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "entity_script": "Mars_CellarBatReview_Bat_EntityScript"
+    },
+    {
+      "label": "CellarBatReview_Camera",
+      "class": "CameraActor",
+      "location": [
+        950.0,
+        -950.0,
+        560.0
+      ],
+      "rotation_pyr": [
+        -14.0,
+        137.9,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "label": "CellarBatReview_CameraClose",
+      "class": "CameraActor",
+      "location": [
+        250.0,
+        -450.0,
+        330.0
+      ],
+      "rotation_pyr": [
+        -16.4,
+        55.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "label": "CellarBatReview_Ceiling",
+      "class": "StaticMeshActor",
+      "location": [
+        0.0,
+        0.0,
+        610.0
+      ],
+      "rotation_pyr": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        20.8,
+        20.8,
+        0.2
+      ],
+      "collision_profile": "BlockAll",
+      "mobility": "<ComponentMobility.STATIC: 0>"
+    },
+    {
+      "label": "CellarBatReview_Exposure",
+      "class": "PostProcessVolume",
+      "location": [
+        0.0,
+        0.0,
+        300.0
+      ],
+      "rotation_pyr": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "label": "CellarBatReview_FlightVolume",
+      "class": "Ck_EntitySpawner_UE",
+      "location": [
+        0.0,
+        0.0,
+        300.0
+      ],
+      "rotation_pyr": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "entity_script": "Mars_CellarBatReview_FlightVolume_EntityScript"
+    },
+    {
+      "label": "CellarBatReview_Floor",
+      "class": "StaticMeshActor",
+      "location": [
+        0.0,
+        0.0,
+        -10.0
+      ],
+      "rotation_pyr": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        20.8,
+        20.8,
+        0.2
+      ],
+      "collision_profile": "BlockAll",
+      "mobility": "<ComponentMobility.STATIC: 0>"
+    },
+    {
+      "label": "CellarBatReview_NeutralSky",
+      "class": "SkyLight",
+      "location": [
+        0.0,
+        0.0,
+        300.0
+      ],
+      "rotation_pyr": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "label": "CellarBatReview_NeutralSun",
+      "class": "DirectionalLight",
+      "location": [
+        0.0,
+        0.0,
+        500.0
+      ],
+      "rotation_pyr": [
+        -45.0,
+        -150.0,
+        0.0
+      ],
+      "scale": [
+        2.5,
+        2.5,
+        2.5
+      ]
+    },
+    {
+      "label": "CellarBatReview_PerchBeam",
+      "class": "StaticMeshActor",
+      "location": [
+        -600.0,
+        0.0,
+        540.0
+      ],
+      "rotation_pyr": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        3.0,
+        0.2,
+        0.2
+      ],
+      "collision_profile": "BlockAll",
+      "mobility": "<ComponentMobility.STATIC: 0>"
+    },
+    {
+      "label": "CellarBatReview_PerchPost",
+      "class": "StaticMeshActor",
+      "location": [
+        -600.0,
+        0.0,
+        575.0
+      ],
+      "rotation_pyr": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        0.2,
+        0.2,
+        0.5
+      ],
+      "collision_profile": "BlockAll",
+      "mobility": "<ComponentMobility.STATIC: 0>"
+    },
+    {
+      "label": "CellarBatReview_Pillar",
+      "class": "StaticMeshActor",
+      "location": [
+        0.0,
+        0.0,
+        300.0
+      ],
+      "rotation_pyr": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.2,
+        1.2,
+        6.0
+      ],
+      "collision_profile": "BlockAll",
+      "mobility": "<ComponentMobility.STATIC: 0>"
+    },
+    {
+      "label": "CellarBatReview_PlayerStart",
+      "class": "PlayerStart",
+      "location": [
+        850.0,
+        -820.0,
+        100.0
+      ],
+      "rotation_pyr": [
+        -5.0,
+        150.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "label": "CellarBatReview_Roost",
+      "class": "Ck_EntitySpawner_UE",
+      "location": [
+        -600.0,
+        0.0,
+        530.0
+      ],
+      "rotation_pyr": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "entity_script": "Mars_BatRoost_EntityScript"
+    },
+    {
+      "label": "CellarBatReview_TargetDummy",
+      "class": "Ck_EntitySpawner_UE",
+      "location": [
+        600.0,
+        0.0,
+        0.0
+      ],
+      "rotation_pyr": [
+        0.0,
+        180.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "entity_script": "Mars_CellarBatReview_TargetDummy_EntityScript"
+    },
+    {
+      "label": "CellarBatReview_TealLight",
+      "class": "PointLight",
+      "location": [
+        -800.0,
+        -200.0,
+        150.0
+      ],
+      "rotation_pyr": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "label": "CellarBatReview_WallEast",
+      "class": "StaticMeshActor",
+      "location": [
+        1020.0,
+        0.0,
+        300.0
+      ],
+      "rotation_pyr": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        0.4,
+        20.8,
+        6.0
+      ],
+      "collision_profile": "BlockAll",
+      "mobility": "<ComponentMobility.STATIC: 0>"
+    },
+    {
+      "label": "CellarBatReview_WallNorth",
+      "class": "StaticMeshActor",
+      "location": [
+        0.0,
+        1020.0,
+        300.0
+      ],
+      "rotation_pyr": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        20.8,
+        0.4,
+        6.0
+      ],
+      "collision_profile": "BlockAll",
+      "mobility": "<ComponentMobility.STATIC: 0>"
+    },
+    {
+      "label": "CellarBatReview_WallSouth",
+      "class": "StaticMeshActor",
+      "location": [
+        0.0,
+        -1020.0,
+        300.0
+      ],
+      "rotation_pyr": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        20.8,
+        0.4,
+        6.0
+      ],
+      "collision_profile": "BlockAll",
+      "mobility": "<ComponentMobility.STATIC: 0>"
+    },
+    {
+      "label": "CellarBatReview_WallWest",
+      "class": "StaticMeshActor",
+      "location": [
+        -1020.0,
+        0.0,
+        300.0
+      ],
+      "rotation_pyr": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        0.4,
+        20.8,
+        6.0
+      ],
+      "collision_profile": "BlockAll",
+      "mobility": "<ComponentMobility.STATIC: 0>"
+    }
+  ]
+}
