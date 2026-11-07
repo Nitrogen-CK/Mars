@@ -1,6 +1,7 @@
 // Placeable eye-swarm test wall (+X is its facing): a 300 x 200 cm ProtoGrid slab standing on its origin with a jittered
 // 7 x 5 grid of eyes set into its face, each an eyeball instance and a lid-shell instance (utils_eye_swarm::Add_Eye) with a
-// random phase, variant, size (0.7..1.4) and a tilt within 15 degrees of the slab's normal, bulging ~2 cm out of the face.
+// random phase, variant, size (0.45..2.0, skewed small so a few eyes are big) and a tilt within 15 degrees of the slab's
+// normal, bulging ~2 cm out of the face.
 // The MarsEyeball / MarsEyelid looks do every blink and glance in the shader from the roster's player heads; the wall only
 // places the instances, picks the preset uniforms and forwards a focus override. Placed by Mars.Sandbox.PlaceEyeWall
 // (Script/Editor/Mars_SandboxMapBuilder.as); not under Script/Editor because the saved map references it at runtime.
@@ -47,8 +48,11 @@ class UMars_EyeWallDummy_EntityScript : UCk_GenericEntityScript_UE
     private const int32 Rows = 5;
     // Of a cell, each way from its centre.
     private const float JitterFraction = 0.25;
-    private const float ScaleMin = 0.7;
-    private const float ScaleMax = 1.4;
+    // Skewed toward small (fraction ^ ScaleSkew): most eyes are 5..10 cm, a few reach 20 cm. A 2.0 lid is 22 cm across,
+    // just under the 43 x 40 cm cells minus the jitter, so neighbours do not overlap.
+    private const float ScaleMin = 0.45;
+    private const float ScaleMax = 2.0;
+    private const float ScaleSkew = 1.6;
     // Pitch and yaw each within MaxTiltDeg / sqrt(2), so the forward axis stays within MaxTiltDeg of the normal.
     private const float MaxTiltDeg = 15.0;
     private const float MaxRollDeg = 15.0;
@@ -190,7 +194,7 @@ class UMars_EyeWallDummy_EntityScript : UCk_GenericEntityScript_UE
             {
                 const float Y = -0.5 * SlabWidth + CellY * (float(Column) + 0.5) + Draw_Signed(Stream) * JitterFraction * CellY;
                 const float Z = -0.5 * SlabHeight + CellZ * (float(Row) + 0.5) + Draw_Signed(Stream) * JitterFraction * CellZ;
-                const float Scale = Math::Lerp(ScaleMin, ScaleMax, float(Stream.GetFraction()));
+                const float Scale = Math::Lerp(ScaleMin, ScaleMax, Math::Pow(float(Stream.GetFraction()), ScaleSkew));
                 const auto Rotation = FRotator(Draw_Signed(Stream) * AxisTilt, Draw_Signed(Stream) * AxisTilt, Draw_Signed(Stream) * MaxRollDeg);
                 const float X = ProtrusionCm - constants_eye_swarm::k_EyeballRadiusCm * Scale;
 

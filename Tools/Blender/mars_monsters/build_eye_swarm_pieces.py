@@ -7,10 +7,10 @@ pieces share one pivot (the eye's centre) and one frame, Unreal local cm: +X for
 
   EyeSwarm_Eyeball_Mars_SM  a faceted icosphere (the icosahedron subdivided twice: 320 tris, 162 vertices), radius
                             EYE_RADIUS 5.0 cm round the pivot, a vertex on +X (the gaze: the pupil's facets fan round it),
-                            flat shaded, one slot `Eyeball`.
+                            smooth shaded, one slot `Eyeball`.
   EyeSwarm_Eyelid_Mars_SM   the same icosphere at LID_RADIUS 5.5 cm (its facets line up with the eyeball's), the FULL
                             sphere (the shader cuts the opening with an opacity mask: there is no hole), normals outward,
-                            flat shaded, one slot `Eyelid`. Its faces' inradius stays above EYE_RADIUS, so the lid never
+                            smooth shaded, one slot `Eyelid`. Its faces' inradius stays above EYE_RADIUS, so the lid never
                             dips into the eyeball.
   EyeSwarm_Socket_Mars_SM   optional: a shallow faceted rim (SOCKET_SIDES sides) round the lid, to blend an eye into a flat
                             host surface. Its back face lies on the plane x 0 (the host surface through the eye's centre: the
@@ -137,8 +137,9 @@ def preview_material(slot):
 
 
 # ---------------------------------------------------------------- the pieces (Blender metres)
-def _finish(name, bm, slot):
-    """bmesh -> a flat-shaded triangulated mesh object at the origin with one slot."""
+def _finish(name, bm, slot, smooth=False):
+    """bmesh -> a triangulated mesh object at the origin with one slot; smooth-shaded when asked (the eyeball and the lid:
+    Stephen 2026-11-07, "the normals are faceted - if they can be smoothed"), else flat (the socket rim keeps its edges)."""
     bmesh.ops.triangulate(bm, faces=bm.faces[:], quad_method="BEAUTY", ngon_method="BEAUTY")
     bmesh.ops.recalc_face_normals(bm, faces=bm.faces[:])
     mesh = bpy.data.meshes.new(name)
@@ -146,7 +147,7 @@ def _finish(name, bm, slot):
     bm.free()
     mesh.materials.append(preview_material(slot))
     mesh.polygons.foreach_set("material_index", [0] * len(mesh.polygons))
-    mesh.polygons.foreach_set("use_smooth", [False] * len(mesh.polygons))
+    mesh.polygons.foreach_set("use_smooth", [bool(smooth)] * len(mesh.polygons))
     mesh.validate(verbose=False)
     mesh.update()
     obj = bpy.data.objects.new(name, mesh)
@@ -161,7 +162,7 @@ def build_sphere(name, radius_cm, slot):
     bmesh.ops.transform(bm, matrix=Matrix.Rotation(math.radians(90.0), 4, "Y"), verts=bm.verts[:])
     for v in bm.verts:                       # exactly on the sphere (the subdivision projects; this removes float drift)
         v.co = v.co.normalized() * radius_cm * 0.01
-    return _finish(name, bm, slot)
+    return _finish(name, bm, slot, smooth=True)
 
 
 def build_socket(name):
@@ -340,8 +341,9 @@ def piece_checks(objs):
             fails.append("%s is not closed: %d open/non-manifold edges, %d loose verts" % (o.name, bad, loose))
         if vol <= 0.0:
             fails.append("%s winds inward (volume %.2f)" % (o.name, vol))
-        if smooth:
-            fails.append("%s has %d smooth faces" % (o.name, smooth))
+        want_smooth = len(me.polygons) if part in ("Eyeball", "Eyelid") else 0
+        if smooth != want_smooth:
+            fails.append("%s has %d smooth faces, wanted %d" % (o.name, smooth, want_smooth))
         if slots != [SLOTS[part]]:
             fails.append("%s slots %s != [%s]" % (o.name, slots, SLOTS[part]))
         if [a.name for a in me.color_attributes] != ["Col"]:

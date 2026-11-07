@@ -52,6 +52,8 @@ namespace constants_eye_swarm
     const FName k_Param_EmissiveStrength = n"EmissiveStrength";
     const FName k_Param_ShaderLid = n"ShaderLid";
     const FName k_Param_LidColor = n"LidColor";
+    const FName k_Param_ScleraRimColor = n"ScleraRimColor";
+    const FName k_Param_IrisInnerColor = n"IrisInnerColor";
 }
 
 // One eye of a cluster, in the instancers' component space: centre, rotation (+X is where it looks at rest) and a uniform
@@ -325,6 +327,9 @@ namespace utils_eye_swarm
 
         InMid.SetVectorParameterValue(constants_eye_swarm::k_Param_ScleraColor, FLinearColor(0.35f, 0.04f, 0.03f, 1.0f));
         InMid.SetVectorParameterValue(constants_eye_swarm::k_Param_IrisColor, FLinearColor(1.0f, 0.12f, 0.05f, 1.0f));
+        // The stylised gradients' colours follow the recolour: a darker red rim, a hot orange ring round the pupil.
+        InMid.SetVectorParameterValue(constants_eye_swarm::k_Param_ScleraRimColor, FLinearColor(0.12f, 0.012f, 0.01f, 1.0f));
+        InMid.SetVectorParameterValue(constants_eye_swarm::k_Param_IrisInnerColor, FLinearColor(1.0f, 0.45f, 0.12f, 1.0f));
         InMid.SetVectorParameterValue(constants_eye_swarm::k_Param_PupilColor, FLinearColor(0.01f, 0.0f, 0.0f, 1.0f));
         InMid.SetScalarParameterValue(constants_eye_swarm::k_Param_EmissiveStrength, 8.0f);
         InMid.SetVectorParameterValue(constants_eye_swarm::k_Param_LidColor, FLinearColor(0.45f, 0.12f, 0.10f, 1.0f));

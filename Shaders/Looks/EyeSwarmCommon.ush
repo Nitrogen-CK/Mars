@@ -16,7 +16,7 @@
 // lid shell and a ShaderLid-painted lid close on exactly the same frame. Keep the two looks' shared defaults identical.
 //
 // Performance: no texture samples, no loop longer than two cells, the roster is four unrolled compares; the only
-// derivatives are the ones CkUsf_SdfEdgeAA takes in the looks.
+// derivatives are taken in the looks (CkUsf_SdfEdgeAA, the pupil edge, the iris fibre fade), never inside a branch.
 #pragma once
 #include "/CkUsf/Common.ush"
 
@@ -293,23 +293,30 @@ float Mars_EyeSwarm_Openness(FMars_EyeSwarm_LidShape S, float FocusWeight, float
     return max(S.OpenFraction + S.WidenAperture * FocusWeight, 0.0) * (1.0 - saturate(Closure));
 }
 
+// The upper lid alone: signed angular distance (degrees) from its edge circle, > 0 under the upper lid. The eyeball's
+// upper shade band hangs off this, so the shadow sits just below the lid edge and travels down with it in a blink.
+float Mars_EyeSwarm_UpperLidDistDeg(float3 N, FMars_EyeSwarm_LidShape S, float Openness)
+{
+    const float UpperRad = clamp(lerp(S.MeetDeg, S.OpenUpperDeg, Openness), -89.0, 89.0) * MARS_EYESWARM_DEG2RAD;
+    // Covered where elevation > UpperRad.  dot(N, (-sin U, 0, cos U)) = sin(elevation - U) on the front meridian.
+    return asin(clamp(dot(N, float3(-sin(UpperRad), 0.0, cos(UpperRad))), -1.0, 1.0)) * MARS_EYESWARM_RAD2DEG;
+}
+
 // Signed angular distance (degrees) of a local direction from the lid edge: > 0 covered (flesh), < 0 open.
 // Each lid edge is a great circle through the eye's +-Y axis (the canthi), tilted to its elevation at the front: the
 // upper lid covers everything above its circle, the lower lid everything below its own, so the open aperture is the
 // forward-facing lens between them. Openness 0 brings both circles to MeetDeg, closing the lens on the forward axis.
 float Mars_EyeSwarm_LidSignedDistDeg(float3 N, FMars_EyeSwarm_LidShape S, float Openness)
 {
-    const float UpperRad = clamp(lerp(S.MeetDeg, S.OpenUpperDeg, Openness), -89.0, 89.0) * MARS_EYESWARM_DEG2RAD;
     const float LowerRad = clamp(lerp(S.MeetDeg, -S.OpenLowerDeg, Openness), -89.0, 89.0) * MARS_EYESWARM_DEG2RAD;
 
-    // Upper: covered where elevation > UpperRad.  dot(N, (-sin U, 0, cos U)) = sin(elevation - U) on the front meridian.
-    const float Upper = asin(clamp(dot(N, float3(-sin(UpperRad), 0.0, cos(UpperRad))), -1.0, 1.0));
+    const float UpperDeg = Mars_EyeSwarm_UpperLidDistDeg(N, S, Openness);
     // Lower: covered where elevation < LowerRad. dot(N, (sin L, 0, -cos L)) = sin(L - elevation).
     const float Lower = asin(clamp(dot(N, float3(sin(LowerRad), 0.0, -cos(LowerRad))), -1.0, 1.0));
     // Back rim: covered where N.x < BackCoverX, measured as the same kind of angle.
     const float Back = asin(clamp(S.BackCoverX, -1.0, 1.0)) - asin(clamp(N.x, -1.0, 1.0));
 
-    return max(max(Upper, Lower), Back) * MARS_EYESWARM_RAD2DEG;
+    return max(UpperDeg, max(Lower, Back) * MARS_EYESWARM_RAD2DEG);
 }
 
 // Lid flesh colour: a small per-eye brightness jitter from Variant and a darker lash line along the aperture edge.
@@ -324,4 +331,24 @@ float3 Mars_EyeSwarm_LidShade(FMars_EyeSwarm_LidLook L, float Variant, float Sig
 {
     const float Rim = 1.0 - smoothstep(0.0, max(L.RimWidthDeg, 1e-3), SignedDistDeg);
     return L.Color * lerp(0.92, 1.08, saturate(Variant)) * (1.0 - saturate(L.RimDarken) * Rim);
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+// Stylisation: the whole-eye gradient shared by the eyeball (sclera, painted lid) and the lid shell, so ball and lid
+// read as one shaded object. View-independent: it lives in the eye's local frame, like every reference eye's paint.
+// --------------------------------------------------------------------------------------------------------------------
+
+struct FMars_EyeSwarm_BodyGradient
+{
+    float3 TopTint;         // multiplicative tint at local +Z
+    float3 BottomTint;      // multiplicative tint at local -Z
+    float  Strength;        // 0 = off, 1 = the tints as authored
+};
+
+// Multiplicative colour factor along the eye's local up axis (smoothstepped, so the middle band changes fastest).
+float3 Mars_EyeSwarm_BodyGradientTint(FMars_EyeSwarm_BodyGradient G, float3 N)
+{
+    const float T = saturate(N.z * 0.5 + 0.5);
+    const float3 Tint = lerp(G.BottomTint, G.TopTint, T * T * (3.0 - 2.0 * T));
+    return max(lerp(float3(1.0, 1.0, 1.0), Tint, max(G.Strength, 0.0)), 0.0);
 }

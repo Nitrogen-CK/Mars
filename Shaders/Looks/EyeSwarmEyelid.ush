@@ -8,6 +8,7 @@
 //
 // The blink and the focus weight come from the same functions, inputs and defaults as MarsEyeball, so a lid and its
 // eyeball close together. The lid needs no transform: it never aims, it only measures the distance to the roster.
+// It takes the eyeball's whole-eye up/down gradient (Gradient*, identical defaults) so ball and lid read as one object.
 // The data contract lives at the top of Script/ECS/EyeSwarm/Mars_EyeSwarm_Look_Assets.as.
 #pragma once
 #include "/Project/Looks/EyeSwarmCommon.ush"
@@ -42,7 +43,10 @@ FCkUsf_SurfaceOutput Mars_Look_EyeSwarmEyelid(
     float               LidOpenLowerDeg,
     float               LidMeetDeg,
     float               LidBackCoverX,
-    float               ShellRadiusCm)
+    float               ShellRadiusCm,
+    float3              GradientTopTint,
+    float3              GradientBottomTint,
+    float               GradientStrength)
 {
     FCkUsf_SurfaceOutput O = CkUsf_DefaultSurface();
 
@@ -85,7 +89,14 @@ FCkUsf_SurfaceOutput Mars_Look_EyeSwarmEyelid(
     LidLook.RimDarken = LidRimDarken;
     LidLook.RimWidthDeg = LidRimWidthDeg;
 
-    O.BaseColor = Mars_EyeSwarm_LidShade(LidLook, Variant, LidDist);
+    // The whole-eye up/down gradient, the same function and defaults as MarsEyeball's sclera and painted lid, so the lid
+    // and the ball under it shade as one object.
+    FMars_EyeSwarm_BodyGradient Gradient;
+    Gradient.TopTint = GradientTopTint;
+    Gradient.BottomTint = GradientBottomTint;
+    Gradient.Strength = GradientStrength;
+
+    O.BaseColor = Mars_EyeSwarm_LidShade(LidLook, Variant, LidDist) * Mars_EyeSwarm_BodyGradientTint(Gradient, N);
     O.Roughness = saturate(LidRoughness);
     O.OpacityMask = CkUsf_SdfEdgeAA(-LidDist);
     return O;
