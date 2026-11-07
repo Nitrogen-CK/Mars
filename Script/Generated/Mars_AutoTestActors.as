@@ -4100,6 +4100,42 @@ class AMars_AutoTest_EyesDummy_ComposesAndWrites_Actor : ACk_AutoTestRunner
     }
 }
 
+class AMars_AutoTest_EyeSwarm_LookMatchesSlotLayout_Actor : ACk_AutoTestRunner
+{
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_EyeSwarm_LookMatchesSlotLayout");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_EyeSwarm_RosterWritesPlayers_Actor : ACk_AutoTestRunner
+{
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_EyeSwarm_RosterWritesPlayers");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_EyeSwarm_WallDummyComposes_Actor : ACk_AutoTestRunner
+{
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_EyeSwarm_WallDummyComposes");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
 class AMars_AutoTest_Fishing_ABiteArrivesInsideTheWaitWindow_Actor : ACk_AutoTestRunner
 {
     default _TimeoutSeconds = 15.0f;

@@ -1,0 +1,824 @@
+{
+	"material": "M_CkUsf_Look_MarsEyelid",
+	"packagePath": "/Game/Mars/Materials/GeneratedLooks/M_CkUsf_Look_MarsEyelid",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "8e733c60984a596027022d1d4280ded0",
+		"exporterVersion": 3
+	},
+	"blendMode": "BLEND_Masked",
+	"twoSided": true,
+	"unlit": false,
+	"shadingModel": "MSM_DefaultLit",
+	"domain": "MD_Surface",
+	"connectedOutputs": [
+		"EmissiveColor",
+		"BaseColor",
+		"OpacityMask",
+		"Normal"
+	],
+	"expressions":
+	{
+		"CameraVectorWS": 1,
+		"CollectionParameter": 4,
+		"Custom": 1,
+		"PerInstanceCustomData": 2,
+		"PixelDepth": 1,
+		"ScalarParameter": 21,
+		"TextureCoordinate": 1,
+		"Time": 1,
+		"VectorParameter": 2,
+		"VertexColor": 1,
+		"VertexNormalWS": 1,
+		"VertexTangentWS": 1,
+		"WorldPosition": 1
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "WorldPosition",
+						"node": 1,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 1,
+						"name": "CameraVector",
+						"node": 2,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "VertexNormal",
+						"node": 3,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "VertexTangent",
+						"node": 4,
+						"output": 0
+					},
+					{
+						"index": 4,
+						"name": "PixelDepth",
+						"node": 5,
+						"output": 0,
+						"mask": "r"
+					},
+					{
+						"index": 5,
+						"name": "VertexColor",
+						"node": 6,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 6,
+						"name": "Phase",
+						"node": 7,
+						"output": 0
+					},
+					{
+						"index": 7,
+						"name": "Variant",
+						"node": 8,
+						"output": 0
+					},
+					{
+						"index": 8,
+						"name": "PhaseCpd",
+						"node": 9,
+						"output": 0
+					},
+					{
+						"index": 9,
+						"name": "FocusOverride",
+						"node": 10,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 10,
+						"name": "FocusOverrideWeight",
+						"node": 11,
+						"output": 0
+					},
+					{
+						"index": 11,
+						"name": "Player0",
+						"node": 12,
+						"output": 0
+					},
+					{
+						"index": 12,
+						"name": "Player1",
+						"node": 13,
+						"output": 0
+					},
+					{
+						"index": 13,
+						"name": "Player2",
+						"node": 14,
+						"output": 0
+					},
+					{
+						"index": 14,
+						"name": "Player3",
+						"node": 15,
+						"output": 0
+					},
+					{
+						"index": 15,
+						"name": "LidColor",
+						"node": 16,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 16,
+						"name": "LidRoughness",
+						"node": 17,
+						"output": 0
+					},
+					{
+						"index": 17,
+						"name": "LidRimDarken",
+						"node": 18,
+						"output": 0
+					},
+					{
+						"index": 18,
+						"name": "LidRimWidthDeg",
+						"node": 19,
+						"output": 0
+					},
+					{
+						"index": 19,
+						"name": "FocusNearCm",
+						"node": 20,
+						"output": 0
+					},
+					{
+						"index": 20,
+						"name": "FocusFarCm",
+						"node": 21,
+						"output": 0
+					},
+					{
+						"index": 21,
+						"name": "BlinkIntervalMinS",
+						"node": 22,
+						"output": 0
+					},
+					{
+						"index": 22,
+						"name": "BlinkIntervalMaxS",
+						"node": 23,
+						"output": 0
+					},
+					{
+						"index": 23,
+						"name": "BlinkCloseS",
+						"node": 24,
+						"output": 0
+					},
+					{
+						"index": 24,
+						"name": "BlinkHoldS",
+						"node": 25,
+						"output": 0
+					},
+					{
+						"index": 25,
+						"name": "BlinkOpenS",
+						"node": 26,
+						"output": 0
+					},
+					{
+						"index": 26,
+						"name": "DoubleBlinkChance",
+						"node": 27,
+						"output": 0
+					},
+					{
+						"index": 27,
+						"name": "FocusBlinkSuppress",
+						"node": 28,
+						"output": 0
+					},
+					{
+						"index": 28,
+						"name": "LidOpenFraction",
+						"node": 29,
+						"output": 0
+					},
+					{
+						"index": 29,
+						"name": "FocusWidenAperture",
+						"node": 30,
+						"output": 0
+					},
+					{
+						"index": 30,
+						"name": "LidOpenUpperDeg",
+						"node": 31,
+						"output": 0
+					},
+					{
+						"index": 31,
+						"name": "LidOpenLowerDeg",
+						"node": 32,
+						"output": 0
+					},
+					{
+						"index": 32,
+						"name": "LidMeetDeg",
+						"node": 33,
+						"output": 0
+					},
+					{
+						"index": 33,
+						"name": "LidBackCoverX",
+						"node": 34,
+						"output": 0
+					},
+					{
+						"index": 34,
+						"name": "ShellRadiusCm",
+						"node": 35,
+						"output": 0
+					},
+					{
+						"index": 35,
+						"name": "Time",
+						"node": 36,
+						"output": 0
+					},
+					{
+						"index": 36,
+						"name": "UV",
+						"node": 37,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"return",
+					"EmissiveColor",
+					"Roughness",
+					"Metallic",
+					"Specular",
+					"AmbientOcclusion",
+					"Normal",
+					"Opacity",
+					"OpacityMask",
+					"Refraction",
+					"SubsurfaceColor",
+					"ClearCoat",
+					"ClearCoatRoughness"
+				],
+				"props":
+				{
+					"Code": "FCkUsf_SurfaceInput In = CkUsf_DefaultInput();\nIn.Time = Time;\nIn.UV = UV;\nIn.WorldPosition = WorldPosition;\nIn.CameraVector = CameraVector;\nIn.VertexNormal = VertexNormal;\nIn.VertexTangent = VertexTangent;\nIn.PixelDepth = PixelDepth;\nIn.VertexColor = VertexColor;\nFCkUsf_SurfaceOutput O = Mars_Look_EyeSwarmEyelid(In, Phase, Variant, PhaseCpd, FocusOverride.rgb, FocusOverrideWeight, Player0.rgb, Player1.rgb, Player2.rgb, Player3.rgb, LidColor.rgb, LidRoughness, LidRimDarken, LidRimWidthDeg, FocusNearCm, FocusFarCm, BlinkIntervalMinS, BlinkIntervalMaxS, BlinkCloseS, BlinkHoldS, BlinkOpenS, DoubleBlinkChance, FocusBlinkSuppress, LidOpenFraction, FocusWidenAperture, LidOpenUpperDeg, LidOpenLowerDeg, LidMeetDeg, LidBackCoverX, ShellRadiusCm);\nEmissiveColor = O.EmissiveColor;\nRoughness = O.Roughness;\nMetallic = O.Metallic;\nSpecular = O.Specular;\nAmbientOcclusion = O.AmbientOcclusion;\nNormal = O.Normal;\nOpacity = O.Opacity;\nOpacityMask = O.OpacityMask;\nRefraction = O.Refraction;\nSubsurfaceColor = O.SubsurfaceColor;\nClearCoat = O.ClearCoat;\nClearCoatRoughness = O.ClearCoatRoughness;\nreturn O.BaseColor;",
+					"IncludeFilePaths": [
+						"/Project/Looks/EyeSwarmEyelid.ush"
+					]
+				}
+			},
+			{
+				"id": 1,
+				"class": "WorldPosition",
+				"name": "MaterialExpressionWorldPosition_0",
+				"outputs": [
+					"XYZ",
+					"XY",
+					"Z"
+				]
+			},
+			{
+				"id": 2,
+				"class": "CameraVectorWS",
+				"name": "MaterialExpressionCameraVectorWS_0"
+			},
+			{
+				"id": 3,
+				"class": "VertexNormalWS",
+				"name": "MaterialExpressionVertexNormalWS_0"
+			},
+			{
+				"id": 4,
+				"class": "VertexTangentWS",
+				"name": "MaterialExpressionVertexTangentWS_0"
+			},
+			{
+				"id": 5,
+				"class": "PixelDepth",
+				"name": "MaterialExpressionPixelDepth_0"
+			},
+			{
+				"id": 6,
+				"class": "VertexColor",
+				"name": "MaterialExpressionVertexColor_0",
+				"outputs": [
+					"None",
+					"None",
+					"None",
+					"None",
+					"None"
+				]
+			},
+			{
+				"id": 7,
+				"class": "PerInstanceCustomData",
+				"name": "MaterialExpressionPerInstanceCustomData_0"
+			},
+			{
+				"id": 8,
+				"class": "PerInstanceCustomData",
+				"name": "MaterialExpressionPerInstanceCustomData_1",
+				"props":
+				{
+					"ConstDefaultValue": 0.5,
+					"DataIndex": 1
+				}
+			},
+			{
+				"id": 9,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_0",
+				"props":
+				{
+					"bUseCustomPrimitiveData": true,
+					"ParameterName": "PhaseCpd",
+					"Group": "Source"
+				}
+			},
+			{
+				"id": 10,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_0",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"bUseCustomPrimitiveData": true,
+					"PrimitiveDataIndex": 4,
+					"ParameterName": "FocusOverride",
+					"Group": "Source"
+				}
+			},
+			{
+				"id": 11,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_1",
+				"props":
+				{
+					"bUseCustomPrimitiveData": true,
+					"PrimitiveDataIndex": 8,
+					"ParameterName": "FocusOverrideWeight",
+					"Group": "Source"
+				}
+			},
+			{
+				"id": 12,
+				"class": "CollectionParameter",
+				"name": "MaterialExpressionCollectionParameter_0",
+				"props":
+				{
+					"Collection": "/Game/Mars/Gameplay/Monsters/EyeSwarm/Materials/EyeSwarm_Mars_MPC.EyeSwarm_Mars_MPC",
+					"ParameterName": "Player0",
+					"Group": "Source",
+					"ParameterId": "10F4EAD648C7316E65D5EFBE3B3D85AA"
+				}
+			},
+			{
+				"id": 13,
+				"class": "CollectionParameter",
+				"name": "MaterialExpressionCollectionParameter_1",
+				"props":
+				{
+					"Collection": "/Game/Mars/Gameplay/Monsters/EyeSwarm/Materials/EyeSwarm_Mars_MPC.EyeSwarm_Mars_MPC",
+					"ParameterName": "Player1",
+					"Group": "Source",
+					"ParameterId": "1CF824B24DC14773B3E812885028F8CE"
+				}
+			},
+			{
+				"id": 14,
+				"class": "CollectionParameter",
+				"name": "MaterialExpressionCollectionParameter_2",
+				"props":
+				{
+					"Collection": "/Game/Mars/Gameplay/Monsters/EyeSwarm/Materials/EyeSwarm_Mars_MPC.EyeSwarm_Mars_MPC",
+					"ParameterName": "Player2",
+					"Group": "Source",
+					"ParameterId": "5D08A2DE4AE84105535195977734F459"
+				}
+			},
+			{
+				"id": 15,
+				"class": "CollectionParameter",
+				"name": "MaterialExpressionCollectionParameter_3",
+				"props":
+				{
+					"Collection": "/Game/Mars/Gameplay/Monsters/EyeSwarm/Materials/EyeSwarm_Mars_MPC.EyeSwarm_Mars_MPC",
+					"ParameterName": "Player3",
+					"Group": "Source",
+					"ParameterId": "BD65B5484D7DA698FB5FD6B5C7BF8DB0"
+				}
+			},
+			{
+				"id": 16,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_1",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.550000,G=0.320000,B=0.260000,A=1.000000)",
+					"ParameterName": "LidColor",
+					"Group": "Colour"
+				}
+			},
+			{
+				"id": 17,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_2",
+				"props":
+				{
+					"DefaultValue": 0.60000002384185791,
+					"ParameterName": "LidRoughness",
+					"Group": "Lid"
+				}
+			},
+			{
+				"id": 18,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_3",
+				"props":
+				{
+					"DefaultValue": 0.34999999403953552,
+					"ParameterName": "LidRimDarken",
+					"Group": "Lid"
+				}
+			},
+			{
+				"id": 19,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_4",
+				"props":
+				{
+					"DefaultValue": 5,
+					"ParameterName": "LidRimWidthDeg",
+					"Group": "Lid"
+				}
+			},
+			{
+				"id": 20,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_5",
+				"props":
+				{
+					"DefaultValue": 300,
+					"ParameterName": "FocusNearCm",
+					"Group": "Gaze"
+				}
+			},
+			{
+				"id": 21,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_6",
+				"props":
+				{
+					"DefaultValue": 900,
+					"ParameterName": "FocusFarCm",
+					"Group": "Gaze"
+				}
+			},
+			{
+				"id": 22,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_7",
+				"props":
+				{
+					"DefaultValue": 2,
+					"ParameterName": "BlinkIntervalMinS",
+					"Group": "Blink"
+				}
+			},
+			{
+				"id": 23,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_8",
+				"props":
+				{
+					"DefaultValue": 6,
+					"ParameterName": "BlinkIntervalMaxS",
+					"Group": "Blink"
+				}
+			},
+			{
+				"id": 24,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_9",
+				"props":
+				{
+					"DefaultValue": 0.070000000298023224,
+					"ParameterName": "BlinkCloseS",
+					"Group": "Blink"
+				}
+			},
+			{
+				"id": 25,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_10",
+				"props":
+				{
+					"DefaultValue": 0.05000000074505806,
+					"ParameterName": "BlinkHoldS",
+					"Group": "Blink"
+				}
+			},
+			{
+				"id": 26,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_11",
+				"props":
+				{
+					"DefaultValue": 0.15999999642372131,
+					"ParameterName": "BlinkOpenS",
+					"Group": "Blink"
+				}
+			},
+			{
+				"id": 27,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_12",
+				"props":
+				{
+					"DefaultValue": 0.20000000298023224,
+					"ParameterName": "DoubleBlinkChance",
+					"Group": "Blink"
+				}
+			},
+			{
+				"id": 28,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_13",
+				"props":
+				{
+					"DefaultValue": 0.89999997615814209,
+					"ParameterName": "FocusBlinkSuppress",
+					"Group": "Blink"
+				}
+			},
+			{
+				"id": 29,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_14",
+				"props":
+				{
+					"DefaultValue": 0.89999997615814209,
+					"ParameterName": "LidOpenFraction",
+					"Group": "Lid"
+				}
+			},
+			{
+				"id": 30,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_15",
+				"props":
+				{
+					"DefaultValue": 0.11999999731779099,
+					"ParameterName": "FocusWidenAperture",
+					"Group": "Lid"
+				}
+			},
+			{
+				"id": 31,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_16",
+				"props":
+				{
+					"DefaultValue": 58,
+					"ParameterName": "LidOpenUpperDeg",
+					"Group": "Lid"
+				}
+			},
+			{
+				"id": 32,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_17",
+				"props":
+				{
+					"DefaultValue": 48,
+					"ParameterName": "LidOpenLowerDeg",
+					"Group": "Lid"
+				}
+			},
+			{
+				"id": 33,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_18",
+				"props":
+				{
+					"DefaultValue": -8,
+					"ParameterName": "LidMeetDeg",
+					"Group": "Lid"
+				}
+			},
+			{
+				"id": 34,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_19",
+				"props":
+				{
+					"DefaultValue": -0.20000000298023224,
+					"ParameterName": "LidBackCoverX",
+					"Group": "Lid"
+				}
+			},
+			{
+				"id": 35,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_20",
+				"props":
+				{
+					"DefaultValue": 5.5,
+					"ParameterName": "ShellRadiusCm",
+					"Group": "Lid"
+				}
+			},
+			{
+				"id": 36,
+				"class": "Time",
+				"name": "MaterialExpressionTime_0"
+			},
+			{
+				"id": 37,
+				"class": "TextureCoordinate",
+				"name": "MaterialExpressionTextureCoordinate_0"
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_EmissiveColor",
+				"node": 0,
+				"output": 1
+			},
+			{
+				"property": "MP_OpacityMask",
+				"node": 0,
+				"output": 8
+			},
+			{
+				"property": "MP_BaseColor",
+				"node": 0,
+				"output": 0
+			},
+			{
+				"property": "MP_Metallic",
+				"node": 0,
+				"output": 3
+			},
+			{
+				"property": "MP_Specular",
+				"node": 0,
+				"output": 4
+			},
+			{
+				"property": "MP_Roughness",
+				"node": 0,
+				"output": 2
+			},
+			{
+				"property": "MP_Normal",
+				"node": 0,
+				"output": 6
+			},
+			{
+				"property": "MP_AmbientOcclusion",
+				"node": 0,
+				"output": 5
+			}
+		]
+	},
+	"scalarParams": [
+		{
+			"name": "PhaseCpd",
+			"value": 0
+		},
+		{
+			"name": "FocusOverrideWeight",
+			"value": 0
+		},
+		{
+			"name": "LidRoughness",
+			"value": 0.60000002384185791
+		},
+		{
+			"name": "LidRimDarken",
+			"value": 0.34999999403953552
+		},
+		{
+			"name": "LidRimWidthDeg",
+			"value": 5
+		},
+		{
+			"name": "FocusNearCm",
+			"value": 300
+		},
+		{
+			"name": "FocusFarCm",
+			"value": 900
+		},
+		{
+			"name": "BlinkIntervalMinS",
+			"value": 2
+		},
+		{
+			"name": "BlinkIntervalMaxS",
+			"value": 6
+		},
+		{
+			"name": "BlinkCloseS",
+			"value": 0.070000000298023224
+		},
+		{
+			"name": "BlinkHoldS",
+			"value": 0.05000000074505806
+		},
+		{
+			"name": "BlinkOpenS",
+			"value": 0.15999999642372131
+		},
+		{
+			"name": "DoubleBlinkChance",
+			"value": 0.20000000298023224
+		},
+		{
+			"name": "FocusBlinkSuppress",
+			"value": 0.89999997615814209
+		},
+		{
+			"name": "LidOpenFraction",
+			"value": 0.89999997615814209
+		},
+		{
+			"name": "FocusWidenAperture",
+			"value": 0.11999999731779099
+		},
+		{
+			"name": "LidOpenUpperDeg",
+			"value": 58
+		},
+		{
+			"name": "LidOpenLowerDeg",
+			"value": 48
+		},
+		{
+			"name": "LidMeetDeg",
+			"value": -8
+		},
+		{
+			"name": "LidBackCoverX",
+			"value": -0.20000000298023224
+		},
+		{
+			"name": "ShellRadiusCm",
+			"value": 5.5
+		}
+	],
+	"vectorParams": [
+		{
+			"name": "FocusOverride",
+			"value": "RGBA(0, 0, 0, 0)"
+		},
+		{
+			"name": "LidColor",
+			"value": "RGBA(0.55, 0.32, 0.26, 1)"
+		}
+	],
+	"textureParams": [],
+	"usedTextures": []
+}

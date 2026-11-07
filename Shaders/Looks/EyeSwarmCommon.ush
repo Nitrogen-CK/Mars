@@ -1,0 +1,327 @@
+// /Project/Looks/EyeSwarmCommon.ush
+//
+// Shared maths for the eye-swarm looks (MarsEyeball, MarsEyelid): one procedural eyeball per mesh instance, wrapped in
+// a lid shell, for many-eyed creatures and eye-covered walls. Everything here is STATELESS: a pure function of the time,
+// the eye's seed and its inputs, so thousands of instances blink and glance independently with no CPU tick at all.
+//
+// Frames and units. Both meshes are spheres centred on the pivot, forward = local +X, up = local +Z. Vertex colour RGB
+// is the local unit normal * 0.5 + 0.5, so every pixel decodes its own direction in the eye's frame without a transform
+// (Mars_EyeSwarm_LocalNormal). Angles are DEGREES, distances world CENTIMETRES, durations SECONDS.
+//
+// A gaze is a float2 in the exponential map around local +X: its length is the angle off forward (degrees), its
+// direction is where on the (Y, Z) plane the eye turns (x = toward local +Y, y = toward local +Z, i.e. up). Lerping two
+// gazes swings the eye along the shorter arc, and clamping the length is the MaxLookDeg cone.
+//
+// The eyeball and the lid compute the blink and the focus weight from the SAME functions and the same inputs, so the
+// lid shell and a ShaderLid-painted lid close on exactly the same frame. Keep the two looks' shared defaults identical.
+//
+// Performance: no texture samples, no loop longer than two cells, the roster is four unrolled compares; the only
+// derivatives are the ones CkUsf_SdfEdgeAA takes in the looks.
+#pragma once
+#include "/CkUsf/Common.ush"
+
+#define MARS_EYESWARM_TAU     6.28318530718
+#define MARS_EYESWARM_DEG2RAD 0.01745329252
+#define MARS_EYESWARM_RAD2DEG 57.2957795131
+
+// Gap between the two closures of a double blink. Retunable per master via the look's _Defines.
+#ifndef MARS_EYESWARM_DOUBLE_BLINK_GAP_S
+    #define MARS_EYESWARM_DOUBLE_BLINK_GAP_S 0.09
+#endif
+
+// Share of the wander targets that come back near the centre instead of anywhere in the cone, and how near.
+#ifndef MARS_EYESWARM_WANDER_CENTRE_CHANCE
+    #define MARS_EYESWARM_WANDER_CENTRE_CHANCE 0.25
+#endif
+#ifndef MARS_EYESWARM_WANDER_CENTRE_SCALE
+    #define MARS_EYESWARM_WANDER_CENTRE_SCALE 0.2
+#endif
+
+// Vertical share of the wander amplitude: eyes glance sideways more than up and down.
+#ifndef MARS_EYESWARM_WANDER_VERTICAL
+    #define MARS_EYESWARM_WANDER_VERTICAL 0.65
+#endif
+
+// --------------------------------------------------------------------------------------------------------------------
+// Seed and hashing.
+// --------------------------------------------------------------------------------------------------------------------
+
+// Per-instance Phase (ISM custom data) plus per-component PhaseCpd (custom primitive data): either source alone works,
+// and a cluster can offset all its instances at once through the CPD.
+float Mars_EyeSwarm_Seed(float Phase, float PhaseCpd)
+{
+    return frac(Phase + PhaseCpd);
+}
+
+// One uniform 0..1 per (schedule cell, eye). Salt separates the independent streams (blink start, double blink,
+// saccade start, saccade target) so they do not move together.
+float Mars_EyeSwarm_Hash(float Cell, float Seed, float Salt)
+{
+    return CkUsf_Hash21(float2(Cell, Seed * 113.17 + Salt));
+}
+
+// The pixel's direction in the eye's own frame, decoded from the vertex colour (see the header).
+float3 Mars_EyeSwarm_LocalNormal(FCkUsf_SurfaceInput In)
+{
+    const float3 N = In.VertexColor * 2.0 - 1.0;
+    return N * rsqrt(max(dot(N, N), 1e-8));
+}
+
+// The eye's centre in world space, from the pixel on its sphere of ShellRadiusCm. Using it instead of the pixel position
+// makes the eyeball (5 cm) and its lid shell (5.5 cm) agree on the focus distance, so both blink on the same frame.
+float3 Mars_EyeSwarm_EyeCentre(FCkUsf_SurfaceInput In, float ShellRadiusCm)
+{
+    return In.WorldPosition - normalize(In.VertexNormal) * ShellRadiusCm;
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+// Blink.
+// --------------------------------------------------------------------------------------------------------------------
+
+struct FMars_EyeSwarm_BlinkTiming
+{
+    float IntervalMinS;     // shortest gap between two blink starts
+    float IntervalMaxS;     // longest gap
+    float CloseS;           // fast close
+    float HoldS;            // brief hold shut
+    float OpenS;            // slower open
+    float DoubleChance;     // 0..1: share of blinks followed by a second one
+};
+
+// Closure 0..1 of one blink, T seconds after it started. Branchless: the closing ramp times one minus the opening ramp.
+float Mars_EyeSwarm_BlinkWave(float T, FMars_EyeSwarm_BlinkTiming B)
+{
+    const float CloseS = max(B.CloseS, 1e-3);
+    const float HoldS = max(B.HoldS, 0.0);
+    const float OpenS = max(B.OpenS, 1e-3);
+    const float Closing = smoothstep(0.0, CloseS, T);
+    const float Opening = smoothstep(CloseS + HoldS, CloseS + HoldS + OpenS, T);
+    return Closing * (1.0 - Opening);
+}
+
+// The eye's blink schedule. Time is cut into cells of the mean interval; each cell holds exactly one blink, started at a
+// hashed offset within [0, mean - min], so consecutive starts are between IntervalMinS and IntervalMaxS apart. A hashed
+// share of blinks repeats once (double blink). A blink can spill into the next cell, so this cell and the previous one
+// are both evaluated; that is enough while one blink (doubled) is shorter than two cells.
+float Mars_EyeSwarm_BlinkClosure(float Time, float Seed, FMars_EyeSwarm_BlinkTiming B)
+{
+    const float MinS = max(B.IntervalMinS, 0.5);
+    const float MaxS = max(B.IntervalMaxS, MinS);
+    const float CellS = 0.5 * (MinS + MaxS);
+    const float JitterS = CellS - MinS;
+    const float SpanS = max(B.CloseS, 1e-3) + max(B.HoldS, 0.0) + max(B.OpenS, 1e-3);
+
+    const float U = Time / CellS + Seed * 37.0;
+    const float Cell = floor(U);
+    const float InCellS = (U - Cell) * CellS;
+
+    float Closure = 0.0;
+    [unroll]
+    for (int K = 0; K < 2; ++K)
+    {
+        const float C = Cell - K;
+        const float T = InCellS + K * CellS - Mars_EyeSwarm_Hash(C, Seed, 3.1) * JitterS;
+        const float IsDouble = step(Mars_EyeSwarm_Hash(C, Seed, 7.7), B.DoubleChance);
+        const float First = Mars_EyeSwarm_BlinkWave(T, B);
+        const float Second = IsDouble * Mars_EyeSwarm_BlinkWave(T - SpanS - MARS_EYESWARM_DOUBLE_BLINK_GAP_S, B);
+        Closure = max(Closure, max(First, Second));
+    }
+    return Closure;
+}
+
+// Blink closure after focus: an eye locked on a player (weight near 1) holds its stare and stops blinking.
+float Mars_EyeSwarm_FocusedClosure(float Closure, float FocusWeight, float FocusBlinkSuppress)
+{
+    return Closure * (1.0 - saturate(FocusBlinkSuppress) * smoothstep(0.5, 1.0, FocusWeight));
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+// Wander: saccades, not drift.
+// --------------------------------------------------------------------------------------------------------------------
+
+struct FMars_EyeSwarm_WanderParams
+{
+    float AmplitudeDeg;     // radius of the idle look cone
+    float SaccadeMinS;      // shortest gap between two saccades
+    float SaccadeMaxS;      // longest gap
+    float SaccadeS;         // how long one jump takes
+    float MicroJitterDeg;   // tremor on top of the held target
+};
+
+// Unit-disc look target of one schedule cell (scaled by the amplitude by the caller).
+float2 Mars_EyeSwarm_WanderTarget(float Cell, float Seed)
+{
+    const float2 H = CkUsf_Hash22(float2(Cell, Seed * 91.7 + 11.0));
+    const float NearCentre = step(Mars_EyeSwarm_Hash(Cell, Seed, 5.3), MARS_EYESWARM_WANDER_CENTRE_CHANCE);
+    const float Radius = sqrt(H.x) * lerp(1.0, MARS_EYESWARM_WANDER_CENTRE_SCALE, NearCentre);
+    const float Angle = H.y * MARS_EYESWARM_TAU;
+    return float2(cos(Angle), sin(Angle) * MARS_EYESWARM_WANDER_VERTICAL) * Radius;
+}
+
+// Idle gaze (degrees, exponential map). One saccade per cell of the mean gap, at a hashed offset, so gaps fall between
+// SaccadeMinS and SaccadeMaxS; each jumps from the previous cell's target to this one with a quick smoothstep and holds.
+float2 Mars_EyeSwarm_Wander(float Time, float Seed, FMars_EyeSwarm_WanderParams W)
+{
+    const float MinS = max(W.SaccadeMinS, 0.1);
+    const float MaxS = max(W.SaccadeMaxS, MinS);
+    const float CellS = 0.5 * (MinS + MaxS);
+    const float JitterS = CellS - MinS;
+
+    const float U = Time / CellS + Seed * 53.0 + 0.37;
+    const float Cell = floor(U);
+    const float InCellS = (U - Cell) * CellS;
+
+    // Has this cell's saccade fired yet? If not, the latest one is the previous cell's (its start is before this cell).
+    const float StartS = Mars_EyeSwarm_Hash(Cell, Seed, 1.9) * JitterS;
+    const float PrevStartS = Mars_EyeSwarm_Hash(Cell - 1.0, Seed, 1.9) * JitterS - CellS;
+    const float Fired = step(StartS, InCellS);
+    const float Last = Cell - 1.0 + Fired;
+    const float SinceS = InCellS - lerp(PrevStartS, StartS, Fired);
+
+    const float Move = smoothstep(0.0, max(W.SaccadeS, 1e-3), SinceS);
+    float2 Gaze = lerp(Mars_EyeSwarm_WanderTarget(Last - 1.0, Seed), Mars_EyeSwarm_WanderTarget(Last, Seed), Move);
+    Gaze *= W.AmplitudeDeg;
+    Gaze += W.MicroJitterDeg * float2(sin(Time * 23.0 + Seed * 40.0), sin(Time * 31.0 + Seed * 17.0 + 1.3));
+    return Gaze;
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+// Gaze <-> direction (exponential map around local +X).
+// --------------------------------------------------------------------------------------------------------------------
+
+float3 Mars_EyeSwarm_GazeToDir(float2 GazeDeg)
+{
+    const float Len = length(GazeDeg);
+    const float Theta = Len * MARS_EYESWARM_DEG2RAD;
+    const float2 Axis = GazeDeg / max(Len, 1e-4);
+    return float3(cos(Theta), sin(Theta) * Axis);
+}
+
+float2 Mars_EyeSwarm_DirToGaze(float3 LocalDir)
+{
+    const float3 D = LocalDir * rsqrt(max(dot(LocalDir, LocalDir), 1e-8));
+    const float ThetaDeg = acos(clamp(D.x, -1.0, 1.0)) * MARS_EYESWARM_RAD2DEG;
+    const float Side = length(D.yz);
+    return Side > 1e-5 ? D.yz * (ThetaDeg / Side) : float2(0.0, 0.0);
+}
+
+// The MaxLookDeg cone. A target behind the eye ends on the cone's rim on the target's side.
+float2 Mars_EyeSwarm_ClampGaze(float2 GazeDeg, float MaxLookDeg)
+{
+    const float Len = length(GazeDeg);
+    const float MaxDeg = max(MaxLookDeg, 0.0);
+    return Len > MaxDeg ? GazeDeg * (MaxDeg / Len) : GazeDeg;
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+// Focus: the player roster (MPC) and the CPD override.
+// --------------------------------------------------------------------------------------------------------------------
+
+// The four MPC roster entries: each player's head in world cm; an absent player is parked at (0, 0, -1e7).
+struct FMars_EyeSwarm_Roster
+{
+    float3 Player0;
+    float3 Player1;
+    float3 Player2;
+    float3 Player3;
+};
+
+struct FMars_EyeSwarm_FocusQuery
+{
+    float3                EyeCentre;
+    FMars_EyeSwarm_Roster Roster;
+    float3                OverrideTarget;   // CPD FocusOverride, world cm
+    float                 OverrideWeight;   // CPD FocusOverrideWeight, 0..1
+    float                 NearCm;           // full focus at or inside this distance
+    float                 FarCm;            // no focus at or beyond this distance
+};
+
+struct FMars_EyeSwarm_Focus
+{
+    float3 RosterTarget;    // nearest roster player
+    float  RosterWeight;    // smoothstep(FarCm, NearCm, its distance)
+    float3 OverrideTarget;
+    float  OverrideWeight;  // saturated
+    float  Weight;          // combined: what blinking, aperture and pupil respond to
+};
+
+FMars_EyeSwarm_Focus Mars_EyeSwarm_ResolveFocus(FMars_EyeSwarm_FocusQuery Q)
+{
+    float3 Nearest = Q.Roster.Player0;
+    float NearestCm = distance(Q.EyeCentre, Q.Roster.Player0);
+
+    const float D1 = distance(Q.EyeCentre, Q.Roster.Player1);
+    Nearest = D1 < NearestCm ? Q.Roster.Player1 : Nearest;
+    NearestCm = min(NearestCm, D1);
+
+    const float D2 = distance(Q.EyeCentre, Q.Roster.Player2);
+    Nearest = D2 < NearestCm ? Q.Roster.Player2 : Nearest;
+    NearestCm = min(NearestCm, D2);
+
+    const float D3 = distance(Q.EyeCentre, Q.Roster.Player3);
+    Nearest = D3 < NearestCm ? Q.Roster.Player3 : Nearest;
+    NearestCm = min(NearestCm, D3);
+
+    FMars_EyeSwarm_Focus F;
+    F.RosterTarget = Nearest;
+    F.RosterWeight = 1.0 - smoothstep(Q.NearCm, max(Q.FarCm, Q.NearCm + 1.0), NearestCm);
+    F.OverrideTarget = Q.OverrideTarget;
+    F.OverrideWeight = saturate(Q.OverrideWeight);
+    // The override takes over by its weight: at 1 it fully replaces the roster, at 0 it is ignored, and in between
+    // nothing jumps (a hard switch at weight > 0 would snap an eye already staring at a player).
+    F.Weight = lerp(F.RosterWeight, 1.0, F.OverrideWeight);
+    return F;
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+// Lids.
+// --------------------------------------------------------------------------------------------------------------------
+
+struct FMars_EyeSwarm_LidShape
+{
+    float OpenFraction;     // rest openness: 1 = fully open, < 1 a half-lidded rest pose
+    float WidenAperture;    // extra openness at full focus (the stare)
+    float OpenUpperDeg;     // upper lid edge elevation at the front when fully open
+    float OpenLowerDeg;     // lower lid edge depression at the front when fully open (positive = below the axis)
+    float MeetDeg;          // elevation where the lids meet when shut (slightly negative: the upper lid travels most)
+    float BackCoverX;       // local normal.x below this is always covered (the rim that blends into the host)
+};
+
+// Openness after focus widening and the blink: 0 = shut.
+float Mars_EyeSwarm_Openness(FMars_EyeSwarm_LidShape S, float FocusWeight, float Closure)
+{
+    return max(S.OpenFraction + S.WidenAperture * FocusWeight, 0.0) * (1.0 - saturate(Closure));
+}
+
+// Signed angular distance (degrees) of a local direction from the lid edge: > 0 covered (flesh), < 0 open.
+// Each lid edge is a great circle through the eye's +-Y axis (the canthi), tilted to its elevation at the front: the
+// upper lid covers everything above its circle, the lower lid everything below its own, so the open aperture is the
+// forward-facing lens between them. Openness 0 brings both circles to MeetDeg, closing the lens on the forward axis.
+float Mars_EyeSwarm_LidSignedDistDeg(float3 N, FMars_EyeSwarm_LidShape S, float Openness)
+{
+    const float UpperRad = clamp(lerp(S.MeetDeg, S.OpenUpperDeg, Openness), -89.0, 89.0) * MARS_EYESWARM_DEG2RAD;
+    const float LowerRad = clamp(lerp(S.MeetDeg, -S.OpenLowerDeg, Openness), -89.0, 89.0) * MARS_EYESWARM_DEG2RAD;
+
+    // Upper: covered where elevation > UpperRad.  dot(N, (-sin U, 0, cos U)) = sin(elevation - U) on the front meridian.
+    const float Upper = asin(clamp(dot(N, float3(-sin(UpperRad), 0.0, cos(UpperRad))), -1.0, 1.0));
+    // Lower: covered where elevation < LowerRad. dot(N, (sin L, 0, -cos L)) = sin(L - elevation).
+    const float Lower = asin(clamp(dot(N, float3(sin(LowerRad), 0.0, -cos(LowerRad))), -1.0, 1.0));
+    // Back rim: covered where N.x < BackCoverX, measured as the same kind of angle.
+    const float Back = asin(clamp(S.BackCoverX, -1.0, 1.0)) - asin(clamp(N.x, -1.0, 1.0));
+
+    return max(max(Upper, Lower), Back) * MARS_EYESWARM_RAD2DEG;
+}
+
+// Lid flesh colour: a small per-eye brightness jitter from Variant and a darker lash line along the aperture edge.
+struct FMars_EyeSwarm_LidLook
+{
+    float3 Color;
+    float  RimDarken;       // 0..1 darkening at the edge
+    float  RimWidthDeg;     // how far into the flesh the darkening fades
+};
+
+float3 Mars_EyeSwarm_LidShade(FMars_EyeSwarm_LidLook L, float Variant, float SignedDistDeg)
+{
+    const float Rim = 1.0 - smoothstep(0.0, max(L.RimWidthDeg, 1e-3), SignedDistDeg);
+    return L.Color * lerp(0.92, 1.08, saturate(Variant)) * (1.0 - saturate(L.RimDarken) * Rim);
+}

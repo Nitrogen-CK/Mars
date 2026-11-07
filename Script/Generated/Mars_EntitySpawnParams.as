@@ -5377,6 +5377,45 @@ namespace UMars_AutoTest_EyesDummy_ComposesAndWrites
 }
 
 USTRUCT()
+struct FMars_AutoTest_EyeSwarm_LookMatchesSlotLayout_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_EyeSwarm_LookMatchesSlotLayout
+{
+    FMars_AutoTest_EyeSwarm_LookMatchesSlotLayout_SpawnParams Params()
+    {
+        return FMars_AutoTest_EyeSwarm_LookMatchesSlotLayout_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_EyeSwarm_RosterWritesPlayers_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_EyeSwarm_RosterWritesPlayers
+{
+    FMars_AutoTest_EyeSwarm_RosterWritesPlayers_SpawnParams Params()
+    {
+        return FMars_AutoTest_EyeSwarm_RosterWritesPlayers_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_EyeSwarm_WallDummyComposes_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_EyeSwarm_WallDummyComposes
+{
+    FMars_AutoTest_EyeSwarm_WallDummyComposes_SpawnParams Params()
+    {
+        return FMars_AutoTest_EyeSwarm_WallDummyComposes_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_Fishing_ABiteArrivesInsideTheWaitWindow_SpawnParams
 {
 }
@@ -12657,6 +12696,52 @@ namespace UMars_EyesDummy_EntityScript
     FMars_EyesDummy_EntityScript_SpawnParams Params(FTransform InSpawnTransform)
     {
         return FMars_EyesDummy_EntityScript_SpawnParams(InSpawnTransform);
+    }
+}
+
+USTRUCT()
+struct FMars_EyeSwarmRoster_EntityScript_SpawnParams
+{
+}
+
+namespace UMars_EyeSwarmRoster_EntityScript
+{
+    FMars_EyeSwarmRoster_EntityScript_SpawnParams Params()
+    {
+        return FMars_EyeSwarmRoster_EntityScript_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_EyeWallDummy_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    EMars_EyeSwarm_Preset Preset = EMars_EyeSwarm_Preset::Cartoon;
+
+    UPROPERTY()
+    bool ShaderLid = false;
+
+    FMars_EyeWallDummy_EntityScript_SpawnParams(FTransform InSpawnTransform, EMars_EyeSwarm_Preset InPreset, bool InShaderLid)
+    {
+        SpawnTransform = InSpawnTransform;
+        Preset = InPreset;
+        ShaderLid = InShaderLid;
+    }
+}
+
+namespace UMars_EyeWallDummy_EntityScript
+{
+    FMars_EyeWallDummy_EntityScript_SpawnParams Params()
+    {
+        return FMars_EyeWallDummy_EntityScript_SpawnParams();
+    }
+
+    FMars_EyeWallDummy_EntityScript_SpawnParams Params(FTransform InSpawnTransform, EMars_EyeSwarm_Preset InPreset, bool InShaderLid)
+    {
+        return FMars_EyeWallDummy_EntityScript_SpawnParams(InSpawnTransform, InPreset, InShaderLid);
     }
 }
 

@@ -1,0 +1,291 @@
+// /Project/Looks/EyeSwarmEyeball.ush
+//
+// The eye-swarm eyeball (look MarsEyeball): a cartoon eyeball drawn on a 5 cm sphere per instance that blinks, glances
+// around in saccades and, when a player comes within FocusFarCm, turns to stare at the nearest one. Lit, opaque.
+// The data contract (mesh encoding, per-instance slots, CPD indices, MPC roster, uniforms) is spelled out at the top of
+// Script/ECS/EyeSwarm/Mars_EyeSwarm_Look_Assets.as; the shared maths is in EyeSwarmCommon.ush.
+//
+// Iris and pupil are discs on the sphere centred on the look direction, measured as the angle between the pixel's
+// local normal and that direction, edged with CkUsf_SdfEdgeAA. With ShaderLid >= 0.5 the eyeball paints its own lid with
+// the same coverage function as the MarsEyelid shell; with neither (a lidless horror eye) a blink is a vertical squash of
+// the iris plus an emissive dip (BlinkSquash scales it).
+//
+// ---- The instance-space escape hatch ------------------------------------------------------------------------------
+// Focus needs the world-space aim (target - eye) in the EYE'S OWN frame, which on an ISM is the per-INSTANCE transform.
+// A CkUsf look function never sees the material's `Parameters`, so after the entry point below this file redefines the
+// entry point's NAME as a variadic macro: the generated Custom node's call `Mars_Look_EyeSwarmEyeball(In, ...)` (made
+// inside `CustomExpressionN(FMaterialPixelParameters Parameters, ...)`, right after this include) expands to
+// Mars_EyeSwarm_EyeballFramed(Mars_EyeSwarm_WorldToEyeBasis(Parameters), In, ...). The validator only matches a
+// definition whose preceding token is the return type, so the macro does not confuse its signature check.
+//
+// The basis comes from the engine's GetWorldToInstanceDF(FMaterialPixelParameters) (Engine/Shaders/Private/
+// MaterialTemplate.ush), the helper the material translator's TransformVector(World -> Instance) node emits. It returns
+// Parameters.InstanceWorldToLocal when HAS_INSTANCE_WORLD_TO_LOCAL_PS, else the PRIMITIVE WorldToLocal; which is right for
+// a plain static-mesh eye. HAS_INSTANCE_WORLD_TO_LOCAL_PS needs NEEDS_INSTANCE_WORLD_TO_LOCAL_PS, which the translator
+// sets only when the material GRAPH has a pixel-stage World -> Instance transform node (HLSLMaterialTranslator.cpp,
+// bUsesInstanceWorldToLocalPS); a Custom node cannot set it. Until the generated master carries such a node, an ISM
+// instance aims with its COMPONENT's rotation: exact for instances that share the component's rotation, wrong for
+// instances rotated relative to it. Do not use TransformWorldVectorToLocal-style primitive helpers directly: the
+// instance-aware one already falls back to them.
+//
+// Version-fragile by design (the CkUsf doc's raw escape hatch). If a future engine breaks it, set the look's _Defines to
+// "MARS_EYESWARM_INSTANCE_FRAME=0": the macro disappears and the eye treats world axes as its own (correct only for
+// unrotated eyes) instead of failing to compile.
+#pragma once
+#include "/Project/Looks/EyeSwarmCommon.ush"
+
+#ifndef MARS_EYESWARM_INSTANCE_FRAME
+    #define MARS_EYESWARM_INSTANCE_FRAME 1
+#endif
+
+// A lidless blink never squashes the iris flatter than this share of its height.
+#ifndef MARS_EYESWARM_MIN_SQUASH
+    #define MARS_EYESWARM_MIN_SQUASH 0.06
+#endif
+
+// How far the emissive dips at a full lidless blink.
+#ifndef MARS_EYESWARM_BLINK_EMISSIVE_DIP
+    #define MARS_EYESWARM_BLINK_EMISSIVE_DIP 0.85
+#endif
+
+#if MARS_EYESWARM_INSTANCE_FRAME
+// Row-vector world -> eye basis (mul(WorldVector, Basis) = local vector), scale included; the caller normalizes.
+float3x3 Mars_EyeSwarm_WorldToEyeBasis(FMaterialPixelParameters Parameters)
+{
+    return DFToFloat3x3(GetWorldToInstanceDF(Parameters));
+}
+#endif
+
+FCkUsf_SurfaceOutput Mars_EyeSwarm_EyeballFramed(
+    float3x3            WorldToEye,
+    FCkUsf_SurfaceInput In,
+    float               Phase,
+    float               Variant,
+    float               PhaseCpd,
+    float3              FocusOverride,
+    float               FocusOverrideWeight,
+    float3              Player0,
+    float3              Player1,
+    float3              Player2,
+    float3              Player3,
+    float3              ScleraColor,
+    float3              IrisColor,
+    float3              PupilColor,
+    float3              LidColor,
+    float               EmissiveStrength,
+    float               ScleraGlow,
+    float               ShaderLid,
+    float               BlinkSquash,
+    float               IrisAngleDeg,
+    float               PupilAngleDeg,
+    float               PupilFocusScale,
+    float               LimbalWidthDeg,
+    float               LimbalDarken,
+    float               IrisHueJitter,
+    float               ScleraRoughness,
+    float               IrisRoughness,
+    float               LidRoughness,
+    float               LidRimDarken,
+    float               LidRimWidthDeg,
+    float               MaxLookDeg,
+    float               FocusNearCm,
+    float               FocusFarCm,
+    float               WanderAmpDeg,
+    float               SaccadeMinS,
+    float               SaccadeMaxS,
+    float               SaccadeS,
+    float               MicroJitterDeg,
+    float               BlinkIntervalMinS,
+    float               BlinkIntervalMaxS,
+    float               BlinkCloseS,
+    float               BlinkHoldS,
+    float               BlinkOpenS,
+    float               DoubleBlinkChance,
+    float               FocusBlinkSuppress,
+    float               LidOpenFraction,
+    float               FocusWidenAperture,
+    float               LidOpenUpperDeg,
+    float               LidOpenLowerDeg,
+    float               LidMeetDeg,
+    float               LidBackCoverX,
+    float               ShellRadiusCm)
+{
+    FCkUsf_SurfaceOutput O = CkUsf_DefaultSurface();
+
+    const float Seed = Mars_EyeSwarm_Seed(Phase, PhaseCpd);
+    const float3 N = Mars_EyeSwarm_LocalNormal(In);
+    const float3 Centre = Mars_EyeSwarm_EyeCentre(In, ShellRadiusCm);
+
+    // ---- Focus ----
+    FMars_EyeSwarm_FocusQuery Query;
+    Query.EyeCentre = Centre;
+    Query.Roster.Player0 = Player0;
+    Query.Roster.Player1 = Player1;
+    Query.Roster.Player2 = Player2;
+    Query.Roster.Player3 = Player3;
+    Query.OverrideTarget = FocusOverride;
+    Query.OverrideWeight = FocusOverrideWeight;
+    Query.NearCm = FocusNearCm;
+    Query.FarCm = FocusFarCm;
+    const FMars_EyeSwarm_Focus Focus = Mars_EyeSwarm_ResolveFocus(Query);
+
+    // ---- Gaze: wander, then the roster aim by its weight, then the override by its own ----
+    FMars_EyeSwarm_WanderParams Wander;
+    Wander.AmplitudeDeg = WanderAmpDeg;
+    Wander.SaccadeMinS = SaccadeMinS;
+    Wander.SaccadeMaxS = SaccadeMaxS;
+    Wander.SaccadeS = SaccadeS;
+    Wander.MicroJitterDeg = MicroJitterDeg;
+    const float2 WanderGaze = Mars_EyeSwarm_ClampGaze(Mars_EyeSwarm_Wander(In.Time, Seed, Wander), MaxLookDeg);
+
+    const float2 RosterGaze = Mars_EyeSwarm_ClampGaze(
+        Mars_EyeSwarm_DirToGaze(mul(Focus.RosterTarget - Centre, WorldToEye)), MaxLookDeg);
+    const float2 OverrideGaze = Mars_EyeSwarm_ClampGaze(
+        Mars_EyeSwarm_DirToGaze(mul(Focus.OverrideTarget - Centre, WorldToEye)), MaxLookDeg);
+
+    float2 Gaze = lerp(WanderGaze, RosterGaze, Focus.RosterWeight);
+    Gaze = Mars_EyeSwarm_ClampGaze(lerp(Gaze, OverrideGaze, Focus.OverrideWeight), MaxLookDeg);
+    const float3 Look = Mars_EyeSwarm_GazeToDir(Gaze);
+
+    // ---- Blink and lids ----
+    FMars_EyeSwarm_BlinkTiming Blink;
+    Blink.IntervalMinS = BlinkIntervalMinS;
+    Blink.IntervalMaxS = BlinkIntervalMaxS;
+    Blink.CloseS = BlinkCloseS;
+    Blink.HoldS = BlinkHoldS;
+    Blink.OpenS = BlinkOpenS;
+    Blink.DoubleChance = DoubleBlinkChance;
+    const float Closure = Mars_EyeSwarm_FocusedClosure(
+        Mars_EyeSwarm_BlinkClosure(In.Time, Seed, Blink), Focus.Weight, FocusBlinkSuppress);
+
+    const float PaintLid = step(0.5, ShaderLid);
+    const float Squash = saturate(BlinkSquash) * Closure * (1.0 - PaintLid);
+
+    // ---- Iris and pupil discs around Look (exponential map, so the squash stays a clean vertical squash) ----
+    const float3 UpRaw = float3(0.0, 0.0, 1.0) - Look * Look.z;
+    const float3 Up = dot(UpRaw, UpRaw) > 1e-8 ? normalize(UpRaw) : float3(-1.0, 0.0, 0.0);
+    const float3 Side = cross(Up, Look);
+    const float2 Q = float2(dot(N, Side), dot(N, Up));
+    const float QLen = length(Q);
+    const float OffDeg = atan2(QLen, dot(N, Look)) * MARS_EYESWARM_RAD2DEG;
+    float2 P = Q * (OffDeg / max(QLen, 1e-5));
+    P.y /= max(1.0 - Squash, MARS_EYESWARM_MIN_SQUASH);
+    const float R = length(P);
+
+    const float IrisR = max(IrisAngleDeg, 0.1) * lerp(0.94, 1.06, saturate(Variant));
+    const float PupilR = min(max(PupilAngleDeg, 0.0) * lerp(1.0, PupilFocusScale, Focus.Weight), IrisR * 0.95);
+    const float IrisCov = CkUsf_SdfEdgeAA(R - IrisR);
+    const float PupilCov = CkUsf_SdfEdgeAA(R - PupilR);
+
+    float3 Iris = CkUsf_HueShift(IrisColor, (saturate(Variant) - 0.5) * IrisHueJitter);
+    const float IrisT = saturate((R - PupilR) / max(IrisR - PupilR, 1e-3));
+    Iris *= lerp(1.12, 0.92, IrisT);
+    Iris *= 1.0 - saturate(LimbalDarken) * smoothstep(IrisR - max(LimbalWidthDeg, 1e-3), IrisR, R);
+
+    float3 Base = lerp(ScleraColor, Iris, IrisCov);
+    Base = lerp(Base, PupilColor, PupilCov);
+
+    const float Dip = 1.0 - MARS_EYESWARM_BLINK_EMISSIVE_DIP * Squash;
+    float3 Emissive = max(EmissiveStrength, 0.0) * Dip
+        * (Iris * IrisCov * (1.0 - PupilCov) + ScleraColor * max(ScleraGlow, 0.0) * (1.0 - IrisCov));
+    float Roughness = lerp(ScleraRoughness, IrisRoughness, IrisCov);
+
+    // ---- Optional painted lid (same coverage as the MarsEyelid shell) ----
+    // Evaluated unconditionally and weighted by the uniform switch: CkUsf_SdfEdgeAA takes derivatives, which must not
+    // sit inside a branch the compiler cannot prove uniform.
+    FMars_EyeSwarm_LidShape Lid;
+    Lid.OpenFraction = LidOpenFraction;
+    Lid.WidenAperture = FocusWidenAperture;
+    Lid.OpenUpperDeg = LidOpenUpperDeg;
+    Lid.OpenLowerDeg = LidOpenLowerDeg;
+    Lid.MeetDeg = LidMeetDeg;
+    Lid.BackCoverX = LidBackCoverX;
+    const float LidDist = Mars_EyeSwarm_LidSignedDistDeg(N, Lid, Mars_EyeSwarm_Openness(Lid, Focus.Weight, Closure));
+    const float LidCov = CkUsf_SdfEdgeAA(-LidDist) * PaintLid;
+
+    FMars_EyeSwarm_LidLook LidLook;
+    LidLook.Color = LidColor;
+    LidLook.RimDarken = LidRimDarken;
+    LidLook.RimWidthDeg = LidRimWidthDeg;
+    Base = lerp(Base, Mars_EyeSwarm_LidShade(LidLook, Variant, LidDist), LidCov);
+    Roughness = lerp(Roughness, LidRoughness, LidCov);
+    Emissive *= 1.0 - LidCov;
+
+    O.BaseColor = Base;
+    O.Roughness = saturate(Roughness);
+    O.EmissiveColor = Emissive;
+    return O;
+}
+
+// The entry point the generator calls (and the validator checks). In the generated master the macro below routes the
+// call to the framed version with the instance basis; without it (MARS_EYESWARM_INSTANCE_FRAME=0) world axes stand in.
+FCkUsf_SurfaceOutput Mars_Look_EyeSwarmEyeball(
+    FCkUsf_SurfaceInput In,
+    float               Phase,
+    float               Variant,
+    float               PhaseCpd,
+    float3              FocusOverride,
+    float               FocusOverrideWeight,
+    float3              Player0,
+    float3              Player1,
+    float3              Player2,
+    float3              Player3,
+    float3              ScleraColor,
+    float3              IrisColor,
+    float3              PupilColor,
+    float3              LidColor,
+    float               EmissiveStrength,
+    float               ScleraGlow,
+    float               ShaderLid,
+    float               BlinkSquash,
+    float               IrisAngleDeg,
+    float               PupilAngleDeg,
+    float               PupilFocusScale,
+    float               LimbalWidthDeg,
+    float               LimbalDarken,
+    float               IrisHueJitter,
+    float               ScleraRoughness,
+    float               IrisRoughness,
+    float               LidRoughness,
+    float               LidRimDarken,
+    float               LidRimWidthDeg,
+    float               MaxLookDeg,
+    float               FocusNearCm,
+    float               FocusFarCm,
+    float               WanderAmpDeg,
+    float               SaccadeMinS,
+    float               SaccadeMaxS,
+    float               SaccadeS,
+    float               MicroJitterDeg,
+    float               BlinkIntervalMinS,
+    float               BlinkIntervalMaxS,
+    float               BlinkCloseS,
+    float               BlinkHoldS,
+    float               BlinkOpenS,
+    float               DoubleBlinkChance,
+    float               FocusBlinkSuppress,
+    float               LidOpenFraction,
+    float               FocusWidenAperture,
+    float               LidOpenUpperDeg,
+    float               LidOpenLowerDeg,
+    float               LidMeetDeg,
+    float               LidBackCoverX,
+    float               ShellRadiusCm)
+{
+    const float3x3 Identity = float3x3(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
+    return Mars_EyeSwarm_EyeballFramed(Identity, In,
+        Phase, Variant, PhaseCpd, FocusOverride, FocusOverrideWeight,
+        Player0, Player1, Player2, Player3,
+        ScleraColor, IrisColor, PupilColor, LidColor, EmissiveStrength, ScleraGlow, ShaderLid, BlinkSquash,
+        IrisAngleDeg, PupilAngleDeg, PupilFocusScale, LimbalWidthDeg, LimbalDarken, IrisHueJitter,
+        ScleraRoughness, IrisRoughness, LidRoughness, LidRimDarken, LidRimWidthDeg,
+        MaxLookDeg, FocusNearCm, FocusFarCm, WanderAmpDeg, SaccadeMinS, SaccadeMaxS, SaccadeS, MicroJitterDeg,
+        BlinkIntervalMinS, BlinkIntervalMaxS, BlinkCloseS, BlinkHoldS, BlinkOpenS, DoubleBlinkChance, FocusBlinkSuppress,
+        LidOpenFraction, FocusWidenAperture, LidOpenUpperDeg, LidOpenLowerDeg, LidMeetDeg, LidBackCoverX, ShellRadiusCm);
+}
+
+#if MARS_EYESWARM_INSTANCE_FRAME
+    // Defined AFTER the function, so the definition above is not expanded; a macro never re-expands its own name, so
+    // the expansion calls the framed function. `Parameters` is the Custom node function's argument (see the header).
+    #define Mars_Look_EyeSwarmEyeball(...) Mars_EyeSwarm_EyeballFramed(Mars_EyeSwarm_WorldToEyeBasis(Parameters), __VA_ARGS__)
+#endif

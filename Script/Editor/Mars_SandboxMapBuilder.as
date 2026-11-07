@@ -142,6 +142,14 @@ void Mars_PlaceSandboxEyesDummyFunc(const TArray<FString>& Args)
 const FConsoleCommand Mars_PlaceSandboxEyesDummyCommand("Mars.Sandbox.PlaceEyesDummy", n"Mars_PlaceSandboxEyesDummyFunc");
 
 UFUNCTION()
+void Mars_PlaceSandboxEyeWallFunc(const TArray<FString>& Args)
+{
+    utils_mars_sandbox::PlaceEyeWall();
+}
+
+const FConsoleCommand Mars_PlaceSandboxEyeWallCommand("Mars.Sandbox.PlaceEyeWall", n"Mars_PlaceSandboxEyeWallFunc");
+
+UFUNCTION()
 void Mars_PlaceSandboxFailSwitchFunc(const TArray<FString>& Args)
 {
     utils_mars_sandbox::PlaceFailSwitch();
@@ -275,6 +283,7 @@ namespace utils_mars_sandbox
     const FString k_FoodMeatSlabLabel = "Sandbox_Food_MeatSlab";
     const FString k_FoodMushroomSliceLabel = "Sandbox_Food_MushroomSlice";
     const FString k_EyesDummyLabel = "EyesDummy";
+    const FString k_EyeWallLabel = "EyeWall";
     const FString k_FailSwitchLabel = "Mech_FailSwitch";
     const FString k_FailSwitchPedestalLabel = "Sandbox_FailSwitch_Pedestal";
 
@@ -328,6 +337,7 @@ namespace utils_mars_sandbox
         Spawn_Items();
         Spawn_Backpack();
         Spawn_EyesDummy();
+        Spawn_EyeWall();
         Spawn_FailSwitch(Command);
 
         Apply_ProtoGridMaterials();
@@ -821,6 +831,24 @@ namespace utils_mars_sandbox
     {
         utils_mars_map_builder::Spawn_EntityScript(UMars_EyesDummy_EntityScript,
             FMars_MapBuilder_Placement(k_EyesDummyLabel, FVector(-150.0, 0.0, 0.0), FRotator(0.0, 180.0, 0.0)));
+    }
+
+    void PlaceEyeWall()
+    {
+        const FString Command = "Mars.Sandbox.PlaceEyeWall";
+        if (Get_CanAdd(Command, k_EyeWallLabel, "Delete it first to re-place.") == false)
+        { return; }
+
+        Spawn_EyeWall();
+        utils_mars_map_builder::SaveOpenLevel(Command);
+    }
+
+    // 5.5 m along +Y from the eyes dummy, clear of the test lamp; yawed 180 like the dummy so its face (+X) looks at the
+    // player starts. The 300 cm slab spans Y 400..700 and stands on the floor.
+    void Spawn_EyeWall()
+    {
+        utils_mars_map_builder::Spawn_EntityScript(UMars_EyeWallDummy_EntityScript,
+            FMars_MapBuilder_Placement(k_EyeWallLabel, FVector(-150.0, 550.0, 0.0), FRotator(0.0, 180.0, 0.0)));
     }
 
     // East of the main floor. The gated bays sit in a partition with an alcove behind each gate; controls stand 250uu in

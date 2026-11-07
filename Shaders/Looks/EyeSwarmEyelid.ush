@@ -1,0 +1,92 @@
+// /Project/Looks/EyeSwarmEyelid.ush
+//
+// The eye-swarm eyelid (look MarsEyelid): the flesh shell (5.5 cm sphere) around one MarsEyeball. Lit, Masked,
+// two-sided. OpacityMask is 1 where the lids cover (flesh) and 0 in the open aperture, so the eyeball shows through.
+// The upper lid descends from local +Z and the lower rises from -Z (Mars_EyeSwarm_LidSignedDistDeg), meeting on the
+// forward axis at a full blink; the back of the shell (local normal.x < LidBackCoverX) is always flesh so the shell
+// blends into the host surface it is sunk into.
+//
+// The blink and the focus weight come from the same functions, inputs and defaults as MarsEyeball, so a lid and its
+// eyeball close together. The lid needs no transform: it never aims, it only measures the distance to the roster.
+// The data contract lives at the top of Script/ECS/EyeSwarm/Mars_EyeSwarm_Look_Assets.as.
+#pragma once
+#include "/Project/Looks/EyeSwarmCommon.ush"
+
+FCkUsf_SurfaceOutput Mars_Look_EyeSwarmEyelid(
+    FCkUsf_SurfaceInput In,
+    float               Phase,
+    float               Variant,
+    float               PhaseCpd,
+    float3              FocusOverride,
+    float               FocusOverrideWeight,
+    float3              Player0,
+    float3              Player1,
+    float3              Player2,
+    float3              Player3,
+    float3              LidColor,
+    float               LidRoughness,
+    float               LidRimDarken,
+    float               LidRimWidthDeg,
+    float               FocusNearCm,
+    float               FocusFarCm,
+    float               BlinkIntervalMinS,
+    float               BlinkIntervalMaxS,
+    float               BlinkCloseS,
+    float               BlinkHoldS,
+    float               BlinkOpenS,
+    float               DoubleBlinkChance,
+    float               FocusBlinkSuppress,
+    float               LidOpenFraction,
+    float               FocusWidenAperture,
+    float               LidOpenUpperDeg,
+    float               LidOpenLowerDeg,
+    float               LidMeetDeg,
+    float               LidBackCoverX,
+    float               ShellRadiusCm)
+{
+    FCkUsf_SurfaceOutput O = CkUsf_DefaultSurface();
+
+    const float Seed = Mars_EyeSwarm_Seed(Phase, PhaseCpd);
+    const float3 N = Mars_EyeSwarm_LocalNormal(In);
+
+    FMars_EyeSwarm_FocusQuery Query;
+    Query.EyeCentre = Mars_EyeSwarm_EyeCentre(In, ShellRadiusCm);
+    Query.Roster.Player0 = Player0;
+    Query.Roster.Player1 = Player1;
+    Query.Roster.Player2 = Player2;
+    Query.Roster.Player3 = Player3;
+    Query.OverrideTarget = FocusOverride;
+    Query.OverrideWeight = FocusOverrideWeight;
+    Query.NearCm = FocusNearCm;
+    Query.FarCm = FocusFarCm;
+    const FMars_EyeSwarm_Focus Focus = Mars_EyeSwarm_ResolveFocus(Query);
+
+    FMars_EyeSwarm_BlinkTiming Blink;
+    Blink.IntervalMinS = BlinkIntervalMinS;
+    Blink.IntervalMaxS = BlinkIntervalMaxS;
+    Blink.CloseS = BlinkCloseS;
+    Blink.HoldS = BlinkHoldS;
+    Blink.OpenS = BlinkOpenS;
+    Blink.DoubleChance = DoubleBlinkChance;
+    const float Closure = Mars_EyeSwarm_FocusedClosure(
+        Mars_EyeSwarm_BlinkClosure(In.Time, Seed, Blink), Focus.Weight, FocusBlinkSuppress);
+
+    FMars_EyeSwarm_LidShape Lid;
+    Lid.OpenFraction = LidOpenFraction;
+    Lid.WidenAperture = FocusWidenAperture;
+    Lid.OpenUpperDeg = LidOpenUpperDeg;
+    Lid.OpenLowerDeg = LidOpenLowerDeg;
+    Lid.MeetDeg = LidMeetDeg;
+    Lid.BackCoverX = LidBackCoverX;
+    const float LidDist = Mars_EyeSwarm_LidSignedDistDeg(N, Lid, Mars_EyeSwarm_Openness(Lid, Focus.Weight, Closure));
+
+    FMars_EyeSwarm_LidLook LidLook;
+    LidLook.Color = LidColor;
+    LidLook.RimDarken = LidRimDarken;
+    LidLook.RimWidthDeg = LidRimWidthDeg;
+
+    O.BaseColor = Mars_EyeSwarm_LidShade(LidLook, Variant, LidDist);
+    O.Roughness = saturate(LidRoughness);
+    O.OpacityMask = CkUsf_SdfEdgeAA(-LidDist);
+    return O;
+}
