@@ -179,7 +179,9 @@ FCkUsf_SurfaceOutput Mars_EyeSwarm_EyeballFramed(
     float               ViewRimDarken,
     float               ViewRimPower,
     float               ViewCentreBoost,
-    float               EmissiveFacingPower)
+    float               EmissiveFacingPower,
+    float               PupilShadowAngleDeg,
+    float               PupilShadowStrength)
 {
     FCkUsf_SurfaceOutput O = CkUsf_DefaultSurface();
 
@@ -354,6 +356,14 @@ FCkUsf_SurfaceOutput Mars_EyeSwarm_EyeballFramed(
     // its silhouette, 2026-11-07): 0 leaves the glow flat.
     Emissive *= pow(max(Facing, 1e-3), max(EmissiveFacingPower, 0.0));
 
+    // A dark falloff just outside the pupil (2026-11-07, "a dark gradient around the pupil to mask the emissive so the
+    // emissive band is clearer"): masks the glow fully and the base colour by half, over PupilShadowAngleDeg from the
+    // pupil edge. 0 = off. The glints are applied afterwards and stay unmasked.
+    const float ShadowT = saturate(max(PupilDist, 0.0) / max(PupilShadowAngleDeg, 1e-3));
+    const float ShadowMask = 1.0 - saturate(PupilShadowStrength) * (1.0 - ShadowT * ShadowT * (3.0 - 2.0 * ShadowT)) * (1.0 - PupilCov);
+    Emissive *= ShadowMask;
+    Base *= lerp(1.0, ShadowMask, 0.5);
+
     // ---- Painted glints, flat on top: a large soft ellipse up-left of the gaze and a small dot down-right, placed in
     // the iris frame (shares of IrisR along Side / Up) so they ride the iris as the eye looks around. Not shaded; their
     // emissive scales with EmissiveStrength so they still read white over a glowing horror iris ----
@@ -452,7 +462,9 @@ FCkUsf_SurfaceOutput Mars_Look_EyeSwarmEyeball(
     float               ViewRimDarken,
     float               ViewRimPower,
     float               ViewCentreBoost,
-    float               EmissiveFacingPower)
+    float               EmissiveFacingPower,
+    float               PupilShadowAngleDeg,
+    float               PupilShadowStrength)
 {
     const float3x3 Identity = float3x3(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
     return Mars_EyeSwarm_EyeballFramed(Identity, In,
@@ -468,7 +480,8 @@ FCkUsf_SurfaceOutput Mars_Look_EyeSwarmEyeball(
         UpperShadeStrength, UpperShadeStartDeg, UpperShadeSoftDeg,
         IrisInnerColor, IrisInnerWidth, IrisFibreStrength, IrisFibreCount,
         GlintStrength, GlintSize, GlintColor, PupilSlit,
-        PupilHaloColor, PupilHaloAngleDeg, PupilHaloStrength, ViewRimDarken, ViewRimPower, ViewCentreBoost, EmissiveFacingPower);
+        PupilHaloColor, PupilHaloAngleDeg, PupilHaloStrength, ViewRimDarken, ViewRimPower, ViewCentreBoost, EmissiveFacingPower,
+        PupilShadowAngleDeg, PupilShadowStrength);
 }
 
 #if MARS_EYESWARM_INSTANCE_FRAME

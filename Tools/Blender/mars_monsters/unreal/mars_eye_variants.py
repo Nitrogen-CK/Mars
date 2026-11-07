@@ -30,7 +30,8 @@ EYE_SCALE = 2.4            # 24 cm eyeballs so a 512 px close-up reads
 STRAY_EYE = {"ScleraColor": (0.62, 0.08, 0.05), "ScleraRimColor": (0.07, 0.008, 0.006), "ScleraRimStrength": 1.0,
              "ScleraRimPower": 1.3, "GradientTopTint": (0.5, 0.36, 0.36), "GradientBottomTint": (1.05, 1.0, 1.0),
              "GradientStrength": 0.7, "IrisAngleDeg": 0.0, "PupilAngleDeg": 15.0, "PupilColor": (0.03, 0.0, 0.0),
-             "PupilHaloColor": (0.85, 0.16, 0.04), "PupilHaloAngleDeg": 55.0, "PupilHaloStrength": 0.5,
+             "PupilHaloColor": (0.85, 0.16, 0.04), "PupilHaloAngleDeg": 60.0, "PupilHaloStrength": 0.6,
+             "PupilShadowAngleDeg": 14.0, "PupilShadowStrength": 0.85,
              "ViewRimDarken": 0.9, "ViewRimPower": 1.1, "ViewCentreBoost": 0.4, "EmissiveFacingPower": 1.8,
              "EmissiveStrength": 3.0, "ScleraGlow": 0.55, "ScleraRoughness": 0.04, "GlintStrength": 0.12, "GlintSize": 6.0,
              "LidColor": (0.40, 0.09, 0.07), "UpperShadeStrength": 0.45}

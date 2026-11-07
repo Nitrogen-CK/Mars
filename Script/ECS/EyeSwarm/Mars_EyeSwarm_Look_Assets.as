@@ -42,7 +42,8 @@
 //     upper lid edge, over sclera and iris), IrisInnerColor, IrisInnerWidth (bright ring round the pupil),
 //     IrisFibreStrength, IrisFibreCount (radial streaks), GlintStrength, GlintSize, GlintColor (painted highlights riding
 //     the iris), PupilSlit (0 round .. 1 vertical slit), PupilHaloColor, PupilHaloAngleDeg, PupilHaloStrength (radial
-//     glow round the pupil over the sclera, also emissive; 0 = off), ViewCentreBoost (view-facing sclera brightening), EmissiveFacingPower (view-space sphere mask on the glow; 0 = flat).
+//     glow round the pupil over the sclera, also emissive; 0 = off), ViewCentreBoost (view-facing sclera brightening), EmissiveFacingPower (view-space sphere mask on the glow; 0 = flat), PupilShadowAngleDeg / Strength (a dark falloff
+//     just outside the pupil that masks the glow fully and the base by half, so the glow reads as a band; angle 0 = off).
 //     Iris-less mode: IrisAngleDeg <= PupilAngleDeg (or <= 0) draws no iris at all, the pupil straight on the sclera. A preset that recolours IrisColor / ScleraColor should recolour
 //     IrisInnerColor / ScleraRimColor with them (utils_eye_swarm::Apply_Preset does).
 //   Both: LidColor, LidRoughness, LidRimDarken, LidRimWidthDeg, FocusNearCm, FocusFarCm, BlinkIntervalMinS,
@@ -54,7 +55,7 @@
 //     then ViewRimDarken, ViewRimPower (view-dependent silhouette darkening on everything but the glints; equal on both).
 //   Parameter order: each look's list below IS its .ush signature after In. MarsEyeball: sources, colour, iris, gaze,
 //     blink, lid shape, then the stylisation block (ScleraRim*, Gradient*, UpperShade*, IrisInner*, IrisFibre*, Glint*,
-//     PupilSlit, PupilHalo*, ViewRimDarken, ViewRimPower, ViewCentreBoost, EmissiveFacingPower). MarsEyelid: sources, flesh, focus distance,
+//     PupilSlit, PupilHalo*, ViewRimDarken, ViewRimPower, ViewCentreBoost, EmissiveFacingPower, PupilShadow*). MarsEyelid: sources, flesh, focus distance,
 //     blink, lid shape, Gradient*, ViewRimDarken, ViewRimPower. New parameters go at the END.
 //
 // Behaviour (stateless; a function of the material time, the seed and the inputs above):
@@ -193,6 +194,8 @@ asset MarsEyeball of UCkUsf_LookDefinition
     // Soft brightening of the sclera where it faces the camera (lit from within); 0 = off.
     _Parameters.Add(CkUsf::Usf_ScalarIn(n"ViewCentreBoost", 0.0, n"Stylise"));
     _Parameters.Add(CkUsf::Usf_ScalarIn(n"EmissiveFacingPower", 0.0, n"Stylise"));
+    _Parameters.Add(CkUsf::Usf_ScalarIn(n"PupilShadowAngleDeg", 0.0, n"Stylise"));
+    _Parameters.Add(CkUsf::Usf_ScalarIn(n"PupilShadowStrength", 0.7, n"Stylise"));
 }
 
 asset MarsEyelid of UCkUsf_LookDefinition
