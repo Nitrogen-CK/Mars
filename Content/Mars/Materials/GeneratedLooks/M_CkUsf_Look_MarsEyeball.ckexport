@@ -4,7 +4,7 @@
 	"_meta":
 	{
 		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
-		"sourceHash": "d50e860f576eab05ebf225bd5a9be4f9",
+		"sourceHash": "0939fd70cde03d21b08842cc54f61a8e",
 		"exporterVersion": 3
 	},
 	"blendMode": "BLEND_Opaque",
@@ -25,7 +25,7 @@
 		"Custom": 1,
 		"PerInstanceCustomData": 2,
 		"PixelDepth": 1,
-		"ScalarParameter": 56,
+		"ScalarParameter": 57,
 		"TextureCoordinate": 1,
 		"Time": 1,
 		"Transform": 1,
@@ -533,18 +533,24 @@
 					},
 					{
 						"index": 79,
-						"name": "Time",
+						"name": "EmissiveFacingPower",
 						"node": 82,
 						"output": 0
 					},
 					{
 						"index": 80,
-						"name": "UV",
+						"name": "Time",
 						"node": 83,
 						"output": 0
 					},
 					{
 						"index": 81,
+						"name": "UV",
+						"node": 84,
+						"output": 0
+					},
+					{
+						"index": 82,
 						"name": "CkUsf_InstanceFrameProbe",
 						"node": 8,
 						"output": 0
@@ -567,7 +573,7 @@
 				],
 				"props":
 				{
-					"Code": "FCkUsf_SurfaceInput In = CkUsf_DefaultInput();\nIn.Time = Time;\nIn.UV = UV;\nIn.WorldPosition = WorldPosition;\nIn.CameraVector = CameraVector;\nIn.VertexNormal = VertexNormal;\nIn.VertexTangent = VertexTangent;\nIn.PixelDepth = PixelDepth;\nIn.VertexColor = VertexColor;\nFCkUsf_SurfaceOutput O = Mars_Look_EyeSwarmEyeball(In, Phase, Variant, PhaseCpd, FocusOverride.rgb, FocusOverrideWeight, Player0.rgb, Player1.rgb, Player2.rgb, Player3.rgb, ScleraColor.rgb, IrisColor.rgb, PupilColor.rgb, LidColor.rgb, EmissiveStrength, ScleraGlow, ShaderLid, BlinkSquash, IrisAngleDeg, PupilAngleDeg, PupilFocusScale, LimbalWidthDeg, LimbalDarken, IrisHueJitter, ScleraRoughness, IrisRoughness, LidRoughness, LidRimDarken, LidRimWidthDeg, MaxLookDeg, FocusNearCm, FocusFarCm, WanderAmpDeg, SaccadeMinS, SaccadeMaxS, SaccadeS, MicroJitterDeg, BlinkIntervalMinS, BlinkIntervalMaxS, BlinkCloseS, BlinkHoldS, BlinkOpenS, DoubleBlinkChance, FocusBlinkSuppress, LidOpenFraction, FocusWidenAperture, LidOpenUpperDeg, LidOpenLowerDeg, LidMeetDeg, LidBackCoverX, ShellRadiusCm, ScleraRimColor.rgb, ScleraRimPower, ScleraRimStrength, GradientTopTint.rgb, GradientBottomTint.rgb, GradientStrength, UpperShadeStrength, UpperShadeStartDeg, UpperShadeSoftDeg, IrisInnerColor.rgb, IrisInnerWidth, IrisFibreStrength, IrisFibreCount, GlintStrength, GlintSize, GlintColor.rgb, PupilSlit, PupilHaloColor.rgb, PupilHaloAngleDeg, PupilHaloStrength, ViewRimDarken, ViewRimPower, ViewCentreBoost);\nEmissiveColor = O.EmissiveColor;\nRoughness = O.Roughness;\nMetallic = O.Metallic;\nSpecular = O.Specular;\nAmbientOcclusion = O.AmbientOcclusion;\nNormal = O.Normal;\nOpacity = O.Opacity;\nOpacityMask = O.OpacityMask;\nRefraction = O.Refraction;\nSubsurfaceColor = O.SubsurfaceColor;\nClearCoat = O.ClearCoat;\nClearCoatRoughness = O.ClearCoatRoughness;\nreturn O.BaseColor;",
+					"Code": "FCkUsf_SurfaceInput In = CkUsf_DefaultInput();\nIn.Time = Time;\nIn.UV = UV;\nIn.WorldPosition = WorldPosition;\nIn.CameraVector = CameraVector;\nIn.VertexNormal = VertexNormal;\nIn.VertexTangent = VertexTangent;\nIn.PixelDepth = PixelDepth;\nIn.VertexColor = VertexColor;\nFCkUsf_SurfaceOutput O = Mars_Look_EyeSwarmEyeball(In, Phase, Variant, PhaseCpd, FocusOverride.rgb, FocusOverrideWeight, Player0.rgb, Player1.rgb, Player2.rgb, Player3.rgb, ScleraColor.rgb, IrisColor.rgb, PupilColor.rgb, LidColor.rgb, EmissiveStrength, ScleraGlow, ShaderLid, BlinkSquash, IrisAngleDeg, PupilAngleDeg, PupilFocusScale, LimbalWidthDeg, LimbalDarken, IrisHueJitter, ScleraRoughness, IrisRoughness, LidRoughness, LidRimDarken, LidRimWidthDeg, MaxLookDeg, FocusNearCm, FocusFarCm, WanderAmpDeg, SaccadeMinS, SaccadeMaxS, SaccadeS, MicroJitterDeg, BlinkIntervalMinS, BlinkIntervalMaxS, BlinkCloseS, BlinkHoldS, BlinkOpenS, DoubleBlinkChance, FocusBlinkSuppress, LidOpenFraction, FocusWidenAperture, LidOpenUpperDeg, LidOpenLowerDeg, LidMeetDeg, LidBackCoverX, ShellRadiusCm, ScleraRimColor.rgb, ScleraRimPower, ScleraRimStrength, GradientTopTint.rgb, GradientBottomTint.rgb, GradientStrength, UpperShadeStrength, UpperShadeStartDeg, UpperShadeSoftDeg, IrisInnerColor.rgb, IrisInnerWidth, IrisFibreStrength, IrisFibreCount, GlintStrength, GlintSize, GlintColor.rgb, PupilSlit, PupilHaloColor.rgb, PupilHaloAngleDeg, PupilHaloStrength, ViewRimDarken, ViewRimPower, ViewCentreBoost, EmissiveFacingPower);\nEmissiveColor = O.EmissiveColor;\nRoughness = O.Roughness;\nMetallic = O.Metallic;\nSpecular = O.Specular;\nAmbientOcclusion = O.AmbientOcclusion;\nNormal = O.Normal;\nOpacity = O.Opacity;\nOpacityMask = O.OpacityMask;\nRefraction = O.Refraction;\nSubsurfaceColor = O.SubsurfaceColor;\nClearCoat = O.ClearCoat;\nClearCoatRoughness = O.ClearCoatRoughness;\nreturn O.BaseColor;",
 					"IncludeFilePaths": [
 						"/Project/Looks/EyeSwarmEyeball.ush"
 					]
@@ -1536,11 +1542,21 @@
 			},
 			{
 				"id": 82,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_56",
+				"props":
+				{
+					"ParameterName": "EmissiveFacingPower",
+					"Group": "Stylise"
+				}
+			},
+			{
+				"id": 83,
 				"class": "Time",
 				"name": "MaterialExpressionTime_0"
 			},
 			{
-				"id": 83,
+				"id": 84,
 				"class": "TextureCoordinate",
 				"name": "MaterialExpressionTextureCoordinate_0"
 			}
@@ -1806,6 +1822,10 @@
 		},
 		{
 			"name": "ViewCentreBoost",
+			"value": 0
+		},
+		{
+			"name": "EmissiveFacingPower",
 			"value": 0
 		}
 	],

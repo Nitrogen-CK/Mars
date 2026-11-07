@@ -178,7 +178,8 @@ FCkUsf_SurfaceOutput Mars_EyeSwarm_EyeballFramed(
     float               PupilHaloStrength,
     float               ViewRimDarken,
     float               ViewRimPower,
-    float               ViewCentreBoost)
+    float               ViewCentreBoost,
+    float               EmissiveFacingPower)
 {
     FCkUsf_SurfaceOutput O = CkUsf_DefaultSurface();
 
@@ -349,6 +350,9 @@ FCkUsf_SurfaceOutput Mars_EyeSwarm_EyeballFramed(
     // Silhouette darkening on everything drawn so far (sclera, iris, pupil, painted lid, non-glint emissive).
     Base *= ViewShade;
     Emissive *= ViewShade;
+    // View-space sphere mask on the glow (the Stray wall eye glows brightest where it faces the viewer and falls off to
+    // its silhouette, 2026-11-07): 0 leaves the glow flat.
+    Emissive *= pow(max(Facing, 1e-3), max(EmissiveFacingPower, 0.0));
 
     // ---- Painted glints, flat on top: a large soft ellipse up-left of the gaze and a small dot down-right, placed in
     // the iris frame (shares of IrisR along Side / Up) so they ride the iris as the eye looks around. Not shaded; their
@@ -447,7 +451,8 @@ FCkUsf_SurfaceOutput Mars_Look_EyeSwarmEyeball(
     float               PupilHaloStrength,
     float               ViewRimDarken,
     float               ViewRimPower,
-    float               ViewCentreBoost)
+    float               ViewCentreBoost,
+    float               EmissiveFacingPower)
 {
     const float3x3 Identity = float3x3(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
     return Mars_EyeSwarm_EyeballFramed(Identity, In,
@@ -463,7 +468,7 @@ FCkUsf_SurfaceOutput Mars_Look_EyeSwarmEyeball(
         UpperShadeStrength, UpperShadeStartDeg, UpperShadeSoftDeg,
         IrisInnerColor, IrisInnerWidth, IrisFibreStrength, IrisFibreCount,
         GlintStrength, GlintSize, GlintColor, PupilSlit,
-        PupilHaloColor, PupilHaloAngleDeg, PupilHaloStrength, ViewRimDarken, ViewRimPower, ViewCentreBoost);
+        PupilHaloColor, PupilHaloAngleDeg, PupilHaloStrength, ViewRimDarken, ViewRimPower, ViewCentreBoost, EmissiveFacingPower);
 }
 
 #if MARS_EYESWARM_INSTANCE_FRAME

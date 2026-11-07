@@ -27,15 +27,15 @@ EYE_SCALE = 2.4            # 24 cm eyeballs so a 512 px close-up reads
 # The Stray wall eye (Stephen 2026-11-07): no iris, a pupil set in a graded red sclera with an orange halo, GLASSY (the
 # reference shows pinpoint specular hits, so the roughness is near zero and the painted glints are almost off) and
 # emissive-led so it pierces a dark, foggy room.
-STRAY_EYE = {"ScleraColor": (0.72, 0.10, 0.06), "ScleraRimColor": (0.10, 0.012, 0.01), "ScleraRimStrength": 1.0,
-             "ScleraRimPower": 1.4, "GradientTopTint": (0.45, 0.32, 0.32), "GradientBottomTint": (1.05, 1.0, 1.0),
-             "GradientStrength": 0.8, "IrisAngleDeg": 0.0, "PupilAngleDeg": 15.0, "PupilColor": (0.03, 0.0, 0.0),
-             "PupilHaloColor": (1.0, 0.42, 0.12), "PupilHaloAngleDeg": 34.0, "PupilHaloStrength": 1.0,
-             "ViewRimDarken": 0.75, "ViewRimPower": 1.6, "ViewCentreBoost": 0.25, "EmissiveStrength": 4.0,
-             "ScleraGlow": 0.7, "ScleraRoughness": 0.04, "GlintStrength": 0.15, "GlintSize": 6.0,
+STRAY_EYE = {"ScleraColor": (0.62, 0.08, 0.05), "ScleraRimColor": (0.07, 0.008, 0.006), "ScleraRimStrength": 1.0,
+             "ScleraRimPower": 1.3, "GradientTopTint": (0.5, 0.36, 0.36), "GradientBottomTint": (1.05, 1.0, 1.0),
+             "GradientStrength": 0.7, "IrisAngleDeg": 0.0, "PupilAngleDeg": 15.0, "PupilColor": (0.03, 0.0, 0.0),
+             "PupilHaloColor": (0.85, 0.16, 0.04), "PupilHaloAngleDeg": 55.0, "PupilHaloStrength": 0.5,
+             "ViewRimDarken": 0.9, "ViewRimPower": 1.1, "ViewCentreBoost": 0.4, "EmissiveFacingPower": 1.8,
+             "EmissiveStrength": 3.0, "ScleraGlow": 0.55, "ScleraRoughness": 0.04, "GlintStrength": 0.12, "GlintSize": 6.0,
              "LidColor": (0.40, 0.09, 0.07), "UpperShadeStrength": 0.45}
-STRAY_LID = {"LidColor": (0.40, 0.09, 0.07), "GradientTopTint": (0.45, 0.32, 0.32), "GradientBottomTint": (1.05, 1.0, 1.0),
-             "ViewRimDarken": 0.75, "ViewRimPower": 1.6, "LidRoughness": 0.35}
+STRAY_LID = {"LidColor": (0.40, 0.09, 0.07), "GradientTopTint": (0.5, 0.36, 0.36), "GradientBottomTint": (1.05, 1.0, 1.0),
+             "ViewRimDarken": 0.9, "ViewRimPower": 1.1, "LidRoughness": 0.35}
 
 # name -> (eyeball uniforms, lid uniforms). Vectors are (r, g, b); scalars are floats. Missing = the look's default.
 VARIANTS = [
