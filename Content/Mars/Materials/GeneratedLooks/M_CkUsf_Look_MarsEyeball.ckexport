@@ -4,7 +4,7 @@
 	"_meta":
 	{
 		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
-		"sourceHash": "7b4bdc75fa1f211fa7fd21ee7ec8b685",
+		"sourceHash": "d50e860f576eab05ebf225bd5a9be4f9",
 		"exporterVersion": 3
 	},
 	"blendMode": "BLEND_Opaque",
@@ -25,11 +25,11 @@
 		"Custom": 1,
 		"PerInstanceCustomData": 2,
 		"PixelDepth": 1,
-		"ScalarParameter": 51,
+		"ScalarParameter": 56,
 		"TextureCoordinate": 1,
 		"Time": 1,
 		"Transform": 1,
-		"VectorParameter": 10,
+		"VectorParameter": 11,
 		"VertexColor": 1,
 		"VertexNormalWS": 1,
 		"VertexTangentWS": 1,
@@ -496,18 +496,55 @@
 					},
 					{
 						"index": 73,
-						"name": "Time",
+						"name": "PupilHaloColor",
 						"node": 76,
-						"output": 0
+						"output": 0,
+						"mask": "rgb"
 					},
 					{
 						"index": 74,
-						"name": "UV",
+						"name": "PupilHaloAngleDeg",
 						"node": 77,
 						"output": 0
 					},
 					{
 						"index": 75,
+						"name": "PupilHaloStrength",
+						"node": 78,
+						"output": 0
+					},
+					{
+						"index": 76,
+						"name": "ViewRimDarken",
+						"node": 79,
+						"output": 0
+					},
+					{
+						"index": 77,
+						"name": "ViewRimPower",
+						"node": 80,
+						"output": 0
+					},
+					{
+						"index": 78,
+						"name": "ViewCentreBoost",
+						"node": 81,
+						"output": 0
+					},
+					{
+						"index": 79,
+						"name": "Time",
+						"node": 82,
+						"output": 0
+					},
+					{
+						"index": 80,
+						"name": "UV",
+						"node": 83,
+						"output": 0
+					},
+					{
+						"index": 81,
 						"name": "CkUsf_InstanceFrameProbe",
 						"node": 8,
 						"output": 0
@@ -530,7 +567,7 @@
 				],
 				"props":
 				{
-					"Code": "FCkUsf_SurfaceInput In = CkUsf_DefaultInput();\nIn.Time = Time;\nIn.UV = UV;\nIn.WorldPosition = WorldPosition;\nIn.CameraVector = CameraVector;\nIn.VertexNormal = VertexNormal;\nIn.VertexTangent = VertexTangent;\nIn.PixelDepth = PixelDepth;\nIn.VertexColor = VertexColor;\nFCkUsf_SurfaceOutput O = Mars_Look_EyeSwarmEyeball(In, Phase, Variant, PhaseCpd, FocusOverride.rgb, FocusOverrideWeight, Player0.rgb, Player1.rgb, Player2.rgb, Player3.rgb, ScleraColor.rgb, IrisColor.rgb, PupilColor.rgb, LidColor.rgb, EmissiveStrength, ScleraGlow, ShaderLid, BlinkSquash, IrisAngleDeg, PupilAngleDeg, PupilFocusScale, LimbalWidthDeg, LimbalDarken, IrisHueJitter, ScleraRoughness, IrisRoughness, LidRoughness, LidRimDarken, LidRimWidthDeg, MaxLookDeg, FocusNearCm, FocusFarCm, WanderAmpDeg, SaccadeMinS, SaccadeMaxS, SaccadeS, MicroJitterDeg, BlinkIntervalMinS, BlinkIntervalMaxS, BlinkCloseS, BlinkHoldS, BlinkOpenS, DoubleBlinkChance, FocusBlinkSuppress, LidOpenFraction, FocusWidenAperture, LidOpenUpperDeg, LidOpenLowerDeg, LidMeetDeg, LidBackCoverX, ShellRadiusCm, ScleraRimColor.rgb, ScleraRimPower, ScleraRimStrength, GradientTopTint.rgb, GradientBottomTint.rgb, GradientStrength, UpperShadeStrength, UpperShadeStartDeg, UpperShadeSoftDeg, IrisInnerColor.rgb, IrisInnerWidth, IrisFibreStrength, IrisFibreCount, GlintStrength, GlintSize, GlintColor.rgb, PupilSlit);\nEmissiveColor = O.EmissiveColor;\nRoughness = O.Roughness;\nMetallic = O.Metallic;\nSpecular = O.Specular;\nAmbientOcclusion = O.AmbientOcclusion;\nNormal = O.Normal;\nOpacity = O.Opacity;\nOpacityMask = O.OpacityMask;\nRefraction = O.Refraction;\nSubsurfaceColor = O.SubsurfaceColor;\nClearCoat = O.ClearCoat;\nClearCoatRoughness = O.ClearCoatRoughness;\nreturn O.BaseColor;",
+					"Code": "FCkUsf_SurfaceInput In = CkUsf_DefaultInput();\nIn.Time = Time;\nIn.UV = UV;\nIn.WorldPosition = WorldPosition;\nIn.CameraVector = CameraVector;\nIn.VertexNormal = VertexNormal;\nIn.VertexTangent = VertexTangent;\nIn.PixelDepth = PixelDepth;\nIn.VertexColor = VertexColor;\nFCkUsf_SurfaceOutput O = Mars_Look_EyeSwarmEyeball(In, Phase, Variant, PhaseCpd, FocusOverride.rgb, FocusOverrideWeight, Player0.rgb, Player1.rgb, Player2.rgb, Player3.rgb, ScleraColor.rgb, IrisColor.rgb, PupilColor.rgb, LidColor.rgb, EmissiveStrength, ScleraGlow, ShaderLid, BlinkSquash, IrisAngleDeg, PupilAngleDeg, PupilFocusScale, LimbalWidthDeg, LimbalDarken, IrisHueJitter, ScleraRoughness, IrisRoughness, LidRoughness, LidRimDarken, LidRimWidthDeg, MaxLookDeg, FocusNearCm, FocusFarCm, WanderAmpDeg, SaccadeMinS, SaccadeMaxS, SaccadeS, MicroJitterDeg, BlinkIntervalMinS, BlinkIntervalMaxS, BlinkCloseS, BlinkHoldS, BlinkOpenS, DoubleBlinkChance, FocusBlinkSuppress, LidOpenFraction, FocusWidenAperture, LidOpenUpperDeg, LidOpenLowerDeg, LidMeetDeg, LidBackCoverX, ShellRadiusCm, ScleraRimColor.rgb, ScleraRimPower, ScleraRimStrength, GradientTopTint.rgb, GradientBottomTint.rgb, GradientStrength, UpperShadeStrength, UpperShadeStartDeg, UpperShadeSoftDeg, IrisInnerColor.rgb, IrisInnerWidth, IrisFibreStrength, IrisFibreCount, GlintStrength, GlintSize, GlintColor.rgb, PupilSlit, PupilHaloColor.rgb, PupilHaloAngleDeg, PupilHaloStrength, ViewRimDarken, ViewRimPower, ViewCentreBoost);\nEmissiveColor = O.EmissiveColor;\nRoughness = O.Roughness;\nMetallic = O.Metallic;\nSpecular = O.Specular;\nAmbientOcclusion = O.AmbientOcclusion;\nNormal = O.Normal;\nOpacity = O.Opacity;\nOpacityMask = O.OpacityMask;\nRefraction = O.Refraction;\nSubsurfaceColor = O.SubsurfaceColor;\nClearCoat = O.ClearCoat;\nClearCoatRoughness = O.ClearCoatRoughness;\nreturn O.BaseColor;",
 					"IncludeFilePaths": [
 						"/Project/Looks/EyeSwarmEyeball.ush"
 					]
@@ -1427,11 +1464,83 @@
 			},
 			{
 				"id": 76,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_10",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=1.000000,G=0.450000,B=0.150000,A=1.000000)",
+					"ParameterName": "PupilHaloColor",
+					"Group": "Stylise"
+				}
+			},
+			{
+				"id": 77,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_51",
+				"props":
+				{
+					"DefaultValue": 30,
+					"ParameterName": "PupilHaloAngleDeg",
+					"Group": "Stylise"
+				}
+			},
+			{
+				"id": 78,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_52",
+				"props":
+				{
+					"ParameterName": "PupilHaloStrength",
+					"Group": "Stylise"
+				}
+			},
+			{
+				"id": 79,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_53",
+				"props":
+				{
+					"DefaultValue": 0.25,
+					"ParameterName": "ViewRimDarken",
+					"Group": "Stylise"
+				}
+			},
+			{
+				"id": 80,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_54",
+				"props":
+				{
+					"DefaultValue": 2,
+					"ParameterName": "ViewRimPower",
+					"Group": "Stylise"
+				}
+			},
+			{
+				"id": 81,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_55",
+				"props":
+				{
+					"ParameterName": "ViewCentreBoost",
+					"Group": "Stylise"
+				}
+			},
+			{
+				"id": 82,
 				"class": "Time",
 				"name": "MaterialExpressionTime_0"
 			},
 			{
-				"id": 77,
+				"id": 83,
 				"class": "TextureCoordinate",
 				"name": "MaterialExpressionTextureCoordinate_0"
 			}
@@ -1678,6 +1787,26 @@
 		{
 			"name": "PupilSlit",
 			"value": 0
+		},
+		{
+			"name": "PupilHaloAngleDeg",
+			"value": 30
+		},
+		{
+			"name": "PupilHaloStrength",
+			"value": 0
+		},
+		{
+			"name": "ViewRimDarken",
+			"value": 0.25
+		},
+		{
+			"name": "ViewRimPower",
+			"value": 2
+		},
+		{
+			"name": "ViewCentreBoost",
+			"value": 0
 		}
 	],
 	"vectorParams": [
@@ -1720,6 +1849,10 @@
 		{
 			"name": "GlintColor",
 			"value": "RGBA(1, 0.98, 0.95, 1)"
+		},
+		{
+			"name": "PupilHaloColor",
+			"value": "RGBA(1, 0.45, 0.15, 1)"
 		}
 	],
 	"textureParams": [],

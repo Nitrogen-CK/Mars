@@ -41,17 +41,21 @@
 //     from the forward pole to the rim), UpperShadeStrength, UpperShadeStartDeg, UpperShadeSoftDeg (shade band under the
 //     upper lid edge, over sclera and iris), IrisInnerColor, IrisInnerWidth (bright ring round the pupil),
 //     IrisFibreStrength, IrisFibreCount (radial streaks), GlintStrength, GlintSize, GlintColor (painted highlights riding
-//     the iris), PupilSlit (0 round .. 1 vertical slit). A preset that recolours IrisColor / ScleraColor should recolour
+//     the iris), PupilSlit (0 round .. 1 vertical slit), PupilHaloColor, PupilHaloAngleDeg, PupilHaloStrength (radial
+//     glow round the pupil over the sclera, also emissive; 0 = off), ViewCentreBoost (view-facing sclera brightening).
+//     Iris-less mode: IrisAngleDeg <= PupilAngleDeg (or <= 0) draws no iris at all, the pupil straight on the sclera. A preset that recolours IrisColor / ScleraColor should recolour
 //     IrisInnerColor / ScleraRimColor with them (utils_eye_swarm::Apply_Preset does).
 //   Both: LidColor, LidRoughness, LidRimDarken, LidRimWidthDeg, FocusNearCm, FocusFarCm, BlinkIntervalMinS,
 //     BlinkIntervalMaxS, BlinkCloseS, BlinkHoldS, BlinkOpenS, DoubleBlinkChance, FocusBlinkSuppress, LidOpenFraction,
 //     FocusWidenAperture, LidOpenUpperDeg, LidOpenLowerDeg, LidMeetDeg, LidBackCoverX, ShellRadiusCm (5 on the eyeball,
 //     5.5 on the lid: the radius the eye centre is recovered from; scale it with the instance scale for big eyes), then
 //     GradientTopTint, GradientBottomTint, GradientStrength (the whole-eye up/down multiplicative tint on the sclera, the
-//     painted lid and the lid shell, never the iris; keep them equal on both looks or ball and lid shade differently).
+//     painted lid and the lid shell, never the iris; keep them equal on both looks or ball and lid shade differently),
+//     then ViewRimDarken, ViewRimPower (view-dependent silhouette darkening on everything but the glints; equal on both).
 //   Parameter order: each look's list below IS its .ush signature after In. MarsEyeball: sources, colour, iris, gaze,
 //     blink, lid shape, then the stylisation block (ScleraRim*, Gradient*, UpperShade*, IrisInner*, IrisFibre*, Glint*,
-//     PupilSlit). MarsEyelid: sources, flesh, focus distance, blink, lid shape, then Gradient*. New parameters go at the END.
+//     PupilSlit, PupilHalo*, ViewRimDarken, ViewRimPower, ViewCentreBoost). MarsEyelid: sources, flesh, focus distance,
+//     blink, lid shape, Gradient*, ViewRimDarken, ViewRimPower. New parameters go at the END.
 //
 // Behaviour (stateless; a function of the material time, the seed and the inputs above):
 //   Blink: one blink per cell of mean(BlinkIntervalMinS, BlinkIntervalMaxS) at a hashed offset (starts are between the
@@ -65,7 +69,7 @@
 //     lerp(LidMeetDeg, -LidOpenLowerDeg, openness); openness = (LidOpenFraction + FocusWidenAperture * weight) * (1 -
 //     blink). The aperture is the lens between them, pinched at the eye's +-Y sides; local normal.x < LidBackCoverX is
 //     always flesh.
-//   Stylisation is all in the eye's local frame (view-independent, like paint): the up/down gradient follows local +Z,
+//   Stylisation is in the eye's local frame (view-independent, like paint) except ViewRim* / ViewCentreBoost: the up/down gradient follows local +Z,
 //     the rim gradient local +X, the upper shade hangs off the upper lid edge (so it descends with a blink), and the
 //     iris fibres and glints ride the gaze. The iris takes the upper shade but neither gradient, so it stays a flat disc
 //     on top.
@@ -179,6 +183,15 @@ asset MarsEyeball of UCkUsf_LookDefinition
     _Parameters.Add(CkUsf::Usf_VectorIn(n"GlintColor", FLinearColor(1.0, 0.98, 0.95, 1.0), n"Stylise"));
     // Pupil shape: 0 = round, 1 = vertical slit.
     _Parameters.Add(CkUsf::Usf_ScalarIn(n"PupilSlit", 0.0, n"Stylise"));
+    // Pupil halo: a radial glow round the pupil over the sclera, gone PupilHaloAngleDeg from the pupil centre; also emissive.
+    _Parameters.Add(CkUsf::Usf_VectorIn(n"PupilHaloColor", FLinearColor(1.0, 0.45, 0.15, 1.0), n"Stylise"));
+    _Parameters.Add(CkUsf::Usf_ScalarIn(n"PupilHaloAngleDeg", 30.0, n"Stylise"));
+    _Parameters.Add(CkUsf::Usf_ScalarIn(n"PupilHaloStrength", 0.0, n"Stylise"));
+    // ---- View-dependent sphere shading: silhouette darkening (identical defaults on both looks) ----
+    _Parameters.Add(CkUsf::Usf_ScalarIn(n"ViewRimDarken", 0.25, n"Stylise"));
+    _Parameters.Add(CkUsf::Usf_ScalarIn(n"ViewRimPower", 2.0, n"Stylise"));
+    // Soft brightening of the sclera where it faces the camera (lit from within); 0 = off.
+    _Parameters.Add(CkUsf::Usf_ScalarIn(n"ViewCentreBoost", 0.0, n"Stylise"));
 }
 
 asset MarsEyelid of UCkUsf_LookDefinition
@@ -237,6 +250,9 @@ asset MarsEyelid of UCkUsf_LookDefinition
     _Parameters.Add(CkUsf::Usf_VectorIn(n"GradientTopTint", FLinearColor(0.75, 0.75, 0.75, 1.0), n"Stylise"));
     _Parameters.Add(CkUsf::Usf_VectorIn(n"GradientBottomTint", FLinearColor(1.0, 1.0, 1.0, 1.0), n"Stylise"));
     _Parameters.Add(CkUsf::Usf_ScalarIn(n"GradientStrength", 1.0, n"Stylise"));
+    // ---- View-dependent sphere shading: silhouette darkening (identical defaults on both looks) ----
+    _Parameters.Add(CkUsf::Usf_ScalarIn(n"ViewRimDarken", 0.25, n"Stylise"));
+    _Parameters.Add(CkUsf::Usf_ScalarIn(n"ViewRimPower", 2.0, n"Stylise"));
 }
 
 namespace utils_eyeswarm

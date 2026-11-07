@@ -352,3 +352,22 @@ float3 Mars_EyeSwarm_BodyGradientTint(FMars_EyeSwarm_BodyGradient G, float3 N)
     const float3 Tint = lerp(G.BottomTint, G.TopTint, T * T * (3.0 - 2.0 * T));
     return max(lerp(float3(1.0, 1.0, 1.0), Tint, max(G.Strength, 0.0)), 0.0);
 }
+
+// --------------------------------------------------------------------------------------------------------------------
+// View-dependent sphere shading: the one view-DEPENDENT term, darkening toward the silhouette so a ball reads as a ball.
+// Shared by the eyeball and the lid shell so they shade together. abs() keeps the two-sided lid's back faces sane.
+// --------------------------------------------------------------------------------------------------------------------
+
+// 1 where the surface faces the camera, 0 at the silhouette.
+float Mars_EyeSwarm_ViewFacing(FCkUsf_SurfaceInput In)
+{
+    const float3 Nw = In.VertexNormal * rsqrt(max(dot(In.VertexNormal, In.VertexNormal), 1e-8));
+    return saturate(abs(dot(Nw, In.CameraVector)));
+}
+
+// Multiplier: 1 facing the camera, 1 - Darken at the silhouette, shaped by Power.
+float Mars_EyeSwarm_ViewRimShade(float Facing, float Darken, float Power)
+{
+    return 1.0 - saturate(Darken) * pow(saturate(1.0 - Facing), max(Power, 1e-3));
+}
+

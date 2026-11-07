@@ -16,6 +16,10 @@
 // two so it stays a flat-ish disc on top, and carries its own radial gradient instead: a bright inner ring (IrisInner*),
 // radial fibres (IrisFibre*, faded before they alias) and the limbal rim. Painted glints (Glint*) ride the iris, drawn
 // flat on top; PupilSlit narrows the soft-edged pupil to a vertical slit.
+// Iris-less mode (IrisAngleDeg <= PupilAngleDeg, or <= 0): no iris at all, the pupil sits straight on the sclera. A pupil
+// halo (PupilHalo*) glows over the sclera round the pupil and feeds the emissive. The one view-DEPENDENT term is the
+// silhouette darkening (ViewRim*, shared with the lid shell) plus an optional view-facing sclera boost (ViewCentreBoost);
+// the glints stay unshaded.
 //
 // ---- The instance-space escape hatch ------------------------------------------------------------------------------
 // Focus needs the world-space aim (target - eye) in the EYE'S OWN frame, which on an ISM is the per-INSTANCE transform.
@@ -81,6 +85,10 @@
 #endif
 #ifndef MARS_EYESWARM_GLINT_SMALL_UP
     #define MARS_EYESWARM_GLINT_SMALL_UP -0.45
+#endif
+// Iris-less eyes anchor the glints to the pupil: this many pupil radii stand in for IrisR.
+#ifndef MARS_EYESWARM_GLINT_PUPIL_ANCHOR
+    #define MARS_EYESWARM_GLINT_PUPIL_ANCHOR 1.6
 #endif
 // The small dot's radius as a share of GlintSize.
 #ifndef MARS_EYESWARM_GLINT_SMALL_SCALE
@@ -164,7 +172,13 @@ FCkUsf_SurfaceOutput Mars_EyeSwarm_EyeballFramed(
     float               GlintStrength,
     float               GlintSize,
     float3              GlintColor,
-    float               PupilSlit)
+    float               PupilSlit,
+    float3              PupilHaloColor,
+    float               PupilHaloAngleDeg,
+    float               PupilHaloStrength,
+    float               ViewRimDarken,
+    float               ViewRimPower,
+    float               ViewCentreBoost)
 {
     FCkUsf_SurfaceOutput O = CkUsf_DefaultSurface();
 
@@ -237,18 +251,24 @@ FCkUsf_SurfaceOutput Mars_EyeSwarm_EyeballFramed(
     P.y /= max(1.0 - Squash, MARS_EYESWARM_MIN_SQUASH);
     const float R = length(P);
 
+    // Iris-less mode (the Stray wall: a pupil straight on the sclera): no iris when IrisAngleDeg <= PupilAngleDeg or
+    // IrisAngleDeg <= 0. HasIris is a uniform 0/1 SELECT, not a branch, so every derivative below still runs everywhere;
+    // with it 0 the iris coverage is 0, the pupil is not capped by or clipped to the iris, and IrisR stays >= 0.1 so no
+    // divide below can reach zero.
+    const float HasIris = IrisAngleDeg > max(PupilAngleDeg, 0.0) ? 1.0 : 0.0;
     const float IrisR = max(IrisAngleDeg, 0.1) * lerp(0.94, 1.06, saturate(Variant));
-    const float PupilR = min(max(PupilAngleDeg, 0.0) * lerp(1.0, PupilFocusScale, Focus.Weight), IrisR * 0.95);
-    const float IrisCov = CkUsf_SdfEdgeAA(R - IrisR);
+    const float PupilCap = HasIris > 0.5 ? IrisR * 0.95 : 180.0;
+    const float PupilR = min(max(PupilAngleDeg, 0.0) * lerp(1.0, PupilFocusScale, Focus.Weight), PupilCap);
+    const float IrisCov = CkUsf_SdfEdgeAA(R - IrisR) * HasIris;
 
     // Pupil: a soft-edged disc that PupilSlit squeezes sideways (and stretches a little) into a vertical slit. The
     // distance is scaled by the tighter axis, so it stays a conservative SDF and the soft edge keeps its width. Clipped to
-    // the iris so a long slit never runs onto the sclera.
+    // the iris so a long slit never runs onto the sclera; drawn straight on the sclera in iris-less mode.
     const float Slit = saturate(PupilSlit);
     const float2 PupilScale = float2(lerp(1.0, MARS_EYESWARM_SLIT_WIDTH, Slit), lerp(1.0, MARS_EYESWARM_SLIT_LENGTH, Slit));
     const float PupilDist = (length(P / PupilScale) - PupilR) * min(PupilScale.x, PupilScale.y);
     const float PupilEdge = max(fwidth(PupilDist), MARS_EYESWARM_PUPIL_SOFT_DEG);
-    const float PupilCov = saturate(0.5 - PupilDist / PupilEdge) * IrisCov;
+    const float PupilCov = saturate(0.5 - PupilDist / PupilEdge) * lerp(1.0, IrisCov, HasIris);
 
     // Iris: a flat-ish disc with its own radial gradient: a bright inner ring at the pupil, the gentle falloff, radial
     // fibre streaks, then the dark limbal rim. It takes none of the whole-eye gradients below, so it reads as a disc on top.
@@ -280,7 +300,20 @@ FCkUsf_SurfaceOutput Mars_EyeSwarm_EyeballFramed(
     Gradient.BottomTint = GradientBottomTint;
     Gradient.Strength = GradientStrength;
     const float3 BodyTint = Mars_EyeSwarm_BodyGradientTint(Gradient, N);
-    const float3 Sclera = lerp(ScleraColor, ScleraRimColor, saturate(ScleraRimStrength) * RimT) * BodyTint;
+    // Pupil halo: a radial glow round the pupil spread over the sclera (under the iris when there is one), full at the
+    // pupil edge, gone PupilHaloAngleDeg from the pupil centre. Measured on the pupil's own distance, so it follows a slit.
+    const float HaloSpan = max(PupilHaloAngleDeg - PupilR, 1e-3);
+    const float HaloT = saturate(1.0 - max(PupilDist, 0.0) / HaloSpan);
+    const float HaloW = HaloT * HaloT * (3.0 - 2.0 * HaloT) * saturate(PupilHaloStrength);
+
+    // View-facing term: the silhouette darkening (applied to everything but the glints, further down) and an optional
+    // soft brightening of the sclera where it faces the camera, so a glowing eye reads lit from within.
+    const float Facing = Mars_EyeSwarm_ViewFacing(In);
+    const float ViewShade = Mars_EyeSwarm_ViewRimShade(Facing, ViewRimDarken, ViewRimPower);
+    const float CentreBoost = 1.0 + max(ViewCentreBoost, 0.0) * Facing * Facing;
+
+    const float3 ScleraRimmed = lerp(ScleraColor, ScleraRimColor, saturate(ScleraRimStrength) * RimT);
+    const float3 Sclera = lerp(ScleraRimmed, PupilHaloColor, HaloW) * BodyTint * CentreBoost;
 
     // ---- Upper lid shade: full from the upper lid edge down to UpperShadeStartDeg below it, then fading out over
     // UpperShadeSoftDeg. It crosses sclera, iris and pupil alike and travels down with the lid in a blink ----
@@ -293,8 +326,10 @@ FCkUsf_SurfaceOutput Mars_EyeSwarm_EyeballFramed(
     Base = lerp(Base, PupilColor, PupilCov) * Shade;
 
     const float Dip = 1.0 - MARS_EYESWARM_BLINK_EMISSIVE_DIP * Squash;
+    // The halo feeds the emissive at full weight (not scaled by ScleraGlow), so a glowing eye glows most round the pupil.
     float3 Emissive = max(EmissiveStrength, 0.0) * Dip * Shade
-        * (Iris * IrisCov * (1.0 - PupilCov) + Sclera * max(ScleraGlow, 0.0) * (1.0 - IrisCov));
+        * (Iris * IrisCov * (1.0 - PupilCov)
+           + (Sclera * max(ScleraGlow, 0.0) + PupilHaloColor * HaloW * BodyTint) * (1.0 - IrisCov) * (1.0 - PupilCov));
     float Roughness = lerp(ScleraRoughness, IrisRoughness, IrisCov);
 
     // ---- Optional painted lid (same coverage as the MarsEyelid shell, same body gradient) ----
@@ -311,12 +346,18 @@ FCkUsf_SurfaceOutput Mars_EyeSwarm_EyeballFramed(
     Roughness = lerp(Roughness, LidRoughness, LidCov);
     Emissive *= 1.0 - LidCov;
 
+    // Silhouette darkening on everything drawn so far (sclera, iris, pupil, painted lid, non-glint emissive).
+    Base *= ViewShade;
+    Emissive *= ViewShade;
+
     // ---- Painted glints, flat on top: a large soft ellipse up-left of the gaze and a small dot down-right, placed in
     // the iris frame (shares of IrisR along Side / Up) so they ride the iris as the eye looks around. Not shaded; their
     // emissive scales with EmissiveStrength so they still read white over a glowing horror iris ----
+    // Iris-less, they are placed against the pupil instead (MARS_EYESWARM_GLINT_PUPIL_ANCHOR x its radius).
     const float GlintR = max(GlintSize, 0.0);
-    const float2 BigC = float2(MARS_EYESWARM_GLINT_BIG_SIDE, MARS_EYESWARM_GLINT_BIG_UP) * IrisR;
-    const float2 SmallC = float2(MARS_EYESWARM_GLINT_SMALL_SIDE, MARS_EYESWARM_GLINT_SMALL_UP) * IrisR;
+    const float GlintAnchorR = lerp(max(PupilR * MARS_EYESWARM_GLINT_PUPIL_ANCHOR, 1.0), IrisR, HasIris);
+    const float2 BigC = float2(MARS_EYESWARM_GLINT_BIG_SIDE, MARS_EYESWARM_GLINT_BIG_UP) * GlintAnchorR;
+    const float2 SmallC = float2(MARS_EYESWARM_GLINT_SMALL_SIDE, MARS_EYESWARM_GLINT_SMALL_UP) * GlintAnchorR;
     const float BigLen = length((P - BigC) / max(GlintR * float2(1.0, 0.8), 1e-3));
     const float SmallLen = length((P - SmallC) / max(GlintR * MARS_EYESWARM_GLINT_SMALL_SCALE, 1e-3));
     const float GlintShape = max(1.0 - smoothstep(0.55, 1.0, BigLen), 1.0 - smoothstep(0.5, 1.0, SmallLen));
@@ -400,7 +441,13 @@ FCkUsf_SurfaceOutput Mars_Look_EyeSwarmEyeball(
     float               GlintStrength,
     float               GlintSize,
     float3              GlintColor,
-    float               PupilSlit)
+    float               PupilSlit,
+    float3              PupilHaloColor,
+    float               PupilHaloAngleDeg,
+    float               PupilHaloStrength,
+    float               ViewRimDarken,
+    float               ViewRimPower,
+    float               ViewCentreBoost)
 {
     const float3x3 Identity = float3x3(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
     return Mars_EyeSwarm_EyeballFramed(Identity, In,
@@ -415,7 +462,8 @@ FCkUsf_SurfaceOutput Mars_Look_EyeSwarmEyeball(
         ScleraRimColor, ScleraRimPower, ScleraRimStrength, GradientTopTint, GradientBottomTint, GradientStrength,
         UpperShadeStrength, UpperShadeStartDeg, UpperShadeSoftDeg,
         IrisInnerColor, IrisInnerWidth, IrisFibreStrength, IrisFibreCount,
-        GlintStrength, GlintSize, GlintColor, PupilSlit);
+        GlintStrength, GlintSize, GlintColor, PupilSlit,
+        PupilHaloColor, PupilHaloAngleDeg, PupilHaloStrength, ViewRimDarken, ViewRimPower, ViewCentreBoost);
 }
 
 #if MARS_EYESWARM_INSTANCE_FRAME
