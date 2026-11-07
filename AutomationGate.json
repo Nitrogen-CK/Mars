@@ -41,20 +41,6 @@
       "added": "2026-10-03"
     },
     {
-      "test": "Monolith.ReflectionIntel.CppReflect.FindSpecifier",
-      "status": "red",
-      "reason": "Monolith plugin test (third-party submodule with no list of its own), red in this project. The fixture root resolves to 'D:/Saved/Automation/Tmp/...' (outside the project), so the staged fixtures are not found. Seen: Expected 'ASampleActor surfaces under specifier 'Abstract'' to be true.",
-      "evidence": "Mars dev f4d3c25 (CkFoundation 9366c2a34, CkTests 771c2a98, CkGameplayDebugger 5af581da), UnrealToolbox v1.52, 3 full gates on one build 2026-10-03 (G1 raw 4243 run/62 red; G2 judged 4243/62; G3 judged 4243/63) + solo fresh-boot runs: gates RED RED RED, solo RED. The only change under test was adding this file (and docs), so the failure predates it.",
-      "added": "2026-10-03"
-    },
-    {
-      "test": "Monolith.ReflectionIntel.CppReflect.UHTArtefactParse",
-      "status": "red",
-      "reason": "Monolith plugin test (third-party submodule with no list of its own), red in this project. The fixture root resolves to 'D:/Saved/Automation/Tmp/...' (outside the project), so the staged fixtures are not found. Seen: Expected 'At least 2 UClasses parsed (ASampleActor + USampleInterface)' to be true.",
-      "evidence": "Mars dev f4d3c25 (CkFoundation 9366c2a34, CkTests 771c2a98, CkGameplayDebugger 5af581da), UnrealToolbox v1.52, 3 full gates on one build 2026-10-03 (G1 raw 4243 run/62 red; G2 judged 4243/62; G3 judged 4243/63) + solo fresh-boot runs: gates RED RED RED, solo RED. The only change under test was adding this file (and docs), so the failure predates it.",
-      "added": "2026-10-03"
-    },
-    {
       "test": "Monolith.ReflectionIntel.Decision.HeuristicAccuracy",
       "status": "red",
       "reason": "Monolith plugin test (third-party submodule with no list of its own), red in this project. The fixture root resolves to 'D:/Saved/Automation/Tmp/...' (outside the project), so the staged fixtures are not found. Seen: Expected 'At least 4 decision rows from fixture corpus' to be true.",
@@ -62,23 +48,9 @@
       "added": "2026-10-03"
     },
     {
-      "test": "Monolith.ReflectionIntel.Decision.StalenessFlag",
-      "status": "red",
-      "reason": "Monolith plugin test (third-party submodule with no list of its own), red in this project. The fixture root resolves to 'D:/Saved/Automation/Tmp/...' (outside the project), so the staged fixtures are not found. Seen: Expected 'At least one stale row past 30-day cutoff' to be true.",
-      "evidence": "Mars dev f4d3c25 (CkFoundation 9366c2a34, CkTests 771c2a98, CkGameplayDebugger 5af581da), UnrealToolbox v1.52, 3 full gates on one build 2026-10-03 (G1 raw 4243 run/62 red; G2 judged 4243/62; G3 judged 4243/63) + solo fresh-boot runs: gates RED RED RED, solo RED. The only change under test was adding this file (and docs), so the failure predates it.",
-      "added": "2026-10-03"
-    },
-    {
       "test": "Monolith.ReflectionIntel.Decision.SupersessionChain",
       "status": "red",
       "reason": "Monolith plugin test (third-party submodule with no list of its own), red in this project. The fixture root resolves to 'D:/Saved/Automation/Tmp/...' (outside the project), so the staged fixtures are not found. Seen: Expected 'At least one supersession edge resolved from corpus' to be true.",
-      "evidence": "Mars dev f4d3c25 (CkFoundation 9366c2a34, CkTests 771c2a98, CkGameplayDebugger 5af581da), UnrealToolbox v1.52, 3 full gates on one build 2026-10-03 (G1 raw 4243 run/62 red; G2 judged 4243/62; G3 judged 4243/63) + solo fresh-boot runs: gates RED RED RED, solo RED. The only change under test was adding this file (and docs), so the failure predates it.",
-      "added": "2026-10-03"
-    },
-    {
-      "test": "Monolith.ReflectionIntel.Risk.ConditionalGateSweep",
-      "status": "red",
-      "reason": "Monolith plugin test (third-party submodule with no list of its own), red in this project. The fixture root resolves to 'D:/Saved/Automation/Tmp/...' (outside the project), so the staged fixtures are not found. Seen: Expected 'At least one gate row detected' to be true.",
       "evidence": "Mars dev f4d3c25 (CkFoundation 9366c2a34, CkTests 771c2a98, CkGameplayDebugger 5af581da), UnrealToolbox v1.52, 3 full gates on one build 2026-10-03 (G1 raw 4243 run/62 red; G2 judged 4243/62; G3 judged 4243/63) + solo fresh-boot runs: gates RED RED RED, solo RED. The only change under test was adding this file (and docs), so the failure predates it.",
       "added": "2026-10-03"
     },
