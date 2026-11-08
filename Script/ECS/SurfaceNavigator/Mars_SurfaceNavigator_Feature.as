@@ -175,6 +175,17 @@ struct FMars_Fragment_SurfaceNavigator
 
     UPROPERTY()
     FMars_SurfaceNavigator_Steering Steering;
+
+    // Set by a SetSpeed: the speed the tick steers with instead of Spec.Speed, until the next SetSpeed.
+    UPROPERTY()
+    TOptional<float32> SpeedOverride;
+
+    // Face requests applied (the navigator was not Moving) and dropped (a move owned the steer).
+    UPROPERTY()
+    int32 FacesApplied = 0;
+
+    UPROPERTY()
+    int32 FacesDropped = 0;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -221,6 +232,38 @@ struct FMars_Request_SurfaceNavigator_MoveTo
     }
 }
 
+// Overrides the speed the tick steers with (Spec.Speed until the first one); the last one queued wins. Drained before
+// MoveTo, so a SetSpeed and a MoveTo queued together move at the new speed. SurfaceMotion still clamps it to its MaxSpeed.
+struct FMars_Request_SurfaceNavigator_SetSpeed
+{
+    UPROPERTY()
+    float32 Speed = 120.0f;
+
+    FMars_Request_SurfaceNavigator_SetSpeed() {}
+
+    FMars_Request_SurfaceNavigator_SetSpeed(float32 InSpeed)
+    {
+        Speed = InSpeed;
+    }
+}
+
+// Turns the body in place toward a world direction (planar; a zero-length one is ignored): a zero-speed steer, so
+// SurfaceMotion turns at its SurfaceTurnRate without moving. Applied only when the navigator is not Moving after this
+// frame's Stop and MoveTo (a move owns the steer, so a Face during a move is dropped); the last one queued wins. The facing
+// holds until the next steer: a later Stop keeps it (SurfaceMotion keeps the travel tangent), a MoveTo replaces it.
+struct FMars_Request_SurfaceNavigator_Face
+{
+    UPROPERTY()
+    FVector WorldDirection = FVector::ForwardVector;
+
+    FMars_Request_SurfaceNavigator_Face() {}
+
+    FMars_Request_SurfaceNavigator_Face(FVector InWorldDirection)
+    {
+        WorldDirection = InWorldDirection;
+    }
+}
+
 // Request_Stop drops every MoveTo queued before it, so applying Stop and then the last MoveTo is arrival order: a Stop
 // after a MoveTo in one frame stops, a MoveTo after a Stop moves.
 struct FMars_Fragment_SurfaceNavigator_Requests
@@ -230,4 +273,10 @@ struct FMars_Fragment_SurfaceNavigator_Requests
 
     UPROPERTY()
     TArray<FMars_Request_SurfaceNavigator_MoveTo> MoveToRequests;
+
+    UPROPERTY()
+    TArray<FMars_Request_SurfaceNavigator_SetSpeed> SetSpeedRequests;
+
+    UPROPERTY()
+    TArray<FMars_Request_SurfaceNavigator_Face> FaceRequests;
 }

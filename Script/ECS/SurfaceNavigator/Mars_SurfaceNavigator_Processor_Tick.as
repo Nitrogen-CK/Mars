@@ -42,7 +42,7 @@ class UMars_Processor_SurfaceNavigator_Tick : UCk_Processor_Script_Base_UE
             return;
         }
 
-        Steer(InState, ToTarget.GetSafeNormal(), Spec.Speed);
+        Steer(InState, ToTarget.GetSafeNormal(), InState.SpeedOverride.IsSet() ? InState.SpeedOverride.GetValue() : Spec.Speed);
 
         auto& Watchdog = InState.Watchdog;
         if ((Location - Watchdog.StuckAnchor).Size2D() > Spec.StuckDistance)

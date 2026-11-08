@@ -45,6 +45,23 @@ mixin EMars_SurfaceNavigator_Status Get_Status(const FCk_Handle_SurfaceNavigator
     return Self.Get_Fragment(FMars_Fragment_SurfaceNavigator).Status;
 }
 
+// The speed the tick steers with: the last SetSpeed, else Spec.Speed.
+mixin float32 Get_Speed(const FCk_Handle_SurfaceNavigator& Self)
+{
+    const auto& State = Self.Get_Fragment(FMars_Fragment_SurfaceNavigator);
+    return State.SpeedOverride.IsSet() ? State.SpeedOverride.GetValue() : Self.Get_Spec().Speed;
+}
+
+mixin int32 Get_FacesApplied(const FCk_Handle_SurfaceNavigator& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_SurfaceNavigator).FacesApplied;
+}
+
+mixin int32 Get_FacesDropped(const FCk_Handle_SurfaceNavigator& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_SurfaceNavigator).FacesDropped;
+}
+
 // None unless Status is Failed.
 mixin EMars_SurfaceNavigator_FailReason Get_FailReason(const FCk_Handle_SurfaceNavigator& Self)
 {
@@ -90,6 +107,18 @@ mixin void Request_Stop(FCk_Handle_SurfaceNavigator& Self, const FMars_Request_S
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_SurfaceNavigator_Requests);
     Requests.MoveToRequests.Empty();
     Requests.StopRequests.Add(InRequest);
+}
+
+mixin void Request_SetSpeed(FCk_Handle_SurfaceNavigator& Self, const FMars_Request_SurfaceNavigator_SetSpeed& InRequest)
+{
+    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_SurfaceNavigator_Requests);
+    Requests.SetSpeedRequests.Add(InRequest);
+}
+
+mixin void Request_Face(FCk_Handle_SurfaceNavigator& Self, const FMars_Request_SurfaceNavigator_Face& InRequest)
+{
+    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_SurfaceNavigator_Requests);
+    Requests.FaceRequests.Add(InRequest);
 }
 
 mixin void Request_MoveTo(FCk_Handle_SurfaceNavigator& Self, const FMars_Request_SurfaceNavigator_MoveTo& InRequest)

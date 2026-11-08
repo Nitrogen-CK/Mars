@@ -18,9 +18,14 @@ class UMars_Processor_SurfaceNavigator_HandleRequests : UCk_Processor_Script_Bas
 
         TArray<FMars_Request_SurfaceNavigator_Stop> StopRequests = InRequests.StopRequests;
         TArray<FMars_Request_SurfaceNavigator_MoveTo> MoveToRequests = InRequests.MoveToRequests;
+        TArray<FMars_Request_SurfaceNavigator_SetSpeed> SetSpeedRequests = InRequests.SetSpeedRequests;
+        TArray<FMars_Request_SurfaceNavigator_Face> FaceRequests = InRequests.FaceRequests;
 
         // InRequests is invalid past this line; removing before broadcasting lets re-entrant requests survive.
         Self.Request_TryRemove(FMars_Fragment_SurfaceNavigator_Requests);
+
+        if (SetSpeedRequests.Num() > 0)
+        { HandleSetSpeed(Self, SetSpeedRequests.Last()); }
 
         // Request_Stop cancelled every MoveTo queued before it, so Stop -> last MoveTo is arrival order.
         if (StopRequests.Num() > 0)
@@ -28,6 +33,41 @@ class UMars_Processor_SurfaceNavigator_HandleRequests : UCk_Processor_Script_Bas
 
         if (MoveToRequests.Num() > 0)
         { HandleMoveTo(Self, MoveToRequests.Last()); }
+
+        // After Stop and MoveTo: a Face queued with a Stop turns the stopped body, one queued with a MoveTo is dropped.
+        if (FaceRequests.Num() > 0)
+        { HandleFace(Self, FaceRequests.Last()); }
+    }
+
+    // A zero-speed steer toward the planar direction: SurfaceMotion turns the body in place. The tick's dedupe state is
+    // the zero steer it would send anyway, so the next MoveTo's first steer still goes out.
+    private void HandleFace(FCk_Handle_SurfaceNavigator& InSelf, FMars_Request_SurfaceNavigator_Face InRequest)
+    {
+        auto& State = InSelf.Get_Fragment(FMars_Fragment_SurfaceNavigator);
+        if (State.Status == EMars_SurfaceNavigator_Status::Moving)
+        {
+            ++State.FacesDropped;
+            return;
+        }
+
+        const auto Direction = InRequest.WorldDirection.GetSafeNormal2D();
+        if (Direction.IsNearlyZero())
+        { return; }
+
+        ++State.FacesApplied;
+        State.Steering.Direction = FVector::ZeroVector;
+        State.Steering.Speed = TOptional<float32>(0.0f);
+        utils_surface_motion::Request_Steering(State.Motion, FCk_Request_SurfaceMotion_Steering(Direction, 0.0f));
+    }
+
+    // A non-finite or non-positive speed is ignored (the speed in use stays). The next steer goes out at the new speed.
+    private void HandleSetSpeed(FCk_Handle_SurfaceNavigator& InSelf, FMars_Request_SurfaceNavigator_SetSpeed InRequest)
+    {
+        if (Math::IsFinite(InRequest.Speed) == false || InRequest.Speed <= 0.0f)
+        { return; }
+
+        auto& State = InSelf.Get_Fragment(FMars_Fragment_SurfaceNavigator);
+        State.SpeedOverride = TOptional<float32>(InRequest.Speed);
     }
 
     private void HandleStop(FCk_Handle_SurfaceNavigator& InSelf)
