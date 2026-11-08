@@ -541,6 +541,24 @@
 			]
 		},
 		{
+			"TypeName": "FCk_Handle_PantryRaid",
+			"ShortName": "PantryRaid",
+			"Description": "A pantry raid encounter: the dens, rats and grounded cheese packs inside its bounds, chef guard snapshots, one theft lease per pack, readiness and emergence",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_PantryRaidHandle",
+			"RequiredFragments": [
+				"Mars_Feature_PantryRaid"
+			]
+		},
+		{
+			"TypeName": "FCk_Handle_PantryRat",
+			"ShortName": "PantryRat",
+			"Description": "A pantry rat: phase ledger, capacity-1 loot pocket, guarded claim transaction, threat and flee routing, lethal hit and original-item release receipts",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_PantryRatHandle",
+			"RequiredFragments": [
+				"Mars_Feature_PantryRat"
+			]
+		},
+		{
 			"TypeName": "FCk_Handle_Pendulum",
 			"ShortName": "Pendulum",
 			"Description": "A swinging hazard: an oscillator whose hazard is armed while it swings",
@@ -583,6 +601,15 @@
 			"SourceAsset": "/Script/AngelscriptAssets.Mars_PlayerViewpointHandle",
 			"RequiredFragments": [
 				"Mars_Feature_PlayerViewpoint"
+			]
+		},
+		{
+			"TypeName": "FCk_Handle_RatDen",
+			"ShortName": "RatDen",
+			"Description": "A rat den: portal frames, resident slots (dormant, pending, outside, dead cooldown) with emergence operation ids, and the eye occupancy proxy",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_RatDenHandle",
+			"RequiredFragments": [
+				"Mars_Feature_RatDen"
 			]
 		},
 		{
