@@ -1,0 +1,27 @@
+// /Project/Looks/PantryRatSurface.ush
+//
+// The pantry rat's body look: one flat colour per material slot (Body, Pink, Belly, Wood, Harness), lit, Masked so
+// the rat can dither out. FadeAlpha arrives on custom primitive data index 14 (the rat's fade slot; 0..13 are the
+// eye plate's): 1 = solid, 0 = gone. Same Masked / FadeAlpha / CPD 14 contract as the BusterBlock crowd fade; the
+// threshold is a white-noise hash per UV cell (CkUsf_Hash21(floor(UV * 512))), because IGN needs pixel coordinates a
+// surface look cannot read (IGN on the continuous UV ramp aliases into line bands).
+// Every rat primitive must seed CPD 14 = 1.0 before its first visible frame (see Mars_PantryRat_Look_Assets.as).
+#pragma once
+#include "/CkUsf/Common.ush"
+
+// Params: Color (Vector), FadeAlpha (Scalar CUSTOM PRIMITIVE DATA, index 14)
+FCkUsf_SurfaceOutput Mars_Look_PantryRatSurface(
+    FCkUsf_SurfaceInput In,
+    float3 Color,
+    float  FadeAlpha)
+{
+    FCkUsf_SurfaceOutput O = CkUsf_DefaultSurface();
+    O.BaseColor = Color;
+    O.Metallic  = 0.0;
+    O.Specular  = 0.25;
+    O.Roughness = 0.85;
+
+    if (FadeAlpha < 1.0) { O.OpacityMask = (CkUsf_Hash21(floor(In.UV * 512.0)) < FadeAlpha) ? 1.0 : 0.0; }
+
+    return O;
+}

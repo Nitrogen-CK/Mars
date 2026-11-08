@@ -1,0 +1,97 @@
+// /Project/Looks/PantryRatEyes.ush
+//
+// The pantry rat's eye patches: the shared eye plate (Mars_Look_EyePlate, unchanged, same positional signature and
+// the same custom primitive data 0..13 the Eyes feature writes) wrapped in a Masked look that applies the rat's fade
+// (FadeAlpha, custom primitive data 14) with the same threshold as PantryRatSurface.ush, so the eyes leave with the body:
+// same Masked / FadeAlpha / CPD 14 contract as the BusterBlock crowd fade, threshold = a white-noise hash per UV cell
+// (CkUsf_Hash21(floor(UV * 512))), because IGN needs pixel coordinates a surface look cannot read.
+// The shared MarsEyePlate master stays Opaque; this is a separate, rat-local master.
+#pragma once
+#include "/Project/Looks/EyePlate.ush"
+
+// Params: the MarsEyePlate block in order (Atlas .. CellPad), then FadeAlpha (Scalar CUSTOM PRIMITIVE DATA, index 14)
+FCkUsf_SurfaceOutput Mars_Look_PantryRatEyePlate(
+    FCkUsf_SurfaceInput In,
+    Texture2D           Atlas,
+    SamplerState        AtlasSampler,
+    float               LeftCell,
+    float               RightCell,
+    float               PrevLeftCell,
+    float               PrevRightCell,
+    float               Blend,
+    float               BlinkLeft,
+    float               BlinkRight,
+    float               Strength,
+    float               LookX,
+    float               LookY,
+    float3              EyeColor,
+    float               AtlasCols,
+    float               AtlasRows,
+    float               EyeScale,
+    float               LookMaxUV,
+    float               MinBlinkScale,
+    float               GlowStrength,
+    float               CellPad,
+    float               FadeAlpha)
+{
+    FCkUsf_SurfaceOutput O = Mars_Look_EyePlate(In, Atlas, AtlasSampler, LeftCell, RightCell, PrevLeftCell,
+        PrevRightCell, Blend, BlinkLeft, BlinkRight, Strength, LookX, LookY, EyeColor, AtlasCols, AtlasRows, EyeScale,
+        LookMaxUV, MinBlinkScale, GlowStrength, CellPad);
+
+    // The patch around the eyes (R02): Mars_Look_EyePlate draws a black void (BaseColor 0, Emissive = the eyes only); the
+    // rat's patch is a near-Body mauve, sRGB #5A3F4D, linear (0.1022, 0.0497, 0.0742) = Mars_PantryRat_PatchColor. The
+    // look is Unlit, so the colour is emissive, under the eyes' own emissive. A constant, not a look parameter: adding a
+    // parameter needs the master regenerated (Ck_Usf_GenerateLooks), which replaces the loaded master in the live editor.
+    // (Phase 7: the R02 rat wears the Lit look below instead; this Unlit one is kept as Phase 5 left it.)
+    const float3 Mars_PantryRat_PatchColor = float3(0.1022, 0.0497, 0.0742);
+    O.EmissiveColor = O.EmissiveColor + Mars_PantryRat_PatchColor * saturate(1.0 - dot(O.EmissiveColor, float3(1.0, 1.0, 1.0)));
+
+    if (FadeAlpha < 1.0) { O.OpacityMask = (CkUsf_Hash21(floor(In.UV * 512.0)) < FadeAlpha) ? 1.0 : 0.0; }
+
+    return O;
+}
+
+// Phase 7: the LIT rat eye plate (look MarsPantryRatEyePlateLit, a separate master). The same plate and fade, but the patch is
+// a lit surface: BaseColor = PatchColor (the near-Body mauve #5A3F4D, lit by the scene like the body), Emissive = the eyes only
+// (Mars_Look_EyePlate's emissive, unchanged), OpacityMask = the rat's hash dither.
+// Params: the MarsEyePlate block in order (Atlas .. CellPad), FadeAlpha (CPD 14), then PatchColor (Vector)
+FCkUsf_SurfaceOutput Mars_Look_PantryRatEyePlateLit(
+    FCkUsf_SurfaceInput In,
+    Texture2D           Atlas,
+    SamplerState        AtlasSampler,
+    float               LeftCell,
+    float               RightCell,
+    float               PrevLeftCell,
+    float               PrevRightCell,
+    float               Blend,
+    float               BlinkLeft,
+    float               BlinkRight,
+    float               Strength,
+    float               LookX,
+    float               LookY,
+    float3              EyeColor,
+    float               AtlasCols,
+    float               AtlasRows,
+    float               EyeScale,
+    float               LookMaxUV,
+    float               MinBlinkScale,
+    float               GlowStrength,
+    float               CellPad,
+    float               FadeAlpha,
+    float3              PatchColor)
+{
+    const FCkUsf_SurfaceOutput Eyes = Mars_Look_EyePlate(In, Atlas, AtlasSampler, LeftCell, RightCell, PrevLeftCell,
+        PrevRightCell, Blend, BlinkLeft, BlinkRight, Strength, LookX, LookY, EyeColor, AtlasCols, AtlasRows, EyeScale,
+        LookMaxUV, MinBlinkScale, GlowStrength, CellPad);
+
+    FCkUsf_SurfaceOutput O = CkUsf_DefaultSurface();
+    O.BaseColor     = PatchColor;
+    O.Metallic      = 0.0;
+    O.Specular      = 0.25;
+    O.Roughness     = 0.85;
+    O.EmissiveColor = Eyes.EmissiveColor;
+
+    if (FadeAlpha < 1.0) { O.OpacityMask = (CkUsf_Hash21(floor(In.UV * 512.0)) < FadeAlpha) ? 1.0 : 0.0; }
+
+    return O;
+}
