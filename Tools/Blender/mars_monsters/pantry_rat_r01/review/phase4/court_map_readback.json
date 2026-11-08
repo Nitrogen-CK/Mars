@@ -1,0 +1,203 @@
+{
+ "level": "/Game/ArtCandidates/PantryRat/R01/Review/PantryRat_R01_Court_MAP",
+ "game_mode": "Mars_Gameplay_GameMode",
+ "count": 14,
+ "actors": [
+  {
+   "label": "PantryRatCourt_Cam_Follow",
+   "class": "CameraActor",
+   "location": [
+    0.0,
+    -400.0,
+    250.0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "label": "PantryRatCourt_Cam_Overview",
+   "class": "CameraActor",
+   "location": [
+    0.0,
+    -1250.0,
+    1500.0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "label": "PantryRatCourt_CrateNorth",
+   "class": "StaticMeshActor",
+   "location": [
+    0.0,
+    330.0,
+    50.0
+   ],
+   "scale": [
+    2.0,
+    1.4,
+    1.0
+   ]
+  },
+  {
+   "label": "PantryRatCourt_CrateSouth",
+   "class": "StaticMeshActor",
+   "location": [
+    0.0,
+    -330.0,
+    50.0
+   ],
+   "scale": [
+    2.0,
+    1.4,
+    1.0
+   ]
+  },
+  {
+   "label": "PantryRatCourt_Director",
+   "class": "Ck_EntitySpawner_UE",
+   "location": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "label": "PantryRatCourt_Exposure",
+   "class": "PostProcessVolume",
+   "location": [
+    0.0,
+    0.0,
+    300.0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "label": "PantryRatCourt_Floor",
+   "class": "StaticMeshActor",
+   "location": [
+    0.0,
+    0.0,
+    -10.0
+   ],
+   "scale": [
+    25.8,
+    19.8,
+    0.2
+   ]
+  },
+  {
+   "label": "PantryRatCourt_PlayerStart",
+   "class": "PlayerStart",
+   "location": [
+    900.0,
+    -550.0,
+    100.0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "label": "PantryRatCourt_Sky",
+   "class": "SkyLight",
+   "location": [
+    0.0,
+    0.0,
+    300.0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "label": "PantryRatCourt_Sun",
+   "class": "DirectionalLight",
+   "location": [
+    0.0,
+    0.0,
+    500.0
+   ],
+   "scale": [
+    2.5,
+    2.5,
+    2.5
+   ]
+  },
+  {
+   "label": "PantryRatCourt_WallEast",
+   "class": "StaticMeshActor",
+   "location": [
+    1070.0,
+    0.0,
+    60.0
+   ],
+   "scale": [
+    0.4,
+    15.8,
+    1.2
+   ]
+  },
+  {
+   "label": "PantryRatCourt_WallNorth",
+   "class": "StaticMeshActor",
+   "location": [
+    0.0,
+    770.0,
+    60.0
+   ],
+   "scale": [
+    21.8,
+    0.4,
+    1.2
+   ]
+  },
+  {
+   "label": "PantryRatCourt_WallSouth",
+   "class": "StaticMeshActor",
+   "location": [
+    0.0,
+    -770.0,
+    60.0
+   ],
+   "scale": [
+    21.8,
+    0.4,
+    1.2
+   ]
+  },
+  {
+   "label": "PantryRatCourt_WallWest",
+   "class": "StaticMeshActor",
+   "location": [
+    -1070.0,
+    0.0,
+    60.0
+   ],
+   "scale": [
+    0.4,
+    15.8,
+    1.2
+   ]
+  }
+ ]
+}

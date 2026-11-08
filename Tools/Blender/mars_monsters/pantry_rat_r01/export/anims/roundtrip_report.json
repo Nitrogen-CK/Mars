@@ -1,0 +1,841 @@
+{
+ "cube": {
+  "bounds_min": [
+   -5.0,
+   -5.0,
+   -5.0
+  ],
+  "bounds_max": [
+   5.0,
+   5.0,
+   5.0
+  ]
+ },
+ "bind": {
+  "objects": [
+   [
+    "Armature",
+    "ARMATURE"
+   ],
+   [
+    "PantryRat_R01_Body",
+    "MESH"
+   ]
+  ],
+  "armature_scale": [
+   1.0,
+   1.0,
+   1.0
+  ],
+  "bone_count": 26,
+  "bone_mismatch": [],
+  "max_bind_head_err_cm": 5e-05,
+  "tris": 2086,
+  "slots": [
+   "Body",
+   "Pink",
+   "Belly",
+   "Wood",
+   "Harness",
+   "EyePatch"
+  ],
+  "bounds": {
+   "min": [
+    -41.895,
+    -16.301,
+    -0.0
+   ],
+   "max": [
+    23.1,
+    16.301,
+    46.838
+   ]
+  },
+  "bounds_err_cm": 0.00047,
+  "max_influences": 2,
+  "bad_weights": 0,
+  "sockets": {
+   "Carry_Mouth": {
+    "rebuilt_ue_cm": [
+     19.8,
+     -0.0,
+     20.6
+    ],
+    "err_cm": 3e-05
+   },
+   "Carry_Drag": {
+    "rebuilt_ue_cm": [
+     24.546,
+     0.0,
+     -5.9059
+    ],
+    "err_cm": 7e-05
+   }
+  },
+  "imported_jaw_axis_y_ue": [
+   0.97342,
+   0.0,
+   -0.22904
+  ]
+ },
+ "clips": {
+  "IdleBreath": {
+   "file": "PantryRat_R01_IdleBreath_Mars_ANIM.fbx",
+   "actions": [
+    "Armature|Scene"
+   ],
+   "bones": 26,
+   "bone_mismatch": [],
+   "keyed": [
+    0,
+    60,
+    61
+   ],
+   "landmark_err_cm_at": {
+    "0": 5e-05,
+    "30": 7e-05,
+    "60": 5e-05
+   },
+   "landmark_max_err_cm": 7e-05,
+   "root_max_dev": 0.0,
+   "loop_seam_cm": 0.0
+  },
+  "SniffGround": {
+   "file": "PantryRat_R01_SniffGround_Mars_ANIM.fbx",
+   "actions": [
+    "Armature|Scene"
+   ],
+   "bones": 26,
+   "bone_mismatch": [],
+   "keyed": [
+    0,
+    36,
+    37
+   ],
+   "landmark_err_cm_at": {
+    "0": 6e-05,
+    "18": 5e-05,
+    "36": 6e-05
+   },
+   "landmark_max_err_cm": 6e-05,
+   "root_max_dev": 0.0,
+   "loop_seam_cm": 0.0
+  },
+  "SniffAir": {
+   "file": "PantryRat_R01_SniffAir_Mars_ANIM.fbx",
+   "actions": [
+    "Armature|Scene"
+   ],
+   "bones": 26,
+   "bone_mismatch": [],
+   "keyed": [
+    0,
+    30,
+    31
+   ],
+   "landmark_err_cm_at": {
+    "0": 5e-05,
+    "15": 6e-05,
+    "30": 5e-05
+   },
+   "landmark_max_err_cm": 6e-05,
+   "root_max_dev": 0.0,
+   "loop_seam_cm": 0.0
+  },
+  "StretchAttend": {
+   "file": "PantryRat_R01_StretchAttend_Mars_ANIM.fbx",
+   "actions": [
+    "Armature|Scene"
+   ],
+   "bones": 26,
+   "bone_mismatch": [],
+   "keyed": [
+    0,
+    30,
+    31
+   ],
+   "landmark_err_cm_at": {
+    "0": 5e-05,
+    "15": 0.0001,
+    "30": 5e-05
+   },
+   "landmark_max_err_cm": 0.0001,
+   "root_max_dev": 0.0
+  },
+  "RearUp": {
+   "file": "PantryRat_R01_RearUp_Mars_ANIM.fbx",
+   "actions": [
+    "Armature|Scene"
+   ],
+   "bones": 26,
+   "bone_mismatch": [],
+   "keyed": [
+    0,
+    8,
+    9
+   ],
+   "landmark_err_cm_at": {
+    "0": 5e-05,
+    "4": 0.00021,
+    "8": 0.00032
+   },
+   "landmark_max_err_cm": 0.00032,
+   "root_max_dev": 0.0
+  },
+  "RearObserve": {
+   "file": "PantryRat_R01_RearObserve_Mars_ANIM.fbx",
+   "actions": [
+    "Armature|Scene"
+   ],
+   "bones": 26,
+   "bone_mismatch": [],
+   "keyed": [
+    0,
+    36,
+    37
+   ],
+   "landmark_err_cm_at": {
+    "0": 0.00032,
+    "18": 0.00032,
+    "36": 0.00032
+   },
+   "landmark_max_err_cm": 0.00032,
+   "root_max_dev": 0.0,
+   "loop_seam_cm": 0.0
+  },
+  "RearDown": {
+   "file": "PantryRat_R01_RearDown_Mars_ANIM.fbx",
+   "actions": [
+    "Armature|Scene"
+   ],
+   "bones": 26,
+   "bone_mismatch": [],
+   "keyed": [
+    0,
+    8,
+    9
+   ],
+   "landmark_err_cm_at": {
+    "0": 0.00032,
+    "4": 0.00021,
+    "8": 5e-05
+   },
+   "landmark_max_err_cm": 0.00032,
+   "root_max_dev": 0.0
+  },
+  "BoundStart": {
+   "file": "PantryRat_R01_BoundStart_Mars_ANIM.fbx",
+   "actions": [
+    "Armature|Scene"
+   ],
+   "bones": 26,
+   "bone_mismatch": [],
+   "keyed": [
+    0,
+    5,
+    6
+   ],
+   "landmark_err_cm_at": {
+    "0": 5e-05,
+    "2": 6e-05,
+    "5": 6e-05
+   },
+   "landmark_max_err_cm": 6e-05,
+   "root_max_dev": 0.0
+  },
+  "BoundCycle": {
+   "file": "PantryRat_R01_BoundCycle_Mars_ANIM.fbx",
+   "actions": [
+    "Armature|Scene"
+   ],
+   "bones": 26,
+   "bone_mismatch": [],
+   "keyed": [
+    0,
+    12,
+    13
+   ],
+   "landmark_err_cm_at": {
+    "0": 6e-05,
+    "6": 7e-05,
+    "12": 6e-05
+   },
+   "landmark_max_err_cm": 7e-05,
+   "root_max_dev": 0.0,
+   "loop_seam_cm": 0.0
+  },
+  "BoundStop": {
+   "file": "PantryRat_R01_BoundStop_Mars_ANIM.fbx",
+   "actions": [
+    "Armature|Scene"
+   ],
+   "bones": 26,
+   "bone_mismatch": [],
+   "keyed": [
+    0,
+    5,
+    6
+   ],
+   "landmark_err_cm_at": {
+    "0": 6e-05,
+    "2": 7e-05,
+    "5": 5e-05
+   },
+   "landmark_max_err_cm": 7e-05,
+   "root_max_dev": 0.0
+  },
+  "TurnLeft90": {
+   "file": "PantryRat_R01_TurnLeft90_Mars_ANIM.fbx",
+   "actions": [
+    "Armature|Scene"
+   ],
+   "bones": 26,
+   "bone_mismatch": [],
+   "keyed": [
+    0,
+    9,
+    10
+   ],
+   "landmark_err_cm_at": {
+    "0": 5e-05,
+    "4": 7e-05,
+    "9": 5e-05
+   },
+   "landmark_max_err_cm": 7e-05,
+   "root_max_dev": 0.0
+  },
+  "TurnRight90": {
+   "file": "PantryRat_R01_TurnRight90_Mars_ANIM.fbx",
+   "actions": [
+    "Armature|Scene"
+   ],
+   "bones": 26,
+   "bone_mismatch": [],
+   "keyed": [
+    0,
+    9,
+    10
+   ],
+   "landmark_err_cm_at": {
+    "0": 5e-05,
+    "4": 6e-05,
+    "9": 5e-05
+   },
+   "landmark_max_err_cm": 6e-05,
+   "root_max_dev": 0.0
+  },
+  "Turn180": {
+   "file": "PantryRat_R01_Turn180_Mars_ANIM.fbx",
+   "actions": [
+    "Armature|Scene"
+   ],
+   "bones": 26,
+   "bone_mismatch": [],
+   "keyed": [
+    0,
+    14,
+    15
+   ],
+   "landmark_err_cm_at": {
+    "0": 5e-05,
+    "7": 6e-05,
+    "14": 5e-05
+   },
+   "landmark_max_err_cm": 6e-05,
+   "root_max_dev": 0.0
+  },
+  "Startle": {
+   "file": "PantryRat_R01_Startle_Mars_ANIM.fbx",
+   "actions": [
+    "Armature|Scene"
+   ],
+   "bones": 26,
+   "bone_mismatch": [],
+   "keyed": [
+    0,
+    9,
+    10
+   ],
+   "landmark_err_cm_at": {
+    "0": 5e-05,
+    "4": 0.00012,
+    "9": 0.00011
+   },
+   "landmark_max_err_cm": 0.00012,
+   "root_max_dev": 0.0
+  },
+  "Backstep": {
+   "file": "PantryRat_R01_Backstep_Mars_ANIM.fbx",
+   "actions": [
+    "Armature|Scene"
+   ],
+   "bones": 26,
+   "bone_mismatch": [],
+   "keyed": [
+    0,
+    11,
+    12
+   ],
+   "landmark_err_cm_at": {
+    "0": 5e-05,
+    "5": 7e-05,
+    "11": 5e-05
+   },
+   "landmark_max_err_cm": 7e-05,
+   "root_max_dev": 0.0
+  },
+  "GuardedWatch": {
+   "file": "PantryRat_R01_GuardedWatch_Mars_ANIM.fbx",
+   "actions": [
+    "Armature|Scene"
+   ],
+   "bones": 26,
+   "bone_mismatch": [],
+   "keyed": [
+    0,
+    45,
+    46
+   ],
+   "landmark_err_cm_at": {
+    "0": 7e-05,
+    "22": 7e-05,
+    "45": 7e-05
+   },
+   "landmark_max_err_cm": 7e-05,
+   "root_max_dev": 0.0,
+   "loop_seam_cm": 0.0
+  },
+  "DenEmerge": {
+   "file": "PantryRat_R01_DenEmerge_Mars_ANIM.fbx",
+   "actions": [
+    "Armature|Scene"
+   ],
+   "bones": 26,
+   "bone_mismatch": [],
+   "keyed": [
+    0,
+    30,
+    31
+   ],
+   "landmark_err_cm_at": {
+    "0": 6e-05,
+    "15": 6e-05,
+    "30": 5e-05
+   },
+   "landmark_max_err_cm": 6e-05,
+   "root_max_dev": 0.0
+  },
+  "DenEnter": {
+   "file": "PantryRat_R01_DenEnter_Mars_ANIM.fbx",
+   "actions": [
+    "Armature|Scene"
+   ],
+   "bones": 26,
+   "bone_mismatch": [],
+   "keyed": [
+    0,
+    30,
+    31
+   ],
+   "landmark_err_cm_at": {
+    "0": 5e-05,
+    "15": 8e-05,
+    "30": 6e-05
+   },
+   "landmark_max_err_cm": 8e-05,
+   "root_max_dev": 0.0
+  },
+  "InspectSlot": {
+   "file": "PantryRat_R01_InspectSlot_Mars_ANIM.fbx",
+   "actions": [
+    "Armature|Scene"
+   ],
+   "bones": 26,
+   "bone_mismatch": [],
+   "keyed": [
+    0,
+    12,
+    13
+   ],
+   "landmark_err_cm_at": {
+    "0": 5e-05,
+    "6": 6e-05,
+    "12": 4e-05
+   },
+   "landmark_max_err_cm": 6e-05,
+   "root_max_dev": 0.0
+  },
+  "Rummage": {
+   "file": "PantryRat_R01_Rummage_Mars_ANIM.fbx",
+   "actions": [
+    "Armature|Scene"
+   ],
+   "bones": 26,
+   "bone_mismatch": [],
+   "keyed": [
+    0,
+    48,
+    49
+   ],
+   "landmark_err_cm_at": {
+    "0": 0.0002,
+    "24": 0.0002,
+    "48": 0.0002
+   },
+   "landmark_max_err_cm": 0.0002,
+   "root_max_dev": 0.0,
+   "loop_seam_cm": 0.0
+  },
+  "Snatch": {
+   "file": "PantryRat_R01_Snatch_Mars_ANIM.fbx",
+   "actions": [
+    "Armature|Scene"
+   ],
+   "bones": 26,
+   "bone_mismatch": [],
+   "keyed": [
+    0,
+    8,
+    9
+   ],
+   "landmark_err_cm_at": {
+    "0": 0.0002,
+    "4": 0.00016,
+    "8": 5e-05
+   },
+   "landmark_max_err_cm": 0.0002,
+   "root_max_dev": 0.0
+  },
+  "LoadedIdle": {
+   "file": "PantryRat_R01_LoadedIdle_Mars_ANIM.fbx",
+   "actions": [
+    "Armature|Scene"
+   ],
+   "bones": 26,
+   "bone_mismatch": [],
+   "keyed": [
+    0,
+    36,
+    37
+   ],
+   "landmark_err_cm_at": {
+    "0": 5e-05,
+    "18": 6e-05,
+    "36": 5e-05
+   },
+   "landmark_max_err_cm": 6e-05,
+   "root_max_dev": 0.0,
+   "loop_seam_cm": 0.0
+  },
+  "LoadedBound": {
+   "file": "PantryRat_R01_LoadedBound_Mars_ANIM.fbx",
+   "actions": [
+    "Armature|Scene"
+   ],
+   "bones": 26,
+   "bone_mismatch": [],
+   "keyed": [
+    0,
+    14,
+    15
+   ],
+   "landmark_err_cm_at": {
+    "0": 7e-05,
+    "7": 7e-05,
+    "14": 7e-05
+   },
+   "landmark_max_err_cm": 7e-05,
+   "root_max_dev": 0.0,
+   "loop_seam_cm": 0.0
+  },
+  "LoadedTurnLeft": {
+   "file": "PantryRat_R01_LoadedTurnLeft_Mars_ANIM.fbx",
+   "actions": [
+    "Armature|Scene"
+   ],
+   "bones": 26,
+   "bone_mismatch": [],
+   "keyed": [
+    0,
+    11,
+    12
+   ],
+   "landmark_err_cm_at": {
+    "0": 5e-05,
+    "5": 6e-05,
+    "11": 5e-05
+   },
+   "landmark_max_err_cm": 6e-05,
+   "root_max_dev": 0.0
+  },
+  "LoadedTurnRight": {
+   "file": "PantryRat_R01_LoadedTurnRight_Mars_ANIM.fbx",
+   "actions": [
+    "Armature|Scene"
+   ],
+   "bones": 26,
+   "bone_mismatch": [],
+   "keyed": [
+    0,
+    11,
+    12
+   ],
+   "landmark_err_cm_at": {
+    "0": 5e-05,
+    "5": 7e-05,
+    "11": 5e-05
+   },
+   "landmark_max_err_cm": 7e-05,
+   "root_max_dev": 0.0
+  },
+  "LoadedLookBack": {
+   "file": "PantryRat_R01_LoadedLookBack_Mars_ANIM.fbx",
+   "actions": [
+    "Armature|Scene"
+   ],
+   "bones": 26,
+   "bone_mismatch": [],
+   "keyed": [
+    0,
+    15,
+    16
+   ],
+   "landmark_err_cm_at": {
+    "0": 4e-05,
+    "7": 7e-05,
+    "15": 4e-05
+   },
+   "landmark_max_err_cm": 7e-05,
+   "root_max_dev": 0.0
+  },
+  "LoadedCornered": {
+   "file": "PantryRat_R01_LoadedCornered_Mars_ANIM.fbx",
+   "actions": [
+    "Armature|Scene"
+   ],
+   "bones": 26,
+   "bone_mismatch": [],
+   "keyed": [
+    0,
+    24,
+    25
+   ],
+   "landmark_err_cm_at": {
+    "0": 7e-05,
+    "12": 7e-05,
+    "24": 7e-05
+   },
+   "landmark_max_err_cm": 7e-05,
+   "root_max_dev": 0.0,
+   "loop_seam_cm": 0.0
+  },
+  "HitReact": {
+   "file": "PantryRat_R01_HitReact_Mars_ANIM.fbx",
+   "actions": [
+    "Armature|Scene"
+   ],
+   "bones": 26,
+   "bone_mismatch": [],
+   "keyed": [
+    0,
+    4,
+    5
+   ],
+   "landmark_err_cm_at": {
+    "0": 5e-05,
+    "2": 0.00011,
+    "4": 0.00011
+   },
+   "landmark_max_err_cm": 0.00011,
+   "root_max_dev": 0.0
+  },
+  "MouthRelease": {
+   "file": "PantryRat_R01_MouthRelease_Mars_ANIM.fbx",
+   "actions": [
+    "Armature|Scene"
+   ],
+   "bones": 26,
+   "bone_mismatch": [],
+   "keyed": [
+    0,
+    6,
+    7
+   ],
+   "landmark_err_cm_at": {
+    "0": 5e-05,
+    "3": 6e-05,
+    "6": 5e-05
+   },
+   "landmark_max_err_cm": 6e-05,
+   "root_max_dev": 0.0
+  },
+  "DeathToppleLeft": {
+   "file": "PantryRat_R01_DeathToppleLeft_Mars_ANIM.fbx",
+   "actions": [
+    "Armature|Scene"
+   ],
+   "bones": 26,
+   "bone_mismatch": [],
+   "keyed": [
+    0,
+    24,
+    25
+   ],
+   "landmark_err_cm_at": {
+    "0": 5e-05,
+    "12": 0.00017,
+    "24": 0.00015
+   },
+   "landmark_max_err_cm": 0.00017,
+   "root_max_dev": 0.0
+  },
+  "DeathToppleRight": {
+   "file": "PantryRat_R01_DeathToppleRight_Mars_ANIM.fbx",
+   "actions": [
+    "Armature|Scene"
+   ],
+   "bones": 26,
+   "bone_mismatch": [],
+   "keyed": [
+    0,
+    24,
+    25
+   ],
+   "landmark_err_cm_at": {
+    "0": 5e-05,
+    "12": 0.00015,
+    "24": 0.00021
+   },
+   "landmark_max_err_cm": 0.00021,
+   "root_max_dev": 0.0
+  },
+  "DeadHold": {
+   "file": "PantryRat_R01_DeadHold_Mars_ANIM.fbx",
+   "actions": [
+    "Armature|Scene"
+   ],
+   "bones": 26,
+   "bone_mismatch": [],
+   "keyed": [
+    0,
+    30,
+    31
+   ],
+   "landmark_err_cm_at": {
+    "0": 9e-05,
+    "15": 9e-05,
+    "30": 9e-05
+   },
+   "landmark_max_err_cm": 9e-05,
+   "root_max_dev": 0.0,
+   "loop_seam_cm": 0.0
+  },
+  "EarFlick": {
+   "file": "PantryRat_R01_EarFlick_Mars_ANIM.fbx",
+   "actions": [
+    "Armature|Scene"
+   ],
+   "bones": 26,
+   "bone_mismatch": [],
+   "keyed": [
+    0,
+    12,
+    13
+   ],
+   "landmark_err_cm_at": {
+    "0": 5e-05,
+    "6": 5e-05,
+    "12": 5e-05
+   },
+   "landmark_max_err_cm": 5e-05,
+   "root_max_dev": 0.0
+  },
+  "TailSettle": {
+   "file": "PantryRat_R01_TailSettle_Mars_ANIM.fbx",
+   "actions": [
+    "Armature|Scene"
+   ],
+   "bones": 26,
+   "bone_mismatch": [],
+   "keyed": [
+    0,
+    24,
+    25
+   ],
+   "landmark_err_cm_at": {
+    "0": 5e-05,
+    "12": 7e-05,
+    "24": 5e-05
+   },
+   "landmark_max_err_cm": 7e-05,
+   "root_max_dev": 0.0
+  }
+ },
+ "den": {
+  "objects": [
+   "PantryRat_R01_Den_Mars_SM"
+  ],
+  "tris": 330,
+  "slots": [
+   "Stone",
+   "Void"
+  ],
+  "bounds_err_cm": 0.00014,
+  "scale": [
+   1.0,
+   1.0,
+   1.0
+  ]
+ },
+ "den_eye_plate": {
+  "objects": [
+   "PantryRat_R01_DenEyePlate_Mars_SM"
+  ],
+  "tris": 2,
+  "slots": [
+   "EyePatch"
+  ],
+  "bounds_err_cm": 0.0,
+  "scale": [
+   1.0,
+   1.0,
+   1.0
+  ],
+  "uv_min": [
+   0.0,
+   0.0
+  ],
+  "uv_max": [
+   1.0,
+   1.0
+  ],
+  "normal_ue": [
+   1.0,
+   -0.0,
+   0.0
+  ],
+  "u_by_ue_y": {
+   "-10.0": 0.0,
+   "10.0": 1.0
+  }
+ },
+ "cheese": {
+  "objects": [
+   "PantryRat_R01_Cheese_Mars_SM"
+  ],
+  "tris": 56,
+  "slots": [
+   "Rind",
+   "Flesh"
+  ],
+  "bounds_err_cm": 0.0,
+  "scale": [
+   1.0,
+   1.0,
+   1.0
+  ]
+ },
+ "clip_count": 34,
+ "fails": [],
+ "tolerance_cm": 0.1
+}

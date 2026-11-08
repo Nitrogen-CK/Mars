@@ -1,0 +1,27 @@
+{
+ "faces_reprojected": 1990,
+ "eyepatch_faces_kept": 18,
+ "eyepatch_uv_unchanged": true,
+ "cm_per_uv": 24.0,
+ "ign_cells_per_cm": 21.333,
+ "uv_range_after": [
+  [
+   -1.545,
+   0.0
+  ],
+  [
+   1.668,
+   2.542
+  ]
+ ],
+ "uv_range_before": [
+  [
+   0.0,
+   0.0
+  ],
+  [
+   1.0,
+   1.0
+  ]
+ ]
+}

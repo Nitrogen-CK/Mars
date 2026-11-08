@@ -1,0 +1,65 @@
+00:01.781  blend            | Read blend: "D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r01\source\PantryRat_R01.blend"
+CLIP IdleBreath        n= 60 loop=True seam={'pose_max': 0.0, 'seam_second_diff': 0.002849, 'interior_max_second_diff': 0.003681} bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.15, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=1.0s
+CLIP SniffGround       n= 36 loop=True seam={'pose_max': 0.0, 'seam_second_diff': 0.003868, 'interior_max_second_diff': 0.025} bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.15, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=0.7s
+KEYFIX SniffAir f0 {"spoon_lift_cm": 0.3, "spoon_slide_deg": -3.0, "spoon_pitch_deg": 0.0, "before": ["spoon-torso", "head-spoon"]}
+KEYFIX SniffAir f8 {"spoon_lift_cm": 0.6, "spoon_slide_deg": -3.0, "spoon_pitch_deg": 0.0, "before": ["spoon-torso", "head-spoon"]}
+KEYFIX SniffAir f15 {"spoon_lift_cm": 0.6, "spoon_slide_deg": -3.0, "spoon_pitch_deg": 3.0, "before": ["spoon-torso", "head-spoon"]}
+KEYFIX SniffAir f22 {"spoon_lift_cm": 0.6, "spoon_slide_deg": -3.0, "spoon_pitch_deg": 0.0, "before": ["spoon-torso", "head-spoon"]}
+CLIP SniffAir          n= 30 loop=True seam={'pose_max': 0.0, 'seam_second_diff': 0.02138, 'interior_max_second_diff': 0.017946} bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.15, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=2.0s
+KEYFIX StretchAttend f5 {"spoon_lift_cm": 1.0, "spoon_slide_deg": 0.0, "spoon_pitch_deg": -3.0, "before": ["spoon-torso"]}
+KEYFIX StretchAttend f24 {"spoon_lift_cm": 1.0, "spoon_slide_deg": 0.0, "spoon_pitch_deg": -3.0, "before": ["spoon-torso"]}
+CLIP StretchAttend     n= 30 loop=False seam=None bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.158, "below_floor": 0, "head_spoon_tris": 0} drift=1.213 t=1.8s
+CLIP RearUp            n=  8 loop=False seam=None bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.15, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=0.2s
+CLIP RearObserve       n= 36 loop=True seam={'pose_max': 0.0, 'seam_second_diff': 0.003472, 'interior_max_second_diff': 0.004632} bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.15, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=0.6s
+CLIP RearDown          n=  8 loop=False seam=None bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.15, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=0.2s
+CLIP BoundStart        n=  5 loop=False seam=None bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.15, "below_floor": 0, "head_spoon_tris": 0} drift=3.000 t=0.1s
+CLIP BoundCycle        n= 12 loop=True seam={'pose_max': 0.0, 'seam_second_diff': 0.932222, 'interior_max_second_diff': 4.63} bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.15, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=0.3s
+CLIP BoundStop         n=  5 loop=False seam=None bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.15, "below_floor": 0, "head_spoon_tris": 0} drift=3.267 t=0.1s
+KEYFIX TurnLeft90 f3 {"unresolved": true, "before": ["harness-torso"]}
+KEYFIX TurnLeft90 f6 {"unresolved": true, "before": ["harness-torso"]}
+CLIP TurnLeft90        n=  9 loop=False seam=None bad=3 worst={"spoon_torso_tris": 0, "harness_clear": -0.256, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=8.5s
+KEYFIX TurnRight90 f3 {"unresolved": true, "before": ["harness-torso", "head-spoon"]}
+KEYFIX TurnRight90 f6 {"spoon_lift_cm": 0.3, "spoon_slide_deg": 0.0, "spoon_pitch_deg": 0.0, "before": ["head-spoon"]}
+CLIP TurnRight90       n=  9 loop=False seam=None bad=4 worst={"spoon_torso_tris": 0, "harness_clear": -0.286, "below_floor": 0, "head_spoon_tris": 6} drift=0.000 t=4.3s
+KEYFIX Turn180 f5 {"unresolved": true, "before": ["harness-torso"]}
+KEYFIX Turn180 f9 {"unresolved": true, "before": ["harness-torso"]}
+CLIP Turn180           n= 14 loop=False seam=None bad=9 worst={"spoon_torso_tris": 0, "harness_clear": -0.409, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=8.6s
+CLIP Startle           n=  9 loop=False seam=None bad=4 worst={"spoon_torso_tris": 0, "harness_clear": -0.15, "below_floor": 6, "head_spoon_tris": 0} drift=0.000 t=0.2s
+CLIP Backstep          n= 11 loop=False seam=None bad=2 worst={"spoon_torso_tris": 0, "harness_clear": -0.15, "below_floor": 0, "head_spoon_tris": 10} drift=0.000 t=0.3s
+KEYFIX GuardedWatch f15 {"spoon_lift_cm": 0.0, "spoon_slide_deg": -3.0, "spoon_pitch_deg": 0.0, "before": ["head-spoon"]}
+CLIP GuardedWatch      n= 45 loop=True seam={'pose_max': 0.0, 'seam_second_diff': 0.007038, 'interior_max_second_diff': 0.014076} bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.15, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=0.8s
+CLIP DenEmerge         n= 30 loop=False seam=None bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.162, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=0.5s
+CLIP DenEnter          n= 30 loop=False seam=None bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.162, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=0.5s
+KEYFIX InspectSlot f5 {"spoon_lift_cm": 0.3, "spoon_slide_deg": -3.0, "spoon_pitch_deg": 0.0, "before": ["head-spoon"]}
+KEYFIX InspectSlot f8 {"spoon_lift_cm": 0.3, "spoon_slide_deg": 0.0, "spoon_pitch_deg": 0.0, "before": ["head-spoon"]}
+KEYFIX InspectSlot f12 {"spoon_lift_cm": 0.3, "spoon_slide_deg": -3.0, "spoon_pitch_deg": 0.0, "before": ["head-spoon"]}
+CLIP InspectSlot       n= 12 loop=False seam=None bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.15, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=0.5s
+CLIP Rummage           n= 48 loop=True seam={'pose_max': 0.0, 'seam_second_diff': 0.005923, 'interior_max_second_diff': 0.007104} bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.15, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=0.8s
+CLIP Snatch            n=  8 loop=False seam=None bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.15, "below_floor": 0, "head_spoon_tris": 0} drift=0.551 t=0.2s
+CLIP LoadedIdle        n= 36 loop=True seam={'pose_max': 0.0, 'seam_second_diff': 0.004948, 'interior_max_second_diff': 0.009896} bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.15, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=0.6s
+CLIP LoadedBound       n= 14 loop=True seam={'pose_max': 0.0, 'seam_second_diff': 0.764583, 'interior_max_second_diff': 3.416667} bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.15, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=0.3s
+KEYFIX LoadedTurnLeft f0 {"spoon_lift_cm": 0.0, "spoon_slide_deg": -3.0, "spoon_pitch_deg": 0.0, "before": ["head-spoon"]}
+KEYFIX LoadedTurnLeft f4 {"unresolved": true, "before": ["harness-torso", "head-spoon"]}
+KEYFIX LoadedTurnLeft f7 {"unresolved": true, "before": ["harness-torso", "head-spoon"]}
+KEYFIX LoadedTurnLeft f11 {"spoon_lift_cm": 0.0, "spoon_slide_deg": -3.0, "spoon_pitch_deg": 0.0, "before": ["head-spoon"]}
+CLIP LoadedTurnLeft    n= 11 loop=False seam=None bad=4 worst={"spoon_torso_tris": 0, "harness_clear": -0.256, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=8.9s
+KEYFIX LoadedTurnRight f0 {"spoon_lift_cm": 0.0, "spoon_slide_deg": -3.0, "spoon_pitch_deg": 0.0, "before": ["head-spoon"]}
+KEYFIX LoadedTurnRight f4 {"unresolved": true, "before": ["harness-torso"]}
+KEYFIX LoadedTurnRight f7 {"spoon_lift_cm": 0.3, "spoon_slide_deg": 0.0, "spoon_pitch_deg": 0.0, "before": ["head-spoon"]}
+KEYFIX LoadedTurnRight f11 {"spoon_lift_cm": 0.0, "spoon_slide_deg": -3.0, "spoon_pitch_deg": 0.0, "before": ["head-spoon"]}
+CLIP LoadedTurnRight   n= 11 loop=False seam=None bad=4 worst={"spoon_torso_tris": 0, "harness_clear": -0.286, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=4.9s
+CLIP LoadedLookBack    n= 15 loop=False seam=None bad=3 worst={"spoon_torso_tris": 0, "harness_clear": -0.15, "below_floor": 0, "head_spoon_tris": 26} drift=0.000 t=0.3s
+CLIP LoadedCornered    n= 24 loop=True seam={'pose_max': 0.0, 'seam_second_diff': 0.013509, 'interior_max_second_diff': 0.016211} bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.15, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=0.5s
+CLIP HitReact          n=  4 loop=False seam=None bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.15, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=0.1sBlender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+
+CLIP MouthRelease      n=  6 loop=False seam=None bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.15, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=0.2s
+KEYFIX DeathToppleLeft f11 {"spoon_lift_cm": 0.0, "spoon_slide_deg": -10.0, "spoon_pitch_deg": 0.0, "before": ["head-spoon", "below-floor"]}
+KEYFIX DeathToppleLeft f15 {"unresolved": true, "before": ["head-spoon", "below-floor"]}
+KEYFIX DeathToppleLeft f19 {"spoon_lift_cm": 0.3, "spoon_slide_deg": -10.0, "spoon_pitch_deg": 3.0, "before": ["head-spoon"]}
+CLIP DeathToppleLeft   n= 24 loop=False seam=None bad=14 worst={"spoon_torso_tris": 6, "harness_clear": -0.15, "below_floor": 27, "head_spoon_tris": 16} drift=0.000 t=7.0s
+CLIP DeathToppleRight  n= 24 loop=False seam=None bad=14 worst={"spoon_torso_tris": 0, "harness_clear": -0.15, "below_floor": 27, "head_spoon_tris": 10} drift=0.000 t=0.4s
+CLIP DeadHold          n= 30 loop=True seam={'pose_max': 0.0, 'seam_second_diff': 0.0, 'interior_max_second_diff': 0.0} bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.15, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=0.4s
+KEYFIX EarFlick f5 {"spoon_lift_cm": 0.3, "spoon_slide_deg": 0.0, "spoon_pitch_deg": 0.0, "before": ["head-spoon"]}
+CLIP EarFlick          n= 12 loop=False seam=None bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.15, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=0.3s
+CLIP TailSettle        n= 24 loop=False seam=None bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.15, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=0.5s
+PANTRY_RAT_FAIL SniffAir seam {'pose_max': 0.0, 'seam_second_diff': 0.02138, 'interior_max_second_diff': 0.017946} | StretchAttend planted drift 1.21 | BoundStart planted drift 3.00 | BoundStop planted drift 3.27 | TurnLeft90 bad frames [(3, ['harness-torso']), (6, ['harness-torso']), (7, ['harness-torso'])] | TurnRight90 bad frames [(2, ['harness-torso']), (3, ['harness-torso']), (4, ['harness-torso', 'head-spoon']), (5, ['head-spoon'])] | Turn180 bad frames [(3, ['harness-torso']), (4, ['harness-torso']), (5, ['harness-torso']), (6, ['harness-torso'])] | Startle bad frames [(3, ['below-floor']), (4, ['below-floor', 'spoon-lifts-body']), (5, ['below-floor', 'spoon-lifts-body']), (6, ['below-floor'])] | Backstep bad frames [(2, ['head-spoon']), (8, ['head-spoon'])] | Snatch planted drift 0.55 | LoadedTurnLeft bad frames [(4, ['harness-torso']), (7, ['harness-torso']), (8, ['harness-torso']), (9, ['harness-torso'])] | LoadedTurnRight bad frames [(2, ['harness-torso']), (3, ['harness-torso']), (4, ['harness-torso']), (5, ['harness-torso'])] | LoadedLookBack bad frames [(7, ['head-spoon']), (8, ['head-spoon']), (9, ['head-spoon'])] | DeathToppleLeft bad frames [(1, ['below-floor']), (2, ['head-spoon', 'below-floor']), (3, ['head-spoon', 'below-floor']), (4, ['below-floor'])] | DeathToppleRight bad frames [(1, ['below-floor']), (2, ['below-floor']), (3, ['head-spoon', 'below-floor']), (4, ['below-floor'])]

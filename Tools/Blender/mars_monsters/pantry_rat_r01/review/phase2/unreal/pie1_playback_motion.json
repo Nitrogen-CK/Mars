@@ -1,0 +1,30 @@
+{
+ "BoundCycle": {
+  "mean_frame_delta": 0.02784,
+  "max": 0.0409
+ },
+ "Rummage": {
+  "mean_frame_delta": 0.02094,
+  "max": 0.0269
+ },
+ "Snatch": {
+  "mean_frame_delta": 0.03075,
+  "max": 0.04484
+ },
+ "LoadedBound": {
+  "mean_frame_delta": 0.04186,
+  "max": 0.06501
+ },
+ "DeathToppleLeft": {
+  "mean_frame_delta": 0.09857,
+  "max": 0.12302
+ },
+ "DeadHold": {
+  "mean_frame_delta": 0.00259,
+  "max": 0.00361
+ },
+ "DenEmerge": {
+  "mean_frame_delta": 0.00685,
+  "max": 0.00825
+ }
+}

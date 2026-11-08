@@ -1,0 +1,16 @@
+== --python scripts/build_pantry_rat.py -- --no-renders
+exit 0
+== source/PantryRat_R02.blend --python scripts/animate_pantry_rat.py
+exit 0
+== source/PantryRat_R02.blend --python scripts/dither_uv_pantry_rat.py
+exit 0
+== source/PantryRat_R02.blend --python scripts/write_rig_json.py
+exit 0
+== source/PantryRat_R02.blend --python scripts/export_pantry_rat.py
+exit 0
+== --python scripts/validate_roundtrip.py
+exit 0
+== --python scripts/reopen_check.py
+exit 0
+== source/PantryRat_R02.blend --python scripts/den_check.py
+exit 0

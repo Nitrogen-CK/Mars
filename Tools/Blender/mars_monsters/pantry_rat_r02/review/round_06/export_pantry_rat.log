@@ -1,0 +1,161 @@
+00:03.360  blend            | Read blend: "D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\source\PantryRat_R02.blend"
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\validation\\Cube10_Mars_SM.fbx'
+export finished in 0.0049 sec.
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\PantryRat_R02_Mars_SK.fbx'
+export finished in 0.0349 sec.
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_IdleBreath_Mars_ANIM.fbx'
+export finished in 0.1168 sec.
+EXPORTED clip IdleBreath        D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_IdleBreath_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_SniffGround_Mars_ANIM.fbx'
+export finished in 0.0885 sec.
+EXPORTED clip SniffGround       D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_SniffGround_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_SniffAir_Mars_ANIM.fbx'
+export finished in 0.0868 sec.
+EXPORTED clip SniffAir          D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_SniffAir_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_StretchAttend_Mars_ANIM.fbx'
+export finished in 0.0985 sec.
+EXPORTED clip StretchAttend     D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_StretchAttend_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_RearUp_Mars_ANIM.fbx'
+export finished in 0.0843 sec.
+EXPORTED clip RearUp            D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_RearUp_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_RearObserve_Mars_ANIM.fbx'
+export finished in 0.1033 sec.
+EXPORTED clip RearObserve       D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_RearObserve_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_RearDown_Mars_ANIM.fbx'
+export finished in 0.0991 sec.
+EXPORTED clip RearDown          D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_RearDown_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_BoundStart_Mars_ANIM.fbx'
+export finished in 0.0844 sec.
+EXPORTED clip BoundStart        D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_BoundStart_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_BoundCycle_Mars_ANIM.fbx'
+export finished in 0.0719 sec.
+EXPORTED clip BoundCycle        D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_BoundCycle_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_BoundStop_Mars_ANIM.fbx'
+export finished in 0.0819 sec.
+EXPORTED clip BoundStop         D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_BoundStop_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_TurnLeft90_Mars_ANIM.fbx'
+export finished in 0.0696 sec.
+EXPORTED clip TurnLeft90        D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_TurnLeft90_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_TurnRight90_Mars_ANIM.fbx'
+export finished in 0.1127 sec.
+EXPORTED clip TurnRight90       D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_TurnRight90_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_Turn180_Mars_ANIM.fbx'
+export finished in 0.0900 sec.
+EXPORTED clip Turn180           D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_Turn180_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_Startle_Mars_ANIM.fbx'
+export finished in 0.0807 sec.
+EXPORTED clip Startle           D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_Startle_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_Backstep_Mars_ANIM.fbx'
+export finished in 0.0856 sec.
+EXPORTED clip Backstep          D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_Backstep_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_GuardedWatch_Mars_ANIM.fbx'
+export finished in 0.1094 sec.
+EXPORTED clip GuardedWatch      D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_GuardedWatch_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_DenEmerge_Mars_ANIM.fbx'
+export finished in 0.0916 sec.
+EXPORTED clip DenEmerge         D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_DenEmerge_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_DenEnter_Mars_ANIM.fbx'
+export finished in 0.0988 sec.
+EXPORTED clip DenEnter          D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_DenEnter_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_InspectSlot_Mars_ANIM.fbx'
+export finished in 0.0742 sec.
+EXPORTED clip InspectSlot       D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_InspectSlot_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_Rummage_Mars_ANIM.fbx'
+export finished in 0.1154 sec.
+EXPORTED clip Rummage           D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_Rummage_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_Snatch_Mars_ANIM.fbx'
+export finished in 0.0764 sec.
+EXPORTED clip Snatch            D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_Snatch_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_LoadedIdle_Mars_ANIM.fbx'
+export finished in 0.1159 sec.
+EXPORTED clip LoadedIdle        D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_LoadedIdle_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_LoadedBound_Mars_ANIM.fbx'
+export finished in 0.0751 sec.
+EXPORTED clip LoadedBound       D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_LoadedBound_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_LoadedTurnLeft_Mars_ANIM.fbx'
+export finished in 0.0613 sec.
+EXPORTED clip LoadedTurnLeft    D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_LoadedTurnLeft_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_LoadedTurnRight_Mars_ANIM.fbx'
+export finished in 0.0711 sec.
+EXPORTED clip LoadedTurnRight   D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_LoadedTurnRight_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_LoadedLookBack_Mars_ANIM.fbx'
+export finished in 0.0761 sec.
+EXPORTED clip LoadedLookBack    D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_LoadedLookBack_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_LoadedCornered_Mars_ANIM.fbx'
+export finished in 0.0858 sec.
+EXPORTED clip LoadedCornered    D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_LoadedCornered_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_HitReact_Mars_ANIM.fbx'
+export finished in 0.0600 sec.
+EXPORTED clip HitReact          D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_HitReact_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_MouthRelease_Mars_ANIM.fbx'
+export finished in 0.0816 sec.
+EXPORTED clip MouthRelease      D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_MouthRelease_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_DeathToppleLeft_Mars_ANIM.fbx'
+export finished in 0.0831 sec.
+EXPORTED clip DeathToppleLeft   D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_DeathToppleLeft_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_DeathToppleRight_Mars_ANIM.fbx'
+export finished in 0.0977 sec.
+EXPORTED clip DeathToppleRight  D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_DeathToppleRight_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_DeadHold_Mars_ANIM.fbx'
+export finished in 0.0863 sec.
+EXPORTED clip DeadHold          D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_DeadHold_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_EarFlick_Mars_ANIM.fbx'
+export finished in 0.0749 sec.
+EXPORTED clip EarFlick          D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_EarFlick_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_TailSettle_Mars_ANIM.fbx'
+export finished in 0.0885 sec.
+EXPORTED clip TailSettle        D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_TailSettle_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\PantryRat_R02_Den_Mars_SM.fbx'
+export finished in 0.0075 sec.
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\PantryRat_R02_DenEyePlate_Mars_SM.fbx'
+export finished in 0.0045 sec.
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\PantryRat_R02_Cheese_Mars_SM.fbx'
+export finished in 0.0053 sec.
+BIND {"tris": 3076, "verts": 1650, "slots": ["Body", "Pink", "Belly", "Wood", "Harness", "EyePatch"], "bounds_ue_cm": {"min": [-45.156, -19.367, 0.0], "max": [30.7, 20.68, 44.45]}}
+SOCKETS {"Carry_Mouth": {"bone": "jaw", "component_cm": [26.6, 0.0, 13.2], "component_axis_x": [-0.615662, 0.0, -0.788011], "component_axis_z": [0.788011, -0.0, -0.615662], "blender_world_rest_cm": [26.6, -0.0, 13.2], "blender_jaw_local_cm": [0.0, 13.1374, 0.6779], "blender_jaw_local_quat_wxyz": [0.354557, -0.611792, 0.611792, 0.354557], "ue_relative_location_cm_predicted": [0.0, -13.1374, 0.6779], "ue_relative_axis_x_predicted": [0.0, 0.497159, -0.86766], "ue_relative_axis_z_predicted": [-0.0, -0.86766, -0.497159], "frame_rule": "UE = (x, -y, z); a frame's UE X axis = S*x_b, Z axis = S*z_b (Y = Z x X in UE's left-handed sense); bone-relative values assume the UE jaw rest rotation = S*R_b*S (proved on the Unreal readback: predicted vs read relative)"}, "Carry_Drag": {"bone": "jaw", "component_cm": [32.9811, -0.0, -8.8137], "component_axis_x": [0.939693, 0.0, -0.34202], "component_axis_z": [0.34202, 0.0, 0.939693], "blender_world_rest_cm": [32.9811, 0.0, -8.8137], "blender_jaw_local_cm": [-0.0, 22.5886, -20.2026], "blender_jaw_local_quat_wxyz": [0.703353, -0.07276, 0.07276, 0.703353], "ue_relative_location_cm_predicted": [-0.0, -22.5886, -20.2026], "ue_relative_axis_x_predicted": [0.0, -0.978824, -0.204704], "ue_relative_axis_z_predicted": [0.0, -0.204704, 0.978824], "frame_rule": "UE = (x, -y, z); a frame's UE X axis = S*x_b, Z axis = S*z_b (Y = Z x X in UE's left-handed sense); bone-relative values assume the UE jaw rest rotation = S*R_b*S (proved on the Unreal readback: predicted vs read relative)"}}
+DEN {"object": "PantryRat_R02_Den_Mars_SM", "tris": 330, "verts": 197, "slots": ["Stone", "Void"], "bounds_ue_cm": {"min": [-47.0, -56.0, -1.0], "max": [9.5, 56.0, 81.013]}, "uv_layers": ["UV0"]} PLATE {"object": "PantryRat_R02_DenEyePlate_Mars_SM", "tris": 2, "verts": 4, "slots": ["EyePatch"], "bounds_ue_cm": {"min": [-43.0, -10.0, 18.0], "max": [-43.0, 10.0, 26.0]}, "uv_layers": ["UV0"], "quad_normal_ue": [1.0, 0.0, 0.0], "source_front_uv_range": [[0.0, 1.0], [0.0, 1.0]], "uv_rule": "U = 0 at den +Y Blender (= UE -Y, the resident's LEFT when it faces out of the den), U = 1 at den -Y; V = 0 at the bottom"} CHEESE {"object": "PantryRat_R02_Cheese_Mars_SM", "tris": 56, "verts": 30, "slots": ["Rind", "Flesh"], "bounds_ue_cm": {"min": [-7.5, -5.0, 0.0], "max": [7.5, 5.0, 8.0]}, "uv_layers": ["UV0"], "faces_per_slot": {"Rind": 20, "Flesh": 14}}
+JAW_LOADED_MAX_DEG {"Snatch": 1.765, "LoadedIdle": 0.0, "LoadedBound": 0.0, "LoadedTurnLeft": 0.0, "LoadedTurnRight": 0.0, "LoadedLookBack": 0.0, "LoadedCornered": 0.0, "MouthRelease": 16.31}
+FBX {"magic": "Kaydara FBX Binary", "file_version": 7400, "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"} addon 5.15.0
+PANTRY_RAT_OK
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+
+Blender quit

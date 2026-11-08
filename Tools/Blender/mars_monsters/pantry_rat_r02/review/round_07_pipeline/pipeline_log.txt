@@ -1,0 +1,2 @@
+== --python scripts/build_pantry_rat.py -- --no-renders
+exit 1

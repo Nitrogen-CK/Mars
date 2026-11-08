@@ -1,0 +1,7469 @@
+{
+ "asset": "PantryRat_R01",
+ "generated_by": "scripts/export_pantry_rat.py (Phase 2)",
+ "versions": {
+  "blender": "5.2.2 LTS",
+  "fbx_exporter_addon": "5.15.0",
+  "fbx_file_version": 7400,
+  "fbx_creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+ },
+ "units_axes": {
+  "blender": "1 BU = 1 cm (scale_length 0.01), +X forward, +Z up, rat LEFT = Blender +Y",
+  "frame_map": "Blender (x, y, z) -> Unreal (x, -y, z); rat LEFT (*_l) = Unreal -Y",
+  "exporter_args_common": {
+   "use_selection": true,
+   "apply_unit_scale": true,
+   "apply_scale_options": "FBX_SCALE_NONE",
+   "global_scale": 1.0,
+   "axis_forward": "-Z",
+   "axis_up": "Y",
+   "use_mesh_modifiers": false,
+   "mesh_smooth_type": "FACE",
+   "use_triangles": true,
+   "use_tspace": false,
+   "add_leaf_bones": false,
+   "path_mode": "STRIP",
+   "colors_type": "SRGB",
+   "use_custom_props": false,
+   "bake_space_transform": false
+  },
+  "bind_args": {
+   "use_selection": true,
+   "apply_unit_scale": true,
+   "apply_scale_options": "FBX_SCALE_NONE",
+   "global_scale": 1.0,
+   "axis_forward": "-Z",
+   "axis_up": "Y",
+   "use_mesh_modifiers": false,
+   "mesh_smooth_type": "FACE",
+   "use_triangles": true,
+   "use_tspace": false,
+   "add_leaf_bones": false,
+   "path_mode": "STRIP",
+   "colors_type": "SRGB",
+   "use_custom_props": false,
+   "bake_space_transform": false,
+   "object_types": [
+    "ARMATURE",
+    "MESH"
+   ],
+   "primary_bone_axis": "Y",
+   "secondary_bone_axis": "X",
+   "use_armature_deform_only": true,
+   "armature_nodetype": "NULL",
+   "bake_anim": false
+  },
+  "clip_args": {
+   "use_selection": true,
+   "apply_unit_scale": true,
+   "apply_scale_options": "FBX_SCALE_NONE",
+   "global_scale": 1.0,
+   "axis_forward": "-Z",
+   "axis_up": "Y",
+   "use_mesh_modifiers": false,
+   "mesh_smooth_type": "FACE",
+   "use_triangles": true,
+   "use_tspace": false,
+   "add_leaf_bones": false,
+   "path_mode": "STRIP",
+   "colors_type": "SRGB",
+   "use_custom_props": false,
+   "bake_space_transform": false,
+   "object_types": [
+    "ARMATURE",
+    "MESH"
+   ],
+   "primary_bone_axis": "Y",
+   "secondary_bone_axis": "X",
+   "use_armature_deform_only": true,
+   "armature_nodetype": "NULL",
+   "bake_anim": true,
+   "bake_anim_use_all_bones": true,
+   "bake_anim_use_nla_strips": false,
+   "bake_anim_use_all_actions": false,
+   "bake_anim_force_startend_keying": true,
+   "bake_anim_step": 1.0,
+   "bake_anim_simplify_factor": 0.0
+  }
+ },
+ "bone_count": 26,
+ "bones": [
+  {
+   "name": "root",
+   "parent": null,
+   "head_ue_cm": [
+    0.0,
+    -0.0,
+    0.0
+   ],
+   "tail_ue_cm": [
+    0.0,
+    -10.0,
+    0.0
+   ]
+  },
+  {
+   "name": "body",
+   "parent": "root",
+   "head_ue_cm": [
+    -3.0,
+    -0.0,
+    22.0
+   ],
+   "tail_ue_cm": [
+    3.0,
+    -0.0,
+    22.0
+   ]
+  },
+  {
+   "name": "pelvis",
+   "parent": "body",
+   "head_ue_cm": [
+    -3.0,
+    -0.0,
+    22.0
+   ],
+   "tail_ue_cm": [
+    -13.0,
+    -0.0,
+    20.0
+   ]
+  },
+  {
+   "name": "hind_upper_l",
+   "parent": "pelvis",
+   "head_ue_cm": [
+    -10.2,
+    -8.0,
+    16.0
+   ],
+   "tail_ue_cm": [
+    -5.0,
+    -10.6,
+    8.2
+   ]
+  },
+  {
+   "name": "hind_lower_l",
+   "parent": "hind_upper_l",
+   "head_ue_cm": [
+    -5.0,
+    -10.6,
+    8.2
+   ],
+   "tail_ue_cm": [
+    -11.0,
+    -10.8,
+    2.6
+   ]
+  },
+  {
+   "name": "hind_foot_l",
+   "parent": "hind_lower_l",
+   "head_ue_cm": [
+    -11.0,
+    -10.8,
+    2.6
+   ],
+   "tail_ue_cm": [
+    -3.2,
+    -10.8,
+    0.9
+   ]
+  },
+  {
+   "name": "hind_upper_r",
+   "parent": "pelvis",
+   "head_ue_cm": [
+    -10.2,
+    8.0,
+    16.0
+   ],
+   "tail_ue_cm": [
+    -5.0,
+    10.6,
+    8.2
+   ]
+  },
+  {
+   "name": "hind_lower_r",
+   "parent": "hind_upper_r",
+   "head_ue_cm": [
+    -5.0,
+    10.6,
+    8.2
+   ],
+   "tail_ue_cm": [
+    -11.0,
+    10.8,
+    2.6
+   ]
+  },
+  {
+   "name": "hind_foot_r",
+   "parent": "hind_lower_r",
+   "head_ue_cm": [
+    -11.0,
+    10.8,
+    2.6
+   ],
+   "tail_ue_cm": [
+    -3.2,
+    10.8,
+    0.9
+   ]
+  },
+  {
+   "name": "tail_01",
+   "parent": "pelvis",
+   "head_ue_cm": [
+    -15.6,
+    -0.0,
+    15.4
+   ],
+   "tail_ue_cm": [
+    -24.4,
+    -0.0,
+    7.8
+   ]
+  },
+  {
+   "name": "tail_02",
+   "parent": "tail_01",
+   "head_ue_cm": [
+    -24.4,
+    -0.0,
+    7.8
+   ],
+   "tail_ue_cm": [
+    -33.4,
+    -0.0,
+    3.4
+   ]
+  },
+  {
+   "name": "tail_03",
+   "parent": "tail_02",
+   "head_ue_cm": [
+    -33.4,
+    -0.0,
+    3.4
+   ],
+   "tail_ue_cm": [
+    -39.9,
+    -0.0,
+    4.8
+   ]
+  },
+  {
+   "name": "tail_04",
+   "parent": "tail_03",
+   "head_ue_cm": [
+    -39.9,
+    -0.0,
+    4.8
+   ],
+   "tail_ue_cm": [
+    -41.4,
+    -0.0,
+    7.4
+   ]
+  },
+  {
+   "name": "chest",
+   "parent": "body",
+   "head_ue_cm": [
+    3.0,
+    -0.0,
+    22.0
+   ],
+   "tail_ue_cm": [
+    8.8,
+    -0.0,
+    24.0
+   ]
+  },
+  {
+   "name": "neck",
+   "parent": "chest",
+   "head_ue_cm": [
+    8.8,
+    -0.0,
+    24.0
+   ],
+   "tail_ue_cm": [
+    12.0,
+    -0.0,
+    25.0
+   ]
+  },
+  {
+   "name": "head",
+   "parent": "neck",
+   "head_ue_cm": [
+    12.0,
+    -0.0,
+    25.0
+   ],
+   "tail_ue_cm": [
+    20.9,
+    -0.0,
+    22.4
+   ]
+  },
+  {
+   "name": "jaw",
+   "parent": "head",
+   "head_ue_cm": [
+    13.8,
+    -0.0,
+    21.4
+   ],
+   "tail_ue_cm": [
+    20.6,
+    -0.0,
+    19.8
+   ]
+  },
+  {
+   "name": "ear_l",
+   "parent": "head",
+   "head_ue_cm": [
+    12.8199,
+    -10.0893,
+    31.4245
+   ],
+   "tail_ue_cm": [
+    7.7458,
+    -12.628,
+    43.2542
+   ]
+  },
+  {
+   "name": "ear_r",
+   "parent": "head",
+   "head_ue_cm": [
+    12.8199,
+    10.0893,
+    31.4245
+   ],
+   "tail_ue_cm": [
+    7.7458,
+    12.628,
+    43.2542
+   ]
+  },
+  {
+   "name": "fore_upper_l",
+   "parent": "chest",
+   "head_ue_cm": [
+    3.4,
+    -7.2,
+    14.5
+   ],
+   "tail_ue_cm": [
+    2.0,
+    -9.2,
+    7.4
+   ]
+  },
+  {
+   "name": "fore_lower_l",
+   "parent": "fore_upper_l",
+   "head_ue_cm": [
+    2.0,
+    -9.2,
+    7.4
+   ],
+   "tail_ue_cm": [
+    4.6,
+    -9.4,
+    2.3
+   ]
+  },
+  {
+   "name": "fore_foot_l",
+   "parent": "fore_lower_l",
+   "head_ue_cm": [
+    4.6,
+    -9.4,
+    2.3
+   ],
+   "tail_ue_cm": [
+    8.8,
+    -9.8,
+    0.9
+   ]
+  },
+  {
+   "name": "fore_upper_r",
+   "parent": "chest",
+   "head_ue_cm": [
+    3.4,
+    7.2,
+    14.5
+   ],
+   "tail_ue_cm": [
+    2.0,
+    9.2,
+    7.4
+   ]
+  },
+  {
+   "name": "fore_lower_r",
+   "parent": "fore_upper_r",
+   "head_ue_cm": [
+    2.0,
+    9.2,
+    7.4
+   ],
+   "tail_ue_cm": [
+    4.6,
+    9.4,
+    2.3
+   ]
+  },
+  {
+   "name": "fore_foot_r",
+   "parent": "fore_lower_r",
+   "head_ue_cm": [
+    4.6,
+    9.4,
+    2.3
+   ],
+   "tail_ue_cm": [
+    8.8,
+    9.8,
+    0.9
+   ]
+  },
+  {
+   "name": "spoon_prop",
+   "parent": "chest",
+   "head_ue_cm": [
+    -6.8513,
+    -2.0605,
+    37.9888
+   ],
+   "tail_ue_cm": [
+    -1.0302,
+    2.508,
+    41.0292
+   ]
+  }
+ ],
+ "slots": [
+  "Body",
+  "Pink",
+  "Belly",
+  "Wood",
+  "Harness",
+  "EyePatch"
+ ],
+ "bind": {
+  "tris": 2086,
+  "verts": 1130,
+  "bounds_ue_cm": {
+   "min": [
+    -41.895,
+    -16.301,
+    0.0
+   ],
+   "max": [
+    23.1,
+    16.301,
+    46.838
+   ]
+  },
+  "nose_point_ue_cm": [
+   23.1,
+   -0.0,
+   21.7
+  ]
+ },
+ "withers_target_cm": 35.3,
+ "jaw_rest": {
+  "head_ue_cm": [
+   13.8,
+   -0.0,
+   21.4
+  ],
+  "tail_ue_cm": [
+   20.6,
+   -0.0,
+   19.8
+  ]
+ },
+ "sockets": {
+  "Carry_Mouth": {
+   "bone": "jaw",
+   "component_cm": [
+    19.8,
+    -0.0,
+    20.6
+   ],
+   "component_axis_x": [
+    -0.615661,
+    0.0,
+    -0.788011
+   ],
+   "component_axis_z": [
+    0.788011,
+    -0.0,
+    -0.615661
+   ],
+   "blender_world_rest_cm": [
+    19.8,
+    0.0,
+    20.6
+   ],
+   "blender_jaw_local_cm": [
+    0.0,
+    6.0237,
+    0.5955
+   ],
+   "blender_jaw_local_quat_wxyz": [
+    0.381179,
+    -0.595569,
+    0.595569,
+    0.381179
+   ],
+   "ue_relative_location_cm_predicted": [
+    0.0,
+    -6.0237,
+    0.5955
+   ],
+   "ue_relative_axis_x_predicted": [
+    0.0,
+    0.41881,
+    -0.908074
+   ],
+   "ue_relative_axis_z_predicted": [
+    -0.0,
+    -0.908074,
+    -0.41881
+   ],
+   "frame_rule": "UE = (x, -y, z); a frame's UE X axis = S*x_b, Z axis = S*z_b (Y = Z x X in UE's left-handed sense); bone-relative values assume the UE jaw rest rotation = S*R_b*S (proved on the Unreal readback: predicted vs read relative)",
+   "ue_socket_relative_location_cm": [
+    0.0,
+    -6.0237,
+    0.5955
+   ],
+   "ue_socket_relative_rotation_pitch_yaw_roll_deg": [
+    -65.2406,
+    90.0,
+    -180.0
+   ],
+   "ue_readback_component_err_cm": 0.0,
+   "convention_proof": {
+    "bone": "jaw",
+    "location": [
+     -0.0,
+     -6.0237,
+     0.5955
+    ],
+    "rotation_pyr": [
+     -65.2406,
+     90.0,
+     -180.0
+    ],
+    "relative_axis_x": [
+     -0.0,
+     0.418809,
+     -0.908074
+    ],
+    "relative_axis_z": [
+     0.0,
+     -0.908074,
+     -0.418809
+    ],
+    "predicted_location": [
+     0.0,
+     -6.0237,
+     0.5955
+    ],
+    "predicted_axis_x": [
+     0.0,
+     0.41881,
+     -0.908074
+    ],
+    "predicted_axis_z": [
+     -0.0,
+     -0.908074,
+     -0.41881
+    ],
+    "predicted_location_err_cm": 0.0,
+    "predicted_axis_err": 1e-06,
+    "exists": false
+   }
+  },
+  "Carry_Drag": {
+   "bone": "jaw",
+   "component_cm": [
+    24.546,
+    0.0,
+    -5.906
+   ],
+   "component_axis_x": [
+    0.939693,
+    0.0,
+    -0.34202
+   ],
+   "component_axis_z": [
+    0.34202,
+    0.0,
+    0.939693
+   ],
+   "blender_world_rest_cm": [
+    24.546,
+    -0.0,
+    -5.906
+   ],
+   "blender_jaw_local_cm": [
+    0.0,
+    16.7145,
+    -24.1188
+   ],
+   "blender_jaw_local_quat_wxyz": [
+    0.705877,
+    -0.041686,
+    0.041686,
+    0.705877
+   ],
+   "ue_relative_location_cm_predicted": [
+    0.0,
+    -16.7145,
+    -24.1188
+   ],
+   "ue_relative_axis_x_predicted": [
+    0.0,
+    -0.993049,
+    -0.117702
+   ],
+   "ue_relative_axis_z_predicted": [
+    0.0,
+    -0.117702,
+    0.993049
+   ],
+   "frame_rule": "UE = (x, -y, z); a frame's UE X axis = S*x_b, Z axis = S*z_b (Y = Z x X in UE's left-handed sense); bone-relative values assume the UE jaw rest rotation = S*R_b*S (proved on the Unreal readback: predicted vs read relative)",
+   "ue_socket_relative_location_cm": [
+    0.0,
+    -16.7145,
+    -24.1189
+   ],
+   "ue_socket_relative_rotation_pitch_yaw_roll_deg": [
+    -6.7595,
+    -90.0,
+    0.0
+   ],
+   "ue_readback_component_err_cm": 0.0,
+   "convention_proof": {
+    "bone": "jaw",
+    "location": [
+     -0.0,
+     -16.7145,
+     -24.1189
+    ],
+    "rotation_pyr": [
+     -6.7595,
+     -90.0,
+     0.0
+    ],
+    "relative_axis_x": [
+     -0.0,
+     -0.993049,
+     -0.117701
+    ],
+    "relative_axis_z": [
+     0.0,
+     -0.117701,
+     0.993049
+    ],
+    "predicted_location": [
+     0.0,
+     -16.7145,
+     -24.1188
+    ],
+    "predicted_axis_x": [
+     0.0,
+     -0.993049,
+     -0.117702
+    ],
+    "predicted_axis_z": [
+     0.0,
+     -0.117702,
+     0.993049
+    ],
+    "predicted_location_err_cm": 0.0001,
+    "predicted_axis_err": 1e-06,
+    "exists": false
+   }
+  }
+ },
+ "clip_contract": {
+  "fps": 30,
+  "root": "root bone never keyed: identity on every sample of every clip",
+  "durations": "frames N = round_half_up(seconds * 30); N+1 samples on frames 0..N; length N/30 s",
+  "loops": "frame N == frame 0 in pose; seam second difference <= interior max (anim_report)",
+  "additive": "EarFlick / TailSettle: full poses that start and end on IdleBreath frame 0; import additive (local space) against IdleBreath frame 0",
+  "jaw_closed_on_carry_max_deg": {
+   "Snatch": 1.765,
+   "LoadedIdle": 0.0,
+   "LoadedBound": 0.0,
+   "LoadedTurnLeft": 0.0,
+   "LoadedTurnRight": 0.0,
+   "LoadedLookBack": 0.0,
+   "LoadedCornered": 0.0,
+   "MouthRelease": 16.31
+  }
+ },
+ "clips": {
+  "IdleBreath": {
+   "fps": 30,
+   "frames": [
+    0,
+    60
+   ],
+   "frame_count": 60,
+   "samples": 61,
+   "seconds": 2.0,
+   "seconds_proposed": 2.0,
+   "loop": true,
+   "additive": false,
+   "additive_reference": null,
+   "landmarks_ue_cm": {
+    "0": {
+     "body": [
+      -3.0,
+      -0.0,
+      22.0
+     ],
+     "chest": [
+      3.0,
+      -0.0,
+      22.0
+     ],
+     "head": [
+      12.0,
+      -0.0,
+      25.0
+     ],
+     "jaw": [
+      13.8,
+      -0.0,
+      21.4
+     ],
+     "fore_foot_l": [
+      4.6,
+      -9.4,
+      2.3
+     ],
+     "fore_foot_r": [
+      4.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -39.8392,
+      1.2632,
+      4.8
+     ],
+     "spoon_prop": [
+      -6.8513,
+      -2.0605,
+      37.9888
+     ],
+     "ear_l": [
+      12.8199,
+      -10.0893,
+      31.4245
+     ],
+     "root_dev": 0.0
+    },
+    "30": {
+     "body": [
+      -3.0,
+      -0.0,
+      22.2644
+     ],
+     "chest": [
+      3.0,
+      -0.0,
+      22.2644
+     ],
+     "head": [
+      11.9518,
+      0.0,
+      25.4054
+     ],
+     "jaw": [
+      13.7941,
+      -0.0,
+      21.8268
+     ],
+     "fore_foot_l": [
+      4.6,
+      -9.4,
+      2.3
+     ],
+     "fore_foot_r": [
+      4.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -39.8759,
+      -0.6925,
+      5.0644
+     ],
+     "spoon_prop": [
+      -7.1012,
+      -2.0605,
+      38.0964
+     ],
+     "ear_l": [
+      12.6959,
+      -10.0893,
+      31.8391
+     ],
+     "root_dev": 0.0
+    },
+    "60": {
+     "body": [
+      -3.0,
+      -0.0,
+      22.0
+     ],
+     "chest": [
+      3.0,
+      -0.0,
+      22.0
+     ],
+     "head": [
+      12.0,
+      -0.0,
+      25.0
+     ],
+     "jaw": [
+      13.8,
+      -0.0,
+      21.4
+     ],
+     "fore_foot_l": [
+      4.6,
+      -9.4,
+      2.3
+     ],
+     "fore_foot_r": [
+      4.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -39.8392,
+      1.2632,
+      4.8
+     ],
+     "spoon_prop": [
+      -6.8513,
+      -2.0605,
+      37.9888
+     ],
+     "ear_l": [
+      12.8199,
+      -10.0893,
+      31.4245
+     ],
+     "root_dev": 0.0
+    }
+   },
+   "file": "export/anims/PantryRat_R01_IdleBreath_Mars_ANIM.fbx",
+   "bytes": 399468,
+   "unreal_path": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_IdleBreath_Mars_ANIM",
+   "carry_frames": null
+  },
+  "SniffGround": {
+   "fps": 30,
+   "frames": [
+    0,
+    36
+   ],
+   "frame_count": 36,
+   "samples": 37,
+   "seconds": 1.2,
+   "seconds_proposed": 1.2,
+   "loop": true,
+   "additive": false,
+   "additive_reference": null,
+   "landmarks_ue_cm": {
+    "0": {
+     "body": [
+      -2.4,
+      -0.0,
+      20.6
+     ],
+     "chest": [
+      3.6,
+      -0.0,
+      20.6
+     ],
+     "head": [
+      12.9035,
+      -0.0,
+      21.9906
+     ],
+     "jaw": [
+      12.4535,
+      0.0315,
+      17.991
+     ],
+     "fore_foot_l": [
+      4.6,
+      -9.4,
+      2.3
+     ],
+     "fore_foot_r": [
+      4.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -39.6551,
+      0.0,
+      4.2545
+     ],
+     "spoon_prop": [
+      -4.8203,
+      -2.0605,
+      37.3865
+     ],
+     "ear_l": [
+      16.3761,
+      -10.3568,
+      26.9321
+     ],
+     "root_dev": 0.0
+    },
+    "18": {
+     "body": [
+      -2.4,
+      -0.0,
+      20.6
+     ],
+     "chest": [
+      3.6,
+      -0.0,
+      20.6
+     ],
+     "head": [
+      12.9035,
+      -0.0,
+      21.9906
+     ],
+     "jaw": [
+      12.3132,
+      0.0103,
+      18.0092
+     ],
+     "fore_foot_l": [
+      4.6,
+      -9.4,
+      2.3
+     ],
+     "fore_foot_r": [
+      4.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -39.6551,
+      0.0,
+      4.2545
+     ],
+     "spoon_prop": [
+      -4.8203,
+      -2.0605,
+      37.3865
+     ],
+     "ear_l": [
+      17.0833,
+      -10.1638,
+      26.7829
+     ],
+     "root_dev": 0.0
+    },
+    "36": {
+     "body": [
+      -2.4,
+      -0.0,
+      20.6
+     ],
+     "chest": [
+      3.6,
+      -0.0,
+      20.6
+     ],
+     "head": [
+      12.9035,
+      -0.0,
+      21.9906
+     ],
+     "jaw": [
+      12.4535,
+      0.0315,
+      17.991
+     ],
+     "fore_foot_l": [
+      4.6,
+      -9.4,
+      2.3
+     ],
+     "fore_foot_r": [
+      4.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -39.6551,
+      0.0,
+      4.2545
+     ],
+     "spoon_prop": [
+      -4.8203,
+      -2.0605,
+      37.3865
+     ],
+     "ear_l": [
+      16.3761,
+      -10.3568,
+      26.9321
+     ],
+     "root_dev": 0.0
+    }
+   },
+   "file": "export/anims/PantryRat_R01_SniffGround_Mars_ANIM.fbx",
+   "bytes": 350940,
+   "unreal_path": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_SniffGround_Mars_ANIM",
+   "carry_frames": null
+  },
+  "SniffAir": {
+   "fps": 30,
+   "frames": [
+    0,
+    30
+   ],
+   "frame_count": 30,
+   "samples": 31,
+   "seconds": 1.0,
+   "seconds_proposed": 1.0,
+   "loop": true,
+   "additive": false,
+   "additive_reference": null,
+   "landmarks_ue_cm": {
+    "0": {
+     "body": [
+      -3.0,
+      -0.0,
+      22.6
+     ],
+     "chest": [
+      3.0,
+      -0.0,
+      22.6
+     ],
+     "head": [
+      11.5195,
+      -0.0,
+      26.695
+     ],
+     "jaw": [
+      14.821,
+      -0.347,
+      24.419
+     ],
+     "fore_foot_l": [
+      4.6,
+      -9.4,
+      2.3
+     ],
+     "fore_foot_r": [
+      4.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -39.9,
+      0.0,
+      5.4
+     ],
+     "spoon_prop": [
+      -7.8232,
+      -3.0532,
+      38.4752
+     ],
+     "ear_l": [
+      8.0805,
+      -9.7835,
+      32.7114
+     ],
+     "root_dev": 0.0
+    },
+    "15": {
+     "body": [
+      -3.0,
+      -0.0,
+      22.6
+     ],
+     "chest": [
+      3.0,
+      -0.0,
+      22.6
+     ],
+     "head": [
+      11.5195,
+      -0.0,
+      26.695
+     ],
+     "jaw": [
+      14.821,
+      0.347,
+      24.419
+     ],
+     "fore_foot_l": [
+      4.6,
+      -9.4,
+      2.3
+     ],
+     "fore_foot_r": [
+      4.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -39.9,
+      0.0,
+      5.4
+     ],
+     "spoon_prop": [
+      -7.8232,
+      -3.0532,
+      38.4752
+     ],
+     "ear_l": [
+      10.1897,
+      -10.2847,
+      32.7114
+     ],
+     "root_dev": 0.0
+    },
+    "30": {
+     "body": [
+      -3.0,
+      -0.0,
+      22.6
+     ],
+     "chest": [
+      3.0,
+      -0.0,
+      22.6
+     ],
+     "head": [
+      11.5195,
+      -0.0,
+      26.695
+     ],
+     "jaw": [
+      14.821,
+      -0.347,
+      24.419
+     ],
+     "fore_foot_l": [
+      4.6,
+      -9.4,
+      2.3
+     ],
+     "fore_foot_r": [
+      4.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -39.9,
+      0.0,
+      5.4
+     ],
+     "spoon_prop": [
+      -7.8232,
+      -3.0532,
+      38.4752
+     ],
+     "ear_l": [
+      8.0805,
+      -9.7835,
+      32.7114
+     ],
+     "root_dev": 0.0
+    }
+   },
+   "file": "export/anims/PantryRat_R01_SniffAir_Mars_ANIM.fbx",
+   "bytes": 360636,
+   "unreal_path": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_SniffAir_Mars_ANIM",
+   "carry_frames": null
+  },
+  "StretchAttend": {
+   "fps": 30,
+   "frames": [
+    0,
+    30
+   ],
+   "frame_count": 30,
+   "samples": 31,
+   "seconds": 1.0,
+   "seconds_proposed": 1.0,
+   "loop": false,
+   "additive": false,
+   "additive_reference": null,
+   "landmarks_ue_cm": {
+    "0": {
+     "body": [
+      -3.0,
+      -0.0,
+      22.0
+     ],
+     "chest": [
+      3.0,
+      -0.0,
+      22.0
+     ],
+     "head": [
+      12.0,
+      -0.0,
+      25.0
+     ],
+     "jaw": [
+      13.8,
+      -0.0,
+      21.4
+     ],
+     "fore_foot_l": [
+      4.6,
+      -9.4,
+      2.3
+     ],
+     "fore_foot_r": [
+      4.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -39.9,
+      0.0,
+      4.8
+     ],
+     "spoon_prop": [
+      -7.0991,
+      -2.3583,
+      38.9107
+     ],
+     "ear_l": [
+      12.8199,
+      -10.0893,
+      31.4245
+     ],
+     "root_dev": 0.0
+    },
+    "15": {
+     "body": [
+      -0.4346,
+      -0.0,
+      18.8347
+     ],
+     "chest": [
+      11.1654,
+      -0.0,
+      19.4347
+     ],
+     "head": [
+      22.307,
+      -0.0,
+      23.118
+     ],
+     "jaw": [
+      24.8585,
+      0.0574,
+      20.0056
+     ],
+     "fore_foot_l": [
+      13.6,
+      -9.4,
+      2.3
+     ],
+     "fore_foot_r": [
+      13.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -41.0315,
+      0.0,
+      8.0328
+     ],
+     "spoon_prop": [
+      0.243,
+      -2.3583,
+      35.8078
+     ],
+     "ear_l": [
+      21.9227,
+      -10.0954,
+      29.5736
+     ],
+     "root_dev": 0.0
+    },
+    "30": {
+     "body": [
+      -3.0,
+      -0.0,
+      22.0
+     ],
+     "chest": [
+      3.0,
+      -0.0,
+      22.0
+     ],
+     "head": [
+      12.0,
+      -0.0,
+      25.0
+     ],
+     "jaw": [
+      13.8,
+      -0.0,
+      21.4
+     ],
+     "fore_foot_l": [
+      4.6,
+      -9.4,
+      2.3
+     ],
+     "fore_foot_r": [
+      4.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -39.9,
+      0.0,
+      4.8
+     ],
+     "spoon_prop": [
+      -7.0991,
+      -2.3583,
+      38.9107
+     ],
+     "ear_l": [
+      12.8199,
+      -10.0893,
+      31.4245
+     ],
+     "root_dev": 0.0
+    }
+   },
+   "file": "export/anims/PantryRat_R01_StretchAttend_Mars_ANIM.fbx",
+   "bytes": 360636,
+   "unreal_path": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_StretchAttend_Mars_ANIM",
+   "carry_frames": null
+  },
+  "RearUp": {
+   "fps": 30,
+   "frames": [
+    0,
+    8
+   ],
+   "frame_count": 8,
+   "samples": 9,
+   "seconds": 0.266667,
+   "seconds_proposed": 0.25,
+   "loop": false,
+   "additive": false,
+   "additive_reference": null,
+   "landmarks_ue_cm": {
+    "0": {
+     "body": [
+      -3.0,
+      -0.0,
+      22.0
+     ],
+     "chest": [
+      3.0,
+      -0.0,
+      22.0
+     ],
+     "head": [
+      12.0,
+      -0.0,
+      25.0
+     ],
+     "jaw": [
+      13.8,
+      -0.0,
+      21.4
+     ],
+     "fore_foot_l": [
+      4.6,
+      -9.4,
+      2.3
+     ],
+     "fore_foot_r": [
+      4.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -39.9,
+      0.0,
+      4.8
+     ],
+     "spoon_prop": [
+      -6.8513,
+      -2.0605,
+      37.9888
+     ],
+     "ear_l": [
+      12.8199,
+      -10.0893,
+      31.4245
+     ],
+     "root_dev": 0.0
+    },
+    "4": {
+     "body": [
+      -6.9646,
+      -0.0,
+      24.7962
+     ],
+     "chest": [
+      -1.7685,
+      -0.0,
+      27.7962
+     ],
+     "head": [
+      4.8653,
+      -0.0,
+      34.5314
+     ],
+     "jaw": [
+      7.4018,
+      -0.0,
+      31.4064
+     ],
+     "fore_foot_l": [
+      12.6454,
+      -8.9,
+      22.0307
+     ],
+     "fore_foot_r": [
+      12.6454,
+      8.9,
+      22.0307
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -36.8411,
+      0.0,
+      4.1306
+     ],
+     "spoon_prop": [
+      -18.2943,
+      -2.0605,
+      36.7172
+     ],
+     "ear_l": [
+      4.2753,
+      -10.0893,
+      40.9811
+     ],
+     "root_dev": 0.0
+    },
+    "8": {
+     "body": [
+      -12.1175,
+      -0.0,
+      25.1741
+     ],
+     "chest": [
+      -9.3007,
+      -0.0,
+      30.4717
+     ],
+     "head": [
+      -6.9402,
+      -0.0,
+      39.5765
+     ],
+     "jaw": [
+      -3.6087,
+      0.0,
+      37.318
+     ],
+     "fore_foot_l": [
+      5.9782,
+      -8.9,
+      33.2205
+     ],
+     "fore_foot_r": [
+      5.9782,
+      8.9,
+      33.2205
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -36.8319,
+      -0.0,
+      4.1306
+     ],
+     "spoon_prop": [
+      -28.0428,
+      -2.0605,
+      29.2799
+     ],
+     "ear_l": [
+      -9.3692,
+      -10.0893,
+      45.5804
+     ],
+     "root_dev": 0.0
+    }
+   },
+   "file": "export/anims/PantryRat_R01_RearUp_Mars_ANIM.fbx",
+   "bytes": 308876,
+   "unreal_path": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_RearUp_Mars_ANIM",
+   "carry_frames": null
+  },
+  "RearObserve": {
+   "fps": 30,
+   "frames": [
+    0,
+    36
+   ],
+   "frame_count": 36,
+   "samples": 37,
+   "seconds": 1.2,
+   "seconds_proposed": 1.2,
+   "loop": true,
+   "additive": false,
+   "additive_reference": null,
+   "landmarks_ue_cm": {
+    "0": {
+     "body": [
+      -12.1175,
+      -0.0,
+      25.1741
+     ],
+     "chest": [
+      -9.3007,
+      -0.0,
+      30.4717
+     ],
+     "head": [
+      -6.9402,
+      -0.0,
+      39.5765
+     ],
+     "jaw": [
+      -3.6087,
+      0.0,
+      37.318
+     ],
+     "fore_foot_l": [
+      5.9782,
+      -8.9,
+      33.2205
+     ],
+     "fore_foot_r": [
+      5.9782,
+      8.9,
+      33.2205
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -36.8319,
+      -0.0,
+      4.1306
+     ],
+     "spoon_prop": [
+      -28.0428,
+      -2.0605,
+      29.2799
+     ],
+     "ear_l": [
+      -9.3692,
+      -10.0893,
+      45.5804
+     ],
+     "root_dev": 0.0
+    },
+    "18": {
+     "body": [
+      -12.1175,
+      -0.0,
+      25.1741
+     ],
+     "chest": [
+      -9.3007,
+      -0.0,
+      30.4717
+     ],
+     "head": [
+      -6.9402,
+      -0.0,
+      39.5765
+     ],
+     "jaw": [
+      -3.7315,
+      0.0,
+      37.1467
+     ],
+     "fore_foot_l": [
+      5.9782,
+      -8.9,
+      33.2205
+     ],
+     "fore_foot_r": [
+      5.9782,
+      8.9,
+      33.2205
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -36.8319,
+      -0.0,
+      4.1306
+     ],
+     "spoon_prop": [
+      -28.0428,
+      -2.0605,
+      29.2799
+     ],
+     "ear_l": [
+      -9.0517,
+      -10.0893,
+      45.6993
+     ],
+     "root_dev": 0.0
+    },
+    "36": {
+     "body": [
+      -12.1175,
+      -0.0,
+      25.1741
+     ],
+     "chest": [
+      -9.3007,
+      -0.0,
+      30.4717
+     ],
+     "head": [
+      -6.9402,
+      -0.0,
+      39.5765
+     ],
+     "jaw": [
+      -3.6087,
+      0.0,
+      37.318
+     ],
+     "fore_foot_l": [
+      5.9782,
+      -8.9,
+      33.2205
+     ],
+     "fore_foot_r": [
+      5.9782,
+      8.9,
+      33.2205
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -36.8319,
+      -0.0,
+      4.1306
+     ],
+     "spoon_prop": [
+      -28.0428,
+      -2.0605,
+      29.2799
+     ],
+     "ear_l": [
+      -9.3692,
+      -10.0893,
+      45.5804
+     ],
+     "root_dev": 0.0
+    }
+   },
+   "file": "export/anims/PantryRat_R01_RearObserve_Mars_ANIM.fbx",
+   "bytes": 346188,
+   "unreal_path": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_RearObserve_Mars_ANIM",
+   "carry_frames": null
+  },
+  "RearDown": {
+   "fps": 30,
+   "frames": [
+    0,
+    8
+   ],
+   "frame_count": 8,
+   "samples": 9,
+   "seconds": 0.266667,
+   "seconds_proposed": 0.25,
+   "loop": false,
+   "additive": false,
+   "additive_reference": null,
+   "landmarks_ue_cm": {
+    "0": {
+     "body": [
+      -12.1175,
+      -0.0,
+      25.1741
+     ],
+     "chest": [
+      -9.3007,
+      -0.0,
+      30.4717
+     ],
+     "head": [
+      -6.9402,
+      -0.0,
+      39.5765
+     ],
+     "jaw": [
+      -3.6087,
+      0.0,
+      37.318
+     ],
+     "fore_foot_l": [
+      5.9782,
+      -8.9,
+      33.2205
+     ],
+     "fore_foot_r": [
+      5.9782,
+      8.9,
+      33.2205
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -36.8319,
+      -0.0,
+      4.1306
+     ],
+     "spoon_prop": [
+      -28.0428,
+      -2.0605,
+      29.2799
+     ],
+     "ear_l": [
+      -9.3692,
+      -10.0893,
+      45.5804
+     ],
+     "root_dev": 0.0
+    },
+    "4": {
+     "body": [
+      -6.9646,
+      -0.0,
+      24.7962
+     ],
+     "chest": [
+      -1.7685,
+      -0.0,
+      27.7962
+     ],
+     "head": [
+      4.8653,
+      -0.0,
+      34.5314
+     ],
+     "jaw": [
+      7.4018,
+      -0.0,
+      31.4064
+     ],
+     "fore_foot_l": [
+      12.6454,
+      -8.9,
+      22.0307
+     ],
+     "fore_foot_r": [
+      12.6454,
+      8.9,
+      22.0307
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -36.8411,
+      0.0,
+      4.1306
+     ],
+     "spoon_prop": [
+      -18.2943,
+      -2.0605,
+      36.7172
+     ],
+     "ear_l": [
+      4.2753,
+      -10.0893,
+      40.9811
+     ],
+     "root_dev": 0.0
+    },
+    "8": {
+     "body": [
+      -3.0,
+      -0.0,
+      22.0
+     ],
+     "chest": [
+      3.0,
+      -0.0,
+      22.0
+     ],
+     "head": [
+      12.0,
+      -0.0,
+      25.0
+     ],
+     "jaw": [
+      13.8,
+      -0.0,
+      21.4
+     ],
+     "fore_foot_l": [
+      4.6,
+      -9.4,
+      2.3
+     ],
+     "fore_foot_r": [
+      4.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -39.9,
+      0.0,
+      4.8
+     ],
+     "spoon_prop": [
+      -6.8513,
+      -2.0605,
+      37.9888
+     ],
+     "ear_l": [
+      12.8199,
+      -10.0893,
+      31.4245
+     ],
+     "root_dev": 0.0
+    }
+   },
+   "file": "export/anims/PantryRat_R01_RearDown_Mars_ANIM.fbx",
+   "bytes": 308876,
+   "unreal_path": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_RearDown_Mars_ANIM",
+   "carry_frames": null
+  },
+  "BoundStart": {
+   "fps": 30,
+   "frames": [
+    0,
+    5
+   ],
+   "frame_count": 5,
+   "samples": 6,
+   "seconds": 0.166667,
+   "seconds_proposed": 0.18,
+   "loop": false,
+   "additive": false,
+   "additive_reference": null,
+   "landmarks_ue_cm": {
+    "0": {
+     "body": [
+      -3.0,
+      -0.0,
+      22.0
+     ],
+     "chest": [
+      3.0,
+      -0.0,
+      22.0
+     ],
+     "head": [
+      12.0,
+      -0.0,
+      25.0
+     ],
+     "jaw": [
+      13.8,
+      -0.0,
+      21.4
+     ],
+     "fore_foot_l": [
+      4.6,
+      -9.4,
+      2.3
+     ],
+     "fore_foot_r": [
+      4.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -39.9,
+      0.0,
+      4.8
+     ],
+     "spoon_prop": [
+      -6.8513,
+      -2.0605,
+      37.9888
+     ],
+     "ear_l": [
+      12.8199,
+      -10.0893,
+      31.4245
+     ],
+     "root_dev": 0.0
+    },
+    "2": {
+     "body": [
+      -3.2,
+      -0.0,
+      20.8
+     ],
+     "chest": [
+      2.7979,
+      -0.0,
+      20.6429
+     ],
+     "head": [
+      11.8734,
+      -0.0,
+      23.4063
+     ],
+     "jaw": [
+      13.5785,
+      -0.0,
+      19.7604
+     ],
+     "fore_foot_l": [
+      2.6,
+      -9.4,
+      4.5
+     ],
+     "fore_foot_r": [
+      3.1,
+      9.4,
+      4.3
+     ],
+     "hind_foot_l": [
+      -10.3,
+      -10.8,
+      3.8
+     ],
+     "hind_foot_r": [
+      -10.7,
+      10.8,
+      3.6
+     ],
+     "tail_04": [
+      -40.5376,
+      -0.0,
+      4.5718
+     ],
+     "spoon_prop": [
+      -6.6314,
+      -2.0605,
+      36.8841
+     ],
+     "ear_l": [
+      12.8612,
+      -10.0893,
+      29.8071
+     ],
+     "root_dev": 0.0
+    },
+    "5": {
+     "body": [
+      -3.4,
+      -0.0,
+      19.4
+     ],
+     "chest": [
+      1.1918,
+      -0.0,
+      19.086
+     ],
+     "head": [
+      10.3865,
+      0.0,
+      21.3823
+     ],
+     "jaw": [
+      11.6012,
+      0.0,
+      17.545
+     ],
+     "fore_foot_l": [
+      0.6,
+      -9.4,
+      2.9
+     ],
+     "fore_foot_r": [
+      1.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -9.6,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -10.4,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -40.6813,
+      0.0,
+      4.5879
+     ],
+     "spoon_prop": [
+      -7.8092,
+      -2.0605,
+      35.5684
+     ],
+     "ear_l": [
+      12.2013,
+      -10.0893,
+      27.5994
+     ],
+     "root_dev": 0.0
+    }
+   },
+   "file": "export/anims/PantryRat_R01_BoundStart_Mars_ANIM.fbx",
+   "bytes": 300124,
+   "unreal_path": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_BoundStart_Mars_ANIM",
+   "carry_frames": null
+  },
+  "BoundCycle": {
+   "fps": 30,
+   "frames": [
+    0,
+    12
+   ],
+   "frame_count": 12,
+   "samples": 13,
+   "seconds": 0.4,
+   "seconds_proposed": 0.4,
+   "loop": true,
+   "additive": false,
+   "additive_reference": null,
+   "landmarks_ue_cm": {
+    "0": {
+     "body": [
+      -3.4,
+      -0.0,
+      19.4
+     ],
+     "chest": [
+      1.1918,
+      -0.0,
+      19.086
+     ],
+     "head": [
+      10.3865,
+      0.0,
+      21.3823
+     ],
+     "jaw": [
+      11.6012,
+      0.0,
+      17.545
+     ],
+     "fore_foot_l": [
+      0.6,
+      -9.4,
+      2.9
+     ],
+     "fore_foot_r": [
+      1.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -9.6,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -10.4,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -40.6813,
+      0.0,
+      4.5879
+     ],
+     "spoon_prop": [
+      -8.057,
+      -2.3583,
+      36.4903
+     ],
+     "ear_l": [
+      12.2013,
+      -10.0893,
+      27.5994
+     ],
+     "root_dev": 0.0
+    },
+    "6": {
+     "body": [
+      -2.695,
+      -0.0,
+      26.6775
+     ],
+     "chest": [
+      5.543,
+      -0.0,
+      26.4491
+     ],
+     "head": [
+      14.6955,
+      0.0,
+      28.9458
+     ],
+     "jaw": [
+      16.4269,
+      0.0,
+      25.3123
+     ],
+     "fore_foot_l": [
+      9.8085,
+      -9.0819,
+      6.5721
+     ],
+     "fore_foot_r": [
+      9.2415,
+      9.1391,
+      6.3986
+     ],
+     "hind_foot_l": [
+      -13.6938,
+      -10.8,
+      7.4975
+     ],
+     "hind_foot_r": [
+      -14.2767,
+      10.7907,
+      6.9985
+     ],
+     "tail_04": [
+      -41.9494,
+      -0.0,
+      15.1377
+     ],
+     "spoon_prop": [
+      -3.6438,
+      -2.3583,
+      43.8831
+     ],
+     "ear_l": [
+      15.6371,
+      -10.0893,
+      35.3536
+     ],
+     "root_dev": 0.0
+    },
+    "12": {
+     "body": [
+      -3.4,
+      -0.0,
+      19.4
+     ],
+     "chest": [
+      1.1918,
+      -0.0,
+      19.086
+     ],
+     "head": [
+      10.3865,
+      0.0,
+      21.3823
+     ],
+     "jaw": [
+      11.6012,
+      0.0,
+      17.545
+     ],
+     "fore_foot_l": [
+      0.6,
+      -9.4,
+      2.9
+     ],
+     "fore_foot_r": [
+      1.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -9.6,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -10.4,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -40.6813,
+      0.0,
+      4.5879
+     ],
+     "spoon_prop": [
+      -8.057,
+      -2.3583,
+      36.4903
+     ],
+     "ear_l": [
+      12.2013,
+      -10.0893,
+      27.5994
+     ],
+     "root_dev": 0.0
+    }
+   },
+   "file": "export/anims/PantryRat_R01_BoundCycle_Mars_ANIM.fbx",
+   "bytes": 320540,
+   "unreal_path": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_BoundCycle_Mars_ANIM",
+   "carry_frames": null
+  },
+  "BoundStop": {
+   "fps": 30,
+   "frames": [
+    0,
+    5
+   ],
+   "frame_count": 5,
+   "samples": 6,
+   "seconds": 0.166667,
+   "seconds_proposed": 0.18,
+   "loop": false,
+   "additive": false,
+   "additive_reference": null,
+   "landmarks_ue_cm": {
+    "0": {
+     "body": [
+      -3.4,
+      -0.0,
+      19.4
+     ],
+     "chest": [
+      1.1918,
+      -0.0,
+      19.086
+     ],
+     "head": [
+      10.3865,
+      0.0,
+      21.3823
+     ],
+     "jaw": [
+      11.6012,
+      0.0,
+      17.545
+     ],
+     "fore_foot_l": [
+      0.6,
+      -9.4,
+      2.9
+     ],
+     "fore_foot_r": [
+      1.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -9.6,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -10.4,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -40.6813,
+      0.0,
+      4.5879
+     ],
+     "spoon_prop": [
+      -7.8092,
+      -2.0605,
+      35.5684
+     ],
+     "ear_l": [
+      12.2013,
+      -10.0893,
+      27.5994
+     ],
+     "root_dev": 0.0
+    },
+    "2": {
+     "body": [
+      -2.4,
+      -0.0,
+      18.6
+     ],
+     "chest": [
+      3.6,
+      -0.0,
+      18.6
+     ],
+     "head": [
+      12.9023,
+      -0.0,
+      20.4119
+     ],
+     "jaw": [
+      14.1838,
+      -0.0,
+      16.5964
+     ],
+     "fore_foot_l": [
+      4.6,
+      -9.4,
+      2.3
+     ],
+     "fore_foot_r": [
+      4.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -37.8466,
+      0.0,
+      5.5088
+     ],
+     "spoon_prop": [
+      -4.526,
+      -2.0605,
+      35.5309
+     ],
+     "ear_l": [
+      14.6084,
+      -10.0893,
+      26.6598
+     ],
+     "root_dev": 0.0
+    },
+    "5": {
+     "body": [
+      -3.0,
+      -0.0,
+      22.0
+     ],
+     "chest": [
+      3.0,
+      -0.0,
+      22.0
+     ],
+     "head": [
+      12.0,
+      -0.0,
+      25.0
+     ],
+     "jaw": [
+      13.8,
+      -0.0,
+      21.4
+     ],
+     "fore_foot_l": [
+      4.6,
+      -9.4,
+      2.3
+     ],
+     "fore_foot_r": [
+      4.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -39.9,
+      0.0,
+      4.8
+     ],
+     "spoon_prop": [
+      -6.8513,
+      -2.0605,
+      37.9888
+     ],
+     "ear_l": [
+      12.8199,
+      -10.0893,
+      31.4245
+     ],
+     "root_dev": 0.0
+    }
+   },
+   "file": "export/anims/PantryRat_R01_BoundStop_Mars_ANIM.fbx",
+   "bytes": 300124,
+   "unreal_path": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_BoundStop_Mars_ANIM",
+   "carry_frames": null
+  },
+  "TurnLeft90": {
+   "fps": 30,
+   "frames": [
+    0,
+    9
+   ],
+   "frame_count": 9,
+   "samples": 10,
+   "seconds": 0.3,
+   "seconds_proposed": 0.3,
+   "loop": false,
+   "additive": false,
+   "additive_reference": null,
+   "landmarks_ue_cm": {
+    "0": {
+     "body": [
+      -3.0,
+      -0.0,
+      22.0
+     ],
+     "chest": [
+      3.0,
+      -0.0,
+      22.0
+     ],
+     "head": [
+      12.0,
+      -0.0,
+      25.0
+     ],
+     "jaw": [
+      13.8,
+      -0.0,
+      21.4
+     ],
+     "fore_foot_l": [
+      4.6,
+      -9.4,
+      2.3
+     ],
+     "fore_foot_r": [
+      4.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -39.9,
+      0.0,
+      4.8
+     ],
+     "spoon_prop": [
+      -6.8513,
+      -2.0605,
+      37.9888
+     ],
+     "ear_l": [
+      12.8199,
+      -10.0893,
+      31.4245
+     ],
+     "root_dev": 0.0
+    },
+    "4": {
+     "body": [
+      -3.0,
+      -0.0,
+      21.1111
+     ],
+     "chest": [
+      2.9187,
+      -0.9845,
+      21.1111
+     ],
+     "head": [
+      11.5381,
+      -3.3868,
+      24.1111
+     ],
+     "jaw": [
+      13.0205,
+      -4.4077,
+      20.5111
+     ],
+     "fore_foot_l": [
+      5.3407,
+      -10.8815,
+      4.5222
+     ],
+     "fore_foot_r": [
+      4.8593,
+      9.0111,
+      3.0259
+     ],
+     "hind_foot_l": [
+      -11.1296,
+      -11.1889,
+      3.2741
+     ],
+     "hind_foot_r": [
+      -11.3704,
+      10.0593,
+      4.5259
+     ],
+     "tail_04": [
+      -38.0598,
+      10.2417,
+      3.9111
+     ],
+     "spoon_prop": [
+      -7.1447,
+      -1.1275,
+      37.0999
+     ],
+     "ear_l": [
+      6.491,
+      -12.1615,
+      30.5356
+     ],
+     "root_dev": 0.0
+    },
+    "9": {
+     "body": [
+      -3.0,
+      -0.0,
+      22.0
+     ],
+     "chest": [
+      3.0,
+      -0.0,
+      22.0
+     ],
+     "head": [
+      12.0,
+      -0.0,
+      25.0
+     ],
+     "jaw": [
+      13.8,
+      -0.0,
+      21.4
+     ],
+     "fore_foot_l": [
+      4.6,
+      -9.4,
+      2.3
+     ],
+     "fore_foot_r": [
+      4.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -39.9,
+      0.0,
+      4.8
+     ],
+     "spoon_prop": [
+      -6.8513,
+      -2.0605,
+      37.9888
+     ],
+     "ear_l": [
+      12.8199,
+      -10.0893,
+      31.4245
+     ],
+     "root_dev": 0.0
+    }
+   },
+   "file": "export/anims/PantryRat_R01_TurnLeft90_Mars_ANIM.fbx",
+   "bytes": 311788,
+   "unreal_path": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_TurnLeft90_Mars_ANIM",
+   "carry_frames": null
+  },
+  "TurnRight90": {
+   "fps": 30,
+   "frames": [
+    0,
+    9
+   ],
+   "frame_count": 9,
+   "samples": 10,
+   "seconds": 0.3,
+   "seconds_proposed": 0.3,
+   "loop": false,
+   "additive": false,
+   "additive_reference": null,
+   "landmarks_ue_cm": {
+    "0": {
+     "body": [
+      -3.0,
+      -0.0,
+      22.0
+     ],
+     "chest": [
+      3.0,
+      -0.0,
+      22.0
+     ],
+     "head": [
+      12.0,
+      -0.0,
+      25.0
+     ],
+     "jaw": [
+      13.8,
+      -0.0,
+      21.4
+     ],
+     "fore_foot_l": [
+      4.6,
+      -9.4,
+      2.3
+     ],
+     "fore_foot_r": [
+      4.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -39.9,
+      0.0,
+      4.8
+     ],
+     "spoon_prop": [
+      -6.9256,
+      -2.9838,
+      38.1356
+     ],
+     "ear_l": [
+      12.8199,
+      -10.0893,
+      31.4245
+     ],
+     "root_dev": 0.0
+    },
+    "4": {
+     "body": [
+      -3.0,
+      -0.0,
+      21.1111
+     ],
+     "chest": [
+      2.9187,
+      0.9845,
+      21.1111
+     ],
+     "head": [
+      11.5381,
+      3.3868,
+      24.1111
+     ],
+     "jaw": [
+      13.0205,
+      4.4077,
+      20.5111
+     ],
+     "fore_foot_l": [
+      4.8593,
+      -9.0111,
+      3.0259
+     ],
+     "fore_foot_r": [
+      5.3407,
+      10.8815,
+      4.5222
+     ],
+     "hind_foot_l": [
+      -11.3704,
+      -10.0593,
+      4.5259
+     ],
+     "hind_foot_r": [
+      -11.1296,
+      11.1889,
+      3.2741
+     ],
+     "tail_04": [
+      -38.0598,
+      -10.2417,
+      3.9111
+     ],
+     "spoon_prop": [
+      -6.4328,
+      -3.8394,
+      37.1803
+     ],
+     "ear_l": [
+      17.9356,
+      -4.4578,
+      30.5356
+     ],
+     "root_dev": 0.0
+    },
+    "9": {
+     "body": [
+      -3.0,
+      -0.0,
+      22.0
+     ],
+     "chest": [
+      3.0,
+      -0.0,
+      22.0
+     ],
+     "head": [
+      12.0,
+      -0.0,
+      25.0
+     ],
+     "jaw": [
+      13.8,
+      -0.0,
+      21.4
+     ],
+     "fore_foot_l": [
+      4.6,
+      -9.4,
+      2.3
+     ],
+     "fore_foot_r": [
+      4.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -39.9,
+      0.0,
+      4.8
+     ],
+     "spoon_prop": [
+      -6.9256,
+      -2.9838,
+      38.1356
+     ],
+     "ear_l": [
+      12.8199,
+      -10.0893,
+      31.4245
+     ],
+     "root_dev": 0.0
+    }
+   },
+   "file": "export/anims/PantryRat_R01_TurnRight90_Mars_ANIM.fbx",
+   "bytes": 311788,
+   "unreal_path": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_TurnRight90_Mars_ANIM",
+   "carry_frames": null
+  },
+  "Turn180": {
+   "fps": 30,
+   "frames": [
+    0,
+    14
+   ],
+   "frame_count": 14,
+   "samples": 15,
+   "seconds": 0.466667,
+   "seconds_proposed": 0.45,
+   "loop": false,
+   "additive": false,
+   "additive_reference": null,
+   "landmarks_ue_cm": {
+    "0": {
+     "body": [
+      -3.0,
+      -0.0,
+      22.0
+     ],
+     "chest": [
+      3.0,
+      -0.0,
+      22.0
+     ],
+     "head": [
+      12.0,
+      -0.0,
+      25.0
+     ],
+     "jaw": [
+      13.8,
+      -0.0,
+      21.4
+     ],
+     "fore_foot_l": [
+      4.6,
+      -9.4,
+      2.3
+     ],
+     "fore_foot_r": [
+      4.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -39.9,
+      0.0,
+      4.8
+     ],
+     "spoon_prop": [
+      -6.8513,
+      -2.0605,
+      37.9888
+     ],
+     "ear_l": [
+      12.8199,
+      -10.0893,
+      31.4245
+     ],
+     "root_dev": 0.0
+    },
+    "7": {
+     "body": [
+      -3.0,
+      -0.0,
+      20.2222
+     ],
+     "chest": [
+      2.8383,
+      -1.3835,
+      20.2222
+     ],
+     "head": [
+      11.1252,
+      -4.6325,
+      23.2222
+     ],
+     "jaw": [
+      12.3504,
+      -5.9512,
+      19.6222
+     ],
+     "fore_foot_l": [
+      5.1,
+      -10.4,
+      3.8
+     ],
+     "fore_foot_r": [
+      5.1,
+      8.65,
+      3.7
+     ],
+     "hind_foot_l": [
+      -11.25,
+      -11.55,
+      3.9
+     ],
+     "hind_foot_r": [
+      -11.25,
+      10.3,
+      3.9
+     ],
+     "tail_04": [
+      -36.7828,
+      13.772,
+      4.0805
+     ],
+     "spoon_prop": [
+      -7.2095,
+      -0.805,
+      36.211
+     ],
+     "ear_l": [
+      4.2921,
+      -12.1009,
+      29.6467
+     ],
+     "root_dev": 0.0
+    },
+    "14": {
+     "body": [
+      -3.0,
+      -0.0,
+      22.0
+     ],
+     "chest": [
+      3.0,
+      -0.0,
+      22.0
+     ],
+     "head": [
+      12.0,
+      -0.0,
+      25.0
+     ],
+     "jaw": [
+      13.8,
+      -0.0,
+      21.4
+     ],
+     "fore_foot_l": [
+      4.6,
+      -9.4,
+      2.3
+     ],
+     "fore_foot_r": [
+      4.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -39.9,
+      0.0,
+      4.8
+     ],
+     "spoon_prop": [
+      -6.8513,
+      -2.0605,
+      37.9888
+     ],
+     "ear_l": [
+      12.8199,
+      -10.0893,
+      31.4245
+     ],
+     "root_dev": 0.0
+    }
+   },
+   "file": "export/anims/PantryRat_R01_Turn180_Mars_ANIM.fbx",
+   "bytes": 326364,
+   "unreal_path": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_Turn180_Mars_ANIM",
+   "carry_frames": null
+  },
+  "Startle": {
+   "fps": 30,
+   "frames": [
+    0,
+    9
+   ],
+   "frame_count": 9,
+   "samples": 10,
+   "seconds": 0.3,
+   "seconds_proposed": 0.3,
+   "loop": false,
+   "additive": false,
+   "additive_reference": null,
+   "landmarks_ue_cm": {
+    "0": {
+     "body": [
+      -3.0,
+      -0.0,
+      22.0
+     ],
+     "chest": [
+      3.0,
+      -0.0,
+      22.0
+     ],
+     "head": [
+      12.0,
+      -0.0,
+      25.0
+     ],
+     "jaw": [
+      13.8,
+      -0.0,
+      21.4
+     ],
+     "fore_foot_l": [
+      4.6,
+      -9.4,
+      2.3
+     ],
+     "fore_foot_r": [
+      4.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -39.9,
+      0.0,
+      4.8
+     ],
+     "spoon_prop": [
+      -6.8513,
+      -2.0605,
+      37.9888
+     ],
+     "ear_l": [
+      12.8199,
+      -10.0893,
+      31.4245
+     ],
+     "root_dev": 0.0
+    },
+    "4": {
+     "body": [
+      -4.508,
+      -0.0,
+      19.0444
+     ],
+     "chest": [
+      1.492,
+      -0.0,
+      19.0444
+     ],
+     "head": [
+      10.6258,
+      -0.0,
+      21.6031
+     ],
+     "jaw": [
+      12.8196,
+      0.0,
+      18.2285
+     ],
+     "fore_foot_l": [
+      4.6,
+      -9.4,
+      2.3
+     ],
+     "fore_foot_r": [
+      4.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -42.6047,
+      0.0,
+      8.7756
+     ],
+     "spoon_prop": [
+      -7.1303,
+      -2.0605,
+      35.7281
+     ],
+     "ear_l": [
+      10.7174,
+      -10.0893,
+      28.079
+     ],
+     "root_dev": 0.0
+    },
+    "9": {
+     "body": [
+      -4.4,
+      -0.0,
+      19.6
+     ],
+     "chest": [
+      1.6,
+      -0.0,
+      19.6
+     ],
+     "head": [
+      10.7254,
+      -0.0,
+      22.1905
+     ],
+     "jaw": [
+      12.8918,
+      0.0,
+      18.7984
+     ],
+     "fore_foot_l": [
+      4.6,
+      -9.4,
+      2.3
+     ],
+     "fore_foot_r": [
+      4.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -42.4794,
+      0.0,
+      8.8335
+     ],
+     "spoon_prop": [
+      -7.112,
+      -2.0605,
+      36.237
+     ],
+     "ear_l": [
+      10.8693,
+      -10.0893,
+      28.6655
+     ],
+     "root_dev": 0.0
+    }
+   },
+   "file": "export/anims/PantryRat_R01_Startle_Mars_ANIM.fbx",
+   "bytes": 311788,
+   "unreal_path": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_Startle_Mars_ANIM",
+   "carry_frames": null
+  },
+  "Backstep": {
+   "fps": 30,
+   "frames": [
+    0,
+    11
+   ],
+   "frame_count": 11,
+   "samples": 12,
+   "seconds": 0.366667,
+   "seconds_proposed": 0.35,
+   "loop": false,
+   "additive": false,
+   "additive_reference": null,
+   "landmarks_ue_cm": {
+    "0": {
+     "body": [
+      -3.0,
+      -0.0,
+      22.0
+     ],
+     "chest": [
+      3.0,
+      -0.0,
+      22.0
+     ],
+     "head": [
+      12.0,
+      -0.0,
+      25.0
+     ],
+     "jaw": [
+      13.8,
+      -0.0,
+      21.4
+     ],
+     "fore_foot_l": [
+      4.6,
+      -9.4,
+      2.3
+     ],
+     "fore_foot_r": [
+      4.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -39.9,
+      0.0,
+      4.8
+     ],
+     "spoon_prop": [
+      -6.8513,
+      -2.8945,
+      37.859
+     ],
+     "ear_l": [
+      12.8199,
+      -10.0893,
+      31.4245
+     ],
+     "root_dev": 0.0
+    },
+    "5": {
+     "body": [
+      -6.2444,
+      -0.0,
+      20.9074
+     ],
+     "chest": [
+      -0.2444,
+      -0.0,
+      20.9074
+     ],
+     "head": [
+      8.6931,
+      -0.0,
+      24.0887
+     ],
+     "jaw": [
+      10.8277,
+      -0.0,
+      20.6764
+     ],
+     "fore_foot_l": [
+      1.7481,
+      -9.4,
+      3.0778
+     ],
+     "fore_foot_r": [
+      3.1185,
+      9.4,
+      4.5222
+     ],
+     "hind_foot_l": [
+      -12.4815,
+      -10.8,
+      4.5259
+     ],
+     "hind_foot_r": [
+      -13.8519,
+      10.8,
+      3.2741
+     ],
+     "tail_04": [
+      -43.1444,
+      0.0,
+      3.7074
+     ],
+     "spoon_prop": [
+      -10.0957,
+      -2.8945,
+      36.7664
+     ],
+     "ear_l": [
+      8.8977,
+      -10.0893,
+      30.5621
+     ],
+     "root_dev": 0.0
+    },
+    "11": {
+     "body": [
+      -3.0,
+      -0.0,
+      22.0
+     ],
+     "chest": [
+      3.0,
+      -0.0,
+      22.0
+     ],
+     "head": [
+      12.0,
+      -0.0,
+      25.0
+     ],
+     "jaw": [
+      13.8,
+      -0.0,
+      21.4
+     ],
+     "fore_foot_l": [
+      4.6,
+      -9.4,
+      2.3
+     ],
+     "fore_foot_r": [
+      4.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -39.9,
+      0.0,
+      4.8
+     ],
+     "spoon_prop": [
+      -6.8513,
+      -2.8945,
+      37.859
+     ],
+     "ear_l": [
+      12.8199,
+      -10.0893,
+      31.4245
+     ],
+     "root_dev": 0.0
+    }
+   },
+   "file": "export/anims/PantryRat_R01_Backstep_Mars_ANIM.fbx",
+   "bytes": 317628,
+   "unreal_path": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_Backstep_Mars_ANIM",
+   "carry_frames": null
+  },
+  "GuardedWatch": {
+   "fps": 30,
+   "frames": [
+    0,
+    45
+   ],
+   "frame_count": 45,
+   "samples": 46,
+   "seconds": 1.5,
+   "seconds_proposed": 1.5,
+   "loop": true,
+   "additive": false,
+   "additive_reference": null,
+   "landmarks_ue_cm": {
+    "0": {
+     "body": [
+      -3.4,
+      -0.0,
+      21.0
+     ],
+     "chest": [
+      2.6,
+      -0.0,
+      21.0
+     ],
+     "head": [
+      11.6501,
+      -0.5614,
+      23.6841
+     ],
+     "jaw": [
+      13.2415,
+      -1.0785,
+      20.0235
+     ],
+     "fore_foot_l": [
+      4.6,
+      -9.4,
+      2.3
+     ],
+     "fore_foot_r": [
+      4.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -40.2698,
+      0.8806,
+      3.8
+     ],
+     "spoon_prop": [
+      -6.6873,
+      -2.9065,
+      37.1928
+     ],
+     "ear_l": [
+      9.5249,
+      -10.4794,
+      30.076
+     ],
+     "root_dev": 0.0
+    },
+    "22": {
+     "body": [
+      -3.4,
+      -0.0,
+      21.0
+     ],
+     "chest": [
+      2.6,
+      -0.0,
+      21.0
+     ],
+     "head": [
+      11.6724,
+      -0.4155,
+      23.6841
+     ],
+     "jaw": [
+      13.3609,
+      -0.5444,
+      20.0327
+     ],
+     "fore_foot_l": [
+      4.6,
+      -9.4,
+      2.3
+     ],
+     "fore_foot_r": [
+      4.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -40.2862,
+      -0.5538,
+      3.8
+     ],
+     "spoon_prop": [
+      -6.6873,
+      -2.9065,
+      37.1928
+     ],
+     "ear_l": [
+      12.0828,
+      -10.4971,
+      30.1598
+     ],
+     "root_dev": 0.0
+    },
+    "45": {
+     "body": [
+      -3.4,
+      -0.0,
+      21.0
+     ],
+     "chest": [
+      2.6,
+      -0.0,
+      21.0
+     ],
+     "head": [
+      11.6501,
+      -0.5614,
+      23.6841
+     ],
+     "jaw": [
+      13.2415,
+      -1.0785,
+      20.0235
+     ],
+     "fore_foot_l": [
+      4.6,
+      -9.4,
+      2.3
+     ],
+     "fore_foot_r": [
+      4.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -40.2698,
+      0.8806,
+      3.8
+     ],
+     "spoon_prop": [
+      -6.6873,
+      -2.9065,
+      37.1928
+     ],
+     "ear_l": [
+      9.5249,
+      -10.4794,
+      30.076
+     ],
+     "root_dev": 0.0
+    }
+   },
+   "file": "export/anims/PantryRat_R01_GuardedWatch_Mars_ANIM.fbx",
+   "bytes": 363772,
+   "unreal_path": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_GuardedWatch_Mars_ANIM",
+   "carry_frames": null
+  },
+  "DenEmerge": {
+   "fps": 30,
+   "frames": [
+    0,
+    30
+   ],
+   "frame_count": 30,
+   "samples": 31,
+   "seconds": 1.0,
+   "seconds_proposed": 1.0,
+   "loop": false,
+   "additive": false,
+   "additive_reference": null,
+   "landmarks_ue_cm": {
+    "0": {
+     "body": [
+      -3.4,
+      -0.0,
+      18.5
+     ],
+     "chest": [
+      2.6,
+      -0.0,
+      18.5
+     ],
+     "head": [
+      11.9263,
+      -0.0,
+      19.728
+     ],
+     "jaw": [
+      11.966,
+      -0.0,
+      15.7033
+     ],
+     "fore_foot_l": [
+      4.6,
+      -9.4,
+      2.3
+     ],
+     "fore_foot_r": [
+      4.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -42.1103,
+      0.0,
+      5.2558
+     ],
+     "spoon_prop": [
+      -5.526,
+      -2.0605,
+      35.4309
+     ],
+     "ear_l": [
+      15.4796,
+      -10.0893,
+      25.1429
+     ],
+     "root_dev": 0.0
+    },
+    "15": {
+     "body": [
+      -3.3883,
+      -0.0,
+      18.9039
+     ],
+     "chest": [
+      2.6117,
+      -0.0,
+      18.9039
+     ],
+     "head": [
+      11.9365,
+      -0.0,
+      20.4904
+     ],
+     "jaw": [
+      12.8122,
+      0.0237,
+      16.562
+     ],
+     "fore_foot_l": [
+      5.2328,
+      -9.4,
+      3.1227
+     ],
+     "fore_foot_r": [
+      5.9672,
+      9.4,
+      4.0773
+     ],
+     "hind_foot_l": [
+      -10.3164,
+      -10.8,
+      4.1039
+     ],
+     "hind_foot_r": [
+      -10.6836,
+      10.8,
+      3.2961
+     ],
+     "tail_04": [
+      -42.0837,
+      0.0,
+      5.6268
+     ],
+     "spoon_prop": [
+      -5.497,
+      -2.0605,
+      35.8431
+     ],
+     "ear_l": [
+      14.6511,
+      -9.9845,
+      26.547
+     ],
+     "root_dev": 0.0
+    },
+    "30": {
+     "body": [
+      -3.6,
+      -0.0,
+      19.1
+     ],
+     "chest": [
+      2.4,
+      -0.0,
+      19.1
+     ],
+     "head": [
+      11.6991,
+      -0.0,
+      20.783
+     ],
+     "jaw": [
+      12.2986,
+      0.0,
+      16.803
+     ],
+     "fore_foot_l": [
+      4.6,
+      -9.4,
+      2.3
+     ],
+     "fore_foot_r": [
+      4.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -42.5462,
+      0.0,
+      6.4273
+     ],
+     "spoon_prop": [
+      -6.0203,
+      -2.0605,
+      35.8865
+     ],
+     "ear_l": [
+      14.4642,
+      -10.0893,
+      26.6397
+     ],
+     "root_dev": 0.0
+    }
+   },
+   "file": "export/anims/PantryRat_R01_DenEmerge_Mars_ANIM.fbx",
+   "bytes": 360636,
+   "unreal_path": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_DenEmerge_Mars_ANIM",
+   "carry_frames": null
+  },
+  "DenEnter": {
+   "fps": 30,
+   "frames": [
+    0,
+    30
+   ],
+   "frame_count": 30,
+   "samples": 31,
+   "seconds": 1.0,
+   "seconds_proposed": 1.0,
+   "loop": false,
+   "additive": false,
+   "additive_reference": null,
+   "landmarks_ue_cm": {
+    "0": {
+     "body": [
+      -3.0,
+      -0.0,
+      22.0
+     ],
+     "chest": [
+      3.0,
+      -0.0,
+      22.0
+     ],
+     "head": [
+      12.0,
+      -0.0,
+      25.0
+     ],
+     "jaw": [
+      13.8,
+      -0.0,
+      21.4
+     ],
+     "fore_foot_l": [
+      4.6,
+      -9.4,
+      2.3
+     ],
+     "fore_foot_r": [
+      4.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -39.9,
+      0.0,
+      4.8
+     ],
+     "spoon_prop": [
+      -6.8513,
+      -2.0605,
+      37.9888
+     ],
+     "ear_l": [
+      12.8199,
+      -10.0893,
+      31.4245
+     ],
+     "root_dev": 0.0
+    },
+    "15": {
+     "body": [
+      -3.4209,
+      -0.0,
+      18.897
+     ],
+     "chest": [
+      2.5791,
+      -0.0,
+      18.897
+     ],
+     "head": [
+      11.9038,
+      -0.0,
+      20.1222
+     ],
+     "jaw": [
+      11.9438,
+      -0.0,
+      16.0975
+     ],
+     "fore_foot_l": [
+      6.5141,
+      -9.4,
+      4.7883
+     ],
+     "fore_foot_r": [
+      4.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -10.043,
+      10.8,
+      4.7055
+     ],
+     "tail_04": [
+      -42.1914,
+      0.0,
+      5.8279
+     ],
+     "spoon_prop": [
+      -5.5616,
+      -2.0605,
+      35.8208
+     ],
+     "ear_l": [
+      15.4567,
+      -10.0893,
+      25.5373
+     ],
+     "root_dev": 0.0
+    },
+    "30": {
+     "body": [
+      -3.4,
+      -0.0,
+      18.9
+     ],
+     "chest": [
+      2.6,
+      -0.0,
+      18.9
+     ],
+     "head": [
+      11.9263,
+      -0.0,
+      20.128
+     ],
+     "jaw": [
+      11.966,
+      -0.0,
+      16.1033
+     ],
+     "fore_foot_l": [
+      4.6,
+      -9.4,
+      2.3
+     ],
+     "fore_foot_r": [
+      4.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -41.3186,
+      -0.0,
+      3.9034
+     ],
+     "spoon_prop": [
+      -5.526,
+      -2.0605,
+      35.8309
+     ],
+     "ear_l": [
+      15.4796,
+      -10.0893,
+      25.5429
+     ],
+     "root_dev": 0.0
+    }
+   },
+   "file": "export/anims/PantryRat_R01_DenEnter_Mars_ANIM.fbx",
+   "bytes": 360636,
+   "unreal_path": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_DenEnter_Mars_ANIM",
+   "carry_frames": null
+  },
+  "InspectSlot": {
+   "fps": 30,
+   "frames": [
+    0,
+    12
+   ],
+   "frame_count": 12,
+   "samples": 13,
+   "seconds": 0.4,
+   "seconds_proposed": 0.4,
+   "loop": false,
+   "additive": false,
+   "additive_reference": null,
+   "landmarks_ue_cm": {
+    "0": {
+     "body": [
+      -3.0,
+      -0.0,
+      22.0
+     ],
+     "chest": [
+      3.0,
+      -0.0,
+      22.0
+     ],
+     "head": [
+      12.0,
+      -0.0,
+      25.0
+     ],
+     "jaw": [
+      13.8,
+      -0.0,
+      21.4
+     ],
+     "fore_foot_l": [
+      4.6,
+      -9.4,
+      2.3
+     ],
+     "fore_foot_r": [
+      4.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -39.9,
+      0.0,
+      4.8
+     ],
+     "spoon_prop": [
+      -6.9256,
+      -2.9838,
+      38.1356
+     ],
+     "ear_l": [
+      12.8199,
+      -10.0893,
+      31.4245
+     ],
+     "root_dev": 0.0
+    },
+    "6": {
+     "body": [
+      -1.7333,
+      -0.0,
+      22.4222
+     ],
+     "chest": [
+      5.9556,
+      -0.0,
+      22.4222
+     ],
+     "head": [
+      14.774,
+      -0.0,
+      25.8813
+     ],
+     "jaw": [
+      17.2675,
+      -0.0424,
+      22.722
+     ],
+     "fore_foot_l": [
+      4.6,
+      -9.4,
+      2.3
+     ],
+     "fore_foot_r": [
+      4.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -38.6333,
+      0.0,
+      5.2222
+     ],
+     "spoon_prop": [
+      -3.9701,
+      -2.9838,
+      38.5578
+     ],
+     "ear_l": [
+      14.0942,
+      -10.0819,
+      32.3337
+     ],
+     "root_dev": 0.0
+    },
+    "12": {
+     "body": [
+      -1.8,
+      -0.0,
+      22.4
+     ],
+     "chest": [
+      5.8,
+      -0.0,
+      22.4
+     ],
+     "head": [
+      14.6297,
+      -0.0,
+      25.8356
+     ],
+     "jaw": [
+      17.1373,
+      0.0876,
+      22.6885
+     ],
+     "fore_foot_l": [
+      4.6,
+      -9.4,
+      2.3
+     ],
+     "fore_foot_r": [
+      4.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -38.7,
+      0.0,
+      5.2
+     ],
+     "spoon_prop": [
+      -4.1256,
+      -2.9838,
+      38.5356
+     ],
+     "ear_l": [
+      14.4484,
+      -10.1018,
+      32.2902
+     ],
+     "root_dev": 0.0
+    }
+   },
+   "file": "export/anims/PantryRat_R01_InspectSlot_Mars_ANIM.fbx",
+   "bytes": 320540,
+   "unreal_path": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_InspectSlot_Mars_ANIM",
+   "carry_frames": null
+  },
+  "Rummage": {
+   "fps": 30,
+   "frames": [
+    0,
+    48
+   ],
+   "frame_count": 48,
+   "samples": 49,
+   "seconds": 1.6,
+   "seconds_proposed": 1.6,
+   "loop": true,
+   "additive": false,
+   "additive_reference": null,
+   "landmarks_ue_cm": {
+    "0": {
+     "body": [
+      -8.4261,
+      -0.0,
+      25.2029
+     ],
+     "chest": [
+      -3.782,
+      -0.0,
+      29.0019
+     ],
+     "head": [
+      1.97,
+      0.0,
+      36.4232
+     ],
+     "jaw": [
+      4.9825,
+      -0.0,
+      33.754
+     ],
+     "fore_foot_l": [
+      11.6,
+      -7.0,
+      23.0019
+     ],
+     "fore_foot_r": [
+      11.6,
+      7.0,
+      23.0019
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -37.2726,
+      0.0,
+      4.1306
+     ],
+     "spoon_prop": [
+      -21.5305,
+      -2.0605,
+      35.14
+     ],
+     "ear_l": [
+      0.3353,
+      -10.0893,
+      42.6901
+     ],
+     "root_dev": 0.0
+    },
+    "24": {
+     "body": [
+      -8.4261,
+      -0.0,
+      25.2029
+     ],
+     "chest": [
+      -3.782,
+      -0.0,
+      29.0019
+     ],
+     "head": [
+      1.97,
+      0.0,
+      36.4232
+     ],
+     "jaw": [
+      5.0739,
+      0.0,
+      33.8607
+     ],
+     "fore_foot_l": [
+      11.6,
+      -7.0,
+      23.0019
+     ],
+     "fore_foot_r": [
+      11.6,
+      7.0,
+      23.0019
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -37.2726,
+      0.0,
+      4.1306
+     ],
+     "spoon_prop": [
+      -21.5305,
+      -2.0605,
+      35.14
+     ],
+     "ear_l": [
+      0.1176,
+      -10.0893,
+      42.6292
+     ],
+     "root_dev": 0.0
+    },
+    "48": {
+     "body": [
+      -8.4261,
+      -0.0,
+      25.2029
+     ],
+     "chest": [
+      -3.782,
+      -0.0,
+      29.0019
+     ],
+     "head": [
+      1.97,
+      0.0,
+      36.4232
+     ],
+     "jaw": [
+      4.9825,
+      -0.0,
+      33.754
+     ],
+     "fore_foot_l": [
+      11.6,
+      -7.0,
+      23.0019
+     ],
+     "fore_foot_r": [
+      11.6,
+      7.0,
+      23.0019
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -37.2726,
+      0.0,
+      4.1306
+     ],
+     "spoon_prop": [
+      -21.5305,
+      -2.0605,
+      35.14
+     ],
+     "ear_l": [
+      0.3353,
+      -10.0893,
+      42.6901
+     ],
+     "root_dev": 0.0
+    }
+   },
+   "file": "export/anims/PantryRat_R01_Rummage_Mars_ANIM.fbx",
+   "bytes": 373292,
+   "unreal_path": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_Rummage_Mars_ANIM",
+   "carry_frames": null
+  },
+  "Snatch": {
+   "fps": 30,
+   "frames": [
+    0,
+    8
+   ],
+   "frame_count": 8,
+   "samples": 9,
+   "seconds": 0.266667,
+   "seconds_proposed": 0.25,
+   "loop": false,
+   "additive": false,
+   "additive_reference": null,
+   "landmarks_ue_cm": {
+    "0": {
+     "body": [
+      -8.4261,
+      -0.0,
+      25.2029
+     ],
+     "chest": [
+      -3.782,
+      -0.0,
+      29.0019
+     ],
+     "head": [
+      1.97,
+      0.0,
+      36.4232
+     ],
+     "jaw": [
+      4.9825,
+      -0.0,
+      33.754
+     ],
+     "fore_foot_l": [
+      11.6,
+      -7.0,
+      23.0019
+     ],
+     "fore_foot_r": [
+      11.6,
+      7.0,
+      23.0019
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -37.2726,
+      0.0,
+      4.1306
+     ],
+     "spoon_prop": [
+      -21.5305,
+      -2.0605,
+      35.14
+     ],
+     "ear_l": [
+      0.3353,
+      -10.0893,
+      42.6901
+     ],
+     "root_dev": 0.0
+    },
+    "4": {
+     "body": [
+      -8.1371,
+      -0.0,
+      24.4417
+     ],
+     "chest": [
+      -2.7198,
+      -0.0,
+      27.0211
+     ],
+     "head": [
+      4.2906,
+      0.0,
+      33.3949
+     ],
+     "jaw": [
+      7.3928,
+      0.0,
+      30.8304
+     ],
+     "fore_foot_l": [
+      5.7498,
+      -8.6268,
+      11.1256
+     ],
+     "fore_foot_r": [
+      5.9817,
+      8.5736,
+      11.1611
+     ],
+     "hind_foot_l": [
+      -12.4518,
+      -10.8,
+      4.3778
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -38.9264,
+      0.0,
+      3.8218
+     ],
+     "spoon_prop": [
+      -18.492,
+      -1.9987,
+      37.2306
+     ],
+     "ear_l": [
+      2.4423,
+      -10.0893,
+      39.6022
+     ],
+     "root_dev": 0.0
+    },
+    "8": {
+     "body": [
+      -3.0,
+      -0.0,
+      22.0
+     ],
+     "chest": [
+      3.0,
+      -0.0,
+      22.0
+     ],
+     "head": [
+      11.9007,
+      -0.0,
+      25.2751
+     ],
+     "jaw": [
+      14.5181,
+      -0.0,
+      22.2175
+     ],
+     "fore_foot_l": [
+      4.6,
+      -9.4,
+      2.3
+     ],
+     "fore_foot_r": [
+      4.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -13.4,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -38.9589,
+      -0.0,
+      3.4516
+     ],
+     "spoon_prop": [
+      -6.8513,
+      -2.8945,
+      37.859
+     ],
+     "ear_l": [
+      11.142,
+      -10.0893,
+      31.7071
+     ],
+     "root_dev": 0.0
+    }
+   },
+   "file": "export/anims/PantryRat_R01_Snatch_Mars_ANIM.fbx",
+   "bytes": 308876,
+   "unreal_path": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_Snatch_Mars_ANIM",
+   "carry_frames": [
+    2,
+    8
+   ]
+  },
+  "LoadedIdle": {
+   "fps": 30,
+   "frames": [
+    0,
+    36
+   ],
+   "frame_count": 36,
+   "samples": 37,
+   "seconds": 1.2,
+   "seconds_proposed": 1.2,
+   "loop": true,
+   "additive": false,
+   "additive_reference": null,
+   "landmarks_ue_cm": {
+    "0": {
+     "body": [
+      -3.0,
+      -0.0,
+      22.0
+     ],
+     "chest": [
+      3.0,
+      -0.0,
+      22.0
+     ],
+     "head": [
+      11.9007,
+      -0.0,
+      25.2751
+     ],
+     "jaw": [
+      14.5181,
+      -0.0,
+      22.2175
+     ],
+     "fore_foot_l": [
+      4.6,
+      -9.4,
+      2.3
+     ],
+     "fore_foot_r": [
+      4.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -38.9589,
+      -0.0,
+      3.4516
+     ],
+     "spoon_prop": [
+      -6.8513,
+      -2.8945,
+      37.859
+     ],
+     "ear_l": [
+      11.142,
+      -10.0893,
+      31.7071
+     ],
+     "root_dev": 0.0
+    },
+    "18": {
+     "body": [
+      -3.0,
+      -0.0,
+      22.1688
+     ],
+     "chest": [
+      3.0,
+      -0.0,
+      22.1688
+     ],
+     "head": [
+      11.8681,
+      0.0011,
+      25.5311
+     ],
+     "jaw": [
+      14.5134,
+      -0.0018,
+      22.4975
+     ],
+     "fore_foot_l": [
+      4.6,
+      -9.4,
+      2.3
+     ],
+     "fore_foot_r": [
+      4.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -38.8897,
+      0.0019,
+      3.3262
+     ],
+     "spoon_prop": [
+      -7.0078,
+      -2.8909,
+      37.9304
+     ],
+     "ear_l": [
+      11.0493,
+      -10.0827,
+      31.9644
+     ],
+     "root_dev": 0.0
+    },
+    "36": {
+     "body": [
+      -3.0,
+      -0.0,
+      22.0
+     ],
+     "chest": [
+      3.0,
+      -0.0,
+      22.0
+     ],
+     "head": [
+      11.9007,
+      -0.0,
+      25.2751
+     ],
+     "jaw": [
+      14.5181,
+      -0.0,
+      22.2175
+     ],
+     "fore_foot_l": [
+      4.6,
+      -9.4,
+      2.3
+     ],
+     "fore_foot_r": [
+      4.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -38.9589,
+      -0.0,
+      3.4516
+     ],
+     "spoon_prop": [
+      -6.8513,
+      -2.8945,
+      37.859
+     ],
+     "ear_l": [
+      11.142,
+      -10.0893,
+      31.7071
+     ],
+     "root_dev": 0.0
+    }
+   },
+   "file": "export/anims/PantryRat_R01_LoadedIdle_Mars_ANIM.fbx",
+   "bytes": 356156,
+   "unreal_path": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_LoadedIdle_Mars_ANIM",
+   "carry_frames": [
+    0,
+    36
+   ]
+  },
+  "LoadedBound": {
+   "fps": 30,
+   "frames": [
+    0,
+    14
+   ],
+   "frame_count": 14,
+   "samples": 15,
+   "seconds": 0.466667,
+   "seconds_proposed": 0.45,
+   "loop": true,
+   "additive": false,
+   "additive_reference": null,
+   "landmarks_ue_cm": {
+    "0": {
+     "body": [
+      -3.4,
+      -0.0,
+      19.4
+     ],
+     "chest": [
+      1.1947,
+      -0.0,
+      19.1487
+     ],
+     "head": [
+      10.2442,
+      -0.0,
+      21.9931
+     ],
+     "jaw": [
+      12.7313,
+      0.0,
+      18.8285
+     ],
+     "fore_foot_l": [
+      0.6,
+      -9.4,
+      2.9
+     ],
+     "fore_foot_r": [
+      1.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -9.6,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -10.4,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -39.8957,
+      -0.0,
+      4.0251
+     ],
+     "spoon_prop": [
+      -8.2262,
+      -2.3583,
+      36.4579
+     ],
+     "ear_l": [
+      9.7556,
+      -10.0893,
+      28.4512
+     ],
+     "root_dev": 0.0
+    },
+    "7": {
+     "body": [
+      -2.7,
+      -0.0,
+      25.7875
+     ],
+     "chest": [
+      5.5029,
+      -0.0,
+      25.6411
+     ],
+     "head": [
+      14.4783,
+      -0.0,
+      28.6746
+     ],
+     "jaw": [
+      17.3572,
+      -0.0,
+      25.8617
+     ],
+     "fore_foot_l": [
+      9.8789,
+      -9.1632,
+      5.7882
+     ],
+     "fore_foot_r": [
+      9.2832,
+      9.2272,
+      5.6059
+     ],
+     "hind_foot_l": [
+      -13.6146,
+      -10.8,
+      7.4625
+     ],
+     "hind_foot_r": [
+      -14.2167,
+      10.8,
+      6.9125
+     ],
+     "tail_04": [
+      -41.0289,
+      -0.0,
+      11.0927
+     ],
+     "spoon_prop": [
+      -3.8555,
+      -2.3583,
+      42.9826
+     ],
+     "ear_l": [
+      13.1508,
+      -10.0893,
+      35.0136
+     ],
+     "root_dev": 0.0
+    },
+    "14": {
+     "body": [
+      -3.4,
+      -0.0,
+      19.4
+     ],
+     "chest": [
+      1.1947,
+      -0.0,
+      19.1487
+     ],
+     "head": [
+      10.2442,
+      -0.0,
+      21.9931
+     ],
+     "jaw": [
+      12.7313,
+      0.0,
+      18.8285
+     ],
+     "fore_foot_l": [
+      0.6,
+      -9.4,
+      2.9
+     ],
+     "fore_foot_r": [
+      1.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -9.6,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -10.4,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -39.8957,
+      -0.0,
+      4.0251
+     ],
+     "spoon_prop": [
+      -8.2262,
+      -2.3583,
+      36.4579
+     ],
+     "ear_l": [
+      9.7556,
+      -10.0893,
+      28.4512
+     ],
+     "root_dev": 0.0
+    }
+   },
+   "file": "export/anims/PantryRat_R01_LoadedBound_Mars_ANIM.fbx",
+   "bytes": 326364,
+   "unreal_path": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_LoadedBound_Mars_ANIM",
+   "carry_frames": [
+    0,
+    14
+   ]
+  },
+  "LoadedTurnLeft": {
+   "fps": 30,
+   "frames": [
+    0,
+    11
+   ],
+   "frame_count": 11,
+   "samples": 12,
+   "seconds": 0.366667,
+   "seconds_proposed": 0.35,
+   "loop": false,
+   "additive": false,
+   "additive_reference": null,
+   "landmarks_ue_cm": {
+    "0": {
+     "body": [
+      -3.0,
+      -0.0,
+      22.0
+     ],
+     "chest": [
+      3.0,
+      -0.0,
+      22.0
+     ],
+     "head": [
+      11.9007,
+      -0.0,
+      25.2751
+     ],
+     "jaw": [
+      14.5181,
+      -0.0,
+      22.2175
+     ],
+     "fore_foot_l": [
+      4.6,
+      -9.4,
+      2.3
+     ],
+     "fore_foot_r": [
+      4.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -38.9589,
+      -0.0,
+      3.4516
+     ],
+     "spoon_prop": [
+      -6.8513,
+      -2.0605,
+      37.9888
+     ],
+     "ear_l": [
+      11.142,
+      -10.0893,
+      31.7071
+     ],
+     "root_dev": 0.0
+    },
+    "5": {
+     "body": [
+      -3.0,
+      -0.0,
+      21.1238
+     ],
+     "chest": [
+      2.9205,
+      -0.9735,
+      21.1238
+     ],
+     "head": [
+      11.563,
+      -3.0398,
+      24.3939
+     ],
+     "jaw": [
+      14.0201,
+      -3.8835,
+      21.3196
+     ],
+     "fore_foot_l": [
+      5.3407,
+      -10.8815,
+      4.5222
+     ],
+     "fore_foot_r": [
+      4.8593,
+      9.0111,
+      3.0259
+     ],
+     "hind_foot_l": [
+      -11.1296,
+      -11.1889,
+      3.2741
+     ],
+     "hind_foot_r": [
+      -11.3704,
+      10.0593,
+      4.5259
+     ],
+     "tail_04": [
+      -37.3879,
+      10.2406,
+      4.0562
+     ],
+     "spoon_prop": [
+      -7.1426,
+      -1.137,
+      37.1126
+     ],
+     "ear_l": [
+      6.7695,
+      -12.3879,
+      30.1712
+     ],
+     "root_dev": 0.0
+    },
+    "11": {
+     "body": [
+      -3.0,
+      -0.0,
+      22.0
+     ],
+     "chest": [
+      3.0,
+      -0.0,
+      22.0
+     ],
+     "head": [
+      11.9007,
+      -0.0,
+      25.2751
+     ],
+     "jaw": [
+      14.5181,
+      -0.0,
+      22.2175
+     ],
+     "fore_foot_l": [
+      4.6,
+      -9.4,
+      2.3
+     ],
+     "fore_foot_r": [
+      4.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -38.9589,
+      -0.0,
+      3.4516
+     ],
+     "spoon_prop": [
+      -6.8513,
+      -2.0605,
+      37.9888
+     ],
+     "ear_l": [
+      11.142,
+      -10.0893,
+      31.7071
+     ],
+     "root_dev": 0.0
+    }
+   },
+   "file": "export/anims/PantryRat_R01_LoadedTurnLeft_Mars_ANIM.fbx",
+   "bytes": 317628,
+   "unreal_path": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_LoadedTurnLeft_Mars_ANIM",
+   "carry_frames": [
+    0,
+    11
+   ]
+  },
+  "LoadedTurnRight": {
+   "fps": 30,
+   "frames": [
+    0,
+    11
+   ],
+   "frame_count": 11,
+   "samples": 12,
+   "seconds": 0.366667,
+   "seconds_proposed": 0.35,
+   "loop": false,
+   "additive": false,
+   "additive_reference": null,
+   "landmarks_ue_cm": {
+    "0": {
+     "body": [
+      -3.0,
+      -0.0,
+      22.0
+     ],
+     "chest": [
+      3.0,
+      -0.0,
+      22.0
+     ],
+     "head": [
+      11.9007,
+      -0.0,
+      25.2751
+     ],
+     "jaw": [
+      14.5181,
+      -0.0,
+      22.2175
+     ],
+     "fore_foot_l": [
+      4.6,
+      -9.4,
+      2.3
+     ],
+     "fore_foot_r": [
+      4.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -38.9589,
+      -0.0,
+      3.4516
+     ],
+     "spoon_prop": [
+      -6.8513,
+      -2.8945,
+      37.859
+     ],
+     "ear_l": [
+      11.142,
+      -10.0893,
+      31.7071
+     ],
+     "root_dev": 0.0
+    },
+    "5": {
+     "body": [
+      -3.0,
+      -0.0,
+      21.1238
+     ],
+     "chest": [
+      2.9205,
+      0.9735,
+      21.1238
+     ],
+     "head": [
+      11.563,
+      3.0398,
+      24.3939
+     ],
+     "jaw": [
+      14.0201,
+      3.8835,
+      21.3196
+     ],
+     "fore_foot_l": [
+      4.8593,
+      -9.0111,
+      3.0259
+     ],
+     "fore_foot_r": [
+      5.3407,
+      10.8815,
+      4.5222
+     ],
+     "hind_foot_l": [
+      -11.3704,
+      -10.0593,
+      4.5259
+     ],
+     "hind_foot_r": [
+      -11.1296,
+      11.1889,
+      3.2741
+     ],
+     "tail_04": [
+      -37.3879,
+      -10.2406,
+      4.0562
+     ],
+     "spoon_prop": [
+      -6.3645,
+      -3.742,
+      36.9171
+     ],
+     "ear_l": [
+      14.7401,
+      -6.1045,
+      31.4669
+     ],
+     "root_dev": 0.0
+    },
+    "11": {
+     "body": [
+      -3.0,
+      -0.0,
+      22.0
+     ],
+     "chest": [
+      3.0,
+      -0.0,
+      22.0
+     ],
+     "head": [
+      11.9007,
+      -0.0,
+      25.2751
+     ],
+     "jaw": [
+      14.5181,
+      -0.0,
+      22.2175
+     ],
+     "fore_foot_l": [
+      4.6,
+      -9.4,
+      2.3
+     ],
+     "fore_foot_r": [
+      4.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -38.9589,
+      -0.0,
+      3.4516
+     ],
+     "spoon_prop": [
+      -6.8513,
+      -2.8945,
+      37.859
+     ],
+     "ear_l": [
+      11.142,
+      -10.0893,
+      31.7071
+     ],
+     "root_dev": 0.0
+    }
+   },
+   "file": "export/anims/PantryRat_R01_LoadedTurnRight_Mars_ANIM.fbx",
+   "bytes": 317628,
+   "unreal_path": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_LoadedTurnRight_Mars_ANIM",
+   "carry_frames": [
+    0,
+    11
+   ]
+  },
+  "LoadedLookBack": {
+   "fps": 30,
+   "frames": [
+    0,
+    15
+   ],
+   "frame_count": 15,
+   "samples": 16,
+   "seconds": 0.5,
+   "seconds_proposed": 0.5,
+   "loop": false,
+   "additive": false,
+   "additive_reference": null,
+   "landmarks_ue_cm": {
+    "0": {
+     "body": [
+      -3.0,
+      -0.0,
+      22.0
+     ],
+     "chest": [
+      3.0,
+      -0.0,
+      22.0
+     ],
+     "head": [
+      11.9007,
+      -0.0,
+      25.2751
+     ],
+     "jaw": [
+      14.5181,
+      -0.0,
+      22.2175
+     ],
+     "fore_foot_l": [
+      4.6,
+      -9.4,
+      2.3
+     ],
+     "fore_foot_r": [
+      4.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -38.9589,
+      -0.0,
+      3.4516
+     ],
+     "spoon_prop": [
+      -7.0,
+      -0.5566,
+      38.6697
+     ],
+     "ear_l": [
+      11.142,
+      -10.0893,
+      31.7071
+     ],
+     "root_dev": 0.0
+    },
+    "7": {
+     "body": [
+      -3.0,
+      -0.0,
+      22.0
+     ],
+     "chest": [
+      3.0,
+      -0.0,
+      22.0
+     ],
+     "head": [
+      11.6703,
+      -1.1728,
+      25.2751
+     ],
+     "jaw": [
+      13.5139,
+      -2.9892,
+      22.1926
+     ],
+     "fore_foot_l": [
+      4.6,
+      -9.4,
+      2.3
+     ],
+     "fore_foot_r": [
+      4.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -38.9589,
+      -0.0,
+      3.4516
+     ],
+     "spoon_prop": [
+      -7.0,
+      -0.5566,
+      38.6697
+     ],
+     "ear_l": [
+      3.3758,
+      -7.5697,
+      31.108
+     ],
+     "root_dev": 0.0
+    },
+    "15": {
+     "body": [
+      -3.0,
+      -0.0,
+      22.0
+     ],
+     "chest": [
+      3.0,
+      -0.0,
+      22.0
+     ],
+     "head": [
+      11.9007,
+      -0.0,
+      25.2751
+     ],
+     "jaw": [
+      14.5181,
+      -0.0,
+      22.2175
+     ],
+     "fore_foot_l": [
+      4.6,
+      -9.4,
+      2.3
+     ],
+     "fore_foot_r": [
+      4.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -38.9589,
+      -0.0,
+      3.4516
+     ],
+     "spoon_prop": [
+      -7.0,
+      -0.5566,
+      38.6697
+     ],
+     "ear_l": [
+      11.142,
+      -10.0893,
+      31.7071
+     ],
+     "root_dev": 0.0
+    }
+   },
+   "file": "export/anims/PantryRat_R01_LoadedLookBack_Mars_ANIM.fbx",
+   "bytes": 329292,
+   "unreal_path": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_LoadedLookBack_Mars_ANIM",
+   "carry_frames": [
+    0,
+    15
+   ]
+  },
+  "LoadedCornered": {
+   "fps": 30,
+   "frames": [
+    0,
+    24
+   ],
+   "frame_count": 24,
+   "samples": 25,
+   "seconds": 0.8,
+   "seconds_proposed": 0.8,
+   "loop": true,
+   "additive": false,
+   "additive_reference": null,
+   "landmarks_ue_cm": {
+    "0": {
+     "body": [
+      -3.8,
+      -0.0,
+      19.6
+     ],
+     "chest": [
+      2.2,
+      -0.0,
+      19.6
+     ],
+     "head": [
+      11.1908,
+      -0.6577,
+      22.4048
+     ],
+     "jaw": [
+      13.6031,
+      -1.0578,
+      19.2078
+     ],
+     "fore_foot_l": [
+      4.6,
+      -9.4,
+      2.3
+     ],
+     "fore_foot_r": [
+      4.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -40.8799,
+      0.0,
+      4.7281
+     ],
+     "spoon_prop": [
+      -6.801,
+      -2.9121,
+      35.9522
+     ],
+     "ear_l": [
+      8.685,
+      -10.6503,
+      28.5375
+     ],
+     "root_dev": 0.0
+    },
+    "12": {
+     "body": [
+      -3.8,
+      -0.0,
+      19.6
+     ],
+     "chest": [
+      2.2,
+      -0.0,
+      19.6
+     ],
+     "head": [
+      11.2119,
+      0.5488,
+      22.4048
+     ],
+     "jaw": [
+      13.7341,
+      0.8936,
+      19.2872
+     ],
+     "fore_foot_l": [
+      4.6,
+      -9.4,
+      2.3
+     ],
+     "fore_foot_r": [
+      4.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -40.8799,
+      0.0,
+      4.7281
+     ],
+     "spoon_prop": [
+      -6.801,
+      -2.9121,
+      35.9522
+     ],
+     "ear_l": [
+      12.3057,
+      -9.3057,
+      29.1451
+     ],
+     "root_dev": 0.0
+    },
+    "24": {
+     "body": [
+      -3.8,
+      -0.0,
+      19.6
+     ],
+     "chest": [
+      2.2,
+      -0.0,
+      19.6
+     ],
+     "head": [
+      11.1908,
+      -0.6577,
+      22.4048
+     ],
+     "jaw": [
+      13.6031,
+      -1.0578,
+      19.2078
+     ],
+     "fore_foot_l": [
+      4.6,
+      -9.4,
+      2.3
+     ],
+     "fore_foot_r": [
+      4.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -40.8799,
+      0.0,
+      4.7281
+     ],
+     "spoon_prop": [
+      -6.801,
+      -2.9121,
+      35.9522
+     ],
+     "ear_l": [
+      8.685,
+      -10.6503,
+      28.5375
+     ],
+     "root_dev": 0.0
+    }
+   },
+   "file": "export/anims/PantryRat_R01_LoadedCornered_Mars_ANIM.fbx",
+   "bytes": 345804,
+   "unreal_path": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_LoadedCornered_Mars_ANIM",
+   "carry_frames": [
+    0,
+    24
+   ]
+  },
+  "HitReact": {
+   "fps": 30,
+   "frames": [
+    0,
+    4
+   ],
+   "frame_count": 4,
+   "samples": 5,
+   "seconds": 0.133333,
+   "seconds_proposed": 0.12,
+   "loop": false,
+   "additive": false,
+   "additive_reference": null,
+   "landmarks_ue_cm": {
+    "0": {
+     "body": [
+      -3.0,
+      -0.0,
+      22.0
+     ],
+     "chest": [
+      3.0,
+      -0.0,
+      22.0
+     ],
+     "head": [
+      12.0,
+      -0.0,
+      25.0
+     ],
+     "jaw": [
+      13.8,
+      -0.0,
+      21.4
+     ],
+     "fore_foot_l": [
+      4.6,
+      -9.4,
+      2.3
+     ],
+     "fore_foot_r": [
+      4.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -39.9,
+      0.0,
+      4.8
+     ],
+     "spoon_prop": [
+      -6.8513,
+      -2.0605,
+      37.9888
+     ],
+     "ear_l": [
+      12.8199,
+      -10.0893,
+      31.4245
+     ],
+     "root_dev": 0.0
+    },
+    "2": {
+     "body": [
+      -4.0,
+      -0.0,
+      19.0
+     ],
+     "chest": [
+      2.0,
+      -0.0,
+      19.0
+     ],
+     "head": [
+      11.3023,
+      -0.0,
+      20.8119
+     ],
+     "jaw": [
+      11.9018,
+      -0.416,
+      16.8537
+     ],
+     "fore_foot_l": [
+      4.6,
+      -9.4,
+      2.3
+     ],
+     "fore_foot_r": [
+      4.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -42.0075,
+      0.0,
+      8.7731
+     ],
+     "spoon_prop": [
+      -6.126,
+      -2.0605,
+      35.9309
+     ],
+     "ear_l": [
+      14.0674,
+      -9.4219,
+      27.6911
+     ],
+     "root_dev": 0.0
+    },
+    "4": {
+     "body": [
+      -3.6,
+      -0.0,
+      20.2
+     ],
+     "chest": [
+      2.4,
+      -0.0,
+      20.2
+     ],
+     "head": [
+      11.7023,
+      -0.0,
+      22.0119
+     ],
+     "jaw": [
+      12.3018,
+      -0.416,
+      18.0537
+     ],
+     "fore_foot_l": [
+      4.6,
+      -9.4,
+      2.3
+     ],
+     "fore_foot_r": [
+      4.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -41.6075,
+      0.0,
+      9.9731
+     ],
+     "spoon_prop": [
+      -5.726,
+      -2.0605,
+      37.1309
+     ],
+     "ear_l": [
+      14.4674,
+      -9.4219,
+      28.8911
+     ],
+     "root_dev": 0.0
+    }
+   },
+   "file": "export/anims/PantryRat_R01_HitReact_Mars_ANIM.fbx",
+   "bytes": 297212,
+   "unreal_path": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_HitReact_Mars_ANIM",
+   "carry_frames": null
+  },
+  "MouthRelease": {
+   "fps": 30,
+   "frames": [
+    0,
+    6
+   ],
+   "frame_count": 6,
+   "samples": 7,
+   "seconds": 0.2,
+   "seconds_proposed": 0.2,
+   "loop": false,
+   "additive": false,
+   "additive_reference": null,
+   "landmarks_ue_cm": {
+    "0": {
+     "body": [
+      -3.0,
+      -0.0,
+      22.0
+     ],
+     "chest": [
+      3.0,
+      -0.0,
+      22.0
+     ],
+     "head": [
+      11.9007,
+      -0.0,
+      25.2751
+     ],
+     "jaw": [
+      14.5181,
+      -0.0,
+      22.2175
+     ],
+     "fore_foot_l": [
+      4.6,
+      -9.4,
+      2.3
+     ],
+     "fore_foot_r": [
+      4.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -38.9589,
+      -0.0,
+      3.4516
+     ],
+     "spoon_prop": [
+      -6.8513,
+      -2.8945,
+      37.859
+     ],
+     "ear_l": [
+      11.142,
+      -10.0893,
+      31.7071
+     ],
+     "root_dev": 0.0
+    },
+    "3": {
+     "body": [
+      -3.0,
+      -0.0,
+      22.0
+     ],
+     "chest": [
+      3.0,
+      -0.0,
+      22.0
+     ],
+     "head": [
+      11.9007,
+      -0.0,
+      25.2751
+     ],
+     "jaw": [
+      14.1842,
+      -0.0,
+      21.9606
+     ],
+     "fore_foot_l": [
+      4.6,
+      -9.4,
+      2.3
+     ],
+     "fore_foot_r": [
+      4.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -38.9589,
+      -0.0,
+      3.4516
+     ],
+     "spoon_prop": [
+      -6.8513,
+      -2.8945,
+      37.859
+     ],
+     "ear_l": [
+      11.8185,
+      -10.0893,
+      31.7512
+     ],
+     "root_dev": 0.0
+    },
+    "6": {
+     "body": [
+      -3.0,
+      -0.0,
+      22.0
+     ],
+     "chest": [
+      3.0,
+      -0.0,
+      22.0
+     ],
+     "head": [
+      11.9007,
+      -0.0,
+      25.2751
+     ],
+     "jaw": [
+      14.3545,
+      -0.0,
+      22.0847
+     ],
+     "fore_foot_l": [
+      4.6,
+      -9.4,
+      2.3
+     ],
+     "fore_foot_r": [
+      4.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -38.9589,
+      -0.0,
+      3.4516
+     ],
+     "spoon_prop": [
+      -6.8513,
+      -2.8945,
+      37.859
+     ],
+     "ear_l": [
+      11.4797,
+      -10.0893,
+      31.738
+     ],
+     "root_dev": 0.0
+    }
+   },
+   "file": "export/anims/PantryRat_R01_MouthRelease_Mars_ANIM.fbx",
+   "bytes": 303036,
+   "unreal_path": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_MouthRelease_Mars_ANIM",
+   "carry_frames": [
+    0,
+    2
+   ]
+  },
+  "DeathToppleLeft": {
+   "fps": 30,
+   "frames": [
+    0,
+    24
+   ],
+   "frame_count": 24,
+   "samples": 25,
+   "seconds": 0.8,
+   "seconds_proposed": 0.8,
+   "loop": false,
+   "additive": false,
+   "additive_reference": null,
+   "landmarks_ue_cm": {
+    "0": {
+     "body": [
+      -3.0,
+      -0.0,
+      22.0
+     ],
+     "chest": [
+      3.0,
+      -0.0,
+      22.0
+     ],
+     "head": [
+      12.0,
+      -0.0,
+      25.0
+     ],
+     "jaw": [
+      13.8,
+      -0.0,
+      21.4
+     ],
+     "fore_foot_l": [
+      4.6,
+      -9.4,
+      2.3
+     ],
+     "fore_foot_r": [
+      4.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -39.9,
+      0.0,
+      4.8
+     ],
+     "spoon_prop": [
+      -7.223,
+      -5.2523,
+      38.7709
+     ],
+     "ear_l": [
+      12.8199,
+      -10.0893,
+      31.4245
+     ],
+     "root_dev": 0.0
+    },
+    "12": {
+     "body": [
+      -3.0,
+      -0.0,
+      23.3912
+     ],
+     "chest": [
+      2.9999,
+      0.0145,
+      23.3598
+     ],
+     "head": [
+      11.9045,
+      -3.0287,
+      24.4473
+     ],
+     "jaw": [
+      14.1106,
+      0.2036,
+      23.5063
+     ],
+     "fore_foot_l": [
+      7.6184,
+      9.175,
+      5.4166
+     ],
+     "fore_foot_r": [
+      7.7049,
+      19.8393,
+      26.8304
+     ],
+     "hind_foot_l": [
+      -13.1881,
+      8.2449,
+      4.3967
+     ],
+     "hind_foot_r": [
+      -13.0915,
+      20.1598,
+      28.3218
+     ],
+     "tail_04": [
+      -35.2285,
+      23.8208,
+      21.4646
+     ],
+     "spoon_prop": [
+      -7.164,
+      -16.3653,
+      27.2829
+     ],
+     "ear_l": [
+      12.3692,
+      -12.2656,
+      16.818
+     ],
+     "root_dev": 0.0
+    },
+    "24": {
+     "body": [
+      -3.0,
+      -0.0,
+      19.4401
+     ],
+     "chest": [
+      3.0,
+      -0.0,
+      19.4401
+     ],
+     "head": [
+      11.878,
+      -3.3191,
+      19.3596
+     ],
+     "jaw": [
+      13.996,
+      0.0553,
+      19.9315
+     ],
+     "fore_foot_l": [
+      7.6,
+      15.7748,
+      6.982
+     ],
+     "fore_foot_r": [
+      7.6,
+      16.6054,
+      30.7675
+     ],
+     "hind_foot_l": [
+      -13.0,
+      15.4262,
+      5.5933
+     ],
+     "hind_foot_r": [
+      -13.0,
+      16.3545,
+      32.1771
+     ],
+     "tail_04": [
+      -33.5465,
+      26.8855,
+      18.8398
+     ],
+     "spoon_prop": [
+      -6.9256,
+      -15.6357,
+      15.4511
+     ],
+     "ear_l": [
+      13.1046,
+      -8.7019,
+      8.7171
+     ],
+     "root_dev": 0.0
+    }
+   },
+   "file": "export/anims/PantryRat_R01_DeathToppleLeft_Mars_ANIM.fbx",
+   "bytes": 345804,
+   "unreal_path": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_DeathToppleLeft_Mars_ANIM",
+   "carry_frames": null
+  },
+  "DeathToppleRight": {
+   "fps": 30,
+   "frames": [
+    0,
+    24
+   ],
+   "frame_count": 24,
+   "samples": 25,
+   "seconds": 0.8,
+   "seconds_proposed": 0.8,
+   "loop": false,
+   "additive": false,
+   "additive_reference": null,
+   "landmarks_ue_cm": {
+    "0": {
+     "body": [
+      -3.0,
+      -0.0,
+      22.0
+     ],
+     "chest": [
+      3.0,
+      -0.0,
+      22.0
+     ],
+     "head": [
+      12.0,
+      -0.0,
+      25.0
+     ],
+     "jaw": [
+      13.8,
+      -0.0,
+      21.4
+     ],
+     "fore_foot_l": [
+      4.6,
+      -9.4,
+      2.3
+     ],
+     "fore_foot_r": [
+      4.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -39.9,
+      0.0,
+      4.8
+     ],
+     "spoon_prop": [
+      -6.9256,
+      -2.1498,
+      38.2653
+     ],
+     "ear_l": [
+      12.8199,
+      -10.0893,
+      31.4245
+     ],
+     "root_dev": 0.0
+    },
+    "12": {
+     "body": [
+      -3.0,
+      -0.0,
+      23.3912
+     ],
+     "chest": [
+      2.9999,
+      -0.0145,
+      23.3598
+     ],
+     "head": [
+      11.9045,
+      3.0287,
+      24.4473
+     ],
+     "jaw": [
+      14.1106,
+      -0.2036,
+      23.5063
+     ],
+     "fore_foot_l": [
+      7.7049,
+      -19.8393,
+      26.8304
+     ],
+     "fore_foot_r": [
+      7.6184,
+      -9.175,
+      5.4166
+     ],
+     "hind_foot_l": [
+      -13.0915,
+      -20.1598,
+      28.3218
+     ],
+     "hind_foot_r": [
+      -13.1881,
+      -8.2449,
+      4.3967
+     ],
+     "tail_04": [
+      -35.2285,
+      -23.8208,
+      21.4646
+     ],
+     "spoon_prop": [
+      -6.8465,
+      13.3192,
+      32.6482
+     ],
+     "ear_l": [
+      11.569,
+      6.1282,
+      36.0241
+     ],
+     "root_dev": 0.0
+    },
+    "24": {
+     "body": [
+      -3.0,
+      -0.0,
+      19.4401
+     ],
+     "chest": [
+      3.0,
+      -0.0,
+      19.4401
+     ],
+     "head": [
+      11.878,
+      3.3191,
+      19.3596
+     ],
+     "jaw": [
+      13.996,
+      -0.0553,
+      19.9315
+     ],
+     "fore_foot_l": [
+      7.6,
+      -16.6054,
+      30.7675
+     ],
+     "fore_foot_r": [
+      7.6,
+      -15.7748,
+      6.982
+     ],
+     "hind_foot_l": [
+      -13.0,
+      -16.3545,
+      32.1771
+     ],
+     "hind_foot_r": [
+      -13.0,
+      -15.4261,
+      5.5933
+     ],
+     "tail_04": [
+      -33.5465,
+      -26.8855,
+      18.8398
+     ],
+     "spoon_prop": [
+      -6.8513,
+      15.9071,
+      22.0573
+     ],
+     "ear_l": [
+      11.0802,
+      10.815,
+      28.6825
+     ],
+     "root_dev": 0.0
+    }
+   },
+   "file": "export/anims/PantryRat_R01_DeathToppleRight_Mars_ANIM.fbx",
+   "bytes": 345804,
+   "unreal_path": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_DeathToppleRight_Mars_ANIM",
+   "carry_frames": null
+  },
+  "DeadHold": {
+   "fps": 30,
+   "frames": [
+    0,
+    30
+   ],
+   "frame_count": 30,
+   "samples": 31,
+   "seconds": 1.0,
+   "seconds_proposed": 1.0,
+   "loop": true,
+   "additive": false,
+   "additive_reference": null,
+   "landmarks_ue_cm": {
+    "0": {
+     "body": [
+      -3.0,
+      -0.0,
+      17.9407
+     ],
+     "chest": [
+      3.0,
+      -0.0,
+      17.9407
+     ],
+     "head": [
+      11.801,
+      -1.5,
+      14.8001
+     ],
+     "jaw": [
+      14.6378,
+      1.068,
+      16.0481
+     ],
+     "fore_foot_l": [
+      7.1,
+      17.4727,
+      25.4043
+     ],
+     "fore_foot_r": [
+      7.1,
+      -2.2727,
+      36.8043
+     ],
+     "hind_foot_l": [
+      -12.5,
+      18.5351,
+      24.4445
+     ],
+     "hind_foot_r": [
+      -12.5,
+      -3.6351,
+      37.2445
+     ],
+     "tail_04": [
+      -32.2825,
+      22.131,
+      32.8363
+     ],
+     "spoon_prop": [
+      -6.8513,
+      -6.2099,
+      3.0638
+     ],
+     "ear_l": [
+      8.5872,
+      -0.779,
+      3.2722
+     ],
+     "root_dev": 0.0
+    },
+    "15": {
+     "body": [
+      -3.0,
+      -0.0,
+      17.9407
+     ],
+     "chest": [
+      3.0,
+      -0.0,
+      17.9407
+     ],
+     "head": [
+      11.801,
+      -1.5,
+      14.8001
+     ],
+     "jaw": [
+      14.6378,
+      1.068,
+      16.0481
+     ],
+     "fore_foot_l": [
+      7.1,
+      17.4727,
+      25.4043
+     ],
+     "fore_foot_r": [
+      7.1,
+      -2.2727,
+      36.8043
+     ],
+     "hind_foot_l": [
+      -12.5,
+      18.5351,
+      24.4445
+     ],
+     "hind_foot_r": [
+      -12.5,
+      -3.6351,
+      37.2445
+     ],
+     "tail_04": [
+      -32.2825,
+      22.131,
+      32.8363
+     ],
+     "spoon_prop": [
+      -6.8513,
+      -6.2099,
+      3.0638
+     ],
+     "ear_l": [
+      8.5872,
+      -0.779,
+      3.2722
+     ],
+     "root_dev": 0.0
+    },
+    "30": {
+     "body": [
+      -3.0,
+      -0.0,
+      17.9407
+     ],
+     "chest": [
+      3.0,
+      -0.0,
+      17.9407
+     ],
+     "head": [
+      11.801,
+      -1.5,
+      14.8001
+     ],
+     "jaw": [
+      14.6378,
+      1.068,
+      16.0481
+     ],
+     "fore_foot_l": [
+      7.1,
+      17.4727,
+      25.4043
+     ],
+     "fore_foot_r": [
+      7.1,
+      -2.2727,
+      36.8043
+     ],
+     "hind_foot_l": [
+      -12.5,
+      18.5351,
+      24.4445
+     ],
+     "hind_foot_r": [
+      -12.5,
+      -3.6351,
+      37.2445
+     ],
+     "tail_04": [
+      -32.2825,
+      22.131,
+      32.8363
+     ],
+     "spoon_prop": [
+      -6.8513,
+      -6.2099,
+      3.0638
+     ],
+     "ear_l": [
+      8.5872,
+      -0.779,
+      3.2722
+     ],
+     "root_dev": 0.0
+    }
+   },
+   "file": "export/anims/PantryRat_R01_DeadHold_Mars_ANIM.fbx",
+   "bytes": 360636,
+   "unreal_path": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_DeadHold_Mars_ANIM",
+   "carry_frames": null
+  },
+  "EarFlick": {
+   "fps": 30,
+   "frames": [
+    0,
+    12
+   ],
+   "frame_count": 12,
+   "samples": 13,
+   "seconds": 0.4,
+   "seconds_proposed": 0.4,
+   "loop": false,
+   "additive": true,
+   "additive_reference": {
+    "clip": "IdleBreath",
+    "frame": 0
+   },
+   "landmarks_ue_cm": {
+    "0": {
+     "body": [
+      -3.0,
+      -0.0,
+      22.0
+     ],
+     "chest": [
+      3.0,
+      -0.0,
+      22.0
+     ],
+     "head": [
+      12.0,
+      -0.0,
+      25.0
+     ],
+     "jaw": [
+      13.8,
+      -0.0,
+      21.4
+     ],
+     "fore_foot_l": [
+      4.6,
+      -9.4,
+      2.3
+     ],
+     "fore_foot_r": [
+      4.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -39.8392,
+      1.2632,
+      4.8
+     ],
+     "spoon_prop": [
+      -6.8513,
+      -2.0605,
+      37.9888
+     ],
+     "ear_l": [
+      12.8199,
+      -10.0893,
+      31.4245
+     ],
+     "root_dev": 0.0
+    },
+    "6": {
+     "body": [
+      -3.0,
+      -0.0,
+      22.0
+     ],
+     "chest": [
+      3.0,
+      -0.0,
+      22.0
+     ],
+     "head": [
+      12.0,
+      -0.0,
+      25.0
+     ],
+     "jaw": [
+      13.8,
+      -0.0,
+      21.4
+     ],
+     "fore_foot_l": [
+      4.6,
+      -9.4,
+      2.3
+     ],
+     "fore_foot_r": [
+      4.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -39.8392,
+      1.2632,
+      4.8
+     ],
+     "spoon_prop": [
+      -6.8513,
+      -2.0605,
+      37.9888
+     ],
+     "ear_l": [
+      12.8199,
+      -10.0893,
+      31.4245
+     ],
+     "root_dev": 0.0
+    },
+    "12": {
+     "body": [
+      -3.0,
+      -0.0,
+      22.0
+     ],
+     "chest": [
+      3.0,
+      -0.0,
+      22.0
+     ],
+     "head": [
+      12.0,
+      -0.0,
+      25.0
+     ],
+     "jaw": [
+      13.8,
+      -0.0,
+      21.4
+     ],
+     "fore_foot_l": [
+      4.6,
+      -9.4,
+      2.3
+     ],
+     "fore_foot_r": [
+      4.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -39.8392,
+      1.2632,
+      4.8
+     ],
+     "spoon_prop": [
+      -6.8513,
+      -2.0605,
+      37.9888
+     ],
+     "ear_l": [
+      12.8199,
+      -10.0893,
+      31.4245
+     ],
+     "root_dev": 0.0
+    }
+   },
+   "file": "export/anims/PantryRat_R01_EarFlick_Mars_ANIM.fbx",
+   "bytes": 320540,
+   "unreal_path": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_EarFlick_Mars_ANIM",
+   "carry_frames": null
+  },
+  "TailSettle": {
+   "fps": 30,
+   "frames": [
+    0,
+    24
+   ],
+   "frame_count": 24,
+   "samples": 25,
+   "seconds": 0.8,
+   "seconds_proposed": 0.8,
+   "loop": false,
+   "additive": true,
+   "additive_reference": {
+    "clip": "IdleBreath",
+    "frame": 0
+   },
+   "landmarks_ue_cm": {
+    "0": {
+     "body": [
+      -3.0,
+      -0.0,
+      22.0
+     ],
+     "chest": [
+      3.0,
+      -0.0,
+      22.0
+     ],
+     "head": [
+      12.0,
+      -0.0,
+      25.0
+     ],
+     "jaw": [
+      13.8,
+      -0.0,
+      21.4
+     ],
+     "fore_foot_l": [
+      4.6,
+      -9.4,
+      2.3
+     ],
+     "fore_foot_r": [
+      4.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -39.8392,
+      1.2632,
+      4.8
+     ],
+     "spoon_prop": [
+      -6.8513,
+      -2.0605,
+      37.9888
+     ],
+     "ear_l": [
+      12.8199,
+      -10.0893,
+      31.4245
+     ],
+     "root_dev": 0.0
+    },
+    "12": {
+     "body": [
+      -3.0,
+      -0.0,
+      22.0
+     ],
+     "chest": [
+      3.0,
+      -0.0,
+      22.0
+     ],
+     "head": [
+      12.0,
+      -0.0,
+      25.0
+     ],
+     "jaw": [
+      13.8,
+      -0.0,
+      21.4
+     ],
+     "fore_foot_l": [
+      4.6,
+      -9.4,
+      2.3
+     ],
+     "fore_foot_r": [
+      4.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -39.8345,
+      0.7211,
+      4.6916
+     ],
+     "spoon_prop": [
+      -6.8513,
+      -2.0605,
+      37.9888
+     ],
+     "ear_l": [
+      12.8199,
+      -10.0893,
+      31.4245
+     ],
+     "root_dev": 0.0
+    },
+    "24": {
+     "body": [
+      -3.0,
+      -0.0,
+      22.0
+     ],
+     "chest": [
+      3.0,
+      -0.0,
+      22.0
+     ],
+     "head": [
+      12.0,
+      -0.0,
+      25.0
+     ],
+     "jaw": [
+      13.8,
+      -0.0,
+      21.4
+     ],
+     "fore_foot_l": [
+      4.6,
+      -9.4,
+      2.3
+     ],
+     "fore_foot_r": [
+      4.6,
+      9.4,
+      2.3
+     ],
+     "hind_foot_l": [
+      -11.0,
+      -10.8,
+      2.6
+     ],
+     "hind_foot_r": [
+      -11.0,
+      10.8,
+      2.6
+     ],
+     "tail_04": [
+      -39.8392,
+      1.2632,
+      4.8
+     ],
+     "spoon_prop": [
+      -6.8513,
+      -2.0605,
+      37.9888
+     ],
+     "ear_l": [
+      12.8199,
+      -10.0893,
+      31.4245
+     ],
+     "root_dev": 0.0
+    }
+   },
+   "file": "export/anims/PantryRat_R01_TailSettle_Mars_ANIM.fbx",
+   "bytes": 345804,
+   "unreal_path": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_TailSettle_Mars_ANIM",
+   "carry_frames": null
+  }
+ },
+ "den": {
+  "file": "export/PantryRat_R01_Den_Mars_SM.fbx",
+  "slots": [
+   "Stone",
+   "Void"
+  ],
+  "tris": 330,
+  "bounds_ue_cm": {
+   "min": [
+    -47.0,
+    -56.0,
+    -1.0
+   ],
+   "max": [
+    9.5,
+    56.0,
+    81.013
+   ]
+  },
+  "frame": "den-local: origin = den root on the floor, +X = out of the den (the opening faces +X), opening 60 x 60",
+  "markers": {
+   "EntryPortal": {
+    "den_local_ue_cm": [
+     24.0,
+     14.0,
+     0.0
+    ],
+    "phase1_court_world_ue_cm": [
+     368.0,
+     -14.0,
+     0.0
+    ]
+   },
+   "ExitPortal": {
+    "den_local_ue_cm": [
+     24.0,
+     -14.0,
+     0.0
+    ],
+    "phase1_court_world_ue_cm": [
+     368.0,
+     14.0,
+     0.0
+    ]
+   },
+   "ReturnAdmission": {
+    "den_local_ue_cm": [
+     48.0,
+     -0.0,
+     0.0
+    ],
+    "phase1_court_world_ue_cm": [
+     344.0,
+     -0.0,
+     0.0
+    ]
+   },
+   "OutsideStand": {
+    "den_local_ue_cm": [
+     75.0,
+     -0.0,
+     0.0
+    ],
+    "phase1_court_world_ue_cm": [
+     317.0,
+     -0.0,
+     0.0
+    ]
+   }
+  }
+ },
+ "den_eye_plate": {
+  "file": "export/PantryRat_R01_DenEyePlate_Mars_SM.fbx",
+  "tris": 2,
+  "bounds_ue_cm": {
+   "min": [
+    -43.0,
+    -10.0,
+    18.0
+   ],
+   "max": [
+    -43.0,
+    10.0,
+    26.0
+   ]
+  },
+  "uv_rule": "U = 0 at den +Y Blender (= UE -Y, the resident's LEFT when it faces out of the den), U = 1 at den -Y; V = 0 at the bottom"
+ },
+ "cheese": {
+  "file": "export/PantryRat_R01_Cheese_Mars_SM.fbx",
+  "slots": [
+   "Rind",
+   "Flesh"
+  ],
+  "tris": 56,
+  "bounds_ue_cm": {
+   "min": [
+    -7.5,
+    -5.0,
+    0.0
+   ],
+   "max": [
+    7.5,
+    5.0,
+    8.0
+   ]
+  },
+  "faces_per_slot": {
+   "Rind": 20,
+   "Flesh": 14
+  },
+  "pivot": "base centre"
+ },
+ "unreal_paths": {
+  "skeletal_mesh": "/Game/ArtCandidates/PantryRat/R01/Meshes/PantryRat_R01_Mars_SK",
+  "skeleton": "/Game/ArtCandidates/PantryRat/R01/Meshes/PantryRat_R01_Mars_SKEL",
+  "animations": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_<Clip>_Mars_ANIM",
+  "props": "/Game/ArtCandidates/PantryRat/R01/Props/",
+  "materials": "/Game/ArtCandidates/PantryRat/R01/Materials/"
+ }
+}

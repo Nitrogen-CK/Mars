@@ -1,0 +1,4 @@
+00:02.875  blend            | Read blend: "D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\source\PantryRat_R02.blend"
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+REOPEN {"bones": 26, "slots": ["Body", "Pink", "Belly", "Wood", "Harness", "EyePatch"], "tris": 3076, "verts": 1650, "max_influences": 3, "pose_actions": 15, "clip_actions": 34, "smooth_faces": 0, "file": "D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\source\\PantryRat_R02.blend"}
+PANTRY_RAT_OK

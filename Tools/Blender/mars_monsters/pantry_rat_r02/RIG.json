@@ -1,0 +1,388 @@
+{
+ "name": "PantryRat_R02",
+ "source": "R02_BRIEF.md (rig contract frozen: the 26 bones of ../pantry_rat_r01/RIG.json, names / parents / roles unchanged; rest positions follow the R02 proportions)",
+ "frame": "1 BU = 1 cm; rat faces +X, up +Z; Blender (x,y,z) == Unreal (x,-y,z); *_l = rat LEFT = Blender +Y",
+ "root": "root at the origin (floor centre beneath the neutral body), rest matrix identity, never animated",
+ "export_bone_count": 26,
+ "bones": [
+  {
+   "name": "root",
+   "parent": null,
+   "rest_head_cm": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "rest_tail_cm": [
+    0.0,
+    10.0,
+    0.0
+   ]
+  },
+  {
+   "name": "body",
+   "parent": "root",
+   "rest_head_cm": [
+    -3.0,
+    0.0,
+    20.0
+   ],
+   "rest_tail_cm": [
+    3.0,
+    0.0,
+    20.0
+   ]
+  },
+  {
+   "name": "pelvis",
+   "parent": "body",
+   "rest_head_cm": [
+    -3.0,
+    0.0,
+    20.0
+   ],
+   "rest_tail_cm": [
+    -15.0,
+    0.0,
+    18.0
+   ]
+  },
+  {
+   "name": "hind_upper_l",
+   "parent": "pelvis",
+   "rest_head_cm": [
+    -16.5,
+    10.8,
+    13.0
+   ],
+   "rest_tail_cm": [
+    -12.6,
+    12.0,
+    6.4
+   ]
+  },
+  {
+   "name": "hind_lower_l",
+   "parent": "hind_upper_l",
+   "rest_head_cm": [
+    -12.6,
+    12.0,
+    6.4
+   ],
+   "rest_tail_cm": [
+    -22.0,
+    11.8,
+    2.3
+   ]
+  },
+  {
+   "name": "hind_foot_l",
+   "parent": "hind_lower_l",
+   "rest_head_cm": [
+    -22.0,
+    11.8,
+    2.3
+   ],
+   "rest_tail_cm": [
+    -13.4,
+    11.8,
+    0.0
+   ]
+  },
+  {
+   "name": "hind_upper_r",
+   "parent": "pelvis",
+   "rest_head_cm": [
+    -16.5,
+    -10.8,
+    13.0
+   ],
+   "rest_tail_cm": [
+    -12.6,
+    -12.0,
+    6.4
+   ]
+  },
+  {
+   "name": "hind_lower_r",
+   "parent": "hind_upper_r",
+   "rest_head_cm": [
+    -12.6,
+    -12.0,
+    6.4
+   ],
+   "rest_tail_cm": [
+    -22.0,
+    -11.8,
+    2.3
+   ]
+  },
+  {
+   "name": "hind_foot_r",
+   "parent": "hind_lower_r",
+   "rest_head_cm": [
+    -22.0,
+    -11.8,
+    2.3
+   ],
+   "rest_tail_cm": [
+    -13.4,
+    -11.8,
+    0.0
+   ]
+  },
+  {
+   "name": "tail_01",
+   "parent": "pelvis",
+   "rest_head_cm": [
+    -27.6,
+    0.0,
+    16.6
+   ],
+   "rest_tail_cm": [
+    -36.5,
+    0.0,
+    13.4
+   ]
+  },
+  {
+   "name": "tail_02",
+   "parent": "tail_01",
+   "rest_head_cm": [
+    -36.5,
+    0.0,
+    13.4
+   ],
+   "rest_tail_cm": [
+    -43.2,
+    0.0,
+    8.4
+   ]
+  },
+  {
+   "name": "tail_03",
+   "parent": "tail_02",
+   "rest_head_cm": [
+    -43.2,
+    0.0,
+    8.4
+   ],
+   "rest_tail_cm": [
+    -43.4,
+    0.0,
+    3.9
+   ]
+  },
+  {
+   "name": "tail_04",
+   "parent": "tail_03",
+   "rest_head_cm": [
+    -43.4,
+    0.0,
+    3.9
+   ],
+   "rest_tail_cm": [
+    -39.0,
+    0.0,
+    3.4
+   ]
+  },
+  {
+   "name": "chest",
+   "parent": "body",
+   "rest_head_cm": [
+    3.0,
+    0.0,
+    20.0
+   ],
+   "rest_tail_cm": [
+    8.5,
+    0.0,
+    21.5
+   ]
+  },
+  {
+   "name": "neck",
+   "parent": "chest",
+   "rest_head_cm": [
+    8.5,
+    0.0,
+    21.5
+   ],
+   "rest_tail_cm": [
+    12.5,
+    0.0,
+    22.0
+   ]
+  },
+  {
+   "name": "head",
+   "parent": "neck",
+   "rest_head_cm": [
+    12.5,
+    0.0,
+    22.0
+   ],
+   "rest_tail_cm": [
+    28.5,
+    0.0,
+    17.0
+   ]
+  },
+  {
+   "name": "jaw",
+   "parent": "head",
+   "rest_head_cm": [
+    13.5,
+    0.0,
+    14.4
+   ],
+   "rest_tail_cm": [
+    27.4,
+    0.0,
+    12.4
+   ]
+  },
+  {
+   "name": "ear_l",
+   "parent": "head",
+   "rest_head_cm": [
+    10.207,
+    11.7569,
+    26.3493
+   ],
+   "rest_tail_cm": [
+    3.6202,
+    16.6704,
+    34.7841
+   ]
+  },
+  {
+   "name": "ear_r",
+   "parent": "head",
+   "rest_head_cm": [
+    10.207,
+    -11.7569,
+    26.3493
+   ],
+   "rest_tail_cm": [
+    3.6202,
+    -16.6704,
+    34.7841
+   ]
+  },
+  {
+   "name": "fore_upper_l",
+   "parent": "chest",
+   "rest_head_cm": [
+    6.8,
+    10.0,
+    12.5
+   ],
+   "rest_tail_cm": [
+    5.4,
+    10.8,
+    6.6
+   ]
+  },
+  {
+   "name": "fore_lower_l",
+   "parent": "fore_upper_l",
+   "rest_head_cm": [
+    5.4,
+    10.8,
+    6.6
+   ],
+   "rest_tail_cm": [
+    8.8,
+    11.0,
+    2.0
+   ]
+  },
+  {
+   "name": "fore_foot_l",
+   "parent": "fore_lower_l",
+   "rest_head_cm": [
+    8.8,
+    11.0,
+    2.0
+   ],
+   "rest_tail_cm": [
+    13.2,
+    11.0,
+    0.0
+   ]
+  },
+  {
+   "name": "fore_upper_r",
+   "parent": "chest",
+   "rest_head_cm": [
+    6.8,
+    -10.0,
+    12.5
+   ],
+   "rest_tail_cm": [
+    5.4,
+    -10.8,
+    6.6
+   ]
+  },
+  {
+   "name": "fore_lower_r",
+   "parent": "fore_upper_r",
+   "rest_head_cm": [
+    5.4,
+    -10.8,
+    6.6
+   ],
+   "rest_tail_cm": [
+    8.8,
+    -11.0,
+    2.0
+   ]
+  },
+  {
+   "name": "fore_foot_r",
+   "parent": "fore_lower_r",
+   "rest_head_cm": [
+    8.8,
+    -11.0,
+    2.0
+   ],
+   "rest_tail_cm": [
+    13.2,
+    -11.0,
+    0.0
+   ]
+  },
+  {
+   "name": "spoon_prop",
+   "parent": "chest",
+   "rest_head_cm": [
+    -15.0783,
+    -17.3375,
+    20.0667
+   ],
+   "rest_tail_cm": [
+    -11.1763,
+    -15.1697,
+    26.7056
+   ]
+  }
+ ],
+ "non_bone_frames": [
+  {
+   "name": "Carry_Mouth",
+   "type": "Empty",
+   "parent_bone": "jaw",
+   "purpose": "mouth-carry contact frame (item pivot)"
+  },
+  {
+   "name": "Carry_Drag",
+   "type": "Empty",
+   "parent_bone": "jaw",
+   "purpose": "bulky-item drag offset (item pivot)"
+  }
+ ],
+ "names_parents_match_R01": true
+}

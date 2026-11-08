@@ -1,0 +1,6 @@
+[2026.11.08-00.41.14:938][872]Angelscript: [PantryRat] [382|2(2097534)[Valid](PantryRat)] faces [X=281.249 Y=-22.500 Z=37.625] from [X=291.897 Y=-63.517 Z=18.000] in [Inspect] (heading [X=-0.251 Y=0.968 Z=0.000])
+[2026.11.08-00.41.14:938][872]Angelscript: [PantryRat] [382|2(2097534)[Valid](PantryRat)] op [1] Observe -> Inspect at [X=291.897 Y=-63.517 Z=18.000] clock [20.839764] loot [TOMBSTONE] fade [1.0]
+[2026.11.08-00.41.15:992][913]Angelscript: [PantryRat] [382|2(2097534)[Valid](PantryRat)] faces [X=281.249 Y=-22.500 Z=37.625] from [X=291.897 Y=-63.517 Z=18.000] in [ClaimTell] (heading [X=-0.251 Y=0.968 Z=0.000])
+[2026.11.08-00.41.15:992][913]Angelscript: [PantryRat] [382|2(2097534)[Valid](PantryRat)] op [1] Inspect -> ClaimTell at [X=291.897 Y=-63.517 Z=18.000] clock [21.240995] loot [TOMBSTONE] fade [1.0]
+[2026.11.08-00.41.17:629][967]Angelscript: [PantryRat] [382|2(2097534)[Valid](PantryRat)] faces [X=281.249 Y=-22.500 Z=37.625] from [X=291.897 Y=-63.517 Z=18.000] in [ClaimTransfer] (heading [X=-0.251 Y=0.968 Z=0.000])
+[2026.11.08-00.41.17:629][967]Angelscript: [PantryRat] [382|2(2097534)[Valid](PantryRat)] op [1] ClaimTell -> ClaimTransfer at [X=291.897 Y=-63.517 Z=18.000] clock [22.859951] loot [TOMBSTONE] fade [1.0]

@@ -1,0 +1,7 @@
+{
+ "withers_cm": 35.2563,
+ "rule": "max z of Body-slot (material id 0) vertices with 1.4 <= x <= 5.4 (Phase 1 withers band), GeometryScript copy of LOD0",
+ "vertices": 5636,
+ "triangles": 2086,
+ "nose_max_x": 23.1
+}

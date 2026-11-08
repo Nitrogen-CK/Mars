@@ -1,0 +1,81 @@
+FBX version: 7400
+FBX version: 7400
+FBX version: 7400
+ROUNDTRIP IdleBreath        {"file": "PantryRat_R02_IdleBreath_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 60, 61], "landmark_err_cm_at": {"0": 6e-05, "30": 7e-05, "60": 6e-05}, "landmark_max_err_cm": 7e-05, "root_max_dev": 0.0, "loop_seam_cm": 0.0}
+FBX version: 7400
+ROUNDTRIP SniffGround       {"file": "PantryRat_R02_SniffGround_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 36, 37], "landmark_err_cm_at": {"0": 6e-05, "18": 6e-05, "36": 6e-05}, "landmark_max_err_cm": 6e-05, "root_max_dev": 0.0, "loop_seam_cm": 0.0}
+FBX version: 7400
+ROUNDTRIP SniffAir          {"file": "PantryRat_R02_SniffAir_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 30, 31], "landmark_err_cm_at": {"0": 7e-05, "15": 7e-05, "30": 7e-05}, "landmark_max_err_cm": 7e-05, "root_max_dev": 0.0, "loop_seam_cm": 0.0}
+FBX version: 7400
+ROUNDTRIP StretchAttend     {"file": "PantryRat_R02_StretchAttend_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 30, 31], "landmark_err_cm_at": {"0": 6e-05, "15": 0.00013, "30": 6e-05}, "landmark_max_err_cm": 0.00013, "root_max_dev": 0.0}
+FBX version: 7400
+ROUNDTRIP RearUp            {"file": "PantryRat_R02_RearUp_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 8, 9], "landmark_err_cm_at": {"0": 6e-05, "4": 0.00018, "8": 0.00015}, "landmark_max_err_cm": 0.00018, "root_max_dev": 0.0}
+FBX version: 7400
+ROUNDTRIP RearObserve       {"file": "PantryRat_R02_RearObserve_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 36, 37], "landmark_err_cm_at": {"0": 0.00015, "18": 0.00015, "36": 0.00015}, "landmark_max_err_cm": 0.00015, "root_max_dev": 0.0, "loop_seam_cm": 0.0}
+FBX version: 7400
+ROUNDTRIP RearDown          {"file": "PantryRat_R02_RearDown_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 8, 9], "landmark_err_cm_at": {"0": 0.00015, "4": 0.00018, "8": 6e-05}, "landmark_max_err_cm": 0.00018, "root_max_dev": 0.0}
+FBX version: 7400
+ROUNDTRIP BoundStart        {"file": "PantryRat_R02_BoundStart_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 5, 6], "landmark_err_cm_at": {"0": 6e-05, "2": 6e-05, "5": 7e-05}, "landmark_max_err_cm": 7e-05, "root_max_dev": 0.0}
+FBX version: 7400
+ROUNDTRIP BoundCycle        {"file": "PantryRat_R02_BoundCycle_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 12, 13], "landmark_err_cm_at": {"0": 7e-05, "6": 8e-05, "12": 7e-05}, "landmark_max_err_cm": 8e-05, "root_max_dev": 0.0, "loop_seam_cm": 0.0}
+FBX version: 7400
+ROUNDTRIP BoundStop         {"file": "PantryRat_R02_BoundStop_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 5, 6], "landmark_err_cm_at": {"0": 7e-05, "2": 7e-05, "5": 6e-05}, "landmark_max_err_cm": 7e-05, "root_max_dev": 0.0}
+FBX version: 7400
+ROUNDTRIP TurnLeft90        {"file": "PantryRat_R02_TurnLeft90_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 9, 10], "landmark_err_cm_at": {"0": 6e-05, "4": 9e-05, "9": 6e-05}, "landmark_max_err_cm": 9e-05, "root_max_dev": 0.0}
+FBX version: 7400
+ROUNDTRIP TurnRight90       {"file": "PantryRat_R02_TurnRight90_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 9, 10], "landmark_err_cm_at": {"0": 6e-05, "4": 8e-05, "9": 6e-05}, "landmark_max_err_cm": 8e-05, "root_max_dev": 0.0}
+FBX version: 7400
+ROUNDTRIP Turn180           {"file": "PantryRat_R02_Turn180_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 14, 15], "landmark_err_cm_at": {"0": 6e-05, "7": 7e-05, "14": 6e-05}, "landmark_max_err_cm": 7e-05, "root_max_dev": 0.0}
+FBX version: 7400
+ROUNDTRIP Startle           {"file": "PantryRat_R02_Startle_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 9, 10], "landmark_err_cm_at": {"0": 6e-05, "4": 0.0001, "9": 7e-05}, "landmark_max_err_cm": 0.0001, "root_max_dev": 0.0}
+FBX version: 7400
+ROUNDTRIP Backstep          {"file": "PantryRat_R02_Backstep_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 11, 12], "landmark_err_cm_at": {"0": 6e-05, "5": 6e-05, "11": 6e-05}, "landmark_max_err_cm": 6e-05, "root_max_dev": 0.0}
+FBX version: 7400
+ROUNDTRIP GuardedWatch      {"file": "PantryRat_R02_GuardedWatch_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 45, 46], "landmark_err_cm_at": {"0": 6e-05, "22": 6e-05, "45": 6e-05}, "landmark_max_err_cm": 6e-05, "root_max_dev": 0.0, "loop_seam_cm": 0.0}
+FBX version: 7400
+ROUNDTRIP DenEmerge         {"file": "PantryRat_R02_DenEmerge_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 30, 31], "landmark_err_cm_at": {"0": 7e-05, "15": 7e-05, "30": 8e-05}, "landmark_max_err_cm": 8e-05, "root_max_dev": 0.0}
+FBX version: 7400
+ROUNDTRIP DenEnter          {"file": "PantryRat_R02_DenEnter_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 30, 31], "landmark_err_cm_at": {"0": 6e-05, "15": 7e-05, "30": 7e-05}, "landmark_max_err_cm": 7e-05, "root_max_dev": 0.0}
+FBX version: 7400
+ROUNDTRIP InspectSlot       {"file": "PantryRat_R02_InspectSlot_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 12, 13], "landmark_err_cm_at": {"0": 6e-05, "6": 5e-05, "12": 6e-05}, "landmark_max_err_cm": 6e-05, "root_max_dev": 0.0}
+FBX version: 7400
+ROUNDTRIP Rummage           {"file": "PantryRat_R02_Rummage_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 48, 49], "landmark_err_cm_at": {"0": 0.00019, "24": 0.00019, "48": 0.00019}, "landmark_max_err_cm": 0.00019, "root_max_dev": 0.0, "loop_seam_cm": 0.0}
+FBX version: 7400
+ROUNDTRIP Snatch            {"file": "PantryRat_R02_Snatch_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 8, 9], "landmark_err_cm_at": {"0": 0.00019, "4": 0.0001, "8": 6e-05}, "landmark_max_err_cm": 0.00019, "root_max_dev": 0.0}
+FBX version: 7400
+ROUNDTRIP LoadedIdle        {"file": "PantryRat_R02_LoadedIdle_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 36, 37], "landmark_err_cm_at": {"0": 6e-05, "18": 7e-05, "36": 6e-05}, "landmark_max_err_cm": 7e-05, "root_max_dev": 0.0, "loop_seam_cm": 0.0}
+FBX version: 7400
+ROUNDTRIP LoadedBound       {"file": "PantryRat_R02_LoadedBound_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 12, 13], "landmark_err_cm_at": {"0": 0.0001, "6": 0.0001, "12": 0.0001}, "landmark_max_err_cm": 0.0001, "root_max_dev": 0.0, "loop_seam_cm": 0.0}
+FBX version: 7400
+ROUNDTRIP LoadedTurnLeft    {"file": "PantryRat_R02_LoadedTurnLeft_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 11, 12], "landmark_err_cm_at": {"0": 6e-05, "5": 9e-05, "11": 6e-05}, "landmark_max_err_cm": 9e-05, "root_max_dev": 0.0}
+FBX version: 7400
+ROUNDTRIP LoadedTurnRight   {"file": "PantryRat_R02_LoadedTurnRight_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 11, 12], "landmark_err_cm_at": {"0": 6e-05, "5": 0.0001, "11": 6e-05}, "landmark_max_err_cm": 0.0001, "root_max_dev": 0.0}
+FBX version: 7400
+ROUNDTRIP LoadedLookBack    {"file": "PantryRat_R02_LoadedLookBack_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 15, 16], "landmark_err_cm_at": {"0": 6e-05, "7": 6e-05, "15": 6e-05}, "landmark_max_err_cm": 6e-05, "root_max_dev": 0.0}
+FBX version: 7400
+ROUNDTRIP LoadedCornered    {"file": "PantryRat_R02_LoadedCornered_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 24, 25], "landmark_err_cm_at": {"0": 6e-05, "12": 6e-05, "24": 6e-05}, "landmark_max_err_cm": 6e-05, "root_max_dev": 0.0, "loop_seam_cm": 0.0}
+FBX version: 7400
+ROUNDTRIP HitReact          {"file": "PantryRat_R02_HitReact_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 4, 5], "landmark_err_cm_at": {"0": 6e-05, "2": 7e-05, "4": 7e-05}, "landmark_max_err_cm": 7e-05, "root_max_dev": 0.0}
+FBX version: 7400
+ROUNDTRIP MouthRelease      {"file": "PantryRat_R02_MouthRelease_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 6, 7], "landmark_err_cm_at": {"0": 6e-05, "3": 6e-05, "6": 7e-05}, "landmark_max_err_cm": 7e-05, "root_max_dev": 0.0}
+FBX version: 7400
+ROUNDTRIP DeathToppleLeft   {"file": "PantryRat_R02_DeathToppleLeft_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 24, 25], "landmark_err_cm_at": {"0": 6e-05, "12": 0.00011, "24": 0.00016}, "landmark_max_err_cm": 0.00016, "root_max_dev": 0.0}
+FBX version: 7400
+ROUNDTRIP DeathToppleRight  {"file": "PantryRat_R02_DeathToppleRight_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 24, 25], "landmark_err_cm_at": {"0": 6e-05, "12": 0.0001, "24": 0.00012}, "landmark_max_err_cm": 0.00012, "root_max_dev": 0.0}
+FBX version: 7400
+ROUNDTRIP DeadHold          {"file": "PantryRat_R02_DeadHold_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 30, 31], "landmark_err_cm_at": {"0": 0.0001, "15": 0.0001, "30": 0.0001}, "landmark_max_err_cm": 0.0001, "root_max_dev": 0.0, "loop_seam_cm": 0.0}
+FBX version: 7400
+ROUNDTRIP EarFlick          {"file": "PantryRat_R02_EarFlick_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 12, 13], "landmark_err_cm_at": {"0": 6e-05, "6": 6e-05, "12": 6e-05}, "landmark_max_err_cm": 6e-05, "root_max_dev": 0.0}
+FBX version: 7400
+ROUNDTRIP TailSettle        {"file": "PantryRat_R02_TailSettle_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 24, 25], "landmark_err_cm_at": {"0": 6e-05, "12": 6e-05, "24": 6e-05}, "landmark_max_err_cm": 6e-05, "root_max_dev": 0.0}
+FBX version: 7400
+ROUNDTRIP Walk              {"file": "PantryRat_R02_Walk_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 15, 16], "landmark_err_cm_at": {"0": 0.00012, "7": 8e-05, "15": 0.00012}, "landmark_max_err_cm": 0.00012, "root_max_dev": 0.0, "loop_seam_cm": 0.0}
+FBX version: 7400
+FBX version: 7400
+FBX version: 7400
+ROUNDTRIP bind {"objects": [["Armature", "ARMATURE"], ["PantryRat_R02_Body", "MESH"]], "armature_scale": [1.0, 1.0, 1.0], "bone_count": 26, "bone_mismatch": [], "max_bind_head_err_cm": 6e-05, "tris": 3092, "slots": ["Body", "Pink", "Belly", "Wood", "Harness", "EyePatch"], "bounds": {"min": [-45.156, -19.367, -0.0], "max": [30.7, 20.68, 44.45]}, "bounds_err_cm": 0.00048, "max_influences": 3, "bad_weights": 0, "min_loop_vs_face_normal_dot": 1.0, "sockets": {"Carry_Mouth": {"rebuilt_ue_cm": [26.6, -0.0, 13.2], "err_cm": 4e-05}, "Carry_Drag": {"rebuilt_ue_cm": [26.9455, 0.0, -13.3872], "err_cm": 6e-05}}, "imported_jaw_axis_y_ue": [0.98981, 0.0, -0.14242]}
+ROUNDTRIP statics {"den": {"objects": ["PantryRat_R02_Den_Mars_SM"], "tris": 330, "slots": ["Stone", "Void"], "bounds_err_cm": 0.00014, "scale": [1.0, 1.0, 1.0]}, "den_eye_plate": {"objects": ["PantryRat_R02_DenEyePlate_Mars_SM"], "tris": 2, "slots": ["EyePatch"], "bounds_err_cm": 0.0, "scale": [1.0, 1.0, 1.0], "uv_min": [0.0, 0.0], "uv_max": [1.0, 1.0], "normal_ue": [1.0, -0.0, 0.0], "u_by_ue_y": {"-10.0": 0.0, "10.0": 1.0}}, "cheese": {"objects": ["PantryRat_R02_Cheese_Mars_SM"], "tris": 56, "slots": ["Rind", "Flesh"], "bounds_err_cm": 0.0, "scale": [1.0, 1.0, 1.0]}}
+PANTRY_RAT_OK
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+
+Blender quit

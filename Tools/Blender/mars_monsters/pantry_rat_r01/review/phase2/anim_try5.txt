@@ -1,0 +1,9 @@
+00:01.765  blend            | Read blend: "D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r01\source\PantryRat_R01.blend"
+STRAPFIT DeathToppleLeft {"strap_fit": {"spoon_lift_cm": 0.0, "spoon_slide_deg": -10.0, "spoon_pitch_deg": 0.0}, "before": [[2, ["head-spoon"]], [6, ["head-spoon"]], [7, ["head-spoon"]], [8, ["head-spoon"]], [9, ["head-spoon"]], [10, ["head-spoon"]], [11, ["head-spoon"]], [12, ["head-spoon"]], [13, ["head-spoon"]], [14, ["head-spoon"]], [15, ["head-spoon"]], [16, ["head-spoon"]], [17, ["head-spoon"]], [18, ["head-spoon"]], [19, ["head-spoon"]], [20, ["head-spoon"]], [21, ["head-spoon"]], [22, ["head-spoon"]], [23, ["head-spoon"]]], "unresolved": []}
+CLIP DeathToppleLeft   n= 24 loop=False seam=None bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.15, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=13.8s
+STRAPFIT DeathToppleRight {"strap_fit": {"spoon_lift_cm": 0.3, "spoon_slide_deg": 0.0, "spoon_pitch_deg": 0.0}, "before": [[2, ["head-spoon"]]], "unresolved": []}
+CLIP DeathToppleRight  n= 24 loop=False seam=None bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.15, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=0.8s
+PANTRY_RAT_OK
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+
+Blender quit

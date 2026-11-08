@@ -1,0 +1,425 @@
+{
+ "IdleBreath": {
+  "fps": 30,
+  "frames": [
+   0,
+   60
+  ],
+  "samples": 61,
+  "loop": true,
+  "additive": false,
+  "export_action": "IdleBreath",
+  "seconds": 2.0
+ },
+ "SniffGround": {
+  "fps": 30,
+  "frames": [
+   0,
+   36
+  ],
+  "samples": 37,
+  "loop": true,
+  "additive": false,
+  "export_action": "SniffGround",
+  "seconds": 1.2
+ },
+ "SniffAir": {
+  "fps": 30,
+  "frames": [
+   0,
+   30
+  ],
+  "samples": 31,
+  "loop": true,
+  "additive": false,
+  "export_action": "SniffAir",
+  "seconds": 1.0
+ },
+ "StretchAttend": {
+  "fps": 30,
+  "frames": [
+   0,
+   30
+  ],
+  "samples": 31,
+  "loop": false,
+  "additive": false,
+  "export_action": "StretchAttend",
+  "seconds": 1.0
+ },
+ "RearUp": {
+  "fps": 30,
+  "frames": [
+   0,
+   8
+  ],
+  "samples": 9,
+  "loop": false,
+  "additive": false,
+  "export_action": "RearUp",
+  "seconds": 0.266667
+ },
+ "RearObserve": {
+  "fps": 30,
+  "frames": [
+   0,
+   36
+  ],
+  "samples": 37,
+  "loop": true,
+  "additive": false,
+  "export_action": "RearObserve",
+  "seconds": 1.2
+ },
+ "RearDown": {
+  "fps": 30,
+  "frames": [
+   0,
+   8
+  ],
+  "samples": 9,
+  "loop": false,
+  "additive": false,
+  "export_action": "RearDown",
+  "seconds": 0.266667
+ },
+ "BoundStart": {
+  "fps": 30,
+  "frames": [
+   0,
+   5
+  ],
+  "samples": 6,
+  "loop": false,
+  "additive": false,
+  "export_action": "BoundStart",
+  "seconds": 0.166667
+ },
+ "BoundCycle": {
+  "fps": 30,
+  "frames": [
+   0,
+   12
+  ],
+  "samples": 13,
+  "loop": true,
+  "additive": false,
+  "export_action": "BoundCycle",
+  "seconds": 0.4,
+  "design_speed_cm_s": 200.0
+ },
+ "BoundStop": {
+  "fps": 30,
+  "frames": [
+   0,
+   5
+  ],
+  "samples": 6,
+  "loop": false,
+  "additive": false,
+  "export_action": "BoundStop",
+  "seconds": 0.166667
+ },
+ "TurnLeft90": {
+  "fps": 30,
+  "frames": [
+   0,
+   9
+  ],
+  "samples": 10,
+  "loop": false,
+  "additive": false,
+  "export_action": "TurnLeft90",
+  "seconds": 0.3
+ },
+ "TurnRight90": {
+  "fps": 30,
+  "frames": [
+   0,
+   9
+  ],
+  "samples": 10,
+  "loop": false,
+  "additive": false,
+  "export_action": "TurnRight90",
+  "seconds": 0.3
+ },
+ "Turn180": {
+  "fps": 30,
+  "frames": [
+   0,
+   14
+  ],
+  "samples": 15,
+  "loop": false,
+  "additive": false,
+  "export_action": "Turn180",
+  "seconds": 0.466667
+ },
+ "Startle": {
+  "fps": 30,
+  "frames": [
+   0,
+   9
+  ],
+  "samples": 10,
+  "loop": false,
+  "additive": false,
+  "export_action": "Startle",
+  "seconds": 0.3
+ },
+ "Backstep": {
+  "fps": 30,
+  "frames": [
+   0,
+   11
+  ],
+  "samples": 12,
+  "loop": false,
+  "additive": false,
+  "export_action": "Backstep",
+  "seconds": 0.366667
+ },
+ "GuardedWatch": {
+  "fps": 30,
+  "frames": [
+   0,
+   45
+  ],
+  "samples": 46,
+  "loop": true,
+  "additive": false,
+  "export_action": "GuardedWatch",
+  "seconds": 1.5
+ },
+ "DenEmerge": {
+  "fps": 30,
+  "frames": [
+   0,
+   30
+  ],
+  "samples": 31,
+  "loop": false,
+  "additive": false,
+  "export_action": "DenEmerge",
+  "seconds": 1.0
+ },
+ "DenEnter": {
+  "fps": 30,
+  "frames": [
+   0,
+   30
+  ],
+  "samples": 31,
+  "loop": false,
+  "additive": false,
+  "export_action": "DenEnter",
+  "seconds": 1.0
+ },
+ "InspectSlot": {
+  "fps": 30,
+  "frames": [
+   0,
+   12
+  ],
+  "samples": 13,
+  "loop": false,
+  "additive": false,
+  "export_action": "InspectSlot",
+  "seconds": 0.4
+ },
+ "Rummage": {
+  "fps": 30,
+  "frames": [
+   0,
+   48
+  ],
+  "samples": 49,
+  "loop": true,
+  "additive": false,
+  "export_action": "Rummage",
+  "seconds": 1.6
+ },
+ "Snatch": {
+  "fps": 30,
+  "frames": [
+   0,
+   8
+  ],
+  "samples": 9,
+  "loop": false,
+  "additive": false,
+  "export_action": "Snatch",
+  "seconds": 0.266667
+ },
+ "LoadedIdle": {
+  "fps": 30,
+  "frames": [
+   0,
+   36
+  ],
+  "samples": 37,
+  "loop": true,
+  "additive": false,
+  "export_action": "LoadedIdle",
+  "seconds": 1.2
+ },
+ "LoadedBound": {
+  "fps": 30,
+  "frames": [
+   0,
+   12
+  ],
+  "samples": 13,
+  "loop": true,
+  "additive": false,
+  "export_action": "LoadedBound",
+  "seconds": 0.4,
+  "design_speed_cm_s": 280.0
+ },
+ "LoadedTurnLeft": {
+  "fps": 30,
+  "frames": [
+   0,
+   11
+  ],
+  "samples": 12,
+  "loop": false,
+  "additive": false,
+  "export_action": "LoadedTurnLeft",
+  "seconds": 0.366667
+ },
+ "LoadedTurnRight": {
+  "fps": 30,
+  "frames": [
+   0,
+   11
+  ],
+  "samples": 12,
+  "loop": false,
+  "additive": false,
+  "export_action": "LoadedTurnRight",
+  "seconds": 0.366667
+ },
+ "LoadedLookBack": {
+  "fps": 30,
+  "frames": [
+   0,
+   15
+  ],
+  "samples": 16,
+  "loop": false,
+  "additive": false,
+  "export_action": "LoadedLookBack",
+  "seconds": 0.5
+ },
+ "LoadedCornered": {
+  "fps": 30,
+  "frames": [
+   0,
+   24
+  ],
+  "samples": 25,
+  "loop": true,
+  "additive": false,
+  "export_action": "LoadedCornered",
+  "seconds": 0.8
+ },
+ "HitReact": {
+  "fps": 30,
+  "frames": [
+   0,
+   4
+  ],
+  "samples": 5,
+  "loop": false,
+  "additive": false,
+  "export_action": "HitReact",
+  "seconds": 0.133333
+ },
+ "MouthRelease": {
+  "fps": 30,
+  "frames": [
+   0,
+   6
+  ],
+  "samples": 7,
+  "loop": false,
+  "additive": false,
+  "export_action": "MouthRelease",
+  "seconds": 0.2
+ },
+ "DeathToppleLeft": {
+  "fps": 30,
+  "frames": [
+   0,
+   24
+  ],
+  "samples": 25,
+  "loop": false,
+  "additive": false,
+  "export_action": "DeathToppleLeft",
+  "seconds": 0.8
+ },
+ "DeathToppleRight": {
+  "fps": 30,
+  "frames": [
+   0,
+   24
+  ],
+  "samples": 25,
+  "loop": false,
+  "additive": false,
+  "export_action": "DeathToppleRight",
+  "seconds": 0.8
+ },
+ "DeadHold": {
+  "fps": 30,
+  "frames": [
+   0,
+   30
+  ],
+  "samples": 31,
+  "loop": true,
+  "additive": false,
+  "export_action": "DeadHold",
+  "seconds": 1.0
+ },
+ "EarFlick": {
+  "fps": 30,
+  "frames": [
+   0,
+   12
+  ],
+  "samples": 13,
+  "loop": false,
+  "additive": true,
+  "export_action": "EarFlick",
+  "seconds": 0.4
+ },
+ "TailSettle": {
+  "fps": 30,
+  "frames": [
+   0,
+   24
+  ],
+  "samples": 25,
+  "loop": false,
+  "additive": true,
+  "export_action": "TailSettle",
+  "seconds": 0.8
+ },
+ "Walk": {
+  "fps": 30,
+  "frames": [
+   0,
+   15
+  ],
+  "samples": 16,
+  "loop": true,
+  "additive": false,
+  "export_action": "Walk",
+  "seconds": 0.5,
+  "design_speed_cm_s": 100.0
+ }
+}

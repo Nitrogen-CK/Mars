@@ -1,0 +1,614 @@
+{
+ "bones": [
+  {
+   "name": "root",
+   "parent": null,
+   "head_ue_cm": [
+    0.0,
+    -0.0,
+    0.0
+   ],
+   "tail_ue_cm": [
+    0.0,
+    -10.0,
+    0.0
+   ]
+  },
+  {
+   "name": "body",
+   "parent": "root",
+   "head_ue_cm": [
+    -3.0,
+    -0.0,
+    22.0
+   ],
+   "tail_ue_cm": [
+    3.0,
+    -0.0,
+    22.0
+   ]
+  },
+  {
+   "name": "pelvis",
+   "parent": "body",
+   "head_ue_cm": [
+    -3.0,
+    -0.0,
+    22.0
+   ],
+   "tail_ue_cm": [
+    -13.0,
+    -0.0,
+    20.0
+   ]
+  },
+  {
+   "name": "hind_upper_l",
+   "parent": "pelvis",
+   "head_ue_cm": [
+    -10.2,
+    -8.0,
+    16.0
+   ],
+   "tail_ue_cm": [
+    -5.0,
+    -10.6,
+    8.2
+   ]
+  },
+  {
+   "name": "hind_lower_l",
+   "parent": "hind_upper_l",
+   "head_ue_cm": [
+    -5.0,
+    -10.6,
+    8.2
+   ],
+   "tail_ue_cm": [
+    -11.0,
+    -10.8,
+    2.6
+   ]
+  },
+  {
+   "name": "hind_foot_l",
+   "parent": "hind_lower_l",
+   "head_ue_cm": [
+    -11.0,
+    -10.8,
+    2.6
+   ],
+   "tail_ue_cm": [
+    -3.2,
+    -10.8,
+    0.9
+   ]
+  },
+  {
+   "name": "hind_upper_r",
+   "parent": "pelvis",
+   "head_ue_cm": [
+    -10.2,
+    8.0,
+    16.0
+   ],
+   "tail_ue_cm": [
+    -5.0,
+    10.6,
+    8.2
+   ]
+  },
+  {
+   "name": "hind_lower_r",
+   "parent": "hind_upper_r",
+   "head_ue_cm": [
+    -5.0,
+    10.6,
+    8.2
+   ],
+   "tail_ue_cm": [
+    -11.0,
+    10.8,
+    2.6
+   ]
+  },
+  {
+   "name": "hind_foot_r",
+   "parent": "hind_lower_r",
+   "head_ue_cm": [
+    -11.0,
+    10.8,
+    2.6
+   ],
+   "tail_ue_cm": [
+    -3.2,
+    10.8,
+    0.9
+   ]
+  },
+  {
+   "name": "tail_01",
+   "parent": "pelvis",
+   "head_ue_cm": [
+    -15.6,
+    -0.0,
+    15.4
+   ],
+   "tail_ue_cm": [
+    -24.4,
+    -0.0,
+    7.8
+   ]
+  },
+  {
+   "name": "tail_02",
+   "parent": "tail_01",
+   "head_ue_cm": [
+    -24.4,
+    -0.0,
+    7.8
+   ],
+   "tail_ue_cm": [
+    -33.4,
+    -0.0,
+    3.4
+   ]
+  },
+  {
+   "name": "tail_03",
+   "parent": "tail_02",
+   "head_ue_cm": [
+    -33.4,
+    -0.0,
+    3.4
+   ],
+   "tail_ue_cm": [
+    -39.9,
+    -0.0,
+    4.8
+   ]
+  },
+  {
+   "name": "tail_04",
+   "parent": "tail_03",
+   "head_ue_cm": [
+    -39.9,
+    -0.0,
+    4.8
+   ],
+   "tail_ue_cm": [
+    -41.4,
+    -0.0,
+    7.4
+   ]
+  },
+  {
+   "name": "chest",
+   "parent": "body",
+   "head_ue_cm": [
+    3.0,
+    -0.0,
+    22.0
+   ],
+   "tail_ue_cm": [
+    8.8,
+    -0.0,
+    24.0
+   ]
+  },
+  {
+   "name": "neck",
+   "parent": "chest",
+   "head_ue_cm": [
+    8.8,
+    -0.0,
+    24.0
+   ],
+   "tail_ue_cm": [
+    12.0,
+    -0.0,
+    25.0
+   ]
+  },
+  {
+   "name": "head",
+   "parent": "neck",
+   "head_ue_cm": [
+    12.0,
+    -0.0,
+    25.0
+   ],
+   "tail_ue_cm": [
+    20.9,
+    -0.0,
+    22.4
+   ]
+  },
+  {
+   "name": "jaw",
+   "parent": "head",
+   "head_ue_cm": [
+    13.8,
+    -0.0,
+    21.4
+   ],
+   "tail_ue_cm": [
+    20.6,
+    -0.0,
+    19.8
+   ]
+  },
+  {
+   "name": "ear_l",
+   "parent": "head",
+   "head_ue_cm": [
+    12.8199,
+    -10.0893,
+    31.4245
+   ],
+   "tail_ue_cm": [
+    7.7458,
+    -12.628,
+    43.2542
+   ]
+  },
+  {
+   "name": "ear_r",
+   "parent": "head",
+   "head_ue_cm": [
+    12.8199,
+    10.0893,
+    31.4245
+   ],
+   "tail_ue_cm": [
+    7.7458,
+    12.628,
+    43.2542
+   ]
+  },
+  {
+   "name": "fore_upper_l",
+   "parent": "chest",
+   "head_ue_cm": [
+    3.4,
+    -7.2,
+    14.5
+   ],
+   "tail_ue_cm": [
+    2.0,
+    -9.2,
+    7.4
+   ]
+  },
+  {
+   "name": "fore_lower_l",
+   "parent": "fore_upper_l",
+   "head_ue_cm": [
+    2.0,
+    -9.2,
+    7.4
+   ],
+   "tail_ue_cm": [
+    4.6,
+    -9.4,
+    2.3
+   ]
+  },
+  {
+   "name": "fore_foot_l",
+   "parent": "fore_lower_l",
+   "head_ue_cm": [
+    4.6,
+    -9.4,
+    2.3
+   ],
+   "tail_ue_cm": [
+    8.8,
+    -9.8,
+    0.9
+   ]
+  },
+  {
+   "name": "fore_upper_r",
+   "parent": "chest",
+   "head_ue_cm": [
+    3.4,
+    7.2,
+    14.5
+   ],
+   "tail_ue_cm": [
+    2.0,
+    9.2,
+    7.4
+   ]
+  },
+  {
+   "name": "fore_lower_r",
+   "parent": "fore_upper_r",
+   "head_ue_cm": [
+    2.0,
+    9.2,
+    7.4
+   ],
+   "tail_ue_cm": [
+    4.6,
+    9.4,
+    2.3
+   ]
+  },
+  {
+   "name": "fore_foot_r",
+   "parent": "fore_lower_r",
+   "head_ue_cm": [
+    4.6,
+    9.4,
+    2.3
+   ],
+   "tail_ue_cm": [
+    8.8,
+    9.8,
+    0.9
+   ]
+  },
+  {
+   "name": "spoon_prop",
+   "parent": "chest",
+   "head_ue_cm": [
+    -6.8513,
+    -2.0605,
+    37.9888
+   ],
+   "tail_ue_cm": [
+    -1.0302,
+    2.508,
+    41.0292
+   ]
+  }
+ ],
+ "bind": {
+  "object": "PantryRat_R01_Body",
+  "tris": 2086,
+  "verts": 1130,
+  "slots": [
+   "Body",
+   "Pink",
+   "Belly",
+   "Wood",
+   "Harness",
+   "EyePatch"
+  ],
+  "bounds_ue_cm": {
+   "min": [
+    -41.895,
+    -16.301,
+    0.0
+   ],
+   "max": [
+    23.1,
+    16.301,
+    46.838
+   ]
+  },
+  "uv_layers": [
+   "UV0"
+  ],
+  "nose_point_ue_cm": [
+   23.1,
+   -0.0,
+   21.7
+  ]
+ },
+ "slots": [
+  "Body",
+  "Pink",
+  "Belly",
+  "Wood",
+  "Harness",
+  "EyePatch"
+ ],
+ "den": {
+  "object": "PantryRat_R01_Den_Mars_SM",
+  "tris": 330,
+  "verts": 197,
+  "slots": [
+   "Stone",
+   "Void"
+  ],
+  "bounds_ue_cm": {
+   "min": [
+    -47.0,
+    -56.0,
+    -1.0
+   ],
+   "max": [
+    9.5,
+    56.0,
+    81.013
+   ]
+  },
+  "uv_layers": [
+   "UV0"
+  ]
+ },
+ "den_eye_plate": {
+  "object": "PantryRat_R01_DenEyePlate_Mars_SM",
+  "tris": 2,
+  "verts": 4,
+  "slots": [
+   "EyePatch"
+  ],
+  "bounds_ue_cm": {
+   "min": [
+    -43.0,
+    -10.0,
+    18.0
+   ],
+   "max": [
+    -43.0,
+    10.0,
+    26.0
+   ]
+  },
+  "uv_layers": [
+   "UV0"
+  ],
+  "quad_normal_ue": [
+   1.0,
+   0.0,
+   0.0
+  ],
+  "source_front_uv_range": [
+   [
+    0.0,
+    1.0
+   ],
+   [
+    0.0,
+    1.0
+   ]
+  ],
+  "uv_rule": "U = 0 at den +Y Blender (= UE -Y, the resident's LEFT when it faces out of the den), U = 1 at den -Y; V = 0 at the bottom"
+ },
+ "cheese": {
+  "object": "PantryRat_R01_Cheese_Mars_SM",
+  "tris": 56,
+  "verts": 30,
+  "slots": [
+   "Rind",
+   "Flesh"
+  ],
+  "bounds_ue_cm": {
+   "min": [
+    -7.5,
+    -5.0,
+    0.0
+   ],
+   "max": [
+    7.5,
+    5.0,
+    8.0
+   ]
+  },
+  "uv_layers": [
+   "UV0"
+  ],
+  "faces_per_slot": {
+   "Rind": 20,
+   "Flesh": 14
+  }
+ },
+ "cube_bounds_ue_cm": {
+  "min": [
+   -5.0,
+   -5.0,
+   -5.0
+  ],
+  "max": [
+   5.0,
+   5.0,
+   5.0
+  ]
+ },
+ "sockets": {
+  "Carry_Mouth": {
+   "bone": "jaw",
+   "component_cm": [
+    19.8,
+    -0.0,
+    20.6
+   ],
+   "component_axis_x": [
+    -0.615661,
+    0.0,
+    -0.788011
+   ],
+   "component_axis_z": [
+    0.788011,
+    -0.0,
+    -0.615661
+   ],
+   "blender_world_rest_cm": [
+    19.8,
+    0.0,
+    20.6
+   ],
+   "blender_jaw_local_cm": [
+    0.0,
+    6.0237,
+    0.5955
+   ],
+   "blender_jaw_local_quat_wxyz": [
+    0.381179,
+    -0.595569,
+    0.595569,
+    0.381179
+   ],
+   "ue_relative_location_cm_predicted": [
+    0.0,
+    -6.0237,
+    0.5955
+   ],
+   "ue_relative_axis_x_predicted": [
+    0.0,
+    0.41881,
+    -0.908074
+   ],
+   "ue_relative_axis_z_predicted": [
+    -0.0,
+    -0.908074,
+    -0.41881
+   ],
+   "frame_rule": "UE = (x, -y, z); a frame's UE X axis = S*x_b, Z axis = S*z_b (Y = Z x X in UE's left-handed sense); bone-relative values assume the UE jaw rest rotation = S*R_b*S (proved on the Unreal readback: predicted vs read relative)"
+  },
+  "Carry_Drag": {
+   "bone": "jaw",
+   "component_cm": [
+    24.546,
+    0.0,
+    -5.906
+   ],
+   "component_axis_x": [
+    0.939693,
+    0.0,
+    -0.34202
+   ],
+   "component_axis_z": [
+    0.34202,
+    0.0,
+    0.939693
+   ],
+   "blender_world_rest_cm": [
+    24.546,
+    -0.0,
+    -5.906
+   ],
+   "blender_jaw_local_cm": [
+    0.0,
+    16.7145,
+    -24.1188
+   ],
+   "blender_jaw_local_quat_wxyz": [
+    0.705877,
+    -0.041686,
+    0.041686,
+    0.705877
+   ],
+   "ue_relative_location_cm_predicted": [
+    0.0,
+    -16.7145,
+    -24.1188
+   ],
+   "ue_relative_axis_x_predicted": [
+    0.0,
+    -0.993049,
+    -0.117702
+   ],
+   "ue_relative_axis_z_predicted": [
+    0.0,
+    -0.117702,
+    0.993049
+   ],
+   "frame_rule": "UE = (x, -y, z); a frame's UE X axis = S*x_b, Z axis = S*z_b (Y = Z x X in UE's left-handed sense); bone-relative values assume the UE jaw rest rotation = S*R_b*S (proved on the Unreal readback: predicted vs read relative)"
+  }
+ }
+}

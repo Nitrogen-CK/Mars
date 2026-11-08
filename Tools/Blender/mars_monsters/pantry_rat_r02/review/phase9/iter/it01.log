@@ -1,0 +1,11 @@
+00:01.640  blend            | Read blend: "D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\source\PantryRat_R02.blend"
+STRAPFIT BoundCycle {"strap_fit": {"spoon_lift_cm": 0.3, "spoon_slide_deg": 0.0, "spoon_pitch_deg": 0.0}, "before": [[2, ["spoon-torso"]], [3, ["spoon-torso"]], [10, ["spoon-torso"]], [11, ["spoon-torso"]]], "unresolved": []}
+CLIP BoundCycle        n= 12 loop=True seam={'pose_max': 0.0, 'seam_second_diff': 2.118778, 'interior_max_second_diff': 5.299999} bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.102, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=0.9s
+STRAPFIT Walk {"strap_fit": {"spoon_lift_cm": 0.3, "spoon_slide_deg": 0.0, "spoon_pitch_deg": 0.0}, "before": [[0, ["spoon-torso"]], [1, ["spoon-torso"]], [14, ["spoon-torso"]], [15, ["spoon-torso"]]], "unresolved": []}
+CLIP Walk              n= 15 loop=True seam={'pose_max': 0.0, 'seam_second_diff': 0.248687, 'interior_max_second_diff': 0.676631} bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.086, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=1.1s
+STRAPFIT LoadedBound {"strap_fit": {"spoon_lift_cm": 0.3, "spoon_slide_deg": 0.0, "spoon_pitch_deg": 0.0}, "before": [[2, ["spoon-torso"]], [3, ["spoon-torso"]], [10, ["spoon-torso"]], [11, ["spoon-torso"]]], "unresolved": []}
+CLIP LoadedBound       n= 12 loop=True seam={'pose_max': 0.0, 'seam_second_diff': 2.12518, 'interior_max_second_diff': 4.186553} bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.103, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=0.9s
+PANTRY_RAT_OK
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+
+Blender quit

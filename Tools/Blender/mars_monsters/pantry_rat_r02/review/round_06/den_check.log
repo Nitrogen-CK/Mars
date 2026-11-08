@@ -1,0 +1,7 @@
+00:02.969  blend            | Read blend: "D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\source\PantryRat_R02.blend"
+FBX version: 7400
+DEN {"max_abs_profile_dev": 6.383, "clips": {"DenEmerge": {"min_clear_to_den_mesh_cm": 9.32, "frame": 0, "point_yz": [-20.68, 11.94]}, "DenEnter": {"min_clear_to_den_mesh_cm": 9.32, "frame": 9, "point_yz": [-20.68, 12.11]}}}
+PANTRY_RAT_OK
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+
+Blender quit

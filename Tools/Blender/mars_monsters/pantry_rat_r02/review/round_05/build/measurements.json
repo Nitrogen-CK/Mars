@@ -1,0 +1,1825 @@
+{
+ "units": "cm (scale_length 0.01), 30 fps; Blender (x,y,z) == Unreal (x,-y,z); rat faces +X; rat LEFT = +Y",
+ "skin": {
+  "verts_by_part": {
+   "torso": 261,
+   "head": 121,
+   "nose": 44,
+   "jaw": 37,
+   "ear": 52,
+   "leg_upper": 154,
+   "leg_lower": 136,
+   "foot": 268,
+   "tail": 121,
+   "spoon": 76,
+   "cuff": 102,
+   "eyepatch": 22,
+   "strap/band": 264
+  }
+ },
+ "spoon_placement": {
+  "slide_out_cm": 6.9128,
+  "binding_contact_spoon_body": [
+   [
+    -11.38,
+    -14.48,
+    25.52
+   ],
+   [
+    -11.34,
+    -13.73,
+    25.23
+   ]
+  ],
+  "clearance": 0.8,
+  "length_target_vs_model": 0.9493,
+  "handle_end": [
+   -19.4681,
+   -19.7763,
+   12.598
+  ],
+  "bowl_centre": [
+   -4.2989,
+   -11.349,
+   38.4067
+  ]
+ },
+ "model_info": {
+  "tris_per_part_source": {
+   "Loft": 760,
+   "Nose": 84,
+   "Jaw": 70,
+   "Ear_L": 96,
+   "Leg_Fore_L": 456,
+   "Leg_Hind_L": 508,
+   "Tail": 238,
+   "Spoon": 144,
+   "Cuffs": 192,
+   "Band": 320,
+   "ChestStrap": 204,
+   "EyePatch_L": 10,
+   "EyePatch_R": 10
+  },
+  "spoon": {
+   "slide_out_cm": 6.9128,
+   "binding_contact_spoon_body": [
+    [
+     -11.38,
+     -14.48,
+     25.52
+    ],
+    [
+     -11.34,
+     -13.73,
+     25.23
+    ]
+   ],
+   "clearance": 0.8,
+   "length_target_vs_model": 0.9493,
+   "handle_end": [
+    -19.4681,
+    -19.7763,
+    12.598
+   ],
+   "bowl_centre": [
+    -4.2989,
+    -11.349,
+    38.4067
+   ]
+  },
+  "band_max_lift": 4.0,
+  "tail_length_cm": 27.6296,
+  "scale": 1.0,
+  "eye_flat_verts_moved": {
+   "1": 30,
+   "-1": 30
+  },
+  "strap": {
+   "plane_normal": [
+    0.637,
+    0.24,
+    0.733
+   ],
+   "centre": [
+    -10.43,
+    0.89,
+    23.13
+   ],
+   "arc_deg": 180.0
+  },
+  "band_x": -11.38,
+  "strap_max_lift": 3.25,
+  "cuffs": {
+   "girth": {
+    "along_cm": 11.19,
+    "dist_cm": 1.37
+   },
+   "strap": {
+    "along_cm": 20.16,
+    "dist_cm": 1.37
+   }
+  },
+  "belly_faces": 72,
+  "eye_plane": {
+   "1": [
+    [
+     20.388,
+     6.988,
+     20.66
+    ],
+    [
+     0.641,
+     0.751,
+     0.16
+    ]
+   ],
+   "-1": [
+    [
+     20.388,
+     -6.988,
+     20.66
+    ],
+    [
+     0.641,
+     -0.751,
+     0.16
+    ]
+   ]
+  }
+ },
+ "rig": {
+  "bones": 26,
+  "matches_RIG_json": true,
+  "issues": [],
+  "root_rest_identity": true,
+  "bone_heads_tails_rest": {
+   "root": [
+    [
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     10.0,
+     0.0
+    ]
+   ],
+   "body": [
+    [
+     -3.0,
+     0.0,
+     20.0
+    ],
+    [
+     3.0,
+     0.0,
+     20.0
+    ]
+   ],
+   "pelvis": [
+    [
+     -3.0,
+     0.0,
+     20.0
+    ],
+    [
+     -15.0,
+     0.0,
+     18.0
+    ]
+   ],
+   "hind_upper_l": [
+    [
+     -16.5,
+     10.8,
+     13.0
+    ],
+    [
+     -12.6,
+     12.0,
+     6.4
+    ]
+   ],
+   "hind_lower_l": [
+    [
+     -12.6,
+     12.0,
+     6.4
+    ],
+    [
+     -22.0,
+     11.8,
+     2.3
+    ]
+   ],
+   "hind_foot_l": [
+    [
+     -22.0,
+     11.8,
+     2.3
+    ],
+    [
+     -13.4,
+     11.8,
+     0.0
+    ]
+   ],
+   "hind_upper_r": [
+    [
+     -16.5,
+     -10.8,
+     13.0
+    ],
+    [
+     -12.6,
+     -12.0,
+     6.4
+    ]
+   ],
+   "hind_lower_r": [
+    [
+     -12.6,
+     -12.0,
+     6.4
+    ],
+    [
+     -22.0,
+     -11.8,
+     2.3
+    ]
+   ],
+   "hind_foot_r": [
+    [
+     -22.0,
+     -11.8,
+     2.3
+    ],
+    [
+     -13.4,
+     -11.8,
+     0.0
+    ]
+   ],
+   "tail_01": [
+    [
+     -27.6,
+     0.0,
+     16.6
+    ],
+    [
+     -36.5,
+     0.0,
+     13.4
+    ]
+   ],
+   "tail_02": [
+    [
+     -36.5,
+     0.0,
+     13.4
+    ],
+    [
+     -43.2,
+     0.0,
+     8.4
+    ]
+   ],
+   "tail_03": [
+    [
+     -43.2,
+     0.0,
+     8.4
+    ],
+    [
+     -43.4,
+     0.0,
+     3.9
+    ]
+   ],
+   "tail_04": [
+    [
+     -43.4,
+     0.0,
+     3.9
+    ],
+    [
+     -39.0,
+     0.0,
+     3.4
+    ]
+   ],
+   "chest": [
+    [
+     3.0,
+     0.0,
+     20.0
+    ],
+    [
+     8.5,
+     0.0,
+     21.5
+    ]
+   ],
+   "neck": [
+    [
+     8.5,
+     0.0,
+     21.5
+    ],
+    [
+     12.5,
+     0.0,
+     22.0
+    ]
+   ],
+   "head": [
+    [
+     12.5,
+     0.0,
+     22.0
+    ],
+    [
+     28.5,
+     0.0,
+     17.0
+    ]
+   ],
+   "jaw": [
+    [
+     13.5,
+     0.0,
+     14.4
+    ],
+    [
+     27.4,
+     0.0,
+     12.4
+    ]
+   ],
+   "ear_l": [
+    [
+     10.207,
+     11.7569,
+     26.3493
+    ],
+    [
+     3.6202,
+     16.6704,
+     34.7841
+    ]
+   ],
+   "ear_r": [
+    [
+     10.207,
+     -11.7569,
+     26.3493
+    ],
+    [
+     3.6202,
+     -16.6704,
+     34.7841
+    ]
+   ],
+   "fore_upper_l": [
+    [
+     6.8,
+     10.0,
+     12.5
+    ],
+    [
+     5.4,
+     10.8,
+     6.6
+    ]
+   ],
+   "fore_lower_l": [
+    [
+     5.4,
+     10.8,
+     6.6
+    ],
+    [
+     8.8,
+     11.0,
+     2.0
+    ]
+   ],
+   "fore_foot_l": [
+    [
+     8.8,
+     11.0,
+     2.0
+    ],
+    [
+     13.2,
+     11.0,
+     0.0
+    ]
+   ],
+   "fore_upper_r": [
+    [
+     6.8,
+     -10.0,
+     12.5
+    ],
+    [
+     5.4,
+     -10.8,
+     6.6
+    ]
+   ],
+   "fore_lower_r": [
+    [
+     5.4,
+     -10.8,
+     6.6
+    ],
+    [
+     8.8,
+     -11.0,
+     2.0
+    ]
+   ],
+   "fore_foot_r": [
+    [
+     8.8,
+     -11.0,
+     2.0
+    ],
+    [
+     13.2,
+     -11.0,
+     0.0
+    ]
+   ],
+   "spoon_prop": [
+    [
+     -15.0783,
+     -17.3375,
+     20.0667
+    ],
+    [
+     -11.1763,
+     -15.1697,
+     26.7056
+    ]
+   ]
+  }
+ },
+ "mesh": {
+  "object": "PantryRat_R02_Body",
+  "tris_total": 3092,
+  "verts": 1658,
+  "loops": 9072,
+  "budget_tris": "3000-4500 (R02 brief), > 5000 = deviation",
+  "tris_per_part_source": {
+   "Loft": 760,
+   "Nose": 84,
+   "Jaw": 70,
+   "Ear_L": 96,
+   "Leg_Fore_L": 456,
+   "Leg_Hind_L": 508,
+   "Tail": 238,
+   "Spoon": 144,
+   "Cuffs": 192,
+   "Band": 320,
+   "ChestStrap": 204,
+   "EyePatch_L": 10,
+   "EyePatch_R": 10
+  },
+  "tris_per_part_tag": {
+   "torso": 480,
+   "head": 280,
+   "nose": 84,
+   "ear": 96,
+   "eyepatch": 20,
+   "leg_upper": 276,
+   "leg_lower": 240,
+   "foot": 448,
+   "tail": 238,
+   "spoon": 114,
+   "cuff": 120,
+   "band": 320,
+   "jaw": 70,
+   "strap": 204
+  },
+  "slots": [
+   "Body",
+   "Pink",
+   "Belly",
+   "Wood",
+   "Harness",
+   "EyePatch"
+  ],
+  "tris_per_slot": {
+   "Body": 1274,
+   "Pink": 866,
+   "Belly": 72,
+   "Wood": 114,
+   "Harness": 644,
+   "EyePatch": 20
+  },
+  "weights": {
+   "max_influences": 3,
+   "unnormalized": 0,
+   "unweighted": 0,
+   "non_bone_groups": []
+  },
+  "rigid_spoon_and_strap": {
+   "verts": 178,
+   "not_rigid": 0
+  },
+  "rigid_eye_patches_head": {
+   "verts": 22,
+   "not_rigid": 0
+  },
+  "rigid_ears": {
+   "verts": 52,
+   "not_rigid": 0
+  },
+  "rigid_jaw": {
+   "verts": 37,
+   "not_rigid": 0
+  },
+  "orientation_fixes": 0,
+  "eye_patch_uv": {
+   "left_+Y": {
+    "u": [
+     0.0,
+     0.5
+    ],
+    "v": [
+     0.0,
+     1.0
+    ],
+    "loops": 30
+   },
+   "right_-Y": {
+    "u": [
+     0.5,
+     1.0
+    ],
+    "v": [
+     0.0,
+     1.0
+    ],
+    "loops": 30
+   }
+  },
+  "eye_patch_uv_halves_ok": true,
+  "eye_patch_uv_convention": "U decreases toward rat-left (+Y): LEFT patch U in [0,0.5] (back edge 0, front edge 0.5), RIGHT patch U in [0.5,1] (front 0.5, back 1); V up. EyePlate.ush: U<0.5 = LeftCell, mirrored, so frac(2U) runs front->back on both eyes."
+ },
+ "anatomy_islands": {
+  "ears": 2,
+  "eye_patches": 2,
+  "upper_limbs": 8,
+  "lower_limbs": 8,
+  "tail": 1,
+  "nose": 1,
+  "paw_and_toe_solids": 22,
+  "spoon_and_cuffs": 5,
+  "band": 1,
+  "chest_strap": 1,
+  "jaw": 1
+ },
+ "neutral": {
+  "nose_to_tail_x_extent_cm": 75.856,
+  "nose_to_tail_rat_only_no_spoon_cm": 75.856,
+  "body_length_tail_excluded_cm": 60.6,
+  "torso_length_cm": 40.9,
+  "body_width_torso_y_cm": 31.0,
+  "width_incl_ears_cm": 38.735,
+  "withers_top_z_cm": 33.4,
+  "withers_x_window": [
+   4.8,
+   8.8
+  ],
+  "torso_top_max_z_cm": 35.2,
+  "height_incl_spoon_cm": 44.45,
+  "height_no_spoon_cm": 36.309,
+  "nose_tip": [
+   30.5,
+   -0.7922,
+   14.04
+  ],
+  "tail_tip_x_cm": -45.156,
+  "belly_min_z_cm": 5.8,
+  "bounds_min_blender": [
+   -45.1558,
+   -20.6804,
+   -0.0
+  ],
+  "bounds_max_blender": [
+   30.7,
+   19.3675,
+   44.4497
+  ],
+  "targets": {
+   "torso_top_max_z_cm": 35.0,
+   "body_width_torso_y_cm": 30.0
+  },
+  "deviation": {
+   "torso_top_max_z_cm": 0.2,
+   "body_width_torso_y_cm": 1.0
+  },
+  "deviations_over_1cm": [],
+  "height_incl_spoon_le_65": true
+ },
+ "carry_mouth": {
+  "parent_bone": "jaw",
+  "jaw_head_local_translation_cm": [
+   0.0,
+   13.1374,
+   0.6779
+  ],
+  "jaw_head_local_rotation_quat_wxyz": [
+   0.3546,
+   -0.6118,
+   0.6118,
+   0.3546
+  ],
+  "jaw_head_local_euler_deg_xyz": [
+   0.0,
+   119.812,
+   90.0
+  ],
+  "world_rest_translation_cm": [
+   26.6,
+   -0.0,
+   13.2
+  ],
+  "frame_note": "Blender bone space (Y along the bone); the item pivot (base centre) sits here, item +Z = cap direction. Phase 2 must restate it in the exported UE socket frame.",
+  "offset_note": "mouth carry: item pivot at Carry_Mouth; drag carry: bulky pivot at Carry_Drag",
+  "jaw_carry_proxy_world_bounds": {
+   "min": [
+    27.3158,
+    -6.0,
+    9.9483
+   ],
+   "max": [
+    36.1211,
+    6.0,
+    21.1573
+   ]
+  },
+  "jaw_carry_proxy_min_z_cm": 9.948
+ },
+ "look_back_yaw_search": [
+  {
+   "yaw_deg": 0,
+   "ok": true,
+   "proxy_spoon_clear": 34.521,
+   "proxy_chest_clear": 16.032,
+   "head_spoon_tris": 0
+  },
+  {
+   "yaw_deg": 5,
+   "ok": true,
+   "proxy_spoon_clear": 35.001,
+   "proxy_chest_clear": 16.03,
+   "head_spoon_tris": 0
+  },
+  {
+   "yaw_deg": 10,
+   "ok": true,
+   "proxy_spoon_clear": 35.444,
+   "proxy_chest_clear": 16.025,
+   "head_spoon_tris": 0
+  },
+  {
+   "yaw_deg": 15,
+   "ok": true,
+   "proxy_spoon_clear": 35.848,
+   "proxy_chest_clear": 16.017,
+   "head_spoon_tris": 0
+  },
+  {
+   "yaw_deg": 20,
+   "ok": true,
+   "proxy_spoon_clear": 36.212,
+   "proxy_chest_clear": 15.863,
+   "head_spoon_tris": 0
+  },
+  {
+   "yaw_deg": 25,
+   "ok": true,
+   "proxy_spoon_clear": 36.535,
+   "proxy_chest_clear": 15.214,
+   "head_spoon_tris": 0
+  },
+  {
+   "yaw_deg": 30,
+   "ok": true,
+   "proxy_spoon_clear": 36.799,
+   "proxy_chest_clear": 14.356,
+   "head_spoon_tris": 0
+  },
+  {
+   "yaw_deg": 35,
+   "ok": true,
+   "proxy_spoon_clear": 37.001,
+   "proxy_chest_clear": 13.498,
+   "head_spoon_tris": 0
+  },
+  {
+   "yaw_deg": 40,
+   "ok": true,
+   "proxy_spoon_clear": 37.156,
+   "proxy_chest_clear": 12.65,
+   "head_spoon_tris": 0
+  },
+  {
+   "yaw_deg": 45,
+   "ok": true,
+   "proxy_spoon_clear": 37.264,
+   "proxy_chest_clear": 11.821,
+   "head_spoon_tris": 0
+  },
+  {
+   "yaw_deg": 50,
+   "ok": true,
+   "proxy_spoon_clear": 37.253,
+   "proxy_chest_clear": 11.02,
+   "head_spoon_tris": 0
+  },
+  {
+   "yaw_deg": 55,
+   "ok": true,
+   "proxy_spoon_clear": 37.125,
+   "proxy_chest_clear": 10.249,
+   "head_spoon_tris": 0
+  },
+  {
+   "yaw_deg": 60,
+   "ok": true,
+   "proxy_spoon_clear": 36.889,
+   "proxy_chest_clear": 9.49,
+   "head_spoon_tris": 0
+  },
+  {
+   "yaw_deg": 65,
+   "ok": true,
+   "proxy_spoon_clear": 36.602,
+   "proxy_chest_clear": 8.758,
+   "head_spoon_tris": 0
+  },
+  {
+   "yaw_deg": 70,
+   "ok": true,
+   "proxy_spoon_clear": 36.275,
+   "proxy_chest_clear": 8.061,
+   "head_spoon_tris": 0
+  }
+ ],
+ "look_back_yaw_deg": {
+  "total": 70,
+  "neck": 31.5,
+  "head": 38.5,
+  "direction": "toward rat LEFT (+Y), away from the bowl on the right shoulder",
+  "rule": "largest yaw <= 70 with proxy >= 2 cm off spoon and chest"
+ },
+ "dead_back_search": [
+  {
+   "dev": 0.0,
+   "slide": 0.0,
+   "ok": false,
+   "body_lift": 9.25,
+   "spoon_torso_tris": 0,
+   "spoon_min_z": 0.0
+  },
+  {
+   "dev": 10.0,
+   "slide": 0.0,
+   "ok": false,
+   "body_lift": 6.499,
+   "spoon_torso_tris": 0,
+   "spoon_min_z": 0.0
+  },
+  {
+   "dev": -10.0,
+   "slide": 0.0,
+   "ok": false,
+   "body_lift": 10.968,
+   "spoon_torso_tris": 0,
+   "spoon_min_z": 0.0
+  },
+  {
+   "dev": 20.0,
+   "slide": 0.0,
+   "ok": false,
+   "body_lift": 3.307,
+   "spoon_torso_tris": 0,
+   "spoon_min_z": 0.0
+  },
+  {
+   "dev": -20.0,
+   "slide": 0.0,
+   "ok": false,
+   "body_lift": 11.715,
+   "spoon_torso_tris": 0,
+   "spoon_min_z": 0.0
+  },
+  {
+   "dev": 30.0,
+   "slide": 0.0,
+   "ok": false,
+   "body_lift": 0.334,
+   "spoon_torso_tris": 0,
+   "spoon_min_z": 0.0
+  },
+  {
+   "dev": -30.0,
+   "slide": 0.0,
+   "ok": false,
+   "body_lift": 11.861,
+   "spoon_torso_tris": 0,
+   "spoon_min_z": 0.0
+  },
+  {
+   "dev": 40.0,
+   "slide": 0.0,
+   "ok": true,
+   "body_lift": 0.278,
+   "spoon_torso_tris": 0,
+   "spoon_min_z": 3.186
+  }
+ ],
+ "dead_back_solution": {
+  "roll_deg": 220.0,
+  "spoon_slide_deg": 0.0
+ },
+ "pose_ratios": {
+  "crouch_height_ratio_no_spoon": 0.9013,
+  "crouch_height_ratio_incl_spoon": 0.9444,
+  "stretch_length_ratio": 1.2251,
+  "bound_apex_body_lift_cm": 8.0,
+  "bound_apex_min_z_cm": 10.16
+ },
+ "rear_up_nose_height_cm": 44.235,
+ "den": {
+  "info": {
+   "opening_half_width": 30.0,
+   "spring_z": 30.0,
+   "opening_height": 60.0,
+   "recess_depth_from_front": 45.0,
+   "front_plane_x": 0.0,
+   "back_plane_x": -45.0,
+   "eye_plate_x": -43.0,
+   "eye_plate_size": [
+    20.0,
+    8.0
+   ],
+   "eye_plate_centre_z": 22.0
+  },
+  "portal_clearance": {
+   "pose": "den_crouch",
+   "includes_spoon": true,
+   "posed_y_extent_cm": 39.694,
+   "posed_y_min_max": [
+    -20.68,
+    19.013
+   ],
+   "posed_z_extent_cm": 41.84,
+   "posed_z_max_cm": 41.84,
+   "opening_cm": [
+    60.0,
+    60.0
+   ],
+   "opening_profile": "30 cm jambs + 30 cm radius semicircle (60 x 60)",
+   "box_clearance_width_total_cm": 20.306,
+   "box_clearance_height_cm": 18.16,
+   "arch_profile_min_clearance_cm": 9.32,
+   "arch_tightest_point_yz": [
+    -20.68,
+    12.34
+   ],
+   "fits": true,
+   "opening_widened": false
+  },
+  "markers_den_local": {
+   "EntryPortal": [
+    24.0,
+    -14.0,
+    0.0
+   ],
+   "ExitPortal": [
+    24.0,
+    14.0,
+    0.0
+   ],
+   "OutsideStand": [
+    75.0,
+    0.0,
+    0.0
+   ],
+   "ReturnAdmission": [
+    48.0,
+    0.0,
+    0.0
+   ]
+  },
+  "den_world": [
+   392.0,
+   0.0,
+   0.0
+  ],
+  "den_facing": "-X (opening looks into the court)"
+ },
+ "pocket_reach": {
+  "rummage": {
+   "pocket": "Pocket2",
+   "pocket_world": [
+    -269.0,
+    -22.5,
+    37.5
+   ],
+   "pocket_height_cm": 37.5,
+   "rear_pitch_deg": 41.51,
+   "nose_world": [
+    -256.5,
+    -22.5,
+    37.5
+   ],
+   "nose_height_cm": 37.5,
+   "height_shortfall_cm": 0.0,
+   "nose_reaches_pocket_height": true,
+   "nose_to_socket_3d_cm": 12.5,
+   "nose_pack_local": [
+    -43.5,
+    22.5,
+    37.5
+   ],
+   "socket_depth_behind_envelope_face_cm": 12.0,
+   "hind_feet_min_z_cm": -0.0,
+   "hind_feet_planted_rest_targets": true,
+   "below_floor_verts": 0,
+   "audit": {
+    "spoon_vs_torso_tris": 0,
+    "spoon_vs_torso_clear_cm": 0.194,
+    "spoon_min_z_cm": 10.073,
+    "spoon_below_floor_verts": 0,
+    "harness_vs_torso_tris": 370,
+    "harness_vs_torso_clear_cm": -0.109,
+    "band_float_max_cm": 4.563,
+    "head_vs_spoon_tris": 0,
+    "head_vs_spoon_dist_cm": 8.246,
+    "legs_vs_torso_tris": 0,
+    "feet_vs_torso_tris": 0,
+    "below_floor_verts": 0,
+    "below_floor_parts": {},
+    "min_z_cm": -0.0,
+    "body_min_z_cm": -0.0,
+    "body_lift_by_spoon_cm": 0.0,
+    "eye_patch_detach_cm": 0.2,
+    "height_cm": 47.867,
+    "height_no_spoon_cm": 47.867,
+    "x_extent_cm": 71.811,
+    "y_extent_cm": 40.048,
+    "carry_proxy_vs_chest_tris": "n/a",
+    "carry_proxy_vs_chest_clear_cm": "n/a",
+    "carry_proxy_vs_spoon_tris": "n/a",
+    "carry_proxy_vs_spoon_clear_cm": "n/a"
+   },
+   "rat_placement_world": [
+    -236.8147,
+    -21.7079,
+    0.0
+   ],
+   "rat_yaw_deg": 180.0
+  },
+  "rummage_p3": {
+   "pocket": "Pocket3",
+   "pocket_world": [
+    -269.0,
+    17.5,
+    37.5
+   ],
+   "pocket_height_cm": 37.5,
+   "rear_pitch_deg": 41.51,
+   "nose_world": [
+    -256.5,
+    17.5,
+    37.5
+   ],
+   "nose_height_cm": 37.5,
+   "height_shortfall_cm": 0.0,
+   "nose_reaches_pocket_height": true,
+   "nose_to_socket_3d_cm": 12.5,
+   "nose_pack_local": [
+    -43.5,
+    -17.5,
+    37.5
+   ],
+   "socket_depth_behind_envelope_face_cm": 12.0,
+   "hind_feet_min_z_cm": -0.0,
+   "hind_feet_planted_rest_targets": true,
+   "below_floor_verts": 0,
+   "audit": {
+    "spoon_vs_torso_tris": 0,
+    "spoon_vs_torso_clear_cm": 0.194,
+    "spoon_min_z_cm": 10.073,
+    "spoon_below_floor_verts": 0,
+    "harness_vs_torso_tris": 370,
+    "harness_vs_torso_clear_cm": -0.109,
+    "band_float_max_cm": 4.563,
+    "head_vs_spoon_tris": 0,
+    "head_vs_spoon_dist_cm": 8.246,
+    "legs_vs_torso_tris": 0,
+    "feet_vs_torso_tris": 0,
+    "below_floor_verts": 0,
+    "below_floor_parts": {},
+    "min_z_cm": -0.0,
+    "body_min_z_cm": -0.0,
+    "body_lift_by_spoon_cm": 0.0,
+    "eye_patch_detach_cm": 0.2,
+    "height_cm": 47.867,
+    "height_no_spoon_cm": 47.867,
+    "x_extent_cm": 71.811,
+    "y_extent_cm": 40.048,
+    "carry_proxy_vs_chest_tris": "n/a",
+    "carry_proxy_vs_chest_clear_cm": "n/a",
+    "carry_proxy_vs_spoon_tris": "n/a",
+    "carry_proxy_vs_spoon_clear_cm": "n/a"
+   },
+   "rat_placement_world": [
+    -236.8147,
+    18.2921,
+    0.0
+   ],
+   "rat_yaw_deg": 180.0
+  },
+  "rear_rummage": {
+   "pocket": "Pocket1",
+   "pocket_world": [
+    -269.0,
+    -1.25,
+    75.0
+   ],
+   "pocket_height_cm": 75.0,
+   "rear_pitch_deg": 82.0,
+   "nose_world": [
+    -256.5,
+    -1.25,
+    56.5095
+   ],
+   "nose_height_cm": 56.51,
+   "height_shortfall_cm": 18.49,
+   "nose_reaches_pocket_height": false,
+   "nose_to_socket_3d_cm": 22.319,
+   "nose_pack_local": [
+    -43.5,
+    1.25,
+    56.5095
+   ],
+   "socket_depth_behind_envelope_face_cm": 12.0,
+   "hind_feet_min_z_cm": -0.0,
+   "hind_feet_planted_rest_targets": true,
+   "below_floor_verts": 0,
+   "audit": {
+    "spoon_vs_torso_tris": 0,
+    "spoon_vs_torso_clear_cm": 0.365,
+    "spoon_min_z_cm": 9.019,
+    "spoon_below_floor_verts": 0,
+    "harness_vs_torso_tris": 370,
+    "harness_vs_torso_clear_cm": -0.108,
+    "band_float_max_cm": 4.563,
+    "head_vs_spoon_tris": 0,
+    "head_vs_spoon_dist_cm": 7.017,
+    "legs_vs_torso_tris": 128,
+    "feet_vs_torso_tris": 0,
+    "below_floor_verts": 0,
+    "below_floor_parts": {},
+    "min_z_cm": -0.0,
+    "body_min_z_cm": -0.0,
+    "body_lift_by_spoon_cm": 0.0,
+    "eye_patch_detach_cm": 0.2,
+    "height_cm": 57.521,
+    "height_no_spoon_cm": 57.521,
+    "x_extent_cm": 40.531,
+    "y_extent_cm": 40.309,
+    "carry_proxy_vs_chest_tris": "n/a",
+    "carry_proxy_vs_chest_clear_cm": "n/a",
+    "carry_proxy_vs_spoon_tris": "n/a",
+    "carry_proxy_vs_spoon_clear_cm": "n/a"
+   },
+   "rat_placement_world": [
+    -262.5096,
+    -0.4578,
+    0.0
+   ],
+   "rat_yaw_deg": 180.0
+  }
+ },
+ "pack": {
+  "world": [
+   -300.0,
+   0.0,
+   0.0
+  ],
+  "yaw_deg": 180.0,
+  "envelope_cm": [
+   86.0,
+   116.0,
+   121.0
+  ],
+  "pockets_pack_local": {
+   "Pocket1": [
+    -31.0,
+    1.25,
+    75.0
+   ],
+   "Pocket2": [
+    -31.0,
+    22.5,
+    37.5
+   ],
+   "Pocket3": [
+    -31.0,
+    -17.5,
+    37.5
+   ]
+  },
+  "pocket_face": "-X (faces world +X, toward the court)",
+  "chef_capsule": {
+   "world": [
+    -300.0,
+    -120.0,
+    0.0
+   ],
+   "radius": 39.0,
+   "half_height": 75.0,
+   "pack_pivot_to_axis_cm": 120.0
+  },
+  "proxy_dims_cm": [
+   86.8,
+   116.0,
+   121.0
+  ]
+ },
+ "drag_head_lift_deg": 10,
+ "carry_drag": {
+  "parent_bone": "jaw",
+  "jaw_head_local_translation_cm": [
+   -0.0,
+   17.2659,
+   -25.5891
+  ],
+  "jaw_head_local_rotation_quat_wxyz": [
+   0.6943,
+   -0.1338,
+   0.1338,
+   0.6943
+  ],
+  "bulky_proxy_cm": [
+   30.0,
+   30.0,
+   25.0
+  ],
+  "proxy_pivot": "base centre",
+  "jaw_tip_world_in_drag_pose": [
+   30.7239,
+   -0.0,
+   22.5596
+  ],
+  "bite_over_top_edge_cm": 2.5,
+  "proxy_top_z_cm": 25.0,
+  "jaw_tip_z_vs_top_edge_cm": -2.44,
+  "audit": {
+   "spoon_vs_torso_tris": 0,
+   "spoon_vs_torso_clear_cm": 0.194,
+   "spoon_min_z_cm": 11.733,
+   "spoon_below_floor_verts": 0,
+   "harness_vs_torso_tris": 368,
+   "harness_vs_torso_clear_cm": -0.05,
+   "band_float_max_cm": 4.563,
+   "head_vs_spoon_tris": 0,
+   "head_vs_spoon_dist_cm": 3.077,
+   "legs_vs_torso_tris": 0,
+   "feet_vs_torso_tris": 0,
+   "below_floor_verts": 0,
+   "below_floor_parts": {},
+   "min_z_cm": -0.0,
+   "body_min_z_cm": -0.0,
+   "body_lift_by_spoon_cm": 0.0,
+   "eye_patch_detach_cm": 0.2,
+   "height_cm": 44.45,
+   "height_no_spoon_cm": 35.2,
+   "x_extent_cm": 74.54,
+   "y_extent_cm": 40.048,
+   "carry_proxy_vs_chest_tris": 0,
+   "carry_proxy_vs_chest_clear_cm": 17.277,
+   "carry_proxy_vs_legs_tris": 0,
+   "carry_proxy_vs_spoon_tris": 0,
+   "carry_proxy_vs_spoon_clear_cm": 30.205,
+   "carry_proxy_min_z_cm": -0.0
+  }
+ },
+ "death_drop": {
+  "corpse_pose": "dead_back",
+  "release_point_world": [
+   28.2513,
+   -0.0,
+   17.2192
+  ],
+  "vertical_drop": {
+   "mushroom_centre_world": [
+    28.2513,
+    -0.0,
+    6.0
+   ],
+   "horizontal_gap_cm": 0.0,
+   "mushroom_min_z_cm": -0.0,
+   "outside_corpse": false
+  },
+  "released_forward_12cm": {
+   "mushroom_centre_world": [
+    40.2513,
+    -0.0,
+    6.0
+   ],
+   "horizontal_gap_cm": 4.635,
+   "mushroom_min_z_cm": -0.0,
+   "outside_corpse": true
+  },
+  "shown": "released_forward_12cm"
+ },
+ "flee_routes": {
+  "Loop_A": {
+   "min_dist_to_portal_markers_cm": 188.52,
+   "portal_rule_ge_150": true,
+   "min_gap_to_crate_faces_cm": 42.89,
+   "min_gap_to_pack_envelope_cm": 107.0,
+   "min_gap_to_chef_capsule_cm": 141.82,
+   "min_margin_to_floor_edge_cm": 195.0,
+   "rat_half_width_cm": 15.0,
+   "clear_of_crates_with_rat_half_width": true,
+   "length_cm": 858.4
+  },
+  "FigureEight_B": {
+   "min_dist_to_portal_markers_cm": 175.39,
+   "portal_rule_ge_150": true,
+   "min_gap_to_crate_faces_cm": 18.31,
+   "min_gap_to_pack_envelope_cm": 94.0,
+   "min_gap_to_chef_capsule_cm": 115.16,
+   "min_margin_to_floor_edge_cm": 182.0,
+   "rat_half_width_cm": 15.0,
+   "clear_of_crates_with_rat_half_width": true,
+   "length_cm": 1266.7
+  }
+ },
+ "crates_world": [
+  [
+   -60.0,
+   0.0,
+   0.0
+  ],
+  [
+   90.0,
+   0.0,
+   0.0
+  ]
+ ],
+ "cheese": {
+  "object": "Cheese_MonksRind",
+  "dims_cm": [
+   15.0,
+   10.0,
+   8.0
+  ],
+  "target_cm": [
+   15.0,
+   10.0,
+   8.0
+  ],
+  "tris": 56,
+  "pivot": "base centre",
+  "pivot_check_min_z": 0.0
+ },
+ "mushroom_proxy": {
+  "dims_cm": [
+   12.0,
+   12.0,
+   8.0
+  ],
+  "target_cm": [
+   12.0,
+   12.0,
+   8.0
+  ],
+  "tris": 100,
+  "at_pocket2_world": [
+   -269.0,
+   -22.5,
+   37.5
+  ]
+ },
+ "pose_actions": [
+  "PantryRat_R02_Pose_bound_apex",
+  "PantryRat_R02_Pose_crouch",
+  "PantryRat_R02_Pose_dead_back",
+  "PantryRat_R02_Pose_den_crouch",
+  "PantryRat_R02_Pose_drag_carry",
+  "PantryRat_R02_Pose_jaw_carry",
+  "PantryRat_R02_Pose_look_back",
+  "PantryRat_R02_Pose_neutral",
+  "PantryRat_R02_Pose_rear_rummage",
+  "PantryRat_R02_Pose_rear_up",
+  "PantryRat_R02_Pose_rummage",
+  "PantryRat_R02_Pose_rummage_p3",
+  "PantryRat_R02_Pose_stretch",
+  "PantryRat_R02_Pose_topple_left",
+  "PantryRat_R02_Pose_topple_right"
+ ],
+ "pose_audit": {
+  "neutral": {
+   "spoon_vs_torso_tris": 0,
+   "spoon_vs_torso_clear_cm": 0.194,
+   "spoon_min_z_cm": 11.733,
+   "spoon_below_floor_verts": 0,
+   "harness_vs_torso_tris": 372,
+   "harness_vs_torso_clear_cm": -0.05,
+   "band_float_max_cm": 4.563,
+   "head_vs_spoon_tris": 0,
+   "head_vs_spoon_dist_cm": 5.505,
+   "legs_vs_torso_tris": 20,
+   "feet_vs_torso_tris": 0,
+   "below_floor_verts": 0,
+   "below_floor_parts": {},
+   "min_z_cm": -0.0,
+   "body_min_z_cm": -0.0,
+   "body_lift_by_spoon_cm": 0.0,
+   "eye_patch_detach_cm": 0.2,
+   "height_cm": 44.45,
+   "height_no_spoon_cm": 36.309,
+   "x_extent_cm": 75.856,
+   "y_extent_cm": 40.048,
+   "carry_proxy_vs_chest_tris": "n/a",
+   "carry_proxy_vs_chest_clear_cm": "n/a",
+   "carry_proxy_vs_spoon_tris": "n/a",
+   "carry_proxy_vs_spoon_clear_cm": "n/a"
+  },
+  "crouch": {
+   "spoon_vs_torso_tris": 0,
+   "spoon_vs_torso_clear_cm": 0.383,
+   "spoon_min_z_cm": 10.726,
+   "spoon_below_floor_verts": 0,
+   "harness_vs_torso_tris": 374,
+   "harness_vs_torso_clear_cm": -0.091,
+   "band_float_max_cm": 4.697,
+   "head_vs_spoon_tris": 0,
+   "head_vs_spoon_dist_cm": 4.103,
+   "legs_vs_torso_tris": 32,
+   "feet_vs_torso_tris": 0,
+   "below_floor_verts": 0,
+   "below_floor_parts": {},
+   "min_z_cm": -0.0,
+   "body_min_z_cm": -0.0,
+   "body_lift_by_spoon_cm": 0.0,
+   "eye_patch_detach_cm": 0.2,
+   "height_cm": 41.977,
+   "height_no_spoon_cm": 32.726,
+   "x_extent_cm": 74.639,
+   "y_extent_cm": 39.471,
+   "carry_proxy_vs_chest_tris": "n/a",
+   "carry_proxy_vs_chest_clear_cm": "n/a",
+   "carry_proxy_vs_spoon_tris": "n/a",
+   "carry_proxy_vs_spoon_clear_cm": "n/a"
+  },
+  "stretch": {
+   "spoon_vs_torso_tris": 0,
+   "spoon_vs_torso_clear_cm": 0.061,
+   "spoon_min_z_cm": 8.227,
+   "spoon_below_floor_verts": 0,
+   "harness_vs_torso_tris": 382,
+   "harness_vs_torso_clear_cm": -0.078,
+   "band_float_max_cm": 4.555,
+   "head_vs_spoon_tris": 0,
+   "head_vs_spoon_dist_cm": 5.443,
+   "legs_vs_torso_tris": 0,
+   "feet_vs_torso_tris": 0,
+   "below_floor_verts": 0,
+   "below_floor_parts": {},
+   "min_z_cm": -0.0,
+   "body_min_z_cm": -0.0,
+   "body_lift_by_spoon_cm": 0.0,
+   "eye_patch_detach_cm": 0.2,
+   "height_cm": 41.704,
+   "height_no_spoon_cm": 32.525,
+   "x_extent_cm": 92.932,
+   "y_extent_cm": 40.048,
+   "carry_proxy_vs_chest_tris": "n/a",
+   "carry_proxy_vs_chest_clear_cm": "n/a",
+   "carry_proxy_vs_spoon_tris": "n/a",
+   "carry_proxy_vs_spoon_clear_cm": "n/a"
+  },
+  "bound_apex": {
+   "spoon_vs_torso_tris": 0,
+   "spoon_vs_torso_clear_cm": 0.194,
+   "spoon_min_z_cm": 18.941,
+   "spoon_below_floor_verts": 0,
+   "harness_vs_torso_tris": 372,
+   "harness_vs_torso_clear_cm": -0.05,
+   "band_float_max_cm": 4.563,
+   "head_vs_spoon_tris": 0,
+   "head_vs_spoon_dist_cm": 4.445,
+   "legs_vs_torso_tris": 0,
+   "feet_vs_torso_tris": 0,
+   "below_floor_verts": 0,
+   "below_floor_parts": {},
+   "min_z_cm": 10.16,
+   "body_min_z_cm": 10.16,
+   "body_lift_by_spoon_cm": 0.0,
+   "eye_patch_detach_cm": 0.2,
+   "height_cm": 52.418,
+   "height_no_spoon_cm": 42.76,
+   "x_extent_cm": 84.052,
+   "y_extent_cm": 40.048,
+   "carry_proxy_vs_chest_tris": "n/a",
+   "carry_proxy_vs_chest_clear_cm": "n/a",
+   "carry_proxy_vs_spoon_tris": "n/a",
+   "carry_proxy_vs_spoon_clear_cm": "n/a"
+  },
+  "rear_up": {
+   "spoon_vs_torso_tris": 0,
+   "spoon_vs_torso_clear_cm": 0.573,
+   "spoon_min_z_cm": 10.662,
+   "spoon_below_floor_verts": 0,
+   "harness_vs_torso_tris": 370,
+   "harness_vs_torso_clear_cm": -0.109,
+   "band_float_max_cm": 4.648,
+   "head_vs_spoon_tris": 0,
+   "head_vs_spoon_dist_cm": 10.524,
+   "legs_vs_torso_tris": 0,
+   "feet_vs_torso_tris": 0,
+   "below_floor_verts": 0,
+   "below_floor_parts": {},
+   "min_z_cm": -0.0,
+   "body_min_z_cm": -0.0,
+   "body_lift_by_spoon_cm": 0.0,
+   "eye_patch_detach_cm": 0.2,
+   "height_cm": 50.883,
+   "height_no_spoon_cm": 50.883,
+   "x_extent_cm": 58.616,
+   "y_extent_cm": 41.82,
+   "carry_proxy_vs_chest_tris": "n/a",
+   "carry_proxy_vs_chest_clear_cm": "n/a",
+   "carry_proxy_vs_spoon_tris": "n/a",
+   "carry_proxy_vs_spoon_clear_cm": "n/a"
+  },
+  "jaw_carry": {
+   "spoon_vs_torso_tris": 0,
+   "spoon_vs_torso_clear_cm": 0.194,
+   "spoon_min_z_cm": 11.733,
+   "spoon_below_floor_verts": 0,
+   "harness_vs_torso_tris": 372,
+   "harness_vs_torso_clear_cm": -0.05,
+   "band_float_max_cm": 4.563,
+   "head_vs_spoon_tris": 0,
+   "head_vs_spoon_dist_cm": 4.109,
+   "legs_vs_torso_tris": 18,
+   "feet_vs_torso_tris": 0,
+   "below_floor_verts": 0,
+   "below_floor_parts": {},
+   "min_z_cm": -0.0,
+   "body_min_z_cm": -0.0,
+   "body_lift_by_spoon_cm": 0.0,
+   "eye_patch_detach_cm": 0.2,
+   "height_cm": 44.45,
+   "height_no_spoon_cm": 35.2,
+   "x_extent_cm": 75.131,
+   "y_extent_cm": 40.048,
+   "carry_proxy_vs_chest_tris": 0,
+   "carry_proxy_vs_chest_clear_cm": 16.032,
+   "carry_proxy_vs_legs_tris": 0,
+   "carry_proxy_vs_spoon_tris": 0,
+   "carry_proxy_vs_spoon_clear_cm": 34.521,
+   "carry_proxy_min_z_cm": 9.948
+  },
+  "look_back": {
+   "spoon_vs_torso_tris": 0,
+   "spoon_vs_torso_clear_cm": 0.194,
+   "spoon_min_z_cm": 11.733,
+   "spoon_below_floor_verts": 0,
+   "harness_vs_torso_tris": 370,
+   "harness_vs_torso_clear_cm": -0.064,
+   "band_float_max_cm": 4.563,
+   "head_vs_spoon_tris": 0,
+   "head_vs_spoon_dist_cm": 6.362,
+   "legs_vs_torso_tris": 18,
+   "feet_vs_torso_tris": 0,
+   "below_floor_verts": 0,
+   "below_floor_parts": {},
+   "min_z_cm": -0.0,
+   "body_min_z_cm": -0.0,
+   "body_lift_by_spoon_cm": 0.0,
+   "eye_patch_detach_cm": 0.2,
+   "height_cm": 44.45,
+   "height_no_spoon_cm": 35.794,
+   "x_extent_cm": 69.4,
+   "y_extent_cm": 41.259,
+   "carry_proxy_vs_chest_tris": 0,
+   "carry_proxy_vs_chest_clear_cm": 8.061,
+   "carry_proxy_vs_legs_tris": 0,
+   "carry_proxy_vs_spoon_tris": 0,
+   "carry_proxy_vs_spoon_clear_cm": 36.275,
+   "carry_proxy_min_z_cm": 9.596
+  },
+  "topple_left": {
+   "spoon_vs_torso_tris": 0,
+   "spoon_vs_torso_clear_cm": 0.194,
+   "spoon_min_z_cm": 30.189,
+   "spoon_below_floor_verts": 0,
+   "harness_vs_torso_tris": 372,
+   "harness_vs_torso_clear_cm": -0.05,
+   "band_float_max_cm": 4.563,
+   "head_vs_spoon_tris": 0,
+   "head_vs_spoon_dist_cm": 1.138,
+   "legs_vs_torso_tris": 0,
+   "feet_vs_torso_tris": 0,
+   "below_floor_verts": 0,
+   "below_floor_parts": {},
+   "min_z_cm": -0.0,
+   "body_min_z_cm": -0.0,
+   "body_lift_by_spoon_cm": 0.0,
+   "eye_patch_detach_cm": 0.2,
+   "height_cm": 42.535,
+   "height_no_spoon_cm": 39.404,
+   "x_extent_cm": 70.427,
+   "y_extent_cm": 45.635,
+   "carry_proxy_vs_chest_tris": "n/a",
+   "carry_proxy_vs_chest_clear_cm": "n/a",
+   "carry_proxy_vs_spoon_tris": "n/a",
+   "carry_proxy_vs_spoon_clear_cm": "n/a"
+  },
+  "topple_right": {
+   "spoon_vs_torso_tris": 0,
+   "spoon_vs_torso_clear_cm": 0.194,
+   "spoon_min_z_cm": 1.2,
+   "spoon_below_floor_verts": 0,
+   "harness_vs_torso_tris": 372,
+   "harness_vs_torso_clear_cm": -0.05,
+   "band_float_max_cm": 4.563,
+   "head_vs_spoon_tris": 0,
+   "head_vs_spoon_dist_cm": 8.409,
+   "legs_vs_torso_tris": 0,
+   "feet_vs_torso_tris": 0,
+   "below_floor_verts": 0,
+   "below_floor_parts": {},
+   "min_z_cm": -0.0,
+   "body_min_z_cm": -0.0,
+   "body_lift_by_spoon_cm": 0.0,
+   "eye_patch_detach_cm": 0.2,
+   "height_cm": 40.509,
+   "height_no_spoon_cm": 39.404,
+   "x_extent_cm": 70.427,
+   "y_extent_cm": 46.458,
+   "carry_proxy_vs_chest_tris": "n/a",
+   "carry_proxy_vs_chest_clear_cm": "n/a",
+   "carry_proxy_vs_spoon_tris": "n/a",
+   "carry_proxy_vs_spoon_clear_cm": "n/a"
+  },
+  "dead_back": {
+   "spoon_vs_torso_tris": 0,
+   "spoon_vs_torso_clear_cm": 0.194,
+   "spoon_min_z_cm": 3.186,
+   "spoon_below_floor_verts": 0,
+   "harness_vs_torso_tris": 372,
+   "harness_vs_torso_clear_cm": -0.05,
+   "band_float_max_cm": 4.563,
+   "head_vs_spoon_tris": 0,
+   "head_vs_spoon_dist_cm": 9.722,
+   "legs_vs_torso_tris": 0,
+   "feet_vs_torso_tris": 0,
+   "below_floor_verts": 0,
+   "below_floor_parts": {},
+   "min_z_cm": 0.0,
+   "body_min_z_cm": 0.278,
+   "body_lift_by_spoon_cm": 0.278,
+   "eye_patch_detach_cm": 0.2,
+   "height_cm": 37.502,
+   "height_no_spoon_cm": 37.502,
+   "x_extent_cm": 70.121,
+   "y_extent_cm": 47.39,
+   "carry_proxy_vs_chest_tris": "n/a",
+   "carry_proxy_vs_chest_clear_cm": "n/a",
+   "carry_proxy_vs_spoon_tris": "n/a",
+   "carry_proxy_vs_spoon_clear_cm": "n/a"
+  },
+  "den_crouch": {
+   "spoon_vs_torso_tris": 0,
+   "spoon_vs_torso_clear_cm": 0.411,
+   "spoon_min_z_cm": 10.911,
+   "spoon_below_floor_verts": 0,
+   "harness_vs_torso_tris": 372,
+   "harness_vs_torso_clear_cm": -0.097,
+   "band_float_max_cm": 4.747,
+   "head_vs_spoon_tris": 0,
+   "head_vs_spoon_dist_cm": 3.655,
+   "legs_vs_torso_tris": 32,
+   "feet_vs_torso_tris": 0,
+   "below_floor_verts": 0,
+   "below_floor_parts": {},
+   "min_z_cm": -0.0,
+   "body_min_z_cm": -0.0,
+   "body_lift_by_spoon_cm": 0.0,
+   "eye_patch_detach_cm": 0.2,
+   "height_cm": 41.84,
+   "height_no_spoon_cm": 32.623,
+   "x_extent_cm": 74.846,
+   "y_extent_cm": 39.694,
+   "carry_proxy_vs_chest_tris": "n/a",
+   "carry_proxy_vs_chest_clear_cm": "n/a",
+   "carry_proxy_vs_spoon_tris": "n/a",
+   "carry_proxy_vs_spoon_clear_cm": "n/a"
+  },
+  "rummage": {
+   "spoon_vs_torso_tris": 0,
+   "spoon_vs_torso_clear_cm": 0.194,
+   "spoon_min_z_cm": 10.073,
+   "spoon_below_floor_verts": 0,
+   "harness_vs_torso_tris": 370,
+   "harness_vs_torso_clear_cm": -0.109,
+   "band_float_max_cm": 4.563,
+   "head_vs_spoon_tris": 0,
+   "head_vs_spoon_dist_cm": 8.246,
+   "legs_vs_torso_tris": 0,
+   "feet_vs_torso_tris": 0,
+   "below_floor_verts": 0,
+   "below_floor_parts": {},
+   "min_z_cm": -0.0,
+   "body_min_z_cm": -0.0,
+   "body_lift_by_spoon_cm": 0.0,
+   "eye_patch_detach_cm": 0.2,
+   "height_cm": 47.867,
+   "height_no_spoon_cm": 47.867,
+   "x_extent_cm": 71.811,
+   "y_extent_cm": 40.048,
+   "carry_proxy_vs_chest_tris": "n/a",
+   "carry_proxy_vs_chest_clear_cm": "n/a",
+   "carry_proxy_vs_spoon_tris": "n/a",
+   "carry_proxy_vs_spoon_clear_cm": "n/a"
+  },
+  "rummage_p3": {
+   "spoon_vs_torso_tris": 0,
+   "spoon_vs_torso_clear_cm": 0.194,
+   "spoon_min_z_cm": 10.073,
+   "spoon_below_floor_verts": 0,
+   "harness_vs_torso_tris": 370,
+   "harness_vs_torso_clear_cm": -0.109,
+   "band_float_max_cm": 4.563,
+   "head_vs_spoon_tris": 0,
+   "head_vs_spoon_dist_cm": 8.246,
+   "legs_vs_torso_tris": 0,
+   "feet_vs_torso_tris": 0,
+   "below_floor_verts": 0,
+   "below_floor_parts": {},
+   "min_z_cm": -0.0,
+   "body_min_z_cm": -0.0,
+   "body_lift_by_spoon_cm": 0.0,
+   "eye_patch_detach_cm": 0.2,
+   "height_cm": 47.867,
+   "height_no_spoon_cm": 47.867,
+   "x_extent_cm": 71.811,
+   "y_extent_cm": 40.048,
+   "carry_proxy_vs_chest_tris": "n/a",
+   "carry_proxy_vs_chest_clear_cm": "n/a",
+   "carry_proxy_vs_spoon_tris": "n/a",
+   "carry_proxy_vs_spoon_clear_cm": "n/a"
+  },
+  "rear_rummage": {
+   "spoon_vs_torso_tris": 0,
+   "spoon_vs_torso_clear_cm": 0.365,
+   "spoon_min_z_cm": 9.019,
+   "spoon_below_floor_verts": 0,
+   "harness_vs_torso_tris": 370,
+   "harness_vs_torso_clear_cm": -0.108,
+   "band_float_max_cm": 4.563,
+   "head_vs_spoon_tris": 0,
+   "head_vs_spoon_dist_cm": 7.017,
+   "legs_vs_torso_tris": 128,
+   "feet_vs_torso_tris": 0,
+   "below_floor_verts": 0,
+   "below_floor_parts": {},
+   "min_z_cm": -0.0,
+   "body_min_z_cm": -0.0,
+   "body_lift_by_spoon_cm": 0.0,
+   "eye_patch_detach_cm": 0.2,
+   "height_cm": 57.521,
+   "height_no_spoon_cm": 57.521,
+   "x_extent_cm": 40.531,
+   "y_extent_cm": 40.309,
+   "carry_proxy_vs_chest_tris": "n/a",
+   "carry_proxy_vs_chest_clear_cm": "n/a",
+   "carry_proxy_vs_spoon_tris": "n/a",
+   "carry_proxy_vs_spoon_clear_cm": "n/a"
+  },
+  "drag_carry": {
+   "spoon_vs_torso_tris": 0,
+   "spoon_vs_torso_clear_cm": 0.194,
+   "spoon_min_z_cm": 11.733,
+   "spoon_below_floor_verts": 0,
+   "harness_vs_torso_tris": 368,
+   "harness_vs_torso_clear_cm": -0.05,
+   "band_float_max_cm": 4.563,
+   "head_vs_spoon_tris": 0,
+   "head_vs_spoon_dist_cm": 3.077,
+   "legs_vs_torso_tris": 0,
+   "feet_vs_torso_tris": 0,
+   "below_floor_verts": 0,
+   "below_floor_parts": {},
+   "min_z_cm": -0.0,
+   "body_min_z_cm": -0.0,
+   "body_lift_by_spoon_cm": 0.0,
+   "eye_patch_detach_cm": 0.2,
+   "height_cm": 44.45,
+   "height_no_spoon_cm": 35.2,
+   "x_extent_cm": 74.54,
+   "y_extent_cm": 40.048,
+   "carry_proxy_vs_chest_tris": 0,
+   "carry_proxy_vs_chest_clear_cm": 17.277,
+   "carry_proxy_vs_legs_tris": 0,
+   "carry_proxy_vs_spoon_tris": 0,
+   "carry_proxy_vs_spoon_clear_cm": 30.205,
+   "carry_proxy_min_z_cm": -0.0
+  }
+ },
+ "pose_fixes": {
+  "rear_up": {
+   "before": {
+    "spoon_vs_torso_tris": 21,
+    "spoon_vs_torso_clear_cm": -0.724,
+    "spoon_min_z_cm": 9.61,
+    "spoon_below_floor_verts": 0,
+    "harness_vs_torso_tris": 370,
+    "harness_vs_torso_clear_cm": -0.109,
+    "band_float_max_cm": 4.563,
+    "head_vs_spoon_tris": 0,
+    "head_vs_spoon_dist_cm": 10.694,
+    "legs_vs_torso_tris": 0,
+    "feet_vs_torso_tris": 0,
+    "below_floor_verts": 0,
+    "below_floor_parts": {},
+    "min_z_cm": -0.0,
+    "body_min_z_cm": -0.0,
+    "body_lift_by_spoon_cm": 0.0,
+    "eye_patch_detach_cm": 0.2,
+    "height_cm": 50.883,
+    "height_no_spoon_cm": 50.883,
+    "x_extent_cm": 58.616,
+    "y_extent_cm": 40.717,
+    "carry_proxy_vs_chest_tris": "n/a",
+    "carry_proxy_vs_chest_clear_cm": "n/a",
+    "carry_proxy_vs_spoon_tris": "n/a",
+    "carry_proxy_vs_spoon_clear_cm": "n/a"
+   },
+   "after": {
+    "spoon_vs_torso_tris": 0,
+    "spoon_vs_torso_clear_cm": 0.573,
+    "spoon_min_z_cm": 10.662,
+    "spoon_below_floor_verts": 0,
+    "harness_vs_torso_tris": 370,
+    "harness_vs_torso_clear_cm": -0.109,
+    "band_float_max_cm": 4.648,
+    "head_vs_spoon_tris": 0,
+    "head_vs_spoon_dist_cm": 10.524,
+    "legs_vs_torso_tris": 0,
+    "feet_vs_torso_tris": 0,
+    "below_floor_verts": 0,
+    "below_floor_parts": {},
+    "min_z_cm": -0.0,
+    "body_min_z_cm": -0.0,
+    "body_lift_by_spoon_cm": 0.0,
+    "eye_patch_detach_cm": 0.2,
+    "height_cm": 50.883,
+    "height_no_spoon_cm": 50.883,
+    "x_extent_cm": 58.616,
+    "y_extent_cm": 41.82,
+    "carry_proxy_vs_chest_tris": "n/a",
+    "carry_proxy_vs_chest_clear_cm": "n/a",
+    "carry_proxy_vs_spoon_tris": "n/a",
+    "carry_proxy_vs_spoon_clear_cm": "n/a"
+   },
+   "issues_before": [
+    "spoon-torso"
+   ],
+   "correction": {
+    "spoon_lift_cm": 0.0,
+    "spoon_slide_deg": -3.0,
+    "spoon_pitch_deg": 0.0
+   }
+  },
+  "rear_rummage": {
+   "issues_before": [
+    "spoon-torso"
+   ],
+   "correction": {
+    "spoon_lift_cm": 0.3,
+    "spoon_slide_deg": 0.0,
+    "spoon_pitch_deg": 0.0
+   }
+  }
+ },
+ "fails": [],
+ "elapsed_s": 3.3
+}

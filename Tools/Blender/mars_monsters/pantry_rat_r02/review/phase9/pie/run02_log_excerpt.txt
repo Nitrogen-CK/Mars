@@ -1,0 +1,104 @@
+[2026.11.08-00.40.13:428][647]LogPython: PANTRYRAT_STORY t=0.38 state guard_walk | t [1.185072] stowed [true] bot [WalkTo] presses [0] raid ready [true] leases [0] | den eyes [true] slot0 [Dormant] | pack [World] at [X=249.999 Y=0
+[2026.11.08-00.40.15:252][715]LogPython: PANTRYRAT_STORY t=2.19 state guard | t [3.008432] stowed [true] bot [Idle] presses [0] raid ready [true] leases [0] | den eyes [true] slot0 [Dormant] | pack [World] at [X=249.999 Y=0.000 Z=
+[2026.11.08-00.40.16:441][767]Cmd: slomo 0.25
+[2026.11.08-00.40.16:441][767]LogPython: PANTRYRAT_STORY slomo 0.25 phase Emerge
+[2026.11.08-00.40.17:517][808]Angelscript: [PantryRat] [382|2(2097534)[Valid](PantryRat)] op [1] Emerge -> Observe at [X=-903.563 Y=-7.841 Z=18.000] clock [0.268795] loot [TOMBSTONE] fade [1.0]
+[2026.11.08-00.40.17:529][808]Cmd: slomo 1.0
+[2026.11.08-00.40.17:529][808]LogPython: PANTRYRAT_STORY slomo 1.0 phase Observe
+[2026.11.08-00.40.18:358][840]Angelscript: [PantryRat] [382|2(2097534)[Valid](PantryRat)] op [1] Observe -> WatchGuarded at [X=-903.563 Y=-7.841 Z=18.000] clock [1.09363] loot [TOMBSTONE] fade [1.0]
+[2026.11.08-00.40.23:441][ 30]LogPython: PANTRYRAT_STORY t=10.32 state leave | t [10.383546] stowed [true] bot [WalkTo] presses [0] raid ready [true] leases [0] | rat [382|2(2097534)[Valid](PantryRat)] op [1] WatchGuarded loot [TO
+[2026.11.08-00.40.25:511][101]Angelscript: [PantryRat] [382|2(2097534)[Valid](PantryRat)] op [1] WatchGuarded -> Observe at [X=-903.563 Y=-7.841 Z=18.000] clock [8.241132] loot [TOMBSTONE] fade [1.0]
+[2026.11.08-00.40.25:547][102]LogPython: PANTRYRAT_STORY t=12.41 state away | t [12.487099] stowed [true] bot [Idle] presses [0] raid ready [true] leases [0] | rat [382|2(2097534)[Valid](PantryRat)] op [1] Observe loot [TOMBSTONE]
+[2026.11.08-00.40.26:351][130]Angelscript: [PantryRat] [382|2(2097534)[Valid](PantryRat)] op [1] Observe -> BoundApproach at [X=-903.563 Y=-7.841 Z=18.000] clock [9.089003] loot [TOMBSTONE] fade [1.0]
+[2026.11.08-00.40.26:369][130]Cmd: slomo 0.125
+[2026.11.08-00.40.26:369][130]LogPython: PANTRYRAT_STORY slomo 0.125 phase BoundApproach
+[2026.11.08-00.40.28:628][210]Angelscript: [PantryRat] [382|2(2097534)[Valid](PantryRat)] op [1] BoundApproach -> Observe at [X=-837.169 Y=-10.067 Z=18.000] clock [9.389385] loot [TOMBSTONE] fade [1.0]
+[2026.11.08-00.40.28:640][210]Cmd: slomo 1.0
+[2026.11.08-00.40.28:640][210]LogPython: PANTRYRAT_STORY slomo 1.0 phase Observe
+[2026.11.08-00.40.29:433][239]Angelscript: [PantryRat] [382|2(2097534)[Valid](PantryRat)] op [1] Observe -> BoundApproach at [X=-837.169 Y=-10.067 Z=18.000] clock [10.175756] loot [TOMBSTONE] fade [1.0]
+[2026.11.08-00.40.29:445][239]Cmd: slomo 0.125
+[2026.11.08-00.40.29:445][239]LogPython: PANTRYRAT_STORY slomo 0.125 phase BoundApproach
+[2026.11.08-00.40.31:700][323]Angelscript: [PantryRat] [382|2(2097534)[Valid](PantryRat)] op [1] BoundApproach -> Observe at [X=-770.998 Y=-12.286 Z=18.000] clock [10.478286] loot [TOMBSTONE] fade [1.0]
+[2026.11.08-00.40.31:712][323]Cmd: slomo 1.0
+[2026.11.08-00.40.31:712][323]LogPython: PANTRYRAT_STORY slomo 1.0 phase Observe
+[2026.11.08-00.40.32:517][353]Angelscript: [PantryRat] [382|2(2097534)[Valid](PantryRat)] op [1] Observe -> BoundApproach at [X=-770.998 Y=-12.286 Z=18.000] clock [11.280266] loot [TOMBSTONE] fade [1.0]
+[2026.11.08-00.40.32:529][353]Cmd: slomo 0.125
+[2026.11.08-00.40.32:529][353]LogPython: PANTRYRAT_STORY slomo 0.125 phase BoundApproach
+[2026.11.08-00.40.38:085][546]Angelscript: [PantryRat] [382|2(2097534)[Valid](PantryRat)] op [1] BoundApproach -> Observe at [X=-605.896 Y=-17.822 Z=18.000] clock [11.992178] loot [TOMBSTONE] fade [1.0]
+[2026.11.08-00.40.38:100][546]Cmd: slomo 1.0
+[2026.11.08-00.40.38:101][546]LogPython: PANTRYRAT_STORY slomo 1.0 phase Observe
+[2026.11.08-00.40.38:874][575]Angelscript: [PantryRat] [382|2(2097534)[Valid](PantryRat)] op [1] Observe -> BoundApproach at [X=-605.896 Y=-17.822 Z=18.000] clock [12.758103] loot [TOMBSTONE] fade [1.0]
+[2026.11.08-00.40.38:890][575]Cmd: slomo 0.125
+[2026.11.08-00.40.38:890][575]LogPython: PANTRYRAT_STORY slomo 0.125 phase BoundApproach
+[2026.11.08-00.40.47:545][897]Angelscript: [PantryRat] [382|2(2097534)[Valid](PantryRat)] op [1] BoundApproach -> Observe at [X=-348.025 Y=-26.469 Z=18.000] clock [13.862956] loot [TOMBSTONE] fade [1.0]
+[2026.11.08-00.40.47:555][897]Cmd: slomo 1.0
+[2026.11.08-00.40.47:555][897]LogPython: PANTRYRAT_STORY slomo 1.0 phase Observe
+[2026.11.08-00.40.48:309][921]Angelscript: [PantryRat] [382|2(2097534)[Valid](PantryRat)] op [1] Observe -> BoundApproach at [X=-348.025 Y=-26.469 Z=18.000] clock [14.607711] loot [TOMBSTONE] fade [1.0]
+[2026.11.08-00.40.48:324][921]Cmd: slomo 0.125
+[2026.11.08-00.40.48:324][921]LogPython: PANTRYRAT_STORY slomo 0.125 phase BoundApproach
+[2026.11.08-00.40.50:583][  6]Angelscript: [PantryRat] [382|2(2097534)[Valid](PantryRat)] op [1] BoundApproach -> Observe at [X=-281.841 Y=-28.688 Z=18.000] clock [14.911207] loot [TOMBSTONE] fade [1.0]
+[2026.11.08-00.40.50:597][  6]Cmd: slomo 1.0
+[2026.11.08-00.40.50:598][  6]LogPython: PANTRYRAT_STORY slomo 1.0 phase Observe
+[2026.11.08-00.40.51:580][ 39]Angelscript: [PantryRat] [382|2(2097534)[Valid](PantryRat)] op [1] Observe -> BoundApproach at [X=-281.841 Y=-28.688 Z=18.000] clock [15.770017] loot [TOMBSTONE] fade [1.0]
+[2026.11.08-00.40.51:592][ 39]Cmd: slomo 0.125
+[2026.11.08-00.40.51:593][ 39]LogPython: PANTRYRAT_STORY slomo 0.125 phase BoundApproach
+[2026.11.08-00.41.00:269][342]Angelscript: [PantryRat] [382|2(2097534)[Valid](PantryRat)] op [1] BoundApproach -> Observe at [X=-23.129 Y=-37.363 Z=18.000] clock [16.995241] loot [TOMBSTONE] fade [1.0]
+[2026.11.08-00.41.00:279][342]Cmd: slomo 1.0
+[2026.11.08-00.41.00:279][342]LogPython: PANTRYRAT_STORY slomo 1.0 phase Observe
+[2026.11.08-00.41.01:037][369]Angelscript: [PantryRat] [382|2(2097534)[Valid](PantryRat)] op [1] Observe -> BoundApproach at [X=-23.129 Y=-37.363 Z=18.000] clock [17.623823] loot [TOMBSTONE] fade [1.0]
+[2026.11.08-00.41.01:051][369]Cmd: slomo 0.125
+[2026.11.08-00.41.01:051][369]LogPython: PANTRYRAT_STORY slomo 0.125 phase BoundApproach
+[2026.11.08-00.41.03:306][453]Angelscript: [PantryRat] [382|2(2097534)[Valid](PantryRat)] op [1] BoundApproach -> Observe at [X=43.083 Y=-39.583 Z=18.000] clock [18.045387] loot [TOMBSTONE] fade [1.0]
+[2026.11.08-00.41.03:321][453]Cmd: slomo 1.0
+[2026.11.08-00.41.03:322][453]LogPython: PANTRYRAT_STORY slomo 1.0 phase Observe
+[2026.11.08-00.41.03:983][475]Angelscript: [PantryRat] [382|2(2097534)[Valid](PantryRat)] op [1] Observe -> BoundApproach at [X=43.083 Y=-39.583 Z=18.000] clock [18.70805] loot [TOMBSTONE] fade [1.0]
+[2026.11.08-00.41.03:995][475]Cmd: slomo 0.125
+[2026.11.08-00.41.03:995][475]LogPython: PANTRYRAT_STORY slomo 0.125 phase BoundApproach
+[2026.11.08-00.41.13:923][842]Angelscript: [PantryRat] [382|2(2097534)[Valid](PantryRat)] op [1] BoundApproach -> Observe at [X=291.897 Y=-63.517 Z=18.000] clock [19.965664] loot [TOMBSTONE] fade [1.0]
+[2026.11.08-00.41.13:937][842]Cmd: slomo 1.0
+[2026.11.08-00.41.13:937][842]LogPython: PANTRYRAT_STORY slomo 1.0 phase Observe
+[2026.11.08-00.41.14:938][872]Angelscript: [PantryRat] [382|2(2097534)[Valid](PantryRat)] faces [X=281.249 Y=-22.500 Z=37.625] from [X=291.897 Y=-63.517 Z=18.000] in [Inspect] (heading [X=-0.251 Y=0.968 Z=0.000])
+[2026.11.08-00.41.14:938][872]Angelscript: [PantryRat] [382|2(2097534)[Valid](PantryRat)] op [1] Observe -> Inspect at [X=291.897 Y=-63.517 Z=18.000] clock [20.839764] loot [TOMBSTONE] fade [1.0]
+[2026.11.08-00.41.14:952][872]Cmd: slomo 0.25
+[2026.11.08-00.41.14:952][872]LogPython: PANTRYRAT_STORY slomo 0.25 phase Inspect
+[2026.11.08-00.41.15:992][913]Angelscript: [PantryRat] [382|2(2097534)[Valid](PantryRat)] faces [X=281.249 Y=-22.500 Z=37.625] from [X=291.897 Y=-63.517 Z=18.000] in [ClaimTell] (heading [X=-0.251 Y=0.968 Z=0.000])
+[2026.11.08-00.41.15:992][913]Angelscript: [PantryRat] [382|2(2097534)[Valid](PantryRat)] op [1] Inspect -> ClaimTell at [X=291.897 Y=-63.517 Z=18.000] clock [21.240995] loot [TOMBSTONE] fade [1.0]
+[2026.11.08-00.41.16:011][913]LogConsoleManager: Warning:    slomo : 329
+[2026.11.08-00.41.16:011][913]Cmd: slomo 1.0
+[2026.11.08-00.41.16:012][913]LogPython: PANTRYRAT_STORY slomo 1.0 phase ClaimTell
+[2026.11.08-00.41.17:629][967]Angelscript: [PantryRat] [382|2(2097534)[Valid](PantryRat)] faces [X=281.249 Y=-22.500 Z=37.625] from [X=291.897 Y=-63.517 Z=18.000] in [ClaimTransfer] (heading [X=-0.251 Y=0.968 Z=0.000])
+[2026.11.08-00.41.17:629][967]Angelscript: [PantryRat] [382|2(2097534)[Valid](PantryRat)] op [1] ClaimTell -> ClaimTransfer at [X=291.897 Y=-63.517 Z=18.000] clock [22.859951] loot [TOMBSTONE] fade [1.0]
+[2026.11.08-00.41.17:631][967]Angelscript: [PantryRat] [382|2(2097534)[Valid](PantryRat)] op [1] ClaimTransfer -> CarryMountPending at [X=291.897 Y=-63.517 Z=18.000] clock [22.882433] loot [410|0(410)[Valid](Item (Mars_ItemDef_Foo
+[2026.11.08-00.41.17:921][974]Angelscript: [PantryRat] [382|2(2097534)[Valid](PantryRat)] op [1] CarryMountPending -> FleeWithLoot at [X=291.897 Y=-63.517 Z=18.000] clock [23.174334] loot [410|0(410)[Valid](Item (Mars_ItemDef_Food
+[2026.11.08-00.41.17:932][974]Cmd: slomo 0.125
+[2026.11.08-00.41.17:932][974]LogPython: PANTRYRAT_STORY slomo 0.125 phase FleeWithLoot
+[2026.11.08-00.41.17:933][974]LogPython: PANTRYRAT_STORY t=63.54 state chase | t [27.372156] stowed [true] bot [Chase] presses [0] raid ready [true] leases [1] | rat [382|2(2097534)[Valid](PantryRat)] op [1] FleeWithLoot loot [410
+[2026.11.08-00.41.23:669][171]Angelscript: [PantryRat] [382|2(2097534)[Valid](PantryRat)] op [1] FleeWithLoot -> FleePause at [X=183.744 Y=-262.296 Z=18.000] clock [23.89044] loot [410|0(410)[Valid](Item (Mars_ItemDef_Food_Mushroo
+[2026.11.08-00.41.23:678][171]Cmd: slomo 1.0
+[2026.11.08-00.41.23:679][171]LogPython: PANTRYRAT_STORY slomo 1.0 phase FleePause
+[2026.11.08-00.41.24:075][186]Angelscript: [PantryRat] [382|2(2097534)[Valid](PantryRat)] op [1] FleePause -> FleeWithLoot at [X=183.744 Y=-262.296 Z=18.000] clock [24.275999] loot [410|0(410)[Valid](Item (Mars_ItemDef_Food_Mushro
+[2026.11.08-00.41.24:086][186]Cmd: slomo 0.125
+[2026.11.08-00.41.24:086][186]LogPython: PANTRYRAT_STORY slomo 0.125 phase FleeWithLoot
+[2026.11.08-00.41.33:166][499]Angelscript: [PantryRat] [382|2(2097534)[Valid](PantryRat)] op [1] FleeWithLoot -> FleePause at [X=14.412 Y=-573.815 Z=18.000] clock [25.431826] loot [410|0(410)[Valid](Item (Mars_ItemDef_Food_Mushroo
+[2026.11.08-00.41.33:179][499]Cmd: slomo 1.0
+[2026.11.08-00.41.33:179][499]LogPython: PANTRYRAT_STORY slomo 1.0 phase FleePause
+[2026.11.08-00.41.33:622][515]Angelscript: [PantryRat] [382|2(2097534)[Valid](PantryRat)] op [1] FleePause -> FleeWithLoot at [X=14.412 Y=-573.815 Z=18.000] clock [25.872799] loot [410|0(410)[Valid](Item (Mars_ItemDef_Food_Mushroo
+[2026.11.08-00.41.33:633][515]Cmd: slomo 0.125
+[2026.11.08-00.41.33:633][515]LogPython: PANTRYRAT_STORY slomo 0.125 phase FleeWithLoot
+[2026.11.08-00.41.39:555][724]Angelscript: [PantryRat] [382|2(2097534)[Valid](PantryRat)] op [1] FleeWithLoot -> FleePause at [X=-211.448 Y=-545.638 Z=18.000] clock [26.631014] loot [410|0(410)[Valid](Item (Mars_ItemDef_Food_Mushr
+[2026.11.08-00.41.39:570][724]Cmd: slomo 1.0
+[2026.11.08-00.41.39:570][724]LogPython: PANTRYRAT_STORY slomo 1.0 phase FleePause
+[2026.11.08-00.41.39:906][736]Angelscript: [PantryRatCourt] the chef's strike was DEALT to zone [382|2(2097534)[Valid](PantryRat)] amount [20.0] causer [35|1(1048611)[Valid](Item (Mars_ItemDef_Cleaver))] t [31.180981]
+[2026.11.08-00.41.39:908][736]Angelscript: [PantryRat] [382|2(2097534)[Valid](PantryRat)] op [1] FleePause -> Dying at [X=-211.448 Y=-545.638 Z=18.000] clock [26.983158] loot [410|0(410)[Valid](Item (Mars_ItemDef_Food_Mushroom))] 
+[2026.11.08-00.41.39:908][736]Angelscript: [PantryRat] [382|2(2097534)[Valid](PantryRat)] op [1] Dying -> LootReleasePending at [X=-211.448 Y=-545.638 Z=18.000] clock [26.983158] loot [410|0(410)[Valid](Item (Mars_ItemDef_Food_Mus
+[2026.11.08-00.41.39:925][736]LogPython: PANTRYRAT_STORY t=84.61 state dead | t [31.180981] stowed [true] bot [Chase] presses [1] raid ready [true] leases [1] | rat [382|2(2097534)[Valid](PantryRat)] op [1] LootReleasePending loot
+[2026.11.08-00.41.39:927][737]Angelscript: [PantryRat] [382|2(2097534)[Valid](PantryRat)] topples Right (impulse [X=-223.834 Y=-27.369 Z=-197.862], left clear [true], right clear [true])
+[2026.11.08-00.41.39:929][737]Angelscript: [PantryRat] [382|2(2097534)[Valid](PantryRat)] op [1] LootReleasePending -> DeadHold at [X=-211.448 Y=-545.638 Z=18.000] clock [27.007376] loot [TOMBSTONE] fade [1.0]
+[2026.11.08-00.41.42:924][831]Angelscript: [PantryRat] [382|2(2097534)[Valid](PantryRat)] op [1] DeadHold -> CorpseFade at [X=-211.448 Y=-545.638 Z=18.000] clock [30.00305] loot [TOMBSTONE] fade [1.0]
+[2026.11.08-00.41.43:289][842]Angelscript: [PantryRat] [382|2(2097534)[D_Init](PantryRat)] op [1] CorpseFade -> Destroyed at [X=-211.448 Y=-545.638 Z=18.000] clock [30.367001] loot [TOMBSTONE] fade [0.0]
+[2026.11.08-00.41.43:303][842]LogPython: PANTRYRAT_STORY t=87.64 state to_food | t [34.564819] stowed [true] bot [WalkTo] presses [1] raid ready [true] leases [1] | rat [364|3(3146092)[Valid](PantryRat)] op [2] Observe loot [TOMBS
+[2026.11.08-00.41.43:326][843]LogPython: PANTRYRAT_STORY t=87.76 state pickup_food | t [34.589935] stowed [true] bot [PressUseAt] presses [1] raid ready [true] leases [1] | rat [364|3(3146092)[Valid](PantryRat)] op [2] Observe loo
+[2026.11.08-00.41.44:103][868]Angelscript: [PantryRat] [364|3(3146092)[Valid](PantryRat)] faces [X=281.249 Y=17.500 Z=37.625] from [X=299.825 Y=58.577 Z=18.000] in [Inspect] (heading [X=-0.412 Y=-0.911 Z=0.000])
+[2026.11.08-00.41.44:500][881]Angelscript: [PantryRat] [364|3(3146092)[Valid](PantryRat)] faces [X=281.249 Y=17.500 Z=37.625] from [X=299.825 Y=58.577 Z=18.000] in [ClaimTell] (heading [X=-0.412 Y=-0.911 Z=0.000])
+[2026.11.08-00.41.46:130][937]Angelscript: [PantryRat] [364|3(3146092)[Valid](PantryRat)] faces [X=281.249 Y=17.500 Z=37.625] from [X=299.825 Y=58.577 Z=18.000] in [ClaimTransfer] (heading [X=-0.412 Y=-0.911 Z=0.000])
+[2026.11.08-00.41.46:586][953]LogPython: PANTRYRAT_STORY t=90.78 state done | t [37.848061] stowed [true] bot [Idle] presses [1] raid ready [true] leases [2] | rat [364|3(3146092)[Valid](PantryRat)] op [2] FleeWithLoot loot [389|0

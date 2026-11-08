@@ -1,0 +1,2233 @@
+{
+ "part_a": {
+  "stage": "part_a",
+  "preflight": {
+   "project": "D:/Repositories/CkRepos/Orion/Mars.uproject",
+   "pie": false,
+   "engine": "5.7.4-0+UE5",
+   "ok": true
+  },
+  "error": null,
+  "collisions_outside_root": {},
+  "materials": {
+   "rat": {
+    "Body": {
+     "path": "/Game/ArtCandidates/PantryRat/R01/Materials/PantryRat_R01_Body_Mars_MI.PantryRat_R01_Body_Mars_MI",
+     "new": false,
+     "srgb": "#5A4553"
+    },
+    "Pink": {
+     "path": "/Game/ArtCandidates/PantryRat/R01/Materials/PantryRat_R01_Pink_Mars_MI.PantryRat_R01_Pink_Mars_MI",
+     "new": false,
+     "srgb": "#D97B86"
+    },
+    "Belly": {
+     "path": "/Game/ArtCandidates/PantryRat/R01/Materials/PantryRat_R01_Belly_Mars_MI.PantryRat_R01_Belly_Mars_MI",
+     "new": false,
+     "srgb": "#E9D5C1"
+    },
+    "Wood": {
+     "path": "/Game/ArtCandidates/PantryRat/R01/Materials/PantryRat_R01_Wood_Mars_MI.PantryRat_R01_Wood_Mars_MI",
+     "new": false,
+     "srgb": "#A8683B"
+    },
+    "Harness": {
+     "path": "/Game/ArtCandidates/PantryRat/R01/Materials/PantryRat_R01_Harness_Mars_MI.PantryRat_R01_Harness_Mars_MI",
+     "new": false,
+     "srgb": "#6E4327"
+    }
+   },
+   "props": {
+    "Stone": {
+     "path": "/Game/ArtCandidates/PantryRat/R01/Materials/PantryRat_R01_Stone_Mars_MI.PantryRat_R01_Stone_Mars_MI",
+     "new": false,
+     "srgb": "#8C8478"
+    },
+    "Void": {
+     "path": "/Game/ArtCandidates/PantryRat/R01/Materials/PantryRat_R01_Void_Mars_MI.PantryRat_R01_Void_Mars_MI",
+     "new": false,
+     "srgb": "#050505"
+    },
+    "Rind": {
+     "path": "/Game/ArtCandidates/PantryRat/R01/Materials/PantryRat_R01_Rind_Mars_MI.PantryRat_R01_Rind_Mars_MI",
+     "new": false,
+     "srgb": "#D9842B"
+    },
+    "Flesh": {
+     "path": "/Game/ArtCandidates/PantryRat/R01/Materials/PantryRat_R01_Flesh_Mars_MI.PantryRat_R01_Flesh_Mars_MI",
+     "new": false,
+     "srgb": "#F2E6C8"
+    }
+   },
+   "prop_master": {
+    "path": "/Game/ArtCandidates/PantryRat/R01/Materials/PantryRat_R01_Prop_Mars_M.PantryRat_R01_Prop_Mars_M",
+    "new": false
+   }
+  },
+  "import": {
+   "interchange_flag_before_after": [
+    true,
+    true
+   ],
+   "skeleton": "/Game/ArtCandidates/PantryRat/R01/Meshes/PantryRat_R01_Mars_SKEL.PantryRat_R01_Mars_SKEL"
+  },
+  "bound": {
+   "Body": "/Game/ArtCandidates/PantryRat/R01/Materials/PantryRat_R01_Body_Mars_MI.PantryRat_R01_Body_Mars_MI",
+   "Pink": "/Game/ArtCandidates/PantryRat/R01/Materials/PantryRat_R01_Pink_Mars_MI.PantryRat_R01_Pink_Mars_MI",
+   "Belly": "/Game/ArtCandidates/PantryRat/R01/Materials/PantryRat_R01_Belly_Mars_MI.PantryRat_R01_Belly_Mars_MI",
+   "Wood": "/Game/ArtCandidates/PantryRat/R01/Materials/PantryRat_R01_Wood_Mars_MI.PantryRat_R01_Wood_Mars_MI",
+   "Harness": "/Game/ArtCandidates/PantryRat/R01/Materials/PantryRat_R01_Harness_Mars_MI.PantryRat_R01_Harness_Mars_MI",
+   "EyePatch": "/Game/Mars/Materials/GeneratedLooks/M_CkUsf_Look_MarsPantryRatEyePlate.M_CkUsf_Look_MarsPantryRatEyePlate"
+  },
+  "statics": {
+   "interchange_flag_before_after": [
+    true,
+    true
+   ],
+   "PantryRat_R01_Den_Mars_SM": {
+    "path": "/Game/ArtCandidates/PantryRat/R01/Props/PantryRat_R01_Den_Mars_SM.PantryRat_R01_Den_Mars_SM",
+    "slots": [
+     "Stone",
+     "Void"
+    ],
+    "collision": "complex_as_simple"
+   },
+   "PantryRat_R01_DenEyePlate_Mars_SM": {
+    "path": "/Game/ArtCandidates/PantryRat/R01/Props/PantryRat_R01_DenEyePlate_Mars_SM.PantryRat_R01_DenEyePlate_Mars_SM",
+    "slots": [
+     "EyePatch"
+    ],
+    "collision": "box"
+   },
+   "PantryRat_R01_Cheese_Mars_SM": {
+    "path": "/Game/ArtCandidates/PantryRat/R01/Props/PantryRat_R01_Cheese_Mars_SM.PantryRat_R01_Cheese_Mars_SM",
+    "slots": [
+     "Rind",
+     "Flesh"
+    ],
+    "collision": "box"
+   }
+  },
+  "saved": [
+   "/Game/ArtCandidates/PantryRat/R01/Materials/PantryRat_R01_Body_Mars_MI.PantryRat_R01_Body_Mars_MI",
+   "/Game/ArtCandidates/PantryRat/R01/Materials/PantryRat_R01_Pink_Mars_MI.PantryRat_R01_Pink_Mars_MI",
+   "/Game/ArtCandidates/PantryRat/R01/Materials/PantryRat_R01_Belly_Mars_MI.PantryRat_R01_Belly_Mars_MI",
+   "/Game/ArtCandidates/PantryRat/R01/Materials/PantryRat_R01_Wood_Mars_MI.PantryRat_R01_Wood_Mars_MI",
+   "/Game/ArtCandidates/PantryRat/R01/Materials/PantryRat_R01_Harness_Mars_MI.PantryRat_R01_Harness_Mars_MI",
+   "/Game/ArtCandidates/PantryRat/R01/Materials/PantryRat_R01_Stone_Mars_MI.PantryRat_R01_Stone_Mars_MI",
+   "/Game/ArtCandidates/PantryRat/R01/Materials/PantryRat_R01_Void_Mars_MI.PantryRat_R01_Void_Mars_MI",
+   "/Game/ArtCandidates/PantryRat/R01/Materials/PantryRat_R01_Rind_Mars_MI.PantryRat_R01_Rind_Mars_MI",
+   "/Game/ArtCandidates/PantryRat/R01/Materials/PantryRat_R01_Flesh_Mars_MI.PantryRat_R01_Flesh_Mars_MI",
+   "/Game/ArtCandidates/PantryRat/R01/Materials/PantryRat_R01_Prop_Mars_M.PantryRat_R01_Prop_Mars_M",
+   "/Game/ArtCandidates/PantryRat/R01/Meshes/PantryRat_R01_Mars_SK.PantryRat_R01_Mars_SK",
+   "/Game/ArtCandidates/PantryRat/R01/Meshes/PantryRat_R01_Mars_SKEL.PantryRat_R01_Mars_SKEL",
+   "/Game/ArtCandidates/PantryRat/R01/Props/PantryRat_R01_Den_Mars_SM.PantryRat_R01_Den_Mars_SM",
+   "/Game/ArtCandidates/PantryRat/R01/Props/PantryRat_R01_DenEyePlate_Mars_SM.PantryRat_R01_DenEyePlate_Mars_SM",
+   "/Game/ArtCandidates/PantryRat/R01/Props/PantryRat_R01_Cheese_Mars_SM.PantryRat_R01_Cheese_Mars_SM"
+  ],
+  "owned_assets": [
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_Backstep_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_BoundCycle_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_BoundStart_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_BoundStop_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_DeadHold_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_DeathToppleLeft_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_DeathToppleRight_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_DenEmerge_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_DenEnter_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_EarFlick_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_GuardedWatch_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_HitReact_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_IdleBreath_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_InspectSlot_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_LoadedBound_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_LoadedCornered_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_LoadedIdle_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_LoadedLookBack_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_LoadedTurnLeft_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_LoadedTurnRight_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_MouthRelease_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_RearDown_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_RearObserve_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_RearUp_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_Rummage_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_Snatch_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_SniffAir_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_SniffGround_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_Startle_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_StretchAttend_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_TailSettle_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_Turn180_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_TurnLeft90_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_TurnRight90_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Materials/PantryRat_R01_Belly_Mars_MI",
+   "/Game/ArtCandidates/PantryRat/R01/Materials/PantryRat_R01_Body_Mars_MI",
+   "/Game/ArtCandidates/PantryRat/R01/Materials/PantryRat_R01_Flesh_Mars_MI",
+   "/Game/ArtCandidates/PantryRat/R01/Materials/PantryRat_R01_Harness_Mars_MI",
+   "/Game/ArtCandidates/PantryRat/R01/Materials/PantryRat_R01_Pink_Mars_MI",
+   "/Game/ArtCandidates/PantryRat/R01/Materials/PantryRat_R01_Prop_Mars_M",
+   "/Game/ArtCandidates/PantryRat/R01/Materials/PantryRat_R01_Rind_Mars_MI",
+   "/Game/ArtCandidates/PantryRat/R01/Materials/PantryRat_R01_Stone_Mars_MI",
+   "/Game/ArtCandidates/PantryRat/R01/Materials/PantryRat_R01_Void_Mars_MI",
+   "/Game/ArtCandidates/PantryRat/R01/Materials/PantryRat_R01_Wood_Mars_MI",
+   "/Game/ArtCandidates/PantryRat/R01/Meshes/PantryRat_R01_Mars_SK",
+   "/Game/ArtCandidates/PantryRat/R01/Meshes/PantryRat_R01_Mars_SKEL",
+   "/Game/ArtCandidates/PantryRat/R01/Props/PantryRat_R01_Cheese_Mars_SM",
+   "/Game/ArtCandidates/PantryRat/R01/Props/PantryRat_R01_DenEyePlate_Mars_SM",
+   "/Game/ArtCandidates/PantryRat/R01/Props/PantryRat_R01_Den_Mars_SM"
+  ],
+  "seconds": 3.72
+ },
+ "updated_utc": "2026-11-07T01:43:33Z",
+ "socket_plan": {
+  "stage": "socket_plan",
+  "socket_plan": {
+   "Carry_Mouth": {
+    "bone": "jaw",
+    "location": [
+     -0.0,
+     -6.0237,
+     0.5955
+    ],
+    "rotation_pyr": [
+     -65.2406,
+     90.0,
+     -180.0
+    ],
+    "relative_axis_x": [
+     -0.0,
+     0.418809,
+     -0.908074
+    ],
+    "relative_axis_z": [
+     0.0,
+     -0.908074,
+     -0.418809
+    ],
+    "predicted_location": [
+     0.0,
+     -6.0237,
+     0.5955
+    ],
+    "predicted_axis_x": [
+     0.0,
+     0.41881,
+     -0.908074
+    ],
+    "predicted_axis_z": [
+     -0.0,
+     -0.908074,
+     -0.41881
+    ],
+    "predicted_location_err_cm": 0.0,
+    "predicted_axis_err": 1e-06,
+    "exists": false
+   },
+   "Carry_Drag": {
+    "bone": "jaw",
+    "location": [
+     -0.0,
+     -16.7145,
+     -24.1189
+    ],
+    "rotation_pyr": [
+     -6.7595,
+     -90.0,
+     0.0
+    ],
+    "relative_axis_x": [
+     -0.0,
+     -0.993049,
+     -0.117701
+    ],
+    "relative_axis_z": [
+     0.0,
+     -0.117701,
+     0.993049
+    ],
+    "predicted_location": [
+     0.0,
+     -16.7145,
+     -24.1188
+    ],
+    "predicted_axis_x": [
+     0.0,
+     -0.993049,
+     -0.117702
+    ],
+    "predicted_axis_z": [
+     0.0,
+     -0.117702,
+     0.993049
+    ],
+    "predicted_location_err_cm": 0.0001,
+    "predicted_axis_err": 1e-06,
+    "exists": false
+   }
+  },
+  "seconds": 0.0
+ },
+ "part_b": {
+  "stage": "part_b",
+  "preflight": {
+   "project": "D:/Repositories/CkRepos/Orion/Mars.uproject",
+   "pie": false,
+   "engine": "5.7.4-0+UE5",
+   "ok": true
+  },
+  "error": null,
+  "collisions_outside_root": {},
+  "import": {
+   "interchange_flag_before_after": [
+    true,
+    true
+   ],
+   "clips": {
+    "IdleBreath": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_IdleBreath_Mars_ANIM.PantryRat_R01_IdleBreath_Mars_ANIM",
+    "SniffGround": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_SniffGround_Mars_ANIM.PantryRat_R01_SniffGround_Mars_ANIM",
+    "SniffAir": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_SniffAir_Mars_ANIM.PantryRat_R01_SniffAir_Mars_ANIM",
+    "StretchAttend": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_StretchAttend_Mars_ANIM.PantryRat_R01_StretchAttend_Mars_ANIM",
+    "RearUp": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_RearUp_Mars_ANIM.PantryRat_R01_RearUp_Mars_ANIM",
+    "RearObserve": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_RearObserve_Mars_ANIM.PantryRat_R01_RearObserve_Mars_ANIM",
+    "RearDown": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_RearDown_Mars_ANIM.PantryRat_R01_RearDown_Mars_ANIM",
+    "BoundStart": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_BoundStart_Mars_ANIM.PantryRat_R01_BoundStart_Mars_ANIM",
+    "BoundCycle": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_BoundCycle_Mars_ANIM.PantryRat_R01_BoundCycle_Mars_ANIM",
+    "BoundStop": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_BoundStop_Mars_ANIM.PantryRat_R01_BoundStop_Mars_ANIM",
+    "TurnLeft90": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_TurnLeft90_Mars_ANIM.PantryRat_R01_TurnLeft90_Mars_ANIM",
+    "TurnRight90": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_TurnRight90_Mars_ANIM.PantryRat_R01_TurnRight90_Mars_ANIM",
+    "Turn180": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_Turn180_Mars_ANIM.PantryRat_R01_Turn180_Mars_ANIM",
+    "Startle": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_Startle_Mars_ANIM.PantryRat_R01_Startle_Mars_ANIM",
+    "Backstep": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_Backstep_Mars_ANIM.PantryRat_R01_Backstep_Mars_ANIM",
+    "GuardedWatch": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_GuardedWatch_Mars_ANIM.PantryRat_R01_GuardedWatch_Mars_ANIM",
+    "DenEmerge": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_DenEmerge_Mars_ANIM.PantryRat_R01_DenEmerge_Mars_ANIM",
+    "DenEnter": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_DenEnter_Mars_ANIM.PantryRat_R01_DenEnter_Mars_ANIM",
+    "InspectSlot": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_InspectSlot_Mars_ANIM.PantryRat_R01_InspectSlot_Mars_ANIM",
+    "Rummage": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_Rummage_Mars_ANIM.PantryRat_R01_Rummage_Mars_ANIM",
+    "Snatch": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_Snatch_Mars_ANIM.PantryRat_R01_Snatch_Mars_ANIM",
+    "LoadedIdle": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_LoadedIdle_Mars_ANIM.PantryRat_R01_LoadedIdle_Mars_ANIM",
+    "LoadedBound": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_LoadedBound_Mars_ANIM.PantryRat_R01_LoadedBound_Mars_ANIM",
+    "LoadedTurnLeft": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_LoadedTurnLeft_Mars_ANIM.PantryRat_R01_LoadedTurnLeft_Mars_ANIM",
+    "LoadedTurnRight": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_LoadedTurnRight_Mars_ANIM.PantryRat_R01_LoadedTurnRight_Mars_ANIM",
+    "LoadedLookBack": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_LoadedLookBack_Mars_ANIM.PantryRat_R01_LoadedLookBack_Mars_ANIM",
+    "LoadedCornered": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_LoadedCornered_Mars_ANIM.PantryRat_R01_LoadedCornered_Mars_ANIM",
+    "HitReact": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_HitReact_Mars_ANIM.PantryRat_R01_HitReact_Mars_ANIM",
+    "MouthRelease": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_MouthRelease_Mars_ANIM.PantryRat_R01_MouthRelease_Mars_ANIM",
+    "DeathToppleLeft": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_DeathToppleLeft_Mars_ANIM.PantryRat_R01_DeathToppleLeft_Mars_ANIM",
+    "DeathToppleRight": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_DeathToppleRight_Mars_ANIM.PantryRat_R01_DeathToppleRight_Mars_ANIM",
+    "DeadHold": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_DeadHold_Mars_ANIM.PantryRat_R01_DeadHold_Mars_ANIM",
+    "EarFlick": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_EarFlick_Mars_ANIM.PantryRat_R01_EarFlick_Mars_ANIM",
+    "TailSettle": "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_TailSettle_Mars_ANIM.PantryRat_R01_TailSettle_Mars_ANIM"
+   }
+  },
+  "saved": [
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_IdleBreath_Mars_ANIM.PantryRat_R01_IdleBreath_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_SniffGround_Mars_ANIM.PantryRat_R01_SniffGround_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_SniffAir_Mars_ANIM.PantryRat_R01_SniffAir_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_StretchAttend_Mars_ANIM.PantryRat_R01_StretchAttend_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_RearUp_Mars_ANIM.PantryRat_R01_RearUp_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_RearObserve_Mars_ANIM.PantryRat_R01_RearObserve_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_RearDown_Mars_ANIM.PantryRat_R01_RearDown_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_BoundStart_Mars_ANIM.PantryRat_R01_BoundStart_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_BoundCycle_Mars_ANIM.PantryRat_R01_BoundCycle_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_BoundStop_Mars_ANIM.PantryRat_R01_BoundStop_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_TurnLeft90_Mars_ANIM.PantryRat_R01_TurnLeft90_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_TurnRight90_Mars_ANIM.PantryRat_R01_TurnRight90_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_Turn180_Mars_ANIM.PantryRat_R01_Turn180_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_Startle_Mars_ANIM.PantryRat_R01_Startle_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_Backstep_Mars_ANIM.PantryRat_R01_Backstep_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_GuardedWatch_Mars_ANIM.PantryRat_R01_GuardedWatch_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_DenEmerge_Mars_ANIM.PantryRat_R01_DenEmerge_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_DenEnter_Mars_ANIM.PantryRat_R01_DenEnter_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_InspectSlot_Mars_ANIM.PantryRat_R01_InspectSlot_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_Rummage_Mars_ANIM.PantryRat_R01_Rummage_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_Snatch_Mars_ANIM.PantryRat_R01_Snatch_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_LoadedIdle_Mars_ANIM.PantryRat_R01_LoadedIdle_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_LoadedBound_Mars_ANIM.PantryRat_R01_LoadedBound_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_LoadedTurnLeft_Mars_ANIM.PantryRat_R01_LoadedTurnLeft_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_LoadedTurnRight_Mars_ANIM.PantryRat_R01_LoadedTurnRight_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_LoadedLookBack_Mars_ANIM.PantryRat_R01_LoadedLookBack_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_LoadedCornered_Mars_ANIM.PantryRat_R01_LoadedCornered_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_HitReact_Mars_ANIM.PantryRat_R01_HitReact_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_MouthRelease_Mars_ANIM.PantryRat_R01_MouthRelease_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_DeathToppleLeft_Mars_ANIM.PantryRat_R01_DeathToppleLeft_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_DeathToppleRight_Mars_ANIM.PantryRat_R01_DeathToppleRight_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_DeadHold_Mars_ANIM.PantryRat_R01_DeadHold_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_EarFlick_Mars_ANIM.PantryRat_R01_EarFlick_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_TailSettle_Mars_ANIM.PantryRat_R01_TailSettle_Mars_ANIM"
+  ],
+  "seconds": 3.45
+ },
+ "save": {
+  "saved": [
+   "/Game/ArtCandidates/PantryRat/R01/Meshes/PantryRat_R01_Mars_SKEL.PantryRat_R01_Mars_SKEL",
+   "/Game/ArtCandidates/PantryRat/R01/Meshes/PantryRat_R01_Mars_SK.PantryRat_R01_Mars_SK"
+  ],
+  "seconds": 0.1
+ },
+ "readback": {
+  "checks": {
+   "dedicated_skeleton": [
+    true,
+    "/Game/ArtCandidates/PantryRat/R01/Meshes/PantryRat_R01_Mars_SKEL.PantryRat_R01_Mars_SKEL"
+   ],
+   "bind_bounds_match_blender": [
+    true,
+    0.0005
+   ],
+   "nose_at_max_x": [
+    true,
+    {
+     "max_x": 23.1,
+     "blender_nose_x": 23.1
+    }
+   ],
+   "bone_count_26": [
+    true,
+    26
+   ],
+   "parents_exact": [
+    true,
+    []
+   ],
+   "root_identity": [
+    true,
+    {
+     "t": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "q": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ]
+    }
+   ],
+   "bone_scales_1": [
+    true,
+    1.3e-06
+   ],
+   "bone_heads_match_blender": [
+    true,
+    5e-05
+   ],
+   "handedness_ear_l_minus_y": [
+    true,
+    [
+     -10.089,
+     10.089
+    ]
+   ],
+   "slots_in_order": [
+    true,
+    [
+     "Body",
+     "Pink",
+     "Belly",
+     "Wood",
+     "Harness",
+     "EyePatch"
+    ]
+   ],
+   "slot_materials": [
+    true,
+    [
+     "/Game/ArtCandidates/PantryRat/R01/Materials/PantryRat_R01_Body_Mars_MI.PantryRat_R01_Body_Mars_MI",
+     "/Game/ArtCandidates/PantryRat/R01/Materials/PantryRat_R01_Pink_Mars_MI.PantryRat_R01_Pink_Mars_MI",
+     "/Game/ArtCandidates/PantryRat/R01/Materials/PantryRat_R01_Belly_Mars_MI.PantryRat_R01_Belly_Mars_MI",
+     "/Game/ArtCandidates/PantryRat/R01/Materials/PantryRat_R01_Wood_Mars_MI.PantryRat_R01_Wood_Mars_MI",
+     "/Game/ArtCandidates/PantryRat/R01/Materials/PantryRat_R01_Harness_Mars_MI.PantryRat_R01_Harness_Mars_MI",
+     "/Game/Mars/Materials/GeneratedLooks/M_CkUsf_Look_MarsPantryRatEyePlate.M_CkUsf_Look_MarsPantryRatEyePlate"
+    ]
+   ],
+   "rat_mis_on_surface_master_with_fadealpha": [
+    true,
+    null
+   ],
+   "sockets_carry_mouth_drag": [
+    true,
+    [
+     "Carry_Drag",
+     "Carry_Mouth"
+    ]
+   ],
+   "statics_present": [
+    true,
+    [
+     "PantryRat_R01_Cheese_Mars_SM",
+     "PantryRat_R01_DenEyePlate_Mars_SM",
+     "PantryRat_R01_Den_Mars_SM"
+    ]
+   ],
+   "clips_34": [
+    true,
+    []
+   ],
+   "clip_landmarks_vs_blender_max_cm": [
+    true,
+    0.00014
+   ]
+  },
+  "preflight": {
+   "project": "D:/Repositories/CkRepos/Orion/Mars.uproject",
+   "pie": false,
+   "engine": "5.7.4-0+UE5",
+   "ok": true
+  },
+  "skeleton": "/Game/ArtCandidates/PantryRat/R01/Meshes/PantryRat_R01_Mars_SKEL.PantryRat_R01_Mars_SKEL",
+  "imported_bounds": {
+   "min": [
+    -41.8955,
+    -16.3014,
+    -0.0
+   ],
+   "max": [
+    23.1,
+    16.3014,
+    46.8376
+   ]
+  },
+  "slots": [
+   [
+    "Body",
+    "/Game/ArtCandidates/PantryRat/R01/Materials/PantryRat_R01_Body_Mars_MI.PantryRat_R01_Body_Mars_MI"
+   ],
+   [
+    "Pink",
+    "/Game/ArtCandidates/PantryRat/R01/Materials/PantryRat_R01_Pink_Mars_MI.PantryRat_R01_Pink_Mars_MI"
+   ],
+   [
+    "Belly",
+    "/Game/ArtCandidates/PantryRat/R01/Materials/PantryRat_R01_Belly_Mars_MI.PantryRat_R01_Belly_Mars_MI"
+   ],
+   [
+    "Wood",
+    "/Game/ArtCandidates/PantryRat/R01/Materials/PantryRat_R01_Wood_Mars_MI.PantryRat_R01_Wood_Mars_MI"
+   ],
+   [
+    "Harness",
+    "/Game/ArtCandidates/PantryRat/R01/Materials/PantryRat_R01_Harness_Mars_MI.PantryRat_R01_Harness_Mars_MI"
+   ],
+   [
+    "EyePatch",
+    "/Game/Mars/Materials/GeneratedLooks/M_CkUsf_Look_MarsPantryRatEyePlate.M_CkUsf_Look_MarsPantryRatEyePlate"
+   ]
+  ],
+  "rat_mis": {
+   "Body": {
+    "parent": "/Game/Mars/Materials/GeneratedLooks/M_CkUsf_Look_MarsPantryRatSurface.M_CkUsf_Look_MarsPantryRatSurface",
+    "Color": [
+     0.1022,
+     0.0595,
+     0.0865
+    ],
+    "FadeAlpha_default": 1.0
+   },
+   "Pink": {
+    "parent": "/Game/Mars/Materials/GeneratedLooks/M_CkUsf_Look_MarsPantryRatSurface.M_CkUsf_Look_MarsPantryRatSurface",
+    "Color": [
+     0.6939,
+     0.1981,
+     0.2384
+    ],
+    "FadeAlpha_default": 1.0
+   },
+   "Belly": {
+    "parent": "/Game/Mars/Materials/GeneratedLooks/M_CkUsf_Look_MarsPantryRatSurface.M_CkUsf_Look_MarsPantryRatSurface",
+    "Color": [
+     0.8148,
+     0.6654,
+     0.5333
+    ],
+    "FadeAlpha_default": 1.0
+   },
+   "Wood": {
+    "parent": "/Game/Mars/Materials/GeneratedLooks/M_CkUsf_Look_MarsPantryRatSurface.M_CkUsf_Look_MarsPantryRatSurface",
+    "Color": [
+     0.3916,
+     0.1384,
+     0.0437
+    ],
+    "FadeAlpha_default": 1.0
+   },
+   "Harness": {
+    "parent": "/Game/Mars/Materials/GeneratedLooks/M_CkUsf_Look_MarsPantryRatSurface.M_CkUsf_Look_MarsPantryRatSurface",
+    "Color": [
+     0.1559,
+     0.0561,
+     0.0203
+    ],
+    "FadeAlpha_default": 1.0
+   }
+  },
+  "sockets": {
+   "Carry_Mouth": {
+    "bone": "jaw",
+    "relative_cm": [
+     0.0,
+     -6.0237,
+     0.5955
+    ],
+    "relative_rotation_pyr": [
+     -65.2406,
+     90.0,
+     -180.0
+    ],
+    "component_cm": [
+     19.8,
+     0.0,
+     20.6
+    ],
+    "blender_world_rest_cm": [
+     19.8,
+     0.0,
+     20.6
+    ],
+    "target_ue_cm": [
+     19.8,
+     -0.0,
+     20.6
+    ],
+    "err_cm": 0.0,
+    "axis_err": 0.0
+   },
+   "Carry_Drag": {
+    "bone": "jaw",
+    "relative_cm": [
+     0.0,
+     -16.7145,
+     -24.1189
+    ],
+    "relative_rotation_pyr": [
+     -6.7595,
+     -90.0,
+     0.0
+    ],
+    "component_cm": [
+     24.546,
+     0.0,
+     -5.906
+    ],
+    "blender_world_rest_cm": [
+     24.546,
+     -0.0,
+     -5.906
+    ],
+    "target_ue_cm": [
+     24.546,
+     0.0,
+     -5.906
+    ],
+    "err_cm": 0.0,
+    "axis_err": 0.0
+   }
+  },
+  "statics": {
+   "PantryRat_R01_Den_Mars_SM": {
+    "slots": [
+     "Stone",
+     "Void"
+    ],
+    "materials": [
+     "/Game/ArtCandidates/PantryRat/R01/Materials/PantryRat_R01_Stone_Mars_MI.PantryRat_R01_Stone_Mars_MI",
+     "/Game/ArtCandidates/PantryRat/R01/Materials/PantryRat_R01_Void_Mars_MI.PantryRat_R01_Void_Mars_MI"
+    ],
+    "bounds": {
+     "min": [
+      -47.0,
+      -56.0,
+      -1.0
+     ],
+     "max": [
+      9.5,
+      56.0,
+      81.0131
+     ]
+    },
+    "boxes": 0,
+    "trace_flag": "<CollisionTraceFlag.CTF_USE_COMPLEX_AS_SIMPLE: 3>"
+   },
+   "PantryRat_R01_DenEyePlate_Mars_SM": {
+    "slots": [
+     "EyePatch"
+    ],
+    "materials": [
+     "/Game/Mars/Materials/GeneratedLooks/M_CkUsf_Look_MarsEyePlate.M_CkUsf_Look_MarsEyePlate"
+    ],
+    "bounds": {
+     "min": [
+      -43.0,
+      -10.0,
+      18.0
+     ],
+     "max": [
+      -43.0,
+      10.0,
+      26.0
+     ]
+    },
+    "boxes": 1,
+    "trace_flag": "<CollisionTraceFlag.CTF_USE_DEFAULT: 0>"
+   },
+   "PantryRat_R01_Cheese_Mars_SM": {
+    "slots": [
+     "Rind",
+     "Flesh"
+    ],
+    "materials": [
+     "/Game/ArtCandidates/PantryRat/R01/Materials/PantryRat_R01_Rind_Mars_MI.PantryRat_R01_Rind_Mars_MI",
+     "/Game/ArtCandidates/PantryRat/R01/Materials/PantryRat_R01_Flesh_Mars_MI.PantryRat_R01_Flesh_Mars_MI"
+    ],
+    "bounds": {
+     "min": [
+      -7.5,
+      -5.0,
+      -0.0
+     ],
+     "max": [
+      7.5,
+      5.0,
+      8.0
+     ]
+    },
+    "boxes": 1,
+    "trace_flag": "<CollisionTraceFlag.CTF_USE_DEFAULT: 0>"
+   }
+  },
+  "clips": {
+   "IdleBreath": {
+    "num_frames": 60,
+    "length_s": 2.0,
+    "loop": true,
+    "root_motion": false,
+    "additive": "<AdditiveAnimationType.AAT_NONE: 0>",
+    "skeleton_ok": true,
+    "num_keys": 61,
+    "tracks": 26,
+    "landmarks": {
+     "0": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "30": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "60": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     }
+    },
+    "ok": true
+   },
+   "SniffGround": {
+    "num_frames": 36,
+    "length_s": 1.2,
+    "loop": true,
+    "root_motion": false,
+    "additive": "<AdditiveAnimationType.AAT_NONE: 0>",
+    "skeleton_ok": true,
+    "num_keys": 37,
+    "tracks": 26,
+    "landmarks": {
+     "0": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "18": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "36": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     }
+    },
+    "ok": true
+   },
+   "SniffAir": {
+    "num_frames": 30,
+    "length_s": 1.0,
+    "loop": true,
+    "root_motion": false,
+    "additive": "<AdditiveAnimationType.AAT_NONE: 0>",
+    "skeleton_ok": true,
+    "num_keys": 31,
+    "tracks": 26,
+    "landmarks": {
+     "0": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "15": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "30": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     }
+    },
+    "ok": true
+   },
+   "StretchAttend": {
+    "num_frames": 30,
+    "length_s": 1.0,
+    "loop": false,
+    "root_motion": false,
+    "additive": "<AdditiveAnimationType.AAT_NONE: 0>",
+    "skeleton_ok": true,
+    "num_keys": 31,
+    "tracks": 26,
+    "landmarks": {
+     "0": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "15": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "30": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     }
+    },
+    "ok": true
+   },
+   "RearUp": {
+    "num_frames": 8,
+    "length_s": 0.26667,
+    "loop": false,
+    "root_motion": false,
+    "additive": "<AdditiveAnimationType.AAT_NONE: 0>",
+    "skeleton_ok": true,
+    "num_keys": 9,
+    "tracks": 26,
+    "landmarks": {
+     "0": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "4": {
+      "landmark_err_cm": 0.0001,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "8": {
+      "landmark_err_cm": 0.0001,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     }
+    },
+    "ok": true
+   },
+   "RearObserve": {
+    "num_frames": 36,
+    "length_s": 1.2,
+    "loop": true,
+    "root_motion": false,
+    "additive": "<AdditiveAnimationType.AAT_NONE: 0>",
+    "skeleton_ok": true,
+    "num_keys": 37,
+    "tracks": 26,
+    "landmarks": {
+     "0": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "18": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "36": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     }
+    },
+    "ok": true
+   },
+   "RearDown": {
+    "num_frames": 8,
+    "length_s": 0.26667,
+    "loop": false,
+    "root_motion": false,
+    "additive": "<AdditiveAnimationType.AAT_NONE: 0>",
+    "skeleton_ok": true,
+    "num_keys": 9,
+    "tracks": 26,
+    "landmarks": {
+     "0": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "4": {
+      "landmark_err_cm": 0.0001,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "8": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     }
+    },
+    "ok": true
+   },
+   "BoundStart": {
+    "num_frames": 5,
+    "length_s": 0.16667,
+    "loop": false,
+    "root_motion": false,
+    "additive": "<AdditiveAnimationType.AAT_NONE: 0>",
+    "skeleton_ok": true,
+    "num_keys": 6,
+    "tracks": 26,
+    "landmarks": {
+     "0": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "2": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "5": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     }
+    },
+    "ok": true
+   },
+   "BoundCycle": {
+    "num_frames": 12,
+    "length_s": 0.4,
+    "loop": true,
+    "root_motion": false,
+    "additive": "<AdditiveAnimationType.AAT_NONE: 0>",
+    "skeleton_ok": true,
+    "num_keys": 13,
+    "tracks": 26,
+    "landmarks": {
+     "0": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "6": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "12": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     }
+    },
+    "ok": true
+   },
+   "BoundStop": {
+    "num_frames": 5,
+    "length_s": 0.16667,
+    "loop": false,
+    "root_motion": false,
+    "additive": "<AdditiveAnimationType.AAT_NONE: 0>",
+    "skeleton_ok": true,
+    "num_keys": 6,
+    "tracks": 26,
+    "landmarks": {
+     "0": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "2": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "5": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     }
+    },
+    "ok": true
+   },
+   "TurnLeft90": {
+    "num_frames": 9,
+    "length_s": 0.3,
+    "loop": false,
+    "root_motion": false,
+    "additive": "<AdditiveAnimationType.AAT_NONE: 0>",
+    "skeleton_ok": true,
+    "num_keys": 10,
+    "tracks": 26,
+    "landmarks": {
+     "0": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "4": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "9": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     }
+    },
+    "ok": true
+   },
+   "TurnRight90": {
+    "num_frames": 9,
+    "length_s": 0.3,
+    "loop": false,
+    "root_motion": false,
+    "additive": "<AdditiveAnimationType.AAT_NONE: 0>",
+    "skeleton_ok": true,
+    "num_keys": 10,
+    "tracks": 26,
+    "landmarks": {
+     "0": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "4": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "9": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     }
+    },
+    "ok": true
+   },
+   "Turn180": {
+    "num_frames": 14,
+    "length_s": 0.46667,
+    "loop": false,
+    "root_motion": false,
+    "additive": "<AdditiveAnimationType.AAT_NONE: 0>",
+    "skeleton_ok": true,
+    "num_keys": 15,
+    "tracks": 26,
+    "landmarks": {
+     "0": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "7": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "14": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     }
+    },
+    "ok": true
+   },
+   "Startle": {
+    "num_frames": 9,
+    "length_s": 0.3,
+    "loop": false,
+    "root_motion": false,
+    "additive": "<AdditiveAnimationType.AAT_NONE: 0>",
+    "skeleton_ok": true,
+    "num_keys": 10,
+    "tracks": 26,
+    "landmarks": {
+     "0": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "4": {
+      "landmark_err_cm": 0.0001,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "9": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     }
+    },
+    "ok": true
+   },
+   "Backstep": {
+    "num_frames": 11,
+    "length_s": 0.36667,
+    "loop": false,
+    "root_motion": false,
+    "additive": "<AdditiveAnimationType.AAT_NONE: 0>",
+    "skeleton_ok": true,
+    "num_keys": 12,
+    "tracks": 26,
+    "landmarks": {
+     "0": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "5": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "11": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     }
+    },
+    "ok": true
+   },
+   "GuardedWatch": {
+    "num_frames": 45,
+    "length_s": 1.5,
+    "loop": true,
+    "root_motion": false,
+    "additive": "<AdditiveAnimationType.AAT_NONE: 0>",
+    "skeleton_ok": true,
+    "num_keys": 46,
+    "tracks": 26,
+    "landmarks": {
+     "0": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "22": {
+      "landmark_err_cm": 0.0001,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "45": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     }
+    },
+    "ok": true
+   },
+   "DenEmerge": {
+    "num_frames": 30,
+    "length_s": 1.0,
+    "loop": false,
+    "root_motion": false,
+    "additive": "<AdditiveAnimationType.AAT_NONE: 0>",
+    "skeleton_ok": true,
+    "num_keys": 31,
+    "tracks": 26,
+    "landmarks": {
+     "0": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "15": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "30": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     }
+    },
+    "ok": true
+   },
+   "DenEnter": {
+    "num_frames": 30,
+    "length_s": 1.0,
+    "loop": false,
+    "root_motion": false,
+    "additive": "<AdditiveAnimationType.AAT_NONE: 0>",
+    "skeleton_ok": true,
+    "num_keys": 31,
+    "tracks": 26,
+    "landmarks": {
+     "0": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "15": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "30": {
+      "landmark_err_cm": 0.0001,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     }
+    },
+    "ok": true
+   },
+   "InspectSlot": {
+    "num_frames": 12,
+    "length_s": 0.4,
+    "loop": false,
+    "root_motion": false,
+    "additive": "<AdditiveAnimationType.AAT_NONE: 0>",
+    "skeleton_ok": true,
+    "num_keys": 13,
+    "tracks": 26,
+    "landmarks": {
+     "0": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "6": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "12": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     }
+    },
+    "ok": true
+   },
+   "Rummage": {
+    "num_frames": 48,
+    "length_s": 1.6,
+    "loop": true,
+    "root_motion": false,
+    "additive": "<AdditiveAnimationType.AAT_NONE: 0>",
+    "skeleton_ok": true,
+    "num_keys": 49,
+    "tracks": 26,
+    "landmarks": {
+     "0": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "24": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "48": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     }
+    },
+    "ok": true
+   },
+   "Snatch": {
+    "num_frames": 8,
+    "length_s": 0.26667,
+    "loop": false,
+    "root_motion": false,
+    "additive": "<AdditiveAnimationType.AAT_NONE: 0>",
+    "skeleton_ok": true,
+    "num_keys": 9,
+    "tracks": 26,
+    "landmarks": {
+     "0": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "4": {
+      "landmark_err_cm": 0.0001,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "8": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     }
+    },
+    "ok": true
+   },
+   "LoadedIdle": {
+    "num_frames": 36,
+    "length_s": 1.2,
+    "loop": true,
+    "root_motion": false,
+    "additive": "<AdditiveAnimationType.AAT_NONE: 0>",
+    "skeleton_ok": true,
+    "num_keys": 37,
+    "tracks": 26,
+    "landmarks": {
+     "0": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "18": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "36": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     }
+    },
+    "ok": true
+   },
+   "LoadedBound": {
+    "num_frames": 14,
+    "length_s": 0.46667,
+    "loop": true,
+    "root_motion": false,
+    "additive": "<AdditiveAnimationType.AAT_NONE: 0>",
+    "skeleton_ok": true,
+    "num_keys": 15,
+    "tracks": 26,
+    "landmarks": {
+     "0": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "7": {
+      "landmark_err_cm": 0.0001,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "14": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     }
+    },
+    "ok": true
+   },
+   "LoadedTurnLeft": {
+    "num_frames": 11,
+    "length_s": 0.36667,
+    "loop": false,
+    "root_motion": false,
+    "additive": "<AdditiveAnimationType.AAT_NONE: 0>",
+    "skeleton_ok": true,
+    "num_keys": 12,
+    "tracks": 26,
+    "landmarks": {
+     "0": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "5": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "11": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     }
+    },
+    "ok": true
+   },
+   "LoadedTurnRight": {
+    "num_frames": 11,
+    "length_s": 0.36667,
+    "loop": false,
+    "root_motion": false,
+    "additive": "<AdditiveAnimationType.AAT_NONE: 0>",
+    "skeleton_ok": true,
+    "num_keys": 12,
+    "tracks": 26,
+    "landmarks": {
+     "0": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "5": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "11": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     }
+    },
+    "ok": true
+   },
+   "LoadedLookBack": {
+    "num_frames": 15,
+    "length_s": 0.5,
+    "loop": false,
+    "root_motion": false,
+    "additive": "<AdditiveAnimationType.AAT_NONE: 0>",
+    "skeleton_ok": true,
+    "num_keys": 16,
+    "tracks": 26,
+    "landmarks": {
+     "0": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "7": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "15": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     }
+    },
+    "ok": true
+   },
+   "LoadedCornered": {
+    "num_frames": 24,
+    "length_s": 0.8,
+    "loop": true,
+    "root_motion": false,
+    "additive": "<AdditiveAnimationType.AAT_NONE: 0>",
+    "skeleton_ok": true,
+    "num_keys": 25,
+    "tracks": 26,
+    "landmarks": {
+     "0": {
+      "landmark_err_cm": 0.0001,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "12": {
+      "landmark_err_cm": 0.0001,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "24": {
+      "landmark_err_cm": 0.0001,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     }
+    },
+    "ok": true
+   },
+   "HitReact": {
+    "num_frames": 4,
+    "length_s": 0.13333,
+    "loop": false,
+    "root_motion": false,
+    "additive": "<AdditiveAnimationType.AAT_NONE: 0>",
+    "skeleton_ok": true,
+    "num_keys": 5,
+    "tracks": 26,
+    "landmarks": {
+     "0": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "2": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "4": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     }
+    },
+    "ok": true
+   },
+   "MouthRelease": {
+    "num_frames": 6,
+    "length_s": 0.2,
+    "loop": false,
+    "root_motion": false,
+    "additive": "<AdditiveAnimationType.AAT_NONE: 0>",
+    "skeleton_ok": true,
+    "num_keys": 7,
+    "tracks": 26,
+    "landmarks": {
+     "0": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "3": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "6": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     }
+    },
+    "ok": true
+   },
+   "DeathToppleLeft": {
+    "num_frames": 24,
+    "length_s": 0.8,
+    "loop": false,
+    "root_motion": false,
+    "additive": "<AdditiveAnimationType.AAT_NONE: 0>",
+    "skeleton_ok": true,
+    "num_keys": 25,
+    "tracks": 26,
+    "landmarks": {
+     "0": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "12": {
+      "landmark_err_cm": 0.0001,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "24": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     }
+    },
+    "ok": true
+   },
+   "DeathToppleRight": {
+    "num_frames": 24,
+    "length_s": 0.8,
+    "loop": false,
+    "root_motion": false,
+    "additive": "<AdditiveAnimationType.AAT_NONE: 0>",
+    "skeleton_ok": true,
+    "num_keys": 25,
+    "tracks": 26,
+    "landmarks": {
+     "0": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "12": {
+      "landmark_err_cm": 0.0001,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "24": {
+      "landmark_err_cm": 0.0001,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     }
+    },
+    "ok": true
+   },
+   "DeadHold": {
+    "num_frames": 30,
+    "length_s": 1.0,
+    "loop": true,
+    "root_motion": false,
+    "additive": "<AdditiveAnimationType.AAT_NONE: 0>",
+    "skeleton_ok": true,
+    "num_keys": 31,
+    "tracks": 26,
+    "landmarks": {
+     "0": {
+      "landmark_err_cm": 0.0001,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "15": {
+      "landmark_err_cm": 0.0001,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "30": {
+      "landmark_err_cm": 0.0001,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     }
+    },
+    "ok": true
+   },
+   "EarFlick": {
+    "num_frames": 12,
+    "length_s": 0.4,
+    "loop": false,
+    "root_motion": false,
+    "additive": "<AdditiveAnimationType.AAT_LOCAL_SPACE_BASE: 1>",
+    "skeleton_ok": true,
+    "num_keys": 13,
+    "tracks": 26,
+    "landmarks": {
+     "0": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "6": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "12": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     }
+    },
+    "ok": true
+   },
+   "TailSettle": {
+    "num_frames": 24,
+    "length_s": 0.8,
+    "loop": false,
+    "root_motion": false,
+    "additive": "<AdditiveAnimationType.AAT_LOCAL_SPACE_BASE: 1>",
+    "skeleton_ok": true,
+    "num_keys": 25,
+    "tracks": 26,
+    "landmarks": {
+     "0": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "12": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "24": {
+      "landmark_err_cm": 0.0,
+      "root_t": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     }
+    },
+    "ok": true
+   }
+  },
+  "owned_assets": [
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_Backstep_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_BoundCycle_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_BoundStart_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_BoundStop_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_DeadHold_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_DeathToppleLeft_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_DeathToppleRight_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_DenEmerge_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_DenEnter_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_EarFlick_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_GuardedWatch_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_HitReact_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_IdleBreath_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_InspectSlot_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_LoadedBound_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_LoadedCornered_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_LoadedIdle_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_LoadedLookBack_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_LoadedTurnLeft_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_LoadedTurnRight_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_MouthRelease_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_RearDown_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_RearObserve_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_RearUp_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_Rummage_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_Snatch_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_SniffAir_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_SniffGround_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_Startle_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_StretchAttend_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_TailSettle_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_Turn180_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_TurnLeft90_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Animation/PantryRat_R01_TurnRight90_Mars_ANIM",
+   "/Game/ArtCandidates/PantryRat/R01/Materials/PantryRat_R01_Belly_Mars_MI",
+   "/Game/ArtCandidates/PantryRat/R01/Materials/PantryRat_R01_Body_Mars_MI",
+   "/Game/ArtCandidates/PantryRat/R01/Materials/PantryRat_R01_Flesh_Mars_MI",
+   "/Game/ArtCandidates/PantryRat/R01/Materials/PantryRat_R01_Harness_Mars_MI",
+   "/Game/ArtCandidates/PantryRat/R01/Materials/PantryRat_R01_Pink_Mars_MI",
+   "/Game/ArtCandidates/PantryRat/R01/Materials/PantryRat_R01_Prop_Mars_M",
+   "/Game/ArtCandidates/PantryRat/R01/Materials/PantryRat_R01_Rind_Mars_MI",
+   "/Game/ArtCandidates/PantryRat/R01/Materials/PantryRat_R01_Stone_Mars_MI",
+   "/Game/ArtCandidates/PantryRat/R01/Materials/PantryRat_R01_Void_Mars_MI",
+   "/Game/ArtCandidates/PantryRat/R01/Materials/PantryRat_R01_Wood_Mars_MI",
+   "/Game/ArtCandidates/PantryRat/R01/Meshes/PantryRat_R01_Mars_SK",
+   "/Game/ArtCandidates/PantryRat/R01/Meshes/PantryRat_R01_Mars_SKEL",
+   "/Game/ArtCandidates/PantryRat/R01/Props/PantryRat_R01_Cheese_Mars_SM",
+   "/Game/ArtCandidates/PantryRat/R01/Props/PantryRat_R01_DenEyePlate_Mars_SM",
+   "/Game/ArtCandidates/PantryRat/R01/Props/PantryRat_R01_Den_Mars_SM"
+  ],
+  "pass": true,
+  "seconds": 0.08
+ },
+ "withers": {
+  "withers_cm": 35.2563,
+  "rule": "max z of Body-slot (material id 0) vertices with 1.4 <= x <= 5.4 (Phase 1 withers band), GeometryScript copy of LOD0",
+  "vertices": 5636,
+  "triangles": 2086,
+  "nose_max_x": 23.1,
+  "target_cm": 35.3,
+  "tol_cm": 0.5,
+  "ok": true
+ },
+ "pocket_depths": {
+  "pack_world": [
+   -300.0,
+   0.0,
+   0.0
+  ],
+  "yaw": 180.0,
+  "scale": 1.25,
+  "collision_trace_flag": "<CollisionTraceFlag.CTF_USE_DEFAULT: 0>",
+  "pockets": {
+   "Pocket1": {
+    "socket_world": [
+     -268.75,
+     -1.25,
+     75.0
+    ],
+    "ray_start": [
+     -208.75,
+     -1.25,
+     75.0
+    ],
+    "collision_hit": [
+     -258.32,
+     -1.25,
+     75.0
+    ],
+    "collision_hit_actor": "PantryRatReview_Backpack",
+    "collision_ray_distance_cm": 49.57,
+    "collision_depth_cm": 10.43,
+    "render_hit": [
+     -270.716,
+     -1.25,
+     75.0
+    ],
+    "render_surface_to_socket_cm": 1.966
+   },
+   "Pocket2": {
+    "socket_world": [
+     -268.75,
+     -22.5,
+     37.5
+    ],
+    "ray_start": [
+     -208.75,
+     -22.5,
+     37.5
+    ],
+    "collision_hit": [
+     -258.32,
+     -22.5,
+     37.5
+    ],
+    "collision_hit_actor": "PantryRatReview_Backpack",
+    "collision_ray_distance_cm": 49.57,
+    "collision_depth_cm": 10.43,
+    "render_hit": [
+     -268.048,
+     -22.5,
+     37.5
+    ],
+    "render_surface_to_socket_cm": 0.702
+   },
+   "Pocket3": {
+    "socket_world": [
+     -268.75,
+     17.5,
+     37.5
+    ],
+    "ray_start": [
+     -208.75,
+     17.5,
+     37.5
+    ],
+    "collision_hit": [
+     -258.32,
+     17.5,
+     37.5
+    ],
+    "collision_hit_actor": "PantryRatReview_Backpack",
+    "collision_ray_distance_cm": 49.57,
+    "collision_depth_cm": 10.43,
+    "render_hit": [
+     -268.031,
+     17.5,
+     37.5
+    ],
+    "render_surface_to_socket_cm": 0.719
+   }
+  },
+  "seconds": 0.05
+ },
+ "review_map": {
+  "build": {
+   "map": "/Game/ArtCandidates/PantryRat/R01/Review/PantryRat_R01_Review_MAP",
+   "previous_level": "/Game/ArtCandidates/CellarBat/R01/Review/CellarBat_R01_Review_MAP",
+   "created": true,
+   "deleted": 0,
+   "saved": true,
+   "error": null,
+   "actors": [
+    "PantryRatReview_AmberLight",
+    "PantryRatReview_Backpack",
+    "PantryRatReview_Cam_Overview",
+    "PantryRatReview_Cam_Playback",
+    "PantryRatReview_Cheese",
+    "PantryRatReview_Den",
+    "PantryRatReview_DenEyePlate",
+    "PantryRatReview_Exposure",
+    "PantryRatReview_Floor",
+    "PantryRatReview_Mushroom_BesideFadingRat",
+    "PantryRatReview_NeutralSky",
+    "PantryRatReview_NeutralSun",
+    "PantryRatReview_Play_BoundCycle",
+    "PantryRatReview_Play_DeadHold",
+    "PantryRatReview_Play_DeathToppleLeft",
+    "PantryRatReview_Play_DenEmerge",
+    "PantryRatReview_Play_LoadedBound",
+    "PantryRatReview_Play_LoadedBound_Mushroom",
+    "PantryRatReview_Play_Rummage",
+    "PantryRatReview_Play_Snatch",
+    "PantryRatReview_Play_Snatch_Mushroom",
+    "PantryRatReview_PlayerStart",
+    "PantryRatReview_Rat_Alpha0",
+    "PantryRatReview_Rat_Alpha05",
+    "PantryRatReview_Rat_Alpha1",
+    "PantryRatReview_Rat_Asym",
+    "PantryRatReview_Rat_Cpd14Unset",
+    "PantryRatReview_Rat_XEyes",
+    "PantryRatReview_TealLight",
+    "PantryRatReview_WallNorth",
+    "PantryRatReview_WallWest"
+   ],
+   "seconds": 0.82
+  },
+  "captures": {
+   "shots": [
+    "review/phase2/unreal/row_neutral.png",
+    "review/phase2/unreal/den_neutral.png",
+    "review/phase2/unreal/playback_row_neutral.png",
+    "review/phase2/unreal/row_amberteal.png",
+    "review/phase2/unreal/den_amberteal.png",
+    "review/phase2/unreal/playback_row_amberteal.png",
+    "review/phase2/unreal/close_Rat_Alpha1.png",
+    "review/phase2/unreal/close_Rat_Alpha05.png",
+    "review/phase2/unreal/close_Rat_Alpha0.png",
+    "review/phase2/unreal/close_Rat_XEyes.png",
+    "review/phase2/unreal/close_Rat_Asym.png",
+    "review/phase2/unreal/close_Rat_Cpd14Unset.png",
+    "review/phase2/unreal/close_Alpha05_with_mushroom.png",
+    "review/phase2/unreal/side_Rat_Alpha05.png",
+    "review/phase2/unreal/side_Rat_Alpha1.png",
+    "review/phase2/unreal/eyes_front_XEyes.png",
+    "review/phase2/unreal/eyes_front_Asym.png"
+   ],
+   "seconds": 1.86
+  }
+ },
+ "summary": {
+  "bones": 26,
+  "slots": [
+   "Body",
+   "Pink",
+   "Belly",
+   "Wood",
+   "Harness",
+   "EyePatch"
+  ],
+  "readback_pass": true,
+  "sockets": {
+   "Carry_Mouth": {
+    "err_cm": 0.0,
+    "component_cm": [
+     19.8,
+     0.0,
+     20.6
+    ],
+    "blender_world_rest_cm": [
+     19.8,
+     0.0,
+     20.6
+    ]
+   },
+   "Carry_Drag": {
+    "err_cm": 0.0,
+    "component_cm": [
+     24.546,
+     0.0,
+     -5.906
+    ],
+    "blender_world_rest_cm": [
+     24.546,
+     -0.0,
+     -5.906
+    ]
+   }
+  },
+  "socket_convention_proof": {
+   "Carry_Mouth": {
+    "predicted_location_err_cm": 0.0,
+    "predicted_axis_err": 1e-06
+   },
+   "Carry_Drag": {
+    "predicted_location_err_cm": 0.0001,
+    "predicted_axis_err": 1e-06
+   }
+  },
+  "clips": 34,
+  "clip_landmark_max_err_cm": 0.00014,
+  "note": "readback key = final readback after the dither-UV reimport (part_a + part_b re-run 2026-11-07 ~01:24 UTC)"
+ }
+}

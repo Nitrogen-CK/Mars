@@ -1,0 +1,443 @@
+{
+ "blender_version": "5.2.2 LTS",
+ "fbx_addon_version": "5.15.0",
+ "scene_unit_settings": {
+  "system": "METRIC",
+  "scale_length": 0.009999999776482582
+ },
+ "frame_map": "Blender (x, y, z) BU=cm -> Unreal (x, -y, z) cm",
+ "armature_export_name": "Armature (renamed during export only; Unreal drops this root node)",
+ "static_mesh_args": {
+  "use_selection": true,
+  "apply_unit_scale": true,
+  "apply_scale_options": "FBX_SCALE_NONE",
+  "global_scale": 1.0,
+  "axis_forward": "-Z",
+  "axis_up": "Y",
+  "use_mesh_modifiers": false,
+  "mesh_smooth_type": "FACE",
+  "use_triangles": true,
+  "use_tspace": false,
+  "add_leaf_bones": false,
+  "path_mode": "STRIP",
+  "colors_type": "SRGB",
+  "use_custom_props": false,
+  "bake_space_transform": false,
+  "object_types": [
+   "MESH"
+  ],
+  "bake_anim": false
+ },
+ "bind_args": {
+  "use_selection": true,
+  "apply_unit_scale": true,
+  "apply_scale_options": "FBX_SCALE_NONE",
+  "global_scale": 1.0,
+  "axis_forward": "-Z",
+  "axis_up": "Y",
+  "use_mesh_modifiers": false,
+  "mesh_smooth_type": "FACE",
+  "use_triangles": true,
+  "use_tspace": false,
+  "add_leaf_bones": false,
+  "path_mode": "STRIP",
+  "colors_type": "SRGB",
+  "use_custom_props": false,
+  "bake_space_transform": false,
+  "object_types": [
+   "ARMATURE",
+   "MESH"
+  ],
+  "primary_bone_axis": "Y",
+  "secondary_bone_axis": "X",
+  "use_armature_deform_only": true,
+  "armature_nodetype": "NULL",
+  "bake_anim": false
+ },
+ "clip_args": {
+  "use_selection": true,
+  "apply_unit_scale": true,
+  "apply_scale_options": "FBX_SCALE_NONE",
+  "global_scale": 1.0,
+  "axis_forward": "-Z",
+  "axis_up": "Y",
+  "use_mesh_modifiers": false,
+  "mesh_smooth_type": "FACE",
+  "use_triangles": true,
+  "use_tspace": false,
+  "add_leaf_bones": false,
+  "path_mode": "STRIP",
+  "colors_type": "SRGB",
+  "use_custom_props": false,
+  "bake_space_transform": false,
+  "object_types": [
+   "ARMATURE",
+   "MESH"
+  ],
+  "primary_bone_axis": "Y",
+  "secondary_bone_axis": "X",
+  "use_armature_deform_only": true,
+  "armature_nodetype": "NULL",
+  "bake_anim": true,
+  "bake_anim_use_all_bones": true,
+  "bake_anim_use_nla_strips": false,
+  "bake_anim_use_all_actions": false,
+  "bake_anim_force_startend_keying": true,
+  "bake_anim_step": 1.0,
+  "bake_anim_simplify_factor": 0.0
+ },
+ "recipe_source": "Tools/Blender/mars_monsters/cellar_bat_r01/scripts/export_cellar_bat.py (verbatim)",
+ "files": {
+  "cube": {
+   "path": "export/validation/Cube10_Mars_SM.fbx",
+   "bytes": 12188,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "bind": {
+   "path": "export/PantryRat_R01_Mars_SK.fbx",
+   "bytes": 155372,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "den": {
+   "path": "export/PantryRat_R01_Den_Mars_SM.fbx",
+   "bytes": 26924,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "den_eye_plate": {
+   "path": "export/PantryRat_R01_DenEyePlate_Mars_SM.fbx",
+   "bytes": 15260,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "cheese": {
+   "path": "export/PantryRat_R01_Cheese_Mars_SM.fbx",
+   "bytes": 18588,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "clip_IdleBreath": {
+   "path": "export/anims/PantryRat_R01_IdleBreath_Mars_ANIM.fbx",
+   "bytes": 399468,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "clip_SniffGround": {
+   "path": "export/anims/PantryRat_R01_SniffGround_Mars_ANIM.fbx",
+   "bytes": 350940,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "clip_SniffAir": {
+   "path": "export/anims/PantryRat_R01_SniffAir_Mars_ANIM.fbx",
+   "bytes": 360636,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "clip_StretchAttend": {
+   "path": "export/anims/PantryRat_R01_StretchAttend_Mars_ANIM.fbx",
+   "bytes": 360636,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "clip_RearUp": {
+   "path": "export/anims/PantryRat_R01_RearUp_Mars_ANIM.fbx",
+   "bytes": 308876,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "clip_RearObserve": {
+   "path": "export/anims/PantryRat_R01_RearObserve_Mars_ANIM.fbx",
+   "bytes": 346188,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "clip_RearDown": {
+   "path": "export/anims/PantryRat_R01_RearDown_Mars_ANIM.fbx",
+   "bytes": 308876,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "clip_BoundStart": {
+   "path": "export/anims/PantryRat_R01_BoundStart_Mars_ANIM.fbx",
+   "bytes": 300124,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "clip_BoundCycle": {
+   "path": "export/anims/PantryRat_R01_BoundCycle_Mars_ANIM.fbx",
+   "bytes": 320540,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "clip_BoundStop": {
+   "path": "export/anims/PantryRat_R01_BoundStop_Mars_ANIM.fbx",
+   "bytes": 300124,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "clip_TurnLeft90": {
+   "path": "export/anims/PantryRat_R01_TurnLeft90_Mars_ANIM.fbx",
+   "bytes": 311788,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "clip_TurnRight90": {
+   "path": "export/anims/PantryRat_R01_TurnRight90_Mars_ANIM.fbx",
+   "bytes": 311788,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "clip_Turn180": {
+   "path": "export/anims/PantryRat_R01_Turn180_Mars_ANIM.fbx",
+   "bytes": 326364,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "clip_Startle": {
+   "path": "export/anims/PantryRat_R01_Startle_Mars_ANIM.fbx",
+   "bytes": 311788,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "clip_Backstep": {
+   "path": "export/anims/PantryRat_R01_Backstep_Mars_ANIM.fbx",
+   "bytes": 317628,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "clip_GuardedWatch": {
+   "path": "export/anims/PantryRat_R01_GuardedWatch_Mars_ANIM.fbx",
+   "bytes": 363772,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "clip_DenEmerge": {
+   "path": "export/anims/PantryRat_R01_DenEmerge_Mars_ANIM.fbx",
+   "bytes": 360636,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "clip_DenEnter": {
+   "path": "export/anims/PantryRat_R01_DenEnter_Mars_ANIM.fbx",
+   "bytes": 360636,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "clip_InspectSlot": {
+   "path": "export/anims/PantryRat_R01_InspectSlot_Mars_ANIM.fbx",
+   "bytes": 320540,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "clip_Rummage": {
+   "path": "export/anims/PantryRat_R01_Rummage_Mars_ANIM.fbx",
+   "bytes": 373292,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "clip_Snatch": {
+   "path": "export/anims/PantryRat_R01_Snatch_Mars_ANIM.fbx",
+   "bytes": 308876,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "clip_LoadedIdle": {
+   "path": "export/anims/PantryRat_R01_LoadedIdle_Mars_ANIM.fbx",
+   "bytes": 356156,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "clip_LoadedBound": {
+   "path": "export/anims/PantryRat_R01_LoadedBound_Mars_ANIM.fbx",
+   "bytes": 326364,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "clip_LoadedTurnLeft": {
+   "path": "export/anims/PantryRat_R01_LoadedTurnLeft_Mars_ANIM.fbx",
+   "bytes": 317628,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "clip_LoadedTurnRight": {
+   "path": "export/anims/PantryRat_R01_LoadedTurnRight_Mars_ANIM.fbx",
+   "bytes": 317628,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "clip_LoadedLookBack": {
+   "path": "export/anims/PantryRat_R01_LoadedLookBack_Mars_ANIM.fbx",
+   "bytes": 329292,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "clip_LoadedCornered": {
+   "path": "export/anims/PantryRat_R01_LoadedCornered_Mars_ANIM.fbx",
+   "bytes": 345804,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "clip_HitReact": {
+   "path": "export/anims/PantryRat_R01_HitReact_Mars_ANIM.fbx",
+   "bytes": 297212,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "clip_MouthRelease": {
+   "path": "export/anims/PantryRat_R01_MouthRelease_Mars_ANIM.fbx",
+   "bytes": 303036,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "clip_DeathToppleLeft": {
+   "path": "export/anims/PantryRat_R01_DeathToppleLeft_Mars_ANIM.fbx",
+   "bytes": 345804,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "clip_DeathToppleRight": {
+   "path": "export/anims/PantryRat_R01_DeathToppleRight_Mars_ANIM.fbx",
+   "bytes": 345804,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "clip_DeadHold": {
+   "path": "export/anims/PantryRat_R01_DeadHold_Mars_ANIM.fbx",
+   "bytes": 360636,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "clip_EarFlick": {
+   "path": "export/anims/PantryRat_R01_EarFlick_Mars_ANIM.fbx",
+   "bytes": 320540,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  },
+  "clip_TailSettle": {
+   "path": "export/anims/PantryRat_R01_TailSettle_Mars_ANIM.fbx",
+   "bytes": 345804,
+   "header": {
+    "magic": "Kaydara FBX Binary",
+    "file_version": 7400,
+    "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"
+   }
+  }
+ }
+}

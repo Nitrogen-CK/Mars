@@ -1,0 +1,7 @@
+00:02.641  blend            | Read blend: "D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\source\PantryRat_R02.blend"
+DITHER_UV {"faces_reprojected": 2954, "eyepatch_faces_kept": 20, "eyepatch_uv_unchanged": true, "cm_per_uv": 24.0, "ign_cells_per_cm": 21.333, "uv_range_after": [[-1.639, -0.005], [1.999, 2.442]], "uv_range_before": [[0.0, 0.0], [1.0, 1.0]]}
+Info: Saved as "PantryRat_R02.blend"
+PANTRY_RAT_OK
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+
+Blender quit

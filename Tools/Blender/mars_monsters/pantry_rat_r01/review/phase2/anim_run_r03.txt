@@ -1,0 +1,13 @@
+00:01.860  blend            | Read blend: "D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r01\source\PantryRat_R01.blend"
+CLIP BoundStart        n=  5 loop=False seam=None bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.184, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=0.3s
+STRAPFIT BoundCycle {"strap_fit": {"spoon_lift_cm": 1.0, "spoon_slide_deg": 0.0, "spoon_pitch_deg": 0.0}, "before": [[2, ["spoon-torso"]], [3, ["spoon-torso"]], [4, ["spoon-torso"]], [5, ["spoon-torso"]], [6, ["spoon-torso"]]], "unresolved": []}
+CLIP BoundCycle        n= 12 loop=True seam={'pose_max': 0.0, 'seam_second_diff': 0.992222, 'interior_max_second_diff': 5.23} bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.196, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=4.1s
+CLIP BoundStop         n=  5 loop=False seam=None bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.184, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=0.2s
+STRAPFIT LoadedBound {"strap_fit": {"spoon_lift_cm": 1.0, "spoon_slide_deg": 0.0, "spoon_pitch_deg": 0.0}, "before": [[2, ["spoon-torso"]], [3, ["spoon-torso"]], [4, ["spoon-torso"]], [5, ["spoon-torso"]], [6, ["spoon-torso"]], [7, ["spoon-torso"]]], "unresolved": []}
+CLIP LoadedBound       n= 14 loop=True seam={'pose_max': 0.0, 'seam_second_diff': 0.814583, 'interior_max_second_diff': 4.016667} bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.198, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=4.7s
+Info: Saved as "PantryRat_R01.blend"
+SAVED D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r01\source\PantryRat_R01.blend
+PANTRY_RAT_OK
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+
+Blender quit

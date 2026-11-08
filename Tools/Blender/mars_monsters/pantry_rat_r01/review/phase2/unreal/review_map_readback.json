@@ -1,0 +1,636 @@
+{
+ "map": "/Game/ArtCandidates/PantryRat/R01/Review/PantryRat_R01_Review_MAP",
+ "actors": {
+  "PantryRatReview_Floor": {
+   "class": "StaticMeshActor",
+   "loc": [
+    0.0,
+    0.0,
+    -10.0
+   ],
+   "cpd_defaults": []
+  },
+  "PantryRatReview_WallNorth": {
+   "class": "StaticMeshActor",
+   "loc": [
+    0.0,
+    820.0,
+    200.0
+   ],
+   "cpd_defaults": []
+  },
+  "PantryRatReview_WallWest": {
+   "class": "StaticMeshActor",
+   "loc": [
+    -920.0,
+    0.0,
+    200.0
+   ],
+   "cpd_defaults": []
+  },
+  "PantryRatReview_Den": {
+   "class": "StaticMeshActor",
+   "loc": [
+    300.0,
+    430.0,
+    0.0
+   ],
+   "cpd_defaults": []
+  },
+  "PantryRatReview_DenEyePlate": {
+   "class": "StaticMeshActor",
+   "loc": [
+    300.0,
+    430.0,
+    0.0
+   ],
+   "cpd_defaults": [
+    19.0,
+    19.0,
+    19.0,
+    19.0,
+    1.0,
+    0.0,
+    0.0,
+    6.0,
+    0.0,
+    0.0,
+    1.0,
+    0.78,
+    0.45,
+    1.0
+   ]
+  },
+  "PantryRatReview_Cheese": {
+   "class": "StaticMeshActor",
+   "loc": [
+    380.0,
+    330.0,
+    0.0
+   ],
+   "cpd_defaults": []
+  },
+  "PantryRatReview_Backpack": {
+   "class": "StaticMeshActor",
+   "loc": [
+    -300.0,
+    0.0,
+    0.0
+   ],
+   "cpd_defaults": []
+  },
+  "PantryRatReview_Rat_Alpha1": {
+   "class": "SkeletalMeshActor",
+   "loc": [
+    100.0,
+    -225.0,
+    0.0
+   ],
+   "cpd_defaults": [
+    2.0,
+    2.0,
+    2.0,
+    2.0,
+    1.0,
+    0.0,
+    0.0,
+    6.0,
+    0.0,
+    0.0,
+    1.0,
+    0.78,
+    0.45,
+    1.0,
+    1.0
+   ],
+   "anim": null,
+   "mode": "<AnimationMode.ANIMATION_BLUEPRINT: 0>",
+   "materials": [
+    "PantryRat_R01_Body_Mars_MI",
+    "PantryRat_R01_Pink_Mars_MI",
+    "PantryRat_R01_Belly_Mars_MI",
+    "PantryRat_R01_Wood_Mars_MI",
+    "PantryRat_R01_Harness_Mars_MI",
+    "M_CkUsf_Look_MarsPantryRatEyePlate"
+   ]
+  },
+  "PantryRatReview_Rat_Alpha05": {
+   "class": "SkeletalMeshActor",
+   "loc": [
+    100.0,
+    -135.0,
+    0.0
+   ],
+   "cpd_defaults": [
+    2.0,
+    2.0,
+    2.0,
+    2.0,
+    1.0,
+    0.0,
+    0.0,
+    6.0,
+    0.0,
+    0.0,
+    1.0,
+    0.78,
+    0.45,
+    1.0,
+    0.5
+   ],
+   "anim": null,
+   "mode": "<AnimationMode.ANIMATION_BLUEPRINT: 0>",
+   "materials": [
+    "PantryRat_R01_Body_Mars_MI",
+    "PantryRat_R01_Pink_Mars_MI",
+    "PantryRat_R01_Belly_Mars_MI",
+    "PantryRat_R01_Wood_Mars_MI",
+    "PantryRat_R01_Harness_Mars_MI",
+    "M_CkUsf_Look_MarsPantryRatEyePlate"
+   ]
+  },
+  "PantryRatReview_Rat_Alpha0": {
+   "class": "SkeletalMeshActor",
+   "loc": [
+    100.0,
+    -45.0,
+    0.0
+   ],
+   "cpd_defaults": [
+    2.0,
+    2.0,
+    2.0,
+    2.0,
+    1.0,
+    0.0,
+    0.0,
+    6.0,
+    0.0,
+    0.0,
+    1.0,
+    0.78,
+    0.45,
+    1.0,
+    0.0
+   ],
+   "anim": null,
+   "mode": "<AnimationMode.ANIMATION_BLUEPRINT: 0>",
+   "materials": [
+    "PantryRat_R01_Body_Mars_MI",
+    "PantryRat_R01_Pink_Mars_MI",
+    "PantryRat_R01_Belly_Mars_MI",
+    "PantryRat_R01_Wood_Mars_MI",
+    "PantryRat_R01_Harness_Mars_MI",
+    "M_CkUsf_Look_MarsPantryRatEyePlate"
+   ]
+  },
+  "PantryRatReview_Rat_XEyes": {
+   "class": "SkeletalMeshActor",
+   "loc": [
+    100.0,
+    45.0,
+    0.0
+   ],
+   "cpd_defaults": [
+    20.0,
+    20.0,
+    20.0,
+    20.0,
+    1.0,
+    0.0,
+    0.0,
+    6.0,
+    0.0,
+    0.0,
+    1.0,
+    0.78,
+    0.45,
+    1.0,
+    1.0
+   ],
+   "anim": null,
+   "mode": "<AnimationMode.ANIMATION_BLUEPRINT: 0>",
+   "materials": [
+    "PantryRat_R01_Body_Mars_MI",
+    "PantryRat_R01_Pink_Mars_MI",
+    "PantryRat_R01_Belly_Mars_MI",
+    "PantryRat_R01_Wood_Mars_MI",
+    "PantryRat_R01_Harness_Mars_MI",
+    "M_CkUsf_Look_MarsPantryRatEyePlate"
+   ]
+  },
+  "PantryRatReview_Rat_Asym": {
+   "class": "SkeletalMeshActor",
+   "loc": [
+    100.0,
+    135.0,
+    0.0
+   ],
+   "cpd_defaults": [
+    2.0,
+    19.0,
+    2.0,
+    19.0,
+    1.0,
+    0.0,
+    0.0,
+    6.0,
+    0.0,
+    0.0,
+    1.0,
+    0.78,
+    0.45,
+    1.0,
+    1.0
+   ],
+   "anim": null,
+   "mode": "<AnimationMode.ANIMATION_BLUEPRINT: 0>",
+   "materials": [
+    "PantryRat_R01_Body_Mars_MI",
+    "PantryRat_R01_Pink_Mars_MI",
+    "PantryRat_R01_Belly_Mars_MI",
+    "PantryRat_R01_Wood_Mars_MI",
+    "PantryRat_R01_Harness_Mars_MI",
+    "M_CkUsf_Look_MarsPantryRatEyePlate"
+   ]
+  },
+  "PantryRatReview_Rat_Cpd14Unset": {
+   "class": "SkeletalMeshActor",
+   "loc": [
+    100.0,
+    225.0,
+    0.0
+   ],
+   "cpd_defaults": [
+    2.0,
+    2.0,
+    2.0,
+    2.0,
+    1.0,
+    0.0,
+    0.0,
+    6.0,
+    0.0,
+    0.0,
+    1.0,
+    0.78,
+    0.45,
+    1.0
+   ],
+   "anim": null,
+   "mode": "<AnimationMode.ANIMATION_BLUEPRINT: 0>",
+   "materials": [
+    "PantryRat_R01_Body_Mars_MI",
+    "PantryRat_R01_Pink_Mars_MI",
+    "PantryRat_R01_Belly_Mars_MI",
+    "PantryRat_R01_Wood_Mars_MI",
+    "PantryRat_R01_Harness_Mars_MI",
+    "M_CkUsf_Look_MarsPantryRatEyePlate"
+   ]
+  },
+  "PantryRatReview_Mushroom_BesideFadingRat": {
+   "class": "StaticMeshActor",
+   "loc": [
+    134.0,
+    -105.0,
+    0.0
+   ],
+   "cpd_defaults": []
+  },
+  "PantryRatReview_Play_BoundCycle": {
+   "class": "SkeletalMeshActor",
+   "loc": [
+    -300.0,
+    -480.0,
+    0.0
+   ],
+   "cpd_defaults": [
+    2.0,
+    2.0,
+    2.0,
+    2.0,
+    1.0,
+    0.0,
+    0.0,
+    6.0,
+    0.0,
+    0.0,
+    1.0,
+    0.78,
+    0.45,
+    1.0,
+    1.0
+   ],
+   "anim": "PantryRat_R01_BoundCycle_Mars_ANIM",
+   "mode": "<AnimationMode.ANIMATION_SINGLE_NODE: 1>",
+   "materials": [
+    "PantryRat_R01_Body_Mars_MI",
+    "PantryRat_R01_Pink_Mars_MI",
+    "PantryRat_R01_Belly_Mars_MI",
+    "PantryRat_R01_Wood_Mars_MI",
+    "PantryRat_R01_Harness_Mars_MI",
+    "M_CkUsf_Look_MarsPantryRatEyePlate"
+   ]
+  },
+  "PantryRatReview_Play_Rummage": {
+   "class": "SkeletalMeshActor",
+   "loc": [
+    -200.0,
+    -480.0,
+    0.0
+   ],
+   "cpd_defaults": [
+    2.0,
+    2.0,
+    2.0,
+    2.0,
+    1.0,
+    0.0,
+    0.0,
+    6.0,
+    0.0,
+    0.0,
+    1.0,
+    0.78,
+    0.45,
+    1.0,
+    1.0
+   ],
+   "anim": "PantryRat_R01_Rummage_Mars_ANIM",
+   "mode": "<AnimationMode.ANIMATION_SINGLE_NODE: 1>",
+   "materials": [
+    "PantryRat_R01_Body_Mars_MI",
+    "PantryRat_R01_Pink_Mars_MI",
+    "PantryRat_R01_Belly_Mars_MI",
+    "PantryRat_R01_Wood_Mars_MI",
+    "PantryRat_R01_Harness_Mars_MI",
+    "M_CkUsf_Look_MarsPantryRatEyePlate"
+   ]
+  },
+  "PantryRatReview_Play_Snatch": {
+   "class": "SkeletalMeshActor",
+   "loc": [
+    -100.0,
+    -480.0,
+    0.0
+   ],
+   "cpd_defaults": [
+    2.0,
+    2.0,
+    2.0,
+    2.0,
+    1.0,
+    0.0,
+    0.0,
+    6.0,
+    0.0,
+    0.0,
+    1.0,
+    0.78,
+    0.45,
+    1.0,
+    1.0
+   ],
+   "anim": "PantryRat_R01_Snatch_Mars_ANIM",
+   "mode": "<AnimationMode.ANIMATION_SINGLE_NODE: 1>",
+   "materials": [
+    "PantryRat_R01_Body_Mars_MI",
+    "PantryRat_R01_Pink_Mars_MI",
+    "PantryRat_R01_Belly_Mars_MI",
+    "PantryRat_R01_Wood_Mars_MI",
+    "PantryRat_R01_Harness_Mars_MI",
+    "M_CkUsf_Look_MarsPantryRatEyePlate"
+   ]
+  },
+  "PantryRatReview_Play_Snatch_Mushroom": {
+   "class": "StaticMeshActor",
+   "loc": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "cpd_defaults": []
+  },
+  "PantryRatReview_Play_LoadedBound": {
+   "class": "SkeletalMeshActor",
+   "loc": [
+    0.0,
+    -480.0,
+    0.0
+   ],
+   "cpd_defaults": [
+    2.0,
+    2.0,
+    2.0,
+    2.0,
+    1.0,
+    0.0,
+    0.0,
+    6.0,
+    0.0,
+    0.0,
+    1.0,
+    0.78,
+    0.45,
+    1.0,
+    1.0
+   ],
+   "anim": "PantryRat_R01_LoadedBound_Mars_ANIM",
+   "mode": "<AnimationMode.ANIMATION_SINGLE_NODE: 1>",
+   "materials": [
+    "PantryRat_R01_Body_Mars_MI",
+    "PantryRat_R01_Pink_Mars_MI",
+    "PantryRat_R01_Belly_Mars_MI",
+    "PantryRat_R01_Wood_Mars_MI",
+    "PantryRat_R01_Harness_Mars_MI",
+    "M_CkUsf_Look_MarsPantryRatEyePlate"
+   ]
+  },
+  "PantryRatReview_Play_LoadedBound_Mushroom": {
+   "class": "StaticMeshActor",
+   "loc": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "cpd_defaults": []
+  },
+  "PantryRatReview_Play_DeathToppleLeft": {
+   "class": "SkeletalMeshActor",
+   "loc": [
+    100.0,
+    -480.0,
+    0.0
+   ],
+   "cpd_defaults": [
+    20.0,
+    20.0,
+    20.0,
+    20.0,
+    1.0,
+    0.0,
+    0.0,
+    6.0,
+    0.0,
+    0.0,
+    1.0,
+    0.78,
+    0.45,
+    1.0,
+    1.0
+   ],
+   "anim": "PantryRat_R01_DeathToppleLeft_Mars_ANIM",
+   "mode": "<AnimationMode.ANIMATION_SINGLE_NODE: 1>",
+   "materials": [
+    "PantryRat_R01_Body_Mars_MI",
+    "PantryRat_R01_Pink_Mars_MI",
+    "PantryRat_R01_Belly_Mars_MI",
+    "PantryRat_R01_Wood_Mars_MI",
+    "PantryRat_R01_Harness_Mars_MI",
+    "M_CkUsf_Look_MarsPantryRatEyePlate"
+   ]
+  },
+  "PantryRatReview_Play_DeadHold": {
+   "class": "SkeletalMeshActor",
+   "loc": [
+    200.0,
+    -480.0,
+    0.0
+   ],
+   "cpd_defaults": [
+    20.0,
+    20.0,
+    20.0,
+    20.0,
+    1.0,
+    0.0,
+    0.0,
+    6.0,
+    0.0,
+    0.0,
+    1.0,
+    0.78,
+    0.45,
+    1.0,
+    1.0
+   ],
+   "anim": "PantryRat_R01_DeadHold_Mars_ANIM",
+   "mode": "<AnimationMode.ANIMATION_SINGLE_NODE: 1>",
+   "materials": [
+    "PantryRat_R01_Body_Mars_MI",
+    "PantryRat_R01_Pink_Mars_MI",
+    "PantryRat_R01_Belly_Mars_MI",
+    "PantryRat_R01_Wood_Mars_MI",
+    "PantryRat_R01_Harness_Mars_MI",
+    "M_CkUsf_Look_MarsPantryRatEyePlate"
+   ]
+  },
+  "PantryRatReview_Play_DenEmerge": {
+   "class": "SkeletalMeshActor",
+   "loc": [
+    300.0,
+    -480.0,
+    0.0
+   ],
+   "cpd_defaults": [
+    2.0,
+    2.0,
+    2.0,
+    2.0,
+    1.0,
+    0.0,
+    0.0,
+    6.0,
+    0.0,
+    0.0,
+    1.0,
+    0.78,
+    0.45,
+    1.0,
+    1.0
+   ],
+   "anim": "PantryRat_R01_DenEmerge_Mars_ANIM",
+   "mode": "<AnimationMode.ANIMATION_SINGLE_NODE: 1>",
+   "materials": [
+    "PantryRat_R01_Body_Mars_MI",
+    "PantryRat_R01_Pink_Mars_MI",
+    "PantryRat_R01_Belly_Mars_MI",
+    "PantryRat_R01_Wood_Mars_MI",
+    "PantryRat_R01_Harness_Mars_MI",
+    "M_CkUsf_Look_MarsPantryRatEyePlate"
+   ]
+  },
+  "PantryRatReview_PlayerStart": {
+   "class": "PlayerStart",
+   "loc": [
+    -700.0,
+    600.0,
+    100.0
+   ],
+   "cpd_defaults": []
+  },
+  "PantryRatReview_NeutralSun": {
+   "class": "DirectionalLight",
+   "loc": [
+    0.0,
+    0.0,
+    500.0
+   ],
+   "cpd_defaults": []
+  },
+  "PantryRatReview_NeutralSky": {
+   "class": "SkyLight",
+   "loc": [
+    0.0,
+    0.0,
+    300.0
+   ],
+   "cpd_defaults": []
+  },
+  "PantryRatReview_AmberLight": {
+   "class": "PointLight",
+   "loc": [
+    250.0,
+    150.0,
+    300.0
+   ],
+   "cpd_defaults": []
+  },
+  "PantryRatReview_TealLight": {
+   "class": "PointLight",
+   "loc": [
+    -300.0,
+    -250.0,
+    150.0
+   ],
+   "cpd_defaults": []
+  },
+  "PantryRatReview_Cam_Overview": {
+   "class": "CameraActor",
+   "loc": [
+    420.0,
+    0.0,
+    150.0
+   ],
+   "cpd_defaults": []
+  },
+  "PantryRatReview_Cam_Playback": {
+   "class": "CameraActor",
+   "loc": [
+    0.0,
+    -880.0,
+    70.0
+   ],
+   "cpd_defaults": []
+  },
+  "PantryRatReview_Exposure": {
+   "class": "PostProcessVolume",
+   "loc": [
+    0.0,
+    0.0,
+    300.0
+   ],
+   "cpd_defaults": []
+  }
+ }
+}

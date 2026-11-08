@@ -1,0 +1,19 @@
+00:01.782  blend            | Read blend: "D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r01\source\PantryRat_R01.blend"
+CLIP BoundStart        n=  5 loop=False seam=None bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.184, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=0.2s
+STRAPFIT BoundCycle {"strap_fit": {"spoon_lift_cm": 1.0, "spoon_slide_deg": 0.0, "spoon_pitch_deg": 0.0}, "before": [[2, ["spoon-torso"]], [3, ["spoon-torso"]], [4, ["spoon-torso"]], [5, ["spoon-torso"]], [6, ["spoon-torso"]]], "unresolved": []}
+CLIP BoundCycle        n= 12 loop=True seam={'pose_max': 0.0, 'seam_second_diff': 0.932222, 'interior_max_second_diff': 4.63} bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.196, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=4.1s
+CLIP BoundStop         n=  5 loop=False seam=None bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.184, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=0.2s
+CLIP Rummage           n= 48 loop=True seam={'pose_max': 0.0, 'seam_second_diff': 0.047222, 'interior_max_second_diff': 0.047222} bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.15, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=0.8s
+CLIP Snatch            n=  8 loop=False seam=None bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.15, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=0.3s
+STRAPFIT LoadedBound {"strap_fit": {"spoon_lift_cm": 1.0, "spoon_slide_deg": 0.0, "spoon_pitch_deg": 0.0}, "before": [[2, ["spoon-torso"]], [3, ["spoon-torso"]], [4, ["spoon-torso"]], [5, ["spoon-torso"]], [6, ["spoon-torso"]], [7, ["spoon-torso"]]], "unresolved": []}
+CLIP LoadedBound       n= 14 loop=True seam={'pose_max': 0.0, 'seam_second_diff': 0.764583, 'interior_max_second_diff': 3.416667} bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.198, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=4.7s
+STRAPFIT DeathToppleLeft {"strap_fit": {"spoon_lift_cm": 1.5, "spoon_slide_deg": -10.0, "spoon_pitch_deg": 6.0}, "before": [[2, ["head-spoon"]], [12, ["head-spoon"]], [13, ["head-spoon"]], [14, ["head-spoon"]], [15, ["head-spoon"]], [16, ["head-spoon"]], [17, ["head-spoon"]], [18, ["head-spoon"]], [19, ["head-spoon"]], [20, ["head-spoon"]], [21, ["head-spoon"]], [22, ["head-spoon"]], [23, ["head-spoon"]]], "unresolved": []}
+CLIP DeathToppleLeft   n= 24 loop=False seam=None bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.15, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=63.9s
+STRAPFIT DeathToppleRight {"strap_fit": {"spoon_lift_cm": 0.3, "spoon_slide_deg": 0.0, "spoon_pitch_deg": 0.0}, "before": [[2, ["head-spoon"]], [3, ["head-spoon"]]], "unresolved": []}
+CLIP DeathToppleRight  n= 24 loop=False seam=None bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.15, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=0.9s
+Info: Saved as "PantryRat_R01.blend"
+SAVED D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r01\source\PantryRat_R01.blend
+PANTRY_RAT_OK
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+
+Blender quit

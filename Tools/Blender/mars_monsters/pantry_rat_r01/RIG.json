@@ -1,0 +1,127 @@
+{
+ "name": "PantryRat_R01",
+ "source": "docs/art/pantry-rat-dens-production-r01/DESIGN_TECH_SPEC.md section 5 + Tools/Blender/mars_monsters/pantry_rat_r01/PHASE_1_BRIEF.md",
+ "frame": "1 BU = 1 cm; rat faces +X, up +Z; Blender (x,y,z) == Unreal (x,-y,z); *_l = rat LEFT = Blender +Y",
+ "root": "root at the origin (floor centre beneath the neutral body), rest matrix identity, never animated",
+ "export_bone_count": 26,
+ "bones": [
+  {
+   "name": "root",
+   "parent": null
+  },
+  {
+   "name": "body",
+   "parent": "root"
+  },
+  {
+   "name": "pelvis",
+   "parent": "body"
+  },
+  {
+   "name": "chest",
+   "parent": "body"
+  },
+  {
+   "name": "neck",
+   "parent": "chest"
+  },
+  {
+   "name": "head",
+   "parent": "neck"
+  },
+  {
+   "name": "jaw",
+   "parent": "head"
+  },
+  {
+   "name": "ear_l",
+   "parent": "head"
+  },
+  {
+   "name": "ear_r",
+   "parent": "head"
+  },
+  {
+   "name": "fore_upper_l",
+   "parent": "chest"
+  },
+  {
+   "name": "fore_lower_l",
+   "parent": "fore_upper_l"
+  },
+  {
+   "name": "fore_foot_l",
+   "parent": "fore_lower_l"
+  },
+  {
+   "name": "fore_upper_r",
+   "parent": "chest"
+  },
+  {
+   "name": "fore_lower_r",
+   "parent": "fore_upper_r"
+  },
+  {
+   "name": "fore_foot_r",
+   "parent": "fore_lower_r"
+  },
+  {
+   "name": "hind_upper_l",
+   "parent": "pelvis"
+  },
+  {
+   "name": "hind_lower_l",
+   "parent": "hind_upper_l"
+  },
+  {
+   "name": "hind_foot_l",
+   "parent": "hind_lower_l"
+  },
+  {
+   "name": "hind_upper_r",
+   "parent": "pelvis"
+  },
+  {
+   "name": "hind_lower_r",
+   "parent": "hind_upper_r"
+  },
+  {
+   "name": "hind_foot_r",
+   "parent": "hind_lower_r"
+  },
+  {
+   "name": "tail_01",
+   "parent": "pelvis"
+  },
+  {
+   "name": "tail_02",
+   "parent": "tail_01"
+  },
+  {
+   "name": "tail_03",
+   "parent": "tail_02"
+  },
+  {
+   "name": "tail_04",
+   "parent": "tail_03"
+  },
+  {
+   "name": "spoon_prop",
+   "parent": "chest"
+  }
+ ],
+ "non_bone_frames": [
+  {
+   "name": "Carry_Mouth",
+   "type": "Empty",
+   "parent_bone": "jaw",
+   "purpose": "mouth-carry contact frame (item pivot)"
+  },
+  {
+   "name": "Carry_Drag",
+   "type": "Empty",
+   "parent_bone": "jaw",
+   "purpose": "bulky-item drag offset (item pivot)"
+  }
+ ]
+}

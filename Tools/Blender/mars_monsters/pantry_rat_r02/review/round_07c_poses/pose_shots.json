@@ -1,0 +1,180 @@
+{
+ "sniff": {
+  "sheet": "04-curiosity-and-bound-poses.png",
+  "crop": [
+   25,
+   700,
+   365,
+   890
+  ],
+  "clip": "SniffGround",
+  "frame": 18,
+  "view_az_el": [
+   35,
+   12
+  ],
+  "mushroom": false,
+  "render": "review/round_07c_poses/poses/sniff.png"
+ },
+ "stretch_check": {
+  "sheet": "04-curiosity-and-bound-poses.png",
+  "crop": [
+   370,
+   700,
+   765,
+   890
+  ],
+  "clip": "StretchAttend",
+  "frame": 15,
+  "view_az_el": [
+   20,
+   10
+  ],
+  "mushroom": false,
+  "render": "review/round_07c_poses/poses/stretch_check.png"
+ },
+ "rear_observe": {
+  "sheet": "04-curiosity-and-bound-poses.png",
+  "crop": [
+   770,
+   690,
+   1095,
+   890
+  ],
+  "clip": "RearObserve",
+  "frame": 0,
+  "view_az_el": [
+   30,
+   8
+  ],
+  "mushroom": false,
+  "render": "review/round_07c_poses/poses/rear_observe.png"
+ },
+ "startle_backstep": {
+  "sheet": "04-curiosity-and-bound-poses.png",
+  "crop": [
+   1105,
+   690,
+   1525,
+   890
+  ],
+  "clip": "Startle",
+  "frame": 9,
+  "view_az_el": [
+   25,
+   10
+  ],
+  "mushroom": false,
+  "render": "review/round_07c_poses/poses/startle_backstep.png"
+ },
+ "loaded_bound": {
+  "sheet": "05-claim-and-loaded-flee-poses.png",
+  "crop": [
+   15,
+   440,
+   510,
+   710
+  ],
+  "clip": "LoadedBound",
+  "frame": 6,
+  "view_az_el": [
+   10,
+   6
+  ],
+  "mushroom": true,
+  "render": "review/round_07c_poses/poses/loaded_bound.png"
+ },
+ "brake_look_back": {
+  "sheet": "05-claim-and-loaded-flee-poses.png",
+  "crop": [
+   520,
+   440,
+   1020,
+   710
+  ],
+  "clip": "LoadedLookBack",
+  "frame": 8,
+  "view_az_el": [
+   30,
+   8
+  ],
+  "mushroom": true,
+  "render": "review/round_07c_poses/poses/brake_look_back.png"
+ },
+ "carry_mushroom": {
+  "sheet": "03-rig-construction-and-eyes.png",
+  "crop": [
+   540,
+   520,
+   1030,
+   765
+  ],
+  "clip": "LoadedIdle",
+  "frame": 0,
+  "view_az_el": [
+   8,
+   6
+  ],
+  "mushroom": true,
+  "render": "review/round_07c_poses/poses/carry_mushroom.png"
+ },
+ "snatch": {
+  "sheet": "05-claim-and-loaded-flee-poses.png",
+  "crop": [
+   1025,
+   90,
+   1520,
+   410
+  ],
+  "clip": "Snatch",
+  "frame": 8,
+  "view_az_el": [
+   25,
+   8
+  ],
+  "mushroom": true,
+  "render": "review/round_07c_poses/poses/snatch.png"
+ },
+ "topple": {
+  "sheet": "06-weapon-hit-and-x-eyes.png",
+  "crop": [
+   940,
+   90,
+   1215,
+   345
+  ],
+  "clip": "DeathToppleLeft",
+  "frame": 16,
+  "view_az_el": [
+   30,
+   12
+  ],
+  "mushroom": false,
+  "render": "review/round_07c_poses/poses/topple.png"
+ },
+ "dead_x_hold": {
+  "sheet": "06-weapon-hit-and-x-eyes.png",
+  "crop": [
+   1030,
+   395,
+   1510,
+   700
+  ],
+  "clip": "DeadHold",
+  "frame": 0,
+  "view_az_el": [
+   30,
+   15
+  ],
+  "mushroom": false,
+  "render": "review/round_07c_poses/poses/dead_x_hold.png"
+ },
+ "BoundCycle_contact": {
+  "frames": 13,
+  "view": "side ortho, fixed per clip"
+ },
+ "LoadedBound_contact": {
+  "frames": 15,
+  "view": "side ortho, fixed per clip"
+ }
+}

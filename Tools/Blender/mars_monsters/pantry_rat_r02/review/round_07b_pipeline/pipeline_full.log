@@ -1,0 +1,349 @@
+
+Starting unwrap
+	Generating lengths...done
+...done
+	Consolidating Boxes...Consolidated 0 boxes, done
+	Packing Boxes 1546...done
+	writing back UVsdone
+finished all 0.22 
+RIG {"bones": 26, "issues": [], "root_identity": true}
+MESH {"object": "PantryRat_R02_Body", "tris_total": 3092, "verts": 1658, "loops": 9072, "budget_tris": "3000-4500 (R02 brief), > 5000 = deviation", "tris_per_part_source": {"Loft": 760, "Nose": 84, "Jaw": 70, "Ear_L": 96, "Leg_Fore_L": 456, "Leg_Hind_L": 508, "Tail": 238, "Spoon": 144, "Cuffs": 192, "Band": 320, "ChestStrap": 204, "EyePatch_L": 10, "EyePatch_R": 10}, "tris_per_part_tag": {"torso": 480, "head": 280, "nose": 84, "ear": 96, "eyepatch": 20, "leg_upper": 276, "leg_lower": 240, "foot": 448, "tail": 238, "spoon": 114, "cuff": 120, "band": 320, "jaw": 70, "strap": 204}, "slots": ["Body", "Pink", "Belly", "Wood", "Harness", "EyePatch"], "tris_per_slot": {"Body": 1274, "Pink": 866, "Belly": 72, "Wood": 114, "Harness": 644, "EyePatch": 20}, "weights": {"max_influences": 3, "unnormalized": 0, "unweighted": 0, "non_bone_groups": []}, "rigid_spoon_and_strap": {"verts": 178, "not_rigid": 0}, "rigid_eye_patches_head": {"verts": 22, "not_rigid": 0}, "rigid_ears": {"verts": 52, "not_rigid": 0}, "rigid_jaw": {"verts": 37, "not_rigid": 0}, "orientation_fixes": 0, "eye_patch_uv": {"left_+Y": {"u": [0.0, 0.5], "v": [0.0, 1.0], "loops": 30}, "right_-Y": {"u": [0.5, 1.0], "v": [0.0, 1.0], "loops": 30}}, "eye_patch_uv_halves_ok": true, "eye_patch_uv_convention": "U decreases toward rat-left (+Y): LEFT patch U in [0,0.5] (back edge 0, front edge 0.5), RIGHT patch U in [0.5,1] (front 0.5, back 1); V up. EyePlate.ush: U<0.5 = LeftCell, mirrored, so frac(2U) runs front->back on both eyes."}
+NEUTRAL {"nose_to_tail_x_extent_cm": 75.856, "nose_to_tail_rat_only_no_spoon_cm": 75.856, "body_length_tail_excluded_cm": 60.6, "torso_length_cm": 40.9, "body_width_torso_y_cm": 31.0, "width_incl_ears_cm": 38.735, "withers_top_z_cm": 33.4, "withers_x_window": [4.8, 8.8], "torso_top_max_z_cm": 35.2, "height_incl_spoon_cm": 44.45, "height_no_spoon_cm": 36.309, "nose_tip": [30.5, -0.7922, 14.04], "tail_tip_x_cm": -45.156, "belly_min_z_cm": 5.8, "bounds_min_blender": [-45.1558, -20.6804, -0.0], "bounds_max_blender": [30.7, 19.3675, 44.4497], "targets": {"torso_top_max_z_cm": 35.0, "body_width_torso_y_cm": 30.0}, "deviation": {"torso_top_max_z_cm": 0.2, "body_width_torso_y_cm": 1.0}, "deviations_over_1cm": [], "height_incl_spoon_le_65": true}
+POSE neutral      {"spoon_vs_torso_tris": 0, "spoon_vs_torso_clear_cm": 0.194, "spoon_min_z_cm": 11.733, "spoon_below_floor_verts": 0, "harness_vs_torso_tris": 372, "harness_vs_torso_clear_cm": -0.05, "band_float_max_cm": 4.563, "head_vs_spoon_tris": 0, "head_vs_spoon_dist_cm": 5.505, "legs_vs_torso_tris": 20, "feet_vs_torso_tris": 0, "below_floor_verts": 0, "below_floor_parts": {}, "min_z_cm": -0.0, "body_min_z_cm": -0.0, "body_lift_by_spoon_cm": 0.0, "eye_patch_detach_cm": 0.2, "height_cm": 44.45, "height_no_spoon_cm": 36.309, "x_extent_cm": 75.856, "y_extent_cm": 40.048, "carry_proxy_vs_chest_tris": "n/a", "carry_proxy_vs_chest_clear_cm": "n/a", "carry_proxy_vs_spoon_tris": "n/a", "carry_proxy_vs_spoon_clear_cm": "n/a"}
+POSE crouch       {"spoon_vs_torso_tris": 0, "spoon_vs_torso_clear_cm": 0.383, "spoon_min_z_cm": 10.726, "spoon_below_floor_verts": 0, "harness_vs_torso_tris": 374, "harness_vs_torso_clear_cm": -0.091, "band_float_max_cm": 4.697, "head_vs_spoon_tris": 0, "head_vs_spoon_dist_cm": 4.103, "legs_vs_torso_tris": 32, "feet_vs_torso_tris": 0, "below_floor_verts": 0, "below_floor_parts": {}, "min_z_cm": -0.0, "body_min_z_cm": -0.0, "body_lift_by_spoon_cm": 0.0, "eye_patch_detach_cm": 0.2, "height_cm": 41.977, "height_no_spoon_cm": 32.726, "x_extent_cm": 74.639, "y_extent_cm": 39.471, "carry_proxy_vs_chest_tris": "n/a", "carry_proxy_vs_chest_clear_cm": "n/a", "carry_proxy_vs_spoon_tris": "n/a", "carry_proxy_vs_spoon_clear_cm": "n/a"}
+POSE stretch      {"spoon_vs_torso_tris": 0, "spoon_vs_torso_clear_cm": 0.061, "spoon_min_z_cm": 8.227, "spoon_below_floor_verts": 0, "harness_vs_torso_tris": 382, "harness_vs_torso_clear_cm": -0.078, "band_float_max_cm": 4.555, "head_vs_spoon_tris": 0, "head_vs_spoon_dist_cm": 5.443, "legs_vs_torso_tris": 0, "feet_vs_torso_tris": 0, "below_floor_verts": 0, "below_floor_parts": {}, "min_z_cm": -0.0, "body_min_z_cm": -0.0, "body_lift_by_spoon_cm": 0.0, "eye_patch_detach_cm": 0.2, "height_cm": 41.704, "height_no_spoon_cm": 32.525, "x_extent_cm": 92.932, "y_extent_cm": 40.048, "carry_proxy_vs_chest_tris": "n/a", "carry_proxy_vs_chest_clear_cm": "n/a", "carry_proxy_vs_spoon_tris": "n/a", "carry_proxy_vs_spoon_clear_cm": "n/a"}
+POSE bound_apex   {"spoon_vs_torso_tris": 0, "spoon_vs_torso_clear_cm": 0.194, "spoon_min_z_cm": 18.941, "spoon_below_floor_verts": 0, "harness_vs_torso_tris": 372, "harness_vs_torso_clear_cm": -0.05, "band_float_max_cm": 4.563, "head_vs_spoon_tris": 0, "head_vs_spoon_dist_cm": 4.445, "legs_vs_torso_tris": 0, "feet_vs_torso_tris": 0, "below_floor_verts": 0, "below_floor_parts": {}, "min_z_cm": 10.16, "body_min_z_cm": 10.16, "body_lift_by_spoon_cm": 0.0, "eye_patch_detach_cm": 0.2, "height_cm": 52.418, "height_no_spoon_cm": 42.76, "x_extent_cm": 84.052, "y_extent_cm": 40.048, "carry_proxy_vs_chest_tris": "n/a", "carry_proxy_vs_chest_clear_cm": "n/a", "carry_proxy_vs_spoon_tris": "n/a", "carry_proxy_vs_spoon_clear_cm": "n/a"}
+FIX rear_up ['spoon-torso'] -> [] {'spoon_lift_cm': 0.0, 'spoon_slide_deg': -3.0, 'spoon_pitch_deg': 0.0}
+POSE rear_up      {"spoon_vs_torso_tris": 0, "spoon_vs_torso_clear_cm": 0.573, "spoon_min_z_cm": 10.662, "spoon_below_floor_verts": 0, "harness_vs_torso_tris": 370, "harness_vs_torso_clear_cm": -0.109, "band_float_max_cm": 4.648, "head_vs_spoon_tris": 0, "head_vs_spoon_dist_cm": 10.524, "legs_vs_torso_tris": 0, "feet_vs_torso_tris": 0, "below_floor_verts": 0, "below_floor_parts": {}, "min_z_cm": -0.0, "body_min_z_cm": -0.0, "body_lift_by_spoon_cm": 0.0, "eye_patch_detach_cm": 0.2, "height_cm": 50.883, "height_no_spoon_cm": 50.883, "x_extent_cm": 58.616, "y_extent_cm": 41.82, "carry_proxy_vs_chest_tris": "n/a", "carry_proxy_vs_chest_clear_cm": "n/a", "carry_proxy_vs_spoon_tris": "n/a", "carry_proxy_vs_spoon_clear_cm": "n/a"}
+POSE jaw_carry    {"spoon_vs_torso_tris": 0, "spoon_vs_torso_clear_cm": 0.194, "spoon_min_z_cm": 11.733, "spoon_below_floor_verts": 0, "harness_vs_torso_tris": 372, "harness_vs_torso_clear_cm": -0.05, "band_float_max_cm": 4.563, "head_vs_spoon_tris": 0, "head_vs_spoon_dist_cm": 4.109, "legs_vs_torso_tris": 18, "feet_vs_torso_tris": 0, "below_floor_verts": 0, "below_floor_parts": {}, "min_z_cm": -0.0, "body_min_z_cm": -0.0, "body_lift_by_spoon_cm": 0.0, "eye_patch_detach_cm": 0.2, "height_cm": 44.45, "height_no_spoon_cm": 35.2, "x_extent_cm": 75.131, "y_extent_cm": 40.048, "carry_proxy_vs_chest_tris": 0, "carry_proxy_vs_chest_clear_cm": 16.032, "carry_proxy_vs_legs_tris": 0, "carry_proxy_vs_spoon_tris": 0, "carry_proxy_vs_spoon_clear_cm": 34.521, "carry_proxy_min_z_cm": 9.948}
+POSE look_back    {"spoon_vs_torso_tris": 0, "spoon_vs_torso_clear_cm": 0.194, "spoon_min_z_cm": 11.733, "spoon_below_floor_verts": 0, "harness_vs_torso_tris": 370, "harness_vs_torso_clear_cm": -0.064, "band_float_max_cm": 4.563, "head_vs_spoon_tris": 0, "head_vs_spoon_dist_cm": 6.362, "legs_vs_torso_tris": 18, "feet_vs_torso_tris": 0, "below_floor_verts": 0, "below_floor_parts": {}, "min_z_cm": -0.0, "body_min_z_cm": -0.0, "body_lift_by_spoon_cm": 0.0, "eye_patch_detach_cm": 0.2, "height_cm": 44.45, "height_no_spoon_cm": 35.794, "x_extent_cm": 69.4, "y_extent_cm": 41.259, "carry_proxy_vs_chest_tris": 0, "carry_proxy_vs_chest_clear_cm": 8.061, "carry_proxy_vs_legs_tris": 0, "carry_proxy_vs_spoon_tris": 0, "carry_proxy_vs_spoon_clear_cm": 36.275, "carry_proxy_min_z_cm": 9.596}
+POSE topple_left  {"spoon_vs_torso_tris": 0, "spoon_vs_torso_clear_cm": 0.194, "spoon_min_z_cm": 30.189, "spoon_below_floor_verts": 0, "harness_vs_torso_tris": 372, "harness_vs_torso_clear_cm": -0.05, "band_float_max_cm": 4.563, "head_vs_spoon_tris": 0, "head_vs_spoon_dist_cm": 1.138, "legs_vs_torso_tris": 0, "feet_vs_torso_tris": 0, "below_floor_verts": 0, "below_floor_parts": {}, "min_z_cm": -0.0, "body_min_z_cm": -0.0, "body_lift_by_spoon_cm": 0.0, "eye_patch_detach_cm": 0.2, "height_cm": 42.535, "height_no_spoon_cm": 39.404, "x_extent_cm": 70.427, "y_extent_cm": 45.635, "carry_proxy_vs_chest_tris": "n/a", "carry_proxy_vs_chest_clear_cm": "n/a", "carry_proxy_vs_spoon_tris": "n/a", "carry_proxy_vs_spoon_clear_cm": "n/a"}Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+
+POSE topple_right {"spoon_vs_torso_tris": 0, "spoon_vs_torso_clear_cm": 0.194, "spoon_min_z_cm": 1.2, "spoon_below_floor_verts": 0, "harness_vs_torso_tris": 372, "harness_vs_torso_clear_cm": -0.05, "band_float_max_cm": 4.563, "head_vs_spoon_tris": 0, "head_vs_spoon_dist_cm": 8.409, "legs_vs_torso_tris": 0, "feet_vs_torso_tris": 0, "below_floor_verts": 0, "below_floor_parts": {}, "min_z_cm": -0.0, "body_min_z_cm": -0.0, "body_lift_by_spoon_cm": 0.0, "eye_patch_detach_cm": 0.2, "height_cm": 40.509, "height_no_spoon_cm": 39.404, "x_extent_cm": 70.427, "y_extent_cm": 46.458, "carry_proxy_vs_chest_tris": "n/a", "carry_proxy_vs_chest_clear_cm": "n/a", "carry_proxy_vs_spoon_tris": "n/a", "carry_proxy_vs_spoon_clear_cm": "n/a"}
+POSE dead_back    {"spoon_vs_torso_tris": 0, "spoon_vs_torso_clear_cm": 0.194, "spoon_min_z_cm": 3.186, "spoon_below_floor_verts": 0, "harness_vs_torso_tris": 372, "harness_vs_torso_clear_cm": -0.05, "band_float_max_cm": 4.563, "head_vs_spoon_tris": 0, "head_vs_spoon_dist_cm": 9.722, "legs_vs_torso_tris": 0, "feet_vs_torso_tris": 0, "below_floor_verts": 0, "below_floor_parts": {}, "min_z_cm": 0.0, "body_min_z_cm": 0.278, "body_lift_by_spoon_cm": 0.278, "eye_patch_detach_cm": 0.2, "height_cm": 37.502, "height_no_spoon_cm": 37.502, "x_extent_cm": 70.121, "y_extent_cm": 47.39, "carry_proxy_vs_chest_tris": "n/a", "carry_proxy_vs_chest_clear_cm": "n/a", "carry_proxy_vs_spoon_tris": "n/a", "carry_proxy_vs_spoon_clear_cm": "n/a"}
+POSE den_crouch   {"spoon_vs_torso_tris": 0, "spoon_vs_torso_clear_cm": 0.411, "spoon_min_z_cm": 10.911, "spoon_below_floor_verts": 0, "harness_vs_torso_tris": 372, "harness_vs_torso_clear_cm": -0.097, "band_float_max_cm": 4.747, "head_vs_spoon_tris": 0, "head_vs_spoon_dist_cm": 3.655, "legs_vs_torso_tris": 32, "feet_vs_torso_tris": 0, "below_floor_verts": 0, "below_floor_parts": {}, "min_z_cm": -0.0, "body_min_z_cm": -0.0, "body_lift_by_spoon_cm": 0.0, "eye_patch_detach_cm": 0.2, "height_cm": 41.84, "height_no_spoon_cm": 32.623, "x_extent_cm": 74.846, "y_extent_cm": 39.694, "carry_proxy_vs_chest_tris": "n/a", "carry_proxy_vs_chest_clear_cm": "n/a", "carry_proxy_vs_spoon_tris": "n/a", "carry_proxy_vs_spoon_clear_cm": "n/a"}
+RATIOS {"crouch_height_ratio_no_spoon": 0.9013, "crouch_height_ratio_incl_spoon": 0.9444, "stretch_length_ratio": 1.2251, "bound_apex_body_lift_cm": 8.0, "bound_apex_min_z_cm": 10.16} rear_up nose z 44.23
+PORTAL {"pose": "den_crouch", "includes_spoon": true, "posed_y_extent_cm": 39.694, "posed_y_min_max": [-20.68, 19.013], "posed_z_extent_cm": 41.84, "posed_z_max_cm": 41.84, "opening_cm": [60.0, 60.0], "opening_profile": "30 cm jambs + 30 cm radius semicircle (60 x 60)", "box_clearance_width_total_cm": 20.306, "box_clearance_height_cm": 18.16, "arch_profile_min_clearance_cm": 9.32, "arch_tightest_point_yz": [-20.68, 12.34], "fits": true, "opening_widened": false}
+REACH rummage {"pocket": "Pocket2", "pocket_world": [-269.0, -22.5, 37.5], "pocket_height_cm": 37.5, "rear_pitch_deg": 41.51, "nose_world": [-256.5, -22.5, 37.5], "nose_height_cm": 37.5, "height_shortfall_cm": 0.0, "nose_reaches_pocket_height": true, "nose_to_socket_3d_cm": 12.5, "nose_pack_local": [-43.5, 22.5, 37.5], "socket_depth_behind_envelope_face_cm": 12.0, "hind_feet_min_z_cm": -0.0, "hind_feet_planted_rest_targets": true, "below_floor_verts": 0, "rat_placement_world": [-236.8147, -21.7079, 0.0], "rat_yaw_deg": 180.0}
+REACH rummage_p3 {"pocket": "Pocket3", "pocket_world": [-269.0, 17.5, 37.5], "pocket_height_cm": 37.5, "rear_pitch_deg": 41.51, "nose_world": [-256.5, 17.5, 37.5], "nose_height_cm": 37.5, "height_shortfall_cm": 0.0, "nose_reaches_pocket_height": true, "nose_to_socket_3d_cm": 12.5, "nose_pack_local": [-43.5, -17.5, 37.5], "socket_depth_behind_envelope_face_cm": 12.0, "hind_feet_min_z_cm": -0.0, "hind_feet_planted_rest_targets": true, "below_floor_verts": 0, "rat_placement_world": [-236.8147, 18.2921, 0.0], "rat_yaw_deg": 180.0}
+FIX rear_rummage ['spoon-torso'] -> [] {'spoon_lift_cm': 0.3, 'spoon_slide_deg': 0.0, 'spoon_pitch_deg': 0.0}
+REACH rear_rummage {"pocket": "Pocket1", "pocket_world": [-269.0, -1.25, 75.0], "pocket_height_cm": 75.0, "rear_pitch_deg": 82.0, "nose_world": [-256.5, -1.25, 56.5095], "nose_height_cm": 56.51, "height_shortfall_cm": 18.49, "nose_reaches_pocket_height": false, "nose_to_socket_3d_cm": 22.319, "nose_pack_local": [-43.5, 1.25, 56.5095], "socket_depth_behind_envelope_face_cm": 12.0, "hind_feet_min_z_cm": -0.0, "hind_feet_planted_rest_targets": true, "below_floor_verts": 0, "rat_placement_world": [-262.5096, -0.4578, 0.0], "rat_yaw_deg": 180.0}
+POSE drag_carry   {"spoon_vs_torso_tris": 0, "spoon_vs_torso_clear_cm": 0.194, "spoon_min_z_cm": 11.733, "spoon_below_floor_verts": 0, "harness_vs_torso_tris": 368, "harness_vs_torso_clear_cm": -0.05, "band_float_max_cm": 4.563, "head_vs_spoon_tris": 0, "head_vs_spoon_dist_cm": 3.077, "legs_vs_torso_tris": 0, "feet_vs_torso_tris": 0, "below_floor_verts": 0, "below_floor_parts": {}, "min_z_cm": -0.0, "body_min_z_cm": -0.0, "body_lift_by_spoon_cm": 0.0, "eye_patch_detach_cm": 0.2, "height_cm": 44.45, "height_no_spoon_cm": 35.2, "x_extent_cm": 74.54, "y_extent_cm": 40.048, "carry_proxy_vs_chest_tris": 0, "carry_proxy_vs_chest_clear_cm": 17.277, "carry_proxy_vs_legs_tris": 0, "carry_proxy_vs_spoon_tris": 0, "carry_proxy_vs_spoon_clear_cm": 30.205, "carry_proxy_min_z_cm": -0.0}
+DRAG {"parent_bone": "jaw", "jaw_head_local_translation_cm": [-0.0, 17.2659, -25.5891], "jaw_head_local_rotation_quat_wxyz": [0.6943, -0.1338, 0.1338, 0.6943], "bulky_proxy_cm": [30.0, 30.0, 25.0], "proxy_pivot": "base centre", "jaw_tip_world_in_drag_pose": [30.7239, -0.0, 22.5596], "bite_over_top_edge_cm": 2.5, "proxy_top_z_cm": 25.0, "jaw_tip_z_vs_top_edge_cm": -2.44, "audit": {"spoon_vs_torso_tris": 0, "spoon_vs_torso_clear_cm": 0.194, "spoon_min_z_cm": 11.733, "spoon_below_floor_verts": 0, "harness_vs_torso_tris": 368, "harness_vs_torso_clear_cm": -0.05, "band_float_max_cm": 4.563, "head_vs_spoon_tris": 0, "head_vs_spoon_dist_cm": 3.077, "legs_vs_torso_tris": 0, "feet_vs_torso_tris": 0, "below_floor_verts": 0, "below_floor_parts": {}, "min_z_cm": -0.0, "body_min_z_cm": -0.0, "body_lift_by_spoon_cm": 0.0, "eye_patch_detach_cm": 0.2, "height_cm": 44.45, "height_no_spoon_cm": 35.2, "x_extent_cm": 74.54, "y_extent_cm": 40.048, "carry_proxy_vs_chest_tris": 0, "carry_proxy_vs_chest_clear_cm": 17.277, "carry_proxy_vs_legs_tris": 0, "carry_proxy_vs_spoon_tris": 0, "carry_proxy_vs_spoon_clear_cm": 30.205, "carry_proxy_min_z_cm": -0.0}}
+DROP {"corpse_pose": "dead_back", "release_point_world": [28.2513, -0.0, 17.2192], "vertical_drop": {"mushroom_centre_world": [28.2513, -0.0, 6.0], "horizontal_gap_cm": 0.0, "mushroom_min_z_cm": -0.0, "outside_corpse": false}, "released_forward_12cm": {"mushroom_centre_world": [40.2513, -0.0, 6.0], "horizontal_gap_cm": 4.635, "mushroom_min_z_cm": -0.0, "outside_corpse": true}, "shown": "released_forward_12cm"}
+ROUTES {"Loop_A": {"min_dist_to_portal_markers_cm": 188.52, "portal_rule_ge_150": true, "min_gap_to_crate_faces_cm": 42.89, "min_gap_to_pack_envelope_cm": 107.0, "min_gap_to_chef_capsule_cm": 141.82, "min_margin_to_floor_edge_cm": 195.0, "rat_half_width_cm": 15.0, "clear_of_crates_with_rat_half_width": true, "length_cm": 858.4}, "FigureEight_B": {"min_dist_to_portal_markers_cm": 175.39, "portal_rule_ge_150": true, "min_gap_to_crate_faces_cm": 18.31, "min_gap_to_pack_envelope_cm": 94.0, "min_gap_to_chef_capsule_cm": 115.16, "min_margin_to_floor_edge_cm": 182.0, "rat_half_width_cm": 15.0, "clear_of_crates_with_rat_half_width": true, "length_cm": 1266.7}}
+CHEESE {"object": "Cheese_MonksRind", "dims_cm": [15.0, 10.0, 8.0], "target_cm": [15.0, 10.0, 8.0], "tris": 56, "pivot": "base centre", "pivot_check_min_z": 0.0} MUSH {"dims_cm": [12.0, 12.0, 8.0], "target_cm": [12.0, 12.0, 8.0], "tris": 100, "at_pocket2_world": [-269.0, -22.5, 37.5]}
+Info: Saved as "PantryRat_R02.blend"
+SAVED D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\source\PantryRat_R02.blend
+ELAPSED 4.2s
+PANTRY_RAT_OK
+00:02.344  blend            | Read blend: "D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\source\PantryRat_R02.blend"
+CLIP IdleBreath        n= 60 loop=True seam={'pose_max': 0.0, 'seam_second_diff': 0.002849, 'interior_max_second_diff': 0.003681} bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.05, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=1.9s
+CLIP SniffGround       n= 36 loop=True seam={'pose_max': 0.0, 'seam_second_diff': 0.003868, 'interior_max_second_diff': 0.025} bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.109, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=1.6s
+STRAPFIT SniffAir {"strap_fit": {"spoon_lift_cm": 0.3, "spoon_slide_deg": 0.0, "spoon_pitch_deg": 0.0}, "before": [[0, ["spoon-torso"]], [1, ["spoon-torso"]], [2, ["spoon-torso"]], [3, ["spoon-torso"]], [4, ["spoon-torso"]], [5, ["spoon-torso"]], [6, ["spoon-torso"]], [7, ["spoon-torso"]], [8, ["spoon-torso"]], [9, ["spoon-torso"]], [10, ["spoon-torso"]], [11, ["spoon-torso"]], [12, ["spoon-torso"]], [13, ["spoon-torso"]], [14, ["spoon-torso"]], [15, ["spoon-torso"]], [16, ["spoon-torso"]], [17, ["spoon-torso"]], [18, ["spoon-torso"]], [19, ["spoon-torso"]], [20, ["spoon-torso"]], [21, ["spoon-torso"]], [22, ["spoon-torso"]], [23, ["spoon-torso"]], [24, ["spoon-torso"]], [25, ["spoon-torso"]], [26, ["spoon-torso"]], [27, ["spoon-torso"]], [28, ["spoon-torso"]], [29, ["spoon-torso"]], [30, ["spoon-torso"]]], "unresolved": []}
+CLIP SniffAir          n= 30 loop=True seam={'pose_max': 0.0, 'seam_second_diff': 0.004906, 'interior_max_second_diff': 0.006965} bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.05, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=2.5s
+STRAPFIT StretchAttend {"strap_fit": {"spoon_lift_cm": 0.3, "spoon_slide_deg": 0.0, "spoon_pitch_deg": 0.0}, "before": [[2, ["spoon-torso"]], [27, ["spoon-torso"]]], "unresolved": []}
+CLIP StretchAttend     n= 30 loop=False seam=None bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.081, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=2.4s
+CLIP RearUp            n=  8 loop=False seam=None bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.109, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=0.5s
+CLIP RearObserve       n= 36 loop=True seam={'pose_max': 0.0, 'seam_second_diff': 0.003174, 'interior_max_second_diff': 0.004296} bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.11, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=1.3s
+CLIP RearDown          n=  8 loop=False seam=None bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.109, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=0.5s
+CLIP BoundStart        n=  5 loop=False seam=None bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.097, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=0.4s
+STRAPFIT BoundCycle {"strap_fit": {"spoon_lift_cm": 0.3, "spoon_slide_deg": 0.0, "spoon_pitch_deg": 0.0}, "before": [[1, ["spoon-torso"]], [2, ["spoon-torso"]], [3, ["spoon-torso"]]], "unresolved": []}
+CLIP BoundCycle        n= 12 loop=True seam={'pose_max': 0.0, 'seam_second_diff': 1.291883, 'interior_max_second_diff': 8.45} bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.097, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=1.0s
+CLIP BoundStop         n=  5 loop=False seam=None bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.097, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=0.3s
+CLIP TurnLeft90        n=  9 loop=False seam=None bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.063, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=0.5s
+STRAPFIT TurnRight90 {"strap_fit": {"spoon_lift_cm": 0.3, "spoon_slide_deg": 0.0, "spoon_pitch_deg": 3.0}, "before": [[2, ["spoon-torso"]], [3, ["spoon-torso", "head-spoon"]], [4, ["spoon-torso", "head-spoon"]]], "unresolved": []}
+CLIP TurnRight90       n=  9 loop=False seam=None bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.072, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=3.0s
+CLIP Turn180           n= 14 loop=False seam=None bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.072, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=0.8s
+CLIP Startle           n=  9 loop=False seam=None bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.114, "below_floor": 0, "head_spoon_tris": 0} drift=0.054 t=0.5s
+CLIP Backstep          n= 11 loop=False seam=None bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.05, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=0.6s
+CLIP GuardedWatch      n= 45 loop=True seam={'pose_max': 0.0, 'seam_second_diff': 0.001726, 'interior_max_second_diff': 0.002983} bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.063, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=1.4s
+CLIP DenEmerge         n= 30 loop=False seam=None bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.109, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=1.5s
+CLIP DenEnter          n= 30 loop=False seam=None bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.11, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=2.0s
+CLIP InspectSlot       n= 12 loop=False seam=None bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.05, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=0.7s
+CLIP Rummage           n= 48 loop=True seam={'pose_max': 0.0, 'seam_second_diff': 0.047222, 'interior_max_second_diff': 0.047222} bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.109, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=1.6s
+CLIP Snatch            n=  8 loop=False seam=None bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.11, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=0.5s
+CLIP LoadedIdle        n= 36 loop=True seam={'pose_max': 0.0, 'seam_second_diff': 0.004948, 'interior_max_second_diff': 0.009896} bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.05, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=1.2s
+STRAPFIT LoadedBound {"strap_fit": {"spoon_lift_cm": 0.3, "spoon_slide_deg": 0.0, "spoon_pitch_deg": 0.0}, "before": [[2, ["spoon-torso"]], [3, ["spoon-torso"]]], "unresolved": []}
+CLIP LoadedBound       n= 14 loop=True seam={'pose_max': 0.0, 'seam_second_diff': 0.934873, 'interior_max_second_diff': 6.399999} bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.097, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=1.3s
+CLIP LoadedTurnLeft    n= 11 loop=False seam=None bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.063, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=0.6s
+STRAPFIT LoadedTurnRight {"strap_fit": {"spoon_lift_cm": 0.6, "spoon_slide_deg": 0.0, "spoon_pitch_deg": 0.0}, "before": [[2, ["spoon-torso"]], [3, ["spoon-torso"]], [4, ["spoon-torso"]], [5, ["spoon-torso"]]], "unresolved": []}
+CLIP LoadedTurnRight   n= 11 loop=False seam=None bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.067, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=2.6s
+CLIP LoadedLookBack    n= 15 loop=False seam=None bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.066, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=0.9s
+CLIP LoadedCornered    n= 24 loop=True seam={'pose_max': 0.0, 'seam_second_diff': 0.014021, 'interior_max_second_diff': 0.016826} bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.071, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=1.5s
+CLIP HitReact          n=  4 loop=False seam=None bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.094, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=0.3s
+CLIP MouthRelease      n=  6 loop=False seam=None bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.05, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=0.4s
+CLIP DeathToppleLeft   n= 24 loop=False seam=None bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.05, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=1.2s
+STRAPFIT DeathToppleRight {"strap_fit": {"spoon_lift_cm": 1.0, "spoon_slide_deg": 6.0, "spoon_pitch_deg": -3.0}, "before": [[14, ["spoon-lifts-body"]], [15, ["spoon-lifts-body"]], [17, ["spoon-lifts-body"]], [18, ["spoon-lifts-body"]], [19, ["spoon-lifts-body"]], [20, ["spoon-lifts-body"]]], "unresolved": []}
+CLIP DeathToppleRight  n= 24 loop=False seam=None bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.055, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=70.0s
+CLIP DeadHold          n= 30 loop=True seam={'pose_max': 0.0, 'seam_second_diff': 0.0, 'interior_max_second_diff': 0.0} bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.05, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=1.5s
+CLIP EarFlick          n= 12 loop=False seam=None bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.05, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=0.9s
+CLIP TailSettle        n= 24 loop=False seam=None bad=0 worst={"spoon_torso_tris": 0, "harness_clear": -0.05, "below_floor": 0, "head_spoon_tris": 0} drift=0.000 t=1.4s
+Info: Saved as "PantryRat_R02.blend"
+SAVED D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\source\PantryRat_R02.blend
+PANTRY_RAT_OK
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+
+Blender quit
+00:02.656  blend            | Read blend: "D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\source\PantryRat_R02.blend"
+DITHER_UV {"faces_reprojected": 2970, "eyepatch_faces_kept": 20, "eyepatch_uv_unchanged": true, "cm_per_uv": 24.0, "ign_cells_per_cm": 21.333, "uv_range_after": [[-1.639, -0.005], [2.001, 2.442]], "uv_range_before": [[0.0, 0.0], [1.0, 1.0]]}
+Info: Saved as "PantryRat_R02.blend"
+PANTRY_RAT_OK
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+
+Blender quit
+00:02.734  blend            | Read blend: "D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\source\PantryRat_R02.blend"
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+RIG_JSON True 26
+PANTRY_RAT_OK
+00:04.062  blend            | Read blend: "D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\source\PantryRat_R02.blend"
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\validation\\Cube10_Mars_SM.fbx'
+export finished in 0.0059 sec.
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\PantryRat_R02_Mars_SK.fbx'
+export finished in 0.0341 sec.
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_IdleBreath_Mars_ANIM.fbx'
+export finished in 0.1125 sec.
+EXPORTED clip IdleBreath        D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_IdleBreath_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_SniffGround_Mars_ANIM.fbx'
+export finished in 0.0944 sec.
+EXPORTED clip SniffGround       D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_SniffGround_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_SniffAir_Mars_ANIM.fbx'
+export finished in 0.0771 sec.
+EXPORTED clip SniffAir          D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_SniffAir_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_StretchAttend_Mars_ANIM.fbx'
+export finished in 0.0840 sec.
+EXPORTED clip StretchAttend     D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_StretchAttend_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_RearUp_Mars_ANIM.fbx'
+export finished in 0.0611 sec.
+EXPORTED clip RearUp            D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_RearUp_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_RearObserve_Mars_ANIM.fbx'
+export finished in 0.0866 sec.
+EXPORTED clip RearObserve       D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_RearObserve_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_RearDown_Mars_ANIM.fbx'
+export finished in 0.0632 sec.
+EXPORTED clip RearDown          D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_RearDown_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_BoundStart_Mars_ANIM.fbx'
+export finished in 0.0547 sec.
+EXPORTED clip BoundStart        D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_BoundStart_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_BoundCycle_Mars_ANIM.fbx'
+export finished in 0.0735 sec.
+EXPORTED clip BoundCycle        D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_BoundCycle_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_BoundStop_Mars_ANIM.fbx'
+export finished in 0.1103 sec.
+EXPORTED clip BoundStop         D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_BoundStop_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_TurnLeft90_Mars_ANIM.fbx'
+export finished in 0.0675 sec.
+EXPORTED clip TurnLeft90        D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_TurnLeft90_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_TurnRight90_Mars_ANIM.fbx'
+export finished in 0.1324 sec.
+EXPORTED clip TurnRight90       D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_TurnRight90_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_Turn180_Mars_ANIM.fbx'
+export finished in 0.0619 sec.
+EXPORTED clip Turn180           D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_Turn180_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_Startle_Mars_ANIM.fbx'
+export finished in 0.0634 sec.
+EXPORTED clip Startle           D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_Startle_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_Backstep_Mars_ANIM.fbx'
+export finished in 0.0550 sec.
+EXPORTED clip Backstep          D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_Backstep_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_GuardedWatch_Mars_ANIM.fbx'
+export finished in 0.1000 sec.
+EXPORTED clip GuardedWatch      D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_GuardedWatch_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_DenEmerge_Mars_ANIM.fbx'
+export finished in 0.0796 sec.
+EXPORTED clip DenEmerge         D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_DenEmerge_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_DenEnter_Mars_ANIM.fbx'
+export finished in 0.0756 sec.
+EXPORTED clip DenEnter          D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_DenEnter_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_InspectSlot_Mars_ANIM.fbx'
+export finished in 0.0558 sec.
+EXPORTED clip InspectSlot       D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_InspectSlot_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_Rummage_Mars_ANIM.fbx'
+export finished in 0.1071 sec.
+EXPORTED clip Rummage           D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_Rummage_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_Snatch_Mars_ANIM.fbx'
+export finished in 0.0636 sec.
+EXPORTED clip Snatch            D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_Snatch_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_LoadedIdle_Mars_ANIM.fbx'
+export finished in 0.0881 sec.
+EXPORTED clip LoadedIdle        D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_LoadedIdle_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_LoadedBound_Mars_ANIM.fbx'
+export finished in 0.0688 sec.
+EXPORTED clip LoadedBound       D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_LoadedBound_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_LoadedTurnLeft_Mars_ANIM.fbx'
+export finished in 0.0729 sec.
+EXPORTED clip LoadedTurnLeft    D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_LoadedTurnLeft_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_LoadedTurnRight_Mars_ANIM.fbx'
+export finished in 0.0693 sec.
+EXPORTED clip LoadedTurnRight   D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_LoadedTurnRight_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_LoadedLookBack_Mars_ANIM.fbx'
+export finished in 0.0737 sec.
+EXPORTED clip LoadedLookBack    D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_LoadedLookBack_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_LoadedCornered_Mars_ANIM.fbx'
+export finished in 0.0906 sec.
+EXPORTED clip LoadedCornered    D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_LoadedCornered_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_HitReact_Mars_ANIM.fbx'
+export finished in 0.0579 sec.
+EXPORTED clip HitReact          D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_HitReact_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_MouthRelease_Mars_ANIM.fbx'
+export finished in 0.0613 sec.
+EXPORTED clip MouthRelease      D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_MouthRelease_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_DeathToppleLeft_Mars_ANIM.fbx'
+export finished in 0.0944 sec.
+EXPORTED clip DeathToppleLeft   D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_DeathToppleLeft_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_DeathToppleRight_Mars_ANIM.fbx'
+export finished in 0.1022 sec.
+EXPORTED clip DeathToppleRight  D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_DeathToppleRight_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_DeadHold_Mars_ANIM.fbx'
+export finished in 0.1013 sec.
+EXPORTED clip DeadHold          D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_DeadHold_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_EarFlick_Mars_ANIM.fbx'
+export finished in 0.0665 sec.
+EXPORTED clip EarFlick          D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_EarFlick_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\anims\\PantryRat_R02_TailSettle_Mars_ANIM.fbx'
+export finished in 0.1169 sec.
+EXPORTED clip TailSettle        D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\export\anims\PantryRat_R02_TailSettle_Mars_ANIM.fbx
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\PantryRat_R02_Den_Mars_SM.fbx'
+export finished in 0.0061 sec.
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\PantryRat_R02_DenEyePlate_Mars_SM.fbx'
+export finished in 0.0036 sec.
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\export\\PantryRat_R02_Cheese_Mars_SM.fbx'
+export finished in 0.0046 sec.
+BIND {"tris": 3092, "verts": 1658, "slots": ["Body", "Pink", "Belly", "Wood", "Harness", "EyePatch"], "bounds_ue_cm": {"min": [-45.156, -19.367, 0.0], "max": [30.7, 20.68, 44.45]}}
+SOCKETS {"Carry_Mouth": {"bone": "jaw", "component_cm": [26.6, 0.0, 13.2], "component_axis_x": [-0.615662, 0.0, -0.788011], "component_axis_z": [0.788011, -0.0, -0.615662], "blender_world_rest_cm": [26.6, -0.0, 13.2], "blender_jaw_local_cm": [0.0, 13.1374, 0.6779], "blender_jaw_local_quat_wxyz": [0.354557, -0.611792, 0.611792, 0.354557], "ue_relative_location_cm_predicted": [0.0, -13.1374, 0.6779], "ue_relative_axis_x_predicted": [0.0, 0.497159, -0.86766], "ue_relative_axis_z_predicted": [-0.0, -0.86766, -0.497159], "frame_rule": "UE = (x, -y, z); a frame's UE X axis = S*x_b, Z axis = S*z_b (Y = Z x X in UE's left-handed sense); bone-relative values assume the UE jaw rest rotation = S*R_b*S (proved on the Unreal readback: predicted vs read relative)"}, "Carry_Drag": {"bone": "jaw", "component_cm": [26.9455, -0.0, -13.3872], "component_axis_x": [0.866026, 0.0, -0.5], "component_axis_z": [0.5, 0.0, 0.866025], "blender_world_rest_cm": [26.9455, 0.0, -13.3872], "blender_jaw_local_cm": [-0.0, 17.2659, -25.5891], "blender_jaw_local_quat_wxyz": [0.694335, -0.133785, 0.133785, 0.694335], "ue_relative_location_cm_predicted": [-0.0, -17.2659, -25.5891], "ue_relative_axis_x_predicted": [0.0, -0.928407, -0.371565], "ue_relative_axis_z_predicted": [0.0, -0.371565, 0.928407], "frame_rule": "UE = (x, -y, z); a frame's UE X axis = S*x_b, Z axis = S*z_b (Y = Z x X in UE's left-handed sense); bone-relative values assume the UE jaw rest rotation = S*R_b*S (proved on the Unreal readback: predicted vs read relative)"}}
+DEN {"object": "PantryRat_R02_Den_Mars_SM", "tris": 330, "verts": 197, "slots": ["Stone", "Void"], "bounds_ue_cm": {"min": [-47.0, -56.0, -1.0], "max": [9.5, 56.0, 81.013]}, "uv_layers": ["UV0"]} PLATE {"object": "PantryRat_R02_DenEyePlate_Mars_SM", "tris": 2, "verts": 4, "slots": ["EyePatch"], "bounds_ue_cm": {"min": [-43.0, -10.0, 18.0], "max": [-43.0, 10.0, 26.0]}, "uv_layers": ["UV0"], "quad_normal_ue": [1.0, 0.0, 0.0], "source_front_uv_range": [[0.0, 1.0], [0.0, 1.0]], "uv_rule": "U = 0 at den +Y Blender (= UE -Y, the resident's LEFT when it faces out of the den), U = 1 at den -Y; V = 0 at the bottom"} CHEESE {"object": "PantryRat_R02_Cheese_Mars_SM", "tris": 56, "verts": 30, "slots": ["Rind", "Flesh"], "bounds_ue_cm": {"min": [-7.5, -5.0, 0.0], "max": [7.5, 5.0, 8.0]}, "uv_layers": ["UV0"], "faces_per_slot": {"Rind": 20, "Flesh": 14}}
+JAW_LOADED_MAX_DEG {"Snatch": 1.765, "LoadedIdle": 0.0, "LoadedBound": 0.0, "LoadedTurnLeft": 0.0, "LoadedTurnRight": 0.0, "LoadedLookBack": 0.0, "LoadedCornered": 0.0, "MouthRelease": 16.31}
+FBX {"magic": "Kaydara FBX Binary", "file_version": 7400, "Creator": "Blender (stable FBX IO) - 5.2.2 LTS - 5.15.0"} addon 5.15.0
+PANTRY_RAT_OK
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+
+Blender quit
+FBX version: 7400
+FBX version: 7400
+FBX version: 7400
+ROUNDTRIP IdleBreath        {"file": "PantryRat_R02_IdleBreath_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 60, 61], "landmark_err_cm_at": {"0": 6e-05, "30": 7e-05, "60": 6e-05}, "landmark_max_err_cm": 7e-05, "root_max_dev": 0.0, "loop_seam_cm": 0.0}
+FBX version: 7400
+ROUNDTRIP SniffGround       {"file": "PantryRat_R02_SniffGround_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 36, 37], "landmark_err_cm_at": {"0": 6e-05, "18": 6e-05, "36": 6e-05}, "landmark_max_err_cm": 6e-05, "root_max_dev": 0.0, "loop_seam_cm": 0.0}
+FBX version: 7400
+ROUNDTRIP SniffAir          {"file": "PantryRat_R02_SniffAir_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 30, 31], "landmark_err_cm_at": {"0": 7e-05, "15": 7e-05, "30": 7e-05}, "landmark_max_err_cm": 7e-05, "root_max_dev": 0.0, "loop_seam_cm": 0.0}
+FBX version: 7400
+ROUNDTRIP StretchAttend     {"file": "PantryRat_R02_StretchAttend_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 30, 31], "landmark_err_cm_at": {"0": 6e-05, "15": 0.00013, "30": 6e-05}, "landmark_max_err_cm": 0.00013, "root_max_dev": 0.0}
+FBX version: 7400
+ROUNDTRIP RearUp            {"file": "PantryRat_R02_RearUp_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 8, 9], "landmark_err_cm_at": {"0": 6e-05, "4": 0.00018, "8": 0.00015}, "landmark_max_err_cm": 0.00018, "root_max_dev": 0.0}
+FBX version: 7400
+ROUNDTRIP RearObserve       {"file": "PantryRat_R02_RearObserve_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 36, 37], "landmark_err_cm_at": {"0": 0.00015, "18": 0.00015, "36": 0.00015}, "landmark_max_err_cm": 0.00015, "root_max_dev": 0.0, "loop_seam_cm": 0.0}
+FBX version: 7400
+ROUNDTRIP RearDown          {"file": "PantryRat_R02_RearDown_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 8, 9], "landmark_err_cm_at": {"0": 0.00015, "4": 0.00018, "8": 6e-05}, "landmark_max_err_cm": 0.00018, "root_max_dev": 0.0}
+FBX version: 7400
+ROUNDTRIP BoundStart        {"file": "PantryRat_R02_BoundStart_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 5, 6], "landmark_err_cm_at": {"0": 6e-05, "2": 6e-05, "5": 6e-05}, "landmark_max_err_cm": 6e-05, "root_max_dev": 0.0}
+FBX version: 7400
+ROUNDTRIP BoundCycle        {"file": "PantryRat_R02_BoundCycle_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 12, 13], "landmark_err_cm_at": {"0": 6e-05, "6": 9e-05, "12": 6e-05}, "landmark_max_err_cm": 9e-05, "root_max_dev": 0.0, "loop_seam_cm": 0.0}
+FBX version: 7400
+ROUNDTRIP BoundStop         {"file": "PantryRat_R02_BoundStop_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 5, 6], "landmark_err_cm_at": {"0": 6e-05, "2": 7e-05, "5": 6e-05}, "landmark_max_err_cm": 7e-05, "root_max_dev": 0.0}
+FBX version: 7400
+ROUNDTRIP TurnLeft90        {"file": "PantryRat_R02_TurnLeft90_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 9, 10], "landmark_err_cm_at": {"0": 6e-05, "4": 9e-05, "9": 6e-05}, "landmark_max_err_cm": 9e-05, "root_max_dev": 0.0}
+FBX version: 7400
+ROUNDTRIP TurnRight90       {"file": "PantryRat_R02_TurnRight90_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 9, 10], "landmark_err_cm_at": {"0": 6e-05, "4": 8e-05, "9": 6e-05}, "landmark_max_err_cm": 8e-05, "root_max_dev": 0.0}
+FBX version: 7400
+ROUNDTRIP Turn180           {"file": "PantryRat_R02_Turn180_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 14, 15], "landmark_err_cm_at": {"0": 6e-05, "7": 7e-05, "14": 6e-05}, "landmark_max_err_cm": 7e-05, "root_max_dev": 0.0}
+FBX version: 7400
+ROUNDTRIP Startle           {"file": "PantryRat_R02_Startle_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 9, 10], "landmark_err_cm_at": {"0": 6e-05, "4": 0.00011, "9": 7e-05}, "landmark_max_err_cm": 0.00011, "root_max_dev": 0.0}
+FBX version: 7400
+ROUNDTRIP Backstep          {"file": "PantryRat_R02_Backstep_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 11, 12], "landmark_err_cm_at": {"0": 6e-05, "5": 6e-05, "11": 6e-05}, "landmark_max_err_cm": 6e-05, "root_max_dev": 0.0}
+FBX version: 7400
+ROUNDTRIP GuardedWatch      {"file": "PantryRat_R02_GuardedWatch_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 45, 46], "landmark_err_cm_at": {"0": 6e-05, "22": 6e-05, "45": 6e-05}, "landmark_max_err_cm": 6e-05, "root_max_dev": 0.0, "loop_seam_cm": 0.0}
+FBX version: 7400
+ROUNDTRIP DenEmerge         {"file": "PantryRat_R02_DenEmerge_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 30, 31], "landmark_err_cm_at": {"0": 7e-05, "15": 7e-05, "30": 8e-05}, "landmark_max_err_cm": 8e-05, "root_max_dev": 0.0}
+FBX version: 7400
+ROUNDTRIP DenEnter          {"file": "PantryRat_R02_DenEnter_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 30, 31], "landmark_err_cm_at": {"0": 6e-05, "15": 7e-05, "30": 7e-05}, "landmark_max_err_cm": 7e-05, "root_max_dev": 0.0}
+FBX version: 7400
+ROUNDTRIP InspectSlot       {"file": "PantryRat_R02_InspectSlot_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 12, 13], "landmark_err_cm_at": {"0": 6e-05, "6": 5e-05, "12": 6e-05}, "landmark_max_err_cm": 6e-05, "root_max_dev": 0.0}
+FBX version: 7400
+ROUNDTRIP Rummage           {"file": "PantryRat_R02_Rummage_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 48, 49], "landmark_err_cm_at": {"0": 0.00019, "24": 0.00019, "48": 0.00019}, "landmark_max_err_cm": 0.00019, "root_max_dev": 0.0, "loop_seam_cm": 0.0}
+FBX version: 7400
+ROUNDTRIP Snatch            {"file": "PantryRat_R02_Snatch_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 8, 9], "landmark_err_cm_at": {"0": 0.00019, "4": 0.0001, "8": 6e-05}, "landmark_max_err_cm": 0.00019, "root_max_dev": 0.0}
+FBX version: 7400
+ROUNDTRIP LoadedIdle        {"file": "PantryRat_R02_LoadedIdle_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 36, 37], "landmark_err_cm_at": {"0": 6e-05, "18": 7e-05, "36": 6e-05}, "landmark_max_err_cm": 7e-05, "root_max_dev": 0.0, "loop_seam_cm": 0.0}
+FBX version: 7400
+ROUNDTRIP LoadedBound       {"file": "PantryRat_R02_LoadedBound_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 14, 15], "landmark_err_cm_at": {"0": 6e-05, "7": 9e-05, "14": 6e-05}, "landmark_max_err_cm": 9e-05, "root_max_dev": 0.0, "loop_seam_cm": 0.0}
+FBX version: 7400
+ROUNDTRIP LoadedTurnLeft    {"file": "PantryRat_R02_LoadedTurnLeft_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 11, 12], "landmark_err_cm_at": {"0": 6e-05, "5": 9e-05, "11": 6e-05}, "landmark_max_err_cm": 9e-05, "root_max_dev": 0.0}
+FBX version: 7400
+ROUNDTRIP LoadedTurnRight   {"file": "PantryRat_R02_LoadedTurnRight_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 11, 12], "landmark_err_cm_at": {"0": 6e-05, "5": 0.0001, "11": 6e-05}, "landmark_max_err_cm": 0.0001, "root_max_dev": 0.0}
+FBX version: 7400
+ROUNDTRIP LoadedLookBack    {"file": "PantryRat_R02_LoadedLookBack_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 15, 16], "landmark_err_cm_at": {"0": 6e-05, "7": 6e-05, "15": 6e-05}, "landmark_max_err_cm": 6e-05, "root_max_dev": 0.0}
+FBX version: 7400
+ROUNDTRIP LoadedCornered    {"file": "PantryRat_R02_LoadedCornered_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 24, 25], "landmark_err_cm_at": {"0": 6e-05, "12": 6e-05, "24": 6e-05}, "landmark_max_err_cm": 6e-05, "root_max_dev": 0.0, "loop_seam_cm": 0.0}
+FBX version: 7400
+ROUNDTRIP HitReact          {"file": "PantryRat_R02_HitReact_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 4, 5], "landmark_err_cm_at": {"0": 6e-05, "2": 7e-05, "4": 7e-05}, "landmark_max_err_cm": 7e-05, "root_max_dev": 0.0}
+FBX version: 7400
+ROUNDTRIP MouthRelease      {"file": "PantryRat_R02_MouthRelease_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 6, 7], "landmark_err_cm_at": {"0": 6e-05, "3": 6e-05, "6": 7e-05}, "landmark_max_err_cm": 7e-05, "root_max_dev": 0.0}
+FBX version: 7400
+ROUNDTRIP DeathToppleLeft   {"file": "PantryRat_R02_DeathToppleLeft_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 24, 25], "landmark_err_cm_at": {"0": 6e-05, "12": 0.00011, "24": 0.00016}, "landmark_max_err_cm": 0.00016, "root_max_dev": 0.0}
+FBX version: 7400
+ROUNDTRIP DeathToppleRight  {"file": "PantryRat_R02_DeathToppleRight_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 24, 25], "landmark_err_cm_at": {"0": 6e-05, "12": 0.0001, "24": 0.00012}, "landmark_max_err_cm": 0.00012, "root_max_dev": 0.0}
+FBX version: 7400
+ROUNDTRIP DeadHold          {"file": "PantryRat_R02_DeadHold_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 30, 31], "landmark_err_cm_at": {"0": 0.0001, "15": 0.0001, "30": 0.0001}, "landmark_max_err_cm": 0.0001, "root_max_dev": 0.0, "loop_seam_cm": 0.0}
+FBX version: 7400
+ROUNDTRIP EarFlick          {"file": "PantryRat_R02_EarFlick_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 12, 13], "landmark_err_cm_at": {"0": 6e-05, "6": 6e-05, "12": 6e-05}, "landmark_max_err_cm": 6e-05, "root_max_dev": 0.0}
+FBX version: 7400
+ROUNDTRIP TailSettle        {"file": "PantryRat_R02_TailSettle_Mars_ANIM.fbx", "bones": 26, "bone_mismatch": [], "keyed": [0, 24, 25], "landmark_err_cm_at": {"0": 6e-05, "12": 6e-05, "24": 6e-05}, "landmark_max_err_cm": 6e-05, "root_max_dev": 0.0}
+FBX version: 7400
+FBX version: 7400
+FBX version: 7400
+ROUNDTRIP bind {"objects": [["Armature", "ARMATURE"], ["PantryRat_R02_Body", "MESH"]], "armature_scale": [1.0, 1.0, 1.0], "bone_count": 26, "bone_mismatch": [], "max_bind_head_err_cm": 6e-05, "tris": 3092, "slots": ["Body", "Pink", "Belly", "Wood", "Harness", "EyePatch"], "bounds": {"min": [-45.156, -19.367, -0.0], "max": [30.7, 20.68, 44.45]}, "bounds_err_cm": 0.00048, "max_influences": 3, "bad_weights": 0, "min_loop_vs_face_normal_dot": 1.0, "sockets": {"Carry_Mouth": {"rebuilt_ue_cm": [26.6, -0.0, 13.2], "err_cm": 4e-05}, "Carry_Drag": {"rebuilt_ue_cm": [26.9455, 0.0, -13.3872], "err_cm": 6e-05}}, "imported_jaw_axis_y_ue": [0.98981, 0.0, -0.14242]}
+ROUNDTRIP statics {"den": {"objects": ["PantryRat_R02_Den_Mars_SM"], "tris": 330, "slots": ["Stone", "Void"], "bounds_err_cm": 0.00014, "scale": [1.0, 1.0, 1.0]}, "den_eye_plate": {"objects": ["PantryRat_R02_DenEyePlate_Mars_SM"], "tris": 2, "slots": ["EyePatch"], "bounds_err_cm": 0.0, "scale": [1.0, 1.0, 1.0], "uv_min": [0.0, 0.0], "uv_max": [1.0, 1.0], "normal_ue": [1.0, -0.0, 0.0], "u_by_ue_y": {"-10.0": 0.0, "10.0": 1.0}}, "cheese": {"objects": ["PantryRat_R02_Cheese_Mars_SM"], "tris": 56, "slots": ["Rind", "Flesh"], "bounds_err_cm": 0.0, "scale": [1.0, 1.0, 1.0]}}
+PANTRY_RAT_OK
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+
+Blender quit
+00:02.688  blend            | Read blend: "D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\source\PantryRat_R02.blend"
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+REOPEN {"bones": 26, "slots": ["Body", "Pink", "Belly", "Wood", "Harness", "EyePatch"], "tris": 3092, "verts": 1658, "max_influences": 3, "pose_actions": 15, "clip_actions": 34, "smooth_faces": 0, "file": "D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_monsters\\pantry_rat_r02\\source\\PantryRat_R02.blend"}
+PANTRY_RAT_OK
+00:02.906  blend            | Read blend: "D:\Repositories\CkRepos\Orion\Tools\Blender\mars_monsters\pantry_rat_r02\source\PantryRat_R02.blend"
+FBX version: 7400
+DEN {"max_abs_profile_dev": 6.383, "clips": {"DenEmerge": {"min_clear_to_den_mesh_cm": 9.32, "frame": 0, "point_yz": [-20.68, 11.94]}, "DenEnter": {"min_clear_to_den_mesh_cm": 9.32, "frame": 9, "point_yz": [-20.68, 12.11]}}}
+PANTRY_RAT_OK
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+
+Blender quit
