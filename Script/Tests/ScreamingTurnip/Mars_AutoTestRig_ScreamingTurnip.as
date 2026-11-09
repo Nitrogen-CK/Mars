@@ -22,6 +22,11 @@ struct FMars_AutoTestHelper_TurnipPlacement
 // the "within one tick" tolerance for the interval assertions. A carrier (body with Back, a two-slot hotbar, HeldItem) is
 // built only by the tests that hold a root (Build_Carrier); it picks a root up as the pickup task does (a holder transfer
 // into its hotbar's stow target).
+//
+// The bed's walk pull is driven as the player's ManipulateControl does it, without gloves: Start_Pull starts the interaction
+// from the bare carrier, the new interaction begins the bed Control's manipulation with a puller transform entity the rig
+// owns (k_PullerStartCm out on the bed's -X, the Use side), Walk_Puller moves that puller straight away from the bed, and the
+// interaction's finish ends the manipulation.
 UCLASS(Abstract)
 class UMars_AutoTestRig_ScreamingTurnip : UMars_AutoTestRig_Carrier
 {
@@ -52,6 +57,19 @@ class UMars_AutoTestRig_ScreamingTurnip : UMars_AutoTestRig_Carrier
     protected int32 _RefusedCount = 0;
     protected TArray<ECk_SucceededFailed> _PullResults;
     protected int32 _PullsStarted = 0;
+    // The Pull the rig spawns its bed with: explicit, so no test moves with the bed's defaults (a design knob). The tests'
+    // own Grip span (0.2 s) and a travel that is not the default's; a test may change it before Spawn_Bed.
+    protected FMars_ScreamingTurnipBed_PullSpec _BedPull = FMars_ScreamingTurnipBed_PullSpec(
+        FMars_ScreamingTurnipBed_StretchSpec(120.0f, 15.0f),
+        FMars_ScreamingTurnipBed_SpringSpec(400.0f, 40.0f, 0.97f),
+        FMars_ScreamingTurnipBed_TimingSpec(0.2f, 0.7f, 540.0f));
+    // The bed's walk-pull Control and the rig's puller (Spawn_Bed).
+    protected FCk_Handle_Control _BedControl;
+    protected FCk_Handle_Transform _Puller;
+    // Where the puller grips from: this far from the bed's centre on its -X.
+    protected const float64 k_PullerStartCm = 60.0;
+    // Game time a wait started at (Mark_Time).
+    private float64 _MarkedAt = 0.0;
 
     // Anticipate 0.1, Inhale 0.2, Scream 0.1, Recover 0.1, Cooldown 0.6: period 0.9 s.
     protected FMars_ScreamingTurnip_Vocal Make_ShortVocal() const
@@ -173,9 +191,12 @@ class UMars_AutoTestRig_ScreamingTurnip : UMars_AutoTestRig_Carrier
     {
         auto Params = UMars_ScreamingTurnipBed_EntityScript::Params();
         Params.SpawnTransform = FTransform(FRotator::ZeroRotator, _Origin);
-        // The tests' own stages (0.7 s in all): the bed's defaults are a design knob the tests must not move with.
-        Params.GripSeconds = 0.2f;
-        Params.TugSeconds = 0.5f;
+        Params.Pull = _BedPull;
+
+        auto PullerEntity = utils_entity_lifetime::Request_CreateEntity(InHandle);
+        _Puller = utils_transform::Add(PullerEntity, FTransform(FRotator::ZeroRotator, Get_PullerLocation(0.0)),
+            ECk_Replication::DoesNotReplicate);
+        utils_handle::Set_DebugName(_Puller.H(), n"ScreamingTurnipRig.Puller");
 
         auto Owner = InHandle;
         auto Pending = utils_entity_script::Request_SpawnEntity(Owner, UMars_ScreamingTurnipBed_EntityScript, Params);
@@ -192,6 +213,40 @@ class UMars_AutoTestRig_ScreamingTurnip : UMars_AutoTestRig_Carrier
     protected void Cancel_Pull()
     {
         _BedTarget.Request_CancelInteraction(FCk_Request_InteractTarget_CancelInteraction(_Carrier));
+    }
+
+    // The puller InGainedCm farther from the bed than where it gripped, straight back along the bed's -X.
+    protected void Walk_Puller(float64 InGainedCm)
+    {
+        utils_transform::Request_SetLocation(_Puller, FCk_Request_Transform_SetLocation(Get_PullerLocation(InGainedCm)));
+    }
+
+    // The ground that reads as InAlpha of the stretch (the bed's WalkCm is its Pull.Stretch.TravelCm).
+    protected float64 Get_WalkCmFor(float32 InAlpha) const
+    {
+        return InAlpha * _BedPull.Stretch.TravelCm;
+    }
+
+    // The bed Control's alpha; 0 when it is not manipulated.
+    protected float32 Get_PullAlpha() const
+    {
+        const auto Alpha = _BedControl.TryGet_ManipulationAlpha();
+        return Alpha.IsSet() ? Alpha.GetValue() : 0.0f;
+    }
+
+    protected void Mark_Time()
+    {
+        _MarkedAt = System::GetGameTimeInSeconds();
+    }
+
+    protected float64 Get_SecondsSinceMark() const
+    {
+        return System::GetGameTimeInSeconds() - _MarkedAt;
+    }
+
+    private FVector Get_PullerLocation(float64 InGainedCm) const
+    {
+        return _Origin + FVector(-(k_PullerStartCm + InGainedCm), 0.0, 0.0);
     }
 
     // World items within a metre of the bed (the bed spawns its yield under the transient entity).
@@ -216,7 +271,28 @@ class UMars_AutoTestRig_ScreamingTurnip : UMars_AutoTestRig_Carrier
     protected void Check_BedReady(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(ck::IsValid(_BedTarget) && ck::IsValid(_BedForage));
+        Res.Set(ck::IsValid(_BedTarget) && ck::IsValid(_BedForage) && ck::IsValid(_BedControl));
+    }
+
+    // The pull's manipulation began (the rig's puller holds the stalks).
+    UFUNCTION()
+    protected void Check_PullGripped(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(_BedControl.Get_IsManipulating());
+    }
+
+    UFUNCTION()
+    protected void Step_Pull(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        Start_Pull();
+    }
+
+    UFUNCTION()
+    protected void Check_PullFinished(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(_PullResults.Num() >= 1);
     }
 
     UFUNCTION()
@@ -240,6 +316,13 @@ class UMars_AutoTestRig_ScreamingTurnip : UMars_AutoTestRig_Carrier
         if (ck::Is_NOT_Valid(_BedInteractable))
         {
             FinishFailure("the bed composed no interactable");
+            return;
+        }
+
+        _BedControl = _Bed.As_Control(ECk_SanityCheck::UnChecked);
+        if (ck::Is_NOT_Valid(_BedControl))
+        {
+            FinishFailure("the bed composed no Control");
             return;
         }
 
@@ -271,16 +354,22 @@ class UMars_AutoTestRig_ScreamingTurnip : UMars_AutoTestRig_Carrier
         ++_RefusedCount;
     }
 
+    // The player's ManipulateControl without gloves: the new interaction begins the walk pull at once, the rig's puller
+    // walking.
     UFUNCTION()
     private void OnBedPullStarted(FCk_Handle_InteractTarget InTarget, FCk_Handle_Interaction InInteraction)
     {
         ++_PullsStarted;
+        _BedControl.Request_BeginManipulation(FMars_Request_Control_BeginManipulation(InInteraction,
+            EMars_Control_ManipulationCompletion::AtEngageAlpha, _Puller));
     }
 
+    // As ManipulateControl's OnInteractionFinished: the finish ends the manipulation (a no-op after the threshold).
     UFUNCTION()
     private void OnBedPullFinished(FCk_Handle_InteractTarget InTarget, FCk_Handle_Interaction InInteraction, ECk_SucceededFailed InResult)
     {
         _PullResults.Add(InResult);
+        _BedControl.Request_EndManipulation(FMars_Request_Control_EndManipulation());
     }
 
     //----------------------------------------------------------------------------------------------------------------------

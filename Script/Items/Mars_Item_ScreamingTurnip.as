@@ -34,16 +34,17 @@ namespace constants_screaming_turnip_assets
         return AssetRegistry::GetAssetByObjectPath(InPath).GetSoftObjectPath().IsValid();
     }
 
-    // The pull's clips, authored at 0.2 s (SRC_Grip: the stalks compress at the HarvestGrip points) and 0.5 s (SRC_Tug: the
-    // stalks stretch up to the full strain), stretched by the bed to span its Grip and Tug seconds; SRC_Cancel (0.23 s)
-    // eases the full strain back to the planted rest (manifest clips).
+    // The pull's clips: SRC_Grip (0.2 s: the stalks compress at the HarvestGrip points), stretched by the bed to span its
+    // Pull.Timing.GripSeconds; SRC_Tug (0.5 s: the strain's pose - crown pitch, trailing leaves, bulb tilt - while the
+    // distance is the runtime crown offset of the bed's Pull.Stretch), never played but scrubbed by the bed to the walk
+    // pull's alpha; SRC_Cancel (0.23 s) eases the full strain back to the planted rest (manifest clips).
     const FString k_Clip_Grip = "SRC_Grip";
     const FString k_Clip_Tug = "SRC_Tug";
     const FString k_Clip_Cancel = "SRC_Cancel";
     const FString k_Clip_PlantedIdle = "SRC_Idle";
 
-    // The skeletal mesh's leaf-stalk sockets on the crown bone (manifest sockets.HarvestGrip_R / _L): the bed's pull grip
-    // nodes ride them through the pull's clips.
+    // The skeletal mesh's leaf-stalk sockets on the crown bone (manifest sockets.HarvestGrip_R / _L): the bed's grip table
+    // names them, and the gloves read them live through the pull's clips.
     const FName k_HarvestGripSocket_R = n"HarvestGrip_R";
     const FName k_HarvestGripSocket_L = n"HarvestGrip_L";
 
@@ -70,6 +71,33 @@ namespace constants_screaming_turnip_assets
         { return nullptr; }
 
         return System::LoadAsset_Blocking(Path);
+    }
+
+    // The stretch travels the mesh holds (manifest gameplay_numbers.stretch_runtime_safe_travel_cm, Phase K Part 1's
+    // injected-stretch audit): under the minimum the leaves lie into the bulb, over the maximum the bulb top necks. The
+    // bed's Pull.Validate rejects a Stretch.TravelCm outside it.
+    const float32 k_StretchTravelSafeMinCm = 20.0f;
+    const float32 k_StretchTravelSafeMaxCm = 230.0f;
+
+    // The anim blueprint the presentation plays through (UMars_ScreamingTurnip_AnimInstance's child: the clip by explicit
+    // time plus the stretch's crown offset). A rebuild goes to a fresh _vN name: point both paths at it. _v2: the first
+    // build (the unsuffixed asset, still on disk, unused) saved with a compile error - its Sequence pin was bound without
+    // being exposed, which the engine's asset check does not see (Phase K Part 3).
+    const FString k_AnimBlueprintName = "ScreamingTurnip_R01_Mars_ABP_v2";
+
+    TSoftClassPtr<UAnimInstance> AnimClass()
+    {
+        return TSoftClassPtr<UAnimInstance>(FSoftObjectPath(
+            f"{k_Root}/Animation/{k_AnimBlueprintName}.{k_AnimBlueprintName}_C"));
+    }
+
+    // Null while the anim blueprint is not saved (asked of the asset registry by the blueprint asset, not its _C class).
+    UClass TryLoad_AnimClass()
+    {
+        if (Get_IsKnownAsset(FSoftObjectPath(f"{k_Root}/Animation/{k_AnimBlueprintName}.{k_AnimBlueprintName}")) == false)
+        { return nullptr; }
+
+        return System::LoadClassAsset_Blocking(AnimClass());
     }
 
     // The planted bed and the harvested one: pivot at the soil-line centre, 72 x 72 cm, Z -10.2 .. +2.06 (manifest
@@ -108,12 +136,6 @@ namespace constants_screaming_turnip_assets
     // mesh (its root at the taproot tip; manifest gameplay_numbers.k_PlantedOffset). The planted stand-in hull takes the
     // same offset.
     const FTransform k_PlantedOffset = FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, -28.8));
-
-    // Where the gloves take the planted root's leaf stalks for the pull, from the skeletal root (the crown sockets
-    // HarvestGrip_R / HarvestGrip_L at their bind pose: 2.4 cm up the stems of leaf_02 / leaf_05, Unreal axes; manifest
-    // sockets.HarvestGrip_R / _L root_relative_ue_cm). The bed places them through k_PlantedOffset.
-    const FVector k_HarvestGripLocation_R = FVector(-1.522, 4.683, 38.035);
-    const FVector k_HarvestGripLocation_L = FVector(-1.522, -4.683, 38.035);
 
     // The held root's place in the hand frame: the hull centre where the 16 cm candidate's was (13.669, 0, -5.25), so the
     // 48 cm root's root goes 25.5 cm under the hands (manifest gameplay_numbers.HeldOffset_location; PIE run-03 kept it).
