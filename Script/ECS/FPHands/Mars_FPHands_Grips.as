@@ -30,6 +30,28 @@ struct FMars_FPHands_MeshGrips
     // follow a moving part - a lever's handle - rather than the object's root.
     UPROPERTY()
     FCk_Handle_Transform Host;
+
+    // Entity-built mechanisms only: the mesh component carrying the sockets and their names, so a reach reads the sockets
+    // live (FMars_FPHands_HandGrip.SocketHost); invalid for an asset's or a plain actor's sockets (baked as Right / Left).
+    UPROPERTY()
+    FCk_Handle_UnrealComponent SocketHost;
+
+    UPROPERTY()
+    FName RightSocket;
+
+    UPROPERTY()
+    FName LeftSocket;
+}
+
+// A mesh component (static or skeletal) that carries a socket, and its Ck unreal-component handle (what a grip stores).
+// Both invalid when none was found. Transient: a fragment keeps the handle, never the component.
+struct FMars_FPHands_SocketComponent
+{
+    UPROPERTY()
+    UMeshComponent Component;
+
+    UPROPERTY()
+    FCk_Handle_UnrealComponent Host;
 }
 
 enum EMars_Hand
@@ -59,19 +81,30 @@ enum EMars_FPHands_GripFrame
     Node
 }
 
-// One glove's grip on a reach target: its own anchor (a part that may move on its own) and the grip in that anchor's space.
+// One glove's grip on a reach target: its own anchor (a part that may move on its own) and the grip in that anchor's space,
+// or - a socket grip - in the space of a socket on a mesh component, read live (a skeletal socket moves with its pose).
+// Both are read when the grip is composed (utils_fphands::Resolve_WorldGrip, at anim time), never from a frame-old copy.
 struct FMars_FPHands_HandGrip
 {
     UPROPERTY()
     FCk_Handle_Transform Anchor;
 
-    // Last known anchor transform; kept once the anchor is gone (a picked-up item destroys itself).
+    // Last known base transform (the socket's for a socket grip, else the anchor's); the fallback once that is gone (a
+    // picked-up item destroys itself, a mesh component is removed).
     UPROPERTY()
     FTransform AnchorWorld;
 
-    // Anchor space. A point grip uses only the location.
+    // Base space (the socket's for a socket grip, else the anchor's). A point grip uses only the location; a socket grip's
+    // identity is the socket's own axes.
     UPROPERTY()
     FTransform Grip;
+
+    // A socket grip: the mesh component carrying Socket (invalid = the anchor itself is the base).
+    UPROPERTY()
+    FCk_Handle_UnrealComponent SocketHost;
+
+    UPROPERTY()
+    FName Socket;
 
     // The grip's rotation is matched, not just its location.
     UPROPERTY()
@@ -118,10 +151,17 @@ struct FMars_FPHands_GripEntry
     UPROPERTY()
     EMars_FPHands_GripRoll Roll = EMars_FPHands_GripRoll::Fixed;
 
+    // Socket entries only: the glove's handed grip rotation in the socket's frame, for a socket authored as a position only
+    // (build it with utils_fphands::Make_GripRotation(hand, fingers, palm)); unset = the socket's own axes are the grip.
+    UPROPERTY()
+    TOptional<FQuat> SocketRotation;
+
     FMars_FPHands_GripEntry() {}
 
+    // The spawn-params generator and the grip tables call this positionally; SocketRotation trails, defaulted.
     FMars_FPHands_GripEntry(EMars_Hand InHand, FCk_Handle_Transform InNode, TOptional<FName> InSocket, EMars_HandGripPose InPose,
-                            TOptional<float32> InReachOverrideCm, EMars_FPHands_GripFrame InFrame, EMars_FPHands_GripRoll InRoll)
+                            TOptional<float32> InReachOverrideCm, EMars_FPHands_GripFrame InFrame, EMars_FPHands_GripRoll InRoll,
+                            TOptional<FQuat> InSocketRotation = TOptional<FQuat>())
     {
         Hand = InHand;
         Node = InNode;
@@ -130,6 +170,7 @@ struct FMars_FPHands_GripEntry
         ReachOverrideCm = InReachOverrideCm;
         Frame = InFrame;
         Roll = InRoll;
+        SocketRotation = InSocketRotation;
     }
 }
 
@@ -409,8 +450,12 @@ namespace utils_fphands
 
             auto Grips = FMars_FPHands_MeshGrips();
             Grips.Right = Component.GetSocketTransform(RightName, ERelativeTransformSpace::RTS_World);
+            Grips.RightSocket = RightName;
             if (Component.DoesSocketExist(n"Grip_L"))
-            { Grips.Left = TOptional<FTransform>(Component.GetSocketTransform(n"Grip_L", ERelativeTransformSpace::RTS_World)); }
+            {
+                Grips.Left = TOptional<FTransform>(Component.GetSocketTransform(n"Grip_L", ERelativeTransformSpace::RTS_World));
+                Grips.LeftSocket = n"Grip_L";
+            }
 
             return TOptional<FMars_FPHands_MeshGrips>(Grips);
         }
@@ -418,17 +463,24 @@ namespace utils_fphands
     }
 
     // Grip sockets on the static meshes an entity and its transform descendants own (entity-built mechanisms: their
-    // components live on a shared component host actor, so the entity tree is what scopes them to this object).
+    // components live on a shared component host actor, so the entity tree is what scopes them to this object), with the
+    // component's handle and the socket names so the reach reads them live.
     TOptional<FMars_FPHands_MeshGrips> Find_EntitySockets(const FCk_Handle& InRoot)
     {
         for (auto Entity : Get_TransformTree(InRoot))
         {
-            auto Grips = Find_ComponentSockets(utils_unreal_component::Get_ComponentsByType(Entity, UStaticMeshComponent));
-            if (Grips.IsSet())
+            for (auto Handle : utils_unreal_component::Get_HandlesByType(Entity, UStaticMeshComponent))
             {
+                auto Components = TArray<UActorComponent>();
+                Components.Add(utils_unreal_component::Get_Component(Handle));
+                auto Grips = Find_ComponentSockets(Components);
+                if (Grips.IsSet() == false)
+                { continue; }
+
                 // The root itself may carry no transform; the reach then anchors to the owner as a whole.
                 auto Found = Grips.GetValue();
                 Found.Host = Entity.As_Transform(ECk_SanityCheck::UnChecked);
+                Found.SocketHost = Handle;
                 return TOptional<FMars_FPHands_MeshGrips>(Found);
             }
         }
@@ -444,19 +496,52 @@ namespace utils_fphands
         return Find_ComponentSockets(InActor.GetComponentsByClass(UStaticMeshComponent));
     }
 
-    // The first static mesh component on InRoot or its transform descendants that carries InSocket, or null.
-    UStaticMeshComponent Find_EntitySocketComponent(const FCk_Handle& InRoot, FName InSocket)
+    // The first mesh component (static or skeletal) on InRoot or its transform descendants that carries InSocket, with its
+    // Ck handle; both invalid when none does.
+    FMars_FPHands_SocketComponent Find_EntitySocketComponent(const FCk_Handle& InRoot, FName InSocket)
     {
         for (auto Entity : Get_TransformTree(InRoot))
         {
-            for (auto Candidate : utils_unreal_component::Get_ComponentsByType(Entity, UStaticMeshComponent))
+            for (auto Handle : utils_unreal_component::Get_HandlesByType(Entity, UMeshComponent))
             {
-                auto Component = Cast<UStaticMeshComponent>(Candidate);
+                auto Component = Cast<UMeshComponent>(utils_unreal_component::Get_Component(Handle));
                 if (ck::IsValid(Component) && Component.DoesSocketExist(InSocket))
-                { return Component; }
+                {
+                    auto Found = FMars_FPHands_SocketComponent();
+                    Found.Component = Component;
+                    Found.Host = Handle;
+                    return Found;
+                }
             }
         }
-        return nullptr;
+        return FMars_FPHands_SocketComponent();
+    }
+
+    // InGrip's socket in world this moment; unset for a non-socket grip, or once its component or socket is gone.
+    TOptional<FTransform> TryGet_SocketWorld(const FMars_FPHands_HandGrip& InGrip)
+    {
+        if (ck::Is_NOT_Valid(InGrip.SocketHost))
+        { return TOptional<FTransform>(); }
+
+        auto Component = Cast<USceneComponent>(utils_unreal_component::Get_Component(InGrip.SocketHost));
+        if (ck::Is_NOT_Valid(Component) || Component.DoesSocketExist(InGrip.Socket) == false)
+        { return TOptional<FTransform>(); }
+
+        return TOptional<FTransform>(Component.GetSocketTransform(InGrip.Socket, ERelativeTransformSpace::RTS_World));
+    }
+
+    // What InGrip.Grip is relative to, read now: the live socket of a socket grip, else the live anchor; the last known
+    // AnchorWorld once that is gone (no ensure: a target may destroy itself mid-reach).
+    FTransform Get_GripBaseWorld(const FMars_FPHands_HandGrip& InGrip)
+    {
+        const auto SocketWorld = TryGet_SocketWorld(InGrip);
+        if (SocketWorld.IsSet())
+        { return SocketWorld.GetValue(); }
+
+        if (ck::IsValid(InGrip.SocketHost) || ck::Is_NOT_Valid(InGrip.Anchor))
+        { return InGrip.AnchorWorld; }
+
+        return utils_transform::Get_EntityCurrentTransform(InGrip.Anchor);
     }
 
     // One grip-table row as a glove's grip: anchored to the row's node, on the named socket when the node (or a part
@@ -477,12 +562,18 @@ namespace utils_fphands
         }
 
         const auto Socket = InEntry.Socket.GetValue();
-        auto Component = Find_EntitySocketComponent(InEntry.Node, Socket);
-        if (ck::EnsureIfNot(ck::IsValid(Component),
+        const auto Found = Find_EntitySocketComponent(InEntry.Node, Socket);
+        if (ck::EnsureIfNot(ck::IsValid(Found.Component),
             f"[FPHands] grip node [{InEntry.Node.ToString()}] carries no socket [{Socket}]; the glove takes the node itself"))
         { return Grip; }
 
-        Grip.Grip = Component.GetSocketTransform(Socket, ERelativeTransformSpace::RTS_World).GetRelativeTransform(Grip.AnchorWorld);
+        // Bound live: the socket is read whenever the grip is composed; the grip is the authored rotation in its frame.
+        Grip.SocketHost = Found.Host;
+        Grip.Socket = Socket;
+        Grip.AnchorWorld = Found.Component.GetSocketTransform(Socket, ERelativeTransformSpace::RTS_World);
+        Grip.Grip = InEntry.SocketRotation.IsSet()
+            ? FTransform(InEntry.SocketRotation.GetValue(), FVector::ZeroVector, FVector::OneVector)
+            : FTransform::Identity;
         Grip.IsAuthored = true;
         return Grip;
     }
@@ -492,6 +583,16 @@ namespace utils_fphands
     {
         auto Grip = InShared;
         Grip.Grip = InGrip;
+        return TOptional<FMars_FPHands_HandGrip>(Grip);
+    }
+
+    // InShared (its SocketHost set) on its socket InSocket, as a used glove's grip: the socket's own axes, read live.
+    TOptional<FMars_FPHands_HandGrip> Make_UsedSocketGrip(const FMars_FPHands_HandGrip& InShared, FName InSocket, const FTransform& InSocketWorld)
+    {
+        auto Grip = InShared;
+        Grip.Socket = InSocket;
+        Grip.AnchorWorld = InSocketWorld;
+        Grip.Grip = FTransform::Identity;
         return TOptional<FMars_FPHands_HandGrip>(Grip);
     }
 
@@ -567,9 +668,10 @@ namespace utils_fphands
         if (Grip.IsAuthored == false || Grip.Roll != EMars_FPHands_GripRoll::FaceViewer)
         { return; }
 
-        const auto GripWorld = Grip.Grip * Grip.AnchorWorld;
+        const auto BaseWorld = Get_GripBaseWorld(Grip);
+        const auto GripWorld = Grip.Grip * BaseWorld;
         const auto Rolled = Make_ViewerFacingGrip(GripWorld.GetRotation(), InRestWorld);
-        Grip.Grip.SetRotation(Grip.AnchorWorld.InverseTransformRotation(Rolled));
+        Grip.Grip.SetRotation(BaseWorld.InverseTransformRotation(Rolled));
         InOutGrip = TOptional<FMars_FPHands_HandGrip>(Grip);
     }
 
@@ -699,6 +801,23 @@ namespace utils_fphands
             Shared.IsAuthored = true;
             Shared.Roll = EMars_FPHands_GripRoll::FaceViewer;
             Target.Layout = EMars_FPHands_GripLayout::Authored;
+
+            // An entity-built mechanism's sockets are read live from their mesh component, as a grip table's are.
+            if (ck::IsValid(Sockets.SocketHost))
+            {
+                Shared.SocketHost = Sockets.SocketHost;
+                if (BothFree)
+                {
+                    Target.Right = Make_UsedSocketGrip(Shared, Sockets.RightSocket, Sockets.Right);
+                    if (Sockets.Left.IsSet())
+                    { Target.Left = Make_UsedSocketGrip(Shared, Sockets.LeftSocket, Sockets.Left.GetValue()); }
+                }
+                else
+                { Target.Left = Make_UsedSocketGrip(Shared, Sockets.RightSocket, Sockets.Right); }
+
+                return TOptional<FMars_FPHands_ReachTarget>(Target);
+            }
+
             const auto RightGrip = Sockets.Right.GetRelativeTransform(Shared.AnchorWorld);
             if (BothFree)
             {
@@ -774,7 +893,11 @@ namespace utils_fphands
         if (InOutGrip.IsSet() == false)
         { return; }
 
+        // A socket grip stays on its socket: re-anchoring would freeze it to the root.
         auto Grip = InOutGrip.GetValue();
+        if (ck::IsValid(Grip.SocketHost))
+        { return; }
+
         Grip.Grip = (Grip.Grip * Grip.AnchorWorld).GetRelativeTransform(InAnchorWorld);
         Grip.Anchor = InAnchor;
         Grip.AnchorWorld = InAnchorWorld;
@@ -888,11 +1011,12 @@ namespace utils_fphands
         if (InOutGrip.IsSet() == false)
         { return; }
 
+        // The last known base: kept as it is once the anchor (or the socket's component) is gone.
         auto Grip = InOutGrip.GetValue();
         if (ck::Is_NOT_Valid(Grip.Anchor))
         { return; }
 
-        Grip.AnchorWorld = utils_transform::Get_EntityCurrentTransform(Grip.Anchor);
+        Grip.AnchorWorld = Get_GripBaseWorld(Grip);
         InOutGrip = TOptional<FMars_FPHands_HandGrip>(Grip);
     }
 
@@ -909,16 +1033,18 @@ namespace utils_fphands
         InOutGrip.IsAuthored = HandGrip.IsAuthored;
         InOutGrip.Standoff = IsSides || HandGrip.IsAuthored ? 0.0f : InSpec.Reach.Stretch.StandoffCm;
         InOutGrip.ReachOverrideCm = HandGrip.ReachOverrideCm;
+        // Read now (at composition), not the copy the ECS tick refreshed before this frame's transforms and poses settled.
+        const auto BaseWorld = Get_GripBaseWorld(HandGrip);
         if (IsSides)
         {
-            const auto Center = HandGrip.AnchorWorld.TransformPosition(InTarget.Sides.Center);
+            const auto Center = BaseWorld.TransformPosition(InTarget.Sides.Center);
             const auto Side = InOutGrip.HandWorld.GetRotation().GetRightVector() * (InTarget.Sides.HalfWidth + InSpec.Rest.PalmSurfaceOffset);
             const auto GripLocation = InOutGrip.Hand == EMars_Hand::Right ? Center + Side : Center - Side;
             InOutGrip.WorldGrip = FTransform(FRotator::ZeroRotator, GripLocation, FVector::OneVector);
             return;
         }
 
-        InOutGrip.WorldGrip = HandGrip.Grip * HandGrip.AnchorWorld;
+        InOutGrip.WorldGrip = HandGrip.Grip * BaseWorld;
     }
 
     bool Get_UsesHand(const TOptional<FMars_FPHands_ReachTarget>& InTarget, EMars_Hand InHand)
