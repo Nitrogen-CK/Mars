@@ -1,0 +1,294 @@
+{
+	"assetName": "ScreamingTurnip_R01_Mars_ABP_v2",
+	"assetPath": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2.ScreamingTurnip_R01_Mars_ABP_v2",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "aaef8eab9c6c19a7e0ca2d546a24bfb9",
+		"exporterVersion": 3
+	},
+	"blueprintType": "AnimBlueprint",
+	"parentClass": "Mars_ScreamingTurnip_AnimInstance",
+	"parentClassPath": "/Script/Angelscript.Mars_ScreamingTurnip_AnimInstance",
+	"implementedInterfaces": [],
+	"variables": [],
+	"classDefaults": [
+		{
+			"name": "Sequence",
+			"type": "UAnimSequenceBase*",
+			"category": "ScreamingTurnip",
+			"value": "None",
+			"tooltip": "The clip on screen; null holds the bind pose."
+		},
+		{
+			"name": "ClipTime",
+			"type": "float",
+			"category": "ScreamingTurnip",
+			"value": 0,
+			"tooltip": "Seconds into Sequence, already wrapped or clamped by the component."
+		},
+		{
+			"name": "CrownOffset",
+			"type": "FVector",
+			"category": "ScreamingTurnip",
+			"value":
+			{
+				"X": 0,
+				"Y": 0,
+				"Z": 0
+			},
+			"tooltip": "The stretch's runtime crown offset, component space, cm: (-Alpha * TravelCm, 0, Alpha * LiftCm), toward the mesh's -X."
+		},
+		{
+			"name": "RootMotionMode",
+			"type": "TEnumAsByte<ERootMotionMode::Type>",
+			"category": "RootMotion",
+			"value": "RootMotionFromMontagesOnly",
+			"tooltip": "Sets where this blueprint pulls Root Motion from"
+		},
+		{
+			"name": "bReceiveNotifiesFromLinkedInstances",
+			"type": "uint8",
+			"category": "Notifies",
+			"value": false,
+			"tooltip": "Whether to process notifies from any linked anim instances"
+		},
+		{
+			"name": "bPropagateNotifiesToLinkedInstances",
+			"type": "uint8",
+			"category": "Notifies",
+			"value": false,
+			"tooltip": "Whether to propagate notifies to any linked anim instances"
+		},
+		{
+			"name": "bUseMainInstanceMontageEvaluationData",
+			"type": "uint8",
+			"category": "Montage",
+			"value": false,
+			"tooltip": "If true, linked instances will use the main instance's montage data. (i.e. playing a montage on a main instance will play it on the linked layer too.)"
+		}
+	],
+	"components": [],
+	"eventGraphs": [
+		{
+			"graphName": "EventGraph",
+			"graphCategory": "EventGraph",
+			"executionFlows": [
+				{
+					"entryPoint": "Event BlueprintUpdateAnimation",
+					"entryNodeId": "Node_Y-UwIU6ZeVnx29qCE-FO1g",
+					"steps": [
+						{
+							"nodeId": "Node_Y-UwIU6ZeVnx29qCE-FO1g",
+							"title": "Event BlueprintUpdateAnimation"
+						}
+					]
+				}
+			],
+			"nodes": [
+				{
+					"nodeId": "Node_Y-UwIU6ZeVnx29qCE-FO1g",
+					"nodeClass": "K2Node_Event",
+					"nodeTitle": "Event BlueprintUpdateAnimation",
+					"nodeComment": "This node is disabled and will not be called.\nDrag off pins to build functionality.",
+					"inputPins": [],
+					"outputPins": [
+						{
+							"pinName": "OutputDelegate",
+							"pinType": "Delegate",
+							"direction": "Output"
+						},
+						{
+							"pinName": "then",
+							"pinType": "exec",
+							"direction": "Output"
+						},
+						{
+							"pinName": "DeltaTimeX",
+							"pinType": "float",
+							"direction": "Output",
+							"defaultValue": "0.0"
+						}
+					]
+				},
+				{
+					"nodeId": "Node_GWCWV0pGFXqPsseTqArrhw",
+					"nodeClass": "K2Node_CallFunction",
+					"nodeTitle": "Try Get Pawn Owner\nTarget is Anim Instance",
+					"nodeComment": "This node is disabled and will not be called.\nDrag off pins to build functionality.",
+					"inputPins": [
+						{
+							"pinName": "self",
+							"pinType": "AnimInstance",
+							"direction": "Input"
+						}
+					],
+					"outputPins": [
+						{
+							"pinName": "ReturnValue",
+							"pinType": "Pawn",
+							"direction": "Output"
+						}
+					]
+				}
+			]
+		}
+	],
+	"functionGraphs": [
+		{
+			"graphName": "AnimGraph",
+			"graphCategory": "Function",
+			"executionFlows": [],
+			"nodes": [
+				{
+					"nodeId": "Node_DhknykdOdoL7t8ODi3ju1Q",
+					"nodeClass": "AnimGraphNode_Root",
+					"nodeTitle": "Output Pose\nAnimGraph",
+					"inputPins": [
+						{
+							"pinName": "Result",
+							"pinType": "PoseLink",
+							"direction": "Input",
+							"defaultValue": "(LinkID=-1,SourceLinkID=-1)",
+							"connections": [
+								"Node_ALPv3k6Dh2QXxX-8bbicEQ.Pose"
+							]
+						}
+					],
+					"outputPins": []
+				},
+				{
+					"nodeId": "Node_NmEEgEK-Hy2BgG-GmkNMpg",
+					"nodeClass": "AnimGraphNode_SequenceEvaluator",
+					"nodeTitle": "Sequence Evaluator (by time)",
+					"inputPins": [
+						{
+							"pinName": "Sequence",
+							"pinType": "AnimSequenceBase",
+							"direction": "Input"
+						},
+						{
+							"pinName": "ExplicitTime",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "0.000000"
+						}
+					],
+					"outputPins": [
+						{
+							"pinName": "Pose",
+							"pinType": "PoseLink",
+							"direction": "Output",
+							"connections": [
+								"Node_MmsZ9kT35ZYZmxqq3oToug.LocalPose"
+							]
+						}
+					]
+				},
+				{
+					"nodeId": "Node_MmsZ9kT35ZYZmxqq3oToug",
+					"nodeClass": "AnimGraphNode_LocalToComponentSpace",
+					"nodeTitle": "Local To Component",
+					"inputPins": [
+						{
+							"pinName": "LocalPose",
+							"pinType": "PoseLink",
+							"direction": "Input",
+							"defaultValue": "(LinkID=-1,SourceLinkID=-1)",
+							"connections": [
+								"Node_NmEEgEK-Hy2BgG-GmkNMpg.Pose"
+							]
+						}
+					],
+					"outputPins": [
+						{
+							"pinName": "ComponentPose",
+							"pinType": "ComponentSpacePoseLink",
+							"direction": "Output",
+							"connections": [
+								"Node_qze-v0_JtOo5j8uCtTb1wA.ComponentPose"
+							]
+						}
+					]
+				},
+				{
+					"nodeId": "Node_qze-v0_JtOo5j8uCtTb1wA",
+					"nodeClass": "AnimGraphNode_ModifyBone",
+					"nodeTitle": "Transform (Modify) Bone\nBone: crown",
+					"inputPins": [
+						{
+							"pinName": "ComponentPose",
+							"pinType": "ComponentSpacePoseLink",
+							"direction": "Input",
+							"defaultValue": "(LinkID=-1,SourceLinkID=-1)",
+							"connections": [
+								"Node_MmsZ9kT35ZYZmxqq3oToug.ComponentPose"
+							]
+						},
+						{
+							"pinName": "Alpha",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "1.000000"
+						},
+						{
+							"pinName": "Translation",
+							"pinType": "Vector",
+							"direction": "Input",
+							"defaultValue": "0.000000,0.000000,0.000000"
+						},
+						{
+							"pinName": "Rotation",
+							"pinType": "Rotator",
+							"direction": "Input",
+							"defaultValue": "0.000000,0.000000,0.000000"
+						},
+						{
+							"pinName": "Scale",
+							"pinType": "Vector",
+							"direction": "Input",
+							"defaultValue": "1.000000,1.000000,1.000000"
+						}
+					],
+					"outputPins": [
+						{
+							"pinName": "Pose",
+							"pinType": "ComponentSpacePoseLink",
+							"direction": "Output",
+							"connections": [
+								"Node_ALPv3k6Dh2QXxX-8bbicEQ.ComponentPose"
+							]
+						}
+					]
+				},
+				{
+					"nodeId": "Node_ALPv3k6Dh2QXxX-8bbicEQ",
+					"nodeClass": "AnimGraphNode_ComponentToLocalSpace",
+					"nodeTitle": "Component To Local",
+					"inputPins": [
+						{
+							"pinName": "ComponentPose",
+							"pinType": "ComponentSpacePoseLink",
+							"direction": "Input",
+							"defaultValue": "(LinkID=-1,SourceLinkID=-1)",
+							"connections": [
+								"Node_qze-v0_JtOo5j8uCtTb1wA.Pose"
+							]
+						}
+					],
+					"outputPins": [
+						{
+							"pinName": "Pose",
+							"pinType": "PoseLink",
+							"direction": "Output",
+							"connections": [
+								"Node_DhknykdOdoL7t8ODi3ju1Q.Result"
+							]
+						}
+					]
+				}
+			]
+		}
+	],
+	"macroGraphs": []
+}
