@@ -349,6 +349,14 @@ enum EMars_ManipulateControl_ReachWait
 // began (cancelled, lost) hands the view back; once begun, the manipulation's end does - by default not before the Use row
 // releases (ViewLock), since the drag that pulled a lever over its threshold would otherwise turn the view the frame the
 // lever lands. The look delta drained before the grip is still not a pull (_SeenLookSequence is captured at begin).
+// A Walk control (EMars_Control_PullSource::Walk, a rooted plant pulled by backing away) holds no view at all - the player
+// has to look and walk - takes the player's own transform as its Puller, and is sent no nudges; the grip wait, the push-end
+// wait, a refusal and OnInteractionFinished are shared.
+// An interaction already live on a target from this player when the task starts watching it is adopted as if
+// OnNewInteraction had just fired (pending, grip wait / reach, a Look control's view hold): its start came before the watch.
+// Primary and Use share LMB and Primary resolves the Use channel, so Primary can start a Use-channel control itself; a later
+// Use press then only joins that live interaction (UMars_SmTask_IntentToResolver::Forward_To), and without the adoption the
+// control would never be manipulated (run-12b, PROGRESS Phase K Part 2c / 2d).
 // Stateful like UMars_SmTask_InteractionFocus; leaving Locomotion ends any manipulation and releases the hold at once.
 class UMars_SmTask_ManipulateControl : UCk_SmTask_EntityScript
 {
@@ -462,7 +470,8 @@ class UMars_SmTask_ManipulateControl : UCk_SmTask_EntityScript
             return ECk_SmTaskResult::Running;
         }
 
-        if (ck::Is_NOT_Valid(_Intents))
+        // A Walk control's pull is the player's distance from it, read by the Control itself.
+        if (Get_IsWalkPull() || ck::Is_NOT_Valid(_Intents))
         { return ECk_SmTaskResult::Running; }
 
         // One nudge per drained delta, whatever the processor order; a still frame advances nothing.
@@ -516,6 +525,12 @@ class UMars_SmTask_ManipulateControl : UCk_SmTask_EntityScript
             _Control = Control;
             _Target.BindTo_OnNewInteraction(FCk_Delegate_InteractTarget_OnNewInteraction(this, n"OnNewInteraction"));
             _Target.BindTo_OnInteractionFinished(FCk_Delegate_InteractTarget_OnInteractionFinished(this, n"OnInteractionFinished"));
+
+            // Started before the watch (another intent's press): adopted as a new one.
+            const auto Live = utils_interact_target::TryGet_Interaction(_Target, _Player);
+            if (ck::IsValid(Live))
+            { OnNewInteraction(_Target, Live); }
+
             return;
         }
     }
@@ -526,9 +541,10 @@ class UMars_SmTask_ManipulateControl : UCk_SmTask_EntityScript
         if (InTarget != _Target || ck::Is_NOT_Valid(_Control))
         { return; }
 
-        // Begins once the gloves grip the target (DoTick); the view holds still from here.
+        // Begins once the gloves grip the target (DoTick); a Look control's view holds still from here.
         _PendingInteraction = InInteraction;
-        HoldView();
+        if (Get_IsWalkPull() == false)
+        { HoldView(); }
 
         if (ck::Is_NOT_Valid(_Hands))
         { return; }
@@ -651,10 +667,19 @@ class UMars_SmTask_ManipulateControl : UCk_SmTask_EntityScript
         _IsManipulating = true;
         ClearPendingInteraction();
 
-        // The delta that was drained before the grip is not a pull.
+        // The delta that was drained before the grip is not a pull. The player's root is what walks away from a Walk control
+        // (a Look control ignores the Puller; without a transform a Walk grip ensures in the Control and is ignored).
         _SeenLookSequence = ck::IsValid(_Intents) ? _Intents.Get_LookDeltaSequence() : 0;
-        _Control.Request_BeginManipulation(FMars_Request_Control_BeginManipulation(Interaction));
-        HoldView();
+        _Control.Request_BeginManipulation(FMars_Request_Control_BeginManipulation(Interaction,
+            EMars_Control_ManipulationCompletion::AtEngageAlpha, _Player.As_Transform(ECk_SanityCheck::UnChecked)));
+        if (Get_IsWalkPull() == false)
+        { HoldView(); }
+    }
+
+    // The watched control is pulled by walking away from it: no view hold, no nudges.
+    private bool Get_IsWalkPull() const
+    {
+        return ck::IsValid(_Control) && _Control.Get_PullSource() == EMars_Control_PullSource::Walk;
     }
 
     // A pending interaction that never began gives the view back; a begun manipulation keeps it until EndManipulation.

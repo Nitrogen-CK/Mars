@@ -53,16 +53,26 @@ enum EMars_Control_ManipulationMode
     FreeTurn
 }
 
-// How a ManuallyCompleted control is pulled: the player grips it (Use) and swings the look input along PullAxis. The
-// spawn-params generator emits a non-default value as the positional constructor call.
+// Where a gripped Travel control's Pull comes from: Look sums the look delta along PullAxis (Request_Nudge, AlphaPerDegree
+// per degree: a lever); Walk is the ground the puller (FMars_Request_Control_BeginManipulation.Puller) has gained since the
+// grip, horizontally from the control entity, WalkCm of it reading as Pull 1 (a rooted plant pulled by backing away).
+// Opt-in: every existing control is Look.
+enum EMars_Control_PullSource
+{
+    Look,
+    Walk
+}
+
+// How a ManuallyCompleted control is pulled: the player grips it (Use) and swings the look input along PullAxis (Look), or
+// backs away from it (Walk). The spawn-params generator emits a non-default value as the positional constructor call.
 struct FMars_Control_Manipulation_Spec
 {
     // Direction the grip travels toward the end pose, in the control entity's own space (lever: local -X, the
-    // handle top pitching over). Zero = no screen projection: raw pitch, mouse down pulls.
+    // handle top pitching over). Zero = no screen projection: raw pitch, mouse down pulls. Look only (Walk ignores it).
     UPROPERTY()
     FVector PullAxis = FVector::ZeroVector;
 
-    // Alpha per degree of pull (0.02 = 50 degrees of would-be look for the full travel).
+    // Alpha per degree of pull (0.02 = 50 degrees of would-be look for the full travel). Look only (Walk ignores it).
     UPROPERTY()
     float32 AlphaPerDegree = 0.02f;
 
@@ -86,6 +96,14 @@ struct FMars_Control_Manipulation_Spec
     UPROPERTY()
     EMars_Control_ManipulationMode Mode = EMars_Control_ManipulationMode::Travel;
 
+    // Walk needs a ManuallyCompleted Travel control and a Puller on every BeginManipulation.
+    UPROPERTY()
+    EMars_Control_PullSource PullSource = EMars_Control_PullSource::Look;
+
+    // Walk only: the horizontal distance, cm, the puller gains from where it gripped that reads as Pull 1.
+    UPROPERTY()
+    float32 WalkCm = 40.0f;
+
     FMars_Control_Manipulation_Spec() {}
 
     FMars_Control_Manipulation_Spec(
@@ -95,7 +113,9 @@ struct FMars_Control_Manipulation_Spec
         float32 InStiffness,
         float32 InDamping,
         bool InReturnsToRest,
-        EMars_Control_ManipulationMode InMode = EMars_Control_ManipulationMode::Travel)
+        EMars_Control_ManipulationMode InMode = EMars_Control_ManipulationMode::Travel,
+        EMars_Control_PullSource InPullSource = EMars_Control_PullSource::Look,
+        float32 InWalkCm = 40.0f)
     {
         PullAxis = InPullAxis;
         AlphaPerDegree = InAlphaPerDegree;
@@ -104,6 +124,8 @@ struct FMars_Control_Manipulation_Spec
         Damping = InDamping;
         ReturnsToRest = InReturnsToRest;
         Mode = InMode;
+        PullSource = InPullSource;
+        WalkCm = InWalkCm;
     }
 }
 
@@ -154,7 +176,8 @@ struct FMars_Control_Spec
 }
 
 // Timed holds for a positive time; ManuallyCompleted engages inside (0, 1], moves per degree and has a spring to move
-// with that never feeds energy in (no negative damping); Momentary releases after a positive time.
+// with that never feeds energy in (no negative damping); a Walk pull is a ManuallyCompleted Travel control over a positive
+// distance; Momentary releases after a positive time.
 mixin FMars_Validation Validate(const FMars_Control_Spec& Self)
 {
     if (Self.Interaction == ECk_Interaction_CompletionPolicy::Timed && Self.HoldSeconds <= 0.0f)
@@ -178,6 +201,18 @@ mixin FMars_Validation Validate(const FMars_Control_Spec& Self)
 
     if (Self.Manipulation.Mode == EMars_Control_ManipulationMode::FreeTurn && Self.Interaction != ECk_Interaction_CompletionPolicy::ManuallyCompleted)
     { return FMars_Validation("FreeTurn control must be ManuallyCompleted: only a grip turns it"); }
+
+    if (Self.Manipulation.PullSource == EMars_Control_PullSource::Walk)
+    {
+        if (Self.Interaction != ECk_Interaction_CompletionPolicy::ManuallyCompleted)
+        { return FMars_Validation("Manipulation.PullSource Walk needs a ManuallyCompleted control: only a grip is walked away from"); }
+
+        if (Self.Manipulation.Mode != EMars_Control_ManipulationMode::Travel)
+        { return FMars_Validation(f"Manipulation.PullSource Walk needs Manipulation.Mode Travel (got {Self.Manipulation.Mode :n})"); }
+
+        if (Self.Manipulation.WalkCm <= 0.0f)
+        { return FMars_Validation(f"Walk control has a non-positive Manipulation.WalkCm [{Self.Manipulation.WalkCm}]"); }
+    }
 
     if (Self.Behavior == EMars_Control_Behavior::Momentary && Self.ActiveSeconds <= 0.0f)
     { return FMars_Validation(f"Momentary control has a non-positive ActiveSeconds [{Self.ActiveSeconds}]"); }
@@ -236,6 +271,14 @@ struct FMars_Control_Manipulation
     // From the BeginManipulation request: OnRelease never crosses the threshold.
     UPROPERTY()
     EMars_Control_ManipulationCompletion Completion = EMars_Control_ManipulationCompletion::AtEngageAlpha;
+
+    // Walk only (invalid otherwise): who walks away, and the horizontal distance, cm, from the control entity to it at
+    // the grip; Pull is the distance gained since, over WalkCm.
+    UPROPERTY()
+    FCk_Handle_Transform Puller;
+
+    UPROPERTY()
+    float32 WalkStartCm = 0.0f;
 }
 
 // Written only by the two Control processors.
@@ -333,6 +376,11 @@ struct FMars_Request_Control_BeginManipulation
     UPROPERTY()
     EMars_Control_ManipulationCompletion Completion = EMars_Control_ManipulationCompletion::AtEngageAlpha;
 
+    // Walk controls only (a Look control ignores it): whose horizontal distance from the control is the pull. A Walk
+    // grip without one ensures and is ignored.
+    UPROPERTY()
+    FCk_Handle_Transform Puller;
+
     FMars_Request_Control_BeginManipulation() {}
 
     FMars_Request_Control_BeginManipulation(FCk_Handle_Interaction InInteraction)
@@ -345,9 +393,17 @@ struct FMars_Request_Control_BeginManipulation
         Interaction = InInteraction;
         Completion = InCompletion;
     }
+
+    FMars_Request_Control_BeginManipulation(FCk_Handle_Interaction InInteraction, EMars_Control_ManipulationCompletion InCompletion,
+                                            FCk_Handle_Transform InPuller)
+    {
+        Interaction = InInteraction;
+        Completion = InCompletion;
+        Puller = InPuller;
+    }
 }
 
-// Degrees of pull along PullAxis this frame; positive toward the end pose. Summed per drain.
+// Degrees of pull along PullAxis this frame; positive toward the end pose. Summed per drain. A Walk control ignores it.
 struct FMars_Request_Control_Nudge
 {
     UPROPERTY()

@@ -171,6 +171,30 @@ mixin EMars_Control_ManipulationCompletion Get_ManipulationCompletion(const FCk_
     return State.Manipulation.GetValue().Completion;
 }
 
+// Where the control's Pull comes from while gripped (Look: the look delta; Walk: the puller's distance).
+mixin EMars_Control_PullSource Get_PullSource(const FCk_Handle_Control& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_Control_Params).Manipulation.PullSource;
+}
+
+// Who walks away from a gripped Walk control; invalid unless a Walk control is being manipulated.
+mixin FCk_Handle_Transform TryGet_Puller(const FCk_Handle_Control& Self)
+{
+    const auto& State = Self.Get_Fragment(FMars_Fragment_Control);
+    if (State.Manipulation.IsSet() == false || Self.Get_PullSource() != EMars_Control_PullSource::Walk)
+    { return FCk_Handle_Transform(); }
+
+    return State.Manipulation.GetValue().Puller;
+}
+
+// The horizontal (XY) distance, cm, from the control entity's own transform to InPuller (a Walk pull's measure).
+mixin float32 Get_HorizontalDistanceTo(const FCk_Handle_Control& Self, const FCk_Handle_Transform& InPuller)
+{
+    const auto From = utils_transform::Get_EntityCurrentTransform(Self.As_Transform()).GetLocation();
+    const auto To = utils_transform::Get_EntityCurrentTransform(InPuller).GetLocation();
+    return float32(FVector2D(To.X - From.X, To.Y - From.Y).Size());
+}
+
 // A gripped control that moves nothing and hands its pull out as OnTurned (EMars_Control_ManipulationMode::FreeTurn).
 mixin bool Get_IsFreeTurn(const FCk_Handle_Control& Self)
 {
@@ -223,14 +247,14 @@ mixin void Request_SetActive(FCk_Handle_Control& Self, const FMars_Request_Contr
     Requests.SetActiveRequest = InRequest;
 }
 
-// Grips a ManuallyCompleted control; any other policy ensures and is ignored.
+// Grips a ManuallyCompleted control; any other policy ensures and is ignored, as does a Walk control without a Puller.
 mixin void Request_BeginManipulation(FCk_Handle_Control& Self, const FMars_Request_Control_BeginManipulation& InRequest)
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Control_Requests);
     Requests.BeginManipulationRequest = InRequest;
 }
 
-// Dropped unless manipulating when drained.
+// Dropped unless manipulating when drained; a Walk control's pull is the distance, so it ignores nudges.
 mixin void Request_Nudge(FCk_Handle_Control& Self, const FMars_Request_Control_Nudge& InRequest)
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Control_Requests);

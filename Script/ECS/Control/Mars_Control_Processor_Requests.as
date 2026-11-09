@@ -116,8 +116,10 @@ class UMars_Processor_Control_HandleRequests : UCk_Processor_Script_Base_UE
         { Mover.Request_Settle(FMars_Request_Mover_Settle()); }
     }
 
-    // Returns false when the control is not ManuallyCompleted (ensures). The grip starts where the handle stands (without
-    // a Mover: at the end the pull runs from), and the scrub stops an in-flight engage tween so the hand owns the handle.
+    // Returns false when the control is not ManuallyCompleted, or is a Walk control without a valid Puller (ensures). The
+    // grip starts where the handle stands (without a Mover: at the end the pull runs from), and the scrub stops an in-flight
+    // engage tween so the hand owns the handle. A Walk grip records the puller's horizontal distance now: the pull is what
+    // it gains from here.
     private bool BeginManipulation(
         FCk_Handle_Control& InControl,
         FMars_Fragment_Control& InState,
@@ -126,6 +128,11 @@ class UMars_Processor_Control_HandleRequests : UCk_Processor_Script_Base_UE
         const auto IsManuallyCompleted =
             InControl.Get_CompletionPolicy() == ECk_Interaction_CompletionPolicy::ManuallyCompleted;
         if (ck::EnsureIfNot(IsManuallyCompleted, f"[Control] [{InControl.ToString()}] is not ManuallyCompleted; BeginManipulation ignored"))
+        { return false; }
+
+        const auto IsWalk = InControl.Get_PullSource() == EMars_Control_PullSource::Walk;
+        if (IsWalk && ck::EnsureIfNot(ck::IsValid(InRequest.Puller) && ck::IsValid(InControl.H().As_Transform(ECk_SanityCheck::UnChecked)),
+            f"[Control] [{InControl.ToString()}] is a Walk control: BeginManipulation needs a valid Puller and a control with a transform; ignored"))
         { return false; }
 
         auto Mover = InState.Mover;
@@ -141,6 +148,11 @@ class UMars_Processor_Control_HandleRequests : UCk_Processor_Script_Base_UE
         Manipulation.Completion = IsFreeTurn ? EMars_Control_ManipulationCompletion::OnRelease : InRequest.Completion;
         Manipulation.Alpha = HasMover ? Mover.Get_Alpha() : RestAlpha;
         Manipulation.Pull = Manipulation.Alpha;
+        if (IsWalk)
+        {
+            Manipulation.Puller = InRequest.Puller;
+            Manipulation.WalkStartCm = InControl.Get_HorizontalDistanceTo(InRequest.Puller);
+        }
         InState.Manipulation = Manipulation;
 
         if (InControl.Has_Fragment(FMars_Tag_Control_Manipulating) == false)
@@ -152,7 +164,9 @@ class UMars_Processor_Control_HandleRequests : UCk_Processor_Script_Base_UE
         return true;
     }
 
-    // Returns the drain's degrees for a FreeTurn control (its pull is not integrated), 0 for Travel.
+    // Returns the drain's degrees for a FreeTurn control (its pull is not integrated), 0 for Travel. A Walk control's pull is
+    // the puller's distance (UMars_Processor_Control_Tick): its nudges change nothing. Not an error: the player's task just
+    // sends none.
     private float32 ApplyNudges(
         FCk_Handle_Control& InControl,
         FMars_Fragment_Control& InState,
@@ -167,6 +181,9 @@ class UMars_Processor_Control_HandleRequests : UCk_Processor_Script_Base_UE
 
         if (InControl.Get_IsFreeTurn())
         { return PullDegrees; }
+
+        if (InControl.Get_PullSource() == EMars_Control_PullSource::Walk)
+        { return 0.0f; }
 
         const auto AlphaPerDegree = InControl.Get_Fragment(FMars_Fragment_Control_Params).Manipulation.AlphaPerDegree;
         auto Manipulation = InState.Manipulation.GetValue();

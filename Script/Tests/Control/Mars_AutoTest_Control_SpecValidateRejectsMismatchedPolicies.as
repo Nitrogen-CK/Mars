@@ -1,5 +1,6 @@
 // Validate() accepts each completion policy at its defaults and rejects a spec whose policy-specific tuning cannot work:
-// a Timed hold of no time, a manipulation that never engages, never moves or gains energy, a Momentary pulse of no time.
+// a Timed hold of no time, a manipulation that never engages, never moves or gains energy, a Momentary pulse of no time,
+// and a Walk pull that is not a ManuallyCompleted Travel control or walks no distance.
 class UMars_AutoTest_Control_SpecValidateRejectsMismatchedPolicies : UCk_AutoTest_Base
 {
     UFUNCTION(BlueprintOverride)
@@ -48,6 +49,23 @@ class UMars_AutoTest_Control_SpecValidateRejectsMismatchedPolicies : UCk_AutoTes
         auto ManualPushingDamper = Manual;
         ManualPushingDamper.Manipulation.Damping = -1.0f;
         AssertInvalid(ManualPushingDamper, "ManuallyCompleted with Damping -1", "Damping");
+
+        auto Walk = Manual;
+        Walk.Manipulation.PullSource = EMars_Control_PullSource::Walk;
+        Walk.Manipulation.WalkCm = 36.0f;
+        AssertValid(Walk, "ManuallyCompleted Travel Walk over 36 cm");
+
+        auto WalkTimed = Walk;
+        WalkTimed.Interaction = ECk_Interaction_CompletionPolicy::Timed;
+        AssertInvalid(WalkTimed, "Walk on a Timed control", "PullSource");
+
+        auto WalkFreeTurn = Walk;
+        WalkFreeTurn.Manipulation.Mode = EMars_Control_ManipulationMode::FreeTurn;
+        AssertInvalid(WalkFreeTurn, "Walk on a FreeTurn control", "Mode");
+
+        auto WalkNoDistance = Walk;
+        WalkNoDistance.Manipulation.WalkCm = 0.0f;
+        AssertInvalid(WalkNoDistance, "Walk with WalkCm 0", "WalkCm");
 
         auto MomentaryNoPulse = FMars_Control_Spec();
         MomentaryNoPulse.Behavior = EMars_Control_Behavior::Momentary;

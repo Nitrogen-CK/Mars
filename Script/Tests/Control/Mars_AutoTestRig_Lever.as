@@ -1,7 +1,9 @@
 // The lever rig: a ManuallyCompleted Control (pull axis -X, 0.02 alpha per degree, EngageAlpha 0.85) on a root entity,
 // turning a scene-node handle 70 degrees in pitch over 0.3 s through a Mover, with one transform-only interact target
 // (no ProbeInfo: the reach resolves as a point grip at the owner). The test entity is the player. The handlers record
-// the Control's engages and the target's interactions.
+// the Control's engages and the target's interactions. A subclass that sets _PullSource to Walk gets a walk lever (WalkCm
+// _WalkCm) and a puller transform entity of its own, k_PullerStartCm out along the lever's -X and k_PullerHeightCm up
+// (the pull is horizontal: the height must not count); Walk_Puller moves it straight back.
 UCLASS(Abstract)
 class UMars_AutoTestRig_Lever : UCk_AutoTest_Base
 {
@@ -17,6 +19,13 @@ class UMars_AutoTestRig_Lever : UCk_AutoTest_Base
     protected int32 _EngagedCount = 0;
     protected int32 _NewInteractionCount = 0;
     protected TArray<ECk_SucceededFailed> _FinishedResults;
+
+    protected EMars_Control_PullSource _PullSource = EMars_Control_PullSource::Look;
+    protected float32 _WalkCm = 50.0f;
+    // Walk only: who walks away (BuildLever).
+    protected FCk_Handle_Transform _Puller;
+    protected const float64 k_PullerStartCm = 60.0;
+    protected const float64 k_PullerHeightCm = 150.0;
 
     // An Active lever starts with its handle at the far stop.
     protected void BuildLever(FCk_Handle InHandle, EMars_Control_Activation InStart)
@@ -40,6 +49,8 @@ class UMars_AutoTestRig_Lever : UCk_AutoTest_Base
         ControlSpec.Manipulation.PullAxis = FVector(-1.0, 0.0, 0.0);
         ControlSpec.Manipulation.AlphaPerDegree = 0.02f;
         ControlSpec.Manipulation.EngageAlpha = 0.85f;
+        ControlSpec.Manipulation.PullSource = _PullSource;
+        ControlSpec.Manipulation.WalkCm = _WalkCm;
         ControlSpec.Mover = _Mover;
         _Control = utils_control::Add(RootEntity, ControlSpec);
         _Control.BindTo_OnEngaged(FMars_Delegate_Control_OnEngaged(this, n"OnEngaged"));
@@ -49,6 +60,31 @@ class UMars_AutoTestRig_Lever : UCk_AutoTest_Base
         _Interactable = utils_interactable::Create(Root, Spec);
         _Target = _Interactable.Get_AllInteractTargets()[0];
         BindTargetSignals();
+
+        if (_PullSource == EMars_Control_PullSource::Walk)
+        {
+            auto PullerEntity = utils_entity_lifetime::Request_CreateEntity(InHandle);
+            _Puller = utils_transform::Add(PullerEntity, FTransform(FRotator::ZeroRotator, Get_PullerLocation(0.0)),
+                ECk_Replication::DoesNotReplicate);
+        }
+    }
+
+    // The puller InGainedCm farther from the lever than where it gripped, straight back along -X.
+    protected void Walk_Puller(float64 InGainedCm)
+    {
+        utils_transform::Request_SetLocation(_Puller, FCk_Request_Transform_SetLocation(Get_PullerLocation(InGainedCm)));
+    }
+
+    protected FVector Get_PullerLocation(float64 InGainedCm) const
+    {
+        return FVector(-(k_PullerStartCm + InGainedCm), 0.0, k_PullerHeightCm);
+    }
+
+    // The Control's alpha; 0 when it is not manipulated.
+    protected float32 Get_ManipulationAlpha() const
+    {
+        const auto Alpha = _Control.TryGet_ManipulationAlpha();
+        return Alpha.IsSet() ? Alpha.GetValue() : 0.0f;
     }
 
     protected void BindTargetSignals()
@@ -101,6 +137,14 @@ class UMars_AutoTestRig_Lever : UCk_AutoTest_Base
     protected void Step_BeginManipulation(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         _Control.Request_BeginManipulation(FMars_Request_Control_BeginManipulation(_Interaction));
+    }
+
+    // A walk grip: the rig's puller is the one who walks away.
+    UFUNCTION()
+    protected void Step_BeginWalkManipulation(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        _Control.Request_BeginManipulation(FMars_Request_Control_BeginManipulation(_Interaction,
+            EMars_Control_ManipulationCompletion::AtEngageAlpha, _Puller));
     }
 
     UFUNCTION()

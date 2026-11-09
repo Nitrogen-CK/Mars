@@ -2,14 +2,20 @@
 // direction ends the manipulation and the CkInteraction (Succeeded) - the Interactable's Engage chain then flips the
 // control, exactly as an Instant or Timed completion would. If that interaction finishes Failed instead (a cancel racing
 // the end), nothing engages and the handle settles back from the threshold. A grip begun OnRelease has no threshold: the
-// handle keeps following the pull inside [0, 1] until EndManipulation.
+// handle keeps following the pull inside [0, 1] until EndManipulation. A Walk control's Pull is set here each tick from the
+// puller's horizontal distance gained since the grip (over WalkCm, clamped); walking back lowers it and the spring follows.
+// A Walk grip whose puller is gone ends as EndManipulation ends it; its interaction ends by its own teardown.
 class UMars_Processor_Control_Tick : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
     default _RunAfter.Add(n"/Script/Angelscript.Mars_Processor_Control_HandleRequests");
 
-    // A hitch must not blow the spring up.
+    // A hitch must not blow the spring up: the frame is capped, then integrated in substeps no longer than this. One
+    // semi-implicit Euler step is only stable while Stiffness * dt^2 stays small; at the turnip bed's 400 / 40 a single
+    // 0.08 s step carried alpha from 0.30 past the 0.97 threshold and popped the root on a hitch frame (PIE run-09).
+    // 1/240 s keeps a stiffness of a few thousand well inside the stable range; a 0.1 s frame costs 24 cheap steps.
     private const float32 k_MaxStepSeconds = 0.1f;
+    private const float32 k_MaxSubstepSeconds = 1.0f / 240.0f;
 
     UFUNCTION(BlueprintOverride)
     void Configure(FCk_ScriptProcessorQuery& Query)
@@ -30,20 +36,39 @@ class UMars_Processor_Control_Tick : UCk_Processor_Script_Base_UE
 
         const auto DeltaSeconds = Math::Min(float32(InDeltaT.Get_Seconds()), k_MaxStepSeconds);
 
-        // Semi-implicit Euler, with the travel's ends as hard stops.
         auto Manipulation = InState.Manipulation.GetValue();
-        const auto Acceleration = Tuning.Stiffness * (Manipulation.Pull - Manipulation.Alpha) - Tuning.Damping * Manipulation.Velocity;
-        Manipulation.Velocity += Acceleration * DeltaSeconds;
-        Manipulation.Alpha += Manipulation.Velocity * DeltaSeconds;
-        if (Manipulation.Alpha < 0.0f)
+
+        if (Tuning.PullSource == EMars_Control_PullSource::Walk)
         {
-            Manipulation.Alpha = 0.0f;
-            Manipulation.Velocity = 0.0f;
+            if (ck::Is_NOT_Valid(Manipulation.Puller))
+            {
+                EndWithoutPuller(Self, InState);
+                return;
+            }
+
+            // TowardStart mirrors the travel, as the nudge integral does from its seeded alpha.
+            const auto Gained = Math::Clamp((Self.Get_HorizontalDistanceTo(Manipulation.Puller) - Manipulation.WalkStartCm) / Tuning.WalkCm, 0.0f, 1.0f);
+            Manipulation.Pull = Self.Get_PullDirection() == EMars_Control_PullDirection::TowardStart ? 1.0f - Gained : Gained;
         }
-        else if (Manipulation.Alpha > 1.0f)
+
+        // Semi-implicit Euler in substeps, with the travel's ends as hard stops.
+        const auto Substeps = Math::Max(int32(Math::CeilToInt(DeltaSeconds / k_MaxSubstepSeconds)), 1);
+        const auto SubstepSeconds = DeltaSeconds / float32(Substeps);
+        for (int32 Substep = 0; Substep < Substeps; ++Substep)
         {
-            Manipulation.Alpha = 1.0f;
-            Manipulation.Velocity = 0.0f;
+            const auto Acceleration = Tuning.Stiffness * (Manipulation.Pull - Manipulation.Alpha) - Tuning.Damping * Manipulation.Velocity;
+            Manipulation.Velocity += Acceleration * SubstepSeconds;
+            Manipulation.Alpha += Manipulation.Velocity * SubstepSeconds;
+            if (Manipulation.Alpha < 0.0f)
+            {
+                Manipulation.Alpha = 0.0f;
+                Manipulation.Velocity = 0.0f;
+            }
+            else if (Manipulation.Alpha > 1.0f)
+            {
+                Manipulation.Alpha = 1.0f;
+                Manipulation.Velocity = 0.0f;
+            }
         }
         InState.Manipulation = Manipulation;
 
@@ -88,6 +113,23 @@ class UMars_Processor_Control_Tick : UCk_Processor_Script_Base_UE
             ECk_Signal_BindingPolicy::FireIfPayloadInFlightThisFrame,
             ECk_Signal_PostFireBehavior::Unbind);
         utils_interaction::Request_EndInteraction(Interaction, FCk_Request_Interaction_EndInteraction(ECk_SucceededFailed::Succeeded));
+    }
+
+    // EndManipulation's end (UMars_Processor_Control_HandleRequests): the handle settles back, Released and progress 0.
+    private void EndWithoutPuller(FCk_Handle_Control& InControl, FMars_Fragment_Control& InState)
+    {
+        InState.Manipulation.Reset();
+        InControl.Request_TryRemove(FMars_Tag_Control_Manipulating);
+
+        auto Mover = InState.Mover;
+        if (ck::IsValid(Mover))
+        { Mover.Request_Settle(FMars_Request_Mover_Settle()); }
+
+        if (InControl.Has_Fragment(FMars_Fragment_Control_Signals))
+        { InControl.Get_Fragment(FMars_Fragment_Control_Signals).OnManipulationChanged.Broadcast(InControl, EMars_Control_Grip::Released); }
+
+        if (InControl.Has_Fragment(FMars_Fragment_Control_Signals))
+        { InControl.Get_Fragment(FMars_Fragment_Control_Signals).OnManipulationProgress.Broadcast(InControl, 0.0f); }
     }
 
     // A Failed finish engages nothing, so the handle would rest at the threshold: settle it back to the current target
