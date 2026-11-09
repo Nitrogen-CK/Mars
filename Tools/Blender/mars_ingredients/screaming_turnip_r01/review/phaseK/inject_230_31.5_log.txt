@@ -1,0 +1,6 @@
+00:04.406  blend            | Read blend: "D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\source\ScreamingTurnip_R01.blend"
+INJECT T 230 L 31.5: fails 0; Tug stem_gap -0.642 isect frames [] crown [-230.0, 65.365] dimple [-8.89, 1.991] ring 4.67; Cancel isect frames []; Release isect frames [2, 3, 4]
+TURNIP_OK inject 230,31.5
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+
+Blender quit

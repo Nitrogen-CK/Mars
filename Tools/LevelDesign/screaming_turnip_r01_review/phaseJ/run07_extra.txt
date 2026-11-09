@@ -1,0 +1,21 @@
+yaw within 5 deg after press (s): {'bed0': 0.1013, 'bed1_pull1': 0.1842, 'bed1_pull2': 0.0}
+cancel steps (first 14):
+   {'game': 13.4622, 'dt': 0.0085, 'clip': 'SRC_Tug->SRC_Tug', 't': 0.2495, 'step': 0.241, 'speed': 28.4, 'per_60hz': 0.473, 'glove': 0.241}
+   {'game': 13.4712, 'dt': 0.009, 'clip': 'SRC_Tug->SRC_Cancel', 't': 0.1169, 'step': 0.228, 'speed': 25.38, 'per_60hz': 0.423, 'glove': 0.228}
+   {'game': 13.4798, 'dt': 0.0086, 'clip': 'SRC_Cancel->SRC_Cancel', 't': 0.1197, 'step': 1.38, 'speed': 160.41, 'per_60hz': 2.674, 'glove': 1.643}
+   {'game': 13.487, 'dt': 0.0072, 'clip': 'SRC_Cancel->SRC_Cancel', 't': 0.1222, 'step': 0.877, 'speed': 121.86, 'per_60hz': 2.031, 'glove': 1.932}
+   {'game': 13.4959, 'dt': 0.0089, 'clip': 'SRC_Cancel->SRC_Cancel', 't': 0.1251, 'step': 1.08, 'speed': 121.31, 'per_60hz': 2.022, 'glove': 3.739}
+   {'game': 13.5034, 'dt': 0.0075, 'clip': 'SRC_Cancel->SRC_Cancel', 't': 0.1276, 'step': 0.908, 'speed': 121.1, 'per_60hz': 2.018, 'glove': 5.534}
+   {'game': 13.5105, 'dt': 0.0071, 'clip': 'SRC_Cancel->SRC_Cancel', 't': 0.13, 'step': 0.869, 'speed': 122.41, 'per_60hz': 2.04, 'glove': 7.84}
+   {'game': 13.5179, 'dt': 0.0074, 'clip': 'SRC_Cancel->SRC_Cancel', 't': 0.1325, 'step': 0.893, 'speed': 120.65, 'per_60hz': 2.011, 'glove': 10.738}
+   {'game': 13.5252, 'dt': 0.0073, 'clip': 'SRC_Cancel->SRC_Cancel', 't': 0.1349, 'step': 1.009, 'speed': 138.16, 'per_60hz': 2.303, 'glove': 14.121}
+   {'game': 13.5338, 'dt': 0.0086, 'clip': 'SRC_Cancel->SRC_Cancel', 't': 0.1377, 'step': 1.269, 'speed': 147.54, 'per_60hz': 2.459, 'glove': 18.744}
+   {'game': 13.5413, 'dt': 0.0075, 'clip': 'SRC_Cancel->SRC_Cancel', 't': 0.1402, 'step': 1.109, 'speed': 147.86, 'per_60hz': 2.464, 'glove': 22.967}
+   {'game': 13.5494, 'dt': 0.0081, 'clip': 'SRC_Cancel->SRC_Cancel', 't': 0.1429, 'step': 1.198, 'speed': 147.94, 'per_60hz': 2.466, 'glove': 28.13}
+   {'game': 13.5593, 'dt': 0.0099, 'clip': 'SRC_Cancel->SRC_Cancel', 't': 0.1462, 'step': 1.466, 'speed': 148.12, 'per_60hz': 2.469, 'glove': 35.051}
+   {'game': 13.5679, 'dt': 0.0086, 'clip': 'SRC_Cancel->SRC_Cancel', 't': 0.1491, 'step': 1.284, 'speed': 149.35, 'per_60hz': 2.489, 'glove': 41.261}
+cancel in-clip per_60hz max 2.674, min 0.388 over 35 steps
+bed0 first-person Tug rows (hold0 under the side view excluded): n 332, glove(n) vs socket(n-1) max 0.000 cm, rows > 0.5 cm 0, same tick max 4.031 cm
+bed0 last visible Tug row: game 6.9847 d 184.612 pitch -27.702 ring [{'pct': 0.9748, 'vis': 'VISIBLE: 0>', 'shown': True}]; Tug rows without a prompt ring: 0; pitch range [-41.345, -6.563]
+bed1 last visible Tug row: game 19.8775 d 189.626 pitch -27.101 ring [{'pct': 0.999, 'vis': 'VISIBLE: 0>', 'shown': True}]; Tug rows without a prompt ring: 0; pitch range [-41.142, -27.101]
+bed0 first hidden row game 7.0789 dt 0.0942 (previous row alpha 0.9456, ring [{'pct': 0.9748, 'vis': 'VISIBLE: 0>', 'shown': True}]); shots near: ['K6_break_fp']

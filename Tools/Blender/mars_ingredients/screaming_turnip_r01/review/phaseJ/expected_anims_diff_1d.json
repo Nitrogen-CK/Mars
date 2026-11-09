@@ -1,0 +1,157 @@
+{
+ "a": "review/phaseJ/iterations/r03_1c/expected_anims.json",
+ "b": "export/anims/expected_anims.json",
+ "tol_cm": 0.001,
+ "clips": {
+  "ROOT_AirborneLeafTrail": {
+   "max_abs": 0.0,
+   "at": null,
+   "leaves": 1775,
+   "bone_landmarks_max_abs": 0.0,
+   "extremes_max_abs": 0.0,
+   "peak_verts_max_abs": 0.0,
+   "unchanged": true
+  },
+  "ROOT_Anticipate": {
+   "max_abs": 0.0,
+   "at": null,
+   "leaves": 578,
+   "bone_landmarks_max_abs": 0.0,
+   "extremes_max_abs": 0.0,
+   "peak_verts_max_abs": 0.0,
+   "unchanged": true
+  },
+  "ROOT_AnticipateTired": {
+   "max_abs": 0.0,
+   "at": null,
+   "leaves": 578,
+   "bone_landmarks_max_abs": 0.0,
+   "extremes_max_abs": 0.0,
+   "peak_verts_max_abs": 0.0,
+   "unchanged": true
+  },
+  "ROOT_ImpactSquash": {
+   "max_abs": 0.0,
+   "at": null,
+   "leaves": 464,
+   "bone_landmarks_max_abs": 0.0,
+   "extremes_max_abs": 0.0,
+   "peak_verts_max_abs": 0.0,
+   "unchanged": true
+  },
+  "ROOT_Inhale": {
+   "max_abs": 0.09720000000000084,
+   "at": "/peak_verts_blender_cm/0[338][2]",
+   "leaves": 11864,
+   "bone_landmarks_max_abs": 0.0,
+   "extremes_max_abs": 0.0,
+   "peak_verts_max_abs": 0.09720000000000084,
+   "unchanged": true
+  },
+  "ROOT_PlaceSettle": {
+   "max_abs": 0.0,
+   "at": null,
+   "leaves": 464,
+   "bone_landmarks_max_abs": 0.0,
+   "extremes_max_abs": 0.0,
+   "peak_verts_max_abs": 0.0,
+   "unchanged": true
+  },
+  "ROOT_QuietIdle": {
+   "max_abs": 0.0,
+   "at": null,
+   "leaves": 8357,
+   "bone_landmarks_max_abs": 0.0,
+   "extremes_max_abs": 0.0,
+   "peak_verts_max_abs": 0.0,
+   "unchanged": true
+  },
+  "ROOT_Recover": {
+   "max_abs": 0.0,
+   "at": null,
+   "leaves": 1777,
+   "bone_landmarks_max_abs": 0.0,
+   "extremes_max_abs": 0.0,
+   "peak_verts_max_abs": 0.0,
+   "unchanged": true
+  },
+  "ROOT_RecoveryIdle": {
+   "max_abs": 0.0,
+   "at": null,
+   "leaves": 3485,
+   "bone_landmarks_max_abs": 0.0,
+   "extremes_max_abs": 0.0,
+   "peak_verts_max_abs": 0.0,
+   "unchanged": true
+  },
+  "ROOT_Scream": {
+   "max_abs": 0.03709000000000007,
+   "at": "/peak_verts_blender_cm/11[322][0]",
+   "leaves": 79049,
+   "bone_landmarks_max_abs": 0.0,
+   "extremes_max_abs": 0.0,
+   "peak_verts_max_abs": 0.03709000000000007,
+   "unchanged": true
+  },
+  "ROOT_SettleRock": {
+   "max_abs": 0.0,
+   "at": null,
+   "leaves": 749,
+   "bone_landmarks_max_abs": 0.0,
+   "extremes_max_abs": 0.0,
+   "peak_verts_max_abs": 0.0,
+   "unchanged": true
+  },
+  "SRC_Cancel": {
+   "max_abs": 36.86059999999999,
+   "at": "/landmarks/0/leaf_01_b[0]",
+   "leaves": 464,
+   "bone_landmarks_max_abs": 36.86059999999999,
+   "extremes_max_abs": 35.2996,
+   "peak_verts_max_abs": 0.0,
+   "unchanged": false
+  },
+  "SRC_Grip": {
+   "max_abs": 0.0,
+   "at": null,
+   "leaves": 407,
+   "bone_landmarks_max_abs": 0.0,
+   "extremes_max_abs": 0.0,
+   "peak_verts_max_abs": 0.0,
+   "unchanged": true
+  },
+  "SRC_Idle": {
+   "max_abs": 0.0,
+   "at": null,
+   "leaves": 8357,
+   "bone_landmarks_max_abs": 0.0,
+   "extremes_max_abs": 0.0,
+   "peak_verts_max_abs": 0.0,
+   "unchanged": true
+  },
+  "SRC_Release": {
+   "max_abs": 36.86059999999999,
+   "at": "/landmarks/0/leaf_01_b[0]",
+   "leaves": 407,
+   "bone_landmarks_max_abs": 36.86059999999999,
+   "extremes_max_abs": 35.2996,
+   "peak_verts_max_abs": 0.0,
+   "unchanged": false
+  },
+  "SRC_Tug": {
+   "max_abs": 36.86059999999999,
+   "at": "/landmarks/15/leaf_01_b[0]",
+   "leaves": 920,
+   "bone_landmarks_max_abs": 36.86059999999999,
+   "extremes_max_abs": 35.2996,
+   "peak_verts_max_abs": 0.0,
+   "unchanged": false
+  }
+ },
+ "changed": [
+  "SRC_Cancel",
+  "SRC_Release",
+  "SRC_Tug"
+ ],
+ "fails": []
+}

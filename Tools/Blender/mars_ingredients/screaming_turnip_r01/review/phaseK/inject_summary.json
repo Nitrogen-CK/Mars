@@ -1,0 +1,560 @@
+{
+ "what": "runtime crown offset (-T * a, 0, L * a) UE cm injected on SRC_Tug (a = f / 15) and SRC_Cancel (a = 1 - f / 7); gates: intersections 0, stem_gap <= 0, neck (dimple <= 9 cm x / <= 3 cm z from Tug f0, ring below the dimple); SRC_Release is info only (the bed never plays it); L ~ 0.137 T above the brief's four points",
+ "default": {
+  "T_cm": 146.2,
+  "L_cm": 20.0
+ },
+ "default_run": {
+  "T_cm": 146.2,
+  "L_cm": 20.0,
+  "pass": true,
+  "fail_count": 0,
+  "failing_gates": [],
+  "first_fail": null,
+  "tug_full": {
+   "crown_xz": [
+    -146.2,
+    53.865
+   ],
+   "socket_R": [
+    -149.909,
+    4.683,
+    53.721
+   ],
+   "dimple_d_xz": [
+    -6.376,
+    1.646
+   ],
+   "ring_max_d": 3.849,
+   "stem_gap_max": -0.7152
+  },
+  "release_info_count": 5
+ },
+ "safe_travel_cm": [
+  20.0,
+  230.0
+ ],
+ "first_fail_above_default": {
+  "T_cm": 235.0,
+  "L_cm": 32.1,
+  "pass": false,
+  "fail_count": 2,
+  "failing_gates": [
+   "neck dimple"
+  ],
+  "first_fail": "SRC_Tug f15 (a 1.00): neck dimple [-9.04, 2.009] ring 4.71",
+  "tug_full": {
+   "crown_xz": [
+    -235.0,
+    65.965
+   ],
+   "socket_R": [
+    -238.709,
+    4.683,
+    65.821
+   ],
+   "dimple_d_xz": [
+    -9.04,
+    2.009
+   ],
+   "ring_max_d": 4.715,
+   "stem_gap_max": -0.6377
+  },
+  "release_info_count": 7
+ },
+ "last_fail_below_default": 10.0,
+ "runs": [
+  {
+   "T_cm": 0.0,
+   "L_cm": 0.0,
+   "pass": false,
+   "fail_count": 35,
+   "failing_gates": [
+    "intersections",
+    "neck dimple"
+   ],
+   "first_fail": "SRC_Tug f1 (a 0.07): neck dimple [-0.027, 0.017] ring 0.04",
+   "tug_full": {
+    "crown_xz": [
+     0.0,
+     33.865
+    ],
+    "socket_R": [
+     -3.709,
+     4.683,
+     33.721
+    ],
+    "dimple_d_xz": [
+     -1.99,
+     1.046
+    ],
+    "ring_max_d": 2.469,
+    "stem_gap_max": -0.1204
+   },
+   "release_info_count": 5
+  },
+  {
+   "T_cm": 5.0,
+   "L_cm": 0.7,
+   "pass": false,
+   "fail_count": 31,
+   "failing_gates": [
+    "neck dimple",
+    "stem_gap"
+   ],
+   "first_fail": "SRC_Tug f3 (a 0.20): neck dimple [-0.244, 0.14] ring 0.29",
+   "tug_full": {
+    "crown_xz": [
+     -5.0,
+     34.565
+    ],
+    "socket_R": [
+     -8.709,
+     4.683,
+     34.421
+    ],
+    "dimple_d_xz": [
+     -2.14,
+     1.067
+    ],
+    "ring_max_d": 2.515,
+    "stem_gap_max": 0.9207
+   },
+   "release_info_count": 5
+  },
+  {
+   "T_cm": 10.0,
+   "L_cm": 1.4,
+   "pass": false,
+   "fail_count": 14,
+   "failing_gates": [
+    "neck dimple"
+   ],
+   "first_fail": "SRC_Tug f7 (a 0.47): neck dimple [-0.974, 0.517] ring 1.11",
+   "tug_full": {
+    "crown_xz": [
+     -10.0,
+     35.265
+    ],
+    "socket_R": [
+     -13.709,
+     4.683,
+     35.121
+    ],
+    "dimple_d_xz": [
+     -2.29,
+     1.088
+    ],
+    "ring_max_d": 2.561,
+    "stem_gap_max": -0.7334
+   },
+   "release_info_count": 4
+  },
+  {
+   "T_cm": 20.0,
+   "L_cm": 2.7,
+   "pass": true,
+   "fail_count": 0,
+   "failing_gates": [],
+   "first_fail": null,
+   "tug_full": {
+    "crown_xz": [
+     -20.0,
+     36.565
+    ],
+    "socket_R": [
+     -23.709,
+     4.683,
+     36.421
+    ],
+    "dimple_d_xz": [
+     -2.59,
+     1.127
+    ],
+    "ring_max_d": 2.652,
+    "stem_gap_max": -0.7334
+   },
+   "release_info_count": 2
+  },
+  {
+   "T_cm": 28.0,
+   "L_cm": 3.8,
+   "pass": true,
+   "fail_count": 0,
+   "failing_gates": [],
+   "first_fail": null,
+   "tug_full": {
+    "crown_xz": [
+     -28.0,
+     37.665
+    ],
+    "socket_R": [
+     -31.709,
+     4.683,
+     37.521
+    ],
+    "dimple_d_xz": [
+     -2.83,
+     1.16
+    ],
+    "ring_max_d": 2.726,
+    "stem_gap_max": -0.7334
+   },
+   "release_info_count": 3
+  },
+  {
+   "T_cm": 36.0,
+   "L_cm": 5.0,
+   "pass": true,
+   "fail_count": 0,
+   "failing_gates": [],
+   "first_fail": null,
+   "tug_full": {
+    "crown_xz": [
+     -36.0,
+     38.865
+    ],
+    "socket_R": [
+     -39.709,
+     4.683,
+     38.721
+    ],
+    "dimple_d_xz": [
+     -3.07,
+     1.196
+    ],
+    "ring_max_d": 2.8,
+    "stem_gap_max": -0.7334
+   },
+   "release_info_count": 3
+  },
+  {
+   "T_cm": 74.0,
+   "L_cm": 10.0,
+   "pass": true,
+   "fail_count": 0,
+   "failing_gates": [],
+   "first_fail": null,
+   "tug_full": {
+    "crown_xz": [
+     -74.0,
+     43.865
+    ],
+    "socket_R": [
+     -77.709,
+     4.683,
+     43.721
+    ],
+    "dimple_d_xz": [
+     -4.21,
+     1.346
+    ],
+    "ring_max_d": 3.156,
+    "stem_gap_max": -0.7334
+   },
+   "release_info_count": 4
+  },
+  {
+   "T_cm": 146.0,
+   "L_cm": 20.0,
+   "pass": true,
+   "fail_count": 0,
+   "failing_gates": [],
+   "first_fail": null,
+   "tug_full": {
+    "crown_xz": [
+     -146.0,
+     53.865
+    ],
+    "socket_R": [
+     -149.709,
+     4.683,
+     53.721
+    ],
+    "dimple_d_xz": [
+     -6.37,
+     1.646
+    ],
+    "ring_max_d": 3.847,
+    "stem_gap_max": -0.7155
+   },
+   "release_info_count": 5
+  },
+  {
+   "T_cm": 146.2,
+   "L_cm": 20.0,
+   "pass": true,
+   "fail_count": 0,
+   "failing_gates": [],
+   "first_fail": null,
+   "tug_full": {
+    "crown_xz": [
+     -146.2,
+     53.865
+    ],
+    "socket_R": [
+     -149.909,
+     4.683,
+     53.721
+    ],
+    "dimple_d_xz": [
+     -6.376,
+     1.646
+    ],
+    "ring_max_d": 3.849,
+    "stem_gap_max": -0.7152
+   },
+   "release_info_count": 5
+  },
+  {
+   "T_cm": 220.0,
+   "L_cm": 30.0,
+   "pass": true,
+   "fail_count": 0,
+   "failing_gates": [],
+   "first_fail": null,
+   "tug_full": {
+    "crown_xz": [
+     -220.0,
+     63.865
+    ],
+    "socket_R": [
+     -223.709,
+     4.683,
+     63.721
+    ],
+    "dimple_d_xz": [
+     -8.59,
+     1.946
+    ],
+    "ring_max_d": 4.568,
+    "stem_gap_max": -0.6487
+   },
+   "release_info_count": 6
+  },
+  {
+   "T_cm": 230.0,
+   "L_cm": 31.5,
+   "pass": true,
+   "fail_count": 0,
+   "failing_gates": [],
+   "first_fail": null,
+   "tug_full": {
+    "crown_xz": [
+     -230.0,
+     65.365
+    ],
+    "socket_R": [
+     -233.709,
+     4.683,
+     65.221
+    ],
+    "dimple_d_xz": [
+     -8.89,
+     1.991
+    ],
+    "ring_max_d": 4.666,
+    "stem_gap_max": -0.6416
+   },
+   "release_info_count": 6
+  },
+  {
+   "T_cm": 235.0,
+   "L_cm": 32.1,
+   "pass": false,
+   "fail_count": 2,
+   "failing_gates": [
+    "neck dimple"
+   ],
+   "first_fail": "SRC_Tug f15 (a 1.00): neck dimple [-9.04, 2.009] ring 4.71",
+   "tug_full": {
+    "crown_xz": [
+     -235.0,
+     65.965
+    ],
+    "socket_R": [
+     -238.709,
+     4.683,
+     65.821
+    ],
+    "dimple_d_xz": [
+     -9.04,
+     2.009
+    ],
+    "ring_max_d": 4.715,
+    "stem_gap_max": -0.6377
+   },
+   "release_info_count": 7
+  },
+  {
+   "T_cm": 240.0,
+   "L_cm": 32.8,
+   "pass": false,
+   "fail_count": 2,
+   "failing_gates": [
+    "neck dimple"
+   ],
+   "first_fail": "SRC_Tug f15 (a 1.00): neck dimple [-9.19, 2.03] ring 4.76",
+   "tug_full": {
+    "crown_xz": [
+     -240.0,
+     66.665
+    ],
+    "socket_R": [
+     -243.709,
+     4.683,
+     66.521
+    ],
+    "dimple_d_xz": [
+     -9.19,
+     2.03
+    ],
+    "ring_max_d": 4.764,
+    "stem_gap_max": -0.6341
+   },
+   "release_info_count": 7
+  },
+  {
+   "T_cm": 260.0,
+   "L_cm": 35.6,
+   "pass": false,
+   "fail_count": 3,
+   "failing_gates": [
+    "neck dimple"
+   ],
+   "first_fail": "SRC_Tug f14 (a 0.93): neck dimple [-9.23, 2.026] ring 4.74",
+   "tug_full": {
+    "crown_xz": [
+     -260.0,
+     69.465
+    ],
+    "socket_R": [
+     -263.709,
+     4.683,
+     69.321
+    ],
+    "dimple_d_xz": [
+     -9.79,
+     2.114
+    ],
+    "ring_max_d": 4.961,
+    "stem_gap_max": -0.6207
+   },
+   "release_info_count": 7
+  },
+  {
+   "T_cm": 280.0,
+   "L_cm": 38.3,
+   "pass": false,
+   "fail_count": 5,
+   "failing_gates": [
+    "neck dimple"
+   ],
+   "first_fail": "SRC_Tug f13 (a 0.87): neck dimple [-9.123, 1.979] ring 4.62",
+   "tug_full": {
+    "crown_xz": [
+     -280.0,
+     72.165
+    ],
+    "socket_R": [
+     -283.709,
+     4.683,
+     72.021
+    ],
+    "dimple_d_xz": [
+     -10.39,
+     2.195
+    ],
+    "ring_max_d": 5.158,
+    "stem_gap_max": -0.6078
+   },
+   "release_info_count": 7
+  },
+  {
+   "T_cm": 300.0,
+   "L_cm": 41.0,
+   "pass": false,
+   "fail_count": 6,
+   "failing_gates": [
+    "intersections",
+    "neck dimple"
+   ],
+   "first_fail": "SRC_Tug f6 (a 0.40): intersections {'outer_shell_self': 26}",
+   "tug_full": {
+    "crown_xz": [
+     -300.0,
+     74.865
+    ],
+    "socket_R": [
+     -303.709,
+     4.683,
+     74.721
+    ],
+    "dimple_d_xz": [
+     -10.99,
+     2.276
+    ],
+    "ring_max_d": 5.355,
+    "stem_gap_max": -0.5958
+   },
+   "release_info_count": 7
+  },
+  {
+   "T_cm": 400.0,
+   "L_cm": 55.0,
+   "pass": false,
+   "fail_count": 9,
+   "failing_gates": [
+    "neck dimple"
+   ],
+   "first_fail": "SRC_Tug f10 (a 0.67): neck dimple [-9.313, 1.843] ring 4.23",
+   "tug_full": {
+    "crown_xz": [
+     -400.0,
+     88.865
+    ],
+    "socket_R": [
+     -403.709,
+     4.683,
+     88.721
+    ],
+    "dimple_d_xz": [
+     -13.99,
+     2.696
+    ],
+    "ring_max_d": 6.348,
+    "stem_gap_max": -0.5479
+   },
+   "release_info_count": 8
+  },
+  {
+   "T_cm": 500.0,
+   "L_cm": 68.0,
+   "pass": false,
+   "fail_count": 13,
+   "failing_gates": [
+    "intersections",
+    "neck dimple"
+   ],
+   "first_fail": "SRC_Tug f3 (a 0.20): intersections {'leaf_vs_leaf': 12}",
+   "tug_full": {
+    "crown_xz": [
+     -500.0,
+     101.865
+    ],
+    "socket_R": [
+     -503.709,
+     4.683,
+     101.721
+    ],
+    "dimple_d_xz": [
+     -16.99,
+     3.086
+    ],
+    "ring_max_d": 7.342,
+    "stem_gap_max": -0.5097
+   },
+   "release_info_count": 8
+  }
+ ]
+}

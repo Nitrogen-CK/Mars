@@ -1,0 +1,2 @@
+SRC_Tug HarvestGrip_R -X travel vs alpha*38.2 (crown_travel.json, linear between frames): max |diff| 2.977 cm at alpha 0.800
+travel at alpha 1.0: 38.153 cm

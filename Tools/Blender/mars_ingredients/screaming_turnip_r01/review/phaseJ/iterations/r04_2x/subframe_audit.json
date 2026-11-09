@@ -1,0 +1,20 @@
+{
+ "SRC_Tug": {
+  "samples": 151,
+  "step_frames": 0.1,
+  "stem_gap_max_cm": -0.687,
+  "isect": {}
+ },
+ "SRC_Cancel": {
+  "samples": 71,
+  "step_frames": 0.1,
+  "stem_gap_max_cm": -0.686,
+  "isect": {}
+ },
+ "SRC_Release": {
+  "samples": 61,
+  "step_frames": 0.1,
+  "stem_gap_max_cm": -0.687,
+  "isect": {}
+ }
+}

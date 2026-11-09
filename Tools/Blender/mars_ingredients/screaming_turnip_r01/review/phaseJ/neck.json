@@ -1,0 +1,299 @@
+{
+ "frame_map": "UE cm (x, -y, z), root-relative; displacement from SRC_Tug f0 (== SRC_Grip f6)",
+ "dimple_vertex": [
+  338
+ ],
+ "top_ring_vertices": 28,
+ "target": "dimple <= 25 % of the crown head's travel at SRC_Tug f15 (<= 9 cm x, <= 3 cm z); the top ring less",
+ "frames": {
+  "0": {
+   "crown_d": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "dimple_d": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "dimple_pct_of_crown": 0.0,
+   "ring_max_d": 0.0,
+   "ring_max_abs_dx": 0.0,
+   "ring_max_dz": 0.0,
+   "ring_pct_of_crown": 0.0
+  },
+  "1": {
+   "crown_d": [
+    -2.352,
+    0.0,
+    0.413
+   ],
+   "dimple_d": [
+    -0.098,
+    0.0,
+    0.028
+   ],
+   "dimple_pct_of_crown": 4.3,
+   "ring_max_d": 0.057,
+   "ring_max_abs_dx": 0.054,
+   "ring_max_dz": 0.026,
+   "ring_pct_of_crown": 2.4
+  },
+  "2": {
+   "crown_d": [
+    -8.777,
+    0.0,
+    1.514
+   ],
+   "dimple_d": [
+    -0.366,
+    0.0,
+    0.105
+   ],
+   "dimple_pct_of_crown": 4.3,
+   "ring_max_d": 0.214,
+   "ring_max_abs_dx": 0.2,
+   "ring_max_dz": 0.096,
+   "ring_pct_of_crown": 2.4
+  },
+  "3": {
+   "crown_d": [
+    -18.348,
+    0.0,
+    3.065
+   ],
+   "dimple_d": [
+    -0.765,
+    0.0,
+    0.215
+   ],
+   "dimple_pct_of_crown": 4.3,
+   "ring_max_d": 0.448,
+   "ring_max_abs_dx": 0.42,
+   "ring_max_dz": 0.199,
+   "ring_pct_of_crown": 2.4
+  },
+  "4": {
+   "crown_d": [
+    -30.134,
+    0.0,
+    4.825
+   ],
+   "dimple_d": [
+    -1.258,
+    0.0,
+    0.346
+   ],
+   "dimple_pct_of_crown": 4.3,
+   "ring_max_d": 0.737,
+   "ring_max_abs_dx": 0.69,
+   "ring_max_dz": 0.323,
+   "ring_pct_of_crown": 2.4
+  },
+  "5": {
+   "crown_d": [
+    -43.186,
+    0.0,
+    6.593
+   ],
+   "dimple_d": [
+    -1.807,
+    0.0,
+    0.484
+   ],
+   "dimple_pct_of_crown": 4.3,
+   "ring_max_d": 1.058,
+   "ring_max_abs_dx": 0.991,
+   "ring_max_dz": 0.458,
+   "ring_pct_of_crown": 2.4
+  },
+  "6": {
+   "crown_d": [
+    -56.526,
+    0.0,
+    8.234
+   ],
+   "dimple_d": [
+    -2.371,
+    0.0,
+    0.62
+   ],
+   "dimple_pct_of_crown": 4.3,
+   "ring_max_d": 1.389,
+   "ring_max_abs_dx": 1.302,
+   "ring_max_dz": 0.593,
+   "ring_pct_of_crown": 2.4
+  },
+  "7": {
+   "crown_d": [
+    -69.142,
+    0.0,
+    9.692
+   ],
+   "dimple_d": [
+    -2.908,
+    0.0,
+    0.746
+   ],
+   "dimple_pct_of_crown": 4.3,
+   "ring_max_d": 1.706,
+   "ring_max_abs_dx": 1.6,
+   "ring_max_dz": 0.72,
+   "ring_pct_of_crown": 2.4
+  },
+  "8": {
+   "crown_d": [
+    -79.99,
+    0.0,
+    10.991
+   ],
+   "dimple_d": [
+    -3.378,
+    0.0,
+    0.857
+   ],
+   "dimple_pct_of_crown": 4.3,
+   "ring_max_d": 1.987,
+   "ring_max_abs_dx": 1.864,
+   "ring_max_dz": 0.832,
+   "ring_pct_of_crown": 2.5
+  },
+  "9": {
+   "crown_d": [
+    -90.532,
+    0.0,
+    12.524
+   ],
+   "dimple_d": [
+    -3.847,
+    0.0,
+    0.978
+   ],
+   "dimple_pct_of_crown": 4.3,
+   "ring_max_d": 2.275,
+   "ring_max_abs_dx": 2.134,
+   "ring_max_dz": 0.95,
+   "ring_pct_of_crown": 2.5
+  },
+  "10": {
+   "crown_d": [
+    -102.31,
+    0.0,
+    14.369
+   ],
+   "dimple_d": [
+    -4.382,
+    0.0,
+    1.119
+   ],
+   "dimple_pct_of_crown": 4.4,
+   "ring_max_d": 2.609,
+   "ring_max_abs_dx": 2.448,
+   "ring_max_dz": 1.088,
+   "ring_pct_of_crown": 2.5
+  },
+  "11": {
+   "crown_d": [
+    -114.355,
+    0.0,
+    16.196
+   ],
+   "dimple_d": [
+    -4.936,
+    0.0,
+    1.262
+   ],
+   "dimple_pct_of_crown": 4.4,
+   "ring_max_d": 2.957,
+   "ring_max_abs_dx": 2.775,
+   "ring_max_dz": 1.228,
+   "ring_pct_of_crown": 2.6
+  },
+  "12": {
+   "crown_d": [
+    -125.641,
+    0.0,
+    17.775
+   ],
+   "dimple_d": [
+    -5.457,
+    0.0,
+    1.39
+   ],
+   "dimple_pct_of_crown": 4.4,
+   "ring_max_d": 3.285,
+   "ring_max_abs_dx": 3.085,
+   "ring_max_dz": 1.358,
+   "ring_pct_of_crown": 2.6
+  },
+  "13": {
+   "crown_d": [
+    -135.087,
+    0.0,
+    18.973
+   ],
+   "dimple_d": [
+    -5.895,
+    0.0,
+    1.492
+   ],
+   "dimple_pct_of_crown": 4.5,
+   "ring_max_d": 3.56,
+   "ring_max_abs_dx": 3.345,
+   "ring_max_dz": 1.463,
+   "ring_pct_of_crown": 2.6
+  },
+  "14": {
+   "crown_d": [
+    -141.576,
+    0.0,
+    19.728
+   ],
+   "dimple_d": [
+    -6.197,
+    0.0,
+    1.56
+   ],
+   "dimple_pct_of_crown": 4.5,
+   "ring_max_d": 3.75,
+   "ring_max_abs_dx": 3.525,
+   "ring_max_dz": 1.534,
+   "ring_pct_of_crown": 2.6
+  },
+  "15": {
+   "crown_d": [
+    -143.986,
+    0.0,
+    19.997
+   ],
+   "dimple_d": [
+    -6.31,
+    0.0,
+    1.584
+   ],
+   "dimple_pct_of_crown": 4.5,
+   "ring_max_d": 3.82,
+   "ring_max_abs_dx": 3.593,
+   "ring_max_dz": 1.561,
+   "ring_pct_of_crown": 2.6
+  }
+ },
+ "f15": {
+  "crown_d": [
+   -143.986,
+   0.0,
+   19.997
+  ],
+  "dimple_d": [
+   -6.31,
+   0.0,
+   1.584
+  ],
+  "dimple_pct_of_crown": 4.5,
+  "ring_max_d": 3.82,
+  "ring_max_abs_dx": 3.593,
+  "ring_max_dz": 1.561,
+  "ring_pct_of_crown": 2.6
+ }
+}

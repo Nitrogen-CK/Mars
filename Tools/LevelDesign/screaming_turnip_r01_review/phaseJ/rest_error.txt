@@ -1,0 +1,6 @@
+run-05-walk bed0 rest rows 0 max |alpha - want| None
+run-05-walk bed1_pull1 rest rows 0 max |alpha - want| None
+run-05-walk bed1_pull2 rest rows 31 max |alpha - want| 0.0028
+run-05-walk-shots bed0 rest rows 97 max |alpha - want| 0.0021
+run-05-walk-shots bed1_pull1 rest rows 0 max |alpha - want| None
+run-05-walk-shots bed1_pull2 rest rows 235 max |alpha - want| 0.0029

@@ -1,0 +1,828 @@
+{
+ "poses": {
+  "neutral": {
+   "spec": {},
+   "bounds": {
+    "min": [
+     -17.69,
+     -20.041,
+     0.0
+    ],
+    "max": [
+     16.214,
+     20.041,
+     48.0
+    ],
+    "h_z": 48.0,
+    "w_y": 40.082,
+    "d_x": 33.904
+   },
+   "envelope_exceeded_by_cm": {},
+   "bulb_bounds": {
+    "min": [
+     -12.0,
+     -14.006,
+     5.4
+    ],
+    "max": [
+     11.832,
+     14.006,
+     35.1
+    ],
+    "h_z": 29.7,
+    "w_y": 28.013,
+    "d_x": 23.832
+   },
+   "bulb_h_ratio": 1.0,
+   "bulb_w_ratio": 1.0,
+   "intersections": {
+    "mouth_self (lip+cavity folding)": 0,
+    "teeth_vs_mouth": 0,
+    "teeth_vs_teeth": 0,
+    "mouth_vs_outer_shell": 0,
+    "outer_shell_self": 0,
+    "taproot_vs_bulb": 0,
+    "leaf_vs_leaf": 0,
+    "pad_self (lip pad self-contact, info)": 0,
+    "teeth_vs_pad": 0,
+    "leaf_vs_bulb": 0,
+    "attach_tooth_root (info)": 158,
+    "attach_stem_root (info)": 100,
+    "attach_taproot_root (info)": 40,
+    "lip_teeth_vs_cavity (sum)": 0
+   },
+   "gape": {
+    "side_lip_separation_cm": 4.673,
+    "open_width_over_neutral_bulb_width": 0.167,
+    "vertical_lip_separation_cm": 0.516,
+    "closure_aperture_l1_cm": 0.036,
+    "tip_span_y_cm": 12.7,
+    "outline_extent_y_cm": 12.7,
+    "outline_extent_y_over_neutral_bulb_width": 0.453
+   },
+   "cheeks": {
+    "bulb_width_at_cheek_height_cm": 28.013,
+    "cheek_head_z": 19.2,
+    "width_ratio_vs_neutral": 1.0
+   },
+   "mouth_b2": {
+    "pad_thickness_cm": {
+     "U": 4.71,
+     "L": 5.06,
+     "S+": 4.674,
+     "S-": 4.674
+    },
+    "pad_crest_x_max": 15.184,
+    "crease_depth_cm": {
+     "pp": {
+      "s0.25": 3.198,
+      "s0.50": 2.552,
+      "s0.75": 0.773
+     },
+     "pm": {
+      "s0.25": 3.309,
+      "s0.50": 2.637,
+      "s0.75": 0.809
+     },
+     "mm": {
+      "s0.25": 3.309,
+      "s0.50": 2.637,
+      "s0.75": 0.809
+     },
+     "mp": {
+      "s0.25": 3.198,
+      "s0.50": 2.552,
+      "s0.75": 0.773
+     }
+    },
+    "crease_depth_min_at_s0.5": 2.552,
+    "centre_pinch_cm": 0.952,
+    "centre_below_pad_crests_cm": 3.16,
+    "gap_closure_cm": 0.041,
+    "centre_aperture_cm": 0.0,
+    "rim_front_cm": {
+     "min": 3.528,
+     "mean": 4.904
+    },
+    "rim_front_min_by_pad_cm": {
+     "U": 3.528,
+     "L": 3.776,
+     "S+": 4.597,
+     "S-": 4.597
+    },
+    "cavity_depth_cm": 12.469,
+    "lobes": {
+     "lobe_l": {
+      "apex": [
+       8.946,
+       11.638,
+       19.2
+      ],
+      "forward_cm": 0.0,
+      "outward_cm": 0.0,
+      "apex_x_minus_lip_crest_x": -6.238,
+      "front_x": 10.092,
+      "front_x_minus_lip_crest_x": -5.092
+     },
+     "lobe_r": {
+      "apex": [
+       8.946,
+       -11.638,
+       19.2
+      ],
+      "forward_cm": 0.0,
+      "outward_cm": 0.0,
+      "apex_x_minus_lip_crest_x": -6.238,
+      "front_x": 10.092,
+      "front_x_minus_lip_crest_x": -5.092
+     }
+    },
+    "tip_span_y_cm": 12.7,
+    "tip_span_z_cm": 6.0,
+    "tip_span_y_ratio": 1.0,
+    "tip_span_z_ratio": 1.0,
+    "crest_ring_span_y_ratio": 1.0
+   },
+   "root_matrix_max_abs_dev": 0.0,
+   "taproot_tip_z": 0.0,
+   "teeth_min_z": 15.879,
+   "ue_dev_cm": 1e-05,
+   "ue_dev_worst_vertex": 1590
+  },
+  "inhale": {
+   "spec": {
+    "bh": 0.92,
+    "bw": 0.88,
+    "jaw": 0.0,
+    "cheek": {
+     "s": [
+      1.3,
+      1.3,
+      1.3
+     ],
+     "pivot": [
+      1.5,
+      3.3,
+      6.4
+     ],
+     "dl": [
+      1.6,
+      1.25,
+      0.0
+     ]
+    },
+    "sk": {
+     "Inhale": 1.0
+    },
+    "la": -14.0,
+    "lb": -10.0
+   },
+   "bounds": {
+    "min": [
+     -12.107,
+     -19.348,
+     0.0
+    ],
+    "max": [
+     16.665,
+     19.348,
+     50.622
+    ],
+    "h_z": 50.622,
+    "w_y": 38.696,
+    "d_x": 28.772
+   },
+   "envelope_exceeded_by_cm": {},
+   "bulb_bounds": {
+    "min": [
+     -11.04,
+     -19.348,
+     5.424
+    ],
+    "max": [
+     16.665,
+     19.348,
+     32.761
+    ],
+    "h_z": 27.337,
+    "w_y": 38.696,
+    "d_x": 27.705
+   },
+   "bulb_h_ratio": 0.92,
+   "bulb_w_ratio": 1.381,
+   "intersections": {
+    "mouth_self (lip+cavity folding)": 0,
+    "teeth_vs_mouth": 0,
+    "teeth_vs_teeth": 0,
+    "mouth_vs_outer_shell": 0,
+    "outer_shell_self": 0,
+    "taproot_vs_bulb": 0,
+    "leaf_vs_leaf": 0,
+    "pad_self (lip pad self-contact, info)": 0,
+    "teeth_vs_pad": 0,
+    "leaf_vs_bulb": 0,
+    "attach_tooth_root (info)": 158,
+    "attach_stem_root (info)": 100,
+    "attach_taproot_root (info)": 40,
+    "lip_teeth_vs_cavity (sum)": 0
+   },
+   "gape": {
+    "side_lip_separation_cm": 3.989,
+    "open_width_over_neutral_bulb_width": 0.142,
+    "vertical_lip_separation_cm": 0.461,
+    "closure_aperture_l1_cm": 0.032,
+    "tip_span_y_cm": 10.841,
+    "outline_extent_y_cm": 10.841,
+    "outline_extent_y_over_neutral_bulb_width": 0.387
+   },
+   "cheeks": {
+    "bulb_width_at_cheek_height_cm": 38.696,
+    "cheek_head_z": 18.12,
+    "width_ratio_vs_neutral": 1.381
+   },
+   "mouth_b2": {
+    "pad_thickness_cm": {
+     "U": 4.333,
+     "L": 4.655,
+     "S+": 4.3,
+     "S-": 4.3
+    },
+    "pad_crest_x_max": 13.969,
+    "crease_depth_cm": {
+     "pp": {
+      "s0.25": 2.889,
+      "s0.50": 2.3,
+      "s0.75": 0.67
+     },
+     "pm": {
+      "s0.25": 2.982,
+      "s0.50": 2.419,
+      "s0.75": 0.701
+     },
+     "mm": {
+      "s0.25": 2.982,
+      "s0.50": 2.419,
+      "s0.75": 0.701
+     },
+     "mp": {
+      "s0.25": 2.889,
+      "s0.50": 2.3,
+      "s0.75": 0.67
+     }
+    },
+    "crease_depth_min_at_s0.5": 2.3,
+    "centre_pinch_cm": 0.876,
+    "centre_below_pad_crests_cm": 2.907,
+    "gap_closure_cm": 0.033,
+    "centre_aperture_cm": -0.004,
+    "rim_front_cm": {
+     "min": 3.253,
+     "mean": 6.87
+    },
+    "rim_front_min_by_pad_cm": {
+     "U": 3.253,
+     "L": 3.481,
+     "S+": 8.235,
+     "S-": 8.235
+    },
+    "cavity_depth_cm": 11.471,
+    "lobes": {
+     "lobe_l": {
+      "apex": [
+       14.663,
+       16.369,
+       18.683
+      ],
+      "forward_cm": 5.717,
+      "outward_cm": 4.732,
+      "apex_x_minus_lip_crest_x": 0.694,
+      "front_x": 16.091,
+      "front_x_minus_lip_crest_x": 2.122
+     },
+     "lobe_r": {
+      "apex": [
+       14.663,
+       -16.369,
+       18.683
+      ],
+      "forward_cm": 5.717,
+      "outward_cm": 4.732,
+      "apex_x_minus_lip_crest_x": 0.694,
+      "front_x": 16.091,
+      "front_x_minus_lip_crest_x": 2.122
+     }
+    },
+    "tip_span_y_cm": 10.841,
+    "tip_span_z_cm": 5.354,
+    "tip_span_y_ratio": 0.854,
+    "tip_span_z_ratio": 0.892,
+    "crest_ring_span_y_ratio": 1.182
+   },
+   "root_matrix_max_abs_dev": 0.0,
+   "taproot_tip_z": 0.0,
+   "teeth_min_z": 15.157,
+   "ue_dev_cm": 1e-05,
+   "ue_dev_worst_vertex": 1622
+  },
+  "scream": {
+   "spec": {
+    "bh": 1.3,
+    "bw": 1.0,
+    "jaw": 34.0,
+    "sk": {
+     "Scream": 1.0
+    },
+    "cr_y": -6.0,
+    "la": -4.0,
+    "lb": -14.0,
+    "lf": [
+     10,
+     5,
+     0,
+     -5,
+     -10
+    ]
+   },
+   "bounds": {
+    "min": [
+     -15.771,
+     -17.125,
+     0.0
+    ],
+    "max": [
+     19.709,
+     17.125,
+     59.574
+    ],
+    "h_z": 59.574,
+    "w_y": 34.251,
+    "d_x": 35.48
+   },
+   "envelope_exceeded_by_cm": {},
+   "bulb_bounds": {
+    "min": [
+     -15.6,
+     -13.492,
+     5.31
+    ],
+    "max": [
+     18.108,
+     13.492,
+     43.955
+    ],
+    "h_z": 38.645,
+    "w_y": 26.984,
+    "d_x": 33.708
+   },
+   "bulb_h_ratio": 1.301,
+   "bulb_w_ratio": 0.963,
+   "intersections": {
+    "mouth_self (lip+cavity folding)": 0,
+    "teeth_vs_mouth": 0,
+    "teeth_vs_teeth": 0,
+    "mouth_vs_outer_shell": 0,
+    "outer_shell_self": 0,
+    "taproot_vs_bulb": 0,
+    "leaf_vs_leaf": 0,
+    "pad_self (lip pad self-contact, info)": 0,
+    "teeth_vs_pad": 0,
+    "leaf_vs_bulb": 0,
+    "attach_tooth_root (info)": 208,
+    "attach_stem_root (info)": 100,
+    "attach_taproot_root (info)": 40,
+    "lip_teeth_vs_cavity (sum)": 0
+   },
+   "gape": {
+    "side_lip_separation_cm": 17.929,
+    "open_width_over_neutral_bulb_width": 0.64,
+    "vertical_lip_separation_cm": 20.108,
+    "closure_aperture_l1_cm": 19.167,
+    "tip_span_y_cm": 13.324,
+    "outline_extent_y_cm": 17.929,
+    "outline_extent_y_over_neutral_bulb_width": 0.64
+   },
+   "cheeks": {
+    "bulb_width_at_cheek_height_cm": 26.984,
+    "cheek_head_z": 23.25,
+    "width_ratio_vs_neutral": 0.963
+   },
+   "mouth_b2": {
+    "pad_thickness_cm": {
+     "U": 1.509,
+     "L": 2.497,
+     "S+": 2.689,
+     "S-": 2.699
+    },
+    "pad_crest_x_max": 19.158,
+    "crease_depth_cm": {
+     "pp": {
+      "s0.25": 1.671,
+      "s0.50": 1.763,
+      "s0.75": 1.266
+     },
+     "pm": {
+      "s0.25": 1.804,
+      "s0.50": 1.922,
+      "s0.75": 1.297
+     },
+     "mm": {
+      "s0.25": 1.805,
+      "s0.50": 1.923,
+      "s0.75": 1.295
+     },
+     "mp": {
+      "s0.25": 1.672,
+      "s0.50": 1.763,
+      "s0.75": 1.266
+     }
+    },
+    "crease_depth_min_at_s0.5": 1.763,
+    "centre_pinch_cm": 0.031,
+    "centre_below_pad_crests_cm": 0.622,
+    "gap_closure_cm": 6.461,
+    "centre_aperture_cm": 19.131,
+    "rim_front_cm": {
+     "min": 2.903,
+     "mean": 3.307
+    },
+    "rim_front_min_by_pad_cm": {
+     "U": 3.376,
+     "L": 3.376,
+     "S+": 2.903,
+     "S-": 2.903
+    },
+    "cavity_depth_cm": 10.904,
+    "lobes": {
+     "lobe_l": {
+      "apex": [
+       5.887,
+       12.563,
+       23.262
+      ],
+      "forward_cm": -3.059,
+      "outward_cm": 0.926,
+      "apex_x_minus_lip_crest_x": -13.271,
+      "front_x": 14.395,
+      "front_x_minus_lip_crest_x": -4.763
+     },
+     "lobe_r": {
+      "apex": [
+       5.881,
+       -12.565,
+       23.262
+      ],
+      "forward_cm": -3.065,
+      "outward_cm": 0.927,
+      "apex_x_minus_lip_crest_x": -13.277,
+      "front_x": 14.395,
+      "front_x_minus_lip_crest_x": -4.763
+     }
+    },
+    "tip_span_y_cm": 13.324,
+    "tip_span_z_cm": 13.197,
+    "tip_span_y_ratio": 1.049,
+    "tip_span_z_ratio": 2.2,
+    "crest_ring_span_y_ratio": 1.365
+   },
+   "root_matrix_max_abs_dev": 0.0,
+   "taproot_tip_z": 0.0,
+   "teeth_min_z": 12.813,
+   "ue_dev_cm": 1e-05,
+   "ue_dev_worst_vertex": 1575
+  },
+  "recover": {
+   "spec": {
+    "bh": 0.75,
+    "bw": 1.25,
+    "jaw": 0.0,
+    "cr_y": 4.0,
+    "la": 22.0,
+    "lb": 34.0,
+    "leaf_k": [
+     1.0,
+     0.62,
+     0.85,
+     0.62,
+     1.0
+    ]
+   },
+   "bounds": {
+    "min": [
+     -20.715,
+     -20.747,
+     -0.0
+    ],
+    "max": [
+     15.903,
+     20.747,
+     32.49
+    ],
+    "h_z": 32.49,
+    "w_y": 41.494,
+    "d_x": 36.618
+   },
+   "envelope_exceeded_by_cm": {},
+   "bulb_bounds": {
+    "min": [
+     -9.0,
+     -17.508,
+     5.475
+    ],
+    "max": [
+     8.874,
+     17.508,
+     27.844
+    ],
+    "h_z": 22.369,
+    "w_y": 35.016,
+    "d_x": 17.874
+   },
+   "bulb_h_ratio": 0.753,
+   "bulb_w_ratio": 1.25,
+   "intersections": {
+    "mouth_self (lip+cavity folding)": 0,
+    "teeth_vs_mouth": 0,
+    "teeth_vs_teeth": 0,
+    "mouth_vs_outer_shell": 0,
+    "outer_shell_self": 0,
+    "taproot_vs_bulb": 0,
+    "leaf_vs_leaf": 0,
+    "pad_self (lip pad self-contact, info)": 0,
+    "teeth_vs_pad": 0,
+    "leaf_vs_bulb": 0,
+    "attach_tooth_root (info)": 158,
+    "attach_stem_root (info)": 96,
+    "attach_taproot_root (info)": 40,
+    "lip_teeth_vs_cavity (sum)": 0
+   },
+   "gape": {
+    "side_lip_separation_cm": 5.841,
+    "open_width_over_neutral_bulb_width": 0.209,
+    "vertical_lip_separation_cm": 0.387,
+    "closure_aperture_l1_cm": 0.042,
+    "tip_span_y_cm": 15.875,
+    "outline_extent_y_cm": 15.875,
+    "outline_extent_y_over_neutral_bulb_width": 0.567
+   },
+   "cheeks": {
+    "bulb_width_at_cheek_height_cm": 35.016,
+    "cheek_head_z": 15.825,
+    "width_ratio_vs_neutral": 1.25
+   },
+   "mouth_b2": {
+    "pad_thickness_cm": {
+     "U": 3.532,
+     "L": 3.795,
+     "S+": 3.506,
+     "S-": 3.506
+    },
+    "pad_crest_x_max": 11.388,
+    "crease_depth_cm": {
+     "pp": {
+      "s0.25": 2.618,
+      "s0.50": 2.645,
+      "s0.75": 0.806
+     },
+     "pm": {
+      "s0.25": 2.76,
+      "s0.50": 2.772,
+      "s0.75": 0.844
+     },
+     "mm": {
+      "s0.25": 2.76,
+      "s0.50": 2.772,
+      "s0.75": 0.844
+     },
+     "mp": {
+      "s0.25": 2.618,
+      "s0.50": 2.645,
+      "s0.75": 0.806
+     }
+    },
+    "crease_depth_min_at_s0.5": 2.645,
+    "centre_pinch_cm": 0.714,
+    "centre_below_pad_crests_cm": 2.37,
+    "gap_closure_cm": 0.026,
+    "centre_aperture_cm": 0.006,
+    "rim_front_cm": {
+     "min": 2.646,
+     "mean": 5.344
+    },
+    "rim_front_min_by_pad_cm": {
+     "U": 2.646,
+     "L": 2.832,
+     "S+": 5.295,
+     "S-": 5.295
+    },
+    "cavity_depth_cm": 9.352,
+    "lobes": {
+     "lobe_l": {
+      "apex": [
+       6.71,
+       14.547,
+       15.825
+      ],
+      "forward_cm": -2.237,
+      "outward_cm": 2.909,
+      "apex_x_minus_lip_crest_x": -4.678,
+      "front_x": 7.569,
+      "front_x_minus_lip_crest_x": -3.819
+     },
+     "lobe_r": {
+      "apex": [
+       6.71,
+       -14.547,
+       15.825
+      ],
+      "forward_cm": -2.237,
+      "outward_cm": 2.909,
+      "apex_x_minus_lip_crest_x": -4.678,
+      "front_x": 7.569,
+      "front_x_minus_lip_crest_x": -3.819
+     }
+    },
+    "tip_span_y_cm": 15.875,
+    "tip_span_z_cm": 4.5,
+    "tip_span_y_ratio": 1.25,
+    "tip_span_z_ratio": 0.75,
+    "crest_ring_span_y_ratio": 1.25
+   },
+   "root_matrix_max_abs_dev": 0.0,
+   "taproot_tip_z": -0.0,
+   "teeth_min_z": 13.334,
+   "ue_dev_cm": 1e-05,
+   "ue_dev_worst_vertex": 1557
+  },
+  "impact_squash": {
+   "spec": {
+    "bh": 0.8,
+    "bw": 1.2,
+    "pivot": "centre",
+    "la": 14.0,
+    "lb": 12.0,
+    "leaf_k": [
+     1.0,
+     0.6,
+     0.85,
+     0.6,
+     1.0
+    ]
+   },
+   "bounds": {
+    "min": [
+     -20.653,
+     -21.173,
+     2.955
+    ],
+    "max": [
+     17.738,
+     21.173,
+     39.444
+    ],
+    "h_z": 36.489,
+    "w_y": 42.346,
+    "d_x": 38.391
+   },
+   "envelope_exceeded_by_cm": {
+    "w": 0.346
+   },
+   "bulb_bounds": {
+    "min": [
+     -9.6,
+     -16.808,
+     8.415
+    ],
+    "max": [
+     9.465,
+     16.808,
+     32.207
+    ],
+    "h_z": 23.792,
+    "w_y": 33.615,
+    "d_x": 19.065
+   },
+   "bulb_h_ratio": 0.801,
+   "bulb_w_ratio": 1.2,
+   "intersections": {
+    "mouth_self (lip+cavity folding)": 0,
+    "teeth_vs_mouth": 0,
+    "teeth_vs_teeth": 0,
+    "mouth_vs_outer_shell": 0,
+    "outer_shell_self": 0,
+    "taproot_vs_bulb": 0,
+    "leaf_vs_leaf": 0,
+    "pad_self (lip pad self-contact, info)": 0,
+    "teeth_vs_pad": 0,
+    "leaf_vs_bulb": 0,
+    "attach_tooth_root (info)": 158,
+    "attach_stem_root (info)": 96,
+    "attach_taproot_root (info)": 40,
+    "lip_teeth_vs_cavity (sum)": 0
+   },
+   "gape": {
+    "side_lip_separation_cm": 5.607,
+    "open_width_over_neutral_bulb_width": 0.2,
+    "vertical_lip_separation_cm": 0.413,
+    "closure_aperture_l1_cm": 0.04,
+    "tip_span_y_cm": 15.24,
+    "outline_extent_y_cm": 15.24,
+    "outline_extent_y_over_neutral_bulb_width": 0.544
+   },
+   "cheeks": {
+    "bulb_width_at_cheek_height_cm": 33.615,
+    "cheek_head_z": 19.455,
+    "width_ratio_vs_neutral": 1.2
+   },
+   "mouth_b2": {
+    "pad_thickness_cm": {
+     "U": 3.768,
+     "L": 4.048,
+     "S+": 3.74,
+     "S-": 3.74
+    },
+    "pad_crest_x_max": 12.147,
+    "crease_depth_cm": {
+     "pp": {
+      "s0.25": 2.753,
+      "s0.50": 2.642,
+      "s0.75": 0.8
+     },
+     "pm": {
+      "s0.25": 2.893,
+      "s0.50": 2.759,
+      "s0.75": 0.837
+     },
+     "mm": {
+      "s0.25": 2.893,
+      "s0.50": 2.759,
+      "s0.75": 0.837
+     },
+     "mp": {
+      "s0.25": 2.753,
+      "s0.50": 2.642,
+      "s0.75": 0.8
+     }
+    },
+    "crease_depth_min_at_s0.5": 2.642,
+    "centre_pinch_cm": 0.762,
+    "centre_below_pad_crests_cm": 2.528,
+    "gap_closure_cm": 0.029,
+    "centre_aperture_cm": 0.004,
+    "rim_front_cm": {
+     "min": 2.823,
+     "mean": 5.246
+    },
+    "rim_front_min_by_pad_cm": {
+     "U": 2.823,
+     "L": 3.021,
+     "S+": 5.142,
+     "S-": 5.142
+    },
+    "cavity_depth_cm": 9.975,
+    "lobes": {
+     "lobe_l": {
+      "apex": [
+       7.157,
+       13.965,
+       19.455
+      ],
+      "forward_cm": -1.789,
+      "outward_cm": 2.328,
+      "apex_x_minus_lip_crest_x": -4.99,
+      "front_x": 8.074,
+      "front_x_minus_lip_crest_x": -4.073
+     },
+     "lobe_r": {
+      "apex": [
+       7.157,
+       -13.965,
+       19.455
+      ],
+      "forward_cm": -1.789,
+      "outward_cm": 2.328,
+      "apex_x_minus_lip_crest_x": -4.99,
+      "front_x": 8.074,
+      "front_x_minus_lip_crest_x": -4.073
+     }
+    },
+    "tip_span_y_cm": 15.24,
+    "tip_span_z_cm": 4.8,
+    "tip_span_y_ratio": 1.2,
+    "tip_span_z_ratio": 0.8,
+    "crest_ring_span_y_ratio": 1.2
+   },
+   "root_matrix_max_abs_dev": 0.0,
+   "taproot_tip_z": 2.955,
+   "teeth_min_z": 16.798,
+   "ue_dev_cm": 1e-05,
+   "ue_dev_worst_vertex": 1485
+  }
+ },
+ "envelope_cm": [
+  66.0,
+  42.0,
+  39.0
+ ],
+ "scale_factor": 3.0,
+ "clip_keys": {}
+}

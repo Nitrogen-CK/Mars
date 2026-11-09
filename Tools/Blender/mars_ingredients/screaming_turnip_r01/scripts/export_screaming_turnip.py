@@ -311,6 +311,17 @@ def main():
     crown_rest_inv = arm.data.bones["crown"].matrix_local.inverted()
     travel = {"frame_map": "UE cm (x, -y, z), root-relative (the taproot tip); 30 fps; sockets ride the crown",
               "clips": {}}
+    # Phase J Part 1b: the bulb-top "neck" gauge. Dimple = the bulb vertex on the axis carrying crown weight; top ring =
+    # the other bulb vertices carrying crown weight. Per SRC_Tug frame, their skinned displacement from f0 (UE cm).
+    cg = body.vertex_groups["crown"].index
+    bulb_crown = [v.index for v in body.data.vertices
+                  if any(g.group == cg and g.weight > 0 for g in v.groups) and
+                  not any(body.vertex_groups[g.group].name.startswith("leaf_") for g in v.groups)]
+    dimple = [i for i in bulb_crown if abs(body.data.vertices[i].co.x) < 1e-4 and abs(body.data.vertices[i].co.y) < 1e-4]
+    ring = [i for i in bulb_crown if i not in dimple]
+    neck = {"frame_map": "UE cm (x, -y, z), root-relative; displacement from SRC_Tug f0 (== SRC_Grip f6)",
+            "dimple_vertex": dimple, "top_ring_vertices": len(ring), "target": "dimple <= 25 % of the crown head's "
+            "travel at SRC_Tug f15 (<= 9 cm x, <= 3 cm z); the top ring less", "frames": {}}
     for name, info in clips.items():
         act = bpy.data.actions.get(name)
         if act is None:
@@ -350,6 +361,10 @@ def main():
             if dev > peak["dev"]:
                 peak = {"frame": f, "dev": round(dev, 5)}
             lm[str(f)] = k
+            if name == "SRC_Tug":
+                ev = world_verts(body, evaluated=True)
+                neck["frames"][str(f)] = {"crown": k["crown"], "dimple": ev[dimple[0]].round(4).tolist(),
+                                          "ring": ev[ring].round(4).tolist()}
             if name.startswith("SRC_"):
                 M = arm.matrix_world @ arm.pose.bones["crown"].matrix @ crown_rest_inv
                 travel["clips"].setdefault(name, {})[str(f)] = dict(
@@ -395,10 +410,14 @@ def main():
             tr = travel["clips"][name]
             z = [tr[str(f)]["crown"][2] for f in range(start, end + 1)]
             hz = [tr[str(f)]["HarvestGrip_R"][2] for f in range(start, end + 1)]
+            x = [tr[str(f)]["crown"][0] for f in range(start, end + 1)]           # Phase J: the crown leans in X too
+            hx = [tr[str(f)]["HarvestGrip_R"][0] for f in range(start, end + 1)]
             man_clips[name]["crown_travel_ue_cm"] = {
                 "crown_z_first_last": [z[0], z[-1]], "crown_z_min_max": [min(z), max(z)],
                 "crown_dz": round(z[-1] - z[0], 4), "harvest_grip_z_first_last": [hz[0], hz[-1]],
-                "per_frame": "review/phaseI/crown_travel.json (Phase I)"}
+                "crown_x_first_last": [x[0], x[-1]], "crown_dx": round(x[-1] - x[0], 4),
+                "harvest_grip_x_first_last": [hx[0], hx[-1]],
+                "per_frame": "review/%s/crown_travel.json" % rev}
         print("EXPORTED clip %-24s frames %d..%d  %d bytes" % (name, start, end, os.path.getsize(p)))
     use_action(arm, None)
     use_key_action(body, None)
@@ -407,7 +426,49 @@ def main():
         json.dump(exp_anims, fh, indent=1)
     with open(os.path.join(OUT, "expected.json"), "w") as fh:
         json.dump(expected, fh, indent=1)
+    # Phase J: the walk-away stretch = the horizontal (UE XY) travel of the HarvestGrip sockets from SRC_Tug f0 (== SRC_Grip
+    # f6, where the gloves grip) to SRC_Tug f15 (full strain); both sockets ride the crown, so they travel the same.
+    stretch = None
+    if "SRC_Tug" in travel["clips"]:
+        tug = travel["clips"]["SRC_Tug"]
+        last = str(max(int(k) for k in tug))
+        hor = {n: round(float(np.hypot(*(np.array(tug[last][n][:2]) - np.array(tug["0"][n][:2])))), 4)
+               for n in ("HarvestGrip_R", "HarvestGrip_L")}
+        crown_h = round(float(np.hypot(*(np.array(tug[last]["crown"][:2]) - np.array(tug["0"]["crown"][:2])))), 4)
+        # Phase K: the clip carries only the pose (crown head held at x 0); this is the clip's own socket travel, the
+        # pitch swinging the socket offset (~2 cm). The stretch distance is the bed's runtime tuner (k_StretchTravelCm_default).
+        stretch = {"frames": "SRC_Tug f0 (== SRC_Grip f6) -> f%s" % last, "socket_horizontal_travel_cm": hor,
+                   "crown_horizontal_travel_cm": crown_h,
+                   "crown_delta_xz_cm": [round(tug[last]["crown"][0] - tug["0"]["crown"][0], 4),
+                                         round(tug[last]["crown"][2] - tug["0"]["crown"][2], 4)],
+                   "clip_socket_travel_cm": round(float(np.mean(list(hor.values()))), 1)}
+        travel["stretch"] = stretch
+    if neck["frames"]:
+        f0, fr = neck["frames"]["0"], {}
+        for f, d in neck["frames"].items():
+            cd = np.array(d["crown"]) - np.array(f0["crown"])
+            dd = np.array(d["dimple"]) - np.array(f0["dimple"])
+            rd = np.array(d["ring"]) - np.array(f0["ring"])
+            rn = np.linalg.norm(rd, axis=1)
+            fr[f] = {"crown_d": cd.round(3).tolist(), "dimple_d": dd.round(3).tolist(),
+                     "dimple_pct_of_crown": round(100.0 * float(np.linalg.norm(dd)) / max(1e-9, float(np.linalg.norm(cd))), 1),
+                     "ring_max_d": round(float(rn.max()), 3), "ring_max_abs_dx": round(float(np.abs(rd[:, 0]).max()), 3),
+                     "ring_max_dz": round(float(rd[:, 2].max()), 3),
+                     "ring_pct_of_crown": round(100.0 * float(rn.max()) / max(1e-9, float(np.linalg.norm(cd))), 1)}
+        neck["frames"] = fr
+        last = fr[str(max(int(k) for k in fr))]
+        neck["f15"] = last
+        # Phase K: the clip alone has ~2 cm of crown travel, so the percentage / ring-below-dimple rules are meaningless
+        # here; the clip is gated on the absolute limits, and the stretched neck by animate's injected default
+        # (review/<rev>/inject_146.2_20.json) and the --inject-stretch sweep (inject_summary.json).
+        if abs(last["dimple_d"][0]) > 9.0 or last["dimple_d"][2] > 3.0:
+            fails.append("neck: dimple %s (%.1f %%), ring max %.3f" % (last["dimple_d"], last["dimple_pct_of_crown"],
+                                                                     last["ring_max_d"]))
+        print("NECK f15", json.dumps(last))
     if "--review" in argv:
+        if neck["frames"]:
+            with open(os.path.join(ROOT, "review", rev, "neck.json"), "w") as fh:
+                json.dump(neck, fh, indent=1)
         with open(os.path.join(ROOT, "review", rev, "crown_travel.json"), "w") as fh:
             json.dump(travel, fh, indent=1)
 
@@ -469,7 +530,8 @@ def main():
         "bone_count": len(bones),
         "bones": bones,
         "rig_contract": "root identity on every sample of every clip; non-leaf bones have identity rest rotation; "
-                        "body scale X == Z; jaw and crown rotate about Y only; crown/taproot counter-scale the body; "
+                        "body scale X == Z; jaw and crown rotate about Y only; the crown translates in X and Z (Phase J "
+                        "cr_dx / cr_dz); crown/taproot counter-scale the body; "
                         "cheeks scale per axis + translate, never rotate (D-A1)",
         "material_slots": expected["sk"]["slots"],
         "mesh": {"tris": expected["sk"]["tris"], "verts": expected["sk"]["verts"],
@@ -575,6 +637,31 @@ def main():
                                   "curve -> morph binding at runtime"],
     }
     manifest["gameplay_numbers"] = gameplay_numbers(S, sockets, hull, expected, anim_rep, meas)
+    # Phase K: the stretch is a bed tuner (FMars_ScreamingTurnipBed_StretchSpec TravelCm / LiftCm, a runtime crown offset in
+    # the ABP); the manifest records its default and the travel range the deformation audit holds
+    # (review/<rev>/inject_summary.json, written by review/phaseK/inject_summary_k.py from the --inject-stretch runs).
+    inj_p = os.path.join(ROOT, "review", rev, "inject_summary.json")
+    if os.path.exists(inj_p):
+        inj = json.load(open(inj_p))
+        g = manifest["gameplay_numbers"]
+        g["k_StretchTravelCm_default"] = inj["default"]["T_cm"]
+        g["k_StretchLiftCm_default"] = inj["default"]["L_cm"]
+        g["stretch_runtime_safe_travel_cm"] = inj["safe_travel_cm"]
+        ff = inj["first_fail_above_default"]
+        g["stretch_note"] = (
+            "Phase K: the walk-away stretch is a runtime tuner, not clip content. The bed's Pull.Stretch (TravelCm, LiftCm; "
+            "default %g / %g cm) drives the ABP's ModifyBone on `crown` (component space, Add): (-TravelCm * a, 0, LiftCm * a), "
+            "a = the Control alpha while gripped, 1 - played alpha while SRC_Cancel plays. SRC_Tug / SRC_Cancel / SRC_Release "
+            "carry only the pose (crown pitch, trailing leaves, bulb tilt; crown head held at x 0, clip socket travel %s cm "
+            "from the pitch). The HarvestGrip sockets travel TravelCm + about 2 cm. Deformation audit with the offset "
+            "injected (intersections 0, stem_gap <= 0, neck): safe for TravelCm %s cm with LiftCm ~ 0.137 x TravelCm; the "
+            "first failure above the default is at %s cm (%s). Below %s cm the relative neck rule (ring below dimple) fails "
+            "and at 0-5 cm the pitched crown lays the leaves on the bulb / lifts a stem base. Per run: review/%s/inject_summary.json" % (
+                inj["default"]["T_cm"], inj["default"]["L_cm"], stretch["clip_socket_travel_cm"] if stretch else None,
+                inj["safe_travel_cm"], ff["T_cm"] if ff else None, ff["first_fail"] if ff else None,
+                inj["safe_travel_cm"][0], rev))
+    elif stretch is not None:
+        fails.append("no %s: run the --inject-stretch sweep and review/phaseK/inject_summary_k.py first" % inj_p)
     print("GAMEPLAY_NUMBERS", json.dumps(manifest["gameplay_numbers"]))
     with open(os.path.join(OUT, "ScreamingTurnip_R01_Manifest.json"), "w") as fh:
         json.dump(manifest, fh, indent=1)

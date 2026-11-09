@@ -1,0 +1,5 @@
+bed1 pull2 (full speed): rows with the ray past the 250 cm trace: 40, from game 20.9128 (d 278.7, eye 294.8, ray enters the probe at 251.9 cm, pitch -18.64) to the break
+  no ring / not focused: {'game': 21.1799, 'd': 390.906, 'eye': 402.52, 'pitch': -13.5, 'ray_enter': 360.87, 'ray_hits_in_trace': False, 'focused': True, 'ring': None, 'clip': 'SRC_Tug', 'alpha': 0.968, 'vis': False}
+  no ring / not focused: {'game': 21.1904, 'd': 394.311, 'eye': 405.78, 'pitch': -13.5, 'ray_enter': 364.37, 'ray_hits_in_trace': False, 'focused': False, 'ring': None, 'clip': 'SRC_Tug', 'alpha': 0.968, 'vis': False}
+last visible: {'game': 21.1729, 'd': 387.967, 'eye': 399.7, 'pitch': -13.611, 'ray_enter': 358.02, 'ray_hits_in_trace': False, 'focused': True, 'ring': 0.9979, 'clip': 'SRC_Tug', 'alpha': 0.968, 'vis': True}
+bed0 rows with the ray past the trace outside the side view: 0; bed0 max eye distance 273.9; last visible {'game': 9.2486, 'd': 255.005, 'eye': 273.88, 'pitch': -20.827, 'ray_enter': 219.13, 'ray_hits_in_trace': True, 'focused': True, 'ring': 0.9989, 'clip': 'SRC_Tug', 'alpha': 0.9688, 'vis': True}

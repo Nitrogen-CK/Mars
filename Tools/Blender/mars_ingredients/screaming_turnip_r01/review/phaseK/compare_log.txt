@@ -1,0 +1,6 @@
+00:01.953  blend            | Read blend: "D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\source\ScreamingTurnip_R01.blend"
+COMPARE {"verts": [1624, 1624], "tris": [3188, 3188], "polygons_identical": true, "material_indices_identical": true, "rest_vertex_max_cm": 0.0, "shape_keys": {"new": ["Basis", "Inhale", "Scream"], "ref": ["Basis", "Inhale", "Scream"]}, "shape_key_block_max_cm": {"Basis": 0.0, "Inhale": 0.0, "Scream": 0.0}, "shape_key_offset_max_cm": {"Basis": 0.0, "Inhale": 0.0, "Scream": 0.0}, "vertex_colour_max": {"Col": 0.0}, "bones": [17, 17], "bone_max_delta": 0.0, "statics_max_cm": {"TurnipBed_R01": 0.0, "TurnipBedEmpty_R01": 0.0, "ScreamingTurnip_R01_Collision": 0.0}, "id_props_identical": {"mouth_L0": true, "mouth_L1": true, "mouth_centre_l0": true, "mouth_centre_l1": true, "mouth_tips": true, "mouth_info": true}, "weights_changed_vertices": 0, "weights_changed_by_part": {}, "fails": []}
+TURNIP_OK
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+
+Blender quit

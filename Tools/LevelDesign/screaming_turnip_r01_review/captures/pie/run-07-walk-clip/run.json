@@ -1,0 +1,237 @@
+{
+ "events": [
+  {
+   "t": 0.0,
+   "game_elapsed": 0.0,
+   "frame_delta": 0.3209,
+   "event": "begin",
+   "player": "player X=-250.000 Y=0.000 Z=77.150 health=100.0 pack=false selected=TOMBSTONE slot1=TOMBSTONE slot2=TOMBSTONE slot3=TOMBSTONE held=TOMBSTONE operating=false",
+   "world_items": 0,
+   "turnips": [],
+   "beds": [
+    "bed=13|0(13)[Valid](ScreamingTurnipBed) enabled=Enable focused=false exhausted_reason=false charges=1 released=0 exhausted=false at=X=0.000 Y=0.000 Z=0.000",
+    "bed=15|0(15)[Valid](ScreamingTurnipBed) enabled=Enable focused=false exhausted_reason=false charges=1 released=0 exhausted=false at=X=450.000 Y=-450.000 Z=0.000"
+   ],
+   "clips": [
+    {
+     "name": "1",
+     "clip": "SRC_Idle",
+     "curves": {
+      "Inhale": 0.0,
+      "Scream": 0.0
+     },
+     "t": 1.729,
+     "at": [
+      450.0,
+      -450.0,
+      -28.8
+     ],
+     "up": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "fwd": [
+      1.0,
+      0.0,
+      0.0
+     ],
+     "visible": true
+    },
+    {
+     "name": "0",
+     "clip": "SRC_Idle",
+     "curves": {
+      "Inhale": 0.0,
+      "Scream": 0.0
+     },
+     "t": 1.729,
+     "at": [
+      0.0,
+      0.0,
+      -28.8
+     ],
+     "up": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "fwd": [
+      1.0,
+      0.0,
+      0.0
+     ],
+     "visible": true
+    }
+   ]
+  }
+ ],
+ "changes": [
+  {
+   "game": 0.354,
+   "frame_delta": 0.3544,
+   "turnips": [],
+   "clips": [
+    {
+     "name": "1",
+     "clip": "SRC_Idle"
+    },
+    {
+     "name": "0",
+     "clip": "SRC_Idle"
+    }
+   ],
+   "at": []
+  },
+  {
+   "game": 5.188,
+   "arrive": "walk",
+   "at": [
+    -98,
+    -69,
+    77
+   ]
+  },
+  {
+   "game": 12.0732,
+   "mark": "stand"
+  },
+  {
+   "game": 14.099,
+   "mark": "use0_down"
+  },
+  {
+   "game": 14.447,
+   "key": "LeftMouseButton",
+   "down": true
+  },
+  {
+   "game": 14.805,
+   "frame_delta": 0.3585,
+   "turnips": [],
+   "clips": [
+    {
+     "name": "1",
+     "clip": "SRC_Idle"
+    },
+    {
+     "name": "0",
+     "clip": "SRC_Grip"
+    }
+   ],
+   "at": []
+  },
+  {
+   "game": 15.518,
+   "frame_delta": 0.3484,
+   "turnips": [],
+   "clips": [
+    {
+     "name": "1",
+     "clip": "SRC_Idle"
+    },
+    {
+     "name": "0",
+     "clip": "SRC_Tug"
+    }
+   ],
+   "at": []
+  },
+  {
+   "game": 19.688,
+   "frame_delta": 0.3682,
+   "turnips": [
+    {
+     "entity": "268|1(1048844)[E_New](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "Loose",
+     "phase": "Dormant",
+     "seq": "0",
+     "mount": "World"
+    }
+   ],
+   "clips": [
+    {
+     "name": "2",
+     "clip": "ROOT_AirborneLeafTrail"
+    },
+    {
+     "name": "1",
+     "clip": "SRC_Idle"
+    },
+    {
+     "name": "0",
+     "clip": "SRC_Tug"
+    }
+   ],
+   "at": [
+    [
+     "268|1(1048844)[E_New](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      0.0,
+      0.0,
+      60.0
+     ],
+     [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "0.0"
+    ]
+   ]
+  },
+  {
+   "game": 20.061,
+   "frame_delta": 0.3722,
+   "turnips": [
+    {
+     "entity": "268|1(1048844)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "Loose",
+     "phase": "Dormant",
+     "seq": "0",
+     "mount": "World"
+    }
+   ],
+   "clips": [
+    {
+     "name": "2",
+     "clip": "ROOT_AirborneLeafTrail"
+    },
+    {
+     "name": "1",
+     "clip": "SRC_Idle"
+    },
+    {
+     "name": "0",
+     "clip": "SRC_Tug"
+    }
+   ],
+   "at": [
+    [
+     "268|1(1048844)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      5.97,
+      -0.14,
+      66.82
+     ],
+     [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "0.372237"
+    ]
+   ]
+  },
+  {
+   "game": 20.0607,
+   "mark": "bed0_gone"
+  },
+  {
+   "game": 20.417,
+   "key": "LeftMouseButton",
+   "down": false
+  }
+ ],
+ "max_delta": 0.4
+}

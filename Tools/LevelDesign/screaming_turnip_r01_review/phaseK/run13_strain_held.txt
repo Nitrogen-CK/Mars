@@ -1,0 +1,14 @@
+bed1 (74) full speed
+   game 64.1268 clip SRC_Tug t 0.4785 vis True ring 0.9866 offset [-70.818, 0.0, 8.613] keys ['LeftMouseButton']
+   game 64.1352 clip SRC_Tug t 0.4811 vis True ring 0.992 offset [-71.206, 0.0, 8.66] keys ['LeftMouseButton']
+   game 64.1432 clip SRC_Tug t 0.4833 vis True ring 0.9964 offset [-71.524, 0.0, 8.699] keys ['LeftMouseButton']
+   game 64.1512 clip SRC_Tug t 0.4833 vis False ring None offset [-71.524, 0.0, 8.699] keys ['LeftMouseButton']
+   game 64.1617 clip SRC_Tug t 0.4833 vis False ring None offset [-0.0, 0.0, 0.0] keys ['LeftMouseButton']
+bed2 (146.2) slow
+   game 59.4837 clip SRC_Tug t 0.4824 vis True ring 0.9945 offset [-141.04, 0.0, 17.365] keys ['LeftMouseButton']
+   game 59.4920 clip SRC_Tug t 0.4832 vis True ring 0.9963 offset [-141.295, 0.0, 17.396] keys ['LeftMouseButton']
+   game 59.5003 clip SRC_Tug t 0.4841 vis True ring 0.9981 offset [-141.551, 0.0, 17.428] keys ['LeftMouseButton']
+   game 59.5090 clip SRC_Tug t 0.4841 vis False ring None offset [-141.551, 0.0, 17.428] keys ['LeftMouseButton']
+   game 59.5214 clip SRC_Tug t 0.4841 vis False ring None offset [-0.0, 0.0, 0.0] keys ['LeftMouseButton']
+   game 59.5299 clip SRC_Tug t 0.4841 vis False ring None offset [-0.0, 0.0, 0.0] keys ['LeftMouseButton']
+bed2 glove-to-previous-socket 2.707 cm at game 59.107: the previous sampled Tug row is 1.634 s earlier (the side-view rows between are excluded); not consecutive ticks

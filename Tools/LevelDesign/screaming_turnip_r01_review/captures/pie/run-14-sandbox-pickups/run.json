@@ -1,0 +1,59 @@
+{
+ "events": [
+  {
+   "t": 0.0,
+   "game_elapsed": 0.0,
+   "frame_delta": 0.0172,
+   "event": "begin",
+   "player": "player X=-600.000 Y=225.000 Z=77.150 health=100.0 pack=false selected=TOMBSTONE slot1=TOMBSTONE slot2=TOMBSTONE slot3=TOMBSTONE held=TOMBSTONE operating=false",
+   "world_items": 35,
+   "turnips": [],
+   "beds": [],
+   "clips": []
+  }
+ ],
+ "changes": [
+  {
+   "game": 0.083,
+   "frame_delta": 0.0829,
+   "turnips": [],
+   "clips": [],
+   "at": []
+  },
+  {
+   "game": 2.151,
+   "key": "LeftMouseButton",
+   "down": true
+  },
+  {
+   "game": 2.435,
+   "key": "LeftMouseButton",
+   "down": false
+  },
+  {
+   "game": 4.374,
+   "key": "R",
+   "down": true
+  },
+  {
+   "game": 4.556,
+   "key": "R",
+   "down": false
+  },
+  {
+   "game": 7.751,
+   "key": "LeftMouseButton",
+   "down": true
+  },
+  {
+   "game": 8.026,
+   "key": "LeftMouseButton",
+   "down": false
+  },
+  {
+   "game": 9.929,
+   "sequence_done": "run-14-sandbox-pickups"
+  }
+ ],
+ "max_delta": 0.2603
+}

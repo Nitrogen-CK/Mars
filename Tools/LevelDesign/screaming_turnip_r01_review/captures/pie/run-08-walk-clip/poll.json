@@ -1,0 +1,78 @@
+{
+ "session_id": "pie_smoke_5_010456",
+ "status": "complete",
+ "marker": "MONOLITH_CLIP",
+ "map": "UEDPIE_0_ScreamingTurnip_R01_Review_MAP",
+ "duration": 60,
+ "pie_active": true,
+ "pie_ready": true,
+ "lifecycle": "teardown-complete",
+ "sample_count": 186,
+ "elapsed_seconds": 60.04227539896965,
+ "var_summary": {},
+ "output_dir": "D:/Repositories/CkRepos/Orion/Tools/LevelDesign/screaming_turnip_r01_review/captures/pie/run-08-walk-clip/frames",
+ "frame_count": 185,
+ "capture_validity": {
+  "valid_frames": 184,
+  "invalid_frames": 0,
+  "captured_ok": true,
+  "uniformity_checked": true
+ },
+ "view_target": {
+  "active_actor": "Mars_PlayerCharacter_0",
+  "active_class": "Mars_PlayerCharacter"
+ },
+ "runtime_identity": {
+  "actor": "Mars_PlayerCharacter_0",
+  "actor_class": "Mars_PlayerCharacter",
+  "skel_comp": "CharacterMesh0",
+  "anim_instance_class": "/Game/Mars/Gameplay/PlayerCharacter/Chef/ABP_Chef.ABP_Chef_C",
+  "mesh_anim_class": "/Game/Mars/Gameplay/PlayerCharacter/Chef/ABP_Chef.ABP_Chef_C",
+  "animation_mode": "anim_blueprint",
+  "anim_class_changed": false
+ },
+ "grouped_counts": {
+  "active_runtime": {
+   "must_absent": {
+    "Blueprint Runtime Error": 0,
+    "Accessed None": 0,
+    "LogChooser": 0,
+    "Ensure condition failed": 0
+   },
+   "must_present": {},
+   "observe_only": {},
+   "warn": {},
+   "entry_count": 238
+  },
+  "teardown": {
+   "must_absent": {
+    "Blueprint Runtime Error": 0,
+    "Accessed None": 0,
+    "LogChooser": 0,
+    "Ensure condition failed": 0
+   },
+   "entry_count": 16,
+   "allowed": true
+  },
+  "ignore_after_pattern": "BeginTearingDown"
+ },
+ "warnings": [],
+ "missing_must_present": [],
+ "post_marker_counts": {
+  "Blueprint Runtime Error": 0,
+  "Accessed None": 0,
+  "LogChooser": 0,
+  "Ensure condition failed": 0
+ },
+ "total_matches": 0,
+ "ok": true,
+ "probes": [
+  {
+   "at_seconds": 1.5,
+   "fired": true,
+   "fired_at_seconds": 1.6959565989673138,
+   "python_ok": true,
+   "python_output": "None"
+  }
+ ]
+}

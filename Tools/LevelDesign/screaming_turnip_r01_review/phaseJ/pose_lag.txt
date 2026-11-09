@@ -1,0 +1,6 @@
+run-05-walk bed0 vs clip at same-row alpha max 3.049 cm; at previous-row alpha max 0.008 cm
+run-05-walk bed1_pull1 vs clip at same-row alpha max 3.069 cm; at previous-row alpha max 0.006 cm
+run-05-walk bed1_pull2 vs clip at same-row alpha max 3.142 cm; at previous-row alpha max 0.012 cm
+run-05-walk-shots bed0 vs clip at same-row alpha max 2.863 cm; at previous-row alpha max 0.009 cm
+run-05-walk-shots bed1_pull1 vs clip at same-row alpha max 1.969 cm; at previous-row alpha max 0.007 cm
+run-05-walk-shots bed1_pull2 vs clip at same-row alpha max 0.728 cm; at previous-row alpha max 0.010 cm

@@ -16,6 +16,11 @@ Run (from the screaming_turnip_r01 folder):
 Phase I: [--out phaseI] writes under review/<out>/ (default review/phaseB4/clips/); [--views front,side,threequarter]
 picks the clip-sheet rows; [--pull-chain] adds review/<out>/pull_chain_sheet.png (rows: SRC_Idle f0 -> SRC_Grip ->
 SRC_Tug -> SRC_Release, then the same -> SRC_Cancel; side and three-quarter views each).
+Phase J: [--ortho 34 --target -7,0,8.5] (design-frame units, x unit()) widen and re-centre the clip-sheet and pull-chain
+framing so the 36 cm lean toward -X stays in frame (defaults: each view's own framing).
+Phase K: [--inject-stretch T,L] poses SRC_Tug / SRC_Cancel from the authored spline plus the runtime crown offset
+(-T * a, 0, L * a) UE cm (a = f / 15 on the Tug, 1 - f / 7 on the Cancel), as the bed's anim blueprint shows them; the
+other clips play their actions.
 Prints TURNIP_OK / TURNIP_FAIL.
 """
 import json
@@ -82,8 +87,30 @@ def shapekey_sheet(sc, cam, arm, tmp):
     return R.save_sheet(tiles, len(cols), os.path.join(OUT, "shapekey_sheet.png"))
 
 
+INJ = {"SRC_Tug": (15, lambda f: f / 15.0), "SRC_Cancel": (7, lambda f: 1.0 - f / 7.0)}
+
+
+def pose_frame(sc, arm, name, f, inject):
+    """Phase K: set the frame; with --inject-stretch, the Tug / Cancel pose is the spline + the runtime crown offset."""
+    if inject is None or name not in INJ:
+        use(arm, bpy.data.actions[name])
+        sc.frame_set(f)
+        return
+    import animate_screaming_turnip as A
+    from mathutils import Matrix, Vector
+    use(arm, None)
+    clip = {c.name: c for c in A.build_clips(BT.unit(arm))}[name]
+    a = INJ[name][1](f)
+    BT.apply_params(arm, clip.sample(float(f)))
+    pb = arm.pose.bones["crown"]
+    pb.matrix = Matrix.Translation(Vector((-inject[0] * a, 0.0, inject[1] * a))) @ pb.matrix
+    bpy.context.view_layer.update()
+
+
 def main():
     argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
+    inject = tuple(float(x) for x in argv[argv.index("--inject-stretch") + 1].split(",")) \
+        if "--inject-stretch" in argv else None
     arg = lambda k, d=None: argv[argv.index(k) + 1] if k in argv else d
     res = int(arg("--res", "300"))
     tag = arg("--tag")
@@ -92,6 +119,9 @@ def main():
     if arg("--out"):
         OUT = ITER = os.path.join(ROOT, "review", arg("--out"))
     views = tuple(arg("--views", "front,threequarter").split(","))
+    ortho_o = float(arg("--ortho")) if arg("--ortho") else None                     # Phase J framing override
+    from mathutils import Vector
+    tgt_o = Vector([float(x) * BT.unit(bpy.data.objects[BT.ARM_NAME]) for x in arg("--target").split(",")])         if arg("--target") else None
     only = arg("--clips")
     names = only.split(",") if only else list(clips)
     sc = bpy.context.scene
@@ -120,9 +150,9 @@ def main():
         tiles = []
         for view in views:
             for f in frames:
-                sc.frame_set(f)
+                pose_frame(sc, arm, name, f, inject)
                 tiles.append(R.shot(sc, cam, os.path.join(tmp, "%s_%s_%03d.png" % (name, view, f)), view,
-                                    "%s f%d/%d %s" % (name, f, n, view)))
+                                    "%s f%d/%d %s" % (name, f, n, view), tgt_o, ortho_o))
         written.append(R.save_sheet(tiles, len(frames), os.path.join(OUT, "%s_sheet.png" % name)))
         print("SHEET", written[-1])
     if "--pull-chain" in argv:
@@ -135,10 +165,9 @@ def main():
         for si, seq in enumerate(strips):
             for view in ("side", "threequarter"):
                 for name, f in seq:
-                    use(arm, bpy.data.actions[name])
-                    sc.frame_set(f)
+                    pose_frame(sc, arm, name, f, inject)
                     tiles.append(R.shot(sc, cam, os.path.join(tmp, "pull_%d_%s_%s_%03d.png" % (si, view, name, f)), view,
-                                        "%s f%d %s" % (name.replace("SRC_", ""), f, view)))
+                                        "%s f%d %s" % (name.replace("SRC_", ""), f, view), tgt_o, ortho_o))
         written.append(R.save_sheet(tiles, len(strips[0]), os.path.join(OUT, "pull_chain_sheet.png")))
         print("SHEET", written[-1], len(tiles), "frames")
     bed.hide_render = True

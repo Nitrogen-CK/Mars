@@ -1,0 +1,128 @@
+{
+ "label": "2x",
+ "frame_map": "UE cm root-relative; SRC_Tug f0 (== SRC_Grip f6) vs f15",
+ "crown_d": [
+  -71.994,
+  0.0,
+  13.999
+ ],
+ "socket_HG_R_d": [
+  -74.181,
+  0.0,
+  10.471
+ ],
+ "socket_horizontal_travel": 74.181,
+ "neck": {
+  "dimple_d": [
+   -6.248,
+   -0.0,
+   1.794
+  ],
+  "ring_max_d": 4.568,
+  "target": "dimple <= 9 cm x, <= 3 cm z; ring below the dimple",
+  "pass": true
+ },
+ "stems": {
+  "leaf_1": {
+   "base_to_blade_cm": [
+    4.5,
+    76.76
+   ],
+   "base_to_blade_x": 17.06,
+   "emergence_to_blade_cm": [
+    2.63,
+    39.85
+   ],
+   "emergence_to_blade_x": 15.12
+  },
+  "leaf_2": {
+   "base_to_blade_cm": [
+    4.56,
+    74.87
+   ],
+   "base_to_blade_x": 16.43,
+   "emergence_to_blade_cm": [
+    2.52,
+    38.31
+   ],
+   "emergence_to_blade_x": 15.2
+  },
+  "leaf_3": {
+   "base_to_blade_cm": [
+    4.44,
+    74.07
+   ],
+   "base_to_blade_x": 16.67,
+   "emergence_to_blade_cm": [
+    2.74,
+    38.0
+   ],
+   "emergence_to_blade_x": 13.87
+  },
+  "leaf_4": {
+   "base_to_blade_cm": [
+    4.56,
+    74.87
+   ],
+   "base_to_blade_x": 16.43,
+   "emergence_to_blade_cm": [
+    2.52,
+    38.31
+   ],
+   "emergence_to_blade_x": 15.2
+  },
+  "leaf_5": {
+   "base_to_blade_cm": [
+    4.5,
+    76.76
+   ],
+   "base_to_blade_x": 17.06,
+   "emergence_to_blade_cm": [
+    2.63,
+    39.85
+   ],
+   "emergence_to_blade_x": 15.12
+  }
+ },
+ "anim_report": {
+  "fails": [],
+  "envelope": {
+   "min": [
+    -93.19,
+    -21.32,
+    -1.8
+   ],
+   "max": [
+    20.036,
+    21.32,
+    63.956
+   ],
+   "h_z": 65.756,
+   "w_y": 42.641,
+   "d_x": 113.226,
+   "limit_h_w_d": [
+    66.0,
+    42.0,
+    39.0
+   ],
+   "exceeds": {
+    "w": 0.641,
+    "d": 74.226
+   }
+  },
+  "SRC": {
+   "SRC_Tug": {
+    "stem_gap_max_cm": -0.6868,
+    "isect_max": {}
+   },
+   "SRC_Cancel": {
+    "stem_gap_max_cm": -0.6864,
+    "isect_max": {}
+   },
+   "SRC_Release": {
+    "stem_gap_max_cm": -0.6873,
+    "isect_max": {}
+   }
+  }
+ }
+}

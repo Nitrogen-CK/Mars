@@ -33,7 +33,9 @@ Loop convention: N+1 samples, frame N duplicates frame 0 (pose and slope); Unrea
 
 Run (from the screaming_turnip_r01 folder):
   "$B" -b --factory-startup source/ScreamingTurnip_R01.blend --python scripts/animate_screaming_turnip.py -- \
-      [--clips A,B] [--no-audit] [--no-save]
+      [--clips A,B] [--no-audit] [--no-save] [--review phaseK]
+Phase K: `-- --inject-stretch T,L [--review phaseK]` audits SRC_Tug / SRC_Cancel / SRC_Release with the runtime crown
+offset (-T * a, 0, L * a) UE cm and writes review/<review>/inject_T_L.json; no actions written, no save.
 Prints TURNIP_OK / TURNIP_FAIL <reason>; exits non-zero on failure.
 """
 import json
@@ -54,7 +56,7 @@ import build_screaming_turnip as BT  # noqa: E402
 import turnip_audit  # noqa: E402
 
 ROOT = os.path.dirname(HERE)
-REVIEW = os.path.join(ROOT, "review", "phaseB4")      # Phase I: `-- --review phaseI` writes anim_report there
+REVIEW = os.path.join(ROOT, "review", "phaseB4")      # Phase I / J / K: `-- --review phaseK` writes anim_report there
 ANIMS = os.path.join(ROOT, "export", "anims")
 BLEND = os.path.join(ROOT, "source", "ScreamingTurnip_R01.blend")
 FPS = 30
@@ -89,16 +91,44 @@ def leaves(v, la=None, lb=None, lf=None, k=(1, 1, 1, 1, 1)):
 NEUTRAL = BT.NEUTRAL.copy()
 PLANT = P({"bdz": PLANT_DZ})
 GRIP = leaves(with_(PLANT, cr_dz=-0.35), la=-6.0, lb=-4.0)
-# Phase I (PHASE_I_BRIEF.md): the pull has travel. Was bh 0.90 / bw 1.10 / cr_dz 0.9 (squash in place: crown head
-# 31.8 -> 32.4 cm UE over SRC_Tug). Now crown head 39.5 cm (target 39.5 +- 0.5; the HarvestGrip sockets ride the crown,
-# so they lift the same ~7.7 cm); the bulb stays planted (bdz = PLANT_DZ, root never moves) and domes slightly
-# (bh 1.06 / bw 0.96); the stalks stretch between the bulb and the crown (Part 1b: the builder weights each stem's
-# embedded base ring to the body, the emergence ring 0.5 body / 0.5 leaf_a; the stem_gap audit below gates it).
-# Leaves keep the authored droop (la -12 / lb -7).
-STRAIN = leaves(P({"bh": 1.06, "bw": 0.96, "bdz": PLANT_DZ, "cr_dz": 1.545}), la=-12.0, lb=-7.0)
-# Phase I: SRC_Tug mid key (f8): bh 1.03 / bw 0.98 / cr_dz 0.74 puts the crown at 36.0 cm = 55 % of the lift (target
-# 50-60 %). Was with_(STRAIN, bh=0.93, bw=1.07, cr_dz=0.6).
-TUG_MID = leaves(with_(STRAIN, bh=1.03, bw=0.98, cr_dz=0.74), la=-10, lb=-6)
+# Phase J (PHASE_J_BRIEF.md D-J3): the walk-away pull. SRC_Tug is now a lean-and-stretch toward the puller on the
+# mesh's -X (the Use side): crown head at f15 dx -36 +- 2 / dz +9 +- 2 cm (UE, root-relative) from SRC_Grip f6
+# (0, 0, 31.8) -> (-36.0, 0, 42.3) = dx -36.0 / dz +10.5; the HarvestGrip sockets ride the crown (their horizontal
+# travel is gameplay_numbers.k_StretchTravelCm). cr_dx / cr_dz are the design-cm values that put the crown head there
+# under this body pose (solved; x unit() = 3 in bone_targets). The crown pitches -X (cr_y < 0, the sign of
+# ROOT_AirborneLeafTrail's "crown pitched -X") 50 deg. The bulb stays planted (bdz = PLANT_DZ, the root never moves)
+# and tilts toward the pull (brot -8 deg, bh 1.04 / bw 0.98); the taproot holds the base. Leaves la -12 / lb -7 (Phase I).
+# Why dz 10.5 (not 9) and cr_y -50 / mid -46: the bulb's top ring (0.35 crown) and dimple (0.6 crown) follow the crown
+# further than stem 3's emergence ring (0.5), so past ~25 cm of lean the dragged bulb top reaches stem 3 (the -X stalk);
+# the sweep (PROGRESS Phase J) found 3-28 stem3-vs-bulb pairs on f10-f15 for dz 9-10 or a pitch that trails the
+# travel; dz 10.5 + a pitch that leads it (-46 at f8) is 0 on every frame of Tug / Cancel / Release, as are -49 / dz 11.
+# Was (Phase I, straight up): bh 1.06, bw 0.96, bdz PLANT_DZ, cr_dz 1.545, la -12, lb -7 (crown 31.8 -> 39.5 cm).
+# Phase J Part 1d (maintainer: "2x-3x as a start"): shipped at 2x, crown head dx -72.0 / dz +14.0 at f15 (Part 1/1b/1c
+# was -36.0 / +10.5 with cr_y -50, cr_dx -10.398, cr_dz 4.192 and the mid key cr_y -46, cr_dx -6.113, cr_dz 1.543); the lift
+# scales less than the reach so the stalks run long and low. Pitch -60 (mid -50), the top of the brief's 50-60: at -55
+# Release f3 grazes stem 3 on the bulb top (3 pairs) before the ease below; Tug / Cancel are clean at -55 and -60. The
+# Part 1d bulb-top weights (0.03 ring / 0.06 dimple, builder) keep the dimple <= 9 cm x / 3 cm z (review/phaseJ/neck.json).
+# Phase J Part 1e (maintainer: "go with 4x"): shipped at 4x, crown head dx -144.0 / dz +20.0 at f15. Part 1d (2x) was
+# cr_dx -21.667, cr_dz 6.908 (mid -12.571 / 2.878): crown -72 / +14. The Part 1e bulb-top weights (0.01 ring / 0.03 dimple)
+# keep the dimple <= 9 cm x / 3 cm z. Pitch -60 / mid -50 as 2x; the Tug / Cancel / Release sweep at -55 / -60, mid -50 /
+# -55 was clean everywhere (with the REL_OVER ease).
+# Phase K (PHASE_K_BRIEF.md D-K2): the stretch DISTANCE moves to a runtime crown offset (the ABP's ModifyBone, component
+# space, (-TravelCm * a, 0, LiftCm * a), a bed tuner); the clips keep only the pose: the crown pitch, the trailing leaves,
+# the bulb tilt. The brief says cr_dx = 0 / cr_dz = 0. DEV-K-1: with cr_dx 0 the 8 deg body tilt (brot) alone carries the
+# crown head -2.05 cm in x at f15 (-1.01 at f8), and the brief's own readback (Part 3: f15 crown x within 0.05 of f0) would
+# fail; so cr_dx is the small value that holds the crown head at x 0 (+0.6512 at STRAIN, +0.3289 at TUG_MID; design cm),
+# with cr_dz -0.0915 / -0.0230 keeping the z that cr_dz 0 gives (33.87 / 33.39 cm UE). The travel is entirely the tuner's.
+# Phase J 1e (4x) was cr_dx -44.249 / cr_dz 12.023 (mid -25.534 / 4.864): crown -144 / +20 authored.
+STRAIN = leaves(P({"bh": 1.04, "bw": 0.98, "bdz": PLANT_DZ, "brot": -8.0, "cr_y": -60.0,
+                   "cr_dx": 0.6512, "cr_dz": -0.0915}), la=-12.0, lb=-7.0)
+# SRC_Tug mid key (f8): half the tilt, the pitch leading (-50); crown head held at x 0 (DEV-K-1).
+# Was (Phase I) with_(STRAIN, bh=1.03, bw=0.98, cr_dz=0.74), la -10 / lb -6.
+TUG_MID = leaves(with_(STRAIN, bh=1.02, bw=0.99, brot=-4.0, cr_y=-50.0, cr_dx=0.3289, cr_dz=-0.0230), la=-10, lb=-6)
+# Part 1d preview only (`-- --variant 3x`: not shipped, saved to a scratch blend): crown dx -108 / dz +18, mid -60 / +9.9.
+# Phase K: obsolete (the travel is a runtime tuner; audit it with --inject-stretch); kept for the Part 1d record.
+STRAIN_3X = leaves(P({"bh": 1.04, "bw": 0.98, "bdz": PLANT_DZ, "brot": -8.0, "cr_y": -60.0,
+                      "cr_dx": -32.913, "cr_dz": 9.783}), la=-12.0, lb=-7.0)
+TUG_MID_3X = leaves(with_(STRAIN_3X, bh=1.02, bw=0.99, brot=-4.0, cr_y=-50.0, cr_dx=-19.04, cr_dz=4.05), la=-10, lb=-6)
 REL_OVER = leaves(P({"bh": 1.10, "bw": 0.95, "cr_dz": -0.15}), la=14.0, lb=10.0)
 REL_UNDER = leaves(P({"bh": 0.97, "bw": 1.02, "cr_dz": 0.05}), la=-5.0, lb=-3.0)
 ANT = leaves(P({"bh": 0.90, "bw": 1.10, "cr_dz": 0.4, "cheek": {"s": (1.0, 1.10, 1.08), "pivot": BT.MOUTH_PIVOT}}),
@@ -233,14 +263,31 @@ def build_clips(u=1.0):
         Clip("SRC_Grip", 6, False, [(0, PLANT), (6, GRIP)], note="stalks compress at the HarvestGrip points",
              chain={"from": ("SRC_Idle", 0)}),
         Clip("SRC_Tug", 15, False, [(0, GRIP), (8, TUG_MID), (15, STRAIN)],
-             note="Phase I: stalks pulled straight up (crown head 31.8 -> 39.5 cm UE, ~7.7 cm; the HarvestGrip sockets "
-                  "ride it; the stalks stretch), bulb stays planted and domes 1.06 h / 0.96 w, leaves keep their droop; ends at full "
-                  "strain",
+             note="Phase K: the pull's POSE only, scrubbed by the walk-away pull: crown pitched -60 deg toward -X (the Use "
+                  "side), leaves trailing, bulb planted and tilted 8 deg toward -X at 1.04 h / 0.98 w; the crown head stays at "
+                  "x 0 (z 31.8 -> 33.9 cm UE). The stretch distance is the runtime crown offset (-TravelCm * a, 0, "
+                  "LiftCm * a) in component space, a bed tuner (default 146.2 / 20 cm); ends at full strain",
              chain={"from": ("SRC_Grip", 6)}),
-        Clip("SRC_Release", 6, False, [(0, STRAIN), (2, REL_OVER), (4, REL_UNDER), (6, NEUTRAL)],
-             note="elastic break-free from the Phase I strain (crown 39.5 cm): crown springs back, leaves rebound, bulb "
+        # Part 1d: ease (zero slope) at REL_OVER f2, so the 72 cm snap-back does not overshoot past neutral into +X at f3
+        # (the spline overshoot pressed stem 3 into the bulb top: 3 pairs). Was no ease. Part 1e: still clean at 144 cm.
+        Clip("SRC_Release", 6, False, [(0, STRAIN), (2, REL_OVER), (4, REL_UNDER), (6, NEUTRAL)], ease=(2,),
+             note="elastic break-free from the strain pose (Phase K: the runtime offset is 0 by the release): crown springs back, leaves rebound, bulb "
                   "overshoots to 1.1 h, settles at neutral (== ROOT_QuietIdle f0); root never moves", chain={"from": ("SRC_Tug", 15)}),
-        Clip("SRC_Cancel", 7, False, [(0, STRAIN), (7, PLANT)], note="full strain (Phase I: crown 39.5 cm) back to the planted rest (crown 32.85 cm)",
+        # Phase J Part 1c: the Tug's mirror, so SRC_Cancel played from 1 - a starts where SRC_Tug(a) is (PIE run measured a
+        # 3.57 cm jump at a 0.586 with no mid key). TUG_MID at 7 * (1 - 8/15) = 49/15 = f3.267 (fractional key: the spline
+        # takes it; every integer frame is still keyed). Crown mismatch Cancel(1 - a) vs Tug(a) over a 0.05..0.95: authored
+        # spline <= 1.03 cm, as keyed at 30 fps (linear between keys, as played) <= 1.26 cm at a 0.07 and <= 0.89 from
+        # a 0.2; 0.02 cm at a 0.59 (was 2.36; max 2.76 crown / 3.93 socket). The floor near a 0 is the Grip dip (Tug starts
+        # at GRIP, Cancel ends at PLANT: 1.05 cm). Part 1d (2x): spline still <= 1.03; as keyed <= 1.13 from a 0.15,
+        # peak 1.68 at a 0.07 (the 30 fps chord error doubles with the travel), 0.04 at a 0.59. Part 1e (4x): spline
+        # <= 1.03; as keyed peaks 2.65 at a 0.07 and 2.24 at a 0.93 (the 7-key chord at both eased ends), <= 1.01 over
+        # a 0.25..0.80, 0.10 at a 0.59.
+        # review/phaseJ/cancel_match.json. Was [(0, STRAIN), (7, PLANT)].
+        Clip("SRC_Cancel", 7, False, [(0, STRAIN), (49.0 / 15.0, TUG_MID), (7, PLANT)],
+             note="full strain pose back to the planted rest (Phase K: the runtime offset shrinks with 1 - played alpha); "
+                  "Part 1c: TUG_MID at f3.267 mirrors SRC_Tug's f8, so Cancel at 1 - a matches Tug at a (Part 1e 4x, as keyed: "
+                  "<= 1.01 cm over a 0.25..0.80, peaks 2.65 cm at a 0.07 and 2.24 cm at a 0.93 (30 fps chord at the eased ends, "
+                  "over the 1.05 cm Grip-dip floor); review/phaseJ/cancel_match.json)",
              chain={"from": ("SRC_Tug", 15)}),
         Clip("ROOT_QuietIdle", 60, True, [(0, NEUTRAL), (30, NEUTRAL)], layer=quiet_layer,
              note="closed pucker, breath 1.000..1.015 h, relaxed crown"),
@@ -303,6 +350,8 @@ CHAINS = [  # (a, fa, b, fb, hard_cut)
 ]
 
 
+INJECTED = ("SRC_Tug", "SRC_Cancel", "SRC_Release")        # Phase K: pose-only clips, shown with the runtime crown offset
+DEFAULT_STRETCH = (146.2, 20.0)       # Phase K: the bed's FMars_ScreamingTurnipBed_StretchSpec default (TravelCm, LiftCm), UE cm
 SUBFRAME_CLIPS = {"ROOT_Inhale": 36, "ROOT_Scream": 6, "ROOT_Recover": 10}   # half-frame info audit (not gated)
 SK_NAMES = tuple(BT.SHAPE_KEYS.values())          # ("Inhale", "Scream")
 SK_PARAM = {nm: k for k, nm in BT.SHAPE_KEYS.items()}
@@ -469,12 +518,104 @@ def shape_profile(c, vals):
             "per_frame": {"Inhale": np.round(ki, 4).tolist(), "Scream": np.round(ks, 4).tolist()}}
 
 
+def inject_audit(arm, ob, T, L, review):
+    """Phase K: the deformation gates on SRC_Tug / SRC_Cancel WITH the runtime crown offset the anim blueprint adds
+    (ModifyBone, crown, component space, Add): (-T * a, 0, L * a) UE cm, a = f / 15 on SRC_Tug and 1 - f / 7 on SRC_Cancel
+    (the bed drives the offset with the Control alpha while gripped and 1 - played alpha while the cancel plays).
+    Blender world cm == UE cm in x / z (y flips; the offset has no y), the armature at the origin. The clip pose comes from
+    the authored spline (== the exported action, audited to 1e-4 cm); the offset is added to the crown's armature-space
+    matrix, so the stems, leaves and sockets follow as they do under the ABP. Gates: every intersection category 0,
+    stem_gap <= 0, the neck (dimple <= 9 cm x / <= 3 cm z from SRC_Tug f0, ring below the dimple). Never saves."""
+    from mathutils import Matrix, Vector
+    clips = {c.name: c for c in build_clips(BT.unit(arm))}
+    cg = ob.vertex_groups["crown"].index
+    bulb_crown = [v.index for v in ob.data.vertices if any(g.group == cg and g.weight > 0 for g in v.groups)
+                  and not any(ob.vertex_groups[g.group].name.startswith("leaf_") for g in v.groups)]
+    dimple = [i for i in bulb_crown if abs(ob.data.vertices[i].co.x) < 1e-4 and abs(ob.data.vertices[i].co.y) < 1e-4]
+    ring = [i for i in bulb_crown if i not in dimple]
+    meas = json.load(open(os.path.join(ROOT, "review", "phaseB4", "measurements.json")))
+    hg = Vector(meas["landmarks"]["sockets_blender_cm"]["HarvestGrip_R"])
+    crinv = arm.data.bones["crown"].matrix_local.inverted()
+    arm.animation_data.action = None
+    assign(ob.data.shape_keys, None)
+    ref = None
+    out = {"T_cm": T, "L_cm": L, "offset": "(-T * a, 0, L * a) UE cm on the crown, component space", "clips": {},
+           "fails": [], "release_info": []}
+    # SRC_Release: the bed does not play it (Script: no k_Clip_Release); audited as if released from full strain with the
+    # offset shrinking over its 6 frames (a = 1 - f / 6), so a future use starts from a known state.
+    for name, n, alpha in (("SRC_Tug", 15, lambda f: f / 15.0), ("SRC_Cancel", 7, lambda f: 1.0 - f / 7.0),
+                           ("SRC_Release", 6, lambda f: 1.0 - f / 6.0)):
+        c = clips[name]
+        rows = []
+        for f in range(n + 1):
+            a = alpha(f)
+            BT.apply_params(arm, c.sample(float(f)))
+            pb = arm.pose.bones["crown"]
+            pb.matrix = Matrix.Translation(Vector((-T * a, 0.0, L * a))) @ pb.matrix
+            bpy.context.view_layer.update()
+            co, tris, tp, tl = turnip_audit.evaluated(ob)
+            if ref is None:
+                ref = co.copy()            # SRC_Tug f0, a 0: the neck's zero
+            isect = {k: x for k, x in turnip_audit.intersections(ob, BT.PART).items()
+                     if x and "(info)" not in k and "(sum)" not in k}
+            gap = max(stem_gap(co, tris, tp, tl))
+            dd = co[dimple[0]] - ref[dimple[0]]
+            rmax = float(np.linalg.norm(co[ring] - ref[ring], axis=1).max())
+            dn = float(np.linalg.norm(dd))
+            crown = np.array(arm.matrix_world @ pb.head)
+            sock = np.array(arm.matrix_world @ pb.matrix @ crinv @ hg)
+            neck_ok = abs(dd[0]) <= 9.0 and dd[2] <= 3.0 and (rmax < dn or (rmax == 0.0 and dn == 0.0))
+            row = {"f": f, "a": round(a, 4), "crown_ue_xz": [round(float(crown[0]), 3), round(float(crown[2]), 3)],
+                   "socket_R_ue": [round(float(sock[0]), 3), round(float(-sock[1]), 3), round(float(sock[2]), 3)],
+                   "isect": isect, "stem_gap": round(gap, 4), "dimple_d_xz": [round(float(dd[0]), 3), round(float(dd[2]), 3)],
+                   "ring_max_d": round(rmax, 3), "neck_ok": bool(neck_ok)}
+            rows.append(row)
+            for why, bad in (("intersections %s" % isect, bool(isect)), ("stem_gap %.3f" % gap, gap > 0),
+                             ("neck dimple %s ring %.2f" % (row["dimple_d_xz"], rmax), not neck_ok)):
+                if bad:      # SRC_Release is info only: the bed never plays it, and its a = 1 - f / 6 is an assumption
+                    out["fails" if name != "SRC_Release" else "release_info"].append("%s f%d (a %.2f): %s" % (name, f, a, why))
+        full = rows[-1] if name == "SRC_Tug" else rows[0]
+        out["clips"][name] = {"rows": rows, "stem_gap_max": max(r["stem_gap"] for r in rows),
+                              "isect_frames": [r["f"] for r in rows if r["isect"]],
+                              "dimple_d_at_full": full["dimple_d_xz"], "ring_max_d_at_full": full["ring_max_d"],
+                              "crown_at_full": full["crown_ue_xz"], "socket_R_at_full": full["socket_R_ue"]}
+    BT.apply_params(arm, NEUTRAL)
+    os.makedirs(review, exist_ok=True)
+    path = os.path.join(review, "inject_%g_%g.json" % (T, L))
+    with open(path, "w") as fh:
+        json.dump(out, fh, indent=1)
+    tug = out["clips"]["SRC_Tug"]
+    print("INJECT T %g L %g: fails %d; Tug stem_gap %.3f isect frames %s crown %s dimple %s ring %.2f; Cancel isect frames %s;"
+          " Release isect frames %s" % (T, L, len(out["fails"]), tug["stem_gap_max"], tug["isect_frames"], tug["crown_at_full"],
+                                        tug["dimple_d_at_full"], tug["ring_max_d_at_full"],
+                                        out["clips"]["SRC_Cancel"]["isect_frames"], out["clips"]["SRC_Release"]["isect_frames"]))
+    return out
+
+
 def main():
     argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
+    if "--inject-stretch" in argv:          # Phase K: audit only (no actions written, no save)
+        T, L = (float(x) for x in argv[argv.index("--inject-stretch") + 1].split(","))
+        review = os.path.join(ROOT, "review", argv[argv.index("--review") + 1]) if "--review" in argv else REVIEW
+        arm = bpy.data.objects[BT.ARM_NAME]
+        arm.animation_data_create()
+        res = inject_audit(arm, bpy.data.objects[BT.MESH_NAME], T, L, review)
+        if res["fails"]:
+            print("TURNIP_FAIL inject %g,%g: %s" % (T, L, "; ".join(res["fails"][:6])))
+            sys.exit(1)
+        print("TURNIP_OK inject %g,%g" % (T, L))
+        return
     only = argv[argv.index("--clips") + 1].split(",") if "--clips" in argv else None
     do_audit = "--no-audit" not in argv
     do_save = "--no-save" not in argv
     review = os.path.join(ROOT, "review", argv[argv.index("--review") + 1]) if "--review" in argv else REVIEW
+    blend_out, variant = BLEND, argv[argv.index("--variant") + 1] if "--variant" in argv else None
+    if variant == "3x":         # Part 1d preview: 3x poses, scratch blend, no export/anims/clips.json (frames unchanged)
+        global STRAIN, TUG_MID
+        STRAIN, TUG_MID = STRAIN_3X, TUG_MID_3X
+        blend_out = os.path.join(ROOT, "source", "ScreamingTurnip_R01_phaseJ_3x_preview.blend")
+    elif variant is not None:
+        raise RuntimeError("unknown --variant %s" % variant)
     t_start = time.time()
     fails = []
     sc = bpy.context.scene
@@ -595,6 +736,12 @@ def main():
                 fails.append("%s Unreal composition deviation %.4f" % (c.name, per["ue_dev_max_cm"]))
             for k, x in per["isect_max"].items():
                 allowed = 3 if (k == "outer_shell_self" and c.name in ("ROOT_Scream", "ROOT_Recover")) else 0
+                if c.name in INJECTED and x > allowed:
+                    # Phase K: these clips are the pull's pose only and never render without the runtime crown offset;
+                    # alone (offset 0) the pitched crown lays the leaves on the bulb. Info here; gated below by the
+                    # injected default (DEFAULT_STRETCH) and by the --inject-stretch sweep.
+                    per.setdefault("standalone_isect_info", {})[k] = x
+                    continue
                 if x > allowed:
                     fails.append("%s %s max %d (frames %s)" % (c.name, k, x, per["isect_frames"].get(k)))
         per["seam"] = seam
@@ -604,7 +751,7 @@ def main():
         clip_json[c.name] = {"fps": FPS, "frames": [0, c.end], "samples": c.end + 1, "loop": c.loop,
                              "duration_s": round(c.end / FPS, 4), "export_action": c.name,
                              "export_key_action": key_action_name(c.name), "note": c.note,
-                             "chain": c.chain, "key_frames": [int(k) for k in c.F],
+                             "chain": c.chain, "key_frames": [int(k) if k == int(k) else round(float(k), 4) for k in c.F],   # 1c: f3.267
                              "shape_keys": {n: [round(float(x), 6) for x in played[:, j]] for j, n in enumerate(SK_NAMES)},
                              "shape_key_peaks": prof["peaks"]}
         print("CLIP %-24s frames 0..%-3d loop %-5s stem_gap %.3f isect_max %s ue_dev %.6f seam %s sk_peaks %s" % (
@@ -629,6 +776,13 @@ def main():
                                                                          "HARD CUT (reported)" if hard else ""))
             if not hard and (d[0] > 0.1 or d[1] > 1.0 or d[2] > 1e-3):
                 fails.append("chain %s -> %s %s" % (row["from"], row["to"], d))
+
+    if do_audit and not only and variant is None:          # Phase K: the pose clips gated with the shipped default offset
+        inj = inject_audit(arm, ob, DEFAULT_STRETCH[0], DEFAULT_STRETCH[1], review)
+        fails += ["injected default: " + f for f in inj["fails"]]
+        arm.animation_data_create()
+        arm.animation_data.action = None
+        assign(key, None)
 
     env = None
     if do_audit:
@@ -662,15 +816,16 @@ def main():
         with open(os.path.join(review, "anim_report.json"), "w") as fh:
             json.dump({"clips": report, "chain": chain_rep, "envelope": env, "planted": planted,
                        "fails": fails, "seconds": round(time.time() - t_start, 1)}, fh, indent=1)
-        with open(os.path.join(ANIMS, "clips.json"), "w") as fh:
-            json.dump(clip_json, fh, indent=1)
+        if variant is None:
+            with open(os.path.join(ANIMS, "clips.json"), "w") as fh:
+                json.dump(clip_json, fh, indent=1)
     arm.animation_data.action = None
     assign(key, None)
     for n in SK_NAMES:
         key.key_blocks[n].value = 0.0
     sc.frame_set(0)
     if do_save:
-        bpy.ops.wm.save_as_mainfile(filepath=BLEND)
+        bpy.ops.wm.save_as_mainfile(filepath=blend_out)
     if fails:
         print("TURNIP_FAIL " + "; ".join(fails))
         sys.exit(1)

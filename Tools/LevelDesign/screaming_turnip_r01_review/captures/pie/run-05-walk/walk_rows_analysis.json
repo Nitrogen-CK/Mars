@@ -1,0 +1,5438 @@
+{
+ "source": "captures/pie/run-05-walk/walk_rows.json",
+ "n_rows": 829,
+ "marks": [
+  [
+   "bed0_before",
+   1.7882,
+   "bed=13|0(13)[Valid](ScreamingTurnipBed) enabled=Enable focused=true exhausted_reason=false charges=1 released=0 exhausted=false at=X=0.000 Y=0.000 Z=0.000"
+  ],
+  [
+   "use0_down",
+   1.9374,
+   null
+  ],
+  [
+   "back0_start",
+   2.9591,
+   null
+  ],
+  [
+   "bed0_gone",
+   4.5735,
+   null
+  ],
+  [
+   "bed0_after",
+   6.4033,
+   "bed=13|0(13)[Valid](ScreamingTurnipBed) enabled=Disable focused=false exhausted_reason=true charges=0 released=1 exhausted=true at=X=0.000 Y=0.000 Z=0.000"
+  ],
+  [
+   "bed1_before",
+   8.9396,
+   "bed=15|0(15)[Valid](ScreamingTurnipBed) enabled=Enable focused=true exhausted_reason=false charges=1 released=0 exhausted=false at=X=450.000 Y=-450.000 Z=0.000"
+  ],
+  [
+   "use1a_down",
+   9.0812,
+   null
+  ],
+  [
+   "use1a_up",
+   11.0807,
+   null
+  ],
+  [
+   "bed1_after_cancel",
+   13.3064,
+   "bed=15|0(15)[Valid](ScreamingTurnipBed) enabled=Enable focused=true exhausted_reason=false charges=1 released=0 exhausted=false at=X=450.000 Y=-450.000 Z=0.000"
+  ],
+  [
+   "use1b_down",
+   14.5825,
+   null
+  ],
+  [
+   "sidestep_radius",
+   16.4287,
+   null
+  ],
+  [
+   "side1b_start",
+   16.5608,
+   null
+  ],
+  [
+   "move_timeout",
+   18.6723,
+   1
+  ],
+  [
+   "side1b_end",
+   18.7872,
+   null
+  ],
+  [
+   "bed1_gone",
+   19.7646,
+   null
+  ],
+  [
+   "bed1_after",
+   21.5072,
+   "bed=15|0(15)[Valid](ScreamingTurnipBed) enabled=Disable focused=false exhausted_reason=true charges=0 released=1 exhausted=true at=X=450.000 Y=-450.000 Z=0.000"
+  ]
+ ],
+ "bed0": {
+  "bed": 0,
+  "press": 1.9374,
+  "end": 4.5735,
+  "d0": 114.256,
+  "tug_first": {
+   "game": 2.414,
+   "t": 0.0,
+   "d": 114.256
+  },
+  "player_moved_during_grip_cm": 0.0,
+  "rows": [
+   {
+    "game": 2.414,
+    "dt": 0.067,
+    "d": 114.256,
+    "gained": 0.0,
+    "alpha": 0.0,
+    "want": 0.0,
+    "err": 0.0,
+    "want_lag": 0.0,
+    "err_lag": 0.0,
+    "sock_travel": [
+     -0.0,
+     -0.0
+    ],
+    "sock_travel_want": 0.0,
+    "sock_travel_err": 0.0,
+    "local_travel": [
+     0.0,
+     -0.0
+    ],
+    "local_err_vs_alpha": 0.0,
+    "clip_travel": -0.0,
+    "local_err_vs_clip": 0.0,
+    "yaw": 36.174,
+    "aim": 43.496,
+    "yaw_err": -7.322,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     -3.993,
+     2.882,
+     6.385
+    ]
+   },
+   {
+    "game": 2.4749,
+    "dt": 0.0609,
+    "d": 114.256,
+    "gained": 0.0,
+    "alpha": 0.0,
+    "want": 0.0,
+    "err": 0.0,
+    "want_lag": 0.0,
+    "err_lag": 0.0,
+    "sock_travel": [
+     0.608,
+     -0.584
+    ],
+    "sock_travel_want": 0.0,
+    "sock_travel_err": 0.608,
+    "local_travel": [
+     -0.001,
+     0.0
+    ],
+    "local_err_vs_alpha": 0.001,
+    "clip_travel": -0.0,
+    "local_err_vs_clip": 0.001,
+    "yaw": 43.497,
+    "aim": 43.496,
+    "yaw_err": 0.001,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     -4.327,
+     2.35,
+     6.385
+    ]
+   },
+   {
+    "game": 2.5509,
+    "dt": 0.076,
+    "d": 114.256,
+    "gained": 0.0,
+    "alpha": 0.0,
+    "want": 0.0,
+    "err": 0.0,
+    "want_lag": 0.0,
+    "err_lag": 0.0,
+    "sock_travel": [
+     0.608,
+     -0.584
+    ],
+    "sock_travel_want": 0.0,
+    "sock_travel_err": 0.608,
+    "local_travel": [
+     -0.001,
+     0.0
+    ],
+    "local_err_vs_alpha": 0.001,
+    "clip_travel": -0.0,
+    "local_err_vs_clip": 0.001,
+    "yaw": 43.497,
+    "aim": 43.496,
+    "yaw_err": 0.001,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     -4.327,
+     2.35,
+     6.385
+    ]
+   },
+   {
+    "game": 2.6229,
+    "dt": 0.072,
+    "d": 114.256,
+    "gained": 0.0,
+    "alpha": 0.0,
+    "want": 0.0,
+    "err": 0.0,
+    "want_lag": 0.0,
+    "err_lag": 0.0,
+    "sock_travel": [
+     0.608,
+     -0.584
+    ],
+    "sock_travel_want": 0.0,
+    "sock_travel_err": 0.608,
+    "local_travel": [
+     -0.001,
+     0.0
+    ],
+    "local_err_vs_alpha": 0.001,
+    "clip_travel": -0.0,
+    "local_err_vs_clip": 0.001,
+    "yaw": 43.497,
+    "aim": 43.496,
+    "yaw_err": 0.001,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     -4.327,
+     2.35,
+     6.385
+    ]
+   },
+   {
+    "game": 2.6942,
+    "dt": 0.0713,
+    "d": 114.256,
+    "gained": 0.0,
+    "alpha": 0.0,
+    "want": 0.0,
+    "err": 0.0,
+    "want_lag": 0.0,
+    "err_lag": 0.0,
+    "sock_travel": [
+     0.608,
+     -0.584
+    ],
+    "sock_travel_want": 0.0,
+    "sock_travel_err": 0.608,
+    "local_travel": [
+     -0.001,
+     0.0
+    ],
+    "local_err_vs_alpha": 0.001,
+    "clip_travel": -0.0,
+    "local_err_vs_clip": 0.001,
+    "yaw": 43.497,
+    "aim": 43.496,
+    "yaw_err": 0.001,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     -4.327,
+     2.35,
+     6.385
+    ]
+   },
+   {
+    "game": 2.7601,
+    "dt": 0.0659,
+    "d": 114.256,
+    "gained": 0.0,
+    "alpha": 0.0,
+    "want": 0.0,
+    "err": 0.0,
+    "want_lag": 0.0,
+    "err_lag": 0.0,
+    "sock_travel": [
+     0.608,
+     -0.584
+    ],
+    "sock_travel_want": 0.0,
+    "sock_travel_err": 0.608,
+    "local_travel": [
+     -0.001,
+     0.0
+    ],
+    "local_err_vs_alpha": 0.001,
+    "clip_travel": -0.0,
+    "local_err_vs_clip": 0.001,
+    "yaw": 43.497,
+    "aim": 43.496,
+    "yaw_err": 0.001,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     -4.327,
+     2.35,
+     6.385
+    ]
+   },
+   {
+    "game": 2.8211,
+    "dt": 0.061,
+    "d": 114.256,
+    "gained": 0.0,
+    "alpha": 0.0,
+    "want": 0.0,
+    "err": 0.0,
+    "want_lag": 0.0,
+    "err_lag": 0.0,
+    "sock_travel": [
+     0.608,
+     -0.584
+    ],
+    "sock_travel_want": 0.0,
+    "sock_travel_err": 0.608,
+    "local_travel": [
+     -0.001,
+     0.0
+    ],
+    "local_err_vs_alpha": 0.001,
+    "clip_travel": -0.0,
+    "local_err_vs_clip": 0.001,
+    "yaw": 43.497,
+    "aim": 43.496,
+    "yaw_err": 0.001,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     -4.327,
+     2.35,
+     6.385
+    ]
+   },
+   {
+    "game": 2.8842,
+    "dt": 0.0631,
+    "d": 114.256,
+    "gained": 0.0,
+    "alpha": 0.0,
+    "want": 0.0,
+    "err": 0.0,
+    "want_lag": 0.0,
+    "err_lag": 0.0,
+    "sock_travel": [
+     0.608,
+     -0.584
+    ],
+    "sock_travel_want": 0.0,
+    "sock_travel_err": 0.608,
+    "local_travel": [
+     -0.001,
+     0.0
+    ],
+    "local_err_vs_alpha": 0.001,
+    "clip_travel": -0.0,
+    "local_err_vs_clip": 0.001,
+    "yaw": 43.497,
+    "aim": 43.496,
+    "yaw_err": 0.001,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     -4.327,
+     2.35,
+     6.385
+    ]
+   },
+   {
+    "game": 2.9591,
+    "dt": 0.0749,
+    "d": 114.256,
+    "gained": 0.0,
+    "alpha": 0.0,
+    "want": 0.0,
+    "err": 0.0,
+    "want_lag": 0.0,
+    "err_lag": 0.0,
+    "sock_travel": [
+     0.608,
+     -0.584
+    ],
+    "sock_travel_want": 0.0,
+    "sock_travel_err": 0.608,
+    "local_travel": [
+     -0.001,
+     0.0
+    ],
+    "local_err_vs_alpha": 0.001,
+    "clip_travel": -0.0,
+    "local_err_vs_clip": 0.001,
+    "yaw": 43.497,
+    "aim": 43.496,
+    "yaw_err": 0.001,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     -4.327,
+     2.35,
+     6.385
+    ]
+   },
+   {
+    "game": 3.0274,
+    "dt": 0.0683,
+    "d": 114.256,
+    "gained": 0.0,
+    "alpha": 0.0,
+    "want": 0.0,
+    "err": 0.0,
+    "want_lag": 0.0,
+    "err_lag": 0.0,
+    "sock_travel": [
+     0.608,
+     -0.584
+    ],
+    "sock_travel_want": 0.0,
+    "sock_travel_err": 0.608,
+    "local_travel": [
+     -0.001,
+     0.0
+    ],
+    "local_err_vs_alpha": 0.001,
+    "clip_travel": -0.0,
+    "local_err_vs_clip": 0.001,
+    "yaw": 43.497,
+    "aim": 43.496,
+    "yaw_err": 0.001,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     -4.327,
+     2.35,
+     6.385
+    ]
+   },
+   {
+    "game": 3.0879,
+    "dt": 0.0606,
+    "d": 114.751,
+    "gained": 0.495,
+    "alpha": 0.0028,
+    "want": 0.013,
+    "err": -0.0102,
+    "want_lag": 0.0,
+    "err_lag": 0.0028,
+    "sock_travel": [
+     0.608,
+     -0.584
+    ],
+    "sock_travel_want": 0.107,
+    "sock_travel_err": 0.691,
+    "local_travel": [
+     -0.001,
+     0.0
+    ],
+    "local_err_vs_alpha": 0.108,
+    "clip_travel": 0.029,
+    "local_err_vs_clip": 0.03,
+    "yaw": 43.497,
+    "aim": 43.496,
+    "yaw_err": 0.001,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     -4.327,
+     2.35,
+     6.385
+    ]
+   },
+   {
+    "game": 3.1537,
+    "dt": 0.0657,
+    "d": 116.05,
+    "gained": 1.794,
+    "alpha": 0.015,
+    "want": 0.047,
+    "err": -0.032,
+    "want_lag": 0.0,
+    "err_lag": 0.015,
+    "sock_travel": [
+     0.639,
+     -0.555
+    ],
+    "sock_travel_want": 0.573,
+    "sock_travel_err": 1.128,
+    "local_travel": [
+     0.03,
+     0.029
+    ],
+    "local_err_vs_alpha": 0.544,
+    "clip_travel": 0.155,
+    "local_err_vs_clip": 0.125,
+    "yaw": 43.497,
+    "aim": 43.497,
+    "yaw_err": 0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     -4.349,
+     2.329,
+     6.39
+    ]
+   },
+   {
+    "game": 3.2183,
+    "dt": 0.0647,
+    "d": 117.993,
+    "gained": 3.737,
+    "alpha": 0.0384,
+    "want": 0.0978,
+    "err": -0.0594,
+    "want_lag": 0.0,
+    "err_lag": 0.0384,
+    "sock_travel": [
+     0.764,
+     -0.43
+    ],
+    "sock_travel_want": 1.467,
+    "sock_travel_err": 1.897,
+    "local_travel": [
+     0.155,
+     0.155
+    ],
+    "local_err_vs_alpha": 1.312,
+    "clip_travel": 0.397,
+    "local_err_vs_clip": 0.242,
+    "yaw": 43.497,
+    "aim": 43.497,
+    "yaw_err": 0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     -4.44,
+     2.243,
+     6.41
+    ]
+   },
+   {
+    "game": 3.284,
+    "dt": 0.0656,
+    "d": 120.059,
+    "gained": 5.803,
+    "alpha": 0.0728,
+    "want": 0.1519,
+    "err": -0.0791,
+    "want_lag": 0.0,
+    "err_lag": 0.0728,
+    "sock_travel": [
+     1.007,
+     -0.186
+    ],
+    "sock_travel_want": 2.781,
+    "sock_travel_err": 2.967,
+    "local_travel": [
+     0.398,
+     0.399
+    ],
+    "local_err_vs_alpha": 2.383,
+    "clip_travel": 0.86,
+    "local_err_vs_clip": 0.462,
+    "yaw": 43.497,
+    "aim": 43.496,
+    "yaw_err": 0.001,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     -4.616,
+     2.075,
+     6.45
+    ]
+   },
+   {
+    "game": 3.3455,
+    "dt": 0.0616,
+    "d": 121.999,
+    "gained": 7.743,
+    "alpha": 0.1108,
+    "want": 0.2027,
+    "err": -0.0919,
+    "want_lag": 0.013,
+    "err_lag": 0.0978,
+    "sock_travel": [
+     1.473,
+     0.279
+    ],
+    "sock_travel_want": 4.233,
+    "sock_travel_err": 3.954,
+    "local_travel": [
+     0.864,
+     0.863
+    ],
+    "local_err_vs_alpha": 3.369,
+    "clip_travel": 1.926,
+    "local_err_vs_clip": 1.062,
+    "yaw": 43.497,
+    "aim": 43.496,
+    "yaw_err": 0.001,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     -4.954,
+     1.755,
+     6.524
+    ]
+   },
+   {
+    "game": 3.4164,
+    "dt": 0.0709,
+    "d": 124.233,
+    "gained": 9.977,
+    "alpha": 0.1626,
+    "want": 0.2612,
+    "err": -0.0986,
+    "want_lag": 0.047,
+    "err_lag": 0.1156,
+    "sock_travel": [
+     2.536,
+     1.343
+    ],
+    "sock_travel_want": 6.211,
+    "sock_travel_err": 4.868,
+    "local_travel": [
+     1.927,
+     1.927
+    ],
+    "local_err_vs_alpha": 4.284,
+    "clip_travel": 3.766,
+    "local_err_vs_clip": 1.839,
+    "yaw": 43.497,
+    "aim": 43.497,
+    "yaw_err": 0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     -5.725,
+     1.023,
+     6.692
+    ]
+   },
+   {
+    "game": 3.4785,
+    "dt": 0.0621,
+    "d": 126.187,
+    "gained": 11.931,
+    "alpha": 0.2088,
+    "want": 0.3123,
+    "err": -0.1035,
+    "want_lag": 0.0978,
+    "err_lag": 0.111,
+    "sock_travel": [
+     4.38,
+     3.188
+    ],
+    "sock_travel_want": 7.976,
+    "sock_travel_err": 4.789,
+    "local_travel": [
+     3.771,
+     3.772
+    ],
+    "local_err_vs_alpha": 4.205,
+    "clip_travel": 5.75,
+    "local_err_vs_clip": 1.979,
+    "yaw": 43.497,
+    "aim": 43.497,
+    "yaw_err": 0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     -7.063,
+     -0.246,
+     6.965
+    ]
+   },
+   {
+    "game": 3.5493,
+    "dt": 0.0708,
+    "d": 128.417,
+    "gained": 14.161,
+    "alpha": 0.2654,
+    "want": 0.3707,
+    "err": -0.1053,
+    "want_lag": 0.2027,
+    "err_lag": 0.0627,
+    "sock_travel": [
+     6.364,
+     5.171
+    ],
+    "sock_travel_want": 10.138,
+    "sock_travel_err": 4.967,
+    "local_travel": [
+     5.755,
+     5.755
+    ],
+    "local_err_vs_alpha": 4.383,
+    "clip_travel": 8.582,
+    "local_err_vs_clip": 2.827,
+    "yaw": 43.497,
+    "aim": 43.497,
+    "yaw_err": 0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     -8.502,
+     -1.612,
+     7.229
+    ]
+   },
+   {
+    "game": 3.61,
+    "dt": 0.0607,
+    "d": 130.329,
+    "gained": 16.073,
+    "alpha": 0.313,
+    "want": 0.4208,
+    "err": -0.1078,
+    "want_lag": 0.2027,
+    "err_lag": 0.1103,
+    "sock_travel": [
+     9.196,
+     8.003
+    ],
+    "sock_travel_want": 11.957,
+    "sock_travel_err": 3.953,
+    "local_travel": [
+     8.587,
+     8.588
+    ],
+    "local_err_vs_alpha": 3.369,
+    "clip_travel": 11.163,
+    "local_err_vs_clip": 2.575,
+    "yaw": 43.497,
+    "aim": 43.497,
+    "yaw_err": 0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     -10.557,
+     -3.561,
+     7.562
+    ]
+   },
+   {
+    "game": 3.6789,
+    "dt": 0.0689,
+    "d": 132.499,
+    "gained": 18.243,
+    "alpha": 0.3692,
+    "want": 0.4776,
+    "err": -0.1084,
+    "want_lag": 0.3123,
+    "err_lag": 0.0569,
+    "sock_travel": [
+     11.775,
+     10.581
+    ],
+    "sock_travel_want": 14.103,
+    "sock_travel_err": 3.523,
+    "local_travel": [
+     11.166,
+     11.165
+    ],
+    "local_err_vs_alpha": 2.938,
+    "clip_travel": 14.214,
+    "local_err_vs_clip": 3.049,
+    "yaw": 43.497,
+    "aim": 43.497,
+    "yaw_err": 0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     -12.427,
+     -5.336,
+     7.841
+    ]
+   },
+   {
+    "game": 3.7418,
+    "dt": 0.063,
+    "d": 134.483,
+    "gained": 20.227,
+    "alpha": 0.4198,
+    "want": 0.5295,
+    "err": -0.1097,
+    "want_lag": 0.3123,
+    "err_lag": 0.1075,
+    "sock_travel": [
+     14.826,
+     13.632
+    ],
+    "sock_travel_want": 16.036,
+    "sock_travel_err": 2.404,
+    "local_travel": [
+     14.217,
+     14.217
+    ],
+    "local_err_vs_alpha": 1.82,
+    "clip_travel": 16.88,
+    "local_err_vs_clip": 2.663,
+    "yaw": 43.497,
+    "aim": 43.497,
+    "yaw_err": 0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     -14.641,
+     -7.436,
+     8.14
+    ]
+   },
+   {
+    "game": 3.8088,
+    "dt": 0.067,
+    "d": 136.593,
+    "gained": 22.337,
+    "alpha": 0.4748,
+    "want": 0.5847,
+    "err": -0.1099,
+    "want_lag": 0.3707,
+    "err_lag": 0.1041,
+    "sock_travel": [
+     17.494,
+     16.3
+    ],
+    "sock_travel_want": 18.137,
+    "sock_travel_err": 1.837,
+    "local_travel": [
+     16.885,
+     16.885
+    ],
+    "local_err_vs_alpha": 1.252,
+    "clip_travel": 19.575,
+    "local_err_vs_clip": 2.691,
+    "yaw": 43.497,
+    "aim": 43.496,
+    "yaw_err": 0.001,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     -16.576,
+     -9.273,
+     8.392
+    ]
+   },
+   {
+    "game": 3.8694,
+    "dt": 0.0606,
+    "d": 138.502,
+    "gained": 24.246,
+    "alpha": 0.5236,
+    "want": 0.6347,
+    "err": -0.1111,
+    "want_lag": 0.4208,
+    "err_lag": 0.1028,
+    "sock_travel": [
+     20.187,
+     18.993
+    ],
+    "sock_travel_want": 20.002,
+    "sock_travel_err": 1.009,
+    "local_travel": [
+     19.577,
+     19.577
+    ],
+    "local_err_vs_alpha": 0.424,
+    "clip_travel": 21.636,
+    "local_err_vs_clip": 2.059,
+    "yaw": 43.497,
+    "aim": 43.497,
+    "yaw_err": 0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     -18.529,
+     -11.126,
+     8.669
+    ]
+   },
+   {
+    "game": 3.935,
+    "dt": 0.0656,
+    "d": 140.569,
+    "gained": 26.313,
+    "alpha": 0.5776,
+    "want": 0.6888,
+    "err": -0.1112,
+    "want_lag": 0.4776,
+    "err_lag": 0.1,
+    "sock_travel": [
+     22.245,
+     21.052
+    ],
+    "sock_travel_want": 22.064,
+    "sock_travel_err": 1.013,
+    "local_travel": [
+     21.636,
+     21.636
+    ],
+    "local_err_vs_alpha": 0.429,
+    "clip_travel": 23.826,
+    "local_err_vs_clip": 2.19,
+    "yaw": 43.497,
+    "aim": 43.496,
+    "yaw_err": 0.001,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     -20.022,
+     -12.543,
+     8.959
+    ]
+   },
+   {
+    "game": 3.9919,
+    "dt": 0.0569,
+    "d": 142.36,
+    "gained": 28.104,
+    "alpha": 0.623,
+    "want": 0.7357,
+    "err": -0.1127,
+    "want_lag": 0.5295,
+    "err_lag": 0.0935,
+    "sock_travel": [
+     24.432,
+     23.238
+    ],
+    "sock_travel_want": 23.799,
+    "sock_travel_err": 0.633,
+    "local_travel": [
+     23.823,
+     23.823
+    ],
+    "local_err_vs_alpha": 0.024,
+    "clip_travel": 25.747,
+    "local_err_vs_clip": 1.924,
+    "yaw": 43.497,
+    "aim": 43.497,
+    "yaw_err": 0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     -21.609,
+     -14.048,
+     9.429
+    ]
+   },
+   {
+    "game": 4.0567,
+    "dt": 0.0647,
+    "d": 144.4,
+    "gained": 30.144,
+    "alpha": 0.6764,
+    "want": 0.7891,
+    "err": -0.1127,
+    "want_lag": 0.5847,
+    "err_lag": 0.0917,
+    "sock_travel": [
+     26.359,
+     25.165
+    ],
+    "sock_travel_want": 25.838,
+    "sock_travel_err": 0.673,
+    "local_travel": [
+     25.75,
+     25.749
+    ],
+    "local_err_vs_alpha": 0.089,
+    "clip_travel": 28.127,
+    "local_err_vs_clip": 2.377,
+    "yaw": 43.497,
+    "aim": 43.497,
+    "yaw_err": 0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     -23.007,
+     -15.374,
+     9.945
+    ]
+   },
+   {
+    "game": 4.1171,
+    "dt": 0.0604,
+    "d": 146.304,
+    "gained": 32.048,
+    "alpha": 0.7258,
+    "want": 0.839,
+    "err": -0.1132,
+    "want_lag": 0.6347,
+    "err_lag": 0.0911,
+    "sock_travel": [
+     28.736,
+     27.542
+    ],
+    "sock_travel_want": 27.726,
+    "sock_travel_err": 1.01,
+    "local_travel": [
+     28.126,
+     28.127
+    ],
+    "local_err_vs_alpha": 0.401,
+    "clip_travel": 30.365,
+    "local_err_vs_clip": 2.238,
+    "yaw": 43.497,
+    "aim": 43.496,
+    "yaw_err": 0.001,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     -24.731,
+     -17.01,
+     10.663
+    ]
+   },
+   {
+    "game": 4.1819,
+    "dt": 0.0648,
+    "d": 148.344,
+    "gained": 34.088,
+    "alpha": 0.7794,
+    "want": 0.8924,
+    "err": -0.113,
+    "want_lag": 0.6888,
+    "err_lag": 0.0906,
+    "sock_travel": [
+     30.967,
+     29.773
+    ],
+    "sock_travel_want": 29.773,
+    "sock_travel_err": 1.193,
+    "local_travel": [
+     30.357,
+     30.357
+    ],
+    "local_err_vs_alpha": 0.584,
+    "clip_travel": 32.662,
+    "local_err_vs_clip": 2.305,
+    "yaw": 43.497,
+    "aim": 43.497,
+    "yaw_err": 0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     -26.349,
+     -18.546,
+     11.387
+    ]
+   },
+   {
+    "game": 4.2435,
+    "dt": 0.0616,
+    "d": 150.284,
+    "gained": 36.028,
+    "alpha": 0.83,
+    "want": 0.9431,
+    "err": -0.1131,
+    "want_lag": 0.7357,
+    "err_lag": 0.0943,
+    "sock_travel": [
+     33.265,
+     32.072
+    ],
+    "sock_travel_want": 31.706,
+    "sock_travel_err": 1.559,
+    "local_travel": [
+     32.656,
+     32.656
+    ],
+    "local_err_vs_alpha": 0.95,
+    "clip_travel": 34.606,
+    "local_err_vs_clip": 1.95,
+    "yaw": 43.497,
+    "aim": 43.497,
+    "yaw_err": 0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     -28.017,
+     -20.128,
+     12.16
+    ]
+   },
+   {
+    "game": 4.3112,
+    "dt": 0.0678,
+    "d": 152.418,
+    "gained": 38.162,
+    "alpha": 0.887,
+    "want": 0.999,
+    "err": -0.112,
+    "want_lag": 0.7891,
+    "err_lag": 0.0979,
+    "sock_travel": [
+     35.209,
+     34.015
+    ],
+    "sock_travel_want": 33.883,
+    "sock_travel_err": 1.326,
+    "local_travel": [
+     34.6,
+     34.6
+    ],
+    "local_err_vs_alpha": 0.717,
+    "clip_travel": 36.41,
+    "local_err_vs_clip": 1.81,
+    "yaw": 43.497,
+    "aim": 43.497,
+    "yaw_err": 0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     -29.427,
+     -21.466,
+     12.812
+    ]
+   },
+   {
+    "game": 4.3726,
+    "dt": 0.0613,
+    "d": 154.35,
+    "gained": 40.094,
+    "alpha": 0.926,
+    "want": 1.0,
+    "err": -0.074,
+    "want_lag": 0.839,
+    "err_lag": 0.087,
+    "sock_travel": [
+     37.016,
+     35.824
+    ],
+    "sock_travel_want": 35.373,
+    "sock_travel_err": 1.643,
+    "local_travel": [
+     36.407,
+     36.408
+    ],
+    "local_err_vs_alpha": 1.035,
+    "clip_travel": 37.366,
+    "local_err_vs_clip": 0.959,
+    "yaw": 43.497,
+    "aim": 43.497,
+    "yaw_err": 0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     -30.738,
+     -22.71,
+     13.417
+    ]
+   },
+   {
+    "game": 4.4385,
+    "dt": 0.066,
+    "d": 156.429,
+    "gained": 42.173,
+    "alpha": 0.9542,
+    "want": 1.0,
+    "err": -0.0458,
+    "want_lag": 0.8924,
+    "err_lag": 0.0618,
+    "sock_travel": [
+     37.977,
+     36.784
+    ],
+    "sock_travel_want": 36.45,
+    "sock_travel_err": 1.527,
+    "local_travel": [
+     37.368,
+     37.368
+    ],
+    "local_err_vs_alpha": 0.918,
+    "clip_travel": 37.736,
+    "local_err_vs_clip": 0.368,
+    "yaw": 43.497,
+    "aim": 43.497,
+    "yaw_err": 0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     -31.435,
+     -23.371,
+     13.741
+    ]
+   }
+  ],
+  "settle_rule": "rows from 0.5 s after the first SRC_Tug row (about 2.5 spring time constants)",
+  "alpha_err_max_abs": 0.1132,
+  "alpha_err_mean": -0.0848,
+  "alpha_err_lag_max_abs": 0.1156,
+  "n_settled": 24,
+  "sock_travel_err_max": 4.967,
+  "local_travel_err_vs_alpha_max": {
+   "err": 4.383,
+   "game": 3.5493,
+   "alpha": 0.2654,
+   "local": [
+    5.755,
+    5.755
+   ],
+   "want": 10.138
+  },
+  "local_travel_err_vs_clip_max": 3.049,
+  "local_travel_at_last": {
+   "alpha": 0.9542,
+   "local": [
+    37.368,
+    37.368
+   ],
+   "want": 36.45,
+   "clip": 37.736
+  },
+  "yaw_err_max_abs_after_0_2s": 7.322,
+  "last_tug_row": {
+   "game": 4.4385,
+   "alpha": 0.9542,
+   "d": 156.429,
+   "gained": 42.173,
+   "want": 1.0,
+   "ring": null
+  },
+  "yaw_track_first": [
+   [
+    1.8632,
+    0.0,
+    43.496
+   ],
+   [
+    1.9374,
+    0.0,
+    43.496
+   ],
+   [
+    2.0047,
+    0.0,
+    43.496
+   ],
+   [
+    2.0815,
+    0.0,
+    43.496
+   ],
+   [
+    2.1507,
+    0.0,
+    43.496
+   ],
+   [
+    2.219,
+    0.0,
+    43.496
+   ],
+   [
+    2.2829,
+    0.0,
+    43.496
+   ],
+   [
+    2.347,
+    0.0,
+    43.496
+   ],
+   [
+    2.414,
+    36.174,
+    43.496
+   ],
+   [
+    2.4749,
+    43.497,
+    43.496
+   ],
+   [
+    2.5509,
+    43.497,
+    43.496
+   ],
+   [
+    2.6229,
+    43.497,
+    43.496
+   ]
+  ],
+  "gloves": {
+   "n": 32,
+   "same_max": 3.066,
+   "lag1_max": 0.0,
+   "over_05_same": 19,
+   "over_05_lag1": 0,
+   "worst": null,
+   "over_rows": []
+  },
+  "gloves_from_press_0_17": {
+   "n": 36,
+   "same_max": 60.967,
+   "lag1_max": 4.811,
+   "over_05_same": 21,
+   "over_05_lag1": 1,
+   "worst": {
+    "game": 2.219,
+    "dt": 0.0683,
+    "lag1": 4.811,
+    "same": 4.947,
+    "clip": "SRC_Grip",
+    "t": 0.1071
+   },
+   "over_rows": [
+    {
+     "game": 2.219,
+     "dt": 0.0683,
+     "lag1": 4.811,
+     "same": 4.947,
+     "clip": "SRC_Grip",
+     "t": 0.1071
+    }
+   ]
+  },
+  "ring_vs_alpha": {
+   "n": 0,
+   "max_ring": null,
+   "max_abs_ring_x097_minus_alpha": null
+  },
+  "rendered_false_rows": [],
+  "frame_dt": {
+   "max": 0.076,
+   "mean": 0.0654
+  }
+ },
+ "bed1_pull1": {
+  "bed": 1,
+  "press": 9.0812,
+  "end": 11.0807,
+  "d0": 129.85,
+  "tug_first": {
+   "game": 9.5971,
+   "t": 0.0,
+   "d": 129.85
+  },
+  "player_moved_during_grip_cm": 0.0,
+  "rows": [
+   {
+    "game": 9.5971,
+    "dt": 0.0564,
+    "d": 129.85,
+    "gained": 0.0,
+    "alpha": 0.0,
+    "want": 0.0,
+    "err": 0.0,
+    "want_lag": 0.0,
+    "err_lag": 0.0,
+    "sock_travel": [
+     0.0,
+     0.0
+    ],
+    "sock_travel_want": 0.0,
+    "sock_travel_err": 0.0,
+    "local_travel": [
+     0.0,
+     -0.0
+    ],
+    "local_err_vs_alpha": 0.0,
+    "clip_travel": -0.0,
+    "local_err_vs_clip": 0.0,
+    "yaw": -64.259,
+    "aim": -90.178,
+    "yaw_err": 25.919,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     453.557,
+     -446.595,
+     6.385
+    ]
+   },
+   {
+    "game": 9.6611,
+    "dt": 0.064,
+    "d": 129.85,
+    "gained": 0.0,
+    "alpha": 0.0,
+    "want": 0.0,
+    "err": 0.0,
+    "want_lag": 0.0,
+    "err_lag": 0.0,
+    "sock_travel": [
+     -1.894,
+     2.201
+    ],
+    "sock_travel_want": 0.0,
+    "sock_travel_err": 2.201,
+    "local_travel": [
+     -0.0,
+     0.0
+    ],
+    "local_err_vs_alpha": 0.0,
+    "clip_travel": -0.0,
+    "local_err_vs_clip": 0.0,
+    "yaw": -90.178,
+    "aim": -90.178,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     454.688,
+     -448.493,
+     6.385
+    ]
+   },
+   {
+    "game": 9.7194,
+    "dt": 0.0583,
+    "d": 129.85,
+    "gained": 0.0,
+    "alpha": 0.0,
+    "want": 0.0,
+    "err": 0.0,
+    "want_lag": 0.0,
+    "err_lag": 0.0,
+    "sock_travel": [
+     -1.894,
+     2.201
+    ],
+    "sock_travel_want": 0.0,
+    "sock_travel_err": 2.201,
+    "local_travel": [
+     -0.0,
+     0.0
+    ],
+    "local_err_vs_alpha": 0.0,
+    "clip_travel": -0.0,
+    "local_err_vs_clip": 0.0,
+    "yaw": -90.178,
+    "aim": -90.178,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     454.688,
+     -448.493,
+     6.385
+    ]
+   },
+   {
+    "game": 9.7789,
+    "dt": 0.0595,
+    "d": 129.85,
+    "gained": 0.0,
+    "alpha": 0.0,
+    "want": 0.0,
+    "err": 0.0,
+    "want_lag": 0.0,
+    "err_lag": 0.0,
+    "sock_travel": [
+     -1.894,
+     2.201
+    ],
+    "sock_travel_want": 0.0,
+    "sock_travel_err": 2.201,
+    "local_travel": [
+     -0.0,
+     0.0
+    ],
+    "local_err_vs_alpha": 0.0,
+    "clip_travel": -0.0,
+    "local_err_vs_clip": 0.0,
+    "yaw": -90.178,
+    "aim": -90.178,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     454.688,
+     -448.493,
+     6.385
+    ]
+   },
+   {
+    "game": 9.8376,
+    "dt": 0.0587,
+    "d": 129.85,
+    "gained": 0.0,
+    "alpha": 0.0,
+    "want": 0.0,
+    "err": 0.0,
+    "want_lag": 0.0,
+    "err_lag": 0.0,
+    "sock_travel": [
+     -1.894,
+     2.201
+    ],
+    "sock_travel_want": 0.0,
+    "sock_travel_err": 2.201,
+    "local_travel": [
+     -0.0,
+     0.0
+    ],
+    "local_err_vs_alpha": 0.0,
+    "clip_travel": -0.0,
+    "local_err_vs_clip": 0.0,
+    "yaw": -90.178,
+    "aim": -90.178,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     454.688,
+     -448.493,
+     6.385
+    ]
+   },
+   {
+    "game": 9.8958,
+    "dt": 0.0581,
+    "d": 129.85,
+    "gained": 0.0,
+    "alpha": 0.0,
+    "want": 0.0,
+    "err": 0.0,
+    "want_lag": 0.0,
+    "err_lag": 0.0,
+    "sock_travel": [
+     -1.894,
+     2.201
+    ],
+    "sock_travel_want": 0.0,
+    "sock_travel_err": 2.201,
+    "local_travel": [
+     -0.0,
+     0.0
+    ],
+    "local_err_vs_alpha": 0.0,
+    "clip_travel": -0.0,
+    "local_err_vs_clip": 0.0,
+    "yaw": -90.178,
+    "aim": -90.178,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     454.688,
+     -448.493,
+     6.385
+    ]
+   },
+   {
+    "game": 9.9593,
+    "dt": 0.0635,
+    "d": 129.85,
+    "gained": 0.0,
+    "alpha": 0.0,
+    "want": 0.0,
+    "err": 0.0,
+    "want_lag": 0.0,
+    "err_lag": 0.0,
+    "sock_travel": [
+     -1.894,
+     2.201
+    ],
+    "sock_travel_want": 0.0,
+    "sock_travel_err": 2.201,
+    "local_travel": [
+     -0.0,
+     0.0
+    ],
+    "local_err_vs_alpha": 0.0,
+    "clip_travel": -0.0,
+    "local_err_vs_clip": 0.0,
+    "yaw": -90.178,
+    "aim": -90.178,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     454.688,
+     -448.493,
+     6.385
+    ]
+   },
+   {
+    "game": 10.0198,
+    "dt": 0.0605,
+    "d": 129.85,
+    "gained": 0.0,
+    "alpha": 0.0,
+    "want": 0.0,
+    "err": 0.0,
+    "want_lag": 0.0,
+    "err_lag": 0.0,
+    "sock_travel": [
+     -1.894,
+     2.201
+    ],
+    "sock_travel_want": 0.0,
+    "sock_travel_err": 2.201,
+    "local_travel": [
+     -0.0,
+     0.0
+    ],
+    "local_err_vs_alpha": 0.0,
+    "clip_travel": -0.0,
+    "local_err_vs_clip": 0.0,
+    "yaw": -90.178,
+    "aim": -90.178,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     454.688,
+     -448.493,
+     6.385
+    ]
+   },
+   {
+    "game": 10.0761,
+    "dt": 0.0563,
+    "d": 129.85,
+    "gained": 0.0,
+    "alpha": 0.0,
+    "want": 0.0,
+    "err": 0.0,
+    "want_lag": 0.0,
+    "err_lag": 0.0,
+    "sock_travel": [
+     -1.894,
+     2.201
+    ],
+    "sock_travel_want": 0.0,
+    "sock_travel_err": 2.201,
+    "local_travel": [
+     -0.0,
+     0.0
+    ],
+    "local_err_vs_alpha": 0.0,
+    "clip_travel": -0.0,
+    "local_err_vs_clip": 0.0,
+    "yaw": -90.178,
+    "aim": -90.178,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     454.688,
+     -448.493,
+     6.385
+    ]
+   },
+   {
+    "game": 10.1326,
+    "dt": 0.0565,
+    "d": 130.281,
+    "gained": 0.431,
+    "alpha": 0.0022,
+    "want": 0.0113,
+    "err": -0.0091,
+    "want_lag": 0.0,
+    "err_lag": 0.0022,
+    "sock_travel": [
+     -1.894,
+     2.201
+    ],
+    "sock_travel_want": 0.084,
+    "sock_travel_err": 2.117,
+    "local_travel": [
+     -0.0,
+     0.0
+    ],
+    "local_err_vs_alpha": 0.084,
+    "clip_travel": 0.023,
+    "local_err_vs_clip": 0.023,
+    "yaw": -90.178,
+    "aim": -90.178,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     454.688,
+     -448.493,
+     6.385
+    ]
+   },
+   {
+    "game": 10.1973,
+    "dt": 0.0648,
+    "d": 131.506,
+    "gained": 1.656,
+    "alpha": 0.013,
+    "want": 0.0434,
+    "err": -0.0304,
+    "want_lag": 0.0,
+    "err_lag": 0.013,
+    "sock_travel": [
+     -1.871,
+     2.223
+    ],
+    "sock_travel_want": 0.497,
+    "sock_travel_err": 2.368,
+    "local_travel": [
+     0.023,
+     0.022
+    ],
+    "local_err_vs_alpha": 0.474,
+    "clip_travel": 0.134,
+    "local_err_vs_clip": 0.112,
+    "yaw": -90.178,
+    "aim": -90.178,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     454.688,
+     -448.47,
+     6.389
+    ]
+   },
+   {
+    "game": 10.2552,
+    "dt": 0.0579,
+    "d": 133.2,
+    "gained": 3.35,
+    "alpha": 0.031,
+    "want": 0.0877,
+    "err": -0.0567,
+    "want_lag": 0.0,
+    "err_lag": 0.031,
+    "sock_travel": [
+     -1.758,
+     2.336
+    ],
+    "sock_travel_want": 1.184,
+    "sock_travel_err": 2.943,
+    "local_travel": [
+     0.136,
+     0.135
+    ],
+    "local_err_vs_alpha": 1.049,
+    "clip_travel": 0.32,
+    "local_err_vs_clip": 0.185,
+    "yaw": -90.178,
+    "aim": -90.178,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     454.688,
+     -448.357,
+     6.407
+    ]
+   },
+   {
+    "game": 10.3154,
+    "dt": 0.0603,
+    "d": 135.098,
+    "gained": 5.248,
+    "alpha": 0.0594,
+    "want": 0.1374,
+    "err": -0.078,
+    "want_lag": 0.0,
+    "err_lag": 0.0594,
+    "sock_travel": [
+     -1.572,
+     2.522
+    ],
+    "sock_travel_want": 2.269,
+    "sock_travel_err": 3.842,
+    "local_travel": [
+     0.322,
+     0.321
+    ],
+    "local_err_vs_alpha": 1.948,
+    "clip_travel": 0.613,
+    "local_err_vs_clip": 0.292,
+    "yaw": -90.178,
+    "aim": -90.178,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     454.689,
+     -448.171,
+     6.437
+    ]
+   },
+   {
+    "game": 10.372,
+    "dt": 0.0566,
+    "d": 136.881,
+    "gained": 7.031,
+    "alpha": 0.0918,
+    "want": 0.1841,
+    "err": -0.0923,
+    "want_lag": 0.0113,
+    "err_lag": 0.0805,
+    "sock_travel": [
+     -1.278,
+     2.816
+    ],
+    "sock_travel_want": 3.507,
+    "sock_travel_err": 4.785,
+    "local_travel": [
+     0.616,
+     0.615
+    ],
+    "local_err_vs_alpha": 2.891,
+    "clip_travel": 1.393,
+    "local_err_vs_clip": 0.778,
+    "yaw": -90.178,
+    "aim": -90.177,
+    "yaw_err": -0.001,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     454.69,
+     -447.877,
+     6.484
+    ]
+   },
+   {
+    "game": 10.4363,
+    "dt": 0.0643,
+    "d": 138.906,
+    "gained": 9.056,
+    "alpha": 0.1364,
+    "want": 0.2371,
+    "err": -0.1007,
+    "want_lag": 0.0434,
+    "err_lag": 0.093,
+    "sock_travel": [
+     -0.495,
+     3.599
+    ],
+    "sock_travel_want": 5.21,
+    "sock_travel_err": 5.706,
+    "local_travel": [
+     1.399,
+     1.398
+    ],
+    "local_err_vs_alpha": 3.812,
+    "clip_travel": 2.684,
+    "local_err_vs_clip": 1.286,
+    "yaw": -90.178,
+    "aim": -90.178,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     454.692,
+     -447.094,
+     6.61
+    ]
+   },
+   {
+    "game": 10.4991,
+    "dt": 0.0627,
+    "d": 140.882,
+    "gained": 11.032,
+    "alpha": 0.183,
+    "want": 0.2888,
+    "err": -0.1058,
+    "want_lag": 0.0877,
+    "err_lag": 0.0953,
+    "sock_travel": [
+     0.79,
+     4.884
+    ],
+    "sock_travel_want": 6.991,
+    "sock_travel_err": 6.201,
+    "local_travel": [
+     2.684,
+     2.683
+    ],
+    "local_err_vs_alpha": 4.307,
+    "clip_travel": 4.608,
+    "local_err_vs_clip": 1.924,
+    "yaw": -90.178,
+    "aim": -90.178,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     454.696,
+     -445.809,
+     6.806
+    ]
+   },
+   {
+    "game": 10.5602,
+    "dt": 0.0611,
+    "d": 142.806,
+    "gained": 12.956,
+    "alpha": 0.2302,
+    "want": 0.3392,
+    "err": -0.109,
+    "want_lag": 0.1374,
+    "err_lag": 0.0928,
+    "sock_travel": [
+     2.718,
+     6.812
+    ],
+    "sock_travel_want": 8.794,
+    "sock_travel_err": 6.076,
+    "local_travel": [
+     4.612,
+     4.611
+    ],
+    "local_err_vs_alpha": 4.182,
+    "clip_travel": 6.821,
+    "local_err_vs_clip": 2.21,
+    "yaw": -90.178,
+    "aim": -90.178,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     454.702,
+     -443.881,
+     7.079
+    ]
+   },
+   {
+    "game": 10.6229,
+    "dt": 0.0627,
+    "d": 144.781,
+    "gained": 14.931,
+    "alpha": 0.28,
+    "want": 0.3909,
+    "err": -0.1109,
+    "want_lag": 0.1841,
+    "err_lag": 0.0959,
+    "sock_travel": [
+     4.929,
+     9.023
+    ],
+    "sock_travel_want": 10.696,
+    "sock_travel_err": 5.767,
+    "local_travel": [
+     6.823,
+     6.822
+    ],
+    "local_err_vs_alpha": 3.874,
+    "clip_travel": 9.37,
+    "local_err_vs_clip": 2.548,
+    "yaw": -90.178,
+    "aim": -90.178,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     454.709,
+     -441.67,
+     7.363
+    ]
+   },
+   {
+    "game": 10.6912,
+    "dt": 0.0683,
+    "d": 146.934,
+    "gained": 17.084,
+    "alpha": 0.3366,
+    "want": 0.4472,
+    "err": -0.1106,
+    "want_lag": 0.2371,
+    "err_lag": 0.0995,
+    "sock_travel": [
+     7.482,
+     11.576
+    ],
+    "sock_travel_want": 12.858,
+    "sock_travel_err": 5.377,
+    "local_travel": [
+     9.376,
+     9.376
+    ],
+    "local_err_vs_alpha": 3.483,
+    "clip_travel": 12.445,
+    "local_err_vs_clip": 3.069,
+    "yaw": -90.178,
+    "aim": -90.178,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     454.717,
+     -439.117,
+     7.653
+    ]
+   },
+   {
+    "game": 10.7517,
+    "dt": 0.0605,
+    "d": 148.84,
+    "gained": 18.99,
+    "alpha": 0.3856,
+    "want": 0.4971,
+    "err": -0.1115,
+    "want_lag": 0.2888,
+    "err_lag": 0.0968,
+    "sock_travel": [
+     10.556,
+     14.65
+    ],
+    "sock_travel_want": 14.73,
+    "sock_travel_err": 4.174,
+    "local_travel": [
+     12.45,
+     12.45
+    ],
+    "local_err_vs_alpha": 2.28,
+    "clip_travel": 15.105,
+    "local_err_vs_clip": 2.655,
+    "yaw": -90.178,
+    "aim": -90.178,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     454.726,
+     -436.043,
+     7.963
+    ]
+   },
+   {
+    "game": 10.817,
+    "dt": 0.0653,
+    "d": 150.897,
+    "gained": 21.047,
+    "alpha": 0.4394,
+    "want": 0.551,
+    "err": -0.1116,
+    "want_lag": 0.3392,
+    "err_lag": 0.1002,
+    "sock_travel": [
+     13.215,
+     17.309
+    ],
+    "sock_travel_want": 16.785,
+    "sock_travel_err": 3.57,
+    "local_travel": [
+     15.109,
+     15.109
+    ],
+    "local_err_vs_alpha": 1.677,
+    "clip_travel": 17.864,
+    "local_err_vs_clip": 2.755,
+    "yaw": -90.178,
+    "aim": -90.178,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     454.735,
+     -433.384,
+     8.219
+    ]
+   },
+   {
+    "game": 10.8769,
+    "dt": 0.0599,
+    "d": 152.783,
+    "gained": 22.933,
+    "alpha": 0.4878,
+    "want": 0.6003,
+    "err": -0.1125,
+    "want_lag": 0.3909,
+    "err_lag": 0.0969,
+    "sock_travel": [
+     15.97,
+     20.064
+    ],
+    "sock_travel_want": 18.634,
+    "sock_travel_err": 2.664,
+    "local_travel": [
+     17.864,
+     17.864
+    ],
+    "local_err_vs_alpha": 0.77,
+    "clip_travel": 20.124,
+    "local_err_vs_clip": 2.261,
+    "yaw": -90.178,
+    "aim": -90.178,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     454.743,
+     -430.629,
+     8.491
+    ]
+   },
+   {
+    "game": 10.9419,
+    "dt": 0.065,
+    "d": 154.832,
+    "gained": 24.982,
+    "alpha": 0.5416,
+    "want": 0.654,
+    "err": -0.1124,
+    "want_lag": 0.4472,
+    "err_lag": 0.0944,
+    "sock_travel": [
+     18.233,
+     22.327
+    ],
+    "sock_travel_want": 20.689,
+    "sock_travel_err": 2.457,
+    "local_travel": [
+     20.127,
+     20.127
+    ],
+    "local_err_vs_alpha": 0.563,
+    "clip_travel": 22.38,
+    "local_err_vs_clip": 2.253,
+    "yaw": -90.178,
+    "aim": -90.178,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     454.75,
+     -428.366,
+     8.75
+    ]
+   },
+   {
+    "game": 11.0135,
+    "dt": 0.0716,
+    "d": 154.832,
+    "gained": 24.982,
+    "alpha": 0.5844,
+    "want": 0.654,
+    "err": -0.0696,
+    "want_lag": 0.4971,
+    "err_lag": 0.0873,
+    "sock_travel": [
+     20.483,
+     24.577
+    ],
+    "sock_travel_want": 22.324,
+    "sock_travel_err": 2.253,
+    "local_travel": [
+     22.377,
+     22.377
+    ],
+    "local_err_vs_alpha": 0.053,
+    "clip_travel": 24.099,
+    "local_err_vs_clip": 1.722,
+    "yaw": -90.178,
+    "aim": -90.178,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     454.757,
+     -426.116,
+     9.093
+    ]
+   },
+   {
+    "game": 11.0807,
+    "dt": 0.0672,
+    "d": 154.832,
+    "gained": 24.982,
+    "alpha": 0.6112,
+    "want": 0.654,
+    "err": -0.0428,
+    "want_lag": 0.6003,
+    "err_lag": 0.0109,
+    "sock_travel": [
+     22.21,
+     26.304
+    ],
+    "sock_travel_want": 23.348,
+    "sock_travel_err": 2.956,
+    "local_travel": [
+     24.104,
+     24.104
+    ],
+    "local_err_vs_alpha": 0.756,
+    "clip_travel": 25.223,
+    "local_err_vs_clip": 1.119,
+    "yaw": -90.178,
+    "aim": -90.178,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     454.762,
+     -424.389,
+     9.493
+    ]
+   }
+  ],
+  "settle_rule": "rows from 0.5 s after the first SRC_Tug row (about 2.5 spring time constants)",
+  "alpha_err_max_abs": 0.1125,
+  "alpha_err_mean": -0.0852,
+  "alpha_err_lag_max_abs": 0.1002,
+  "n_settled": 16,
+  "sock_travel_err_max": 6.201,
+  "local_travel_err_vs_alpha_max": {
+   "err": 4.307,
+   "game": 10.4991,
+   "alpha": 0.183,
+   "local": [
+    2.684,
+    2.683
+   ],
+   "want": 6.991
+  },
+  "local_travel_err_vs_clip_max": 3.069,
+  "local_travel_at_last": {
+   "alpha": 0.6112,
+   "local": [
+    24.104,
+    24.104
+   ],
+   "want": 23.348,
+   "clip": 25.223
+  },
+  "yaw_err_max_abs_after_0_2s": 25.919,
+  "last_tug_row": {
+   "game": 11.0807,
+   "alpha": 0.6112,
+   "d": 154.832,
+   "gained": 24.982,
+   "want": 0.654,
+   "ring": null
+  },
+  "yaw_track_first": [
+   [
+    9.0188,
+    0.0,
+    -90.178
+   ],
+   [
+    9.0812,
+    0.0,
+    -90.178
+   ],
+   [
+    9.1467,
+    0.0,
+    -90.178
+   ],
+   [
+    9.21,
+    0.0,
+    -90.178
+   ],
+   [
+    9.2814,
+    0.0,
+    -90.178
+   ],
+   [
+    9.3498,
+    0.0,
+    -90.178
+   ],
+   [
+    9.4164,
+    0.0,
+    -90.178
+   ],
+   [
+    9.4781,
+    0.0,
+    -90.178
+   ],
+   [
+    9.5407,
+    -33.811,
+    -90.178
+   ],
+   [
+    9.5971,
+    -64.259,
+    -90.178
+   ],
+   [
+    9.6611,
+    -90.178,
+    -90.178
+   ],
+   [
+    9.7194,
+    -90.178,
+    -90.178
+   ]
+  ],
+  "gloves": {
+   "n": 25,
+   "same_max": 3.09,
+   "lag1_max": 0.0,
+   "over_05_same": 13,
+   "over_05_lag1": 0,
+   "worst": null,
+   "over_rows": []
+  },
+  "gloves_from_press_0_17": {
+   "n": 30,
+   "same_max": 67.181,
+   "lag1_max": 4.417,
+   "over_05_same": 16,
+   "over_05_lag1": 1,
+   "worst": {
+    "game": 9.3498,
+    "dt": 0.0685,
+    "lag1": 4.417,
+    "same": 4.542,
+    "clip": "SRC_Grip",
+    "t": 0.1016
+   },
+   "over_rows": [
+    {
+     "game": 9.3498,
+     "dt": 0.0685,
+     "lag1": 4.417,
+     "same": 4.542,
+     "clip": "SRC_Grip",
+     "t": 0.1016
+    }
+   ]
+  },
+  "ring_vs_alpha": {
+   "n": 0,
+   "max_ring": null,
+   "max_abs_ring_x097_minus_alpha": null
+  },
+  "rendered_false_rows": [],
+  "frame_dt": {
+   "max": 0.0716,
+   "mean": 0.0616
+  }
+ },
+ "bed1_cancel": {
+  "up": 11.0807,
+  "last_tug": {
+   "game": 11.0807,
+   "t": 0.3056,
+   "alpha": 0.6112
+  },
+  "cancel_first": {
+   "game": 11.2132,
+   "t": 0.0867,
+   "start_alpha": 0.3716,
+   "want_start_alpha": 0.3888
+  },
+  "steps": [
+   {
+    "game": 11.1546,
+    "dt": 0.0739,
+    "clip": "SRC_Tug->SRC_Tug",
+    "t": 0.3142,
+    "step": 1.154,
+    "speed": 15.62,
+    "per_60hz": 0.26,
+    "glove": 1.154
+   },
+   {
+    "game": 11.2132,
+    "dt": 0.0586,
+    "clip": "SRC_Tug->SRC_Cancel",
+    "t": 0.0867,
+    "step": 0.803,
+    "speed": 13.7,
+    "per_60hz": 0.228,
+    "glove": 0.803
+   },
+   {
+    "game": 11.2832,
+    "dt": 0.07,
+    "clip": "SRC_Cancel->SRC_Cancel",
+    "t": 0.11,
+    "step": 6.059,
+    "speed": 86.55,
+    "per_60hz": 1.443,
+    "glove": 27.823
+   },
+   {
+    "game": 11.3547,
+    "dt": 0.0715,
+    "clip": "SRC_Cancel->SRC_Cancel",
+    "t": 0.1338,
+    "step": 5.898,
+    "speed": 82.5,
+    "per_60hz": 1.375,
+    "glove": 82.831
+   },
+   {
+    "game": 11.4199,
+    "dt": 0.0652,
+    "clip": "SRC_Cancel->SRC_Cancel",
+    "t": 0.1556,
+    "step": 4.939,
+    "speed": 75.74,
+    "per_60hz": 1.262,
+    "glove": 95.346
+   },
+   {
+    "game": 11.4898,
+    "dt": 0.0699,
+    "clip": "SRC_Cancel->SRC_Cancel",
+    "t": 0.1789,
+    "step": 4.543,
+    "speed": 65.0,
+    "per_60hz": 1.083,
+    "glove": 98.786
+   },
+   {
+    "game": 11.561,
+    "dt": 0.0712,
+    "clip": "SRC_Cancel->SRC_Cancel",
+    "t": 0.2026,
+    "step": 3.665,
+    "speed": 51.48,
+    "per_60hz": 0.858,
+    "glove": 101.474
+   },
+   {
+    "game": 11.6289,
+    "dt": 0.0679,
+    "clip": "SRC_Cancel->SRC_Cancel",
+    "t": 0.2253,
+    "step": 1.452,
+    "speed": 21.39,
+    "per_60hz": 0.357,
+    "glove": 102.183
+   },
+   {
+    "game": 11.6935,
+    "dt": 0.0646,
+    "clip": "SRC_Cancel->SRC_Cancel",
+    "t": 0.2333,
+    "step": 0.52,
+    "speed": 8.04,
+    "per_60hz": 0.134,
+    "glove": 102.411
+   },
+   {
+    "game": 11.7691,
+    "dt": 0.0756,
+    "clip": "SRC_Cancel->SRC_Idle",
+    "t": 0.0756,
+    "step": 0.0,
+    "speed": 0.0,
+    "per_60hz": 0.0,
+    "glove": 102.312
+   },
+   {
+    "game": 11.8309,
+    "dt": 0.0618,
+    "clip": "SRC_Idle->SRC_Idle",
+    "t": 0.1373,
+    "step": 0.0,
+    "speed": 0.0,
+    "per_60hz": 0.0,
+    "glove": 102.313
+   },
+   {
+    "game": 11.9037,
+    "dt": 0.0728,
+    "clip": "SRC_Idle->SRC_Idle",
+    "t": 0.2101,
+    "step": 0.0,
+    "speed": 0.0,
+    "per_60hz": 0.0,
+    "glove": 102.313
+   },
+   {
+    "game": 11.966,
+    "dt": 0.0623,
+    "clip": "SRC_Idle->SRC_Idle",
+    "t": 0.2725,
+    "step": 0.0,
+    "speed": 0.0,
+    "per_60hz": 0.0,
+    "glove": 102.312
+   },
+   {
+    "game": 12.0328,
+    "dt": 0.0668,
+    "clip": "SRC_Idle->SRC_Idle",
+    "t": 0.3393,
+    "step": 0.0,
+    "speed": 0.0,
+    "per_60hz": 0.0,
+    "glove": 102.31
+   },
+   {
+    "game": 12.0983,
+    "dt": 0.0655,
+    "clip": "SRC_Idle->SRC_Idle",
+    "t": 0.4047,
+    "step": 0.0,
+    "speed": 0.0,
+    "per_60hz": 0.0,
+    "glove": 102.306
+   },
+   {
+    "game": 12.167,
+    "dt": 0.0687,
+    "clip": "SRC_Idle->SRC_Idle",
+    "t": 0.4734,
+    "step": 0.0,
+    "speed": 0.0,
+    "per_60hz": 0.0,
+    "glove": 102.302
+   },
+   {
+    "game": 12.2392,
+    "dt": 0.0722,
+    "clip": "SRC_Idle->SRC_Idle",
+    "t": 0.5456,
+    "step": 0.0,
+    "speed": 0.0,
+    "per_60hz": 0.0,
+    "glove": 102.296
+   },
+   {
+    "game": 12.3064,
+    "dt": 0.0672,
+    "clip": "SRC_Idle->SRC_Idle",
+    "t": 0.6129,
+    "step": 0.0,
+    "speed": 0.0,
+    "per_60hz": 0.0,
+    "glove": 102.29
+   },
+   {
+    "game": 12.369,
+    "dt": 0.0626,
+    "clip": "SRC_Idle->SRC_Idle",
+    "t": 0.6755,
+    "step": 0.0,
+    "speed": 0.0,
+    "per_60hz": 0.0,
+    "glove": 102.284
+   },
+   {
+    "game": 12.4441,
+    "dt": 0.0751,
+    "clip": "SRC_Idle->SRC_Idle",
+    "t": 0.7506,
+    "step": 0.0,
+    "speed": 0.0,
+    "per_60hz": 0.0,
+    "glove": 102.276
+   },
+   {
+    "game": 12.5154,
+    "dt": 0.0713,
+    "clip": "SRC_Idle->SRC_Idle",
+    "t": 0.8219,
+    "step": 0.0,
+    "speed": 0.0,
+    "per_60hz": 0.0,
+    "glove": 102.267
+   },
+   {
+    "game": 12.5863,
+    "dt": 0.0709,
+    "clip": "SRC_Idle->SRC_Idle",
+    "t": 0.8928,
+    "step": 0.0,
+    "speed": 0.0,
+    "per_60hz": 0.0,
+    "glove": 102.258
+   },
+   {
+    "game": 12.6653,
+    "dt": 0.079,
+    "clip": "SRC_Idle->SRC_Idle",
+    "t": 0.9718,
+    "step": 0.0,
+    "speed": 0.0,
+    "per_60hz": 0.0,
+    "glove": 102.247
+   },
+   {
+    "game": 12.7357,
+    "dt": 0.0704,
+    "clip": "SRC_Idle->SRC_Idle",
+    "t": 1.0422,
+    "step": 0.0,
+    "speed": 0.0,
+    "per_60hz": 0.0,
+    "glove": 102.238
+   },
+   {
+    "game": 12.8005,
+    "dt": 0.0648,
+    "clip": "SRC_Idle->SRC_Idle",
+    "t": 1.107,
+    "step": 0.0,
+    "speed": 0.0,
+    "per_60hz": 0.0,
+    "glove": 102.229
+   },
+   {
+    "game": 12.8749,
+    "dt": 0.0744,
+    "clip": "SRC_Idle->SRC_Idle",
+    "t": 1.1814,
+    "step": 0.0,
+    "speed": 0.0,
+    "per_60hz": 0.0,
+    "glove": 102.22
+   },
+   {
+    "game": 12.9421,
+    "dt": 0.0672,
+    "clip": "SRC_Idle->SRC_Idle",
+    "t": 1.2486,
+    "step": 0.0,
+    "speed": 0.0,
+    "per_60hz": 0.0,
+    "glove": 102.21
+   },
+   {
+    "game": 13.017,
+    "dt": 0.0749,
+    "clip": "SRC_Idle->SRC_Idle",
+    "t": 1.3234,
+    "step": 0.0,
+    "speed": 0.0,
+    "per_60hz": 0.0,
+    "glove": 102.201
+   },
+   {
+    "game": 13.0859,
+    "dt": 0.0689,
+    "clip": "SRC_Idle->SRC_Idle",
+    "t": 1.3924,
+    "step": 0.0,
+    "speed": 0.0,
+    "per_60hz": 0.0,
+    "glove": 102.192
+   },
+   {
+    "game": 13.1697,
+    "dt": 0.0838,
+    "clip": "SRC_Idle->SRC_Idle",
+    "t": 1.4762,
+    "step": 0.0,
+    "speed": 0.0,
+    "per_60hz": 0.0,
+    "glove": 102.184
+   },
+   {
+    "game": 13.2396,
+    "dt": 0.0699,
+    "clip": "SRC_Idle->SRC_Idle",
+    "t": 1.5461,
+    "step": 0.0,
+    "speed": 0.0,
+    "per_60hz": 0.0,
+    "glove": 102.177
+   },
+   {
+    "game": 13.3064,
+    "dt": 0.0668,
+    "clip": "SRC_Idle->SRC_Idle",
+    "t": 1.6129,
+    "step": 0.0,
+    "speed": 0.0,
+    "per_60hz": 0.0,
+    "glove": 102.171
+   },
+   {
+    "game": 13.3782,
+    "dt": 0.0718,
+    "clip": "SRC_Idle->SRC_Idle",
+    "t": 1.6847,
+    "step": 0.0,
+    "speed": 0.0,
+    "per_60hz": 0.0,
+    "glove": 102.168
+   },
+   {
+    "game": 13.4439,
+    "dt": 0.0657,
+    "clip": "SRC_Idle->SRC_Idle",
+    "t": 1.7504,
+    "step": 0.0,
+    "speed": 0.0,
+    "per_60hz": 0.0,
+    "glove": 102.165
+   },
+   {
+    "game": 13.5088,
+    "dt": 0.0649,
+    "clip": "SRC_Idle->SRC_Idle",
+    "t": 1.8153,
+    "step": 0.0,
+    "speed": 0.0,
+    "per_60hz": 0.0,
+    "glove": 102.164
+   },
+   {
+    "game": 13.5719,
+    "dt": 0.0631,
+    "clip": "SRC_Idle->SRC_Idle",
+    "t": 1.8783,
+    "step": 0.0,
+    "speed": 0.0,
+    "per_60hz": 0.0,
+    "glove": 97.163
+   },
+   {
+    "game": 13.6349,
+    "dt": 0.063,
+    "clip": "SRC_Idle->SRC_Idle",
+    "t": 1.9414,
+    "step": 0.0,
+    "speed": 0.0,
+    "per_60hz": 0.0,
+    "glove": 85.679
+   },
+   {
+    "game": 13.7071,
+    "dt": 0.0722,
+    "clip": "SRC_Idle->SRC_Idle",
+    "t": 0.0136,
+    "step": 0.0,
+    "speed": 0.0,
+    "per_60hz": 0.0,
+    "glove": 84.19
+   },
+   {
+    "game": 13.776,
+    "dt": 0.0689,
+    "clip": "SRC_Idle->SRC_Idle",
+    "t": 0.0825,
+    "step": 0.0,
+    "speed": 0.0,
+    "per_60hz": 0.0,
+    "glove": 85.142
+   },
+   {
+    "game": 13.8385,
+    "dt": 0.0625,
+    "clip": "SRC_Idle->SRC_Idle",
+    "t": 0.145,
+    "step": 0.0,
+    "speed": 0.0,
+    "per_60hz": 0.0,
+    "glove": 86.621
+   },
+   {
+    "game": 13.9094,
+    "dt": 0.0709,
+    "clip": "SRC_Idle->SRC_Idle",
+    "t": 0.2159,
+    "step": 0.0,
+    "speed": 0.0,
+    "per_60hz": 0.0,
+    "glove": 85.794
+   },
+   {
+    "game": 13.9746,
+    "dt": 0.0652,
+    "clip": "SRC_Idle->SRC_Idle",
+    "t": 0.2811,
+    "step": 0.0,
+    "speed": 0.0,
+    "per_60hz": 0.0,
+    "glove": 85.262
+   },
+   {
+    "game": 14.0419,
+    "dt": 0.0673,
+    "clip": "SRC_Idle->SRC_Idle",
+    "t": 0.3484,
+    "step": 0.0,
+    "speed": 0.0,
+    "per_60hz": 0.0,
+    "glove": 85.282
+   },
+   {
+    "game": 14.0998,
+    "dt": 0.0579,
+    "clip": "SRC_Idle->SRC_Idle",
+    "t": 0.4062,
+    "step": 0.0,
+    "speed": 0.0,
+    "per_60hz": 0.0,
+    "glove": 85.421
+   },
+   {
+    "game": 14.166,
+    "dt": 0.0662,
+    "clip": "SRC_Idle->SRC_Idle",
+    "t": 0.4725,
+    "step": 0.0,
+    "speed": 0.0,
+    "per_60hz": 0.0,
+    "glove": 85.474
+   },
+   {
+    "game": 14.2303,
+    "dt": 0.0643,
+    "clip": "SRC_Idle->SRC_Idle",
+    "t": 0.5368,
+    "step": 0.0,
+    "speed": 0.0,
+    "per_60hz": 0.0,
+    "glove": 85.489
+   },
+   {
+    "game": 14.304,
+    "dt": 0.0737,
+    "clip": "SRC_Idle->SRC_Idle",
+    "t": 0.6104,
+    "step": 0.0,
+    "speed": 0.0,
+    "per_60hz": 0.0,
+    "glove": 85.496
+   },
+   {
+    "game": 14.3721,
+    "dt": 0.0681,
+    "clip": "SRC_Idle->SRC_Idle",
+    "t": 0.6786,
+    "step": 0.0,
+    "speed": 0.0,
+    "per_60hz": 0.0,
+    "glove": 85.505
+   },
+   {
+    "game": 14.4397,
+    "dt": 0.0676,
+    "clip": "SRC_Idle->SRC_Idle",
+    "t": 0.7462,
+    "step": 0.0,
+    "speed": 0.0,
+    "per_60hz": 0.0,
+    "glove": 85.517
+   },
+   {
+    "game": 14.5109,
+    "dt": 0.0712,
+    "clip": "SRC_Idle->SRC_Idle",
+    "t": 0.8174,
+    "step": 0.0,
+    "speed": 0.0,
+    "per_60hz": 0.0,
+    "glove": 85.528
+   },
+   {
+    "game": 14.5825,
+    "dt": 0.0716,
+    "clip": "SRC_Idle->SRC_Idle",
+    "t": 0.889,
+    "step": 0.0,
+    "speed": 0.0,
+    "per_60hz": 0.0,
+    "glove": 85.537
+   }
+  ],
+  "max_step_per_sample": 6.059,
+  "max_speed_cms": 86.55,
+  "max_step_at_60hz_equiv": 1.443,
+  "idle_at": 11.7691,
+  "cancel_span_s": 0.5559
+ },
+ "bed1_pull2": {
+  "bed": 1,
+  "press": 14.5825,
+  "end": 19.7646,
+  "d0": 128.12,
+  "tug_first": {
+   "game": 15.0587,
+   "t": 0.0,
+   "d": 128.12
+  },
+  "player_moved_during_grip_cm": 0.0,
+  "rows": [
+   {
+    "game": 15.0587,
+    "dt": 0.0674,
+    "d": 128.12,
+    "gained": 0.0,
+    "alpha": 0.0,
+    "want": 0.0,
+    "err": 0.0,
+    "want_lag": 0.0,
+    "err_lag": 0.0,
+    "sock_travel": [
+     0.0,
+     0.0
+    ],
+    "sock_travel_want": 0.0,
+    "sock_travel_err": 0.0,
+    "local_travel": [
+     -0.0,
+     0.0
+    ],
+    "local_err_vs_alpha": 0.0,
+    "clip_travel": -0.0,
+    "local_err_vs_clip": 0.0,
+    "yaw": -89.984,
+    "aim": -89.984,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     454.683,
+     -448.477,
+     6.385
+    ]
+   },
+   {
+    "game": 15.1417,
+    "dt": 0.083,
+    "d": 128.12,
+    "gained": 0.0,
+    "alpha": 0.0,
+    "want": 0.0,
+    "err": 0.0,
+    "want_lag": 0.0,
+    "err_lag": 0.0,
+    "sock_travel": [
+     0.0,
+     0.0
+    ],
+    "sock_travel_want": 0.0,
+    "sock_travel_err": 0.0,
+    "local_travel": [
+     -0.0,
+     0.0
+    ],
+    "local_err_vs_alpha": 0.0,
+    "clip_travel": -0.0,
+    "local_err_vs_clip": 0.0,
+    "yaw": -89.984,
+    "aim": -89.984,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     454.683,
+     -448.477,
+     6.385
+    ]
+   },
+   {
+    "game": 15.2091,
+    "dt": 0.0674,
+    "d": 128.12,
+    "gained": 0.0,
+    "alpha": 0.0,
+    "want": 0.0,
+    "err": 0.0,
+    "want_lag": 0.0,
+    "err_lag": 0.0,
+    "sock_travel": [
+     0.0,
+     0.0
+    ],
+    "sock_travel_want": 0.0,
+    "sock_travel_err": 0.0,
+    "local_travel": [
+     -0.0,
+     0.0
+    ],
+    "local_err_vs_alpha": 0.0,
+    "clip_travel": -0.0,
+    "local_err_vs_clip": 0.0,
+    "yaw": -89.984,
+    "aim": -89.984,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     454.683,
+     -448.477,
+     6.385
+    ]
+   },
+   {
+    "game": 15.2777,
+    "dt": 0.0685,
+    "d": 128.12,
+    "gained": 0.0,
+    "alpha": 0.0,
+    "want": 0.0,
+    "err": 0.0,
+    "want_lag": 0.0,
+    "err_lag": 0.0,
+    "sock_travel": [
+     0.0,
+     0.0
+    ],
+    "sock_travel_want": 0.0,
+    "sock_travel_err": 0.0,
+    "local_travel": [
+     -0.0,
+     0.0
+    ],
+    "local_err_vs_alpha": 0.0,
+    "clip_travel": -0.0,
+    "local_err_vs_clip": 0.0,
+    "yaw": -89.984,
+    "aim": -89.984,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     454.683,
+     -448.477,
+     6.385
+    ]
+   },
+   {
+    "game": 15.3426,
+    "dt": 0.0649,
+    "d": 128.12,
+    "gained": 0.0,
+    "alpha": 0.0,
+    "want": 0.0,
+    "err": 0.0,
+    "want_lag": 0.0,
+    "err_lag": 0.0,
+    "sock_travel": [
+     0.0,
+     0.0
+    ],
+    "sock_travel_want": 0.0,
+    "sock_travel_err": 0.0,
+    "local_travel": [
+     -0.0,
+     0.0
+    ],
+    "local_err_vs_alpha": 0.0,
+    "clip_travel": -0.0,
+    "local_err_vs_clip": 0.0,
+    "yaw": -89.984,
+    "aim": -89.984,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     454.683,
+     -448.477,
+     6.385
+    ]
+   },
+   {
+    "game": 15.4098,
+    "dt": 0.0672,
+    "d": 128.12,
+    "gained": 0.0,
+    "alpha": 0.0,
+    "want": 0.0,
+    "err": 0.0,
+    "want_lag": 0.0,
+    "err_lag": 0.0,
+    "sock_travel": [
+     0.0,
+     0.0
+    ],
+    "sock_travel_want": 0.0,
+    "sock_travel_err": 0.0,
+    "local_travel": [
+     -0.0,
+     0.0
+    ],
+    "local_err_vs_alpha": 0.0,
+    "clip_travel": -0.0,
+    "local_err_vs_clip": 0.0,
+    "yaw": -89.984,
+    "aim": -89.984,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     454.683,
+     -448.477,
+     6.385
+    ]
+   },
+   {
+    "game": 15.4744,
+    "dt": 0.0646,
+    "d": 128.12,
+    "gained": 0.0,
+    "alpha": 0.0,
+    "want": 0.0,
+    "err": 0.0,
+    "want_lag": 0.0,
+    "err_lag": 0.0,
+    "sock_travel": [
+     0.0,
+     0.0
+    ],
+    "sock_travel_want": 0.0,
+    "sock_travel_err": 0.0,
+    "local_travel": [
+     -0.0,
+     0.0
+    ],
+    "local_err_vs_alpha": 0.0,
+    "clip_travel": -0.0,
+    "local_err_vs_clip": 0.0,
+    "yaw": -89.984,
+    "aim": -89.984,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     454.683,
+     -448.477,
+     6.385
+    ]
+   },
+   {
+    "game": 15.5417,
+    "dt": 0.0674,
+    "d": 128.12,
+    "gained": 0.0,
+    "alpha": 0.0,
+    "want": 0.0,
+    "err": 0.0,
+    "want_lag": 0.0,
+    "err_lag": 0.0,
+    "sock_travel": [
+     0.0,
+     0.0
+    ],
+    "sock_travel_want": 0.0,
+    "sock_travel_err": 0.0,
+    "local_travel": [
+     -0.0,
+     0.0
+    ],
+    "local_err_vs_alpha": 0.0,
+    "clip_travel": -0.0,
+    "local_err_vs_clip": 0.0,
+    "yaw": -89.984,
+    "aim": -89.984,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     454.683,
+     -448.477,
+     6.385
+    ]
+   },
+   {
+    "game": 15.6053,
+    "dt": 0.0636,
+    "d": 128.12,
+    "gained": 0.0,
+    "alpha": 0.0,
+    "want": 0.0,
+    "err": 0.0,
+    "want_lag": 0.0,
+    "err_lag": 0.0,
+    "sock_travel": [
+     0.0,
+     0.0
+    ],
+    "sock_travel_want": 0.0,
+    "sock_travel_err": 0.0,
+    "local_travel": [
+     -0.0,
+     0.0
+    ],
+    "local_err_vs_alpha": 0.0,
+    "clip_travel": -0.0,
+    "local_err_vs_clip": 0.0,
+    "yaw": -89.984,
+    "aim": -89.984,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     454.683,
+     -448.477,
+     6.385
+    ]
+   },
+   {
+    "game": 15.6741,
+    "dt": 0.0688,
+    "d": 128.759,
+    "gained": 0.639,
+    "alpha": 0.0048,
+    "want": 0.0167,
+    "err": -0.0119,
+    "want_lag": 0.0,
+    "err_lag": 0.0048,
+    "sock_travel": [
+     0.0,
+     0.0
+    ],
+    "sock_travel_want": 0.183,
+    "sock_travel_err": 0.183,
+    "local_travel": [
+     -0.0,
+     0.0
+    ],
+    "local_err_vs_alpha": 0.184,
+    "clip_travel": 0.05,
+    "local_err_vs_clip": 0.05,
+    "yaw": -89.984,
+    "aim": -89.984,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     454.683,
+     -448.477,
+     6.385
+    ]
+   },
+   {
+    "game": 15.7386,
+    "dt": 0.0645,
+    "d": 130.119,
+    "gained": 1.999,
+    "alpha": 0.0176,
+    "want": 0.0523,
+    "err": -0.0347,
+    "want_lag": 0.0,
+    "err_lag": 0.0176,
+    "sock_travel": [
+     0.05,
+     0.049
+    ],
+    "sock_travel_want": 0.672,
+    "sock_travel_err": 0.623,
+    "local_travel": [
+     0.05,
+     0.049
+    ],
+    "local_err_vs_alpha": 0.623,
+    "clip_travel": 0.182,
+    "local_err_vs_clip": 0.132,
+    "yaw": -89.984,
+    "aim": -89.984,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     454.683,
+     -448.427,
+     6.393
+    ]
+   },
+   {
+    "game": 15.809,
+    "dt": 0.0704,
+    "d": 132.296,
+    "gained": 4.176,
+    "alpha": 0.047,
+    "want": 0.1093,
+    "err": -0.0623,
+    "want_lag": 0.0,
+    "err_lag": 0.047,
+    "sock_travel": [
+     0.183,
+     0.183
+    ],
+    "sock_travel_want": 1.795,
+    "sock_travel_err": 1.612,
+    "local_travel": [
+     0.183,
+     0.183
+    ],
+    "local_err_vs_alpha": 1.613,
+    "clip_travel": 0.485,
+    "local_err_vs_clip": 0.303,
+    "yaw": -89.984,
+    "aim": -89.984,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     454.683,
+     -448.294,
+     6.415
+    ]
+   },
+   {
+    "game": 15.8754,
+    "dt": 0.0663,
+    "d": 134.385,
+    "gained": 6.265,
+    "alpha": 0.0836,
+    "want": 0.164,
+    "err": -0.0804,
+    "want_lag": 0.0167,
+    "err_lag": 0.0669,
+    "sock_travel": [
+     0.488,
+     0.488
+    ],
+    "sock_travel_want": 3.194,
+    "sock_travel_err": 2.706,
+    "local_travel": [
+     0.488,
+     0.488
+    ],
+    "local_err_vs_alpha": 2.706,
+    "clip_travel": 1.163,
+    "local_err_vs_clip": 0.675,
+    "yaw": -89.984,
+    "aim": -89.984,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     454.682,
+     -447.989,
+     6.464
+    ]
+   },
+   {
+    "game": 15.9398,
+    "dt": 0.0645,
+    "d": 136.415,
+    "gained": 8.295,
+    "alpha": 0.125,
+    "want": 0.2171,
+    "err": -0.0921,
+    "want_lag": 0.0523,
+    "err_lag": 0.0727,
+    "sock_travel": [
+     1.166,
+     1.165
+    ],
+    "sock_travel_want": 4.775,
+    "sock_travel_err": 3.61,
+    "local_travel": [
+     1.166,
+     1.165
+    ],
+    "local_err_vs_alpha": 3.61,
+    "clip_travel": 2.324,
+    "local_err_vs_clip": 1.158,
+    "yaw": -89.984,
+    "aim": -89.984,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     454.682,
+     -447.311,
+     6.573
+    ]
+   },
+   {
+    "game": 16.0056,
+    "dt": 0.0658,
+    "d": 138.487,
+    "gained": 10.367,
+    "alpha": 0.1718,
+    "want": 0.2714,
+    "err": -0.0996,
+    "want_lag": 0.0523,
+    "err_lag": 0.1195,
+    "sock_travel": [
+     2.324,
+     2.324
+    ],
+    "sock_travel_want": 6.563,
+    "sock_travel_err": 4.239,
+    "local_travel": [
+     2.324,
+     2.324
+    ],
+    "local_err_vs_alpha": 4.239,
+    "clip_travel": 4.146,
+    "local_err_vs_clip": 1.822,
+    "yaw": -89.984,
+    "aim": -89.984,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     454.682,
+     -446.153,
+     6.752
+    ]
+   },
+   {
+    "game": 16.0712,
+    "dt": 0.0656,
+    "d": 140.554,
+    "gained": 12.434,
+    "alpha": 0.2214,
+    "want": 0.3255,
+    "err": -0.1041,
+    "want_lag": 0.1093,
+    "err_lag": 0.1121,
+    "sock_travel": [
+     4.149,
+     4.149
+    ],
+    "sock_travel_want": 8.457,
+    "sock_travel_err": 4.308,
+    "local_travel": [
+     4.149,
+     4.149
+    ],
+    "local_err_vs_alpha": 4.309,
+    "clip_travel": 6.381,
+    "local_err_vs_clip": 2.232,
+    "yaw": -89.984,
+    "aim": -89.984,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     454.681,
+     -444.328,
+     7.017
+    ]
+   },
+   {
+    "game": 16.1436,
+    "dt": 0.0723,
+    "d": 142.833,
+    "gained": 14.713,
+    "alpha": 0.2802,
+    "want": 0.3852,
+    "err": -0.105,
+    "want_lag": 0.2171,
+    "err_lag": 0.0631,
+    "sock_travel": [
+     6.389,
+     6.389
+    ],
+    "sock_travel_want": 10.704,
+    "sock_travel_err": 4.315,
+    "local_travel": [
+     6.389,
+     6.389
+    ],
+    "local_err_vs_alpha": 4.315,
+    "clip_travel": 9.381,
+    "local_err_vs_clip": 2.992,
+    "yaw": -89.984,
+    "aim": -89.984,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     454.681,
+     -442.088,
+     7.31
+    ]
+   },
+   {
+    "game": 16.2101,
+    "dt": 0.0665,
+    "d": 144.928,
+    "gained": 16.808,
+    "alpha": 0.3334,
+    "want": 0.44,
+    "err": -0.1066,
+    "want_lag": 0.2714,
+    "err_lag": 0.062,
+    "sock_travel": [
+     9.381,
+     9.38
+    ],
+    "sock_travel_want": 12.736,
+    "sock_travel_err": 3.356,
+    "local_travel": [
+     9.381,
+     9.38
+    ],
+    "local_err_vs_alpha": 3.356,
+    "clip_travel": 12.271,
+    "local_err_vs_clip": 2.891,
+    "yaw": -89.984,
+    "aim": -89.984,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     454.68,
+     -439.096,
+     7.653
+    ]
+   },
+   {
+    "game": 16.2797,
+    "dt": 0.0697,
+    "d": 147.123,
+    "gained": 19.003,
+    "alpha": 0.3904,
+    "want": 0.4975,
+    "err": -0.1071,
+    "want_lag": 0.3255,
+    "err_lag": 0.0649,
+    "sock_travel": [
+     12.273,
+     12.272
+    ],
+    "sock_travel_want": 14.913,
+    "sock_travel_err": 2.641,
+    "local_travel": [
+     12.273,
+     12.272
+    ],
+    "local_err_vs_alpha": 2.641,
+    "clip_travel": 15.365,
+    "local_err_vs_clip": 3.093,
+    "yaw": -89.984,
+    "aim": -89.984,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     454.679,
+     -436.204,
+     7.943
+    ]
+   },
+   {
+    "game": 16.3536,
+    "dt": 0.0739,
+    "d": 149.451,
+    "gained": 21.331,
+    "alpha": 0.4522,
+    "want": 0.5584,
+    "err": -0.1062,
+    "want_lag": 0.3852,
+    "err_lag": 0.067,
+    "sock_travel": [
+     15.364,
+     15.364
+    ],
+    "sock_travel_want": 17.274,
+    "sock_travel_err": 1.91,
+    "local_travel": [
+     15.364,
+     15.364
+    ],
+    "local_err_vs_alpha": 1.91,
+    "clip_travel": 18.506,
+    "local_err_vs_clip": 3.142,
+    "yaw": -89.984,
+    "aim": -89.984,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     454.678,
+     -433.113,
+     8.241
+    ]
+   },
+   {
+    "game": 16.4287,
+    "dt": 0.0751,
+    "d": 149.451,
+    "gained": 21.331,
+    "alpha": 0.4944,
+    "want": 0.5584,
+    "err": -0.064,
+    "want_lag": 0.44,
+    "err_lag": 0.0544,
+    "sock_travel": [
+     18.51,
+     18.509
+    ],
+    "sock_travel_want": 18.886,
+    "sock_travel_err": 0.377,
+    "local_travel": [
+     18.51,
+     18.509
+    ],
+    "local_err_vs_alpha": 0.377,
+    "clip_travel": 20.403,
+    "local_err_vs_clip": 1.894,
+    "yaw": -89.984,
+    "aim": -89.984,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     454.677,
+     -429.967,
+     8.552
+    ]
+   },
+   {
+    "game": 16.4921,
+    "dt": 0.0634,
+    "d": 149.451,
+    "gained": 21.331,
+    "alpha": 0.5184,
+    "want": 0.5584,
+    "err": -0.04,
+    "want_lag": 0.4975,
+    "err_lag": 0.0209,
+    "sock_travel": [
+     20.401,
+     20.401
+    ],
+    "sock_travel_want": 19.803,
+    "sock_travel_err": 0.598,
+    "local_travel": [
+     20.401,
+     20.401
+    ],
+    "local_err_vs_alpha": 0.598,
+    "clip_travel": 21.417,
+    "local_err_vs_clip": 1.016,
+    "yaw": -89.984,
+    "aim": -89.984,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     454.677,
+     -428.076,
+     8.789
+    ]
+   },
+   {
+    "game": 16.5608,
+    "dt": 0.0687,
+    "d": 149.451,
+    "gained": 21.331,
+    "alpha": 0.5342,
+    "want": 0.5584,
+    "err": -0.0242,
+    "want_lag": 0.5584,
+    "err_lag": -0.0242,
+    "sock_travel": [
+     21.411,
+     21.411
+    ],
+    "sock_travel_want": 20.406,
+    "sock_travel_err": 1.005,
+    "local_travel": [
+     21.411,
+     21.411
+    ],
+    "local_err_vs_alpha": 1.005,
+    "clip_travel": 22.082,
+    "local_err_vs_clip": 0.672,
+    "yaw": -89.984,
+    "aim": -89.984,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     454.677,
+     -427.066,
+     8.929
+    ]
+   },
+   {
+    "game": 16.6308,
+    "dt": 0.07,
+    "d": 149.451,
+    "gained": 21.331,
+    "alpha": 0.544,
+    "want": 0.5584,
+    "err": -0.0144,
+    "want_lag": 0.5584,
+    "err_lag": -0.0144,
+    "sock_travel": [
+     22.081,
+     22.08
+    ],
+    "sock_travel_want": 20.781,
+    "sock_travel_err": 1.3,
+    "local_travel": [
+     22.081,
+     22.08
+    ],
+    "local_err_vs_alpha": 1.3,
+    "clip_travel": 22.476,
+    "local_err_vs_clip": 0.396,
+    "yaw": -89.984,
+    "aim": -89.984,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     454.676,
+     -426.396,
+     9.022
+    ]
+   },
+   {
+    "game": 16.6979,
+    "dt": 0.0671,
+    "d": 149.452,
+    "gained": 21.332,
+    "alpha": 0.5496,
+    "want": 0.5584,
+    "err": -0.0088,
+    "want_lag": 0.5584,
+    "err_lag": -0.0088,
+    "sock_travel": [
+     22.489,
+     22.45
+    ],
+    "sock_travel_want": 20.995,
+    "sock_travel_err": 1.495,
+    "local_travel": [
+     22.47,
+     22.47
+    ],
+    "local_err_vs_alpha": 1.475,
+    "clip_travel": 22.701,
+    "local_err_vs_clip": 0.231,
+    "yaw": -89.751,
+    "aim": -89.751,
+    "yaw_err": 0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     454.579,
+     -425.988,
+     9.115
+    ]
+   },
+   {
+    "game": 16.763,
+    "dt": 0.0652,
+    "d": 149.46,
+    "gained": 21.34,
+    "alpha": 0.5532,
+    "want": 0.5586,
+    "err": -0.0054,
+    "want_lag": 0.5584,
+    "err_lag": -0.0052,
+    "sock_travel": [
+     22.762,
+     22.638
+    ],
+    "sock_travel_want": 21.132,
+    "sock_travel_err": 1.63,
+    "local_travel": [
+     22.7,
+     22.7
+    ],
+    "local_err_vs_alpha": 1.568,
+    "clip_travel": 22.845,
+    "local_err_vs_clip": 0.145,
+    "yaw": -89.229,
+    "aim": -89.229,
+    "yaw_err": 0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     454.357,
+     -425.717,
+     9.17
+    ]
+   },
+   {
+    "game": 16.8265,
+    "dt": 0.0635,
+    "d": 149.48,
+    "gained": 21.36,
+    "alpha": 0.5554,
+    "want": 0.5592,
+    "err": -0.0038,
+    "want_lag": 0.5584,
+    "err_lag": -0.003,
+    "sock_travel": [
+     22.964,
+     22.719
+    ],
+    "sock_travel_want": 21.216,
+    "sock_travel_err": 1.748,
+    "local_travel": [
+     22.841,
+     22.841
+    ],
+    "local_err_vs_alpha": 1.625,
+    "clip_travel": 22.934,
+    "local_err_vs_clip": 0.093,
+    "yaw": -88.487,
+    "aim": -88.487,
+    "yaw_err": 0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     454.038,
+     -425.522,
+     9.203
+    ]
+   },
+   {
+    "game": 16.893,
+    "dt": 0.0665,
+    "d": 149.505,
+    "gained": 21.385,
+    "alpha": 0.557,
+    "want": 0.5598,
+    "err": -0.0028,
+    "want_lag": 0.5584,
+    "err_lag": -0.0014,
+    "sock_travel": [
+     23.121,
+     22.745
+    ],
+    "sock_travel_want": 21.277,
+    "sock_travel_err": 1.844,
+    "local_travel": [
+     22.932,
+     22.932
+    ],
+    "local_err_vs_alpha": 1.655,
+    "clip_travel": 22.998,
+    "local_err_vs_clip": 0.066,
+    "yaw": -87.685,
+    "aim": -87.685,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     453.691,
+     -425.377,
+     9.224
+    ]
+   },
+   {
+    "game": 16.9582,
+    "dt": 0.0653,
+    "d": 149.525,
+    "gained": 21.405,
+    "alpha": 0.5582,
+    "want": 0.5603,
+    "err": -0.0021,
+    "want_lag": 0.5584,
+    "err_lag": -0.0002,
+    "sock_travel": [
+     23.253,
+     22.748
+    ],
+    "sock_travel_want": 21.323,
+    "sock_travel_err": 1.93,
+    "local_travel": [
+     22.998,
+     22.998
+    ],
+    "local_err_vs_alpha": 1.675,
+    "clip_travel": 23.046,
+    "local_err_vs_clip": 0.048,
+    "yaw": -86.897,
+    "aim": -86.897,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     453.349,
+     -425.262,
+     9.24
+    ]
+   },
+   {
+    "game": 17.0336,
+    "dt": 0.0754,
+    "d": 149.539,
+    "gained": 21.419,
+    "alpha": 0.5592,
+    "want": 0.5607,
+    "err": -0.0015,
+    "want_lag": 0.5592,
+    "err_lag": 0.0,
+    "sock_travel": [
+     23.376,
+     22.723
+    ],
+    "sock_travel_want": 21.361,
+    "sock_travel_err": 2.015,
+    "local_travel": [
+     23.046,
+     23.046
+    ],
+    "local_err_vs_alpha": 1.685,
+    "clip_travel": 23.086,
+    "local_err_vs_clip": 0.041,
+    "yaw": -85.987,
+    "aim": -85.987,
+    "yaw_err": 0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     452.952,
+     -425.165,
+     9.251
+    ]
+   },
+   {
+    "game": 17.1157,
+    "dt": 0.0821,
+    "d": 149.546,
+    "gained": 21.426,
+    "alpha": 0.56,
+    "want": 0.5609,
+    "err": -0.0009,
+    "want_lag": 0.5598,
+    "err_lag": 0.0002,
+    "sock_travel": [
+     23.499,
+     22.684
+    ],
+    "sock_travel_want": 21.392,
+    "sock_travel_err": 2.107,
+    "local_travel": [
+     23.085,
+     23.085
+    ],
+    "local_err_vs_alpha": 1.693,
+    "clip_travel": 23.119,
+    "local_err_vs_clip": 0.033,
+    "yaw": -84.996,
+    "aim": -84.996,
+    "yaw_err": 0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     452.519,
+     -425.078,
+     9.26
+    ]
+   },
+   {
+    "game": 17.1869,
+    "dt": 0.0711,
+    "d": 149.549,
+    "gained": 21.429,
+    "alpha": 0.5604,
+    "want": 0.561,
+    "err": -0.0006,
+    "want_lag": 0.5603,
+    "err_lag": 0.0001,
+    "sock_travel": [
+     23.598,
+     22.644
+    ],
+    "sock_travel_want": 21.407,
+    "sock_travel_err": 2.191,
+    "local_travel": [
+     23.113,
+     23.113
+    ],
+    "local_err_vs_alpha": 1.706,
+    "clip_travel": 23.135,
+    "local_err_vs_clip": 0.022,
+    "yaw": -84.138,
+    "aim": -84.138,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     452.142,
+     -425.016,
+     9.266
+    ]
+   },
+   {
+    "game": 17.2525,
+    "dt": 0.0657,
+    "d": 149.549,
+    "gained": 21.429,
+    "alpha": 0.5606,
+    "want": 0.561,
+    "err": -0.0004,
+    "want_lag": 0.5607,
+    "err_lag": -0.0001,
+    "sock_travel": [
+     23.681,
+     22.597
+    ],
+    "sock_travel_want": 21.415,
+    "sock_travel_err": 2.266,
+    "local_travel": [
+     23.129,
+     23.129
+    ],
+    "local_err_vs_alpha": 1.714,
+    "clip_travel": 23.143,
+    "local_err_vs_clip": 0.014,
+    "yaw": -83.345,
+    "aim": -83.345,
+    "yaw_err": 0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     451.795,
+     -424.972,
+     9.27
+    ]
+   },
+   {
+    "game": 17.3201,
+    "dt": 0.0676,
+    "d": 149.547,
+    "gained": 21.427,
+    "alpha": 0.5608,
+    "want": 0.5609,
+    "err": -0.0001,
+    "want_lag": 0.5609,
+    "err_lag": -0.0001,
+    "sock_travel": [
+     23.76,
+     22.544
+    ],
+    "sock_travel_want": 21.423,
+    "sock_travel_err": 2.338,
+    "local_travel": [
+     23.139,
+     23.139
+    ],
+    "local_err_vs_alpha": 1.717,
+    "clip_travel": 23.151,
+    "local_err_vs_clip": 0.011,
+    "yaw": -82.529,
+    "aim": -82.529,
+    "yaw_err": 0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     451.437,
+     -424.939,
+     9.272
+    ]
+   },
+   {
+    "game": 17.3892,
+    "dt": 0.0691,
+    "d": 149.545,
+    "gained": 21.425,
+    "alpha": 0.5608,
+    "want": 0.5609,
+    "err": -0.0001,
+    "want_lag": 0.561,
+    "err_lag": -0.0002,
+    "sock_travel": [
+     23.837,
+     22.486
+    ],
+    "sock_travel_want": 21.423,
+    "sock_travel_err": 2.414,
+    "local_travel": [
+     23.145,
+     23.145
+    ],
+    "local_err_vs_alpha": 1.723,
+    "clip_travel": 23.151,
+    "local_err_vs_clip": 0.006,
+    "yaw": -81.696,
+    "aim": -81.696,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     451.071,
+     -424.915,
+     9.274
+    ]
+   },
+   {
+    "game": 17.4555,
+    "dt": 0.0663,
+    "d": 149.544,
+    "gained": 21.424,
+    "alpha": 0.5608,
+    "want": 0.5608,
+    "err": -0.0,
+    "want_lag": 0.561,
+    "err_lag": -0.0002,
+    "sock_travel": [
+     23.907,
+     22.427
+    ],
+    "sock_travel_want": 21.423,
+    "sock_travel_err": 2.484,
+    "local_travel": [
+     23.148,
+     23.148
+    ],
+    "local_err_vs_alpha": 1.725,
+    "clip_travel": 23.151,
+    "local_err_vs_clip": 0.003,
+    "yaw": -80.895,
+    "aim": -80.896,
+    "yaw_err": 0.001,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     450.72,
+     -424.9,
+     9.274
+    ]
+   },
+   {
+    "game": 17.5309,
+    "dt": 0.0754,
+    "d": 149.542,
+    "gained": 21.422,
+    "alpha": 0.5608,
+    "want": 0.5608,
+    "err": 0.0,
+    "want_lag": 0.5609,
+    "err_lag": -0.0001,
+    "sock_travel": [
+     23.985,
+     22.358
+    ],
+    "sock_travel_want": 21.423,
+    "sock_travel_err": 2.562,
+    "local_travel": [
+     23.148,
+     23.148
+    ],
+    "local_err_vs_alpha": 1.726,
+    "clip_travel": 23.151,
+    "local_err_vs_clip": 0.003,
+    "yaw": -79.986,
+    "aim": -79.986,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     450.322,
+     -424.891,
+     9.275
+    ]
+   },
+   {
+    "game": 17.5955,
+    "dt": 0.0646,
+    "d": 149.543,
+    "gained": 21.423,
+    "alpha": 0.5608,
+    "want": 0.5608,
+    "err": -0.0,
+    "want_lag": 0.5609,
+    "err_lag": -0.0001,
+    "sock_travel": [
+     24.051,
+     22.299
+    ],
+    "sock_travel_want": 21.423,
+    "sock_travel_err": 2.629,
+    "local_travel": [
+     23.148,
+     23.148
+    ],
+    "local_err_vs_alpha": 1.726,
+    "clip_travel": 23.151,
+    "local_err_vs_clip": 0.002,
+    "yaw": -79.206,
+    "aim": -79.206,
+    "yaw_err": 0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     449.98,
+     -424.889,
+     9.275
+    ]
+   },
+   {
+    "game": 17.6634,
+    "dt": 0.0679,
+    "d": 149.543,
+    "gained": 21.423,
+    "alpha": 0.5608,
+    "want": 0.5608,
+    "err": -0.0,
+    "want_lag": 0.5608,
+    "err_lag": -0.0,
+    "sock_travel": [
+     24.121,
+     22.238
+    ],
+    "sock_travel_want": 21.423,
+    "sock_travel_err": 2.699,
+    "local_travel": [
+     23.148,
+     23.149
+    ],
+    "local_err_vs_alpha": 1.726,
+    "clip_travel": 23.151,
+    "local_err_vs_clip": 0.003,
+    "yaw": -78.386,
+    "aim": -78.386,
+    "yaw_err": 0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     449.621,
+     -424.892,
+     9.275
+    ]
+   },
+   {
+    "game": 17.7253,
+    "dt": 0.0619,
+    "d": 149.543,
+    "gained": 21.423,
+    "alpha": 0.5608,
+    "want": 0.5608,
+    "err": -0.0,
+    "want_lag": 0.5608,
+    "err_lag": -0.0,
+    "sock_travel": [
+     24.185,
+     22.182
+    ],
+    "sock_travel_want": 21.423,
+    "sock_travel_err": 2.763,
+    "local_travel": [
+     23.149,
+     23.148
+    ],
+    "local_err_vs_alpha": 1.726,
+    "clip_travel": 23.151,
+    "local_err_vs_clip": 0.003,
+    "yaw": -77.64,
+    "aim": -77.64,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     449.293,
+     -424.899,
+     9.275
+    ]
+   },
+   {
+    "game": 17.7958,
+    "dt": 0.0705,
+    "d": 149.542,
+    "gained": 21.422,
+    "alpha": 0.5608,
+    "want": 0.5608,
+    "err": 0.0,
+    "want_lag": 0.5608,
+    "err_lag": -0.0,
+    "sock_travel": [
+     24.258,
+     22.119
+    ],
+    "sock_travel_want": 21.423,
+    "sock_travel_err": 2.836,
+    "local_travel": [
+     23.149,
+     23.148
+    ],
+    "local_err_vs_alpha": 1.726,
+    "clip_travel": 23.151,
+    "local_err_vs_clip": 0.002,
+    "yaw": -76.788,
+    "aim": -76.788,
+    "yaw_err": 0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     448.921,
+     -424.912,
+     9.275
+    ]
+   },
+   {
+    "game": 17.8595,
+    "dt": 0.0637,
+    "d": 149.543,
+    "gained": 21.423,
+    "alpha": 0.5608,
+    "want": 0.5608,
+    "err": -0.0,
+    "want_lag": 0.5608,
+    "err_lag": -0.0,
+    "sock_travel": [
+     24.324,
+     22.063
+    ],
+    "sock_travel_want": 21.423,
+    "sock_travel_err": 2.901,
+    "local_travel": [
+     23.148,
+     23.148
+    ],
+    "local_err_vs_alpha": 1.726,
+    "clip_travel": 23.151,
+    "local_err_vs_clip": 0.003,
+    "yaw": -76.02,
+    "aim": -76.02,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     448.584,
+     -424.929,
+     9.275
+    ]
+   },
+   {
+    "game": 17.927,
+    "dt": 0.0675,
+    "d": 149.542,
+    "gained": 21.422,
+    "alpha": 0.5608,
+    "want": 0.5608,
+    "err": 0.0,
+    "want_lag": 0.5608,
+    "err_lag": -0.0,
+    "sock_travel": [
+     24.393,
+     22.004
+    ],
+    "sock_travel_want": 21.423,
+    "sock_travel_err": 2.971,
+    "local_travel": [
+     23.148,
+     23.149
+    ],
+    "local_err_vs_alpha": 1.726,
+    "clip_travel": 23.151,
+    "local_err_vs_clip": 0.003,
+    "yaw": -75.205,
+    "aim": -75.205,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     448.228,
+     -424.952,
+     9.274
+    ]
+   },
+   {
+    "game": 17.985,
+    "dt": 0.058,
+    "d": 149.543,
+    "gained": 21.423,
+    "alpha": 0.5608,
+    "want": 0.5608,
+    "err": -0.0,
+    "want_lag": 0.5608,
+    "err_lag": -0.0,
+    "sock_travel": [
+     24.454,
+     21.954
+    ],
+    "sock_travel_want": 21.423,
+    "sock_travel_err": 3.031,
+    "local_travel": [
+     23.149,
+     23.149
+    ],
+    "local_err_vs_alpha": 1.726,
+    "clip_travel": 23.151,
+    "local_err_vs_clip": 0.002,
+    "yaw": -74.505,
+    "aim": -74.505,
+    "yaw_err": 0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     447.922,
+     -424.975,
+     9.274
+    ]
+   },
+   {
+    "game": 18.0517,
+    "dt": 0.0667,
+    "d": 149.542,
+    "gained": 21.422,
+    "alpha": 0.5608,
+    "want": 0.5608,
+    "err": 0.0,
+    "want_lag": 0.5608,
+    "err_lag": 0.0,
+    "sock_travel": [
+     24.523,
+     21.896
+    ],
+    "sock_travel_want": 21.423,
+    "sock_travel_err": 3.1,
+    "local_travel": [
+     23.148,
+     23.148
+    ],
+    "local_err_vs_alpha": 1.726,
+    "clip_travel": 23.151,
+    "local_err_vs_clip": 0.003,
+    "yaw": -73.701,
+    "aim": -73.701,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     447.571,
+     -425.007,
+     9.274
+    ]
+   },
+   {
+    "game": 18.1147,
+    "dt": 0.063,
+    "d": 149.542,
+    "gained": 21.422,
+    "alpha": 0.5608,
+    "want": 0.5608,
+    "err": 0.0,
+    "want_lag": 0.5608,
+    "err_lag": -0.0,
+    "sock_travel": [
+     24.588,
+     21.843
+    ],
+    "sock_travel_want": 21.423,
+    "sock_travel_err": 3.165,
+    "local_travel": [
+     23.148,
+     23.149
+    ],
+    "local_err_vs_alpha": 1.726,
+    "clip_travel": 23.151,
+    "local_err_vs_clip": 0.003,
+    "yaw": -72.94,
+    "aim": -72.94,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     447.239,
+     -425.042,
+     9.274
+    ]
+   },
+   {
+    "game": 18.1818,
+    "dt": 0.0671,
+    "d": 149.542,
+    "gained": 21.422,
+    "alpha": 0.5608,
+    "want": 0.5608,
+    "err": 0.0,
+    "want_lag": 0.5608,
+    "err_lag": 0.0,
+    "sock_travel": [
+     24.658,
+     21.785
+    ],
+    "sock_travel_want": 21.423,
+    "sock_travel_err": 3.235,
+    "local_travel": [
+     23.148,
+     23.148
+    ],
+    "local_err_vs_alpha": 1.726,
+    "clip_travel": 23.151,
+    "local_err_vs_clip": 0.003,
+    "yaw": -72.131,
+    "aim": -72.131,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     446.887,
+     -425.083,
+     9.274
+    ]
+   },
+   {
+    "game": 18.2403,
+    "dt": 0.0586,
+    "d": 149.542,
+    "gained": 21.422,
+    "alpha": 0.5608,
+    "want": 0.5608,
+    "err": 0.0,
+    "want_lag": 0.5608,
+    "err_lag": -0.0,
+    "sock_travel": [
+     24.718,
+     21.737
+    ],
+    "sock_travel_want": 21.423,
+    "sock_travel_err": 3.295,
+    "local_travel": [
+     23.147,
+     23.148
+    ],
+    "local_err_vs_alpha": 1.726,
+    "clip_travel": 23.151,
+    "local_err_vs_clip": 0.003,
+    "yaw": -71.424,
+    "aim": -71.423,
+    "yaw_err": -0.001,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     446.58,
+     -425.124,
+     9.274
+    ]
+   },
+   {
+    "game": 18.3062,
+    "dt": 0.0659,
+    "d": 149.542,
+    "gained": 21.422,
+    "alpha": 0.5608,
+    "want": 0.5608,
+    "err": 0.0,
+    "want_lag": 0.5608,
+    "err_lag": 0.0,
+    "sock_travel": [
+     24.786,
+     21.682
+    ],
+    "sock_travel_want": 21.423,
+    "sock_travel_err": 3.363,
+    "local_travel": [
+     23.147,
+     23.148
+    ],
+    "local_err_vs_alpha": 1.726,
+    "clip_travel": 23.151,
+    "local_err_vs_clip": 0.003,
+    "yaw": -70.628,
+    "aim": -70.628,
+    "yaw_err": 0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     446.235,
+     -425.174,
+     9.274
+    ]
+   },
+   {
+    "game": 18.3634,
+    "dt": 0.0572,
+    "d": 149.542,
+    "gained": 21.422,
+    "alpha": 0.5608,
+    "want": 0.5608,
+    "err": 0.0,
+    "want_lag": 0.5608,
+    "err_lag": 0.0,
+    "sock_travel": [
+     24.845,
+     21.634
+    ],
+    "sock_travel_want": 21.423,
+    "sock_travel_err": 3.423,
+    "local_travel": [
+     23.148,
+     23.147
+    ],
+    "local_err_vs_alpha": 1.725,
+    "clip_travel": 23.151,
+    "local_err_vs_clip": 0.004,
+    "yaw": -69.938,
+    "aim": -69.938,
+    "yaw_err": 0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     445.936,
+     -425.221,
+     9.274
+    ]
+   },
+   {
+    "game": 18.426,
+    "dt": 0.0626,
+    "d": 149.542,
+    "gained": 21.422,
+    "alpha": 0.5608,
+    "want": 0.5608,
+    "err": 0.0,
+    "want_lag": 0.5608,
+    "err_lag": 0.0,
+    "sock_travel": [
+     24.91,
+     21.584
+    ],
+    "sock_travel_want": 21.423,
+    "sock_travel_err": 3.487,
+    "local_travel": [
+     23.147,
+     23.148
+    ],
+    "local_err_vs_alpha": 1.725,
+    "clip_travel": 23.151,
+    "local_err_vs_clip": 0.004,
+    "yaw": -69.182,
+    "aim": -69.182,
+    "yaw_err": 0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     445.61,
+     -425.277,
+     9.274
+    ]
+   },
+   {
+    "game": 18.4874,
+    "dt": 0.0613,
+    "d": 149.541,
+    "gained": 21.421,
+    "alpha": 0.5608,
+    "want": 0.5608,
+    "err": 0.0,
+    "want_lag": 0.5608,
+    "err_lag": 0.0,
+    "sock_travel": [
+     24.974,
+     21.534
+    ],
+    "sock_travel_want": 21.423,
+    "sock_travel_err": 3.552,
+    "local_travel": [
+     23.148,
+     23.147
+    ],
+    "local_err_vs_alpha": 1.725,
+    "clip_travel": 23.151,
+    "local_err_vs_clip": 0.003,
+    "yaw": -68.442,
+    "aim": -68.442,
+    "yaw_err": 0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     445.291,
+     -425.335,
+     9.274
+    ]
+   },
+   {
+    "game": 18.5532,
+    "dt": 0.0659,
+    "d": 149.541,
+    "gained": 21.421,
+    "alpha": 0.5608,
+    "want": 0.5608,
+    "err": 0.0,
+    "want_lag": 0.5608,
+    "err_lag": 0.0,
+    "sock_travel": [
+     25.042,
+     21.482
+    ],
+    "sock_travel_want": 21.423,
+    "sock_travel_err": 3.62,
+    "local_travel": [
+     23.148,
+     23.148
+    ],
+    "local_err_vs_alpha": 1.725,
+    "clip_travel": 23.151,
+    "local_err_vs_clip": 0.003,
+    "yaw": -67.647,
+    "aim": -67.647,
+    "yaw_err": 0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     444.949,
+     -425.403,
+     9.274
+    ]
+   },
+   {
+    "game": 18.6109,
+    "dt": 0.0576,
+    "d": 149.542,
+    "gained": 21.422,
+    "alpha": 0.5608,
+    "want": 0.5608,
+    "err": 0.0,
+    "want_lag": 0.5608,
+    "err_lag": 0.0,
+    "sock_travel": [
+     25.101,
+     21.436
+    ],
+    "sock_travel_want": 21.423,
+    "sock_travel_err": 3.678,
+    "local_travel": [
+     23.147,
+     23.147
+    ],
+    "local_err_vs_alpha": 1.725,
+    "clip_travel": 23.151,
+    "local_err_vs_clip": 0.004,
+    "yaw": -66.952,
+    "aim": -66.951,
+    "yaw_err": -0.001,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     444.651,
+     -425.467,
+     9.274
+    ]
+   },
+   {
+    "game": 18.6723,
+    "dt": 0.0614,
+    "d": 149.541,
+    "gained": 21.421,
+    "alpha": 0.5608,
+    "want": 0.5608,
+    "err": 0.0,
+    "want_lag": 0.5608,
+    "err_lag": 0.0,
+    "sock_travel": [
+     25.165,
+     21.388
+    ],
+    "sock_travel_want": 21.423,
+    "sock_travel_err": 3.742,
+    "local_travel": [
+     23.147,
+     23.147
+    ],
+    "local_err_vs_alpha": 1.725,
+    "clip_travel": 23.151,
+    "local_err_vs_clip": 0.004,
+    "yaw": -66.211,
+    "aim": -66.211,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     444.334,
+     -425.538,
+     9.274
+    ]
+   },
+   {
+    "game": 18.7284,
+    "dt": 0.0562,
+    "d": 149.541,
+    "gained": 21.421,
+    "alpha": 0.5608,
+    "want": 0.5608,
+    "err": 0.0,
+    "want_lag": 0.5608,
+    "err_lag": 0.0,
+    "sock_travel": [
+     25.165,
+     21.388
+    ],
+    "sock_travel_want": 21.423,
+    "sock_travel_err": 3.742,
+    "local_travel": [
+     23.147,
+     23.147
+    ],
+    "local_err_vs_alpha": 1.725,
+    "clip_travel": 23.151,
+    "local_err_vs_clip": 0.004,
+    "yaw": -66.211,
+    "aim": -66.211,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     444.334,
+     -425.538,
+     9.274
+    ]
+   },
+   {
+    "game": 18.7872,
+    "dt": 0.0588,
+    "d": 149.541,
+    "gained": 21.421,
+    "alpha": 0.5608,
+    "want": 0.5608,
+    "err": 0.0,
+    "want_lag": 0.5608,
+    "err_lag": 0.0,
+    "sock_travel": [
+     25.165,
+     21.388
+    ],
+    "sock_travel_want": 21.423,
+    "sock_travel_err": 3.742,
+    "local_travel": [
+     23.147,
+     23.147
+    ],
+    "local_err_vs_alpha": 1.725,
+    "clip_travel": 23.151,
+    "local_err_vs_clip": 0.004,
+    "yaw": -66.211,
+    "aim": -66.211,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     444.334,
+     -425.538,
+     9.274
+    ]
+   },
+   {
+    "game": 18.8462,
+    "dt": 0.059,
+    "d": 149.541,
+    "gained": 21.421,
+    "alpha": 0.5608,
+    "want": 0.5608,
+    "err": 0.0,
+    "want_lag": 0.5608,
+    "err_lag": 0.0,
+    "sock_travel": [
+     25.165,
+     21.388
+    ],
+    "sock_travel_want": 21.423,
+    "sock_travel_err": 3.742,
+    "local_travel": [
+     23.147,
+     23.147
+    ],
+    "local_err_vs_alpha": 1.725,
+    "clip_travel": 23.151,
+    "local_err_vs_clip": 0.004,
+    "yaw": -66.211,
+    "aim": -66.211,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     444.334,
+     -425.538,
+     9.274
+    ]
+   },
+   {
+    "game": 18.9144,
+    "dt": 0.0682,
+    "d": 150.17,
+    "gained": 22.05,
+    "alpha": 0.5654,
+    "want": 0.5772,
+    "err": -0.0118,
+    "want_lag": 0.5608,
+    "err_lag": 0.0046,
+    "sock_travel": [
+     25.165,
+     21.388
+    ],
+    "sock_travel_want": 21.598,
+    "sock_travel_err": 3.566,
+    "local_travel": [
+     23.147,
+     23.147
+    ],
+    "local_err_vs_alpha": 1.549,
+    "clip_travel": 23.336,
+    "local_err_vs_clip": 0.189,
+    "yaw": -66.211,
+    "aim": -66.21,
+    "yaw_err": -0.001,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     444.334,
+     -425.538,
+     9.274
+    ]
+   },
+   {
+    "game": 18.9747,
+    "dt": 0.0603,
+    "d": 151.4,
+    "gained": 23.28,
+    "alpha": 0.576,
+    "want": 0.6094,
+    "err": -0.0334,
+    "want_lag": 0.5608,
+    "err_lag": 0.0152,
+    "sock_travel": [
+     25.349,
+     21.573
+    ],
+    "sock_travel_want": 22.003,
+    "sock_travel_err": 3.346,
+    "local_travel": [
+     23.332,
+     23.332
+    ],
+    "local_err_vs_alpha": 1.329,
+    "clip_travel": 23.761,
+    "local_err_vs_clip": 0.43,
+    "yaw": -66.211,
+    "aim": -66.211,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     444.26,
+     -425.369,
+     9.317
+    ]
+   },
+   {
+    "game": 19.0395,
+    "dt": 0.0648,
+    "d": 153.36,
+    "gained": 25.24,
+    "alpha": 0.6,
+    "want": 0.6607,
+    "err": -0.0607,
+    "want_lag": 0.5608,
+    "err_lag": 0.0392,
+    "sock_travel": [
+     25.782,
+     22.006
+    ],
+    "sock_travel_want": 22.92,
+    "sock_travel_err": 2.862,
+    "local_travel": [
+     23.765,
+     23.764
+    ],
+    "local_err_vs_alpha": 0.845,
+    "clip_travel": 24.725,
+    "local_err_vs_clip": 0.961,
+    "yaw": -66.211,
+    "aim": -66.21,
+    "yaw_err": -0.001,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     444.085,
+     -424.973,
+     9.416
+    ]
+   },
+   {
+    "game": 19.0999,
+    "dt": 0.0604,
+    "d": 155.261,
+    "gained": 27.141,
+    "alpha": 0.6302,
+    "want": 0.7105,
+    "err": -0.0803,
+    "want_lag": 0.5608,
+    "err_lag": 0.0694,
+    "sock_travel": [
+     26.747,
+     22.971
+    ],
+    "sock_travel_want": 24.074,
+    "sock_travel_err": 2.673,
+    "local_travel": [
+     24.729,
+     24.729
+    ],
+    "local_err_vs_alpha": 0.656,
+    "clip_travel": 26.066,
+    "local_err_vs_clip": 1.337,
+    "yaw": -66.211,
+    "aim": -66.21,
+    "yaw_err": -0.001,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     443.696,
+     -424.09,
+     9.632
+    ]
+   },
+   {
+    "game": 19.1655,
+    "dt": 0.0656,
+    "d": 157.329,
+    "gained": 29.209,
+    "alpha": 0.672,
+    "want": 0.7646,
+    "err": -0.0926,
+    "want_lag": 0.5772,
+    "err_lag": 0.0948,
+    "sock_travel": [
+     28.087,
+     24.311
+    ],
+    "sock_travel_want": 25.67,
+    "sock_travel_err": 2.416,
+    "local_travel": [
+     26.07,
+     26.069
+    ],
+    "local_err_vs_alpha": 0.399,
+    "clip_travel": 27.928,
+    "local_err_vs_clip": 1.858,
+    "yaw": -66.211,
+    "aim": -66.21,
+    "yaw_err": -0.001,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     443.155,
+     -422.864,
+     10.041
+    ]
+   },
+   {
+    "game": 19.2313,
+    "dt": 0.0657,
+    "d": 159.4,
+    "gained": 31.28,
+    "alpha": 0.719,
+    "want": 0.8188,
+    "err": -0.0998,
+    "want_lag": 0.6094,
+    "err_lag": 0.1096,
+    "sock_travel": [
+     29.947,
+     26.171
+    ],
+    "sock_travel_want": 27.466,
+    "sock_travel_err": 2.481,
+    "local_travel": [
+     27.929,
+     27.929
+    ],
+    "local_err_vs_alpha": 0.464,
+    "clip_travel": 30.057,
+    "local_err_vs_clip": 2.127,
+    "yaw": -66.211,
+    "aim": -66.211,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     442.405,
+     -421.162,
+     10.596
+    ]
+   },
+   {
+    "game": 19.2935,
+    "dt": 0.0623,
+    "d": 161.361,
+    "gained": 33.241,
+    "alpha": 0.7654,
+    "want": 0.8702,
+    "err": -0.1048,
+    "want_lag": 0.6607,
+    "err_lag": 0.1047,
+    "sock_travel": [
+     32.066,
+     28.289
+    ],
+    "sock_travel_want": 29.238,
+    "sock_travel_err": 2.827,
+    "local_travel": [
+     30.048,
+     30.048
+    ],
+    "local_err_vs_alpha": 0.81,
+    "clip_travel": 32.068,
+    "local_err_vs_clip": 2.02,
+    "yaw": -66.211,
+    "aim": -66.211,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     441.551,
+     -419.223,
+     11.289
+    ]
+   },
+   {
+    "game": 19.3573,
+    "dt": 0.0638,
+    "d": 163.37,
+    "gained": 35.25,
+    "alpha": 0.815,
+    "want": 0.9228,
+    "err": -0.1078,
+    "want_lag": 0.7105,
+    "err_lag": 0.1045,
+    "sock_travel": [
+     34.073,
+     30.297
+    ],
+    "sock_travel_want": 31.133,
+    "sock_travel_err": 2.94,
+    "local_travel": [
+     32.056,
+     32.056
+    ],
+    "local_err_vs_alpha": 0.923,
+    "clip_travel": 34.071,
+    "local_err_vs_clip": 2.016,
+    "yaw": -66.211,
+    "aim": -66.211,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     440.741,
+     -417.386,
+     11.959
+    ]
+   },
+   {
+    "game": 19.423,
+    "dt": 0.0657,
+    "d": 165.441,
+    "gained": 37.321,
+    "alpha": 0.8678,
+    "want": 0.977,
+    "err": -0.1092,
+    "want_lag": 0.7646,
+    "err_lag": 0.1032,
+    "sock_travel": [
+     36.081,
+     32.305
+    ],
+    "sock_travel_want": 33.15,
+    "sock_travel_err": 2.931,
+    "local_travel": [
+     34.063,
+     34.063
+    ],
+    "local_err_vs_alpha": 0.914,
+    "clip_travel": 35.939,
+    "local_err_vs_clip": 1.876,
+    "yaw": -66.211,
+    "aim": -66.211,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     439.931,
+     -415.549,
+     12.629
+    ]
+   },
+   {
+    "game": 19.4858,
+    "dt": 0.0628,
+    "d": 167.418,
+    "gained": 39.298,
+    "alpha": 0.9114,
+    "want": 1.0,
+    "err": -0.0886,
+    "want_lag": 0.8188,
+    "err_lag": 0.0926,
+    "sock_travel": [
+     37.955,
+     34.179
+    ],
+    "sock_travel_want": 34.815,
+    "sock_travel_err": 3.14,
+    "local_travel": [
+     35.938,
+     35.938
+    ],
+    "local_err_vs_alpha": 1.122,
+    "clip_travel": 37.008,
+    "local_err_vs_clip": 1.071,
+    "yaw": -66.211,
+    "aim": -66.211,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     439.175,
+     -413.834,
+     13.256
+    ]
+   },
+   {
+    "game": 19.5528,
+    "dt": 0.067,
+    "d": 169.529,
+    "gained": 41.409,
+    "alpha": 0.9444,
+    "want": 1.0,
+    "err": -0.0556,
+    "want_lag": 0.8702,
+    "err_lag": 0.0742,
+    "sock_travel": [
+     39.025,
+     35.249
+    ],
+    "sock_travel_want": 36.076,
+    "sock_travel_err": 2.949,
+    "local_travel": [
+     37.008,
+     37.008
+    ],
+    "local_err_vs_alpha": 0.932,
+    "clip_travel": 37.647,
+    "local_err_vs_clip": 0.639,
+    "yaw": -66.211,
+    "aim": -66.211,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     438.743,
+     -412.855,
+     13.62
+    ]
+   },
+   {
+    "game": 19.6188,
+    "dt": 0.066,
+    "d": 171.607,
+    "gained": 43.487,
+    "alpha": 0.9658,
+    "want": 1.0,
+    "err": -0.0342,
+    "want_lag": 0.9228,
+    "err_lag": 0.043,
+    "sock_travel": [
+     39.665,
+     35.888
+    ],
+    "sock_travel_want": 36.894,
+    "sock_travel_err": 2.771,
+    "local_travel": [
+     37.647,
+     37.647
+    ],
+    "local_err_vs_alpha": 0.754,
+    "clip_travel": 37.842,
+    "local_err_vs_clip": 0.195,
+    "yaw": -66.211,
+    "aim": -66.211,
+    "yaw_err": -0.0,
+    "ring": null,
+    "rendered": true,
+    "sock_r": [
+     438.485,
+     -412.27,
+     13.834
+    ]
+   }
+  ],
+  "settle_rule": "rows from 0.5 s after the first SRC_Tug row (about 2.5 spring time constants)",
+  "alpha_err_max_abs": 0.1092,
+  "alpha_err_mean": -0.0316,
+  "alpha_err_lag_max_abs": 0.1195,
+  "n_settled": 62,
+  "sock_travel_err_max": 4.315,
+  "local_travel_err_vs_alpha_max": {
+   "err": 4.315,
+   "game": 16.1436,
+   "alpha": 0.2802,
+   "local": [
+    6.389,
+    6.389
+   ],
+   "want": 10.704
+  },
+  "local_travel_err_vs_clip_max": 3.142,
+  "local_travel_at_last": {
+   "alpha": 0.9658,
+   "local": [
+    37.647,
+    37.647
+   ],
+   "want": 36.894,
+   "clip": 37.842
+  },
+  "yaw_err_max_abs_after_0_2s": 0.001,
+  "last_tug_row": {
+   "game": 19.6188,
+   "alpha": 0.9658,
+   "d": 171.607,
+   "gained": 43.487,
+   "want": 1.0,
+   "ring": null
+  },
+  "yaw_track_first": [
+   [
+    14.5109,
+    -90.178,
+    -89.984
+   ],
+   [
+    14.5825,
+    -90.178,
+    -89.984
+   ],
+   [
+    14.6569,
+    -90.178,
+    -89.984
+   ],
+   [
+    14.716,
+    -90.178,
+    -89.984
+   ],
+   [
+    14.7919,
+    -90.178,
+    -89.984
+   ],
+   [
+    14.8584,
+    -90.178,
+    -89.984
+   ],
+   [
+    14.9284,
+    -90.178,
+    -89.984
+   ],
+   [
+    14.9913,
+    -90.178,
+    -89.984
+   ],
+   [
+    15.0587,
+    -89.984,
+    -89.984
+   ],
+   [
+    15.1417,
+    -89.984,
+    -89.984
+   ],
+   [
+    15.2091,
+    -89.984,
+    -89.984
+   ],
+   [
+    15.2777,
+    -89.984,
+    -89.984
+   ]
+  ],
+  "gloves": {
+   "n": 70,
+   "same_max": 3.161,
+   "lag1_max": 0.0,
+   "over_05_same": 20,
+   "over_05_lag1": 0,
+   "worst": null,
+   "over_rows": []
+  },
+  "gloves_from_press_0_17": {
+   "n": 74,
+   "same_max": 57.906,
+   "lag1_max": 3.159,
+   "over_05_same": 22,
+   "over_05_lag1": 1,
+   "worst": {
+    "game": 14.8584,
+    "dt": 0.0665,
+    "lag1": 3.159,
+    "same": 3.291,
+    "clip": "SRC_Grip",
+    "t": 0.1007
+   },
+   "over_rows": [
+    {
+     "game": 14.8584,
+     "dt": 0.0665,
+     "lag1": 3.159,
+     "same": 3.291,
+     "clip": "SRC_Grip",
+     "t": 0.1007
+    }
+   ]
+  },
+  "ring_vs_alpha": {
+   "n": 0,
+   "max_ring": null,
+   "max_abs_ring_x097_minus_alpha": null
+  },
+  "rendered_false_rows": [],
+  "frame_dt": {
+   "max": 0.083,
+   "mean": 0.0661
+  }
+ },
+ "sidestep": {
+  "n": 35,
+  "aim_from": -89.984,
+  "aim_to": -66.211,
+  "yaw_from": -89.984,
+  "yaw_to": -66.211,
+  "yaw_err_max_abs": 0.001,
+  "d_range": [
+   149.451,
+   149.549
+  ],
+  "alpha_range": [
+   0.5342,
+   0.5608
+  ]
+ },
+ "bed_readouts": [
+  [
+   "bed0_before",
+   "bed=13|0(13)[Valid](ScreamingTurnipBed) enabled=Enable focused=true exhausted_reason=false charges=1 released=0 exhausted=false at=X=0.000 Y=0.000 Z=0.000"
+  ],
+  [
+   "bed0_after",
+   "bed=13|0(13)[Valid](ScreamingTurnipBed) enabled=Disable focused=false exhausted_reason=true charges=0 released=1 exhausted=true at=X=0.000 Y=0.000 Z=0.000"
+  ],
+  [
+   "bed1_before",
+   "bed=15|0(15)[Valid](ScreamingTurnipBed) enabled=Enable focused=true exhausted_reason=false charges=1 released=0 exhausted=false at=X=450.000 Y=-450.000 Z=0.000"
+  ],
+  [
+   "bed1_after_cancel",
+   "bed=15|0(15)[Valid](ScreamingTurnipBed) enabled=Enable focused=true exhausted_reason=false charges=1 released=0 exhausted=false at=X=450.000 Y=-450.000 Z=0.000"
+  ],
+  [
+   "bed1_after",
+   "bed=15|0(15)[Valid](ScreamingTurnipBed) enabled=Disable focused=false exhausted_reason=true charges=0 released=1 exhausted=true at=X=450.000 Y=-450.000 Z=0.000"
+  ]
+ ]
+}

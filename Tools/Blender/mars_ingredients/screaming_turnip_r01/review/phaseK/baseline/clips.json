@@ -1,0 +1,1399 @@
+{
+ "SRC_Idle": {
+  "fps": 30,
+  "frames": [
+   0,
+   60
+  ],
+  "samples": 61,
+  "loop": true,
+  "duration_s": 2.0,
+  "export_action": "SRC_Idle",
+  "export_key_action": "SRC_Idle_Key",
+  "note": "planted (body z -1.8 cm), gentle leaf sway, no mouth",
+  "chain": {},
+  "key_frames": [
+   0,
+   30
+  ],
+  "shape_keys": {
+   "Inhale": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "Scream": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  "shape_key_peaks": {
+   "Inhale": {
+    "max": 0.0,
+    "frames_at_max": []
+   },
+   "Scream": {
+    "max": 0.0,
+    "frames_at_max": []
+   }
+  }
+ },
+ "SRC_Grip": {
+  "fps": 30,
+  "frames": [
+   0,
+   6
+  ],
+  "samples": 7,
+  "loop": false,
+  "duration_s": 0.2,
+  "export_action": "SRC_Grip",
+  "export_key_action": "SRC_Grip_Key",
+  "note": "stalks compress at the HarvestGrip points",
+  "chain": {
+   "from": [
+    "SRC_Idle",
+    0
+   ]
+  },
+  "key_frames": [
+   0,
+   6
+  ],
+  "shape_keys": {
+   "Inhale": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "Scream": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  "shape_key_peaks": {
+   "Inhale": {
+    "max": 0.0,
+    "frames_at_max": []
+   },
+   "Scream": {
+    "max": 0.0,
+    "frames_at_max": []
+   }
+  }
+ },
+ "SRC_Tug": {
+  "fps": 30,
+  "frames": [
+   0,
+   15
+  ],
+  "samples": 16,
+  "loop": false,
+  "duration_s": 0.5,
+  "export_action": "SRC_Tug",
+  "export_key_action": "SRC_Tug_Key",
+  "note": "Phase J: lean-and-stretch toward the puller on -X, scrubbed by the walk-away pull (crown head (0, 31.8) -> (-144.0, 51.8) cm UE x/z, Part 1e 4x; the HarvestGrip sockets ride it; the stalks stretch), crown pitched -60 deg toward -X, bulb planted and tilted 8 deg toward -X at 1.04 h / 0.98 w, leaves keep their droop; ends at full strain",
+  "chain": {
+   "from": [
+    "SRC_Grip",
+    6
+   ]
+  },
+  "key_frames": [
+   0,
+   8,
+   15
+  ],
+  "shape_keys": {
+   "Inhale": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "Scream": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  "shape_key_peaks": {
+   "Inhale": {
+    "max": 0.0,
+    "frames_at_max": []
+   },
+   "Scream": {
+    "max": 0.0,
+    "frames_at_max": []
+   }
+  }
+ },
+ "SRC_Release": {
+  "fps": 30,
+  "frames": [
+   0,
+   6
+  ],
+  "samples": 7,
+  "loop": false,
+  "duration_s": 0.2,
+  "export_action": "SRC_Release",
+  "export_key_action": "SRC_Release_Key",
+  "note": "elastic break-free from the Phase J strain (crown (-144.0, 51.8) cm x/z): crown springs back, leaves rebound, bulb overshoots to 1.1 h, settles at neutral (== ROOT_QuietIdle f0); root never moves",
+  "chain": {
+   "from": [
+    "SRC_Tug",
+    15
+   ]
+  },
+  "key_frames": [
+   0,
+   2,
+   4,
+   6
+  ],
+  "shape_keys": {
+   "Inhale": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "Scream": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  "shape_key_peaks": {
+   "Inhale": {
+    "max": 0.0,
+    "frames_at_max": []
+   },
+   "Scream": {
+    "max": 0.0,
+    "frames_at_max": []
+   }
+  }
+ },
+ "SRC_Cancel": {
+  "fps": 30,
+  "frames": [
+   0,
+   7
+  ],
+  "samples": 8,
+  "loop": false,
+  "duration_s": 0.2333,
+  "export_action": "SRC_Cancel",
+  "export_key_action": "SRC_Cancel_Key",
+  "note": "full strain (Phase J: crown (-144.0, 51.8) cm x/z) back to the planted rest (crown (0, 32.85) cm); Part 1c: TUG_MID at f3.267 mirrors SRC_Tug's f8, so Cancel at 1 - a matches Tug at a (Part 1e 4x, as keyed: <= 1.01 cm over a 0.25..0.80, peaks 2.65 cm at a 0.07 and 2.24 cm at a 0.93 (30 fps chord at the eased ends, over the 1.05 cm Grip-dip floor); review/phaseJ/cancel_match.json)",
+  "chain": {
+   "from": [
+    "SRC_Tug",
+    15
+   ]
+  },
+  "key_frames": [
+   0,
+   3.2667,
+   7
+  ],
+  "shape_keys": {
+   "Inhale": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "Scream": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  "shape_key_peaks": {
+   "Inhale": {
+    "max": 0.0,
+    "frames_at_max": []
+   },
+   "Scream": {
+    "max": 0.0,
+    "frames_at_max": []
+   }
+  }
+ },
+ "ROOT_QuietIdle": {
+  "fps": 30,
+  "frames": [
+   0,
+   60
+  ],
+  "samples": 61,
+  "loop": true,
+  "duration_s": 2.0,
+  "export_action": "ROOT_QuietIdle",
+  "export_key_action": "ROOT_QuietIdle_Key",
+  "note": "closed pucker, breath 1.000..1.015 h, relaxed crown",
+  "chain": {},
+  "key_frames": [
+   0,
+   30
+  ],
+  "shape_keys": {
+   "Inhale": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "Scream": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  "shape_key_peaks": {
+   "Inhale": {
+    "max": 0.0,
+    "frames_at_max": []
+   },
+   "Scream": {
+    "max": 0.0,
+    "frames_at_max": []
+   }
+  }
+ },
+ "ROOT_Anticipate": {
+  "fps": 30,
+  "frames": [
+   0,
+   9
+  ],
+  "samples": 10,
+  "loop": false,
+  "duration_s": 0.3,
+  "export_action": "ROOT_Anticipate",
+  "export_key_action": "ROOT_Anticipate_Key",
+  "note": "squash 0.9 h / 1.1 w, cheeks begin (1.1), crown lifts",
+  "chain": {
+   "from": [
+    "ROOT_QuietIdle",
+    0
+   ]
+  },
+  "key_frames": [
+   0,
+   9
+  ],
+  "shape_keys": {
+   "Inhale": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "Scream": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  "shape_key_peaks": {
+   "Inhale": {
+    "max": 0.0,
+    "frames_at_max": []
+   },
+   "Scream": {
+    "max": 0.0,
+    "frames_at_max": []
+   }
+  }
+ },
+ "ROOT_AnticipateTired": {
+  "fps": 30,
+  "frames": [
+   0,
+   9
+  ],
+  "samples": 10,
+  "loop": false,
+  "duration_s": 0.3,
+  "export_action": "ROOT_AnticipateTired",
+  "export_key_action": "ROOT_AnticipateTired_Key",
+  "note": "B3 (B-2): ROOT_Anticipate from the tired pose - starts == ROOT_RecoveryIdle f0 (drooped crown), ends == ROOT_Inhale f0; the presentation picks it after the recovery phase",
+  "chain": {
+   "from": [
+    "ROOT_RecoveryIdle",
+    0
+   ]
+  },
+  "key_frames": [
+   0,
+   9
+  ],
+  "shape_keys": {
+   "Inhale": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "Scream": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  "shape_key_peaks": {
+   "Inhale": {
+    "max": 0.0,
+    "frames_at_max": []
+   },
+   "Scream": {
+    "max": 0.0,
+    "frames_at_max": []
+   }
+  }
+ },
+ "ROOT_Inhale": {
+  "fps": 30,
+  "frames": [
+   0,
+   36
+  ],
+  "samples": 37,
+  "loop": false,
+  "duration_s": 1.2,
+  "export_action": "ROOT_Inhale",
+  "export_key_action": "ROOT_Inhale_Key",
+  "note": "cheeks to the full bellows, leaves rise, pursed aperture; holds the last 0.2 s",
+  "chain": {
+   "from": [
+    "ROOT_Anticipate",
+    9
+   ]
+  },
+  "key_frames": [
+   0,
+   14,
+   30,
+   36
+  ],
+  "shape_keys": {
+   "Inhale": [
+    0.0,
+    0.007264,
+    0.027843,
+    0.059913,
+    0.101652,
+    0.151239,
+    0.206851,
+    0.266667,
+    0.328863,
+    0.391618,
+    0.45311,
+    0.511516,
+    0.565015,
+    0.611783,
+    0.65,
+    0.683228,
+    0.716081,
+    0.748315,
+    0.779688,
+    0.809953,
+    0.838867,
+    0.866186,
+    0.891667,
+    0.915064,
+    0.936133,
+    0.954631,
+    0.970312,
+    0.982935,
+    0.992253,
+    0.998022,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "Scream": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  "shape_key_peaks": {
+   "Inhale": {
+    "max": 1.0,
+    "frames_at_max": [
+     30,
+     36
+    ]
+   },
+   "Scream": {
+    "max": 0.0,
+    "frames_at_max": []
+   }
+  }
+ },
+ "ROOT_Scream": {
+  "fps": 30,
+  "frames": [
+   0,
+   18
+  ],
+  "samples": 19,
+  "loop": false,
+  "duration_s": 0.6,
+  "export_action": "ROOT_Scream",
+  "export_key_action": "ROOT_Scream_Key",
+  "note": "snap to full gape by frame 3, leaves fan + recoil, +-1.5 deg 15 Hz shake",
+  "chain": {
+   "from": [
+    "ROOT_Inhale",
+    36
+   ]
+  },
+  "key_frames": [
+   0,
+   3,
+   7,
+   11,
+   15,
+   18
+  ],
+  "shape_keys": {
+   "Inhale": [
+    1.0,
+    0.740741,
+    0.259259,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "Scream": [
+    0.0,
+    0.259259,
+    0.740741,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  "shape_key_peaks": {
+   "Inhale": {
+    "max": 1.0,
+    "frames_at_max": [
+     0,
+     0
+    ]
+   },
+   "Scream": {
+    "max": 1.0,
+    "frames_at_max": [
+     3,
+     18
+    ]
+   }
+  }
+ },
+ "ROOT_Recover": {
+  "fps": 30,
+  "frames": [
+   0,
+   30
+  ],
+  "samples": 31,
+  "loop": false,
+  "duration_s": 1.0,
+  "export_action": "ROOT_Recover",
+  "export_key_action": "ROOT_Recover_Key",
+  "note": "deflate, overshoot squash 0.75 h / 1.25 w at 0.27 s, crown slumps; ends == RecoveryIdle f0",
+  "chain": {
+   "from": [
+    "ROOT_Scream",
+    18
+   ],
+   "to": [
+    "ROOT_RecoveryIdle",
+    0
+   ]
+  },
+  "key_frames": [
+   0,
+   4,
+   8,
+   16,
+   30
+  ],
+  "shape_keys": {
+   "Inhale": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "Scream": [
+    1.0,
+    0.94,
+    0.82,
+    0.7,
+    0.3,
+    0.15,
+    0.07,
+    0.02,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  "shape_key_peaks": {
+   "Inhale": {
+    "max": 0.0,
+    "frames_at_max": []
+   },
+   "Scream": {
+    "max": 1.0,
+    "frames_at_max": [
+     0,
+     0
+    ],
+    "zero_from_frame": 8
+   }
+  }
+ },
+ "ROOT_RecoveryIdle": {
+  "fps": 30,
+  "frames": [
+   0,
+   60
+  ],
+  "samples": 61,
+  "loop": true,
+  "duration_s": 2.0,
+  "export_action": "ROOT_RecoveryIdle",
+  "export_key_action": "ROOT_RecoveryIdle_Key",
+  "note": "tired breathing 0.97..1.00 h, drooped leaves",
+  "chain": {},
+  "key_frames": [
+   0,
+   30
+  ],
+  "shape_keys": {
+   "Inhale": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "Scream": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  "shape_key_peaks": {
+   "Inhale": {
+    "max": 0.0,
+    "frames_at_max": []
+   },
+   "Scream": {
+    "max": 0.0,
+    "frames_at_max": []
+   }
+  }
+ },
+ "ROOT_AirborneLeafTrail": {
+  "fps": 30,
+  "frames": [
+   0,
+   30
+  ],
+  "samples": 31,
+  "loop": true,
+  "duration_s": 1.0,
+  "export_action": "ROOT_AirborneLeafTrail",
+  "export_key_action": "ROOT_AirborneLeafTrail_Key",
+  "note": "crown pitched -X, leaves trail and flutter, face quiet; root never moves",
+  "chain": {},
+  "key_frames": [
+   0,
+   15
+  ],
+  "shape_keys": {
+   "Inhale": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "Scream": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  "shape_key_peaks": {
+   "Inhale": {
+    "max": 0.0,
+    "frames_at_max": []
+   },
+   "Scream": {
+    "max": 0.0,
+    "frames_at_max": []
+   }
+  }
+ },
+ "ROOT_ImpactSquash": {
+  "fps": 30,
+  "frames": [
+   0,
+   7
+  ],
+  "samples": 8,
+  "loop": false,
+  "duration_s": 0.2333,
+  "export_action": "ROOT_ImpactSquash",
+  "export_key_action": "ROOT_ImpactSquash_Key",
+  "note": "squash 0.80 h / 1.20 w about the bulb centre, back to neutral",
+  "chain": {},
+  "key_frames": [
+   0,
+   2,
+   7
+  ],
+  "shape_keys": {
+   "Inhale": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "Scream": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  "shape_key_peaks": {
+   "Inhale": {
+    "max": 0.0,
+    "frames_at_max": []
+   },
+   "Scream": {
+    "max": 0.0,
+    "frames_at_max": []
+   }
+  }
+ },
+ "ROOT_SettleRock": {
+  "fps": 30,
+  "frames": [
+   0,
+   12
+  ],
+  "samples": 13,
+  "loop": false,
+  "duration_s": 0.4,
+  "export_action": "ROOT_SettleRock",
+  "export_key_action": "ROOT_SettleRock_Key",
+  "note": "damped leaf recoil (2 oscillations), bulb still, ends neutral",
+  "chain": {},
+  "key_frames": [
+   0,
+   12
+  ],
+  "shape_keys": {
+   "Inhale": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "Scream": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  "shape_key_peaks": {
+   "Inhale": {
+    "max": 0.0,
+    "frames_at_max": []
+   },
+   "Scream": {
+    "max": 0.0,
+    "frames_at_max": []
+   }
+  }
+ },
+ "ROOT_PlaceSettle": {
+  "fps": 30,
+  "frames": [
+   0,
+   7
+  ],
+  "samples": 8,
+  "loop": false,
+  "duration_s": 0.2333,
+  "export_action": "ROOT_PlaceSettle",
+  "export_key_action": "ROOT_PlaceSettle_Key",
+  "note": "gentle set-down squash 0.92 h then neutral",
+  "chain": {},
+  "key_frames": [
+   0,
+   3,
+   7
+  ],
+  "shape_keys": {
+   "Inhale": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "Scream": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  "shape_key_peaks": {
+   "Inhale": {
+    "max": 0.0,
+    "frames_at_max": []
+   },
+   "Scream": {
+    "max": 0.0,
+    "frames_at_max": []
+   }
+  }
+ }
+}

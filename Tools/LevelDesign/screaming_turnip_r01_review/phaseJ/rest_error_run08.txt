@@ -1,0 +1,3 @@
+run-08-walk bed0 rest rows 137 max |alpha - want| 0.001
+run-08-walk bed1_pull1 rest rows 0 max |alpha - want| None
+run-08-walk bed1_pull2 rest rows 0 max |alpha - want| None

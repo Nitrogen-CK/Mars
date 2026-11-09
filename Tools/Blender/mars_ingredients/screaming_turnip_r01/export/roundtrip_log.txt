@@ -8,11 +8,11 @@ ANIM SRC_Idle                 keyed [0, 60, 61] root 0.0e+00 landmark 0.000078 e
 FBX version: 7400
 ANIM SRC_Grip                 keyed [0, 6, 7] root 0.0e+00 landmark 0.000069 extremes 0.000054 seam None scale_err 0.000000 sk_err 0.000000 peaks {"Inhale": {"max": 0.0, "frames_at_max": []}, "Scream": {"max": 0.0, "frames_at_max": []}} verts None
 FBX version: 7400
-ANIM SRC_Tug                  keyed [0, 15, 16] root 0.0e+00 landmark 0.000067 extremes 0.000053 seam None scale_err 0.000000 sk_err 0.000000 peaks {"Inhale": {"max": 0.0, "frames_at_max": []}, "Scream": {"max": 0.0, "frames_at_max": []}} verts None
+ANIM SRC_Tug                  keyed [0, 15, 16] root 0.0e+00 landmark 0.000088 extremes 0.000056 seam None scale_err 0.000000 sk_err 0.000000 peaks {"Inhale": {"max": 0.0, "frames_at_max": []}, "Scream": {"max": 0.0, "frames_at_max": []}} verts None
 FBX version: 7400
-ANIM SRC_Release              keyed [0, 6, 7] root 0.0e+00 landmark 0.000067 extremes 0.000055 seam None scale_err 0.000000 sk_err 0.000000 peaks {"Inhale": {"max": 0.0, "frames_at_max": []}, "Scream": {"max": 0.0, "frames_at_max": []}} verts None
+ANIM SRC_Release              keyed [0, 6, 7] root 0.0e+00 landmark 0.000066 extremes 0.000055 seam None scale_err 0.000000 sk_err 0.000000 peaks {"Inhale": {"max": 0.0, "frames_at_max": []}, "Scream": {"max": 0.0, "frames_at_max": []}} verts None
 FBX version: 7400
-ANIM SRC_Cancel               keyed [0, 7, 8] root 0.0e+00 landmark 0.000070 extremes 0.000059 seam None scale_err 0.000000 sk_err 0.000000 peaks {"Inhale": {"max": 0.0, "frames_at_max": []}, "Scream": {"max": 0.0, "frames_at_max": []}} verts None
+ANIM SRC_Cancel               keyed [0, 7, 8] root 0.0e+00 landmark 0.000075 extremes 0.000054 seam None scale_err 0.000000 sk_err 0.000000 peaks {"Inhale": {"max": 0.0, "frames_at_max": []}, "Scream": {"max": 0.0, "frames_at_max": []}} verts None
 FBX version: 7400
 ANIM ROOT_QuietIdle           keyed [0, 60, 61] root 0.0e+00 landmark 0.000081 extremes 0.000067 seam 0.0 scale_err 0.000000 sk_err 0.000000 peaks {"Inhale": {"max": 0.0, "frames_at_max": []}, "Scream": {"max": 0.0, "frames_at_max": []}} verts 1.7e-05
 FBX version: 7400

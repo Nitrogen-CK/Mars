@@ -1,0 +1,178 @@
+{
+ "events": [
+  {
+   "t": 0.0,
+   "game_elapsed": 0.0,
+   "frame_delta": 0.0169,
+   "event": "begin",
+   "player": "player X=-250.000 Y=0.000 Z=77.150 health=100.0 pack=false selected=TOMBSTONE slot1=TOMBSTONE slot2=TOMBSTONE slot3=TOMBSTONE held=TOMBSTONE operating=false",
+   "world_items": 0,
+   "turnips": [],
+   "beds": [
+    "bed=13|0(13)[Valid](ScreamingTurnipBed) enabled=Enable focused=false exhausted_reason=false charges=1 released=0 exhausted=false at=X=0.000 Y=0.000 Z=0.000",
+    "bed=15|0(15)[Valid](ScreamingTurnipBed) enabled=Enable focused=false exhausted_reason=false charges=1 released=0 exhausted=false at=X=450.000 Y=-450.000 Z=0.000"
+   ],
+   "clips": [
+    {
+     "name": "1",
+     "clip": null,
+     "curves": {
+      "Inhale": 0.0,
+      "Scream": 0.0
+     },
+     "t": 0.0,
+     "at": [
+      450.0,
+      -450.0,
+      -28.8
+     ],
+     "up": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "fwd": [
+      1.0,
+      0.0,
+      0.0
+     ],
+     "visible": true
+    },
+    {
+     "name": "0",
+     "clip": null,
+     "curves": {
+      "Inhale": 0.0,
+      "Scream": 0.0
+     },
+     "t": 0.0,
+     "at": [
+      0.0,
+      0.0,
+      -28.8
+     ],
+     "up": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "fwd": [
+      1.0,
+      0.0,
+      0.0
+     ],
+     "visible": true
+    }
+   ]
+  }
+ ],
+ "changes": [
+  {
+   "game": 0.096,
+   "frame_delta": 0.0959,
+   "turnips": [],
+   "clips": [
+    {
+     "name": "1",
+     "clip": null
+    },
+    {
+     "name": "0",
+     "clip": null
+    }
+   ],
+   "at": []
+  },
+  {
+   "game": 0.096,
+   "slomo": 0.25
+  },
+  {
+   "game": 0.624,
+   "arrive": "walk",
+   "at": [
+    -96,
+    -70,
+    77
+   ]
+  },
+  {
+   "game": 0.9205,
+   "mark": "stand"
+  },
+  {
+   "game": 1.5522,
+   "mark": "d0"
+  },
+  {
+   "game": 1.5639,
+   "mark": "use0_down"
+  },
+  {
+   "game": 1.576,
+   "key": "LeftMouseButton",
+   "down": true
+  },
+  {
+   "game": 5.846,
+   "shot": "R1_bed1_full_side"
+  },
+  {
+   "game": 6.2138,
+   "mark": "use0_up"
+  },
+  {
+   "game": 6.227,
+   "key": "LeftMouseButton",
+   "down": false
+  },
+  {
+   "game": 9.277,
+   "arrive": "walk",
+   "at": [
+    427,
+    -332,
+    77
+   ]
+  },
+  {
+   "game": 9.6582,
+   "mark": "stand"
+  },
+  {
+   "game": 10.2895,
+   "mark": "d0"
+  },
+  {
+   "game": 10.3022,
+   "mark": "use1_down"
+  },
+  {
+   "game": 10.316,
+   "key": "LeftMouseButton",
+   "down": true
+  },
+  {
+   "game": 16.698,
+   "shot": "R2_bed2_full_side"
+  },
+  {
+   "game": 17.0659,
+   "mark": "use1_up"
+  },
+  {
+   "game": 17.079,
+   "key": "LeftMouseButton",
+   "down": false
+  },
+  {
+   "game": 18.606,
+   "slomo": 1.0
+  },
+  {
+   "game": 18.713,
+   "sequence_done": "run-12b-walk"
+  }
+ ],
+ "max_delta": 0.1056
+}

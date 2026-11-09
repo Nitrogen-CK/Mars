@@ -130,7 +130,8 @@ def main():
     rep["weights_changed_by_part"] = parts
     rep["weights_examples"] = [{"v": i, "new": wa[i], "ref": wr[i]} for i in changed[:12]]
     rep["fails"] = fails
-    with open(os.path.join(ROOT, "review", "phaseI", "rebuild_compare.json"), "w") as fh:
+    out = argv[argv.index("--out") + 1] if "--out" in argv else os.path.join("review", "phaseI", "rebuild_compare.json")
+    with open(os.path.join(ROOT, out), "w") as fh:          # Phase J: --out review/phaseJ/rebuild_compare.json
         json.dump(rep, fh, indent=1, default=str)
     print("COMPARE", json.dumps({k: v for k, v in rep.items() if k != "weights_examples"}, default=str))
     if fails:

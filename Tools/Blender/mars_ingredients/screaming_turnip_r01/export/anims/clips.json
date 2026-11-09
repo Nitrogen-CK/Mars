@@ -219,7 +219,7 @@
   "duration_s": 0.5,
   "export_action": "SRC_Tug",
   "export_key_action": "SRC_Tug_Key",
-  "note": "Phase I: stalks pulled straight up (crown head 31.8 -> 39.5 cm UE, ~7.7 cm; the HarvestGrip sockets ride it; the stalks stretch), bulb stays planted and domes 1.06 h / 0.96 w, leaves keep their droop; ends at full strain",
+  "note": "Phase K: the pull's POSE only, scrubbed by the walk-away pull: crown pitched -60 deg toward -X (the Use side), leaves trailing, bulb planted and tilted 8 deg toward -X at 1.04 h / 0.98 w; the crown head stays at x 0 (z 31.8 -> 33.9 cm UE). The stretch distance is the runtime crown offset (-TravelCm * a, 0, LiftCm * a) in component space, a bed tuner (default 146.2 / 20 cm); ends at full strain",
   "chain": {
    "from": [
     "SRC_Grip",
@@ -291,7 +291,7 @@
   "duration_s": 0.2,
   "export_action": "SRC_Release",
   "export_key_action": "SRC_Release_Key",
-  "note": "elastic break-free from the Phase I strain (crown 39.5 cm): crown springs back, leaves rebound, bulb overshoots to 1.1 h, settles at neutral (== ROOT_QuietIdle f0); root never moves",
+  "note": "elastic break-free from the strain pose (Phase K: the runtime offset is 0 by the release): crown springs back, leaves rebound, bulb overshoots to 1.1 h, settles at neutral (== ROOT_QuietIdle f0); root never moves",
   "chain": {
    "from": [
     "SRC_Tug",
@@ -346,7 +346,7 @@
   "duration_s": 0.2333,
   "export_action": "SRC_Cancel",
   "export_key_action": "SRC_Cancel_Key",
-  "note": "full strain (Phase I: crown 39.5 cm) back to the planted rest (crown 32.85 cm)",
+  "note": "full strain pose back to the planted rest (Phase K: the runtime offset shrinks with 1 - played alpha); Part 1c: TUG_MID at f3.267 mirrors SRC_Tug's f8, so Cancel at 1 - a matches Tug at a (Part 1e 4x, as keyed: <= 1.01 cm over a 0.25..0.80, peaks 2.65 cm at a 0.07 and 2.24 cm at a 0.93 (30 fps chord at the eased ends, over the 1.05 cm Grip-dip floor); review/phaseJ/cancel_match.json)",
   "chain": {
    "from": [
     "SRC_Tug",
@@ -355,6 +355,7 @@
   },
   "key_frames": [
    0,
+   3.2667,
    7
   ],
   "shape_keys": {

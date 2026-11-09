@@ -1,0 +1,2132 @@
+{
+ "asset": "ScreamingTurnip_R01",
+ "generated_by": "scripts/export_screaming_turnip.py (Phase B4: the B3 asset x3.0 - mesh, keys, rig, clips, statics)",
+ "scale_factor": 3.0,
+ "scale_note": "Phase B4 (maintainer ruling 2026-11-06: the bulb ~ the 30 cm sandbox Rock): every length = 3 x the Phase B3 16 cm asset (vertices, shape-key deltas, bone heads, pose translations, sockets, hull, beds); rotations, scale keys, curve values, timings, topology (3188 tris) and the rig contract unchanged. Proof: review/phaseB4/scale_check*.json (vertex-level vs the B3 blend, every report length).",
+ "versions": {
+  "blender": "5.2.2 LTS",
+  "fbx_exporter_addon": "5.15.0",
+  "fbx_file_version": 7400,
+  "fbx_note": "binary FBX written by the Blender exporter; proven by the Blender round trip (validate_roundtrip.py), Unreal import is Phase C"
+ },
+ "units_axes": {
+  "blender_scene": {
+   "system": "METRIC",
+   "scale_length": 0.009999999776482582,
+   "note": "1 BU = 1 cm"
+  },
+  "exporter_args_common": {
+   "use_selection": true,
+   "apply_unit_scale": true,
+   "apply_scale_options": "FBX_SCALE_NONE",
+   "global_scale": 1.0,
+   "axis_forward": "-Z",
+   "axis_up": "Y",
+   "use_mesh_modifiers": false,
+   "mesh_smooth_type": "FACE",
+   "use_triangles": true,
+   "use_tspace": false,
+   "add_leaf_bones": false,
+   "path_mode": "STRIP",
+   "colors_type": "SRGB",
+   "use_custom_props": false,
+   "bake_space_transform": false
+  },
+  "bind_args": {
+   "use_selection": true,
+   "apply_unit_scale": true,
+   "apply_scale_options": "FBX_SCALE_NONE",
+   "global_scale": 1.0,
+   "axis_forward": "-Z",
+   "axis_up": "Y",
+   "use_mesh_modifiers": false,
+   "mesh_smooth_type": "FACE",
+   "use_triangles": false,
+   "use_tspace": false,
+   "add_leaf_bones": false,
+   "path_mode": "STRIP",
+   "colors_type": "SRGB",
+   "use_custom_props": false,
+   "bake_space_transform": false,
+   "object_types": [
+    "ARMATURE",
+    "MESH"
+   ],
+   "primary_bone_axis": "Y",
+   "secondary_bone_axis": "X",
+   "use_armature_deform_only": true,
+   "armature_nodetype": "NULL",
+   "bake_anim": false
+  },
+  "clip_args": {
+   "use_selection": true,
+   "apply_unit_scale": true,
+   "apply_scale_options": "FBX_SCALE_NONE",
+   "global_scale": 1.0,
+   "axis_forward": "-Z",
+   "axis_up": "Y",
+   "use_mesh_modifiers": false,
+   "mesh_smooth_type": "FACE",
+   "use_triangles": false,
+   "use_tspace": false,
+   "add_leaf_bones": false,
+   "path_mode": "STRIP",
+   "colors_type": "SRGB",
+   "use_custom_props": false,
+   "bake_space_transform": false,
+   "object_types": [
+    "ARMATURE",
+    "MESH"
+   ],
+   "primary_bone_axis": "Y",
+   "secondary_bone_axis": "X",
+   "use_armature_deform_only": true,
+   "armature_nodetype": "NULL",
+   "bake_anim": true,
+   "bake_anim_use_all_bones": true,
+   "bake_anim_use_nla_strips": false,
+   "bake_anim_use_all_actions": false,
+   "bake_anim_force_startend_keying": true,
+   "bake_anim_step": 1.0,
+   "bake_anim_simplify_factor": 0.0
+  },
+  "static_args": {
+   "use_selection": true,
+   "apply_unit_scale": true,
+   "apply_scale_options": "FBX_SCALE_NONE",
+   "global_scale": 1.0,
+   "axis_forward": "-Z",
+   "axis_up": "Y",
+   "use_mesh_modifiers": false,
+   "mesh_smooth_type": "FACE",
+   "use_triangles": true,
+   "use_tspace": false,
+   "add_leaf_bones": false,
+   "path_mode": "STRIP",
+   "colors_type": "SRGB",
+   "use_custom_props": false,
+   "bake_space_transform": false,
+   "object_types": [
+    "MESH"
+   ],
+   "bake_anim": false
+  },
+  "frame_map": "Blender (x, y, z) cm -> Unreal (x, -y, z) cm; mouth +X, +Z up; turnip left (*_l) = Blender +Y = Unreal -Y",
+  "armature_export_name": "Armature (renamed only while exporting; Unreal drops the node)"
+ },
+ "dimensions_cm": {
+  "neutral_overall": {
+   "min": [
+    -17.69,
+    -20.041,
+    0.0
+   ],
+   "max": [
+    16.214,
+    20.041,
+    48.0
+   ],
+   "h_z": 48.0,
+   "w_y": 40.082,
+   "d_x": 33.904
+  },
+  "bulb": {
+   "min": [
+    -12.0,
+    -14.006,
+    5.4
+   ],
+   "max": [
+    11.832,
+    14.006,
+    35.1
+   ],
+   "h_z": 29.7,
+   "w_y": 28.013,
+   "d_x": 23.832
+  },
+  "overall_height_tip_to_highest_leaf": 48.0,
+  "body_centre_offset_from_root": [
+   0.0,
+   0.0,
+   20.475
+  ],
+  "global_clip_envelope": {
+   "min": [
+    -57.89,
+    -21.32,
+    -1.8
+   ],
+   "max": [
+    20.036,
+    21.32,
+    61.827
+   ],
+   "h_z": 63.627,
+   "w_y": 42.641,
+   "d_x": 77.927,
+   "limit_h_w_d": [
+    66.0,
+    42.0,
+    39.0
+   ],
+   "exceeds": {
+    "w": 0.641,
+    "d": 38.927
+   }
+  }
+ },
+ "bone_count": 17,
+ "bones": [
+  {
+   "name": "root",
+   "parent": null
+  },
+  {
+   "name": "body",
+   "parent": "root"
+  },
+  {
+   "name": "jaw",
+   "parent": "body"
+  },
+  {
+   "name": "cheek_l",
+   "parent": "body"
+  },
+  {
+   "name": "cheek_r",
+   "parent": "body"
+  },
+  {
+   "name": "crown",
+   "parent": "body"
+  },
+  {
+   "name": "leaf_01_a",
+   "parent": "crown"
+  },
+  {
+   "name": "leaf_01_b",
+   "parent": "leaf_01_a"
+  },
+  {
+   "name": "leaf_02_a",
+   "parent": "crown"
+  },
+  {
+   "name": "leaf_02_b",
+   "parent": "leaf_02_a"
+  },
+  {
+   "name": "leaf_03_a",
+   "parent": "crown"
+  },
+  {
+   "name": "leaf_03_b",
+   "parent": "leaf_03_a"
+  },
+  {
+   "name": "leaf_04_a",
+   "parent": "crown"
+  },
+  {
+   "name": "leaf_04_b",
+   "parent": "leaf_04_a"
+  },
+  {
+   "name": "leaf_05_a",
+   "parent": "crown"
+  },
+  {
+   "name": "leaf_05_b",
+   "parent": "leaf_05_a"
+  },
+  {
+   "name": "taproot",
+   "parent": "body"
+  }
+ ],
+ "rig_contract": "root identity on every sample of every clip; non-leaf bones have identity rest rotation; body scale X == Z; jaw and crown rotate about Y only; the crown translates in X and Z (Phase J cr_dx / cr_dz); crown/taproot counter-scale the body; cheeks scale per axis + translate, never rotate (D-A1)",
+ "material_slots": [
+  "Skin",
+  "Leaf",
+  "Mouth",
+  "Teeth"
+ ],
+ "mesh": {
+  "tris": 3188,
+  "verts": 1624,
+  "bounds_ue_cm": {
+   "min": [
+    -17.6897,
+    -20.0408,
+    0.0
+   ],
+   "max": [
+    16.2142,
+    20.0408,
+    48.0
+   ]
+  }
+ },
+ "vertex_colour": "corner attribute Col (BYTE_COLOR, sRGB bytes): RGB albedo, A cavity/occlusion baked in the neutral pose (1 - 0.85 * cos-weighted occlusion, floor 0.15)",
+ "uv": "none (vertex-colour materials)",
+ "morph_targets": [
+  "Inhale",
+  "Scream"
+ ],
+ "morph_target_note": "relative shape keys on the body mesh, authored in posed space (delta = A_v^-1 (T - P0); morphs apply before skinning in Blender and Unreal). Inhale: spherical lobes + 0.97 purse (1090 verts, max rest delta 6.798 cm); Scream: elliptical rolled rim, gum band, pocket, seated teeth (1101 verts, 10.596 cm). Each key is sculpted for its full bone pose (inhale / scream).",
+ "clip_contract": {
+  "fps": 30,
+  "root": "root bone identity on every sample of every clip (asserted by animate and the round trip); physics owns travel; no root motion",
+  "loop_convention": "loops export N+1 samples on frames 0..N; frame N duplicates frame 0 in pose and slope; Unreal imports N+1 keys, length N/30 s",
+  "file_content": "export armature + mesh, exactly one armature action per clip FBX plus the mesh Key's action (bake_anim_use_all_actions=False, bake_anim_use_nla_strips=False)",
+  "curves": "every clip carries the morph curves Inhale and Scream on every sample (FBX BlendShapeChannel DeformPercent = value x 100); clips that do not use a key carry 0.0 on every sample",
+  "export_recipe_change": "DEV-13: skeletal exports use_triangles=False (with True the exporter bakes the shape-key curves from an unanimated copy: all 0.0). Mesh is all triangles (asserted).",
+  "hard_cuts": "runtime plays clips with hard cuts (D-3); the vocal chain QuietIdle f0 -> Anticipate -> Inhale -> Scream -> Recover -> RecoveryIdle is continuous (deltas 0, shape keys included); after the recovery phase the presentation plays ROOT_AnticipateTired (starts == RecoveryIdle f0, ends == Inhale f0) instead of ROOT_Anticipate; hard cuts: QuietIdle any frame -> Anticipate f0 and RecoveryIdle any frame -> AnticipateTired f0",
+  "chain_deltas": [
+   {
+    "from": "ROOT_QuietIdle f0",
+    "to": "ROOT_Anticipate f0",
+    "max_head_delta_cm": 0.0,
+    "max_rot_delta_deg": 0.0,
+    "max_shape_key_delta": 0.0,
+    "hard_cut": false
+   },
+   {
+    "from": "ROOT_Anticipate fN",
+    "to": "ROOT_Inhale f0",
+    "max_head_delta_cm": 0.0,
+    "max_rot_delta_deg": 0.0,
+    "max_shape_key_delta": 0.0,
+    "hard_cut": false
+   },
+   {
+    "from": "ROOT_Inhale fN",
+    "to": "ROOT_Scream f0",
+    "max_head_delta_cm": 0.0,
+    "max_rot_delta_deg": 0.0,
+    "max_shape_key_delta": 0.0,
+    "hard_cut": false
+   },
+   {
+    "from": "ROOT_Scream fN",
+    "to": "ROOT_Recover f0",
+    "max_head_delta_cm": 0.0,
+    "max_rot_delta_deg": 0.0,
+    "max_shape_key_delta": 0.0,
+    "hard_cut": false
+   },
+   {
+    "from": "ROOT_Recover fN",
+    "to": "ROOT_RecoveryIdle f0",
+    "max_head_delta_cm": 0.0,
+    "max_rot_delta_deg": 0.0,
+    "max_shape_key_delta": 0.0,
+    "hard_cut": false
+   },
+   {
+    "from": "ROOT_RecoveryIdle f0",
+    "to": "ROOT_AnticipateTired f0",
+    "max_head_delta_cm": 0.0,
+    "max_rot_delta_deg": 0.0,
+    "max_shape_key_delta": 0.0,
+    "hard_cut": false
+   },
+   {
+    "from": "ROOT_AnticipateTired fN",
+    "to": "ROOT_Inhale f0",
+    "max_head_delta_cm": 0.0,
+    "max_rot_delta_deg": 0.0,
+    "max_shape_key_delta": 0.0,
+    "hard_cut": false
+   },
+   {
+    "from": "ROOT_RecoveryIdle fany",
+    "to": "ROOT_AnticipateTired f0",
+    "max_head_delta_cm": 0.44542,
+    "max_rot_delta_deg": 2.2985,
+    "max_shape_key_delta": 0.0,
+    "hard_cut": true
+   },
+   {
+    "from": "ROOT_RecoveryIdle f0",
+    "to": "ROOT_Anticipate f0",
+    "max_head_delta_cm": 1.95521,
+    "max_rot_delta_deg": 42.4622,
+    "max_shape_key_delta": 0.0,
+    "hard_cut": true
+   },
+   {
+    "from": "ROOT_QuietIdle fany",
+    "to": "ROOT_Anticipate f0",
+    "max_head_delta_cm": 0.48077,
+    "max_rot_delta_deg": 4.1313,
+    "max_shape_key_delta": 0.0,
+    "hard_cut": true
+   },
+   {
+    "from": "ROOT_RecoveryIdle fany",
+    "to": "ROOT_Anticipate f0",
+    "max_head_delta_cm": 2.35608,
+    "max_rot_delta_deg": 41.993,
+    "max_shape_key_delta": 0.0,
+    "hard_cut": true
+   },
+   {
+    "from": "SRC_Idle f0",
+    "to": "SRC_Grip f0",
+    "max_head_delta_cm": 0.0,
+    "max_rot_delta_deg": 0.0,
+    "max_shape_key_delta": 0.0,
+    "hard_cut": false
+   },
+   {
+    "from": "SRC_Grip fN",
+    "to": "SRC_Tug f0",
+    "max_head_delta_cm": 0.0,
+    "max_rot_delta_deg": 0.0,
+    "max_shape_key_delta": 0.0,
+    "hard_cut": false
+   },
+   {
+    "from": "SRC_Tug fN",
+    "to": "SRC_Release f0",
+    "max_head_delta_cm": 0.0,
+    "max_rot_delta_deg": 0.0,
+    "max_shape_key_delta": 0.0,
+    "hard_cut": false
+   },
+   {
+    "from": "SRC_Tug fN",
+    "to": "SRC_Cancel f0",
+    "max_head_delta_cm": 0.0,
+    "max_rot_delta_deg": 0.0,
+    "max_shape_key_delta": 0.0,
+    "hard_cut": false
+   },
+   {
+    "from": "SRC_Cancel fN",
+    "to": "SRC_Idle f0",
+    "max_head_delta_cm": 0.0,
+    "max_rot_delta_deg": 0.0,
+    "max_shape_key_delta": 0.0,
+    "hard_cut": false
+   },
+   {
+    "from": "SRC_Release fN",
+    "to": "ROOT_QuietIdle f0",
+    "max_head_delta_cm": 0.0,
+    "max_rot_delta_deg": 0.0,
+    "max_shape_key_delta": 0.0,
+    "hard_cut": false
+   }
+  ],
+  "hands": "the four HANDS_* rows of ANIMATION_MANIFEST.csv are not Blender clips (D-4: FPHands)"
+ },
+ "clips": {
+  "SRC_Idle": {
+   "frames": [
+    0,
+    60
+   ],
+   "samples": 61,
+   "fps": 30,
+   "duration_s": 2.0,
+   "loop": true,
+   "file": "export/anims/ScreamingTurnip_R01_SRC_Idle_Mars_ANIM.fbx",
+   "bytes": 390108,
+   "unreal_path": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_SRC_Idle_Mars_ANIM",
+   "note": "planted (body z -1.8 cm), gentle leaf sway, no mouth",
+   "chain": {},
+   "bounds_cm": {
+    "min": [
+     -18.331,
+     -20.703,
+     -1.8
+    ],
+    "max": [
+     16.812,
+     20.048,
+     47.209
+    ],
+    "h_z": 49.009,
+    "w_y": 40.751,
+    "d_x": 35.143
+   },
+   "intersections_max": {},
+   "curves": [
+    "Inhale",
+    "Scream"
+   ],
+   "curve_peaks": {
+    "Inhale": {
+     "max": 0.0,
+     "frames_at_max": []
+    },
+    "Scream": {
+     "max": 0.0,
+     "frames_at_max": []
+    }
+   },
+   "curve_note": "both curves keyed 0.0 on every frame (a hard cut never inherits a stale value)",
+   "crown_travel_ue_cm": {
+    "crown_z_first_last": [
+     32.85,
+     32.85
+    ],
+    "crown_z_min_max": [
+     32.85,
+     32.85
+    ],
+    "crown_dz": 0.0,
+    "harvest_grip_z_first_last": [
+     36.235,
+     36.235
+    ],
+    "crown_x_first_last": [
+     0.0,
+     0.0
+    ],
+    "crown_dx": 0.0,
+    "harvest_grip_x_first_last": [
+     -1.522,
+     -1.522
+    ],
+    "per_frame": "review/phaseJ/crown_travel.json"
+   }
+  },
+  "SRC_Grip": {
+   "frames": [
+    0,
+    6
+   ],
+   "samples": 7,
+   "fps": 30,
+   "duration_s": 0.2,
+   "loop": false,
+   "file": "export/anims/ScreamingTurnip_R01_SRC_Grip_Mars_ANIM.fbx",
+   "bytes": 330748,
+   "unreal_path": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_SRC_Grip_Mars_ANIM",
+   "note": "stalks compress at the HarvestGrip points",
+   "chain": {
+    "from": [
+     "SRC_Idle",
+     0
+    ]
+   },
+   "bounds_cm": {
+    "min": [
+     -17.69,
+     -20.041,
+     -1.8
+    ],
+    "max": [
+     16.214,
+     20.041,
+     47.475
+    ],
+    "h_z": 49.275,
+    "w_y": 40.082,
+    "d_x": 33.904
+   },
+   "intersections_max": {},
+   "curves": [
+    "Inhale",
+    "Scream"
+   ],
+   "curve_peaks": {
+    "Inhale": {
+     "max": 0.0,
+     "frames_at_max": []
+    },
+    "Scream": {
+     "max": 0.0,
+     "frames_at_max": []
+    }
+   },
+   "curve_note": "both curves keyed 0.0 on every frame (a hard cut never inherits a stale value)",
+   "crown_travel_ue_cm": {
+    "crown_z_first_last": [
+     32.85,
+     31.8
+    ],
+    "crown_z_min_max": [
+     31.8,
+     32.85
+    ],
+    "crown_dz": -1.05,
+    "harvest_grip_z_first_last": [
+     36.235,
+     35.185
+    ],
+    "crown_x_first_last": [
+     0.0,
+     0.0
+    ],
+    "crown_dx": 0.0,
+    "harvest_grip_x_first_last": [
+     -1.522,
+     -1.522
+    ],
+    "per_frame": "review/phaseJ/crown_travel.json"
+   }
+  },
+  "SRC_Tug": {
+   "frames": [
+    0,
+    15
+   ],
+   "samples": 16,
+   "fps": 30,
+   "duration_s": 0.5,
+   "loop": false,
+   "file": "export/anims/ScreamingTurnip_R01_SRC_Tug_Mars_ANIM.fbx",
+   "bytes": 348668,
+   "unreal_path": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_SRC_Tug_Mars_ANIM",
+   "note": "Phase J: lean-and-stretch toward the puller on -X, scrubbed by the walk-away pull (crown head (0, 31.8) -> (-36.0, 42.3) cm UE x/z; the HarvestGrip sockets ride it; the stalks stretch), crown pitched -50 deg toward -X, bulb planted and tilted 8 deg toward -X at 1.04 h / 0.98 w, leaves keep their droop; ends at full strain",
+   "chain": {
+    "from": [
+     "SRC_Grip",
+     6
+    ]
+   },
+   "bounds_cm": {
+    "min": [
+     -57.89,
+     -18.679,
+     -1.8
+    ],
+    "max": [
+     16.165,
+     18.679,
+     61.79
+    ],
+    "h_z": 63.59,
+    "w_y": 37.358,
+    "d_x": 74.055
+   },
+   "intersections_max": {},
+   "curves": [
+    "Inhale",
+    "Scream"
+   ],
+   "curve_peaks": {
+    "Inhale": {
+     "max": 0.0,
+     "frames_at_max": []
+    },
+    "Scream": {
+     "max": 0.0,
+     "frames_at_max": []
+    }
+   },
+   "curve_note": "both curves keyed 0.0 on every frame (a hard cut never inherits a stale value)",
+   "crown_travel_ue_cm": {
+    "crown_z_first_last": [
+     31.8,
+     42.3013
+    ],
+    "crown_z_min_max": [
+     31.8,
+     42.3013
+    ],
+    "crown_dz": 10.5013,
+    "harvest_grip_z_first_last": [
+     35.185,
+     42.8043
+    ],
+    "crown_x_first_last": [
+     0.0,
+     -35.998
+    ],
+    "crown_dx": -35.998,
+    "harvest_grip_x_first_last": [
+     -1.522,
+     -39.6752
+    ],
+    "per_frame": "review/phaseJ/crown_travel.json"
+   }
+  },
+  "SRC_Release": {
+   "frames": [
+    0,
+    6
+   ],
+   "samples": 7,
+   "fps": 30,
+   "duration_s": 0.2,
+   "loop": false,
+   "file": "export/anims/ScreamingTurnip_R01_SRC_Release_Mars_ANIM.fbx",
+   "bytes": 330748,
+   "unreal_path": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_SRC_Release_Mars_ANIM",
+   "note": "elastic break-free from the Phase J strain (crown (-36.0, 42.3) cm x/z): crown springs back, leaves rebound, bulb overshoots to 1.1 h, settles at neutral (== ROOT_QuietIdle f0); root never moves",
+   "chain": {
+    "from": [
+     "SRC_Tug",
+     15
+    ]
+   },
+   "bounds_cm": {
+    "min": [
+     -57.89,
+     -21.32,
+     -1.595
+    ],
+    "max": [
+     19.74,
+     21.32,
+     61.79
+    ],
+    "h_z": 63.385,
+    "w_y": 42.64,
+    "d_x": 77.63
+   },
+   "intersections_max": {},
+   "curves": [
+    "Inhale",
+    "Scream"
+   ],
+   "curve_peaks": {
+    "Inhale": {
+     "max": 0.0,
+     "frames_at_max": []
+    },
+    "Scream": {
+     "max": 0.0,
+     "frames_at_max": []
+    }
+   },
+   "curve_note": "both curves keyed 0.0 on every frame (a hard cut never inherits a stale value)",
+   "crown_travel_ue_cm": {
+    "crown_z_first_last": [
+     42.3013,
+     34.65
+    ],
+    "crown_z_min_max": [
+     33.927,
+     42.3013
+    ],
+    "crown_dz": -7.6513,
+    "harvest_grip_z_first_last": [
+     42.8043,
+     38.035
+    ],
+    "crown_x_first_last": [
+     -35.998,
+     0.0
+    ],
+    "crown_dx": 35.998,
+    "harvest_grip_x_first_last": [
+     -39.6752,
+     -1.522
+    ],
+    "per_frame": "review/phaseJ/crown_travel.json"
+   }
+  },
+  "SRC_Cancel": {
+   "frames": [
+    0,
+    7
+   ],
+   "samples": 8,
+   "fps": 30,
+   "duration_s": 0.2333,
+   "loop": false,
+   "file": "export/anims/ScreamingTurnip_R01_SRC_Cancel_Mars_ANIM.fbx",
+   "bytes": 332732,
+   "unreal_path": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_SRC_Cancel_Mars_ANIM",
+   "note": "full strain (Phase J: crown (-36.0, 42.3) cm x/z) back to the planted rest (crown (0, 32.85) cm)",
+   "chain": {
+    "from": [
+     "SRC_Tug",
+     15
+    ]
+   },
+   "bounds_cm": {
+    "min": [
+     -57.89,
+     -20.041,
+     -1.8
+    ],
+    "max": [
+     16.214,
+     20.041,
+     61.827
+    ],
+    "h_z": 63.627,
+    "w_y": 40.082,
+    "d_x": 74.104
+   },
+   "intersections_max": {},
+   "curves": [
+    "Inhale",
+    "Scream"
+   ],
+   "curve_peaks": {
+    "Inhale": {
+     "max": 0.0,
+     "frames_at_max": []
+    },
+    "Scream": {
+     "max": 0.0,
+     "frames_at_max": []
+    }
+   },
+   "curve_note": "both curves keyed 0.0 on every frame (a hard cut never inherits a stale value)",
+   "crown_travel_ue_cm": {
+    "crown_z_first_last": [
+     42.3013,
+     32.85
+    ],
+    "crown_z_min_max": [
+     32.85,
+     42.3013
+    ],
+    "crown_dz": -9.4513,
+    "harvest_grip_z_first_last": [
+     42.8043,
+     36.235
+    ],
+    "crown_x_first_last": [
+     -35.998,
+     0.0
+    ],
+    "crown_dx": 35.998,
+    "harvest_grip_x_first_last": [
+     -39.6752,
+     -1.522
+    ],
+    "per_frame": "review/phaseJ/crown_travel.json"
+   }
+  },
+  "ROOT_QuietIdle": {
+   "frames": [
+    0,
+    60
+   ],
+   "samples": 61,
+   "fps": 30,
+   "duration_s": 2.0,
+   "loop": true,
+   "file": "export/anims/ScreamingTurnip_R01_ROOT_QuietIdle_Mars_ANIM.fbx",
+   "bytes": 391980,
+   "unreal_path": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_ROOT_QuietIdle_Mars_ANIM",
+   "note": "closed pucker, breath 1.000..1.015 h, relaxed crown",
+   "chain": {},
+   "bounds_cm": {
+    "min": [
+     -18.024,
+     -20.42,
+     0.0
+    ],
+    "max": [
+     16.543,
+     20.044,
+     48.795
+    ],
+    "h_z": 48.795,
+    "w_y": 40.464,
+    "d_x": 34.567
+   },
+   "intersections_max": {},
+   "curves": [
+    "Inhale",
+    "Scream"
+   ],
+   "curve_peaks": {
+    "Inhale": {
+     "max": 0.0,
+     "frames_at_max": []
+    },
+    "Scream": {
+     "max": 0.0,
+     "frames_at_max": []
+    }
+   },
+   "curve_note": "both curves keyed 0.0 on every frame (a hard cut never inherits a stale value)"
+  },
+  "ROOT_Anticipate": {
+   "frames": [
+    0,
+    9
+   ],
+   "samples": 10,
+   "fps": 30,
+   "duration_s": 0.3,
+   "loop": false,
+   "file": "export/anims/ScreamingTurnip_R01_ROOT_Anticipate_Mars_ANIM.fbx",
+   "bytes": 336716,
+   "unreal_path": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_ROOT_Anticipate_Mars_ANIM",
+   "note": "squash 0.9 h / 1.1 w, cheeks begin (1.1), crown lifts",
+   "chain": {
+    "from": [
+     "ROOT_QuietIdle",
+     0
+    ]
+   },
+   "bounds_cm": {
+    "min": [
+     -17.69,
+     -20.041,
+     -0.0
+    ],
+    "max": [
+     16.214,
+     20.041,
+     49.14
+    ],
+    "h_z": 49.14,
+    "w_y": 40.082,
+    "d_x": 33.904
+   },
+   "intersections_max": {},
+   "curves": [
+    "Inhale",
+    "Scream"
+   ],
+   "curve_peaks": {
+    "Inhale": {
+     "max": 0.0,
+     "frames_at_max": []
+    },
+    "Scream": {
+     "max": 0.0,
+     "frames_at_max": []
+    }
+   },
+   "curve_note": "both curves keyed 0.0 on every frame (a hard cut never inherits a stale value)"
+  },
+  "ROOT_AnticipateTired": {
+   "frames": [
+    0,
+    9
+   ],
+   "samples": 10,
+   "fps": 30,
+   "duration_s": 0.3,
+   "loop": false,
+   "file": "export/anims/ScreamingTurnip_R01_ROOT_AnticipateTired_Mars_ANIM.fbx",
+   "bytes": 336716,
+   "unreal_path": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_ROOT_AnticipateTired_Mars_ANIM",
+   "note": "B3 (B-2): ROOT_Anticipate from the tired pose - starts == ROOT_RecoveryIdle f0 (drooped crown), ends == ROOT_Inhale f0; the presentation picks it after the recovery phase",
+   "chain": {
+    "from": [
+     "ROOT_RecoveryIdle",
+     0
+    ]
+   },
+   "bounds_cm": {
+    "min": [
+     -20.803,
+     -21.165,
+     -0.0
+    ],
+    "max": [
+     17.683,
+     21.165,
+     49.14
+    ],
+    "h_z": 49.14,
+    "w_y": 42.33,
+    "d_x": 38.486
+   },
+   "intersections_max": {},
+   "curves": [
+    "Inhale",
+    "Scream"
+   ],
+   "curve_peaks": {
+    "Inhale": {
+     "max": 0.0,
+     "frames_at_max": []
+    },
+    "Scream": {
+     "max": 0.0,
+     "frames_at_max": []
+    }
+   },
+   "curve_note": "both curves keyed 0.0 on every frame (a hard cut never inherits a stale value)"
+  },
+  "ROOT_Inhale": {
+   "frames": [
+    0,
+    36
+   ],
+   "samples": 37,
+   "fps": 30,
+   "duration_s": 1.2,
+   "loop": false,
+   "file": "export/anims/ScreamingTurnip_R01_ROOT_Inhale_Mars_ANIM.fbx",
+   "bytes": 366556,
+   "unreal_path": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_ROOT_Inhale_Mars_ANIM",
+   "note": "cheeks to the full bellows, leaves rise, pursed aperture; holds the last 0.2 s",
+   "chain": {
+    "from": [
+     "ROOT_Anticipate",
+     9
+    ]
+   },
+   "bounds_cm": {
+    "min": [
+     -14.896,
+     -19.348,
+     0.0
+    ],
+    "max": [
+     16.665,
+     19.348,
+     50.622
+    ],
+    "h_z": 50.622,
+    "w_y": 38.696,
+    "d_x": 31.561
+   },
+   "intersections_max": {},
+   "curves": [
+    "Inhale",
+    "Scream"
+   ],
+   "curve_peaks": {
+    "Inhale": {
+     "max": 1.0,
+     "frames_at_max": [
+      30,
+      36
+     ]
+    },
+    "Scream": {
+     "max": 0.0,
+     "frames_at_max": []
+    }
+   },
+   "curve_note": "Inhale eases 0 -> 1, holds 1.0 from f30 to f36 (last 0.2 s)"
+  },
+  "ROOT_Scream": {
+   "frames": [
+    0,
+    18
+   ],
+   "samples": 19,
+   "fps": 30,
+   "duration_s": 0.6,
+   "loop": false,
+   "file": "export/anims/ScreamingTurnip_R01_ROOT_Scream_Mars_ANIM.fbx",
+   "bytes": 349836,
+   "unreal_path": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_ROOT_Scream_Mars_ANIM",
+   "note": "snap to full gape by frame 3, leaves fan + recoil, +-1.5 deg 15 Hz shake",
+   "chain": {
+    "from": [
+     "ROOT_Inhale",
+     36
+    ]
+   },
+   "bounds_cm": {
+    "min": [
+     -20.9,
+     -20.63,
+     0.0
+    ],
+    "max": [
+     20.036,
+     20.63,
+     61.789
+    ],
+    "h_z": 61.789,
+    "w_y": 41.26,
+    "d_x": 40.936
+   },
+   "intersections_max": {},
+   "curves": [
+    "Inhale",
+    "Scream"
+   ],
+   "curve_peaks": {
+    "Inhale": {
+     "max": 1.0,
+     "frames_at_max": [
+      0,
+      0
+     ]
+    },
+    "Scream": {
+     "max": 1.0,
+     "frames_at_max": [
+      3,
+      18
+     ]
+    }
+   },
+   "curve_note": "Inhale 1 -> 0 and Scream 0 -> 1 over f0..f3; Scream holds 1.0 f3..f18"
+  },
+  "ROOT_Recover": {
+   "frames": [
+    0,
+    30
+   ],
+   "samples": 31,
+   "fps": 30,
+   "duration_s": 1.0,
+   "loop": false,
+   "file": "export/anims/ScreamingTurnip_R01_ROOT_Recover_Mars_ANIM.fbx",
+   "bytes": 370076,
+   "unreal_path": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_ROOT_Recover_Mars_ANIM",
+   "note": "deflate, overshoot squash 0.75 h / 1.25 w at 0.27 s, crown slumps; ends == RecoveryIdle f0",
+   "chain": {
+    "from": [
+     "ROOT_Scream",
+     18
+    ],
+    "to": [
+     "ROOT_RecoveryIdle",
+     0
+    ]
+   },
+   "bounds_cm": {
+    "min": [
+     -20.926,
+     -21.152,
+     0.0
+    ],
+    "max": [
+     19.709,
+     21.152,
+     59.574
+    ],
+    "h_z": 59.574,
+    "w_y": 42.304,
+    "d_x": 40.635
+   },
+   "intersections_max": {},
+   "curves": [
+    "Inhale",
+    "Scream"
+   ],
+   "curve_peaks": {
+    "Inhale": {
+     "max": 0.0,
+     "frames_at_max": []
+    },
+    "Scream": {
+     "max": 1.0,
+     "frames_at_max": [
+      0,
+      0
+     ]
+    }
+   },
+   "curve_note": "Scream 1 -> 0 over f0..f8 (jumps the 0.43-0.67 tooth/lip band between f3 and f4); Inhale 0"
+  },
+  "ROOT_RecoveryIdle": {
+   "frames": [
+    0,
+    60
+   ],
+   "samples": 61,
+   "fps": 30,
+   "duration_s": 2.0,
+   "loop": true,
+   "file": "export/anims/ScreamingTurnip_R01_ROOT_RecoveryIdle_Mars_ANIM.fbx",
+   "bytes": 392476,
+   "unreal_path": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_ROOT_RecoveryIdle_Mars_ANIM",
+   "note": "tired breathing 0.97..1.00 h, drooped leaves",
+   "chain": {},
+   "bounds_cm": {
+    "min": [
+     -20.825,
+     -21.152,
+     0.0
+    ],
+    "max": [
+     17.442,
+     21.182,
+     40.593
+    ],
+    "h_z": 40.593,
+    "w_y": 42.334,
+    "d_x": 38.267
+   },
+   "intersections_max": {},
+   "curves": [
+    "Inhale",
+    "Scream"
+   ],
+   "curve_peaks": {
+    "Inhale": {
+     "max": 0.0,
+     "frames_at_max": []
+    },
+    "Scream": {
+     "max": 0.0,
+     "frames_at_max": []
+    }
+   },
+   "curve_note": "both curves keyed 0.0 on every frame (a hard cut never inherits a stale value)"
+  },
+  "ROOT_AirborneLeafTrail": {
+   "frames": [
+    0,
+    30
+   ],
+   "samples": 31,
+   "fps": 30,
+   "duration_s": 1.0,
+   "loop": true,
+   "file": "export/anims/ScreamingTurnip_R01_ROOT_AirborneLeafTrail_Mars_ANIM.fbx",
+   "bytes": 370076,
+   "unreal_path": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_ROOT_AirborneLeafTrail_Mars_ANIM",
+   "note": "crown pitched -X, leaves trail and flutter, face quiet; root never moves",
+   "chain": {},
+   "bounds_cm": {
+    "min": [
+     -21.665,
+     -21.319,
+     0.0
+    ],
+    "max": [
+     16.602,
+     21.053,
+     47.613
+    ],
+    "h_z": 47.613,
+    "w_y": 42.372,
+    "d_x": 38.267
+   },
+   "intersections_max": {},
+   "curves": [
+    "Inhale",
+    "Scream"
+   ],
+   "curve_peaks": {
+    "Inhale": {
+     "max": 0.0,
+     "frames_at_max": []
+    },
+    "Scream": {
+     "max": 0.0,
+     "frames_at_max": []
+    }
+   },
+   "curve_note": "both curves keyed 0.0 on every frame (a hard cut never inherits a stale value)"
+  },
+  "ROOT_ImpactSquash": {
+   "frames": [
+    0,
+    7
+   ],
+   "samples": 8,
+   "fps": 30,
+   "duration_s": 0.2333,
+   "loop": false,
+   "file": "export/anims/ScreamingTurnip_R01_ROOT_ImpactSquash_Mars_ANIM.fbx",
+   "bytes": 332732,
+   "unreal_path": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_ROOT_ImpactSquash_Mars_ANIM",
+   "note": "squash 0.80 h / 1.20 w about the bulb centre, back to neutral",
+   "chain": {},
+   "bounds_cm": {
+    "min": [
+     -20.653,
+     -21.173,
+     0.0
+    ],
+    "max": [
+     17.738,
+     21.173,
+     48.0
+    ],
+    "h_z": 48.0,
+    "w_y": 42.346,
+    "d_x": 38.391
+   },
+   "intersections_max": {},
+   "curves": [
+    "Inhale",
+    "Scream"
+   ],
+   "curve_peaks": {
+    "Inhale": {
+     "max": 0.0,
+     "frames_at_max": []
+    },
+    "Scream": {
+     "max": 0.0,
+     "frames_at_max": []
+    }
+   },
+   "curve_note": "both curves keyed 0.0 on every frame (a hard cut never inherits a stale value)"
+  },
+  "ROOT_SettleRock": {
+   "frames": [
+    0,
+    12
+   ],
+   "samples": 13,
+   "fps": 30,
+   "duration_s": 0.4,
+   "loop": false,
+   "file": "export/anims/ScreamingTurnip_R01_ROOT_SettleRock_Mars_ANIM.fbx",
+   "bytes": 342700,
+   "unreal_path": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_ROOT_SettleRock_Mars_ANIM",
+   "note": "damped leaf recoil (2 oscillations), bulb still, ends neutral",
+   "chain": {},
+   "bounds_cm": {
+    "min": [
+     -19.908,
+     -20.928,
+     0.0
+    ],
+    "max": [
+     17.518,
+     20.928,
+     49.488
+    ],
+    "h_z": 49.488,
+    "w_y": 41.856,
+    "d_x": 37.426
+   },
+   "intersections_max": {},
+   "curves": [
+    "Inhale",
+    "Scream"
+   ],
+   "curve_peaks": {
+    "Inhale": {
+     "max": 0.0,
+     "frames_at_max": []
+    },
+    "Scream": {
+     "max": 0.0,
+     "frames_at_max": []
+    }
+   },
+   "curve_note": "both curves keyed 0.0 on every frame (a hard cut never inherits a stale value)"
+  },
+  "ROOT_PlaceSettle": {
+   "frames": [
+    0,
+    7
+   ],
+   "samples": 8,
+   "fps": 30,
+   "duration_s": 0.2333,
+   "loop": false,
+   "file": "export/anims/ScreamingTurnip_R01_ROOT_PlaceSettle_Mars_ANIM.fbx",
+   "bytes": 332732,
+   "unreal_path": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_ROOT_PlaceSettle_Mars_ANIM",
+   "note": "gentle set-down squash 0.92 h then neutral",
+   "chain": {},
+   "bounds_cm": {
+    "min": [
+     -17.69,
+     -20.041,
+     0.0
+    ],
+    "max": [
+     16.214,
+     20.041,
+     48.0
+    ],
+    "h_z": 48.0,
+    "w_y": 40.082,
+    "d_x": 33.904
+   },
+   "intersections_max": {},
+   "curves": [
+    "Inhale",
+    "Scream"
+   ],
+   "curve_peaks": {
+    "Inhale": {
+     "max": 0.0,
+     "frames_at_max": []
+    },
+    "Scream": {
+     "max": 0.0,
+     "frames_at_max": []
+    }
+   },
+   "curve_note": "both curves keyed 0.0 on every frame (a hard cut never inherits a stale value)"
+  }
+ },
+ "sockets": {
+  "Grip_L": {
+   "bone": "root",
+   "root_relative_ue_cm": [
+    0.0,
+    -11.82,
+    12.0
+   ],
+   "bone_relative_ue_cm": [
+    0.0,
+    -11.82,
+    12.0
+   ],
+   "rotation_ue_deg_pyr": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "note": "lower left flank (bulb surface at z 12); on root so it never inherits expressive body scale (spec section 3)"
+  },
+  "Grip_R": {
+   "bone": "root",
+   "root_relative_ue_cm": [
+    0.0,
+    11.82,
+    12.0
+   ],
+   "bone_relative_ue_cm": [
+    0.0,
+    11.82,
+    12.0
+   ],
+   "rotation_ue_deg_pyr": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "note": "lower right flank; on root (spec section 3)"
+  },
+  "MouthCue": {
+   "bone": "jaw",
+   "root_relative_ue_cm": [
+    12.407,
+    -0.0,
+    19.2
+   ],
+   "bone_relative_ue_cm": [
+    13.907,
+    0.0,
+    6.6
+   ],
+   "rotation_ue_deg_pyr": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "note": "seam centre on the +X face; follows the jaw for sound/VFX"
+  },
+  "SoilLine": {
+   "bone": "body",
+   "root_relative_ue_cm": [
+    0.0,
+    -0.0,
+    28.8
+   ],
+   "bone_relative_ue_cm": [
+    0.0,
+    0.0,
+    8.325
+   ],
+   "rotation_ue_deg_pyr": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "note": "planted soil line; on body so the SRC clips' planted offset (body z -1.8 cm) carries it"
+  },
+  "HarvestGrip_L": {
+   "bone": "crown",
+   "root_relative_ue_cm": [
+    -1.522,
+    -4.683,
+    38.035
+   ],
+   "bone_relative_ue_cm": [
+    -1.522,
+    -4.683,
+    3.385
+   ],
+   "rotation_ue_deg_pyr": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "note": "2.4 cm up the stem of leaf_02 (+Y, turnip left); on crown so it rides the grip dip / tug stretch"
+  },
+  "HarvestGrip_R": {
+   "bone": "crown",
+   "root_relative_ue_cm": [
+    -1.522,
+    4.683,
+    38.035
+   ],
+   "bone_relative_ue_cm": [
+    -1.522,
+    4.683,
+    3.385
+   ],
+   "rotation_ue_deg_pyr": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "note": "2.4 cm up the stem of leaf_04 (-Y); on crown"
+  }
+ },
+ "collision": {
+  "object": "ScreamingTurnip_R01_Collision",
+  "tris": 40,
+  "extents_cm": {
+   "min": [
+    -13.2,
+    -14.85,
+    5.4
+   ],
+   "max": [
+    15.184,
+    14.85,
+    35.1
+   ],
+   "h_z": 29.7,
+   "w_y": 29.7,
+   "d_x": 28.384
+  },
+  "centre_offset_from_root_cm": [
+   0.992,
+   0.0,
+   20.25
+  ],
+  "file": "export/ScreamingTurnip_R01_Collision_Mars_SM.fbx"
+ },
+ "beds": {
+  "TurnipBed_R01": {
+   "tris": 224,
+   "slots": [
+    "Soil"
+   ],
+   "bounds_ue_cm": {
+    "min": [
+     -36.0,
+     -36.0,
+     -10.2
+    ],
+    "max": [
+     36.0,
+     36.0,
+     2.0597
+    ]
+   },
+   "origin": "soil-line centre",
+   "file": "export/TurnipBed_R01_Mars_SM.fbx"
+  },
+  "TurnipBedEmpty_R01": {
+   "tris": 288,
+   "slots": [
+    "Soil"
+   ],
+   "bounds_ue_cm": {
+    "min": [
+     -36.0,
+     -36.0,
+     -10.2
+    ],
+    "max": [
+     36.0,
+     36.0,
+     2.0597
+    ]
+   },
+   "origin": "soil-line centre",
+   "file": "export/TurnipBedEmpty_R01_Mars_SM.fbx"
+  }
+ },
+ "planted": {
+  "body_offset_z_cm": -1.8,
+  "seam_top_z": 20.4,
+  "bulb_top_z": 33.3,
+  "soil_line_z": 28.8,
+  "shoulder_above_soil_cm": 4.5,
+  "taproot_tip_z": -1.8
+ },
+ "export_paths": {
+  "bind": "export/ScreamingTurnip_R01_Mars_SK.fbx",
+  "collision": "export/ScreamingTurnip_R01_Collision_Mars_SM.fbx",
+  "bed": "export/TurnipBed_R01_Mars_SM.fbx",
+  "bed_empty": "export/TurnipBedEmpty_R01_Mars_SM.fbx",
+  "cube": "export/validation/Cube10_Mars_SM.fbx",
+  "anims_dir": "export/anims/"
+ },
+ "unreal_paths": {
+  "skeletal_mesh": "/Game/ArtCandidates/ScreamingTurnip/R01/Meshes/ScreamingTurnip_R01_Mars_SK",
+  "skeleton": "/Game/ArtCandidates/ScreamingTurnip/R01/Meshes/ScreamingTurnip_R01_Mars_SKEL",
+  "animations": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_<Clip>_Mars_ANIM",
+  "animation_list": {
+   "SRC_Idle": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_SRC_Idle_Mars_ANIM",
+   "SRC_Grip": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_SRC_Grip_Mars_ANIM",
+   "SRC_Tug": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_SRC_Tug_Mars_ANIM",
+   "SRC_Release": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_SRC_Release_Mars_ANIM",
+   "SRC_Cancel": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_SRC_Cancel_Mars_ANIM",
+   "ROOT_QuietIdle": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_ROOT_QuietIdle_Mars_ANIM",
+   "ROOT_Anticipate": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_ROOT_Anticipate_Mars_ANIM",
+   "ROOT_AnticipateTired": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_ROOT_AnticipateTired_Mars_ANIM",
+   "ROOT_Inhale": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_ROOT_Inhale_Mars_ANIM",
+   "ROOT_Scream": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_ROOT_Scream_Mars_ANIM",
+   "ROOT_Recover": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_ROOT_Recover_Mars_ANIM",
+   "ROOT_RecoveryIdle": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_ROOT_RecoveryIdle_Mars_ANIM",
+   "ROOT_AirborneLeafTrail": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_ROOT_AirborneLeafTrail_Mars_ANIM",
+   "ROOT_ImpactSquash": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_ROOT_ImpactSquash_Mars_ANIM",
+   "ROOT_SettleRock": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_ROOT_SettleRock_Mars_ANIM",
+   "ROOT_PlaceSettle": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_ROOT_PlaceSettle_Mars_ANIM"
+  },
+  "new_in_b3": {
+   "ROOT_AnticipateTired": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_ROOT_AnticipateTired_Mars_ANIM"
+  },
+  "material": "/Game/ArtCandidates/ScreamingTurnip/R01/Materials/ScreamingTurnip_R01_Mars_M",
+  "material_instances": {
+   "Skin": "/Game/ArtCandidates/ScreamingTurnip/R01/Materials/ScreamingTurnip_R01_Skin_Mars_MI",
+   "Leaf": "/Game/ArtCandidates/ScreamingTurnip/R01/Materials/ScreamingTurnip_R01_Leaf_Mars_MI",
+   "Mouth": "/Game/ArtCandidates/ScreamingTurnip/R01/Materials/ScreamingTurnip_R01_Mouth_Mars_MI",
+   "Teeth": "/Game/ArtCandidates/ScreamingTurnip/R01/Materials/ScreamingTurnip_R01_Teeth_Mars_MI"
+  },
+  "statics": {
+   "TurnipBed_R01": "/Game/ArtCandidates/ScreamingTurnip/R01/Meshes/TurnipBed_R01_Mars_SM",
+   "TurnipBedEmpty_R01": "/Game/ArtCandidates/ScreamingTurnip/R01/Meshes/TurnipBedEmpty_R01_Mars_SM",
+   "ScreamingTurnip_R01_Collision": "/Game/ArtCandidates/ScreamingTurnip/R01/Meshes/ScreamingTurnip_R01_Collision_Mars_SM"
+  }
+ },
+ "phase_c_readback": {
+  "import": {
+   "skeletal_mesh": "export/ScreamingTurnip_R01_Mars_SK.fbx with import_morph_targets=True (the FBX carries BlendShape Inhale / Scream)",
+   "animations": "every export/anims/*.fbx onto the SK's skeleton; replace_existing=True (reimport of the 15 Phase B clips + the new ROOT_AnticipateTired)",
+   "statics": "the three statics, B4 size (hull x -13.200..15.184, beds 72 x 72 cm) replace_existing=True; regenerate the hull's convex element and the beds' box collision",
+   "skeleton": "B4 moves every bone head x3: the reimport MUST update the skeleton reference pose (update_skeleton_reference_pose=True on the stored import data, C2-2) or the SKEL keeps the 16 cm pose; re-assert all six sockets at the B4 positions below (Monolith set_socket_transform, as C2 did for MouthCue)",
+   "bounds_extension": "envelope (63.627 x 42.641 x 77.927) + 6 cm margin (the C2 2 cm x 3)",
+   "normals": "FBXNIM_IMPORT_NORMALS as in Phase C; morph normals are NOT proven: Unreal may recompute them for morph targets (bComputeWeightedNormals / morph normal import) - inspect the scream rim shading in engine"
+  },
+  "assert_on_skeletal_mesh": {
+   "morph_target_names": [
+    "Inhale",
+    "Scream"
+   ],
+   "tris": 3188,
+   "bones": 17,
+   "material_slots": [
+    "Skin",
+    "Leaf",
+    "Mouth",
+    "Teeth"
+   ],
+   "bind_bounds_ue_cm": {
+    "min": [
+     -17.6897,
+     -20.0408,
+     0.0
+    ],
+    "max": [
+     16.2142,
+     20.0408,
+     48.0
+    ]
+   },
+   "bone_heads_ue_cm": {
+    "root": [
+     0.0,
+     -0.0,
+     0.0
+    ],
+    "body": [
+     0.0,
+     -0.0,
+     20.475
+    ],
+    "jaw": [
+     -1.5,
+     -0.0,
+     12.6
+    ],
+    "cheek_l": [
+     4.5,
+     -9.9,
+     19.2
+    ],
+    "cheek_r": [
+     4.5,
+     9.9,
+     19.2
+    ],
+    "crown": [
+     0.0,
+     -0.0,
+     34.65
+    ],
+    "leaf_01_a": [
+     2.7217,
+     -1.9774,
+     36.0
+    ],
+    "leaf_01_b": [
+     3.8289,
+     -2.7819,
+     38.806
+    ],
+    "leaf_02_a": [
+     -1.1286,
+     -3.4735,
+     36.0
+    ],
+    "leaf_02_b": [
+     -1.6169,
+     -4.9764,
+     38.529
+    ],
+    "leaf_03_a": [
+     -3.0223,
+     -0.0,
+     36.0
+    ],
+    "leaf_03_b": [
+     -4.0267,
+     -0.0,
+     39.0913
+    ],
+    "leaf_04_a": [
+     -1.1286,
+     3.4735,
+     36.0
+    ],
+    "leaf_04_b": [
+     -1.6169,
+     4.9764,
+     38.529
+    ],
+    "leaf_05_a": [
+     2.7217,
+     1.9774,
+     36.0
+    ],
+    "leaf_05_b": [
+     3.8289,
+     2.7819,
+     38.806
+    ],
+    "taproot": [
+     0.0,
+     -0.0,
+     5.7
+    ]
+   },
+   "envelope_cm": {
+    "min": [
+     -57.89,
+     -21.32,
+     -1.8
+    ],
+    "max": [
+     20.036,
+     21.32,
+     61.827
+    ],
+    "h_z": 63.627,
+    "w_y": 42.641,
+    "d_x": 77.927
+   },
+   "sockets": {
+    "Grip_L": {
+     "bone": "root",
+     "relative_ue_cm": [
+      0.0,
+      -11.82,
+      12.0
+     ]
+    },
+    "Grip_R": {
+     "bone": "root",
+     "relative_ue_cm": [
+      0.0,
+      11.82,
+      12.0
+     ]
+    },
+    "MouthCue": {
+     "bone": "jaw",
+     "relative_ue_cm": [
+      13.907,
+      0.0,
+      6.6
+     ]
+    },
+    "SoilLine": {
+     "bone": "body",
+     "relative_ue_cm": [
+      0.0,
+      0.0,
+      8.325
+     ]
+    },
+    "HarvestGrip_L": {
+     "bone": "crown",
+     "relative_ue_cm": [
+      -1.522,
+      -4.683,
+      3.385
+     ]
+    },
+    "HarvestGrip_R": {
+     "bone": "crown",
+     "relative_ue_cm": [
+      -1.522,
+      4.683,
+      3.385
+     ]
+    }
+   }
+  },
+  "assert_on_each_anim_sequence": {
+   "get_sequence_info_curve_names": [
+    "Inhale",
+    "Scream"
+   ],
+   "num_keys": {
+    "SRC_Idle": 61,
+    "SRC_Grip": 7,
+    "SRC_Tug": 16,
+    "SRC_Release": 7,
+    "SRC_Cancel": 8,
+    "ROOT_QuietIdle": 61,
+    "ROOT_Anticipate": 10,
+    "ROOT_AnticipateTired": 10,
+    "ROOT_Inhale": 37,
+    "ROOT_Scream": 19,
+    "ROOT_Recover": 31,
+    "ROOT_RecoveryIdle": 61,
+    "ROOT_AirborneLeafTrail": 31,
+    "ROOT_ImpactSquash": 8,
+    "ROOT_SettleRock": 13,
+    "ROOT_PlaceSettle": 8
+   },
+   "curve_peaks": {
+    "SRC_Idle": {
+     "Inhale": {
+      "max": 0.0,
+      "frames_at_max": []
+     },
+     "Scream": {
+      "max": 0.0,
+      "frames_at_max": []
+     }
+    },
+    "SRC_Grip": {
+     "Inhale": {
+      "max": 0.0,
+      "frames_at_max": []
+     },
+     "Scream": {
+      "max": 0.0,
+      "frames_at_max": []
+     }
+    },
+    "SRC_Tug": {
+     "Inhale": {
+      "max": 0.0,
+      "frames_at_max": []
+     },
+     "Scream": {
+      "max": 0.0,
+      "frames_at_max": []
+     }
+    },
+    "SRC_Release": {
+     "Inhale": {
+      "max": 0.0,
+      "frames_at_max": []
+     },
+     "Scream": {
+      "max": 0.0,
+      "frames_at_max": []
+     }
+    },
+    "SRC_Cancel": {
+     "Inhale": {
+      "max": 0.0,
+      "frames_at_max": []
+     },
+     "Scream": {
+      "max": 0.0,
+      "frames_at_max": []
+     }
+    },
+    "ROOT_QuietIdle": {
+     "Inhale": {
+      "max": 0.0,
+      "frames_at_max": []
+     },
+     "Scream": {
+      "max": 0.0,
+      "frames_at_max": []
+     }
+    },
+    "ROOT_Anticipate": {
+     "Inhale": {
+      "max": 0.0,
+      "frames_at_max": []
+     },
+     "Scream": {
+      "max": 0.0,
+      "frames_at_max": []
+     }
+    },
+    "ROOT_AnticipateTired": {
+     "Inhale": {
+      "max": 0.0,
+      "frames_at_max": []
+     },
+     "Scream": {
+      "max": 0.0,
+      "frames_at_max": []
+     }
+    },
+    "ROOT_Inhale": {
+     "Inhale": {
+      "max": 1.0,
+      "frames_at_max": [
+       30,
+       36
+      ]
+     },
+     "Scream": {
+      "max": 0.0,
+      "frames_at_max": []
+     }
+    },
+    "ROOT_Scream": {
+     "Inhale": {
+      "max": 1.0,
+      "frames_at_max": [
+       0,
+       0
+      ]
+     },
+     "Scream": {
+      "max": 1.0,
+      "frames_at_max": [
+       3,
+       18
+      ]
+     }
+    },
+    "ROOT_Recover": {
+     "Inhale": {
+      "max": 0.0,
+      "frames_at_max": []
+     },
+     "Scream": {
+      "max": 1.0,
+      "frames_at_max": [
+       0,
+       0
+      ]
+     }
+    },
+    "ROOT_RecoveryIdle": {
+     "Inhale": {
+      "max": 0.0,
+      "frames_at_max": []
+     },
+     "Scream": {
+      "max": 0.0,
+      "frames_at_max": []
+     }
+    },
+    "ROOT_AirborneLeafTrail": {
+     "Inhale": {
+      "max": 0.0,
+      "frames_at_max": []
+     },
+     "Scream": {
+      "max": 0.0,
+      "frames_at_max": []
+     }
+    },
+    "ROOT_ImpactSquash": {
+     "Inhale": {
+      "max": 0.0,
+      "frames_at_max": []
+     },
+     "Scream": {
+      "max": 0.0,
+      "frames_at_max": []
+     }
+    },
+    "ROOT_SettleRock": {
+     "Inhale": {
+      "max": 0.0,
+      "frames_at_max": []
+     },
+     "Scream": {
+      "max": 0.0,
+      "frames_at_max": []
+     }
+    },
+    "ROOT_PlaceSettle": {
+     "Inhale": {
+      "max": 0.0,
+      "frames_at_max": []
+     },
+     "Scream": {
+      "max": 0.0,
+      "frames_at_max": []
+     }
+    }
+   },
+   "explicit": {
+    "ROOT_Inhale": "Inhale == 1.0 at the last key (f36) and f30..f36",
+    "ROOT_Scream": "Scream == 1.0 at f3..f18, Inhale == 0.0 from f3",
+    "ROOT_Recover": "Scream 1.0 at f0, 0.0 from f8",
+    "others": "Inhale and Scream curves present and 0.0 on every key"
+   }
+  },
+  "assert_on_statics": {
+   "TurnipBed_R01": {
+    "tris": 224,
+    "bounds_ue_cm": {
+     "min": [
+      -36.0,
+      -36.0,
+      -10.2
+     ],
+     "max": [
+      36.0,
+      36.0,
+      2.0597
+     ]
+    }
+   },
+   "TurnipBedEmpty_R01": {
+    "tris": 288,
+    "bounds_ue_cm": {
+     "min": [
+      -36.0,
+      -36.0,
+      -10.2
+     ],
+     "max": [
+      36.0,
+      36.0,
+      2.0597
+     ]
+    }
+   },
+   "ScreamingTurnip_R01_Collision": {
+    "tris": 40,
+    "bounds_ue_cm": {
+     "min": [
+      -13.2,
+      -14.85,
+      5.4
+     ],
+     "max": [
+      15.1839,
+      14.85,
+      35.1
+     ]
+    }
+   }
+  },
+  "hull_sockets": {
+   "Grip_L": [
+    0.0,
+    -11.82,
+    12.0
+   ],
+   "Grip_R": [
+    0.0,
+    11.82,
+    12.0
+   ]
+  },
+  "cuts": {
+   "ROOT_RecoveryIdle f0 -> ROOT_AnticipateTired f0": [
+    0.0,
+    0.0
+   ],
+   "ROOT_RecoveryIdle fany -> ROOT_AnticipateTired f0": [
+    0.44542,
+    2.2985
+   ],
+   "ROOT_RecoveryIdle f0 -> ROOT_Anticipate f0": [
+    1.95521,
+    42.4622
+   ],
+   "ROOT_QuietIdle fany -> ROOT_Anticipate f0": [
+    0.48077,
+    4.1313
+   ],
+   "ROOT_RecoveryIdle fany -> ROOT_Anticipate f0": [
+    2.35608,
+    41.993
+   ]
+  },
+  "cut_gate_note": "chain joints stay 0; the RecoveryIdle f0 -> AnticipateTired f0 gate stays <= 0.1 cm / 1 deg; landmark tolerance per frame 0.02 cm (C2) is now 3x stricter relative to the asset",
+  "playback": "single-node PlayAnimation of ROOT_Scream in the review room drives the morph (the gape opens into the rolled rim); compare a capture to review/phaseB4/clips/ROOT_Scream_sheet.png",
+  "not_proven_in_blender": [
+   "Unreal morph-target import of these FBX files",
+   "morph normals",
+   "curve -> morph binding at runtime"
+  ]
+ },
+ "gameplay_numbers": {
+  "frame": "Unreal cm (x, -y, z) from the skeletal mesh root (the taproot tip); the item's proxy pivot == that root",
+  "scale_factor": 3.0,
+  "k_GripLocation_R": [
+   0.0,
+   -11.82,
+   12.0
+  ],
+  "k_GripLocation_L": [
+   0.0,
+   11.82,
+   12.0
+  ],
+  "grip_note": "R takes the root's -Y flank landmark (its Grip_L), L the +Y one, as now (k_GripRotation yaw 180 unchanged); was (0, -/+3.94, 4.0). The grips are now 23.64 cm apart (was 7.88): check the Cradle glove layout spreads that wide",
+  "hull_centre_offset_from_root": [
+   0.992,
+   0.0,
+   20.25
+  ],
+  "hull_centre_note": "bounds centre of the collision hull; x is 0.992 (not 0) because the hull's +X half is widened over the lip crest (B2b); comment in constants_screaming_turnip_assets says 6.75 -> 20.25",
+  "hull_extents": {
+   "h_z": 29.7,
+   "w_y": 29.7,
+   "d_x": 28.384
+  },
+  "k_PlantedOffset": [
+   0.0,
+   0.0,
+   -28.8
+  ],
+  "bed": {
+   "outer_size_cm": [
+    72.0,
+    72.0,
+    12.26
+   ],
+   "top_z_above_soil_line": 2.0597,
+   "bottom_z": -10.2,
+   "pivot": "soil-line centre (unchanged)"
+  },
+  "k_ReleasePointOffset_suggestion": [
+   0.0,
+   0.0,
+   60.0
+  ],
+  "release_note": "bed centre + 60 cm (was + 20): the hop starts with the 48.0 cm root's base clear of the 2.06 cm bed top. ReleaseLaunch / ReleaseSpinDeg / the bed probe (30, 30, 20) half extents are not re-derived here: the probe box is now smaller than the 72 cm bed (judge in Phase H)",
+  "HeldOffset_location": [
+   14.661,
+   0.0,
+   -25.5
+  ],
+  "HeldOffset_rotation": [
+   0.0,
+   180.0,
+   0.0
+  ],
+  "held_note": "B3 HeldOffset (14, 0, -12) yaw 180 put the hull centre at [13.669, 0.0, -5.25] in the hand frame (root + yaw180([0.331, -0.0, 6.75])); the B4 root goes at [14.661, 0.0, -25.5] so the hull centre stays there. With the brief's x-free centre (0, 0, 20.25) the value is (14, 0, -25.50)",
+  "hull_bounding_radius": 15.018,
+  "PickupProbeRadius_suggestion": 21.0,
+  "pickup_note": "hull bounding radius from its centre 15.02 + 5 cm margin, rounded up (B3 radius would be 5.01). Only used when the item has no Mesh (Mars_WorldItem_Utils.as:391 / :406): the proxy hull's bounds drive the probe otherwise",
+  "k_StretchTravelCm": 38.2,
+  "stretch_note": "Phase J walk-away pull: the horizontal (UE XY) travel of the HarvestGrip_R / _L sockets from SRC_Tug f0 (== SRC_Grip f6, the grip) to SRC_Tug f15 (full strain), {'HarvestGrip_R': 38.1532, 'HarvestGrip_L': 38.1532} cm, rounded to 0.1; the crown head moves (dx, dz) = [-35.998, 10.5013] cm toward the mesh's -X. The bed's Walk control uses it as WalkCm, so the sockets travel toward the player by the ground the player gains. Per frame: review/phaseJ/crown_travel.json"
+ }
+}

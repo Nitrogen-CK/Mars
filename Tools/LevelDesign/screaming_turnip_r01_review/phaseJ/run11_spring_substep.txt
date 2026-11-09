@@ -1,0 +1,8 @@
+state: alpha 0.2952 velocity 2.346 /s, pull 0.7821
+frame dt 0.0167 s (capped 0.0167, 5 substeps): alpha 0.3477
+frame dt 0.0500 s (capped 0.0500, 12 substeps): alpha 0.4730
+frame dt 0.0700 s (capped 0.0700, 17 substeps): alpha 0.5396
+frame dt 0.0800 s (capped 0.0800, 20 substeps): alpha 0.5688
+frame dt 0.0955 s (capped 0.0955, 23 substeps): alpha 0.6087
+frame dt 0.1000 s (capped 0.1000, 24 substeps): alpha 0.6190
+frame dt 0.3000 s (capped 0.1000, 24 substeps): alpha 0.6190

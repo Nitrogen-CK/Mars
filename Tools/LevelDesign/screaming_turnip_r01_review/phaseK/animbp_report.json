@@ -1,0 +1,758 @@
+{
+ "error": null,
+ "abp": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2",
+ "ground": {
+  "project": "D:/Repositories/CkRepos/Orion/Mars.uproject",
+  "pie": false,
+  "parent": "/Script/Angelscript.Mars_ScreamingTurnip_AnimInstance",
+  "props": {
+   "Sequence": "NoneType",
+   "ClipTime": "float",
+   "CrownOffset": "Vector"
+  },
+  "target_in_memory": false,
+  "skeleton": true,
+  "dirty": []
+ },
+ "build": {
+  "nodes": {
+   "seq": "AnimGraphNode_SequenceEvaluator_1",
+   "l2c": "AnimGraphNode_LocalToComponentSpace_1",
+   "modify": "AnimGraphNode_ModifyBone_1",
+   "c2l": "AnimGraphNode_ComponentToLocalSpace_1"
+  },
+  "props": {
+   "seq.bShouldLoop": {
+    "asset_path": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2",
+    "node_id": "AnimGraphNode_SequenceEvaluator_1",
+    "property_path": "bShouldLoop",
+    "old_value": "True",
+    "new_value": "False",
+    "resolved_graph_path": "AnimGraph"
+   },
+   "seq.ReinitializationBehavior": {
+    "asset_path": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2",
+    "node_id": "AnimGraphNode_SequenceEvaluator_1",
+    "property_path": "ReinitializationBehavior",
+    "old_value": "ExplicitTime",
+    "new_value": "NoReset",
+    "resolved_graph_path": "AnimGraph"
+   },
+   "modify.TranslationMode": {
+    "asset_path": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2",
+    "node_id": "AnimGraphNode_ModifyBone_1",
+    "property_path": "TranslationMode",
+    "old_value": "BMM_Ignore",
+    "new_value": "BMM_Additive",
+    "resolved_graph_path": "AnimGraph"
+   },
+   "modify.TranslationSpace": {
+    "asset_path": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2",
+    "node_id": "AnimGraphNode_ModifyBone_1",
+    "property_path": "TranslationSpace",
+    "old_value": "BCS_ComponentSpace",
+    "new_value": "BCS_ComponentSpace",
+    "resolved_graph_path": "AnimGraph"
+   },
+   "modify.RotationMode": {
+    "asset_path": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2",
+    "node_id": "AnimGraphNode_ModifyBone_1",
+    "property_path": "RotationMode",
+    "old_value": "BMM_Ignore",
+    "new_value": "BMM_Ignore",
+    "resolved_graph_path": "AnimGraph"
+   },
+   "modify.ScaleMode": {
+    "asset_path": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2",
+    "node_id": "AnimGraphNode_ModifyBone_1",
+    "property_path": "ScaleMode",
+    "old_value": "BMM_Ignore",
+    "new_value": "BMM_Ignore",
+    "resolved_graph_path": "AnimGraph"
+   },
+   "modify.Alpha": {
+    "asset_path": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2",
+    "node_id": "AnimGraphNode_ModifyBone_1",
+    "property_path": "Alpha",
+    "old_value": "1.000000",
+    "new_value": "1.000000",
+    "resolved_graph_path": "AnimGraph"
+   }
+  },
+  "bindings": {
+   "seq.Sequence": {
+    "asset_path": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2",
+    "node_id": "AnimGraphNode_SequenceEvaluator_1",
+    "pin": "Sequence",
+    "cleared": false,
+    "path": [
+     "Sequence"
+    ],
+    "recompiled": true
+   },
+   "seq.ExplicitTime": {
+    "asset_path": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2",
+    "node_id": "AnimGraphNode_SequenceEvaluator_1",
+    "pin": "ExplicitTime",
+    "cleared": false,
+    "path": [
+     "ClipTime"
+    ],
+    "recompiled": true
+   },
+   "modify.Translation": {
+    "asset_path": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2",
+    "node_id": "AnimGraphNode_ModifyBone_1",
+    "pin": "Translation",
+    "cleared": false,
+    "path": [
+     "CrownOffset"
+    ],
+    "recompiled": true
+   }
+  },
+  "wires": {
+   "seq->l2c": {
+    "asset_path": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2",
+    "source_node": "AnimGraphNode_SequenceEvaluator_1",
+    "source_pin": "Pose",
+    "target_node": "AnimGraphNode_LocalToComponentSpace_1",
+    "target_pin": "LocalPose",
+    "compiled": false
+   },
+   "l2c->modify": {
+    "asset_path": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2",
+    "source_node": "AnimGraphNode_LocalToComponentSpace_1",
+    "source_pin": "ComponentPose",
+    "target_node": "AnimGraphNode_ModifyBone_1",
+    "target_pin": "ComponentPose",
+    "compiled": false
+   },
+   "modify->c2l": {
+    "asset_path": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2",
+    "source_node": "AnimGraphNode_ModifyBone_1",
+    "source_pin": "Pose",
+    "target_node": "AnimGraphNode_ComponentToLocalSpace_1",
+    "target_pin": "ComponentPose",
+    "compiled": false
+   },
+   "c2l->output": {
+    "asset_path": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2",
+    "graph_name": "AnimGraph",
+    "root_node": "AnimGraphNode_Root_0",
+    "source_node": "AnimGraphNode_ComponentToLocalSpace_1",
+    "source_pin": "Pose",
+    "unchanged": false,
+    "saved": false
+   }
+  },
+  "layout": {
+   "asset_path": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2",
+   "graph": "AnimGraph",
+   "nodes_formatted": 5,
+   "formatter_used": "builtin"
+  }
+ },
+ "readback": {
+  "abp_info": {
+   "asset_path": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2",
+   "skeleton": "/Game/ArtCandidates/ScreamingTurnip/R01/Meshes/ScreamingTurnip_R01_Mars_SKEL.ScreamingTurnip_R01_Mars_SKEL",
+   "target_skeleton": "/Game/ArtCandidates/ScreamingTurnip/R01/Meshes/ScreamingTurnip_R01_Mars_SKEL.ScreamingTurnip_R01_Mars_SKEL",
+   "parent_class": "Mars_ScreamingTurnip_AnimInstance",
+   "state_machine_count": 0,
+   "graph_count": 2,
+   "graphs": [
+    "AnimGraph",
+    "EventGraph"
+   ],
+   "variable_count": 0,
+   "interfaces": []
+  },
+  "nodes": {
+   "asset_path": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2",
+   "graph_name": "AnimGraph",
+   "nodes": [
+    {
+     "class": "AnimGraphNode_Root",
+     "name": "AnimGraphNode_Root_0",
+     "title": "Output Pose\nAnimGraph",
+     "graph": "AnimGraph",
+     "connected_pins": [
+      {
+       "name": "Result",
+       "direction": "Input",
+       "connections": 1
+      }
+     ]
+    },
+    {
+     "class": "AnimGraphNode_SequenceEvaluator",
+     "name": "AnimGraphNode_SequenceEvaluator_1",
+     "title": "Sequence Evaluator (by time)",
+     "graph": "AnimGraph",
+     "connected_pins": [
+      {
+       "name": "Pose",
+       "direction": "Output",
+       "connections": 1
+      }
+     ],
+     "pin_bindings": [
+      {
+       "pin": "Sequence",
+       "path": [
+        "Sequence"
+       ]
+      },
+      {
+       "pin": "ExplicitTime",
+       "path": [
+        "ClipTime"
+       ]
+      }
+     ]
+    },
+    {
+     "class": "AnimGraphNode_LocalToComponentSpace",
+     "name": "AnimGraphNode_LocalToComponentSpace_1",
+     "title": "Local To Component",
+     "graph": "AnimGraph",
+     "connected_pins": [
+      {
+       "name": "LocalPose",
+       "direction": "Input",
+       "connections": 1
+      },
+      {
+       "name": "ComponentPose",
+       "direction": "Output",
+       "connections": 1
+      }
+     ]
+    },
+    {
+     "class": "AnimGraphNode_ModifyBone",
+     "name": "AnimGraphNode_ModifyBone_1",
+     "title": "Transform (Modify) Bone\nBone: crown",
+     "graph": "AnimGraph",
+     "connected_pins": [
+      {
+       "name": "ComponentPose",
+       "direction": "Input",
+       "connections": 1
+      },
+      {
+       "name": "Pose",
+       "direction": "Output",
+       "connections": 1
+      }
+     ],
+     "pin_bindings": [
+      {
+       "pin": "Translation",
+       "path": [
+        "CrownOffset"
+       ]
+      }
+     ]
+    },
+    {
+     "class": "AnimGraphNode_ComponentToLocalSpace",
+     "name": "AnimGraphNode_ComponentToLocalSpace_1",
+     "title": "Component To Local",
+     "graph": "AnimGraph",
+     "connected_pins": [
+      {
+       "name": "ComponentPose",
+       "direction": "Input",
+       "connections": 1
+      },
+      {
+       "name": "Pose",
+       "direction": "Output",
+       "connections": 1
+      }
+     ]
+    }
+   ],
+   "count": 5
+  },
+  "pin_bindings": {
+   "asset_path": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2",
+   "nodes": [
+    {
+     "node_id": "AnimGraphNode_Root_0",
+     "node_guid": "0E1927CA474E7682FBB7C3838B78EED5",
+     "class": "AnimGraphNode_Root",
+     "title": "Output Pose\nAnimGraph",
+     "graph": "AnimGraph",
+     "pin_bindings": [
+      {
+       "pin": "Result",
+       "type": "Link",
+       "source_node_id": "AnimGraphNode_ComponentToLocalSpace_1",
+       "source_pin": "Pose"
+      }
+     ],
+     "linked_pin_count": 1
+    },
+    {
+     "node_id": "AnimGraphNode_SequenceEvaluator_1",
+     "node_guid": "3661048042BE1F2D81806F869A434CA6",
+     "class": "AnimGraphNode_SequenceEvaluator",
+     "title": "Sequence Evaluator (by time)",
+     "graph": "AnimGraph",
+     "pin_bindings": [
+      {
+       "pin": "Sequence",
+       "path": [
+        "Sequence"
+       ],
+       "type": "Property",
+       "is_bound": true
+      },
+      {
+       "pin": "ExplicitTime",
+       "path": [
+        "ClipTime"
+       ],
+       "type": "Property",
+       "is_bound": true
+      }
+     ],
+     "linked_pin_count": 0
+    },
+    {
+     "node_id": "AnimGraphNode_LocalToComponentSpace_1",
+     "node_guid": "326B19F644F7E596199B1AAADE84E8BA",
+     "class": "AnimGraphNode_LocalToComponentSpace",
+     "title": "Local To Component",
+     "graph": "AnimGraph",
+     "pin_bindings": [
+      {
+       "pin": "LocalPose",
+       "type": "Link",
+       "source_node_id": "AnimGraphNode_SequenceEvaluator_1",
+       "source_pin": "Pose"
+      }
+     ],
+     "linked_pin_count": 1
+    },
+    {
+     "node_id": "AnimGraphNode_ModifyBone_1",
+     "node_guid": "AB37BEBF4FC9B4EA398FCB82B536F5C0",
+     "class": "AnimGraphNode_ModifyBone",
+     "title": "Transform (Modify) Bone\nBone: crown",
+     "graph": "AnimGraph",
+     "pin_bindings": [
+      {
+       "pin": "Translation",
+       "path": [
+        "CrownOffset"
+       ],
+       "type": "Property",
+       "is_bound": true
+      },
+      {
+       "pin": "ComponentPose",
+       "type": "Link",
+       "source_node_id": "AnimGraphNode_LocalToComponentSpace_1",
+       "source_pin": "ComponentPose"
+      }
+     ],
+     "linked_pin_count": 1
+    },
+    {
+     "node_id": "AnimGraphNode_ComponentToLocalSpace_1",
+     "node_guid": "00B3EFDE4E83876417C57FBC6DB89C11",
+     "class": "AnimGraphNode_ComponentToLocalSpace",
+     "title": "Component To Local",
+     "graph": "AnimGraph",
+     "pin_bindings": [
+      {
+       "pin": "ComponentPose",
+       "type": "Link",
+       "source_node_id": "AnimGraphNode_ModifyBone_1",
+       "source_pin": "Pose"
+      }
+     ],
+     "linked_pin_count": 1
+    }
+   ],
+   "count": 5
+  },
+  "output": {
+   "abp_path": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2",
+   "graph_name": "AnimGraph",
+   "root_node": "AnimGraphNode_Root_0",
+   "output_connected": true,
+   "source_node": "AnimGraphNode_ComponentToLocalSpace_1",
+   "source_pin": "Pose"
+  }
+ },
+ "graph_fails": [],
+ "compile": {
+  "generated": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2.ScreamingTurnip_R01_Mars_ABP_v2_C",
+  "skeleton": "/Game/ArtCandidates/ScreamingTurnip/R01/Meshes/ScreamingTurnip_R01_Mars_SKEL.ScreamingTurnip_R01_Mars_SKEL"
+ },
+ "errored_blueprints": {
+  "count": 1,
+  "blueprints": [
+   {
+    "name": "ScreamingTurnip_R01_Mars_ABP",
+    "path": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP.ScreamingTurnip_R01_Mars_ABP"
+   }
+  ]
+ },
+ "compile_ok": true,
+ "save": {
+  "saved": true,
+  "dirty_after": []
+ },
+ "ok": true,
+ "calls": [
+  {
+   "tool": "editor_query",
+   "action": "run_python",
+   "params": {
+    "command": "\nimport unreal, json\nproj = unreal.Paths.convert_relative_path_to_full(unreal.Paths.get_project_file_path())\npie = unreal.get_editor_subsystem(unreal.UnrealEditorSubsystem).get_game_world() is not None\ncls = unreal.load_class(None, '/Script/Angelscript.Mars_ScreamingTurnip_AnimInstance')\nea = unreal.EditorAssetLibrary\ndirty = [str(x.get_name()) for x in unreal.EditorLoadingAndSavingUtils.get_dirty_content_packages()] + \\\n        [str(x.get_name()) for x in unreal.EditorLoadingAndSavingUtils.get_dirty_map_packages()]\nprops = {}\nif cls:\n    cdo = unreal.get_default_object(cls)\n    for p in (\"Sequence\", \"ClipTime\", \"CrownOffset\"):\n        try:\n            props[p] = str(type(cdo.get_editor_property(p)).__name__)\n        except Exception as e:\n            props[p] = \"error: \" + str(e)[:80]\nprint(\"RESULT:\" + json.dumps({\"project\": proj, \"pie\": pie, \"parent\": cls.get_path_name() if cls else None, \"props\": props,\n                              \"target_in_memory\": ea.does_asset_exist('/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2'), \"skeleton\": ea.does_asset_exist('/Game/ArtCandidates/ScreamingTurnip/R01/Meshes/ScreamingTurnip_R01_Mars_SKEL'),\n                              \"dirty\": dirty}))\n",
+    "unattended": true
+   },
+   "ok": true,
+   "answer": "{\"ok\":true,\"success\":true,\"mode\":\"execute_file\",\"result\":\"None\",\"output\":[{\"type\":\"info\",\"output\":\"RESULT:{\\\"project\\\": \\\"D:/Repositories/CkRepos/Orion/Mars.uproject\\\", \\\"pie\\\": false, \\\"parent\\\": \\\"/Script/Angelscript.Mars_ScreamingTurnip_AnimInstance\\\", \\\"props\\\": {\\\"Sequence\\\": \\\"NoneType\\\", \\\"ClipTime\\\": \\\"float\\\", \\\"CrownOffset\\\": \\\"Vector\\\"}, \\\"target_in_memory\\\": false, \\\"skeleton\\\": true, "
+  },
+  {
+   "tool": "animation_query",
+   "action": "create_anim_blueprint",
+   "params": {
+    "asset_path": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2",
+    "skeleton_path": "/Game/ArtCandidates/ScreamingTurnip/R01/Meshes/ScreamingTurnip_R01_Mars_SKEL",
+    "parent_class": "/Script/Angelscript.Mars_ScreamingTurnip_AnimInstance"
+   },
+   "ok": true,
+   "answer": "{\"asset_path\":\"/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2.ScreamingTurnip_R01_Mars_ABP_v2\",\"asset_name\":\"ScreamingTurnip_R01_Mars_ABP_v2\",\"skeleton\":\"/Game/ArtCandidates/ScreamingTurnip/R01/Meshes/ScreamingTurnip_R01_Mars_SKEL.ScreamingTurnip_R01_Mars_SKEL\",\"parent_class\":\"Mars_ScreamingTurnip_AnimInstance\",\"generated_class\":\"/Game/ArtCandidates/ScreamingTurn"
+  },
+  {
+   "tool": "animation_query",
+   "action": "add_anim_graph_node",
+   "params": {
+    "asset_path": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2",
+    "node_class": "/Script/AnimGraph.AnimGraphNode_SequenceEvaluator",
+    "expose_pins": [
+     "Sequence"
+    ],
+    "position_x": -900,
+    "position_y": 0
+   },
+   "ok": true,
+   "answer": "{\"node_name\":\"AnimGraphNode_SequenceEvaluator_1\",\"node_class\":\"AnimGraphNode_SequenceEvaluator\",\"node_class_path\":\"/Script/AnimGraph.AnimGraphNode_SequenceEvaluator\",\"node_guid\":\"3661048042BE1F2D81806F869A434CA6\",\"position_x\":-912,\"position_y\":0,\"pins\":[{\"name\":\"Sequence\",\"direction\":\"Input\",\"is_pose\":false,\"is_connected\":false,\"type\":\"object\"},{\"name\":\"ExplicitTime\",\"direction\":\"Input\",\"is_pose\":"
+  },
+  {
+   "tool": "animation_query",
+   "action": "add_anim_graph_node",
+   "params": {
+    "asset_path": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2",
+    "node_type": "LocalToComponentSpace",
+    "position_x": -600,
+    "position_y": 0
+   },
+   "ok": true,
+   "answer": "{\"node_name\":\"AnimGraphNode_LocalToComponentSpace_1\",\"node_class\":\"AnimGraphNode_LocalToComponentSpace\",\"node_class_path\":\"/Script/AnimGraph.AnimGraphNode_LocalToComponentSpace\",\"node_guid\":\"326B19F644F7E596199B1AAADE84E8BA\",\"position_x\":-608,\"position_y\":0,\"pins\":[{\"name\":\"LocalPose\",\"direction\":\"Input\",\"is_pose\":true,\"is_connected\":false,\"type\":\"struct\"},{\"name\":\"ComponentPose\",\"direction\":\"Outp"
+  },
+  {
+   "tool": "animation_query",
+   "action": "add_anim_graph_node",
+   "params": {
+    "asset_path": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2",
+    "node_type": "ModifyBone",
+    "bone_to_modify": "crown",
+    "expose_pins": [
+     "Translation"
+    ],
+    "position_x": -300,
+    "position_y": 0
+   },
+   "ok": true,
+   "answer": "{\"node_name\":\"AnimGraphNode_ModifyBone_1\",\"node_class\":\"AnimGraphNode_ModifyBone\",\"node_class_path\":\"/Script/AnimGraph.AnimGraphNode_ModifyBone\",\"node_guid\":\"AB37BEBF4FC9B4EA398FCB82B536F5C0\",\"position_x\":-304,\"position_y\":0,\"pins\":[{\"name\":\"ComponentPose\",\"direction\":\"Input\",\"is_pose\":true,\"is_connected\":false,\"type\":\"struct\"},{\"name\":\"bAlphaBoolEnabled\",\"direction\":\"Input\",\"is_pose\":false,\"is_co"
+  },
+  {
+   "tool": "animation_query",
+   "action": "add_anim_graph_node",
+   "params": {
+    "asset_path": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2",
+    "node_type": "ComponentToLocalSpace",
+    "position_x": 0,
+    "position_y": 0
+   },
+   "ok": true,
+   "answer": "{\"node_name\":\"AnimGraphNode_ComponentToLocalSpace_1\",\"node_class\":\"AnimGraphNode_ComponentToLocalSpace\",\"node_class_path\":\"/Script/AnimGraph.AnimGraphNode_ComponentToLocalSpace\",\"node_guid\":\"00B3EFDE4E83876417C57FBC6DB89C11\",\"position_x\":0,\"position_y\":0,\"pins\":[{\"name\":\"ComponentPose\",\"direction\":\"Input\",\"is_pose\":true,\"is_connected\":false,\"type\":\"struct\"},{\"name\":\"Pose\",\"direction\":\"Output\",\"is_"
+  },
+  {
+   "tool": "animation_query",
+   "action": "set_anim_graph_node_property",
+   "params": {
+    "asset_path": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2",
+    "node_id": "AnimGraphNode_SequenceEvaluator_1",
+    "graph_name": "AnimGraph",
+    "property_path": "bShouldLoop",
+    "value": "False"
+   },
+   "ok": true,
+   "answer": "{\"asset_path\":\"/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2\",\"node_id\":\"AnimGraphNode_SequenceEvaluator_1\",\"property_path\":\"bShouldLoop\",\"old_value\":\"True\",\"new_value\":\"False\",\"resolved_graph_path\":\"AnimGraph\"}"
+  },
+  {
+   "tool": "animation_query",
+   "action": "set_anim_graph_node_property",
+   "params": {
+    "asset_path": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2",
+    "node_id": "AnimGraphNode_SequenceEvaluator_1",
+    "graph_name": "AnimGraph",
+    "property_path": "ReinitializationBehavior",
+    "value": "NoReset"
+   },
+   "ok": true,
+   "answer": "{\"asset_path\":\"/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2\",\"node_id\":\"AnimGraphNode_SequenceEvaluator_1\",\"property_path\":\"ReinitializationBehavior\",\"old_value\":\"ExplicitTime\",\"new_value\":\"NoReset\",\"resolved_graph_path\":\"AnimGraph\"}"
+  },
+  {
+   "tool": "animation_query",
+   "action": "set_anim_graph_node_property",
+   "params": {
+    "asset_path": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2",
+    "node_id": "AnimGraphNode_ModifyBone_1",
+    "graph_name": "AnimGraph",
+    "property_path": "TranslationMode",
+    "value": "BMM_Additive"
+   },
+   "ok": true,
+   "answer": "{\"asset_path\":\"/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2\",\"node_id\":\"AnimGraphNode_ModifyBone_1\",\"property_path\":\"TranslationMode\",\"old_value\":\"BMM_Ignore\",\"new_value\":\"BMM_Additive\",\"resolved_graph_path\":\"AnimGraph\"}"
+  },
+  {
+   "tool": "animation_query",
+   "action": "set_anim_graph_node_property",
+   "params": {
+    "asset_path": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2",
+    "node_id": "AnimGraphNode_ModifyBone_1",
+    "graph_name": "AnimGraph",
+    "property_path": "TranslationSpace",
+    "value": "BCS_ComponentSpace"
+   },
+   "ok": true,
+   "answer": "{\"asset_path\":\"/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2\",\"node_id\":\"AnimGraphNode_ModifyBone_1\",\"property_path\":\"TranslationSpace\",\"old_value\":\"BCS_ComponentSpace\",\"new_value\":\"BCS_ComponentSpace\",\"resolved_graph_path\":\"AnimGraph\"}"
+  },
+  {
+   "tool": "animation_query",
+   "action": "set_anim_graph_node_property",
+   "params": {
+    "asset_path": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2",
+    "node_id": "AnimGraphNode_ModifyBone_1",
+    "graph_name": "AnimGraph",
+    "property_path": "RotationMode",
+    "value": "BMM_Ignore"
+   },
+   "ok": true,
+   "answer": "{\"asset_path\":\"/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2\",\"node_id\":\"AnimGraphNode_ModifyBone_1\",\"property_path\":\"RotationMode\",\"old_value\":\"BMM_Ignore\",\"new_value\":\"BMM_Ignore\",\"resolved_graph_path\":\"AnimGraph\"}"
+  },
+  {
+   "tool": "animation_query",
+   "action": "set_anim_graph_node_property",
+   "params": {
+    "asset_path": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2",
+    "node_id": "AnimGraphNode_ModifyBone_1",
+    "graph_name": "AnimGraph",
+    "property_path": "ScaleMode",
+    "value": "BMM_Ignore"
+   },
+   "ok": true,
+   "answer": "{\"asset_path\":\"/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2\",\"node_id\":\"AnimGraphNode_ModifyBone_1\",\"property_path\":\"ScaleMode\",\"old_value\":\"BMM_Ignore\",\"new_value\":\"BMM_Ignore\",\"resolved_graph_path\":\"AnimGraph\"}"
+  },
+  {
+   "tool": "animation_query",
+   "action": "set_anim_graph_node_property",
+   "params": {
+    "asset_path": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2",
+    "node_id": "AnimGraphNode_ModifyBone_1",
+    "graph_name": "AnimGraph",
+    "property_path": "Alpha",
+    "value": "1.0"
+   },
+   "ok": true,
+   "answer": "{\"asset_path\":\"/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2\",\"node_id\":\"AnimGraphNode_ModifyBone_1\",\"property_path\":\"Alpha\",\"old_value\":\"1.000000\",\"new_value\":\"1.000000\",\"resolved_graph_path\":\"AnimGraph\"}"
+  },
+  {
+   "tool": "animation_query",
+   "action": "set_anim_node_pin_binding",
+   "params": {
+    "asset_path": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2",
+    "node_id": "AnimGraphNode_SequenceEvaluator_1",
+    "pin": "Sequence",
+    "path": [
+     "Sequence"
+    ],
+    "graph_name": "AnimGraph"
+   },
+   "ok": true,
+   "answer": "{\"asset_path\":\"/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2\",\"node_id\":\"AnimGraphNode_SequenceEvaluator_1\",\"pin\":\"Sequence\",\"cleared\":false,\"path\":[\"Sequence\"],\"recompiled\":true}"
+  },
+  {
+   "tool": "animation_query",
+   "action": "set_anim_node_pin_binding",
+   "params": {
+    "asset_path": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2",
+    "node_id": "AnimGraphNode_SequenceEvaluator_1",
+    "pin": "ExplicitTime",
+    "path": [
+     "ClipTime"
+    ],
+    "graph_name": "AnimGraph"
+   },
+   "ok": true,
+   "answer": "{\"asset_path\":\"/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2\",\"node_id\":\"AnimGraphNode_SequenceEvaluator_1\",\"pin\":\"ExplicitTime\",\"cleared\":false,\"path\":[\"ClipTime\"],\"recompiled\":true}"
+  },
+  {
+   "tool": "animation_query",
+   "action": "set_anim_node_pin_binding",
+   "params": {
+    "asset_path": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2",
+    "node_id": "AnimGraphNode_ModifyBone_1",
+    "pin": "Translation",
+    "path": [
+     "CrownOffset"
+    ],
+    "graph_name": "AnimGraph"
+   },
+   "ok": true,
+   "answer": "{\"asset_path\":\"/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2\",\"node_id\":\"AnimGraphNode_ModifyBone_1\",\"pin\":\"Translation\",\"cleared\":false,\"path\":[\"CrownOffset\"],\"recompiled\":true}"
+  },
+  {
+   "tool": "animation_query",
+   "action": "connect_anim_graph_pins",
+   "params": {
+    "asset_path": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2",
+    "source_node": "AnimGraphNode_SequenceEvaluator_1",
+    "source_pin": "Pose",
+    "target_node": "AnimGraphNode_LocalToComponentSpace_1",
+    "target_pin": "LocalPose",
+    "graph_name": "AnimGraph",
+    "compile": false
+   },
+   "ok": true,
+   "answer": "{\"asset_path\":\"/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2\",\"source_node\":\"AnimGraphNode_SequenceEvaluator_1\",\"source_pin\":\"Pose\",\"target_node\":\"AnimGraphNode_LocalToComponentSpace_1\",\"target_pin\":\"LocalPose\",\"compiled\":false}"
+  },
+  {
+   "tool": "animation_query",
+   "action": "connect_anim_graph_pins",
+   "params": {
+    "asset_path": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2",
+    "source_node": "AnimGraphNode_LocalToComponentSpace_1",
+    "source_pin": "ComponentPose",
+    "target_node": "AnimGraphNode_ModifyBone_1",
+    "target_pin": "ComponentPose",
+    "graph_name": "AnimGraph",
+    "compile": false
+   },
+   "ok": true,
+   "answer": "{\"asset_path\":\"/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2\",\"source_node\":\"AnimGraphNode_LocalToComponentSpace_1\",\"source_pin\":\"ComponentPose\",\"target_node\":\"AnimGraphNode_ModifyBone_1\",\"target_pin\":\"ComponentPose\",\"compiled\":false}"
+  },
+  {
+   "tool": "animation_query",
+   "action": "connect_anim_graph_pins",
+   "params": {
+    "asset_path": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2",
+    "source_node": "AnimGraphNode_ModifyBone_1",
+    "source_pin": "Pose",
+    "target_node": "AnimGraphNode_ComponentToLocalSpace_1",
+    "target_pin": "ComponentPose",
+    "graph_name": "AnimGraph",
+    "compile": false
+   },
+   "ok": true,
+   "answer": "{\"asset_path\":\"/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2\",\"source_node\":\"AnimGraphNode_ModifyBone_1\",\"source_pin\":\"Pose\",\"target_node\":\"AnimGraphNode_ComponentToLocalSpace_1\",\"target_pin\":\"ComponentPose\",\"compiled\":false}"
+  },
+  {
+   "tool": "animation_query",
+   "action": "set_output_pose_source",
+   "params": {
+    "asset_path": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2",
+    "source_node": "AnimGraphNode_ComponentToLocalSpace_1",
+    "graph_name": "AnimGraph"
+   },
+   "ok": true,
+   "answer": "{\"asset_path\":\"/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2\",\"graph_name\":\"AnimGraph\",\"root_node\":\"AnimGraphNode_Root_0\",\"source_node\":\"AnimGraphNode_ComponentToLocalSpace_1\",\"source_pin\":\"Pose\",\"unchanged\":false,\"saved\":false}"
+  },
+  {
+   "tool": "animation_query",
+   "action": "auto_layout",
+   "params": {
+    "asset_path": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2",
+    "graph_name": "AnimGraph",
+    "formatter": "builtin"
+   },
+   "ok": true,
+   "answer": "{\"asset_path\":\"/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2\",\"graph\":\"AnimGraph\",\"nodes_formatted\":5,\"formatter_used\":\"builtin\"}"
+  },
+  {
+   "tool": "animation_query",
+   "action": "get_abp_info",
+   "params": {
+    "asset_path": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2"
+   },
+   "ok": true,
+   "answer": "{\"asset_path\":\"/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2\",\"skeleton\":\"/Game/ArtCandidates/ScreamingTurnip/R01/Meshes/ScreamingTurnip_R01_Mars_SKEL.ScreamingTurnip_R01_Mars_SKEL\",\"target_skeleton\":\"/Game/ArtCandidates/ScreamingTurnip/R01/Meshes/ScreamingTurnip_R01_Mars_SKEL.ScreamingTurnip_R01_Mars_SKEL\",\"parent_class\":\"Mars_ScreamingTurnip_AnimInstance\",\"sta"
+  },
+  {
+   "tool": "animation_query",
+   "action": "get_nodes",
+   "params": {
+    "asset_path": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2",
+    "graph_name": "AnimGraph"
+   },
+   "ok": true,
+   "answer": "{\"asset_path\":\"/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2\",\"graph_name\":\"AnimGraph\",\"nodes\":[{\"class\":\"AnimGraphNode_Root\",\"name\":\"AnimGraphNode_Root_0\",\"title\":\"Output Pose\\nAnimGraph\",\"graph\":\"AnimGraph\",\"connected_pins\":[{\"name\":\"Result\",\"direction\":\"Input\",\"connections\":1}]},{\"class\":\"AnimGraphNode_SequenceEvaluator\",\"name\":\"AnimGraphNode_SequenceEvaluato"
+  },
+  {
+   "tool": "animation_query",
+   "action": "get_anim_node_pin_bindings",
+   "params": {
+    "asset_path": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2"
+   },
+   "ok": true,
+   "answer": "{\"asset_path\":\"/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2\",\"nodes\":[{\"node_id\":\"AnimGraphNode_Root_0\",\"node_guid\":\"0E1927CA474E7682FBB7C3838B78EED5\",\"class\":\"AnimGraphNode_Root\",\"title\":\"Output Pose\\nAnimGraph\",\"graph\":\"AnimGraph\",\"pin_bindings\":[{\"pin\":\"Result\",\"type\":\"Link\",\"source_node_id\":\"AnimGraphNode_ComponentToLocalSpace_1\",\"source_pin\":\"Pose\"}],\"link"
+  },
+  {
+   "tool": "animation_query",
+   "action": "get_anim_graph_output_connection",
+   "params": {
+    "abp_path": "/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2"
+   },
+   "ok": true,
+   "answer": "{\"abp_path\":\"/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2\",\"graph_name\":\"AnimGraph\",\"root_node\":\"AnimGraphNode_Root_0\",\"output_connected\":true,\"source_node\":\"AnimGraphNode_ComponentToLocalSpace_1\",\"source_pin\":\"Pose\"}"
+  },
+  {
+   "tool": "editor_query",
+   "action": "run_python",
+   "params": {
+    "command": "\nimport unreal, json\nabp = unreal.load_asset('/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2')\nunreal.BlueprintEditorLibrary.compile_blueprint(abp)\ngen = unreal.BlueprintEditorLibrary.generated_class(abp)\nprint(\"RESULT:\" + json.dumps({\"generated\": gen.get_path_name() if gen else None,\n                              \"skeleton\": abp.get_editor_property(\"target_skeleton\").get_path_name()}))\n",
+    "unattended": true
+   },
+   "ok": true,
+   "answer": "{\"ok\":true,\"success\":true,\"mode\":\"execute_file\",\"result\":\"None\",\"output\":[{\"type\":\"info\",\"output\":\"RESULT:{\\\"generated\\\": \\\"/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2.ScreamingTurnip_R01_Mars_ABP_v2_C\\\", \\\"skeleton\\\": \\\"/Game/ArtCandidates/ScreamingTurnip/R01/Meshes/ScreamingTurnip_R01_Mars_SKEL.ScreamingTurnip_R01_Mars_SKEL\\\"}\\r\\n\"}]}"
+  },
+  {
+   "tool": "editor_query",
+   "action": "list_errored_blueprints",
+   "params": {},
+   "ok": true,
+   "answer": "{\"count\":1,\"blueprints\":[{\"name\":\"ScreamingTurnip_R01_Mars_ABP\",\"path\":\"/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP.ScreamingTurnip_R01_Mars_ABP\"}]}"
+  },
+  {
+   "tool": "editor_query",
+   "action": "run_python",
+   "params": {
+    "command": "\nimport unreal, json\nsaved = unreal.EditorAssetLibrary.save_asset('/Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP_v2', only_if_is_dirty=False)\ndirty = [str(x.get_name()) for x in unreal.EditorLoadingAndSavingUtils.get_dirty_content_packages()] + \\\n        [str(x.get_name()) for x in unreal.EditorLoadingAndSavingUtils.get_dirty_map_packages()]\nprint(\"RESULT:\" + json.dumps({\"saved\": saved, \"dirty_after\": dirty}))\n",
+    "unattended": true
+   },
+   "ok": true,
+   "answer": "{\"ok\":true,\"success\":true,\"mode\":\"execute_file\",\"result\":\"None\",\"output\":[{\"type\":\"info\",\"output\":\"RESULT:{\\\"saved\\\": true, \\\"dirty_after\\\": []}\\r\\n\"}]}"
+  }
+ ]
+}

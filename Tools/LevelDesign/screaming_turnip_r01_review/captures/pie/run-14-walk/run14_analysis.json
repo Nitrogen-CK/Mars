@@ -1,0 +1,153 @@
+{
+ "source": "captures/pie/run-14-walk/walk_rows.json",
+ "bed1_slow": {
+  "glove_vs_same_tick_socket": {
+   "n": 183,
+   "mean": 0.0,
+   "max": 0.0
+  },
+  "glove_vs_prev_tick_socket": {
+   "n": 181,
+   "mean": 0.3769,
+   "max": 0.6649
+  },
+  "drawn_vs_control_same_tick": {
+   "n": 183,
+   "mean": 0.0001,
+   "max": 0.0001
+  },
+  "walk_speed_median": 31.5,
+  "yaw_err": {
+   "n": 183,
+   "mean": 0.0003,
+   "max": 0.0007
+  }
+ },
+ "bed1_sidestep": {
+  "glove_vs_same_tick_socket": {
+   "n": 160,
+   "mean": 0.0,
+   "max": 0.0
+  },
+  "glove_vs_prev_tick_socket": {
+   "n": 159,
+   "mean": 0.1508,
+   "max": 0.211
+  },
+  "drawn_vs_control_same_tick": {
+   "n": 160,
+   "mean": 0.0001,
+   "max": 0.0001
+  },
+  "walk_speed_median": 0.0,
+  "yaw_err": {
+   "n": 160,
+   "mean": 0.0003,
+   "max": 0.0007
+  }
+ },
+ "bed1_fast": {
+  "glove_vs_same_tick_socket": {
+   "n": 29,
+   "mean": 0.0,
+   "max": 0.0
+  },
+  "glove_vs_prev_tick_socket": {
+   "n": 28,
+   "mean": 2.6394,
+   "max": 6.5419
+  },
+  "drawn_vs_control_same_tick": {
+   "n": 29,
+   "mean": 0.0001,
+   "max": 0.0001
+  },
+  "walk_speed_median": 419.1,
+  "yaw_err": {
+   "n": 29,
+   "mean": 0.0004,
+   "max": 0.0006
+  }
+ },
+ "bed2_slow": {
+  "glove_vs_same_tick_socket": {
+   "n": 433,
+   "mean": 0.0,
+   "max": 0.0
+  },
+  "glove_vs_prev_tick_socket": {
+   "n": 431,
+   "mean": 0.4927,
+   "max": 1.3263
+  },
+  "drawn_vs_control_same_tick": {
+   "n": 433,
+   "mean": 0.0012,
+   "max": 0.5068
+  },
+  "walk_speed_median": 31.5,
+  "yaw_err": {
+   "n": 433,
+   "mean": 0.0002,
+   "max": 0.0005
+  }
+ },
+ "bed2_fast": {
+  "glove_vs_same_tick_socket": {
+   "n": 39,
+   "mean": 0.0,
+   "max": 0.0
+  },
+  "glove_vs_prev_tick_socket": {
+   "n": 38,
+   "mean": 3.8129,
+   "max": 6.9844
+  },
+  "drawn_vs_control_same_tick": {
+   "n": 39,
+   "mean": 0.0001,
+   "max": 0.0001
+  },
+  "walk_speed_median": 419.7,
+  "yaw_err": {
+   "n": 39,
+   "mean": 0.0146,
+   "max": 0.0148
+  }
+ },
+ "sidestep_yaw": {
+  "yaw_from": 44.287,
+  "yaw_to": 72.5,
+  "bearing_from": 44.287,
+  "bearing_to": 72.5
+ },
+ "bed2_cancel": {
+  "last_tug_alpha": 0.5068,
+  "start_alpha": 0.5186,
+  "glove_on_first_cancel_tick": 1.431
+ },
+ "readouts": [
+  [
+   "bed1_after",
+   "bed=13|0(13)[Valid](ScreamingTurnipBed) enabled=Disable focused=false exhausted_reason=true charges=0 released=1 exhausted=true at=X=0.000 Y=0.000 Z=0.000"
+  ],
+  [
+   "bed2_after_cancel",
+   "bed=15|0(15)[Valid](ScreamingTurnipBed) enabled=Enable focused=true exhausted_reason=false charges=1 released=0 exhausted=false at=X=450.000 Y=-450.000 Z=0.000"
+  ],
+  [
+   "bed2_after",
+   "bed=15|0(15)[Valid](ScreamingTurnipBed) enabled=Disable focused=false exhausted_reason=true charges=0 released=1 exhausted=true at=X=450.000 Y=-450.000 Z=0.000"
+  ]
+ ],
+ "breaks": [
+  [
+   "a2_gone",
+   13.4293
+  ],
+  [
+   "b3_gone",
+   34.4238
+  ]
+ ]
+}

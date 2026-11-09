@@ -1,0 +1,22 @@
+{'d0': 110.475, 'n': 83, 'dt_max': 0.0103, 'walk_speed_max': 425.4, 'last_visible': {'game': 2.9759, 'dt': 0.0063, 'walked': 212.05, 'want': 1, 'alpha': 0.9674, 'ring': 0.9974, 'trail': 0.0326, 'glove_same': 0.162, 'glove_lag1': 0.0}, 'released_at': {'game': 2.9823, 'dt': 0.0064, 'walked': 214.73}, 'walked_at_break_vs_walkcm': 65.85, 'trail_max': 0.2632, 'ring_x097_vs_alpha_max': 0.00013599999999999897, 'glove_lag1_max': 0.0, 'glove_lag1_over_05': 0, 'glove_same_max': 4.744, 'rows_chase_view_excluded': 0}
+   {'game': 2.3811, 'dt': 0.0066, 'walked': 0.0, 'want': 0, 'alpha': 0.0, 'ring': 0.0, 'trail': 0.0, 'glove_same': 0.0, 'glove_lag1': None}
+   {'game': 2.4074, 'dt': 0.0082, 'walked': 0.65, 'want': 0.0045, 'alpha': 0.0002, 'ring': 0.0002, 'trail': 0.0043, 'glove_same': 0.001, 'glove_lag1': 0.0}
+   {'game': 2.4352, 'dt': 0.0087, 'walked': 3.16, 'want': 0.0216, 'alpha': 0.0022, 'ring': 0.0023, 'trail': 0.0194, 'glove_same': 0.016, 'glove_lag1': 0.0}
+   {'game': 2.4607, 'dt': 0.0065, 'walked': 7.07, 'want': 0.0484, 'alpha': 0.0076, 'ring': 0.0079, 'trail': 0.0408, 'glove_same': 0.059, 'glove_lag1': 0.0}
+   {'game': 2.4895, 'dt': 0.0069, 'walked': 13.39, 'want': 0.0916, 'alpha': 0.0208, 'ring': 0.0214, 'trail': 0.0708, 'glove_same': 0.122, 'glove_lag1': 0.0}
+   {'game': 2.525, 'dt': 0.0091, 'walked': 24.0, 'want': 0.1641, 'alpha': 0.0508, 'ring': 0.0523, 'trail': 0.1133, 'glove_same': 0.272, 'glove_lag1': 0.0}
+   {'game': 2.5581, 'dt': 0.0082, 'walked': 36.56, 'want': 0.25, 'alpha': 0.0932, 'ring': 0.0961, 'trail': 0.1568, 'glove_same': 1.011, 'glove_lag1': 0.0}
+   {'game': 2.5867, 'dt': 0.0067, 'walked': 48.58, 'want': 0.3323, 'alpha': 0.1414, 'ring': 0.1458, 'trail': 0.1909, 'glove_same': 1.399, 'glove_lag1': 0.0}
+   {'game': 2.6146, 'dt': 0.0072, 'walked': 60.3, 'want': 0.4124, 'alpha': 0.1976, 'ring': 0.2038, 'trail': 0.2148, 'glove_same': 1.795, 'glove_lag1': 0.0}
+   {'game': 2.6422, 'dt': 0.0062, 'walked': 71.91, 'want': 0.4919, 'alpha': 0.2606, 'ring': 0.2687, 'trail': 0.2313, 'glove_same': 2.501, 'glove_lag1': 0.0}
+   {'game': 2.6725, 'dt': 0.007, 'walked': 84.6, 'want': 0.5787, 'alpha': 0.3354, 'ring': 0.3457, 'trail': 0.2433, 'glove_same': 3.871, 'glove_lag1': 0.0}
+   {'game': 2.7025, 'dt': 0.0071, 'walked': 97.24, 'want': 0.6651, 'alpha': 0.414, 'ring': 0.4268, 'trail': 0.2511, 'glove_same': 3.737, 'glove_lag1': 0.0}
+   {'game': 2.7288, 'dt': 0.0061, 'walked': 108.29, 'want': 0.7407, 'alpha': 0.4846, 'ring': 0.4997, 'trail': 0.2561, 'glove_same': 3.204, 'glove_lag1': 0.0}
+   {'game': 2.7588, 'dt': 0.0065, 'walked': 120.86, 'want': 0.8267, 'alpha': 0.567, 'ring': 0.5846, 'trail': 0.2597, 'glove_same': 3.902, 'glove_lag1': 0.0}
+   {'game': 2.7885, 'dt': 0.0073, 'walked': 133.35, 'want': 0.9121, 'alpha': 0.6504, 'ring': 0.6704, 'trail': 0.2617, 'glove_same': 4.0, 'glove_lag1': 0.0}
+   {'game': 2.8186, 'dt': 0.007, 'walked': 145.99, 'want': 0.9986, 'alpha': 0.7354, 'ring': 0.7582, 'trail': 0.2632, 'glove_same': 4.744, 'glove_lag1': 0.0}
+   {'game': 2.8504, 'dt': 0.0072, 'walked': 159.36, 'want': 1, 'alpha': 0.8176, 'ring': 0.8429, 'trail': 0.1824, 'glove_same': 3.821, 'glove_lag1': 0.0}
+   {'game': 2.8799, 'dt': 0.0073, 'walked': 171.73, 'want': 1, 'alpha': 0.8756, 'ring': 0.9026, 'trail': 0.1244, 'glove_same': 2.174, 'glove_lag1': 0.0}
+   {'game': 2.9079, 'dt': 0.0083, 'walked': 183.48, 'want': 1, 'alpha': 0.915, 'ring': 0.9433, 'trail': 0.085, 'glove_same': 0.916, 'glove_lag1': 0.0}
+   {'game': 2.9359, 'dt': 0.0083, 'walked': 195.25, 'want': 1, 'alpha': 0.9424, 'ring': 0.9716, 'trail': 0.0576, 'glove_same': 0.471, 'glove_lag1': 0.0}
+   {'game': 2.9613, 'dt': 0.0058, 'walked': 205.9, 'want': 1, 'alpha': 0.96, 'ring': 0.9896, 'trail': 0.04, 'glove_same': 0.152, 'glove_lag1': 0.0}

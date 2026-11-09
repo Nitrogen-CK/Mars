@@ -162,7 +162,7 @@
    }
   },
   "export\\anims\\ScreamingTurnip_R01_SRC_Tug_Mars_ANIM.fbx": {
-   "bytes": 348652,
+   "bytes": 348636,
    "header": {
     "magic": "Kaydara FBX Binary",
     "file_version": 7400,
@@ -182,7 +182,7 @@
    }
   },
   "export\\anims\\ScreamingTurnip_R01_SRC_Cancel_Mars_ANIM.fbx": {
-   "bytes": 332716,
+   "bytes": 332700,
    "header": {
     "magic": "Kaydara FBX Binary",
     "file_version": 7400,
@@ -202,7 +202,7 @@
    }
   },
   "export\\anims\\ScreamingTurnip_R01_ROOT_Anticipate_Mars_ANIM.fbx": {
-   "bytes": 336700,
+   "bytes": 336684,
    "header": {
     "magic": "Kaydara FBX Binary",
     "file_version": 7400,
@@ -212,7 +212,7 @@
    }
   },
   "export\\anims\\ScreamingTurnip_R01_ROOT_AnticipateTired_Mars_ANIM.fbx": {
-   "bytes": 336700,
+   "bytes": 336684,
    "header": {
     "magic": "Kaydara FBX Binary",
     "file_version": 7400,
@@ -222,7 +222,7 @@
    }
   },
   "export\\anims\\ScreamingTurnip_R01_ROOT_Inhale_Mars_ANIM.fbx": {
-   "bytes": 366540,
+   "bytes": 366524,
    "header": {
     "magic": "Kaydara FBX Binary",
     "file_version": 7400,
@@ -272,7 +272,7 @@
    }
   },
   "export\\anims\\ScreamingTurnip_R01_ROOT_ImpactSquash_Mars_ANIM.fbx": {
-   "bytes": 332716,
+   "bytes": 332700,
    "header": {
     "magic": "Kaydara FBX Binary",
     "file_version": 7400,
@@ -292,7 +292,7 @@
    }
   },
   "export\\anims\\ScreamingTurnip_R01_ROOT_PlaceSettle_Mars_ANIM.fbx": {
-   "bytes": 332716,
+   "bytes": 332700,
    "header": {
     "magic": "Kaydara FBX Binary",
     "file_version": 7400,

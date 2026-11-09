@@ -106,6 +106,20 @@ def world_item_count():
     return int(m.group(1)) if m else -1
 
 
+def clip_state(c):
+    """(sequence asset, clip time) of a presentation component. Phase K: the component plays through the AnimBlueprint
+    (Mars_ScreamingTurnip_AnimInstance's Sequence / ClipTime); the single-node API (GetPosition, GetAnimationAsset) would
+    log "Currently in Animation Blueprint mode" each call, so it is used only when the instance has no such fields."""
+    inst = c.get_anim_instance()
+    if inst is None:
+        return None, 0.0
+    try:
+        return inst.get_editor_property("Sequence"), float(inst.get_editor_property("ClipTime"))
+    except Exception:
+        asset = inst.get_animation_asset() if hasattr(inst, "get_animation_asset") else None
+        return asset, c.get_position()
+
+
 def _pie_objects(class_path):
     cls = u.load_class(None, class_path)
     return [o for o in u.ObjectIterator(cls) if "UEDPIE" in o.get_path_name()]
@@ -128,7 +142,7 @@ def clips():
             if not c.get_owner():
                 continue
             inst = c.get_anim_instance()
-            asset = inst.get_animation_asset() if inst and hasattr(inst, "get_animation_asset") else None
+            asset, clip_t = clip_state(c)
             loc = c.get_world_location()
             up = c.get_up_vector()
             fwd = c.get_forward_vector()
@@ -141,7 +155,7 @@ def clips():
                         pass
             rows.append(dict(name=c.get_name().rsplit("_", 1)[-1], clip=(asset.get_name().replace("ScreamingTurnip_R01_", "")
                                                       .replace("_Mars_ANIM", "") if asset else None), curves=curves,
-                             t=round(c.get_position(), 3),
+                             t=round(clip_t, 3),
                              at=[round(loc.x, 1), round(loc.y, 1), round(loc.z, 1)],
                              up=[round(up.x, 2), round(up.y, 2), round(up.z, 2)],
                              fwd=[round(fwd.x, 2), round(fwd.y, 2), round(fwd.z, 2)], visible=c.is_visible()))
@@ -496,8 +510,8 @@ def morph_probe():
             if not c.get_owner():
                 continue
             inst = c.get_anim_instance()
-            asset = inst.get_animation_asset() if inst and hasattr(inst, "get_animation_asset") else None
-            out.append(dict(clip=asset.get_name() if asset else None, t=round(c.get_position(), 3),
+            asset, clip_t = clip_state(c)
+            out.append(dict(clip=asset.get_name() if asset else None, t=round(clip_t, 3),
                             curve_inhale=round(inst.get_curve_value("Inhale"), 4) if inst else None,
                             curve_scream=round(inst.get_curve_value("Scream"), 4) if inst else None,
                             manual_inhale=c.get_morph_target("Inhale"), manual_scream=c.get_morph_target("Scream"),

@@ -1,0 +1,753 @@
+{
+ "T_cm": 400.0,
+ "L_cm": 55.0,
+ "offset": "(-T * a, 0, L * a) UE cm on the crown, component space",
+ "clips": {
+  "SRC_Tug": {
+   "rows": [
+    {
+     "f": 0,
+     "a": 0.0,
+     "crown_ue_xz": [
+      0.0,
+      31.8
+     ],
+     "socket_R_ue": [
+      -1.522,
+      4.683,
+      35.185
+     ],
+     "isect": {},
+     "stem_gap": -0.7334,
+     "dimple_d_xz": [
+      0.0,
+      0.0
+     ],
+     "ring_max_d": 0.0,
+     "neck_ok": true
+    },
+    {
+     "f": 1,
+     "a": 0.0667,
+     "crown_ue_xz": [
+      -26.665,
+      35.519
+     ],
+     "socket_R_ue": [
+      -28.294,
+      4.683,
+      38.854
+     ],
+     "isect": {},
+     "stem_gap": -0.78,
+     "dimple_d_xz": [
+      -0.827,
+      0.127
+     ],
+     "ring_max_d": 0.301,
+     "neck_ok": true
+    },
+    {
+     "f": 2,
+     "a": 0.1333,
+     "crown_ue_xz": [
+      -53.326,
+      39.327
+     ],
+     "socket_R_ue": [
+      -55.235,
+      4.683,
+      42.51
+     ],
+     "isect": {},
+     "stem_gap": -0.7548,
+     "dimple_d_xz": [
+      -1.702,
+      0.285
+     ],
+     "ring_max_d": 0.657,
+     "neck_ok": true
+    },
+    {
+     "f": 3,
+     "a": 0.2,
+     "crown_ue_xz": [
+      -79.988,
+      43.201
+     ],
+     "socket_R_ue": [
+      -82.278,
+      4.683,
+      46.122
+     ],
+     "isect": {},
+     "stem_gap": -0.7054,
+     "dimple_d_xz": [
+      -2.614,
+      0.465
+     ],
+     "ring_max_d": 1.056,
+     "neck_ok": true
+    },
+    {
+     "f": 4,
+     "a": 0.2667,
+     "crown_ue_xz": [
+      -106.651,
+      47.118
+     ],
+     "socket_R_ue": [
+      -109.351,
+      4.683,
+      49.665
+     ],
+     "isect": {},
+     "stem_gap": -0.6665,
+     "dimple_d_xz": [
+      -3.554,
+      0.661
+     ],
+     "ring_max_d": 1.49,
+     "neck_ok": true
+    },
+    {
+     "f": 5,
+     "a": 0.3333,
+     "crown_ue_xz": [
+      -133.317,
+      51.054
+     ],
+     "socket_R_ue": [
+      -136.387,
+      4.683,
+      53.14
+     ],
+     "isect": {},
+     "stem_gap": -0.6362,
+     "dimple_d_xz": [
+      -4.511,
+      0.864
+     ],
+     "ring_max_d": 1.945,
+     "neck_ok": true
+    },
+    {
+     "f": 6,
+     "a": 0.4,
+     "crown_ue_xz": [
+      -159.987,
+      54.985
+     ],
+     "socket_R_ue": [
+      -163.342,
+      4.683,
+      56.572
+     ],
+     "isect": {},
+     "stem_gap": -0.6126,
+     "dimple_d_xz": [
+      -5.475,
+      1.069
+     ],
+     "ring_max_d": 2.408,
+     "neck_ok": true
+    },
+    {
+     "f": 7,
+     "a": 0.4667,
+     "crown_ue_xz": [
+      -186.66,
+      58.884
+     ],
+     "socket_R_ue": [
+      -190.198,
+      4.683,
+      60.005
+     ],
+     "isect": {},
+     "stem_gap": -0.5938,
+     "dimple_d_xz": [
+      -6.434,
+      1.268
+     ],
+     "ring_max_d": 2.865,
+     "neck_ok": true
+    },
+    {
+     "f": 8,
+     "a": 0.5333,
+     "crown_ue_xz": [
+      -213.333,
+      62.727
+     ],
+     "socket_R_ue": [
+      -216.966,
+      4.683,
+      63.485
+     ],
+     "isect": {},
+     "stem_gap": -0.5782,
+     "dimple_d_xz": [
+      -7.378,
+      1.455
+     ],
+     "ring_max_d": 3.302,
+     "neck_ok": true
+    },
+    {
+     "f": 9,
+     "a": 0.6,
+     "crown_ue_xz": [
+      -240.005,
+      66.521
+     ],
+     "socket_R_ue": [
+      -243.683,
+      4.683,
+      67.017
+     ],
+     "isect": {},
+     "stem_gap": -0.5669,
+     "dimple_d_xz": [
+      -8.332,
+      1.644
+     ],
+     "ring_max_d": 3.75,
+     "neck_ok": true
+    },
+    {
+     "f": 10,
+     "a": 0.6667,
+     "crown_ue_xz": [
+      -266.674,
+      70.293
+     ],
+     "socket_R_ue": [
+      -270.375,
+      4.683,
+      70.577
+     ],
+     "isect": {},
+     "stem_gap": -0.5611,
+     "dimple_d_xz": [
+      -9.313,
+      1.843
+     ],
+     "ring_max_d": 4.23,
+     "neck_ok": false
+    },
+    {
+     "f": 11,
+     "a": 0.7333,
+     "crown_ue_xz": [
+      -293.342,
+      74.045
+     ],
+     "socket_R_ue": [
+      -297.052,
+      4.683,
+      74.164
+     ],
+     "isect": {},
+     "stem_gap": -0.5591,
+     "dimple_d_xz": [
+      -10.305,
+      2.043
+     ],
+     "ring_max_d": 4.72,
+     "neck_ok": false
+    },
+    {
+     "f": 12,
+     "a": 0.8,
+     "crown_ue_xz": [
+      -320.008,
+      77.778
+     ],
+     "socket_R_ue": [
+      -323.719,
+      4.683,
+      77.776
+     ],
+     "isect": {},
+     "stem_gap": -0.5591,
+     "dimple_d_xz": [
+      -11.288,
+      2.236
+     ],
+     "ring_max_d": 5.2,
+     "neck_ok": false
+    },
+    {
+     "f": 13,
+     "a": 0.8667,
+     "crown_ue_xz": [
+      -346.671,
+      81.493
+     ],
+     "socket_R_ue": [
+      -350.382,
+      4.683,
+      81.409
+     ],
+     "isect": {},
+     "stem_gap": -0.5587,
+     "dimple_d_xz": [
+      -12.243,
+      2.414
+     ],
+     "ring_max_d": 5.646,
+     "neck_ok": false
+    },
+    {
+     "f": 14,
+     "a": 0.9333,
+     "crown_ue_xz": [
+      -373.335,
+      85.188
+     ],
+     "socket_R_ue": [
+      -377.044,
+      4.683,
+      85.059
+     ],
+     "isect": {},
+     "stem_gap": -0.5557,
+     "dimple_d_xz": [
+      -13.15,
+      2.569
+     ],
+     "ring_max_d": 6.036,
+     "neck_ok": false
+    },
+    {
+     "f": 15,
+     "a": 1.0,
+     "crown_ue_xz": [
+      -400.0,
+      88.865
+     ],
+     "socket_R_ue": [
+      -403.709,
+      4.683,
+      88.721
+     ],
+     "isect": {},
+     "stem_gap": -0.5479,
+     "dimple_d_xz": [
+      -13.99,
+      2.696
+     ],
+     "ring_max_d": 6.348,
+     "neck_ok": false
+    }
+   ],
+   "stem_gap_max": -0.5479,
+   "isect_frames": [],
+   "dimple_d_at_full": [
+    -13.99,
+    2.696
+   ],
+   "ring_max_d_at_full": 6.348,
+   "crown_at_full": [
+    -400.0,
+    88.865
+   ],
+   "socket_R_at_full": [
+    -403.709,
+    4.683,
+    88.721
+   ]
+  },
+  "SRC_Cancel": {
+   "rows": [
+    {
+     "f": 0,
+     "a": 1.0,
+     "crown_ue_xz": [
+      -400.0,
+      88.865
+     ],
+     "socket_R_ue": [
+      -403.709,
+      4.683,
+      88.721
+     ],
+     "isect": {},
+     "stem_gap": -0.5479,
+     "dimple_d_xz": [
+      -13.99,
+      2.696
+     ],
+     "ring_max_d": 6.348,
+     "neck_ok": false
+    },
+    {
+     "f": 1,
+     "a": 0.8571,
+     "crown_ue_xz": [
+      -342.858,
+      80.93
+     ],
+     "socket_R_ue": [
+      -346.569,
+      4.683,
+      80.857
+     ],
+     "isect": {},
+     "stem_gap": -0.5587,
+     "dimple_d_xz": [
+      -12.109,
+      2.389
+     ],
+     "ring_max_d": 5.585,
+     "neck_ok": false
+    },
+    {
+     "f": 2,
+     "a": 0.7143,
+     "crown_ue_xz": [
+      -285.716,
+      72.902
+     ],
+     "socket_R_ue": [
+      -289.423,
+      4.683,
+      73.064
+     ],
+     "isect": {},
+     "stem_gap": -0.5592,
+     "dimple_d_xz": [
+      -10.022,
+      1.984
+     ],
+     "ring_max_d": 4.58,
+     "neck_ok": false
+    },
+    {
+     "f": 3,
+     "a": 0.5714,
+     "crown_ue_xz": [
+      -228.571,
+      64.864
+     ],
+     "socket_R_ue": [
+      -232.234,
+      4.683,
+      65.466
+     ],
+     "isect": {},
+     "stem_gap": -0.5708,
+     "dimple_d_xz": [
+      -7.918,
+      1.56
+     ],
+     "ring_max_d": 3.553,
+     "neck_ok": true
+    },
+    {
+     "f": 4,
+     "a": 0.4286,
+     "crown_ue_xz": [
+      -171.428,
+      56.84
+     ],
+     "socket_R_ue": [
+      -174.873,
+      4.683,
+      58.22
+     ],
+     "isect": {},
+     "stem_gap": -0.6048,
+     "dimple_d_xz": [
+      -5.887,
+      1.16
+     ],
+     "ring_max_d": 2.606,
+     "neck_ok": true
+    },
+    {
+     "f": 5,
+     "a": 0.2857,
+     "crown_ue_xz": [
+      -114.285,
+      48.79
+     ],
+     "socket_R_ue": [
+      -117.097,
+      4.683,
+      51.211
+     ],
+     "isect": {},
+     "stem_gap": -0.6595,
+     "dimple_d_xz": [
+      -3.827,
+      0.735
+     ],
+     "ring_max_d": 1.62,
+     "neck_ok": true
+    },
+    {
+     "f": 6,
+     "a": 0.1429,
+     "crown_ue_xz": [
+      -57.143,
+      40.773
+     ],
+     "socket_R_ue": [
+      -59.101,
+      4.683,
+      43.926
+     ],
+     "isect": {},
+     "stem_gap": -0.7516,
+     "dimple_d_xz": [
+      -1.83,
+      0.337
+     ],
+     "ring_max_d": 0.713,
+     "neck_ok": true
+    },
+    {
+     "f": 7,
+     "a": 0.0,
+     "crown_ue_xz": [
+      0.0,
+      32.85
+     ],
+     "socket_R_ue": [
+      -1.522,
+      4.683,
+      36.235
+     ],
+     "isect": {},
+     "stem_gap": -0.7374,
+     "dimple_d_xz": [
+      0.0,
+      0.032
+     ],
+     "ring_max_d": 0.011,
+     "neck_ok": true
+    }
+   ],
+   "stem_gap_max": -0.5479,
+   "isect_frames": [],
+   "dimple_d_at_full": [
+    -13.99,
+    2.696
+   ],
+   "ring_max_d_at_full": 6.348,
+   "crown_at_full": [
+    -400.0,
+    88.865
+   ],
+   "socket_R_at_full": [
+    -403.709,
+    4.683,
+    88.721
+   ]
+  },
+  "SRC_Release": {
+   "rows": [
+    {
+     "f": 0,
+     "a": 1.0,
+     "crown_ue_xz": [
+      -400.0,
+      88.865
+     ],
+     "socket_R_ue": [
+      -403.709,
+      4.683,
+      88.721
+     ],
+     "isect": {},
+     "stem_gap": -0.5479,
+     "dimple_d_xz": [
+      -13.99,
+      2.696
+     ],
+     "ring_max_d": 6.348,
+     "neck_ok": false
+    },
+    {
+     "f": 1,
+     "a": 0.8333,
+     "crown_ue_xz": [
+      -333.322,
+      81.259
+     ],
+     "socket_R_ue": [
+      -336.476,
+      4.683,
+      83.214
+     ],
+     "isect": {},
+     "stem_gap": -0.5185,
+     "dimple_d_xz": [
+      -11.026,
+      4.287
+     ],
+     "ring_max_d": 5.576,
+     "neck_ok": false
+    },
+    {
+     "f": 2,
+     "a": 0.6667,
+     "crown_ue_xz": [
+      -266.667,
+      73.717
+     ],
+     "socket_R_ue": [
+      -268.189,
+      4.683,
+      77.102
+     ],
+     "isect": {
+      "leaf_vs_leaf": 32
+     },
+     "stem_gap": -0.5112,
+     "dimple_d_xz": [
+      -8.0,
+      5.812
+     ],
+     "ring_max_d": 5.873,
+     "neck_ok": false
+    },
+    {
+     "f": 3,
+     "a": 0.5,
+     "crown_ue_xz": [
+      -200.0,
+      63.159
+     ],
+     "socket_R_ue": [
+      -201.522,
+      4.683,
+      66.544
+     ],
+     "isect": {
+      "leaf_vs_leaf": 38
+     },
+     "stem_gap": -0.5422,
+     "dimple_d_xz": [
+      -6.0,
+      3.845
+     ],
+     "ring_max_d": 3.904,
+     "neck_ok": false
+    },
+    {
+     "f": 4,
+     "a": 0.3333,
+     "crown_ue_xz": [
+      -133.333,
+      52.26
+     ],
+     "socket_R_ue": [
+      -134.855,
+      4.683,
+      55.645
+     ],
+     "isect": {
+      "outer_shell_self": 26,
+      "leaf_vs_leaf": 26
+     },
+     "stem_gap": -0.5791,
+     "dimple_d_xz": [
+      -4.0,
+      1.517
+     ],
+     "ring_max_d": 1.789,
+     "neck_ok": true
+    },
+    {
+     "f": 5,
+     "a": 0.1667,
+     "crown_ue_xz": [
+      -66.667,
+      43.302
+     ],
+     "socket_R_ue": [
+      -68.189,
+      4.683,
+      46.687
+     ],
+     "isect": {
+      "leaf_vs_leaf": 20
+     },
+     "stem_gap": -0.707,
+     "dimple_d_xz": [
+      -2.0,
+      1.494
+     ],
+     "ring_max_d": 1.465,
+     "neck_ok": true
+    },
+    {
+     "f": 6,
+     "a": 0.0,
+     "crown_ue_xz": [
+      0.0,
+      34.65
+     ],
+     "socket_R_ue": [
+      -1.522,
+      4.683,
+      38.035
+     ],
+     "isect": {},
+     "stem_gap": -0.7374,
+     "dimple_d_xz": [
+      0.0,
+      1.832
+     ],
+     "ring_max_d": 1.811,
+     "neck_ok": true
+    }
+   ],
+   "stem_gap_max": -0.5112,
+   "isect_frames": [
+    2,
+    3,
+    4,
+    5
+   ],
+   "dimple_d_at_full": [
+    -13.99,
+    2.696
+   ],
+   "ring_max_d_at_full": 6.348,
+   "crown_at_full": [
+    -400.0,
+    88.865
+   ],
+   "socket_R_at_full": [
+    -403.709,
+    4.683,
+    88.721
+   ]
+  }
+ },
+ "fails": [
+  "SRC_Tug f10 (a 0.67): neck dimple [-9.313, 1.843] ring 4.23",
+  "SRC_Tug f11 (a 0.73): neck dimple [-10.305, 2.043] ring 4.72",
+  "SRC_Tug f12 (a 0.80): neck dimple [-11.288, 2.236] ring 5.20",
+  "SRC_Tug f13 (a 0.87): neck dimple [-12.243, 2.414] ring 5.65",
+  "SRC_Tug f14 (a 0.93): neck dimple [-13.15, 2.569] ring 6.04",
+  "SRC_Tug f15 (a 1.00): neck dimple [-13.99, 2.696] ring 6.35",
+  "SRC_Cancel f0 (a 1.00): neck dimple [-13.99, 2.696] ring 6.35",
+  "SRC_Cancel f1 (a 0.86): neck dimple [-12.109, 2.389] ring 5.59",
+  "SRC_Cancel f2 (a 0.71): neck dimple [-10.022, 1.984] ring 4.58"
+ ],
+ "release_info": [
+  "SRC_Release f0 (a 1.00): neck dimple [-13.99, 2.696] ring 6.35",
+  "SRC_Release f1 (a 0.83): neck dimple [-11.026, 4.287] ring 5.58",
+  "SRC_Release f2 (a 0.67): intersections {'leaf_vs_leaf': 32}",
+  "SRC_Release f2 (a 0.67): neck dimple [-8.0, 5.812] ring 5.87",
+  "SRC_Release f3 (a 0.50): intersections {'leaf_vs_leaf': 38}",
+  "SRC_Release f3 (a 0.50): neck dimple [-6.0, 3.845] ring 3.90",
+  "SRC_Release f4 (a 0.33): intersections {'outer_shell_self': 26, 'leaf_vs_leaf': 26}",
+  "SRC_Release f5 (a 0.17): intersections {'leaf_vs_leaf': 20}"
+ ]
+}

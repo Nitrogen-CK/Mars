@@ -135,8 +135,8 @@
     16
    ],
    "root_max_deviation_all_frames": 0.0,
-   "max_landmark_err_cm": 6.7e-05,
-   "max_extremes_err_cm": 5.3e-05,
+   "max_landmark_err_cm": 8.8e-05,
+   "max_extremes_err_cm": 5.6e-05,
    "shape_key_value_max_err": 0.0,
    "shape_key_peaks": {
     "Inhale": {
@@ -152,9 +152,9 @@
    "scale_peak": {
     "frame": 15,
     "body": [
-     1.06,
-     0.96,
-     1.06
+     1.04,
+     0.98,
+     1.04
     ],
     "cheek_l": [
      1.0,
@@ -162,9 +162,9 @@
      1.0
     ],
     "authored_body": [
-     1.06,
-     0.96,
-     1.06
+     1.04,
+     0.98,
+     1.04
     ],
     "authored_cheek_l": [
      1.0,
@@ -192,7 +192,7 @@
     7
    ],
    "root_max_deviation_all_frames": 0.0,
-   "max_landmark_err_cm": 6.7e-05,
+   "max_landmark_err_cm": 6.6e-05,
    "max_extremes_err_cm": 5.5e-05,
    "shape_key_value_max_err": 0.0,
    "shape_key_peaks": {
@@ -249,8 +249,8 @@
     8
    ],
    "root_max_deviation_all_frames": 0.0,
-   "max_landmark_err_cm": 7e-05,
-   "max_extremes_err_cm": 5.9e-05,
+   "max_landmark_err_cm": 7.5e-05,
+   "max_extremes_err_cm": 5.4e-05,
    "shape_key_value_max_err": 0.0,
    "shape_key_peaks": {
     "Inhale": {
@@ -266,9 +266,9 @@
    "scale_peak": {
     "frame": 0,
     "body": [
-     1.06,
-     0.96,
-     1.06
+     1.04,
+     0.98,
+     1.04
     ],
     "cheek_l": [
      1.0,
@@ -276,9 +276,9 @@
      1.0
     ],
     "authored_body": [
-     1.06,
-     0.96,
-     1.06
+     1.04,
+     0.98,
+     1.04
     ],
     "authored_cheek_l": [
      1.0,

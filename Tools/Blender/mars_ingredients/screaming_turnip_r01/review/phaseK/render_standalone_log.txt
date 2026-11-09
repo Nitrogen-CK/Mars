@@ -1,0 +1,23 @@
+00:02.078  blend            | Read blend: "D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\source\ScreamingTurnip_R01.blend"
+00:03.484  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseK\standalone\_frames\SRC_Tug_side_000.png'
+00:03.578  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseK\standalone\_frames\SRC_Tug_side_002.png'
+00:03.656  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseK\standalone\_frames\SRC_Tug_side_004.png'
+00:03.734  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseK\standalone\_frames\SRC_Tug_side_006.png'
+00:03.797  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseK\standalone\_frames\SRC_Tug_side_009.png'
+00:03.875  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseK\standalone\_frames\SRC_Tug_side_011.png'
+00:03.953  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseK\standalone\_frames\SRC_Tug_side_013.png'
+00:04.015  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseK\standalone\_frames\SRC_Tug_side_015.png'
+00:04.094  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseK\standalone\_frames\SRC_Tug_threequarter_000.png'
+00:04.172  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseK\standalone\_frames\SRC_Tug_threequarter_002.png'
+00:04.265  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseK\standalone\_frames\SRC_Tug_threequarter_004.png'
+00:04.344  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseK\standalone\_frames\SRC_Tug_threequarter_006.png'
+00:04.422  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseK\standalone\_frames\SRC_Tug_threequarter_009.png'
+00:04.500  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseK\standalone\_frames\SRC_Tug_threequarter_011.png'
+00:04.562  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseK\standalone\_frames\SRC_Tug_threequarter_013.png'
+00:04.640  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseK\standalone\_frames\SRC_Tug_threequarter_015.png'
+RENDER_UNIT 3.0
+SHEET D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\review\phaseK/standalone\SRC_Tug_sheet.png
+TURNIP_OK
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+
+Blender quit

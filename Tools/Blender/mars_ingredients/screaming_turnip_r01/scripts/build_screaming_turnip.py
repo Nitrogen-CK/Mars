@@ -14,7 +14,8 @@ turnip's LEFT (`_l`) is Blender +Y. Root bone at the origin = neutral taproot ti
 
 Rig contract that makes Blender and Unreal agree (see PROGRESS Phase A, D-A1): every non-leaf bone (root, body, jaw,
 cheek_l/_r, crown, taproot) has an IDENTITY rest rotation (points +Y, roll 0); body scale keeps depth == height factor
-(X == Z), the jaw and crown only rotate about Y, crown and taproot counter-scale the body. Under those rules the
+(X == Z), the jaw and crown only rotate about Y (the crown translates in X and Z: `cr_dx` / `cr_dz`, Phase J), crown
+and taproot counter-scale the body. Under those rules the
 Unreal FTransform composition (per-axis scale, no shear) equals Blender's matrix composition exactly; the builder
 measures the difference per pose (`ue_dev_cm`).
 
@@ -632,11 +633,18 @@ def build_bulb(ids):
                 continue
             p, n = surf(z, phi, ry)
             p = p + n * lobe_bump(p)
-            crown = 0.35 if k == len(R) - 1 else 0.0
+            # Phase J Part 1b: the top ring's crown share 0.35 -> 0.08 (and the dimple's 0.6 -> 0.15 below) so the bulb
+            # top stays with the bulb under the 36 cm SRC_Tug lean (target: the dimple moves <= 25 % of the crown head's
+            # travel at SRC_Tug f15, <= 9 cm x / <= 3 cm z UE; the ring less; measured in review/phaseJ/neck.json).
+            # At 0.35 / 0.6 the top was dragged into a pink neck a third of the way up the stalks.
+            # Phase J Part 1d (2x lean, crown dx -72; previewed at 3x, -108): ring 0.08 -> 0.03 and dimple 0.15 -> 0.06
+            # keep the same absolute target (dimple <= 9 cm x / <= 3 cm z UE, ring below it) at 2x and at 3x.
+            # Phase J Part 1e (4x, crown dx -144): ring 0.03 -> 0.01, dimple 0.06 -> 0.03, same absolute target.
+            crown = 0.01 if k == len(R) - 1 else 0.0
             cl, cr = field_cheeks(p)
             grid[(k, j)] = mb.vert(p, make_w(cl, cr, jaw_field(phi, p.z), crown))
     bottom = mb.vert((0, 0, P["BOTTOM_Z"]), make_w(0, 0, 0))
-    top = mb.vert((0, 0, P["TOP_DIP_Z"]), {"crown": 0.6, "body": 0.4})
+    top = mb.vert((0, 0, P["TOP_DIP_Z"]), {"crown": 0.03, "body": 0.97})       # Phase J 1e (1d 0.06, 1b 0.15; was 0.6 / 0.4)
     ids["bottom"], ids["top_dip"] = bottom, top
     qv = {}                       # vertex -> rest 2D muzzle coordinate (patch vertices only)
 
@@ -932,8 +940,9 @@ def build_leaf(L):
     # stations: (centre, axis dir, hw, ht, fold, weights, part of the segment that ENDS here)
     # Phase I (coordinator ruling): the stem's embedded base ring rides the BODY and the emergence ring blends body /
     # leaf_a, so the stalk stretches elastically between the bulb and the crown when the crown lifts (SRC_Tug) instead
-    # of pulling out of the bulb (was {leaf_a: 1.0} on both rings). The emergence ring's 0.5 crown share matches the bulb
-    # top ring's crown weight (0.35 ring / 0.6 dimple), so the stalk leaves the bulb where the surface is. Blades unchanged.
+    # of pulling out of the bulb (was {leaf_a: 1.0} on both rings). Phase I chose the emergence ring's 0.5 crown share
+    # near the bulb top's (0.35 ring / 0.6 dimple); Phase J Part 1b cut the bulb top to 0.08 / 0.15 (no neck under the
+    # 36 cm lean; Part 1d 0.03 / 0.06 for 72 cm; Part 1e 0.01 / 0.03 for 144 cm) and kept 0.5 here (the stem_gap audit gates the embedded ring). Blades unchanged.
     st = [(L["s0"], L["ds"], sr * 0.55, sr * 0.55, 0.0, {"body": 1.0}, None),
           (L["s1"], L["ds"], sr, sr, 0.0, {"body": 0.5, na: 0.5}, "stem_root"),
           (L["b1"], nrm(L["ds"] + L["db"]), sr, P["BLADE"][0][2], 0.0, {na: 0.5, nb: 0.5}, "stem")]
@@ -1162,7 +1171,9 @@ def build_armature(coll, lay):
 # ---------------------------------------------------------------- poses (parameter vectors on the export bones)
 # A pose is a flat parameter vector (PKEYS); clips spline these scalars, so the rig contract (body X == Z scale,
 # crown/taproot exact counter-scale, jaw/crown rotate about Y only) holds on every interpolated frame.
-PKEYS = (["bh", "bw", "bpiv", "bdz", "brot", "jaw", "csx", "csy", "csz", "clx", "cly", "clz", "cr_y", "cr_dz"] +
+# Phase J: `cr_dx` (crown X translation, design cm, x unit()) appended after cr_dz; default 0, so every pose that does not
+# set it is unchanged (diff_expected_anims.py proves it per clip).
+PKEYS = (["bh", "bw", "bpiv", "bdz", "brot", "jaw", "csx", "csy", "csz", "clx", "cly", "clz", "cr_y", "cr_dz", "cr_dx"] +
          ["la%d" % i for i in range(1, 6)] + ["lb%d" % i for i in range(1, 6)] + ["lf%d" % i for i in range(1, 6)] +
          ["k_inhale", "k_scream"])      # B2b: shape-key values (the B2 `jx` jaw-forward key is gone)
 SHAPE_KEYS = {"k_inhale": "Inhale", "k_scream": "Scream"}
@@ -1185,13 +1196,13 @@ def cheek_params(s, pivot, dl=(0.0, 0.0, 0.0)):
 def params_of(spec):
     """Pose spec dict -> parameter vector. Keys: bh, bw (body height/width scale), pivot ('bottom'|'centre'), bdz
     (extra body z, cm), brot (body about Y, deg), jaw (deg), cheek {'s': (x, y, z), 'pivot': (x, y, z)}, cr_y (crown
-    about Y, deg), cr_dz (crown z, cm), la / lb (leaf_a / leaf_b tilt, deg, scalar or 5-list), lf (leaf_a fan about
+    about Y, deg), cr_dz (crown z, cm), cr_dx (crown x, cm; Phase J), la / lb (leaf_a / leaf_b tilt, deg, scalar or 5-list), lf (leaf_a fan about
     Z, deg), leaf_k (5 multipliers on la/lb)."""
     v = NEUTRAL.copy()
     spec = spec or {}
     if "body_s" in spec:            # legacy (x, y, z)
         spec = dict(spec, bh=spec["body_s"][0], bw=spec["body_s"][1])
-    for k in ("bh", "bw", "bdz", "brot", "jaw", "cr_y", "cr_dz"):
+    for k in ("bh", "bw", "bdz", "brot", "jaw", "cr_y", "cr_dz", "cr_dx"):
         if k in spec:
             v[PIDX[k]] = spec[k]
     for k, nm in SHAPE_KEYS.items():          # B2b: {"sk": {"Inhale": 1.0}} -> k_inhale
@@ -1227,7 +1238,7 @@ def bone_targets(arm, v):
     u = unit(arm)               # B4: pose translations are design-frame cm -> world cm
     out["body"] = (qaxis(Y, g("brot")), Vector((0, 0, g("bpiv") * (ZC - 1.9) * (bh - 1.0) + g("bdz"))) * u, s)
     out["taproot"] = (Quaternion(), Vector(), inv)
-    out["crown"] = (qaxis(Y, g("cr_y")), Vector((0, 0, g("cr_dz"))) * u, inv)
+    out["crown"] = (qaxis(Y, g("cr_y")), Vector((g("cr_dx"), 0, g("cr_dz"))) * u, inv)     # Phase J: + cr_dx
     out["jaw"] = (qaxis(Y, g("jaw")), Vector(), Vector((1, 1, 1)))
     cs = Vector((g("csx"), g("csy"), g("csz")))
     out["cheek_l"] = (Quaternion(), Vector((g("clx"), g("cly"), g("clz"))) * u, cs)

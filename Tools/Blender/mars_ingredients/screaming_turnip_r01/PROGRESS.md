@@ -2857,3 +2857,2595 @@ the bed writes them from the socket each tick (`DoMove_GripNode`), and glove-to-
 - Cold `reload` after an editor restart: still pending, against the refreshed snapshot.
 - The claim I'd most expect to be wrong: that the stalk read is right in motion at game frame rate. The movement clip gives
   only about 4 frames of the Tug.
+
+## Phase J Part 1 - Blender: SRC_Tug re-authored as the lean-and-stretch toward -X (executor report, Opus, 2026-11-08) - DONE, waiting for Fable's go before Part 2
+
+No Unreal, no `Script/`, every write under this folder. One slip: I ran a read-only `git diff --stat` on the builder once
+(no state change) against the brief's "no git"; nothing else touched git.
+
+**Files**
+- `scripts/build_screaming_turnip.py`: `cr_dx` appended to `PKEYS` after `cr_dz`, read by `params_of`, applied in
+  `bone_targets` as the crown's local X (design cm x `unit()`); the docstring rig contract says the crown translates in X and Z.
+- `scripts/animate_screaming_turnip.py`: STRAIN, TUG_MID, the three SRC notes (the comments carry the targets and the sweep).
+- `scripts/export_screaming_turnip.py`: `crown_travel.json` gains a `stretch` block; manifest `gameplay_numbers.k_StretchTravelCm`
+  + `stretch_note`; `clips.SRC_*.crown_travel_ue_cm` gains crown / socket x; `per_frame` path follows `--review`; `rig_contract` text.
+- `scripts/render_anims_screaming_turnip.py`: `--ortho` / `--target` framing override (the lean leaves the default frame).
+- Data: `source/ScreamingTurnip_R01.blend` re-animated (md5 4c2db60a...); backup `source/ScreamingTurnip_R01_phaseI.blend`
+  (byte copy before the first write, md5 49d9f0c7..., == the Phase I blend); `export/` SK, statics, 16 clips, expected files,
+  manifest, reports; `review/phaseJ/` (sheets, `anim_report.json`, `crown_travel.json`, `expected_anims_diff.json`, logs;
+  `baseline/` = pre-Phase-J expected_anims / manifest / anim_report / crown_travel / round-trip reports / the three scripts;
+  `iterations/r01/` = the rejected cr_y -48 / dz 9 attempt).
+
+#### Rerun (from this folder; each prints TURNIP_OK / TURNIP_FAIL)
+```bash
+B="C:/Program Files/Blender Foundation/Blender 5.2/blender.exe"
+"$B" -b --factory-startup source/ScreamingTurnip_R01.blend --python scripts/animate_screaming_turnip.py -- --review phaseJ
+"$B" -b --factory-startup source/ScreamingTurnip_R01.blend --python scripts/export_screaming_turnip.py -- --review phaseJ
+"$B" -b --factory-startup --python scripts/validate_roundtrip.py
+python scripts/diff_expected_anims.py review/phaseJ/baseline/expected_anims.json export/anims/expected_anims.json \
+    --expect-changed SRC_Tug,SRC_Release,SRC_Cancel --out review/phaseJ/expected_anims_diff.json
+"$B" -b --factory-startup source/ScreamingTurnip_R01.blend --python scripts/render_anims_screaming_turnip.py -- --out phaseJ \
+    --clips SRC_Tug,SRC_Cancel,SRC_Release --views front,side,threequarter --no-shapekey --pull-chain --ortho 34 --target -6,0,8.5
+```
+Final chain, all on the final code, **confirmed**: animate exit 0 `TURNIP_OK (16 clips, 14 s)` (`review/phaseJ/animate_log.txt`);
+export exit 0 `TURNIP_OK` (`export/export_log.txt`); round trip exit 0 `TURNIP_OK`; diff exit 0; renders exit 0
+(`review/phaseJ/render_anims_log.txt`).
+
+#### Pose numbers (design frame; crown head UE cm (x, z), root-relative)
+| pose | before (Phase I) | after (Phase J) |
+|---|---|---|
+| STRAIN | bh 1.06, bw 0.96, bdz -0.6, cr_dz 1.545, la -12, lb -7; crown (0, 39.50) | **bh 1.04, bw 0.98, bdz -0.6, brot -8, cr_y -50, cr_dx -10.398, cr_dz 4.192, la -12, lb -7; crown (-36.00, 42.30)** |
+| TUG_MID (f8) | bh 1.03, bw 0.98, cr_dz 0.74, la -10, lb -6; crown (0, 36.00) | **bh 1.02, bw 0.99, brot -4, cr_y -46, cr_dx -6.113, cr_dz 1.543, la -10, lb -6; crown (-20.00, 36.80) = 55.6 % of the dx** |
+| GRIP, PLANT, REL_OVER, REL_UNDER, NEUTRAL | - | unchanged (not re-tuned) |
+
+**DEV-J-1: dz +10.5 (brief +9 +- 2, inside the band) and the pitch leading the travel (-46 at f8, -50 at f15; brief "about
+35-50 at f15").** The brief's first numbers (dz 9, cr_y -40..-48, mid -22) fail the intersection gate: 3-28 `leaf_vs_bulb`
+pairs on Tug f10-f15 and Cancel f0-f2.
+- **Cause** (scratch sweep with a per-pair breakdown): always stem 3 (the -X stalk, azimuth 180) against bulb triangles at
+  x -13..-18, z 36-37. The bulb's top ring (0.35 crown) and dimple (0.6 crown) follow the crown further than stem 3's
+  emergence ring (0.5), so past ~25 cm of lean the dragged bulb top overtakes that stalk.
+- The weights are the builder's (Part 1b). I did not touch them: that would mean an SK reimport.
+- Leaf 3's `la` (-28..+6) changes nothing. Less body tilt (brot 0) is clean at f15 but not on f14 / Release f0.
+- What clears it: more height (stem 3 rides above the bulb neck) and a pitch already near its end while the travel is large.
+
+Sweep (0 = clean on every frame of Tug / Cancel / Release):
+
+| STRAIN cr_y / dz, mid cr_y | worst pairs |
+|---|---|
+| -48 / 9, -22 (first try) | 25 (Tug f12-15, Cancel f0-2, Release f0) |
+| -50 / 9, -22..-42 | 22-27 |
+| -48 / 10, -42 | 3 |
+| -50 / 10.5, -36 | 3 |
+| -49 / 10.5, -46; -49 / 11, -42; -49 / 11, -46; -50 / 10.5, -42; -50 / 11, -42; -50 / 11, -46 | 0 |
+| **-50 / 10.5, -46 (shipped)** | **0** |
+
+Shipped in the middle of the clean neighbourhood. The margin is thin: one step outside it gives 3 pairs again.
+
+#### Crown + socket travel (`review/phaseJ/crown_travel.json`, UE cm, root-relative)  **confirmed**
+| SRC_Tug frame | crown head (x, z) | HarvestGrip_R (x, y, z) | socket horizontal travel from f0 |
+|---|---|---|---|
+| f0 (== SRC_Grip f6) | (0.00, 31.80) | (-1.522, 4.683, 35.185) | 0 |
+| f8 | (-20.00, 36.80) | (-23.570, 4.683, 37.809) | 22.05 (57.8 %) |
+| f15 | (-36.00, 42.30) | (-39.675, 4.683, 42.804) | **38.153** |
+
+- HarvestGrip_L mirrors it (y -4.683), same travel. The sockets move only in X / Z (the crown rotates about Y only).
+- **`k_StretchTravelCm = 38.2`** (manifest `gameplay_numbers`, with `stretch_note` naming the frames).
+  - It is 2.2 cm more than the crown's 36.0: the 50 deg pitch swings the socket offset (-1.522, 3.385) forward on the crown.
+  - For the same reason the crown rises +10.5 at f15 but the sockets only +7.6 (35.19 -> 42.80).
+- Monotonic in x over the Tug; largest per-frame socket step 3.64 cm (f5-f6). The Tug is scrubbed by alpha, so no rate applies.
+- SRC_Cancel (7 frames at rate 1): socket steps 2.2 / 5.6 / 7.6 / **8.3** / 7.6 / 5.5 / 2.1 cm per 1/30 s (Phase I peak 1.4).
+- SRC_Release: 16.0 / **22.4** cm over f0-f2 (the snap); the crown overshoots to x +2.1 at f3 and settles at NEUTRAL.
+
+#### Audit (`review/phaseJ/anim_report.json`, `fails: []`)  **confirmed**
+- Every frame of every clip: intersections 0 in every category (no lip-fold allowance used on SRC), root identity (max dev
+  0.0), UE composition deviation <= 3e-5 cm, playback == authored.
+- `stem_gap` (max over frames and stems; <= 0 = seated): SRC_Idle -0.737, Grip -0.315, **Tug -0.315, Release -0.231,
+  Cancel -0.607**; every ROOT_* clip as in Phase I. The stem bases hold the 36 cm lean.
+- SRC chain joints 0 / 0 / 0 (Idle -> Grip -> Tug -> Release / Cancel -> Idle; Release fN == ROOT_QuietIdle f0).
+- SRC_Tug bounds: h 63.59, d_x 74.06, min x -57.89.
+- **Global envelope**: d_x 41.70 -> 77.93, min x -21.67 -> -57.89, h 63.59 -> 63.63. The manifest's
+  `phase_c_readback.bounds_extension` / `envelope_cm` follow it.
+
+#### Round trip  **confirmed**
+- `export/roundtrip_report.json` and `export/anims/roundtrip_report.json`: `fails: []`.
+- SRC_Tug: landmarks <= 7.5e-5 cm, extremes <= 6e-5, root 0.0, scale / shape-key error 0.0.
+- `export/expected.json` (bind, statics, cube) is byte-identical to the baseline: the mesh and rig did not change.
+
+#### Untouched clips (diff proof)  **confirmed**
+- **Command.** `python scripts/diff_expected_anims.py review/phaseJ/baseline/expected_anims.json
+  export/anims/expected_anims.json --expect-changed SRC_Tug,SRC_Release,SRC_Cancel --out review/phaseJ/expected_anims_diff.json`
+  (full compare, not `--bones-only`; tol 0.001 cm).
+- **Result.** Exit 0, `TURNIP_OK (3 changed: ['SRC_Cancel', 'SRC_Release', 'SRC_Tug'])`. Every ROOT_* clip, SRC_Idle and
+  SRC_Grip: max abs difference **0.0** on every leaf (bone heads, extremes, scale, shape-key values, peak vertices).
+- **Manifest diff** vs `review/phaseJ/baseline/`. Only these change:
+  - `clips.SRC_Tug/Cancel/Release`;
+  - the new x fields and the `per_frame` path on `SRC_Idle/Grip.crown_travel_ue_cm`;
+  - the envelope and its `phase_c_readback` copies;
+  - `rig_contract`;
+  - `gameplay_numbers.k_StretchTravelCm / stretch_note`.
+
+  `scale_factor` 3.0 is untouched.
+
+#### Sheets (looked at; `review/phaseJ/`)
+- **`SRC_Tug_sheet.png`** (front / side / 3/4) and **`crop_tug_f15_x3.png`** (f15 at 3x).
+  - The stalks lean out long and thin toward -X, about 3.5x their length. The leaves end pitched forward-up.
+  - The bulb stays in the soil and tilts slightly.
+  - **The bulb top is pulled into a pink tapered neck** about a third of the way up the stalks (the 0.35 / 0.6 crown
+    weights on the top ring and dimple). The stalks come out of that neck.
+  - No gap, tear or detached blade at sheet resolution.
+- **Honest read.** It reads as a rubbery stalk pulled sideways out of a peaked bulb, the Astro Bot rope idea. Two things to
+  judge:
+  - The pink neck. A builder-weight change would remove it but needs an SK reimport.
+  - The leaves point along the pull rather than trailing behind it. That is what a -X crown pitch does; a +X pitch would
+    trail, but it swings stem 3 into the bulb neck harder.
+  - Side tiles: the f15 leaf tip touches the right edge of the frame.
+- **`SRC_Cancel_sheet.png`**: a smooth spring-back to planted, no tearing; the neck shrinks back into the bulb.
+- **`SRC_Release_sheet.png`**: a 2-frame snap from the lean to the domed REL_OVER (leaves flat), then it settles at neutral.
+- **`pull_chain_sheet.png`**: Idle -> Grip -> Tug -> Release / Cancel, side and 3/4. Continuous; the joints are 0 (audit).
+
+#### Decisions made rather than asked (say to swap)
+- **REL_OVER / REL_UNDER not re-tuned.**
+  - The release settles at NEUTRAL (chain 0) but snaps 36 cm in 2 frames (22 cm per frame), with a 2.1 cm overshoot to +X.
+  - Phase I's PIE showed SRC_Release never plays visibly on the bed: the planted component is hidden at the yield. So I
+    left it.
+  - If it should play, re-key it (e.g. a REL_OVER at f2 with cr_dx +1.5).
+- **Framing override** in the renderer rather than changing the default views.
+
+#### For Part 2 / 3 (findings, not acted on)
+- **Cancel speed vs the Part 3 bed-2 rule** (no socket jump > 1.5 cm between samples).
+  - Cancel peaks at 8.3 cm per 1/30 s = 248 cm/s, about 4.1 cm per sample at 60 fps.
+  - To hold 1.5 cm at 60 fps it needs a playback rate <= 0.36: a span >= ~0.65 s from full strain (less from 1 - a).
+  - The clip length stays as briefed. Either the bed spans SRC_Cancel (`SpanSeconds`) or the rule is relaxed.
+- **Skeletal mesh bounds.** The clip envelope now reaches x -57.9, while the mesh's bind bounds are -27.7..26.2.
+  - The SK's bounds extension must cover the lean, or the planted turnip may be culled when the bind bounds leave the view.
+  - Inferred; check in Part 3.
+- **Part 3 readback target**: SRC_Tug crown head at f15 = (-35.998, 0, 42.3013) UE root-relative (`crown_travel.json`).
+
+#### Not verified
+- Anything in Unreal: the reimport, the scrub, culling, the gloves on the moved sockets.
+- The look in first person at game frame rate, including the pink neck from the player's view.
+- **Sub-frame audit** (`review/phaseJ/subframe_audit.json`, from the saved actions every 0.1 frame; script
+  `review/phaseJ/subframe_audit_j.py`, run like the animate command with `--python review/phaseJ/subframe_audit_j.py`;
+  it prints `TURNIP_FAIL subframe` because of the two rows below). **confirmed**:
+  - SRC_Tug (what the bed scrubs), 151 samples: 0 intersections, stem_gap -0.315.
+  - SRC_Cancel, 71 samples: **3 stem-3-vs-bulb pairs at f2.4 only** (a graze between the whole frames; at 60 fps the
+    cancel will pass through it).
+  - SRC_Release, 61 samples: **3 pairs at f0.5 and 25 at f0.6**, inside the 22 cm/frame snap. It does not play visibly on
+    the bed today.
+  - Fix if wanted: a Cancel mid key (and a Release re-key) that keeps the pitch ahead of the travel, as the Tug does.
+    Not done: the brief gates whole frames, and the sweep margin is thin.
+- **The claim I'd most expect to be wrong**: that the pink bulb neck reads as rubber stretch, not a defect, from the player's
+  view. Judged only on 300 px sheets.
+
+## Phase J Part 1b - Blender: the bulb top stays with the bulb (no neck); SK + every clip re-exported (Opus, 2026-11-08) - DONE, awaiting Fable audit
+
+Fable's audit of Part 1 accepted the gates and the travel numbers but rejected the pink neck. The bulb top was dragged a
+third of the way up the stalks, the same read as Phase I's rejected bh 1.22. **This section supersedes Part 1's sheets and
+its sub-frame finding.**
+
+The poses are unchanged: STRAIN and TUG_MID ship as in Part 1. No Unreal, no `Script/`, no git. Every write is under this
+folder.
+
+**Part 3 must reimport the SK as well as SRC_Tug / SRC_Cancel / SRC_Release.** The skin weights changed; the geometry,
+bones and sockets did not.
+
+### Weights (`scripts/build_screaming_turnip.py` `build_bulb`; 29 bulb vertices)
+| vertices | before | after |
+|---|---|---|
+| bulb top ring (28) | crown 0.35 (x rem x (1 - jaw)) | **crown 0.08** |
+| dimple (1, on the axis) | crown 0.6 / body 0.4 | **crown 0.15 / body 0.85** |
+| stem emergence rings | body 0.5 / leaf_a 0.5 | unchanged (stem_gap still <= 0, below) |
+
+The comments carry the target. The `build_leaf` comment now records why the emergence ring keeps 0.5.
+
+### Neck gauge (`review/phaseJ/neck.json`, new; written by the export, which now fails if the target is missed)  **confirmed**
+Displacement from SRC_Tug f0 in UE cm. The dimple is the axis vertex with crown weight; the ring is the other bulb
+vertices with crown weight.
+
+| SRC_Tug | crown head d (x, z) | dimple d (x, z) | dimple % of crown | ring max d (max abs dx / max dz) | ring % |
+|---|---|---|---|---|---|
+| f4 | (-7.53, 1.96) | (-1.44, 0.47) | 19.5 | 1.07 (0.97 / 0.47) | 13.7 |
+| f8 | (-20.00, 5.00) | (-3.86, 1.21) | 19.6 | 2.87 (2.61 / 1.18) | 13.9 |
+| f12 | (-31.39, 8.92) | (-6.19, 2.09) | 20.0 | 4.64 (4.22 / 1.93) | 14.2 |
+| **f15** | (-36.00, 10.50) | **(-7.14, 2.44)** | **20.1** | **5.36 (4.88 / 2.22)** | **14.3** |
+
+Target was dimple <= 25 %, <= 9 cm x, <= 3 cm z, ring less than the dimple. Met. Phase J Part 1's weights (0.35 / 0.6)
+put the dimple about 0.6 of the way, about 22 cm (estimated from the weights; not measured, the gauge is new).
+
+### Rebuild proof (`review/phaseJ/rebuild_compare.json`, vs `source/ScreamingTurnip_R01_phaseI.blend`)  **confirmed**
+- Counts: 1624 vertices / 3188 triangles; polygons and material indices identical.
+- Positions: rest vertices 0.0; Basis / Scream key blocks 0.0; Inhale 3.8e-6 cm (float noise). Vertex colour 0.0.
+- Bones 17 / 17 at 0.0; statics 0.0; mouth id props identical.
+- **Weights: 29 vertices changed, all bulb**, nothing else.
+- `review/phaseB4/measurements.json` (sockets, landmarks) has 0 differences from the pre-rebuild copy in
+  `review/phaseJ/baseline/`.
+- `pose_report.json` has 15 differences, all bulb-top bounds <= 0.07 cm lower in posed extremes (impact / inhale /
+  recover / scream) plus the info-only `attach_stem_root` count.
+- Builder exit 0, `TURNIP_OK` (`review/phaseJ/build_log.txt`); compare exit 0, `TURNIP_OK`.
+- `scripts/compare_rebuild_screaming_turnip.py` gained `--out`.
+
+### Audit, poses, intersections  **confirmed**
+- Animate: exit 0, `TURNIP_OK (16 clips, 18 s)`; `review/phaseJ/anim_report.json` `fails: []`.
+- Every frame of every clip:
+  - intersections 0 in every category;
+  - root identity;
+  - UE deviation <= 3e-5 cm;
+  - chain joints 0.
+- `stem_gap` (max over frames and stems; <= 0 = seated):
+
+  | clip | Part 1 | Part 1b |
+  |---|---|---|
+  | SRC_Tug | -0.315 | -0.648 |
+  | SRC_Grip | -0.315 | -0.648 |
+  | SRC_Release | -0.231 | -0.691 |
+  | SRC_Cancel | -0.607 | -0.731 |
+  | ROOT_* | -0.500 or lower | -0.574 or lower |
+
+- Stem 3 does not collide with the bulb top any more, so no cr_y change and no sweep was needed. The cause of Part 1's
+  thin margin (the dragged dimple) is gone.
+- **Sub-frame audit** (`review/phaseJ/subframe_audit.json`, every 0.1 frame from the saved actions): 0 intersections on
+  SRC_Tug (151 samples), SRC_Cancel (71) and SRC_Release (61). `TURNIP_OK subframe`.
+  - Part 1's Cancel f2.4 and Release f0.5 / f0.6 pairs are gone, so **no SRC_Cancel mid key was added**. Release is
+    untouched.
+
+### Export, round trip, diff, manifest  **confirmed**
+- Export (DEV-13 recipe; SK, statics, 16 clips): exit 0, `TURNIP_OK`.
+- Round trip: exit 0, `TURNIP_OK`; `fails: []` in both reports.
+- Diff proof:
+  - Command: `python scripts/diff_expected_anims.py review/phaseJ/baseline/expected_anims.json
+    export/anims/expected_anims.json --bones-only --expect-changed SRC_Tug,SRC_Release,SRC_Cancel --out
+    review/phaseJ/expected_anims_diff.json`.
+  - Result: exit 0, `TURNIP_OK (3 changed: ['SRC_Cancel', 'SRC_Release', 'SRC_Tug'])`.
+  - Every ROOT_* clip, SRC_Idle and SRC_Grip, against the pre-Phase-J baseline: bone landmarks 0.0 and skinned extremes 0.0.
+  - Peak vertices change only on ROOT_Inhale (0.49 cm) and ROOT_Scream (0.20 cm): bulb-top vertices with the new weights.
+- **`k_StretchTravelCm` re-measured: 38.2** (sockets 38.1532 cm; the crown -36.00 / +10.50). Sockets ride the crown bone,
+  so the weights cannot move them. The manifest `scale_factor` is still 3.0.
+
+### Sheets (looked at; `review/phaseJ/`, overwritten)
+- **`crop_tug_f15_x3.png`** (f15, side / 3/4 / front at 3x).
+  - **The neck is gone.** The bulb top is a low peaked dome leaning slightly toward the pull, and the stalks leave its
+    peak straight out.
+  - The peak is still a visible point (the dimple's 7 cm); it reads as a bulb being tugged, not a bulb leaving the soil.
+  - No gap, tear or floating stalk at sheet resolution.
+- **`SRC_Tug_sheet.png`**: the dome stays in the soil on every frame; the stretch is all stalk.
+- **`SRC_Cancel_sheet.png`**, **`SRC_Release_sheet.png`**, **`pull_chain_sheet.png`**: as in Part 1, minus the neck.
+  - Cancel is a smooth spring-back.
+  - Release is the 2-frame snap, then it settles.
+- **For the record**: `iterations/r02/` holds Part 1's neck version (the crop, four sheets, crown_travel, anim_report,
+  subframe audit, expected_anims and its blend `ScreamingTurnip_R01_phaseJ_part1.blend`). `iterations/r01/` is the cr_y -48
+  try.
+
+### Rerun (from this folder)
+```bash
+B="C:/Program Files/Blender Foundation/Blender 5.2/blender.exe"
+"$B" -b --factory-startup --python scripts/build_screaming_turnip.py
+"$B" -b --factory-startup source/ScreamingTurnip_R01.blend --python scripts/compare_rebuild_screaming_turnip.py -- \
+    --ref source/ScreamingTurnip_R01_phaseI.blend --out review/phaseJ/rebuild_compare.json
+"$B" -b --factory-startup source/ScreamingTurnip_R01.blend --python scripts/animate_screaming_turnip.py -- --review phaseJ
+"$B" -b --factory-startup source/ScreamingTurnip_R01.blend --python review/phaseJ/subframe_audit_j.py
+"$B" -b --factory-startup source/ScreamingTurnip_R01.blend --python scripts/export_screaming_turnip.py -- --review phaseJ
+"$B" -b --factory-startup --python scripts/validate_roundtrip.py
+python scripts/diff_expected_anims.py review/phaseJ/baseline/expected_anims.json export/anims/expected_anims.json \
+    --bones-only --expect-changed SRC_Tug,SRC_Release,SRC_Cancel --out review/phaseJ/expected_anims_diff.json
+"$B" -b --factory-startup source/ScreamingTurnip_R01.blend --python scripts/render_anims_screaming_turnip.py -- --out phaseJ \
+    --clips SRC_Tug,SRC_Cancel,SRC_Release --views front,side,threequarter --no-shapekey --pull-chain --ortho 34 --target -6,0,8.5
+```
+The blend md5 is now 89f8e34a.... Each step was run in this order on the final code; each printed TURNIP_OK and exited 0.
+**Confirmed.**
+
+### Still standing from Part 1 (for Part 2 / 3)
+- **Cancel speed.** Peak 8.3 cm per 1/30 s, against the Part 3 bed-2 rule of <= 1.5 cm per sample.
+- **Mesh bounds.** The clip envelope now reaches x -57.9.
+- **Part 3 readback target.** SRC_Tug crown head at f15 = (-35.998, 0, 42.3013).
+- **SK reimport.** Part 3 now reimports the SK (weights). Skin weights are not read back by the importer: verify them by
+  the in-engine look, as Phase I did.
+
+### Not verified
+- Unreal.
+- The dome's first-person read.
+- **The claim I'd most expect to be wrong**: that the residual peak (dimple 7 cm toward the pull) reads as fine in motion.
+  It is judged only on 300 px sheets and a 3x crop.
+
+## Phase J Part 2 - Script + tests: the walk-away pull on the Control kernel (Opus, 2026-11-08) - DONE, awaiting Fable audit
+
+Brief: `PHASE_J_BRIEF.md` D-J1, D-J2, D-J4, "Part 2", plus Fable's addendum (k_StretchTravelCm measured, SRC_Cancel spanned).
+No git, no `Script/Generated/*` by hand, no `Config/DefaultGameplayTags.ini`, nothing under `Tools/Blender` but this section.
+
+### What changed (Script/)
+
+- `ECS/Control/Mars_Control_Feature.as`: `enum EMars_Control_PullSource { Look, Walk }`; `FMars_Control_Manipulation_Spec`
+  gains `PullSource` (default Look) and `WalkCm` (default 40), declared after `Mode` and added as trailing defaulted ctor
+  params, so the spawn-params generator's 7-arg calls still compile and its 9-arg ones do too. `Validate`: Walk needs
+  ManuallyCompleted (error names `PullSource`), `Mode == Travel` (names `Mode`), `WalkCm > 0` (names `WalkCm`).
+  `FMars_Control_Manipulation` gains `Puller` + `WalkStartCm`; `FMars_Request_Control_BeginManipulation` gains `Puller` and
+  the `(Interaction, Completion, Puller)` ctor. PullAxis / AlphaPerDegree documented as Look-only.
+- `ECS/Control/Mars_Control_Utils.as`: mixins `Get_PullSource`, `TryGet_Puller` (invalid unless a Walk control is being
+  manipulated), `Get_HorizontalDistanceTo(Puller)` (XY distance from the control entity's own transform).
+- `ECS/Control/Mars_Control_Processor_Requests.as`: Begin on a Walk control ensures and returns false without a valid
+  Puller (or without a transform on the control); records `WalkStartCm`. `ApplyNudges` returns 0 on Walk without touching
+  Pull (commented: not an error, the player task sends none).
+- `ECS/Control/Mars_Control_Processor_Tick.as`: Walk branch before the spring:
+  `Pull = Clamp((Dist - WalkStartCm) / WalkCm, 0, 1)`, mirrored `1 - ...` for TowardStart. A Walk grip whose Puller is no
+  longer valid ends inline as EndManipulation does (`EndWithoutPuller`: reset, untag, Mover settle, Released + progress 0).
+- `PlayerCharacter/HFSM/Mars_PlayerCharacter_Hfsm_Tasks.as` (`UMars_SmTask_ManipulateControl`): for a Walk control no
+  `HoldView` at the interaction's start or at begin, no nudges in `DoTick`; `BeginManipulation` now always sends
+  `(Interaction, AtEngageAlpha, _Player.As_Transform(UnChecked))` (a Look control ignores the Puller). Grip wait, push-end
+  wait, refusal, OnInteractionFinished shared.
+- `WorldObjects/Forage/Mars_ScreamingTurnipBed_EntityScript.as`: composes `utils_control::Add` (ManuallyCompleted,
+  Toggle, Walk, `WalkCm = k_StretchTravelCm`, EngageAlpha 0.97, Stiffness 60, Damping 12, no Mover); target now
+  ManuallyCompleted (no duration), state class / RequiresFreeHands / AfterCompletion / Hold unchanged. `TugSeconds` and its
+  readers removed (the target duration, the Grip->Tug chain). OnPullStarted plays SRC_Grip only (span GripSeconds). Follow
+  tick: `DoTurn_TowardPuller` (planted node yawed so mesh -X faces the puller in XY, eased 540 deg/s, held after a cancel),
+  `DoScrub_Tug` (scrubs SRC_Tug to the Control's alpha while the drawing is in Grip or Tug, once alpha > 0 or the Grip
+  has played through; never overrides SRC_Cancel), then the grip nodes with their rotations pre-multiplied by the same yaw.
+  Cancel (addendum): `SpanSeconds = k_CancelSecondsFromFullStrain (0.7 s)` when Strain >= 0.05, StartAlpha 1 - Strain;
+  below 0.05 the tail plays at authored rate.
+- `Items/Presentation/Mars_ScreamingTurnipPresentationComponent.as`: `Scrub_Clip(Clip, Alpha)` - starts the clip
+  HoldLastFrame if not playing (drops any chain), then `SetPlayRate(0)` + `SetPosition(alpha * length, false)` per call.
+  `Play_ClipChain` is now unused (kept; one-line follow-up: delete it if Part 3 does not need it).
+- `Items/Mars_Item_ScreamingTurnip.as`: `k_StretchTravelCm = 38.2f` (manifest `gameplay_numbers.k_StretchTravelCm`,
+  confirmed 38.2 in `export/ScreamingTurnip_R01_Manifest.json` at append time); clip comment updated (Tug is scrubbed).
+- Tests, Control: rig `Mars_AutoTestRig_Lever.as` gains `_PullSource` / `_WalkCm` (subclass `default`s), a puller entity
+  (60 cm out on -X, 150 cm up so a 3D distance would read wrong), `Walk_Puller`, `Step_BeginWalkManipulation`. New
+  `WalkPullFollowsTheDistance` (0 -> 0.5 -> 0.3 within 0.05 after 1 s each, then 1.3 x WalkCm -> Succeeded, engaged),
+  `WalkPullIgnoresLookNudges` (30 frames of 4 deg: peak alpha 0, live, nothing engaged), `WalkPullDoesNotHoldTheView`
+  (through the player: test entity given a transform; never a ControlPull hold / orientation lost from Use to threshold;
+  `TryGet_Puller() == player root`; walking it 1.3 x WalkCm ends Succeeded). `SpecValidateRejectsMismatchedPolicies`
+  gains a valid Walk spec and three rejections (Timed, FreeTurn, WalkCm 0).
+- Tests, ScreamingTurnip: rig spawns a puller with the bed; the bed's `OnNewInteraction` begins the manipulation with it
+  (as ManipulateControl does without gloves), `OnInteractionFinished` ends it (as the task does); `Walk_Puller`,
+  `Get_WalkCmFor(alpha)`, `Get_PullAlpha`, `Mark_Time`. Rewritten `AnUnarmedPullReleasesOneRootAndEmptiesTheBed` (walk
+  1.25 x WalkCm), `ACancelledPullKeepsTheCharge` (0.5, cancel, alpha < 0.05 within 1 s, charge kept). New
+  `AStretchShortOfTheBreakNeverReleases` (0.8 for 1 s, within 0.05, live, kept), `WalkingBackUnstretches` (0.8 then 0.2:
+  under 0.3 within 1 s, still gripped, nothing released).
+
+### Lanes (toolbox, `--test --no-live --discover-fresh`, focused; no full gate)
+
+| Pattern | Passed | Failed | Exit | Known reds |
+| --- | --- | --- | --- | --- |
+| Control | 74 | 0 | 0 | none ran, no new failures |
+| ScreamingTurnip | 12 | 0 | 0 | none ran, no new failures |
+| FPHands | 34 | 0 | 0 | none ran, no new failures |
+| Interactable | 14 | 0 | 0 | none ran, no new failures |
+
+Evidence: `Saved/Logs/TurnipJ/{control,ScreamingTurnip,FPHands,Interactable}.out` (toolbox console; `Passed:` lines at
+26958 / 24561 / 24607 / 24525), editor logs `Saved/Logs/Test-TurnipJ-<P>.log`. The three new Control tests completed
+Success at control.out:25834 / 26097 / 26832; all 12 ScreamingTurnip tests listed Success. All four ran after the addendum
+edits (stale-green check: they started after the last `.as` write).
+
+A first Control run without `--discover-fresh` passed 71/0 but used a cached test list (the new tests were never
+discovered): discarded. Its regen editor logged "Full Reload is required ... Keeping old angelscript code active" for the
+changed generated files; the second regen boot compiled clean ("Script/Generated unchanged") - transient, as
+ARCHITECTURE.md §22.3 describes. The toolbox regenerated `Script/Generated/Mars_EntitySpawnParams.as` /
+`Mars_AutoTestActors.as` (TugSeconds gone, new tests present): generated, not to be committed by hand.
+
+Rerun:
+```bash
+./CkAuto/UnrealToolbox.exe --test --no-live --discover-fresh --test-pattern Control --output=Saved/Logs/Test-TurnipJ-Control.log --project=D:/Repositories/CkRepos/Orion/Mars.uproject
+# same with ScreamingTurnip, FPHands, Interactable (one at a time)
+```
+
+### Decisions made rather than asked (one line each to revert)
+
+- Cancel span: the addendum wrote `SpanSeconds = 0.7 * Strain` but also "the play rate is constant whatever the strain".
+  `DoPlay` sets rate = clip length / SpanSeconds for the whole clip, then seeks to StartAlpha, so `0.7 * Strain` would
+  make the rate grow as the strain falls. Implemented the constant rate: SpanSeconds = 0.7 (rate 0.233/0.7 = 0.33), so the
+  remaining Strain of the clip takes 0.7 x Strain s. Revert: multiply by Strain in `OnPullFinished`.
+- The bed's Control sets `ReturnsToRest = true` (not in the brief): IsActive never flips, but this pins Get_PullDirection
+  to TowardEnd regardless. Revert: drop the line.
+- The player task passes its transform as Puller to every control (Look ignores it), rather than branching.
+- The ScreamingTurnip rig ends the manipulation on the interaction's finish (the player task's job); without that a
+  cancelled rig pull would stay gripped with a dead interaction.
+
+### Unverified headless (Part 3, PIE)
+
+- The yaw (planted node facing the puller, 540 deg/s, grip rotations yawed), the Tug scrub posing bones and morph curves
+  while the single node sits at rate 0, `Get_HasPlayedThrough` staying false short of alpha 1, the spanned SRC_Cancel's
+  socket steps, and the gloves on the sockets: all visual, none exercised by a lane (headless has no gloves on the bed and
+  the rig never reads the presentation). **inferred** from the code only.
+- "Alpha back near 0 within 1 s" in `ACancelledPullKeepsTheCharge` is satisfied by the manipulation ending (alpha unset ->
+  0), not by a spring: the bed has no Mover; the visible springback is SRC_Cancel. **confirmed** by the test, but it proves
+  the end, not the drawing.
+- The real player's root as Puller: the through-player test gives the test entity a transform; that the PIE player
+  entity carries one is **inferred** (`ck::Ctx` of the Locomotion task; a missing one would ensure in the Control).
+
+Not started: Part 3.
+
+## Phase J Part 3 - Unreal reimport + PIE run-05-walk (Opus, 2026-11-08) - DONE, awaiting Fable audit
+
+No git, no `Script/` edits, no level load through the console, no unload / reload of packages. Unreal writes: the SK, its
+SKEL and the three SRC clips under `/Game/ArtCandidates/ScreamingTurnip/R01/`, saved per asset. Driver files under
+`Tools/LevelDesign/screaming_turnip_r01_review/` (`R` below). Editor left running on the review map, PIE stopped.
+
+### Preflight  **confirmed**
+- Monolith answered on :9316. Mars.log boot: AngelScript full compile with warnings only, `new module swap-in` done, 0
+  `Full Reload is required` lines. 0 dirty packages, PIE off. The editor was on the Sandbox; the review map was loaded with
+  `LevelEditorSubsystem.load_level` (clean; not a console command).
+
+### Reimport (`R/phaseJ/reimport_phaseJ_ue.py import`; report `R/phaseJ/reimport_phaseJ.json`)
+- The wrapper drives the importer's own functions (`run_mesh`, `import_clips` with the clip list filtered to SRC_Tug /
+  SRC_Cancel / SRC_Release, `full_readback`) without editing it. It does not write the importer ledger
+  (`export/unreal_readback_final.json` is untouched); it diffs against that ledger's `reimport_phaseI`.
+- Mesh: stored import options synced (morph targets True, IMPORT_NORMALS, vcolor REPLACE, update ref pose True), the
+  existing SKEL reused, SK + SKEL saved. Clips: 3 saved. Duplicates []; root assets before == after. **confirmed**.
+- Bounds: the importer's rule (envelope + 6 cm) gave negative extension x 47 (x min -64.69); positive x was raised from 10
+  to 14 so +x reaches 30.21 (Fable's "-60..+30"). Bounds with extension (-64.69, -28.04, -8)..(30.21, 28.04, 68).
+  **confirmed** (`mesh_readback.bounds_with_extension`).
+- Readback: material / mesh / statics / clip groups all PASS, `TURNIP_OK`. SRC_Tug crown head at f15 = (-35.998, -0.0,
+  42.3013), err 0.0 cm vs `crown_travel.json`. Frames: Tug 15 (16 keys, 0.5 s), Cancel 7 (8, 0.2333 s), Release 6 (7,
+  0.2 s); landmark worst <= 7.2e-5 cm. Morphs [Inhale, Scream], 9536 render verts, 6 sockets err 0.0. **confirmed**.
+- Diff vs `reimport_phaseI`: materials, statics, owned / root assets 0 lines. Mesh 5 lines, all the bounds extension.
+  Clip 56 lines, all in the three SRC clips except ROOT_QuietIdle and SRC_Idle `landmark_worst_cm` (7.9e-5 / 8.2e-5 ->
+  6.4e-4 / 3.5e-4 cm). Those two assets were not reimported; Part 1b re-exported `expected_anims.json` (its diff used tol
+  0.001), so the reference moved by < 0.001 cm. **confirmed** (diff); the cause is **inferred**.
+- Skin weights are not read back: the dome look below is the evidence.
+
+### PIE sessions (review map; `R/screaming_turnip_walk_ue.py` on top of `screaming_turnip_pie_ue.py`)
+| session | folder (`R/captures/pie/`) | what | Mars.log |
+|---|---|---|---|
+| void | `run-05-walk-void-a/` | a sampler bug (`bounds` attribute) blanked the bed rows, and the run broke bed 1 at a timeout. Discarded. | from 3551 |
+| A | `run-05-walk/` (`walk_rows.json`, `walk_rows_analysis.json`) | the numbers: no screenshots, real time, ~15 fps under the sampler | to 4173 |
+| B | `run-05-walk-shots/` (J0-J13 png, 3 sheets, rows, analysis) | the captures: `Shot SHOWUI`, slomo 0.25 (game steps ~0.016 s: the 60 Hz numbers) | 4174-4473 |
+| C | `run-05-walk-clip/` (217 frames, `sheet_pull_side.png`) | `capture_pie_movement_clip`, wide side view of bed 0's pull to the break | 4488-4948 |
+| D | `run-05-walk-clip-edge/` (297 frames, `sheet_hold_views.png`) | as C, held at alpha 0.87 with two close side views | 4949-5467 |
+
+Driver: walk at 30 cm/s (input scale 0.075; calibrated 392 cm/s at scale 1.0, 40 at 0.1), camera re-aimed at the bed every
+tick (Aim), Use through `Key`. Bed 0 from the diagonal (-80, -80) (the root must turn 45 deg), bed 1 from +Y (450, -320)
+(-90 deg). Alpha = the scrubbed SRC_Tug position / 0.5 s. The ring = the prompt widget's Duration DMI `Percent` (read
+from session B on; A's ring reader filtered the widget out).
+
+### Numbers (A unless stated; analysis files above, `R/phaseJ/rest_error.txt`, `pose_lag.txt`, `clip_linearity.txt`)
+- **Alpha vs (d - d0) / 38.2.** Standing still (spring settled): max |err| 0.0028 (A bed 1 pull 2, 31 rows), 0.0021 /
+  0.0029 (B bed 0 hold / bed 1 pull 2). While walking at 30 cm/s the spring trails by 0.105-0.113 (max 0.113 A bed 0,
+  mean -0.085): a velocity lag of about 0.135 s, about 4.2 cm of walk. In B (fine steps) the alpha matches the target
+  0.2 s earlier (Damping / Stiffness) within 0.039. **confirmed**.
+- **The ring fills with the Control's alpha**: |ring x 0.97 - drawing alpha| <= 0.00014 over 256 / 84 / 387 rows (B); max
+  ring 0.983 / 0.998 on the last visible row before each break. **confirmed**.
+- **Release at alpha >= 0.97.** Last visible row before the root hides: alpha 0.954 (A bed 0), 0.966 (A bed 1), 0.953 /
+  0.968 (B; ring 0.983 / 0.998); the root is out on the next tick. **confirmed** that it releases one tick after 0.95-0.97;
+  that the crossing value is >= 0.97 is **inferred** (the threshold is the only Succeeded path; no row samples it).
+- **Socket travel toward the player vs alpha x 38.2** (along the planted -X, frame-correct): max 4.38 cm (A), 2.97 cm (B).
+  Two parts:
+  1. The drawn pose is one tick behind the scrub position. The sockets match SRC_Tug's authored travel at the previous
+     row's alpha within 0.012 cm, and at the same row's within 3.1 cm (A, 15 fps) (`pose_lag.txt`).
+  2. The clip's own ease differs from linear by up to 2.98 cm (alpha 0.8; `clip_linearity.txt`).
+
+  **confirmed**. The paused node (rate 0) poses the bones exactly at the set position (D-J2's proof) **confirmed**; the
+  morph curves at the set position were not checked.
+- **Gloves on the sockets**: glove bone at tick n vs socket at tick n-1 = 0.000 cm on all 127 rows (A) and 84 rows (B bed 1
+  pull 1): the gloves sit exactly one tick behind. Same tick max 3.07-3.16 cm at 15 fps, 2.02 cm in B. The FPHands reach
+  cap never left a glove short (0 rows > 0.5 cm lagged). B's bed 0 / pull 2 rows under a chase view are excluded (the
+  gloves follow the view, 155-179 cm off). **confirmed**.
+- **Yaw.** The turn starts when the manipulation begins (after the 0.4 s Grip; `TryGet_Puller` is unset before), not
+  during the Grip clip: bed 0 0 -> 36.2 -> 43.5 deg in 2 ticks, bed 1 0 -> -33.8 -> -64.3 -> -90.2 in 3. From then on
+  |yaw - bearing| <= 0.001 deg. Sidestep (A): bearing -90.0 -> -66.2, yaw -90.0 -> -66.2, max err 0.001, d held
+  149.45-149.55; B -90.0 -> -61.5, max err 0.001. The yaw is kept after the cancel (pull 2 starts at -90.18). **confirmed**.
+- **Bed 1 cancel** (B, ~60 Hz steps).
+  - Let go at alpha 0.586 -> SRC_Cancel first row t 0.0945 = start alpha 0.405 (1 - a = 0.414; one tick of play).
+  - In-clip socket steps 1.22-1.28 cm per sample (<= 1.5).
+  - **The switch frame steps 3.57 cm**: SRC_Cancel at 1 - a sits about 3.1-3.7 cm above SRC_Tug at a for a 0.3-0.6
+    (`crown_travel.json`; 3.36 cm at a 0.586), 0.44 cm at a 0.9.
+  - A (15 fps): 6.06 cm per 70 ms sample = 86.6 cm/s = 1.44 cm per 60 Hz frame.
+  - Ends on SRC_Idle 0.436 s (B) / 0.556 s (A) after the first Cancel row.
+  - **The gloves do not ride the cancel**: 3.8, 6.4, 12.7 ... 94 cm off the sockets over the first 0.18 s. The interaction
+    ends on the let-go and FPHands releases the grip (Script side, as Phase I).
+
+  **confirmed**.
+- **Charge kept, second pull works**: `bed1_after_cancel` charges=1 released=0 enabled; after pull 2 released=1
+  exhausted (A and B marks). **confirmed**.
+- **Culling.** `was_recently_rendered(0.2)` true on every visible planted row in A, B, D, including D's close views at
+  alpha 0.868 (11 + 11 rows). **confirmed**.
+
+### Captures, my read
+- `run-05-walk-shots/sheet_bed0.png` (J0-J3, J6, J7 first person, HUD): the prompt ("Pull Screaming Turnip") and its ring
+  sit on top of the turnip and hide most of it; the gloves are on the stalks, the leaves lean toward the camera. J7: the
+  root in the air beside the empty bed, gloves back. The dome cannot be judged from first person (as Phase I).
+- `sheet_side_bounds.png` (J4, J5a, J5b, chase views at full strain): the stalks run long and low from a small pink dome in
+  the bed to the leaves at the chef's hands: a lean, not a lift. The dome stays a low dome in the soil, no neck. The chase
+  view keeps the player camera's 90 deg FOV (my FOV argument does nothing), so J5a / J5b do not frame what their names say:
+  the bulb is in view in both. Superseded by D.
+- `run-05-walk-clip-edge/sheet_hold_views.png` frames 082-090 (scene only, 25 cm off the axis, held at alpha 0.87): the
+  stretched stalks and blades fill the frame, the pink dome cut by the bottom-right edge: **the bulb at the edge of view and
+  the leaves draw**. Frames 094-102 (aimed 60 cm toward the player): the leaves fill the frame, a sliver of the dome is
+  still in the corner, so "bind bounds wholly outside the frustum" is **not** shown (90 deg at 25 cm reaches the bulb).
+- `run-05-walk-clip/sheet_pull_side.png` frames 055-073 (wide side view): idle stalks; the stalks lengthen and lean toward
+  the chef while the dome stays in the bed; frame 073 the root is airborne over the empty bed. About 5 game fps (0.2 s per
+  frame under ReadPixels). The gloves do not render in a third-person view.
+- `sheet_bed1.png`: J8 (alpha 0.5, prompt over the turnip), J9 / J10 (cancel early / mid: the gloves already off the
+  stalks and coming back), J11 (idle, gloves at rest), J12 / J13 (top view before / after the sidestep: the stalks point at
+  the player in both; the turn follows the player round the bed).
+
+### Ensures, dirty, Sandbox
+- Mars.log 3406-5467 (reimport through session D): **1** `Ensure condition failed`, line 4635: `InRHITexture`
+  D3D12RenderTarget.cpp:617, frame [833], 27 ms after `MONOLITH_CLIP begin` (line 4633), before the driver's probe: the
+  clip capture's first readback; the stack is D3D12RHI / Engine / RenderCore. Sessions A, B and D: 0. **confirmed**
+  (lines); not the turnip **inferred** from the stack and timing.
+- 0 dirty packages after the reimport and after the last session. The Sandbox map was only unloaded (file mtime
+  2026-11-07 21:08, unchanged). **confirmed**.
+
+### Rerun
+```text
+# editor (review map loaded, PIE off), Monolith editor_query run_python execute_file:
+D:/Repositories/CkRepos/Orion/Tools/LevelDesign/screaming_turnip_r01_review/phaseJ/reimport_phaseJ_ue.py import
+# PIE (editor_query start_pie), then run_python:
+import sys; sys.path.insert(0, r"D:/Repositories/CkRepos/Orion/Tools/LevelDesign/screaming_turnip_r01_review")
+import screaming_turnip_pie_ue as t, screaming_turnip_walk_ue as w
+t.begin("run-05-walk"); w.state["full_speed"] = 400.0; w.sample_start(); w.run_measure(30.0)   # or run_captures(30.0, 0.25)
+# poll w.status(); then w.finish(); stop_pie
+# clips: capture_pie_movement_clip duration 45 / 60, interval 0.15, a probe at 1.5 s running w.clip_drive_walk() or
+#        w.clip_drive_walk('run-05-walk-clip-edge', 15.0, 0.8)
+# from R/: python phaseJ/analyse_walk.py captures/pie/run-05-walk/walk_rows.json
+#          python phaseJ/rest_error.py <analysis.json> ; python phaseJ/pose_lag.py <analysis.json>
+#          python phaseJ/crop_sheet.py ... ; python phaseJ/clip_sheet.py ...   (sheets)
+```
+
+### Not verified / findings for Fable
+- **Cancel switch jump 3.57 cm** (authored: SRC_Cancel at 1 - a is not SRC_Tug at a mid-strain). A fix is either a Blender
+  re-key of Cancel (or of the Tug ease) so the two poses meet, or a Script start alpha matched by pose rather than 1 - a.
+- **Gloves leave on the cancel** (Script side, unchanged since Phase I).
+- **The yaw turns after the Grip**, not during it (D-J2 asked for "through the Grip clip").
+- The walking spring lag (0.11 at 30 cm/s) exceeds the brief's 0.1 while walking; at rest it is 0.003.
+- The pose is one tick behind the scrub, which adds about one frame of socket travel to the glove's same-tick gap.
+- Bind bounds wholly outside the view with the leaves drawn: not framed (FOV fixed at 90 deg in the chase view).
+- The morph curves under the scrub, the release crossing value, node-to-socket (private handles): not read.
+- The claim I'd most expect to be wrong: that the gloves-on-stalks read is right at game frame rate in first person. Every
+  first-person capture has the prompt over the turnip.
+
+## Phase J Part 2b - Script: the plant turns toward the presser from the press, not from the grip (Opus, 2026-11-08) - DONE, awaiting Fable audit
+
+Why: PIE (Part 3) showed the turn starting only at the manipulation's begin (after the 0.4 s Grip; the Control's Puller is
+unknown until then) and finishing in 2-3 ticks: a snap as the pull starts.
+
+- `Script/WorldObjects/Forage/Mars_ScreamingTurnipBed_EntityScript.as` only:
+  - New member `_Aim` (FCk_Handle_Transform), set in `OnPullStarted` from
+    `utils_interaction::Get_InteractionSource(InInteraction).As_Transform(UnChecked)`.
+  - `DoTurn_TowardPuller` uses `_Control.TryGet_Puller()` while gripped, else `_Aim`. It is the same 540 deg/s ease, so the
+    turn runs through the Grip clip and the gloves' reach.
+  - `_Aim` is cleared where the follow ends: the follow tick's Done branch (the cancel back at SRC_Idle, or harvested) and
+    `OnForageReleased`.
+- No new mixin. The live interaction's source is already a public CkFoundation util (`utils_interaction::Get_InteractionSource`),
+  and `Mars_Interactable_Hfsm_Tasks.as` `DoGet_Initiator` uses the same call for a live interaction. The stamped
+  `FMars_Fragment_InteractionContext.Initiator` exists only on the completion's sub-SM, too late for the press.
+- No headless test (`ThePlantTurnsTowardThePullerDuringTheGrip` not added):
+  - The rig cannot read the planted yaw cheaply. CkFoundation has no handle -> entity-script-object getter (only
+    `Get_ScriptClass`).
+  - The turn runs only on the follow tick, which needs the planted skeletal component.
+  - The rig's carrier has no transform, so `_Aim` is invalid there and the turn holds.
+  - Left to PIE: the yaw should start moving on the press and face the player within 5 deg before the grip.
+- Inferred, not confirmed: the PIE interaction source is the player entity with its transform. The Use path starts
+  interactions with source `_Player`, and `Mars_Interactable_Processor_Setup.as:80` takes the source as the initiator.
+
+Lane (`--test --no-live --discover-fresh --test-pattern ScreamingTurnip`): **12 passed, 0 failed, exit 0**, no known red
+ran, no new failures (`Saved/Logs/TurnipJ/ScreamingTurnip_2b.out` lines 24521-24542; editor log
+`Saved/Logs/Test-TurnipJ2b-ScreamingTurnip.log`). Started after the edit (stale-green check).
+
+Rerun: `./CkAuto/UnrealToolbox.exe --test --no-live --discover-fresh --test-pattern ScreamingTurnip --output=Saved/Logs/Test-TurnipJ2b-ScreamingTurnip.log --project=D:/Repositories/CkRepos/Orion/Mars.uproject`
+
+## Phase J Part 1c - Blender: SRC_Cancel re-keyed as the Tug's mirror (Opus, 2026-11-08) - DONE, awaiting Fable audit
+
+**Why.** PIE (Part 3) measured a 3.57 cm on-screen jump at a 0.586 where the cancel takes over: SRC_Cancel(1 - a) sat
+3.1-3.7 cm above SRC_Tug(a). Cancel was keyed STRAIN -> PLANT with no mid key, while Tug has TUG_MID at f8.
+
+No Unreal, no `Script/`, no git. Every write is under this folder. Only SRC_Cancel changed; **Part 3 reimports that one
+clip** (the SK and the other clips are byte-identical in intent; diff below).
+
+### Change (`scripts/animate_screaming_turnip.py`)
+- SRC_Cancel keys: `[(0, STRAIN), (7, PLANT)]` -> **`[(0, STRAIN), (49/15 = f3.2667, TUG_MID), (7, PLANT)]`**.
+  - 49/15 = 7 x (1 - 8/15), the mirror of Tug's f8.
+  - The spline takes a fractional key, and every integer frame is still keyed in the action.
+  - The clip still covers 0..7 and still ends at PLANT (chain Cancel fN -> Idle f0 is 0).
+- `clips.json` `key_frames` now keeps a fractional key (`[0, 3.2667, 7]`) instead of truncating it.
+- The comment and the clip note carry the numbers.
+
+### Match (`review/phaseJ/cancel_match.json`, from `review/phaseJ/cancel_match_j.py`)  **confirmed**
+Method: Cancel sampled at frame 7(1 - a) against Tug at frame 15a, every 0.01 of alpha. Crown head and both HarvestGrip
+sockets, UE cm, root-relative. Two evaluations:
+- `actions`: the exported keys at 30 fps with linear sub-frame interpolation, as Unreal plays them.
+- `spline`: the authored curve.
+
+Choosing k by the spline, max crown mismatch over a 0.05..0.95:
+
+| k | max mismatch (cm) | at a 0.59 (cm) |
+|---|---|---|
+| none (old) | 2.79 | 2.39 |
+| 3 | 1.66 | 1.59 |
+| 3.2 | 1.03 | 0.42 |
+| **3.2667** | **1.03** | **0.05** |
+| 3.3 | 1.03 | 0.19 |
+| 3.5 | 1.55 | 1.35 |
+| 4 | 4.92 | 4.02 |
+
+Shipped f3.2667: the f3 / f4 integer choices are worse at every alpha.
+
+As played (`actions`), before -> after:
+
+| | crown max, a 0.05..0.95 | socket max | at a 0.59 | crown max, a 0.2..0.95 |
+|---|---|---|---|---|
+| before (Part 1b blend) | 2.76 (at a 0.43) | 3.93 | 2.36 | 2.76 |
+| **after** | **1.26 (at a 0.07)** | **1.26** | **0.02** | **0.89** |
+
+The "before" is the actions block of `iterations/r02/cancel_match_before_1c.json`; its spline block is meaningless (it
+reads the current script).
+
+**Target (<= 1.0 cm over a 0.05..0.95) MISSED at the low end, for two measured reasons:**
+- The floor is the Grip dip. Tug starts at GRIP (crown 31.80) and Cancel ends at PLANT (32.85), so a -> 0 cannot match
+  better than 1.05 cm while Cancel ends at PLANT, which the chain requires. The spline is at 1.03 at a 0.05 and <= 1.0
+  from a 0.08.
+- 30 fps keys. Linear interpolation between the 7 Cancel keys and the 15 Tug keys adds up to about 0.25 cm near the eased
+  ends. So as played it peaks at 1.26 (a 0.07), is <= 1.01 from a 0.12, and <= 0.89 from a 0.2. Fixing this would need a
+  longer Cancel, which the brief forbids.
+- `cancel_match_j.py` is a measurement: it prints `TARGET ... MISSED` per evaluation and `TURNIP_OK` once written.
+
+Sockets match the crown to within 0.003 cm on the same curve.
+
+**Cancel speed** (`crown_travel.json`): socket steps per 1/30 s are 2.7 / 6.1 / 6.6 / 6.2 / 7.7 / 6.8 / 2.9 cm. Peak 7.7
+(was 8.3), more even. Still above Part 3's bed-2 1.5 cm-per-sample rule at rate 1.
+
+### Gates (each on the final code; real lines and exit codes)  **confirmed**
+- Animate: exit 0, `TURNIP_OK (16 clips, 24 s)`; `anim_report.json` `fails: []`.
+  - SRC_Cancel: intersections 0, stem_gap -0.690, UE deviation 2e-5.
+  - SRC chain joints 0.
+- Sub-frame audit (`subframe_audit.json`, every 0.1 frame): SRC_Cancel 71 samples, 0 intersections. Tug and Release are
+  unchanged and still 0. `TURNIP_OK subframe`.
+- Export (DEV-13): exit 0, `TURNIP_OK`. The neck gauge is unchanged (dimple 20.1 %).
+- Round trip: exit 0, `TURNIP_OK`; `fails: []` in both reports. SRC_Cancel landmarks 7.3e-5 cm, root 0, scale and
+  shape-key error 0.
+- **Diff proof** (full compare, not bones-only, tol 0.001 cm, against Part 1b's expected_anims):
+  - Command: `python scripts/diff_expected_anims.py review/phaseJ/iterations/r02/expected_anims_part1b.json
+    export/anims/expected_anims.json --expect-changed SRC_Cancel --out review/phaseJ/expected_anims_diff_1c.json`.
+  - Result: exit 0, `TURNIP_OK (1 changed: ['SRC_Cancel'])`. Every ROOT_* clip, SRC_Idle, SRC_Grip, SRC_Tug and
+    SRC_Release: 0.0 on every leaf.
+- **Manifest** vs Part 1b's copy (`iterations/r02/ScreamingTurnip_R01_Manifest_part1b.json`): only
+  `clips.SRC_Cancel` (note, bounds h 63.627 -> 63.59) and the envelope h_z 63.627 -> 63.59 changed. The envelope's max z
+  came from the old Cancel's f1 overshoot; it is also copied into `phase_c_readback`.
+  `k_StretchTravelCm` is still 38.2 and `scale_factor` 3.0.
+
+### Sheet (looked at)
+`review/phaseJ/SRC_Cancel_sheet.png` (front / side / 3/4; the Part 1b version is in `iterations/r02/`): a smooth, even
+spring-back from the lean to planted, retracing the Tug's arc. No tearing; the dome stays in the soil.
+
+### Rerun (from this folder)
+```bash
+B="C:/Program Files/Blender Foundation/Blender 5.2/blender.exe"
+"$B" -b --factory-startup source/ScreamingTurnip_R01.blend --python scripts/animate_screaming_turnip.py -- --review phaseJ
+"$B" -b --factory-startup source/ScreamingTurnip_R01.blend --python review/phaseJ/subframe_audit_j.py
+"$B" -b --factory-startup source/ScreamingTurnip_R01.blend --python review/phaseJ/cancel_match_j.py
+"$B" -b --factory-startup source/ScreamingTurnip_R01.blend --python scripts/export_screaming_turnip.py -- --review phaseJ
+"$B" -b --factory-startup --python scripts/validate_roundtrip.py
+python scripts/diff_expected_anims.py review/phaseJ/iterations/r02/expected_anims_part1b.json export/anims/expected_anims.json \
+    --expect-changed SRC_Cancel --out review/phaseJ/expected_anims_diff_1c.json
+"$B" -b --factory-startup source/ScreamingTurnip_R01.blend --python scripts/render_anims_screaming_turnip.py -- --out phaseJ \
+    --clips SRC_Cancel --views front,side,threequarter --no-shapekey --ortho 34 --target -6,0,8.5
+```
+The blend md5 is now 798d0826....
+
+### Not verified
+- Unreal: the reimport of SRC_Cancel, and the switch-frame jump in PIE.
+  - Expected about 0.02 cm at a 0.59 and <= 1.26 cm anywhere. That is inferred from the Blender actions; Unreal's
+    interpolation of the same keys should match.
+- **The claim I'd most expect to be wrong**: that a cancel at a <= 0.1 reads clean. That is where the 1.05 cm Grip-dip
+  step sits, unavoidable while Cancel ends at PLANT.
+
+## Phase J Part 3b - SRC_Cancel reimport (Part 1c mirror), aim from the press, PIE run-06 from a 110 cm stand (Opus, 2026-11-09) - DONE, awaiting Fable audit
+
+Same hard rules as Part 3. One asset written: `ScreamingTurnip_R01_SRC_Cancel_Mars_ANIM`, saved alone. `R` =
+`Tools/LevelDesign/screaming_turnip_r01_review/`. The editor is left running on the review map, with PIE stopped.
+
+### Correction to the brief's premise (from my own files)
+Part 3 did not start the pulls at the 250 cm spawn. `d0` was 114.3 / 129.9 / 128.1 cm in
+`R/captures/pie/run-05-walk/walk_rows_analysis.json`, and 112.6 / 128.7 / 130.2 cm in `run-05-walk-shots/`.
+- The bed 0 stand was (-80, -80), 113 cm away; the bed 1 stand was (450, -320), 130 cm away.
+- The gloves were on the stalks in those runs (glove lag 0.000 cm). They look small in first person because of the
+  camera geometry, and the prompt covers them.
+- run-06 stands at 110 cm all the same: d0 110.44 / 110.50 / 111.08 cm, stand offsets 1.22 / 1.26 / 1.08 cm
+  (`run-06-walk/walk_rows.json` marks). **confirmed**.
+
+### Preflight  **confirmed**
+- Mars.log 5468-5561 covers the hot compile of the bed change. It is a soft reload: `Compiling (structural)` for
+  `Mars_ScreamingTurnipBed_EntityScript` followed by `new module swap-in`. It has no error lines and no
+  `Full Reload is required`.
+- PIE was off, 0 packages were dirty, and the review map was loaded.
+
+### Reimport: `R/phaseJ/reimport_phaseJ_ue.py clips SRC_Cancel` (report `R/phaseJ/reimport_phaseJ_clips.json`)
+- This is the new `clips` mode of the same wrapper: `import_clips` with the clip list filtered to SRC_Cancel, then a
+  full readback.
+- Only SRC_Cancel was saved. Duplicates []. Root assets unchanged. 0 packages dirty before and after.
+- All four readback groups PASS (`TURNIP_OK`).
+- SRC_Cancel: 7 frames, 8 keys, 0.2333 s, landmark worst 6.4e-5 cm. Chain: from Tug f15 1.1e-5 cm, end to Idle f0 0.0.
+- Diff against Part 3's `reimport_phaseJ.json`:
+  - The clip lines are all SRC_Cancel.
+  - Mesh has one line: `bounds_contain_clip_envelope_margin` 6.173 -> 6.2. The asset did not change. The manifest
+    envelope that the margin is measured against did (Part 1c); this is **inferred**.
+  - Everything else: 0 lines.
+
+  **confirmed**.
+
+### run-06-walk (`R/captures/pie/run-06-walk/`)
+Sampled per tick at slomo 0.25 (game steps of about 0.016 s); `walk_rows.json` and `walk_rows_analysis.json`. Driver:
+`run_06` in `R/screaming_turnip_walk_ue.py`. Each pull walks to the stand and makes a slow final approach to within
+1.5 cm, aiming at the bed. Bed 0 is approached from the -X/-Y diagonal (the root must turn 45 deg); bed 1 from +Y
+(-90 deg).
+
+**The yaw starts on the press** (`yaw_from_press` in the analysis file). **confirmed**.
+
+| pull | yaw track from the press | within 5 deg | Grip clip at that moment |
+|---|---|---|---|
+| bed 0 | 0 until +0.043 s (the first SRC_Grip tick), then 8.9 / 17.7 / 26.0 / 34.3 / 41.6 / 44.41 deg | +0.120 s | t 0.046 of 0.2 s authored (0.4 s span) |
+| bed 1, pull 1 | 0 -> -88.6 deg | +0.195 s | t 0.090 |
+| bed 1, pull 2 | the yaw was kept from pull 1; error 0.575 deg on the press, 0.0 from +0.048 s | at the press | - |
+
+After the turn the yaw error is <= 0.001 deg for the rest of every pull.
+
+**Bed 0 back-off to the break.**
+- Alpha vs (d - d0) / 38.2 at rest (hold): <= 0.002 (`R/phaseJ/rest_error_run06.txt`). While walking the spring trails
+  by up to 0.155. Against the target 0.2 s earlier the error is <= 0.049.
+- Ring: abs(ring x 0.97 - alpha) <= 0.00014 (219 rows).
+- The last visible row before the break is at alpha 0.967 (ring 0.997); the root is out on the next tick.
+- Sockets: they match SRC_Tug at the previous row's alpha within 0.010 cm (`pose_lag_run06.txt`).
+- Gloves: glove(n) vs socket(n-1) 0.000 cm on 121 first-person Tug rows, 0 rows over 0.5 cm, same tick <= 3.10 cm
+  (`R/phaseJ/run06_gloves_bed0.txt`; the hold rows taken under the side view are excluded).
+- `was_recently_rendered` was true on every visible row.
+
+**confirmed**.
+
+**Bed 1 cancel** (`bed1_cancel` in the analysis file).
+- The let-go came at alpha 0.650. That is over the asked 0.5-0.6: the move stops at 0.55, and the spring plus the shot
+  frame carried it on.
+- The SRC_Cancel first row is at t 0.0799, start alpha 0.342 (1 - a = 0.350, one tick of play later).
+- Switch frame: the step is 0.371 cm on the switch row. On the first row with the Cancel pose drawn (the pose is one tick
+  behind) it is 1.019 cm, which includes that tick's play at about 1.0 cm. Part 3 measured 3.57 cm here.
+- In-clip steps are 0.88-1.41 cm per sample at about 60 Hz. One 5.45 cm step falls over a 73.5 ms shot frame
+  (1.24 cm per 60 Hz frame).
+- The cancel ends on SRC_Idle 0.477 s after the first Cancel row.
+- `bed1_after_cancel`: charges=1, released=0, enabled.
+
+**confirmed**.
+
+**Bed 1, pull 2 to the break.**
+- Gloves 0.000 cm lagged, <= 0.76 cm same tick.
+- The last visible row is at alpha 0.968 (ring 0.998).
+- `bed1_after`: released=1, exhausted.
+
+**confirmed**.
+
+**Still Script side:** the gloves leave on the cancel (2.1 cm on the first Cancel-pose row, then 5.7, 11.9 ... 89 cm).
+
+### Captures, my read
+- `run-06-walk/sheet_bed0.png` (K0 prompt, K1 grip, K2 alpha 0.3, K3 0.7, K4 full strain, K6 break; first person, HUD).
+  - K0, taken just before the press, shows the gloves big in the foreground with the prompt and ring over the bed.
+  - From K1 on, the gloves are at the stalks, small at 110 cm and partly under the prompt.
+- `run-06-walk/zoom_K1_K4.png` (crops around the turnip).
+  - K1: the two gloves clasp the stalks under the leaves.
+  - K2-K4: gloves, stalks and leaves come down-screen toward the camera, the leaves trailing beside the gloves, and the
+    pink dome stays behind the prompt at the bed.
+  - **The lean toward the camera reads; the gloves are on the stalks.**
+- `sheet_side_bed1.png`.
+  - K5 (side, full strain): long low stalks from a small pink dome in the bed toward the chef. The dome stays low; there
+    is no neck.
+  - K7: the root in the air beside the empty bed, the gloves back.
+  - K8 (alpha 0.55-0.65): the turnip under the prompt.
+  - K9: the gloves already leaving at the cancel.
+  - K10: idle, the gloves at rest.
+- `run-06-walk-clip/sheet_pull_side.png` (capture_pie_movement_clip, 231 frames, `poll.json` ok true, 0 ensures).
+  - Frames 020-022 are first person before the view switch: prompt, gloves reaching to the bed.
+  - Frames 024-040 are the side view: grip, then the stalks lengthening and leaning low toward the chef while the dome
+    stays in the bed.
+  - Frames 042-044: the root airborne.
+  - About 5 game fps under ReadPixels.
+
+### Ensures, dirty, Sandbox  **confirmed**
+- Mars.log 5562-6326 (the reimport, run-06 and the clip): 0 `Ensure condition failed`, 0 `Full Reload is required`.
+- 0 dirty packages after the last session.
+- The Sandbox file mtime is 2026-11-07 21:08, unchanged.
+
+### Rerun
+```text
+run_python execute_file: D:/Repositories/CkRepos/Orion/Tools/LevelDesign/screaming_turnip_r01_review/phaseJ/reimport_phaseJ_ue.py clips SRC_Cancel
+start_pie; run_python: t.begin("run-06-walk"); w.state["full_speed"] = 400.0; w.sample_start(); w.run_06(30.0, 0.25)
+  ... w.finish(); stop_pie
+capture_pie_movement_clip duration 45, interval 0.15, probe at 1.5 s: w.clip_drive_06()
+python phaseJ/analyse_walk.py captures/pie/run-06-walk/walk_rows.json; rest_error.py / pose_lag.py on the analysis
+```
+
+### Not verified
+- The release crossing value, still inferred: a release one tick after alpha 0.967 / 0.968.
+- Node-to-socket (private handles).
+- The morph curves under the scrub.
+- Bind bounds wholly off-screen.
+- The let-go landed at 0.65, not within 0.5-0.6.
+- The claim I'd most expect to be wrong: that the first-person read is good at full game speed. The first-person
+  evidence is slomo screenshots and two clip frames.
+
+## Phase J - Fable audit (2026-11-09): the walk-away pull is ACCEPTED, uncommitted
+
+Audited against the artifacts, not the reports: the Part 1/1b/1c sheets and crops, `crown_travel.json`, `neck.json`,
+`cancel_match.json`, the Part 2 diff (Control tick/requests/utils/feature, the player task, the bed, the presentation
+component, the rigs and tests), the four lane logs, the run-05 and run-06 capture sheets and `zoom_K1_K4.png`.
+
+- Part 1 rejected once (the bulb top dragged into a pink neck a third of the way up the stalks: the Phase I "bulb out of
+  the soil before break-free" read); Part 1b's weights (top ring crown 0.08, dimple 0.15) fixed it, dimple travel 20 % of
+  the crown's. Part 1c re-keyed SRC_Cancel as the Tug's mirror (fractional key f3.2667): switch mismatch 0.02 cm at a 0.59,
+  1.26 cm worst at a 0.07 (the Grip dip; structural).
+- Part 2 accepted: Walk pull source on the Control kernel (Look unchanged), bed composes it, Scrub_Clip, cancel spanned
+  0.7 s (the executor's constant-span correction of my `0.7 * Strain` is right: DoPlay's rate covers the whole clip).
+  Part 2b: the plant aims at the presser from the press (utils_interaction::Get_InteractionSource).
+- Part 3/3b accepted: readback exact, PIE run-06 from a 110 cm stand: yaw within 5 deg at 0.12-0.20 s after the press
+  (during the Grip), alpha vs distance within 0.002 at rest (spring trails up to 0.155 while walking, by design), ring
+  fills, release one tick after alpha 0.967, glove-to-previous-tick socket 0.000 cm, cancel switch 0.37 cm (drawn 1.02),
+  cancel steps 0.88-1.41 cm per 60 Hz sample, charge kept and the second pull works, 0 ensures in Mars.log 5562-6326.
+- My own error, for the record: I read run-05's d0 as 250 cm (the spawn) from the first sampler row; the pulls actually
+  started at 114-130 cm. run-06 at 110 cm stands anyway and is the first-person evidence.
+
+Rulings: the gloves leaving the stalks on a cancel stays (the player let go; the plant springs back without them). The
+prompt label and ring sit over the turnip from the standing view: a HUD placement matter, out of Phase J.
+
+Owed / maintainer's: judge the first-person read at full game speed (all evidence is slow-motion or sheet frames); a
+let-go inside alpha 0.5-0.6 was not sampled (run-06's came at 0.65); morph curves under the scrub, bind bounds wholly
+off-screen, grip-node-to-socket (glove-to-socket covers it) not measured; the two untracked
+`Content/EntitySpawnParams/EntitySpawnParams_CkEntityScriptEditorServices_*` assets are lane regen output, never committed;
+`Play_ClipChain` has no callers left (delete when convenient); `Script/Generated/*` regenerated by the lanes.
+
+
+## Phase J Part 1d - Blender: the stretch at 2x (shipped) and a 3x preview (Opus, 2026-11-09) - DONE, awaiting Fable audit
+
+The maintainer, on the walk-away pull: the leaves should stretch much more, "2x-3x as a start". **Shipped: 2x.** 3x is
+rendered and audited as a preview only (a scratch blend; not exported).
+
+No Unreal, no `Script/`. Two slips: a read-only `git status` (piped to `head -0`, no output used), and earlier in Part 1 a
+`git diff --stat`. Neither changed anything.
+
+**The skin weights changed, so Part 3 reimports the SK plus SRC_Tug / SRC_Cancel / SRC_Release.**
+
+### Changes
+- **`scripts/build_screaming_turnip.py`**: bulb top ring crown 0.08 -> **0.03**, dimple 0.15 / 0.85 -> **0.06 / 0.94**
+  (29 vertices). This keeps the absolute neck target (dimple <= 9 cm x / <= 3 cm z, ring below it) at 2x *and* 3x, so
+  picking 3x later needs no further weight change. Emergence rings unchanged (0.5 / 0.5).
+- **`scripts/animate_screaming_turnip.py`**:
+  - STRAIN: cr_y -60, cr_dx -21.667, cr_dz 6.908 (bh 1.04, bw 0.98, brot -8, la -12, lb -7 unchanged).
+  - TUG_MID: cr_y -50, cr_dx -12.571, cr_dz 2.878 (bh 1.02, bw 0.99, brot -4, la -10, lb -6).
+  - SRC_Release gains `ease=(2,)` at REL_OVER.
+  - SRC_Cancel keeps the Part 1c mirror key (f3.2667 TUG_MID).
+  - New `STRAIN_3X` / `TUG_MID_3X` and a `--variant 3x` flag. It swaps the poses, saves to
+    `source/ScreamingTurnip_R01_phaseJ_3x_preview.blend`, and does not write `export/anims/clips.json`.
+  - Clip notes and comments carry the numbers.
+- **New measurement script** `review/phaseJ/stretch_audit_j.py`: crown / socket travel, neck, stem lengths at f0 vs f15.
+
+### Pose choice (sweep through the clip splines, every frame of Tug / Cancel / Release; scratch `tune_j2.py`)
+| 2x STRAIN cr_y, mid cr_y | Tug | Cancel | Release |
+|---|---|---|---|
+| -50 / -55, mid -46 / -50 / -55 | 0 | 0 | 3 pairs at f3 (stem 3 vs the bulb top at x -1, z 36) |
+| -60, mid -46 / -50 / -55 | 0 | 0 | 3 pairs at f3 |
+| **-60, mid -50, plus Release ease at f2 (shipped)** | **0** | **0** | **0** |
+
+- The Release f3 graze is the spline's overshoot past neutral into +X after a 72 cm snap. Zero slope at REL_OVER removes
+  the overshoot.
+- Stem 3 never touches the bulb top on the Tug at 2x or 3x: the cut bulb-top weights did that.
+- Pitch -60 is the top of the brief's 50-60 band. As at 1x, the leaves point along the pull (a -X crown pitch).
+
+### 2x numbers (confirmed)
+**SRC_Tug** (`crown_travel.json`, UE cm, root-relative):
+
+| frame | crown head (x, z) | HarvestGrip_R (x, y, z) | horizontal socket travel |
+|---|---|---|---|
+| f0 | (0, 31.80) | (-1.522, 4.683, 35.185) | 0 |
+| f8 | (-40.00, 39.50) | (-43.630, 4.683, 40.254) | 42.11 (56.8 %) |
+| f15 | (-71.99, 45.80) | (-75.703, 4.683, 45.656) | **74.18** |
+
+- **`k_StretchTravelCm = 74.2`**, not the ~76 expected. The -60 deg pitch swings the socket offset forward by 2.2 cm
+  (crown 72.0 -> socket 74.2).
+- The manifest is refreshed; `rig_contract` text untouched; `scale_factor` 3.0.
+
+**Neck** (`neck.json`; the export gates it): f15 dimple (-6.25, 1.79) = 8.9 % of the crown's travel; ring max 4.57.
+**PASS.**
+
+**Audit** (`anim_report.json` `fails: []`, animate `TURNIP_OK (16 clips, 17 s)`):
+- Intersections 0 on every frame of every clip; root identity; UE deviation <= 3e-5; chain joints 0.
+- stem_gap: Tug -0.687, Cancel -0.686, Release -0.687, Grip -0.712. Every ROOT_* clip <= 0.
+- Envelope: d_x 113.23 cm (min x -93.19), h 65.76.
+
+**Sub-frame audit** (`subframe_audit.json`, every 0.1 frame): Tug 151 / Cancel 71 / Release 61 samples, 0 intersections.
+`TURNIP_OK subframe`.
+
+**Cancel match** (`cancel_match.json`, as played: 30 fps keys, linear between them):
+- Max crown 1.65 / socket 1.68 cm, at a 0.07. That is **over the 1.3 target for a 0.04..0.10**.
+- <= 1.13 from a 0.15; 0.04 at a 0.59. The spline itself is <= 1.03.
+- Cause, measured:
+  - The 1.05 cm Grip-dip floor (Cancel must end at PLANT) remains.
+  - On top of it sits the chord error of the 7-key Cancel near its eased end. That error scales with the travel: about
+    1.3 cm at 72 cm, about 0.7 at 36. Only a longer Cancel (more keys) shrinks it, and that is off-brief.
+  - So the mismatch is above 1.3 cm only while a is between 0.04 and 0.10.
+
+**Speeds:**
+- SRC_Cancel socket steps per 1/30 s: 5.1 / 11.7 / 12.8 / 12.1 / 14.8 / 12.8 / 5.5 cm.
+- SRC_Release: 36.0 / 38.6 cm over f0-f2, then <= 1.7 (no overshoot now).
+
+**Export / round trip** (DEV-13, the SK included): exit 0 `TURNIP_OK` both; `fails: []` in both reports.
+
+**Rebuild proof** (`rebuild_compare.json` vs `source/ScreamingTurnip_R01_phaseI.blend`):
+- 1624 / 3188, polygons identical.
+- Rest, bones, statics 0.0; Inhale key 3.8e-6.
+- Weights: 29 bulb vertices, nothing else.
+- `TURNIP_OK`.
+
+**Diff proof**:
+- Command: `python scripts/diff_expected_anims.py review/phaseJ/iterations/r03_1c/expected_anims.json
+  export/anims/expected_anims.json --bones-only --expect-changed SRC_Tug,SRC_Release,SRC_Cancel --out
+  review/phaseJ/expected_anims_diff_1d.json`.
+- Result: exit 0, `TURNIP_OK (3 changed: ['SRC_Cancel', 'SRC_Release', 'SRC_Tug'])`.
+- Every ROOT_* clip, SRC_Idle and SRC_Grip: bone landmarks 0.0 and skinned extremes 0.0.
+- Peak vertices: ROOT_Inhale 0.097 cm and ROOT_Scream 0.037 cm (bulb-top vertices, the weights).
+- The same command against the pre-Phase-J baseline also passes.
+
+### 3x preview (not shipped; `stretch_3x_audit.json`, `SRC_Tug_3x_sheet.png`)
+- Poses: STRAIN cr_dx -32.913, cr_dz 9.783, cr_y -60; mid cr_dx -19.04, cr_dz 4.05, cr_y -50. Same weights as 2x.
+- Crown (-107.99, +18.00); socket horizontal travel 110.18 (`k_StretchTravelCm` would be 110.2).
+- Neck: dimple (-8.41, 2.03), ring 5.62. **PASS**, at the edge of the 9 cm x.
+- Its animate run (`variant_3x/anim_report.json`): `fails: []`; intersections 0 on every frame of every clip;
+  stem_gap Tug / Cancel / Release about -0.60. Envelope min x -129.2.
+- **Not run at 3x**: sub-frame audit, cancel match, export, round trip.
+- Blend: `source/ScreamingTurnip_R01_phaseJ_3x_preview.blend`. The shipped blend and the exports are the 2x: confirmed
+  by mtime, the 3x run wrote neither.
+
+### Stem lengths (`stretch_audit_j.py`; base ring -> blade ring, SRC_Tug f15 / f0)
+| | leaf 1 / 5 | leaf 2 / 4 | leaf 3 | emergence -> blade |
+|---|---|---|---|---|
+| 1x | 9.0x | 8.6x | 8.7x | 7.3-8.2x |
+| **2x (shipped)** | **17.1x** (4.5 -> 76.8 cm) | **16.4x** | **16.7x** | 13.9-15.2x |
+| 3x | 25.1x | 24.4x | 24.8x | 20.5-22.4x |
+
+The brief guessed 7x and 10x of rest. The short rest stalk (about 4.5 cm base to blade) already makes 1x about 9x, so 2x
+is about 17x and 3x about 25x.
+
+### What the stems look like (`crop_tug_f15_2x.png`, `crop_tug_f15_3x.png`, `stretch_1x_2x_3x.png`; looked at)
+- **No thinning.** Linear skinning keeps each ring's cross-section, so the stalks stay the same width along their whole
+  length. At 2x and 3x they read as thin, uniform green rods (wires) with no taper.
+- **Faceting.** The four-sided stem cross-section cannot be resolved at 300 px x3. It is likely to show up close in first
+  person (inferred).
+- **Blades.** They stay attached at the far end, clustered at the crown: no gap at the blade ring, no detached blade. They
+  read small against 75-110 cm of stalk. Leaf 3's blade points along the pull, like an arrowhead.
+- **The bulb.** A low peaked dome; the stalks leave its peak. There is no neck at 2x or 3x.
+- **The read.** 2x reads as a long rubber band. 3x reads as a fishing line: the stalks dominate and the plant shrinks to
+  a dome plus a tuft.
+- **If the maintainer goes 3x**, the honest fix for the rod look is builder-side, and needs a reimport. Fatter stems
+  (STEM_R), more rings along the stem so it can taper or sag, or a 6-sided cross-section. None of this was done.
+
+### Sheets
+- `review/phaseJ/SRC_Tug_sheet.png`, `SRC_Cancel_sheet.png`, `SRC_Release_sheet.png`, `pull_chain_sheet.png`: 2x, framing
+  `--ortho 44 --target -12,0,8.5`.
+- `SRC_Tug_3x_sheet.png` (`--ortho 56 --target -18,0,8.5`).
+- `stretch_1x_2x_3x.png`: f15 side and 3/4, same framing. 1x is the Part 1c blend with the Part 1b weights.
+- Part 1c state kept in `iterations/r03_1c/` (blend, expected_anims, manifest, crown_travel, neck, cancel_match, sheet).
+
+### Rerun (from this folder)
+```bash
+B="C:/Program Files/Blender Foundation/Blender 5.2/blender.exe"
+"$B" -b --factory-startup --python scripts/build_screaming_turnip.py
+"$B" -b --factory-startup source/ScreamingTurnip_R01.blend --python scripts/compare_rebuild_screaming_turnip.py -- --ref source/ScreamingTurnip_R01_phaseI.blend --out review/phaseJ/rebuild_compare.json
+"$B" -b --factory-startup source/ScreamingTurnip_R01.blend --python scripts/animate_screaming_turnip.py -- --review phaseJ
+"$B" -b --factory-startup source/ScreamingTurnip_R01.blend --python review/phaseJ/subframe_audit_j.py
+"$B" -b --factory-startup source/ScreamingTurnip_R01.blend --python review/phaseJ/cancel_match_j.py
+"$B" -b --factory-startup source/ScreamingTurnip_R01.blend --python scripts/export_screaming_turnip.py -- --review phaseJ
+"$B" -b --factory-startup --python scripts/validate_roundtrip.py
+python scripts/diff_expected_anims.py review/phaseJ/iterations/r03_1c/expected_anims.json export/anims/expected_anims.json --bones-only --expect-changed SRC_Tug,SRC_Release,SRC_Cancel --out review/phaseJ/expected_anims_diff_1d.json
+"$B" -b --factory-startup source/ScreamingTurnip_R01.blend --python scripts/render_anims_screaming_turnip.py -- --out phaseJ --clips SRC_Tug,SRC_Cancel,SRC_Release --views front,side,threequarter --no-shapekey --pull-chain --ortho 44 --target -12,0,8.5
+# 3x preview (scratch blend; run after the shipped chain)
+"$B" -b --factory-startup source/ScreamingTurnip_R01.blend --python scripts/animate_screaming_turnip.py -- --review phaseJ/variant_3x --variant 3x
+"$B" -b --factory-startup source/ScreamingTurnip_R01_phaseJ_3x_preview.blend --python review/phaseJ/stretch_audit_j.py -- 3x review/phaseJ/stretch_3x_audit.json review/phaseJ/variant_3x/anim_report.json
+```
+Each printed TURNIP_OK with exit 0 on the final code. The shipped blend md5 is 4b064dcd....
+`cancel_match_j.py` prints `TARGET ... MISSED` (a measurement, by design).
+
+### Part 3 notes
+- Reimport the **SK** (weights) and the three SRC clips.
+- The SK bounds must now cover x -93 (2x).
+- Readback: SRC_Tug crown head at f15 = (-71.9944, 0, 45.7995).
+- Script side: `k_StretchTravelCm` 38.2 -> **74.2**, so `WalkCm` doubles and the player backs off 74 cm. The 250 cm
+  interaction trace and the 40 cm probe box were judged at 36 cm. Re-check that the focus holds (inferred risk).
+
+### Not verified
+- Unreal.
+- The 3x sub-frame / cancel match / round trip.
+- The first-person read of the rods.
+- **The claim I'd most expect to be wrong**: that a 74 cm walk-away keeps the turnip in focus and the gloves on the
+  sockets. The FPHands `MaxReachCm` and the interaction probe were tuned for 36 cm.
+
+## Phase J Part 3c - the 2x stretch in Unreal: SK + three SRC clips, bounds to x -100, PIE run-07 (Opus, 2026-11-09) - DONE, awaiting Fable audit
+
+Same hard rules. `R` = `Tools/LevelDesign/screaming_turnip_r01_review/`. The editor is left running on the review map,
+with PIE stopped.
+
+### Preflight  **confirmed**
+- Mars.log 7659-7690 is the hot compile of `k_StretchTravelCm = 74.2` (`Compiling (code only): Items.Mars_Item_ScreamingTurnip`,
+  line 7672). It has no error lines, ends in `new module swap-in`, and has 0 `Full Reload is required` lines.
+- PIE was off, 0 packages were dirty, and the review map was loaded.
+
+### Reimport: `R/phaseJ/reimport_phaseJ_ue.py import 1d` (report `R/phaseJ/reimport_phaseJ_1d.json`)
+- It runs the mesh stage (stored options synced, existing SKEL reused, SK + SKEL saved), then the three clips.
+- The new `1d` tag sets the 1d crown target and a negative bounds floor of 83. The report is diffed against
+  `reimport_phaseJ_clips.json`.
+- All four readback groups PASS (`TURNIP_OK`). No duplicates, root assets unchanged, 0 packages dirty before and after.
+- SRC_Tug crown at f15: (-71.9944, -0.0, 45.7995), err 0.0 cm.
+- Frames: Tug 15, Cancel 7, Release 6. Landmark worst <= 7.5e-5 cm. Chains (Grip <- Idle, Tug <- Grip, Cancel / Release
+  <- Tug f15, the two notes ends) <= 1.1e-5 cm.
+- Bounds with extension: (-100.69, -28.04, -8)..(30.21, 28.04, 70).
+  - Negative extension x 83 (the importer's rule gave 82, raised to 83).
+  - Positive x 14.
+  - z 22 (the importer's rule).
+  - `bounds_contain_clip_envelope_margin` 6.044 cm.
+- Diff: the clip lines are all in the three SRC clips; mesh lines are the bounds only; 0 lines elsewhere.
+- The new bulb-top weights cannot be read back; the look is in the captures.
+
+**confirmed**.
+
+### run-07-walk (`R/captures/pie/run-07-walk/`)
+Run with `run_06(30, 0.25, "run-07-walk", let_go=0.45)` and `WALK_CM = 74.2`. Samples were per tick at slomo 0.25 (game
+steps of about 0.009 s). Files: `walk_rows.json`, `walk_rows_analysis.json` (`WALK_CM=74.2 python phaseJ/analyse_walk.py`),
+and `R/phaseJ/run07_extra.txt`, `rest_error_run07.txt`, `pose_lag_run07.txt`. Stands: d0 110.43 / 110.39 / 111.02 cm.
+
+**Bed 0, back-off to the break.**
+- Alpha vs (d - d0) / 74.2 at rest (the hold): max 0.0016 (`rest_error_run07.txt`, 112 rows). While walking the spring
+  trails by up to 0.083.
+- Ring: abs(ring x 0.97 - alpha) <= 0.00014 (493 rows).
+- The sockets match SRC_Tug at the previous tick's alpha within 0.017 cm (`pose_lag_run07.txt`). Against alpha x 74.2 the
+  max is 5.49 cm, which is the clip's ease plus that one-tick pose lag.
+- Gloves: glove(n) vs socket(n-1) 0.000 cm on all 332 first-person Tug rows, 0 rows over 0.5 cm, same tick <= 4.03 cm
+  (`run07_extra.txt`).
+- The FPHands reach cap: the player sets no MaxReachCm (`Mars_PlayerCharacter_Assets.as:225`, "unset = uncapped"), and the
+  bed's grip entries pass none. So **0 ticks were left short**, matching the 0 lagged rows above.
+- **The focus held to the break.**
+  - Every Tug row had the prompt ring up. No `pull_dropped` mark.
+  - Bed 0's last visible row: d 184.61 cm, camera pitch -27.7 deg.
+  - Bed 1 pull 2: d 189.63, pitch -27.1.
+  - The pitch ran from -41.3 at the grip up to -27.7.
+- Release.
+  - Bed 0: the last visible row is at alpha 0.9456 (ring 0.9748). The release tick is the K6 screenshot's long tick
+    (dt 0.094 s), so the crossing happened inside that tick.
+  - Bed 1 pull 2: last visible alpha 0.969 (ring 0.999).
+  - That the crossing value is >= 0.97 is **inferred**.
+- Yaw: within 5 deg 0.101 s after the press (45 deg turn) and 0.184 s (90 deg); kept for pull 2.
+- `was_recently_rendered` was true on every visible row.
+
+**confirmed**.
+
+**Bed 1 cancel.**
+- Let go at alpha 0.496 (the stop is at 0.45, then the spring lag). SRC_Cancel's first row: start alpha 0.501 vs
+  1 - a = 0.504.
+- Switch row step 0.228 cm. The first row with the Cancel pose drawn moves 1.38 cm in 8.6 ms. That includes about 1.0 cm of
+  play at ~120 cm/s, so the pose mismatch itself is about 0.35 cm (**inferred**).
+- **Spanned cancel speed**: the plateau is 120-150 cm/s, i.e. **2.0-2.5 cm per 60 Hz frame**; peak 2.67 cm (the step
+  that contains the switch). Over 35 in-clip steps the 60 Hz equivalent ranges 0.39-2.67 cm (`run07_extra.txt`). This
+  exceeds the 1.5 cm rule.
+  - Inferred: the speed scales with 1 / span, so holding 1.5 cm at the measured 150 cm/s peak needs
+    k_CancelSecondsFromFullStrain of about 0.7 x 150 / 90 = 1.17 s. That is Fable's call.
+- Ends on SRC_Idle 0.363 s after the first Cancel row. `bed1_after_cancel`: charges=1, released=0, enabled.
+- The gloves leave on the cancel (1.6, 1.9, 3.7 ... 41 cm; Script side).
+
+**confirmed** (the measured numbers).
+
+**Bed 1, pull 2** broke, and `bed1_after` reads released=1. **confirmed**.
+
+### Captures, my read
+- `sheet_bed0.png` (first person: K0 prompt, K1 grip, K2 0.3, K3 0.7, K4 full strain, K6 break).
+  - K0: the gloves big, the prompt over the bed.
+  - From K1 on, the gloves are on the stalks.
+  - K3 to K6: the gloves, stalks and leaves come toward the camera and sit at the bottom edge of the frame. They are partly
+    cut off by the screen bottom because the camera keeps aiming at the bed, at pitch about -27.7 by the break. The pink
+    dome is behind the prompt at the bed.
+- `zoom_K4b_stalks_fp.png` (close crop at full strain): five thin stalks run from the dome to the gloves. **Faceting
+  shows**: each 4-sided stalk reads as flat bands, a light and a dark green stripe per face, a ribbon rather than a round
+  stem. Not a tear; visible at this size.
+- `zoom_K5_rods_side.png` and `sheet_side_bed1.png` K5 (side, full strain).
+  - The stalks are long straight rods, about the length of the chef's reach, converging to thin points at a small pink
+    dome that stays low in the soil. No neck.
+  - The rods read as flat-faced (olive / yellow bands), the leaves clustered at the far end.
+- K7: the root in the air beside the empty bed.
+- K8 to K10: the cancel; the gloves leave the stalks at once (K9) and are at rest by K10.
+- `R/captures/pie/run-07-walk-clip/sheet_pull_side.png` (capture_pie_movement_clip, 146 frames, `poll.json` ok true,
+  0 ensures).
+  - Frames 044-054: idle and grip.
+  - Frames 056-060: the rods lengthen low toward the chef while the dome stays in the bed.
+  - Frames 062-066: the root airborne.
+  - About 3 game fps under capture (0.35 s per frame).
+
+### Ensures, dirty, Sandbox  **confirmed**
+- Mars.log 7737-8506 (the reimport, run-07 and the clip): 0 `Ensure condition failed`, 0 `Full Reload is required`.
+- 0 dirty packages. The Sandbox mtime is 2026-11-07 21:08, unchanged.
+
+### Rerun
+```text
+run_python execute_file: D:/Repositories/CkRepos/Orion/Tools/LevelDesign/screaming_turnip_r01_review/phaseJ/reimport_phaseJ_ue.py import 1d
+start_pie; run_python: w.WALK_CM = 74.2; t.begin("run-07-walk"); w.state["full_speed"] = 400.0; w.sample_start();
+  w.run_06(30.0, 0.25, "run-07-walk", 0.45) ... w.finish(); stop_pie
+capture_pie_movement_clip duration 50, interval 0.15, probe at 1.5 s: w.clip_drive_06('run-07-walk-clip', 30.0, 74.2)
+WALK_CM=74.2 python phaseJ/analyse_walk.py captures/pie/run-07-walk/walk_rows.json; rest_error.py / pose_lag.py likewise
+```
+
+### Not verified / findings for Fable
+- The cancel at 2x is 2.0-2.5 cm per 60 Hz frame, against the 1.5 cm rule. k_CancelSecondsFromFullStrain of about
+  1.2 s would hold it (inferred).
+- The stalks show faceting at full strain in a close first-person view.
+- In first person the stretched stalks and gloves leave the bottom of the frame by full strain, because the camera stays
+  on the bed.
+- The release crossing value, node-to-socket and the morph curves are not read.
+- The claim I'd most expect to be wrong: that the first-person read at full game speed is good. The evidence is slomo
+  screenshots and a 3 fps clip.
+
+## Phase J - Fable audit addendum (2026-11-09): the 2x stretch (Part 1d / 3c) is ACCEPTED, uncommitted
+
+Seen: `review/phaseJ/stretch_1x_2x_3x.png`, the run-07 sheets, `zoom_K4b_stalks_fp.png`, `zoom_K5_rods_side.png`;
+read: `reimport_phaseJ_1d.json`, `rest_error_run07.txt`, `pose_lag_run07.txt`, `run07_extra.txt`.
+
+- Shipped: crown travel (-72.0, +14.0) cm, sockets 74.18 cm, `k_StretchTravelCm = 74.2` (Fable's one-line edit,
+  ScreamingTurnip lane 12/0 exit 0 on it: `Saved/Logs/TurnipJ/ScreamingTurnip_1d.out`), SK weights top ring 0.03 /
+  dimple 0.06 (dome holds at 2x and 3x), SRC_Release eased at REL_OVER. PIE run-07 from 110 cm: focus held to the break at
+  185-190 cm (pitch -27 deg), alpha vs distance within 0.0016 at rest, gloves on the previous-tick socket 0.000 cm on 332
+  rows, 0 reach-cap shortfalls (the player's MaxReachCm is unset), yaw within 5 deg at 0.10-0.18 s, cancel switch 0.23 cm,
+  charge kept, second pull breaks, 0 ensures (Mars.log 7737-8506).
+- Ruling, cancel speed: the 1.5 cm-per-sample rule is RELAXED for the cancel. It was written for gloves riding the
+  sockets, and the gloves let go on a cancel; a spring-back is meant to be quick. `k_CancelSecondsFromFullStrain` stays
+  0.7 s (120-150 cm/s, 2.0-2.5 cm per 60 Hz frame, switch mismatch ~0.35 cm). Raise it if the snap reads harsh in play.
+- Ruling, framing: the stretched stalks leave the bottom of the first-person frame at full strain because the view aims
+  at the bed; the player can look down. Accepted.
+- Maintainer's call, stems: at 17x their rest length the 4-sided stems read as flat light/dark ribbons close up
+  (`zoom_K4b_stalks_fp.png`). Options if it bothers: 6-8 sided stems, a slight taper, more rings - a builder mesh change
+  plus an SK reimport.
+- 3x preview only (`SRC_Tug_3x_sheet.png`, `stretch_3x_audit.json`): crown -108, sockets 110 cm, dome holds, audits
+  clean; not exported. A 3x walk ends ~220 cm from the bed where the 250 cm interaction trace is at its limit (the run-07
+  ray at the break was ~213 cm): 3x needs a longer trace or a closer stand, and the stems would want the mesh change above.
+
+
+## Phase J Part 1e - Blender: the stretch at 4x, shipped (Opus, 2026-11-09) - DONE, awaiting Fable audit
+
+The maintainer saw 2x and the 3x preview: "go with 4x". No Unreal, no `Script/`, no git this round.
+
+**The skin weights changed again, so Part 3 reimports the SK plus SRC_Tug / SRC_Cancel / SRC_Release.**
+
+The 2x state is kept in `review/phaseJ/iterations/r04_2x/`: the blend, expected_anims, manifest, crown_travel, neck,
+cancel_match, sub-frame audit, anim_report, stretch_2x, the four sheets, the 2x crop, rebuild_compare, and the 2x builder
+and animate scripts.
+
+### Changes
+- **`scripts/build_screaming_turnip.py`**: bulb top ring crown 0.03 -> **0.01**, dimple 0.06 / 0.94 -> **0.03 / 0.97**
+  (29 vertices, commented). The neck target is absolute: dimple <= 9 cm x / <= 3 cm z, ring below it.
+- **`scripts/animate_screaming_turnip.py`**:
+  - STRAIN: cr_y -60, cr_dx -44.249, cr_dz 12.023. Bulb unchanged: bh 1.04, bw 0.98, bdz -0.6, brot -8, la -12, lb -7.
+  - TUG_MID: cr_y -50, cr_dx -25.534, cr_dz 4.864 (bh 1.02, bw 0.99, brot -4, la -10, lb -6).
+  - SRC_Cancel keeps the Tug-mirror key (f3.2667); SRC_Release keeps the REL_OVER ease.
+  - Clip notes and comments carry the numbers. The 2x / 3x poses stay in comments; the `--variant 3x` preview flag is
+    left in place.
+- **New** `review/phaseJ/closeup_j.py`: close-ups of SRC_Tug f15 at the stem base, mid-stalk and crown.
+
+### Pose sweep (`tune_j2.py`, every frame of Tug / Cancel-with-mirror-key / Release-with-ease, 4x weights)
+STRAIN cr_y -55 / -60 x mid -50 / -55: **0 intersections in all four**, stem_gap -0.71. Shipped -60 / -50, as 2x.
+Stem 3 does not touch the bulb top at 144 cm, and the Release ease still clears it.
+
+### Numbers (confirmed)
+**SRC_Tug** (`crown_travel.json`, UE cm, root-relative):
+
+| frame | crown head (x, z) | HarvestGrip_R (x, y, z) | horizontal socket travel |
+|---|---|---|---|
+| f0 | (0, 31.80) | (-1.522, 4.683, 35.185) | 0 |
+| f8 | (-79.99, 42.79) | (-83.624, 4.683, 43.549) | 82.10 (56.2 %) |
+| f15 | **(-143.99, 51.80)**: dx -144.0, dz +20.0 | (-147.694, 4.683, 51.654) | **146.17** |
+
+- **`k_StretchTravelCm = 146.2`**, not the ~148 expected. The -60 deg pitch adds only 2.2 cm over the crown, as at 2x.
+- Manifest refreshed; `rig_contract` text and `scale_factor` 3.0 untouched.
+
+**Neck** (`neck.json`; the export gates it): f15 dimple (-6.31, 1.58) = 4.5 % of the crown's travel; ring max 3.82 (dx
+3.59, dz 1.56). **PASS.**
+
+**Audit** (`anim_report.json` `fails: []`, animate `TURNIP_OK (16 clips, 16 s)`):
+- Intersections 0 on every frame of every clip; root identity; UE deviation <= 5e-5 cm; chain joints 0.
+- stem_gap: Tug / Cancel / Release -0.710, Grip -0.733. Every ROOT_* clip <= -0.55.
+- Envelope: min x -165.18, d_x 185.22, h 71.75. The height is now over the 66 cm design limit; that is reported, not gated.
+
+**Sub-frame audit** (`subframe_audit.json`, every 0.1 frame): Tug 151 / Cancel 71 / Release 61 samples, 0 intersections.
+`TURNIP_OK subframe`.
+
+**Cancel match** (`cancel_match.json`, as played: 30 fps keys, linear between them):
+- Max socket 2.66 cm at a 0.07 and 2.24 cm at a 0.93. <= 1.01 cm over a 0.25..0.80; 0.10 at a 0.59.
+- The spline itself is still <= 1.03 cm.
+- Both peaks are the chord error of the 7-key Cancel against the 15-key Tug at the eased ends. It scales with the
+  travel: 0.7 cm at 1x, 1.3 at 2x, about 2.6 now. The low-a end also carries the 1.05 cm Grip-dip floor.
+- **New at 4x: the a -> 1 end** (a cancel let go just short of the break) jumps up to 2.24 cm.
+
+**Speeds** (socket per 1/30 s):
+- SRC_Cancel: 10.2 / 23.1 / 25.4 / 24.0 / 29.0 / 24.8 / 10.5 cm.
+- SRC_Release: 71.3 / 75.7 cm over f0-f2, then <= 1.7.
+
+**Export / round trip** (DEV-13, the SK included): exit 0 `TURNIP_OK` both; `fails: []` in both reports.
+
+**Rebuild proof** (`rebuild_compare.json` vs `source/ScreamingTurnip_R01_phaseI.blend`):
+- 1624 / 3188, polygons and material indices identical.
+- Rest 0.0; Basis / Scream 0.0, Inhale 3.8e-6 (noise); vertex colour 0.0; bones 0.0; statics 0.0.
+- **Weights: 29 bulb vertices only.** `TURNIP_OK`.
+
+**Diff proof**:
+- Command: `python scripts/diff_expected_anims.py review/phaseJ/iterations/r04_2x/expected_anims.json
+  export/anims/expected_anims.json --bones-only --expect-changed SRC_Tug,SRC_Release,SRC_Cancel --out
+  review/phaseJ/expected_anims_diff_1e.json`.
+- Result: exit 0, `TURNIP_OK (3 changed: ['SRC_Cancel', 'SRC_Release', 'SRC_Tug'])`.
+- Every ROOT_* clip, SRC_Idle and SRC_Grip: bone landmarks 0.0 and skinned extremes 0.0.
+- Peak vertices: ROOT_Inhale 0.032 cm and ROOT_Scream 0.015 cm (bulb-top weights).
+- The same command against the pre-Phase-J `baseline/` also passes.
+
+### Stretch (`stretch_4x.json`, base ring -> blade ring, SRC_Tug f15 / f0)
+| | leaf 1 / 5 | leaf 2 / 4 | leaf 3 | emergence -> blade |
+|---|---|---|---|---|
+| 1x | 9.0x | 8.6x | 8.7x | 7.3-8.2x |
+| 2x | 17.1x | 16.4x | 16.7x | 13.9-15.2x |
+| **4x (shipped)** | **33.0x** (4.5 -> about 148 cm) | **32.2x** | **32.9x** | **27.1-29.5x** |
+
+### How it looks (looked at)
+Files: `crop_tug_f15_4x.png`, `stretch_1x_2x_4x.png` (f15, side and 3/4, one framing), and `closeup_4x.png` (600 px
+close-ups at f15: the stem base 18 cm wide, mid-stalk 18 cm, the crown 24 cm).
+
+- **Stalks** (mid-stalk close-up):
+  - Every stalk is a square-section rod: four flat faces, one lit and one dark. Edge-on, two faces read as a flat green
+    ribbon. Seen whole, they read as long thin wires.
+  - The cross-section holds its width all the way (linear skinning), so there is no thinning and no taper.
+  - Each stalk is one long segment between rings, so there are no gaps between rings to open.
+  - A fine stipple runs along the edge where two stalks run side by side. Near-coincident faces shading against each
+    other is my inference; the audit counts 0 leaf-vs-leaf intersections.
+- **Blades** (crown close-up): all five stay attached. Each stalk widens into its blade at the stem-to-blade ring with a
+  visible kink; there is no gap and no detached blade. Leaf 3's blade points along the pull. Against about 1.5 m of stalk
+  the leaf tuft reads very small in the full-frame views.
+- **The dome** (stem base close-up):
+  - With the crown share almost gone, the bulb top is now a **flat-topped, faceted cone**: the dimple plateau, tilted 8 deg
+    toward the pull.
+  - The stalks leave from the -X rim of the plateau, with a dark notch where their embedded segment enters.
+  - No gap, no neck, nothing lifting out of the soil. It reads as a turnip top, but blockier than the 1x / 2x peaked dome.
+- **Overall**:
+  - 4x reads as a fishing line from a turnip to a tuft of leaves.
+  - The stretch is unmistakable, and nothing tears.
+  - The square, flat-shaded rod is plain at close range. That is the stem-mesh call (more sides, taper, sag rings),
+    deliberately not made this round.
+- **Release**: snaps back 147 cm in 2 frames, then settles. **Cancel**: retraces the arc.
+
+### Sheets
+- `review/phaseJ/SRC_Tug_sheet.png`, `SRC_Cancel_sheet.png`, `SRC_Release_sheet.png`, `pull_chain_sheet.png`: framing
+  `--ortho 70 --target -28,0,8.5`.
+- In that framing the bulb is small. Use the close-ups for detail.
+
+### Rerun (from this folder)
+```bash
+B="C:/Program Files/Blender Foundation/Blender 5.2/blender.exe"
+"$B" -b --factory-startup --python scripts/build_screaming_turnip.py
+"$B" -b --factory-startup source/ScreamingTurnip_R01.blend --python scripts/compare_rebuild_screaming_turnip.py -- --ref source/ScreamingTurnip_R01_phaseI.blend --out review/phaseJ/rebuild_compare.json
+"$B" -b --factory-startup source/ScreamingTurnip_R01.blend --python scripts/animate_screaming_turnip.py -- --review phaseJ
+"$B" -b --factory-startup source/ScreamingTurnip_R01.blend --python review/phaseJ/subframe_audit_j.py
+"$B" -b --factory-startup source/ScreamingTurnip_R01.blend --python review/phaseJ/cancel_match_j.py
+"$B" -b --factory-startup source/ScreamingTurnip_R01.blend --python scripts/export_screaming_turnip.py -- --review phaseJ
+"$B" -b --factory-startup --python scripts/validate_roundtrip.py
+python scripts/diff_expected_anims.py review/phaseJ/iterations/r04_2x/expected_anims.json export/anims/expected_anims.json --bones-only --expect-changed SRC_Tug,SRC_Release,SRC_Cancel --out review/phaseJ/expected_anims_diff_1e.json
+"$B" -b --factory-startup source/ScreamingTurnip_R01.blend --python review/phaseJ/stretch_audit_j.py -- 4x review/phaseJ/stretch_4x.json review/phaseJ/anim_report.json
+"$B" -b --factory-startup source/ScreamingTurnip_R01.blend --python scripts/render_anims_screaming_turnip.py -- --out phaseJ --clips SRC_Tug,SRC_Cancel,SRC_Release --views front,side,threequarter --no-shapekey --pull-chain --ortho 70 --target -28,0,8.5
+"$B" -b --factory-startup source/ScreamingTurnip_R01.blend --python review/phaseJ/closeup_j.py
+```
+Each printed TURNIP_OK with exit 0 on the final code. The shipped blend md5 is c81a59bc....
+`cancel_match_j.py` prints `TARGET ... MISSED` (a measurement, by design).
+
+### Part 3 notes
+- Reimport the SK (weights) and the three SRC clips.
+- The SK bounds must cover x -165 and z 70; Part 3c set -100.
+- Readback: SRC_Tug crown head at f15 = (-143.9856, 0, 51.7974).
+- Script side: `k_StretchTravelCm` 74.2 -> **146.2**. The player backs off about 1.5 m holding Use. Re-check that the
+  250 cm trace and the probe box keep the focus, and that the FPHands reach holds the sockets (inferred risk).
+
+### Not verified
+- Unreal.
+- The first-person read of a 1.5 m square rod.
+- Whether the stipple between neighbouring stalks shows in engine.
+- **The claim I'd most expect to be wrong**: that walking 146 cm back while holding Use keeps the turnip in focus and the
+  gloves on the sockets. Nothing in Script was tuned for this distance.
+
+## Phase J Part 3d - the 4x stretch in Unreal: SK + three SRC clips, bounds to x -170 / z 75, PIE run-08 past the 250 cm trace (Opus, 2026-11-09) - DONE, awaiting Fable audit
+
+Same hard rules. `R` = `Tools/LevelDesign/screaming_turnip_r01_review/`. The editor is left running on the review map with
+PIE stopped.
+
+### Preflight  **confirmed**
+- Mars.log 8735-8741 is the hot compile of `k_StretchTravelCm = 146.2` (`Items.Mars_Item_ScreamingTurnip`, code only). It
+  ends in `new module swap-in`, with no error lines and 0 `Full Reload is required`.
+- PIE was off, 0 packages were dirty, and the review map was loaded.
+
+### Reimport: `R/phaseJ/reimport_phaseJ_ue.py import 1e` (report `R/phaseJ/reimport_phaseJ_1e.json`)
+- The wrapper's tag table gained `1e`: crown target (-143.9856, 0, 51.7974), bounds floor x 153, z 27. The report is
+  diffed against `reimport_phaseJ_1d.json`.
+- All four readback groups PASS (`TURNIP_OK`). No duplicates, root assets unchanged, 0 packages dirty before and after.
+- SRC_Tug crown at f15: (-143.9856, -0.0, 51.7974), err 0.0 cm.
+- Frames: Tug 15, Cancel 7, Release 6. Landmark worst <= 9.1e-5 cm. Chains <= 2.6e-5 cm.
+- Bounds with extension: (-171.69, -28.04, -8)..(30.21, 28.04, 76).
+  - The importer's own rule already gave negative x 154 and z 28, so no raise was needed beyond the +x 14.
+  - Envelope margin 6.046 cm.
+- Diff: clip lines only in the three SRC clips; mesh lines only the bounds; 0 lines elsewhere.
+
+**confirmed**.
+
+### run-08-walk (`R/captures/pie/run-08-walk/`)
+- Run: `run_06(30, 0.25, "run-08-walk", let_go=0.45, side=(70, 260), speed2=400)` with `WALK_CM = 146.2`.
+- Sampling: per tick, game steps of about 0.008 s.
+- New per-tick fields: the camera location / pitch / yaw (`cam`), and each bed's `focused` flag from the Bed() readout.
+- Files:
+  - `walk_rows.json`, `walk_rows_analysis.json` (`WALK_CM=146.2`)
+  - `ray_focus.json` (from `R/phaseJ/ray_focus.py`)
+  - `R/phaseJ/ray_focus_run08.txt`, `run08_extra.txt`, `rest_error_run08.txt`, `pose_lag_run08.txt`
+- Stands: d0 110.40 / 110.29 / 111.21 cm.
+- Pulls:
+  - Bed 0: slow, 30 cm/s.
+  - Bed 1, pull 1: slow, let go.
+  - Bed 1, pull 2: **full backward walking speed** (input scale 1.0; measured up to 425.6 cm/s).
+
+**The pull survives the ray leaving the probe**. `ray_focus.py` intersects the view ray with the bed's probe box (centre
+bed + (0, 0, 12), half (40, 40, 22)) inside the 250 cm trace. **confirmed**.
+
+**Bed 1, pull 2 (full speed).**
+- From game 20.913 (player 278.7 cm from the bed, eye 294.8 cm from the probe centre, pitch -18.6 deg) the ray reaches
+  the probe only at 251.9 cm, past the trace.
+- From there to the break it stays out of reach: 40 rows. On the 38 rows before the release, `focused=true` and the
+  prompt ring is up.
+- It breaks at alpha 0.968 (ring 0.998) with the player 388.0 cm away and the ray entering the probe at 358 cm.
+- Focus and ring go only on the release rows. The pinned focus holds.
+
+**Bed 0 (slow pull).**
+- The break comes at 255.0 cm horizontal (eye 273.9 cm). The ray still enters the probe's near face at 219 cm, so this
+  pull does not test the pin.
+- The rows where the ray misses (pitch about -4 deg) are the side-view shots: the camera manager is the chase camera
+  there, not the player's view.
+
+**Bed 0, back-off to the break.**
+- Alpha vs (d - d0) / 146.2 at rest: max 0.001 (137 rows, `rest_error_run08.txt`). While walking at 30 cm/s it trails by
+  up to 0.043.
+- Ring: abs(ring x 0.97 - alpha) <= 0.00015.
+- The sockets match SRC_Tug at the previous tick's alpha within 0.033 cm (`pose_lag_run08.txt`). Against alpha x 146.2 the
+  max is 10.6 cm, which is the clip's ease plus the one-tick lag.
+- Gloves: glove(n) vs socket(n-1) <= 0.001 cm on 667 first-person rows, 0 rows over 0.5 cm, same tick <= 3.61 cm.
+- Reach-cap shortfalls: 0 (MaxReachCm unset, `Mars_PlayerCharacter_Assets.as:225`).
+- Yaw: within 5 deg 0.094 s after the press (45 deg) and 0.181 s (90 deg), inside the Grip clip.
+- Release: the last visible row is at alpha 0.969 (ring 0.999). That the crossing is >= 0.97 is **inferred**.
+- `was_recently_rendered` was true on every visible row.
+
+**confirmed**.
+
+**Spring lag at full speed** (bed 1 pull 2, `run08_extra.txt`).
+
+| game s | walked | target (walked / 146.2) | alpha | trail |
+|---|---|---|---|---|
+| 20.597 | 34.9 cm | 0.238 | 0.028 | 0.21 |
+| 20.685 | 71.7 cm | 0.490 | 0.109 | 0.38 |
+| 20.770 | 107.4 cm | 0.735 | 0.250 | 0.49 |
+| 20.853 | 142.4 cm | 0.974 | 0.436 | **0.54** |
+| 20.940 | 179.0 cm | 1.0 | 0.649 | 0.35 |
+
+- The break comes at 276.8 cm walked, **130.6 cm past WalkCm**, about 0.7 s after starting to walk.
+- At normal walking speed the root comes out well after the walk distance. **confirmed**.
+
+**Bed 1 cancel.**
+- Let go at alpha 0.473. SRC_Cancel's first row: start 0.523 vs 1 - a = 0.527.
+- Switch row step 0.185 cm. The first row with the Cancel pose drawn moves 2.64 cm in 7.9 ms. That includes about 1.9 cm
+  of play at about 240 cm/s, so the pose mismatch is about 0.7 cm (**inferred**).
+- **Cancel steps per 60 Hz equivalent** (34 in-clip steps): median 4.11 cm, max 5.57 cm (the step containing the
+  switch), min 1.74. The plateau is about 240-250 cm/s. This exceeds the 1.5 cm rule.
+  - Inferred: about 1.9 s of k_CancelSecondsFromFullStrain would hold it.
+- Ends on SRC_Idle 0.342 s after the first Cancel row. `bed1_after_cancel`: charges=1, released=0.
+- The full-speed second pull broke; `bed1_after` reads released=1.
+- The gloves still leave on the let-go (Script side).
+
+**confirmed** (the measured numbers).
+
+### Captures, my read
+- `sheet_bed0.png` (first person: K0 prompt, K1 grip, K2 0.3, K3 0.7, K4 full strain, K6 break).
+  - K0 / K1: the gloves on the bed.
+  - From K3 on, the stretched stalks run from the bed straight down out of the bottom of the frame toward the camera,
+    with the gloves already below the frame. At 4x the gloves and leaves are off-screen at full strain; only the green
+    rods are seen converging on the bed.
+  - The white root at the bottom-left of K3 to K6 is the review map's floating `Display_HandHeight_SK` display actor (at
+    -205, 0, 135), not the pull.
+- `zoom_K4b_stalks_fp.png`: the five stalks show flat light / dark bands per face, faceted as at 2x.
+- `K5_full_strain_side.png`, `zoom_K5_rods_side.png`, `zoom_K5_cone_side.png` (side, full strain).
+  - About 1.5 m of thin straight rods run from the chef's hands to the bed, with the leaves bunched at the far end. They
+    read as a long thin pole, square in section (flat olive / yellow faces).
+  - Near the bed **the stipple reads as a dashed yellow / dark line along the rods**: at that size it is a dotted
+    pattern, not a texture.
+  - The base is a smooth pink cone low in the soil, the rods joined at its apex; no neck.
+- `sheet_side_bed1.png`: K7 the root in the air; K8 to K10 the cancel, with the gloves leaving at once.
+- `R/captures/pie/run-08-walk-clip/sheet_pull_side.png` (capture_pie_movement_clip, 185 frames, `poll.json` ok true,
+  0 ensures).
+  - Frames 028-038: idle and grip.
+  - Frames 040-048: the rod lengthens low toward the chef across the floor while the cone stays in the bed.
+  - Frames 050-052: the root airborne.
+  - About 3 game fps.
+
+### Ensures, dirty, Sandbox  **confirmed**
+- Mars.log 8795-9600 (the reimport, run-08 and the clip): 0 `Ensure condition failed`, 0 `Full Reload is required`.
+- 0 dirty packages. The Sandbox mtime is 2026-11-07 21:08, unchanged.
+
+### Rerun
+```text
+run_python execute_file: D:/Repositories/CkRepos/Orion/Tools/LevelDesign/screaming_turnip_r01_review/phaseJ/reimport_phaseJ_ue.py import 1e
+start_pie; run_python: w.WALK_CM = 146.2; t.begin("run-08-walk"); w.state["full_speed"] = 400.0; w.state["track_focus"] = True;
+  w.sample_start(); w.state["track_focus"] = True; w.run_06(30.0, 0.25, "run-08-walk", 0.45, side=(70.0, 260.0), speed2=400.0)
+  ... w.finish(); stop_pie
+capture_pie_movement_clip duration 60, interval 0.15, probe at 1.5 s: w.clip_drive_06('run-08-walk-clip', 30.0, 146.2)
+WALK_CM=146.2 python phaseJ/analyse_walk.py captures/pie/run-08-walk/walk_rows.json
+python phaseJ/ray_focus.py captures/pie/run-08-walk/walk_rows.json captures/pie/run-08-walk/ray_focus.json
+```
+
+### Not verified / findings for Fable
+- The cancel at 4x is about 4 cm per 60 Hz frame. A span of about 1.9 s would hold 1.5 cm (inferred).
+- At full walking speed the spring trails by up to 0.54, and the root breaks 131 cm past WalkCm.
+- The ray-vs-probe test is geometric, from the camera manager's view. The game's own trace result is not read; the
+  focused flag and the ring are the game's own evidence that the pin held.
+- In first person at 4x the gloves and leaves leave the frame by full strain.
+- Faceting and the stipple read as noted.
+- The claim I'd most expect to be wrong: that the pinned focus holds in a real session with mouse look. The driver
+  re-aims the camera at the bed every tick.
+
+## Phase J Part 3e - the bed's spring at 400 / 40: full-speed pulls, the mid-pull stop, run-09 / run-10 / run-10b (Opus, 2026-11-09) - DONE, awaiting Fable audit
+
+No reimport and no Unreal writes. Driver and analysis files are under `R` = `Tools/LevelDesign/screaming_turnip_r01_review/`.
+The editor is left running on the review map with PIE stopped.
+
+### Preflight  **confirmed**
+- Mars.log 9613-9618 is the hot compile of `Mars_ScreamingTurnipBed_EntityScript` (k_PullStiffness 400, k_PullDamping 40,
+  lines 62-63). It ends in `new module swap-in`, with no error lines and 0 `Full Reload is required`.
+- PIE was off, 0 packages were dirty.
+
+### Finding: a stiff spring releases the root early on one long frame  **confirmed** (rows + reproduction)
+- run-09 bed 0 (full speed, `R/captures/pie/run-09-walk/walk_rows.json`). The last visible row is at game 2.6576: walked
+  75.4 cm, drawn alpha 0.295, ring 0.304. The next tick, the L2 screenshot's, lasted **0.0955 game s**; the planted root
+  was then hidden and the bed reports released=1.
+  - The root came out at 114 cm walked with the drawn alpha at 0.30. That is a Succeeded threshold, not a cancel.
+- Reproduction (`R/phaseJ/run09_spring_step.txt`). One step of the Control's semi-implicit Euler
+  (`Mars_Control_Processor_Tick.as`: v += a dt, x += v dt; dt capped at k_MaxStepSeconds 0.1 s) with 400 / 40, starting
+  from the sampled state (alpha 0.295, velocity 2.35 /s, pull 0.782):
+
+  | step dt | alpha after one step |
+  |---|---|
+  | 0.0167 s | 0.362 |
+  | 0.050 s | 0.665 |
+  | 0.070 s | 0.954 |
+  | 0.080 s | **1.129**: crosses EngageAlpha 0.97 |
+  | 0.0955 s | **1.440** |
+
+  The old 60 / 12 spring reaches 0.529 on the same 0.0955 s step.
+- So any frame of about 0.07-0.08 s or longer in mid-walk (under ~13 fps) can pop the root early. This is **inferred**
+  from the reproduction for states other than the sampled one.
+- The run-09 bed 0 full-speed pull is therefore void for the overshoot number. run-10 redid it with no screenshots, and
+  run-10b took the side capture at slomo 0.1 (screenshot ticks <= 0.034 game s).
+
+### Full-speed pulls (input scale 1.0; walk up to 425-436 cm/s)
+| run / bed | file | walked at the break | vs WalkCm 146.2 | trail max | ticks (dt max) |
+|---|---|---|---|---|---|
+| run-10 bed 0 (no screenshots) | `R/phaseJ/run10_fast_bed0.txt`, `R/captures/pie/run-10-walk/fast_bed0.json` | 212.05 cm (alpha 0.967, ring 0.997) | **+65.9** | 0.263 | 83 (0.0103 s) |
+| run-10 bed 1 (screenshots, slomo 0.1) | `run10_fast_bed1.txt`, `fast_bed1.json` | 216.9 | +70.7 | 0.238 | 172 (0.036) |
+| run-10b bed 0 (side shot, slomo 0.1) | `run10b_fast_bed0.txt`, `R/captures/pie/run-10b-walk/fast_bed0.json` | 208.3 | +62.1 | 0.264 | 195 (0.034) |
+| run-08 (60 / 12, for reference) | Part 3d | 276.8 | +130.6 | 0.54 | |
+
+- **The overshoot halves (+131 -> +62..71 cm) but is not within ~25 cm.** **confirmed**.
+- Inferred: the trail plateaus at about 0.26, i.e. a steady lag of about 0.09 s at 425 cm/s (Damping / Stiffness =
+  0.1 s), plus the critically damped tail to 0.97 after the walk passes WalkCm.
+- Gloves, run-10 bed 0: glove(n) vs socket(n-1) 0.000 cm on all 83 rows, same tick <= 4.74 cm, 0 reach-cap shortfalls.
+- Run-10 bed 1 and run-10b rows under the chase view are not glove evidence: the gloves follow the view, 32-37 cm off.
+- **Arm reach**: eye-to-glove went from 82.9 cm at the press to **196.1 cm at the break**, with the player 322.5 cm from
+  the bed (`R/phaseJ/run10_reach.txt`). FPHands MaxReachCm is unset, so the gloves never fall short.
+- Ring: abs(ring x 0.97 - alpha) <= 0.00014 in all three pulls.
+
+### The mid-pull stop (run-09 bed 1, `R/captures/pie/run-09-walk/run09_analysis.json` `bed1_stop`, `R/phaseJ/run09_summary.txt`)
+- Full speed until the target reached 0.5, then no input, held for 1 s.
+- The player slid 6.3 cm after the stop: the target went 0.556 -> 0.599.
+- Alpha at the stop was 0.325 (0.23 behind). It rose monotonically to 0.5986.
+- **Overshoot: -0.0001**, none. **Settled within 0.01 of the target 0.251 s after the stop.** The asked 0.2 s is missed by
+  0.05 s; the remaining distance was 0.27 alpha.
+
+**confirmed**.
+
+### Cancel, charge, slow pull (run-09 bed 1)  **confirmed**
+- Let go at alpha 0.5986. SRC_Cancel's first row t 0.0936 = start 0.4011 vs 1 - a = 0.4014.
+- `bed1_after_cancel`: charges=1, released=0.
+- Slow pull 2 at 30 cm/s: the break at 144.55 cm walked (-1.65 vs WalkCm), alpha 0.969 (ring 0.999), trail <= 0.020.
+  `bed1_after` reads released=1.
+
+### Captures, my read
+- `R/captures/pie/run-10-walk/sheet_fast_bed1.png`.
+  - M1 grip: the gloves on the stalks under the prompt.
+  - M2 mid-walk (60 cm walked): the turnip still nearly upright; the stretch lags the walk.
+  - M3: **void**. The side camera was placed outside the room (bed 1 + 260 cm on x) and shows only the wall.
+  - M4 break: the stalks run from the bed down off the frame bottom.
+  - M5: the root in the air, the gloves returning.
+- `R/captures/pie/run-10b-walk/N3_midwalk_side_viewport.png` (side, 101 cm walked, alpha 0.43, full speed).
+  - The chef is well clear of the bed. The leaves reach only about 60 cm out from a pink cone, so a gap of roughly 40 cm
+    separates the leaf end from the chef's hands: the spring lag, seen.
+  - The FP gloves do not render in third person, so the "arm stretch" is not visible on the body. It is measured above as
+    the 196 cm eye-to-glove reach.
+- run-09's L1-L4 screenshots: L1 / L2 are valid. L3 and L4 were taken after the early release, so they show the empty bed.
+
+### Ensures, dirty, Sandbox  **confirmed**
+- Mars.log 9666-10396 (run-09, run-10, run-10b): 0 `Ensure condition failed`, 0 `Full Reload is required`.
+- 0 dirty packages. The Sandbox mtime is 2026-11-07 21:08, unchanged.
+
+### Rerun
+```text
+start_pie; run_python: w.WALK_CM = 146.2; t.begin("run-09-walk"); w.state["full_speed"] = 400.0; w.sample_start(); w.run_09(0.25)
+  (run-10: w.run_10("run-10-walk"); run-10b: w.run_10b("run-10b-walk")); poll; w.finish(); stop_pie
+python phaseJ/analyse_run09.py captures/pie/run-09-walk/walk_rows.json captures/pie/run-09-walk/run09_analysis.json
+python phaseJ/analyse_fast.py captures/pie/run-10-walk/walk_rows.json 0 0 fast0_start captures/pie/run-10-walk/fast_bed0.json
+```
+
+### Not verified / for Fable
+- **The stiff spring's early release on a long frame** is a Script-side issue in the Control kernel's integration, not in
+  the bed. Possible fixes, Fable's call:
+  - substep the spring (dt slices <= 1/60 s);
+  - an exact critically damped step;
+  - lower stiffness.
+- The overshoot is +62..71 cm, not within ~25. Damping / Stiffness sets the lag: 0.1 s at 400 / 40.
+- The settle is 0.25 s, not 0.2.
+- The claim I'd most expect to be wrong: that the early release needs a frame as long as 0.07 s. That threshold is from
+  one sampled state; a faster alpha velocity lowers it.
+
+## Phase J Part 3f - the Control's substepped spring (1/240 s): run-11 (Opus, 2026-11-09) - DONE, awaiting Fable audit
+
+No reimport and no Unreal writes. `R` = `Tools/LevelDesign/screaming_turnip_r01_review/`. The editor is left running on the
+review map with PIE stopped.
+
+### Preflight  **confirmed**
+- Mars.log 10409-10415 is the hot compile, structural, of `ECS.Control.Mars_Control_Processor_Tick` and
+  `Generated.Mars_ScriptProcessorDrivers`. It ends in `new module swap-in`; lines 10397-10613 hold 0 errors and 0
+  `Full Reload is required`.
+- The code reads `k_MaxSubstepSeconds = 1/240`, with the frame still capped at 0.1 s (`Mars_Control_Processor_Tick.as`
+  lines 16-18, 55-61).
+
+### The reproduction against the substepped update (`R/phaseJ/run11_spring_substep.txt`)  **confirmed** (arithmetic)
+Same sampled state as Part 3e: alpha 0.2952, velocity 2.346 /s, pull 0.7821.
+
+| frame dt | substeps | alpha after the frame |
+|---|---|---|
+| 0.0955 s | 23 | **0.6087** (was 1.440 in one step) |
+| 0.07 s | 17 | 0.540 |
+| 0.1 s (and any longer frame, capped) | 24 | 0.619 |
+
+No frame length crosses 0.97 from this state.
+
+### run-11 bed 0: full speed with screenshots at normal time (slomo 1)
+Files: `R/captures/pie/run-11-walk/fast_bed0.json`, `R/phaseJ/run11_fast_bed0.txt`.
+- d0 110.42 cm. 13 Tug ticks: the sampler runs at about 25 fps at normal time.
+- **The root released only past WalkCm.** The last visible tick was at 204.86 cm walked (+58.7 vs 146.2), alpha 0.924
+  (ring 0.952). The release fell inside the next tick, the P3 screenshot's **0.4 s** tick, during which the player
+  reached 345.9 cm. **confirmed**.
+- **Ticks longer than 0.05 s while the root was visible: one.** Game 3.4962, dt 0.3625 s (the P2 screenshot's tick):
+  alpha 0.4202 -> 0.7890, **delta +0.369**, walked 74.4 -> 199.6 cm (target 0.51 -> 1.0).
+  - So "never more than 0.1 per tick" **fails on that tick**. It is the walk of a 0.36 s frame, not an overshoot: the
+    target itself moved +0.49, and the Control integrates only the first 0.1 s (the cap).
+  - No other tick moved more than 0.07. The run-09 failure (a Succeeded at drawn alpha 0.30) did not recur.
+  - Inferred: from the spring's state at 3.13 a 0.1 s substepped integration toward 1.0 ends near 0.79.
+- Gloves: glove(n) vs socket(n-1) 0.000 cm on every tick. Same tick up to 18.5 cm on the long ticks; that is one frame of
+  socket travel.
+- Ring: abs(ring x 0.97 - alpha) <= 0.00012.
+
+### run-11 bed 1: as run-09 (slomo 0.25; `R/captures/pie/run-11-walk/run11_analysis.json`, `R/phaseJ/run11_summary.txt`)  **confirmed**
+- **Stop at target 0.5.** The player slid 6.0 cm after the stop (target 0.547 -> 0.588).
+  - Alpha at the stop 0.312, rising monotonically to 0.5884.
+  - **Overshoot 0.0001.**
+  - **Settled within 0.01 at 0.243 s** (run-09: 0.251 s).
+- **Cancel.** Let go at alpha 0.5884; start 0.4119 vs 1 - a = 0.4116. `bed1_after_cancel`: charges=1.
+- **Slow pull 2.** The break at 144.70 cm walked (-1.5 vs WalkCm), alpha 0.970 (ring 0.9997), trail <= 0.020.
+  `bed1_after` reads released=1.
+
+### Captures, my read (`R/captures/pie/run-11-walk/sheet_fast_bed0.png`)
+- P1 grip: the gloves on the stalks under the prompt.
+- P2 mid-walk at 74 cm: the turnip only starting to lean; leaves and stalks under the prompt.
+- P3, the hitch-frame mid-walk at 205 cm: the stretched stalks run toward the camera with the leaves and gloves in view
+  below the prompt, and the pink cone at the bed.
+- P4: taken on the release tick, so it is after the break. The root is airborne and the gloves are returning, blurred.
+- The white root at the left of P3 / P4 is the review map's display actor.
+
+### Ensures, dirty, Sandbox  **confirmed**
+- Mars.log 10614-10872 (run-11): 0 `Ensure condition failed`, 0 `Full Reload is required`.
+- 0 dirty packages. The Sandbox mtime is 2026-11-07 21:08, unchanged.
+
+### Rerun
+```text
+start_pie; run_python: w.WALK_CM = 146.2; t.begin("run-11-walk"); w.state["full_speed"] = 400.0; w.sample_start(); w.run_11("run-11-walk")
+  ... w.finish(); stop_pie
+python phaseJ/analyse_fast.py captures/pie/run-11-walk/walk_rows.json 0 0 fast0_start captures/pie/run-11-walk/fast_bed0.json
+python phaseJ/analyse_run09.py captures/pie/run-11-walk/walk_rows.json captures/pie/run-11-walk/run11_analysis.json
+```
+
+### Not verified
+- A sampled tick at the exact crossing: the release fell inside a 0.4 s screenshot tick.
+- The "<= 0.1 alpha per tick" rule cannot hold on a 0.36 s frame where the target itself moves 0.49. It holds on every
+  tick of 0.044 s or less (max 0.07).
+- The claim I'd most expect to be wrong: that no long frame can still pop the root early. That is shown for one sampled
+  state plus one 0.36 s frame, not for every state.
+
+## Phase J - Fable audit addendum 2 (2026-11-09): 4x shipped (Parts 1e / 3d / 3e / 3f), spring stiffened and substepped; ACCEPTED, uncommitted
+
+- Shipped 4x: crown travel (-144, +20) cm, sockets 146.17 cm, `k_StretchTravelCm = 146.2`, SK weights top ring 0.01 /
+  dimple 0.03 (the bulb top is a flat cone in the soil), SK bounds to x -171.7. Readback exact (crown f15 -143.9856 / 51.7974).
+- PIE run-08: the pinned focus carries the pull past the 250 cm trace (full-speed pull: ray off the probe from 279 cm,
+  focused and ring up to the break at 388 cm). Slow pull: alpha vs distance within 0.001 at rest. 0 ensures.
+- Fable edits this round (Script, both lane-proven): bed spring 60/12 -> 400/40 (the lever's spring trailed a full-speed
+  walk by alpha 0.54 and broke 131 cm past WalkCm); then the Control kernel's spring integrator now substeps at <= 1/240 s
+  (`Mars_Control_Processor_Tick.as`): the single semi-implicit Euler step at 400/40 carried alpha 0.30 -> 1.44 on a 0.0955 s
+  hitch frame and popped the root early (run-09); substepped it gives 0.61 and no frame length crosses the threshold from
+  that state. Lanes after the fix: Control 74/0, ScreamingTurnip 12/0 (`Saved/Logs/TurnipJ/*_3f.out`).
+- PIE run-10/11 on the fixed spring: full-speed break 59-71 cm past WalkCm (trail plateau ~0.26, the 0.1 s lag of 40/400),
+  mid-pull stop overshoot 0.0001 and settle 0.24 s, cancel at 1 - a, charge kept, slow pull breaks 1.5 cm short of WalkCm.
+- Rulings: the per-tick alpha rule is restated as "no overshoot past the walked target" (a 0.36 s screenshot frame moved
+  the target 0.49); the cancel-speed rule stays relaxed (4-5 cm per 60 Hz frame at 4x, span 0.7 s); the 60-70 cm
+  full-speed overshoot is the spring's load read, tunable at `k_PullStiffness` / `k_PullDamping` (stiffer = less).
+- Maintainer's questions answered: the stretch amount is NOT tunable in Unreal today (authored crown travel in SRC_Tug,
+  WalkCm must match). Proposed next phase: a runtime crown-bone driver scaling the clip's crown translation by a bed
+  `StretchTravelCm` param (the clip keeps the lean/trail/tilt), so no Blender round per distance. Stem look at 33x stretch
+  (square rods, stipple between neighbours) is the other open call (6-8 sided, tapered stems = mesh change + SK reimport).
+
+
+## Phase K Part 1 - Blender: the clips keep only the pose; the stretch audited as a runtime offset (Opus, 2026-11-09) - DONE, awaiting Fable audit
+
+Brief: `PHASE_K_BRIEF.md` D-K2 Blender bullet and Part 1. No Unreal, no `Script/` writes (one read-only `rg` over the bed
+script to check which clips it plays), no git, no deletes.
+
+**Only SRC_Tug / SRC_Cancel / SRC_Release changed; the mesh and weights did not, so Part 3 reimports those three clips
+only (no SK).**
+
+### Files
+- `source/ScreamingTurnip_R01_phaseJ.blend`: the backup, a byte copy before any write. md5 c81a59bc..., == the Phase J 1e
+  blend.
+- **`scripts/animate_screaming_turnip.py`**:
+  - STRAIN / TUG_MID lose the authored travel (below).
+  - New `inject_audit()` and the `--inject-stretch T,L` mode (audit only; no actions written, no save).
+  - The normal run now gates SRC_Tug / SRC_Cancel on the injected default (`DEFAULT_STRETCH = (146.2, 20.0)`). Their
+    standalone intersections (offset 0) are recorded as `standalone_isect_info`.
+  - Clip notes rewritten. The `--variant 3x` flag is marked obsolete (kept for the 1d record).
+- **`scripts/export_screaming_turnip.py`**:
+  - `gameplay_numbers.k_StretchTravelCm` is replaced by `k_StretchTravelCm_default` (146.2), `k_StretchLiftCm_default`
+    (20.0), `stretch_runtime_safe_travel_cm` and a `stretch_note`, read from `review/<rev>/inject_summary.json`. The
+    export fails if that file is missing.
+  - The clip-only neck gate is now absolute (<= 9 cm x / <= 3 cm z). The percentage and ring-below-dimple rules are
+    meaningless with 2 cm of clip travel; the stretched neck is gated through the injection.
+  - The crown_travel `stretch` block reports `clip_socket_travel_cm`.
+- **`scripts/render_anims_screaming_turnip.py`**: `--inject-stretch T,L` poses Tug / Cancel as spline + offset.
+- **New** `review/phaseK/inject_summary_k.py` (plain Python, TURNIP_OK / _FAIL): summarises the runs into
+  `inject_summary.json`.
+- **Outputs**: `review/phaseK/` (anim_report, crown_travel, neck, the inject_T_L.json runs + logs, inject_summary.json,
+  rebuild_compare.json, expected_anims_diff.json, sheets, `baseline/`) and `export/` (16 clips, SK, statics, manifest,
+  reports).
+
+### Poses (design cm; DEV-K-1)
+| | Phase J 1e (4x) | Phase K |
+|---|---|---|
+| STRAIN | cr_dx -44.249, cr_dz 12.023 | **cr_dx +0.6512, cr_dz -0.0915**; cr_y -60, bh 1.04, bw 0.98, brot -8, la -12, lb -7 unchanged |
+| TUG_MID | cr_dx -25.534, cr_dz 4.864 | **cr_dx +0.3289, cr_dz -0.0230**; cr_y -50, bh 1.02, bw 0.99, brot -4, la -10, lb -6 unchanged |
+
+**DEV-K-1 (decided, not asked): not the brief's cr_dx = 0 / cr_dz = 0.**
+- Measured with cr_dx = 0 / cr_dz = 0, the 8 deg body tilt alone carries the crown head to x -2.05 cm at STRAIN (-1.01
+  at TUG_MID). That would break the brief's own Part 3 readback (f15 crown x within 0.05 of f0) and add 2 cm to every
+  tuned travel.
+- So cr_dx is solved to hold the crown head at x 0, and cr_dz is solved to keep the z that cr_dz = 0 gives.
+- **Exported crown head x over SRC_Tug: max |x| 0.016 cm** (f0 0.0, f8 0.0003, f15 0.0); SRC_Cancel 0.0013, SRC_Release
+  0.012 (`crown_travel.json`).
+- Crown z 31.80 -> 33.86 (+2.07 from the bulb's bh 1.04). Note for Part 2: a LiftCm of 20 puts the crown at +22.1 over
+  the grip, 2 cm higher than Phase J's +20. A LiftCm of 18 would reproduce Phase J's full-strain height (inferred from
+  the sum).
+- Undo: set both to 0.0 in STRAIN / TUG_MID and re-run.
+
+### Injected-stretch audit (`review/phaseK/inject_T_L.json`, `inject_summary.json`)  **confirmed**
+Method:
+- Offset (-T * a, 0, L * a) UE cm added to the crown's armature-space matrix on top of the authored spline pose.
+- a = f / 15 on SRC_Tug and 1 - f / 7 on SRC_Cancel. SRC_Release uses a = 1 - f / 6 as info only: the bed never plays it
+  (`rg` over `Mars_ScreamingTurnipBed_EntityScript.as`: Grip, Tug scrub, Cancel, PlantedIdle only).
+- Gates: every intersection category 0; stem_gap <= 0; neck = dimple <= 9 cm x / <= 3 cm z from Tug f0 and ring below
+  the dimple.
+- The brief's four points use its L. The others use L ~ 0.137 T (146.2 / 20).
+
+| T / L (cm) | result | first failing gate (frame) | Tug f15 crown (x, z) | dimple d (x, z) / ring | stem_gap max |
+|---|---|---|---|---|---|
+| 0 / 0 | FAIL 35 | intersections leaf_vs_bulb 28 on Tug f7-f15, Cancel f0-f3; neck (ring > dimple) | (0, 33.87) | (-1.99, 1.05) / 2.47 | -0.120 |
+| 5 / 0.7 | FAIL 31 | **stem_gap +0.921** (a stem base lifts out); neck ring rule | (-5, 34.57) | (-2.14, 1.07) / 2.52 | +0.921 |
+| 10 / 1.4 | FAIL 14 | neck ring rule only (ring 1.1-2.6 cm > dimple; both < 2.6 cm) | (-10, 35.27) | (-2.29, 1.09) / 2.56 | -0.733 |
+| 20 / 2.7 | PASS | - | (-20, 36.57) | (-2.59, 1.13) / 2.65 | -0.733 |
+| 28 / 3.8 | PASS | - | | (-2.83, 1.16) / 2.73 | -0.733 |
+| **36 / 5** | **PASS** | - | (-36, 38.87) | (-3.07, 1.20) / 2.80 | -0.733 |
+| **74 / 10** | **PASS** | - | (-74, 43.87) | (-4.21, 1.35) / 3.16 | -0.733 |
+| **146 / 20** and **146.2 / 20 (default)** | **PASS** | - | (-146.2, 53.87) | (-6.38, 1.65) / 3.85 | -0.715 |
+| **220 / 30** | **PASS** | - | (-220, 63.87) | (-8.59, 1.95) / 4.57 | -0.649 |
+| 230 / 31.5 | PASS | - | (-230, 65.37) | (-8.89, 1.99) / 4.67 | -0.642 |
+| **235 / 32.1** | **FAIL 2** | **neck: dimple x -9.04 > 9** (Tug f15, Cancel f0) | (-235, 65.97) | (-9.04, 2.01) / 4.71 | -0.638 |
+| 240 / 32.8 | FAIL 2 | neck dimple x -9.19 | | | |
+| 260 / 35.6 | FAIL 3 | neck dimple x | | | |
+| 280 / 38.3 | FAIL 5 | neck dimple x | | | |
+| 300 / 41 | FAIL 6 | neck dimple x; **outer_shell_self 26 at Tug f6** | | (-10.99, 2.28) / 5.36 | -0.596 |
+| 400 / 55 | FAIL 9 | neck dimple x | | (-13.99, 2.70) / 6.35 | |
+| 500 / 68 | FAIL 13 | neck dimple x; leaf_vs_leaf 12 / outer_shell_self 26 at Tug f3-f4 | | (-16.99, 3.09) / 7.34 | |
+
+- **Safe travel: 20..230 cm** (manifest `stretch_runtime_safe_travel_cm` [20.0, 230.0]).
+- **The first failure above the default is at 235 cm**: the neck gate, the bulb-top dimple dragged 9.04 cm (> 9) at full
+  strain.
+- The first non-neck failure above it is at 300 cm (bulb shell self-intersection mid-pull).
+- Below 20 cm only the relative ring-below-dimple rule fails at 10 cm; that is no visible neck, both move under 2.6 cm.
+- The real low-end limits: a stem base lifts out at 5 cm, and at 0 cm the pitched crown lays the leaves into the bulb.
+- SRC_Release at the default (info): leaf_vs_leaf 40 and dimple z +5.1 at f2. That is the REL_OVER bh 1.10 overshoot
+  with half the offset still applied, under an assumed alpha. Unused by the bed.
+
+### Gates on the shipped clips  **confirmed**
+- **Animate**: exit 0, `TURNIP_OK (16 clips, 19 s)`; `anim_report.json` `fails: []`.
+  - Every non-SRC clip is gated as before: 0 intersections, stem_gap <= 0.
+  - SRC_Tug / SRC_Cancel / SRC_Release standalone: leaf_vs_bulb 28 recorded as info. These clips never render without
+    the offset.
+  - The injected default gates Tug / Cancel: `INJECT T 146.2 L 20: fails 0`, stem_gap -0.715, full-strain socket R
+    (-149.91, 4.68, 53.72).
+  - SRC chain joints 0. Envelope back to d_x 42.16 (clip-only).
+- **Export**: exit 0, `TURNIP_OK`. Neck (clip-only, absolute gate) dimple (-1.99, 1.05).
+- **Round trip**: exit 0, `TURNIP_OK`; `fails: []` in both reports.
+- **Diff proof**:
+  - Command: `python scripts/diff_expected_anims.py review/phaseK/baseline/expected_anims.json
+    export/anims/expected_anims.json --expect-changed SRC_Tug,SRC_Release,SRC_Cancel --out
+    review/phaseK/expected_anims_diff.json` (full compare, tol 0.001 cm).
+  - Result: exit 0, `TURNIP_OK (3 changed: ['SRC_Cancel', 'SRC_Release', 'SRC_Tug'])`.
+  - Every ROOT_* clip, SRC_Idle and SRC_Grip: 0.0 on every leaf. SRC_Tug's exported crown head is fixed in x (above).
+- **Mesh / weights** (`compare_rebuild` against `source/ScreamingTurnip_R01_phaseJ.blend`, `review/phaseK/rebuild_compare.json`):
+  - 1624 / 3188, polygons and material indices identical.
+  - Rest, shape keys, vertex colour, bones and statics all 0.0; id props identical.
+  - **0 weight changes.** `TURNIP_OK`.
+  - `export/expected.json` (bind / statics facts) is byte-identical to the Phase J baseline. The SK FBX was re-written by
+    the export; the same mesh and weights went in.
+- **Manifest**:
+  - `k_StretchTravelCm` is gone. `k_StretchTravelCm_default` 146.2, `k_StretchLiftCm_default` 20.0,
+    `stretch_runtime_safe_travel_cm` [20.0, 230.0], plus the tuner `stretch_note`.
+  - `scale_factor` 3.0; `rig_contract` untouched.
+  - The `clips` envelope / bounds are now clip-only: Part 3's SK bounds come from the presentation's `BoundsScale`, not
+    the manifest.
+
+### Not run this round
+- `cancel_match_j.py`: it writes into review/phaseJ. With the crown fixed in x, the Tug(a) / Cancel(1 - a) pose mismatch
+  should be far smaller than Phase J's, and the offset is the same alpha on both sides (inferred; Part 3 measures the
+  switch).
+- The 0.1-frame sub-frame audit: it runs on the standalone actions, which intersect by design now. The injected audit is
+  per whole frame.
+
+### Sheets (looked at; `review/phaseK/`)
+- **`SRC_Tug_sheet.png` and `SRC_Cancel_sheet.png`** (front / side / 3/4) and **`pull_chain_sheet.png`**, all with the
+  injected 146.2 / 20 offset. Framing `--ortho 70 --target -28,0,8.5`.
+  - The stalks stretch toward -X and the leaves pitch and trail as in Phase J.
+  - **`compare_f15_phaseK_injected_vs_phaseJ_1e.png`**: f15 injected (top) against the Phase J 1e clip (bottom) are the
+    same picture. The tuft sits about 2 cm higher (the LiftCm note above).
+  - Mid-pull (f2-f6) the offset is linear in alpha while the pitch and leaves follow the authored ease. At f2 / f4 the
+    crown is already 20-40 cm out with the leaves still nearly upright, then the pitch catches up by f8. That is the
+    D-K3 lead / trail. It reads as the stalks stretching first and the leaves tipping after, and it is visible.
+- **`standalone/SRC_Tug_sheet.png`**: the clip alone (offset 0). The crown pitches to -60 over the bulb and the leaves
+  lie on and into the bulb and bed, which is the 28-pair `leaf_vs_bulb` info. It only shows if the tuner goes below about
+  10 cm.
+- The release sheet was not re-rendered (unused by the bed; standalone it starts in the same intersecting pose).
+
+### Rerun (from this folder)
+```bash
+B="C:/Program Files/Blender Foundation/Blender 5.2/blender.exe"
+"$B" -b --factory-startup source/ScreamingTurnip_R01.blend --python scripts/animate_screaming_turnip.py -- --review phaseK
+for tl in 0,0 5,0.7 10,1.4 20,2.7 28,3.8 36,5 74,10 146,20 220,30 230,31.5 235,32.1 240,32.8 260,35.6 280,38.3 300,41 400,55 500,68; do
+  "$B" -b --factory-startup source/ScreamingTurnip_R01.blend --python scripts/animate_screaming_turnip.py -- --inject-stretch $tl --review phaseK
+done      # failing points exit 1 / TURNIP_FAIL by design
+python review/phaseK/inject_summary_k.py
+"$B" -b --factory-startup source/ScreamingTurnip_R01.blend --python scripts/export_screaming_turnip.py -- --review phaseK
+"$B" -b --factory-startup --python scripts/validate_roundtrip.py
+python scripts/diff_expected_anims.py review/phaseK/baseline/expected_anims.json export/anims/expected_anims.json --expect-changed SRC_Tug,SRC_Release,SRC_Cancel --out review/phaseK/expected_anims_diff.json
+"$B" -b --factory-startup source/ScreamingTurnip_R01.blend --python scripts/compare_rebuild_screaming_turnip.py -- --ref source/ScreamingTurnip_R01_phaseJ.blend --out review/phaseK/rebuild_compare.json
+"$B" -b --factory-startup source/ScreamingTurnip_R01.blend --python scripts/render_anims_screaming_turnip.py -- --out phaseK --clips SRC_Tug,SRC_Cancel --views front,side,threequarter --no-shapekey --pull-chain --ortho 70 --target -28,0,8.5 --inject-stretch 146.2,20
+```
+Each gate printed TURNIP_OK with exit 0 on the final code; the inject runs as tabled.
+
+### For Part 2 / 3
+- The anim instance offset must be component space, Add, on `crown`, exactly (-TravelCm * a, 0, LiftCm * a).
+- The clips' crown head stays at x 0 (|x| <= 0.016 cm), so Part 3's readback of x within 0.05 holds (confirmed in the
+  export).
+- The pull chain at the default reproduces Phase J's full-strain look.
+- Validate (Part 2): TravelCm outside 20..230 still deforms legally per the audit's gates except as tabled. The Validate
+  rule in the brief is only "travel > 0". Consider whether `stretch_runtime_safe_travel_cm` should bound it (Fable's call).
+
+### Not verified
+- Unreal: the ABP's ModifyBone matching this Blender-side injection, especially the component-space order against the
+  scrubbed pose.
+- The sub-frame audit with the offset.
+- **The claim I'd most expect to be wrong**: that the Blender injection (translate the crown's armature-space matrix after
+  the pose) equals Unreal's ModifyBone Add in ComponentSpace. They should agree because both translate the bone's
+  component transform and the children follow. That is unchecked until Part 3's readback.
+
+## Phase K Part 2 - Script: the stretch is a bed tuner, the presentation plays through an anim blueprint (Opus, 2026-11-09) - DONE except the map builder args (blocked, below); awaiting Fable audit
+
+Brief: `PHASE_K_BRIEF.md` D-K2 and "Part 2", plus the coordinator's addendum (the safe travel range 20..230 cm, LiftCm 18,
+manifest-key comments). No git, no `Script/Generated/*` by hand, no tags ini.
+
+### Files
+
+- `Script/WorldObjects/Forage/Mars_ScreamingTurnipBed_PullSpec.as` (new):
+  - `FMars_ScreamingTurnipBed_StretchSpec` {TravelCm 146.2, LiftCm 18}, `_SpringSpec` {Stiffness 400, Damping 40,
+    EngageAlpha 0.97}, `_TimingSpec` {GripSeconds 0.4, CancelSecondsFromFullStrain 0.7, TurnDegreesPerSecond 540}.
+  - `FMars_ScreamingTurnipBed_PullSpec` {Stretch, Spring, Timing}. Every struct has UPROPERTY fields and full positional
+    ctors.
+  - `mixin Validate`: travel positive and finite, then inside [20, 230] cm (the error names the range); lift finite;
+    stiffness > 0; damping >= 0; engage alpha in (0, 1]; both spans > 0; turn rate > 0. Each error names its field
+    (`Pull.Stretch.TravelCm`, ...).
+- `Script/WorldObjects/Forage/Mars_ScreamingTurnipBed_EntityScript.as`:
+  - `UPROPERTY(ExposeOnSpawn) Pull` replaces `GripSeconds` and the private spring / turn / cancel constants.
+    `k_MinAimCm` and `k_MinSpannedStrain` stay constants.
+  - `DoConstruct` validates first and on failure ensures (`rejected the Pull: ...`), destroys the entity and composes
+    nothing.
+  - The Control's WalkCm, stiffness, damping and threshold come from the tuner. The +2 cm socket swing is documented at
+    `Make_ControlSpec`.
+  - The follow tick sets the stretch alpha: `1 - Get_PlayedAlpha()` while SRC_Cancel plays, else the Control's alpha,
+    else 0. It passes `Set_Stretch(FMars_ScreamingTurnip_Stretch(alpha, TravelCm, LiftCm))`, still scrubs the Tug and
+    still turns.
+  - The stretch is set to 0 at rest (the planted component's add, which widens the bounds before the first pull), when
+    the follow ends, and in `OnForageReleased` before the visuals swap.
+- `Script/Items/Presentation/Mars_ScreamingTurnip_AnimInstance.as` (new): `UMars_ScreamingTurnip_AnimInstance : UAnimInstance`
+  with `UPROPERTY(BlueprintReadOnly, NotEditable, Category = "ScreamingTurnip")`:
+  - `UAnimSequenceBase Sequence`
+  - `float32 ClipTime`
+  - `FVector CrownOffset` (component space, cm)
+
+  It has no BlueprintUpdateAnimation. The presentation writes the three fields through one method,
+  `Set_Pose(Sequence, ClipTime, CrownOffset)`, the bat's `Apply` pattern: I did not rely on another script class
+  writing BlueprintReadOnly fields directly.
+- `Script/Items/Presentation/Mars_ScreamingTurnipPresentationComponent.as` (rewritten):
+  - `default AnimationMode = AnimationBlueprint`. DoInitialize loads the mesh, then `TryLoad_AnimClass()` ->
+    `SetAnimInstanceClass` (which sets the mode and initialises the instance) -> cast to the instance.
+  - A missing anim class warns once per component and the mesh holds its bind pose. There is no single-node path.
+  - The component is the single clock: `_Time += dt * _Rate`. Loop wraps (`Math::Fmod`), one-shots clamp. `SpanSeconds`
+    sets `_Rate`, `StartAlpha` seeds `_Time`, `Scrub_Clip` sets `_Time` with rate 0. `Get_PlayedAlpha` and
+    `Get_HasPlayedThrough` read `_Time`.
+  - Tick order: advance the clock -> refresh from the kernel -> return-to-loop -> write the instance.
+  - `Set_Stretch` maps the stretch to `CrownOffset = (-Alpha*TravelCm, 0, Alpha*LiftCm)` and refreshes `SetBoundsScale`
+    when the travel or lift changes: `(extent + |(T, 0, L)|) / extent`, with extent the half-diagonal of the mesh's
+    imported bounds.
+  - `Play_ClipChain` and its queue are deleted.
+  - New struct `FMars_ScreamingTurnip_Stretch(Alpha, TravelCm, LiftCm)`.
+- `Script/Items/Mars_Item_ScreamingTurnip.as`:
+  - `k_StretchTravelCm` deleted.
+  - `k_StretchTravelSafeMinCm = 20` / `k_StretchTravelSafeMaxCm = 230` (manifest `stretch_runtime_safe_travel_cm`).
+  - `k_AnimBlueprintName = "ScreamingTurnip_R01_Mars_ABP"`, `AnimClass()` (soft class `..._ABP.ScreamingTurnip_R01_Mars_ABP_C`)
+    and `TryLoad_AnimClass()`, which asks the registry by the blueprint asset, not the `_C`, then
+    `System::LoadClassAsset_Blocking`.
+  - The clip comment is updated.
+- Tests (`Script/Tests/ScreamingTurnip/`):
+  - The rig spawns its bed with an explicit `_BedPull` (travel 120, lift 15, 400/40/0.97, grip 0.2, cancel 0.7, turn
+    540). `Get_WalkCmFor` reads `_BedPull.Stretch.TravelCm`.
+  - New `Mars_AutoTest_ScreamingTurnipBed_PullSpecValidateRejectsBadTuners`:
+    - Accepted: the defaults, a hand-set tuner, and the 230 edge.
+    - Rejected, one per rule: travel 0, NaN, under and over the range; NaN lift; stiffness 0; damping -1; engage 0 and
+      1.2; grip 0; cancel 0; turn 0.
+    - A spawned bed with travel 0: the ensure is expected through a hand-authored `_Actor` wrapper pinned to
+      `rejected the Pull: Pull.Stretch.TravelCm [0`, and no Forage or Control is left.
+  - New `Mars_AutoTest_ScreamingTurnipBed_WalkDistanceIsTheStretchTravel`: travel 74 gives Control WalkCm 74 and the
+    spring values; walking 37 cm reads alpha 0.5 +- 0.05.
+
+### Engine APIs, verified against the engine source (D:/Repositories/UnrealEngine-Angelscript)
+
+- `USkeletalMeshComponent::SetAnimInstanceClass` (UFUNCTION BlueprintCallable, SkeletalMeshComponent.h:1009-1010; it sets
+  the mode to AnimationBlueprint).
+- `AnimationMode` (UPROPERTY, :620; already set with `default` in this file).
+- `UPrimitiveComponent::SetBoundsScale` (UFUNCTION, PrimitiveComponent.h:1474).
+- `USkeletalMesh::GetImportedBounds` (UFUNCTION, SkeletalMesh.h:838).
+- `UKismetSystemLibrary::LoadClassAsset_Blocking` returns `UClass*` (KismetSystemLibrary.h:429).
+- Tick order: `USkinnedMeshComponent::TickComponent` runs the component's own tick (ReceiveTick) before `TickPose` /
+  `RefreshBoneTransforms` (SkinnedMeshComponent.cpp:1664-1700), so this tick's writes are this frame's pose.
+- `Math::Fmod` / `Math::Sqrt(-1)` / `Math::IsFinite` are used elsewhere in Script.
+- `UAnimSequenceBase` as an AS property: compiled clean in the lanes.
+
+### Lanes (`--test --no-live --discover-fresh`, one at a time)
+
+| Pattern | Passed | Failed | Exit | Known reds |
+| --- | --- | --- | --- | --- |
+| ScreamingTurnip | 14 | 0 | 0 | none ran, no new failures |
+| Control | 74 | 0 | 0 | none ran, no new failures |
+| Forage | 10 | 0 | 0 | none ran, no new failures |
+
+- Evidence: `Saved/Logs/TurnipJ/K-{ScreamingTurnip,Control,Forage}.out` (`Passed:` at 24463 / 27127 / 24424); editor logs
+  `Saved/Logs/Test-TurnipK-<P>.log`.
+- The expected ensure fired: `Saved/Logs/Mars_2-backup-2026.11.09-07.05.45.log:2055`. The missing-ABP warning, once per
+  component, is in the same log at 1994+.
+- The first attempt failed to compile: `'Pull' is not a member of FMars_ScreamingTurnipBed_EntityScript_SpawnParams`.
+  The tests used the new spawn field before the generator had emitted it, and the toolbox refused stale bytecode
+  (AS_COMPILE_FAILED, exit 76).
+- Fix, in two steps:
+  1. Pulled the two `Params.Pull` lines out. The live editor (holding the regen lock) hot-compiled and regenerated
+     `Mars_EntitySpawnParams.as` with `Pull` (line 19665).
+  2. Restored the lines and ran the lanes above.
+
+  The step-1 lane (`K-regen.out`) is discarded.
+
+### Blocked: `Mars.ScreamingTurnip.BuildReviewRoom <bed1 travel> <bed2 travel>` (Part 3 point 3)
+
+Not implemented: AngelScript cannot reach a placed spawner's script instance.
+- `ACk_EntitySpawner_UE::_EntityScript` is `UPROPERTY(EditAnywhere, Instanced)`, private, with no BlueprintRead and a
+  C++-only getter (CkEntitySpawner_Actor.h:129-147).
+- The AS plugin binds such a property edit-only: a class `default`, never read or written at runtime
+  (Helper_PropertyBind.h: no read without CPF_BlueprintVisible).
+- No Ck UFUNCTION exposes it. Only the CkTests editor C++ (`CkGroundNavStreamingAcceptance_EditorUtils::CreateVolumeSpawner`)
+  configures a spawner's script, in C++.
+- Kismet's Get/SetEditorProperty are wildcard CustomThunks, not bound in AS.
+
+Options, my order:
+1. A small CkFoundation editor UFUNCTION returning a spawner's script instance (e.g. on a `UCk_Utils_EntitySpawner_UE`
+   editor library), then the AS builder sets `Pull.Stretch.TravelCm` per bed and rebuilds. Needs a C++ build and a
+   CkFoundation change (outside Part 2's Script-only scope).
+2. Part 3 sets the travel through editor Python: `spawner.get_editor_property("_EntityScript")` then `set_editor_property`
+   on `Pull`. Python honours CPF_Edit. Inferred, not tried.
+
+A builder whose args silently did nothing would be the hack, so it is unchanged.
+
+### Unverified headless (Part 3)
+
+- The ABP does not exist yet, so every lane ran with the "no anim blueprint" warning and the bind pose. The clock, the
+  stretch mapping, the bounds scale and the instance writes are exercised only as far as `Get_PlayingClip` /
+  `Get_PlayedAlpha`; nothing poses.
+- Correction to D-K3: the lanes DO load the skeletal mesh. The TiredAnticipate test asserts `Get_HasMesh`, and the
+  per-component warnings name `Mars_ScreamingTurnipPresentationComponent_N`.
+- Inferred:
+  - The ABP's Sequence Evaluator pins bind to `Sequence` / `ClipTime` and the Modify Bone `Translation` pin to
+    `CrownOffset`.
+  - The morph curves still drive through the evaluator.
+  - The bounds scale keeps the leaves drawn with the bulb off-screen.
+  - The crown offset sign: -X is the Use side, as authored.
+
+## Phase K Part 3 - the ABP, the clip reimport, bed 1's travel, PIE run-12 (Opus, 2026-11-09) - DONE, awaiting Fable audit
+
+Brief: `PHASE_K_BRIEF.md` Part 3, with the coordinator's rulings. No git, no Script edits, no deletes, no Save All, no
+unload / reload. `R` = `Tools/LevelDesign/screaming_turnip_r01_review/`. The editor is left running on the review map with
+PIE stopped.
+
+### Preflight  **confirmed**
+- PIE was off, the review map loaded, 0 dirty packages, `list_errored_blueprints` empty.
+- Mars.log has no `Full Reload is required`. The last AngelScript reloads (to 14576) swapped in clean; the 12500 hot-reload
+  error was fixed by later reloads.
+- The parent class `/Script/Angelscript.Mars_ScreamingTurnip_AnimInstance` loads with `Sequence` / `ClipTime` /
+  `CrownOffset`.
+
+### The ABP (`R/screaming_turnip_animbp_ue.py`; reports `R/phaseK/animbp_report*.json`)
+- **First build, `ScreamingTurnip_R01_Mars_ABP`: compile error.** The builder log reads "[Compiler] Sequence Evaluator (by
+  time) references an unknown Anim Sequence Base" (Mars.log, `LogBlueprint: Error`).
+  - Cause, read in the engine source: `UAnimGraphNode_AssetPlayerBase::ValidateAnimNodeDuringCompilationHelper`
+    (AnimGraphNode_AssetPlayerBase.cpp:501-535) finds the property-access binding only through the EXPOSED pin, and
+    `Sequence` is PinHiddenByDefault.
+  - Monolith exposes pins only at node creation (`add_anim_graph_node expose_pins`, MonolithAbpWriteActions.cpp:1407-1428).
+  - That builder's save step did not wait for the compile verdict, so the errored asset was saved. It stays on disk unused
+    (no deletes). **The maintainer should delete it with the editor closed.** It is the only entry in
+    `list_errored_blueprints`, so PIE was started with `on_compile_errors: suppress` (accepted by the coordinator).
+  - Logs: `animbp_report_build_pass1.json` (every build call ok; the compile step's python failed on a `parent_class`
+    read) and `animbp_report_v1_errored.json`.
+- **The fix, in the builder:** `expose_pins: ["Sequence"]` on the Sequence Evaluator, and the save now needs
+  compile_ok. Both dead ends and every call that worked are in the builder's header.
+- **Rebuild to a fresh name per the rule: `ScreamingTurnip_R01_Mars_ABP_v2`.** `TURNIP_ABP_OK`, exit 0, compiled with no
+  error line, saved alone (dirty after: []). The coordinator pointed `k_AnimBlueprintName` at it (Mars.log 14894 / 14900).
+- Readback (`animbp_report_readback.json`, `--readback-only`, `TURNIP_ABP_OK`):
+  - Parent `Mars_ScreamingTurnip_AnimInstance`; skeleton `ScreamingTurnip_R01_Mars_SKEL`; 0 state machines.
+  - Nodes: Root, SequenceEvaluator, LocalToComponentSpace, ModifyBone (Bone: crown), ComponentToLocalSpace.
+  - Bindings: Sequence <- [Sequence], ExplicitTime <- [ClipTime], Translation <- [CrownOffset], all type Property and
+    bound.
+  - Links: SequenceEvaluator.Pose -> LocalPose -> ComponentPose -> ModifyBone.Pose -> ComponentToLocalSpace.Pose ->
+    Root.Result (`output_connected: true`).
+  - Properties set (old -> new): bShouldLoop True -> False; ReinitializationBehavior ExplicitTime -> NoReset;
+    TranslationMode BMM_Additive; TranslationSpace BCS_ComponentSpace; Rotation / Scale BMM_Ignore; Alpha 1.0.
+  - `list_errored_blueprints` does not list `_v2`.
+
+  **confirmed**.
+
+### Clip reimport: `R/phaseJ/reimport_phaseJ_ue.py clips SRC_Tug,SRC_Cancel,SRC_Release` (`R/phaseJ/reimport_phaseK_clips.json`)  **confirmed**
+- Three clips saved; duplicates []; 0 packages dirty before and after; all four readback groups PASS (`TURNIP_OK`).
+- **SRC_Tug crown head x over every frame: max deviation from f0 0.0161 cm** (gate 0.05). f15 is (0.0, -0.0, 33.8646),
+  err 0.0 vs `review/phaseK/crown_travel.json`.
+- Frame counts 15 / 7 / 6; landmark worst <= 8.2e-5 cm.
+- Diff against the 1e readback:
+  - Clip lines only in the three SRC clips.
+  - Mesh: one line, the envelope margin 6.046 -> 6.2. The manifest's envelope is clip-only now; the asset is unchanged
+    (**inferred**).
+  - Owned / root assets: the two new ABPs.
+- No SK reimport.
+
+### Bed 1's travel (editor Python on the review map; the coordinator's ruling 3)  **confirmed**
+```python
+es = spawner.get_editor_property("_EntityScript")       # ScreamingTurnipR01Review_Bed (Ck_EntitySpawner_UE_4)
+p = es.get_editor_property("Pull")                       # the AS struct's fields are not Python-visible (UPROPERTY()
+txt = p.export_text().replace("Stretch=(TravelCm=146.199997,LiftCm=18.000000)",   #  without Edit flags), so via text
+                              "Stretch=(TravelCm=74.000000,LiftCm=9.000000)")
+p.import_text(txt); spawner.modify(); es.modify(); es.set_editor_property("Pull", p)
+unreal.get_editor_subsystem(unreal.LevelEditorSubsystem).save_current_level()
+```
+- Read back after the save: bed 1 `(Stretch=(TravelCm=74.000000,LiftCm=9.000000),Spring=(400,40,0.97),Timing=(0.4,0.7,540))`;
+  bed 2 unchanged (146.2 / 18).
+- The save wrote only `Content/ArtCandidates/ScreamingTurnip/R01/Review/ScreamingTurnip_R01_Review_MAP.umap` (find
+  -newer); dirty after: [].
+- `get_editor_property("Stretch")` on the struct is a dead end (the fields are not reflected to Python); export / import
+  text is the working route.
+
+### PIE run-12 (`R/captures/pie/run-12-walk/`; analysis `run12_analysis.json`, `R/phaseK/run12_summary.txt`, `R/phaseK/run12_lag.txt`)
+- Driver: `run_12` in `R/screaming_turnip_walk_ue.py`, slomo 0.25, 30 cm/s, the 110 cm stand. It now reads the planted
+  clip from the AS instance's `Sequence` / `ClipTime` / `CrownOffset`: the single-node readout returns nothing in
+  AnimationBlueprint mode. The first attempt with the old readout is `run-12-walk-void-a/`.
+- Both planted components run `ScreamingTurnip_R01_Mars_ABP_v2_C` in AnimationBlueprint mode (read at the run start).
+
+**Bed 1 (TravelCm 74 / LiftCm 9).**
+- d0 110.39. The root popped at **74.00 cm walked** (alpha 0.961, ring 0.996).
+- Crown x vs -alpha x 74: within **0.023 cm on all 342 Tug ticks**. CrownOffset vs (-a T, 0, a L) within 0.008.
+- Full strain: crown x -71.14 at alpha 0.961. **Crown x / alpha = -74.005.**
+- Sockets travel 73.33 cm at alpha 0.961 = 76.3 per alpha (T + 2.3, the D-K3 swing). Ring vs drawn alpha: see the lag.
+- Gloves: 0.000 cm to the previous tick's sockets (223 ticks); same tick <= 1.93 cm, mean 0.32 cm.
+
+**Bed 2 (TravelCm 146.2 / LiftCm 18), pull 2 (the full pull).**
+- d0 111.46. The pop at **144.57 cm walked (-1.63)**, alpha 0.967 (ring 0.9995).
+- Crown x vs -a T within 0.031 cm (627 ticks). **Crown x / alpha = -146.198.** At the break crown x is -141.32.
+- Sockets 143.50 cm = 148.5 per alpha.
+- Gloves: 0.000 cm to the previous tick's sockets; same tick <= 2.16 cm.
+
+**"Crown x at full strain = -TravelCm within 2 cm": PARTIAL.**
+- The bed never reaches alpha 1: it pops at EngageAlpha 0.97. So the full strain shown is -0.961 x 74 = -71.1 (2.9
+  short) and -0.967 x 146.2 = -141.3 (4.9 short).
+- The mapping itself is exact: crown x = -a T within 0.031 cm, extrapolated to a = 1 it gives -74.005 / -146.198.
+
+**The one-tick lag is still there** (`run12_lag.txt`). **confirmed**.
+- The drawn alpha (instance ClipTime / 0.5) equals the Control's alpha of the **previous** tick within 0.0001. Against the
+  same tick it differs by up to 0.026 (the ring runs one tick ahead).
+- The gloves sit on the previous tick's sockets (0.000 cm).
+- So the pose is one tick behind the Control, and the gloves are one tick behind the pose.
+- Inferred cause: the presentation component's tick (it writes the instance) runs before the bed's follow tick (it sets
+  the scrub and the stretch) in the same frame.
+- The crown matches the instance's own CrownOffset of the same tick: the ABP itself adds no lag.
+
+**Bed 2 cancel** (`bed2_cancel`).
+- Let go at alpha 0.462 (the stop is at 0.45). SRC_Cancel's first tick t 0.1308 = start 0.5606 vs 1 - a = 0.5384 plus one
+  tick of play (0.0155 x 0.333 / 0.2333 = 0.022): consistent.
+- **Switch: the socket step is 0.25 cm** on the switch tick (<= 1.5). The offset holds the Tug value for that one tick,
+  then follows the clip.
+- **The offset shrinks in step with the clip, one tick late:** CrownOffset.x vs -(1 - played) x T stays about -3 cm,
+  i.e. one tick of cancel, on every 60 Hz tick (-18.3 cm on one 0.088 s screenshot tick).
+- **Cancel speed: the sockets move 2.8-4.1 cm per ~60 Hz tick**: about 210 cm/s, the 146 cm offset closing in 0.32 s at
+  the 0.7 s span. That exceeds the 1.5 cm rule. It is the known Phase J 4x finding: the span is Fable's call.
+- Charge kept (`bed1_after_cancel` charges=1). The second pull popped (`bed1_after` released=1).
+
+**Bulb off-screen** (bed 2, phase `offscreen1b`, a camera 25 cm off the pull axis aimed 110 cm out, alpha 0.922).
+- `was_recently_rendered` true on all 92 ticks.
+- `Q10_bed2_bulb_offscreen.png`: the green rods fill the frame and the bulb is not in it. **confirmed**.
+
+**Morph curves.** The pulled bed-2 root was picked up (Held), then sampled:
+- Inhale 0.92 at its Inhale.
+- Scream 1.0 at Scream for the held root (and for the loose bed-1 root).
+
+The curves arrive through the ABP: the Sequence Evaluator passes the clip curves. `Q11_scream_fp.png`: the held root with
+the mouth open and the teeth showing. **confirmed** (the instance's `get_curve_value` and the capture).
+
+**Ensures, dirty, Sandbox**  **confirmed**.
+- Mars.log 14693-30989 (the builds, the reimport, the map save, run-12, run-12b, run-12c): 0 `Ensure condition failed`,
+  0 `Full Reload is required`.
+- 0 dirty packages after.
+- The Sandbox mtime is 2026-11-07 21:08, unchanged.
+
+### Captures, my read
+- `run-12-walk/sheet_fp_both.png` (left bed 1 / right bed 2: grip, mid, full).
+  - Grip: the gloves on the stalks under the prompt.
+  - Mid / full: the stalks and leaves run down-screen toward the camera, the gloves at the frame bottom, the pink cone
+    behind the prompt.
+  - Bed 2 reaches farther down-screen than bed 1 at the same alpha.
+- `run-12c-walk/side_by_side_74_vs_146.png` (bed 1 from run-12b, bed 2 from run-12c; side, target 0.92).
+  - Bed 1: a 74 cm rod from the low pink cone to the leaves at the chef's hand.
+  - Bed 2: a rod about twice as long, the chef farther out.
+  - The leaves trail at the far end in both.
+  - run-12's `Q9_bed2_full_side` is **void**: the camera stood outside the room. Bed 2's side shot was retaken in
+    run-12c.
+- `run-12-walk/sheet_side_cancel_scream.png`: Q6 the cancel (the gloves already leaving, leaves near the idle); Q10 the
+  bulb off-screen; Q11 the scream.
+
+### Finding (Script side, not reproduced): an interaction that started without a press
+- run-12b (`R/captures/pie/run-12b-walk/walk_rows.json`): after a let-go on bed 1, the player walked to bed 2.
+- Bed 2 entered SRC_Grip at game 9.98 with no key held (`keys: []`), 0.30 s before the driver's press (10.28). The gloves
+  reached the stalks, but the Control's manipulation never began: ring 0.0 and no Tug while the player walked 135 cm away.
+- run-12c, the same sequence, started on the press (10.33 after 10.30) and stretched normally.
+- One sample. The cause is not investigated (Script scope).
+
+### Rerun
+```text
+python Tools/LevelDesign/screaming_turnip_r01_review/screaming_turnip_animbp_ue.py [--readback-only]
+run_python execute_file: .../phaseJ/reimport_phaseJ_ue.py clips SRC_Tug,SRC_Cancel,SRC_Release
+(bed travel: the python above; the review map saved)
+start_pie {on_compile_errors: suppress}; run_python: t.begin("run-12-walk"); w.state["full_speed"] = 400.0; w.sample_start(); w.run_12()
+  ... w.finish(); stop_pie                     (run-12b: w.run_12b(); run-12c: w.run_12b(beds=(1,), label="run-12c-walk"))
+python phaseK/analyse_run12.py captures/pie/run-12-walk/walk_rows.json captures/pie/run-12-walk/run12_analysis.json
+```
+run-12c's `beds=(1,)` did not take effect: both beds ran (the reload). Bed 2's shot is from that run either way.
+
+### Not verified
+- Grip node to socket (private handles).
+- Why the pose and gloves still lag one tick (the cause is inferred from tick order).
+- The run-12b press-less grip.
+- The claim I'd most expect to be wrong: that the ABP adds no lag. That rests on crown == CrownOffset in the same sample,
+  and both are read after the frame.
+
+## Phase K - Fable audit (2026-11-09): the stretch is an Unreal tuner; Parts 1-3 ACCEPTED, Part 2c open, uncommitted
+
+Audited against the artifacts: Part 1's inject_summary.json (17 travels; safe range 20..230 cm) and sheets, Part 2's
+diff (PullSpec + Validate, the presentation as the single clock writing UMars_ScreamingTurnip_AnimInstance, lanes
+ScreamingTurnip 14 / Control 74 / Forage 10), Part 3's animbp_report_readback.json, reimport_phaseK_clips.json,
+run12_analysis.json / run12_summary.txt / run12_lag.txt, side_by_side_74_vs_146.png, sheet_fp_both.png.
+
+- Proven: two beds pull 74 and 146.2 cm from the SAME three clips; crown x = -alpha * TravelCm within 0.03 cm on every
+  tick; the pops at 74.00 / 144.57 cm walked; morph curves drive the scream through the evaluator; bulb-off-screen draws;
+  cancel switch 0.25 cm; 0 ensures (Mars.log 14693-30989).
+- Fable's edits this phase: k_AnimBlueprintName -> ScreamingTurnip_R01_Mars_ABP_v2 (the unsuffixed first build saved with
+  a compile error: its Sequence pin was bound without being exposed; the builder now exposes it and waits for the verdict).
+  MAINTAINER: delete /Game/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP with the editor closed.
+- Rulings: "crown at -TravelCm at full strain" is restated as "-EngageAlpha * TravelCm at the pop" (0.97 by design);
+  the cancel-speed rule stays relaxed and the span is now a tuner (Pull.Timing.CancelSecondsFromFullStrain); the review
+  room's per-bed travel is set through the placed spawner's details (editor Python export/import text), since the spawner's
+  script instance is editor-only data AngelScript cannot set at runtime and a CkFoundation change is out of bounds.
+- Open (Part 2c, Script executor): the drawn pose trails the Control by one tick and the gloves one more (a frame-order
+  fix, not a deferral); a press-less grip on bed 2 in run-12b (driver keys empty at 9.98, ring from 9.39) to be explained
+  with file:line and fixed with a headless test if it is a defect.
+
+## Phase K Part 2c - Script: the drawn pull is this frame's; the run-12b press-less grip audited (Opus, 2026-11-09) - DONE (pose link fixed; glove link one frame by framework order; 2 not reproduced on the Use path); awaiting Fable audit
+
+### (1) Frame order, read from the code (confirmed by source; group order is CkProcessorGroups.h's RunAfter chain)
+
+1. **FGroup_Gameplay_TimeDelta.**
+   - The bed's follow tick runs here: `utils_timer::Create_Tick` fires from `FProcessor_Timer_Update` (CkTimer_Processor.h:110-122, Group TimeDelta).
+   - The autotest step timer runs here too.
+2. **FGroup_Gameplay_Script.**
+   - `UMars_Processor_Control_Tick` sets this frame's alpha.
+   - `UMars_Processor_FPHands_Tick` refreshes each reach target's `AnchorWorld` from the grip node's current transform (`utils_fphands::Update_ReachTarget`, Mars_FPHands_Processor_Tick.as:34).
+3. **FGroup_Transform.**
+   - Scene-node offset requests apply here (`FProcessor_SceneNode_HandleRequests`, CkSceneNode_Processor.h:18-27).
+   - `FProcessor_SceneNode_FollowUnrealAnchor` (socket followers) runs earlier, in Transform_SyncFrom.
+4. **FGroup_PostTransform.**
+   - `FProcessor_UnrealComponent_Tick` (CkUnrealComponent_Processor.h:64-76) calls `TickComponent` (.cpp:343).
+   - `USkinnedMeshComponent::TickComponent` runs the component's own tick (our `Tick`), then `TickPose` / `RefreshBoneTransforms` (SkinnedMeshComponent.cpp:1664-1700). The turnip pose is evaluated here.
+5. **After the ECS tick.**
+   - The FPHands ABP's `BlueprintUpdateAnimation` composes the gloves from the stored `AnchorWorld` (Mars_FPHands_AnimInstance.as:56-130).
+   - Inferred, not confirmed: this runs after the ECS frame. Run-12's 0.000 cm glove-to-previous-socket fits it.
+
+**Why it lagged** (the cause run-12 measured):
+- The bed set the scrub and the stretch in TimeDelta from last frame's Control alpha, so the pose drew alpha N-1.
+- The grip nodes take the sockets of the pose evaluated last frame (N-1).
+
+**Fix (the pose link):** the presentation draws the pull itself in its own tick, which runs after the Control in the same frame.
+- `Mars_ScreamingTurnipPresentationComponent.as`:
+  - `Set_PullDrawing(FMars_ScreamingTurnip_PullDrawing(Control, TravelCm, LiftCm))`, set once by the bed, replaces `Set_Stretch` and `FMars_ScreamingTurnip_Stretch`.
+  - `DoFollow_Pull` (in Tick, after the clock) scrubs SRC_Tug to `Control.TryGet_ManipulationAlpha()` while the drawing shows Grip or Tug and the alpha moved or the Grip played through. This is the bed's old rule, moved.
+  - The stretch alpha follows the clip on screen: Tug's played alpha, Cancel's `1 - played`, else 0. Tug's played alpha is the scrub, and it now holds after the threshold ends the grip until the release, where the old code dropped to 0 for those frames.
+- `Mars_ScreamingTurnipBed_EntityScript.as`:
+  - `DoScrub_Tug`, `Get_StretchAlpha` and `DoSet_Stretch` are removed.
+  - `OnPlantedSkeletalAdded` sets the drawing (bounds widened from the start). `OnForageReleased` clears it.
+  - The follow tick keeps the turn and the grip nodes.
+
+**The link that cannot be same-frame without touching the framework: sockets -> grip nodes -> gloves.**
+- The pose is evaluated in FGroup_PostTransform, after FGroup_Transform (where a scene node's offset lands) and after FPHands_Tick reads `AnchorWorld` (Gameplay_Script).
+- So the earliest a grip node, or the anchor FPHands stores, can hold this frame's sockets is the next frame's Transform pass.
+- Moving the bed's grip-node write into PostTransform gains nothing: the request still lands next frame.
+- The ways out:
+  - an immediate scene-node set or a post-pose transform pass (CkFoundation);
+  - or FPHands resolving a skeletal socket live at anim time. Today `Make_EntryGrip` stores the socket relative to the node at reach start, and `Find_EntitySocketComponent` searches static meshes only. That is a Mars FPHands change that moves the glove grip frame, so it needs a PIE look first: proposed, not done.
+- Net effect: the gloves were two Control frames behind and are now one (they sit on the sockets of the pose drawn with last frame's alpha).
+
+**Proof** (headless; lanes run with the v2 ABP loaded): new `Mars_AutoTest_ScreamingTurnipBed_TheDrawnStretchIsThisFramesPull`.
+- The step timer samples in TimeDelta, so it reads the Control alpha and the instance from the same end-of-frame state.
+- It samples 30 frames of the spring following a 0.8 step: max |CrownOffset.X + alpha*T| <= 0.01 cm, Tug ClipTime = alpha*length within 0.0005 s, and the alpha moved > 0.01 per frame.
+- **Before the fix, the same test failed:** worst 11.80 cm over 30 samples, 2 of 4 assertions (`Saved/Logs/TurnipJ/K2c-A-prefix.out:23629`).
+- **After the fix it passed** (`K2c-ScreamingTurnip.out`). confirmed.
+
+### (2) The run-12b press-less grip
+
+- **Not reproduced on the Use path.** New `Mars_AutoTest_Control_ACancelledPullStartsNothingOnTheNextFocus`, through the player's real ManipulateControl, UseIntentToResolver and Hands tasks:
+  1. Grip lever A, then release Use: the pull finishes Failed.
+  2. The gloves are back at rest; A is withdrawn and lever B offered, with Use up.
+  3. For 1 s: no interaction on B, B not gripped, the gloves never reach B.
+  4. A fresh press starts B.
+
+  It passes. The Use task opens only on a press edge (`Open_Intent` from `OnIntentPressed`, Hfsm_Tasks.as ~964), and its release / finish / removal paths all close it.
+- **Inferred: the signature fits an interaction started by the Primary intent, not by Use.**
+  - Primary shares LMB and resolves the Use channel (Mars_PlayerCharacter_Assets.as:207-214). It starts a target itself whenever its press is not deferred to Use (`Forward_To` Hfsm_Tasks.as:1058-1070, `Get_DefersStart` :1073).
+  - `UMars_SmTask_ManipulateControl` watches only the Use intent's best targets (:499). An interaction Primary starts never reaches its `OnNewInteraction` (:528), so no manipulation begins and the ring stays 0. That matches run-12b.
+  - Then the driver's real press at 10.28 opens Use, whose `Forward_To` joins the already-live interaction (:1066). ManipulateControl starts watching only after the interaction's start has fired, so it never begins either. That matches "ring 0 while the player walked 135 cm away".
+- **What opened the Primary intent (or produced a press edge) with no driver key is NOT established.**
+  - Primary closes on release, on its forwarded interaction's finish (`Spend_Hold`), and two frames after an early release (`_CloseWhenStarted`), so a stale open needs an edge I cannot see from the code.
+  - Leads in Mars.log:
+    - 07:31:42.802: `FProcessor_IntentSampler_Sample` dropped 2 intervals after the R1 screenshot hitch, just before bed 1's release.
+    - 07:32:00.038: `LevelEditor.ToggleImmersive`, within about 2 s of game 9.98 at the 0.25 slomo, from the R2 shot's wall/game mapping. A viewport change can deliver a mouse-capture down into PIE.
+  - Both are inferred and point at the PIE driver session rather than Script. Next proof: log the Primary / Use phase edges (`OnIntentPhaseChanged`) in a PIE rerun of run-12b.
+- **Separate robustness defect (inferred, not fixed):** ManipulateControl ignores a ManuallyCompleted interaction already live from its player when it starts watching a target. The fix would be: on adopting `_Target`, treat `TryGet_Interaction(_Target, _Player)` as a new interaction. It is a behaviour change on every pulled control: Fable's call.
+
+### Lanes (`--test --no-live --discover-fresh`, one at a time)
+
+| Pattern | Passed | Failed | Exit | Known reds |
+| --- | --- | --- | --- | --- |
+| ScreamingTurnip | 15 | 0 | 0 | none ran, no new failures |
+| Control | 75 | 0 | 0 | none ran, no new failures |
+| Player | 34 | 0 | 0 | none ran, no new failures |
+| Interactable | 14 | 0 | 0 | none ran, no new failures |
+
+Evidence: `Saved/Logs/TurnipJ/K2c-{ScreamingTurnip,Control,Player,Interactable}.out` (`Passed:` at 24515 / 27166 / 27295 /
+24468); editor logs `Saved/Logs/Test-TurnipK2c-<P>.log`.
+
+- Process note: I wrote the Control test file while the pre-fix A run was running. That run tested only TheDrawnStretch and was not flagged CONTAMINATED. The four lanes above started after every edit.
+
+### Side finding
+
+- During run-12b, Mars.log logs `Currently in Animation Blueprint mode. Please change AnimationMode to Use Animation Asset` twice per frame.
+- The presentation no longer calls any single-node API. Inferred: it comes from the PIE driver reading `get_position` / `get_play_rate` on the two beds' components. The driver should read the instance's ClipTime instead.
+
+### Unverified headless (PIE)
+- The pose matching the Control on screen.
+- The gloves' remaining one-frame trail (expected: glove to the previous tick's socket 0.000, same-tick difference about halved).
+- The Tug holding after the threshold until the release.
+
+## Phase K Part 2d - Script: ManipulateControl adopts an interaction already live on a target it starts watching (Opus, 2026-11-09) - DONE, awaiting Fable audit
+
+Ruling (Fable): the defect found in Part 2c is real for every pulled control. Fixed.
+
+- `Script/PlayerCharacter/HFSM/Mars_PlayerCharacter_Hfsm_Tasks.as`, `UMars_SmTask_ManipulateControl::OnBestTargetsChanged`:
+  - After binding the new ManuallyCompleted Control target, a live `utils_interact_target::TryGet_Interaction(_Target, _Player)`
+    goes through `OnNewInteraction(_Target, Live)` as if it had just fired: pending interaction, grip wait or reach ask,
+    and a Look control's view hold.
+  - Nothing else changes.
+  - The header comment documents the case: Primary and Use share LMB, Primary resolves the Use channel and can start a
+    Use-channel control itself, and a later Use press only joins it (`Forward_To`).
+- New `Script/Tests/Control/Mars_AutoTest_Control_AnAlreadyLiveInteractionIsAdoptedOnWatch.as`, through the player rig:
+  1. Start the lever's interaction directly.
+  2. Assert one interaction and no manipulation.
+  3. Offer the lever and press Use.
+  4. The gloves grip and the manipulation begins, carrying that same interaction. The Use press started no second one.
+  5. A pull past the threshold ends it Succeeded.
+- Without the fix the manipulation could not begin (the interaction's start fired before the watch). This is inferred; I
+  did not run an A/B.
+- The press-less-grip root cause stays open for PIE (the Use / Primary phase edges).
+
+### Lanes (`--test --no-live --discover-fresh`, one at a time)
+
+| Pattern | Passed | Failed | Exit | Known reds |
+| --- | --- | --- | --- | --- |
+| Control | 76 | 0 | 0 | none ran, no new failures |
+| Player | 34 | 0 | 0 | none ran, no new failures |
+
+Evidence: `Saved/Logs/TurnipJ/K2d-Control.out` (`Passed:` 27535; the new test Success), `K2d-Player.out` (`Passed:` 27299);
+editor logs `Saved/Logs/Test-TurnipK2d-<P>.log`.
+
+## Phase K Part 3b - run-13: the same-frame drawing, the held strain, the press-less grip hunt, a cold boot (Opus, 2026-11-09) - DONE, awaiting Fable audit
+
+Same hard rules. `R` = `Tools/LevelDesign/screaming_turnip_r01_review/`. No Unreal asset writes this part.
+
+### A fresh editor (the cold-boot proof)
+- **The previous live editor was found closed** between Part 3 and Part 3b: no MarsEditor process, Monolith refusing
+  connections, and no crash dump newer than 2026-11-08 23:40. The cause is unknown; its log had already been rotated away
+  by the headless lane editors (Saved/Logs/Mars.log was a Test-TurnipK2d lane's).
+- With the coordinator's agreement I launched a fresh editor with `CkAuto/UnrealToolbox.exe --launch-editor`
+  (`Saved/Logs/TurnipK3b/launch-editor.out`) and loaded the review map. It is left running.
+- **So run-13 is also the cold-boot proof** of the Phase K scripts and the `_v2` ABP.
+  - Boot compile (Mars.log): `script compilation total` 2467, swap-in 2469. No AngelScript error, 0
+    `Full Reload is required`.
+  - `list_errored_blueprints` was empty at boot: the stale unsuffixed ABP was not loaded.
+  - Bed 1's travel survived the reboot: export_text 74 / 9 (bed 2 146.2 / 18).
+  - On the cold boot the PullSpec struct's fields are visible to Python (`stretch`, `spring`, `timing`). After the hot
+    reload in Part 3 they were not.
+- **Driver fix:** `screaming_turnip_pie_ue.clip_state()` reads the instance's `Sequence` / `ClipTime`. The single-node
+  `GetPosition` / `GetAnimationAsset` are no longer called; the walk sampler uses the same. Mars.log has **0** "Currently in
+  Animation Blueprint mode" lines over the whole session.
+- **Intent rows:** new `_intents()` in `R/screaming_turnip_walk_ue.py`.
+  - Path: the local player's `Ck_InputSource_Subsystem` -> `get_input_source()` ->
+    `Ck_Utils_InputLayer_UE.try_get_layer_with_priority(source, 10)` (the gameplay profile's layer) ->
+    `Ck_Utils_IntentMatcher_UE.do_cast_checked` -> `get_intent_phase` / `try_get_activation_frame`.
+  - Tags `Mars.Intent.Interact.Use` / `.Primary`. The matcher reports 21 active intents.
+
+### run-13 (`R/captures/pie/run-13-walk/`; `run13_analysis.json`, `R/phaseK/run13_summary.txt`, `R/phaseK/run13_strain_held.txt`)
+- Slomo 0.25 (game ticks about 0.0085 s), the 110 cm stand, both beds.
+- `run_13`: A (bed 1 slow, shots, let go); B x3 (run-12b's sequence); C (bed 2 slow to the break, shots); D (bed 1 at full
+  backward speed to the break).
+
+**1. Lag.** **confirmed**.
+
+| pull | ticks | drawn alpha vs the SAME tick's Control alpha | vs the previous tick's | glove vs previous-tick socket | glove vs same-tick socket (max / mean) | walk |
+|---|---|---|---|---|---|---|
+| bed 1 slow (A) | 270 | **<= 0.00014** | 0.036 | 0.000 | 2.73 / 0.25 cm | 31.5 cm/s |
+| bed 2 slow (C) | 541 | **<= 0.00014** | 0.018 | 0.000* | 1.49 / 0.26 cm | 31.5 cm/s |
+| bed 1 full speed (D) | 56 | **<= 0.00014** | 0.045 | 0.000 | 3.48 / 1.35 cm | 418 cm/s |
+
+\* One 2.71 cm row compares across a 1.63 s gap: the side-view rows between are excluded. It is not a tick pair.
+
+- The drawn pose is now this frame's Control alpha (run-12: one tick behind). The gloves still sit exactly on the previous
+  tick's sockets.
+- **The remaining trail: about 0.25 cm (mean) at 30 cm/s and about 1.35 cm (mean, max 3.5) at full speed.** It is the one
+  frame of socket travel, about half of run-12's.
+
+**2. The strain held** (`run13_strain_held.txt`).
+- On both beds the release is the tick right after the last visible tick:
+  - bed 1, full speed: ring 0.9964, drawn alpha 0.9666, crown offset -71.52 at 64.1432; hidden at 64.1512 with the offset
+    still -71.52;
+  - bed 2: ring 0.9981, offset -141.55.
+- The offset goes to 0 only on the next tick, after the mesh is hidden. The crown never drops while visible. **confirmed**.
+- There is no observable "threshold-to-release" window: the threshold and the release land in the same frame, so the
+  Tug-hold (Part 2d) has no visible ticks to act on here (**inferred** from the ring -> hidden sequence).
+
+**3. The press-less grip: not reproduced in 3 runs** (`run13_analysis.json` `pressless`). **confirmed**.
+- Each repetition: bed 1 grip -> back to 0.5 -> Use up -> walk to bed 2 with LMB up -> wait 2.0 s -> press.
+  - Between the let-go and the press, bed 2 never left SRC_Idle (`grip_before_press: []`).
+  - The Use and Primary rows were Idle except on the let-go tick itself: both ACTIVE at 10.7625 / 25.6703-25.6846 /
+    40.5888-40.5958, carrying the press's activation frame, then Idle.
+- On the press both rows go ACTIVE together (LMB maps both), with new activation frames 5423 / 6316 / 7212. The Grip
+  started 0.023 / 0.016 / 0.028 s after the press.
+- Each repetition stretched (max alpha 0.505 / 0.504 / 0.505, ring 0.52) and cancelled with the charge kept
+  (`B1..B3_bed2_after_cancel` charges=1).
+- Whether a Primary-started pull stretches could not be tested: no pull started without a press.
+
+**4. Breaks, cancels, charge.**
+- Bed 2's three cancels at alpha ~0.50: start 0.508 / 0.510 / 0.507 vs 1 - a 0.495 / 0.496 / 0.495 (one tick of play).
+  - **Switch step 1.81-2.05 cm, the same size as the next steps (1.64-2.10)**: no extra jump at the switch. It is the
+    cancel's own speed.
+  - Per 60 Hz: max 3.67-3.68 cm (the 0.7 s span over 146 cm; Fable's call).
+- Bed 1's cancel at 0.92 (A): start 0.093 vs 0.080, switch step 1.03 cm.
+- Both beds broke (`bed2_after` / `bed1_after` released=1).
+- **Ensures:** Mars.log (the fresh editor's) 1-3670, including the run window 3318-3670: **0** `Ensure condition failed`,
+  0 Full Reload. 0 dirty packages. The Sandbox mtime is 2026-11-07 21:08, unchanged.
+
+### Captures (`R/captures/pie/run-13-walk/sheet_run13.png`)
+- **S1 / S2, bed 1 mid / full (first person):** the gloves on the stalks, the stalks and leaves leaning down toward the
+  camera, the cone at the bed. The white root at the left is the review map's display actor.
+- **S3 / S4, bed 2 mid / full:** the same, longer. The stretch now stays inside the frame (the camera pitch at the stand).
+- **S5, bed 2 side at full strain:** a 146 cm rod from the low pink cone, the leaves trailing at the chef's end, the chef a
+  little beyond them.
+
+### Rerun
+```text
+start_pie {on_compile_errors: suppress}; run_python: t.begin("run-13-walk"); w.state["full_speed"] = 400.0; w.sample_start();
+  w.state["track_intents"] = True; w.run_13()   ... w.finish(); stop_pie
+python phaseK/analyse_run13.py captures/pie/run-13-walk/walk_rows.json captures/pie/run-13-walk/run13_analysis.json
+```
+
+### Not verified
+- run-12b's press-less grip: it did not recur in 3 runs, so its cause and whether Part 2d fixes a Primary-started pull are
+  open.
+- The Tug-hold window (none observed).
+- The grip-node lag is framework order, as the coordinator states (not measured: private handles).
+- The claim I'd most expect to be wrong: that the 2 cm cancel steps hide no switch discontinuity. At 8 ms ticks a 0.3 cm
+  mismatch would sit inside a 2 cm step.
+
+## Phase K - Fable audit addendum (2026-11-09): Parts 2c / 2d / 3b ACCEPTED; Phase K complete, uncommitted
+
+- Same-frame pose: the presentation reads the Control in its own tick (PostTransform, after the Control tick); headless
+  test TheDrawnStretchIsThisFramesPull (failed 11.80 cm before, passes after); PIE run-13: drawn alpha = same-tick Control
+  alpha within 0.00014 on 867 ticks. The gloves keep a one-frame trail behind the sockets (0.25 cm at 30 cm/s, 1.35 mean /
+  3.5 max at full speed): framework order (scene-node offsets apply in FGroup_Transform, the pose evaluates in
+  FGroup_PostTransform, FPHands composes after). Proper routes, both outside this phase: FPHands resolving skeletal sockets
+  live at anim time (Make_EntryGrip stores the socket relative to the node at reach start; Find_EntitySocketComponent only
+  searches static meshes), or a CkFoundation post-pose transform pass. Not papered over.
+- ManipulateControl adopts an interaction already live on the target it starts watching (Part 2d, test
+  AnAlreadyLiveInteractionIsAdoptedOnWatch; Control 76/0, Player 34/0): a real defect for every pulled control.
+- Press-less grip (run-12b): 0 of 3 reproductions in run-13 with the Use/Primary intent rows logged; closed as not
+  reproducible, leading hypothesis an editor-window mouse-down during the driver's ToggleImmersive (Mars.log 07:32:00).
+- Cold boot: the previous live editor was found closed before Part 3b (no crash dump; cause unknown). The fresh editor
+  compiled the whole Phase K script set clean (Mars.log 2467-2469) and bed 1's 74/9 travel survived the reload.
+- Rulings: cancel speed stays relaxed (now a tuner, Pull.Timing.CancelSecondsFromFullStrain: ~1.9 s would meet 1.5 cm per
+  frame at 146 cm); "strain held" has no visible window (threshold and release share a frame).
+- Final lanes this phase: ScreamingTurnip 15, Control 76, Player 34, Interactable 14, Forage 10, all exit 0, no new reds.
+- MAINTAINER: delete Content/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP(.uasset/.ckexport)
+  with the editor closed (the errored first build; the game uses _v2). Open calls: the glove one-frame trail (above), the
+  square-rod stem look at long stretches (6-8 sided tapered stems = mesh change + SK reimport), the HUD prompt covering
+  the turnip from standing height.
+
+## Phase L Part 1 - Script: the gloves read their grip live (anchors at composition, skeletal sockets as grips) (Opus, 2026-11-09) - DONE, awaiting Fable audit
+
+Brief: `PHASE_L_BRIEF.md` D-L1..D-L4. Script/ only.
+
+### Changes
+
+`Script/ECS/FPHands/Mars_FPHands_Grips.as`:
+- **`FMars_FPHands_HandGrip`** gains:
+  - `UPROPERTY() FCk_Handle_UnrealComponent SocketHost`: invalid means the anchor itself is the base.
+  - `UPROPERTY() FName Socket`.
+
+  `Grip` is in the BASE space: the socket's for a socket grip, where identity means the socket's own axes; else the
+  anchor's. `AnchorWorld` is the last known base world, used as the fallback.
+- **`FMars_FPHands_GripEntry`** gains `UPROPERTY() TOptional<FQuat> SocketRotation`. It is the handed grip rotation in the
+  socket's frame; unset means the socket's axes. The positional ctor takes it as a trailing defaulted 8th parameter, so
+  the existing 7-argument calls (Station, WorldItem, tests) are unchanged.
+- **`FMars_FPHands_MeshGrips`** gains `FCk_Handle_UnrealComponent SocketHost`, `FName RightSocket`, `FName LeftSocket`.
+- **New** `FMars_FPHands_SocketComponent { UMeshComponent Component; FCk_Handle_UnrealComponent Host; }`: the
+  transient result of the socket lookup.
+- **`Find_EntitySocketComponent(Root, Socket)`** now returns `FMars_FPHands_SocketComponent`. It searches every
+  `UMeshComponent` (static or skeletal) in the transform tree through `utils_unreal_component::Get_HandlesByType` +
+  `Get_Component`.
+- **New** `TryGet_SocketWorld(HandGrip)` and `Get_GripBaseWorld(HandGrip)`. The base is resolved in this order:
+  1. the live socket;
+  2. else the cached `AnchorWorld` for a socket grip whose component or socket is gone;
+  3. else the live anchor;
+  4. else `AnchorWorld`.
+- **D-L1:** `Resolve_WorldGrip` composes `Grip * Get_GripBaseWorld(...)`, Sides centre included. `Refresh_Anchor` stores
+  `Get_GripBaseWorld` and still keeps the cache for a dead anchor. `Roll_HandGrip` (FaceViewer) rolls against the live
+  base.
+- **D-L2, entries:** `Make_EntryGrip`'s socket path fills `SocketHost` / `Socket`, `Grip = SocketRotation` (or identity)
+  and `AnchorWorld` = the socket's world. A missing socket still ensures and falls back to the node, as before.
+- **D-L2, object sockets:** `Find_EntitySockets` iterates the static mesh handles and records the component handle and the
+  socket names. The object-socket path in `Resolve_ReachTarget_AsAuthored` binds live through the new
+  `Make_UsedSocketGrip(Shared, Socket, SocketWorld)` (identity grip, FaceViewer roll as before) whenever `SocketHost` is
+  valid. A plain actor's sockets (`Find_ActorSockets`, no Ck handle) stay baked as before.
+- `Anchor_HandGrip` (items re-anchored to their root) leaves a socket grip on its socket.
+
+`Script/WorldObjects/Forage/Mars_ScreamingTurnipBed_EntityScript.as`:
+- `AddHarvestGrips(InHandle)` writes two entries on `_PlantedNode`:
+  - `Socket` = `k_HarvestGripSocket_R / _L`;
+  - `SocketRotation` = `Make_GripRotation(Right, +X, -Y)` / `(Left, +X, +Y)`;
+  - Pose Power, Roll Fixed.
+- Removed: `_HarvestGrip_R/_L`, `_HarvestGripRotation_R/_L`, `DoMove_GripNode` and the node moves. The follow tick keeps
+  the turn and its end condition. The header comment is updated.
+
+`Script/Items/Mars_Item_ScreamingTurnip.as`: `k_HarvestGripLocation_R / _L` deleted (no reader left, including no test);
+the socket comment is updated. The manifest is not touched: it is Blender's file.
+
+### Tests (D-L4)
+
+- **`Mars_AutoTest_FPHands_ANodeAnchorIsReadLiveAtResolve`:** a grip-table reach on a node, resolved once and held.
+  - Move the node 30 cm with nothing refreshing the held target: the cached `AnchorWorld` is still the old place, while
+    `Resolve_WorldGrip` puts the grip on the new node position within 0.01 cm.
+  - Refresh, then destroy the node: the grip is the last known world, with no ensure.
+  - The move is a deferred transform request, so "no tick between" is implemented as "no refresh of the held target in
+    between". That is the property D-L1 changes.
+- **`Mars_AutoTest_FPHands_ASkeletalSocketGripIsResolvedLive`:** a node carrying `UMars_ScreamingTurnipPresentationComponent`
+  (the SK through ABP v2, loaded headless) and an entry on `HarvestGrip_R` with a SocketRotation.
+  - Resolved: `SocketHost` is valid, `Socket` = HarvestGrip_R, and `Grip` = the SocketRotation.
+  - Move the node: the grip = SocketRotation x the live socket (0.01 cm, rotation 1e-4).
+  - Pose the mesh (SRC_Tug scrubbed to 1 with a 100 cm crown offset through `Set_PullDrawing` and no Control): the socket
+    moves more than 50 cm off the node, and the grip follows the socket.
+  - **This confirms the pose is evaluated headless** (`VisibilityBasedAnimTickOption` refreshes the bones under nullrhi).
+  - It logs `HarvestGrip_R in the component at bind: location X=-1.522 Y=4.683 Z=38.035, rotation P=0 Y=0 R=0`.
+    **The socket's bind frame is the component's (identity)**, so the bed's SocketRotation reproduces Phase K's world
+    rotation (yaw x Make_GripRotation) at rest. During the pull the glove now also takes the crown's pitch: that is the
+    PIE call in D-L3 / D-L5.
+- `SocketGripFollowsMovingPart` (lever object sockets, now bound live) and `GripTableGivesEachHandItsOwnAnchor` pass
+  unchanged.
+- The ScreamingTurnip rig had no reader of `k_HarvestGripLocation_*`.
+
+### Lanes (`--test --no-live --discover-fresh`, one at a time)
+
+| Pattern | Passed | Failed | Exit | Known reds |
+| --- | --- | --- | --- | --- |
+| FPHands | 36 | 0 | 0 | none ran, no new failures |
+| ScreamingTurnip | 15 | 0 | 0 | none ran, no new failures |
+| Control | 76 | 0 | 0 | none ran, no new failures |
+| WorldItem | 25 | 0 | 0 | none ran, no new failures |
+| Station | 75 | 1 | 1 | none listed ran; 1 NEW failure, not ours |
+
+- Evidence: `Saved/Logs/TurnipJ/L1-<P>.out`; editor logs `Saved/Logs/Test-TurnipL1-<P>.log`.
+- **The Station red:** `CkTests.UnitTests.CkCrowd.StationaryMarkup.WindowedSpeedThreshold`.
+  - It is a CkTests C++ CkCrowd unit test that matches the pattern only through "Stationary". It expects the warning
+    `Invalid stationary-markup movement sample` 6 times and finds 1.
+  - It is red again alone (`Saved/Logs/TurnipJ/L1-Windowed.out`, `Passed: 0` / `Failed: 1`).
+  - Not caused by this change, by reasoning: it is a synchronous C++ unit test of CkCrowd that runs no Mars script. No A/B
+    was run.
+  - It is not on any knownReds list. The "two known Station reds" the coordinator named did not appear in the
+    known-reds block. Following the gate's rules, the entry belongs in CkTests' own list via that home project, not here.
+  - Every Mars Station test passed (75).
+
+Rerun:
+```bash
+./CkAuto/UnrealToolbox.exe --test --no-live --discover-fresh --test-pattern FPHands --output=Saved/Logs/Test-TurnipL1-FPHands.log --project=D:/Repositories/CkRepos/Orion/Mars.uproject
+# ScreamingTurnip, Control, WorldItem, Station likewise, one at a time
+```
+
+### The PIE driver (Part 2)
+
+- No driver line samples the old grip nodes; they were private.
+- `screaming_turnip_walk_ue.py` already samples the bed sockets (`sock_r/sock_l` = `get_socket_location("HarvestGrip_R/_L")`,
+  :108-109) and the glove bones (`grip_r/grip_l` on the FPHands mesh, :189).
+- So "glove to SAME-tick socket" is `|grip_r - sock_r|` and `|grip_l - sock_l|` in the same row. The analysis
+  (`phaseK/analyse_run12.py`) should report those per row instead of against the previous row's sockets.
+- Also recommended: drop the single-node reads that log `Currently in Animation Blueprint mode` twice a frame. Read the
+  instance's ClipTime instead.
+
+### Unverified headless (PIE, D-L5)
+
+- The glove-to-same-tick socket distance on screen. Expected 0.00x; it rests on the inferred anim-time order.
+- Whether Make_GripRotation's +X fingers / palm-to-crown read right on the pitched, turned stalks.
+- Every other grip's look after D-L1: lever, pickups, platter / dock Place.
+- That the Station's socket grips (now live) and the lever object sockets look as before.
+
+## Phase L Part 2 - PIE: the gloves on the live sockets (run-14) and the regression look in the Sandbox (Opus, 2026-11-09) - DONE, awaiting Fable audit
+
+Brief: `PHASE_L_BRIEF.md` D-L5 plus the coordinator's points. No git, no Script edits, no asset writes. The Sandbox was
+loaded and NOT saved. `R` = `Tools/LevelDesign/screaming_turnip_r01_review/`. The editor is left running on the review map
+with PIE stopped.
+
+### Preflight  **confirmed**
+- Mars.log of the editor launched in Part 3b: the Phase L hot compiles at 4806-6576, the last swap-in at 6576. No
+  AngelScript error, 0 `Full Reload is required`.
+- PIE off, 0 dirty packages.
+- The driver reads no single-node state. **"Currently in Animation Blueprint mode": 0 lines in the whole session**
+  (Mars.log 1-8306).
+
+### run-14 (`R/captures/pie/run-14-walk/`; `run14_analysis.json`, `R/phaseL/run14_summary.txt`; driver `run_14`)
+Slomo 0.25, the 110 cm stand. Bed 1 (74 / 9) pull 1 slow with a sidestep, pull 2 at full speed. Bed 2 (146.2 / 18) pull 1
+to 0.5 then cancel, pull 2 slow to a hold, pull 3 at full speed.
+
+| pull | glove to the SAME tick's socket (mean / max) | glove to the previous tick's socket (mean / max) | drawn vs the Control, same tick | walk |
+|---|---|---|---|---|
+| bed 1 slow | **0.000 / 0.000** (183 ticks) | 0.38 / 0.66 cm | <= 0.0001 | 31.5 cm/s |
+| bed 1 sidestep | **0.000 / 0.000** (160) | 0.15 / 0.21 | <= 0.0001 | (around the bed) |
+| bed 1 full speed | **0.000 / 0.000** (29) | 2.64 / 6.54 | <= 0.0001 | 419 cm/s |
+| bed 2 slow | **0.000 / 0.000** (433) | 0.49 / 1.33 | <= 0.0001 except the let-go tick* | 31.5 cm/s |
+| bed 2 full speed | **0.000 / 0.000** (39) | 3.81 / 6.98 | <= 0.0001 | 420 cm/s |
+
+\* On the let-go tick (game 20.6285) the ring is already 0 while the drawing still shows the Tug at 0.507. It is not a lag.
+
+- **The glove trail is gone: the glove bones sit on the same tick's sockets at 0.000 cm** at 30 cm/s and at full speed on
+  both beds. Against the previous tick they now read one frame of socket travel, which is the old trail inverted.
+  **confirmed**.
+- **The yaw carries the grips.** Sidestep: planted yaw 44.29 -> 72.50 deg, the bearing to the player the same; yaw error
+  <= 0.0007 deg, and the gloves at 0.000 cm on the turning sockets. **confirmed**.
+- **The cancel** (bed 2 at alpha 0.507): start 0.519 (1 - a 0.493 plus a tick of play). The gloves are 1.43 cm off the
+  socket on the first Cancel tick (they let go, as before). `bed2_after_cancel` charges=1. **confirmed**.
+- **Breaks:** bed 1 at 13.43 (full speed), bed 2 at 34.42 (full speed); `bed1_after` / `bed2_after` released=1.
+  **confirmed**.
+
+**The glove frame on the stalks** (`sheet_run14.png`, `zoom_gloves.png`: grip and full strain, both beds; my read).
+- **At the grip:** both gloves close round the stalks from either side, fists closed, knuckles up toward the leaves, the
+  stalks between the palms. They read right.
+- **At full strain:** the gloves sit in the leaf cluster at the stalks' far end, mostly hidden behind the leaves. Their
+  backs face the camera and the stalk bundle runs between them. That is consistent with palms toward the stalk and crown
+  as the crown pitches.
+- Nothing looks twisted or inside-out at this resolution, but **the finger wrap at full strain cannot be judged**: the
+  leaves cover the fingers. **inferred**. No SocketRotation change is proposed.
+
+### The regression look in the Sandbox (D-L1 freshens every grip)
+- Loaded with `LevelEditorSubsystem.load_level` (read-only). 0 dirty packages after the load and after both PIE sessions.
+- Never saved: the `Sandbox_Mars_MAP.umap` mtime is still 2026-11-07 21:08.
+- The review map was reloaded afterwards.
+- Driver: `R/screaming_turnip_regression_ue.py` teleports the pawn to a stand 120 cm off each target, aims, and presses Use
+  through Mars_ExpeditionAcceptance.
+  - Runs: `run-14-sandbox` (the lever) and `run-14-sandbox-pickups`.
+  - `run-14-sandbox-void-a` died at its first shot: a duplicate keyword in the mark call.
+  - In the first run's pickups the aim passed over the floor items (no prompt, nothing held). The pickups run re-aimed
+    low.
+
+| grip | capture | result (my read) |
+|---|---|---|
+| Pulled lever (Mech_LeverA, a Mars_Sandbox_PulledLever) | `run-14-sandbox/G0_lever_focus`, `G1_lever_grip`, `G2_lever_pulled` | G1: one glove closes on the top of the handle. G2: after 20 look deltas down the handle has gone forward out of view with the glove on it. Plausible. Glove-to-handle-socket not sampled (no Python path to the lever's grip). |
+| Two-handed pickup (Item_Cookbook) | `run-14-sandbox-pickups/G3b_cookbook_*` | The prompt "Pick up Cookbook"; the reach and held: both gloves hold the book's sides in front of the camera; `held=Mars_ItemDef_Cookbook` (inspect). Looks right. |
+| One-handed pickup riding home (Item_Key_Red) | `G5b_key_*` | The prompt "Pick up Red key"; the right glove holds the key in its fist at the hand's rest; `held=Mars_ItemDef_Key_Red`. Looks right. |
+| Platter / dock Place | - | Not done: the dock was not located in the time. The platters exist (Sandbox_Platter_Large / Small). |
+
+- **"Looks as before": not claimable.** There are no pre-Phase-L captures of these grips in this campaign to diff. What
+  can be said is that each looks correct, with no glove off its grip, twisted or inside-out. **inferred**.
+- The right glove reads darker brown than the left in these shots. In the review map both read tan, so it is likely the
+  shadow side of the Sandbox light, not a material change (**inferred**).
+
+### Ensures, dirty, Sandbox  **confirmed**
+- Mars.log 1-8306 (Phase L hot compiles, run-14 from 6764, both Sandbox sessions): **0** `Ensure condition failed`, 0 Full
+  Reload, 0 "Currently in Animation Blueprint mode".
+- 0 dirty packages at the end (the review map loaded).
+- The Sandbox file is unchanged.
+
+### Rerun
+```text
+review map, PIE: t.begin("run-14-walk"); w.state["full_speed"] = 400.0; w.sample_start(); w.state["track_intents"] = True; w.run_14() ... w.finish()
+python phaseL/analyse_run14.py captures/pie/run-14-walk/walk_rows.json captures/pie/run-14-walk/run14_analysis.json
+sandbox (load_level, never save), PIE: import screaming_turnip_regression_ue as g; t.begin("run-14-sandbox"); g.run()   (or g.run_pickups())
+```
+
+### Not verified
+- The finger wrap at full strain (hidden by the leaves).
+- Glove to the lever's grip socket.
+- The platter / dock Place.
+- "As before" (no baseline captures).
+- The claim I'd most expect to be wrong: that the gloves at full strain have the right handed frame. Only their backs are
+  visible.
+
+## Phase L - Fable audit (2026-11-09): live grip anchors + skeletal-socket grips ACCEPTED; uncommitted
+
+- FPHands: Resolve_WorldGrip composes on a live base (socket -> cached world if the host is gone -> live anchor -> cached
+  world; Get_GripBaseWorld / TryGet_SocketWorld), grips may be sockets on any UMeshComponent (HandGrip.SocketHost + Socket,
+  Grip in socket space; GripEntry.SocketRotation), object sockets bind live (Make_UsedSocketGrip); the bed grips
+  HarvestGrip_R/_L on the planted node and moves no scene nodes (k_HarvestGripLocation_* deleted). Tests
+  ANodeAnchorIsReadLiveAtResolve and ASkeletalSocketGripIsResolvedLive (the turnip SK posed through its ABP headless).
+  Lanes FPHands 36 / ScreamingTurnip 15 / Control 76 / WorldItem 25 green; Station 75/1, the red being
+  CkTests.UnitTests.CkCrowd.StationaryMarkup.WindowedSpeedThreshold, a C++ unit test red alone and recorded red on
+  2026-11-06 before any of this work (not ours; belongs in CkTests' own list via its home project).
+- PIE run-14: glove-to-SAME-tick socket 0.000 / 0.000 cm on every pull (slow, sidestep, full speed, both beds; 844 ticks);
+  drawn alpha same-tick within 0.0001; the yaw turn carries the grips (bearing error 0.0007 deg); cancel from the strain,
+  charge kept; 0 ensures (Mars.log 1-8306). Gloves judged on zoom_gloves.png: fists round the stalks from both sides at
+  the grip, backs to the camera inside the leaf cluster at full strain; no twist. SocketRotation unchanged.
+- Sandbox regression look (loaded read-only, never saved, 0 dirty): pulled lever, two-handed Cookbook pickup, one-handed
+  Red key ride-home all grip correctly (no pre-Phase-L captures exist to say "as before"; the paths changed only in reading
+  the anchor a frame fresher). Platter/dock Place not exercised (the Place path itself is untouched by D-L2): owed to the
+  maintainer's next platter session.
+- Owed: finger wrap at full strain is hidden by the leaves (a side camera could show it); glove-to-lever-socket not sampled.

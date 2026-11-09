@@ -134,3 +134,153 @@ No full gate was run (maintainer rule: focused patterns only).
 | I-9 full strain look | **PARTIAL** | `run-04-pull-strain/S3_tug_end_side.png`: stalks stretched out of a slight dome, no gap. First person (`S2`): the dome is hidden by the gloves and prompt. |
 | I-10 motion clip | **PARTIAL** | `run-04-pull-clip/strip_tug_side_f15_f21.png`: a smooth rise, but only about 4 frames of the Tug. |
 | I-11 0 ensures; Sandbox restored | **PARTIAL** | 0 ensures in Mars.log 19338-20084. **Sandbox not restored**: the review map is dirty from the SK reimport, and the discard-load was refused by the session's permission classifier. Nothing is dirty outside the owned folder. |
+
+## Phase J Part 3 - the walk-away pull in Unreal (Opus, 2026-11-08; detail in PROGRESS.md "Phase J Part 3")
+
+Paths: `R` = `Tools/LevelDesign/screaming_turnip_r01_review/`.
+
+| row | verdict | evidence |
+|---|---|---|
+| J-1 SK (1b weights) + SRC_Tug / Cancel / Release reimported, readback | **PASS** | `R/phaseJ/reimport_phaseJ.json`: 4 groups PASS; Tug crown f15 (-35.998, 0, 42.3013) err 0.0; frames 15 / 7 / 6; diff vs `reimport_phaseI` only the bounds and the 3 clips (plus < 1e-3 cm reference drift on 2 untouched clips). |
+| J-2 SK bounds cover the lean | **PASS** | Bounds with extension (-64.69, -28.04, -8)..(30.21, 28.04, 68); `was_recently_rendered` true on every visible row; `R/captures/pie/run-05-walk-clip-edge` frames 082-090: the bulb at the frame edge, the stalks drawn. Bind bounds wholly off-screen not framed. |
+| J-3 alpha tracks (d - d0) / WalkCm within 0.1 once settled | **PASS** at rest / **PARTIAL** walking | At rest <= 0.0029 (`R/phaseJ/rest_error.txt`); walking at 30 cm/s the spring trails 0.105-0.113 (`R/captures/pie/run-05-walk/walk_rows_analysis.json`). |
+| J-4 socket travel within 3 cm of alpha x 38.2 | **PARTIAL** | Max 4.38 cm (A, 15 fps) / 2.97 (B): the clip's ease, up to 2.98 cm (`R/phaseJ/clip_linearity.txt`), plus the pose one tick behind the scrub (it matches the clip at the previous alpha within 0.012 cm, `R/phaseJ/pose_lag.txt`). |
+| J-5 gloves on the grip targets <= 0.5 cm, reach-cap frames | **PASS** (end to end) | Glove(n) vs socket(n-1) 0.000 cm on all clean rows; 0 reach-cap shortfall rows; same tick <= 3.16 cm (15 fps) / 2.02 (B). Node-to-socket not readable. |
+| J-6 release at alpha >= 0.97 | **PASS** (crossing inferred) | The root is out one tick after alpha 0.953-0.968 (ring 0.983 / 0.998), 4 pulls. |
+| J-7 yaw faces the player within 5 deg; a sidestep follows | **PASS** after the turn | <= 0.001 deg from the turn's end; sidestep -90 -> -66.2 / -61.5, err 0.001. The turn starts after the Grip (2-3 ticks), not during it. |
+| J-8 the prompt ring fills | **PASS** | abs(ring x 0.97 - alpha) <= 0.00014 (B, 727 rows). |
+| J-9 cancel: start ~1 - a, no socket jump > 1.5 cm, gloves ride down, ends SRC_Idle, charge kept | **PARTIAL** | Start 0.405 at a 0.586; in-clip 1.22-1.28 cm per ~60 Hz sample; **switch frame 3.57 cm** (authored Tug(a) / Cancel(1 - a) mismatch); **the gloves leave** (Script side); SRC_Idle at 0.44 s; charges=1, pull 2 released. |
+| J-10 captures | **PARTIAL** | First person: the prompt hides the turnip. Side: the dome low in the soil, long low stalks to the chef's hands, the root airborne (`R/captures/pie/run-05-walk-clip/sheet_pull_side.png`). |
+| J-11 0 ensures, Sandbox untouched, 0 foreign dirty | **PASS** (turnip) | Mars.log 3406-5467: 1 ensure, line 4635 `InRHITexture` D3D12, at `MONOLITH_CLIP begin` before any driver step; sessions A / B / D 0. 0 dirty packages; the Sandbox file unchanged. |
+
+## Phase J Part 3b - Cancel mirror, aim from the press, 110 cm stand (Opus, 2026-11-09; detail in PROGRESS.md "Phase J Part 3b")
+
+Paths: `R` = `Tools/LevelDesign/screaming_turnip_r01_review/`; run files under `R/captures/pie/run-06-walk/`.
+
+| row | verdict | evidence |
+|---|---|---|
+| J-12 SRC_Cancel reimported alone, readback | **PASS** | `R/phaseJ/reimport_phaseJ_clips.json`: 4 groups PASS; 7 frames; chain Tug f15 -> Cancel 1.1e-5 cm; only SRC_Cancel saved; diff limited to SRC_Cancel (and one manifest-envelope margin number). |
+| J-13 yaw starts on the press, within 5 deg before the Grip ends | **PASS** | `walk_rows_analysis.json` `yaw_from_press`: within 5 deg at +0.120 s (45 deg turn) and +0.195 s (90 deg); the turn starts on the first SRC_Grip tick. |
+| J-14 bed 0 back-off to the break from 110 cm | **PASS** (alpha while walking as J-3) | d0 110.44; rest error <= 0.002 (`R/phaseJ/rest_error_run06.txt`); ring abs(x 0.97 - alpha) <= 0.00014; break one tick after alpha 0.967; gloves lagged 0.000 cm on 121 rows (`R/phaseJ/run06_gloves_bed0.txt`). |
+| J-15 first-person captures with the gloves on the stalks, lean toward the camera; side capture for the dome | **PASS** (my read) | `sheet_bed0.png`, `zoom_K1_K4.png`, `sheet_side_bed1.png` K5; `R/captures/pie/run-06-walk-clip/sheet_pull_side.png`. |
+| J-16 cancel switch jump <= 1.5 cm, spanned steps <= 1.5 cm, charge kept | **PASS** (let-go at 0.65, not 0.5-0.6) | Switch row 0.371 cm, first Cancel-pose row 1.019 cm (Part 3: 3.57); in-clip 0.88-1.41 cm per ~60 Hz sample; charges=1. The gloves still leave (Script side). |
+| J-17 second pull on bed 1 after the cancel | **PASS** | Break one tick after alpha 0.968; `bed1_after` released=1. |
+| J-18 0 ensures, Sandbox untouched, 0 foreign dirty | **PASS** | Mars.log 5562-6326: 0 ensures (clip tool included); 0 dirty packages; Sandbox mtime unchanged. |
+
+## Phase J Part 3c - the 2x stretch in Unreal (Opus, 2026-11-09; detail in PROGRESS.md "Phase J Part 3c")
+
+Paths: `R` = `Tools/LevelDesign/screaming_turnip_r01_review/`; run files under `R/captures/pie/run-07-walk/`.
+
+| row | verdict | evidence |
+|---|---|---|
+| J-19 SK + SRC_Tug / Cancel / Release reimported, readback | **PASS** | `R/phaseJ/reimport_phaseJ_1d.json`: 4 groups PASS; Tug crown f15 (-71.9944, 0, 45.7995) err 0.0; frames 15 / 7 / 6; diff limited to the 3 clips and the bounds. |
+| J-20 bounds cover x -100..+30 | **PASS** | (-100.69, -28.04, -8)..(30.21, 28.04, 70); `was_recently_rendered` true on every visible row. |
+| J-21 alpha vs (d - d0) / 74.2 at rest within 0.01 | **PASS** | 0.0016 (`R/phaseJ/rest_error_run07.txt`). |
+| J-22 sockets follow the scrub; gloves <= 0.5 cm lagged; reach-cap shortfalls | **PASS** | Previous-tick clip match <= 0.017 cm (`pose_lag_run07.txt`); glove lag 0.000 cm on 332 rows; 0 shortfall ticks (MaxReachCm unset, `Mars_PlayerCharacter_Assets.as:225`). |
+| J-23 the focus holds to the break | **PASS** | Ring up on every Tug row; no drop; break at d 184.6 / 189.6 cm, pitch -27.7 / -27.1 deg (`R/phaseJ/run07_extra.txt`). |
+| J-24 release at the threshold | **PASS** (crossing inferred) | Released after alpha 0.946 (inside a 0.094 s screenshot tick) and 0.969. |
+| J-25 captures, the dome, the rods, faceting | **PASS** (my read) | `zoom_K4b_stalks_fp.png`: faceting visible (flat light / dark bands per face); `zoom_K5_rods_side.png`: rods to a low dome, no neck; `R/captures/pie/run-07-walk-clip/sheet_pull_side.png`. |
+| J-26 cancel: switch jump, steps per 60 Hz, charge, second pull | **PARTIAL** | Let-go 0.496; switch 0.23 cm (first drawn row 1.38 cm incl. about 1.0 cm of play); **steps 2.0-2.5 cm per 60 Hz frame (peak 2.67), over 1.5**; charges=1; pull 2 released. Span of about 1.17 s needed (inferred). |
+| J-27 0 ensures, Sandbox untouched, 0 foreign dirty | **PASS** | Mars.log 7737-8506: 0 ensures; 0 dirty; Sandbox mtime unchanged. |
+
+## Phase J Part 3d - the 4x stretch in Unreal (Opus, 2026-11-09; detail in PROGRESS.md "Phase J Part 3d")
+
+Paths: `R` = `Tools/LevelDesign/screaming_turnip_r01_review/`; run files under `R/captures/pie/run-08-walk/`.
+
+| row | verdict | evidence |
+|---|---|---|
+| J-28 SK + 3 SRC clips reimported, readback | **PASS** | `R/phaseJ/reimport_phaseJ_1e.json`: 4 groups PASS; Tug crown f15 (-143.9856, 0, 51.7974) err 0.0; frames 15 / 7 / 6; diff limited to the clips and the bounds. |
+| J-29 bounds cover x -170..+30, z 75 | **PASS** | (-171.69, -28.04, -8)..(30.21, 28.04, 76); rendered on every visible row. |
+| J-30 the pull survives the ray leaving the 250 cm trace | **PASS** | `ray_focus.json` / `R/phaseJ/ray_focus_run08.txt`: bed 1 pull 2, 38 rows with the ray past 250 cm (from d 278.7, pitch -18.6) all `focused=true` with the ring up; break at d 388.0 (ray enters at 358 cm). |
+| J-31 alpha vs (d - d0) / 146.2 at rest within 0.01 | **PASS** | 0.001 (`R/phaseJ/rest_error_run08.txt`). |
+| J-32 sockets follow the scrub; gloves; reach cap | **PASS** | Previous-tick clip match <= 0.033 cm; glove lag <= 0.001 cm on 667 rows; same tick <= 3.61; 0 shortfall ticks. |
+| J-33 yaw within 5 deg in the Grip; release at the threshold | **PASS** (crossing inferred) | 0.094 / 0.181 s after the press; break after alpha 0.969 / 0.968. |
+| J-34 spring lag at full walking speed | **FINDING** | Trail up to 0.54; the break at 276.8 cm walked, 130.6 cm past WalkCm (`R/phaseJ/run08_extra.txt`). |
+| J-35 captures: rods, cone, stipple, faceting, clip | **PASS** (my read) | `zoom_K5_rods_side.png` / `zoom_K5_cone_side.png`: square rods about 1.5 m, a pink cone, the stipple reading as a dashed line; first person: the gloves and leaves leave the frame at full strain; `R/captures/pie/run-08-walk-clip/sheet_pull_side.png`. |
+| J-36 cancel: switch, steps per 60 Hz, charge, second pull | **PARTIAL** | Let-go 0.473; switch row 0.19 cm; **steps median 4.11, max 5.57 cm per 60 Hz frame**; charges=1; the full-speed pull 2 broke. A span of about 1.9 s is needed for 1.5 cm (inferred). |
+| J-37 0 ensures, Sandbox untouched, 0 foreign dirty | **PASS** | Mars.log 8795-9600: 0 ensures; 0 dirty; Sandbox mtime unchanged. |
+
+## Phase J Part 3e - the bed's spring at 400 / 40 (Opus, 2026-11-09; detail in PROGRESS.md "Phase J Part 3e")
+
+Paths: `R` = `Tools/LevelDesign/screaming_turnip_r01_review/`.
+
+| row | verdict | evidence |
+|---|---|---|
+| J-38 hot compile clean | **PASS** | Mars.log 9613-9618, no errors, no Full Reload. |
+| J-39 full-speed overshoot past WalkCm within ~25 cm | **PARTIAL** | +65.9 (run-10, no screenshots), +70.7, +62.1 cm (was +130.6): `R/phaseJ/run10_fast_bed0.txt`, `run10_fast_bed1.txt`, `run10b_fast_bed0.txt`. |
+| J-40 gloves at full speed; arm reach | **PASS** | Glove lag 0.000 cm (run-10 bed 0, 83 rows); same tick <= 4.74 cm; eye-to-glove 82.9 -> 196.1 cm (`R/phaseJ/run10_reach.txt`). |
+| J-41 the mid-pull stop: overshoot <= 0.02, settle <= 0.2 s | **PASS** overshoot / **PARTIAL** settle | Overshoot -0.0001; settled within 0.01 at 0.251 s (`R/captures/pie/run-09-walk/run09_analysis.json`). |
+| J-42 cancel from 1 - a, charge kept, slow pull to the break | **PASS** | Start 0.4011 vs 0.4014; charges=1; the slow break at -1.65 cm vs WalkCm. |
+| J-43 the stiff spring on a long frame | **FINDING (FAIL)** | run-09 bed 0 released at 114 cm walked, drawn alpha 0.30, on a 0.0955 s tick; one semi-implicit step from the sampled state crosses 0.97 for dt >= ~0.08 s (`R/phaseJ/run09_spring_step.txt`). |
+| J-44 captures | **PARTIAL** | Valid: M1, M2, M4, M5, `R/captures/pie/run-10b-walk/N3_midwalk_side_viewport.png`. Void: M3 (camera outside the room), run-09 L3 / L4 (after the early release). |
+| J-45 0 ensures, nothing dirty, Sandbox untouched | **PASS** | Mars.log 9666-10396: 0 ensures; 0 dirty; Sandbox mtime unchanged. |
+
+## Phase J Part 3f - the substepped spring (Opus, 2026-11-09; detail in PROGRESS.md "Phase J Part 3f")
+
+Paths: `R` = `Tools/LevelDesign/screaming_turnip_r01_review/`.
+
+| row | verdict | evidence |
+|---|---|---|
+| J-46 hot compile clean | **PASS** | Mars.log 10409-10415; 0 errors / Full Reload in 10397-10613. |
+| J-47 reproduction against the substepped update | **PASS** | dt 0.0955 -> alpha 0.6087 (was 1.440); no frame length crosses 0.97 from the sampled state (`R/phaseJ/run11_spring_substep.txt`). |
+| J-48 full speed with screenshots: release only past WalkCm | **PASS** | Last visible tick at +58.7 cm (alpha 0.924); release inside the 0.4 s screenshot tick (`R/phaseJ/run11_fast_bed0.txt`). |
+| J-49 alpha <= 0.1 per tick, ticks > 0.05 s listed | **PARTIAL** | One tick > 0.05 s: dt 0.3625, alpha 0.420 -> 0.789 (+0.369) while the target moved +0.49 (walked 74 -> 200 cm); every other tick <= 0.07. No early release. |
+| J-50 gloves | **PASS** | Glove(n) vs socket(n-1) 0.000 cm. |
+| J-51 the mid-pull stop | **PASS** overshoot / **PARTIAL** settle | Overshoot 0.0001; settle 0.243 s (`R/captures/pie/run-11-walk/run11_analysis.json`). |
+| J-52 cancel from 1 - a, charge kept, slow break | **PASS** | 0.4119 vs 0.4116; charges=1; the slow break at -1.5 cm vs WalkCm. |
+| J-53 captures | **PASS** (P4 is post-release) | `R/captures/pie/run-11-walk/sheet_fast_bed0.png`. |
+| J-54 0 ensures, nothing dirty, Sandbox untouched | **PASS** | Mars.log 10614-10872: 0; 0 dirty; Sandbox mtime unchanged. |
+
+## Phase K Part 3 - the stretch as an Unreal tuner (Opus, 2026-11-09; detail in PROGRESS.md "Phase K Part 3")
+
+Paths: `R` = `Tools/LevelDesign/screaming_turnip_r01_review/`; run files under `R/captures/pie/run-12-walk/`.
+
+| row | verdict | evidence |
+|---|---|---|
+| K-1 ABP built, bound, wired, compiles, saved alone | **PASS** (`_v2`) | `R/phaseK/animbp_report.json` / `_readback.json`: 5 nodes, 3 Property bindings, output from ComponentToLocalSpace, parent / skeleton right, not errored; `TURNIP_ABP_OK`. |
+| K-1a the unsuffixed `ScreamingTurnip_R01_Mars_ABP` | **STALE, unused** | Saved with "references an unknown Anim Sequence Base" (the Sequence pin not exposed); listed by `list_errored_blueprints`; PIE runs with `on_compile_errors: suppress`. **The maintainer deletes it with the editor closed.** |
+| K-2 SRC_Tug / Cancel / Release reimported; crown x fixed | **PASS** | `R/phaseJ/reimport_phaseK_clips.json`: max crown x deviation 0.0161 cm; frames 15 / 7 / 6; diff limited to the 3 clips. |
+| K-3 bed 1 travel 74 / 9 set in the review map | **PASS** | export_text after the save; bed 2 unchanged; only the review map written. |
+| K-4 bed 1 pops at TravelCm; sockets 74 +- 3 | **PASS** | Pop at 74.00 cm walked; sockets 73.33 at alpha 0.961 (`run12_summary.txt`). |
+| K-5 crown x = -TravelCm at full strain within 2 cm | **PARTIAL** | Crown x = -a T within 0.031 cm every tick (/a = -74.005, -146.198); the bed stops at a ~0.965 (EngageAlpha), so -71.1 / -141.3. |
+| K-6 bed 2 as run-11 | **PASS** | Pop at -1.63 cm vs 146.2; charge kept after the cancel; pull 2 popped. |
+| K-7 gloves ride the sockets; the lag | **PASS** (prev tick) / **FINDING** | 0.000 cm to the previous tick's sockets; the pose is one tick behind the Control (drawn alpha == previous-tick Control alpha within 0.0001, `R/phaseK/run12_lag.txt`). |
+| K-8 the cancel: switch <= 1.5 cm, the offset with the clip | **PASS** switch / **PARTIAL** speed | Switch step 0.25 cm; the offset follows the clip one tick late (~3 cm); steps 2.8-4.1 cm per 60 Hz tick (the 0.7 s span over 146 cm). |
+| K-9 rendered with the bulb off-screen | **PASS** | 92 / 92 ticks; `Q10_bed2_bulb_offscreen.png`. |
+| K-10 morph curves after the pull | **PASS** | Held root: Scream curve 1.0, Inhale 0.92; `Q11_scream_fp.png` mouth open. |
+| K-11 captures | **PASS** | `sheet_fp_both.png`, `R/captures/pie/run-12c-walk/side_by_side_74_vs_146.png`, `sheet_side_cancel_scream.png` (Q9 void, retaken). |
+| K-12 0 ensures, nothing foreign dirty, Sandbox untouched | **PASS** | Mars.log 14693-30989: 0; dirty []; Sandbox mtime unchanged. |
+| K-13 a grip without a press (run-12b) | **FINDING** | Bed 2 SRC_Grip at 9.98 with no key held, the manipulation never began; not reproduced in run-12c. |
+
+## Phase K Part 3b - run-13 (Opus, 2026-11-09; detail in PROGRESS.md "Phase K Part 3b")
+
+Paths: `R` = `Tools/LevelDesign/screaming_turnip_r01_review/`; run files under `R/captures/pie/run-13-walk/`.
+
+| row | verdict | evidence |
+|---|---|---|
+| K-14 cold boot: the Phase K scripts and the `_v2` ABP | **PASS** | A fresh editor (the previous one found closed, no dump): boot compile clean, no Full Reload; `_v2` runs; bed travels persisted. |
+| K-15 the drawn pose is this frame's Control alpha | **PASS** | Drawn vs same-tick Control <= 0.00014 on 270 / 541 / 56 ticks (`R/phaseK/run13_summary.txt`). |
+| K-16 the gloves on the sockets; the trail | **PASS** (one frame) | Glove vs previous-tick socket 0.000; same tick mean 0.25 cm at 30 cm/s, 1.35 cm (max 3.5) at full speed. |
+| K-17 the strain held to the release | **PASS** | Threshold and release in the same frame; the crown at its last alpha on the hide tick, 0 only after (`R/phaseK/run13_strain_held.txt`). |
+| K-18 the press-less grip | **NOT REPRODUCED** (3 / 3) | No grip before the press; Use / Primary Idle between the let-go tick and the press; grip 16-28 ms after the press. |
+| K-19 the bed-2 cancel at ~0.5, charge kept, breaks | **PASS** switch / **PARTIAL** speed | Switch step 1.8-2.05 cm, equal to the in-clip steps; 3.7 cm per 60 Hz (the span); charges=1 x3; both beds released. |
+| K-20 the driver's single-node calls | **FIXED** | 0 "Currently in Animation Blueprint mode" lines in the session. |
+| K-21 0 ensures, nothing dirty, Sandbox untouched | **PASS** | Mars.log 1-3670: 0; dirty []; Sandbox mtime unchanged. |
+
+## Phase L Part 2 - the gloves on the live sockets (Opus, 2026-11-09; detail in PROGRESS.md "Phase L Part 2")
+
+Paths: `R` = `Tools/LevelDesign/screaming_turnip_r01_review/`.
+
+| row | verdict | evidence |
+|---|---|---|
+| L-1 the Phase L compile clean; no single-node reads | **PASS** | Mars.log: no error, no Full Reload; 0 "Currently in Animation Blueprint mode" (1-8306). |
+| L-2 glove to the same tick's socket, both beds, 30 cm/s and full speed | **PASS** | 0.000 / 0.000 cm on 183 / 29 / 433 / 39 ticks (`R/phaseL/run14_summary.txt`). |
+| L-3 the drawn alpha still same-tick | **PASS** | <= 0.0001 (one let-go tick excepted). |
+| L-4 the yaw carries the grips | **PASS** | Sidestep 44.29 -> 72.50 deg, yaw error <= 0.0007, gloves 0.000 cm. |
+| L-5 cancel at ~0.5, charge kept; both breaks | **PASS** | Start 0.519 at a 0.507; charges=1; both released. |
+| L-6 the glove frame on the stalks | **PASS** grip / **UNJUDGED** full strain | `R/captures/pie/run-14-walk/zoom_gloves.png`: fists round the stalks at the grip; at full strain the leaves hide the fingers; no twist seen. |
+| L-7 regression: pulled lever | **PASS** (look) | `R/captures/pie/run-14-sandbox/G1_lever_grip.png`, `G2_lever_pulled.png`; glove-to-socket not sampled. |
+| L-8 regression: two-handed pickup (Cookbook) | **PASS** (look) | `R/captures/pie/run-14-sandbox-pickups/G3b_cookbook_*`; held = Cookbook. |
+| L-9 regression: one-handed pickup riding home (Red key) | **PASS** (look) | `G5b_key_*`; held = Key_Red. |
+| L-10 regression: platter / dock Place | **NOT DONE** | The dock was not located. |
+| L-11 0 ensures, nothing dirty, Sandbox not saved | **PASS** | Mars.log 1-8306: 0; dirty []; Sandbox mtime unchanged. |

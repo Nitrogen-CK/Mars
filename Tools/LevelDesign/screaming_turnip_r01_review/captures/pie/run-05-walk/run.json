@@ -1,0 +1,3578 @@
+{
+ "events": [
+  {
+   "t": 0.0,
+   "game_elapsed": 0.0,
+   "frame_delta": 0.0448,
+   "event": "begin",
+   "player": "player X=-250.000 Y=0.000 Z=77.150 health=100.0 pack=false selected=TOMBSTONE slot1=TOMBSTONE slot2=TOMBSTONE slot3=TOMBSTONE held=TOMBSTONE operating=false",
+   "world_items": 0,
+   "turnips": [],
+   "beds": [
+    "bed=13|0(13)[Valid](ScreamingTurnipBed) enabled=Enable focused=false exhausted_reason=false charges=1 released=0 exhausted=false at=X=0.000 Y=0.000 Z=0.000",
+    "bed=15|0(15)[Valid](ScreamingTurnipBed) enabled=Enable focused=false exhausted_reason=false charges=1 released=0 exhausted=false at=X=450.000 Y=-450.000 Z=0.000"
+   ],
+   "clips": [
+    {
+     "name": "1",
+     "clip": "SRC_Idle",
+     "curves": {
+      "Inhale": 0.0,
+      "Scream": 0.0
+     },
+     "t": 1.536,
+     "at": [
+      450.0,
+      -450.0,
+      -28.8
+     ],
+     "up": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "fwd": [
+      1.0,
+      0.0,
+      0.0
+     ],
+     "visible": true
+    },
+    {
+     "name": "0",
+     "clip": "SRC_Idle",
+     "curves": {
+      "Inhale": 0.0,
+      "Scream": 0.0
+     },
+     "t": 1.536,
+     "at": [
+      0.0,
+      0.0,
+      -28.8
+     ],
+     "up": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "fwd": [
+      1.0,
+      0.0,
+      0.0
+     ],
+     "visible": true
+    }
+   ]
+  }
+ ],
+ "changes": [
+  {
+   "game": 0.106,
+   "frame_delta": 0.1056,
+   "turnips": [],
+   "clips": [
+    {
+     "name": "1",
+     "clip": "SRC_Idle"
+    },
+    {
+     "name": "0",
+     "clip": "SRC_Idle"
+    }
+   ],
+   "at": []
+  },
+  {
+   "game": 0.966,
+   "arrive": "walk",
+   "at": [
+    -80,
+    -80,
+    77
+   ]
+  },
+  {
+   "game": 1.7882,
+   "mark": "bed0_before"
+  },
+  {
+   "game": 1.9374,
+   "mark": "use0_down"
+  },
+  {
+   "game": 2.005,
+   "key": "LeftMouseButton",
+   "down": true
+  },
+  {
+   "game": 2.082,
+   "frame_delta": 0.0768,
+   "turnips": [],
+   "clips": [
+    {
+     "name": "1",
+     "clip": "SRC_Idle"
+    },
+    {
+     "name": "0",
+     "clip": "SRC_Grip"
+    }
+   ],
+   "at": []
+  },
+  {
+   "game": 2.414,
+   "frame_delta": 0.067,
+   "turnips": [],
+   "clips": [
+    {
+     "name": "1",
+     "clip": "SRC_Idle"
+    },
+    {
+     "name": "0",
+     "clip": "SRC_Tug"
+    }
+   ],
+   "at": []
+  },
+  {
+   "game": 2.9591,
+   "mark": "back0_start"
+  },
+  {
+   "game": 4.503,
+   "frame_delta": 0.0646,
+   "turnips": [
+    {
+     "entity": "642|1(1049218)[E_New](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "Loose",
+     "phase": "Dormant",
+     "seq": "0",
+     "mount": "World"
+    }
+   ],
+   "clips": [
+    {
+     "name": "2",
+     "clip": "ROOT_AirborneLeafTrail"
+    },
+    {
+     "name": "1",
+     "clip": "SRC_Idle"
+    },
+    {
+     "name": "0",
+     "clip": "SRC_Tug"
+    }
+   ],
+   "at": [
+    [
+     "642|1(1049218)[E_New](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      0.0,
+      0.0,
+      60.0
+     ],
+     [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "0.0"
+    ]
+   ]
+  },
+  {
+   "game": 4.573,
+   "frame_delta": 0.0704,
+   "turnips": [
+    {
+     "entity": "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "Loose",
+     "phase": "Dormant",
+     "seq": "0",
+     "mount": "World"
+    }
+   ],
+   "clips": [
+    {
+     "name": "2",
+     "clip": "ROOT_AirborneLeafTrail"
+    },
+    {
+     "name": "1",
+     "clip": "SRC_Idle"
+    },
+    {
+     "name": "0",
+     "clip": "SRC_Tug"
+    }
+   ],
+   "at": [
+    [
+     "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      5.97,
+      -0.14,
+      66.82
+     ],
+     [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "0.070389"
+    ]
+   ]
+  },
+  {
+   "game": 4.5735,
+   "mark": "bed0_gone"
+  },
+  {
+   "game": 4.711,
+   "key": "LeftMouseButton",
+   "down": false
+  },
+  {
+   "game": 5.308,
+   "frame_delta": 0.0673,
+   "turnips": [
+    {
+     "entity": "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "Loose",
+     "phase": "Dormant",
+     "seq": "0",
+     "mount": "World"
+    }
+   ],
+   "clips": [
+    {
+     "name": "2",
+     "clip": "ROOT_QuietIdle"
+    },
+    {
+     "name": "1",
+     "clip": "SRC_Idle"
+    },
+    {
+     "name": "0",
+     "clip": "SRC_Tug"
+    }
+   ],
+   "at": [
+    [
+     "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      64.73,
+      -4.12,
+      3.36
+     ],
+     [
+      0.6,
+      0.43,
+      0.67
+     ],
+     "0.805128"
+    ]
+   ]
+  },
+  {
+   "game": 6.4033,
+   "mark": "bed0_after"
+  },
+  {
+   "game": 6.728,
+   "frame_delta": 0.0591,
+   "turnips": [
+    {
+     "entity": "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "Anticipate",
+     "seq": "0",
+     "mount": "World"
+    }
+   ],
+   "clips": [
+    {
+     "name": "2",
+     "clip": "ROOT_Anticipate"
+    },
+    {
+     "name": "1",
+     "clip": "SRC_Idle"
+    },
+    {
+     "name": "0",
+     "clip": "SRC_Tug"
+    }
+   ],
+   "at": [
+    [
+     "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      76.56,
+      -12.43,
+      3.15
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "2.224535"
+    ]
+   ]
+  },
+  {
+   "game": 7.075,
+   "frame_delta": 0.067,
+   "turnips": [
+    {
+     "entity": "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "Inhale",
+     "seq": "0",
+     "mount": "World"
+    }
+   ],
+   "clips": [
+    {
+     "name": "2",
+     "clip": "ROOT_Inhale"
+    },
+    {
+     "name": "1",
+     "clip": "SRC_Idle"
+    },
+    {
+     "name": "0",
+     "clip": "SRC_Tug"
+    }
+   ],
+   "at": [
+    [
+     "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      76.56,
+      -12.43,
+      3.15
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "2.571605"
+    ]
+   ]
+  },
+  {
+   "game": 8.097,
+   "arrive": "walk",
+   "at": [
+    446,
+    -318,
+    77
+   ]
+  },
+  {
+   "game": 8.291,
+   "frame_delta": 0.064,
+   "turnips": [
+    {
+     "entity": "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "Scream",
+     "seq": "1",
+     "mount": "World"
+    }
+   ],
+   "clips": [
+    {
+     "name": "2",
+     "clip": "ROOT_Scream"
+    },
+    {
+     "name": "1",
+     "clip": "SRC_Idle"
+    },
+    {
+     "name": "0",
+     "clip": "SRC_Tug"
+    }
+   ],
+   "at": [
+    [
+     "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      76.56,
+      -12.43,
+      3.15
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "3.787834"
+    ]
+   ]
+  },
+  {
+   "game": 8.94,
+   "frame_delta": 0.0689,
+   "turnips": [
+    {
+     "entity": "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "Recover",
+     "seq": "1",
+     "mount": "World"
+    }
+   ],
+   "clips": [
+    {
+     "name": "2",
+     "clip": "ROOT_Recover"
+    },
+    {
+     "name": "1",
+     "clip": "SRC_Idle"
+    },
+    {
+     "name": "0",
+     "clip": "SRC_Tug"
+    }
+   ],
+   "at": [
+    [
+     "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      76.56,
+      -12.43,
+      3.15
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "4.436497"
+    ]
+   ]
+  },
+  {
+   "game": 8.9396,
+   "mark": "bed1_before"
+  },
+  {
+   "game": 9.0812,
+   "mark": "use1a_down"
+  },
+  {
+   "game": 9.147,
+   "key": "LeftMouseButton",
+   "down": true
+  },
+  {
+   "game": 9.21,
+   "frame_delta": 0.0633,
+   "turnips": [
+    {
+     "entity": "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "Recover",
+     "seq": "1",
+     "mount": "World"
+    }
+   ],
+   "clips": [
+    {
+     "name": "2",
+     "clip": "ROOT_Recover"
+    },
+    {
+     "name": "1",
+     "clip": "SRC_Grip"
+    },
+    {
+     "name": "0",
+     "clip": "SRC_Tug"
+    }
+   ],
+   "at": [
+    [
+     "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      76.56,
+      -12.43,
+      3.15
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "4.706891"
+    ]
+   ]
+  },
+  {
+   "game": 9.597,
+   "frame_delta": 0.0564,
+   "turnips": [
+    {
+     "entity": "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "Recover",
+     "seq": "1",
+     "mount": "World"
+    }
+   ],
+   "clips": [
+    {
+     "name": "2",
+     "clip": "ROOT_Recover"
+    },
+    {
+     "name": "1",
+     "clip": "SRC_Tug"
+    },
+    {
+     "name": "0",
+     "clip": "SRC_Tug"
+    }
+   ],
+   "at": [
+    [
+     "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      76.56,
+      -12.43,
+      3.15
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "5.094025"
+    ]
+   ]
+  },
+  {
+   "game": 9.896,
+   "frame_delta": 0.0581,
+   "turnips": [
+    {
+     "entity": "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "RecoveryIdle",
+     "seq": "1",
+     "mount": "World"
+    }
+   ],
+   "clips": [
+    {
+     "name": "2",
+     "clip": "ROOT_RecoveryIdle"
+    },
+    {
+     "name": "1",
+     "clip": "SRC_Tug"
+    },
+    {
+     "name": "0",
+     "clip": "SRC_Tug"
+    }
+   ],
+   "at": [
+    [
+     "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      76.56,
+      -12.43,
+      3.15
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "5.392686"
+    ]
+   ]
+  },
+  {
+   "game": 11.0807,
+   "mark": "use1a_up"
+  },
+  {
+   "game": 11.155,
+   "key": "LeftMouseButton",
+   "down": false
+  },
+  {
+   "game": 11.213,
+   "frame_delta": 0.0586,
+   "turnips": [
+    {
+     "entity": "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "RecoveryIdle",
+     "seq": "1",
+     "mount": "World"
+    }
+   ],
+   "clips": [
+    {
+     "name": "2",
+     "clip": "ROOT_RecoveryIdle"
+    },
+    {
+     "name": "1",
+     "clip": "SRC_Cancel"
+    },
+    {
+     "name": "0",
+     "clip": "SRC_Tug"
+    }
+   ],
+   "at": [
+    [
+     "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      76.56,
+      -12.43,
+      3.15
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "6.710101"
+    ]
+   ]
+  },
+  {
+   "game": 11.769,
+   "frame_delta": 0.0756,
+   "turnips": [
+    {
+     "entity": "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "RecoveryIdle",
+     "seq": "1",
+     "mount": "World"
+    }
+   ],
+   "clips": [
+    {
+     "name": "2",
+     "clip": "ROOT_RecoveryIdle"
+    },
+    {
+     "name": "1",
+     "clip": "SRC_Idle"
+    },
+    {
+     "name": "0",
+     "clip": "SRC_Tug"
+    }
+   ],
+   "at": [
+    [
+     "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      76.56,
+      -12.43,
+      3.15
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "7.266011"
+    ]
+   ]
+  },
+  {
+   "game": 13.3064,
+   "mark": "bed1_after_cancel"
+  },
+  {
+   "game": 13.635,
+   "arrive": "walk",
+   "at": [
+    450,
+    -319,
+    77
+   ]
+  },
+  {
+   "game": 14.5825,
+   "mark": "use1b_down"
+  },
+  {
+   "game": 14.657,
+   "key": "LeftMouseButton",
+   "down": true
+  },
+  {
+   "game": 14.716,
+   "frame_delta": 0.059,
+   "turnips": [
+    {
+     "entity": "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "RecoveryIdle",
+     "seq": "1",
+     "mount": "World"
+    }
+   ],
+   "clips": [
+    {
+     "name": "2",
+     "clip": "ROOT_RecoveryIdle"
+    },
+    {
+     "name": "1",
+     "clip": "SRC_Grip"
+    },
+    {
+     "name": "0",
+     "clip": "SRC_Tug"
+    }
+   ],
+   "at": [
+    [
+     "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      76.56,
+      -12.43,
+      3.15
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "10.212859"
+    ]
+   ]
+  },
+  {
+   "game": 15.059,
+   "frame_delta": 0.0674,
+   "turnips": [
+    {
+     "entity": "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "RecoveryIdle",
+     "seq": "1",
+     "mount": "World"
+    }
+   ],
+   "clips": [
+    {
+     "name": "2",
+     "clip": "ROOT_RecoveryIdle"
+    },
+    {
+     "name": "1",
+     "clip": "SRC_Tug"
+    },
+    {
+     "name": "0",
+     "clip": "SRC_Tug"
+    }
+   ],
+   "at": [
+    [
+     "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      76.56,
+      -12.43,
+      3.15
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "10.555589"
+    ]
+   ]
+  },
+  {
+   "game": 16.354,
+   "frame_delta": 0.0739,
+   "turnips": [
+    {
+     "entity": "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "Anticipate",
+     "seq": "1",
+     "mount": "World"
+    }
+   ],
+   "clips": [
+    {
+     "name": "2",
+     "clip": "ROOT_AnticipateTired"
+    },
+    {
+     "name": "1",
+     "clip": "SRC_Tug"
+    },
+    {
+     "name": "0",
+     "clip": "SRC_Tug"
+    }
+   ],
+   "at": [
+    [
+     "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      76.56,
+      -12.43,
+      3.15
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "11.850538"
+    ]
+   ]
+  },
+  {
+   "game": 16.4287,
+   "mark": "sidestep_radius"
+  },
+  {
+   "game": 16.5608,
+   "mark": "side1b_start"
+  },
+  {
+   "game": 16.631,
+   "frame_delta": 0.07,
+   "turnips": [
+    {
+     "entity": "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "Inhale",
+     "seq": "1",
+     "mount": "World"
+    }
+   ],
+   "clips": [
+    {
+     "name": "2",
+     "clip": "ROOT_Inhale"
+    },
+    {
+     "name": "1",
+     "clip": "SRC_Tug"
+    },
+    {
+     "name": "0",
+     "clip": "SRC_Tug"
+    }
+   ],
+   "at": [
+    [
+     "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      76.56,
+      -12.43,
+      3.15
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "12.127692"
+    ]
+   ]
+  },
+  {
+   "game": 17.796,
+   "frame_delta": 0.0705,
+   "turnips": [
+    {
+     "entity": "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "Scream",
+     "seq": "2",
+     "mount": "World"
+    }
+   ],
+   "clips": [
+    {
+     "name": "2",
+     "clip": "ROOT_Scream"
+    },
+    {
+     "name": "1",
+     "clip": "SRC_Tug"
+    },
+    {
+     "name": "0",
+     "clip": "SRC_Tug"
+    }
+   ],
+   "at": [
+    [
+     "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      76.56,
+      -12.43,
+      3.15
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "13.292744"
+    ]
+   ]
+  },
+  {
+   "game": 18.426,
+   "frame_delta": 0.0626,
+   "turnips": [
+    {
+     "entity": "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "Recover",
+     "seq": "2",
+     "mount": "World"
+    }
+   ],
+   "clips": [
+    {
+     "name": "2",
+     "clip": "ROOT_Recover"
+    },
+    {
+     "name": "1",
+     "clip": "SRC_Tug"
+    },
+    {
+     "name": "0",
+     "clip": "SRC_Tug"
+    }
+   ],
+   "at": [
+    [
+     "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      76.56,
+      -12.43,
+      3.15
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "13.922936"
+    ]
+   ]
+  },
+  {
+   "game": 18.6723,
+   "mark": "move_timeout"
+  },
+  {
+   "game": 18.7872,
+   "mark": "side1b_end"
+  },
+  {
+   "game": 19.423,
+   "frame_delta": 0.0657,
+   "turnips": [
+    {
+     "entity": "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "RecoveryIdle",
+     "seq": "2",
+     "mount": "World"
+    }
+   ],
+   "clips": [
+    {
+     "name": "2",
+     "clip": "ROOT_RecoveryIdle"
+    },
+    {
+     "name": "1",
+     "clip": "SRC_Tug"
+    },
+    {
+     "name": "0",
+     "clip": "SRC_Tug"
+    }
+   ],
+   "at": [
+    [
+     "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      76.56,
+      -12.43,
+      3.15
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "14.919944"
+    ]
+   ]
+  },
+  {
+   "game": 19.687,
+   "frame_delta": 0.0678,
+   "turnips": [
+    {
+     "entity": "189|3(3145917)[E_New](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "Loose",
+     "phase": "Dormant",
+     "seq": "0",
+     "mount": "World"
+    },
+    {
+     "entity": "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "RecoveryIdle",
+     "seq": "2",
+     "mount": "World"
+    }
+   ],
+   "clips": [
+    {
+     "name": "3",
+     "clip": "ROOT_AirborneLeafTrail"
+    },
+    {
+     "name": "2",
+     "clip": "ROOT_RecoveryIdle"
+    },
+    {
+     "name": "1",
+     "clip": "SRC_Tug"
+    },
+    {
+     "name": "0",
+     "clip": "SRC_Tug"
+    }
+   ],
+   "at": [
+    [
+     "189|3(3145917)[E_New](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      450.0,
+      -450.0,
+      60.0
+     ],
+     [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "0.0"
+    ],
+    [
+     "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      76.56,
+      -12.43,
+      3.15
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "15.183444"
+    ]
+   ]
+  },
+  {
+   "game": 19.765,
+   "frame_delta": 0.078,
+   "turnips": [
+    {
+     "entity": "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "Loose",
+     "phase": "Dormant",
+     "seq": "0",
+     "mount": "World"
+    },
+    {
+     "entity": "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "RecoveryIdle",
+     "seq": "2",
+     "mount": "World"
+    }
+   ],
+   "clips": [
+    {
+     "name": "3",
+     "clip": "ROOT_AirborneLeafTrail"
+    },
+    {
+     "name": "2",
+     "clip": "ROOT_RecoveryIdle"
+    },
+    {
+     "name": "1",
+     "clip": "SRC_Tug"
+    },
+    {
+     "name": "0",
+     "clip": "SRC_Tug"
+    }
+   ],
+   "at": [
+    [
+     "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      455.97,
+      -450.14,
+      66.82
+     ],
+     [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "0.07805"
+    ],
+    [
+     "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      76.56,
+      -12.43,
+      3.15
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "15.261494"
+    ]
+   ]
+  },
+  {
+   "game": 19.7646,
+   "mark": "bed1_gone"
+  },
+  {
+   "game": 19.83,
+   "key": "LeftMouseButton",
+   "down": false
+  },
+  {
+   "game": 20.485,
+   "frame_delta": 0.0629,
+   "turnips": [
+    {
+     "entity": "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "Loose",
+     "phase": "Dormant",
+     "seq": "0",
+     "mount": "World"
+    },
+    {
+     "entity": "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "RecoveryIdle",
+     "seq": "2",
+     "mount": "World"
+    }
+   ],
+   "clips": [
+    {
+     "name": "3",
+     "clip": "ROOT_QuietIdle"
+    },
+    {
+     "name": "2",
+     "clip": "ROOT_RecoveryIdle"
+    },
+    {
+     "name": "1",
+     "clip": "SRC_Tug"
+    },
+    {
+     "name": "0",
+     "clip": "SRC_Tug"
+    }
+   ],
+   "at": [
+    [
+     "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      514.64,
+      -454.02,
+      3.29
+     ],
+     [
+      0.59,
+      0.42,
+      0.69
+     ],
+     "0.798486"
+    ],
+    [
+     "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      76.56,
+      -12.43,
+      3.15
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "15.981931"
+    ]
+   ]
+  },
+  {
+   "game": 21.5072,
+   "mark": "bed1_after"
+  },
+  {
+   "game": 21.64,
+   "sequence_done": "run-05-walk"
+  },
+  {
+   "game": 21.965,
+   "frame_delta": 0.0654,
+   "turnips": [
+    {
+     "entity": "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "Anticipate",
+     "seq": "0",
+     "mount": "World"
+    },
+    {
+     "entity": "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "RecoveryIdle",
+     "seq": "2",
+     "mount": "World"
+    }
+   ],
+   "clips": [
+    {
+     "name": "3",
+     "clip": "ROOT_Anticipate"
+    },
+    {
+     "name": "2",
+     "clip": "ROOT_RecoveryIdle"
+    },
+    {
+     "name": "1",
+     "clip": "SRC_Tug"
+    },
+    {
+     "name": "0",
+     "clip": "SRC_Tug"
+    }
+   ],
+   "at": [
+    [
+     "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      526.5,
+      -462.37,
+      3.14
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "2.278632"
+    ],
+    [
+     "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      76.56,
+      -12.43,
+      3.15
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "17.462072"
+    ]
+   ]
+  },
+  {
+   "game": 22.312,
+   "frame_delta": 0.0663,
+   "turnips": [
+    {
+     "entity": "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "Inhale",
+     "seq": "0",
+     "mount": "World"
+    },
+    {
+     "entity": "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "RecoveryIdle",
+     "seq": "2",
+     "mount": "World"
+    }
+   ],
+   "clips": [
+    {
+     "name": "3",
+     "clip": "ROOT_Inhale"
+    },
+    {
+     "name": "2",
+     "clip": "ROOT_RecoveryIdle"
+    },
+    {
+     "name": "1",
+     "clip": "SRC_Tug"
+    },
+    {
+     "name": "0",
+     "clip": "SRC_Tug"
+    }
+   ],
+   "at": [
+    [
+     "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      526.5,
+      -462.37,
+      3.14
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "2.625301"
+    ],
+    [
+     "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      76.56,
+      -12.43,
+      3.15
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "17.808741"
+    ]
+   ]
+  },
+  {
+   "game": 23.53,
+   "frame_delta": 0.066,
+   "turnips": [
+    {
+     "entity": "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "Scream",
+     "seq": "1",
+     "mount": "World"
+    },
+    {
+     "entity": "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "RecoveryIdle",
+     "seq": "2",
+     "mount": "World"
+    }
+   ],
+   "clips": [
+    {
+     "name": "3",
+     "clip": "ROOT_Scream"
+    },
+    {
+     "name": "2",
+     "clip": "ROOT_RecoveryIdle"
+    },
+    {
+     "name": "1",
+     "clip": "SRC_Tug"
+    },
+    {
+     "name": "0",
+     "clip": "SRC_Tug"
+    }
+   ],
+   "at": [
+    [
+     "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      526.5,
+      -462.37,
+      3.14
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "3.843608"
+    ],
+    [
+     "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      76.56,
+      -12.43,
+      3.15
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "19.02705"
+    ]
+   ]
+  },
+  {
+   "game": 24.142,
+   "frame_delta": 0.0622,
+   "turnips": [
+    {
+     "entity": "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "Recover",
+     "seq": "1",
+     "mount": "World"
+    },
+    {
+     "entity": "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "RecoveryIdle",
+     "seq": "2",
+     "mount": "World"
+    }
+   ],
+   "clips": [
+    {
+     "name": "3",
+     "clip": "ROOT_Recover"
+    },
+    {
+     "name": "2",
+     "clip": "ROOT_RecoveryIdle"
+    },
+    {
+     "name": "1",
+     "clip": "SRC_Tug"
+    },
+    {
+     "name": "0",
+     "clip": "SRC_Tug"
+    }
+   ],
+   "at": [
+    [
+     "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      526.5,
+      -462.37,
+      3.14
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "4.455881"
+    ],
+    [
+     "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      76.56,
+      -12.43,
+      3.15
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "19.639324"
+    ]
+   ]
+  },
+  {
+   "game": 25.171,
+   "frame_delta": 0.0599,
+   "turnips": [
+    {
+     "entity": "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "RecoveryIdle",
+     "seq": "1",
+     "mount": "World"
+    },
+    {
+     "entity": "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "RecoveryIdle",
+     "seq": "2",
+     "mount": "World"
+    }
+   ],
+   "clips": [
+    {
+     "name": "3",
+     "clip": "ROOT_RecoveryIdle"
+    },
+    {
+     "name": "2",
+     "clip": "ROOT_RecoveryIdle"
+    },
+    {
+     "name": "1",
+     "clip": "SRC_Tug"
+    },
+    {
+     "name": "0",
+     "clip": "SRC_Tug"
+    }
+   ],
+   "at": [
+    [
+     "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      526.5,
+      -462.37,
+      3.14
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "5.484"
+    ],
+    [
+     "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      76.56,
+      -12.43,
+      3.15
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "20.66744"
+    ]
+   ]
+  },
+  {
+   "game": 25.812,
+   "frame_delta": 0.066,
+   "turnips": [
+    {
+     "entity": "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "RecoveryIdle",
+     "seq": "1",
+     "mount": "World"
+    },
+    {
+     "entity": "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "Anticipate",
+     "seq": "2",
+     "mount": "World"
+    }
+   ],
+   "clips": [
+    {
+     "name": "3",
+     "clip": "ROOT_RecoveryIdle"
+    },
+    {
+     "name": "2",
+     "clip": "ROOT_AnticipateTired"
+    },
+    {
+     "name": "1",
+     "clip": "SRC_Tug"
+    },
+    {
+     "name": "0",
+     "clip": "SRC_Tug"
+    }
+   ],
+   "at": [
+    [
+     "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      526.5,
+      -462.37,
+      3.14
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "6.125313"
+    ],
+    [
+     "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      76.56,
+      -12.43,
+      3.15
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "21.308754"
+    ]
+   ]
+  },
+  {
+   "game": 26.131,
+   "frame_delta": 0.0618,
+   "turnips": [
+    {
+     "entity": "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "RecoveryIdle",
+     "seq": "1",
+     "mount": "World"
+    },
+    {
+     "entity": "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "Inhale",
+     "seq": "2",
+     "mount": "World"
+    }
+   ],
+   "clips": [
+    {
+     "name": "3",
+     "clip": "ROOT_RecoveryIdle"
+    },
+    {
+     "name": "2",
+     "clip": "ROOT_Inhale"
+    },
+    {
+     "name": "1",
+     "clip": "SRC_Tug"
+    },
+    {
+     "name": "0",
+     "clip": "SRC_Tug"
+    }
+   ],
+   "at": [
+    [
+     "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      526.5,
+      -462.37,
+      3.14
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "6.444448"
+    ],
+    [
+     "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      76.56,
+      -12.43,
+      3.15
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "21.62789"
+    ]
+   ]
+  },
+  {
+   "game": 27.332,
+   "frame_delta": 0.0583,
+   "turnips": [
+    {
+     "entity": "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "RecoveryIdle",
+     "seq": "1",
+     "mount": "World"
+    },
+    {
+     "entity": "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "Scream",
+     "seq": "3",
+     "mount": "World"
+    }
+   ],
+   "clips": [
+    {
+     "name": "3",
+     "clip": "ROOT_RecoveryIdle"
+    },
+    {
+     "name": "2",
+     "clip": "ROOT_Scream"
+    },
+    {
+     "name": "1",
+     "clip": "SRC_Tug"
+    },
+    {
+     "name": "0",
+     "clip": "SRC_Tug"
+    }
+   ],
+   "at": [
+    [
+     "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      526.5,
+      -462.37,
+      3.14
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "7.645663"
+    ],
+    [
+     "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      76.56,
+      -12.43,
+      3.15
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "22.829103"
+    ]
+   ]
+  },
+  {
+   "game": 27.987,
+   "frame_delta": 0.0586,
+   "turnips": [
+    {
+     "entity": "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "RecoveryIdle",
+     "seq": "1",
+     "mount": "World"
+    },
+    {
+     "entity": "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "Recover",
+     "seq": "3",
+     "mount": "World"
+    }
+   ],
+   "clips": [
+    {
+     "name": "3",
+     "clip": "ROOT_RecoveryIdle"
+    },
+    {
+     "name": "2",
+     "clip": "ROOT_Recover"
+    },
+    {
+     "name": "1",
+     "clip": "SRC_Tug"
+    },
+    {
+     "name": "0",
+     "clip": "SRC_Tug"
+    }
+   ],
+   "at": [
+    [
+     "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      526.5,
+      -462.37,
+      3.14
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "8.300923"
+    ],
+    [
+     "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      76.56,
+      -12.43,
+      3.15
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "23.484364"
+    ]
+   ]
+  },
+  {
+   "game": 28.972,
+   "frame_delta": 0.0649,
+   "turnips": [
+    {
+     "entity": "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "RecoveryIdle",
+     "seq": "1",
+     "mount": "World"
+    },
+    {
+     "entity": "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "RecoveryIdle",
+     "seq": "3",
+     "mount": "World"
+    }
+   ],
+   "clips": [
+    {
+     "name": "3",
+     "clip": "ROOT_RecoveryIdle"
+    },
+    {
+     "name": "2",
+     "clip": "ROOT_RecoveryIdle"
+    },
+    {
+     "name": "1",
+     "clip": "SRC_Tug"
+    },
+    {
+     "name": "0",
+     "clip": "SRC_Tug"
+    }
+   ],
+   "at": [
+    [
+     "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      526.5,
+      -462.37,
+      3.14
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "9.285192"
+    ],
+    [
+     "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      76.56,
+      -12.43,
+      3.15
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "24.468628"
+    ]
+   ]
+  },
+  {
+   "game": 31.584,
+   "frame_delta": 0.0597,
+   "turnips": [
+    {
+     "entity": "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "Anticipate",
+     "seq": "1",
+     "mount": "World"
+    },
+    {
+     "entity": "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "RecoveryIdle",
+     "seq": "3",
+     "mount": "World"
+    }
+   ],
+   "clips": [
+    {
+     "name": "3",
+     "clip": "ROOT_AnticipateTired"
+    },
+    {
+     "name": "2",
+     "clip": "ROOT_RecoveryIdle"
+    },
+    {
+     "name": "1",
+     "clip": "SRC_Tug"
+    },
+    {
+     "name": "0",
+     "clip": "SRC_Tug"
+    }
+   ],
+   "at": [
+    [
+     "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      526.5,
+      -462.37,
+      3.14
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "11.89762"
+    ],
+    [
+     "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      76.56,
+      -12.43,
+      3.15
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "27.081055"
+    ]
+   ]
+  },
+  {
+   "game": 31.835,
+   "frame_delta": 0.0601,
+   "turnips": [
+    {
+     "entity": "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "Inhale",
+     "seq": "1",
+     "mount": "World"
+    },
+    {
+     "entity": "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "RecoveryIdle",
+     "seq": "3",
+     "mount": "World"
+    }
+   ],
+   "clips": [
+    {
+     "name": "3",
+     "clip": "ROOT_Inhale"
+    },
+    {
+     "name": "2",
+     "clip": "ROOT_RecoveryIdle"
+    },
+    {
+     "name": "1",
+     "clip": "SRC_Tug"
+    },
+    {
+     "name": "0",
+     "clip": "SRC_Tug"
+    }
+   ],
+   "at": [
+    [
+     "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      526.5,
+      -462.37,
+      3.14
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "12.148602"
+    ],
+    [
+     "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      76.56,
+      -12.43,
+      3.15
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "27.332037"
+    ]
+   ]
+  },
+  {
+   "game": 33.06,
+   "frame_delta": 0.0629,
+   "turnips": [
+    {
+     "entity": "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "Scream",
+     "seq": "2",
+     "mount": "World"
+    },
+    {
+     "entity": "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "RecoveryIdle",
+     "seq": "3",
+     "mount": "World"
+    }
+   ],
+   "clips": [
+    {
+     "name": "3",
+     "clip": "ROOT_Scream"
+    },
+    {
+     "name": "2",
+     "clip": "ROOT_RecoveryIdle"
+    },
+    {
+     "name": "1",
+     "clip": "SRC_Tug"
+    },
+    {
+     "name": "0",
+     "clip": "SRC_Tug"
+    }
+   ],
+   "at": [
+    [
+     "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      526.5,
+      -462.37,
+      3.14
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "13.373885"
+    ],
+    [
+     "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      76.56,
+      -12.43,
+      3.15
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "28.55732"
+    ]
+   ]
+  },
+  {
+   "game": 33.713,
+   "frame_delta": 0.0614,
+   "turnips": [
+    {
+     "entity": "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "Recover",
+     "seq": "2",
+     "mount": "World"
+    },
+    {
+     "entity": "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "RecoveryIdle",
+     "seq": "3",
+     "mount": "World"
+    }
+   ],
+   "clips": [
+    {
+     "name": "3",
+     "clip": "ROOT_Recover"
+    },
+    {
+     "name": "2",
+     "clip": "ROOT_RecoveryIdle"
+    },
+    {
+     "name": "1",
+     "clip": "SRC_Tug"
+    },
+    {
+     "name": "0",
+     "clip": "SRC_Tug"
+    }
+   ],
+   "at": [
+    [
+     "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      526.5,
+      -462.37,
+      3.14
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "14.026152"
+    ],
+    [
+     "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      76.56,
+      -12.43,
+      3.15
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "29.209585"
+    ]
+   ]
+  },
+  {
+   "game": 34.682,
+   "frame_delta": 0.061,
+   "turnips": [
+    {
+     "entity": "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "RecoveryIdle",
+     "seq": "2",
+     "mount": "World"
+    },
+    {
+     "entity": "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "RecoveryIdle",
+     "seq": "3",
+     "mount": "World"
+    }
+   ],
+   "clips": [
+    {
+     "name": "3",
+     "clip": "ROOT_RecoveryIdle"
+    },
+    {
+     "name": "2",
+     "clip": "ROOT_RecoveryIdle"
+    },
+    {
+     "name": "1",
+     "clip": "SRC_Tug"
+    },
+    {
+     "name": "0",
+     "clip": "SRC_Tug"
+    }
+   ],
+   "at": [
+    [
+     "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      526.5,
+      -462.37,
+      3.14
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "14.995466"
+    ],
+    [
+     "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      76.56,
+      -12.43,
+      3.15
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "30.1789"
+    ]
+   ]
+  },
+  {
+   "game": 35.358,
+   "frame_delta": 0.061,
+   "turnips": [
+    {
+     "entity": "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "RecoveryIdle",
+     "seq": "2",
+     "mount": "World"
+    },
+    {
+     "entity": "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "Anticipate",
+     "seq": "3",
+     "mount": "World"
+    }
+   ],
+   "clips": [
+    {
+     "name": "3",
+     "clip": "ROOT_RecoveryIdle"
+    },
+    {
+     "name": "2",
+     "clip": "ROOT_AnticipateTired"
+    },
+    {
+     "name": "1",
+     "clip": "SRC_Tug"
+    },
+    {
+     "name": "0",
+     "clip": "SRC_Tug"
+    }
+   ],
+   "at": [
+    [
+     "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      526.5,
+      -462.37,
+      3.14
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "15.671653"
+    ],
+    [
+     "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      76.56,
+      -12.43,
+      3.15
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "30.855089"
+    ]
+   ]
+  },
+  {
+   "game": 35.691,
+   "frame_delta": 0.0712,
+   "turnips": [
+    {
+     "entity": "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "RecoveryIdle",
+     "seq": "2",
+     "mount": "World"
+    },
+    {
+     "entity": "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "Inhale",
+     "seq": "3",
+     "mount": "World"
+    }
+   ],
+   "clips": [
+    {
+     "name": "3",
+     "clip": "ROOT_RecoveryIdle"
+    },
+    {
+     "name": "2",
+     "clip": "ROOT_Inhale"
+    },
+    {
+     "name": "1",
+     "clip": "SRC_Tug"
+    },
+    {
+     "name": "0",
+     "clip": "SRC_Tug"
+    }
+   ],
+   "at": [
+    [
+     "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      526.5,
+      -462.37,
+      3.14
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "16.004732"
+    ],
+    [
+     "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      76.56,
+      -12.43,
+      3.15
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "31.188168"
+    ]
+   ]
+  },
+  {
+   "game": 36.877,
+   "frame_delta": 0.0588,
+   "turnips": [
+    {
+     "entity": "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "RecoveryIdle",
+     "seq": "2",
+     "mount": "World"
+    },
+    {
+     "entity": "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "Scream",
+     "seq": "4",
+     "mount": "World"
+    }
+   ],
+   "clips": [
+    {
+     "name": "3",
+     "clip": "ROOT_RecoveryIdle"
+    },
+    {
+     "name": "2",
+     "clip": "ROOT_Scream"
+    },
+    {
+     "name": "1",
+     "clip": "SRC_Tug"
+    },
+    {
+     "name": "0",
+     "clip": "SRC_Tug"
+    }
+   ],
+   "at": [
+    [
+     "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      526.5,
+      -462.37,
+      3.14
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "17.190845"
+    ],
+    [
+     "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      76.56,
+      -12.43,
+      3.15
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "32.374279"
+    ]
+   ]
+  },
+  {
+   "game": 37.497,
+   "frame_delta": 0.0654,
+   "turnips": [
+    {
+     "entity": "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "RecoveryIdle",
+     "seq": "2",
+     "mount": "World"
+    },
+    {
+     "entity": "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "Recover",
+     "seq": "4",
+     "mount": "World"
+    }
+   ],
+   "clips": [
+    {
+     "name": "3",
+     "clip": "ROOT_RecoveryIdle"
+    },
+    {
+     "name": "2",
+     "clip": "ROOT_Recover"
+    },
+    {
+     "name": "1",
+     "clip": "SRC_Tug"
+    },
+    {
+     "name": "0",
+     "clip": "SRC_Tug"
+    }
+   ],
+   "at": [
+    [
+     "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      526.5,
+      -462.37,
+      3.14
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "17.810053"
+    ],
+    [
+     "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      76.56,
+      -12.43,
+      3.15
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "32.993488"
+    ]
+   ]
+  },
+  {
+   "game": 38.529,
+   "frame_delta": 0.0639,
+   "turnips": [
+    {
+     "entity": "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "RecoveryIdle",
+     "seq": "2",
+     "mount": "World"
+    },
+    {
+     "entity": "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "RecoveryIdle",
+     "seq": "4",
+     "mount": "World"
+    }
+   ],
+   "clips": [
+    {
+     "name": "3",
+     "clip": "ROOT_RecoveryIdle"
+    },
+    {
+     "name": "2",
+     "clip": "ROOT_RecoveryIdle"
+    },
+    {
+     "name": "1",
+     "clip": "SRC_Tug"
+    },
+    {
+     "name": "0",
+     "clip": "SRC_Tug"
+    }
+   ],
+   "at": [
+    [
+     "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      526.5,
+      -462.37,
+      3.14
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "18.842485"
+    ],
+    [
+     "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      76.56,
+      -12.43,
+      3.15
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "34.025921"
+    ]
+   ]
+  },
+  {
+   "game": 41.095,
+   "frame_delta": 0.0622,
+   "turnips": [
+    {
+     "entity": "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "Anticipate",
+     "seq": "2",
+     "mount": "World"
+    },
+    {
+     "entity": "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "RecoveryIdle",
+     "seq": "4",
+     "mount": "World"
+    }
+   ],
+   "clips": [
+    {
+     "name": "3",
+     "clip": "ROOT_AnticipateTired"
+    },
+    {
+     "name": "2",
+     "clip": "ROOT_RecoveryIdle"
+    },
+    {
+     "name": "1",
+     "clip": "SRC_Tug"
+    },
+    {
+     "name": "0",
+     "clip": "SRC_Tug"
+    }
+   ],
+   "at": [
+    [
+     "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      526.5,
+      -462.37,
+      3.14
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "21.408535"
+    ],
+    [
+     "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      76.56,
+      -12.43,
+      3.15
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "36.591984"
+    ]
+   ]
+  },
+  {
+   "game": 41.407,
+   "frame_delta": 0.067,
+   "turnips": [
+    {
+     "entity": "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "Inhale",
+     "seq": "2",
+     "mount": "World"
+    },
+    {
+     "entity": "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "RecoveryIdle",
+     "seq": "4",
+     "mount": "World"
+    }
+   ],
+   "clips": [
+    {
+     "name": "3",
+     "clip": "ROOT_Inhale"
+    },
+    {
+     "name": "2",
+     "clip": "ROOT_RecoveryIdle"
+    },
+    {
+     "name": "1",
+     "clip": "SRC_Tug"
+    },
+    {
+     "name": "0",
+     "clip": "SRC_Tug"
+    }
+   ],
+   "at": [
+    [
+     "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      526.5,
+      -462.37,
+      3.14
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "21.720737"
+    ],
+    [
+     "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      76.56,
+      -12.43,
+      3.15
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "36.904182"
+    ]
+   ]
+  },
+  {
+   "game": 42.581,
+   "frame_delta": 0.0599,
+   "turnips": [
+    {
+     "entity": "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "Scream",
+     "seq": "3",
+     "mount": "World"
+    },
+    {
+     "entity": "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "RecoveryIdle",
+     "seq": "4",
+     "mount": "World"
+    }
+   ],
+   "clips": [
+    {
+     "name": "3",
+     "clip": "ROOT_Scream"
+    },
+    {
+     "name": "2",
+     "clip": "ROOT_RecoveryIdle"
+    },
+    {
+     "name": "1",
+     "clip": "SRC_Tug"
+    },
+    {
+     "name": "0",
+     "clip": "SRC_Tug"
+    }
+   ],
+   "at": [
+    [
+     "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      526.5,
+      -462.37,
+      3.14
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "22.894369"
+    ],
+    [
+     "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      76.56,
+      -12.43,
+      3.15
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "38.077812"
+    ]
+   ]
+  },
+  {
+   "game": 43.186,
+   "frame_delta": 0.066,
+   "turnips": [
+    {
+     "entity": "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "Recover",
+     "seq": "3",
+     "mount": "World"
+    },
+    {
+     "entity": "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "RecoveryIdle",
+     "seq": "4",
+     "mount": "World"
+    }
+   ],
+   "clips": [
+    {
+     "name": "3",
+     "clip": "ROOT_Recover"
+    },
+    {
+     "name": "2",
+     "clip": "ROOT_RecoveryIdle"
+    },
+    {
+     "name": "1",
+     "clip": "SRC_Tug"
+    },
+    {
+     "name": "0",
+     "clip": "SRC_Tug"
+    }
+   ],
+   "at": [
+    [
+     "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      526.5,
+      -462.37,
+      3.14
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "23.499159"
+    ],
+    [
+     "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      76.56,
+      -12.43,
+      3.15
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "38.682606"
+    ]
+   ]
+  },
+  {
+   "game": 44.221,
+   "frame_delta": 0.0781,
+   "turnips": [
+    {
+     "entity": "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "RecoveryIdle",
+     "seq": "3",
+     "mount": "World"
+    },
+    {
+     "entity": "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "RecoveryIdle",
+     "seq": "4",
+     "mount": "World"
+    }
+   ],
+   "clips": [
+    {
+     "name": "3",
+     "clip": "ROOT_RecoveryIdle"
+    },
+    {
+     "name": "2",
+     "clip": "ROOT_RecoveryIdle"
+    },
+    {
+     "name": "1",
+     "clip": "SRC_Tug"
+    },
+    {
+     "name": "0",
+     "clip": "SRC_Tug"
+    }
+   ],
+   "at": [
+    [
+     "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      526.5,
+      -462.37,
+      3.14
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "24.534096"
+    ],
+    [
+     "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      76.56,
+      -12.43,
+      3.15
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "39.717537"
+    ]
+   ]
+  },
+  {
+   "game": 44.909,
+   "frame_delta": 0.0703,
+   "turnips": [
+    {
+     "entity": "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "RecoveryIdle",
+     "seq": "3",
+     "mount": "World"
+    },
+    {
+     "entity": "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "Anticipate",
+     "seq": "4",
+     "mount": "World"
+    }
+   ],
+   "clips": [
+    {
+     "name": "3",
+     "clip": "ROOT_RecoveryIdle"
+    },
+    {
+     "name": "2",
+     "clip": "ROOT_AnticipateTired"
+    },
+    {
+     "name": "1",
+     "clip": "SRC_Tug"
+    },
+    {
+     "name": "0",
+     "clip": "SRC_Tug"
+    }
+   ],
+   "at": [
+    [
+     "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      526.5,
+      -462.37,
+      3.14
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "25.222298"
+    ],
+    [
+     "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      76.56,
+      -12.43,
+      3.15
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "40.405735"
+    ]
+   ]
+  },
+  {
+   "game": 45.223,
+   "frame_delta": 0.0578,
+   "turnips": [
+    {
+     "entity": "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "RecoveryIdle",
+     "seq": "3",
+     "mount": "World"
+    },
+    {
+     "entity": "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "Inhale",
+     "seq": "4",
+     "mount": "World"
+    }
+   ],
+   "clips": [
+    {
+     "name": "3",
+     "clip": "ROOT_RecoveryIdle"
+    },
+    {
+     "name": "2",
+     "clip": "ROOT_Inhale"
+    },
+    {
+     "name": "1",
+     "clip": "SRC_Tug"
+    },
+    {
+     "name": "0",
+     "clip": "SRC_Tug"
+    }
+   ],
+   "at": [
+    [
+     "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      526.5,
+      -462.37,
+      3.14
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "25.536028"
+    ],
+    [
+     "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      76.56,
+      -12.43,
+      3.15
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "40.719471"
+    ]
+   ]
+  },
+  {
+   "game": 46.442,
+   "frame_delta": 0.0662,
+   "turnips": [
+    {
+     "entity": "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "RecoveryIdle",
+     "seq": "3",
+     "mount": "World"
+    },
+    {
+     "entity": "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "Scream",
+     "seq": "5",
+     "mount": "World"
+    }
+   ],
+   "clips": [
+    {
+     "name": "3",
+     "clip": "ROOT_RecoveryIdle"
+    },
+    {
+     "name": "2",
+     "clip": "ROOT_Scream"
+    },
+    {
+     "name": "1",
+     "clip": "SRC_Tug"
+    },
+    {
+     "name": "0",
+     "clip": "SRC_Tug"
+    }
+   ],
+   "at": [
+    [
+     "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      526.5,
+      -462.37,
+      3.14
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "26.755571"
+    ],
+    [
+     "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      76.56,
+      -12.43,
+      3.15
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "41.939018"
+    ]
+   ]
+  },
+  {
+   "game": 47.048,
+   "frame_delta": 0.0609,
+   "turnips": [
+    {
+     "entity": "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "RecoveryIdle",
+     "seq": "3",
+     "mount": "World"
+    },
+    {
+     "entity": "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "Recover",
+     "seq": "5",
+     "mount": "World"
+    }
+   ],
+   "clips": [
+    {
+     "name": "3",
+     "clip": "ROOT_RecoveryIdle"
+    },
+    {
+     "name": "2",
+     "clip": "ROOT_Recover"
+    },
+    {
+     "name": "1",
+     "clip": "SRC_Tug"
+    },
+    {
+     "name": "0",
+     "clip": "SRC_Tug"
+    }
+   ],
+   "at": [
+    [
+     "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      526.5,
+      -462.37,
+      3.14
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "27.361139"
+    ],
+    [
+     "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      76.56,
+      -12.43,
+      3.15
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "42.544579"
+    ]
+   ]
+  },
+  {
+   "game": 48.065,
+   "frame_delta": 0.0615,
+   "turnips": [
+    {
+     "entity": "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "RecoveryIdle",
+     "seq": "3",
+     "mount": "World"
+    },
+    {
+     "entity": "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "RecoveryIdle",
+     "seq": "5",
+     "mount": "World"
+    }
+   ],
+   "clips": [
+    {
+     "name": "3",
+     "clip": "ROOT_RecoveryIdle"
+    },
+    {
+     "name": "2",
+     "clip": "ROOT_RecoveryIdle"
+    },
+    {
+     "name": "1",
+     "clip": "SRC_Tug"
+    },
+    {
+     "name": "0",
+     "clip": "SRC_Tug"
+    }
+   ],
+   "at": [
+    [
+     "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      526.5,
+      -462.37,
+      3.14
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "28.378527"
+    ],
+    [
+     "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      76.56,
+      -12.43,
+      3.15
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "43.561966"
+    ]
+   ]
+  },
+  {
+   "game": 50.599,
+   "frame_delta": 0.0593,
+   "turnips": [
+    {
+     "entity": "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "Anticipate",
+     "seq": "3",
+     "mount": "World"
+    },
+    {
+     "entity": "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "RecoveryIdle",
+     "seq": "5",
+     "mount": "World"
+    }
+   ],
+   "clips": [
+    {
+     "name": "3",
+     "clip": "ROOT_AnticipateTired"
+    },
+    {
+     "name": "2",
+     "clip": "ROOT_RecoveryIdle"
+    },
+    {
+     "name": "1",
+     "clip": "SRC_Tug"
+    },
+    {
+     "name": "0",
+     "clip": "SRC_Tug"
+    }
+   ],
+   "at": [
+    [
+     "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      526.5,
+      -462.37,
+      3.14
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "30.912107"
+    ],
+    [
+     "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      76.56,
+      -12.43,
+      3.15
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "46.095531"
+    ]
+   ]
+  },
+  {
+   "game": 50.922,
+   "frame_delta": 0.0619,
+   "turnips": [
+    {
+     "entity": "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "Inhale",
+     "seq": "3",
+     "mount": "World"
+    },
+    {
+     "entity": "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "RecoveryIdle",
+     "seq": "5",
+     "mount": "World"
+    }
+   ],
+   "clips": [
+    {
+     "name": "3",
+     "clip": "ROOT_Inhale"
+    },
+    {
+     "name": "2",
+     "clip": "ROOT_RecoveryIdle"
+    },
+    {
+     "name": "1",
+     "clip": "SRC_Tug"
+    },
+    {
+     "name": "0",
+     "clip": "SRC_Tug"
+    }
+   ],
+   "at": [
+    [
+     "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      526.5,
+      -462.37,
+      3.14
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "31.235041"
+    ],
+    [
+     "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      76.56,
+      -12.43,
+      3.15
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "46.418465"
+    ]
+   ]
+  },
+  {
+   "game": 52.111,
+   "frame_delta": 0.0591,
+   "turnips": [
+    {
+     "entity": "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "Scream",
+     "seq": "4",
+     "mount": "World"
+    },
+    {
+     "entity": "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "RecoveryIdle",
+     "seq": "5",
+     "mount": "World"
+    }
+   ],
+   "clips": [
+    {
+     "name": "3",
+     "clip": "ROOT_Scream"
+    },
+    {
+     "name": "2",
+     "clip": "ROOT_RecoveryIdle"
+    },
+    {
+     "name": "1",
+     "clip": "SRC_Tug"
+    },
+    {
+     "name": "0",
+     "clip": "SRC_Tug"
+    }
+   ],
+   "at": [
+    [
+     "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      526.5,
+      -462.37,
+      3.14
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "32.424606"
+    ],
+    [
+     "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      76.56,
+      -12.43,
+      3.15
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "47.608032"
+    ]
+   ]
+  },
+  {
+   "game": 52.72,
+   "frame_delta": 0.0808,
+   "turnips": [
+    {
+     "entity": "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "Recover",
+     "seq": "4",
+     "mount": "World"
+    },
+    {
+     "entity": "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     "placement": "LooseSettled",
+     "phase": "RecoveryIdle",
+     "seq": "5",
+     "mount": "World"
+    }
+   ],
+   "clips": [
+    {
+     "name": "3",
+     "clip": "ROOT_Recover"
+    },
+    {
+     "name": "2",
+     "clip": "ROOT_RecoveryIdle"
+    },
+    {
+     "name": "1",
+     "clip": "SRC_Tug"
+    },
+    {
+     "name": "0",
+     "clip": "SRC_Tug"
+    }
+   ],
+   "at": [
+    [
+     "189|3(3145917)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      526.5,
+      -462.37,
+      3.14
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "33.033379"
+    ],
+    [
+     "642|1(1049218)[Valid](Default__Mars_ScreamingTurnip_EntityScript)",
+     [
+      76.56,
+      -12.43,
+      3.15
+     ],
+     [
+      0.27,
+      0.83,
+      0.49
+     ],
+     "48.216805"
+    ]
+   ]
+  }
+ ],
+ "max_delta": 0.1056
+}

@@ -1,0 +1,1 @@
+run-06 bed0, phases grip0/back0/back0b (first person; hold0 with the side view excluded), SRC_Tug rows: n 121, glove(n) vs socket(n-1) max 0.000 cm, rows > 0.5 cm 0, same-tick max 3.097 cm

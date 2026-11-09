@@ -1,0 +1,87 @@
+{
+ "label": "1x",
+ "frame_map": "UE cm root-relative; SRC_Tug f0 (== SRC_Grip f6) vs f15",
+ "crown_d": [
+  -35.998,
+  0.0,
+  10.501
+ ],
+ "socket_HG_R_d": [
+  -38.153,
+  0.0,
+  7.619
+ ],
+ "socket_horizontal_travel": 38.153,
+ "neck": {
+  "dimple_d": [
+   -7.144,
+   -0.0,
+   2.438
+  ],
+  "ring_max_d": 5.364,
+  "target": "dimple <= 9 cm x, <= 3 cm z; ring below the dimple",
+  "pass": true
+ },
+ "stems": {
+  "leaf_1": {
+   "base_to_blade_cm": [
+    4.5,
+    40.49
+   ],
+   "base_to_blade_x": 9.0,
+   "emergence_to_blade_cm": [
+    2.63,
+    21.53
+   ],
+   "emergence_to_blade_x": 8.17
+  },
+  "leaf_2": {
+   "base_to_blade_cm": [
+    4.56,
+    39.04
+   ],
+   "base_to_blade_x": 8.57,
+   "emergence_to_blade_cm": [
+    2.52,
+    20.29
+   ],
+   "emergence_to_blade_x": 8.05
+  },
+  "leaf_3": {
+   "base_to_blade_cm": [
+    4.44,
+    38.41
+   ],
+   "base_to_blade_x": 8.65,
+   "emergence_to_blade_cm": [
+    2.74,
+    20.07
+   ],
+   "emergence_to_blade_x": 7.33
+  },
+  "leaf_4": {
+   "base_to_blade_cm": [
+    4.56,
+    39.04
+   ],
+   "base_to_blade_x": 8.57,
+   "emergence_to_blade_cm": [
+    2.52,
+    20.29
+   ],
+   "emergence_to_blade_x": 8.05
+  },
+  "leaf_5": {
+   "base_to_blade_cm": [
+    4.5,
+    40.49
+   ],
+   "base_to_blade_x": 9.0,
+   "emergence_to_blade_cm": [
+    2.63,
+    21.53
+   ],
+   "emergence_to_blade_x": 8.17
+  }
+ }
+}

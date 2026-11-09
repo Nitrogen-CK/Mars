@@ -1,0 +1,31 @@
+{
+ "SRC_Tug": {
+  "samples": 151,
+  "step_frames": 0.1,
+  "stem_gap_max_cm": -0.315,
+  "isect": {}
+ },
+ "SRC_Cancel": {
+  "samples": 71,
+  "step_frames": 0.1,
+  "stem_gap_max_cm": -0.607,
+  "isect": {
+   "2.4": {
+    "leaf_vs_bulb": 3
+   }
+  }
+ },
+ "SRC_Release": {
+  "samples": 61,
+  "step_frames": 0.1,
+  "stem_gap_max_cm": -0.231,
+  "isect": {
+   "0.5": {
+    "leaf_vs_bulb": 3
+   },
+   "0.6": {
+    "leaf_vs_bulb": 25
+   }
+  }
+ }
+}

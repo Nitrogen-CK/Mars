@@ -1,0 +1,6 @@
+{'d0': 110.421, 'n': 13, 'dt_max': 0.3625, 'walk_speed_max': 420.5, 'last_visible': {'game': 3.5677, 'dt': 0.0381, 'walked': 204.86, 'want': 1, 'alpha': 0.9236, 'ring': 0.9522, 'trail': 0.0764, 'glove_same': 11.419, 'glove_lag1': 0.0}, 'released_at': {'game': 3.9677, 'dt': 0.4, 'walked': 345.86}, 'walked_at_break_vs_walkcm': 58.66, 'trail_max': 0.211, 'ring_x097_vs_alpha_max': 0.00012299999999998423, 'glove_lag1_max': 0.0, 'glove_lag1_over_05': 0, 'glove_same_max': 18.53, 'rows_chase_view_excluded': 1}
+shots: {'P1_grip_fp': 2.217, 'P2_midwalk_fp': 3.1014, 'P3_midwalk_fp': 3.5295, 'P4_break_fp': 4.0287}
+max |alpha delta| between consecutive ticks: 0.3688 over 13 ticks
+ticks longer than 0.05 s:
+   {'game': 3.4962, 'dt': 0.3625, 'alpha_from': 0.4202, 'alpha_to': 0.789, 'delta': 0.3688, 'walked': 199.64, 'want': 1}
+release tick: {'game': 3.9677, 'dt': 0.4, 'walked': 345.86} previous alpha 0.9236 jump on release tick n/a (hidden)

@@ -1,0 +1,174 @@
+{
+"d0": 110.421,
+"n": 13,
+"dt_max": 0.3625,
+"walk_speed_max": 420.5,
+"last_visible": {
+"game": 3.5677,
+"dt": 0.0381,
+"walked": 204.86,
+"want": 1,
+"alpha": 0.9236,
+"ring": 0.9522,
+"trail": 0.0764,
+"glove_same": 11.419,
+"glove_lag1": 0.0
+},
+"released_at": {
+"game": 3.9677,
+"dt": 0.4,
+"walked": 345.86
+},
+"walked_at_break_vs_walkcm": 58.66,
+"trail_max": 0.211,
+"ring_x097_vs_alpha_max": 0.00012299999999998423,
+"glove_lag1_max": 0.0,
+"glove_lag1_over_05": 0,
+"glove_same_max": 18.53,
+"rows_chase_view_excluded": 1,
+"rows": [
+{
+"game": 2.7916,
+"dt": 0.0357,
+"walked": 0.0,
+"want": 0,
+"alpha": 0.0,
+"ring": 0.0,
+"trail": 0.0,
+"glove_same": 0.0,
+"glove_lag1": null
+},
+{
+"game": 2.8226,
+"dt": 0.031,
+"walked": 0.0,
+"want": 0,
+"alpha": 0.0,
+"ring": 0.0,
+"trail": 0.0,
+"glove_same": 0.0,
+"glove_lag1": 0.0
+},
+{
+"game": 2.8635,
+"dt": 0.041,
+"walked": 4.03,
+"want": 0.0275,
+"alpha": 0.0062,
+"ring": 0.0063,
+"trail": 0.0213,
+"glove_same": 0.0,
+"glove_lag1": 0.0
+},
+{
+"game": 2.9077,
+"dt": 0.0442,
+"walked": 13.05,
+"want": 0.0893,
+"alpha": 0.0298,
+"ring": 0.0307,
+"trail": 0.0595,
+"glove_same": 0.228,
+"glove_lag1": 0.0
+},
+{
+"game": 2.947,
+"dt": 0.0393,
+"walked": 24.77,
+"want": 0.1694,
+"alpha": 0.0686,
+"ring": 0.0707,
+"trail": 0.1008,
+"glove_same": 0.882,
+"glove_lag1": 0.0
+},
+{
+"game": 2.9897,
+"dt": 0.0427,
+"walked": 41.91,
+"want": 0.2867,
+"alpha": 0.1366,
+"ring": 0.1409,
+"trail": 0.1501,
+"glove_same": 1.576,
+"glove_lag1": 0.0
+},
+{
+"game": 3.0219,
+"dt": 0.0322,
+"walked": 55.45,
+"want": 0.3793,
+"alpha": 0.1996,
+"ring": 0.2059,
+"trail": 0.1797,
+"glove_same": 7.078,
+"glove_lag1": 0.0
+},
+{
+"game": 3.0576,
+"dt": 0.0356,
+"walked": 70.42,
+"want": 0.4817,
+"alpha": 0.2812,
+"ring": 0.2899,
+"trail": 0.2005,
+"glove_same": 9.479,
+"glove_lag1": 0.0
+},
+{
+"game": 3.1014,
+"dt": 0.0439,
+"walked": 74.38,
+"want": 0.5088,
+"alpha": 0.3724,
+"ring": 0.3838,
+"trail": 0.1364,
+"glove_same": 15.27,
+"glove_lag1": 0.0
+},
+{
+"game": 3.1337,
+"dt": 0.0323,
+"walked": 74.38,
+"want": 0.5088,
+"alpha": 0.4202,
+"ring": 0.4333,
+"trail": 0.0886,
+"glove_same": 18.53,
+"glove_lag1": 0.0
+},
+{
+"game": 3.4962,
+"dt": 0.3625,
+"walked": 199.64,
+"want": 1,
+"alpha": 0.789,
+"ring": 0.8134,
+"trail": 0.211,
+"glove_same": 9.583,
+"glove_lag1": 0.0
+},
+{
+"game": 3.5295,
+"dt": 0.0333,
+"walked": 204.86,
+"want": 1,
+"alpha": 0.867,
+"ring": 0.8938,
+"trail": 0.133,
+"glove_same": 64.151,
+"glove_lag1": 0.0
+},
+{
+"game": 3.5677,
+"dt": 0.0381,
+"walked": 204.86,
+"want": 1,
+"alpha": 0.9236,
+"ring": 0.9522,
+"trail": 0.0764,
+"glove_same": 11.419,
+"glove_lag1": 0.0
+}
+]
+}

@@ -1,0 +1,11 @@
+state: alpha 0.2952 velocity 2.346 /s, pull 0.7821
+dt 0.0167 s: alpha after one step 0.362
+dt 0.0250 s: alpha after one step 0.417
+dt 0.0330 s: alpha after one step 0.482
+dt 0.0400 s: alpha after one step 0.550
+dt 0.0500 s: alpha after one step 0.665
+dt 0.0600 s: alpha after one step 0.799
+dt 0.0700 s: alpha after one step 0.954
+dt 0.0800 s: alpha after one step 1.129  >= 0.97: crosses EngageAlpha, Succeeded
+dt 0.0955 s: alpha after one step 1.440  >= 0.97: crosses EngageAlpha, Succeeded
+old 60/12, dt 0.0955: alpha 0.529

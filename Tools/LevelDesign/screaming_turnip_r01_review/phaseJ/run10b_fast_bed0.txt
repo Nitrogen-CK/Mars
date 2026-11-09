@@ -1,0 +1,2 @@
+{'d0': 110.458, 'n': 195, 'dt_max': 0.0339, 'walk_speed_max': 434.8, 'last_visible': {'game': 2.8778, 'dt': 0.0033, 'walked': 208.33, 'want': 1, 'alpha': 0.969, 'ring': 0.999, 'trail': 0.031, 'glove_same': 0.059, 'glove_lag1': 0.0}, 'released_at': {'game': 2.8817, 'dt': 0.0039, 'walked': 209.95}, 'walked_at_break_vs_walkcm': 62.13, 'trail_max': 0.2641, 'ring_x097_vs_alpha_max': 0.00013999999999997348, 'glove_lag1_max': 35.333, 'glove_lag1_over_05': 18, 'glove_same_max': 37.577, 'rows_chase_view_
+shot row game 2.621 walked 101.2 alpha 0.428 True

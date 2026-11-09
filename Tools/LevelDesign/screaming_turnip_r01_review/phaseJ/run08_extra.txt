@@ -1,0 +1,28 @@
+yaw within 5 deg after press (s): {'bed0': 0.0936, 'bed1_pull1': 0.1808, 'bed1_pull2': 0.0}
+cancel first: {'game': 16.751, 't': 0.1221, 'start_alpha': 0.5233, 'want_start_alpha': 0.527} last tug {'game': 16.722, 't': 0.2365, 'alpha': 0.473} span to idle 0.3415
+   {'game': 16.7291, 'dt': 0.0071, 'clip': 'SRC_Tug->SRC_Tug', 't': 0.2371, 'step': 0.216, 'speed': 30.43, 'per_60hz': 0.507, 'glove': 0.216}
+   {'game': 16.7363, 'dt': 0.0072, 'clip': 'SRC_Tug->SRC_Tug', 't': 0.2377, 'step': 0.202, 'speed': 28.04, 'per_60hz': 0.467, 'glove': 0.202}
+   {'game': 16.7433, 'dt': 0.007, 'clip': 'SRC_Tug->SRC_Tug', 't': 0.2383, 'step': 0.199, 'speed': 28.4, 'per_60hz': 0.473, 'glove': 0.199}
+   {'game': 16.751, 'dt': 0.0077, 'clip': 'SRC_Tug->SRC_Cancel', 't': 0.1221, 'step': 0.185, 'speed': 24.0, 'per_60hz': 0.4, 'glove': 0.185}
+   {'game': 16.7589, 'dt': 0.0079, 'clip': 'SRC_Cancel->SRC_Cancel', 't': 0.1248, 'step': 2.639, 'speed': 334.06, 'per_60hz': 5.568, 'glove': 2.846}
+   {'game': 16.7653, 'dt': 0.0064, 'clip': 'SRC_Cancel->SRC_Cancel', 't': 0.1269, 'step': 1.551, 'speed': 242.31, 'per_60hz': 4.038, 'glove': 2.363}
+   {'game': 16.7722, 'dt': 0.0069, 'clip': 'SRC_Cancel->SRC_Cancel', 't': 0.1292, 'step': 1.64, 'speed': 237.61, 'per_60hz': 3.96, 'glove': 3.498}
+   {'game': 16.7797, 'dt': 0.0075, 'clip': 'SRC_Cancel->SRC_Cancel', 't': 0.1317, 'step': 1.81, 'speed': 241.33, 'per_60hz': 4.022, 'glove': 5.352}
+in-clip per_60hz: n 34, max 5.568, median 4.110, min 1.738; peak speed 334.1 cm/s
+bed0 first-person Tug rows: n 667, glove(n) vs socket(n-1) max 0.001 cm, rows > 0.5 cm 0, same tick max 3.606 cm
+full-speed pull 2: d0 111.20; alpha vs walked (gained/146.2):
+   game 20.011 gained 0.0 want 0.000 alpha 0.000 trail 0.000
+   game 20.108 gained 0.0 want 0.000 alpha 0.000 trail 0.000
+   game 20.210 gained 0.0 want 0.000 alpha 0.000 trail 0.000
+   game 20.320 gained 0.0 want 0.000 alpha 0.000 trail 0.000
+   game 20.414 gained 0.0 want 0.000 alpha 0.000 trail 0.000
+   game 20.510 gained 8.5 want 0.058 alpha 0.002 trail 0.056
+   game 20.597 gained 34.9 want 0.238 alpha 0.028 trail 0.211
+   game 20.685 gained 71.7 want 0.490 alpha 0.109 trail 0.381
+   game 20.770 gained 107.4 want 0.735 alpha 0.250 trail 0.485
+   game 20.853 gained 142.4 want 0.974 alpha 0.436 trail 0.538
+   game 20.940 gained 179.0 want 1.000 alpha 0.649 trail 0.351
+   game 21.023 gained 213.7 want 1.000 alpha 0.811 trail 0.189
+   game 21.109 gained 250.1 want 1.000 alpha 0.921 trail 0.079
+   break: gained 276.8 cm (walked past WalkCm by 130.6 cm), alpha 0.968
+   walk speed max 425.6 cm/s

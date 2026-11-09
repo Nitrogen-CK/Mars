@@ -1,0 +1,4 @@
+00:02.125  blend            | Read blend: "D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\source\ScreamingTurnip_R01.blend"
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+INJECT T 10 L 1.4: fails 14; Tug stem_gap -0.733 isect frames [] crown [-10.0, 35.265] dimple [-2.29, 1.088] ring 2.56; Cancel isect frames []; Release isect frames []
+TURNIP_FAIL inject 10,1.4: SRC_Tug f7 (a 0.47): neck dimple [-0.974, 0.517] ring 1.11; SRC_Tug f8 (a 0.53): neck dimple [-1.138, 0.598] ring 1.29; SRC_Tug f9 (a 0.60): neck dimple [-1.312, 0.679] ring 1.49; SRC_Tug f10 (a 0.67): neck dimple [-1.513, 0.771] ring 1.72; SRC_Tug f11 (a 0.73): neck dimple [-1.725, 0.864] ring 1.96; SRC_Tug f12 (a 0.80): neck dimple [-1.928, 0.95] ring 2.18

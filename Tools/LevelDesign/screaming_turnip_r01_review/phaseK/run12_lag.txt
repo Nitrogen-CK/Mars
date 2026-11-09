@@ -1,0 +1,4 @@
+bed1_travel74: drawn alpha vs the Control alpha of the same tick max 0.0256, of the previous tick max 0.0001 (342 ticks)
+   gloves: vs the previous tick's sockets max 0.0 cm; vs the same tick's max 1.927 cm, mean 0.3176
+bed2_pull2: drawn alpha vs the Control alpha of the same tick max 0.0147, of the previous tick max 0.0001 (627 ticks)
+   gloves: vs the previous tick's sockets max 0.0 cm; vs the same tick's max 2.162 cm, mean 0.3285

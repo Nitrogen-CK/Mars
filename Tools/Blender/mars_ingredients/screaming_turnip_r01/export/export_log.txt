@@ -1,66 +1,66 @@
-00:01.609  blend            | Read blend: "D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\source\ScreamingTurnip_R01.blend"
+00:01.922  blend            | Read blend: "D:\Repositories\CkRepos\Orion\Tools\Blender\mars_ingredients\screaming_turnip_r01\source\ScreamingTurnip_R01.blend"
 
 FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_ingredients\\screaming_turnip_r01\\export\\validation\\Cube10_Mars_SM.fbx'
-export finished in 0.0038 sec.
+export finished in 0.0054 sec.
 
 FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_ingredients\\screaming_turnip_r01\\export\\TurnipBed_R01_Mars_SM.fbx'
-export finished in 0.0038 sec.
+export finished in 0.0036 sec.
 
 FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_ingredients\\screaming_turnip_r01\\export\\TurnipBedEmpty_R01_Mars_SM.fbx'
-export finished in 0.0032 sec.
+export finished in 0.0036 sec.
 
 FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_ingredients\\screaming_turnip_r01\\export\\ScreamingTurnip_R01_Collision_Mars_SM.fbx'
-export finished in 0.0039 sec.
+export finished in 0.0031 sec.
 
 FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_ingredients\\screaming_turnip_r01\\export\\ScreamingTurnip_R01_Mars_SK.fbx'
-export finished in 0.0152 sec.
+export finished in 0.0150 sec.
 
 FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_ingredients\\screaming_turnip_r01\\export\\anims\\ScreamingTurnip_R01_SRC_Idle_Mars_ANIM.fbx'
-export finished in 0.0548 sec.
+export finished in 0.0651 sec.
 EXPORTED clip SRC_Idle                 frames 0..60  390076 bytes
 
 FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_ingredients\\screaming_turnip_r01\\export\\anims\\ScreamingTurnip_R01_SRC_Grip_Mars_ANIM.fbx'
-export finished in 0.0266 sec.
+export finished in 0.0313 sec.
 EXPORTED clip SRC_Grip                 frames 0..6  330716 bytes
 
 FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_ingredients\\screaming_turnip_r01\\export\\anims\\ScreamingTurnip_R01_SRC_Tug_Mars_ANIM.fbx'
-export finished in 0.0314 sec.
-EXPORTED clip SRC_Tug                  frames 0..15  348652 bytes
+export finished in 0.0393 sec.
+EXPORTED clip SRC_Tug                  frames 0..15  348636 bytes
 
 FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_ingredients\\screaming_turnip_r01\\export\\anims\\ScreamingTurnip_R01_SRC_Release_Mars_ANIM.fbx'
-export finished in 0.0277 sec.
+export finished in 0.0292 sec.
 EXPORTED clip SRC_Release              frames 0..6  330716 bytes
 
 FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_ingredients\\screaming_turnip_r01\\export\\anims\\ScreamingTurnip_R01_SRC_Cancel_Mars_ANIM.fbx'
-export finished in 0.0270 sec.
-EXPORTED clip SRC_Cancel               frames 0..7  332716 bytes
+export finished in 0.0335 sec.
+EXPORTED clip SRC_Cancel               frames 0..7  332700 bytes
 
 FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_ingredients\\screaming_turnip_r01\\export\\anims\\ScreamingTurnip_R01_ROOT_QuietIdle_Mars_ANIM.fbx'
-export finished in 0.0577 sec.
+export finished in 0.0617 sec.
 EXPORTED clip ROOT_QuietIdle           frames 0..60  391948 bytes
 
 FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_ingredients\\screaming_turnip_r01\\export\\anims\\ScreamingTurnip_R01_ROOT_Anticipate_Mars_ANIM.fbx'
-export finished in 0.0291 sec.
-EXPORTED clip ROOT_Anticipate          frames 0..9  336700 bytes
+export finished in 0.0311 sec.
+EXPORTED clip ROOT_Anticipate          frames 0..9  336684 bytes
 
 FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_ingredients\\screaming_turnip_r01\\export\\anims\\ScreamingTurnip_R01_ROOT_AnticipateTired_Mars_ANIM.fbx'
-export finished in 0.0301 sec.
-EXPORTED clip ROOT_AnticipateTired     frames 0..9  336700 bytes
+export finished in 0.0322 sec.
+EXPORTED clip ROOT_AnticipateTired     frames 0..9  336684 bytes
 
 FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_ingredients\\screaming_turnip_r01\\export\\anims\\ScreamingTurnip_R01_ROOT_Inhale_Mars_ANIM.fbx'
-export finished in 0.0464 sec.
-EXPORTED clip ROOT_Inhale              frames 0..36  366540 bytes
+export finished in 0.0471 sec.
+EXPORTED clip ROOT_Inhale              frames 0..36  366524 bytes
 
 FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_ingredients\\screaming_turnip_r01\\export\\anims\\ScreamingTurnip_R01_ROOT_Scream_Mars_ANIM.fbx'
-export finished in 0.0356 sec.
+export finished in 0.0399 sec.
 EXPORTED clip ROOT_Scream              frames 0..18  349804 bytes
 
 FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_ingredients\\screaming_turnip_r01\\export\\anims\\ScreamingTurnip_R01_ROOT_Recover_Mars_ANIM.fbx'
-export finished in 0.0396 sec.
+export finished in 0.0486 sec.
 EXPORTED clip ROOT_Recover             frames 0..30  370060 bytes
 
 FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_ingredients\\screaming_turnip_r01\\export\\anims\\ScreamingTurnip_R01_ROOT_RecoveryIdle_Mars_ANIM.fbx'
-export finished in 0.0573 sec.
+export finished in 0.0669 sec.
 EXPORTED clip ROOT_RecoveryIdle        frames 0..60  392460 bytes
 
 FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_ingredients\\screaming_turnip_r01\\export\\anims\\ScreamingTurnip_R01_ROOT_AirborneLeafTrail_Mars_ANIM.fbx'
@@ -68,17 +68,18 @@ export finished in 0.0471 sec.
 EXPORTED clip ROOT_AirborneLeafTrail   frames 0..30  370060 bytes
 
 FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_ingredients\\screaming_turnip_r01\\export\\anims\\ScreamingTurnip_R01_ROOT_ImpactSquash_Mars_ANIM.fbx'
-export finished in 0.0282 sec.
-EXPORTED clip ROOT_ImpactSquash        frames 0..7  332716 bytes
+export finished in 0.0340 sec.
+EXPORTED clip ROOT_ImpactSquash        frames 0..7  332700 bytes
 
 FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_ingredients\\screaming_turnip_r01\\export\\anims\\ScreamingTurnip_R01_ROOT_SettleRock_Mars_ANIM.fbx'
-export finished in 0.0511 sec.
+export finished in 0.0606 sec.
 EXPORTED clip ROOT_SettleRock          frames 0..12  342668 bytes
 
 FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\Blender\\mars_ingredients\\screaming_turnip_r01\\export\\anims\\ScreamingTurnip_R01_ROOT_PlaceSettle_Mars_ANIM.fbx'
-export finished in 0.0292 sec.
-EXPORTED clip ROOT_PlaceSettle         frames 0..7  332716 bytes
-GAMEPLAY_NUMBERS {"frame": "Unreal cm (x, -y, z) from the skeletal mesh root (the taproot tip); the item's proxy pivot == that root", "scale_factor": 3.0, "k_GripLocation_R": [0.0, -11.82, 12.0], "k_GripLocation_L": [0.0, 11.82, 12.0], "grip_note": "R takes the root's -Y flank landmark (its Grip_L), L the +Y one, as now (k_GripRotation yaw 180 unchanged); was (0, -/+3.94, 4.0). The grips are now 23.64 cm apart (was 7.88): check the Cradle glove layout spreads that wide", "hull_centre_offset_from_root": [0.992, 0.0, 20.25], "hull_centre_note": "bounds centre of the collision hull; x is 0.992 (not 0) because the hull's +X half is widened over the lip crest (B2b); comment in constants_screaming_turnip_assets says 6.75 -> 20.25", "hull_extents": {"h_z": 29.7, "w_y": 29.7, "d_x": 28.384}, "k_PlantedOffset": [0.0, 0.0, -28.8], "bed": {"outer_size_cm": [72.0, 72.0, 12.26], "top_z_above_soil_line": 2.0597, "bottom_z": -10.2, "pivot": "soil-line centre (unchanged)"}, "k_ReleasePointOffset_suggestion": [0.0, 0.0, 60.0], "release_note": "bed centre + 60 cm (was + 20): the hop starts with the 48.0 cm root's base clear of the 2.06 cm bed top. ReleaseLaunch / ReleaseSpinDeg / the bed probe (30, 30, 20) half extents are not re-derived here: the probe box is now smaller than the 72 cm bed (judge in Phase H)", "HeldOffset_location": [14.661, 0.0, -25.5], "HeldOffset_rotation": [0.0, 180.0, 0.0], "held_note": "B3 HeldOffset (14, 0, -12) yaw 180 put the hull centre at [13.669, 0.0, -5.25] in the hand frame (root + yaw180([0.331, -0.0, 6.75])); the B4 root goes at [14.661, 0.0, -25.5] so the hull centre stays there. With the brief's x-free centre (0, 0, 20.25) the value is (14, 0, -25.50)", "hull_bounding_radius": 15.018, "PickupProbeRadius_suggestion": 21.0, "pickup_note": "hull bounding radius from its centre 15.02 + 5 cm margin, rounded up (B3 radius would be 5.01). Only used when the item has no Mesh (Mars_WorldItem_Utils.as:391 / :406): the proxy hull's bounds drive the probe otherwise"}
+export finished in 0.0343 sec.
+EXPORTED clip ROOT_PlaceSettle         frames 0..7  332700 bytes
+NECK f15 {"crown_d": [0.0, 0.0, 2.065], "dimple_d": [-1.99, 0.0, 1.046], "dimple_pct_of_crown": 108.9, "ring_max_d": 2.469, "ring_max_abs_dx": 2.153, "ring_max_dz": 1.381, "ring_pct_of_crown": 119.6}
+GAMEPLAY_NUMBERS {"frame": "Unreal cm (x, -y, z) from the skeletal mesh root (the taproot tip); the item's proxy pivot == that root", "scale_factor": 3.0, "k_GripLocation_R": [0.0, -11.82, 12.0], "k_GripLocation_L": [0.0, 11.82, 12.0], "grip_note": "R takes the root's -Y flank landmark (its Grip_L), L the +Y one, as now (k_GripRotation yaw 180 unchanged); was (0, -/+3.94, 4.0). The grips are now 23.64 cm apart (was 7.88): check the Cradle glove layout spreads that wide", "hull_centre_offset_from_root": [0.992, 0.0, 20.25], "hull_centre_note": "bounds centre of the collision hull; x is 0.992 (not 0) because the hull's +X half is widened over the lip crest (B2b); comment in constants_screaming_turnip_assets says 6.75 -> 20.25", "hull_extents": {"h_z": 29.7, "w_y": 29.7, "d_x": 28.384}, "k_PlantedOffset": [0.0, 0.0, -28.8], "bed": {"outer_size_cm": [72.0, 72.0, 12.26], "top_z_above_soil_line": 2.0597, "bottom_z": -10.2, "pivot": "soil-line centre (unchanged)"}, "k_ReleasePointOffset_suggestion": [0.0, 0.0, 60.0], "release_note": "bed centre + 60 cm (was + 20): the hop starts with the 48.0 cm root's base clear of the 2.06 cm bed top. ReleaseLaunch / ReleaseSpinDeg / the bed probe (30, 30, 20) half extents are not re-derived here: the probe box is now smaller than the 72 cm bed (judge in Phase H)", "HeldOffset_location": [14.661, 0.0, -25.5], "HeldOffset_rotation": [0.0, 180.0, 0.0], "held_note": "B3 HeldOffset (14, 0, -12) yaw 180 put the hull centre at [13.669, 0.0, -5.25] in the hand frame (root + yaw180([0.331, -0.0, 6.75])); the B4 root goes at [14.661, 0.0, -25.5] so the hull centre stays there. With the brief's x-free centre (0, 0, 20.25) the value is (14, 0, -25.50)", "hull_bounding_radius": 15.018, "PickupProbeRadius_suggestion": 21.0, "pickup_note": "hull bounding radius from its centre 15.02 + 5 cm margin, rounded up (B3 radius would be 5.01). Only used when the item has no Mesh (Mars_WorldItem_Utils.as:391 / :406): the proxy hull's bounds drive the probe otherwise", "k_StretchTravelCm_default": 146.2, "k_StretchLiftCm_default": 20.0, "stretch_runtime_safe_travel_cm": [20.0, 230.0], "stretch_note": "Phase K: the walk-away stretch is a runtime tuner, not clip content. The bed's Pull.Stretch (TravelCm, LiftCm; default 146.2 / 20 cm) drives the ABP's ModifyBone on `crown` (component space, Add): (-TravelCm * a, 0, LiftCm * a), a = the Control alpha while gripped, 1 - played alpha while SRC_Cancel plays. SRC_Tug / SRC_Cancel / SRC_Release carry only the pose (crown pitch, trailing leaves, bulb tilt; crown head held at x 0, clip socket travel 2.2 cm from the pitch). The HarvestGrip sockets travel TravelCm + about 2 cm. Deformation audit with the offset injected (intersections 0, stem_gap <= 0, neck): safe for TravelCm [20.0, 230.0] cm with LiftCm ~ 0.137 x TravelCm; the first failure above the default is at 235.0 cm (SRC_Tug f15 (a 1.00): neck dimple [-9.04, 2.009] ring 4.71). Below 20.0 cm the relative neck rule (ring below dimple) fails and at 0-5 cm the pitched crown lays the leaves on the bulb / lifts a stem base. Per run: review/phaseK/inject_summary.json"}
 FILE export\validation\Cube10_Mars_SM.fbx                              12204 bytes  v7400
 FILE export\TurnipBed_R01_Mars_SM.fbx                                  22428 bytes  v7400
 FILE export\TurnipBedEmpty_R01_Mars_SM.fbx                             24412 bytes  v7400
@@ -86,20 +87,20 @@ FILE export\ScreamingTurnip_R01_Collision_Mars_SM.fbx                  12956 byt
 FILE export\ScreamingTurnip_R01_Mars_SK.fbx                           227628 bytes  v7400
 FILE export\anims\ScreamingTurnip_R01_SRC_Idle_Mars_ANIM.fbx          390076 bytes  v7400
 FILE export\anims\ScreamingTurnip_R01_SRC_Grip_Mars_ANIM.fbx          330716 bytes  v7400
-FILE export\anims\ScreamingTurnip_R01_SRC_Tug_Mars_ANIM.fbx           348652 bytes  v7400
+FILE export\anims\ScreamingTurnip_R01_SRC_Tug_Mars_ANIM.fbx           348636 bytes  v7400
 FILE export\anims\ScreamingTurnip_R01_SRC_Release_Mars_ANIM.fbx       330716 bytes  v7400
-FILE export\anims\ScreamingTurnip_R01_SRC_Cancel_Mars_ANIM.fbx        332716 bytes  v7400
+FILE export\anims\ScreamingTurnip_R01_SRC_Cancel_Mars_ANIM.fbx        332700 bytes  v7400
 FILE export\anims\ScreamingTurnip_R01_ROOT_QuietIdle_Mars_ANIM.fbx    391948 bytes  v7400
-FILE export\anims\ScreamingTurnip_R01_ROOT_Anticipate_Mars_ANIM.fbx   336700 bytes  v7400
-FILE export\anims\ScreamingTurnip_R01_ROOT_AnticipateTired_Mars_ANIM.fbx   336700 bytes  v7400
-FILE export\anims\ScreamingTurnip_R01_ROOT_Inhale_Mars_ANIM.fbx       366540 bytes  v7400
+FILE export\anims\ScreamingTurnip_R01_ROOT_Anticipate_Mars_ANIM.fbx   336684 bytes  v7400
+FILE export\anims\ScreamingTurnip_R01_ROOT_AnticipateTired_Mars_ANIM.fbx   336684 bytes  v7400
+FILE export\anims\ScreamingTurnip_R01_ROOT_Inhale_Mars_ANIM.fbx       366524 bytes  v7400
 FILE export\anims\ScreamingTurnip_R01_ROOT_Scream_Mars_ANIM.fbx       349804 bytes  v7400
 FILE export\anims\ScreamingTurnip_R01_ROOT_Recover_Mars_ANIM.fbx      370060 bytes  v7400
 FILE export\anims\ScreamingTurnip_R01_ROOT_RecoveryIdle_Mars_ANIM.fbx   392460 bytes  v7400
 FILE export\anims\ScreamingTurnip_R01_ROOT_AirborneLeafTrail_Mars_ANIM.fbx   370060 bytes  v7400
-FILE export\anims\ScreamingTurnip_R01_ROOT_ImpactSquash_Mars_ANIM.fbx   332716 bytes  v7400
+FILE export\anims\ScreamingTurnip_R01_ROOT_ImpactSquash_Mars_ANIM.fbx   332700 bytes  v7400
 FILE export\anims\ScreamingTurnip_R01_ROOT_SettleRock_Mars_ANIM.fbx   342668 bytes  v7400
-FILE export\anims\ScreamingTurnip_R01_ROOT_PlaceSettle_Mars_ANIM.fbx   332716 bytes  v7400
+FILE export\anims\ScreamingTurnip_R01_ROOT_PlaceSettle_Mars_ANIM.fbx   332700 bytes  v7400
 SOCKETS {"Grip_L": {"bone": "root", "root_relative_ue_cm": [0.0, -11.82, 12.0], "bone_relative_ue_cm": [0.0, -11.82, 12.0], "rotation_ue_deg_pyr": [0.0, 0.0, 0.0], "note": "lower left flank (bulb surface at z 12); on root so it never inherits expressive body scale (spec section 3)"}, "Grip_R": {"bone": "root", "root_relative_ue_cm": [0.0, 11.82, 12.0], "bone_relative_ue_cm": [0.0, 11.82, 12.0], "rotation_ue_deg_pyr": [0.0, 0.0, 0.0], "note": "lower right flank; on root (spec section 3)"}, "MouthCue": {"bone": "jaw", "root_relative_ue_cm": [12.407, -0.0, 19.2], "bone_relative_ue_cm": [13.907, 0.0, 6.6], "rotation_ue_deg_pyr": [0.0, 0.0, 0.0], "note": "seam centre on the +X face; follows the jaw for sound/VFX"}, "SoilLine": {"bone": "body", "root_relative_ue_cm": [0.0, -0.0, 28.8], "bone_relative_ue_cm": [0.0, 0.0, 8.325], "rotation_ue_deg_pyr": [0.0, 0.0, 0.0], "note": "planted soil line; on body so the SRC clips' planted offset (body z -1.8 cm) carries it"}, "HarvestGrip_L": {"bone": "crown", "root_relative_ue_cm": [-1.522, -4.683, 38.035], "bone_relative_ue_cm": [-1.522, -4.683, 3.385], "rotation_ue_deg_pyr": [0.0, 0.0, 0.0], "note": "2.4 cm up the stem of leaf_02 (+Y, turnip left); on crown so it rides the grip dip / tug stretch"}, "HarvestGrip_R": {"bone": "crown", "root_relative_ue_cm": [-1.522, 4.683, 38.035], "bone_relative_ue_cm": [-1.522, 4.683, 3.385], "rotation_ue_deg_pyr": [0.0, 0.0, 0.0], "note": "2.4 cm up the stem of leaf_04 (-Y); on crown"}}
 TURNIP_OK
 Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
