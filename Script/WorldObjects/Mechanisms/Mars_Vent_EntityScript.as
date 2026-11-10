@@ -6,7 +6,10 @@
 class UMars_Vent_EntityScript : UCk_GenericEntityScript_UE
 {
     default _ShowInPlaceActors = true;
-    default _Replication = ECk_Replication::DoesNotReplicate;
+    // Stance A: placed by the authority's spawner; the vent, its root transform and its cycle, hazard and sink ledgers
+    // replicate; the nozzle, trigger and jet are built on every machine; the jet follows the replicated phase. Only the
+    // authority hits.
+    default _Replication = ECk_Replication::Replicates;
 
     UPROPERTY(ExposeOnSpawn)
     FTransform SpawnTransform = FTransform::Identity;
@@ -41,7 +44,7 @@ class UMars_Vent_EntityScript : UCk_GenericEntityScript_UE
     UFUNCTION(BlueprintOverride)
     ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
     {
-        VentRoot = utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::DoesNotReplicate);
+        VentRoot = utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::Replicates);
         utils_entity_tag::Add(InHandle, n"TAG_MarsVent");
 
         auto TriggerSpec = FMars_Trigger_Spec();
@@ -72,6 +75,10 @@ class UMars_Vent_EntityScript : UCk_GenericEntityScript_UE
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
+        // The jet is cosmetic: a machine that cannot show it never spawns it.
+        if (utils_net::Get_CanExecuteCosmeticEvents(InHandle) == false)
+        { return; }
+
         // A rejected trap already ensured in utils_trap::Add and composed no cycle; the vent then never fires.
         auto Cycle = InHandle.As_Cycle(ECk_SanityCheck::UnChecked);
         if (ck::Is_NOT_Valid(Cycle))
@@ -119,6 +126,10 @@ class UMars_Vent_EntityScript : UCk_GenericEntityScript_UE
 
         if (Ensure_Steam() == false)
         { return; }
+
+        // Placed from the root at every activation: on a client the root transform may replicate after the first phase.
+        const auto Root = utils_transform::Get_EntityCurrentTransform(VentRoot);
+        Steam.SetWorldLocationAndRotation(Root.TransformPosition(NozzleMouth), Root.Rotator());
 
         Set_SteamActive(true);
         if (IsTelegraph)

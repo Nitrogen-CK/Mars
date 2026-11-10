@@ -84,6 +84,26 @@ namespace utils_oscillator
         return InParams.AmplitudeDegrees * InState.Envelope * float32(Math::Sin(2.0 * PI * InState.Time / InParams.PeriodSeconds));
     }
 
+    // InTime folded into [0, InPeriod).
+    float32 Wrap_Time(float32 InTime, float32 InPeriod)
+    {
+        auto Time = float32(Math::Fmod(InTime, InPeriod));
+        if (Time < 0.0f)
+        { Time += InPeriod; }
+
+        return Time;
+    }
+
+    // The shortest signed time from InActual to InExpected on a swing of InPeriod, in (-InPeriod / 2, InPeriod / 2].
+    float32 Get_PhaseError(float32 InExpected, float32 InActual, float32 InPeriod)
+    {
+        auto Error = Wrap_Time(InExpected - InActual, InPeriod);
+        if (Error > InPeriod * 0.5f)
+        { Error -= InPeriod; }
+
+        return Error;
+    }
+
     FRotator Make_SwingRotation(EMars_Oscillator_Axis InAxis, float32 InAngleDegrees)
     {
         if (InAxis == EMars_Oscillator_Axis::Pitch)
@@ -120,6 +140,41 @@ mixin bool Get_IsSwinging(const FCk_Handle_Oscillator& Self)
     return State.Envelope > 0.0f || Self.Get_Fragment(FMars_Fragment_Oscillator_Params).CatchAngleDegrees.IsSet();
 }
 
+mixin FMars_Oscillator_Sample Get_Sample(const FCk_Handle_Oscillator& Self)
+{
+    const auto& State = Self.Get_Fragment(FMars_Fragment_Oscillator);
+    return FMars_Oscillator_Sample(State.State, State.Time, State.Envelope);
+}
+
+// InFrom as this oscillator's Tick would carry it InSeconds on, with no state change: a swing easing out stops advancing
+// once it is at rest, as the Tick does. It does not look for a catch inside the window: the authority's own catch arrives
+// as a Caught sample.
+mixin FMars_Oscillator_Sample Get_Advanced(const FCk_Handle_Oscillator& Self, FMars_Oscillator_Sample InFrom, float32 InSeconds)
+{
+    if (InFrom.State == EMars_Oscillator_State::Caught)
+    { return InFrom; }
+
+    const auto& Params = Self.Get_Fragment(FMars_Fragment_Oscillator_Params);
+
+    const auto IsBraking = InFrom.State == EMars_Oscillator_State::Stopped && Params.CatchAngleDegrees.IsSet();
+    const auto IsEasingOut = InFrom.State == EMars_Oscillator_State::Stopped && IsBraking == false;
+    const auto Seconds = IsEasingOut ? Math::Min(InSeconds, InFrom.Envelope * Params.SettleSeconds) : InSeconds;
+
+    auto Result = InFrom;
+    Result.Time = utils_oscillator::Wrap_Time(InFrom.Time + Seconds, Params.PeriodSeconds);
+
+    const auto TargetEnvelope = (InFrom.State == EMars_Oscillator_State::Running || IsBraking) ? 1.0f : 0.0f;
+    if (Params.SettleSeconds <= KINDA_SMALL_NUMBER)
+    { Result.Envelope = TargetEnvelope; }
+    else
+    {
+        const auto MaxStep = Seconds / Params.SettleSeconds;
+        Result.Envelope = Math::Clamp(InFrom.Envelope + Math::Clamp(TargetEnvelope - InFrom.Envelope, -MaxStep, MaxStep), 0.0f, 1.0f);
+    }
+
+    return Result;
+}
+
 // The swing angle the node shows now, on top of its rest rotation.
 mixin float32 Get_Angle(const FCk_Handle_Oscillator& Self)
 {
@@ -134,6 +189,12 @@ mixin void Request_SetRunning(FCk_Handle_Oscillator& Self, const FMars_Request_O
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Oscillator_Requests);
     Requests.SetRunningRequests.Add(InRequest);
+}
+
+mixin void Request_Align(FCk_Handle_Oscillator& Self, const FMars_Request_Oscillator_Align& InRequest)
+{
+    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Oscillator_Requests);
+    Requests.AlignRequests.Add(InRequest);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

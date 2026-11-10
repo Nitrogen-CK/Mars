@@ -1,3 +1,8 @@
+// Stance A for arming, C for hits. Arming (FMars_Fragment_Hazard) is the replicated ledger, written by the authority's
+// request drain; a client mirrors it and broadcasts OnArmedChanged from what replicated. Hits and pushes are the
+// authority's alone: only its setup binds the trigger and the arm edge, so OnHit never fires on a client, and a pushed
+// character's client receives the launch through its movement component's correction.
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
 //--------------------------------------------------------------------------------------------------------------------------
@@ -71,9 +76,14 @@ struct FMars_Fragment_Hazard
 {
     UPROPERTY()
     EMars_Hazard_Arming Arming = EMars_Hazard_Arming::Disarmed;
+}
 
+// Non-authority only (the authority's setup removes it): the ledger as this machine last applied it, seeded with the
+// ledger as Add composed it, so a value that replicated before the setup ran is still applied.
+struct FMars_Fragment_Hazard_Mirror
+{
     UPROPERTY()
-    FCk_Handle_Trigger Trigger;
+    FMars_Fragment_Hazard Last;
 }
 
 // Lives on the trigger entity: trigger signals carry only the trigger, so this is how they find their hazards.

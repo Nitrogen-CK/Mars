@@ -1,4 +1,6 @@
-// Owns every hit: an entity entering the trigger of an armed hazard, and everything already inside when it arms.
+// Owns every hit, on the authority only: an entity entering the trigger of an armed hazard, and everything already inside
+// when it arms. A client wires none of it: it binds the ledger's rep-notify, reconciles once and broadcasts
+// OnArmedChanged when the replicated arming changes.
 class UMars_Processor_Hazard_Setup : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -14,6 +16,16 @@ class UMars_Processor_Hazard_Setup : UCk_Processor_Script_Base_UE
     void ForEachEntity(FCk_Time InDeltaT, FCk_Handle& InHandle)
     {
         auto Hazard = InHandle.As_Hazard();
+        Hazard.Request_TryRemove(FMars_Tag_Hazard_NeedsSetup);
+
+        if (utils_net::Get_HasAuthority(InHandle) == false)
+        {
+            InHandle.BindTo_OnRepNotify(FMars_Fragment_Hazard, FCk_DynamicFragment_OnRepNotify(this, n"OnLedgerReplicated"));
+            Reconcile(Hazard);
+            return;
+        }
+
+        Hazard.Request_TryRemove(FMars_Fragment_Hazard_Mirror);
         Hazard.BindTo_OnArmedChanged(FMars_Delegate_Hazard_OnArmedChanged(this, n"OnHazardArmedChanged"));
 
         // Several hazards may share a trigger; binding this processor twice to one event would double-fire.
@@ -28,8 +40,28 @@ class UMars_Processor_Hazard_Setup : UCk_Processor_Script_Base_UE
         // An arm request handled before this setup broadcast to no one.
         if (Hazard.Get_IsArmed())
         { HitAllInside(Hazard); }
+    }
 
-        Hazard.Request_TryRemove(FMars_Tag_Hazard_NeedsSetup);
+    UFUNCTION()
+    private void OnLedgerReplicated(FCk_Handle InHandle, FCk_DynamicFragment_RepNotifyInfo InInfo)
+    {
+        auto Hazard = InHandle.As_Hazard();
+        Reconcile(Hazard);
+    }
+
+    // The diff against Last guards the reconcile and the notify alike: one replicated change broadcasts once.
+    private void Reconcile(FCk_Handle_Hazard& InHazard)
+    {
+        auto& Mirror = InHazard.Get_Fragment(FMars_Fragment_Hazard_Mirror);
+        const auto WasArming = Mirror.Last.Arming;
+        Mirror.Last = InHazard.Get_Fragment(FMars_Fragment_Hazard);
+
+        const auto Arming = Mirror.Last.Arming;
+        if (Arming == WasArming)
+        { return; }
+
+        if (InHazard.Has_Fragment(FMars_Fragment_Hazard_Signals))
+        { InHazard.Get_Fragment(FMars_Fragment_Hazard_Signals).OnArmedChanged.Broadcast(InHazard, Arming); }
     }
 
     UFUNCTION()

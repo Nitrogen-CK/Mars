@@ -13,6 +13,12 @@ class UMars_Processor_Hazard_HandleRequests : UCk_Processor_Script_Base_UE
                        FMars_Fragment_Hazard_Requests& InRequests,
                        FMars_Fragment_Hazard& InState)
     {
+        if (utils_net::Get_HasAuthority(InHandle) == false)
+        {
+            InHandle.Request_TryRemove(FMars_Fragment_Hazard_Requests);
+            return;
+        }
+
         auto Hazard = InHandle.As_Hazard();
 
         // Absolute requests: the last one stands.
@@ -25,6 +31,7 @@ class UMars_Processor_Hazard_HandleRequests : UCk_Processor_Script_Base_UE
         { return; }
 
         InState.Arming = Arming;
+        InHandle.Request_MarkReplicationDirty(FMars_Fragment_Hazard);
 
         // Hitting what is already inside on arming is the setup processor's reaction to this signal.
         if (Hazard.Has_Fragment(FMars_Fragment_Hazard_Signals))

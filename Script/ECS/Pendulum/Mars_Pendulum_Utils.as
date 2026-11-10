@@ -13,17 +13,45 @@ namespace utils_pendulum
 
         auto Params = FMars_Fragment_Pendulum_Params();
         Params.Powered = InSpec.Powered;
+        Params.Oscillator = InSpec.Parts.Oscillator;
+        Params.Hazard = InSpec.Parts.Hazard;
 
-        auto State = FMars_Fragment_Pendulum();
-        State.Oscillator = InSpec.Parts.Oscillator;
-        State.Hazard = InSpec.Parts.Hazard;
+        auto Ledger = FMars_Fragment_Pendulum();
+        Ledger.Swing = InSpec.Parts.Oscillator.Get_Sample();
+        Ledger.Anchors = 0;
+
+        auto Mirror = FMars_Fragment_Pendulum_Mirror();
+        Mirror.Last = Ledger;
 
         InHandle.Add_Fragment(FMars_Feature_Pendulum());
         InHandle.Add_Fragment(Params);
-        InHandle.Add_Fragment(State);
+        InHandle.Add_Fragment(Ledger, ECk_Replication::Replicates);
+        InHandle.Add_Fragment(Mirror);
         InHandle.Add_Fragment(FMars_Tag_Pendulum_NeedsSetup());
         return InHandle.As_Pendulum();
     }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+// Getters
+//--------------------------------------------------------------------------------------------------------------------------
+
+mixin FCk_Handle_Oscillator Get_Oscillator(const FCk_Handle_Pendulum& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_Pendulum_Params).Oscillator;
+}
+
+mixin FCk_Handle_Hazard Get_Hazard(const FCk_Handle_Pendulum& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_Pendulum_Params).Hazard;
+}
+
+// The authority's anchored swing carried on to now by the server clock: the phase this machine's swing should show.
+mixin FMars_Oscillator_Sample Get_AnchoredSample(const FCk_Handle_Pendulum& Self)
+{
+    const auto& Ledger = Self.Get_Fragment(FMars_Fragment_Pendulum);
+    const auto Elapsed = Math::Max(utils_mars_net::Get_ServerWorldSeconds(Self) - Ledger.AnchorServerSeconds, 0.0);
+    return Self.Get_Oscillator().Get_Advanced(Ledger.Swing, float32(Elapsed));
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

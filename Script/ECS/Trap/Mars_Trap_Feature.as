@@ -1,3 +1,7 @@
+// SPLIT. The replicated truth is the Cycle (stance A, its own ledger on this entity): the trap adds no ledger of its own.
+// The phase-to-Mover glue runs on every machine from the Cycle's signals, which a client's Cycle mirror broadcasts too.
+// The sink -> cycle wiring, phase -> hazard arming and hit forwarding (OnTriggered) are the authority's.
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
 //--------------------------------------------------------------------------------------------------------------------------
@@ -109,6 +113,7 @@ struct FMars_Fragment_Trap_Params
 // State
 //--------------------------------------------------------------------------------------------------------------------------
 
+// Local wiring, never replicated: the parts this trap drives, on every machine.
 struct FMars_Fragment_Trap
 {
     UPROPERTY()

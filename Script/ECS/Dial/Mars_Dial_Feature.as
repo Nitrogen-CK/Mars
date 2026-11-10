@@ -1,3 +1,6 @@
+// Stance pending: Index and Locked become authority state judged with its host's commit; Angle is operator input. Its
+// one host composes it on scene nodes, so the ledger will live on the host's root.
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
 //--------------------------------------------------------------------------------------------------------------------------

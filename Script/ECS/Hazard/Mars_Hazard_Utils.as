@@ -19,11 +19,14 @@ namespace utils_hazard
 
         auto State = FMars_Fragment_Hazard();
         State.Arming = InSpec.StartArmed ? EMars_Hazard_Arming::Armed : EMars_Hazard_Arming::Disarmed;
-        State.Trigger = InSpec.Trigger;
+
+        auto Mirror = FMars_Fragment_Hazard_Mirror();
+        Mirror.Last = State;
 
         InHandle.Add_Fragment(FMars_Feature_Hazard());
         InHandle.Add_Fragment(Params);
-        InHandle.Add_Fragment(State);
+        InHandle.Add_Fragment(State, ECk_Replication::Replicates);
+        InHandle.Add_Fragment(Mirror);
         InHandle.Add_Fragment(FMars_Tag_Hazard_NeedsSetup());
         auto Hazard = InHandle.As_Hazard();
 
@@ -50,7 +53,7 @@ mixin bool Get_IsArmed(const FCk_Handle_Hazard& Self)
 
 mixin FCk_Handle_Trigger Get_Trigger(const FCk_Handle_Hazard& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_Hazard).Trigger;
+    return Self.Get_Fragment(FMars_Fragment_Hazard_Params).Spec.Trigger;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

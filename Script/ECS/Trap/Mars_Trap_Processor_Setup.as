@@ -1,5 +1,5 @@
-// Drives the trap's Mover/Hazard from its Cycle's phases, gates the Cycle by an optional MechanismSink on the same
-// entity, and forwards Hazard hits as OnTriggered.
+// Drives the trap's Mover from its Cycle's phases on every machine. On the authority only: arms the Hazard per phase,
+// gates the Cycle by an optional MechanismSink on the same entity, and forwards Hazard hits as OnTriggered.
 class UMars_Processor_Trap_Setup : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -15,6 +15,8 @@ class UMars_Processor_Trap_Setup : UCk_Processor_Script_Base_UE
     void ForEachEntity(FCk_Time InDeltaT, FCk_Handle& InHandle)
     {
         auto Trap = InHandle.As_Trap();
+        Trap.Request_TryRemove(FMars_Tag_Trap_NeedsSetup);
+
         const auto& State = Trap.Get_Fragment(FMars_Fragment_Trap);
 
         auto Cycle = State.Cycle;
@@ -22,11 +24,15 @@ class UMars_Processor_Trap_Setup : UCk_Processor_Script_Base_UE
 
         Cycle.BindTo_OnPhaseChanged(FMars_Delegate_Cycle_OnPhaseChanged(this, n"OnCyclePhaseChanged"));
         Cycle.BindTo_OnRunningChanged(FMars_Delegate_Cycle_OnRunningChanged(this, n"OnCycleRunningChanged"));
-        Hazard.BindTo_OnHit(FMars_Delegate_Hazard_OnHit(this, n"OnHazardHit"));
 
         // The cycle may have entered its first phase before these binds; re-applying is idempotent.
         if (Cycle.Get_IsRunning())
         { ApplyPhase(Trap, Cycle.Get_CurrentPhase()); }
+
+        if (utils_net::Get_HasAuthority(InHandle) == false)
+        { return; }
+
+        Hazard.BindTo_OnHit(FMars_Delegate_Hazard_OnHit(this, n"OnHazardHit"));
 
         auto Sink = InHandle.As_MechanismSink(ECk_SanityCheck::UnChecked);
         if (ck::IsValid(Sink))
@@ -34,8 +40,6 @@ class UMars_Processor_Trap_Setup : UCk_Processor_Script_Base_UE
             Sink.BindTo_OnPoweredChanged(FMars_Delegate_MechanismSink_OnPoweredChanged(this, n"OnSinkPoweredChanged"),
                 ECk_Signal_BindingPolicy::FireIfPayloadInFlight);
         }
-
-        Trap.Request_TryRemove(FMars_Tag_Trap_NeedsSetup);
     }
 
     private void ApplyPhase(FCk_Handle_Trap& InTrap, FGameplayTag InPhase)
@@ -46,6 +50,7 @@ class UMars_Processor_Trap_Setup : UCk_Processor_Script_Base_UE
         // Add guarantees a mover when an action moves a part.
         auto Mover = State.Mover;
         auto Hazard = State.Hazard;
+        const auto HasAuthority = utils_net::Get_HasAuthority(InTrap);
 
         for (const auto& Action : Spec.Actions)
         {
@@ -55,7 +60,7 @@ class UMars_Processor_Trap_Setup : UCk_Processor_Script_Base_UE
             if (Action.MoverAtEnd.IsSet())
             { Mover.Request_MoveTo(FMars_Request_Mover_MoveTo(Action.MoverAtEnd.GetValue() ? EMars_Mover_Pose::End : EMars_Mover_Pose::Start)); }
 
-            if (Action.HazardArmed.IsSet())
+            if (Action.HazardArmed.IsSet() && HasAuthority)
             { Hazard.Request_SetArmed(FMars_Request_Hazard_SetArmed(Action.HazardArmed.GetValue() ? EMars_Hazard_Arming::Armed : EMars_Hazard_Arming::Disarmed)); }
         }
     }
@@ -85,8 +90,11 @@ class UMars_Processor_Trap_Setup : UCk_Processor_Script_Base_UE
         auto Trap = InCycle.As_Trap();
         const auto& State = Trap.Get_Fragment(FMars_Fragment_Trap);
 
-        auto Hazard = State.Hazard;
-        Hazard.Request_SetArmed(FMars_Request_Hazard_SetArmed(EMars_Hazard_Arming::Disarmed));
+        if (utils_net::Get_HasAuthority(Trap))
+        {
+            auto Hazard = State.Hazard;
+            Hazard.Request_SetArmed(FMars_Request_Hazard_SetArmed(EMars_Hazard_Arming::Disarmed));
+        }
 
         // Invalid when the trap moves no part.
         auto Mover = State.Mover;

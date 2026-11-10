@@ -4,7 +4,9 @@
 class UMars_SpikeTrap_EntityScript : UCk_GenericEntityScript_UE
 {
     default _ShowInPlaceActors = true;
-    default _Replication = ECk_Replication::DoesNotReplicate;
+    // Stance A: placed by the authority's spawner; the trap, its root transform and its cycle, hazard and sink ledgers
+    // replicate; the tile, spikes, their mover and the trigger are built on every machine. Only the authority hits.
+    default _Replication = ECk_Replication::Replicates;
 
     UPROPERTY(ExposeOnSpawn)
     FTransform SpawnTransform = FTransform::Identity;
@@ -29,7 +31,7 @@ class UMars_SpikeTrap_EntityScript : UCk_GenericEntityScript_UE
     UFUNCTION(BlueprintOverride)
     ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
     {
-        auto TrapRoot = utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::DoesNotReplicate);
+        auto TrapRoot = utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::Replicates);
         utils_entity_tag::Add(InHandle, n"TAG_MarsSpikeTrap");
 
         auto SpikeNode = utils_scene_node::Create(TrapRoot, FTransform::Identity);

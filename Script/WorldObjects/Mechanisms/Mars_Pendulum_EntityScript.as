@@ -4,7 +4,10 @@
 class UMars_Pendulum_EntityScript : UCk_GenericEntityScript_UE
 {
     default _ShowInPlaceActors = true;
-    default _Replication = ECk_Replication::DoesNotReplicate;
+    // Stance A: placed by the authority's spawner; the pendulum, its root transform and its swing anchor, hazard and sink
+    // ledgers replicate; the pivot, arm, bob, their oscillator and the moving trigger are built on every machine and swing
+    // in the host's phase. Only the authority hits.
+    default _Replication = ECk_Replication::Replicates;
 
     UPROPERTY(ExposeOnSpawn)
     FTransform SpawnTransform = FTransform::Identity;
@@ -35,7 +38,7 @@ class UMars_Pendulum_EntityScript : UCk_GenericEntityScript_UE
     UFUNCTION(BlueprintOverride)
     ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
     {
-        auto PendulumRoot = utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::DoesNotReplicate);
+        auto PendulumRoot = utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::Replicates);
         utils_entity_tag::Add(InHandle, n"TAG_MarsPendulum");
 
         const auto PivotHeight = ArmLength + PivotClearance;

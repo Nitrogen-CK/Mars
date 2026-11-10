@@ -1,6 +1,8 @@
-// Gates the pendulum's Oscillator by an optional MechanismSink on the same entity, arms the Hazard while the bob swings
-// (from a start until the oscillator reports rest, not merely until it is told to stop), and forwards Hazard hits as
-// OnTriggered.
+// On the authority: gates the pendulum's Oscillator by an optional MechanismSink on the same entity, arms the Hazard
+// while the bob swings (from a start until the oscillator reports rest, not merely until it is told to stop), forwards
+// Hazard hits as OnTriggered, and writes the phase anchor (the only writer) at setup and at every run-state change and
+// rest. A client wires none of it: it binds the anchor's rep-notify, reconciles once, and aligns its own oscillator to
+// each new anchor.
 class UMars_Processor_Pendulum_Setup : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -16,10 +18,17 @@ class UMars_Processor_Pendulum_Setup : UCk_Processor_Script_Base_UE
     void ForEachEntity(FCk_Time InDeltaT, FCk_Handle& InHandle)
     {
         auto Pendulum = InHandle.As_Pendulum();
-        const auto& State = Pendulum.Get_Fragment(FMars_Fragment_Pendulum);
+        Pendulum.Request_TryRemove(FMars_Tag_Pendulum_NeedsSetup);
 
-        auto Oscillator = State.Oscillator;
-        auto Hazard = State.Hazard;
+        if (utils_net::Get_HasAuthority(InHandle) == false)
+        {
+            InHandle.BindTo_OnRepNotify(FMars_Fragment_Pendulum, FCk_DynamicFragment_OnRepNotify(this, n"OnLedgerReplicated"));
+            Reconcile(Pendulum);
+            return;
+        }
+
+        auto Oscillator = Pendulum.Get_Oscillator();
+        auto Hazard = Pendulum.Get_Hazard();
 
         Oscillator.BindTo_OnRunningChanged(FMars_Delegate_Oscillator_OnRunningChanged(this, n"OnOscillatorRunningChanged"));
         Oscillator.BindTo_OnCameToRest(FMars_Delegate_Oscillator_OnCameToRest(this, n"OnOscillatorCameToRest"));
@@ -34,7 +43,42 @@ class UMars_Processor_Pendulum_Setup : UCk_Processor_Script_Base_UE
                 ECk_Signal_BindingPolicy::FireIfPayloadInFlight);
         }
 
-        Pendulum.Request_TryRemove(FMars_Tag_Pendulum_NeedsSetup);
+        WriteAnchor(Pendulum);
+        Pendulum.Request_TryRemove(FMars_Fragment_Pendulum_Mirror);
+    }
+
+    UFUNCTION()
+    private void OnLedgerReplicated(FCk_Handle InHandle, FCk_DynamicFragment_RepNotifyInfo InInfo)
+    {
+        auto Pendulum = InHandle.As_Pendulum();
+        Reconcile(Pendulum);
+    }
+
+    // Broadcasts nothing itself (OnTriggered is a hit, the authority's): the oscillator's Align signals its own edges.
+    private void Reconcile(FCk_Handle_Pendulum& InPendulum)
+    {
+        auto& Mirror = InPendulum.Get_Fragment(FMars_Fragment_Pendulum_Mirror);
+        const auto LastAnchors = Mirror.Last.Anchors;
+        Mirror.Last = InPendulum.Get_Fragment(FMars_Fragment_Pendulum);
+
+        if (Mirror.Last.Anchors == LastAnchors)
+        { return; }
+
+        auto Oscillator = InPendulum.Get_Oscillator();
+        Oscillator.Request_Align(FMars_Request_Oscillator_Align(InPendulum.Get_AnchoredSample()));
+    }
+
+    // Samples the oscillator after the state change that called it. Two writes in one frame replicate as the last.
+    private void WriteAnchor(FCk_Handle_Pendulum& InPendulum)
+    {
+        const auto Swing = InPendulum.Get_Oscillator().Get_Sample();
+        const auto Now = utils_mars_net::Get_ServerWorldSeconds(InPendulum);
+
+        auto& Ledger = InPendulum.Get_Fragment(FMars_Fragment_Pendulum);
+        Ledger.Swing = Swing;
+        Ledger.AnchorServerSeconds = Now;
+        Ledger.Anchors += 1;
+        InPendulum.H().Request_MarkReplicationDirty(FMars_Fragment_Pendulum);
     }
 
     // The oscillator lives on the pendulum's entity or on a scene node directly under it (utils_pendulum::Add). The owner
@@ -51,30 +95,33 @@ class UMars_Processor_Pendulum_Setup : UCk_Processor_Script_Base_UE
         return Owner.As_Pendulum();
     }
 
-    private void SetArmed(FCk_Handle_Oscillator InOscillator, EMars_Hazard_Arming InArming)
+    // A stop disarms nothing: the bob keeps swinging (easing out, or braking to its catch angle) until OnCameToRest.
+    UFUNCTION()
+    private void OnOscillatorRunningChanged(FCk_Handle_Oscillator InOscillator, EMars_Oscillator_RunState InRunState)
     {
         auto Pendulum = Find_Pendulum(InOscillator);
         if (ck::Is_NOT_Valid(Pendulum))
         { return; }
 
-        auto Hazard = Pendulum.Get_Fragment(FMars_Fragment_Pendulum).Hazard;
-        Hazard.Request_SetArmed(FMars_Request_Hazard_SetArmed(InArming));
-    }
+        WriteAnchor(Pendulum);
 
-    // A stop disarms nothing: the bob keeps swinging (easing out, or braking to its catch angle) until OnCameToRest.
-    UFUNCTION()
-    private void OnOscillatorRunningChanged(FCk_Handle_Oscillator InOscillator, EMars_Oscillator_RunState InRunState)
-    {
         if (InRunState != EMars_Oscillator_RunState::Running)
         { return; }
 
-        SetArmed(InOscillator, EMars_Hazard_Arming::Armed);
+        auto Hazard = Pendulum.Get_Hazard();
+        Hazard.Request_SetArmed(FMars_Request_Hazard_SetArmed(EMars_Hazard_Arming::Armed));
     }
 
     UFUNCTION()
     private void OnOscillatorCameToRest(FCk_Handle_Oscillator InOscillator)
     {
-        SetArmed(InOscillator, EMars_Hazard_Arming::Disarmed);
+        auto Pendulum = Find_Pendulum(InOscillator);
+        if (ck::Is_NOT_Valid(Pendulum))
+        { return; }
+
+        WriteAnchor(Pendulum);
+        auto Hazard = Pendulum.Get_Hazard();
+        Hazard.Request_SetArmed(FMars_Request_Hazard_SetArmed(EMars_Hazard_Arming::Disarmed));
     }
 
     UFUNCTION()
@@ -84,7 +131,7 @@ class UMars_Processor_Pendulum_Setup : UCk_Processor_Script_Base_UE
         const auto Powered = Pendulum.Get_Fragment(FMars_Fragment_Pendulum_Params).Powered;
         const auto Running = utils_mechanism_sink::Get_ShouldRun(Powered, InPower);
 
-        auto Oscillator = Pendulum.Get_Fragment(FMars_Fragment_Pendulum).Oscillator;
+        auto Oscillator = Pendulum.Get_Oscillator();
         Oscillator.Request_SetRunning(FMars_Request_Oscillator_SetRunning(
             Running ? EMars_Oscillator_RunState::Running : EMars_Oscillator_RunState::Stopped));
     }

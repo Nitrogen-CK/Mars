@@ -92,6 +92,23 @@ namespace utils_mars_net
         return utils_net::Get_NetMode(World) == ECk_Net_NetModeType::Client;
     }
 
+    // The authority's clock as this machine knows it: the server's world time on the server, a smoothed estimate of it
+    // on a client (the GameState learns the offset from replication, so it lags by about the one-way latency and reads
+    // the local clock until the first update arrives). Without a GameState, the world's own time. Resolved through
+    // InAnyHandle's world, never the implicit world context: a processor has none, and two PIE worlds share a process.
+    float64 Get_ServerWorldSeconds(const FCk_Handle& InAnyHandle)
+    {
+        const auto World = utils_entity_lifetime::Get_WorldForEntity(InAnyHandle);
+        if (ck::EnsureIfNot(ck::IsValid(World), "[MarsNet] the handle resolves to no world: it has no server time"))
+        { return 0.0; }
+
+        const auto GameState = World.GetGameState();
+        if (GameState == nullptr)
+        { return World.GetTimeSeconds(); }
+
+        return GameState.GetServerWorldTimeSeconds();
+    }
+
     // Re-resolved at every call and never latched: the tag answers "does it exist right now".
     FCk_Handle DoFind_SpawnOwner(const FCk_Handle& InAnyHandle)
     {

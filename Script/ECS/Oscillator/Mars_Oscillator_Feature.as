@@ -1,3 +1,7 @@
+// Stance D. Nothing replicates here: the oscillator lives on a scene node, which cannot hold a replicated ledger, so
+// every machine runs its own Time and Envelope. A replicated owner aligns a client's swing to the authority's with
+// Request_Align; the owner decides who issues requests.
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
 //--------------------------------------------------------------------------------------------------------------------------
@@ -122,6 +126,28 @@ struct FMars_Fragment_Oscillator
     float32 Envelope = 0.0f;
 }
 
+// The three fields of FMars_Fragment_Oscillator as a value: what a replicated owner anchors and aligns a copy to.
+struct FMars_Oscillator_Sample
+{
+    UPROPERTY()
+    EMars_Oscillator_State State = EMars_Oscillator_State::Stopped;
+
+    UPROPERTY()
+    float32 Time = 0.0f;
+
+    UPROPERTY()
+    float32 Envelope = 0.0f;
+
+    FMars_Oscillator_Sample() {}
+
+    FMars_Oscillator_Sample(EMars_Oscillator_State InState, float32 InTime, float32 InEnvelope)
+    {
+        State = InState;
+        Time = InTime;
+        Envelope = InEnvelope;
+    }
+}
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Signals
 //--------------------------------------------------------------------------------------------------------------------------
@@ -157,9 +183,26 @@ struct FMars_Request_Oscillator_SetRunning
     }
 }
 
-// SetRunning is absolute: the latest one wins.
+// Sets the swing outright (state, phase and envelope), signalling the edges it crosses.
+struct FMars_Request_Oscillator_Align
+{
+    UPROPERTY()
+    FMars_Oscillator_Sample Sample;
+
+    FMars_Request_Oscillator_Align() {}
+
+    FMars_Request_Oscillator_Align(FMars_Oscillator_Sample InSample)
+    {
+        Sample = InSample;
+    }
+}
+
+// SetRunning is absolute: the latest one wins. Align is absolute: the latest one wins, applied after SetRunning.
 struct FMars_Fragment_Oscillator_Requests
 {
     UPROPERTY()
     TArray<FMars_Request_Oscillator_SetRunning> SetRunningRequests;
+
+    UPROPERTY()
+    TArray<FMars_Request_Oscillator_Align> AlignRequests;
 }

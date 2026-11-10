@@ -1,6 +1,7 @@
 // One rigid cage span. Root local +Y crosses the gap; the seated deck spans Y [0, DeckLength], top Z 0.
 // Retraction translates the entire cage by -Travel. Fixed bank floors, guard jambs/transoms and storage enclosure belong
-// to the map. The terminal latch resets only with a fresh entity/world; this local prototype does not replicate.
+// to the map. The terminal latch resets only with a fresh entity/world; every machine runs its own copy (see the stance
+// above _Replication).
 struct FMars_SlidingBridge_Spec
 {
     UPROPERTY()
@@ -108,6 +109,9 @@ mixin FMars_Validation Validate(const FMars_SlidingBridge_Spec& Self)
 class UMars_SlidingBridge_EntityScript : UCk_GenericEntityScript_UE
 {
     default _ShowInPlaceActors = true;
+    // Stance D for now: every machine builds and runs its own copy (a client's is self-authoritative); the haul state lives
+    // on this script and the windlass and guards on scene nodes, so nothing here can replicate until the windlass is a
+    // kernel on the root, with the operator stream.
     default _Replication = ECk_Replication::DoesNotReplicate;
 
     UPROPERTY(ExposeOnSpawn)

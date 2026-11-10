@@ -1,3 +1,9 @@
+// SPLIT. The phase anchor (FMars_Fragment_Pendulum: the authority's oscillator sample and the server time it was taken
+// at) is the replicated ledger, written only by the authority's setup processor on every run-state change and rest. The
+// swing itself is stance D: every machine runs its own oscillator, and a client aligns it to the anchor advanced by the
+// server clock (on each new anchor, and through the phase lock while it drifts). The sink, the arming and the hit
+// forwarding (OnTriggered) are the authority's.
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
 //--------------------------------------------------------------------------------------------------------------------------
@@ -62,19 +68,44 @@ struct FMars_Fragment_Pendulum_Params
 {
     UPROPERTY()
     EMars_PoweredBehavior Powered = EMars_PoweredBehavior::SuppressWhilePowered;
+
+    UPROPERTY()
+    FCk_Handle_Oscillator Oscillator;
+
+    UPROPERTY()
+    FCk_Handle_Hazard Hazard;
+}
+
+namespace constants_pendulum
+{
+    // How far a client's swing may drift from the authority's anchored phase before the phase lock re-aligns it.
+    const float32 k_PhaseToleranceSeconds = 0.05f;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 // State
 //--------------------------------------------------------------------------------------------------------------------------
 
+// The replicated phase anchor: the authority's swing as sampled at AnchorServerSeconds on the server's clock.
 struct FMars_Fragment_Pendulum
 {
     UPROPERTY()
-    FCk_Handle_Oscillator Oscillator;
+    FMars_Oscillator_Sample Swing;
 
     UPROPERTY()
-    FCk_Handle_Hazard Hazard;
+    float64 AnchorServerSeconds = 0.0;
+
+    // Every anchor the authority wrote: a restart from the same sample is not a diff.
+    UPROPERTY()
+    int32 Anchors = 0;
+}
+
+// Non-authority only (the authority's setup removes it): the ledger as this machine last applied it, seeded with the
+// ledger as Add composed it, so a value that replicated before the setup ran is still applied.
+struct FMars_Fragment_Pendulum_Mirror
+{
+    UPROPERTY()
+    FMars_Fragment_Pendulum Last;
 }
 
 struct FMars_Tag_Pendulum_NeedsSetup {}
