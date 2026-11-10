@@ -230,10 +230,111 @@ struct FMars_TPBody_HoldQuery
     FTransform Swing;
 }
 
+// How the chef's arms throw a bare-fisted jab (Config.TPBody.Punch): each fist travels from Guard to Blow in the hold's
+// hand frame (FMars_TPBody_Hold::HandFrame: X forward, Y the chef's right, Z up; unscaled body units). Both are the right
+// arm's; the left mirrors Y. The arms are short (a shoulder reaches about 17 body units): a Blow past their reach only
+// straightens the arm toward it, which is the jab.
+struct FMars_TPBody_Punch
+{
+    // The fist cocked beside the chest, where a jab starts and ends.
+    UPROPERTY()
+    FVector Guard = FVector(-14.0, 9.0, -3.0);
+
+    // The fist at the blow: out in front, in toward the centre line and a little up.
+    UPROPERTY()
+    FVector Blow = FVector(4.0, 4.0, 3.0);
+
+    // The arm leaves its locomotion pose for the jab over this first share of the fist's travel, 0..1, and goes back to
+    // it over the same share at the end.
+    UPROPERTY()
+    float32 RaiseFraction = 0.3f;
+}
+
+mixin FMars_Validation Validate(const FMars_TPBody_Punch& Self)
+{
+    if ((utils_held_view::Get_IsFinite(Self.Guard) && utils_held_view::Get_IsFinite(Self.Blow)) == false)
+    { return FMars_Validation(f"Guard [{Self.Guard}] / Blow [{Self.Blow}] is not finite"); }
+
+    // A NaN fails the comparison, so it is rejected too.
+    if ((Self.RaiseFraction > 0.0f && Self.RaiseFraction <= 1.0f) == false)
+    { return FMars_Validation(f"RaiseFraction [{Self.RaiseFraction}] is outside (0, 1]"); }
+
+    return FMars_Validation();
+}
+
+// One arm's share of a jab.
+struct FMars_TPBody_PunchArm
+{
+    // The fist's travel as the gloves ease it: 0 at home, 1 at the blow (utils_fphands::Get_PunchAlpha).
+    UPROPERTY()
+    float32 Alpha = 0.0f;
+
+    // The glove's grip rotation at the blow, hand node space (FMars_FPHands_PunchSpec).
+    UPROPERTY()
+    FQuat GripRotation = FQuat::Identity;
+
+    // The hand bone relative to its grip bone (the inverse of the grip bone's reference pose under the hand).
+    UPROPERTY()
+    FTransform HandInGrip;
+
+    FMars_TPBody_PunchArm() {}
+
+    FMars_TPBody_PunchArm(float32 InAlpha, FQuat InGripRotation, FTransform InHandInGrip)
+    {
+        Alpha = InAlpha;
+        GripRotation = InGripRotation;
+        HandInGrip = InHandInGrip;
+    }
+}
+
+// What the body's arm targets for the jabs in flight are built from.
+struct FMars_TPBody_PunchQuery
+{
+    // Its hand frame and elbow pole targets.
+    UPROPERTY()
+    FMars_TPBody_Hold Hold;
+
+    UPROPERTY()
+    FMars_TPBody_Punch Punch;
+
+    UPROPERTY()
+    FMars_TPBody_PunchArm Right;
+
+    UPROPERTY()
+    FMars_TPBody_PunchArm Left;
+}
+
 // HeldView is the PlayerCharacter's own namespace by ruling: the replicated hold view and the body's arm math have no
 // typed-handle feature behind them, and they serve only AMars_PlayerCharacter and its anim instance.
 namespace utils_held_view
 {
+    // Both arms' targets for the jabs in flight (empty hands), taken as they are, like a swing: each fist is laid out in
+    // the hold's hand frame between Guard and Blow by its alpha, with the gloves' punch rotation, and converted to its
+    // hand bone. A fist at home leaves its arm in the locomotion pose (alpha 0).
+    FMars_TPBody_HoldFrame Make_PunchFrame(const FMars_TPBody_PunchQuery& InQuery)
+    {
+        auto Result = FMars_TPBody_HoldFrame();
+        Result.Right = Make_PunchArm(InQuery, EMars_Hand::Right);
+        Result.Left = Make_PunchArm(InQuery, EMars_Hand::Left);
+        return Result;
+    }
+
+    // InHand's arm for its fist's travel: at Guard for alpha 0, at Blow for 1, weighted in over Punch.RaiseFraction.
+    FMars_TPBody_ArmTarget Make_PunchArm(const FMars_TPBody_PunchQuery& InQuery, EMars_Hand InHand)
+    {
+        const auto IsRight = InHand == EMars_Hand::Right;
+        const auto Arm = IsRight ? InQuery.Right : InQuery.Left;
+        const auto Side = IsRight ? 1.0 : -1.0;
+        const auto Guard = FVector(InQuery.Punch.Guard.X, InQuery.Punch.Guard.Y * Side, InQuery.Punch.Guard.Z);
+        const auto Blow = FVector(InQuery.Punch.Blow.X, InQuery.Punch.Blow.Y * Side, InQuery.Punch.Blow.Z);
+        const auto Alpha = Math::Clamp(Arm.Alpha, 0.0f, 1.0f);
+
+        const auto Grip = FTransform(Arm.GripRotation, Math::Lerp(Guard, Blow, float(Alpha)), FVector::OneVector) * InQuery.Hold.HandFrame;
+        auto Target = Make_ArmTarget(Arm.HandInGrip * Grip, IsRight ? InQuery.Hold.ElbowOffset_R : InQuery.Hold.ElbowOffset_L);
+        Target.Alpha = Math::Clamp(Alpha / Math::Max(InQuery.Punch.RaiseFraction, KINDA_SMALL_NUMBER), 0.0f, 1.0f);
+        return Target;
+    }
+
     // The view of an item held by the local gloves: its Presentation look and utils_fphands::Make_Hold's grip.
     // Not holding when the item is invalid or has no Presentation.
     FMars_HeldView Make(const FCk_Handle_Item& InItem)

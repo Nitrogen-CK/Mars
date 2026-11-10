@@ -98,6 +98,12 @@ class AMars_PlayerCharacter : AMars_Character
     // The melee swing of the hand (HandSwing): offsets the swing node the gloves and held item hang off, and is read by
     // Update_BodyHold to swing the body's arms.
     private FCk_Handle_HandSwing _HandSwing;
+    // The bare fists (Punch): the owner's UMars_SmTask_PunchIntent throws them, the other machines' copies mirror each
+    // jab (Multicast_PlayPunch); the gloves read them (FPHands) and Update_BodyHold throws the body's arms by them.
+    private FCk_Handle_Punch _Punch;
+    // A bare fist's blow plays a surface's light knock this loud (constants_surface_fx: between the light and the heavy
+    // impact speeds), never the heavy hit of a held item's blow.
+    private const float32 k_FistKnockIntensity = 220.0f;
 
     // The player SM (UMars_SmState_Alive) and whether this copy started it (TryStartPlayerSm).
     private FCk_Handle_StateMachine _Sm;
@@ -248,6 +254,15 @@ class AMars_PlayerCharacter : AMars_Character
         utils_team::Add(Player, ECk_Team_ID::One, ECk_Replication::DoesNotReplicate);
         auto Dealer = utils_damage_dealer::Add(Player, FMars_DamageDealer_Spec());
         Dealer.BindTo_OnDamageDealt(FMars_Delegate_DamageDealer_OnDamageDealt(this, n"OnDamageDealt"));
+
+        // The fists deal their blows through the dealer above, from the viewpoint composed below. A rejected spec ensures
+        // in Add and leaves the player without fists.
+        _Punch = utils_punch::Add(Player, Config.Punch);
+        if (ck::IsValid(_Punch))
+        {
+            _Punch.BindTo_OnThrown(FMars_Delegate_Punch_OnThrown(this, n"OnPunchThrown"));
+            _Punch.BindTo_OnBlow(FMars_Delegate_Punch_OnBlow(this, n"OnPunchBlow"));
+        }
 
         // The character's stride clock; the head and hand bobs below read it. The spec's tunables come from the config,
         // its motion source is this pawn's movement component.
@@ -430,7 +445,8 @@ class AMars_PlayerCharacter : AMars_Character
     // surface's impact (SurfaceFx) at the contact and shake this player's camera: the striker's by the item's
     // Strike.HitShake, the victim's by Config.Combat.HurtShake. The striker's zone cue is the dealer's OnDamageDealt, not
     // Health.OnDamaged: a leg hit spills to the body and damages twice. Every zone plays as flesh until a zone names its
-    // surface; the world plays its phys mat's surface.
+    // surface; the world plays its phys mat's surface. A bare fist's blow (a Punch jab: its causer is the dealer itself,
+    // no item) plays the surface's light knock instead of the heavy hit, and shakes nothing.
     //----------------------------------------------------------------------------------------------------------------------
 
     // A held item's strike was stopped by the world (a wall, a prop) short of any zone (UMars_SmTask_ItemUse_Strike).
@@ -452,8 +468,29 @@ class AMars_PlayerCharacter : AMars_Character
         if (utils_net::Get_CanExecuteCosmeticEvents(InDealer) == false)
         { return; }
 
-        PlayImpactFx(InDealer, GameplayTag::MakeContainerFromTag(GameplayTags::Surface_Flesh), Make_Contact(InEvent));
+        const auto Flesh = GameplayTag::MakeContainerFromTag(GameplayTags::Surface_Flesh);
+        if (InEvent.Source.Causer == InEvent.Source.Instigator)
+        {
+            PlayKnockFx(InDealer, Flesh, Make_Contact(InEvent));
+            return;
+        }
+
+        PlayImpactFx(InDealer, Flesh, Make_Contact(InEvent));
         PlayStrikeShake(InDealer, InEvent.Source.Causer.As_Item(ECk_SanityCheck::UnChecked));
+    }
+
+    // A jab's blow (Punch.OnBlow, the thrower's own copy only). A zone hit plays through the dealer's OnDamageDealt; a
+    // fist the world stops knocks on its surface.
+    UFUNCTION()
+    private void OnPunchBlow(FCk_Handle_Punch InPunch, EMars_Hand InHand, FCk_ShapeCast_Result InHit)
+    {
+        if (InHit.Get_HitKind() != ECk_ProbeTrace_HitKind::World || utils_net::Get_CanExecuteCosmeticEvents(InPunch) == false)
+        { return; }
+
+        auto Contact = FMars_SurfaceFx_Contact();
+        Contact.Location = InHit.Get_HitLocation();
+        Contact.Normal = InHit.Get_SurfaceNormal();
+        PlayKnockFx(InPunch, utils_surface_fx::Get_SurfaceTags(InHit.Get_PhysicalMaterial().Get()), Contact);
     }
 
     // Only the local receiver binds this (TryConstructCombatReceiver), so the victim is always this machine's player.
@@ -469,14 +506,27 @@ class AMars_PlayerCharacter : AMars_Character
 
     private void PlayImpactFx(FCk_Handle InPlayer, FGameplayTagContainer InSurfaceTags, FMars_SurfaceFx_Contact InContact)
     {
+        utils_surface_fx::Play(Make_ImpactEvent(InPlayer, InSurfaceTags, InContact));
+    }
+
+    // A bare fist's blow: the surface's light knock.
+    private void PlayKnockFx(FCk_Handle InPlayer, FGameplayTagContainer InSurfaceTags, FMars_SurfaceFx_Contact InContact)
+    {
+        auto Event = Make_ImpactEvent(InPlayer, InSurfaceTags, InContact);
+        Event.Intensity = k_FistKnockIntensity;
+        utils_surface_fx::Play(Event);
+    }
+
+    private FMars_SurfaceFx_Event Make_ImpactEvent(FCk_Handle InPlayer, FGameplayTagContainer InSurfaceTags, FMars_SurfaceFx_Contact InContact) const
+    {
         auto Event = FMars_SurfaceFx_Event();
         Event.Kind = GameplayTags::SurfaceFx_Impact;
         Event.SurfaceTags = InSurfaceTags;
         Event.Contact = InContact;
-        // A blow always plays the surface's heavy hit, never the light knock.
+        // A held item's blow, and a blow taken, always play the surface's heavy hit, never the light knock.
         Event.Intensity = constants_surface_fx::k_ImpactHeavyMinSpeed;
         Event.Instigator = InPlayer;
-        utils_surface_fx::Play(Event);
+        return Event;
     }
 
     // InItem's Strike.HitShake, on the striker's own machine only.
@@ -695,6 +745,34 @@ class AMars_PlayerCharacter : AMars_Character
         { Server_PlayStrike(InRequest); }
     }
 
+    // A fist was thrown here (Punch.OnThrown). The owner's own jab (a Throw whose turn came) is carried to the other
+    // machines, whose copies mirror it on their bodies; a mirrored jab arrives on a copy this machine does not control,
+    // and is not carried on.
+    UFUNCTION()
+    private void OnPunchThrown(FCk_Handle_Punch InPunch, EMars_Hand InHand)
+    {
+        if (IsLocallyControlled())
+        { Server_PlayPunch(InHand); }
+    }
+
+    // Unreliable, both ways: a jab is a quarter-second cosmetic on the other machines, thrown several times a second. A
+    // lost one is skipped, and the next names its own hand.
+    UFUNCTION(Server, Unreliable)
+    void Server_PlayPunch(EMars_Hand InHand)
+    {
+        Multicast_PlayPunch(InHand);
+    }
+
+    // The owner's copy already threw it. A copy whose entity is not composed yet shows no jab.
+    UFUNCTION(NetMulticast, Unreliable)
+    void Multicast_PlayPunch(EMars_Hand InHand)
+    {
+        if (IsLocallyControlled() || ck::Is_NOT_Valid(_Punch))
+        { return; }
+
+        _Punch.Request_Mirror(FMars_Request_Punch_Mirror(InHand));
+    }
+
     UFUNCTION(Server)
     void Server_PlayEmote(EMars_FPEmote InEmote)
     {
@@ -830,22 +908,45 @@ class AMars_PlayerCharacter : AMars_Character
     // Eases the arms toward _HeldView's hold. Driven by UMars_Chef_AnimInstance's update (the body's anim always ticks,
     // see Mesh's VisibilityBasedAnimTickOption), so the arms move exactly as often as the pose is evaluated and the
     // character needs no actor tick. While the hand swings (a held item's strike), the hold is rebuilt around the
-    // swing's pose every update and taken as is: the swing is the motion, and easing it would blunt the blow.
+    // swing's pose every update and taken as is: the swing is the motion, and easing it would blunt the blow. With empty
+    // hands the fists' jabs (Punch) throw the arms the same way, each arm by its own fist.
     void Update_BodyHold(float32 InDeltaSeconds)
     {
         auto Target = _BodyHoldTarget;
         const auto& Speed = Config.TPBody.Hold.InterpSpeed;
         auto Step = Speed.IsSet() ? Math::Clamp(InDeltaSeconds * Speed.GetValue(), 0.0f, 1.0f) : 1.0f;
-        if (_HeldView.Grip.Kind != EMars_FPHands_HoldKind::Empty && ck::IsValid(_HandSwing) && _HandSwing.Get_IsSwinging())
+        const auto IsEmptyHanded = _HeldView.Grip.Kind == EMars_FPHands_HoldKind::Empty;
+        if (IsEmptyHanded == false && ck::IsValid(_HandSwing) && _HandSwing.Get_IsSwinging())
         {
             auto Query = _BodyHoldQuery;
             Query.Swing = _HandSwing.Get_Pose();
             Target = utils_held_view::Make_HoldFrame(Query);
             Step = 1.0f;
         }
+        else if (IsEmptyHanded && ck::IsValid(_Punch) && _Punch.Get_IsPunching())
+        {
+            Target = utils_held_view::Make_PunchFrame(Make_BodyPunchQuery());
+            Step = 1.0f;
+        }
 
         _BodyHoldFrame.Left = utils_held_view::Ease_Arm(_BodyHoldFrame.Left, Target.Left, Step);
         _BodyHoldFrame.Right = utils_held_view::Ease_Arm(_BodyHoldFrame.Right, Target.Right, Step);
+    }
+
+    // The body's jabs this update: each fist's travel eased as the gloves ease it (Config.FPHands.Punch), with the
+    // gloves' punch rotations, on the body's own arms.
+    private FMars_TPBody_PunchQuery Make_BodyPunchQuery()
+    {
+        const auto& Gloves = Config.FPHands.Punch;
+        const auto Alpha_R = utils_fphands::Get_PunchAlpha(Gloves, _Punch.Get_Stroke(EMars_Hand::Right), _Punch.Get_StrokeAlpha(EMars_Hand::Right));
+        const auto Alpha_L = utils_fphands::Get_PunchAlpha(Gloves, _Punch.Get_Stroke(EMars_Hand::Left), _Punch.Get_StrokeAlpha(EMars_Hand::Left));
+
+        auto Query = FMars_TPBody_PunchQuery();
+        Query.Hold = Config.TPBody.Hold;
+        Query.Punch = Config.TPBody.Punch;
+        Query.Right = FMars_TPBody_PunchArm(Alpha_R, Gloves.GripRotation_R, Get_HandInGrip(BodyGripBone_R));
+        Query.Left = FMars_TPBody_PunchArm(Alpha_L, Gloves.GripRotation_L, Get_HandInGrip(BodyGripBone_L));
+        return Query;
     }
 
     // Shows _HeldView on the body: the item mesh relative to grip_r where the first-person system puts it relative to the

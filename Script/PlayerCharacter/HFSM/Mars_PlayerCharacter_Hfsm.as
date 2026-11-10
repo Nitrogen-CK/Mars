@@ -72,8 +72,9 @@ class UMars_SmState_Downed : UCk_SmState_EntityScript
     }
 }
 
-// The free-roam interaction mode: every task that turns input or the view trace into an interaction, an item use, an emote
-// or a ladder mount. Operating replaces it wholesale, so none of them can fire while a station holds the player.
+// The free-roam interaction mode: every task that turns input or the view trace into an interaction, an item use, a
+// bare-fisted jab, an emote or a ladder mount. Operating replaces it wholesale, so none of them can fire while a station
+// holds the player.
 class UMars_SmState_Locomotion : UCk_SmState_EntityScript
 {
     UFUNCTION(BlueprintOverride)
@@ -85,6 +86,7 @@ class UMars_SmState_Locomotion : UCk_SmState_EntityScript
         AddTask(InHandle, UMars_SmTask_InteractionFocus);
         AddTask(InHandle, UMars_SmTask_UseIntentToResolver);
         AddTask(InHandle, UMars_SmTask_PrimaryIntentToResolver);
+        AddTask(InHandle, UMars_SmTask_PunchIntent);
         AddTask(InHandle, UMars_SmTask_ManipulateControl);
         AddTask(InHandle, UMars_SmTask_HotbarIntents);
         AddTask(InHandle, UMars_SmTask_EmoteIntents);

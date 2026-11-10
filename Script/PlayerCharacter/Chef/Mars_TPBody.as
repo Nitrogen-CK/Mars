@@ -1,7 +1,8 @@
 // The third-person chef body: the character's inherited Mesh, hidden from its owner (who sees the first-person gloves)
 // and seen by everyone else. Composed by AMars_PlayerCharacter from Config.TPBody; its emotes are montages played on the
 // ABP's DefaultSlot (AMars_PlayerCharacter::Request_Emote), its held-item strike is the procedural HandSwing carried
-// through the arms' IK (Mars_HeldView.as, AMars_PlayerCharacter::Request_Strike).
+// through the arms' IK (Mars_HeldView.as, AMars_PlayerCharacter::Request_Strike), and its bare-fisted jabs are the Punch
+// feature's fists carried through the same IK (AMars_PlayerCharacter::Update_BodyHold).
 
 // The body's montages: one per EMars_FPEmote, as the gloves' FMars_FPHands_EmoteSpec::Montages. Each plays through the
 // slot its montage names.
@@ -96,6 +97,10 @@ struct FMars_TPBody_Spec
     // Where the hands hold an item other players see (Mars_HeldView.as).
     UPROPERTY()
     FMars_TPBody_Hold Hold;
+
+    // How the arms throw a bare-fisted jab other players see (Mars_HeldView.as), laid out in Hold's hand frame.
+    UPROPERTY()
+    FMars_TPBody_Punch Punch;
 }
 
 // The body mesh's location relative to the capsule's centre, with its feet on the capsule's base. InCrouchDrop is how
@@ -165,6 +170,10 @@ mixin FMars_Validation Validate(const FMars_TPBody_Spec& Self)
     const auto HoldValidation = Self.Hold.Validate();
     if (HoldValidation.IsValid() == false)
     { return FMars_Validation(f"Hold: {HoldValidation.Get_Error()}"); }
+
+    const auto PunchValidation = Self.Punch.Validate();
+    if (PunchValidation.IsValid() == false)
+    { return FMars_Validation(f"Punch: {PunchValidation.Get_Error()}"); }
 
     return FMars_Validation();
 }

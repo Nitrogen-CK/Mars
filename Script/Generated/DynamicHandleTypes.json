@@ -604,6 +604,15 @@
 			]
 		},
 		{
+			"TypeName": "FCk_Handle_Punch",
+			"ShortName": "Punch",
+			"Description": "Bare-fisted jabs: one light blow per throw, the hands alternating, each fist on its own short clock",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_PunchHandle",
+			"RequiredFragments": [
+				"Mars_Feature_Punch"
+			]
+		},
+		{
 			"TypeName": "FCk_Handle_RatDen",
 			"ShortName": "RatDen",
 			"Description": "A rat den: portal frames, resident slots (dormant, pending, outside, dead cooldown) with emergence operation ids, and the eye occupancy proxy",

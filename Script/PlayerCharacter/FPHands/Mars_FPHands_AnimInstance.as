@@ -115,9 +115,12 @@ class UMars_FPHands_AnimInstance : UAnimInstance
         const auto Viewpoint = Character.TryGet_ActorEntityHandle().As_PlayerViewpoint().Get_Viewpoint();
         const auto ComponentWorld = Mesh.GetRelativeTransform() * utils_transform::Get_EntityCurrentTransform(Viewpoint);
 
-        // The reach is blended after the easing, so the gesture timing stays crisp.
-        GripTarget_L = (Blend(Offset(Grips.Left, Left.Swing), Left.ReachGrip, Left.ReachAlpha) * HandWorld).GetRelativeTransform(ComponentWorld);
-        GripTarget_R = (Blend(Offset(Grips.Right, Right.Swing), Right.ReachGrip, Right.ReachAlpha) * HandWorld).GetRelativeTransform(ComponentWorld);
+        // The reach is blended after the easing, so the gesture timing stays crisp; a jab is blended over that, on the
+        // Punch feature's own clock.
+        const auto ReachedLeft = Blend(Offset(Grips.Left, Left.Swing), Left.ReachGrip, Left.ReachAlpha);
+        const auto ReachedRight = Blend(Offset(Grips.Right, Right.Swing), Right.ReachGrip, Right.ReachAlpha);
+        GripTarget_L = (Blend(ReachedLeft, Left.PunchGrip, Left.PunchAlpha) * HandWorld).GetRelativeTransform(ComponentWorld);
+        GripTarget_R = (Blend(ReachedRight, Right.PunchGrip, Right.PunchAlpha) * HandWorld).GetRelativeTransform(ComponentWorld);
 
         GripPoseIndex_L = int32(Left.Pose);
         GripPoseIndex_R = int32(Right.Pose);

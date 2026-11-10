@@ -150,6 +150,11 @@ class UMars_PlayerCharacter_Config : UDataAsset
     UPROPERTY(Category = "Body")
     FMars_PlayerCharacter_Combat Combat;
 
+    // The bare fists: Primary with empty hands and nothing to use it on throws a jab (UMars_SmTask_PunchIntent). What
+    // the gloves and the body show of it is FPHands.Punch and TPBody.Punch.
+    UPROPERTY(Category = "Body")
+    FMars_Punch_Spec Punch;
+
     UPROPERTY(Category = "View")
     FMars_PlayerCharacter_View View;
 

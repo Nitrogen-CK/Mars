@@ -136,6 +136,10 @@ struct FMars_FPHands_Spec
     UPROPERTY()
     FMars_FPHands_PushSpec Push;
 
+    // Throwing a bare-fisted jab (the Punch feature's fists).
+    UPROPERTY()
+    FMars_FPHands_PunchSpec Punch;
+
     // Fingers stop on the surface of what the gloves hold or grab (CR_FPHands_Contact).
     UPROPERTY()
     FMars_FPHands_ContactSpec Contact;
@@ -223,6 +227,14 @@ struct FMars_FPHands_HandTarget
 
     UPROPERTY()
     float32 ReachAlpha = 0.0f;
+
+    // A jab: the glove at the blow (hand node space) and how far along it the fist is. Blended last, over the reach, so
+    // a jab reads the same out of a lean as out of rest.
+    UPROPERTY()
+    FTransform PunchGrip;
+
+    UPROPERTY()
+    float32 PunchAlpha = 0.0f;
 
     UPROPERTY()
     EMars_HandGripPose Pose = EMars_HandGripPose::Relaxed;
@@ -576,7 +588,8 @@ namespace utils_fphands
 //--------------------------------------------------------------------------------------------------------------------------
 
 // Where the gloves go this frame, in the hand node's space: the rest targets for the hold, then a reach (or the
-// focus lean) on each glove. A push follows through from the hold the item launched from instead.
+// focus lean) on each glove. A push follows through from the hold the item launched from instead. A jab in flight
+// (the Punch feature) is laid over either.
 mixin void Get_HandTargets(const FCk_Handle_FPHands& Self, const FMars_FPHands_TargetFrame& InFrame, FMars_FPHands_HandTargets& OutTargets)
 {
     const auto& Rest = Self.Get_Spec().Rest;
@@ -584,12 +597,14 @@ mixin void Get_HandTargets(const FCk_Handle_FPHands& Self, const FMars_FPHands_T
     {
         OutTargets = utils_fphands::Get_RestTargets(Rest, Self.Get_PushHold(), InFrame);
         Self.Apply_HandPush(OutTargets);
+        Self.Apply_HandPunch(OutTargets);
         return;
     }
 
     OutTargets = utils_fphands::Get_RestTargets(Rest, Self.Get_Hold(), InFrame);
     Self.Apply_HandReach(InFrame.HandWorld, EMars_Hand::Right, OutTargets.Right);
     Self.Apply_HandReach(InFrame.HandWorld, EMars_Hand::Left, OutTargets.Left);
+    Self.Apply_HandPunch(OutTargets);
 }
 
 // A glove takes the larger of its focus lean and its reach (to its own grip on the target); the reach's finger pose (or
