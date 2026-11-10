@@ -45,6 +45,9 @@ struct FMars_NetSpike_SpawnParams
     UPROPERTY()
     bool WithRef = false;
 
+    UPROPERTY()
+    bool ChildInConstruct = false;
+
     FMars_NetSpike_SpawnParams() {}
 
     FMars_NetSpike_SpawnParams(FVector InLocation, int32 InPayload)
@@ -73,6 +76,11 @@ class UMars_NetSpike_EntityScript : UCk_GenericEntityScript_UE
     UPROPERTY(ExposeOnSpawn)
     bool WithRef = false;
 
+    // DoConstruct requests a Replicates child of this entity, payload Payload * 10 + 1, on every machine (a client's
+    // request is the placeholder the replicated child resolves).
+    UPROPERTY(ExposeOnSpawn)
+    bool ChildInConstruct = false;
+
     UFUNCTION(BlueprintOverride)
     ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
     {
@@ -89,6 +97,9 @@ class UMars_NetSpike_EntityScript : UCk_GenericEntityScript_UE
         if (WithRef)
         { InHandle.Add_Fragment(FMars_Fragment_NetSpike_Ref(), ECk_Replication::Replicates); }
 
+        if (ChildInConstruct)
+        { utils_net_spike::Request_Child(InHandle, utils_net_spike::Get_ConstructChildPayload(Payload)); }
+
         return ECk_EntityScript_ConstructionFlow::Finished;
     }
 }
@@ -101,6 +112,16 @@ namespace utils_net_spike
             FCk_Delegate_Inventory_CustomCanAcceptItem_Dynamic(), FCk_Delegate_Inventory_CustomCanStackItems_Dynamic());
         Params.Set_StackingPolicy(ECk_Inventory_StackingPolicy::NoStacking);
         return utils_inventory_data_only::Add(InOwner, Params, ECk_Replication::Replicates);
+    }
+
+    int32 Get_ConstructChildPayload(int32 InParentPayload)
+    { return InParentPayload * 10 + 1; }
+
+    // A flagless Replicates spike child of InParent.
+    void Request_Child(FCk_Handle& InParent, int32 InPayload)
+    {
+        auto Params = FMars_NetSpike_SpawnParams(FVector::ZeroVector, InPayload);
+        utils_entity_script::Request_SpawnEntity(InParent, UMars_NetSpike_EntityScript, Params);
     }
 
     // The spike entity on InAny's machine whose DoConstruct received InPayload; invalid while it has not arrived.

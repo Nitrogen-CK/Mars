@@ -65,6 +65,8 @@ class UMars_Processor_Anchor_HandleRequests : UCk_Processor_Script_Base_UE
                 auto Pending = utils_entity_script::Request_SpawnEntity(
                     Owner, Row.Script, FMars_Anchor_SpawnParams(Self.Get_Transform(), Request.Context));
                 InAnchorComp.Spawned = Pending.Get_EntityUnderConstruction();
+                if (Row.Net == EMars_AnchorRow_Net::Replicated)
+                { utils_net_spawn::Expect_Replicated(InAnchorComp.Spawned); }
             }
 
             InAnchorComp.State = EMars_Anchor_State::Spawned;

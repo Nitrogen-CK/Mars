@@ -1,7 +1,8 @@
 // What a resolved anchor can become. Every candidate takes the anchor's SpawnTransform and its FMars_Anchor_Context
 // (property `Anchor`). A Replicates candidate's row is flagged Replicated (Mars_Anchor_Presets.as): on the authority it
 // spawns under the replicated spawn owner and re-runs DoConstruct on clients with the same params, where its own
-// Replicates children come back as placeholders and arrive by replication. Every other candidate is the anchor's child.
+// Replicates children come back as placeholders and arrive by replication. A Replicates child requested in DoConstruct
+// replicates whichever scheduler pass built its candidate. Every other candidate is the anchor's child.
 // The street runs along local X; a gate's opening spans local Y (Mars_Gate_EntityScript.as), so a gate placed here blocks
 // travel along X. Existing presets are spawned with runtime params, never subclassed or edited.
 

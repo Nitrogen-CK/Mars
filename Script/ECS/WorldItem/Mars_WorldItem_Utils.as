@@ -332,7 +332,8 @@ namespace utils_world_item
     // is its replicated child), else the replicated spawn owner (utils_mars_net::Get_SpawnOwnerFor), the same on a listen
     // host, a dedicated server and in standalone. Under the spawn owner a non-transient InOwner is kept as the tether
     // (FMars_Fragment_WorldItem_Tether): the authority ends the item once InOwner is gone. A client, and an authority whose
-    // spawn owner is not published yet, spawn nothing and get an invalid pending handle.
+    // spawn owner is not published yet, spawn nothing and get an invalid pending handle. The host checks that the item
+    // replicates (utils_net_spawn::Expect_Replicated).
     FCk_Handle_PendingEntityScript Request_SpawnWorldEntity(const FCk_Handle& InOwner, TSubclassOf<UMars_WorldItem_EntityScript> InClass,
                                                             FAngelscriptAnyStructParameter InSpawnParams)
     {
@@ -345,10 +346,11 @@ namespace utils_world_item
         { return FCk_Handle_PendingEntityScript(); }
 
         auto Pending = UCk_Utils_EntityScript_UE::Request_SpawnEntity(Owner, InClass, InSpawnParams.InstancedStruct);
+        auto Entity = Pending.Get_EntityUnderConstruction();
+        utils_net_spawn::Expect_Replicated(Entity);
         if (Owner == InOwner || utils_entity_lifetime::Get_IsTransientEntity(InOwner))
         { return Pending; }
 
-        auto Entity = Pending.Get_EntityUnderConstruction();
         if (ck::IsValid(Entity))
         { Entity.Add_Fragment(FMars_Fragment_WorldItem_Tether(InOwner)); }
 

@@ -14,7 +14,8 @@ class UMars_Shortcut_EntityScript : UCk_GenericEntityScript_UE
 {
     default _ShowInPlaceActors = true;
     // Stance A: placed by the authority's spawner; the shortcut, its root transform and its gate and control ledgers
-    // replicate. Its lever is a ManuallyCompleted grip, authority-local until the manipulation stream exists.
+    // replicate; its gate and lever, requested in DoConstruct, replicate whichever scheduler pass built the shortcut.
+    // Its lever is a ManuallyCompleted grip, authority-local until the manipulation stream exists.
     default _Replication = ECk_Replication::Replicates;
 
     UPROPERTY(ExposeOnSpawn)
