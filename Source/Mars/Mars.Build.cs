@@ -16,6 +16,11 @@ public class Mars : ModuleRules
         if (Target.bBuildEditor)
         {
             PrivateDependencyModuleNames.AddRange(new string[] { "UnrealEd", "Sockets" });
+
+            // The generated net-autotest stubs under Tests/Net/Generated include CkTests/Net/* (WITH_EDITOR && WITH_DEV_AUTOMATION_TESTS).
+            // The CkEcs headers those pull in register their AngelScript binds inline, so the stub's object file links
+            // against the modules that own the registration machinery and the handle.
+            PrivateDependencyModuleNames.AddRange(new string[] { "CkTests", "CkEcs", "CkCore", "AngelscriptCode" });
         }
 
         SetupIrisSupport(Target, true);
