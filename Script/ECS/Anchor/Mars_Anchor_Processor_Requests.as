@@ -51,8 +51,19 @@ class UMars_Processor_Anchor_HandleRequests : UCk_Processor_Script_Base_UE
             InAnchorComp.Spawned = FCk_Handle();
             if (Row.Script != nullptr)
             {
+                // A Replicates candidate needs an owner with a replication driver, and the anchor has none: a Replicated
+                // row goes under the replicated spawn owner on every authority (the anchor's end of play destroys it). A
+                // Local row is the anchor's child. Spawned keeps it either way, so a Clear destroys it whatever its owner.
+                auto Owner = InHandle;
+                if (Row.Net == EMars_AnchorRow_Net::Replicated)
+                { Owner = utils_mars_net::Get_SpawnOwnerFor(InHandle, InHandle); }
+
+                if (ck::EnsureIfNot(ck::IsValid(Owner),
+                    f"[Anchor] [{Self.Get_AnchorId().ToString()}] resolved a replicated row with no replicated spawn owner (a client's world, or an authority's before the owner was published): nothing spawns"))
+                { continue; }
+
                 auto Pending = utils_entity_script::Request_SpawnEntity(
-                    InHandle, Row.Script, FMars_Anchor_SpawnParams(Self.Get_Transform(), Request.Context));
+                    Owner, Row.Script, FMars_Anchor_SpawnParams(Self.Get_Transform(), Request.Context));
                 InAnchorComp.Spawned = Pending.Get_EntityUnderConstruction();
             }
 

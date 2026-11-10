@@ -49,6 +49,8 @@ class UMars_PantryRatCourt_EntityScript : UCk_GenericEntityScript_UE
     private FCk_Handle _DenEntity;
     private FCk_Handle _PackEntity;
     private FCk_Handle _FoodEntity;
+    // The first pack and food are spawned (Spawn_WorldItems), which waits for the world's replicated spawn owner.
+    private bool _HasWorldItems = false;
     private FCk_Handle_Inventory_DataOnly _CheeseHolder;
     private FCk_Handle_Item _FoodItem;
     private FCk_Handle_Item _CheeseItem;
@@ -112,15 +114,6 @@ class UMars_PantryRatCourt_EntityScript : UCk_GenericEntityScript_UE
         // Phase 5: the den's default shell (BlockAll + Ck.Jolt.NoBake) - no NoCollision override (F4-3 fixed in the den script).
         _DenEntity = utils_entity_script::Request_SpawnEntity(InHandle, UMars_RatDen_EntityScript, DenParams).Get_EntityUnderConstruction();
 
-        _PackEntity = Spawn_Pack(PackLocation);
-
-        auto FoodParams = UMars_FoodItem_EntityScript::Params();
-        FoodParams.SpawnTransform = FTransform(FRotator::ZeroRotator, FoodLocation);
-        FoodParams.Definition = utils_held_item::Make_DefinitionSoft(mars_items::Food_Mushroom());
-        FoodParams.Mode = EMars_WorldItem_Mode::World;
-        _FoodEntity = utils_entity_script::Request_SpawnEntity(ck::TransientEntity(), UMars_FoodItem_EntityScript, FoodParams)
-            .Get_EntityUnderConstruction();
-
         _CheeseHolder = Make_CheeseHolder(InHandle);
 
         utils_timer::Create_Tick(InHandle, FCk_Delegate_Timer(this, n"OnTick"));
@@ -140,13 +133,28 @@ class UMars_PantryRatCourt_EntityScript : UCk_GenericEntityScript_UE
         return FCk_GroundNavVolume_Spec(CourtBounds, Config, Profile);
     }
 
+    // The pack and the food are replicated world items: they go under the world's replicated spawn owner, which is
+    // published a few frames after begin play, so the tick spawns them (and the court's clock starts) once it is there.
+    private void Spawn_WorldItems()
+    {
+        _PackEntity = Spawn_Pack(PackLocation);
+
+        auto FoodParams = UMars_FoodItem_EntityScript::Params();
+        FoodParams.SpawnTransform = FTransform(FRotator::ZeroRotator, FoodLocation);
+        FoodParams.Definition = utils_held_item::Make_DefinitionSoft(mars_items::Food_Mushroom());
+        FoodParams.Mode = EMars_WorldItem_Mode::World;
+        _FoodEntity = utils_world_item::Request_SpawnWorldEntity(ck::TransientEntity(), UMars_FoodItem_EntityScript, FoodParams)
+            .Get_EntityUnderConstruction();
+        _HasWorldItems = true;
+    }
+
     private FCk_Handle Spawn_Pack(FVector InLocation)
     {
         auto PackParams = UMars_Backpack_EntityScript::Params();
         PackParams.Definition = mars_items::Backpack();
         PackParams.Mode = EMars_WorldItem_Mode::World;
         PackParams.SpawnTransform = FTransform(FRotator(0.0, 180.0, 0.0), InLocation);
-        return utils_entity_script::Request_SpawnEntity(_Self, UMars_Backpack_EntityScript, PackParams).Get_EntityUnderConstruction();
+        return utils_world_item::Request_SpawnWorldEntity(_Self, UMars_Backpack_EntityScript, PackParams).Get_EntityUnderConstruction();
     }
 
     private FCk_Handle_Inventory_DataOnly Make_CheeseHolder(FCk_Handle InHandle)
@@ -168,6 +176,14 @@ class UMars_PantryRatCourt_EntityScript : UCk_GenericEntityScript_UE
     UFUNCTION()
     private void OnTick(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
     {
+        if (_HasWorldItems == false)
+        {
+            if (utils_mars_net::Get_HasReplicatedSpawnOwner(_Self) == false)
+            { return; }
+
+            Spawn_WorldItems();
+        }
+
         _Clock += float32(InDeltaT.Get_Seconds());
         Try_Stow();
         Tick_Bot(float32(InDeltaT.Get_Seconds()));
@@ -722,7 +738,7 @@ class UMars_PantryRatCourt_EntityScript : UCk_GenericEntityScript_UE
         FoodParams.SpawnTransform = FTransform(FRotator::ZeroRotator, SecondPackLocation + FVector(150.0, 0.0, 5.0));
         FoodParams.Definition = utils_held_item::Make_DefinitionSoft(mars_items::Food_Mushroom());
         FoodParams.Mode = EMars_WorldItem_Mode::World;
-        _FoodEntity = utils_entity_script::Request_SpawnEntity(ck::TransientEntity(), UMars_FoodItem_EntityScript, FoodParams)
+        _FoodEntity = utils_world_item::Request_SpawnWorldEntity(ck::TransientEntity(), UMars_FoodItem_EntityScript, FoodParams)
             .Get_EntityUnderConstruction();
         Log(f"[PantryRatCourt] a second cheese pack at [{SecondPackLocation.ToString()}] t [{_Clock}]");
     }

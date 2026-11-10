@@ -56,15 +56,25 @@ mixin bool Get_IsCurrentItemLaunched(const FCk_Handle_HeldItemUse& Self)
     return ck::IsValid(Item) && Item == Self.Get_Fragment(FMars_Fragment_HeldItemUse).LaunchedItem;
 }
 
-// Unset with empty hands, or when a Persistent item has lost its world item.
+// Unset with empty hands, or when a Persistent item has lost its world item. Aimed by this machine's view.
 mixin TOptional<FMars_HeldItemUse_LaunchSolution> Get_LaunchSolution(const FCk_Handle_HeldItemUse& Self, EMars_LaunchKind InKind)
+{
+    auto Launch = FMars_HeldItemUse_Launch();
+    Launch.Kind = InKind;
+    return Self.Get_LaunchSolutionFor(Launch);
+}
+
+// As Get_LaunchSolution, aimed by the aim InLaunch carries when it carries one: the launching machine's view, which the
+// authority cannot read for a client's player.
+mixin TOptional<FMars_HeldItemUse_LaunchSolution> Get_LaunchSolutionFor(const FCk_Handle_HeldItemUse& Self,
+    const FMars_HeldItemUse_Launch& InLaunch)
 {
     auto HeldItem = Self.As_HeldItem();
     const auto Item = HeldItem.Get_CurrentItem();
     if (ck::Is_NOT_Valid(Item))
     { return TOptional<FMars_HeldItemUse_LaunchSolution>(); }
 
-    const auto IsThrow = InKind == EMars_LaunchKind::Throw;
+    const auto IsThrow = InLaunch.Kind == EMars_LaunchKind::Throw;
     auto Speed = IsThrow ? constants_held_item_use::k_DefaultThrowSpeed : constants_held_item_use::k_DefaultDropSpeed;
     auto AngularVelocityDeg = FVector::ZeroVector;
     if (Item.Has_Throwable())
@@ -75,20 +85,15 @@ mixin TOptional<FMars_HeldItemUse_LaunchSolution> Get_LaunchSolution(const FCk_H
     }
 
     const auto View = Self.Get_LaunchView();
-    const auto Forward = View.GetRotation().GetForwardVector();
-
-    // Optional: a test carrier has no actor.
     FCk_Handle Carrier = Self;
-    auto PawnVelocity = FVector::ZeroVector;
-    auto Character = Cast<ACharacter>(ck::ToActor(Carrier, ECk_SanityCheck::UnChecked));
-    if (ck::IsValid(Character))
-    { PawnVelocity = Character.GetVelocity(); }
+    const auto Aim = InLaunch.Aim.IsSet() ? InLaunch.Aim.GetValue() : utils_held_item_use::Make_Aim(Carrier);
+    const auto Forward = Aim.Forward;
 
     if (IsThrow)
     { Speed *= Self.Get_ThrowPower(); }
 
     auto Solution = FMars_HeldItemUse_LaunchSolution();
-    Solution.LinearVelocity = Forward * Speed + PawnVelocity;
+    Solution.LinearVelocity = Forward * Speed + Aim.PawnVelocity;
     Solution.AngularVelocityDeg = AngularVelocityDeg;
 
     if (Item.Has_PersistentWorldItem())

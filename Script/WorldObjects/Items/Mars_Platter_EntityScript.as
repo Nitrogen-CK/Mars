@@ -190,7 +190,7 @@ namespace utils_platter
         SpawnParams.Definition = utils_held_item::Make_DefinitionSoft(Definition);
         SpawnParams.Mode = EMars_WorldItem_Mode::World;
 
-        auto Pending = utils_entity_script::Request_SpawnEntity(InOwner, UMars_Platter_EntityScript, SpawnParams);
+        auto Pending = utils_world_item::Request_SpawnWorldEntity(InOwner, UMars_Platter_EntityScript, SpawnParams);
         return Pending.Get_EntityUnderConstruction();
     }
 }

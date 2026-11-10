@@ -7,6 +7,9 @@
 // that UMars_Processor_WorldItem_Mount commits once the body reads Kinematic; it takes the next mount's arrival
 // (Request_ArriveNextMount) when one is fresh. Only a release brings an item home and commits World; a home it reached any
 // other way ensures and commits World here. Nothing is reconciled while a release waits on its transfer.
+//
+// Runs on every machine, but only a linked item reconciles, and an item is linked where its holder seeded or adopted it:
+// the authority. A world item ends only on the authority; its destroy replicates.
 class UMars_Processor_WorldItem_Reconcile : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -108,6 +111,9 @@ class UMars_Processor_WorldItem_Reconcile : UCk_Processor_Script_Base_UE
     // logged: a Persistent body that vanishes with its carrier leaves a trace.
     private void End(FCk_Handle_WorldItem& InWorldItem, const FString& InWhy)
     {
+        if (utils_net::Get_HasAuthority(InWorldItem) == false)
+        { return; }
+
         Log(f"[WorldItem] [{InWorldItem.ToString()}] ends: {InWhy}");
 
         auto SceneNode = InWorldItem.As_SceneNode(ECk_SanityCheck::UnChecked);

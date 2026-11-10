@@ -79,10 +79,10 @@ class UMars_SmTask_ItemUse_Throw : UCk_SmTask_EntityScript
             return;
         }
 
-        // The use interactable is built by HeldItemUse, so its owner always has it.
+        // The use interactable is built by HeldItemUse, so its owner always has it. The throw is the authority's: the cue
+        // carries it there with this machine's aim.
         auto Player = Context.Get_Fragment(FMars_Fragment_InteractionContext).InteractableOwner;
-        auto Use = Player.As_HeldItemUse();
-        Use.Request_Throw(FMars_Request_HeldItemUse_Throw());
+        utils_held_item_use::Fire_LaunchCue(Player, EMars_LaunchKind::Throw);
         Mark_Result(ECk_SmTaskResult::Succeeded);
     }
 }

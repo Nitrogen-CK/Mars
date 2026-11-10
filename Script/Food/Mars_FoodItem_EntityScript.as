@@ -9,6 +9,9 @@ namespace constants_food_item
 // dressed, given its convex body with the food's own surface (only in a game world: Jolt runs nowhere else, and a food
 // placed in a level also composes in the editor's preview world) and the shared world-item tail: a holder, a pickup fitted
 // to the joint's bounds and the WorldItem feature. A joint that fails to import takes the entity with it.
+//
+// Stance SPLIT, as the base world item: spawned through utils_world_item::Request_SpawnWorldEntity, its root transform and
+// holder replicate; the joint and its display are built on every machine from the definition; the body is the authority's.
 class UMars_FoodItem_EntityScript : UMars_WorldItem_EntityScript
 {
     private UMars_Food_Def _Food;
@@ -37,7 +40,7 @@ class UMars_FoodItem_EntityScript : UMars_WorldItem_EntityScript
 
         _Food = FoodTrait.Food;
 
-        utils_transform::Add(InHandle, _Food.Get_JointWorld(SpawnTransform), ECk_Replication::DoesNotReplicate);
+        utils_transform::Add(InHandle, _Food.Get_JointWorld(SpawnTransform), ECk_Replication::Replicates);
         utils_entity_tag::Add(InHandle, n"TAG_MarsWorldItem");
 
         // A rejected definition or spec already ensured in Compose_Joint.
@@ -84,14 +87,16 @@ class UMars_FoodItem_EntityScript : UMars_WorldItem_EntityScript
 
         FCk_Handle Entity = InPiece;
         const UWorld EntityWorld = utils_entity_lifetime::Get_WorldForEntity(Entity);
-        if (ck::IsValid(EntityWorld) && EntityWorld.IsGameWorld())
+        // Authority only: a client-side body would be a second simulation fighting the replicated transform.
+        if (ck::IsValid(EntityWorld) && EntityWorld.IsGameWorld() && utils_net::Get_HasAuthority(Entity))
         {
             auto Piece = InPiece;
             Composition.Body = utils_foodpiece::Add_Body(Piece);
             Composition.BodyProfile = Piece.Get_BodyTuners().CollisionProfileName;
         }
 
-        // A rejected spec destroyed the entity (utils_world_item::Add ensured): nothing to finish.
+        // A rejected spec, or a spawn that bypassed the funnel, destroyed the entity (Compose_WorldItem ensured): nothing to
+        // finish.
         Compose_WorldItem(Entity, Composition);
         if (Entity.Is_WorldItem() == false)
         { return; }

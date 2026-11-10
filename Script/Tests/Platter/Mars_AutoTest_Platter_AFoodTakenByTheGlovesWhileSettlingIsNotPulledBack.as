@@ -51,7 +51,7 @@ class UMars_AutoTest_Platter_AFoodTakenByTheGlovesWhileSettlingIsNotPulledBack :
 
         // A piece outlives its spawner: under the world's transient entity, tracked for cleanup.
         auto PieceOwner = ck::TransientEntity();
-        _FoodEntity = utils_entity_script::Request_SpawnEntity(PieceOwner, UMars_FoodItem_EntityScript, SpawnParams).Get_EntityUnderConstruction();
+        _FoodEntity = utils_world_item::Request_SpawnWorldEntity(PieceOwner, UMars_FoodItem_EntityScript, SpawnParams).Get_EntityUnderConstruction();
         Track_ForCleanup(_FoodEntity);
 
         // Past the platter's longest settle (Settle.MaxSeconds) a freeze would have pulled the slab back.

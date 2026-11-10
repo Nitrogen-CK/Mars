@@ -1,6 +1,9 @@
 // A placed level ingredient that becomes one candidate at run start. The anchor never decides: the run's resolver
-// (Script/ECS/AnchorResolver) picks its row and requests the resolve, and the anchor spawns that row's entity script as
-// its own child (destroying the anchor destroys the candidate).
+// (Script/ECS/AnchorResolver) picks its row and requests the resolve, and the anchor spawns that row's entity script.
+// Stance C for the anchor itself: placed DoesNotReplicate, resolved only where the resolver runs (the authority), and
+// nothing of it replicates. A row flagged Replicated spawns its candidate under the replicated spawn owner, so the
+// candidate (stance A) reaches clients; the anchor's end of play destroys it. Every other row spawns as the anchor's own
+// child (destroying the anchor destroys the candidate).
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
@@ -45,6 +48,15 @@ enum EMars_AnchorRow_Need
     LeverSide
 }
 
+// Whether a row's script is a Replicates class. Local: it spawns as the anchor's child on the machine that resolves.
+// Replicated: it spawns under the replicated spawn owner, so clients receive it.
+// CK-GAP(2026-11-10): no script-visible Get_EffectiveReplication on an entity script class; the anchor row carries it.
+enum EMars_AnchorRow_Net
+{
+    Local,
+    Replicated
+}
+
 // Idle until the resolver resolves it; Spawned once resolved (also when its row spawns nothing); Cleared after a clear.
 enum EMars_Anchor_State
 {
@@ -73,6 +85,11 @@ struct FMars_AnchorTable_Row
     UPROPERTY()
     EMars_AnchorRow_Need Need = EMars_AnchorRow_Need::None;
 
+    // Must match the script's own _Replication: a Replicated row of a DoesNotReplicate script never reaches a client,
+    // and a Local row of a Replicates script builds a host-only candidate with no ensure to say so.
+    UPROPERTY()
+    EMars_AnchorRow_Net Net = EMars_AnchorRow_Net::Local;
+
     FMars_AnchorTable_Row() {}
 
     FMars_AnchorTable_Row(TSubclassOf<UCk_EntityScript_UE> InScript, float32 InWeight, EMars_Anchor_Role InRole)
@@ -88,6 +105,23 @@ struct FMars_AnchorTable_Row
         Weight = InWeight;
         Role = InRole;
         Need = InNeed;
+    }
+
+    FMars_AnchorTable_Row(TSubclassOf<UCk_EntityScript_UE> InScript, float32 InWeight, EMars_Anchor_Role InRole, EMars_AnchorRow_Net InNet)
+    {
+        Script = InScript;
+        Weight = InWeight;
+        Role = InRole;
+        Net = InNet;
+    }
+
+    FMars_AnchorTable_Row(TSubclassOf<UCk_EntityScript_UE> InScript, float32 InWeight, EMars_Anchor_Role InRole, EMars_AnchorRow_Need InNeed, EMars_AnchorRow_Net InNet)
+    {
+        Script = InScript;
+        Weight = InWeight;
+        Role = InRole;
+        Need = InNeed;
+        Net = InNet;
     }
 }
 
@@ -286,6 +320,7 @@ struct FMars_Fragment_Anchor
     UPROPERTY()
     TOptional<int32> RowIndex;
 
+    // The candidate, whatever its owner (the anchor, or the spawn owner for a Replicated row).
     // Invalid for a Nothing row.
     UPROPERTY()
     FCk_Handle Spawned;

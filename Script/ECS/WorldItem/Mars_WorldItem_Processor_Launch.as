@@ -6,6 +6,8 @@
 // Kinematic body ignores velocity. Get_IsBodyAdded && Get_MotionType == Dynamic is the gate. A body whose setup failed, or
 // that is still setting up after constants_world_item::k_BodySetupBudgetPasses passes, will never take the launch: it is
 // dropped with an ensure naming the body's setup.
+//
+// Authority only: the body exists there alone, and a client follows the replicated transform.
 class UMars_Processor_WorldItem_Launch : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -20,6 +22,12 @@ class UMars_Processor_WorldItem_Launch : UCk_Processor_Script_Base_UE
 
     void ForEachEntity(FCk_Time InDeltaT, FCk_Handle& InHandle, FMars_Fragment_WorldItem_PendingLaunch& InPending)
     {
+        if (utils_net::Get_HasAuthority(InHandle) == false)
+        {
+            InHandle.Request_TryRemove(FMars_Fragment_WorldItem_PendingLaunch);
+            return;
+        }
+
         // A launch is only ever queued for a world item with a body.
         auto Body = InHandle.As_JoltBody(ECk_SanityCheck::UnChecked);
         if (ck::EnsureIfNot(ck::IsValid(Body), f"[WorldItem] Launch on [{InHandle.ToString()}], which has no Jolt body - dropped"))

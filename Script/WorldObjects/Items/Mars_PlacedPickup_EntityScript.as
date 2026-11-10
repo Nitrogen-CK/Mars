@@ -7,11 +7,14 @@ enum EMars_PlacedPickup_State
 
 // Opt-in startup proxy for persistent-level placed supplies. Author the WHOLE initial body clear of its support in the
 // placement preflight. This small predicate only waits for five authored floor witnesses; it is not a placement solver.
-// The proxy must live in persistent Main for the entire world: its original WorldItem/Backpack child keeps that lifetime
-// through pickup, cargo and drop. Never place this owner in an unloadable Level Instance.
+// The proxy must live in persistent Main for the entire world. Its original WorldItem/Backpack lives under the replicated
+// spawn owner and follows the proxy's lifetime through the tether (utils_world_item::Request_SpawnWorldEntity) through
+// pickup, cargo and drop; the proxy only dispatches. Never place this owner in an unloadable Level Instance.
 class UMars_PlacedPickup_EntityScript : UCk_GenericEntityScript_UE
 {
     default _ShowInPlaceActors = true;
+    // Stance C: placed on every machine, dispatches only on the host (a client world receives the item by replication);
+    // the proxy itself never replicates.
     default _Replication = ECk_Replication::DoesNotReplicate;
 
     UPROPERTY(ExposeOnSpawn)
@@ -143,10 +146,12 @@ class UMars_PlacedPickup_EntityScript : UCk_GenericEntityScript_UE
         return ECk_EntityScript_ConstructionFlow::Finished;
     }
 
+    // A DoesNotReplicate proxy has the Authority role on a client too, so the gate asks the world: a client world never
+    // dispatches, and its copy of the item arrives from the host.
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
-        if (_State != EMars_PlacedPickup_State::Waiting)
+        if (_State != EMars_PlacedPickup_State::Waiting || utils_mars_net::Get_IsClientWorld(InHandle))
         { return; }
         auto Spec = FCk_Timer_Spec(FCk_Time(0.05f));
         Spec.Set_StartingState(ECk_Timer_State::Running).Set_Behavior(ECk_Timer_Behavior::ResetOnDone);
@@ -182,12 +187,15 @@ class UMars_PlacedPickup_EntityScript : UCk_GenericEntityScript_UE
     UFUNCTION()
     private void OnCheckSupport(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
     {
-        if (ck::Is_NOT_Valid(_Owner) || _State != EMars_PlacedPickup_State::Waiting || Get_HasSupport() == false)
+        // The item spawns under the replicated spawn owner, published shortly after begin play.
+        if (ck::Is_NOT_Valid(_Owner) || _State != EMars_PlacedPickup_State::Waiting
+            || utils_mars_net::Get_HasReplicatedSpawnOwner(_Owner) == false || Get_HasSupport() == false)
         { return; }
         // Claim the one-shot before issuing any spawn request. A later empty/destroyed item never re-arms this proxy.
         _State = EMars_PlacedPickup_State::Dispatched;
         _DispatchTimeSeconds = System::GetGameTimeInSeconds();
         Stop_Timer();
+        // The proxy has no replication driver: the item goes under the spawn owner, tethered to the proxy.
         _SpawnedEntity = utils_world_item::Request_SpawnWorld(_Owner, FMars_WorldItem_WorldSpec(Definition, SpawnTransform));
         if (ck::EnsureIfNot(ck::IsValid(_SpawnedEntity), f"[PlacedPickup] [{FixtureId.ToString()}] original world-item dispatch returned no pending entity"))
         { Set_Failed("Original world-item dispatch returned no pending entity"); return; }

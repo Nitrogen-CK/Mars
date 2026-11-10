@@ -25,7 +25,7 @@ class UMars_AutoTest_Backpack_CargoStowThenTake : UMars_AutoTestRig_Carrier
         SpawnParams.Mode = EMars_WorldItem_Mode::World;
         SpawnParams.SpawnTransform = FTransform(FRotator::ZeroRotator, FVector(200.0, 0.0, -53000.0));
 
-        auto Pending = utils_entity_script::Request_SpawnEntity(InHandle, UMars_Backpack_EntityScript, SpawnParams);
+        auto Pending = utils_world_item::Request_SpawnWorldEntity(InHandle, UMars_Backpack_EntityScript, SpawnParams);
         utils_pending_entity_script::Promise_OnConstructed(
             Pending,
             FCk_Delegate_EntityScript_Constructed(this, n"OnBackpackConstructed"));

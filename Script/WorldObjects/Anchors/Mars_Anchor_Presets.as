@@ -1,5 +1,8 @@
 // The placeable anchors and their candidate tables. A table is a script asset, visible only in this file, so other files
 // reach it through the utils_anchor accessors below. Row order is part of the contract: a ledger names rows by index.
+// A row whose script is a Replicates class says so (EMars_AnchorRow_Net::Replicated): the anchor spawns it under the
+// replicated spawn owner. The rest stay local to the machine that resolves (crawlers, eyes, nav fields, the rest sconce,
+// the forage sources) until their own phase replicates them.
 
 // Row 3, the one-sided lever gate, is eligible only for an anchor with an authored lever side (a crawl beside it): there
 // it takes 4 of 12 weight against the open arch's 4, the two-sided gate's 2 and rubble's 2; without a lever side the
@@ -8,9 +11,9 @@ asset Mars_AnchorTable_Route of UMars_AnchorTable_Def
 {
     Family = EMars_Anchor_Family::Route;
     Rows.Add(FMars_AnchorTable_Row(TSubclassOf<UCk_EntityScript_UE>(), 4.0f, EMars_Anchor_Role::Open));
-    Rows.Add(FMars_AnchorTable_Row(UMars_Anchor_LeverGate_EntityScript, 2.0f, EMars_Anchor_Role::Open));
-    Rows.Add(FMars_AnchorTable_Row(UMars_Anchor_Rubble_EntityScript, 2.0f, EMars_Anchor_Role::Closed));
-    Rows.Add(FMars_AnchorTable_Row(UMars_Anchor_OneSidedLeverGate_EntityScript, 4.0f, EMars_Anchor_Role::Open, EMars_AnchorRow_Need::LeverSide));
+    Rows.Add(FMars_AnchorTable_Row(UMars_Anchor_LeverGate_EntityScript, 2.0f, EMars_Anchor_Role::Open, EMars_AnchorRow_Net::Replicated));
+    Rows.Add(FMars_AnchorTable_Row(UMars_Anchor_Rubble_EntityScript, 2.0f, EMars_Anchor_Role::Closed, EMars_AnchorRow_Net::Replicated));
+    Rows.Add(FMars_AnchorTable_Row(UMars_Anchor_OneSidedLeverGate_EntityScript, 4.0f, EMars_Anchor_Role::Open, EMars_AnchorRow_Need::LeverSide, EMars_AnchorRow_Net::Replicated));
 }
 
 // The pocket (flavour) families. None is in the plan graph, so each resolves with Role None and draws from its Other
@@ -29,9 +32,9 @@ asset Mars_AnchorTable_Forage of UMars_AnchorTable_Def
 asset Mars_AnchorTable_Cache of UMars_AnchorTable_Def
 {
     Family = EMars_Anchor_Family::Cache;
-    Rows.Add(FMars_AnchorTable_Row(UMars_Sandbox_Tenderizer_EntityScript, 2.0f, EMars_Anchor_Role::Active));
-    Rows.Add(FMars_AnchorTable_Row(UMars_Sandbox_Cleaver_EntityScript, 1.0f, EMars_Anchor_Role::Active));
-    Rows.Add(FMars_AnchorTable_Row(UMars_WorldItem_Ration_EntityScript, 1.0f, EMars_Anchor_Role::Active));
+    Rows.Add(FMars_AnchorTable_Row(UMars_Sandbox_Tenderizer_EntityScript, 2.0f, EMars_Anchor_Role::Active, EMars_AnchorRow_Net::Replicated));
+    Rows.Add(FMars_AnchorTable_Row(UMars_Sandbox_Cleaver_EntityScript, 1.0f, EMars_Anchor_Role::Active, EMars_AnchorRow_Net::Replicated));
+    Rows.Add(FMars_AnchorTable_Row(UMars_WorldItem_Ration_EntityScript, 1.0f, EMars_Anchor_Role::Active, EMars_AnchorRow_Net::Replicated));
     Rows.Add(FMars_AnchorTable_Row(TSubclassOf<UCk_EntityScript_UE>(), 1.0f, EMars_Anchor_Role::Dormant));
 }
 
@@ -39,7 +42,7 @@ asset Mars_AnchorTable_Omen of UMars_AnchorTable_Def
 {
     Family = EMars_Anchor_Family::Omen;
     Rows.Add(FMars_AnchorTable_Row(UMars_EyesDummy_EntityScript, 3.0f, EMars_Anchor_Role::Other));
-    Rows.Add(FMars_AnchorTable_Row(UMars_Anchor_OmenLampBank_EntityScript, 2.0f, EMars_Anchor_Role::Other));
+    Rows.Add(FMars_AnchorTable_Row(UMars_Anchor_OmenLampBank_EntityScript, 2.0f, EMars_Anchor_Role::Other, EMars_AnchorRow_Net::Replicated));
     Rows.Add(FMars_AnchorTable_Row(TSubclassOf<UCk_EntityScript_UE>(), 2.0f, EMars_Anchor_Role::Other));
 }
 
@@ -53,8 +56,8 @@ asset Mars_AnchorTable_Threat of UMars_AnchorTable_Def
 asset Mars_AnchorTable_Trap of UMars_AnchorTable_Def
 {
     Family = EMars_Anchor_Family::Trap;
-    Rows.Add(FMars_AnchorTable_Row(UMars_SpikeTrap_EntityScript, 3.0f, EMars_Anchor_Role::Other));
-    Rows.Add(FMars_AnchorTable_Row(UMars_Vent_EntityScript, 2.0f, EMars_Anchor_Role::Other));
+    Rows.Add(FMars_AnchorTable_Row(UMars_SpikeTrap_EntityScript, 3.0f, EMars_Anchor_Role::Other, EMars_AnchorRow_Net::Replicated));
+    Rows.Add(FMars_AnchorTable_Row(UMars_Vent_EntityScript, 2.0f, EMars_Anchor_Role::Other, EMars_AnchorRow_Net::Replicated));
     Rows.Add(FMars_AnchorTable_Row(TSubclassOf<UCk_EntityScript_UE>(), 3.0f, EMars_Anchor_Role::Other));
 }
 
@@ -82,7 +85,7 @@ asset Mars_AnchorTable_Spawn of UMars_AnchorTable_Def
 {
     Family = EMars_Anchor_Family::Spawn;
     Rows.Add(FMars_AnchorTable_Row(TSubclassOf<UCk_EntityScript_UE>(), 1.0f, EMars_Anchor_Role::Open));
-    Rows.Add(FMars_AnchorTable_Row(UMars_Anchor_Rubble_EntityScript, 1.0f, EMars_Anchor_Role::Closed));
+    Rows.Add(FMars_AnchorTable_Row(UMars_Anchor_Rubble_EntityScript, 1.0f, EMars_Anchor_Role::Closed, EMars_AnchorRow_Net::Replicated));
 }
 
 namespace utils_anchor
@@ -136,6 +139,8 @@ namespace utils_anchor
 UCLASS(Abstract)
 class UMars_Anchor_EntityScript : UCk_GenericEntityScript_UE
 {
+    // Stance C: placed on every machine, resolved only where the resolver runs (the authority); nothing replicates. A
+    // Replicated row's candidate lives under the spawn owner, so this anchor's end of play destroys it.
     default _Replication = ECk_Replication::DoesNotReplicate;
 
     UPROPERTY(ExposeOnSpawn)
@@ -208,6 +213,25 @@ class UMars_Anchor_EntityScript : UCk_GenericEntityScript_UE
         utils_anchor::Add(InHandle, Spec);
 
         return ECk_EntityScript_ConstructionFlow::Finished;
+    }
+
+    // A candidate that is the anchor's own child dies with it; one under the replicated spawn owner does not, and its
+    // destroy replicates from the authority.
+    UFUNCTION(BlueprintOverride)
+    void DoEndPlay(FCk_Handle InHandle)
+    {
+        if (utils_net::Get_HasAuthority(InHandle) == false)
+        { return; }
+
+        auto Anchor = InHandle.As_Anchor(ECk_SanityCheck::UnChecked);
+        if (ck::Is_NOT_Valid(Anchor))
+        { return; }
+
+        auto Spawned = Anchor.Get_Spawned();
+        if (ck::Is_NOT_Valid(Spawned) || Spawned.Get_LifetimeOwner() == InHandle)
+        { return; }
+
+        utils_entity_lifetime::Request_DestroyEntity(Spawned);
     }
 }
 

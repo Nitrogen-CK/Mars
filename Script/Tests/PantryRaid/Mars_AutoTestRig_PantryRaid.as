@@ -77,13 +77,13 @@ class UMars_AutoTestRig_PantryRaid : UMars_AutoTestRig_GroundNavBuildOutcome
         PackParams.Definition = mars_items::Backpack();
         PackParams.Mode = EMars_WorldItem_Mode::World;
         PackParams.SpawnTransform = FTransform(FRotator::ZeroRotator, _Origin + k_PackOffset + FVector(0.0, 0.0, 2.0));
-        _PackEntity = utils_entity_script::Request_SpawnEntity(InHandle, UMars_Backpack_EntityScript, PackParams).Get_EntityUnderConstruction();
+        _PackEntity = utils_world_item::Request_SpawnWorldEntity(InHandle, UMars_Backpack_EntityScript, PackParams).Get_EntityUnderConstruction();
 
         auto FoodParams = UMars_FoodItem_EntityScript::Params();
         FoodParams.SpawnTransform = FTransform(FRotator::ZeroRotator, _Origin + k_FoodOffset + FVector(0.0, 0.0, 5.0));
         FoodParams.Definition = utils_held_item::Make_DefinitionSoft(mars_items::Food_Mushroom());
         FoodParams.Mode = EMars_WorldItem_Mode::World;
-        _FoodEntity = utils_entity_script::Request_SpawnEntity(ck::TransientEntity(), UMars_FoodItem_EntityScript, FoodParams)
+        _FoodEntity = utils_world_item::Request_SpawnWorldEntity(ck::TransientEntity(), UMars_FoodItem_EntityScript, FoodParams)
             .Get_EntityUnderConstruction();
         Track_ForCleanup(_FoodEntity);
 

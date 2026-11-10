@@ -98,7 +98,7 @@ class UMars_SmTask_HotbarEjectDrops : UCk_SmTask_EntityScript
     private void OnOverflowEjectRequested(FCk_Handle_Hotbar InHotbar, FCk_Handle_Item InItem)
     {
         if (ck::IsValid(_Use))
-        { _Use.Request_Drop(FMars_Request_HeldItemUse_Drop()); }
+        { utils_held_item_use::Fire_LaunchCue(_Use, EMars_LaunchKind::Drop); }
     }
 }
 
@@ -396,10 +396,8 @@ class UMars_SmTask_DropThrowIntent : UMars_SmTask_IntentEdges
 
         if (ck::IsValid(_Use) && ck::IsValid(_HeldItem) && ck::IsValid(_HeldItem.Get_CurrentItem()))
         {
-            if (_Armed)
-            { _Use.Request_Throw(FMars_Request_HeldItemUse_Throw()); }
-            else
-            { _Use.Request_Drop(FMars_Request_HeldItemUse_Drop()); }
+            const auto Kind = _Armed ? EMars_LaunchKind::Throw : EMars_LaunchKind::Drop;
+            utils_held_item_use::Fire_LaunchCue(_Use, Kind);
         }
 
         CancelHold();

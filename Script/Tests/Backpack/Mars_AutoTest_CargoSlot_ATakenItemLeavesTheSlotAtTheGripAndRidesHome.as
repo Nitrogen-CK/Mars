@@ -49,7 +49,7 @@ class UMars_AutoTest_CargoSlot_ATakenItemLeavesTheSlotAtTheGripAndRidesHome : UM
         SpawnParams.Definition = mars_items::Backpack();
         SpawnParams.Mode = EMars_WorldItem_Mode::World;
         SpawnParams.SpawnTransform = FTransform(FRotator::ZeroRotator, FloorTop + FVector(0.0, 0.0, 5.0));
-        auto Pending = utils_entity_script::Request_SpawnEntity(InHandle, UMars_Backpack_EntityScript, SpawnParams);
+        auto Pending = utils_world_item::Request_SpawnWorldEntity(InHandle, UMars_Backpack_EntityScript, SpawnParams);
         utils_pending_entity_script::Promise_OnConstructed(Pending, FCk_Delegate_EntityScript_Constructed(this, n"OnBackpackConstructed"));
 
         _Holders.Add(MakeSeededHolder(InHandle, mars_items::Rock()));

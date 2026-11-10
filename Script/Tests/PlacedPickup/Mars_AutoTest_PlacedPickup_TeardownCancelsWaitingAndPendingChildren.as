@@ -54,7 +54,7 @@ class UMars_AutoTest_PlacedPickup_TeardownCancelsWaitingAndPendingChildren : UMa
         auto Result = OutResult;
         for (auto Entity : utils_entity_tag::ForEach_Entity(InHandle, n"TAG_MarsPlacedPickupPendingFixture"))
         {
-            if (ck::IsValid(Entity) && utils_entity_lifetime::Get_LifetimeOwner(Entity) == _Proxy)
+            if (ck::IsValid(Entity) && utils_world_item::Get_SpawnOwner(Entity) == _Proxy)
             { _PendingChild = Entity; break; }
         }
         Result.Set(ck::IsValid(_PendingChild) && utils_entity_tag::Has(_Proxy, n"TAG_MarsPlacedPickupDispatched"));

@@ -1,5 +1,10 @@
-// Drains ArriveNextMount (latest wins), then Release (in queue order) for Persistent world items. Where a world item mounts
-// is not requested: UMars_Processor_WorldItem_Reconcile derives it from the inventory its item lives in.
+// Drains ArriveNextMount (latest wins), then Release (in queue order) for Persistent world items, then PickUp (in queue
+// order). Where a world item mounts is not requested: UMars_Processor_WorldItem_Reconcile derives it from the inventory its
+// item lives in. ArriveNextMount is presentation and applies on every machine; Release and PickUp move the item, so a
+// non-authority drops them (its transfers would be refused, and the move replicates from the authority).
+//
+// A PickUp stows the holder's item into the initiator's hotbar stow target. With nowhere to stow, a pickup already in
+// flight, or a refused transfer, it advances FMars_Fragment_WorldItem_Net (the replicated refusal) naming the initiator.
 //
 // A Release validates before it mutates: the item must sit in an inventory other than the holder, with no release already
 // in flight. It then transfers the item back into the holder; the transfer's answer commits World (detach, Dynamic, own
@@ -26,6 +31,7 @@ class UMars_Processor_WorldItem_HandleRequests : UCk_Processor_Script_Base_UE
 
         TArray<FMars_Request_WorldItem_ArriveNextMount> ArriveNextMountRequests = InRequests.ArriveNextMountRequests;
         TArray<FMars_Request_WorldItem_Release> ReleaseRequests = InRequests.ReleaseRequests;
+        TArray<FMars_Request_WorldItem_PickUp> PickUpRequests = InRequests.PickUpRequests;
 
         // InRequests is invalid past this line; removing before broadcasting lets re-entrant requests survive.
         Self.Request_TryRemove(FMars_Fragment_WorldItem_Requests);
@@ -36,8 +42,76 @@ class UMars_Processor_WorldItem_HandleRequests : UCk_Processor_Script_Base_UE
                 FMars_WorldItem_PendingArrive(ArriveNextMountRequests.Last().Arrive, System::GetGameTimeInSeconds()));
         }
 
+        if (utils_net::Get_HasAuthority(InHandle) == false)
+        { return; }
+
         for (const auto& Request : ReleaseRequests)
         { HandleReleaseRequest(Self, InState, Request); }
+
+        for (const auto& Request : PickUpRequests)
+        { HandlePickUpRequest(Self, Request); }
+    }
+
+    //--------------------------------------------------------------------------------------------------------------------------
+    // PickUp
+    //--------------------------------------------------------------------------------------------------------------------------
+
+    // The hotbar is asked here, on the authority: the initiator's machine checked its own copy before the cue, which may
+    // be stale or (for a client, until the hotbar replicates) empty.
+    private void HandlePickUpRequest(FCk_Handle_WorldItem& InWorldItem, const FMars_Request_WorldItem_PickUp& InRequest)
+    {
+        if (InWorldItem.Has_Fragment(FMars_Fragment_WorldItem_PendingPickUp))
+        {
+            Refuse_PickUp(InWorldItem, InRequest.Initiator, EMars_Interaction_FailReason::TransferRefused);
+            return;
+        }
+
+        auto Item = InWorldItem.Get_HeldItem();
+        const auto Hotbar = InRequest.Initiator.As_Hotbar(ECk_SanityCheck::UnChecked);
+        auto Target = ck::IsValid(Hotbar) && ck::IsValid(Item) ? Hotbar.TryGet_StowTarget(Item) : FCk_Handle_Inventory_DataOnly();
+        if (ck::Is_NOT_Valid(Target))
+        {
+            Refuse_PickUp(InWorldItem, InRequest.Initiator, EMars_Interaction_FailReason::NowhereToStow);
+            return;
+        }
+
+        auto Holder = InWorldItem.Get_Holder();
+        InWorldItem.Add_Fragment(FMars_Fragment_WorldItem_PendingPickUp(InRequest.Initiator));
+        Holder.Request_TransferItem_ToDataOnly(FCk_Request_Inventory_TransferItem_ToDataOnly(Item, Target),
+            FCk_Delegate_Inventory_OnOperationResult_Transfer(this, n"OnPickUpTransferComplete"));
+    }
+
+    // The holder is the source; its lifetime owner is the world item. A stowed Transient item's world item then ends
+    // itself (its holder emptied); a Persistent one mounts from where its item landed.
+    UFUNCTION()
+    private void OnPickUpTransferComplete(FCk_Handle_Inventory InSource,
+                                          FCk_Handle_Item InItem,
+                                          FCk_Handle_Inventory InTarget,
+                                          int32 InCount,
+                                          FCk_Handle_Item InNewItemInTarget,
+                                          ECk_Inventory_OperationResult_Transfer InResult)
+    {
+        FCk_Handle Holder = InSource;
+        auto WorldItem = utils_entity_lifetime::Get_LifetimeOwner(Holder).As_WorldItem(ECk_SanityCheck::UnChecked);
+        if (ck::Is_NOT_Valid(WorldItem) || WorldItem.Has_Fragment(FMars_Fragment_WorldItem_PendingPickUp) == false)
+        { return; }
+
+        const auto Initiator = WorldItem.Get_Fragment(FMars_Fragment_WorldItem_PendingPickUp).Initiator;
+        WorldItem.Request_TryRemove(FMars_Fragment_WorldItem_PendingPickUp);
+
+        if (InResult == ECk_Inventory_OperationResult_Transfer::Success)
+        { return; }
+
+        Refuse_PickUp(WorldItem, Initiator, EMars_Interaction_FailReason::TransferRefused);
+    }
+
+    private void Refuse_PickUp(FCk_Handle_WorldItem& InWorldItem, const FCk_Handle& InInitiator, EMars_Interaction_FailReason InReason)
+    {
+        auto& Net = InWorldItem.Get_Fragment(FMars_Fragment_WorldItem_Net);
+        Net.RefusalSerial += 1;
+        Net.LastRefusal = InReason;
+        Net.LastRefused = InInitiator;
+        InWorldItem.H().Request_MarkReplicationDirty(FMars_Fragment_WorldItem_Net);
     }
 
     //--------------------------------------------------------------------------------------------------------------------------

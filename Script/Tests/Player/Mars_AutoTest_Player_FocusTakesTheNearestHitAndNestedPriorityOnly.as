@@ -339,7 +339,7 @@ class UMars_AutoTest_Player_FocusTakesTheNearestHitAndNestedPriorityOnly : UMars
         SpawnParams.Mode = EMars_WorldItem_Mode::World;
 
         // A piece outlives its spawner: under the world's transient entity, tracked for cleanup.
-        auto Entity = utils_entity_script::Request_SpawnEntity(ck::TransientEntity(), UMars_FoodItem_EntityScript, SpawnParams).Get_EntityUnderConstruction();
+        auto Entity = utils_world_item::Request_SpawnWorldEntity(ck::TransientEntity(), UMars_FoodItem_EntityScript, SpawnParams).Get_EntityUnderConstruction();
         Track_ForCleanup(Entity);
         return Entity;
     }

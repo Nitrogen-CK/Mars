@@ -38,7 +38,7 @@ class UMars_AutoTest_WorldItem_AnItemWhoseHolderDiesEndsItself : UMars_AutoTestR
         PackParams.Definition = mars_items::Backpack();
         PackParams.Mode = EMars_WorldItem_Mode::World;
         PackParams.SpawnTransform = FTransform(FRotator::ZeroRotator, k_Origin + k_PackOffset + FVector(0.0, 0.0, 20.0));
-        _PackEntity = utils_entity_script::Request_SpawnEntity(InHandle, UMars_Backpack_EntityScript, PackParams).Get_EntityUnderConstruction();
+        _PackEntity = utils_world_item::Request_SpawnWorldEntity(InHandle, UMars_Backpack_EntityScript, PackParams).Get_EntityUnderConstruction();
 
         _SlabEntity = Spawn_FoodItemOnFloor(InHandle, mars_items::Food_MeatSlab(), k_Origin + k_SlabOffset);
 

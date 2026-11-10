@@ -16,7 +16,11 @@
 // the root (utils_fphands::Add_Grips). This is the only place an item's grips are declared to the gloves.
 class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
 {
-    default _Replication = ECk_Replication::DoesNotReplicate;
+    // Stance SPLIT: a World-mode item is spawned by an authority through utils_world_item::Request_SpawnWorldEntity under
+    // an owner with a replication driver, and replicates its root transform, holder and pickup ledger; the body simulates
+    // on the authority only; probe, interactable, grips and visual are built on every machine. Visual-mode spawns use the
+    // definition's DoesNotReplicate visual class (utils_world_item::Get_VisualScriptClass). Every subclass inherits this.
+    default _Replication = ECk_Replication::Replicates;
     default _ShowInPlaceActors = true;
 
     UPROPERTY(ExposeOnSpawn)
@@ -79,7 +83,8 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
     {
         _SelfEntity = InHandle;
 
-        auto Root = utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::DoesNotReplicate);
+        const auto RootReplication = Mode == EMars_WorldItem_Mode::World ? ECk_Replication::Replicates : ECk_Replication::DoesNotReplicate;
+        auto Root = utils_transform::Add(InHandle, SpawnTransform, RootReplication);
         utils_entity_tag::Add(InHandle, n"TAG_MarsWorldItem");
 
         _Definition = Definition.Get();
@@ -107,7 +112,11 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
             Composition.BoundsFit = FMars_WorldItem_BoundsFit(FVector(k_BareProbeRadius, k_BareProbeRadius, k_BareProbeRadius), FVector::ZeroVector);
             if (ck::IsValid(Presentation))
             {
-                Composition.Body = AddBody(InHandle, Presentation.Visual.MeshScale);
+                // Authority only: a client-side body would be a second, independent simulation fighting the replicated
+                // transform. Without a body a client builds no launch either.
+                if (utils_net::Get_HasAuthority(InHandle))
+                { Composition.Body = AddBody(InHandle, Presentation.Visual.MeshScale); }
+
                 Composition.ProbeFit = utils_world_item::Make_ProbeFit(Presentation);
                 Composition.BoundsFit = utils_world_item::Make_BoundsFit(Presentation);
             }
@@ -193,7 +202,9 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
         return ECk_EntityScript_ConstructionFlow::Finished;
     }
 
-    // The holder must be fully composed before an item can be seeded into it or adopted.
+    // The holder must be fully composed before an item can be seeded into it or adopted. Only the authority seeds or
+    // adopts (a client's holder would refuse: inventory dispatch is authority-gated); a client's holder receives the item
+    // by replication.
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
@@ -205,6 +216,9 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
 
         auto Holder = WorldItem.Get_Holder();
         Holder.BindTo_OnItemsChanged(FCk_Delegate_Inventory_OnItemsChanged(this, n"OnHolderItemsChanged"));
+
+        if (utils_net::Get_HasAuthority(InHandle) == false)
+        { return; }
 
         if (ck::IsValid(SourceItem) && ck::IsValid(SourceInventory))
         {
@@ -237,6 +251,13 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
         _SelfEntity = InHandle;
         _Definition = Definition.Get();
 
+        if (ck::EnsureIfNot(Get_BypassedTheSpawnFunnel(InHandle) == false,
+            f"[WorldItem] [{InHandle.ToString()}] ({GetClass().GetName()}) is a World-mode item with no replication driver on an authority: spawn it through utils_world_item::Request_SpawnWorldEntity. Destroyed."))
+        {
+            utils_entity_lifetime::Request_DestroyEntity(InHandle);
+            return;
+        }
+
         auto Root = InHandle.As_Transform();
 
         const UMars_ItemTrait_Presentation Presentation = _Definition.Get_ItemTraitByClass(UMars_ItemTrait_Presentation);
@@ -254,6 +275,22 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
         auto WorldItem = utils_world_item::Add(InHandle, Spec);
         if (ck::Is_NOT_Valid(WorldItem))
         { utils_entity_lifetime::Request_DestroyEntity(InHandle); }
+    }
+
+    // A World-mode item replicates, and only an owner with a replication driver gives it one (the funnel picks that owner).
+    // Without one, on an authority, it would be a silent host-only entity whose replicated holder cannot create its item,
+    // so a spawn site that bypassed the funnel fails here. Only game worlds are checked: a placed item also composes in
+    // the editor's preview world, which has no net.
+    private bool Get_BypassedTheSpawnFunnel(const FCk_Handle& InHandle) const
+    {
+        const UWorld EntityWorld = utils_entity_lifetime::Get_WorldForEntity(InHandle);
+        if (ck::Is_NOT_Valid(EntityWorld) || EntityWorld.IsGameWorld() == false)
+        { return false; }
+
+        if (utils_net::Get_HasAuthority(InHandle) == false)
+        { return false; }
+
+        return utils_entity_replication_driver::Has(InHandle) == false;
     }
 
     // The name the pickup prompt shows: the item definition's.
@@ -373,7 +410,9 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
             FCk_Delegate_Inventory_CustomCanStackItems_Dynamic());
         HolderParams.Set_StackingPolicy(ECk_Inventory_StackingPolicy::NoStacking);
 
-        return utils_inventory_data_only::Add(InHandle, HolderParams, ECk_Replication::DoesNotReplicate);
+        // Replicated: the item lives here, and its move out is what a client sees as the pickup. One inventory on the root,
+        // so the DataOnly container on the owner holds this holder's items alone.
+        return utils_inventory_data_only::Add(InHandle, HolderParams, ECk_Replication::Replicates);
     }
 
     // No mesh, no body: the item then rests where it was spawned.
@@ -530,13 +569,17 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
     }
 
     // Transient: the item was stowed and nothing is left to present. Persistent: the world item IS the item's body and
-    // follows it wherever it goes (UMars_Processor_WorldItem_Reconcile), so it never destroys itself here.
+    // follows it wherever it goes (UMars_Processor_WorldItem_Reconcile), so it never destroys itself here. Only the
+    // authority ends it; the destroy replicates.
     UFUNCTION()
     private void OnHolderItemsChanged(FCk_Handle_Inventory InInventory,
                                       const TArray<FCk_Handle_Item>&in InItemsAdded,
                                       const TArray<FCk_Handle_Item>&in InItemsRemoved)
     {
         if (InItemsRemoved.Num() == 0 || InInventory.Get_NumItems() != 0)
+        { return; }
+
+        if (utils_net::Get_HasAuthority(_SelfEntity) == false)
         { return; }
 
         auto WorldItem = _SelfEntity.As_WorldItem();
@@ -624,4 +667,23 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
 
         return InHotbar.Get_CanStow(Item);
     }
+}
+
+// Stance D: a Visual-mode world item, spawned on every machine under a local owner (the hand, a cargo slot, a lock), never
+// replicated. The base class replicates for its World mode, and a Replicates class spawned on a client is a placeholder
+// that never builds, so every Visual-mode spawn uses the definition's visual class, this one by default
+// (Presentation.WorldItem.VisualScriptClass).
+class UMars_WorldItem_Visual_EntityScript : UMars_WorldItem_EntityScript
+{
+    default _ShowInPlaceActors = false;
+    // Stance D: built per machine, never replicated.
+    default _Replication = ECk_Replication::DoesNotReplicate;
+}
+
+// The potion's visual keeps its slosh without replicating; the potion definitions name it as their VisualScriptClass.
+class UMars_Potion_Visual_EntityScript : UMars_Potion_EntityScript
+{
+    default _ShowInPlaceActors = false;
+    // Stance D: built per machine, never replicated.
+    default _Replication = ECk_Replication::DoesNotReplicate;
 }

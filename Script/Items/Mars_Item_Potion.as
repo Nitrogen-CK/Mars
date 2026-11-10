@@ -43,6 +43,7 @@ namespace mars_items
         Presentation.Mounting.HeldOffset = FTransform(FRotator::ZeroRotator,
             IsJar ? constants_potion_item::k_JarHeldLocation : constants_potion_item::k_HeldLocation);
         Presentation.WorldItem.ScriptClass = UMars_Potion_EntityScript;
+        Presentation.WorldItem.VisualScriptClass = UMars_Potion_Visual_EntityScript;
         InDefinition._ItemTraits.Add(Presentation);
 
         auto Look = Cast<UMars_ItemTrait_PotionLook>(NewObject(InDefinition, UMars_ItemTrait_PotionLook));

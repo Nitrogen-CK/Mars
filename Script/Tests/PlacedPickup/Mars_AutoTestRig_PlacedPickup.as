@@ -77,7 +77,7 @@ class UMars_AutoTestRig_PlacedPickup : UMars_AutoTestRig_Carrier
         TArray<FCk_Handle> Items;
         for (auto Entity : utils_entity_tag::ForEach_Entity(_FixtureOwner, n"TAG_MarsWorldItem"))
         {
-            if (ck::IsValid(Entity) && utils_entity_lifetime::Get_LifetimeOwner(Entity) == _Proxy)
+            if (ck::IsValid(Entity) && utils_world_item::Get_SpawnOwner(Entity) == _Proxy)
             { Items.Add(Entity); }
         }
         return Items;

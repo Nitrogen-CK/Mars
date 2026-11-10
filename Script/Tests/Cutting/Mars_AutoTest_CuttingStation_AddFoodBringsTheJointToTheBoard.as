@@ -121,7 +121,7 @@ class UMars_AutoTest_CuttingStation_AddFoodBringsTheJointToTheBoard : UMars_Auto
 
         // A piece outlives its spawner: under the world's transient entity, tracked for cleanup.
         auto PieceOwner = ck::TransientEntity();
-        _FoodEntity = utils_entity_script::Request_SpawnEntity(PieceOwner, UMars_FoodItem_EntityScript, SpawnParams).Get_EntityUnderConstruction();
+        _FoodEntity = utils_world_item::Request_SpawnWorldEntity(PieceOwner, UMars_FoodItem_EntityScript, SpawnParams).Get_EntityUnderConstruction();
         Track_ForCleanup(_FoodEntity);
     }
 

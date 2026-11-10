@@ -236,7 +236,7 @@ class UMars_AutoTestRig_Carrier : UCk_AutoTest_Base
         SpawnParams.Definition = utils_held_item::Make_DefinitionSoft(InItem);
         SpawnParams.Mode = EMars_WorldItem_Mode::World;
 
-        auto Entity = utils_entity_script::Request_SpawnEntity(ck::TransientEntity(), UMars_FoodItem_EntityScript, SpawnParams)
+        auto Entity = utils_world_item::Request_SpawnWorldEntity(ck::TransientEntity(), UMars_FoodItem_EntityScript, SpawnParams)
             .Get_EntityUnderConstruction();
         Track_ForCleanup(Entity);
         return Entity;

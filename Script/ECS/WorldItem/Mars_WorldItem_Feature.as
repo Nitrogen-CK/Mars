@@ -1,3 +1,16 @@
+// Stance SPLIT. A World-mode item replicates as an entity: its root transform (interpolated), its holder inventory (the
+// item lives there) and FMars_Fragment_WorldItem_Net (the authority's pickup refusals). Its Jolt body, its launch, a
+// Release and a PickUp are the authority's; the probe, the pickup interactable, the grips, the visual and the arrival are
+// built on every machine (D). FMars_Fragment_WorldItem stays local (it holds body and probe handles), and a Persistent
+// item's mount is derived where its item is linked (the authority, until the hotbar replicates). A Visual-mode item never
+// replicates: it is a DoesNotReplicate script spawned per machine under a local owner
+// (utils_world_item::Get_VisualScriptClass).
+// A World-mode item exists on an authority under an owner with a replication driver, and its script ensures and ends
+// one that has none. Runtime code spawns it through utils_world_item::Request_SpawnWorldEntity, which picks that owner;
+// FMars_Fragment_WorldItem_Tether (local, authority-only) keeps the lifetime of the owner the caller named when that owner
+// could not be the replicated parent. A level-placed item gets its owner from its spawner actor, and an anchor's cache row
+// from the anchor.
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
 //--------------------------------------------------------------------------------------------------------------------------
@@ -191,6 +204,14 @@ struct FMars_WorldItem_WorldSpec
 
     UPROPERTY()
     FVector AngularVelocityDeg = FVector::ZeroVector;
+
+    // Adopt SourceItem out of SourceInventory instead of seeding a new item from Definition (a drop, a pocket's loot):
+    // both must be this authority's handles.
+    UPROPERTY()
+    FCk_Handle_Item SourceItem;
+
+    UPROPERTY()
+    FCk_Handle_Inventory SourceInventory;
 
     FMars_WorldItem_WorldSpec() {}
 
@@ -755,7 +776,24 @@ struct FMars_Request_WorldItem_Release
     }
 }
 
-// Drain order ArriveNextMount -> Release (see UMars_Processor_WorldItem_HandleRequests).
+// Holder -> the initiator's hotbar stow target, on the authority. The initiator's machine fires it as
+// Cue.Mars.WorldItem.PickUp at the world item's root (UMars_Cue_WorldItem_PickUp); a refusal advances the replicated
+// FMars_Fragment_WorldItem_Net so the initiator's task fails with its reason.
+struct FMars_Request_WorldItem_PickUp
+{
+    // The player's entity (replicated with its pawn), whose hotbar takes the item.
+    UPROPERTY()
+    FCk_Handle Initiator;
+
+    FMars_Request_WorldItem_PickUp() {}
+
+    FMars_Request_WorldItem_PickUp(const FCk_Handle& InInitiator)
+    {
+        Initiator = InInitiator;
+    }
+}
+
+// Drain order ArriveNextMount -> Release -> PickUp (see UMars_Processor_WorldItem_HandleRequests).
 struct FMars_Fragment_WorldItem_Requests
 {
     UPROPERTY()
@@ -763,4 +801,57 @@ struct FMars_Fragment_WorldItem_Requests
 
     UPROPERTY()
     TArray<FMars_Request_WorldItem_Release> ReleaseRequests;
+
+    UPROPERTY()
+    TArray<FMars_Request_WorldItem_PickUp> PickUpRequests;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+// Replicated ledger (World mode)
+//--------------------------------------------------------------------------------------------------------------------------
+
+// The authority's answer to pickups it refused, replicated on the root: the serial advances once per refusal, so an
+// initiator that recorded it before its cue knows a newer refusal is about its own. It holds no item, holder or mount:
+// those are the holder inventory and the mount derived from it.
+struct FMars_Fragment_WorldItem_Net
+{
+    UPROPERTY()
+    int32 RefusalSerial = 0;
+
+    UPROPERTY()
+    EMars_Interaction_FailReason LastRefusal = EMars_Interaction_FailReason::NowhereToStow;
+
+    // The refused initiator, a player's entity. On a client it may arrive unresolved: that only means "not known here yet".
+    UPROPERTY()
+    FCk_Handle LastRefused;
+}
+
+// Authority only, never replicated: the owner a caller of utils_world_item::Request_SpawnWorldEntity named when the item
+// had to go under another (the replicated spawn owner, because Owner has no replication driver). Stamped once by the
+// funnel on the entity under construction; UMars_Processor_WorldItem_Tether ends the item once Owner is gone.
+struct FMars_Fragment_WorldItem_Tether
+{
+    UPROPERTY()
+    FCk_Handle Owner;
+
+    FMars_Fragment_WorldItem_Tether() {}
+
+    FMars_Fragment_WorldItem_Tether(const FCk_Handle& InOwner)
+    {
+        Owner = InOwner;
+    }
+}
+
+// Authority only: a pickup whose transfer has not answered yet, and whose it is (the answer's refusal names it).
+struct FMars_Fragment_WorldItem_PendingPickUp
+{
+    UPROPERTY()
+    FCk_Handle Initiator;
+
+    FMars_Fragment_WorldItem_PendingPickUp() {}
+
+    FMars_Fragment_WorldItem_PendingPickUp(const FCk_Handle& InInitiator)
+    {
+        Initiator = InInitiator;
+    }
 }

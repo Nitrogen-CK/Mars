@@ -59,7 +59,7 @@ class UMars_AutoTest_CrawlerMelee_ShunsAHeldLitLantern : UMars_AutoTestRig_Crawl
         SpawnParams.Mode = EMars_WorldItem_Mode::World;
         SpawnParams.SpawnTransform = FTransform(FRotator::ZeroRotator,
             utils_transform::Get_EntityCurrentLocation(_Target.Root) + Get_Forward() * 60.0 + FVector(0.0, 0.0, 30.0));
-        auto Pending = utils_entity_script::Request_SpawnEntity(InHandle, UMars_Lantern_EntityScript, SpawnParams);
+        auto Pending = utils_world_item::Request_SpawnWorldEntity(InHandle, UMars_Lantern_EntityScript, SpawnParams);
         utils_pending_entity_script::Promise_OnConstructed(Pending, FCk_Delegate_EntityScript_Constructed(this, n"OnLanternConstructed"));
     }
 

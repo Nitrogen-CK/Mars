@@ -8,7 +8,10 @@
 //
 // Drop and Throw launch the held item as a World-mode world item that adopts it out of the selected slot. A Persistent
 // item already has its world item: it is asked to Release (it takes the item back into its holder, then goes Dynamic and
-// launches). Either way the hotbar's sync pass sees the slot empty and the held item follows.
+// launches). Either way the hotbar's sync pass sees the slot empty and the held item follows. They launch only on the
+// authority, from the aim the request carries (the launching machine's, through Cue.Mars.HeldItemUse.Launch) or, without
+// one, from the player's view here; a non-authority drops them. Refresh and SetThrowArmed are owner-local and apply on
+// every machine.
 class UMars_Processor_HeldItemUse_HandleRequests : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -29,7 +32,17 @@ class UMars_Processor_HeldItemUse_HandleRequests : UCk_Processor_Script_Base_UE
         const auto Refresh = InRequests.RefreshFromHeldItemRequests.Num() > 0;
         const auto Drop = InRequests.DropRequests.Num() > 0;
         const auto Throw = InRequests.ThrowRequests.Num() > 0;
+        auto DropLaunch = FMars_HeldItemUse_Launch();
+        if (Drop)
+        { DropLaunch.Aim = InRequests.DropRequests.Last().Aim; }
+
+        auto ThrowLaunch = FMars_HeldItemUse_Launch();
+        ThrowLaunch.Kind = EMars_LaunchKind::Throw;
+        if (Throw)
+        { ThrowLaunch.Aim = InRequests.ThrowRequests.Last().Aim; }
+
         TArray<FMars_Request_HeldItemUse_SetThrowArmed> SetThrowArmedRequests = InRequests.SetThrowArmedRequests;
+        const auto HasAuthority = utils_net::Get_HasAuthority(InHandle);
 
         // InRequests is invalid past this line; removing before broadcasting lets re-entrant requests survive.
         Self.Request_TryRemove(FMars_Fragment_HeldItemUse_Requests);
@@ -37,11 +50,11 @@ class UMars_Processor_HeldItemUse_HandleRequests : UCk_Processor_Script_Base_UE
         if (Refresh)
         { RebuildFromHeldItem(InHandle, InState); }
 
-        if (Drop)
-        { LaunchHeldItem(InHandle, InState, EMars_LaunchKind::Drop); }
+        if (Drop && HasAuthority)
+        { LaunchHeldItem(InHandle, InState, DropLaunch); }
 
-        if (Throw)
-        { LaunchHeldItem(InHandle, InState, EMars_LaunchKind::Throw); }
+        if (Throw && HasAuthority)
+        { LaunchHeldItem(InHandle, InState, ThrowLaunch); }
 
         for (const auto& Request : SetThrowArmedRequests)
         { HandleSetThrowArmedRequest(Self, InState, Request); }
@@ -154,8 +167,9 @@ class UMars_Processor_HeldItemUse_HandleRequests : UCk_Processor_Script_Base_UE
     // Drop / Throw
     //--------------------------------------------------------------------------------------------------------------------------
 
-    private void LaunchHeldItem(FCk_Handle& InPlayer, FMars_Fragment_HeldItemUse& InState, EMars_LaunchKind InKind)
+    private void LaunchHeldItem(FCk_Handle& InPlayer, FMars_Fragment_HeldItemUse& InState, const FMars_HeldItemUse_Launch& InLaunch)
     {
+        const auto InKind = InLaunch.Kind;
         auto HeldItem = InPlayer.As_HeldItem();
         auto Item = HeldItem.Get_CurrentItem();
         if (ck::Is_NOT_Valid(Item))
@@ -172,7 +186,7 @@ class UMars_Processor_HeldItemUse_HandleRequests : UCk_Processor_Script_Base_UE
         }
 
         // Set from here on: the item is valid and a Persistent item still has its world item.
-        const auto MaybeSolution = InPlayer.As_HeldItemUse().Get_LaunchSolution(InKind);
+        const auto MaybeSolution = InPlayer.As_HeldItemUse().Get_LaunchSolutionFor(InLaunch);
         if (MaybeSolution.IsSet() == false)
         { return; }
 
@@ -196,8 +210,11 @@ class UMars_Processor_HeldItemUse_HandleRequests : UCk_Processor_Script_Base_UE
         SpawnParams.LaunchVelocity = Solution.LinearVelocity;
         SpawnParams.AngularVelocityDeg = Solution.AngularVelocityDeg;
 
-        // The dropped item outlives the player; it destroys itself once picked up.
-        utils_entity_script::Request_SpawnEntity(ck::TransientEntity(), utils_world_item::Get_WorldItemScriptClass(Item), SpawnParams);
+        // The dropped item outlives the player (it follows nobody) and destroys itself once picked up; the funnel puts it
+        // under the replicated spawn owner. SourceItem and SourceInventory are this authority's own handles, so the adopt
+        // works here.
+        auto Owner = ck::TransientEntity();
+        utils_world_item::Request_SpawnWorldEntity(Owner, utils_world_item::Get_WorldItemScriptClass(Item), SpawnParams);
 
         InState.LaunchedItem = Item;
         Broadcast_ItemLaunched(InPlayer, Item, InKind);

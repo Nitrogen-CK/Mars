@@ -1,7 +1,9 @@
 // What a resolved anchor can become. Every candidate takes the anchor's SpawnTransform and its FMars_Anchor_Context
-// (property `Anchor`) and is spawned as the anchor's child. The street runs along local X; a gate's opening spans local
-// Y (Mars_Gate_EntityScript.as), so a gate placed here blocks travel along X. Existing presets are spawned with runtime
-// params, never subclassed or edited.
+// (property `Anchor`). A Replicates candidate's row is flagged Replicated (Mars_Anchor_Presets.as): on the authority it
+// spawns under the replicated spawn owner and re-runs DoConstruct on clients with the same params, where its own
+// Replicates children come back as placeholders and arrive by replication. Every other candidate is the anchor's child.
+// The street runs along local X; a gate's opening spans local Y (Mars_Gate_EntityScript.as), so a gate placed here blocks
+// travel along X. Existing presets are spawned with runtime params, never subclassed or edited.
 
 namespace utils_anchor
 {
@@ -54,7 +56,10 @@ namespace utils_anchor
 class UMars_Anchor_Rubble_EntityScript : UCk_GenericEntityScript_UE
 {
     default _ShowInPlaceActors = false;
-    default _Replication = ECk_Replication::DoesNotReplicate;
+    // Stance A through its child: spawned by the authority's anchor under the replicated spawn owner; its root transform
+    // replicates; the fillers and the crawl plug are built on every machine; its gate spawns under it on the authority
+    // and reaches clients as its child.
+    default _Replication = ECk_Replication::Replicates;
 
     UPROPERTY(ExposeOnSpawn)
     FTransform SpawnTransform = FTransform::Identity;
@@ -65,7 +70,7 @@ class UMars_Anchor_Rubble_EntityScript : UCk_GenericEntityScript_UE
     UFUNCTION(BlueprintOverride)
     ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
     {
-        auto Root = utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::DoesNotReplicate);
+        auto Root = utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::Replicates);
         utils_anchor::Add_CandidateSideFillers(this, Root, Anchor.SpanCm, Anchor.GateMaterialOverride.Get());
         utils_anchor::Add_CandidateCrawlPlug(this, Root, Anchor);
 
@@ -85,7 +90,10 @@ class UMars_Anchor_Rubble_EntityScript : UCk_GenericEntityScript_UE
 class UMars_Anchor_LeverGate_EntityScript : UCk_GenericEntityScript_UE
 {
     default _ShowInPlaceActors = false;
-    default _Replication = ECk_Replication::DoesNotReplicate;
+    // Stance A through its children: spawned by the authority's anchor under the replicated spawn owner; its root
+    // transform replicates; the fillers and the crawl plug are built on every machine; its gate and levers spawn under
+    // it on the authority and reach clients as its children.
+    default _Replication = ECk_Replication::Replicates;
 
     UPROPERTY(ExposeOnSpawn)
     FTransform SpawnTransform = FTransform::Identity;
@@ -99,7 +107,7 @@ class UMars_Anchor_LeverGate_EntityScript : UCk_GenericEntityScript_UE
     UFUNCTION(BlueprintOverride)
     ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
     {
-        auto Root = utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::DoesNotReplicate);
+        auto Root = utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::Replicates);
         utils_anchor::Add_CandidateSideFillers(this, Root, Anchor.SpanCm, Anchor.GateMaterialOverride.Get());
         utils_anchor::Add_CandidateCrawlPlug(this, Root, Anchor);
 
@@ -180,7 +188,10 @@ class UMars_Anchor_CourtNavField_EntityScript : UCk_GroundNavVolume_EntityScript
 class UMars_Anchor_OneSidedLeverGate_EntityScript : UCk_GenericEntityScript_UE
 {
     default _ShowInPlaceActors = false;
-    default _Replication = ECk_Replication::DoesNotReplicate;
+    // Stance A through its children: spawned by the authority's anchor under the replicated spawn owner; its root
+    // transform replicates; the fillers are built on every machine; its gate and lever spawn under it on the authority
+    // and reach clients as its children.
+    default _Replication = ECk_Replication::Replicates;
 
     UPROPERTY(ExposeOnSpawn)
     FTransform SpawnTransform = FTransform::Identity;
@@ -198,7 +209,7 @@ class UMars_Anchor_OneSidedLeverGate_EntityScript : UCk_GenericEntityScript_UE
             f"[Anchor] one-sided lever gate {Anchor.AnchorId.ToString()} has no lever side; its row needs one"))
         { return ECk_EntityScript_ConstructionFlow::Finished; }
 
-        auto Root = utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::DoesNotReplicate);
+        auto Root = utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::Replicates);
         utils_anchor::Add_CandidateSideFillers(this, Root, Anchor.SpanCm, Anchor.GateMaterialOverride.Get());
 
         auto GateParams = UMars_Gate_EntityScript::Params();
@@ -302,6 +313,8 @@ namespace utils_anchor
 class UMars_Anchor_RestSconce_EntityScript : UCk_GenericEntityScript_UE
 {
     default _ShowInPlaceActors = false;
+    // Stance C until the sconce it hangs replicates: a Local row, spawned as the anchor's own child and built only where
+    // the anchor resolves (the authority), so a client has no rest sconce.
     default _Replication = ECk_Replication::DoesNotReplicate;
 
     UPROPERTY(ExposeOnSpawn)
@@ -325,7 +338,9 @@ class UMars_Anchor_RestSconce_EntityScript : UCk_GenericEntityScript_UE
 class UMars_Anchor_OmenLampBank_EntityScript : UCk_GenericEntityScript_UE
 {
     default _ShowInPlaceActors = false;
-    default _Replication = ECk_Replication::DoesNotReplicate;
+    // Stance A through its child: spawned by the authority's anchor under the replicated spawn owner; its root transform
+    // replicates; its lamp bank spawns under it on the authority and reaches clients as its child.
+    default _Replication = ECk_Replication::Replicates;
 
     UPROPERTY(ExposeOnSpawn)
     FTransform SpawnTransform = FTransform::Identity;
@@ -336,7 +351,7 @@ class UMars_Anchor_OmenLampBank_EntityScript : UCk_GenericEntityScript_UE
     UFUNCTION(BlueprintOverride)
     ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
     {
-        utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::DoesNotReplicate);
+        utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::Replicates);
         auto BankParams = UMars_LampBank_EntityScript::Params();
         BankParams.SpawnTransform = FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, 160.0)) * utils_anchor::Get_PocketBackWall(SpawnTransform, Anchor.SpanCm);
         utils_entity_script::Request_SpawnEntity(InHandle, UMars_LampBank_EntityScript, BankParams);

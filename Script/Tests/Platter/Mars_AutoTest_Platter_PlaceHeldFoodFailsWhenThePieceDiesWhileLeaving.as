@@ -45,7 +45,7 @@ class UMars_AutoTest_Platter_PlaceHeldFoodFailsWhenThePieceDiesWhileLeaving : UM
         SpawnParams.Mode = EMars_WorldItem_Mode::World;
 
         // A piece outlives its spawner: under the world's transient entity, tracked for cleanup.
-        _FoodEntity = utils_entity_script::Request_SpawnEntity(ck::TransientEntity(), UMars_FoodItem_EntityScript, SpawnParams).Get_EntityUnderConstruction();
+        _FoodEntity = utils_world_item::Request_SpawnWorldEntity(ck::TransientEntity(), UMars_FoodItem_EntityScript, SpawnParams).Get_EntityUnderConstruction();
         Track_ForCleanup(_FoodEntity);
 
         Add_Step_WaitUntil("the platter and the food item are constructed", n"Check_Constructed", k_SlowPolls, 0);

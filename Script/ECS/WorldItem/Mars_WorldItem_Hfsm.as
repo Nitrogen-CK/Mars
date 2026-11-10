@@ -72,16 +72,23 @@ class UMars_SmTask_MoveItemAtGrip : UMars_SmTask_ActAtGrip
     }
 }
 
-// Transfers the world item's held item into the initiator's hotbar stow target at the Grip of the initiator's gloves on it
-// (UMars_SmTask_ActAtGrip: at once without gloves, or when they do not reach for it), and runs until the transfer reports:
-// the item lands when the gloves close on it, never before they get there. A Transient world item destroys itself once its
-// holder empties; a Persistent one mounts on the initiator from where its item lands (UMars_Processor_WorldItem_Reconcile),
-// riding the gloves home when they took it. A full hotbar fails (the pickup is normally disabled before it gets here); so
-// do gloves that return or lose it before their Grip.
+// Stows the world item's held item into the initiator's hotbar at the Grip of the initiator's gloves on it
+// (UMars_SmTask_ActAtGrip: at once without gloves, or when they do not reach for it): the item leaves the floor when the
+// gloves close on it, never before they get there. The task runs on the initiating machine; the stow is the authority's,
+// so at the Grip it fires Cue.Mars.WorldItem.PickUp at the world item's root and waits for the effect to replicate back
+// (the holder empty, or the world item gone) or for the authority's refusal (FMars_Fragment_WorldItem_Net naming this
+// initiator), which fails it with that reason. On the listen host and in standalone the cue runs the same frame. A
+// Transient world item destroys itself once its holder empties; a Persistent one mounts on the initiator from where its
+// item lands (UMars_Processor_WorldItem_Reconcile), riding the gloves home when they took it. A full hotbar fails (the
+// pickup is normally disabled before it gets here); so do gloves that return or lose it before their Grip.
+// Interim (until the hotbar replicates): a client's pickup leaves the floor on every machine, but the item lands in that
+// chef's hotbar on the host only, so the client's own hotbar stays empty; its local stow check reads that empty copy.
 class UMars_SmTask_WorldItem_StowIntoInitiator : UMars_SmTask_MoveItemAtGrip
 {
     private FCk_Handle _Initiator;
     private FCk_Handle_WorldItem _WorldItem;
+    // The world item's refusal serial when this task fired its cue: only a later refusal is about it.
+    private int32 _RefusalSerialAtCue = 0;
 
     UFUNCTION(BlueprintOverride)
     void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
@@ -134,25 +141,31 @@ class UMars_SmTask_WorldItem_StowIntoInitiator : UMars_SmTask_MoveItemAtGrip
         FCk_Handle LyingEntity = _WorldItem;
         Ride_IntoHand(_Initiator, Item, utils_transform::Get_EntityCurrentTransform(LyingEntity.As_Transform()));
 
-        auto Holder = _WorldItem.Get_Holder();
-        Holder.Request_TransferItem_ToDataOnly(FCk_Request_Inventory_TransferItem_ToDataOnly(Item, Target),
-            FCk_Delegate_Inventory_OnOperationResult_Transfer(this, n"OnStowComplete"));
+        _RefusalSerialAtCue = _WorldItem.Get_RefusalSerial();
+        utils_cue_generic::Request_ExecuteCue(_WorldItem, GameplayTags::Cue_Mars_WorldItem_PickUp,
+            FMars_Request_WorldItem_PickUp(_Initiator), ECk_Cue_ReliabilityPolicy::Reliable, ECk_Cue_MulticastPolicy::ServerOnly);
+        Await_ReplicatedEffect();
     }
 
-    UFUNCTION()
-    private void OnStowComplete(FCk_Handle_Inventory InSource,
-                                FCk_Handle_Item InItem,
-                                FCk_Handle_Inventory InTarget,
-                                int32 InCount,
-                                FCk_Handle_Item InNewItemInTarget,
-                                ECk_Inventory_OperationResult_Transfer InResult)
+    // A stowed Transient item's world item ends; a Persistent one's holder empties and it stays as the item's body.
+    protected bool DoGet_EffectLanded() override
     {
-        if (InResult == ECk_Inventory_OperationResult_Transfer::Success)
-        {
-            _Outcome = ECk_SmTaskResult::Succeeded;
-            return;
-        }
+        if (ck::Is_NOT_Valid(_WorldItem))
+        { return true; }
 
-        DoFail(EMars_Interaction_FailReason::TransferRefused);
+        auto Holder = _WorldItem.Get_Holder();
+        return ck::Is_NOT_Valid(Holder) || Holder.Get_NumItems() == 0;
+    }
+
+    protected bool DoTryGet_Refusal(EMars_Interaction_FailReason& OutReason) override
+    {
+        if (ck::Is_NOT_Valid(_WorldItem) || _WorldItem.Get_RefusalSerial() <= _RefusalSerialAtCue)
+        { return false; }
+
+        if (_WorldItem.Get_LastRefused() != _Initiator)
+        { return false; }
+
+        OutReason = _WorldItem.Get_LastRefusal();
+        return true;
     }
 }

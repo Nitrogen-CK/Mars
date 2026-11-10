@@ -300,11 +300,25 @@ class UMars_SmTask_EndInteraction_Failed : UMars_SmTask_EndInteraction
     default Result = ECk_SucceededFailed::Failed;
 }
 
+namespace constants_interactable
+{
+    // Task ticks a converted work task waits for its cue's effect to replicate back before it fails TransferRefused: two
+    // seconds of round trip at 60 fps. Counted in ticks, never wall clock, so a hitch does not fail a pickup.
+    const int32 k_EffectBudgetFrames = 120;
+}
+
 // The base of a WhileLive work task (an interaction sub-SM's work state: a stow, a take, a deposit) that runs until its
 // work answers. The subclass resets _Outcome to Running on enter, reads its interaction's ends with TryGet_InteractionEnds,
 // sets _Outcome to Succeeded when the work lands, and calls DoFail with the reason when it does not; the task ticks and
 // returns _Outcome, so the work state's AllTasksSucceeded / AnyTaskFailed conditions route the sub-SM to its end. A
-// subclass that overrides DoTick calls Super.
+// subclass that overrides DoTick calls Super, or Tick_AwaitedEffect itself; one that overrides DoExitTask calls
+// End_AwaitedEffect.
+//
+// A task whose work mutates a replicated kernel does not perform it: it fires the verb's cue at the kernel's replicated
+// root (the authority applies it; on the listen host and in standalone the same frame) and calls Await_ReplicatedEffect.
+// Every tick then asks DoGet_EffectLanded (the effect as this machine sees it) and DoTryGet_Refusal (the authority's
+// refusal, replicated with the kernel's ledger); neither within constants_interactable::k_EffectBudgetFrames ticks fails
+// the task TransferRefused.
 UCLASS(Abstract)
 class UMars_SmTask_InteractionWork : UCk_SmTask_EntityScript
 {
@@ -312,10 +326,74 @@ class UMars_SmTask_InteractionWork : UCk_SmTask_EntityScript
 
     protected ECk_SmTaskResult _Outcome = ECk_SmTaskResult::Running;
 
+    // Ticks since Await_ReplicatedEffect; unset while nothing is awaited.
+    private TOptional<int32> _AwaitedTicks;
+
     UFUNCTION(BlueprintOverride)
     ECk_SmTaskResult DoTick(FCk_Handle_SmTask InHandle, FCk_Time InDeltaT, ECk_Sm_NetContext InNetContext)
     {
+        Tick_AwaitedEffect();
         return _Outcome;
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void DoExitTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
+    {
+        End_AwaitedEffect();
+    }
+
+    // The cue is fired: from the next tick the task ends on the effect, the refusal, or the budget.
+    protected void Await_ReplicatedEffect()
+    {
+        _AwaitedTicks = TOptional<int32>(0);
+    }
+
+    // The awaited effect is visible on this machine.
+    protected bool DoGet_EffectLanded()
+    {
+        return false;
+    }
+
+    // The authority refused this task's cue; OutReason is why.
+    protected bool DoTryGet_Refusal(EMars_Interaction_FailReason& OutReason)
+    {
+        return false;
+    }
+
+    protected void Tick_AwaitedEffect()
+    {
+        if (_AwaitedTicks.IsSet() == false || _Outcome != ECk_SmTaskResult::Running)
+        { return; }
+
+        if (DoGet_EffectLanded())
+        {
+            End_AwaitedEffect();
+            _Outcome = ECk_SmTaskResult::Succeeded;
+            return;
+        }
+
+        auto Reason = EMars_Interaction_FailReason::TransferRefused;
+        if (DoTryGet_Refusal(Reason))
+        {
+            End_AwaitedEffect();
+            DoFail(Reason);
+            return;
+        }
+
+        const auto Ticks = _AwaitedTicks.GetValue() + 1;
+        _AwaitedTicks = TOptional<int32>(Ticks);
+        if (Ticks <= constants_interactable::k_EffectBudgetFrames)
+        { return; }
+
+        Warning(f"[Interactable] [{GetClass().GetName()}] its cue's effect did not replicate back within {Ticks - 1} ticks: failing TransferRefused");
+        End_AwaitedEffect();
+        DoFail(EMars_Interaction_FailReason::TransferRefused);
+    }
+
+    // A task torn down while it waits (its interaction ended under it) stops waiting, so a later enter starts clean.
+    protected void End_AwaitedEffect()
+    {
+        _AwaitedTicks.Reset();
     }
 
     // The work failed and nothing moved: InReason is reported (utils_interactable::Record_FailReason) and the task fails.

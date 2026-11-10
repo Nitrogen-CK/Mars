@@ -36,6 +36,11 @@ namespace utils_world_item
         InHandle.Add_Fragment(State);
         Add_ReachHint(InHandle, InSpec);
 
+        // A client's copy whose construction continues past DoConstruct (a food item importing its joint) can receive the
+        // replicated ledger before it composes: it is already there then.
+        if (InSpec.World.IsSet() && InHandle.Has_Fragment(FMars_Fragment_WorldItem_Net) == false)
+        { InHandle.Add_Fragment(FMars_Fragment_WorldItem_Net(), ECk_Replication::Replicates); }
+
         // Never applied here: the body is not added for at least one frame. The launch processor drains it.
         if (InSpec.World.IsSet() && InSpec.World.GetValue().Composition.Launch.IsSet())
         { InHandle.Add_Fragment(InSpec.World.GetValue().Composition.Launch.GetValue()); }
@@ -273,7 +278,8 @@ namespace utils_world_item
     }
 
     // A Visual-mode world item of InSpec.Item, owned by InOwner (it dies with it). It spawns where it starts - at
-    // ArriveFrom when set (then lerps in), else at rest - so the first rendered frame is already there.
+    // ArriveFrom when set (then lerps in), else at rest - so the first rendered frame is already there. Its class never
+    // replicates (Get_VisualScriptClass): every machine spawns its own under a local owner.
     FCk_Handle Request_SpawnVisual(FCk_Handle& InOwner, const FMars_WorldItem_VisualSpec& InSpec)
     {
         auto Item = InSpec.Item;
@@ -293,14 +299,14 @@ namespace utils_world_item
         SpawnParams.ArriveFrom = InSpec.ArriveFrom;
         SpawnParams.SpawnAtWorld = InSpec.SpawnAtWorld;
 
-        auto Pending = utils_entity_script::Request_SpawnEntity(InOwner, Get_WorldItemScriptClass(Item), SpawnParams);
+        auto Pending = utils_entity_script::Request_SpawnEntity(InOwner, Get_VisualScriptClass(Item), SpawnParams);
         return Pending.Get_EntityUnderConstruction();
     }
 
-    // A World-mode world item seeded from InSpec.Definition, owned by InOwner (ck::TransientEntity() for something that
-    // must outlive its spawner). Uses the definition's Presentation.WorldItem.ScriptClass, else the base script. The
-    // launch goes through the PendingLaunch processor once the body exists. An unresolved definition ensures and spawns
-    // nothing.
+    // A World-mode world item of InSpec.Definition, seeded from it, or adopting InSpec.SourceItem when both source handles
+    // are set, spawned through Request_SpawnWorldEntity with InOwner's meaning there. Uses the definition's
+    // Presentation.WorldItem.ScriptClass, else the base script. The launch goes through the PendingLaunch processor once
+    // the body exists. An unresolved definition ensures and spawns nothing; so does a client (invalid handle).
     FCk_Handle Request_SpawnWorld(FCk_Handle& InOwner, const FMars_WorldItem_WorldSpec& InSpec)
     {
         const auto Definition = InSpec.Definition.Get();
@@ -311,11 +317,52 @@ namespace utils_world_item
         SpawnParams.SpawnTransform = FTransform(InSpec.World.Rotator(), InSpec.World.GetLocation());
         SpawnParams.Definition = InSpec.Definition;
         SpawnParams.Mode = EMars_WorldItem_Mode::World;
+        SpawnParams.SourceItem = InSpec.SourceItem;
+        SpawnParams.SourceInventory = InSpec.SourceInventory;
         SpawnParams.LaunchVelocity = InSpec.LinearVelocity;
         SpawnParams.AngularVelocityDeg = InSpec.AngularVelocityDeg;
 
-        auto Pending = utils_entity_script::Request_SpawnEntity(InOwner, Get_WorldItemScriptClass(Definition), SpawnParams);
+        auto Pending = Request_SpawnWorldEntity(InOwner, Get_WorldItemScriptClass(Definition), SpawnParams);
         return Pending.Get_EntityUnderConstruction();
+    }
+
+    // The one spawn of a World-mode world item (every Replicates world-item class, in game code and in tests; the class's
+    // own DoConstruct ensures and destroys an item that bypassed it). InOwner is whose lifetime the item follows;
+    // ck::TransientEntity() means nobody. The item's lifetime owner is InOwner when it has a replication driver (the item
+    // is its replicated child), else the replicated spawn owner (utils_mars_net::Get_SpawnOwnerFor), the same on a listen
+    // host, a dedicated server and in standalone. Under the spawn owner a non-transient InOwner is kept as the tether
+    // (FMars_Fragment_WorldItem_Tether): the authority ends the item once InOwner is gone. A client, and an authority whose
+    // spawn owner is not published yet, spawn nothing and get an invalid pending handle.
+    FCk_Handle_PendingEntityScript Request_SpawnWorldEntity(const FCk_Handle& InOwner, TSubclassOf<UMars_WorldItem_EntityScript> InClass,
+                                                            FAngelscriptAnyStructParameter InSpawnParams)
+    {
+        if (ck::EnsureIfNot(ck::IsValid(InOwner),
+            f"[WorldItem] a world item of [{InClass.Get().GetName()}] was spawned for an invalid owner (ck::TransientEntity() means nobody): nothing spawns"))
+        { return FCk_Handle_PendingEntityScript(); }
+
+        auto Owner = utils_mars_net::Get_SpawnOwnerFor(InOwner, InOwner);
+        if (ck::Is_NOT_Valid(Owner))
+        { return FCk_Handle_PendingEntityScript(); }
+
+        auto Pending = UCk_Utils_EntityScript_UE::Request_SpawnEntity(Owner, InClass, InSpawnParams.InstancedStruct);
+        if (Owner == InOwner || utils_entity_lifetime::Get_IsTransientEntity(InOwner))
+        { return Pending; }
+
+        auto Entity = Pending.Get_EntityUnderConstruction();
+        if (ck::IsValid(Entity))
+        { Entity.Add_Fragment(FMars_Fragment_WorldItem_Tether(InOwner)); }
+
+        return Pending;
+    }
+
+    // Whose lifetime InEntity follows: the tether's owner when the spawn put it under another, else its lifetime owner.
+    // Valid on an entity still under construction.
+    FCk_Handle Get_SpawnOwner(const FCk_Handle& InEntity)
+    {
+        if (InEntity.Has_Fragment(FMars_Fragment_WorldItem_Tether))
+        { return InEntity.Get_Fragment(FMars_Fragment_WorldItem_Tether).Owner; }
+
+        return utils_entity_lifetime::Get_LifetimeOwner(InEntity);
     }
 
     // Unset when InPending is older than constants_world_item::k_ArriveFromMaxAgeSeconds.
@@ -365,6 +412,23 @@ namespace utils_world_item
 
         const UMars_ItemTrait_Presentation Presentation = Definition.Get_ItemTraitByClass(UMars_ItemTrait_Presentation);
         return Presentation;
+    }
+
+    // The DoesNotReplicate script a Visual-mode spawn of InItem uses: the definition's Presentation.WorldItem.VisualScriptClass
+    // (the base visual unless the item's own visual dresses itself), else the base visual. A Replicates class spawned on a
+    // client is a placeholder that never builds, and on a host it would replicate a visual that is the owner's alone.
+    TSubclassOf<UMars_WorldItem_EntityScript> Get_VisualScriptClass(const FCk_Handle_Item& InItem)
+    {
+        TSubclassOf<UMars_WorldItem_EntityScript> VisualClass = UMars_WorldItem_Visual_EntityScript;
+        const auto Definition = InItem.Get_Definition();
+        if (ck::Is_NOT_Valid(Definition))
+        { return VisualClass; }
+
+        const UMars_ItemTrait_Presentation Presentation = Definition.Get_ItemTraitByClass(UMars_ItemTrait_Presentation);
+        if (ck::IsValid(Presentation) && ck::IsValid(Presentation.WorldItem.VisualScriptClass))
+        { VisualClass = Presentation.WorldItem.VisualScriptClass; }
+
+        return VisualClass;
     }
 
     // The item's Presentation.WorldItem.ScriptClass, else the base WorldItem entity script.
@@ -476,6 +540,33 @@ mixin UCk_InventoryItem_Definition Get_Definition(const FCk_Handle_WorldItem& Se
 mixin FCk_Handle_Inventory_DataOnly Get_Holder(const FCk_Handle_WorldItem& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_WorldItem).Holder;
+}
+
+// The pickups the authority has refused, as this machine last received it; 0 in Visual mode.
+mixin int32 Get_RefusalSerial(const FCk_Handle_WorldItem& Self)
+{
+    if (Self.Has_Fragment(FMars_Fragment_WorldItem_Net) == false)
+    { return 0; }
+
+    return Self.Get_Fragment(FMars_Fragment_WorldItem_Net).RefusalSerial;
+}
+
+// Why the latest refused pickup was refused; meaningful once Get_RefusalSerial is above 0.
+mixin EMars_Interaction_FailReason Get_LastRefusal(const FCk_Handle_WorldItem& Self)
+{
+    if (Self.Has_Fragment(FMars_Fragment_WorldItem_Net) == false)
+    { return EMars_Interaction_FailReason::NowhereToStow; }
+
+    return Self.Get_Fragment(FMars_Fragment_WorldItem_Net).LastRefusal;
+}
+
+// Whose pickup was refused last; invalid before any, and on a client while that entity is not resolved there.
+mixin FCk_Handle Get_LastRefused(const FCk_Handle_WorldItem& Self)
+{
+    if (Self.Has_Fragment(FMars_Fragment_WorldItem_Net) == false)
+    { return FCk_Handle(); }
+
+    return Self.Get_Fragment(FMars_Fragment_WorldItem_Net).LastRefused;
 }
 
 // Invalid in Visual mode, and while the holder is empty.
@@ -653,6 +744,12 @@ mixin void Request_ArriveNextMount(FCk_Handle_WorldItem& Self, const FMars_Reque
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_WorldItem_Requests);
     Requests.ArriveNextMountRequests.Add(InRequest);
+}
+
+mixin void Request_PickUp(FCk_Handle_WorldItem& Self, const FMars_Request_WorldItem_PickUp& InRequest)
+{
+    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_WorldItem_Requests);
+    Requests.PickUpRequests.Add(InRequest);
 }
 
 mixin void Request_Release(FCk_Handle_WorldItem& Self, const FMars_Request_WorldItem_Release& InRequest)

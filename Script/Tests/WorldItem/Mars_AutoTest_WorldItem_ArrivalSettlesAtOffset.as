@@ -21,7 +21,7 @@ class UMars_AutoTest_WorldItem_ArrivalSettlesAtOffset : UCk_AutoTest_Base
         SpawnParams.ArriveFrom = FMars_WorldItem_Arrival(
             FTransform(FRotator::ZeroRotator, RootWorld.GetLocation() + FVector(110.0, 0.0, 0.0)));
 
-        auto Pending = utils_entity_script::Request_SpawnEntity(InHandle, UMars_WorldItem_EntityScript, SpawnParams);
+        auto Pending = utils_entity_script::Request_SpawnEntity(InHandle, UMars_WorldItem_Visual_EntityScript, SpawnParams);
         utils_pending_entity_script::Promise_OnConstructed(
             Pending,
             FCk_Delegate_EntityScript_Constructed(this, n"OnVisualConstructed"));

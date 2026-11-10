@@ -370,6 +370,7 @@ class UMars_SmTask_ActAtGrip : UMars_SmTask_InteractionWork
         _LastDeltaSeconds = float32(InDeltaT.Get_Seconds());
         Tick_ReachAnswer();
         Tick_PushEnd();
+        Tick_AwaitedEffect();
         return _Outcome;
     }
 
@@ -378,6 +379,7 @@ class UMars_SmTask_ActAtGrip : UMars_SmTask_InteractionWork
     void DoExitTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
     {
         Stop_Waiting();
+        End_AwaitedEffect();
     }
 
     // Acts at the Grip of the reach InInitiator's gloves make for this interaction's target, which this task asks for.

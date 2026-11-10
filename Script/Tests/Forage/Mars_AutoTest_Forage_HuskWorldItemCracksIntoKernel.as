@@ -20,7 +20,7 @@ class UMars_AutoTest_Forage_HuskWorldItemCracksIntoKernel : UMars_AutoTestRig_Fo
         SpawnParams.Mode = EMars_WorldItem_Mode::World;
         SpawnParams.SpawnTransform = FTransform(FRotator::ZeroRotator, k_Origin + FVector(0.0, 0.0, k_SpawnHeight));
 
-        auto Pending = utils_entity_script::Request_SpawnEntity(InHandle, UMars_WorldItem_Husk_EntityScript, SpawnParams);
+        auto Pending = utils_world_item::Request_SpawnWorldEntity(InHandle, UMars_WorldItem_Husk_EntityScript, SpawnParams);
         utils_pending_entity_script::Promise_OnConstructed(
             Pending,
             FCk_Delegate_EntityScript_Constructed(this, n"OnHuskConstructed"));

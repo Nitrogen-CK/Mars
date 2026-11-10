@@ -38,7 +38,7 @@ class UMars_AutoTest_CargoSlot_AFoodItemStowsIntoThePackAndRidesIt : UMars_AutoT
         PackParams.Definition = mars_items::Backpack();
         PackParams.Mode = EMars_WorldItem_Mode::World;
         PackParams.SpawnTransform = FTransform(FRotator::ZeroRotator, k_Origin + k_PackOffset + FVector(0.0, 0.0, 20.0));
-        auto PackPending = utils_entity_script::Request_SpawnEntity(InHandle, UMars_Backpack_EntityScript, PackParams);
+        auto PackPending = utils_world_item::Request_SpawnWorldEntity(InHandle, UMars_Backpack_EntityScript, PackParams);
         _PackEntity = PackPending.Get_EntityUnderConstruction();
 
         _FoodEntity = Spawn_FoodItemOnFloor(InHandle, mars_items::Food_MeatSlab(), k_Origin + k_FoodOffset);

@@ -96,7 +96,7 @@ class UMars_AutoTestRig_FlameItem : UMars_AutoTestRig_Carrier
         SpawnParams.Mode = EMars_WorldItem_Mode::World;
         SpawnParams.SpawnTransform = FTransform(FRotator::ZeroRotator, InSpawn.Location);
 
-        auto Pending = utils_entity_script::Request_SpawnEntity(InHandle, InSpawn.ScriptClass, SpawnParams);
+        auto Pending = utils_world_item::Request_SpawnWorldEntity(InHandle, InSpawn.ScriptClass, SpawnParams);
         utils_pending_entity_script::Promise_OnConstructed(Pending, FCk_Delegate_EntityScript_Constructed(this, n"OnFlameItemConstructed"));
     }
 

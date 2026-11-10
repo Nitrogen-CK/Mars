@@ -611,7 +611,7 @@ namespace utils_pantry_rat
 
         // Under the world's transient entity: the dropped item outlives the corpse.
         auto Owner = ck::TransientEntity();
-        auto Pending = utils_entity_script::Request_SpawnEntity(Owner, utils_world_item::Get_WorldItemScriptClass(Loot), SpawnParams);
+        auto Pending = utils_world_item::Request_SpawnWorldEntity(Owner, utils_world_item::Get_WorldItemScriptClass(Loot), SpawnParams);
         InOutState.Death.ReleaseHolder = Pending.Get_EntityUnderConstruction();
 
         if (ck::IsValid(InOutState.CarryVisual))

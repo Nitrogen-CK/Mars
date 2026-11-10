@@ -130,6 +130,12 @@ struct FMars_ItemPresentation_WorldItem
     // Null = the base WorldItem entity script. Set it only for an item family that needs behaviour of its own.
     UPROPERTY()
     TSubclassOf<UMars_WorldItem_EntityScript> ScriptClass;
+
+    // The DoesNotReplicate script a held, carried or locked visual of the item uses (utils_world_item::Get_VisualScriptClass).
+    // Set it beside ScriptClass only when the family's visual dresses itself (a potion's slosh); a family whose script
+    // adds nothing in Visual mode keeps the base visual.
+    UPROPERTY()
+    TSubclassOf<UMars_WorldItem_EntityScript> VisualScriptClass = UMars_WorldItem_Visual_EntityScript;
 }
 
 // What an item looks like when it needs a physical representation - dropped in the world or held in the hand.

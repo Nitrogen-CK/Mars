@@ -1,3 +1,9 @@
+// Stance SPLIT, nothing replicates here. The probe, targets, focus, prompts and the per-target interaction state machine
+// are owner-local (E): they run on the initiating machine, built on every machine with their owner. Disable reasons stay
+// derived per machine from replicated facts (the holder, the mount, a kernel's ledger). A WhileLive task whose work
+// mutates a replicated kernel fires that kernel's cue and waits for the effect to replicate back
+// (UMars_SmTask_InteractionWork.Await_ReplicatedEffect); the transfer itself happens on the authority.
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
 //--------------------------------------------------------------------------------------------------------------------------

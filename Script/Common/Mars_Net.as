@@ -4,11 +4,13 @@ namespace constants_mars_net
     const FName k_SpawnOwnerTag = n"TAG_MarsReplicatedSpawnOwner";
 }
 
-// Owns the net-correlated lifetime owner that every replicated runtime spawn goes under. Server only: a client receives
-// replicated entities, it never spawns one. A world subsystem rather than the GameState because every world that can
-// spawn needs the anchor (the camp, a dungeon, the net-test harness map) and none of them share a GameState.
-// A Replicates spawn under a non-replicating owner (ck::TransientEntity()) never reaches a client, so the channel is
-// acquired once here and published by entity tag for the synchronous lookup at every spawn site.
+// Owns the net-correlated lifetime owner that every replicated runtime spawn goes under. Every world but a client's
+// (a listen host, a dedicated server, a standalone session alike): a client receives replicated entities, it never spawns
+// one. A world subsystem rather than the GameState because every world that can spawn needs the anchor (the camp, a
+// dungeon, the net-test harness map) and none of them share a GameState.
+// A Replicates script spawned under an owner with no replication driver (ck::TransientEntity()) gets replicated net
+// params and no driver: it never reaches a client and cannot create a replicated inventory item, in standalone too. So
+// the channel is acquired once here and published by entity tag for the synchronous lookup at every spawn site.
 class UMars_Net_Subsystem : UScriptWorldSubsystem
 {
     private FCk_Handle_PendingActorRelay _PendingChannel;
@@ -30,6 +32,9 @@ class UMars_Net_Subsystem : UScriptWorldSubsystem
     UFUNCTION(BlueprintOverride)
     void OnWorldBeginPlay()
     {
+        // The automation lanes inherit this machine's PIE net mode, so every log says which world it ran.
+        Log(f"[MarsNet] world [{GetWorld().GetName()}] begins play with net mode {GetWorld().GetNetMode() :n}");
+
         if (System::IsServer() == false)
         { return; }
 
@@ -44,7 +49,7 @@ class UMars_Net_Subsystem : UScriptWorldSubsystem
 
         auto ChannelOwner = InResult.Get_ChannelEntity();
         if (ck::EnsureIfNot(ck::IsValid(ChannelOwner),
-            "[MarsNet] the ActorRelay channel came back invalid: every replicated runtime spawn in this world degrades to a local one"))
+            "[MarsNet] the ActorRelay channel came back invalid: no replicated runtime spawn can happen in this world"))
         { return; }
 
         _ChannelOwner = ChannelOwner;
@@ -56,9 +61,10 @@ class UMars_Net_Subsystem : UScriptWorldSubsystem
 namespace utils_mars_net
 {
     // The replicated lifetime owner for a runtime spawn of a Replicates entity script, resolved through InAnyHandle's
-    // world. Authority: the channel entity, or (ensure) ck::TransientEntity() while the channel is still being acquired,
-    // so a too-early spawn degrades to a local one instead of crashing. Client: invalid - a client never spawns a
-    // replicated thing; callers gate on utils_net::Get_HasAuthority first.
+    // world. Authority: the channel entity; invalid (ensure) while the channel is still being acquired, because a
+    // Replicates script under a driverless owner is a broken half-replicated entity, never a working local one: a caller
+    // that can run that early asks Get_HasReplicatedSpawnOwner first. Client: invalid - a client never spawns a
+    // replicated thing.
     FCk_Handle Get_ReplicatedSpawnOwner(const FCk_Handle& InAnyHandle)
     {
         if (Get_IsClientWorld(InAnyHandle))
@@ -66,10 +72,26 @@ namespace utils_mars_net
 
         const auto Owner = DoFind_SpawnOwner(InAnyHandle);
         if (ck::EnsureIfNot(ck::IsValid(Owner),
-            "[MarsNet] a replicated spawn asked for the spawn owner before the channel was acquired: it spawns local and never reaches a client"))
-        { return ck::TransientEntity(); }
+            "[MarsNet] a replicated spawn asked for the spawn owner before the channel was acquired: nothing spawns"))
+        { return FCk_Handle(); }
 
         return Owner;
+    }
+
+    // The lifetime owner a runtime spawn of a Replicates script gets when the caller wants it to follow InOwner: InOwner
+    // itself when it has a replication driver (the spawn is then its replicated child), else the replicated spawn owner.
+    // One path on every authority world, standalone included; invalid on a client and while the channel is not
+    // acquired (Get_ReplicatedSpawnOwner). A spawn that lands under the spawn owner no longer dies with InOwner: its
+    // caller ends it.
+    FCk_Handle Get_SpawnOwnerFor(const FCk_Handle& InAnyHandle, const FCk_Handle& InOwner)
+    {
+        if (Get_IsClientWorld(InAnyHandle))
+        { return FCk_Handle(); }
+
+        if (ck::IsValid(InOwner) && utils_entity_replication_driver::Has(InOwner))
+        { return InOwner; }
+
+        return Get_ReplicatedSpawnOwner(InAnyHandle);
     }
 
     // Whether this world's spawn owner is published yet; always false on a client. The readiness query for code that

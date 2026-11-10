@@ -46,7 +46,7 @@ class UMars_AutoTest_PackFit_WornPackRaisesTheCrouch : UMars_AutoTestRig_PlayerC
         PackParams.Mode = EMars_WorldItem_Mode::World;
         PackParams.SpawnTransform = FTransform(FRotator::ZeroRotator, _Origin + FVector(150.0, 0.0, 30.0));
         // A loose item lives under the world's transient entity, as the WorldItem tests spawn theirs; tracked for cleanup.
-        _PackEntity = utils_entity_script::Request_SpawnEntity(ck::TransientEntity(), UMars_Backpack_EntityScript, PackParams).Get_EntityUnderConstruction();
+        _PackEntity = utils_world_item::Request_SpawnWorldEntity(ck::TransientEntity(), UMars_Backpack_EntityScript, PackParams).Get_EntityUnderConstruction();
         Track_ForCleanup(_PackEntity);
     }
 

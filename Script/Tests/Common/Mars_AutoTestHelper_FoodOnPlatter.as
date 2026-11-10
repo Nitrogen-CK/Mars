@@ -19,7 +19,7 @@ class UMars_AutoTestHelper_FoodOnPlatter : UObject
         SpawnParams.Mode = EMars_WorldItem_Mode::World;
 
         auto Owner = ck::TransientEntity();
-        auto Pending = utils_entity_script::Request_SpawnEntity(Owner, UMars_FoodItem_EntityScript, SpawnParams);
+        auto Pending = utils_world_item::Request_SpawnWorldEntity(Owner, UMars_FoodItem_EntityScript, SpawnParams);
         utils_pending_entity_script::Promise_OnConstructed(Pending, FCk_Delegate_EntityScript_Constructed(this, n"OnFoodConstructed"));
 
         auto Food = Pending.Get_EntityUnderConstruction();

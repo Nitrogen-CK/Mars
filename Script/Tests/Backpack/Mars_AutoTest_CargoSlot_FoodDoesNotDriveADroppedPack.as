@@ -29,7 +29,7 @@ class UMars_AutoTest_CargoSlot_FoodDoesNotDriveADroppedPack : UMars_AutoTestRig_
         Params.Definition = mars_items::Backpack();
         Params.Mode = EMars_WorldItem_Mode::World;
         Params.SpawnTransform = FTransform(FRotator(90.0, 0.0, 0.0), k_Origin + FVector(200.0, -150.0, 50.0));
-        _PackEntity = utils_entity_script::Request_SpawnEntity(InHandle, UMars_Backpack_EntityScript, Params).Get_EntityUnderConstruction();
+        _PackEntity = utils_world_item::Request_SpawnWorldEntity(InHandle, UMars_Backpack_EntityScript, Params).Get_EntityUnderConstruction();
         _FoodEntity = Spawn_FoodItemOnFloor(InHandle, mars_items::Food_Mushroom(), k_Origin + FVector(200.0, 250.0, 0.0));
         utils_timer::Create_Tick(InHandle, FCk_Delegate_Timer(this, n"OnWatch"));
 

@@ -47,7 +47,7 @@ class UMars_AutoTest_PlatterDock_PlaceFoodLoadsTheDockedPlatter : UMars_AutoTest
 
         // A piece outlives its spawner: under the world's transient entity, tracked for cleanup.
         auto PieceOwner = ck::TransientEntity();
-        _FoodEntity = utils_entity_script::Request_SpawnEntity(PieceOwner, UMars_FoodItem_EntityScript, SpawnParams).Get_EntityUnderConstruction();
+        _FoodEntity = utils_world_item::Request_SpawnWorldEntity(PieceOwner, UMars_FoodItem_EntityScript, SpawnParams).Get_EntityUnderConstruction();
         Track_ForCleanup(_FoodEntity);
 
         Add_Step_WaitUntil("the platter is constructed", n"Check_PlattersConstructed", k_SlowPolls, 0);

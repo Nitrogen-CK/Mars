@@ -1,3 +1,9 @@
+// Stance SPLIT, nothing replicates here. A drop or a throw is the authority's: every machine that decides one fires
+// Cue.Mars.HeldItemUse.Launch at the player's entity with its own aim (utils_held_item_use::Fire_LaunchCue), and the
+// authority's drain launches the item as a World-mode world item under the replicated spawn owner; a client's own Drop or
+// Throw request is dropped. ThrowArmed and the use interactable are owner-local (E): the HUD's throw-armed state and the
+// use interactable live on the machine whose player holds the item, so their requests apply on every machine.
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
 //--------------------------------------------------------------------------------------------------------------------------
@@ -127,12 +133,58 @@ struct FMars_Request_HeldItemUse_RefreshFromHeldItem
     FMars_Request_HeldItemUse_RefreshFromHeldItem() {}
 }
 
+// Where a launch goes, taken from the launching machine's view: the authority cannot know a client's view.
+struct FMars_HeldItemUse_Aim
+{
+    UPROPERTY()
+    FVector Forward = FVector::ForwardVector;
+
+    UPROPERTY()
+    FVector PawnVelocity = FVector::ZeroVector;
+
+    FMars_HeldItemUse_Aim() {}
+
+    FMars_HeldItemUse_Aim(FVector InForward, FVector InPawnVelocity)
+    {
+        Forward = InForward;
+        PawnVelocity = InPawnVelocity;
+    }
+}
+
+// One launch: its kind and its aim (unset: the drain reads the player's view where it runs). The payload of
+// Cue.Mars.HeldItemUse.Launch, and what the drain launches from.
+struct FMars_HeldItemUse_Launch
+{
+    UPROPERTY()
+    EMars_LaunchKind Kind = EMars_LaunchKind::Drop;
+
+    UPROPERTY()
+    TOptional<FMars_HeldItemUse_Aim> Aim;
+
+    FMars_HeldItemUse_Launch() {}
+
+    FMars_HeldItemUse_Launch(EMars_LaunchKind InKind, const FMars_HeldItemUse_Aim& InAim)
+    {
+        Kind = InKind;
+        Aim = TOptional<FMars_HeldItemUse_Aim>(InAim);
+    }
+}
+
+// Aim unset: the drain reads the player's view (a request issued on the authority itself, as the tests do).
 struct FMars_Request_HeldItemUse_Drop
 {
     UPROPERTY()
     bool Requested = true;
 
+    UPROPERTY()
+    TOptional<FMars_HeldItemUse_Aim> Aim;
+
     FMars_Request_HeldItemUse_Drop() {}
+
+    FMars_Request_HeldItemUse_Drop(TOptional<FMars_HeldItemUse_Aim> InAim)
+    {
+        Aim = InAim;
+    }
 }
 
 struct FMars_Request_HeldItemUse_Throw
@@ -140,7 +192,15 @@ struct FMars_Request_HeldItemUse_Throw
     UPROPERTY()
     bool Requested = true;
 
+    UPROPERTY()
+    TOptional<FMars_HeldItemUse_Aim> Aim;
+
     FMars_Request_HeldItemUse_Throw() {}
+
+    FMars_Request_HeldItemUse_Throw(TOptional<FMars_HeldItemUse_Aim> InAim)
+    {
+        Aim = InAim;
+    }
 }
 
 struct FMars_Request_HeldItemUse_SetThrowArmed

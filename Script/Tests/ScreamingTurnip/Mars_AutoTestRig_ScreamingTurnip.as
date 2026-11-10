@@ -113,7 +113,7 @@ class UMars_AutoTestRig_ScreamingTurnip : UMars_AutoTestRig_Carrier
         Params.Vocal = InVocal;
 
         auto Owner = InHandle;
-        auto Pending = utils_entity_script::Request_SpawnEntity(Owner, UMars_ScreamingTurnip_EntityScript, Params);
+        auto Pending = utils_world_item::Request_SpawnWorldEntity(Owner, UMars_ScreamingTurnip_EntityScript, Params);
         utils_pending_entity_script::Promise_OnConstructed(Pending, FCk_Delegate_EntityScript_Constructed(this, n"OnTurnipConstructed"));
     }
 
