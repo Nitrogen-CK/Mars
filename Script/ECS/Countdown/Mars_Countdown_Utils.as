@@ -15,9 +15,14 @@ namespace utils_countdown
         auto State = FMars_Fragment_Countdown();
         State.Remaining = InParams.StartCharged ? InParams.Steps : 0;
 
+        auto Mirror = FMars_Fragment_Countdown_Mirror();
+        Mirror.Last = State;
+
         InHandle.Add_Fragment(FMars_Feature_Countdown());
         InHandle.Add_Fragment(Params);
-        InHandle.Add_Fragment(State);
+        InHandle.Add_Fragment(State, ECk_Replication::Replicates);
+        InHandle.Add_Fragment(FMars_Fragment_Countdown_Clock());
+        InHandle.Add_Fragment(Mirror);
         InHandle.Add_Fragment(FMars_Tag_Countdown_NeedsSetup());
         if (State.Remaining > 0)
         { InHandle.Add_Fragment(FMars_Tag_Countdown_Running()); }

@@ -1,6 +1,7 @@
 UCLASS(NotPlaceable)
 class UMars_MechanismDriver_EntityScript : UCk_GenericEntityScript_UE
 {
+    // Stance C, server-only: spawned by the subsystem on the authority; never exists on a client.
     default _Replication = ECk_Replication::DoesNotReplicate;
 
     private FCk_Handle_MechanismDriver _Driver;

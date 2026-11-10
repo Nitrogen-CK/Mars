@@ -1,6 +1,7 @@
-// The link: a Gate that also has a MechanismSink opens while powered; a Gate that also has a MechanismSource
-// asserts while open. Both features live on the gate's own entity. A gate with a threshold retries a deferred close
-// each time something leaves it.
+// The link, on the authority: a Gate that also has a MechanismSink opens while powered; a Gate that also has a
+// MechanismSource asserts while open. Both features live on the gate's own entity. A gate with a threshold retries a
+// deferred close each time something leaves it. A client wires none of it: it binds the ledger's rep-notify and
+// reconciles once, moving its own leaf and broadcasting OnOpenChanged when the replicated position changes.
 class UMars_Processor_Gate_Setup : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -16,6 +17,16 @@ class UMars_Processor_Gate_Setup : UCk_Processor_Script_Base_UE
     void ForEachEntity(FCk_Time InDeltaT, FCk_Handle& InHandle)
     {
         auto Gate = InHandle.As_Gate();
+        Gate.Request_TryRemove(FMars_Tag_Gate_NeedsSetup);
+
+        if (utils_net::Get_HasAuthority(InHandle) == false)
+        {
+            InHandle.BindTo_OnRepNotify(FMars_Fragment_Gate, FCk_DynamicFragment_OnRepNotify(this, n"OnLedgerReplicated"));
+            Reconcile(Gate);
+            return;
+        }
+
+        Gate.Request_TryRemove(FMars_Fragment_Gate_Mirror);
 
         auto Sink = InHandle.As_MechanismSink(ECk_SanityCheck::UnChecked);
         if (ck::IsValid(Sink))
@@ -34,8 +45,33 @@ class UMars_Processor_Gate_Setup : UCk_Processor_Script_Base_UE
         auto Threshold = Gate.Get_Threshold();
         if (ck::IsValid(Threshold))
         { Threshold.BindTo_OnEntityExited(FMars_Delegate_Trigger_OnEntityExited(this, n"OnThresholdEntityExited")); }
+    }
 
-        Gate.Request_TryRemove(FMars_Tag_Gate_NeedsSetup);
+    UFUNCTION()
+    private void OnLedgerReplicated(FCk_Handle InHandle, FCk_DynamicFragment_RepNotifyInfo InInfo)
+    {
+        auto Gate = InHandle.As_Gate();
+        Reconcile(Gate);
+    }
+
+    // A deferred close is still open, so it moves nothing and broadcasts nothing. The diff against Last guards the
+    // reconcile and the notify alike: one replicated change broadcasts once.
+    private void Reconcile(FCk_Handle_Gate& InGate)
+    {
+        auto& Mirror = InGate.Get_Fragment(FMars_Fragment_Gate_Mirror);
+        const auto WasOpen = Mirror.Last.State != EMars_Gate_State::Closed;
+        Mirror.Last = InGate.Get_Fragment(FMars_Fragment_Gate);
+
+        const auto Position = InGate.Get_Position();
+        const auto Open = Position == EMars_Gate_Position::Open;
+        if (Open == WasOpen)
+        { return; }
+
+        auto Mover = InGate.Get_MovingNode().As_Mover();
+        Mover.Request_MoveTo(FMars_Request_Mover_MoveTo(Open ? EMars_Mover_Pose::End : EMars_Mover_Pose::Start));
+
+        if (InGate.Has_Fragment(FMars_Fragment_Gate_Signals))
+        { InGate.Get_Fragment(FMars_Fragment_Gate_Signals).OnOpenChanged.Broadcast(InGate, Position); }
     }
 
     // The source asserts while the gate is open.

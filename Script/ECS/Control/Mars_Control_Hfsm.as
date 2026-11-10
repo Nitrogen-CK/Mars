@@ -36,14 +36,17 @@ class UMars_SmTask_Control_Engage : UCk_SmTask_EntityScript
             return;
         }
 
-        auto Control = Context.Get_Fragment(FMars_Fragment_InteractionContext).InteractableOwner.As_Control();
-        if (ck::Is_NOT_Valid(Control))
+        // The control's root is the replicated entity: the cue carries the engage from this (initiating) machine to the
+        // authority, which runs it the same way on the listen host and in standalone.
+        auto Owner = Context.Get_Fragment(FMars_Fragment_InteractionContext).InteractableOwner;
+        if (ck::Is_NOT_Valid(Owner.As_Control(ECk_SanityCheck::UnChecked)))
         {
             Mark_Result(ECk_SmTaskResult::Failed);
             return;
         }
 
-        Control.Request_Engage(FMars_Request_Control_Engage());
+        utils_cue_generic::Request_ExecuteCue(Owner, GameplayTags::Cue_Mars_Control_Engage, UMars_Cue_Control_Engage::Params(),
+            ECk_Cue_ReliabilityPolicy::Reliable, ECk_Cue_MulticastPolicy::ServerOnly);
         Mark_Result(ECk_SmTaskResult::Succeeded);
     }
 }

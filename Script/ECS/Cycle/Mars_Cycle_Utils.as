@@ -13,9 +13,14 @@ namespace utils_cycle
 
         InHandle.Add_Fragment(FMars_Feature_Cycle());
         InHandle.Add_Fragment(Params);
-        InHandle.Add_Fragment(FMars_Fragment_Cycle());
+        InHandle.Add_Fragment(FMars_Fragment_Cycle(), ECk_Replication::Replicates);
+        InHandle.Add_Fragment(FMars_Fragment_Cycle_Local());
+        InHandle.Add_Fragment(FMars_Fragment_Cycle_Mirror());
+        InHandle.Add_Fragment(FMars_Tag_Cycle_NeedsSetup());
 
         auto Cycle = InHandle.As_Cycle();
+
+        // A client's drain drops it: the authority's start replicates.
         if (InParams.StartRunning)
         { Cycle.Request_SetRunning(FMars_Request_Cycle_SetRunning(EMars_Cycle_RunState::Running)); }
 

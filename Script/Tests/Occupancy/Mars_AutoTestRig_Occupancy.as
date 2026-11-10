@@ -83,7 +83,7 @@ class UMars_AutoTestRig_Occupancy : UCk_AutoTest_Base
 
     protected FCk_Handle_Timer Get_ReleaseTimer(const FCk_Handle_Occupancy& InOccupancy) const
     {
-        return InOccupancy.Get_Fragment(FMars_Fragment_Occupancy).ReleaseTimer;
+        return InOccupancy.Get_Fragment(FMars_Fragment_Occupancy_Local).ReleaseTimer;
     }
 
     private FVector Get_OutsideLocation(int32 InIndex) const

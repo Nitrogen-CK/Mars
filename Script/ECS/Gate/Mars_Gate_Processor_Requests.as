@@ -16,6 +16,12 @@ class UMars_Processor_Gate_HandleRequests : UCk_Processor_Script_Base_UE
                        FMars_Fragment_Gate_Requests& InRequests,
                        FMars_Fragment_Gate& InState)
     {
+        if (utils_net::Get_HasAuthority(InHandle) == false)
+        {
+            InHandle.Request_TryRemove(FMars_Fragment_Gate_Requests);
+            return;
+        }
+
         auto Self = InHandle.As_Gate();
 
         const auto HasSetPosition = InRequests.SetPositionRequests.Num() > 0;
@@ -46,15 +52,17 @@ class UMars_Processor_Gate_HandleRequests : UCk_Processor_Script_Base_UE
         if (Open == false && WasOpen && InGate.Get_IsThresholdOccupied())
         {
             InState.State = EMars_Gate_State::CloseDeferred;
+            InGate.H().Request_MarkReplicationDirty(FMars_Fragment_Gate);
             return;
         }
 
         InState.State = Open ? EMars_Gate_State::Open : EMars_Gate_State::Closed;
+        InGate.H().Request_MarkReplicationDirty(FMars_Fragment_Gate);
 
         if (WasOpen == Open)
         { return; }
 
-        auto Mover = InState.MovingNode.As_Mover();
+        auto Mover = InGate.Get_MovingNode().As_Mover();
         Mover.Request_MoveTo(FMars_Request_Mover_MoveTo(Open ? EMars_Mover_Pose::End : EMars_Mover_Pose::Start));
 
         if (InGate.Has_Fragment(FMars_Fragment_Gate_Signals))

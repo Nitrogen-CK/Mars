@@ -22,7 +22,11 @@ namespace utils_mechanism_sink
 
         InHandle.Add_Fragment(FMars_Feature_MechanismSink());
         InHandle.Add_Fragment(Params);
-        InHandle.Add_Fragment(State);
+        InHandle.Add_Fragment(State, ECk_Replication::Replicates);
+        auto Mirror = FMars_Fragment_MechanismSink_Mirror();
+        Mirror.Last = State;
+        InHandle.Add_Fragment(Mirror);
+        InHandle.Add_Fragment(FMars_Tag_MechanismSink_NeedsSetup());
         utils_entity_tag::Add(InHandle, n"TAG_MarsMechanismSink");
         return InHandle.As_MechanismSink();
     }

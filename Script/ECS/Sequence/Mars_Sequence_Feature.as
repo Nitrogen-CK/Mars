@@ -1,3 +1,7 @@
+// Stance A. Progress and the rejection record (FMars_Fragment_Sequence) are the replicated ledger, judged and written by
+// the authority's request drain; the step timer is the authority's clock and lives in the local
+// FMars_Fragment_Sequence_Local. A client mirrors the ledger and broadcasts the same four signals from it.
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
 //--------------------------------------------------------------------------------------------------------------------------
@@ -90,9 +94,28 @@ struct FMars_Fragment_Sequence
     UPROPERTY()
     int32 Progress = 0;
 
+    // Every rejected input, counted, and the channel of the latest: a client cannot tell a rejection from the progress.
+    UPROPERTY()
+    int32 Rejections = 0;
+
+    UPROPERTY()
+    FGameplayTag LastRejectedChannel;
+}
+
+// The authority's clock, never replicated (its request drain arms and destroys the timer).
+struct FMars_Fragment_Sequence_Local
+{
     // Step timeout while in progress; output pulse while complete and unlatched.
     UPROPERTY()
     FCk_Handle_Timer StepTimer;
+}
+
+// Non-authority only (the authority's setup removes it): the ledger as this machine last broadcast it, seeded with the
+// ledger as Add composed it, so a value that replicated before the setup ran still broadcasts.
+struct FMars_Fragment_Sequence_Mirror
+{
+    UPROPERTY()
+    FMars_Fragment_Sequence Last;
 }
 
 struct FMars_Tag_Sequence_NeedsSetup {}

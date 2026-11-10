@@ -1,5 +1,7 @@
-// The link: a countdown consumes rising edges from the MechanismSink on its own entity (each one charges it) and drives the
-// MechanismSource on that entity (asserted while charged). With HoldWhilePowered the sink's power also holds it full.
+// The link, on the authority: a countdown consumes rising edges from the MechanismSink on its own entity (each one charges
+// it) and drives the MechanismSource on that entity (asserted while charged). With HoldWhilePowered the sink's power also
+// holds it full. A client wires none of it: it binds the ledger's rep-notify, reconciles once, and broadcasts
+// OnRemainingChanged when the replicated Remaining changes.
 class UMars_Processor_Countdown_Setup : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -15,6 +17,16 @@ class UMars_Processor_Countdown_Setup : UCk_Processor_Script_Base_UE
     void ForEachEntity(FCk_Time InDeltaT, FCk_Handle& InHandle)
     {
         auto Countdown = InHandle.As_Countdown();
+
+        if (utils_net::Get_HasAuthority(InHandle) == false)
+        {
+            InHandle.BindTo_OnRepNotify(FMars_Fragment_Countdown, FCk_DynamicFragment_OnRepNotify(this, n"OnLedgerReplicated"));
+            Reconcile(Countdown);
+            Countdown.Request_TryRemove(FMars_Tag_Countdown_NeedsSetup);
+            return;
+        }
+
+        Countdown.Request_TryRemove(FMars_Fragment_Countdown_Mirror);
 
         auto Sink = InHandle.As_MechanismSink(ECk_SanityCheck::UnChecked);
         ck::EnsureIfNot(ck::IsValid(Sink) || Countdown.Get_HoldWhilePowered() == false,
@@ -45,6 +57,26 @@ class UMars_Processor_Countdown_Setup : UCk_Processor_Script_Base_UE
     private EMars_MechanismSource_Output Get_SourceOutput(int32 InRemaining) const
     {
         return InRemaining > 0 ? EMars_MechanismSource_Output::Asserted : EMars_MechanismSource_Output::Deasserted;
+    }
+
+    UFUNCTION()
+    private void OnLedgerReplicated(FCk_Handle InHandle, FCk_DynamicFragment_RepNotifyInfo InInfo)
+    {
+        auto Countdown = InHandle.As_Countdown();
+        Reconcile(Countdown);
+    }
+
+    private void Reconcile(FCk_Handle_Countdown& InCountdown)
+    {
+        const auto Ledger = InCountdown.Get_Fragment(FMars_Fragment_Countdown);
+        auto& Mirror = InCountdown.Get_Fragment(FMars_Fragment_Countdown_Mirror);
+        const auto PreviousRemaining = Mirror.Last.Remaining;
+        Mirror.Last = Ledger;
+
+        if (Ledger.Remaining == PreviousRemaining || InCountdown.Has_Fragment(FMars_Fragment_Countdown_Signals) == false)
+        { return; }
+
+        InCountdown.Get_Fragment(FMars_Fragment_Countdown_Signals).OnRemainingChanged.Broadcast(InCountdown, Ledger.Remaining);
     }
 
     UFUNCTION()

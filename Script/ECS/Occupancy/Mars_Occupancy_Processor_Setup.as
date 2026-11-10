@@ -1,5 +1,6 @@
-// Recounts on every trigger enter/exit, drives IsActive (with the release delay) and the optional mover, and is the
-// link: an occupancy that also has a MechanismSource asserts it while active.
+// On the authority: recounts on every trigger enter/exit, drives IsActive (with the release delay) and the optional
+// mover, and is the link: an occupancy that also has a MechanismSource asserts it while active. A client binds the
+// ledger's rep-notify and reconciles once instead: it moves its own mover and broadcasts what replicated.
 class UMars_Processor_Occupancy_Setup : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -15,6 +16,16 @@ class UMars_Processor_Occupancy_Setup : UCk_Processor_Script_Base_UE
     void ForEachEntity(FCk_Time InDeltaT, FCk_Handle& InHandle)
     {
         auto Occupancy = InHandle.As_Occupancy();
+
+        if (utils_net::Get_HasAuthority(InHandle) == false)
+        {
+            InHandle.BindTo_OnRepNotify(FMars_Fragment_Occupancy, FCk_DynamicFragment_OnRepNotify(this, n"OnLedgerReplicated"));
+            Reconcile(Occupancy);
+            Occupancy.Request_TryRemove(FMars_Tag_Occupancy_NeedsSetup);
+            return;
+        }
+
+        Occupancy.Request_TryRemove(FMars_Fragment_Occupancy_Mirror);
 
         auto Source = InHandle.As_MechanismSource(ECk_SanityCheck::UnChecked);
         if (ck::IsValid(Source))
@@ -48,6 +59,38 @@ class UMars_Processor_Occupancy_Setup : UCk_Processor_Script_Base_UE
     }
 
     UFUNCTION()
+    private void OnLedgerReplicated(FCk_Handle InHandle, FCk_DynamicFragment_RepNotifyInfo InInfo)
+    {
+        auto Occupancy = InHandle.As_Occupancy();
+        Reconcile(Occupancy);
+    }
+
+    // The authority's order: the activation edge (with its mover move), then the count.
+    private void Reconcile(FCk_Handle_Occupancy& InOccupancy)
+    {
+        const auto Ledger = InOccupancy.Get_Fragment(FMars_Fragment_Occupancy);
+        auto& Mirror = InOccupancy.Get_Fragment(FMars_Fragment_Occupancy_Mirror);
+        const auto Last = Mirror.Last;
+        Mirror.Last = Ledger;
+
+        if (Ledger.IsActive != Last.IsActive)
+        {
+            auto Mover = InOccupancy.Get_Mover();
+            if (ck::IsValid(Mover))
+            { Mover.Request_MoveTo(FMars_Request_Mover_MoveTo(Ledger.IsActive ? EMars_Mover_Pose::End : EMars_Mover_Pose::Start)); }
+
+            if (InOccupancy.Has_Fragment(FMars_Fragment_Occupancy_Signals))
+            {
+                const auto Activation = Ledger.IsActive ? EMars_Occupancy_Activation::Active : EMars_Occupancy_Activation::Inactive;
+                InOccupancy.Get_Fragment(FMars_Fragment_Occupancy_Signals).OnActiveChanged.Broadcast(InOccupancy, Activation);
+            }
+        }
+
+        if (Ledger.Count != Last.Count && InOccupancy.Has_Fragment(FMars_Fragment_Occupancy_Signals))
+        { InOccupancy.Get_Fragment(FMars_Fragment_Occupancy_Signals).OnCountChanged.Broadcast(InOccupancy, Ledger.Count); }
+    }
+
+    UFUNCTION()
     private void OnTriggerEntityEntered(FCk_Handle_Trigger InTrigger, FCk_Handle InEntity)
     {
         RecountLinked(InTrigger);
@@ -77,7 +120,7 @@ class UMars_Processor_Occupancy_Setup : UCk_Processor_Script_Base_UE
         auto Occupancy = Owner.As_Occupancy();
 
         // A timer cancelled by a re-entry can still finish in the frame it was destroyed.
-        if (Occupancy.Get_Fragment(FMars_Fragment_Occupancy).ReleaseTimer != InTimer)
+        if (Occupancy.Get_Fragment(FMars_Fragment_Occupancy_Local).ReleaseTimer != InTimer)
         { return; }
 
         DestroyReleaseTimer(Occupancy);
@@ -106,10 +149,13 @@ class UMars_Processor_Occupancy_Setup : UCk_Processor_Script_Base_UE
         const auto RequiredCount = Params.RequiredCount;
         const auto ReleaseDelaySeconds = Params.ReleaseDelaySeconds;
 
+        const auto Trigger = InOccupancy.Get_Trigger();
         auto& State = InOccupancy.Get_Fragment(FMars_Fragment_Occupancy);
-        const auto NewCount = ck::IsValid(State.Trigger) ? State.Trigger.Get_EntityCount() : 0;
+        const auto NewCount = ck::IsValid(Trigger) ? Trigger.Get_EntityCount() : 0;
         const auto CountChanged = NewCount != State.Count;
         State.Count = NewCount;
+        if (CountChanged)
+        { InOccupancy.H().Request_MarkReplicationDirty(FMars_Fragment_Occupancy); }
 
         if (NewCount >= RequiredCount)
         {
@@ -125,7 +171,7 @@ class UMars_Processor_Occupancy_Setup : UCk_Processor_Script_Base_UE
             SetActive(InOccupancy, false);
         }
         // Only the first drop below RequiredCount starts the countdown; later exits do not extend it.
-        else if (ck::Is_NOT_Valid(State.ReleaseTimer))
+        else if (ck::Is_NOT_Valid(InOccupancy.Get_Fragment(FMars_Fragment_Occupancy_Local).ReleaseTimer))
         {
             ArmReleaseTimer(InOccupancy, ReleaseDelaySeconds);
         }
@@ -141,8 +187,9 @@ class UMars_Processor_Occupancy_Setup : UCk_Processor_Script_Base_UE
         { return; }
 
         State.IsActive = InActive;
+        InOccupancy.H().Request_MarkReplicationDirty(FMars_Fragment_Occupancy);
 
-        auto Mover = State.Mover;
+        auto Mover = InOccupancy.Get_Mover();
         if (ck::IsValid(Mover))
         { Mover.Request_MoveTo(FMars_Request_Mover_MoveTo(InActive ? EMars_Mover_Pose::End : EMars_Mover_Pose::Start)); }
 
@@ -165,15 +212,15 @@ class UMars_Processor_Occupancy_Setup : UCk_Processor_Script_Base_UE
         if (ck::IsValid(Timer))
         { Timer.BindTo_OnDone(FCk_Delegate_Timer(this, n"OnReleaseTimerDone")); }
 
-        InOccupancy.Get_Fragment(FMars_Fragment_Occupancy).ReleaseTimer = Timer;
+        InOccupancy.Get_Fragment(FMars_Fragment_Occupancy_Local).ReleaseTimer = Timer;
     }
 
     private void DestroyReleaseTimer(FCk_Handle_Occupancy& InOccupancy)
     {
-        auto& State = InOccupancy.Get_Fragment(FMars_Fragment_Occupancy);
-        if (ck::IsValid(State.ReleaseTimer))
-        { utils_entity_lifetime::Request_DestroyEntity(State.ReleaseTimer.H()); }
+        auto& Local = InOccupancy.Get_Fragment(FMars_Fragment_Occupancy_Local);
+        if (ck::IsValid(Local.ReleaseTimer))
+        { utils_entity_lifetime::Request_DestroyEntity(Local.ReleaseTimer.H()); }
 
-        State.ReleaseTimer = FCk_Handle_Timer();
+        Local.ReleaseTimer = FCk_Handle_Timer();
     }
 }

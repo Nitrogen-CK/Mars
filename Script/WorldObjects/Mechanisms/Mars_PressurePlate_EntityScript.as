@@ -44,7 +44,9 @@ asset MarsImageDecal of UCkUsf_LookDefinition
 class UMars_PressurePlate_EntityScript : UCk_GenericEntityScript_UE
 {
     default _ShowInPlaceActors = true;
-    default _Replication = ECk_Replication::DoesNotReplicate;
+    // Stance A: placed by the authority's spawner; the plate, its root transform and its occupancy ledger replicate;
+    // the slab, trigger and decal are built on every machine, and the slab sinks from the replicated activation.
+    default _Replication = ECk_Replication::Replicates;
 
     UPROPERTY(ExposeOnSpawn)
     FTransform SpawnTransform = FTransform::Identity;
@@ -79,7 +81,7 @@ class UMars_PressurePlate_EntityScript : UCk_GenericEntityScript_UE
     UFUNCTION(BlueprintOverride)
     ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
     {
-        auto PlateRoot = utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::DoesNotReplicate);
+        auto PlateRoot = utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::Replicates);
         utils_entity_tag::Add(InHandle, n"TAG_MarsPressurePlate");
 
         auto PlateNode = utils_scene_node::Create(PlateRoot, FTransform::Identity);

@@ -40,7 +40,7 @@ class UMars_AutoTest_Control_AnAlreadyLiveInteractionIsAdoptedOnWatch : UMars_Au
     {
         Assert_Equals_Int(_NewInteractionCount, 1, "the Use press joined the live interaction instead of starting another");
         Assert_True(_Hands.Get_IsGrippingTarget(_Target), "the gloves grip the lever");
-        Assert_True(_Control.Get_Fragment(FMars_Fragment_Control).Manipulation.GetValue().Interaction == _Interaction,
+        Assert_True(_Control.Get_Fragment(FMars_Fragment_Control_Local).Manipulation.GetValue().Interaction == _Interaction,
             "the manipulation carries the adopted interaction (the threshold ends it)");
     }
 

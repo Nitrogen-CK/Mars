@@ -1,3 +1,7 @@
+// Stance C. The fragment exists on every machine (each control's DoConstruct composes it) but is written on the
+// authority only, by authority-gated kernels, and read only by the server's mechanism graph; nothing replicates and
+// nobody reads it off-authority (clients see a control's state through its own replicated ledger).
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
 //--------------------------------------------------------------------------------------------------------------------------

@@ -16,6 +16,12 @@ class UMars_Processor_Cycle_HandleRequests : UCk_Processor_Script_Base_UE
                        FMars_Fragment_Cycle_Requests& InRequests,
                        FMars_Fragment_Cycle& InState)
     {
+        if (utils_net::Get_HasAuthority(InHandle) == false)
+        {
+            InHandle.Request_TryRemove(FMars_Fragment_Cycle_Requests);
+            return;
+        }
+
         auto Self = InHandle.As_Cycle();
 
         auto TargetRunState = InState.RunState;
@@ -30,12 +36,13 @@ class UMars_Processor_Cycle_HandleRequests : UCk_Processor_Script_Base_UE
         if (TargetRunState != InState.RunState)
         {
             InState.RunState = TargetRunState;
+            InHandle.Request_MarkReplicationDirty(FMars_Fragment_Cycle);
 
             const auto Running = TargetRunState == EMars_Cycle_RunState::Running;
             if (Running)
             { EnterPhase(Self, 0); }
             else
-            { DestroyPhaseTimer(InState); }
+            { DestroyPhaseTimer(Self); }
 
             BroadcastRunningChanged(Self, TargetRunState);
             return;
@@ -65,7 +72,8 @@ class UMars_Processor_Cycle_HandleRequests : UCk_Processor_Script_Base_UE
         }
 
         InState.RunState = EMars_Cycle_RunState::Stopped;
-        DestroyPhaseTimer(InState);
+        InCycle.H().Request_MarkReplicationDirty(FMars_Fragment_Cycle);
+        DestroyPhaseTimer(InCycle);
         BroadcastRunningChanged(InCycle, EMars_Cycle_RunState::Stopped);
     }
 
@@ -81,7 +89,9 @@ class UMars_Processor_Cycle_HandleRequests : UCk_Processor_Script_Base_UE
 
         auto& State = InCycle.Get_Fragment(FMars_Fragment_Cycle);
         State.PhaseIndex = InIndex;
-        DestroyPhaseTimer(State);
+        State.PhaseEntries += 1;
+        InCycle.H().Request_MarkReplicationDirty(FMars_Fragment_Cycle);
+        DestroyPhaseTimer(InCycle);
 
         auto TimerSpec = FCk_Timer_Spec(FCk_Time(Phase.Duration));
         TimerSpec.Set_StartingState(ECk_Timer_State::Running)
@@ -90,18 +100,19 @@ class UMars_Processor_Cycle_HandleRequests : UCk_Processor_Script_Base_UE
         auto Timer = utils_timer::Add(InCycle.H(), TimerSpec);
         if (ck::IsValid(Timer))
         { Timer.BindTo_OnDone(FCk_Delegate_Timer(this, n"OnPhaseTimerDone")); }
-        State.PhaseTimer = Timer;
+        InCycle.Get_Fragment(FMars_Fragment_Cycle_Local).PhaseTimer = Timer;
 
         if (InCycle.Has_Fragment(FMars_Fragment_Cycle_Signals))
         { InCycle.Get_Fragment(FMars_Fragment_Cycle_Signals).OnPhaseChanged.Broadcast(InCycle, Phase.Phase, InIndex); }
     }
 
-    private void DestroyPhaseTimer(FMars_Fragment_Cycle& InState)
+    private void DestroyPhaseTimer(FCk_Handle_Cycle& InCycle)
     {
-        if (ck::IsValid(InState.PhaseTimer))
-        { utils_entity_lifetime::Request_DestroyEntity(InState.PhaseTimer.H()); }
+        auto& Local = InCycle.Get_Fragment(FMars_Fragment_Cycle_Local);
+        if (ck::IsValid(Local.PhaseTimer))
+        { utils_entity_lifetime::Request_DestroyEntity(Local.PhaseTimer.H()); }
 
-        InState.PhaseTimer = FCk_Handle_Timer();
+        Local.PhaseTimer = FCk_Handle_Timer();
     }
 
     private void BroadcastRunningChanged(FCk_Handle_Cycle& InCycle, EMars_Cycle_RunState InRunState)
@@ -123,7 +134,7 @@ class UMars_Processor_Cycle_HandleRequests : UCk_Processor_Script_Base_UE
         auto Cycle = Owner.As_Cycle();
 
         // A timer replaced by a phase entry or a stop can still finish in the frame it was destroyed.
-        if (Cycle.Get_Fragment(FMars_Fragment_Cycle).PhaseTimer != InTimer)
+        if (Cycle.Get_Fragment(FMars_Fragment_Cycle_Local).PhaseTimer != InTimer)
         { return; }
 
         auto& Requests = Cycle.AddOrGet_Fragment(FMars_Fragment_Cycle_Requests);

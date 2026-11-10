@@ -1,3 +1,7 @@
+// Stance A. Remaining and Hold (FMars_Fragment_Countdown) are the replicated ledger, written by the authority's request
+// drain and tick; the step clock (FMars_Fragment_Countdown_Clock) is composed everywhere but ticked on the authority
+// only. A client mirrors the ledger and broadcasts OnRemainingChanged from what replicated.
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
 //--------------------------------------------------------------------------------------------------------------------------
@@ -89,16 +93,29 @@ struct FMars_Fragment_Countdown
     UPROPERTY()
     int32 Remaining = 0;
 
-    // Seconds into the current step.
-    UPROPERTY()
-    float32 StepElapsed = 0.0f;
-
     // Held full by its powered sink (HoldWhilePowered): it does not drain.
     UPROPERTY()
     EMars_Countdown_Hold Hold = EMars_Countdown_Hold::Released;
 }
 
-// Present while Remaining > 0 and not held; gates UMars_Processor_Countdown_Tick.
+// The authority's clock, never replicated: clients receive Remaining, not the time into the step.
+struct FMars_Fragment_Countdown_Clock
+{
+    // Seconds into the current step.
+    UPROPERTY()
+    float32 StepElapsed = 0.0f;
+}
+
+// Non-authority only (the authority's setup removes it): the ledger as this machine last broadcast it, seeded with the
+// ledger as Add composed it, so a value that replicated before the setup ran still broadcasts.
+struct FMars_Fragment_Countdown_Mirror
+{
+    UPROPERTY()
+    FMars_Fragment_Countdown Last;
+}
+
+// Present while Remaining > 0 and not held; gates UMars_Processor_Countdown_Tick. On a client it is only ever the
+// one Add composed: the client's tick touches nothing.
 struct FMars_Tag_Countdown_Running {}
 
 struct FMars_Tag_Countdown_NeedsSetup {}

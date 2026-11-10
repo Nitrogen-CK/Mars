@@ -1,3 +1,9 @@
+// SPLIT. Inputs are stance C: the authority's mechanism driver pushes them and only the authority evaluates the rule.
+// The whole state fragment (inputs and Power) is the replicated ledger, written by the authority's request drain; a
+// client mirrors it and broadcasts OnPoweredChanged from the replicated Power, so lights, gates and monsters bind one
+// signal on every machine. OnInputEdge / OnInputRose are authority-side events (their consumers are authority kernels)
+// and are never synthesized on a client.
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
 //--------------------------------------------------------------------------------------------------------------------------
@@ -112,6 +118,16 @@ struct FMars_Fragment_MechanismSink
     UPROPERTY()
     EMars_MechanismSink_Power Power = EMars_MechanismSink_Power::Unevaluated;
 }
+
+// Non-authority only (the authority's setup removes it): the ledger as this machine last broadcast it, seeded with the
+// ledger as Add composed it, so a value that replicated before the setup ran still broadcasts its first evaluation.
+struct FMars_Fragment_MechanismSink_Mirror
+{
+    UPROPERTY()
+    FMars_Fragment_MechanismSink Last;
+}
+
+struct FMars_Tag_MechanismSink_NeedsSetup {}
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Signals

@@ -22,13 +22,20 @@ namespace utils_control
         Params.ActiveSeconds = InParams.ActiveSeconds;
         Params.Manipulation = Manipulation;
 
+        auto Local = FMars_Fragment_Control_Local();
+        Local.Mover = InParams.Mover;
+
         auto State = FMars_Fragment_Control();
         State.IsActive = InParams.StartActive;
-        State.Mover = InParams.Mover;
+
+        auto Mirror = FMars_Fragment_Control_Mirror();
+        Mirror.Last = State;
 
         InHandle.Add_Fragment(FMars_Feature_Control());
         InHandle.Add_Fragment(Params);
-        InHandle.Add_Fragment(State);
+        InHandle.Add_Fragment(Local);
+        InHandle.Add_Fragment(State, ECk_Replication::Replicates);
+        InHandle.Add_Fragment(Mirror);
         InHandle.Add_Fragment(FMars_Tag_Control_NeedsSetup());
         return InHandle.As_Control();
     }
@@ -110,7 +117,7 @@ mixin EMars_Control_Activation Get_Activation(const FCk_Handle_Control& Self)
 
 mixin FCk_Handle_Mover Get_Mover(const FCk_Handle_Control& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_Control).Mover;
+    return Self.Get_Fragment(FMars_Fragment_Control_Local).Mover;
 }
 
 mixin ECk_Interaction_CompletionPolicy Get_CompletionPolicy(const FCk_Handle_Control& Self)
@@ -120,13 +127,13 @@ mixin ECk_Interaction_CompletionPolicy Get_CompletionPolicy(const FCk_Handle_Con
 
 mixin bool Get_IsManipulating(const FCk_Handle_Control& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_Control).Manipulation.IsSet();
+    return Self.Get_Fragment(FMars_Fragment_Control_Local).Manipulation.IsSet();
 }
 
 // The handle's position 0..1 while gripped; unset when not manipulating.
 mixin TOptional<float32> TryGet_ManipulationAlpha(const FCk_Handle_Control& Self)
 {
-    const auto& State = Self.Get_Fragment(FMars_Fragment_Control);
+    const auto& State = Self.Get_Fragment(FMars_Fragment_Control_Local);
     if (State.Manipulation.IsSet() == false)
     { return TOptional<float32>(); }
 
@@ -164,7 +171,7 @@ mixin FCk_Handle_Control TryGet_ManipulatedControl(const FCk_Handle_InteractTarg
 // How the current grip ends; AtEngageAlpha when not manipulating.
 mixin EMars_Control_ManipulationCompletion Get_ManipulationCompletion(const FCk_Handle_Control& Self)
 {
-    const auto& State = Self.Get_Fragment(FMars_Fragment_Control);
+    const auto& State = Self.Get_Fragment(FMars_Fragment_Control_Local);
     if (State.Manipulation.IsSet() == false)
     { return EMars_Control_ManipulationCompletion::AtEngageAlpha; }
 
@@ -180,7 +187,7 @@ mixin EMars_Control_PullSource Get_PullSource(const FCk_Handle_Control& Self)
 // Who walks away from a gripped Walk control; invalid unless a Walk control is being manipulated.
 mixin FCk_Handle_Transform TryGet_Puller(const FCk_Handle_Control& Self)
 {
-    const auto& State = Self.Get_Fragment(FMars_Fragment_Control);
+    const auto& State = Self.Get_Fragment(FMars_Fragment_Control_Local);
     if (State.Manipulation.IsSet() == false || Self.Get_PullSource() != EMars_Control_PullSource::Walk)
     { return FCk_Handle_Transform(); }
 

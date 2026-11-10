@@ -11,13 +11,19 @@ namespace utils_occupancy
         Params.RequiredCount = InParams.RequiredCount;
         Params.ReleaseDelaySeconds = InParams.ReleaseDelaySeconds;
 
+        auto Local = FMars_Fragment_Occupancy_Local();
+        Local.Trigger = InParams.Parts.Trigger;
+        Local.Mover = InParams.Parts.Mover;
+
         auto State = FMars_Fragment_Occupancy();
-        State.Trigger = InParams.Parts.Trigger;
-        State.Mover = InParams.Parts.Mover;
+        auto Mirror = FMars_Fragment_Occupancy_Mirror();
+        Mirror.Last = State;
 
         InHandle.Add_Fragment(FMars_Feature_Occupancy());
         InHandle.Add_Fragment(Params);
-        InHandle.Add_Fragment(State);
+        InHandle.Add_Fragment(Local);
+        InHandle.Add_Fragment(State, ECk_Replication::Replicates);
+        InHandle.Add_Fragment(Mirror);
         InHandle.Add_Fragment(FMars_Tag_Occupancy_NeedsSetup());
         auto Occupancy = InHandle.As_Occupancy();
 
@@ -54,7 +60,13 @@ mixin EMars_Occupancy_Activation Get_Activation(const FCk_Handle_Occupancy& Self
 
 mixin FCk_Handle_Trigger Get_Trigger(const FCk_Handle_Occupancy& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_Occupancy).Trigger;
+    return Self.Get_Fragment(FMars_Fragment_Occupancy_Local).Trigger;
+}
+
+// Invalid when the occupancy moves nothing.
+mixin FCk_Handle_Mover Get_Mover(const FCk_Handle_Occupancy& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_Occupancy_Local).Mover;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

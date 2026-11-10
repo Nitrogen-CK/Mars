@@ -16,6 +16,13 @@ class UMars_Processor_MechanismDriver_HandleRequests : UCk_Processor_Script_Base
                        FMars_Fragment_MechanismDriver_Requests& InRequests,
                        FMars_Fragment_MechanismDriver& InDriverComp)
     {
+        // The driver only ever exists on the authority; the gate keeps that true if it is ever spawned elsewhere.
+        if (utils_net::Get_HasAuthority(InHandle) == false)
+        {
+            InHandle.Request_TryRemove(FMars_Fragment_MechanismDriver_Requests);
+            return;
+        }
+
         auto Self = InHandle.As_MechanismDriver();
         _Driver = Self;
 

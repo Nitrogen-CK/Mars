@@ -26,7 +26,12 @@ class UMars_Processor_Control_Tick : UCk_Processor_Script_Base_UE
 
     void ForEachEntity(FCk_Time InDeltaT, FCk_Handle& InHandle, FMars_Fragment_Control& InState)
     {
+        // The grip is authority-local until the manipulation stream exists; a client never begins one.
+        if (utils_net::Get_HasAuthority(InHandle) == false)
+        { return; }
+
         auto Self = InHandle.As_Control();
+        auto& Local = Self.Get_Fragment(FMars_Fragment_Control_Local);
 
         // A FreeTurn grip has no handle travel: its pull leaves as OnTurned from the request drain.
         if (Self.Get_IsFreeTurn())
@@ -36,13 +41,13 @@ class UMars_Processor_Control_Tick : UCk_Processor_Script_Base_UE
 
         const auto DeltaSeconds = Math::Min(float32(InDeltaT.Get_Seconds()), k_MaxStepSeconds);
 
-        auto Manipulation = InState.Manipulation.GetValue();
+        auto Manipulation = Local.Manipulation.GetValue();
 
         if (Tuning.PullSource == EMars_Control_PullSource::Walk)
         {
             if (ck::Is_NOT_Valid(Manipulation.Puller))
             {
-                EndWithoutPuller(Self, InState);
+                EndWithoutPuller(Self, Local);
                 return;
             }
 
@@ -70,11 +75,11 @@ class UMars_Processor_Control_Tick : UCk_Processor_Script_Base_UE
                 Manipulation.Velocity = 0.0f;
             }
         }
-        InState.Manipulation = Manipulation;
+        Local.Manipulation = Manipulation;
 
         const auto Alpha = Manipulation.Alpha;
 
-        auto Mover = InState.Mover;
+        auto Mover = Local.Mover;
         if (ck::IsValid(Mover))
         { Mover.Request_Scrub(FMars_Request_Mover_Scrub(Alpha)); }
 
@@ -92,7 +97,7 @@ class UMars_Processor_Control_Tick : UCk_Processor_Script_Base_UE
         // A lever's handle is carried the rest of the way by the Engage's MoveTo; a returns-to-rest handle springs back now
         // (the Mover drains Scrub before Settle, so the tween starts from this frame's alpha).
         auto Interaction = Manipulation.Interaction;
-        InState.Manipulation.Reset();
+        Local.Manipulation.Reset();
         Self.Request_TryRemove(FMars_Tag_Control_Manipulating);
 
         if (Self.Get_ReturnsToRest() && ck::IsValid(Mover))
@@ -116,7 +121,7 @@ class UMars_Processor_Control_Tick : UCk_Processor_Script_Base_UE
     }
 
     // EndManipulation's end (UMars_Processor_Control_HandleRequests): the handle settles back, Released and progress 0.
-    private void EndWithoutPuller(FCk_Handle_Control& InControl, FMars_Fragment_Control& InState)
+    private void EndWithoutPuller(FCk_Handle_Control& InControl, FMars_Fragment_Control_Local& InState)
     {
         InState.Manipulation.Reset();
         InControl.Request_TryRemove(FMars_Tag_Control_Manipulating);

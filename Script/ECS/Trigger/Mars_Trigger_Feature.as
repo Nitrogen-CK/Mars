@@ -1,3 +1,6 @@
+// Stance D. Composed on every machine and fed by each machine's own probe overlaps; nothing replicates. Only authority
+// kernels decide from it (an occupancy's count, a gate's threshold): a client's trigger counts but drives nothing.
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
 //--------------------------------------------------------------------------------------------------------------------------

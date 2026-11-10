@@ -15,6 +15,12 @@ class UMars_Processor_Countdown_HandleRequests : UCk_Processor_Script_Base_UE
                        FMars_Fragment_Countdown_Requests& InRequests,
                        FMars_Fragment_Countdown& InState)
     {
+        if (utils_net::Get_HasAuthority(InHandle) == false)
+        {
+            InHandle.Request_TryRemove(FMars_Fragment_Countdown_Requests);
+            return;
+        }
+
         auto Self = InHandle.As_Countdown();
         const auto HasCharge = InRequests.ChargeRequests.Num() > 0;
         const auto HasSetHeld = InRequests.SetHeldRequests.Num() > 0;
@@ -30,14 +36,18 @@ class UMars_Processor_Countdown_HandleRequests : UCk_Processor_Script_Base_UE
         { return; }
 
         const auto Previous = InState.Remaining;
+        const auto PreviousHold = InState.Hold;
         InState.Hold = Hold;
         const auto Held = Hold == EMars_Countdown_Hold::Held;
 
         if (Held || HasCharge)
         {
             InState.Remaining = Self.Get_Steps();
-            InState.StepElapsed = 0.0f;
+            Self.Get_Fragment(FMars_Fragment_Countdown_Clock).StepElapsed = 0.0f;
         }
+
+        if (InState.Remaining != Previous || InState.Hold != PreviousHold)
+        { InHandle.Request_MarkReplicationDirty(FMars_Fragment_Countdown); }
 
         const auto ShouldDrain = InState.Remaining > 0 && Held == false;
         const auto IsDraining = Self.Has_Fragment(FMars_Tag_Countdown_Running);

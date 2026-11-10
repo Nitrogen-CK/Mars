@@ -13,6 +13,12 @@ class UMars_Processor_MechanismSink_HandleRequests : UCk_Processor_Script_Base_U
                        FMars_Fragment_MechanismSink_Requests& InRequests,
                        FMars_Fragment_MechanismSink& InSinkComp)
     {
+        if (utils_net::Get_HasAuthority(InHandle) == false)
+        {
+            InHandle.Request_TryRemove(FMars_Fragment_MechanismSink_Requests);
+            return;
+        }
+
         auto Self = InHandle.As_MechanismSink();
 
         const auto SetChannelInputRequests = InRequests.SetChannelInputRequests;
@@ -42,13 +48,15 @@ class UMars_Processor_MechanismSink_HandleRequests : UCk_Processor_Script_Base_U
 
         // The first evaluation broadcasts even when unpowered: link setups wait for it instead of reading a default.
         const auto FirstEvaluation = InSinkComp.Power == EMars_MechanismSink_Power::Unevaluated && SetChannelInputRequests.Num() > 0;
-        if (FirstEvaluation || (InSinkComp.Power != EMars_MechanismSink_Power::Unevaluated && InSinkComp.Power != Power))
-        {
-            InSinkComp.Power = Power;
+        const auto PowerChanged = FirstEvaluation || (InSinkComp.Power != EMars_MechanismSink_Power::Unevaluated && InSinkComp.Power != Power);
+        if (PowerChanged)
+        { InSinkComp.Power = Power; }
 
-            if (Self.Has_Fragment(FMars_Fragment_MechanismSink_Signals))
-            { Self.Get_Fragment(FMars_Fragment_MechanismSink_Signals).OnPoweredChanged.Broadcast(Self, Power); }
-        }
+        if (PowerChanged || SetChannelInputRequests.Num() > 0)
+        { InHandle.Request_MarkReplicationDirty(FMars_Fragment_MechanismSink); }
+
+        if (PowerChanged && Self.Has_Fragment(FMars_Fragment_MechanismSink_Signals))
+        { Self.Get_Fragment(FMars_Fragment_MechanismSink_Signals).OnPoweredChanged.Broadcast(Self, Power); }
 
         if (NotifyInputEdgeRequests.Num() == 0 || Self.Has_Fragment(FMars_Fragment_MechanismSink_Signals) == false)
         { return; }

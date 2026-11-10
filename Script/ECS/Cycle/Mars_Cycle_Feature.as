@@ -1,3 +1,7 @@
+// Stance A. The run state, phase index and phase-entry count (FMars_Fragment_Cycle) are the replicated ledger, written
+// by the authority's request drain; the phase timer is the authority's clock and lives in the local
+// FMars_Fragment_Cycle_Local. A client mirrors the ledger and broadcasts OnPhaseChanged / OnRunningChanged from it.
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
 //--------------------------------------------------------------------------------------------------------------------------
@@ -92,9 +96,28 @@ struct FMars_Fragment_Cycle
     UPROPERTY()
     int32 PhaseIndex = 0;
 
+    // Every phase entry, counted: a looping one-phase cycle re-enters the same index, which a client could not tell
+    // from no entry at all.
+    UPROPERTY()
+    int32 PhaseEntries = 0;
+}
+
+// The authority's clock, never replicated (its request drain arms and destroys the timer).
+struct FMars_Fragment_Cycle_Local
+{
     UPROPERTY()
     FCk_Handle_Timer PhaseTimer;
 }
+
+// Non-authority only (the authority's setup removes it): the ledger as this machine last broadcast it, seeded with the
+// ledger as Add composed it, so a value that replicated before the setup ran still broadcasts.
+struct FMars_Fragment_Cycle_Mirror
+{
+    UPROPERTY()
+    FMars_Fragment_Cycle Last;
+}
+
+struct FMars_Tag_Cycle_NeedsSetup {}
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Signals

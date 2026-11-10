@@ -13,7 +13,9 @@ enum EMars_Shortcut_LeverSide
 class UMars_Shortcut_EntityScript : UCk_GenericEntityScript_UE
 {
     default _ShowInPlaceActors = true;
-    default _Replication = ECk_Replication::DoesNotReplicate;
+    // Stance A: placed by the authority's spawner; the shortcut, its root transform and its gate and control ledgers
+    // replicate. Its lever is a ManuallyCompleted grip, authority-local until the manipulation stream exists.
+    default _Replication = ECk_Replication::Replicates;
 
     UPROPERTY(ExposeOnSpawn)
     FTransform SpawnTransform = FTransform::Identity;
@@ -40,7 +42,7 @@ class UMars_Shortcut_EntityScript : UCk_GenericEntityScript_UE
         if (ck::EnsureIfNot(Channel.IsValid(), f"[Shortcut] {ShortcutId.ToString()} has no channel: its lever would open nothing"))
         { return ECk_EntityScript_ConstructionFlow::Finished; }
 
-        auto Root = utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::DoesNotReplicate);
+        auto Root = utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::Replicates);
         utils_anchor::Add_CandidateSideFillers(this, Root, SpanCm);
 
         auto GateParams = UMars_Gate_EntityScript::Params();

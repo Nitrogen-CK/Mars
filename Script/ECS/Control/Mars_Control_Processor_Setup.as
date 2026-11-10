@@ -1,4 +1,6 @@
-// One-shot per control: a control that also has a MechanismSource asserts it while active.
+// One-shot per control. On the authority: a control that also has a MechanismSource asserts it while active. A client
+// binds the ledger's rep-notify and reconciles once instead: it moves its own handle and broadcasts OnEngaged once per
+// replicated engagement, then OnActiveChanged, the authority's order.
 class UMars_Processor_Control_Setup : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -15,6 +17,16 @@ class UMars_Processor_Control_Setup : UCk_Processor_Script_Base_UE
     {
         auto Control = InHandle.As_Control();
 
+        if (utils_net::Get_HasAuthority(InHandle) == false)
+        {
+            InHandle.BindTo_OnRepNotify(FMars_Fragment_Control, FCk_DynamicFragment_OnRepNotify(this, n"OnLedgerReplicated"));
+            Reconcile(Control);
+            Control.Request_TryRemove(FMars_Tag_Control_NeedsSetup);
+            return;
+        }
+
+        Control.Request_TryRemove(FMars_Fragment_Control_Mirror);
+
         auto Source = InHandle.As_MechanismSource(ECk_SanityCheck::UnChecked);
         if (ck::IsValid(Source))
         {
@@ -27,6 +39,40 @@ class UMars_Processor_Control_Setup : UCk_Processor_Script_Base_UE
         { Control.Request_SetActive(FMars_Request_Control_SetActive(EMars_Control_Activation::Active)); }
 
         Control.Request_TryRemove(FMars_Tag_Control_NeedsSetup);
+    }
+
+    UFUNCTION()
+    private void OnLedgerReplicated(FCk_Handle InHandle, FCk_DynamicFragment_RepNotifyInfo InInfo)
+    {
+        auto Control = InHandle.As_Control();
+        Reconcile(Control);
+    }
+
+    private void Reconcile(FCk_Handle_Control& InControl)
+    {
+        const auto Ledger = InControl.Get_Fragment(FMars_Fragment_Control);
+        auto& Mirror = InControl.Get_Fragment(FMars_Fragment_Control_Mirror);
+        const auto Last = Mirror.Last;
+        Mirror.Last = Ledger;
+
+        const auto Changed = Ledger.IsActive != Last.IsActive;
+
+        // A returns-to-rest handle is not a state display, as on the authority.
+        auto Mover = InControl.Get_Mover();
+        if (Changed && ck::IsValid(Mover) && InControl.Get_ReturnsToRest() == false)
+        { Mover.Request_MoveTo(FMars_Request_Mover_MoveTo(Ledger.IsActive ? EMars_Mover_Pose::End : EMars_Mover_Pose::Start)); }
+
+        if (InControl.Has_Fragment(FMars_Fragment_Control_Signals) == false)
+        { return; }
+
+        for (int32 Engagement = Last.Engagements; Engagement < Ledger.Engagements; ++Engagement)
+        { InControl.Get_Fragment(FMars_Fragment_Control_Signals).OnEngaged.Broadcast(InControl); }
+
+        if (Changed)
+        {
+            const auto Activation = Ledger.IsActive ? EMars_Control_Activation::Active : EMars_Control_Activation::Inactive;
+            InControl.Get_Fragment(FMars_Fragment_Control_Signals).OnActiveChanged.Broadcast(InControl, Activation);
+        }
     }
 
     UFUNCTION()

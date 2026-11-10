@@ -17,7 +17,9 @@ namespace utils_sequence
 
         InHandle.Add_Fragment(FMars_Feature_Sequence());
         InHandle.Add_Fragment(Params);
-        InHandle.Add_Fragment(FMars_Fragment_Sequence());
+        InHandle.Add_Fragment(FMars_Fragment_Sequence(), ECk_Replication::Replicates);
+        InHandle.Add_Fragment(FMars_Fragment_Sequence_Local());
+        InHandle.Add_Fragment(FMars_Fragment_Sequence_Mirror());
         InHandle.Add_Fragment(FMars_Tag_Sequence_NeedsSetup());
         return InHandle.As_Sequence();
     }

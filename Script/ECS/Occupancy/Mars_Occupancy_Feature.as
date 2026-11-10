@@ -1,3 +1,8 @@
+// SPLIT. The count and activation (FMars_Fragment_Occupancy) are the replicated ledger (stance A), recounted on the
+// authority from its trigger; the release timer is the authority's clock (stance C) and lives with the trigger and
+// mover handles in the local FMars_Fragment_Occupancy_Local. A client mirrors the ledger: it moves its own Mover and
+// broadcasts OnActiveChanged / OnCountChanged from what replicated, never from its own trigger's overlaps.
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
 //--------------------------------------------------------------------------------------------------------------------------
@@ -88,7 +93,12 @@ struct FMars_Fragment_Occupancy
 
     UPROPERTY()
     bool IsActive = false;
+}
 
+// Never replicated: the trigger and mover are built on every machine, and the release timer is the authority's
+// clock (its setup processor arms and destroys it).
+struct FMars_Fragment_Occupancy_Local
+{
     UPROPERTY()
     FCk_Handle_Timer ReleaseTimer;
 
@@ -98,6 +108,14 @@ struct FMars_Fragment_Occupancy
     // Invalid when the occupancy moves nothing.
     UPROPERTY()
     FCk_Handle_Mover Mover;
+}
+
+// Non-authority only (the authority's setup removes it): the ledger as this machine last applied it, seeded with the
+// ledger as Add composed it, so a value that replicated before the setup ran is still applied.
+struct FMars_Fragment_Occupancy_Mirror
+{
+    UPROPERTY()
+    FMars_Fragment_Occupancy Last;
 }
 
 // Lives on the trigger entity: trigger signals carry only the trigger, so this is how they find their occupancies.

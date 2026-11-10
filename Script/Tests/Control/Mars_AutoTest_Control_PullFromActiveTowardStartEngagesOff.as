@@ -75,7 +75,7 @@ class UMars_AutoTest_Control_PullFromActiveTowardStartEngagesOff : UMars_AutoTes
         Assert_True(_Control.Get_IsManipulating(), "pushing into the stop does not end the grip");
         if (_Control.Get_IsManipulating())
         {
-            const auto Pull = _Control.Get_Fragment(FMars_Fragment_Control).Manipulation.GetValue().Pull;
+            const auto Pull = _Control.Get_Fragment(FMars_Fragment_Control_Local).Manipulation.GetValue().Pull;
             Assert_Equals_Float(Pull, 1.0, 0.0001, "three pushes into the far stop leave the pull clamped at 1");
         }
     }

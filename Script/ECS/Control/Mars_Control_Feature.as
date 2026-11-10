@@ -1,3 +1,10 @@
+// Stance A for the engage path. IsActive and the engagement count (FMars_Fragment_Control) are the replicated ledger,
+// written by the authority's request drain; a client's use arrives there as Cue.Mars.Control.Engage
+// (Mars_Control_Cues.as). The release timer, the mover and the grip live in the local FMars_Fragment_Control_Local. A
+// client mirrors the ledger: it moves its own Mover and broadcasts OnEngaged / OnActiveChanged from what replicated.
+// ManuallyCompleted manipulation (BeginManipulation / Nudge / EndManipulation and the Tick spring) is authority-local
+// until the manipulation stream exists: off-authority its requests are dropped, so a client cannot pull a lever yet.
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
 //--------------------------------------------------------------------------------------------------------------------------
@@ -281,12 +288,21 @@ struct FMars_Control_Manipulation
     float32 WalkStartCm = 0.0f;
 }
 
-// Written only by the two Control processors.
+// Written only by the Control request drain.
 struct FMars_Fragment_Control
 {
     UPROPERTY()
     bool IsActive = false;
 
+    // Every accepted engage, counted: a Momentary re-engage changes nothing else a client could see.
+    UPROPERTY()
+    int32 Engagements = 0;
+}
+
+// Never replicated: the mover is built on every machine; the release timer and the grip are the authority's (written
+// only by the two Control processors).
+struct FMars_Fragment_Control_Local
+{
     UPROPERTY()
     FCk_Handle_Timer ReleaseTimer;
 
@@ -297,6 +313,14 @@ struct FMars_Fragment_Control
     // Set while gripped.
     UPROPERTY()
     TOptional<FMars_Control_Manipulation> Manipulation;
+}
+
+// Non-authority only (the authority's setup removes it): the ledger as this machine last broadcast it, seeded with the
+// ledger as Add composed it, so a value that replicated before the setup ran still broadcasts.
+struct FMars_Fragment_Control_Mirror
+{
+    UPROPERTY()
+    FMars_Fragment_Control Last;
 }
 
 // Present while Manipulation is set; gates UMars_Processor_Control_Tick.

@@ -1,4 +1,5 @@
-// Drains SetActive -> Engage -> EndManipulation -> BeginManipulation -> Nudges (see FMars_Fragment_Control_Requests).
+// Drains SetActive -> Engage -> EndManipulation -> BeginManipulation -> Nudges (see FMars_Fragment_Control_Requests), on
+// the authority only: a client's requests are dropped (its engage arrives as Cue.Mars.Control.Engage).
 class UMars_Processor_Control_HandleRequests : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -14,6 +15,12 @@ class UMars_Processor_Control_HandleRequests : UCk_Processor_Script_Base_UE
                        FMars_Fragment_Control_Requests& InRequests,
                        FMars_Fragment_Control& InState)
     {
+        if (utils_net::Get_HasAuthority(InHandle) == false)
+        {
+            InHandle.Request_TryRemove(FMars_Fragment_Control_Requests);
+            return;
+        }
+
         auto Self = InHandle.As_Control();
 
         const auto HasEngage = InRequests.EngageRequest.IsSet();
@@ -34,15 +41,16 @@ class UMars_Processor_Control_HandleRequests : UCk_Processor_Script_Base_UE
         Self.Request_TryRemove(FMars_Fragment_Control_Requests);
 
         const auto& Params = Self.Get_Fragment(FMars_Fragment_Control_Params);
+        auto& Local = Self.Get_Fragment(FMars_Fragment_Control_Local);
         const auto WasActive = InState.IsActive;
         auto NewActive = WasActive;
 
         if (HasSetActive)
         {
             if (SetActiveValue == false)
-            { DestroyReleaseTimer(InState); }
+            { DestroyReleaseTimer(Local); }
             else if (Params.Behavior == EMars_Control_Behavior::Momentary)
-            { ArmReleaseTimer(Self, InState, Params.ActiveSeconds); }
+            { ArmReleaseTimer(Self, Local, Params.ActiveSeconds); }
 
             NewActive = SetActiveValue;
         }
@@ -54,8 +62,10 @@ class UMars_Processor_Control_HandleRequests : UCk_Processor_Script_Base_UE
             else
             {
                 NewActive = true;
-                ArmReleaseTimer(Self, InState, Params.ActiveSeconds);
+                ArmReleaseTimer(Self, Local, Params.ActiveSeconds);
             }
+
+            InState.Engagements += 1;
         }
 
         const auto Changed = NewActive != WasActive;
@@ -64,24 +74,27 @@ class UMars_Processor_Control_HandleRequests : UCk_Processor_Script_Base_UE
             InState.IsActive = NewActive;
 
             // A returns-to-rest handle is not a state display: it springs back after every pull.
-            auto Mover = InState.Mover;
+            auto Mover = Local.Mover;
             if (ck::IsValid(Mover) && Self.Get_ReturnsToRest() == false)
             { Mover.Request_MoveTo(FMars_Request_Mover_MoveTo(NewActive ? EMars_Mover_Pose::End : EMars_Mover_Pose::Start)); }
         }
 
+        if (Changed || HasEngage)
+        { InHandle.Request_MarkReplicationDirty(FMars_Fragment_Control); }
+
         // Not manipulating: the threshold already ended it, and a Settle here would fight the Engage's MoveTo.
-        const auto Ended = HasEndManipulation && InState.Manipulation.IsSet();
+        const auto Ended = HasEndManipulation && Local.Manipulation.IsSet();
         if (Ended)
-        { EndManipulation(Self, InState); }
+        { EndManipulation(Self, Local); }
 
         auto Began = false;
         if (HasBeginManipulation)
-        { Began = BeginManipulation(Self, InState, BeginManipulationRequest); }
+        { Began = BeginManipulation(Self, Local, BeginManipulationRequest); }
 
         // FreeTurn: the drain's pull degrees, broadcast after the grip edges below.
         auto TurnDegrees = 0.0f;
-        if (InState.Manipulation.IsSet())
-        { TurnDegrees = ApplyNudges(Self, InState, NudgeRequests); }
+        if (Local.Manipulation.IsSet())
+        { TurnDegrees = ApplyNudges(Self, Local, NudgeRequests); }
 
         if (HasEngage && Self.Has_Fragment(FMars_Fragment_Control_Signals))
         { Self.Get_Fragment(FMars_Fragment_Control_Signals).OnEngaged.Broadcast(Self); }
@@ -106,7 +119,7 @@ class UMars_Processor_Control_HandleRequests : UCk_Processor_Script_Base_UE
     }
 
     // Lets go before the threshold: the handle settles back to the current target pose from wherever it is.
-    private void EndManipulation(FCk_Handle_Control& InControl, FMars_Fragment_Control& InState)
+    private void EndManipulation(FCk_Handle_Control& InControl, FMars_Fragment_Control_Local& InState)
     {
         InState.Manipulation.Reset();
         InControl.Request_TryRemove(FMars_Tag_Control_Manipulating);
@@ -122,7 +135,7 @@ class UMars_Processor_Control_HandleRequests : UCk_Processor_Script_Base_UE
     // it gains from here.
     private bool BeginManipulation(
         FCk_Handle_Control& InControl,
-        FMars_Fragment_Control& InState,
+        FMars_Fragment_Control_Local& InState,
         const FMars_Request_Control_BeginManipulation& InRequest)
     {
         const auto IsManuallyCompleted =
@@ -169,7 +182,7 @@ class UMars_Processor_Control_HandleRequests : UCk_Processor_Script_Base_UE
     // sends none.
     private float32 ApplyNudges(
         FCk_Handle_Control& InControl,
-        FMars_Fragment_Control& InState,
+        FMars_Fragment_Control_Local& InState,
         const TArray<FMars_Request_Control_Nudge>& InNudges)
     {
         if (InNudges.IsEmpty())
@@ -192,7 +205,7 @@ class UMars_Processor_Control_HandleRequests : UCk_Processor_Script_Base_UE
         return 0.0f;
     }
 
-    private void ArmReleaseTimer(FCk_Handle_Control& InControl, FMars_Fragment_Control& InState, float32 InActiveSeconds)
+    private void ArmReleaseTimer(FCk_Handle_Control& InControl, FMars_Fragment_Control_Local& InState, float32 InActiveSeconds)
     {
         DestroyReleaseTimer(InState);
 
@@ -206,7 +219,7 @@ class UMars_Processor_Control_HandleRequests : UCk_Processor_Script_Base_UE
         InState.ReleaseTimer = Timer;
     }
 
-    private void DestroyReleaseTimer(FMars_Fragment_Control& InState)
+    private void DestroyReleaseTimer(FMars_Fragment_Control_Local& InState)
     {
         if (ck::IsValid(InState.ReleaseTimer))
         { utils_entity_lifetime::Request_DestroyEntity(InState.ReleaseTimer); }
@@ -225,7 +238,7 @@ class UMars_Processor_Control_HandleRequests : UCk_Processor_Script_Base_UE
         auto Control = Owner.As_Control();
 
         // A timer replaced by a re-engage can still finish in the frame it was destroyed.
-        const auto& State = Control.Get_Fragment(FMars_Fragment_Control);
+        const auto& State = Control.Get_Fragment(FMars_Fragment_Control_Local);
         if (State.ReleaseTimer != InTimer)
         { return; }
 

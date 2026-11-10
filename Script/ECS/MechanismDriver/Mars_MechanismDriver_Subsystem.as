@@ -1,4 +1,5 @@
-// Spawns the world's mechanism driver entity at begin play; the driver finds every source and sink through entity tags.
+// Spawns the world's mechanism driver entity at begin play, on the authority only; the driver finds every source and
+// sink through entity tags.
 class UMars_MechanismDriver_Subsystem : UScriptWorldSubsystem
 {
     private FCk_Handle_PendingEntityScript _PendingDriver;
@@ -17,6 +18,10 @@ class UMars_MechanismDriver_Subsystem : UScriptWorldSubsystem
     UFUNCTION(BlueprintOverride)
     void OnWorldBeginPlay()
     {
+        // The graph evaluates on the authority only; clients receive the sinks' power through the replicated ledgers.
+        if (System::IsServer() == false)
+        { return; }
+
         _PendingDriver = utils_entity_script::Request_SpawnEntity(
             ck::TransientEntity(), UMars_MechanismDriver_EntityScript, UMars_MechanismDriver_EntityScript::Params());
 

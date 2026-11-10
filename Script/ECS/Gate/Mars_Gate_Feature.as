@@ -1,3 +1,8 @@
+// Stance A. FMars_Fragment_Gate (the state: closed, open, close deferred) is the replicated ledger, written by the
+// authority's request drain; the threshold is decided there. The moving node and threshold handles stay local in
+// Params (built identically on every machine). A client mirrors the ledger: it moves its own Mover (stance D) and
+// broadcasts OnOpenChanged from what replicated.
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
 //--------------------------------------------------------------------------------------------------------------------------
@@ -76,7 +81,11 @@ struct FMars_Fragment_Gate
 {
     UPROPERTY()
     EMars_Gate_State State = EMars_Gate_State::Closed;
+}
 
+// Set once by Add, the same on every machine; never replicated (scene nodes and triggers do not cross the wire).
+struct FMars_Fragment_Gate_Params
+{
     // Carries the Mover that slides the leaf.
     UPROPERTY()
     FCk_Handle_SceneNode MovingNode;
@@ -84,6 +93,14 @@ struct FMars_Fragment_Gate
     // Invalid when the spec set no Threshold.
     UPROPERTY()
     FCk_Handle_Trigger Threshold;
+}
+
+// Non-authority only (the authority's setup removes it): the ledger as this machine last applied it, seeded with the
+// ledger as Add composed it, so a value that replicated before the setup ran is still applied.
+struct FMars_Fragment_Gate_Mirror
+{
+    UPROPERTY()
+    FMars_Fragment_Gate Last;
 }
 
 struct FMars_Tag_Gate_NeedsSetup {}

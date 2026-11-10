@@ -17,14 +17,21 @@ namespace utils_gate
         MoverSpec.StartPose = InParams.StartOpen ? EMars_Mover_Pose::End : EMars_Mover_Pose::Start;
         utils_mover::Add(MovingNode, MoverSpec);
 
+        auto GateParams = FMars_Fragment_Gate_Params();
+        GateParams.MovingNode = MovingNode;
+        if (InParams.Threshold.IsSet())
+        { GateParams.Threshold = utils_trigger::Add(InOwner, InParams.Threshold.GetValue()); }
+
         auto Gate = FMars_Fragment_Gate();
         Gate.State = InParams.StartOpen ? EMars_Gate_State::Open : EMars_Gate_State::Closed;
-        Gate.MovingNode = MovingNode;
-        if (InParams.Threshold.IsSet())
-        { Gate.Threshold = utils_trigger::Add(InOwner, InParams.Threshold.GetValue()); }
+
+        auto Mirror = FMars_Fragment_Gate_Mirror();
+        Mirror.Last = Gate;
 
         InOwner.Add_Fragment(FMars_Feature_Gate());
-        InOwner.Add_Fragment(Gate);
+        InOwner.Add_Fragment(GateParams);
+        InOwner.Add_Fragment(Gate, ECk_Replication::Replicates);
+        InOwner.Add_Fragment(Mirror);
         InOwner.Add_Fragment(FMars_Tag_Gate_NeedsSetup());
         return InOwner.As_Gate();
     }
@@ -58,12 +65,12 @@ mixin bool Get_IsCloseDeferred(const FCk_Handle_Gate& Self)
 
 mixin FCk_Handle_SceneNode Get_MovingNode(const FCk_Handle_Gate& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_Gate).MovingNode;
+    return Self.Get_Fragment(FMars_Fragment_Gate_Params).MovingNode;
 }
 
 mixin FCk_Handle_Trigger Get_Threshold(const FCk_Handle_Gate& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_Gate).Threshold;
+    return Self.Get_Fragment(FMars_Fragment_Gate_Params).Threshold;
 }
 
 // False for a gate without a threshold.

@@ -5,7 +5,9 @@
 class UMars_PullChain_EntityScript : UCk_GenericEntityScript_UE
 {
     default _ShowInPlaceActors = true;
-    default _Replication = ECk_Replication::DoesNotReplicate;
+    // Stance A: placed by the authority's spawner; the chain, its root transform and its control ledger replicate. Its
+    // grip is a ManuallyCompleted pull, authority-local until the manipulation stream exists: only the host can pull it.
+    default _Replication = ECk_Replication::Replicates;
 
     UPROPERTY(ExposeOnSpawn)
     FTransform SpawnTransform = FTransform::Identity;
@@ -46,7 +48,7 @@ class UMars_PullChain_EntityScript : UCk_GenericEntityScript_UE
     UFUNCTION(BlueprintOverride)
     ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
     {
-        auto ChainRoot = utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::DoesNotReplicate);
+        auto ChainRoot = utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::Replicates);
         utils_entity_tag::Add(InHandle, n"TAG_MarsPullChain");
 
         auto ChainNode = utils_scene_node::Create(ChainRoot, FTransform::Identity);

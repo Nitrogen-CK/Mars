@@ -17,6 +17,12 @@ class UMars_Processor_Sequence_HandleRequests : UCk_Processor_Script_Base_UE
 
     void ForEachEntity(FCk_Time InDeltaT, FCk_Handle& InHandle, FMars_Fragment_Sequence_Requests& InRequests)
     {
+        if (utils_net::Get_HasAuthority(InHandle) == false)
+        {
+            InHandle.Request_TryRemove(FMars_Fragment_Sequence_Requests);
+            return;
+        }
+
         auto Self = InHandle.As_Sequence();
 
         const auto HasReset = InRequests.ResetRequests.Num() > 0;
@@ -48,6 +54,10 @@ class UMars_Processor_Sequence_HandleRequests : UCk_Processor_Script_Base_UE
 
         if (Params.Steps[State.Progress] != InChannel)
         {
+            State.Rejections += 1;
+            State.LastRejectedChannel = InChannel;
+            InSequence.H().Request_MarkReplicationDirty(FMars_Fragment_Sequence);
+
             if (InSequence.Has_Fragment(FMars_Fragment_Sequence_Signals))
             { InSequence.Get_Fragment(FMars_Fragment_Sequence_Signals).OnInputRejected.Broadcast(InSequence, InChannel); }
 
@@ -58,17 +68,18 @@ class UMars_Processor_Sequence_HandleRequests : UCk_Processor_Script_Base_UE
 
         const auto AcceptedIndex = State.Progress;
         State.Progress = AcceptedIndex + 1;
+        InSequence.H().Request_MarkReplicationDirty(FMars_Fragment_Sequence);
         const auto Completed = State.Progress >= StepCount;
 
-        DestroyStepTimer(State);
+        DestroyStepTimer(InSequence);
 
         if (Completed)
         {
             if (Latch == false)
-            { State.StepTimer = ArmTimer(InSequence, PulseSeconds); }
+            { InSequence.Get_Fragment(FMars_Fragment_Sequence_Local).StepTimer = ArmTimer(InSequence, PulseSeconds); }
         }
         else if (StepTimeoutSeconds.IsSet())
-        { State.StepTimer = ArmTimer(InSequence, StepTimeoutSeconds.GetValue()); }
+        { InSequence.Get_Fragment(FMars_Fragment_Sequence_Local).StepTimer = ArmTimer(InSequence, StepTimeoutSeconds.GetValue()); }
 
         if (InSequence.Has_Fragment(FMars_Fragment_Sequence_Signals))
         { InSequence.Get_Fragment(FMars_Fragment_Sequence_Signals).OnStepAccepted.Broadcast(InSequence, AcceptedIndex); }
@@ -87,13 +98,14 @@ class UMars_Processor_Sequence_HandleRequests : UCk_Processor_Script_Base_UE
 
     private void Reset(FCk_Handle_Sequence& InSequence)
     {
-        auto& State = InSequence.Get_Fragment(FMars_Fragment_Sequence);
-        DestroyStepTimer(State);
+        DestroyStepTimer(InSequence);
 
+        auto& State = InSequence.Get_Fragment(FMars_Fragment_Sequence);
         if (State.Progress == 0)
         { return; }
 
         State.Progress = 0;
+        InSequence.H().Request_MarkReplicationDirty(FMars_Fragment_Sequence);
 
         auto Source = InSequence.As_MechanismSource(ECk_SanityCheck::UnChecked);
         if (ck::IsValid(Source))
@@ -103,12 +115,13 @@ class UMars_Processor_Sequence_HandleRequests : UCk_Processor_Script_Base_UE
         { InSequence.Get_Fragment(FMars_Fragment_Sequence_Signals).OnReset.Broadcast(InSequence); }
     }
 
-    private void DestroyStepTimer(FMars_Fragment_Sequence& InState)
+    private void DestroyStepTimer(FCk_Handle_Sequence& InSequence)
     {
-        if (ck::IsValid(InState.StepTimer))
-        { utils_entity_lifetime::Request_DestroyEntity(InState.StepTimer.H()); }
+        auto& Local = InSequence.Get_Fragment(FMars_Fragment_Sequence_Local);
+        if (ck::IsValid(Local.StepTimer))
+        { utils_entity_lifetime::Request_DestroyEntity(Local.StepTimer.H()); }
 
-        InState.StepTimer = FCk_Handle_Timer();
+        Local.StepTimer = FCk_Handle_Timer();
     }
 
     private FCk_Handle_Timer ArmTimer(FCk_Handle_Sequence& InSequence, float32 InSeconds)
@@ -136,7 +149,7 @@ class UMars_Processor_Sequence_HandleRequests : UCk_Processor_Script_Base_UE
         auto Sequence = Owner.As_Sequence();
 
         // A timer replaced by a newer step can still finish in the frame it was destroyed.
-        if (Sequence.Get_Fragment(FMars_Fragment_Sequence).StepTimer != InTimer)
+        if (Sequence.Get_Fragment(FMars_Fragment_Sequence_Local).StepTimer != InTimer)
         { return; }
 
         Sequence.Request_Reset();

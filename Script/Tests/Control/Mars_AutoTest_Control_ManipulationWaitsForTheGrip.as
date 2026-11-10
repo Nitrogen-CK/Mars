@@ -38,7 +38,7 @@ class UMars_AutoTest_Control_ManipulationWaitsForTheGrip : UMars_AutoTestRig_Lev
         Assert_False(_SawManipulationBeforeGrip,
             f"the lever was manipulated while the gloves were not gripping it (phase {_Hands.Get_Phase() :n}, alpha {_Hands.Get_ReachAlpha()})");
         Assert_True(_Hands.Get_IsGrippingTarget(_Target), "the gloves grip the lever while it is manipulated");
-        Assert_True(_Control.Get_IsManipulating() && ck::IsValid(_Control.Get_Fragment(FMars_Fragment_Control).Manipulation.GetValue().Interaction),
+        Assert_True(_Control.Get_IsManipulating() && ck::IsValid(_Control.Get_Fragment(FMars_Fragment_Control_Local).Manipulation.GetValue().Interaction),
             "the manipulation carries the started interaction (the threshold ends it)");
     }
 }

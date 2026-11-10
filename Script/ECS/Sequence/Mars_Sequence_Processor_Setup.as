@@ -1,5 +1,6 @@
-// The link: rising edges from the MechanismSink on the sequence's own entity become the sequence's inputs, and the
-// optional MechanismSource on that entity is asserted while the sequence is complete.
+// The link, on the authority: rising edges from the MechanismSink on the sequence's own entity become the sequence's
+// inputs, and the optional MechanismSource on that entity is asserted while the sequence is complete. A client wires none
+// of it: it binds the ledger's rep-notify, reconciles once, and broadcasts the signals the replicated change implies.
 class UMars_Processor_Sequence_Setup : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -15,6 +16,16 @@ class UMars_Processor_Sequence_Setup : UCk_Processor_Script_Base_UE
     void ForEachEntity(FCk_Time InDeltaT, FCk_Handle& InHandle)
     {
         auto Sequence = InHandle.As_Sequence();
+
+        if (utils_net::Get_HasAuthority(InHandle) == false)
+        {
+            InHandle.BindTo_OnRepNotify(FMars_Fragment_Sequence, FCk_DynamicFragment_OnRepNotify(this, n"OnLedgerReplicated"));
+            Reconcile(Sequence);
+            Sequence.Request_TryRemove(FMars_Tag_Sequence_NeedsSetup);
+            return;
+        }
+
+        Sequence.Request_TryRemove(FMars_Fragment_Sequence_Mirror);
 
         auto Sink = InHandle.As_MechanismSink();
         const auto InputChannels = Sink.Get_InputChannels();
@@ -35,6 +46,42 @@ class UMars_Processor_Sequence_Setup : UCk_Processor_Script_Base_UE
         }
 
         Sequence.Request_TryRemove(FMars_Tag_Sequence_NeedsSetup);
+    }
+
+    UFUNCTION()
+    private void OnLedgerReplicated(FCk_Handle InHandle, FCk_DynamicFragment_RepNotifyInfo InInfo)
+    {
+        auto Sequence = InHandle.As_Sequence();
+        Reconcile(Sequence);
+    }
+
+    // The authority's order: a rejection, then the reset it caused (progress fell), then each step gained since, then the
+    // completion. Several changes between two replications broadcast as one diff.
+    private void Reconcile(FCk_Handle_Sequence& InSequence)
+    {
+        const auto Ledger = InSequence.Get_Fragment(FMars_Fragment_Sequence);
+        auto& Mirror = InSequence.Get_Fragment(FMars_Fragment_Sequence_Mirror);
+        const auto Last = Mirror.Last;
+        Mirror.Last = Ledger;
+
+        if (InSequence.Has_Fragment(FMars_Fragment_Sequence_Signals) == false)
+        { return; }
+
+        if (Ledger.Rejections > Last.Rejections)
+        { InSequence.Get_Fragment(FMars_Fragment_Sequence_Signals).OnInputRejected.Broadcast(InSequence, Ledger.LastRejectedChannel); }
+
+        auto FirstGained = Last.Progress;
+        if (Ledger.Progress < Last.Progress)
+        {
+            FirstGained = 0;
+            InSequence.Get_Fragment(FMars_Fragment_Sequence_Signals).OnReset.Broadcast(InSequence);
+        }
+
+        for (int32 Index = FirstGained; Index < Ledger.Progress; ++Index)
+        { InSequence.Get_Fragment(FMars_Fragment_Sequence_Signals).OnStepAccepted.Broadcast(InSequence, Index); }
+
+        if (FirstGained < Ledger.Progress && InSequence.Get_IsComplete())
+        { InSequence.Get_Fragment(FMars_Fragment_Sequence_Signals).OnCompleted.Broadcast(InSequence); }
     }
 
     UFUNCTION()
