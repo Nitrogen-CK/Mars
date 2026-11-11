@@ -8,8 +8,13 @@
 // (UMars_Processor_WorldItem_Reconcile). Any other item with a Presentation gets a Visual-mode world item under the Hand,
 // spawned at a requested start pose (UMars_Processor_HeldItem_HandleRequests) when one waits. The Hand is the first-person
 // chain on every copy of a character and its body already draws the held item for the others, so the Owned visual is
-// spawned only for a carrier with no character or a locally controlled one. A Persistent item whose link is absent here
-// (it is stamped on the authority only) gets no presentation at all: an Owned visual would sit beside its replicated body.
+// spawned only for a carrier with no character or a locally controlled one.
+//
+// A Persistent item's presentation is its body on every machine once this machine has linked it (the authority where
+// the holder seeded or adopted it, a client from the replicated ledger); an Owned visual is spawned only for a Transient
+// item, and only where the carrier draws first person. A Persistent item not linked here yet has no presentation (an
+// Owned visual would sit beside its replicated body); when its link appears while it is still held, its body is adopted
+// as the presentation and OnHeldItemChanged is broadcast with the same item as previous and new (a refresh).
 class UMars_Processor_HeldItem_Sync : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -29,7 +34,7 @@ class UMars_Processor_HeldItem_Sync : UCk_Processor_Script_Base_UE
         InState.CurrentInventory = Hotbar.Get_SelectedSlot();
 
         const auto PrevItem = InState.CurrentItem;
-        if (NewItem == PrevItem)
+        if (NewItem == PrevItem && Get_AdoptsLinkedBody(InState, NewItem) == false)
         { return; }
 
         auto Self = InHandle.As_HeldItem();
@@ -39,11 +44,17 @@ class UMars_Processor_HeldItem_Sync : UCk_Processor_Script_Base_UE
         auto Item = NewItem;
         if (ck::IsValid(Item) && Item.Has_PersistentWorldItem())
         {
+            // Without authority over the item, a body that is gone (or not resolved yet) means no presentation; it is
+            // adopted if it becomes valid while the item is still held.
             const auto WorldItem = Item.Get_PersistentWorldItem();
-            ck::EnsureIfNot(ck::IsValid(WorldItem), f"[HeldItem] Persistent item [{Item.ToString()}] has lost its world item");
+            if (utils_net::Get_HasAuthority(Item))
+            { ck::EnsureIfNot(ck::IsValid(WorldItem), f"[HeldItem] Persistent item [{Item.ToString()}] has lost its world item"); }
 
-            InState.PresentationEntity = WorldItem;
-            InState.PresentationOwnership = EMars_HeldItem_PresentationOwnership::Borrowed;
+            if (ck::IsValid(WorldItem))
+            {
+                InState.PresentationEntity = WorldItem;
+                InState.PresentationOwnership = EMars_HeldItem_PresentationOwnership::Borrowed;
+            }
         }
         else if (ck::IsValid(Item) && Item.Has_Presentation() && Get_IsPersistent(Item) == false && Get_DrawsFirstPerson(InHandle))
         {
@@ -61,6 +72,16 @@ class UMars_Processor_HeldItem_Sync : UCk_Processor_Script_Base_UE
     {
         auto Character = Cast<ACharacter>(utils_owning_actor::TryGet_EntityOwningActor_Recursive(InHandle));
         return Character == nullptr || Character.IsLocallyControlled();
+    }
+
+    // The held item is unchanged, has no presentation yet, and is a Persistent item whose body this machine has since
+    // linked: the link arrived after the selection.
+    private bool Get_AdoptsLinkedBody(const FMars_Fragment_HeldItem& InState, const FCk_Handle_Item& InItem) const
+    {
+        if (ck::IsValid(InState.PresentationEntity) || ck::Is_NOT_Valid(InItem) || InItem.Has_PersistentWorldItem() == false)
+        { return false; }
+
+        return ck::IsValid(InItem.Get_PersistentWorldItem());
     }
 
     private bool Get_IsPersistent(const FCk_Handle_Item& InItem) const

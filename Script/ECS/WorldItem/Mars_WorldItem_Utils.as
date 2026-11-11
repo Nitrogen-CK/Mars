@@ -41,6 +41,10 @@ namespace utils_world_item
         if (InSpec.World.IsSet() && InHandle.Has_Fragment(FMars_Fragment_WorldItem_Net) == false)
         { InHandle.Add_Fragment(FMars_Fragment_WorldItem_Net(), ECk_Replication::Replicates); }
 
+        if (InSpec.Mode == EMars_WorldItem_Mode::World && utils_net::Get_HasAuthority(InHandle) == false
+            && InHandle.As_WorldItem().Get_Persistence() == EMars_WorldItem_Persistence::Persistent)
+        { InHandle.Add_Fragment(FMars_Tag_WorldItem_AwaitingLink()); }
+
         // Never applied here: the body is not added for at least one frame. The launch processor drains it.
         if (InSpec.World.IsSet() && InSpec.World.GetValue().Composition.Launch.IsSet())
         { InHandle.Add_Fragment(InSpec.World.GetValue().Composition.Launch.GetValue()); }
@@ -85,6 +89,13 @@ namespace utils_world_item
 
         auto& State = InWorldItem.Get_Fragment(FMars_Fragment_WorldItem);
         State.Item = TOptional<FCk_Handle_Item>(Item);
+
+        if (utils_net::Get_HasAuthority(InWorldItem) && InWorldItem.Has_Fragment(FMars_Fragment_WorldItem_Net))
+        {
+            auto& Net = InWorldItem.Get_Fragment(FMars_Fragment_WorldItem_Net);
+            Net.Item = Item;
+            InWorldItem.H().Request_MarkReplicationDirty(FMars_Fragment_WorldItem_Net);
+        }
     }
 
     // Marks InInventory as one whose Persistent items ride its lifetime owner as InMarker says. Called once, by whoever
@@ -123,6 +134,11 @@ namespace utils_world_item
 
         if (ck::Is_NOT_Valid(Inventory))
         {
+            // On a machine without authority an item in no inventory it can see is in transit between two, or in one that
+            // does not replicate: its body follows the replicated pose.
+            if (utils_net::Get_HasAuthority(InWorldItem) == false)
+            { return FMars_WorldItem_Resolution(); }
+
             Resolution.Placement = EMars_WorldItem_Placement::Unmountable;
             return Resolution;
         }
@@ -194,10 +210,11 @@ namespace utils_world_item
         return ck::Is_NOT_Valid(InEntity) || utils_entity_lifetime::Get_IsPendingDestroy(InEntity, ECk_EntityLifetime_DestructionPhase::BeginDestroy);
     }
 
-    // The World commit, called only by the WorldItem processors (a release's answer, and the reconcile's recovery): any
-    // pending mount and arrival dropped, detached keeping its world pose, the body Dynamic with its own profile
-    // (InOnProfileRestored records it) and InLaunch pending, the pickup's Mounted claim released, then OnMountChanged and
-    // OnMountSettled.
+    // The World commit, called only by the WorldItem processors (a release's answer, and the reconcile's recovery; on a
+    // machine without authority, the reconcile seeing the item back in its holder): any pending mount and arrival dropped,
+    // detached keeping its world pose (a client's root then takes the authority's replicated pose again), the body Dynamic
+    // with its own profile (InOnProfileRestored records it) and InLaunch pending, the pickup's Mounted claim released, then
+    // OnMountChanged and OnMountSettled. A machine without the body skips the body's part.
     void Commit_World(FCk_Handle_WorldItem& InWorldItem, TOptional<FMars_Fragment_WorldItem_PendingLaunch> InLaunch,
                       FCk_Delegate_Request_OnCompleted InOnProfileRestored)
     {
@@ -655,6 +672,12 @@ mixin FCk_Handle Get_Carrier(const FCk_Handle_WorldItem& Self)
 mixin FGameplayTag Get_MountPoint(const FCk_Handle_WorldItem& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_WorldItem).Committed.Point;
+}
+
+// True once this machine has linked the item this world item is the body of.
+mixin bool Get_IsLinked(const FCk_Handle_WorldItem& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_WorldItem).Item.IsSet();
 }
 
 // Landed: the committed mount is where the item's inventory says it belongs, with nothing pending (no mount waiting on the

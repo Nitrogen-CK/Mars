@@ -17,9 +17,11 @@
 class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
 {
     // Stance SPLIT: a World-mode item is spawned by an authority through utils_world_item::Request_SpawnWorldEntity under
-    // an owner with a replication driver, and replicates its root transform, holder and pickup ledger; the body simulates
-    // on the authority only; probe, interactable, grips and visual are built on every machine. Visual-mode spawns use the
-    // definition's DoesNotReplicate visual class (utils_world_item::Get_VisualScriptClass). Every subclass inherits this.
+    // an owner with a replication driver, and replicates its root transform, holder and ledger (refusals and the item
+    // link); a client's holder receives the item by replication and its link from the ledger. The root's replicated pose
+    // yields to a local mount on a machine without authority. The body simulates on the authority only; probe,
+    // interactable, grips and visual are built on every machine. Visual-mode spawns use the definition's DoesNotReplicate
+    // visual class (utils_world_item::Get_VisualScriptClass). Every subclass inherits this.
     default _Replication = ECk_Replication::Replicates;
     default _ShowInPlaceActors = true;
 
@@ -85,6 +87,11 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
 
         const auto RootReplication = Mode == EMars_WorldItem_Mode::World ? ECk_Replication::Replicates : ECk_Replication::DoesNotReplicate;
         auto Root = utils_transform::Add(InHandle, SpawnTransform, RootReplication);
+        // A machine without authority that mounts this body parents it locally; the authority's pose applies again when it
+        // lets go.
+        if (Mode == EMars_WorldItem_Mode::World)
+        { utils_transform::Request_SetReplicatedPosePolicy(Root, ECk_Transform_ReplicatedPosePolicy::YieldsToSceneNodeParent); }
+
         utils_entity_tag::Add(InHandle, n"TAG_MarsWorldItem");
 
         _Definition = Definition.Get();
@@ -204,7 +211,7 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
 
     // The holder must be fully composed before an item can be seeded into it or adopted. Only the authority seeds or
     // adopts (a client's holder would refuse: inventory dispatch is authority-gated); a client's holder receives the item
-    // by replication.
+    // by replication, and a client links it from the replicated ledger (UMars_Processor_WorldItem_Link).
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {

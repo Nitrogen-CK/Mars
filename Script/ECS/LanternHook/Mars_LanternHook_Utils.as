@@ -64,10 +64,11 @@ namespace utils_lantern_hook
     }
 
     // The accept rule the hook's inventory enforces: an item with UMars_ItemTrait_Lantern whose body is its Persistent
-    // world item.
+    // world item. Its verbs are applied by the authority: a machine without authority over the item is offered none.
     bool Get_IsLantern(const FCk_Handle_Item& InItem)
     {
-        return ck::IsValid(InItem) && InItem.Has_LanternTrait() && InItem.Has_PersistentWorldItem();
+        return ck::IsValid(InItem) && InItem.Has_LanternTrait() && InItem.Has_PersistentWorldItem()
+            && utils_net::Get_HasAuthority(InItem);
     }
 
 }

@@ -3,6 +3,26 @@
 // attach point, a hotbar, HeldItem and HeldItemUse) is composed on the subject on both machines, as the pawn composes
 // them. The server's rest pose reaches the client through a test-only replicated fragment on the subject: the two PIE
 // worlds share nothing else the test may read. Each test places its floor at its own X.
+//
+// A Persistent fixture (the rock's ball, carried on the Belt) and the steps its tests share: the server spawns it like a
+// rock; each machine records the OnMountChanged its own copy raises and measures its root against a node and offset.
+
+// Immutable test input: a Persistent one-item body with distinct carry and held offsets, so a pose check can tell the
+// mounts apart.
+asset Mars_TestItemDef_NetPersistentRock of UCk_InventoryItem_Definition
+{
+    _CoreInfo = FCk_InventoryItem_CoreInfo(FText::FromString("Persistent rock fixture"));
+    auto Presentation = mars_items::Add_BlockoutTraits(this, mars_items::Make_BallBlockout(FVector(0.3, 0.3, 0.3)));
+    Presentation.Mounting.Persistence = EMars_WorldItem_Persistence::Persistent;
+    Presentation.Mounting.CarryPoint = GameplayTags::AttachPoint_Mars_Belt;
+    Presentation.Mounting.CarryOffset = FTransform(FRotator::ZeroRotator, FVector(0.0, 12.0, -8.0));
+    Presentation.Mounting.HeldOffset = FTransform(FRotator::ZeroRotator, FVector(6.0, 0.0, -10.0));
+}
+
+namespace mars_test_world_item
+{
+    UCk_InventoryItem_Definition NetPersistentRock() { return Mars_TestItemDef_NetPersistentRock; }
+}
 
 // Written by the server only, through Get_Fragment + Request_MarkReplicationDirty (test-only: a feature's processors are
 // the only writers in game code).
@@ -19,6 +39,7 @@ struct FMars_Fragment_TESTONLY_NetWorldItemReport
 struct FMars_TESTONLY_NetCarrier
 {
     FCk_Handle_Transform Hand;
+    FCk_Handle_Transform Belt;
     FCk_Handle_Hotbar Hotbar;
     FCk_Handle_HeldItem HeldItem;
     FCk_Handle_HeldItemUse Use;
@@ -35,8 +56,11 @@ class UMars_AutoTestRig_NetWorldItem : UCk_AutoTest_NetBase
     protected const float64 k_StillCmPerFrame = 0.15;
     protected const int32 k_StillFrames = 10;
     protected const float64 k_FloorHalfExtent = 800.0;
+    protected const FVector k_BeltFromHand = FVector(0.0, 40.0, -60.0);
 
     protected FCk_Handle _Rock;
+    // Every OnMountChanged this machine's copy raised since Record_MountChanges, the new mount of each.
+    protected TArray<EMars_WorldItem_Mount> _MountChanges;
     private TOptional<FVector> _LastRockLocation;
     private int32 _StillCount = 0;
 
@@ -95,8 +119,80 @@ class UMars_AutoTestRig_NetWorldItem : UCk_AutoTest_NetBase
         return Rock;
     }
 
-    // A hand node (a transform of its own at InHandLocation), its attach point, a hotbar of InBagSlots bag slots and the
-    // overflow (no backpack slot), HeldItem and HeldItemUse, on the subject.
+    // A Persistent fixture under the replicated spawn owner, seeded on the server, tracked for cleanup.
+    protected FCk_Handle Spawn_ServerPersistent(FVector InLocation)
+    {
+        auto Owner = utils_mars_net::Get_ReplicatedSpawnOwner(Get_SubjectEntity());
+        auto Spec = FMars_WorldItem_WorldSpec(utils_held_item::Make_DefinitionSoft(mars_test_world_item::NetPersistentRock()),
+            FTransform(FRotator::ZeroRotator, InLocation));
+        auto Body = utils_world_item::Request_SpawnWorld(Owner, Spec);
+        Track_ForCleanup(Body);
+        return Body;
+    }
+
+    protected void Record_MountChanges(FCk_Handle_WorldItem InWorldItem)
+    {
+        auto WorldItem = InWorldItem;
+        _MountChanges.Empty();
+        WorldItem.BindTo_OnMountChanged(FMars_Delegate_WorldItem_OnMountChanged(this, n"OnRecordedMountChanged"));
+    }
+
+    UFUNCTION()
+    private void OnRecordedMountChanged(FCk_Handle_WorldItem InWorldItem, EMars_WorldItem_Mount InPrev, EMars_WorldItem_Mount InNew)
+    {
+        _MountChanges.Add(InNew);
+    }
+
+    protected FString Describe_MountChanges() const
+    {
+        auto Text = FString();
+        for (const auto Mount : _MountChanges)
+        { Text += f"{Mount :n} "; }
+
+        return Text;
+    }
+
+    // How far InEntity's root is from where InNode composed with InOffset puts it, in cm.
+    protected float64 Get_PoseError(FCk_Handle InEntity, FCk_Handle_Transform InNode, FTransform InOffset)
+    {
+        const auto Expected = InOffset * utils_transform::Get_EntityCurrentTransform(InNode);
+        return (Get_RootLocation(InEntity) - Expected.GetLocation()).Size();
+    }
+
+    // This machine's Visual-mode world items anywhere under the subject's world.
+    protected int32 Get_VisualWorldItemCount()
+    {
+        auto Count = 0;
+        for (auto Candidate : utils_entity_tag::ForEach_Entity(Get_SubjectEntity(), n"TAG_MarsWorldItem"))
+        {
+            auto WorldItem = Candidate.As_WorldItem(ECk_SanityCheck::UnChecked);
+            if (ck::IsValid(WorldItem) && WorldItem.Get_Mode() == EMars_WorldItem_Mode::Visual)
+            { Count += 1; }
+        }
+
+        return Count;
+    }
+
+    // This machine's World-mode world items within InRadius of InNear in X and Y.
+    protected int32 Get_WorldItemCountNear(FVector InNear, float64 InRadius)
+    {
+        auto Count = 0;
+        for (auto Candidate : utils_entity_tag::ForEach_Entity(Get_SubjectEntity(), n"TAG_MarsWorldItem"))
+        {
+            auto WorldItem = Candidate.As_WorldItem(ECk_SanityCheck::UnChecked);
+            if (ck::Is_NOT_Valid(WorldItem) || WorldItem.Get_Mode() != EMars_WorldItem_Mode::World)
+            { continue; }
+
+            const auto Location = Get_RootLocation(Candidate);
+            if (FVector2D(Location.X - InNear.X, Location.Y - InNear.Y).Size() < InRadius)
+            { Count += 1; }
+        }
+
+        return Count;
+    }
+
+    // A hand node (a transform of its own at InHandLocation) and a belt node beside it, their attach points, a hotbar of
+    // InBagSlots bag slots and the overflow (no backpack slot), HeldItem and HeldItemUse, on the subject.
     protected FMars_TESTONLY_NetCarrier Compose_Carrier(FVector InHandLocation, int32 InBagSlots)
     {
         auto Subject = Get_SubjectEntity();
@@ -105,8 +201,12 @@ class UMars_AutoTestRig_NetWorldItem : UCk_AutoTest_NetBase
         auto HandEntity = utils_entity_lifetime::Request_CreateEntity(Subject);
         Carrier.Hand = utils_transform::Add(HandEntity, FTransform(FRotator::ZeroRotator, InHandLocation), ECk_Replication::DoesNotReplicate);
 
+        auto BeltEntity = utils_entity_lifetime::Request_CreateEntity(Subject);
+        Carrier.Belt = utils_transform::Add(BeltEntity, FTransform(FRotator::ZeroRotator, InHandLocation + k_BeltFromHand), ECk_Replication::DoesNotReplicate);
+
         auto Points = FMars_AttachPoints_Spec();
         Points.Points.Add(FMars_AttachPoint_Entry(GameplayTags::AttachPoint_Mars_Hand, Carrier.Hand));
+        Points.Points.Add(FMars_AttachPoint_Entry(GameplayTags::AttachPoint_Mars_Belt, Carrier.Belt));
         utils_attach_points::Add(Subject, Points);
 
         auto HotbarSpec = FMars_Hotbar_Spec();

@@ -8,8 +8,10 @@
 // (Request_ArriveNextMount) when one is fresh. Only a release brings an item home and commits World; a home it reached any
 // other way ensures and commits World here. Nothing is reconciled while a release waits on its transfer.
 //
-// Runs on every machine, but only a linked item reconciles, and an item is linked where its holder seeded or adopted it:
-// the authority. A world item ends only on the authority; its destroy replicates.
+// Runs on every machine on a linked item: the authority links it where its holder seeded or adopted the item, a client
+// from the replicated ledger (UMars_Processor_WorldItem_Link). The authority alone ends a world item (its destroy
+// replicates) and alone commits World from a release's answer; a machine without authority commits World when the item
+// is back in its holder, and treats an unmountable placement as not yet.
 class UMars_Processor_WorldItem_Reconcile : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -28,6 +30,7 @@ class UMars_Processor_WorldItem_Reconcile : UCk_Processor_Script_Base_UE
         { return; }
 
         auto Self = InHandle.As_WorldItem();
+        const auto HasAuthority = utils_net::Get_HasAuthority(InHandle);
         const auto Resolution = utils_world_item::Resolve_Target(Self);
         if (Resolution.Placement == EMars_WorldItem_Placement::ItemGone)
         {
@@ -47,7 +50,11 @@ class UMars_Processor_WorldItem_Reconcile : UCk_Processor_Script_Base_UE
 
         if (Resolution.Placement == EMars_WorldItem_Placement::Unmountable)
         {
-            Report_Unmountable(Self, InState, Resolution);
+            // Without authority, an inventory this machine has not finished composing (a carrier whose hotbar or attach
+            // points are still arriving) is not yet, and a composition defect is the authority's to report.
+            if (HasAuthority)
+            { Report_Unmountable(Self, InState, Resolution); }
+
             return;
         }
 
@@ -62,6 +69,13 @@ class UMars_Processor_WorldItem_Reconcile : UCk_Processor_Script_Base_UE
 
         if (Target.Mount == EMars_WorldItem_Mount::World)
         {
+            // Without authority, the item back in its holder is how this machine learns of the release.
+            if (HasAuthority == false)
+            {
+                utils_world_item::Commit_World(Self, TOptional<FMars_Fragment_WorldItem_PendingLaunch>(), FCk_Delegate_Request_OnCompleted());
+                return;
+            }
+
             ck::EnsureIfNot(false,
                 f"[WorldItem] [{Self.ToString()}] is back in its holder without a release (mount [{InState.Committed.Mount :n}]): committed World without a launch");
             utils_world_item::Commit_World(Self, TOptional<FMars_Fragment_WorldItem_PendingLaunch>(), FCk_Delegate_Request_OnCompleted());

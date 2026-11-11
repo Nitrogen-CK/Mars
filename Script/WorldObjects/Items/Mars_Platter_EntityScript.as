@@ -15,6 +15,9 @@ enum EMars_Platter_PickupAction
 // up. The prompt follows the focuser: refreshed when the pickup is focused and whenever the focuser's held item changes,
 // never per frame. While the platter rides a carrier (Carried or Held) its pile ignores pawns, as the tray's own body
 // does. The small and the large platter items share this script.
+//
+// Stance SPLIT, as its base: the world item's mount is derived on every machine, but the pile's mounted collision is set
+// only by the authority, on the bodies it has.
 class UMars_Platter_EntityScript : UMars_WorldItem_EntityScript
 {
     // A placed platter resolves its item from here; a spawn sets it anyway.
@@ -97,6 +100,10 @@ class UMars_Platter_EntityScript : UMars_WorldItem_EntityScript
     UFUNCTION()
     private void OnPlatterMountChanged(FCk_Handle_WorldItem InWorldItem, EMars_WorldItem_Mount InPrev, EMars_WorldItem_Mount InNew)
     {
+        // The pile's collision is the authority's.
+        if (utils_net::Get_HasAuthority(InWorldItem) == false)
+        { return; }
+
         const auto Mounting = InNew == EMars_WorldItem_Mount::World ? EMars_Platter_Mounting::Free : EMars_Platter_Mounting::Mounted;
         _Platter.Request_SetMounted(FMars_Request_Platter_SetMounted(Mounting));
     }

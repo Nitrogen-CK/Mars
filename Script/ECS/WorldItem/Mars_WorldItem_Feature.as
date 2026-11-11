@@ -1,9 +1,11 @@
-// Stance SPLIT. A World-mode item replicates as an entity: its root transform (interpolated), its holder inventory (the
-// item lives there) and FMars_Fragment_WorldItem_Net (the authority's pickup refusals). Its Jolt body, its launch, a
-// Release and a PickUp are the authority's; the probe, the pickup interactable, the grips, the visual and the arrival are
-// built on every machine (D). FMars_Fragment_WorldItem stays local (it holds body and probe handles), and a Persistent
-// item's mount is derived where its item is linked (the authority only: a client never links them). A Visual-mode item never
-// replicates: it is a DoesNotReplicate script spawned per machine under a local owner
+// Stance SPLIT. A World-mode item replicates as an entity: its root transform (each replicated pose snaps; a machine
+// without authority that mounts the body parents it locally instead, and the pose applies again when it lets go), its
+// holder inventory (the item lives there) and FMars_Fragment_WorldItem_Net (the authority's pickup refusals and the item
+// link). Its Jolt body, its launch, a Release and a PickUp are the authority's; the probe, the pickup interactable, the
+// grips, the visual and the arrival are built on every machine (D). FMars_Fragment_WorldItem stays local (it holds body
+// and probe handles). A Persistent item's link is stamped by the authority where the holder seeded or adopted the item,
+// and by a client from the ledger; its mount is derived on every machine from where the item lives. A Visual-mode item
+// never replicates: it is a DoesNotReplicate script spawned per machine under a local owner
 // (utils_world_item::Get_VisualScriptClass).
 // A World-mode item exists on an authority under an owner with a replication driver, and its script ensures and ends
 // one that has none. Runtime code spawns it through utils_world_item::Request_SpawnWorldEntity, which picks that owner;
@@ -22,6 +24,13 @@ asset Mars_WorldItemHandle of UCkDynamic_HandleDefinition
     Description = "An item presented outside an inventory: pickable with physics in the world, or a visual in the player's hand";
 }
 struct FMars_Feature_WorldItem {}
+
+// A client's Persistent World-mode item that has not linked its item yet; consumed by the link processor.
+struct FMars_Tag_WorldItem_AwaitingLink
+{
+    UPROPERTY()
+    bool Requested = true;
+}
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Enums
@@ -810,9 +819,9 @@ struct FMars_Fragment_WorldItem_Requests
 // Replicated ledger (World mode)
 //--------------------------------------------------------------------------------------------------------------------------
 
-// The authority's answer to pickups it refused, replicated on the root: the serial advances once per refusal, so an
-// initiator that recorded it before its cue knows a newer refusal is about its own. It holds no item, holder or mount:
-// those are the holder inventory and the mount derived from it.
+// The authority's ledger on the root: the refusals and the item link. The refusal serial advances once per refusal, so an
+// initiator that recorded it before its cue knows a newer refusal is about its own. It holds no holder or mount: the
+// mount is derived from where the item lives.
 struct FMars_Fragment_WorldItem_Net
 {
     UPROPERTY()
@@ -824,6 +833,11 @@ struct FMars_Fragment_WorldItem_Net
     // The refused initiator, a player's entity. On a client it may arrive unresolved: that only means "not known here yet".
     UPROPERTY()
     FCk_Handle LastRefused;
+
+    // The item a Persistent world item is the body of, as the authority linked it. Invalid before that, for a Transient
+    // item, and on a client while that entity is not resolved there: not yet, never an error.
+    UPROPERTY()
+    FCk_Handle_Item Item;
 }
 
 // Authority only, never replicated: the owner a caller of utils_world_item::Request_SpawnWorldEntity named when the item

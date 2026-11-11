@@ -74,7 +74,8 @@ namespace utils_platter_dock
     // The platter riding InItem's Persistent world item; invalid when InItem is not a platter's item.
     FCk_Handle_Platter TryGet_PlatterOf(const FCk_Handle_Item& InItem)
     {
-        if (ck::Is_NOT_Valid(InItem) || InItem.Has_PersistentWorldItem() == false)
+        // Its verbs are applied by the authority: a machine without authority over the item is offered none.
+        if (ck::Is_NOT_Valid(InItem) || InItem.Has_PersistentWorldItem() == false || utils_net::Get_HasAuthority(InItem) == false)
         { return FCk_Handle_Platter(); }
 
         FCk_Handle WorldItemEntity = InItem.Get_PersistentWorldItem();

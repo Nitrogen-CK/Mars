@@ -214,7 +214,8 @@ namespace utils_flame
 // The flame an item's body carries: a Persistent item whose world item composed the Flame feature. Invalid otherwise.
 mixin FCk_Handle_Flame TryGet_Flame(const FCk_Handle_Item& Self)
 {
-    if (ck::Is_NOT_Valid(Self) || Self.Has_PersistentWorldItem() == false)
+    // Its verbs are applied by the authority: a machine without authority over the item is offered none.
+    if (ck::Is_NOT_Valid(Self) || Self.Has_PersistentWorldItem() == false || utils_net::Get_HasAuthority(Self) == false)
     { return FCk_Handle_Flame(); }
 
     const auto WorldItem = Self.Get_PersistentWorldItem();

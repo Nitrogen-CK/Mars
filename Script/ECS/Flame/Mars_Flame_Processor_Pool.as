@@ -1,7 +1,8 @@
 // Follows the flame from pool to pool: on the edge into Stowed a lit flame that snuffs when stowed goes out (the belt is no
 // place for an open flame); then, while lit, exactly the Probe.Mars.Light probe of Get_LightPool is enabled (a lantern
 // taken from the hand to the belt or a hook swaps probes), and none while dark or in a pool it has no probe for. Polled:
-// the pool changes with the world item's mount and the flame with the burn, and a probe toggles only on a change.
+// the pool changes with the world item's mount and the flame with the burn, and a probe toggles only on a change. The
+// pool and the probes follow this machine's mount on every machine; the snuff runs only with authority.
 class UMars_Processor_Flame_Pool : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -20,7 +21,8 @@ class UMars_Processor_Flame_Pool : UCk_Processor_Script_Base_UE
 
         const auto IsNewPool = InState.LastPool.IsSet() && InState.LastPool.GetValue() != Pool;
         const auto SnuffsHere = Pool == EMars_Flame_Pool::Stowed && Params.OnStow == EMars_Flame_OnStow::Snuffs;
-        if (IsNewPool && SnuffsHere && InState.Ignition == EMars_Flame_Ignition::Lit)
+        // A flame goes out where its ignition is decided.
+        if (IsNewPool && SnuffsHere && InState.Ignition == EMars_Flame_Ignition::Lit && utils_net::Get_HasAuthority(InHandle))
         {
             const auto Before = utils_flame::Make_Reading(Params, InState);
             InState.Ignition = EMars_Flame_Ignition::Snuffed;

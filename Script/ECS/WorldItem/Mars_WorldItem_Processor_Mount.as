@@ -1,5 +1,6 @@
 // Commits a PendingMount (written by UMars_Processor_WorldItem_Reconcile) once the body can be scene-node-attached, then
-// broadcasts OnMountChanged.
+// broadcasts OnMountChanged. Runs on every machine that has linked the item; a machine without the body (a client: the
+// body simulates on the authority only) commits at once.
 //
 // Gate: no body, OR the body is added and reads Kinematic (utils_jolt_body::Get_MotionType is the mirror the
 // SetMotionType handler stamps). Attaching while the body still reads Dynamic would fight the Jolt writeback; a Kinematic

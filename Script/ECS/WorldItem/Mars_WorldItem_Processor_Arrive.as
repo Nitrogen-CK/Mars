@@ -1,3 +1,5 @@
+// Runs on every machine, on its own copy's attach: the travel is presentation, with or without a body.
+//
 // Holds a scene-node-attached world item's offset at FromOffset for DelaySeconds, then lerps it to ToOffset with Easing
 // over Duration, then removes the Arrival fragment; a World-mode world item has then settled on its mount
 // (OnMountSettled). With FromWorld set the start is re-read against the parent every pass, so a parent that moves under
