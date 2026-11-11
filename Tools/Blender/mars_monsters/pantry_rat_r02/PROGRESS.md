@@ -1,3 +1,26 @@
+---
+{
+  "campaign": "Pantry Rat R02",
+  "status": "awaiting-review",
+  "updated": "2026-11-07",
+  "phases": [
+    {"id": "R1-R2", "title": "Rebuild to the sheet, hand-back 1", "state": "done"},
+    {"id": "R3-R6", "title": "Look, clips, export, hand-back 2", "state": "done"},
+    {"id": "R7", "title": "Eye patch, nose, clip touch-ups", "state": "done"},
+    {"id": "5", "title": "Import, script swap, story re-captured", "state": "done"},
+    {"id": "6", "title": "Amber eyes, jaw carry", "state": "done"},
+    {"id": "7", "title": "Lit eye plate, emergence gate", "state": "done"},
+    {"id": "8", "title": "Emergence uses own scent test", "state": "done"},
+    {"id": "9", "title": "Locomotion matches the mover", "state": "done"}
+  ],
+  "next": "Planner audit of Phase 9 (locomotion by measured speed, the navigator Face request)",
+  "blocked_on": null,
+  "owed_by_maintainer": [
+    "Decide D5-1: `M_CkUsf_Look_MarsPantryRatEyePlate` is dirty in memory, not saved (patch colour is a shader constant)"
+  ]
+}
+---
+
 # Pantry Rat R02 - PROGRESS
 
 Executor record for `R02_BRIEF.md`. Every claim is **confirmed** (evidence named) or **inferred**. Deviations are DR-n.

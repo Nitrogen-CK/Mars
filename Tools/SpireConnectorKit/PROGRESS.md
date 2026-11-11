@@ -1,3 +1,20 @@
+---
+{
+  "campaign": "Spire connector kit",
+  "status": "done",
+  "updated": "2026-10-27",
+  "phases": [
+    {"id": "baseline", "title": "Baseline traversal and safety sweeps", "state": "done"},
+    {"id": "fix", "title": "Roof colliders, rebuild and reimport", "state": "done"},
+    {"id": "pie", "title": "Final single-player PIE acceptance", "state": "done"},
+    {"id": "audit", "title": "Native reload audit, Toolbox tests", "state": "done"}
+  ],
+  "next": null,
+  "blocked_on": null,
+  "owed_by_maintainer": []
+}
+---
+
 # Spire production progress
 
 ## Complete: model delivery and single-player PIE acceptance

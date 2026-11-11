@@ -1,3 +1,19 @@
+---
+{
+  "campaign": "Pump and Cistern kit",
+  "status": "active",
+  "updated": "2026-10-24",
+  "phases": [
+    {"id": "research", "title": "Research and art audit", "state": "active"},
+    {"id": "chain", "title": "Finish Chain Crossing and Sluice", "state": "pending"},
+    {"id": "waterworks", "title": "Full WaterworksW incl. lower Cistern", "state": "pending"}
+  ],
+  "next": "Finish the research/audit, then the Chain Crossing/Sluice section, then full WaterworksW",
+  "blocked_on": null,
+  "owed_by_maintainer": []
+}
+---
+
 # Current state
 
 2026-10-24. HEAD 793bd123b2d2f4ebe9f398487f4cf48992fc9f22. Research/audit in progress. Live editor Variant C outside PIE; no dirty map/content packages at entry. Prior kit baseline: 88 models; 1216 live placements/73 HISM groups; 39 original authored actors/2476 source instances retained. Prior completed focused gate 6/6 and PIE probe are historical baseline, not final proof for this new pass.

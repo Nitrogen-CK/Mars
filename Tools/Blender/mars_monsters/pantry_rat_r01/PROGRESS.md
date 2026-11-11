@@ -1,3 +1,20 @@
+---
+{
+  "campaign": "Pantry Rat R01",
+  "status": "awaiting-review",
+  "updated": "2026-11-07",
+  "phases": [
+    {"id": "1", "title": "Blockout, 26-bone rig, proofs", "state": "done"},
+    {"id": "2", "title": "34 clips and Unreal candidate", "state": "done"},
+    {"id": "3", "title": "Raid, den and rat kernels", "state": "done"},
+    {"id": "4", "title": "Pursuit, death, court story", "state": "done"}
+  ],
+  "next": "Planner audit of Phase 4 and its findings F4-1 to F4-5 (emerge churn, outside-the-mouth dither, den NoSurface)",
+  "blocked_on": null,
+  "owed_by_maintainer": []
+}
+---
+
 # Pantry Rat R01 - PROGRESS
 
 Production record for `docs/art/pantry-rat-dens-production-r01/` (Mars). Every claim is marked **confirmed** (evidence

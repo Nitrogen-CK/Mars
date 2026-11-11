@@ -1,3 +1,32 @@
+---
+{
+  "campaign": "Warrens two-player level design",
+  "status": "active",
+  "updated": "2026-10-22",
+  "phases": [
+    {"id": "P1", "title": "Baseline and contracts", "state": "done"},
+    {"id": "P2", "title": "Spatial revision", "state": "done"},
+    {"id": "P3", "title": "Local routes and fixtures", "state": "done"},
+    {"id": "P4", "title": "Bellkeeper dial lock", "state": "blocked"},
+    {"id": "P5", "title": "Presentation A/B/C", "state": "blocked"},
+    {"id": "P6", "title": "Design acceptance", "state": "pending"}
+  ],
+  "next": "Resume the Phase 5 A sound axis once the four approved sound assets exist",
+  "blocked_on": "Four approved sound assets (HearthCooling, WellDripChain, CourtLooseStone, OssuaryDryTick) are absent",
+  "owed_by_maintainer": [
+    "Supply the sound assets HearthCooling, WellDripChain, CourtLooseStone and OssuaryDryTick",
+    "Check Phase 4 normal heard audio (full acceptance pending it)"
+  ],
+  "commits": [
+    "ceae87899",
+    "093e20ef7",
+    "937b1dc9b",
+    "972f79b4d",
+    "4255159dc"
+  ]
+}
+---
+
 # Warrens two-person level design — progress
 
 ## Current state

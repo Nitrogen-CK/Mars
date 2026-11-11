@@ -1,3 +1,18 @@
+---
+{
+  "campaign": "Steward service selection",
+  "status": "awaiting-review",
+  "updated": "2026-10-29",
+  "phases": [
+    {"id": "R3", "title": "Arch, drape, route, travel proof", "state": "done"},
+    {"id": "gauntlet", "title": "Gauntlet mission travel return", "state": "blocked"}
+  ],
+  "next": "Run Gauntlet `StewardMissionTravelReturn` once the unrelated procedural plugin AS boot errors are fixed",
+  "blocked_on": "Unrelated procedural plugin AngelScript boot errors stop the Gauntlet test before it runs",
+  "owed_by_maintainer": []
+}
+---
+
 # Steward service selection progress
 
 Revision 3: focused tests, functional capture, full route and mission travel/return/reset passed. Settled front/side drape captures and the reading HUD screenshot were visually reviewed. Local logical commits requested; no push.

@@ -1,3 +1,21 @@
+---
+{
+  "campaign": "Chain Crossing kit",
+  "status": "done",
+  "updated": "2026-10-24",
+  "phases": [
+    {"id": "models", "title": "88 catalog models in Blender", "state": "done"},
+    {"id": "library", "title": "Packed asset library and diorama", "state": "done"},
+    {"id": "import", "title": "Unreal import and kit maps", "state": "done"},
+    {"id": "dressing", "title": "Variant C district dressing", "state": "done"},
+    {"id": "evidence", "title": "Validation, PIE gate, preview", "state": "done"}
+  ],
+  "next": null,
+  "blocked_on": null,
+  "owed_by_maintainer": []
+}
+---
+
 # Production progress
 
 Completed 2026-10-24. Starting commit: `793bd123b2d2f4ebe9f398487f4cf48992fc9f22`. No commit or push performed. Existing unrelated cookbook, Sandbox/Jolt, deleted maps, generated/source/config and submodule changes were preserved.

@@ -1,3 +1,23 @@
+---
+{
+  "campaign": "Warrens Variant C art kit",
+  "status": "awaiting-review",
+  "updated": "2026-10-24",
+  "phases": [
+    {"id": "G1", "title": "Source snapshots and mapping", "state": "done"},
+    {"id": "G2", "title": "New models and packed library", "state": "done"},
+    {"id": "G3", "title": "Import and first full pass", "state": "done"},
+    {"id": "G4", "title": "Final fitting, audit, PIE review", "state": "done"},
+    {"id": "G5", "title": "Kit maps, Toolbox gate, preview", "state": "done"}
+  ],
+  "next": "Maintainer reviews `Output/Reports/FINAL_AUDIT.md` and `Output/PREVIEW.html`",
+  "blocked_on": null,
+  "owed_by_maintainer": [
+    "Review `Output/Reports/FINAL_AUDIT.md` and `Output/PREVIEW.html` (the agent's interactive browser QA of the preview was blocked)"
+  ]
+}
+---
+
 ## Delivery checkpoint — 2026-10-24
 
 The whole-level art production and scoped audit are complete. This checkpoint supersedes the historical in-progress notes below. Main editor is Warrens_VariantC_Mars_MAP, outside PIE; dirty map packages0 and dirty content packages0. HEAD remains793bd123b2d2f4ebe9f398487f4cf48992fc9f22. Nothing committed/pushed; unrelated work preserved.

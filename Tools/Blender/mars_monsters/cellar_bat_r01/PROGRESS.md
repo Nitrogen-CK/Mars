@@ -1,3 +1,34 @@
+---
+{
+  "campaign": "Cellar Bat R01",
+  "status": "awaiting-review",
+  "updated": "2026-11-07",
+  "phases": [
+    {"id": "1", "title": "Environment, MCP and baseline", "state": "done"},
+    {"id": "2", "title": "Blockout and folding proof", "state": "done"},
+    {"id": "3", "title": "Mesh, materials, rig, LODs", "state": "done"},
+    {"id": "3b", "title": "Wrap cloak, membrane, ears", "state": "done"},
+    {"id": "4", "title": "All 18 clips exported", "state": "done"},
+    {"id": "5", "title": "Unreal import of final bat", "state": "done"},
+    {"id": "6a", "title": "Runtime candidate headless", "state": "done"},
+    {"id": "6b-1", "title": "Kernel hardening, first PIE", "state": "done"},
+    {"id": "6b-2", "title": "Final AnimBP, wiring, PIE review", "state": "done"},
+    {"id": "7", "title": "Attack-pattern fix", "state": "done"},
+    {"id": "8", "title": "Search, hit-and-run, altitude bob", "state": "done"},
+    {"id": "9", "title": "Self-running review room", "state": "done"},
+    {"id": "9b", "title": "Dives on a walking target", "state": "done"}
+  ],
+  "next": "Maintainer clears the campaign-close residuals; open tuning: corner-turn dive lead, SwoopAlpha vs SwoopSeconds",
+  "blocked_on": null,
+  "owed_by_maintainer": [
+    "Delete the head, wrist_l and wrist_r stopgap bodies from the bat's physics asset by hand",
+    "With the editor closed, delete superseded `CellarBat_R01_Mars_ABP`, `_Locomotion_Mars_BS1D` and the Additive bank clips",
+    "Turn `LogPhases` review logging off in the preset when the review is done",
+    "Rule on FlyForward to Glide never blending: lower the Glide sample (e.g. 450) or let Return glide"
+  ]
+}
+---
+
 # Cellar Bat R01 - PROGRESS
 
 Living record for the end-to-end production of the Cellar Bat (prompt:

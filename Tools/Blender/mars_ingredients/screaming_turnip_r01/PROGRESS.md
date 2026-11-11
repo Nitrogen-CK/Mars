@@ -1,3 +1,39 @@
+---
+{
+  "campaign": "Screaming Turnip R01",
+  "status": "awaiting-review",
+  "updated": "2026-11-09",
+  "phases": [
+    {"id": "1", "title": "Environment, state, baseline", "state": "done"},
+    {"id": "A", "title": "Blockout, rig, extremes, export proof", "state": "done"},
+    {"id": "B", "title": "Look pass and 15 clips", "state": "done"},
+    {"id": "B2", "title": "Mouth rework, two rounds", "state": "done"},
+    {"id": "B3", "title": "Clips on the new mouth", "state": "done"},
+    {"id": "C", "title": "Unreal candidate import", "state": "done"},
+    {"id": "C2", "title": "Reimport with morph targets", "state": "done"},
+    {"id": "B4", "title": "Whole asset scaled x3", "state": "done"},
+    {"id": "C3", "title": "Reimport of the x3 asset", "state": "done"},
+    {"id": "D", "title": "Runtime slice", "state": "done"},
+    {"id": "E", "title": "Grip nodes", "state": "done"},
+    {"id": "F", "title": "PIE verification of the slice", "state": "done"},
+    {"id": "G", "title": "Fixes for five PIE findings", "state": "done"},
+    {"id": "H", "title": "x3 re-tune and final PIE", "state": "done"},
+    {"id": "I", "title": "Gloves ride the pull", "state": "done"},
+    {"id": "J", "title": "Walk-away pull and stretch", "state": "done"},
+    {"id": "K", "title": "Stretch as an Unreal tuner", "state": "done"},
+    {"id": "L", "title": "Live grip anchors, socket grips", "state": "done"}
+  ],
+  "next": "Maintainer clears the Phase K/L owed items and rules on the open look calls",
+  "blocked_on": null,
+  "owed_by_maintainer": [
+    "With the editor closed, delete `Content/ArtCandidates/ScreamingTurnip/R01/Animation/ScreamingTurnip_R01_Mars_ABP` (the game uses _v2)",
+    "Check platter/dock Place grips in the next platter session (not exercised in Phase L)",
+    "Rule on the glove one-frame trail behind the sockets (FPHands live sockets or a post-pose pass)",
+    "Rule on the square-rod stem look at long stretches and the HUD prompt covering the turnip"
+  ]
+}
+---
+
 # Screaming Turnip R01 - PROGRESS
 
 Living record for the end-to-end production of the Screaming Turnip / Radish v1 (handoff package:

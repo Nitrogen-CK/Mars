@@ -1,3 +1,33 @@
+---
+{
+  "campaign": "Jolt collision world",
+  "status": "awaiting-review",
+  "updated": "2026-09-23",
+  "phases": [
+    {"id": "P0", "title": "Extract CkJolt module", "state": "done", "commit": "74c33059e 32a28d6 5806b80"},
+    {"id": "P1", "title": "Static world baking", "state": "done", "commit": "ca08d8b46 68ac401"},
+    {"id": "P2", "title": "Collision layers and query extensions", "state": "done", "commit": "4b73f9f80 f594983"},
+    {"id": "P3", "title": "Step relocation and JoltBody dynamics", "state": "done", "commit": "9f250bc59 abf1b6cbe b23f1bddd 5f5128c48 4a2c4df"},
+    {"id": "P4", "title": "Requests, signals, JoltCharacter", "state": "done", "commit": "e2687e2e1 fb6a727"},
+    {"id": "P5", "title": "Parity, benchmarks, debug overlay", "state": "done"}
+  ],
+  "next": "Maintainer runs the consolidated `[EDITOR-VERIFY]` checklist and gives the word to commit the uncommitted post-campaign work",
+  "blocked_on": null,
+  "owed_by_maintainer": [
+    "Run the consolidated `[EDITOR-VERIFY]` checklist (gyms, debug draw, debugger, static bake)",
+    "Give the word to commit the post-campaign constraints tier (springs, ropes, doors, hair; 45/45 green, uncommitted)",
+    "Confirm or commit the other post-campaign items logged as uncommitted (static-actor entities, Jolt debugger, stress gym)",
+    "PIE the four constraint gyms with `ck.Jolt.DebugDraw.Enabled 1`"
+  ],
+  "commits": [
+    "a62b33d92",
+    "16e23003a",
+    "2583e36",
+    "6d2bbe4"
+  ]
+}
+---
+
 # PROGRESS — Jolt Collision World campaign
 
 Append-only, dated. Newest entries at the bottom of each day. The ONLY home for volatile state.
