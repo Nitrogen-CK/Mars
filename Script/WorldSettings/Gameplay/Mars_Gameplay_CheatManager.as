@@ -195,7 +195,7 @@ class UMars_Gameplay_CheatManager : UCheatManager
             return;
         }
 
-        Nearest.Request_Reserve(FMars_Request_Station_Reserve(Player));
+        utils_station::Request_ActFor(Nearest, Player, EMars_Station_Verb::Reserve);
     }
 
     // The steward nearest the local player (within InRangeCm) devours them: the fail scene, from the console.

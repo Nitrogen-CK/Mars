@@ -1,3 +1,6 @@
+// Stance A, following its host: the back-ref (FMars_Fragment_Operator) replicates and is written only by the station
+// arbiter on the authority; a client reads the authority's answer. Leaving goes through the held station's Act cue.
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
 //--------------------------------------------------------------------------------------------------------------------------
@@ -17,11 +20,17 @@ struct FMars_Feature_Operator {}
 // The busy state IS this back-ref: operating <=> Station is valid.
 struct FMars_Fragment_Operator
 {
-    // Written ONLY by UMars_Processor_Station_HandleRequests (and its destroy watches), in the same call as the station's
+    // Written ONLY by UMars_Processor_Station_HandleRequests on the authority (and its destroy watches), marked dirty with
+    // each write, in the same call as the station's
     // own Operator, so both ends of the link change in one drain and a same-tick double reserve (two stations, one
     // operator; or two operators, one station) cannot interleave. Nothing else writes it.
     UPROPERTY()
     FCk_Handle_Station Station;
+
+    // Station is meaningful only while this says Operated (a replicated handle cleared on the authority keeps its old
+    // value on a client).
+    UPROPERTY()
+    EMars_Station_Occupancy Occupancy = EMars_Station_Occupancy::Free;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

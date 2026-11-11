@@ -32,7 +32,10 @@ struct FMars_Station_GripNode
 UCLASS(Abstract)
 class UMars_Station_EntityScript : UCk_GenericEntityScript_UE
 {
-    default _Replication = ECk_Replication::DoesNotReplicate;
+    // Stance A: placed by the authority's spawner; the station, its root transform and its ledger replicate (who operates
+    // it), with the operator's back-ref; its nodes, meshes, interactables and prompt are built on every machine. A client
+    // takes or leaves it through the station's Act cue; what an operator does at it still runs on each machine's copy.
+    default _Replication = ECk_Replication::Replicates;
 
     UPROPERTY(ExposeOnSpawn)
     FTransform SpawnTransform = FTransform::Identity;
@@ -45,7 +48,7 @@ class UMars_Station_EntityScript : UCk_GenericEntityScript_UE
     UFUNCTION(BlueprintOverride)
     ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
     {
-        auto Root = utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::DoesNotReplicate);
+        auto Root = utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::Replicates);
 
         auto Spec = Station;
         Configure_Spec(Spec);

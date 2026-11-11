@@ -53,7 +53,7 @@ class UMars_SmState_Station_Grip : UMars_SmState_ExitAndTerminate
     }
 }
 
-// Reserves the station for the initiator. The state only runs as a station's Use interaction, so the owner is the
+// Asks the station's authority to reserve it for the initiator. The state only runs as a station's Use interaction, so the owner is the
 // station and the sub-SM root carries the initiator of its live interaction; failing either ensures and fails the task.
 class UMars_SmTask_Station_RequestReserve : UCk_SmTask_EntityScript
 {
@@ -71,7 +71,7 @@ class UMars_SmTask_Station_RequestReserve : UCk_SmTask_EntityScript
             return;
         }
 
-        Station.Request_Reserve(FMars_Request_Station_Reserve(Context.Initiator));
+        utils_station::Request_ActFor(Station, Context.Initiator, EMars_Station_Verb::Reserve);
         Mark_Result(ECk_SmTaskResult::Succeeded);
     }
 }

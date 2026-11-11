@@ -37,12 +37,17 @@ class UMars_SmState_Operating : UCk_SmState_EntityScript
         AddTask(InHandle, UMars_SmTask_Operating_Hints);
     }
 
-    // A teardown that did not come from the station's release (Downed): the operator leaves, scoped to this player (a
-    // no-op once the station has let go). It reaches the arbiter on its next drain, so the back-ref may lag a frame;
-    // nothing re-enters Operating meanwhile (Alive is gone).
+    // A teardown that did not come from the station's release (Downed): the owning copy's operator leaves, scoped to this
+    // player (a no-op once the station has let go). It reaches the authority's arbiter on its next drain, so the back-ref
+    // may lag; nothing re-enters Operating meanwhile (Alive is gone). Every other copy only follows the replicated back-ref.
     UFUNCTION(BlueprintOverride)
     void DoExitState(FCk_Handle_SmState InHandle, ECk_Sm_NetContext InNetContext)
     {
+        const auto IsOwningCopy = InNetContext == ECk_Sm_NetContext::Standalone
+            || utils_net::Get_IsEntityLocallyControlled_ByPlayer(ck::Ctx(InHandle)) == ECk_Utils_Net_IsLocallyControlled_Result::IsLocallyControlled;
+        if (IsOwningCopy == false)
+        { return; }
+
         auto Operator = ck::Ctx(InHandle).As_Operator();
         Operator.Request_Leave(FMars_Request_Operator_Leave());
     }
@@ -445,7 +450,7 @@ class UMars_SmTask_Operating_Grip : UCk_SmTask_EntityScript
 // LeaveIntent
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Mars.Intent.Back pressed -> the operator asks its station to release it.
+// Mars.Intent.Back pressed on the owning copy -> the operator asks its station to release it.
 class UMars_SmTask_Operating_LeaveIntent : UMars_SmTask_IntentEdges
 {
     private FCk_Handle_Operator _Operator;
@@ -453,7 +458,9 @@ class UMars_SmTask_Operating_LeaveIntent : UMars_SmTask_IntentEdges
     UFUNCTION(BlueprintOverride)
     void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
     {
-        _Operator = ck::Ctx(InHandle).As_Operator();
+        _Operator = FCk_Handle_Operator();
+        if (utils_player_sm::Get_IsOwningCopy(InHandle, InNetContext))
+        { _Operator = ck::Ctx(InHandle).As_Operator(); }
 
         Super::DoEnterTask(InHandle, InNetContext);
     }
@@ -468,7 +475,7 @@ class UMars_SmTask_Operating_LeaveIntent : UMars_SmTask_IntentEdges
 
     protected void OnIntentPressed(FGameplayTag InIntent) override
     {
-        if (InIntent != GameplayTags::Mars_Intent_Back)
+        if (InIntent != GameplayTags::Mars_Intent_Back || ck::Is_NOT_Valid(_Operator))
         { return; }
 
         _Operator.Request_Leave(FMars_Request_Operator_Leave());

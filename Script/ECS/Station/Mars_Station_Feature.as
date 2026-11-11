@@ -1,3 +1,10 @@
+// Stance A, following its host. FMars_Fragment_Station (who operates it, the last release and the last refusal) is the
+// replicated ledger, written only by the authority's arbiter (UMars_Processor_Station_HandleRequests), which also writes the
+// operator's replicated back-ref; on a host with no replication driver it is local. The stand, the view, the
+// interactables and the minigame state machine (FMars_Fragment_Station_Local) are each machine's own. A client mirrors the
+// ledger (UMars_Processor_Station_Mirror) and raises the signals the authority raised. A player takes or leaves a station
+// through Cue.Mars.Station.Act (utils_station::Request_ActFor), which only the authority resolves.
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
 //--------------------------------------------------------------------------------------------------------------------------
@@ -30,6 +37,23 @@ enum EMars_Station_ReleaseReason
     OperatorLost,
     // The station entity began destroying while an operator held it.
     StationDestroyed
+}
+
+// Whether a link handle names anyone. A replicated handle that goes back to invalid keeps its old value on a client, so
+// each end of the link carries this beside its handle, and the getters read the handle only while it says Operated.
+enum EMars_Station_Occupancy
+{
+    Free,
+    Operated
+}
+
+// What a player asks of a station through FMars_Request_Station_Act, resolved by the authority.
+enum EMars_Station_Verb
+{
+    // Take the station for the operator (the arbiter's Reserve).
+    Reserve,
+    // Give it up (the arbiter's Release, OperatorRequested); a no-op unless the operator holds it.
+    Leave
 }
 
 enum EMars_Station_LookControl
@@ -259,14 +283,41 @@ struct FMars_Fragment_Station_Params
 // State
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Operator is written only by UMars_Processor_Station_HandleRequests (its drain and its destroy watches), always in the
-// same call as the operator's FMars_Fragment_Operator.Station. The handles are set once by Add.
+// The replicated ledger. Written only by UMars_Processor_Station_HandleRequests on the authority (its drain and its destroy
+// watches), Operator always in the same call as the operator's FMars_Fragment_Operator.Station. ReleaseSerial advances
+// once per release and RefusalSerial once per rejected reserve, so a mirror counts what it missed.
 struct FMars_Fragment_Station
 {
-    // The operating entity (the player); invalid = free.
+    UPROPERTY()
+    EMars_Station_Occupancy Occupancy = EMars_Station_Occupancy::Free;
+
+    // The operating entity (the player), meaningful only while Occupancy is Operated (utils_station::Get_HeldBy).
     UPROPERTY()
     FCk_Handle Operator;
 
+    // Why the latest release happened; meaningful once ReleaseSerial is above 0.
+    UPROPERTY()
+    EMars_Station_ReleaseReason LastReleaseReason = EMars_Station_ReleaseReason::StationRequested;
+
+    UPROPERTY()
+    int32 ReleaseSerial = 0;
+
+    UPROPERTY()
+    int32 RefusalSerial = 0;
+
+    // Why the latest rejected reserve was rejected; meaningful once RefusalSerial is above 0.
+    UPROPERTY()
+    EMars_Station_RejectReason LastRefusal = EMars_Station_RejectReason::Occupied;
+
+    // The rejected operator. On a client it may arrive unresolved: that only means "not known here yet".
+    UPROPERTY()
+    FCk_Handle LastRefused;
+}
+
+// This machine's own: the handles Add builds, set once, and the ledger the mirror last reconciled (unset on the
+// authority, whose own arbiter broadcasts).
+struct FMars_Fragment_Station_Local
+{
     // Child scene node at StandLocal: the world pose the operator glides to.
     UPROPERTY()
     FCk_Handle_Transform Stand;
@@ -288,7 +339,12 @@ struct FMars_Fragment_Station
     // Invalid when the spec names no MinigameStateClass.
     UPROPERTY()
     FCk_Handle_StateMachine MinigameSm;
+
+    UPROPERTY()
+    TOptional<FMars_Fragment_Station> Last;
 }
+
+struct FMars_Tag_Station_NeedsMirror {}
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Signals
@@ -348,6 +404,26 @@ struct FMars_Request_Station_Release
     }
 }
 
+// A player's ask, from any machine (utils_station::Request_ActFor). Only the authority applies it, as the Reserve or the
+// OperatorRequested Release it names, through the same checks.
+struct FMars_Request_Station_Act
+{
+    UPROPERTY()
+    FCk_Handle Operator;
+
+    UPROPERTY()
+    EMars_Station_Verb Verb = EMars_Station_Verb::Reserve;
+
+    FMars_Request_Station_Act() {}
+
+    FMars_Request_Station_Act(FCk_Handle InOperator, EMars_Station_Verb InVerb)
+    {
+        Operator = InOperator;
+        Verb = InVerb;
+    }
+}
+
+// An Act joins its kind's queue behind the direct requests of the same drain (Leave as a Release, Reserve as a Reserve).
 // Applied Release -> Reserve, each kind in arrival order: a release and a reserve in one drain re-seat the station, and of
 // two reserves in one drain the first wins and the second is rejected Occupied.
 struct FMars_Fragment_Station_Requests
@@ -357,4 +433,7 @@ struct FMars_Fragment_Station_Requests
 
     UPROPERTY()
     TArray<FMars_Request_Station_Reserve> ReserveRequests;
+
+    UPROPERTY()
+    TArray<FMars_Request_Station_Act> ActRequests;
 }

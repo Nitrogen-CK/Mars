@@ -3,9 +3,9 @@ namespace utils_station
     // Composes the station on InRoot (its frame is InRoot's transform, see FMars_Station_Spec): the Stand child node, the
     // Use interactable (probe-driven focus when Setup.Probe is set, else a transform-only child) with its one reserving
     // target and Setup.UsePrompt, the grip interactable on the root, and the minigame state machine when the spec names
-    // one; it keeps Setup.View as the operator's view. The glove grip table and the View node are the placing script's
-    // (UMars_Station_EntityScript). A rejected spec or a minigame class that does not load ensures and returns an invalid
-    // handle with nothing composed.
+    // one; it keeps Setup.View as the operator's view, and adds the replicated ledger unless it already arrived. The glove
+    // grip table and the View node are the placing script's (UMars_Station_EntityScript). A rejected spec or a minigame
+    // class that does not load ensures and returns an invalid handle with nothing composed.
     FCk_Handle_Station Add(FCk_Handle_Transform& InRoot, FMars_Station_Spec InSpec)
     {
         const auto Validation = InSpec.Validate();
@@ -24,14 +24,26 @@ namespace utils_station
         Params.Spec.Setup = FMars_Station_Setup();
         Params.Spec.Setup.UsePrompt = InSpec.Setup.UsePrompt;
 
-        auto State = FMars_Fragment_Station();
-        State.Stand = utils_scene_node::Create(InRoot, InSpec.StandLocal).As_Transform();
-        State.View = InSpec.Setup.View;
+        auto Local = FMars_Fragment_Station_Local();
+        Local.Stand = utils_scene_node::Create(InRoot, InSpec.StandLocal).As_Transform();
+        Local.View = InSpec.Setup.View;
 
         InRoot.Add_Fragment(FMars_Feature_Station());
         InRoot.Add_Fragment(Params);
-        InRoot.Add_Fragment(State);
+
+        // A client's copy can receive the replicated ledger before it composes: the arrived ledger stands then.
+        if (InRoot.Has_Fragment(FMars_Fragment_Station) == false)
+        { InRoot.Add_Fragment(FMars_Fragment_Station(), ECk_Replication::Replicates); }
+
+        // The mirror starts from the arrived ledger with nobody operating: an operator already there is raised once, the
+        // releases and refusals before this machine composed are not.
+        auto Seen = InRoot.Get_Fragment(FMars_Fragment_Station);
+        Seen.Occupancy = EMars_Station_Occupancy::Free;
+        Local.Last = TOptional<FMars_Fragment_Station>(Seen);
+
+        InRoot.Add_Fragment(Local);
         InRoot.Add_Fragment(FMars_Tag_Station_NeedsSetup());
+        InRoot.Add_Fragment(FMars_Tag_Station_NeedsMirror());
         auto Station = InRoot.As_Station();
 
         auto UseSpec = FMars_Interactable_Spec();
@@ -47,11 +59,36 @@ namespace utils_station
         if (ck::IsValid(MinigameClass))
         { MinigameSm = utils_state_machine::Add(InRoot, FCk_StateMachine_Spec(MinigameClass)); }
 
-        auto& StoredState = Station.Get_Fragment(FMars_Fragment_Station);
-        StoredState.Interactable = Interactable;
-        StoredState.GripInteractable = GripInteractable;
-        StoredState.MinigameSm = MinigameSm;
+        auto& StoredLocal = Station.Get_Fragment(FMars_Fragment_Station_Local);
+        StoredLocal.Interactable = Interactable;
+        StoredLocal.GripInteractable = GripInteractable;
+        StoredLocal.MinigameSm = MinigameSm;
         return Station;
+    }
+
+    // Who holds the station by InLedger: its Operator while Occupancy says Operated, else invalid.
+    FCk_Handle Get_HeldBy(const FMars_Fragment_Station& InLedger)
+    {
+        if (InLedger.Occupancy == EMars_Station_Occupancy::Free)
+        { return FCk_Handle(); }
+
+        return InLedger.Operator;
+    }
+
+    // InOperator asks InStation for InVerb. A station with a replication driver is reached through Cue.Mars.Station.Act,
+    // which only its authority applies; a local station has no other machine to reach and takes the Act request directly.
+    // Either way the answer is the station's OnReserved / OnReleased / OnReserveRejected, mirrored on a client.
+    void Request_ActFor(FCk_Handle_Station& InStation, FCk_Handle InOperator, EMars_Station_Verb InVerb)
+    {
+        const auto Request = FMars_Request_Station_Act(InOperator, InVerb);
+        if (utils_entity_replication_driver::Has(InStation))
+        {
+            utils_cue_generic::Request_ExecuteCue(InStation, GameplayTags::Cue_Mars_Station_Act, Request,
+                ECk_Cue_ReliabilityPolicy::Reliable, ECk_Cue_MulticastPolicy::ServerOnly);
+            return;
+        }
+
+        InStation.Request_Act(Request);
     }
 
     // The interaction context of a station interaction sub-SM: the stamped sub-SM root's copy (the stamp lands before the
@@ -114,30 +151,30 @@ mixin FMars_Station_Spec Get_Spec(const FCk_Handle_Station& Self)
 
 mixin FCk_Handle Get_Operator(const FCk_Handle_Station& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_Station).Operator;
+    return utils_station::Get_HeldBy(Self.Get_Fragment(FMars_Fragment_Station));
 }
 
 mixin bool Get_IsOperated(const FCk_Handle_Station& Self)
 {
-    return ck::IsValid(Self.Get_Fragment(FMars_Fragment_Station).Operator);
+    return ck::IsValid(utils_station::Get_HeldBy(Self.Get_Fragment(FMars_Fragment_Station)));
 }
 
 mixin bool Get_IsOperatedBy(const FCk_Handle_Station& Self, FCk_Handle InOperator)
 {
-    const auto Operator = Self.Get_Fragment(FMars_Fragment_Station).Operator;
+    const auto Operator = utils_station::Get_HeldBy(Self.Get_Fragment(FMars_Fragment_Station));
     return ck::IsValid(Operator) && Operator == InOperator;
 }
 
 // The operator's view node (the placing script's, at Camera.ViewLocal); invalid when the spec leaves it unset.
 mixin FCk_Handle_Transform Get_View(const FCk_Handle_Station& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_Station).View;
+    return Self.Get_Fragment(FMars_Fragment_Station_Local).View;
 }
 
 // The stand's world pose (Z at the floor, +X facing the station); the station root's pose when the Stand node is gone.
 mixin FTransform Get_StandWorld(const FCk_Handle_Station& Self)
 {
-    const auto Stand = Self.Get_Fragment(FMars_Fragment_Station).Stand;
+    const auto Stand = Self.Get_Fragment(FMars_Fragment_Station_Local).Stand;
     if (ck::IsValid(Stand))
     { return utils_transform::Get_EntityCurrentTransform(Stand); }
 
@@ -146,12 +183,12 @@ mixin FTransform Get_StandWorld(const FCk_Handle_Station& Self)
 
 mixin FCk_Handle_Interactable Get_Interactable(const FCk_Handle_Station& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_Station).Interactable;
+    return Self.Get_Fragment(FMars_Fragment_Station_Local).Interactable;
 }
 
 mixin FCk_Handle_InteractTarget Get_UseTarget(const FCk_Handle_Station& Self)
 {
-    const auto Interactable = Self.Get_Fragment(FMars_Fragment_Station).Interactable;
+    const auto Interactable = Self.Get_Fragment(FMars_Fragment_Station_Local).Interactable;
     if (ck::Is_NOT_Valid(Interactable))
     { return FCk_Handle_InteractTarget(); }
 
@@ -160,7 +197,7 @@ mixin FCk_Handle_InteractTarget Get_UseTarget(const FCk_Handle_Station& Self)
 
 mixin FCk_Handle_InteractTarget Get_GripTarget(const FCk_Handle_Station& Self)
 {
-    const auto GripInteractable = Self.Get_Fragment(FMars_Fragment_Station).GripInteractable;
+    const auto GripInteractable = Self.Get_Fragment(FMars_Fragment_Station_Local).GripInteractable;
     if (ck::Is_NOT_Valid(GripInteractable))
     { return FCk_Handle_InteractTarget(); }
 
@@ -169,7 +206,35 @@ mixin FCk_Handle_InteractTarget Get_GripTarget(const FCk_Handle_Station& Self)
 
 mixin FCk_Handle_StateMachine Get_MinigameSm(const FCk_Handle_Station& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_Station).MinigameSm;
+    return Self.Get_Fragment(FMars_Fragment_Station_Local).MinigameSm;
+}
+
+mixin int32 Get_ReleaseSerial(const FCk_Handle_Station& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_Station).ReleaseSerial;
+}
+
+// Why the latest release happened; meaningful once Get_ReleaseSerial is above 0.
+mixin EMars_Station_ReleaseReason Get_LastReleaseReason(const FCk_Handle_Station& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_Station).LastReleaseReason;
+}
+
+mixin int32 Get_RefusalSerial(const FCk_Handle_Station& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_Station).RefusalSerial;
+}
+
+// Why the latest rejected reserve was rejected; meaningful once Get_RefusalSerial is above 0.
+mixin EMars_Station_RejectReason Get_LastRefusal(const FCk_Handle_Station& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_Station).LastRefusal;
+}
+
+// The latest rejected operator; on a client it may be unresolved.
+mixin FCk_Handle Get_LastRefused(const FCk_Handle_Station& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_Station).LastRefused;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -186,6 +251,13 @@ mixin void Request_Release(FCk_Handle_Station& Self, const FMars_Request_Station
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Station_Requests);
     Requests.ReleaseRequests.Add(InRequest);
+}
+
+// A player's ask: callers go through utils_station::Request_ActFor, which reaches the authority.
+mixin void Request_Act(FCk_Handle_Station& Self, const FMars_Request_Station_Act& InRequest)
+{
+    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Station_Requests);
+    Requests.ActRequests.Add(InRequest);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
