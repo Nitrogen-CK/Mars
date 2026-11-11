@@ -162,51 +162,37 @@ class UMars_Processor_HeldItemUse_HandleRequests : UCk_Processor_Script_Base_UE
         if (Item == InState.LaunchedItem)
         { return; }
 
-        const auto IsThrow = InKind == EMars_LaunchKind::Throw;
-        auto Speed = IsThrow ? constants_held_item_use::k_DefaultThrowSpeed : constants_held_item_use::k_DefaultDropSpeed;
-        auto AngularVelocityDeg = FVector::ZeroVector;
-        if (Item.Has_Throwable())
+        auto WorldItem = Item.Get_PersistentWorldItem();
+        if (Item.Has_PersistentWorldItem())
         {
-            const UMars_ItemTrait_Throwable Throwable = Item.Get_Throwable();
-            Speed = IsThrow ? Throwable.ThrowSpeed : Throwable.DropSpeed;
-            AngularVelocityDeg = Throwable.AngularVelocityDeg;
+            if (ck::EnsureIfNot(ck::IsValid(WorldItem), f"[HeldItemUse] Persistent item [{Item.ToString()}] has lost its world item"))
+            { return; }
         }
 
-        const auto View = Get_ViewTransform(InPlayer);
-        const auto Forward = View.GetRotation().GetForwardVector();
+        // Set from here on: the item is valid and a Persistent item still has its world item.
+        const auto MaybeSolution = InPlayer.As_HeldItemUse().Get_LaunchSolution(InKind);
+        if (MaybeSolution.IsSet() == false)
+        { return; }
 
-        // Optional: a test player has no actor.
-        auto PawnVelocity = FVector::ZeroVector;
-        auto Character = Cast<ACharacter>(ck::ToActor(InPlayer, ECk_SanityCheck::UnChecked));
-        if (ck::IsValid(Character))
-        { PawnVelocity = Character.GetVelocity(); }
+        const auto Solution = MaybeSolution.GetValue();
 
         if (Item.Has_PersistentWorldItem())
         {
-            auto WorldItem = Item.Get_PersistentWorldItem();
-            if (ck::EnsureIfNot(ck::IsValid(WorldItem), f"[HeldItemUse] Persistent item [{Item.ToString()}] has lost its world item"))
-            { return; }
-
-            WorldItem.Request_Release(FMars_Request_WorldItem_Release(Forward * Speed + PawnVelocity, AngularVelocityDeg));
+            WorldItem.Request_Release(FMars_Request_WorldItem_Release(Solution.LinearVelocity, Solution.AngularVelocityDeg));
 
             InState.LaunchedItem = Item;
             Broadcast_ItemLaunched(InPlayer, Item, InKind);
             return;
         }
 
-        auto SpawnTransform = FTransform(View.Rotator(), View.GetLocation() + Forward * constants_held_item_use::k_NoHandSpawnDistance);
-        auto Hand = HeldItem.Get_HandAttachPoint();
-        if (ck::IsValid(Hand))
-        { SpawnTransform = utils_transform::Get_EntityCurrentTransform(Hand); }
-
         auto SpawnParams = UMars_WorldItem_EntityScript::Params();
-        SpawnParams.SpawnTransform = FTransform(SpawnTransform.Rotator(), SpawnTransform.GetLocation());
+        SpawnParams.SpawnTransform = FTransform(Solution.Origin.Rotator(), Solution.Origin.GetLocation());
         SpawnParams.Definition = utils_held_item::Make_DefinitionSoft(Item.Get_Definition());
         SpawnParams.Mode = EMars_WorldItem_Mode::World;
         SpawnParams.SourceItem = Item;
         SpawnParams.SourceInventory = HeldItem.Get_CurrentInventory();
-        SpawnParams.LaunchVelocity = Forward * Speed + PawnVelocity;
-        SpawnParams.AngularVelocityDeg = AngularVelocityDeg;
+        SpawnParams.LaunchVelocity = Solution.LinearVelocity;
+        SpawnParams.AngularVelocityDeg = Solution.AngularVelocityDeg;
 
         // The dropped item outlives the player; it destroys itself once picked up.
         utils_entity_script::Request_SpawnEntity(ck::TransientEntity(), utils_world_item::Get_WorldItemScriptClass(Item), SpawnParams);
@@ -219,15 +205,5 @@ class UMars_Processor_HeldItemUse_HandleRequests : UCk_Processor_Script_Base_UE
     {
         if (InPlayer.Has_Fragment(FMars_Fragment_HeldItemUse_Signals))
         { InPlayer.Get_Fragment(FMars_Fragment_HeldItemUse_Signals).OnItemLaunched.Broadcast(InPlayer.As_HeldItemUse(), InItem, InKind); }
-    }
-
-    // The player's view; a carrier without a PlayerViewpoint (a test rig) launches from its own transform.
-    private FTransform Get_ViewTransform(FCk_Handle& InPlayer) const
-    {
-        auto Viewpoint = InPlayer.As_PlayerViewpoint(ECk_SanityCheck::UnChecked);
-        if (ck::IsValid(Viewpoint))
-        { return utils_transform::Get_EntityCurrentTransform(Viewpoint.Get_Viewpoint()); }
-
-        return utils_transform::Get_EntityCurrentTransform(InPlayer.As_Transform());
     }
 }

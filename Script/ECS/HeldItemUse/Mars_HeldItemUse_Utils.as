@@ -28,6 +28,70 @@ mixin bool Get_IsCurrentItemLaunched(const FCk_Handle_HeldItemUse& Self)
     return ck::IsValid(Item) && Item == Self.Get_Fragment(FMars_Fragment_HeldItemUse).LaunchedItem;
 }
 
+// Unset with empty hands, or when a Persistent item has lost its world item.
+mixin TOptional<FMars_HeldItemUse_LaunchSolution> Get_LaunchSolution(const FCk_Handle_HeldItemUse& Self, EMars_LaunchKind InKind)
+{
+    auto HeldItem = Self.As_HeldItem();
+    const auto Item = HeldItem.Get_CurrentItem();
+    if (ck::Is_NOT_Valid(Item))
+    { return TOptional<FMars_HeldItemUse_LaunchSolution>(); }
+
+    const auto IsThrow = InKind == EMars_LaunchKind::Throw;
+    auto Speed = IsThrow ? constants_held_item_use::k_DefaultThrowSpeed : constants_held_item_use::k_DefaultDropSpeed;
+    auto AngularVelocityDeg = FVector::ZeroVector;
+    if (Item.Has_Throwable())
+    {
+        const UMars_ItemTrait_Throwable Throwable = Item.Get_Throwable();
+        Speed = IsThrow ? Throwable.ThrowSpeed : Throwable.DropSpeed;
+        AngularVelocityDeg = Throwable.AngularVelocityDeg;
+    }
+
+    const auto View = Self.Get_LaunchView();
+    const auto Forward = View.GetRotation().GetForwardVector();
+
+    // Optional: a test carrier has no actor.
+    FCk_Handle Carrier = Self;
+    auto PawnVelocity = FVector::ZeroVector;
+    auto Character = Cast<ACharacter>(ck::ToActor(Carrier, ECk_SanityCheck::UnChecked));
+    if (ck::IsValid(Character))
+    { PawnVelocity = Character.GetVelocity(); }
+
+    auto Solution = FMars_HeldItemUse_LaunchSolution();
+    Solution.LinearVelocity = Forward * Speed + PawnVelocity;
+    Solution.AngularVelocityDeg = AngularVelocityDeg;
+
+    if (Item.Has_PersistentWorldItem())
+    {
+        const auto WorldItem = Item.Get_PersistentWorldItem();
+        if (ck::Is_NOT_Valid(WorldItem))
+        { return TOptional<FMars_HeldItemUse_LaunchSolution>(); }
+
+        FCk_Handle WorldItemEntity = WorldItem;
+        const auto Mounted = utils_transform::Get_EntityCurrentTransform(WorldItemEntity.As_Transform());
+        Solution.Origin = FTransform(Mounted.Rotator(), Mounted.GetLocation());
+        return TOptional<FMars_HeldItemUse_LaunchSolution>(Solution);
+    }
+
+    auto Origin = FTransform(View.Rotator(), View.GetLocation() + Forward * constants_held_item_use::k_NoHandSpawnDistance);
+    auto Hand = HeldItem.Get_HandAttachPoint();
+    if (ck::IsValid(Hand))
+    { Origin = utils_transform::Get_EntityCurrentTransform(Hand); }
+
+    Solution.Origin = FTransform(Origin.Rotator(), Origin.GetLocation());
+    return TOptional<FMars_HeldItemUse_LaunchSolution>(Solution);
+}
+
+// The carrier's view; a carrier without a PlayerViewpoint launches from its own transform.
+mixin FTransform Get_LaunchView(const FCk_Handle_HeldItemUse& Self)
+{
+    FCk_Handle Carrier = Self;
+    const auto Viewpoint = Carrier.As_PlayerViewpoint(ECk_SanityCheck::UnChecked);
+    if (ck::IsValid(Viewpoint))
+    { return utils_transform::Get_EntityCurrentTransform(Viewpoint.Get_Viewpoint()); }
+
+    return utils_transform::Get_EntityCurrentTransform(Carrier.As_Transform());
+}
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Requests
 //--------------------------------------------------------------------------------------------------------------------------

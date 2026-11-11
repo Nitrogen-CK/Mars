@@ -21,6 +21,21 @@ enum EMars_LaunchKind
     Throw
 }
 
+// What a drop or throw of the held item would launch with right now. The launch and anything that predicts it read
+// this one definition.
+struct FMars_HeldItemUse_LaunchSolution
+{
+    // Where the item's body is when it leaves: the hand attach point, or a Persistent item's own mounted world item.
+    UPROPERTY()
+    FTransform Origin;
+
+    UPROPERTY()
+    FVector LinearVelocity = FVector::ZeroVector;
+
+    UPROPERTY()
+    FVector AngularVelocityDeg = FVector::ZeroVector;
+}
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Constants
 //--------------------------------------------------------------------------------------------------------------------------
@@ -46,8 +61,9 @@ struct FMars_Fragment_HeldItemUse
     UPROPERTY()
     FCk_Handle_Interactable CurrentInteractable;
 
-    // HUD-only: requested by the drop/throw input task once Drop has been held past the throw threshold, read by the
-    // action-hint task. Never read by gameplay - the input task decides throw-vs-drop from its own flag.
+    // Presentation-only: requested by the drop/throw input task once Drop has been held past the throw threshold; the
+    // hint row and the throw preview follow it. Never read by gameplay - the input task decides throw-vs-drop from its
+    // own flag.
     UPROPERTY()
     bool ThrowArmed = false;
 

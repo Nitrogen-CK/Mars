@@ -685,6 +685,15 @@
 			]
 		},
 		{
+			"TypeName": "FCk_Handle_ThrowPreview",
+			"ShortName": "ThrowPreview",
+			"Description": "Predicts the path a throw of the held item would take, while an aim is requested",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_ThrowPreviewHandle",
+			"RequiredFragments": [
+				"Mars_Feature_ThrowPreview"
+			]
+		},
+		{
 			"TypeName": "FCk_Handle_Trap",
 			"ShortName": "Trap",
 			"Description": "A cycle-driven trap that arms a hazard and optionally moves a part per phase",

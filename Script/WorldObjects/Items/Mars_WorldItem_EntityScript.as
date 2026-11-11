@@ -58,7 +58,6 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
     TOptional<FTransform> SpawnAtWorld;
 
     private const float32 k_MassKg = 2.0f;
-    private const float32 k_LinearDamping = 0.2f;
     private const float32 k_AngularDamping = 0.5f;
     private const float32 k_Friction = 0.6f;
     private const float32 k_Restitution = 0.1f;
@@ -391,7 +390,7 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
         BodySpec.Set_MotionQuality(ECk_MotionQuality::LinearCast);
         BodySpec.Set_MassSource(ECk_JoltBody_MassSource::Explicit);
         BodySpec.Set_MassKg(k_MassKg);
-        BodySpec.Set_LinearDamping(k_LinearDamping);
+        BodySpec.Set_LinearDamping(constants_world_item::k_BodyLinearDamping);
         BodySpec.Set_AngularDamping(k_AngularDamping);
         BodySpec.Set_SurfaceSource(ECk_JoltBody_SurfaceSource::Explicit);
         BodySpec.Set_Friction(k_Friction);

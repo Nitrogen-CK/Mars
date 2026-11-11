@@ -83,6 +83,9 @@ namespace constants_world_item
     // What a world item's own body collides as when its script names nothing else.
     const FName k_DefaultBodyProfile = n"PhysicsActor";
 
+    // The base world-item body's linear damping. The body builder and anything that predicts the body's flight read it.
+    const float32 k_BodyLinearDamping = 0.2f;
+
     // Passes a mount or a launch waits on a body still setting up before it goes on without it (a mount commits bodiless,
     // a launch is dropped): a body is in the simulation within a few passes of its Add.
     const int32 k_BodySetupBudgetPasses = 120;
@@ -249,6 +252,16 @@ struct FMars_WorldItem_BoundsFit
         HalfExtents = InHalfExtents;
         Centre = InCentre;
     }
+}
+
+// The body an item flies as once it leaves a carrier.
+struct FMars_WorldItem_FlightBody
+{
+    UPROPERTY()
+    FCk_Jolt_BallisticFlight Flight;
+
+    UPROPERTY()
+    FMars_WorldItem_BoundsFit BoundsFit;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

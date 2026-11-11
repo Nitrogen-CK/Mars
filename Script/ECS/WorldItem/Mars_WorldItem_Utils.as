@@ -597,6 +597,39 @@ mixin FCk_Handle_WorldItem Get_PersistentWorldItem(const FCk_Handle_Item& Self)
     return Self.Get_Fragment(FMars_Fragment_Item_PersistentWorldItem).WorldItem;
 }
 
+// Unset when the item would have no body (no Presentation, or no mesh). A Persistent item with a live body answers
+// from that body; every other item answers with the base world-item body.
+mixin TOptional<FMars_WorldItem_FlightBody> Get_FlightBody(const FCk_Handle_Item& Self)
+{
+    if (Self.Has_PersistentWorldItem())
+    {
+        const auto WorldItem = Self.Get_PersistentWorldItem();
+        if (ck::IsValid(WorldItem))
+        {
+            const auto Body = WorldItem.As_JoltBody(ECk_SanityCheck::UnChecked);
+            if (ck::IsValid(Body))
+            {
+                auto FromBody = FMars_WorldItem_FlightBody();
+                FromBody.Flight = utils_jolt_body::Get_BallisticFlight(Body);
+                FromBody.BoundsFit = WorldItem.Get_BoundsFit();
+                return TOptional<FMars_WorldItem_FlightBody>(FromBody);
+            }
+        }
+    }
+
+    if (Self.Has_Presentation() == false)
+    { return TOptional<FMars_WorldItem_FlightBody>(); }
+
+    const UMars_ItemTrait_Presentation Presentation = Self.Get_Presentation();
+    if (ck::Is_NOT_Valid(utils_world_item::TryLoad_Mesh(Presentation)))
+    { return TOptional<FMars_WorldItem_FlightBody>(); }
+
+    auto FlightBody = FMars_WorldItem_FlightBody();
+    FlightBody.Flight.Set_LinearDamping(constants_world_item::k_BodyLinearDamping);
+    FlightBody.BoundsFit = utils_world_item::Make_BoundsFit(Presentation);
+    return TOptional<FMars_WorldItem_FlightBody>(FlightBody);
+}
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Capacity-1 inventories (a world item's holder, a hotbar slot, a cargo slot)
 //--------------------------------------------------------------------------------------------------------------------------
