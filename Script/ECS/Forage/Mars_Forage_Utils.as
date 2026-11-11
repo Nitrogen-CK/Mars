@@ -2,7 +2,8 @@ namespace utils_forage
 {
     // The entity script composes the release point first and hands it in through InSpec.Parts; whatever triggers the
     // releases (a strike, a knock, a pluck) is composed and bound by that script too. A rejected spec ensures and returns
-    // an invalid handle with nothing composed.
+    // an invalid handle with nothing composed. The ledger always replicates (the drain marks it dirty on every write); on
+    // a host without a replication driver it simply has nowhere to go.
     FCk_Handle_Forage Add(FCk_Handle& InHandle, FMars_Forage_Spec InSpec)
     {
         const auto Validation = InSpec.Validate();
@@ -14,13 +15,22 @@ namespace utils_forage
         Params.Exhaustion = InSpec.Exhaustion;
         Params.Launch = InSpec.Launch;
 
-        auto State = FMars_Fragment_Forage();
-        State.ReleasePoint = InSpec.Parts.ReleasePoint;
-        State.ChargesLeft = InSpec.Yield.Charges;
+        auto Ledger = FMars_Fragment_Forage();
+        Ledger.ChargesLeft = InSpec.Yield.Charges;
+
+        auto Local = FMars_Fragment_Forage_Local();
+        Local.ReleasePoint = InSpec.Parts.ReleasePoint;
+        Local.Last = TOptional<FMars_Fragment_Forage>(Ledger);
 
         InHandle.Add_Fragment(FMars_Feature_Forage());
         InHandle.Add_Fragment(Params);
-        InHandle.Add_Fragment(State);
+
+        // A client's copy can receive the replicated ledger before it composes: the arrived ledger stands then.
+        if (InHandle.Has_Fragment(FMars_Fragment_Forage) == false)
+        { InHandle.Add_Fragment(Ledger, ECk_Replication::Replicates); }
+
+        InHandle.Add_Fragment(Local);
+        InHandle.Add_Fragment(FMars_Tag_Forage_NeedsMirror());
         return InHandle.As_Forage();
     }
 
@@ -64,12 +74,12 @@ mixin int32 Get_ReleasedCount(const FCk_Handle_Forage& Self)
 
 mixin FCk_Handle_Transform Get_ReleasePoint(const FCk_Handle_Forage& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_Forage).ReleasePoint;
+    return Self.Get_Fragment(FMars_Fragment_Forage_Local).ReleasePoint;
 }
 
 mixin bool Get_IsRegrowPending(const FCk_Handle_Forage& Self)
 {
-    return ck::IsValid(Self.Get_Fragment(FMars_Fragment_Forage).RegrowTimer);
+    return ck::IsValid(Self.Get_Fragment(FMars_Fragment_Forage_Local).RegrowTimer);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

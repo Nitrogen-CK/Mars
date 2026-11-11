@@ -23,6 +23,9 @@ struct FMars_ForageSource_KnockBody
 // releases a yield; exhausting it disables its hit zone and hides its yield mesh (and removes a FollowsYield knock body);
 // replenishing heals it and restores all three. Subclasses compose the forage, the health, the zone and their geometry,
 // then call AddKnockBody and BindForage.
+// On every machine the yield mesh follows the forage's (mirrored) exhaustion and replenishment; the zone, the health and
+// the knock body follow them only with authority, the one machine whose releases count (a client's copies stay as they
+// are and their release requests are dropped).
 UCLASS(Abstract)
 class UMars_ForageSource_EntityScript : UCk_GenericEntityScript_UE
 {
@@ -113,8 +116,12 @@ class UMars_ForageSource_EntityScript : UCk_GenericEntityScript_UE
     UFUNCTION()
     private void OnForageExhausted(FCk_Handle_Forage InForage)
     {
-        _Zone.Request_SetEnabled(FMars_Request_HitZone_SetEnabled(ECk_EnableDisable::Disable));
         SetYieldVisible(false);
+
+        if (utils_net::Get_HasAuthority(InForage) == false)
+        { return; }
+
+        _Zone.Request_SetEnabled(FMars_Request_HitZone_SetEnabled(ECk_EnableDisable::Disable));
 
         if (_KnockBody.Presence == EMars_ForageSource_KnockPresence::FollowsYield)
         { DestroyKnockBody(); }
@@ -123,9 +130,13 @@ class UMars_ForageSource_EntityScript : UCk_GenericEntityScript_UE
     UFUNCTION()
     private void OnForageReplenished(FCk_Handle_Forage InForage)
     {
+        SetYieldVisible(true);
+
+        if (utils_net::Get_HasAuthority(InForage) == false)
+        { return; }
+
         _Health.Request_Heal(FMars_Request_Health_Heal(_Health.Get_Max()));
         _Zone.Request_SetEnabled(FMars_Request_HitZone_SetEnabled(ECk_EnableDisable::Enable));
-        SetYieldVisible(true);
 
         if (_KnockBody.Presence == EMars_ForageSource_KnockPresence::FollowsYield && ck::Is_NOT_Valid(_KnockNode))
         { CreateKnockBody(); }

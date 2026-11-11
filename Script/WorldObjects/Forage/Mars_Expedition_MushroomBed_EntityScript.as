@@ -1,5 +1,6 @@
 // The expedition's harvest is actual cookable food. The existing vine owns strike/knock, yield and regrowth;
-// this bed only supplies its yield and its project-art presentation on the authored stone planter.
+// this bed only supplies its yield and its project-art presentation on the authored stone planter. Its stance is the
+// vine's (Stance A): the bed and its forage ledger replicate, and a client sees the mushroom picked and regrown.
 class UMars_Expedition_MushroomBed_EntityScript : UMars_ForageVine_EntityScript
 {
     // The strike centre clears the planter lip. The mesh's base stays planted on the authored soil surface.

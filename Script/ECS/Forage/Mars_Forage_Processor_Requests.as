@@ -1,4 +1,5 @@
-// The Forage arbiter. Replenish is applied before Release, so a regrow and a hit landing in one frame read as
+// The Forage arbiter, on the authority only: a machine without authority drops its requests (its ledger arrives by
+// replication and UMars_Processor_Forage_Mirror raises the signals). Replenish is applied before Release, so a regrow and a hit landing in one frame read as
 // "replenished, then released". A release spawns the yield as a World-mode world item at the release point, owned by the
 // transient entity (a Destroyed source dies the same frame); the last charge exhausts the source by its policy. A release
 // asked of an exhausted source spawns nothing and is refused (OnReleaseRefused).
@@ -30,6 +31,9 @@ class UMars_Processor_Forage_HandleRequests : UCk_Processor_Script_Base_UE
         // InRequests is invalid past this line; removing before broadcasting lets re-entrant requests survive.
         Forage.Request_TryRemove(FMars_Fragment_Forage_Requests);
 
+        if (utils_net::Get_HasAuthority(InHandle) == false)
+        { return; }
+
         for (const auto& Request : ReplenishRequests)
         { HandleReplenish(Forage); }
 
@@ -40,13 +44,14 @@ class UMars_Processor_Forage_HandleRequests : UCk_Processor_Script_Base_UE
     private void HandleReplenish(FCk_Handle_Forage& InForage)
     {
         const auto& Params = InForage.Get_Fragment(FMars_Fragment_Forage_Params);
-        auto& State = InForage.Get_Fragment(FMars_Fragment_Forage);
-        State.ChargesLeft = Params.Yield.Charges;
+        InForage.Get_Fragment(FMars_Fragment_Forage).ChargesLeft = Params.Yield.Charges;
+        InForage.H().Request_MarkReplicationDirty(FMars_Fragment_Forage);
 
-        if (ck::IsValid(State.RegrowTimer))
-        { utils_entity_lifetime::Request_DestroyEntity(State.RegrowTimer); }
+        auto& Local = InForage.Get_Fragment(FMars_Fragment_Forage_Local);
+        if (ck::IsValid(Local.RegrowTimer))
+        { utils_entity_lifetime::Request_DestroyEntity(Local.RegrowTimer); }
 
-        State.RegrowTimer = FCk_Handle_Timer();
+        Local.RegrowTimer = FCk_Handle_Timer();
 
         if (InForage.Has_Fragment(FMars_Fragment_Forage_Signals))
         { InForage.Get_Fragment(FMars_Fragment_Forage_Signals).OnReplenished.Broadcast(InForage); }
@@ -75,10 +80,12 @@ class UMars_Processor_Forage_HandleRequests : UCk_Processor_Script_Base_UE
         auto Spawned = utils_world_item::Request_SpawnWorld(Owner,
             FMars_WorldItem_WorldSpec(Params.Yield.Definition, Pose, Linear, Params.Launch.AngularVelocityDeg));
 
-        auto& State = InForage.Get_Fragment(FMars_Fragment_Forage);
-        ++State.ReleasedCount;
-        --State.ChargesLeft;
-        const auto Exhausted = State.ChargesLeft <= 0;
+        auto& Ledger = InForage.Get_Fragment(FMars_Fragment_Forage);
+        ++Ledger.ReleasedCount;
+        --Ledger.ChargesLeft;
+        Ledger.LastReason = InRequest.Reason;
+        const auto Exhausted = Ledger.ChargesLeft <= 0;
+        InForage.H().Request_MarkReplicationDirty(FMars_Fragment_Forage);
 
         if (InForage.Has_Fragment(FMars_Fragment_Forage_Signals))
         { InForage.Get_Fragment(FMars_Fragment_Forage_Signals).OnReleased.Broadcast(InForage, Spawned, InRequest.Reason); }
@@ -106,7 +113,7 @@ class UMars_Processor_Forage_HandleRequests : UCk_Processor_Script_Base_UE
 
                 auto Timer = utils_timer::Add(InForage, TimerSpec);
                 Timer.BindTo_OnDone(FCk_Delegate_Timer(this, n"OnRegrowDone"));
-                InForage.Get_Fragment(FMars_Fragment_Forage).RegrowTimer = Timer;
+                InForage.Get_Fragment(FMars_Fragment_Forage_Local).RegrowTimer = Timer;
                 break;
             }
 
@@ -148,7 +155,7 @@ class UMars_Processor_Forage_HandleRequests : UCk_Processor_Script_Base_UE
         auto Forage = Owner.As_Forage();
 
         // A replenish already destroyed the timer this one belonged to.
-        if (Forage.Get_Fragment(FMars_Fragment_Forage).RegrowTimer != InTimer)
+        if (Forage.Get_Fragment(FMars_Fragment_Forage_Local).RegrowTimer != InTimer)
         { return; }
 
         Forage.Request_Replenish(FMars_Request_Forage_Replenish());

@@ -3,6 +3,11 @@
 // depletion requests the release. Visual mode composes nothing of this (a held or bagged nut has no body).
 //
 // A half-cracked nut picked up and dropped again composes fresh, at full CrackHealth.
+//
+// Stance A, as every World-mode item: the husk and its forage ledger replicate; the health, the zone and the hurtbox are
+// built on every machine, and only the authority's depletion releases. The shell breaks once on every machine: from
+// OnReleased (the authority's own, or a client's mirrored one), or, on a client whose husk ends before its mirror raised
+// the release, from its end of play once the ledger shows a release this machine has not played.
 class UMars_WorldItem_Husk_EntityScript : UMars_WorldItem_EntityScript
 {
     private const float64 k_HurtboxMargin = 5.0;
@@ -12,6 +17,8 @@ class UMars_WorldItem_Husk_EntityScript : UMars_WorldItem_EntityScript
 
     private FCk_Handle_Forage _Forage;
     private FCk_Handle_Transform _Root;
+    // Releases this machine has played the crack for.
+    private int32 _CracksPlayed = 0;
 
     UFUNCTION(BlueprintOverride)
     ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
@@ -71,10 +78,29 @@ class UMars_WorldItem_Husk_EntityScript : UMars_WorldItem_EntityScript
         _Forage.Request_Release(FMars_Request_Forage_Release(EMars_Forage_ReleaseReason::Depleted));
     }
 
-    // Shell pieces ringed around the crack point, owned by the transient entity (the husk dies this frame), and a puff.
+    UFUNCTION(BlueprintOverride)
+    void DoEndPlay(FCk_Handle InHandle)
+    {
+        Super::DoEndPlay(InHandle);
+
+        if (ck::Is_NOT_Valid(_Forage) || utils_net::Get_HasAuthority(_Forage))
+        { return; }
+
+        if (_Forage.Get_ReleasedCount() > _CracksPlayed)
+        { PlayCrack(); }
+    }
+
     UFUNCTION()
     private void OnCracked(FCk_Handle_Forage InForage, FCk_Handle InWorldItem, EMars_Forage_ReleaseReason InReason)
     {
+        PlayCrack();
+    }
+
+    // Shell pieces ringed around the crack point, owned by the transient entity (the husk dies this frame), and a puff.
+    private void PlayCrack()
+    {
+        _CracksPlayed += 1;
+
         const UCk_InventoryItem_Definition ItemDefinition = Definition.Get();
         const UMars_ItemTrait_Husk Husk = ItemDefinition.Get_ItemTraitByClass(UMars_ItemTrait_Husk);
         const UMars_ItemTrait_Presentation Presentation = ItemDefinition.Get_ItemTraitByClass(UMars_ItemTrait_Presentation);

@@ -6,7 +6,10 @@
 class UMars_ForageCenser_EntityScript : UMars_ForageSource_EntityScript
 {
     default _ShowInPlaceActors = true;
-    default _Replication = ECk_Replication::DoesNotReplicate;
+    // Stance A: placed by the authority's spawner (or an anchor); the censer, its root transform and its forage ledger
+    // replicate; the pivot, the swing, the meshes, the health, the zone, the hurtbox and the knock body are built on every
+    // machine. Only the authority's spills count; every machine swings and puffs on the (mirrored) spill.
+    default _Replication = ECk_Replication::Replicates;
 
     UPROPERTY(ExposeOnSpawn)
     FTransform SpawnTransform = FTransform::Identity;
@@ -72,7 +75,7 @@ class UMars_ForageCenser_EntityScript : UMars_ForageSource_EntityScript
     UFUNCTION(BlueprintOverride)
     ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
     {
-        auto Root = utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::DoesNotReplicate);
+        auto Root = utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::Replicates);
         utils_entity_tag::Add(InHandle, n"TAG_MarsForageCenser");
 
         const auto PivotHeight = ArmLength + PivotClearance + BobRadius;

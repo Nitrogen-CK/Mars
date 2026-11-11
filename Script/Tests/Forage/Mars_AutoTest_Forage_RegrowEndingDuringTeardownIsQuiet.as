@@ -34,7 +34,7 @@ class UMars_AutoTest_Forage_RegrowEndingDuringTeardownIsQuiet : UMars_AutoTestRi
         const auto Pending = _Forage.Get_IsExhausted() && _Forage.Get_IsRegrowPending();
         if (Pending)
         {
-            _RegrowTimer = _Forage.Get_Fragment(FMars_Fragment_Forage).RegrowTimer;
+            _RegrowTimer = _Forage.Get_Fragment(FMars_Fragment_Forage_Local).RegrowTimer;
             utils_entity_lifetime::Request_DestroyEntity(_Source);
         }
 

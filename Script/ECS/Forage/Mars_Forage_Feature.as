@@ -1,3 +1,9 @@
+// Stance A. ChargesLeft, ReleasedCount and LastReason (FMars_Fragment_Forage) are the replicated ledger, written only by
+// the authority's request drain: a release, its yield spawn, the exhaustion and the regrow happen on the authority alone,
+// and a client's Release and Replenish requests are dropped. The release point and the regrow timer live in the local
+// FMars_Fragment_Forage_Local. A client mirrors the ledger (UMars_Processor_Forage_Mirror): it raises OnReleased (with an
+// invalid world item), OnExhausted and OnReplenished from what replicated; OnReleaseRefused is the authority's only.
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
 //--------------------------------------------------------------------------------------------------------------------------
@@ -166,23 +172,41 @@ struct FMars_Fragment_Forage_Params
 // State
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Written only by the Forage processors (and composed by Add).
+// The replicated ledger: written only by the authority's request drain (and composed by Add), mirrored on a client.
 struct FMars_Fragment_Forage
 {
-    UPROPERTY()
-    FCk_Handle_Transform ReleasePoint;
-
     // 0 = exhausted.
     UPROPERTY()
     int32 ChargesLeft = 0;
 
+    // Every release, counted: a client raises one OnReleased per count it has not seen.
     UPROPERTY()
     int32 ReleasedCount = 0;
+
+    // The reason of the newest release; what a client's mirrored OnReleased carries.
+    UPROPERTY()
+    EMars_Forage_ReleaseReason LastReason = EMars_Forage_ReleaseReason::Hit;
+}
+
+// Never replicated: the release point is built on every machine; the regrow timer is the authority's (written only by
+// the request drain); Last is the client's mirror state.
+struct FMars_Fragment_Forage_Local
+{
+    UPROPERTY()
+    FCk_Handle_Transform ReleasePoint;
 
     // Valid while a regrow is pending.
     UPROPERTY()
     FCk_Handle_Timer RegrowTimer;
+
+    // Non-authority only (the authority's mirror drops it): the ledger as this machine last broadcast it, seeded with the
+    // spec's start values, so a ledger that replicated before the mirror ran still broadcasts.
+    UPROPERTY()
+    TOptional<FMars_Fragment_Forage> Last;
 }
+
+// Present until UMars_Processor_Forage_Mirror has run once.
+struct FMars_Tag_Forage_NeedsMirror {}
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Signals
