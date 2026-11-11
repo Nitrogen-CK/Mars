@@ -41,6 +41,12 @@ namespace utils_world_item
         if (InSpec.World.IsSet() && InHandle.Has_Fragment(FMars_Fragment_WorldItem_Net) == false)
         { InHandle.Add_Fragment(FMars_Fragment_WorldItem_Net(), ECk_Replication::Replicates); }
 
+        // A machine without authority that mounts this body parents its root locally, and the authority's pose applies
+        // again when it lets go. Declared here, so every World-mode item has it whichever script composed its root.
+        auto Root = InHandle.As_Transform(ECk_SanityCheck::UnChecked);
+        if (InSpec.Mode == EMars_WorldItem_Mode::World && ck::IsValid(Root))
+        { utils_transform::Request_SetReplicatedPosePolicy(Root, ECk_Transform_ReplicatedPosePolicy::YieldsToSceneNodeParent); }
+
         if (InSpec.Mode == EMars_WorldItem_Mode::World && utils_net::Get_HasAuthority(InHandle) == false
             && InHandle.As_WorldItem().Get_Persistence() == EMars_WorldItem_Persistence::Persistent)
         { InHandle.Add_Fragment(FMars_Tag_WorldItem_AwaitingLink()); }

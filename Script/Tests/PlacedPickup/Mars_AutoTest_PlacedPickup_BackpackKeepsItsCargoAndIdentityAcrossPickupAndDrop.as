@@ -45,7 +45,7 @@ class UMars_AutoTest_PlacedPickup_BackpackKeepsItsCargoAndIdentityAcrossPickupAn
         { Result.Set(false); return; }
         _Backpack = _Placed.As_Backpack();
         const UMars_ItemTrait_Backpack Trait = mars_items::Backpack().Get_ItemTraitByClass(UMars_ItemTrait_Backpack);
-        Result.Set(_Backpack.Get_CargoSlotCount() == Trait.CargoSlots.Num());
+        Result.Set(_Backpack.Get_IsReady() && _Backpack.Get_CargoSlotCount() == Trait.CargoSlots.Num());
     }
 
     UFUNCTION()

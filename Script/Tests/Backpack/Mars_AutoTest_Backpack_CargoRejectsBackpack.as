@@ -54,7 +54,7 @@ class UMars_AutoTest_Backpack_CargoRejectsBackpack : UMars_AutoTestRig_Carrier
         { AllSeeded = AllSeeded && Holder.Get_NumItems() == 1; }
 
         const UMars_ItemTrait_Backpack Trait = mars_items::Backpack().Get_ItemTraitByClass(UMars_ItemTrait_Backpack);
-        const auto Ready = AllSeeded && ck::IsValid(_Backpack) && _Backpack.Get_CargoSlotCount() == Trait.CargoSlots.Num();
+        const auto Ready = AllSeeded && ck::IsValid(_Backpack) && _Backpack.Get_IsReady() && _Backpack.Get_CargoSlotCount() == Trait.CargoSlots.Num();
         if (Ready && _Items.Num() == 0)
         {
             for (const auto& Holder : _Holders)

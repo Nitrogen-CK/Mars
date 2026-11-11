@@ -1,19 +1,22 @@
 // A World-mode, Persistent world item whose definition carries UMars_ItemTrait_Backpack: the base WorldItem composition,
-// then one cargo slot per mount of the trait (utils_backpack::Add), and a lantern hook when the trait names a
-// LanternHookOffset (AddLanternHook).
+// then one cargo slot per mount of the trait (utils_backpack::Add; each slot is a UMars_CargoSlot_EntityScript of its own),
+// and a lantern hook when the trait names a LanternHookOffset (a UMars_BackpackLanternHook_EntityScript).
 //
 // Mounts resolve here: Socket unset -> Offset is pack-root relative; a named socket -> Offset on top of the socket
 // transform, the socket location scaled by Presentation.Visual.MeshScale (the pack root is unit scale; the visual node
 // carries the display scale). A named socket the mesh does not have is a configuration error: ensure, destroy self.
 //
 // While the pack is Held (in its carrier's hands) its cargo and hook interactables hold the HolderHeld claim: nobody can
-// reach them. Every other mount releases it.
+// reach them. Every other mount releases it. The slots and the hook are read when the mount changes; one that composes
+// later applies the pack's current mount itself.
 //
 // The weight probe (Probe.Mars.Backpack) is what backpack pressure plates feel. It is enabled only while the pack lies in
 // the world (Mount World): a carried or held pack weighs on nothing.
+//
+// Stance: the world item's SPLIT stance (inherited). The slot specs resolve on every machine from the same definition;
+// each machine requests the slots and the hook, which the authority builds and replicates under the pack.
 class UMars_Backpack_EntityScript : UMars_WorldItem_EntityScript
 {
-    private TArray<FCk_Handle_Interactable> _CargoInteractables;
     private FCk_Handle_Probe _WeightProbe;
 
     UFUNCTION(BlueprintOverride)
@@ -55,17 +58,8 @@ class UMars_Backpack_EntityScript : UMars_WorldItem_EntityScript
             return ECk_EntityScript_ConstructionFlow::Finished;
         }
 
-        _CargoInteractables.Empty();
-        const auto CargoSlots = Backpack.Get_CargoSlots();
-        for (const auto& Slot : CargoSlots)
-        { _CargoInteractables.Add(Slot.Get_Interactable()); }
-
         if (BackpackTrait.LanternHookOffset.IsSet())
-        {
-            const auto Hook = AddLanternHook(InHandle, BackpackTrait.LanternHookOffset.GetValue());
-            if (ck::IsValid(Hook))
-            { _CargoInteractables.Add(Hook.Get_Interactable()); }
-        }
+        { Request_LanternHook(InHandle); }
 
         _WeightProbe = AddWeightProbe(InHandle, Presentation);
 
@@ -118,32 +112,18 @@ class UMars_Backpack_EntityScript : UMars_WorldItem_EntityScript
         return TOptional<FMars_Backpack_Spec>(Spec);
     }
 
-    // The pack's lantern hook: a scene-node child of the pack root at InOffset (so it dies with the pack, and a lantern
-    // hung on it with it) carrying the hook and its interactable; the lantern hangs by its bail. Its interactable shares the
-    // cargo's HolderHeld claim.
-    private FCk_Handle_LanternHook AddLanternHook(FCk_Handle& InHandle, const FTransform& InOffset)
+    // The pack's lantern hook, requested on every machine: the authority builds it and stamps the host-side check; a
+    // client's request is the placeholder the replicated hook resolves to.
+    private void Request_LanternHook(FCk_Handle& InHandle)
     {
-        auto HookNode = utils_scene_node::Create(InHandle.As_Transform(), InOffset).As_Transform();
-        utils_handle::Set_DebugName(HookNode.H(), n"Backpack.LanternHook");
+        auto Pending = utils_entity_script::Request_SpawnEntity(InHandle, UMars_BackpackLanternHook_EntityScript,
+            FMars_BackpackLanternHook_SpawnParams());
 
-        auto Probe = FMars_Interactable_ProbeInfo();
-        Probe.ProbeSpec = FCk_Probe_Spec(GameplayTags::Probe_Mars_Interact);
-        Probe.ProbeSpec.Set_MotionType(ECk_MotionType::Kinematic);
-        Probe.ProbeShape = utils_shapes::Make_Sphere(FCk_ShapeSphere_Dimensions(14.0f));
-        Probe.ProbeOffset = FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, -14.0));
-
-        auto InteractableSpec = FMars_Interactable_Spec();
-        InteractableSpec.ProbeInfo = Probe;
-        InteractableSpec.Targets.Add(utils_lantern_hook::Make_InteractTarget());
-        InteractableSpec.FocusPriority = constants_lantern_hook::k_FocusPriority;
-
-        auto Spec = FMars_LanternHook_Spec();
-        Spec.HangNode = HookNode;
-        Spec.HangOffset = FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, -constants_lantern_item::k_BailHeight));
-        Spec.Interactable = utils_interactable::Create(HookNode, InteractableSpec);
-
-        FCk_Handle HookEntity = HookNode;
-        return utils_lantern_hook::Add(HookEntity, Spec);
+        if (utils_net::Get_HasAuthority(InHandle))
+        {
+            auto Hook = Pending.Get_EntityUnderConstruction();
+            utils_net_spawn::Expect_Replicated(Hook);
+        }
     }
 
     // The same shape as the pickup probe (utils_world_item::Make_ProbeFit), as a separate probe: the pickup is a QueryOnly
@@ -168,16 +148,24 @@ class UMars_Backpack_EntityScript : UMars_WorldItem_EntityScript
     UFUNCTION()
     private void OnMountChanged(FCk_Handle_WorldItem InWorldItem, EMars_WorldItem_Mount InPrev, EMars_WorldItem_Mount InNew)
     {
-        const auto IsHeld = InNew == EMars_WorldItem_Mount::Held;
-        for (auto& Interactable : _CargoInteractables)
+        auto Backpack = InWorldItem.As_Backpack(ECk_SanityCheck::UnChecked);
+        if (ck::IsValid(Backpack))
         {
-            if (ck::Is_NOT_Valid(Interactable))
-            { continue; }
+            for (const auto& Slot : Backpack.Get_CargoSlots())
+            {
+                if (ck::Is_NOT_Valid(Slot))
+                { continue; }
 
-            if (IsHeld)
-            { Interactable.Request_Disable(FMars_Request_Interactable_Disable(EMars_Interactable_DisableReason::HolderHeld)); }
-            else
-            { Interactable.Request_Enable(FMars_Request_Interactable_Enable(EMars_Interactable_DisableReason::HolderHeld)); }
+                auto Interactable = Slot.Get_Interactable();
+                utils_backpack::Request_ApplyHolderHeld(Interactable, InNew);
+            }
+
+            const auto Hook = Backpack.TryGet_LanternHook();
+            if (ck::IsValid(Hook))
+            {
+                auto Interactable = Hook.Get_Interactable();
+                utils_backpack::Request_ApplyHolderHeld(Interactable, InNew);
+            }
         }
 
         if (ck::IsValid(_WeightProbe))

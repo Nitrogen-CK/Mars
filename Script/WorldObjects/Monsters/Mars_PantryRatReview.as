@@ -198,7 +198,7 @@ class UMars_PantryRatCourt_EntityScript : UCk_GenericEntityScript_UE
         { return; }
 
         const auto PackReady = ck::IsValid(_PackEntity) && _PackEntity.Is_Backpack() && _PackEntity.Is_WorldItem()
-            && ck::IsValid(_PackEntity.As_WorldItem().Get_HeldItem());
+            && ck::IsValid(_PackEntity.As_WorldItem().Get_HeldItem()) && _PackEntity.As_Backpack().Get_IsReady();
         const auto FoodReady = ck::IsValid(_FoodEntity) && _FoodEntity.Is_WorldItem() && ck::IsValid(_FoodEntity.As_WorldItem().Get_HeldItem())
             && _FoodEntity.As_WorldItem().Get_IsSettled() && _PackEntity.As_WorldItem().Get_IsSettled() && _Clock > 1.0f;
         auto Pack = _PackEntity.As_Backpack();

@@ -87,11 +87,6 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
 
         const auto RootReplication = Mode == EMars_WorldItem_Mode::World ? ECk_Replication::Replicates : ECk_Replication::DoesNotReplicate;
         auto Root = utils_transform::Add(InHandle, SpawnTransform, RootReplication);
-        // A machine without authority that mounts this body parents it locally; the authority's pose applies again when it
-        // lets go.
-        if (Mode == EMars_WorldItem_Mode::World)
-        { utils_transform::Request_SetReplicatedPosePolicy(Root, ECk_Transform_ReplicatedPosePolicy::YieldsToSceneNodeParent); }
-
         utils_entity_tag::Add(InHandle, n"TAG_MarsWorldItem");
 
         _Definition = Definition.Get();

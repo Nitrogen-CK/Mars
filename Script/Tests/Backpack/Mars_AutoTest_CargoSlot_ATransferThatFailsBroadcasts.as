@@ -82,7 +82,7 @@ class UMars_AutoTest_CargoSlot_ATransferThatFailsBroadcasts : UMars_AutoTestRig_
     private void Check_Ready(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         const UMars_ItemTrait_Backpack Trait = mars_items::Backpack().Get_ItemTraitByClass(UMars_ItemTrait_Backpack);
-        const auto Ready = ck::IsValid(_Backpack) && _Backpack.Get_CargoSlotCount() == Trait.CargoSlots.Num() &&
+        const auto Ready = ck::IsValid(_Backpack) && _Backpack.Get_IsReady() && _Backpack.Get_CargoSlotCount() == Trait.CargoSlots.Num() &&
             _Holders[0].Get_NumItems() == 1;
         if (Ready && _Items.Num() == 0)
         {

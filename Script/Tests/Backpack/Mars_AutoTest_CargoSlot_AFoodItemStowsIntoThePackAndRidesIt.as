@@ -84,7 +84,7 @@ class UMars_AutoTest_CargoSlot_AFoodItemStowsIntoThePackAndRidesIt : UMars_AutoT
     private void Check_Constructed(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         const auto PackReady = ck::IsValid(_PackEntity) && _PackEntity.Is_Backpack() && _PackEntity.Is_WorldItem()
-            && ck::IsValid(_PackEntity.As_WorldItem().Get_HeldItem());
+            && ck::IsValid(_PackEntity.As_WorldItem().Get_HeldItem()) && _PackEntity.As_Backpack().Get_IsReady();
         const auto Food = TryGet_ConstructedWorldItem(_FoodEntity);
         const auto FoodReady = ck::IsValid(Food);
         if (PackReady && FoodReady && ck::Is_NOT_Valid(_Backpack))

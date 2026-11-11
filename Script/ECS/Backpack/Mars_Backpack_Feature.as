@@ -1,5 +1,11 @@
 // A backpack: lives on a Persistent world item (the pack's body) and owns its cargo slot child entities. The pack moves
 // between World / Carried / Held as a world item; the cargo slots, their inventories and their visuals ride along.
+//
+// Stance: the pack replicates as a world item; nothing in this feature replicates itself. Each cargo slot is a replicated
+// entity script of its own under the pack (UMars_CargoSlot_EntityScript), requested on every machine by
+// UMars_Processor_Backpack_SpawnSlots (the authority builds it; a client's request is the placeholder it resolves to) and
+// adopted into FMars_Fragment_Backpack on every machine by UMars_Processor_Backpack_AdoptSlots. The slot specs are local:
+// every machine resolves them from the same definition.
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
@@ -17,7 +23,8 @@ struct FMars_Feature_Backpack {}
 // Spec
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Resolved by UMars_Backpack_EntityScript from the item's UMars_ItemTrait_Backpack mounts (sockets already applied).
+// Resolved by UMars_Backpack_EntityScript from the item's UMars_ItemTrait_Backpack mounts (sockets already applied), the
+// same on every machine.
 struct FMars_Backpack_Spec
 {
     UPROPERTY()
@@ -59,9 +66,28 @@ mixin FMars_Validation Validate(const FMars_Backpack_Spec& Self)
 // State
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Written once by utils_backpack::Add; the slots are the pack's child entities and die with it.
+// Sized by utils_backpack::Add to the layout, one invalid entry per slot until UMars_Processor_Backpack_AdoptSlots fills
+// it; the slots are the pack's child entities and die with it.
 struct FMars_Fragment_Backpack
 {
     UPROPERTY()
     TArray<FCk_Handle_CargoSlot> CargoSlots;
 }
+
+// Local, written once by utils_backpack::Add: each slot's spec by index, with Backpack filled in. A slot's own script
+// reads its entry from its pack (utils_backpack::TryGet_SlotSpec).
+struct FMars_Fragment_Backpack_SlotSpecs
+{
+    UPROPERTY()
+    TArray<FMars_CargoSlot_Spec> Slots;
+}
+
+// Present until every slot is adopted (Get_IsReady), removed by UMars_Processor_Backpack_AdoptSlots.
+struct FMars_Fragment_Backpack_AwaitingSlots
+{
+    UPROPERTY()
+    bool Awaiting = true;
+}
+
+// Consumed by UMars_Processor_Backpack_SpawnSlots.
+struct FMars_Tag_Backpack_NeedsSlots {}

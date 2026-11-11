@@ -1,8 +1,8 @@
-// Polls each slot's item against the last pass (the Hotbar sync shape). A change consumes the pending arrival, destroys
-// the old cargo visual, spawns one for the new item (a Visual-mode world item under the slot node at
-// Presentation.Mounting.CargoOffset, arriving from where a fresh stow said it was; owned by the slot entity, so it dies
-// with the pack), then broadcasts OnItemChanged. A Persistent item gets no visual: its own world item mounts on the slot's
-// node (UMars_Processor_WorldItem_Reconcile).
+// Polls each slot's item against the last pass (the Hotbar sync shape), on every machine from the contents it sees. A
+// change consumes the pending arrival, destroys the old cargo visual, spawns one for the new item (a Visual-mode world item
+// under the slot node at Presentation.Mounting.CargoOffset, arriving from where this machine's ExpectArrival said it was;
+// owned by the slot entity, so it dies with the pack), then broadcasts OnItemChanged. An item whose presentation is
+// Persistent gets no visual: its own world item mounts on the slot's node (UMars_Processor_WorldItem_Reconcile).
 class UMars_Processor_CargoSlot_Sync : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -27,7 +27,7 @@ class UMars_Processor_CargoSlot_Sync : UCk_Processor_Script_Base_UE
 
         InState.Visual = FCk_Handle();
 
-        if (ck::IsValid(Now) && Now.Has_Presentation() && Now.Has_PersistentWorldItem() == false)
+        if (ck::IsValid(Now) && Now.Has_Presentation() && utils_cargo_slot::Get_IsPersistent(Now) == false)
         {
             const UMars_ItemTrait_Presentation Presentation = Now.Get_Presentation();
             auto Visual = FMars_WorldItem_VisualSpec(Now, InHandle.As_Transform(), Presentation.Mounting.CargoOffset);

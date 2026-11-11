@@ -85,7 +85,7 @@ class UMars_AutoTest_WorldItem_TheMountFollowsTheItemsInventory : UMars_AutoTest
         const auto PlatterReady = _Platters.Num() == 1 && ck::IsValid(_WorldItems[0].Get_Item());
 
         const auto PackReady = ck::IsValid(_PackEntity) && _PackEntity.Is_Backpack() && _PackEntity.Is_WorldItem()
-            && ck::IsValid(_PackEntity.As_WorldItem().Get_Item());
+            && ck::IsValid(_PackEntity.As_WorldItem().Get_Item()) && _PackEntity.As_Backpack().Get_IsReady();
         const auto Slab = TryGet_ConstructedWorldItem(_SlabEntity);
         const auto SlabReady = ck::IsValid(Slab) && ck::IsValid(Slab.Get_Item());
         if (PackReady && SlabReady && ck::Is_NOT_Valid(_Pack))

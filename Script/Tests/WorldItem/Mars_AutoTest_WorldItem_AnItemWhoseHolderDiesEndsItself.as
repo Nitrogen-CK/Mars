@@ -57,7 +57,7 @@ class UMars_AutoTest_WorldItem_AnItemWhoseHolderDiesEndsItself : UMars_AutoTestR
     private void Check_Constructed(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         const auto PackReady = ck::IsValid(_PackEntity) && _PackEntity.Is_Backpack() && _PackEntity.Is_WorldItem()
-            && ck::IsValid(_PackEntity.As_WorldItem().Get_Item());
+            && ck::IsValid(_PackEntity.As_WorldItem().Get_Item()) && _PackEntity.As_Backpack().Get_IsReady();
         const auto Slab = TryGet_ConstructedWorldItem(_SlabEntity);
         const auto SlabReady = ck::IsValid(Slab) && ck::IsValid(Slab.Get_Item());
         if (PackReady && SlabReady && ck::Is_NOT_Valid(_Pack))

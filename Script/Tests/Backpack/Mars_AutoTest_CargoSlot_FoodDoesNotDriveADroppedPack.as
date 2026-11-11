@@ -53,7 +53,7 @@ class UMars_AutoTest_CargoSlot_FoodDoesNotDriveADroppedPack : UMars_AutoTestRig_
     {
         _Pack = TryGet_ConstructedWorldItem(_PackEntity);
         _Food = TryGet_ConstructedWorldItem(_FoodEntity);
-        bool Ready = ck::IsValid(_Pack) && ck::IsValid(_Food);
+        bool Ready = ck::IsValid(_Pack) && ck::IsValid(_Food) && _PackEntity.As_Backpack().Get_IsReady();
         if (Ready)
         {
             Ready = utils_jolt_body::Get_IsBodyAdded(_Pack.Get_Body()) && utils_jolt_body::Get_IsBodyAdded(_Food.Get_Body());

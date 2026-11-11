@@ -321,7 +321,7 @@ class UMars_AutoTestRig_PantryRaid : UMars_AutoTestRig_GroundNavBuildOutcome
         _Raid = _RaidEntity.As_PantryRaid(ECk_SanityCheck::UnChecked);
         _Den = _DenEntity.As_RatDen(ECk_SanityCheck::UnChecked);
         const auto PackReady = ck::IsValid(_PackEntity) && _PackEntity.Is_Backpack() && _PackEntity.Is_WorldItem()
-            && ck::IsValid(_PackEntity.As_WorldItem().Get_HeldItem());
+            && ck::IsValid(_PackEntity.As_WorldItem().Get_HeldItem()) && _PackEntity.As_Backpack().Get_IsReady();
         const auto FoodReady = ck::IsValid(_FoodEntity) && _FoodEntity.Is_WorldItem() && ck::IsValid(_FoodEntity.As_WorldItem().Get_HeldItem());
         auto ChefsReady = true;
         for (auto Chef : _Chefs)

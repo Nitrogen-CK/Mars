@@ -79,7 +79,7 @@ class UMars_AutoTest_CargoSlot_ATakenItemLeavesTheSlotAtTheGripAndRidesHome : UM
     private void Check_Ready(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         const UMars_ItemTrait_Backpack Trait = mars_items::Backpack().Get_ItemTraitByClass(UMars_ItemTrait_Backpack);
-        const auto Ready = ck::IsValid(_Backpack) && _Backpack.Get_CargoSlotCount() == Trait.CargoSlots.Num();
+        const auto Ready = ck::IsValid(_Backpack) && _Backpack.Get_IsReady() && _Backpack.Get_CargoSlotCount() == Trait.CargoSlots.Num();
         if (Ready && ck::Is_NOT_Valid(_Slot))
         { _Slot = _Backpack.Get_CargoSlot(0); }
 

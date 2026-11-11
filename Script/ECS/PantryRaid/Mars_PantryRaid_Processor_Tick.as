@@ -213,7 +213,11 @@ class UMars_Processor_PantryRaid_Tick : UCk_Processor_Script_Base_UE
         auto Eligible = TArray<int32>();
         for (int32 Index = 0; Index < Backpack.Get_CargoSlotCount(); ++Index)
         {
+            // A slot not yet adopted here is "not yet": the next pass sees it.
             const auto Slot = Backpack.Get_CargoSlot(Index);
+            if (ck::Is_NOT_Valid(Slot))
+            { continue; }
+
             const auto Item = Slot.Get_Item();
             if (ck::Is_NOT_Valid(Item))
             { continue; }

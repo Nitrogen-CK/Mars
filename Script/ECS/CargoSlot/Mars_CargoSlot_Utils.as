@@ -9,17 +9,18 @@ class UMars_CargoSlot_AcceptPolicy : UObject
 
 namespace utils_cargo_slot
 {
-    // A scene-node child of the pack root at MountOffset carrying the slot: a capacity-1 Inventory.Mars.Cargo.<Index>
-    // inventory (accept policy CDO) whose Persistent item rides the slot's node at its CargoOffset, and a probe
-    // interactable with one Use target running UMars_SmState_CargoSlot_Interact. The slot entity is owned by the pack, so
-    // it dies with it.
-    FCk_Handle_CargoSlot Create(FCk_Handle_Transform& InPackRoot, FMars_CargoSlot_Spec InSpec)
+    // The slot on InHandle, an entity with a transform already placed at its mount (the slot's script attaches it under
+    // the pack root): a capacity-1 Inventory.Mars.Cargo.<Index> inventory (accept policy CDO, InSpec.Replication) whose
+    // Persistent item rides the slot's node at its CargoOffset, the slot's replicated refusal ledger, and a probe
+    // interactable with one Use target running UMars_SmState_CargoSlot_Interact. A spec that fails Validate() ensures and
+    // adds nothing.
+    FCk_Handle_CargoSlot Add(FCk_Handle& InHandle, FMars_CargoSlot_Spec InSpec)
     {
         const auto Validation = InSpec.Validate();
-        if (ck::EnsureIfNot(Validation.IsValid(), f"[CargoSlot] [{InPackRoot.ToString()}] rejected the spec: {Validation.Get_Error()}"))
+        if (ck::EnsureIfNot(Validation.IsValid(), f"[CargoSlot] [{InHandle.ToString()}] rejected the spec: {Validation.Get_Error()}"))
         { return FCk_Handle_CargoSlot(); }
 
-        auto SlotNode = utils_scene_node::Create(InPackRoot, InSpec.MountOffset).As_Transform();
+        auto SlotNode = InHandle.As_Transform();
 
         TSubclassOf<UMars_CargoSlot_AcceptPolicy> PolicyClass = UMars_CargoSlot_AcceptPolicy;
         auto Policy = PolicyClass.GetDefaultObject();
@@ -31,26 +32,47 @@ namespace utils_cargo_slot
         InventoryParams.Set_StackingPolicy(ECk_Inventory_StackingPolicy::NoStacking);
         InventoryParams.Set_PersistContents(ECk_EnableDisable::Disable);
 
-        FCk_Handle SlotEntity = SlotNode;
-        auto Inventory = utils_inventory_data_only::Add(SlotEntity, InventoryParams, ECk_Replication::DoesNotReplicate);
+        auto Inventory = utils_inventory_data_only::Add(InHandle, InventoryParams, InSpec.Replication);
         utils_world_item::Add_MountedInventory(Inventory, FMars_Fragment_MountedInventory(EMars_WorldItem_MountRule::PointAtCargoOffset,
             constants_cargo_slot::Get_MountPoint(), FTransform::Identity));
 
         auto AttachPointsSpec = FMars_AttachPoints_Spec();
         AttachPointsSpec.Points.Add(FMars_AttachPoint_Entry(constants_cargo_slot::Get_MountPoint(), SlotNode));
-        utils_attach_points::Add(SlotEntity, AttachPointsSpec);
+        utils_attach_points::Add(InHandle, AttachPointsSpec);
 
         auto Params = FMars_Fragment_CargoSlot_Params();
+        Params.Index = InSpec.Index;
         Params.Backpack = InSpec.Backpack;
 
         auto State = FMars_Fragment_CargoSlot();
         State.Inventory = Inventory;
         State.Interactable = DoCreate_Interactable(SlotNode, InSpec);
 
-        SlotNode.Add_Fragment(FMars_Feature_CargoSlot());
-        SlotNode.Add_Fragment(Params);
-        SlotNode.Add_Fragment(State);
-        return SlotEntity.As_CargoSlot();
+        InHandle.Add_Fragment(FMars_Feature_CargoSlot());
+        InHandle.Add_Fragment(Params);
+        InHandle.Add_Fragment(State);
+
+        // A client's copy can receive the replicated ledger before it composes: it is already there then.
+        if (InHandle.Has_Fragment(FMars_Fragment_CargoSlot_Net) == false)
+        { InHandle.Add_Fragment(FMars_Fragment_CargoSlot_Net(), InSpec.Replication); }
+
+        return InHandle.As_CargoSlot();
+    }
+
+    // InInitiator's interaction asks InSlot for InAction. A slot with a replication driver is reached through
+    // Cue.Mars.CargoSlot.Act, which only its authority applies; a local slot has no other machine to reach and takes the
+    // Act request directly. Either way the effect, or the refusal in the slot's ledger, is what the caller waits on.
+    void Request_ActFor(FCk_Handle_CargoSlot& InSlot, FCk_Handle InInitiator, EMars_CargoSlot_Action InAction)
+    {
+        const auto Request = FMars_Request_CargoSlot_Act(InInitiator, InAction);
+        if (utils_entity_replication_driver::Has(InSlot))
+        {
+            utils_cue_generic::Request_ExecuteCue(InSlot, GameplayTags::Cue_Mars_CargoSlot_Act, Request,
+                ECk_Cue_ReliabilityPolicy::Reliable, ECk_Cue_MulticastPolicy::ServerOnly);
+            return;
+        }
+
+        InSlot.Request_Act(Request);
     }
 
     // The accept rule every cargo slot enforces (and Get_ActionFor previews): no backpack, no hands-only item, and no
@@ -60,7 +82,18 @@ namespace utils_cargo_slot
         if (ck::Is_NOT_Valid(InItem) || InItem.Has_Backpack() || InItem.Has_HandsOnly())
         { return false; }
 
-        return InItem.Has_PersistentWorldItem() == false || InItem.Has_Food();
+        return Get_IsPersistent(InItem) == false || InItem.Has_Food();
+    }
+
+    // InItem's definition gives it a Persistent world item. Read from the presentation, which every machine has the same,
+    // rather than from the body's link, which a client makes only once the body has arrived.
+    bool Get_IsPersistent(const FCk_Handle_Item& InItem)
+    {
+        if (ck::Is_NOT_Valid(InItem) || InItem.Has_Presentation() == false)
+        { return false; }
+
+        const UMars_ItemTrait_Presentation Presentation = InItem.Get_Presentation();
+        return Presentation.Mounting.Persistence == EMars_WorldItem_Persistence::Persistent;
     }
 
     // The probe carries Probe.Mars.Interact (the player's interaction trace only sees probes under that tag) and is
@@ -101,6 +134,11 @@ mixin FCk_Handle_WorldItem Get_Backpack(const FCk_Handle_CargoSlot& Self)
     return Self.Get_Fragment(FMars_Fragment_CargoSlot_Params).Backpack;
 }
 
+mixin int32 Get_Index(const FCk_Handle_CargoSlot& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_CargoSlot_Params).Index;
+}
+
 mixin FCk_Handle_Inventory_DataOnly Get_Inventory(const FCk_Handle_CargoSlot& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_CargoSlot).Inventory;
@@ -127,6 +165,24 @@ mixin FCk_Handle_Interactable Get_Interactable(const FCk_Handle_CargoSlot& Self)
 mixin FCk_Handle Get_Visual(const FCk_Handle_CargoSlot& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_CargoSlot).Visual;
+}
+
+// The Acts the authority has refused, as this machine last received it.
+mixin int32 Get_RefusalSerial(const FCk_Handle_CargoSlot& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_CargoSlot_Net).RefusalSerial;
+}
+
+// Why the latest refused Act was refused; meaningful once Get_RefusalSerial is above 0.
+mixin EMars_Interaction_FailReason Get_LastRefusal(const FCk_Handle_CargoSlot& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_CargoSlot_Net).LastRefusal;
+}
+
+// Whose Act was refused last; invalid before any, and on a client while that entity is not resolved there.
+mixin FCk_Handle Get_LastRefused(const FCk_Handle_CargoSlot& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_CargoSlot_Net).LastRefused;
 }
 
 // What interacting would do for InFocuser, first matching row wins:
@@ -180,6 +236,19 @@ mixin void Request_Take(FCk_Handle_CargoSlot& Self, const FMars_Request_CargoSlo
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_CargoSlot_Requests);
     Requests.TakeRequests.Add(InRequest);
+}
+
+mixin void Request_ExpectArrival(FCk_Handle_CargoSlot& Self, const FMars_Request_CargoSlot_ExpectArrival& InRequest)
+{
+    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_CargoSlot_Requests);
+    Requests.ExpectArrivalRequests.Add(InRequest);
+}
+
+// The authority-side Act; a machine acting for a player goes through utils_cargo_slot::Request_ActFor.
+mixin void Request_Act(FCk_Handle_CargoSlot& Self, const FMars_Request_CargoSlot_Act& InRequest)
+{
+    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_CargoSlot_Requests);
+    Requests.ActRequests.Add(InRequest);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
