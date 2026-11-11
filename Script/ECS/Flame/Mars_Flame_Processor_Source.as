@@ -1,5 +1,6 @@
 // A MechanismSource on the flame's own entity follows the flame: asserted while lit, deasserted otherwise, asked only
-// when that reading changes. A flame entity with no source records the reading and asks nothing.
+// when that reading changes. A flame entity with no source records the reading and asks nothing. Only the authority
+// asserts: a source's output is the authority's to decide.
 class UMars_Processor_Flame_Source : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -12,12 +13,17 @@ class UMars_Processor_Flame_Source : UCk_Processor_Script_Base_UE
 
     void ForEachEntity(FCk_Time InDeltaT, FCk_Handle& InHandle, FMars_Fragment_Flame& InState)
     {
-        const auto Self = InHandle.As_Flame();
-        const auto Output = Self.Get_IsLit() ? EMars_MechanismSource_Output::Asserted : EMars_MechanismSource_Output::Deasserted;
-        if (InState.LastSourceOutput.IsSet() && InState.LastSourceOutput.GetValue() == Output)
+        if (utils_net::Get_HasAuthority(InHandle) == false)
         { return; }
 
-        InState.LastSourceOutput = TOptional<EMars_MechanismSource_Output>(Output);
+        auto& Local = InHandle.Get_Fragment(FMars_Fragment_Flame_Local);
+
+        const auto Self = InHandle.As_Flame();
+        const auto Output = Self.Get_IsLit() ? EMars_MechanismSource_Output::Asserted : EMars_MechanismSource_Output::Deasserted;
+        if (Local.LastSourceOutput.IsSet() && Local.LastSourceOutput.GetValue() == Output)
+        { return; }
+
+        Local.LastSourceOutput = TOptional<EMars_MechanismSource_Output>(Output);
 
         auto Source = InHandle.As_MechanismSource(ECk_SanityCheck::UnChecked);
         if (ck::Is_NOT_Valid(Source))

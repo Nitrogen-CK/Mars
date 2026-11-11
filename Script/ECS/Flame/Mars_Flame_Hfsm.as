@@ -5,8 +5,8 @@ class UMars_SmState_Flame_Ignite : UMars_SmState_InteractTarget_RunTask
 }
 
 // Re-evaluates Get_ActionFor for the initiator: Light lights this flame from the held one, TakeLight lights the held one
-// from this one. Any other action fails: the prompt processor disables the row for it, but can lag the initiator's hands
-// by a frame.
+// from this one, each asked of the flame through utils_flame::Request_ActFor (the authority checks it again). Any other
+// action fails: the prompt processor disables the row for it, but can lag the initiator's hands by a frame.
 class UMars_SmTask_Flame_Ignite : UCk_SmTask_EntityScript
 {
     default _TaskMode = ECk_SmTaskMode::EnterExitOnly;
@@ -35,17 +35,16 @@ class UMars_SmTask_Flame_Ignite : UCk_SmTask_EntityScript
         }
 
         const auto Action = Flame.Get_ActionFor(Initiator);
-        auto Held = utils_flame::TryGet_HeldFlame(Initiator);
         if (Action == EMars_Flame_Action::Light)
         {
-            Flame.Request_SetIgnition(FMars_Request_Flame_SetIgnition(EMars_Flame_Ignition::Lit, Held));
+            utils_flame::Request_ActFor(Flame, Initiator, EMars_Flame_Verb::Light);
             Mark_Result(ECk_SmTaskResult::Succeeded);
             return;
         }
 
         if (Action == EMars_Flame_Action::TakeLight)
         {
-            Held.Request_SetIgnition(FMars_Request_Flame_SetIgnition(EMars_Flame_Ignition::Lit, Flame));
+            utils_flame::Request_ActFor(Flame, Initiator, EMars_Flame_Verb::TakeLight);
             Mark_Result(ECk_SmTaskResult::Succeeded);
             return;
         }

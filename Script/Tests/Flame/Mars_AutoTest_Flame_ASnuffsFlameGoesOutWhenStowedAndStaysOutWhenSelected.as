@@ -63,7 +63,7 @@ class UMars_AutoTest_Flame_ASnuffsFlameGoesOutWhenStowedAndStaysOutWhenSelected 
     UFUNCTION()
     private void Check_PoolPassedStowed(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
-        const auto LastPool = Get_FlameState().LastPool;
+        const auto LastPool = Get_FlameLocal().LastPool;
         auto Res = OutResult;
         Res.Set(LastPool.IsSet() && LastPool.GetValue() == EMars_Flame_Pool::Stowed);
     }
@@ -71,7 +71,7 @@ class UMars_AutoTest_Flame_ASnuffsFlameGoesOutWhenStowedAndStaysOutWhenSelected 
     UFUNCTION()
     private void Check_PoolPassedHeld(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
-        const auto LastPool = Get_FlameState().LastPool;
+        const auto LastPool = Get_FlameLocal().LastPool;
         auto Res = OutResult;
         Res.Set(_FlameItem.Get_Mount() == EMars_WorldItem_Mount::Held && LastPool.IsSet() && LastPool.GetValue() == EMars_Flame_Pool::Held);
     }

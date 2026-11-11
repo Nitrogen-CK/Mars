@@ -15,22 +15,24 @@ class UMars_Processor_Flame_Pool : UCk_Processor_Script_Base_UE
 
     void ForEachEntity(FCk_Time InDeltaT, FCk_Handle& InHandle, FMars_Fragment_Flame& InState)
     {
+        auto& Local = InHandle.Get_Fragment(FMars_Fragment_Flame_Local);
         auto Self = InHandle.As_Flame();
         const auto& Params = Self.Get_Fragment(FMars_Fragment_Flame_Params);
         const auto Pool = Self.Get_LightPool();
 
-        const auto IsNewPool = InState.LastPool.IsSet() && InState.LastPool.GetValue() != Pool;
+        const auto IsNewPool = Local.LastPool.IsSet() && Local.LastPool.GetValue() != Pool;
         const auto SnuffsHere = Pool == EMars_Flame_Pool::Stowed && Params.OnStow == EMars_Flame_OnStow::Snuffs;
         // A flame goes out where its ignition is decided.
         if (IsNewPool && SnuffsHere && InState.Ignition == EMars_Flame_Ignition::Lit && utils_net::Get_HasAuthority(InHandle))
         {
             const auto Before = utils_flame::Make_Reading(Params, InState);
             InState.Ignition = EMars_Flame_Ignition::Snuffed;
-            InState.Condition = utils_flame::Get_Condition(Params, InState);
+            InState.Condition = utils_flame::Get_Condition(Params, InState, Local);
+            utils_flame::Mark_LedgerDirty(InHandle, Params);
             utils_flame::Apply_Changes(Self, Before, utils_flame::Make_Reading(Params, InState));
         }
 
-        InState.LastPool = TOptional<EMars_Flame_Pool>(Pool);
+        Local.LastPool = TOptional<EMars_Flame_Pool>(Pool);
 
         if (Self.Has_Fragment(FMars_Fragment_Flame_LightProbes) == false)
         { return; }

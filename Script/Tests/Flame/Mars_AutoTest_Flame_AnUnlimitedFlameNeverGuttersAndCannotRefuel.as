@@ -89,13 +89,13 @@ class UMars_AutoTest_Flame_AnUnlimitedFlameNeverGuttersAndCannotRefuel : UCk_Aut
     UFUNCTION()
     private void Step_AssertUnburnt(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        const auto& State = _Flame.Get_Fragment(FMars_Fragment_Flame);
+        const auto& Local = _Flame.Get_Fragment(FMars_Fragment_Flame_Local);
         Assert_True(_Flame.Get_IsLit(), "it is still lit");
         Assert_True(_Flame.Get_Condition() == EMars_Flame_Condition::Steady, "it stays steady");
         Assert_Equals_Float(_Flame.Get_FuelFraction(), 1.0f, 0.0001f, "it stays full");
         Assert_False(_Flame.Get_CanRefuel(), "it still cannot be refuelled");
         Assert_Equals_Int(_Flame.Get_MeasuresLeft(), 0, "it still counts no measures");
-        Assert_True(State.MeasureElapsed == 0.0f, "its measure clock never ran");
+        Assert_True(Local.MeasureElapsed == 0.0f, "its measure clock never ran");
         Assert_Equals_Float(_Flame.Get_LightRadius(), 500.0f, 0.01f, "it lights its World radius");
         Assert_Equals_Int(_MeasuresEdges, 0, "OnMeasuresChanged never fired");
         Assert_Equals_Int(_ConditionEdges, 0, "OnConditionChanged never fired");

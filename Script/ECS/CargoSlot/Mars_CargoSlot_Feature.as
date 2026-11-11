@@ -83,8 +83,9 @@ struct FMars_CargoSlot_Spec
     UPROPERTY()
     FMars_InteractPrompt_Spec Prompt;
 
-    // The slot entity's own replication, which the inventory and the refusal ledger follow. A replicated inventory on an
-    // entity without a replication driver cannot create an item.
+    // The inventory's replication: the slot entity's own. A replicated inventory on an entity without a replication
+    // driver cannot create an item. (The refusal ledger always replicates: on an entity without a driver it simply
+    // has nowhere to go.)
     UPROPERTY()
     ECk_Replication Replication = ECk_Replication::DoesNotReplicate;
 }

@@ -127,6 +127,11 @@ class UMars_AutoTestRig_FlameItem : UMars_AutoTestRig_Carrier
         return Get_Flame().Get_Fragment(FMars_Fragment_Flame);
     }
 
+    protected FMars_Fragment_Flame_Local Get_FlameLocal() const
+    {
+        return Get_Flame().Get_Fragment(FMars_Fragment_Flame_Local);
+    }
+
     // The flame world item is constructed, composed the Flame feature and its holder holds its item.
     UFUNCTION()
     protected void Check_FlameReady(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)

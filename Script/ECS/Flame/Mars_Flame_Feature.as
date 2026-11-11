@@ -6,6 +6,13 @@
 // to an Open flame. A MechanismSource on the flame's own entity is asserted while it is lit. The kernel owns the fuel
 // clock, the ignite rules and the light radius (the gameplay sphere whatever reads the light overlaps); it knows no
 // light component, mesh, colour or words (the entity scripts draw it, the control layer words it).
+//
+// Stance A, following its host. FMars_Fragment_Flame (ignition, measures left, condition) is the replicated ledger, written
+// only by the authority's processors and utils_flame::Add; on a host with no replication driver it is local. The fuel
+// clock, the ignite rules and the source run only with authority. The clock's progress, the last pool and the probes
+// (FMars_Fragment_Flame_Local, the light probes) are each machine's own: the pool and the probes follow this machine's
+// mount. A client mirrors the ledger (UMars_Processor_Flame_Mirror) and raises the signals the authority raised. A player
+// acts on a flame through Cue.Mars.Flame.Act (utils_flame::Request_ActFor), which only the authority resolves.
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
@@ -99,6 +106,19 @@ enum EMars_Flame_Action
     None
 }
 
+// What a player asks of a flame through FMars_Request_Flame_Act, resolved by the authority from the initiator's side.
+enum EMars_Flame_Verb
+{
+    // The initiator's held flame lights this one.
+    Light,
+    // This flame lights the initiator's held flame.
+    TakeLight,
+    // This flame is the initiator's held flame: lit snuffs, unlit lights itself.
+    Toggle,
+    // The initiator's held tallow feeds this flame, the refuel target of its hotbar, and is used up.
+    Refuel
+}
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Spec
 //--------------------------------------------------------------------------------------------------------------------------
@@ -181,6 +201,10 @@ struct FMars_Flame_Spec
     // Optional: the interactable whose Use row lights this flame or takes light from it (fixtures). Invalid: none.
     UPROPERTY()
     FCk_Handle_Interactable Interactable;
+
+    // The host's own replication, which the ledger follows. Only a host with a replication driver replicates.
+    UPROPERTY()
+    ECk_Replication Replication = ECk_Replication::DoesNotReplicate;
 }
 
 // The fuel's rules when it has fuel, positive Held and World radii, a positive Stowed radius when it stays lit stowed, and
@@ -234,13 +258,17 @@ struct FMars_Fragment_Flame_Params
     // Invalid: none.
     UPROPERTY()
     FCk_Handle_Interactable Interactable;
+
+    // The ledger's replication.
+    UPROPERTY()
+    ECk_Replication Replication = ECk_Replication::DoesNotReplicate;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 // State
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Written only by the Flame processors and utils_flame::Add.
+// The ledger, replicated with its host: written only by the authority's Flame processors and utils_flame::Add.
 struct FMars_Fragment_Flame
 {
     UPROPERTY()
@@ -250,12 +278,16 @@ struct FMars_Fragment_Flame
     UPROPERTY()
     int32 MeasuresLeft = 0;
 
-    // Seconds the burning measure has burnt.
-    UPROPERTY()
-    float32 MeasureElapsed = 0.0f;
-
     UPROPERTY()
     EMars_Flame_Condition Condition = EMars_Flame_Condition::Steady;
+}
+
+// This machine's own: written only by the Flame processors and utils_flame::Add, never replicated.
+struct FMars_Fragment_Flame_Local
+{
+    // Seconds the burning measure has burnt. Only the authority's clock advances it; it stays 0 on a client.
+    UPROPERTY()
+    float32 MeasureElapsed = 0.0f;
 
     // The pool of the last Pool pass; unset before the first. The Snuffs rule fires on the edge into Stowed.
     UPROPERTY()
@@ -264,7 +296,14 @@ struct FMars_Fragment_Flame
     // The same-entity MechanismSource's last output; unset before the first Source pass or without a source.
     UPROPERTY()
     TOptional<EMars_MechanismSource_Output> LastSourceOutput;
+
+    // A client's mirror: the reading of the ledger it last reconciled, seeded with the one it composed with.
+    UPROPERTY()
+    FMars_Flame_Reading Last;
 }
+
+// Present until UMars_Processor_Flame_Mirror has run once for the flame.
+struct FMars_Tag_Flame_NeedsMirror {}
 
 // Present while Lit with fuel left (or unlimited fuel); gates UMars_Processor_Flame_Burn.
 struct FMars_Tag_Flame_Burning {}
@@ -371,9 +410,33 @@ struct FMars_Request_Flame_Refuel
     }
 }
 
-// Drain order: every refuel, then the latest ignition (so a refuel and a Lit in one frame light it).
+// A player's verb at this flame (EMars_Flame_Verb), checked again on the authority before it becomes an ignition or a
+// refuel. Reaches the authority through Cue.Mars.Flame.Act; a machine without authority drops it.
+struct FMars_Request_Flame_Act
+{
+    // The player's entity: whose hand and hotbar the verb reads.
+    UPROPERTY()
+    FCk_Handle Initiator;
+
+    UPROPERTY()
+    EMars_Flame_Verb Verb = EMars_Flame_Verb::Toggle;
+
+    FMars_Request_Flame_Act() {}
+
+    FMars_Request_Flame_Act(FCk_Handle InInitiator, EMars_Flame_Verb InVerb)
+    {
+        Initiator = InInitiator;
+        Verb = InVerb;
+    }
+}
+
+// Drain order: every act (each becomes a refuel or an ignition), then every refuel, then the latest ignition (so a refuel
+// and a Lit in one frame light it).
 struct FMars_Fragment_Flame_Requests
 {
+    UPROPERTY()
+    TArray<FMars_Request_Flame_Act> ActRequests;
+
     UPROPERTY()
     TArray<FMars_Request_Flame_Refuel> RefuelRequests;
 

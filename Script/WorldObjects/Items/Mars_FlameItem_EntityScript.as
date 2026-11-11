@@ -2,7 +2,8 @@
 // the Flame kernel from the trait's Spec, puts a flame node at the subclass's height and draws what the kernel decides
 // through a UMars_FlameDressing, following the item from the floor to the hand to the belt to a hook. The kernel owns the
 // fuel clock and the pools; a subclass owns its look, its flame height, whether its body shows while stowed, and anything
-// else it dresses (DoOnFlameComposed).
+// else it dresses (DoOnFlameComposed). The flame's ledger replicates with the world item's root (the item's own stance);
+// the dressing and the probes are built on every machine and follow the ledger and this machine's mount.
 class UMars_FlameItem_EntityScript : UMars_WorldItem_EntityScript
 {
     protected FCk_Handle_Flame _Flame;
@@ -30,8 +31,11 @@ class UMars_FlameItem_EntityScript : UMars_WorldItem_EntityScript
             return ECk_EntityScript_ConstructionFlow::Finished;
         }
 
+        auto FlameSpec = FlameTrait.Spec;
+        FlameSpec.Replication = _Replication;
+
         // A rejected spec already ensured in utils_flame::Add; the item then stays dark.
-        _Flame = utils_flame::Add(InHandle, FlameTrait.Spec);
+        _Flame = utils_flame::Add(InHandle, FlameSpec);
         if (ck::Is_NOT_Valid(_Flame))
         { return ECk_EntityScript_ConstructionFlow::Finished; }
 

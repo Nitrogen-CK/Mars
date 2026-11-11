@@ -46,7 +46,7 @@ namespace utils_key_lock
 
         // A client's copy can receive the replicated ledger before it composes: it is already there then.
         if (InHandle.Has_Fragment(FMars_Fragment_KeyLock_Net) == false)
-        { InHandle.Add_Fragment(FMars_Fragment_KeyLock_Net(), InSpec.Replication); }
+        { InHandle.Add_Fragment(FMars_Fragment_KeyLock_Net(), ECk_Replication::Replicates); }
 
         return InHandle.As_KeyLock();
     }

@@ -14,20 +14,30 @@ namespace utils_flame
         Params.OnStow = InSpec.OnStow;
         Params.Radius = InSpec.Radius;
         Params.Interactable = InSpec.Interactable;
+        Params.Replication = InSpec.Replication;
 
-        auto State = FMars_Fragment_Flame();
-        State.Ignition = InSpec.StartIgnition;
+        auto Local = FMars_Fragment_Flame_Local();
+        auto Ledger = FMars_Fragment_Flame();
+        Ledger.Ignition = InSpec.StartIgnition;
         if (InSpec.Fuel.IsSet())
         {
             const auto& Fuel = InSpec.Fuel.GetValue();
-            State.MeasuresLeft = Fuel.StartMeasures.IsSet() ? Fuel.StartMeasures.GetValue() : Fuel.Measures;
+            Ledger.MeasuresLeft = Fuel.StartMeasures.IsSet() ? Fuel.StartMeasures.GetValue() : Fuel.Measures;
         }
-        State.Condition = Get_Condition(Params, State);
+        Ledger.Condition = Get_Condition(Params, Ledger, Local);
 
         InHandle.Add_Fragment(FMars_Feature_Flame());
         InHandle.Add_Fragment(Params);
-        InHandle.Add_Fragment(State);
-        if (Get_IsBurning(Params, State))
+
+        // A client's copy can receive the replicated ledger before it composes: the arrived ledger stands then.
+        if (InHandle.Has_Fragment(FMars_Fragment_Flame) == false)
+        { InHandle.Add_Fragment(Ledger, InSpec.Replication); }
+
+        const auto Composed = InHandle.Get_Fragment(FMars_Fragment_Flame);
+        Local.Last = Make_Reading(Params, Composed);
+        InHandle.Add_Fragment(Local);
+        InHandle.Add_Fragment(FMars_Tag_Flame_NeedsMirror());
+        if (Get_IsBurning(Params, Composed))
         { InHandle.Add_Fragment(FMars_Tag_Flame_Burning()); }
 
         auto Root = InHandle.As_Transform(ECk_SanityCheck::UnChecked);
@@ -96,7 +106,8 @@ namespace utils_flame
 
     // Unlimited fuel is always Steady; measured fuel is Spent with none left and Guttering through the last GutterSeconds
     // of the last measure.
-    EMars_Flame_Condition Get_Condition(const FMars_Fragment_Flame_Params& InParams, const FMars_Fragment_Flame& InState)
+    EMars_Flame_Condition Get_Condition(const FMars_Fragment_Flame_Params& InParams, const FMars_Fragment_Flame& InState,
+                                        const FMars_Fragment_Flame_Local& InLocal)
     {
         if (InParams.Fuel.IsSet() == false)
         { return EMars_Flame_Condition::Steady; }
@@ -106,7 +117,7 @@ namespace utils_flame
 
         const auto& Fuel = InParams.Fuel.GetValue();
         const auto IsLastMeasure = InState.MeasuresLeft == 1;
-        const auto SecondsLeftInMeasure = Fuel.SecondsPerMeasure - InState.MeasureElapsed;
+        const auto SecondsLeftInMeasure = Fuel.SecondsPerMeasure - InLocal.MeasureElapsed;
         if (IsLastMeasure && SecondsLeftInMeasure <= Fuel.GutterSeconds)
         { return EMars_Flame_Condition::Guttering; }
 
@@ -133,7 +144,14 @@ namespace utils_flame
         return Reading;
     }
 
-    // The processors' one tail: keeps the Burning tag in step with InAfter and broadcasts each reading that changed
+    // The authority's processors call this after every ledger write; a local ledger has no copy to send it to.
+    void Mark_LedgerDirty(FCk_Handle& InHandle, const FMars_Fragment_Flame_Params& InParams)
+    {
+        if (InParams.Replication == ECk_Replication::Replicates)
+        { InHandle.Request_MarkReplicationDirty(FMars_Fragment_Flame); }
+    }
+
+    // The processors' and the mirror's one tail: keeps the Burning tag in step with InAfter and broadcasts each reading that changed
     // across the pass, measures first, then the condition, then lit.
     void Apply_Changes(FCk_Handle_Flame& InFlame, const FMars_Flame_Reading& InBefore, const FMars_Flame_Reading& InAfter)
     {
@@ -155,6 +173,22 @@ namespace utils_flame
 
         if (InAfter.IsLit != InBefore.IsLit)
         { Signals.OnLitChanged.Broadcast(InFlame, InAfter.IsLit); }
+    }
+
+    // InInitiator asks InFlame for InVerb. A flame whose host has a replication driver is reached through
+    // Cue.Mars.Flame.Act, which only its authority applies; a local flame has no other machine to reach and takes the Act
+    // request directly. Either way the ignition or the fuel that follows is what the caller sees.
+    void Request_ActFor(FCk_Handle_Flame& InFlame, FCk_Handle InInitiator, EMars_Flame_Verb InVerb)
+    {
+        const auto Request = FMars_Request_Flame_Act(InInitiator, InVerb);
+        if (utils_entity_replication_driver::Has(InFlame))
+        {
+            utils_cue_generic::Request_ExecuteCue(InFlame, GameplayTags::Cue_Mars_Flame_Act, Request,
+                ECk_Cue_ReliabilityPolicy::Reliable, ECk_Cue_MulticastPolicy::ServerOnly);
+            return;
+        }
+
+        InFlame.Request_Act(Request);
     }
 
     // A carried flame InHotbar can refuel, the emptiest first (lowest index on a tie). Invalid when none can take fuel.
@@ -214,8 +248,7 @@ namespace utils_flame
 // The flame an item's body carries: a Persistent item whose world item composed the Flame feature. Invalid otherwise.
 mixin FCk_Handle_Flame TryGet_Flame(const FCk_Handle_Item& Self)
 {
-    // Its verbs are applied by the authority: a machine without authority over the item is offered none.
-    if (ck::Is_NOT_Valid(Self) || Self.Has_PersistentWorldItem() == false || utils_net::Get_HasAuthority(Self) == false)
+    if (ck::Is_NOT_Valid(Self) || Self.Has_PersistentWorldItem() == false)
     { return FCk_Handle_Flame(); }
 
     const auto WorldItem = Self.Get_PersistentWorldItem();
@@ -274,8 +307,9 @@ mixin float32 Get_FuelFraction(const FCk_Handle_Flame& Self)
     if (State.MeasuresLeft <= 0)
     { return 0.0f; }
 
+    // A client's clock does not run: its fraction steps by whole measures.
     const auto& Fuel = Params.Fuel.GetValue();
-    const auto Left = float32(State.MeasuresLeft) - State.MeasureElapsed / Fuel.SecondsPerMeasure;
+    const auto Left = float32(State.MeasuresLeft) - Self.Get_Fragment(FMars_Fragment_Flame_Local).MeasureElapsed / Fuel.SecondsPerMeasure;
     return Math::Clamp(Left / float32(Fuel.Measures), 0.0f, 1.0f);
 }
 
@@ -450,6 +484,13 @@ mixin void Request_Refuel(FCk_Handle_Flame& Self, const FMars_Request_Flame_Refu
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Flame_Requests);
     Requests.RefuelRequests.Add(InRequest);
+}
+
+// The authority's own caller; a player's machine goes through utils_flame::Request_ActFor.
+mixin void Request_Act(FCk_Handle_Flame& Self, const FMars_Request_Flame_Act& InRequest)
+{
+    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Flame_Requests);
+    Requests.ActRequests.Add(InRequest);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

@@ -72,8 +72,9 @@ struct FMars_LanternHook_Spec
     UPROPERTY()
     FCk_Handle_Interactable Interactable;
 
-    // The host's own replication, which the inventory and the refusal ledger follow. Only a host with a replication
-    // driver replicates; a replicated inventory on a host without one cannot create an item.
+    // The inventory's replication: the host's own. Only a host with a replication driver replicates; a replicated
+    // inventory on a host without one cannot create an item. (The refusal ledger always replicates: on a host
+    // without a driver it simply has nowhere to go.)
     UPROPERTY()
     ECk_Replication Replication = ECk_Replication::DoesNotReplicate;
 }

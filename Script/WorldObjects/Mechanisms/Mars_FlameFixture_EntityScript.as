@@ -6,7 +6,10 @@ UCLASS(Abstract)
 class UMars_FlameFixture_EntityScript : UCk_GenericEntityScript_UE
 {
     default _ShowInPlaceActors = false;
-    default _Replication = ECk_Replication::DoesNotReplicate;
+    // Stance A: placed by the authority's spawner; the fixture, its root transform and the flame's ledger replicate; the
+    // meshes, the flame node, the interactable, the source and the dressing are built on every machine. A client lights,
+    // or takes a light, through the flame's Act cue.
+    default _Replication = ECk_Replication::Replicates;
 
     UPROPERTY(ExposeOnSpawn)
     FTransform SpawnTransform = FTransform::Identity;
@@ -35,7 +38,7 @@ class UMars_FlameFixture_EntityScript : UCk_GenericEntityScript_UE
     UFUNCTION(BlueprintOverride)
     ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
     {
-        auto Root = utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::DoesNotReplicate);
+        auto Root = utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::Replicates);
         utils_entity_tag::Add(InHandle, n"TAG_MarsFlameFixture");
 
         AddVisuals(Root);
@@ -45,6 +48,7 @@ class UMars_FlameFixture_EntityScript : UCk_GenericEntityScript_UE
 
         Flame.StartIgnition = StartLit;
         Flame.Interactable = AddInteractable(Root);
+        Flame.Replication = _Replication;
 
         // A rejected spec already ensured in utils_flame::Add.
         _Flame = utils_flame::Add(InHandle, Flame);
