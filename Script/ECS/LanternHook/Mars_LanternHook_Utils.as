@@ -9,10 +9,10 @@ class UMars_LanternHook_AcceptPolicy : UObject
 
 namespace utils_lantern_hook
 {
-    // A capacity-1 Inventory.Mars.LanternHook inventory (accept policy CDO) on InHandle whose lantern rides InHandle's
+    // A capacity-1 Inventory.Mars.LanternHook inventory (accept policy CDO, InSpec.Replication) on InHandle whose lantern rides InHandle's
     // AttachPoint.Mars.Hook (the caller's HangNode) at HangOffset, the hook's feature on it, and the caller's Interactable
-    // recorded for the prompt. InHandle is the carrier a hung lantern mounts on: it publishes no other attach point. A spec
-    // that fails Validate() ensures and adds nothing.
+    // recorded for the prompt, with the hook's replicated refusal ledger. InHandle is the carrier a hung lantern mounts on:
+    // it publishes no other attach point. A spec that fails Validate() ensures and adds nothing.
     FCk_Handle_LanternHook Add(FCk_Handle& InHandle, FMars_LanternHook_Spec InSpec)
     {
         const auto Validation = InSpec.Validate();
@@ -31,7 +31,7 @@ namespace utils_lantern_hook
         InventoryParams.Set_StackingPolicy(ECk_Inventory_StackingPolicy::NoStacking);
         InventoryParams.Set_PersistContents(ECk_EnableDisable::Disable);
 
-        auto Inventory = utils_inventory_data_only::Add(InHandle, InventoryParams, ECk_Replication::DoesNotReplicate);
+        auto Inventory = utils_inventory_data_only::Add(InHandle, InventoryParams, InSpec.Replication);
         utils_world_item::Add_MountedInventory(Inventory, FMars_Fragment_MountedInventory(EMars_WorldItem_MountRule::PointAtOffset,
             HookPoint, InSpec.HangOffset));
 
@@ -46,7 +46,28 @@ namespace utils_lantern_hook
 
         InHandle.Add_Fragment(FMars_Feature_LanternHook());
         InHandle.Add_Fragment(State);
+
+        // A client's copy can receive the replicated ledger before it composes: it is already there then.
+        if (InHandle.Has_Fragment(FMars_Fragment_LanternHook_Net) == false)
+        { InHandle.Add_Fragment(FMars_Fragment_LanternHook_Net(), InSpec.Replication); }
+
         return InHandle.As_LanternHook();
+    }
+
+    // InInitiator's interaction asks InHook for InAction. A hook with a replication driver is reached through
+    // Cue.Mars.LanternHook.Act, which only its authority applies; a local hook has no other machine to reach and takes the
+    // Act request directly. Either way the effect, or the refusal in the hook's ledger, is what the caller waits on.
+    void Request_ActFor(FCk_Handle_LanternHook& InHook, FCk_Handle InInitiator, EMars_LanternHook_Action InAction)
+    {
+        const auto Request = FMars_Request_LanternHook_Act(InInitiator, InAction);
+        if (utils_entity_replication_driver::Has(InHook))
+        {
+            utils_cue_generic::Request_ExecuteCue(InHook, GameplayTags::Cue_Mars_LanternHook_Act, Request,
+                ECk_Cue_ReliabilityPolicy::Reliable, ECk_Cue_MulticastPolicy::ServerOnly);
+            return;
+        }
+
+        InHook.Request_Act(Request);
     }
 
     // The hook's one interact target: Use with the caller's prompt (a placeholder the hook's prompt processor rewrites
@@ -64,11 +85,10 @@ namespace utils_lantern_hook
     }
 
     // The accept rule the hook's inventory enforces: an item with UMars_ItemTrait_Lantern whose body is its Persistent
-    // world item. Its verbs are applied by the authority: a machine without authority over the item is offered none.
+    // world item. Identity only, so every machine reads the same answer; the authority applies the verbs.
     bool Get_IsLantern(const FCk_Handle_Item& InItem)
     {
-        return ck::IsValid(InItem) && InItem.Has_LanternTrait() && InItem.Has_PersistentWorldItem()
-            && utils_net::Get_HasAuthority(InItem);
+        return ck::IsValid(InItem) && InItem.Has_LanternTrait() && InItem.Has_PersistentWorldItem();
     }
 
 }
@@ -107,6 +127,24 @@ mixin FCk_Handle_Flame Get_Flame(const FCk_Handle_LanternHook& Self)
     { return FCk_Handle_Flame(); }
 
     return Item.TryGet_Flame();
+}
+
+// The Acts the authority has refused, as this machine last received it.
+mixin int32 Get_RefusalSerial(const FCk_Handle_LanternHook& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_LanternHook_Net).RefusalSerial;
+}
+
+// Why the latest refused Act was refused; meaningful once Get_RefusalSerial is above 0.
+mixin EMars_Interaction_FailReason Get_LastRefusal(const FCk_Handle_LanternHook& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_LanternHook_Net).LastRefusal;
+}
+
+// Whose Act was refused last; invalid before any, and on a client while that entity is not resolved there.
+mixin FCk_Handle Get_LastRefused(const FCk_Handle_LanternHook& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_LanternHook_Net).LastRefused;
 }
 
 mixin bool Get_IsOccupied(const FCk_Handle_LanternHook& Self)
@@ -194,6 +232,13 @@ mixin void Request_Refuel(FCk_Handle_LanternHook& Self, const FMars_Request_Lant
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_LanternHook_Requests);
     Requests.RefuelRequests.Add(InRequest);
+}
+
+// The authority-side Act; a machine acting for a player goes through utils_lantern_hook::Request_ActFor.
+mixin void Request_Act(FCk_Handle_LanternHook& Self, const FMars_Request_LanternHook_Act& InRequest)
+{
+    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_LanternHook_Requests);
+    Requests.ActRequests.Add(InRequest);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

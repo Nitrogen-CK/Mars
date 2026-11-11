@@ -5,7 +5,10 @@
 class UMars_KeyLock_EntityScript : UCk_GenericEntityScript_UE
 {
     default _ShowInPlaceActors = true;
-    default _Replication = ECk_Replication::DoesNotReplicate;
+    // Stance A: placed by the authority's spawner; the lock, its root transform, its inventory and its refusal ledger
+    // replicate; the key mount, the meshes, the interactable and the key visual are built on every machine. A client
+    // inserts or takes through the lock's Act cue.
+    default _Replication = ECk_Replication::Replicates;
 
     UPROPERTY(ExposeOnSpawn)
     FTransform SpawnTransform = FTransform::Identity;
@@ -26,7 +29,7 @@ class UMars_KeyLock_EntityScript : UCk_GenericEntityScript_UE
     UFUNCTION(BlueprintOverride)
     ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
     {
-        auto LockRoot = utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::DoesNotReplicate);
+        auto LockRoot = utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::Replicates);
         utils_entity_tag::Add(InHandle, n"TAG_MarsKeyLock");
 
         // Pitch -90 turns the key's +X (its shaft) to the plate's -Z: into the keyhole.
@@ -38,6 +41,7 @@ class UMars_KeyLock_EntityScript : UCk_GenericEntityScript_UE
         Spec.Release = Release;
         Spec.KeyMount = KeyMount;
         Spec.Interactable = AddInteractable(LockRoot);
+        Spec.Replication = _Replication;
         utils_key_lock::Add(InHandle, Spec);
 
         utils_mechanism_source::TryAdd(InHandle, Source);

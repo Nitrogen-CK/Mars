@@ -4,6 +4,12 @@
 // interactable's Use target hangs the held lantern, takes the hung one back, or feeds it the held tallow. Holding a lit
 // lantern asserts an optional MechanismSource on the same entity (UMars_Processor_LanternHook_Sync), so "light the two
 // sconces" is a Sink rule over two hooks. The KeyLock shape for a lantern; nothing here reads "the local player".
+//
+// Stance: on a replicated host the inventory replicates with it, and so does the refusal ledger
+// (FMars_Fragment_LanternHook_Net). A machine acts through utils_lantern_hook::Request_ActFor, which fires
+// Cue.Mars.LanternHook.Act at the host; only the authority hangs, takes or refuels (the drain drops Hang, Take, Refuel and
+// Act elsewhere). The hung lantern mounts on each machine's own hang node from the replicated contents; LastSeen and the
+// signals follow them on every machine; only the authority drives the MechanismSource.
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
@@ -65,6 +71,11 @@ struct FMars_LanternHook_Spec
     // The hook's interactable, built by the caller with utils_lantern_hook::Make_InteractTarget as its one target.
     UPROPERTY()
     FCk_Handle_Interactable Interactable;
+
+    // The host's own replication, which the inventory and the refusal ledger follow. Only a host with a replication
+    // driver replicates; a replicated inventory on a host without one cannot create an item.
+    UPROPERTY()
+    ECk_Replication Replication = ECk_Replication::DoesNotReplicate;
 }
 
 mixin FMars_Validation Validate(const FMars_LanternHook_Spec& Self)
@@ -105,6 +116,40 @@ struct FMars_Fragment_LanternHook
     // What the sync last asked of the same-entity MechanismSource; unset before its first pass.
     UPROPERTY()
     TOptional<EMars_MechanismSource_Output> LastOutput;
+}
+
+// The authority's refusal ledger on the hook, replicated with it. The serial advances once per refused Act, so an
+// initiator that recorded it before its cue knows a newer refusal is about its own. Written only by the request drain.
+struct FMars_Fragment_LanternHook_Net
+{
+    UPROPERTY()
+    int32 RefusalSerial = 0;
+
+    UPROPERTY()
+    EMars_Interaction_FailReason LastRefusal = EMars_Interaction_FailReason::ActionBlocked;
+
+    // The refused initiator, a player's entity. On a client it may arrive unresolved: that only means "not known here yet".
+    UPROPERTY()
+    FCk_Handle LastRefused;
+}
+
+// The Act whose transfer is in flight on the authority: who asked, so a refused transfer names them. Local; written only
+// by the request drain.
+struct FMars_Fragment_LanternHook_PendingAct
+{
+    UPROPERTY()
+    FCk_Handle Initiator;
+
+    UPROPERTY()
+    FCk_Handle_Item Item;
+
+    FMars_Fragment_LanternHook_PendingAct() {}
+
+    FMars_Fragment_LanternHook_PendingAct(const FCk_Handle& InInitiator, const FCk_Handle_Item& InItem)
+    {
+        Initiator = InInitiator;
+        Item = InItem;
+    }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -176,7 +221,26 @@ struct FMars_Request_LanternHook_Refuel
     }
 }
 
-// Drain order Hang -> Take -> Refuel (see UMars_Processor_LanternHook_HandleRequests).
+// What Initiator's interaction asks of the hook, resolved on the authority from the initiator's side: refused
+// (ActionBlocked) unless Get_ActionFor(Initiator) is still Action there. The spawn params of Cue.Mars.LanternHook.Act.
+struct FMars_Request_LanternHook_Act
+{
+    UPROPERTY()
+    FCk_Handle Initiator;
+
+    UPROPERTY()
+    EMars_LanternHook_Action Action = EMars_LanternHook_Action::Hang;
+
+    FMars_Request_LanternHook_Act() {}
+
+    FMars_Request_LanternHook_Act(const FCk_Handle& InInitiator, EMars_LanternHook_Action InAction)
+    {
+        Initiator = InInitiator;
+        Action = InAction;
+    }
+}
+
+// Drain order Hang -> Take -> Refuel -> Act (see UMars_Processor_LanternHook_HandleRequests).
 struct FMars_Fragment_LanternHook_Requests
 {
     UPROPERTY()
@@ -187,4 +251,7 @@ struct FMars_Fragment_LanternHook_Requests
 
     UPROPERTY()
     TArray<FMars_Request_LanternHook_Refuel> RefuelRequests;
+
+    UPROPERTY()
+    TArray<FMars_Request_LanternHook_Act> ActRequests;
 }

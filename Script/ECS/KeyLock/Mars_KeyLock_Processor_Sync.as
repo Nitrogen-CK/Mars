@@ -1,6 +1,7 @@
-// Polls each lock's key against the last pass (the CargoSlot sync shape). A change destroys the old key visual, spawns one
-// for the new key (a Visual-mode world item on the KeyMount node, arriving from where a fresh insert said it was), drives
-// a MechanismSource on the same entity (asserted while a key is in), then broadcasts OnKeyChanged.
+// Polls each lock's key against the last pass (the CargoSlot sync shape), on every machine from the contents it sees. A
+// change destroys the old key visual, spawns one for the new key (a Visual-mode world item on the KeyMount node, arriving
+// from where this machine's ExpectArrival said it was), drives a MechanismSource on the same entity on the authority only
+// (asserted while a key is in), then broadcasts OnKeyChanged.
 class UMars_Processor_KeyLock_Sync : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -34,7 +35,7 @@ class UMars_Processor_KeyLock_Sync : UCk_Processor_Script_Base_UE
         }
 
         auto Source = InHandle.As_MechanismSource(ECk_SanityCheck::UnChecked);
-        if (ck::IsValid(Source))
+        if (ck::IsValid(Source) && utils_net::Get_HasAuthority(InHandle))
         {
             const auto Output = ck::IsValid(Now) ? EMars_MechanismSource_Output::Asserted : EMars_MechanismSource_Output::Deasserted;
             Source.Request_SetOutput(utils_mechanism_source::Make_SetOutput(Output));

@@ -314,9 +314,9 @@ namespace utils_anchor
 class UMars_Anchor_RestSconce_EntityScript : UCk_GenericEntityScript_UE
 {
     default _ShowInPlaceActors = false;
-    // Stance C until the sconce it hangs replicates: a Local row, spawned as the anchor's own child and built only where
-    // the anchor resolves (the authority), so a client has no rest sconce.
-    default _Replication = ECk_Replication::DoesNotReplicate;
+    // Stance A through its child: spawned by the authority's anchor under the replicated spawn owner; its root transform
+    // replicates; its sconce spawns under it on the authority and reaches clients as its child.
+    default _Replication = ECk_Replication::Replicates;
 
     UPROPERTY(ExposeOnSpawn)
     FTransform SpawnTransform = FTransform::Identity;
@@ -327,7 +327,7 @@ class UMars_Anchor_RestSconce_EntityScript : UCk_GenericEntityScript_UE
     UFUNCTION(BlueprintOverride)
     ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
     {
-        utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::DoesNotReplicate);
+        utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::Replicates);
         auto SconceParams = UMars_LanternSconce_EntityScript::Params();
         SconceParams.SpawnTransform = FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, 140.0)) * utils_anchor::Get_PocketBackWall(SpawnTransform, Anchor.SpanCm);
         utils_entity_script::Request_SpawnEntity(InHandle, UMars_LanternSconce_EntityScript, SconceParams);

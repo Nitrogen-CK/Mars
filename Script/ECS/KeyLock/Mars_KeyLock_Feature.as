@@ -3,6 +3,11 @@
 // key or takes the inserted one back. Holding its key is being unlocked: a MechanismSource on the same entity asserts while
 // it does (UMars_Processor_KeyLock_Sync), so doors that need several keys are Sink rules over several locks. The CargoSlot
 // shape for a keyhole; nothing here reads "the local player".
+//
+// Stance: on a replicated host the inventory replicates with it, and so does the refusal ledger
+// (FMars_Fragment_KeyLock_Net). A machine acts through utils_key_lock::Request_ActFor, which fires Cue.Mars.KeyLock.Act at
+// the host; only the authority moves a key (the drain drops Insert, Take and Act elsewhere). The key visual, LastSeen and
+// the signals follow the replicated contents on every machine; only the authority drives the MechanismSource.
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
@@ -71,6 +76,11 @@ struct FMars_KeyLock_Spec
     // The keyhole's interactable, built by the caller with utils_key_lock::Make_InteractTarget as its one target.
     UPROPERTY()
     FCk_Handle_Interactable Interactable;
+
+    // The host's own replication, which the inventory and the refusal ledger follow. Only a host with a replication
+    // driver replicates; a replicated inventory on a host without one cannot create an item.
+    UPROPERTY()
+    ECk_Replication Replication = ECk_Replication::DoesNotReplicate;
 }
 
 mixin FMars_Validation Validate(const FMars_KeyLock_Spec& Self)
@@ -130,6 +140,40 @@ struct FMars_Fragment_KeyLock
     TOptional<FMars_WorldItem_PendingArrival> PendingArrival;
 }
 
+// The authority's refusal ledger on the lock, replicated with it. The serial advances once per refused Act, so an
+// initiator that recorded it before its cue knows a newer refusal is about its own. Written only by the request drain.
+struct FMars_Fragment_KeyLock_Net
+{
+    UPROPERTY()
+    int32 RefusalSerial = 0;
+
+    UPROPERTY()
+    EMars_Interaction_FailReason LastRefusal = EMars_Interaction_FailReason::ActionBlocked;
+
+    // The refused initiator, a player's entity. On a client it may arrive unresolved: that only means "not known here yet".
+    UPROPERTY()
+    FCk_Handle LastRefused;
+}
+
+// The Act whose transfer is in flight on the authority: who asked, so a refused transfer names them. Local; written only
+// by the request drain.
+struct FMars_Fragment_KeyLock_PendingAct
+{
+    UPROPERTY()
+    FCk_Handle Initiator;
+
+    UPROPERTY()
+    FCk_Handle_Item Item;
+
+    FMars_Fragment_KeyLock_PendingAct() {}
+
+    FMars_Fragment_KeyLock_PendingAct(const FCk_Handle& InInitiator, const FCk_Handle_Item& InItem)
+    {
+        Initiator = InInitiator;
+        Item = InItem;
+    }
+}
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Signals
 //--------------------------------------------------------------------------------------------------------------------------
@@ -158,21 +202,29 @@ struct FMars_Request_KeyLock_Insert
     UPROPERTY()
     FCk_Handle_Item Item;
 
-    // Where the key visually is now; its visual in the lock lerps in from there. Unset = it appears at rest.
-    UPROPERTY()
-    TOptional<FTransform> ArriveFrom;
-
     FMars_Request_KeyLock_Insert() {}
 
     FMars_Request_KeyLock_Insert(const FCk_Handle_Item& InItem)
     {
         Item = InItem;
     }
+}
 
-    FMars_Request_KeyLock_Insert(const FCk_Handle_Item& InItem, const FTransform& InArriveFrom)
+// Presentation, drained on every machine: when Item next lands in the lock, its visual lerps in from From.
+struct FMars_Request_KeyLock_ExpectArrival
+{
+    UPROPERTY()
+    FCk_Handle_Item Item;
+
+    UPROPERTY()
+    FTransform From = FTransform::Identity;
+
+    FMars_Request_KeyLock_ExpectArrival() {}
+
+    FMars_Request_KeyLock_ExpectArrival(const FCk_Handle_Item& InItem, const FTransform& InFrom)
     {
         Item = InItem;
-        ArriveFrom = TOptional<FTransform>(InArriveFrom);
+        From = InFrom;
     }
 }
 
@@ -194,12 +246,37 @@ struct FMars_Request_KeyLock_Take
     }
 }
 
-// Drain order Insert -> Take (see UMars_Processor_KeyLock_HandleRequests).
+// What Initiator's interaction asks of the lock, resolved on the authority from the initiator's side: refused
+// (ActionBlocked) unless Get_ActionFor(Initiator) is still Action there. The spawn params of Cue.Mars.KeyLock.Act.
+struct FMars_Request_KeyLock_Act
+{
+    UPROPERTY()
+    FCk_Handle Initiator;
+
+    UPROPERTY()
+    EMars_KeyLock_Action Action = EMars_KeyLock_Action::Insert;
+
+    FMars_Request_KeyLock_Act() {}
+
+    FMars_Request_KeyLock_Act(const FCk_Handle& InInitiator, EMars_KeyLock_Action InAction)
+    {
+        Initiator = InInitiator;
+        Action = InAction;
+    }
+}
+
+// Drain order ExpectArrival -> Insert -> Take -> Act (see UMars_Processor_KeyLock_HandleRequests).
 struct FMars_Fragment_KeyLock_Requests
 {
+    UPROPERTY()
+    TArray<FMars_Request_KeyLock_ExpectArrival> ExpectArrivalRequests;
+
     UPROPERTY()
     TArray<FMars_Request_KeyLock_Insert> InsertRequests;
 
     UPROPERTY()
     TArray<FMars_Request_KeyLock_Take> TakeRequests;
+
+    UPROPERTY()
+    TArray<FMars_Request_KeyLock_Act> ActRequests;
 }

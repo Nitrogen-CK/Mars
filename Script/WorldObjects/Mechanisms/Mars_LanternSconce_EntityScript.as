@@ -5,7 +5,10 @@
 class UMars_LanternSconce_EntityScript : UCk_GenericEntityScript_UE
 {
     default _ShowInPlaceActors = true;
-    default _Replication = ECk_Replication::DoesNotReplicate;
+    // Stance A: placed by the authority's spawner; the sconce, its root transform, its hook's inventory and its refusal
+    // ledger replicate; the hang node, the meshes and the interactable are built on every machine, so a hung lantern
+    // mounts on each machine's own hook. A client hangs or takes through the hook's Act cue.
+    default _Replication = ECk_Replication::Replicates;
 
     UPROPERTY(ExposeOnSpawn)
     FTransform SpawnTransform = FTransform::Identity;
@@ -20,7 +23,7 @@ class UMars_LanternSconce_EntityScript : UCk_GenericEntityScript_UE
     UFUNCTION(BlueprintOverride)
     ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
     {
-        auto Root = utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::DoesNotReplicate);
+        auto Root = utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::Replicates);
         utils_entity_tag::Add(InHandle, n"TAG_MarsLanternSconce");
 
         auto HangNode = utils_scene_node::Create(Root, FTransform(FRotator::ZeroRotator, k_HookLocal)).As_Transform();
@@ -30,6 +33,7 @@ class UMars_LanternSconce_EntityScript : UCk_GenericEntityScript_UE
         Spec.HangNode = HangNode;
         Spec.HangOffset = FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, -constants_lantern_item::k_BailHeight));
         Spec.Interactable = AddInteractable(Root);
+        Spec.Replication = _Replication;
         utils_lantern_hook::Add(InHandle, Spec);
 
         utils_mechanism_source::TryAdd(InHandle, Source);
