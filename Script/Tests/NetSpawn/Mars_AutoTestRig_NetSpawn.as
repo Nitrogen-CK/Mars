@@ -98,8 +98,8 @@ class UMars_AutoTestRig_NetSpawnParent : UCk_AutoTest_NetBase
 
     private void Assert_Family(FCk_Handle InSubject, int32 InPayload, FString InWhere)
     {
-        const auto Parent = utils_net_spawn_test::Find_Spike(InSubject, InPayload);
-        const auto Child = utils_net_spawn_test::Find_Spike(InSubject, utils_net_spike::Get_ConstructChildPayload(InPayload));
+        const auto Parent = utils_net_spawn_test::Find_Carrier(InSubject, InPayload);
+        const auto Child = utils_net_spawn_test::Find_Carrier(InSubject, utils_net_spawn_test::Get_ChildPayload(InPayload));
         Track(Parent);
         Track(Child);
         Assert_True(utils_net_spawn_test::Get_IsComplete(Parent), f"the parent {InWhere} replicated on the host ({utils_net_spawn_test::Get_HostState(Parent)})");
@@ -108,8 +108,8 @@ class UMars_AutoTestRig_NetSpawnParent : UCk_AutoTest_NetBase
 
     private FString Get_FamilyLine(FCk_Handle InSubject, int32 InPayload) const
     {
-        return f"{utils_net_spawn_test::Get_HostState(utils_net_spawn_test::Find_Spike(InSubject, InPayload))}/"
-            + f"{utils_net_spawn_test::Get_HostState(utils_net_spawn_test::Find_Spike(InSubject, utils_net_spike::Get_ConstructChildPayload(InPayload)))}";
+        return f"{utils_net_spawn_test::Get_HostState(utils_net_spawn_test::Find_Carrier(InSubject, InPayload))}/"
+            + f"{utils_net_spawn_test::Get_HostState(utils_net_spawn_test::Find_Carrier(InSubject, utils_net_spawn_test::Get_ChildPayload(InPayload)))}";
     }
 
     private void Track(FCk_Handle InEntity)
@@ -139,8 +139,8 @@ class UMars_AutoTestRig_NetSpawnParent : UCk_AutoTest_NetBase
     private bool Get_IsFamilySeen(int32 InPayload)
     {
         auto Subject = Get_SubjectEntity();
-        return ck::IsValid(utils_net_spawn_test::Find_Spike(Subject, InPayload))
-            && ck::IsValid(utils_net_spawn_test::Find_Spike(Subject, utils_net_spike::Get_ConstructChildPayload(InPayload)));
+        return ck::IsValid(utils_net_spawn_test::Find_Carrier(Subject, InPayload))
+            && ck::IsValid(utils_net_spawn_test::Find_Carrier(Subject, utils_net_spawn_test::Get_ChildPayload(InPayload)));
     }
 
     UFUNCTION()

@@ -10,18 +10,19 @@
 
 namespace utils_net_spawn_test
 {
-    // The live measurement carrier on InAny's machine with InPayload, skipping entities being torn down.
-    FCk_Handle Find_Spike(const FCk_Handle& InAny, int32 InPayload)
+    // The live carrier (UMars_TESTONLY_NetSpawn_Carrier_EntityScript) on InAny's machine with InPayload, skipping entities
+    // being torn down.
+    FCk_Handle Find_Carrier(const FCk_Handle& InAny, int32 InPayload)
     {
-        for (auto Candidate : utils_entity_tag::ForEach_Entity(InAny, constants_net_spike::k_Tag))
+        for (auto Candidate : utils_entity_tag::ForEach_Entity(InAny, constants_net_spawn_test::k_CarrierTag))
         {
             if (utils_entity_lifetime::Get_IsPendingDestroy(Candidate, ECk_EntityLifetime_DestructionPhase::BeginDestroy))
             { continue; }
 
-            if (Candidate.Has_Fragment(FMars_Fragment_NetSpike_Local) == false)
+            if (Candidate.Has_Fragment(FMars_TESTONLY_NetSpawn_CarrierPayload) == false)
             { continue; }
 
-            if (Candidate.Get_Fragment(FMars_Fragment_NetSpike_Local).Payload == InPayload)
+            if (Candidate.Get_Fragment(FMars_TESTONLY_NetSpawn_CarrierPayload).Payload == InPayload)
             { return Candidate; }
         }
 
@@ -184,15 +185,15 @@ namespace utils_net_spawn_test
             {
                 case EMars_TESTONLY_NetSpawn_OrderKind::LegacyParent:
                 {
-                    auto Params = FMars_NetSpike_SpawnParams(Order.Location, Order.Payload);
+                    auto Params = FMars_TESTONLY_NetSpawn_CarrierParams(Order.Location, Order.Payload);
                     Params.ChildInConstruct = true;
-                    utils_entity_script::Request_SpawnEntity(Owner, UMars_NetSpike_EntityScript, Params);
+                    utils_entity_script::Request_SpawnEntity(Owner, UMars_TESTONLY_NetSpawn_Carrier_EntityScript, Params);
                     break;
                 }
                 case EMars_TESTONLY_NetSpawn_OrderKind::PlainSpawn:
                 {
-                    auto Params = FMars_NetSpike_SpawnParams(Order.Location, Order.Payload);
-                    auto Entity = utils_entity_script::Request_SpawnEntity(Owner, UMars_NetSpike_EntityScript, Params).Get_EntityUnderConstruction();
+                    auto Params = FMars_TESTONLY_NetSpawn_CarrierParams(Order.Location, Order.Payload);
+                    auto Entity = utils_entity_script::Request_SpawnEntity(Owner, UMars_TESTONLY_NetSpawn_Carrier_EntityScript, Params).Get_EntityUnderConstruction();
                     utils_net_spawn::Expect_Replicated(Entity);
                     break;
                 }

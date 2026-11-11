@@ -62,7 +62,7 @@ class UCk_AutoTest_Net_NetSpawn_ASettleBuiltSpawnReachesTheClient : UCk_AutoTest
     private void Is_CheckSettled(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         _ServerPolls += 1;
-        const auto Spawned = utils_net_spawn_test::Find_Spike(Get_SubjectEntity(), k_Payload);
+        const auto Spawned = utils_net_spawn_test::Find_Carrier(Get_SubjectEntity(), k_Payload);
         const auto Settled = ck::IsValid(Spawned) && Spawned.Has_Fragment(FMars_Fragment_NetSpawn_AwaitingReplication) == false;
         auto Result = OutResult;
         Result.Set(Settled || _ServerPolls >= k_ServerMaxPolls);
@@ -71,7 +71,7 @@ class UCk_AutoTest_Net_NetSpawn_ASettleBuiltSpawnReachesTheClient : UCk_AutoTest
     UFUNCTION()
     private void OnServerSettled(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
     {
-        const auto Spawned = utils_net_spawn_test::Find_Spike(Get_SubjectEntity(), k_Payload);
+        const auto Spawned = utils_net_spawn_test::Find_Carrier(Get_SubjectEntity(), k_Payload);
         Assert_True(ck::IsValid(Spawned), "the host built the settle-pass spawn");
         if (ck::IsValid(Spawned))
         {
@@ -96,7 +96,7 @@ class UCk_AutoTest_Net_NetSpawn_ASettleBuiltSpawnReachesTheClient : UCk_AutoTest
     private void Poll_ClientSees(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         _ClientFrame += 1;
-        if (ck::IsValid(utils_net_spawn_test::Find_Spike(Get_SubjectEntity(), k_Payload)))
+        if (ck::IsValid(utils_net_spawn_test::Find_Carrier(Get_SubjectEntity(), k_Payload)))
         { _ClientSaw = true; }
 
         auto Result = OutResult;
