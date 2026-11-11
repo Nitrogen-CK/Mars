@@ -143,19 +143,19 @@ CkAuto/CkRun_LogOnly.bat
 CkAuto/CkRun_TraceAll.bat
 ```
 
-## Campaign status headers (`Tools/CampaignBoard/`)
+## Campaign status headers (`CkAuto/CampaignBoard/`)
 
 Every campaign log (`PROGRESS.md` / `PROGRESS_<lane>.md` under `docs/` or `Tools/`) opens with a JSON status header
 between two `---` lines. The campaign board reads that header and nothing else; the contract is
-[Tools/CampaignBoard/README.md](Tools/CampaignBoard/README.md).
+[CkAuto/CampaignBoard/README.md](CkAuto/CampaignBoard/README.md).
 
 - **Whoever changes a campaign's current state rewrites its header in the same edit**: at every phase boundary and at
   session end (phase states, `next`, `blocked_on`, `owed_by_maintainer`, `updated` = today). A new `PROGRESS.md` is
   born with one.
-- Then run `python Tools/CampaignBoard/campaign_board.py validate <file>`. An invalid header shows on the board as an error.
+- Then run `python CkAuto/CampaignBoard/campaign_board.py validate <file>`. An invalid header shows on the board as an error.
 - Commit hashes go in a phase's `commit` or in `commits`. Never list "push" as an owed item: the board works out which
   commits are unpushed, in the project and in every submodule.
-- The board: `python Tools/CampaignBoard/campaign_board.py serve`, then <http://127.0.0.1:8766/> (`scan` prints a
+- The board: `python CkAuto/CampaignBoard/campaign_board.py serve`, then <http://127.0.0.1:8766/> (`scan` prints a
   terminal summary and writes `Saved/CampaignBoard/campaigns.json`).
 
 ## Submodule Management
