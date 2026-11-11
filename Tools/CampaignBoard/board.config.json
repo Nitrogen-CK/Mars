@@ -1,0 +1,9 @@
+{
+  "project": "Mars",
+  "project_root": "../..",
+  "roots": ["docs", "Tools"],
+  "exclude": ["*/evidence/*", "Tools/CampaignBoard/*"],
+  "stale_days": 7,
+  "port": 8766,
+  "output": "Saved/CampaignBoard/campaigns.json"
+}
