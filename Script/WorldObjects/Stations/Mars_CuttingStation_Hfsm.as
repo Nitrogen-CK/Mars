@@ -9,8 +9,13 @@
 //   Idle      ->Operated [StationIsOperated]      tasks: Cutting_ResetOnEnter (the hand back at the centre for the next
 //                                                         operator)
 //   Operated  ->Idle     [StationIsNotOperated]   tasks: Cutting_OperatorInput (Tick), Cutting_CutBridge,
-//                                                         CuttingFeed_OperatorInput (Tick), CuttingFeed_OperatorHints
-//                                                         (Tick), Cutting_OperatorHints
+//                                                         Cutting_PredictHand (Tick), CuttingFeed_OperatorInput (Tick),
+//                                                         CuttingFeed_OperatorHints (Tick), Cutting_OperatorHints
+//
+// Stance: the station's control reads its operator on the authority alone (the cutting station's InputStance is
+// Authority). The authority's reader steers the hand for any operator and chops for its own player; a remote operator's
+// machine predicts its own hand and chops through Cue.Mars.Cutting.Chop with the aim it saw. Only the authority turns a
+// landing into a board cut: a client's copy mirrors the landing and cuts nothing.
 //
 // The feed sources itself from the input dock and lands its releases without an operator: a joint released over the board
 // lands whoever is standing there. The sweep (RMB) is this station's take-out (the station's take-out contract on the board), so the feed's take-out
@@ -89,6 +94,7 @@ class UMars_SmState_Cutting_Operated : UCk_SmState_EntityScript
 
         AddTask(InHandle, UMars_SmTask_Cutting_OperatorInput);
         AddTask(InHandle, UMars_SmTask_Cutting_CutBridge);
+        AddTask(InHandle, UMars_SmTask_Cutting_PredictHand);
         AddTask(InHandle, UMars_SmTask_CuttingFeed_OperatorInput);
         AddTask(InHandle, UMars_SmTask_CuttingFeed_OperatorHints);
         AddTask(InHandle, UMars_SmTask_Cutting_OperatorHints);
@@ -117,6 +123,8 @@ class UMars_SmTask_Cutting_ResetOnEnter : UCk_SmTask_EntityScript
 // along the board each; positive = mouse right = the board's +Y, the operator's right), one chop per press of
 // Interact_Primary, one sweep (utils_cutting::Request_Sweep) per press of Interact_Secondary and one turn
 // (utils_cutting::Request_Turn) per press of Drop (R: the hands are empty at a station, so nothing else reads it here).
+// The chop is read only for this machine's own player (its InputIntents has a matcher): a remote operator's press also
+// arrives in its stream, but its chop arrives as Cue.Mars.Cutting.Chop with the aim (UMars_SmTask_Cutting_PredictHand).
 class UMars_SmTask_Cutting_OperatorInput : UMars_SmTask_StationOperatorInput
 {
     private FCk_Handle_Cutting _Cutting;
@@ -146,7 +154,8 @@ class UMars_SmTask_Cutting_OperatorInput : UMars_SmTask_StationOperatorInput
         if (_Look.Advance(_Intents))
         { _Cutting.Request_Nudge(FMars_Request_Cutting_Nudge(float32(_Intents.Get_LookDelta().X) * utils_cutting::k_LateralCmPerLookDegree)); }
 
-        if (utils_input_intents::Get_HasPress(_Chop.Advance(_Intents, GameplayTags::Mars_Intent_Interact_Primary)))
+        const auto IsOwnPlayer = ck::IsValid(_Intents.Get_Matcher());
+        if (utils_input_intents::Get_HasPress(_Chop.Advance(_Intents, GameplayTags::Mars_Intent_Interact_Primary)) && IsOwnPlayer)
         { _Cutting.Request_Chop(FMars_Request_Cutting_Chop()); }
 
         if (utils_input_intents::Get_HasPress(_Sweep.Advance(_Intents, GameplayTags::Mars_Intent_Interact_Secondary)))
@@ -168,8 +177,9 @@ class UMars_SmTask_Cutting_OperatorInput : UMars_SmTask_StationOperatorInput
 
 // Every chop the cleaver lands cuts the board along the blade: the board holds the food under the blade, and its answer
 // (OnCutIssued) says whether the blade met any. The binding lives exactly as long as the Operated state, so a chop that lands
-// after the operator left cuts nothing. It needs no operator input, so a headless operator drives it too. No board or
-// Cutting on the context (a composition that failed and already ensured) = nothing to cut.
+// after the operator left cuts nothing. It needs no operator input, so a headless operator drives it too. It binds only with
+// authority over the station: a client's copy raises the mirrored landing and cuts nothing. No board or Cutting on the
+// context (a composition that failed and already ensured) = nothing to cut.
 class UMars_SmTask_Cutting_CutBridge : UCk_SmTask_EntityScript
 {
     default _TaskMode = ECk_SmTaskMode::EnterExitOnly;
@@ -182,6 +192,9 @@ class UMars_SmTask_Cutting_CutBridge : UCk_SmTask_EntityScript
     void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
     {
         auto StationEntity = ck::Ctx(InHandle);
+        if (utils_net::Get_HasAuthority(StationEntity) == false)
+        { return; }
+
         _Board = StationEntity.As_FoodBoard(ECk_SanityCheck::UnChecked);
         _Cutting = StationEntity.As_Cutting(ECk_SanityCheck::UnChecked);
         if (ck::Is_NOT_Valid(_Board) || ck::Is_NOT_Valid(_Cutting))
@@ -207,6 +220,98 @@ class UMars_SmTask_Cutting_CutBridge : UCk_SmTask_EntityScript
     {
         const auto StationWorld = utils_transform::Get_EntityCurrentTransform(_Root);
         _Board.Request_Cut(FMars_Request_FoodBoard_Cut(utils_cutting::Get_BladePlane(StationWorld, InCutting.Get_HandLateral())));
+    }
+}
+
+// The operating machine's own hand, where the authority alone reads the operator: on a machine without authority over the
+// station whose own player operates it (its InputIntents has a matcher), each drained look delta moves a local copy of the
+// kernel's clamped sum (k_LateralCmPerLookDegree cm per degree, clamped to the board's half width), shown through
+// PredictHand whenever it changes; a press of Interact_Primary chops through utils_cutting::Request_ChopFor with that hand
+// as the aim. It seeds from the ledger's hand once the matcher is there. Leaving Operated clears the prediction, so the
+// node returns to the ledger's hand. The authority and every other machine do nothing here.
+class UMars_SmTask_Cutting_PredictHand : UCk_SmTask_EntityScript
+{
+    default _TaskMode = ECk_SmTaskMode::Tick;
+
+    private FCk_Handle_Cutting _Cutting;
+    private FCk_Handle _Operator;
+    private FCk_Handle_InputIntents _Intents;
+    private bool _IsSeeded = false;
+    private float32 _Hand = 0.0f;
+    private FMars_LookCursor _Look;
+    private FMars_IntentEdge _Chop;
+
+    UFUNCTION(BlueprintOverride)
+    void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
+    {
+        Reset();
+
+        auto Station = ck::Ctx(InHandle);
+        if (utils_net::Get_HasAuthority(Station))
+        { return; }
+
+        auto Cutting = Station.As_Cutting(ECk_SanityCheck::UnChecked);
+        if (ck::Is_NOT_Valid(Cutting))
+        { return; }
+
+        _Operator = Station.As_Station().Get_Operator();
+        _Intents = _Operator.As_InputIntents(ECk_SanityCheck::UnChecked);
+        if (ck::IsValid(_Intents))
+        { _Cutting = Cutting; }
+    }
+
+    // Must return Running every frame: a Succeeded/Failed result would end the task while Operated is still active.
+    UFUNCTION(BlueprintOverride)
+    ECk_SmTaskResult DoTick(FCk_Handle_SmTask InHandle, FCk_Time InDeltaT, ECk_Sm_NetContext InNetContext)
+    {
+        if (ck::Is_NOT_Valid(_Cutting) || ck::Is_NOT_Valid(_Intents) || ck::Is_NOT_Valid(_Intents.Get_Matcher()))
+        { return ECk_SmTaskResult::Running; }
+
+        if (_IsSeeded == false)
+        {
+            _Look.Seed(_Intents);
+            _Chop.Seed(_Intents, GameplayTags::Mars_Intent_Interact_Primary);
+            _Hand = _Cutting.Get_HandLateral();
+            _IsSeeded = true;
+            return ECk_SmTaskResult::Running;
+        }
+
+        if (_Look.Advance(_Intents))
+        {
+            const auto HalfWidth = _Cutting.Get_Spec().BoardHalfWidth;
+            const auto Nudge = float32(_Intents.Get_LookDelta().X) * utils_cutting::k_LateralCmPerLookDegree;
+            const auto Next = Math::Clamp(_Hand + Nudge, -HalfWidth, HalfWidth);
+            if (Next != _Hand)
+            {
+                _Hand = Next;
+                _Cutting.Request_PredictHand(FMars_Request_Cutting_PredictHand(_Hand));
+            }
+        }
+
+        if (utils_input_intents::Get_HasPress(_Chop.Advance(_Intents, GameplayTags::Mars_Intent_Interact_Primary)))
+        { utils_cutting::Request_ChopFor(_Cutting, _Operator, _Hand); }
+
+        return ECk_SmTaskResult::Running;
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void DoExitTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
+    {
+        if (_IsSeeded && ck::IsValid(_Cutting))
+        { _Cutting.Request_ClearPrediction(FMars_Request_Cutting_ClearPrediction()); }
+
+        Reset();
+    }
+
+    private void Reset()
+    {
+        _Cutting = FCk_Handle_Cutting();
+        _Operator = FCk_Handle();
+        _Intents = FCk_Handle_InputIntents();
+        _IsSeeded = false;
+        _Hand = 0.0f;
+        _Look = FMars_LookCursor();
+        _Chop = FMars_IntentEdge();
     }
 }
 

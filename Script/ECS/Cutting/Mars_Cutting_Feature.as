@@ -1,3 +1,11 @@
+// Stance A, following its host. FMars_Fragment_Cutting (the hand, the chops started, the chops landed) is the replicated
+// ledger, written only by the authority's drain and chop clock and by utils_cutting::Add; on a host with no replication
+// driver it is local. The chop clock and the operator's requests run only with authority. The clock's progress, the
+// mirror's last ledger and a predicted hand (FMars_Fragment_Cutting_Local) are each machine's own. A client mirrors the
+// ledger (UMars_Processor_Cutting_Mirror): it slides its own lateral node and raises the chop signals the authority raised.
+// The operating machine predicts its own hand (PredictHand, applied on every machine) and a remote operator chops through
+// Cue.Mars.Cutting.Chop (utils_cutting::Request_ChopFor), carrying the aim it saw.
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
 //--------------------------------------------------------------------------------------------------------------------------
@@ -76,6 +84,9 @@ enum EMars_Cutting_ChopPhase
 // On the Cutting entity while a chop runs: the chop clock's Tick runs only then.
 struct FMars_Tag_Cutting_Chopping {}
 
+// Added by utils_cutting::Add, dropped by UMars_Processor_Cutting_Mirror once it has bound the ledger's rep-notify.
+struct FMars_Tag_Cutting_NeedsMirror {}
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Params
 //--------------------------------------------------------------------------------------------------------------------------
@@ -90,13 +101,27 @@ struct FMars_Fragment_Cutting_Params
 // State
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Written only by the Cutting processors (and Add). The station SM and the operator only issue requests.
+// The replicated ledger. Written only by the authority's Cutting processors (and Add). The station SM and the operator only
+// issue requests.
 struct FMars_Fragment_Cutting
 {
     // cm, clamped to +-BoardHalfWidth.
     UPROPERTY()
     float32 HandLateral = 0.0f;
 
+    // Chops started: one per OnChopStarted the authority raised.
+    UPROPERTY()
+    int32 ChopSerial = 0;
+
+    // Chops landed: one per OnChopLanded the authority raised.
+    UPROPERTY()
+    int32 LandSerial = 0;
+}
+
+// Each machine's own: the chop clock (advanced only with authority), the ledger the mirror last reconciled, and the hand
+// this machine's operator predicts.
+struct FMars_Fragment_Cutting_Local
+{
     // One press = one chop: a chop request starts a chop only while Idle.
     UPROPERTY()
     EMars_Cutting_ChopPhase ChopPhase = EMars_Cutting_ChopPhase::Idle;
@@ -104,6 +129,14 @@ struct FMars_Fragment_Cutting
     // Seconds left in the current phase of the chop (Spec.ChopSeconds at each phase's start); 0 while Idle.
     UPROPERTY()
     float32 ChopSecondsLeft = 0.0f;
+
+    // The ledger the mirror last reconciled; unset with authority.
+    UPROPERTY()
+    TOptional<FMars_Fragment_Cutting> Last;
+
+    // While set, the lateral node shows this instead of the ledger's hand (cm).
+    UPROPERTY()
+    TOptional<float32> PredictedHand;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -143,13 +176,44 @@ struct FMars_Request_Cutting_Nudge
     }
 }
 
-// Payload-less: one placeholder field (request doctrine).
+// A chop. LateralCm, when set, is where the hand stands as the chop starts (clamped to the board): a remote operator's aim.
+// Unset leaves the hand where it is.
 struct FMars_Request_Cutting_Chop
+{
+    UPROPERTY()
+    TOptional<float32> LateralCm;
+
+    FMars_Request_Cutting_Chop() {}
+
+    FMars_Request_Cutting_Chop(float32 InLateralCm)
+    {
+        LateralCm = TOptional<float32>(InLateralCm);
+    }
+}
+
+// Presentation, applied on every machine: this machine's lateral node shows LateralCm (cm, as given) until the prediction
+// is cleared, and the ledger's hand no longer moves it.
+struct FMars_Request_Cutting_PredictHand
+{
+    UPROPERTY()
+    float32 LateralCm = 0.0f;
+
+    FMars_Request_Cutting_PredictHand() {}
+
+    FMars_Request_Cutting_PredictHand(float32 InLateralCm)
+    {
+        LateralCm = InLateralCm;
+    }
+}
+
+// Presentation, applied on every machine: the prediction ends and the lateral node returns to the ledger's hand.
+// Payload-less: one placeholder field (request doctrine).
+struct FMars_Request_Cutting_ClearPrediction
 {
     UPROPERTY()
     bool Requested = true;
 
-    FMars_Request_Cutting_Chop() {}
+    FMars_Request_Cutting_ClearPrediction() {}
 }
 
 // The hand back at the board centre. A chop in flight still lands. Payload-less: one placeholder field (request doctrine).
@@ -161,9 +225,16 @@ struct FMars_Request_Cutting_Reset
     FMars_Request_Cutting_Reset() {}
 }
 
-// Applied Reset -> Nudge -> Chop, so a reset and the first nudge or chop of a new session can share a drain.
+// PredictHand / ClearPrediction apply first, on every machine; then, with authority only, Reset -> Nudge -> Chop, so a
+// reset and the first nudge or chop of a new session can share a drain.
 struct FMars_Fragment_Cutting_Requests
 {
+    UPROPERTY()
+    TArray<FMars_Request_Cutting_PredictHand> PredictHandRequests;
+
+    UPROPERTY()
+    TArray<FMars_Request_Cutting_ClearPrediction> ClearPredictionRequests;
+
     UPROPERTY()
     TArray<FMars_Request_Cutting_Reset> ResetRequests;
 
