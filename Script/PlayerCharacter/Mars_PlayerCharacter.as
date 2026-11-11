@@ -120,6 +120,8 @@ class AMars_PlayerCharacter : AMars_Character
     FCk_Handle Get_GameplayComposedEntity() const
     { return _GameplayComposedEntity; }
     private bool _ReceiverConstructed = false;
+    // Whether this copy spawned what its own player sees of an armed throw (TryConstructThrowPreviewVisual).
+    private bool _ThrowPreviewVisualConstructed = false;
     // The body emote montage last played on this machine (Request_StopEmote ends it); null when none.
     private UAnimMontage _BodyEmoteMontage;
 
@@ -307,6 +309,7 @@ class AMars_PlayerCharacter : AMars_Character
         utils_handle::Set_DebugName(BodyProbe.H(), n"Player.Probe.Body");
         _PlayerEntity = Player;
         TryConstructCombatReceiver();
+        TryConstructThrowPreviewVisual();
 
         auto DownedSpec = FCk_ByteAttribute_Spec(GameplayTags::ByteAttribute_Mars_Player_Downed, 0);
         DownedSpec.Set_MinMax(ECk_MinMax::MinMax).Set_MinValue(0).Set_MaxValue(1);
@@ -366,6 +369,7 @@ class AMars_PlayerCharacter : AMars_Character
         utils_hotbar::Add(Player, HotbarSpec);
         utils_held_item::Add(Player);
         utils_held_item_use::Add(Player);
+        utils_throw_preview::Add(Player, Config.Inventory.ThrowPreview);
         utils_emote_wheel::Add(Player, Config.EmoteWheel);
         utils_climber::Add(Player, FMars_Climber_Spec(Config.Movement.Speeds.Climb));
         utils_operator::Add(Player);
@@ -438,6 +442,24 @@ class AMars_PlayerCharacter : AMars_Character
         { return; }
 
         utils_entity_tag::Add(Player, n"TAG_MarsCombatTarget");
+    }
+
+    // What this machine's own player sees of an armed throw (UMars_ThrowPreview_EntityScript, owned by the player's entity),
+    // on the locally controlled copy only; the ThrowPreview kernel itself is on every copy. Like TryConstructCombatReceiver
+    // it waits for local control, which only resolves after possession, and also for the kernel (the first call, beside the
+    // receiver's, comes before the entity composes it). One-shot.
+    private void TryConstructThrowPreviewVisual()
+    {
+        if (_ThrowPreviewVisualConstructed || ck::Is_NOT_Valid(_PlayerEntity) || _PlayerEntity.Is_ThrowPreview() == false)
+        { return; }
+
+        if (utils_net::Get_IsEntityLocallyControlled_ByPlayer(_PlayerEntity) != ECk_Utils_Net_IsLocallyControlled_Result::IsLocallyControlled)
+        { return; }
+
+        _ThrowPreviewVisualConstructed = true;
+        auto Params = UMars_ThrowPreview_EntityScript::Params();
+        Params.Preview = _PlayerEntity.As_ThrowPreview();
+        utils_entity_script::Request_SpawnEntity(_PlayerEntity, UMars_ThrowPreview_EntityScript, Params);
     }
 
     //----------------------------------------------------------------------------------------------------------------------
@@ -569,6 +591,7 @@ class AMars_PlayerCharacter : AMars_Character
     {
         TryStartPlayerSm();
         TryConstructCombatReceiver();
+        TryConstructThrowPreviewVisual();
     }
 
     UFUNCTION(BlueprintOverride)
@@ -576,6 +599,7 @@ class AMars_PlayerCharacter : AMars_Character
     {
         TryStartPlayerSm();
         TryConstructCombatReceiver();
+        TryConstructThrowPreviewVisual();
         EmitSurfaceFx();
     }
 

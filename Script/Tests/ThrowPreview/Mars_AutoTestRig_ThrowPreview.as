@@ -348,3 +348,155 @@ class UMars_AutoTestRig_ThrowPreview : UMars_AutoTestRig_Carrier
         return Length;
     }
 }
+
+//--------------------------------------------------------------------------------------------------------------------------
+// The player-path throw-preview rig
+//--------------------------------------------------------------------------------------------------------------------------
+
+// The player's tasks that turn a held Drop into a throw and the arm into an aim, as Alive and Locomotion run them, beside
+// the player-path rig's own (focus, the Use intent, the held-item -> gloves link, the Hands sub-SM).
+class UMars_AutoTestState_ThrowPreviewPlayerPath : UCk_SmState_EntityScript
+{
+    UFUNCTION(BlueprintOverride)
+    void DoDefineState(FCk_Handle_SmState_UnderConstruction& InHandle)
+    {
+        AddTask(InHandle, UMars_SmTask_InteractionFocus);
+        AddTask(InHandle, UMars_SmTask_UseIntentToResolver);
+        AddTask(InHandle, UMars_SmTask_HeldItemDrivesHands);
+        AddTask(InHandle, UMars_SmTask_HandsSubSm);
+        AddTask(InHandle, UMars_SmTask_HeldItemDrivesUse);
+        AddTask(InHandle, UMars_SmTask_DropThrowIntent);
+        AddTask(InHandle, UMars_SmTask_ThrowPreviewFollowsArm);
+    }
+}
+
+// The player-path rig (UMars_AutoTestRig_PlayerPath: the carrier composed down the player's path, a private key stack its
+// InputIntents read) with HeldItemUse and a ThrowPreview composed, a Drop row on the key stack, and the player's
+// DropThrowIntent and ThrowPreviewFollowsArm tasks running (UMars_AutoTestState_ThrowPreviewPlayerPath). Two seeded rocks.
+// Records every OnAimChanged and every OnItemLaunched; destroys every World-mode world item near the origin in DoEndPlay
+// (the rocks the test drops or throws).
+UCLASS(Abstract)
+class UMars_AutoTestRig_ThrowPreviewPlayerPath : UMars_AutoTestRig_PlayerPath
+{
+    default _TimeoutSeconds = 25.0f;
+
+    // How many frames an effect of a request may take to show.
+    protected const int32 k_FewFrames = 30;
+
+    protected FCk_Handle_HeldItemUse _Use;
+    protected FCk_Handle_ThrowPreview _Preview;
+    protected TArray<EMars_ThrowPreview_Aim> _AimChanges;
+    protected TArray<EMars_LaunchKind> _Launches;
+
+    protected void Build_ThrowPreviewPlayerPath(FCk_Handle InHandle, FVector InOrigin)
+    {
+        Build_PlayerPath(InHandle, InOrigin);
+        _Use = utils_held_item_use::Add(_Carrier);
+        _Preview = utils_throw_preview::Add(_Carrier, FMars_ThrowPreview_Spec());
+        _Preview.BindTo_OnAimChanged(FMars_Delegate_ThrowPreview_OnAimChanged(this, n"OnPathAimChanged"));
+        _Use.BindTo_OnItemLaunched(FMars_Delegate_HeldItemUse_OnItemLaunched(this, n"OnPathItemLaunched"));
+
+        _Holders.Add(MakeSeededHolder(InHandle, mars_items::Rock()));
+        _Holders.Add(MakeSeededHolder(InHandle, mars_items::Rock()));
+    }
+
+    // Up to a composed, idle rig holding the first rock.
+    protected void Add_Steps_UntilHoldingTheFirstRock()
+    {
+        Add_Steps_UntilReady();
+        Add_Step_WaitUntil("the holders hold their rocks", n"Check_HoldersSeeded");
+        Add_Step("stow the first rock into the hands", n"Step_StowFirst");
+        Add_Step_WaitUntil("the hands hold the first rock", n"Check_HoldingFirst");
+    }
+
+    protected float32 Get_ThrowHoldSeconds() const
+    {
+        return FMars_PlayerCharacter_Inventory().ThrowHoldSeconds;
+    }
+
+    protected TSubclassOf<UCk_SmState_EntityScript> Get_RigStateClass() const override
+    { return UMars_AutoTestState_ThrowPreviewPlayerPath; }
+
+    protected TArray<FMars_AutoTestHelper_KeyRow> Get_ExtraKeyRows() const override
+    {
+        TArray<FMars_AutoTestHelper_KeyRow> Rows;
+        Rows.Add(FMars_AutoTestHelper_KeyRow(EKeys::F7, GameplayTags::Mars_Intent_Drop, n"DR"));
+        return Rows;
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void DoEndPlay(FCk_Handle InHandle)
+    {
+        if (ck::IsValid(_Preview))
+        { _Preview.UnbindFrom_OnAimChanged(FMars_Delegate_ThrowPreview_OnAimChanged(this, n"OnPathAimChanged")); }
+
+        if (ck::IsValid(_Use))
+        { _Use.UnbindFrom_OnItemLaunched(FMars_Delegate_HeldItemUse_OnItemLaunched(this, n"OnPathItemLaunched")); }
+
+        const auto WorldItems = utils_entity_tag::ForEach_Entity(InHandle, n"TAG_MarsWorldItem");
+        for (const auto& Entity : WorldItems)
+        {
+            if (ck::Is_NOT_Valid(Entity) || Entity.Is_WorldItem() == false)
+            { continue; }
+
+            if (Entity.As_WorldItem().Get_Mode() != EMars_WorldItem_Mode::World)
+            { continue; }
+
+            const auto Location = utils_transform::Get_EntityCurrentTransform(Entity.As_Transform()).GetLocation();
+            if (Location.Distance(_Origin) < 3000.0)
+            { utils_entity_lifetime::Request_DestroyEntity(Entity); }
+        }
+    }
+
+    UFUNCTION()
+    private void OnPathAimChanged(FCk_Handle_ThrowPreview InPreview, EMars_ThrowPreview_Aim InAim)
+    {
+        _AimChanges.Add(InAim);
+    }
+
+    UFUNCTION()
+    private void OnPathItemLaunched(FCk_Handle_HeldItemUse InUse, FCk_Handle_Item InItem, EMars_LaunchKind InKind)
+    {
+        _Launches.Add(InKind);
+    }
+
+    UFUNCTION()
+    protected void Check_HoldingFirst(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(_Items.Num() > 0 && _HeldItem.Get_CurrentItem() == _Items[0]);
+    }
+
+    UFUNCTION()
+    protected void Check_HoldingSecond(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(_Items.Num() > 1 && _HeldItem.Get_CurrentItem() == _Items[1]);
+    }
+
+    UFUNCTION()
+    protected void Step_PressDrop(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        _UseKey.Press_Row(GameplayTags::Mars_Intent_Drop);
+    }
+
+    UFUNCTION()
+    protected void Step_ReleaseDrop(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        _UseKey.Release_Row(GameplayTags::Mars_Intent_Drop);
+    }
+
+    UFUNCTION()
+    protected void Check_DropHeld(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(_Intents.Get_IsIntentActive(GameplayTags::Mars_Intent_Drop));
+    }
+
+    UFUNCTION()
+    protected void Check_Launched(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(_Launches.Num() > 0);
+    }
+}

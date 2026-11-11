@@ -426,6 +426,57 @@ class UMars_SmTask_DropThrowIntent : UMars_SmTask_IntentEdges
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
+// ThrowPreviewFollowsArm
+//--------------------------------------------------------------------------------------------------------------------------
+
+// The throw preview aims exactly while a throw is armed, on the owning copy. It decides nothing about the throw: the
+// arm is UMars_SmTask_DropThrowIntent's.
+class UMars_SmTask_ThrowPreviewFollowsArm : UCk_SmTask_EntityScript
+{
+    default _TaskMode = ECk_SmTaskMode::EnterExitOnly;
+
+    private FCk_Handle_HeldItemUse _Use;
+    private FCk_Handle_ThrowPreview _Preview;
+
+    UFUNCTION(BlueprintOverride)
+    void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
+    {
+        if (utils_player_sm::Get_IsOwningCopy(InHandle, InNetContext) == false)
+        { return; }
+
+        auto Player = ck::Ctx(InHandle);
+        _Use = Player.As_HeldItemUse();
+        _Preview = Player.As_ThrowPreview();
+
+        _Use.BindTo_OnThrowArmedChanged(FMars_Delegate_HeldItemUse_OnThrowArmedChanged(this, n"OnThrowArmedChanged"));
+
+        // The state can be re-entered while a throw is still armed.
+        if (_Use.Get_ThrowArmed())
+        { _Preview.Request_SetAim(FMars_Request_ThrowPreview_SetAim(EMars_ThrowPreview_Aim::Aiming)); }
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void DoExitTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
+    {
+        if (ck::IsValid(_Use))
+        { _Use.UnbindFrom_OnThrowArmedChanged(FMars_Delegate_HeldItemUse_OnThrowArmedChanged(this, n"OnThrowArmedChanged")); }
+
+        if (ck::IsValid(_Preview))
+        { _Preview.Request_SetAim(FMars_Request_ThrowPreview_SetAim(EMars_ThrowPreview_Aim::Idle)); }
+
+        _Use = FCk_Handle_HeldItemUse();
+        _Preview = FCk_Handle_ThrowPreview();
+    }
+
+    UFUNCTION()
+    private void OnThrowArmedChanged(FCk_Handle_HeldItemUse InUse, bool InArmed)
+    {
+        if (ck::IsValid(_Preview))
+        { _Preview.Request_SetAim(FMars_Request_ThrowPreview_SetAim(InArmed ? EMars_ThrowPreview_Aim::Aiming : EMars_ThrowPreview_Aim::Idle)); }
+    }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
 // HeldItemHints
 //--------------------------------------------------------------------------------------------------------------------------
 

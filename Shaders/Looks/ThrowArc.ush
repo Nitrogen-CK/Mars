@@ -1,0 +1,41 @@
+// /Project/Looks/ThrowArc.ush
+//
+// Dashes marching along a tube: UV.x is the distance along the path in centimetres, vertex colour R is the progress
+// along it (0 at the start, 1 at the end). Unlit and emissive-only, so it reads the same in a dark crypt and a lit
+// kitchen; translucent, depth-tested, so what stands in front of the arc hides it. Coverage is the look's overall
+// opacity ("Opacity" is the generated Custom node's own output name, so a parameter cannot take it).
+#pragma once
+#include "/CkUsf/Common.ush"
+
+// A dash's soft edge, as a fraction of the dash period.
+#ifndef MARS_THROWARC_EDGE_SOFTNESS
+#define MARS_THROWARC_EDGE_SOFTNESS 0.06f
+#endif
+
+FCkUsf_SurfaceOutput Mars_Look_ThrowArc(
+    FCkUsf_SurfaceInput In,
+    float3              Tint,
+    float               Brightness,
+    float               Coverage,
+    float               DashLengthCm,
+    float               DashFill,
+    float               ScrollCmPerSecond,
+    float               EndFade)
+{
+    FCkUsf_SurfaceOutput O = CkUsf_DefaultSurface();
+
+    const float Phase    = frac((In.UV.x - In.Time * ScrollCmPerSecond) / max(DashLengthCm, 1.0f));
+    const float Softness = MARS_THROWARC_EDGE_SOFTNESS;
+    // On from 0 to DashFill, each edge smoothed over Softness of the period.
+    const float Dash     = smoothstep(0.0f, Softness, Phase) * (1.0f - smoothstep(DashFill - Softness, DashFill, Phase));
+
+    const float Progress = saturate(In.VertexColor.r);
+    const float Fade     = EndFade > 0.0f
+        ? smoothstep(0.0f, EndFade, Progress) * smoothstep(0.0f, EndFade, 1.0f - Progress)
+        : 1.0f;
+
+    O.BaseColor     = float3(0.0f, 0.0f, 0.0f);
+    O.EmissiveColor = Tint * Brightness;
+    O.Opacity       = saturate(Dash * Fade * Coverage);
+    return O;
+}

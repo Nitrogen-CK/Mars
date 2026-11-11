@@ -94,6 +94,7 @@ class UMars_SmState_Locomotion : UCk_SmState_EntityScript
         AddTask(InHandle, UMars_SmTask_HeldItemDrivesUse);
         AddTask(InHandle, UMars_SmTask_CookbookIntents);
         AddTask(InHandle, UMars_SmTask_DropThrowIntent);
+        AddTask(InHandle, UMars_SmTask_ThrowPreviewFollowsArm);
         AddTask(InHandle, UMars_SmTask_HeldItemHints);
         AddTask(InHandle, UMars_SmTask_ClimberMountIntent);
         AddTask(InHandle, UMars_SmTask_LocomotionSubSm);

@@ -137,6 +137,10 @@ struct FMars_PlayerCharacter_Inventory
     // Drop held past this arms a throw.
     UPROPERTY()
     float32 ThrowHoldSeconds = 0.35f;
+
+    // How the armed throw's path is predicted. What is drawn of it is UMars_ThrowPreview_EntityScript's.
+    UPROPERTY()
+    FMars_ThrowPreview_Spec ThrowPreview;
 }
 
 class UMars_PlayerCharacter_Config : UDataAsset
