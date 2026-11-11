@@ -1,3 +1,8 @@
+// Local on every machine: nothing here replicates. Where the player's input profile runs, the matcher and the look feed
+// it. The authority's copy of a remote operator is fed instead by the operator's remote samples (running totals and press
+// serials, so a lost sample loses nothing), applied into FMars_Fragment_InputIntents_Remote; the getters read the matcher
+// when it is valid and the remote state otherwise.
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
 //--------------------------------------------------------------------------------------------------------------------------
@@ -35,6 +40,156 @@ struct FMars_Fragment_InputIntents
 
     UPROPERTY()
     int32 LookDeltaSequence = 0;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+// Polled readers
+//--------------------------------------------------------------------------------------------------------------------------
+
+// What one intent row did between two polls of a reader.
+enum EMars_IntentEdge
+{
+    None,
+    Pressed,
+    Released,
+    // A release and a fresh press between two polls (a new activation frame while one was already seen).
+    ReleasedAndPressed
+}
+
+// One intent row's edges, polled: the activation frame of the hold last seen (unset while it is not held).
+struct FMars_IntentEdge
+{
+    TOptional<int32> Seen;
+}
+
+// One look-delta reader: the look sequence last seen.
+struct FMars_LookCursor
+{
+    int32 Seen = 0;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+// Remote input
+//--------------------------------------------------------------------------------------------------------------------------
+
+enum EMars_InputIntents_Hold
+{
+    Released,
+    Held
+}
+
+// One intent row as the sending machine sees it: how many presses it has counted and whether it is held now.
+struct FMars_InputIntents_RemoteIntent
+{
+    UPROPERTY()
+    FGameplayTag Intent;
+
+    UPROPERTY()
+    int32 PressSerial = 0;
+
+    UPROPERTY()
+    EMars_InputIntents_Hold Hold = EMars_InputIntents_Hold::Released;
+
+    FMars_InputIntents_RemoteIntent() {}
+
+    FMars_InputIntents_RemoteIntent(FGameplayTag InIntent, int32 InPressSerial, EMars_InputIntents_Hold InHold)
+    {
+        Intent = InIntent;
+        PressSerial = InPressSerial;
+        Hold = InHold;
+    }
+}
+
+// What an operating machine sends the authority: totals, never deltas, so any later sample carries what a lost one did.
+// LookTotal is the running sum of every look delta the sampler has seen.
+struct FMars_InputIntents_RemoteSample
+{
+    UPROPERTY()
+    FVector LookTotal = FVector::ZeroVector;
+
+    UPROPERTY()
+    TArray<FMars_InputIntents_RemoteIntent> Intents;
+}
+
+// One sampled intent on the sending machine: the edge over its activation frame and the presses counted so far.
+struct FMars_InputIntents_SamplerRow
+{
+    FGameplayTag Intent;
+    FMars_IntentEdge Edge;
+    int32 PressSerial = 0;
+}
+
+// The sending machine's running state (local to the sender, never replicated); empty Rows = not seeded yet.
+struct FMars_InputIntents_Sampler
+{
+    FMars_LookCursor Look;
+    FVector LookTotal = FVector::ZeroVector;
+    TArray<FMars_InputIntents_SamplerRow> Rows;
+}
+
+// One intent row as the authority last applied it. ActivationFrame stamps the first press of the row's current run and
+// Presses counts the run: presses that landed together (a late burst, a sample making up lost ones) are read one a frame,
+// never merged (utils_input_intents::TryGet_RemoteActivationFrame). The run's last press reads while Held, and while
+// Released through constants_input_intents::k_ReleasedPressFrames after the frame it first read on.
+struct FMars_InputIntents_RemoteRow
+{
+    UPROPERTY()
+    FGameplayTag Intent;
+
+    UPROPERTY()
+    int32 PressSerial = 0;
+
+    UPROPERTY()
+    EMars_InputIntents_Hold Hold = EMars_InputIntents_Hold::Released;
+
+    UPROPERTY()
+    TOptional<int32> ActivationFrame;
+
+    UPROPERTY()
+    int32 Presses = 0;
+}
+
+// Local, on the authority's copy of a remote operator: written only by UMars_Processor_InputIntents_HandleRequests from
+// ApplyRemoteSample, emptied by ClearRemote. LookTotal unset = no sample since the last clear (the next one seeds).
+struct FMars_Fragment_InputIntents_Remote
+{
+    UPROPERTY()
+    TOptional<FVector> LookTotal;
+
+    UPROPERTY()
+    TArray<FMars_InputIntents_RemoteRow> Rows;
+}
+
+// One drain of remote samples, while it runs: the frame it stamps and the look total it moves from (unset until a seed).
+struct FMars_InputIntents_RemoteDrain
+{
+    FCk_Handle_InputIntents Intents;
+    int32 Frame = 0;
+    TOptional<FVector> LookStart;
+}
+
+namespace constants_input_intents
+{
+    // A sender repeats an unchanged sample this often (frames), so a lost last sample (a release) still lands.
+    const int32 k_KeepAliveFrames = 6;
+
+    // Frames after the one it first read on that a run's last press, already released, still reads active.
+    const int32 k_ReleasedPressFrames = 1;
+
+    // The most presses one run holds, so the most one sample makes up; a serial that jumps further is clamped to it.
+    const int32 k_MaxRemoteRunPresses = 8;
+
+    // Every intent a station's operator-input reader advances on: what a remote operator's samples carry.
+    TArray<FGameplayTag> Get_OperatorIntents()
+    {
+        auto Intents = TArray<FGameplayTag>();
+        Intents.Add(GameplayTags::Mars_Intent_Interact_Primary);
+        Intents.Add(GameplayTags::Mars_Intent_Interact_Secondary);
+        Intents.Add(GameplayTags::Mars_Intent_Interact_Use);
+        Intents.Add(GameplayTags::Mars_Intent_StationAddFood);
+        Intents.Add(GameplayTags::Mars_Intent_Drop);
+        return Intents;
+    }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -93,6 +248,27 @@ struct FMars_Request_InputIntents_AddLookDelta
     }
 }
 
+// One remote operator sample, applied on the authority's copy of that operator.
+struct FMars_Request_InputIntents_ApplyRemoteSample
+{
+    UPROPERTY()
+    FMars_InputIntents_RemoteSample Sample;
+
+    FMars_Request_InputIntents_ApplyRemoteSample() {}
+
+    FMars_Request_InputIntents_ApplyRemoteSample(const FMars_InputIntents_RemoteSample& InSample)
+    {
+        Sample = InSample;
+    }
+}
+
+// Drops the remote state: no hold outlives the station it was for, and the next sample seeds.
+struct FMars_Request_InputIntents_ClearRemote
+{
+    UPROPERTY()
+    bool Requested = true;
+}
+
 struct FMars_Fragment_InputIntents_Requests
 {
     UPROPERTY()
@@ -103,4 +279,10 @@ struct FMars_Fragment_InputIntents_Requests
 
     UPROPERTY()
     TArray<FMars_Request_InputIntents_AddLookDelta> AddLookDeltaRequests;
+
+    UPROPERTY()
+    TArray<FMars_Request_InputIntents_ClearRemote> ClearRemoteRequests;
+
+    UPROPERTY()
+    TArray<FMars_Request_InputIntents_ApplyRemoteSample> ApplyRemoteSampleRequests;
 }

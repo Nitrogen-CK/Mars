@@ -65,10 +65,10 @@ class UMars_SmTask_Batter_OperatorInput : UMars_SmTask_StationOperatorInput
         { return; }
 
         const auto Edge = _Primary.Advance(_Intents, GameplayTags::Mars_Intent_Interact_Primary);
-        if (utils_station::Get_HasRelease(Edge))
+        if (utils_input_intents::Get_HasRelease(Edge))
         { _Batter.Request_Lift(FMars_Request_Batter_Lift()); }
 
-        if (utils_station::Get_HasPress(Edge))
+        if (utils_input_intents::Get_HasPress(Edge))
         { _Batter.Request_Dip(FMars_Request_Batter_Dip()); }
     }
 

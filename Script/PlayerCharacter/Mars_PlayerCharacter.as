@@ -833,6 +833,23 @@ class AMars_PlayerCharacter : AMars_Character
         StopBodyEmote();
     }
 
+    // The owning client's operator input while it operates (UMars_SmTask_Operating_SendInput), applied to the authority's
+    // copy of this player's InputIntents. Unreliable: each sample carries totals, so the next one makes up a lost one. Kept
+    // only while this player operates a station that reads its operator on the authority
+    // (utils_station::Get_TakesRemoteInput): a sample sent before the release reached the client would otherwise leave a
+    // hold and a look total behind for the next station. A sample that arrives before this copy composed its entity is
+    // dropped (the next one seeds).
+    UFUNCTION(Server, Unreliable)
+    void Server_OperatorInput(FMars_InputIntents_RemoteSample InSample)
+    {
+        auto Intents = _PlayerEntity.As_InputIntents(ECk_SanityCheck::UnChecked);
+        auto Operator = _PlayerEntity.As_Operator(ECk_SanityCheck::UnChecked);
+        if (ck::Is_NOT_Valid(Intents) || ck::Is_NOT_Valid(Operator) || utils_station::Get_TakesRemoteInput(Operator.Get_Station()) == false)
+        { return; }
+
+        Intents.Request_ApplyRemoteSample(FMars_Request_InputIntents_ApplyRemoteSample(InSample));
+    }
+
     UFUNCTION(Server)
     void Server_PlayStrike(FMars_Request_HandSwing_Start InRequest)
     {

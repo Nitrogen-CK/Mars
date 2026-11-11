@@ -3,7 +3,9 @@
 // operator's replicated back-ref; on a host with no replication driver it is local. The stand, the view, the
 // interactables and the minigame state machine (FMars_Fragment_Station_Local) are each machine's own. A client mirrors the
 // ledger (UMars_Processor_Station_Mirror) and raises the signals the authority raised. A player takes or leaves a station
-// through Cue.Mars.Station.Act (utils_station::Request_ActFor), which only the authority resolves.
+// through Cue.Mars.Station.Act (utils_station::Request_ActFor), which only the authority resolves. The spec's InputStance
+// says which copies' control state machine reads the operator's input (every machine's, or the authority's alone); the
+// arbiter clears a released operator's remote input on the authority.
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
@@ -54,6 +56,15 @@ enum EMars_Station_Verb
     Reserve,
     // Give it up (the arbiter's Release, OperatorRequested); a no-op unless the operator holds it.
     Leave
+}
+
+// Where the station's control state machine reads its operator's input.
+enum EMars_Station_InputStance
+{
+    // Every machine's copy reads the operator's InputIntents there.
+    PerMachine,
+    // Only the authority's copy reads it; a remote operator's input reaches the authority as its remote samples.
+    Authority
 }
 
 enum EMars_Station_LookControl
@@ -201,6 +212,9 @@ struct FMars_Station_Spec
     UPROPERTY()
     TSoftClassPtr<UCk_SmState_EntityScript> MinigameStateClass;
 
+    UPROPERTY()
+    EMars_Station_InputStance InputStance = EMars_Station_InputStance::PerMachine;
+
     // Construction inputs the placing script builds (not a UPROPERTY: the spawn params and maps never carry it).
     FMars_Station_Setup Setup;
 
@@ -212,7 +226,8 @@ struct FMars_Station_Spec
         float32 InEngageMaxSeconds,
         FMars_Station_CameraSpec InCamera,
         FMars_Station_PromptSpec InPrompt,
-        TSoftClassPtr<UCk_SmState_EntityScript> InMinigameStateClass)
+        TSoftClassPtr<UCk_SmState_EntityScript> InMinigameStateClass,
+        EMars_Station_InputStance InInputStance = EMars_Station_InputStance::PerMachine)
     {
         StandLocal = InStandLocal;
         Grips = InGrips;
@@ -220,6 +235,7 @@ struct FMars_Station_Spec
         Camera = InCamera;
         Prompt = InPrompt;
         MinigameStateClass = InMinigameStateClass;
+        InputStance = InInputStance;
     }
 }
 

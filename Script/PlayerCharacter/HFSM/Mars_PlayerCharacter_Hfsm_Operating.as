@@ -35,6 +35,7 @@ class UMars_SmState_Operating : UCk_SmState_EntityScript
         AddTask(InHandle, UMars_SmTask_Operating_Grip);
         AddTask(InHandle, UMars_SmTask_Operating_LeaveIntent);
         AddTask(InHandle, UMars_SmTask_Operating_Hints);
+        AddTask(InHandle, UMars_SmTask_Operating_SendInput);
     }
 
     // A teardown that did not come from the station's release (Downed): the owning copy's operator leaves, scoped to this
@@ -517,5 +518,78 @@ class UMars_SmTask_Operating_Hints : UCk_SmTask_EntityScript
         { _Display.Request_UnregisterHintsByOwner(FMars_Request_ActionHintDisplay_UnregisterByOwner(k_OwnerKey)); }
 
         _Display = FCk_Handle_ActionHintDisplay();
+    }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+// SendInput
+//--------------------------------------------------------------------------------------------------------------------------
+
+// On a machine that owns the player without authority over it (a client operating), while the station held reads its
+// operator on the authority (utils_station::Get_TakesRemoteInput): samples the player's InputIntents every frame and sends
+// the authority the sample through the pawn's Server_OperatorInput when it changed, or every k_KeepAliveFrames frames when
+// it did not. At a station that reads on every machine nothing is sent, and the next sample seeds afresh. The authority's
+// own player is fed locally and sends nothing; so does a copy with no pawn (headless).
+class UMars_SmTask_Operating_SendInput : UCk_SmTask_EntityScript
+{
+    default _TaskMode = ECk_SmTaskMode::Tick;
+
+    private AMars_PlayerCharacter _Pawn;
+    private FCk_Handle_InputIntents _Intents;
+    private FCk_Handle_Operator _Operator;
+    private FMars_InputIntents_Sampler _Sampler;
+    private FMars_InputIntents_RemoteSample _LastSent;
+    private int32 _FramesSinceSent = 0;
+
+    UFUNCTION(BlueprintOverride)
+    void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
+    {
+        _Pawn = nullptr;
+        _Intents = FCk_Handle_InputIntents();
+        _Operator = FCk_Handle_Operator();
+        _Sampler = FMars_InputIntents_Sampler();
+        _FramesSinceSent = 0;
+
+        auto Player = ck::Ctx(InHandle);
+        if (utils_player_sm::Get_IsOwningCopy(InHandle, InNetContext) == false || utils_net::Get_HasAuthority(Player))
+        { return; }
+
+        _Pawn = Cast<AMars_PlayerCharacter>(utils_owning_actor::TryGet_EntityOwningActor_Recursive(Player));
+        _Intents = Player.As_InputIntents(ECk_SanityCheck::UnChecked);
+        _Operator = Player.As_Operator(ECk_SanityCheck::UnChecked);
+    }
+
+    UFUNCTION(BlueprintOverride)
+    ECk_SmTaskResult DoTick(FCk_Handle_SmTask InHandle, FCk_Time InDeltaT, ECk_Sm_NetContext InNetContext)
+    {
+        if (_Pawn == nullptr || ck::Is_NOT_Valid(_Intents) || ck::Is_NOT_Valid(_Operator))
+        { return ECk_SmTaskResult::Running; }
+
+        if (utils_station::Get_TakesRemoteInput(_Operator.Get_Station()) == false)
+        {
+            _Sampler = FMars_InputIntents_Sampler();
+            return ECk_SmTaskResult::Running;
+        }
+
+        const auto FirstSample = _Sampler.Rows.IsEmpty();
+        const auto Sample = utils_input_intents::Make_RemoteSample(_Intents, _Sampler);
+        _FramesSinceSent += 1;
+
+        if (FirstSample == false && _FramesSinceSent < constants_input_intents::k_KeepAliveFrames
+            && utils_input_intents::Get_AreSameSamples(Sample, _LastSent))
+        { return ECk_SmTaskResult::Running; }
+
+        _Pawn.Server_OperatorInput(Sample);
+        _LastSent = Sample;
+        _FramesSinceSent = 0;
+        return ECk_SmTaskResult::Running;
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void DoExitTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
+    {
+        _Pawn = nullptr;
+        _Intents = FCk_Handle_InputIntents();
+        _Operator = FCk_Handle_Operator();
     }
 }

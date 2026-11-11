@@ -114,7 +114,7 @@ class UMars_SmTask_Fry_OperatorInput : UMars_SmTask_StationOperatorInput
         if (Edge == EMars_IntentEdge::None)
         { return; }
 
-        const auto Skim = utils_station::Get_HasPress(Edge) ? EMars_Fry_Skim::Dip : EMars_Fry_Skim::Carry;
+        const auto Skim = utils_input_intents::Get_HasPress(Edge) ? EMars_Fry_Skim::Dip : EMars_Fry_Skim::Carry;
         _Fry.Request_Skim(FMars_Request_Fry_Skim(Skim));
     }
 

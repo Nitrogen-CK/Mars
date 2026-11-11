@@ -91,6 +91,13 @@ namespace utils_station
         InStation.Request_Act(Request);
     }
 
+    // Whether InStation's operator streams its input to the authority: a station held, whose control reads there. A
+    // station that reads on every machine takes none, so the authority's copy never acts on a remote operator's input.
+    bool Get_TakesRemoteInput(const FCk_Handle_Station& InStation)
+    {
+        return ck::IsValid(InStation) && InStation.Get_InputStance() == EMars_Station_InputStance::Authority;
+    }
+
     // The interaction context of a station interaction sub-SM: the stamped sub-SM root's copy (the stamp lands before the
     // sub-SM's first state enters), else the InteractTarget's copy, which names no initiator.
     FMars_Fragment_InteractionContext Get_InteractionContext(FCk_Handle InContext, FCk_Handle InOwningSm)
@@ -147,6 +154,11 @@ mixin FMars_Interactable_TargetEntry Make_GripTarget(const FCk_Handle_Station& S
 mixin FMars_Station_Spec Get_Spec(const FCk_Handle_Station& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_Station_Params).Spec;
+}
+
+mixin EMars_Station_InputStance Get_InputStance(const FCk_Handle_Station& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_Station_Params).Spec.InputStance;
 }
 
 mixin FCk_Handle Get_Operator(const FCk_Handle_Station& Self)

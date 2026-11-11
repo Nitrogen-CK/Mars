@@ -1,90 +1,14 @@
 // The shared shapes of every station's control tasks: the operator-input reader (UMars_SmTask_StationOperatorInput) and the
 // operator's legend rows (UMars_SmTask_StationOperatorHints). They run on the STATION entity (context = the station) and read
-// the station's operator; a station's own task subclasses one and overrides its hooks only.
-
-// What one intent row did between two polls of a station's input task.
-enum EMars_IntentEdge
-{
-    None,
-    Pressed,
-    Released,
-    // A release and a fresh press between two polls (a new activation frame while one was already seen).
-    ReleasedAndPressed
-}
-
-// One intent row's edges, polled: the activation frame of the hold last seen (unset while it is not held).
-struct FMars_IntentEdge
-{
-    TOptional<int32> Seen;
-}
-
-// One look-delta reader: the look sequence last seen.
-struct FMars_LookCursor
-{
-    int32 Seen = 0;
-}
-
-namespace utils_station
-{
-    // InEdge carries a press (alone, or after a release between two polls).
-    bool Get_HasPress(EMars_IntentEdge InEdge)
-    {
-        return InEdge == EMars_IntentEdge::Pressed || InEdge == EMars_IntentEdge::ReleasedAndPressed;
-    }
-
-    // InEdge carries a release (alone, or before a press between two polls).
-    bool Get_HasRelease(EMars_IntentEdge InEdge)
-    {
-        return InEdge == EMars_IntentEdge::Released || InEdge == EMars_IntentEdge::ReleasedAndPressed;
-    }
-}
-
-// The edge from the frame last seen to InFrame, which becomes the frame seen.
-mixin EMars_IntentEdge Advance_To(FMars_IntentEdge& Self, TOptional<int32> InFrame)
-{
-    if (InFrame == Self.Seen)
-    { return EMars_IntentEdge::None; }
-
-    const auto WasHeld = Self.Seen.IsSet();
-    Self.Seen = InFrame;
-    if (InFrame.IsSet() == false)
-    { return EMars_IntentEdge::Released; }
-
-    return WasHeld ? EMars_IntentEdge::ReleasedAndPressed : EMars_IntentEdge::Pressed;
-}
-
-mixin EMars_IntentEdge Advance(FMars_IntentEdge& Self, const FCk_Handle_InputIntents& InIntents, FGameplayTag InIntent)
-{
-    return Self.Advance_To(InIntents.TryGet_IntentActivationFrame(InIntent));
-}
-
-// A hold already going counts as seen, so only a fresh press is an edge.
-mixin void Seed(FMars_IntentEdge& Self, const FCk_Handle_InputIntents& InIntents, FGameplayTag InIntent)
-{
-    Self.Seen = InIntents.TryGet_IntentActivationFrame(InIntent);
-}
-
-// True once per drained look delta (InIntents.Get_LookDelta() is that delta).
-mixin bool Advance(FMars_LookCursor& Self, const FCk_Handle_InputIntents& InIntents)
-{
-    const auto Sequence = InIntents.Get_LookDeltaSequence();
-    if (Sequence == Self.Seen)
-    { return false; }
-
-    Self.Seen = Sequence;
-    return true;
-}
-
-// A delta drained before the seed never counts.
-mixin void Seed(FMars_LookCursor& Self, const FCk_Handle_InputIntents& InIntents)
-{
-    Self.Seen = InIntents.Get_LookDeltaSequence();
-}
+// the station's operator; a station's own task subclasses one and overrides its hooks only. The edges and cursors a reader
+// polls with are the InputIntents kernel's (FMars_IntentEdge, FMars_LookCursor).
 
 // A station's operator-input reader: resolves the station and its operator's InputIntents on enter, lets the subclass cache
 // its kernel (Bind) and seed its edges (Seed), and polls (Poll) every frame the intents exist. Seeding on enter means a
 // hold or a look from before the station was taken never counts. No operator intents (headless) = no Seed and no Poll;
-// Bind and Unbind run either way, so a subclass's exit request (a cancel, a lift) still goes out.
+// Bind and Unbind run either way, so a subclass's exit request (a cancel, a lift) still goes out. The station's input
+// stance picks the copies that read: every machine's for PerMachine, only the one with authority over the station for
+// Authority (there the operator's InputIntents is fed by the remote samples when the operator is remote).
 UCLASS(Abstract)
 class UMars_SmTask_StationOperatorInput : UCk_SmTask_EntityScript
 {
@@ -99,8 +23,12 @@ class UMars_SmTask_StationOperatorInput : UCk_SmTask_EntityScript
         _Station = ck::Ctx(InHandle);
         Bind(_Station);
 
-        auto Operator = _Station.As_Station().Get_Operator();
-        _Intents = Operator.As_InputIntents(ECk_SanityCheck::UnChecked);
+        auto Station = _Station.As_Station();
+        const auto Reads = Station.Get_InputStance() == EMars_Station_InputStance::PerMachine || utils_net::Get_HasAuthority(_Station);
+        if (Reads == false)
+        { return; }
+
+        _Intents = Station.Get_Operator().As_InputIntents(ECk_SanityCheck::UnChecked);
         if (ck::IsValid(_Intents))
         { Seed(); }
     }

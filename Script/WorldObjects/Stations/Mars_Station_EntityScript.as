@@ -48,6 +48,10 @@ class UMars_Station_EntityScript : UCk_GenericEntityScript_UE
     UFUNCTION(BlueprintOverride)
     ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
     {
+        // The station is its own context on every machine, whoever spawned it (the map's spawner, an anchor row, a
+        // runtime spawn under the replicated spawn owner): its control state machine reads ck::Ctx as the station.
+        InHandle.Request_OverrideToSelf();
+
         auto Root = utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::Replicates);
 
         auto Spec = Station;

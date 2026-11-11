@@ -70,10 +70,10 @@ class UMars_SmTask_Tumbler_OperatorInput : UMars_SmTask_StationOperatorInput
         { _Tumbler.Request_Look(FMars_Request_Tumbler_Look(_Intents.Get_LookDelta())); }
 
         const auto Edge = _Use.Advance(_Intents, GameplayTags::Mars_Intent_Interact_Use);
-        if (utils_station::Get_HasRelease(Edge))
+        if (utils_input_intents::Get_HasRelease(Edge))
         { _Tumbler.Request_Release(FMars_Request_Tumbler_Release()); }
 
-        if (utils_station::Get_HasPress(Edge))
+        if (utils_input_intents::Get_HasPress(Edge))
         { _Tumbler.Request_Press(FMars_Request_Tumbler_Press()); }
     }
 

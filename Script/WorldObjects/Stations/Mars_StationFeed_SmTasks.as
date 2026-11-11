@@ -49,7 +49,7 @@ class UMars_SmTask_StationFeed_OperatorInput : UMars_SmTask_StationOperatorInput
         if (ck::Is_NOT_Valid(_Feed))
         { return; }
 
-        if (utils_station::Get_HasPress(_AddFood.Advance(_Intents, GameplayTags::Mars_Intent_StationAddFood)) == false)
+        if (utils_input_intents::Get_HasPress(_AddFood.Advance(_Intents, GameplayTags::Mars_Intent_StationAddFood)) == false)
         { return; }
 
         const auto Gate = Get_CanBeginTransfer() ? EMars_CookingFeed_StationGate::Open : EMars_CookingFeed_StationGate::Shut;
@@ -100,7 +100,7 @@ class UMars_SmTask_StationFeed_TakeOutInput : UMars_SmTask_StationOperatorInput
         if (ck::Is_NOT_Valid(_OutputDock))
         { return; }
 
-        if (utils_station::Get_HasPress(_TakeOut.Advance(_Intents, GameplayTags::Mars_Intent_Interact_Secondary)))
+        if (utils_input_intents::Get_HasPress(_TakeOut.Advance(_Intents, GameplayTags::Mars_Intent_Interact_Secondary)))
         { utils_cooking_feed::Request_TakeOutToDock(_Station, _OutputDock); }
     }
 

@@ -86,16 +86,16 @@ class UMars_SmTask_Mortar_OperatorInput : UMars_SmTask_StationOperatorInput
         { return; }
 
         const auto Primary = _Primary.Advance(_Intents, GameplayTags::Mars_Intent_Interact_Primary);
-        if (utils_station::Get_HasRelease(Primary))
+        if (utils_input_intents::Get_HasRelease(Primary))
         { _Mortar.Request_Release(FMars_Request_Mortar_Release()); }
 
-        if (utils_station::Get_HasPress(Primary))
+        if (utils_input_intents::Get_HasPress(Primary))
         { _Mortar.Request_Press(FMars_Request_Mortar_Press()); }
 
-        if (utils_station::Get_HasPress(_Collect.Advance(_Intents, GameplayTags::Mars_Intent_Interact_Secondary)))
+        if (utils_input_intents::Get_HasPress(_Collect.Advance(_Intents, GameplayTags::Mars_Intent_Interact_Secondary)))
         { _Mortar.Request_Collect(FMars_Request_Mortar_Collect()); }
 
-        if (utils_station::Get_HasPress(_Switch.Advance(_Intents, GameplayTags::Mars_Intent_Drop)))
+        if (utils_input_intents::Get_HasPress(_Switch.Advance(_Intents, GameplayTags::Mars_Intent_Drop)))
         { _Mortar.Request_SwitchSeasoning(FMars_Request_Mortar_SwitchSeasoning()); }
     }
 

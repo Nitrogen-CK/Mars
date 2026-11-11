@@ -13,7 +13,8 @@
 //
 // A reserve arms two destroy watches: the operator dying releases the station (OperatorLost), the station dying clears the
 // operator's back-ref (StationDestroyed). Every release is cleared on both ends, and its serial advanced, BEFORE OnReleased
-// broadcasts. A dying end is not marked dirty: its destruction replicates instead.
+// broadcasts. A dying end is not marked dirty: its destruction replicates instead. A release the operator survives also
+// clears the operator's remote input (its InputIntents' ClearRemote).
 class UMars_Processor_Station_HandleRequests : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -123,6 +124,7 @@ class UMars_Processor_Station_HandleRequests : UCk_Processor_Script_Base_UE
 
         Record_Release(InState, InRequest.Reason);
         InStation.H().Request_MarkReplicationDirty(FMars_Fragment_Station);
+        Clear_RemoteInput(Operator);
 
         Operator.UnbindFrom_OnBeginDestroy(FCk_Delegate_OnBeginDestroy(this, n"OnOperatorBeginDestroy"));
         InStation.H().UnbindFrom_OnBeginDestroy(FCk_Delegate_OnBeginDestroy(this, n"OnStationBeginDestroy"));
@@ -178,10 +180,19 @@ class UMars_Processor_Station_HandleRequests : UCk_Processor_Script_Base_UE
         }
 
         Record_Release(StationState, EMars_Station_ReleaseReason::StationDestroyed);
+        Clear_RemoteInput(Operator);
         Operator.UnbindFrom_OnBeginDestroy(FCk_Delegate_OnBeginDestroy(this, n"OnOperatorBeginDestroy"));
 
         auto Station = StationEntity.As_Station();
         BroadcastReleased(Station, Operator, EMars_Station_ReleaseReason::StationDestroyed);
+    }
+
+    // A hold the operator streamed must not outlive the station; an operator without InputIntents has none.
+    private void Clear_RemoteInput(FCk_Handle InOperator)
+    {
+        auto Intents = InOperator.As_InputIntents(ECk_SanityCheck::UnChecked);
+        if (ck::IsValid(Intents))
+        { Intents.Request_ClearRemote(FMars_Request_InputIntents_ClearRemote()); }
     }
 
     private void Clear_BackRef(FMars_Fragment_Operator& InOperatorState)

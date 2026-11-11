@@ -146,13 +146,13 @@ class UMars_SmTask_Cutting_OperatorInput : UMars_SmTask_StationOperatorInput
         if (_Look.Advance(_Intents))
         { _Cutting.Request_Nudge(FMars_Request_Cutting_Nudge(float32(_Intents.Get_LookDelta().X) * utils_cutting::k_LateralCmPerLookDegree)); }
 
-        if (utils_station::Get_HasPress(_Chop.Advance(_Intents, GameplayTags::Mars_Intent_Interact_Primary)))
+        if (utils_input_intents::Get_HasPress(_Chop.Advance(_Intents, GameplayTags::Mars_Intent_Interact_Primary)))
         { _Cutting.Request_Chop(FMars_Request_Cutting_Chop()); }
 
-        if (utils_station::Get_HasPress(_Sweep.Advance(_Intents, GameplayTags::Mars_Intent_Interact_Secondary)))
+        if (utils_input_intents::Get_HasPress(_Sweep.Advance(_Intents, GameplayTags::Mars_Intent_Interact_Secondary)))
         { utils_cutting::Request_Sweep(_Station); }
 
-        if (utils_station::Get_HasPress(_Turn.Advance(_Intents, GameplayTags::Mars_Intent_Drop)))
+        if (utils_input_intents::Get_HasPress(_Turn.Advance(_Intents, GameplayTags::Mars_Intent_Drop)))
         { utils_cutting::Request_Turn(_Station); }
     }
 

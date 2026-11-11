@@ -320,7 +320,7 @@ class UMars_SmTask_Fishing_OperatorInput : UMars_SmTask_StationOperatorInput
         const auto Edge = _Primary.Advance(_Intents, GameplayTags::Mars_Intent_Interact_Primary);
         if (Phase == EMars_Fishing_Phase::Idle)
         {
-            if (utils_station::Get_HasRelease(Edge) && _ChargeStart.IsSet())
+            if (utils_input_intents::Get_HasRelease(Edge) && _ChargeStart.IsSet())
             {
                 const auto Held = float32(System::GetGameTimeInSeconds()) - _ChargeStart.GetValue();
                 const auto Power = Math::Clamp(Held / constants_fishing_station::k_ChargeFullSeconds, constants_fishing_station::k_ChargeMinPower, 1.0f);
@@ -328,7 +328,7 @@ class UMars_SmTask_Fishing_OperatorInput : UMars_SmTask_StationOperatorInput
                 _Fishing.Request_Cast(FMars_Request_Fishing_Cast(Power));
             }
 
-            if (utils_station::Get_HasPress(Edge))
+            if (utils_input_intents::Get_HasPress(Edge))
             { _ChargeStart = TOptional<float32>(float32(System::GetGameTimeInSeconds())); }
 
             return;
@@ -337,7 +337,7 @@ class UMars_SmTask_Fishing_OperatorInput : UMars_SmTask_StationOperatorInput
         _ChargeStart = TOptional<float32>();
         if (Phase == EMars_Fishing_Phase::Bite)
         {
-            if (utils_station::Get_HasPress(Edge))
+            if (utils_input_intents::Get_HasPress(Edge))
             { _Fishing.Request_Hook(FMars_Request_Fishing_Hook()); }
 
             return;
@@ -346,10 +346,10 @@ class UMars_SmTask_Fishing_OperatorInput : UMars_SmTask_StationOperatorInput
         if (IsFighting == false)
         { return; }
 
-        if (utils_station::Get_HasRelease(Edge))
+        if (utils_input_intents::Get_HasRelease(Edge))
         { _Fishing.Request_ReelRelease(FMars_Request_Fishing_ReelRelease()); }
 
-        if (utils_station::Get_HasPress(Edge))
+        if (utils_input_intents::Get_HasPress(Edge))
         { _Fishing.Request_ReelHold(FMars_Request_Fishing_ReelHold()); }
     }
 
