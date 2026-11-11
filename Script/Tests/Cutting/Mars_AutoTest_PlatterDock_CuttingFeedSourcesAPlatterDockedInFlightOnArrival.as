@@ -15,6 +15,7 @@ class UMars_AutoTest_PlatterDock_CuttingFeedSourcesAPlatterDockedInFlightOnArriv
 
     private FCk_Handle _Carrier;
     private FCk_Handle_SceneNode _CarrierNode;
+    private FCk_Handle_Hotbar _CarrierHotbar;
     private FVector _Start;
     private FVector _Direction;
     private float64 _MoveStart = 0.0;
@@ -31,7 +32,9 @@ class UMars_AutoTest_PlatterDock_CuttingFeedSourcesAPlatterDockedInFlightOnArriv
         Add_Step_WaitUntil("the station composed its Cutting, FoodBoard, feed and docks", n"Check_StationReady", 0, 0);
         Add_Step("a meat platter spawns on a floor 150 cm from the input dock", n"Step_SpawnPlatter");
         Add_Step_WaitUntil("the platter is constructed and its joint landed", n"Check_PlatterWithJoint", k_SlowPolls, 0);
-        Add_Step("a carrier node takes the platter in hand and starts toward the dock", n"Step_HoldOnCarrier");
+        Add_Step("compose a carrier node with a hotbar where the platter lies", n"Step_ComposeCarrier");
+        Add_Step_WaitUntil("the carrier's hotbar is ready", n"Check_CarrierHotbarReady", k_SlowPolls, 0);
+        Add_Step("the carrier takes the platter in hand and starts toward the dock", n"Step_HoldOnCarrier");
         Add_Step_WaitUntil("the platter is held on the moving carrier", n"Check_Held", k_SlowPolls, 0);
         Add_Step("dock the platter while the carrier still moves", n"Step_DockInFlight");
         Add_Step_WaitUntil("the platter arrived on the dock and the feed draws from it", n"Check_SourcedOnArrival", k_SlowPolls, 0);
@@ -89,10 +92,9 @@ class UMars_AutoTest_PlatterDock_CuttingFeedSourcesAPlatterDockedInFlightOnArriv
         { ++_SourcedInFlight; }
     }
 
-    // A carrier where the platter lies, its Hand a node: the platter's item goes into the carrier's hotbar (the overflow,
-    // selected), so the platter is in hand, as a player carries it to the dock. The node starts moving now and never stops.
+    // A carrier where the platter lies, its Hand a node, and a hotbar.
     UFUNCTION()
-    private void Step_HoldOnCarrier(FCk_Handle InHandle, FInstancedStruct InPayload)
+    private void Step_ComposeCarrier(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         auto Owner = InHandle;
         _Carrier = utils_entity_lifetime::Request_CreateEntity(Owner);
@@ -106,11 +108,25 @@ class UMars_AutoTest_PlatterDock_CuttingFeedSourcesAPlatterDockedInFlightOnArriv
 
         auto HotbarSpec = FMars_Hotbar_Spec();
         HotbarSpec.BagSlotCount = 1;
-        auto Hotbar = utils_hotbar::Add(_Carrier, HotbarSpec);
+        _CarrierHotbar = utils_hotbar::Add(_Carrier, HotbarSpec);
+    }
 
+    UFUNCTION()
+    private void Check_CarrierHotbarReady(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(_CarrierHotbar.Get_IsReady());
+    }
+
+    // The platter's item goes into the carrier's hotbar (the overflow, selected), so the platter is in hand, as a player
+    // carries it to the dock. The node starts moving now and never stops.
+    UFUNCTION()
+    private void Step_HoldOnCarrier(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        auto Owner = InHandle;
         auto WorldItem = _InputPlatterEntity.As_WorldItem();
         auto Holder = WorldItem.Get_Holder();
-        Holder.Request_TransferItem_ToDataOnly(FCk_Request_Inventory_TransferItem_ToDataOnly(_InputPlatterItem, Hotbar.TryGet_StowTarget(_InputPlatterItem)),
+        Holder.Request_TransferItem_ToDataOnly(FCk_Request_Inventory_TransferItem_ToDataOnly(_InputPlatterItem, _CarrierHotbar.TryGet_StowTarget(_InputPlatterItem)),
             FCk_Delegate_Inventory_OnOperationResult_Transfer());
 
         _MoveStart = float64(System::GetGameTimeInSeconds());

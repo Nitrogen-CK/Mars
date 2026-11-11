@@ -249,8 +249,8 @@ class AMars_PlayerCharacter : AMars_Character
     // Every machine composes all of it. The player entity replicates with the pawn (its driver is on the pawn; a client's
     // spawn here is a placeholder that resolves to the server's entity), so it is the replicated owner of the cues its
     // owner fires (a drop, a throw) and of the replicated state machine below. The interaction resolver, prompts, hints,
-    // hands, viewpoint and input are owner-local (stance E). The hotbar and HeldItem are local on every machine until the
-    // hotbar replicates; the authority's copy is the one a pickup or a launch changes.
+    // hands, viewpoint and input are owner-local (stance E). The hotbar replicates (its slot roots are children of this
+    // entity; the authority decides what they hold and what is selected) and HeldItem derives from it on every machine.
     UFUNCTION()
     private void OnEntityConstructed(FCk_Handle_EntityScript InEntityScriptHandle)
     {

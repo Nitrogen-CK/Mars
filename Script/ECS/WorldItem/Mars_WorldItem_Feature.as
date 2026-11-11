@@ -2,7 +2,7 @@
 // item lives there) and FMars_Fragment_WorldItem_Net (the authority's pickup refusals). Its Jolt body, its launch, a
 // Release and a PickUp are the authority's; the probe, the pickup interactable, the grips, the visual and the arrival are
 // built on every machine (D). FMars_Fragment_WorldItem stays local (it holds body and probe handles), and a Persistent
-// item's mount is derived where its item is linked (the authority, until the hotbar replicates). A Visual-mode item never
+// item's mount is derived where its item is linked (the authority only: a client never links them). A Visual-mode item never
 // replicates: it is a DoesNotReplicate script spawned per machine under a local owner
 // (utils_world_item::Get_VisualScriptClass).
 // A World-mode item exists on an authority under an owner with a replication driver, and its script ensures and ends

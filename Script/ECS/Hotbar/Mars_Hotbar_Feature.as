@@ -1,3 +1,11 @@
+// Stance A. FMars_Fragment_Hotbar (the selection, the parked selection, the eject serial) is the replicated ledger, written
+// only by the authority's request drain and sync pass. Each slot is a root of its own (UMars_HotbarSlot_EntityScript, a
+// lifetime child of the carrier) holding one capacity-1 inventory: an inventory replicates its contents through its
+// lifetime owner, so slots sharing the carrier would overwrite one another. The slot roots and their inventories
+// replicate with the carrier; on a carrier with no replication driver (a test rig) they are local. The slot handles
+// (Local) are adopted per machine; a client mirrors the ledger and broadcasts the signals from what replicated (Mirror).
+// A client's selection reaches the authority through Cue.Mars.Hotbar.Select (utils_hotbar::Fire_SelectCue).
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
 //--------------------------------------------------------------------------------------------------------------------------
@@ -20,13 +28,23 @@ enum EMars_Hotbar_CycleDirection
     Previous
 }
 
+// Whether a selection waits behind the occupied overflow slot (FMars_Fragment_Hotbar.ParkedIndex says which).
+enum EMars_Hotbar_Park
+{
+    Nothing,
+    Parked
+}
+
 // Deselect empties the hands (parked instead while an occupied overflow slot is selected). Cycle steps through the bag
-// slots only, wrapping; the overflow slot is never a cycle target.
+// slots only, wrapping; the overflow slot is never a cycle target. Set is absolute (a target slot, or empty hands) and
+// never toggles: it is what a relative change means against one machine's view (utils_hotbar::Resolve_SelectionChange),
+// so the authority applies the same target the requesting machine saw.
 enum EMars_Hotbar_SelectionChange
 {
     Select,
     Deselect,
-    Cycle
+    Cycle,
+    Set
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -86,25 +104,117 @@ struct FMars_Hotbar_ParkedSelection
     }
 }
 
-// The overflow slot is only ever occupied while every bag slot is full, or by a hands-only item (which fits only the
-// overflow slot), and while occupied it is always the selected slot: any selection that would leave it is parked until
-// its item has been dropped.
+// The replicated ledger, written only by UMars_Processor_Hotbar_HandleRequests and UMars_Processor_Hotbar_Sync on the
+// authority. The overflow slot is only ever occupied while every bag slot is full, or by a hands-only item (which fits
+// only the overflow slot), and while occupied it is always the selected slot: any selection that would leave it is
+// parked until its item has been dropped.
 struct FMars_Fragment_Hotbar
 {
-    // Layout: [0 .. N-1] bag, [N] overflow, [N+1] backpack (only with a backpack slot), N = BagSlotCount.
-    UPROPERTY()
-    TArray<FCk_Handle_Inventory_DataOnly> Slots;
-
     // Unset = hands empty.
     UPROPERTY()
     TOptional<int32> SelectedIndex;
 
+    // The parked selection, split in two because a replicated fragment cannot carry an optional struct (the net
+    // serializer has no path for it). Read it as one through TryGet_ParkedSelection.
     UPROPERTY()
-    TOptional<FMars_Hotbar_ParkedSelection> ParkedSelection;
+    EMars_Hotbar_Park Park = EMars_Hotbar_Park::Nothing;
 
-    // The item each slot held on the previous sync pass; slot contents are polled, not bound.
+    // Parked only; unset parks empty hands.
+    UPROPERTY()
+    TOptional<int32> ParkedIndex;
+
+    // Advances once per park: the machine that owns the carrier answers each advance with one overflow eject.
+    UPROPERTY()
+    int32 EjectSerial = 0;
+}
+
+// Never replicated, sized by Add on every machine. Layout: [0 .. N-1] bag, [N] overflow, [N+1] backpack (only with a
+// backpack slot), N = BagSlotCount. Slots fill as UMars_Processor_Hotbar_AdoptSlots finds each slot root; LastSeen is
+// UMars_Processor_Hotbar_Sync's (slot contents are polled, not bound).
+struct FMars_Fragment_Hotbar_Local
+{
+    UPROPERTY()
+    TArray<FCk_Handle_Inventory_DataOnly> Slots;
+
     UPROPERTY()
     TArray<FCk_Handle_Item> LastSeen;
+}
+
+// Non-authority only (the authority's mirror pass removes it): the ledger as this machine last broadcast it, seeded with
+// the ledger as Add composed it, so a value that replicated before the mirror bound still broadcasts.
+struct FMars_Fragment_Hotbar_Mirror
+{
+    UPROPERTY()
+    FMars_Fragment_Hotbar Last;
+}
+
+// Present until every slot root is adopted (Get_IsReady), removed by UMars_Processor_Hotbar_AdoptSlots.
+struct FMars_Fragment_Hotbar_AwaitingSlots
+{
+    UPROPERTY()
+    bool Awaiting = true;
+}
+
+// Consumed by UMars_Processor_Hotbar_SpawnSlots and UMars_Processor_Hotbar_Mirror respectively.
+struct FMars_Tag_Hotbar_NeedsSlots {}
+struct FMars_Tag_Hotbar_NeedsMirror {}
+
+//--------------------------------------------------------------------------------------------------------------------------
+// Slot roots
+//--------------------------------------------------------------------------------------------------------------------------
+
+// What one slot root is: its place in the layout, and the replication its inventory takes (the slot script's own).
+struct FMars_HotbarSlot_Spec
+{
+    UPROPERTY()
+    int32 Index = 0;
+
+    UPROPERTY()
+    EMars_Hotbar_SlotKind Kind = EMars_Hotbar_SlotKind::Bag;
+
+    UPROPERTY()
+    ECk_Replication Replication = ECk_Replication::DoesNotReplicate;
+
+    FMars_HotbarSlot_Spec() {}
+
+    FMars_HotbarSlot_Spec(int32 InIndex, EMars_Hotbar_SlotKind InKind, ECk_Replication InReplication)
+    {
+        Index = InIndex;
+        Kind = InKind;
+        Replication = InReplication;
+    }
+}
+
+// The slot script's spawn params (UMars_HotbarSlot_EntityScript's ExposeOnSpawn fields): a client's placeholder is
+// matched to the replicated slot by them.
+struct FMars_HotbarSlot_SpawnParams
+{
+    UPROPERTY()
+    int32 Index = 0;
+
+    UPROPERTY()
+    EMars_Hotbar_SlotKind Kind = EMars_Hotbar_SlotKind::Bag;
+
+    FMars_HotbarSlot_SpawnParams() {}
+
+    FMars_HotbarSlot_SpawnParams(int32 InIndex, EMars_Hotbar_SlotKind InKind)
+    {
+        Index = InIndex;
+        Kind = InKind;
+    }
+}
+
+// On a slot root, written once by utils_hotbar::Add_Slot on every machine.
+struct FMars_Fragment_HotbarSlot
+{
+    UPROPERTY()
+    int32 Index = 0;
+
+    UPROPERTY()
+    EMars_Hotbar_SlotKind Kind = EMars_Hotbar_SlotKind::Bag;
+
+    UPROPERTY()
+    FCk_Handle_Inventory_DataOnly Inventory;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -123,8 +233,13 @@ event void FMars_Delegate_Hotbar_OnSlotItemChanged_MC(FCk_Handle_Hotbar InHotbar
 delegate void FMars_Delegate_Hotbar_OnOverflowEjectRequested(FCk_Handle_Hotbar InHotbar, FCk_Handle_Item InItem);
 event void FMars_Delegate_Hotbar_OnOverflowEjectRequested_MC(FCk_Handle_Hotbar InHotbar, FCk_Handle_Item InItem);
 
+// Fired once per machine, when the last slot root is adopted (Get_IsReady turns true); slot handles are valid from then.
+delegate void FMars_Delegate_Hotbar_OnReady(FCk_Handle_Hotbar InHotbar);
+event void FMars_Delegate_Hotbar_OnReady_MC(FCk_Handle_Hotbar InHotbar);
+
 struct FMars_Fragment_Hotbar_Signals
 {
+    FMars_Delegate_Hotbar_OnReady_MC OnReady;
     FMars_Delegate_Hotbar_OnSelectionChanged_MC OnSelectionChanged;
     FMars_Delegate_Hotbar_OnSlotItemChanged_MC OnSlotItemChanged;
     FMars_Delegate_Hotbar_OnOverflowEjectRequested_MC OnOverflowEjectRequested;
@@ -168,13 +283,28 @@ struct FMars_Request_Hotbar_Cycle
     }
 }
 
-// A Select, Deselect or Cycle request, queued with the other kinds so the drain applies them in arrival order.
+// Absolute: the target slot, or unset for empty hands. Selecting the selected slot changes nothing. The payload of
+// Cue.Mars.Hotbar.Select.
+struct FMars_Request_Hotbar_SetSelection
+{
+    UPROPERTY()
+    TOptional<int32> Index;
+
+    FMars_Request_Hotbar_SetSelection() {}
+
+    FMars_Request_Hotbar_SetSelection(TOptional<int32> InIndex)
+    {
+        Index = InIndex;
+    }
+}
+
+// A Select, Deselect, Cycle or Set request, queued with the other kinds so the drain applies them in arrival order.
 struct FMars_Hotbar_SelectionChangeRequest
 {
     UPROPERTY()
     EMars_Hotbar_SelectionChange Change = EMars_Hotbar_SelectionChange::Deselect;
 
-    // Select only; a Select without one is rejected by the drain.
+    // Select: the slot (a Select without one is rejected by the drain). Set: the target, unset for empty hands.
     UPROPERTY()
     TOptional<int32> Index;
 
@@ -199,6 +329,12 @@ struct FMars_Hotbar_SelectionChangeRequest
     {
         Change = EMars_Hotbar_SelectionChange::Cycle;
         Direction = InRequest.Direction;
+    }
+
+    FMars_Hotbar_SelectionChangeRequest(const FMars_Request_Hotbar_SetSelection& InRequest)
+    {
+        Change = EMars_Hotbar_SelectionChange::Set;
+        Index = InRequest.Index;
     }
 }
 

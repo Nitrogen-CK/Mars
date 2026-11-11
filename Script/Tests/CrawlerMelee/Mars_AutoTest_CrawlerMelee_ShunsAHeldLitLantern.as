@@ -23,6 +23,7 @@ class UMars_AutoTest_CrawlerMelee_ShunsAHeldLitLantern : UMars_AutoTestRig_Crawl
         Add_Step("spawn a target ahead that can hold a lantern, and a lantern beside it", n"Step_SpawnTargetAndLantern");
         Add_Step_WaitUntil("the target's hurtbox is traceable", n"Check_TargetTraceable", k_SlowPolls, 0);
         Add_Step_WaitUntil("the lantern world item is composed", n"Check_LanternReady", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the target's hotbar is ready", n"Check_TargetHotbarReady", k_SlowPolls, 0);
         Add_Step("the target picks the lantern up and opens it", n"Step_RaiseLitLantern");
         Add_Step_WaitUntil("the target holds the lit lantern and the crawler feels its Held pool", n"Check_Warded", k_SlowPolls, 0);
         Add_Step("select the target and request an attack", n"Step_TargetAndStartMarked");
@@ -61,6 +62,13 @@ class UMars_AutoTest_CrawlerMelee_ShunsAHeldLitLantern : UMars_AutoTestRig_Crawl
             utils_transform::Get_EntityCurrentLocation(_Target.Root) + Get_Forward() * 60.0 + FVector(0.0, 0.0, 30.0));
         auto Pending = utils_world_item::Request_SpawnWorldEntity(InHandle, UMars_Lantern_EntityScript, SpawnParams);
         utils_pending_entity_script::Promise_OnConstructed(Pending, FCk_Delegate_EntityScript_Constructed(this, n"OnLanternConstructed"));
+    }
+
+    UFUNCTION()
+    private void Check_TargetHotbarReady(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(_TargetHotbar.Get_IsReady());
     }
 
     UFUNCTION()

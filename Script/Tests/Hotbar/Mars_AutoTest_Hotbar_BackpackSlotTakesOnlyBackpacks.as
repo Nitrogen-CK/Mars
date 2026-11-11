@@ -115,7 +115,7 @@ class UMars_AutoTest_Hotbar_BackpackSlotTakesOnlyBackpacks : UMars_AutoTestRig_C
         const auto Index = _Hotbar.Get_BackpackIndex().GetValue();
         const auto Item = _Hotbar.Get_ItemAt(Index);
         auto Res = OutResult;
-        Res.Set(ck::IsValid(Item) && _Hotbar.Get_Fragment(FMars_Fragment_Hotbar).LastSeen[Index] == Item);
+        Res.Set(ck::IsValid(Item) && _Hotbar.Get_Fragment(FMars_Fragment_Hotbar_Local).LastSeen[Index] == Item);
     }
 
     UFUNCTION()

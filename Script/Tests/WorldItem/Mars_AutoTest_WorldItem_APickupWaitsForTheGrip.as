@@ -55,6 +55,7 @@ class UMars_AutoTest_WorldItem_APickupWaitsForTheGrip : UMars_AutoTestRig_Carrie
         _BareSlabEntity = Spawn_FoodItemOnFloor(InHandle, mars_items::Food_MeatSlab(), k_Origin + k_BareOffset + k_SlabOffset);
 
         Add_Step_WaitUntil("both slabs are constructed and their bodies added", n"Check_SlabsReady", k_SlowPolls, 0);
+        Add_Step_WaitUntil("both hotbars are ready", n"Check_HotbarsReady", k_SlowPolls, 0);
         Add_Step_WaitUntil("the gloves rest, listening for a reach", n"Check_CarrierHandsRest", 0, 0);
         Add_Step_WaitUntil("the slabs lie still on their floors", n"Check_SlabsAtRest", k_SlowPolls, 0);
         Add_Step("each carrier focuses its slab's pickup", n"Step_FocusBoth");
@@ -81,6 +82,13 @@ class UMars_AutoTest_WorldItem_APickupWaitsForTheGrip : UMars_AutoTestRig_Carrie
         auto Spec = FMars_Hotbar_Spec();
         Spec.BagSlotCount = 2;
         _BareHotbar = utils_hotbar::Add(_BareCarrier, Spec);
+    }
+
+    UFUNCTION()
+    private void Check_HotbarsReady(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(_Hotbar.Get_IsReady() && _BareHotbar.Get_IsReady());
     }
 
     UFUNCTION()

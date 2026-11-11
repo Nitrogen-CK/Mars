@@ -70,6 +70,25 @@ class UMars_Hotbar_Widget : UCk_UserWidget_UE
         if (ck::EnsureIfNot(SlotWidgetClass != nullptr, "[Mars_Hotbar] SlotWidgetClass is not set on the widget blueprint"))
         { return; }
 
+        // The slot inventories exist only once every slot root is adopted.
+        if (_Hotbar.Get_IsReady() == false)
+        {
+            _Hotbar.BindTo_OnReady(FMars_Delegate_Hotbar_OnReady(this, n"OnHotbarReady"));
+            return;
+        }
+
+        Build_Slots();
+    }
+
+    UFUNCTION()
+    private void OnHotbarReady(FCk_Handle_Hotbar InHotbar)
+    {
+        _Hotbar.UnbindFrom_OnReady(FMars_Delegate_Hotbar_OnReady(this, n"OnHotbarReady"));
+        Build_Slots();
+    }
+
+    private void Build_Slots()
+    {
         ClearSlots();
 
         const auto OverflowIndex = _Hotbar.Get_OverflowIndex();
@@ -105,6 +124,7 @@ class UMars_Hotbar_Widget : UCk_UserWidget_UE
     {
         if (ck::IsValid(_Hotbar))
         {
+            _Hotbar.UnbindFrom_OnReady(FMars_Delegate_Hotbar_OnReady(this, n"OnHotbarReady"));
             _Hotbar.UnbindFrom_OnSelectionChanged(FMars_Delegate_Hotbar_OnSelectionChanged(this, n"OnSelectionChanged"));
             _Hotbar.UnbindFrom_OnSlotItemChanged(FMars_Delegate_Hotbar_OnSlotItemChanged(this, n"OnSlotItemChanged"));
         }

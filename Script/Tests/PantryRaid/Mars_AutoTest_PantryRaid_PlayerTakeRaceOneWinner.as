@@ -60,7 +60,7 @@ class UMars_AutoTest_PantryRaid_PlayerTakeRaceOneWinner : UMars_AutoTestRig_Pant
         FCk_Handle ChefEntity = _Chefs[0];
         auto Result = OutResult;
         Result.Set(_Rat.Get_LastClaimResult() != EMars_PantryRat_ClaimResult::None
-            && utils_entity_lifetime::Get_LifetimeOwner(Parent) == ChefEntity);
+            && utils_hotbar::Get_CarrierOf(Parent) == ChefEntity);
     }
 
     UFUNCTION()
@@ -75,7 +75,7 @@ class UMars_AutoTest_PantryRaid_PlayerTakeRaceOneWinner : UMars_AutoTestRig_Pant
         Assert_True(Get_Slot(2).Get_Item() == _FoodItem, "the Mushroom is untouched");
         const FCk_Handle Parent = _CheeseItem.Get_ParentInventory();
         FCk_Handle ChefEntity = _Chefs[0];
-        const auto WithChef = utils_entity_lifetime::Get_LifetimeOwner(Parent) == ChefEntity ? 1 : 0;
+        const auto WithChef = utils_hotbar::Get_CarrierOf(Parent) == ChefEntity ? 1 : 0;
         Assert_Equals_Int(WithChef, 1, "the cheese is in the chef's hotbar");
         Assert_Equals_Int(Count_CourtItems() + WithChef, 2, "two ingredients in all: no copy, no loss");
     }

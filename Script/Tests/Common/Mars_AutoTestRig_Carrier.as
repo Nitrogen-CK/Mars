@@ -337,11 +337,19 @@ class UMars_AutoTestRig_Carrier : UCk_AutoTest_Base
             FCk_Delegate_Inventory_OnOperationResult_Transfer());
     }
 
-    // Every holder holds its one item; false while the test has seeded none.
+    // The hotbar's slot roots are all adopted (its slots exist from then); true when the test composed no hotbar.
+    UFUNCTION()
+    protected void Check_HotbarReady(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(ck::Is_NOT_Valid(_Hotbar) || _Hotbar.Get_IsReady());
+    }
+
+    // Every holder holds its one item and the hotbar is ready; false while the test has seeded none.
     UFUNCTION()
     protected void Check_HoldersSeeded(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
-        auto AllSeeded = _Holders.Num() > 0;
+        auto AllSeeded = _Holders.Num() > 0 && (ck::Is_NOT_Valid(_Hotbar) || _Hotbar.Get_IsReady());
         for (const auto& Holder : _Holders)
         { AllSeeded = AllSeeded && Holder.Get_NumItems() == 1; }
 

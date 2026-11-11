@@ -56,8 +56,8 @@ class UMars_Processor_WorldItem_HandleRequests : UCk_Processor_Script_Base_UE
     // PickUp
     //--------------------------------------------------------------------------------------------------------------------------
 
-    // The hotbar is asked here, on the authority: the initiator's machine checked its own copy before the cue, which may
-    // be stale or (for a client, until the hotbar replicates) empty.
+    // The hotbar is asked here, on the authority: the initiator's machine checked its own replicated copy before the cue,
+    // which may be a round trip stale.
     private void HandlePickUpRequest(FCk_Handle_WorldItem& InWorldItem, const FMars_Request_WorldItem_PickUp& InRequest)
     {
         if (InWorldItem.Has_Fragment(FMars_Fragment_WorldItem_PendingPickUp))

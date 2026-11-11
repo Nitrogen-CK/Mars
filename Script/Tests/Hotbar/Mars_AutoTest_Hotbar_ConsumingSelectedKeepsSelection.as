@@ -59,7 +59,7 @@ class UMars_AutoTest_Hotbar_ConsumingSelectedKeepsSelection : UMars_AutoTestRig_
     private void Check_SyncSawRemoval(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(ck::Is_NOT_Valid(_Hotbar.Get_Fragment(FMars_Fragment_Hotbar).LastSeen[0]));
+        Res.Set(ck::Is_NOT_Valid(_Hotbar.Get_Fragment(FMars_Fragment_Hotbar_Local).LastSeen[0]));
     }
 
     UFUNCTION()

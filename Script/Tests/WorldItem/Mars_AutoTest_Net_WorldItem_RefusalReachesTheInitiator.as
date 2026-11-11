@@ -29,9 +29,22 @@ class UCk_AutoTest_Net_WorldItem_RefusalReachesTheInitiator : UMars_AutoTestRig_
             return;
         }
 
+        Spawn_ServerFloor(InHandle, k_FloorTop);
+        WaitUntil(n"Is_ServerCarrierReady", n"OnServerCarrierReady", k_SlowPolls);
+    }
+
+    UFUNCTION()
+    private void Is_ServerCarrierReady(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Result = OutResult;
+        Result.Set(Get_IsCarrierReady(_Carrier));
+    }
+
+    UFUNCTION()
+    private void OnServerCarrierReady(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
+    {
         Seed_ServerSlot(_Carrier.Hotbar, 0);
         Seed_ServerSlot(_Carrier.Hotbar, 1);
-        Spawn_ServerFloor(InHandle, k_FloorTop);
         WaitUntil(n"Is_ReplicatedSpawnOwnerPublished", n"OnServerOwnerPublished", k_SlowPolls);
     }
 

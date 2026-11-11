@@ -39,7 +39,7 @@ class UMars_AutoTest_CuttingStation_AddFoodBringsTheJointToTheBoard : UMars_Auto
         Add_Step_WaitUntil("the station composed its Cutting, FoodBoard, feed and docks", n"Check_StationReady", 0, 0);
         Add_Steps_ArmTheAddFoodKey();
         Add_Step_WaitUntil("the empty input platter is constructed", n"Check_EmptyInputPlatterReady", k_SlowPolls, 0);
-        Add_Step_WaitUntil("the food item is constructed and the cook's gloves rest", n"Check_FoodAndCookReady", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the food item is constructed, the cook's gloves rest and its hotbar is ready", n"Check_FoodAndCookReady", k_SlowPolls, 0);
         Add_Step("dock the empty platter", n"Step_DockInput");
         Add_Step_WaitUntil("the empty platter is docked", n"Check_InputDocked", k_SlowPolls, 0);
         Add_Step("the cook focuses the slab's pickup", n"Step_FocusFood");
@@ -267,7 +267,7 @@ class UMars_AutoTest_CuttingStation_AddFoodBringsTheJointToTheBoard : UMars_Auto
             && _CookHands.Get_Fragment(FMars_Fragment_FPHands_Signals).OnReachRequested._Inner.IsBound();
 
         auto Res = OutResult;
-        Res.Set(FoodReady && HandsRest);
+        Res.Set(FoodReady && HandsRest && _CookHotbar.Get_IsReady());
     }
 
     UFUNCTION()

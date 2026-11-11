@@ -97,8 +97,9 @@ namespace utils_world_item
 
     // Where InWorldItem belongs, from the inventory its item lives in: its own holder -> World; the selected slot of the
     // carrier's hotbar -> Held on the carrier's Hand at Presentation.Mounting.HeldOffset; any other inventory marked
-    // FMars_Fragment_MountedInventory -> Carried on its lifetime owner as the marker says. Unlinked (Transient, Visual, not
-    // yet seeded) -> World. The carrier is the inventory's lifetime owner and must publish the attach point.
+    // FMars_Fragment_MountedInventory -> Carried on its carrier as the marker says. Unlinked (Transient, Visual, not yet
+    // seeded) -> World. The carrier (utils_hotbar::Get_CarrierOf: a hotbar slot's carrier, else the inventory's lifetime
+    // owner) must publish the attach point.
     FMars_WorldItem_Resolution Resolve_Target(const FCk_Handle_WorldItem& InWorldItem)
     {
         auto Resolution = FMars_WorldItem_Resolution();
@@ -126,7 +127,7 @@ namespace utils_world_item
             return Resolution;
         }
 
-        const auto Carrier = utils_entity_lifetime::Get_LifetimeOwner(InventoryEntity, ECk_PendingKill_Policy::IncludePendingKill);
+        const auto Carrier = utils_hotbar::Get_CarrierOf(InventoryEntity);
         if (Get_IsEnding(InventoryEntity) || Get_IsEnding(Carrier))
         {
             Resolution.Placement = EMars_WorldItem_Placement::CarrierGone;

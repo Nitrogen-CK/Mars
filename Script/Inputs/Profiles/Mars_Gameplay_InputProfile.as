@@ -303,9 +303,9 @@ class UMars_InputProfile_Gameplay : UMars_InputProfile
 
         const auto Value = ActionValue.GetAxis1D();
         if (Value > 0.0f)
-        { Hotbar.Request_Cycle(FMars_Request_Hotbar_Cycle(EMars_Hotbar_CycleDirection::Next)); }
+        { utils_hotbar::Fire_SelectCue(Hotbar, FMars_Hotbar_SelectionChangeRequest(FMars_Request_Hotbar_Cycle(EMars_Hotbar_CycleDirection::Next))); }
         else if (Value < 0.0f)
-        { Hotbar.Request_Cycle(FMars_Request_Hotbar_Cycle(EMars_Hotbar_CycleDirection::Previous)); }
+        { utils_hotbar::Fire_SelectCue(Hotbar, FMars_Hotbar_SelectionChangeRequest(FMars_Request_Hotbar_Cycle(EMars_Hotbar_CycleDirection::Previous))); }
     }
 
     private FCk_Handle_Hotbar TryGet_PawnHotbar() const

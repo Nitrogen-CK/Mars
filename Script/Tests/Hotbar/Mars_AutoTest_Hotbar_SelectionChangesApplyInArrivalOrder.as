@@ -16,6 +16,7 @@ class UMars_AutoTest_Hotbar_SelectionChangesApplyInArrivalOrder : UCk_AutoTest_B
 
         _Hotbar.BindTo_OnSelectionChanged(FMars_Delegate_Hotbar_OnSelectionChanged(this, n"OnSelectionChanged"));
 
+        Add_Step_WaitUntil("the hotbar is ready", n"Check_Ready");
         Add_Step("queue Deselect then Select slot 0 in one frame", n"Step_DeselectThenSelectZero");
         Add_Step_WaitUntil("the selection changed", n"Check_OneChange");
         Add_Step("the later Select wins: slot 0 is selected", n"Step_AssertSelectedZero");
@@ -26,6 +27,13 @@ class UMars_AutoTest_Hotbar_SelectionChangesApplyInArrivalOrder : UCk_AutoTest_B
         Add_Step_WaitUntil("both changes drained", n"Check_FiveChanges");
         Add_Step("the later Select wins after the Cycle applied: slot 1 is selected", n"Step_AssertSelectedOne");
         Run_Steps(InHandle);
+    }
+
+    UFUNCTION()
+    private void Check_Ready(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(_Hotbar.Get_IsReady());
     }
 
     UFUNCTION()

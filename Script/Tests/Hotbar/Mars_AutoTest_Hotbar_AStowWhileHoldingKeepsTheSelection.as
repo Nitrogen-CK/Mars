@@ -33,7 +33,7 @@ class UMars_AutoTest_Hotbar_AStowWhileHoldingKeepsTheSelection : UMars_AutoTestR
     {
         const auto Item = _Hotbar.Get_ItemAt(1);
         auto Res = OutResult;
-        Res.Set(ck::IsValid(Item) && _Hotbar.Get_Fragment(FMars_Fragment_Hotbar).LastSeen[1] == Item);
+        Res.Set(ck::IsValid(Item) && _Hotbar.Get_Fragment(FMars_Fragment_Hotbar_Local).LastSeen[1] == Item);
     }
 
     UFUNCTION()

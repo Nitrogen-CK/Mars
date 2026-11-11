@@ -546,7 +546,7 @@ class UMars_PantryRatCourt_EntityScript : UCk_GenericEntityScript_UE
         auto Request = FCk_Request_Inventory_AddItemByDefinition(mars_items::Cleaver(), 1);
         Request.Set_Policy(ECk_Inventory_AddPolicy::ForceNewItem);
         Slot.Request_AddItemByDefinition(Request, FCk_Delegate_Inventory_OnOperationResult_AddByDefinition());
-        Hotbar.Request_Select(FMars_Request_Hotbar_Select(Index.GetValue()));
+        utils_hotbar::Fire_SelectCue(Hotbar, FMars_Hotbar_SelectionChangeRequest(FMars_Request_Hotbar_SetSelection(Index)));
         Log(f"[PantryRatCourt] cleaver into hotbar slot [{Index.GetValue()}] (Mars_Give's path) t [{_Clock}]");
     }
 

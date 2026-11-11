@@ -323,8 +323,12 @@ class UMars_AutoTestRig_PantryRaid : UMars_AutoTestRig_GroundNavBuildOutcome
         const auto PackReady = ck::IsValid(_PackEntity) && _PackEntity.Is_Backpack() && _PackEntity.Is_WorldItem()
             && ck::IsValid(_PackEntity.As_WorldItem().Get_HeldItem());
         const auto FoodReady = ck::IsValid(_FoodEntity) && _FoodEntity.Is_WorldItem() && ck::IsValid(_FoodEntity.As_WorldItem().Get_HeldItem());
+        auto ChefsReady = true;
+        for (auto Chef : _Chefs)
+        { ChefsReady = ChefsReady && Chef.As_Hotbar().Get_IsReady(); }
+
         const auto Ready = ck::IsValid(_Raid) && ck::IsValid(_Den) && PackReady && FoodReady && _CheeseHolder.Get_NumItems() == 1
-            && (ck::Is_NOT_Valid(_WeaponHolder) || _WeaponHolder.Get_NumItems() == 1);
+            && (ck::Is_NOT_Valid(_WeaponHolder) || _WeaponHolder.Get_NumItems() == 1) && ChefsReady;
         if (Ready)
         {
             _Pack = _PackEntity.As_WorldItem();

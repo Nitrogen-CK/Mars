@@ -1,8 +1,7 @@
 // A client that calls the drop request mixin on its own copy of the carrier changes nothing anywhere: the HeldItemUse
 // drain launches only on the authority and drops a client's Drop and Throw, so no world item spawns and the server's
 // hands keep the rock. Client intent travels as Cue.Mars.HeldItemUse.Launch instead (ThrownBodyLandsOnTheHost).
-// Weak spot: until the hotbar replicates, the client's own HeldItem holds nothing, so its launch would find no item even
-// without the gate; the server half (its hands still full, nothing spawned) is what pins that nothing crossed.
+// The server half (its hands still full, nothing spawned) is what pins that nothing crossed.
 // Surface: Ck.WorldItem.Net.AS_WorldItem_ClientDropRequestIsDropped
 class UCk_AutoTest_Net_WorldItem_ClientDropRequestIsDropped : UMars_AutoTestRig_NetWorldItem
 {
@@ -28,6 +27,19 @@ class UCk_AutoTest_Net_WorldItem_ClientDropRequestIsDropped : UMars_AutoTestRig_
             return;
         }
 
+        WaitUntil(n"Is_ServerCarrierReady", n"OnServerCarrierReady", k_SlowPolls);
+    }
+
+    UFUNCTION()
+    private void Is_ServerCarrierReady(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Result = OutResult;
+        Result.Set(Get_IsCarrierReady(_Carrier));
+    }
+
+    UFUNCTION()
+    private void OnServerCarrierReady(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
+    {
         Seed_ServerSlot(_Carrier.Hotbar, 0);
         WaitSeconds(k_ServerWatchSeconds, n"OnServerWatched");
     }

@@ -97,7 +97,7 @@ class UMars_AutoTest_Hotbar_HandsOnlyItemStowsOnlyToTheOverflow : UMars_AutoTest
     private void Check_SyncSawRock(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(_Hotbar.Get_Fragment(FMars_Fragment_Hotbar).LastSeen[0] == _Items[1]);
+        Res.Set(_Hotbar.Get_Fragment(FMars_Fragment_Hotbar_Local).LastSeen[0] == _Items[1]);
     }
 
     UFUNCTION()

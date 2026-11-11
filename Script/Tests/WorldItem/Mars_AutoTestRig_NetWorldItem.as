@@ -118,7 +118,13 @@ class UMars_AutoTestRig_NetWorldItem : UCk_AutoTest_NetBase
         return Carrier;
     }
 
-    // Server: one rock straight into InSlot.
+    // The carrier's hotbar has adopted every slot root on this machine (call after Compose_Carrier, from a WaitUntil).
+    protected bool Get_IsCarrierReady(const FMars_TESTONLY_NetCarrier& InCarrier) const
+    {
+        return ck::IsValid(InCarrier.Hotbar) && InCarrier.Hotbar.Get_IsReady();
+    }
+
+    // Server: one rock straight into InSlot. The hotbar must be ready (Get_IsCarrierReady).
     protected void Seed_ServerSlot(FCk_Handle_Hotbar InHotbar, int32 InSlot)
     {
         auto Slot = InHotbar.Get_Slot(InSlot);

@@ -1,8 +1,9 @@
 // Inventory links. The features stay pure data + request processors; these tasks decide when they talk, and never call
-// into each other - they meet only through the features' fragments and signals. Items, the hotbar and HeldItem never
-// replicate, so every task that binds them or drives the owner's gloves, hints or drops gates on
-// utils_player_sm::Get_IsOwningCopy; the intent tasks need no gate (only the owner reads input). The crouch height is
-// movement state every copy needs, so it runs everywhere.
+// into each other - they meet only through the features' fragments and signals. The hotbar replicates (the authority
+// decides; a selection crosses as Cue.Mars.Hotbar.Select) and HeldItem derives from it on every machine, but every task
+// that binds them to drive the owner's gloves, hints or drops gates on utils_player_sm::Get_IsOwningCopy; the intent
+// tasks need no gate (only the owner reads input). The crouch height is movement state every copy needs, so it runs
+// everywhere.
 
 //--------------------------------------------------------------------------------------------------------------------------
 // HotbarIntents
@@ -48,13 +49,13 @@ class UMars_SmTask_HotbarIntents : UMars_SmTask_IntentEdges
         const auto BagSlotCount = _Hotbar.Get_BagSlotCount();
         if (Index < BagSlotCount)
         {
-            _Hotbar.Request_Select(FMars_Request_Hotbar_Select(Index));
+            utils_hotbar::Fire_SelectCue(_Hotbar, FMars_Hotbar_SelectionChangeRequest(FMars_Request_Hotbar_Select(Index)));
             return;
         }
 
         const auto BackpackIndex = _Hotbar.Get_BackpackIndex();
         if (Index == BagSlotCount && BackpackIndex.IsSet())
-        { _Hotbar.Request_Select(FMars_Request_Hotbar_Select(BackpackIndex.GetValue())); }
+        { utils_hotbar::Fire_SelectCue(_Hotbar, FMars_Hotbar_SelectionChangeRequest(FMars_Request_Hotbar_Select(BackpackIndex.GetValue()))); }
     }
 }
 

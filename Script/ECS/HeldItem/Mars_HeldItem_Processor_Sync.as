@@ -1,11 +1,15 @@
-// Every pass, after the hotbar's own sync: the held item follows the hotbar's selected slot and its item. A change
-// releases the old presentation, presents the new item and broadcasts OnHeldItemChanged; an unchanged item only records
-// the (possibly different, empty) selected slot.
+// Stance D: nothing here replicates. Every pass, on every machine, after the hotbar's own sync: the held item follows the
+// hotbar's selected slot and its item (both replicated with the hotbar). A change releases the old presentation, presents
+// the new item and broadcasts OnHeldItemChanged; an unchanged item only records the (possibly different, empty) selected
+// slot.
 //
 // A Persistent item (one whose item carries FMars_Fragment_Item_PersistentWorldItem) is never respawned: its own World-mode
 // world item is a Borrowed presentation, never destroyed here, and it mounts on the hand or back from where its item lives
 // (UMars_Processor_WorldItem_Reconcile). Any other item with a Presentation gets a Visual-mode world item under the Hand,
-// spawned at a requested start pose (UMars_Processor_HeldItem_HandleRequests) when one waits.
+// spawned at a requested start pose (UMars_Processor_HeldItem_HandleRequests) when one waits. The Hand is the first-person
+// chain on every copy of a character and its body already draws the held item for the others, so the Owned visual is
+// spawned only for a carrier with no character or a locally controlled one. A Persistent item whose link is absent here
+// (it is stamped on the authority only) gets no presentation at all: an Owned visual would sit beside its replicated body.
 class UMars_Processor_HeldItem_Sync : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -41,7 +45,7 @@ class UMars_Processor_HeldItem_Sync : UCk_Processor_Script_Base_UE
             InState.PresentationEntity = WorldItem;
             InState.PresentationOwnership = EMars_HeldItem_PresentationOwnership::Borrowed;
         }
-        else if (ck::IsValid(Item) && Item.Has_Presentation())
+        else if (ck::IsValid(Item) && Item.Has_Presentation() && Get_IsPersistent(Item) == false && Get_DrawsFirstPerson(InHandle))
         {
             InState.PresentationEntity = Spawn_Visual(Self, InState, Item);
             InState.PresentationOwnership = EMars_HeldItem_PresentationOwnership::Owned;
@@ -50,6 +54,19 @@ class UMars_Processor_HeldItem_Sync : UCk_Processor_Script_Base_UE
         // InState is not read past this line: a listener may add a request fragment to the carrier.
         if (Self.Has_Fragment(FMars_Fragment_HeldItem_Signals))
         { Self.Get_Fragment(FMars_Fragment_HeldItem_Signals).OnHeldItemChanged.Broadcast(Self, PrevItem, NewItem); }
+    }
+
+    // The carrier draws its own first-person held visual: no character at all (headless tests), or a locally controlled one.
+    private bool Get_DrawsFirstPerson(const FCk_Handle& InHandle) const
+    {
+        auto Character = Cast<ACharacter>(utils_owning_actor::TryGet_EntityOwningActor_Recursive(InHandle));
+        return Character == nullptr || Character.IsLocallyControlled();
+    }
+
+    private bool Get_IsPersistent(const FCk_Handle_Item& InItem) const
+    {
+        const UMars_ItemTrait_Presentation Presentation = InItem.Get_Presentation();
+        return Presentation.Mounting.Persistence == EMars_WorldItem_Persistence::Persistent;
     }
 
     // Owned: destroyed. Borrowed: the world item stays; where it goes is its own reconcile's.

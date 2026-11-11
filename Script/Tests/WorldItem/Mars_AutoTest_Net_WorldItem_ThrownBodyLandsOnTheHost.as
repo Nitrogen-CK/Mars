@@ -32,6 +32,19 @@ class UCk_AutoTest_Net_WorldItem_ThrownBodyLandsOnTheHost : UMars_AutoTestRig_Ne
         }
 
         Spawn_ServerFloor(InHandle, k_FloorTop);
+        WaitUntil(n"Is_ServerCarrierReady", n"OnServerCarrierReady", k_SlowPolls);
+    }
+
+    UFUNCTION()
+    private void Is_ServerCarrierReady(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Result = OutResult;
+        Result.Set(Get_IsCarrierReady(_Carrier));
+    }
+
+    UFUNCTION()
+    private void OnServerCarrierReady(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
+    {
         Seed_ServerSlot(_Carrier.Hotbar, 0);
         WaitUntil(n"Is_ServerReadyToLaunch", n"OnServerReadyToLaunch", k_SlowPolls);
     }

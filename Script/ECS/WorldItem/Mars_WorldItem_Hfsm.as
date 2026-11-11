@@ -79,14 +79,16 @@ class UMars_SmTask_MoveItemAtGrip : UMars_SmTask_ActAtGrip
 // (the holder empty, or the world item gone) or for the authority's refusal (FMars_Fragment_WorldItem_Net naming this
 // initiator), which fails it with that reason. On the listen host and in standalone the cue runs the same frame. A
 // Transient world item destroys itself once its holder empties; a Persistent one mounts on the initiator from where its
-// item lands (UMars_Processor_WorldItem_Reconcile), riding the gloves home when they took it. A full hotbar fails (the
+// item lands (UMars_Processor_WorldItem_Reconcile), riding the gloves home when they took it. The effect is the item, as
+// captured at the Grip, in this initiator's own hotbar as this machine sees it (the hotbar replicates); another chef
+// winning the race empties the holder too, so this task then runs to its budget and fails. A full hotbar fails (the
 // pickup is normally disabled before it gets here); so do gloves that return or lose it before their Grip.
-// Interim (until the hotbar replicates): a client's pickup leaves the floor on every machine, but the item lands in that
-// chef's hotbar on the host only, so the client's own hotbar stays empty; its local stow check reads that empty copy.
 class UMars_SmTask_WorldItem_StowIntoInitiator : UMars_SmTask_MoveItemAtGrip
 {
     private FCk_Handle _Initiator;
     private FCk_Handle_WorldItem _WorldItem;
+    // The item the cue asked for, captured at the Grip: the effect is it landing in the initiator's hotbar.
+    private FCk_Handle_Item _Item;
     // The world item's refusal serial when this task fired its cue: only a later refusal is about it.
     private int32 _RefusalSerialAtCue = 0;
 
@@ -96,6 +98,7 @@ class UMars_SmTask_WorldItem_StowIntoInitiator : UMars_SmTask_MoveItemAtGrip
         _Outcome = ECk_SmTaskResult::Running;
         _Initiator = FCk_Handle();
         _WorldItem = FCk_Handle_WorldItem();
+        _Item = FCk_Handle_Item();
 
         FCk_Handle Owner;
         FCk_Handle Initiator;
@@ -141,20 +144,19 @@ class UMars_SmTask_WorldItem_StowIntoInitiator : UMars_SmTask_MoveItemAtGrip
         FCk_Handle LyingEntity = _WorldItem;
         Ride_IntoHand(_Initiator, Item, utils_transform::Get_EntityCurrentTransform(LyingEntity.As_Transform()));
 
+        _Item = Item;
         _RefusalSerialAtCue = _WorldItem.Get_RefusalSerial();
         utils_cue_generic::Request_ExecuteCue(_WorldItem, GameplayTags::Cue_Mars_WorldItem_PickUp,
             FMars_Request_WorldItem_PickUp(_Initiator), ECk_Cue_ReliabilityPolicy::Reliable, ECk_Cue_MulticastPolicy::ServerOnly);
         Await_ReplicatedEffect();
     }
 
-    // A stowed Transient item's world item ends; a Persistent one's holder empties and it stays as the item's body.
+    // Only this initiator's hotbar holding the item counts: the holder emptying or the world item ending says only that
+    // someone took it.
     protected bool DoGet_EffectLanded() override
     {
-        if (ck::Is_NOT_Valid(_WorldItem))
-        { return true; }
-
-        auto Holder = _WorldItem.Get_Holder();
-        return ck::Is_NOT_Valid(Holder) || Holder.Get_NumItems() == 0;
+        const auto Hotbar = _Initiator.As_Hotbar(ECk_SanityCheck::UnChecked);
+        return ck::IsValid(Hotbar) && Hotbar.TryGet_SlotIndexOf(_Item).IsSet();
     }
 
     protected bool DoTryGet_Refusal(EMars_Interaction_FailReason& OutReason) override
