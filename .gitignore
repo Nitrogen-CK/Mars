@@ -362,3 +362,27 @@ Config/_StubRecovery_DynamicHandleTypes.json
 Content/**/*.hierarchy.copy.txt
 Content/**/*.animation.*.t3d.txt
 !Content/Tests/Monolith/**
+
+# CkAngelscriptGenerator self-heal stub recovery files (written beside the canonical
+# during a failed compile, deleted by OnPostCompile once the canonical regenerates).
+Script/Generated/_StubRecovery_*.as
+Script/Generated/_StubRecovery_*.json
+
+# Generated EntitySpawnParams - regenerated on every editor boot / AS compile, so tracking it only
+# produced merge conflicts and stale commits (a teammate adds a field without regenerating, and
+# every other checkout fails to compile). Bootstrap on a fresh clone, or after a pull deletes it,
+# is covered by the self-heal dispatcher's source-derived stub synthesis
+# (Plugins/CkFoundation/Source/CkAngelscriptGenerator/Claude.md). Same setup as BusterBlock.
+# The other generated files (*_AutoTestActors.as, *Assets.as, DynamicHandleTypes.json,
+# *_ScriptProcessorDrivers.as) stay committed - the asset registries hard-reference wrapper actor types.
+# If CI is ever added: a fresh agent's first cook fails until the self-heal stubs land, so port
+# BusterBlock's .runreal/scripts/cook-with-retry.ps1 and its wiring (pipeline-config.ts,
+# pipelines/compile.pipeline.ts, buildgraph/Build.xml).
+Script/Generated/Mars_EntitySpawnParams.as
+
+# Same for plugin-authored EntitySpawnParams in non-submodule plugins. A committed plugin ESP leaves
+# its subclass accessor present, which blocks the self-heal of the base project accessor it subclasses.
+# Submodule plugins (CkFoundation, CkTests, ...) carry their own .gitignore.
+Plugins/*/Script/Generated/*_EntitySpawnParams.as
+Plugins/*/Script/Generated/_StubRecovery_*.as
+Plugins/*/Script/Generated/_StubRecovery_*.json
