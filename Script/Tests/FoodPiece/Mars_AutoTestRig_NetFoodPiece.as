@@ -62,6 +62,16 @@ struct FMars_Fragment_TESTONLY_NetFoodPieceReport
     int32 Serial = 0;
 }
 
+// What the per-frame sampler saw of one food entity: the frame it appeared, the frame it was first a FoodPiece and its
+// standing then, and the first frame it stood. -1 for what has not happened.
+struct FMars_TESTONLY_NetFoodPieceSighting
+{
+    int32 AppearFrame = -1;
+    int32 PieceFrame = -1;
+    EMars_FoodPiece_Standing FirstStanding = EMars_FoodPiece_Standing::Current;
+    int32 StoodFrame = -1;
+}
+
 UCLASS(Abstract)
 class UMars_AutoTestRig_NetFoodPiece : UMars_AutoTestRig_NetWorldItem
 {
@@ -138,10 +148,16 @@ class UMars_AutoTestRig_NetFoodPiece : UMars_AutoTestRig_NetWorldItem
         Spawn_ServerFloor(InTestEntity, _FloorTop);
     }
 
-    // The meat slab 5 cm above the floor, as _Rock.
+    // The whole food Spawn_ServerSlab spawns.
+    protected UCk_InventoryItem_Definition Get_RigFoodItem()
+    {
+        return mars_items::Food_MeatSlab();
+    }
+
+    // The rig's food (the meat slab unless a test names another) 5 cm above the floor, as _Rock.
     protected void Spawn_ServerSlab()
     {
-        _Rock = Spawn_ServerFood(mars_items::Food_MeatSlab(), _FloorTop + FVector(0.0, 0.0, 5.0));
+        _Rock = Spawn_ServerFood(Get_RigFoodItem(), _FloorTop + FVector(0.0, 0.0, 5.0));
     }
 
     protected bool Get_IsCookStateZero(FMars_FoodPiece_CookState InCookState)
@@ -324,6 +340,20 @@ class UMars_AutoTestRig_NetFoodPiece : UMars_AutoTestRig_NetWorldItem
         {
             const auto Kept = Get_LastKept(Entity);
             if (Kept.IsSet() && Kept.GetValue() == InSide)
+            { return Entity; }
+        }
+
+        return FCk_Handle();
+    }
+
+    // The entity of InEntities whose replay recipe has InCuts cuts, the last keeping InSide; invalid when none does.
+    protected FCk_Handle Find_ByRecipe(TArray<FCk_Handle> InEntities, int32 InCuts, EMars_FoodPiece_CutSide InSide)
+    {
+        for (const auto& Entity : InEntities)
+        {
+            const auto Replay = utils_foodpiece::TryGet_Replay(Entity);
+            const auto Kept = Get_LastKept(Entity);
+            if (Replay.IsSet() && Replay.GetValue().Piece.Data.Recipe.Cuts.Num() == InCuts && Kept.IsSet() && Kept.GetValue() == InSide)
             { return Entity; }
         }
 
@@ -587,6 +617,274 @@ class UMars_AutoTestRig_NetFoodPiece : UMars_AutoTestRig_NetWorldItem
         auto Entity = utils_foodpiece::Request_SpawnCutPiece(Get_SubjectEntity(), InBirth);
         Track_ForCleanup(Entity);
         return Entity;
+    }
+
+    //----------------------------------------------------------------------------------------------------------------------
+    // The two halves by hand (server)
+    //----------------------------------------------------------------------------------------------------------------------
+
+    protected const float32 k_StepSeconds = 1.5f;
+
+    // The rig's food as its halves inherit it, taken when the by-hand slice is asked.
+    protected FMars_FoodPiece_Spec _WholeSpec;
+    // The two halves of the by-hand slice, held until a step spawns them.
+    protected FMars_FoodPiece_Birth _BirthP;
+    protected FMars_FoodPiece_Birth _BirthN;
+    protected FCk_Handle _SpawnedP;
+    protected FCk_Handle _SpawnedN;
+
+    // The plane the by-hand slice cuts the rig's food along.
+    protected FCk_RuntimeMesh_PlaneLocal Get_ByHandPlane()
+    {
+        return Make_CentrePlane();
+    }
+
+    // Slices _Rock's geometry along Get_ByHandPlane and holds its two births; On_ServerHalvesHeld once they are.
+    protected void Begin_ByHandHalves()
+    {
+        auto Food = _Rock.As_FoodPiece();
+        _WholeSpec = Make_SourceSpec(Food);
+        Slice_ByHand(Food.Get_Geometry(), Get_ByHandPlane(), Food.Get_Cap());
+        WaitUntil(n"Is_RigHalvesSliced", n"OnRigHalvesSliced", k_SlowPolls);
+    }
+
+    protected void On_ServerHalvesHeld() {}
+
+    UFUNCTION()
+    private void Is_RigHalvesSliced(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Result = OutResult;
+        Result.Set(_ByHandSlices.Num() >= 1);
+    }
+
+    UFUNCTION()
+    private void OnRigHalvesSliced(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
+    {
+        const auto Slice = _ByHandSlices[0];
+        Assert_True(Slice.Get_Outcome() == ECk_RuntimeMesh_SliceOutcome::Succeeded, f"the by-hand slice succeeded (got {Slice.Get_Outcome() :n})");
+        if (Slice.Get_Outcome() != ECk_RuntimeMesh_SliceOutcome::Succeeded)
+        {
+            End_Server();
+            return;
+        }
+
+        _BirthP = Make_ByHandBirth(_WholeSpec, Slice, FMars_FoodPiece_RecipeCut(Get_ByHandPlane(), EMars_FoodPiece_CutSide::Positive));
+        _BirthN = Make_ByHandBirth(_WholeSpec, Slice, FMars_FoodPiece_RecipeCut(Get_ByHandPlane(), EMars_FoodPiece_CutSide::Negative));
+        On_ServerHalvesHeld();
+    }
+
+    protected void Spawn_P()
+    {
+        _SpawnedP = Spawn_ByHand(_BirthP);
+    }
+
+    protected void Spawn_N()
+    {
+        _SpawnedN = Spawn_ByHand(_BirthN);
+    }
+
+    protected void Destroy_Whole()
+    {
+        if (ck::IsValid(_Rock))
+        { utils_entity_lifetime::Request_DestroyEntity(_Rock); }
+    }
+
+    //----------------------------------------------------------------------------------------------------------------------
+    // Standing (either machine, sampled every frame)
+    //----------------------------------------------------------------------------------------------------------------------
+
+    // Frames in which two standing pieces stand of which one was cut from the other.
+    protected int32 _Both = 0;
+    // Frames, from the first frame a whole food stood, in which nothing near the test's X stands.
+    protected int32 _Neither = 0;
+    protected int32 _SampleFrame = 0;
+    protected bool _WholeStood = false;
+    // In parallel: every food entity seen near the test's X, and what the sampler saw of it.
+    protected TArray<FCk_Handle> _Seen;
+    protected TArray<FMars_TESTONLY_NetFoodPieceSighting> _Sightings;
+    private FCk_Handle_Timer _SampleTimer;
+    private bool _BothLogged = false;
+
+    // Every live whole food and piece script near InNear on this machine, FoodPiece or not.
+    protected TArray<FCk_Handle> Get_FoodEntitiesNear(FVector InNear)
+    {
+        auto Entities = Get_PieceEntitiesNear(InNear);
+        for (auto Candidate : utils_entity_tag::ForEach_Entity(Get_SubjectEntity(), n"TAG_MarsWorldItem"))
+        {
+            if (Get_IsLive(Candidate) && Candidate.Is_Transform() && Get_IsNear(Candidate, InNear))
+            { Entities.Add(Candidate); }
+        }
+
+        return Entities;
+    }
+
+    // A Ready FoodPiece whose standing is Current.
+    protected bool Get_Stands(FCk_Handle InEntity)
+    {
+        return Get_IsLive(InEntity) && InEntity.Is_FoodPiece() && InEntity.As_FoodPiece().Get_Status() == EMars_FoodPiece_Status::Ready
+            && InEntity.As_FoodPiece().Get_Standing() == EMars_FoodPiece_Standing::Current;
+    }
+
+    protected TArray<FCk_Handle_FoodPiece> Get_StandingNear(FVector InNear)
+    {
+        TArray<FCk_Handle_FoodPiece> Standing;
+        for (auto Entity : Get_FoodEntitiesNear(InNear))
+        {
+            if (Get_Stands(Entity))
+            { Standing.Add(Entity.As_FoodPiece()); }
+        }
+
+        return Standing;
+    }
+
+    // InEntity's standing; unset while it is not a FoodPiece.
+    protected TOptional<EMars_FoodPiece_Standing> Get_StandingOf(FCk_Handle InEntity)
+    {
+        if (Get_IsLive(InEntity) == false || InEntity.Is_FoodPiece() == false)
+        { return TOptional<EMars_FoodPiece_Standing>(); }
+
+        return TOptional<EMars_FoodPiece_Standing>(InEntity.As_FoodPiece().Get_Standing());
+    }
+
+    protected bool Get_IsSuperseded(FCk_Handle InEntity)
+    {
+        const auto Standing = Get_StandingOf(InEntity);
+        return Standing.IsSet() && Standing.GetValue() == EMars_FoodPiece_Standing::Superseded;
+    }
+
+    // InEntity's display is Ready and drawn.
+    protected bool Get_IsShown(FCk_Handle InEntity)
+    {
+        if (Get_IsLive(InEntity) == false || InEntity.Is_RuntimeMeshDisplay() == false)
+        { return false; }
+
+        return utils_runtime_mesh_display::Get_Visibility(InEntity.As_RuntimeMeshDisplay()) == ECk_EnableDisable::Enable;
+    }
+
+    // Call on both machines once Begin_Rig ran: samples every frame until End_Sampling.
+    protected void Begin_Sampling(FCk_Handle InTestEntity)
+    {
+        _SampleTimer = utils_timer::Create_Tick(InTestEntity, FCk_Delegate_Timer(this, n"OnRigSample"));
+    }
+
+    protected void End_Sampling()
+    {
+        if (ck::Is_NOT_Valid(_SampleTimer))
+        { return; }
+
+        utils_timer::UnbindFrom_OnUpdate(_SampleTimer, FCk_Delegate_Timer(this, n"OnRigSample"));
+        utils_entity_lifetime::Request_DestroyEntity(_SampleTimer.H());
+        _SampleTimer = FCk_Handle_Timer();
+    }
+
+    // Called every sampled frame after the counts, with every food entity near the test's X and those that stand.
+    protected void On_Sample(TArray<FCk_Handle> InEntities, TArray<FCk_Handle_FoodPiece> InStanding) {}
+
+    protected FString Describe_Standing()
+    {
+        return f"Both={_Both} Neither={_Neither} frames={_SampleFrame}";
+    }
+
+    // InEntity's sighting; a default one (every frame -1) when it was never seen.
+    protected FMars_TESTONLY_NetFoodPieceSighting Get_Sighting(FCk_Handle InEntity)
+    {
+        for (int32 Index = 0; Index < _Seen.Num(); ++Index)
+        {
+            if (_Seen[Index] == InEntity)
+            { return _Sightings[Index]; }
+        }
+
+        return FMars_TESTONLY_NetFoodPieceSighting();
+    }
+
+    // Frames from InEntity's first sighting to its first standing frame; unset while it has not stood.
+    protected TOptional<int32> Get_StandDelay(FCk_Handle InEntity)
+    {
+        const auto Sighting = Get_Sighting(InEntity);
+        if (Sighting.AppearFrame < 0 || Sighting.StoodFrame < 0)
+        { return TOptional<int32>(); }
+
+        return TOptional<int32>(Sighting.StoodFrame - Sighting.AppearFrame);
+    }
+
+    protected FString Describe_Recipe(FCk_Handle_FoodPiece InPiece)
+    {
+        auto Text = f"{InPiece.Get_Recipe().Cuts.Num()} cuts [";
+        for (const auto& Cut : InPiece.Get_Recipe().Cuts)
+        { Text += f"{Cut.Plane.Get_PositionCm().ToString()} {Cut.Kept :n}; "; }
+
+        return Text + "]";
+    }
+
+    UFUNCTION()
+    private void OnRigSample(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
+    {
+        ++_SampleFrame;
+        const auto Entities = Get_FoodEntitiesNear(_FloorTop);
+        TArray<FCk_Handle_FoodPiece> Standing;
+        for (auto Entity : Entities)
+        {
+            auto Index = -1;
+            for (int32 SeenIndex = 0; SeenIndex < _Seen.Num(); ++SeenIndex)
+            {
+                if (_Seen[SeenIndex] == Entity)
+                { Index = SeenIndex; }
+            }
+
+            if (Index < 0)
+            {
+                auto Sighting = FMars_TESTONLY_NetFoodPieceSighting();
+                Sighting.AppearFrame = _SampleFrame;
+                _Seen.Add(Entity);
+                _Sightings.Add(Sighting);
+                Index = _Seen.Num() - 1;
+            }
+
+            if (Entity.Is_FoodPiece() && _Sightings[Index].PieceFrame < 0)
+            {
+                _Sightings[Index].PieceFrame = _SampleFrame;
+                _Sightings[Index].FirstStanding = Entity.As_FoodPiece().Get_Standing();
+            }
+
+            if (Get_Stands(Entity) == false)
+            { continue; }
+
+            Standing.Add(Entity.As_FoodPiece());
+            if (_Sightings[Index].StoodFrame < 0)
+            { _Sightings[Index].StoodFrame = _SampleFrame; }
+
+            if (Entity.As_FoodPiece().Get_IsWhole())
+            { _WholeStood = true; }
+        }
+
+        auto IsBoth = false;
+        for (int32 A = 0; A < Standing.Num(); ++A)
+        {
+            for (int32 B = 0; B < Standing.Num(); ++B)
+            {
+                if (A == B || utils_foodpiece::Get_IsCutFrom(Standing[A], Standing[B]) == false)
+                { continue; }
+
+                IsBoth = true;
+                if (_BothLogged == false)
+                {
+                    _BothLogged = true;
+                    const auto Machine = Get_MachineName();
+                    const auto TestName = GetClass().GetName();
+                    const auto Piece = Describe_Recipe(Standing[A]);
+                    const auto Ancestor = Describe_Recipe(Standing[B]);
+                    Log(f"[FoodPieceNetTest] {TestName} {Machine}: both stand at frame {_SampleFrame}: [{Standing[A].ToString()}] {Piece} was cut from [{Standing[B].ToString()}] {Ancestor}");
+                }
+            }
+        }
+
+        if (IsBoth)
+        { ++_Both; }
+
+        if (_WholeStood && Standing.Num() == 0)
+        { ++_Neither; }
+
+        On_Sample(Entities, Standing);
     }
 
     //----------------------------------------------------------------------------------------------------------------------

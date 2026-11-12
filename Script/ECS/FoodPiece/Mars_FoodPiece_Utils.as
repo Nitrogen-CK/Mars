@@ -21,7 +21,9 @@ namespace utils_foodpiece
     // A piece whose entity replicates (DoGet_HasLedger) also gets the replicated ledger (unless it already arrived), its local
     // mirror state and the mirror tag. The authority writes its identity, cook state and, once Ready, its check numbers into
     // the ledger. A copy without authority mints nothing: its Id and a root's Lineage are the spec's when valid, else the
-    // arrived ledger's, else invalid until the mirror adopts them; it takes an arrived ledger's cook state.
+    // arrived ledger's, else invalid until the mirror adopts them; it takes an arrived ledger's cook state. On such a copy a
+    // cut piece starts Arriving and a whole one Current, and each is tagged for the Succession processor once its lineage
+    // is known.
     FCk_Handle_FoodPiece Add(FCk_Handle& InHandle, FMars_FoodPiece_Spec InSpec)
     {
         const auto Validation = InSpec.Validate();
@@ -74,6 +76,14 @@ namespace utils_foodpiece
             Local.LastCookSerial = Ledger.CookSerial;
         }
 
+        // A copy's cut piece arrives and stands once the Succession processor rules; a whole food stands from the start and
+        // is ruled on once its lineage is known (here, or when the mirror adopts it).
+        const auto IsCut = InSpec.Data.Recipe.Cuts.Num() > 0;
+        if (IsMirror && IsCut)
+        { Local.Standing = EMars_FoodPiece_Standing::Arriving; }
+
+        const auto NeedsSuccession = IsMirror && (IsCut || State.Lineage.IsValid());
+
         // A half is published Ready by its cut, so whoever receives the cut never sees it Pending.
         const auto Geometry = InHandle.As_RuntimeMesh();
         if (utils_runtime_mesh::Get_SetupState(Geometry) == ECk_RuntimeMesh_SetupState::Ready)
@@ -95,6 +105,9 @@ namespace utils_foodpiece
             InHandle.Add_Fragment(Local);
             InHandle.Add_Fragment(FMars_Tag_FoodPiece_NeedsMirror());
         }
+
+        if (NeedsSuccession)
+        { InHandle.Add_Fragment(FMars_Tag_FoodPiece_NeedsSuccession()); }
 
         auto Piece = InHandle.As_FoodPiece();
         Write_LedgerIdentity(Piece);
@@ -562,6 +575,28 @@ namespace utils_foodpiece
         return InA.Get_PositionCm() == InB.Get_PositionCm() && InA.Get_Normal() == InB.Get_Normal() && InA.Get_Tangent() == InB.Get_Tangent();
     }
 
+    // InPiece was cut from InAncestor: one lineage (its cuts share one frame), InAncestor's recipe strictly shorter, and
+    // each of InAncestor's cuts the same plane and kept side as InPiece's cut at that index.
+    bool Get_IsCutFrom(const FCk_Handle_FoodPiece& InPiece, const FCk_Handle_FoodPiece& InAncestor)
+    {
+        const auto Lineage = InPiece.Get_Lineage();
+        if (Lineage.IsValid() == false || InAncestor.Get_Lineage() != Lineage)
+        { return false; }
+
+        const auto Cuts = InPiece.Get_Recipe().Cuts;
+        const auto AncestorCuts = InAncestor.Get_Recipe().Cuts;
+        if (AncestorCuts.Num() >= Cuts.Num())
+        { return false; }
+
+        for (int32 Index = 0; Index < AncestorCuts.Num(); ++Index)
+        {
+            if (AncestorCuts[Index].Kept != Cuts[Index].Kept || Get_IsSamePlane(AncestorCuts[Index].Plane, Cuts[Index].Plane) == false)
+            { return false; }
+        }
+
+        return true;
+    }
+
     // What Request_Replay kept on InHandle; unset when it kept nothing.
     TOptional<FMars_FoodPiece_ReplaySpec> TryGet_Replay(const FCk_Handle& InHandle)
     {
@@ -933,6 +968,16 @@ mixin EMars_FoodPiece_CheckResult Get_CheckResult(const FCk_Handle_FoodPiece& Se
     return Self.Get_Fragment(FMars_Fragment_FoodPiece_Local).CheckResult;
 }
 
+// Whether this copy shows the piece (the Succession processor rules); Current on the authority and for a piece without a
+// replicated ledger.
+mixin EMars_FoodPiece_Standing Get_Standing(const FCk_Handle_FoodPiece& Self)
+{
+    if (Self.Has_Fragment(FMars_Fragment_FoodPiece_Local) == false)
+    { return EMars_FoodPiece_Standing::Current; }
+
+    return Self.Get_Fragment(FMars_Fragment_FoodPiece_Local).Standing;
+}
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Requests
 //--------------------------------------------------------------------------------------------------------------------------
@@ -1007,4 +1052,18 @@ mixin void UnbindFrom_OnCookStateChanged(FCk_Handle_FoodPiece& Self, FMars_Deleg
     { return; }
 
     Self.Get_Fragment(FMars_Fragment_FoodPiece_Signals).OnCookStateChanged.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void BindTo_OnStandingChanged(FCk_Handle_FoodPiece& Self, FMars_Delegate_FoodPiece_OnStandingChanged InDelegate)
+{
+    auto& Fragment = Self.AddOrGet_Fragment(FMars_Fragment_FoodPiece_Signals);
+    Fragment.OnStandingChanged.AddUFunction(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void UnbindFrom_OnStandingChanged(FCk_Handle_FoodPiece& Self, FMars_Delegate_FoodPiece_OnStandingChanged InDelegate)
+{
+    if (Self.Has_Fragment(FMars_Fragment_FoodPiece_Signals) == false)
+    { return; }
+
+    Self.Get_Fragment(FMars_Fragment_FoodPiece_Signals).OnStandingChanged.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
 }

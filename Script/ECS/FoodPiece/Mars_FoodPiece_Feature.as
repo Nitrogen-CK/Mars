@@ -18,7 +18,9 @@ struct FMars_Feature_FoodPiece {}
 // wears the cook state (OnCookStateChanged) and checks its own geometry against the numbers; only the authority gives a
 // piece a body. A machine without the slice rebuilds a cut piece from its recipe (the Replay processors): it imports the
 // definition's mesh once, slices each cut of a lineage once through its local replay memo, and shares the result onto the
-// replicated entity; the memo and everything it holds are local and read by no simulation.
+// replicated entity; the memo and everything it holds are local and read by no simulation. A copy without authority shows
+// a piece only while it stands (its local standing, ruled by the Succession processor): a cut piece arrives and stands
+// once built, and supersedes every standing piece it was cut from; the authority's pieces always stand.
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Vocabulary
@@ -847,7 +849,16 @@ struct FMars_Fragment_FoodPiece_Net
     FVector CheckBoundsMaxCm = FVector::ZeroVector;
 }
 
-// Beside the ledger, this machine's own: the cook serial it last wore and how its geometry compared.
+// Whether a copy without authority shows the piece. A cut piece arrives before it stands; a piece stands until one cut
+// from it stands, and is then superseded for good. A piece with authority always stands.
+enum EMars_FoodPiece_Standing
+{
+    Arriving,
+    Current,
+    Superseded
+}
+
+// Beside the ledger, this machine's own: the cook serial it last wore, how its geometry compared and whether it stands.
 struct FMars_Fragment_FoodPiece_Local
 {
     UPROPERTY()
@@ -855,9 +866,23 @@ struct FMars_Fragment_FoodPiece_Local
 
     UPROPERTY()
     EMars_FoodPiece_CheckResult CheckResult = EMars_FoodPiece_CheckResult::Unchecked;
+
+    UPROPERTY()
+    EMars_FoodPiece_Standing Standing = EMars_FoodPiece_Standing::Current;
 }
 
 struct FMars_Tag_FoodPiece_NeedsMirror {}
+
+// On a copy without authority whose lineage is known: the Succession processor rules on its standing.
+struct FMars_Tag_FoodPiece_NeedsSuccession {}
+
+// On the Succession processor's handle (the world's transient entity): every piece of this machine it has ruled on and that
+// is not gone. Local, read by no simulation.
+struct FMars_Fragment_FoodPiece_Kin
+{
+    UPROPERTY()
+    TArray<FCk_Handle_FoodPiece> Pieces;
+}
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Signals
@@ -882,12 +907,18 @@ event void FMars_Delegate_FoodPiece_OnCutResolved_MC(FCk_Handle_FoodPiece InSour
 delegate void FMars_Delegate_FoodPiece_OnCookStateChanged(FCk_Handle_FoodPiece InPiece);
 event void FMars_Delegate_FoodPiece_OnCookStateChanged_MC(FCk_Handle_FoodPiece InPiece);
 
+// On a copy without authority, each time the piece's standing changes (the standing is written first). Never raised on the
+// authority.
+delegate void FMars_Delegate_FoodPiece_OnStandingChanged(FCk_Handle_FoodPiece InPiece, EMars_FoodPiece_Standing InStanding);
+event void FMars_Delegate_FoodPiece_OnStandingChanged_MC(FCk_Handle_FoodPiece InPiece, EMars_FoodPiece_Standing InStanding);
+
 struct FMars_Fragment_FoodPiece_Signals
 {
     FMars_Delegate_FoodPiece_OnReady_MC OnReady;
     FMars_Delegate_FoodPiece_OnFailed_MC OnFailed;
     FMars_Delegate_FoodPiece_OnCutResolved_MC OnCutResolved;
     FMars_Delegate_FoodPiece_OnCookStateChanged_MC OnCookStateChanged;
+    FMars_Delegate_FoodPiece_OnStandingChanged_MC OnStandingChanged;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

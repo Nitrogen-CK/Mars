@@ -2,8 +2,8 @@
 // the ledger's rep-notify and reconciles once, so a ledger that replicated before the bind still counts; each reconcile
 // adopts the ledger's Id and Lineage while this copy has no Id (a valid Id that differs from the ledger's is a defect),
 // wears the ledger's cook state when its serial is one this copy has not worn and then raises OnCookStateChanged, and
-// checks this copy's geometry against the authority's numbers (utils_foodpiece::Update_CheckResult). A notify that changes
-// nothing does nothing.
+// checks this copy's geometry against the authority's numbers (utils_foodpiece::Update_CheckResult); a lineage it adopts tags
+// the piece for the Succession processor. A notify that changes nothing does nothing.
 class UMars_Processor_FoodPiece_Mirror : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -46,6 +46,7 @@ class UMars_Processor_FoodPiece_Mirror : UCk_Processor_Script_Base_UE
     {
         const auto Ledger = InPiece.Get_Fragment(FMars_Fragment_FoodPiece_Net);
         auto& State = InPiece.Get_Fragment(FMars_Fragment_FoodPiece);
+        auto IsLineageAdopted = false;
 
         if (Ledger.Id.IsValid())
         {
@@ -53,7 +54,10 @@ class UMars_Processor_FoodPiece_Mirror : UCk_Processor_Script_Base_UE
             {
                 State.Id = Ledger.Id;
                 if (Ledger.Lineage.IsValid())
-                { State.Lineage = Ledger.Lineage; }
+                {
+                    IsLineageAdopted = State.Lineage.IsValid() == false;
+                    State.Lineage = Ledger.Lineage;
+                }
             }
             else
             {
@@ -71,6 +75,10 @@ class UMars_Processor_FoodPiece_Mirror : UCk_Processor_Script_Base_UE
         }
 
         utils_foodpiece::Update_CheckResult(InPiece);
+
+        // A lineage now known is ruled on (the Succession processor runs after this one).
+        if (IsLineageAdopted && InPiece.Has_Fragment(FMars_Tag_FoodPiece_NeedsSuccession) == false)
+        { InPiece.Add_Fragment(FMars_Tag_FoodPiece_NeedsSuccession()); }
 
         if (IsNewCookState && InPiece.Has_Fragment(FMars_Fragment_FoodPiece_Signals))
         { InPiece.Get_Fragment(FMars_Fragment_FoodPiece_Signals).OnCookStateChanged.Broadcast(InPiece); }

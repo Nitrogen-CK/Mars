@@ -2,12 +2,15 @@
 // Every machine composes its root transform and its entity tag and resolves its food from the recipe's definition id. The
 // authority's copy carries its birth (the slice's geometry and the half's spec) and composes the FoodPiece from it, then
 // dresses it. A copy without one asks for its recipe to be rebuilt (utils_foodpiece::Request_Replay) and continues its
-// construction until the replay resolves: Built composes the FoodPiece on the shared geometry, dresses it and wears the
-// authority's cook state; Failed finishes it as a non-piece that wears nothing.
+// construction until the replay resolves: Built composes the FoodPiece on the shared geometry, which arrives and is dressed
+// (wearing the authority's cook state) only once it stands, and takes off what it wears once a piece cut from it stands;
+// Failed finishes it as a non-piece that shows the food's mesh fitted to the authority's bounds (a stand-in) once the
+// ledger brings them.
 //
 // Stance REPLICATES from the replicated spawn owner: the spawn data is the recipe, the identity and the mass, and the root
 // transform replicates; the authority shares the cut's geometry, a client rebuilds its own from the recipe. Only the
-// authority's piece has a body (none is added here). Not a world item, so it has no pickup.
+// authority's piece has a body (none is added here). Not a world item, so it has no pickup. A client shows a piece only
+// while it stands (its standing is local, ruled by the Succession processor).
 class UMars_FoodPiece_EntityScript : UCk_GenericEntityScript_UE
 {
     // Stance REPLICATES: from the spawn owner; spawn data is the recipe, the identity and the mass.
@@ -39,6 +42,8 @@ class UMars_FoodPiece_EntityScript : UCk_GenericEntityScript_UE
     private UMars_Food_Def _Food;
     private FCk_Handle _Entity;
     private FCk_Handle_FoodPiece _Piece;
+    // A failed replay's wait for the authority's bounds.
+    private FCk_Handle_Timer _StandInWait;
 
     UFUNCTION(BlueprintOverride)
     ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
@@ -95,19 +100,25 @@ class UMars_FoodPiece_EntityScript : UCk_GenericEntityScript_UE
         { utils_foodpiece::UnbindFrom_OnReplayResolved(_Entity, FMars_Delegate_FoodPiece_OnReplayResolved(this, n"OnReplayResolved")); }
 
         if (ck::IsValid(_Piece))
-        { _Piece.UnbindFrom_OnCookStateChanged(FMars_Delegate_FoodPiece_OnCookStateChanged(this, n"OnPieceCookStateChanged")); }
+        {
+            _Piece.UnbindFrom_OnCookStateChanged(FMars_Delegate_FoodPiece_OnCookStateChanged(this, n"OnPieceCookStateChanged"));
+            _Piece.UnbindFrom_OnStandingChanged(FMars_Delegate_FoodPiece_OnStandingChanged(this, n"OnPieceStandingChanged"));
+        }
 
+        End_StandInWait();
         _Entity = FCk_Handle();
         _Piece = FCk_Handle_FoodPiece();
     }
 
-    // Built: the rebuilt geometry is shared onto the entity, so the piece is Ready at once. Failed already logged (the Replay
-    // processor): the entity stays a non-piece.
+    // Built: the rebuilt geometry is shared onto the entity, so the piece is Ready at once; it arrives, and is dressed only
+    // once it stands (OnStandingChanged). Failed already logged (the Replay processor): the entity stays a non-piece and
+    // shows a stand-in once the authority's ledger brings its bounds.
     UFUNCTION()
     private void OnReplayResolved(FCk_Handle InEntity, EMars_FoodPiece_ReplayState InState)
     {
         if (InState != EMars_FoodPiece_ReplayState::Built)
         {
+            _StandInWait = utils_timer::Create_Tick(_Entity, FCk_Delegate_Timer(this, n"OnWaitForBounds"));
             DoFinishConstruction();
             return;
         }
@@ -123,8 +134,44 @@ class UMars_FoodPiece_EntityScript : UCk_GenericEntityScript_UE
         }
 
         _Piece.BindTo_OnCookStateChanged(FMars_Delegate_FoodPiece_OnCookStateChanged(this, n"OnPieceCookStateChanged"));
-        _Food.Add_Display(_Piece);
+        _Piece.BindTo_OnStandingChanged(FMars_Delegate_FoodPiece_OnStandingChanged(this, n"OnPieceStandingChanged"));
         DoFinishConstruction();
+    }
+
+    // Current: the piece is dressed. Superseded: it takes off what it wears (nothing, if it never stood).
+    UFUNCTION()
+    private void OnPieceStandingChanged(FCk_Handle_FoodPiece InPiece, EMars_FoodPiece_Standing InStanding)
+    {
+        if (InStanding == EMars_FoodPiece_Standing::Current)
+        {
+            _Food.Add_Display(InPiece);
+            return;
+        }
+
+        if (InStanding == EMars_FoodPiece_Standing::Superseded)
+        { InPiece.Hide_Worn(); }
+    }
+
+    // A failed replay's entity: once the authority's piece has recorded its bounds, the food's mesh stands in for it.
+    UFUNCTION()
+    private void OnWaitForBounds(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
+    {
+        const auto Ledger = utils_foodpiece::TryGet_Ledger(_Entity);
+        if (Ledger.IsSet() == false || Ledger.GetValue().Check != EMars_FoodPiece_Check::Recorded)
+        { return; }
+
+        End_StandInWait();
+        utils_food::Add_StandIn(_Entity, _Food, FBox(Ledger.GetValue().CheckBoundsMinCm, Ledger.GetValue().CheckBoundsMaxCm));
+    }
+
+    private void End_StandInWait()
+    {
+        if (ck::Is_NOT_Valid(_StandInWait))
+        { return; }
+
+        utils_timer::UnbindFrom_OnUpdate(_StandInWait, FCk_Delegate_Timer(this, n"OnWaitForBounds"));
+        utils_entity_lifetime::Request_DestroyEntity(_StandInWait.H());
+        _StandInWait = FCk_Handle_Timer();
     }
 
     // A copy without authority wears the cook state the authority's ledger brought; a piece not dressed yet starts from it

@@ -12,7 +12,8 @@ namespace constants_food_item
 //
 // Stance SPLIT, as the base world item: spawned through utils_world_item::Request_SpawnWorldEntity, its root transform and
 // holder replicate; the joint and its display are built on every machine from the definition; the body is the authority's.
-// The joint's replicated ledger brings its identity and cook state to a copy without authority, which wears that cook state.
+// The joint's replicated ledger brings its identity and cook state to a copy without authority, which wears that cook state;
+// once a piece cut from it stands there, the copy takes off what it wears and waits for the authority's destruction.
 class UMars_FoodItem_EntityScript : UMars_WorldItem_EntityScript
 {
     private UMars_Food_Def _Food;
@@ -55,6 +56,7 @@ class UMars_FoodItem_EntityScript : UMars_WorldItem_EntityScript
         _Joint.BindTo_OnReady(FMars_Delegate_FoodPiece_OnReady(this, n"OnJointReady"));
         _Joint.BindTo_OnFailed(FMars_Delegate_FoodPiece_OnFailed(this, n"OnJointFailed"));
         _Joint.BindTo_OnCookStateChanged(FMars_Delegate_FoodPiece_OnCookStateChanged(this, n"OnJointCookStateChanged"));
+        _Joint.BindTo_OnStandingChanged(FMars_Delegate_FoodPiece_OnStandingChanged(this, n"OnJointStandingChanged"));
         return ECk_EntityScript_ConstructionFlow::Continue;
     }
 
@@ -68,6 +70,7 @@ class UMars_FoodItem_EntityScript : UMars_WorldItem_EntityScript
             _Joint.UnbindFrom_OnReady(FMars_Delegate_FoodPiece_OnReady(this, n"OnJointReady"));
             _Joint.UnbindFrom_OnFailed(FMars_Delegate_FoodPiece_OnFailed(this, n"OnJointFailed"));
             _Joint.UnbindFrom_OnCookStateChanged(FMars_Delegate_FoodPiece_OnCookStateChanged(this, n"OnJointCookStateChanged"));
+            _Joint.UnbindFrom_OnStandingChanged(FMars_Delegate_FoodPiece_OnStandingChanged(this, n"OnJointStandingChanged"));
         }
 
         _Joint = FCk_Handle_FoodPiece();
@@ -81,7 +84,9 @@ class UMars_FoodItem_EntityScript : UMars_WorldItem_EntityScript
     UFUNCTION()
     private void OnJointReady(FCk_Handle_FoodPiece InPiece)
     {
-        _Food.Add_Display(InPiece);
+        // A joint replaced on a client before its import resolved is never dressed: the pieces cut from it already stand.
+        if (InPiece.Get_Standing() != EMars_FoodPiece_Standing::Superseded)
+        { _Food.Add_Display(InPiece); }
 
         auto Composition = FMars_WorldItem_Composition();
         Composition.BoundsFit = Make_BoundsFit(InPiece);
@@ -113,6 +118,15 @@ class UMars_FoodItem_EntityScript : UMars_WorldItem_EntityScript
     private void OnJointCookStateChanged(FCk_Handle_FoodPiece InPiece)
     {
         InPiece.Write_Look(utils_cookstate::Make_DisplayParams(InPiece.Get_CookState()));
+    }
+
+    // On a client, once a piece cut from the joint stands: the joint takes off what it wears and stays, with its pickup,
+    // until the authority's destruction arrives.
+    UFUNCTION()
+    private void OnJointStandingChanged(FCk_Handle_FoodPiece InPiece, EMars_FoodPiece_Standing InStanding)
+    {
+        if (InStanding == EMars_FoodPiece_Standing::Superseded)
+        { InPiece.Hide_Worn(); }
     }
 
     // The import already ensured (UMars_Processor_FoodPiece_Setup): a food item without its joint is nothing to pick up.
