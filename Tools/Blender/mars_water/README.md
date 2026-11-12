@@ -10,6 +10,8 @@ rain rings) is closed-form shader maths of game time in `Shaders/Water/MarsDrip.
 |---|---|
 | `Shaders/Water/MarsDrip.ush` | the drip clock (constants, hash, drag fall and its inverse, release / skip / impact, slot resolve, bead growth) |
 | `Shaders/Water/MarsWet.ush` | drop / bead / thread / stream / splash cards (VS + PS), impact rings, rain rings, puddle shape, wet streak, still water |
+| `Shaders/Water/MarsStylizedWater.ush` | the Godot MiseCryptLab stylized water (STYLIZED_WATER_PLAN.md): swell, refraction, Beer's law, foam, caustics, fresnel, glow, player ripples, optional SSR march |
+| `stylized_water_noise.py` | bakes its four tiling textures (numpy + Pillow, host side) to `D:\Repo\Content\Water\export\stylized` |
 | `Script/WorldObjects/Dressing/Water/` | `AMars_DripLeak`, `AMars_Puddle`, `AMars_StillWater`, `AMars_WetStreak`, the types, the AS mirror of the clock (`FMars_DripSchedule`, `utils_drip`) |
 | `Script/Tests/Drips/` | DripSchedule (pure maths, golden table), DripLeak, Puddle, WetStreak, StillWater autotests |
 | `water_spec.py` | names, folders, slot orders (= AS enums = PCG packer orders), presets |
@@ -40,7 +42,26 @@ static-mesh component with CPD works too (a one-off bead: CPD = 0, 0, seed, 0, 3
   **GenerationTrigger = GenerateOnDemand**, Generate. Or `mars_water_pcg.place_volume(centre, extent, preset)`.
   PCG is enabled only in a local `Mars.uproject` change (decision D1): these graphs load only where PCG is enabled, and
   no AngelScript names a PCG type.
-- **Pools:** *Mars Still Water* at the water line, sized to the pool; `Deep` = Single Layer Water (cistern).
+- **Pools:** *Mars Still Water* at the water line, sized to the pool; `Deep` = Single Layer Water (cistern);
+  `Style = Glow` = the glowing teal stylized pool (`StillWaterGlow_Mars_MI` on the tessellated `StillWaterGrid_Mars_SM`).
+  The glow look comes as much from teal point lights under the surface (no shadows) as from the material: without them
+  the scene behind is dark and the pool reads flat green (FishingGym's `WATER_LIGHTS`).
+
+## Stylized (glow) water
+
+Build: `python Tools/Blender/mars_water/stylized_water_noise.py`, then in a hidden editor `mw.build_stylized_all()`
+(textures, `Water_Mars_MPC`, `StylizedWater_Mars_M`, `StillWaterGlow_Mars_MI`, `StillWaterGrid_Mars_SM`; touches no other
+water asset). Check: `mars_water_review.glow_review()` (WaterLookdev cistern bay, Glow vs Dark, never saved).
+- Translucent, Surface ForwardShading, opacity 1, After DOF: the shade node reads the scene colour and depth itself (the
+  SceneColor / SceneDepth nodes are wired into it unused so the pass binds them). Sort priority -1 on the surface: ring
+  cards (0..2) draw after it. The scene colour enters display-referred (x PreExposure), the emissive leaves
+  display-referred (x OneOverPreExposure): the Godot maths assume exposure 1.
+- Master defaults = `mise_water.tres` converted to cm (colours sRGB -> linear); the instance carries the Mars-grade
+  compensation (water_spec INSTANCES comment). PS ~3160 instructions (translucent forward-shaded masters here start
+  ~1900); the `ScreenSpaceReflections` switch adds ~80 and is off.
+- `Water_Mars_MPC.PlayerPosition` is written each frame by every glow `AMars_StillWater` (local pawn's feet, not on a
+  dedicated server); parked at Z -100000 otherwise. WindDirection (1, 0.35, 0) / WindIntensity 0.4 are Godot's globals.
+- Anything floating at the water line must clear the 5 cm swell (the fishing spot disc at +0.5 cm does not).
 - **Puddles without drips:** *Mars Puddle*. **Damp patches:** *Mars Wet Streak*.
 - **Judge timing:** set an instance's `DebugTime`, or `r.Test.OverrideTimeMaterialExpressions <t>`.
 

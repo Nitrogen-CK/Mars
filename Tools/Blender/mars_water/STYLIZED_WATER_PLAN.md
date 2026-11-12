@@ -1,11 +1,15 @@
-# Stylized water (Godot port) + fishing gym: plan (2026-10-29, not started)
+# Stylized water (Godot port) + fishing gym: plan (2026-10-29; shader port built 2026-11-01)
+
+Status 2026-11-01: steps 1-3 done (textures, `MarsStylizedWater.ush`, `StylizedWater_Mars_M` + `StillWaterGlow_Mars_MI`,
+`Water_Mars_MPC`, the writer on `AMars_StillWater` Style Glow); the FishingGym pool is Glow with 9 teal under-lights.
+See README "Stylized (glow) water". Not seen in PIE.
 
 Stephen asked: replicate the Godot MiseCryptLab water shader in Unreal and put together a fishing gym.
 Reconnaissance only so far; nothing below is built.
 
 ## Source (Godot)
 
-- `C:\Users\Stephen\Documents\Houdini\Godot\MiseCryptLab\shaders\third_party\stylized_water.gdshader`: Malido's
+- `C:\Users\Stephen\Documents\Studio\Godot\MiseCryptLab\shaders\third_party\stylized_water.gdshader`: Malido's
   "Absorption Based Stylized Water" (CC0) plus a Mise glow term. Instance values in `materials\mise_water.tres`.
 - Textures are generated FastNoiseLite (`materials\water\*.tres`, all seed 7, seamless): displacement = simplex-smooth
   freq 0.02 256 px; edge_noise = cellular freq 0.03 256 px; normal = cellular freq 0.02 as a normal map (bump 6);
@@ -47,7 +51,7 @@ Godot LOD-2 blur.
   hand-placed fishing stations (`StartOpen = true`, `SurfaceZ` set), piers/islands, teal under-lights + warm wall
   fixtures, and a cutting table + searing station to take the catch through to the pan.
 - Builder: a `mars_fishing_gym_ue.py` on the `mars_station_gym_ue.py` model (kit layout JSON from
-  `C:\Users\Stephen\Documents\Houdini\Blender\export\crypt_kit`, HISM shell, key/home tags so hand edits survive).
+  `C:\Users\Stephen\Documents\Studio\Blender\export\crypt_kit`, HISM shell, key/home tags so hand edits survive).
 
 ## Order
 

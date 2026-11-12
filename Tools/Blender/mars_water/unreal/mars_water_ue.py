@@ -132,9 +132,9 @@ class _G(mc._Graph):
         return self.custom("Drip Time", "return DebugTime >= 0 ? DebugTime : Time;",
                            [("DebugTime", debug, ""), ("Time", t, "")], *self.at(), out=F1)
 
-    def wet(self, title, code, inputs, out=F1, extra=()):
+    def wet(self, title, code, inputs, out=F1, extra=(), include=None):
         cu = self.custom(title, code, inputs, *self.at(220), out=out, extra=extra)
-        cu.set_editor_property("include_file_paths", [spec.WET_INCLUDE])
+        cu.set_editor_property("include_file_paths", [include or spec.WET_INCLUDE])
         if DEBUG:
             d = unreal.CustomDefine()
             d.set_editor_property("define_name", "MARS_WET_DEBUG")
@@ -639,6 +639,320 @@ def build_still_water_deep():
     return _finish(g)
 
 
+# ------------------------------------------------------------------ stylized water (STYLIZED_WATER_PLAN.md)
+def _srgb(c):
+    """Godot source_color uniforms are sRGB: the linear value the shader sees."""
+    return tuple(v / 12.92 if v <= 0.04045 else ((v + 0.055) / 1.055) ** 2.4 for v in c)
+
+
+# Godot materials/mise_water.tres, metres -> cm (per-metre scales / 100); the colours are converted from sRGB.
+STYLIZED = {
+    "Colour": (("AbsorptionColour", _srgb((0.97, 0.45, 0.4)) + (1.0,), "Absorbed from the scene behind; 1 - this is "
+                "the deep body colour (linear)."),
+               ("BeersLaw", 4.0, 0.0, 20.0, "Absorption exponent over DepthDistanceCm."),
+               ("DepthDistanceCm", 400.0, 1.0, 5000.0, "Depth (cm, vertical) at which the absorption saturates."),
+               ("FresnelColour", _srgb((0.05, 0.35, 0.4)) + (1.0,), "Grazing-angle colour (linear)."),
+               ("FresnelRadius", 2.2, 0.0, 6.0, "Fresnel exponent."),
+               ("Roughness", 0.08, 0.0, 1.0, ""),
+               ("Specular", 0.3, 0.0, 1.0, "")),
+    "Glow": (("GlowColour", _srgb((0.12, 0.75, 0.7)) + (1.0,), "Mise glow: deep water and caustic ridges emit this "
+              "(display-referred: the same on screen at any exposure)."),
+             ("GlowStrength", 0.3, 0.0, 8.0, "Glow of the body (x (0.25 + depth blend)); foam glows at half this."),
+             ("GlowCaustic", 1.5, 0.0, 8.0, "Glow of the caustic ridges.")),
+    "Displacement": (("DisplacementStrengthCm", 5.0, 0.0, 50.0, "Swell height (cm, world position offset on Z)."),
+                     ("DisplacementScrollSpeed", 0.05, 0.0, 1.0, ""),
+                     ("DisplacementScrollOffset", (-0.2, 0.3, 0.0, 0.0), "Second sample's extra scroll (xy)."),
+                     ("DisplacementScaleOffset", 0.5, 0.0, 4.0, "Second sample's scale factor."),
+                     ("DisplacementScale", 0.0012, 0.0, 0.05, "Texture tiles per cm.")),
+    "Edge": (("EdgeThicknessCm", 25.0, 0.0, 200.0, "Foam band where the opaque scene comes within this of the surface."),
+             ("EdgeSpeed", 0.2, 0.0, 1.0, ""),
+             ("EdgeNoiseScale", 0.006, 0.0, 0.05, "Foam noise tiles per cm.")),
+    "Player": (("InfluenceSizeCm", 120.0, 0.0, 400.0, "Ripple radius round Water_Mars_MPC PlayerPosition (within 1 m "
+                "of the surface)."),
+               ("PlayerWaveFrequency", 10.0, 0.0, 20.0, ""),
+               ("PlayerWaveSpeed", 5.0, 0.0, 10.0, "")),
+    "Caustics": (("CausticSize", 0.012, 0.0, 0.08, "Caustic cells per cm on the floor."),
+                 ("CausticRangeCm", 4000.0, 0.0, 25600.0, "Caustics fade out over the last 20 m before this distance."),
+                 ("CausticStrength", 0.15, 0.0, 1.0, "")),
+    "Reflections": (("SsrMixStrength", 0.45, 0.0, 1.0, "Only with ScreenSpaceReflections on."),
+                    ("SsrTravel", 100.0, 0.0, 300.0, "Godot units: steps + metres travelled before giving up."),
+                    ("SsrStepNearCm", 50.0, 10.0, 1000.0, ""),
+                    ("SsrStepFarCm", 400.0, 200.0, 2000.0, ""),
+                    ("SsrTolerance", 1.0, 0.0, 2.0, "A hit lies within this many steps behind the scene depth.")),
+    "Normal Map": (("RefractionStrength", 0.6, 0.0, 4.0, "Screen-UV shift (Godot's refract_uv, unchanged)."),
+                   ("NormalMapStrength", 0.8, 0.0, 4.0, ""),
+                   ("ScrollSpeed", 0.15, 0.0, 1.0, ""),
+                   ("ScrollOffset", (0.1, -0.3, 0.0, 0.0), "Second sample's extra scroll (xy)."),
+                   ("ScaleOffset", 0.5, 0.0, 4.0, ""),
+                   ("NormalMapScale", 0.0015, 0.0, 0.05, "Normal texture tiles per cm.")),
+}
+# texture object parameter -> (texture, sampler type)
+STYLIZED_TEXTURE_PARAMS = (
+    ("DisplacementTexture", "StylizedWaterDisplace_Mars_T", unreal.MaterialSamplerType.SAMPLERTYPE_GRAYSCALE),
+    ("EdgeNoiseTexture", "StylizedWaterEdgeNoise_Mars_T", unreal.MaterialSamplerType.SAMPLERTYPE_GRAYSCALE),
+    ("EdgeRampTexture", "StylizedWaterEdgeRamp_Mars_T", unreal.MaterialSamplerType.SAMPLERTYPE_GRAYSCALE),
+    ("NormalTexture", "StylizedWaterNormal_Mars_T", unreal.MaterialSamplerType.SAMPLERTYPE_NORMAL),
+)
+
+
+def import_stylized_textures(bake=False):
+    """Imports (bake=True first runs stylized_water_noise.py, which needs numpy + Pillow in the editor's Python; the
+    host-side `python Tools/Blender/mars_water/stylized_water_noise.py` is the usual way) and sets up the four stylized-water textures to F_TEX. The noises tile and keep
+    their mips (the normal is read at mip 2, as Godot does); the ramp clamps and has none."""
+    if bake:
+        import stylized_water_noise as swn
+        importlib.reload(swn)
+        swn.bake()
+    tasks = [mc._task(os.path.join(spec.STYLIZED_EXPORT_DIR, d["file"]), spec.F_TEX, name)
+             for name, d in spec.STYLIZED_TEXTURES.items()]
+    mc._tools().import_asset_tasks(tasks)
+    TCS, TA = unreal.TextureCompressionSettings, unreal.TextureAddress
+    out = {}
+    for name, d in spec.STYLIZED_TEXTURES.items():
+        tex = mc._asset(spec.F_TEX, name)
+        if tex is None:
+            _warn("texture %s did not import" % name)
+            continue
+        tex.set_editor_property("srgb", False)
+        if d["kind"] == "normal":
+            tex.set_editor_property("compression_settings", TCS.TC_NORMALMAP)
+            tex.set_editor_property("flip_green_channel", False)
+        else:
+            tex.set_editor_property("compression_settings", TCS.TC_GRAYSCALE)
+        if d["kind"] == "ramp":
+            tex.set_editor_property("address_x", TA.TA_CLAMP)
+            tex.set_editor_property("address_y", TA.TA_CLAMP)
+            tex.set_editor_property("mip_gen_settings", unreal.TextureMipGenSettings.TMGS_NO_MIPMAPS)
+        else:
+            tex.set_editor_property("address_x", TA.TA_WRAP)
+            tex.set_editor_property("address_y", TA.TA_WRAP)
+        EAL.save_loaded_asset(tex)
+        out[name] = "%dx%d" % (tex.blueprint_get_size_x(), tex.blueprint_get_size_y())
+    _log("stylized textures %s" % out)
+    return out
+
+
+def _write_grid_obj(path, quads):
+    """A quads x quads grid over the 100 x 100 cm square, Z up, normal +Z, UV 0..1 (U along +X, V down +Y)."""
+    n = quads + 1
+    lines = ["# %s (mars_water_ue._write_grid_obj)" % os.path.basename(path), "o StillWaterGrid", "vn 0 0 1"]
+    for j in range(n):
+        for i in range(n):
+            lines.append("v %.5f %.5f 0" % (-50.0 + 100.0 * i / quads, -50.0 + 100.0 * j / quads))
+    for j in range(n):
+        for i in range(n):
+            lines.append("vt %.6f %.6f" % (i / quads, j / quads))
+    lines.append("usemtl Water")
+    for j in range(quads):
+        for i in range(quads):
+            a, b, c, d = j * n + i + 1, j * n + i + 2, (j + 1) * n + i + 2, (j + 1) * n + i + 1
+            lines.append("f %d/%d/1 %d/%d/1 %d/%d/1" % (a, a, b, b, c, c))
+            lines.append("f %d/%d/1 %d/%d/1 %d/%d/1" % (a, a, c, c, d, d))
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "w") as fh:
+        fh.write("\n".join(lines) + "\n")
+
+
+def build_grid_mesh():
+    """StillWaterGrid_Mars_SM: the glow pool's tessellated surface (the swell is a vertex offset). A live mesh is never
+    rebuilt in place: an existing asset is kept unless its vertex count is wrong."""
+    sme = unreal.get_editor_subsystem(unreal.StaticMeshEditorSubsystem)
+    want = (spec.GRID_QUADS + 1) ** 2
+    mesh = mc._asset(spec.F_MESH, spec.GRID_MESH)
+    if mesh is None or sme.get_number_verts(mesh, 0) != want:
+        obj = os.path.join(spec.REPO, "Saved", "WaterFx", spec.GRID_MESH + ".obj")
+        _write_grid_obj(obj, spec.GRID_QUADS)
+        path = "%s/%s" % (spec.F_MESH, spec.GRID_MESH)
+        if EAL.does_asset_exist(path):
+            EAL.delete_asset(path)
+        before = set(EAL.list_assets(spec.UE_ROOT, recursive=True, include_folder=False))
+        mc._tools().import_asset_tasks([mc._task(obj, spec.F_MESH, spec.GRID_MESH)])
+        mesh = mc._asset(spec.F_MESH, spec.GRID_MESH)
+        if mesh is None:
+            raise RuntimeError("%s did not import" % obj)
+        for p in set(EAL.list_assets(spec.UE_ROOT, recursive=True, include_folder=False)) - before:
+            if not p.split(".")[0].endswith(spec.GRID_MESH):
+                EAL.delete_asset(p.split(".")[0])          # materials the importer made from usemtl
+    sme.remove_collisions(mesh)
+    pos, neg = spec.GRID_BOUNDS
+    mesh.set_editor_property("positive_bounds_extension", unreal.Vector(*pos))
+    mesh.set_editor_property("negative_bounds_extension", unreal.Vector(*neg))
+    try:
+        ns = mesh.get_editor_property("nanite_settings")
+        ns.set_editor_property("enabled", False)
+        mesh.set_editor_property("nanite_settings", ns)
+    except Exception:
+        pass
+    mesh.set_material(0, mc._asset(spec.F_MAT, "StillWaterGlow_Mars_MI"))
+    EAL.save_loaded_asset(mesh)
+    b = mesh.get_bounds()
+    ext = b.box_extent
+    assert abs(ext.x - 50.0) < 0.5 and abs(ext.y - 50.0) < 0.5, "the grid should be 100 x 100 cm in XY (got %s)" % ext
+    return {"verts": sme.get_number_verts(mesh, 0), "extent": str(ext)}
+
+
+def build_mpc():
+    """Water_Mars_MPC: PlayerPosition (cm, written by AMars_StillWater's glow style for the local player), WindDirection,
+    WindIntensity (Godot's shader globals). Existing parameters keep their ids; missing ones are added."""
+    mpc = mc._asset(spec.F_MAT, spec.MPC)
+    if mpc is None:
+        mpc = mc._tools().create_asset(spec.MPC, spec.F_MAT, unreal.MaterialParameterCollection,
+                                       unreal.MaterialParameterCollectionFactoryNew())
+    vectors = list(mpc.get_editor_property("vector_parameters"))
+    scalars = list(mpc.get_editor_property("scalar_parameters"))
+    have = {str(p.get_editor_property("parameter_name")) for p in vectors + scalars}
+    for name, value in spec.MPC_DEFAULTS.items():
+        if name in have:
+            continue
+        if isinstance(value, tuple):
+            p = unreal.CollectionVectorParameter()
+            p.set_editor_property("parameter_name", name)
+            p.set_editor_property("default_value", unreal.LinearColor(*value))
+            vectors.append(p)
+        else:
+            p = unreal.CollectionScalarParameter()
+            p.set_editor_property("parameter_name", name)
+            p.set_editor_property("default_value", float(value))
+            scalars.append(p)
+    mpc.set_editor_property("vector_parameters", vectors)
+    mpc.set_editor_property("scalar_parameters", scalars)
+    EAL.save_loaded_asset(mpc)
+    return sorted(str(p.get_editor_property("parameter_name")) for p in vectors + scalars)
+
+
+def build_stylized_assets():
+    return {"textures": import_stylized_textures(), "mpc": build_mpc()}
+
+
+def build_stylized_all():
+    """Everything the glow pool needs, touching no other water asset: textures, MPC, the master, its instance, the grid."""
+    if mc._in_pie():
+        raise RuntimeError("stop PIE first")
+    r = {"stylized": build_stylized_assets(), "masters": build_masters(["StylizedWater_Mars_M"]),
+         "instances": build_instances(["StillWaterGlow_Mars_MI"]), "grid": build_grid_mesh()}
+    return r
+
+
+def _stylized_params(g):
+    """One column per STYLIZED group; returns {name: node}."""
+    nodes = {}
+    for group, params in STYLIZED.items():
+        g.group(group)
+        for p in params:
+            if isinstance(p[1], tuple):
+                nodes[p[0]] = g.vector(p[0], p[1], p[2])
+            else:
+                nodes[p[0]] = g.scalar(p[0], p[1], p[2], p[3], p[4])
+    g.group("Textures")
+    for name, tex, sampler in STYLIZED_TEXTURE_PARAMS:
+        e = g._param(unreal.MaterialExpressionTextureObjectParameter, 220, name, "")
+        e.set_editor_property("texture", mc._asset(spec.F_TEX, tex))
+        e.set_editor_property("sampler_type", sampler)
+        nodes[name] = e
+    g.group("Switches")
+    ssr = g._param(unreal.MaterialExpressionStaticSwitchParameter, 160, "ScreenSpaceReflections",
+                   "The Godot 100-step reflection march on the scene colour (Mars runs r.ReflectionMethod=0). Off by default.")
+    ssr.set_editor_property("default_value", False)
+    one = g.expr(unreal.MaterialExpressionConstant, *g.at())
+    one.set_editor_property("r", 1.0)
+    zero = g.expr(unreal.MaterialExpressionConstant, *g.at())
+    g.link(one, "", ssr, "True")
+    g.link(zero, "", ssr, "False")
+    nodes["SsrOn"] = ssr
+    return nodes
+
+
+def _mpc_param(g, mpc, name):
+    e = g.node(unreal.MaterialExpressionCollectionParameter)
+    e.set_editor_property("collection", mpc)
+    e.set_editor_property("parameter_name", name)
+    return e
+
+
+def build_stylized_water():
+    """StylizedWater_Mars_M: the Godot MiseCryptLab water (Shaders/Water/MarsStylizedWater.ush). Translucent, lit per
+    pixel (Surface ForwardShading), opacity 1: the refracted scene, absorption, foam, caustics and fresnel are worked out
+    from SceneColor / SceneDepth in the shade node and come out as the lit base colour, as Godot's ALBEDO; the glow goes
+    to emissive. The swell is WPO on Z (needs StillWaterGrid_Mars_SM)."""
+    mpc = mc._asset(spec.F_MAT, spec.MPC)
+    assert mpc is not None, "build_mpc() first"
+    m = _master("StylizedWater_Mars_M")
+    _props(m, material_domain=unreal.MaterialDomain.MD_SURFACE, blend_mode=unreal.BlendMode.BLEND_TRANSLUCENT,
+           shading_model=unreal.MaterialShadingModel.MSM_DEFAULT_LIT,
+           translucency_lighting_mode=unreal.TranslucencyLightingMode.TLM_SURFACE_PER_PIXEL_LIGHTING,
+           tangent_space_normal=False, translucency_pass=unreal.MaterialTranslucencyPass.MTP_AFTER_DOF,
+           compute_fog_per_pixel=True, output_translucent_velocity=False, two_sided=False)
+    g = _G(m)
+    p = _stylized_params(g)
+    g.group("Debug")
+    debug = g.scalar("DebugTime", -1.0, -1.0, 3600.0, ">= 0 freezes the water clock (frozen-time captures).")
+    T = g.time(debug)
+    wind_dir = _mpc_param(g, mpc, "WindDirection")
+    wind_int = _mpc_param(g, mpc, "WindIntensity")
+    player = _mpc_param(g, mpc, "PlayerPosition")
+    wind = g.custom("Wind", "return float4(D.xyz, I);", [("D", wind_dir, ""), ("I", wind_int, "")], *g.at(), out=F4)
+
+    def v4(title, rgb, w):
+        return g.custom(title, "return float4(C.rgb, S);", [("C", p[rgb], ""), ("S", p[w], "")], *g.at(), out=F4)
+
+    absorb = v4("Absorb", "AbsorptionColour", "BeersLaw")
+    fresnel = v4("Fresnel", "FresnelColour", "FresnelRadius")
+    glow = v4("Glow", "GlowColour", "GlowStrength")
+    depth = g.pack("Depth Edge", [(p["DepthDistanceCm"], ""), (p["EdgeThicknessCm"], ""), (p["EdgeSpeed"], ""),
+                                  (p["EdgeNoiseScale"], "")])
+    caustic = g.pack("Caustic", [(p["CausticSize"], ""), (p["CausticRangeCm"], ""), (p["CausticStrength"], ""),
+                                 (p["GlowCaustic"], "")])
+    ripple = g.pack("Ripple", [(p["InfluenceSizeCm"], ""), (p["PlayerWaveFrequency"], ""), (p["PlayerWaveSpeed"], ""),
+                               (p["Roughness"], "")])
+    normal = g.pack("Normal", [(p["RefractionStrength"], ""), (p["NormalMapStrength"], ""), (p["ScrollSpeed"], ""),
+                               (p["ScaleOffset"], "")])
+    normal2 = g.custom("Normal2", "return float4(O.xy, S, Tol);",
+                       [("O", p["ScrollOffset"], ""), ("S", p["NormalMapScale"], ""), ("Tol", p["SsrTolerance"], "")],
+                       *g.at(), out=F4)
+    ssr = g.pack("Ssr", [(p["SsrMixStrength"], ""), (p["SsrTravel"], ""), (p["SsrStepNearCm"], ""),
+                         (p["SsrStepFarCm"], "")])
+    disp = g.pack("Displace", [(p["DisplacementStrengthCm"], ""), (p["DisplacementScrollSpeed"], ""),
+                               (p["DisplacementScaleOffset"], ""), (p["DisplacementScale"], "")])
+    wp_vs = g.world_pos()
+    wp_ps = g.node(unreal.MaterialExpressionWorldPosition)       # after the swell (Godot's displaced global_position)
+    scene_color = g.node(unreal.MaterialExpressionSceneColor)
+    scene_depth = g.node(unreal.MaterialExpressionSceneDepth)
+
+    g.nx, g.ny = -400, -1200
+    vs = g.wet("Swell", "return float3(0, 0, MarsStylizedWater_Displace(WP.xy, T, Wind, Disp, Scroll.xy, Tex, TexSampler));",
+               [("WP", wp_vs, ""), ("T", T, ""), ("Wind", wind, ""), ("Disp", disp, ""),
+                ("Scroll", p["DisplacementScrollOffset"], ""), ("Tex", p["DisplacementTexture"], "")],
+               out=F3, include=spec.STYLIZED_INCLUDE)
+    g.nx, g.ny = 200, -1200
+    code = ("FMarsStylizedWaterInputs I;\n"
+            "I.WP = WP; I.T = T; I.Wind = Wind; I.Player = Player.xyz; I.Absorb = Absorb; I.Fresnel = Fresnel;\n"
+            "I.Glow = Glow; I.Depth = Depth; I.Caustic = Caustic; I.Ripple = Ripple; I.Normal = NormalP;\n"
+            "I.Normal2 = Normal2; I.Ssr = Ssr; I.SsrOn = SsrOn;\n"
+            "// SceneColorBinding / SceneDepthBinding: unused, they make the translucent pass bind what the include reads\n"
+            "FMarsStylizedWater O = MarsStylizedWater_Shade(Parameters, I, NormalTex, NormalTexSampler,\n"
+            "    EdgeTex, EdgeTexSampler, RampTex, RampTexSampler);\n"
+            "WaterNormal = O.Normal; Emissive = O.Emissive;\n"
+            "return O.BaseColor;")
+    ps = g.wet("Stylized Water", code,
+                  [("WP", wp_ps, ""), ("T", T, ""), ("Wind", wind, ""), ("Player", player, ""), ("Absorb", absorb, ""),
+                   ("Fresnel", fresnel, ""), ("Glow", glow, ""), ("Depth", depth, ""), ("Caustic", caustic, ""),
+                   ("Ripple", ripple, ""), ("NormalP", normal, ""), ("Normal2", normal2, ""), ("Ssr", ssr, ""),
+                   ("SsrOn", p["SsrOn"], ""), ("NormalTex", p["NormalTexture"], ""), ("EdgeTex", p["EdgeNoiseTexture"], ""),
+                   ("RampTex", p["EdgeRampTexture"], ""), ("SceneColorBinding", scene_color, ""),
+                   ("SceneDepthBinding", scene_depth, "")],
+               out=F3, extra=(("WaterNormal", F3), ("Emissive", F3)), include=spec.STYLIZED_INCLUDE)
+    opacity = g.expr(unreal.MaterialExpressionConstant, *g.at())
+    opacity.set_editor_property("r", 1.0)
+    g.out(vs, "", MP.MP_WORLD_POSITION_OFFSET)
+    g.out(ps, "", MP.MP_BASE_COLOR)
+    g.out(ps, "WaterNormal", MP.MP_NORMAL)
+    g.out(ps, "Emissive", MP.MP_EMISSIVE_COLOR)
+    g.out(p["Roughness"], "", MP.MP_ROUGHNESS)
+    g.out(p["Specular"], "", MP.MP_SPECULAR)
+    g.out(opacity, "", MP.MP_OPACITY)
+    return _finish(g)
+
+
 BUILDERS = {
     "Droplet_Mars_M": build_droplet,
     "DripImpact_Mars_M": build_impact,
@@ -648,6 +962,7 @@ BUILDERS = {
     "WetStreak_Mars_M": build_streak,
     "StillWater_Mars_M": build_still_water,
     "StillWaterDeep_Mars_M": build_still_water_deep,
+    "StylizedWater_Mars_M": build_stylized_water,
 }
 
 
@@ -662,9 +977,11 @@ def build_masters(names=None):
     return stats
 
 
-def build_instances():
+def build_instances(names=None):
     out = []
     for name, (parent_name, scalars, vectors, switches) in spec.INSTANCES.items():
+        if names and name not in names:
+            continue
         parent = mc._asset(spec.F_MAT, parent_name)
         inst = mc._asset(spec.F_MAT, name)
         if inst is None:
@@ -748,6 +1065,7 @@ def _expressions(m):
 def run_all():
     if mc._in_pie():
         raise RuntimeError("stop PIE first")
-    r = {"meshes": build_meshes(), "physmat": build_physmat(), "masters": build_masters(), "instances": build_instances()}
+    r = {"meshes": build_meshes(), "physmat": build_physmat(), "stylized": build_stylized_assets(),
+         "masters": build_masters(), "instances": build_instances(), "grid": build_grid_mesh()}
     r["verify"] = verify_materials()
     return r

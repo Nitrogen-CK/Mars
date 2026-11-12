@@ -550,3 +550,26 @@ def ring_probe(label="Leak_PipeJoint", t0=10.0, strand=0):
         out += capture(["ring"], (500, 500), suffix="_n%+.2f" % dt, frozen=t + dt, source=unreal.SceneCaptureSource.SCS_NORMAL)
         out += capture(["ring"], (500, 500), suffix="_c%+.2f" % dt, frozen=t + dt)
     return {"impact": t, "point": p, "period": c.p, "tfall": c.tfall, "png": out}
+
+
+# ------------------------------------------------------------------ stylized (glow) water check
+def glow_review(style="Glow", names=("cistern", "cistern_rings", "cistern_low"), suffix="_glow", size=(1600, 1000)):
+    """Loads the map, switches Cistern_Water to `style` (Glow / Dark), captures the cistern shots with that suffix and
+    puts the water back; the map is never saved (Deep and the instance stay as built). Call it once to switch and
+    recapture reflections, and again for the shots if the first set looks unlit."""
+    les = unreal.get_editor_subsystem(unreal.LevelEditorSubsystem)
+    if les.is_in_play_in_editor():
+        raise RuntimeError("stop PIE first")
+    world = _world()
+    if world is None or not world.get_path_name().startswith(MAP):
+        les.load_level(MAP)
+    SHOTS.setdefault("cistern_low", ((1250.0, 760.0, 40.0), (1650.0, 200.0, -40.0), 70.0))
+    water = _actor("Cistern_Water")
+    before = water.get_editor_property("style")
+    water.set_editor_property("style", _enum(water, "style", style))
+    water.call_method("Rebuild")
+    try:
+        return capture(list(names), size, suffix=suffix)
+    finally:
+        water.set_editor_property("style", before)
+        water.call_method("Rebuild")

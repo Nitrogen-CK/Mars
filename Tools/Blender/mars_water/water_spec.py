@@ -19,11 +19,16 @@ AS_DIR = os.path.join(REPO, "Script", "WorldObjects", "Dressing", "Water")
 AS_SCHEDULE = os.path.join(AS_DIR, "Mars_DripSchedule.as")
 AS_TYPES = os.path.join(AS_DIR, "Mars_DripTypes.as")
 REVIEW_DIR = r"D:\Repo\Content\Water\export\review"
+STYLIZED_USH = os.path.join(SHADER_DIR, "MarsStylizedWater.ush")
+STYLIZED_INCLUDE = "/Project/Water/MarsStylizedWater.ush"
+STYLIZED_EXPORT_DIR = r"D:\Repo\Content\Water\export\stylized"
 
 UE_ROOT = "/Game/Mars/Environment/Dressing/Water"
 F_MESH = UE_ROOT + "/Meshes"
 F_MAT = UE_ROOT + "/Materials"
 F_PCG = UE_ROOT + "/PCG"
+F_TEX = UE_ROOT + "/Textures"
+MPC = "Water_Mars_MPC"                       # in F_MAT: PlayerPosition (xyz cm), WindDirection (xyz), WindIntensity
 PHYSMAT_FOLDER = "/Game/Mars/Physics"
 PHYSMAT = "Water_Mars_PhysMat"
 PHYSMAT_SOURCE = "/Game/Mars/Physics/Mud_Mars_PhysMat"
@@ -38,6 +43,28 @@ MESHES = {
     "WetDecalCard_Mars_SM": ((0.0, 0.0, 2.0), (0.0, 0.0, 2.0)),
     "StillWater_Mars_SM": ((0.0, 0.0, 2.0), (0.0, 0.0, 2.0)),
 }
+# The glow pool's surface: a 64 x 64 quad grid over the same 100 x 100 cm (the WPO swell needs vertices; Godot used 3
+# subdivisions per metre, the 16 m fishing pool gets 4 per metre). Bounds cover the 5 cm swell.
+GRID_MESH = "StillWaterGrid_Mars_SM"
+GRID_QUADS = 64
+GRID_BOUNDS = ((0.0, 0.0, 8.0), (0.0, 0.0, 8.0))
+
+# ---------------------------------------------------------------- stylized water (STYLIZED_WATER_PLAN.md)
+# Godot FastNoiseLite seed 7 textures, baked periodic by stylized_water_noise.py. periods = lattice cells per tile
+# (Godot freq x size, rounded so the tile wraps).
+STYLIZED_SEED = 7
+STYLIZED_TEXTURES = {
+    "StylizedWaterDisplace_Mars_T": dict(file="StylizedWaterDisplace_Mars_T.png", size=256, periods=5, kind="gray"),
+    "StylizedWaterEdgeNoise_Mars_T": dict(file="StylizedWaterEdgeNoise_Mars_T.png", size=256, periods=8, kind="gray"),
+    "StylizedWaterNormal_Mars_T": dict(file="StylizedWaterNormal_Mars_T.png", size=512, periods=10, bump=6.0,
+                                       kind="normal"),
+    "StylizedWaterEdgeRamp_Mars_T": dict(file="StylizedWaterEdgeRamp_Mars_T.png", size=256, rows=4, end=0.08,
+                                         kind="ramp"),
+}
+# Water_Mars_MPC defaults: Godot's shader globals (wind_direction (1, 0, 0.35) Y-up -> Unreal xy; the player parked
+# far below every pool until the writer runs).
+MPC_DEFAULTS = {"PlayerPosition": (0.0, 0.0, -100000.0, 0.0), "WindDirection": (1.0, 0.35, 0.0, 0.0),
+                "WindIntensity": 0.4}
 
 # ---------------------------------------------------------------- shared constants (MarsDrip.ush #defines)
 CONSTANTS = {
@@ -71,7 +98,7 @@ PACK_PUDDLE = ("PuddleSeed", "PuddleWetness", "RainRate", "PuddleAspect")
 
 # ---------------------------------------------------------------- materials
 MASTERS = ("Droplet_Mars_M", "DripImpact_Mars_M", "DripRingCard_Mars_M", "PuddleWet_Mars_M", "PuddleGloss_Mars_M", "WetStreak_Mars_M",
-           "StillWater_Mars_M", "StillWaterDeep_Mars_M")
+           "StillWater_Mars_M", "StillWaterDeep_Mars_M", "StylizedWater_Mars_M")
 # instance -> (parent, {scalar overrides}, {vector overrides}, {static switch overrides})
 INSTANCES = {
     "Droplet_Mars_MI": ("Droplet_Mars_M", {}, {}, {}),
@@ -93,6 +120,13 @@ INSTANCES = {
     "StillWaterCistern_Mars_MI": ("StillWaterDeep_Mars_M", {"Roughness": 0.04, "Specular": 0.5, "ColorScaleBehindWater": 0.35},
                                   {"DeepColour": (0.004, 0.008, 0.018, 1.0), "EdgeColour": (0.012, 0.022, 0.035, 1.0),
                                    "Absorption": (0.05, 0.02, 0.011, 1.0), "Scattering": (0.0008, 0.0016, 0.0032, 1.0)}, {}),
+    # The Godot MiseCryptLab glowing teal pool (STYLIZED_WATER_PLAN.md): the master's defaults are mise_water.tres in cm.
+    # 2026-11-01: Mars's warm grade (white balance 7200, highlight gain B 0.88, amber fog) ate two thirds of the pool's
+    # blue (FishingGym "high" RGB 3/116/46 vs Godot 10/131/125); a bluer glow (sRGB 0.08, 0.66, 0.92 for 0.12, 0.75, 0.70),
+    # less blue absorbed (sRGB 0.97, 0.45, 0.28 for .., 0.40) and glow 0.4 (0.3) measure 4/113/105.
+    "StillWaterGlow_Mars_MI": ("StylizedWater_Mars_M", {"GlowStrength": 0.4},
+                               {"GlowColour": (0.0072, 0.3931, 0.8276, 1.0),
+                                "AbsorptionColour": (0.9331, 0.1706, 0.0637, 1.0)}, {}),
 }
 # PS / VS instruction budgets (DRIPS_PLAN §8); the builder logs the measured counts against these
 BUDGETS = {"Droplet_Mars_M": (260, 320), "DripImpact_Mars_M": (200, None), "PuddleWet_Mars_M": (90, None),

@@ -1,0 +1,295 @@
+// Mars stylized water: the Godot MiseCryptLab "absorption based stylized water" (Malido, godotshaders.com, CC0) plus the
+// Mise glow term, ported to HLSL for StylizedWater_Mars_M (virtual path /Project/Water/MarsStylizedWater.ush;
+// Tools/Blender/mars_water/STYLIZED_WATER_PLAN.md). The material's Custom nodes include this file: one calls
+// MarsStylizedWater_Displace for the world position offset, one calls MarsStylizedWater_Shade for colour, normal and
+// emissive. The graph keeps a SceneColor and a SceneDepth node wired into the shade node so the translucent pass binds
+// the scene-colour copy and the scene depth this file reads.
+//
+// Units: the parameters are Unreal centimetres (Godot metres x 100; per-metre scales / 100). The two Godot terms that are
+// not unit-free keep their Godot magnitude here: the refraction offset (relative depth in metres, Godot reverse-Z depth
+// of a 5 cm near plane) and the reflection march (its loop counter adds the step in metres).
+// Colour: the scene colour enters display-referred (x PreExposure) and the emissive leaves display-referred
+// (x OneOverPreExposure), as the Godot maths ran on a buffer at exposure 1; Mars runs a manual exposure (bias ~8.7).
+#pragma once
+
+#define MSW_GODOT_NEAR_CM   5.0      // Godot Camera3D near (0.05 m): DEPTH = near / view depth (reverse Z)
+#define MSW_SSR_MAX_STEPS   100
+
+struct FMarsStylizedWaterInputs
+{
+	float3 WP;          // absolute world position (cm, after the swell)
+	float  T;           // seconds
+	float4 Wind;        // Water_Mars_MPC WindDirection.xyz, WindIntensity
+	float3 Player;      // Water_Mars_MPC PlayerPosition (cm)
+	float4 Absorb;      // absorption colour (linear), beers law
+	float4 Fresnel;     // fresnel colour (linear), fresnel radius (exponent)
+	float4 Glow;        // glow colour (linear), glow strength
+	float4 Depth;       // depth distance cm, edge thickness cm, edge speed, edge noise scale (1/cm)
+	float4 Caustic;     // caustic size (1/cm), caustic range cm, caustic strength, glow caustic
+	float4 Ripple;      // influence size cm, wave frequency, wave speed, roughness
+	float4 Normal;      // refraction strength, normal map strength, scroll speed, scale offset
+	float4 Normal2;     // scroll offset xy, normal map scale (1/cm), SSR tolerance
+	float4 Ssr;         // SSR mix strength, travel, step near cm, step far cm
+	float  SsrOn;       // static: 1 marches the reflection, 0 compiles it out
+};
+
+struct FMarsStylizedWater
+{
+	float3 BaseColor;
+	float3 Normal;      // world space
+	float3 Emissive;
+};
+
+// ------------------------------------------------------------------------------------------------ helpers
+float  MSW_Mod(float X, float Y)   { return X - Y * floor(X / Y); }         // GLSL mod (HLSL fmod truncates)
+float3 MSW_Mod(float3 X, float Y)  { return X - Y * floor(X / Y); }
+float4 MSW_Mod(float4 X, float Y)  { return X - Y * floor(X / Y); }
+
+bool MSW_InBounds(float2 UV)
+{
+	float2 F = abs(floor(UV));
+	return F.x + F.y < 0.1;
+}
+
+// Godot's normalize(float): 1 for positive, -1 for negative (0 here where GLSL is undefined)
+float MSW_Sign(float X) { return X > 0.0 ? 1.0 : (X < 0.0 ? -1.0 : 0.0); }
+
+// ------------------------------------------------------------------------------------------------ caustics
+// OpenSimplex2 with derivatives (BCC lattice as 2 cube lattices), K.jpg / Stefan Gustavson, verbatim from the Godot file.
+float4 MSW_Permute(float4 T) { return T * (T * 34.0 + 133.0); }
+
+float3 MSW_Grad(float Hash)
+{
+	float3 Cube = MSW_Mod(floor(Hash / float3(1.0, 2.0, 4.0)), 2.0) * 2.0 - 1.0;
+	int Axis = int(Hash / 16.0);
+	float3 CubOct = Cube * float3(Axis != 0, Axis != 1, Axis != 2);
+	float Type = MSW_Mod(floor(Hash / 8.0), 2.0);
+	float3 Rhomb = (1.0 - Type) * Cube + Type * (CubOct + cross(Cube, CubOct));
+	float3 G = mad(CubOct, 1.22474487139, Rhomb);
+	G *= mad(-0.042942436724648037, Type, 1.0) * 3.5946317686139184;
+	return G;
+}
+
+float4 MSW_OS2Part(float3 X)
+{
+	float3 B = floor(X);
+	float4 I4 = float4(X - B, 2.5);
+	float3 V1 = B + floor(dot(I4, float4(0.25, 0.25, 0.25, 0.25)));
+	float3 V2 = B + float3(1, 0, 0) + float3(-1, 1, 1) * floor(dot(I4, float4(-0.25, 0.25, 0.25, 0.35)));
+	float3 V3 = B + float3(0, 1, 0) + float3(1, -1, 1) * floor(dot(I4, float4(0.25, -0.25, 0.25, 0.35)));
+	float3 V4 = B + float3(0, 0, 1) + float3(1, 1, -1) * floor(dot(I4, float4(0.25, 0.25, -0.25, 0.35)));
+	float4 Hashes = MSW_Permute(MSW_Mod(float4(V1.x, V2.x, V3.x, V4.x), 289.0));
+	Hashes = MSW_Permute(MSW_Mod(Hashes + float4(V1.y, V2.y, V3.y, V4.y), 289.0));
+	Hashes = MSW_Mod(MSW_Permute(MSW_Mod(Hashes + float4(V1.z, V2.z, V3.z, V4.z), 289.0)), 48.0);
+	float3 D1 = X - V1; float3 D2 = X - V2; float3 D3 = X - V3; float3 D4 = X - V4;
+	float4 A = max(0.75 - float4(dot(D1, D1), dot(D2, D2), dot(D3, D3), dot(D4, D4)), 0.0);
+	float4 AA = A * A; float4 AAAA = AA * AA;
+	float3 G1 = MSW_Grad(Hashes.x); float3 G2 = MSW_Grad(Hashes.y);
+	float3 G3 = MSW_Grad(Hashes.z); float3 G4 = MSW_Grad(Hashes.w);
+	float4 Extrapolations = float4(dot(D1, G1), dot(D2, G2), dot(D3, G3), dot(D4, G4));
+	// GLSL mat4(columns) * v = sum of column_i * v_i
+	float4 W = AA * A * Extrapolations;
+	float3 Derivative = -8.0 * (D1 * W.x + D2 * W.y + D3 * W.z + D4 * W.w)
+		+ (G1 * AAAA.x + G2 * AAAA.y + G3 * AAAA.z + G4 * AAAA.w);
+	return float4(Derivative, dot(AAAA, Extrapolations));
+}
+
+float4 MSW_OS2WithDerivatives(float3 X)
+{
+	X = dot(X, (2.0 / 3.0).xxx) - X;
+	float4 R = MSW_OS2Part(X) + MSW_OS2Part(X + 144.5);
+	return float4(dot(R.xyz, (2.0 / 3.0).xxx) - R.xyz, R.w);
+}
+
+// ------------------------------------------------------------------------------------------------ vertex swell
+// Disp = (strength cm, scroll speed, scale offset, scale 1/cm), ScrollOffset = (xy); returns the Z offset (cm).
+// Godot scrolls the swell along the raw (unnormalized) wind direction; so does this.
+float MarsStylizedWater_Displace(float2 WorldXY, float T, float4 Wind, float4 Disp, float2 ScrollOffset,
+	Texture2D Tex, SamplerState TexSampler)
+{
+	float Time = T * Disp.y * mad(Wind.w, 0.7, 0.3);
+	float D1 = Texture2DSampleLevel(Tex, TexSampler, mad(WorldXY, Disp.w, Time * -Wind.xy), 0.0).r;
+	float D2 = Texture2DSampleLevel(Tex, TexSampler, mad(WorldXY, Disp.w * Disp.z, Time * (-Wind.xy + ScrollOffset)), 0.0).r;
+	return mad(lerp(D1, D2, 0.4), 2.0, -1.0) * Disp.x;
+}
+
+// ------------------------------------------------------------------------------------------------ pixel
+#if PIXELSHADER
+
+float3 MSW_ScreenToTranslatedWorld(float2 ViewportUV, float SceneDepth)
+{
+	float2 ScreenPos = ViewportUVToScreenPos(ViewportUV);
+	return mul(float4(ScreenPos * SceneDepth, SceneDepth, 1.0), View.ScreenToTranslatedWorld).xyz;
+}
+
+float MSW_SceneDepth(float2 ViewportUV)
+{
+	return CalcSceneDepth(ViewportUVToBufferUV(ViewportUV));
+}
+
+float3 MSW_SceneColor(float2 ViewportUV)
+{
+	return DecodeSceneColorForMaterialNode(ClampSceneTextureUV(ViewportUVToBufferUV(ViewportUV), 0)) * View.PreExposure;
+}
+
+FMarsStylizedWater MarsStylizedWater_Shade(FMaterialPixelParameters Parameters, FMarsStylizedWaterInputs In,
+	Texture2D NormalTex, SamplerState NormalTexSampler, Texture2D EdgeTex, SamplerState EdgeTexSampler,
+	Texture2D RampTex, SamplerState RampTexSampler)
+{
+	FMarsStylizedWater O;
+	const float3 Absorption = In.Absorb.rgb;
+	const float3 Opposing = 1.0 - Absorption;
+	const float3 WindDir = normalize(In.Wind.xyz + float3(0, 0, 1e-6));
+	const float WindFactor = mad(In.Wind.w, 0.7, 0.3);
+	const float Roughness = In.Ripple.w;
+
+	const float3 Tws = GetTranslatedWorldPosition(Parameters);
+	const float3 CamTws = View.TranslatedWorldCameraOrigin;
+	const float3 GeoN = normalize(Parameters.TangentToWorld[2]);
+	const float3 ToCam = normalize(CamTws - Tws);
+	const float PixelDepth = max(dot(Tws - CamTws, View.ViewForward), 1.0);
+
+	// fresnel on the geometric normal (Godot reads NORMAL before NORMAL_MAP applies)
+	const float FresnelValue = pow(1.0 - saturate(dot(GeoN, ToCam)), In.Fresnel.w);
+
+	// two scrolled normal-map samples at mip 2 (Godot textureLod 2.0); NM = the mixed encoded sample
+	const float TimeFactor = In.T * In.Normal.z * WindFactor;
+	const float2 UV1 = mad(In.WP.xy, In.Normal2.z, TimeFactor * -WindDir.xy);
+	const float2 UV2 = mad(In.WP.xy, In.Normal2.z * In.Normal.w, TimeFactor * 0.8 * (-WindDir.xy + In.Normal2.xy));
+	const float2 N1 = Texture2DSampleLevel(NormalTex, NormalTexSampler, UV1, 2.0).rg;
+	const float2 N2 = Texture2DSampleLevel(NormalTex, NormalTexSampler, UV2, 2.0).rg;
+	float3 NM;
+	NM.xy = lerp(N1, N2, 0.5);
+	{
+		float2 Xy = NM.xy * 2.0 - 1.0;
+		NM.z = sqrt(saturate(1.0 - dot(Xy, Xy))) * 0.5 + 0.5;
+	}
+	{
+		// Godot: NORMAL = normalize(mix(NORMAL, T * x + B * y + N * z, NORMAL_MAP_DEPTH)), z rebuilt from xy
+		float2 Xy = NM.xy * 2.0 - 1.0;
+		float Z = sqrt(saturate(1.0 - dot(Xy, Xy)));
+		float3 Tn = normalize(Parameters.TangentToWorld[0]);
+		float3 Bn = normalize(Parameters.TangentToWorld[1]);
+		O.Normal = normalize(lerp(GeoN, Tn * Xy.x + Bn * Xy.y + GeoN * Z, In.Normal.y));
+	}
+
+	// relative depth: the surface's height over the opaque scene straight behind it (Godot: vertex y - floor y)
+	const float2 ScreenUV = GetViewportUV(Parameters);
+	const float3 Floor = MSW_ScreenToTranslatedWorld(ScreenUV, MSW_SceneDepth(ScreenUV));
+	const float RelativeDepth = Tws.z - Floor.z;
+
+	// edge foam where geometry cuts the surface: cellular noise through the ramp, binary as Godot's normalize(float)
+	const float EdgeBlend = saturate(RelativeDepth / -In.Depth.y + 1.0);
+	float2 EdgeUV = In.WP.xy * In.Depth.w * mad(WindDir.xy, 0.5, 0.5);
+	EdgeUV = mad(-WindDir.xy * In.T * In.Depth.z, WindFactor, EdgeUV);
+	const float EdgeNoise = Texture2DSample(EdgeTex, EdgeTexSampler, EdgeUV).r;
+	const float EdgeMask = MSW_Sign(Texture2DSampleLevel(RampTex, RampTexSampler,
+		float2(EdgeNoise * mad(EdgeBlend, -1.0, 1.0), 0.5), 0.0).r);
+
+	// player ripples (Water_Mars_MPC PlayerPosition)
+	float PlayerMask = 0.0;
+	{
+		float3 Rel = In.WP - In.Player;
+		float Height = smoothstep(100.0, 0.0, abs(Rel.z));
+		float Factor = smoothstep(In.Ripple.x, 0.0, length(Rel.xy));
+		float Waves = pow(mad(sin(mad(Factor, In.Ripple.y, In.T * In.Ripple.z)), 0.5, 0.5), 6.0);
+		float Distort = Texture2DSampleLevel(RampTex, RampTexSampler,
+			float2(Waves * (EdgeNoise + 0.2) * Factor * Height, 0.5), 0.0).r;
+		PlayerMask = saturate(MSW_Sign(mad(Distort, -1.0, 0.4)));
+	}
+	const float RippleMask = saturate(mad(EdgeMask, EdgeBlend, PlayerMask));
+
+	// refract the screen UV (Godot's refract_uv: both axes move by one scalar; metres and reverse-Z depth as in Godot)
+	const float GodotDepth = MSW_GODOT_NEAR_CM / PixelDepth;
+	const float Strength1 = In.Normal.x * sqrt(GodotDepth) * (RelativeDepth * 0.01);
+	const float2 RefractedUV = ScreenUV + mad(Strength1, length(NM), Strength1 * -1.2);
+
+	const float3 FloorR = MSW_ScreenToTranslatedWorld(RefractedUV, MSW_SceneDepth(RefractedUV));
+	const float DepthTest = Tws.z - FloorR.z;
+
+	// caustics on the refracted floor, in absolute world space
+	float CausticValue = 0.0;
+	{
+		float RangeMod = saturate((In.Caustic.y - PixelDepth) * 0.0005);
+		if (RangeMod > 0.0)
+		{
+			float2 FloorXY = In.WP.xy + (FloorR.xy - Tws.xy);
+			float3 X = float3(FloorXY * In.Caustic.x, MSW_Mod(In.T, 578.0) * 0.8660254037844386);
+			float4 Noise = MSW_OS2WithDerivatives(X);
+			Noise = MSW_OS2WithDerivatives(X - Noise.xyz / 16.0);
+			CausticValue = mad(Noise.w, 0.5, 0.5) * RangeMod * RangeMod;
+		}
+	}
+
+	float3 Screen;
+	float DepthBlend;
+	if (DepthTest > -0.01 && MSW_InBounds(RefractedUV))
+	{
+		Screen = MSW_SceneColor(RefractedUV) * 0.9;
+		DepthBlend = saturate(DepthTest / In.Depth.x);
+	}
+	else
+	{
+		Screen = MSW_SceneColor(ScreenUV) * 0.9;
+		DepthBlend = saturate(RelativeDepth / In.Depth.x);
+	}
+	DepthBlend = mad(exp(-DepthBlend * In.Absorb.w), -1.0, 1.0);
+
+	// screen-space reflection march (static switch; Mars has no SSR of its own)
+	float3 Sampled = -1.0;
+	float AlphaHit = 0.0;
+	if (In.SsrOn > 0.5)
+	{
+		float3 Wn = float3(NM.x * 2.0 - 1.0, NM.y * 2.0 - 1.0, -1.0);    // Godot (x, 0, y) * 2 - 1, Y-up -> Z-up
+		float3 Combined = normalize(Wn * (In.Normal.y * 0.15) + GeoN);
+		float3 Dir = reflect(-ToCam, Combined);
+		float3 Pos = Tws;
+		float I = 0.01;
+		[loop] for (int Step = 0; Step < MSW_SSR_MAX_STEPS && I < In.Ssr.y; ++Step, I += 1.0)
+		{
+			float StepCm = lerp(In.Ssr.z, In.Ssr.w, I / In.Ssr.y);
+			Pos += Dir * StepCm;
+			float4 Clip = mul(float4(Pos, 1.0), View.TranslatedWorldToClip);
+			float2 UV = ScreenPosToViewportUV(Clip.xy / Clip.w);
+			if (!MSW_InBounds(UV)) { break; }
+			float Diff = Clip.w - MSW_SceneDepth(UV);                  // ray depth - scene depth (Godot: scene z - ray z)
+			if (Diff > -0.01 && Diff <= In.Normal2.w * StepCm)
+			{
+				Sampled = MSW_SceneColor(UV);
+				float2 Ruv = sqrt(saturate(1.0 - abs(UV * 2.0 - 1.0)));
+				AlphaHit = saturate(min(Ruv.x, Ruv.y));
+				break;
+			}
+			I += StepCm * 0.01;                                            // Godot adds the step in metres
+		}
+	}
+
+	float3 Color = saturate(Screen - Absorption * DepthBlend);           // absorb the screen colour
+	Color = lerp(Color, Opposing, DepthBlend * DepthBlend);              // depth colour
+	Color = lerp(Color, In.Fresnel.rgb, FresnelValue);
+	Color = saturate(Color + CausticValue * In.Caustic.z * (1.0 - DepthBlend));
+	Color = lerp(Color, Sampled, AlphaHit * (1.0 - Roughness) * In.Ssr.x);
+	Color = lerp(Color, 0.98, RippleMask);
+	O.BaseColor = Color;
+
+	// Mise glow: deep water and caustic ridges emit the pool colour, foam and ripples glow white
+	const float Ridge = smoothstep(0.55, 0.9, CausticValue) * (1.0 - DepthBlend * 0.6);
+	O.Emissive = (In.Glow.rgb * (In.Glow.w * (0.25 + DepthBlend) + In.Caustic.w * Ridge * In.Caustic.z * 4.0)
+		+ float3(0.9, 1.0, 1.0) * RippleMask * In.Glow.w * 0.5) * View.OneOverPreExposure;
+	return O;
+}
+
+#else
+
+FMarsStylizedWater MarsStylizedWater_Shade(FMaterialPixelParameters Parameters, FMarsStylizedWaterInputs In,
+	Texture2D NormalTex, SamplerState NormalTexSampler, Texture2D EdgeTex, SamplerState EdgeTexSampler,
+	Texture2D RampTex, SamplerState RampTexSampler)
+{
+	FMarsStylizedWater O;
+	O.BaseColor = 0.0;
+	O.Normal = float3(0, 0, 1);
+	O.Emissive = 0.0;
+	return O;
+}
+
+#endif
