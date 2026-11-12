@@ -99,9 +99,9 @@ namespace utils_platter_dock
 
         if (Policy.Kind.IsEmpty() == false)
         {
-            for (const auto& Piece : InPlatter.Get_Pieces())
+            for (const auto& Kind : InPlatter.Get_PieceKinds())
             {
-                if (Policy.Kind.Matches(Piece.Get_Kind()) == false)
+                if (Policy.Kind.Matches(Kind) == false)
                 { return TOptional<EMars_PlatterDock_Refusal>(EMars_PlatterDock_Refusal::KindRejected); }
             }
         }

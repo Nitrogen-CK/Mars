@@ -31,7 +31,8 @@ struct FMars_Platter_Drain
 // back. An accepted Load only queues here (membership and holder stamped); UMars_Processor_Platter_Settle drops it,
 // settles it and broadcasts OnLoaded. An Unload of a landed piece re-settles the pieces frozen after it (those that may lie
 // on it). It is also the platter's only teardown listener: the pieces it holds, held, settling or queued, end with it. The
-// only FoodPiece fragment it writes is the holder fact.
+// only FoodPiece fragment it writes is the holder fact. Only the authority applies anything: a copy without authority
+// drops the requests it drained. The replicated ledger is published once the requests are applied, before the broadcasts.
 class UMars_Processor_Platter_HandleRequests : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -58,6 +59,10 @@ class UMars_Processor_Platter_HandleRequests : UCk_Processor_Script_Base_UE
         // InRequests is invalid past this line; removing before broadcasting lets re-entrant requests survive.
         Drain.Platter.Request_TryRemove(FMars_Fragment_Platter_Requests);
 
+        // The books are the authority's: a copy without authority drops every request.
+        if (utils_net::Get_HasAuthority(InHandle) == false)
+        { return; }
+
         if (SetMountedRequests.Num() > 0)
         { Apply_SetMounted(Drain, InState, SetMountedRequests.Last()); }
 
@@ -68,11 +73,12 @@ class UMars_Processor_Platter_HandleRequests : UCk_Processor_Script_Base_UE
 
         // Every landed piece that left this drain leaves a hole under what froze after it: that re-settles once.
         if (Drain.ResettleFrom.IsSet())
-        { utils_platter::Resettle(InState, utils_transform::Get_EntityCurrentTransform(InHandle.As_Transform()), Drain.ResettleFrom.GetValue()); }
+        { utils_platter::Resettle(Drain.Platter, InState, Drain.ResettleFrom.GetValue()); }
 
         for (const auto& Request : LoadRequests)
         { Apply_Load(Drain, InState, Request); }
 
+        utils_platter::Publish(Drain.Platter);
         Broadcast(Drain);
     }
 

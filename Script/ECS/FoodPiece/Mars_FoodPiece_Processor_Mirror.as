@@ -3,7 +3,8 @@
 // adopts the ledger's Id and Lineage while this copy has no Id (a valid Id that differs from the ledger's is a defect),
 // wears the ledger's cook state when its serial is one this copy has not worn and then raises OnCookStateChanged, and
 // checks this copy's geometry against the authority's numbers (utils_foodpiece::Update_CheckResult); a lineage it adopts tags
-// the piece for the Succession processor. A notify that changes nothing does nothing.
+// the piece for the Succession processor; then it applies the ledger's ride (utils_foodpiece::Update_Ride). A notify that
+// changes nothing does nothing.
 class UMars_Processor_FoodPiece_Mirror : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -79,6 +80,9 @@ class UMars_Processor_FoodPiece_Mirror : UCk_Processor_Script_Base_UE
         // A lineage now known is ruled on (the Succession processor runs after this one).
         if (IsLineageAdopted && InPiece.Has_Fragment(FMars_Tag_FoodPiece_NeedsSuccession) == false)
         { InPiece.Add_Fragment(FMars_Tag_FoodPiece_NeedsSuccession()); }
+
+        // State and Local are not read past this line: the ride may attach the piece, which composes.
+        utils_foodpiece::Update_Ride(InPiece);
 
         if (IsNewCookState && InPiece.Has_Fragment(FMars_Fragment_FoodPiece_Signals))
         { InPiece.Get_Fragment(FMars_Fragment_FoodPiece_Signals).OnCookStateChanged.Broadcast(InPiece); }

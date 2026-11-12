@@ -54,6 +54,12 @@ namespace utils_platter
         InHandle.Add_Fragment(FMars_Feature_Platter());
         InHandle.Add_Fragment(Params);
         InHandle.Add_Fragment(State);
+
+        // A client's copy can receive the replicated ledger before it composes: the arrived ledger stands then. On an entity
+        // without a replication driver the ledger is local.
+        if (InHandle.Has_Fragment(FMars_Fragment_Platter_Net) == false)
+        { InHandle.Add_Fragment(FMars_Fragment_Platter_Net(), ECk_Replication::Replicates); }
+
         return InHandle.As_Platter();
     }
 
@@ -206,11 +212,13 @@ namespace utils_platter
     }
 
     // The held pieces frozen at or after InFrozenFrom (the ones that may lie on a piece that left) let go and settle again,
-    // so nothing floats over a hole: detached where they are, Dynamic, back in Settling; the pieces frozen before stay put.
-    // Called by the Platter processors after a landed piece left (Get_ResettleFrom); InRootWorld is the platter root's world
-    // pose.
-    void Resettle(FMars_Fragment_Platter& InState, const FTransform& InRootWorld, int32 InFrozenFrom)
+    // so nothing floats over a hole: detached where they are, Dynamic, back in Settling, their ride cleared; the pieces
+    // frozen before stay put. Called by the Platter processors after a landed piece left (Lower_ResettleFrom); InState is
+    // InPlatter's.
+    void Resettle(const FCk_Handle_Platter& InPlatter, FMars_Fragment_Platter& InState, int32 InFrozenFrom)
     {
+        FCk_Handle PlatterEntity = InPlatter;
+        const auto RootWorld = utils_transform::Get_EntityCurrentTransform(PlatterEntity.As_Transform());
         TArray<FMars_Platter_Held> StillHeld;
         for (const auto& Held : InState.Held)
         {
@@ -229,12 +237,14 @@ namespace utils_platter
             if (ck::IsValid(Node))
             { utils_scene_node::Request_Detach(Node); }
 
+            utils_foodpiece::Clear_Ride(Piece, InPlatter);
+
             auto Body = PieceEntity.As_JoltBody(ECk_SanityCheck::UnChecked);
             if (ck::IsValid(Body))
             { utils_jolt_body::Request_SetMotionType(Body, FCk_Request_JoltBody_SetMotionType(ECk_MotionType::Dynamic)); }
 
             const auto Location = utils_transform::Get_EntityCurrentTransform(PieceEntity.As_Transform()).GetLocation();
-            auto Settling = FMars_Platter_Settling(Piece, EMars_Platter_SettleReason::Resettle, InRootWorld.InverseTransformPosition(Location));
+            auto Settling = FMars_Platter_Settling(Piece, EMars_Platter_SettleReason::Resettle, RootWorld.InverseTransformPosition(Location));
             Settling.FreezeFloor = InState.NextFreezeIndex;
             InState.Settling.Add(Settling);
         }
@@ -248,6 +258,85 @@ namespace utils_platter
     {
         if (InOutFrom.IsSet() == false || InFrozenFrom < InOutFrom.GetValue())
         { InOutFrom = TOptional<int32>(InFrozenFrom); }
+    }
+
+    // The distinct kind containers of every live piece InPlatter's books hold (Get_Pieces), in first-seen order. Reads the
+    // live lists, which only the authority keeps.
+    TArray<FGameplayTagContainer> Get_LiveKinds(const FCk_Handle_Platter& InPlatter)
+    {
+        TArray<FGameplayTagContainer> Kinds;
+        for (const auto& Piece : InPlatter.Get_Pieces())
+        {
+            if (Piece.Get_IsGone())
+            { continue; }
+
+            const auto Kind = Piece.Get_Kind();
+            auto IsSeen = false;
+            for (const auto& Seen : Kinds)
+            {
+                if (Get_IsKindEqual(Seen, Kind))
+                { IsSeen = true; }
+            }
+
+            if (IsSeen == false)
+            { Kinds.Add(Kind); }
+        }
+
+        return Kinds;
+    }
+
+    bool Get_IsKindEqual(const FGameplayTagContainer& InA, const FGameplayTagContainer& InB)
+    {
+        return InA.HasAllExact(InB) && InB.HasAllExact(InA);
+    }
+
+    bool Get_IsLedgerEqual(const FMars_Fragment_Platter_Net& InA, const FMars_Fragment_Platter_Net& InB)
+    {
+        if (InA.HeldCount != InB.HeldCount || InA.Occupancy != InB.Occupancy || InA.Wholeness != InB.Wholeness
+            || InA.PieceKinds.Num() != InB.PieceKinds.Num())
+        { return false; }
+
+        for (int32 Index = 0; Index < InA.PieceKinds.Num(); ++Index)
+        {
+            if (Get_IsKindEqual(InA.PieceKinds[Index], InB.PieceKinds[Index]) == false)
+            { return false; }
+        }
+
+        return true;
+    }
+
+    // Recomputes InPlatter's replicated ledger from its live books and writes it, followed by its dirty mark, only when a
+    // field differs. Called by the Platter processors only, once per call that can change the books: after its last change
+    // and before its first broadcast.
+    void Publish(FCk_Handle_Platter& InPlatter)
+    {
+        const auto& State = InPlatter.Get_Fragment(FMars_Fragment_Platter);
+        auto Next = FMars_Fragment_Platter_Net();
+        Next.HeldCount = State.Held.Num();
+        Next.Occupancy = State.Held.Num() + State.Settling.Num() + State.Queue.Num();
+        Next.PieceKinds = Get_LiveKinds(InPlatter);
+        for (const auto& Piece : InPlatter.Get_Pieces())
+        {
+            if (Piece.Get_IsGone() == false && Piece.Get_IsWhole() == false)
+            { Next.Wholeness = EMars_Platter_Wholeness::HasCut; }
+        }
+
+        auto& Ledger = InPlatter.Get_Fragment(FMars_Fragment_Platter_Net);
+        if (Get_IsLedgerEqual(Ledger, Next))
+        { return; }
+
+        Ledger = Next;
+        FCk_Handle PlatterEntity = InPlatter;
+        PlatterEntity.Request_MarkReplicationDirty(FMars_Fragment_Platter_Net);
+    }
+
+    // InPlatter's replicated ledger as it stands on this machine; unset on an entity without one.
+    TOptional<FMars_Fragment_Platter_Net> TryGet_Ledger(const FCk_Handle& InPlatter)
+    {
+        if (ck::Is_NOT_Valid(InPlatter) || InPlatter.Has_Fragment(FMars_Fragment_Platter_Net) == false)
+        { return TOptional<FMars_Fragment_Platter_Net>(); }
+
+        return TOptional<FMars_Fragment_Platter_Net>(InPlatter.Get_Fragment(FMars_Fragment_Platter_Net));
     }
 
     // InPiece's index in InHeld; -1 when absent.
@@ -277,7 +366,8 @@ mixin int32 Get_Capacity(const FCk_Handle_Platter& Self)
     return Self.Get_Fragment(FMars_Fragment_Platter_Params).Spec.Capacity;
 }
 
-// The frozen pile in freeze order: a station taking "the next piece" takes the last (the top).
+// The frozen pile in freeze order: a station taking "the next piece" takes the last (the top). The lists are the
+// authority's: a copy without authority reads them empty (Get_HeldCount reads its ledger).
 mixin TArray<FCk_Handle_FoodPiece> Get_Held(const FCk_Handle_Platter& Self)
 {
     TArray<FCk_Handle_FoodPiece> Pieces;
@@ -287,7 +377,8 @@ mixin TArray<FCk_Handle_FoodPiece> Get_Held(const FCk_Handle_Platter& Self)
     return Pieces;
 }
 
-// Every piece the platter holds: frozen (freeze order), settling, then queued. What a dock's policy judges.
+// Every piece the platter holds: frozen (freeze order), settling, then queued. The lists are the authority's: a copy
+// without authority reads them empty (Get_PieceKinds and Get_IsWhole read its ledger).
 mixin TArray<FCk_Handle_FoodPiece> Get_Pieces(const FCk_Handle_Platter& Self)
 {
     const auto& State = Self.Get_Fragment(FMars_Fragment_Platter);
@@ -299,21 +390,31 @@ mixin TArray<FCk_Handle_FoodPiece> Get_Pieces(const FCk_Handle_Platter& Self)
     return Pieces;
 }
 
+// Without authority, the ledger's.
 mixin int32 Get_HeldCount(const FCk_Handle_Platter& Self)
 {
+    if (utils_net::Get_HasAuthority(Self) == false)
+    { return Self.Get_Fragment(FMars_Fragment_Platter_Net).HeldCount; }
+
     return Self.Get_Fragment(FMars_Fragment_Platter).Held.Num();
 }
 
-// Accepted pieces not frozen yet: queued, dropping or re-settling.
+// Accepted pieces not frozen yet: queued, dropping or re-settling. Without authority, from the ledger.
 mixin int32 Get_PendingCount(const FCk_Handle_Platter& Self)
 {
+    if (utils_net::Get_HasAuthority(Self) == false)
+    { return Self.Get_Occupancy() - Self.Get_HeldCount(); }
+
     const auto& State = Self.Get_Fragment(FMars_Fragment_Platter);
     return State.Queue.Num() + State.Settling.Num();
 }
 
-// What a Load counts against the capacity: held, settling and queued.
+// What a Load counts against the capacity: held, settling and queued. Without authority, the ledger's.
 mixin int32 Get_Occupancy(const FCk_Handle_Platter& Self)
 {
+    if (utils_net::Get_HasAuthority(Self) == false)
+    { return Self.Get_Fragment(FMars_Fragment_Platter_Net).Occupancy; }
+
     return Self.Get_HeldCount() + Self.Get_PendingCount();
 }
 
@@ -339,9 +440,13 @@ mixin EMars_Platter_Mounting Get_Mounting(const FCk_Handle_Platter& Self)
     return Self.Get_Fragment(FMars_Fragment_Platter).Mounting;
 }
 
-// Whether every piece it holds (Get_Pieces) is a root (never cut); true for an empty platter.
+// Whether every piece it holds (Get_Pieces) is a root (never cut); true for an empty platter. Without authority, the
+// ledger's.
 mixin bool Get_IsWhole(const FCk_Handle_Platter& Self)
 {
+    if (utils_net::Get_HasAuthority(Self) == false)
+    { return Self.Get_Fragment(FMars_Fragment_Platter_Net).Wholeness == EMars_Platter_Wholeness::AllWhole; }
+
     for (const auto& Piece : Self.Get_Pieces())
     {
         if (Piece.Get_IsWhole() == false)
@@ -351,17 +456,28 @@ mixin bool Get_IsWhole(const FCk_Handle_Platter& Self)
     return true;
 }
 
-// The union of the kinds of every piece it holds (Get_Pieces).
+// The distinct kind containers of the live pieces it holds (Get_Pieces), in first-seen order; without authority, the
+// ledger's.
+mixin TArray<FGameplayTagContainer> Get_PieceKinds(const FCk_Handle_Platter& Self)
+{
+    if (utils_net::Get_HasAuthority(Self) == false)
+    { return Self.Get_Fragment(FMars_Fragment_Platter_Net).PieceKinds; }
+
+    return utils_platter::Get_LiveKinds(Self);
+}
+
+// The union of Get_PieceKinds.
 mixin FGameplayTagContainer Get_Kinds(const FCk_Handle_Platter& Self)
 {
     auto Kinds = FGameplayTagContainer();
-    for (const auto& Piece : Self.Get_Pieces())
-    { Kinds.AppendTags(Piece.Get_Kind()); }
+    for (const auto& Kind : Self.Get_PieceKinds())
+    { Kinds.AppendTags(Kind); }
 
     return Kinds;
 }
 
-// The platter holding the piece, held, settling or queued; invalid for a piece no platter holds.
+// The platter holding the piece, held, settling or queued; invalid for a piece no platter holds. It reads the authority's
+// membership: a copy without authority reads every piece as on no platter.
 mixin FCk_Handle_Platter TryGet_Platter(const FCk_Handle_FoodPiece& Self)
 {
     if (ck::Is_NOT_Valid(Self) || Self.Has_Fragment(FMars_Fragment_Platter_Membership) == false)

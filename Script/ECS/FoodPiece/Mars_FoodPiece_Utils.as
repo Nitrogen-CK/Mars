@@ -222,10 +222,11 @@ namespace utils_foodpiece
         { return; }
 
         auto& Net = InPiece.Get_Fragment(FMars_Fragment_FoodPiece_Net);
-        if (Net.Holding == EMars_FoodPiece_Holding::Free)
+        if (Net.Holding == EMars_FoodPiece_Holding::Free && Net.Riding == EMars_FoodPiece_Riding::Loose)
         { return; }
 
         Net.Holding = EMars_FoodPiece_Holding::Free;
+        Net.Riding = EMars_FoodPiece_Riding::Loose;
         DoMark_LedgerDirty(InPiece);
     }
 
@@ -816,6 +817,124 @@ namespace utils_foodpiece
         InPiece.Request_TryRemove(FMars_Fragment_FoodPiece_Holder);
         Write_LedgerFree(InPiece);
     }
+
+    // InOwner's ledger carries InPiece as a scene-node child of its root at InLocal. Called only by a ledger's processor,
+    // right after it attached the piece; InOwner must be the piece's holder (a defect otherwise: nothing is written). The
+    // authority publishes the ride in the replicated ledger (TryGet_ReplicatedRide); its own scene-node parent is its fact.
+    void Stamp_Ride(FCk_Handle_FoodPiece& InPiece, FCk_Handle InOwner, FTransform InLocal)
+    {
+        const auto Holder = InPiece.TryGet_Holder();
+        if (ck::EnsureIfNot(Holder == InOwner,
+            f"[FoodPiece] [{InPiece.ToString()}] is said to ride [{InOwner.ToString()}] while [{Holder.ToString()}] holds it"))
+        { return; }
+
+        if (DoGet_WritesLedger(InPiece) == false)
+        { return; }
+
+        auto& Net = InPiece.Get_Fragment(FMars_Fragment_FoodPiece_Net);
+        Net.Riding = EMars_FoodPiece_Riding::Riding;
+        Net.RideLocal = InLocal;
+        DoMark_LedgerDirty(InPiece);
+    }
+
+    // InOwner's ledger no longer carries InPiece on its root (it still holds it). Nothing unless InOwner is the holder.
+    // Called only by a ledger's processor.
+    void Clear_Ride(FCk_Handle_FoodPiece& InPiece, FCk_Handle InOwner)
+    {
+        if (ck::Is_NOT_Valid(InPiece) || InPiece.TryGet_Holder() != InOwner || DoGet_WritesLedger(InPiece) == false)
+        { return; }
+
+        auto& Net = InPiece.Get_Fragment(FMars_Fragment_FoodPiece_Net);
+        if (Net.Riding == EMars_FoodPiece_Riding::Loose)
+        { return; }
+
+        Net.Riding = EMars_FoodPiece_Riding::Loose;
+        DoMark_LedgerDirty(InPiece);
+    }
+
+    // A copy without authority applies the ledger's ride to its own copy: under the holder's root on this machine, at the
+    // ledger's offset, so the piece rides wherever this machine's holder is. Decided from the ledger, the local fragment and
+    // the piece's scene-node parent only. While the ride cannot be applied (the holder has not arrived, or something else
+    // holds the piece) the piece is tagged for the Ride processor. Called only by the FoodPiece processors; nothing happens
+    // on the authority or on a piece without the local fragment. It may attach (which composes): the caller holds no
+    // fragment reference across it.
+    void Update_Ride(FCk_Handle_FoodPiece& InPiece)
+    {
+        if (utils_net::Get_HasAuthority(InPiece) || InPiece.Has_Fragment(FMars_Fragment_FoodPiece_Local) == false)
+        { return; }
+
+        FCk_Handle Entity = InPiece;
+        auto PieceTransform = Entity.As_Transform();
+        auto Node = Entity.As_SceneNode(ECk_SanityCheck::UnChecked);
+        const auto Parent = ck::IsValid(Node) ? utils_scene_node::Get_Parent(Node) : FCk_Handle_Transform();
+        const auto HasParent = ck::IsValid(Parent);
+        FCk_Handle ParentEntity = Parent;
+        const auto Applied = InPiece.Get_Fragment(FMars_Fragment_FoodPiece_Local);
+
+        const auto Ride = InPiece.TryGet_ReplicatedRide();
+        if (Ride.IsSet() == false)
+        {
+            DoRemove_AwaitsRide(InPiece);
+            // Only what this machine attached is taken off: a hand that took the piece keeps it.
+            if (HasParent && ck::IsValid(Applied.RideParent) && ParentEntity == Applied.RideParent)
+            { utils_scene_node::Request_Detach(Node); }
+
+            DoRecord_Ride(InPiece, FCk_Handle(), FTransform::Identity);
+            return;
+        }
+
+        auto Holder = InPiece.TryGet_ReplicatedHolder();
+        if (ck::Is_NOT_Valid(Holder) || Holder.Is_Transform() == false)
+        {
+            DoAdd_AwaitsRide(InPiece);
+            return;
+        }
+
+        auto Root = Holder.As_Transform();
+        const auto Local = Ride.GetValue();
+        if (HasParent && Parent == Root)
+        {
+            if (Applied.RideLocal.Equals(Local) == false)
+            {
+                utils_scene_node::Request_Detach(Node);
+                utils_scene_node::Add(PieceTransform, Root, Local);
+            }
+
+            DoRecord_Ride(InPiece, Holder, Local);
+            DoRemove_AwaitsRide(InPiece);
+            return;
+        }
+
+        // Something else holds it (a hand's mount before its ledger went free): wait until it lets go.
+        if (HasParent)
+        {
+            DoAdd_AwaitsRide(InPiece);
+            return;
+        }
+
+        utils_scene_node::Add(PieceTransform, Root, Local);
+        DoRecord_Ride(InPiece, Holder, Local);
+        DoRemove_AwaitsRide(InPiece);
+    }
+
+    void DoRecord_Ride(FCk_Handle_FoodPiece& InPiece, FCk_Handle InParent, FTransform InLocal)
+    {
+        auto& Applied = InPiece.Get_Fragment(FMars_Fragment_FoodPiece_Local);
+        Applied.RideParent = InParent;
+        Applied.RideLocal = InLocal;
+    }
+
+    void DoAdd_AwaitsRide(FCk_Handle_FoodPiece& InPiece)
+    {
+        if (InPiece.Has_Fragment(FMars_Tag_FoodPiece_AwaitsRide) == false)
+        { InPiece.Add_Fragment(FMars_Tag_FoodPiece_AwaitsRide()); }
+    }
+
+    void DoRemove_AwaitsRide(FCk_Handle_FoodPiece& InPiece)
+    {
+        if (InPiece.Has_Fragment(FMars_Tag_FoodPiece_AwaitsRide))
+        { InPiece.Request_TryRemove(FMars_Tag_FoodPiece_AwaitsRide); }
+    }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -946,6 +1065,28 @@ mixin FCk_Handle TryGet_ReplicatedHolder(const FCk_Handle_FoodPiece& Self)
     { return FCk_Handle(); }
 
     return Ledger.GetValue().Holder;
+}
+
+// The holder this machine's copy rides under (utils_foodpiece::Update_Ride); invalid while it rides nothing, on the
+// authority (its scene-node parent is the fact there) and for a piece without the local fragment.
+mixin FCk_Handle Get_RideParent(const FCk_Handle_FoodPiece& Self)
+{
+    if (Self.Has_Fragment(FMars_Fragment_FoodPiece_Local) == false || utils_net::Get_HasAuthority(Self))
+    { return FCk_Handle(); }
+
+    return Self.Get_Fragment(FMars_Fragment_FoodPiece_Local).RideParent;
+}
+
+// The offset under the holder's root the authority published while the replicated ledger says Held and Riding; unset
+// otherwise and for a piece without a replicated ledger.
+mixin TOptional<FTransform> TryGet_ReplicatedRide(const FCk_Handle_FoodPiece& Self)
+{
+    const auto Ledger = utils_foodpiece::TryGet_Ledger(Self);
+    if (Ledger.IsSet() == false || Ledger.GetValue().Holding != EMars_FoodPiece_Holding::Held
+        || Ledger.GetValue().Riding != EMars_FoodPiece_Riding::Riding)
+    { return TOptional<FTransform>(); }
+
+    return TOptional<FTransform>(Ledger.GetValue().RideLocal);
 }
 
 // How many drains set the piece's cook state, as the replicated ledger says (0 while never cooked, and for a piece without

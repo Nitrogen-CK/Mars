@@ -1,3 +1,11 @@
+// Stance AUTHORITY-RUN. Only the authority's copy loads, drops, settles, freezes, re-settles and unloads: a copy without
+// authority drops every request and runs none of the pile's processors. What replicates: the platter's ledger
+// (FMars_Fragment_Platter_Net: held and on-the-books counts, wholeness, the pieces' kinds), and on each piece its holder and
+// its ride (FMars_Fragment_FoodPiece_Net), so every machine attaches its own copy of a frozen piece under its own copy of
+// the platter's root and the pile rides that machine's tray. A client reads counts, wholeness and kinds from the ledger;
+// the lists of pieces, the settle clocks, the queue and the membership never leave the authority. Every machine builds
+// the walls.
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
 //--------------------------------------------------------------------------------------------------------------------------
@@ -299,6 +307,31 @@ struct FMars_Fragment_Platter
     // Held and settling pieces collide by it; a piece that lands later takes it on landing.
     UPROPERTY()
     EMars_Platter_Mounting Mounting = EMars_Platter_Mounting::Free;
+}
+
+enum EMars_Platter_Wholeness
+{
+    AllWhole,
+    HasCut
+}
+
+// Stance REPLICATED, authority-written: what a copy without authority reads of the books (utils_platter::Publish, from the
+// Platter processors only, each change followed by its dirty mark).
+struct FMars_Fragment_Platter_Net
+{
+    UPROPERTY()
+    int32 HeldCount = 0;
+
+    // Held, settling and queued.
+    UPROPERTY()
+    int32 Occupancy = 0;
+
+    UPROPERTY()
+    EMars_Platter_Wholeness Wholeness = EMars_Platter_Wholeness::AllWhole;
+
+    // The distinct kind containers of every live piece on the books, in first-seen order.
+    UPROPERTY()
+    TArray<FGameplayTagContainer> PieceKinds;
 }
 
 // On every piece the platter holds (held, settling or queued); written only by the Platter processors. Removed on Unload,

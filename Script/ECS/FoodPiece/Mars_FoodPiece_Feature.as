@@ -796,6 +796,14 @@ enum EMars_FoodPiece_Holding
     Held
 }
 
+// Whether the holding ledger carries the piece as a scene-node child of its root (Riding) or not (Loose: queued, dropping,
+// settling, or a ledger that does not carry it).
+enum EMars_FoodPiece_Riding
+{
+    Loose,
+    Riding
+}
+
 enum EMars_FoodPiece_Check
 {
     // The authority has not recorded its geometry's numbers yet (its import has not resolved).
@@ -812,8 +820,9 @@ enum EMars_FoodPiece_CheckResult
 }
 
 // Stance REPLICATED, authority-written: on every piece whose entity replicates (utils_foodpiece::DoGet_HasLedger), written only
-// by the authority through utils_foodpiece's ledger writers (from Add, the FoodPiece processors and the holder helpers),
-// each write followed by its dirty mark. A copy without authority reads it and never writes it.
+// by the authority through utils_foodpiece's ledger writers (from Add, the FoodPiece processors and the holder and ride
+// helpers), each write followed by its dirty mark. A copy without authority reads it and never writes it; it applies the
+// ride itself (utils_foodpiece::Update_Ride).
 struct FMars_Fragment_FoodPiece_Net
 {
     UPROPERTY()
@@ -839,6 +848,14 @@ struct FMars_Fragment_FoodPiece_Net
     // its old value on a client.
     UPROPERTY()
     FCk_Handle Holder;
+
+    // The ride: while Holding is Held and Riding is Riding, the piece is a scene-node child of Holder's root at RideLocal
+    // (TryGet_ReplicatedRide); every machine attaches its own copy there, so the pile rides wherever that machine's holder is.
+    UPROPERTY()
+    EMars_FoodPiece_Riding Riding = EMars_FoodPiece_Riding::Loose;
+
+    UPROPERTY()
+    FTransform RideLocal = FTransform::Identity;
 
     UPROPERTY()
     EMars_FoodPiece_Check Check = EMars_FoodPiece_Check::NotRecorded;
@@ -866,7 +883,8 @@ enum EMars_FoodPiece_Standing
     Superseded
 }
 
-// Beside the ledger, this machine's own: the cook serial it last wore, how its geometry compared and whether it stands.
+// Beside the ledger, this machine's own: the cook serial it last wore, how its geometry compared, whether it stands and
+// the ride it applied.
 struct FMars_Fragment_FoodPiece_Local
 {
     UPROPERTY()
@@ -877,9 +895,21 @@ struct FMars_Fragment_FoodPiece_Local
 
     UPROPERTY()
     EMars_FoodPiece_Standing Standing = EMars_FoodPiece_Standing::Current;
+
+    // The holder a copy without authority attached the piece under (utils_foodpiece::Update_Ride) and the offset it
+    // attached at; an unset handle while it rides nothing.
+    UPROPERTY()
+    FCk_Handle RideParent;
+
+    UPROPERTY()
+    FTransform RideLocal = FTransform::Identity;
 }
 
 struct FMars_Tag_FoodPiece_NeedsMirror {}
+
+// On a copy without authority whose ledger says it rides a holder it cannot attach under yet (the holder has not arrived,
+// or something else holds the piece): the Ride processor retries every frame.
+struct FMars_Tag_FoodPiece_AwaitsRide {}
 
 // On a copy without authority whose lineage is known: the Succession processor rules on its standing.
 struct FMars_Tag_FoodPiece_NeedsSuccession {}

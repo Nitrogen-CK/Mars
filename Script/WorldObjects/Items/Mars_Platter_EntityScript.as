@@ -16,8 +16,8 @@ enum EMars_Platter_PickupAction
 // never per frame. While the platter rides a carrier (Carried or Held) its pile ignores pawns, as the tray's own body
 // does. The small and the large platter items share this script.
 //
-// Stance SPLIT, as its base: the world item's mount is derived on every machine, but the pile's mounted collision is set
-// only by the authority, on the bodies it has.
+// Stance SPLIT, as its base: the world item's mount is derived on every machine, but the pile is the authority's (its
+// mounted collision is set only there, on the bodies it has), and it rides this item's root on every machine.
 class UMars_Platter_EntityScript : UMars_WorldItem_EntityScript
 {
     // A placed platter resolves its item from here; a spawn sets it anyway.

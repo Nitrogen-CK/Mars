@@ -44,6 +44,9 @@ enum EMars_Platter_SettleStep
 // turned Dynamic and, unless it already lies over the tray, teleported over a random point between the walls
 // (utils_platter::Make_DropPose). A queued piece whose
 // import or body setup failed is refused Failed. A gone or taken piece is Reconcile's.
+//
+// The pile is the authority's: a copy without authority runs nothing here. A frozen piece's ride (its offset under the root)
+// is stamped in its replicated ledger as it is attached, and the platter's ledger is published before the broadcasts.
 class UMars_Processor_Platter_Settle : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -58,6 +61,10 @@ class UMars_Processor_Platter_Settle : UCk_Processor_Script_Base_UE
 
     void ForEachEntity(FCk_Time InDeltaT, FCk_Handle& InHandle, FMars_Fragment_Platter& InState)
     {
+        // The pile is the authority's.
+        if (utils_net::Get_HasAuthority(InHandle) == false)
+        { return; }
+
         auto Platter = InHandle.As_Platter();
         const auto Spec = Platter.Get_Spec();
         const auto Seconds = float32(InDeltaT.Get_Seconds());
@@ -78,7 +85,7 @@ class UMars_Processor_Platter_Settle : UCk_Processor_Script_Base_UE
 
         Settle_Pieces(Pass, InState, Spec);
         if (Pass.ResettleFrom.IsSet())
-        { utils_platter::Resettle(InState, RootWorld, Pass.ResettleFrom.GetValue()); }
+        { utils_platter::Resettle(Platter, InState, Pass.ResettleFrom.GetValue()); }
 
         // Jolt runs only in a game world: in an editor's preview world a queued piece stays queued.
         const UWorld World = utils_entity_lifetime::Get_WorldForEntity(InHandle);
@@ -92,6 +99,7 @@ class UMars_Processor_Platter_Settle : UCk_Processor_Script_Base_UE
         else
         { InState.SinceDrop = 0.0f; }
 
+        utils_platter::Publish(Platter);
         Broadcast(Pass);
     }
 
@@ -252,7 +260,10 @@ class UMars_Processor_Platter_Settle : UCk_Processor_Script_Base_UE
         auto Root = PlatterEntity.As_Transform();
         auto PieceTransform = PieceEntity.As_Transform();
         const auto PieceWorld = utils_transform::Get_EntityCurrentTransform(PieceTransform);
-        utils_scene_node::Add(PieceTransform, Root, PieceWorld.GetRelativeTransform(InPass.RootWorld));
+        const auto Local = PieceWorld.GetRelativeTransform(InPass.RootWorld);
+        utils_scene_node::Add(PieceTransform, Root, Local);
+        auto Piece = InSettling.Piece;
+        utils_foodpiece::Stamp_Ride(Piece, InPass.Platter, Local);
 
         if (InPass.Mounting == EMars_Platter_Mounting::Mounted)
         { utils_platter::Apply_PileProfile(InSettling.Piece, InPass.Mounting); }
@@ -438,6 +449,7 @@ class UMars_Processor_Platter_Settle : UCk_Processor_Script_Base_UE
             Pass.Platter = Platter;
             Pass.Mounting = State.Mounting;
             Refuse(Pass, Settling, f"its body failed setup ({InFailure :n})");
+            utils_platter::Publish(Platter);
             Broadcast(Pass);
             return;
         }
@@ -447,7 +459,8 @@ class UMars_Processor_Platter_Settle : UCk_Processor_Script_Base_UE
 // The platter is a lease over its pieces, reconciled every pass: a piece something else took (detached from the root,
 // carried off by a hand, a queued or settling piece attached anywhere) or destroyed leaves the ledger. A landed piece that
 // left broadcasts OnUnloaded and the rest of the pile re-settles; a queued piece that is destroyed or taken, or one dropping
-// for its first landing that is destroyed or taken, is dropped silently (it never landed).
+// for its first landing that is destroyed or taken, is dropped silently (it never landed). Only the authority reconciles;
+// a pass that forgot anything publishes the platter's ledger before it broadcasts.
 class UMars_Processor_Platter_Reconcile : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -461,6 +474,10 @@ class UMars_Processor_Platter_Reconcile : UCk_Processor_Script_Base_UE
 
     void ForEachEntity(FCk_Time InDeltaT, FCk_Handle& InHandle, FMars_Fragment_Platter& InState)
     {
+        // The books are the authority's.
+        if (utils_net::Get_HasAuthority(InHandle) == false)
+        { return; }
+
         if (InState.Held.Num() == 0 && InState.Settling.Num() == 0 && InState.Queue.Num() == 0)
         { return; }
 
@@ -468,6 +485,7 @@ class UMars_Processor_Platter_Reconcile : UCk_Processor_Script_Base_UE
         auto Root = InHandle.As_Transform();
         TArray<FCk_Handle_FoodPiece> Left;
         auto ResettleFrom = TOptional<int32>();
+        auto HasForgotten = false;
 
         TArray<FMars_Platter_Held> StillHeld;
         for (const auto& Held : InState.Held)
@@ -480,6 +498,7 @@ class UMars_Processor_Platter_Reconcile : UCk_Processor_Script_Base_UE
             }
 
             Forget(Piece, Platter);
+            HasForgotten = true;
             Left.Add(Piece);
             utils_platter::Lower_ResettleFrom(ResettleFrom, Held.FreezeIndex + 1);
         }
@@ -497,6 +516,7 @@ class UMars_Processor_Platter_Reconcile : UCk_Processor_Script_Base_UE
             }
 
             Forget(Piece, Platter);
+            HasForgotten = true;
             if (Settling.Reason == EMars_Platter_SettleReason::Resettle)
             {
                 Left.Add(Piece);
@@ -513,12 +533,14 @@ class UMars_Processor_Platter_Reconcile : UCk_Processor_Script_Base_UE
             if (Piece.Get_IsGone())
             {
                 Forget(Piece, Platter);
+                HasForgotten = true;
                 continue;
             }
 
             if (utils_platter::Get_IsTaken(Piece))
             {
                 Forget(Piece, Platter);
+                HasForgotten = true;
                 continue;
             }
 
@@ -527,10 +549,11 @@ class UMars_Processor_Platter_Reconcile : UCk_Processor_Script_Base_UE
 
         InState.Queue = StillQueued;
 
-        if (Left.Num() == 0)
-        { return; }
+        if (Left.Num() > 0)
+        { utils_platter::Resettle(Platter, InState, ResettleFrom.GetValue()); }
 
-        utils_platter::Resettle(InState, utils_transform::Get_EntityCurrentTransform(Root), ResettleFrom.GetValue());
+        if (HasForgotten)
+        { utils_platter::Publish(Platter); }
 
         // InState is not read past this line: a listener may add a request fragment to the platter.
         for (const auto& Piece : Left)
