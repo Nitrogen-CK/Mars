@@ -367,9 +367,13 @@ class UMars_Processor_Platter_Settle : UCk_Processor_Script_Base_UE
                 utils_transform::Request_SetRotation(PieceTransform, FCk_Request_Transform_SetRotation(World.Rotator()));
             }
 
-            const auto NewBody = utils_foodpiece::Add_Body(Piece);
-            const auto IsObserved = utils_jolt_body::TryPromise_OnSetupResolved(NewBody, FCk_Delegate_JoltBody_OnSetupResolved(this, n"OnDroppedBodySetupResolved"));
-            ck::EnsureIfNot(IsObserved, f"[Platter] [{InPass.Platter.ToString()}] dropped [{Piece.ToString()}] with a body whose setup cannot be observed");
+            // Bodies are the authority's: a copy without authority poses the piece and follows the replicated pose.
+            if (utils_net::Get_HasAuthority(PieceEntity))
+            {
+                const auto NewBody = utils_foodpiece::Add_Body(Piece);
+                const auto IsObserved = utils_jolt_body::TryPromise_OnSetupResolved(NewBody, FCk_Delegate_JoltBody_OnSetupResolved(this, n"OnDroppedBodySetupResolved"));
+                ck::EnsureIfNot(IsObserved, f"[Platter] [{InPass.Platter.ToString()}] dropped [{Piece.ToString()}] with a body whose setup cannot be observed");
+            }
         }
 
         if (InSettling.Freeze.IsSet())

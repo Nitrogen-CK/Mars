@@ -39,6 +39,19 @@ struct FMars_Fragment_TESTONLY_NetFoodPieceReport
     UPROPERTY()
     float64 PositiveYaw = 0.0;
 
+    // The check numbers the server's halves recorded in their ledgers.
+    UPROPERTY()
+    float PositiveCheckVolumeCm3 = 0.0;
+
+    UPROPERTY()
+    int32 PositiveCheckTriangles = 0;
+
+    UPROPERTY()
+    float NegativeCheckVolumeCm3 = 0.0;
+
+    UPROPERTY()
+    int32 NegativeCheckTriangles = 0;
+
     UPROPERTY()
     int32 Serial = 0;
 }
@@ -309,5 +322,83 @@ class UMars_AutoTestRig_NetFoodPiece : UMars_AutoTestRig_NetWorldItem
     protected bool Get_IsPlaneEqual(FCk_RuntimeMesh_PlaneLocal InA, FCk_RuntimeMesh_PlaneLocal InB)
     {
         return InA.Get_PositionCm() == InB.Get_PositionCm() && InA.Get_Normal() == InB.Get_Normal() && InA.Get_Tangent() == InB.Get_Tangent();
+    }
+
+    //----------------------------------------------------------------------------------------------------------------------
+    // The replicated ledger
+    //----------------------------------------------------------------------------------------------------------------------
+
+    // The display slot of the oil coat, as utils_cookstate lays the slots out.
+    protected const int32 k_OilCoatSlot = 7;
+
+    // Every whole food near InNear on this machine that is a FoodPiece (from its composition, before it is a world item).
+    protected TArray<FCk_Handle_FoodPiece> Get_FoodPiecesNear(FVector InNear)
+    {
+        TArray<FCk_Handle_FoodPiece> Foods;
+        for (auto Candidate : utils_entity_tag::ForEach_Entity(Get_SubjectEntity(), n"TAG_MarsWorldItem"))
+        {
+            if (Get_IsLive(Candidate) && Candidate.Is_Transform() && Candidate.Is_FoodPiece() && Get_IsNear(Candidate, InNear))
+            { Foods.Add(Candidate.As_FoodPiece()); }
+        }
+
+        return Foods;
+    }
+
+    // The first whole food near InNear that is a FoodPiece; invalid when none is.
+    protected FCk_Handle_FoodPiece Find_FoodPieceNear(FVector InNear)
+    {
+        const auto Foods = Get_FoodPiecesNear(InNear);
+        if (Foods.Num() == 0)
+        { return FCk_Handle_FoodPiece(); }
+
+        return Foods[0];
+    }
+
+    protected bool Get_IsCookStateEqual(FMars_FoodPiece_CookState InA, FMars_FoodPiece_CookState InB)
+    {
+        if (InA.Sear.Num() != InB.Sear.Num() || InA.Batter.Num() != InB.Batter.Num())
+        { return false; }
+
+        for (int32 Index = 0; Index < InA.Sear.Num(); ++Index)
+        {
+            if (InA.Sear[Index] != InB.Sear[Index])
+            { return false; }
+        }
+
+        for (int32 Index = 0; Index < InA.Batter.Num(); ++Index)
+        {
+            if (InA.Batter[Index] != InB.Batter[Index])
+            { return false; }
+        }
+
+        return InA.OilCoat == InB.OilCoat && InA.Crumb == InB.Crumb && InA.Battered == InB.Battered;
+    }
+
+    // A raw cook state with InPosZSear on +Z and InOilCoat.
+    protected FMars_FoodPiece_CookState Make_CookState(float32 InPosZSear, float32 InOilCoat)
+    {
+        auto CookState = FMars_FoodPiece_CookState();
+        CookState.Sear[int32(EMars_FoodPiece_Face::PosZ)] = InPosZSear;
+        CookState.OilCoat = InOilCoat;
+        return CookState;
+    }
+
+    // The oil coat InPiece's display shows; unset until it has a Ready display.
+    protected TOptional<float32> Get_ShownOilCoat(FCk_Handle_FoodPiece InPiece)
+    {
+        FCk_Handle Entity = InPiece;
+        if (ck::Is_NOT_Valid(Entity) || Entity.Is_RuntimeMeshDisplay() == false)
+        { return TOptional<float32>(); }
+
+        const auto Display = Entity.As_RuntimeMeshDisplay();
+        if (utils_runtime_mesh_display::Get_SetupState(Display) != ECk_RuntimeMesh_SetupState::Ready)
+        { return TOptional<float32>(); }
+
+        return TOptional<float32>(utils_runtime_mesh_display::Get_CustomPrimitiveDataFloat(Display, k_OilCoatSlot));
+    }
+
+    protected float64 Get_Now()
+    {
+        return System::GetGameTimeInSeconds();
     }
 }

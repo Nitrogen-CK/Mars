@@ -13,7 +13,10 @@ struct FMars_Feature_FoodPiece {}
 // Stance AUTHORITY: the cuts and the ledger are the authority's (a copy without authority refuses every cut and drops every
 // cook state). A whole food's piece is composed on every machine from its replicated world item; a cut of a piece that
 // replicates makes replicated piece scripts whose spawn data (the recipe, the identity, the mass) and root transform
-// replicate. Nothing of the ledger replicates yet.
+// replicate. A piece whose entity replicates carries FMars_Fragment_FoodPiece_Net, the authority's replicated ledger: its
+// identity, its cook state, who holds it and its geometry's check numbers. A copy without authority adopts the identity,
+// wears the cook state (OnCookStateChanged) and checks its own geometry against the numbers; only the authority gives a
+// piece a body.
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Vocabulary
@@ -576,6 +579,89 @@ struct FMars_Fragment_FoodPiece_Holder
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
+// Replicated ledger
+//--------------------------------------------------------------------------------------------------------------------------
+
+enum EMars_FoodPiece_Holding
+{
+    Free,
+    Held
+}
+
+enum EMars_FoodPiece_Check
+{
+    // The authority has not recorded its geometry's numbers yet (its import has not resolved).
+    NotRecorded,
+    Recorded
+}
+
+// How a copy without authority compares its own geometry with the authority's numbers.
+enum EMars_FoodPiece_CheckResult
+{
+    Unchecked,
+    Matches,
+    Differs
+}
+
+// Stance REPLICATED, authority-written: on every piece whose entity replicates (utils_foodpiece::DoGet_HasLedger), written only
+// by the authority through utils_foodpiece's ledger writers (from Add, the FoodPiece processors and the holder helpers),
+// each write followed by its dirty mark. A copy without authority reads it and never writes it.
+struct FMars_Fragment_FoodPiece_Net
+{
+    UPROPERTY()
+    FGuid Id;
+
+    UPROPERTY()
+    FGuid ParentId;
+
+    UPROPERTY()
+    FGuid Lineage;
+
+    UPROPERTY()
+    FMars_FoodPiece_CookState CookState;
+
+    // 0 exactly while the piece has never been cooked; one more for every drain that set its cook state.
+    UPROPERTY()
+    int32 CookSerial = 0;
+
+    UPROPERTY()
+    EMars_FoodPiece_Holding Holding = EMars_FoodPiece_Holding::Free;
+
+    // The ledger holding the piece, meaningful only while Holding is Held (TryGet_ReplicatedHolder): a cleared handle keeps
+    // its old value on a client.
+    UPROPERTY()
+    FCk_Handle Holder;
+
+    UPROPERTY()
+    EMars_FoodPiece_Check Check = EMars_FoodPiece_Check::NotRecorded;
+
+    // The authority's Ready geometry, meaningful once Check is Recorded.
+    UPROPERTY()
+    float CheckVolumeCm3 = 0.0;
+
+    UPROPERTY()
+    int32 CheckTriangles = 0;
+
+    UPROPERTY()
+    FVector CheckBoundsMinCm = FVector::ZeroVector;
+
+    UPROPERTY()
+    FVector CheckBoundsMaxCm = FVector::ZeroVector;
+}
+
+// Beside the ledger, this machine's own: the cook serial it last wore and how its geometry compared.
+struct FMars_Fragment_FoodPiece_Local
+{
+    UPROPERTY()
+    int32 LastCookSerial = 0;
+
+    UPROPERTY()
+    EMars_FoodPiece_CheckResult CheckResult = EMars_FoodPiece_CheckResult::Unchecked;
+}
+
+struct FMars_Tag_FoodPiece_NeedsMirror {}
+
+//--------------------------------------------------------------------------------------------------------------------------
 // Signals
 //--------------------------------------------------------------------------------------------------------------------------
 
@@ -593,11 +679,17 @@ event void FMars_Delegate_FoodPiece_OnFailed_MC(FCk_Handle_FoodPiece InPiece, EC
 delegate void FMars_Delegate_FoodPiece_OnCutResolved(FCk_Handle_FoodPiece InSource, FMars_FoodPiece_CutResult InResult);
 event void FMars_Delegate_FoodPiece_OnCutResolved_MC(FCk_Handle_FoodPiece InSource, FMars_FoodPiece_CutResult InResult);
 
+// On a copy without authority, each time the replicated ledger brings a cook state it had not worn. Never raised on the
+// authority: whoever writes a cook state there writes its look.
+delegate void FMars_Delegate_FoodPiece_OnCookStateChanged(FCk_Handle_FoodPiece InPiece);
+event void FMars_Delegate_FoodPiece_OnCookStateChanged_MC(FCk_Handle_FoodPiece InPiece);
+
 struct FMars_Fragment_FoodPiece_Signals
 {
     FMars_Delegate_FoodPiece_OnReady_MC OnReady;
     FMars_Delegate_FoodPiece_OnFailed_MC OnFailed;
     FMars_Delegate_FoodPiece_OnCutResolved_MC OnCutResolved;
+    FMars_Delegate_FoodPiece_OnCookStateChanged_MC OnCookStateChanged;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

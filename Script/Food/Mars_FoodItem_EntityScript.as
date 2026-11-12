@@ -12,6 +12,7 @@ namespace constants_food_item
 //
 // Stance SPLIT, as the base world item: spawned through utils_world_item::Request_SpawnWorldEntity, its root transform and
 // holder replicate; the joint and its display are built on every machine from the definition; the body is the authority's.
+// The joint's replicated ledger brings its identity and cook state to a copy without authority, which wears that cook state.
 class UMars_FoodItem_EntityScript : UMars_WorldItem_EntityScript
 {
     private UMars_Food_Def _Food;
@@ -53,6 +54,7 @@ class UMars_FoodItem_EntityScript : UMars_WorldItem_EntityScript
 
         _Joint.BindTo_OnReady(FMars_Delegate_FoodPiece_OnReady(this, n"OnJointReady"));
         _Joint.BindTo_OnFailed(FMars_Delegate_FoodPiece_OnFailed(this, n"OnJointFailed"));
+        _Joint.BindTo_OnCookStateChanged(FMars_Delegate_FoodPiece_OnCookStateChanged(this, n"OnJointCookStateChanged"));
         return ECk_EntityScript_ConstructionFlow::Continue;
     }
 
@@ -65,6 +67,7 @@ class UMars_FoodItem_EntityScript : UMars_WorldItem_EntityScript
         {
             _Joint.UnbindFrom_OnReady(FMars_Delegate_FoodPiece_OnReady(this, n"OnJointReady"));
             _Joint.UnbindFrom_OnFailed(FMars_Delegate_FoodPiece_OnFailed(this, n"OnJointFailed"));
+            _Joint.UnbindFrom_OnCookStateChanged(FMars_Delegate_FoodPiece_OnCookStateChanged(this, n"OnJointCookStateChanged"));
         }
 
         _Joint = FCk_Handle_FoodPiece();
@@ -102,6 +105,14 @@ class UMars_FoodItem_EntityScript : UMars_WorldItem_EntityScript
         { return; }
 
         DoFinishConstruction();
+    }
+
+    // A copy without authority wears the cook state the authority's ledger brought; a joint not dressed yet starts from it
+    // when it is.
+    UFUNCTION()
+    private void OnJointCookStateChanged(FCk_Handle_FoodPiece InPiece)
+    {
+        InPiece.Write_Look(utils_cookstate::Make_DisplayParams(InPiece.Get_CookState()));
     }
 
     // The import already ensured (UMars_Processor_FoodPiece_Setup): a food item without its joint is nothing to pick up.

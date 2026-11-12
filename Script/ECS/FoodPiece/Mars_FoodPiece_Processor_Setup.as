@@ -1,6 +1,8 @@
 // Announces a piece once its geometry is terminal. A piece composed on Ready geometry (every cut half) was made Ready by
 // Add and only announces here. One still importing keeps its tag and is polled: Ready records the volume; Failed ensures
 // (an authored food mesh that does not import is a content defect), marks the piece Failed and announces the reason.
+// Ready also records the geometry's check numbers in the replicated ledger on the authority, and a copy without authority
+// checks its own geometry against them before it announces.
 class UMars_Processor_FoodPiece_Setup : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -39,9 +41,11 @@ class UMars_Processor_FoodPiece_Setup : UCk_Processor_Script_Base_UE
 
             InState.VolumeCm3 = utils_runtime_mesh::Get_Metrics(Geometry).Get_VolumeCm3();
             InState.Status = EMars_FoodPiece_Status::Ready;
+            utils_foodpiece::Write_LedgerCheck(Piece);
         }
 
         Piece.Request_TryRemove(FMars_Tag_FoodPiece_NeedsSetup);
+        utils_foodpiece::Update_CheckResult(Piece);
 
         if (Piece.Has_Fragment(FMars_Fragment_FoodPiece_Signals))
         { Piece.Get_Fragment(FMars_Fragment_FoodPiece_Signals).OnReady.Broadcast(Piece); }

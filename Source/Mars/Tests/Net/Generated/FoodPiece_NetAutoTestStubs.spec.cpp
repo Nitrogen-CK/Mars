@@ -37,6 +37,134 @@
 
 // --------------------------------------------------------------------------------------------------------------------
 
+// Auto-generated from AS class Ck_AutoTest_Net_FoodPiece_AClientsImportMatchesTheAuthoritys (Replicated-mode).
+// DO NOT EDIT - regenerated on editor startup and every successful AS recompile.
+
+namespace
+{
+    constexpr auto kAsClassPath_FoodPiece_AClientsImportMatchesTheAuthoritys = TEXT("/Script/Angelscript.Ck_AutoTest_Net_FoodPiece_AClientsImportMatchesTheAuthoritys");
+    constexpr auto kTimeoutSeconds_FoodPiece_AClientsImportMatchesTheAuthoritys = 30.0f;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+    FCkFoodPieceNet_AS_FoodPiece_AClientsImportMatchesTheAuthoritys,
+    "Ck.FoodPiece.Net.AS_FoodPiece_AClientsImportMatchesTheAuthoritys",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ClientContext | EAutomationTestFlags::EngineFilter)
+
+bool FCkFoodPieceNet_AS_FoodPiece_AClientsImportMatchesTheAuthoritys::RunTest(const FString& Parameters)
+{
+    bSuppressLogErrors = true;
+    bSuppressLogWarnings = true;
+
+    constexpr auto NumPIEClients = 2;
+    constexpr auto ExpectedTotalWorlds = 2;
+    constexpr auto ReadyTimeoutSeconds = 30.0f;
+    constexpr auto FramesAfterSpawn = 30;
+
+    const auto MapPath = FString{TEXT("/Engine/Maps/Entry")};
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_StartPIEMultiClient(NumPIEClients, MapPath));
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_WaitForPIEReady(ExpectedTotalWorlds, ReadyTimeoutSeconds));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_RunOnServer(
+        FCk_NetAutoTest_ServerAction::CreateLambda([this](UWorld* InServer) -> void
+        {
+            auto SpawnInfo = FActorSpawnParameters{};
+            SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+            const auto SubjectClassPath = FSoftClassPath(TEXT("/Script/CkTests.Ck_AutoTest_NetSubject"));
+            auto* SubjectClass = SubjectClassPath.TryLoadClass<ACk_AutoTest_NetSubject>();
+            if (SubjectClass == nullptr)
+            { AddError(TEXT("AS-test harness: failed to resolve NetSubject class via FSoftClassPath")); return; }
+            auto* Subject = InServer->SpawnActor<ACk_AutoTest_NetSubject>(
+                SubjectClass, FTransform::Identity, SpawnInfo);
+            if (Subject == nullptr)
+            { AddError(TEXT("AS-test harness: server-side SpawnActor returned null")); }
+        })));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_TickWorlds(FramesAfterSpawn));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_RunAsTestOnAllWorlds(this, FString{kAsClassPath_FoodPiece_AClientsImportMatchesTheAuthoritys}, kTimeoutSeconds_FoodPiece_AClientsImportMatchesTheAuthoritys));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_EndPIE());
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_AssertCondition(this,
+        FCk_NetAutoTest_Assertion::CreateLambda([]() -> bool
+        {
+            FAutomationTestBase::bSuppressLogErrors = false;
+            FAutomationTestBase::bSuppressLogWarnings = false;
+            return true;
+        }),
+        TEXT("restore log suppression statics")));
+
+    return true;
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+// Auto-generated from AS class Ck_AutoTest_Net_FoodPiece_ACookStateReachesAClientsLook (Replicated-mode).
+// DO NOT EDIT - regenerated on editor startup and every successful AS recompile.
+
+namespace
+{
+    constexpr auto kAsClassPath_FoodPiece_ACookStateReachesAClientsLook = TEXT("/Script/Angelscript.Ck_AutoTest_Net_FoodPiece_ACookStateReachesAClientsLook");
+    constexpr auto kTimeoutSeconds_FoodPiece_ACookStateReachesAClientsLook = 30.0f;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+    FCkFoodPieceNet_AS_FoodPiece_ACookStateReachesAClientsLook,
+    "Ck.FoodPiece.Net.AS_FoodPiece_ACookStateReachesAClientsLook",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ClientContext | EAutomationTestFlags::EngineFilter)
+
+bool FCkFoodPieceNet_AS_FoodPiece_ACookStateReachesAClientsLook::RunTest(const FString& Parameters)
+{
+    bSuppressLogErrors = true;
+    bSuppressLogWarnings = true;
+
+    constexpr auto NumPIEClients = 2;
+    constexpr auto ExpectedTotalWorlds = 2;
+    constexpr auto ReadyTimeoutSeconds = 30.0f;
+    constexpr auto FramesAfterSpawn = 30;
+
+    const auto MapPath = FString{TEXT("/Engine/Maps/Entry")};
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_StartPIEMultiClient(NumPIEClients, MapPath));
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_WaitForPIEReady(ExpectedTotalWorlds, ReadyTimeoutSeconds));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_RunOnServer(
+        FCk_NetAutoTest_ServerAction::CreateLambda([this](UWorld* InServer) -> void
+        {
+            auto SpawnInfo = FActorSpawnParameters{};
+            SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+            const auto SubjectClassPath = FSoftClassPath(TEXT("/Script/CkTests.Ck_AutoTest_NetSubject"));
+            auto* SubjectClass = SubjectClassPath.TryLoadClass<ACk_AutoTest_NetSubject>();
+            if (SubjectClass == nullptr)
+            { AddError(TEXT("AS-test harness: failed to resolve NetSubject class via FSoftClassPath")); return; }
+            auto* Subject = InServer->SpawnActor<ACk_AutoTest_NetSubject>(
+                SubjectClass, FTransform::Identity, SpawnInfo);
+            if (Subject == nullptr)
+            { AddError(TEXT("AS-test harness: server-side SpawnActor returned null")); }
+        })));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_TickWorlds(FramesAfterSpawn));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_RunAsTestOnAllWorlds(this, FString{kAsClassPath_FoodPiece_ACookStateReachesAClientsLook}, kTimeoutSeconds_FoodPiece_ACookStateReachesAClientsLook));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_EndPIE());
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_AssertCondition(this,
+        FCk_NetAutoTest_Assertion::CreateLambda([]() -> bool
+        {
+            FAutomationTestBase::bSuppressLogErrors = false;
+            FAutomationTestBase::bSuppressLogWarnings = false;
+            return true;
+        }),
+        TEXT("restore log suppression statics")));
+
+    return true;
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
 // Auto-generated from AS class Ck_AutoTest_Net_FoodPiece_ACutMakesTwoReplicatedPieces (Replicated-mode).
 // DO NOT EDIT - regenerated on editor startup and every successful AS recompile.
 
@@ -165,6 +293,198 @@ bool FCkFoodPieceNet_AS_FoodPiece_ACutPieceFollowsTheAuthoritysPose::RunTest(con
 
 // --------------------------------------------------------------------------------------------------------------------
 
+// Auto-generated from AS class Ck_AutoTest_Net_FoodPiece_ACutPiecesLedgerIsThereFromBirth (Replicated-mode).
+// DO NOT EDIT - regenerated on editor startup and every successful AS recompile.
+
+namespace
+{
+    constexpr auto kAsClassPath_FoodPiece_ACutPiecesLedgerIsThereFromBirth = TEXT("/Script/Angelscript.Ck_AutoTest_Net_FoodPiece_ACutPiecesLedgerIsThereFromBirth");
+    constexpr auto kTimeoutSeconds_FoodPiece_ACutPiecesLedgerIsThereFromBirth = 30.0f;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+    FCkFoodPieceNet_AS_FoodPiece_ACutPiecesLedgerIsThereFromBirth,
+    "Ck.FoodPiece.Net.AS_FoodPiece_ACutPiecesLedgerIsThereFromBirth",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ClientContext | EAutomationTestFlags::EngineFilter)
+
+bool FCkFoodPieceNet_AS_FoodPiece_ACutPiecesLedgerIsThereFromBirth::RunTest(const FString& Parameters)
+{
+    bSuppressLogErrors = true;
+    bSuppressLogWarnings = true;
+
+    constexpr auto NumPIEClients = 2;
+    constexpr auto ExpectedTotalWorlds = 2;
+    constexpr auto ReadyTimeoutSeconds = 30.0f;
+    constexpr auto FramesAfterSpawn = 30;
+
+    const auto MapPath = FString{TEXT("/Engine/Maps/Entry")};
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_StartPIEMultiClient(NumPIEClients, MapPath));
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_WaitForPIEReady(ExpectedTotalWorlds, ReadyTimeoutSeconds));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_RunOnServer(
+        FCk_NetAutoTest_ServerAction::CreateLambda([this](UWorld* InServer) -> void
+        {
+            auto SpawnInfo = FActorSpawnParameters{};
+            SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+            const auto SubjectClassPath = FSoftClassPath(TEXT("/Script/CkTests.Ck_AutoTest_NetSubject"));
+            auto* SubjectClass = SubjectClassPath.TryLoadClass<ACk_AutoTest_NetSubject>();
+            if (SubjectClass == nullptr)
+            { AddError(TEXT("AS-test harness: failed to resolve NetSubject class via FSoftClassPath")); return; }
+            auto* Subject = InServer->SpawnActor<ACk_AutoTest_NetSubject>(
+                SubjectClass, FTransform::Identity, SpawnInfo);
+            if (Subject == nullptr)
+            { AddError(TEXT("AS-test harness: server-side SpawnActor returned null")); }
+        })));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_TickWorlds(FramesAfterSpawn));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_RunAsTestOnAllWorlds(this, FString{kAsClassPath_FoodPiece_ACutPiecesLedgerIsThereFromBirth}, kTimeoutSeconds_FoodPiece_ACutPiecesLedgerIsThereFromBirth));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_EndPIE());
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_AssertCondition(this,
+        FCk_NetAutoTest_Assertion::CreateLambda([]() -> bool
+        {
+            FAutomationTestBase::bSuppressLogErrors = false;
+            FAutomationTestBase::bSuppressLogWarnings = false;
+            return true;
+        }),
+        TEXT("restore log suppression statics")));
+
+    return true;
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+// Auto-generated from AS class Ck_AutoTest_Net_FoodPiece_ALateBinderStartsFromTheLedgerAsItStands (Replicated-mode).
+// DO NOT EDIT - regenerated on editor startup and every successful AS recompile.
+
+namespace
+{
+    constexpr auto kAsClassPath_FoodPiece_ALateBinderStartsFromTheLedgerAsItStands = TEXT("/Script/Angelscript.Ck_AutoTest_Net_FoodPiece_ALateBinderStartsFromTheLedgerAsItStands");
+    constexpr auto kTimeoutSeconds_FoodPiece_ALateBinderStartsFromTheLedgerAsItStands = 30.0f;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+    FCkFoodPieceNet_AS_FoodPiece_ALateBinderStartsFromTheLedgerAsItStands,
+    "Ck.FoodPiece.Net.AS_FoodPiece_ALateBinderStartsFromTheLedgerAsItStands",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ClientContext | EAutomationTestFlags::EngineFilter)
+
+bool FCkFoodPieceNet_AS_FoodPiece_ALateBinderStartsFromTheLedgerAsItStands::RunTest(const FString& Parameters)
+{
+    bSuppressLogErrors = true;
+    bSuppressLogWarnings = true;
+
+    constexpr auto NumPIEClients = 2;
+    constexpr auto ExpectedTotalWorlds = 2;
+    constexpr auto ReadyTimeoutSeconds = 30.0f;
+    constexpr auto FramesAfterSpawn = 30;
+
+    const auto MapPath = FString{TEXT("/Engine/Maps/Entry")};
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_StartPIEMultiClient(NumPIEClients, MapPath));
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_WaitForPIEReady(ExpectedTotalWorlds, ReadyTimeoutSeconds));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_RunOnServer(
+        FCk_NetAutoTest_ServerAction::CreateLambda([this](UWorld* InServer) -> void
+        {
+            auto SpawnInfo = FActorSpawnParameters{};
+            SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+            const auto SubjectClassPath = FSoftClassPath(TEXT("/Script/CkTests.Ck_AutoTest_NetSubject"));
+            auto* SubjectClass = SubjectClassPath.TryLoadClass<ACk_AutoTest_NetSubject>();
+            if (SubjectClass == nullptr)
+            { AddError(TEXT("AS-test harness: failed to resolve NetSubject class via FSoftClassPath")); return; }
+            auto* Subject = InServer->SpawnActor<ACk_AutoTest_NetSubject>(
+                SubjectClass, FTransform::Identity, SpawnInfo);
+            if (Subject == nullptr)
+            { AddError(TEXT("AS-test harness: server-side SpawnActor returned null")); }
+        })));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_TickWorlds(FramesAfterSpawn));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_RunAsTestOnAllWorlds(this, FString{kAsClassPath_FoodPiece_ALateBinderStartsFromTheLedgerAsItStands}, kTimeoutSeconds_FoodPiece_ALateBinderStartsFromTheLedgerAsItStands));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_EndPIE());
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_AssertCondition(this,
+        FCk_NetAutoTest_Assertion::CreateLambda([]() -> bool
+        {
+            FAutomationTestBase::bSuppressLogErrors = false;
+            FAutomationTestBase::bSuppressLogWarnings = false;
+            return true;
+        }),
+        TEXT("restore log suppression statics")));
+
+    return true;
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+// Auto-generated from AS class Ck_AutoTest_Net_FoodPiece_AWholeFoodsIdentityReachesTheClient (Replicated-mode).
+// DO NOT EDIT - regenerated on editor startup and every successful AS recompile.
+
+namespace
+{
+    constexpr auto kAsClassPath_FoodPiece_AWholeFoodsIdentityReachesTheClient = TEXT("/Script/Angelscript.Ck_AutoTest_Net_FoodPiece_AWholeFoodsIdentityReachesTheClient");
+    constexpr auto kTimeoutSeconds_FoodPiece_AWholeFoodsIdentityReachesTheClient = 30.0f;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+    FCkFoodPieceNet_AS_FoodPiece_AWholeFoodsIdentityReachesTheClient,
+    "Ck.FoodPiece.Net.AS_FoodPiece_AWholeFoodsIdentityReachesTheClient",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ClientContext | EAutomationTestFlags::EngineFilter)
+
+bool FCkFoodPieceNet_AS_FoodPiece_AWholeFoodsIdentityReachesTheClient::RunTest(const FString& Parameters)
+{
+    bSuppressLogErrors = true;
+    bSuppressLogWarnings = true;
+
+    constexpr auto NumPIEClients = 2;
+    constexpr auto ExpectedTotalWorlds = 2;
+    constexpr auto ReadyTimeoutSeconds = 30.0f;
+    constexpr auto FramesAfterSpawn = 30;
+
+    const auto MapPath = FString{TEXT("/Engine/Maps/Entry")};
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_StartPIEMultiClient(NumPIEClients, MapPath));
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_WaitForPIEReady(ExpectedTotalWorlds, ReadyTimeoutSeconds));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_RunOnServer(
+        FCk_NetAutoTest_ServerAction::CreateLambda([this](UWorld* InServer) -> void
+        {
+            auto SpawnInfo = FActorSpawnParameters{};
+            SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+            const auto SubjectClassPath = FSoftClassPath(TEXT("/Script/CkTests.Ck_AutoTest_NetSubject"));
+            auto* SubjectClass = SubjectClassPath.TryLoadClass<ACk_AutoTest_NetSubject>();
+            if (SubjectClass == nullptr)
+            { AddError(TEXT("AS-test harness: failed to resolve NetSubject class via FSoftClassPath")); return; }
+            auto* Subject = InServer->SpawnActor<ACk_AutoTest_NetSubject>(
+                SubjectClass, FTransform::Identity, SpawnInfo);
+            if (Subject == nullptr)
+            { AddError(TEXT("AS-test harness: server-side SpawnActor returned null")); }
+        })));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_TickWorlds(FramesAfterSpawn));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_RunAsTestOnAllWorlds(this, FString{kAsClassPath_FoodPiece_AWholeFoodsIdentityReachesTheClient}, kTimeoutSeconds_FoodPiece_AWholeFoodsIdentityReachesTheClient));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_EndPIE());
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_AssertCondition(this,
+        FCk_NetAutoTest_Assertion::CreateLambda([]() -> bool
+        {
+            FAutomationTestBase::bSuppressLogErrors = false;
+            FAutomationTestBase::bSuppressLogWarnings = false;
+            return true;
+        }),
+        TEXT("restore log suppression statics")));
+
+    return true;
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
 // Auto-generated from AS class Ck_AutoTest_Net_FoodPiece_EightCutsInOneFrameAllResolve (Replicated-mode).
 // DO NOT EDIT - regenerated on editor startup and every successful AS recompile.
 
@@ -229,6 +549,70 @@ bool FCkFoodPieceNet_AS_FoodPiece_EightCutsInOneFrameAllResolve::RunTest(const F
 
 // --------------------------------------------------------------------------------------------------------------------
 
+// Auto-generated from AS class Ck_AutoTest_Net_FoodPiece_TheClientWroteNoLedger (Replicated-mode).
+// DO NOT EDIT - regenerated on editor startup and every successful AS recompile.
+
+namespace
+{
+    constexpr auto kAsClassPath_FoodPiece_TheClientWroteNoLedger = TEXT("/Script/Angelscript.Ck_AutoTest_Net_FoodPiece_TheClientWroteNoLedger");
+    constexpr auto kTimeoutSeconds_FoodPiece_TheClientWroteNoLedger = 30.0f;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+    FCkFoodPieceNet_AS_FoodPiece_TheClientWroteNoLedger,
+    "Ck.FoodPiece.Net.AS_FoodPiece_TheClientWroteNoLedger",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ClientContext | EAutomationTestFlags::EngineFilter)
+
+bool FCkFoodPieceNet_AS_FoodPiece_TheClientWroteNoLedger::RunTest(const FString& Parameters)
+{
+    bSuppressLogErrors = true;
+    bSuppressLogWarnings = true;
+
+    constexpr auto NumPIEClients = 2;
+    constexpr auto ExpectedTotalWorlds = 2;
+    constexpr auto ReadyTimeoutSeconds = 30.0f;
+    constexpr auto FramesAfterSpawn = 30;
+
+    const auto MapPath = FString{TEXT("/Engine/Maps/Entry")};
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_StartPIEMultiClient(NumPIEClients, MapPath));
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_WaitForPIEReady(ExpectedTotalWorlds, ReadyTimeoutSeconds));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_RunOnServer(
+        FCk_NetAutoTest_ServerAction::CreateLambda([this](UWorld* InServer) -> void
+        {
+            auto SpawnInfo = FActorSpawnParameters{};
+            SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+            const auto SubjectClassPath = FSoftClassPath(TEXT("/Script/CkTests.Ck_AutoTest_NetSubject"));
+            auto* SubjectClass = SubjectClassPath.TryLoadClass<ACk_AutoTest_NetSubject>();
+            if (SubjectClass == nullptr)
+            { AddError(TEXT("AS-test harness: failed to resolve NetSubject class via FSoftClassPath")); return; }
+            auto* Subject = InServer->SpawnActor<ACk_AutoTest_NetSubject>(
+                SubjectClass, FTransform::Identity, SpawnInfo);
+            if (Subject == nullptr)
+            { AddError(TEXT("AS-test harness: server-side SpawnActor returned null")); }
+        })));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_TickWorlds(FramesAfterSpawn));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_RunAsTestOnAllWorlds(this, FString{kAsClassPath_FoodPiece_TheClientWroteNoLedger}, kTimeoutSeconds_FoodPiece_TheClientWroteNoLedger));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_EndPIE());
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_AssertCondition(this,
+        FCk_NetAutoTest_Assertion::CreateLambda([]() -> bool
+        {
+            FAutomationTestBase::bSuppressLogErrors = false;
+            FAutomationTestBase::bSuppressLogWarnings = false;
+            return true;
+        }),
+        TEXT("restore log suppression statics")));
+
+    return true;
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
 // Auto-generated from AS class Ck_AutoTest_Net_FoodPiece_TheClientWroteNothing (Replicated-mode).
 // DO NOT EDIT - regenerated on editor startup and every successful AS recompile.
 
@@ -276,6 +660,70 @@ bool FCkFoodPieceNet_AS_FoodPiece_TheClientWroteNothing::RunTest(const FString& 
     ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_TickWorlds(FramesAfterSpawn));
 
     ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_RunAsTestOnAllWorlds(this, FString{kAsClassPath_FoodPiece_TheClientWroteNothing}, kTimeoutSeconds_FoodPiece_TheClientWroteNothing));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_EndPIE());
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_AssertCondition(this,
+        FCk_NetAutoTest_Assertion::CreateLambda([]() -> bool
+        {
+            FAutomationTestBase::bSuppressLogErrors = false;
+            FAutomationTestBase::bSuppressLogWarnings = false;
+            return true;
+        }),
+        TEXT("restore log suppression statics")));
+
+    return true;
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+// Auto-generated from AS class Ck_AutoTest_Net_FoodPiece_TheHolderIsReadOnAClient (Replicated-mode).
+// DO NOT EDIT - regenerated on editor startup and every successful AS recompile.
+
+namespace
+{
+    constexpr auto kAsClassPath_FoodPiece_TheHolderIsReadOnAClient = TEXT("/Script/Angelscript.Ck_AutoTest_Net_FoodPiece_TheHolderIsReadOnAClient");
+    constexpr auto kTimeoutSeconds_FoodPiece_TheHolderIsReadOnAClient = 30.0f;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+    FCkFoodPieceNet_AS_FoodPiece_TheHolderIsReadOnAClient,
+    "Ck.FoodPiece.Net.AS_FoodPiece_TheHolderIsReadOnAClient",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ClientContext | EAutomationTestFlags::EngineFilter)
+
+bool FCkFoodPieceNet_AS_FoodPiece_TheHolderIsReadOnAClient::RunTest(const FString& Parameters)
+{
+    bSuppressLogErrors = true;
+    bSuppressLogWarnings = true;
+
+    constexpr auto NumPIEClients = 2;
+    constexpr auto ExpectedTotalWorlds = 2;
+    constexpr auto ReadyTimeoutSeconds = 30.0f;
+    constexpr auto FramesAfterSpawn = 30;
+
+    const auto MapPath = FString{TEXT("/Engine/Maps/Entry")};
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_StartPIEMultiClient(NumPIEClients, MapPath));
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_WaitForPIEReady(ExpectedTotalWorlds, ReadyTimeoutSeconds));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_RunOnServer(
+        FCk_NetAutoTest_ServerAction::CreateLambda([this](UWorld* InServer) -> void
+        {
+            auto SpawnInfo = FActorSpawnParameters{};
+            SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+            const auto SubjectClassPath = FSoftClassPath(TEXT("/Script/CkTests.Ck_AutoTest_NetSubject"));
+            auto* SubjectClass = SubjectClassPath.TryLoadClass<ACk_AutoTest_NetSubject>();
+            if (SubjectClass == nullptr)
+            { AddError(TEXT("AS-test harness: failed to resolve NetSubject class via FSoftClassPath")); return; }
+            auto* Subject = InServer->SpawnActor<ACk_AutoTest_NetSubject>(
+                SubjectClass, FTransform::Identity, SpawnInfo);
+            if (Subject == nullptr)
+            { AddError(TEXT("AS-test harness: server-side SpawnActor returned null")); }
+        })));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_TickWorlds(FramesAfterSpawn));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_RunAsTestOnAllWorlds(this, FString{kAsClassPath_FoodPiece_TheHolderIsReadOnAClient}, kTimeoutSeconds_FoodPiece_TheHolderIsReadOnAClient));
 
     ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_EndPIE());
 

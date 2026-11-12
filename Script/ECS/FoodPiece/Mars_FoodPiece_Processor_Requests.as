@@ -12,6 +12,7 @@ struct FMars_FoodPiece_Drain
 // in OnSliceResolved, exactly once: RuntimeMesh answers a slice it cannot queue (its world-wide queue is full) on the
 // submitting call stack, so that rejection resolves inside this drain and is not retried.
 // Only the authority cuts: a copy without authority drops every SetCookState and answers every Cut RefusedNoAuthority.
+// A drain that set a cook state writes it into the replicated ledger (utils_foodpiece::Write_LedgerCookState).
 // A succeeded slice of a source that replicates commits in two stages (Commit_Replicated, then utils_foodpiece::Add_Born);
 // any other commits on the slice's own entities at once (Commit).
 class UMars_Processor_FoodPiece_HandleRequests : UCk_Processor_Script_Base_UE
@@ -50,6 +51,10 @@ class UMars_Processor_FoodPiece_HandleRequests : UCk_Processor_Script_Base_UE
 
         for (const auto& Request : SetCookStateRequests)
         { InState.CookState = Request.CookState; }
+
+        // Once per drain that set a cook state: the replicated ledger carries the last one and its serial advances.
+        if (SetCookStateRequests.Num() > 0)
+        { utils_foodpiece::Write_LedgerCookState(Drain.Piece, Drain.Piece.Get_CookSerial() + 1); }
 
         for (const auto& Request : CutRequests)
         { Apply_Cut(Drain, InState, Request); }

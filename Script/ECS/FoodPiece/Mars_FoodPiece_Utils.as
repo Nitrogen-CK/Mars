@@ -18,6 +18,10 @@ namespace utils_foodpiece
     // Data.Lineage) starts a lineage; a piece gets Data.Id, or a new Id when that is invalid. A piece whose geometry is already Ready (every cut half)
     // is Ready at once; one still importing is Pending until the Setup processor sees the import resolve. A rejected spec
     // or a missing Transform or RuntimeMesh ensures and returns an invalid handle.
+    // A piece whose entity replicates (DoGet_HasLedger) also gets the replicated ledger (unless it already arrived), its local
+    // mirror state and the mirror tag. The authority writes its identity, cook state and, once Ready, its check numbers into
+    // the ledger. A copy without authority mints nothing: its Id and a root's Lineage are the spec's when valid, else the
+    // arrived ledger's, else invalid until the mirror adopts them; it takes an arrived ledger's cook state.
     FCk_Handle_FoodPiece Add(FCk_Handle& InHandle, FMars_FoodPiece_Spec InSpec)
     {
         const auto Validation = InSpec.Validate();
@@ -34,17 +38,41 @@ namespace utils_foodpiece
         Params.Body = InSpec.Body;
         Params.Recipe = InSpec.Data.Recipe;
 
+        const auto HasLedger = DoGet_HasLedger(InHandle);
+        const auto IsMirror = HasLedger && utils_net::Get_HasAuthority(InHandle) == false;
+        const auto Arrived = TryGet_Ledger(InHandle);
+
         auto State = FMars_Fragment_FoodPiece();
-        State.Id = InSpec.Data.Id.IsValid() ? InSpec.Data.Id : FGuid::NewGuid();
+        State.Id = InSpec.Data.Id;
         State.ParentId = InSpec.Data.ParentId;
         State.Lineage = InSpec.Data.Lineage;
-        if (State.Lineage.IsValid() == false)
-        { State.Lineage = FGuid::NewGuid(); }
-
         State.MassKg = InSpec.Data.MassKg;
         State.CookState = InSpec.Data.CookState;
         State.Definition = InSpec.Data.Definition;
         State.Kind = InSpec.Data.Kind;
+
+        auto Local = FMars_Fragment_FoodPiece_Local();
+        if (IsMirror == false)
+        {
+            if (State.Id.IsValid() == false)
+            { State.Id = FGuid::NewGuid(); }
+
+            if (State.Lineage.IsValid() == false)
+            { State.Lineage = FGuid::NewGuid(); }
+        }
+        else if (Arrived.IsSet())
+        {
+            // The ledger replicated before this copy composed: it stands.
+            const auto Ledger = Arrived.GetValue();
+            if (State.Id.IsValid() == false)
+            { State.Id = Ledger.Id; }
+
+            if (State.Lineage.IsValid() == false)
+            { State.Lineage = Ledger.Lineage; }
+
+            State.CookState = Ledger.CookState;
+            Local.LastCookSerial = Ledger.CookSerial;
+        }
 
         // A half is published Ready by its cut, so whoever receives the cut never sees it Pending.
         const auto Geometry = InHandle.As_RuntimeMesh();
@@ -58,17 +86,202 @@ namespace utils_foodpiece
         InHandle.Add_Fragment(Params);
         InHandle.Add_Fragment(State);
         InHandle.Add_Fragment(FMars_Tag_FoodPiece_NeedsSetup());
-        return InHandle.As_FoodPiece();
+
+        if (HasLedger)
+        {
+            if (InHandle.Has_Fragment(FMars_Fragment_FoodPiece_Net) == false)
+            { InHandle.Add_Fragment(FMars_Fragment_FoodPiece_Net(), ECk_Replication::Replicates); }
+
+            InHandle.Add_Fragment(Local);
+            InHandle.Add_Fragment(FMars_Tag_FoodPiece_NeedsMirror());
+        }
+
+        auto Piece = InHandle.As_FoodPiece();
+        Write_LedgerIdentity(Piece);
+
+        if (Get_IsCooked(State.CookState))
+        { Write_LedgerCookState(Piece, 1); }
+
+        if (State.Status == EMars_FoodPiece_Status::Ready)
+        { Write_LedgerCheck(Piece); }
+
+        return Piece;
+    }
+
+    //----------------------------------------------------------------------------------------------------------------------
+    // The replicated ledger: only the authority writes it, each write followed by its dirty mark; a copy without authority
+    // or a piece without a ledger writes nothing
+    //----------------------------------------------------------------------------------------------------------------------
+
+    // How far a copy's geometry volume may read from the authority's, as a share of the authority's, and still match.
+    const float k_CheckVolumeTolerance = 0.000001;
+
+    // InHandle's replicated ledger as it stands on this machine, on any entity (a client's cut piece is not a FoodPiece
+    // yet); unset without one.
+    TOptional<FMars_Fragment_FoodPiece_Net> TryGet_Ledger(const FCk_Handle& InHandle)
+    {
+        if (ck::Is_NOT_Valid(InHandle) || InHandle.Has_Fragment(FMars_Fragment_FoodPiece_Net) == false)
+        { return TOptional<FMars_Fragment_FoodPiece_Net>(); }
+
+        return TOptional<FMars_Fragment_FoodPiece_Net>(InHandle.Get_Fragment(FMars_Fragment_FoodPiece_Net));
+    }
+
+    // Any channel of InCookState above 0.
+    bool Get_IsCooked(const FMars_FoodPiece_CookState& InCookState)
+    {
+        for (const auto Sear : InCookState.Sear)
+        {
+            if (Sear > 0.0f)
+            { return true; }
+        }
+
+        for (const auto Batter : InCookState.Batter)
+        {
+            if (Batter > 0.0f)
+            { return true; }
+        }
+
+        return InCookState.OilCoat > 0.0f || InCookState.Crumb > 0.0f || InCookState.Battered > 0.0f;
+    }
+
+    // The piece's identity, as Add gave it.
+    void Write_LedgerIdentity(FCk_Handle_FoodPiece& InPiece)
+    {
+        if (DoGet_WritesLedger(InPiece) == false)
+        { return; }
+
+        const auto& State = InPiece.Get_Fragment(FMars_Fragment_FoodPiece);
+        auto& Net = InPiece.Get_Fragment(FMars_Fragment_FoodPiece_Net);
+        Net.Id = State.Id;
+        Net.ParentId = State.ParentId;
+        Net.Lineage = State.Lineage;
+        DoMark_LedgerDirty(InPiece);
+    }
+
+    // The piece's cook state as it stands now, as the InSerial-th it was given.
+    void Write_LedgerCookState(FCk_Handle_FoodPiece& InPiece, int32 InSerial)
+    {
+        if (DoGet_WritesLedger(InPiece) == false)
+        { return; }
+
+        const auto CookState = InPiece.Get_CookState();
+        auto& Net = InPiece.Get_Fragment(FMars_Fragment_FoodPiece_Net);
+        Net.CookState = CookState;
+        Net.CookSerial = InSerial;
+        DoMark_LedgerDirty(InPiece);
+    }
+
+    // The Ready geometry's numbers a copy checks its own import against.
+    void Write_LedgerCheck(FCk_Handle_FoodPiece& InPiece)
+    {
+        if (DoGet_WritesLedger(InPiece) == false)
+        { return; }
+
+        const auto Metrics = utils_runtime_mesh::Get_Metrics(InPiece.Get_Geometry());
+        auto& Net = InPiece.Get_Fragment(FMars_Fragment_FoodPiece_Net);
+        Net.Check = EMars_FoodPiece_Check::Recorded;
+        Net.CheckVolumeCm3 = Metrics.Get_VolumeCm3();
+        Net.CheckTriangles = Metrics.Get_TriangleCount();
+        Net.CheckBoundsMinCm = Metrics.Get_BoundsMinCm();
+        Net.CheckBoundsMaxCm = Metrics.Get_BoundsMaxCm();
+        DoMark_LedgerDirty(InPiece);
+    }
+
+    // InOwner's ledger holds the piece.
+    void Write_LedgerHeld(FCk_Handle_FoodPiece& InPiece, FCk_Handle InOwner)
+    {
+        if (DoGet_WritesLedger(InPiece) == false)
+        { return; }
+
+        auto& Net = InPiece.Get_Fragment(FMars_Fragment_FoodPiece_Net);
+        if (Net.Holding == EMars_FoodPiece_Holding::Held && Net.Holder == InOwner)
+        { return; }
+
+        Net.Holding = EMars_FoodPiece_Holding::Held;
+        Net.Holder = InOwner;
+        DoMark_LedgerDirty(InPiece);
+    }
+
+    // No ledger holds the piece. The holder handle stays as it is: Holding is what says it is meaningless.
+    void Write_LedgerFree(FCk_Handle_FoodPiece& InPiece)
+    {
+        if (DoGet_WritesLedger(InPiece) == false)
+        { return; }
+
+        auto& Net = InPiece.Get_Fragment(FMars_Fragment_FoodPiece_Net);
+        if (Net.Holding == EMars_FoodPiece_Holding::Free)
+        { return; }
+
+        Net.Holding = EMars_FoodPiece_Holding::Free;
+        DoMark_LedgerDirty(InPiece);
+    }
+
+    // A copy without authority whose piece is Ready and still unchecked compares its geometry with the numbers the
+    // authority recorded: Matches when the triangle counts are equal and the volumes are within k_CheckVolumeTolerance of the
+    // authority's, else Differs, logged once. Differs is a counted outcome: the piece keeps its geometry. Nothing happens
+    // on the authority, before the numbers are recorded, before the piece is Ready, or once it was checked.
+    void Update_CheckResult(FCk_Handle_FoodPiece& InPiece)
+    {
+        if (utils_net::Get_HasAuthority(InPiece) || InPiece.Has_Fragment(FMars_Fragment_FoodPiece_Local) == false)
+        { return; }
+
+        if (InPiece.Get_Fragment(FMars_Fragment_FoodPiece_Local).CheckResult != EMars_FoodPiece_CheckResult::Unchecked)
+        { return; }
+
+        const auto Ledger = TryGet_Ledger(InPiece);
+        if (Ledger.IsSet() == false || Ledger.GetValue().Check != EMars_FoodPiece_Check::Recorded)
+        { return; }
+
+        if (InPiece.Get_Status() != EMars_FoodPiece_Status::Ready)
+        { return; }
+
+        const auto Metrics = utils_runtime_mesh::Get_Metrics(InPiece.Get_Geometry());
+        const auto Recorded = Ledger.GetValue();
+        const auto VolumeDelta = Math::Abs(Metrics.Get_VolumeCm3() - Recorded.CheckVolumeCm3);
+        const auto IsMatch = Metrics.Get_TriangleCount() == Recorded.CheckTriangles
+            && VolumeDelta <= k_CheckVolumeTolerance * Math::Abs(Recorded.CheckVolumeCm3);
+
+        auto& Local = InPiece.Get_Fragment(FMars_Fragment_FoodPiece_Local);
+        Local.CheckResult = IsMatch ? EMars_FoodPiece_CheckResult::Matches : EMars_FoodPiece_CheckResult::Differs;
+        if (IsMatch == false)
+        { Warning(f"[FoodPiece] [{InPiece.ToString()}]'s geometry differs from the authority's: volume [{Metrics.Get_VolumeCm3()}] cm3 vs [{Recorded.CheckVolumeCm3}], triangles [{Metrics.Get_TriangleCount()}] vs [{Recorded.CheckTriangles}]"); }
+    }
+
+    // A piece composing on InHandle carries the replicated ledger: its entity replicates. The authority has the replication
+    // driver from before construction; a copy without authority receives its driver after it constructs, so there the
+    // entity's own replication says it.
+    bool DoGet_HasLedger(const FCk_Handle& InHandle)
+    {
+        if (utils_entity_replication_driver::Has(InHandle))
+        { return true; }
+
+        if (utils_net::Get_HasAuthority(InHandle) || utils_net::Has(InHandle) == false)
+        { return false; }
+
+        return utils_net::Get_EntityReplication(InHandle) == ECk_Replication::Replicates;
+    }
+
+    bool DoGet_WritesLedger(const FCk_Handle_FoodPiece& InPiece)
+    {
+        return InPiece.Has_Fragment(FMars_Fragment_FoodPiece_Net) && utils_net::Get_HasAuthority(InPiece);
+    }
+
+    void DoMark_LedgerDirty(FCk_Handle_FoodPiece& InPiece)
+    {
+        FCk_Handle Entity = InPiece;
+        Entity.Request_MarkReplicationDirty(FMars_Fragment_FoodPiece_Net);
     }
 
     // A Dynamic convex body of the piece's own mesh and mass with the piece's own surface (its Body tuners), on the piece's
     // entity: the one builder for a piece dropped onto a platter and a whole food item. The piece must be Ready (its
-    // geometry gives the hull) and bodiless; the body reads the piece's transform as it is when the body is set up.
+    // geometry gives the hull) and bodiless; the body reads the piece's transform as it is when the body is set up. Bodies
+    // are the authority's: a copy without authority would run a second simulation against the replicated pose.
     FCk_Handle_JoltBody Add_Body(FCk_Handle_FoodPiece& InPiece)
     {
         FCk_Handle Entity = InPiece;
-        const auto CanAdd = InPiece.Get_Status() == EMars_FoodPiece_Status::Ready && Entity.Is_JoltBody() == false;
-        if (ck::EnsureIfNot(CanAdd, f"[FoodPiece] [{InPiece.ToString()}] gets a body only once Ready and bodiless (status [{InPiece.Get_Status() :n}], body [{Entity.Is_JoltBody()}])"))
+        const auto HasAuthority = utils_net::Get_HasAuthority(Entity);
+        const auto CanAdd = InPiece.Get_Status() == EMars_FoodPiece_Status::Ready && Entity.Is_JoltBody() == false && HasAuthority;
+        if (ck::EnsureIfNot(CanAdd, f"[FoodPiece] [{InPiece.ToString()}] gets a body only once Ready, bodiless and with authority (status [{InPiece.Get_Status() :n}], body [{Entity.Is_JoltBody()}], authority [{HasAuthority}])"))
         { return FCk_Handle_JoltBody(); }
 
         const auto Tuners = InPiece.Get_BodyTuners();
@@ -454,7 +667,8 @@ namespace utils_foodpiece
     }
 
     // InOwner's ledger admitted InPiece. Called only by a ledger's processor, after its own refusals read the holder: a
-    // live holder other than InOwner here would put the piece in two ledgers (a defect); the newest admission wins.
+    // live holder other than InOwner here would put the piece in two ledgers (a defect); the newest admission wins. The
+    // authority publishes the holder in the replicated ledger (TryGet_ReplicatedHolder).
     void Stamp_Holder(FCk_Handle_FoodPiece& InPiece, FCk_Handle InOwner)
     {
         const auto Holder = InPiece.TryGet_Holder();
@@ -462,14 +676,16 @@ namespace utils_foodpiece
             f"[FoodPiece] [{InPiece.ToString()}] is admitted by [{InOwner.ToString()}] while [{Holder.ToString()}] still holds it"))
         {
             InPiece.Get_Fragment(FMars_Fragment_FoodPiece_Holder).Owner = InOwner;
+            Write_LedgerHeld(InPiece, InOwner);
             return;
         }
 
         InPiece.AddOrGet_Fragment(FMars_Fragment_FoodPiece_Holder).Owner = InOwner;
+        Write_LedgerHeld(InPiece, InOwner);
     }
 
     // InOwner's ledger let InPiece go. A piece some other ledger holds by now keeps that holder. Called only by a ledger's
-    // processor.
+    // processor. The authority publishes the piece free.
     void Clear_Holder(FCk_Handle_FoodPiece& InPiece, FCk_Handle InOwner)
     {
         if (ck::Is_NOT_Valid(InPiece) || InPiece.Has_Fragment(FMars_Fragment_FoodPiece_Holder) == false)
@@ -479,6 +695,7 @@ namespace utils_foodpiece
         { return; }
 
         InPiece.Request_TryRemove(FMars_Fragment_FoodPiece_Holder);
+        Write_LedgerFree(InPiece);
     }
 }
 
@@ -601,6 +818,38 @@ mixin FCk_Handle TryGet_Holder(const FCk_Handle_FoodPiece& Self)
     return Owner;
 }
 
+// The ledger holding the piece as the authority published it: the replicated ledger's holder while it says Held, else
+// invalid; invalid for a piece without a replicated ledger. A client reads the authority's holder only through this.
+mixin FCk_Handle TryGet_ReplicatedHolder(const FCk_Handle_FoodPiece& Self)
+{
+    const auto Ledger = utils_foodpiece::TryGet_Ledger(Self);
+    if (Ledger.IsSet() == false || Ledger.GetValue().Holding != EMars_FoodPiece_Holding::Held)
+    { return FCk_Handle(); }
+
+    return Ledger.GetValue().Holder;
+}
+
+// How many drains set the piece's cook state, as the replicated ledger says (0 while never cooked, and for a piece without
+// a replicated ledger).
+mixin int32 Get_CookSerial(const FCk_Handle_FoodPiece& Self)
+{
+    const auto Ledger = utils_foodpiece::TryGet_Ledger(Self);
+    if (Ledger.IsSet() == false)
+    { return 0; }
+
+    return Ledger.GetValue().CookSerial;
+}
+
+// How this copy's geometry compared with the authority's numbers (utils_foodpiece::Update_CheckResult); Unchecked on the
+// authority and for a piece without a replicated ledger.
+mixin EMars_FoodPiece_CheckResult Get_CheckResult(const FCk_Handle_FoodPiece& Self)
+{
+    if (Self.Has_Fragment(FMars_Fragment_FoodPiece_Local) == false)
+    { return EMars_FoodPiece_CheckResult::Unchecked; }
+
+    return Self.Get_Fragment(FMars_Fragment_FoodPiece_Local).CheckResult;
+}
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Requests
 //--------------------------------------------------------------------------------------------------------------------------
@@ -661,4 +910,18 @@ mixin void UnbindFrom_OnCutResolved(FCk_Handle_FoodPiece& Self, FMars_Delegate_F
     { return; }
 
     Self.Get_Fragment(FMars_Fragment_FoodPiece_Signals).OnCutResolved.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void BindTo_OnCookStateChanged(FCk_Handle_FoodPiece& Self, FMars_Delegate_FoodPiece_OnCookStateChanged InDelegate)
+{
+    auto& Fragment = Self.AddOrGet_Fragment(FMars_Fragment_FoodPiece_Signals);
+    Fragment.OnCookStateChanged.AddUFunction(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void UnbindFrom_OnCookStateChanged(FCk_Handle_FoodPiece& Self, FMars_Delegate_FoodPiece_OnCookStateChanged InDelegate)
+{
+    if (Self.Has_Fragment(FMars_Fragment_FoodPiece_Signals) == false)
+    { return; }
+
+    Self.Get_Fragment(FMars_Fragment_FoodPiece_Signals).OnCookStateChanged.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
 }
