@@ -104,6 +104,19 @@ namespace utils_mars_net
         return ck::IsValid(DoFind_SpawnOwner(InAnyHandle));
     }
 
+    // Whether InEntity replicates as seen from this machine: it has a replication driver, or this machine has no authority
+    // over it and its own net params say it replicates (a replicated copy has no driver while it constructs).
+    bool Get_ReplicatesHere(const FCk_Handle& InEntity)
+    {
+        if (utils_entity_replication_driver::Has(InEntity))
+        { return true; }
+
+        if (utils_net::Get_HasAuthority(InEntity) || utils_net::Has(InEntity) == false)
+        { return false; }
+
+        return utils_net::Get_EntityReplication(InEntity) == ECk_Replication::Replicates;
+    }
+
     // Asks the world, not the handle's role, so the answer holds for any handle, replicated or not.
     bool Get_IsClientWorld(const FCk_Handle& InAnyHandle)
     {

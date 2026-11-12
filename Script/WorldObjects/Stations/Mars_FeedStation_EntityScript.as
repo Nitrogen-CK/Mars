@@ -2,6 +2,10 @@ namespace constants_station
 {
     // A carried piece's nominal half extent: the feed's glove holds a piece's middle this far under its palm.
     const float64 k_CarriedHalfExtent = 6.0;
+
+    // The authority waits this many ticks for its docks to compose before it composes the feed; past it, it ensures and
+    // composes the feed with whatever input dock exists.
+    const int32 k_DockWaitTicks = 60;
 }
 
 // The station's record of one piece its kernel admitted. The piece wears its own display (or, battered, its food's battered
@@ -89,8 +93,14 @@ struct FMars_Station_DockPolicies
 }
 
 // The base of a counter station whose entity carries a CookingFeed beside its own kernel (the searing, fry, cutting,
-// tumbler and batter stations). After the kernel it composes the feed (its release node, its glove's hand node and the
-// hand geometry the feed moves that node by, Add_FeedHand) and the two docks (Get_DockLayout) with their markers; every
+// tumbler and batter stations). After the kernel it requests the two docks (Get_DockLayout), each a child script of the
+// station that composes with its words and marker (utils_platter_dock::Request_Docks), and composes the feed (its release
+// node, its glove's hand node and the hand geometry the feed moves that node by, Add_FeedHand). The authority composes
+// the feed with the input dock once its docks have composed; a copy without authority composes its feed at once with
+// none. A station that replicates ends its construction in its spawn frame, with its docks: a replicated script is
+// announced to the other machines when its construction ends, and a dock announced before its station cannot be built
+// there. A station that does not replicate continues its construction until the feed is composed, so whoever spawned
+// it finds its docks and its feed when it is constructed. Every
 // frame it poses the left glove (the feed's pose override) and writes every admitted piece's look (Add_PieceRecord on the
 // kernel's OnPieceAdded; the station says how the look follows its kernel: Get_HoldsPiece, Get_IsPieceFrozen,
 // Make_PieceLook). Where the station's food goes is its kernels': the feed draws from the input dock it is composed with and
@@ -123,8 +133,27 @@ class UMars_FeedStation_EntityScript : UMars_CounterStation_EntityScript
     private FMars_StationFeed_Presentation _FeedPresentation;
     private FCk_Handle_PlatterDock _InputDock;
     private FCk_Handle_PlatterDock _OutputDock;
+    // The authority's wait for its docks: set while it awaits them, counting the ticks waited.
+    private TOptional<int32> _DockWaitTicks;
+    private FCk_Handle_Timer _DockWaitTimer;
+    // The construction continues until the wait ends (a station that does not replicate).
+    private bool _FinishesAfterDocks = false;
+    private FCk_Handle _Self;
     // One per piece the kernel announced and still holds, in admission order.
     private TArray<FMars_Station_PieceDisplay> _PieceRecords;
+
+    // The counter base's construction. An authority's station that does not replicate continues it while its docks have
+    // not composed (OnDockWait); one that replicates ends it here, so its docks are never announced before it.
+    UFUNCTION(BlueprintOverride)
+    ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
+    {
+        const auto Flow = Super::DoConstruct(InHandle);
+        _FinishesAfterDocks = _DockWaitTicks.IsSet() && utils_mars_net::Get_ReplicatesHere(InHandle) == false;
+        if (_FinishesAfterDocks)
+        { return ECk_EntityScript_ConstructionFlow::Continue; }
+
+        return Flow;
+    }
 
     UFUNCTION(BlueprintOverride)
     void DoEndPlay(FCk_Handle InHandle)
@@ -160,15 +189,34 @@ class UMars_FeedStation_EntityScript : UMars_CounterStation_EntityScript
         OutNodes.Add(FMars_Station_GripNode(GameplayTags::Station_Node_Feed, _FeedHandNode.As_Transform()));
     }
 
+    // The docks are requested on every machine; the feed draws from the input dock once it has composed.
     protected void Compose_AfterKernel(FCk_Handle& InHandle) override
     {
-        Compose_Feed(InHandle);
+        const auto Layout = Get_DockLayout();
+        auto Setups = TArray<FMars_PlatterDock_Setup>();
+        Setups.Add(Make_DockSetup(EMars_PlatterDock_Role::Input, Layout.Input));
+        Setups.Add(Make_DockSetup(EMars_PlatterDock_Role::Output, Layout.Output));
+        utils_platter_dock::Request_Docks(InHandle, Setups);
+
+        // The feed's source is the authority's: a copy without authority composes its feed with no input dock.
+        if (utils_net::Get_HasAuthority(InHandle) == false)
+        {
+            Compose_Feed(InHandle, FCk_Handle_PlatterDock());
+            return;
+        }
+
+        _Self = InHandle;
+        _DockWaitTicks = TOptional<int32>(0);
+        _DockWaitTimer = utils_timer::Create_Tick(InHandle, FCk_Delegate_Timer(this, n"OnDockWait"));
     }
 
     // The left glove's pose override follows the feed (the feed moves the glove's node and the piece rides it); then every
     // piece's look.
     protected void Advance_Presentation(float32 InDeltaSeconds) override
     {
+        if (ck::Is_NOT_Valid(_InputDock) || ck::Is_NOT_Valid(_OutputDock))
+        { Resolve_Docks(); }
+
         if (ck::IsValid(_FeedHandle))
         { _FeedPresentation.Advance(_FeedHandle, _Root.H().As_Station().Get_Operator()); }
 
@@ -299,23 +347,13 @@ class UMars_FeedStation_EntityScript : UMars_CounterStation_EntityScript
     // Composition
     //----------------------------------------------------------------------------------------------------------------------
 
-    // The docks first: the feed draws from the input dock it is composed with.
-    private void Compose_Feed(FCk_Handle& InHandle)
+    // The feed draws from InInputDock (invalid: none).
+    private void Compose_Feed(FCk_Handle& InHandle, FCk_Handle_PlatterDock InInputDock)
     {
-        const auto Layout = Get_DockLayout();
-        _InputDock = Add_Dock(EMars_PlatterDock_Role::Input, Layout.Input);
-        _OutputDock = Add_Dock(EMars_PlatterDock_Role::Output, Layout.Output);
-
-        if (ck::IsValid(_InputDock))
-        { Watch_Failures(_InputDock.Get_Interactable()); }
-
-        if (ck::IsValid(_OutputDock))
-        { Watch_Failures(_OutputDock.Get_Interactable()); }
-
         // A rejected feed spec already ensured in utils_cooking_feed::Add; the kernel still works without a platter.
         auto FeedSpec = Feed;
         FeedSpec.Nodes = FMars_CookingFeed_Nodes(_ReleaseNode, _FeedHandNode.As_Transform());
-        FeedSpec.Nodes.InputDock = _InputDock;
+        FeedSpec.Nodes.InputDock = InInputDock;
         FeedSpec.Motion.HeldOffset = _FeedHeldLocal;
         FeedSpec.Hand = TOptional<FMars_CookingFeed_HandGeometry>(_FeedHandGeometry);
         _FeedHandle = utils_cooking_feed::Add(InHandle, FeedSpec);
@@ -326,9 +364,9 @@ class UMars_FeedStation_EntityScript : UMars_CounterStation_EntityScript
         }
     }
 
-    // A dock on the counter top, a child of the root (it dies with the station), lifted so a docked platter's underside rests
-    // on the top, with its marker. A rejected spec already ensured in utils_platter_dock::Create.
-    private FCk_Handle_PlatterDock Add_Dock(EMars_PlatterDock_Role InRole, const FMars_FeedStation_DockSpot& InSpot)
+    // A dock on the counter top, a child of the station (it dies with it), lifted so a docked platter's underside rests on
+    // the top, with its words and its marker.
+    private FMars_PlatterDock_Setup Make_DockSetup(EMars_PlatterDock_Role InRole, const FMars_FeedStation_DockSpot& InSpot) const
     {
         auto Policy = Docks.Input;
         if (InRole == EMars_PlatterDock_Role::Output)
@@ -338,14 +376,30 @@ class UMars_FeedStation_EntityScript : UMars_CounterStation_EntityScript
         auto Spec = FMars_PlatterDock_Spec(InRole, Policy, FTransform(FRotator::ZeroRotator, InSpot.SurfaceLocal + DockLift));
         Spec.Prompt = utils_platter_dock::Make_PromptSpec();
 
-        auto Dock = utils_platter_dock::Create(_Root, Spec);
-        if (ck::IsValid(Dock))
+        auto Setup = FMars_PlatterDock_Setup();
+        Setup.Spec = Spec;
+        Setup.Words = FMars_PlatterDock_PromptWords(InSpot.Name, InSpot.KindRejectedText);
+        Setup.MarkerName = InSpot.MarkerName;
+        return Setup;
+    }
+
+    // Each dock once it has composed, its failed interactions said by the label from then on: on the authority when its
+    // construction ends, and on every machine from the dressing while a dock is missing.
+    private void Resolve_Docks()
+    {
+        if (ck::Is_NOT_Valid(_InputDock))
         {
-            utils_platter_dock::Add_Prompt(Dock, FMars_PlatterDock_PromptWords(InSpot.Name, InSpot.KindRejectedText));
-            Dock.Add_Marker(this, InSpot.MarkerName);
+            _InputDock = utils_platter_dock::Find_OnStation(_Root, EMars_PlatterDock_Role::Input);
+            if (ck::IsValid(_InputDock))
+            { Watch_Failures(_InputDock.Get_Interactable()); }
         }
 
-        return Dock;
+        if (ck::Is_NOT_Valid(_OutputDock))
+        {
+            _OutputDock = utils_platter_dock::Find_OnStation(_Root, EMars_PlatterDock_Role::Output);
+            if (ck::IsValid(_OutputDock))
+            { Watch_Failures(_OutputDock.Get_Interactable()); }
+        }
     }
 
     //----------------------------------------------------------------------------------------------------------------------
@@ -402,6 +456,31 @@ class UMars_FeedStation_EntityScript : UMars_CounterStation_EntityScript
         }
 
         Flash_Refusal("settling");
+    }
+
+    // Once the authority's docks have composed the feed is composed with the input dock, and a construction that waited for
+    // it ends. A wait past k_DockWaitTicks ensures once and composes the feed with whatever input dock exists.
+    UFUNCTION()
+    private void OnDockWait(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
+    {
+        const auto Ticks = _DockWaitTicks.GetValue() + 1;
+        _DockWaitTicks = TOptional<int32>(Ticks);
+        const auto Composed = utils_platter_dock::Get_AreDocksComposed(_Self);
+        if (Composed == false && Ticks <= constants_station::k_DockWaitTicks)
+        { return; }
+
+        ck::EnsureIfNot(Composed,
+            f"[FeedStation] [{_Self.ToString()}] waited {Ticks} ticks and its docks have not composed: the feed is composed with whatever input dock exists");
+
+        utils_timer::UnbindFrom_OnUpdate(_DockWaitTimer, FCk_Delegate_Timer(this, n"OnDockWait"));
+        utils_entity_lifetime::Request_DestroyEntity(_DockWaitTimer.H());
+        _DockWaitTimer = FCk_Handle_Timer();
+        _DockWaitTicks.Reset();
+
+        Resolve_Docks();
+        Compose_Feed(_Self, _InputDock);
+        if (_FinishesAfterDocks)
+        { DoFinishConstruction(); }
     }
 
     UFUNCTION()

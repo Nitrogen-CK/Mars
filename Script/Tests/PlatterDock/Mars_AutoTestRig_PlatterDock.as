@@ -53,7 +53,8 @@ class UMars_AutoTestRig_PlatterDock : UMars_AutoTestRig_Carrier
     protected FCk_Handle_PlatterDock Build_Dock(FCk_Handle_Transform InRoot, FMars_AutoTest_PlatterDock_Setup InSetup)
     {
         auto Root = InRoot;
-        auto Dock = utils_platter_dock::Create(Root, InSetup.Spec);
+        FCk_Handle DockEntity = utils_scene_node::Create(Root, InSetup.Spec.MountLocal);
+        auto Dock = utils_platter_dock::Add(DockEntity, InSetup.Spec);
         utils_platter_dock::Add_Prompt(Dock, InSetup.Words);
         Dock.BindTo_OnDocked(FMars_Delegate_PlatterDock_OnDocked(this, n"OnDockDocked"));
         Dock.BindTo_OnArrived(FMars_Delegate_PlatterDock_OnArrived(this, n"OnDockArrived"));

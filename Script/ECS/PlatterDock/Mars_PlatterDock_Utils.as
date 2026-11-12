@@ -10,18 +10,22 @@ class UMars_PlatterDock_AcceptPolicy : UObject
 
 namespace utils_platter_dock
 {
-    // A scene-node child of the station root at MountLocal carrying the dock: a capacity-1 Inventory.Mars.Dock.<Role>
-    // inventory (accept policy CDO) whose platter rides the node, published as AttachPoint.Mars.Dock (the dock is the
-    // carrier a docked platter mounts on; its root sits on the node), and a probe interactable with one Use target running
-    // UMars_SmState_PlatterDock_Interact. The scene-node Create makes the dock a lifetime child of the station root, so it
-    // dies with the station.
-    FCk_Handle_PlatterDock Create(FCk_Handle_Transform& InStationRoot, FMars_PlatterDock_Spec InSpec)
+    // The dock composed on InHandle, whose Transform is already placed at the mount: a capacity-1
+    // Inventory.Mars.Dock.<Role> inventory (accept policy CDO, InSpec.Replication) whose platter rides the entity, published
+    // as AttachPoint.Mars.Dock (the dock is the carrier a docked platter mounts on; its root sits on the entity), and a
+    // probe interactable with one Use target running UMars_SmState_PlatterDock_Interact. The caller makes InHandle a
+    // lifetime child of the station, so it dies with the station.
+    FCk_Handle_PlatterDock Add(FCk_Handle& InHandle, FMars_PlatterDock_Spec InSpec)
     {
         const auto Validation = InSpec.Validate();
-        if (ck::EnsureIfNot(Validation.IsValid(), f"[PlatterDock] [{InStationRoot.ToString()}] rejected the spec: {Validation.Get_Error()}"))
+        if (ck::EnsureIfNot(Validation.IsValid(), f"[PlatterDock] [{InHandle.ToString()}] rejected the spec: {Validation.Get_Error()}"))
         { return FCk_Handle_PlatterDock(); }
 
-        auto Node = utils_scene_node::Create(InStationRoot, InSpec.MountLocal).As_Transform();
+        if (ck::EnsureIfNot(InHandle.Is_Transform() && InHandle.Is_PlatterDock() == false,
+            f"[PlatterDock] [{InHandle.ToString()}] needs a Transform placed at its mount, and no PlatterDock yet"))
+        { return FCk_Handle_PlatterDock(); }
+
+        auto Node = InHandle.As_Transform();
 
         TSubclassOf<UMars_PlatterDock_AcceptPolicy> PolicyClass = UMars_PlatterDock_AcceptPolicy;
         auto Policy = PolicyClass.GetDefaultObject();
@@ -36,14 +40,13 @@ namespace utils_platter_dock
         InventoryParams.Set_StackingPolicy(ECk_Inventory_StackingPolicy::NoStacking);
         InventoryParams.Set_PersistContents(ECk_EnableDisable::Disable);
 
-        FCk_Handle DockEntity = Node;
-        auto Inventory = utils_inventory_data_only::Add(DockEntity, InventoryParams, ECk_Replication::DoesNotReplicate);
+        auto Inventory = utils_inventory_data_only::Add(InHandle, InventoryParams, InSpec.Replication);
         utils_world_item::Add_MountedInventory(Inventory, FMars_Fragment_MountedInventory(EMars_WorldItem_MountRule::PointAtOffset,
             GameplayTags::AttachPoint_Mars_Dock, FTransform::Identity));
 
         auto AttachPointsSpec = FMars_AttachPoints_Spec();
         AttachPointsSpec.Points.Add(FMars_AttachPoint_Entry(GameplayTags::AttachPoint_Mars_Dock, Node));
-        utils_attach_points::Add(DockEntity, AttachPointsSpec);
+        utils_attach_points::Add(InHandle, AttachPointsSpec);
 
         auto Params = FMars_Fragment_PlatterDock_Params();
         Params.Spec = InSpec;
@@ -53,13 +56,13 @@ namespace utils_platter_dock
         State.Interactable = DoCreate_Interactable(Node, InSpec);
         State.Node = Node;
 
-        Node.Add_Fragment(FMars_Feature_PlatterDock());
-        Node.Add_Fragment(Params);
-        Node.Add_Fragment(State);
-        return DockEntity.As_PlatterDock();
+        InHandle.Add_Fragment(FMars_Feature_PlatterDock());
+        InHandle.Add_Fragment(Params);
+        InHandle.Add_Fragment(State);
+        return InHandle.As_PlatterDock();
     }
 
-    // The dock with InRole that Create made on InStation (a lifetime child of the station root); invalid when there is none.
+    // InStation's composed dock with InRole (a lifetime dependent of the station); invalid when there is none.
     FCk_Handle_PlatterDock Find_OnStation(FCk_Handle InStation, EMars_PlatterDock_Role InRole)
     {
         for (auto Dependent : utils_entity_lifetime::Get_LifetimeDependents(InStation))
@@ -71,11 +74,11 @@ namespace utils_platter_dock
         return FCk_Handle_PlatterDock();
     }
 
-    // The platter riding InItem's Persistent world item; invalid when InItem is not a platter's item.
+    // The platter riding InItem's Persistent world item; invalid when InItem is not a platter's item, or while this machine
+    // has not linked the item to its world item yet.
     FCk_Handle_Platter TryGet_PlatterOf(const FCk_Handle_Item& InItem)
     {
-        // Its verbs are applied by the authority: a machine without authority over the item is offered none.
-        if (ck::Is_NOT_Valid(InItem) || InItem.Has_PersistentWorldItem() == false || utils_net::Get_HasAuthority(InItem) == false)
+        if (ck::Is_NOT_Valid(InItem) || InItem.Has_PersistentWorldItem() == false)
         { return FCk_Handle_Platter(); }
 
         FCk_Handle WorldItemEntity = InItem.Get_PersistentWorldItem();
@@ -241,6 +244,7 @@ mixin bool Get_HasArrived(const FCk_Handle_PlatterDock& Self)
 }
 
 // What interacting would do for InFocuser, first matching row wins:
+//   any dock,  this machine has no authority over the dock    -> Blocked_NothingHeld
 //   any dock,  no HeldItem + Hotbar on the focuser           -> Blocked_NothingHeld
 //   occupied,  holds food, a platter is docked                -> PlaceFood, or Blocked_Policy when the dock refuses the
 //                                                                piece (TryGet_Refusal says why)
@@ -253,6 +257,10 @@ mixin bool Get_HasArrived(const FCk_Handle_PlatterDock& Self)
 // "Hands empty" = the focuser's HeldItem has no current item; "holds food" = its hotbar's selected item is a food item.
 mixin EMars_PlatterDock_Action Get_ActionFor(const FCk_Handle_PlatterDock& Self, FCk_Handle InFocuser)
 {
+    // Its verbs are applied by the authority: a machine without authority is offered none.
+    if (utils_net::Get_HasAuthority(Self) == false)
+    { return EMars_PlatterDock_Action::Blocked_NothingHeld; }
+
     const auto HeldItem = InFocuser.As_HeldItem(ECk_SanityCheck::UnChecked);
     const auto Hotbar = InFocuser.As_Hotbar(ECk_SanityCheck::UnChecked);
     if (ck::Is_NOT_Valid(HeldItem) || ck::Is_NOT_Valid(Hotbar))

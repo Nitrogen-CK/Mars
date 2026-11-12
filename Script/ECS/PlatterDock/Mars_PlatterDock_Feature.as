@@ -1,9 +1,12 @@
-// A station's mount for one platter: a child entity of the station root with its own capacity-1 inventory, an attach point
-// the docked platter's world item mounts on, a probe-driven interactable and a policy on what the platter may bring. The
+// A station's mount for one platter: an entity under its station with its own capacity-1 inventory, an attach point the
+// docked platter's world item mounts on, a probe-driven interactable and a policy on what the platter may bring. The
 // platter's one live entity (a Persistent world item) mounts on the dock because its item lives in the dock's inventory
 // (UMars_Processor_WorldItem_Reconcile); the dock never spawns a visual, and a dock torn down with a platter docked takes
 // the platter with it (the item dies with the dock's inventory, and its world item with the item).
-// Anyone who can aim at the dock can place onto it or take from it; nothing here reads "the local player".
+// Stance: the dock is an entity under its station, replicated with it (UMars_PlatterDock_EntityScript), and its inventory
+// replicates. Only the authority moves a platter: a copy without authority drops every dock request. What it holds, the
+// platter recorded for it and the three signals (OnDocked, OnArrived, OnUndocked) are derived on every machine from that
+// inventory. Anyone who can aim at the dock can place onto it or take from it; nothing here reads "the local player".
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
@@ -114,6 +117,11 @@ struct FMars_PlatterDock_Spec
     UPROPERTY()
     FMars_InteractPrompt_Spec Prompt;
 
+    // The inventory's replication: the dock entity's own. A replicated inventory on an entity without a replication
+    // driver cannot create an item.
+    UPROPERTY()
+    ECk_Replication Replication = ECk_Replication::DoesNotReplicate;
+
     FMars_PlatterDock_Spec() {}
 
     FMars_PlatterDock_Spec(EMars_PlatterDock_Role InRole, const FMars_PlatterDock_Policy& InPolicy, const FTransform& InMountLocal)
@@ -153,9 +161,9 @@ struct FMars_Fragment_PlatterDock_Params
 // State
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Inventory, Interactable and Node are composed by utils_platter_dock::Create. WorldItem, Platter, LastSeen and
+// Inventory, Interactable and Node are composed by utils_platter_dock::Add. WorldItem, Platter, LastSeen and
 // SettleWatchSeconds are written only by UMars_Processor_PlatterDock_Sync from what the inventory holds (polled, as a cargo
-// slot is).
+// slot is, on every machine).
 struct FMars_Fragment_PlatterDock
 {
     UPROPERTY()

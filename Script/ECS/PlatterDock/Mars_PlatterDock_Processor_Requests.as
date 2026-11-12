@@ -1,4 +1,5 @@
-// Drains Dock, then Undock (each kind in queue order). Both are plain inventory transfers; the dock never writes what it
+// Drains Dock, then Undock (each kind in queue order), on the authority only: a copy without authority drops what it was
+// asked once the request fragment is removed. Both are plain inventory transfers; the dock never writes what it
 // holds here - UMars_Processor_PlatterDock_Sync reacts to what lands, like the cargo slot's sync pass - and the platter's
 // world item mounts from where its item lands (UMars_Processor_WorldItem_Reconcile), so a refused transfer moves nothing.
 //   Dock:   Item.Get_ParentInventory() -> this dock's inventory, refused when the dock is taken or the policy says no.
@@ -26,6 +27,10 @@ class UMars_Processor_PlatterDock_HandleRequests : UCk_Processor_Script_Base_UE
 
         // InRequests is invalid past this line; removing before broadcasting lets re-entrant requests survive.
         Self.Request_TryRemove(FMars_Fragment_PlatterDock_Requests);
+
+        // Its verbs are applied by the authority: a copy without authority moves nothing and refuses nothing.
+        if (utils_net::Get_HasAuthority(InHandle) == false)
+        { return; }
 
         for (const auto& Request : DockRequests)
         { HandleDockRequest(Self, InState, Request); }
