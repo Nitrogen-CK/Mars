@@ -249,7 +249,9 @@ class UMars_Processor_FoodPiece_Replay : UCk_Processor_Script_Base_UE
         Destroy_Results(InResult);
     }
 
-    // The index of InDefinition's import, created on a local entity under InWorld when there is none.
+    // The index of InDefinition's import, created on a local entity under InWorld when there is none. A whole food of the
+    // definition that this machine imported holds the same geometry (one mesh, one spec): shared from it, the import is
+    // Ready at once, so the first cut of a food waits for no load and its halves stand before the food ends.
     private int32 FindOrAdd_Import(FCk_Handle& InWorld, FGameplayTag InDefinition, TSoftObjectPtr<UStaticMesh> InMesh)
     {
         {
@@ -266,11 +268,39 @@ class UMars_Processor_FoodPiece_Replay : UCk_Processor_Script_Base_UE
 
         auto Import = FMars_FoodPiece_ReplayImport();
         Import.Definition = InDefinition;
-        Import.Geometry = utils_runtime_mesh::Add(Entity, FCk_RuntimeMesh_Spec(InMesh));
+
+        const auto Whole = Find_ImportedWhole(InWorld, InDefinition);
+        if (ck::IsValid(Whole))
+        { Import.Geometry = utils_runtime_mesh::Add_SharedGeometry(Entity, Whole.Get_Geometry()); }
+        else
+        {
+            Import.Geometry = utils_runtime_mesh::Add(Entity, FCk_RuntimeMesh_Spec(InMesh));
+            InWorld.Get_Fragment(FMars_Fragment_FoodPiece_ReplayMemo).Tally.MeshImports += 1;
+        }
 
         auto& Imports = InWorld.Get_Fragment(FMars_Fragment_FoodPiece_ReplayMemo).Imports;
         Imports.Add(Import);
         return Imports.Num() - 1;
+    }
+
+    // A live, Ready whole food of InDefinition among the pieces the Succession processor has ruled on (its kin, on this
+    // same world entity); invalid when there is none.
+    private FCk_Handle_FoodPiece Find_ImportedWhole(const FCk_Handle& InWorld, FGameplayTag InDefinition) const
+    {
+        if (InWorld.Has_Fragment(FMars_Fragment_FoodPiece_Kin) == false)
+        { return FCk_Handle_FoodPiece(); }
+
+        const auto Pieces = InWorld.Get_Fragment(FMars_Fragment_FoodPiece_Kin).Pieces;
+        for (const auto& Piece : Pieces)
+        {
+            if (utils_foodpiece::Get_IsLiveEntity(Piece) == false || Piece.Get_IsWhole() == false)
+            { continue; }
+
+            if (Piece.Get_Status() == EMars_FoodPiece_Status::Ready && Piece.Get_Recipe().Definition == InDefinition)
+            { return Piece; }
+        }
+
+        return FCk_Handle_FoodPiece();
     }
 
     // The index of InLineage, whose orphan clock restarts; a new lineage's root is its definition's import. The first

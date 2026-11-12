@@ -456,7 +456,7 @@ class UMars_AutoTestRig_NetFoodPiece : UMars_AutoTestRig_NetWorldItem
     protected FString Describe_Tally()
     {
         const auto Tally = Get_Tally();
-        return f"slices={Tally.Slices} built={Tally.Built} failed={Tally.Failed} lineages={Tally.Lineages} geometries={Tally.Geometries}";
+        return f"slices={Tally.Slices} imports={Tally.MeshImports} built={Tally.Built} failed={Tally.Failed} lineages={Tally.Lineages} geometries={Tally.Geometries}";
     }
 
     // Every piece script near InNear on this machine that is a Ready FoodPiece.

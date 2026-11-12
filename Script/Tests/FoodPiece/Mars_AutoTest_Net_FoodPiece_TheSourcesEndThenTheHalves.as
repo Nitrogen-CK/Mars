@@ -82,6 +82,7 @@ class UCk_AutoTest_Net_FoodPiece_TheSourcesEndThenTheHalves : UMars_AutoTestRig_
 
         const auto StandFrames = LastStood - FirstAppear;
         Assert_Equals_Int(_Both, 0, "no frame shows a piece standing with one it was cut from");
+        Assert_Equals_Int(Get_Tally().MeshImports, 1, "with no whole food left to share from, the replay loads the mesh once");
         Assert_True(FirstAppear >= 0 && StandFrames <= k_MaxStandFrames, f"both halves stand within {k_MaxStandFrames} frames of the first piece entity (took {StandFrames})");
         Assert_Equals_Int(Get_EnsureDelta(), 0, "no ensure");
         Log_Result(f"{Describe_Standing()} standFrames={StandFrames} {Describe_Tally()}");

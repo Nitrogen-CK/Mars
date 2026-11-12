@@ -16,8 +16,9 @@ struct FMars_Feature_FoodPiece {}
 // replicate. A piece whose entity replicates carries FMars_Fragment_FoodPiece_Net, the authority's replicated ledger: its
 // identity, its cook state, who holds it and its geometry's check numbers. A copy without authority adopts the identity,
 // wears the cook state (OnCookStateChanged) and checks its own geometry against the numbers; only the authority gives a
-// piece a body. A machine without the slice rebuilds a cut piece from its recipe (the Replay processors): it imports the
-// definition's mesh once, slices each cut of a lineage once through its local replay memo, and shares the result onto the
+// piece a body. A machine without the slice rebuilds a cut piece from its recipe (the Replay processors): it takes the
+// definition's geometry once (shared from a whole food of that definition it already imported, else imported from the
+// mesh), slices each cut of a lineage once through its local replay memo, and shares the result onto the
 // replicated entity; the memo and everything it holds are local and read by no simulation. A copy without authority shows
 // a piece only while it stands (its local standing, ruled by the Succession processor): a cut piece arrives and stands
 // once built, and supersedes every standing piece it was cut from; the authority's pieces always stand.
@@ -711,6 +712,9 @@ struct FMars_FoodPiece_ReplayCounts
     int32 Slices = 0;
 
     UPROPERTY()
+    int32 MeshImports = 0;
+
+    UPROPERTY()
     int32 Built = 0;
 
     UPROPERTY()
@@ -739,12 +743,16 @@ struct FMars_Fragment_FoodPiece_ReplayMemo
     FCk_Handle Keeper;
 }
 
-// What utils_foodpiece::Get_ReplayTally reads of a world's replay memo: the slices submitted, the entities built and
-// failed, and the lineages and live geometry entities (imports included) the memo holds now.
+// What utils_foodpiece::Get_ReplayTally reads of a world's replay memo: the slices submitted, the imports that loaded a
+// mesh (one shared from a whole food loads none), the entities built and failed, and the lineages and live geometry
+// entities (imports included) the memo holds now.
 struct FMars_FoodPiece_ReplayTally
 {
     UPROPERTY()
     int32 Slices = 0;
+
+    UPROPERTY()
+    int32 MeshImports = 0;
 
     UPROPERTY()
     int32 Built = 0;

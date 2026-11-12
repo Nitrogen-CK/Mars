@@ -540,6 +540,7 @@ namespace utils_foodpiece
 
         const auto& Memo = InWorld.Get_Fragment(FMars_Fragment_FoodPiece_ReplayMemo);
         Tally.Slices = Memo.Tally.Slices;
+        Tally.MeshImports = Memo.Tally.MeshImports;
         Tally.Built = Memo.Tally.Built;
         Tally.Failed = Memo.Tally.Failed;
         Tally.Lineages = Memo.Lineages.Num();

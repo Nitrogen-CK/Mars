@@ -1,7 +1,8 @@
 // The server cuts the meat slab for real five times, a second apart, each time the heaviest Ready piece through the middle
-// of its local X bounds. On the client no frame of the whole test shows a piece standing with one it was cut from, and
-// six pieces stand at the end, each matching the authority's geometry. The frames in which nothing stood are logged with
-// the sample frame of each.
+// of its local X bounds. On the client no frame of the whole test shows a piece standing with one it was cut from, the
+// replay loads no mesh (it shares the slab's own import, so the first cut waits for no load), and six pieces stand at
+// the end, each matching the authority's geometry. The frames in which nothing stood are logged with the sample frame of
+// each: the slab's entity can end a frame before its halves are built.
 // Surface: Ck.FoodPiece.Net.AS_FoodPiece_ARealCutNeverShowsBoth
 class UCk_AutoTest_Net_FoodPiece_ARealCutNeverShowsBoth : UMars_AutoTestRig_NetFoodPiece
 {
@@ -109,6 +110,7 @@ class UCk_AutoTest_Net_FoodPiece_ARealCutNeverShowsBoth : UMars_AutoTestRig_NetF
         { NeitherAt += f"{Frame} "; }
 
         Assert_Equals_Int(_Both, 0, "no frame shows a piece standing with one it was cut from");
+        Assert_Equals_Int(Get_Tally().MeshImports, 0, "the replay loaded no mesh: it shares the slab's import");
         Assert_Equals_Int(Standing.Num(), k_CutCount + 1, "six pieces stand");
         Assert_Equals_Int(Get_CheckCount(Standing, EMars_FoodPiece_CheckResult::Matches), k_CutCount + 1, "every standing piece matches the authority");
         Assert_Equals_Int(Get_EnsureDelta(), 0, "no ensure");
