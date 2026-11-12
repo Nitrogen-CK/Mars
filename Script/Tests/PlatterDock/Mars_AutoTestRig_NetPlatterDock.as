@@ -84,8 +84,17 @@ class UMars_AutoTestRig_NetPlatterDock : UMars_AutoTestRig_NetPlatter
     protected int64 _SpawnFrame = -1;
     protected int64 _ConstructedFrame = -1;
 
+    // This machine's copy of the second (small) platter, once found; the server's spawn of it.
+    protected FCk_Handle_Platter _SecondPlatter;
+    protected FCk_Handle _SecondPlatterEntity;
+
+    // Client: the frame of its last Act and the frame it first saw that Act's effect.
+    protected int64 _ActFrame = -1;
+    protected int64 _EffectFrame = -2;
+
     private FCk_Handle _ServerStation;
     private FCk_Handle_PlatterDock _AwaitedDock;
+    private FCk_Handle_WorldItem _AwaitedHeld;
     private FString _DockEndText;
 
     protected void Log_Dock(FString InText)
@@ -240,6 +249,107 @@ class UMars_AutoTestRig_NetPlatterDock : UMars_AutoTestRig_NetPlatter
         return _Station.As_Station().Get_ShownLabel();
     }
 
+    // The rig's first platter is the large one: a second (small) platter on the same floor is never taken for it.
+    protected FCk_Handle_Platter Find_PlatterNear() override
+    {
+        return Find_PlatterOfCapacityNear(Get_CapacityOf(mars_items::Platter_Large()));
+    }
+
+    protected int32 Get_CapacityOf(UCk_InventoryItem_Definition InDefinition)
+    {
+        const UMars_ItemTrait_Platter Trait = InDefinition.Get_ItemTraitByClass(UMars_ItemTrait_Platter);
+        return Trait.Platter.Capacity;
+    }
+
+    // This machine's composed platter world item of InCapacity near the test's X; invalid while none is composed.
+    protected FCk_Handle_Platter Find_PlatterOfCapacityNear(int32 InCapacity)
+    {
+        for (auto Candidate : utils_entity_tag::ForEach_Entity(Get_SubjectEntity(), n"TAG_MarsWorldItem"))
+        {
+            if (Get_IsLive(Candidate) == false || Candidate.Is_Transform() == false || Candidate.Is_Platter() == false
+                || Candidate.Has_Fragment(FMars_Fragment_Platter_Params) == false || Get_IsNear(Candidate, _FloorTop) == false)
+            { continue; }
+
+            if (Candidate.As_Platter().Get_Capacity() == InCapacity)
+            { return Candidate.As_Platter(); }
+        }
+
+        return FCk_Handle_Platter();
+    }
+
+    // This machine's copy of the second (small) platter, once found.
+    protected bool Try_FindSecondPlatter()
+    {
+        if (ck::IsValid(_SecondPlatter))
+        { return true; }
+
+        _SecondPlatter = Find_PlatterOfCapacityNear(Get_CapacityOf(mars_items::Platter()));
+        return ck::IsValid(_SecondPlatter);
+    }
+
+    protected FCk_Handle_WorldItem Get_SecondWorldItem()
+    {
+        FCk_Handle Entity = _SecondPlatter;
+        return Entity.As_WorldItem(ECk_SanityCheck::UnChecked);
+    }
+
+    protected FCk_Handle_Item Get_SecondPlatterItem()
+    {
+        return Get_SecondWorldItem().Get_Item();
+    }
+
+    // Empty when InWorldItem is Held by the subject and settled on this machine; otherwise the first fault.
+    protected FString Get_HeldBySubjectFault(FCk_Handle_WorldItem InWorldItem)
+    {
+        if (ck::Is_NOT_Valid(InWorldItem))
+        { return "no world item"; }
+
+        if (InWorldItem.Get_Mount() != EMars_WorldItem_Mount::Held || InWorldItem.Get_Carrier() != Get_SubjectEntity())
+        { return f"mount {InWorldItem.Get_Mount() :n} by [{InWorldItem.Get_Carrier().ToString()}]"; }
+
+        if (InWorldItem.Get_IsSettled() == false)
+        { return "not settled"; }
+
+        return "";
+    }
+
+    // The item in the subject's overflow slot on this machine; invalid while it is empty.
+    protected FCk_Handle_Item Get_OverflowItem()
+    {
+        return _Carrier.Hotbar.Get_ItemAt(_Carrier.Hotbar.Get_OverflowIndex());
+    }
+
+    protected bool Get_LedgerNamesSubject(FCk_Handle_PlatterDock InDock)
+    {
+        return InDock.Get_LastRefused() == Get_SubjectEntity();
+    }
+
+    // InDock's refusal ledger as this machine reads it.
+    protected FString Describe_Ledger(FCk_Handle_PlatterDock InDock)
+    {
+        return f"ledger=[serial={InDock.Get_RefusalSerial()} last={InDock.Get_LastRefusal() :n} namesSubject={Get_LedgerNamesSubject(InDock)}]";
+    }
+
+    // Client: the subject's InAction at InDock through the dock's Act (the cue), as the task fires it at the grip.
+    protected void Act(FCk_Handle_PlatterDock InDock, EMars_PlatterDock_Action InAction)
+    {
+        auto Dock = InDock;
+        _ActFrame = utils_time::Get_FrameCounter();
+        utils_platter_dock::Request_ActFor(Dock, Get_SubjectEntity(), InAction);
+    }
+
+    // The frames between the last Act and the frame the test first saw its effect.
+    protected FString Describe_ActFrames()
+    {
+        return f"actToEffectFrames={_EffectFrame - _ActFrame}";
+    }
+
+    protected void Record_EffectFrame()
+    {
+        if (_EffectFrame < _ActFrame)
+        { _EffectFrame = utils_time::Get_FrameCounter(); }
+    }
+
     //----------------------------------------------------------------------------------------------------------------------
     // Server
     //----------------------------------------------------------------------------------------------------------------------
@@ -356,6 +466,75 @@ class UMars_AutoTestRig_NetPlatterDock : UMars_AutoTestRig_NetPlatter
     private void OnRigPlatterHeldAgain(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
     {
         On_ServerUndocked();
+    }
+
+    protected void On_ServerSecondPlatterReady() {}
+
+    protected void On_ServerHeld() {}
+
+    // Server: the second (small) platter on the same floor, 150 cm from the first in X, under the spawn owner and tracked;
+    // On_ServerSecondPlatterReady once this machine finds it.
+    protected void Spawn_SecondPlatter()
+    {
+        auto Owner = utils_mars_net::Get_ReplicatedSpawnOwner(Get_SubjectEntity());
+        const auto Root = FTransform(FRotator::ZeroRotator,
+            _FloorTop + FVector(k_BesideCm, 0.0, constants_platter::k_FloorAboveBase + 0.5));
+        _SecondPlatterEntity = utils_platter::Request_SpawnWorld(Owner, FMars_Platter_SpawnSpec(Root, mars_items::Platter()));
+        Track_ForCleanup(_SecondPlatterEntity);
+        WaitUntil(n"Is_RigSecondPlatterBuilt", n"OnRigSecondPlatterBuilt", k_SlowPolls);
+    }
+
+    UFUNCTION()
+    private void Is_RigSecondPlatterBuilt(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Result = OutResult;
+        Result.Set(Get_IsLive(_SecondPlatterEntity) && _SecondPlatterEntity.Is_Platter()
+            && _SecondPlatterEntity.Has_Fragment(FMars_Feature_WorldItem) && Try_FindSecondPlatter());
+    }
+
+    UFUNCTION()
+    private void OnRigSecondPlatterBuilt(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
+    {
+        Assert_True(_SecondPlatter == _SecondPlatterEntity, "the server finds the second platter it spawned");
+        On_ServerSecondPlatterReady();
+    }
+
+    // Server: the subject holds InWorldItem's platter (its item into the subject's stow target, the kernel path a pickup
+    // takes); On_ServerHeld once it is Held by the subject and settled.
+    protected void Hold_Platter(FCk_Handle_WorldItem InWorldItem)
+    {
+        Assert_True(Get_IsCarrierReady(_Carrier), "the server's carrier is ready");
+        _AwaitedHeld = InWorldItem;
+        Stow(InWorldItem);
+        WaitUntil(n"Is_RigHeldBySubject", n"OnRigHeldBySubject", k_SlowPolls);
+    }
+
+    UFUNCTION()
+    private void Is_RigHeldBySubject(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Result = OutResult;
+        Result.Set(Get_HeldBySubjectFault(_AwaitedHeld).IsEmpty());
+    }
+
+    UFUNCTION()
+    private void OnRigHeldBySubject(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
+    {
+        On_ServerHeld();
+    }
+
+    // Server: On_ServerDocked once InDock reports its platter arrived, whoever docked it.
+    protected void Await_Arrived(FCk_Handle_PlatterDock InDock)
+    {
+        _AwaitedDock = InDock;
+        WaitUntil(n"Is_RigPlatterArrived", n"OnRigPlatterArrived", k_SlowPolls);
+    }
+
+    // Server: InItem onto InDock; On_ServerDocked once the dock reports it arrived.
+    protected void Dock_Item(FCk_Handle_PlatterDock InDock, FCk_Handle_Item InItem)
+    {
+        auto Dock = InDock;
+        Dock.Request_Dock(FMars_Request_PlatterDock_Dock(InItem));
+        Await_Arrived(InDock);
     }
 
     // Server: step InStep with the rides as Publish_Rides writes them and InLocation.

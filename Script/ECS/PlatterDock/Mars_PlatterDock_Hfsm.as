@@ -13,21 +13,24 @@ class UMars_SmState_PlatterDock_Interact : UMars_SmState_InteractTarget_RunTask
     }
 }
 
-// Re-evaluates Get_ActionFor for the initiator and moves the platter at the Grip of the initiator's gloves
-// (UMars_SmTask_ActAtGrip): a Place is a Place reach that sets the held platter down over the dock's node
-// (utils_platter_dock::Start_PlaceReach), and the Dock is requested at its Grip, so the platter mounts on the dock
-// from where the gloves hold it; a Take waits for the gloves to close on the dock, then requests the Undock, its next
-// mount riding the gloves home. Without gloves both act at once. The task then runs until the dock reports the platter
-// docked or undocked, or that the dock or the undock was refused (the task fails).
+// Re-evaluates Get_ActionFor for the initiator and acts at the Grip of the initiator's gloves (UMars_SmTask_ActAtGrip):
+// a Place is a Place reach that sets the held platter down over the dock's node (utils_platter_dock::Start_PlaceReach); a
+// Take waits for the gloves to close on the dock, checks the platter is still docked and the hotbar has a stow target, and
+// lets the platter ride the gloves home. Without gloves both act at once. The dock moves nothing for the task:
+// utils_platter_dock::Request_ActFor asks the dock's authority, which docks or undocks the platter, and the task runs
+// until the effect is visible here (the dock holds the captured item; or no longer holds it and the initiator's hotbar
+// does) or the dock's ledger names this initiator's refusal (DockRefused, UndockRefused, NoLongerDocked, NowhereToStow).
 // PlaceFood succeeds at once (UMars_SmTask_PlaceHeldFood places the food). A Blocked_ action fails (ActionBlocked): the
 // prompt processor disables the target for it, but can lag the initiator's hands by a frame.
 class UMars_SmTask_PlatterDock_PlaceOrTake : UMars_SmTask_MoveItemAtGrip
 {
     private FCk_Handle_PlatterDock _Dock;
     private FCk_Handle _Initiator;
+    // The item the Act moves, captured on enter: the effect is it landing where the action puts it.
     private FCk_Handle_Item _Item;
-    private FCk_Handle_Platter _Platter;
     private EMars_PlatterDock_Action _Action = EMars_PlatterDock_Action::Place;
+    // The dock's refusal serial when this task acted: only a later refusal is about it.
+    private int32 _RefusalSerialAtAct = 0;
 
     UFUNCTION(BlueprintOverride)
     void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
@@ -36,7 +39,6 @@ class UMars_SmTask_PlatterDock_PlaceOrTake : UMars_SmTask_MoveItemAtGrip
         _Dock = FCk_Handle_PlatterDock();
         _Initiator = FCk_Handle();
         _Item = FCk_Handle_Item();
-        _Platter = FCk_Handle_Platter();
 
         FCk_Handle Owner;
         FCk_Handle Initiator;
@@ -85,19 +87,12 @@ class UMars_SmTask_PlatterDock_PlaceOrTake : UMars_SmTask_MoveItemAtGrip
         DoFail(EMars_Interaction_FailReason::ActionBlocked);
     }
 
-    UFUNCTION(BlueprintOverride)
-    void DoExitTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
-    {
-        Super::DoExitTask(InHandle, InNetContext);
-        DoUnbind();
-    }
-
     // The take's stow target is asked at the grip: the hotbar may have changed while the gloves reached.
     protected void DoAtGrip() override
     {
         if (_Action == EMars_PlatterDock_Action::Place)
         {
-            _Dock.Request_Dock(FMars_Request_PlatterDock_Dock(_Item));
+            DoAct();
             return;
         }
 
@@ -118,73 +113,46 @@ class UMars_SmTask_PlatterDock_PlaceOrTake : UMars_SmTask_MoveItemAtGrip
         FCk_Handle DockEntity = _Dock;
         Ride_IntoHand(_Initiator, _Item, utils_transform::Get_EntityCurrentTransform(DockEntity.As_Transform()));
 
-        _Dock.Request_Undock(FMars_Request_PlatterDock_Undock(_Item, Target));
+        DoAct();
     }
 
-    UFUNCTION()
-    private void OnDocked(FCk_Handle_PlatterDock InDock, FCk_Handle_Platter InPlatter)
+    // A place lands when the dock holds the item; a take when the dock no longer holds it and the initiator's hotbar does.
+    protected bool DoGet_EffectLanded() override
     {
-        if (_Action != EMars_PlatterDock_Action::Place || InPlatter != _Platter)
-        { return; }
+        if (ck::Is_NOT_Valid(_Dock))
+        { return false; }
 
-        DoUnbind();
-        _Outcome = ECk_SmTaskResult::Succeeded;
+        if (_Action == EMars_PlatterDock_Action::Place)
+        { return _Dock.Get_Item() == _Item; }
+
+        const auto Hotbar = _Initiator.As_Hotbar(ECk_SanityCheck::UnChecked);
+        return _Dock.Get_Item() != _Item && ck::IsValid(Hotbar) && Hotbar.TryGet_SlotIndexOf(_Item).IsSet();
     }
 
-    UFUNCTION()
-    private void OnUndocked(FCk_Handle_PlatterDock InDock, FCk_Handle_Platter InPlatter)
+    protected bool DoTryGet_Refusal(EMars_Interaction_FailReason& OutReason) override
     {
-        if (_Action != EMars_PlatterDock_Action::Take || InPlatter != _Platter)
-        { return; }
+        if (ck::Is_NOT_Valid(_Dock) || _Dock.Get_RefusalSerial() <= _RefusalSerialAtAct)
+        { return false; }
 
-        DoUnbind();
-        _Outcome = ECk_SmTaskResult::Succeeded;
+        if (_Dock.Get_LastRefused() != _Initiator)
+        { return false; }
+
+        OutReason = _Dock.Get_LastRefusal();
+        return true;
     }
 
-    UFUNCTION()
-    private void OnDockRefused(FCk_Handle_PlatterDock InDock, FCk_Handle_Item InItem, EMars_PlatterDock_Refusal InRefusal)
-    {
-        if (InItem != _Item)
-        { return; }
-
-        DoUnbind();
-        DoFail(EMars_Interaction_FailReason::DockRefused);
-    }
-
-    UFUNCTION()
-    private void OnUndockRefused(FCk_Handle_PlatterDock InDock, FCk_Handle_Item InItem, EMars_PlatterDock_Refusal InRefusal)
-    {
-        if (_Action != EMars_PlatterDock_Action::Take || InItem != _Item)
-        { return; }
-
-        DoUnbind();
-        DoFail(EMars_Interaction_FailReason::UndockRefused);
-    }
-
-    // Place waits on OnDocked of the item's platter (or its refusal), Take on OnUndocked of the docked one (or its refusal).
     private void DoStart(FCk_Handle_PlatterDock& InDock, const FCk_Handle_Item& InItem, EMars_PlatterDock_Action InAction)
     {
         _Dock = InDock;
         _Item = InItem;
         _Action = InAction;
-        _Platter = utils_platter_dock::TryGet_PlatterOf(InItem);
-        _Dock.BindTo_OnDocked(FMars_Delegate_PlatterDock_OnDocked(this, n"OnDocked"));
-        _Dock.BindTo_OnUndocked(FMars_Delegate_PlatterDock_OnUndocked(this, n"OnUndocked"));
-        _Dock.BindTo_OnDockRefused(FMars_Delegate_PlatterDock_OnDockRefused(this, n"OnDockRefused"));
-        _Dock.BindTo_OnUndockRefused(FMars_Delegate_PlatterDock_OnUndockRefused(this, n"OnUndockRefused"));
     }
 
-    private void DoUnbind()
+    private void DoAct()
     {
-        if (ck::IsValid(_Dock))
-        {
-            _Dock.UnbindFrom_OnDocked(FMars_Delegate_PlatterDock_OnDocked(this, n"OnDocked"));
-            _Dock.UnbindFrom_OnUndocked(FMars_Delegate_PlatterDock_OnUndocked(this, n"OnUndocked"));
-            _Dock.UnbindFrom_OnDockRefused(FMars_Delegate_PlatterDock_OnDockRefused(this, n"OnDockRefused"));
-            _Dock.UnbindFrom_OnUndockRefused(FMars_Delegate_PlatterDock_OnUndockRefused(this, n"OnUndockRefused"));
-        }
-
-        _Dock = FCk_Handle_PlatterDock();
+        _RefusalSerialAtAct = _Dock.Get_RefusalSerial();
+        utils_platter_dock::Request_ActFor(_Dock, _Initiator, _Action);
+        Await_ReplicatedEffect();
     }
 }
 

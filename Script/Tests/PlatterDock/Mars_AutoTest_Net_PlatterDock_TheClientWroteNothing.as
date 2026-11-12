@@ -1,5 +1,6 @@
-// The server docks the platter on the Input dock (step 1) and watches 6 s. At step 1 the client is offered no action on
-// either dock, asks its own Input dock to undock the item to the subject and its own Output dock to dock it: 1.5 s later its
+// The server docks the platter on the Input dock (step 1) and watches 6 s. At step 1 the client, its hands empty, is offered
+// what the host would be (Take on the occupied Input dock, Blocked_NothingHeld on the empty Output dock), then bypasses the
+// Act and asks its own Input dock to undock the item to the subject and its own Output dock to dock it: 1.5 s later its
 // Input dock still holds the item, its Output dock is empty, neither raised a refusal and its platter is still Carried by
 // its Input dock. At the end the server's platter is still docked and neither of its docks raised an undock or a refusal.
 // Surface: Ck.PlatterDock.Net.AS_PlatterDock_TheClientWroteNothing
@@ -63,8 +64,8 @@ class UCk_AutoTest_Net_PlatterDock_TheClientWroteNothing : UMars_AutoTestRig_Net
         auto Subject = Get_SubjectEntity();
         const auto InputAction = _InputDock.Get_ActionFor(Subject);
         const auto OutputAction = _OutputDock.Get_ActionFor(Subject);
-        Assert_True(InputAction == EMars_PlatterDock_Action::Blocked_NothingHeld, f"the client is offered nothing on its Input dock (got {InputAction :n})");
-        Assert_True(OutputAction == EMars_PlatterDock_Action::Blocked_NothingHeld, f"the client is offered nothing on its Output dock (got {OutputAction :n})");
+        Assert_True(InputAction == EMars_PlatterDock_Action::Take, f"the client is offered Take on its occupied Input dock (got {InputAction :n})");
+        Assert_True(OutputAction == EMars_PlatterDock_Action::Blocked_NothingHeld, f"the client's empty hands get Blocked_NothingHeld on its empty Output dock (got {OutputAction :n})");
 
         _ClientItem = _InputDock.Get_Item();
         auto Target = _Carrier.Hotbar.TryGet_StowTarget(_ClientItem);

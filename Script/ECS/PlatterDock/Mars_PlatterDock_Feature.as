@@ -4,9 +4,11 @@
 // (UMars_Processor_WorldItem_Reconcile); the dock never spawns a visual, and a dock torn down with a platter docked takes
 // the platter with it (the item dies with the dock's inventory, and its world item with the item).
 // Stance: the dock is an entity under its station, replicated with it (UMars_PlatterDock_EntityScript), and its inventory
-// replicates. Only the authority moves a platter: a copy without authority drops every dock request. What it holds, the
-// platter recorded for it and the three signals (OnDocked, OnArrived, OnUndocked) are derived on every machine from that
-// inventory. Anyone who can aim at the dock can place onto it or take from it; nothing here reads "the local player".
+// replicates. Only the authority moves a platter: a copy without authority drops every dock request. A machine acts
+// through utils_platter_dock::Request_ActFor (a cue the authority applies); a refused act is in the dock's replicated
+// ledger (FMars_Fragment_PlatterDock_Net). What it holds, the platter recorded for it and the three signals (OnDocked,
+// OnArrived, OnUndocked) are derived on every machine from that inventory. Anyone who can aim at the dock can place onto
+// it or take from it; nothing here reads "the local player".
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
@@ -193,6 +195,40 @@ struct FMars_Fragment_PlatterDock
     TOptional<float32> SettleWatchSeconds;
 }
 
+// The authority's refusal ledger on the dock, replicated with it. The serial advances once per refused Act, so an
+// initiator that recorded it before its cue knows a newer refusal is about its own. Written only by the request drain.
+struct FMars_Fragment_PlatterDock_Net
+{
+    UPROPERTY()
+    int32 RefusalSerial = 0;
+
+    UPROPERTY()
+    EMars_Interaction_FailReason LastRefusal = EMars_Interaction_FailReason::ActionBlocked;
+
+    // The refused initiator, a player's entity. On a client it may arrive unresolved: that only means "not known here yet".
+    UPROPERTY()
+    FCk_Handle LastRefused;
+}
+
+// The Act whose transfer is in flight on the authority: who asked and which item moves, so the transfer's answer ends it
+// and a refused transfer names them. Local; written only by the request drain.
+struct FMars_Fragment_PlatterDock_PendingAct
+{
+    UPROPERTY()
+    FCk_Handle Initiator;
+
+    UPROPERTY()
+    FCk_Handle_Item Item;
+
+    FMars_Fragment_PlatterDock_PendingAct() {}
+
+    FMars_Fragment_PlatterDock_PendingAct(const FCk_Handle& InInitiator, const FCk_Handle_Item& InItem)
+    {
+        Initiator = InInitiator;
+        Item = InItem;
+    }
+}
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Signals
 //--------------------------------------------------------------------------------------------------------------------------
@@ -267,7 +303,27 @@ struct FMars_Request_PlatterDock_Undock
     }
 }
 
-// Drain order Dock -> Undock (see UMars_Processor_PlatterDock_HandleRequests).
+// Initiator asks for Action (Place or Take) on the authority's dock, which resolves the item and the target itself: Place
+// docks the initiator's held item, Take undocks the dock's item into the initiator's hotbar stow target. A refused Act
+// advances FMars_Fragment_PlatterDock_Net naming the initiator. Sent by utils_platter_dock::Request_ActFor.
+struct FMars_Request_PlatterDock_Act
+{
+    UPROPERTY()
+    FCk_Handle Initiator;
+
+    UPROPERTY()
+    EMars_PlatterDock_Action Action = EMars_PlatterDock_Action::Place;
+
+    FMars_Request_PlatterDock_Act() {}
+
+    FMars_Request_PlatterDock_Act(const FCk_Handle& InInitiator, EMars_PlatterDock_Action InAction)
+    {
+        Initiator = InInitiator;
+        Action = InAction;
+    }
+}
+
+// Drain order Dock -> Undock -> Act (see UMars_Processor_PlatterDock_HandleRequests).
 struct FMars_Fragment_PlatterDock_Requests
 {
     UPROPERTY()
@@ -275,4 +331,7 @@ struct FMars_Fragment_PlatterDock_Requests
 
     UPROPERTY()
     TArray<FMars_Request_PlatterDock_Undock> UndockRequests;
+
+    UPROPERTY()
+    TArray<FMars_Request_PlatterDock_Act> ActRequests;
 }

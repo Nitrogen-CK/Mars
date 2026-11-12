@@ -59,6 +59,11 @@ namespace utils_platter_dock
         InHandle.Add_Fragment(FMars_Feature_PlatterDock());
         InHandle.Add_Fragment(Params);
         InHandle.Add_Fragment(State);
+
+        // A client's copy can receive the replicated ledger before it composes: it is already there then.
+        if (InHandle.Has_Fragment(FMars_Fragment_PlatterDock_Net) == false)
+        { InHandle.Add_Fragment(FMars_Fragment_PlatterDock_Net(), ECk_Replication::Replicates); }
+
         return InHandle.As_PlatterDock();
     }
 
@@ -243,8 +248,8 @@ mixin bool Get_HasArrived(const FCk_Handle_PlatterDock& Self)
     return WorldItem.Get_Mount() == EMars_WorldItem_Mount::Carried && WorldItem.Get_Carrier() == DockEntity && WorldItem.Get_IsSettled();
 }
 
-// What interacting would do for InFocuser, first matching row wins:
-//   any dock,  this machine has no authority over the dock    -> Blocked_NothingHeld
+// What interacting would do for InFocuser, first matching row wins. Every machine reads it from its own copy of the dock,
+// the platter's ledger and the focuser's hotbar; the authority judges the Act again when it arrives.
 //   any dock,  no HeldItem + Hotbar on the focuser           -> Blocked_NothingHeld
 //   occupied,  holds food, a platter is docked                -> PlaceFood, or Blocked_Policy when the dock refuses the
 //                                                                piece (TryGet_Refusal says why)
@@ -257,10 +262,6 @@ mixin bool Get_HasArrived(const FCk_Handle_PlatterDock& Self)
 // "Hands empty" = the focuser's HeldItem has no current item; "holds food" = its hotbar's selected item is a food item.
 mixin EMars_PlatterDock_Action Get_ActionFor(const FCk_Handle_PlatterDock& Self, FCk_Handle InFocuser)
 {
-    // Its verbs are applied by the authority: a machine without authority is offered none.
-    if (utils_net::Get_HasAuthority(Self) == false)
-    { return EMars_PlatterDock_Action::Blocked_NothingHeld; }
-
     const auto HeldItem = InFocuser.As_HeldItem(ECk_SanityCheck::UnChecked);
     const auto Hotbar = InFocuser.As_Hotbar(ECk_SanityCheck::UnChecked);
     if (ck::Is_NOT_Valid(HeldItem) || ck::Is_NOT_Valid(Hotbar))
@@ -323,6 +324,51 @@ mixin void Request_Undock(FCk_Handle_PlatterDock& Self, const FMars_Request_Plat
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_PlatterDock_Requests);
     Requests.UndockRequests.Add(InRequest);
+}
+
+// The authority-side entry of an Act (utils_platter_dock::Request_ActFor is the initiating machine's); a copy without
+// authority drops it.
+mixin void Request_Act(FCk_Handle_PlatterDock& Self, const FMars_Request_PlatterDock_Act& InRequest)
+{
+    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_PlatterDock_Requests);
+    Requests.ActRequests.Add(InRequest);
+}
+
+namespace utils_platter_dock
+{
+    // InInitiator's interaction asks InDock for InAction. A dock with a replication driver is reached through
+    // Cue.Mars.PlatterDock.Act, which only its authority applies; a local dock has no other machine to reach and takes the
+    // Act request directly. Either way the effect, or the refusal in the dock's ledger, is what the caller waits on.
+    void Request_ActFor(FCk_Handle_PlatterDock& InDock, FCk_Handle InInitiator, EMars_PlatterDock_Action InAction)
+    {
+        const auto Request = FMars_Request_PlatterDock_Act(InInitiator, InAction);
+        if (utils_entity_replication_driver::Has(InDock))
+        {
+            utils_cue_generic::Request_ExecuteCue(InDock, GameplayTags::Cue_Mars_PlatterDock_Act, Request,
+                ECk_Cue_ReliabilityPolicy::Reliable, ECk_Cue_MulticastPolicy::ServerOnly);
+            return;
+        }
+
+        InDock.Request_Act(Request);
+    }
+}
+
+// The Acts the authority has refused, as this machine last received it.
+mixin int32 Get_RefusalSerial(const FCk_Handle_PlatterDock& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_PlatterDock_Net).RefusalSerial;
+}
+
+// Why the latest refused Act was refused; meaningful once Get_RefusalSerial is above 0.
+mixin EMars_Interaction_FailReason Get_LastRefusal(const FCk_Handle_PlatterDock& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_PlatterDock_Net).LastRefusal;
+}
+
+// Whose Act was refused last; invalid before any, and on a client while that entity is not resolved there.
+mixin FCk_Handle Get_LastRefused(const FCk_Handle_PlatterDock& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_PlatterDock_Net).LastRefused;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
