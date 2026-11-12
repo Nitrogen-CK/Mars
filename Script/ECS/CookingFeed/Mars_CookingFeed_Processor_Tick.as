@@ -4,6 +4,8 @@ struct FMars_CookingFeed_Frame
     FCk_Handle_CookingFeed Feed;
     FMars_CookingFeed_Spec Spec;
     float32 DeltaSeconds = 0.0f;
+    // Pieces this tick let go where they lie (an expired admission with no platter left).
+    int32 LetGo = 0;
 }
 
 // The one clock of the transfer, and the hand that carries the real piece. First it guards the reservation: before the
@@ -23,7 +25,12 @@ struct FMars_CookingFeed_Frame
 // hand: once its unload has landed (off the source, its body Kinematic) it is attached under Nodes.Hand where it is, and
 // through Grasp its offset lerps to Motion.HeldOffset. Last, the stock is compared with what was last broadcast: the source
 // changes under the feed without a request, so its edges are found here. A feed torn down while it holds a piece (from the
-// grasp until the admission answer) ends that piece with it.
+// grasp until the admission answer) ends that piece with it. Its last step publishes the replicated ledger.
+// A copy without authority runs none of this: it shows the transfer from the ledger (Follow). Its own clock runs in the
+// ledger's phase, the hand node takes the pose utils_cooking_feed::Get_HandLocal gives for that phase, that clock's progress
+// and the ledger's grasp point, and the ledger's piece rides this machine's hand node while the ledger says the hand holds
+// it: attached where it is, eased to the held offset through the grasp, and taken off when the ledger lets it go (only if
+// this machine's hand node still holds it).
 class UMars_Processor_CookingFeed_Tick : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -42,6 +49,12 @@ class UMars_Processor_CookingFeed_Tick : UCk_Processor_Script_Base_UE
         Frame.Spec = Frame.Feed.Get_Spec();
         Frame.DeltaSeconds = float32(InDeltaT.Get_Seconds());
 
+        if (utils_net::Get_HasAuthority(InHandle) == false)
+        {
+            Follow(Frame);
+            return;
+        }
+
         Guard_Reservation(Frame, InState);
         Measure_Release(Frame, InState);
         Expire_Admission(Frame, InState);
@@ -50,6 +63,15 @@ class UMars_Processor_CookingFeed_Tick : UCk_Processor_Script_Base_UE
         Move_Hand(Frame, InState);
         Carry_Piece(Frame, InState);
         Broadcast_StockIfChanged(Frame, InState);
+        Publish(Frame);
+    }
+
+    // What this tick announced goes into the ledger with the state it left.
+    private void Publish(FMars_CookingFeed_Frame& InFrame)
+    {
+        auto Answers = FMars_CookingFeed_Answers();
+        Answers.LetGo = InFrame.LetGo;
+        utils_cooking_feed::Publish(InFrame.Feed, Answers);
     }
 
     // From Reach through Carry the reserved piece must be where the feed left it: on the source while the hand reaches, on
@@ -136,6 +158,8 @@ class UMars_Processor_CookingFeed_Tick : UCk_Processor_Script_Base_UE
         InState.Active.Reset();
         InState.Phase = EMars_CookingFeed_Phase::Return;
         InState.PhaseSeconds = 0.0f;
+        if (Returned == EMars_CookingFeed_PieceReturn::LetGo)
+        { InFrame.LetGo += 1; }
 
         auto Feed = InFrame.Feed;
         if (Feed.Has_Fragment(FMars_Fragment_CookingFeed_Signals))
@@ -268,12 +292,24 @@ class UMars_Processor_CookingFeed_Tick : UCk_Processor_Script_Base_UE
         auto HandNode = HandEntity.As_SceneNode();
         const auto ParentWorld = utils_transform::Get_EntityCurrentTransform(utils_scene_node::Get_Parent(HandNode));
         Track_Grasp(InState, ParentWorld);
+        Pose_Hand(InFrame, FMars_CookingFeed_HandState(InState.Phase, InFrame.Feed.Get_PhaseProgress(), InState.GraspPoint));
+    }
+
+    // The hand node's pose for InHand (with hand geometry only), written on change: the one pose every machine gives it.
+    private void Pose_Hand(const FMars_CookingFeed_Frame& InFrame, const FMars_CookingFeed_HandState& InHand)
+    {
+        if (InFrame.Spec.Hand.IsSet() == false)
+        { return; }
+
+        FCk_Handle HandEntity = InFrame.Spec.Nodes.Hand;
+        auto HandNode = HandEntity.As_SceneNode();
+        const auto ParentWorld = utils_transform::Get_EntityCurrentTransform(utils_scene_node::Get_Parent(HandNode));
 
         auto Query = FMars_CookingFeed_HandQuery();
         Query.Geometry = InFrame.Spec.Hand.GetValue();
-        Query.Phase = InState.Phase;
-        Query.Progress = InFrame.Feed.Get_PhaseProgress();
-        Query.GraspPoint = InState.GraspPoint;
+        Query.Phase = InHand.Phase;
+        Query.Progress = InHand.Progress;
+        Query.GraspPoint = InHand.GraspPoint;
         Query.ReleasePoint = ParentWorld.InverseTransformPosition(utils_transform::Get_EntityCurrentLocation(InFrame.Spec.Nodes.Release));
 
         const auto HandLocal = utils_cooking_feed::Get_HandLocal(Query);
@@ -376,12 +412,19 @@ class UMars_Processor_CookingFeed_Tick : UCk_Processor_Script_Base_UE
         { return; }
 
         const auto Alpha = InState.Phase == EMars_CookingFeed_Phase::Grasp ? InFrame.Feed.Get_PhaseProgress() : 1.0f;
-        const auto Held = Get_HeldRootOffset(InFrame, Reservation.Piece);
-        auto Offset = Reservation.HeldFrom;
-        Offset.SetLocation(Math::Lerp(Reservation.HeldFrom.GetLocation(), Held.GetLocation(), float64(Alpha)));
-        Offset.SetRotation(FQuat::Slerp(Reservation.HeldFrom.GetRotation(), Held.GetRotation(), float64(Alpha)));
+        Ease_Held(InFrame, Reservation.Piece, Reservation.HeldFrom, Alpha);
+    }
 
-        FCk_Handle Entity = Reservation.Piece;
+    // InPiece's offset under the hand, InAlpha of the way from InHeldFrom to its held offset; one request, on change.
+    private void Ease_Held(const FMars_CookingFeed_Frame& InFrame, const FCk_Handle_FoodPiece& InPiece, const FTransform& InHeldFrom,
+                           float32 InAlpha)
+    {
+        const auto Held = Get_HeldRootOffset(InFrame, InPiece);
+        auto Offset = InHeldFrom;
+        Offset.SetLocation(Math::Lerp(InHeldFrom.GetLocation(), Held.GetLocation(), float64(InAlpha)));
+        Offset.SetRotation(FQuat::Slerp(InHeldFrom.GetRotation(), Held.GetRotation(), float64(InAlpha)));
+
+        FCk_Handle Entity = InPiece;
         auto Node = Entity.As_SceneNode();
         if (Offset.Equals(utils_scene_node::Get_Offset(Node), 0.01))
         { return; }
@@ -403,7 +446,15 @@ class UMars_Processor_CookingFeed_Tick : UCk_Processor_Script_Base_UE
     // (immediate, keeps the world pose).
     private void Attach_ToHand(const FMars_CookingFeed_Frame& InFrame, FMars_CookingFeed_Reservation& InOutReservation)
     {
-        FCk_Handle Entity = InOutReservation.Piece;
+        const auto FromOffset = Attach_UnderHand(InFrame, InOutReservation.Piece);
+        InOutReservation.Hold = EMars_CookingFeed_PieceHold::InHand;
+        InOutReservation.HeldFrom = FromOffset;
+    }
+
+    // InPiece under the hand node where it is now (detached first from whatever holds it); the offset it was attached at.
+    private FTransform Attach_UnderHand(const FMars_CookingFeed_Frame& InFrame, FCk_Handle InPiece)
+    {
+        auto Entity = InPiece;
         auto Node = Entity.As_SceneNode(ECk_SanityCheck::UnChecked);
         if (ck::IsValid(Node))
         { utils_scene_node::Request_Detach(Node); }
@@ -414,9 +465,68 @@ class UMars_Processor_CookingFeed_Tick : UCk_Processor_Script_Base_UE
         const auto HandWorld = utils_transform::Get_EntityCurrentTransform(Hand);
         const auto FromOffset = PieceWorld.GetRelativeTransform(HandWorld);
         utils_scene_node::Add(PieceTransform, Hand, FromOffset);
+        return FromOffset;
+    }
 
-        InOutReservation.Hold = EMars_CookingFeed_PieceHold::InHand;
-        InOutReservation.HeldFrom = FromOffset;
+    //----------------------------------------------------------------------------------------------------------------------
+    // Without authority
+    //----------------------------------------------------------------------------------------------------------------------
+
+    // The transfer as the ledger says it stands: this machine's clock in the ledger's phase, the hand, then the piece. No
+    // fragment reference is held across an attach.
+    private void Follow(FMars_CookingFeed_Frame& InFrame)
+    {
+        auto Feed = InFrame.Feed;
+        Feed.Get_Fragment(FMars_Fragment_CookingFeed_Local).PhaseSeconds += InFrame.DeltaSeconds;
+
+        const auto Ledger = Feed.Get_Fragment(FMars_Fragment_CookingFeed_Net);
+        auto GraspPoint = TOptional<FVector>();
+        if (Ledger.Aim == EMars_CookingFeed_GraspAim::Point)
+        { GraspPoint = TOptional<FVector>(Ledger.GraspPoint); }
+
+        Pose_Hand(InFrame, FMars_CookingFeed_HandState(Ledger.Phase, Feed.Get_PhaseProgress(), GraspPoint));
+        Follow_Piece(InFrame, Ledger);
+    }
+
+    // The ledger's held piece rides this machine's hand node: a piece this machine carried and the ledger no longer names is
+    // taken off (only while this hand node still holds it); a named piece that is here and not yet carried is attached where
+    // it is; a carried Ready FoodPiece eases to the held offset through the grasp (1 in any later phase). A named piece that
+    // has not arrived is tried again next frame.
+    private void Follow_Piece(FMars_CookingFeed_Frame& InFrame, const FMars_Fragment_CookingFeed_Net& InLedger)
+    {
+        auto Feed = InFrame.Feed;
+        const auto Wanted = utils_cooking_feed::Get_LedgerHeldPiece(InLedger);
+        auto Carried = Feed.Get_Fragment(FMars_Fragment_CookingFeed_Local).Carried;
+
+        if (ck::IsValid(Carried) && Carried != Wanted)
+        {
+            auto CarriedNode = Carried.As_SceneNode(ECk_SanityCheck::UnChecked);
+            if (ck::IsValid(CarriedNode) && utils_scene_node::Get_Parent(CarriedNode) == InFrame.Spec.Nodes.Hand)
+            { utils_scene_node::Request_Detach(CarriedNode); }
+
+            Carried = FCk_Handle();
+            Feed.Get_Fragment(FMars_Fragment_CookingFeed_Local).Carried = Carried;
+        }
+
+        if (ck::Is_NOT_Valid(Wanted) || utils_foodpiece::Get_IsLiveEntity(Wanted) == false || Wanted.Is_Transform() == false)
+        { return; }
+
+        if (Carried != Wanted)
+        {
+            const auto HeldFrom = Attach_UnderHand(InFrame, Wanted);
+            auto& Local = Feed.Get_Fragment(FMars_Fragment_CookingFeed_Local);
+            Local.Carried = Wanted;
+            Local.HeldFrom = HeldFrom;
+            return;
+        }
+
+        const auto Piece = Wanted.As_FoodPiece(ECk_SanityCheck::UnChecked);
+        if (ck::Is_NOT_Valid(Piece) || Piece.Get_Status() != EMars_FoodPiece_Status::Ready)
+        { return; }
+
+        const auto Alpha = InLedger.Phase == EMars_CookingFeed_Phase::Grasp ? Feed.Get_PhaseProgress() : 1.0f;
+        const auto HeldFrom = Feed.Get_Fragment(FMars_Fragment_CookingFeed_Local).HeldFrom;
+        Ease_Held(InFrame, Piece, HeldFrom, Alpha);
     }
 
     // The piece root's offset under the hand that puts its bounds centre at Motion.HeldOffset's location, in its rotation.

@@ -10,6 +10,24 @@ struct FMars_CookingFeed_HandQuery
     FVector ReleasePoint = FVector::ZeroVector;
 }
 
+// Where the transfer is for the hand's pose: from the live state with authority, from the ledger and this machine's own
+// phase clock without.
+struct FMars_CookingFeed_HandState
+{
+    EMars_CookingFeed_Phase Phase = EMars_CookingFeed_Phase::Idle;
+    float32 Progress = 1.0f;
+    TOptional<FVector> GraspPoint;
+
+    FMars_CookingFeed_HandState() {}
+
+    FMars_CookingFeed_HandState(EMars_CookingFeed_Phase InPhase, float32 InProgress, TOptional<FVector> InGraspPoint)
+    {
+        Phase = InPhase;
+        Progress = InProgress;
+        GraspPoint = InGraspPoint;
+    }
+}
+
 namespace utils_cooking_feed
 {
     // Composes the feed on InHandle (the station entity; the feature does not need the Station feature). The spec's Nodes are
@@ -51,7 +69,102 @@ namespace utils_cooking_feed
         InHandle.Add_Fragment(Params);
         InHandle.Add_Fragment(FMars_Fragment_CookingFeed());
         InHandle.Add_Fragment(FMars_Tag_CookingFeed_NeedsSetup());
+
+        // A copy without authority can receive the replicated ledger before it composes: the arrived ledger stands then,
+        // and a feed first read mid-transfer shows that phase finished.
+        if (InHandle.Has_Fragment(FMars_Fragment_CookingFeed_Net) == false)
+        { InHandle.Add_Fragment(FMars_Fragment_CookingFeed_Net(), ECk_Replication::Replicates); }
+
+        const auto Ledger = InHandle.Get_Fragment(FMars_Fragment_CookingFeed_Net);
+        auto Local = FMars_Fragment_CookingFeed_Local();
+        Local.Last = TOptional<FMars_Fragment_CookingFeed_Net>(Ledger);
+        Local.PhaseSeconds = Get_PhaseDuration(InSpec.Timing, Ledger.Phase);
+        InHandle.Add_Fragment(Local);
+        InHandle.Add_Fragment(FMars_Tag_CookingFeed_NeedsMirror());
         return InHandle.As_CookingFeed();
+    }
+
+    // The ledger a machine without authority reads the feed through, from the live state and what the caller announced:
+    // written and marked dirty only when a field changes. Called only by the feed's processors on the authority, by the
+    // drain once after its last apply and by the tick as its last step. Reads the state through the handle.
+    void Publish(FCk_Handle_CookingFeed& InFeed, const FMars_CookingFeed_Answers& InAnswers)
+    {
+        const auto State = InFeed.Get_Fragment(FMars_Fragment_CookingFeed);
+        const auto Ledger = InFeed.Get_Fragment(FMars_Fragment_CookingFeed_Net);
+        auto Next = Ledger;
+
+        Next.Phase = State.Phase;
+        if (State.Phase != Ledger.Phase || InAnswers.Begun > 0)
+        { Next.PhaseSerial += 1; }
+
+        if (State.Active.IsSet())
+        {
+            Next.Hold = State.Active.GetValue().Hold;
+            Next.Piece = State.Active.GetValue().Piece;
+        }
+        else
+        { Next.Hold = EMars_CookingFeed_PieceHold::OnSource; }
+
+        if (State.GraspPoint.IsSet() == false)
+        { Next.Aim = EMars_CookingFeed_GraspAim::Rest; }
+        else
+        {
+            const auto Point = State.GraspPoint.GetValue();
+            if (Ledger.Aim == EMars_CookingFeed_GraspAim::Rest || Point.Distance(Ledger.GraspPoint) > k_GraspRepublishCm)
+            { Next.GraspPoint = Point; }
+
+            Next.Aim = EMars_CookingFeed_GraspAim::Point;
+        }
+
+        if (ck::IsValid(State.Source))
+        {
+            Next.Sourcing = EMars_CookingFeed_Sourcing::Sourced;
+            Next.Source = State.Source;
+        }
+        else
+        { Next.Sourcing = EMars_CookingFeed_Sourcing::Unsourced; }
+
+        Next.Available = Get_Available(State);
+        Next.Admitted = State.Admitted;
+        Next.Pile = Get_IsSettling(State) ? EMars_CookingFeed_Pile::Settling : EMars_CookingFeed_Pile::Frozen;
+
+        if (InAnswers.Refusals.Num() > 0)
+        {
+            Next.RefusalSerial += InAnswers.Refusals.Num();
+            Next.LastRefusal = InAnswers.Refusals.Last();
+        }
+
+        Next.LetGoSerial += InAnswers.LetGo;
+
+        if (Get_IsSameLedger(Next, Ledger))
+        { return; }
+
+        InFeed.Get_Fragment(FMars_Fragment_CookingFeed_Net) = Next;
+        FCk_Handle Entity = InFeed;
+        Entity.Request_MarkReplicationDirty(FMars_Fragment_CookingFeed_Net);
+    }
+
+    // A grasp point that moved less than this since the ledger's is not published again.
+    const float64 k_GraspRepublishCm = 1.0;
+
+    bool Get_IsSameLedger(const FMars_Fragment_CookingFeed_Net& InA, const FMars_Fragment_CookingFeed_Net& InB)
+    {
+        return InA.PhaseSerial == InB.PhaseSerial && InA.Phase == InB.Phase && InA.Hold == InB.Hold && InA.Piece == InB.Piece
+            && InA.Aim == InB.Aim && InA.GraspPoint.Equals(InB.GraspPoint, 0.0) && InA.Sourcing == InB.Sourcing
+            && InA.Source == InB.Source && InA.Available == InB.Available && InA.Admitted == InB.Admitted && InA.Pile == InB.Pile
+            && InA.RefusalSerial == InB.RefusalSerial && InA.LastRefusal == InB.LastRefusal && InA.LetGoSerial == InB.LetGoSerial;
+    }
+
+    // The ledger's piece while the authority's hand holds it (InHand, from Reach through AwaitAdmission); invalid
+    // otherwise.
+    FCk_Handle Get_LedgerHeldPiece(const FMars_Fragment_CookingFeed_Net& InLedger)
+    {
+        const auto IsHolding = InLedger.Phase == EMars_CookingFeed_Phase::Reach || InLedger.Phase == EMars_CookingFeed_Phase::Grasp
+            || InLedger.Phase == EMars_CookingFeed_Phase::Carry || InLedger.Phase == EMars_CookingFeed_Phase::AwaitAdmission;
+        if (InLedger.Hold != EMars_CookingFeed_PieceHold::InHand || IsHolding == false)
+        { return FCk_Handle(); }
+
+        return InLedger.Piece;
     }
 
     // What the source holds (frozen, settling or about to drop: a pile re-settling after a piece left is still stock) less a
@@ -592,70 +705,100 @@ mixin FMars_CookingFeed_Spec Get_Spec(const FCk_Handle_CookingFeed& Self)
     return Self.Get_Fragment(FMars_Fragment_CookingFeed_Params).Spec;
 }
 
+// The live phase with authority; without, the replicated ledger's.
 mixin EMars_CookingFeed_Phase Get_Phase(const FCk_Handle_CookingFeed& Self)
 {
+    if (utils_net::Get_HasAuthority(Self) == false)
+    { return Self.Get_Fragment(FMars_Fragment_CookingFeed_Net).Phase; }
+
     return Self.Get_Fragment(FMars_Fragment_CookingFeed).Phase;
 }
 
-// Seconds into the current timed phase, or into AwaitAdmission.
+// Seconds into the current timed phase, or into AwaitAdmission. Without authority, this machine's own clock in the
+// ledger's phase (from the moment it saw the phase).
 mixin float32 Get_PhaseSeconds(const FCk_Handle_CookingFeed& Self)
 {
+    if (utils_net::Get_HasAuthority(Self) == false)
+    { return Self.Get_Fragment(FMars_Fragment_CookingFeed_Local).PhaseSeconds; }
+
     return Self.Get_Fragment(FMars_Fragment_CookingFeed).PhaseSeconds;
 }
 
 // 0..1 within the current timed phase; 1 while idle or awaiting admission, and for a zero-length phase.
 mixin float32 Get_PhaseProgress(const FCk_Handle_CookingFeed& Self)
 {
-    const auto& State = Self.Get_Fragment(FMars_Fragment_CookingFeed);
-    if (utils_cooking_feed::Get_IsTimed(State.Phase) == false)
+    const auto Phase = Self.Get_Phase();
+    if (utils_cooking_feed::Get_IsTimed(Phase) == false)
     { return 1.0f; }
 
-    const auto Duration = utils_cooking_feed::Get_PhaseDuration(Self.Get_Spec().Timing, State.Phase);
+    const auto Duration = utils_cooking_feed::Get_PhaseDuration(Self.Get_Spec().Timing, Phase);
     if (Duration <= 0.0f)
     { return 1.0f; }
 
-    return Math::Clamp(State.PhaseSeconds / Duration, 0.0f, 1.0f);
+    return Math::Clamp(Self.Get_PhaseSeconds() / Duration, 0.0f, 1.0f);
 }
 
+// The authority's attempt; reads the initial one elsewhere.
 mixin int32 Get_Generation(const FCk_Handle_CookingFeed& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_CookingFeed).Generation;
 }
 
-// Unreserved stock on the source: what a hint calls "left". Derived, never stored (utils_cooking_feed::Get_Available).
+// Unreserved stock on the source: what a hint calls "left". Derived with authority (utils_cooking_feed::Get_Available);
+// without, the replicated ledger's.
 mixin int32 Get_Available(const FCk_Handle_CookingFeed& Self)
 {
+    if (utils_net::Get_HasAuthority(Self) == false)
+    { return Self.Get_Fragment(FMars_Fragment_CookingFeed_Net).Available; }
+
     return utils_cooking_feed::Get_Available(Self.Get_Fragment(FMars_Fragment_CookingFeed));
 }
 
-// Admissions since the last SetSource (or a Reset the feed honoured).
+// Admissions since the last SetSource (or a Reset the feed honoured); without authority, the replicated ledger's.
 mixin int32 Get_Admitted(const FCk_Handle_CookingFeed& Self)
 {
+    if (utils_net::Get_HasAuthority(Self) == false)
+    { return Self.Get_Fragment(FMars_Fragment_CookingFeed_Net).Admitted; }
+
     return Self.Get_Fragment(FMars_Fragment_CookingFeed).Admitted;
 }
 
-// The platter the stock is drawn from; invalid while unsourced.
+// The platter the stock is drawn from; invalid while unsourced. Without authority, this machine's copy of the platter the
+// ledger names (unchecked: it may not have arrived).
 mixin FCk_Handle_Platter Get_Source(const FCk_Handle_CookingFeed& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_CookingFeed).Source;
+    if (utils_net::Get_HasAuthority(Self))
+    { return Self.Get_Fragment(FMars_Fragment_CookingFeed).Source; }
+
+    const auto& Ledger = Self.Get_Fragment(FMars_Fragment_CookingFeed_Net);
+    if (Ledger.Sourcing != EMars_CookingFeed_Sourcing::Sourced)
+    { return FCk_Handle_Platter(); }
+
+    return Ledger.Source.As_Platter(ECk_SanityCheck::UnChecked);
 }
 
 mixin bool Get_IsSourced(const FCk_Handle_CookingFeed& Self)
 {
+    if (utils_net::Get_HasAuthority(Self) == false)
+    { return Self.Get_Fragment(FMars_Fragment_CookingFeed_Net).Sourcing == EMars_CookingFeed_Sourcing::Sourced; }
+
     return ck::IsValid(Self.Get_Source());
 }
 
 mixin bool Get_IsSettling(const FCk_Handle_CookingFeed& Self)
 {
+    if (utils_net::Get_HasAuthority(Self) == false)
+    { return Self.Get_Fragment(FMars_Fragment_CookingFeed_Net).Pile == EMars_CookingFeed_Pile::Settling; }
+
     return utils_cooking_feed::Get_IsSettling(Self.Get_Fragment(FMars_Fragment_CookingFeed));
 }
 
 mixin bool Get_IsBusy(const FCk_Handle_CookingFeed& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_CookingFeed).Phase != EMars_CookingFeed_Phase::Idle;
+    return Self.Get_Phase() != EMars_CookingFeed_Phase::Idle;
 }
 
-// Set from BeginTransfer until the transfer settles.
+// Set from BeginTransfer until the transfer settles. The authority's: unset elsewhere.
 mixin TOptional<FMars_CookingFeed_PieceId> TryGet_ActivePiece(const FCk_Handle_CookingFeed& Self)
 {
     const auto& Active = Self.Get_Fragment(FMars_Fragment_CookingFeed).Active;
@@ -665,7 +808,7 @@ mixin TOptional<FMars_CookingFeed_PieceId> TryGet_ActivePiece(const FCk_Handle_C
     return TOptional<FMars_CookingFeed_PieceId>(Active.GetValue().Id);
 }
 
-// The reserved piece; invalid while idle.
+// The reserved piece; invalid while idle. The authority's: invalid elsewhere.
 mixin FCk_Handle_FoodPiece TryGet_ActiveFoodPiece(const FCk_Handle_CookingFeed& Self)
 {
     const auto& Active = Self.Get_Fragment(FMars_Fragment_CookingFeed).Active;
@@ -675,17 +818,24 @@ mixin FCk_Handle_FoodPiece TryGet_ActiveFoodPiece(const FCk_Handle_CookingFeed& 
     return Active.GetValue().Piece;
 }
 
-// The release in flight is still the one the feed awaits an answer for: AwaitAdmission under exactly InPieceId.
+// The release in flight is still the one the feed awaits an answer for: AwaitAdmission under exactly InPieceId. The
+// authority's: false elsewhere.
 mixin bool Get_IsAwaiting(const FCk_Handle_CookingFeed& Self, const FMars_CookingFeed_PieceId& InPieceId)
 {
     const auto& State = Self.Get_Fragment(FMars_Fragment_CookingFeed);
     return State.Phase == EMars_CookingFeed_Phase::AwaitAdmission && State.Active.IsSet() && State.Active.GetValue().Id.Get_IsSame(InPieceId);
 }
 
-// The last release sampled (valid through AwaitAdmission; stale afterwards).
+// The last release sampled (valid through AwaitAdmission; stale afterwards). The authority's: empty elsewhere.
 mixin FMars_CookingFeed_Release Get_PendingRelease(const FCk_Handle_CookingFeed& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_CookingFeed).PendingRelease;
+}
+
+// The replicated ledger as this machine has it: what a machine without authority reads the feed through.
+mixin FMars_Fragment_CookingFeed_Net Get_Ledger(const FCk_Handle_CookingFeed& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_CookingFeed_Net);
 }
 
 mixin FCk_Handle_Transform Get_ReleaseNode(const FCk_Handle_CookingFeed& Self)
@@ -704,7 +854,7 @@ mixin FCk_Handle_PlatterDock Get_InputDock(const FCk_Handle_CookingFeed& Self)
     return Self.Get_Fragment(FMars_Fragment_CookingFeed_Params).Spec.Nodes.InputDock;
 }
 
-// Where the reserved piece is; unset while idle.
+// Where the reserved piece is; unset while idle. The authority's: unset elsewhere (the ledger's Hold says it there).
 mixin TOptional<EMars_CookingFeed_PieceHold> TryGet_PieceHold(const FCk_Handle_CookingFeed& Self)
 {
     const auto& Active = Self.Get_Fragment(FMars_Fragment_CookingFeed).Active;

@@ -3,7 +3,8 @@
 // rejected piece back itself. A feed with an input dock (a station's) draws from the platter that has arrived on that dock:
 // set here when one already has, again on every OnArrived, and cleared on every OnUndocked (an unsourced feed cancels a
 // transfer in flight). A platter still travelling onto the dock is no source yet. The bindings live as long as the feed: the
-// dock is its lifetime child.
+// dock is its lifetime child. A copy without authority binds nothing: its feed takes no answer and no source (the
+// authority's does), so its setup only drops the tag.
 class UMars_Processor_CookingFeed_Setup : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -19,6 +20,12 @@ class UMars_Processor_CookingFeed_Setup : UCk_Processor_Script_Base_UE
     void ForEachEntity(FCk_Time InDeltaT, FCk_Handle& InHandle)
     {
         auto Feed = InHandle.As_CookingFeed();
+        if (utils_net::Get_HasAuthority(InHandle) == false)
+        {
+            Feed.Request_TryRemove(FMars_Tag_CookingFeed_NeedsSetup);
+            return;
+        }
+
         utils_cooking_feed::BindTo_OnAdmission(InHandle, FMars_Delegate_StationAdmission_OnAdmission(this, n"OnAdmission"));
 
         auto InputDock = Feed.Get_InputDock();

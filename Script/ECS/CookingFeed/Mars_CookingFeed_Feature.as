@@ -1,3 +1,13 @@
+// Stance: the feed is the authority's. Only the authority's copy takes a source, reserves, unloads, carries, releases,
+// hands a release to the station's inbox and puts a piece back; a copy without authority drops every request and its setup
+// binds nothing. The authority publishes a replicated ledger (FMars_Fragment_CookingFeed_Net): the phase and its serial,
+// where the reserved piece is and which it is, the grasp point, the source and the stock, and a serial for each refusal and
+// each piece let go. A copy without authority reads its getters from that ledger and shows the transfer from it: its own
+// clock in the ledger's phase, its own hand node posed by the same hand function, and its own copy of the reserved piece
+// under that node while the ledger says the hand holds it. There it raises OnPhaseChanged, OnStockChanged,
+// OnTransferRefused and OnPieceLetGo from the ledger (UMars_Processor_CookingFeed_Mirror). The reservation, its piece id,
+// the generation, the pending release, the hand-off, OnReleaseRequested and OnTransferSettled never leave the authority.
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
 //--------------------------------------------------------------------------------------------------------------------------
@@ -143,6 +153,36 @@ enum EMars_CookingFeed_Handoff
     AwaitingUnload,
     // In the inbox, or refused for want of a receiving kernel: the answer is on its way.
     Handed
+}
+
+// Whether the ledger's GraspPoint is one (Point) or the hand reaches from rest (Rest).
+enum EMars_CookingFeed_GraspAim
+{
+    Rest,
+    Point
+}
+
+// Whether the ledger's Source names the platter the stock is drawn from.
+enum EMars_CookingFeed_Sourcing
+{
+    Unsourced,
+    Sourced
+}
+
+// The source's pile as the stock reads it: Settling = stock, but nothing frozen to reach for.
+enum EMars_CookingFeed_Pile
+{
+    Frozen,
+    Settling
+}
+
+// What one drain or one tick announced, for utils_cooking_feed::Publish: the presses it refused, in order, the pieces it
+// let go where they lie and the transfers it began.
+struct FMars_CookingFeed_Answers
+{
+    TArray<EMars_CookingFeed_Refusal> Refusals;
+    int32 LetGo = 0;
+    int32 Begun = 0;
 }
 
 // Where the reserved piece is, from the press to the admission answer. The feed takes it off the source itself at the grasp.
@@ -470,32 +510,111 @@ struct FMars_Fragment_CookingFeed
     EMars_CookingFeed_Handoff Handoff = EMars_CookingFeed_Handoff::None;
 }
 
+// The replicated ledger: what a machine without authority reads the feed through and shows the transfer from. Written only
+// by utils_cooking_feed::Publish, which the authority's two feed processors call, each write followed by its dirty mark.
+// Piece is read only while Hold is InHand and Phase is Reach, Grasp, Carry or AwaitAdmission; Source only while Sourcing is
+// Sourced; GraspPoint (the hand node's parent frame) only while Aim is Point: a cleared handle keeps its old value on a
+// client.
+struct FMars_Fragment_CookingFeed_Net
+{
+    // One more for every phase the authority entered and every transfer it began.
+    UPROPERTY()
+    int32 PhaseSerial = 0;
+
+    UPROPERTY()
+    EMars_CookingFeed_Phase Phase = EMars_CookingFeed_Phase::Idle;
+
+    // The reservation's hold; OnSource without one.
+    UPROPERTY()
+    EMars_CookingFeed_PieceHold Hold = EMars_CookingFeed_PieceHold::OnSource;
+
+    UPROPERTY()
+    FCk_Handle Piece;
+
+    UPROPERTY()
+    EMars_CookingFeed_GraspAim Aim = EMars_CookingFeed_GraspAim::Rest;
+
+    UPROPERTY()
+    FVector GraspPoint = FVector::ZeroVector;
+
+    UPROPERTY()
+    EMars_CookingFeed_Sourcing Sourcing = EMars_CookingFeed_Sourcing::Unsourced;
+
+    UPROPERTY()
+    FCk_Handle Source;
+
+    UPROPERTY()
+    int32 Available = 0;
+
+    UPROPERTY()
+    int32 Admitted = 0;
+
+    UPROPERTY()
+    EMars_CookingFeed_Pile Pile = EMars_CookingFeed_Pile::Frozen;
+
+    // One per OnTransferRefused the authority raised; LastRefusal is the latest.
+    UPROPERTY()
+    int32 RefusalSerial = 0;
+
+    UPROPERTY()
+    EMars_CookingFeed_Refusal LastRefusal = EMars_CookingFeed_Refusal::Busy;
+
+    // One per OnPieceLetGo the authority raised.
+    UPROPERTY()
+    int32 LetGoSerial = 0;
+}
+
+// Each machine's own. Last is the ledger the mirror last reconciled (unset with authority); the rest is what a machine
+// without authority shows: its own clock in the ledger's phase, and the piece it carries under its own hand node with the
+// offset it attached it at.
+struct FMars_Fragment_CookingFeed_Local
+{
+    UPROPERTY()
+    TOptional<FMars_Fragment_CookingFeed_Net> Last;
+
+    UPROPERTY()
+    float32 PhaseSeconds = 0.0f;
+
+    UPROPERTY()
+    FCk_Handle Carried;
+
+    UPROPERTY()
+    FTransform HeldFrom = FTransform::Identity;
+}
+
+// Added by utils_cooking_feed::Add, dropped by UMars_Processor_CookingFeed_Mirror once it has bound the ledger's rep-notify.
+struct FMars_Tag_CookingFeed_NeedsMirror {}
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Signals
 //--------------------------------------------------------------------------------------------------------------------------
 
 // Edges only, seen by the Tick: a reservation, an admission, a reset, and anything that changes what the source holds.
+// Raised on every machine (without authority, once per ledger change of the sourcing, the counts or the pile).
 delegate void FMars_Delegate_CookingFeed_OnStockChanged(FCk_Handle_CookingFeed InFeed, int32 InAvailable, int32 InAdmitted);
 event void FMars_Delegate_CookingFeed_OnStockChanged_MC(FCk_Handle_CookingFeed InFeed, int32 InAvailable, int32 InAdmitted);
 
+// Raised on every machine; without authority once per replication that moved the phase, with the latest phase.
 delegate void FMars_Delegate_CookingFeed_OnPhaseChanged(FCk_Handle_CookingFeed InFeed, EMars_CookingFeed_Phase InPhase);
 event void FMars_Delegate_CookingFeed_OnPhaseChanged_MC(FCk_Handle_CookingFeed InFeed, EMars_CookingFeed_Phase InPhase);
 
-// Once per transfer, at Carry's end. A station's feed has already handed it to its own entity's admission inbox (or will,
+// The authority's only. Once per transfer, at Carry's end. A station's feed has already handed it to its own entity's admission inbox (or will,
 // once its piece is off its platter) and takes the kernel's answer from the station's OnAdmission itself; a bare feed's
 // listener answers it with Request_ResolveAdmission.
 delegate void FMars_Delegate_CookingFeed_OnReleaseRequested(FCk_Handle_CookingFeed InFeed, FMars_CookingFeed_Release InRelease);
 event void FMars_Delegate_CookingFeed_OnReleaseRequested_MC(FCk_Handle_CookingFeed InFeed, FMars_CookingFeed_Release InRelease);
 
-// How the transfer ended. Only tests bind it today: the feed's test-pinned contract, kept for the assembly.
+// The authority's only. How the transfer ended. Only tests bind it today: the feed's test-pinned contract, kept for the assembly.
 delegate void FMars_Delegate_CookingFeed_OnTransferSettled(FCk_Handle_CookingFeed InFeed, FMars_CookingFeed_PieceId InPieceId, EMars_CookingFeed_Settle InSettle);
 event void FMars_Delegate_CookingFeed_OnTransferSettled_MC(FCk_Handle_CookingFeed InFeed, FMars_CookingFeed_PieceId InPieceId, EMars_CookingFeed_Settle InSettle);
 
-// A press that did nothing (busy, empty, no release node, or the station's own gate shut): never deferred.
+// A press that did nothing (busy, empty, no release node, or the station's own gate shut): never deferred. Raised on every
+// machine (without authority, once per refusal the ledger counts, each with the latest refusal).
 delegate void FMars_Delegate_CookingFeed_OnTransferRefused(FCk_Handle_CookingFeed InFeed, EMars_CookingFeed_Refusal InRefusal);
 event void FMars_Delegate_CookingFeed_OnTransferRefused_MC(FCk_Handle_CookingFeed InFeed, EMars_CookingFeed_Refusal InRefusal);
 
-// A piece the feed took is let go where it lies, Dynamic and detached, because no platter is left to take it back.
+// A piece the feed took is let go where it lies, Dynamic and detached, because no platter is left to take it back. Raised
+// on every machine; without authority it names no piece.
 delegate void FMars_Delegate_CookingFeed_OnPieceLetGo(FCk_Handle_CookingFeed InFeed, FCk_Handle_FoodPiece InPiece);
 event void FMars_Delegate_CookingFeed_OnPieceLetGo_MC(FCk_Handle_CookingFeed InFeed, FCk_Handle_FoodPiece InPiece);
 

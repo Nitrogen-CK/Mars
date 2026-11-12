@@ -11,6 +11,8 @@ struct FMars_CookingFeed_Drain
     // Pieces utils_cooking_feed::Return_Piece let go where they lie: no platter was left to take them back.
     TArray<FCk_Handle_FoodPiece> LetGoPieces;
     TArray<EMars_CookingFeed_Refusal> Refusals;
+    // Transfers Apply_Begin started.
+    int32 Begun = 0;
 }
 
 // Drains Reset -> SetSource -> Cancel -> ResolveAdmission -> BeginTransfer, then broadcasts: every settle, every piece let
@@ -26,6 +28,8 @@ struct FMars_CookingFeed_Drain
 // The feed is the one owner of the put-back: every piece it took and nobody admitted (cancelled, rejected, or orphaned by a
 // new source) goes back to the platter it came from, or is let go where it lies when no platter is left to take it
 // (utils_cooking_feed::Return_Piece).
+// Only the authority's feed applies requests: a copy without authority drops every request it is given and reads the feed
+// through the replicated ledger, which this drain publishes once after its last apply and before it broadcasts.
 class UMars_Processor_CookingFeed_HandleRequests : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -54,6 +58,9 @@ class UMars_Processor_CookingFeed_HandleRequests : UCk_Processor_Script_Base_UE
         // InRequests is invalid past this line; removing before broadcasting lets re-entrant requests survive.
         Drain.Feed.Request_TryRemove(FMars_Fragment_CookingFeed_Requests);
 
+        if (utils_net::Get_HasAuthority(InHandle) == false)
+        { return; }
+
         if (HasReset)
         { Apply_Reset(Drain, InState); }
 
@@ -69,7 +76,18 @@ class UMars_Processor_CookingFeed_HandleRequests : UCk_Processor_Script_Base_UE
         for (const auto& Request : BeginRequests)
         { Apply_Begin(Drain, InState, Request); }
 
+        Publish(Drain);
         Broadcast(Drain, InState);
+    }
+
+    // What this drain announced goes into the ledger with the state it left.
+    private void Publish(FMars_CookingFeed_Drain& InDrain)
+    {
+        auto Answers = FMars_CookingFeed_Answers();
+        Answers.Refusals = InDrain.Refusals;
+        Answers.LetGo = InDrain.LetGoPieces.Num();
+        Answers.Begun = InDrain.Begun;
+        utils_cooking_feed::Publish(InDrain.Feed, Answers);
     }
 
     // The generation moves first: an answer for any older piece is stale from here on. The source keeps what it holds. A
@@ -216,6 +234,7 @@ class UMars_Processor_CookingFeed_HandleRequests : UCk_Processor_Script_Base_UE
             FMars_CookingFeed_Reservation(FMars_CookingFeed_PieceId(InState.Generation, TransferIndex), Piece, InState.Source));
         InState.Phase = EMars_CookingFeed_Phase::Reach;
         InState.PhaseSeconds = 0.0f;
+        InDrain.Begun += 1;
     }
 
     private void Record_Settle(FMars_CookingFeed_Drain& InDrain, const FMars_CookingFeed_PieceId& InPiece, EMars_CookingFeed_Settle InSettle)
