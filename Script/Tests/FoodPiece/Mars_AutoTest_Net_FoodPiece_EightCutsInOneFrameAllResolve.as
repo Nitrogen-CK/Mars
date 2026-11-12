@@ -98,7 +98,7 @@ class UCk_AutoTest_Net_FoodPiece_EightCutsInOneFrameAllResolve : UMars_AutoTestR
     UFUNCTION()
     private void OnServerHeld(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
     {
-        FinishSuccess();
+        End_Server();
     }
 
     UFUNCTION()
@@ -115,6 +115,6 @@ class UCk_AutoTest_Net_FoodPiece_EightCutsInOneFrameAllResolve : UMars_AutoTestR
         Assert_Equals_Int(Get_WorldItemCountNear(_FloorTop), 0, "no whole food left on the client");
         Assert_Equals_Int(Get_EnsureDelta(), 0, "no ensure");
         Log_Result(f"pieces={Get_PieceEntitiesNear(_FloorTop).Num()} worldItems={Get_WorldItemCountNear(_FloorTop)}");
-        FinishSuccess();
+        End_Client();
     }
 }

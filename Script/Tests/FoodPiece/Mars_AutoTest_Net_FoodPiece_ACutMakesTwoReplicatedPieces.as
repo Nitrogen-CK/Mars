@@ -1,8 +1,8 @@
 // The server cuts a whole meat slab that replicates. Inside its OnCutResolved: the outcome is Cut, both halves are Ready
 // FoodPieces with a Ready RuntimeMesh, a transform and a replication driver, owned by the replicated spawn owner, of the
 // source's lineage with the source as parent, their masses summing to the source's; the source is still live. A frame
-// later the source is gone and both halves wear a display. The client gets two piece scripts near the test's X, neither a
-// FoodPiece, and no world item is left there.
+// later the source is gone and both halves wear a display. The client gets two piece scripts near the test's X, each a
+// Ready FoodPiece inside 3 s of arriving, and no world item is left there.
 // Surface: Ck.FoodPiece.Net.AS_FoodPiece_ACutMakesTwoReplicatedPieces
 class UCk_AutoTest_Net_FoodPiece_ACutMakesTwoReplicatedPieces : UMars_AutoTestRig_NetFoodPiece
 {
@@ -13,6 +13,8 @@ class UCk_AutoTest_Net_FoodPiece_ACutMakesTwoReplicatedPieces : UMars_AutoTestRi
     private FGuid _SourceLineage;
     private float _SourceMassKg = 0.0;
     private FMars_FoodPiece_CutResult _Result;
+    private const float64 k_BuildSeconds = 3.0;
+    private float64 _ClientArrived = 0.0;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
@@ -118,7 +120,7 @@ class UCk_AutoTest_Net_FoodPiece_ACutMakesTwoReplicatedPieces : UMars_AutoTestRi
     UFUNCTION()
     private void OnServerHeld(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
     {
-        FinishSuccess();
+        End_Server();
     }
 
     UFUNCTION()
@@ -131,19 +133,29 @@ class UCk_AutoTest_Net_FoodPiece_ACutMakesTwoReplicatedPieces : UMars_AutoTestRi
     UFUNCTION()
     private void OnClientHalvesThere(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
     {
+        _ClientArrived = Get_Now();
+        WaitUntil(n"Is_ClientHalvesBuiltOrLate", n"OnClientHalvesBuiltOrLate", k_SlowPolls);
+    }
+
+    UFUNCTION()
+    private void Is_ClientHalvesBuiltOrLate(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Result = OutResult;
+        Result.Set(Get_ReadyPieceCountNear(_FloorTop) == 2 || Get_Now() - _ClientArrived > k_BuildSeconds);
+    }
+
+    UFUNCTION()
+    private void OnClientHalvesBuiltOrLate(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
+    {
         const auto Pieces = Get_PieceEntitiesNear(_FloorTop);
-        auto FoodPieces = 0;
-        for (const auto& Piece : Pieces)
-        {
-            if (Piece.Is_FoodPiece())
-            { ++FoodPieces; }
-        }
+        const auto FoodPieces = Get_ReadyPieceCountNear(_FloorTop);
+        const auto Seconds = Get_Now() - _ClientArrived;
 
         Assert_Equals_Int(Pieces.Num(), 2, "two piece scripts near the test's X");
-        Assert_Equals_Int(FoodPieces, 0, "neither is a FoodPiece on the client");
+        Assert_Equals_Int(FoodPieces, 2, f"both are Ready FoodPieces on the client inside {k_BuildSeconds} s (after {Seconds} s)");
         Assert_Equals_Int(Get_WorldItemCountNear(_FloorTop), 0, "no world item is left near the test's X");
         Assert_Equals_Int(Get_EnsureDelta(), 0, "no ensure");
-        Log_Result(f"pieces={Pieces.Num()} foodPieces={FoodPieces} worldItems={Get_WorldItemCountNear(_FloorTop)}");
-        FinishSuccess();
+        Log_Result(f"pieces={Pieces.Num()} foodPieces={FoodPieces} builtAfter={Seconds}s worldItems={Get_WorldItemCountNear(_FloorTop)}");
+        End_Client();
     }
 }

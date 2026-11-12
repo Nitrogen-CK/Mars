@@ -128,7 +128,7 @@ class UCk_AutoTest_Net_FoodPiece_ACutPiecesLedgerIsThereFromBirth : UMars_AutoTe
     UFUNCTION()
     private void OnServerHeld(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
     {
-        FinishSuccess();
+        End_Server();
     }
 
     // Two piece scripts whose ledgers carry an identity and recorded check numbers, and the server's report.
@@ -172,7 +172,7 @@ class UCk_AutoTest_Net_FoodPiece_ACutPiecesLedgerIsThereFromBirth : UMars_AutoTe
 
         Assert_Equals_Int(Get_EnsureDelta(), 0, "no ensure");
         Log_Result(f"pieces={Pieces.Num()} serial={Report.Serial}");
-        FinishSuccess();
+        End_Client();
     }
 
     private void Assert_ClientLedger(FCk_Handle InPiece, float InVolumeCm3, int32 InTriangles, FString InName)

@@ -88,7 +88,7 @@ class UCk_AutoTest_Net_FoodPiece_ACookStateReachesAClientsLook : UMars_AutoTestR
     UFUNCTION()
     private void OnServerHeld(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
     {
-        FinishSuccess();
+        End_Server();
     }
 
     UFUNCTION()
@@ -158,6 +158,6 @@ class UCk_AutoTest_Net_FoodPiece_ACookStateReachesAClientsLook : UMars_AutoTestR
         const auto Shown = Get_ShownOilCoat(_Piece);
         const auto ShownNow = Shown.IsSet() ? Shown.GetValue() : -1.0f;
         Log_Result(f"raisedAtFirst={_RaisedAtFirst} serialAtFirst={_SerialAtFirst} oilShownAtFirst={_ShownAtFirst} raised={_Raised} serial={_Piece.Get_CookSerial()} oilShownNow={ShownNow}");
-        FinishSuccess();
+        End_Client();
     }
 }

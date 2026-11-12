@@ -67,7 +67,7 @@ class UCk_AutoTest_Net_FoodPiece_TheRecipeArrivesExact : UMars_AutoTestRig_NetFo
     UFUNCTION()
     private void OnServerHeld(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
     {
-        FinishSuccess();
+        End_Server();
     }
 
     UFUNCTION()
@@ -120,6 +120,6 @@ class UCk_AutoTest_Net_FoodPiece_TheRecipeArrivesExact : UMars_AutoTestRig_NetFo
         Assert_Equals_Int(Negatives, 1, "one half kept the negative side");
         Assert_Equals_Int(Get_EnsureDelta(), 0, "no ensure");
         Log_Result(f"pieces={Pieces.Num()} positive={Positives} negative={Negatives} exact={Exact}");
-        FinishSuccess();
+        End_Client();
     }
 }

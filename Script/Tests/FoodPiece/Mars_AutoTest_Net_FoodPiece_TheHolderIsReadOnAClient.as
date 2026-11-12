@@ -73,7 +73,7 @@ class UCk_AutoTest_Net_FoodPiece_TheHolderIsReadOnAClient : UMars_AutoTestRig_Ne
     UFUNCTION()
     private void OnServerHeld(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
     {
-        FinishSuccess();
+        End_Server();
     }
 
     private void Record_OwnHolder()
@@ -124,6 +124,6 @@ class UCk_AutoTest_Net_FoodPiece_TheHolderIsReadOnAClient : UMars_AutoTestRig_Ne
         Assert_False(_EverHadOwnHolder, "the client's own holder fragment was never added");
         Assert_Equals_Int(Get_EnsureDelta(), 0, "no ensure");
         Log_Result(f"free={ck::Is_NOT_Valid(_Piece.TryGet_ReplicatedHolder())} ownHolder={_EverHadOwnHolder}");
-        FinishSuccess();
+        End_Client();
     }
 }

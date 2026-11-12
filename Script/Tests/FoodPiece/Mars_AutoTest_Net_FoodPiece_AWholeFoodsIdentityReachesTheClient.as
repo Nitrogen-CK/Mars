@@ -71,7 +71,7 @@ class UCk_AutoTest_Net_FoodPiece_AWholeFoodsIdentityReachesTheClient : UMars_Aut
     UFUNCTION()
     private void OnServerHeld(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
     {
-        FinishSuccess();
+        End_Server();
     }
 
     // Every frame from the copy becoming a FoodPiece: the Ids it read; done once it reads the server's identity, or once
@@ -112,6 +112,6 @@ class UCk_AutoTest_Net_FoodPiece_AWholeFoodsIdentityReachesTheClient : UMars_Aut
         Assert_True(_Piece.Get_IsWhole(), "the client's copy is whole");
         Assert_Equals_Int(Get_EnsureDelta(), 0, "no ensure");
         Log_Result(f"id={_Piece.Get_Id().ToString(EGuidFormats::Short)} server={Report.SourceId.ToString(EGuidFormats::Short)} seen={_SeenIds.Num()} elapsed={_Elapsed}");
-        FinishSuccess();
+        End_Client();
     }
 }

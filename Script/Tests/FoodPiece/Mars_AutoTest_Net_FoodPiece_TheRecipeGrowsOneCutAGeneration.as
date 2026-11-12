@@ -96,7 +96,7 @@ class UCk_AutoTest_Net_FoodPiece_TheRecipeGrowsOneCutAGeneration : UMars_AutoTes
     UFUNCTION()
     private void OnServerHeld(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
     {
-        FinishSuccess();
+        End_Server();
     }
 
     private TArray<FCk_Handle> Get_Deepest()
@@ -144,6 +144,6 @@ class UCk_AutoTest_Net_FoodPiece_TheRecipeGrowsOneCutAGeneration : UMars_AutoTes
         Assert_Equals_Int(LastPositive, 1, "one deepest piece kept the third cut's positive side, the other its negative");
         Assert_Equals_Int(Get_EnsureDelta(), 0, "no ensure");
         Log_Result(f"deepest={Deepest.Num()} ordered={Ordered} lastPositive={LastPositive}");
-        FinishSuccess();
+        End_Client();
     }
 }

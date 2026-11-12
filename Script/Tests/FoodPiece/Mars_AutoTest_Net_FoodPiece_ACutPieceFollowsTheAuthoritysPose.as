@@ -101,7 +101,7 @@ class UCk_AutoTest_Net_FoodPiece_ACutPieceFollowsTheAuthoritysPose : UMars_AutoT
     UFUNCTION()
     private void OnServerHeld(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
     {
-        FinishSuccess();
+        End_Server();
     }
 
     UFUNCTION()
@@ -162,6 +162,6 @@ class UCk_AutoTest_Net_FoodPiece_ACutPieceFollowsTheAuthoritysPose : UMars_AutoT
         Assert_True(NegativeLocation.Equals(Report.NegativeLocation, k_ToleranceCm), f"the client's negative half did not move ({NegativeLocation} vs {Report.NegativeLocation})");
         Assert_Equals_Int(Get_EnsureDelta(), 0, "no ensure");
         Log_Result(f"positive at {World.GetLocation()} yaw {World.Rotator().Yaw} after {Seconds} s; negative at {NegativeLocation}");
-        FinishSuccess();
+        End_Client();
     }
 }

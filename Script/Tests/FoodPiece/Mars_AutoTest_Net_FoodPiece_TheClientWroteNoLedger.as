@@ -86,7 +86,7 @@ class UCk_AutoTest_Net_FoodPiece_TheClientWroteNoLedger : UMars_AutoTestRig_NetF
     UFUNCTION()
     private void OnServerHeld(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
     {
-        FinishSuccess();
+        End_Server();
     }
 
     UFUNCTION()
@@ -145,6 +145,6 @@ class UCk_AutoTest_Net_FoodPiece_TheClientWroteNoLedger : UMars_AutoTestRig_NetF
         Assert_Equals_Int(Bodies, 0, "the client's copies of the halves have no Jolt body");
         Assert_Equals_Int(Get_EnsureDelta(), 0, "no ensure");
         Log_Result(f"body={_ClientBody} holder={_ClientHolder} serial={_ClientSerial} halfBodies={Bodies}");
-        FinishSuccess();
+        End_Client();
     }
 }

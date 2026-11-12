@@ -82,7 +82,7 @@ class UCk_AutoTest_Net_FoodPiece_ALateBinderStartsFromTheLedgerAsItStands : UMar
     UFUNCTION()
     private void OnServerHeld(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
     {
-        FinishSuccess();
+        End_Server();
     }
 
     UFUNCTION()
@@ -130,6 +130,6 @@ class UCk_AutoTest_Net_FoodPiece_ALateBinderStartsFromTheLedgerAsItStands : UMar
         Assert_Equals_Float(_Shown, Get_Second().OilCoat, k_OilTolerance, "the client's display shows the second write's oil coat");
         Assert_Equals_Int(Get_EnsureDelta(), 0, "no ensure");
         Log_Result(f"raised={_Raised} serial={_Piece.Get_CookSerial()} oilShown={_Shown}");
-        FinishSuccess();
+        End_Client();
     }
 }

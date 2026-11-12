@@ -16,7 +16,9 @@ struct FMars_Feature_FoodPiece {}
 // replicate. A piece whose entity replicates carries FMars_Fragment_FoodPiece_Net, the authority's replicated ledger: its
 // identity, its cook state, who holds it and its geometry's check numbers. A copy without authority adopts the identity,
 // wears the cook state (OnCookStateChanged) and checks its own geometry against the numbers; only the authority gives a
-// piece a body.
+// piece a body. A machine without the slice rebuilds a cut piece from its recipe (the Replay processors): it imports the
+// definition's mesh once, slices each cut of a lineage once through its local replay memo, and shares the result onto the
+// replicated entity; the memo and everything it holds are local and read by no simulation.
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Vocabulary
@@ -464,8 +466,8 @@ struct FMars_Fragment_FoodPiece_PendingCuts
 //--------------------------------------------------------------------------------------------------------------------------
 
 // A cut whose source replicates makes its halves as replicated piece scripts (UMars_FoodPiece_EntityScript). Their spawn
-// data is the recipe, the identity and the mass; the authority shares the slice's geometry onto each, a client keeps the
-// recipe. The cut commits once both halves are composed: the source waits with FMars_Fragment_FoodPiece_PendingCommit, and
+// data is the recipe, the identity and the mass; the authority shares the slice's geometry onto each, a client rebuilds it
+// from the recipe (FMars_Fragment_FoodPiece_Replay). The cut commits once both halves are composed: the source waits with FMars_Fragment_FoodPiece_PendingCommit, and
 // the second half to compose broadcasts the cut (utils_foodpiece::Add_Born).
 
 // What a piece script is born from on the authority.
@@ -562,10 +564,206 @@ struct FMars_FoodPiece_ReplaySpec
     TSoftObjectPtr<UStaticMesh> Mesh;
 }
 
+enum EMars_FoodPiece_ReplayState
+{
+    // The recipe is still being walked: an import or a slice it needs has not resolved.
+    Waiting,
+    // The recipe's geometry is shared onto the entity.
+    Built,
+    // The recipe cannot be rebuilt here (FMars_FoodPiece_ReplayResult::Failure says why); the entity stays a non-piece.
+    Failed
+}
+
+enum EMars_FoodPiece_ReplayFailure
+{
+    None,
+    // The definition's mesh did not import on this machine.
+    ImportFailed,
+    // RuntimeMesh refused a slice the recipe needs (FMars_FoodPiece_ReplayResult::SliceOutcome).
+    SliceRejected,
+    // The recipe cuts a piece along a plane other than the one this machine already split it along.
+    PlaneMismatch
+}
+
+// How a machine without the slice fared rebuilding one entity's recipe.
+struct FMars_FoodPiece_ReplayResult
+{
+    UPROPERTY()
+    EMars_FoodPiece_ReplayState State = EMars_FoodPiece_ReplayState::Waiting;
+
+    UPROPERTY()
+    EMars_FoodPiece_ReplayFailure Failure = EMars_FoodPiece_ReplayFailure::None;
+
+    // Set only for SliceRejected.
+    UPROPERTY()
+    TOptional<ECk_RuntimeMesh_SliceOutcome> SliceOutcome;
+}
+
+// On the entity of a piece script that a machine without the slice rebuilds; written by Request_Replay (the spec) and the
+// Replay processor (the result).
 struct FMars_Fragment_FoodPiece_Replay
 {
     UPROPERTY()
     FMars_FoodPiece_ReplaySpec Spec;
+
+    UPROPERTY()
+    EMars_FoodPiece_ReplayState State = EMars_FoodPiece_ReplayState::Waiting;
+
+    UPROPERTY()
+    EMars_FoodPiece_ReplayFailure Failure = EMars_FoodPiece_ReplayFailure::None;
+
+    UPROPERTY()
+    TOptional<ECk_RuntimeMesh_SliceOutcome> SliceOutcome;
+}
+
+// While the entity's replay is Waiting.
+struct FMars_Tag_FoodPiece_AwaitsReplay {}
+
+// On the one local entity whose lifetime keeps the replay memo swept (UMars_Processor_FoodPiece_ReplayKeeper).
+struct FMars_Tag_FoodPiece_ReplayKeeper {}
+
+// One definition's mesh imported on this machine, on a local entity: the root of every lineage of that definition.
+struct FMars_FoodPiece_ReplayImport
+{
+    UPROPERTY(meta = (Categories = "FoodDef.Mars"))
+    FGameplayTag Definition;
+
+    UPROPERTY()
+    FCk_Handle_RuntimeMesh Geometry;
+}
+
+enum EMars_FoodPiece_ReplayNodeState
+{
+    // Not cut on this machine yet.
+    Leaf,
+    // Its slice is submitted and unresolved.
+    InFlight,
+    // Cut along SplitPlane into Positive and Negative.
+    Split,
+    // Its slice was refused (Rejection).
+    Rejected
+}
+
+// One geometry of a lineage as this machine rebuilt it. A node's key is its path from the root: the plane and side of
+// every cut on the way; a piece is cut once, so a node has at most one split plane.
+struct FMars_FoodPiece_ReplayNode
+{
+    UPROPERTY()
+    FCk_Handle_RuntimeMesh Geometry;
+
+    // The entity this node's geometry was shared onto; invalid until one was.
+    UPROPERTY()
+    FCk_Handle Piece;
+
+    UPROPERTY()
+    EMars_FoodPiece_ReplayNodeState State = EMars_FoodPiece_ReplayNodeState::Leaf;
+
+    // Meaningful from InFlight on.
+    UPROPERTY()
+    FCk_RuntimeMesh_PlaneLocal SplitPlane;
+
+    // Node indices of the two sides, once Split.
+    UPROPERTY()
+    int32 Positive = -1;
+
+    UPROPERTY()
+    int32 Negative = -1;
+
+    UPROPERTY()
+    ECk_RuntimeMesh_SliceOutcome Rejection = ECk_RuntimeMesh_SliceOutcome::Succeeded;
+}
+
+// Every geometry this machine rebuilt of one lineage; node 0 is the root, whose geometry is the definition's import.
+struct FMars_FoodPiece_ReplayLineage
+{
+    UPROPERTY()
+    FGuid Lineage;
+
+    UPROPERTY(meta = (Categories = "FoodDef.Mars"))
+    FGameplayTag Definition;
+
+    UPROPERTY()
+    TArray<FMars_FoodPiece_ReplayNode> Nodes;
+
+    // How long the lineage has had no slice in flight and no live piece.
+    UPROPERTY()
+    float32 OrphanSeconds = 0.0f;
+}
+
+// One replay slice in flight: the operation RuntimeMesh answers with and the node it cuts.
+struct FMars_FoodPiece_ReplayFlight
+{
+    UPROPERTY()
+    FGuid OperationID;
+
+    UPROPERTY()
+    FGuid Lineage;
+
+    UPROPERTY()
+    int32 Node = -1;
+}
+
+struct FMars_FoodPiece_ReplayCounts
+{
+    UPROPERTY()
+    int32 Slices = 0;
+
+    UPROPERTY()
+    int32 Built = 0;
+
+    UPROPERTY()
+    int32 Failed = 0;
+}
+
+// On the world's transient entity (the replay processors' own handle, which also owns every import, replay geometry and
+// the keeper): every lineage this machine rebuilds, so a cut shared by several pieces is sliced once and a piece that
+// arrives after its own halves still finds its geometry. Local to the machine, never replicated. Written only by the
+// Replay and ReplayKeeper processors.
+struct FMars_Fragment_FoodPiece_ReplayMemo
+{
+    UPROPERTY()
+    TArray<FMars_FoodPiece_ReplayImport> Imports;
+
+    UPROPERTY()
+    TArray<FMars_FoodPiece_ReplayLineage> Lineages;
+
+    UPROPERTY()
+    TArray<FMars_FoodPiece_ReplayFlight> Flights;
+
+    UPROPERTY()
+    FMars_FoodPiece_ReplayCounts Tally;
+
+    UPROPERTY()
+    FCk_Handle Keeper;
+}
+
+// What utils_foodpiece::Get_ReplayTally reads of a world's replay memo: the slices submitted, the entities built and
+// failed, and the lineages and live geometry entities (imports included) the memo holds now.
+struct FMars_FoodPiece_ReplayTally
+{
+    UPROPERTY()
+    int32 Slices = 0;
+
+    UPROPERTY()
+    int32 Built = 0;
+
+    UPROPERTY()
+    int32 Failed = 0;
+
+    UPROPERTY()
+    int32 Lineages = 0;
+
+    UPROPERTY()
+    int32 Geometries = 0;
+}
+
+// Once per replayed entity, when its replay resolves Built or Failed.
+delegate void FMars_Delegate_FoodPiece_OnReplayResolved(FCk_Handle InEntity, EMars_FoodPiece_ReplayState InState);
+event void FMars_Delegate_FoodPiece_OnReplayResolved_MC(FCk_Handle InEntity, EMars_FoodPiece_ReplayState InState);
+
+struct FMars_Fragment_FoodPiece_ReplaySignals
+{
+    FMars_Delegate_FoodPiece_OnReplayResolved_MC OnReplayResolved;
 }
 
 // The one ledger holding the piece (a platter, a board, a pan, a fryer): the fact every "another ledger holds it" check

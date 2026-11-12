@@ -67,7 +67,7 @@ class UCk_AutoTest_Net_FoodPiece_TheClientWroteNothing : UMars_AutoTestRig_NetFo
     UFUNCTION()
     private void OnServerHeld(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
     {
-        FinishSuccess();
+        End_Server();
     }
 
     UFUNCTION()
@@ -109,6 +109,6 @@ class UCk_AutoTest_Net_FoodPiece_TheClientWroteNothing : UMars_AutoTestRig_NetFo
         Assert_Equals_Int(Get_EnsureDelta(), 0, "no ensure");
         const auto Outcome = _Cuts.Num() > 0 ? _Cuts[0].Outcome : EMars_FoodPiece_CutOutcome::Failed;
         Log_Result(f"resolutions={_Cuts.Num()} outcome={Outcome :n} raw={Get_IsCookStateZero(_Piece.Get_CookState())}");
-        FinishSuccess();
+        End_Client();
     }
 }

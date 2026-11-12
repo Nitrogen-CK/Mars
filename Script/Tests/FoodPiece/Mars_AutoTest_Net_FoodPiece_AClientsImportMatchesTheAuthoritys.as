@@ -101,7 +101,7 @@ class UCk_AutoTest_Net_FoodPiece_AClientsImportMatchesTheAuthoritys : UMars_Auto
     UFUNCTION()
     private void OnServerHeld(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
     {
-        FinishSuccess();
+        End_Server();
     }
 
     // Every one of the nine copies checked, or the check time has passed since the first copy was there.
@@ -152,7 +152,7 @@ class UCk_AutoTest_Net_FoodPiece_AClientsImportMatchesTheAuthoritys : UMars_Auto
         Assert_Equals_Int(Differs, 0, "no copy differs");
         Assert_Equals_Int(Get_EnsureDelta(), 0, "no ensure");
         Log_Result(f"foods={Foods.Num()} matches={Matches} differs={Differs}");
-        FinishSuccess();
+        End_Client();
     }
 
     private void Log_Pair(FCk_Handle_FoodPiece InFood)

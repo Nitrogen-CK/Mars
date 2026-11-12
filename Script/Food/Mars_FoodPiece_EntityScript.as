@@ -1,14 +1,16 @@
 // A cut piece of a food that replicates: one half of a cut the authority made (utils_foodpiece::Request_SpawnCutPiece).
 // Every machine composes its root transform and its entity tag and resolves its food from the recipe's definition id. The
 // authority's copy carries its birth (the slice's geometry and the half's spec) and composes the FoodPiece from it, then
-// dresses it; a copy without one keeps what rebuilding it needs (utils_foodpiece::Request_Replay) and is not a FoodPiece.
+// dresses it. A copy without one asks for its recipe to be rebuilt (utils_foodpiece::Request_Replay) and continues its
+// construction until the replay resolves: Built composes the FoodPiece on the shared geometry, dresses it and wears the
+// authority's cook state; Failed finishes it as a non-piece that wears nothing.
 //
 // Stance REPLICATES from the replicated spawn owner: the spawn data is the recipe, the identity and the mass, and the root
-// transform replicates; the authority shares the cut's geometry, a client builds its own. Not a world item, so it has no
-// pickup.
+// transform replicates; the authority shares the cut's geometry, a client rebuilds its own from the recipe. Only the
+// authority's piece has a body (none is added here). Not a world item, so it has no pickup.
 class UMars_FoodPiece_EntityScript : UCk_GenericEntityScript_UE
 {
-    // Replicates from the spawn owner; spawn data is the recipe, the identity and the mass.
+    // Stance REPLICATES: from the spawn owner; spawn data is the recipe, the identity and the mass.
     default _Replication = ECk_Replication::Replicates;
 
     UPROPERTY(ExposeOnSpawn)
@@ -33,6 +35,10 @@ class UMars_FoodPiece_EntityScript : UCk_GenericEntityScript_UE
 
     UPROPERTY(ExposeOnSpawn)
     float MassKg = 0.0;
+
+    private UMars_Food_Def _Food;
+    private FCk_Handle _Entity;
+    private FCk_Handle_FoodPiece _Piece;
 
     UFUNCTION(BlueprintOverride)
     ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
@@ -66,8 +72,67 @@ class UMars_FoodPiece_EntityScript : UCk_GenericEntityScript_UE
             return ECk_EntityScript_ConstructionFlow::Finished;
         }
 
+        // The authority's piece is born of a cut: one spawned any other way has no geometry to share, and the authority
+        // rebuilds nothing.
+        if (ck::EnsureIfNot(utils_net::Get_HasAuthority(InHandle) == false,
+            f"[FoodPiece] [{InHandle.ToString()}] is a piece script with authority and no birth: spawn it through utils_foodpiece::Request_SpawnCutPiece"))
+        {
+            utils_entity_lifetime::Request_DestroyEntity(InHandle);
+            return ECk_EntityScript_ConstructionFlow::Finished;
+        }
+
+        _Food = Food;
+        _Entity = InHandle;
         utils_foodpiece::Request_Replay(InHandle, Make_ReplaySpec(Food));
-        return ECk_EntityScript_ConstructionFlow::Finished;
+        utils_foodpiece::BindTo_OnReplayResolved(InHandle, FMars_Delegate_FoodPiece_OnReplayResolved(this, n"OnReplayResolved"));
+        return ECk_EntityScript_ConstructionFlow::Continue;
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void DoEndPlay(FCk_Handle InHandle)
+    {
+        if (ck::IsValid(_Entity))
+        { utils_foodpiece::UnbindFrom_OnReplayResolved(_Entity, FMars_Delegate_FoodPiece_OnReplayResolved(this, n"OnReplayResolved")); }
+
+        if (ck::IsValid(_Piece))
+        { _Piece.UnbindFrom_OnCookStateChanged(FMars_Delegate_FoodPiece_OnCookStateChanged(this, n"OnPieceCookStateChanged")); }
+
+        _Entity = FCk_Handle();
+        _Piece = FCk_Handle_FoodPiece();
+    }
+
+    // Built: the rebuilt geometry is shared onto the entity, so the piece is Ready at once. Failed already logged (the Replay
+    // processor): the entity stays a non-piece.
+    UFUNCTION()
+    private void OnReplayResolved(FCk_Handle InEntity, EMars_FoodPiece_ReplayState InState)
+    {
+        if (InState != EMars_FoodPiece_ReplayState::Built)
+        {
+            DoFinishConstruction();
+            return;
+        }
+
+        auto Entity = InEntity;
+        const auto Replay = utils_foodpiece::TryGet_Replay(Entity);
+        // A rejected spec already ensured (Add).
+        _Piece = ck::IsValid(_Food) && Replay.IsSet() ? utils_foodpiece::Add(Entity, Replay.GetValue().Piece) : FCk_Handle_FoodPiece();
+        if (ck::Is_NOT_Valid(_Piece))
+        {
+            utils_entity_lifetime::Request_DestroyEntity(Entity);
+            return;
+        }
+
+        _Piece.BindTo_OnCookStateChanged(FMars_Delegate_FoodPiece_OnCookStateChanged(this, n"OnPieceCookStateChanged"));
+        _Food.Add_Display(_Piece);
+        DoFinishConstruction();
+    }
+
+    // A copy without authority wears the cook state the authority's ledger brought; a piece not dressed yet starts from it
+    // when it is.
+    UFUNCTION()
+    private void OnPieceCookStateChanged(FCk_Handle_FoodPiece InPiece)
+    {
+        InPiece.Write_Look(utils_cookstate::Make_DisplayParams(InPiece.Get_CookState()));
     }
 
     // The piece the spawn data and the food give: its identity, lineage, mass and recipe, and the food's kind, tuners, cap

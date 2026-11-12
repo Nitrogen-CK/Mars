@@ -2,7 +2,9 @@
 // spawns whole foods 5 cm above it under the replicated spawn owner, waits until they are Ready (and the first at rest),
 // cuts them and records every OnCutResolved, tracking every half a cut reports. What the client compares against goes out
 // in one test-only replicated report fragment on the subject. Each machine counts the ensures raised since it began and
-// logs one [FoodPieceNetTest] line.
+// logs one [FoodPieceNetTest] line. Every test ends clean: the server destroys what lies at its X and holds
+// (End_Server); the client waits until no piece script is left at its X and its replay memo holds no lineage and no
+// geometry (End_Client).
 
 // Written by the server only, through Get_Fragment + Request_MarkReplicationDirty (test-only: a feature's processors are
 // the only writers in game code).
@@ -52,6 +54,10 @@ struct FMars_Fragment_TESTONLY_NetFoodPieceReport
     UPROPERTY()
     int32 NegativeCheckTriangles = 0;
 
+    // How many uncut pieces the server's test left.
+    UPROPERTY()
+    int32 LeafCount = 0;
+
     UPROPERTY()
     int32 Serial = 0;
 }
@@ -67,6 +73,10 @@ class UMars_AutoTestRig_NetFoodPiece : UMars_AutoTestRig_NetWorldItem
 
     protected FVector _FloorTop;
     private int32 _EnsuresAtStart = 0;
+    // The server's test entity: the owner of the floor and of every slice the test makes by hand.
+    protected FCk_Handle _ServerTestEntity;
+    // In order: every slice the server's test made by hand (Slice_ByHand).
+    protected TArray<FCk_RuntimeMesh_SliceResult> _ByHandSlices;
 
     // In parallel: one entry per OnCutResolved of a piece this machine cut.
     protected TArray<FCk_Handle_FoodPiece> _CutSources;
@@ -124,6 +134,7 @@ class UMars_AutoTestRig_NetFoodPiece : UMars_AutoTestRig_NetWorldItem
     // Before the spawn owner is published: the floor the foods lie on.
     protected void Begin_ServerFloor(FCk_Handle InTestEntity)
     {
+        _ServerTestEntity = InTestEntity;
         Spawn_ServerFloor(InTestEntity, _FloorTop);
     }
 
@@ -400,5 +411,227 @@ class UMars_AutoTestRig_NetFoodPiece : UMars_AutoTestRig_NetWorldItem
     protected float64 Get_Now()
     {
         return System::GetGameTimeInSeconds();
+    }
+
+    //----------------------------------------------------------------------------------------------------------------------
+    // The replay
+    //----------------------------------------------------------------------------------------------------------------------
+
+    // This machine's replay memo as counts.
+    protected FMars_FoodPiece_ReplayTally Get_Tally()
+    {
+        return utils_foodpiece::Get_ReplayTally(ck::TransientEntity());
+    }
+
+    protected FString Describe_Tally()
+    {
+        const auto Tally = Get_Tally();
+        return f"slices={Tally.Slices} built={Tally.Built} failed={Tally.Failed} lineages={Tally.Lineages} geometries={Tally.Geometries}";
+    }
+
+    // Every piece script near InNear on this machine that is a Ready FoodPiece.
+    protected TArray<FCk_Handle_FoodPiece> Get_ReadyPiecesNear(FVector InNear)
+    {
+        TArray<FCk_Handle_FoodPiece> Ready;
+        for (auto Entity : Get_PieceEntitiesNear(InNear))
+        {
+            if (Entity.Is_FoodPiece() && Entity.As_FoodPiece().Get_Status() == EMars_FoodPiece_Status::Ready)
+            { Ready.Add(Entity.As_FoodPiece()); }
+        }
+
+        return Ready;
+    }
+
+    protected int32 Get_ReadyPieceCountNear(FVector InNear)
+    {
+        return Get_ReadyPiecesNear(InNear).Num();
+    }
+
+    // The piece of InPieces with InId; invalid when none has it.
+    protected FCk_Handle_FoodPiece Find_ById(TArray<FCk_Handle_FoodPiece> InPieces, FGuid InId)
+    {
+        for (const auto& Piece : InPieces)
+        {
+            if (Piece.Get_Id() == InId)
+            { return Piece; }
+        }
+
+        return FCk_Handle_FoodPiece();
+    }
+
+    // InPieces that compared InResult against the authority's numbers.
+    protected int32 Get_CheckCount(TArray<FCk_Handle_FoodPiece> InPieces, EMars_FoodPiece_CheckResult InResult)
+    {
+        auto Count = 0;
+        for (const auto& Piece : InPieces)
+        {
+            if (Piece.Get_CheckResult() == InResult)
+            { ++Count; }
+        }
+
+        return Count;
+    }
+
+    // None of InPieces is still Unchecked.
+    protected bool Get_AreChecked(TArray<FCk_Handle_FoodPiece> InPieces)
+    {
+        return Get_CheckCount(InPieces, EMars_FoodPiece_CheckResult::Unchecked) == 0;
+    }
+
+    //----------------------------------------------------------------------------------------------------------------------
+    // The slab (server)
+    //----------------------------------------------------------------------------------------------------------------------
+
+    // Lays the floor, waits for the replicated spawn owner, spawns the slab and calls On_ServerSlabStill once it is Ready
+    // and at rest.
+    protected void Begin_ServerSlab(FCk_Handle InTestEntity)
+    {
+        Begin_ServerFloor(InTestEntity);
+        WaitUntil(n"Is_ReplicatedSpawnOwnerPublished", n"OnRigOwnerPublished", k_SlowPolls);
+    }
+
+    protected void On_ServerSlabStill() {}
+
+    UFUNCTION()
+    private void OnRigOwnerPublished(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
+    {
+        Spawn_ServerSlab();
+        WaitUntil(n"Is_RigSlabStill", n"OnRigSlabStill", k_SlowPolls);
+    }
+
+    UFUNCTION()
+    private void Is_RigSlabStill(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Result = OutResult;
+        Result.Set(Tick_SlabReadyAndStill());
+    }
+
+    UFUNCTION()
+    private void OnRigSlabStill(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
+    {
+        On_ServerSlabStill();
+    }
+
+    // The middle of InPiece's local bounds on InAxis (0 X, 1 Y), as a plane with that axis as its normal.
+    protected FCk_RuntimeMesh_PlaneLocal Make_MiddlePlane(FCk_Handle_FoodPiece InPiece, int32 InAxis)
+    {
+        const auto Metrics = utils_runtime_mesh::Get_Metrics(InPiece.Get_Geometry());
+        const auto Centre = (Metrics.Get_BoundsMinCm() + Metrics.Get_BoundsMaxCm()) * 0.5;
+        if (InAxis == 0)
+        { return Make_Plane(FVector(Centre.X, 0.0, 0.0), FVector::ForwardVector, FVector::RightVector); }
+
+        return Make_Plane(FVector(0.0, Centre.Y, 0.0), FVector::RightVector, FVector::ForwardVector);
+    }
+
+    //----------------------------------------------------------------------------------------------------------------------
+    // By hand (server)
+    //----------------------------------------------------------------------------------------------------------------------
+
+    // Slices InGeometry along InPlane with InCap and default limits, the results owned by the test entity and recorded in
+    // _ByHandSlices.
+    protected void Slice_ByHand(FCk_Handle_RuntimeMesh InGeometry, FCk_RuntimeMesh_PlaneLocal InPlane, FCk_RuntimeMesh_Cap InCap)
+    {
+        auto Slice = FCk_Request_RuntimeMesh_Slice();
+        Slice.Set_OperationID(FGuid::NewGuid());
+        Slice.Set_ResultOwner(_ServerTestEntity);
+        Slice.Set_Plane(InPlane);
+        Slice.Set_Cap(InCap);
+        utils_runtime_mesh::Request_Slice(InGeometry, Slice, FCk_Delegate_RuntimeMesh_OnSliceResolved(this, n"OnRigByHandSliced"));
+    }
+
+    UFUNCTION()
+    private void OnRigByHandSliced(FCk_RuntimeMesh_SliceResult InResult)
+    {
+        _ByHandSlices.Add(InResult);
+    }
+
+    // InPiece's spec as its halves inherit it: identity, lineage, mass, cook state, definition, kind, recipe, tuners, cap
+    // and body surface.
+    protected FMars_FoodPiece_Spec Make_SourceSpec(FCk_Handle_FoodPiece InPiece)
+    {
+        auto Spec = FMars_FoodPiece_Spec(FMars_FoodPiece_Data(InPiece.Get_MassKg()), InPiece.Get_Tuners(), InPiece.Get_Cap(), InPiece.Get_BodyTuners());
+        Spec.Data.Id = InPiece.Get_Id();
+        Spec.Data.ParentId = InPiece.Get_ParentId();
+        Spec.Data.Lineage = InPiece.Get_Lineage();
+        Spec.Data.CookState = InPiece.Get_CookState();
+        Spec.Data.Definition = InPiece.Get_Definition();
+        Spec.Data.Kind = InPiece.Get_Kind();
+        Spec.Data.Recipe = InPiece.Get_Recipe();
+        return Spec;
+    }
+
+    // The birth of the InCut.Kept side of InSlice, as a commit builds it from InSource: a new Id, InSource as parent, its
+    // lineage, tuners, cap, body, definition and kind, its share of the mass and the recipe of InSource plus InCut. It
+    // names no source piece, so nothing commits; its world transform is the slab's.
+    protected FMars_FoodPiece_Birth Make_ByHandBirth(FMars_FoodPiece_Spec InSource, FCk_RuntimeMesh_SliceResult InSlice, FMars_FoodPiece_RecipeCut InCut)
+    {
+        const auto Split = utils_foodpiece::Get_MassSplit(InSource.Data.MassKg, InSlice);
+        const auto IsPositive = InCut.Kept == EMars_FoodPiece_CutSide::Positive;
+
+        auto Spec = InSource;
+        Spec.Data.Id = FGuid::NewGuid();
+        Spec.Data.ParentId = InSource.Data.Id;
+        Spec.Data.MassKg = IsPositive ? Split.PositiveKg : Split.NegativeKg;
+        Spec.Data.Recipe.Cuts.Add(InCut);
+
+        auto Birth = FMars_FoodPiece_Birth();
+        Birth.Geometry = IsPositive ? InSlice.Get_Positive() : InSlice.Get_Negative();
+        Birth.Spec = Spec;
+        Birth.World = utils_transform::Get_EntityCurrentTransform(_Rock.As_Transform());
+        return Birth;
+    }
+
+    // The piece script of InBirth under the replicated spawn owner, tracked.
+    protected FCk_Handle Spawn_ByHand(FMars_FoodPiece_Birth InBirth)
+    {
+        auto Entity = utils_foodpiece::Request_SpawnCutPiece(Get_SubjectEntity(), InBirth);
+        Track_ForCleanup(Entity);
+        return Entity;
+    }
+
+    //----------------------------------------------------------------------------------------------------------------------
+    // The clean ending
+    //----------------------------------------------------------------------------------------------------------------------
+
+    // The last step of the server: every piece script and world item at the test's X is destroyed, and the server holds
+    // while that replicates.
+    protected void End_Server()
+    {
+        for (auto Piece : Get_PieceEntitiesNear(_FloorTop))
+        { utils_entity_lifetime::Request_DestroyEntity(Piece); }
+
+        for (auto Candidate : utils_entity_tag::ForEach_Entity(Get_SubjectEntity(), n"TAG_MarsWorldItem"))
+        {
+            if (Get_IsLive(Candidate) && Candidate.Is_Transform() && Get_IsNear(Candidate, _FloorTop))
+            { utils_entity_lifetime::Request_DestroyEntity(Candidate); }
+        }
+
+        WaitSeconds(k_ServerHoldSeconds, n"OnRigServerEnded");
+    }
+
+    UFUNCTION()
+    private void OnRigServerEnded(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
+    {
+        FinishSuccess();
+    }
+
+    // The last step of the client: waits until no piece script is left at its X and its replay memo is empty.
+    protected void End_Client()
+    {
+        WaitUntil(n"Is_RigClientClean", n"OnRigClientClean", k_SlowPolls);
+    }
+
+    UFUNCTION()
+    private void Is_RigClientClean(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        const auto Tally = Get_Tally();
+        auto Result = OutResult;
+        Result.Set(Get_PieceEntitiesNear(_FloorTop).Num() == 0 && Tally.Lineages == 0 && Tally.Geometries == 0);
+    }
+
+    UFUNCTION()
+    private void OnRigClientClean(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
+    {
+        FinishSuccess();
     }
 }

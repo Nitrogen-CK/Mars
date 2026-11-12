@@ -473,10 +473,93 @@ namespace utils_foodpiece
         return FCk_Handle_FoodPiece();
     }
 
-    // Keeps what a machine without the slice needs to rebuild the piece (FMars_Fragment_FoodPiece_Replay).
+    // Keeps what a machine without the slice needs to rebuild the piece (FMars_Fragment_FoodPiece_Replay) and asks for the
+    // rebuild: the Replay processor walks the recipe and resolves it once, Built or Failed (OnReplayResolved).
     void Request_Replay(FCk_Handle& InHandle, const FMars_FoodPiece_ReplaySpec& InSpec)
     {
-        InHandle.AddOrGet_Fragment(FMars_Fragment_FoodPiece_Replay).Spec = InSpec;
+        auto Replay = FMars_Fragment_FoodPiece_Replay();
+        Replay.Spec = InSpec;
+        InHandle.AddOrGet_Fragment(FMars_Fragment_FoodPiece_Replay) = Replay;
+        if (InHandle.Has_Fragment(FMars_Tag_FoodPiece_AwaitsReplay) == false)
+        { InHandle.Add_Fragment(FMars_Tag_FoodPiece_AwaitsReplay()); }
+    }
+
+    // How InHandle's replay stands; unset when Request_Replay kept nothing on it.
+    TOptional<FMars_FoodPiece_ReplayResult> TryGet_ReplayResult(const FCk_Handle& InHandle)
+    {
+        if (ck::Is_NOT_Valid(InHandle) || InHandle.Has_Fragment(FMars_Fragment_FoodPiece_Replay) == false)
+        { return TOptional<FMars_FoodPiece_ReplayResult>(); }
+
+        const auto& Replay = InHandle.Get_Fragment(FMars_Fragment_FoodPiece_Replay);
+        auto Result = FMars_FoodPiece_ReplayResult();
+        Result.State = Replay.State;
+        Result.Failure = Replay.Failure;
+        Result.SliceOutcome = Replay.SliceOutcome;
+        return TOptional<FMars_FoodPiece_ReplayResult>(Result);
+    }
+
+    void BindTo_OnReplayResolved(FCk_Handle& InHandle, FMars_Delegate_FoodPiece_OnReplayResolved InDelegate)
+    {
+        auto& Fragment = InHandle.AddOrGet_Fragment(FMars_Fragment_FoodPiece_ReplaySignals);
+        Fragment.OnReplayResolved.AddUFunction(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+    }
+
+    void UnbindFrom_OnReplayResolved(FCk_Handle& InHandle, FMars_Delegate_FoodPiece_OnReplayResolved InDelegate)
+    {
+        if (InHandle.Has_Fragment(FMars_Fragment_FoodPiece_ReplaySignals) == false)
+        { return; }
+
+        InHandle.Get_Fragment(FMars_Fragment_FoodPiece_ReplaySignals).OnReplayResolved.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+    }
+
+    // At most this many replay slices are in flight on one machine; a node that would exceed it waits a frame.
+    const int32 k_MaxReplayFlights = 8;
+
+    // How long a lineage with no slice in flight and no live piece is kept before its geometry is dropped.
+    const float32 k_MemoGraceSeconds = 2.0f;
+
+    // InWorld's (the world's transient entity) replay memo as counts; all zero without one.
+    FMars_FoodPiece_ReplayTally Get_ReplayTally(const FCk_Handle& InWorld)
+    {
+        auto Tally = FMars_FoodPiece_ReplayTally();
+        if (ck::Is_NOT_Valid(InWorld) || InWorld.Has_Fragment(FMars_Fragment_FoodPiece_ReplayMemo) == false)
+        { return Tally; }
+
+        const auto& Memo = InWorld.Get_Fragment(FMars_Fragment_FoodPiece_ReplayMemo);
+        Tally.Slices = Memo.Tally.Slices;
+        Tally.Built = Memo.Tally.Built;
+        Tally.Failed = Memo.Tally.Failed;
+        Tally.Lineages = Memo.Lineages.Num();
+
+        for (const auto& Import : Memo.Imports)
+        {
+            if (Get_IsLiveEntity(Import.Geometry))
+            { ++Tally.Geometries; }
+        }
+
+        // Node 0 is the import, counted above.
+        for (const auto& Lineage : Memo.Lineages)
+        {
+            for (int32 Index = 1; Index < Lineage.Nodes.Num(); ++Index)
+            {
+                if (Get_IsLiveEntity(Lineage.Nodes[Index].Geometry))
+                { ++Tally.Geometries; }
+            }
+        }
+
+        return Tally;
+    }
+
+    // InEntity is valid and not yet in its BeginDestroy.
+    bool Get_IsLiveEntity(const FCk_Handle& InEntity)
+    {
+        return ck::IsValid(InEntity) && utils_entity_lifetime::Get_IsPendingDestroy(InEntity, ECk_EntityLifetime_DestructionPhase::BeginDestroy) == false;
+    }
+
+    // The same plane, exactly: position, normal and tangent.
+    bool Get_IsSamePlane(const FCk_RuntimeMesh_PlaneLocal& InA, const FCk_RuntimeMesh_PlaneLocal& InB)
+    {
+        return InA.Get_PositionCm() == InB.Get_PositionCm() && InA.Get_Normal() == InB.Get_Normal() && InA.Get_Tangent() == InB.Get_Tangent();
     }
 
     // What Request_Replay kept on InHandle; unset when it kept nothing.
