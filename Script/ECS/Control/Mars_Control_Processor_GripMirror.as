@@ -1,11 +1,14 @@
 // Every machine mirrors the grip ledger. A client binds its rep-notify once and reconciles then and on every arrival; the
 // authority reconciles when its own drain refuses a claim (it adds FMars_Tag_Control_NeedsGripMirror). Each reconcile
 // compares the ledger with the one it last reconciled (seeded by Add from the ledger as it arrived, so a machine that binds
-// late raises nothing old) and, for refusals it had not seen: lets this machine's own grip go when it belongs to the
+// late raises nothing old, while the grip it finds held is shown at once) and, for refusals it had not seen: lets this machine's own grip go when it belongs to the
 // refused entity - the local grip ends as EndManipulation ends it (reporting LetGo) and its interaction ends Failed, or,
 // past the crossing (its Cross already reported), the pending engage clears and the handle settles back at once - then
 // raises OnGripRefused once per refusal. A refusal
 // naming the entity the ledger now shows gripping is old: that entity was granted since, and its grip stands.
+// Each reconcile also follows who holds the grant (Follow_Holder): another machine's grip is shown and claimed here,
+// this machine's own never is. The authority also reconciles after each grant and release its drain makes; a client
+// reconciles on every arrival, a changed Pull included.
 class UMars_Processor_Control_GripMirror : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -46,18 +49,70 @@ class UMars_Processor_Control_GripMirror : UCk_Processor_Script_Base_UE
         const auto Last = Mirror.Last;
         Mirror.Last = Ledger;
 
-        if (Ledger.RefusalSerial <= Last.RefusalSerial)
-        { return; }
-
+        const auto HasNewRefusals = Ledger.RefusalSerial > Last.RefusalSerial;
         const auto Refused = Ledger.LastRefused;
-        if (ck::IsValid(Refused) && utils_control::Get_GrippedBy(Ledger) != Refused)
+        if (HasNewRefusals && ck::IsValid(Refused) && utils_control::Get_GrippedBy(Ledger) != Refused)
         { LetGo(InControl, Refused); }
 
-        if (InControl.Has_Fragment(FMars_Fragment_Control_Signals) == false)
+        // After a refused grip let go, so the refused machine shows and claims the grip like any other.
+        Follow_Holder(InControl, Ledger, Last);
+
+        if (HasNewRefusals == false || InControl.Has_Fragment(FMars_Fragment_Control_Signals) == false)
         { return; }
 
         for (int32 Refusal = Last.RefusalSerial; Refusal < Ledger.RefusalSerial; ++Refusal)
         { InControl.Get_Fragment(FMars_Fragment_Control_Signals).OnGripRefused.Broadcast(InControl, Refused); }
+    }
+
+    // Who holds the grant now, against who held it at the last reconcile. Another machine's grip takes the Operated claim
+    // and is shown (UMars_Processor_Control_MirroredGrip, from the Mover's alpha; a new grant while one is shown carries
+    // on from where it is). When it ends the claim goes, and the shown handle settles back after a let-go or a lost
+    // gripper; after a crossing a returns-to-rest handle settles and any other is left where it is for the engage's MoveTo.
+    private void Follow_Holder(FCk_Handle_Control& InControl, const FMars_Fragment_Control_Grip& InLedger, const FMars_Fragment_Control_Grip& InLast)
+    {
+        auto& Local = InControl.Get_Fragment(FMars_Fragment_Control_Local);
+        const auto Previous = Local.GripHolder;
+        const auto Holder = utils_control::Get_GripHolder(InLedger, Local.LastLocalGripper);
+        Local.GripHolder = Holder;
+
+        auto Interactable = Local.Interactable;
+        auto Mover = Local.Mover;
+
+        if (Holder == EMars_Control_GripHolder::AnotherMachine)
+        {
+            if (Previous != EMars_Control_GripHolder::AnotherMachine && ck::IsValid(Interactable))
+            { Interactable.Request_Disable(FMars_Request_Interactable_Disable(EMars_Interactable_DisableReason::Operated)); }
+
+            const auto IsNewGrant = Previous != EMars_Control_GripHolder::AnotherMachine || InLedger.GripSerial != InLast.GripSerial;
+            if (IsNewGrant == false || ck::Is_NOT_Valid(Mover))
+            { return; }
+
+            if (Local.MirroredGrip.IsSet() == false)
+            { Local.MirroredGrip = FMars_Control_Spring(Mover.Get_Alpha(), 0.0f); }
+
+            if (InControl.Has_Fragment(FMars_Tag_Control_MirroringGrip) == false)
+            { InControl.Add_Fragment(FMars_Tag_Control_MirroringGrip()); }
+
+            return;
+        }
+
+        if (Previous != EMars_Control_GripHolder::AnotherMachine)
+        { return; }
+
+        if (ck::IsValid(Interactable))
+        { Interactable.Request_Enable(FMars_Request_Interactable_Enable(EMars_Interactable_DisableReason::Operated)); }
+
+        Local.MirroredGrip.Reset();
+        InControl.Request_TryRemove(FMars_Tag_Control_MirroringGrip);
+
+        if (Holder != EMars_Control_GripHolder::Nobody || ck::Is_NOT_Valid(Mover))
+        { return; }
+
+        const auto LeftForTheEngage = InLedger.LastRelease == EMars_Control_GripRelease::Crossed && InControl.Get_ReturnsToRest() == false;
+        if (LeftForTheEngage)
+        { return; }
+
+        Mover.Request_Settle(FMars_Request_Mover_Settle());
     }
 
     // This machine's grip, or its pending engage, when it belongs to InRefused; nothing otherwise.

@@ -3,6 +3,42 @@
 // subject is the gripper: it starts the interaction on its copy's target and drives the grip through kernel requests,
 // as the single-machine lever rig does. Each machine counts the OnEngaged, OnActiveChanged and OnGripRefused its own copy
 // raises. A stand-in is a second replicated entity the server spawns to hold a grip through direct grip requests.
+// A client's pull reaches the authority through a test-only cue that does what the pawn's Server_ControlPull does (the
+// lanes' subject is no pawn), sent by the kernel's pacing rule once the client's ledger shows its grant.
+
+// Carries one pull report from the gripping machine to the authority, which issues it on every control the gripper holds,
+// as the pawn's Server_ControlPull does.
+class UMars_TESTONLY_Cue_Control_PullReport : UCk_GenericCue_EntityScript
+{
+    default _LifetimeBehavior = ECk_Cue_LifetimeBehavior::AfterOneFrame;
+    default _ConcurrencyPolicy = ECk_Cue_ConcurrencyPolicy::AllowMultiple;
+    default _OwnerValidationPolicy = ECk_Cue_OwnerValidationPolicy::RequireValid;
+
+    // FMars_Request_Control_ReportPull's fields: the request struct is the cue's spawn params.
+    UPROPERTY(ExposeOnSpawn)
+    FCk_Handle Gripper;
+
+    UPROPERTY(ExposeOnSpawn)
+    float32 Pull = 0.0f;
+
+    UFUNCTION(BlueprintOverride)
+    FGameplayTag Get_CueName() const
+    {
+        return GameplayTags::Cue_Mars_Test_ControlPullReport;
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void DoBeginPlay(FCk_Handle InHandle)
+    {
+        const auto Owner = ck::OwnerEntity(InHandle);
+        if (utils_net::Get_HasAuthority(Owner) == false)
+        { return; }
+
+        auto Controls = utils_control::Get_HeldControls(Gripper);
+        for (int32 Index = 0; Index < Controls.Num(); ++Index)
+        { Controls[Index].Request_ReportPull(FMars_Request_Control_ReportPull(Gripper, Pull)); }
+    }
+}
 
 // A replicated root whose Control sits on a scene node beneath it: the node has no replication driver of its own.
 class UMars_TESTONLY_NetNodeControl_EntityScript : UCk_GenericEntityScript_UE
@@ -60,6 +96,11 @@ class UMars_AutoTestRig_NetControl : UCk_AutoTest_NetBase
     protected const float32 k_SettleSeconds = 1.0f;
     // Degrees of pull per poll; negative pulls toward the start pose.
     protected float32 _PullDegrees = 4.0f;
+    protected const float32 k_MaxNudgeDegrees = 4.0f;
+    // Where the follow tests hold a grip.
+    protected const float32 k_HalfPull = 0.5f;
+    // How close a shown handle must come to the pull it follows.
+    protected const float32 k_FollowTolerance = 0.02f;
 
     protected FCk_Handle_Control _Control;
     protected FCk_Handle_Mover _Mover;
@@ -75,6 +116,13 @@ class UMars_AutoTestRig_NetControl : UCk_AutoTest_NetBase
     protected float32 _MaxAlphaBeforeEngage = 0.0f;
     protected FCk_Handle _StandIn;
     protected FCk_Handle _Subject;
+    protected FCk_Handle_Interactable _Interactable;
+
+    // The pacing of this machine's pull reports and how many it sent.
+    protected FMars_Control_PullPacer _PullPacer;
+    protected int32 _ReportsSent = 0;
+    // The game time of the last Get_FrameSeconds call; unset before the first.
+    private TOptional<float64> _LastFrameTime;
 
     // Both machines, first thing.
     protected void Begin_NetControlTest()
@@ -203,12 +251,17 @@ class UMars_AutoTestRig_NetControl : UCk_AutoTest_NetBase
             if (ck::Is_NOT_Valid(Control))
             { continue; }
 
-            auto Target = DoFind_UseTarget(Candidate);
+            auto Interactable = DoFind_Interactable(Candidate);
+            if (ck::Is_NOT_Valid(Interactable))
+            { continue; }
+
+            auto Target = Interactable.Get_InteractTarget(GameplayTags::InteractionChannel_Mars_Use);
             if (ck::Is_NOT_Valid(Target))
             { continue; }
 
             _Control = Control;
             _Mover = Control.Get_Mover();
+            _Interactable = Interactable;
             _Target = Target;
             _Control.BindTo_OnEngaged(FMars_Delegate_Control_OnEngaged(this, n"OnControlEngaged"));
             _Control.BindTo_OnActiveChanged(FMars_Delegate_Control_OnActiveChanged(this, n"OnControlActiveChanged"));
@@ -225,23 +278,98 @@ class UMars_AutoTestRig_NetControl : UCk_AutoTest_NetBase
     }
 
     // The interactable is a node two levels down at most (the lever's probe node under its root).
-    private FCk_Handle_InteractTarget DoFind_UseTarget(FCk_Handle InRoot)
+    private FCk_Handle_Interactable DoFind_Interactable(FCk_Handle InRoot)
     {
         for (auto Dependent : utils_entity_lifetime::Get_LifetimeDependents(InRoot))
         {
             auto Interactable = Dependent.As_Interactable(ECk_SanityCheck::UnChecked);
             if (ck::IsValid(Interactable))
-            { return Interactable.Get_InteractTarget(GameplayTags::InteractionChannel_Mars_Use); }
+            { return Interactable; }
 
             for (auto Grandchild : utils_entity_lifetime::Get_LifetimeDependents(Dependent))
             {
                 auto Inner = Grandchild.As_Interactable(ECk_SanityCheck::UnChecked);
                 if (ck::IsValid(Inner))
-                { return Inner.Get_InteractTarget(GameplayTags::InteractionChannel_Mars_Use); }
+                { return Inner; }
             }
         }
 
-        return FCk_Handle_InteractTarget();
+        return FCk_Handle_Interactable();
+    }
+
+    // This machine's interactable holds the Operated claim.
+    protected bool Get_IsClaimed() const
+    {
+        return ck::IsValid(_Interactable) && _Interactable.Get_IsDisabledFor(EMars_Interactable_DisableReason::Operated);
+    }
+
+    // This machine's control stops watching its interactable, so another's grip never claims it here: a client whose own
+    // claim races another's grant, before that grant reached it, is reproduced without the race. The arbiter and the grip
+    // mirror are then what a test reads.
+    protected void Unwatch_Interactable()
+    {
+        _Control.Request_WatchInteractable(FMars_Request_Control_WatchInteractable());
+    }
+
+    // Seconds since the previous call, game time; 0 on the first.
+    protected float32 Get_FrameSeconds()
+    {
+        const auto Now = float64(System::GetGameTimeInSeconds());
+        auto Seconds = 0.0f;
+        if (_LastFrameTime.IsSet())
+        { Seconds = float32(Now - _LastFrameTime.GetValue()); }
+
+        _LastFrameTime = Now;
+        return Seconds;
+    }
+
+    // This machine's grip nudged toward InTarget pull, at most k_MaxNudgeDegrees a call; nothing while not manipulating.
+    protected void Nudge_Toward(float32 InTarget)
+    {
+        const auto Pull = _Control.TryGet_ManipulationPull();
+        if (Pull.IsSet() == false)
+        { return; }
+
+        const auto AlphaPerDegree = _Control.Get_Fragment(FMars_Fragment_Control_Params).Manipulation.AlphaPerDegree;
+        const auto Degrees = Math::Clamp((InTarget - Pull.GetValue()) / AlphaPerDegree, -k_MaxNudgeDegrees, k_MaxNudgeDegrees);
+        if (Math::Abs(Degrees) > 0.0001f)
+        { _Control.Request_Nudge(FMars_Request_Control_Nudge(Degrees)); }
+    }
+
+    // The gripping machine's report of its grip's pull, by the kernel's pacing rule, once this machine's ledger shows the
+    // subject's grant (as the player's grip task sends through its pawn).
+    protected void Send_PullReport(float32 InDeltaSeconds)
+    {
+        const auto Pull = _Control.TryGet_ManipulationPull();
+        if (Pull.IsSet() == false || _Control.Get_Gripper() != Get_SubjectEntity())
+        { return; }
+
+        if (utils_control::Advance_PullPacer(_PullPacer, Pull.GetValue(), InDeltaSeconds) == false)
+        { return; }
+
+        _ReportsSent += 1;
+        utils_cue_generic::Request_ExecuteCue(Get_SubjectEntity(), GameplayTags::Cue_Mars_Test_ControlPullReport,
+            FMars_Request_Control_ReportPull(Get_SubjectEntity(), Pull.GetValue()), ECk_Cue_ReliabilityPolicy::Reliable, ECk_Cue_MulticastPolicy::ServerOnly);
+    }
+
+    // The handle this machine shows: its own grip's alpha, else another machine's mirrored, else the Mover's.
+    protected float32 Get_ShownAlpha() const
+    {
+        const auto Mirrored = _Control.TryGet_MirroredGripAlpha();
+        if (Mirrored.IsSet())
+        { return Mirrored.GetValue(); }
+
+        return Get_HandleAlpha();
+    }
+
+    protected FString Get_PullText() const
+    {
+        const auto Own = _Control.TryGet_ManipulationPull();
+        const auto Mirrored = _Control.TryGet_MirroredGripAlpha();
+        const auto OwnText = Own.IsSet() ? f"{Own.GetValue() :.3}" : "unset";
+        const auto MirroredText = Mirrored.IsSet() ? f"{Mirrored.GetValue() :.3}" : "unset";
+        const auto MoverText = ck::IsValid(_Mover) ? f"{_Mover.Get_Alpha() :.3}" : "none";
+        return f"ledgerPull {_Control.Get_GripPull() :.3}, ownPull {OwnText}, mirroredAlpha {MirroredText}, moverAlpha {MoverText}, holder {_Control.Get_GripHolder() :n}, claimed {Get_IsClaimed()}";
     }
 
     protected int32 Get_Engagements() const
@@ -385,6 +513,14 @@ class UMars_AutoTestRig_NetControl : UCk_AutoTest_NetBase
     {
         auto Result = OutResult;
         Result.Set(ck::IsValid(_Control) && Get_IsStandInFound() && _Control.Get_Gripper() == _StandIn);
+    }
+
+    // This machine's ledger shows the stand-in holding _Control and its interactable holds no claim.
+    UFUNCTION()
+    protected void Is_GrippedByStandInUnclaimed(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Result = OutResult;
+        Result.Set(ck::IsValid(_Control) && Get_IsStandInFound() && _Control.Get_Gripper() == _StandIn && Get_IsClaimed() == false);
     }
 
     // This machine's ledger shows the subject holding _Control.

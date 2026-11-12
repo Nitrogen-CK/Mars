@@ -1,6 +1,8 @@
 // A stand-in holds the grip on the server; the client then grips its copy through an interaction. The authority refuses
 // it: the refusal serial advances once and names the subject on both machines, the client raises OnGripRefused once,
 // its local grip ends, its interaction ends Failed and its handle comes back to rest; the stand-in still holds the grip.
+// The client's copy watches no interactable, as a client whose claim raced the stand-in's grant does: a watched one would
+// hold the Operated claim and the client could not start the interaction at all.
 // Surface: Ck.Control.Net.AS_Control_ASecondGripperIsRefused
 class UCk_AutoTest_Net_Control_ASecondGripperIsRefused : UMars_AutoTestRig_NetControl
 {
@@ -29,7 +31,8 @@ class UCk_AutoTest_Net_Control_ASecondGripperIsRefused : UMars_AutoTestRig_NetCo
     UFUNCTION()
     private void OnClientFound(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
     {
-        WaitUntil(n"Is_GrippedByStandIn", n"OnClientSawStandIn", k_SlowPolls);
+        Unwatch_Interactable();
+        WaitUntil(n"Is_GrippedByStandInUnclaimed", n"OnClientSawStandIn", k_SlowPolls);
     }
 
     UFUNCTION()

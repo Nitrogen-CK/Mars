@@ -2,7 +2,8 @@
 // the same frame it asks for the grip, so it crosses before the refusal can come back: the refusal, when it is mirrored,
 // finds the pending engage already cleared, well inside k_PendingEngageSeconds of the crossing, the handle settles back
 // to rest, and nothing engages anywhere. A pending engage can live for less than a frame here, so the crossing and the
-// refusal are read from their signals, not by polling.
+// refusal are read from their signals, not by polling. The client's copy watches no interactable, as a client whose
+// claim raced the stand-in's grant does: a watched one would hold the Operated claim and the grip could not start.
 // Surface: Ck.Control.Net.AS_Control_ARefusalAfterTheCrossingSettlesTheHandle
 class UCk_AutoTest_Net_Control_ARefusalAfterTheCrossingSettlesTheHandle : UMars_AutoTestRig_NetControl
 {
@@ -40,7 +41,8 @@ class UCk_AutoTest_Net_Control_ARefusalAfterTheCrossingSettlesTheHandle : UMars_
     {
         _Control.BindTo_OnManipulationChanged(FMars_Delegate_Control_OnManipulationChanged(this, n"OnClientGripChanged"));
         _Control.BindTo_OnGripRefused(FMars_Delegate_Control_OnGripRefused(this, n"OnClientRefused"));
-        WaitUntil(n"Is_GrippedByStandIn", n"OnClientSawStandIn", k_SlowPolls);
+        Unwatch_Interactable();
+        WaitUntil(n"Is_GrippedByStandInUnclaimed", n"OnClientSawStandIn", k_SlowPolls);
     }
 
     // The threshold ends the grip (Released) before it arms the pending engage, in the same tick.

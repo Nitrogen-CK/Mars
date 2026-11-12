@@ -3,8 +3,10 @@
 class UMars_Lever_EntityScript : UCk_GenericEntityScript_UE
 {
     default _ShowInPlaceActors = true;
-    // Stance A: placed by the authority's spawner; the lever, its root transform and its control ledger replicate; the
-    // handle, its mover and the interactable are built on every machine. A client engages through the control's cue.
+    // Stance A: placed by the authority's spawner; the lever, its root transform, its control ledger and its grip ledger
+    // (who grips, how far pulled) replicate; the handle, its mover and the interactable are built on every machine. A
+    // client grips and engages through the control's cues; the other machines show the handle following the pull and
+    // keep the interactable unavailable while it is held.
     default _Replication = ECk_Replication::Replicates;
 
     UPROPERTY(ExposeOnSpawn)
@@ -72,7 +74,7 @@ class UMars_Lever_EntityScript : UCk_GenericEntityScript_UE
             assets::load::LeverHandle_Mars_SM(), Material, collision::profile::NoCollision, n"Lever_Handle"));
     }
 
-    private void AddInteractable(FCk_Handle_Transform& InRoot, const FCk_Handle_Control& InControl)
+    private void AddInteractable(FCk_Handle_Transform& InRoot, FCk_Handle_Control& InControl)
     {
         // A rejected Control spec already ensured in utils_control::Add.
         if (ck::Is_NOT_Valid(InControl))
@@ -87,6 +89,7 @@ class UMars_Lever_EntityScript : UCk_GenericEntityScript_UE
         Spec.ProbeInfo = Probe;
         Spec.Targets.Add(InControl.Make_InteractTarget(FMars_InteractPrompt_Spec(mars::Mars_IA_Interact_Use, PromptText)));
 
-        utils_interactable::Create(InRoot, Spec);
+        // Held by another machine's grip, the interactable is unavailable here (the Control keeps its Operated claim).
+        InControl.Request_WatchInteractable(FMars_Request_Control_WatchInteractable(utils_interactable::Create(InRoot, Spec)));
     }
 }

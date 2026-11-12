@@ -11,18 +11,13 @@
 // handle settles back from the threshold. Each grip ending here reports its end to the arbiter exactly once
 // (utils_control::Request_GripFor): a lost puller, or a threshold whose interaction is already gone, reports LetGo; a
 // threshold reports Cross when its interaction finishes Succeeded, LetGo when it finishes Failed. The pending engage keeps
-// the gripper, so a refusal mirrored after the crossing (UMars_Processor_Control_GripMirror) clears it at once.
+// the gripper, so a refusal mirrored after the crossing (UMars_Processor_Control_GripMirror) clears it at once. On the
+// authority, a grip the ledger shows granted publishes its pull to the ledger by the pacing rule; a client's grip reports
+// through its pawn instead (UMars_SmTask_ManipulateControl).
 class UMars_Processor_Control_Tick : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
     default _RunAfter.Add(n"/Script/Angelscript.Mars_Processor_Control_HandleRequests");
-
-    // A hitch must not blow the spring up: the frame is capped, then integrated in substeps no longer than this. One
-    // semi-implicit Euler step is only stable while Stiffness * dt^2 stays small; at the turnip bed's 400 / 40 a single
-    // 0.08 s step carried alpha from 0.30 past the 0.97 threshold and popped the root on a hitch frame (PIE run-09).
-    // 1/240 s keeps a stiffness of a few thousand well inside the stable range; a 0.1 s frame costs 24 cheap steps.
-    private const float32 k_MaxStepSeconds = 0.1f;
-    private const float32 k_MaxSubstepSeconds = 1.0f / 240.0f;
 
     UFUNCTION(BlueprintOverride)
     void Configure(FCk_ScriptProcessorQuery& Query)
@@ -42,7 +37,7 @@ class UMars_Processor_Control_Tick : UCk_Processor_Script_Base_UE
 
         const auto& Tuning = Self.Get_Fragment(FMars_Fragment_Control_Params).Manipulation;
 
-        const auto DeltaSeconds = Math::Min(float32(InDeltaT.Get_Seconds()), k_MaxStepSeconds);
+        const auto DeltaSeconds = float32(InDeltaT.Get_Seconds());
 
         auto Manipulation = Local.Manipulation.GetValue();
 
@@ -59,25 +54,12 @@ class UMars_Processor_Control_Tick : UCk_Processor_Script_Base_UE
             Manipulation.Pull = Self.Get_PullDirection() == EMars_Control_PullDirection::TowardStart ? 1.0f - Gained : Gained;
         }
 
-        // Semi-implicit Euler in substeps, with the travel's ends as hard stops.
-        const auto Substeps = Math::Max(int32(Math::CeilToInt(DeltaSeconds / k_MaxSubstepSeconds)), 1);
-        const auto SubstepSeconds = DeltaSeconds / float32(Substeps);
-        for (int32 Substep = 0; Substep < Substeps; ++Substep)
-        {
-            const auto Acceleration = Tuning.Stiffness * (Manipulation.Pull - Manipulation.Alpha) - Tuning.Damping * Manipulation.Velocity;
-            Manipulation.Velocity += Acceleration * SubstepSeconds;
-            Manipulation.Alpha += Manipulation.Velocity * SubstepSeconds;
-            if (Manipulation.Alpha < 0.0f)
-            {
-                Manipulation.Alpha = 0.0f;
-                Manipulation.Velocity = 0.0f;
-            }
-            else if (Manipulation.Alpha > 1.0f)
-            {
-                Manipulation.Alpha = 1.0f;
-                Manipulation.Velocity = 0.0f;
-            }
-        }
+        auto Spring = FMars_Control_Spring(Manipulation.Alpha, Manipulation.Velocity);
+        Tuning.Step_Spring(Spring, Manipulation.Pull, DeltaSeconds);
+        Manipulation.Alpha = Spring.Alpha;
+        Manipulation.Velocity = Spring.Velocity;
+
+        Publish_OwnPull(Self, Manipulation, DeltaSeconds);
         Local.Manipulation = Manipulation;
 
         const auto Alpha = Manipulation.Alpha;
@@ -134,6 +116,27 @@ class UMars_Processor_Control_Tick : UCk_Processor_Script_Base_UE
             ECk_Signal_BindingPolicy::FireIfPayloadInFlightThisFrame,
             ECk_Signal_PostFireBehavior::Unbind);
         utils_interaction::Request_EndInteraction(Interaction, FCk_Request_Interaction_EndInteraction(ECk_SucceededFailed::Succeeded));
+    }
+
+    // The authority's own grip of an arbitrated control is the ledger's pull: once the ledger shows this grip's gripper,
+    // its pull is written by the pacing rule (utils_control::Advance_PullPacer) and marked dirty when it changed.
+    private void Publish_OwnPull(FCk_Handle_Control& InControl, FMars_Control_Manipulation& InOutManipulation, float32 InDeltaSeconds)
+    {
+        if (utils_net::Get_HasAuthority(InControl) == false || InControl.Get_IsGripArbitrated() == false)
+        { return; }
+
+        if (ck::Is_NOT_Valid(InOutManipulation.Gripper) || InControl.Get_Gripper() != InOutManipulation.Gripper)
+        { return; }
+
+        if (utils_control::Advance_PullPacer(InOutManipulation.Pacer, InOutManipulation.Pull, InDeltaSeconds) == false)
+        { return; }
+
+        auto& Ledger = InControl.Get_Fragment(FMars_Fragment_Control_Grip);
+        if (Ledger.Pull == InOutManipulation.Pull)
+        { return; }
+
+        Ledger.Pull = InOutManipulation.Pull;
+        InControl.H().Request_MarkReplicationDirty(FMars_Fragment_Control_Grip);
     }
 
     // EndManipulation's end (UMars_Processor_Control_HandleRequests): the handle settles back, Released and progress 0.

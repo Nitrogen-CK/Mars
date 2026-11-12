@@ -850,6 +850,18 @@ class AMars_PlayerCharacter : AMars_Character
         Intents.Request_ApplyRemoteSample(FMars_Request_InputIntents_ApplyRemoteSample(InSample));
     }
 
+    // The owning client's pull of the control it grips (UMars_SmTask_ManipulateControl), paced by the Control's rule and
+    // issued on every control the authority granted this player and it still holds (utils_control::Get_HeldControls);
+    // the drain applies it only from the current gripper. Unreliable: each report is an absolute pull, so a lost one
+    // costs one step of a remote handle's motion and nothing is resent. A player that holds nothing issues nothing.
+    UFUNCTION(Server, Unreliable)
+    void Server_ControlPull(float32 InPull)
+    {
+        auto Controls = utils_control::Get_HeldControls(_PlayerEntity);
+        for (int32 Index = 0; Index < Controls.Num(); ++Index)
+        { Controls[Index].Request_ReportPull(FMars_Request_Control_ReportPull(_PlayerEntity, InPull)); }
+    }
+
     UFUNCTION(Server)
     void Server_PlayStrike(FMars_Request_HandSwing_Start InRequest)
     {

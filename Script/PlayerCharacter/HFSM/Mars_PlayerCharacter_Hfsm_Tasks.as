@@ -358,7 +358,9 @@ enum EMars_ManipulateControl_ReachWait
 // Use press then only joins that live interaction (UMars_SmTask_IntentToResolver::Forward_To), and without the adoption the
 // control would never be manipulated (run-12b, PROGRESS Phase K Part 2c / 2d).
 // Stateful like UMars_SmTask_InteractionFocus; leaving Locomotion ends any manipulation and releases the hold at once.
-// It acts on the owning copy of the player only: the grip runs on the machine whose player pulls.
+// It acts on the owning copy of the player only: the grip runs on the machine whose player pulls. On a client gripping an
+// arbitrated control it also reports the grip's pull to the authority through the pawn's Server_ControlPull, by the
+// Control's pacing rule, so every other machine shows the handle following it.
 class UMars_SmTask_ManipulateControl : UCk_SmTask_EntityScript
 {
     default _TaskMode = ECk_SmTaskMode::Tick;
@@ -394,6 +396,9 @@ class UMars_SmTask_ManipulateControl : UCk_SmTask_EntityScript
     private float32 _PushWaitSeconds = 0.0f;
     private int32 _TicksPastPush = 0;
     private bool _IsManipulating = false;
+    // A client's grip reports its pull through this pawn (null on the authority's own copy and without a pawn).
+    private AMars_PlayerCharacter _Pawn;
+    private FMars_Control_PullPacer _PullPacer;
     // This task holds the viewpoint's ControlPull hold.
     private bool _HoldsView = false;
     // The view was handed back while Use was still held: it stays frozen until the row releases.
@@ -411,6 +416,8 @@ class UMars_SmTask_ManipulateControl : UCk_SmTask_EntityScript
         _Resolver = _Player.As_InteractionResolver();
         _Intents = _Player.As_InputIntents(ECk_SanityCheck::UnChecked);
         _Hands = _Player.As_FPHands(ECk_SanityCheck::UnChecked);
+        if (utils_net::Get_HasAuthority(_Player) == false)
+        { _Pawn = Cast<AMars_PlayerCharacter>(utils_owning_actor::TryGet_EntityOwningActor_Recursive(_Player)); }
 
         _Viewpoint = _Player.As_PlayerViewpoint(ECk_SanityCheck::UnChecked);
         if (ck::IsValid(_Viewpoint))
@@ -453,6 +460,7 @@ class UMars_SmTask_ManipulateControl : UCk_SmTask_EntityScript
         _Hands = FCk_Handle_FPHands();
         _Viewpoint = FCk_Handle_PlayerViewpoint();
         _View = FCk_Handle_Transform();
+        _Pawn = nullptr;
     }
 
     // Must return Running every frame: a Succeeded/Failed result would end the task while Locomotion is still active.
@@ -474,6 +482,8 @@ class UMars_SmTask_ManipulateControl : UCk_SmTask_EntityScript
             EndManipulation();
             return ECk_SmTaskResult::Running;
         }
+
+        Send_Pull(float32(InDeltaT.Get_Seconds()));
 
         // A Walk control's pull is the player's distance from it, read by the Control itself.
         if (Get_IsWalkPull() || ck::Is_NOT_Valid(_Intents))
@@ -675,10 +685,29 @@ class UMars_SmTask_ManipulateControl : UCk_SmTask_EntityScript
         // The delta that was drained before the grip is not a pull. The player's root is what walks away from a Walk control
         // (a Look control ignores the Puller; without a transform a Walk grip ensures in the Control and is ignored).
         _SeenLookSequence = ck::IsValid(_Intents) ? _Intents.Get_LookDeltaSequence() : 0;
+        _PullPacer = FMars_Control_PullPacer();
         _Control.Request_BeginManipulation(FMars_Request_Control_BeginManipulation(Interaction,
             EMars_Control_ManipulationCompletion::AtEngageAlpha, _Player.As_Transform(ECk_SanityCheck::UnChecked)));
         if (Get_IsWalkPull() == false)
         { HoldView(); }
+    }
+
+    // A client's grip of an arbitrated control, once this machine's ledger shows the grant: its pull goes to the authority
+    // through the pawn by the Control's pacing rule (a report before the grant is dropped there and would leave the other
+    // machines' handle behind). The authority's own grip publishes itself in the Control's tick.
+    private void Send_Pull(float32 InDeltaSeconds)
+    {
+        if (_Pawn == nullptr || utils_net::Get_HasAuthority(_Control) || _Control.Get_IsGripArbitrated() == false)
+        { return; }
+
+        const auto Pull = _Control.TryGet_ManipulationPull();
+        if (Pull.IsSet() == false || _Control.Get_Gripper() != _Player)
+        { return; }
+
+        if (utils_control::Advance_PullPacer(_PullPacer, Pull.GetValue(), InDeltaSeconds) == false)
+        { return; }
+
+        _Pawn.Server_ControlPull(Pull.GetValue());
     }
 
     // The watched control is pulled by walking away from it: no view hold, no nudges.

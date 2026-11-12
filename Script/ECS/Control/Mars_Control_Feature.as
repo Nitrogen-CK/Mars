@@ -4,9 +4,8 @@
 // FMars_Fragment_Control_Local. A client mirrors the ledger: it moves its own Mover and broadcasts OnEngaged /
 // OnActiveChanged from what replicated. A ManuallyCompleted grip (BeginManipulation / Nudge / EndManipulation and the
 // Tick spring) runs on the machine that begins it - the authority, or a client whose control's entity replicates
-// (Get_MayGripHere) - and nothing of the pull crosses the wire: a client's threshold ends its interaction, whose
-// completion sends the engage cue, and holds off the next grip until the ledger shows that engagement or
-// utils_control::k_PendingEngageSeconds pass. Other machines see the handle only when the engage moves it.
+// (Get_MayGripHere): a client's threshold ends its interaction, whose completion sends the engage cue, and holds off the
+// next grip until the ledger shows that engagement or utils_control::k_PendingEngageSeconds pass.
 // Who grips is the authority's: on a control whose entity replicates (Get_IsGripArbitrated), the machine that begins or
 // ends a grip begun by an interaction reports it through Cue.Mars.Control.Grip (Begin, then LetGo or Cross), and the
 // authority's drain keeps the replicated FMars_Fragment_Control_Grip (the gripper, a grip serial, a refusal serial naming
@@ -14,7 +13,14 @@
 // releases a grip whose gripper is destroyed. On an arbitrated ManuallyCompleted control the engage rides the grip's end:
 // a Cross from the current gripper releases the grip and engages once, and the interaction's completion sends no engage
 // cue. Every machine mirrors the grip ledger and raises OnGripRefused once per refusal; the machine whose grip was
-// refused lets go. How far the handle is pulled is not in the ledger.
+// refused lets go.
+// How far the handle is pulled is presentation and rides the grip ledger as Pull, written only by the authority while
+// Gripped, by one pacing rule (utils_control::Advance_PullPacer): the authority's own grip publishes itself from its tick;
+// a client's grip reports through its pawn's unreliable Server_ControlPull, which the drain applies only from the current
+// gripper, in arrival order with the grip requests. Every machine that does not hold the grip shows the handle following
+// that Pull through the control's own spring (UMars_Processor_Control_MirroredGrip) and keeps the Operated claim on the
+// interactable the assembly watches (Request_WatchInteractable), so nobody else starts a grip; nothing simulated reads
+// the mirrored handle.
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
@@ -267,6 +273,35 @@ struct FMars_Fragment_Control_Params
 // State
 //--------------------------------------------------------------------------------------------------------------------------
 
+// A handle position 0..1 and its speed, alpha per second: the state the control's spring integrates.
+struct FMars_Control_Spring
+{
+    UPROPERTY()
+    float32 Alpha = 0.0f;
+
+    UPROPERTY()
+    float32 Velocity = 0.0f;
+
+    FMars_Control_Spring() {}
+
+    FMars_Control_Spring(float32 InAlpha, float32 InVelocity)
+    {
+        Alpha = InAlpha;
+        Velocity = InVelocity;
+    }
+}
+
+// The pacing rule's memory for one publisher of a grip's pull (utils_control::Advance_PullPacer): the last pull it
+// published, unset before the first, and the time since.
+struct FMars_Control_PullPacer
+{
+    UPROPERTY()
+    TOptional<float32> Published;
+
+    UPROPERTY()
+    float32 SecondsSincePublished = 0.0f;
+}
+
 // A grip in progress, from BeginManipulation to the end (threshold or EndManipulation).
 struct FMars_Control_Manipulation
 {
@@ -301,6 +336,10 @@ struct FMars_Control_Manipulation
     // The source of the grip's interaction; invalid for a grip begun without one, which claims nothing.
     UPROPERTY()
     FCk_Handle Gripper;
+
+    // On the authority only: how this grip's pull was last written to the grip ledger.
+    UPROPERTY()
+    FMars_Control_PullPacer Pacer;
 }
 
 // Written only by the Control request drain.
@@ -330,11 +369,22 @@ struct FMars_Control_PendingEngage
     FCk_Handle Gripper;
 }
 
-// Why the last granted grip was released: its gripper let go, or was destroyed holding it.
+// Why the last granted grip was released: its gripper let go, its pull crossed the threshold (an engage follows), or it
+// was destroyed holding it.
 enum EMars_Control_GripRelease
 {
     Ended,
-    GripperLost
+    GripperLost,
+    Crossed
+}
+
+// Who holds the granted grip, as this machine reads the grip ledger: nobody, this machine's own grip (the gripper of its
+// latest local grip), or another machine.
+enum EMars_Control_GripHolder
+{
+    Nobody,
+    ThisMachine,
+    AnotherMachine
 }
 
 // Replicated; written only by the authority's request drain, on a control whose entity replicates. Gripper stays the last
@@ -347,6 +397,11 @@ struct FMars_Fragment_Control_Grip
 
     UPROPERTY()
     FCk_Handle Gripper;
+
+    // The granted grip's pull 0..1, an absolute value: seeded where the handle stands at the grant, then moved by the
+    // gripper's paced reports. Presentation only; nothing simulated reads it. Kept as it was after a release.
+    UPROPERTY()
+    float32 Pull = 0.0f;
 
     // Every granted grip, counted.
     UPROPERTY()
@@ -382,7 +437,8 @@ struct FMars_Fragment_Control_HeldGrips
 }
 
 // Never replicated: the mover is built on every machine; the release timer is the authority's, the grip the gripping
-// machine's, the pending engage a client's (written only by the Control processors).
+// machine's, the pending engage a client's, the mirrored grip and the watched interactable every machine's (written only
+// by the Control processors).
 struct FMars_Fragment_Control_Local
 {
     UPROPERTY()
@@ -400,6 +456,24 @@ struct FMars_Fragment_Control_Local
     // begins while it stands.
     UPROPERTY()
     TOptional<FMars_Control_PendingEngage> PendingEngage;
+
+    // Set while this machine shows another machine's grip: the handle following the ledger's Pull. Separate from
+    // Manipulation, which is this machine's own grip.
+    UPROPERTY()
+    TOptional<FMars_Control_Spring> MirroredGrip;
+
+    // The gripper of this machine's latest local grip: a ledger grip naming it is this machine's own.
+    UPROPERTY()
+    FCk_Handle LastLocalGripper;
+
+    // Who held the grant when the grip mirror last reconciled.
+    UPROPERTY()
+    EMars_Control_GripHolder GripHolder = EMars_Control_GripHolder::Nobody;
+
+    // The interactable the assembly works the control through; invalid until it is watched. Claimed Operated while
+    // another machine holds the grip.
+    UPROPERTY()
+    FCk_Handle_Interactable Interactable;
 }
 
 // Non-authority only (the authority's setup removes it): the ledger as this machine last broadcast it, seeded with the
@@ -412,6 +486,9 @@ struct FMars_Fragment_Control_Mirror
 
 // Present while Manipulation is set; gates UMars_Processor_Control_Tick.
 struct FMars_Tag_Control_Manipulating {}
+
+// Present while MirroredGrip is set; gates UMars_Processor_Control_MirroredGrip.
+struct FMars_Tag_Control_MirroringGrip {}
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Signals
@@ -498,6 +575,59 @@ struct FMars_Request_Control_Grip
     }
 }
 
+// Gripper's grip has been pulled to Pull (0..1, absolute). The authority's drain of an arbitrated control applies it to
+// the grip ledger only from the current gripper, clamped, in arrival order with the grip requests; anything else is
+// dropped. A client's arrives through its pawn's Server_ControlPull.
+struct FMars_Request_Control_ReportPull
+{
+    UPROPERTY()
+    FCk_Handle Gripper;
+
+    UPROPERTY()
+    float32 Pull = 0.0f;
+
+    FMars_Request_Control_ReportPull() {}
+
+    FMars_Request_Control_ReportPull(FCk_Handle InGripper, float32 InPull)
+    {
+        Gripper = InGripper;
+        Pull = InPull;
+    }
+}
+
+// A report and how many grip requests were queued before it, so the drain reads the two kinds in arrival order.
+struct FMars_Control_QueuedPullReport
+{
+    UPROPERTY()
+    FMars_Request_Control_ReportPull Report;
+
+    UPROPERTY()
+    int32 AfterGripRequests = 0;
+
+    FMars_Control_QueuedPullReport() {}
+
+    FMars_Control_QueuedPullReport(FMars_Request_Control_ReportPull InReport, int32 InAfterGripRequests)
+    {
+        Report = InReport;
+        AfterGripRequests = InAfterGripRequests;
+    }
+}
+
+// The interactable the assembly works this control through, applied on every machine: it holds the Operated claim while
+// another machine holds the grip.
+struct FMars_Request_Control_WatchInteractable
+{
+    UPROPERTY()
+    FCk_Handle_Interactable Interactable;
+
+    FMars_Request_Control_WatchInteractable() {}
+
+    FMars_Request_Control_WatchInteractable(FCk_Handle_Interactable InInteractable)
+    {
+        Interactable = InInteractable;
+    }
+}
+
 // Activating a Momentary control arms its release timer, as an engage would.
 struct FMars_Request_Control_SetActive
 {
@@ -571,15 +701,22 @@ struct FMars_Request_Control_EndManipulation
     FMars_Request_Control_EndManipulation() {}
 }
 
-// Presence = requested; SetActive and the manipulation pair are latest-wins, nudges and grip requests accumulate. Applied
-// SetActive -> grip requests in arrival order -> the drain's engages (Engage, then one per accepted Cross) ->
-// EndManipulation -> BeginManipulation -> Nudges: an engage in the same frame as a Momentary release re-arms it, a claim
-// and its end that arrive together are read in the order they were sent, and an end and a re-grab in one frame leave the
-// control gripped with the nudges on the new grip.
+// Presence = requested; SetActive, WatchInteractable and the manipulation pair are latest-wins, nudges, grip requests and
+// pull reports accumulate. Applied WatchInteractable -> SetActive -> grip requests and pull reports together in arrival
+// order -> the drain's engages (Engage, then one per accepted Cross) -> EndManipulation -> BeginManipulation -> Nudges:
+// an engage in the same frame as a Momentary release re-arms it, a claim, its reports and its end that arrive together
+// are read in the order they were sent, and an end and a re-grab in one frame leave the control gripped with the nudges
+// on the new grip.
 struct FMars_Fragment_Control_Requests
 {
     UPROPERTY()
+    TOptional<FMars_Request_Control_WatchInteractable> WatchInteractableRequest;
+
+    UPROPERTY()
     TArray<FMars_Request_Control_Grip> GripRequests;
+
+    UPROPERTY()
+    TArray<FMars_Control_QueuedPullReport> PullReports;
 
     UPROPERTY()
     TOptional<FMars_Request_Control_Engage> EngageRequest;

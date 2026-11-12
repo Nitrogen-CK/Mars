@@ -35,10 +35,19 @@ class UCk_AutoTest_Net_Control_AGripIsReleasedWhenItsGripperIsDestroyed : UMars_
             && _Control.Get_LastGripRelease() == EMars_Control_GripRelease::GripperLost);
     }
 
+    // Client: the loss shows, and the lever is free here again (another's grip held the Operated claim on it).
+    UFUNCTION()
+    private void Is_GripperLostAndUnclaimed(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Result = OutResult;
+        Result.Set(ck::IsValid(_Control) && _Control.Get_GripSerial() >= 1 && _Control.Get_IsGripped() == false
+            && _Control.Get_LastGripRelease() == EMars_Control_GripRelease::GripperLost && Get_IsClaimed() == false);
+    }
+
     UFUNCTION()
     private void OnClientFound(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
     {
-        WaitUntil(n"Is_GripperLost", n"OnClientSawLoss", k_SlowPolls);
+        WaitUntil(n"Is_GripperLostAndUnclaimed", n"OnClientSawLoss", k_SlowPolls);
     }
 
     UFUNCTION()

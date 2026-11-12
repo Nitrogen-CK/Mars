@@ -8,6 +8,61 @@ namespace utils_control
     // the ledger before it gives the handle back: an engage refused or lost with the control never arrives.
     const float32 k_PendingEngageSeconds = 2.0f;
 
+    // The pacing rule for a grip's pull, wherever it is published (the authority's ledger write, a client's report): a
+    // pull goes out when it differs from the last one published by at least the quantum and at least 1 / k_PullReportHz
+    // has passed since.
+    const float32 k_PullReportQuantum = 0.005f;
+    const float32 k_PullReportHz = 15.0f;
+
+    // A hitch must not blow the spring up: the frame is capped, then integrated in substeps no longer than this. One
+    // semi-implicit Euler step is only stable while Stiffness * dt^2 stays small; at the turnip bed's 400 / 40 a single
+    // 0.08 s step carried alpha from 0.30 past the 0.97 threshold and popped the root on a hitch frame (PIE run-09).
+    // 1/240 s keeps a stiffness of a few thousand well inside the stable range; a 0.1 s frame costs 24 cheap steps.
+    const float32 k_MaxSpringStepSeconds = 0.1f;
+    const float32 k_MaxSpringSubstepSeconds = 1.0f / 240.0f;
+
+    // Advances InOutPacer by InDeltaSeconds and returns whether InPull is published now (the pacing rule above); the
+    // first pull is always published. A true answer records InPull as published.
+    bool Advance_PullPacer(FMars_Control_PullPacer& InOutPacer, float32 InPull, float32 InDeltaSeconds)
+    {
+        InOutPacer.SecondsSincePublished += InDeltaSeconds;
+
+        if (InOutPacer.Published.IsSet())
+        {
+            if (Math::Abs(InPull - InOutPacer.Published.GetValue()) < k_PullReportQuantum)
+            { return false; }
+
+            if (InOutPacer.SecondsSincePublished < 1.0f / k_PullReportHz)
+            { return false; }
+        }
+
+        InOutPacer.Published = InPull;
+        InOutPacer.SecondsSincePublished = 0.0f;
+        return true;
+    }
+
+    // Who holds InLedger's grant as this machine reads it: InLocalGripper is the gripper of this machine's latest local
+    // grip (invalid when it never gripped).
+    EMars_Control_GripHolder Get_GripHolder(const FMars_Fragment_Control_Grip& InLedger, FCk_Handle InLocalGripper)
+    {
+        if (InLedger.Grip == EMars_Control_Grip::Released)
+        { return EMars_Control_GripHolder::Nobody; }
+
+        if (ck::IsValid(InLocalGripper) && InLedger.Gripper == InLocalGripper)
+        { return EMars_Control_GripHolder::ThisMachine; }
+
+        return EMars_Control_GripHolder::AnotherMachine;
+    }
+
+    // The controls the authority granted InGripper and it still holds; empty anywhere else, and for a gripper holding none.
+    TArray<FCk_Handle_Control> Get_HeldControls(const FCk_Handle& InGripper)
+    {
+        if (ck::Is_NOT_Valid(InGripper) || InGripper.Has_Fragment(FMars_Fragment_Control_HeldGrips) == false)
+        { return TArray<FCk_Handle_Control>(); }
+
+        return InGripper.Get_Fragment(FMars_Fragment_Control_HeldGrips).Controls;
+    }
+
     // InParams.Mover is optional: an invalid handle means the control moves nothing. The completion policy and HoldSeconds
     // are retained for Make_InteractTarget; a rejected spec ensures and returns an invalid handle.
     FCk_Handle_Control Add(FCk_Handle& InHandle, FMars_Control_Spec InParams)
@@ -117,6 +172,31 @@ namespace utils_control
     }
 }
 
+// The control's damped spring over InDeltaSeconds (capped, in substeps): Alpha'' = Stiffness (InPull - Alpha) - Damping
+// Alpha', with the travel's ends [0, 1] as hard stops. The one spring a grip and a mirrored grip both move by.
+mixin void Step_Spring(const FMars_Control_Manipulation_Spec& Self, FMars_Control_Spring& InOutSpring, float32 InPull, float32 InDeltaSeconds)
+{
+    const auto DeltaSeconds = Math::Min(InDeltaSeconds, utils_control::k_MaxSpringStepSeconds);
+    const auto Substeps = Math::Max(int32(Math::CeilToInt(DeltaSeconds / utils_control::k_MaxSpringSubstepSeconds)), 1);
+    const auto SubstepSeconds = DeltaSeconds / float32(Substeps);
+    for (int32 Substep = 0; Substep < Substeps; ++Substep)
+    {
+        const auto Acceleration = Self.Stiffness * (InPull - InOutSpring.Alpha) - Self.Damping * InOutSpring.Velocity;
+        InOutSpring.Velocity += Acceleration * SubstepSeconds;
+        InOutSpring.Alpha += InOutSpring.Velocity * SubstepSeconds;
+        if (InOutSpring.Alpha < 0.0f)
+        {
+            InOutSpring.Alpha = 0.0f;
+            InOutSpring.Velocity = 0.0f;
+        }
+        else if (InOutSpring.Alpha > 1.0f)
+        {
+            InOutSpring.Alpha = 1.0f;
+            InOutSpring.Velocity = 0.0f;
+        }
+    }
+}
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Interact Target
 //--------------------------------------------------------------------------------------------------------------------------
@@ -217,9 +297,52 @@ mixin EMars_Control_GripRelease Get_LastGripRelease(const FCk_Handle_Control& Se
     return Self.Get_Fragment(FMars_Fragment_Control_Grip).LastRelease;
 }
 
+// This machine's own grip, never another machine's shown here (TryGet_MirroredGripAlpha).
 mixin bool Get_IsManipulating(const FCk_Handle_Control& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_Control_Local).Manipulation.IsSet();
+}
+
+// Where this machine's own grip has been pulled to, 0..1; unset when not manipulating.
+mixin TOptional<float32> TryGet_ManipulationPull(const FCk_Handle_Control& Self)
+{
+    const auto& State = Self.Get_Fragment(FMars_Fragment_Control_Local);
+    if (State.Manipulation.IsSet() == false)
+    { return TOptional<float32>(); }
+
+    return TOptional<float32>(State.Manipulation.GetValue().Pull);
+}
+
+// The handle position 0..1 this machine shows for another machine's grip; unset unless it is showing one.
+mixin TOptional<float32> TryGet_MirroredGripAlpha(const FCk_Handle_Control& Self)
+{
+    const auto& State = Self.Get_Fragment(FMars_Fragment_Control_Local);
+    if (State.MirroredGrip.IsSet() == false)
+    { return TOptional<float32>(); }
+
+    return TOptional<float32>(State.MirroredGrip.GetValue().Alpha);
+}
+
+// The grip ledger's Pull as it stands on this machine (the last granted grip's, after a release).
+mixin float32 Get_GripPull(const FCk_Handle_Control& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_Control_Grip).Pull;
+}
+
+// Who holds the grant as the grip mirror last read it on this machine.
+mixin EMars_Control_GripHolder Get_GripHolder(const FCk_Handle_Control& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_Control_Local).GripHolder;
+}
+
+// Where a grip starts: the Mover's alpha, or without a Mover the end the pull runs from.
+mixin float32 Get_GripStartAlpha(const FCk_Handle_Control& Self)
+{
+    const auto Mover = Self.Get_Mover();
+    if (ck::IsValid(Mover))
+    { return Mover.Get_Alpha(); }
+
+    return Self.Get_PullDirection() == EMars_Control_PullDirection::TowardStart ? 1.0f : 0.0f;
 }
 
 // The handle's position 0..1 while gripped; unset when not manipulating.
@@ -366,6 +489,21 @@ mixin void Request_Grip(FCk_Handle_Control& Self, const FMars_Request_Control_Gr
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Control_Requests);
     Requests.GripRequests.Add(InRequest);
+}
+
+// A gripper's pull, for the authority's drain (see FMars_Request_Control_ReportPull); queued after the grip requests
+// already waiting, so the drain reads them in arrival order.
+mixin void Request_ReportPull(FCk_Handle_Control& Self, const FMars_Request_Control_ReportPull& InRequest)
+{
+    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Control_Requests);
+    Requests.PullReports.Add(FMars_Control_QueuedPullReport(InRequest, Requests.GripRequests.Num()));
+}
+
+// The assembly names the interactable it works this control through, on every machine.
+mixin void Request_WatchInteractable(FCk_Handle_Control& Self, const FMars_Request_Control_WatchInteractable& InRequest)
+{
+    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Control_Requests);
+    Requests.WatchInteractableRequest = InRequest;
 }
 
 // Lets go: the handle settles back to the current target pose. A no-op when not manipulating.

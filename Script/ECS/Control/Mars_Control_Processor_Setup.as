@@ -2,7 +2,7 @@
 // binds the ledger's rep-notify and reconciles once instead: it moves its own handle and broadcasts OnEngaged once per
 // replicated engagement, then OnActiveChanged, the authority's order. The reconcile also clears the pending engage this
 // client's own pull set (UMars_Processor_Control_Tick) once the ledger counts that engagement, so the next grip reads the
-// new direction.
+// new direction. The handle it moves leaves any mirrored grip (UMars_Processor_Control_MirroredGrip).
 class UMars_Processor_Control_Setup : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -69,10 +69,15 @@ class UMars_Processor_Control_Setup : UCk_Processor_Script_Base_UE
 
         const auto Changed = Ledger.IsActive != Last.IsActive;
 
-        // A returns-to-rest handle is not a state display, as on the authority.
+        // A returns-to-rest handle is not a state display, as on the authority. The MoveTo takes the handle from a mirrored
+        // grip, whichever of the two ledgers arrived first: a scrub after it would stop the tween where the grip left it.
         auto Mover = InControl.Get_Mover();
         if (Changed && ck::IsValid(Mover) && InControl.Get_ReturnsToRest() == false)
-        { Mover.Request_MoveTo(FMars_Request_Mover_MoveTo(Ledger.IsActive ? EMars_Mover_Pose::End : EMars_Mover_Pose::Start)); }
+        {
+            Local.MirroredGrip.Reset();
+            InControl.Request_TryRemove(FMars_Tag_Control_MirroringGrip);
+            Mover.Request_MoveTo(FMars_Request_Mover_MoveTo(Ledger.IsActive ? EMars_Mover_Pose::End : EMars_Mover_Pose::Start));
+        }
 
         if (InControl.Has_Fragment(FMars_Fragment_Control_Signals) == false)
         { return; }
