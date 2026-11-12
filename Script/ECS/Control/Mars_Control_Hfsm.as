@@ -39,9 +39,17 @@ class UMars_SmTask_Control_Engage : UCk_SmTask_EntityScript
         // The control's root is the replicated entity: the cue carries the engage from this (initiating) machine to the
         // authority, which runs it the same way on the listen host and in standalone.
         auto Owner = Context.Get_Fragment(FMars_Fragment_InteractionContext).InteractableOwner;
-        if (ck::Is_NOT_Valid(Owner.As_Control(ECk_SanityCheck::UnChecked)))
+        auto Control = Owner.As_Control(ECk_SanityCheck::UnChecked);
+        if (ck::Is_NOT_Valid(Control))
         {
             Mark_Result(ECk_SmTaskResult::Failed);
+            return;
+        }
+
+        // An arbitrated pulled control's engage already left with its grip's Cross.
+        if (Control.Get_IsGripArbitrated() && Control.Get_CompletionPolicy() == ECk_Interaction_CompletionPolicy::ManuallyCompleted)
+        {
+            Mark_Result(ECk_SmTaskResult::Succeeded);
             return;
         }
 

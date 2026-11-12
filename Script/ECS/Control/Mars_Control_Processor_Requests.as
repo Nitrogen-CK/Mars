@@ -1,7 +1,19 @@
-// Drains SetActive -> Engage -> EndManipulation -> BeginManipulation -> Nudges (see FMars_Fragment_Control_Requests).
-// SetActive and Engage apply on the authority only: a client's are dropped (its engage arrives as Cue.Mars.Control.Engage).
-// The grip requests apply wherever a grip may begin (Get_MayGripHere: the authority, or a client whose control's entity
-// replicates) and are dropped elsewhere. A pending engage on a client begins no grip until it clears.
+// Drains SetActive -> grip requests in arrival order -> the drain's engages -> EndManipulation -> BeginManipulation ->
+// Nudges (see FMars_Fragment_Control_Requests). SetActive and Engage apply on the authority only: a client's are dropped (its engage
+// arrives as Cue.Mars.Control.Engage). The manipulation requests apply wherever a grip may begin (Get_MayGripHere: the
+// authority, or a client whose control's entity replicates) and are dropped elsewhere. A pending engage on a client begins
+// no grip until it clears.
+//
+// The grip arbiter, on the authority of an arbitrated control only (Get_IsGripArbitrated; anywhere else a grip claim is
+// dropped and the grip ledger never moves), one request at a time in the order they arrived. Begin: a Released ledger
+// grants (Gripped, the gripper, GripSerial + 1) and watches the gripper's destruction through
+// FMars_Fragment_Control_HeldGrips on it; the holder asking again changes nothing; anyone else is refused (RefusalSerial +
+// 1, LastRefused), never with an ensure (two players reaching for one lever is legitimate), and this machine's grip mirror
+// runs for it. LetGo: only the holder releases (Ended). Cross: only the holder releases (Ended), and the control engages
+// once for it; from anyone else it is dropped. The holder's destruction releases (GripperLost). A drain may apply more
+// than one engage (its Engage request and each accepted Cross): each toggles or re-arms as an engage does and raises
+// OnEngaged. Every ledger change marks it dirty. This machine's own grip reports itself: a grip begun by an interaction
+// claims for the interaction's source, and its end reports exactly one of LetGo or Cross (utils_control::Request_GripFor).
 class UMars_Processor_Control_HandleRequests : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -28,6 +40,13 @@ class UMars_Processor_Control_HandleRequests : UCk_Processor_Script_Base_UE
         // Off authority only the grip applies; the ledger is the authority's.
         const auto HasAuthority = utils_net::Get_HasAuthority(InHandle);
         const auto HasEngage = HasAuthority && InRequests.EngageRequest.IsSet();
+
+        // A claim anywhere but an arbitrated control's authority is dropped: the grip ledger is that authority's alone.
+        const auto Arbitrates = HasAuthority && Self.Get_IsGripArbitrated();
+        TArray<FMars_Request_Control_Grip> GripRequests;
+        if (Arbitrates)
+        { GripRequests = InRequests.GripRequests; }
+
         const auto HasSetActive = HasAuthority && InRequests.SetActiveRequest.IsSet();
         auto SetActiveValue = false;
         if (HasSetActive)
@@ -49,6 +68,7 @@ class UMars_Processor_Control_HandleRequests : UCk_Processor_Script_Base_UE
         const auto WasActive = InState.IsActive;
         auto NewActive = WasActive;
 
+
         if (HasSetActive)
         {
             if (SetActiveValue == false)
@@ -59,7 +79,22 @@ class UMars_Processor_Control_HandleRequests : UCk_Processor_Script_Base_UE
             NewActive = SetActiveValue;
         }
 
-        if (HasEngage)
+        // Strictly in arrival order: a claim and its end that land together are read as they were sent.
+        auto EngageCount = HasEngage ? 1 : 0;
+        for (const auto& Request : GripRequests)
+        {
+            if (Request.Verb == EMars_Control_GripVerb::Begin)
+            {
+                HandleGripBegin(Self, Request.Gripper);
+                continue;
+            }
+
+            const auto Released = HandleGripEnd(Self, Request.Gripper);
+            if (Released && Request.Verb == EMars_Control_GripVerb::Cross)
+            { EngageCount += 1; }
+        }
+
+        for (int32 Engage = 0; Engage < EngageCount; ++Engage)
         {
             if (Params.Behavior == EMars_Control_Behavior::Toggle)
             { NewActive = NewActive == false; }
@@ -83,7 +118,7 @@ class UMars_Processor_Control_HandleRequests : UCk_Processor_Script_Base_UE
             { Mover.Request_MoveTo(FMars_Request_Mover_MoveTo(NewActive ? EMars_Mover_Pose::End : EMars_Mover_Pose::Start)); }
         }
 
-        if (Changed || HasEngage)
+        if (Changed || EngageCount > 0)
         { InHandle.Request_MarkReplicationDirty(FMars_Fragment_Control); }
 
         // Not manipulating: the threshold already ended it, and a Settle here would fight the Engage's MoveTo.
@@ -100,8 +135,11 @@ class UMars_Processor_Control_HandleRequests : UCk_Processor_Script_Base_UE
         if (Local.Manipulation.IsSet())
         { TurnDegrees = ApplyNudges(Self, Local, NudgeRequests); }
 
-        if (HasEngage && Self.Has_Fragment(FMars_Fragment_Control_Signals))
-        { Self.Get_Fragment(FMars_Fragment_Control_Signals).OnEngaged.Broadcast(Self); }
+        for (int32 Engage = 0; Engage < EngageCount; ++Engage)
+        {
+            if (Self.Has_Fragment(FMars_Fragment_Control_Signals))
+            { Self.Get_Fragment(FMars_Fragment_Control_Signals).OnEngaged.Broadcast(Self); }
+        }
 
         if (Changed && Self.Has_Fragment(FMars_Fragment_Control_Signals))
         {
@@ -125,12 +163,15 @@ class UMars_Processor_Control_HandleRequests : UCk_Processor_Script_Base_UE
     // Lets go before the threshold: the handle settles back to the current target pose from wherever it is.
     private void EndManipulation(FCk_Handle_Control& InControl, FMars_Fragment_Control_Local& InState)
     {
+        const auto Gripper = InState.Manipulation.GetValue().Gripper;
         InState.Manipulation.Reset();
         InControl.Request_TryRemove(FMars_Tag_Control_Manipulating);
 
         auto Mover = InState.Mover;
         if (ck::IsValid(Mover))
         { Mover.Request_Settle(FMars_Request_Mover_Settle()); }
+
+        utils_control::Request_GripFor(InControl, Gripper, EMars_Control_GripVerb::LetGo);
     }
 
     // Returns false while a pending engage stands (not an error: the grip is asked again once it clears), when the control
@@ -165,8 +206,17 @@ class UMars_Processor_Control_HandleRequests : UCk_Processor_Script_Base_UE
         // A FreeTurn grip has no threshold to cross, whatever the request asked.
         const auto IsFreeTurn = InControl.Get_IsFreeTurn();
 
+        auto Gripper = FCk_Handle();
+        if (ck::IsValid(InRequest.Interaction))
+        { Gripper = utils_interaction::Get_InteractionSource(InRequest.Interaction); }
+
+        // A grip that replaces another's without an end lets the other's claim go first.
+        if (InState.Manipulation.IsSet() && InState.Manipulation.GetValue().Gripper != Gripper)
+        { utils_control::Request_GripFor(InControl, InState.Manipulation.GetValue().Gripper, EMars_Control_GripVerb::LetGo); }
+
         auto Manipulation = FMars_Control_Manipulation();
         Manipulation.Interaction = InRequest.Interaction;
+        Manipulation.Gripper = Gripper;
         Manipulation.Completion = IsFreeTurn ? EMars_Control_ManipulationCompletion::OnRelease : InRequest.Completion;
         Manipulation.Alpha = HasMover ? Mover.Get_Alpha() : RestAlpha;
         Manipulation.Pull = Manipulation.Alpha;
@@ -183,7 +233,96 @@ class UMars_Processor_Control_HandleRequests : UCk_Processor_Script_Base_UE
         if (HasMover)
         { Mover.Request_Scrub(FMars_Request_Mover_Scrub(Manipulation.Alpha)); }
 
+        // The local grip does not wait for the answer: a refusal ends it once it is mirrored.
+        utils_control::Request_GripFor(InControl, Gripper, EMars_Control_GripVerb::Begin);
         return true;
+    }
+
+    // The arbiter's Begin (see the class comment). A gripper destroyed while its claim was in flight claims nothing.
+    private void HandleGripBegin(FCk_Handle_Control& InControl, FCk_Handle InGripper)
+    {
+        if (ck::Is_NOT_Valid(InGripper))
+        { return; }
+
+        auto& Ledger = InControl.Get_Fragment(FMars_Fragment_Control_Grip);
+        if (Ledger.Grip == EMars_Control_Grip::Gripped)
+        {
+            if (Ledger.Gripper == InGripper)
+            { return; }
+
+            Ledger.RefusalSerial += 1;
+            Ledger.LastRefused = InGripper;
+            InControl.H().Request_MarkReplicationDirty(FMars_Fragment_Control_Grip);
+
+            // The authority mirrors its own ledger: a grip of this machine's that was refused lets go.
+            if (InControl.Has_Fragment(FMars_Tag_Control_NeedsGripMirror) == false)
+            { InControl.Add_Fragment(FMars_Tag_Control_NeedsGripMirror()); }
+
+            return;
+        }
+
+        Ledger.Grip = EMars_Control_Grip::Gripped;
+        Ledger.Gripper = InGripper;
+        Ledger.GripSerial += 1;
+        InControl.H().Request_MarkReplicationDirty(FMars_Fragment_Control_Grip);
+
+        auto Gripper = InGripper;
+        auto& Held = Gripper.AddOrGet_Fragment(FMars_Fragment_Control_HeldGrips);
+        if (Held.Controls.Contains(InControl) == false)
+        { Held.Controls.Add(InControl); }
+
+        // Unbind first keeps the watch single across the controls one gripper holds.
+        Gripper.UnbindFrom_OnBeginDestroy(FCk_Delegate_OnBeginDestroy(this, n"OnGripperBeginDestroy"));
+        Gripper.BindTo_OnBeginDestroy(FCk_Delegate_OnBeginDestroy(this, n"OnGripperBeginDestroy"));
+    }
+
+    // The arbiter's LetGo and Cross: scoped, so an end naming anyone but the holder changes nothing. Returns whether the
+    // grip was released.
+    private bool HandleGripEnd(FCk_Handle_Control& InControl, FCk_Handle InGripper)
+    {
+        auto& Ledger = InControl.Get_Fragment(FMars_Fragment_Control_Grip);
+        if (Ledger.Grip == EMars_Control_Grip::Released || ck::Is_NOT_Valid(InGripper) || Ledger.Gripper != InGripper)
+        { return false; }
+
+        Ledger.Grip = EMars_Control_Grip::Released;
+        Ledger.LastRelease = EMars_Control_GripRelease::Ended;
+        InControl.H().Request_MarkReplicationDirty(FMars_Fragment_Control_Grip);
+
+        auto Gripper = InGripper;
+        if (Gripper.Has_Fragment(FMars_Fragment_Control_HeldGrips) == false)
+        { return true; }
+
+        auto& Held = Gripper.Get_Fragment(FMars_Fragment_Control_HeldGrips);
+        Held.Controls.Remove(InControl);
+        if (Held.Controls.IsEmpty())
+        { Gripper.UnbindFrom_OnBeginDestroy(FCk_Delegate_OnBeginDestroy(this, n"OnGripperBeginDestroy")); }
+
+        return true;
+    }
+
+    // A gripper going away releases every grip it still holds.
+    UFUNCTION()
+    private void OnGripperBeginDestroy(FCk_Handle InGripper)
+    {
+        if (InGripper.Has_Fragment(FMars_Fragment_Control_HeldGrips) == false)
+        { return; }
+
+        auto Gripper = InGripper;
+        auto Controls = Gripper.Get_Fragment(FMars_Fragment_Control_HeldGrips).Controls;
+        for (int32 Index = 0; Index < Controls.Num(); ++Index)
+        {
+            auto Control = Controls[Index];
+            if (ck::Is_NOT_Valid(Control) || Control.Has_Fragment(FMars_Fragment_Control_Grip) == false)
+            { continue; }
+
+            auto& Ledger = Control.Get_Fragment(FMars_Fragment_Control_Grip);
+            if (Ledger.Grip == EMars_Control_Grip::Released || Ledger.Gripper != InGripper)
+            { continue; }
+
+            Ledger.Grip = EMars_Control_Grip::Released;
+            Ledger.LastRelease = EMars_Control_GripRelease::GripperLost;
+            Control.H().Request_MarkReplicationDirty(FMars_Fragment_Control_Grip);
+        }
     }
 
     // Returns the drain's degrees for a FreeTurn control (its pull is not integrated), 0 for Travel. A Walk control's pull is

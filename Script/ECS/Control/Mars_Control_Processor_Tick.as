@@ -8,7 +8,10 @@
 // It runs wherever a grip began: the authority, or a client whose control replicates (the Manipulating tag exists only
 // there). A threshold crossed without authority also sets a pending engage: no grip begins until the ledger counts the
 // engagement (UMars_Processor_Control_Setup clears it), and when utils_control::k_PendingEngageSeconds pass first the
-// handle settles back from the threshold.
+// handle settles back from the threshold. Each grip ending here reports its end to the arbiter exactly once
+// (utils_control::Request_GripFor): a lost puller, or a threshold whose interaction is already gone, reports LetGo; a
+// threshold reports Cross when its interaction finishes Succeeded, LetGo when it finishes Failed. The pending engage keeps
+// the gripper, so a refusal mirrored after the crossing (UMars_Processor_Control_GripMirror) clears it at once.
 class UMars_Processor_Control_Tick : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -97,6 +100,7 @@ class UMars_Processor_Control_Tick : UCk_Processor_Script_Base_UE
         // A lever's handle is carried the rest of the way by the Engage's MoveTo; a returns-to-rest handle springs back now
         // (the Mover drains Scrub before Settle, so the tween starts from this frame's alpha).
         auto Interaction = Manipulation.Interaction;
+        const auto Gripper = Manipulation.Gripper;
         Local.Manipulation.Reset();
         Self.Request_TryRemove(FMars_Tag_Control_Manipulating);
 
@@ -111,11 +115,19 @@ class UMars_Processor_Control_Tick : UCk_Processor_Script_Base_UE
 
         // Until the engage comes back, this machine's ledger still holds the direction the crossing is about to change.
         if (utils_net::Get_HasAuthority(InHandle) == false)
-        { Arm_PendingEngage(Self, Local, InState.Engagements); }
+        {
+            auto Pending = FMars_Control_PendingEngage();
+            Pending.Engagements = InState.Engagements;
+            Pending.Gripper = Gripper;
+            Arm_PendingEngage(Self, Local, Pending);
+        }
 
-        // The interaction was cancelled before the threshold: nothing is left to complete.
+        // The interaction was cancelled before the threshold: nothing is left to complete, and the grip only lets go.
         if (ck::Is_NOT_Valid(Interaction))
-        { return; }
+        {
+            utils_control::Request_GripFor(Self, Gripper, EMars_Control_GripVerb::LetGo);
+            return;
+        }
 
         utils_interaction::BindTo_OnInteractionFinished(Interaction,
             FCk_Delegate_Interaction_OnInteractionFinished(this, n"OnThresholdInteractionFinished"),
@@ -127,6 +139,7 @@ class UMars_Processor_Control_Tick : UCk_Processor_Script_Base_UE
     // EndManipulation's end (UMars_Processor_Control_HandleRequests): the handle settles back, Released and progress 0.
     private void EndWithoutPuller(FCk_Handle_Control& InControl, FMars_Fragment_Control_Local& InState)
     {
+        const auto Gripper = InState.Manipulation.GetValue().Gripper;
         InState.Manipulation.Reset();
         InControl.Request_TryRemove(FMars_Tag_Control_Manipulating);
 
@@ -139,9 +152,12 @@ class UMars_Processor_Control_Tick : UCk_Processor_Script_Base_UE
 
         if (InControl.Has_Fragment(FMars_Fragment_Control_Signals))
         { InControl.Get_Fragment(FMars_Fragment_Control_Signals).OnManipulationProgress.Broadcast(InControl, 0.0f); }
+
+        utils_control::Request_GripFor(InControl, Gripper, EMars_Control_GripVerb::LetGo);
     }
 
-    private void Arm_PendingEngage(FCk_Handle_Control& InControl, FMars_Fragment_Control_Local& InState, int32 InEngagements)
+    // InPending carries the crossing's engagements and gripper; its timer is armed here.
+    private void Arm_PendingEngage(FCk_Handle_Control& InControl, FMars_Fragment_Control_Local& InState, FMars_Control_PendingEngage InPending)
     {
         auto TimerSpec = FCk_Timer_Spec(FCk_Time(utils_control::k_PendingEngageSeconds));
         TimerSpec.Set_StartingState(ECk_Timer_State::Running)
@@ -151,8 +167,7 @@ class UMars_Processor_Control_Tick : UCk_Processor_Script_Base_UE
         if (ck::IsValid(Timer))
         { Timer.BindTo_OnDone(FCk_Delegate_Timer(this, n"OnPendingEngageTimerDone")); }
 
-        auto Pending = FMars_Control_PendingEngage();
-        Pending.Engagements = InEngagements;
+        auto Pending = InPending;
         Pending.Timer = Timer;
         InState.PendingEngage = Pending;
     }
@@ -181,21 +196,26 @@ class UMars_Processor_Control_Tick : UCk_Processor_Script_Base_UE
         { Mover.Request_Settle(FMars_Request_Mover_Settle()); }
     }
 
-    // A Failed finish engages nothing, so the handle would rest at the threshold: settle it back to the current target
-    // pose - unless a re-grip already owns the handle.
+    // The threshold's grip ends here: Succeeded reports Cross (the arbiter engages for it), Failed reports LetGo. A Failed
+    // finish engages nothing, so the handle would rest at the threshold: settle it back to the current target pose - unless
+    // a re-grip already owns the handle.
     UFUNCTION()
     private void OnThresholdInteractionFinished(FCk_Handle_Interaction InInteraction, ECk_SucceededFailed InResult)
     {
-        if (InResult == ECk_SucceededFailed::Succeeded)
-        { return; }
-
-        // The control's target, unless it is being torn down.
+        // The control's target, unless it is being torn down (its grip goes with it).
         auto TargetEntity = utils_interaction::Get_InteractionTarget(InInteraction);
         if (ck::Is_NOT_Valid(TargetEntity))
         { return; }
 
         auto Target = TargetEntity.As_InteractTarget();
         auto Control = Target.Get_Fragment(FMars_Fragment_InteractionContext).InteractableOwner.As_Control();
+        const auto Gripper = utils_interaction::Get_InteractionSource(InInteraction);
+        const auto Verb = InResult == ECk_SucceededFailed::Succeeded ? EMars_Control_GripVerb::Cross : EMars_Control_GripVerb::LetGo;
+        utils_control::Request_GripFor(Control, Gripper, Verb);
+
+        if (InResult == ECk_SucceededFailed::Succeeded)
+        { return; }
+
         if (Control.Get_IsManipulating())
         { return; }
 

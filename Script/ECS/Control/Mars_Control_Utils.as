@@ -38,10 +38,50 @@ namespace utils_control
         InHandle.Add_Fragment(FMars_Feature_Control());
         InHandle.Add_Fragment(Params);
         InHandle.Add_Fragment(Local);
-        InHandle.Add_Fragment(State, ECk_Replication::Replicates);
+        // A client's copy can receive the ledger before it composes: the arrived one stands; the mirror's seed stays the
+        // composed state, so a value that arrived early still broadcasts.
+        if (InHandle.Has_Fragment(FMars_Fragment_Control) == false)
+        { InHandle.Add_Fragment(State, ECk_Replication::Replicates); }
+
         InHandle.Add_Fragment(Mirror);
+
+        // A client's copy can receive the grip ledger before it composes: the arrived one stands, and the mirror starts
+        // from it.
+        if (InHandle.Has_Fragment(FMars_Fragment_Control_Grip) == false)
+        { InHandle.Add_Fragment(FMars_Fragment_Control_Grip(), ECk_Replication::Replicates); }
+
+        auto GripMirror = FMars_Fragment_Control_GripMirror();
+        GripMirror.Last = InHandle.Get_Fragment(FMars_Fragment_Control_Grip);
+        InHandle.Add_Fragment(GripMirror);
+        InHandle.Add_Fragment(FMars_Tag_Control_NeedsGripMirror());
+
         InHandle.Add_Fragment(FMars_Tag_Control_NeedsSetup());
         return InHandle.As_Control();
+    }
+
+    // The ledger's gripper; invalid while Released.
+    FCk_Handle Get_GrippedBy(const FMars_Fragment_Control_Grip& InLedger)
+    {
+        if (InLedger.Grip == EMars_Control_Grip::Released)
+        { return FCk_Handle(); }
+
+        return InLedger.Gripper;
+    }
+
+    // InGripper begins or ends a grip on InControl: the kernel's report of this machine's own grip, sent through
+    // Cue.Mars.Control.Grip, which only the control's authority applies. A grip with no gripper (begun without an
+    // interaction) or on a control that is not arbitrated claims nothing: nothing is sent.
+    void Request_GripFor(FCk_Handle_Control& InControl, FCk_Handle InGripper, EMars_Control_GripVerb InVerb)
+    {
+        if (ck::Is_NOT_Valid(InGripper) || InControl.Get_IsGripArbitrated() == false)
+        { return; }
+
+        // The cue executor is found through the implicit world context, which a processor does not have and which two
+        // PIE worlds in one process would share: scope it to the control's own world.
+        const UWorld World = utils_entity_lifetime::Get_WorldForEntity(InControl);
+        const auto WorldContext = FAngelscriptGameThreadScopeWorldContext(World);
+        utils_cue_generic::Request_ExecuteCue(InControl, GameplayTags::Cue_Mars_Control_Grip, FMars_Request_Control_Grip(InGripper, InVerb),
+            ECk_Cue_ReliabilityPolicy::Reliable, ECk_Cue_MulticastPolicy::ServerOnly);
     }
 
     // The look delta projected onto the control's on-screen pull direction, in the look delta's units (degrees of
@@ -135,6 +175,46 @@ mixin ECk_Interaction_CompletionPolicy Get_CompletionPolicy(const FCk_Handle_Con
 mixin bool Get_MayGripHere(const FCk_Handle_Control& Self)
 {
     return utils_net::Get_HasAuthority(Self) || utils_entity_replication_driver::Has(Self);
+}
+
+// Whether the authority decides who grips: a control whose own entity replicates (has a replication driver). One without
+// keeps its direct grip and engage, on its one machine, and its grip ledger never moves.
+mixin bool Get_IsGripArbitrated(const FCk_Handle_Control& Self)
+{
+    return utils_entity_replication_driver::Has(Self);
+}
+
+// The granted grip's gripper, as the ledger stands on this machine; invalid while Released.
+mixin FCk_Handle Get_Gripper(const FCk_Handle_Control& Self)
+{
+    return utils_control::Get_GrippedBy(Self.Get_Fragment(FMars_Fragment_Control_Grip));
+}
+
+mixin bool Get_IsGripped(const FCk_Handle_Control& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_Control_Grip).Grip == EMars_Control_Grip::Gripped;
+}
+
+mixin int32 Get_GripSerial(const FCk_Handle_Control& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_Control_Grip).GripSerial;
+}
+
+mixin int32 Get_RefusalSerial(const FCk_Handle_Control& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_Control_Grip).RefusalSerial;
+}
+
+// Who the latest refusal named; invalid before any.
+mixin FCk_Handle Get_LastRefused(const FCk_Handle_Control& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_Control_Grip).LastRefused;
+}
+
+// Why the last granted grip was released; Ended before any.
+mixin EMars_Control_GripRelease Get_LastGripRelease(const FCk_Handle_Control& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_Control_Grip).LastRelease;
 }
 
 mixin bool Get_IsManipulating(const FCk_Handle_Control& Self)
@@ -280,6 +360,14 @@ mixin void Request_Nudge(FCk_Handle_Control& Self, const FMars_Request_Control_N
     Requests.NudgeRequests.Add(InRequest);
 }
 
+// A grip claim or its release, applied by the authority on an arbitrated control and dropped anywhere else. The kernel
+// sends its own through utils_control::Request_GripFor; a direct call is for a holder with no grip of its own.
+mixin void Request_Grip(FCk_Handle_Control& Self, const FMars_Request_Control_Grip& InRequest)
+{
+    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Control_Requests);
+    Requests.GripRequests.Add(InRequest);
+}
+
 // Lets go: the handle settles back to the current target pose. A no-op when not manipulating.
 mixin void Request_EndManipulation(FCk_Handle_Control& Self, const FMars_Request_Control_EndManipulation& InRequest)
 {
@@ -359,4 +447,18 @@ mixin void UnbindFrom_OnTurned(FCk_Handle_Control& Self, FMars_Delegate_Control_
     { return; }
 
     Self.Get_Fragment(FMars_Fragment_Control_Signals).OnTurned.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void BindTo_OnGripRefused(FCk_Handle_Control& Self, FMars_Delegate_Control_OnGripRefused InDelegate)
+{
+    auto& Fragment = Self.AddOrGet_Fragment(FMars_Fragment_Control_Signals);
+    Fragment.OnGripRefused.AddUFunction(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void UnbindFrom_OnGripRefused(FCk_Handle_Control& Self, FMars_Delegate_Control_OnGripRefused InDelegate)
+{
+    if (Self.Has_Fragment(FMars_Fragment_Control_Signals) == false)
+    { return; }
+
+    Self.Get_Fragment(FMars_Fragment_Control_Signals).OnGripRefused.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
 }
