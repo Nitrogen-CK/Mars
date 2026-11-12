@@ -84,7 +84,11 @@ class UMars_AutoTestRig_NetPlatter : UMars_AutoTestRig_NetFoodPiece
     protected float64 _RideErrorCm = -1.0;
     protected float64 _RideErrorDegrees = -1.0;
 
+    // Client: the frame of its last Deposit.
+    protected int64 _DepositFrame = -1;
+
     private FCk_Handle _LoadFood;
+    private FCk_Handle _AwaitedFood;
     private int32 _FrozenHeld = 0;
     private int32 _FrozenLoaded = 0;
     private int32 _AwaitedStep = 0;
@@ -387,9 +391,91 @@ class UMars_AutoTestRig_NetPlatter : UMars_AutoTestRig_NetFoodPiece
         return "";
     }
 
+    // This machine's platter refusal ledger.
+    protected bool Get_PlatterLedgerNamesSubject()
+    {
+        return _Platter.Get_LastRefused() == Get_SubjectEntity();
+    }
+
+    protected FString Describe_PlatterLedger()
+    {
+        if (ck::Is_NOT_Valid(_Platter))
+        { return "ledger=[no platter]"; }
+
+        return f"ledger=[serial={_Platter.Get_RefusalSerial()} last={_Platter.Get_LastRefusal() :n} namesSubject={Get_PlatterLedgerNamesSubject()}]";
+    }
+
+    // This machine's FoodPiece of the subject's selected food; invalid while it holds none.
+    protected FCk_Handle_FoodPiece Get_SelectedFoodPiece()
+    {
+        return utils_platter_dock::TryGet_SelectedFoodPiece(Get_SubjectEntity());
+    }
+
+    // The subject's deposit on this machine's platter, as the deposit task asks it at the grip.
+    protected void Deposit()
+    {
+        _DepositFrame = utils_time::Get_FrameCounter();
+        utils_platter::Request_DepositFor(_Platter, Get_SubjectEntity());
+    }
+
     //----------------------------------------------------------------------------------------------------------------------
     // Server
     //----------------------------------------------------------------------------------------------------------------------
+
+    protected void On_ServerFoodHeld() {}
+
+    // Server: the subject holds InFood once its piece is Ready (its item into the subject's stow target, the kernel path a
+    // pickup takes); On_ServerFoodHeld once it is the subject's held item, Held and settled.
+    protected void Hold_FoodWhenReady(FCk_Handle InFood)
+    {
+        _AwaitedFood = InFood;
+        WaitUntil(n"Is_RigHeldFoodReady", n"OnRigHeldFoodReady", k_SlowPolls);
+    }
+
+    UFUNCTION()
+    private void Is_RigHeldFoodReady(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Result = OutResult;
+        Result.Set(Get_IsFoodReady(_AwaitedFood) && _AwaitedFood.As_WorldItem().Get_IsLinked() && Get_IsCarrierReady(_Carrier));
+    }
+
+    UFUNCTION()
+    private void OnRigHeldFoodReady(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
+    {
+        Stow(_AwaitedFood.As_WorldItem());
+        WaitUntil(n"Is_RigFoodStowed", n"OnRigFoodStowed", k_SlowPolls);
+    }
+
+    UFUNCTION()
+    private void Is_RigFoodStowed(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Result = OutResult;
+        Result.Set(_Carrier.Hotbar.TryGet_SlotIndexOf(_AwaitedFood.As_WorldItem().Get_Item()).IsSet());
+    }
+
+    // A food stowed in a bag slot is in the hands once that slot is selected.
+    UFUNCTION()
+    private void OnRigFoodStowed(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
+    {
+        const auto Index = _Carrier.Hotbar.TryGet_SlotIndexOf(_AwaitedFood.As_WorldItem().Get_Item()).GetValue();
+        _Carrier.Hotbar.Request_SetSelection(FMars_Request_Hotbar_SetSelection(TOptional<int32>(Index)));
+        WaitUntil(n"Is_RigFoodHeld", n"OnRigFoodHeld", k_SlowPolls);
+    }
+
+    UFUNCTION()
+    private void Is_RigFoodHeld(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto WorldItem = _AwaitedFood.As_WorldItem();
+        auto Result = OutResult;
+        Result.Set(_Carrier.HeldItem.Get_CurrentItem() == WorldItem.Get_Item() && WorldItem.Get_Mount() == EMars_WorldItem_Mount::Held
+            && WorldItem.Get_Carrier() == Get_SubjectEntity() && WorldItem.Get_IsSettled());
+    }
+
+    UFUNCTION()
+    private void OnRigFoodHeld(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
+    {
+        On_ServerFoodHeld();
+    }
 
     protected void On_ServerPlatterReady() {}
 

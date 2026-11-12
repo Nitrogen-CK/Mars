@@ -4,7 +4,9 @@
 // its ride (FMars_Fragment_FoodPiece_Net), so every machine attaches its own copy of a frozen piece under its own copy of
 // the platter's root and the pile rides that machine's tray. A client reads counts, wholeness and kinds from the ledger;
 // the lists of pieces, the settle clocks, the queue and the membership never leave the authority. Every machine builds
-// the walls.
+// the walls. A deposit (the food in a player's hands put on the platter) is asked by any machine through
+// utils_platter::Request_DepositFor and run from start to end by the authority, which lets the food go and loads it; a
+// refused deposit is in the ledger with its reason and whom it refused.
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
@@ -332,6 +334,77 @@ struct FMars_Fragment_Platter_Net
     // The distinct kind containers of every live piece on the books, in first-seen order.
     UPROPERTY()
     TArray<FGameplayTagContainer> PieceKinds;
+
+    // One more per refused deposit, so an initiator that recorded it before asking knows a newer refusal is about its own.
+    // Written by the Platter processors when they refuse a deposit; utils_platter::Publish leaves it and the two below.
+    UPROPERTY()
+    int32 RefusalSerial = 0;
+
+    UPROPERTY()
+    EMars_Interaction_FailReason LastRefusal = EMars_Interaction_FailReason::ActionBlocked;
+
+    // The refused initiator, a player's entity. On a client it may arrive unresolved: that only means "not known here yet".
+    UPROPERTY()
+    FCk_Handle LastRefused;
+}
+
+// Where a deposit stands on the authority's books.
+enum EMars_Platter_DepositStep
+{
+    // Drained, not looked at yet.
+    Asked,
+    // The food's release is asked: its world item settles World (OnMountSettled) or refuses it (OnReleaseRefused).
+    Releasing,
+    // Released: the platter loads it once it hangs off no node (a piece hanging off a node is one something else took).
+    Leaving,
+    // The platter is asked to load it: the drain accepts it on the books or refuses it.
+    Loading
+}
+
+struct FMars_Platter_Deposit
+{
+    UPROPERTY()
+    FCk_Handle Initiator;
+
+    // Set once the food carries this deposit's mark (FMars_Fragment_Platter_Depositing): from Releasing on.
+    UPROPERTY()
+    FCk_Handle_WorldItem Food;
+
+    UPROPERTY()
+    FCk_Handle_FoodPiece Piece;
+
+    UPROPERTY()
+    EMars_Platter_DepositStep Step = EMars_Platter_DepositStep::Asked;
+
+    FMars_Platter_Deposit() {}
+
+    FMars_Platter_Deposit(FCk_Handle InInitiator)
+    {
+        Initiator = InInitiator;
+    }
+}
+
+// Local, on the authority's platter while any deposit is pending, in the order they were asked; written only by the
+// Platter processors.
+struct FMars_Fragment_Platter_Deposits
+{
+    UPROPERTY()
+    TArray<FMars_Platter_Deposit> Pending;
+}
+
+// Local, on a food from the release a deposit asked for to that deposit's answer: the platter it is going to. A food with
+// it is in one deposit already. Written only by the Platter processors.
+struct FMars_Fragment_Platter_Depositing
+{
+    UPROPERTY()
+    FCk_Handle_Platter Platter;
+
+    FMars_Fragment_Platter_Depositing() {}
+
+    FMars_Fragment_Platter_Depositing(FCk_Handle_Platter InPlatter)
+    {
+        Platter = InPlatter;
+    }
 }
 
 // On every piece the platter holds (held, settling or queued); written only by the Platter processors. Removed on Unload,
@@ -424,7 +497,26 @@ struct FMars_Request_Platter_SetMounted
     }
 }
 
-// Applied SetMounted -> Unload -> Load: the latest SetMounted wins, and an unload never races a load of the same piece.
+// Put Initiator's selected food on the platter: the authority lets it go from Initiator's hands, waits until it is free and
+// loads it (UMars_Processor_Platter_Deposits). A deposit with no food in the hands, on a full platter, of a food already in
+// a deposit, whose release is refused, whose piece is gone before the load, or whose load is refused is refused in the
+// platter's replicated ledger (FMars_Fragment_Platter_Net) naming Initiator. Sent by utils_platter::Request_DepositFor; a
+// copy without authority drops it.
+struct FMars_Request_Platter_Deposit
+{
+    UPROPERTY()
+    FCk_Handle Initiator;
+
+    FMars_Request_Platter_Deposit() {}
+
+    FMars_Request_Platter_Deposit(FCk_Handle InInitiator)
+    {
+        Initiator = InInitiator;
+    }
+}
+
+// Applied SetMounted -> Unload -> Deposit -> Load: the latest SetMounted wins, and an unload never races a load of the same
+// piece.
 struct FMars_Fragment_Platter_Requests
 {
     UPROPERTY()
@@ -432,6 +524,9 @@ struct FMars_Fragment_Platter_Requests
 
     UPROPERTY()
     TArray<FMars_Request_Platter_Unload> UnloadRequests;
+
+    UPROPERTY()
+    TArray<FMars_Request_Platter_Deposit> DepositRequests;
 
     UPROPERTY()
     TArray<FMars_Request_Platter_Load> LoadRequests;

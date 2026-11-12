@@ -10,7 +10,8 @@
 //           the dock's item into the initiator's hotbar stow target. The dock's occupancy and policy are judged by the Dock
 //           and Undock handlers alone. One Act transfers at a time; a second while the first is in flight is refused. A
 //           refused Act advances FMars_Fragment_PlatterDock_Net naming the initiator, without an ensure: two machines
-//           racing for one dock is legitimate.
+//           racing for one dock is legitimate. A PlaceFood is forwarded to the docked platter as a deposit while the dock
+//           still offers the initiator PlaceFood, and refused ActionBlocked otherwise; it moves nothing of the dock's.
 class UMars_Processor_PlatterDock_HandleRequests : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -107,6 +108,12 @@ class UMars_Processor_PlatterDock_HandleRequests : UCk_Processor_Script_Base_UE
     {
         const auto Initiator = InRequest.Initiator;
         const auto Action = InRequest.Action;
+        if (Action == EMars_PlatterDock_Action::PlaceFood)
+        {
+            Forward_PlaceFood(InDock, Initiator);
+            return;
+        }
+
         if (Action != EMars_PlatterDock_Action::Place && Action != EMars_PlatterDock_Action::Take)
         {
             Refuse_Act(InDock, Initiator, EMars_Interaction_FailReason::ActionBlocked);
@@ -155,6 +162,20 @@ class UMars_Processor_PlatterDock_HandleRequests : UCk_Processor_Script_Base_UE
         InDock.Add_Fragment(FMars_Fragment_PlatterDock_PendingAct(Initiator, Item));
         if (HandleUndockRequest(InDock, InState, FMars_Request_PlatterDock_Undock(Item, Target)) == false)
         { DoEnd_UnstartedAct(InDock, Initiator, RefusedAs); }
+    }
+
+    // The dock's policy is judged again as the authority sees the initiator's hands; the docked platter runs the deposit and
+    // answers it in its own ledger. The dock moves nothing, so no act is pending.
+    private void Forward_PlaceFood(FCk_Handle_PlatterDock& InDock, const FCk_Handle& InInitiator)
+    {
+        if (InDock.Get_ActionFor(InInitiator) != EMars_PlatterDock_Action::PlaceFood)
+        {
+            Refuse_Act(InDock, InInitiator, EMars_Interaction_FailReason::ActionBlocked);
+            return;
+        }
+
+        auto Platter = InDock.Get_Platter();
+        Platter.Request_Deposit(FMars_Request_Platter_Deposit(InInitiator));
     }
 
     // NotAPlatter, Occupied, then the policy's own order (utils_platter_dock::Get_Refusal).

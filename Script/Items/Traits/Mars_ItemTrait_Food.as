@@ -26,10 +26,8 @@ mixin FCk_Handle_Item TryGet_SelectedFood(const FCk_Handle_Hotbar& Self)
     if (ck::Is_NOT_Valid(HeldItem))
     { return FCk_Handle_Item(); }
 
-    // Its verbs are applied by the authority: a machine without authority over the item is offered none.
     const auto Item = HeldItem.Get_CurrentItem();
-    if (ck::Is_NOT_Valid(Item) || Item.Has_Food() == false || Item.Has_PersistentWorldItem() == false
-        || utils_net::Get_HasAuthority(Item) == false)
+    if (ck::Is_NOT_Valid(Item) || Item.Has_Food() == false || Item.Has_PersistentWorldItem() == false)
     { return FCk_Handle_Item(); }
 
     return Item;

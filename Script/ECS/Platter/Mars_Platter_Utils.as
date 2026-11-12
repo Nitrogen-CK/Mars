@@ -307,11 +307,15 @@ namespace utils_platter
 
     // Recomputes InPlatter's replicated ledger from its live books and writes it, followed by its dirty mark, only when a
     // field differs. Called by the Platter processors only, once per call that can change the books: after its last change
-    // and before its first broadcast.
+    // and before its first broadcast. The refusal fields are not the books': they are kept as they stand.
     void Publish(FCk_Handle_Platter& InPlatter)
     {
         const auto& State = InPlatter.Get_Fragment(FMars_Fragment_Platter);
+        const auto Current = InPlatter.Get_Fragment(FMars_Fragment_Platter_Net);
         auto Next = FMars_Fragment_Platter_Net();
+        Next.RefusalSerial = Current.RefusalSerial;
+        Next.LastRefusal = Current.LastRefusal;
+        Next.LastRefused = Current.LastRefused;
         Next.HeldCount = State.Held.Num();
         Next.Occupancy = State.Held.Num() + State.Settling.Num() + State.Queue.Num();
         Next.PieceKinds = Get_LiveKinds(InPlatter);
@@ -486,9 +490,133 @@ mixin FCk_Handle_Platter TryGet_Platter(const FCk_Handle_FoodPiece& Self)
     return Self.Get_Fragment(FMars_Fragment_Platter_Membership).Platter;
 }
 
+// Whether the platter has InPiece on its books (queued, settling or frozen), as this machine can tell: with authority its
+// membership, without it the piece's replicated holder.
+mixin bool Get_HoldsPiece(const FCk_Handle_Platter& Self, const FCk_Handle_FoodPiece& InPiece)
+{
+    if (InPiece.Get_IsGone())
+    { return false; }
+
+    if (utils_net::Get_HasAuthority(Self))
+    { return InPiece.TryGet_Platter() == Self; }
+
+    return InPiece.TryGet_ReplicatedHolder() == Self;
+}
+
+// Whether InPiece froze into the platter's pile, as this machine can tell: with authority it is in the frozen pile, without
+// it the platter holds it and its replicated ledger says it rides.
+mixin bool Get_HasLanded(const FCk_Handle_Platter& Self, const FCk_Handle_FoodPiece& InPiece)
+{
+    if (Self.Get_HoldsPiece(InPiece) == false)
+    { return false; }
+
+    if (utils_net::Get_HasAuthority(Self))
+    { return utils_platter::Find_Held(Self.Get_Fragment(FMars_Fragment_Platter).Held, InPiece) >= 0; }
+
+    return InPiece.TryGet_ReplicatedRide().IsSet();
+}
+
+// The deposits the authority has refused, as this machine last received it.
+mixin int32 Get_RefusalSerial(const FCk_Handle_Platter& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_Platter_Net).RefusalSerial;
+}
+
+// Why the latest refused deposit was refused; meaningful once Get_RefusalSerial is above 0.
+mixin EMars_Interaction_FailReason Get_LastRefusal(const FCk_Handle_Platter& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_Platter_Net).LastRefusal;
+}
+
+// Whose deposit was refused last; invalid before any, and on a client while that entity is not resolved there.
+mixin FCk_Handle Get_LastRefused(const FCk_Handle_Platter& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_Platter_Net).LastRefused;
+}
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Requests
 //--------------------------------------------------------------------------------------------------------------------------
+
+// The authority-side entry of a deposit (utils_platter::Request_DepositFor is the initiating machine's); a copy without
+// authority drops it.
+mixin void Request_Deposit(FCk_Handle_Platter& Self, const FMars_Request_Platter_Deposit& InRequest)
+{
+    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Platter_Requests);
+    Requests.DepositRequests.Add(InRequest);
+}
+
+namespace utils_platter
+{
+    // InInitiator's interaction asks InPlatter to take the food in its hands. A platter with a replication driver is
+    // reached through Cue.Mars.Platter.Deposit, which only its authority applies; a local platter has no other machine to
+    // reach and takes the Deposit request directly. Either way the food on the books, or the refusal in the platter's
+    // ledger, is what the caller waits on.
+    void Request_DepositFor(FCk_Handle_Platter& InPlatter, FCk_Handle InInitiator)
+    {
+        const auto Request = FMars_Request_Platter_Deposit(InInitiator);
+        if (utils_entity_replication_driver::Has(InPlatter))
+        {
+            utils_cue_generic::Request_ExecuteCue(InPlatter, GameplayTags::Cue_Mars_Platter_Deposit, Request,
+                ECk_Cue_ReliabilityPolicy::Reliable, ECk_Cue_MulticastPolicy::ServerOnly);
+            return;
+        }
+
+        InPlatter.Request_Deposit(Request);
+    }
+
+    // InPlatter's pending deposit of InFood (a food's world item entity); unset when it has none.
+    TOptional<FMars_Platter_Deposit> TryGet_Deposit(const FCk_Handle_Platter& InPlatter, const FCk_Handle& InFood)
+    {
+        if (ck::Is_NOT_Valid(InPlatter) || ck::Is_NOT_Valid(InFood) || InPlatter.Has_Fragment(FMars_Fragment_Platter_Deposits) == false)
+        { return TOptional<FMars_Platter_Deposit>(); }
+
+        for (const auto& Deposit : InPlatter.Get_Fragment(FMars_Fragment_Platter_Deposits).Pending)
+        {
+            const FCk_Handle Food = Deposit.Food;
+            if (ck::IsValid(Food) && Food == InFood)
+            { return TOptional<FMars_Platter_Deposit>(Deposit); }
+        }
+
+        return TOptional<FMars_Platter_Deposit>();
+    }
+
+    // InDeposit ends on InPlatter's books: it leaves the pending list (the fragment goes with the last), the mark it put on
+    // its food goes, and a refusal advances the platter's replicated ledger naming the initiator. A deposit refused before
+    // it marked a food has no food and leaves the food's mark alone. Called only by the Platter processors.
+    void Close_Deposit(FCk_Handle_Platter& InPlatter, const FMars_Platter_Deposit& InDeposit, TOptional<EMars_Interaction_FailReason> InRefusal)
+    {
+        FCk_Handle Food = InDeposit.Food;
+        if (ck::IsValid(Food))
+        {
+            if (InPlatter.Has_Fragment(FMars_Fragment_Platter_Deposits))
+            {
+                auto& Deposits = InPlatter.Get_Fragment(FMars_Fragment_Platter_Deposits);
+                for (int32 Index = Deposits.Pending.Num() - 1; Index >= 0; --Index)
+                {
+                    const FCk_Handle PendingFood = Deposits.Pending[Index].Food;
+                    if (PendingFood == Food)
+                    { Deposits.Pending.RemoveAt(Index); }
+                }
+
+                if (Deposits.Pending.Num() == 0)
+                { InPlatter.Request_TryRemove(FMars_Fragment_Platter_Deposits); }
+            }
+
+            if (Food.Has_Fragment(FMars_Fragment_Platter_Depositing) && Food.Get_Fragment(FMars_Fragment_Platter_Depositing).Platter == InPlatter)
+            { Food.Request_TryRemove(FMars_Fragment_Platter_Depositing); }
+        }
+
+        if (InRefusal.IsSet() == false)
+        { return; }
+
+        auto& Ledger = InPlatter.Get_Fragment(FMars_Fragment_Platter_Net);
+        Ledger.RefusalSerial += 1;
+        Ledger.LastRefusal = InRefusal.GetValue();
+        Ledger.LastRefused = InDeposit.Initiator;
+        InPlatter.H().Request_MarkReplicationDirty(FMars_Fragment_Platter_Net);
+    }
+}
 
 mixin void Request_SetMounted(FCk_Handle_Platter& Self, const FMars_Request_Platter_SetMounted& InRequest)
 {

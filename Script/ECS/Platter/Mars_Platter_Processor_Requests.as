@@ -26,7 +26,9 @@ struct FMars_Platter_Drain
     TArray<FMars_Platter_LoadRefused> Refused;
 }
 
-// Drains SetMounted -> Unload -> Load, then broadcasts Unloaded, LoadAccepted, LoadRefused. SetMounted switches the held
+// Drains SetMounted -> Unload -> Deposit -> Load, then broadcasts Unloaded, LoadAccepted, LoadRefused. A Deposit is only
+// put on the books (UMars_Processor_Platter_Deposits runs it); a Load of a piece a deposit marked for this platter ends that
+// deposit, accepted or refused LoadRefused. SetMounted switches the held
 // and settling pieces' profiles (a piece landing later takes the mode in Settle); a piece that leaves takes its own profile
 // back. An accepted Load only queues here (membership and holder stamped); UMars_Processor_Platter_Settle drops it,
 // settles it and broadcasts OnLoaded. An Unload of a landed piece re-settles the pieces frozen after it (those that may lie
@@ -54,6 +56,7 @@ class UMars_Processor_Platter_HandleRequests : UCk_Processor_Script_Base_UE
 
         TArray<FMars_Request_Platter_SetMounted> SetMountedRequests = InRequests.SetMountedRequests;
         TArray<FMars_Request_Platter_Unload> UnloadRequests = InRequests.UnloadRequests;
+        TArray<FMars_Request_Platter_Deposit> DepositRequests = InRequests.DepositRequests;
         TArray<FMars_Request_Platter_Load> LoadRequests = InRequests.LoadRequests;
 
         // InRequests is invalid past this line; removing before broadcasting lets re-entrant requests survive.
@@ -74,6 +77,14 @@ class UMars_Processor_Platter_HandleRequests : UCk_Processor_Script_Base_UE
         // Every landed piece that left this drain leaves a hole under what froze after it: that re-settles once.
         if (Drain.ResettleFrom.IsSet())
         { utils_platter::Resettle(Drain.Platter, InState, Drain.ResettleFrom.GetValue()); }
+
+        // A deposit only goes on the books here, in arrival order; UMars_Processor_Platter_Deposits runs it.
+        if (DepositRequests.Num() > 0)
+        {
+            auto& Deposits = Drain.Platter.AddOrGet_Fragment(FMars_Fragment_Platter_Deposits);
+            for (const auto& Request : DepositRequests)
+            { Deposits.Pending.Add(FMars_Platter_Deposit(Request.Initiator)); }
+        }
 
         for (const auto& Request : LoadRequests)
         { Apply_Load(Drain, InState, Request); }
@@ -177,6 +188,7 @@ class UMars_Processor_Platter_HandleRequests : UCk_Processor_Script_Base_UE
         if (Refusal.IsSet())
         {
             InDrain.Refused.Add(FMars_Platter_LoadRefused(Piece, Refusal.GetValue()));
+            End_Deposit(InDrain.Platter, Piece, TOptional<EMars_Interaction_FailReason>(EMars_Interaction_FailReason::LoadRefused));
             return;
         }
 
@@ -187,6 +199,21 @@ class UMars_Processor_Platter_HandleRequests : UCk_Processor_Script_Base_UE
         InState.Queue.Add(Piece);
         InDrain.Accepted.Add(Piece);
         Watch_Teardown(InDrain.Platter);
+        End_Deposit(InDrain.Platter, Piece, TOptional<EMars_Interaction_FailReason>());
+    }
+
+    // A load of a piece marked for this platter is a deposit's: accepted, the deposit ends; refused, it is refused
+    // LoadRefused.
+    private void End_Deposit(FCk_Handle_Platter& InPlatter, const FCk_Handle_FoodPiece& InPiece, TOptional<EMars_Interaction_FailReason> InRefusal)
+    {
+        FCk_Handle Food = InPiece;
+        if (ck::Is_NOT_Valid(Food) || Food.Has_Fragment(FMars_Fragment_Platter_Depositing) == false
+            || Food.Get_Fragment(FMars_Fragment_Platter_Depositing).Platter != InPlatter)
+        { return; }
+
+        const auto Deposit = utils_platter::TryGet_Deposit(InPlatter, Food);
+        if (Deposit.IsSet())
+        { utils_platter::Close_Deposit(InPlatter, Deposit.GetValue(), InRefusal); }
     }
 
     private TOptional<EMars_Platter_LoadRefusal> Get_LoadRefusal(const FCk_Handle_Platter& InPlatter, const FCk_Handle_FoodPiece& InPiece)

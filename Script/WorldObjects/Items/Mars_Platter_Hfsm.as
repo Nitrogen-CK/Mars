@@ -39,38 +39,39 @@ enum EMars_Platter_DepositStage
 {
     // Waiting for the place reach's Grip (or nothing to place).
     AtTheGloves,
-    // The food's release is asked for: it lands in the World (OnMountSettled) or is refused (OnReleaseRefused).
-    Releasing,
-    // Released: the platter is asked to load it once it is off the hand node (a piece hanging off a node is one something
-    // else took).
-    Leaving,
-    // The platter is asked to load it: it takes it on its books (OnLoadAccepted) or refuses it (OnLoadRefused).
-    Loading,
-    // The platter took it on its books (queued or settling): it lands (OnLoaded), or leaves the books before it landed
-    // (taken by hand, or gone), which the platter does not answer.
+    // The deposit is asked for: the platter takes the food on its books (Get_HoldsPiece), or a ledger refuses it.
+    Asked,
+    // The platter holds the food: it lands (Get_HasLanded), or leaves the books before it landed (taken by hand, or gone).
     OnTheBooks,
     // The deposit has its outcome.
     Done
 }
 
 // Places the initiator's selected food on the platter the interaction is about (utils_platter::TryGet_PlaceTarget: the
-// platter itself, or a dock's docked platter when the dock offers PlaceFood). The gloves carry the food over the
-// platter (an FPHands Place reach, utils_platter::Start_DepositReach); at the reach's Grip (UMars_SmTask_ActAtGrip)
-// the food's world item is released back to its own holder, and only once that release has landed - the World commit
-// (OnMountSettled) and the food off the hand node - is the platter asked to Load its joint, whose drop queue poses it. The
-// task ends with the load: it succeeds when the joint lands (OnLoaded) and fails when the platter refuses it (OnLoadRefused:
-// the food lies where it was let go) or forgets it before it landed (taken by hand while it dropped, or destroyed: the
-// platter answers neither; a piece gone before the load is asked fails the same way). A refused release (OnReleaseRefused) fails it with the food still in the hands, still on the
-// hand node. An interaction this task does not apply to succeeds at once. Fails, the food still in hand, when the
-// platter is full, when the gloves refuse the place reach, or when they return or lose the target before the Grip.
+// platter itself, or a dock's docked platter when the dock offers PlaceFood). The gloves carry the food over the platter (an
+// FPHands Place reach, utils_platter::Start_DepositReach); at the reach's Grip (UMars_SmTask_ActAtGrip) the task asks for
+// the deposit and moves nothing itself: through utils_platter_dock::Request_ActFor (PlaceFood) at a dock, whose authority
+// judges the dock's policy and forwards it, else through utils_platter::Request_DepositFor. The platter's authority lets
+// the food go from the initiator's hands, waits until it is free and loads it (UMars_Processor_Platter_Deposits). The task
+// then waits, as this machine sees it: Asked until the platter holds the piece (within the awaited effect's budget), or
+// until the platter's ledger, or the dock's, has a refusal newer than the ask that names this initiator (the deposit fails
+// with its reason: NoFoodInHand, PlatterFull, TransferRefused, ReleaseRefused, LeftTheBooks, LoadRefused, ActionBlocked);
+// then OnTheBooks until the piece lands (succeeds), or fails LeftTheBooks when it leaves the books or is gone first. An
+// interaction this task does not apply to succeeds at once. Fails, the food still in hand, when the platter is full, when
+// the gloves refuse the place reach, or when they return or lose the target before the Grip.
 class UMars_SmTask_PlaceHeldFood : UMars_SmTask_ActAtGrip
 {
     private FCk_Handle_Platter _Platter;
+    // The interaction's owner when it is a dock: the deposit is asked through its Act.
+    private FCk_Handle_PlatterDock _Dock;
+    private FCk_Handle _Initiator;
     private FCk_Handle_Hotbar _Holder;
     private FCk_Handle_FPHands _Hands;
-    // The food being deposited: its world item and its joint.
-    private FCk_Handle_WorldItem _Food;
+    // The food's joint, captured at the Grip.
     private FCk_Handle_FoodPiece _Piece;
+    // The ledgers' refusal serials when this task asked: only a later refusal is about it.
+    private int32 _PlatterSerialAtAsk = 0;
+    private int32 _DockSerialAtAsk = 0;
     private EMars_Platter_DepositStage _Stage = EMars_Platter_DepositStage::AtTheGloves;
 
     UFUNCTION(BlueprintOverride)
@@ -78,6 +79,8 @@ class UMars_SmTask_PlaceHeldFood : UMars_SmTask_ActAtGrip
     {
         _Outcome = ECk_SmTaskResult::Running;
         _Stage = EMars_Platter_DepositStage::AtTheGloves;
+        _Dock = FCk_Handle_PlatterDock();
+        _Piece = FCk_Handle_FoodPiece();
 
         FCk_Handle Owner;
         FCk_Handle Initiator;
@@ -91,6 +94,8 @@ class UMars_SmTask_PlaceHeldFood : UMars_SmTask_ActAtGrip
             return;
         }
 
+        _Initiator = Initiator;
+        _Dock = Owner.As_PlatterDock(ECk_SanityCheck::UnChecked);
         _Holder = Initiator.As_Hotbar();
         _Hands = Initiator.As_FPHands(ECk_SanityCheck::UnChecked);
         if (ck::EnsureIfNot(ck::IsValid(_Hands), f"[Platter] [{Initiator.ToString()}] holds food but has no gloves to place it with"))
@@ -109,28 +114,26 @@ class UMars_SmTask_PlaceHeldFood : UMars_SmTask_ActAtGrip
         utils_platter::Start_DepositReach(_Platter, _Holder, _Hands);
     }
 
+    // The books are watched before the base ticks the awaited effect: a piece on the books ends the wait in the tick it
+    // shows.
     UFUNCTION(BlueprintOverride)
     ECk_SmTaskResult DoTick(FCk_Handle_SmTask InHandle, FCk_Time InDeltaT, ECk_Sm_NetContext InNetContext)
     {
+        if (_Stage == EMars_Platter_DepositStage::Asked && _Outcome == ECk_SmTaskResult::Running && _Platter.Get_HoldsPiece(_Piece))
+        {
+            End_AwaitedEffect();
+            _Stage = EMars_Platter_DepositStage::OnTheBooks;
+        }
+
         Super::DoTick(InHandle, InDeltaT, InNetContext);
 
-        if (_Stage == EMars_Platter_DepositStage::Leaving)
-        { Tick_Leaving(); }
-        else if (_Stage == EMars_Platter_DepositStage::Loading || _Stage == EMars_Platter_DepositStage::OnTheBooks)
+        if (_Stage == EMars_Platter_DepositStage::OnTheBooks && _Outcome == ECk_SmTaskResult::Running)
         { Tick_Books(); }
 
         return _Outcome;
     }
 
-    UFUNCTION(BlueprintOverride)
-    void DoExitTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
-    {
-        Super::DoExitTask(InHandle, InNetContext);
-        Unbind_Food();
-        Unbind_Platter();
-    }
-
-    // The food is released where the gloves carried it; the platter loads it once it is free.
+    // The food and the room are checked as this machine sees them; the deposit is asked of the authority.
     protected void DoAtGrip() override
     {
         const auto Food = _Holder.TryGet_SelectedFood();
@@ -146,143 +149,66 @@ class UMars_SmTask_PlaceHeldFood : UMars_SmTask_ActAtGrip
             return;
         }
 
-        auto WorldItem = Food.Get_PersistentWorldItem();
+        const auto WorldItem = Food.Get_PersistentWorldItem();
         FCk_Handle FoodEntity = WorldItem;
-        const auto Piece = FoodEntity.As_FoodPiece(ECk_SanityCheck::UnChecked);
-        if (ck::EnsureIfNot(ck::IsValid(WorldItem) && ck::IsValid(Piece),
+        const auto Piece = ck::IsValid(WorldItem) ? FoodEntity.As_FoodPiece(ECk_SanityCheck::UnChecked) : FCk_Handle_FoodPiece();
+        if (ck::EnsureIfNot(ck::IsValid(Piece),
             f"[Platter] Food item [{Food.ToString()}] has no world item that is a FoodPiece (world item [{WorldItem.ToString()}])"))
         {
             _Outcome = ECk_SmTaskResult::Failed;
             return;
         }
 
-        _Food = WorldItem;
         _Piece = Piece;
-        _Stage = EMars_Platter_DepositStage::Releasing;
-        _Food.BindTo_OnMountSettled(FMars_Delegate_WorldItem_OnMountSettled(this, n"OnFoodMountSettled"));
-        _Food.BindTo_OnReleaseRefused(FMars_Delegate_WorldItem_OnReleaseRefused(this, n"OnFoodReleaseRefused"));
-        _Food.Request_Release(FMars_Request_WorldItem_Release(FVector::ZeroVector, FVector::ZeroVector));
-    }
-
-    UFUNCTION()
-    private void OnFoodMountSettled(FCk_Handle_WorldItem InWorldItem, EMars_WorldItem_Mount InMount, FCk_Handle InCarrier)
-    {
-        if (_Stage != EMars_Platter_DepositStage::Releasing || InMount != EMars_WorldItem_Mount::World)
-        { return; }
-
-        Unbind_Food();
-        _Stage = EMars_Platter_DepositStage::Leaving;
-    }
-
-    UFUNCTION()
-    private void OnFoodReleaseRefused(FCk_Handle_WorldItem InWorldItem, EMars_WorldItem_ReleaseRefusal InReason)
-    {
-        if (_Stage != EMars_Platter_DepositStage::Releasing)
-        { return; }
-
-        Unbind_Food();
-        _Stage = EMars_Platter_DepositStage::Done;
-        DoFail(EMars_Interaction_FailReason::ReleaseRefused);
-    }
-
-    // A piece that died while it left the hand never reaches the platter; one still hanging off a node is something
-    // else's.
-    private void Tick_Leaving()
-    {
-        if (_Piece.Get_IsGone())
+        _PlatterSerialAtAsk = _Platter.Get_RefusalSerial();
+        _Stage = EMars_Platter_DepositStage::Asked;
+        if (ck::IsValid(_Dock))
         {
-            _Stage = EMars_Platter_DepositStage::Done;
-            DoFail(EMars_Interaction_FailReason::LeftTheBooks);
-            return;
+            _DockSerialAtAsk = _Dock.Get_RefusalSerial();
+            utils_platter_dock::Request_ActFor(_Dock, _Initiator, EMars_PlatterDock_Action::PlaceFood);
+        }
+        else
+        { utils_platter::Request_DepositFor(_Platter, _Initiator); }
+
+        Await_ReplicatedEffect();
+    }
+
+    // A refusal newer than the ask that names this initiator, in the platter's ledger or the dock's.
+    protected bool DoTryGet_Refusal(EMars_Interaction_FailReason& OutReason) override
+    {
+        if (_Stage != EMars_Platter_DepositStage::Asked)
+        { return false; }
+
+        if (_Platter.Get_RefusalSerial() > _PlatterSerialAtAsk && _Platter.Get_LastRefused() == _Initiator)
+        {
+            OutReason = _Platter.Get_LastRefusal();
+            return true;
         }
 
-        if (utils_platter::Get_IsTaken(_Piece))
-        { return; }
+        if (ck::IsValid(_Dock) && _Dock.Get_RefusalSerial() > _DockSerialAtAsk && _Dock.Get_LastRefused() == _Initiator)
+        {
+            OutReason = _Dock.Get_LastRefusal();
+            return true;
+        }
 
-        _Stage = EMars_Platter_DepositStage::Loading;
-        _Platter.BindTo_OnLoaded(FMars_Delegate_Platter_OnLoaded(this, n"OnPlatterLoaded"));
-        _Platter.BindTo_OnLoadAccepted(FMars_Delegate_Platter_OnLoadAccepted(this, n"OnPlatterLoadAccepted"));
-        _Platter.BindTo_OnLoadRefused(FMars_Delegate_Platter_OnLoadRefused(this, n"OnPlatterLoadRefused"));
-        _Platter.Request_Load(FMars_Request_Platter_Load(_Piece));
+        return false;
     }
 
-    // Taken on the platter's books, or gone from them (or gone altogether) before it landed.
+    // On the books: it lands, or it leaves them (taken by hand while it dropped, or destroyed) before it landed.
     private void Tick_Books()
     {
-        const auto IsGone = _Piece.Get_IsGone();
-        const auto IsOnTheBooks = IsGone == false && _Piece.TryGet_Platter() == _Platter;
-        if (_Stage == EMars_Platter_DepositStage::Loading && IsGone == false)
+        if (_Piece.Get_IsGone() == false && _Platter.Get_HasLanded(_Piece))
         {
-            if (IsOnTheBooks)
-            { _Stage = EMars_Platter_DepositStage::OnTheBooks; }
-
+            _Stage = EMars_Platter_DepositStage::Done;
+            _Outcome = ECk_SmTaskResult::Succeeded;
             return;
         }
 
-        if (IsOnTheBooks)
+        if (_Piece.Get_IsGone() == false && _Platter.Get_HoldsPiece(_Piece))
         { return; }
 
-        Unbind_Platter();
         _Stage = EMars_Platter_DepositStage::Done;
         DoFail(EMars_Interaction_FailReason::LeftTheBooks);
-    }
-
-    // The drain took the piece: from here a piece no longer on the books has left them, even when the platter forgot it
-    // before this task's next tick could see it there.
-    UFUNCTION()
-    private void OnPlatterLoadAccepted(FCk_Handle_Platter InPlatter, FCk_Handle_FoodPiece InPiece)
-    {
-        if (_Stage != EMars_Platter_DepositStage::Loading || InPiece != _Piece)
-        { return; }
-
-        _Stage = EMars_Platter_DepositStage::OnTheBooks;
-    }
-
-    UFUNCTION()
-    private void OnPlatterLoaded(FCk_Handle_Platter InPlatter, FCk_Handle_FoodPiece InPiece)
-    {
-        if (Get_IsLoading() == false || InPiece != _Piece)
-        { return; }
-
-        Unbind_Platter();
-        _Stage = EMars_Platter_DepositStage::Done;
-        _Outcome = ECk_SmTaskResult::Succeeded;
-    }
-
-    // The food was released already: it lies where the gloves let it go.
-    UFUNCTION()
-    private void OnPlatterLoadRefused(FCk_Handle_Platter InPlatter, FCk_Handle_FoodPiece InPiece, EMars_Platter_LoadRefusal InRefusal)
-    {
-        if (Get_IsLoading() == false || InPiece != _Piece)
-        { return; }
-
-        Unbind_Platter();
-        _Stage = EMars_Platter_DepositStage::Done;
-        DoFail(EMars_Interaction_FailReason::LoadRefused);
-    }
-
-    private bool Get_IsLoading() const
-    {
-        return _Stage == EMars_Platter_DepositStage::Loading || _Stage == EMars_Platter_DepositStage::OnTheBooks;
-    }
-
-    private void Unbind_Food()
-    {
-        if (ck::Is_NOT_Valid(_Food))
-        { return; }
-
-        _Food.UnbindFrom_OnMountSettled(FMars_Delegate_WorldItem_OnMountSettled(this, n"OnFoodMountSettled"));
-        _Food.UnbindFrom_OnReleaseRefused(FMars_Delegate_WorldItem_OnReleaseRefused(this, n"OnFoodReleaseRefused"));
-    }
-
-    private void Unbind_Platter()
-    {
-        if (ck::Is_NOT_Valid(_Platter))
-        { return; }
-
-        _Platter.UnbindFrom_OnLoaded(FMars_Delegate_Platter_OnLoaded(this, n"OnPlatterLoaded"));
-        _Platter.UnbindFrom_OnLoadAccepted(FMars_Delegate_Platter_OnLoadAccepted(this, n"OnPlatterLoadAccepted"));
-        _Platter.UnbindFrom_OnLoadRefused(FMars_Delegate_Platter_OnLoadRefused(this, n"OnPlatterLoadRefused"));
     }
 }
 
@@ -311,8 +237,8 @@ namespace utils_platter
     }
 
     // Starts putting InHolder's selected food on InPlatter: the gloves carry it over the platter (an FPHands Place reach on
-    // the platter's world item). The food is let go at the reach's Grip (UMars_SmTask_PlaceHeldFood), which checks the food
-    // and the room before it asks: holding no food, or a full platter, here is a defect and starts nothing.
+    // the platter's world item). The deposit is asked at the reach's Grip (UMars_SmTask_PlaceHeldFood), which checks the
+    // food and the room before it asks: holding no food, or a full platter, here is a defect and starts nothing.
     void Start_DepositReach(FCk_Handle_Platter InPlatter, FCk_Handle_Hotbar InHolder, FCk_Handle_FPHands InHands)
     {
         const auto Food = InHolder.TryGet_SelectedFood();
