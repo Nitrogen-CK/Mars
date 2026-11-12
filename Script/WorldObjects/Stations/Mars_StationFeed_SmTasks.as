@@ -15,10 +15,11 @@
 namespace utils_cooking_feed
 {
     // Every piece InStation's kernel would hand back onto the platter docked on InOutputDock, capped at its free room (no
-    // tray docked caps it at none, which the kernel refuses NoRoom and the station's label says).
+    // tray docked caps it at none, which the kernel refuses NoRoom and the station's label says). A station with no output
+    // dock (an invalid InOutputDock) sweeps like one with no tray.
     void Request_TakeOutToDock(FCk_Handle InStation, FCk_Handle_PlatterDock InOutputDock)
     {
-        const auto Tray = InOutputDock.Get_Platter();
+        const auto Tray = ck::IsValid(InOutputDock) ? InOutputDock.Get_Platter() : FCk_Handle_Platter();
         const auto Room = ck::IsValid(Tray) ? Tray.Get_FreeCount() : 0;
         auto Station = InStation;
         Request_StationTakeOut(Station, FMars_Request_StationTakeOut(Room, Tray));

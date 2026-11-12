@@ -25,6 +25,36 @@ namespace constants_foodboard_net_autotest
     // The server's tolerance against its own geometry.
     const float64 k_ServerToleranceCm = 0.01;
     const float64 k_ServerToleranceDegrees = 0.01;
+    // The remote seed's press serial on every row it carries: presses from before it never count.
+    const int32 k_SeedSerial = 7;
+    // Frames the server waits after the seed before a press, so the reader has polled it.
+    const int32 k_SeedFrames = 10;
+}
+
+// How either machine reads a world item's pickup and its ledger's claim.
+namespace mars_test_ledger_claim
+{
+    // InWorldItem's pickup holds the Ledger reason on this machine.
+    bool Get_IsHeldByLedger(FCk_Handle_WorldItem InWorldItem)
+    {
+        const auto Pickup = InWorldItem.Get_Pickup();
+        return ck::IsValid(Pickup) && Pickup.Get_IsDisabledFor(EMars_Interactable_DisableReason::Ledger);
+    }
+
+    // InWorldItem's pickup can take focus on this machine; false without a pickup.
+    bool Get_IsFocusable(FCk_Handle_WorldItem InWorldItem)
+    {
+        const auto Pickup = InWorldItem.Get_Pickup();
+        return ck::IsValid(Pickup) && Pickup.Get_IsFocusable();
+    }
+
+    FString Describe(FCk_Handle_WorldItem InWorldItem)
+    {
+        if (ck::Is_NOT_Valid(InWorldItem))
+        { return "no world item"; }
+
+        return f"ledger-held={Get_IsHeldByLedger(InWorldItem)} focusable={Get_IsFocusable(InWorldItem)} claim={InWorldItem.Get_LedgerClaim() :n}";
+    }
 }
 
 // Written by the server only, through Get_Fragment + Request_MarkReplicationDirty (test-only: a feature's processors are
@@ -56,7 +86,10 @@ enum EMars_TESTONLY_NetBoardEvent
     HeldCountChanged,
     Placed,
     PieceCut,
-    Released
+    Released,
+    // The cleaver's, recorded once Begin_OperatorRig ran.
+    ChopStarted,
+    ChopLanded
 }
 
 // How the standing pieces on a client compare with the report: the reported ids found standing, and the worst errors.
@@ -119,6 +152,13 @@ class UMars_AutoTestRig_NetFoodBoard : UMars_AutoTestRig_NetFoodPiece
     private FName _HeldContinuation;
     private int32 _AwaitedStep = 0;
     private FName _StepContinuation;
+
+    // The subject as the station's operator (Begin_OperatorRig).
+    protected FCk_Handle_InputIntents _Intents;
+    private bool _IsRecordingChops = false;
+    private FName _SeatedContinuation;
+    private int32 _DropSerial = constants_foodboard_net_autotest::k_SeedSerial;
+    private int32 _SweepSerial = constants_foodboard_net_autotest::k_SeedSerial;
 
     // Call first, on both machines.
     protected void Begin_BoardRig(FCk_Handle InTestEntity, float64 InX)
@@ -197,6 +237,13 @@ class UMars_AutoTestRig_NetFoodBoard : UMars_AutoTestRig_NetFoodPiece
             _Board.BindTo_OnTurned(FMars_Delegate_FoodBoard_OnTurned(this, n"OnRigTurned"));
             _Board.BindTo_OnReleaseRefused(FMars_Delegate_FoodBoard_OnReleaseRefused(this, n"OnRigReleaseRefused"));
             _Board.BindTo_OnHeldCountChanged(FMars_Delegate_FoodBoard_OnHeldCountChanged(this, n"OnRigHeldCountChanged"));
+            if (_IsRecordingChops)
+            {
+                auto Cutting = Get_Cutting();
+                Cutting.BindTo_OnChopStarted(FMars_Delegate_Cutting_OnChopStarted(this, n"OnRigChopStarted"));
+                Cutting.BindTo_OnChopLanded(FMars_Delegate_Cutting_OnChopLanded(this, n"OnRigChopLanded"));
+            }
+
             if (Get_IsServer())
             {
                 _Board.BindTo_OnPlaced(FMars_Delegate_FoodBoard_OnPlaced(this, n"OnRigPlaced"));
@@ -608,6 +655,117 @@ class UMars_AutoTestRig_NetFoodBoard : UMars_AutoTestRig_NetFoodPiece
     }
 
     //----------------------------------------------------------------------------------------------------------------------
+    // The operator (either machine)
+    //----------------------------------------------------------------------------------------------------------------------
+
+    // Both machines, first thing (after Begin_BoardRig): the subject's Operator feature and its InputIntents (reused when an
+    // earlier test of this session composed it), and the cleaver's starts and landings recorded beside the board's
+    // signals. The server clears any remote state an earlier test left behind.
+    protected void Begin_OperatorRig()
+    {
+        auto Subject = Get_SubjectEntity();
+        utils_operator::Add(Subject);
+        _Intents = Subject.As_InputIntents(ECk_SanityCheck::UnChecked);
+        if (ck::Is_NOT_Valid(_Intents))
+        { _Intents = utils_input_intents::Add(Subject); }
+
+        _IsRecordingChops = true;
+        if (Get_IsServer())
+        { _Intents.Request_ClearRemote(FMars_Request_InputIntents_ClearRemote()); }
+    }
+
+    protected FCk_Handle_Station Get_Station()
+    {
+        return _Board.H().As_Station();
+    }
+
+    protected FCk_Handle_Cutting Get_Cutting()
+    {
+        return _Board.H().As_Cutting();
+    }
+
+    protected bool Get_IsSubjectOperating()
+    {
+        return Get_IsBoardStationFound() && Get_Station().Get_IsOperatedBy(Get_SubjectEntity());
+    }
+
+    // This machine's whole food near the test's X as a world item; invalid while there is none.
+    protected FCk_Handle_WorldItem Find_WholeFood()
+    {
+        return Find_WorldItemNear(_FloorTop);
+    }
+
+    // Exactly one cleaver start, then one landing.
+    protected bool Get_IsOneChop()
+    {
+        TArray<EMars_TESTONLY_NetBoardEvent> Kinds;
+        Kinds.Add(EMars_TESTONLY_NetBoardEvent::ChopStarted);
+        Kinds.Add(EMars_TESTONLY_NetBoardEvent::ChopLanded);
+        const auto Chops = Get_EventsOf(Kinds);
+        return Chops.Num() == 2 && Chops[0] == EMars_TESTONLY_NetBoardEvent::ChopStarted && Chops[1] == EMars_TESTONLY_NetBoardEvent::ChopLanded;
+    }
+
+    // Exactly one answer, and it issued InIssued cuts.
+    protected bool Get_IsOneAnswer(int32 InIssued)
+    {
+        return _CutIssues.Num() == 1 && _CutIssues[0].Issued == InIssued;
+    }
+
+    // Server: seats the subject and calls InContinuation once the station reads it operating.
+    protected void Seat_SubjectThen(FName InContinuation)
+    {
+        auto Station = Get_Station();
+        Station.Request_Reserve(FMars_Request_Station_Reserve(Get_SubjectEntity()));
+        _SeatedContinuation = InContinuation;
+        WaitUntil(n"Is_BoardRigSubjectOperating", n"OnBoardRigSubjectOperating", k_SlowPolls);
+    }
+
+    UFUNCTION()
+    protected void Is_BoardRigSubjectOperating(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Result = OutResult;
+        Result.Set(Get_IsSubjectOperating());
+    }
+
+    UFUNCTION()
+    private void OnBoardRigSubjectOperating(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
+    {
+        WaitFrames(1, _SeatedContinuation);
+    }
+
+    // Server: the seed, a first remote sample carrying the turn and sweep rows at k_SeedSerial, released; then
+    // InContinuation k_SeedFrames frames later.
+    protected void Seed_RemoteThen(FName InContinuation)
+    {
+        auto Sample = FMars_InputIntents_RemoteSample();
+        Sample.Intents.Add(FMars_InputIntents_RemoteIntent(GameplayTags::Mars_Intent_Drop, _DropSerial, EMars_InputIntents_Hold::Released));
+        Sample.Intents.Add(FMars_InputIntents_RemoteIntent(GameplayTags::Mars_Intent_Interact_Secondary, _SweepSerial, EMars_InputIntents_Hold::Released));
+        _Intents.Request_ApplyRemoteSample(FMars_Request_InputIntents_ApplyRemoteSample(Sample));
+        WaitFrames(constants_foodboard_net_autotest::k_SeedFrames, InContinuation);
+    }
+
+    // Server: a remote turn press, the Drop row at its next serial, released.
+    protected void Press_RemoteTurn()
+    {
+        _DropSerial += 1;
+        Apply_RemotePress(GameplayTags::Mars_Intent_Drop, _DropSerial);
+    }
+
+    // Server: a remote sweep press, the Interact_Secondary row at its next serial, released.
+    protected void Press_RemoteSweep()
+    {
+        _SweepSerial += 1;
+        Apply_RemotePress(GameplayTags::Mars_Intent_Interact_Secondary, _SweepSerial);
+    }
+
+    private void Apply_RemotePress(FGameplayTag InRow, int32 InSerial)
+    {
+        auto Sample = FMars_InputIntents_RemoteSample();
+        Sample.Intents.Add(FMars_InputIntents_RemoteIntent(InRow, InSerial, EMars_InputIntents_Hold::Released));
+        _Intents.Request_ApplyRemoteSample(FMars_Request_InputIntents_ApplyRemoteSample(Sample));
+    }
+
+    //----------------------------------------------------------------------------------------------------------------------
     // Handlers
     //----------------------------------------------------------------------------------------------------------------------
 
@@ -658,5 +816,17 @@ class UMars_AutoTestRig_NetFoodBoard : UMars_AutoTestRig_NetFoodPiece
     private void OnRigReleased(FCk_Handle_FoodBoard InBoard, FCk_Handle_FoodPiece InPiece)
     {
         Record(EMars_TESTONLY_NetBoardEvent::Released);
+    }
+
+    UFUNCTION()
+    private void OnRigChopStarted(FCk_Handle_Cutting InCutting)
+    {
+        Record(EMars_TESTONLY_NetBoardEvent::ChopStarted);
+    }
+
+    UFUNCTION()
+    private void OnRigChopLanded(FCk_Handle_Cutting InCutting)
+    {
+        Record(EMars_TESTONLY_NetBoardEvent::ChopLanded);
     }
 }

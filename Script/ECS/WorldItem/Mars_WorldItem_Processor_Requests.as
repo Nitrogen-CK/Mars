@@ -3,8 +3,9 @@
 // item lives in. ArriveNextMount is presentation and applies on every machine; Release and PickUp move the item, so a
 // non-authority drops them (its transfers would be refused, and the move replicates from the authority).
 //
-// A PickUp stows the holder's item into the initiator's hotbar stow target. With nowhere to stow, a pickup already in
-// flight, or a refused transfer, it advances FMars_Fragment_WorldItem_Net (the replicated refusal) naming the initiator.
+// A PickUp stows the holder's item into the initiator's hotbar stow target. While a kernel's ledger holds the item, with
+// nowhere to stow, a pickup already in flight, or a refused transfer, it advances FMars_Fragment_WorldItem_Net (the
+// replicated refusal) naming the initiator.
 //
 // A Release validates before it mutates: the item must sit in an inventory other than the holder, with no release already
 // in flight. It then transfers the item back into the holder; the transfer's answer commits World (detach, Dynamic, own
@@ -60,6 +61,14 @@ class UMars_Processor_WorldItem_HandleRequests : UCk_Processor_Script_Base_UE
     // which may be a round trip stale.
     private void HandlePickUpRequest(FCk_Handle_WorldItem& InWorldItem, const FMars_Request_WorldItem_PickUp& InRequest)
     {
+        // The ledger, not the pickup's reasons: the interactable applies a claim in its own later drain, and a client's
+        // pickup sent before the claim reached it arrives here all the same.
+        if (InWorldItem.Get_LedgerClaim() == EMars_WorldItem_LedgerClaim::Claimed)
+        {
+            Refuse_PickUp(InWorldItem, InRequest.Initiator, EMars_Interaction_FailReason::ActionBlocked);
+            return;
+        }
+
         if (InWorldItem.Has_Fragment(FMars_Fragment_WorldItem_PendingPickUp))
         {
             Refuse_PickUp(InWorldItem, InRequest.Initiator, EMars_Interaction_FailReason::TransferRefused);

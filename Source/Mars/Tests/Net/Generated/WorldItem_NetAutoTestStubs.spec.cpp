@@ -37,6 +37,70 @@
 
 // --------------------------------------------------------------------------------------------------------------------
 
+// Auto-generated from AS class Ck_AutoTest_Net_WorldItem_AClaimedItemRefusesAClientsPickUp (Replicated-mode).
+// DO NOT EDIT - regenerated on editor startup and every successful AS recompile.
+
+namespace
+{
+    constexpr auto kAsClassPath_WorldItem_AClaimedItemRefusesAClientsPickUp = TEXT("/Script/Angelscript.Ck_AutoTest_Net_WorldItem_AClaimedItemRefusesAClientsPickUp");
+    constexpr auto kTimeoutSeconds_WorldItem_AClaimedItemRefusesAClientsPickUp = 30.0f;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+    FCkWorldItemNet_AS_WorldItem_AClaimedItemRefusesAClientsPickUp,
+    "Ck.WorldItem.Net.AS_WorldItem_AClaimedItemRefusesAClientsPickUp",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ClientContext | EAutomationTestFlags::EngineFilter)
+
+bool FCkWorldItemNet_AS_WorldItem_AClaimedItemRefusesAClientsPickUp::RunTest(const FString& Parameters)
+{
+    bSuppressLogErrors = true;
+    bSuppressLogWarnings = true;
+
+    constexpr auto NumPIEClients = 2;
+    constexpr auto ExpectedTotalWorlds = 2;
+    constexpr auto ReadyTimeoutSeconds = 30.0f;
+    constexpr auto FramesAfterSpawn = 30;
+
+    const auto MapPath = FString{TEXT("/Engine/Maps/Entry")};
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_StartPIEMultiClient(NumPIEClients, MapPath));
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_WaitForPIEReady(ExpectedTotalWorlds, ReadyTimeoutSeconds));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_RunOnServer(
+        FCk_NetAutoTest_ServerAction::CreateLambda([this](UWorld* InServer) -> void
+        {
+            auto SpawnInfo = FActorSpawnParameters{};
+            SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+            const auto SubjectClassPath = FSoftClassPath(TEXT("/Script/CkTests.Ck_AutoTest_NetSubject"));
+            auto* SubjectClass = SubjectClassPath.TryLoadClass<ACk_AutoTest_NetSubject>();
+            if (SubjectClass == nullptr)
+            { AddError(TEXT("AS-test harness: failed to resolve NetSubject class via FSoftClassPath")); return; }
+            auto* Subject = InServer->SpawnActor<ACk_AutoTest_NetSubject>(
+                SubjectClass, FTransform::Identity, SpawnInfo);
+            if (Subject == nullptr)
+            { AddError(TEXT("AS-test harness: server-side SpawnActor returned null")); }
+        })));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_TickWorlds(FramesAfterSpawn));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_RunAsTestOnAllWorlds(this, FString{kAsClassPath_WorldItem_AClaimedItemRefusesAClientsPickUp}, kTimeoutSeconds_WorldItem_AClaimedItemRefusesAClientsPickUp));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_EndPIE());
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_AssertCondition(this,
+        FCk_NetAutoTest_Assertion::CreateLambda([]() -> bool
+        {
+            FAutomationTestBase::bSuppressLogErrors = false;
+            FAutomationTestBase::bSuppressLogWarnings = false;
+            return true;
+        }),
+        TEXT("restore log suppression statics")));
+
+    return true;
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
 // Auto-generated from AS class Ck_AutoTest_Net_WorldItem_AClientPickUpOfAPersistentItemIsHeldOnEveryMachine (Replicated-mode).
 // DO NOT EDIT - regenerated on editor startup and every successful AS recompile.
 
@@ -165,6 +229,70 @@ bool FCkWorldItemNet_AS_WorldItem_ADropReturnsOneBodyToTheWorldOnEveryMachine::R
 
 // --------------------------------------------------------------------------------------------------------------------
 
+// Auto-generated from AS class Ck_AutoTest_Net_WorldItem_ALateBinderSeesTheClaimAsItStands (Replicated-mode).
+// DO NOT EDIT - regenerated on editor startup and every successful AS recompile.
+
+namespace
+{
+    constexpr auto kAsClassPath_WorldItem_ALateBinderSeesTheClaimAsItStands = TEXT("/Script/Angelscript.Ck_AutoTest_Net_WorldItem_ALateBinderSeesTheClaimAsItStands");
+    constexpr auto kTimeoutSeconds_WorldItem_ALateBinderSeesTheClaimAsItStands = 30.0f;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+    FCkWorldItemNet_AS_WorldItem_ALateBinderSeesTheClaimAsItStands,
+    "Ck.WorldItem.Net.AS_WorldItem_ALateBinderSeesTheClaimAsItStands",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ClientContext | EAutomationTestFlags::EngineFilter)
+
+bool FCkWorldItemNet_AS_WorldItem_ALateBinderSeesTheClaimAsItStands::RunTest(const FString& Parameters)
+{
+    bSuppressLogErrors = true;
+    bSuppressLogWarnings = true;
+
+    constexpr auto NumPIEClients = 2;
+    constexpr auto ExpectedTotalWorlds = 2;
+    constexpr auto ReadyTimeoutSeconds = 30.0f;
+    constexpr auto FramesAfterSpawn = 30;
+
+    const auto MapPath = FString{TEXT("/Engine/Maps/Entry")};
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_StartPIEMultiClient(NumPIEClients, MapPath));
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_WaitForPIEReady(ExpectedTotalWorlds, ReadyTimeoutSeconds));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_RunOnServer(
+        FCk_NetAutoTest_ServerAction::CreateLambda([this](UWorld* InServer) -> void
+        {
+            auto SpawnInfo = FActorSpawnParameters{};
+            SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+            const auto SubjectClassPath = FSoftClassPath(TEXT("/Script/CkTests.Ck_AutoTest_NetSubject"));
+            auto* SubjectClass = SubjectClassPath.TryLoadClass<ACk_AutoTest_NetSubject>();
+            if (SubjectClass == nullptr)
+            { AddError(TEXT("AS-test harness: failed to resolve NetSubject class via FSoftClassPath")); return; }
+            auto* Subject = InServer->SpawnActor<ACk_AutoTest_NetSubject>(
+                SubjectClass, FTransform::Identity, SpawnInfo);
+            if (Subject == nullptr)
+            { AddError(TEXT("AS-test harness: server-side SpawnActor returned null")); }
+        })));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_TickWorlds(FramesAfterSpawn));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_RunAsTestOnAllWorlds(this, FString{kAsClassPath_WorldItem_ALateBinderSeesTheClaimAsItStands}, kTimeoutSeconds_WorldItem_ALateBinderSeesTheClaimAsItStands));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_EndPIE());
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_AssertCondition(this,
+        FCk_NetAutoTest_Assertion::CreateLambda([]() -> bool
+        {
+            FAutomationTestBase::bSuppressLogErrors = false;
+            FAutomationTestBase::bSuppressLogWarnings = false;
+            return true;
+        }),
+        TEXT("restore log suppression statics")));
+
+    return true;
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
 // Auto-generated from AS class Ck_AutoTest_Net_WorldItem_ALateCarrierStillMountsABodyWhoseItemIsInASlot (Replicated-mode).
 // DO NOT EDIT - regenerated on editor startup and every successful AS recompile.
 
@@ -212,6 +340,70 @@ bool FCkWorldItemNet_AS_WorldItem_ALateCarrierStillMountsABodyWhoseItemIsInASlot
     ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_TickWorlds(FramesAfterSpawn));
 
     ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_RunAsTestOnAllWorlds(this, FString{kAsClassPath_WorldItem_ALateCarrierStillMountsABodyWhoseItemIsInASlot}, kTimeoutSeconds_WorldItem_ALateCarrierStillMountsABodyWhoseItemIsInASlot));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_EndPIE());
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_AssertCondition(this,
+        FCk_NetAutoTest_Assertion::CreateLambda([]() -> bool
+        {
+            FAutomationTestBase::bSuppressLogErrors = false;
+            FAutomationTestBase::bSuppressLogWarnings = false;
+            return true;
+        }),
+        TEXT("restore log suppression statics")));
+
+    return true;
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+// Auto-generated from AS class Ck_AutoTest_Net_WorldItem_ALedgerClaimReachesTheClient (Replicated-mode).
+// DO NOT EDIT - regenerated on editor startup and every successful AS recompile.
+
+namespace
+{
+    constexpr auto kAsClassPath_WorldItem_ALedgerClaimReachesTheClient = TEXT("/Script/Angelscript.Ck_AutoTest_Net_WorldItem_ALedgerClaimReachesTheClient");
+    constexpr auto kTimeoutSeconds_WorldItem_ALedgerClaimReachesTheClient = 30.0f;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+    FCkWorldItemNet_AS_WorldItem_ALedgerClaimReachesTheClient,
+    "Ck.WorldItem.Net.AS_WorldItem_ALedgerClaimReachesTheClient",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ClientContext | EAutomationTestFlags::EngineFilter)
+
+bool FCkWorldItemNet_AS_WorldItem_ALedgerClaimReachesTheClient::RunTest(const FString& Parameters)
+{
+    bSuppressLogErrors = true;
+    bSuppressLogWarnings = true;
+
+    constexpr auto NumPIEClients = 2;
+    constexpr auto ExpectedTotalWorlds = 2;
+    constexpr auto ReadyTimeoutSeconds = 30.0f;
+    constexpr auto FramesAfterSpawn = 30;
+
+    const auto MapPath = FString{TEXT("/Engine/Maps/Entry")};
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_StartPIEMultiClient(NumPIEClients, MapPath));
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_WaitForPIEReady(ExpectedTotalWorlds, ReadyTimeoutSeconds));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_RunOnServer(
+        FCk_NetAutoTest_ServerAction::CreateLambda([this](UWorld* InServer) -> void
+        {
+            auto SpawnInfo = FActorSpawnParameters{};
+            SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+            const auto SubjectClassPath = FSoftClassPath(TEXT("/Script/CkTests.Ck_AutoTest_NetSubject"));
+            auto* SubjectClass = SubjectClassPath.TryLoadClass<ACk_AutoTest_NetSubject>();
+            if (SubjectClass == nullptr)
+            { AddError(TEXT("AS-test harness: failed to resolve NetSubject class via FSoftClassPath")); return; }
+            auto* Subject = InServer->SpawnActor<ACk_AutoTest_NetSubject>(
+                SubjectClass, FTransform::Identity, SpawnInfo);
+            if (Subject == nullptr)
+            { AddError(TEXT("AS-test harness: server-side SpawnActor returned null")); }
+        })));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_TickWorlds(FramesAfterSpawn));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_RunAsTestOnAllWorlds(this, FString{kAsClassPath_WorldItem_ALedgerClaimReachesTheClient}, kTimeoutSeconds_WorldItem_ALedgerClaimReachesTheClient));
 
     ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_EndPIE());
 
@@ -724,6 +916,70 @@ bool FCkWorldItemNet_AS_WorldItem_SelectingAwayCarriesTheBodyOnEveryMachine::Run
     ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_TickWorlds(FramesAfterSpawn));
 
     ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_RunAsTestOnAllWorlds(this, FString{kAsClassPath_WorldItem_SelectingAwayCarriesTheBodyOnEveryMachine}, kTimeoutSeconds_WorldItem_SelectingAwayCarriesTheBodyOnEveryMachine));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_EndPIE());
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_AssertCondition(this,
+        FCk_NetAutoTest_Assertion::CreateLambda([]() -> bool
+        {
+            FAutomationTestBase::bSuppressLogErrors = false;
+            FAutomationTestBase::bSuppressLogWarnings = false;
+            return true;
+        }),
+        TEXT("restore log suppression statics")));
+
+    return true;
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+// Auto-generated from AS class Ck_AutoTest_Net_WorldItem_TheClientWroteNoClaim (Replicated-mode).
+// DO NOT EDIT - regenerated on editor startup and every successful AS recompile.
+
+namespace
+{
+    constexpr auto kAsClassPath_WorldItem_TheClientWroteNoClaim = TEXT("/Script/Angelscript.Ck_AutoTest_Net_WorldItem_TheClientWroteNoClaim");
+    constexpr auto kTimeoutSeconds_WorldItem_TheClientWroteNoClaim = 30.0f;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+    FCkWorldItemNet_AS_WorldItem_TheClientWroteNoClaim,
+    "Ck.WorldItem.Net.AS_WorldItem_TheClientWroteNoClaim",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ClientContext | EAutomationTestFlags::EngineFilter)
+
+bool FCkWorldItemNet_AS_WorldItem_TheClientWroteNoClaim::RunTest(const FString& Parameters)
+{
+    bSuppressLogErrors = true;
+    bSuppressLogWarnings = true;
+
+    constexpr auto NumPIEClients = 2;
+    constexpr auto ExpectedTotalWorlds = 2;
+    constexpr auto ReadyTimeoutSeconds = 30.0f;
+    constexpr auto FramesAfterSpawn = 30;
+
+    const auto MapPath = FString{TEXT("/Engine/Maps/Entry")};
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_StartPIEMultiClient(NumPIEClients, MapPath));
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_WaitForPIEReady(ExpectedTotalWorlds, ReadyTimeoutSeconds));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_RunOnServer(
+        FCk_NetAutoTest_ServerAction::CreateLambda([this](UWorld* InServer) -> void
+        {
+            auto SpawnInfo = FActorSpawnParameters{};
+            SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+            const auto SubjectClassPath = FSoftClassPath(TEXT("/Script/CkTests.Ck_AutoTest_NetSubject"));
+            auto* SubjectClass = SubjectClassPath.TryLoadClass<ACk_AutoTest_NetSubject>();
+            if (SubjectClass == nullptr)
+            { AddError(TEXT("AS-test harness: failed to resolve NetSubject class via FSoftClassPath")); return; }
+            auto* Subject = InServer->SpawnActor<ACk_AutoTest_NetSubject>(
+                SubjectClass, FTransform::Identity, SpawnInfo);
+            if (Subject == nullptr)
+            { AddError(TEXT("AS-test harness: server-side SpawnActor returned null")); }
+        })));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_TickWorlds(FramesAfterSpawn));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_RunAsTestOnAllWorlds(this, FString{kAsClassPath_WorldItem_TheClientWroteNoClaim}, kTimeoutSeconds_WorldItem_TheClientWroteNoClaim));
 
     ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_EndPIE());
 

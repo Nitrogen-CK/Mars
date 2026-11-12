@@ -1,7 +1,8 @@
 // Stance SPLIT. A World-mode item replicates as an entity: its root transform (each replicated pose snaps; a machine
 // without authority that mounts the body parents it locally instead, and the pose applies again when it lets go), its
-// holder inventory (the item lives there) and FMars_Fragment_WorldItem_Net (the authority's pickup refusals and the item
-// link). Its Jolt body, its launch, a Release and a PickUp are the authority's; the probe, the pickup interactable, the
+// holder inventory (the item lives there) and FMars_Fragment_WorldItem_Net (the authority's pickup refusals, the item
+// link, and whether a kernel's ledger holds the item, which a copy without authority follows with its pickup's Ledger
+// claim). Its Jolt body, its launch, a Release and a PickUp are the authority's; the probe, the pickup interactable, the
 // grips, the visual and the arrival are built on every machine (D). FMars_Fragment_WorldItem stays local (it holds body
 // and probe handles). A Persistent item's link is stamped by the authority where the holder seeded or adopted the item,
 // and by a client from the ledger; its mount is derived on every machine from where the item lives. A Visual-mode item
@@ -27,6 +28,14 @@ struct FMars_Feature_WorldItem {}
 
 // A client's Persistent World-mode item that has not linked its item yet; consumed by the link processor.
 struct FMars_Tag_WorldItem_AwaitingLink
+{
+    UPROPERTY()
+    bool Requested = true;
+}
+
+// A World-mode item composed without authority whose pickup has not bound the ledger's claim yet; consumed by the claim
+// mirror.
+struct FMars_Tag_WorldItem_NeedsClaimMirror
 {
     UPROPERTY()
     bool Requested = true;
@@ -88,6 +97,14 @@ enum EMars_WorldItem_Placement
     // The item sits in no inventory, in one that names no mount (FMars_Fragment_MountedInventory), or on a carrier that
     // publishes no attach point for it.
     Unmountable
+}
+
+// Whether a kernel's ledger (a board, a pan, a fryer) holds the item's entity, as the authority published it: while it
+// does, no hand takes the item on any machine.
+enum EMars_WorldItem_LedgerClaim
+{
+    Unclaimed,
+    Claimed
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -668,6 +685,10 @@ struct FMars_Fragment_WorldItem
     // The inventory the reconcile last reported as naming no mount for the item: it ensures once per placement.
     UPROPERTY()
     TOptional<FCk_Handle_Inventory> ReportedUnmountedIn;
+
+    // Off authority: the ledger's claim this machine's pickup last took on (UMars_Processor_WorldItem_ClaimMirror).
+    UPROPERTY()
+    EMars_WorldItem_LedgerClaim AppliedLedgerClaim = EMars_WorldItem_LedgerClaim::Unclaimed;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -819,7 +840,7 @@ struct FMars_Fragment_WorldItem_Requests
 // Replicated ledger (World mode)
 //--------------------------------------------------------------------------------------------------------------------------
 
-// The authority's ledger on the root: the refusals and the item link. The refusal serial advances once per refusal, so an
+// The authority's ledger on the root: the refusals, the item link and the ledger claim. The refusal serial advances once per refusal, so an
 // initiator that recorded it before its cue knows a newer refusal is about its own. It holds no holder or mount: the
 // mount is derived from where the item lives.
 struct FMars_Fragment_WorldItem_Net
@@ -838,6 +859,11 @@ struct FMars_Fragment_WorldItem_Net
     // item, and on a client while that entity is not resolved there: not yet, never an error.
     UPROPERTY()
     FCk_Handle_Item Item;
+
+    // Whether a kernel's ledger holds the item, written by the authority's utils_world_item::Request_ClaimPickup: a copy
+    // without authority takes its pickup out of reach while it reads Claimed, and the authority refuses every pickup then.
+    UPROPERTY()
+    EMars_WorldItem_LedgerClaim LedgerClaim = EMars_WorldItem_LedgerClaim::Unclaimed;
 }
 
 // Authority only, never replicated: the owner a caller of utils_world_item::Request_SpawnWorldEntity named when the item

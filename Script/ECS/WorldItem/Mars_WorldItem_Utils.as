@@ -51,6 +51,10 @@ namespace utils_world_item
             && InHandle.As_WorldItem().Get_Persistence() == EMars_WorldItem_Persistence::Persistent)
         { InHandle.Add_Fragment(FMars_Tag_WorldItem_AwaitingLink()); }
 
+        // A copy without authority follows the authority's ledger claim with its own pickup (the claim mirror).
+        if (InSpec.Mode == EMars_WorldItem_Mode::World && utils_net::Get_HasAuthority(InHandle) == false)
+        { InHandle.Add_Fragment(FMars_Tag_WorldItem_NeedsClaimMirror()); }
+
         // Never applied here: the body is not added for at least one frame. The launch processor drains it.
         if (InSpec.World.IsSet() && InSpec.World.GetValue().Composition.Launch.IsSet())
         { InHandle.Add_Fragment(InSpec.World.GetValue().Composition.Launch.GetValue()); }
@@ -530,7 +534,9 @@ namespace utils_world_item
 
     // Claims (Disable) or releases (Enable) InReason on the pickup of InEntity's world item: a ledger that holds an item's
     // entity (a whole food on a board or in a pan) keeps a hand from taking it until it lets go, whatever other claimant
-    // releases in between. An entity that is no World-mode world item has no pickup and needs nothing.
+    // releases in between. An entity that is no World-mode world item has no pickup and needs nothing. With authority, a
+    // Ledger claim is also published in the replicated ledger, so every machine's copy leaves reach and the authority
+    // refuses a pickup that arrives all the same; a machine without authority claims only its own pickup.
     void Request_ClaimPickup(FCk_Handle InEntity, EMars_Interactable_DisableReason InReason, ECk_EnableDisable InEnableDisable)
     {
         if (InEntity.Is_WorldItem() == false)
@@ -544,6 +550,20 @@ namespace utils_world_item
         { Pickup.Request_Disable(FMars_Request_Interactable_Disable(InReason)); }
         else
         { Pickup.Request_Enable(FMars_Request_Interactable_Enable(InReason)); }
+
+        if (InReason != EMars_Interactable_DisableReason::Ledger || utils_net::Get_HasAuthority(InEntity) == false)
+        { return; }
+
+        const auto Claim = InEnableDisable == ECk_EnableDisable::Disable
+            ? EMars_WorldItem_LedgerClaim::Claimed
+            : EMars_WorldItem_LedgerClaim::Unclaimed;
+        auto Entity = InEntity;
+        auto& Net = Entity.Get_Fragment(FMars_Fragment_WorldItem_Net);
+        if (Net.LedgerClaim == Claim)
+        { return; }
+
+        Net.LedgerClaim = Claim;
+        Entity.Request_MarkReplicationDirty(FMars_Fragment_WorldItem_Net);
     }
 }
 
@@ -584,6 +604,15 @@ mixin EMars_Interaction_FailReason Get_LastRefusal(const FCk_Handle_WorldItem& S
     { return EMars_Interaction_FailReason::NowhereToStow; }
 
     return Self.Get_Fragment(FMars_Fragment_WorldItem_Net).LastRefusal;
+}
+
+// Whether a kernel's ledger holds the item, as this machine last received it; Unclaimed in Visual mode.
+mixin EMars_WorldItem_LedgerClaim Get_LedgerClaim(const FCk_Handle_WorldItem& Self)
+{
+    if (Self.Has_Fragment(FMars_Fragment_WorldItem_Net) == false)
+    { return EMars_WorldItem_LedgerClaim::Unclaimed; }
+
+    return Self.Get_Fragment(FMars_Fragment_WorldItem_Net).LedgerClaim;
 }
 
 // Whose pickup was refused last; invalid before any, and on a client while that entity is not resolved there.
