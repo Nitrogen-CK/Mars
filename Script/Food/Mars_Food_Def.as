@@ -5,6 +5,10 @@
 
 struct FMars_Food_Data
 {
+    // How another machine names this definition; unset for one that never leaves its machine.
+    UPROPERTY(meta = (Categories = "FoodDef.Mars"))
+    FGameplayTag Id;
+
     // CPU-readable, and under RuntimeMesh's import ceiling (2048 raw render vertices on LOD0).
     UPROPERTY()
     TSoftObjectPtr<UStaticMesh> Mesh;
@@ -202,6 +206,7 @@ class UMars_Food_Def : UDataAsset
         auto PieceData = FMars_FoodPiece_Data(Data.MassKg);
         PieceData.Definition = TWeakObjectPtr<UMars_Food_Def>(this);
         PieceData.Kind = Data.Kind;
+        PieceData.Recipe.Definition = Data.Id;
 
         // A rejected spec already ensured in utils_foodpiece::Add.
         return utils_foodpiece::Add(InEntity, FMars_FoodPiece_Spec(PieceData, Tuners, Visuals.Cap, Body));
@@ -247,6 +252,7 @@ namespace mars
     // linear, so a fresh cut matches the authored end cuts. The slab's UVs span about 37 cm.
     asset Food_MeatSlab_Mars of UMars_Food_Def
     {
+        Data.Id = GameplayTags::FoodDef_Mars_MeatSlab;
         Data.Mesh = assets::MeatSlab_Mars_SM();
         Data.MassKg = 7.94;
         Data.Kind.AddTag(GameplayTags::Food_Meat_Beef);
@@ -275,6 +281,7 @@ namespace mars
     // batterable; the FoodPiece kernel's tests keep it as a cheap gram-scale fixture.
     asset Food_MushroomSlice_Mars of UMars_Food_Def
     {
+        Data.Id = GameplayTags::FoodDef_Mars_MushroomSlice;
         Data.Mesh = assets::Mushroom_Slice_Mars_SM();
         Data.MassKg = 0.032;
         Data.Kind.AddTag(GameplayTags::Food_Vegetable_Mushroom);
@@ -310,6 +317,7 @@ namespace mars
     // end's paint, C(228, 190, 150).
     asset Food_Drumstick_Mars of UMars_Food_Def
     {
+        Data.Id = GameplayTags::FoodDef_Mars_Drumstick;
         Data.Mesh = assets::Drumstick_Prep_Mars_SM();
         Data.MassKg = 0.80;
         Data.Kind.AddTag(GameplayTags::Food_Meat);
@@ -336,6 +344,7 @@ namespace mars
     // at 1.05 g/cm3. Yawed 90 so the long axis runs along the cleaver's travel. Cap: pale pink flesh, C(236, 206, 210).
     asset Food_Tentacle_Mars of UMars_Food_Def
     {
+        Data.Id = GameplayTags::FoodDef_Mars_Tentacle;
         Data.Mesh = assets::Tentacle_Prep_Mars_SM();
         Data.MassKg = 0.32;
         Data.Kind.AddTag(GameplayTags::Food_Meat);
@@ -361,6 +370,7 @@ namespace mars
     // 588 cm3 at 1.0 g/cm3. Round: unrotated. Cap: pale orange flesh, C(246, 196, 140).
     asset Food_Puffer_Mars of UMars_Food_Def
     {
+        Data.Id = GameplayTags::FoodDef_Mars_Puffer;
         Data.Mesh = assets::Puffer_Prep_Mars_SM();
         Data.MassKg = 0.59;
         Data.Kind.AddTag(GameplayTags::Food_Meat);
@@ -385,6 +395,7 @@ namespace mars
     // = 250 cm3 at 0.95 g/cm3. Round: unrotated. Cap: magenta berry flesh, C(214, 150, 196).
     asset Food_SpikedBerry_Mars of UMars_Food_Def
     {
+        Data.Id = GameplayTags::FoodDef_Mars_SpikedBerry;
         Data.Mesh = assets::SpikedBerry_Prep_Mars_SM();
         Data.MassKg = 0.24;
         Data.Kind.AddTag(GameplayTags::Food_Vegetable);
@@ -409,6 +420,7 @@ namespace mars
     // 0.22 kg = 373 cm3 at 0.6 g/cm3 (a mushroom floats). Round: unrotated. Cap: the slice's painted flesh, C(235, 222, 200).
     asset Food_Mushroom_Mars of UMars_Food_Def
     {
+        Data.Id = GameplayTags::FoodDef_Mars_Mushroom;
         Data.Mesh = assets::Mushroom_Prep_Mars_SM();
         Data.MassKg = 0.22;
         Data.Kind.AddTag(GameplayTags::Food_Vegetable_Mushroom);
@@ -438,6 +450,7 @@ namespace mars
     // not batterable.
     asset Food_Pickle_Mars of UMars_Food_Def
     {
+        Data.Id = GameplayTags::FoodDef_Mars_Pickle;
         Data.Mesh = assets::Pickle_Mars_SM();
         Data.MassKg = 0.55;
         Data.Kind.AddTag(GameplayTags::Food_Vegetable_Pickle);
@@ -466,6 +479,7 @@ namespace mars
     // long axis runs along the cleaver's travel; the UVs span about 34 cm.
     asset Food_Fish_Mars of UMars_Food_Def
     {
+        Data.Id = GameplayTags::FoodDef_Mars_Fish;
         Data.Mesh = assets::Fish_Mars_SM();
         Data.MassKg = 2.02;
         Data.Kind.AddTag(GameplayTags::Food_Meat_Fish);
@@ -485,5 +499,39 @@ namespace mars
         Visuals.Cap.Set_UVPolicy(ECk_RuntimeMesh_CapUVPolicy::PlanarOnLayer0_KeepInterpolated);
 
         Layout.YawDegrees = 90.0;
+    }
+}
+
+namespace utils_food
+{
+    // Every food definition another machine can name, by its Data.Id.
+    TArray<UMars_Food_Def> Get_Definitions()
+    {
+        TArray<UMars_Food_Def> Definitions;
+        Definitions.Add(mars::Food_MeatSlab_Mars);
+        Definitions.Add(mars::Food_MushroomSlice_Mars);
+        Definitions.Add(mars::Food_Drumstick_Mars);
+        Definitions.Add(mars::Food_Tentacle_Mars);
+        Definitions.Add(mars::Food_Puffer_Mars);
+        Definitions.Add(mars::Food_SpikedBerry_Mars);
+        Definitions.Add(mars::Food_Mushroom_Mars);
+        Definitions.Add(mars::Food_Pickle_Mars);
+        Definitions.Add(mars::Food_Fish_Mars);
+        return Definitions;
+    }
+
+    // The definition whose Data.Id is InId; null for an invalid or unknown id.
+    UMars_Food_Def Find_Definition(FGameplayTag InId)
+    {
+        if (InId.IsValid() == false)
+        { return nullptr; }
+
+        for (auto Definition : Get_Definitions())
+        {
+            if (Definition.Data.Id == InId)
+            { return Definition; }
+        }
+
+        return nullptr;
     }
 }

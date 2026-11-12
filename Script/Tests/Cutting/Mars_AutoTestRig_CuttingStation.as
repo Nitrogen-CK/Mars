@@ -321,25 +321,44 @@ class UMars_AutoTestRig_CuttingStation : UCk_AutoTest_Base
         return VolumeCm3;
     }
 
-    // Live pieces near the station; roots only (a whole joint) when InRootsOnly.
+    // Live pieces near the station; roots only (a whole joint) when InRootsOnly. A bare joint and the halves of its cuts
+    // live under the world's transient entity. The pieces cut from a world food are replicated scripts under the
+    // replicated spawn owner; the world foods there are not station pieces to this rig, so only cut pieces count from it.
     protected TArray<FCk_Handle_FoodPiece> Get_StationPieces(bool InRootsOnly) const
     {
         TArray<FCk_Handle_FoodPiece> Pieces;
         for (auto Dependent : utils_entity_lifetime::Get_LifetimeDependents(ck::TransientEntity()))
         {
-            if (ck::Is_NOT_Valid(Dependent) || utils_entity_lifetime::Get_IsPendingDestroy(Dependent, ECk_EntityLifetime_DestructionPhase::BeginDestroy)
-                || Dependent.Is_FoodPiece() == false)
+            if (Get_IsStationPiece(Dependent) == false)
             { continue; }
 
             const auto Piece = Dependent.As_FoodPiece();
             if (InRootsOnly && Piece.Get_ParentId().IsValid())
             { continue; }
 
-            if ((Get_World(Piece).GetLocation() - _Origin).Size() <= k_StationRadius)
-            { Pieces.Add(Piece); }
+            Pieces.Add(Piece);
+        }
+
+        if (InRootsOnly || utils_mars_net::Get_HasReplicatedSpawnOwner(ck::TransientEntity()) == false)
+        { return Pieces; }
+
+        for (auto Dependent : utils_entity_lifetime::Get_LifetimeDependents(utils_mars_net::Get_ReplicatedSpawnOwner(ck::TransientEntity())))
+        {
+            if (Get_IsStationPiece(Dependent) && Dependent.As_FoodPiece().Get_ParentId().IsValid())
+            { Pieces.Add(Dependent.As_FoodPiece()); }
         }
 
         return Pieces;
+    }
+
+    // A live FoodPiece within the station's radius.
+    private bool Get_IsStationPiece(FCk_Handle InEntity) const
+    {
+        if (ck::Is_NOT_Valid(InEntity) || utils_entity_lifetime::Get_IsPendingDestroy(InEntity, ECk_EntityLifetime_DestructionPhase::BeginDestroy)
+            || InEntity.Is_FoodPiece() == false)
+        { return false; }
+
+        return (Get_World(InEntity.As_FoodPiece()).GetLocation() - _Origin).Size() <= k_StationRadius;
     }
 
     // A WorldItem and a Platter whose holder holds its item.

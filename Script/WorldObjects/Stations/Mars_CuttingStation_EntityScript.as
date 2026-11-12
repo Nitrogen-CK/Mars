@@ -548,6 +548,7 @@ class UMars_CuttingStation_EntityScript : UMars_FeedStation_EntityScript
     }
 
     // The halves are born Ready and inherit the source's definition: they wear its food's display, whatever station built it.
+    // A half that already wears one (a replicated piece dresses itself) is left as it is.
     UFUNCTION()
     private void OnBoardPieceCut(FCk_Handle_FoodBoard InBoard, FCk_Handle_FoodPiece InSource, FCk_Handle_FoodPiece InPositive, FCk_Handle_FoodPiece InNegative)
     {
@@ -555,7 +556,12 @@ class UMars_CuttingStation_EntityScript : UMars_FeedStation_EntityScript
         if (ck::EnsureIfNot(ck::IsValid(Def), "[CuttingStation] a cut piece has no definition to dress its halves with"))
         { return; }
 
-        Def.Add_Display(InPositive);
-        Def.Add_Display(InNegative);
+        FCk_Handle PositiveEntity = InPositive;
+        if (PositiveEntity.Is_RuntimeMeshDisplay() == false)
+        { Def.Add_Display(InPositive); }
+
+        FCk_Handle NegativeEntity = InNegative;
+        if (NegativeEntity.Is_RuntimeMeshDisplay() == false)
+        { Def.Add_Display(InNegative); }
     }
 }

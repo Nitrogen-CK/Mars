@@ -138,22 +138,39 @@ class UMars_AutoTestRig_FoodPiece : UCk_AutoTest_Base
         return FMars_FoodPiece_CutResult();
     }
 
-    // Every live piece under the world's transient entity in InLineage.
+    // Every live piece in InLineage under the world's transient entity (a bare joint and the halves of its cuts), and
+    // every cut piece in it under the replicated spawn owner (the replicated scripts a world food is cut into; the world
+    // food itself was never one of these).
     protected TArray<FCk_Handle_FoodPiece> Get_LineagePieces(FGuid InLineage) const
     {
         TArray<FCk_Handle_FoodPiece> Pieces;
         for (auto Dependent : utils_entity_lifetime::Get_LifetimeDependents(ck::TransientEntity()))
         {
-            if (ck::Is_NOT_Valid(Dependent) || utils_entity_lifetime::Get_IsPendingDestroy(Dependent, ECk_EntityLifetime_DestructionPhase::BeginDestroy)
-                || Dependent.Is_FoodPiece() == false)
+            if (Get_IsLivePiece(Dependent) && Dependent.As_FoodPiece().Get_Lineage() == InLineage)
+            { Pieces.Add(Dependent.As_FoodPiece()); }
+        }
+
+        if (utils_mars_net::Get_HasReplicatedSpawnOwner(ck::TransientEntity()) == false)
+        { return Pieces; }
+
+        for (auto Dependent : utils_entity_lifetime::Get_LifetimeDependents(utils_mars_net::Get_ReplicatedSpawnOwner(ck::TransientEntity())))
+        {
+            if (Get_IsLivePiece(Dependent) == false)
             { continue; }
 
             const auto Piece = Dependent.As_FoodPiece();
-            if (Piece.Get_Lineage() == InLineage)
+            if (Piece.Get_ParentId().IsValid() && Piece.Get_Lineage() == InLineage)
             { Pieces.Add(Piece); }
         }
 
         return Pieces;
+    }
+
+    private bool Get_IsLivePiece(FCk_Handle InEntity) const
+    {
+        return ck::IsValid(InEntity)
+            && utils_entity_lifetime::Get_IsPendingDestroy(InEntity, ECk_EntityLifetime_DestructionPhase::BeginDestroy) == false
+            && InEntity.Is_FoodPiece();
     }
 
     // Records every answer InStation's kernel gives on its one OnAdmission signal.

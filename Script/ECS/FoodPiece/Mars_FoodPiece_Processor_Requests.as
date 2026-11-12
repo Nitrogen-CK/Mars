@@ -11,6 +11,9 @@ struct FMars_FoodPiece_Drain
 // world's transient entity, which also owns the halves. Refusals broadcast after the drain. Every submitted slice resolves
 // in OnSliceResolved, exactly once: RuntimeMesh answers a slice it cannot queue (its world-wide queue is full) on the
 // submitting call stack, so that rejection resolves inside this drain and is not retried.
+// Only the authority cuts: a copy without authority drops every SetCookState and answers every Cut RefusedNoAuthority.
+// A succeeded slice of a source that replicates commits in two stages (Commit_Replicated, then utils_foodpiece::Add_Born);
+// any other commits on the slice's own entities at once (Commit).
 class UMars_Processor_FoodPiece_HandleRequests : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -35,6 +38,15 @@ class UMars_Processor_FoodPiece_HandleRequests : UCk_Processor_Script_Base_UE
 
         // InRequests is invalid past this line; removing before broadcasting lets re-entrant requests survive.
         Drain.Piece.Request_TryRemove(FMars_Fragment_FoodPiece_Requests);
+
+        // A piece's ledger and its cuts are the authority's: a copy without authority writes nothing.
+        if (utils_net::Get_HasAuthority(InHandle) == false)
+        {
+            for (int32 Index = 0; Index < CutRequests.Num(); ++Index)
+            { Broadcast_CutResolved(Drain.Piece, FMars_FoodPiece_CutResult(EMars_FoodPiece_CutOutcome::RefusedNoAuthority)); }
+
+            return;
+        }
 
         for (const auto& Request : SetCookStateRequests)
         { InState.CookState = Request.CookState; }
@@ -78,7 +90,7 @@ class UMars_Processor_FoodPiece_HandleRequests : UCk_Processor_Script_Base_UE
         // Entered before submitting: a slice RuntimeMesh cannot queue resolves on this call stack.
         InState.PendingCut = TOptional<FGuid>(OperationID);
         InState.Status = EMars_FoodPiece_Status::Cutting;
-        WorldEntity.AddOrGet_Fragment(FMars_Fragment_FoodPiece_PendingCuts).Entries.Add(FMars_FoodPiece_CutInFlight(OperationID, Piece));
+        WorldEntity.AddOrGet_Fragment(FMars_Fragment_FoodPiece_PendingCuts).Entries.Add(FMars_FoodPiece_CutInFlight(OperationID, Piece, InRequest.Plane));
 
         auto Geometry = Piece.Get_Geometry();
         utils_runtime_mesh::Request_Slice(Geometry, Slice, FCk_Delegate_RuntimeMesh_OnSliceResolved(this, n"OnSliceResolved"));
@@ -97,7 +109,8 @@ class UMars_Processor_FoodPiece_HandleRequests : UCk_Processor_Script_Base_UE
         { return; }
 
         const auto OperationID = InResult.Get_OperationID();
-        auto Piece = Take_CutInFlight(WorldEntity, OperationID);
+        const auto InFlight = Take_CutInFlight(WorldEntity, OperationID);
+        auto Piece = InFlight.Piece;
 
         // An expected absence, not a defect: a board or a test tore the piece down while its slice was queued.
         if (Piece.Get_IsGone())
@@ -115,7 +128,11 @@ class UMars_Processor_FoodPiece_HandleRequests : UCk_Processor_Script_Base_UE
 
         if (InResult.Get_Outcome() == ECk_RuntimeMesh_SliceOutcome::Succeeded)
         {
-            Commit(Piece, InResult);
+            if (utils_foodpiece::Get_CutsIntoReplicatedPieces(Piece))
+            { Commit_Replicated(Piece, InFlight.Plane, InResult); }
+            else
+            { Commit(Piece, InResult); }
+
             return;
         }
 
@@ -143,13 +160,13 @@ class UMars_Processor_FoodPiece_HandleRequests : UCk_Processor_Script_Base_UE
         return Pending.Last().CookState;
     }
 
-    // Removes and returns the ledger's piece for InOperationID. Every result answers a slice this processor entered, so a
-    // missing entry is a broken ledger.
-    private FCk_Handle_FoodPiece Take_CutInFlight(FCk_Handle& InWorld, const FGuid& InOperationID)
+    // Removes and returns the ledger's entry for InOperationID (an entry with no piece when there is none). Every result
+    // answers a slice this processor entered, so a missing entry is a broken ledger.
+    private FMars_FoodPiece_CutInFlight Take_CutInFlight(FCk_Handle& InWorld, const FGuid& InOperationID)
     {
         const auto HasLedger = InWorld.Has_Fragment(FMars_Fragment_FoodPiece_PendingCuts);
         if (ck::EnsureIfNot(HasLedger, f"[FoodPiece] cut [{InOperationID.ToString(EGuidFormats::Short)}] resolved with no PendingCuts ledger on [{InWorld.ToString()}]"))
-        { return FCk_Handle_FoodPiece(); }
+        { return FMars_FoodPiece_CutInFlight(); }
 
         auto& Entries = InWorld.Get_Fragment(FMars_Fragment_FoodPiece_PendingCuts).Entries;
         for (int32 Index = 0; Index < Entries.Num(); ++Index)
@@ -157,13 +174,13 @@ class UMars_Processor_FoodPiece_HandleRequests : UCk_Processor_Script_Base_UE
             if (Entries[Index].OperationID != InOperationID)
             { continue; }
 
-            const auto Piece = Entries[Index].Piece;
+            const auto Entry = Entries[Index];
             Entries.RemoveAt(Index);
-            return Piece;
+            return Entry;
         }
 
         ck::EnsureIfNot(false, f"[FoodPiece] cut [{InOperationID.ToString(EGuidFormats::Short)}] resolved but is not in the PendingCuts ledger");
-        return FCk_Handle_FoodPiece();
+        return FMars_FoodPiece_CutInFlight();
     }
 
     // The live piece's pending cut is InOperationID: set at submission, cleared only by that cut's resolution.
@@ -214,6 +231,86 @@ class UMars_Processor_FoodPiece_HandleRequests : UCk_Processor_Script_Base_UE
         Broadcast_CutResolved(InSource, Result);
 
         utils_entity_lifetime::Request_DestroyEntity(InSource);
+    }
+
+    // The first stage of a succeeded slice of a source that replicates: each half is spawned as a piece script
+    // (utils_foodpiece::Request_SpawnCutPiece) with the slice's geometry for the authority to share, a spec as Commit builds
+    // it plus a new Id and the source's recipe with this cut appended, and the cook state the source holds now. The source
+    // stays Cutting with its PendingCommit until the second half composes and broadcasts the cut (utils_foodpiece::Add_Born).
+    // A source with no recipe definition cannot be rebuilt on another machine, and a half that does not spawn fails the
+    // commit: it ensured, what was spawned and sliced is destroyed, and the source is Ready again with Failed.
+    private void Commit_Replicated(FCk_Handle_FoodPiece& InSource, const FCk_RuntimeMesh_PlaneLocal& InPlane, const FCk_RuntimeMesh_SliceResult& InResult)
+    {
+        const auto State = InSource.Get_Fragment(FMars_Fragment_FoodPiece);
+        const auto Recipe = InSource.Get_Recipe();
+        if (ck::EnsureIfNot(Recipe.Definition.IsValid(), f"[FoodPiece] [{InSource.ToString()}] replicates but has no recipe definition: its halves could not be rebuilt on another machine"))
+        {
+            Fail_Commit(InSource, InResult);
+            return;
+        }
+
+        FCk_Handle SourceEntity = InSource;
+        // The spawn runs in this processor's slice callback: scope the script world to the source's.
+        const auto WorldContext = FAngelscriptGameThreadScopeWorldContext(utils_entity_lifetime::Get_WorldForEntity(SourceEntity));
+
+        const auto Split = utils_foodpiece::Get_MassSplit(State.MassKg, InResult);
+        auto HalfSpec = FMars_FoodPiece_Spec(FMars_FoodPiece_Data(), InSource.Get_Tuners(), InSource.Get_Cap(), InSource.Get_BodyTuners());
+        HalfSpec.Data.Lineage = State.Lineage;
+        HalfSpec.Data.ParentId = State.Id;
+        HalfSpec.Data.CookState = Get_CookStateAtCommit(InSource, State);
+        HalfSpec.Data.Definition = State.Definition;
+        HalfSpec.Data.Kind = State.Kind;
+        HalfSpec.Data.Recipe = Recipe;
+
+        auto Birth = FMars_FoodPiece_Birth();
+        Birth.World = utils_transform::Get_EntityCurrentTransform(SourceEntity.As_Transform());
+        Birth.Source = InSource;
+
+        Birth.Geometry = InResult.Get_Positive();
+        Birth.Spec = Make_HalfSpec(HalfSpec, FMars_FoodPiece_RecipeCut(InPlane, EMars_FoodPiece_CutSide::Positive), Split.PositiveKg);
+        auto Positive = utils_foodpiece::Request_SpawnCutPiece(SourceEntity, Birth);
+
+        Birth.Geometry = InResult.Get_Negative();
+        Birth.Spec = Make_HalfSpec(HalfSpec, FMars_FoodPiece_RecipeCut(InPlane, EMars_FoodPiece_CutSide::Negative), Split.NegativeKg);
+        auto Negative = utils_foodpiece::Request_SpawnCutPiece(SourceEntity, Birth);
+
+        // A spawn that returned invalid already ensured.
+        if (ck::Is_NOT_Valid(Positive) || ck::Is_NOT_Valid(Negative))
+        {
+            if (ck::IsValid(Positive))
+            { utils_entity_lifetime::Request_DestroyEntity(Positive); }
+
+            if (ck::IsValid(Negative))
+            { utils_entity_lifetime::Request_DestroyEntity(Negative); }
+
+            Fail_Commit(InSource, InResult);
+            return;
+        }
+
+        Positive.Get_Fragment(FMars_Fragment_FoodPiece_Birth).Birth.Sibling = Negative;
+        Negative.Get_Fragment(FMars_Fragment_FoodPiece_Birth).Birth.Sibling = Positive;
+        InSource.Add_Fragment(FMars_Fragment_FoodPiece_PendingCommit(Positive, Negative, InResult.Get_Outcome()));
+    }
+
+    // InSpec as one half: its share of the mass, a new Id and InCut appended to its recipe.
+    private FMars_FoodPiece_Spec Make_HalfSpec(const FMars_FoodPiece_Spec& InSpec, const FMars_FoodPiece_RecipeCut& InCut, float InMassKg) const
+    {
+        auto Spec = InSpec;
+        Spec.Data.MassKg = InMassKg;
+        Spec.Data.Id = FGuid::NewGuid();
+        Spec.Data.Recipe.Cuts.Add(InCut);
+        return Spec;
+    }
+
+    // The slice's results are destroyed and the source is whole and Ready again; its cut reports Failed.
+    private void Fail_Commit(FCk_Handle_FoodPiece& InSource, const FCk_RuntimeMesh_SliceResult& InResult)
+    {
+        Destroy_Halves(InResult);
+
+        auto& SourceState = InSource.Get_Fragment(FMars_Fragment_FoodPiece);
+        SourceState.PendingCut.Reset();
+        SourceState.Status = EMars_FoodPiece_Status::Ready;
+        Broadcast_CutResolved(InSource, FMars_FoodPiece_CutResult(EMars_FoodPiece_CutOutcome::Failed, InResult.Get_Outcome()));
     }
 
     private FCk_Handle_FoodPiece Compose_Half(const FCk_Handle_RuntimeMesh& InGeometry, const FTransform& InWorld, const FMars_FoodPiece_Spec& InSpec)

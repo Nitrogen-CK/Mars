@@ -15,7 +15,7 @@ namespace utils_foodpiece
     const int32 k_FaceCount = 6;
 
     // Composes the piece on InHandle, which must already carry a Transform and a RuntimeMesh. A new root (invalid
-    // Data.Lineage) starts a lineage; every piece gets a new Id. A piece whose geometry is already Ready (every cut half)
+    // Data.Lineage) starts a lineage; a piece gets Data.Id, or a new Id when that is invalid. A piece whose geometry is already Ready (every cut half)
     // is Ready at once; one still importing is Pending until the Setup processor sees the import resolve. A rejected spec
     // or a missing Transform or RuntimeMesh ensures and returns an invalid handle.
     FCk_Handle_FoodPiece Add(FCk_Handle& InHandle, FMars_FoodPiece_Spec InSpec)
@@ -32,9 +32,10 @@ namespace utils_foodpiece
         Params.Tuners = InSpec.Tuners;
         Params.Cap = InSpec.Cap;
         Params.Body = InSpec.Body;
+        Params.Recipe = InSpec.Data.Recipe;
 
         auto State = FMars_Fragment_FoodPiece();
-        State.Id = FGuid::NewGuid();
+        State.Id = InSpec.Data.Id.IsValid() ? InSpec.Data.Id : FGuid::NewGuid();
         State.ParentId = InSpec.Data.ParentId;
         State.Lineage = InSpec.Data.Lineage;
         if (State.Lineage.IsValid() == false)
@@ -156,6 +157,169 @@ namespace utils_foodpiece
         }
 
         return false;
+    }
+
+    //----------------------------------------------------------------------------------------------------------------------
+    // Replicated pieces: a cut whose source replicates makes its halves as piece scripts (UMars_FoodPiece_EntityScript)
+    //----------------------------------------------------------------------------------------------------------------------
+
+    // A cut of InPiece makes replicated piece scripts: its entity replicates. Any other piece's cut composes its halves on
+    // the slice's own entities, on this machine only.
+    bool Get_CutsIntoReplicatedPieces(const FCk_Handle_FoodPiece& InPiece)
+    {
+        return utils_entity_replication_driver::Has(InPiece);
+    }
+
+    // The one spawn of a piece script: under the replicated spawn owner, its spawn data taken from InBirth (World, the
+    // recipe, the identity, the mass), InBirth stamped on the entity under construction for the script to compose from.
+    // Returns that entity; invalid, having ensured, where there is no replicated spawn owner (a client, or an authority
+    // whose owner is not published yet). The host checks that it replicates.
+    FCk_Handle Request_SpawnCutPiece(const FCk_Handle& InAnyHandle, const FMars_FoodPiece_Birth& InBirth)
+    {
+        auto Owner = utils_mars_net::Get_ReplicatedSpawnOwner(InAnyHandle);
+        if (ck::EnsureIfNot(ck::IsValid(Owner), f"[FoodPiece] a cut piece spawned from [{InAnyHandle.ToString()}] has no replicated spawn owner: nothing spawns"))
+        { return FCk_Handle(); }
+
+        auto Params = FMars_FoodPiece_SpawnParams();
+        Params.SpawnTransform = InBirth.World;
+        Params.Definition = InBirth.Spec.Data.Recipe.Definition;
+        Params.Cuts = InBirth.Spec.Data.Recipe.Cuts;
+        Params.Id = InBirth.Spec.Data.Id;
+        Params.ParentId = InBirth.Spec.Data.ParentId;
+        Params.Lineage = InBirth.Spec.Data.Lineage;
+        Params.MassKg = InBirth.Spec.Data.MassKg;
+
+        auto Pending = utils_entity_script::Request_SpawnEntity(Owner, UMars_FoodPiece_EntityScript, Params);
+        auto Entity = Pending.Get_EntityUnderConstruction();
+        utils_net_spawn::Expect_Replicated(Entity);
+        if (ck::IsValid(Entity))
+        { Entity.Add_Fragment(FMars_Fragment_FoodPiece_Birth(InBirth)); }
+
+        return Entity;
+    }
+
+    // InHandle (a piece script under construction, already carrying its transform) has its birth: the authority spawned it
+    // and it has not composed yet.
+    bool Get_IsBorn(const FCk_Handle& InHandle)
+    {
+        return ck::IsValid(InHandle) && InHandle.Has_Fragment(FMars_Fragment_FoodPiece_Birth);
+    }
+
+    // Composes the piece InHandle was born to be: the birth geometry shared onto it (that geometry's own entity is then
+    // destroyed) and a FoodPiece of the birth spec, Ready at once. A birth that names a source finishes or abandons that
+    // source's cut. The source gone or no longer committing: the sibling, if it is a piece, is destroyed and this piece is
+    // not composed. The sibling already a piece: the cut commits here (OnCutResolved reports both halves as the source
+    // recorded them, then the source is destroyed). The sibling still unborn: this piece waits for it. The sibling neither
+    // (it failed or is gone), or this piece failing to compose: the cut fails (the source is Ready again, OnCutResolved
+    // reports Failed) and this piece is not composed. Returns the piece, or an invalid handle: the caller ends the entity.
+    FCk_Handle_FoodPiece Add_Born(FCk_Handle& InHandle)
+    {
+        if (ck::EnsureIfNot(Get_IsBorn(InHandle), f"[FoodPiece] [{InHandle.ToString()}] has no birth to compose from"))
+        { return FCk_Handle_FoodPiece(); }
+
+        // Removed first: the sibling reads it to tell an unborn half from a failed one.
+        const auto Birth = InHandle.Get_Fragment(FMars_Fragment_FoodPiece_Birth).Birth;
+        InHandle.Request_TryRemove(FMars_Fragment_FoodPiece_Birth);
+
+        const auto Piece = DoCompose_Born(InHandle, Birth);
+        if (Birth.Source == FCk_Handle_FoodPiece())
+        { return Piece; }
+
+        auto Source = Birth.Source;
+        FCk_Handle Sibling = Birth.Sibling;
+        const auto SiblingIsPiece = ck::IsValid(Sibling) && Sibling.Is_FoodPiece()
+            && utils_entity_lifetime::Get_IsPendingDestroy(Sibling, ECk_EntityLifetime_DestructionPhase::BeginDestroy) == false;
+
+        if (Source.Get_IsGone() || Source.Has_Fragment(FMars_Fragment_FoodPiece_PendingCommit) == false)
+        {
+            if (SiblingIsPiece)
+            { utils_entity_lifetime::Request_DestroyEntity(Sibling); }
+
+            return FCk_Handle_FoodPiece();
+        }
+
+        if (ck::Is_NOT_Valid(Piece))
+        {
+            if (SiblingIsPiece)
+            { utils_entity_lifetime::Request_DestroyEntity(Sibling); }
+
+            DoFail_PendingCommit(Source);
+            return FCk_Handle_FoodPiece();
+        }
+
+        if (SiblingIsPiece)
+        {
+            DoFinish_PendingCommit(Source);
+            return Piece;
+        }
+
+        if (Get_IsBorn(Sibling))
+        { return Piece; }
+
+        DoFail_PendingCommit(Source);
+        return FCk_Handle_FoodPiece();
+    }
+
+    // Keeps what a machine without the slice needs to rebuild the piece (FMars_Fragment_FoodPiece_Replay).
+    void Request_Replay(FCk_Handle& InHandle, const FMars_FoodPiece_ReplaySpec& InSpec)
+    {
+        InHandle.AddOrGet_Fragment(FMars_Fragment_FoodPiece_Replay).Spec = InSpec;
+    }
+
+    // What Request_Replay kept on InHandle; unset when it kept nothing.
+    TOptional<FMars_FoodPiece_ReplaySpec> TryGet_Replay(const FCk_Handle& InHandle)
+    {
+        if (ck::Is_NOT_Valid(InHandle) || InHandle.Has_Fragment(FMars_Fragment_FoodPiece_Replay) == false)
+        { return TOptional<FMars_FoodPiece_ReplaySpec>(); }
+
+        return TOptional<FMars_FoodPiece_ReplaySpec>(InHandle.Get_Fragment(FMars_Fragment_FoodPiece_Replay).Spec);
+    }
+
+    // A rejected share or spec already ensured (RuntimeMesh, Add).
+    FCk_Handle_FoodPiece DoCompose_Born(FCk_Handle& InHandle, const FMars_FoodPiece_Birth& InBirth)
+    {
+        const auto Shared = utils_runtime_mesh::Add_SharedGeometry(InHandle, InBirth.Geometry);
+
+        FCk_Handle GeometryEntity = InBirth.Geometry;
+        if (ck::IsValid(GeometryEntity))
+        { utils_entity_lifetime::Request_DestroyEntity(GeometryEntity); }
+
+        if (ck::Is_NOT_Valid(Shared))
+        { return FCk_Handle_FoodPiece(); }
+
+        return Add(InHandle, InBirth.Spec);
+    }
+
+    // Both halves are pieces: the cut the source was committing is reported and the source ends.
+    void DoFinish_PendingCommit(FCk_Handle_FoodPiece& InSource)
+    {
+        const auto Commit = InSource.Get_Fragment(FMars_Fragment_FoodPiece_PendingCommit);
+        InSource.Request_TryRemove(FMars_Fragment_FoodPiece_PendingCommit);
+
+        auto Result = FMars_FoodPiece_CutResult(EMars_FoodPiece_CutOutcome::Cut, Commit.SliceOutcome);
+        Result.Positive = Commit.Positive.As_FoodPiece();
+        Result.Negative = Commit.Negative.As_FoodPiece();
+        DoBroadcast_CutResolved(InSource, Result);
+
+        utils_entity_lifetime::Request_DestroyEntity(InSource);
+    }
+
+    // A half of the cut the source was committing will never be a piece: the source is whole and Ready again.
+    void DoFail_PendingCommit(FCk_Handle_FoodPiece& InSource)
+    {
+        const auto SliceOutcome = InSource.Get_Fragment(FMars_Fragment_FoodPiece_PendingCommit).SliceOutcome;
+        InSource.Request_TryRemove(FMars_Fragment_FoodPiece_PendingCommit);
+
+        auto& State = InSource.Get_Fragment(FMars_Fragment_FoodPiece);
+        State.PendingCut.Reset();
+        State.Status = EMars_FoodPiece_Status::Ready;
+        DoBroadcast_CutResolved(InSource, FMars_FoodPiece_CutResult(EMars_FoodPiece_CutOutcome::Failed, SliceOutcome));
+    }
+
+    void DoBroadcast_CutResolved(FCk_Handle_FoodPiece& InSource, const FMars_FoodPiece_CutResult& InResult)
+    {
+        if (InSource.Has_Fragment(FMars_Fragment_FoodPiece_Signals))
+        { InSource.Get_Fragment(FMars_Fragment_FoodPiece_Signals).OnCutResolved.Broadcast(InSource, InResult); }
     }
 
     bool Get_IsUnitColor(const FLinearColor& InColor)
@@ -395,6 +559,12 @@ mixin FMars_FoodPiece_Tuners Get_Tuners(const FCk_Handle_FoodPiece& Self)
 mixin FCk_RuntimeMesh_Cap Get_Cap(const FCk_Handle_FoodPiece& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_FoodPiece_Params).Cap;
+}
+
+// How another machine rebuilds the piece: its food's wire id and every cut of its lineage. Empty for a bare piece.
+mixin FMars_FoodPiece_Recipe Get_Recipe(const FCk_Handle_FoodPiece& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_FoodPiece_Params).Recipe;
 }
 
 // The surface of every body the piece is given.

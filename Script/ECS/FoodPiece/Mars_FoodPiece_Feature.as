@@ -10,6 +10,11 @@ asset Mars_FoodPieceHandle of UCkDynamic_HandleDefinition
 }
 struct FMars_Feature_FoodPiece {}
 
+// Stance AUTHORITY: the cuts and the ledger are the authority's (a copy without authority refuses every cut and drops every
+// cook state). A whole food's piece is composed on every machine from its replicated world item; a cut of a piece that
+// replicates makes replicated piece scripts whose spawn data (the recipe, the identity, the mass) and root transform
+// replicate. Nothing of the ledger replicates yet.
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Vocabulary
 //--------------------------------------------------------------------------------------------------------------------------
@@ -36,7 +41,46 @@ enum EMars_FoodPiece_CutOutcome
     // Not sliced: another cut of this piece is in flight.
     RefusedBusy,
     Cancelled,
-    Failed
+    Failed,
+    // Not sliced: this machine has no authority over the piece. Only the authority cuts.
+    RefusedNoAuthority
+}
+
+// Which side of a cut a piece kept: the plane normal's (Positive) or the other.
+enum EMars_FoodPiece_CutSide
+{
+    Positive,
+    Negative
+}
+
+// One cut of a piece's lineage: the plane it was cut along, in the definition mesh's frame (every cut of a lineage is in
+// that one frame), and the side this piece kept.
+struct FMars_FoodPiece_RecipeCut
+{
+    UPROPERTY()
+    FCk_RuntimeMesh_PlaneLocal Plane;
+
+    UPROPERTY()
+    EMars_FoodPiece_CutSide Kept = EMars_FoodPiece_CutSide::Positive;
+
+    FMars_FoodPiece_RecipeCut() {}
+
+    FMars_FoodPiece_RecipeCut(FCk_RuntimeMesh_PlaneLocal InPlane, EMars_FoodPiece_CutSide InKept)
+    {
+        Plane = InPlane;
+        Kept = InKept;
+    }
+}
+
+// How any machine rebuilds a piece: its food definition's wire id and every cut of its lineage, root first. Empty Cuts for
+// a whole food; an unset Definition for a piece that never leaves its machine (a bare piece).
+struct FMars_FoodPiece_Recipe
+{
+    UPROPERTY(meta = (Categories = "FoodDef.Mars"))
+    FGameplayTag Definition;
+
+    UPROPERTY()
+    TArray<FMars_FoodPiece_RecipeCut> Cuts;
 }
 
 // What OnCutResolved reports. The halves are valid only for Cut.
@@ -152,6 +196,11 @@ struct FMars_FoodPiece_CookState
 // What the piece is. A cut half carries its source's lineage, cook state, definition and kind, and its share of the mass.
 struct FMars_FoodPiece_Data
 {
+    // The piece's identity. Left invalid: Add assigns one. Set only where another machine must name the piece as the
+    // authority does (a replicated cut half).
+    UPROPERTY()
+    FGuid Id;
+
     // The root joint's identity, shared by every piece cut from it. Left invalid for a new root: Add assigns one.
     UPROPERTY()
     FGuid Lineage;
@@ -174,6 +223,10 @@ struct FMars_FoodPiece_Data
     // What the food is (Food.Meat.Beef); the gate every station policy reads. Inherited by every half.
     UPROPERTY(meta = (Categories = "Food"))
     FGameplayTagContainer Kind;
+
+    // How the piece is rebuilt on another machine; a cut half carries its source's with that cut appended.
+    UPROPERTY()
+    FMars_FoodPiece_Recipe Recipe;
 
     FMars_FoodPiece_Data() {}
 
@@ -266,6 +319,12 @@ mixin FMars_Validation Validate(const FMars_FoodPiece_Spec& Self)
     if (Self.Data.Definition.IsValid() && Self.Data.Kind.IsEmpty())
     { return FMars_Validation("FoodPiece has a Data.Definition but no Data.Kind: a piece nobody can gate is a defect"); }
 
+    if (Self.Data.Recipe.Cuts.Num() > 0 && Self.Data.Recipe.Definition.IsValid() == false)
+    { return FMars_Validation("FoodPiece has Data.Recipe.Cuts but no Data.Recipe.Definition: no machine could rebuild it"); }
+
+    if (Self.Data.Recipe.Cuts.Num() > 0 && Self.Data.ParentId.IsValid() == false)
+    { return FMars_Validation("FoodPiece has Data.Recipe.Cuts but no Data.ParentId: a cut piece names the piece it was cut from"); }
+
     if (Math::IsFinite(Self.Tuners.MinPortionMassKg) == false || Self.Tuners.MinPortionMassKg <= 0.0)
     { return FMars_Validation(f"FoodPiece has a non-positive or non-finite Tuners.MinPortionMassKg [{Self.Tuners.MinPortionMassKg}]"); }
 
@@ -317,6 +376,9 @@ struct FMars_Fragment_FoodPiece_Params
 
     UPROPERTY()
     FMars_FoodPiece_BodyTuners Body;
+
+    UPROPERTY()
+    FMars_FoodPiece_Recipe Recipe;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -362,7 +424,8 @@ struct FMars_Fragment_FoodPiece
     TOptional<FGuid> PendingCut;
 }
 
-// One slice in flight: the operation RuntimeMesh answers with, and the piece it cuts.
+// One slice in flight: the operation RuntimeMesh answers with, the piece it cuts and the plane it was submitted with (the
+// plane a replicated half's recipe records).
 struct FMars_FoodPiece_CutInFlight
 {
     UPROPERTY()
@@ -371,12 +434,16 @@ struct FMars_FoodPiece_CutInFlight
     UPROPERTY()
     FCk_Handle_FoodPiece Piece;
 
+    UPROPERTY()
+    FCk_RuntimeMesh_PlaneLocal Plane;
+
     FMars_FoodPiece_CutInFlight() {}
 
-    FMars_FoodPiece_CutInFlight(FGuid InOperationID, FCk_Handle_FoodPiece InPiece)
+    FMars_FoodPiece_CutInFlight(FGuid InOperationID, FCk_Handle_FoodPiece InPiece, FCk_RuntimeMesh_PlaneLocal InPlane)
     {
         OperationID = InOperationID;
         Piece = InPiece;
+        Plane = InPlane;
     }
 }
 
@@ -387,6 +454,115 @@ struct FMars_Fragment_FoodPiece_PendingCuts
 {
     UPROPERTY()
     TArray<FMars_FoodPiece_CutInFlight> Entries;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+// Replicated pieces
+//--------------------------------------------------------------------------------------------------------------------------
+
+// A cut whose source replicates makes its halves as replicated piece scripts (UMars_FoodPiece_EntityScript). Their spawn
+// data is the recipe, the identity and the mass; the authority shares the slice's geometry onto each, a client keeps the
+// recipe. The cut commits once both halves are composed: the source waits with FMars_Fragment_FoodPiece_PendingCommit, and
+// the second half to compose broadcasts the cut (utils_foodpiece::Add_Born).
+
+// What a piece script is born from on the authority.
+struct FMars_FoodPiece_Birth
+{
+    // A Ready geometry on a local entity (a slice result); destroyed once shared onto the piece.
+    UPROPERTY()
+    FCk_Handle_RuntimeMesh Geometry;
+
+    UPROPERTY()
+    FMars_FoodPiece_Spec Spec;
+
+    UPROPERTY()
+    FTransform World;
+
+    // The piece whose cut this is, and the other half of that cut. Invalid for a piece spawned outside a cut.
+    UPROPERTY()
+    FCk_Handle_FoodPiece Source;
+
+    UPROPERTY()
+    FCk_Handle Sibling;
+}
+
+// On a piece script's entity under construction, the authority's only: removed when the piece composes.
+struct FMars_Fragment_FoodPiece_Birth
+{
+    UPROPERTY()
+    FMars_FoodPiece_Birth Birth;
+
+    FMars_Fragment_FoodPiece_Birth() {}
+
+    FMars_Fragment_FoodPiece_Birth(FMars_FoodPiece_Birth InBirth)
+    {
+        Birth = InBirth;
+    }
+}
+
+// On a source whose halves are composing: the two halves as it spawned them and the slice's outcome, for the broadcast.
+// While it is there the source stays Cutting.
+struct FMars_Fragment_FoodPiece_PendingCommit
+{
+    UPROPERTY()
+    FCk_Handle Positive;
+
+    UPROPERTY()
+    FCk_Handle Negative;
+
+    UPROPERTY()
+    ECk_RuntimeMesh_SliceOutcome SliceOutcome = ECk_RuntimeMesh_SliceOutcome::Succeeded;
+
+    FMars_Fragment_FoodPiece_PendingCommit() {}
+
+    FMars_Fragment_FoodPiece_PendingCommit(FCk_Handle InPositive, FCk_Handle InNegative, ECk_RuntimeMesh_SliceOutcome InSliceOutcome)
+    {
+        Positive = InPositive;
+        Negative = InNegative;
+        SliceOutcome = InSliceOutcome;
+    }
+}
+
+// What a piece script is spawned with; injection matches UMars_FoodPiece_EntityScript's properties by name.
+struct FMars_FoodPiece_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform;
+
+    UPROPERTY(meta = (Categories = "FoodDef.Mars"))
+    FGameplayTag Definition;
+
+    UPROPERTY()
+    TArray<FMars_FoodPiece_RecipeCut> Cuts;
+
+    UPROPERTY()
+    FGuid Id;
+
+    UPROPERTY()
+    FGuid ParentId;
+
+    UPROPERTY()
+    FGuid Lineage;
+
+    UPROPERTY()
+    float MassKg = 0.0;
+}
+
+// What a machine without the slice keeps of a piece: the spec the recipe and the definition give, and the mesh the recipe
+// replays on.
+struct FMars_FoodPiece_ReplaySpec
+{
+    UPROPERTY()
+    FMars_FoodPiece_Spec Piece;
+
+    UPROPERTY()
+    TSoftObjectPtr<UStaticMesh> Mesh;
+}
+
+struct FMars_Fragment_FoodPiece_Replay
+{
+    UPROPERTY()
+    FMars_FoodPiece_ReplaySpec Spec;
 }
 
 // The one ledger holding the piece (a platter, a board, a pan, a fryer): the fact every "another ledger holds it" check
