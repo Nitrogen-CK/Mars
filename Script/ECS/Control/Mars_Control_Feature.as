@@ -1,9 +1,12 @@
 // Stance A for the engage path. IsActive and the engagement count (FMars_Fragment_Control) are the replicated ledger,
 // written by the authority's request drain; a client's use arrives there as Cue.Mars.Control.Engage
-// (Mars_Control_Cues.as). The release timer, the mover and the grip live in the local FMars_Fragment_Control_Local. A
-// client mirrors the ledger: it moves its own Mover and broadcasts OnEngaged / OnActiveChanged from what replicated.
-// ManuallyCompleted manipulation (BeginManipulation / Nudge / EndManipulation and the Tick spring) is authority-local
-// until the manipulation stream exists: off-authority its requests are dropped, so a client cannot pull a lever yet.
+// (Mars_Control_Cues.as). The release timer, the mover, the grip and a pending engage live in the local
+// FMars_Fragment_Control_Local. A client mirrors the ledger: it moves its own Mover and broadcasts OnEngaged /
+// OnActiveChanged from what replicated. A ManuallyCompleted grip (BeginManipulation / Nudge / EndManipulation and the
+// Tick spring) runs on the machine that begins it - the authority, or a client whose control's entity replicates
+// (Get_MayGripHere) - and nothing of the pull crosses the wire: a client's threshold ends its interaction, whose
+// completion sends the engage cue, and holds off the next grip until the ledger shows that engagement or
+// utils_control::k_PendingEngageSeconds pass. Other machines see the handle only when the engage moves it.
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
@@ -299,8 +302,20 @@ struct FMars_Fragment_Control
     int32 Engagements = 0;
 }
 
-// Never replicated: the mover is built on every machine; the release timer and the grip are the authority's (written
-// only by the two Control processors).
+// A machine without authority whose pull crossed the threshold, waiting for the engage to come back in the ledger.
+struct FMars_Control_PendingEngage
+{
+    // The ledger's Engagements at the crossing: the engage has arrived once the ledger counts more.
+    UPROPERTY()
+    int32 Engagements = 0;
+
+    // Runs utils_control::k_PendingEngageSeconds; when it finishes first, the handle settles back.
+    UPROPERTY()
+    FCk_Handle_Timer Timer;
+}
+
+// Never replicated: the mover is built on every machine; the release timer is the authority's, the grip the gripping
+// machine's, the pending engage a client's (written only by the Control processors).
 struct FMars_Fragment_Control_Local
 {
     UPROPERTY()
@@ -313,6 +328,11 @@ struct FMars_Fragment_Control_Local
     // Set while gripped.
     UPROPERTY()
     TOptional<FMars_Control_Manipulation> Manipulation;
+
+    // Set from a threshold crossed without authority until the ledger shows the engagement or the timer runs out; no grip
+    // begins while it stands.
+    UPROPERTY()
+    TOptional<FMars_Control_PendingEngage> PendingEngage;
 }
 
 // Non-authority only (the authority's setup removes it): the ledger as this machine last broadcast it, seeded with the

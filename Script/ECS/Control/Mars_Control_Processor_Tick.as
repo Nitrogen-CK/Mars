@@ -5,6 +5,10 @@
 // handle keeps following the pull inside [0, 1] until EndManipulation. A Walk control's Pull is set here each tick from the
 // puller's horizontal distance gained since the grip (over WalkCm, clamped); walking back lowers it and the spring follows.
 // A Walk grip whose puller is gone ends as EndManipulation ends it; its interaction ends by its own teardown.
+// It runs wherever a grip began: the authority, or a client whose control replicates (the Manipulating tag exists only
+// there). A threshold crossed without authority also sets a pending engage: no grip begins until the ledger counts the
+// engagement (UMars_Processor_Control_Setup clears it), and when utils_control::k_PendingEngageSeconds pass first the
+// handle settles back from the threshold.
 class UMars_Processor_Control_Tick : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -26,10 +30,6 @@ class UMars_Processor_Control_Tick : UCk_Processor_Script_Base_UE
 
     void ForEachEntity(FCk_Time InDeltaT, FCk_Handle& InHandle, FMars_Fragment_Control& InState)
     {
-        // The grip is authority-local until the manipulation stream exists; a client never begins one.
-        if (utils_net::Get_HasAuthority(InHandle) == false)
-        { return; }
-
         auto Self = InHandle.As_Control();
         auto& Local = Self.Get_Fragment(FMars_Fragment_Control_Local);
 
@@ -109,6 +109,10 @@ class UMars_Processor_Control_Tick : UCk_Processor_Script_Base_UE
         if (Self.Has_Fragment(FMars_Fragment_Control_Signals))
         { Self.Get_Fragment(FMars_Fragment_Control_Signals).OnManipulationProgress.Broadcast(Self, 0.0f); }
 
+        // Until the engage comes back, this machine's ledger still holds the direction the crossing is about to change.
+        if (utils_net::Get_HasAuthority(InHandle) == false)
+        { Arm_PendingEngage(Self, Local, InState.Engagements); }
+
         // The interaction was cancelled before the threshold: nothing is left to complete.
         if (ck::Is_NOT_Valid(Interaction))
         { return; }
@@ -135,6 +139,46 @@ class UMars_Processor_Control_Tick : UCk_Processor_Script_Base_UE
 
         if (InControl.Has_Fragment(FMars_Fragment_Control_Signals))
         { InControl.Get_Fragment(FMars_Fragment_Control_Signals).OnManipulationProgress.Broadcast(InControl, 0.0f); }
+    }
+
+    private void Arm_PendingEngage(FCk_Handle_Control& InControl, FMars_Fragment_Control_Local& InState, int32 InEngagements)
+    {
+        auto TimerSpec = FCk_Timer_Spec(FCk_Time(utils_control::k_PendingEngageSeconds));
+        TimerSpec.Set_StartingState(ECk_Timer_State::Running)
+                 .Set_Behavior(ECk_Timer_Behavior::StopOnDone);
+
+        auto Timer = utils_timer::Add(InControl, TimerSpec);
+        if (ck::IsValid(Timer))
+        { Timer.BindTo_OnDone(FCk_Delegate_Timer(this, n"OnPendingEngageTimerDone")); }
+
+        auto Pending = FMars_Control_PendingEngage();
+        Pending.Engagements = InEngagements;
+        Pending.Timer = Timer;
+        InState.PendingEngage = Pending;
+    }
+
+    // The engage never came back (refused, or lost with the control): the handle settles back from the threshold.
+    UFUNCTION()
+    private void OnPendingEngageTimerDone(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
+    {
+        // The control is going away with its timer.
+        auto Owner = utils_entity_lifetime::Get_LifetimeOwner(InTimer);
+        if (ck::Is_NOT_Valid(Owner))
+        { return; }
+
+        auto Control = Owner.As_Control();
+        auto& Local = Control.Get_Fragment(FMars_Fragment_Control_Local);
+
+        // The mirrored engage already cleared it and destroyed this timer, which can still finish that frame.
+        if (Local.PendingEngage.IsSet() == false || Local.PendingEngage.GetValue().Timer != InTimer)
+        { return; }
+
+        Local.PendingEngage.Reset();
+        utils_entity_lifetime::Request_DestroyEntity(InTimer);
+
+        auto Mover = Local.Mover;
+        if (ck::IsValid(Mover))
+        { Mover.Request_Settle(FMars_Request_Mover_Settle()); }
     }
 
     // A Failed finish engages nothing, so the handle would rest at the threshold: settle it back to the current target

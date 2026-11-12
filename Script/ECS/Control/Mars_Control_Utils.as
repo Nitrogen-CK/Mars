@@ -4,6 +4,10 @@ namespace utils_control
     // usable screen direction.
     const float64 k_MinScreenPullLength = 0.05;
 
+    // How long a machine without authority waits, after its pull crossed the threshold, for the engage to come back in
+    // the ledger before it gives the handle back: an engage refused or lost with the control never arrives.
+    const float32 k_PendingEngageSeconds = 2.0f;
+
     // InParams.Mover is optional: an invalid handle means the control moves nothing. The completion policy and HoldSeconds
     // are retained for Make_InteractTarget; a rejected spec ensures and returns an invalid handle.
     FCk_Handle_Control Add(FCk_Handle& InHandle, FMars_Control_Spec InParams)
@@ -123,6 +127,14 @@ mixin FCk_Handle_Mover Get_Mover(const FCk_Handle_Control& Self)
 mixin ECk_Interaction_CompletionPolicy Get_CompletionPolicy(const FCk_Handle_Control& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_Control_Params).CompletionPolicy;
+}
+
+// Where a grip may begin and be driven: on the authority, or without it when the control's own entity replicates (has a
+// replication driver), so the engage its threshold sends can reach the authority. A control on a scene node beneath a
+// replicated root has no driver: it is gripped on the authority alone.
+mixin bool Get_MayGripHere(const FCk_Handle_Control& Self)
+{
+    return utils_net::Get_HasAuthority(Self) || utils_entity_replication_driver::Has(Self);
 }
 
 mixin bool Get_IsManipulating(const FCk_Handle_Control& Self)

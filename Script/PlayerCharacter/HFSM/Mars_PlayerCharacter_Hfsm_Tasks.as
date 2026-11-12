@@ -358,6 +358,7 @@ enum EMars_ManipulateControl_ReachWait
 // Use press then only joins that live interaction (UMars_SmTask_IntentToResolver::Forward_To), and without the adoption the
 // control would never be manipulated (run-12b, PROGRESS Phase K Part 2c / 2d).
 // Stateful like UMars_SmTask_InteractionFocus; leaving Locomotion ends any manipulation and releases the hold at once.
+// It acts on the owning copy of the player only: the grip runs on the machine whose player pulls.
 class UMars_SmTask_ManipulateControl : UCk_SmTask_EntityScript
 {
     default _TaskMode = ECk_SmTaskMode::Tick;
@@ -402,6 +403,10 @@ class UMars_SmTask_ManipulateControl : UCk_SmTask_EntityScript
     UFUNCTION(BlueprintOverride)
     void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
     {
+        // Only the owning copy grips: a remote copy binds nothing, and its exit and ticks find nothing to undo.
+        if (utils_player_sm::Get_IsOwningCopy(InHandle, InNetContext) == false)
+        { return; }
+
         _Player = ck::Ctx(InHandle);
         _Resolver = _Player.As_InteractionResolver();
         _Intents = _Player.As_InputIntents(ECk_SanityCheck::UnChecked);

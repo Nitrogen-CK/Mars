@@ -6,7 +6,7 @@ class UMars_PullChain_EntityScript : UCk_GenericEntityScript_UE
 {
     default _ShowInPlaceActors = true;
     // Stance A: placed by the authority's spawner; the chain, its root transform and its control ledger replicate. Its
-    // grip is a ManuallyCompleted pull, authority-local until the manipulation stream exists: only the host can pull it.
+    // grip is a ManuallyCompleted pull that runs on the machine whose player pulls; only the engage reaches the authority.
     default _Replication = ECk_Replication::Replicates;
 
     UPROPERTY(ExposeOnSpawn)

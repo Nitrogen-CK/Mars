@@ -1,6 +1,8 @@
 // One-shot per control. On the authority: a control that also has a MechanismSource asserts it while active. A client
 // binds the ledger's rep-notify and reconciles once instead: it moves its own handle and broadcasts OnEngaged once per
-// replicated engagement, then OnActiveChanged, the authority's order.
+// replicated engagement, then OnActiveChanged, the authority's order. The reconcile also clears the pending engage this
+// client's own pull set (UMars_Processor_Control_Tick) once the ledger counts that engagement, so the next grip reads the
+// new direction.
 class UMars_Processor_Control_Setup : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -54,6 +56,16 @@ class UMars_Processor_Control_Setup : UCk_Processor_Script_Base_UE
         auto& Mirror = InControl.Get_Fragment(FMars_Fragment_Control_Mirror);
         const auto Last = Mirror.Last;
         Mirror.Last = Ledger;
+
+        auto& Local = InControl.Get_Fragment(FMars_Fragment_Control_Local);
+        if (Local.PendingEngage.IsSet() && Ledger.Engagements > Local.PendingEngage.GetValue().Engagements)
+        {
+            auto Timer = Local.PendingEngage.GetValue().Timer;
+            if (ck::IsValid(Timer))
+            { utils_entity_lifetime::Request_DestroyEntity(Timer); }
+
+            Local.PendingEngage.Reset();
+        }
 
         const auto Changed = Ledger.IsActive != Last.IsActive;
 

@@ -1,5 +1,7 @@
-// Drains SetActive -> Engage -> EndManipulation -> BeginManipulation -> Nudges (see FMars_Fragment_Control_Requests), on
-// the authority only: a client's requests are dropped (its engage arrives as Cue.Mars.Control.Engage).
+// Drains SetActive -> Engage -> EndManipulation -> BeginManipulation -> Nudges (see FMars_Fragment_Control_Requests).
+// SetActive and Engage apply on the authority only: a client's are dropped (its engage arrives as Cue.Mars.Control.Engage).
+// The grip requests apply wherever a grip may begin (Get_MayGripHere: the authority, or a client whose control's entity
+// replicates) and are dropped elsewhere. A pending engage on a client begins no grip until it clears.
 class UMars_Processor_Control_HandleRequests : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -15,16 +17,18 @@ class UMars_Processor_Control_HandleRequests : UCk_Processor_Script_Base_UE
                        FMars_Fragment_Control_Requests& InRequests,
                        FMars_Fragment_Control& InState)
     {
-        if (utils_net::Get_HasAuthority(InHandle) == false)
+        auto Self = InHandle.As_Control();
+
+        if (Self.Get_MayGripHere() == false)
         {
             InHandle.Request_TryRemove(FMars_Fragment_Control_Requests);
             return;
         }
 
-        auto Self = InHandle.As_Control();
-
-        const auto HasEngage = InRequests.EngageRequest.IsSet();
-        const auto HasSetActive = InRequests.SetActiveRequest.IsSet();
+        // Off authority only the grip applies; the ledger is the authority's.
+        const auto HasAuthority = utils_net::Get_HasAuthority(InHandle);
+        const auto HasEngage = HasAuthority && InRequests.EngageRequest.IsSet();
+        const auto HasSetActive = HasAuthority && InRequests.SetActiveRequest.IsSet();
         auto SetActiveValue = false;
         if (HasSetActive)
         { SetActiveValue = InRequests.SetActiveRequest.GetValue().Activation == EMars_Control_Activation::Active; }
@@ -129,7 +133,8 @@ class UMars_Processor_Control_HandleRequests : UCk_Processor_Script_Base_UE
         { Mover.Request_Settle(FMars_Request_Mover_Settle()); }
     }
 
-    // Returns false when the control is not ManuallyCompleted, or is a Walk control without a valid Puller (ensures). The
+    // Returns false while a pending engage stands (not an error: the grip is asked again once it clears), when the control
+    // is not ManuallyCompleted, or is a Walk control without a valid Puller (both ensure). The
     // grip starts where the handle stands (without a Mover: at the end the pull runs from), and the scrub stops an in-flight
     // engage tween so the hand owns the handle. A Walk grip records the puller's horizontal distance now: the pull is what
     // it gains from here.
@@ -138,6 +143,10 @@ class UMars_Processor_Control_HandleRequests : UCk_Processor_Script_Base_UE
         FMars_Fragment_Control_Local& InState,
         const FMars_Request_Control_BeginManipulation& InRequest)
     {
+        // A grip now would seed at the threshold and read the direction the engage is about to change.
+        if (InState.PendingEngage.IsSet())
+        { return false; }
+
         const auto IsManuallyCompleted =
             InControl.Get_CompletionPolicy() == ECk_Interaction_CompletionPolicy::ManuallyCompleted;
         if (ck::EnsureIfNot(IsManuallyCompleted, f"[Control] [{InControl.ToString()}] is not ManuallyCompleted; BeginManipulation ignored"))
