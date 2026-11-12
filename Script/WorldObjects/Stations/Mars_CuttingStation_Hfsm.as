@@ -15,7 +15,8 @@
 // Stance: the station's control reads its operator on the authority alone (the cutting station's InputStance is
 // Authority). The authority's reader steers the hand for any operator and chops for its own player; a remote operator's
 // machine predicts its own hand and chops through Cue.Mars.Cutting.Chop with the aim it saw. Only the authority turns a
-// landing into a board cut: a client's copy mirrors the landing and cuts nothing.
+// landing into a board cut: a client's copy mirrors the landing and cuts nothing. Off authority the board's count is the
+// ledger's: the hint rows re-text on its OnHeldCountChanged.
 //
 // The feed sources itself from the input dock and lands its releases without an operator: a joint released over the board
 // lands whoever is standing there. The sweep (RMB) is this station's take-out (the station's take-out contract on the board), so the feed's take-out
@@ -339,8 +340,8 @@ class UMars_SmTask_CuttingFeed_OperatorInput : UMars_SmTask_StationFeed_Operator
     }
 }
 
-// The shared add-food row, reading "board busy" while the cutting station would refuse a press, re-texted on every board edge
-// that changes it (a place, a release; a cut keeps the count above zero).
+// The shared add-food row, reading "board busy" while the cutting station would refuse a press, re-texted whenever the board's
+// count changes (OnHeldCountChanged, raised on every machine: by the drain with authority, from the ledger without).
 class UMars_SmTask_CuttingFeed_OperatorHints : UMars_SmTask_StationFeed_OperatorHints
 {
     private FCk_Handle_FoodBoard _Board;
@@ -349,8 +350,7 @@ class UMars_SmTask_CuttingFeed_OperatorHints : UMars_SmTask_StationFeed_Operator
     protected void Register_Rows() override
     {
         _Board = _Station.As_FoodBoard();
-        _Board.BindTo_OnPlaced(FMars_Delegate_FoodBoard_OnPlaced(this, n"OnBoardPlaced"));
-        _Board.BindTo_OnReleased(FMars_Delegate_FoodBoard_OnReleased(this, n"OnBoardReleased"));
+        _Board.BindTo_OnHeldCountChanged(FMars_Delegate_FoodBoard_OnHeldCountChanged(this, n"OnBoardHeldCountChanged"));
         Super::Register_Rows();
     }
 
@@ -358,8 +358,7 @@ class UMars_SmTask_CuttingFeed_OperatorHints : UMars_SmTask_StationFeed_Operator
     {
         if (ck::IsValid(_Board))
         {
-            _Board.UnbindFrom_OnPlaced(FMars_Delegate_FoodBoard_OnPlaced(this, n"OnBoardPlaced"));
-            _Board.UnbindFrom_OnReleased(FMars_Delegate_FoodBoard_OnReleased(this, n"OnBoardReleased"));
+            _Board.UnbindFrom_OnHeldCountChanged(FMars_Delegate_FoodBoard_OnHeldCountChanged(this, n"OnBoardHeldCountChanged"));
         }
 
         Super::Unregister_Rows();
@@ -376,13 +375,7 @@ class UMars_SmTask_CuttingFeed_OperatorHints : UMars_SmTask_StationFeed_Operator
     }
 
     UFUNCTION()
-    private void OnBoardPlaced(FCk_Handle_FoodBoard InBoard, FCk_Handle_FoodPiece InPiece)
-    {
-        Refresh_AddFoodRow();
-    }
-
-    UFUNCTION()
-    private void OnBoardReleased(FCk_Handle_FoodBoard InBoard, FCk_Handle_FoodPiece InPiece)
+    private void OnBoardHeldCountChanged(FCk_Handle_FoodBoard InBoard, int32 InHeldCount)
     {
         Refresh_AddFoodRow();
     }
@@ -419,8 +412,7 @@ class UMars_SmTask_Cutting_OperatorHints : UMars_SmTask_StationOperatorHints
         _Board = _Station.As_FoodBoard(ECk_SanityCheck::UnChecked);
         if (ck::IsValid(_Board))
         {
-            _Board.BindTo_OnPlaced(FMars_Delegate_FoodBoard_OnPlaced(this, n"OnBoardPlaced"));
-            _Board.BindTo_OnReleased(FMars_Delegate_FoodBoard_OnReleased(this, n"OnBoardReleased"));
+            _Board.BindTo_OnHeldCountChanged(FMars_Delegate_FoodBoard_OnHeldCountChanged(this, n"OnBoardHeldCountChanged"));
             Refresh_TurnRow();
         }
 
@@ -444,8 +436,7 @@ class UMars_SmTask_Cutting_OperatorHints : UMars_SmTask_StationOperatorHints
 
         if (ck::IsValid(_Board))
         {
-            _Board.UnbindFrom_OnPlaced(FMars_Delegate_FoodBoard_OnPlaced(this, n"OnBoardPlaced"));
-            _Board.UnbindFrom_OnReleased(FMars_Delegate_FoodBoard_OnReleased(this, n"OnBoardReleased"));
+            _Board.UnbindFrom_OnHeldCountChanged(FMars_Delegate_FoodBoard_OnHeldCountChanged(this, n"OnBoardHeldCountChanged"));
         }
 
         _OutputDock = FCk_Handle_PlatterDock();
@@ -460,7 +451,7 @@ class UMars_SmTask_Cutting_OperatorHints : UMars_SmTask_StationOperatorHints
         { _SweepRow = Show_Row(_SweepRow, Make_Row(mars::Mars_IA_Interact_Secondary, "to tray", k_SweepSortOrder)); }
     }
 
-    // A cut keeps the count above zero, so placements and releases are the only edges.
+    // Re-texted on every change of the board's count (OnHeldCountChanged).
     private void Refresh_TurnRow()
     {
         const auto HoldsAnything = _Board.Get_HeldCount() > 0;
@@ -487,13 +478,7 @@ class UMars_SmTask_Cutting_OperatorHints : UMars_SmTask_StationOperatorHints
     }
 
     UFUNCTION()
-    private void OnBoardPlaced(FCk_Handle_FoodBoard InBoard, FCk_Handle_FoodPiece InPiece)
-    {
-        Refresh_TurnRow();
-    }
-
-    UFUNCTION()
-    private void OnBoardReleased(FCk_Handle_FoodBoard InBoard, FCk_Handle_FoodPiece InPiece)
+    private void OnBoardHeldCountChanged(FCk_Handle_FoodBoard InBoard, int32 InHeldCount)
     {
         Refresh_TurnRow();
     }

@@ -8,8 +8,10 @@ namespace utils_foodboard
 
     // Composes the board on InHandle (the station entity), which must carry a Transform, and the station's admission inbox:
     // the board receives what the station's feed releases (each a Place, posed on Spec.PileNode) and its take-outs (each a
-    // Release onto the tray). The board starts empty; an empty first drain starts its watch of the station's queue. A
-    // rejected spec, a missing Transform or a missing pile node ensures and returns an invalid handle.
+    // Release onto the tray). The board starts empty; an empty first drain starts its watch of the station's queue. It
+    // adds the replicated ledger unless it already arrived, and the mirror starts from the arrived ledger: answers the
+    // authority gave before this machine composed are not raised. A rejected spec, a missing Transform or a missing pile
+    // node ensures and returns an invalid handle.
     FCk_Handle_FoodBoard Add(FCk_Handle& InHandle, FMars_FoodBoard_Spec InSpec)
     {
         const auto Validation = InSpec.Validate();
@@ -31,6 +33,16 @@ namespace utils_foodboard
         InHandle.Add_Fragment(Params);
         InHandle.Add_Fragment(FMars_Fragment_FoodBoard());
         InHandle.Add_Fragment(FMars_Fragment_FoodBoard_Requests());
+
+        // A client's copy can receive the replicated ledger before it composes: the arrived ledger stands then.
+        if (InHandle.Has_Fragment(FMars_Fragment_FoodBoard_Net) == false)
+        { InHandle.Add_Fragment(FMars_Fragment_FoodBoard_Net(), ECk_Replication::Replicates); }
+
+        auto Local = FMars_Fragment_FoodBoard_Local();
+        Local.Last = TOptional<FMars_Fragment_FoodBoard_Net>(InHandle.Get_Fragment(FMars_Fragment_FoodBoard_Net));
+        InHandle.Add_Fragment(Local);
+        InHandle.Add_Fragment(FMars_Tag_FoodBoard_NeedsMirror());
+
         utils_cooking_feed::Add_Admission(InHandle);
         return InHandle.As_FoodBoard();
     }
@@ -125,21 +137,29 @@ mixin FTransform Get_PoseOnPile(const FCk_Handle_FoodBoard& Self, const FCk_Hand
     return PoseWorld;
 }
 
-// Board order. A piece destroyed elsewhere leaves the ledger at the board's next drain.
+// The authority's held list, board order: it reads empty on a machine without authority, whose board holds nothing. A
+// piece destroyed elsewhere leaves the list at the board's next drain.
 mixin TArray<FCk_Handle_FoodPiece> Get_Held(const FCk_Handle_FoodBoard& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_FoodBoard).Held;
 }
 
+// The live count with authority; without, the replicated ledger's.
 mixin int32 Get_HeldCount(const FCk_Handle_FoodBoard& Self)
 {
+    if (utils_net::Get_HasAuthority(Self) == false)
+    { return Self.Get_Fragment(FMars_Fragment_FoodBoard_Net).HeldCount; }
+
     return Self.Get_Fragment(FMars_Fragment_FoodBoard).Held.Num();
 }
 
 // What a Place or a chop counts against MaxHeldPieces: the held pieces plus the second half of every cut the board has in
-// flight.
+// flight. Counted live with authority; without, the replicated ledger's.
 mixin int32 Get_Occupancy(const FCk_Handle_FoodBoard& Self)
 {
+    if (utils_net::Get_HasAuthority(Self) == false)
+    { return Self.Get_Fragment(FMars_Fragment_FoodBoard_Net).Occupancy; }
+
     auto Occupancy = 0;
     for (const auto& Piece : Self.Get_Fragment(FMars_Fragment_FoodBoard).Held)
     {
@@ -151,7 +171,14 @@ mixin int32 Get_Occupancy(const FCk_Handle_FoodBoard& Self)
     return Occupancy;
 }
 
-// The board holding the piece; invalid for a piece no board holds (never placed, or released).
+// The replicated ledger as this machine has it: what a machine without authority reads the board through.
+mixin FMars_Fragment_FoodBoard_Net Get_Ledger(const FCk_Handle_FoodBoard& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_FoodBoard_Net);
+}
+
+// The board holding the piece; invalid for a piece no board holds (never placed, or released). It reads the authority's
+// membership: a piece on a machine without authority has none (TryGet_ReplicatedHolder reads the published holder).
 mixin FCk_Handle_FoodBoard TryGet_FoodBoard(const FCk_Handle_FoodPiece& Self)
 {
     if (ck::Is_NOT_Valid(Self) || Self.Has_Fragment(FMars_Fragment_FoodBoard_Membership) == false)
@@ -160,7 +187,8 @@ mixin FCk_Handle_FoodBoard TryGet_FoodBoard(const FCk_Handle_FoodPiece& Self)
     return Self.Get_Fragment(FMars_Fragment_FoodBoard_Membership).Board;
 }
 
-// Whether a cut its board submitted for the piece awaits its answer.
+// Whether a cut its board submitted for the piece awaits its answer. It reads the authority's membership: false on a machine
+// without authority.
 mixin bool Get_HasBoardCutPending(const FCk_Handle_FoodPiece& Self)
 {
     if (ck::Is_NOT_Valid(Self) || Self.Has_Fragment(FMars_Fragment_FoodBoard_Membership) == false)
@@ -317,4 +345,18 @@ mixin void UnbindFrom_OnTurned(FCk_Handle_FoodBoard& Self, FMars_Delegate_FoodBo
     { return; }
 
     Self.Get_Fragment(FMars_Fragment_FoodBoard_Signals).OnTurned.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void BindTo_OnHeldCountChanged(FCk_Handle_FoodBoard& Self, FMars_Delegate_FoodBoard_OnHeldCountChanged InDelegate)
+{
+    auto& Fragment = Self.AddOrGet_Fragment(FMars_Fragment_FoodBoard_Signals);
+    Fragment.OnHeldCountChanged.AddUFunction(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void UnbindFrom_OnHeldCountChanged(FCk_Handle_FoodBoard& Self, FMars_Delegate_FoodBoard_OnHeldCountChanged InDelegate)
+{
+    if (Self.Has_Fragment(FMars_Fragment_FoodBoard_Signals) == false)
+    { return; }
+
+    Self.Get_Fragment(FMars_Fragment_FoodBoard_Signals).OnHeldCountChanged.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
 }

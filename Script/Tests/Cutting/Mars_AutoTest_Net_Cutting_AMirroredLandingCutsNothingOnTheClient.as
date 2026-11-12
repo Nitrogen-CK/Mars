@@ -1,5 +1,6 @@
 // The server seats the subject, so both machines' control is in Operated with the cut bridge, and the server chops: the
-// server's board answers one cut, and the client's copy raises the landing but its board answers none.
+// server's board answers one cut, and the client's copy raises the landing and the one answer the authority's board gave,
+// and cuts nothing itself.
 // Surface: Ck.Cutting.Net.AS_Cutting_AMirroredLandingCutsNothingOnTheClient
 class UCk_AutoTest_Net_Cutting_AMirroredLandingCutsNothingOnTheClient : UMars_AutoTestRig_NetCutting
 {
@@ -42,7 +43,7 @@ class UCk_AutoTest_Net_Cutting_AMirroredLandingCutsNothingOnTheClient : UMars_Au
     {
         Log(f"[CuttingNetTest] AMirroredLandingCutsNothingOnTheClient client: events [{Get_EventsText()}], cuts answered {_CutsIssued}, ensures {Get_NewEnsures()}");
         Assert_True(Get_IsOneChop(), f"the client raises one start then one landing (got [{Get_EventsText()}])");
-        Assert_True(_CutsIssued == 0, f"the client's board answers no cut (got {_CutsIssued})");
+        Assert_True(_CutsIssued == 1, f"the client raises the authority's one answer and cuts nothing itself (got {_CutsIssued})");
         Assert_True(Get_NewEnsures() == 0, f"no ensure fired (got {Get_NewEnsures()})");
         FinishSuccess();
     }

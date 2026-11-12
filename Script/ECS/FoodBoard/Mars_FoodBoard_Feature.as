@@ -1,3 +1,9 @@
+// Stance: authority-written. Only the authority's board admits, cuts, parts, turns and releases; a machine without authority
+// drops every board request. FMars_Fragment_FoodBoard_Net replicates: the piece count, the occupancy and the board's
+// answers (a chop answered, a turn, a sweep refused), a serial each, which a client's mirror raises as the same signals,
+// with OnHeldCountChanged for the count. The held list, the unparted planes, the queue and every piece's membership never
+// leave the authority; the pieces replicate their own poses and holders.
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
 //--------------------------------------------------------------------------------------------------------------------------
@@ -176,6 +182,64 @@ struct FMars_Fragment_FoodBoard
     TArray<FMars_FoodBoard_Op> Queue;
 }
 
+// The replicated ledger: what a machine without authority reads the board through. Written only by the authority's
+// FoodBoard processor, each write followed by its dirty mark. It names no piece and no pose: the pieces replicate their own.
+struct FMars_Fragment_FoodBoard_Net
+{
+    UPROPERTY()
+    int32 HeldCount = 0;
+
+    // As Get_Occupancy counts it on the authority.
+    UPROPERTY()
+    int32 Occupancy = 0;
+
+    // One per answer of any kind below, in the order the authority raised them. Each kind keeps the value this had after
+    // its latest answer (its At), so answers of different kinds that reach a machine in one replication are raised there
+    // in the authority's order.
+    UPROPERTY()
+    int32 AnswerSerial = 0;
+
+    // One per OnCutIssued the authority raised; LastCut is the latest.
+    UPROPERTY()
+    int32 CutSerial = 0;
+
+    UPROPERTY()
+    FMars_FoodBoard_CutIssue LastCut;
+
+    UPROPERTY()
+    int32 LastCutAt = 0;
+
+    // One per OnTurned the authority raised; LastTurnDegrees is the latest.
+    UPROPERTY()
+    int32 TurnSerial = 0;
+
+    UPROPERTY()
+    float32 LastTurnDegrees = 0.0f;
+
+    UPROPERTY()
+    int32 LastTurnAt = 0;
+
+    // One per OnReleaseRefused the authority raised; LastReleaseRefusal is the latest.
+    UPROPERTY()
+    int32 ReleaseRefusalSerial = 0;
+
+    UPROPERTY()
+    EMars_FoodBoard_ReleaseRefusal LastReleaseRefusal = EMars_FoodBoard_ReleaseRefusal::NoRoom;
+
+    UPROPERTY()
+    int32 LastReleaseRefusalAt = 0;
+}
+
+// Each machine's own: the ledger the mirror last reconciled; unset with authority.
+struct FMars_Fragment_FoodBoard_Local
+{
+    UPROPERTY()
+    TOptional<FMars_Fragment_FoodBoard_Net> Last;
+}
+
+// Added by utils_foodboard::Add, dropped by UMars_Processor_FoodBoard_Mirror once it has bound the ledger's rep-notify.
+struct FMars_Tag_FoodBoard_NeedsMirror {}
+
 // On every held piece; written only by the FoodBoard processor. PendingCutPlane (world, unit normal) is the plane of the cut
 // the board submitted, set until that cut resolves; it is what parts the board once the cut commits and the board is
 // quiet. Removed when the piece is released.
@@ -192,9 +256,11 @@ struct FMars_Fragment_FoodBoard_Membership
 // Signals
 //--------------------------------------------------------------------------------------------------------------------------
 
+// Raised only with authority: a machine without authority places nothing.
 delegate void FMars_Delegate_FoodBoard_OnPlaced(FCk_Handle_FoodBoard InBoard, FCk_Handle_FoodPiece InPiece);
 event void FMars_Delegate_FoodBoard_OnPlaced_MC(FCk_Handle_FoodBoard InBoard, FCk_Handle_FoodPiece InPiece);
 
+// Raised only with authority.
 delegate void FMars_Delegate_FoodBoard_OnPlaceRefused(FCk_Handle_FoodBoard InBoard, FCk_Handle_FoodPiece InPiece, EMars_FoodBoard_PlaceRefusal InRefusal);
 event void FMars_Delegate_FoodBoard_OnPlaceRefused_MC(FCk_Handle_FoodBoard InBoard, FCk_Handle_FoodPiece InPiece, EMars_FoodBoard_PlaceRefusal InRefusal);
 
@@ -203,12 +269,12 @@ delegate void FMars_Delegate_FoodBoard_OnCutIssued(FCk_Handle_FoodBoard InBoard,
 event void FMars_Delegate_FoodBoard_OnCutIssued_MC(FCk_Handle_FoodBoard InBoard, FMars_FoodBoard_CutIssue InIssue);
 
 // A held piece was cut: its halves hold its place and InSource is being destroyed. The halves are already Ready (a cut
-// half is born Ready): compose on them here rather than waiting for their OnReady.
+// half is born Ready): compose on them here rather than waiting for their OnReady. Raised only with authority.
 delegate void FMars_Delegate_FoodBoard_OnPieceCut(FCk_Handle_FoodBoard InBoard, FCk_Handle_FoodPiece InSource, FCk_Handle_FoodPiece InPositive, FCk_Handle_FoodPiece InNegative);
 event void FMars_Delegate_FoodBoard_OnPieceCut_MC(FCk_Handle_FoodBoard InBoard, FCk_Handle_FoodPiece InSource, FCk_Handle_FoodPiece InPositive, FCk_Handle_FoodPiece InNegative);
 
 // The piece is no longer the board's to cut: it lies where the board left it, with whatever body it had, until its new
-// holder takes it.
+// holder takes it. Raised only with authority.
 delegate void FMars_Delegate_FoodBoard_OnReleased(FCk_Handle_FoodBoard InBoard, FCk_Handle_FoodPiece InPiece);
 event void FMars_Delegate_FoodBoard_OnReleased_MC(FCk_Handle_FoodBoard InBoard, FCk_Handle_FoodPiece InPiece);
 
@@ -221,6 +287,10 @@ event void FMars_Delegate_FoodBoard_OnReleaseRefused_MC(FCk_Handle_FoodBoard InB
 delegate void FMars_Delegate_FoodBoard_OnTurned(FCk_Handle_FoodBoard InBoard, float32 InYawDegrees);
 event void FMars_Delegate_FoodBoard_OnTurned_MC(FCk_Handle_FoodBoard InBoard, float32 InYawDegrees);
 
+// The board's piece count changed: with authority last in the drain that changed it, without from the mirrored ledger.
+delegate void FMars_Delegate_FoodBoard_OnHeldCountChanged(FCk_Handle_FoodBoard InBoard, int32 InHeldCount);
+event void FMars_Delegate_FoodBoard_OnHeldCountChanged_MC(FCk_Handle_FoodBoard InBoard, int32 InHeldCount);
+
 struct FMars_Fragment_FoodBoard_Signals
 {
     FMars_Delegate_FoodBoard_OnPlaced_MC OnPlaced;
@@ -230,6 +300,7 @@ struct FMars_Fragment_FoodBoard_Signals
     FMars_Delegate_FoodBoard_OnReleased_MC OnReleased;
     FMars_Delegate_FoodBoard_OnReleaseRefused_MC OnReleaseRefused;
     FMars_Delegate_FoodBoard_OnTurned_MC OnTurned;
+    FMars_Delegate_FoodBoard_OnHeldCountChanged_MC OnHeldCountChanged;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

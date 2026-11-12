@@ -38,6 +38,8 @@ struct FMars_FoodBoard_Drain
     TArray<EMars_FoodBoard_ReleaseRefusal> ReleaseRefusals;
     // One per release the station's inbox held, answered on the station's OnAdmission.
     TArray<FMars_CookingFeed_AdmissionAnswer> Answers;
+    // Set when this drain changed the board's piece count: the new count.
+    TOptional<int32> HeldCount;
 }
 
 // Why the queue's head did not apply this drain.
@@ -51,14 +53,16 @@ enum EMars_FoodBoard_HeadWait
     PiecesMoved
 }
 
-// Drains ResolveCut -> (parting) -> Place (then the station inbox's releases, each a Place posed on the pile node and
+// Runs with authority only: past the request fragment's removal a copy without authority returns (the board's mirror
+// raises the ledger's answers there). Drains ResolveCut -> (parting) -> Place (then the station inbox's releases, each a Place posed on the pile node and
 // answered on the station's OnAdmission) -> the queue, then broadcasts in that order. Pieces destroyed elsewhere leave the
 // ledger after the resolutions, so a cut source (destroyed by its own commit) is still found by its ResolveCut. The board
 // parts only when quiet (Apply_Parting). This drain's cuts, turns and releases join the queue in arrival order (the
 // station's take-outs, each a Release onto its tray, after them), and the queue applies from its head until an entry must
 // wait (EMars_FoodBoard_HeadWait): a cut while a parting is owed or once the pieces moved this drain, a turn while any cut
 // is in flight or once the pieces moved; everything behind a waiting entry waits with it. Turns that reach the head
-// together apply as one yaw of their sum, so two turns in one drain compose.
+// together apply as one yaw of their sum, so two turns in one drain compose. The replicated ledger is written once, after
+// the queue, and OnHeldCountChanged is raised last, after the drain's other broadcasts.
 //
 // The board is the one owner of its pieces' lease facts: it stamps every piece it holds with the holder fact and its
 // pickup's Ledger claim (a whole food is a world item a hand could otherwise take off the board behind its back), and
@@ -99,6 +103,11 @@ class UMars_Processor_FoodBoard_HandleRequests : UCk_Processor_Script_Base_UE
         // InRequests is invalid past this line; removing before broadcasting lets re-entrant requests survive.
         Drain.Board.Request_TryRemove(FMars_Fragment_FoodBoard_Requests);
 
+        // Only the authority's board admits, cuts, parts, turns and releases: a copy without authority drops every request
+        // and reads the board through the replicated ledger.
+        if (utils_net::Get_HasAuthority(InHandle) == false)
+        { return; }
+
         Watch_Station(Drain.Board);
         TArray<FMars_CookingFeed_Release> Inbox = utils_cooking_feed::Take_Inbox(InHandle);
         TArray<FMars_Request_StationTakeOut> TakeOuts = utils_cooking_feed::Take_TakeOutRequests(InHandle);
@@ -129,7 +138,57 @@ class UMars_Processor_FoodBoard_HandleRequests : UCk_Processor_Script_Base_UE
         if (Wait == EMars_FoodBoard_HeadWait::PiecesMoved)
         { Drain.Board.AddOrGet_Fragment(FMars_Fragment_FoodBoard_Requests); }
 
+        Publish(Drain);
         Broadcast(Drain);
+    }
+
+    // The ledger a machine without authority reads the board through: the live count and occupancy, and one serial per
+    // answer this drain raises, with the last answer of each kind. Written and marked dirty only when a field changes; a
+    // changed count is recorded for the broadcast.
+    private void Publish(FMars_FoodBoard_Drain& InDrain)
+    {
+        auto Board = InDrain.Board;
+        const auto HeldCount = Board.Get_Fragment(FMars_Fragment_FoodBoard).Held.Num();
+        const auto Occupancy = Board.Get_Occupancy();
+        const auto IsAnswered = InDrain.CutIssues.Num() > 0 || InDrain.Turned.Num() > 0 || InDrain.ReleaseRefusals.Num() > 0;
+
+        auto& Ledger = Board.Get_Fragment(FMars_Fragment_FoodBoard_Net);
+        if (HeldCount == Ledger.HeldCount && Occupancy == Ledger.Occupancy && IsAnswered == false)
+        { return; }
+
+        if (HeldCount != Ledger.HeldCount)
+        { InDrain.HeldCount = TOptional<int32>(HeldCount); }
+
+        Ledger.HeldCount = HeldCount;
+        Ledger.Occupancy = Occupancy;
+
+        // In the order Broadcast raises them: answers, then turns, then refused sweeps.
+        if (InDrain.CutIssues.Num() > 0)
+        {
+            Ledger.CutSerial += InDrain.CutIssues.Num();
+            Ledger.LastCut = InDrain.CutIssues.Last();
+            Ledger.AnswerSerial += InDrain.CutIssues.Num();
+            Ledger.LastCutAt = Ledger.AnswerSerial;
+        }
+
+        if (InDrain.Turned.Num() > 0)
+        {
+            Ledger.TurnSerial += InDrain.Turned.Num();
+            Ledger.LastTurnDegrees = InDrain.Turned.Last();
+            Ledger.AnswerSerial += InDrain.Turned.Num();
+            Ledger.LastTurnAt = Ledger.AnswerSerial;
+        }
+
+        if (InDrain.ReleaseRefusals.Num() > 0)
+        {
+            Ledger.ReleaseRefusalSerial += InDrain.ReleaseRefusals.Num();
+            Ledger.LastReleaseRefusal = InDrain.ReleaseRefusals.Last();
+            Ledger.AnswerSerial += InDrain.ReleaseRefusals.Num();
+            Ledger.LastReleaseRefusalAt = Ledger.AnswerSerial;
+        }
+
+        FCk_Handle Entity = Board;
+        Entity.Request_MarkReplicationDirty(FMars_Fragment_FoodBoard_Net);
     }
 
     // This drain's cuts, turns and releases as queue entries in arrival order: each list is already in its own order, so
@@ -691,6 +750,9 @@ class UMars_Processor_FoodBoard_HandleRequests : UCk_Processor_Script_Base_UE
             if (Board.Has_Fragment(FMars_Fragment_FoodBoard_Signals))
             { Board.Get_Fragment(FMars_Fragment_FoodBoard_Signals).OnReleaseRefused.Broadcast(Board, Refusal); }
         }
+
+        if (InDrain.HeldCount.IsSet() && Board.Has_Fragment(FMars_Fragment_FoodBoard_Signals))
+        { Board.Get_Fragment(FMars_Fragment_FoodBoard_Signals).OnHeldCountChanged.Broadcast(Board, InDrain.HeldCount.GetValue()); }
     }
 
     // A held piece's cut resolved: every outcome reaches the board as a ResolveCut (a Cut replaces the piece with its halves;
