@@ -16,7 +16,8 @@
 // Authority). The authority's reader steers the hand for any operator and chops for its own player; a remote operator's
 // machine predicts its own hand and chops through Cue.Mars.Cutting.Chop with the aim it saw. Only the authority turns a
 // landing into a board cut: a client's copy mirrors the landing and cuts nothing. Off authority the board's count is the
-// ledger's: the hint rows re-text on its OnHeldCountChanged.
+// ledger's: the hint rows re-text on its OnHeldCountChanged. The feed's ledger stands beside the cleaver's and the board's:
+// the add-food press is issued on the authority alone, and the add-food row reads the mirrored feed on every machine.
 //
 // The feed sources itself from the input dock and lands its releases without an operator: a joint released over the board
 // lands whoever is standing there. The sweep (RMB) is this station's take-out (the station's take-out contract on the board), so the feed's take-out

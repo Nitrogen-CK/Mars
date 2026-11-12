@@ -107,6 +107,10 @@ struct FMars_Station_DockPolicies
 // hands each release to the station's admission inbox, and the kernel loads what it hands back onto the tray and takes back
 // what the tray refuses. The label (the counter
 // base's) also flashes the feed's refusals and let-go pieces and the docks' failed interactions.
+//
+// Stance: the feed is the authority's and replicates through its ledger. Every machine's copy moves its own hand node and
+// carries its own copy of the piece from that ledger, and flashes the refusals the ledger announces; the glove's pose
+// follows the mirrored phase and shows on the operator's own machine.
 UCLASS(Abstract)
 class UMars_FeedStation_EntityScript : UMars_CounterStation_EntityScript
 {

@@ -11,6 +11,13 @@
 //                    station whose kernel hands pieces back through the feed's take-out: Searing, Fry, Batter, Tumbler)
 //
 // The input and hint tasks are the shared station shapes (Mars_Station_SmTasks.as).
+//
+// Stance: the feed is the authority's. OperatorInput runs on every machine and issues feed requests only on the copy with
+// authority over the station: at a station whose control reads on the authority a remote operator's press arrives there in
+// its stream; at a station whose control reads on every machine only the host's own press is issued. OperatorHints runs on
+// every machine whose operator has a hint display and reads the feed's getters, which a copy without authority answers from
+// the feed's ledger; there the add-food row says the key is the host's when this machine's press is not issued.
+// TakeOutInput reads where the station's input stance reads and asks the station's own copy of its kernel.
 
 namespace utils_cooking_feed
 {
@@ -35,9 +42,14 @@ class UMars_SmTask_StationFeed_OperatorInput : UMars_SmTask_StationOperatorInput
     protected FCk_Handle_CookingFeed _Feed;
     private FMars_IntentEdge _AddFood;
 
+    // The feed is the authority's: only the copy with authority over the station caches it, so a copy without issues no
+    // press and no cancel. At a station whose control reads on the authority the operator's press arrives there in its
+    // stream; at a station whose control reads on every machine only the host's own press is issued.
     protected void Bind(FCk_Handle InStation) override
     {
-        _Feed = InStation.As_CookingFeed();
+        _Feed = FCk_Handle_CookingFeed();
+        if (utils_net::Get_HasAuthority(InStation))
+        { _Feed = InStation.As_CookingFeed(); }
     }
 
     protected void Seed() override
@@ -113,7 +125,8 @@ class UMars_SmTask_StationFeed_TakeOutInput : UMars_SmTask_StationOperatorInput
 }
 
 // The operator's rows while operating, under owner key StationFeed. The add-food row (IA_StationAddFood): "add food - N left"
-// while the hand is idle, "adding food... - N left" while it is busy, the station's own refusal while it would refuse a
+// while the hand is idle, "adding food... - N left" while it is busy, "add food - host only" while this machine's press is
+// not issued (a client at a station whose control reads on every machine), the station's own refusal while it would refuse a
 // press (a subclass's TryGet_StationRefusal: the cutting station's "board busy"), "no platter" without a source, "platter
 // empty" once nothing is left on it, "settling - N left" while the pile re-settles (a press then is refused until a piece
 // freezes); re-texted on every stock and phase edge. The take-out row (IA_Interact_Secondary), on a station whose kernel
@@ -256,11 +269,19 @@ class UMars_SmTask_StationFeed_OperatorHints : UMars_SmTask_StationOperatorHints
     // Why the station's own gate would refuse a press now (its OperatorInput's Get_CanBeginTransfer); unset = it would not.
     protected TOptional<FString> TryGet_StationRefusal() const { return TOptional<FString>(); }
 
+    // This machine's add-food press is issued: it has authority over the station, or the station takes its operator's
+    // input remotely (the press reaches the authority in the operator's stream).
+    protected bool Get_CanAddFoodFromHere() const
+    { return utils_net::Get_HasAuthority(_Station) || utils_station::Get_TakesRemoteInput(_Station.As_Station()); }
+
     private FString Get_AddFoodText() const
     {
         const auto Available = _Feed.Get_Available();
         if (_Feed.Get_IsBusy())
         { return f"adding food... - {Available} left"; }
+
+        if (Get_CanAddFoodFromHere() == false)
+        { return "add food - host only"; }
 
         const auto StationRefusal = TryGet_StationRefusal();
         if (StationRefusal.IsSet())
