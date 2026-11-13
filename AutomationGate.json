@@ -41,20 +41,6 @@
       "added": "2026-10-03"
     },
     {
-      "test": "Monolith.ReflectionIntel.CppReflect.FindSpecifier",
-      "status": "red",
-      "reason": "Monolith plugin test (third-party submodule with no list of its own), red in this project. The fixture root resolves to 'D:/Saved/Automation/Tmp/...' (outside the project), so the staged fixtures are not found. Seen: Expected 'ASampleActor surfaces under specifier 'Abstract'' to be true.",
-      "evidence": "Mars dev f4d3c25 (CkFoundation 9366c2a34, CkTests 771c2a98, CkGameplayDebugger 5af581da), UnrealToolbox v1.52, 3 full gates on one build 2026-10-03 (G1 raw 4243 run/62 red; G2 judged 4243/62; G3 judged 4243/63) + solo fresh-boot runs: gates RED RED RED, solo RED. The only change under test was adding this file (and docs), so the failure predates it.",
-      "added": "2026-10-03"
-    },
-    {
-      "test": "Monolith.ReflectionIntel.CppReflect.UHTArtefactParse",
-      "status": "red",
-      "reason": "Monolith plugin test (third-party submodule with no list of its own), red in this project. The fixture root resolves to 'D:/Saved/Automation/Tmp/...' (outside the project), so the staged fixtures are not found. Seen: Expected 'At least 2 UClasses parsed (ASampleActor + USampleInterface)' to be true.",
-      "evidence": "Mars dev f4d3c25 (CkFoundation 9366c2a34, CkTests 771c2a98, CkGameplayDebugger 5af581da), UnrealToolbox v1.52, 3 full gates on one build 2026-10-03 (G1 raw 4243 run/62 red; G2 judged 4243/62; G3 judged 4243/63) + solo fresh-boot runs: gates RED RED RED, solo RED. The only change under test was adding this file (and docs), so the failure predates it.",
-      "added": "2026-10-03"
-    },
-    {
       "test": "Monolith.ReflectionIntel.Decision.HeuristicAccuracy",
       "status": "red",
       "reason": "Monolith plugin test (third-party submodule with no list of its own), red in this project. The fixture root resolves to 'D:/Saved/Automation/Tmp/...' (outside the project), so the staged fixtures are not found. Seen: Expected 'At least 4 decision rows from fixture corpus' to be true.",
@@ -62,23 +48,9 @@
       "added": "2026-10-03"
     },
     {
-      "test": "Monolith.ReflectionIntel.Decision.StalenessFlag",
-      "status": "red",
-      "reason": "Monolith plugin test (third-party submodule with no list of its own), red in this project. The fixture root resolves to 'D:/Saved/Automation/Tmp/...' (outside the project), so the staged fixtures are not found. Seen: Expected 'At least one stale row past 30-day cutoff' to be true.",
-      "evidence": "Mars dev f4d3c25 (CkFoundation 9366c2a34, CkTests 771c2a98, CkGameplayDebugger 5af581da), UnrealToolbox v1.52, 3 full gates on one build 2026-10-03 (G1 raw 4243 run/62 red; G2 judged 4243/62; G3 judged 4243/63) + solo fresh-boot runs: gates RED RED RED, solo RED. The only change under test was adding this file (and docs), so the failure predates it.",
-      "added": "2026-10-03"
-    },
-    {
       "test": "Monolith.ReflectionIntel.Decision.SupersessionChain",
       "status": "red",
       "reason": "Monolith plugin test (third-party submodule with no list of its own), red in this project. The fixture root resolves to 'D:/Saved/Automation/Tmp/...' (outside the project), so the staged fixtures are not found. Seen: Expected 'At least one supersession edge resolved from corpus' to be true.",
-      "evidence": "Mars dev f4d3c25 (CkFoundation 9366c2a34, CkTests 771c2a98, CkGameplayDebugger 5af581da), UnrealToolbox v1.52, 3 full gates on one build 2026-10-03 (G1 raw 4243 run/62 red; G2 judged 4243/62; G3 judged 4243/63) + solo fresh-boot runs: gates RED RED RED, solo RED. The only change under test was adding this file (and docs), so the failure predates it.",
-      "added": "2026-10-03"
-    },
-    {
-      "test": "Monolith.ReflectionIntel.Risk.ConditionalGateSweep",
-      "status": "red",
-      "reason": "Monolith plugin test (third-party submodule with no list of its own), red in this project. The fixture root resolves to 'D:/Saved/Automation/Tmp/...' (outside the project), so the staged fixtures are not found. Seen: Expected 'At least one gate row detected' to be true.",
       "evidence": "Mars dev f4d3c25 (CkFoundation 9366c2a34, CkTests 771c2a98, CkGameplayDebugger 5af581da), UnrealToolbox v1.52, 3 full gates on one build 2026-10-03 (G1 raw 4243 run/62 red; G2 judged 4243/62; G3 judged 4243/63) + solo fresh-boot runs: gates RED RED RED, solo RED. The only change under test was adding this file (and docs), so the failure predates it.",
       "added": "2026-10-03"
     },
@@ -102,6 +74,62 @@
       "reason": "Mars test. Seen: CkUsf: Look [MarsEyePlate] master material has shader compile errors (or is still compiling) - it will render as the checkered DefaultMaterial. See LogShaderCompilers for the HLSL error, then re-run Generate Look Materials or 'RecompileShaders Material M_CkUsf_Look_MarsEyePlate'. [log]",
       "evidence": "Mars dev f4d3c25 (CkFoundation 9366c2a34, CkTests 771c2a98, CkGameplayDebugger 5af581da), UnrealToolbox v1.52, 3 full gates on one build 2026-10-03 (G1 raw 4243 run/62 red; G2 judged 4243/62; G3 judged 4243/63) + solo fresh-boot runs: gates RED RED RED, solo RED. The only change under test was adding this file (and docs), so the failure predates it.",
       "added": "2026-10-03"
+    },
+    {
+      "test": "Project.Functional Tests.Mars.Maps.AutoTests_Mars_MAP.Mars_AutoTest_AttackCatalog_SeedReferenceGraphs",
+      "status": "red",
+      "reason": "UE 5.8 regression, owner: Mars team. The preview leg ID/hip/rest geometry differs on 5.8 (60/297 assertions), and the check compares with exact FVector ==. Green on 5.7.",
+      "evidence": "Gate58-Rebased-v178 (Mars feature/ue58-upgrade rebased onto dev 6f4597ec + Ck re-pin 35916246: CkFoundation e7bcb43cf, CkTests 7bf54cba, CkGameplayDebugger e5c07cc29; engine ue58_engine 417f32a755, UE 5.8.4; UnrealToolbox v1.78; 2026-11-07, 5475 run / 41 failed): red. Red alone on 5.8 and green on 5.7 in the Mars#12 investigation (2026-11-05, see the PR body).",
+      "added": "2026-11-07"
+    },
+    {
+      "test": "Project.Functional Tests.Mars.Maps.AutoTests_Mars_MAP.Mars_AutoTest_AttackCatalog_ShippedReferenceGraphs",
+      "status": "red",
+      "reason": "UE 5.8 regression, owner: Mars team. Same cause as AttackCatalog_SeedReferenceGraphs: preview leg geometry differs on 5.8 and the check uses exact FVector ==.",
+      "evidence": "Gate58-Rebased-v178 (Mars feature/ue58-upgrade rebased onto dev 6f4597ec + Ck re-pin 35916246: CkFoundation e7bcb43cf, CkTests 7bf54cba, CkGameplayDebugger e5c07cc29; engine ue58_engine 417f32a755, UE 5.8.4; UnrealToolbox v1.78; 2026-11-07, 5475 run / 41 failed): red. Red alone on 5.8 and green on 5.7 in the Mars#12 investigation (2026-11-05).",
+      "added": "2026-11-07"
+    },
+    {
+      "test": "Ck.ProceduralAnimation.Action.Editor.MountedToolkit.PoseWorkspace.PanelsShowTheSelection",
+      "status": "red",
+      "reason": "HOST-COUPLED to Mars + engine 417f32a755. The test's FState::Close() runs CollectGarbage, which reclaims an AutoTests_Mars_MAP world whose WorldPartitionSubsystem was never deinitialized: handled ensure 'Tickable subsystem WorldPartitionSubsystem ... was destroyed while still initialized' (WorldSubsystem.cpp:118). Green in CkPlugins on the same Ck pins (its map is not World Partition). Inferred cause: the merged engine 417f32a755 (Saad's 5.8 commits); every Mars 5.8 run on the earlier engine 935c5aa08b6d passed it. Owner: engine/Mars; the test is in CkTests.",
+      "evidence": "Gate58-Rebased-v178 (Mars feature/ue58-upgrade rebased onto dev 6f4597ec + Ck re-pin 35916246: CkFoundation e7bcb43cf, CkTests 7bf54cba, CkGameplayDebugger e5c07cc29; engine ue58_engine 417f32a755, UE 5.8.4; UnrealToolbox v1.78; 2026-11-07, 5475 run / 41 failed): red. Red alone 4 times: rebased pins (Solo58R-4, -4b), with CkTests' cursor hook 5a7550b9 reverted (Solo58R-4-AB-NoHook), with toolbox v1.73 (Solo58R-4-AB-v173), and on the pre-rebase pins CkFoundation 5982ae75b / CkTests cde8b157 / CkGameplayDebugger e957bf83 (Solo58R-4-AB-OldPins). Passed in Gate58-Mars-G1, Gate58-Mars-Pin60 and Gate58-Mars-Pin60-keep (all on engine 935c5aa08b6d, before ue58_engine moved to 417f32a755 at 2026-11-06 04:33 UTC). CkPlugins Gate58-CkDevPins (same Ck pins, engine 417f32a755): passed.",
+      "added": "2026-11-07"
+    },
+    {
+      "test": "Ck.PixelSprite.Examples.SproutlingBorder",
+      "status": "red",
+      "reason": "HOST-COUPLED to Mars: 'Corrected XPM reimports through production importer' fails here, on 5.7 and 5.8, but passes in CkPlugins' 5.8 gate. Coupling not traced. Owner: CkFoundation (CkPixelSpriteEditor).",
+      "evidence": "Gate58-Rebased-v178 (Mars feature/ue58-upgrade rebased onto dev 6f4597ec + Ck re-pin 35916246: CkFoundation e7bcb43cf, CkTests 7bf54cba, CkGameplayDebugger e5c07cc29; engine ue58_engine 417f32a755, UE 5.8.4; UnrealToolbox v1.78; 2026-11-07, 5475 run / 41 failed): red. Red alone on 5.8 (Solo58R-Sproutling, 2026-11-07), and red alone on 5.7 with toolbox v1.73 and v1.75 (Mars v1.75 bump, 2026-11-06). Passed in CkPlugins Gate58-CkDevPins.",
+      "added": "2026-11-07"
+    },
+    {
+      "test": "Ck.ProceduralAnimation.Action.Editor.MountedToolkit.TwoTabsModesAndCapture",
+      "status": "flaky",
+      "reason": "Suite-only failure of a renderer-only editor-toolkit test in Mars. Possibly the real OS cursor during the gate (the person was moving the mouse; CkTests had no virtual cursor yet); not confirmed.",
+      "evidence": "Gate58-Rebased-v178 (Mars feature/ue58-upgrade rebased onto dev 6f4597ec + Ck re-pin 35916246: CkFoundation e7bcb43cf, CkTests 7bf54cba, CkGameplayDebugger e5c07cc29; engine ue58_engine 417f32a755, UE 5.8.4; UnrealToolbox v1.78; 2026-11-07, 5475 run / 41 failed): red at 33 FPS (load clean). Green alone (Solo58R-5, 2026-11-07).",
+      "added": "2026-11-07"
+    },
+    {
+      "test": "Project.Functional Tests.Mars.Maps.AutoTests_Mars_MAP.Mars_AutoTest_CrawlerDoorway_EightLegCrossing",
+      "status": "flaky",
+      "reason": "Suite-only failure; green alone. Cause not traced (load annotation clean, 53 FPS).",
+      "evidence": "Gate58-Rebased-v178 (Mars feature/ue58-upgrade rebased onto dev 6f4597ec + Ck re-pin 35916246: CkFoundation e7bcb43cf, CkTests 7bf54cba, CkGameplayDebugger e5c07cc29; engine ue58_engine 417f32a755, UE 5.8.4; UnrealToolbox v1.78; 2026-11-07, 5475 run / 41 failed): red. Green alone (Solo58R-1, 2026-11-07).",
+      "added": "2026-11-07"
+    },
+    {
+      "test": "Project.Functional Tests.Mars.Maps.AutoTests_Mars_MAP.Mars_AutoTest_FPHands_TimedReachHoldsUntilRelease",
+      "status": "flaky",
+      "reason": "Suite-only failure of a timed-reach test; green alone. Cause not traced (load annotation clean, 56 FPS vs 59 usual).",
+      "evidence": "Gate58-Rebased-v178 (Mars feature/ue58-upgrade rebased onto dev 6f4597ec + Ck re-pin 35916246: CkFoundation e7bcb43cf, CkTests 7bf54cba, CkGameplayDebugger e5c07cc29; engine ue58_engine 417f32a755, UE 5.8.4; UnrealToolbox v1.78; 2026-11-07, 5475 run / 41 failed): red. Green alone (Solo58R-2, 2026-11-07).",
+      "added": "2026-11-07"
+    },
+    {
+      "test": "Project.Functional Tests.Mars.Maps.AutoTests_Mars_MAP.Mars_AutoTest_Fry_ADrainedPieceKnockedOutIsNoLongerDrained",
+      "status": "flaky",
+      "reason": "Suite-only failure; green alone. Cause not traced (load annotation clean, 58 FPS).",
+      "evidence": "Gate58-Rebased-v178 (Mars feature/ue58-upgrade rebased onto dev 6f4597ec + Ck re-pin 35916246: CkFoundation e7bcb43cf, CkTests 7bf54cba, CkGameplayDebugger e5c07cc29; engine ue58_engine 417f32a755, UE 5.8.4; UnrealToolbox v1.78; 2026-11-07, 5475 run / 41 failed): red. Green alone (Solo58R-3, 2026-11-07).",
+      "added": "2026-11-07"
     }
   ]
 }

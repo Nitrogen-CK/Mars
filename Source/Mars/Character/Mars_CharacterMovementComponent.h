@@ -1,8 +1,18 @@
 #pragma once
 
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Misc/EngineVersionComparison.h"
 
 #include "Mars_CharacterMovementComponent.generated.h"
+
+// The client-movement-base parameter of the server position checks overridden below. UE 5.8 calls the
+// FMovementBaseInterfaceData overloads; its UPrimitiveComponent overloads are deprecated and only forward to them, so
+// overriding those on 5.8 compiles but is never called.
+#if UE_VERSION_OLDER_THAN(5, 8, 0)
+using FMars_ClientMovementBase = UPrimitiveComponent;
+#else
+using FMars_ClientMovementBase = FMovementBaseInterfaceData;
+#endif
 
 /**
  * Mars character movement for non-competitive co-op.
@@ -56,7 +66,7 @@ protected:
 		const FVector& Accel,
 		const FVector& ClientWorldLocation,
 		const FVector& RelativeClientLocation,
-		UPrimitiveComponent* ClientMovementBase,
+		FMars_ClientMovementBase* ClientMovementBase,
 		FName ClientBaseBoneName,
 		uint8 ClientMovementMode) override;
 
@@ -67,7 +77,7 @@ protected:
 		const FVector& Accel,
 		const FVector& ClientWorldLocation,
 		const FVector& RelativeClientLocation,
-		UPrimitiveComponent* ClientMovementBase,
+		FMars_ClientMovementBase* ClientMovementBase,
 		FName ClientBaseBoneName,
 		uint8 ClientMovementMode) override;
 
