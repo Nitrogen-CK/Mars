@@ -95,13 +95,13 @@ class UMars_AutoTestRig_Mortar : UCk_AutoTest_Base
     protected void Step_Press(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         _WindowAtPress = _Mortar.Get_Window();
-        _Mortar.Request_Press(FMars_Request_Mortar_Press());
+        _Mortar.Request_Pestle(FMars_Request_Mortar_Pestle(EMars_Mortar_PestleVerb::Press));
     }
 
     UFUNCTION()
     protected void Step_Release(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        _Mortar.Request_Release(FMars_Request_Mortar_Release());
+        _Mortar.Request_Pestle(FMars_Request_Mortar_Pestle(EMars_Mortar_PestleVerb::Release));
     }
 
     //----------------------------------------------------------------------------------------------------------------------

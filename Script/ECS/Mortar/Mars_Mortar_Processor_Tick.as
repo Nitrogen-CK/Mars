@@ -1,8 +1,11 @@
-// The mortar's clocks, while it is engaged. The timing window pans through its pass and starts again (Crush phase only).
-// A strike counts down Spec.StrikeSeconds and lands (OnStrikeLanded; a hit crushes, and the last hit needed cracks the
-// batch and opens the Grind phase), then its recover counts down as long; a long frame finishes at most one phase, so the
-// landing is never skipped. In the Grind phase the pestle circles while it is held with no strike in flight, and the
-// grind's progress fills over Spec.GrindSeconds of that; full, the batch is Ground and Done.
+// The mortar's clocks, while it is engaged. With authority: the timing window pans through its pass and starts again
+// (Crush phase only). A strike counts down Spec.StrikeSeconds and lands (OnStrikeLanded; a hit crushes, and the last hit
+// needed cracks the batch and opens the Grind phase), then its recover counts down as long; a long frame finishes at most
+// one phase, so the landing is never skipped. In the Grind phase the pestle circles while it is held with no strike in
+// flight, and the grind's progress fills over Spec.GrindSeconds of that; full, the batch is Ground and Done. Then it
+// publishes the ledger (utils_mortar::Publish) and broadcasts. Without authority (engaged by the mirror) it only follows:
+// the sweep advances in the Crush phase and the grind's progress while the ledger says the pestle circles, by the same
+// two functions; it changes no phase, starts and lands no strike and raises nothing.
 class UMars_Processor_Mortar_Tick : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -24,10 +27,14 @@ class UMars_Processor_Mortar_Tick : UCk_Processor_Script_Base_UE
         auto Landed = TOptional<EMars_Mortar_Strike>();
 
         if (InState.Batch.Phase == EMars_Mortar_Phase::Crush)
+        { InState.SweepSeconds = utils_mortar::Get_AdvancedSweep(InState.SweepSeconds, Spec.Timing, DeltaSeconds); }
+
+        if (utils_net::Get_HasAuthority(InHandle) == false)
         {
-            InState.SweepSeconds += DeltaSeconds;
-            while (InState.SweepSeconds >= Spec.Timing.SweepSeconds)
-            { InState.SweepSeconds -= Spec.Timing.SweepSeconds; }
+            if (InState.Pestle.Motion == EMars_Mortar_Pestle::Grinding)
+            { InState.Batch.GrindProgress = utils_mortar::Get_AdvancedGrind(InState.Batch.GrindProgress, Spec, DeltaSeconds); }
+
+            return;
         }
 
         if (InState.Pestle.StrikePhase != EMars_Mortar_StrikePhase::Idle)
@@ -53,7 +60,7 @@ class UMars_Processor_Mortar_Tick : UCk_Processor_Script_Base_UE
         InState.Pestle.Motion = IsGrinding ? EMars_Mortar_Pestle::Grinding : EMars_Mortar_Pestle::Resting;
         if (IsGrinding)
         {
-            InState.Batch.GrindProgress = Math::Min(1.0f, InState.Batch.GrindProgress + DeltaSeconds / Spec.GrindSeconds);
+            InState.Batch.GrindProgress = utils_mortar::Get_AdvancedGrind(InState.Batch.GrindProgress, Spec, DeltaSeconds);
             if (InState.Batch.GrindProgress >= 1.0f)
             {
                 InState.Batch.Stage = EMars_Mortar_Stage::Ground;
@@ -66,6 +73,10 @@ class UMars_Processor_Mortar_Tick : UCk_Processor_Script_Base_UE
         const auto Batch = InState.Batch;
 
         // InState is not read past this line: a listener may add fragments to the station.
+        auto Answers = FMars_Mortar_Answers();
+        Answers.Landed = Landed;
+        utils_mortar::Publish(Self, Answers);
+
         if (Self.Has_Fragment(FMars_Fragment_Mortar_Signals) == false)
         { return; }
 

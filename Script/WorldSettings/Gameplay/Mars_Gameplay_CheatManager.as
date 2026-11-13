@@ -250,9 +250,9 @@ class UMars_Gameplay_CheatManager : UCheatManager
         { return; }
 
         if (InPressed)
-        { Mortar.Request_Press(FMars_Request_Mortar_Press()); }
+        { Mortar.Request_Pestle(FMars_Request_Mortar_Pestle(EMars_Mortar_PestleVerb::Press)); }
         else
-        { Mortar.Request_Release(FMars_Request_Mortar_Release()); }
+        { Mortar.Request_Pestle(FMars_Request_Mortar_Pestle(EMars_Mortar_PestleVerb::Release)); }
     }
 
     // A bite now at the fishing spot the local player operates (while its bait waits on the water).

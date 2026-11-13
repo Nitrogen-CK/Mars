@@ -1,3 +1,14 @@
+// Stance: the mortar is the authority's. Only the authority's copy engages, switches, collects, presses and releases the
+// pestle, strikes, lands, grinds and tallies; a copy without authority drops every request. The authority publishes a
+// replicated ledger (FMars_Fragment_Mortar_Net): the engagement, the batch, the pestle's motion, the tally, a serial for
+// each strike started, each landing (with the last result) and each restart of the timing window's pass, and an anchor:
+// the server's clock (utils_mars_net::Get_ServerWorldSeconds) at the publish with the sweep and the grind's progress then.
+// A copy without authority shows its own state fragment, written by its mirror (UMars_Processor_Mortar_Mirror) from each
+// ledger that arrives and carried on between them by its tick (the sweep, and the grind while the pestle circles), both
+// measured from the anchor on the server's clock; there it raises OnStrikeStarted, OnStrikeLanded and OnBatchChanged
+// from the ledger. A remote operator's pestle reaches the authority as Cue.Mars.Mortar.Pestle, whose press carries the
+// sweep that operator saw: the authority judges that strike on it.
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
 //--------------------------------------------------------------------------------------------------------------------------
@@ -131,8 +142,66 @@ mixin FMars_Validation Validate(const FMars_Mortar_Spec& Self)
     return FMars_Validation();
 }
 
-// On the Mortar entity while an operator works it: the sweep, the strike and the grind clocks run only then.
+// On the Mortar entity while an operator works it: the sweep, the strike and the grind clocks run only then. A copy
+// without authority takes it from the ledger's Engagement.
 struct FMars_Tag_Mortar_Engaged {}
+
+// Whether an operator works the mortar, as the ledger carries it.
+enum EMars_Mortar_Engagement
+{
+    Idle,
+    Engaged
+}
+
+// Which edge of the pestle a request or a cue carries.
+enum EMars_Mortar_PestleVerb
+{
+    Press,
+    Release
+}
+
+// Whether a publish's pass of the timing window carried on or started again at 0.
+enum EMars_Mortar_Sweep
+{
+    Kept,
+    Restarted
+}
+
+// What a pestle cue carries: who works the pestle, which edge, (for a press) the sweep that machine showed, and the
+// sender's running count of its pestle acts, which orders acts that reach the authority together. The cue's spawn params.
+struct FMars_Mortar_PestleAct
+{
+    UPROPERTY()
+    FCk_Handle Operator;
+
+    UPROPERTY()
+    EMars_Mortar_PestleVerb Verb = EMars_Mortar_PestleVerb::Press;
+
+    UPROPERTY()
+    float32 SweepSeconds = 0.0f;
+
+    UPROPERTY()
+    int32 Sequence = 0;
+
+    FMars_Mortar_PestleAct() {}
+
+    FMars_Mortar_PestleAct(FCk_Handle InOperator, EMars_Mortar_PestleVerb InVerb, float32 InSweepSeconds, int32 InSequence)
+    {
+        Operator = InOperator;
+        Verb = InVerb;
+        SweepSeconds = InSweepSeconds;
+        Sequence = InSequence;
+    }
+}
+
+// What a processor tells utils_mortar::Publish beyond the state: the strikes it started, the landing it made, and whether
+// it restarted the timing window's pass.
+struct FMars_Mortar_Answers
+{
+    int32 StrikesStarted = 0;
+    TOptional<EMars_Mortar_Strike> Landed;
+    EMars_Mortar_Sweep Sweep = EMars_Mortar_Sweep::Kept;
+}
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Params
@@ -224,6 +293,56 @@ struct FMars_Fragment_Mortar
     FMars_Mortar_Tally Tally;
 }
 
+// The replicated ledger: what a copy without authority shows the mortar from. Written only by utils_mortar::Publish, which
+// the authority's two mortar processors call, each write followed by its dirty mark. Batch.GrindProgress and SweepAtAnchor
+// are as of AnchorServerSeconds (the server's clock at the write); the sweep's wrap and the grind's progress alone never
+// cause a write.
+struct FMars_Fragment_Mortar_Net
+{
+    UPROPERTY()
+    EMars_Mortar_Engagement Engagement = EMars_Mortar_Engagement::Idle;
+
+    UPROPERTY()
+    FMars_Mortar_Batch Batch;
+
+    UPROPERTY()
+    EMars_Mortar_Pestle Motion = EMars_Mortar_Pestle::Resting;
+
+    UPROPERTY()
+    FMars_Mortar_Tally Tally;
+
+    // One more each time the timing window's pass restarts at 0 (an Engage, a Collect).
+    UPROPERTY()
+    int32 SweepSerial = 0;
+
+    UPROPERTY()
+    float64 AnchorServerSeconds = 0.0;
+
+    UPROPERTY()
+    float32 SweepAtAnchor = 0.0f;
+
+    // One per strike the authority started.
+    UPROPERTY()
+    int32 StrikeSerial = 0;
+
+    // One per strike the authority landed; LastLanded is the latest's timing.
+    UPROPERTY()
+    int32 LandedSerial = 0;
+
+    UPROPERTY()
+    EMars_Mortar_Strike LastLanded = EMars_Mortar_Strike::Miss;
+}
+
+// Each machine's own: the ledger the mirror last reconciled (unset with authority).
+struct FMars_Fragment_Mortar_Local
+{
+    UPROPERTY()
+    TOptional<FMars_Fragment_Mortar_Net> Last;
+}
+
+// Added by utils_mortar::Add, dropped by UMars_Processor_Mortar_Mirror once it has bound the ledger's rep-notify.
+struct FMars_Tag_Mortar_NeedsMirror {}
+
 // The timing bar as its meter draws it, in bar lengths: the window's middle (off the bar at the ends of a pass), its half
 // width, and the marker a strike is judged against.
 struct FMars_Mortar_Window
@@ -286,22 +405,40 @@ struct FMars_Request_Mortar_Disengage
     FMars_Request_Mortar_Disengage() {}
 }
 
-// The pestle is borne down: in the Crush phase a strike, judged against the timing window as it is pressed (ignored while
-// a strike is in flight); in the Grind phase the grind, until Release.
-struct FMars_Request_Mortar_Press
+// One edge of the pestle. Press bears it down: in the Crush phase a strike (ignored while a strike is in flight), judged
+// against the timing window at ObservedSweepSeconds when it is set and finite (the sweep the operator's own machine
+// showed, wrapped into the pass), else at the kernel's own sweep; in the Grind phase the grind, until a Release. Sequence
+// is a remote operator's count of its acts (unset for this machine's own reader).
+struct FMars_Request_Mortar_Pestle
 {
     UPROPERTY()
-    bool Requested = true;
+    EMars_Mortar_PestleVerb Verb = EMars_Mortar_PestleVerb::Press;
 
-    FMars_Request_Mortar_Press() {}
-}
-
-struct FMars_Request_Mortar_Release
-{
     UPROPERTY()
-    bool Requested = true;
+    TOptional<float32> ObservedSweepSeconds;
 
-    FMars_Request_Mortar_Release() {}
+    UPROPERTY()
+    TOptional<int32> Sequence;
+
+    FMars_Request_Mortar_Pestle() {}
+
+    FMars_Request_Mortar_Pestle(EMars_Mortar_PestleVerb InVerb)
+    {
+        Verb = InVerb;
+    }
+
+    FMars_Request_Mortar_Pestle(EMars_Mortar_PestleVerb InVerb, float32 InObservedSweepSeconds)
+    {
+        Verb = InVerb;
+        ObservedSweepSeconds = InObservedSweepSeconds;
+    }
+
+    FMars_Request_Mortar_Pestle(EMars_Mortar_PestleVerb InVerb, TOptional<float32> InObservedSweepSeconds, int32 InSequence)
+    {
+        Verb = InVerb;
+        ObservedSweepSeconds = InObservedSweepSeconds;
+        Sequence = InSequence;
+    }
 }
 
 // A Done batch leaves the bowl (the tally counts it) and a fresh one of the same seasoning takes its place. Ignored while
@@ -323,8 +460,9 @@ struct FMars_Request_Mortar_SwitchSeasoning
     FMars_Request_Mortar_SwitchSeasoning() {}
 }
 
-// Applied Disengage -> Engage -> SwitchSeasoning -> Collect -> Release -> Press, so a leave and the next operator's take,
-// or a release and a new press between two ticks, can share a drain.
+// Applied Disengage -> Engage -> SwitchSeasoning -> Collect, then each pestle edge in the order it was made (this
+// machine's own, as issued, then a remote operator's by its sequence), so a leave and the next operator's take can share
+// a drain, and a tap whose press and release arrive together ends released.
 struct FMars_Fragment_Mortar_Requests
 {
     UPROPERTY()
@@ -340,8 +478,5 @@ struct FMars_Fragment_Mortar_Requests
     TArray<FMars_Request_Mortar_Collect> CollectRequests;
 
     UPROPERTY()
-    TArray<FMars_Request_Mortar_Release> ReleaseRequests;
-
-    UPROPERTY()
-    TArray<FMars_Request_Mortar_Press> PressRequests;
+    TArray<FMars_Request_Mortar_Pestle> PestleRequests;
 }

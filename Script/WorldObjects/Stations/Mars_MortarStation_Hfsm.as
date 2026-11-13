@@ -4,7 +4,12 @@
 // clock: the timing window, the strike and the grind are the kernel's.
 //
 //   Idle      ->Operated [StationIsOperated]
-//   Operated  ->Idle     [StationIsNotOperated]   tasks: Mortar_Engage, Mortar_OperatorInput (Tick), Mortar_OperatorHints
+//   Operated  ->Idle     [StationIsNotOperated]   tasks: Mortar_Engage, Mortar_OperatorInput (Tick), Mortar_OperatorPestle
+//                                                 (Tick), Mortar_OperatorHints
+//
+// Stance: the input task reads the operator on the authority alone (the station's InputStance), so a remote operator's
+// collect and switch arrive in its input stream there. A remote operator's pestle is sent by its own machine as
+// Cue.Mars.Mortar.Pestle with the sweep that machine shows (Mortar_OperatorPestle), so the strike is judged on what it saw.
 //
 // The batch persists across a leave and a re-enter: nothing is reset. The conditions are the shared station ones
 // (Mars_Station_SmConditions.as). The player's Operating state owns the pose, the camera (Captured: the view stays still),
@@ -30,6 +35,7 @@ class UMars_SmState_Mortar_Operated : UCk_SmState_EntityScript
 
         AddTask(InHandle, UMars_SmTask_Mortar_Engage);
         AddTask(InHandle, UMars_SmTask_Mortar_OperatorInput);
+        AddTask(InHandle, UMars_SmTask_Mortar_OperatorPestle);
         AddTask(InHandle, UMars_SmTask_Mortar_OperatorHints);
     }
 }
@@ -58,9 +64,11 @@ class UMars_SmTask_Mortar_Engage : UCk_SmTask_EntityScript
 }
 
 // The operator's input: Interact_Primary going down presses the pestle (a strike in the Crush phase, the grind in the
-// Grind phase) and coming up releases it (a release and a press between two polls send both: the kernel drains Release
-// before Press), one collect per press of Interact_Secondary and one switch of seasoning per press of Drop (R: the hands
-// are empty at a station, so nothing else reads it here).
+// Grind phase) and coming up releases it (a release and a press between two polls send both, the release first: the
+// kernel applies them in the order issued), one collect per press of Interact_Secondary and one switch of seasoning per
+// press of Drop (R: the hands are empty at a station, so nothing else reads it here). The pestle is read only for this
+// machine's own player (its InputIntents has a matcher): a remote operator's presses also arrive in its stream, but its
+// pestle arrives as Cue.Mars.Mortar.Pestle with the sweep it saw (UMars_SmTask_Mortar_OperatorPestle).
 class UMars_SmTask_Mortar_OperatorInput : UMars_SmTask_StationOperatorInput
 {
     private FCk_Handle_Mortar _Mortar;
@@ -86,11 +94,12 @@ class UMars_SmTask_Mortar_OperatorInput : UMars_SmTask_StationOperatorInput
         { return; }
 
         const auto Primary = _Primary.Advance(_Intents, GameplayTags::Mars_Intent_Interact_Primary);
-        if (utils_input_intents::Get_HasRelease(Primary))
-        { _Mortar.Request_Release(FMars_Request_Mortar_Release()); }
+        const auto IsOwnPlayer = ck::IsValid(_Intents.Get_Matcher());
+        if (utils_input_intents::Get_HasRelease(Primary) && IsOwnPlayer)
+        { _Mortar.Request_Pestle(FMars_Request_Mortar_Pestle(EMars_Mortar_PestleVerb::Release)); }
 
-        if (utils_input_intents::Get_HasPress(Primary))
-        { _Mortar.Request_Press(FMars_Request_Mortar_Press()); }
+        if (utils_input_intents::Get_HasPress(Primary) && IsOwnPlayer)
+        { _Mortar.Request_Pestle(FMars_Request_Mortar_Pestle(EMars_Mortar_PestleVerb::Press)); }
 
         if (utils_input_intents::Get_HasPress(_Collect.Advance(_Intents, GameplayTags::Mars_Intent_Interact_Secondary)))
         { _Mortar.Request_Collect(FMars_Request_Mortar_Collect()); }
@@ -106,6 +115,95 @@ class UMars_SmTask_Mortar_OperatorInput : UMars_SmTask_StationOperatorInput
         _Collect = FMars_IntentEdge();
         _Switch = FMars_IntentEdge();
     }
+}
+
+// The operating machine's pestle, where the authority alone reads the operator: on a machine without authority over the
+// station whose own player operates it (its InputIntents has a matcher), each frame's Interact_Primary edges go through
+// utils_mortar::Request_PestleFor, a release before a press, the press carrying the sweep this machine shows, each act
+// with the next of its own count (reset on enter). It seeds the edge once the matcher is there, predicts nothing, and
+// sends nothing on exit. The authority and every other machine do nothing here.
+class UMars_SmTask_Mortar_OperatorPestle : UCk_SmTask_EntityScript
+{
+    default _TaskMode = ECk_SmTaskMode::Tick;
+
+    private FCk_Handle_Mortar _Mortar;
+    private FCk_Handle _Operator;
+    private FCk_Handle_InputIntents _Intents;
+    private EMars_Mortar_PestleSeed _Seed = EMars_Mortar_PestleSeed::Unseeded;
+    private FMars_IntentEdge _Primary;
+    private int32 _Sequence = 0;
+
+    UFUNCTION(BlueprintOverride)
+    void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
+    {
+        Reset();
+
+        auto Station = ck::Ctx(InHandle);
+        if (utils_net::Get_HasAuthority(Station))
+        { return; }
+
+        auto Mortar = Station.As_Mortar(ECk_SanityCheck::UnChecked);
+        if (ck::Is_NOT_Valid(Mortar))
+        { return; }
+
+        _Operator = Station.As_Station().Get_Operator();
+        _Intents = _Operator.As_InputIntents(ECk_SanityCheck::UnChecked);
+        if (ck::IsValid(_Intents))
+        { _Mortar = Mortar; }
+    }
+
+    // Must return Running every frame: a Succeeded/Failed result would end the task while Operated is still active.
+    UFUNCTION(BlueprintOverride)
+    ECk_SmTaskResult DoTick(FCk_Handle_SmTask InHandle, FCk_Time InDeltaT, ECk_Sm_NetContext InNetContext)
+    {
+        if (ck::Is_NOT_Valid(_Mortar) || ck::Is_NOT_Valid(_Intents) || ck::Is_NOT_Valid(_Intents.Get_Matcher()))
+        { return ECk_SmTaskResult::Running; }
+
+        if (_Seed == EMars_Mortar_PestleSeed::Unseeded)
+        {
+            _Primary.Seed(_Intents, GameplayTags::Mars_Intent_Interact_Primary);
+            _Seed = EMars_Mortar_PestleSeed::Seeded;
+            return ECk_SmTaskResult::Running;
+        }
+
+        const auto Primary = _Primary.Advance(_Intents, GameplayTags::Mars_Intent_Interact_Primary);
+        if (utils_input_intents::Get_HasRelease(Primary))
+        {
+            ++_Sequence;
+            utils_mortar::Request_PestleFor(_Mortar, FMars_Mortar_PestleAct(_Operator, EMars_Mortar_PestleVerb::Release, 0.0f, _Sequence));
+        }
+
+        if (utils_input_intents::Get_HasPress(Primary))
+        {
+            ++_Sequence;
+            utils_mortar::Request_PestleFor(_Mortar, FMars_Mortar_PestleAct(_Operator, EMars_Mortar_PestleVerb::Press, _Mortar.Get_SweepSeconds(), _Sequence));
+        }
+
+        return ECk_SmTaskResult::Running;
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void DoExitTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
+    {
+        Reset();
+    }
+
+    private void Reset()
+    {
+        _Mortar = FCk_Handle_Mortar();
+        _Operator = FCk_Handle();
+        _Intents = FCk_Handle_InputIntents();
+        _Seed = EMars_Mortar_PestleSeed::Unseeded;
+        _Primary = FMars_IntentEdge();
+        _Sequence = 0;
+    }
+}
+
+// Whether the operating machine's pestle task has seeded its edge from the operator's intents.
+enum EMars_Mortar_PestleSeed
+{
+    Unseeded,
+    Seeded
 }
 
 // The operator's legend rows while operating, re-read on every step of the batch: the pestle's row (IA_Interact_Primary:

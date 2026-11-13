@@ -57,7 +57,7 @@ class UMars_AutoTest_Mortar_CollectTalliesADoneBatchOnly : UMars_AutoTestRig_Mor
     {
         _Mortar.Request_Collect(FMars_Request_Mortar_Collect());
         _Mortar.Request_Collect(FMars_Request_Mortar_Collect());
-        _Mortar.Request_Release(FMars_Request_Mortar_Release());
+        _Mortar.Request_Pestle(FMars_Request_Mortar_Pestle(EMars_Mortar_PestleVerb::Release));
     }
 
     UFUNCTION()
