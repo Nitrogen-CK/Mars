@@ -32,6 +32,11 @@ struct FMars_Fry_AdmissionResult
 //
 // It also listens: the station's queue (OnQueued wakes this drain) and the answers of every tray it loads (OnLoaded,
 // OnLoadRefused).
+//
+// Only the authority's kernel applies requests. It publishes the kernel's ledger and the skimmer's once after its last
+// apply and before it broadcasts, with every skim, take-out and admission it refused. A copy without authority still arms
+// the station's queue watch and takes the station's inbox and take-outs, then drops them with its own requests: what it
+// shows comes from the ledgers (the Tick's announce pass, the mirror, and the commands the mirror gives its skimmer).
 class UMars_Processor_Fry_HandleRequests : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -62,6 +67,9 @@ class UMars_Processor_Fry_HandleRequests : UCk_Processor_Script_Base_UE
         Watch_Station(Self);
         TArray<FMars_CookingFeed_Release> Inbox = utils_cooking_feed::Take_Inbox(InHandle);
         TArray<FMars_Request_StationTakeOut> StationTakeOuts = utils_cooking_feed::Take_TakeOutRequests(InHandle);
+        if (utils_net::Get_HasAuthority(InHandle) == false)
+        { return; }
+
         for (const auto& TakeOut : StationTakeOuts)
         { TakeOutRequests.Add(Make_TakeOut(TakeOut)); }
 
@@ -132,7 +140,18 @@ class UMars_Processor_Fry_HandleRequests : UCk_Processor_Script_Base_UE
         }
 
         if ((InState.SkimmerTarget - TargetBeforeSteering).Size() > 0.0001)
-        { Send_SlideTarget(Self, InState); }
+        { utils_fry::Send_SkimmerSlide(Self, InState.SkimmerTarget); }
+
+        auto Answers = FMars_Fry_Answers();
+        Answers.RefusedSkims = RefusedSkims;
+        Answers.TakeOutRefusals = TakeOutRefusals;
+        for (const auto& Result : Admissions)
+        {
+            if (Result.Admission == EMars_CookingFeed_Admission::Rejected)
+            { Answers.AdmissionRefusals.Add(Result.Refusal); }
+        }
+
+        utils_fry::Publish(Self, Answers);
 
         const auto EndDrive = InState.Drive;
         const auto EndSkim = InState.Skim;
@@ -192,9 +211,10 @@ class UMars_Processor_Fry_HandleRequests : UCk_Processor_Script_Base_UE
 
         auto Skimmer = InFry.Get_Skimmer();
         Skimmer.Request_Reset(FMars_Request_Implement_Reset());
-        // After the implement's reset in its own drain: the carry height is the skimmer's, not necessarily its rest.
-        Skimmer.Request_SetLiftTarget(FMars_Request_Implement_SetLiftTarget(InFry.Get_Spec().Scoop.CarryLift));
-        Skimmer.Request_SetSlideTarget(FMars_Request_Implement_SetSlideTarget(FVector2D::ZeroVector));
+        // After the implement's reset in its own drain: the carry height is the skimmer's, not necessarily its rest, and the
+        // park is a zero slide.
+        utils_fry::Send_SkimmerPose(InFry, EMars_Fry_Skim::Carry);
+        utils_fry::Send_SkimmerSlide(InFry, InState.SkimmerPark);
     }
 
     // An idle skimmer carries: nobody holds it in the oil.
@@ -204,8 +224,7 @@ class UMars_Processor_Fry_HandleRequests : UCk_Processor_Script_Base_UE
         { return; }
 
         InState.Drive = InDrive;
-        auto Skimmer = InFry.Get_Skimmer();
-        Skimmer.Request_SetDrive(FMars_Request_Implement_SetDrive(InDrive));
+        utils_fry::Send_SkimmerDrive(InFry, InDrive);
 
         if (InDrive == EMars_Implement_Drive::Idle)
         { Set_Skim(InFry, InState, EMars_Fry_Skim::Carry); }
@@ -549,25 +568,10 @@ class UMars_Processor_Fry_HandleRequests : UCk_Processor_Script_Base_UE
         return TOptional<EMars_Fry_Skim>(InSkim);
     }
 
-    // The skimmer implement's commanded lift and tilt follow the skim: its spring lowers or raises the scoop, its tilt tips
-    // it toward the operator for the pour (a positive pitch raises the far side, +X, in the skimmer's rest frame, which Add
-    // ensures is axis-aligned with the root) or levels it.
+    // The skimmer implement's commanded lift and tilt follow the skim (utils_fry::Send_SkimmerPose).
     private void Set_Skim(FCk_Handle_Fry& InFry, FMars_Fragment_Fry& InState, EMars_Fry_Skim InSkim)
     {
-        const auto& Scoop = InFry.Get_Spec().Scoop;
-        const auto Lift = InSkim == EMars_Fry_Skim::Dip ? Scoop.DipLift : Scoop.CarryLift;
-        const auto Pitch = InSkim == EMars_Fry_Skim::Pour ? float64(Scoop.PourPitchDegrees) : 0.0;
-        auto Skimmer = InFry.Get_Skimmer();
-        Skimmer.Request_SetLiftTarget(FMars_Request_Implement_SetLiftTarget(Lift));
-        Skimmer.Request_SetTiltTarget(FMars_Request_Implement_SetTiltTarget(FRotator(Pitch, 0.0, 0.0)));
+        utils_fry::Send_SkimmerPose(InFry, InSkim);
         InState.Skim = InSkim;
-    }
-
-    // The target in the skimmer's rest frame: its offset from the park (the rest frame is axis-aligned with the root; Add
-    // ensures it).
-    private void Send_SlideTarget(FCk_Handle_Fry& InFry, const FMars_Fragment_Fry& InState)
-    {
-        auto Skimmer = InFry.Get_Skimmer();
-        Skimmer.Request_SetSlideTarget(FMars_Request_Implement_SetSlideTarget(InState.SkimmerTarget - InState.SkimmerPark));
     }
 }

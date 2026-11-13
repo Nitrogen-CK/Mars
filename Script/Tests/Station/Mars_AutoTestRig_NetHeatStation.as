@@ -11,8 +11,11 @@
 // replicated report on the subject with the followed pieces, the bowl's ids, a coat and the bowl's serial (the pan's ids,
 // a number and a face at the searing station). The Searing branch spawns the real searing station with the test's exposed
 // Searing spec (ready once its pan body is in the simulation on the server), records the kernel's signals and samples the
-// pan every frame (its roll, its lift, its node's location). One [BatterNetTest] or [SearingNetTest] line per test per
-// machine. Only the Batter and Searing branches are built; the other stations ensure.
+// pan every frame (its roll, its lift, its node's location). The Fry branch spawns the real fry station with the test's
+// exposed Fry spec (ready once its scoop and basket bodies are in the simulation on the server), records the kernel's
+// signals and samples the scoop every frame (its root-frame location, the skim, the first row's face heats); its report also
+// carries a root-frame target and a scoop location. One [BatterNetTest], [SearingNetTest] or [FryNetTest] line per test per
+// machine. The Tumbler branch is not built; it ensures.
 
 namespace constants_heat_station_net_autotest
 {
@@ -75,6 +78,26 @@ struct FMars_Fragment_TESTONLY_NetHeatStationReport
 
     UPROPERTY()
     int32 Face = -1;
+
+    // At the fryer: a root-frame target (Z 0) and the scoop's root-frame location the test reports.
+    UPROPERTY()
+    FVector Target = FVector::ZeroVector;
+
+    UPROPERTY()
+    FVector Scoop = FVector::ZeroVector;
+}
+
+// One frame of this machine's scoop, as the sampler read it.
+struct FMars_TESTONLY_NetHeatScoopSample
+{
+    int32 Step = 0;
+    int64 Frame = 0;
+    float64 Seconds = 0.0;
+    FVector Root = FVector::ZeroVector;
+    EMars_Fry_Skim Skim = EMars_Fry_Skim::Carry;
+    int32 Rows = 0;
+    // The first ledger row's six face heats on this machine (empty without a row).
+    TArray<float32> FirstRowHeat;
 }
 
 // One frame of this machine's pan, as the sampler read it.
@@ -95,6 +118,9 @@ UCLASS(Abstract)
 class UMars_AutoTestRig_NetHeatStation : UMars_AutoTestRig_NetFeedStation
 {
     default _TimeoutSeconds = 25.0f;
+
+    // A scoop this close to its commanded slide or lift has arrived there.
+    protected const float64 k_ScoopSettledCm = 0.5;
 
     // This machine's copy of the bowl, once found.
     protected FCk_Handle_Batter _Batter;
@@ -122,9 +148,26 @@ class UMars_AutoTestRig_NetHeatStation : UMars_AutoTestRig_NetFeedStation
     // Every sampled frame of this machine's pan since it was found.
     protected TArray<FMars_TESTONLY_NetHeatPanSample> _PanSamples;
 
-    // Server: what the next report carries as its number and its face.
+    // This machine's copy of the fryer's kernel, once found, and every signal it raised since (or since Clear_FryRecord).
+    protected FCk_Handle_Fry _Fry;
+    protected TArray<EMars_Fry_Skim> _SkimChanges;
+    protected TArray<FMars_CookingFeed_PieceId> _FryAddedIds;
+    protected TArray<EMars_Fry_Skim> _SkimRefusals;
+    protected TArray<EMars_CookingFeed_TakeOutRefusal> _FryTakeOutRefusals;
+    protected TArray<EMars_Fry_AdmissionRefusal> _FryAdmissionRefusals;
+    protected TArray<FMars_CookingFeed_PieceId> _StageIds;
+    // In parallel with _StageIds.
+    protected TArray<EMars_FoodPiece_Face> _StageFaces;
+    protected TArray<EMars_Fry_HeatStage> _Stages;
+    protected TArray<FMars_CookingFeed_PieceId> _DrainedIds;
+    // Every sampled frame of this machine's scoop since it was found.
+    protected TArray<FMars_TESTONLY_NetHeatScoopSample> _ScoopSamples;
+
+    // Server: what the next report carries as its number, its face, its target and its scoop.
     protected float32 _ReportValue = 0.0f;
     protected int32 _ReportFace = -1;
+    protected FVector _ReportTarget = FVector::ZeroVector;
+    protected FVector _ReportScoop = FVector::ZeroVector;
 
     // Server: the foods it spawned loose, the half of a cut it keeps, the pieces the report follows.
     protected TArray<FCk_Handle> _Foods;
@@ -155,6 +198,8 @@ class UMars_AutoTestRig_NetHeatStation : UMars_AutoTestRig_NetFeedStation
     private FCk_Handle_FoodPiece _SearAllRoundPiece;
     private FName _SearAllRoundContinuation;
     private float64 _LastPanSampleSeconds = -1.0;
+    private TArray<FCk_Handle_FoodPiece> _BatterPieces;
+    private FName _BatterContinuation;
 
     //----------------------------------------------------------------------------------------------------------------------
     // Hooks
@@ -177,6 +222,12 @@ class UMars_AutoTestRig_NetHeatStation : UMars_AutoTestRig_NetFeedStation
     protected FMars_Searing_Spec Make_SearingSpec() const
     {
         return FMars_Searing_Spec();
+    }
+
+    // The fry station's exposed spec.
+    protected FMars_Fry_Spec Make_FrySpec() const
+    {
+        return FMars_Fry_Spec();
     }
 
     // Every sampled frame, once this machine found its heat station.
@@ -206,7 +257,16 @@ class UMars_AutoTestRig_NetHeatStation : UMars_AutoTestRig_NetFeedStation
 
     protected FString Get_LogTag() const
     {
+        if (Get_HeatStation() == EMars_TESTONLY_HeatStation::Fry)
+        { return "[FryNetTest]"; }
+
         return Get_HeatStation() == EMars_TESTONLY_HeatStation::Searing ? "[SearingNetTest]" : "[BatterNetTest]";
+    }
+
+    // The Batter, Searing and Fry branches are built.
+    private bool Get_IsBuiltBranch() const
+    {
+        return Get_HeatStation() != EMars_TESTONLY_HeatStation::Tumbler;
     }
 
     // Finds this machine's station (its docks and its feed composed) and its kernel, and records the kernel's signals from
@@ -219,12 +279,14 @@ class UMars_AutoTestRig_NetHeatStation : UMars_AutoTestRig_NetFeedStation
         if (Try_FindFeedStation() == false)
         { return false; }
 
-        if (ck::EnsureIfNot(Get_HeatStation() == EMars_TESTONLY_HeatStation::Batter || Get_HeatStation() == EMars_TESTONLY_HeatStation::Searing,
-            f"[NetHeatStation] the {Get_HeatStation() :n} branch is not built yet"))
+        if (ck::EnsureIfNot(Get_IsBuiltBranch(), f"[NetHeatStation] the {Get_HeatStation() :n} branch is not built yet"))
         { return false; }
 
         if (Get_HeatStation() == EMars_TESTONLY_HeatStation::Searing)
         { return Try_FindSearing(); }
+
+        if (Get_HeatStation() == EMars_TESTONLY_HeatStation::Fry)
+        { return Try_FindFry(); }
 
         if (_Station.Is_Batter() == false)
         { return false; }
@@ -257,6 +319,208 @@ class UMars_AutoTestRig_NetHeatStation : UMars_AutoTestRig_NetFeedStation
         _Searing.BindTo_OnTakeOutRefused(FMars_Delegate_Searing_OnTakeOutRefused(this, n"OnRigPanTakeOutRefused"));
         _Searing.BindTo_OnPieceLost(FMars_Delegate_Searing_OnPieceLost(this, n"OnRigPieceLost"));
         return true;
+    }
+
+    private bool Try_FindFry()
+    {
+        if (_Station.Is_Fry() == false)
+        { return false; }
+
+        _WasHeatStationFound = true;
+        _Fry = _Station.As_Fry();
+        // A row this copy announced before the rig bound raised OnPieceAdded all the same.
+        _FryAddedIds.Append(Get_FryAnnouncedRows());
+        _Fry.BindTo_OnPieceAdded(FMars_Delegate_Fry_OnPieceAdded(this, n"OnRigFryPieceAdded"));
+        _Fry.BindTo_OnSkimChanged(FMars_Delegate_Fry_OnSkimChanged(this, n"OnRigSkimChanged"));
+        _Fry.BindTo_OnSkimRefused(FMars_Delegate_Fry_OnSkimRefused(this, n"OnRigSkimRefused"));
+        _Fry.BindTo_OnTakeOutRefused(FMars_Delegate_Fry_OnTakeOutRefused(this, n"OnRigFryTakeOutRefused"));
+        _Fry.BindTo_OnAdmissionRefused(FMars_Delegate_Fry_OnAdmissionRefused(this, n"OnRigFryAdmissionRefused"));
+        _Fry.BindTo_OnFaceHeatStage(FMars_Delegate_Fry_OnFaceHeatStage(this, n"OnRigFaceHeatStage"));
+        _Fry.BindTo_OnPieceDrained(FMars_Delegate_Fry_OnPieceDrained(this, n"OnRigPieceDrained"));
+        return true;
+    }
+
+    // The ledger rows a copy without authority has announced (it raised OnPieceAdded for each); none with authority.
+    protected TArray<FMars_CookingFeed_PieceId> Get_FryAnnouncedRows()
+    {
+        TArray<FMars_CookingFeed_PieceId> Ids;
+        if (Get_IsServer() || ck::Is_NOT_Valid(_Fry) || _Fry.Has_Fragment(FMars_Fragment_Fry_Local) == false)
+        { return Ids; }
+
+        return _Fry.Get_Fragment(FMars_Fragment_Fry_Local).Announced;
+    }
+
+    protected void Clear_FryRecord()
+    {
+        _SkimChanges.Empty();
+        _FryAddedIds.Empty();
+        _SkimRefusals.Empty();
+        _FryTakeOutRefusals.Empty();
+        _FryAdmissionRefusals.Empty();
+        _StageIds.Empty();
+        _StageFaces.Empty();
+        _Stages.Empty();
+        _DrainedIds.Empty();
+    }
+
+    protected int32 Get_FryAddedCount(FMars_CookingFeed_PieceId InId)
+    {
+        auto Count = 0;
+        for (const auto& Id : _FryAddedIds)
+        {
+            if (Id.Get_IsSame(InId))
+            { ++Count; }
+        }
+
+        return Count;
+    }
+
+    protected int32 Get_SkimChangeCount(EMars_Fry_Skim InSkim)
+    {
+        auto Count = 0;
+        for (const auto Skim : _SkimChanges)
+        {
+            if (Skim == InSkim)
+            { ++Count; }
+        }
+
+        return Count;
+    }
+
+    protected FString Describe_FryRecord()
+    {
+        FString Skims = "";
+        for (const auto Skim : _SkimChanges)
+        { Skims += f"{Skim :n} "; }
+
+        FString Added = "";
+        for (const auto& Id : _FryAddedIds)
+        { Added += f"{Id.Generation}.{Id.TransferIndex} "; }
+
+        FString Refused = "";
+        for (const auto Skim : _SkimRefusals)
+        { Refused += f"{Skim :n} "; }
+
+        FString Admissions = "";
+        for (const auto Refusal : _FryAdmissionRefusals)
+        { Admissions += f"{Refusal :n} "; }
+
+        FString TakeOuts = "";
+        for (const auto Refusal : _FryTakeOutRefusals)
+        { TakeOuts += f"{Refusal :n} "; }
+
+        return f"skims=[{Skims}] added=[{Added}] skimRefused=[{Refused}] admissionRefused=[{Admissions}] takeOutRefused=[{TakeOuts}] "
+            + f"stages={_Stages.Num()} drained={_DrainedIds.Num()}";
+    }
+
+    // The kernel's ledger and the skimmer's as this machine reads them.
+    protected FString Describe_FryLedger()
+    {
+        if (ck::Is_NOT_Valid(_Fry))
+        { return "ledger=[none]"; }
+
+        const auto Ledger = _Fry.Get_Ledger();
+        FString Rows = "";
+        for (const auto& Row : Ledger.Pieces)
+        {
+            FString Heats = "";
+            for (const auto Heat : Row.FaceHeat)
+            { Heats += f"{Heat} "; }
+
+            Rows += f"{Row.Id.Generation}.{Row.Id.TransferIndex}:{Row.Whereabouts :n}/{Row.Drain :n}/{Row.DrainProgress}[{Heats}] ";
+        }
+
+        const auto Skimmer = _Fry.Get_SkimmerLedger();
+        const auto& Counts = Ledger.Counts;
+        return f"ledger=[losses={Counts.Losses} takenOut={Counts.TakenOut} catches={Counts.Catches} retrievals={Counts.Retrievals} ejections={Counts.Ejections} "
+            + f"rows=[{Rows}] skimRefusals={Ledger.SkimRefusalSerial} takeOutRefusals={Ledger.TakeOutRefusalSerial} admissionRefusals={Ledger.AdmissionRefusalSerial}] "
+            + f"skimmer=[drive={Skimmer.Drive :n} skim={Skimmer.Skim :n} target={Skimmer.Target}]";
+    }
+
+    protected FString Describe_Fry()
+    {
+        if (ck::Is_NOT_Valid(_Fry))
+        { return "fry=[none]"; }
+
+        const auto Skimmer = _Fry.Get_Skimmer();
+        const auto Summary = _Fry.Get_Summary();
+        return f"fry=[drive={_Fry.Get_Drive() :n} skim={_Fry.Get_Skim() :n} target={_Fry.Get_SkimmerTarget()} scoop={_Fry.Get_ScoopRoot()} "
+            + f"implement=[drive={Skimmer.Get_Drive() :n} lift={Skimmer.Get_Lift()}/{Skimmer.Get_TargetLift()} tilt={Skimmer.Get_Tilt()}/{Skimmer.Get_TargetTilt()} slide={Skimmer.Get_Slide()}/{Skimmer.Get_TargetSlide()}] "
+            + f"pieces={_Fry.Get_PieceIds().Num()} admitted={Summary.Admitted} oil={Summary.InOil} basket={Summary.InBasket} drained={Summary.Drained} takenOut={Summary.TakenOut}] "
+            + f"takeable={utils_cooking_feed::Get_TakeableCount(_Station)}";
+    }
+
+    // This machine's copy of the piece the fryer holds as InId (the ledger row's handle without authority); invalid when it
+    // holds none or that copy is not here.
+    protected FCk_Handle_FoodPiece Get_FryCopy(FMars_CookingFeed_PieceId InId)
+    {
+        if (_Fry.Get_HasPiece(InId) == false)
+        { return FCk_Handle_FoodPiece(); }
+
+        const auto Entity = _Fry.Get_PieceEntity(InId);
+        if (Get_IsLive(Entity) == false || Entity.Is_FoodPiece() == false)
+        { return FCk_Handle_FoodPiece(); }
+
+        return Entity.As_FoodPiece();
+    }
+
+    // The look (degrees: X yaw right+, Y pitch down+) that moves the skimmer's target InShare of the way to the basket's
+    // centre, sized by the reach's CmPerLookDegree.
+    protected FVector Get_LookTowardBasket(float64 InShare)
+    {
+        const auto Spec = _Fry.Get_Spec();
+        const auto Delta = (Spec.Reach.BasketCentre - _Fry.Get_SkimmerTarget()) * InShare;
+        const auto Step = float64(Spec.Reach.CmPerLookDegree);
+        return FVector(Delta.Y / Step, -Delta.X / Step, 0.0);
+    }
+
+    // The scoop's centre is within k_ScoopSettledCm of the skimmer's target (root-frame XY).
+    protected bool Get_IsScoopAtTarget()
+    {
+        const auto Scoop = _Fry.Get_ScoopRoot();
+        return (FVector2D(Scoop.X, Scoop.Y) - _Fry.Get_SkimmerTarget()).Size() <= k_ScoopSettledCm;
+    }
+
+    // The scoop is at its target and its lift at its commanded lift (k_ScoopSettledCm each).
+    protected bool Get_IsScoopSettled()
+    {
+        const auto Skimmer = _Fry.Get_Skimmer();
+        return Get_IsScoopAtTarget() && Math::Abs(Skimmer.Get_Lift() - Skimmer.Get_TargetLift()) <= float32(k_ScoopSettledCm);
+    }
+
+    // The kernel reads Dip and the skimmer's lift, commanded to the dip, is within k_ScoopSettledCm of it.
+    protected bool Get_IsDipSettled()
+    {
+        const auto Skimmer = _Fry.Get_Skimmer();
+        const auto DipLift = _Fry.Get_Spec().Scoop.DipLift;
+        return _Fry.Get_Skim() == EMars_Fry_Skim::Dip && Math::Abs(Skimmer.Get_TargetLift() - DipLift) <= 0.01f
+            && Math::Abs(Skimmer.Get_Lift() - DipLift) <= float32(k_ScoopSettledCm);
+    }
+
+    // The largest move of this machine's scoop between the first samples of two successive frames since sample InFrom, and
+    // where it happened.
+    protected float64 Get_LargestScoopStep(int32 InFrom, FString& OutWhere)
+    {
+        auto Largest = 0.0;
+        auto Previous = InFrom;
+        for (int32 Index = InFrom + 1; Index < _ScoopSamples.Num(); ++Index)
+        {
+            const auto Sample = _ScoopSamples[Index];
+            const auto Before = _ScoopSamples[Previous];
+            if (Sample.Frame == Before.Frame)
+            { continue; }
+
+            const auto Step = Sample.Root.Distance(Before.Root);
+            if (Step > Largest)
+            {
+                Largest = Step;
+                OutWhere = f"sample {Index}/{_ScoopSamples.Num()} step={Sample.Step} {Before.Root}->{Sample.Root} dt={Sample.Seconds - Before.Seconds} frames={Sample.Frame - Before.Frame}";
+            }
+
+            Previous = Index;
+        }
+
+        return Largest;
     }
 
     // The ledger rows a copy without authority has announced (it raised OnPieceAdded for each); none with authority.
@@ -639,7 +903,28 @@ class UMars_AutoTestRig_NetHeatStation : UMars_AutoTestRig_NetFeedStation
         { return; }
 
         Sample_Pan();
+        Sample_Scoop();
         On_HeatStationSample();
+    }
+
+    // The scoop as this machine shows it this frame (the fry station only).
+    private void Sample_Scoop()
+    {
+        if (ck::Is_NOT_Valid(_Fry))
+        { return; }
+
+        const auto Ledger = _Fry.Get_Ledger();
+        auto Sample = FMars_TESTONLY_NetHeatScoopSample();
+        Sample.Step = Get_HeatStationReport().Step;
+        Sample.Frame = utils_time::Get_FrameCounter();
+        Sample.Seconds = System::GetGameTimeInSeconds();
+        Sample.Root = _Fry.Get_ScoopRoot();
+        Sample.Skim = _Fry.Get_Skim();
+        Sample.Rows = Ledger.Pieces.Num();
+        if (Ledger.Pieces.Num() > 0)
+        { Sample.FirstRowHeat = Ledger.Pieces[0].FaceHeat; }
+
+        _ScoopSamples.Add(Sample);
     }
 
     // The pan as this machine shows it this frame (the searing station only).
@@ -708,7 +993,9 @@ class UMars_AutoTestRig_NetHeatStation : UMars_AutoTestRig_NetFeedStation
         TArray<FMars_CookingFeed_PieceId> BowlIds;
         auto Coat = -1.0f;
         auto BowlSerial = 0;
-        if (ck::IsValid(_Searing))
+        if (ck::IsValid(_Fry))
+        { BowlIds = _Fry.Get_PieceIds(); }
+        else if (ck::IsValid(_Searing))
         { BowlIds = _Searing.Get_PieceIds(); }
         else
         {
@@ -733,6 +1020,8 @@ class UMars_AutoTestRig_NetHeatStation : UMars_AutoTestRig_NetFeedStation
         Report.EventFrame = int32(_EventFrame);
         Report.Value = _ReportValue;
         Report.Face = _ReportFace;
+        Report.Target = _ReportTarget;
+        Report.Scoop = _ReportScoop;
         Subject.Request_MarkReplicationDirty(FMars_Fragment_TESTONLY_NetHeatStationReport);
     }
 
@@ -744,13 +1033,14 @@ class UMars_AutoTestRig_NetHeatStation : UMars_AutoTestRig_NetFeedStation
     // On_ServerFeedStationReady once this machine finds it composed with its kernel.
     protected void Spawn_HeatStation()
     {
-        if (ck::EnsureIfNot(Get_HeatStation() == EMars_TESTONLY_HeatStation::Batter || Get_HeatStation() == EMars_TESTONLY_HeatStation::Searing,
-            f"[NetHeatStation] the {Get_HeatStation() :n} branch is not built yet"))
+        if (ck::EnsureIfNot(Get_IsBuiltBranch(), f"[NetHeatStation] the {Get_HeatStation() :n} branch is not built yet"))
         { return; }
 
         auto Owner = utils_mars_net::Get_ReplicatedSpawnOwner(Get_SubjectEntity());
         if (Get_HeatStation() == EMars_TESTONLY_HeatStation::Searing)
         { _FeedStationEntity = Spawn_SearingStation(Owner); }
+        else if (Get_HeatStation() == EMars_TESTONLY_HeatStation::Fry)
+        { _FeedStationEntity = Spawn_FryStation(Owner); }
         else
         {
             auto Fixture = Cast<UMars_AutoTestHelper_HeatStation>(NewObject(this, UMars_AutoTestHelper_HeatStation));
@@ -773,13 +1063,27 @@ class UMars_AutoTestRig_NetHeatStation : UMars_AutoTestRig_NetFeedStation
         return Station;
     }
 
-    // The searing station is ready once its pan body is in the simulation (the pan admits nothing before).
+    // The real fry station with the test's exposed Fry spec, as the map's spawner makes it (its own context).
+    private FCk_Handle Spawn_FryStation(FCk_Handle InOwner)
+    {
+        auto Params = UMars_FryStation_EntityScript::Params();
+        Params.SpawnTransform = FTransform(FRotator::ZeroRotator, Get_StationLocation());
+        Params.Fry = Make_FrySpec();
+        auto Station = utils_entity_script::Request_SpawnEntity(InOwner, UMars_FryStation_EntityScript, Params).Get_EntityUnderConstruction();
+        Station.Request_OverrideToSelf();
+        return Station;
+    }
+
+    // The searing station is ready once its pan body is in the simulation (the pan admits nothing before); the fry station
+    // once its scoop and basket bodies are.
     UFUNCTION()
     private void Is_RigHeatStationReady(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Result = OutResult;
         Result.Set(Get_IsLive(_FeedStationEntity) && _FeedStationEntity.Is_CookingFeed() && Try_FindHeatStation()
-            && (ck::Is_NOT_Valid(_Searing) || utils_jolt_body::Get_IsBodyAdded(_Searing.Get_Spec().Nodes.PanBaseBody)));
+            && (ck::Is_NOT_Valid(_Searing) || utils_jolt_body::Get_IsBodyAdded(_Searing.Get_Spec().Nodes.PanBaseBody))
+            && (ck::Is_NOT_Valid(_Fry) || (utils_jolt_body::Get_IsBodyAdded(_Fry.Get_Spec().Nodes.ScoopBody)
+                && utils_jolt_body::Get_IsBodyAdded(_Fry.Get_Spec().Nodes.BasketBody))));
     }
 
     UFUNCTION()
@@ -1000,6 +1304,60 @@ class UMars_AutoTestRig_NetHeatStation : UMars_AutoTestRig_NetFeedStation
         WaitFrames(1, _SearAllRoundContinuation);
     }
 
+    // Server: InPieces' cook states battered, as the batter station's take-out leaves them; InContinuation once each reads so.
+    protected void Batter_Then(TArray<FCk_Handle_FoodPiece> InPieces, FName InContinuation)
+    {
+        for (const auto& InPiece : InPieces)
+        {
+            auto Piece = InPiece;
+            auto CookState = Piece.Get_CookState();
+            CookState.Battered = 1.0f;
+            Piece.Request_SetCookState(FMars_Request_FoodPiece_SetCookState(CookState));
+        }
+
+        _BatterPieces = InPieces;
+        _BatterContinuation = InContinuation;
+        WaitUntil(n"Is_RigBattered", n"OnRigBattered", k_SlowPolls);
+    }
+
+    UFUNCTION()
+    private void Is_RigBattered(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto IsBattered = true;
+        for (const auto& Piece : _BatterPieces)
+        {
+            if (utils_batter::Get_IsBattered(Piece.Get_CookState()) == false)
+            { IsBattered = false; }
+        }
+
+        auto Result = OutResult;
+        Result.Set(IsBattered);
+    }
+
+    UFUNCTION()
+    private void OnRigBattered(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
+    {
+        WaitFrames(1, _BatterContinuation);
+    }
+
+    // Server: the fryer's piece InId moved to rest on the basket floor's centre, level with the basket, its bottom 1 cm above
+    // the floor.
+    protected void Put_IntoBasket(FMars_CookingFeed_PieceId InId)
+    {
+        const auto Basket = _Fry.Get_BasketWorld();
+        const auto Piece = _Fry.Get_PieceState(InId);
+        const auto Rotation = Basket.GetRotation();
+        const auto Centre = Basket.TransformPosition(FVector(0.0, 0.0, Piece.HalfExtents.Z + 1.0));
+        auto Body = Piece.Body;
+        utils_jolt_body::Request_Teleport(Body, FCk_Request_JoltBody_Teleport(Centre - Rotation.RotateVector(Piece.CentreLocal), Rotation.Rotator()));
+    }
+
+    // Server: the fryer holds InId in the oil.
+    protected bool Get_IsInOil(FMars_CookingFeed_PieceId InId)
+    {
+        return _Fry.Get_HasPiece(InId) && _Fry.Get_PieceWhereabouts(InId) == EMars_Fry_Whereabouts::Oil;
+    }
+
     //----------------------------------------------------------------------------------------------------------------------
     // Server: the operator
     //----------------------------------------------------------------------------------------------------------------------
@@ -1195,5 +1553,49 @@ class UMars_AutoTestRig_NetHeatStation : UMars_AutoTestRig_NetFeedStation
     private void OnRigPieceLost(FCk_Handle_Searing InSearing, FMars_CookingFeed_PieceId InPieceId, FCk_Handle InPiece)
     {
         _LostIds.Add(InPieceId);
+    }
+
+    UFUNCTION()
+    private void OnRigFryPieceAdded(FCk_Handle_Fry InFry, FMars_CookingFeed_PieceId InPieceId, FCk_Handle InPiece)
+    {
+        _FryAddedIds.Add(InPieceId);
+    }
+
+    UFUNCTION()
+    private void OnRigSkimChanged(FCk_Handle_Fry InFry, EMars_Fry_Skim InSkim)
+    {
+        _SkimChanges.Add(InSkim);
+    }
+
+    UFUNCTION()
+    private void OnRigSkimRefused(FCk_Handle_Fry InFry, EMars_Fry_Skim InSkim)
+    {
+        _SkimRefusals.Add(InSkim);
+    }
+
+    UFUNCTION()
+    private void OnRigFryTakeOutRefused(FCk_Handle_Fry InFry, EMars_CookingFeed_TakeOutRefusal InRefusal)
+    {
+        _FryTakeOutRefusals.Add(InRefusal);
+    }
+
+    UFUNCTION()
+    private void OnRigFryAdmissionRefused(FCk_Handle_Fry InFry, FMars_CookingFeed_PieceId InPieceId, EMars_Fry_AdmissionRefusal InRefusal)
+    {
+        _FryAdmissionRefusals.Add(InRefusal);
+    }
+
+    UFUNCTION()
+    private void OnRigFaceHeatStage(FCk_Handle_Fry InFry, FMars_CookingFeed_PieceId InPieceId, EMars_FoodPiece_Face InFace, EMars_Fry_HeatStage InStage)
+    {
+        _StageIds.Add(InPieceId);
+        _StageFaces.Add(InFace);
+        _Stages.Add(InStage);
+    }
+
+    UFUNCTION()
+    private void OnRigPieceDrained(FCk_Handle_Fry InFry, FMars_CookingFeed_PieceId InPieceId)
+    {
+        _DrainedIds.Add(InPieceId);
     }
 }

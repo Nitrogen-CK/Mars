@@ -285,6 +285,20 @@ namespace utils_platter
         return Kinds;
     }
 
+    // The live pieces InPlatter's books hold (Get_Pieces) whose cook state reads battered. Reads the live lists, which only
+    // the authority keeps.
+    int32 Get_LiveBatteredCount(const FCk_Handle_Platter& InPlatter)
+    {
+        auto Count = 0;
+        for (const auto& Piece : InPlatter.Get_Pieces())
+        {
+            if (ck::IsValid(Piece) && Piece.Get_IsGone() == false && utils_foodpiece::Get_IsBattered(Piece.Get_CookState()))
+            { Count += 1; }
+        }
+
+        return Count;
+    }
+
     bool Get_IsKindEqual(const FGameplayTagContainer& InA, const FGameplayTagContainer& InB)
     {
         return InA.HasAllExact(InB) && InB.HasAllExact(InA);
@@ -293,7 +307,7 @@ namespace utils_platter
     bool Get_IsLedgerEqual(const FMars_Fragment_Platter_Net& InA, const FMars_Fragment_Platter_Net& InB)
     {
         if (InA.HeldCount != InB.HeldCount || InA.Occupancy != InB.Occupancy || InA.Wholeness != InB.Wholeness
-            || InA.PieceKinds.Num() != InB.PieceKinds.Num())
+            || InA.PieceKinds.Num() != InB.PieceKinds.Num() || InA.BatteredCount != InB.BatteredCount)
         { return false; }
 
         for (int32 Index = 0; Index < InA.PieceKinds.Num(); ++Index)
@@ -319,6 +333,7 @@ namespace utils_platter
         Next.HeldCount = State.Held.Num();
         Next.Occupancy = State.Held.Num() + State.Settling.Num() + State.Queue.Num();
         Next.PieceKinds = Get_LiveKinds(InPlatter);
+        Next.BatteredCount = Get_LiveBatteredCount(InPlatter);
         for (const auto& Piece : InPlatter.Get_Pieces())
         {
             if (Piece.Get_IsGone() == false && Piece.Get_IsWhole() == false)
@@ -468,6 +483,15 @@ mixin TArray<FGameplayTagContainer> Get_PieceKinds(const FCk_Handle_Platter& Sel
     { return Self.Get_Fragment(FMars_Fragment_Platter_Net).PieceKinds; }
 
     return utils_platter::Get_LiveKinds(Self);
+}
+
+// The live pieces it holds (Get_Pieces) whose cook state reads battered; without authority, the ledger's.
+mixin int32 Get_BatteredCount(const FCk_Handle_Platter& Self)
+{
+    if (utils_net::Get_HasAuthority(Self) == false)
+    { return Self.Get_Fragment(FMars_Fragment_Platter_Net).BatteredCount; }
+
+    return utils_platter::Get_LiveBatteredCount(Self);
 }
 
 // The union of Get_PieceKinds.

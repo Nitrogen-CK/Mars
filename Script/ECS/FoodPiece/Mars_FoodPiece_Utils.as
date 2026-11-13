@@ -139,6 +139,12 @@ namespace utils_foodpiece
         return TOptional<FMars_Fragment_FoodPiece_Net>(InHandle.Get_Fragment(FMars_Fragment_FoodPiece_Net));
     }
 
+    // The cook state's dip: 1 once a piece was battered, inherited by a cut half.
+    bool Get_IsBattered(const FMars_FoodPiece_CookState& InCookState)
+    {
+        return InCookState.Battered >= 0.5f;
+    }
+
     // Any channel of InCookState above 0.
     bool Get_IsCooked(const FMars_FoodPiece_CookState& InCookState)
     {

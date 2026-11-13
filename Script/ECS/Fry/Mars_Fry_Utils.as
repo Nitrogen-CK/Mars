@@ -50,6 +50,11 @@ namespace utils_fry
     const float32 k_SkimmerLiftHeadroomCm = 2.0f;
     // How far past the reach's bounding box the skimmer's own slide clamp lies (the kernel's reach clamp is the real one).
     const float64 k_SkimmerSlideMarginCm = 1.0;
+    // The ledger's drain progress and face heats step in tenths.
+    const int32 k_LedgerSteps = 10;
+    // The skimmer ledger's target is sent once it moved this far, at most this often.
+    const float64 k_TargetStepCm = 0.1;
+    const float32 k_TargetIntervalSeconds = 1.0f / 30.0f;
 
     // Composes the minigame on InHandle (the station entity, which carries the root transform), and the station's admission
     // inbox and take-out readout. The spec's Nodes are built by the caller and left as composed (the skimmer Idle at its
@@ -105,6 +110,22 @@ namespace utils_fry
         utils_cooking_feed::Add_Admission(InHandle);
         utils_cooking_feed::Add_TakeOut(InHandle);
 
+        // A copy without authority can receive either ledger before it composes: what arrived stands then. A skimmer ledger
+        // composed here starts at the park, the authority's own starting command.
+        if (InHandle.Has_Fragment(FMars_Fragment_Fry_Net) == false)
+        { InHandle.Add_Fragment(FMars_Fragment_Fry_Net(), ECk_Replication::Replicates); }
+
+        if (InHandle.Has_Fragment(FMars_Fragment_Fry_SkimmerNet) == false)
+        {
+            auto Skimmer = FMars_Fragment_Fry_SkimmerNet();
+            Skimmer.Target = State.SkimmerPark;
+            InHandle.Add_Fragment(Skimmer, ECk_Replication::Replicates);
+        }
+
+        auto Local = FMars_Fragment_Fry_Local();
+        Local.Last = TOptional<FMars_Fragment_Fry_Net>(InHandle.Get_Fragment(FMars_Fragment_Fry_Net));
+        InHandle.Add_Fragment(Local);
+        InHandle.Add_Fragment(FMars_Tag_Fry_NeedsMirror());
         return Fry;
     }
 
@@ -426,6 +447,227 @@ namespace utils_fry
         BodySpec.Set_CollisionProfileName(n"BlockAll");
         return utils_jolt_body::Add(BodyNode.H(), BodySpec);
     }
+
+    //----------------------------------------------------------------------------------------------------------------------
+    // The skimmer's commands: the authority's drain gives them from the kernel's state, a copy without authority's mirror
+    // from the skimmer ledger.
+    //----------------------------------------------------------------------------------------------------------------------
+
+    void Send_SkimmerDrive(FCk_Handle_Fry& InFry, EMars_Implement_Drive InDrive)
+    {
+        auto Skimmer = InFry.Get_Skimmer();
+        Skimmer.Request_SetDrive(FMars_Request_Implement_SetDrive(InDrive));
+    }
+
+    // The skim's pose: the skimmer's lift spring lowers or raises the scoop, its tilt tips it toward the operator for the
+    // pour (a positive pitch raises the far side, +X, in the skimmer's rest frame, which Add ensures is axis-aligned with the
+    // root) or levels it.
+    void Send_SkimmerPose(FCk_Handle_Fry& InFry, EMars_Fry_Skim InSkim)
+    {
+        const auto Scoop = InFry.Get_Spec().Scoop;
+        const auto Lift = InSkim == EMars_Fry_Skim::Dip ? Scoop.DipLift : Scoop.CarryLift;
+        const auto Pitch = InSkim == EMars_Fry_Skim::Pour ? float64(Scoop.PourPitchDegrees) : 0.0;
+        auto Skimmer = InFry.Get_Skimmer();
+        Skimmer.Request_SetLiftTarget(FMars_Request_Implement_SetLiftTarget(Lift));
+        Skimmer.Request_SetTiltTarget(FMars_Request_Implement_SetTiltTarget(FRotator(Pitch, 0.0, 0.0)));
+    }
+
+    // InTarget (root-frame XY) in the skimmer's rest frame: its offset from the park (the rest frame is axis-aligned with the
+    // root; Add ensures it).
+    void Send_SkimmerSlide(FCk_Handle_Fry& InFry, FVector2D InTarget)
+    {
+        auto Skimmer = InFry.Get_Skimmer();
+        Skimmer.Request_SetSlideTarget(FMars_Request_Implement_SetSlideTarget(InTarget - InFry.Get_SkimmerPark()));
+    }
+
+    //----------------------------------------------------------------------------------------------------------------------
+    // Replication
+    //----------------------------------------------------------------------------------------------------------------------
+
+    // The kernel's ledger a machine without authority reads it through, rebuilt from the live state and what the caller
+    // announced: written and marked dirty only when a field or a row differs; then the skimmer's ledger (Publish_Skimmer).
+    // Called only by the kernel's processors on the authority: by the drain once after its last apply and by the tick after
+    // its readout, each before its first broadcast.
+    void Publish(FCk_Handle_Fry& InFry, const FMars_Fry_Answers& InAnswers)
+    {
+        const auto State = InFry.Get_Fragment(FMars_Fragment_Fry);
+        const auto Receiver = InFry.Get_Spec().Receiver;
+        const auto Ledger = InFry.Get_Fragment(FMars_Fragment_Fry_Net);
+        auto Next = Ledger;
+        Next.Counts = Make_Counts(State.Tally);
+        Next.Pieces.Empty();
+        for (const auto& Piece : State.Pieces)
+        { Next.Pieces.Add(Make_PieceRow(Piece, Receiver)); }
+
+        if (InAnswers.RefusedSkims.Num() > 0)
+        {
+            Next.SkimRefusalSerial += InAnswers.RefusedSkims.Num();
+            Next.LastSkimRefused = InAnswers.RefusedSkims.Last();
+        }
+
+        if (InAnswers.TakeOutRefusals.Num() > 0)
+        {
+            Next.TakeOutRefusalSerial += InAnswers.TakeOutRefusals.Num();
+            Next.LastTakeOutRefusal = InAnswers.TakeOutRefusals.Last();
+        }
+
+        if (InAnswers.AdmissionRefusals.Num() > 0)
+        {
+            Next.AdmissionRefusalSerial += InAnswers.AdmissionRefusals.Num();
+            Next.LastAdmissionRefusal = InAnswers.AdmissionRefusals.Last();
+        }
+
+        if (Get_IsSameLedger(Next, Ledger) == false)
+        {
+            InFry.Get_Fragment(FMars_Fragment_Fry_Net) = Next;
+            FCk_Handle Entity = InFry;
+            Entity.Request_MarkReplicationDirty(FMars_Fragment_Fry_Net);
+        }
+
+        Publish_Skimmer(InFry, State);
+    }
+
+    // The skimmer's command: written at once, target included, when its drive or skim differs from the ledger's; the target
+    // alone once it moved k_TargetStepCm and k_TargetIntervalSeconds passed since it was last written (the tick advances
+    // that clock), so a look sweeping the scoop sends a paced stream.
+    void Publish_Skimmer(FCk_Handle_Fry& InFry, const FMars_Fragment_Fry& InState)
+    {
+        const auto Ledger = InFry.Get_Fragment(FMars_Fragment_Fry_SkimmerNet);
+        const auto Seconds = InFry.Get_Fragment(FMars_Fragment_Fry_Local).SecondsSinceTarget;
+        const auto IsPoseNew = Ledger.Drive != InState.Drive || Ledger.Skim != InState.Skim;
+        const auto IsTargetDue = (InState.SkimmerTarget - Ledger.Target).Size() >= k_TargetStepCm && Seconds >= k_TargetIntervalSeconds;
+        if (IsPoseNew == false && IsTargetDue == false)
+        { return; }
+
+        auto Next = FMars_Fragment_Fry_SkimmerNet();
+        Next.Drive = InState.Drive;
+        Next.Skim = InState.Skim;
+        Next.Target = InState.SkimmerTarget;
+        InFry.Get_Fragment(FMars_Fragment_Fry_SkimmerNet) = Next;
+        InFry.Get_Fragment(FMars_Fragment_Fry_Local).SecondsSinceTarget = 0.0f;
+        FCk_Handle Entity = InFry;
+        Entity.Request_MarkReplicationDirty(FMars_Fragment_Fry_SkimmerNet);
+    }
+
+    FMars_Fry_Counts Make_Counts(const FMars_Fry_Tally& InTally)
+    {
+        auto Counts = FMars_Fry_Counts();
+        Counts.Ejections = InTally.Ejections;
+        Counts.Catches = InTally.Catches;
+        Counts.Retrievals = InTally.Retrievals;
+        Counts.Losses = InTally.Losses;
+        Counts.TakenOut = InTally.TakenOut;
+        return Counts;
+    }
+
+    // A piece as the ledger carries it: its drain progress and face heats floored to a tenth (a client reads up to a tenth
+    // behind, never ahead; exactly 1 and 2 stay exact).
+    FMars_Fry_PieceRow Make_PieceRow(const FMars_Fry_PieceState& InPiece, const FMars_Fry_ReceiverSpec& InReceiver)
+    {
+        auto Row = FMars_Fry_PieceRow();
+        Row.Id = InPiece.Id;
+        Row.Piece = InPiece.Entity;
+        Row.Whereabouts = InPiece.Whereabouts;
+        Row.Drain = InPiece.Drain;
+        const auto Progress = InPiece.Drain == EMars_Fry_Drain::Drained ? 1.0f : Math::Clamp(InPiece.DrainSeconds / InReceiver.DrainSeconds, 0.0f, 1.0f);
+        Row.DrainProgress = Floor_ToStep(Progress);
+        for (const auto Heat : InPiece.FaceHeat)
+        { Row.FaceHeat.Add(Floor_ToStep(Heat)); }
+
+        return Row;
+    }
+
+    float32 Floor_ToStep(float32 InValue)
+    {
+        return float32(Math::FloorToInt(InValue * float32(k_LedgerSteps))) / float32(k_LedgerSteps);
+    }
+
+    // The summary's rule over InRows and InCounts, with authority or without (Get_Summary).
+    FMars_Fry_Summary Make_Summary(const TArray<FMars_Fry_PieceRow>& InRows, const FMars_Fry_Counts& InCounts)
+    {
+        auto Summary = FMars_Fry_Summary();
+        for (const auto& Row : InRows)
+        {
+            if (Row.Whereabouts == EMars_Fry_Whereabouts::Lost)
+            { continue; }
+
+            if (Row.Whereabouts == EMars_Fry_Whereabouts::Oil)
+            { Summary.InOil += 1; }
+            else if (Row.Whereabouts == EMars_Fry_Whereabouts::Skimmer)
+            { Summary.OnSkimmer += 1; }
+            else if (Row.Whereabouts == EMars_Fry_Whereabouts::Airborne)
+            { Summary.Airborne += 1; }
+            else if (Row.Whereabouts == EMars_Fry_Whereabouts::DrainBasket)
+            {
+                Summary.InBasket += 1;
+                if (Row.Drain == EMars_Fry_Drain::Drained)
+                { Summary.Drained += 1; }
+            }
+
+            for (const auto Heat : Row.FaceHeat)
+            {
+                if (Heat < 1.0f)
+                { Summary.PaleFaces += 1; }
+
+                if (Heat >= 2.0f)
+                { Summary.OverdoneFaces += 1; }
+            }
+        }
+
+        Summary.Lost = InCounts.Losses;
+        Summary.TakenOut = InCounts.TakenOut;
+        Summary.Admitted = Summary.InOil + Summary.OnSkimmer + Summary.Airborne + Summary.InBasket + Summary.Lost + Summary.TakenOut;
+        return Summary;
+    }
+
+    bool Get_IsSameLedger(const FMars_Fragment_Fry_Net& InA, const FMars_Fragment_Fry_Net& InB)
+    {
+        const auto& A = InA.Counts;
+        const auto& B = InB.Counts;
+        if (A.Ejections != B.Ejections || A.Catches != B.Catches || A.Retrievals != B.Retrievals || A.Losses != B.Losses
+            || A.TakenOut != B.TakenOut || InA.Pieces.Num() != InB.Pieces.Num()
+            || InA.SkimRefusalSerial != InB.SkimRefusalSerial || InA.LastSkimRefused != InB.LastSkimRefused
+            || InA.TakeOutRefusalSerial != InB.TakeOutRefusalSerial || InA.LastTakeOutRefusal != InB.LastTakeOutRefusal
+            || InA.AdmissionRefusalSerial != InB.AdmissionRefusalSerial || InA.LastAdmissionRefusal != InB.LastAdmissionRefusal)
+        { return false; }
+
+        for (int32 Index = 0; Index < InA.Pieces.Num(); ++Index)
+        {
+            const auto& RowA = InA.Pieces[Index];
+            const auto& RowB = InB.Pieces[Index];
+            if (RowA.Id.Get_IsSame(RowB.Id) == false || RowA.Piece != RowB.Piece || RowA.Whereabouts != RowB.Whereabouts
+                || RowA.Drain != RowB.Drain || RowA.DrainProgress != RowB.DrainProgress || Get_IsSameHeats(RowA.FaceHeat, RowB.FaceHeat) == false)
+            { return false; }
+        }
+
+        return true;
+    }
+
+    bool Get_IsSameHeats(const TArray<float32>& InA, const TArray<float32>& InB)
+    {
+        if (InA.Num() != InB.Num())
+        { return false; }
+
+        for (int32 Index = 0; Index < InA.Num(); ++Index)
+        {
+            if (InA[Index] != InB[Index])
+            { return false; }
+        }
+
+        return true;
+    }
+
+    // The ledger row carrying InPieceId; -1 = none.
+    int32 Find_RowIndex(const TArray<FMars_Fry_PieceRow>& InRows, const FMars_CookingFeed_PieceId& InPieceId)
+    {
+        for (int32 Index = 0; Index < InRows.Num(); ++Index)
+        {
+            if (InRows[Index].Id.Get_IsSame(InPieceId))
+            { return Index; }
+        }
+
+        return -1;
+    }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -437,20 +679,48 @@ mixin FMars_Fry_Spec Get_Spec(const FCk_Handle_Fry& Self)
     return Self.Get_Fragment(FMars_Fragment_Fry_Params).Spec;
 }
 
+// The kernel's replicated ledger as this machine has it: what a machine without authority reads the kernel through.
+mixin FMars_Fragment_Fry_Net Get_Ledger(const FCk_Handle_Fry& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_Fry_Net);
+}
+
+// The skimmer's replicated command as this machine has it: what a machine without authority commands its skimmer from.
+mixin FMars_Fragment_Fry_SkimmerNet Get_SkimmerLedger(const FCk_Handle_Fry& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_Fry_SkimmerNet);
+}
+
+// Without authority the getters below that read the kernel's state read the replicated ledgers instead (and this machine's
+// own copies of the pieces): the live state is the authority's.
+mixin bool Get_ReadsLedger(const FCk_Handle_Fry& Self)
+{
+    return utils_net::Get_HasAuthority(Self) == false;
+}
+
 mixin EMars_Implement_Drive Get_Drive(const FCk_Handle_Fry& Self)
 {
+    if (Self.Get_ReadsLedger())
+    { return Self.Get_Fragment(FMars_Fragment_Fry_SkimmerNet).Drive; }
+
     return Self.Get_Fragment(FMars_Fragment_Fry).Drive;
 }
 
 // The skimmer's commanded pose (Carry whenever it is idle).
 mixin EMars_Fry_Skim Get_Skim(const FCk_Handle_Fry& Self)
 {
+    if (Self.Get_ReadsLedger())
+    { return Self.Get_Fragment(FMars_Fragment_Fry_SkimmerNet).Skim; }
+
     return Self.Get_Fragment(FMars_Fragment_Fry).Skim;
 }
 
-// Root-frame XY of the scoop's commanded centre.
+// Root-frame XY of the scoop's commanded centre; without authority as the skimmer ledger last carried it.
 mixin FVector2D Get_SkimmerTarget(const FCk_Handle_Fry& Self)
 {
+    if (Self.Get_ReadsLedger())
+    { return Self.Get_Fragment(FMars_Fragment_Fry_SkimmerNet).Target; }
+
     return Self.Get_Fragment(FMars_Fragment_Fry).SkimmerTarget;
 }
 
@@ -459,56 +729,52 @@ mixin FCk_Handle_Implement Get_Skimmer(const FCk_Handle_Fry& Self)
     return Self.Get_Spec().Nodes.Skimmer;
 }
 
+// Root-frame XY of the scoop's centre at the skimmer's rest, as this machine's Add measured it.
+mixin FVector2D Get_SkimmerPark(const FCk_Handle_Fry& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_Fry).SkimmerPark;
+}
+
+// Without authority: the ledger's counts, with Seconds 0 (the clock stays with the authority).
 mixin FMars_Fry_Tally Get_Tally(const FCk_Handle_Fry& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_Fry).Tally;
+    if (Self.Get_ReadsLedger() == false)
+    { return Self.Get_Fragment(FMars_Fragment_Fry).Tally; }
+
+    const auto& Counts = Self.Get_Fragment(FMars_Fragment_Fry_Net).Counts;
+    auto Tally = FMars_Fry_Tally();
+    Tally.Ejections = Counts.Ejections;
+    Tally.Catches = Counts.Catches;
+    Tally.Retrievals = Counts.Retrievals;
+    Tally.Losses = Counts.Losses;
+    Tally.TakenOut = Counts.TakenOut;
+    return Tally;
 }
 
 // Admitted = InOil + OnSkimmer + Airborne + InBasket (in play) + Lost + TakenOut (since the last reset; a lost piece stays
-// counted after its body is destroyed).
+// counted after its body is destroyed). Without authority the same rule over the ledger's rows and counts.
 mixin FMars_Fry_Summary Get_Summary(const FCk_Handle_Fry& Self)
 {
-    const auto& State = Self.Get_Fragment(FMars_Fragment_Fry);
-    auto Summary = FMars_Fry_Summary();
-    for (const auto& Piece : State.Pieces)
+    if (Self.Get_ReadsLedger())
     {
-        if (Piece.Whereabouts == EMars_Fry_Whereabouts::Lost)
-        { continue; }
-
-        if (Piece.Whereabouts == EMars_Fry_Whereabouts::Oil)
-        { Summary.InOil += 1; }
-        else if (Piece.Whereabouts == EMars_Fry_Whereabouts::Skimmer)
-        { Summary.OnSkimmer += 1; }
-        else if (Piece.Whereabouts == EMars_Fry_Whereabouts::Airborne)
-        { Summary.Airborne += 1; }
-        else if (Piece.Whereabouts == EMars_Fry_Whereabouts::DrainBasket)
-        {
-            Summary.InBasket += 1;
-            if (Piece.Drain == EMars_Fry_Drain::Drained)
-            { Summary.Drained += 1; }
-        }
-
-        for (const auto Heat : Piece.FaceHeat)
-        {
-            if (Heat < 1.0f)
-            { Summary.PaleFaces += 1; }
-
-            if (Heat >= 2.0f)
-            { Summary.OverdoneFaces += 1; }
-        }
+        const auto& Ledger = Self.Get_Fragment(FMars_Fragment_Fry_Net);
+        return utils_fry::Make_Summary(Ledger.Pieces, Ledger.Counts);
     }
 
-    Summary.Lost = State.Tally.Losses;
-    Summary.TakenOut = State.Tally.TakenOut;
-    Summary.Admitted = Summary.InOil + Summary.OnSkimmer + Summary.Airborne + Summary.InBasket + Summary.Lost + Summary.TakenOut;
-    return Summary;
+    const auto& State = Self.Get_Fragment(FMars_Fragment_Fry);
+    const auto Receiver = Self.Get_Spec().Receiver;
+    TArray<FMars_Fry_PieceRow> Rows;
+    for (const auto& Piece : State.Pieces)
+    { Rows.Add(utils_fry::Make_PieceRow(Piece, Receiver)); }
+
+    return utils_fry::Make_Summary(Rows, utils_fry::Make_Counts(State.Tally));
 }
 
-// The Drained pieces a TakeOut without a named piece would hand back: the station's take-out readout, as the Tick last
-// wrote it.
+// The Drained pieces a TakeOut without a named piece would hand back: the station's take-out readout as the Tick last
+// wrote it, or its replicated count without authority.
 mixin int32 Get_TakeableCount(const FCk_Handle_Fry& Self)
 {
-    return utils_cooking_feed::Get_Takeable(Self).Num();
+    return utils_cooking_feed::Get_TakeableCount(Self);
 }
 
 // The station root's world transform (the station frame).
@@ -575,6 +841,14 @@ mixin bool Get_IsScoopClearOfRim(const FCk_Handle_Fry& Self)
 mixin TArray<FMars_CookingFeed_PieceId> Get_PieceIds(const FCk_Handle_Fry& Self)
 {
     TArray<FMars_CookingFeed_PieceId> Ids;
+    if (Self.Get_ReadsLedger())
+    {
+        for (const auto& Row : Self.Get_Fragment(FMars_Fragment_Fry_Net).Pieces)
+        { Ids.Add(Row.Id); }
+
+        return Ids;
+    }
+
     for (const auto& Piece : Self.Get_Fragment(FMars_Fragment_Fry).Pieces)
     { Ids.Add(Piece.Id); }
 
@@ -584,12 +858,19 @@ mixin TArray<FMars_CookingFeed_PieceId> Get_PieceIds(const FCk_Handle_Fry& Self)
 // From admission until the piece is taken out or destroyed (a lost one, at the end of its linger).
 mixin bool Get_HasPiece(const FCk_Handle_Fry& Self, const FMars_CookingFeed_PieceId& InPieceId)
 {
+    if (Self.Get_ReadsLedger())
+    { return utils_fry::Find_RowIndex(Self.Get_Fragment(FMars_Fragment_Fry_Net).Pieces, InPieceId) >= 0; }
+
     return utils_fry::Find_PieceIndex(Self.Get_Fragment(FMars_Fragment_Fry).Pieces, InPieceId) >= 0;
 }
 
-// A copy of the piece's state; an unknown Id ensures and answers a default state.
+// A copy of the piece's state; an unknown Id ensures and answers a default state. Without authority it is built from the
+// ledger's row (Get_LedgerPieceState).
 mixin FMars_Fry_PieceState Get_PieceState(const FCk_Handle_Fry& Self, const FMars_CookingFeed_PieceId& InPieceId)
 {
+    if (Self.Get_ReadsLedger())
+    { return Self.Get_LedgerPieceState(InPieceId); }
+
     const auto& Pieces = Self.Get_Fragment(FMars_Fragment_Fry).Pieces;
     const auto Index = utils_fry::Find_PieceIndex(Pieces, InPieceId);
     if (ck::EnsureIfNot(Index >= 0,
@@ -597,6 +878,39 @@ mixin FMars_Fry_PieceState Get_PieceState(const FCk_Handle_Fry& Self, const FMar
     { return FMars_Fry_PieceState(); }
 
     return Pieces[Index];
+}
+
+// The row's id, whereabouts, drain and face heats (a tenth behind at most); DrainSeconds its progress of the spec's drain;
+// its Entity and Piece the row's handle (invalid while it has not replicated here); its CentreLocal and HalfExtents from
+// this copy's mesh metrics, as the authority reads them at admission, once it is a Ready food piece here (zero before); no
+// body.
+mixin FMars_Fry_PieceState Get_LedgerPieceState(const FCk_Handle_Fry& Self, const FMars_CookingFeed_PieceId& InPieceId)
+{
+    const auto& Rows = Self.Get_Fragment(FMars_Fragment_Fry_Net).Pieces;
+    const auto Index = utils_fry::Find_RowIndex(Rows, InPieceId);
+    if (ck::EnsureIfNot(Index >= 0,
+        f"[Fry] [{Self.ToString()}] has no piece {utils_cooking_feed::Get_PieceName(InPieceId)} in its ledger ({Rows.Num()} in play)"))
+    { return FMars_Fry_PieceState(); }
+
+    const auto Row = Rows[Index];
+    auto State = FMars_Fry_PieceState();
+    State.Id = Row.Id;
+    State.Entity = Row.Piece;
+    State.Whereabouts = Row.Whereabouts;
+    State.Drain = Row.Drain;
+    State.FaceHeat = Row.FaceHeat;
+    State.DrainSeconds = Row.DrainProgress * Self.Get_Spec().Receiver.DrainSeconds;
+    if (ck::IsValid(Row.Piece))
+    { State.Piece = Row.Piece.As_FoodPiece(ECk_SanityCheck::UnChecked); }
+
+    if (ck::IsValid(State.Piece) && utils_foodpiece::Get_IsLiveEntity(Row.Piece) && State.Piece.Get_Status() == EMars_FoodPiece_Status::Ready)
+    {
+        const auto Metrics = utils_runtime_mesh::Get_Metrics(State.Piece.Get_Geometry());
+        State.CentreLocal = utils_foodpiece::Get_BoundsCentre(Metrics);
+        State.HalfExtents = utils_foodpiece::Get_BoundsHalfExtents(Metrics);
+    }
+
+    return State;
 }
 
 mixin FCk_Handle Get_PieceEntity(const FCk_Handle_Fry& Self, const FMars_CookingFeed_PieceId& InPieceId)
@@ -631,11 +945,16 @@ mixin FVector Get_PieceCentre(const FCk_Handle_Fry& Self, const FMars_CookingFee
     return PieceWorld.TransformPosition(Piece.CentreLocal);
 }
 
-// The piece's cook state as the fryer would hand it back now: its batter the faces' heat so far.
+// The piece's cook state as the fryer would hand it back now: its batter the faces' heat so far, every other channel the
+// piece's own (a default state while this machine has no live copy of it).
 mixin FMars_FoodPiece_CookState Get_PieceCookState(const FCk_Handle_Fry& Self, const FMars_CookingFeed_PieceId& InPieceId)
 {
     const auto Piece = Self.Get_PieceState(InPieceId);
-    return utils_fry::Get_CookState(Piece, Piece.Piece.Get_CookState());
+    auto Seed = FMars_FoodPiece_CookState();
+    if (ck::IsValid(Piece.Piece) && utils_foodpiece::Get_IsLiveEntity(Piece.Entity))
+    { Seed = Piece.Piece.Get_CookState(); }
+
+    return utils_fry::Get_CookState(Piece, Seed);
 }
 
 mixin EMars_Fry_Whereabouts Get_PieceWhereabouts(const FCk_Handle_Fry& Self, const FMars_CookingFeed_PieceId& InPieceId)

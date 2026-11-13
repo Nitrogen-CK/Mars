@@ -18,6 +18,10 @@
 // A piece the fryer hands back lands on the finished tray through the station's assembly (UMars_FeedStation_EntityScript),
 // whoever operates.
 //
+// Stance: the input tasks read the operator on the authority alone (the station's InputStance), so a remote operator's
+// look, dip, add-food and take-out arrive in its input stream there; the operator's own machine shows the skimmer and the
+// dip row from the ledgers.
+//
 // The conditions are the shared station ones (Mars_Station_SmConditions.as). The player's Operating state owns the pose,
 // the camera (Captured: the view stays still, the look delta is ours), the glove grips and the Leave intent.
 

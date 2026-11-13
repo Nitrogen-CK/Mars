@@ -317,8 +317,9 @@ enum EMars_Platter_Wholeness
     HasCut
 }
 
-// Stance REPLICATED, authority-written: what a copy without authority reads of the books (utils_platter::Publish, from the
-// Platter processors only, each change followed by its dirty mark).
+// Stance REPLICATED, authority-written: what a copy without authority reads of the books, its battered count included (a
+// fryer's add-food gate reads it), written by utils_platter::Publish from the Platter processors only, each change followed
+// by its dirty mark.
 struct FMars_Fragment_Platter_Net
 {
     UPROPERTY()
@@ -334,6 +335,10 @@ struct FMars_Fragment_Platter_Net
     // The distinct kind containers of every live piece on the books, in first-seen order.
     UPROPERTY()
     TArray<FGameplayTagContainer> PieceKinds;
+
+    // The live pieces on the books whose cook state reads battered (utils_batter::Get_IsBattered).
+    UPROPERTY()
+    int32 BatteredCount = 0;
 
     // One more per refused deposit, so an initiator that recorded it before asking knows a newer refusal is about its own.
     // Written by the Platter processors when they refuse a deposit; utils_platter::Publish leaves it and the two below.

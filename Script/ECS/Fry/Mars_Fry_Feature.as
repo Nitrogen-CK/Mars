@@ -1,3 +1,14 @@
+// Stance: the fryer's kernel is the authority's. Only the authority's copy drives the skimmer, admits, pushes the pieces with
+// the oil, judges where each piece is, heats its batter, drains it, takes out and readopts; a copy without authority drops
+// every fry request (and the releases and take-outs its station queued) and reads the fryer through two replicated ledgers
+// on the station: the kernel's (the counts, every piece in play with its whereabouts, its drain and its face heats floored
+// to a tenth, and serials for the skims, take-outs and admissions it refused) and the skimmer's command (its drive, its skim
+// and its target), from which that copy gives its own skimmer Implement the commands the authority's drain gives its own.
+// On that copy the kernel's tick only announces: OnPieceAdded as a row's piece shows up there, so the station dresses it;
+// its mirror raises OnSkimChanged, OnSkimRefused, OnTakeOutRefused and OnAdmissionRefused from the ledgers. The other fry
+// signals, the bodies, the clocks, the tally's seconds, the pieces' cook state, holder facts and pickup claims never leave
+// the authority.
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
 //--------------------------------------------------------------------------------------------------------------------------
@@ -647,6 +658,129 @@ struct FMars_Fragment_Fry
     UPROPERTY()
     FMars_Fry_Tally Tally;
 }
+
+//--------------------------------------------------------------------------------------------------------------------------
+// Replication
+//--------------------------------------------------------------------------------------------------------------------------
+
+// One piece in the kernel's ledger: its identity, its entity, where it is, its drain, and its drain progress and six face
+// heats floored to a tenth (a heat of exactly 1 or 2 and a progress of 1 stay exact), the heats indexed by
+// int32(EMars_FoodPiece_Face).
+struct FMars_Fry_PieceRow
+{
+    UPROPERTY()
+    FMars_CookingFeed_PieceId Id;
+
+    UPROPERTY()
+    FCk_Handle Piece;
+
+    UPROPERTY()
+    EMars_Fry_Whereabouts Whereabouts = EMars_Fry_Whereabouts::Airborne;
+
+    UPROPERTY()
+    EMars_Fry_Drain Drain = EMars_Fry_Drain::NotDraining;
+
+    UPROPERTY()
+    float32 DrainProgress = 0.0f;
+
+    UPROPERTY()
+    TArray<float32> FaceHeat;
+}
+
+// The tally's counts (its seconds stay with the authority: they move every frame a piece is in the oil).
+struct FMars_Fry_Counts
+{
+    UPROPERTY()
+    int32 Ejections = 0;
+
+    UPROPERTY()
+    int32 Catches = 0;
+
+    UPROPERTY()
+    int32 Retrievals = 0;
+
+    UPROPERTY()
+    int32 Losses = 0;
+
+    UPROPERTY()
+    int32 TakenOut = 0;
+}
+
+// What a drain announced, for the ledger's serials: every refused skim, take-out and admission, in order.
+struct FMars_Fry_Answers
+{
+    TArray<EMars_Fry_Skim> RefusedSkims;
+    TArray<EMars_CookingFeed_TakeOutRefusal> TakeOutRefusals;
+    TArray<EMars_Fry_AdmissionRefusal> AdmissionRefusals;
+}
+
+// The kernel as a machine without authority reads it, replicated on the station and written only by utils_fry::Publish on
+// the authority. A row's Piece may not resolve on a client yet (its entity has not replicated there).
+struct FMars_Fragment_Fry_Net
+{
+    UPROPERTY()
+    FMars_Fry_Counts Counts;
+
+    // In admission order, the lingering lost pieces included.
+    UPROPERTY()
+    TArray<FMars_Fry_PieceRow> Pieces;
+
+    // One more for every refused skim, take-out and admission; each one's last reason.
+    UPROPERTY()
+    int32 SkimRefusalSerial = 0;
+
+    UPROPERTY()
+    EMars_Fry_Skim LastSkimRefused = EMars_Fry_Skim::Carry;
+
+    UPROPERTY()
+    int32 TakeOutRefusalSerial = 0;
+
+    UPROPERTY()
+    EMars_CookingFeed_TakeOutRefusal LastTakeOutRefusal = EMars_CookingFeed_TakeOutRefusal::NoRoom;
+
+    UPROPERTY()
+    int32 AdmissionRefusalSerial = 0;
+
+    UPROPERTY()
+    EMars_Fry_AdmissionRefusal LastAdmissionRefusal = EMars_Fry_AdmissionRefusal::Unavailable;
+}
+
+// The authority's skimmer command, from which every other copy commands its own skimmer Implement. Its own fragment: a
+// dynamic fragment is sent whole on every dirty mark, and the target moves many times a second. Written only by
+// utils_fry::Publish on the authority.
+struct FMars_Fragment_Fry_SkimmerNet
+{
+    UPROPERTY()
+    EMars_Implement_Drive Drive = EMars_Implement_Drive::Idle;
+
+    UPROPERTY()
+    EMars_Fry_Skim Skim = EMars_Fry_Skim::Carry;
+
+    // Root-frame XY of the scoop's commanded centre.
+    UPROPERTY()
+    FVector2D Target = FVector2D::ZeroVector;
+}
+
+// Each machine's own: the kernel's ledger it last reconciled and the skimmer ledger it last applied (both used only without
+// authority), the ledger rows it announced (without authority) and the seconds since the skimmer ledger's target was last
+// written (with authority).
+struct FMars_Fragment_Fry_Local
+{
+    UPROPERTY()
+    TOptional<FMars_Fragment_Fry_Net> Last;
+
+    UPROPERTY()
+    TOptional<FMars_Fragment_Fry_SkimmerNet> LastSkimmer;
+
+    UPROPERTY()
+    TArray<FMars_CookingFeed_PieceId> Announced;
+
+    UPROPERTY()
+    float32 SecondsSinceTarget = 0.0f;
+}
+
+// Wakes the mirror once per fryer.
+struct FMars_Tag_Fry_NeedsMirror {}
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Signals

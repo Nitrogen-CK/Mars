@@ -16,6 +16,13 @@
 // holds the skimmer's grip bar (riding its slide, dip and pour roll) and the left follows the feed node, resting in front of
 // the raw platter between transfers.
 //
+// The Fry kernel is the authority's and replicates through its two ledgers (the kernel's and the skimmer's command): the
+// authority's kernel commands its own skimmer, every other machine's mirror gives its skimmer the same commands from the
+// ledger, and every machine dresses the pieces the ledger names (its kernel announces each one as it shows up there). The
+// station's control reads its operator on the authority alone (its InputStance is Authority): a remote operator's look,
+// dip, add-food and take-out arrive in its input stream there, and the operator's own machine shows the skimmer from the
+// ledger.
+//
 // Per piece (keyed by its feed identity): its own cook state (its six face heats; the oil coat ramps up in the oil and falls
 // with the drain in the basket: the visible dripping).
 class UMars_FryStation_EntityScript : UMars_FeedStation_EntityScript
@@ -203,6 +210,10 @@ class UMars_FryStation_EntityScript : UMars_FeedStation_EntityScript
             NSLOCTEXT("MarsInteraction", "FryBatchPrompt", "Fry the batch"),
             NSLOCTEXT("MarsInteraction", "FryStationInUsePrompt", "In use"));
         InOutSpec.MinigameStateClass = UMars_SmState_Fry_Idle;
+
+        // The control reads the operator on the authority alone: a remote operator's look and presses reach it as its
+        // stream, and its own machine shows the skimmer from the ledger.
+        InOutSpec.InputStance = EMars_Station_InputStance::Authority;
     }
 
     protected FVector2D Get_CounterFootprint() const override

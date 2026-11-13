@@ -189,26 +189,18 @@ namespace utils_batter
         return ck::IsValid(Food) && Food.Get_IsBatterable();
     }
 
-    // The ledger's dip: written 1 by the bowl's take-out, inherited by a cut half.
+    // The cook state's dip (utils_foodpiece::Get_IsBattered): written 1 by the bowl's take-out.
     bool Get_IsBattered(const FMars_FoodPiece_CookState& InCookState)
     {
-        return InCookState.Battered >= 0.5f;
+        return utils_foodpiece::Get_IsBattered(InCookState);
     }
 
-    // Some piece on InPlatter (held, settling or queued) has a battered ledger; false with no platter. A fryer's add-food
-    // gate reads it: a platter with nothing battered on it has nothing the fryer would admit.
+    // Some piece on InPlatter (held, settling or queued) has a battered ledger (its Get_BatteredCount, which a copy without
+    // authority reads from the platter's ledger); false with no platter. A fryer's add-food gate reads it: a platter with
+    // nothing battered on it has nothing the fryer would admit.
     bool Get_HasBatteredPiece(const FCk_Handle_Platter& InPlatter)
     {
-        if (ck::Is_NOT_Valid(InPlatter))
-        { return false; }
-
-        for (const auto& Piece : InPlatter.Get_Pieces())
-        {
-            if (ck::IsValid(Piece) && Get_IsBattered(Piece.Get_CookState()))
-            { return true; }
-        }
-
-        return false;
+        return ck::IsValid(InPlatter) && InPlatter.Get_BatteredCount() > 0;
     }
 
     // Why the bowl, as InState is, would not take InPiece (the piece rules only: identity and readiness are the drain's).
