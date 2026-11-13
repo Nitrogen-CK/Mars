@@ -14,6 +14,10 @@
 // A piece the bowl hands back lands on the finished tray through the kernel's own landing, whoever operates. The conditions
 // are the shared station ones (Mars_Station_SmConditions.as). The player's Operating state owns the pose, the camera, the
 // glove grips and the Leave intent.
+//
+// Stance: the input tasks read the operator on the authority alone (the station's InputStance), so a remote operator's
+// presses arrive in its input stream, and a copy without authority issues nothing (its exit lift is dropped by its bowl).
+// The hint rows run on every machine from the bowl's and the feed's mirrored getters and signals.
 
 class UMars_SmState_Batter_Idle : UCk_SmState_EntityScript
 {

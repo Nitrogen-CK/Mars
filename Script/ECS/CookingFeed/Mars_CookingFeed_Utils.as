@@ -375,9 +375,12 @@ namespace utils_cooking_feed
         InStation.AddOrGet_Fragment(FMars_Fragment_StationAdmission);
     }
 
+    // A copy without authority can receive the replicated count before it composes: the arrived count stands then.
     void Add_TakeOut(FCk_Handle& InStation)
     {
         InStation.AddOrGet_Fragment(FMars_Fragment_StationTakeOut);
+        if (InStation.Has_Fragment(FMars_Fragment_StationTakeOut_Net) == false)
+        { InStation.Add_Fragment(FMars_Fragment_StationTakeOut_Net(), ECk_Replication::Replicates); }
     }
 
     // A kernel on InStation receives releases.
@@ -392,13 +395,30 @@ namespace utils_cooking_feed
         return ck::IsValid(InStation) && InStation.Has_Fragment(FMars_Fragment_StationTakeOut);
     }
 
-    // What a take-out would hand back now; empty on a station whose kernel hands nothing back.
+    // What a take-out would hand back now, as the authority's kernel lists it; empty on a station whose kernel hands nothing
+    // back. A machine without authority reads Get_TakeableCount.
     TArray<FCk_Handle_FoodPiece> Get_Takeable(const FCk_Handle& InStation)
     {
         if (Get_HasTakeOut(InStation) == false)
         { return TArray<FCk_Handle_FoodPiece>(); }
 
         return InStation.Get_Fragment(FMars_Fragment_StationTakeOut).Takeable;
+    }
+
+    // How many pieces a take-out would hand back now, on any machine: the readout's list with authority, the replicated
+    // count without; 0 on a station whose kernel hands nothing back.
+    int32 Get_TakeableCount(const FCk_Handle& InStation)
+    {
+        if (Get_HasTakeOut(InStation) == false)
+        { return 0; }
+
+        if (utils_net::Get_HasAuthority(InStation))
+        { return InStation.Get_Fragment(FMars_Fragment_StationTakeOut).Takeable.Num(); }
+
+        if (InStation.Has_Fragment(FMars_Fragment_StationTakeOut_Net) == false)
+        { return 0; }
+
+        return InStation.Get_Fragment(FMars_Fragment_StationTakeOut_Net).Takeable;
     }
 
     // InRelease into InStation's inbox, and the kernel woken: it answers on OnAdmission. False (nothing queued) for a station
@@ -459,7 +479,8 @@ namespace utils_cooking_feed
         { InStation.Get_Fragment(FMars_Fragment_StationAdmission_Signals).OnAdmission.Broadcast(InStation, InAnswer.PieceId, InAnswer.Admission, InAnswer.Reason); }
     }
 
-    // The kernel's Tick writes what a take-out would hand back, only on change.
+    // The kernel's Tick writes what a take-out would hand back, only on change; with authority it also writes the replicated
+    // count, marked dirty only when the count changes (a copy without authority reads that count and never writes it).
     void Write_Takeable(FCk_Handle& InStation, const TArray<FCk_Handle_FoodPiece>& InTakeable)
     {
         if (Get_HasTakeOut(InStation) == false)
@@ -470,6 +491,16 @@ namespace utils_cooking_feed
         { return; }
 
         TakeOut.Takeable = InTakeable;
+
+        if (utils_net::Get_HasAuthority(InStation) == false || InStation.Has_Fragment(FMars_Fragment_StationTakeOut_Net) == false)
+        { return; }
+
+        auto& Net = InStation.Get_Fragment(FMars_Fragment_StationTakeOut_Net);
+        if (Net.Takeable == InTakeable.Num())
+        { return; }
+
+        Net.Takeable = InTakeable.Num();
+        InStation.Request_MarkReplicationDirty(FMars_Fragment_StationTakeOut_Net);
     }
 
     bool Get_IsSamePieces(const TArray<FCk_Handle_FoodPiece>& InA, const TArray<FCk_Handle_FoodPiece>& InB)

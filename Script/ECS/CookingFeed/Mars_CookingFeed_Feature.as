@@ -791,6 +791,14 @@ struct FMars_Fragment_StationTakeOut
     TArray<FCk_Handle_FoodPiece> Takeable;
 }
 
+// How many pieces a take-out would hand back, replicated beside the readout: written by the authority's kernel with its
+// readout, it is what a machine without authority reads (the readout's list is the authority's).
+struct FMars_Fragment_StationTakeOut_Net
+{
+    UPROPERTY()
+    int32 Takeable = 0;
+}
+
 // Hand every takeable piece to Tray, at most MaxPieces of them (the tray's room when the press was read). The kernel takes
 // each off its ledger, loads it onto the tray and takes back the ones the tray refuses (a heat kernel readopts them, the
 // board places them again). A take-out that hands nothing back is refused by the kernel (NoRoom when MaxPieces is at most 0

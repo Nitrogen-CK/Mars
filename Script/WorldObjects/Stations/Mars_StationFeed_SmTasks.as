@@ -154,7 +154,7 @@ class UMars_SmTask_StationFeed_OperatorHints : UMars_SmTask_StationOperatorHints
         if (ck::Is_NOT_Valid(_TakeOutRow))
         { return ECk_SmTaskResult::Running; }
 
-        const auto Takeable = utils_cooking_feed::Get_Takeable(_Station).Num();
+        const auto Takeable = utils_cooking_feed::Get_TakeableCount(_Station);
         if (Takeable != _ShownTakeable)
         {
             _ShownTakeable = Takeable;
@@ -224,7 +224,7 @@ class UMars_SmTask_StationFeed_OperatorHints : UMars_SmTask_StationOperatorHints
         if (ck::IsValid(_TakeOutRow))
         { return; }
 
-        _ShownTakeable = utils_cooking_feed::Get_Takeable(_Station).Num();
+        _ShownTakeable = utils_cooking_feed::Get_TakeableCount(_Station);
         _TakeOutRow = Show_Row(_TakeOutRow, Make_Row(mars::Mars_IA_Interact_Secondary, Get_TakeOutText(), k_TakeOutSortOrder));
     }
 

@@ -9,6 +9,11 @@
 // over the bowl lands in the station's admission inbox. The base builds the feed's nodes and the docks and keeps the label;
 // this script builds the bowl and, every frame, dresses every piece (the wet batter's sheen as its coat grows, then its
 // food's battered shell once its ledger says battered, through Write_Look) and lowers the right glove with the dip.
+//
+// Stance: the bowl is the authority's and every machine reads it through its replicated ledger, so this script dresses its
+// own copies of the pieces and keeps its label and records from the same getters and signals on every machine. Its state
+// machine reads the operator on the authority alone: a remote operator's dip, add-food and take-out arrive there in the
+// operator's input stream.
 
 // A piece a take-out handed back, waiting for its ledger's dip to dress its battered shell.
 struct FMars_BatterStation_Departing
@@ -151,6 +156,9 @@ class UMars_BatterStation_EntityScript : UMars_FeedStation_EntityScript
             NSLOCTEXT("MarsInteraction", "BatterBatchPrompt", "Batter the batch"),
             NSLOCTEXT("MarsInteraction", "BatterStationInUsePrompt", "In use"));
         InOutSpec.MinigameStateClass = UMars_SmState_Batter_Idle;
+
+        // The control reads the operator on the authority alone: a remote operator's input reaches it as its stream.
+        InOutSpec.InputStance = EMars_Station_InputStance::Authority;
     }
 
     protected FVector2D Get_CounterFootprint() const override

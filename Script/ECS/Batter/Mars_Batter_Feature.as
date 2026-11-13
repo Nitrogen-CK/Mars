@@ -1,3 +1,12 @@
+// Stance: the bowl is the authority's. Only the authority's copy admits, dips, lifts, coats, takes out and readopts; a copy
+// without authority drops every bowl request (and the releases and take-outs its station queued) and reads the bowl
+// through a replicated ledger on the station: whether it is dipped, which pieces are in it at which slot, each coat
+// floored to a tenth, and serials for the refusals the authority announced. On that copy the bowl's tick only shows: it
+// sinks and lifts this machine's own copies of the pieces under its own bowl node by the kernel's law, raises
+// OnPieceAdded and OnPieceTakenOut as a piece's row appears and goes, and its mirror raises OnAdmissionRefused (naming no
+// piece), OnTakeOutRefused and OnBowlChanged from the ledger. OnCoatStage, the coat clock, the pieces' cook state, holder
+// facts and pickup claims never leave the authority.
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
 //--------------------------------------------------------------------------------------------------------------------------
@@ -209,7 +218,8 @@ struct FMars_Batter_PieceState
     EMars_Batter_CoatStage Stage = EMars_Batter_CoatStage::Bare;
 }
 
-// Written only by the two Batter processors (and Add). The station SM, the CookingFeed kernel and the operator only issue requests.
+// Written only by the two Batter processors (and Add), and only on the authority. The station SM, the CookingFeed kernel and
+// the operator only issue requests.
 struct FMars_Fragment_Batter
 {
     UPROPERTY()
@@ -218,6 +228,115 @@ struct FMars_Fragment_Batter
     // In admission order.
     UPROPERTY()
     TArray<FMars_Batter_PieceState> Pieces;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+// Replication
+//--------------------------------------------------------------------------------------------------------------------------
+
+// Whether a machine without authority has raised OnPieceAdded for a piece's row yet.
+enum EMars_Batter_Announce
+{
+    Unannounced,
+    Announced
+}
+
+// One piece in the ledger: its identity, its entity, its slot and its coat floored to a tenth (exactly 1 once coated).
+struct FMars_Batter_PieceRow
+{
+    UPROPERTY()
+    FMars_CookingFeed_PieceId Id;
+
+    UPROPERTY()
+    FCk_Handle Piece;
+
+    UPROPERTY()
+    int32 Slot = 0;
+
+    UPROPERTY()
+    float32 Coat = 0.0f;
+}
+
+// What a drain announced, for the ledger's serials: every refusal of each kind, in order.
+struct FMars_Batter_Answers
+{
+    TArray<EMars_Batter_AdmissionRefusal> AdmissionRefusals;
+    TArray<EMars_Batter_TakeOutRefusal> TakeOutRefusals;
+}
+
+// The bowl as a machine without authority reads it, replicated on the station and written only by utils_batter::Publish
+// on the authority. A row's Piece may not resolve on a client yet (its entity has not replicated there).
+struct FMars_Fragment_Batter_Net
+{
+    UPROPERTY()
+    EMars_Batter_Bowl Bowl = EMars_Batter_Bowl::Resting;
+
+    // One more for every published change of Bowl.
+    UPROPERTY()
+    int32 BowlSerial = 0;
+
+    // In admission order.
+    UPROPERTY()
+    TArray<FMars_Batter_PieceRow> Pieces;
+
+    // One more for every admission the authority refused; the last one's reason.
+    UPROPERTY()
+    int32 AdmissionRefusalSerial = 0;
+
+    UPROPERTY()
+    EMars_Batter_AdmissionRefusal LastAdmissionRefusal = EMars_Batter_AdmissionRefusal::Unavailable;
+
+    // One more for every take-out the authority refused; the last one's reason.
+    UPROPERTY()
+    int32 TakeOutRefusalSerial = 0;
+
+    UPROPERTY()
+    EMars_Batter_TakeOutRefusal LastTakeOutRefusal = EMars_Batter_TakeOutRefusal::NoRoom;
+}
+
+// One ledger row as this machine shows it: how far under its piece is here, the copy this machine attached under its bowl
+// node, and whether OnPieceAdded was raised for it.
+struct FMars_Batter_LocalRow
+{
+    UPROPERTY()
+    FMars_CookingFeed_PieceId Id;
+
+    UPROPERTY()
+    float32 Immersion = 0.0f;
+
+    UPROPERTY()
+    FCk_Handle Attached;
+
+    UPROPERTY()
+    EMars_Batter_Announce Announce = EMars_Batter_Announce::Unannounced;
+}
+
+// Each machine's own: the ledger it last reconciled (unset with authority) and its rows (used only without authority).
+struct FMars_Fragment_Batter_Local
+{
+    UPROPERTY()
+    TOptional<FMars_Fragment_Batter_Net> Last;
+
+    UPROPERTY()
+    TArray<FMars_Batter_LocalRow> Rows;
+}
+
+// Wakes the mirror once per bowl.
+struct FMars_Tag_Batter_NeedsMirror {}
+
+// One frame of the dip's ease: the frame's step and the spec's dip time.
+struct FMars_Batter_EaseStep
+{
+    float32 DeltaSeconds = 0.0f;
+    float32 DipSeconds = 0.0f;
+
+    FMars_Batter_EaseStep() {}
+
+    FMars_Batter_EaseStep(float32 InDeltaSeconds, float32 InDipSeconds)
+    {
+        DeltaSeconds = InDeltaSeconds;
+        DipSeconds = InDipSeconds;
+    }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

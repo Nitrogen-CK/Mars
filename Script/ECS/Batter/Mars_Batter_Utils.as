@@ -5,7 +5,8 @@ namespace utils_batter
 
     // Composes the batter bowl on InStation (the station entity) and makes the station a receiver: its admission inbox and
     // its take-out readout. The spec's Nodes are built by the caller. The bowl starts Resting and empty: nothing is in it
-    // until the inbox brings a piece. A rejected spec or a missing bowl node ensures and returns an invalid handle.
+    // until the inbox brings a piece. A rejected spec or a missing bowl node ensures and returns an invalid handle. The
+    // replicated ledger is composed on every machine (a copy without authority reads the bowl through it).
     FCk_Handle_Batter Add(FCk_Handle& InStation, FMars_Batter_Spec InSpec)
     {
         const auto Validation = InSpec.Validate();
@@ -26,7 +27,154 @@ namespace utils_batter
         utils_cooking_feed::Add_Admission(InStation);
         utils_cooking_feed::Add_TakeOut(InStation);
 
+        // A copy without authority can receive the replicated ledger before it composes: the arrived ledger stands then, and
+        // a bowl first read dipped shows its pieces under.
+        if (InStation.Has_Fragment(FMars_Fragment_Batter_Net) == false)
+        { InStation.Add_Fragment(FMars_Fragment_Batter_Net(), ECk_Replication::Replicates); }
+
+        const auto Ledger = InStation.Get_Fragment(FMars_Fragment_Batter_Net);
+        auto Local = FMars_Fragment_Batter_Local();
+        Local.Last = TOptional<FMars_Fragment_Batter_Net>(Ledger);
+        for (const auto& Row : Ledger.Pieces)
+        {
+            auto LocalRow = FMars_Batter_LocalRow();
+            LocalRow.Id = Row.Id;
+            LocalRow.Immersion = Get_TargetImmersion(Ledger.Bowl);
+            Local.Rows.Add(LocalRow);
+        }
+
+        InStation.Add_Fragment(Local);
+        InStation.Add_Fragment(FMars_Tag_Batter_NeedsMirror());
         return InStation.As_Batter();
+    }
+
+    // The ledger a machine without authority reads the bowl through, rebuilt from the live state and what the caller
+    // announced: written and marked dirty only when a field or a row differs. Called only by the bowl's processors on the
+    // authority, by the drain once after its last apply and by the tick after its readout. Reads the state through the
+    // handle.
+    void Publish(FCk_Handle_Batter& InBatter, const FMars_Batter_Answers& InAnswers)
+    {
+        const auto State = InBatter.Get_Fragment(FMars_Fragment_Batter);
+        const auto Ledger = InBatter.Get_Fragment(FMars_Fragment_Batter_Net);
+        auto Next = Ledger;
+
+        Next.Bowl = State.Bowl;
+        if (State.Bowl != Ledger.Bowl)
+        { Next.BowlSerial += 1; }
+
+        Next.Pieces.Empty();
+        for (const auto& Piece : State.Pieces)
+        { Next.Pieces.Add(Make_PieceRow(Piece)); }
+
+        if (InAnswers.AdmissionRefusals.Num() > 0)
+        {
+            Next.AdmissionRefusalSerial += InAnswers.AdmissionRefusals.Num();
+            Next.LastAdmissionRefusal = InAnswers.AdmissionRefusals.Last();
+        }
+
+        if (InAnswers.TakeOutRefusals.Num() > 0)
+        {
+            Next.TakeOutRefusalSerial += InAnswers.TakeOutRefusals.Num();
+            Next.LastTakeOutRefusal = InAnswers.TakeOutRefusals.Last();
+        }
+
+        if (Get_IsSameLedger(Next, Ledger))
+        { return; }
+
+        InBatter.Get_Fragment(FMars_Fragment_Batter_Net) = Next;
+        FCk_Handle Entity = InBatter;
+        Entity.Request_MarkReplicationDirty(FMars_Fragment_Batter_Net);
+    }
+
+    // A piece as the ledger carries it: its coat floored to a tenth (a client's coat reads up to a tenth behind, never
+    // ahead), exactly 1 once coated.
+    FMars_Batter_PieceRow Make_PieceRow(const FMars_Batter_PieceState& InPiece)
+    {
+        auto Row = FMars_Batter_PieceRow();
+        Row.Id = InPiece.Id;
+        Row.Piece = InPiece.Entity;
+        Row.Slot = InPiece.Slot;
+        Row.Coat = Get_IsCoated(InPiece) ? 1.0f : float32(Math::FloorToInt(InPiece.Coat * 10.0f)) / 10.0f;
+        return Row;
+    }
+
+    bool Get_IsSameLedger(const FMars_Fragment_Batter_Net& InA, const FMars_Fragment_Batter_Net& InB)
+    {
+        if (InA.Bowl != InB.Bowl || InA.BowlSerial != InB.BowlSerial || InA.Pieces.Num() != InB.Pieces.Num()
+            || InA.AdmissionRefusalSerial != InB.AdmissionRefusalSerial || InA.LastAdmissionRefusal != InB.LastAdmissionRefusal
+            || InA.TakeOutRefusalSerial != InB.TakeOutRefusalSerial || InA.LastTakeOutRefusal != InB.LastTakeOutRefusal)
+        { return false; }
+
+        for (int32 Index = 0; Index < InA.Pieces.Num(); ++Index)
+        {
+            const auto& A = InA.Pieces[Index];
+            const auto& B = InB.Pieces[Index];
+            if (A.Id.Get_IsSame(B.Id) == false || A.Piece != B.Piece || A.Slot != B.Slot || A.Coat != B.Coat)
+            { return false; }
+        }
+
+        return true;
+    }
+
+    // The ledger row carrying InPieceId; -1 = none.
+    int32 Find_RowIndex(const TArray<FMars_Batter_PieceRow>& InRows, const FMars_CookingFeed_PieceId& InPieceId)
+    {
+        for (int32 Index = 0; Index < InRows.Num(); ++Index)
+        {
+            if (InRows[Index].Id.Get_IsSame(InPieceId))
+            { return Index; }
+        }
+
+        return -1;
+    }
+
+    // This machine's row carrying InPieceId; -1 = none.
+    int32 Find_LocalRowIndex(const TArray<FMars_Batter_LocalRow>& InRows, const FMars_CookingFeed_PieceId& InPieceId)
+    {
+        for (int32 Index = 0; Index < InRows.Num(); ++Index)
+        {
+            if (InRows[Index].Id.Get_IsSame(InPieceId))
+            { return Index; }
+        }
+
+        return -1;
+    }
+
+    //----------------------------------------------------------------------------------------------------------------------
+    // The dip's law (both ticks: the authority's and the follow of a copy without authority)
+    //----------------------------------------------------------------------------------------------------------------------
+
+    // A piece's offset is rewritten only past this much change (cm).
+    const float64 k_OffsetWriteTolerance = 0.01;
+
+    // Where InBowl puts a piece once it has eased: fully under while Dipped, at rest otherwise.
+    float32 Get_TargetImmersion(EMars_Batter_Bowl InBowl)
+    {
+        return InBowl == EMars_Batter_Bowl::Dipped ? 1.0f : 0.0f;
+    }
+
+    // InImmersion one frame of InDeltaSeconds further toward where InBowl puts it, over InCoat.DipSeconds (0 = at once).
+    float32 Ease_Immersion(float32 InImmersion, EMars_Batter_Bowl InBowl, const FMars_Batter_EaseStep& InStep)
+    {
+        const auto Target = Get_TargetImmersion(InBowl);
+        const auto Step = InStep.DipSeconds > 0.0f ? InStep.DeltaSeconds / InStep.DipSeconds : 1.0f;
+        return Target > InImmersion ? Math::Min(Target, InImmersion + Step) : Math::Max(Target, InImmersion - Step);
+    }
+
+    // The piece's offset under the bowl node follows its slot and immersion, written past k_OffsetWriteTolerance only. A
+    // piece on no scene node is left alone.
+    void Write_PieceOffset(const FMars_Batter_BowlSpec& InBowl, const FMars_Batter_PieceState& InPiece)
+    {
+        auto Entity = InPiece.Entity;
+        auto Node = Entity.As_SceneNode(ECk_SanityCheck::UnChecked);
+        if (ck::Is_NOT_Valid(Node))
+        { return; }
+
+        const auto Offset = Get_PieceOffset(InBowl, InPiece);
+        if ((utils_scene_node::Get_Offset(Node).GetLocation() - Offset.GetLocation()).Size() <= k_OffsetWriteTolerance)
+        { return; }
+
+        utils_scene_node::Request_UpdateOffset(Node, FCk_Request_SceneNode_UpdateRelativeTransform(Offset));
     }
 
     // The bowl takes a piece that is whole (never cut: a cut thing is not batterable) and whose food has a battered variant.
@@ -200,20 +348,49 @@ mixin FMars_Batter_Spec Get_Spec(const FCk_Handle_Batter& Self)
     return Self.Get_Fragment(FMars_Fragment_Batter_Params).Spec;
 }
 
+// The replicated ledger as this machine has it: what a machine without authority reads the bowl through.
+mixin FMars_Fragment_Batter_Net Get_Ledger(const FCk_Handle_Batter& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_Batter_Net);
+}
+
+// Without authority the getters below read the replicated ledger (and this machine's own rows): the live state is the
+// authority's.
+mixin bool Get_ReadsLedger(const FCk_Handle_Batter& Self)
+{
+    return utils_net::Get_HasAuthority(Self) == false;
+}
+
 mixin EMars_Batter_Bowl Get_Bowl(const FCk_Handle_Batter& Self)
 {
+    if (Self.Get_ReadsLedger())
+    { return Self.Get_Fragment(FMars_Fragment_Batter_Net).Bowl; }
+
     return Self.Get_Fragment(FMars_Fragment_Batter).Bowl;
 }
 
 mixin int32 Get_PieceCount(const FCk_Handle_Batter& Self)
 {
+    if (Self.Get_ReadsLedger())
+    { return Self.Get_Fragment(FMars_Fragment_Batter_Net).Pieces.Num(); }
+
     return Self.Get_Fragment(FMars_Fragment_Batter).Pieces.Num();
 }
 
-// Pieces fully coated (what a take-out would hand back).
+// Pieces fully coated (what a take-out would hand back; without authority, every row whose coat reads 1).
 mixin int32 Get_CoatedCount(const FCk_Handle_Batter& Self)
 {
-    return utils_batter::Get_Takeable(Self.Get_Fragment(FMars_Fragment_Batter).Pieces).Num();
+    if (Self.Get_ReadsLedger() == false)
+    { return utils_batter::Get_Takeable(Self.Get_Fragment(FMars_Fragment_Batter).Pieces).Num(); }
+
+    auto Count = 0;
+    for (const auto& Row : Self.Get_Fragment(FMars_Fragment_Batter_Net).Pieces)
+    {
+        if (Row.Coat >= 1.0f)
+        { ++Count; }
+    }
+
+    return Count;
 }
 
 mixin bool Get_HasRoom(const FCk_Handle_Batter& Self)
@@ -247,6 +424,14 @@ mixin FTransform Get_BowlWorld(const FCk_Handle_Batter& Self)
 mixin TArray<FMars_CookingFeed_PieceId> Get_PieceIds(const FCk_Handle_Batter& Self)
 {
     TArray<FMars_CookingFeed_PieceId> Ids;
+    if (Self.Get_ReadsLedger())
+    {
+        for (const auto& Row : Self.Get_Fragment(FMars_Fragment_Batter_Net).Pieces)
+        { Ids.Add(Row.Id); }
+
+        return Ids;
+    }
+
     for (const auto& Piece : Self.Get_Fragment(FMars_Fragment_Batter).Pieces)
     { Ids.Add(Piece.Id); }
 
@@ -255,12 +440,20 @@ mixin TArray<FMars_CookingFeed_PieceId> Get_PieceIds(const FCk_Handle_Batter& Se
 
 mixin bool Get_HasPiece(const FCk_Handle_Batter& Self, const FMars_CookingFeed_PieceId& InPieceId)
 {
+    if (Self.Get_ReadsLedger())
+    { return utils_batter::Find_RowIndex(Self.Get_Fragment(FMars_Fragment_Batter_Net).Pieces, InPieceId) >= 0; }
+
     return utils_batter::Find_PieceIndex(Self.Get_Fragment(FMars_Fragment_Batter).Pieces, InPieceId) >= 0;
 }
 
-// A copy of the piece's state; an unknown Id ensures and answers a default state.
+// A copy of the piece's state; an unknown Id ensures and answers a default state. Without authority it is built from the
+// ledger's row (its coat a tenth behind at most, its stage the one that coat gives) and this machine's own immersion (0
+// while this machine has no row for it); its Piece and Entity are the row's handle, invalid while it has not replicated.
 mixin FMars_Batter_PieceState Get_PieceState(const FCk_Handle_Batter& Self, const FMars_CookingFeed_PieceId& InPieceId)
 {
+    if (Self.Get_ReadsLedger())
+    { return Self.Get_LedgerPieceState(InPieceId); }
+
     const auto& Pieces = Self.Get_Fragment(FMars_Fragment_Batter).Pieces;
     const auto Index = utils_batter::Find_PieceIndex(Pieces, InPieceId);
     if (ck::EnsureIfNot(Index >= 0,
@@ -268,6 +461,33 @@ mixin FMars_Batter_PieceState Get_PieceState(const FCk_Handle_Batter& Self, cons
     { return FMars_Batter_PieceState(); }
 
     return Pieces[Index];
+}
+
+mixin FMars_Batter_PieceState Get_LedgerPieceState(const FCk_Handle_Batter& Self, const FMars_CookingFeed_PieceId& InPieceId)
+{
+    const auto& Rows = Self.Get_Fragment(FMars_Fragment_Batter_Net).Pieces;
+    const auto Index = utils_batter::Find_RowIndex(Rows, InPieceId);
+    if (ck::EnsureIfNot(Index >= 0,
+        f"[Batter] [{Self.ToString()}] has no piece {utils_cooking_feed::Get_PieceName(InPieceId)} in its ledger ({Rows.Num()} in the bowl)"))
+    { return FMars_Batter_PieceState(); }
+
+    const auto Row = Rows[Index];
+    auto State = FMars_Batter_PieceState();
+    State.Id = Row.Id;
+    State.Entity = Row.Piece;
+    if (ck::IsValid(Row.Piece))
+    { State.Piece = Row.Piece.As_FoodPiece(ECk_SanityCheck::UnChecked); }
+
+    State.Slot = Row.Slot;
+    State.Coat = Row.Coat;
+    State.Stage = utils_batter::Get_CoatStage(Row.Coat);
+
+    const auto& LocalRows = Self.Get_Fragment(FMars_Fragment_Batter_Local).Rows;
+    const auto LocalIndex = utils_batter::Find_LocalRowIndex(LocalRows, InPieceId);
+    if (LocalIndex >= 0)
+    { State.Immersion = LocalRows[LocalIndex].Immersion; }
+
+    return State;
 }
 
 mixin float32 Get_PieceCoat(const FCk_Handle_Batter& Self, const FMars_CookingFeed_PieceId& InPieceId)

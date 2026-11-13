@@ -32,6 +32,11 @@ struct FMars_Batter_DrainEdges
 // readopted piece, then every admission answer on the station's OnAdmission (and OnPieceAdded or OnAdmissionRefused) are
 // broadcast last. The drain decides and the Tick moves: nothing here integrates over time.
 //
+// Only the authority's bowl applies requests. It publishes the ledger once after its last apply and before it broadcasts,
+// with every refusal it announced. A copy without authority still arms the station's queue watch and takes the station's
+// inbox and take-outs, then drops them with its own requests: what it shows comes from the ledger (the Tick's follow and
+// the mirror).
+//
 // A piece is the bowl's guest: the kernel creates no entity, and a piece it holds ends only with a Reset or with the station
 // (OnBatterBeginDestroy). The bowl is the one owner of its pieces' lease facts: it stamps every piece it takes on with the
 // holder fact and its pickup's Ledger claim, removes the holder when it hands the piece back, and releases the claim when the
@@ -66,6 +71,9 @@ class UMars_Processor_Batter_HandleRequests : UCk_Processor_Script_Base_UE
         TArray<FMars_CookingFeed_Release> Inbox = utils_cooking_feed::Take_Inbox(InHandle);
         TArray<FMars_Request_StationTakeOut> TakeOuts = utils_cooking_feed::Take_TakeOutRequests(InHandle);
 
+        if (utils_net::Get_HasAuthority(InHandle) == false)
+        { return; }
+
         auto Edges = FMars_Batter_DrainEdges();
         Edges.StartBowl = InState.Bowl;
 
@@ -91,7 +99,22 @@ class UMars_Processor_Batter_HandleRequests : UCk_Processor_Script_Base_UE
         if (HasDip)
         { InState.Bowl = EMars_Batter_Bowl::Dipped; }
 
+        utils_batter::Publish(Self, Get_Answers(Edges));
         Broadcast(Self, InState, Edges);
+    }
+
+    // Every refusal this drain will broadcast, for the ledger's serials.
+    private FMars_Batter_Answers Get_Answers(const FMars_Batter_DrainEdges& InEdges) const
+    {
+        auto Answers = FMars_Batter_Answers();
+        Answers.TakeOutRefusals = InEdges.TakeOutRefusals;
+        for (const auto& Result : InEdges.Admissions)
+        {
+            if (Result.Admission != EMars_CookingFeed_Admission::Accepted)
+            { Answers.AdmissionRefusals.Add(Result.Refusal); }
+        }
+
+        return Answers;
     }
 
     private void Broadcast(FCk_Handle_Batter& InBatter, const FMars_Fragment_Batter& InState, const FMars_Batter_DrainEdges& InEdges)
