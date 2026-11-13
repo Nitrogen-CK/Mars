@@ -10,6 +10,10 @@
 //                                                 TumblerFeed_OperatorInput (Tick), StationFeed_OperatorHints,
 //                                                 Tumbler_OperatorHints, StationFeed_TakeOutInput (Tick)
 //
+// Stance: the input tasks read the operator on the authority alone (the station's InputStance), so a remote operator's
+// look, use, add-food and take-out arrive in its input stream there; the operator's own machine shows the hand, the drum and
+// the use row from the ledgers.
+//
 // A piece the drum hands back lands on the finished tray through the kernel's own landing, whoever operates. The
 // conditions are the shared station ones (Mars_Station_SmConditions.as). The player's Operating state owns the pose, the
 // camera (Captured: the view stays still, the look delta is ours), the glove grips and the Leave intent.

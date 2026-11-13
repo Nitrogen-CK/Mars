@@ -25,6 +25,15 @@ namespace utils_tumbler
     // A reseated piece goes back in line with where it escaped along the axle, at most this fraction of the baffles' half
     // length from the middle.
     const float32 k_ReseatAxialFraction = 0.8f;
+    // The kernel's ledger carries a coverage floored to one of this many steps per unit.
+    const int32 k_LedgerSteps = 10;
+    // The motion ledger is written once the axle's alpha moved this much, the hand this far (cm) or turned past
+    // k_HandWriteTolerance, and this long passed since it was last written: a rocking drum sends a paced stream.
+    const float32 k_MotionAlphaStep = 0.002f;
+    const float64 k_MotionHandStepCm = 0.1;
+    const float32 k_MotionIntervalSeconds = 1.0f / 30.0f;
+    // The hand node's offset is rewritten only past this much change (cm, and unit-axis distance for the rotation).
+    const float64 k_HandWriteTolerance = 0.01;
 
     // Composes the minigame on InStation (the station entity, which carries the root transform) and makes the station a
     // receiver: its admission inbox and its take-out readout. The spec's Nodes are built by the caller (the shell with
@@ -78,6 +87,26 @@ namespace utils_tumbler
         InStation.Add_Fragment(FMars_Fragment_Tumbler_Requests());
         utils_cooking_feed::Add_Admission(InStation);
         utils_cooking_feed::Add_TakeOut(InStation);
+
+        // A copy without authority can receive either ledger before it composes: what arrived stands then. A motion ledger
+        // composed here starts where this copy's drum and hand start, the authority's own starting pose.
+        if (InStation.Has_Fragment(FMars_Fragment_Tumbler_Net) == false)
+        { InStation.Add_Fragment(FMars_Fragment_Tumbler_Net(), ECk_Replication::Replicates); }
+
+        if (InStation.Has_Fragment(FMars_Fragment_Tumbler_MotionNet) == false)
+        {
+            auto Motion = FMars_Fragment_Tumbler_MotionNet();
+            Motion.DrumAlpha = Drum.Get_Alpha();
+            Motion.HandLocal = State.Hand.HandLocal;
+            Motion.HandRotationLocal = State.Hand.HandRotationLocal;
+            InStation.Add_Fragment(Motion, ECk_Replication::Replicates);
+        }
+
+        auto Local = FMars_Fragment_Tumbler_Local();
+        Local.Last = TOptional<FMars_Fragment_Tumbler_Net>(InStation.Get_Fragment(FMars_Fragment_Tumbler_Net));
+        Local.ShownDrumAlpha = InStation.Get_Fragment(FMars_Fragment_Tumbler_MotionNet).DrumAlpha;
+        InStation.Add_Fragment(Local);
+        InStation.Add_Fragment(FMars_Tag_Tumbler_NeedsMirror());
 
         return InStation.As_Tumbler();
     }
@@ -280,6 +309,159 @@ namespace utils_tumbler
         return Takeable;
     }
 
+    //----------------------------------------------------------------------------------------------------------------------
+    // Replication
+    //----------------------------------------------------------------------------------------------------------------------
+
+    // The kernel's ledger a machine without authority reads it through, rebuilt from the live state and what the caller
+    // announced: written and marked dirty only when a field or a row differs. Called only by the kernel's processors on the
+    // authority: by the drain once after its last apply and by the tick after the hand's write, each before its broadcast.
+    void Publish(FCk_Handle_Tumbler& InTumbler, const FMars_Tumbler_Answers& InAnswers)
+    {
+        const auto State = InTumbler.Get_Fragment(FMars_Fragment_Tumbler);
+        const auto Ledger = InTumbler.Get_Fragment(FMars_Fragment_Tumbler_Net);
+        auto Next = Ledger;
+        Next.HandMode = State.Hand.Mode;
+        Next.Hovered = State.Hovered;
+        Next.Hatch = State.Hatch;
+        Next.Drum = State.Drum;
+        Next.Reseats = State.Reseats;
+        Next.Pieces.Empty();
+        for (const auto& Piece : State.Pieces)
+        { Next.Pieces.Add(Make_PieceRow(Piece)); }
+
+        if (InAnswers.PressRefusals.Num() > 0)
+        {
+            Next.PressRefusalSerial += InAnswers.PressRefusals.Num();
+            Next.LastPressRefusal = InAnswers.PressRefusals.Last();
+        }
+
+        if (InAnswers.TakeOutRefusals.Num() > 0)
+        {
+            Next.TakeOutRefusalSerial += InAnswers.TakeOutRefusals.Num();
+            Next.LastTakeOutRefusal = InAnswers.TakeOutRefusals.Last();
+        }
+
+        if (Get_IsSameLedger(Next, Ledger))
+        { return; }
+
+        InTumbler.Get_Fragment(FMars_Fragment_Tumbler_Net) = Next;
+        FCk_Handle Entity = InTumbler;
+        Entity.Request_MarkReplicationDirty(FMars_Fragment_Tumbler_Net);
+    }
+
+    // The motion ledger from the axle Mover's alpha and InState's hand pose. Paced: written once the alpha moved
+    // k_MotionAlphaStep, the hand k_MotionHandStepCm or it turned past k_HandWriteTolerance, and k_MotionIntervalSeconds
+    // passed since the last write (the tick advances that clock). AtOnce: written whenever anything differs. Called only by
+    // the tick on the authority, after the kernel's ledger and before its broadcast.
+    void Publish_Motion(FCk_Handle_Tumbler& InTumbler, const FMars_Fragment_Tumbler& InState, EMars_Tumbler_MotionWrite InWrite)
+    {
+        const auto Ledger = InTumbler.Get_Fragment(FMars_Fragment_Tumbler_MotionNet);
+        const auto Seconds = InTumbler.Get_Fragment(FMars_Fragment_Tumbler_Local).SecondsSinceMotion;
+        const auto Alpha = InTumbler.Get_Spec().Nodes.Lever.Get_Mover().Get_Alpha();
+        const auto& Hand = InState.Hand;
+
+        auto IsDue = false;
+        if (InWrite == EMars_Tumbler_MotionWrite::AtOnce)
+        {
+            IsDue = Alpha != Ledger.DrumAlpha || Hand.HandLocal != Ledger.HandLocal
+                || Get_IsTurned(Hand.HandRotationLocal, Ledger.HandRotationLocal);
+        }
+        else
+        {
+            const auto IsMoved = Math::Abs(Alpha - Ledger.DrumAlpha) >= k_MotionAlphaStep
+                || (Hand.HandLocal - Ledger.HandLocal).Size() >= k_MotionHandStepCm
+                || Get_IsTurned(Hand.HandRotationLocal, Ledger.HandRotationLocal);
+            IsDue = IsMoved && Seconds >= k_MotionIntervalSeconds;
+        }
+
+        if (IsDue == false)
+        { return; }
+
+        auto Next = FMars_Fragment_Tumbler_MotionNet();
+        Next.DrumAlpha = Alpha;
+        Next.HandLocal = Hand.HandLocal;
+        Next.HandRotationLocal = Hand.HandRotationLocal;
+        InTumbler.Get_Fragment(FMars_Fragment_Tumbler_MotionNet) = Next;
+        InTumbler.Get_Fragment(FMars_Fragment_Tumbler_Local).SecondsSinceMotion = 0.0f;
+        FCk_Handle Entity = InTumbler;
+        Entity.Request_MarkReplicationDirty(FMars_Fragment_Tumbler_MotionNet);
+    }
+
+    // InA's forward or up axis is more than k_HandWriteTolerance from InB's.
+    bool Get_IsTurned(FQuat InA, FQuat InB)
+    {
+        return (InA.GetForwardVector() - InB.GetForwardVector()).Size() > k_HandWriteTolerance
+            || (InA.GetUpVector() - InB.GetUpVector()).Size() > k_HandWriteTolerance;
+    }
+
+    // A piece as the ledger carries it: its coverage floored to a tenth (a client reads up to a tenth behind, never ahead;
+    // exactly 1 stays exact).
+    FMars_Tumbler_PieceRow Make_PieceRow(const FMars_Tumbler_PieceState& InPiece)
+    {
+        auto Row = FMars_Tumbler_PieceRow();
+        Row.Id = InPiece.Id;
+        Row.Piece = InPiece.Entity;
+        Row.Coverage = float32(Math::FloorToInt(InPiece.Coverage * float32(k_LedgerSteps))) / float32(k_LedgerSteps);
+        return Row;
+    }
+
+    // The ledger row carrying InPieceId; unset = none.
+    TOptional<int32> Find_RowIndex(const TArray<FMars_Tumbler_PieceRow>& InRows, const FMars_CookingFeed_PieceId& InPieceId)
+    {
+        for (int32 Index = 0; Index < InRows.Num(); ++Index)
+        {
+            if (InRows[Index].Id.Get_IsSame(InPieceId))
+            { return TOptional<int32>(Index); }
+        }
+
+        return TOptional<int32>();
+    }
+
+    // The state the kernel's rules (Get_CanToggleHatch, Get_CanGrip, TryGet_LoadRefusal) read, built from InLedger: its
+    // mode, hovered target, hatch, drum and one piece entry per row (its id, coverage and handle; no body).
+    FMars_Fragment_Tumbler Make_LedgerState(const FMars_Fragment_Tumbler_Net& InLedger)
+    {
+        auto State = FMars_Fragment_Tumbler();
+        State.Hand.Mode = InLedger.HandMode;
+        State.Hovered = InLedger.Hovered;
+        State.Hatch = InLedger.Hatch;
+        State.Drum = InLedger.Drum;
+        State.Reseats = InLedger.Reseats;
+        for (const auto& Row : InLedger.Pieces)
+        {
+            auto Piece = FMars_Tumbler_PieceState();
+            Piece.Id = Row.Id;
+            Piece.Entity = Row.Piece;
+            Piece.Coverage = Row.Coverage;
+            if (ck::IsValid(Row.Piece))
+            { Piece.Piece = Row.Piece.As_FoodPiece(ECk_SanityCheck::UnChecked); }
+
+            State.Pieces.Add(Piece);
+        }
+
+        return State;
+    }
+
+    bool Get_IsSameLedger(const FMars_Fragment_Tumbler_Net& InA, const FMars_Fragment_Tumbler_Net& InB)
+    {
+        if (InA.HandMode != InB.HandMode || InA.Hovered != InB.Hovered || InA.Hatch != InB.Hatch || InA.Drum != InB.Drum
+            || InA.Reseats != InB.Reseats || InA.Pieces.Num() != InB.Pieces.Num()
+            || InA.PressRefusalSerial != InB.PressRefusalSerial || InA.LastPressRefusal != InB.LastPressRefusal
+            || InA.TakeOutRefusalSerial != InB.TakeOutRefusalSerial || InA.LastTakeOutRefusal != InB.LastTakeOutRefusal)
+        { return false; }
+
+        for (int32 Index = 0; Index < InA.Pieces.Num(); ++Index)
+        {
+            const auto& RowA = InA.Pieces[Index];
+            const auto& RowB = InB.Pieces[Index];
+            if (RowA.Id.Get_IsSame(RowB.Id) == false || RowA.Piece != RowB.Piece || RowA.Coverage != RowB.Coverage)
+            { return false; }
+        }
+
+        return true;
+    }
+
     // The station's feed's phase (Idle without a feed): anything but Idle is a transfer in flight.
     EMars_CookingFeed_Phase Get_FeedPhase(const FCk_Handle& InStation)
     {
@@ -417,68 +599,124 @@ mixin FMars_Tumbler_Spec Get_Spec(const FCk_Handle_Tumbler& Self)
     return Self.Get_Fragment(FMars_Fragment_Tumbler_Params).Spec;
 }
 
+// The kernel's replicated ledger as this machine has it: what a machine without authority reads the kernel through.
+mixin FMars_Fragment_Tumbler_Net Get_Ledger(const FCk_Handle_Tumbler& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_Tumbler_Net);
+}
+
+// The authority's motion (the axle's alpha and the hand's pose) as this machine has it.
+mixin FMars_Fragment_Tumbler_MotionNet Get_MotionLedger(const FCk_Handle_Tumbler& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_Tumbler_MotionNet);
+}
+
+// Whether this machine reads the kernel through its ledgers (it has no authority over the station).
+mixin bool Get_ReadsLedger(const FCk_Handle_Tumbler& Self)
+{
+    return utils_net::Get_HasAuthority(Self) == false;
+}
+
+// What the kernel's rules read: the live state with authority, else the state built from the kernel's ledger.
+mixin FMars_Fragment_Tumbler Get_RuleState(const FCk_Handle_Tumbler& Self)
+{
+    if (Self.Get_ReadsLedger())
+    { return utils_tumbler::Make_LedgerState(Self.Get_Fragment(FMars_Fragment_Tumbler_Net)); }
+
+    return Self.Get_Fragment(FMars_Fragment_Tumbler);
+}
+
 mixin EMars_Tumbler_HandMode Get_HandMode(const FCk_Handle_Tumbler& Self)
 {
+    if (Self.Get_ReadsLedger())
+    { return Self.Get_Fragment(FMars_Fragment_Tumbler_Net).HandMode; }
+
     return Self.Get_Fragment(FMars_Fragment_Tumbler).Hand.Mode;
 }
 
-// Station frame.
+// Station frame; without authority, as the motion ledger last carried it.
 mixin FVector Get_HandLocal(const FCk_Handle_Tumbler& Self)
 {
+    if (Self.Get_ReadsLedger())
+    { return Self.Get_Fragment(FMars_Fragment_Tumbler_MotionNet).HandLocal; }
+
     return Self.Get_Fragment(FMars_Fragment_Tumbler).Hand.HandLocal;
 }
 
-// (Y, Z) on the reach plane relative to the workspace centre, clamped to the half extents.
+// (Y, Z) on the reach plane relative to the workspace centre, clamped to the half extents. The authority's alone: zero
+// without authority.
 mixin FVector2D Get_Cursor(const FCk_Handle_Tumbler& Self)
 {
+    if (Self.Get_ReadsLedger())
+    { return FVector2D::ZeroVector; }
+
     return Self.Get_Fragment(FMars_Fragment_Tumbler).Hand.Cursor;
 }
 
 mixin EMars_Tumbler_Target Get_Hovered(const FCk_Handle_Tumbler& Self)
 {
+    if (Self.Get_ReadsLedger())
+    { return Self.Get_Fragment(FMars_Fragment_Tumbler_Net).Hovered; }
+
     return Self.Get_Fragment(FMars_Fragment_Tumbler).Hovered;
 }
 
 mixin EMars_Tumbler_Hatch Get_Hatch(const FCk_Handle_Tumbler& Self)
 {
+    if (Self.Get_ReadsLedger())
+    { return Self.Get_Fragment(FMars_Fragment_Tumbler_Net).Hatch; }
+
     return Self.Get_Fragment(FMars_Fragment_Tumbler).Hatch;
 }
 
 mixin EMars_Tumbler_Drum Get_Drum(const FCk_Handle_Tumbler& Self)
 {
+    if (Self.Get_ReadsLedger())
+    { return Self.Get_Fragment(FMars_Fragment_Tumbler_Net).Drum; }
+
     return Self.Get_Fragment(FMars_Fragment_Tumbler).Drum;
 }
 
+// Without authority, the motion ledger's alpha times the spec's arc.
 mixin float32 Get_DrumDegrees(const FCk_Handle_Tumbler& Self)
 {
+    if (Self.Get_ReadsLedger())
+    { return Self.Get_Fragment(FMars_Fragment_Tumbler_MotionNet).DrumAlpha * Self.Get_Spec().Drum.ArcDegrees; }
+
     return Self.Get_Fragment(FMars_Fragment_Tumbler).DrumDegrees;
 }
 
 mixin int32 Get_PieceCount(const FCk_Handle_Tumbler& Self)
 {
+    if (Self.Get_ReadsLedger())
+    { return Self.Get_Fragment(FMars_Fragment_Tumbler_Net).Pieces.Num(); }
+
     return Self.Get_Fragment(FMars_Fragment_Tumbler).Pieces.Num();
 }
 
 // Escaped pieces put back since the last Reset.
 mixin int32 Get_Reseats(const FCk_Handle_Tumbler& Self)
 {
+    if (Self.Get_ReadsLedger())
+    { return Self.Get_Fragment(FMars_Fragment_Tumbler_Net).Reseats; }
+
     return Self.Get_Fragment(FMars_Fragment_Tumbler).Reseats;
 }
 
 mixin bool Get_CanToggleHatch(const FCk_Handle_Tumbler& Self)
 {
-    return utils_tumbler::Get_CanToggleHatch(Self.Get_Fragment(FMars_Fragment_Tumbler), utils_tumbler::Get_FeedPhase(Self));
+    return utils_tumbler::Get_CanToggleHatch(Self.Get_RuleState(), utils_tumbler::Get_FeedPhase(Self));
 }
 
 mixin bool Get_CanGrip(const FCk_Handle_Tumbler& Self)
 {
-    return utils_tumbler::Get_CanGrip(Self.Get_Fragment(FMars_Fragment_Tumbler), utils_tumbler::Get_FeedPhase(Self));
+    return utils_tumbler::Get_CanGrip(Self.Get_RuleState(), utils_tumbler::Get_FeedPhase(Self));
 }
 
 // Why the add-food press would not load a piece now; unset when it would.
 mixin TOptional<EMars_Tumbler_LoadRefusal> TryGet_LoadRefusal(const FCk_Handle_Tumbler& Self)
 {
-    return utils_tumbler::TryGet_LoadRefusal(Self.Get_Fragment(FMars_Fragment_Tumbler), utils_tumbler::Get_FeedPhase(Self), Self.Get_Spec().Drum.Capacity);
+    return utils_tumbler::TryGet_LoadRefusal(Self.Get_RuleState(), utils_tumbler::Get_FeedPhase(Self), Self.Get_Spec().Drum.Capacity);
 }
 
 // The station root's world transform (the station frame).
@@ -501,6 +739,14 @@ mixin FTransform Get_AxleWorld(const FCk_Handle_Tumbler& Self)
 mixin TArray<FMars_CookingFeed_PieceId> Get_PieceIds(const FCk_Handle_Tumbler& Self)
 {
     TArray<FMars_CookingFeed_PieceId> Ids;
+    if (Self.Get_ReadsLedger())
+    {
+        for (const auto& Row : Self.Get_Fragment(FMars_Fragment_Tumbler_Net).Pieces)
+        { Ids.Add(Row.Id); }
+
+        return Ids;
+    }
+
     for (const auto& Piece : Self.Get_Fragment(FMars_Fragment_Tumbler).Pieces)
     { Ids.Add(Piece.Id); }
 
@@ -509,12 +755,36 @@ mixin TArray<FMars_CookingFeed_PieceId> Get_PieceIds(const FCk_Handle_Tumbler& S
 
 mixin bool Get_HasPiece(const FCk_Handle_Tumbler& Self, const FMars_CookingFeed_PieceId& InPieceId)
 {
+    if (Self.Get_ReadsLedger())
+    { return utils_tumbler::Find_RowIndex(Self.Get_Fragment(FMars_Fragment_Tumbler_Net).Pieces, InPieceId).IsSet(); }
+
     return utils_tumbler::Find_PieceIndex(Self.Get_Fragment(FMars_Fragment_Tumbler).Pieces, InPieceId).IsSet();
 }
 
-// A copy of the piece's state; an unknown Id ensures and answers a default state.
+// A copy of the piece's state; an unknown Id ensures and answers a default state. Without authority it is built from the
+// ledger's row: its id and coverage (a tenth behind at most), its Entity and Piece the row's handle (invalid while it has
+// not replicated here), no body.
 mixin FMars_Tumbler_PieceState Get_PieceState(const FCk_Handle_Tumbler& Self, const FMars_CookingFeed_PieceId& InPieceId)
 {
+    if (Self.Get_ReadsLedger())
+    {
+        const auto& Rows = Self.Get_Fragment(FMars_Fragment_Tumbler_Net).Pieces;
+        const auto RowIndex = utils_tumbler::Find_RowIndex(Rows, InPieceId);
+        if (ck::EnsureIfNot(RowIndex.IsSet(),
+            f"[Tumbler] [{Self.ToString()}] has no piece {utils_cooking_feed::Get_PieceName(InPieceId)} in its ledger ({Rows.Num()} in the drum)"))
+        { return FMars_Tumbler_PieceState(); }
+
+        const auto Row = Rows[RowIndex.GetValue()];
+        auto State = FMars_Tumbler_PieceState();
+        State.Id = Row.Id;
+        State.Entity = Row.Piece;
+        State.Coverage = Row.Coverage;
+        if (ck::IsValid(Row.Piece))
+        { State.Piece = Row.Piece.As_FoodPiece(ECk_SanityCheck::UnChecked); }
+
+        return State;
+    }
+
     const auto& Pieces = Self.Get_Fragment(FMars_Fragment_Tumbler).Pieces;
     const auto Index = utils_tumbler::Find_PieceIndex(Pieces, InPieceId);
     if (ck::EnsureIfNot(Index.IsSet(),
@@ -534,11 +804,15 @@ mixin FCk_Handle_FoodPiece Get_PieceHandle(const FCk_Handle_Tumbler& Self, const
     return Self.Get_PieceState(InPieceId).Piece;
 }
 
-// The piece's cook state as a take-out would hand it back now: its coverage so far as its crumb.
+// The piece's cook state as a take-out would hand it back now: its coverage so far as its crumb. Without authority a row's
+// piece that is not a live food piece here yet (or any more) answers a default cook state with that crumb.
 mixin FMars_FoodPiece_CookState Get_PieceCookState(const FCk_Handle_Tumbler& Self, const FMars_CookingFeed_PieceId& InPieceId)
 {
     const auto Piece = Self.Get_PieceState(InPieceId);
-    auto CookState = Piece.Piece.Get_CookState();
+    auto CookState = FMars_FoodPiece_CookState();
+    if (Self.Get_ReadsLedger() == false || (utils_foodpiece::Get_IsLiveEntity(Piece.Entity) && Piece.Entity.Is_FoodPiece()))
+    { CookState = Piece.Piece.Get_CookState(); }
+
     CookState.Crumb = Piece.Coverage;
     return CookState;
 }

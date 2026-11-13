@@ -14,8 +14,12 @@
 // pan every frame (its roll, its lift, its node's location). The Fry branch spawns the real fry station with the test's
 // exposed Fry spec (ready once its scoop and basket bodies are in the simulation on the server), records the kernel's
 // signals and samples the scoop every frame (its root-frame location, the skim, the first row's face heats); its report also
-// carries a root-frame target and a scoop location. One [BatterNetTest], [SearingNetTest] or [FryNetTest] line per test per
-// machine. The Tumbler branch is not built; it ensures.
+// carries a root-frame target and a scoop location. The Tumbler branch spawns the real tumbler station with the test's
+// exposed Tumbler spec (ready once its drum body is in the simulation on the server), records the kernel's signals and
+// samples its Movers every frame (the axle's alpha, target, tween and rest, the hinge's alpha and rest, the hand node's
+// offset, the first row's coverage); its remote rows add Use, and it points the cursor and rocks the lever, on the server's
+// own kernel or in the operator's stream. One [BatterNetTest], [SearingNetTest], [FryNetTest] or [TumblerNetTest] line per
+// test per machine.
 
 namespace constants_heat_station_net_autotest
 {
@@ -26,6 +30,13 @@ namespace constants_heat_station_net_autotest
     // Where the rig's loose foods lie, beside the platter (away from the station's counter), k_FoodSpacingCm apart in X.
     const FVector k_FoodLocal = FVector(-90.0, -150.0, 5.0);
     const float64 k_FoodSpacingCm = 90.0;
+    // What a pointing look took on the sender.
+    const float32 k_PointLookSeconds = 0.1f;
+    // Where a look away puts the tumbler's cursor, as a share of the reach's half extents (down and to the left).
+    const float64 k_AwayCursorShare = 0.6;
+    // The server's axle is still once its alpha moved less than this between the first polls of this many frames in a row.
+    const float32 k_StillAlpha = 0.0005f;
+    const int32 k_StillFrames = 10;
 }
 
 enum EMars_TESTONLY_HeatStation
@@ -100,6 +111,42 @@ struct FMars_TESTONLY_NetHeatScoopSample
     TArray<float32> FirstRowHeat;
 }
 
+// One frame of this machine's tumbler Movers and hand node, as the sampler read it.
+struct FMars_TESTONLY_NetHeatMoverSample
+{
+    int32 Step = 0;
+    int64 Frame = 0;
+    float64 Seconds = 0.0;
+    float32 AxleAlpha = 0.0f;
+    EMars_Mover_Pose AxleTarget = EMars_Mover_Pose::Start;
+    bool AxleTweening = false;
+    bool AxleResting = false;
+    // This machine's lever Control holds a manipulation (only the authority's should).
+    bool LeverManipulating = false;
+    float32 HingeAlpha = 0.0f;
+    bool HingeResting = false;
+    FVector HandOffset = FVector::ZeroVector;
+    // The first ledger row's coverage on this machine; -1 without a row.
+    float32 FirstCoverage = -1.0f;
+}
+
+// How the rig sends a look at the tumbler: on the server's own copy of the kernel, or in the remote operator's stream.
+enum EMars_TESTONLY_NetTumblerLook
+{
+    Kernel,
+    Remote
+}
+
+// The rig's rocking loop: Seconds of one look a frame of Degrees along the lever's pull, its sign flipping every
+// HalfCycleFrames frames (0: never).
+struct FMars_TESTONLY_NetTumblerRock
+{
+    float32 Seconds = 1.0f;
+    float64 Degrees = 0.5;
+    int32 HalfCycleFrames = 0;
+    EMars_TESTONLY_NetTumblerLook Look = EMars_TESTONLY_NetTumblerLook::Kernel;
+}
+
 // One frame of this machine's pan, as the sampler read it.
 struct FMars_TESTONLY_NetHeatPanSample
 {
@@ -163,6 +210,19 @@ class UMars_AutoTestRig_NetHeatStation : UMars_AutoTestRig_NetFeedStation
     // Every sampled frame of this machine's scoop since it was found.
     protected TArray<FMars_TESTONLY_NetHeatScoopSample> _ScoopSamples;
 
+    // This machine's copy of the tumbler's kernel, once found, and every signal it raised since (or since
+    // Clear_TumblerRecord).
+    protected FCk_Handle_Tumbler _Tumbler;
+    protected TArray<EMars_Tumbler_Hatch> _HatchChanges;
+    protected TArray<EMars_Tumbler_Target> _HoverChanges;
+    protected TArray<EMars_Tumbler_Drum> _DrumChanges;
+    protected TArray<EMars_Tumbler_HandMode> _HandModeChanges;
+    protected TArray<EMars_Tumbler_Refusal> _PressRefusals;
+    protected TArray<EMars_CookingFeed_TakeOutRefusal> _TumblerTakeOutRefusals;
+    protected TArray<FMars_CookingFeed_PieceId> _TumblerAddedIds;
+    // Every sampled frame of this machine's tumbler since it was found.
+    protected TArray<FMars_TESTONLY_NetHeatMoverSample> _MoverSamples;
+
     // Server: what the next report carries as its number, its face, its target and its scoop.
     protected float32 _ReportValue = 0.0f;
     protected int32 _ReportFace = -1;
@@ -200,6 +260,21 @@ class UMars_AutoTestRig_NetHeatStation : UMars_AutoTestRig_NetFeedStation
     private float64 _LastPanSampleSeconds = -1.0;
     private TArray<FCk_Handle_FoodPiece> _BatterPieces;
     private FName _BatterContinuation;
+    private TArray<FCk_Handle_FoodPiece> _CrumbPieces;
+    private float32 _Crumb = 0.0f;
+    private FName _CrumbContinuation;
+    private FMars_TESTONLY_NetTumblerRock _TumblerRock;
+    private FName _RockContinuation;
+    private float64 _RockStartSeconds = 0.0;
+    private float64 _RockLastSeconds = 0.0;
+    private int32 _RockFrames = 0;
+    private EMars_Tumbler_Target _PointTarget = EMars_Tumbler_Target::None;
+    private EMars_TESTONLY_NetTumblerLook _LookRoute = EMars_TESTONLY_NetTumblerLook::Kernel;
+    private FName _PointContinuation;
+    private FName _StillContinuation;
+    private int32 _StillFrames = 0;
+    private int64 _StillFrame = -1;
+    private float32 _StillAlpha = -1.0f;
 
     //----------------------------------------------------------------------------------------------------------------------
     // Hooks
@@ -228,6 +303,12 @@ class UMars_AutoTestRig_NetHeatStation : UMars_AutoTestRig_NetFeedStation
     protected FMars_Fry_Spec Make_FrySpec() const
     {
         return FMars_Fry_Spec();
+    }
+
+    // The tumbler station's exposed spec.
+    protected FMars_Tumbler_Spec Make_TumblerSpec() const
+    {
+        return FMars_Tumbler_Spec();
     }
 
     // Every sampled frame, once this machine found its heat station.
@@ -260,13 +341,10 @@ class UMars_AutoTestRig_NetHeatStation : UMars_AutoTestRig_NetFeedStation
         if (Get_HeatStation() == EMars_TESTONLY_HeatStation::Fry)
         { return "[FryNetTest]"; }
 
-        return Get_HeatStation() == EMars_TESTONLY_HeatStation::Searing ? "[SearingNetTest]" : "[BatterNetTest]";
-    }
+        if (Get_HeatStation() == EMars_TESTONLY_HeatStation::Tumbler)
+        { return "[TumblerNetTest]"; }
 
-    // The Batter, Searing and Fry branches are built.
-    private bool Get_IsBuiltBranch() const
-    {
-        return Get_HeatStation() != EMars_TESTONLY_HeatStation::Tumbler;
+        return Get_HeatStation() == EMars_TESTONLY_HeatStation::Searing ? "[SearingNetTest]" : "[BatterNetTest]";
     }
 
     // Finds this machine's station (its docks and its feed composed) and its kernel, and records the kernel's signals from
@@ -279,14 +357,14 @@ class UMars_AutoTestRig_NetHeatStation : UMars_AutoTestRig_NetFeedStation
         if (Try_FindFeedStation() == false)
         { return false; }
 
-        if (ck::EnsureIfNot(Get_IsBuiltBranch(), f"[NetHeatStation] the {Get_HeatStation() :n} branch is not built yet"))
-        { return false; }
-
         if (Get_HeatStation() == EMars_TESTONLY_HeatStation::Searing)
         { return Try_FindSearing(); }
 
         if (Get_HeatStation() == EMars_TESTONLY_HeatStation::Fry)
         { return Try_FindFry(); }
+
+        if (Get_HeatStation() == EMars_TESTONLY_HeatStation::Tumbler)
+        { return Try_FindTumbler(); }
 
         if (_Station.Is_Batter() == false)
         { return false; }
@@ -338,6 +416,288 @@ class UMars_AutoTestRig_NetHeatStation : UMars_AutoTestRig_NetFeedStation
         _Fry.BindTo_OnFaceHeatStage(FMars_Delegate_Fry_OnFaceHeatStage(this, n"OnRigFaceHeatStage"));
         _Fry.BindTo_OnPieceDrained(FMars_Delegate_Fry_OnPieceDrained(this, n"OnRigPieceDrained"));
         return true;
+    }
+
+    private bool Try_FindTumbler()
+    {
+        if (_Station.Is_Tumbler() == false)
+        { return false; }
+
+        _WasHeatStationFound = true;
+        _Tumbler = _Station.As_Tumbler();
+        // A row this copy announced before the rig bound raised OnPieceAdded all the same.
+        _TumblerAddedIds.Append(Get_TumblerAnnouncedRows());
+        _Tumbler.BindTo_OnHatchChanged(FMars_Delegate_Tumbler_OnHatchChanged(this, n"OnRigHatchChanged"));
+        _Tumbler.BindTo_OnHoverChanged(FMars_Delegate_Tumbler_OnHoverChanged(this, n"OnRigHoverChanged"));
+        _Tumbler.BindTo_OnDrumChanged(FMars_Delegate_Tumbler_OnDrumChanged(this, n"OnRigDrumChanged"));
+        _Tumbler.BindTo_OnHandModeChanged(FMars_Delegate_Tumbler_OnHandModeChanged(this, n"OnRigHandModeChanged"));
+        _Tumbler.BindTo_OnPressRefused(FMars_Delegate_Tumbler_OnPressRefused(this, n"OnRigPressRefused"));
+        _Tumbler.BindTo_OnTakeOutRefused(FMars_Delegate_Tumbler_OnTakeOutRefused(this, n"OnRigTumblerTakeOutRefused"));
+        _Tumbler.BindTo_OnPieceAdded(FMars_Delegate_Tumbler_OnPieceAdded(this, n"OnRigTumblerPieceAdded"));
+        return true;
+    }
+
+    // The ledger rows a copy without authority has announced (it raised OnPieceAdded for each); none with authority.
+    protected TArray<FMars_CookingFeed_PieceId> Get_TumblerAnnouncedRows()
+    {
+        TArray<FMars_CookingFeed_PieceId> Ids;
+        if (Get_IsServer() || ck::Is_NOT_Valid(_Tumbler) || _Tumbler.Has_Fragment(FMars_Fragment_Tumbler_Local) == false)
+        { return Ids; }
+
+        return _Tumbler.Get_Fragment(FMars_Fragment_Tumbler_Local).Announced;
+    }
+
+    protected void Clear_TumblerRecord()
+    {
+        _HatchChanges.Empty();
+        _HoverChanges.Empty();
+        _DrumChanges.Empty();
+        _HandModeChanges.Empty();
+        _PressRefusals.Empty();
+        _TumblerTakeOutRefusals.Empty();
+        _TumblerAddedIds.Empty();
+    }
+
+    protected int32 Get_TumblerAddedCount(FMars_CookingFeed_PieceId InId)
+    {
+        auto Count = 0;
+        for (const auto& Id : _TumblerAddedIds)
+        {
+            if (Id.Get_IsSame(InId))
+            { ++Count; }
+        }
+
+        return Count;
+    }
+
+    protected int32 Get_HatchChangeCount(EMars_Tumbler_Hatch InHatch)
+    {
+        auto Count = 0;
+        for (const auto Hatch : _HatchChanges)
+        {
+            if (Hatch == InHatch)
+            { ++Count; }
+        }
+
+        return Count;
+    }
+
+    protected int32 Get_HoverChangeCount(EMars_Tumbler_Target InTarget)
+    {
+        auto Count = 0;
+        for (const auto Target : _HoverChanges)
+        {
+            if (Target == InTarget)
+            { ++Count; }
+        }
+
+        return Count;
+    }
+
+    protected FString Describe_TumblerRecord()
+    {
+        FString Hatches = "";
+        for (const auto Hatch : _HatchChanges)
+        { Hatches += f"{Hatch :n} "; }
+
+        FString Hovers = "";
+        for (const auto Target : _HoverChanges)
+        { Hovers += f"{Target :n} "; }
+
+        FString Drums = "";
+        for (const auto Drum : _DrumChanges)
+        { Drums += f"{Drum :n} "; }
+
+        FString Modes = "";
+        for (const auto Mode : _HandModeChanges)
+        { Modes += f"{Mode :n} "; }
+
+        FString Presses = "";
+        for (const auto Refusal : _PressRefusals)
+        { Presses += f"{Refusal :n} "; }
+
+        FString TakeOuts = "";
+        for (const auto Refusal : _TumblerTakeOutRefusals)
+        { TakeOuts += f"{Refusal :n} "; }
+
+        FString Added = "";
+        for (const auto& Id : _TumblerAddedIds)
+        { Added += f"{Id.Generation}.{Id.TransferIndex} "; }
+
+        return f"hatches=[{Hatches}] hovers=[{Hovers}] drums=[{Drums}] modes=[{Modes}] pressRefused=[{Presses}] takeOutRefused=[{TakeOuts}] added=[{Added}]";
+    }
+
+    // The kernel's ledger and the motion ledger as this machine reads them.
+    protected FString Describe_TumblerLedger()
+    {
+        if (ck::Is_NOT_Valid(_Tumbler))
+        { return "ledger=[none]"; }
+
+        const auto Ledger = _Tumbler.Get_Ledger();
+        FString Rows = "";
+        for (const auto& Row : Ledger.Pieces)
+        { Rows += f"{Row.Id.Generation}.{Row.Id.TransferIndex}:{Row.Coverage} "; }
+
+        const auto Motion = _Tumbler.Get_MotionLedger();
+        return f"ledger=[mode={Ledger.HandMode :n} hovered={Ledger.Hovered :n} hatch={Ledger.Hatch :n} drum={Ledger.Drum :n} rows=[{Rows}] reseats={Ledger.Reseats} "
+            + f"pressRefusals={Ledger.PressRefusalSerial} last={Ledger.LastPressRefusal :n} takeOutRefusals={Ledger.TakeOutRefusalSerial} last={Ledger.LastTakeOutRefusal :n}] "
+            + f"motion=[alpha={Motion.DrumAlpha} hand={Motion.HandLocal}]";
+    }
+
+    protected FString Describe_Tumbler()
+    {
+        if (ck::Is_NOT_Valid(_Tumbler))
+        { return "tumbler=[none]"; }
+
+        const auto Axle = Get_AxleMover();
+        const auto Hinge = Get_HingeMover();
+        return f"tumbler=[mode={_Tumbler.Get_HandMode() :n} hovered={_Tumbler.Get_Hovered() :n} hatch={_Tumbler.Get_Hatch() :n} drum={_Tumbler.Get_Drum() :n} "
+            + f"pieces={_Tumbler.Get_PieceCount()} axle={Axle.Get_Alpha()}/{Axle.Get_Target() :n} resting={Axle.Get_IsResting()} "
+            + f"hinge={Hinge.Get_Alpha()}/{Hinge.Get_Target() :n} hand={_Tumbler.Get_HandLocal()}] takeable={utils_cooking_feed::Get_TakeableCount(_Station)}";
+    }
+
+    // This machine's axle Mover (the drum's turn) and hinge Mover (the hatch).
+    protected FCk_Handle_Mover Get_AxleMover()
+    {
+        return _Tumbler.Get_Spec().Nodes.Lever.Get_Mover();
+    }
+
+    protected FCk_Handle_Mover Get_HingeMover()
+    {
+        return _Tumbler.Get_Spec().Nodes.Hatch;
+    }
+
+    // This machine's copy of the piece the drum holds as InId (the ledger row's handle without authority); invalid when it
+    // holds none or that copy is not here.
+    protected FCk_Handle_FoodPiece Get_TumblerCopy(FMars_CookingFeed_PieceId InId)
+    {
+        if (_Tumbler.Get_HasPiece(InId) == false)
+        { return FCk_Handle_FoodPiece(); }
+
+        const auto Entity = _Tumbler.Get_PieceEntity(InId);
+        if (Get_IsLive(Entity) == false || Entity.Is_FoodPiece() == false)
+        { return FCk_Handle_FoodPiece(); }
+
+        return Entity.As_FoodPiece();
+    }
+
+    // The look (degrees: X yaw right+, Y pitch down+) that puts the server's cursor on InAnchor's point on the reach plane,
+    // sized by the hand's CmPerLookDegree from the cursor as it stands.
+    protected FVector Get_LookToAnchor(FCk_Handle_Transform InAnchor)
+    {
+        const auto Spec = _Tumbler.Get_Spec();
+        const auto AnchorLocal = _Tumbler.Get_RootWorld().InverseTransformPosition(utils_transform::Get_EntityCurrentLocation(InAnchor));
+        const auto Centre = Spec.Hand.WorkspaceCentreLocal;
+        const auto Delta = FVector2D(AnchorLocal.Y - Centre.Y, AnchorLocal.Z - Centre.Z) - _Tumbler.Get_Cursor();
+        const auto Step = float64(Spec.Hand.CmPerLookDegree);
+        return FVector(Delta.X / Step, -Delta.Y / Step, 0.0);
+    }
+
+    // InDegrees of look along the lever's pull as the operator's view shows it (the projection the kernel's look uses).
+    protected FVector Get_LookAlongPull(float64 InDegrees)
+    {
+        const auto Spec = _Tumbler.Get_Spec();
+        const auto Pull = Spec.Nodes.Lever.Get_PullDirectionWorld();
+        const auto View = utils_transform::Get_EntityCurrentTransform(Spec.Nodes.View).GetRotation();
+        auto Screen = FVector2D(Pull.DotProduct(View.GetRightVector()), -Pull.DotProduct(View.GetUpVector()));
+        if (Screen.Size() < 0.01)
+        { return FVector(0.0, InDegrees, 0.0); }
+
+        Screen.Normalize();
+        return FVector(Screen.X * InDegrees, Screen.Y * InDegrees, 0.0);
+    }
+
+    // The largest change of this machine's axle alpha between the first samples of two successive frames since sample
+    // InFrom, and where it happened.
+    protected float32 Get_LargestAxleStep(int32 InFrom, FString& OutWhere)
+    {
+        auto Largest = 0.0f;
+        auto Previous = InFrom;
+        for (int32 Index = InFrom + 1; Index < _MoverSamples.Num(); ++Index)
+        {
+            const auto Sample = _MoverSamples[Index];
+            const auto Before = _MoverSamples[Previous];
+            if (Sample.Frame == Before.Frame)
+            { continue; }
+
+            const auto Step = Math::Abs(Sample.AxleAlpha - Before.AxleAlpha);
+            if (Step > Largest)
+            {
+                Largest = Step;
+                OutWhere = f"sample {Index}/{_MoverSamples.Num()} step={Sample.Step} {Before.AxleAlpha}->{Sample.AxleAlpha} frames={Sample.Frame - Before.Frame}";
+            }
+
+            Previous = Index;
+        }
+
+        return Largest;
+    }
+
+    // The first sampled frame at or after InFrame at which this machine's axle rested under 0.01; -1 when none did.
+    protected int64 Find_AxleHomeFrame(int64 InFrame)
+    {
+        for (const auto& Sample : _MoverSamples)
+        {
+            if (Sample.Frame >= InFrame && Sample.AxleResting && Sample.AxleAlpha < 0.01f)
+            { return Sample.Frame; }
+        }
+
+        return -1;
+    }
+
+    // The first sampled frame at or after InFrame at which this machine's hinge alpha was within 0.02 of InAlpha; -1 when
+    // none was.
+    protected int64 Find_HingeFrame(int64 InFrame, float32 InAlpha)
+    {
+        for (const auto& Sample : _MoverSamples)
+        {
+            if (Sample.Frame >= InFrame && Math::Abs(Sample.HingeAlpha - InAlpha) <= 0.02f)
+            { return Sample.Frame; }
+        }
+
+        return -1;
+    }
+
+    // Every sample since InFrom: the axle and hinge alphas stayed within InTolerance of the first, and this machine's lever
+    // never held a manipulation; OutWhere names the last sample that did not.
+    protected bool Get_AreMoversStill(int32 InFrom, float32 InTolerance, FString& OutWhere)
+    {
+        if (InFrom >= _MoverSamples.Num())
+        { return true; }
+
+        const auto First = _MoverSamples[InFrom];
+        auto IsStill = true;
+        for (int32 Index = InFrom; Index < _MoverSamples.Num(); ++Index)
+        {
+            const auto Sample = _MoverSamples[Index];
+            if (Math::Abs(Sample.AxleAlpha - First.AxleAlpha) > InTolerance || Math::Abs(Sample.HingeAlpha - First.HingeAlpha) > InTolerance
+                || Sample.LeverManipulating)
+            {
+                IsStill = false;
+                OutWhere = f"sample {Index}: axle {First.AxleAlpha}->{Sample.AxleAlpha} hinge {First.HingeAlpha}->{Sample.HingeAlpha} manipulating={Sample.LeverManipulating}";
+            }
+        }
+
+        return IsStill;
+    }
+
+    // Some sample since InFrom shows this machine's lever holding a manipulation (only the authority's should).
+    protected bool Get_SawLocalManipulation(int32 InFrom)
+    {
+        for (int32 Index = InFrom; Index < _MoverSamples.Num(); ++Index)
+        {
+            if (_MoverSamples[Index].LeverManipulating)
+            { return true; }
+        }
+
+        return false;
+    }
+
+    // The tumbler's use row (its operator hints, on the Use action).
+    protected FString Get_UseRowText()
+    {
+        const auto Row = TryGet_Row(n"Tumbler", mars::Mars_IA_Interact_Use);
+        return Row.IsSet() ? Row.GetValue() : "<no row>";
     }
 
     // The ledger rows a copy without authority has announced (it raised OnPieceAdded for each); none with authority.
@@ -904,7 +1264,35 @@ class UMars_AutoTestRig_NetHeatStation : UMars_AutoTestRig_NetFeedStation
 
         Sample_Pan();
         Sample_Scoop();
+        Sample_Movers();
         On_HeatStationSample();
+    }
+
+    // The tumbler's Movers and hand node as this machine shows them this frame (the tumbler station only).
+    private void Sample_Movers()
+    {
+        if (ck::Is_NOT_Valid(_Tumbler))
+        { return; }
+
+        const auto Axle = Get_AxleMover();
+        const auto Hinge = Get_HingeMover();
+        const auto Ledger = _Tumbler.Get_Ledger();
+        auto Sample = FMars_TESTONLY_NetHeatMoverSample();
+        Sample.Step = Get_HeatStationReport().Step;
+        Sample.Frame = utils_time::Get_FrameCounter();
+        Sample.Seconds = System::GetGameTimeInSeconds();
+        Sample.AxleAlpha = Axle.Get_Alpha();
+        Sample.AxleTarget = Axle.Get_Target();
+        Sample.AxleTweening = ck::IsValid(Axle.Get_Fragment(FMars_Fragment_Mover).Tween);
+        Sample.AxleResting = Axle.Get_IsResting();
+        Sample.LeverManipulating = _Tumbler.Get_Spec().Nodes.Lever.Get_IsManipulating();
+        Sample.HingeAlpha = Hinge.Get_Alpha();
+        Sample.HingeResting = Hinge.Get_IsResting();
+        Sample.HandOffset = utils_scene_node::Get_Offset(_Tumbler.Get_Spec().Nodes.Hand).GetLocation();
+        if (Ledger.Pieces.Num() > 0)
+        { Sample.FirstCoverage = Ledger.Pieces[0].Coverage; }
+
+        _MoverSamples.Add(Sample);
     }
 
     // The scoop as this machine shows it this frame (the fry station only).
@@ -995,6 +1383,8 @@ class UMars_AutoTestRig_NetHeatStation : UMars_AutoTestRig_NetFeedStation
         auto BowlSerial = 0;
         if (ck::IsValid(_Fry))
         { BowlIds = _Fry.Get_PieceIds(); }
+        else if (ck::IsValid(_Tumbler))
+        { BowlIds = _Tumbler.Get_PieceIds(); }
         else if (ck::IsValid(_Searing))
         { BowlIds = _Searing.Get_PieceIds(); }
         else
@@ -1033,14 +1423,13 @@ class UMars_AutoTestRig_NetHeatStation : UMars_AutoTestRig_NetFeedStation
     // On_ServerFeedStationReady once this machine finds it composed with its kernel.
     protected void Spawn_HeatStation()
     {
-        if (ck::EnsureIfNot(Get_IsBuiltBranch(), f"[NetHeatStation] the {Get_HeatStation() :n} branch is not built yet"))
-        { return; }
-
         auto Owner = utils_mars_net::Get_ReplicatedSpawnOwner(Get_SubjectEntity());
         if (Get_HeatStation() == EMars_TESTONLY_HeatStation::Searing)
         { _FeedStationEntity = Spawn_SearingStation(Owner); }
         else if (Get_HeatStation() == EMars_TESTONLY_HeatStation::Fry)
         { _FeedStationEntity = Spawn_FryStation(Owner); }
+        else if (Get_HeatStation() == EMars_TESTONLY_HeatStation::Tumbler)
+        { _FeedStationEntity = Spawn_TumblerStation(Owner); }
         else
         {
             auto Fixture = Cast<UMars_AutoTestHelper_HeatStation>(NewObject(this, UMars_AutoTestHelper_HeatStation));
@@ -1074,8 +1463,19 @@ class UMars_AutoTestRig_NetHeatStation : UMars_AutoTestRig_NetFeedStation
         return Station;
     }
 
+    // The real tumbler station with the test's exposed Tumbler spec, as the map's spawner makes it (its own context).
+    private FCk_Handle Spawn_TumblerStation(FCk_Handle InOwner)
+    {
+        auto Params = UMars_TumblerStation_EntityScript::Params();
+        Params.SpawnTransform = FTransform(FRotator::ZeroRotator, Get_StationLocation());
+        Params.Tumbler = Make_TumblerSpec();
+        auto Station = utils_entity_script::Request_SpawnEntity(InOwner, UMars_TumblerStation_EntityScript, Params).Get_EntityUnderConstruction();
+        Station.Request_OverrideToSelf();
+        return Station;
+    }
+
     // The searing station is ready once its pan body is in the simulation (the pan admits nothing before); the fry station
-    // once its scoop and basket bodies are.
+    // once its scoop and basket bodies are; the tumbler station once its drum body is.
     UFUNCTION()
     private void Is_RigHeatStationReady(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
@@ -1083,7 +1483,8 @@ class UMars_AutoTestRig_NetHeatStation : UMars_AutoTestRig_NetFeedStation
         Result.Set(Get_IsLive(_FeedStationEntity) && _FeedStationEntity.Is_CookingFeed() && Try_FindHeatStation()
             && (ck::Is_NOT_Valid(_Searing) || utils_jolt_body::Get_IsBodyAdded(_Searing.Get_Spec().Nodes.PanBaseBody))
             && (ck::Is_NOT_Valid(_Fry) || (utils_jolt_body::Get_IsBodyAdded(_Fry.Get_Spec().Nodes.ScoopBody)
-                && utils_jolt_body::Get_IsBodyAdded(_Fry.Get_Spec().Nodes.BasketBody))));
+                && utils_jolt_body::Get_IsBodyAdded(_Fry.Get_Spec().Nodes.BasketBody)))
+            && (ck::Is_NOT_Valid(_Tumbler) || utils_jolt_body::Get_IsBodyAdded(_Tumbler.Get_Spec().Nodes.DrumBody)));
     }
 
     UFUNCTION()
@@ -1340,6 +1741,160 @@ class UMars_AutoTestRig_NetHeatStation : UMars_AutoTestRig_NetFeedStation
         WaitFrames(1, _BatterContinuation);
     }
 
+    // Server: InPieces' cook states carrying a crumb of InCrumb, as an earlier tumble leaves them; InContinuation once each
+    // reads so.
+    protected void Crumb_Then(TArray<FCk_Handle_FoodPiece> InPieces, float32 InCrumb, FName InContinuation)
+    {
+        for (const auto& InPiece : InPieces)
+        {
+            auto Piece = InPiece;
+            auto CookState = Piece.Get_CookState();
+            CookState.Crumb = InCrumb;
+            Piece.Request_SetCookState(FMars_Request_FoodPiece_SetCookState(CookState));
+        }
+
+        _CrumbPieces = InPieces;
+        _Crumb = InCrumb;
+        _CrumbContinuation = InContinuation;
+        WaitUntil(n"Is_RigCrumbed", n"OnRigCrumbed", k_SlowPolls);
+    }
+
+    UFUNCTION()
+    private void Is_RigCrumbed(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto IsCrumbed = true;
+        for (const auto& Piece : _CrumbPieces)
+        {
+            if (Piece.Get_CookState().Crumb != _Crumb)
+            { IsCrumbed = false; }
+        }
+
+        auto Result = OutResult;
+        Result.Set(IsCrumbed);
+    }
+
+    UFUNCTION()
+    private void OnRigCrumbed(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
+    {
+        WaitFrames(1, _CrumbContinuation);
+    }
+
+    // Server: one look, on its own kernel (Kernel) or in the operator's stream (Remote), that puts its cursor on InTarget's
+    // anchor (the hatch tab or the lever grip) wherever it stands now; InContinuation once its kernel hovers InTarget.
+    protected void Point_AtThen(EMars_Tumbler_Target InTarget, EMars_TESTONLY_NetTumblerLook InRoute, FName InContinuation)
+    {
+        const auto Nodes = _Tumbler.Get_Spec().Nodes;
+        const auto Anchor = InTarget == EMars_Tumbler_Target::Hatch ? Nodes.HatchTab : Nodes.LeverGrip;
+        _PointTarget = InTarget;
+        _LookRoute = InRoute;
+        _PointContinuation = InContinuation;
+        Send_Look(Get_LookToAnchor(Anchor), constants_heat_station_net_autotest::k_PointLookSeconds);
+        WaitUntil(n"Is_RigPointed", n"OnRigPointed", k_SlowPolls);
+    }
+
+    // Server: one look that puts its cursor at k_AwayCursorShare of the reach's half extents down and to the left, far from
+    // the hatch tab and the lever grip (the cursor starts on the shut hatch's tab); InContinuation once nothing is hovered.
+    protected void Point_AwayThen(EMars_TESTONLY_NetTumblerLook InRoute, FName InContinuation)
+    {
+        const auto Hand = _Tumbler.Get_Spec().Hand;
+        const auto Share = constants_heat_station_net_autotest::k_AwayCursorShare;
+        const auto Away = FVector2D(-float64(Hand.HalfExtentY) * Share, -float64(Hand.HalfExtentZ) * Share);
+        const auto Delta = Away - _Tumbler.Get_Cursor();
+        const auto Step = float64(Hand.CmPerLookDegree);
+        _PointTarget = EMars_Tumbler_Target::None;
+        _LookRoute = InRoute;
+        _PointContinuation = InContinuation;
+        Send_Look(FVector(Delta.X / Step, -Delta.Y / Step, 0.0), constants_heat_station_net_autotest::k_PointLookSeconds);
+        WaitUntil(n"Is_RigPointed", n"OnRigPointed", k_SlowPolls);
+    }
+
+    UFUNCTION()
+    private void Is_RigPointed(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Result = OutResult;
+        Result.Set(_Tumbler.Get_Hovered() == _PointTarget);
+    }
+
+    UFUNCTION()
+    private void OnRigPointed(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
+    {
+        WaitFrames(1, _PointContinuation);
+    }
+
+    // Server: InLook (that took InSeconds on the sender) the way the last point or rock asked.
+    private void Send_Look(FVector InLook, float32 InSeconds)
+    {
+        if (_LookRoute == EMars_TESTONLY_NetTumblerLook::Remote)
+        {
+            Look_Remote(InLook, InSeconds);
+            return;
+        }
+
+        _Tumbler.Request_Look(FMars_Request_Tumbler_Look(InLook));
+    }
+
+    // Server: InContinuation once its axle Mover's alpha moved less than k_StillAlpha between the first polls of
+    // k_StillFrames successive frames (the lever's spring has caught up with the last look).
+    protected void Await_AxleStillThen(FName InContinuation)
+    {
+        _StillContinuation = InContinuation;
+        _StillFrames = 0;
+        _StillFrame = -1;
+        _StillAlpha = -1.0f;
+        WaitUntil(n"Is_RigAxleStill", n"OnRigAxleStill", k_SlowPolls);
+    }
+
+    UFUNCTION()
+    private void Is_RigAxleStill(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        const auto Frame = utils_time::Get_FrameCounter();
+        if (Frame != _StillFrame)
+        {
+            const auto Alpha = Get_AxleMover().Get_Alpha();
+            _StillFrames = Math::Abs(Alpha - _StillAlpha) < constants_heat_station_net_autotest::k_StillAlpha ? _StillFrames + 1 : 0;
+            _StillAlpha = Alpha;
+            _StillFrame = Frame;
+        }
+
+        auto Result = OutResult;
+        Result.Set(_StillFrames >= constants_heat_station_net_autotest::k_StillFrames);
+    }
+
+    UFUNCTION()
+    private void OnRigAxleStill(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
+    {
+        WaitFrames(1, _StillContinuation);
+    }
+
+    // Server: InRock's looks, one a frame, then InContinuation the frame after the last.
+    protected void Rock_LeverThen(FMars_TESTONLY_NetTumblerRock InRock, FName InContinuation)
+    {
+        _TumblerRock = InRock;
+        _LookRoute = InRock.Look;
+        _RockContinuation = InContinuation;
+        _RockStartSeconds = System::GetGameTimeInSeconds();
+        _RockLastSeconds = _RockStartSeconds;
+        _RockFrames = 0;
+        WaitFrames(1, n"OnRigRock");
+    }
+
+    UFUNCTION()
+    private void OnRigRock(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
+    {
+        const auto Now = System::GetGameTimeInSeconds();
+        if (Now - _RockStartSeconds >= float64(_TumblerRock.Seconds))
+        {
+            WaitFrames(1, _RockContinuation);
+            return;
+        }
+
+        const auto IsFlipped = _TumblerRock.HalfCycleFrames > 0 && Math::IntegerDivisionTrunc(_RockFrames, _TumblerRock.HalfCycleFrames) % 2 == 1;
+        Send_Look(Get_LookAlongPull(IsFlipped ? -_TumblerRock.Degrees : _TumblerRock.Degrees), float32(Now - _RockLastSeconds));
+        _RockLastSeconds = Now;
+        _RockFrames += 1;
+        WaitFrames(1, n"OnRigRock");
+    }
+
     // Server: the fryer's piece InId moved to rest on the basket floor's centre, level with the basket, its bottom 1 cm above
     // the floor.
     protected void Put_IntoBasket(FMars_CookingFeed_PieceId InId)
@@ -1372,6 +1927,9 @@ class UMars_AutoTestRig_NetHeatStation : UMars_AutoTestRig_NetFeedStation
         Intents.Add(GameplayTags::Mars_Intent_Interact_Primary);
         Intents.Add(GameplayTags::Mars_Intent_Interact_Secondary);
         Intents.Add(GameplayTags::Mars_Intent_StationAddFood);
+        if (Get_HeatStation() == EMars_TESTONLY_HeatStation::Tumbler)
+        { Intents.Add(GameplayTags::Mars_Intent_Interact_Use); }
+
         for (const auto& Intent : Intents)
         {
             auto Row = FMars_TESTONLY_NetHeatRemoteRow();
@@ -1597,5 +2155,47 @@ class UMars_AutoTestRig_NetHeatStation : UMars_AutoTestRig_NetFeedStation
     private void OnRigPieceDrained(FCk_Handle_Fry InFry, FMars_CookingFeed_PieceId InPieceId)
     {
         _DrainedIds.Add(InPieceId);
+    }
+
+    UFUNCTION()
+    private void OnRigHatchChanged(FCk_Handle_Tumbler InTumbler, EMars_Tumbler_Hatch InHatch)
+    {
+        _HatchChanges.Add(InHatch);
+    }
+
+    UFUNCTION()
+    private void OnRigHoverChanged(FCk_Handle_Tumbler InTumbler, EMars_Tumbler_Target InTarget)
+    {
+        _HoverChanges.Add(InTarget);
+    }
+
+    UFUNCTION()
+    private void OnRigDrumChanged(FCk_Handle_Tumbler InTumbler, EMars_Tumbler_Drum InDrum)
+    {
+        _DrumChanges.Add(InDrum);
+    }
+
+    UFUNCTION()
+    private void OnRigHandModeChanged(FCk_Handle_Tumbler InTumbler, EMars_Tumbler_HandMode InHandMode)
+    {
+        _HandModeChanges.Add(InHandMode);
+    }
+
+    UFUNCTION()
+    private void OnRigPressRefused(FCk_Handle_Tumbler InTumbler, EMars_Tumbler_Refusal InRefusal)
+    {
+        _PressRefusals.Add(InRefusal);
+    }
+
+    UFUNCTION()
+    private void OnRigTumblerTakeOutRefused(FCk_Handle_Tumbler InTumbler, EMars_CookingFeed_TakeOutRefusal InRefusal)
+    {
+        _TumblerTakeOutRefusals.Add(InRefusal);
+    }
+
+    UFUNCTION()
+    private void OnRigTumblerPieceAdded(FCk_Handle_Tumbler InTumbler, FMars_CookingFeed_PieceId InPieceId, FCk_Handle InPiece)
+    {
+        _TumblerAddedIds.Add(InPieceId);
     }
 }

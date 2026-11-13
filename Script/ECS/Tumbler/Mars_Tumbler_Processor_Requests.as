@@ -45,6 +45,11 @@ struct FMars_Tumbler_DrainEdges
 // holder fact and its pickup's Ledger claim, removes the holder when it hands the piece back, and releases the claim when
 // the piece lands on its tray (or at once when the take-out named none); a tray's refusal readopts the piece. It also
 // listens: the station's queue (OnQueued wakes this drain) and the answers of every tray it loads.
+//
+// Only the authority's kernel applies requests. It publishes the kernel's ledger once after its last apply and before it
+// broadcasts, with every press and take-out it refused. A copy without authority still arms the station's queue watch and
+// takes the station's inbox and take-outs, then drops them with its own requests: what it shows comes from the ledgers (the
+// Tick's follow and announce pass, and the mirror).
 class UMars_Processor_Tumbler_HandleRequests : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -80,6 +85,10 @@ class UMars_Processor_Tumbler_HandleRequests : UCk_Processor_Script_Base_UE
         TArray<FMars_CookingFeed_Release> Inbox = utils_cooking_feed::Take_Inbox(InHandle);
         TArray<FMars_Request_StationTakeOut> TakeOuts = utils_cooking_feed::Take_TakeOutRequests(InHandle);
 
+        // Only the authority's kernel applies: a copy without authority drops what it took with its own requests.
+        if (utils_net::Get_HasAuthority(InHandle) == false)
+        { return; }
+
         auto Edges = FMars_Tumbler_DrainEdges();
         Edges.StartMode = InState.Hand.Mode;
         Edges.StartHatch = InState.Hatch;
@@ -109,6 +118,10 @@ class UMars_Processor_Tumbler_HandleRequests : UCk_Processor_Script_Base_UE
         if (HasLook)
         { Apply_Look(Self, InState, LookDelta); }
 
+        auto Answers = FMars_Tumbler_Answers();
+        Answers.PressRefusals = Edges.Refusals;
+        Answers.TakeOutRefusals = Edges.TakeOutRefusals;
+        utils_tumbler::Publish(Self, Answers);
         Broadcast(Self, InState, Edges);
     }
 

@@ -1,3 +1,14 @@
+// Stance: the tumbler's kernel is the authority's. Only the authority's copy moves the hand, judges the hover, toggles the
+// hatch, grips and rocks the lever, admits, reads the pieces, coats them, reseats, takes out and readopts; a copy without
+// authority drops every tumbler request (and the releases and take-outs its station queued) and reads the tumbler through
+// two replicated ledgers on the station: the kernel's (the hand's mode, the hovered target, the hatch, the drum, every piece
+// with its coverage floored to a tenth, the reseats, and serials for the presses and take-outs it refused) and its motion
+// (the axle Mover's alpha and the hand node's pose), from which that copy moves its own axle, hand node and, through the
+// mirror, its hinge. On that copy the kernel's tick only follows and announces (OnPieceAdded as a row's piece shows up
+// there, so the station dresses it); its mirror raises OnPressRefused, OnTakeOutRefused, OnDrumChanged, OnHatchChanged,
+// OnHoverChanged and OnHandModeChanged from the kernel's ledger. OnPieceTakenOut, OnCoverageChanged, OnPieceReseated, the
+// cursor, the bodies, the pieces' cook state, holder facts and pickup claims never leave the authority.
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
 //--------------------------------------------------------------------------------------------------------------------------
@@ -598,6 +609,122 @@ struct FMars_Fragment_Tumbler
     UPROPERTY()
     int32 Reseats = 0;
 }
+
+//--------------------------------------------------------------------------------------------------------------------------
+// Replication
+//--------------------------------------------------------------------------------------------------------------------------
+
+// One piece in the kernel's ledger: its identity, its entity and its coverage floored to a tenth (exactly 1 at 1).
+struct FMars_Tumbler_PieceRow
+{
+    UPROPERTY()
+    FMars_CookingFeed_PieceId Id;
+
+    UPROPERTY()
+    FCk_Handle Piece;
+
+    UPROPERTY()
+    float32 Coverage = 0.0f;
+}
+
+// What a drain announced, for the ledger's serials: every refused press and take-out, in order.
+struct FMars_Tumbler_Answers
+{
+    TArray<EMars_Tumbler_Refusal> PressRefusals;
+    TArray<EMars_CookingFeed_TakeOutRefusal> TakeOutRefusals;
+}
+
+// How a copy without authority shows its drum: Following scrubs the axle Mover toward the motion ledger's alpha; Settled
+// has asked the Mover to settle home once.
+enum EMars_Tumbler_DrumShown
+{
+    Following,
+    Settled
+}
+
+// Whether the motion ledger is written as paced (a changed pose and an interval passed) or at once (the hand's mode or the
+// drum's state changed this tick).
+enum EMars_Tumbler_MotionWrite
+{
+    Paced,
+    AtOnce
+}
+
+// The kernel as a machine without authority reads it, replicated on the station and written only by utils_tumbler::Publish
+// on the authority. A row's Piece may not resolve on a client yet (its entity has not replicated there).
+struct FMars_Fragment_Tumbler_Net
+{
+    UPROPERTY()
+    EMars_Tumbler_HandMode HandMode = EMars_Tumbler_HandMode::Free;
+
+    UPROPERTY()
+    EMars_Tumbler_Target Hovered = EMars_Tumbler_Target::None;
+
+    UPROPERTY()
+    EMars_Tumbler_Hatch Hatch = EMars_Tumbler_Hatch::Closed;
+
+    UPROPERTY()
+    EMars_Tumbler_Drum Drum = EMars_Tumbler_Drum::Home;
+
+    // In admission order.
+    UPROPERTY()
+    TArray<FMars_Tumbler_PieceRow> Pieces;
+
+    UPROPERTY()
+    int32 Reseats = 0;
+
+    // One more for every refused press and take-out; each one's last reason.
+    UPROPERTY()
+    int32 PressRefusalSerial = 0;
+
+    UPROPERTY()
+    EMars_Tumbler_Refusal LastPressRefusal = EMars_Tumbler_Refusal::NoTarget;
+
+    UPROPERTY()
+    int32 TakeOutRefusalSerial = 0;
+
+    UPROPERTY()
+    EMars_CookingFeed_TakeOutRefusal LastTakeOutRefusal = EMars_CookingFeed_TakeOutRefusal::NoRoom;
+}
+
+// The authority's motion, from which every other copy moves its own axle and hand node: the axle Mover's alpha and the hand
+// node's pose in the station frame. Its own fragment: a dynamic fragment is sent whole on every dirty mark, and the motion
+// changes many times a second. Written only by utils_tumbler::Publish_Motion on the authority.
+struct FMars_Fragment_Tumbler_MotionNet
+{
+    UPROPERTY()
+    float32 DrumAlpha = 0.0f;
+
+    UPROPERTY()
+    FVector HandLocal = FVector::ZeroVector;
+
+    UPROPERTY()
+    FQuat HandRotationLocal = FQuat::Identity;
+}
+
+// Each machine's own: the kernel's ledger it last reconciled and the ledger rows it announced (both used only without
+// authority), the seconds since the motion ledger was last written (with authority), and the drum as this copy shows it
+// (without authority).
+struct FMars_Fragment_Tumbler_Local
+{
+    UPROPERTY()
+    TOptional<FMars_Fragment_Tumbler_Net> Last;
+
+    UPROPERTY()
+    TArray<FMars_CookingFeed_PieceId> Announced;
+
+    UPROPERTY()
+    float32 SecondsSinceMotion = 0.0f;
+
+    UPROPERTY()
+    float32 ShownDrumAlpha = 0.0f;
+
+    UPROPERTY()
+    EMars_Tumbler_DrumShown DrumShown = EMars_Tumbler_DrumShown::Following;
+}
+
+// Wakes the mirror once per tumbler.
+struct FMars_Tag_Tumbler_NeedsMirror {}
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Signals

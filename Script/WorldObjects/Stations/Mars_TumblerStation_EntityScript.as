@@ -13,6 +13,11 @@
 // kernel lands every tumbled piece a take-out hands back on the docked finished tray and readopts one the tray refuses. The
 // base builds the feed's nodes and the docks and keeps the label; this script builds the drum and, every frame, dresses
 // every piece (its crumb from the kernel's mapping of its cook state), the hover cue and the right glove's pose.
+//
+// The Tumbler kernel is the authority's and replicates through its two ledgers (the kernel's and its motion), from which
+// every other machine moves its own axle, hinge and hand node and dresses the pieces the ledger names. The station's control
+// reads its operator on the authority alone (its InputStance is Authority): a remote operator's look, use, add-food and
+// take-out arrive in its input stream there, and the operator's own machine shows the hand and the drum from the ledgers.
 class UMars_TumblerStation_EntityScript : UMars_FeedStation_EntityScript
 {
     default _ShowInPlaceActors = true;
@@ -224,6 +229,10 @@ class UMars_TumblerStation_EntityScript : UMars_FeedStation_EntityScript
             NSLOCTEXT("MarsInteraction", "TumblerBatchPrompt", "Coat the batch"),
             NSLOCTEXT("MarsInteraction", "TumblerStationInUsePrompt", "In use"));
         InOutSpec.MinigameStateClass = UMars_SmState_Tumbler_Idle;
+
+        // The control reads the operator on the authority alone: a remote operator's look and presses reach it as its
+        // stream, and its own machine shows the hand and the drum from the ledgers.
+        InOutSpec.InputStance = EMars_Station_InputStance::Authority;
     }
 
     protected FVector2D Get_CounterFootprint() const override
