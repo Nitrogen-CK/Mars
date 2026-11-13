@@ -8,6 +8,9 @@ struct FMars_Implement_Frame
     // Drained once per frame (degrees; X yaw right+, Y pitch down+); zero unless Driven.
     FVector Look = FVector::ZeroVector;
 
+    // The seconds the look took where it was made, when every look of the frame carried them; unset = this frame.
+    TOptional<float32> LookSeconds;
+
     // Set when a Kick lift was kicked from rest this frame: the excess degrees OnLiftKicked reports once the pose is written.
     TOptional<float32> KickExcess;
 }
@@ -43,7 +46,7 @@ class UMars_Processor_Implement_Tick : UCk_Processor_Script_Base_UE
         Frame.Implement = InHandle.As_Implement();
         Frame.Spec = Frame.Implement.Get_Spec();
         Frame.DeltaSeconds = float32(InDeltaT.Get_Seconds());
-        Frame.Look = Take_PendingLook(InState);
+        Take_PendingLook(Frame, InState);
 
         Advance_Tilt(Frame, InState);
         Advance_CommandedLift(Frame, InState);
@@ -106,20 +109,23 @@ class UMars_Processor_Implement_Tick : UCk_Processor_Script_Base_UE
         { InState.OrbitPhase -= FullTurn * float32(Math::FloorToInt(InState.OrbitPhase / FullTurn)); }
     }
 
-    // The look is read once per frame and handed to every step; an idle or a followed implement drops it.
-    private FVector Take_PendingLook(FMars_Fragment_Implement& InState)
+    // The look and its seconds are read once per frame and handed to every step; an idle or a followed implement drops them.
+    private void Take_PendingLook(FMars_Implement_Frame& InOutFrame, FMars_Fragment_Implement& InState)
     {
         const auto Look = InState.PendingLook;
+        const auto LookSeconds = InState.PendingLookSeconds;
         InState.PendingLook = FVector::ZeroVector;
+        InState.PendingLookSeconds.Reset();
         if (InState.Drive != EMars_Implement_Drive::Driven || InState.Steering == EMars_Implement_Steering::Followed)
-        { return FVector::ZeroVector; }
+        { return; }
 
-        return Look;
+        InOutFrame.Look = Look;
+        InOutFrame.LookSeconds = LookSeconds;
     }
 
-    // A Kick lift splits the upward look first: the degrees beyond what FlickSpeedDegreesPerSecond covers this frame only
-    // lift (without the split every toss would also pitch the implement to its clamp). The rest steers the targets the
-    // axes name: X rolls (or yaws), Y pitches, unless RollOnly leaves Y to the lift. The targets relax toward level
+    // A Kick lift splits the upward look first: the degrees beyond what FlickSpeedDegreesPerSecond covers in the look's
+    // seconds only lift (without the split every toss would also pitch the implement to its clamp). The rest steers the
+    // targets the axes name: X rolls (or yaws), Y pitches, unless RollOnly leaves Y to the lift. The targets relax toward level
     // without crossing it (every frame, or only while Idle so a held implement keeps its tilt; never while followed: the
     // command already carries its leader's relax) and clamp; the tilt tracks them at a bounded rate.
     private void Advance_Tilt(FMars_Implement_Frame& InFrame, FMars_Fragment_Implement& InState)
@@ -179,14 +185,18 @@ class UMars_Processor_Implement_Tick : UCk_Processor_Script_Base_UE
         { Kick_Lift(InFrame, InState, Excess); }
     }
 
-    // The upward look degrees beyond what FlickSpeedDegreesPerSecond covers this frame; only a Kick lift takes them.
+    // The upward look degrees beyond what FlickSpeedDegreesPerSecond covers in the seconds the look took (its own when it
+    // carried them, else this frame's: a look merged from several of a sender's frames is that much slower); only a Kick
+    // lift takes them.
     private float32 Get_FlickExcess(const FMars_Implement_Frame& InFrame)
     {
         if (InFrame.Spec.Lift.Mode != EMars_Implement_LiftMode::Kick)
         { return 0.0f; }
 
+        const auto HasOwnSeconds = InFrame.LookSeconds.IsSet() && InFrame.LookSeconds.GetValue() > 0.0f;
+        const auto Seconds = HasOwnSeconds ? InFrame.LookSeconds.GetValue() : InFrame.DeltaSeconds;
         const auto UpDegrees = Math::Max(0.0f, float32(-InFrame.Look.Y));
-        return Math::Max(0.0f, UpDegrees - InFrame.Spec.Lift.FlickSpeedDegreesPerSecond * InFrame.DeltaSeconds);
+        return Math::Max(0.0f, UpDegrees - InFrame.Spec.Lift.FlickSpeedDegreesPerSecond * Seconds);
     }
 
     // A Commanded lift: the look's Y moves the target (a downward look lowers it), clamped to [MinLift, MaxLift]. The

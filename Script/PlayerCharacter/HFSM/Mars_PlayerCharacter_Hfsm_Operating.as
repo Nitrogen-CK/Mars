@@ -572,7 +572,7 @@ class UMars_SmTask_Operating_SendInput : UCk_SmTask_EntityScript
         }
 
         const auto FirstSample = _Sampler.Rows.IsEmpty();
-        const auto Sample = utils_input_intents::Make_RemoteSample(_Intents, _Sampler);
+        const auto Sample = utils_input_intents::Make_RemoteSample(_Intents, _Sampler, float32(InDeltaT.Get_Seconds()));
         _FramesSinceSent += 1;
 
         if (FirstSample == false && _FramesSinceSent < constants_input_intents::k_KeepAliveFrames

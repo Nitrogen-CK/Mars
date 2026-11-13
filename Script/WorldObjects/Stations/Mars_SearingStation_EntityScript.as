@@ -16,7 +16,9 @@
 //
 // The Searing kernel is the authority's and replicates through its two ledgers (the kernel's and the pan's command): the
 // authority's kernel steers its own pan, every other machine's pan follows the published command, and every machine
-// dresses the pieces the ledger names (its kernel announces each one as it shows up there).
+// dresses the pieces the ledger names (its kernel announces each one as it shows up there). The station's control reads
+// its operator on the authority alone (its InputStance is Authority): a remote operator's look, add-food and take-out
+// arrive in its input stream there, and the operator's own machine shows the pan from the ledger.
 //
 // Per piece: its own cook state (from that piece's face sears only, never another's), its own seared burst and its own oil
 // pool, sized from its own extents. The pan material has k_PoolSlots meat footprints and oil trails; the pieces
@@ -394,6 +396,10 @@ class UMars_SearingStation_EntityScript : UMars_FeedStation_EntityScript
             NSLOCTEXT("MarsInteraction", "SearSteakPrompt", "Sear steak"),
             NSLOCTEXT("MarsInteraction", "SearingStationInUsePrompt", "In use"));
         InOutSpec.MinigameStateClass = UMars_SmState_Searing_Idle;
+
+        // The control reads the operator on the authority alone: a remote operator's look and presses reach it as its
+        // stream, and its own machine shows the pan from the ledger.
+        InOutSpec.InputStance = EMars_Station_InputStance::Authority;
     }
 
     protected FVector2D Get_CounterFootprint() const override

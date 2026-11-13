@@ -466,6 +466,11 @@ struct FMars_Fragment_Implement
     UPROPERTY()
     FVector PendingLook = FVector::ZeroVector;
 
+    // The sender's seconds the pending look took, set only while every look collected since the Tick last ran carried
+    // them; the Tick judges a flick against them instead of its own frame (a look merged from several frames is slow).
+    UPROPERTY()
+    TOptional<float32> PendingLookSeconds;
+
     // The node's offset at Add: the rest pose the tilt and lift are relative to. Written only by Add.
     UPROPERTY()
     FTransform RestOffset = FTransform::Identity;
@@ -534,17 +539,27 @@ struct FMars_Fragment_Implement_Signals
 // Requests
 //--------------------------------------------------------------------------------------------------------------------------
 
-// One drained look delta (degrees; X yaw right+, Y pitch down+). Summed per drain; accepted while Driven.
+// One drained look delta (degrees; X yaw right+, Y pitch down+). Summed per drain; accepted while Driven. Seconds: how long
+// the look took where it was made, when that is not this frame (a remote operator's merged look); unset = this frame.
 struct FMars_Request_Implement_Look
 {
     UPROPERTY()
     FVector LookDelta = FVector::ZeroVector;
+
+    UPROPERTY()
+    TOptional<float32> Seconds;
 
     FMars_Request_Implement_Look() {}
 
     FMars_Request_Implement_Look(FVector InLookDelta)
     {
         LookDelta = InLookDelta;
+    }
+
+    FMars_Request_Implement_Look(FVector InLookDelta, TOptional<float32> InSeconds)
+    {
+        LookDelta = InLookDelta;
+        Seconds = InSeconds;
     }
 }
 

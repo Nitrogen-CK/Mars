@@ -58,7 +58,7 @@ class UMars_Processor_Implement_HandleRequests : UCk_Processor_Script_Base_UE
         if (InState.Drive == EMars_Implement_Drive::Driven && InState.Steering == EMars_Implement_Steering::Own)
         {
             for (const auto& Request : LookRequests)
-            { InState.PendingLook += FVector(Request.LookDelta.X, Request.LookDelta.Y, 0.0); }
+            { Collect_Look(InState, Request); }
         }
 
         const auto NewDrive = InState.Drive;
@@ -66,6 +66,29 @@ class UMars_Processor_Implement_HandleRequests : UCk_Processor_Script_Base_UE
         { return; }
 
         Self.Get_Fragment(FMars_Fragment_Implement_Signals).OnDriveChanged.Broadcast(Self, NewDrive);
+    }
+
+    // The look joins the pending look; its seconds join the pending seconds only while every look collected since the Tick
+    // last ran carried them (the first look sets them, one without seconds unsets them for the rest of the frame).
+    private void Collect_Look(FMars_Fragment_Implement& InState, const FMars_Request_Implement_Look& InRequest)
+    {
+        const auto IsFirst = InState.PendingLook.IsZero() && InState.PendingLookSeconds.IsSet() == false;
+        InState.PendingLook += FVector(InRequest.LookDelta.X, InRequest.LookDelta.Y, 0.0);
+
+        if (InRequest.Seconds.IsSet() == false)
+        {
+            InState.PendingLookSeconds.Reset();
+            return;
+        }
+
+        if (IsFirst)
+        {
+            InState.PendingLookSeconds = InRequest.Seconds;
+            return;
+        }
+
+        if (InState.PendingLookSeconds.IsSet())
+        { InState.PendingLookSeconds = TOptional<float32>(InState.PendingLookSeconds.GetValue() + InRequest.Seconds.GetValue()); }
     }
 
     private void Apply_Reset(FCk_Handle_Implement& InImplement, FMars_Fragment_Implement& InState)
@@ -84,6 +107,7 @@ class UMars_Processor_Implement_HandleRequests : UCk_Processor_Script_Base_UE
         InState.TargetSlide = FVector2D::ZeroVector;
         InState.SlideVelocity = FVector2D::ZeroVector;
         InState.PendingLook = FVector::ZeroVector;
+        InState.PendingLookSeconds.Reset();
         InState.OrbitPhase = 0.0f;
         InState.OrbitAlpha = 0.0f;
         InState.Steering = EMars_Implement_Steering::Own;

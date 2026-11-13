@@ -13,6 +13,9 @@
 // A piece the pan hands back lands on the finished tray through the station's assembly (UMars_FeedStation_EntityScript),
 // whoever operates.
 //
+// Stance: the input tasks read the operator on the authority alone (the station's InputStance), so a remote operator's
+// look, add-food and take-out arrive in its input stream there; the operator's own machine shows the pan from the ledger.
+//
 // The conditions are the shared station ones (Mars_Station_SmConditions.as). The player's Operating state owns the pose,
 // the camera (Captured: the view stays still, the look delta is ours), the glove grip and the Leave intent.
 
@@ -76,8 +79,8 @@ class UMars_SmTask_Searing_HeatOnEnter : UCk_SmTask_EntityScript
     }
 }
 
-// The operator's input: one look per drained look delta (degrees; X yaw right+, Y pitch down+), which tilts the pan and,
-// fast and upward, tosses it.
+// The operator's input: one look per drained look delta (degrees; X yaw right+, Y pitch down+) with the seconds it took on a
+// remote operator's machine, which tilts the pan and, fast and upward, tosses it.
 class UMars_SmTask_Searing_OperatorInput : UMars_SmTask_StationOperatorInput
 {
     private FCk_Handle_Searing _Searing;
@@ -96,7 +99,7 @@ class UMars_SmTask_Searing_OperatorInput : UMars_SmTask_StationOperatorInput
     protected void Poll() override
     {
         if (ck::IsValid(_Searing) && _Look.Advance(_Intents))
-        { _Searing.Request_Look(FMars_Request_Searing_Look(_Intents.Get_LookDelta())); }
+        { _Searing.Request_Look(FMars_Request_Searing_Look(_Intents.Get_LookDelta(), _Intents.Get_LookDeltaSeconds())); }
     }
 
     protected void Unbind() override

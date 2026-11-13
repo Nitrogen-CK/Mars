@@ -1,7 +1,9 @@
 // The server spawns the real searing station with the slow feed timing, docks the input platter with one slab frozen on
 // it, seats the subject and reports with the rides (step 1), then watches 5 s. At step 1, once its copy reads the subject
-// operating, the client's add-food row reads "add food - host only"; the client applies to its own copy of the subject's
-// InputIntents a seed and then a remote sample carrying one add-food press, and for 2 s every sampled frame its feed has no
+// operating, the client's add-food row reads "add food - 1 left" (the pan's control reads its operator on the authority,
+// where a client's press arrives in the operator's stream). What it pins is that a client's own copy issues nothing: the
+// client applies to its own copy of the subject's InputIntents a seed and then a remote sample carrying one add-food
+// press, and for 2 s every sampled frame its feed has no
 // request fragment, its ledger is unchanged and its hand is at rest; then its slab rides its platter. On the server the
 // feed never left Idle, raised no refusal and admitted none, and the slab is still frozen on the platter.
 // Surface: Ck.CookingFeed.Net.AS_CookingFeed_AClientAtAPanIsToldTheKeyIsTheHosts
@@ -122,7 +124,7 @@ class UCk_AutoTest_Net_CookingFeed_AClientAtAPanIsToldTheKeyIsTheHosts : UMars_A
     private void OnClientSeesOperator(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
     {
         _Row = Get_AddFoodRowText();
-        Assert_True(_Row == "add food - host only", f"the client's add-food row reads add food - host only (got {_Row})");
+        Assert_True(_Row == "add food - 1 left", f"the client's add-food row reads add food - 1 left (got {_Row})");
         Seed_RemoteThen(n"OnClientSeeded");
     }
 

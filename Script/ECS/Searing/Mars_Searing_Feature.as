@@ -590,17 +590,27 @@ struct FMars_Fragment_Searing_Signals
 // Requests
 //--------------------------------------------------------------------------------------------------------------------------
 
-// One drained InputIntents look delta (degrees; X yaw right+, Y pitch down+). Forwarded to the pan while hot.
+// One drained InputIntents look delta (degrees; X yaw right+, Y pitch down+) and the seconds it took on a remote sender
+// (unset = this frame). Forwarded to the pan while hot, which judges a toss against those seconds.
 struct FMars_Request_Searing_Look
 {
     UPROPERTY()
     FVector LookDelta = FVector::ZeroVector;
+
+    UPROPERTY()
+    TOptional<float32> Seconds;
 
     FMars_Request_Searing_Look() {}
 
     FMars_Request_Searing_Look(FVector InLookDelta)
     {
         LookDelta = InLookDelta;
+    }
+
+    FMars_Request_Searing_Look(FVector InLookDelta, TOptional<float32> InSeconds)
+    {
+        LookDelta = InLookDelta;
+        Seconds = InSeconds;
     }
 }
 

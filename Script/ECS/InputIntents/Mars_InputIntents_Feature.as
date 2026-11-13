@@ -1,7 +1,9 @@
 // Local on every machine: nothing here replicates. Where the player's input profile runs, the matcher and the look feed
 // it. The authority's copy of a remote operator is fed instead by the operator's remote samples (running totals and press
 // serials, so a lost sample loses nothing), applied into FMars_Fragment_InputIntents_Remote; the getters read the matcher
-// when it is valid and the remote state otherwise.
+// when it is valid and the remote state otherwise. A remote look also carries the seconds it took on the sender: samples
+// bunch on the wire, so a look the authority drains in one frame may have taken several, and a reader judging its speed
+// (a flick) reads those seconds instead of its own frame.
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
@@ -40,6 +42,11 @@ struct FMars_Fragment_InputIntents
 
     UPROPERTY()
     int32 LookDeltaSequence = 0;
+
+    // Written with every look delta: the sender's seconds the delta took when it came from remote samples alone and they
+    // cover some time; unset for a local look (it took this frame) or a drain that mixed both.
+    UPROPERTY()
+    TOptional<float32> LookDeltaSeconds;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -101,11 +108,15 @@ struct FMars_InputIntents_RemoteIntent
 }
 
 // What an operating machine sends the authority: totals, never deltas, so any later sample carries what a lost one did.
-// LookTotal is the running sum of every look delta the sampler has seen.
+// LookTotal is the running sum of every look delta the sampler has seen; LookSeconds the running sum of the sender's frame
+// seconds over the frames in which LookTotal moved.
 struct FMars_InputIntents_RemoteSample
 {
     UPROPERTY()
     FVector LookTotal = FVector::ZeroVector;
+
+    UPROPERTY()
+    float32 LookSeconds = 0.0f;
 
     UPROPERTY()
     TArray<FMars_InputIntents_RemoteIntent> Intents;
@@ -124,6 +135,7 @@ struct FMars_InputIntents_Sampler
 {
     FMars_LookCursor Look;
     FVector LookTotal = FVector::ZeroVector;
+    float32 LookSeconds = 0.0f;
     TArray<FMars_InputIntents_SamplerRow> Rows;
 }
 
@@ -150,22 +162,35 @@ struct FMars_InputIntents_RemoteRow
 }
 
 // Local, on the authority's copy of a remote operator: written only by UMars_Processor_InputIntents_HandleRequests from
-// ApplyRemoteSample, emptied by ClearRemote. LookTotal unset = no sample since the last clear (the next one seeds).
+// ApplyRemoteSample, emptied by ClearRemote. LookTotal unset = no sample since the last clear (the next one seeds);
+// LookSeconds is seeded and cleared with it.
 struct FMars_Fragment_InputIntents_Remote
 {
     UPROPERTY()
     TOptional<FVector> LookTotal;
 
     UPROPERTY()
+    TOptional<float32> LookSeconds;
+
+    UPROPERTY()
     TArray<FMars_InputIntents_RemoteRow> Rows;
 }
 
-// One drain of remote samples, while it runs: the frame it stamps and the look total it moves from (unset until a seed).
+// One drain of remote samples, while it runs: the frame it stamps and the look total and look seconds it moves from
+// (unset until a seed).
 struct FMars_InputIntents_RemoteDrain
 {
     FCk_Handle_InputIntents Intents;
     int32 Frame = 0;
     TOptional<FVector> LookStart;
+    TOptional<float32> LookSecondsStart;
+}
+
+// How far one drain's remote samples moved the look total, and the sender's seconds that move took.
+struct FMars_InputIntents_RemoteLookMove
+{
+    FVector Delta = FVector::ZeroVector;
+    float32 Seconds = 0.0f;
 }
 
 namespace constants_input_intents

@@ -3,9 +3,10 @@
 // (EMars_TESTONLY_HeatStation) and its exposed spec; the server spawns it through the heat-station fixture under the
 // replicated spawn owner, as the map's spawner makes it (its own context), and each machine finds its own copy as the
 // base rig finds its station, then its kernel, whose signals it records in order from then on. The rig adds: a remote
-// sample (the server applies one FMars_InputIntents_RemoteSample built from a look total and every operator row it keeps,
-// each with its running press serial and hold), holding a row and letting it go, pressing it; admitting a piece (the
-// server queues a release of it over the station's release node in the station's admission inbox, as the feed does); the
+// sample (the server applies one FMars_InputIntents_RemoteSample built from a look total, its seconds and every operator
+// row it keeps, each with its running press serial and hold), a remote look, holding a row and letting it go, pressing it;
+// admitting a piece (the server queues a release of it over the station's release node in the station's admission inbox,
+// as the feed does); the
 // subject's dip and take-out rows; a tray (an empty large platter docked on the Output dock); and a third test-only
 // replicated report on the subject with the followed pieces, the bowl's ids, a coat and the bowl's serial (the pan's ids,
 // a number and a face at the searing station). The Searing branch spawns the real searing station with the test's exposed
@@ -145,6 +146,7 @@ class UMars_AutoTestRig_NetHeatStation : UMars_AutoTestRig_NetFeedStation
     private int32 _AdmitIndex = 0;
     private TArray<FMars_TESTONLY_NetHeatRemoteRow> _RemoteRows;
     private FVector _LookTotal = FVector::ZeroVector;
+    private float32 _LookSeconds = 0.0f;
     private FCk_Handle _CutSlab;
     private FName _FoodsContinuation;
     private FName _CutContinuation;
@@ -1002,11 +1004,12 @@ class UMars_AutoTestRig_NetHeatStation : UMars_AutoTestRig_NetFeedStation
     // Server: the operator
     //----------------------------------------------------------------------------------------------------------------------
 
-    // Every row starts at the seed serial, released, and the look total at zero.
+    // Every row starts at the seed serial, released, and the look total and its seconds at zero.
     private void Reset_RemoteRows()
     {
         _RemoteRows.Empty();
         _LookTotal = FVector::ZeroVector;
+        _LookSeconds = 0.0f;
         auto Intents = TArray<FGameplayTag>();
         Intents.Add(GameplayTags::Mars_Intent_Interact_Primary);
         Intents.Add(GameplayTags::Mars_Intent_Interact_Secondary);
@@ -1020,15 +1023,24 @@ class UMars_AutoTestRig_NetHeatStation : UMars_AutoTestRig_NetFeedStation
         }
     }
 
-    // Server: one remote sample carrying the look total and every row as it stands now.
+    // Server: one remote sample carrying the look total, its seconds and every row as it stands now.
     protected void Apply_RemoteSample()
     {
         auto Sample = FMars_InputIntents_RemoteSample();
         Sample.LookTotal = _LookTotal;
+        Sample.LookSeconds = _LookSeconds;
         for (const auto& Row : _RemoteRows)
         { Sample.Intents.Add(FMars_InputIntents_RemoteIntent(Row.Intent, Row.PressSerial, Row.Hold)); }
 
         _Intents.Request_ApplyRemoteSample(FMars_Request_InputIntents_ApplyRemoteSample(Sample));
+    }
+
+    // Server: a remote look of InDegrees (X yaw right+, Y pitch down+) that took InSeconds on the sender, in one sample.
+    protected void Look_Remote(FVector InDegrees, float32 InSeconds)
+    {
+        _LookTotal += InDegrees;
+        _LookSeconds += InSeconds;
+        Apply_RemoteSample();
     }
 
     // Server: InIntent goes down (one press more, held), in one sample.

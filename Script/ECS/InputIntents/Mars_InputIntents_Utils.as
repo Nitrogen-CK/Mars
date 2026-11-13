@@ -37,10 +37,11 @@ namespace utils_input_intents
         return InEdge == EMars_IntentEdge::Released || InEdge == EMars_IntentEdge::ReleasedAndPressed;
     }
 
-    // The sending machine's sample of InIntents this frame: the look total and, per operator intent, its press serial and
-    // hold. Call once a frame (each look delta is counted once, on the frame it drained). The first call seeds: a hold and
-    // a look from before it never count.
-    FMars_InputIntents_RemoteSample Make_RemoteSample(const FCk_Handle_InputIntents& InIntents, FMars_InputIntents_Sampler& InOutSampler)
+    // The sending machine's sample of InIntents this frame: the look total, the seconds it took (InFrameSeconds joins them
+    // on a frame whose look delta joins the total) and, per operator intent, its press serial and hold. Call once a frame
+    // (each look delta is counted once, on the frame it drained). The first call seeds: a hold and a look from before it
+    // never count.
+    FMars_InputIntents_RemoteSample Make_RemoteSample(const FCk_Handle_InputIntents& InIntents, FMars_InputIntents_Sampler& InOutSampler, float32 InFrameSeconds)
     {
         if (InOutSampler.Rows.IsEmpty())
         {
@@ -54,10 +55,14 @@ namespace utils_input_intents
             }
         }
         else if (InOutSampler.Look.Advance(InIntents))
-        { InOutSampler.LookTotal += InIntents.Get_LookDelta(); }
+        {
+            InOutSampler.LookTotal += InIntents.Get_LookDelta();
+            InOutSampler.LookSeconds += InFrameSeconds;
+        }
 
         auto Sample = FMars_InputIntents_RemoteSample();
         Sample.LookTotal = InOutSampler.LookTotal;
+        Sample.LookSeconds = InOutSampler.LookSeconds;
         for (auto& Row : InOutSampler.Rows)
         {
             if (utils_input_intents::Get_HasPress(Row.Edge.Advance(InIntents, Row.Intent)))
@@ -72,7 +77,7 @@ namespace utils_input_intents
 
     bool Get_AreSameSamples(const FMars_InputIntents_RemoteSample& InA, const FMars_InputIntents_RemoteSample& InB)
     {
-        if (InA.LookTotal != InB.LookTotal || InA.Intents.Num() != InB.Intents.Num())
+        if (InA.LookTotal != InB.LookTotal || InA.LookSeconds != InB.LookSeconds || InA.Intents.Num() != InB.Intents.Num())
         { return false; }
 
         for (int32 Index = 0; Index < InA.Intents.Num(); ++Index)
@@ -152,6 +157,13 @@ mixin FVector Get_MoveDirection(const FCk_Handle_InputIntents& Self)
 mixin FVector Get_LookDelta(const FCk_Handle_InputIntents& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_InputIntents).LookDelta;
+}
+
+// The seconds the last drained look delta took on a remote sender; unset for a local look (it took this frame) or a drain
+// that mixed local and remote look.
+mixin TOptional<float32> Get_LookDeltaSeconds(const FCk_Handle_InputIntents& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_InputIntents).LookDeltaSeconds;
 }
 
 // Advances once per drain that carried a look delta.

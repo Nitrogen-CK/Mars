@@ -240,7 +240,7 @@ class UMars_AutoTestRig_NetInputIntents : UMars_AutoTestRig_NetStation
     protected void Sample_AndSend()
     {
         const auto FirstSample = _Sampler.Rows.IsEmpty();
-        const auto Sample = utils_input_intents::Make_RemoteSample(_Intents, _Sampler);
+        const auto Sample = utils_input_intents::Make_RemoteSample(_Intents, _Sampler, float32(Gameplay::GetWorldDeltaSeconds()));
         _SamplesMade += 1;
         _FramesSinceSent += 1;
 

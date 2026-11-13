@@ -130,7 +130,7 @@ class UMars_Processor_Searing_HandleRequests : UCk_Processor_Script_Base_UE
         if (NewHeat == EMars_Searing_Heat::Hot)
         {
             for (const auto& Request : LookRequests)
-            { Pan.Request_Look(FMars_Request_Implement_Look(Request.LookDelta)); }
+            { Pan.Request_Look(FMars_Request_Implement_Look(Request.LookDelta, Request.Seconds)); }
         }
 
         auto Answers = FMars_Searing_Answers();

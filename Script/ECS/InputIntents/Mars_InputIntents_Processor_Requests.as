@@ -2,7 +2,8 @@
 // ApplyRemoteSample in arrival order. Every SetMatcher that changes the matcher broadcasts OnMatcherChanged(Prev, New) - a
 // swap to INVALID and back inside one frame broadcasts twice - so matcher-signal consumers rebind inside the handler. The
 // AddLookDelta requests of one drain and the remote look total's move over the drain are summed into LookDelta
-// (replacing the last one) and advance LookDeltaSequence once.
+// (replacing the last one) and advance LookDeltaSequence once. LookDeltaSeconds is written with it: the sender's seconds the
+// remote samples of the drain covered when the delta is theirs alone and those seconds are above zero, unset otherwise.
 //
 // Remote samples (the authority's copy of a remote operator): the first after a clear seeds the totals and serials and
 // raises nothing. Later, a serial that advanced starts a run of that many presses stamped with this frame, or lengthens the
@@ -44,6 +45,7 @@ class UMars_Processor_InputIntents_HandleRequests : UCk_Processor_Script_Base_UE
         { InState.MoveDirection = Request.MoveDirection; }
 
         auto LookDelta = Sum_LookDeltas(AddLookDeltaRequests);
+        auto LookSeconds = TOptional<float32>();
 
         if (ClearRemoteRequests.IsEmpty() == false && Self.Has_Fragment(FMars_Fragment_InputIntents_Remote))
         {
@@ -56,14 +58,19 @@ class UMars_Processor_InputIntents_HandleRequests : UCk_Processor_Script_Base_UE
             const auto RemoteLook = HandleApplyRemoteSampleRequests(Self, ApplyRemoteSampleRequests);
             if (RemoteLook.IsSet())
             {
+                const auto Move = RemoteLook.GetValue();
+                if (LookDelta.IsSet() == false && Move.Seconds > 0.0f)
+                { LookSeconds = TOptional<float32>(Move.Seconds); }
+
                 const auto LocalLook = LookDelta.IsSet() ? LookDelta.GetValue() : FVector::ZeroVector;
-                LookDelta = TOptional<FVector>(LocalLook + RemoteLook.GetValue());
+                LookDelta = TOptional<FVector>(LocalLook + Move.Delta);
             }
         }
 
         if (LookDelta.IsSet())
         {
             InState.LookDelta = LookDelta.GetValue();
+            InState.LookDeltaSeconds = LookSeconds;
             InState.LookDeltaSequence += 1;
         }
     }
@@ -80,8 +87,9 @@ class UMars_Processor_InputIntents_HandleRequests : UCk_Processor_Script_Base_UE
         return TOptional<FVector>(LookDelta);
     }
 
-    // Applies every sample in order; returns how far the look total moved over them (unset = it did not move).
-    private TOptional<FVector> HandleApplyRemoteSampleRequests(
+    // Applies every sample in order; returns how far the look total moved over them and how far the look seconds did
+    // (unset = the look total did not move).
+    private TOptional<FMars_InputIntents_RemoteLookMove> HandleApplyRemoteSampleRequests(
         FCk_Handle_InputIntents& InIntents,
         const TArray<FMars_Request_InputIntents_ApplyRemoteSample>& InRequests)
     {
@@ -91,18 +99,23 @@ class UMars_Processor_InputIntents_HandleRequests : UCk_Processor_Script_Base_UE
         Drain.Intents = InIntents;
         Drain.Frame = int32(utils_time::Get_FrameCounter());
         Drain.LookStart = Remote.LookTotal;
+        Drain.LookSecondsStart = Remote.LookSeconds;
 
         for (const auto& Request : InRequests)
         { Apply_Sample(Remote, Request.Sample, Drain); }
 
         if (Drain.LookStart.IsSet() == false || Remote.LookTotal.IsSet() == false)
-        { return TOptional<FVector>(); }
+        { return TOptional<FMars_InputIntents_RemoteLookMove>(); }
 
-        const auto Moved = Remote.LookTotal.GetValue() - Drain.LookStart.GetValue();
-        if (Moved.IsZero())
-        { return TOptional<FVector>(); }
+        auto Move = FMars_InputIntents_RemoteLookMove();
+        Move.Delta = Remote.LookTotal.GetValue() - Drain.LookStart.GetValue();
+        if (Move.Delta.IsZero())
+        { return TOptional<FMars_InputIntents_RemoteLookMove>(); }
 
-        return TOptional<FVector>(Moved);
+        if (Drain.LookSecondsStart.IsSet() && Remote.LookSeconds.IsSet())
+        { Move.Seconds = Remote.LookSeconds.GetValue() - Drain.LookSecondsStart.GetValue(); }
+
+        return TOptional<FMars_InputIntents_RemoteLookMove>(Move);
     }
 
     private void Apply_Sample(
@@ -112,8 +125,12 @@ class UMars_Processor_InputIntents_HandleRequests : UCk_Processor_Script_Base_UE
     {
         const auto Seeding = InOutRemote.LookTotal.IsSet() == false;
         InOutRemote.LookTotal = TOptional<FVector>(InSample.LookTotal);
+        InOutRemote.LookSeconds = TOptional<float32>(InSample.LookSeconds);
         if (Seeding)
-        { InOutDrain.LookStart = TOptional<FVector>(InSample.LookTotal); }
+        {
+            InOutDrain.LookStart = TOptional<FVector>(InSample.LookTotal);
+            InOutDrain.LookSecondsStart = TOptional<float32>(InSample.LookSeconds);
+        }
 
         for (const auto& Intent : InSample.Intents)
         {
