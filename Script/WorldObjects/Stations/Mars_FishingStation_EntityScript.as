@@ -9,6 +9,11 @@
 // tension), the reel handle turning while the reel is held, the line from the rod tip to the bait, the bait on the water,
 // the landed fish's fling to the catch point, the spot's marker on the water, and the label. Milestone 2: engine primitives
 // stand in for the rod, reel, line, bait, fish and spot; the authored meshes, materials, rings and sparkles follow.
+//
+// Stance A, following the base station. The spot is the authority's: every machine draws the rod, the line, the bait, the
+// fish and the label from its own copy of the kernel, which a machine without authority follows from the spot's replicated
+// ledger and whose signals its mirror raises there. The station's InputStance is Authority: a remote operator's look and
+// Primary reach the authority in its input stream, and only the authority lands the fish on the bank.
 class UMars_FishingStation_EntityScript : UMars_CounterStation_EntityScript
 {
     default _ShowInPlaceActors = true;
@@ -190,6 +195,10 @@ class UMars_FishingStation_EntityScript : UMars_CounterStation_EntityScript
             NSLOCTEXT("MarsInteraction", "FishHerePrompt", "Fish here"),
             NSLOCTEXT("MarsInteraction", "FishingStationInUsePrompt", "In use"));
         InOutSpec.MinigameStateClass = UMars_SmState_Fishing_Idle;
+
+        // The control reads the operator on the authority alone: a remote operator's look and Primary reach it as its
+        // stream, and its rod follows the ledger a round trip later.
+        InOutSpec.InputStance = EMars_Station_InputStance::Authority;
     }
 
     protected void AddVisuals(FCk_Handle_Transform& InRoot) override

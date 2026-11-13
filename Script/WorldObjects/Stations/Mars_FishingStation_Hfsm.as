@@ -4,6 +4,11 @@
 // simulation clock: the bait's flight, the bite, the hook window, the runs, the tension and the landing are the kernel's.
 // Its only clocks are working state (the cast's charge, the snapped line's beat), kept on the tasks.
 //
+// Stance: the input task reads the operator on the authority alone (the station's InputStance), so a remote operator's
+// look and Primary reach it in its input stream; the engage task and the snapped line's beat ask on every machine, and only
+// the authority's spot applies. The landing is the authority's: only it puts the fish on the bank, under the replicated
+// spawn owner, and collects the spot.
+//
 //   Idle      ->Operated [StationIsOperated]
 //   Operated  ->Idle     [StationIsNotOperated]   tasks: Fishing_Engage, Fishing_OperatorInput (Tick: look turns the rod;
 //                                                  Primary by the kernel's phase: Idle charges and casts, Bite strikes,
@@ -366,9 +371,10 @@ class UMars_SmTask_Fishing_OperatorInput : UMars_SmTask_StationOperatorInput
     }
 }
 
-// The landing: once the fling has arrived, the catch lands on the bank as a World-mode food item at the catch point (a
-// whole food is its own world item, picked up by hand, never conjured into a hotbar) and the spot is collected. Once per
-// landing.
+// The landing, on the authority over the station only: once the fling has arrived, the catch lands on the bank as a
+// World-mode food item at the catch point (a whole food is its own world item, picked up by hand, never conjured into a
+// hotbar) and the spot is collected. Once per landing. While the world's replicated spawn owner is not published yet it
+// lands nothing and collects nothing, and tries again on its next tick: a catch is never collected without its fish.
 class UMars_SmTask_Fishing_Land : UCk_SmTask_EntityScript
 {
     default _TaskMode = ECk_SmTaskMode::Tick;
@@ -391,11 +397,14 @@ class UMars_SmTask_Fishing_Land : UCk_SmTask_EntityScript
         if (_Granted || ck::Is_NOT_Valid(_Fishing) || _Fishing.Get_Phase() != EMars_Fishing_Phase::Landed)
         { return ECk_SmTaskResult::Running; }
 
-        if (_Fishing.Get_FlingAlpha() < 1.0f)
+        if (utils_net::Get_HasAuthority(_Station) == false || _Fishing.Get_FlingAlpha() < 1.0f)
+        { return ECk_SmTaskResult::Running; }
+
+        if (utils_mars_net::Get_HasReplicatedSpawnOwner(_Station) == false)
         { return ECk_SmTaskResult::Running; }
 
         _Granted = true;
-        utils_fishing_station::Land_Catch(_Fishing.Get_Catch(), _Fishing.Get_CatchWorld());
+        utils_fishing_station::Land_Catch(_Fishing.Get_Catch(), _Station, _Fishing.Get_CatchWorld());
         _Fishing.Request_Collect(FMars_Request_Fishing_Collect());
         return ECk_SmTaskResult::Running;
     }
@@ -445,11 +454,12 @@ class UMars_SmTask_Fishing_SnapBeat : UCk_SmTask_EntityScript
 
 namespace utils_fishing_station
 {
-    // InCatch as a World-mode item at InCatchWorld, loose under the world's transient entity (it outlives the spot), dropped
-    // from the fling's end so it settles on the bank. Returns the entity under construction.
-    FCk_Handle Land_Catch(const FMars_Fishing_Catch& InCatch, FVector InCatchWorld)
+    // InCatch as a World-mode item at InCatchWorld, under InStation's world's replicated spawn owner (the fish outlives the
+    // spot and every machine sees it), dropped from the fling's end so it settles on the bank. Returns the entity under
+    // construction; the caller has checked that the spawn owner is published.
+    FCk_Handle Land_Catch(const FMars_Fishing_Catch& InCatch, const FCk_Handle& InStation, FVector InCatchWorld)
     {
-        auto Owner = ck::TransientEntity();
+        auto Owner = utils_mars_net::Get_SpawnOwnerFor(InStation, FCk_Handle());
         return utils_world_item::Request_SpawnWorld(Owner, FMars_WorldItem_WorldSpec(InCatch.Item, FTransform(FRotator::ZeroRotator, InCatchWorld)));
     }
 }

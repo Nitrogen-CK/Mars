@@ -1,3 +1,17 @@
+// Stance: the spot is the authority's. Only the authority's copy engages, casts, waits, bites, hooks, fights, lands,
+// collects and fades, and only it draws from the spot's generator; a copy without authority drops every request. The
+// authority publishes a replicated ledger (FMars_Fragment_Fishing_Net): the engagement, the phase (with a serial), the
+// presence, the reel, the run, the dip, the tally, the catch's place in the table, a serial for each cast, bite, bite end,
+// landing and collection, and three anchors on the server's clock (utils_mars_net::Get_ServerWorldSeconds): the cast (with
+// its origin and velocity), the landing (with where the fish left the water) and the fade in progress. The aim and the
+// line are paced (written when they moved by a quantum and a fifteenth of a second has passed, and with every other write);
+// everything else is written at once. A copy without authority shows its own state fragment, written by its mirror
+// (UMars_Processor_Fishing_Mirror) from each ledger that arrives and carried on between them by its ticks (the bait's
+// flight, the bob, the aim and the line eased toward the ledger's, the fling and the fade); there it raises OnCast, OnBite,
+// OnBiteEnded, OnLanded, OnCollected, OnPhaseChanged and OnPresenceChanged from the ledger, never OnBaitLanded, OnRun or
+// OnSnapped. The generator and every clock it seeds (the bite's time, the hook window, the hook set, the run) never leave
+// the authority.
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
 //--------------------------------------------------------------------------------------------------------------------------
@@ -49,6 +63,20 @@ enum EMars_Fishing_BiteResult
 {
     Hooked,
     Missed
+}
+
+// Whether an operator works the spot, as the ledger carries it (the Engaged tag on the authority).
+enum EMars_Fishing_Engagement
+{
+    Idle,
+    Engaged
+}
+
+// Whether the fish on the line is running, as the ledger carries it.
+enum EMars_Fishing_RunState
+{
+    Calm,
+    Running
 }
 
 // The cast: a power 0..1 picks a distance between MinDistanceCm and MaxDistanceCm along the aim, launched at LaunchPitchDeg
@@ -477,6 +505,10 @@ struct FMars_Fishing_Catch
     UPROPERTY()
     float32 Fight = 1.0f;
 
+    // The fish's place in Spec.Fish.Table, so a copy without authority finds the same entry.
+    UPROPERTY()
+    int32 TableIndex = 0;
+
     UPROPERTY()
     FVector LandedAt;
 
@@ -485,7 +517,8 @@ struct FMars_Fishing_Catch
     float32 FlingLeft = 0.0f;
 }
 
-// Written only by the Fishing processors (and Add). The station SM and the operator only issue requests.
+// Written only by the Fishing processors (and Add): with authority by the drain and the ticks, without by the mirror and
+// the ticks' follow. The station SM and the operator only issue requests.
 struct FMars_Fragment_Fishing
 {
     UPROPERTY()
@@ -523,6 +556,116 @@ struct FMars_Fragment_Fishing
     UPROPERTY()
     int32 Tally = 0;
 }
+
+// What a processor announces to utils_fishing::Publish beyond the state it leaves: the events of its step, each one a
+// serial more in the ledger. TickSeconds is the engaged tick's step, set only by it: only it publishes the paced values.
+struct FMars_Fishing_Answers
+{
+    int32 Casts = 0;
+    int32 Bites = 0;
+    TArray<EMars_Fishing_BiteResult> BiteEnds;
+    int32 Landings = 0;
+    int32 Collections = 0;
+    TOptional<float32> TickSeconds;
+}
+
+// The replicated ledger: what a copy without authority shows the spot from. Written only by utils_fishing::Publish, which
+// the authority's fishing processors call, each write followed by its dirty mark. Aim and Line are paced; the anchors are
+// the server's clock at the event they stamp.
+struct FMars_Fragment_Fishing_Net
+{
+    UPROPERTY()
+    EMars_Fishing_Engagement Engagement = EMars_Fishing_Engagement::Idle;
+
+    UPROPERTY()
+    EMars_Fishing_Phase Phase = EMars_Fishing_Phase::Idle;
+
+    // One more per phase change.
+    UPROPERTY()
+    int32 PhaseSerial = 0;
+
+    UPROPERTY()
+    EMars_Fishing_Presence Presence = EMars_Fishing_Presence::Open;
+
+    // When the fade in progress began.
+    UPROPERTY()
+    float64 PresenceAnchorServerSeconds = 0.0;
+
+    UPROPERTY()
+    EMars_Fishing_Reel Reel = EMars_Fishing_Reel::Released;
+
+    UPROPERTY()
+    EMars_Fishing_RunState Run = EMars_Fishing_RunState::Calm;
+
+    UPROPERTY()
+    FMars_Fishing_Aim Aim;
+
+    UPROPERTY()
+    FMars_Fishing_Line Line;
+
+    // One per cast the authority launched; the latest's launch.
+    UPROPERTY()
+    int32 CastSerial = 0;
+
+    UPROPERTY()
+    FVector CastOrigin;
+
+    UPROPERTY()
+    FVector CastVelocity;
+
+    UPROPERTY()
+    float64 CastAnchorServerSeconds = 0.0;
+
+    // Where the bait lies on the water from Waiting on.
+    UPROPERTY()
+    FVector BaitPosition;
+
+    UPROPERTY()
+    float32 DipCm = 0.0f;
+
+    // The catch's place in Spec.Fish.Table; -1 with no fish on.
+    UPROPERTY()
+    int32 CatchIndex = -1;
+
+    UPROPERTY()
+    FVector LandedAt;
+
+    UPROPERTY()
+    float64 LandedAnchorServerSeconds = 0.0;
+
+    UPROPERTY()
+    int32 Tally = 0;
+
+    UPROPERTY()
+    int32 BiteSerial = 0;
+
+    // One per bite that ended; LastBiteEnd is the latest's result.
+    UPROPERTY()
+    int32 BiteEndSerial = 0;
+
+    UPROPERTY()
+    EMars_Fishing_BiteResult LastBiteEnd = EMars_Fishing_BiteResult::Missed;
+
+    UPROPERTY()
+    int32 LandedSerial = 0;
+
+    UPROPERTY()
+    int32 CollectedSerial = 0;
+}
+
+// Each machine's own: the ledger the mirror last reconciled (unset with authority), and the seconds since the authority's
+// last paced write.
+struct FMars_Fragment_Fishing_Local
+{
+    UPROPERTY()
+    TOptional<FMars_Fragment_Fishing_Net> Last;
+
+    UPROPERTY()
+    float32 SecondsSincePaced = 0.0f;
+}
+
+// Added by utils_fishing::Add, dropped by UMars_Processor_Fishing_Mirror once it has bound the ledger's rep-notify.
+struct FMars_Tag_Fishing_NeedsMirror {}
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Signals

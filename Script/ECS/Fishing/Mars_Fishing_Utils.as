@@ -10,11 +10,21 @@ struct FMars_Fishing_CastQuery
     float64 SurfaceZ = 0.0;
 }
 
+// What a copy without authority shows: the ledger that arrived, the one it showed before, the spec and its state now.
+struct FMars_Fishing_ShowQuery
+{
+    FMars_Fragment_Fishing_Net Ledger;
+    FMars_Fragment_Fishing_Net Last;
+    FMars_Fishing_Spec Spec;
+    FMars_Fragment_Fishing State;
+}
+
 namespace utils_fishing
 {
     // Composes the fishing spot on InHandle (the station entity; the feature does not need the Station feature). Every
-    // clock is the kernel's; what draws the rod, line, bait and fish follows its state and signals. A rejected spec ensures
-    // and returns an invalid handle.
+    // clock is the kernel's; what draws the rod, line, bait and fish follows its state and signals. Adds the replicated
+    // ledger unless it already arrived, this machine's mirror state and the tag that wakes the mirror; without authority the
+    // state starts as the ledger shows it and no generator is seeded. A rejected spec ensures and returns an invalid handle.
     FCk_Handle_Fishing Add(FCk_Handle& InHandle, FMars_Fishing_Spec InSpec)
     {
         const auto Validation = InSpec.Validate();
@@ -24,16 +34,46 @@ namespace utils_fishing
         auto Params = FMars_Fragment_Fishing_Params();
         Params.Spec = InSpec;
 
+        const auto HasAuthority = utils_net::Get_HasAuthority(InHandle);
         auto State = FMars_Fragment_Fishing();
-        State.Rng = Make_Seed(InSpec.Seed);
         State.Presence = InSpec.Presence.StartOpen ? EMars_Fishing_Presence::Open : EMars_Fishing_Presence::Arriving;
         State.Clock.PresenceLeft = InSpec.Presence.StartOpen ? 0.0f : InSpec.Presence.ArriveSeconds;
+        if (HasAuthority)
+        { State.Rng = Make_Seed(InSpec.Seed); }
+
+        // A copy without authority can receive the replicated ledger before it composes: the arrived ledger stands then,
+        // and a spot first read mid-fight shows that fight and raises nothing.
+        if (InHandle.Has_Fragment(FMars_Fragment_Fishing_Net) == false)
+        {
+            auto Fresh = FMars_Fragment_Fishing_Net();
+            Fresh.Presence = State.Presence;
+            Fresh.PresenceAnchorServerSeconds = utils_mars_net::Get_ServerWorldSeconds(InHandle);
+            InHandle.Add_Fragment(Fresh, ECk_Replication::Replicates);
+        }
+
+        const auto Ledger = InHandle.Get_Fragment(FMars_Fragment_Fishing_Net);
+        if (HasAuthority == false)
+        {
+            auto Query = FMars_Fishing_ShowQuery();
+            Query.Ledger = Ledger;
+            Query.Spec = InSpec;
+            Query.State = State;
+            State = Get_Shown(InHandle, Query);
+        }
+
+        auto Local = FMars_Fragment_Fishing_Local();
+        Local.Last = TOptional<FMars_Fragment_Fishing_Net>(Ledger);
 
         InHandle.Add_Fragment(FMars_Feature_Fishing());
         InHandle.Add_Fragment(Params);
         InHandle.Add_Fragment(State);
-        if (InSpec.Presence.StartOpen == false)
+        InHandle.Add_Fragment(Local);
+        InHandle.Add_Fragment(FMars_Tag_Fishing_NeedsMirror());
+        if (Get_IsFading(State.Presence))
         { InHandle.Add_Fragment(FMars_Tag_Fishing_Transitioning()); }
+
+        if (HasAuthority == false && Ledger.Engagement == EMars_Fishing_Engagement::Engaged)
+        { InHandle.Add_Fragment(FMars_Tag_Fishing_Engaged()); }
 
         return InHandle.As_Fishing();
     }
@@ -69,22 +109,26 @@ namespace utils_fishing
         return Math::Lerp(InMin, InMax, Next_Unit(InOutRng));
     }
 
-    // A weighted draw from the table (the table is non-empty: Validate).
-    FMars_Fishing_FishEntry Draw_Fish(const TArray<FMars_Fishing_FishEntry>& InTable, uint32& InOutRng)
+    // A weighted draw from the table (the table is non-empty: Validate); OutIndex is the entry's place in it.
+    FMars_Fishing_FishEntry Draw_Fish(const TArray<FMars_Fishing_FishEntry>& InTable, uint32& InOutRng, int32& OutIndex)
     {
         float32 Total = 0.0f;
         for (const auto& Entry : InTable)
         { Total += Entry.Weight; }
 
         auto Pick = Next_Unit(InOutRng) * Total;
-        for (const auto& Entry : InTable)
+        for (int32 Index = 0; Index < InTable.Num(); ++Index)
         {
-            Pick -= Entry.Weight;
+            Pick -= InTable[Index].Weight;
             if (Pick < 0.0f)
-            { return Entry; }
+            {
+                OutIndex = Index;
+                return InTable[Index];
+            }
         }
 
-        return InTable[InTable.Num() - 1];
+        OutIndex = InTable.Num() - 1;
+        return InTable[OutIndex];
     }
 
     // The launch velocity that lands the bait DistanceCm out on the plane: v^2 = g d^2 / (2 cos^2(p) (h + d tan(p))) with
@@ -108,6 +152,234 @@ namespace utils_fishing
         auto Forward = InFrame.GetRotation().RotateVector(Local);
         Forward.Z = 0.0;
         return Forward.GetSafeNormal(0.0001, FVector::ForwardVector);
+    }
+
+    // The pacing rule for the ledger's aim and line, published while they move: a write when either moved from the ledger's
+    // by its quantum and at least 1 / k_PacedHz has passed since the last paced write.
+    const float32 k_AimQuantumDeg = 0.25f;
+    const float32 k_LineQuantumCm = 2.0f;
+    const float32 k_TensionQuantum = 0.01f;
+    const float32 k_PacedHz = 15.0f;
+
+    // How fast a copy without authority eases its aim and line toward the ledger's.
+    const float32 k_FollowAimDegPerS = 180.0f;
+    const float32 k_FollowLineCmPerS = 600.0f;
+    const float32 k_FollowTensionPerS = 3.0f;
+
+    // The longest slice a flight is replayed in from its anchor.
+    const float32 k_FlightStepSeconds = 1.0f / 60.0f;
+
+    // One step of the bait's flight under gravity; true once it meets the water, where it is set on the surface at rest. The
+    // one flight of the kernel, with authority and without.
+    bool Advance_Flight(FMars_Fishing_Bait& InOutBait, const FMars_Fishing_Spec& InSpec, float32 InDeltaSeconds)
+    {
+        InOutBait.Velocity.Z -= InSpec.Launch.GravityCmPerS2 * InDeltaSeconds;
+        InOutBait.Position += InOutBait.Velocity * InDeltaSeconds;
+        if (InOutBait.Position.Z > InSpec.Water.SurfaceZ)
+        { return false; }
+
+        InOutBait.Position.Z = InSpec.Water.SurfaceZ;
+        InOutBait.Velocity = FVector::ZeroVector;
+        return true;
+    }
+
+    // The bait InSeconds into the flight that left as InLaunch, by Advance_Flight in slices of at most k_FlightStepSeconds.
+    FMars_Fishing_Bait Get_FlownBait(const FMars_Fishing_Spec& InSpec, const FMars_Fishing_Bait& InLaunch, float32 InSeconds)
+    {
+        auto Bait = InLaunch;
+        auto Left = InSeconds;
+        while (Left > 0.0f)
+        {
+            const auto Step = Math::Min(Left, k_FlightStepSeconds);
+            Left -= Step;
+            if (Advance_Flight(Bait, InSpec, Step))
+            { break; }
+        }
+
+        return Bait;
+    }
+
+    // The spot is fading in or out: its fade clock runs and it carries the Transitioning tag.
+    bool Get_IsFading(EMars_Fishing_Presence InPresence)
+    {
+        return InPresence == EMars_Fishing_Presence::Arriving || InPresence == EMars_Fishing_Presence::Leaving;
+    }
+
+    // The bait floats where it landed: Waiting, a bite, and the fight.
+    bool Get_IsOnTheWater(EMars_Fishing_Phase InPhase)
+    {
+        return InPhase == EMars_Fishing_Phase::Waiting || InPhase == EMars_Fishing_Phase::Bite
+            || InPhase == EMars_Fishing_Phase::Hooked || InPhase == EMars_Fishing_Phase::Reeling;
+    }
+
+    // What a copy without authority shows from InQuery.Ledger, carried on from InQuery.State against InQuery.Last (the
+    // ledger it showed before): the ledger's phase (a new one restarts the phase clock, and the follow then sets the line
+    // outright), presence, reel, run, tally and dip; a fade new to this machine's clock from its anchor; a new cast's bait
+    // where its flight has reached by now; the bait on the ledger's landing point while it floats; the catch at the
+    // ledger's place in the table (none for a bad place) with a new landing's fling from its anchor. The aim and the line
+    // are the follow's while the spot is engaged; an idle spot's are the ledger's, since nothing eases them then. Seconds
+    // since an anchor are on the server's clock and never negative.
+    FMars_Fragment_Fishing Get_Shown(const FCk_Handle& InHandle, const FMars_Fishing_ShowQuery& InQuery)
+    {
+        const auto Ledger = InQuery.Ledger;
+        const auto Last = InQuery.Last;
+        const auto Spec = InQuery.Spec;
+        const auto Now = utils_mars_net::Get_ServerWorldSeconds(InHandle);
+
+        auto Shown = InQuery.State;
+        Shown.Phase = Ledger.Phase;
+        Shown.Presence = Ledger.Presence;
+        Shown.Reel = Ledger.Reel;
+        Shown.Run.Running = Ledger.Run == EMars_Fishing_RunState::Running;
+        Shown.Tally = Ledger.Tally;
+        if (Ledger.Engagement == EMars_Fishing_Engagement::Idle)
+        {
+            Shown.Aim = Ledger.Aim;
+            Shown.Line = Ledger.Line;
+        }
+
+        if (Ledger.PhaseSerial != Last.PhaseSerial)
+        { Shown.Clock.PhaseSeconds = 0.0f; }
+
+        if (Ledger.Presence != Last.Presence || Ledger.PresenceAnchorServerSeconds != Last.PresenceAnchorServerSeconds)
+        {
+            auto FadeSeconds = 0.0f;
+            if (Ledger.Presence == EMars_Fishing_Presence::Arriving)
+            { FadeSeconds = Spec.Presence.ArriveSeconds; }
+            else if (Ledger.Presence == EMars_Fishing_Presence::Leaving)
+            { FadeSeconds = Spec.Presence.LeaveSeconds; }
+
+            const auto Faded = float32(Math::Max(Now - Ledger.PresenceAnchorServerSeconds, 0.0));
+            Shown.Clock.PresenceLeft = Math::Max(0.0f, FadeSeconds - Faded);
+        }
+
+        if (Ledger.CastSerial != Last.CastSerial)
+        {
+            auto Launch = FMars_Fishing_Bait();
+            Launch.Position = Ledger.CastOrigin;
+            Launch.Velocity = Ledger.CastVelocity;
+            const auto Flown = float32(Math::Max(Now - Ledger.CastAnchorServerSeconds, 0.0));
+            Shown.Bait = Get_FlownBait(Spec, Launch, Flown);
+        }
+
+        if (Get_IsOnTheWater(Ledger.Phase))
+        {
+            Shown.Bait.Position = Ledger.BaitPosition;
+            Shown.Bait.Velocity = FVector::ZeroVector;
+        }
+
+        Shown.Bait.DipCm = Ledger.DipCm;
+
+        const auto FlingLeft = Shown.Catch.FlingLeft;
+        Shown.Catch = FMars_Fishing_Catch();
+        if (Ledger.CatchIndex >= 0 && Ledger.CatchIndex < Spec.Fish.Table.Num())
+        {
+            const auto Entry = Spec.Fish.Table[Ledger.CatchIndex];
+            Shown.Catch.Item = Entry.Item;
+            Shown.Catch.Fight = Entry.Fight;
+            Shown.Catch.TableIndex = Ledger.CatchIndex;
+            Shown.Catch.LandedAt = Ledger.LandedAt;
+            Shown.Catch.FlingLeft = FlingLeft;
+            if (Ledger.LandedSerial != Last.LandedSerial)
+            {
+                const auto Flung = float32(Math::Max(Now - Ledger.LandedAnchorServerSeconds, 0.0));
+                Shown.Catch.FlingLeft = Math::Max(0.0f, Spec.Fish.LandFlingSeconds - Flung);
+            }
+        }
+
+        return Shown;
+    }
+
+    // The ledger a copy without authority reads the spot through, from the live state and what the caller announced.
+    // Written and marked dirty at once when the engagement, the phase (one serial more; entering Waiting stamps where the
+    // bait lies), the presence (a fade that begins stamps its anchor), the reel, the run, the dip, the tally or an answer
+    // differ: a cast stamps its origin, velocity and anchor, a landing where the fish left the water and its anchor; every
+    // at-once write carries the catch's place and the current aim and line. Otherwise, only from the engaged tick
+    // (InAnswers.TickSeconds), the aim and the line alone by the pacing rule. Called only by the spot's processors on the
+    // authority, once after their step and before their broadcasts. Reads the state through the handle.
+    void Publish(FCk_Handle_Fishing& InFishing, const FMars_Fishing_Answers& InAnswers)
+    {
+        const auto State = InFishing.Get_Fragment(FMars_Fragment_Fishing);
+        const auto Ledger = InFishing.Get_Fragment(FMars_Fragment_Fishing_Net);
+        auto& Local = InFishing.Get_Fragment(FMars_Fragment_Fishing_Local);
+        if (InAnswers.TickSeconds.IsSet())
+        { Local.SecondsSincePaced += InAnswers.TickSeconds.GetValue(); }
+
+        const auto Engagement = InFishing.Get_IsEngaged() ? EMars_Fishing_Engagement::Engaged : EMars_Fishing_Engagement::Idle;
+        const auto Run = State.Run.Running ? EMars_Fishing_RunState::Running : EMars_Fishing_RunState::Calm;
+        const auto HasAnswer = InAnswers.Casts > 0 || InAnswers.Bites > 0 || InAnswers.BiteEnds.Num() > 0
+            || InAnswers.Landings > 0 || InAnswers.Collections > 0;
+        const auto IsAtOnce = HasAnswer || Engagement != Ledger.Engagement || State.Phase != Ledger.Phase
+            || State.Presence != Ledger.Presence || State.Reel != Ledger.Reel || Run != Ledger.Run
+            || State.Bait.DipCm != Ledger.DipCm || State.Tally != Ledger.Tally;
+        const auto IsPaced = IsAtOnce == false && InAnswers.TickSeconds.IsSet()
+            && Local.SecondsSincePaced >= 1.0f / k_PacedHz && Get_HasPacedMoved(State, Ledger);
+        if (IsAtOnce == false && IsPaced == false)
+        { return; }
+
+        auto Next = Ledger;
+        Next.Aim = State.Aim;
+        Next.Line = State.Line;
+        Local.SecondsSincePaced = 0.0f;
+        if (IsAtOnce)
+        {
+            const auto Now = utils_mars_net::Get_ServerWorldSeconds(InFishing);
+            if (State.Phase != Ledger.Phase)
+            {
+                Next.PhaseSerial += 1;
+                if (State.Phase == EMars_Fishing_Phase::Waiting)
+                { Next.BaitPosition = State.Bait.Position; }
+            }
+
+            if (State.Presence != Ledger.Presence && Get_IsFading(State.Presence))
+            { Next.PresenceAnchorServerSeconds = Now; }
+
+            Next.Engagement = Engagement;
+            Next.Phase = State.Phase;
+            Next.Presence = State.Presence;
+            Next.Reel = State.Reel;
+            Next.Run = Run;
+            Next.DipCm = State.Bait.DipCm;
+            Next.Tally = State.Tally;
+            Next.CatchIndex = State.Catch.Item.IsNull() ? -1 : State.Catch.TableIndex;
+
+            if (InAnswers.Casts > 0)
+            {
+                Next.CastSerial += InAnswers.Casts;
+                Next.CastOrigin = State.Bait.Position;
+                Next.CastVelocity = State.Bait.Velocity;
+                Next.CastAnchorServerSeconds = Now;
+            }
+
+            Next.BiteSerial += InAnswers.Bites;
+            if (InAnswers.BiteEnds.Num() > 0)
+            {
+                Next.BiteEndSerial += InAnswers.BiteEnds.Num();
+                Next.LastBiteEnd = InAnswers.BiteEnds[InAnswers.BiteEnds.Num() - 1];
+            }
+
+            if (InAnswers.Landings > 0)
+            {
+                Next.LandedSerial += InAnswers.Landings;
+                Next.LandedAt = State.Catch.LandedAt;
+                Next.LandedAnchorServerSeconds = Now;
+            }
+
+            Next.CollectedSerial += InAnswers.Collections;
+        }
+
+        InFishing.Get_Fragment(FMars_Fragment_Fishing_Net) = Next;
+        FCk_Handle Entity = InFishing;
+        Entity.Request_MarkReplicationDirty(FMars_Fragment_Fishing_Net);
+    }
+
+    // The state's aim or line moved from the ledger's by its quantum.
+    bool Get_HasPacedMoved(const FMars_Fragment_Fishing& InState, const FMars_Fragment_Fishing_Net& InLedger)
+    {
+        return Math::Abs(InState.Aim.YawDeg - InLedger.Aim.YawDeg) >= k_AimQuantumDeg
+            || Math::Abs(InState.Aim.PitchDeg - InLedger.Aim.PitchDeg) >= k_AimQuantumDeg
+            || Math::Abs(InState.Line.LengthCm - InLedger.Line.LengthCm) >= k_LineQuantumCm
+            || Math::Abs(InState.Line.Tension - InLedger.Line.Tension) >= k_TensionQuantum;
     }
 }
 
@@ -187,6 +459,12 @@ mixin FMars_Fishing_Catch Get_Catch(const FCk_Handle_Fishing& Self)
 mixin int32 Get_Tally(const FCk_Handle_Fishing& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_Fishing).Tally;
+}
+
+// The replicated ledger as it stands on this machine.
+mixin FMars_Fragment_Fishing_Net Get_Ledger(const FCk_Handle_Fishing& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_Fishing_Net);
 }
 
 // Seconds into the current phase.

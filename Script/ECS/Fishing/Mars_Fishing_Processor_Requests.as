@@ -1,8 +1,10 @@
 // Drains Disengage -> Engage -> Leave -> Reset -> ForceBite -> ForceLand -> Aim -> Cast -> Hook -> ReelRelease -> ReelHold
 // -> Collect. Disengage pulls the line in and stops the clocks; Engage starts them; Leave starts the spot's fade out; Reset
 // re-rigs from any phase; the Force requests are the cheats' and tests' shortcuts; Aim turns the rod; Cast launches the bait
-// along the aim; Hook sets inside a Bite; the Reel requests move the reel's hold; Collect takes a Landed catch.
-// UMars_Processor_Fishing_Tick flies the bait, brings the bite, runs the fight and lands the fish.
+// along the aim; Hook sets inside a Bite; the Reel requests move the reel's hold; Collect takes a Landed catch. With authority
+// it then moves the Engaged and Transitioning tags, publishes the ledger (utils_fishing::Publish) and broadcasts; without,
+// it drops the requests and does nothing else. UMars_Processor_Fishing_Tick flies the bait, brings the bite, runs the fight
+// and lands the fish.
 class UMars_Processor_Fishing_HandleRequests : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -37,6 +39,9 @@ class UMars_Processor_Fishing_HandleRequests : UCk_Processor_Script_Base_UE
 
         // InRequests is invalid past this line; removing before broadcasting lets re-entrant requests survive.
         Self.Request_TryRemove(FMars_Fragment_Fishing_Requests);
+
+        if (utils_net::Get_HasAuthority(InHandle) == false)
+        { return; }
 
         const auto Spec = Self.Get_Spec();
         auto IsEngaged = Self.Has_Fragment(FMars_Tag_Fishing_Engaged);
@@ -143,6 +148,16 @@ class UMars_Processor_Fishing_HandleRequests : UCk_Processor_Script_Base_UE
 
         if (IsTransitioning && WasTransitioning == false)
         { Self.Add_Fragment(FMars_Tag_Fishing_Transitioning()); }
+
+        // After the tag move, so the ledger carries the engagement this drain left.
+        auto Answers = FMars_Fishing_Answers();
+        Answers.Casts = LaunchVelocity.IsSet() ? 1 : 0;
+        Answers.Bites = BiteNow ? 1 : 0;
+        if (Hooked)
+        { Answers.BiteEnds.Add(EMars_Fishing_BiteResult::Hooked); }
+
+        Answers.Collections = Collected.IsSet() ? 1 : 0;
+        utils_fishing::Publish(Self, Answers);
 
         if (Self.Has_Fragment(FMars_Fragment_Fishing_Signals) == false)
         { return; }

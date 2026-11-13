@@ -3,7 +3,10 @@
 // until the bite is due (OnBite). Bite counts the hook window down and, unhooked, ends it Missed. Hooked sets the hook and
 // hands over to the reel. Reeling runs the fish's runs (OnRun), shortens the line while the reel is held and strains it,
 // lets the strain recover while released, snaps the line at Reel.SnapTension (OnSnapped) and lands the fish when the line
-// runs out (OnLanded). Landed counts the fling down.
+// runs out (OnLanded). Landed counts the fling down. With authority it then publishes the ledger (utils_fishing::Publish,
+// the paced aim and line included) and broadcasts. Without authority (engaged by the mirror) it only follows: the bait's
+// flight by the same step, the bob, the fling, and the aim and the line eased toward the ledger's; it changes no phase,
+// draws nothing from the generator and raises nothing.
 class UMars_Processor_Fishing_Tick : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -29,18 +32,20 @@ class UMars_Processor_Fishing_Tick : UCk_Processor_Script_Base_UE
         auto Snapped = false;
         auto Caught = TOptional<FMars_Fishing_Catch>();
 
+        if (utils_net::Get_HasAuthority(InHandle) == false)
+        {
+            Follow(Self, InState, DeltaSeconds);
+            return;
+        }
+
         InState.Clock.PhaseSeconds += DeltaSeconds;
 
         switch (InState.Phase)
         {
             case EMars_Fishing_Phase::Casting:
             {
-                InState.Bait.Velocity.Z -= Spec.Launch.GravityCmPerS2 * DeltaSeconds;
-                InState.Bait.Position += InState.Bait.Velocity * DeltaSeconds;
-                if (InState.Bait.Position.Z <= Spec.Water.SurfaceZ)
+                if (utils_fishing::Advance_Flight(InState.Bait, Spec, DeltaSeconds))
                 {
-                    InState.Bait.Position.Z = Spec.Water.SurfaceZ;
-                    InState.Bait.Velocity = FVector::ZeroVector;
                     const auto Out = InState.Bait.Position - Self.Get_AnchorWorld();
                     InState.Line.LengthCm = float32(FVector(Out.X, Out.Y, 0.0).Size());
                     InState.Clock.BiteAtSeconds = utils_fishing::Next_Range(InState.Rng, Spec.Bite.MinWaitSeconds, Spec.Bite.MaxWaitSeconds);
@@ -78,10 +83,12 @@ class UMars_Processor_Fishing_Tick : UCk_Processor_Script_Base_UE
                 InState.Clock.HookSetLeft = Math::Max(0.0f, InState.Clock.HookSetLeft - DeltaSeconds);
                 if (InState.Clock.HookSetLeft <= 0.0f)
                 {
-                    const auto Fish = utils_fishing::Draw_Fish(Spec.Fish.Table, InState.Rng);
+                    auto TableIndex = 0;
+                    const auto Fish = utils_fishing::Draw_Fish(Spec.Fish.Table, InState.Rng, TableIndex);
                     InState.Catch = FMars_Fishing_Catch();
                     InState.Catch.Item = Fish.Item;
                     InState.Catch.Fight = Fish.Fight;
+                    InState.Catch.TableIndex = TableIndex;
                     InState.Run.Running = false;
                     InState.Run.SecondsLeft = utils_fishing::Next_Range(InState.Rng, Spec.Run.MinGapSeconds, Spec.Run.MaxGapSeconds);
                     utils_fishing_requests::Enter(InState, EMars_Fishing_Phase::Reeling);
@@ -123,6 +130,15 @@ class UMars_Processor_Fishing_Tick : UCk_Processor_Script_Base_UE
         const auto Phase = InState.Phase;
 
         // InState is not read past this line: a listener may add fragments to the station.
+        auto Answers = FMars_Fishing_Answers();
+        Answers.Bites = BiteNow ? 1 : 0;
+        if (Missed)
+        { Answers.BiteEnds.Add(EMars_Fishing_BiteResult::Missed); }
+
+        Answers.Landings = Caught.IsSet() ? 1 : 0;
+        Answers.TickSeconds = TOptional<float32>(DeltaSeconds);
+        utils_fishing::Publish(Self, Answers);
+
         if (Self.Has_Fragment(FMars_Fragment_Fishing_Signals) == false)
         { return; }
 
@@ -147,6 +163,46 @@ class UMars_Processor_Fishing_Tick : UCk_Processor_Script_Base_UE
 
         if (Phase != PhaseBefore)
         { Signals.OnPhaseChanged.Broadcast(Self, Phase); }
+    }
+
+    // Without authority, the step between two ledgers: it changes no phase and raises nothing. Casting flies the bait by
+    // the kernel's step and holds it on the water once it lands; Waiting and Bite bob the float; Landed counts the fling
+    // down. The aim and the line ease toward the ledger's (the line is set outright as a phase begins).
+    private void Follow(const FCk_Handle_Fishing& InFishing, FMars_Fragment_Fishing& InOutState, float32 InDeltaSeconds) const
+    {
+        const auto Spec = InFishing.Get_Spec();
+        const auto Ledger = InFishing.Get_Ledger();
+        if (InOutState.Clock.PhaseSeconds <= 0.0f)
+        { InOutState.Line = Ledger.Line; }
+
+        InOutState.Clock.PhaseSeconds += InDeltaSeconds;
+
+        switch (InOutState.Phase)
+        {
+            case EMars_Fishing_Phase::Casting:
+            {
+                utils_fishing::Advance_Flight(InOutState.Bait, Spec, InDeltaSeconds);
+                break;
+            }
+            case EMars_Fishing_Phase::Waiting:
+            case EMars_Fishing_Phase::Bite:
+            {
+                InOutState.Bait.BobPhase += 2.0f * PI * Spec.Water.BobHz * InDeltaSeconds;
+                break;
+            }
+            case EMars_Fishing_Phase::Landed:
+            {
+                InOutState.Catch.FlingLeft = Math::Max(0.0f, InOutState.Catch.FlingLeft - InDeltaSeconds);
+                break;
+            }
+            default:
+                break;
+        }
+
+        InOutState.Aim.YawDeg = Math::FInterpConstantTo(InOutState.Aim.YawDeg, Ledger.Aim.YawDeg, InDeltaSeconds, utils_fishing::k_FollowAimDegPerS);
+        InOutState.Aim.PitchDeg = Math::FInterpConstantTo(InOutState.Aim.PitchDeg, Ledger.Aim.PitchDeg, InDeltaSeconds, utils_fishing::k_FollowAimDegPerS);
+        InOutState.Line.LengthCm = Math::FInterpConstantTo(InOutState.Line.LengthCm, Ledger.Line.LengthCm, InDeltaSeconds, utils_fishing::k_FollowLineCmPerS);
+        InOutState.Line.Tension = Math::FInterpConstantTo(InOutState.Line.Tension, Ledger.Line.Tension, InDeltaSeconds, utils_fishing::k_FollowTensionPerS);
     }
 
     // The fish's run clock: calm until the next run, then a run until it tires. Set when a run starts (true) or ends (false).
@@ -181,7 +237,9 @@ class UMars_Processor_Fishing_Tick : UCk_Processor_Script_Base_UE
 }
 
 // The spot's fade in and out, with or without an operator: Arriving opens after Presence.ArriveSeconds, Leaving is Gone
-// after Presence.LeaveSeconds (OnPresenceChanged), and the Transitioning tag leaves with the fade.
+// after Presence.LeaveSeconds (OnPresenceChanged), and the Transitioning tag leaves with the fade; with authority it
+// publishes the ledger before it broadcasts. Without authority it only counts the fade down: the mirror moves the presence
+// and the tag from the ledger.
 class UMars_Processor_Fishing_PresenceTick : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -198,7 +256,7 @@ class UMars_Processor_Fishing_PresenceTick : UCk_Processor_Script_Base_UE
     {
         auto Self = InHandle.As_Fishing();
         InState.Clock.PresenceLeft = Math::Max(0.0f, InState.Clock.PresenceLeft - float32(InDeltaT.Get_Seconds()));
-        if (InState.Clock.PresenceLeft > 0.0f)
+        if (InState.Clock.PresenceLeft > 0.0f || utils_net::Get_HasAuthority(InHandle) == false)
         { return; }
 
         auto Changed = false;
@@ -217,6 +275,7 @@ class UMars_Processor_Fishing_PresenceTick : UCk_Processor_Script_Base_UE
 
         // InState is not read past this line: the tag moves, and a listener may add fragments to the station.
         Self.Request_TryRemove(FMars_Tag_Fishing_Transitioning);
+        utils_fishing::Publish(Self, FMars_Fishing_Answers());
 
         if (Changed == false || Self.Has_Fragment(FMars_Fragment_Fishing_Signals) == false)
         { return; }
