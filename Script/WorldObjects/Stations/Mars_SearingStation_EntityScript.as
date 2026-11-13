@@ -14,6 +14,10 @@
 // (riding the tilt and the toss) and the left follows the feed node, resting in front of the raw platter between
 // transfers.
 //
+// The Searing kernel is the authority's and replicates through its two ledgers (the kernel's and the pan's command): the
+// authority's kernel steers its own pan, every other machine's pan follows the published command, and every machine
+// dresses the pieces the ledger names (its kernel announces each one as it shows up there).
+//
 // Per piece: its own cook state (from that piece's face sears only, never another's), its own seared burst and its own oil
 // pool, sized from its own extents. The pan material has k_PoolSlots meat footprints and oil trails; the pieces
 // that lie on the pan (Cooking or Ready) fill them in admission order and an unused slot has radius 0 (no pool). Each

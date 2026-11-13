@@ -1,3 +1,8 @@
+// Stance: each machine's own. Nothing of the implement replicates; every machine builds and ticks its own. With authority
+// its kernel feeds it (drive, looks, targets); without, it follows a command the kernel's authority publishes
+// (Request_Follow): it drops its looks, holds the commanded tilt targets instead of relaxing them, kicks its lift by the
+// command's running kick total and re-seats its orbit phase when it drifts, and the same tick tracks and springs it.
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
 //--------------------------------------------------------------------------------------------------------------------------
@@ -348,6 +353,52 @@ mixin FMars_Validation Validate(const FMars_Implement_Spec& Self)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
+// Command
+//--------------------------------------------------------------------------------------------------------------------------
+
+// Own: the implement's own requests and looks steer it. Followed: a command steers it (Request_Follow); its looks are
+// dropped and its tilt targets hold.
+enum EMars_Implement_Steering
+{
+    Own,
+    Followed
+}
+
+// What an implement is being told to do, as another copy can follow it: the drive, the tilt targets (FRotator(Pitch, Yaw,
+// Roll), degrees), the lift target and the slide target (uu), the running sum of every upward excess (degrees) that kicked
+// the lift, and the orbit's phase (radians).
+struct FMars_Implement_Command
+{
+    UPROPERTY()
+    EMars_Implement_Drive Drive = EMars_Implement_Drive::Idle;
+
+    UPROPERTY()
+    FRotator Tilt = FRotator::ZeroRotator;
+
+    UPROPERTY()
+    float32 Lift = 0.0f;
+
+    UPROPERTY()
+    FVector2D Slide = FVector2D::ZeroVector;
+
+    UPROPERTY()
+    float32 KickTotal = 0.0f;
+
+    UPROPERTY()
+    float32 OrbitPhase = 0.0f;
+}
+
+// When a command is worth sending again (utils_implement::Advance_CommandPacer): the one last sent and the seconds since.
+struct FMars_Implement_CommandPacer
+{
+    UPROPERTY()
+    TOptional<FMars_Implement_Command> Published;
+
+    UPROPERTY()
+    float32 SecondsSincePublished = 0.0f;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
 // Params
 //--------------------------------------------------------------------------------------------------------------------------
 
@@ -446,6 +497,18 @@ struct FMars_Fragment_Implement
 
     UPROPERTY()
     FVector WrittenOrbit = FVector::ZeroVector;
+
+    // Own until a Follow; a Reset makes it Own again.
+    UPROPERTY()
+    EMars_Implement_Steering Steering = EMars_Implement_Steering::Own;
+
+    // Degrees: the sum of every upward excess that kicked this implement's lift (what a follower kicks by).
+    UPROPERTY()
+    float32 KickTotal = 0.0f;
+
+    // Followed only: the kick total of the last command followed; unset until the first (which only records it).
+    UPROPERTY()
+    TOptional<float32> FollowedKickTotal;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -547,8 +610,26 @@ struct FMars_Request_Implement_SetSlideTarget
     }
 }
 
+// The implement follows Command from now on (Steering Followed): its drive; its tilt targets, each clamped to MaxTiltDegrees;
+// a Commanded lift's target (clamped to [MinLift, MaxLift]); the slide target when the slide has a reach (clamped to its box
+// or disc); a Kick lift's velocity gains (Command.KickTotal - the last followed total) x Gain when that is positive (the
+// first command only records the total); the orbit's phase is re-seated to the command's when they differ by more than
+// utils_implement::k_OrbitResyncRadians the short way round. Last wins within a drain.
+struct FMars_Request_Implement_Follow
+{
+    UPROPERTY()
+    FMars_Implement_Command Command;
+
+    FMars_Request_Implement_Follow() {}
+
+    FMars_Request_Implement_Follow(FMars_Implement_Command InCommand)
+    {
+        Command = InCommand;
+    }
+}
+
 // Levels the implement (targets and tilt), zeroes the lift and its target, the slide and its target and the orbit,
-// clears the pending look and idles it.
+// clears the pending look, idles it and makes it steer itself again (Own).
 // Payload-less: one placeholder field (request doctrine).
 struct FMars_Request_Implement_Reset
 {
@@ -558,8 +639,8 @@ struct FMars_Request_Implement_Reset
     FMars_Request_Implement_Reset() {}
 }
 
-// Applied Reset -> SetDrive -> SetLiftTarget -> SetTiltTarget -> SetSlideTarget -> Look, so a reset and the first drive,
-// lift, tilt, slide and looks of a new session can share a drain.
+// Applied Reset -> SetDrive -> SetLiftTarget -> SetTiltTarget -> SetSlideTarget -> Follow -> Look, so a reset and the first
+// drive, lift, tilt, slide and looks of a new session can share a drain.
 struct FMars_Fragment_Implement_Requests
 {
     UPROPERTY()
@@ -576,6 +657,9 @@ struct FMars_Fragment_Implement_Requests
 
     UPROPERTY()
     TArray<FMars_Request_Implement_SetSlideTarget> SetSlideTargetRequests;
+
+    UPROPERTY()
+    TArray<FMars_Request_Implement_Follow> FollowRequests;
 
     UPROPERTY()
     TArray<FMars_Request_Implement_Look> LookRequests;

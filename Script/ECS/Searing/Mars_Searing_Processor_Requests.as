@@ -37,6 +37,11 @@ struct FMars_Searing_ReadoptResult
 //
 // It also listens: the station's queue (OnQueued wakes this drain) and the answers of every tray it loads (OnLoaded,
 // OnLoadRefused).
+//
+// Only the authority's kernel applies requests. It publishes the kernel's ledger once after its last apply and before it
+// broadcasts, with every take-out it refused. A copy without authority still arms the station's queue watch and takes the
+// station's inbox and take-outs, then drops them with its own requests: what it shows comes from the ledgers (the Tick's
+// announce pass, the mirror, and its pan following the published command).
 class UMars_Processor_Searing_HandleRequests : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -67,6 +72,9 @@ class UMars_Processor_Searing_HandleRequests : UCk_Processor_Script_Base_UE
         Watch_Station(Self);
         TArray<FMars_CookingFeed_Release> Inbox = utils_cooking_feed::Take_Inbox(InHandle);
         TArray<FMars_Request_StationTakeOut> StationTakeOuts = utils_cooking_feed::Take_TakeOutRequests(InHandle);
+        if (utils_net::Get_HasAuthority(InHandle) == false)
+        { return; }
+
         for (const auto& TakeOut : StationTakeOuts)
         { TakeOutRequests.Add(Make_TakeOut(TakeOut)); }
 
@@ -124,6 +132,10 @@ class UMars_Processor_Searing_HandleRequests : UCk_Processor_Script_Base_UE
             for (const auto& Request : LookRequests)
             { Pan.Request_Look(FMars_Request_Implement_Look(Request.LookDelta)); }
         }
+
+        auto Answers = FMars_Searing_Answers();
+        Answers.TakeOutRefusals = TakeOutRefusals;
+        utils_searing::Publish(Self, Answers);
 
         const auto Tally = InState.Tally;
         if (NewHeat != StartHeat && Self.Has_Fragment(FMars_Fragment_Searing_Signals))

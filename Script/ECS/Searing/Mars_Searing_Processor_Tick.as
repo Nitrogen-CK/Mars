@@ -30,6 +30,11 @@ struct FMars_Searing_PieceEvents
 // order), the pieces' edges, and the aggregate sizzle edge last. The pan moves itself (an Implement); Jolt owns every
 // piece's pose; the kernel reads it back through the entity transform and never writes it, and judges an adopted piece
 // only once it has arrived at its release. Nothing is ever spawned here: pieces arrive only through the station's inbox.
+// With authority it publishes the kernel's ledger after the readout and, paced, the pan's command, before any broadcast.
+//
+// Without authority it only announces, from the ledger: a row this machine's copy has not announced is announced once its
+// piece is a food piece here (OnPieceAdded, so the station dresses it), and a row the ledger dropped is forgotten. It
+// judges, sears, counts and writes nothing else; its pan follows the published command through the mirror.
 class UMars_Processor_Searing_Tick : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -44,6 +49,13 @@ class UMars_Processor_Searing_Tick : UCk_Processor_Script_Base_UE
 
     void ForEachEntity(FCk_Time InDeltaT, FCk_Handle& InHandle, FMars_Fragment_Searing& InState)
     {
+        if (utils_net::Get_HasAuthority(InHandle) == false)
+        {
+            auto Searing = InHandle.As_Searing();
+            Announce(Searing);
+            return;
+        }
+
         auto Frame = FMars_Searing_Frame();
         Frame.Searing = InHandle.As_Searing();
         Frame.Spec = Frame.Searing.Get_Spec();
@@ -119,9 +131,78 @@ class UMars_Processor_Searing_Tick : UCk_Processor_Script_Base_UE
 
         Advance_Tally(Frame, InState);
         utils_cooking_feed::Write_Takeable(InHandle, Get_Takeable(InState));
+        utils_searing::Publish(Frame.Searing, FMars_Searing_Answers());
+        utils_searing::Publish_Pan(Frame.Searing, Frame.DeltaSeconds);
         Broadcast_PieceEvents(Frame, InState, Events);
         Broadcast_SizzleEdge(Frame, InState);
     }
+
+    //----------------------------------------------------------------------------------------------------------------------
+    // Without authority
+    //----------------------------------------------------------------------------------------------------------------------
+
+    // The announcements written back before anything is raised: no fragment reference is held across a broadcast.
+    private void Announce(FCk_Handle_Searing& InSearing)
+    {
+        const auto Ledger = InSearing.Get_Fragment(FMars_Fragment_Searing_Net);
+        const auto Previous = InSearing.Get_Fragment(FMars_Fragment_Searing_Local).Announced;
+
+        TArray<FMars_CookingFeed_PieceId> Announced;
+        for (const auto& Id : Previous)
+        {
+            if (utils_searing::Find_RowIndex(Ledger.Pieces, Id) >= 0)
+            { Announced.Add(Id); }
+        }
+
+        TArray<FMars_CookingFeed_PieceId> AddedIds;
+        TArray<FCk_Handle> AddedPieces;
+        for (const auto& Row : Ledger.Pieces)
+        {
+            if (Get_IsAnnounced(Announced, Row.Id) || Get_IsShownHere(Row.Piece) == false)
+            { continue; }
+
+            Announced.Add(Row.Id);
+            AddedIds.Add(Row.Id);
+            AddedPieces.Add(Row.Piece);
+        }
+
+        InSearing.Get_Fragment(FMars_Fragment_Searing_Local).Announced = Announced;
+        if (AddedIds.Num() == 0 || InSearing.Has_Fragment(FMars_Fragment_Searing_Signals) == false)
+        { return; }
+
+        // Handlers keep the station's piece records: scope the script world to the station's, and read the signals fragment
+        // again for every broadcast.
+        const auto WorldContext = FAngelscriptGameThreadScopeWorldContext(utils_entity_lifetime::Get_WorldForEntity(InSearing));
+        for (int32 Index = 0; Index < AddedIds.Num(); ++Index)
+        {
+            if (InSearing.Has_Fragment(FMars_Fragment_Searing_Signals))
+            { InSearing.Get_Fragment(FMars_Fragment_Searing_Signals).OnPieceAdded.Broadcast(InSearing, AddedIds[Index], AddedPieces[Index]); }
+        }
+    }
+
+    private bool Get_IsAnnounced(const TArray<FMars_CookingFeed_PieceId>& InAnnounced, const FMars_CookingFeed_PieceId& InId) const
+    {
+        for (const auto& Id : InAnnounced)
+        {
+            if (Id.Get_IsSame(InId))
+            { return true; }
+        }
+
+        return false;
+    }
+
+    // A row's piece is shown on this machine once its entity replicated here as a food piece that is not gone.
+    private bool Get_IsShownHere(const FCk_Handle& InPiece) const
+    {
+        if (utils_foodpiece::Get_IsLiveEntity(InPiece) == false || InPiece.Is_FoodPiece() == false)
+        { return false; }
+
+        return InPiece.As_FoodPiece().Get_IsGone() == false;
+    }
+
+    //----------------------------------------------------------------------------------------------------------------------
+    // With authority
+    //----------------------------------------------------------------------------------------------------------------------
 
     // What a take-out without a named piece would hand back now.
     private TArray<FCk_Handle_FoodPiece> Get_Takeable(const FMars_Fragment_Searing& InState) const

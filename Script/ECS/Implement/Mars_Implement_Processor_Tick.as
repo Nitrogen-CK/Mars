@@ -17,7 +17,9 @@ struct FMars_Implement_Frame
 // only while Idle) and clamp, the tilt tracks them at a bounded rate, the lift spring tracks its target, a Look slide's
 // target follows the look across the rest plane (a Commanded one's only its requests) and its spring tracks it, the orbit
 // eases with the drive and turns, and ONE offset write of the node (only when the pose changed) moves the kinematic bodies
-// under it. A kick's OnLiftKicked is broadcast last, so a handler reads the integrated lift and the written pose.
+// under it. A kick's OnLiftKicked is broadcast last, so a handler reads the integrated lift and the written pose. A
+// followed implement takes no look and holds its tilt targets (the command moves them); every other step runs as for one
+// that steers itself, so a follower tracks and springs as smoothly as its leader.
 class UMars_Processor_Implement_Tick : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -104,12 +106,12 @@ class UMars_Processor_Implement_Tick : UCk_Processor_Script_Base_UE
         { InState.OrbitPhase -= FullTurn * float32(Math::FloorToInt(InState.OrbitPhase / FullTurn)); }
     }
 
-    // The look is read once per frame and handed to every step; an idle implement drops it.
+    // The look is read once per frame and handed to every step; an idle or a followed implement drops it.
     private FVector Take_PendingLook(FMars_Fragment_Implement& InState)
     {
         const auto Look = InState.PendingLook;
         InState.PendingLook = FVector::ZeroVector;
-        if (InState.Drive != EMars_Implement_Drive::Driven)
+        if (InState.Drive != EMars_Implement_Drive::Driven || InState.Steering == EMars_Implement_Steering::Followed)
         { return FVector::ZeroVector; }
 
         return Look;
@@ -118,8 +120,8 @@ class UMars_Processor_Implement_Tick : UCk_Processor_Script_Base_UE
     // A Kick lift splits the upward look first: the degrees beyond what FlickSpeedDegreesPerSecond covers this frame only
     // lift (without the split every toss would also pitch the implement to its clamp). The rest steers the targets the
     // axes name: X rolls (or yaws), Y pitches, unless RollOnly leaves Y to the lift. The targets relax toward level
-    // without crossing it (every frame, or only while Idle so a held implement keeps its tilt) and clamp; the tilt tracks
-    // them at a bounded rate.
+    // without crossing it (every frame, or only while Idle so a held implement keeps its tilt; never while followed: the
+    // command already carries its leader's relax) and clamp; the tilt tracks them at a bounded rate.
     private void Advance_Tilt(FMars_Implement_Frame& InFrame, FMars_Fragment_Implement& InState)
     {
         const auto& TiltSpec = InFrame.Spec.Tilt;
@@ -155,7 +157,8 @@ class UMars_Processor_Implement_Tick : UCk_Processor_Script_Base_UE
             }
         }
 
-        if (TiltSpec.Relax == EMars_Implement_Relax::Always || InState.Drive == EMars_Implement_Drive::Idle)
+        const auto IsOwn = InState.Steering == EMars_Implement_Steering::Own;
+        if (IsOwn && (TiltSpec.Relax == EMars_Implement_Relax::Always || InState.Drive == EMars_Implement_Drive::Idle))
         {
             const auto Relax = TiltSpec.LevelReturnDegreesPerSecond * InFrame.DeltaSeconds;
             InState.TargetRoll = Get_RelaxedTowardZero(InState.TargetRoll, Relax);
@@ -198,8 +201,9 @@ class UMars_Processor_Implement_Tick : UCk_Processor_Script_Base_UE
         InState.TargetLift = Math::Clamp(Target, LiftSpec.MinLift, LiftSpec.MaxLift);
     }
 
-    // The excess degrees times Gain join the lift velocity; a kick that starts a rise (not one that adds to a rising
-    // implement) is the toss cue, broadcast once the frame applied (Broadcast_Kick).
+    // The excess degrees times Gain join the lift velocity and the excess joins the kick total (what a follower kicks by); a
+    // kick that starts a rise (not one that adds to a rising implement) is the toss cue, broadcast once the frame applied
+    // (Broadcast_Kick).
     private void Kick_Lift(FMars_Implement_Frame& InFrame, FMars_Fragment_Implement& InState, float32 InExcess)
     {
         if (InExcess <= 0.0f)
@@ -207,6 +211,7 @@ class UMars_Processor_Implement_Tick : UCk_Processor_Script_Base_UE
 
         const auto WasRising = InState.LiftVelocity > 0.0f;
         InState.LiftVelocity += InExcess * InFrame.Spec.Lift.Gain;
+        InState.KickTotal += InExcess;
 
         if (WasRising)
         { return; }

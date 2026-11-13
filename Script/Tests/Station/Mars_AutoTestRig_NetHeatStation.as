@@ -7,8 +7,11 @@
 // each with its running press serial and hold), holding a row and letting it go, pressing it; admitting a piece (the
 // server queues a release of it over the station's release node in the station's admission inbox, as the feed does); the
 // subject's dip and take-out rows; a tray (an empty large platter docked on the Output dock); and a third test-only
-// replicated report on the subject with the followed pieces, the bowl's ids, a coat and the bowl's serial. One
-// [BatterNetTest] line per test per machine. Only the Batter branch is built; the other stations ensure.
+// replicated report on the subject with the followed pieces, the bowl's ids, a coat and the bowl's serial (the pan's ids,
+// a number and a face at the searing station). The Searing branch spawns the real searing station with the test's exposed
+// Searing spec (ready once its pan body is in the simulation on the server), records the kernel's signals and samples the
+// pan every frame (its roll, its lift, its node's location). One [BatterNetTest] or [SearingNetTest] line per test per
+// machine. Only the Batter and Searing branches are built; the other stations ensure.
 
 namespace constants_heat_station_net_autotest
 {
@@ -64,6 +67,27 @@ struct FMars_Fragment_TESTONLY_NetHeatStationReport
     // The frame counter of the server's last marked event (Mark_EventFrame); -1 without one.
     UPROPERTY()
     int32 EventFrame = -1;
+
+    // A number the test reports (the pan's roll, a kick total), and a face (int32(EMars_FoodPiece_Face); -1 without one).
+    UPROPERTY()
+    float32 Value = 0.0f;
+
+    UPROPERTY()
+    int32 Face = -1;
+}
+
+// One frame of this machine's pan, as the sampler read it.
+struct FMars_TESTONLY_NetHeatPanSample
+{
+    int32 Step = 0;
+    int64 Frame = 0;
+    // Game seconds when sampled, and since the previous sample.
+    float64 Seconds = 0.0;
+    float32 DeltaSeconds = 0.0f;
+    float32 Roll = 0.0f;
+    float32 Lift = 0.0f;
+    FVector NodeLocation = FVector::ZeroVector;
+    EMars_Searing_Heat Heat = EMars_Searing_Heat::Cold;
 }
 
 UCLASS(Abstract)
@@ -84,6 +108,22 @@ class UMars_AutoTestRig_NetHeatStation : UMars_AutoTestRig_NetFeedStation
     protected TArray<EMars_Batter_AdmissionRefusal> _AdmissionRefusals;
     protected TArray<EMars_Batter_TakeOutRefusal> _TakeOutRefusals;
     protected TArray<FMars_CookingFeed_PieceId> _TakenOutIds;
+
+    // This machine's copy of the pan's kernel, once found, and every signal it raised since (or since Clear_SearingRecord).
+    protected FCk_Handle_Searing _Searing;
+    protected TArray<EMars_Searing_Heat> _HeatChanges;
+    protected TArray<FMars_CookingFeed_PieceId> _PanAddedIds;
+    protected TArray<FMars_CookingFeed_PieceId> _SearedIds;
+    // In parallel with _SearedIds.
+    protected TArray<EMars_FoodPiece_Face> _SearedFaces;
+    protected TArray<EMars_CookingFeed_TakeOutRefusal> _PanTakeOutRefusals;
+    protected TArray<FMars_CookingFeed_PieceId> _LostIds;
+    // Every sampled frame of this machine's pan since it was found.
+    protected TArray<FMars_TESTONLY_NetHeatPanSample> _PanSamples;
+
+    // Server: what the next report carries as its number and its face.
+    protected float32 _ReportValue = 0.0f;
+    protected int32 _ReportFace = -1;
 
     // Server: the foods it spawned loose, the half of a cut it keeps, the pieces the report follows.
     protected TArray<FCk_Handle> _Foods;
@@ -110,6 +150,9 @@ class UMars_AutoTestRig_NetHeatStation : UMars_AutoTestRig_NetFeedStation
     private FName _CutContinuation;
     private FName _TrayContinuation;
     private FName _OperatorContinuation;
+    private FCk_Handle_FoodPiece _SearAllRoundPiece;
+    private FName _SearAllRoundContinuation;
+    private float64 _LastPanSampleSeconds = -1.0;
 
     //----------------------------------------------------------------------------------------------------------------------
     // Hooks
@@ -126,6 +169,12 @@ class UMars_AutoTestRig_NetHeatStation : UMars_AutoTestRig_NetFeedStation
         auto Spec = FMars_Batter_Spec();
         Spec.Coat.CoatSeconds = constants_heat_station_net_autotest::k_CoatSeconds;
         return Spec;
+    }
+
+    // The searing station's exposed spec.
+    protected FMars_Searing_Spec Make_SearingSpec() const
+    {
+        return FMars_Searing_Spec();
     }
 
     // Every sampled frame, once this machine found its heat station.
@@ -150,7 +199,12 @@ class UMars_AutoTestRig_NetHeatStation : UMars_AutoTestRig_NetFeedStation
         const auto Machine = Get_MachineName();
         const auto TestName = GetClass().GetName();
         const auto Ensures = Get_EnsureDelta();
-        Log(f"[BatterNetTest] {TestName} {Machine}: {InText} times=[{_Times}] ensures={Ensures}");
+        Log(f"{Get_LogTag()} {TestName} {Machine}: {InText} times=[{_Times}] ensures={Ensures}");
+    }
+
+    protected FString Get_LogTag() const
+    {
+        return Get_HeatStation() == EMars_TESTONLY_HeatStation::Searing ? "[SearingNetTest]" : "[BatterNetTest]";
     }
 
     // Finds this machine's station (its docks and its feed composed) and its kernel, and records the kernel's signals from
@@ -163,9 +217,12 @@ class UMars_AutoTestRig_NetHeatStation : UMars_AutoTestRig_NetFeedStation
         if (Try_FindFeedStation() == false)
         { return false; }
 
-        if (ck::EnsureIfNot(Get_HeatStation() == EMars_TESTONLY_HeatStation::Batter,
+        if (ck::EnsureIfNot(Get_HeatStation() == EMars_TESTONLY_HeatStation::Batter || Get_HeatStation() == EMars_TESTONLY_HeatStation::Searing,
             f"[NetHeatStation] the {Get_HeatStation() :n} branch is not built yet"))
         { return false; }
+
+        if (Get_HeatStation() == EMars_TESTONLY_HeatStation::Searing)
+        { return Try_FindSearing(); }
 
         if (_Station.Is_Batter() == false)
         { return false; }
@@ -181,6 +238,137 @@ class UMars_AutoTestRig_NetHeatStation : UMars_AutoTestRig_NetFeedStation
         _Batter.BindTo_OnTakeOutRefused(FMars_Delegate_Batter_OnTakeOutRefused(this, n"OnRigTakeOutRefused"));
         _Batter.BindTo_OnPieceTakenOut(FMars_Delegate_Batter_OnPieceTakenOut(this, n"OnRigPieceTakenOut"));
         return true;
+    }
+
+    private bool Try_FindSearing()
+    {
+        if (_Station.Is_Searing() == false)
+        { return false; }
+
+        _WasHeatStationFound = true;
+        _Searing = _Station.As_Searing();
+        // A row this copy announced before the rig bound raised OnPieceAdded all the same.
+        _PanAddedIds.Append(Get_PanAnnouncedRows());
+        _Searing.BindTo_OnHeatChanged(FMars_Delegate_Searing_OnHeatChanged(this, n"OnRigHeatChanged"));
+        _Searing.BindTo_OnPieceAdded(FMars_Delegate_Searing_OnPieceAdded(this, n"OnRigPanPieceAdded"));
+        _Searing.BindTo_OnFaceSeared(FMars_Delegate_Searing_OnFaceSeared(this, n"OnRigFaceSeared"));
+        _Searing.BindTo_OnTakeOutRefused(FMars_Delegate_Searing_OnTakeOutRefused(this, n"OnRigPanTakeOutRefused"));
+        _Searing.BindTo_OnPieceLost(FMars_Delegate_Searing_OnPieceLost(this, n"OnRigPieceLost"));
+        return true;
+    }
+
+    // The ledger rows a copy without authority has announced (it raised OnPieceAdded for each); none with authority.
+    protected TArray<FMars_CookingFeed_PieceId> Get_PanAnnouncedRows()
+    {
+        TArray<FMars_CookingFeed_PieceId> Ids;
+        if (Get_IsServer() || ck::Is_NOT_Valid(_Searing) || _Searing.Has_Fragment(FMars_Fragment_Searing_Local) == false)
+        { return Ids; }
+
+        return _Searing.Get_Fragment(FMars_Fragment_Searing_Local).Announced;
+    }
+
+    protected void Clear_SearingRecord()
+    {
+        _HeatChanges.Empty();
+        _PanAddedIds.Empty();
+        _SearedIds.Empty();
+        _SearedFaces.Empty();
+        _PanTakeOutRefusals.Empty();
+        _LostIds.Empty();
+    }
+
+    protected int32 Get_PanAddedCount(FMars_CookingFeed_PieceId InId)
+    {
+        auto Count = 0;
+        for (const auto& Id : _PanAddedIds)
+        {
+            if (Id.Get_IsSame(InId))
+            { ++Count; }
+        }
+
+        return Count;
+    }
+
+    protected int32 Get_HeatChangeCount(EMars_Searing_Heat InHeat)
+    {
+        auto Count = 0;
+        for (const auto Heat : _HeatChanges)
+        {
+            if (Heat == InHeat)
+            { ++Count; }
+        }
+
+        return Count;
+    }
+
+    protected FString Describe_SearingRecord()
+    {
+        FString Heats = "";
+        for (const auto Heat : _HeatChanges)
+        { Heats += f"{Heat :n} "; }
+
+        FString Added = "";
+        for (const auto& Id : _PanAddedIds)
+        { Added += f"{Id.Generation}.{Id.TransferIndex} "; }
+
+        FString Seared = "";
+        for (int32 Index = 0; Index < _SearedIds.Num(); ++Index)
+        { Seared += f"{_SearedIds[Index].TransferIndex}:{_SearedFaces[Index] :n} "; }
+
+        FString TakeOuts = "";
+        for (const auto Refusal : _PanTakeOutRefusals)
+        { TakeOuts += f"{Refusal :n} "; }
+
+        return f"heats=[{Heats}] added=[{Added}] seared=[{Seared}] takeOutRefused=[{TakeOuts}] lost={_LostIds.Num()}";
+    }
+
+    // The kernel's ledger and the pan's as this machine reads them.
+    protected FString Describe_SearingLedger()
+    {
+        if (ck::Is_NOT_Valid(_Searing))
+        { return "ledger=[none]"; }
+
+        const auto Ledger = _Searing.Get_Ledger();
+        FString Rows = "";
+        for (const auto& Row : Ledger.Pieces)
+        {
+            FString Sears = "";
+            for (const auto Sear : Row.FaceSear)
+            { Sears += f"{Sear} "; }
+
+            Rows += f"{Row.Id.Generation}.{Row.Id.TransferIndex}:{Row.Status :n}/{Row.Contact :n}/{Row.RestingFace :n}[{Sears}] ";
+        }
+
+        const auto Pan = _Searing.Get_PanLedger().Pan;
+        return f"ledger=[heat={Ledger.Heat :n} sizzle={Ledger.Sizzle :n} flips={Ledger.Counts.Flips} losses={Ledger.Counts.Losses} takenOut={Ledger.Counts.TakenOut} "
+            + f"rows=[{Rows}] takeOutRefusals={Ledger.TakeOutRefusalSerial} last={Ledger.LastTakeOutRefusal :n}] "
+            + f"pan=[drive={Pan.Drive :n} tilt={Pan.Tilt} lift={Pan.Lift} kick={Pan.KickTotal} phase={Pan.OrbitPhase}]";
+    }
+
+    protected FString Describe_Pan()
+    {
+        if (ck::Is_NOT_Valid(_Searing))
+        { return "pan=[none]"; }
+
+        const auto Pan = _Searing.Get_Pan();
+        const auto Summary = _Searing.Get_Summary();
+        return f"pan=[hot={_Searing.Get_IsHot()} tilt={Pan.Get_Tilt()} lift={Pan.Get_Lift()} drive={Pan.Get_Drive() :n} steering={Pan.Get_Steering() :n} "
+            + f"pieces={_Searing.Get_PieceIds().Num()} admitted={Summary.Admitted} cooking={Summary.Cooking} ready={Summary.Ready} lost={Summary.Lost} takenOut={Summary.TakenOut}] "
+            + f"takeable={utils_cooking_feed::Get_TakeableCount(_Station)}";
+    }
+
+    // This machine's copy of the piece the pan holds as InId (the ledger row's handle without authority); invalid when it
+    // holds none or that copy is not here.
+    protected FCk_Handle_FoodPiece Get_PanCopy(FMars_CookingFeed_PieceId InId)
+    {
+        if (_Searing.Get_HasPiece(InId) == false)
+        { return FCk_Handle_FoodPiece(); }
+
+        const auto Entity = _Searing.Get_PieceEntity(InId);
+        if (Get_IsLive(Entity) == false || Entity.Is_FoodPiece() == false)
+        { return FCk_Handle_FoodPiece(); }
+
+        return Entity.As_FoodPiece();
     }
 
     // The rows a copy without authority has announced (it raised OnPieceAdded for each); none with authority.
@@ -445,8 +633,32 @@ class UMars_AutoTestRig_NetHeatStation : UMars_AutoTestRig_NetFeedStation
 
     protected void On_FeedStationSample() override
     {
-        if (Try_FindHeatStation())
-        { On_HeatStationSample(); }
+        if (Try_FindHeatStation() == false)
+        { return; }
+
+        Sample_Pan();
+        On_HeatStationSample();
+    }
+
+    // The pan as this machine shows it this frame (the searing station only).
+    private void Sample_Pan()
+    {
+        if (ck::Is_NOT_Valid(_Searing))
+        { return; }
+
+        const auto Now = System::GetGameTimeInSeconds();
+        const auto Pan = _Searing.Get_Pan();
+        auto Sample = FMars_TESTONLY_NetHeatPanSample();
+        Sample.Step = Get_HeatStationReport().Step;
+        Sample.Frame = utils_time::Get_FrameCounter();
+        Sample.Seconds = Now;
+        Sample.DeltaSeconds = _LastPanSampleSeconds < 0.0 ? 0.0f : float32(Now - _LastPanSampleSeconds);
+        Sample.Roll = float32(_Searing.Get_PanTilt().Roll);
+        Sample.Lift = _Searing.Get_PanLift();
+        Sample.NodeLocation = Pan.Get_NodeWorld().GetLocation();
+        Sample.Heat = _Searing.Get_IsHot() ? EMars_Searing_Heat::Hot : EMars_Searing_Heat::Cold;
+        _PanSamples.Add(Sample);
+        _LastPanSampleSeconds = Now;
     }
 
     //----------------------------------------------------------------------------------------------------------------------
@@ -491,15 +703,23 @@ class UMars_AutoTestRig_NetHeatStation : UMars_AutoTestRig_NetFeedStation
         for (const auto& Piece : _Followed)
         { Guids.Add(Piece.Get_Id()); }
 
-        const auto BowlIds = _Batter.Get_PieceIds();
+        TArray<FMars_CookingFeed_PieceId> BowlIds;
         auto Coat = -1.0f;
-        for (const auto& Id : BowlIds)
+        auto BowlSerial = 0;
+        if (ck::IsValid(_Searing))
+        { BowlIds = _Searing.Get_PieceIds(); }
+        else
         {
-            if (_Followed.Num() > 0 && _Batter.Get_PieceHandle(Id) == _Followed[0])
-            { Coat = _Batter.Get_PieceCoat(Id); }
+            BowlIds = _Batter.Get_PieceIds();
+            for (const auto& Id : BowlIds)
+            {
+                if (_Followed.Num() > 0 && _Batter.Get_PieceHandle(Id) == _Followed[0])
+                { Coat = _Batter.Get_PieceCoat(Id); }
+            }
+
+            BowlSerial = _Batter.Get_Ledger().BowlSerial;
         }
 
-        const auto BowlSerial = _Batter.Get_Ledger().BowlSerial;
         auto Subject = Get_SubjectEntity();
         auto& Report = Subject.Get_Fragment(FMars_Fragment_TESTONLY_NetHeatStationReport);
         Report.Serial += 1;
@@ -509,6 +729,8 @@ class UMars_AutoTestRig_NetHeatStation : UMars_AutoTestRig_NetFeedStation
         Report.Coat = Coat;
         Report.BowlSerial = BowlSerial;
         Report.EventFrame = int32(_EventFrame);
+        Report.Value = _ReportValue;
+        Report.Face = _ReportFace;
         Subject.Request_MarkReplicationDirty(FMars_Fragment_TESTONLY_NetHeatStationReport);
     }
 
@@ -520,23 +742,42 @@ class UMars_AutoTestRig_NetHeatStation : UMars_AutoTestRig_NetFeedStation
     // On_ServerFeedStationReady once this machine finds it composed with its kernel.
     protected void Spawn_HeatStation()
     {
-        if (ck::EnsureIfNot(Get_HeatStation() == EMars_TESTONLY_HeatStation::Batter,
+        if (ck::EnsureIfNot(Get_HeatStation() == EMars_TESTONLY_HeatStation::Batter || Get_HeatStation() == EMars_TESTONLY_HeatStation::Searing,
             f"[NetHeatStation] the {Get_HeatStation() :n} branch is not built yet"))
         { return; }
 
         auto Owner = utils_mars_net::Get_ReplicatedSpawnOwner(Get_SubjectEntity());
-        auto Fixture = Cast<UMars_AutoTestHelper_HeatStation>(NewObject(this, UMars_AutoTestHelper_HeatStation));
-        auto Pending = Fixture.Spawn_Batter(Owner, Get_StationLocation(), Make_BatterSpec().Coat.CoatSeconds);
-        _FeedStationEntity = Pending.Get_EntityUnderConstruction();
+        if (Get_HeatStation() == EMars_TESTONLY_HeatStation::Searing)
+        { _FeedStationEntity = Spawn_SearingStation(Owner); }
+        else
+        {
+            auto Fixture = Cast<UMars_AutoTestHelper_HeatStation>(NewObject(this, UMars_AutoTestHelper_HeatStation));
+            auto Pending = Fixture.Spawn_Batter(Owner, Get_StationLocation(), Make_BatterSpec().Coat.CoatSeconds);
+            _FeedStationEntity = Pending.Get_EntityUnderConstruction();
+        }
+
         Track_ForCleanup(_FeedStationEntity);
         WaitUntil(n"Is_RigHeatStationReady", n"OnRigHeatStationReady", k_SlowPolls);
     }
 
+    // The real searing station with the test's exposed Searing spec, as the map's spawner makes it (its own context).
+    private FCk_Handle Spawn_SearingStation(FCk_Handle InOwner)
+    {
+        auto Params = UMars_SearingStation_EntityScript::Params();
+        Params.SpawnTransform = FTransform(FRotator::ZeroRotator, Get_StationLocation());
+        Params.Searing = Make_SearingSpec();
+        auto Station = utils_entity_script::Request_SpawnEntity(InOwner, UMars_SearingStation_EntityScript, Params).Get_EntityUnderConstruction();
+        Station.Request_OverrideToSelf();
+        return Station;
+    }
+
+    // The searing station is ready once its pan body is in the simulation (the pan admits nothing before).
     UFUNCTION()
     private void Is_RigHeatStationReady(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Result = OutResult;
-        Result.Set(Get_IsLive(_FeedStationEntity) && _FeedStationEntity.Is_CookingFeed() && Try_FindHeatStation());
+        Result.Set(Get_IsLive(_FeedStationEntity) && _FeedStationEntity.Is_CookingFeed() && Try_FindHeatStation()
+            && (ck::Is_NOT_Valid(_Searing) || utils_jolt_body::Get_IsBodyAdded(_Searing.Get_Spec().Nodes.PanBaseBody)));
     }
 
     UFUNCTION()
@@ -708,6 +949,55 @@ class UMars_AutoTestRig_NetHeatStation : UMars_AutoTestRig_NetFeedStation
         utils_cooking_feed::Request_StationTakeOut(Station, FMars_Request_StationTakeOut(4, _Tray));
     }
 
+    // Server: a station take-out naming no tray (the press with none docked).
+    protected void Request_TakeOutWithoutTray()
+    {
+        auto Station = _Station;
+        utils_cooking_feed::Request_StationTakeOut(Station, FMars_Request_StationTakeOut(4, FCk_Handle_Platter()));
+    }
+
+    // Server: InPiece's cook state with all six faces seared; InContinuation once it reads so.
+    protected void Sear_AllRoundThen(FCk_Handle_FoodPiece InPiece, FName InContinuation)
+    {
+        auto Piece = InPiece;
+        auto CookState = Piece.Get_CookState();
+        for (int32 Index = 0; Index < CookState.Sear.Num(); ++Index)
+        { CookState.Sear[Index] = 1.0f; }
+
+        Piece.Request_SetCookState(FMars_Request_FoodPiece_SetCookState(CookState));
+        _SearAllRoundPiece = Piece;
+        _SearAllRoundContinuation = InContinuation;
+        WaitUntil(n"Is_RigSearedAllRound", n"OnRigSearedAllRound", k_SlowPolls);
+    }
+
+    // Every face of InCookState reads seared (six of them).
+    protected bool Get_IsSearedAllRound(FMars_FoodPiece_CookState InCookState)
+    {
+        if (InCookState.Sear.Num() != 6)
+        { return false; }
+
+        for (const auto Sear : InCookState.Sear)
+        {
+            if (Sear < 1.0f)
+            { return false; }
+        }
+
+        return true;
+    }
+
+    UFUNCTION()
+    private void Is_RigSearedAllRound(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Result = OutResult;
+        Result.Set(Get_IsSearedAllRound(_SearAllRoundPiece.Get_CookState()));
+    }
+
+    UFUNCTION()
+    private void OnRigSearedAllRound(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
+    {
+        WaitFrames(1, _SearAllRoundContinuation);
+    }
+
     //----------------------------------------------------------------------------------------------------------------------
     // Server: the operator
     //----------------------------------------------------------------------------------------------------------------------
@@ -820,13 +1110,13 @@ class UMars_AutoTestRig_NetHeatStation : UMars_AutoTestRig_NetFeedStation
     protected void End_HeatServer(FString InText)
     {
         Log_HeatStation(InText);
-        End_FeedStationServer("see [BatterNetTest]");
+        End_FeedStationServer(f"see {Get_LogTag()}");
     }
 
     protected void End_HeatClient(FString InText)
     {
         Log_HeatStation(InText);
-        End_FeedStationClient("see [BatterNetTest]");
+        End_FeedStationClient(f"see {Get_LogTag()}");
     }
 
     //----------------------------------------------------------------------------------------------------------------------
@@ -862,5 +1152,36 @@ class UMars_AutoTestRig_NetHeatStation : UMars_AutoTestRig_NetFeedStation
     private void OnRigPieceTakenOut(FCk_Handle_Batter InBatter, FMars_CookingFeed_PieceId InPieceId, FCk_Handle_FoodPiece InPiece)
     {
         _TakenOutIds.Add(InPieceId);
+    }
+
+    UFUNCTION()
+    private void OnRigHeatChanged(FCk_Handle_Searing InSearing, EMars_Searing_Heat InHeat)
+    {
+        _HeatChanges.Add(InHeat);
+    }
+
+    UFUNCTION()
+    private void OnRigPanPieceAdded(FCk_Handle_Searing InSearing, FMars_CookingFeed_PieceId InPieceId, FCk_Handle InPiece)
+    {
+        _PanAddedIds.Add(InPieceId);
+    }
+
+    UFUNCTION()
+    private void OnRigFaceSeared(FCk_Handle_Searing InSearing, FMars_CookingFeed_PieceId InPieceId, EMars_FoodPiece_Face InFace)
+    {
+        _SearedIds.Add(InPieceId);
+        _SearedFaces.Add(InFace);
+    }
+
+    UFUNCTION()
+    private void OnRigPanTakeOutRefused(FCk_Handle_Searing InSearing, EMars_CookingFeed_TakeOutRefusal InRefusal)
+    {
+        _PanTakeOutRefusals.Add(InRefusal);
+    }
+
+    UFUNCTION()
+    private void OnRigPieceLost(FCk_Handle_Searing InSearing, FMars_CookingFeed_PieceId InPieceId, FCk_Handle InPiece)
+    {
+        _LostIds.Add(InPieceId);
     }
 }

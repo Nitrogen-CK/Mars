@@ -1,9 +1,12 @@
-// Drains Reset -> SetDrive -> SetLiftTarget -> SetTiltTarget -> SetSlideTarget -> Look. Reset levels the implement, zeroes
-// the lift, the slide (and their targets) and the orbit and idles it; SetDrive, SetLiftTarget, SetTiltTarget and
-// SetSlideTarget are last-wins (a lift target only for a Commanded lift, a slide target only for a Commanded slide: any
-// other is a caller's defect, ensured; tilt targets whatever the axes); looks only collect into the pending look while
-// Driven. The drain collects and the Tick measures: a dirty-marked processor is also pumped with a zero DeltaT, so nothing
-// here integrates over time.
+// Drains Reset -> SetDrive -> SetLiftTarget -> SetTiltTarget -> SetSlideTarget -> Follow -> Look. Reset levels the
+// implement, zeroes the lift, the slide (and their targets) and the orbit, idles it and makes it steer itself (Own);
+// SetDrive, SetLiftTarget, SetTiltTarget and SetSlideTarget are last-wins (a lift target only for a Commanded lift, a slide
+// target only for a Commanded slide: any other is a caller's defect, ensured; tilt targets whatever the axes); Follow is
+// last-wins and makes it Followed: the command's drive and targets (clamped as the requests clamp them), a Kick lift's
+// velocity gains the command's rise in kick total, and the orbit phase is re-seated when it drifted; looks only collect
+// into the pending look while Driven and Own. The drain collects and the Tick measures: a dirty-marked processor is also
+// pumped with a zero DeltaT, so nothing here integrates over time (a followed kick is a velocity step, as a look's is).
+// Every copy runs it alike: with authority the kernel feeds it, without it the kernel's mirror sends the Follow.
 class UMars_Processor_Implement_HandleRequests : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -26,6 +29,7 @@ class UMars_Processor_Implement_HandleRequests : UCk_Processor_Script_Base_UE
         TArray<FMars_Request_Implement_SetLiftTarget> SetLiftTargetRequests = InRequests.SetLiftTargetRequests;
         TArray<FMars_Request_Implement_SetTiltTarget> SetTiltTargetRequests = InRequests.SetTiltTargetRequests;
         TArray<FMars_Request_Implement_SetSlideTarget> SetSlideTargetRequests = InRequests.SetSlideTargetRequests;
+        TArray<FMars_Request_Implement_Follow> FollowRequests = InRequests.FollowRequests;
         TArray<FMars_Request_Implement_Look> LookRequests = InRequests.LookRequests;
 
         // InRequests is invalid past this line; removing before broadcasting lets re-entrant requests survive.
@@ -48,7 +52,10 @@ class UMars_Processor_Implement_HandleRequests : UCk_Processor_Script_Base_UE
         if (SetSlideTargetRequests.Num() > 0)
         { Apply_SetSlideTarget(Self, InState, SetSlideTargetRequests.Last().Slide); }
 
-        if (InState.Drive == EMars_Implement_Drive::Driven)
+        if (FollowRequests.Num() > 0)
+        { Apply_Follow(Self, InState, FollowRequests.Last().Command); }
+
+        if (InState.Drive == EMars_Implement_Drive::Driven && InState.Steering == EMars_Implement_Steering::Own)
         {
             for (const auto& Request : LookRequests)
             { InState.PendingLook += FVector(Request.LookDelta.X, Request.LookDelta.Y, 0.0); }
@@ -79,6 +86,8 @@ class UMars_Processor_Implement_HandleRequests : UCk_Processor_Script_Base_UE
         InState.PendingLook = FVector::ZeroVector;
         InState.OrbitPhase = 0.0f;
         InState.OrbitAlpha = 0.0f;
+        InState.Steering = EMars_Implement_Steering::Own;
+        InState.FollowedKickTotal.Reset();
 
         utils_implement::Apply_Pose(InImplement, InState);
         InState.WrittenPitch = 0.0f;
@@ -119,5 +128,37 @@ class UMars_Processor_Implement_HandleRequests : UCk_Processor_Script_Base_UE
         { return; }
 
         InState.TargetSlide = utils_implement::Clamp_SlideTarget(SlideSpec, InSlide);
+    }
+
+    // The command steers from now on: its drive, its tilt targets (clamped as SetTiltTarget clamps), a Commanded lift's
+    // target, the slide target where the slide has a reach (clamped to it), a Kick lift's velocity by the rise in kick total
+    // since the last command (the first only records it), and the orbit phase re-seated past k_OrbitResyncRadians of drift.
+    private void Apply_Follow(FCk_Handle_Implement& InImplement, FMars_Fragment_Implement& InState, const FMars_Implement_Command& InCommand)
+    {
+        const auto Spec = InImplement.Get_Spec();
+        InState.Steering = EMars_Implement_Steering::Followed;
+        InState.Drive = InCommand.Drive;
+        Apply_SetTiltTarget(InImplement, InState, InCommand.Tilt);
+
+        if (Spec.Lift.Mode == EMars_Implement_LiftMode::Commanded)
+        { InState.TargetLift = Math::Clamp(InCommand.Lift, Spec.Lift.MinLift, Spec.Lift.MaxLift); }
+
+        if (Spec.Slide.Radius > 0.0f || Spec.Slide.HalfExtentX > 0.0f || Spec.Slide.HalfExtentY > 0.0f)
+        { InState.TargetSlide = utils_implement::Clamp_SlideTarget(Spec.Slide, InCommand.Slide); }
+
+        if (Spec.Lift.Mode == EMars_Implement_LiftMode::Kick)
+        {
+            if (InState.FollowedKickTotal.IsSet())
+            {
+                const auto Rise = InCommand.KickTotal - InState.FollowedKickTotal.GetValue();
+                if (Rise > 0.0f)
+                { InState.LiftVelocity += Rise * Spec.Lift.Gain; }
+            }
+
+            InState.FollowedKickTotal = TOptional<float32>(InCommand.KickTotal);
+        }
+
+        if (Math::Abs(utils_implement::Get_PhaseDifference(InCommand.OrbitPhase, InState.OrbitPhase)) > utils_implement::k_OrbitResyncRadians)
+        { InState.OrbitPhase = InCommand.OrbitPhase; }
     }
 }

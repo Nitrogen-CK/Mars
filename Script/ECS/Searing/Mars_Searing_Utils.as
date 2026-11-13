@@ -18,7 +18,8 @@ namespace utils_searing
     // the pan node (the kernel makes it Driven while hot and forwards the looks to it), and a piece counts as on the pan only
     // while it rests on Nodes.PanBaseBody. The pan starts empty: pieces arrive only through the station's inbox
     // (utils_cooking_feed::Request_Admit); an empty first drain starts its watch of the station's queue. A rejected spec or
-    // a missing node ensures and returns an invalid handle.
+    // a missing node ensures and returns an invalid handle. The two replicated ledgers are composed on every machine (a copy
+    // without authority reads the kernel and follows the pan through them).
     FCk_Handle_Searing Add(FCk_Handle& InHandle, FMars_Searing_Spec InSpec)
     {
         const auto Validation = InSpec.Validate();
@@ -38,6 +39,18 @@ namespace utils_searing
         InHandle.Add_Fragment(FMars_Fragment_Searing_Requests());
         utils_cooking_feed::Add_Admission(InHandle);
         utils_cooking_feed::Add_TakeOut(InHandle);
+
+        // A copy without authority can receive either ledger before it composes: what arrived stands then.
+        if (InHandle.Has_Fragment(FMars_Fragment_Searing_Net) == false)
+        { InHandle.Add_Fragment(FMars_Fragment_Searing_Net(), ECk_Replication::Replicates); }
+
+        if (InHandle.Has_Fragment(FMars_Fragment_Searing_PanNet) == false)
+        { InHandle.Add_Fragment(FMars_Fragment_Searing_PanNet(), ECk_Replication::Replicates); }
+
+        auto Local = FMars_Fragment_Searing_Local();
+        Local.Last = TOptional<FMars_Fragment_Searing_Net>(InHandle.Get_Fragment(FMars_Fragment_Searing_Net));
+        InHandle.Add_Fragment(Local);
+        InHandle.Add_Fragment(FMars_Tag_Searing_NeedsMirror());
         return InHandle.As_Searing();
     }
 
@@ -137,6 +150,117 @@ namespace utils_searing
         return (InHalfExtents.X + InHalfExtents.Y) * 0.5;
     }
 
+    bool Get_IsSameLedger(const FMars_Fragment_Searing_Net& InA, const FMars_Fragment_Searing_Net& InB)
+    {
+        if (InA.Heat != InB.Heat || InA.Sizzle != InB.Sizzle || InA.Counts.Flips != InB.Counts.Flips
+            || InA.Counts.Losses != InB.Counts.Losses || InA.Counts.TakenOut != InB.Counts.TakenOut
+            || InA.Pieces.Num() != InB.Pieces.Num() || InA.TakeOutRefusalSerial != InB.TakeOutRefusalSerial
+            || InA.LastTakeOutRefusal != InB.LastTakeOutRefusal)
+        { return false; }
+
+        for (int32 Index = 0; Index < InA.Pieces.Num(); ++Index)
+        {
+            const auto& A = InA.Pieces[Index];
+            const auto& B = InB.Pieces[Index];
+            if (A.Id.Get_IsSame(B.Id) == false || A.Piece != B.Piece || A.Status != B.Status || A.Contact != B.Contact
+                || A.RestingFace != B.RestingFace || Get_IsSameSears(A.FaceSear, B.FaceSear) == false)
+            { return false; }
+        }
+
+        return true;
+    }
+
+    bool Get_IsSameSears(const TArray<float32>& InA, const TArray<float32>& InB)
+    {
+        if (InA.Num() != InB.Num())
+        { return false; }
+
+        for (int32 Index = 0; Index < InA.Num(); ++Index)
+        {
+            if (InA[Index] != InB[Index])
+            { return false; }
+        }
+
+        return true;
+    }
+
+    // The kernel's ledger a machine without authority reads it through, rebuilt from the live state and what the caller
+    // announced: written and marked dirty only when a field or a row differs. Called only by the kernel's processors on the
+    // authority, by the drain once after its last apply and by the tick after its readout. Reads the state through the
+    // handle.
+    void Publish(FCk_Handle_Searing& InSearing, const FMars_Searing_Answers& InAnswers)
+    {
+        const auto State = InSearing.Get_Fragment(FMars_Fragment_Searing);
+        const auto Ledger = InSearing.Get_Fragment(FMars_Fragment_Searing_Net);
+        auto Next = Ledger;
+        Next.Heat = State.Heat;
+        Next.Sizzle = State.Sizzle;
+        Next.Counts.Flips = State.Tally.Flips;
+        Next.Counts.Losses = State.Tally.Losses;
+        Next.Counts.TakenOut = State.Tally.TakenOut;
+
+        Next.Pieces.Empty();
+        for (const auto& Piece : State.Pieces)
+        { Next.Pieces.Add(Make_PieceRow(Piece)); }
+
+        if (InAnswers.TakeOutRefusals.Num() > 0)
+        {
+            Next.TakeOutRefusalSerial += InAnswers.TakeOutRefusals.Num();
+            Next.LastTakeOutRefusal = InAnswers.TakeOutRefusals.Last();
+        }
+
+        if (Get_IsSameLedger(Next, Ledger))
+        { return; }
+
+        InSearing.Get_Fragment(FMars_Fragment_Searing_Net) = Next;
+        FCk_Handle Entity = InSearing;
+        Entity.Request_MarkReplicationDirty(FMars_Fragment_Searing_Net);
+    }
+
+    // The pan's command, written and marked dirty only when the pacer says it is worth sending (utils_implement::
+    // Advance_CommandPacer). Called only by the kernel's tick on the authority, after Publish.
+    void Publish_Pan(FCk_Handle_Searing& InSearing, float32 InDeltaSeconds)
+    {
+        const auto Command = InSearing.Get_Pan().Get_Command();
+        auto Pacer = InSearing.Get_Fragment(FMars_Fragment_Searing_Local).PanPacer;
+        const auto IsDue = utils_implement::Advance_CommandPacer(Pacer, Command, InDeltaSeconds);
+        InSearing.Get_Fragment(FMars_Fragment_Searing_Local).PanPacer = Pacer;
+        if (IsDue == false)
+        { return; }
+
+        InSearing.Get_Fragment(FMars_Fragment_Searing_PanNet).Pan = Command;
+        FCk_Handle Entity = InSearing;
+        Entity.Request_MarkReplicationDirty(FMars_Fragment_Searing_PanNet);
+    }
+
+    // A piece as the ledger carries it: its sears floored to a tenth (a client's sear reads up to a tenth behind, never
+    // ahead), exactly 1 once seared.
+    FMars_Searing_PieceRow Make_PieceRow(const FMars_Searing_PieceState& InPiece)
+    {
+        auto Row = FMars_Searing_PieceRow();
+        Row.Id = InPiece.Id;
+        Row.Piece = InPiece.Entity;
+        Row.Status = InPiece.Status;
+        Row.Contact = InPiece.Contact;
+        Row.RestingFace = InPiece.RestingFace;
+        for (const auto Sear : InPiece.FaceSear)
+        { Row.FaceSear.Add(Sear >= 1.0f ? 1.0f : float32(Math::FloorToInt(Sear * float32(k_SearSignalSteps))) / float32(k_SearSignalSteps)); }
+
+        return Row;
+    }
+
+    // The ledger row carrying InPieceId; -1 = none.
+    int32 Find_RowIndex(const TArray<FMars_Searing_PieceRow>& InRows, const FMars_CookingFeed_PieceId& InPieceId)
+    {
+        for (int32 Index = 0; Index < InRows.Num(); ++Index)
+        {
+            if (InRows[Index].Id.Get_IsSame(InPieceId))
+            { return Index; }
+        }
+
+        return -1;
+    }
+
     // The cook state InPiece's sear makes of InSeed (the state the piece arrived with): the sears are the pan's; every
     // other channel is the seed's.
     FMars_FoodPiece_CookState Get_CookState(const FMars_Searing_PieceState& InPiece, const FMars_FoodPiece_CookState& InSeed)
@@ -156,8 +280,30 @@ mixin FMars_Searing_Spec Get_Spec(const FCk_Handle_Searing& Self)
     return Self.Get_Fragment(FMars_Fragment_Searing_Params).Spec;
 }
 
+// The kernel's replicated ledger as this machine has it: what a machine without authority reads the kernel through.
+mixin FMars_Fragment_Searing_Net Get_Ledger(const FCk_Handle_Searing& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_Searing_Net);
+}
+
+// The pan's replicated command as this machine has it: what a machine without authority's pan follows.
+mixin FMars_Fragment_Searing_PanNet Get_PanLedger(const FCk_Handle_Searing& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_Searing_PanNet);
+}
+
+// Without authority the getters below that read the kernel's state read the replicated ledger instead (and this machine's
+// own copies of the pieces): the live state is the authority's.
+mixin bool Get_ReadsLedger(const FCk_Handle_Searing& Self)
+{
+    return utils_net::Get_HasAuthority(Self) == false;
+}
+
 mixin bool Get_IsHot(const FCk_Handle_Searing& Self)
 {
+    if (Self.Get_ReadsLedger())
+    { return Self.Get_Fragment(FMars_Fragment_Searing_Net).Heat == EMars_Searing_Heat::Hot; }
+
     return Self.Get_Fragment(FMars_Fragment_Searing).Heat == EMars_Searing_Heat::Hot;
 }
 
@@ -192,20 +338,49 @@ mixin FVector Get_PanUp(const FCk_Handle_Searing& Self)
 // Aggregate over every piece.
 mixin EMars_Searing_Sizzle Get_Sizzle(const FCk_Handle_Searing& Self)
 {
+    if (Self.Get_ReadsLedger())
+    { return Self.Get_Fragment(FMars_Fragment_Searing_Net).Sizzle; }
+
     return Self.Get_Fragment(FMars_Fragment_Searing).Sizzle;
 }
 
+// Without authority: the ledger's counts, with Seconds 0 (the clock stays with the authority).
 mixin FMars_Searing_Tally Get_Tally(const FCk_Handle_Searing& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_Searing).Tally;
+    if (Self.Get_ReadsLedger() == false)
+    { return Self.Get_Fragment(FMars_Fragment_Searing).Tally; }
+
+    const auto& Counts = Self.Get_Fragment(FMars_Fragment_Searing_Net).Counts;
+    auto Tally = FMars_Searing_Tally();
+    Tally.Flips = Counts.Flips;
+    Tally.Losses = Counts.Losses;
+    Tally.TakenOut = Counts.TakenOut;
+    return Tally;
 }
 
 // Admitted = Cooking + Ready (on the pan) + Lost + TakenOut (since the last reset; a lost piece stays counted after its
-// body is destroyed).
+// body is destroyed). Without authority the same rule over the ledger's rows and counts.
 mixin FMars_Searing_Summary Get_Summary(const FCk_Handle_Searing& Self)
 {
-    const auto& State = Self.Get_Fragment(FMars_Fragment_Searing);
     auto Summary = FMars_Searing_Summary();
+    if (Self.Get_ReadsLedger())
+    {
+        const auto& Ledger = Self.Get_Fragment(FMars_Fragment_Searing_Net);
+        for (const auto& Row : Ledger.Pieces)
+        {
+            if (Row.Status == EMars_Searing_PieceStatus::Cooking)
+            { Summary.Cooking += 1; }
+            else if (Row.Status == EMars_Searing_PieceStatus::Ready)
+            { Summary.Ready += 1; }
+        }
+
+        Summary.Lost = Ledger.Counts.Losses;
+        Summary.TakenOut = Ledger.Counts.TakenOut;
+        Summary.Admitted = Summary.Cooking + Summary.Ready + Summary.Lost + Summary.TakenOut;
+        return Summary;
+    }
+
+    const auto& State = Self.Get_Fragment(FMars_Fragment_Searing);
     for (const auto& Piece : State.Pieces)
     {
         if (Piece.Status == EMars_Searing_PieceStatus::Cooking)
@@ -220,10 +395,11 @@ mixin FMars_Searing_Summary Get_Summary(const FCk_Handle_Searing& Self)
     return Summary;
 }
 
-// The Ready pieces a TakeOut without a named piece would hand back: the station's take-out readout, as the Tick last wrote it.
+// The Ready pieces a TakeOut without a named piece would hand back: the station's take-out readout as the Tick last wrote
+// it, or its replicated count without authority.
 mixin int32 Get_TakeableCount(const FCk_Handle_Searing& Self)
 {
-    return utils_cooking_feed::Get_Takeable(Self).Num();
+    return utils_cooking_feed::Get_TakeableCount(Self);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -234,6 +410,14 @@ mixin int32 Get_TakeableCount(const FCk_Handle_Searing& Self)
 mixin TArray<FMars_CookingFeed_PieceId> Get_PieceIds(const FCk_Handle_Searing& Self)
 {
     TArray<FMars_CookingFeed_PieceId> Ids;
+    if (Self.Get_ReadsLedger())
+    {
+        for (const auto& Row : Self.Get_Fragment(FMars_Fragment_Searing_Net).Pieces)
+        { Ids.Add(Row.Id); }
+
+        return Ids;
+    }
+
     for (const auto& Piece : Self.Get_Fragment(FMars_Fragment_Searing).Pieces)
     { Ids.Add(Piece.Id); }
 
@@ -243,12 +427,19 @@ mixin TArray<FMars_CookingFeed_PieceId> Get_PieceIds(const FCk_Handle_Searing& S
 // From admission until the piece is taken out or destroyed (a lost one, at the end of its linger).
 mixin bool Get_HasPiece(const FCk_Handle_Searing& Self, const FMars_CookingFeed_PieceId& InPieceId)
 {
+    if (Self.Get_ReadsLedger())
+    { return utils_searing::Find_RowIndex(Self.Get_Fragment(FMars_Fragment_Searing_Net).Pieces, InPieceId) >= 0; }
+
     return utils_searing::Find_PieceIndex(Self.Get_Fragment(FMars_Fragment_Searing).Pieces, InPieceId) >= 0;
 }
 
-// A copy of the piece's state; an unknown Id ensures and answers a default state.
+// A copy of the piece's state; an unknown Id ensures and answers a default state. Without authority it is built from the
+// ledger's row (its sears a tenth behind at most) and this machine's copy of the piece.
 mixin FMars_Searing_PieceState Get_PieceState(const FCk_Handle_Searing& Self, const FMars_CookingFeed_PieceId& InPieceId)
 {
+    if (Self.Get_ReadsLedger())
+    { return Self.Get_LedgerPieceState(InPieceId); }
+
     const auto& Pieces = Self.Get_Fragment(FMars_Fragment_Searing).Pieces;
     const auto Index = utils_searing::Find_PieceIndex(Pieces, InPieceId);
     if (ck::EnsureIfNot(Index >= 0,
@@ -256,6 +447,38 @@ mixin FMars_Searing_PieceState Get_PieceState(const FCk_Handle_Searing& Self, co
     { return FMars_Searing_PieceState(); }
 
     return Pieces[Index];
+}
+
+// The row's id, status, contact, resting face and sears; its Entity and Piece the row's handle (invalid while it has not
+// replicated here); its CentreLocal and HalfExtents from this copy's mesh metrics, as the authority reads them at admission,
+// once it is a Ready food piece here (zero before); no body.
+mixin FMars_Searing_PieceState Get_LedgerPieceState(const FCk_Handle_Searing& Self, const FMars_CookingFeed_PieceId& InPieceId)
+{
+    const auto& Rows = Self.Get_Fragment(FMars_Fragment_Searing_Net).Pieces;
+    const auto Index = utils_searing::Find_RowIndex(Rows, InPieceId);
+    if (ck::EnsureIfNot(Index >= 0,
+        f"[Searing] [{Self.ToString()}] has no piece {utils_cooking_feed::Get_PieceName(InPieceId)} in its ledger ({Rows.Num()} on the pan)"))
+    { return FMars_Searing_PieceState(); }
+
+    const auto Row = Rows[Index];
+    auto State = FMars_Searing_PieceState();
+    State.Id = Row.Id;
+    State.Entity = Row.Piece;
+    State.Status = Row.Status;
+    State.Contact = Row.Contact;
+    State.RestingFace = Row.RestingFace;
+    State.FaceSear = Row.FaceSear;
+    if (ck::IsValid(Row.Piece))
+    { State.Piece = Row.Piece.As_FoodPiece(ECk_SanityCheck::UnChecked); }
+
+    if (ck::IsValid(State.Piece) && utils_foodpiece::Get_IsLiveEntity(Row.Piece) && State.Piece.Get_Status() == EMars_FoodPiece_Status::Ready)
+    {
+        const auto Metrics = utils_runtime_mesh::Get_Metrics(State.Piece.Get_Geometry());
+        State.CentreLocal = utils_foodpiece::Get_BoundsCentre(Metrics);
+        State.HalfExtents = utils_foodpiece::Get_BoundsHalfExtents(Metrics);
+    }
+
+    return State;
 }
 
 mixin FCk_Handle Get_PieceEntity(const FCk_Handle_Searing& Self, const FMars_CookingFeed_PieceId& InPieceId)
@@ -304,7 +527,9 @@ mixin EMars_Searing_Contact Get_PieceContact(const FCk_Handle_Searing& Self, con
 mixin FMars_FoodPiece_CookState Get_PieceCookState(const FCk_Handle_Searing& Self, const FMars_CookingFeed_PieceId& InPieceId)
 {
     const auto Piece = Self.Get_PieceState(InPieceId);
-    return utils_searing::Get_CookState(Piece, Piece.Piece.Get_CookState());
+    // A copy without authority can still hold the row of a piece that ended this frame: its sears then start from raw.
+    const auto Base = utils_foodpiece::Get_IsLiveEntity(Piece.Piece) ? Piece.Piece.Get_CookState() : FMars_FoodPiece_CookState();
+    return utils_searing::Get_CookState(Piece, Base);
 }
 
 // 0 raw .. 1 seared.

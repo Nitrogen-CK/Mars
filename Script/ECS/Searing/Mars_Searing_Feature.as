@@ -1,3 +1,12 @@
+// Stance: the pan's kernel is the authority's. Only the authority's copy heats, admits, judges contact, flips and loss,
+// sears, takes out and readopts; a copy without authority drops every searing request (and the releases and take-outs its
+// station queued) and reads the pan through two replicated ledgers on the station: the kernel's (the heat, the sizzle, the
+// counts, every piece it holds with its status, contact, resting face and sears floored to a tenth, and a serial for the
+// take-outs it refused) and the pan's command, which that copy's own pan Implement follows. On that copy the kernel's tick
+// only announces: OnPieceAdded as a row's piece shows up there, so the station dresses it; its mirror raises
+// OnTakeOutRefused, OnHeatChanged and OnFaceSeared from the ledger. The other searing signals, the bodies, the clocks, the
+// tally's seconds, the pieces' cook state, holder facts and pickup claims never leave the authority.
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
 //--------------------------------------------------------------------------------------------------------------------------
@@ -412,6 +421,102 @@ struct FMars_Fragment_Searing
     UPROPERTY()
     EMars_Searing_Sizzle Sizzle = EMars_Searing_Sizzle::Quiet;
 }
+
+//--------------------------------------------------------------------------------------------------------------------------
+// Replication
+//--------------------------------------------------------------------------------------------------------------------------
+
+// One piece in the kernel's ledger: its identity, its entity, its status, contact and resting face, and its six sears,
+// each floored to a tenth (exactly 1 once seared), indexed by int32(EMars_FoodPiece_Face).
+struct FMars_Searing_PieceRow
+{
+    UPROPERTY()
+    FMars_CookingFeed_PieceId Id;
+
+    UPROPERTY()
+    FCk_Handle Piece;
+
+    UPROPERTY()
+    EMars_Searing_PieceStatus Status = EMars_Searing_PieceStatus::Cooking;
+
+    UPROPERTY()
+    EMars_Searing_Contact Contact = EMars_Searing_Contact::Airborne;
+
+    UPROPERTY()
+    EMars_FoodPiece_Face RestingFace = EMars_FoodPiece_Face::NegZ;
+
+    UPROPERTY()
+    TArray<float32> FaceSear;
+}
+
+// The tally's counts (its seconds stay with the authority: they move every hot frame).
+struct FMars_Searing_Counts
+{
+    UPROPERTY()
+    int32 Flips = 0;
+
+    UPROPERTY()
+    int32 Losses = 0;
+
+    UPROPERTY()
+    int32 TakenOut = 0;
+}
+
+// What a drain announced, for the ledger's serial: every refused take-out, in order.
+struct FMars_Searing_Answers
+{
+    TArray<EMars_CookingFeed_TakeOutRefusal> TakeOutRefusals;
+}
+
+// The kernel as a machine without authority reads it, replicated on the station and written only by utils_searing::Publish
+// on the authority. A row's Piece may not resolve on a client yet (its entity has not replicated there).
+struct FMars_Fragment_Searing_Net
+{
+    UPROPERTY()
+    EMars_Searing_Heat Heat = EMars_Searing_Heat::Cold;
+
+    UPROPERTY()
+    EMars_Searing_Sizzle Sizzle = EMars_Searing_Sizzle::Quiet;
+
+    UPROPERTY()
+    FMars_Searing_Counts Counts;
+
+    // In admission order, the lingering lost pieces included.
+    UPROPERTY()
+    TArray<FMars_Searing_PieceRow> Pieces;
+
+    // One more for every take-out the authority refused; the last one's reason.
+    UPROPERTY()
+    int32 TakeOutRefusalSerial = 0;
+
+    UPROPERTY()
+    EMars_CookingFeed_TakeOutRefusal LastTakeOutRefusal = EMars_CookingFeed_TakeOutRefusal::NoRoom;
+}
+
+// The authority's pan command, which every other copy's pan follows. Its own fragment: a dynamic fragment is sent whole on
+// every dirty mark, and the command moves many times a second. Written only by utils_searing::Publish_Pan on the authority.
+struct FMars_Fragment_Searing_PanNet
+{
+    UPROPERTY()
+    FMars_Implement_Command Pan;
+}
+
+// Each machine's own: the kernel's ledger it last reconciled (unset with authority), the ledger rows it announced (used only
+// without authority) and the pacer of the pan's command (used only with authority).
+struct FMars_Fragment_Searing_Local
+{
+    UPROPERTY()
+    TOptional<FMars_Fragment_Searing_Net> Last;
+
+    UPROPERTY()
+    TArray<FMars_CookingFeed_PieceId> Announced;
+
+    UPROPERTY()
+    FMars_Implement_CommandPacer PanPacer;
+}
+
+// Wakes the mirror once per pan.
+struct FMars_Tag_Searing_NeedsMirror {}
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Signals

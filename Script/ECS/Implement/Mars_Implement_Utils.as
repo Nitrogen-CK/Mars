@@ -1,5 +1,57 @@
 namespace utils_implement
 {
+    // A follower's orbit phase is re-seated to its command's past this drift (radians, the short way round).
+    const float32 k_OrbitResyncRadians = 0.5f;
+    // A moved command is sent again at most this often (per second); a driven one at least every k_CommandKeepAliveSeconds.
+    const float32 k_CommandHz = 30.0f;
+    const float32 k_CommandKeepAliveSeconds = 0.5f;
+    // How far a tilt target (degrees), the lift target or the slide target (uu) must move to count as moved.
+    const float32 k_CommandTolerance = 0.05f;
+
+    // Whether InCommand is worth sending now (and, when it is, records it as sent): nothing was sent yet; its drive or kick
+    // total differs from the one sent; a tilt target, the lift or the slide moved by k_CommandTolerance and 1 / k_CommandHz
+    // seconds passed since the last send; or it is Driven and k_CommandKeepAliveSeconds passed.
+    bool Advance_CommandPacer(FMars_Implement_CommandPacer& InOutPacer, const FMars_Implement_Command& InCommand, float32 InDeltaSeconds)
+    {
+        InOutPacer.SecondsSincePublished += InDeltaSeconds;
+        if (Get_IsCommandDue(InOutPacer, InCommand) == false)
+        { return false; }
+
+        InOutPacer.Published = TOptional<FMars_Implement_Command>(InCommand);
+        InOutPacer.SecondsSincePublished = 0.0f;
+        return true;
+    }
+
+    bool Get_IsCommandDue(const FMars_Implement_CommandPacer& InPacer, const FMars_Implement_Command& InCommand)
+    {
+        if (InPacer.Published.IsSet() == false)
+        { return true; }
+
+        const auto Sent = InPacer.Published.GetValue();
+        if (Sent.Drive != InCommand.Drive || Sent.KickTotal != InCommand.KickTotal)
+        { return true; }
+
+        const auto Seconds = InPacer.SecondsSincePublished;
+        const auto IsMoved = Math::Abs(Sent.Tilt.Pitch - InCommand.Tilt.Pitch) > k_CommandTolerance
+            || Math::Abs(Sent.Tilt.Yaw - InCommand.Tilt.Yaw) > k_CommandTolerance
+            || Math::Abs(Sent.Tilt.Roll - InCommand.Tilt.Roll) > k_CommandTolerance
+            || Math::Abs(Sent.Lift - InCommand.Lift) > k_CommandTolerance
+            || (Sent.Slide - InCommand.Slide).Size() > k_CommandTolerance;
+        if (IsMoved && Seconds >= 1.0f / k_CommandHz)
+        { return true; }
+
+        return InCommand.Drive == EMars_Implement_Drive::Driven && Seconds >= k_CommandKeepAliveSeconds;
+    }
+
+    // InA - InB in radians, wrapped into [-pi, pi]: the short way round.
+    float32 Get_PhaseDifference(float32 InA, float32 InB)
+    {
+        const auto FullTurn = 2.0f * float32(Math::DegreesToRadians(180.0));
+        auto Difference = InA - InB;
+        Difference -= FullTurn * float32(Math::FloorToInt((Difference + FullTurn * 0.5f) / FullTurn));
+        return Difference;
+    }
+
     // Composes the implement on InHandle (any entity; the feature does not need a station). The spec's Nodes are built by
     // the caller: the feature writes Nodes.Node's offset every frame relative to the offset it has now. It starts Idle.
     // A rejected spec or a missing node ensures and returns an invalid handle.
@@ -164,6 +216,26 @@ mixin FTransform Get_NodeWorld(const FCk_Handle_Implement& Self)
     return utils_transform::Get_EntityCurrentTransform(Self.Get_Node().As_Transform());
 }
 
+mixin EMars_Implement_Steering Get_Steering(const FCk_Handle_Implement& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_Implement).Steering;
+}
+
+// What this implement is being told to do, as another copy follows it: its drive, its targets, its kick total and its
+// orbit phase.
+mixin FMars_Implement_Command Get_Command(const FCk_Handle_Implement& Self)
+{
+    const auto& State = Self.Get_Fragment(FMars_Fragment_Implement);
+    auto Command = FMars_Implement_Command();
+    Command.Drive = State.Drive;
+    Command.Tilt = FRotator(State.TargetPitch, State.TargetYaw, State.TargetRoll);
+    Command.Lift = State.TargetLift;
+    Command.Slide = State.TargetSlide;
+    Command.KickTotal = State.KickTotal;
+    Command.OrbitPhase = State.OrbitPhase;
+    return Command;
+}
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Requests
 //--------------------------------------------------------------------------------------------------------------------------
@@ -202,6 +274,12 @@ mixin void Request_Reset(FCk_Handle_Implement& Self, const FMars_Request_Impleme
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Implement_Requests);
     Requests.ResetRequests.Add(InRequest);
+}
+
+mixin void Request_Follow(FCk_Handle_Implement& Self, const FMars_Request_Implement_Follow& InRequest)
+{
+    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Implement_Requests);
+    Requests.FollowRequests.Add(InRequest);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
