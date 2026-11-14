@@ -8,7 +8,9 @@
 // it from the row's polled predicates: the largest distance the root moved between two samples, the highest Rise, the
 // first frame its ledger read Standing, the widest lid while its action read Windup, the lowest while it read Recover,
 // the widest since its flinch count last changed, whether it ever read flinching, whether its gait ever read Failed,
-// and, between Begin_FeetRecord and the row's end, its feet.
+// and, between Begin_FeetRecord and the row's end, its feet. It records the frames of its copy's first OnDied and
+// first OnSpill, and finds the pickles lying near the base on this machine (the server hands them to the harness: they
+// belong to the world, not to the mimic).
 struct FMars_NetPickleMimicTest_Phase
 {
     UPROPERTY()
@@ -44,6 +46,7 @@ class UMars_AutoTestRig_NetPickleMimic : UMars_AutoTestRig_NetStrike
     protected const FVector k_FloorHalfExtents = FVector(1500.0, 1500.0, 10.0);
     protected const float64 k_BodyDropTucked = 19.0;
     protected const float64 k_BodyDropStanding = 0.0;
+    protected const float64 k_PickleRadius = 1500.0;
 
     protected FCk_Handle_PickleMimic _Mimic;
     protected FCk_Handle_Monster _MimicMonster;
@@ -53,9 +56,11 @@ class UMars_AutoTestRig_NetPickleMimic : UMars_AutoTestRig_NetStrike
     protected int32 _MimicTuckedStances = 0;
     protected int32 _MimicStandingFrame = -1;
     protected int32 _MimicDied = 0;
+    protected int32 _MimicDiedFrame = -1;
     protected int32 _MimicDamaged = 0;
     protected int32 _MimicSpills = 0;
     protected int32 _MimicLastSpillCount = -1;
+    protected int32 _MimicSpillFrame = -1;
     protected int32 _MimicLedgerStandingFrame = -1;
     protected float64 _MimicLargestStep = 0.0;
     protected float32 _MimicHighestRise = 0.0f;
@@ -506,6 +511,66 @@ class UMars_AutoTestRig_NetPickleMimic : UMars_AutoTestRig_NetStrike
     }
 
     //----------------------------------------------------------------------------------------------------------------------
+    // Each machine: the spilled pickles
+    //----------------------------------------------------------------------------------------------------------------------
+
+    // The pickle foods within k_PickleRadius of the base on this machine, not being destroyed (a world item of another
+    // definition is skipped).
+    protected TArray<FCk_Handle> Get_PicklesNearBase()
+    {
+        const auto Pickle = mars_items::Food_Pickle();
+        auto Found = TArray<FCk_Handle>();
+        for (auto Candidate : utils_entity_tag::ForEach_Entity(Get_SubjectEntity(), n"TAG_MarsWorldItem"))
+        {
+            if (utils_entity_lifetime::Get_IsPendingDestroy(Candidate, ECk_EntityLifetime_DestructionPhase::BeginDestroy))
+            { continue; }
+
+            const auto Item = Candidate.As_WorldItem(ECk_SanityCheck::UnChecked);
+            if (ck::IsValid(Item) && Item.Get_Definition() != Pickle)
+            { continue; }
+
+            const auto Transform = Candidate.As_Transform(ECk_SanityCheck::UnChecked);
+            if (ck::IsValid(Transform) && (utils_transform::Get_EntityCurrentLocation(Transform) - _Base).Size() <= k_PickleRadius)
+            { Found.Add(Candidate); }
+        }
+
+        return Found;
+    }
+
+    // How many of the pickles near the base this machine has authority over.
+    protected int32 Get_PicklesWithAuthority()
+    {
+        auto Count = 0;
+        for (auto Pickle : Get_PicklesNearBase())
+        {
+            if (utils_net::Get_HasAuthority(Pickle))
+            { ++Count; }
+        }
+
+        return Count;
+    }
+
+    // Server: the pickles near the base go to the harness to destroy.
+    protected void Track_ServerPickles()
+    {
+        for (auto Pickle : Get_PicklesNearBase())
+        { Track_ForCleanup(Pickle); }
+    }
+
+    protected FString Describe_Pickles()
+    {
+        const auto Pickles = Get_PicklesNearBase();
+        FString Locations = "";
+        for (auto Pickle : Pickles)
+        {
+            const auto Transform = Pickle.As_Transform(ECk_SanityCheck::UnChecked);
+            Locations += f"{utils_transform::Get_EntityCurrentLocation(Transform).ToString()};";
+        }
+
+        return f"pickles=[{Pickles.Num()} authority {Get_PicklesWithAuthority()} at {Locations}]";
+    }
+
+    //----------------------------------------------------------------------------------------------------------------------
     // The log line and the finish
     //----------------------------------------------------------------------------------------------------------------------
 
@@ -539,7 +604,8 @@ class UMars_AutoTestRig_NetPickleMimic : UMars_AutoTestRig_NetStrike
         const auto Body = IsFound && ck::IsValid(_Health) ? _Health.Get_Current() : -1.0f;
         const auto Phases = Describe_MimicPhases();
         const auto Feet = Describe_Feet();
-        const auto Line = f"[PickleMimicNetTest] {InRow} {Get_MachineName()} stance={Stance} rise={Rise} lid={Lid} root={Location.ToString()} drop={Drop} largestStep={_MimicLargestStep} highestRise={_MimicHighestRise} ledger=[{LedgerText}] ledgerStandingFrame={_MimicLedgerStandingFrame} onStanding={_MimicStandingStances} onTucked={_MimicTuckedStances} standingFrame={_MimicStandingFrame} died={_MimicDied} damaged={_MimicDamaged} body={Body} action=[{ActionText}] phases=[{Phases}] blows={_MimicBlows} widestWindup={_MimicWidestInWindup} lowestRecover={_MimicLowestInRecover} widestSinceFlinch={_MimicWidestSinceFlinch} everFlinched={_MimicEverFlinched} crack={Crack} spills={_MimicSpills}/{_MimicLastSpillCount} spilled={Spilled} gait={Gait} trusted={Trusted} gaitEverFailed={_MimicGaitEverFailed} {Feet} ensures={Get_NewEnsures()} frame={utils_time::Get_FrameCounter()} {InExtra}";
+        const auto Pickles = Describe_Pickles();
+        const auto Line = f"[PickleMimicNetTest] {InRow} {Get_MachineName()} stance={Stance} rise={Rise} lid={Lid} root={Location.ToString()} drop={Drop} largestStep={_MimicLargestStep} highestRise={_MimicHighestRise} ledger=[{LedgerText}] ledgerStandingFrame={_MimicLedgerStandingFrame} onStanding={_MimicStandingStances} onTucked={_MimicTuckedStances} standingFrame={_MimicStandingFrame} died={_MimicDied} damaged={_MimicDamaged} body={Body} action=[{ActionText}] phases=[{Phases}] blows={_MimicBlows} widestWindup={_MimicWidestInWindup} lowestRecover={_MimicLowestInRecover} widestSinceFlinch={_MimicWidestSinceFlinch} everFlinched={_MimicEverFlinched} crack={Crack} spills={_MimicSpills}/{_MimicLastSpillCount} spilled={Spilled} diedFrame={_MimicDiedFrame} spillFrame={_MimicSpillFrame} {Pickles} gait={Gait} trusted={Trusted} gaitEverFailed={_MimicGaitEverFailed} {Feet} ensures={Get_NewEnsures()} frame={utils_time::Get_FrameCounter()} {InExtra}";
         Log(Line);
     }
 
@@ -598,12 +664,16 @@ class UMars_AutoTestRig_NetPickleMimic : UMars_AutoTestRig_NetStrike
     {
         _MimicSpills += 1;
         _MimicLastSpillCount = InCount;
+        if (_MimicSpillFrame < 0)
+        { _MimicSpillFrame = int32(utils_time::Get_FrameCounter()); }
     }
 
     UFUNCTION()
     private void OnMimicDied(FCk_Handle_Monster InMonster, FMars_DamageEvent InCause)
     {
         _MimicDied += 1;
+        if (_MimicDiedFrame < 0)
+        { _MimicDiedFrame = int32(utils_time::Get_FrameCounter()); }
     }
 
     UFUNCTION()
