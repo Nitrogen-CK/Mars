@@ -1,8 +1,9 @@
 namespace utils_mortar
 {
     // Composes the mortar on InHandle (the station entity; the feature does not need the Station feature) with a fresh batch
-    // of the spec's StartSeasoning. Every clock is the kernel's; what draws the pestle, the pile and the meter follows its
-    // state and signals. A rejected spec ensures and returns an invalid handle.
+    // of the spec's StartSeasoning, unless the replicated ledger already arrived: an arrived ledger is the state this
+    // copy was born into and has then taken. Every clock is the kernel's; what draws the pestle, the pile and the meter
+    // follows its state and signals. A rejected spec ensures and returns an invalid handle.
     FCk_Handle_Mortar Add(FCk_Handle& InHandle, FMars_Mortar_Spec InSpec)
     {
         const auto Validation = InSpec.Validate();
@@ -12,14 +13,17 @@ namespace utils_mortar
         auto Params = FMars_Fragment_Mortar_Params();
         Params.Spec = InSpec;
 
-        // A copy without authority can receive the replicated ledger before it composes: the arrived ledger stands then,
-        // and a mortar first read mid-batch shows that batch and raises nothing.
-        if (InHandle.Has_Fragment(FMars_Fragment_Mortar_Net) == false)
-        {
-            auto Fresh = FMars_Fragment_Mortar_Net();
-            Fresh.Batch.Seasoning = InSpec.StartSeasoning;
-            InHandle.Add_Fragment(Fresh, ECk_Replication::Replicates);
-        }
+        auto Fresh = FMars_Fragment_Mortar_Net();
+        Fresh.Batch.Seasoning = InSpec.StartSeasoning;
+        auto Local = FMars_Fragment_Mortar_Local();
+
+        // A ledger already here can only have been put here by its replicated application: this copy was born into it,
+        // has taken that state, and the mirror's first pass shows it as it stands (a mortar first read mid-batch shows
+        // that batch).
+        if (InHandle.Has_Fragment(FMars_Fragment_Mortar_Net))
+        { Local.InitialState = EMars_Net_InitialState::Taken; }
+        else
+        { InHandle.Add_Fragment(Fresh, ECk_Replication::Replicates); }
 
         const auto Ledger = InHandle.Get_Fragment(FMars_Fragment_Mortar_Net);
         auto State = FMars_Fragment_Mortar();
@@ -33,8 +37,8 @@ namespace utils_mortar
             State.SweepSeconds = Shown.SweepSeconds;
         }
 
-        auto Local = FMars_Fragment_Mortar_Local();
-        Local.Last = TOptional<FMars_Fragment_Mortar_Net>(Ledger);
+        // The mirror compares what arrives against the ledger this machine composed.
+        Local.Last = TOptional<FMars_Fragment_Mortar_Net>(Fresh);
 
         InHandle.Add_Fragment(FMars_Feature_Mortar());
         InHandle.Add_Fragment(Params);

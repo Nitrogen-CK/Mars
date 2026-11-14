@@ -1,11 +1,13 @@
 // Once per spot. With authority it drops the mirror state (the spot's own processors publish the ledger and broadcast).
-// Without authority it binds the ledger's rep-notify and reconciles once, so a ledger that replicated before the bind still
-// counts. Each reconcile writes the state the ledger shows (utils_fishing::Get_Shown: the phase, the presence and its fade,
-// the reel, the run, the tally, the dip, the bait of a new cast or on the water, the catch and a new landing's fling; the
-// aim and the line only for an idle spot, since the ticks' follow eases them while it is engaged), moves the Engaged tag
-// to the ledger's engagement and the Transitioning tag to its fade, then raises, from the arrived ledger against the one
-// it last reconciled: OnCast once per unseen cast, OnBite once per unseen bite, OnBiteEnded once per unseen bite end (each
-// with the ledger's last result),
+// Without authority it binds the ledger's rep-notify and reconciles once, showing the ledger this machine composed. The
+// ledger's first application is the state the copy was born into and is taken once as it stands: the rod's aim and the
+// line where the ledger has them, every level written and announced, and no cast, bite, bite end, landing or collection
+// the ledger already counts. Each later change is reconciled as it arrives: it writes the state the ledger shows
+// (utils_fishing::Get_Shown: the phase, the presence and its fade, the reel, the run, the tally, the dip, the bait of a
+// new cast or on the water, the catch and a new landing's fling; the aim and the line only for an idle spot, since the
+// ticks' follow eases them while it is engaged), moves the Engaged tag to the ledger's engagement and the Transitioning
+// tag to its fade, then raises, from the arrived ledger against the one it last reconciled: OnCast once per unseen
+// cast, OnBite once per unseen bite, OnBiteEnded once per unseen bite end (each with the ledger's last result),
 // OnLanded once per unseen landing, OnCollected once per unseen collection (with the catch as it was last shown),
 // OnPhaseChanged once when the phase serial moved and OnPresenceChanged once when the presence differs. OnBaitLanded,
 // OnRun and OnSnapped are the authority's alone.
@@ -33,7 +35,7 @@ class UMars_Processor_Fishing_Mirror : UCk_Processor_Script_Base_UE
         }
 
         InHandle.BindTo_OnRepNotify(FMars_Fragment_Fishing_Net, FCk_DynamicFragment_OnRepNotify(this, n"OnLedgerReplicated"));
-        Reconcile(Fishing);
+        Reconcile(Fishing, EMars_Net_Reconcile::AsItStands);
     }
 
     // An expected absence, not a defect: a notify can land on a station already ending.
@@ -45,19 +47,26 @@ class UMars_Processor_Fishing_Mirror : UCk_Processor_Script_Base_UE
         { return; }
 
         auto Fishing = InHandle.As_Fishing();
-        Reconcile(Fishing);
+        if (Fishing.Get_Fragment(FMars_Fragment_Fishing_Local).InitialState == EMars_Net_InitialState::Awaited)
+        {
+            Fishing.Get_Fragment(FMars_Fragment_Fishing_Local).InitialState = EMars_Net_InitialState::Taken;
+            Reconcile(Fishing, EMars_Net_Reconcile::AsItStands);
+            return;
+        }
+
+        Reconcile(Fishing, EMars_Net_Reconcile::AsItArrives);
     }
 
     // Last is written before the state and any broadcast: a handler may compose on another entity and move the fragment
     // storage, so the signals fragment is read again for every broadcast.
-    private void Reconcile(FCk_Handle_Fishing& InFishing)
+    private void Reconcile(FCk_Handle_Fishing& InFishing, EMars_Net_Reconcile InHow)
     {
         const auto Ledger = InFishing.Get_Fragment(FMars_Fragment_Fishing_Net);
         auto& Local = InFishing.Get_Fragment(FMars_Fragment_Fishing_Local);
         if (ck::EnsureIfNot(Local.Last.IsSet(), f"[Fishing] [{InFishing.ToString()}] has no mirror state off authority"))
         { return; }
 
-        const auto Last = Local.Last.GetValue();
+        auto Last = Local.Last.GetValue();
         Local.Last = TOptional<FMars_Fragment_Fishing_Net>(Ledger);
 
         FCk_Handle Entity = InFishing;
@@ -69,6 +78,22 @@ class UMars_Processor_Fishing_Mirror : UCk_Processor_Script_Base_UE
         Query.Spec = InFishing.Get_Spec();
         Query.State = State;
         State = utils_fishing::Get_Shown(Entity, Query);
+
+        // As it stands, the rod and the line are where the ledger has them (the follow eases toward them only for
+        // what arrives), and every cast, bite, bite end, landing and collection the ledger counts came before this copy
+        // took its state. Get_Shown has already read the unmodified Last: a cast's flight, a fling and a fade show from
+        // their anchors.
+        if (InHow == EMars_Net_Reconcile::AsItStands)
+        {
+            State.Aim = Ledger.Aim;
+            State.Line = Ledger.Line;
+            Last.CastSerial = Ledger.CastSerial;
+            Last.BiteSerial = Ledger.BiteSerial;
+            Last.BiteEndSerial = Ledger.BiteEndSerial;
+            Last.LandedSerial = Ledger.LandedSerial;
+            Last.CollectedSerial = Ledger.CollectedSerial;
+        }
+
         const auto Shown = State;
 
         // State is not read past this line: the tags move, and a listener may add fragments to the station.

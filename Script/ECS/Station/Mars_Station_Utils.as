@@ -3,9 +3,10 @@ namespace utils_station
     // Composes the station on InRoot (its frame is InRoot's transform, see FMars_Station_Spec): the Stand child node, the
     // Use interactable (probe-driven focus when Setup.Probe is set, else a transform-only child) with its one reserving
     // target and Setup.UsePrompt, the grip interactable on the root, and the minigame state machine when the spec names
-    // one; it keeps Setup.View as the operator's view, and adds the replicated ledger unless it already arrived. The glove
-    // grip table and the View node are the placing script's (UMars_Station_EntityScript). A rejected spec or a minigame
-    // class that does not load ensures and returns an invalid handle with nothing composed.
+    // one; it keeps Setup.View as the operator's view, and adds the replicated ledger unless it already arrived; an
+    // arrived ledger is the state this copy was born into and has then taken. The glove grip table and the View node
+    // are the placing script's (UMars_Station_EntityScript). A rejected spec or a minigame class that does not load
+    // ensures and returns an invalid handle with nothing composed.
     FCk_Handle_Station Add(FCk_Handle_Transform& InRoot, FMars_Station_Spec InSpec)
     {
         const auto Validation = InSpec.Validate();
@@ -31,15 +32,15 @@ namespace utils_station
         InRoot.Add_Fragment(FMars_Feature_Station());
         InRoot.Add_Fragment(Params);
 
-        // A client's copy can receive the replicated ledger before it composes: the arrived ledger stands then.
-        if (InRoot.Has_Fragment(FMars_Fragment_Station) == false)
+        // A ledger already here can only have been put here by its replicated application: this copy was born into it,
+        // has taken that state, and the mirror's first pass shows it as it stands.
+        if (InRoot.Has_Fragment(FMars_Fragment_Station))
+        { Local.InitialState = EMars_Net_InitialState::Taken; }
+        else
         { InRoot.Add_Fragment(FMars_Fragment_Station(), ECk_Replication::Replicates); }
 
-        // The mirror starts from the arrived ledger with nobody operating: an operator already there is raised once, the
-        // releases and refusals before this machine composed are not.
-        auto Seen = InRoot.Get_Fragment(FMars_Fragment_Station);
-        Seen.Occupancy = EMars_Station_Occupancy::Free;
-        Local.Last = TOptional<FMars_Fragment_Station>(Seen);
+        // The mirror compares what arrives against the ledger this machine composed.
+        Local.Last = TOptional<FMars_Fragment_Station>(FMars_Fragment_Station());
 
         InRoot.Add_Fragment(Local);
         InRoot.Add_Fragment(FMars_Tag_Station_NeedsSetup());

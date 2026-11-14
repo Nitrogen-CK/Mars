@@ -4,7 +4,9 @@
 // Clear_Record): the seven signals a copy without authority raises, with each phase, bite end and presence they carried. A
 // sampler takes the bait, the line, the aim, the fling, the presence and the ledger on every call of its tick (twice in a
 // frame when the frame is ticked twice). A point (the bait, the catch point) goes out in a second test-only replicated
-// report on the subject, written with the step that names it. One [FishingNetTest] line per test per machine.
+// report on the subject, written with the step that names it. Each signal is recorded with its frame, and a client also
+// records each rep-notify of the ledger from its find. The server spawns Get_FishingStationClass. One [FishingNetTest]
+// line per test per machine.
 
 // A real fishing station that only tags its root, so each machine finds its copy.
 class UMars_TESTONLY_NetFishingStation_EntityScript : UMars_FishingStation_EntityScript
@@ -13,6 +15,24 @@ class UMars_TESTONLY_NetFishingStation_EntityScript : UMars_FishingStation_Entit
     {
         Super::AddVisuals(InRoot);
         utils_entity_tag::Add(InRoot.H(), n"TAG_MarsTestNetFishingStation");
+    }
+}
+
+// A harness fixture: the test fishing station whose authority, as it composes, engages, aims half its yaw range to
+// one side and casts at full power, so its drain launches the cast in the spawn frame. A copy is born into an engaged,
+// aimed spot with one cast in flight; the spot's tick flies it.
+class UMars_TESTONLY_NetFishingStation_BornCasting_EntityScript : UMars_TESTONLY_NetFishingStation_EntityScript
+{
+    protected void Compose_AfterKernel(FCk_Handle& InHandle) override
+    {
+        Super::Compose_AfterKernel(InHandle);
+        if (utils_net::Get_HasAuthority(InHandle) == false)
+        { return; }
+
+        auto Spot = InHandle.As_Fishing();
+        Spot.Request_Engage(FMars_Request_Fishing_Engage());
+        Spot.Request_Aim(FMars_Request_Fishing_Aim(Fishing.Launch.YawHalfAngleDeg * 0.5f, 0.0f));
+        Spot.Request_Cast(FMars_Request_Fishing_Cast(1.0f));
     }
 }
 
@@ -68,6 +88,13 @@ class UMars_AutoTestRig_NetFishing : UMars_AutoTestRig_NetMinigameStation
     protected TArray<EMars_Fishing_BiteResult> _BiteEnds;
     protected TArray<EMars_Fishing_Presence> _Presences;
     protected TArray<FMars_TESTONLY_NetFishingSample> _Samples;
+    // In parallel with _Signals: the frame counter at each.
+    protected TArray<int64> _SignalFrames;
+    // The copy's InitialState as this machine read it when it found the copy.
+    protected EMars_Net_InitialState _InitialAtFind = EMars_Net_InitialState::Awaited;
+    // Off authority: each rep-notify of the copy's ledger, its frame counter and the ledger as it then read.
+    protected TArray<int64> _NotifyFrames;
+    protected TArray<FMars_Fragment_Fishing_Net> _NotifyLedgers;
 
     // Frames a seated test gives the station's phase machine to read a phase before it moves the spot on.
     protected const int32 k_SmSettleFrames = 5;
@@ -123,7 +150,13 @@ class UMars_AutoTestRig_NetFishing : UMars_AutoTestRig_NetMinigameStation
         Params.SpawnTransform = InTransform;
         Params.Fishing = _FishingSpec;
         auto Owner = InOwner;
-        return utils_entity_script::Request_SpawnEntity(Owner, UMars_TESTONLY_NetFishingStation_EntityScript, Params);
+        return utils_entity_script::Request_SpawnEntity(Owner, Get_FishingStationClass(), Params);
+    }
+
+    // The station class the server spawns: the test fishing station or a subclass.
+    protected TSubclassOf<UCk_EntityScript_UE> Get_FishingStationClass() const
+    {
+        return UMars_TESTONLY_NetFishingStation_EntityScript;
     }
 
     protected FName Get_StationTag() const override
@@ -153,12 +186,78 @@ class UMars_AutoTestRig_NetFishing : UMars_AutoTestRig_NetMinigameStation
         _Fishing.BindTo_OnCollected(FMars_Delegate_Fishing_OnCollected(this, n"OnRigCollected"));
         _Fishing.BindTo_OnPhaseChanged(FMars_Delegate_Fishing_OnPhaseChanged(this, n"OnRigPhaseChanged"));
         _Fishing.BindTo_OnPresenceChanged(FMars_Delegate_Fishing_OnPresenceChanged(this, n"OnRigPresenceChanged"));
+        _InitialAtFind = Get_FishingInitialState();
+        if (Get_IsServer() == false)
+        { Entity.BindTo_OnRepNotify(FMars_Fragment_Fishing_Net, FCk_DynamicFragment_OnRepNotify(this, n"OnRigLedgerNotify")); }
+    }
+
+    // This machine's copy's level now; Awaited while there is none.
+    protected EMars_Net_InitialState Get_FishingInitialState()
+    {
+        if (ck::Is_NOT_Valid(_Fishing) || _Fishing.Has_Fragment(FMars_Fragment_Fishing_Local) == false)
+        { return EMars_Net_InitialState::Awaited; }
+
+        return _Fishing.Get_Fragment(FMars_Fragment_Fishing_Local).InitialState;
+    }
+
+    protected bool Get_HasFirstNotify() const
+    {
+        return _NotifyFrames.Num() > 0;
+    }
+
+    // The ledger the first recorded rep-notify read; the composed default while none is recorded.
+    protected FMars_Fragment_Fishing_Net Get_FirstNotifyLedger() const
+    {
+        if (_NotifyLedgers.Num() == 0)
+        { return FMars_Fragment_Fishing_Net(); }
+
+        return _NotifyLedgers[0];
+    }
+
+    protected int64 Get_FirstNotifyFrame() const
+    {
+        if (_NotifyFrames.Num() == 0)
+        { return -1; }
+
+        return _NotifyFrames[0];
+    }
+
+    // Signals recorded in InFrame.
+    protected int32 Get_SignalsInFrame(int64 InFrame) const
+    {
+        auto Count = 0;
+        for (const auto Frame : _SignalFrames)
+        {
+            if (Frame == InFrame)
+            { ++Count; }
+        }
+
+        return Count;
+    }
+
+    protected FString Describe_Find()
+    {
+        auto Notifies = "";
+        for (int32 Index = 0; Index < _NotifyFrames.Num(); ++Index)
+        {
+            const auto& Ledger = _NotifyLedgers[Index];
+            Notifies += f"{_NotifyFrames[Index]}:{Ledger.CastSerial}/{Ledger.BiteSerial}/{Ledger.BiteEndSerial}/{Ledger.LandedSerial}"
+                + f"/{Ledger.CollectedSerial}/{Ledger.PhaseSerial}({Ledger.Phase :n},{Ledger.Engagement :n},aim={Ledger.Aim.YawDeg}) ";
+        }
+
+        auto Signals = "";
+        for (int32 Index = 0; Index < _Signals.Num(); ++Index)
+        { Signals += f"{Describe_Signal(_Signals[Index])}@{_SignalFrames[Index]} "; }
+
+        return f"found@{_StationFoundFrame} initialAtFind={_InitialAtFind :n} initial={Get_FishingInitialState() :n} "
+            + f"notifies=[{Notifies}] signals=[{Signals}]";
     }
 
     // What this copy raised before is not counted from here on.
     protected void Clear_Record()
     {
         _Signals.Empty();
+        _SignalFrames.Empty();
         _Phases.Empty();
         _BiteEnds.Empty();
         _Presences.Empty();
@@ -289,18 +388,7 @@ class UMars_AutoTestRig_NetFishing : UMars_AutoTestRig_NetMinigameStation
     {
         FString Text = "signals=[";
         for (const auto Signal : _Signals)
-        {
-            switch (Signal)
-            {
-                case EMars_TESTONLY_NetFishingSignal::OnCast: Text += "C"; break;
-                case EMars_TESTONLY_NetFishingSignal::OnBite: Text += "B"; break;
-                case EMars_TESTONLY_NetFishingSignal::OnBiteEnded: Text += "E"; break;
-                case EMars_TESTONLY_NetFishingSignal::OnLanded: Text += "L"; break;
-                case EMars_TESTONLY_NetFishingSignal::OnCollected: Text += "K"; break;
-                case EMars_TESTONLY_NetFishingSignal::OnPhaseChanged: Text += "p"; break;
-                default: Text += "q"; break;
-            }
-        }
+        { Text += Describe_Signal(Signal); }
 
         Text += "] phases=[";
         for (const auto Phase : _Phases)
@@ -315,6 +403,22 @@ class UMars_AutoTestRig_NetFishing : UMars_AutoTestRig_NetMinigameStation
         { Text += f"{Presence :n} "; }
 
         return Text + f"] samples={_Samples.Num()}";
+    }
+
+    protected FString Describe_Signal(EMars_TESTONLY_NetFishingSignal InSignal) const
+    {
+        switch (InSignal)
+        {
+            case EMars_TESTONLY_NetFishingSignal::OnCast: return "C";
+            case EMars_TESTONLY_NetFishingSignal::OnBite: return "B";
+            case EMars_TESTONLY_NetFishingSignal::OnBiteEnded: return "E";
+            case EMars_TESTONLY_NetFishingSignal::OnLanded: return "L";
+            case EMars_TESTONLY_NetFishingSignal::OnCollected: return "K";
+            case EMars_TESTONLY_NetFishingSignal::OnPhaseChanged: return "p";
+            default: return "q";
+        }
+
+        return "q";
     }
 
     protected FString Describe_Ledger(const FMars_Fragment_Fishing_Net& InLedger)
@@ -392,6 +496,7 @@ class UMars_AutoTestRig_NetFishing : UMars_AutoTestRig_NetMinigameStation
     private void OnRigCast(FCk_Handle_Fishing InFishing, FVector InLaunchVelocity)
     {
         _Signals.Add(EMars_TESTONLY_NetFishingSignal::OnCast);
+        _SignalFrames.Add(utils_time::Get_FrameCounter());
         Log_Minigame(f"cast frame={utils_time::Get_FrameCounter()} velocity={InLaunchVelocity}");
     }
 
@@ -399,12 +504,14 @@ class UMars_AutoTestRig_NetFishing : UMars_AutoTestRig_NetMinigameStation
     private void OnRigBite(FCk_Handle_Fishing InFishing)
     {
         _Signals.Add(EMars_TESTONLY_NetFishingSignal::OnBite);
+        _SignalFrames.Add(utils_time::Get_FrameCounter());
     }
 
     UFUNCTION()
     private void OnRigBiteEnded(FCk_Handle_Fishing InFishing, EMars_Fishing_BiteResult InResult)
     {
         _Signals.Add(EMars_TESTONLY_NetFishingSignal::OnBiteEnded);
+        _SignalFrames.Add(utils_time::Get_FrameCounter());
         _BiteEnds.Add(InResult);
     }
 
@@ -412,18 +519,21 @@ class UMars_AutoTestRig_NetFishing : UMars_AutoTestRig_NetMinigameStation
     private void OnRigLanded(FCk_Handle_Fishing InFishing, FMars_Fishing_Catch InCatch)
     {
         _Signals.Add(EMars_TESTONLY_NetFishingSignal::OnLanded);
+        _SignalFrames.Add(utils_time::Get_FrameCounter());
     }
 
     UFUNCTION()
     private void OnRigCollected(FCk_Handle_Fishing InFishing, FMars_Fishing_Catch InCatch)
     {
         _Signals.Add(EMars_TESTONLY_NetFishingSignal::OnCollected);
+        _SignalFrames.Add(utils_time::Get_FrameCounter());
     }
 
     UFUNCTION()
     private void OnRigPhaseChanged(FCk_Handle_Fishing InFishing, EMars_Fishing_Phase InPhase)
     {
         _Signals.Add(EMars_TESTONLY_NetFishingSignal::OnPhaseChanged);
+        _SignalFrames.Add(utils_time::Get_FrameCounter());
         _Phases.Add(InPhase);
     }
 
@@ -431,6 +541,18 @@ class UMars_AutoTestRig_NetFishing : UMars_AutoTestRig_NetMinigameStation
     private void OnRigPresenceChanged(FCk_Handle_Fishing InFishing, EMars_Fishing_Presence InPresence)
     {
         _Signals.Add(EMars_TESTONLY_NetFishingSignal::OnPresenceChanged);
+        _SignalFrames.Add(utils_time::Get_FrameCounter());
         _Presences.Add(InPresence);
+    }
+
+    // A notify can land on a station already ending.
+    UFUNCTION()
+    private void OnRigLedgerNotify(FCk_Handle InHandle, FCk_DynamicFragment_RepNotifyInfo InInfo)
+    {
+        if (ck::Is_NOT_Valid(InHandle) || InHandle.Has_Fragment(FMars_Fragment_Fishing_Net) == false)
+        { return; }
+
+        _NotifyFrames.Add(utils_time::Get_FrameCounter());
+        _NotifyLedgers.Add(InHandle.Get_Fragment(FMars_Fragment_Fishing_Net));
     }
 }

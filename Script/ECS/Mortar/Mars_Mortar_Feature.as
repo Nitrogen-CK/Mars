@@ -6,8 +6,8 @@
 // A copy without authority shows its own state fragment, written by its mirror (UMars_Processor_Mortar_Mirror) from each
 // ledger that arrives and carried on between them by its tick (the sweep, and the grind while the pestle circles), both
 // measured from the anchor on the server's clock; there it raises OnStrikeStarted, OnStrikeLanded and OnBatchChanged
-// from the ledger. A remote operator's pestle reaches the authority as Cue.Mars.Mortar.Pestle, whose press carries the
-// sweep that operator saw: the authority judges that strike on it.
+// from the ledger after the state its copy was born into. A remote operator's pestle reaches the authority as
+// Cue.Mars.Mortar.Pestle, whose press carries the sweep that operator saw: the authority judges that strike on it.
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
@@ -333,11 +333,15 @@ struct FMars_Fragment_Mortar_Net
     EMars_Mortar_Strike LastLanded = EMars_Mortar_Strike::Miss;
 }
 
-// Each machine's own: the ledger the mirror last reconciled (unset with authority).
+// Each machine's own: the ledger the mirror last reconciled (unset with authority), and whether this copy has taken the
+// state it was born into.
 struct FMars_Fragment_Mortar_Local
 {
     UPROPERTY()
     TOptional<FMars_Fragment_Mortar_Net> Last;
+
+    UPROPERTY()
+    EMars_Net_InitialState InitialState = EMars_Net_InitialState::Awaited;
 }
 
 // Added by utils_mortar::Add, dropped by UMars_Processor_Mortar_Mirror once it has bound the ledger's rep-notify.

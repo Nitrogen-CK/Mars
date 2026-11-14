@@ -1,10 +1,12 @@
 // Once per mortar: the authority drops the mirror state (its own processors publish the ledger and broadcast). A machine
-// without authority binds the ledger's rep-notify and reconciles once, so a ledger that replicated before the bind still
-// counts. Each reconcile writes the state the ledger shows (the batch with its grind carried on from the anchor while the
-// pestle circles, the tally, the pestle's motion, the Engaged tag; the sweep only when the ledger restarted the pass),
-// then raises, from the arrived ledger against the one it last reconciled: OnStrikeStarted once per unseen StrikeSerial,
-// OnStrikeLanded once per unseen LandedSerial (each with the ledger's last landing), then OnBatchChanged once when the
-// batch's seasoning, stage, phase or hits differ.
+// without authority binds the ledger's rep-notify and reconciles once, showing the ledger this machine composed. The
+// ledger's first application is the state the copy was born into and is taken once as it stands: the batch, the tally,
+// the motion, the Engaged tag and the sweep as the ledger has them, and no strike the ledger already counts. Each later
+// change is reconciled as it arrives: it writes the state the ledger shows (the batch with its grind carried on from
+// the anchor while the pestle circles, the tally, the pestle's motion, the Engaged tag; the sweep only when the ledger
+// restarted the pass), then raises, from the arrived ledger against the one it last reconciled: OnStrikeStarted once
+// per unseen StrikeSerial, OnStrikeLanded once per unseen LandedSerial (each with the ledger's last landing), then
+// OnBatchChanged once when the batch's seasoning, stage, phase or hits differ.
 class UMars_Processor_Mortar_Mirror : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -29,7 +31,7 @@ class UMars_Processor_Mortar_Mirror : UCk_Processor_Script_Base_UE
         }
 
         InHandle.BindTo_OnRepNotify(FMars_Fragment_Mortar_Net, FCk_DynamicFragment_OnRepNotify(this, n"OnLedgerReplicated"));
-        Reconcile(Mortar);
+        Reconcile(Mortar, EMars_Net_Reconcile::AsItStands);
     }
 
     // An expected absence, not a defect: a notify can land on a station already ending.
@@ -41,20 +43,34 @@ class UMars_Processor_Mortar_Mirror : UCk_Processor_Script_Base_UE
         { return; }
 
         auto Mortar = InHandle.As_Mortar();
-        Reconcile(Mortar);
+        if (Mortar.Get_Fragment(FMars_Fragment_Mortar_Local).InitialState == EMars_Net_InitialState::Awaited)
+        {
+            Mortar.Get_Fragment(FMars_Fragment_Mortar_Local).InitialState = EMars_Net_InitialState::Taken;
+            Reconcile(Mortar, EMars_Net_Reconcile::AsItStands);
+            return;
+        }
+
+        Reconcile(Mortar, EMars_Net_Reconcile::AsItArrives);
     }
 
     // Last is written before the state and any broadcast: a handler may compose on another entity and move the fragment
     // storage, so the signals fragment is read again for every broadcast.
-    private void Reconcile(FCk_Handle_Mortar& InMortar)
+    private void Reconcile(FCk_Handle_Mortar& InMortar, EMars_Net_Reconcile InHow)
     {
         const auto Ledger = InMortar.Get_Fragment(FMars_Fragment_Mortar_Net);
         auto& Local = InMortar.Get_Fragment(FMars_Fragment_Mortar_Local);
         if (ck::EnsureIfNot(Local.Last.IsSet(), f"[Mortar] [{InMortar.ToString()}] has no mirror state off authority"))
         { return; }
 
-        const auto Last = Local.Last.GetValue();
+        auto Last = Local.Last.GetValue();
         Local.Last = TOptional<FMars_Fragment_Mortar_Net>(Ledger);
+
+        // As it stands, every strike the ledger counts was started and landed before this copy took its state.
+        if (InHow == EMars_Net_Reconcile::AsItStands)
+        {
+            Last.StrikeSerial = Ledger.StrikeSerial;
+            Last.LandedSerial = Ledger.LandedSerial;
+        }
 
         FCk_Handle Entity = InMortar;
         const auto Shown = utils_mortar::Get_Shown(Entity, Ledger, InMortar.Get_Spec());
@@ -62,7 +78,9 @@ class UMars_Processor_Mortar_Mirror : UCk_Processor_Script_Base_UE
         State.Batch = Shown.Batch;
         State.Tally = Shown.Tally;
         State.Pestle.Motion = Shown.Pestle.Motion;
-        if (Ledger.SweepSerial != Last.SweepSerial)
+        // As it stands the sweep is the ledger's, carried from its anchor; after that this machine's tick advances
+        // it and only a restarted pass overrides it.
+        if (InHow == EMars_Net_Reconcile::AsItStands || Ledger.SweepSerial != Last.SweepSerial)
         { State.SweepSeconds = Shown.SweepSeconds; }
 
         const auto IsEngaged = Ledger.Engagement == EMars_Mortar_Engagement::Engaged;

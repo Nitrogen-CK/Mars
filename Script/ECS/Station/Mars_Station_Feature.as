@@ -2,10 +2,10 @@
 // replicated ledger, written only by the authority's arbiter (UMars_Processor_Station_HandleRequests), which also writes the
 // operator's replicated back-ref; on a host with no replication driver it is local. The stand, the view, the
 // interactables and the minigame state machine (FMars_Fragment_Station_Local) are each machine's own. A client mirrors the
-// ledger (UMars_Processor_Station_Mirror) and raises the signals the authority raised. A player takes or leaves a station
-// through Cue.Mars.Station.Act (utils_station::Request_ActFor), which only the authority resolves. The spec's InputStance
-// says which copies' control state machine reads the operator's input (every machine's, or the authority's alone); the
-// arbiter clears a released operator's remote input on the authority.
+// ledger (UMars_Processor_Station_Mirror) and raises the signals the authority raised after the state its copy was born
+// into. A player takes or leaves a station through Cue.Mars.Station.Act (utils_station::Request_ActFor), which only the
+// authority resolves. The spec's InputStance says which copies' control state machine reads the operator's input (every
+// machine's, or the authority's alone); the arbiter clears a released operator's remote input on the authority.
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
@@ -356,8 +356,13 @@ struct FMars_Fragment_Station_Local
     UPROPERTY()
     FCk_Handle_StateMachine MinigameSm;
 
+    // The ledger the mirror last reconciled (unset with authority), and whether this copy has taken the state it was
+    // born into.
     UPROPERTY()
     TOptional<FMars_Fragment_Station> Last;
+
+    UPROPERTY()
+    EMars_Net_InitialState InitialState = EMars_Net_InitialState::Awaited;
 }
 
 struct FMars_Tag_Station_NeedsMirror {}

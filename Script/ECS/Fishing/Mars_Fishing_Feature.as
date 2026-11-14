@@ -8,9 +8,9 @@
 // everything else is written at once. A copy without authority shows its own state fragment, written by its mirror
 // (UMars_Processor_Fishing_Mirror) from each ledger that arrives and carried on between them by its ticks (the bait's
 // flight, the bob, the aim and the line eased toward the ledger's, the fling and the fade); there it raises OnCast, OnBite,
-// OnBiteEnded, OnLanded, OnCollected, OnPhaseChanged and OnPresenceChanged from the ledger, never OnBaitLanded, OnRun or
-// OnSnapped. The generator and every clock it seeds (the bite's time, the hook window, the hook set, the run) never leave
-// the authority.
+// OnBiteEnded, OnLanded, OnCollected, OnPhaseChanged and OnPresenceChanged from the ledger after the state its copy was
+// born into, never OnBaitLanded, OnRun or OnSnapped. The generator and every clock it seeds (the bite's time, the hook
+// window, the hook set, the run) never leave the authority.
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
@@ -653,12 +653,15 @@ struct FMars_Fragment_Fishing_Net
     int32 CollectedSerial = 0;
 }
 
-// Each machine's own: the ledger the mirror last reconciled (unset with authority), and the seconds since the authority's
-// last paced write.
+// Each machine's own: the ledger the mirror last reconciled (unset with authority), whether this copy has taken the
+// state it was born into, and the seconds since the authority's last paced write.
 struct FMars_Fragment_Fishing_Local
 {
     UPROPERTY()
     TOptional<FMars_Fragment_Fishing_Net> Last;
+
+    UPROPERTY()
+    EMars_Net_InitialState InitialState = EMars_Net_InitialState::Awaited;
 
     UPROPERTY()
     float32 SecondsSincePaced = 0.0f;

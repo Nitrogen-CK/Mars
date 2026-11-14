@@ -23,8 +23,9 @@ namespace utils_fishing
 {
     // Composes the fishing spot on InHandle (the station entity; the feature does not need the Station feature). Every
     // clock is the kernel's; what draws the rod, line, bait and fish follows its state and signals. Adds the replicated
-    // ledger unless it already arrived, this machine's mirror state and the tag that wakes the mirror; without authority the
-    // state starts as the ledger shows it and no generator is seeded. A rejected spec ensures and returns an invalid handle.
+    // ledger unless it already arrived (an arrived ledger is the state this copy was born into and has then taken),
+    // this machine's mirror state and the tag that wakes the mirror; without authority the state starts as the ledger
+    // shows it and no generator is seeded. A rejected spec ensures and returns an invalid handle.
     FCk_Handle_Fishing Add(FCk_Handle& InHandle, FMars_Fishing_Spec InSpec)
     {
         const auto Validation = InSpec.Validate();
@@ -41,15 +42,18 @@ namespace utils_fishing
         if (HasAuthority)
         { State.Rng = Make_Seed(InSpec.Seed); }
 
-        // A copy without authority can receive the replicated ledger before it composes: the arrived ledger stands then,
-        // and a spot first read mid-fight shows that fight and raises nothing.
-        if (InHandle.Has_Fragment(FMars_Fragment_Fishing_Net) == false)
-        {
-            auto Fresh = FMars_Fragment_Fishing_Net();
-            Fresh.Presence = State.Presence;
-            Fresh.PresenceAnchorServerSeconds = utils_mars_net::Get_ServerWorldSeconds(InHandle);
-            InHandle.Add_Fragment(Fresh, ECk_Replication::Replicates);
-        }
+        auto Fresh = FMars_Fragment_Fishing_Net();
+        Fresh.Presence = State.Presence;
+        Fresh.PresenceAnchorServerSeconds = utils_mars_net::Get_ServerWorldSeconds(InHandle);
+        auto Local = FMars_Fragment_Fishing_Local();
+
+        // A ledger already here can only have been put here by its replicated application: this copy was born into it,
+        // has taken that state, and the mirror's first pass shows it as it stands (a spot first read mid-fight shows
+        // that fight).
+        if (InHandle.Has_Fragment(FMars_Fragment_Fishing_Net))
+        { Local.InitialState = EMars_Net_InitialState::Taken; }
+        else
+        { InHandle.Add_Fragment(Fresh, ECk_Replication::Replicates); }
 
         const auto Ledger = InHandle.Get_Fragment(FMars_Fragment_Fishing_Net);
         if (HasAuthority == false)
@@ -61,8 +65,8 @@ namespace utils_fishing
             State = Get_Shown(InHandle, Query);
         }
 
-        auto Local = FMars_Fragment_Fishing_Local();
-        Local.Last = TOptional<FMars_Fragment_Fishing_Net>(Ledger);
+        // The mirror compares what arrives against the ledger this machine composed.
+        Local.Last = TOptional<FMars_Fragment_Fishing_Net>(Fresh);
 
         InHandle.Add_Fragment(FMars_Feature_Fishing());
         InHandle.Add_Fragment(Params);
