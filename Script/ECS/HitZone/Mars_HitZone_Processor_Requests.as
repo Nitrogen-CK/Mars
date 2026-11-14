@@ -1,6 +1,8 @@
-// The zone arbiter. A hit on an enabled zone is scaled by its reaction row, stamped with this zone, broadcast as OnHit,
-// then forwarded to the zone's Health. OnHit fires before the Health drain, so a listener (the BodyPart ledger) sees the
-// hit even when the Health ignores it (invulnerable or already depleted).
+// The zone arbiter. SetEnabled and ReleaseHurtboxes apply on every machine that asks. A hit applies only on the machine
+// with authority over the zone's entity: there, a hit on an enabled zone is scaled by its reaction row, stamped with this
+// zone, broadcast as OnHit, then forwarded to the zone's Health; any other machine drops it. OnHit fires before the Health
+// drain, so a listener (the BodyPart ledger) sees the hit even when the Health ignores it (invulnerable or already
+// depleted).
 //
 // The state is re-fetched per request: an OnHit handler may compose features on another entity mid-broadcast, which can
 // move the fragment storage under a reference held across the broadcast.
@@ -33,6 +35,11 @@ class UMars_Processor_HitZone_HandleRequests : UCk_Processor_Script_Base_UE
 
         if (ReleaseHurtboxesRequests.Num() > 0)
         { HandleReleaseHurtboxes(Self); }
+
+        // The hit is the authority's: any other machine's copy drops it, so it neither counts, signals nor reaches the
+        // Health there.
+        if (utils_net::Get_HasAuthority(InHandle) == false)
+        { return; }
 
         for (const auto& Request : HitRequests)
         { HandleHit(Self, Request); }

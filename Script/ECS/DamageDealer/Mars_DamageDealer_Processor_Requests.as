@@ -4,6 +4,8 @@
 //
 // The zone, never a context root, is the hit's identity: a creature's limbs are distinct zones under one root.
 // Hit feedback (cues, debug draws) belongs at this pass, not on attribute signals (they coalesce same-frame hits).
+// It runs wherever the swing was swept, with or without authority: the zone applies the hit only with authority, so on
+// any other machine this pass shows the blow and changes nothing.
 class UMars_Processor_DamageDealer_HandleRequests : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";

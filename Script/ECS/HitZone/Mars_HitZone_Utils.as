@@ -1,7 +1,8 @@
 namespace utils_hit_zone
 {
-    // Composes the zone on InHandle, feeding InHandle's own Health. A rejected spec, or no Health on InHandle, ensures
-    // and returns an invalid handle with nothing composed.
+    // Composes the zone on InHandle, feeding InHandle's own Health, and registers it last in its root's roster (the spec's
+    // Root, else InHandle). A rejected spec, or no Health on InHandle, ensures and returns an invalid handle with nothing
+    // composed.
     FCk_Handle_HitZone Add(FCk_Handle& InHandle, FMars_HitZone_Spec InSpec)
     {
         const auto Validation = InSpec.Validate();
@@ -15,13 +16,22 @@ namespace utils_hit_zone
         auto Params = FMars_Fragment_HitZone_Params();
         Params.Spec = InSpec;
 
+        FCk_Handle Root = InSpec.Root;
+        if (ck::Is_NOT_Valid(Root))
+        { Root = InHandle; }
+
         auto State = FMars_Fragment_HitZone();
         State.Health = Health;
+        State.RosterIndex = Root.AddOrGet_Fragment(FMars_Fragment_HitZone_Roster).Zones.Num();
 
         InHandle.Add_Fragment(FMars_Feature_HitZone());
         InHandle.Add_Fragment(Params);
         InHandle.Add_Fragment(State);
-        return InHandle.As_HitZone();
+
+        auto Zone = InHandle.As_HitZone();
+        // A composition-time write, like the hurtbox list's; re-fetched because the adds above may move the storage.
+        Root.Get_Fragment(FMars_Fragment_HitZone_Roster).Zones.Add(Zone);
+        return Zone;
     }
 
     // A zone where a Sever hit damages the part's condition and a Crush hit, x InCrushMultiplier, ruins it.
@@ -157,6 +167,25 @@ namespace utils_hit_zone
 
         return Linked;
     }
+
+    // The zone at InAddress on this machine; invalid, with no ensure, when the root is not live, has no roster, the index
+    // is out of range or that zone has died (an address another machine sent may name what this one no longer has).
+    FCk_Handle_HitZone TryGet_ZoneAt(const FMars_HitZone_Address& InAddress)
+    {
+        auto Root = InAddress.Root;
+        if (ck::Is_NOT_Valid(Root) || Root.Has_Fragment(FMars_Fragment_HitZone_Roster) == false)
+        { return FCk_Handle_HitZone(); }
+
+        const auto& Zones = Root.Get_Fragment(FMars_Fragment_HitZone_Roster).Zones;
+        if (Zones.IsValidIndex(InAddress.Index) == false)
+        { return FCk_Handle_HitZone(); }
+
+        const auto Zone = Zones[InAddress.Index];
+        if (ck::Is_NOT_Valid(Zone))
+        { return FCk_Handle_HitZone(); }
+
+        return Zone;
+    }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -198,6 +227,16 @@ mixin TArray<FCk_Handle> Get_Hurtboxes(const FCk_Handle_HitZone& Self)
 mixin int32 Get_HitCount(const FCk_Handle_HitZone& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_HitZone).HitCount;
+}
+
+// The spec's Root when it names one, else the zone's own entity, with this zone's index in that root's roster.
+mixin FMars_HitZone_Address Get_Address(const FCk_Handle_HitZone& Self)
+{
+    FCk_Handle Root = Self.Get_Fragment(FMars_Fragment_HitZone_Params).Spec.Root;
+    if (ck::Is_NOT_Valid(Root))
+    { Root = Self; }
+
+    return FMars_HitZone_Address(Root, Self.Get_Fragment(FMars_Fragment_HitZone).RosterIndex);
 }
 
 // The first row naming InDamageType; with none, a row of DefaultMultiplier and Impact None for that type.

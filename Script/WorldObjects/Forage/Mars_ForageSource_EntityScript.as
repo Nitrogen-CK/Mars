@@ -118,10 +118,11 @@ class UMars_ForageSource_EntityScript : UCk_GenericEntityScript_UE
     {
         SetYieldVisible(false);
 
+        // Every machine's zone follows its forage, so a swing at an empty source is rejected wherever it is swept.
+        _Zone.Request_SetEnabled(FMars_Request_HitZone_SetEnabled(ECk_EnableDisable::Disable));
+
         if (utils_net::Get_HasAuthority(InForage) == false)
         { return; }
-
-        _Zone.Request_SetEnabled(FMars_Request_HitZone_SetEnabled(ECk_EnableDisable::Disable));
 
         if (_KnockBody.Presence == EMars_ForageSource_KnockPresence::FollowsYield)
         { DestroyKnockBody(); }
@@ -132,11 +133,13 @@ class UMars_ForageSource_EntityScript : UCk_GenericEntityScript_UE
     {
         SetYieldVisible(true);
 
+        // Every machine's zone follows its forage; the heal is the authority's.
+        _Zone.Request_SetEnabled(FMars_Request_HitZone_SetEnabled(ECk_EnableDisable::Enable));
+
         if (utils_net::Get_HasAuthority(InForage) == false)
         { return; }
 
         _Health.Request_Heal(FMars_Request_Health_Heal(_Health.Get_Max()));
-        _Zone.Request_SetEnabled(FMars_Request_HitZone_SetEnabled(ECk_EnableDisable::Enable));
 
         if (_KnockBody.Presence == EMars_ForageSource_KnockPresence::FollowsYield && ck::Is_NOT_Valid(_KnockNode))
         { CreateKnockBody(); }

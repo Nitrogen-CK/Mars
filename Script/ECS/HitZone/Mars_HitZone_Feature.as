@@ -1,3 +1,10 @@
+// Stance SPLIT, nothing replicates here. The hit is the authority's: only the machine with authority over the zone's
+// entity applies a Hit request (it counts, raises OnHit and forwards to the Health, whose ledger carries the result); any
+// other machine drops it. IsEnabled, the hurtboxes, the roster and HitCount are each machine's own, and SetEnabled and
+// ReleaseHurtboxes apply on the machine that asks, so whoever disables a zone does so on every machine that should see it.
+// An address names a zone the same way on every machine: the replicated root it is known through and its index in that
+// root's roster. Two machines agree on it because both compose the same zones on the same root in the same order.
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
 //--------------------------------------------------------------------------------------------------------------------------
@@ -65,6 +72,11 @@ struct FMars_HitZone_Spec
     // Damage types with no row: scaled by this, with no condition impact.
     UPROPERTY()
     float32 DefaultMultiplier = 1.0f;
+
+    // The replicated entity other machines know this zone through; unset means the zone's own entity. A zone on a child
+    // of a replicated root names that root.
+    UPROPERTY()
+    FCk_Handle Root;
 
     FMars_HitZone_Spec() {}
 
@@ -144,6 +156,36 @@ struct FMars_Fragment_HitZone
     // Hits routed while enabled.
     UPROPERTY()
     int32 HitCount = 0;
+
+    // This zone's place in its root's roster.
+    UPROPERTY()
+    int32 RosterIndex = 0;
+}
+
+// On a zone's root: every zone registered there, in composition order. Each machine writes its own at composition and
+// never prunes it, so an index stays the same zone for the root's whole life.
+struct FMars_Fragment_HitZone_Roster
+{
+    UPROPERTY()
+    TArray<FCk_Handle_HitZone> Zones;
+}
+
+// Where a zone is, the same on every machine: the replicated root it is known through and its index in that root's roster.
+struct FMars_HitZone_Address
+{
+    UPROPERTY()
+    FCk_Handle Root;
+
+    UPROPERTY()
+    int32 Index = 0;
+
+    FMars_HitZone_Address() {}
+
+    FMars_HitZone_Address(FCk_Handle InRoot, int32 InIndex)
+    {
+        Root = InRoot;
+        Index = InIndex;
+    }
 }
 
 // Lives on every hurtbox node: a swept probe entity resolves to its zone through it (utils_hit_zone::TryGet_Zone).

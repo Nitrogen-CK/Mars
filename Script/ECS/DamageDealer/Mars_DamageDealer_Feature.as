@@ -1,3 +1,7 @@
+// Stance D: nothing replicates here. A dealer drains on the machine that swept the swing, with or without authority;
+// its counters and signals are that machine's own. The zone it forwards to applies the hit only with authority, so on any
+// other machine the dealer shows the blow and changes nothing.
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
 //--------------------------------------------------------------------------------------------------------------------------
