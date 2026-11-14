@@ -65,11 +65,11 @@ struct FMars_Fragment_PantryRat_Assembly
 // group, 0..13, to a new plate). Headless (FApp::CanEverRender false) it composes the kernel only, unless BuildBodyHeadless
 // (tests read the real component's custom primitive data). The entity, its root and the kernel's ledger of its phase
 // replicate: every machine builds the look and the tick, and a copy's speed is measured from the replicated root over
-// its own kernel clock.
+// its own kernel clock. The pocket replicates, and every machine shows what its pocket holds.
 class UMars_PantryRat_EntityScript : UCk_GenericEntityScript_UE
 {
     default _ShowInPlaceActors = true;
-    // SPLIT: authority runs phases, navigator, claim, pocket; root and phase replicate; clips, fade, eyes are local.
+    // SPLIT: authority runs phases, navigator, claim; root, phase, pocket replicate; clips, fade, eyes, carry local.
     default _Replication = ECk_Replication::Replicates;
 
     UPROPERTY(ExposeOnSpawn)
@@ -401,6 +401,11 @@ class UMars_PantryRat_EntityScript : UCk_GenericEntityScript_UE
         if (Frame.Dead)
         {
             Apply_DeadEyes();
+
+            // A corpse this body first sees well into its hold is shown fallen.
+            if (_ToppleSide.IsSet() == false)
+            { _DeadSeconds = Math::Max(0.0f, _Rat.Get_Clock() - _Rat.Get_Death().DiedAt); }
+
             Choose_Topple();
             if (Delta > 0.0)
             { _DeadSeconds += float32(Delta); }

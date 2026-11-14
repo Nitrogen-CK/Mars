@@ -7,12 +7,14 @@
 // UMars_Processor_PantryRat_HandleRequests (and the kernel's own Tick for receipts and clocks); the HFSM (Mars_PantryRat_Hfsm.as)
 // reads it and enqueues requests.
 // Stance SPLIT. Only the machine with authority over the rat composes what decides and moves it (the surface motion,
-// the navigator, the pocket, the state machine), reads its raid and its den, applies its requests, runs its threat,
-// its receipts, its fade and its corpse, and publishes the ledger of its phase (FMars_Fragment_PantryRat_Net, written
-// only by utils_pantry_rat::Publish). The entity, its root and that ledger replicate. A copy without authority
-// follows the replicated root, shows the ledger's phase on its own clock, fades and hides from it, and takes the
-// state it was born into once, as it stands (UMars_Processor_PantryRat_Mirror); its raid and den links name nobody.
-// The theft, the loot and the corpse's receipts are the authority's.
+// the navigator, the state machine), reads its raid and its den, applies its requests, runs its threat, its receipts,
+// its fade and its corpse, and publishes its ledger (FMars_Fragment_PantryRat_Net, written only by
+// utils_pantry_rat::Publish). The entity, its root, the ledger (its phase and the lethal blow's impulse) and its
+// pocket's contents replicate. A copy without authority follows the replicated root, shows the ledger's phase on its
+// own clock, fades and hides from it, takes the state it was born into once, as it stands
+// (UMars_Processor_PantryRat_Mirror), shows what its pocket holds (a Transient item's visual on its mouth, a food's own
+// body mounted there) and topples its corpse the blow's way; its raid and den links name nobody. The theft's
+// decisions, the loot's release, the corpse's receipts and the den's cooldown are the authority's.
 asset Mars_PantryRatHandle of UCkDynamic_HandleDefinition
 {
     TypeName = "FCk_Handle_PantryRat";
@@ -252,7 +254,8 @@ struct FMars_Fragment_PantryRat_Params
     UPROPERTY()
     FCk_Handle_SurfaceNavigator Navigator;
 
-    // The capacity-1 pocket on a child entity the rat owns (its lifetime owner is the rat root).
+    // The capacity-1 pocket on a child entity the rat owns (its lifetime owner is the rat root), on every machine; it
+    // replicates when the rat does.
     UPROPERTY()
     FCk_Handle_Inventory_DataOnly Pocket;
 
@@ -370,7 +373,8 @@ struct FMars_PantryRat_Death
     UPROPERTY()
     FCk_Handle ReleaseHolder;
 
-    // The rat's clock at its death (the corpse's hold counts from here, not from the drop's receipt).
+    // The rat's clock at its death (the corpse's hold counts from here, not from the drop's receipt); on a copy, the
+    // mirror's (the hold's start as this copy took it).
     UPROPERTY()
     float32 DiedAt = 0.0f;
 
@@ -391,7 +395,8 @@ struct FMars_PantryRat_Death
 }
 
 // Written only by the rat's request drain and its Tick (receipts, clocks, threat); composed by Add. On a copy without
-// authority: by the mirror (the phase) and the tick's copy half (the clock, the fade, the hide).
+// authority: by the mirror (the phase, the lethal blow's impulse, the hold's start), the tick's copy half (the clock,
+// the fade, the hide) and its carry sync (Loot, CarryVisual).
 struct FMars_Fragment_PantryRat
 {
     UPROPERTY()
@@ -494,12 +499,17 @@ struct FMars_Fragment_PantryRat
 // The Setup processor binds the navigator's signals and the body zone's hits, then removes this tag.
 struct FMars_Tag_PantryRat_NeedsSetup {}
 
-// The replicated ledger on the root: the phase. Written only by utils_pantry_rat::Publish, from the authority's request
-// drain and its tick.
+// The replicated ledger on the root: the phase and the lethal blow's impulse. Written only by
+// utils_pantry_rat::Publish, from the authority's request drain and its tick.
 struct FMars_Fragment_PantryRat_Net
 {
     UPROPERTY()
     EMars_PantryRat_Phase Phase = EMars_PantryRat_Phase::Emerge;
+
+    // The accepted lethal blow's impulse (world), set once per death and zero before; every machine's assembly picks
+    // its topple side from it against its own floor.
+    UPROPERTY()
+    FVector HitImpulse = FVector::ZeroVector;
 }
 
 // Each machine's own: the ledger the mirror last reconciled (unset with authority) and whether this copy has taken

@@ -1,9 +1,9 @@
 // The server's court emerges one rat: the server has authority over it and it replicates there under its raid, with
 // what decides and moves it (a navigator, a pocket, a state machine, its links to its raid and its den) and no
-// transform interpolation. The client's copy of it lives under the client's copy of the raid, without authority and
-// without any of those: its links name nobody, its tuning is the row's, and it carries the monster (body Health 1, one
-// hurtbox addressed {its root, 0}), the mouth node, a transform interpolation, the ledger and the mirror's state; it
-// reads unloaded, solid and shown. The client's raid copy holds no rat record.
+// transform interpolation. The client's copy of it lives under the client's copy of the raid, without authority; it
+// has its own pocket and none of the rest: its links name nobody, its tuning is the row's, and it carries the monster
+// (body Health 1, one hurtbox addressed {its root, 0}), the mouth node, a transform interpolation, the ledger and the
+// mirror's state; it reads unloaded, solid and shown. The client's raid copy holds no rat record.
 // Surface: Ck.PantryRat.Net.AS_PantryRat_ARatComposesOnBothMachines
 class UCk_AutoTest_Net_PantryRat_ARatComposesOnBothMachines : UMars_AutoTestRig_NetPantryRat
 {
@@ -91,7 +91,11 @@ class UCk_AutoTest_Net_PantryRat_ARatComposesOnBothMachines : UMars_AutoTestRig_
         Assert_True(utils_mars_net::Get_ReplicatesHere(Entity), "the client's rat replicates");
         Assert_True(Entity.Get_LifetimeOwner() == RaidEntity, "the client's rat lives under its raid copy");
         Assert_False(ck::IsValid(_RowRat.Get_Navigator()), "the client's rat has no navigator");
-        Assert_False(ck::IsValid(_RowRat.Get_Pocket()), "the client's rat has no pocket");
+        FCk_Handle PocketEntity = _RowRat.Get_Pocket();
+        Assert_True(ck::IsValid(PocketEntity), "the client's rat has a pocket");
+        Assert_True(ck::IsValid(PocketEntity) && _RowRat.Get_Pocket().Get_NumItems() == 0, "the client's pocket holds no item");
+        Assert_True(ck::IsValid(PocketEntity) && utils_entity_lifetime::Get_LifetimeOwner(PocketEntity) == Entity,
+            "the client's pocket's lifetime owner is its rat");
         Assert_False(ck::IsValid(_RowRat.Get_Raid()), "the client's rat names no raid");
         Assert_False(ck::IsValid(_RowRat.Get_Den()), "the client's rat names no den");
         Assert_False(Get_HasRowRatStateMachine(), "the client's rat has no state machine");

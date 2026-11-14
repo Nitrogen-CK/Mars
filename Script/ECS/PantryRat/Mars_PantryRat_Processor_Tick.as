@@ -6,7 +6,8 @@
 // adopting world item's holder) -> DeadHold. Only this processor and the drain write the rat's state. It has two
 // halves: every machine runs the clock; the authority then runs the rest inside the rat's world and publishes the
 // ledger before it raises the steps, and a copy without authority only shows its phase's fade and hide on that clock
-// (utils_pantry_rat::Apply_ShownPresence) and never reads a raid, a den, a navigator or a pocket.
+// (utils_pantry_rat::Apply_ShownPresence) and its pocket's item (utils_pantry_rat::Sync_ShownCarry), and never reads
+// a raid, a den or a navigator.
 class UMars_Processor_PantryRat_Tick : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -32,6 +33,7 @@ class UMars_Processor_PantryRat_Tick : UCk_Processor_Script_Base_UE
         if (HasAuthority == false)
         {
             utils_pantry_rat::Apply_ShownPresence(InState, Self.Get_Tuning());
+            utils_pantry_rat::Sync_ShownCarry(Self, InState);
             return;
         }
 

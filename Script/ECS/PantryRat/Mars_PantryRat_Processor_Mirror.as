@@ -6,7 +6,8 @@
 // other phase started now. Each later change is reconciled as it arrives: its phase starts on this machine's clock,
 // on which the tick then crouches and fades it. A reconcile raises OnPhaseChanged once (from the phase the copy
 // showed); a phase that never arrived because two of the authority's writes reached this machine as one is not
-// replayed.
+// replayed. The lethal blow's impulse is written as it comes, both ways. A copy born into a corpse reads its hold
+// over, so its body shows it fallen and topples nothing.
 class UMars_Processor_PantryRat_Mirror : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -64,14 +65,22 @@ class UMars_Processor_PantryRat_Mirror : UCk_Processor_Script_Base_UE
 
         const auto Last = Local.Last.GetValue();
         Local.Last = TOptional<FMars_Fragment_PantryRat_Net>(Ledger);
+
+        // A level, never announced: the drain writes it with the lethal hit, often before the phase moves.
+        const auto Tuning = InRat.Get_Tuning();
+        auto& State = InRat.Get_Fragment(FMars_Fragment_PantryRat);
+        State.Death.HitImpulse = Ledger.HitImpulse;
         if (Ledger.Phase == Last.Phase)
         { return; }
 
-        const auto Tuning = InRat.Get_Tuning();
-        auto& State = InRat.Get_Fragment(FMars_Fragment_PantryRat);
+        const auto WasDead = utils_pantry_rat::Get_IsDeadPhase(State.Phase);
         utils_pantry_rat::Set_Phase(State, Ledger.Phase);
         if (InHow == EMars_Net_Reconcile::AsItStands)
         { State.PhaseStartedAt = State.Clock - utils_pantry_rat::Get_FadeOutSeconds(Ledger.Phase, Tuning); }
+
+        // The hold this copy was born into reads over; a death that arrives starts its hold now.
+        if (utils_pantry_rat::Get_IsDeadPhase(Ledger.Phase) && WasDead == false)
+        { State.Death.DiedAt = InHow == EMars_Net_Reconcile::AsItStands ? State.Clock - Tuning.DeathHoldSeconds : State.Clock; }
 
         utils_pantry_rat::Apply_ShownPresence(State, Tuning);
 

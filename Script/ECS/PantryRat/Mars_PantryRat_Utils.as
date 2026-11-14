@@ -84,9 +84,9 @@ namespace utils_pantry_rat
     // -> the mouth node published as AttachPoint.Mars.RatMouth -> the pocket (capacity 1, the drain-time policy, its
     // Persistent loot riding the mouth) on a child entity the rat owns -> the rat's fragments, the replicated ledger
     // and the mirror's state -> LAST the state machine. A copy without authority composes the same without the
-    // surface motion, the navigator, the pocket and the state machine (its Navigator and Pocket stay invalid) and
-    // keeps no links: its raid and its den name nobody whatever its spec arrived with. A rejected spec or sub-feature
-    // ensures and returns an invalid handle.
+    // surface motion, the navigator and the state machine (its Navigator stays invalid) and keeps no links: its raid
+    // and its den name nobody whatever its spec arrived with. A rejected spec or sub-feature ensures and returns an
+    // invalid handle.
     FCk_Handle_PantryRat Add(FCk_Handle_Transform& InRoot, FMars_PantryRat_Spec InSpec)
     {
         FCk_Handle RootEntity = InRoot;
@@ -122,9 +122,7 @@ namespace utils_pantry_rat
         AttachPointsSpec.Points.Add(FMars_AttachPoint_Entry(Get_MouthPoint(), MouthNode));
         utils_attach_points::Add(RootEntity, AttachPointsSpec);
 
-        auto Pocket = FCk_Handle_Inventory_DataOnly();
-        if (HasAuthority)
-        { Pocket = Add_Pocket(RootEntity); }
+        auto Pocket = Add_Pocket(RootEntity);
 
         auto Params = FMars_Fragment_PantryRat_Params();
         Params.Spec = InSpec;
@@ -167,15 +165,17 @@ namespace utils_pantry_rat
     }
 
     // The ledger's only writer, called last by the authority's request drain and at the end of its tick: written and
-    // marked dirty only when the phase differs from the stored ledger.
+    // marked dirty only when the phase or the lethal blow's impulse differs from the stored ledger.
     void Publish(FCk_Handle_PantryRat& InSelf)
     {
         const auto Phase = InSelf.Get_Phase();
+        const auto HitImpulse = InSelf.Get_Death().HitImpulse;
         auto& Ledger = InSelf.Get_Fragment(FMars_Fragment_PantryRat_Net);
-        if (Ledger.Phase == Phase)
+        if (Ledger.Phase == Phase && Ledger.HitImpulse == HitImpulse)
         { return; }
 
         Ledger.Phase = Phase;
+        Ledger.HitImpulse = HitImpulse;
         FCk_Handle Entity = InSelf;
         Entity.Request_MarkReplicationDirty(FMars_Fragment_PantryRat_Net);
     }
@@ -217,9 +217,12 @@ namespace utils_pantry_rat
 
     // The pocket: a capacity-1, non-stacking, non-persisted inventory. CkInventory composes it on a child entity of the rat
     // (its lifetime owner is the rat, which the policy and the world item's mount resolve), its Persistent loot riding
-    // AttachPoint.Mars.RatMouth.
+    // AttachPoint.Mars.RatMouth. A rat that replicates (a driver on the authority, every copy) gets a pocket that
+    // replicates; a rat with no driver (a single-machine world) keeps a local one, since a replicated inventory there
+    // has nowhere to go.
     FCk_Handle_Inventory_DataOnly Add_Pocket(FCk_Handle& InRat)
     {
+        const auto Replication = utils_mars_net::Get_ReplicatesHere(InRat) ? ECk_Replication::Replicates : ECk_Replication::DoesNotReplicate;
         TSubclassOf<UMars_PantryRat_PocketPolicy> PolicyClass = UMars_PantryRat_PocketPolicy;
         auto Params = utils_inventory_data_only::Make_Params_Bounded(Get_PocketTag(), 1,
             FCk_Delegate_Inventory_CustomCanAcceptItem_Dynamic(PolicyClass.GetDefaultObject(), n"OnCanAccept"),
@@ -227,10 +230,44 @@ namespace utils_pantry_rat
         Params.Set_StackingPolicy(ECk_Inventory_StackingPolicy::NoStacking);
         Params.Set_PersistContents(ECk_EnableDisable::Disable);
 
-        auto Pocket = utils_inventory_data_only::Add(InRat, Params, ECk_Replication::DoesNotReplicate);
+        auto Pocket = utils_inventory_data_only::Add(InRat, Params, Replication);
         utils_world_item::Add_MountedInventory(Pocket, FMars_Fragment_MountedInventory(EMars_WorldItem_MountRule::PointAtOffset,
             Get_MouthPoint(), FTransform::Identity));
         return Pocket;
+    }
+
+    // A copy's reading of the authority's carry, from the replicated pocket on this machine: the pocket's item is its
+    // loot; a new item sets the pocket's mount offset to its carry offset, and a Transient one gets one Visual world
+    // item of its own on the mouth node (a Persistent food's own body mounts there through the world item's reconcile,
+    // as on a cargo slot). Nothing about the carry is timed, so a copy that composes mid-carry shows it at rest at
+    // once. CarryReceipt is not written on a copy. Only the tick's copy half calls it.
+    void Sync_ShownCarry(FCk_Handle_PantryRat& InRat, FMars_Fragment_PantryRat& InOutState)
+    {
+        const auto Now = InRat.Get_Pocket().Get_SoleItem();
+        if (Now == InOutState.Loot)
+        { return; }
+
+        // The carry visual belongs to the rat's own world.
+        const auto WorldContext = FAngelscriptGameThreadScopeWorldContext(utils_entity_lifetime::Get_WorldForEntity(InRat));
+        InOutState.Loot = Now;
+        if (ck::IsValid(InOutState.CarryVisual))
+        { utils_entity_lifetime::Request_DestroyEntity(InOutState.CarryVisual); }
+
+        InOutState.CarryVisual = FCk_Handle();
+        if (ck::Is_NOT_Valid(Now) || Now.Has_Presentation() == false)
+        { return; }
+
+        const UMars_ItemTrait_Presentation Presentation = Now.Get_Presentation();
+        const auto Offset = Get_CarryOffset(Presentation);
+        FCk_Handle PocketEntity = InRat.Get_Pocket();
+        PocketEntity.Get_Fragment(FMars_Fragment_MountedInventory).Offset = Offset;
+
+        // Read from the definition: a client stamps the Persistent marker only once the item's world item links.
+        if (Presentation.Mounting.Persistence == EMars_WorldItem_Persistence::Persistent)
+        { return; }
+
+        FCk_Handle RatEntity = InRat;
+        InOutState.CarryVisual = utils_world_item::Request_SpawnVisual(RatEntity, FMars_WorldItem_VisualSpec(Now, InRat.Get_MouthNode(), Offset));
     }
 
     // The drain-time predicate (UMars_PantryRat_PocketPolicy). Its own loot re-entering (a failed outgoing transfer's
@@ -462,13 +499,10 @@ mixin float32 Get_Clock(const FCk_Handle_PantryRat& Self)
     return Self.Get_Fragment(FMars_Fragment_PantryRat).Clock;
 }
 
-// The rat holds (or is landing) an item: its pocket is not empty, or its loot is recorded. A copy without a pocket
-// reads it from its phase.
+// The rat holds (or is landing) an item: its pocket is not empty, or its loot is recorded. A copy reads what its pocket
+// shows.
 mixin bool Get_IsLoaded(const FCk_Handle_PantryRat& Self)
 {
-    if (ck::Is_NOT_Valid(Self.Get_Pocket()))
-    { return utils_pantry_rat::Get_IsLoadedPhase(Self.Get_Phase()); }
-
     return ck::IsValid(Self.Get_Fragment(FMars_Fragment_PantryRat).Loot) || Self.Get_Pocket().Get_NumItems() > 0;
 }
 
