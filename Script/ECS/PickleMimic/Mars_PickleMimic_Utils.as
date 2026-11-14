@@ -89,10 +89,14 @@ namespace utils_pickle_mimic
     }
 
     // Composes the mimic on InRoot (the jar: the SurfaceMotion body, Clearance over the ground; the entity script built
-    // the rig's body node at Get_BodyOffset(0) with every visual on it): surface motion -> the walker on the body node
-    // (four floating feet, the trot) -> monster -> damage dealer -> the body-zone hurtbox round the jar -> the mimic's
-    // fragments, tucked (UMars_Processor_PickleMimic_Setup then binds the body zone's hits to TakeHit) -> LAST the state
-    // machine (Mars_PickleMimic_Hfsm.as). A rejected spec or sub-feature ensures and returns an invalid handle.
+    // the rig's body node at Get_BodyOffset(0) with every visual on it). Only a machine with authority over the root
+    // composes what decides and moves it: surface motion first, then the walker on the body node (four floating feet,
+    // the trot), the monster, the damage dealer, the body-zone hurtbox round the jar, the mimic's fragments, tucked,
+    // with the drive and the targeting, the replicated ledger and the mirror's state (UMars_Processor_PickleMimic_Setup
+    // then binds the body zone's hits to TakeHit), and LAST the state machine (Mars_PickleMimic_Hfsm.as). A copy
+    // without authority composes the same without the surface motion, the dealer, the drive, the targeting and the
+    // state machine (its Motion and Dealer stay invalid); its walker plants its own feet on this machine's ground. A
+    // rejected spec or sub-feature ensures and returns an invalid handle.
     FCk_Handle_PickleMimic Add(FCk_Handle_Transform& InRoot, FMars_PickleMimic_Spec InSpec)
     {
         FCk_Handle RootEntity = InRoot;
@@ -100,9 +104,15 @@ namespace utils_pickle_mimic
         if (ck::EnsureIfNot(Validation.IsValid(), f"[PickleMimic] [{RootEntity.ToString()}] rejected the spec: {Validation.Get_Error()}"))
         { return FCk_Handle_PickleMimic(); }
 
-        auto Motion = utils_surface_motion::Add(InRoot, Make_MotionSpec(InSpec));
-        if (ck::EnsureIfNot(ck::IsValid(Motion), f"[PickleMimic] [{RootEntity.ToString()}] surface motion was rejected"))
-        { return FCk_Handle_PickleMimic(); }
+        const auto HasAuthority = utils_net::Get_HasAuthority(RootEntity);
+
+        auto Motion = FCk_Handle_SurfaceMotion();
+        if (HasAuthority)
+        {
+            Motion = utils_surface_motion::Add(InRoot, Make_MotionSpec(InSpec));
+            if (ck::EnsureIfNot(ck::IsValid(Motion), f"[PickleMimic] [{RootEntity.ToString()}] surface motion was rejected"))
+            { return FCk_Handle_PickleMimic(); }
+        }
 
         auto Body = InSpec.Rig.Body.As_Transform();
         auto Walker = utils_procedural_animation::Add_Walker(Body, FCk_ProceduralWalker_Spec(utils_pickle_mimic::Mars_PickleMimicRig, utils_pickle_mimic::Mars_PickleMimicGait));
@@ -114,9 +124,13 @@ namespace utils_pickle_mimic
         if (ck::Is_NOT_Valid(Monster))
         { return FCk_Handle_PickleMimic(); }
 
-        auto Dealer = utils_damage_dealer::Add(RootEntity, FMars_DamageDealer_Spec());
-        if (ck::Is_NOT_Valid(Dealer))
-        { return FCk_Handle_PickleMimic(); }
+        auto Dealer = FCk_Handle_DamageDealer();
+        if (HasAuthority)
+        {
+            Dealer = utils_damage_dealer::Add(RootEntity, FMars_DamageDealer_Spec());
+            if (ck::Is_NOT_Valid(Dealer))
+            { return FCk_Handle_PickleMimic(); }
+        }
 
         auto BodyZone = Monster.Get_BodyZone();
         utils_hit_zone::AddHurtbox_Box(BodyZone, Body, FMars_HitZone_Hurtbox(HurtboxHalfExtents, FTransform(FRotator::ZeroRotator, HurtboxCentre)));
@@ -137,17 +151,69 @@ namespace utils_pickle_mimic
         RootEntity.Add_Fragment(FMars_Feature_PickleMimic());
         RootEntity.Add_Fragment(Params);
         RootEntity.Add_Fragment(State);
-        RootEntity.Add_Fragment(FMars_Fragment_PickleMimic_Drive());
+        if (HasAuthority)
+        { RootEntity.Add_Fragment(FMars_Fragment_PickleMimic_Drive()); }
+
         RootEntity.Add_Fragment(Posture);
         RootEntity.Add_Fragment(FMars_Fragment_PickleMimic_Mouth());
         RootEntity.Add_Fragment(FMars_Fragment_PickleMimic_Action());
-        RootEntity.Add_Fragment(FMars_Fragment_PickleMimic_Targeting());
+        if (HasAuthority)
+        { RootEntity.Add_Fragment(FMars_Fragment_PickleMimic_Targeting()); }
+
         RootEntity.Add_Fragment(FMars_Fragment_PickleMimic_Hurt());
+
+        // The mirror compares what arrives against the ledger this machine composed, not one that already arrived.
+        auto Ledger = FMars_Fragment_PickleMimic_Net();
+        auto Local = FMars_Fragment_PickleMimic_Local();
+        Local.Last = TOptional<FMars_Fragment_PickleMimic_Net>(Ledger);
+
+        // A client's copy can receive the replicated ledger before it composes: the arrived ledger stands then.
+        if (RootEntity.Has_Fragment(FMars_Fragment_PickleMimic_Net) == false)
+        { RootEntity.Add_Fragment(Ledger, ECk_Replication::Replicates); }
+
+        RootEntity.Add_Fragment(Local);
         RootEntity.Add_Fragment(FMars_Tag_PickleMimic_NeedsSetup());
+        RootEntity.Add_Fragment(FMars_Tag_PickleMimic_NeedsMirror());
 
         // Last: Alive's condition reads the Dead attribute as the machine enters its initial state.
-        utils_state_machine::Add(RootEntity, FCk_StateMachine_Spec(UMars_SmState_PickleMimic_Alive));
+        if (HasAuthority)
+        { utils_state_machine::Add(RootEntity, FCk_StateMachine_Spec(UMars_SmState_PickleMimic_Alive)); }
+
         return RootEntity.As_PickleMimic();
+    }
+
+    // The ledger's only writer, called last by the authority's request drain and at the end of its tick: the stance,
+    // the latched gape, the running action and the last flinch as they stand, written and marked dirty only when they
+    // differ from the stored ledger.
+    void Publish(FCk_Handle_PickleMimic& InSelf)
+    {
+        const auto Action = InSelf.Get_Action();
+        const auto Hurt = InSelf.Get_Hurt();
+
+        auto Next = FMars_Fragment_PickleMimic_Net();
+        Next.Stance = InSelf.Get_Fragment(FMars_Fragment_PickleMimic_Posture).Stance;
+        Next.Gape = InSelf.Get_Fragment(FMars_Fragment_PickleMimic_Mouth).Gape;
+        Next.Action.Kind = Action.Kind;
+        Next.Action.Phase = Action.Phase;
+        Next.Action.Generation = Action.Generation;
+        Next.Flinch.Count = Hurt.FlinchCount;
+        Next.Flinch.From = Hurt.FlinchFrom;
+        Next.Flinch.FoundIn = Hurt.FlinchFoundIn;
+
+        auto& Ledger = InSelf.Get_Fragment(FMars_Fragment_PickleMimic_Net);
+        if (Ledger.Stance == Next.Stance && Ledger.Gape == Next.Gape && Get_IsSameAction(Ledger.Action, Next.Action)
+            && Ledger.Flinch.Count == Next.Flinch.Count && Ledger.Flinch.From.Equals(Next.Flinch.From, 0.0)
+            && Ledger.Flinch.FoundIn == Next.Flinch.FoundIn)
+        { return; }
+
+        Ledger = Next;
+        FCk_Handle Entity = InSelf;
+        Entity.Request_MarkReplicationDirty(FMars_Fragment_PickleMimic_Net);
+    }
+
+    bool Get_IsSameAction(const FMars_PickleMimic_NetAction& InA, const FMars_PickleMimic_NetAction& InB)
+    {
+        return InA.Kind == InB.Kind && InA.Phase == InB.Phase && InA.Generation == InB.Generation;
     }
 
     //----------------------------------------------------------------------------------------------------------------------
@@ -287,16 +353,24 @@ mixin FTransform Get_BodyTransform(const FCk_Handle_PickleMimic& Self)
     return utils_transform::Get_EntityCurrentTransform(Self.Get_Body().As_Transform());
 }
 
-// The normal of the ground it stands on (its own up while it has none).
+// The normal of the ground it stands on (its own up while it has none, and on a copy without surface motion).
 mixin FVector Get_SurfaceUp(const FCk_Handle_PickleMimic& Self)
 {
-    const auto Up = utils_surface_motion::Get_SupportNormal(Self.Get_Motion()).GetSafeNormal();
+    const auto Motion = Self.Get_Motion();
+    if (ck::Is_NOT_Valid(Motion))
+    { return Self.Get_RootTransform().GetRotation().GetUpVector(); }
+
+    const auto Up = utils_surface_motion::Get_SupportNormal(Motion).GetSafeNormal();
     return Up.IsNearlyZero() ? Self.Get_RootTransform().GetRotation().GetUpVector() : Up;
 }
 
+// False on a copy without surface motion.
 mixin bool Get_IsGrounded(const FCk_Handle_PickleMimic& Self)
 {
     const auto Motion = Self.Get_Motion();
+    if (ck::Is_NOT_Valid(Motion))
+    { return false; }
+
     return utils_surface_motion::Get_Status(Motion) == ECk_ProceduralAnimation_Status::Ready &&
         utils_surface_motion::Get_Support(Motion) == ECk_SurfaceMotion_Support::Grounded;
 }

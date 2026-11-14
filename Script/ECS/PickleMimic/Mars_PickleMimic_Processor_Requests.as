@@ -1,6 +1,7 @@
 // The pickle mimic's arbiter: Cancel -> TakeHit -> Stop -> Drive -> SetStance -> Gape -> Start, each kind in arrival order.
 // A Start is admitted only when Get_Admission answers Admitted at drain time (so a second Start in one drain finds the first
-// running and is dropped). Phase changes broadcast OnActionPhase after the state is written.
+// running and is dropped). Phase changes broadcast OnActionPhase after the state is written. Only a machine with
+// authority over the mimic applies them; it publishes the ledger last (utils_pickle_mimic::Publish).
 class UMars_Processor_PickleMimic_HandleRequests : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -26,6 +27,12 @@ class UMars_Processor_PickleMimic_HandleRequests : UCk_Processor_Script_Base_UE
 
         // InRequests is invalid past this line; removing before broadcasting lets re-entrant requests survive.
         Self.Request_TryRemove(FMars_Fragment_PickleMimic_Requests);
+
+        if (utils_net::Get_HasAuthority(InHandle) == false)
+        { return; }
+
+        // Handlers react on the mimic (its state machine, its look): scope the script world to its own.
+        const auto WorldContext = FAngelscriptGameThreadScopeWorldContext(utils_entity_lifetime::Get_WorldForEntity(InHandle));
 
         for (const auto& Request : CancelRequests)
         { HandleCancel(Self); }
@@ -61,6 +68,8 @@ class UMars_Processor_PickleMimic_HandleRequests : UCk_Processor_Script_Base_UE
 
         for (const auto& Request : StartRequests)
         { HandleStart(Self, Request); }
+
+        utils_pickle_mimic::Publish(Self);
     }
 
     private void HandleCancel(FCk_Handle_PickleMimic& InSelf)
@@ -78,13 +87,15 @@ class UMars_Processor_PickleMimic_HandleRequests : UCk_Processor_Script_Base_UE
         if (InSelf.Get_IsDead())
         { return; }
 
-        const auto Disguised = InSelf.Get_Stance() == EMars_PickleMimic_Stance::Tucked;
+        const auto FoundIn = InSelf.Get_Stance();
+        const auto Disguised = FoundIn == EMars_PickleMimic_Stance::Tucked;
         const auto From = Get_BlowFrom(InSelf, InRequest.Event);
 
         auto& Hurt = InSelf.Get_Fragment(FMars_Fragment_PickleMimic_Hurt);
         Hurt.FlinchLeft = InSelf.Get_Spec().Vitals.FlinchSeconds;
         Hurt.FlinchCount += 1;
         Hurt.FlinchFrom = From;
+        Hurt.FlinchFoundIn = FoundIn;
         Hurt.Startled = Hurt.Startled || Disguised;
 
         InSelf.Get_Fragment(FMars_Fragment_PickleMimic_Mouth).LidOpen = Disguised ? 1.0f : 0.0f;

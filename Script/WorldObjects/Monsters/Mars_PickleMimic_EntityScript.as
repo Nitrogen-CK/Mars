@@ -253,10 +253,13 @@ struct FMars_PickleMimic_Shard
 // cracked in place as the kernel's crack stage rises, plays the disguise's tell (Tell), and on death breaks the glass into
 // its shards and drains the brine. The kernel's OnSpill (with or without visuals: they are gameplay) throws real pickle
 // foods out of the broken jar; they belong to the world, not the corpse.
+// The entity, its root transform and the kernel's ledger replicate: every machine builds the body node, the look, the
+// feet and the tick, and the kernel decides on the machine with authority, which alone spills the jar.
 class UMars_PickleMimic_EntityScript : UCk_GenericEntityScript_UE
 {
     default _ShowInPlaceActors = true;
-    default _Replication = ECk_Replication::DoesNotReplicate;
+    // Spawned by the authority (placed, or under the replicated spawn owner); every machine composes its own copy.
+    default _Replication = ECk_Replication::Replicates;
 
     // The root's transform: place it Clearance (30) above the floor it starts on.
     UPROPERTY(ExposeOnSpawn)
@@ -354,7 +357,7 @@ class UMars_PickleMimic_EntityScript : UCk_GenericEntityScript_UE
 
         LoadPieces(InHandle);
 
-        auto Root = utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::DoesNotReplicate);
+        auto Root = utils_mars_net::Add_CreatureRoot(InHandle, SpawnTransform);
         auto Body = utils_scene_node::Create(Root, utils_pickle_mimic::Get_BodyOffset(0.0f));
         auto MimicSpec = Spec;
         MimicSpec.Rig.Body = Body;
@@ -854,7 +857,8 @@ class UMars_PickleMimic_EntityScript : UCk_GenericEntityScript_UE
         const auto Here = _Mimic.Get_Location();
         auto Striker = FCk_Handle();
         auto Best = 0.0;
-        for (auto Candidate : utils_entity_tag::ForEach_Entity(_Mimic, n"TAG_MarsCombatTarget"))
+        // The nearest player's pawn: the shared tag marks every one on the machine with authority over it.
+        for (auto Candidate : utils_entity_tag::ForEach_Entity(_Mimic, n"TAG_MarsSharedCombatTarget"))
         {
             if (utils_pickle_mimic::Get_IsTargetValid(Candidate) == false)
             { continue; }
@@ -965,10 +969,14 @@ class UMars_PickleMimic_EntityScript : UCk_GenericEntityScript_UE
     //----------------------------------------------------------------------------------------------------------------------
 
     // The jar broke: InCount pickle foods where the shader stood them, thrown out and up, tumbling; owned by the world (the
-    // transient entity), so they outlive the corpse and can be picked up and cooked.
+    // transient entity), so they outlive the corpse and can be picked up and cooked. Only the authority spills: a copy
+    // that raised it anyway would throw a second jarful.
     UFUNCTION()
     private void OnSpill(FCk_Handle_PickleMimic InMimic, int32 InCount)
     {
+        if (utils_net::Get_HasAuthority(InMimic) == false)
+        { return; }
+
         const auto Frame = InMimic.Get_BodyTransform();
         const auto Definition = utils_held_item::Make_DefinitionSoft(mars_items::Food_Pickle());
         auto Owner = ck::TransientEntity();

@@ -1,6 +1,7 @@
 // The pickle mimic's one clock, after the request drain, every frame:
-// 0. hurt: the flinch runs down (a dead mimic has none), the crack stage rises with the body health lost, and the first
-//    frame it is dead its jar spills (OnSpill, Vitals.SpilledPickles);
+// 0. hurt: the flinch runs down (a dead mimic has none), the crack stage rises with the body health lost (on every
+//    machine, from its own body Health), and, with authority, the first frame it is dead its jar spills (OnSpill,
+//    Vitals.SpilledPickles);
 // 1. posture: Rise runs toward the stance (StandSeconds up, TuckSeconds down) and the walker body node sinks or rises
 //    with it (moved only when its drop changes); reaching the stance broadcasts OnStance, and standing fully up ends a
 //    startle;
@@ -11,7 +12,13 @@
 //    stands and holds a windup at its start (the drain restarted it); an active or recovering bite runs on;
 // 3. the lid: the bite sets it (gape wide, slam shut, stay shut); otherwise it eases toward the latched Gape, except
 //    through a flinch, which holds it where the blow left it.
-// This processor writes no root transform: steering goes through SurfaceMotion.
+// This processor writes no root transform: steering goes through SurfaceMotion. The authority publishes the ledger
+// after the action (utils_pickle_mimic::Publish).
+// It has two halves. The authority runs 0 to 3. A copy without authority runs 0 (without the spill) and 1, then poses
+// the action its ledger names on its own clock (TickShownAction: the phase's seconds run, capped, and the bite sets
+// the lid; a flinch holds a windup at its start), or with none eases the lid toward the latched Gape outside a flinch.
+// It never advances a phase, steers, sweeps, spills or broadcasts. Its stance, gape, action phase and flinches come
+// from the ledger (UMars_Processor_PickleMimic_Mirror), its walk from the replicated root.
 class UMars_Processor_PickleMimic_Tick : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -28,12 +35,26 @@ class UMars_Processor_PickleMimic_Tick : UCk_Processor_Script_Base_UE
         if (utils_entity_lifetime::Get_IsPendingDestroy(InHandle, ECk_EntityLifetime_DestructionPhase::BeginDestroy))
         { return; }
 
+        // Handlers react on the mimic (its state machine, its look): scope the script world to its own.
+        const auto WorldContext = FAngelscriptGameThreadScopeWorldContext(utils_entity_lifetime::Get_WorldForEntity(InHandle));
+
         auto Self = InHandle.As_PickleMimic();
         const auto DeltaSeconds = float32(InDeltaT.Get_Seconds());
+        const auto HasAuthority = utils_net::Get_HasAuthority(InHandle);
 
         TickHurt(Self, DeltaSeconds);
+        if (HasAuthority)
+        { TickSpill(Self); }
+
         TickPosture(Self, DeltaSeconds);
-        TickAction(Self, DeltaSeconds);
+        if (HasAuthority)
+        {
+            TickAction(Self, DeltaSeconds);
+            utils_pickle_mimic::Publish(Self);
+            return;
+        }
+
+        TickShownAction(Self, DeltaSeconds);
     }
 
     //----------------------------------------------------------------------------------------------------------------------
@@ -55,10 +76,18 @@ class UMars_Processor_PickleMimic_Tick : UCk_Processor_Script_Base_UE
         if (Max > 0.0f)
         { Hurt.CrackStage = Math::Max(Hurt.CrackStage, utils_pickle_mimic::Get_CrackStageFor(InSelf.Get_Spec().Vitals, Health.Get_Current() / Max)); }
 
-        const auto Spill = InSelf.Get_IsDead() && Hurt.Spilled == false;
-        Hurt.Spilled = Hurt.Spilled || Spill;
         InSelf.Get_Fragment(FMars_Fragment_PickleMimic_Hurt) = Hurt;
-        if (Spill && InSelf.Has_Fragment(FMars_Fragment_PickleMimic_Signals))
+    }
+
+    // The authority's alone: the first frame it reads dead its jar spills, once.
+    private void TickSpill(FCk_Handle_PickleMimic& InSelf)
+    {
+        auto& Hurt = InSelf.Get_Fragment(FMars_Fragment_PickleMimic_Hurt);
+        if (InSelf.Get_IsDead() == false || Hurt.Spilled)
+        { return; }
+
+        Hurt.Spilled = true;
+        if (InSelf.Has_Fragment(FMars_Fragment_PickleMimic_Signals))
         { InSelf.Get_Fragment(FMars_Fragment_PickleMimic_Signals).OnSpill.Broadcast(InSelf, InSelf.Get_Spec().Vitals.SpilledPickles); }
     }
 
@@ -176,6 +205,33 @@ class UMars_Processor_PickleMimic_Tick : UCk_Processor_Script_Base_UE
 
         if (Changed)
         { utils_pickle_mimic::Broadcast_ActionPhase(InSelf, Kind, Phase); }
+    }
+
+    // A copy without authority poses the action its ledger told it of, on this machine's clock: a flinch holds a windup
+    // at its start; otherwise the phase's clock runs, capped at the phase's seconds, and the bite sets the lid. With no
+    // action the lid eases toward the latched Gape outside a flinch. The mirror alone changes the phase; nothing here
+    // steers, sweeps, spills or broadcasts.
+    private void TickShownAction(FCk_Handle_PickleMimic& InSelf, float32 InDeltaSeconds)
+    {
+        const auto Flinching = InSelf.Get_IsFlinching();
+        auto Action = InSelf.Get_Action();
+        if (Action.Kind == EMars_PickleMimic_Action::None)
+        {
+            if (Flinching == false)
+            { EaseLid(InSelf, InDeltaSeconds); }
+
+            return;
+        }
+
+        if (Flinching && Action.Phase == EMars_PickleMimic_ActionPhase::Windup)
+        { return; }
+
+        const auto Spec = InSelf.Get_Spec();
+        const auto PhaseSeconds = utils_pickle_mimic::Get_PhaseSeconds(Spec.Bite.Timing, Action.Phase);
+        Action.PhaseElapsed = Math::Min(Action.PhaseElapsed + InDeltaSeconds, PhaseSeconds);
+        InSelf.Get_Fragment(FMars_Fragment_PickleMimic_Action).PhaseElapsed = Action.PhaseElapsed;
+        InSelf.Get_Fragment(FMars_Fragment_PickleMimic_Mouth).LidOpen =
+            utils_pickle_mimic::Get_BiteLid(utils_pickle_mimic::Make_Frame(Spec, Action), Action.LidAtStart);
     }
 
     private void Advance(FMars_Fragment_PickleMimic_Action& InOutAction)

@@ -9,6 +9,17 @@ asset Mars_PickleMimicHandle of UCkDynamic_HandleDefinition
     Description = "The pickle-jar mimic: a jar that sits disguised, stands up on four floating feet (a diagonal trot) to chase, and bites with its hinged lid";
 }
 
+// Replication: the authority spawns the mimic and alone composes what decides and moves it (the surface motion, the
+// damage dealer, the senses, the drive and the state machine), applies its requests and spills its jar. Its drain and
+// its tick publish the ledger (FMars_Fragment_PickleMimic_Net: the stance, the latched gape, the running action and the
+// last flinch) through utils_pickle_mimic::Publish, its one writer; the root transform replicates with it. Every
+// machine composes the walker on the body node and plants its own feet on its own ground. A copy without authority
+// follows the replicated root, runs the posture and the lid's ease on its own clock from that ledger
+// (UMars_Processor_PickleMimic_Mirror), times each arrived action phase from its arrival, takes a flinch as a count
+// with where it came from and the stance it found the mimic in, drops every request, is struck through the strike
+// claim and dies when its monster's ledger does. Its crack stage is its own, from its body Health. A copy that
+// composes late shows the stance, the gape and a running action as they stand, and no past flinch. The spill, the
+// blow, the sweep and OnBlowLanded are the authority's alone.
 struct FMars_Feature_PickleMimic {}
 
 // Until UMars_Processor_PickleMimic_Setup has bound the body zone's hits to TakeHit.
@@ -160,7 +171,8 @@ mixin FMars_Validation Validate(const FMars_PickleMimic_Bite& Self)
     return FMars_Validation();
 }
 
-// Target sensing (UMars_Processor_PickleMimic_Targeting): among the entities tagged TAG_MarsCombatTarget and Hostile to it.
+// Target sensing (UMars_Processor_PickleMimic_Targeting): among the entities tagged TAG_MarsSharedCombatTarget (every
+// player's pawn, on the machine with authority over it) and Hostile to it.
 struct FMars_PickleMimic_Senses
 {
     // A disguised mimic wakes when its target comes this close.
@@ -300,7 +312,8 @@ struct FMars_Fragment_PickleMimic_Params
 // State
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Composed by Add; never written afterwards.
+// Composed by Add; never written afterwards. Motion and Dealer are invalid on a copy without authority; Gait is valid
+// on every machine.
 struct FMars_Fragment_PickleMimic
 {
     UPROPERTY()
@@ -338,7 +351,8 @@ enum EMars_PickleMimic_Stance
     Standing
 }
 
-// Rise runs 0 (tucked) .. 1 (standing) toward Stance; the walker body sinks TuckDrop * (1 - Get_Lift(Rise)).
+// Rise runs 0 (tucked) .. 1 (standing) toward Stance; the walker body sinks TuckDrop * (1 - Get_Lift(Rise)). On a copy
+// without authority the mirror writes Stance (and, as the ledger stands when it binds, Rise).
 struct FMars_Fragment_PickleMimic_Posture
 {
     UPROPERTY()
@@ -353,7 +367,8 @@ struct FMars_Fragment_PickleMimic_Posture
 }
 
 // The lid: Gape is the latched opening the control layer asks for between bites (0 shut .. 1 wide); LidOpen is the
-// lid's opening now, eased toward Gape, or set by the bite while one runs.
+// lid's opening now, eased toward Gape, or set by the bite while one runs. On a copy without authority the mirror
+// writes Gape (and LidOpen as the ledger stands when it binds, and as a flinch arrives).
 struct FMars_Fragment_PickleMimic_Mouth
 {
     UPROPERTY()
@@ -392,7 +407,8 @@ enum EMars_PickleMimic_Admission
     Facing
 }
 
-// The one running action and its clocks. Written only by the request drain and the action tick.
+// The one running action and its clocks. Written only by the request drain and the action tick; on a copy without
+// authority, by the mirror (kind, phase, generation, the phase's start) and the tick (the phase's clock).
 struct FMars_Fragment_PickleMimic_Action
 {
     UPROPERTY()
@@ -432,7 +448,8 @@ struct FMars_Fragment_PickleMimic_Action
     float32 LidAtStart = 0.0f;
 }
 
-// What blows have done to it. Written only by the request drain (a TakeHit) and the tick (the clocks, the crack stage).
+// What blows have done to it. Written only by the request drain (a TakeHit) and the tick (the clocks, the crack stage);
+// on a copy without authority the mirror writes each arrived flinch in the drain's place.
 struct FMars_Fragment_PickleMimic_Hurt
 {
     // Seconds of flinch left (0: not flinching).
@@ -447,6 +464,10 @@ struct FMars_Fragment_PickleMimic_Hurt
     UPROPERTY()
     FVector FlinchFrom = FVector::ZeroVector;
 
+    // The stance the last flinching blow found it in.
+    UPROPERTY()
+    EMars_PickleMimic_Stance FlinchFoundIn = EMars_PickleMimic_Stance::Tucked;
+
     // A blow found it disguised: it wakes whatever the distance. Held until it next stands fully up (or dies).
     UPROPERTY()
     bool Startled = false;
@@ -455,7 +476,7 @@ struct FMars_Fragment_PickleMimic_Hurt
     UPROPERTY()
     int32 CrackStage = 0;
 
-    // Its death spilled the jar's pickles (OnSpill went out).
+    // Its death spilled the jar's pickles (OnSpill went out). The authority's alone: a copy never spills.
     UPROPERTY()
     bool Spilled = false;
 }
@@ -469,6 +490,68 @@ struct FMars_Fragment_PickleMimic_Targeting
     float32 SenseClock = 0.0f;
 }
 
+// The running action as a level: what runs, its phase and the Start that began it.
+struct FMars_PickleMimic_NetAction
+{
+    UPROPERTY()
+    EMars_PickleMimic_Action Kind = EMars_PickleMimic_Action::None;
+
+    UPROPERTY()
+    EMars_PickleMimic_ActionPhase Phase = EMars_PickleMimic_ActionPhase::None;
+
+    UPROPERTY()
+    int32 Generation = 0;
+}
+
+// The last flinch: a count (so each one is seen), where the blow came from and the stance it found the mimic in.
+struct FMars_PickleMimic_NetFlinch
+{
+    UPROPERTY()
+    int32 Count = 0;
+
+    UPROPERTY()
+    FVector From = FVector::ZeroVector;
+
+    UPROPERTY()
+    EMars_PickleMimic_Stance FoundIn = EMars_PickleMimic_Stance::Tucked;
+}
+
+// The replicated ledger on the root: the stance, the latched gape, the running action and the last flinch. Written
+// only by utils_pickle_mimic::Publish, from the authority's request drain and its tick.
+struct FMars_Fragment_PickleMimic_Net
+{
+    UPROPERTY()
+    EMars_PickleMimic_Stance Stance = EMars_PickleMimic_Stance::Tucked;
+
+    UPROPERTY()
+    float32 Gape = 0.0f;
+
+    UPROPERTY()
+    FMars_PickleMimic_NetAction Action;
+
+    UPROPERTY()
+    FMars_PickleMimic_NetFlinch Flinch;
+}
+
+// Each machine's own: the ledger the mirror last reconciled (unset with authority).
+struct FMars_Fragment_PickleMimic_Local
+{
+    UPROPERTY()
+    TOptional<FMars_Fragment_PickleMimic_Net> Last;
+}
+
+// Added by utils_pickle_mimic::Add, dropped by UMars_Processor_PickleMimic_Mirror once it has bound the ledger's
+// rep-notify.
+struct FMars_Tag_PickleMimic_NeedsMirror {}
+
+// How a copy without authority takes the ledger: as it stands when the copy binds (a copy that composed late shows the
+// mimic where it is), or as each change arrives (the tick then plays the stand, the tuck and the lid's ease).
+enum EMars_PickleMimic_Reconcile
+{
+    AsItStands,
+    AsItArrives
+}
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Signals
 //--------------------------------------------------------------------------------------------------------------------------
@@ -477,7 +560,8 @@ struct FMars_Fragment_PickleMimic_Targeting
 delegate void FMars_Delegate_PickleMimic_OnActionPhase(FCk_Handle_PickleMimic InMimic, EMars_PickleMimic_Action InAction, EMars_PickleMimic_ActionPhase InPhase);
 event void FMars_Delegate_PickleMimic_OnActionPhase_MC(FCk_Handle_PickleMimic InMimic, EMars_PickleMimic_Action InAction, EMars_PickleMimic_ActionPhase InPhase);
 
-// A blow landed on a zone (the zone's own OnHit carries the damage).
+// A blow landed on a zone (the zone's own OnHit carries the damage). Raised only on a machine with authority over the
+// mimic: a copy without it never sweeps.
 delegate void FMars_Delegate_PickleMimic_OnBlowLanded(FCk_Handle_PickleMimic InMimic, EMars_PickleMimic_Action InAction, FCk_Handle_HitZone InZone);
 event void FMars_Delegate_PickleMimic_OnBlowLanded_MC(FCk_Handle_PickleMimic InMimic, EMars_PickleMimic_Action InAction, FCk_Handle_HitZone InZone);
 
@@ -486,6 +570,7 @@ delegate void FMars_Delegate_PickleMimic_OnStance(FCk_Handle_PickleMimic InMimic
 event void FMars_Delegate_PickleMimic_OnStance_MC(FCk_Handle_PickleMimic InMimic, EMars_PickleMimic_Stance InStance);
 
 // It died and its jar broke: InCount pickles (Vitals.SpilledPickles) spill out. Once, the frame it is first seen dead.
+// Raised only on a machine with authority over the mimic: a copy without it never spills.
 delegate void FMars_Delegate_PickleMimic_OnSpill(FCk_Handle_PickleMimic InMimic, int32 InCount);
 event void FMars_Delegate_PickleMimic_OnSpill_MC(FCk_Handle_PickleMimic InMimic, int32 InCount);
 

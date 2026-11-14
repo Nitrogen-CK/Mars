@@ -38,8 +38,8 @@ class UMars_AutoTestRig_PickleMimic : UCk_AutoTest_Base
     }
 
     // A target InOffset from the origin (its root 90 up) on team One (Hostile to the mimic on Two): Health 100, a flesh body
-    // zone with one 70 x 70 x 180 box hurtbox round its root, and TAG_MarsCombatTarget added last. Returns its Health; its
-    // root is _TargetRoot.
+    // zone with one 70 x 70 x 180 box hurtbox round its root, and TAG_MarsSharedCombatTarget (the tag the mimic scans)
+    // added last. Returns its Health; its root is _TargetRoot.
     protected FCk_Handle_Health SpawnTarget(FCk_Handle InHandle, FVector InOffset)
     {
         auto Entity = utils_entity_lifetime::Request_CreateEntity(InHandle);
@@ -48,7 +48,7 @@ class UMars_AutoTestRig_PickleMimic : UCk_AutoTest_Base
         auto Health = utils_health::Add(Entity, FMars_Health_Spec(100.0f));
         auto Zone = utils_hit_zone::Add(Entity, utils_hit_zone::Make_FleshZoneSpec(GameplayTags::HitZone_Mars_Body, 1.0f));
         utils_hit_zone::AddHurtbox_Box(Zone, _TargetRoot, FMars_HitZone_Hurtbox(FVector(35.0, 35.0, 90.0), FTransform::Identity));
-        utils_entity_tag::Add(Entity, n"TAG_MarsCombatTarget");
+        utils_entity_tag::Add(Entity, n"TAG_MarsSharedCombatTarget");
         return Health;
     }
 

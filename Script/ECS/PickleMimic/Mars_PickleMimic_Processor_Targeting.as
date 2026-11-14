@@ -1,5 +1,6 @@
-// Chooses the mimic's target every SenseInterval, among the entities tagged TAG_MarsCombatTarget in its world that are
-// Hostile to it and stand within HomeRadius of its home: a held target is kept while it stays valid, Hostile, near home
+// Chooses the mimic's target every SenseInterval, among the entities tagged TAG_MarsSharedCombatTarget in its world
+// (every player's pawn, on the machine with authority over it) that are Hostile to it and stand within HomeRadius of
+// its home: a held target is kept while it stays valid, Hostile, near home
 // and within LoseRadius of the jar; otherwise the nearest within AcquireRadius wins (equal distances go to the lower
 // handle string, so the choice is stable). A dead mimic holds none. The processor owns the targeting fragment.
 class UMars_Processor_PickleMimic_Targeting : UCk_Processor_Script_Base_UE
@@ -58,7 +59,7 @@ class UMars_Processor_PickleMimic_Targeting : UCk_Processor_Script_Base_UE
 
         auto Best = FCk_Handle();
         auto BestDistance = 0.0;
-        for (auto Candidate : utils_entity_tag::ForEach_Entity(InSelf, n"TAG_MarsCombatTarget"))
+        for (auto Candidate : utils_entity_tag::ForEach_Entity(InSelf, n"TAG_MarsSharedCombatTarget"))
         {
             if (Get_IsKeepable(InSelf, Candidate, InRadius) == false)
             { continue; }
