@@ -1,7 +1,7 @@
 // The receiver does not wait for a controller: the production pawn spawned with none composes a Health at its max, a
-// HitZone and one hurtbox linked back to it, without TAG_MarsCombatTarget, and stays that way; once the local player
-// controller possesses it, the same Health, zone and hurtbox remain (no second receiver) and the tag appears. Isolated
-// origin (-180000, 210000, 8000).
+// HitZone and one hurtbox linked back to it, without TAG_MarsCombatTarget or TAG_MarsSharedCombatTarget, and stays that
+// way; once the local player controller possesses it, the same Health, zone and hurtbox remain (no second receiver) and
+// both tags appear. Isolated origin (-180000, 210000, 8000).
 class UMars_AutoTest_PlayerCombat_ReceiverComposesWithoutAController : UMars_AutoTestRig_PlayerCombat
 {
     default _Origin = FVector(-180000.0, 210000.0, 8000.0);
@@ -33,6 +33,11 @@ class UMars_AutoTest_PlayerCombat_ReceiverComposesWithoutAController : UMars_Aut
         return utils_entity_tag::Has(_Player, n"TAG_MarsCombatTarget");
     }
 
+    private bool Get_HasSharedTag() const
+    {
+        return utils_entity_tag::Has(_Player, n"TAG_MarsSharedCombatTarget");
+    }
+
     private void AssertUntaggedReceiver(const FString& InWhen)
     {
         Assert_False(_Pawn.IsLocallyControlled(), f"{InWhen}: the pawn is not locally controlled");
@@ -46,6 +51,7 @@ class UMars_AutoTest_PlayerCombat_ReceiverComposesWithoutAController : UMars_Aut
         { Assert_True(utils_hit_zone::TryGet_Zone(Get_Hurtbox()) == Get_Zone(), f"{InWhen}: the hurtbox links back to the zone"); }
 
         Assert_False(Get_HasTag(), f"{InWhen}: no TAG_MarsCombatTarget");
+        Assert_False(Get_HasSharedTag(), f"{InWhen}: no TAG_MarsSharedCombatTarget");
     }
 
     private void AssertSameReceiver(const FString& InWhen)
@@ -83,6 +89,8 @@ class UMars_AutoTest_PlayerCombat_ReceiverComposesWithoutAController : UMars_Aut
     private void Step_AssertPossessedReceiver(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         Assert_True(_Pawn.IsLocallyControlled(), "possessed: the pawn is locally controlled");
+        Assert_True(Get_HasTag(), "possessed: TAG_MarsCombatTarget");
+        Assert_True(Get_HasSharedTag(), "possessed: TAG_MarsSharedCombatTarget");
         AssertSameReceiver("possessed");
         Assert_Equals_Int(Get_Zone().Get_Hurtboxes().Num(), 1, "possessed: the zone still has one hurtbox");
         Assert_Equals_Float(Get_Health().Get_Current(), Get_Health().Get_Max(), 0.001f, "possessed: the Health is still at its max");

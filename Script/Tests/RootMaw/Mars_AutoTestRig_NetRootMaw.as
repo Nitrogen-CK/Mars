@@ -94,7 +94,8 @@ class UMars_AutoTestRig_NetRootMaw : UMars_AutoTestRig_NetStrike
     }
 
     // The single-machine rig's prey stand-in at InOffset from the base (its root 90 up), owned by the subject: team One
-    // (Hostile to the Maw), Health 100, a flesh body zone with one box hurtbox, TAG_MarsCombatTarget last.
+    // (Hostile to the Maw), Health 100, a flesh body zone with one box hurtbox, TAG_MarsSharedCombatTarget (the tag the
+    // Maw scans) last.
     protected void Spawn_ServerPrey(FVector InOffset)
     {
         auto Subject = Get_SubjectEntity();
@@ -104,7 +105,7 @@ class UMars_AutoTestRig_NetRootMaw : UMars_AutoTestRig_NetStrike
         _PreyHealth = utils_health::Add(Entity, FMars_Health_Spec(100.0f));
         auto Zone = utils_hit_zone::Add(Entity, utils_hit_zone::Make_FleshZoneSpec(GameplayTags::HitZone_Mars_Body, 1.0f));
         utils_hit_zone::AddHurtbox_Box(Zone, _PreyRoot, FMars_HitZone_Hurtbox(FVector(35.0, 35.0, 90.0), FTransform::Identity));
-        utils_entity_tag::Add(Entity, n"TAG_MarsCombatTarget");
+        utils_entity_tag::Add(Entity, n"TAG_MarsSharedCombatTarget");
     }
 
     protected void Move_ServerPrey(FVector InOffset)

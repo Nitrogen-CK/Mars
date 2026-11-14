@@ -203,8 +203,9 @@ class UMars_AutoTestRig_PlayerCombat : UCk_AutoTest_Base
         Res.Set(utils_state_machine::IsInState(_Sm, UMars_SmState_Alive) && _Pawn.CharacterMovement.IsMovingOnGround());
     }
 
-    // Every copy of the pawn composes the receiver; the tag goes only on the pawn this machine has authority over and
-    // controls locally, which the rig's pawn is (its local controller possesses it).
+    // Every copy of the pawn composes the receiver; TAG_MarsSharedCombatTarget goes on every player's pawn this machine
+    // has authority over, TAG_MarsCombatTarget only on the one it also controls locally; the rig's pawn is both (its
+    // local controller possesses it).
     UFUNCTION()
     protected void Step_AssertLocalReceiver(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
@@ -214,6 +215,7 @@ class UMars_AutoTestRig_PlayerCombat : UCk_AutoTest_Base
         Assert_Valid(Get_Zone(), "the local player composed a HitZone");
         Assert_Valid(Get_Hurtbox(), "the local player registered one hurtbox");
         Assert_True(utils_entity_tag::Has(_Player, n"TAG_MarsCombatTarget"), "the local player carries TAG_MarsCombatTarget");
+        Assert_True(utils_entity_tag::Has(_Player, n"TAG_MarsSharedCombatTarget"), "the local player carries TAG_MarsSharedCombatTarget");
         if (ck::Is_NOT_Valid(Get_Health()) || ck::Is_NOT_Valid(Get_Zone()) || ck::Is_NOT_Valid(Get_Hurtbox()))
         { FinishFailure(f"the player has no combat receiver (net mode {NetMode :n}); nothing further can be checked"); }
     }

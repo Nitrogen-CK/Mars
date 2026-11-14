@@ -170,7 +170,8 @@ mixin FMars_Validation Validate(const FMars_RootMaw_Bite& Self)
     return FMars_Validation();
 }
 
-// Target sensing (UMars_Processor_RootMaw_Targeting): among the entities tagged TAG_MarsCombatTarget and Hostile to it.
+// Target sensing (UMars_Processor_RootMaw_Targeting): among the entities tagged TAG_MarsSharedCombatTarget (every
+// player's pawn, on the machine with authority over it) and Hostile to it.
 struct FMars_RootMaw_Senses
 {
     // A buried Maw bursts up when its target comes this close.

@@ -404,8 +404,8 @@ class AMars_PlayerCharacter : AMars_Character
     // capsule probe named Probe.Mars.HitZone registered as the zone's hurtbox. That capsule follows the movement capsule
     // like the Probe.Mars.Player one (crouch and a blocked uncrouch included); the Probe.Mars.Player one stays for the
     // volumes that filter on it. A hit is applied by the machine with authority over the player's entity and reaches every
-    // other copy through the Health's replicated ledger. The combat-target tag is stamped last (Refresh_CombatTargetTag),
-    // so nothing discovers a half-built receiver. Downing at zero Health is still the state machine's decision
+    // other copy through the Health's replicated ledger. The combat-target tags are stamped last, so nothing discovers
+    // a half-built receiver (Refresh_CombatTargetTags). Downing at zero Health is still the state machine's decision
     // (Mars_PlayerCharacter_Hfsm_Combat.as), taken by the owning copy from the Health it reads. A rejected composition
     // ensures once (each Add on its own rejection) and is not retried.
     private void ConstructCombatReceiver(FCk_Handle& InPlayer)
@@ -434,7 +434,7 @@ class AMars_PlayerCharacter : AMars_Character
         if (ck::Is_NOT_Valid(Hurtbox))
         { return; }
 
-        Refresh_CombatTargetTag();
+        Refresh_CombatTargetTags();
     }
 
     // The receiver is whole: a Health and a zone with its hurtbox.
@@ -444,22 +444,31 @@ class AMars_PlayerCharacter : AMars_Character
         return ck::IsValid(_PlayerEntity.As_Health(ECk_SanityCheck::UnChecked)) && ck::IsValid(Zone) && Zone.Get_Hurtboxes().Num() > 0;
     }
 
-    // Marks the pawn a combat target once its receiver is whole, only where this machine has authority over the player's
-    // entity and controls the pawn locally (the host's own pawn, a standalone player's). A monster is simulated on each
-    // machine until it replicates, so the authority's monsters may only choose the player whose machine shows them.
-    // Called when the receiver composes and when the controller changes; never removes the tag.
-    private void Refresh_CombatTargetTag()
+    // Marks the pawn prey once its receiver is whole, only where this machine has authority over the player's entity.
+    // TAG_MarsSharedCombatTarget goes on every pawn a player controls (the host's own, a joined player's), read by
+    // a creature that is one creature on every machine. TAG_MarsCombatTarget goes only on the pawn this machine also
+    // controls locally (the host's own, a standalone player's): it is read by a creature each machine still simulates
+    // for itself, which may only choose the player whose machine shows it. Called when the receiver composes and when
+    // the controller changes. Neither tag is removed: a pawn loses its controller only when it is destroyed.
+    private void Refresh_CombatTargetTags()
     {
         if (ck::Is_NOT_Valid(_PlayerEntity) || Get_IsCombatReceiverComposed() == false)
         { return; }
 
-        if (utils_entity_tag::Has(_PlayerEntity, n"TAG_MarsCombatTarget") || utils_net::Get_HasAuthority(_PlayerEntity) == false)
+        if (utils_net::Get_HasAuthority(_PlayerEntity) == false)
         { return; }
+
+        if (utils_net::Get_IsEntityPlayerControlled(_PlayerEntity) != ECk_Utils_Net_IsPlayerControlled_Result::IsPlayerControlled)
+        { return; }
+
+        if (utils_entity_tag::Has(_PlayerEntity, n"TAG_MarsSharedCombatTarget") == false)
+        { utils_entity_tag::Add(_PlayerEntity, n"TAG_MarsSharedCombatTarget"); }
 
         if (utils_net::Get_IsEntityLocallyControlled_ByPlayer(_PlayerEntity) != ECk_Utils_Net_IsLocallyControlled_Result::IsLocallyControlled)
         { return; }
 
-        utils_entity_tag::Add(_PlayerEntity, n"TAG_MarsCombatTarget");
+        if (utils_entity_tag::Has(_PlayerEntity, n"TAG_MarsCombatTarget") == false)
+        { utils_entity_tag::Add(_PlayerEntity, n"TAG_MarsCombatTarget"); }
     }
 
     // What this machine's own player sees of an armed throw (UMars_ThrowPreview_EntityScript, owned by the player's entity),
@@ -610,7 +619,7 @@ class AMars_PlayerCharacter : AMars_Character
     void ControllerChanged(AController OldController, AController NewController)
     {
         TryStartPlayerSm();
-        Refresh_CombatTargetTag();
+        Refresh_CombatTargetTags();
         TryConstructThrowPreviewVisual();
     }
 

@@ -339,7 +339,8 @@ class UMars_RootMaw_EntityScript : UCk_GenericEntityScript_UE
         const auto Here = _Maw.Get_Location();
         auto Striker = FCk_Handle();
         auto Best = 0.0;
-        for (auto Candidate : utils_entity_tag::ForEach_Entity(_Maw, n"TAG_MarsCombatTarget"))
+        // The nearest player's pawn: the shared tag marks every one on the machine with authority over it.
+        for (auto Candidate : utils_entity_tag::ForEach_Entity(_Maw, n"TAG_MarsSharedCombatTarget"))
         {
             if (utils_root_maw::Get_IsTargetValid(Candidate) == false)
             { continue; }

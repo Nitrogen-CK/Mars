@@ -117,7 +117,7 @@ class UMars_AutoTestRig_NetPlayerCombat : UCk_AutoTest_NetBase
         { FinishFailure("the server's world has not exactly one player controller that is not local"); }
     }
 
-    private AMars_PlayerCharacter DoSpawn_PawnAt(FVector InFeet)
+    protected AMars_PlayerCharacter DoSpawn_PawnAt(FVector InFeet)
     {
         const auto WorldContext = FAngelscriptGameThreadScopeWorldContext(Get_TestWorld());
         const auto HalfHeight = float64(mars::Mars_PlayerCharacter_Config.Body.CapsuleHalfHeight);
@@ -211,7 +211,7 @@ class UMars_AutoTestRig_NetPlayerCombat : UCk_AutoTest_NetBase
     }
 
     // The AMars_PlayerCharacter in this machine's world nearest InSpot, within k_NearCm; null without one.
-    private AMars_PlayerCharacter DoFind_PawnNear(FVector InSpot)
+    protected AMars_PlayerCharacter DoFind_PawnNear(FVector InSpot)
     {
         const auto WorldContext = FAngelscriptGameThreadScopeWorldContext(Get_TestWorld());
         auto Pawns = TArray<AActor>();
