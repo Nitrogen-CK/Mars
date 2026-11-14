@@ -1,7 +1,9 @@
-// Once per Maw: the authority drops the mirror state (its drain publishes the ledger). A machine without authority
-// binds the ledger's rep-notify and reconciles once as it stands, so a copy that composed late shows the Maw where it
-// is; each later change is reconciled as it arrives, and the tick then plays the rise, the sink and the jaw's ease on
-// this machine's clock. A reconcile raises nothing: OnStance is the tick's.
+// Once per Maw: the authority drops the mirror state (its drain and its tick publish the ledger). A machine without
+// authority binds the ledger's rep-notify and reconciles once as it stands, so a copy that composed late shows the Maw
+// where it is and a running action from its phase's start, and no past flinch; each later change is reconciled as it
+// arrives, and the tick then plays the rise, the sink, the jaw's ease and the action's phase on this machine's clock.
+// A reconcile raises OnActionPhase once per arrived action change (OnStance is the tick's); a phase that never arrived
+// because two of the authority's writes reached this machine as one is not replayed.
 class UMars_Processor_RootMaw_Mirror : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -41,8 +43,8 @@ class UMars_Processor_RootMaw_Mirror : UCk_Processor_Script_Base_UE
         Reconcile(Maw, EMars_RootMaw_Reconcile::AsItArrives);
     }
 
-    // Last is written before the state. As it stands, Emerge and the jaw are set to where the ledger has them; as it
-    // arrives, the tick runs them there.
+    // Last is written before the state and any broadcast; then the stance and the gape, the flinch, the action. As it
+    // stands, Emerge and the jaw are set to where the ledger has them; as it arrives, the tick runs them there.
     private void Reconcile(FCk_Handle_RootMaw& InMaw, EMars_RootMaw_Reconcile InHow)
     {
         const auto Ledger = InMaw.Get_Fragment(FMars_Fragment_RootMaw_Net);
@@ -50,16 +52,72 @@ class UMars_Processor_RootMaw_Mirror : UCk_Processor_Script_Base_UE
         if (ck::EnsureIfNot(Local.Last.IsSet(), f"[RootMaw] [{InMaw.ToString()}] has no mirror state off authority"))
         { return; }
 
+        const auto Last = Local.Last.GetValue();
         Local.Last = TOptional<FMars_Fragment_RootMaw_Net>(Ledger);
 
         auto& Posture = InMaw.Get_Fragment(FMars_Fragment_RootMaw_Posture);
         auto& Mouth = InMaw.Get_Fragment(FMars_Fragment_RootMaw_Mouth);
         Posture.Stance = Ledger.Stance;
         Mouth.Gape = Ledger.Gape;
-        if (InHow == EMars_RootMaw_Reconcile::AsItArrives)
+        if (InHow == EMars_RootMaw_Reconcile::AsItStands)
+        {
+            Posture.Emerge = Ledger.Stance == EMars_RootMaw_Stance::Emerged ? 1.0f : 0.0f;
+            Mouth.JawOpen = Ledger.Gape;
+        }
+
+        if (Ledger.Flinch.Count != Last.Flinch.Count)
+        { Reconcile_Flinch(InMaw, Ledger.Flinch, InHow); }
+
+        if (utils_root_maw::Get_IsSameAction(Ledger.Action, Last.Action))
         { return; }
 
-        Posture.Emerge = Ledger.Stance == EMars_RootMaw_Stance::Emerged ? 1.0f : 0.0f;
-        Mouth.JawOpen = Ledger.Gape;
+        Reconcile_Action(InMaw, Ledger.Action);
+
+        // As it stands, only a running action is announced; as it arrives, every change is, None with what ended.
+        const auto Phase = Ledger.Action.Phase;
+        if (InHow == EMars_RootMaw_Reconcile::AsItStands && Phase == EMars_RootMaw_ActionPhase::None)
+        { return; }
+
+        const auto Kind = Phase == EMars_RootMaw_ActionPhase::None ? Last.Action.Kind : Ledger.Action.Kind;
+
+        // Handlers react on the Maw (its look): scope the script world to its own.
+        const auto WorldContext = FAngelscriptGameThreadScopeWorldContext(utils_entity_lifetime::Get_WorldForEntity(InMaw));
+        utils_root_maw::Broadcast_ActionPhase(InMaw, Kind, Phase);
+    }
+
+    // The authority's flinch, field for field: as it arrives this copy's own flinch clock starts, the jaw pops wide
+    // (found buried) or slams shut, and a windup starts over; as it stands a flinch that is over is not replayed.
+    private void Reconcile_Flinch(FCk_Handle_RootMaw& InMaw, const FMars_RootMaw_NetFlinch& InFlinch, EMars_RootMaw_Reconcile InHow)
+    {
+        const auto FlinchSeconds = InMaw.Get_Spec().Vitals.FlinchSeconds;
+        auto& Hurt = InMaw.Get_Fragment(FMars_Fragment_RootMaw_Hurt);
+        Hurt.FlinchCount = InFlinch.Count;
+        Hurt.FlinchFrom = InFlinch.From;
+        Hurt.FlinchFoundIn = InFlinch.FoundIn;
+        if (InHow == EMars_RootMaw_Reconcile::AsItStands)
+        { return; }
+
+        Hurt.FlinchLeft = FlinchSeconds;
+        InMaw.Get_Fragment(FMars_Fragment_RootMaw_Mouth).JawOpen = InFlinch.FoundIn == EMars_RootMaw_Stance::Buried ? 1.0f : 0.0f;
+
+        auto& Action = InMaw.Get_Fragment(FMars_Fragment_RootMaw_Action);
+        if (Action.Phase == EMars_RootMaw_ActionPhase::Windup)
+        {
+            Action.PhaseElapsed = 0.0f;
+            Action.JawAtStart = 0.0f;
+        }
+    }
+
+    // The phase starts on this machine's clock; a windup gapes from where the jaw is now.
+    private void Reconcile_Action(FCk_Handle_RootMaw& InMaw, const FMars_RootMaw_NetAction& InAction)
+    {
+        const auto JawOpen = InMaw.Get_JawOpen();
+        auto& Action = InMaw.Get_Fragment(FMars_Fragment_RootMaw_Action);
+        Action.Kind = InAction.Kind;
+        Action.Phase = InAction.Phase;
+        Action.Generation = InAction.Generation;
+        Action.PhaseElapsed = 0.0f;
+        if (InAction.Phase == EMars_RootMaw_ActionPhase::Windup)
+        { Action.JawAtStart = JawOpen; }
     }
 }

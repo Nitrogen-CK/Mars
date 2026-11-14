@@ -87,13 +87,15 @@ class UMars_Processor_RootMaw_HandleRequests : UCk_Processor_Script_Base_UE
         if (InSelf.Get_IsDead())
         { return; }
 
-        const auto Buried = InSelf.Get_Stance() == EMars_RootMaw_Stance::Buried;
+        const auto FoundIn = InSelf.Get_Stance();
+        const auto Buried = FoundIn == EMars_RootMaw_Stance::Buried;
         const auto From = Get_BlowFrom(InSelf, InRequest.Event);
 
         auto& Hurt = InSelf.Get_Fragment(FMars_Fragment_RootMaw_Hurt);
         Hurt.FlinchLeft = InSelf.Get_Spec().Vitals.FlinchSeconds;
         Hurt.FlinchCount += 1;
         Hurt.FlinchFrom = From;
+        Hurt.FlinchFoundIn = FoundIn;
         Hurt.Startled = Hurt.Startled || Buried;
 
         InSelf.Get_Fragment(FMars_Fragment_RootMaw_Mouth).JawOpen = Buried ? 1.0f : 0.0f;

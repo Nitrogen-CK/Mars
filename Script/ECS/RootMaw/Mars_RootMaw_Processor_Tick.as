@@ -11,10 +11,13 @@
 //    holds a windup at its start (the drain restarted it); an active or recovering bite runs on;
 // 4. the jaw: the bite sets it (gape wide, slam shut, stay shut); otherwise it eases toward the latched Gape, except through
 //    a flinch, which holds it where the blow left it.
-// This processor writes no root transform: steering goes through SurfaceMotion.
-// A copy without authority runs 0 to 2 and eases the jaw toward the latched Gape (outside a flinch): no action, no
-// steering, no sweep. Its stance and gape come from the ledger (UMars_Processor_RootMaw_Mirror), its glide from the
-// replicated root.
+// This processor writes no root transform: steering goes through SurfaceMotion. The authority publishes the ledger
+// after the action (utils_root_maw::Publish).
+// It has two halves. The authority runs 0 to 4. A copy without authority runs 0 to 2, then poses the action its
+// ledger names on its own clock (TickShownAction: the phase's seconds run, capped, and the bite sets the jaw; a
+// flinch holds a windup at its start), or with none eases the jaw toward the latched Gape outside a flinch. It never
+// advances a phase, steers, sweeps or broadcasts. Its stance, gape, action phase and flinches come from the ledger
+// (UMars_Processor_RootMaw_Mirror), its glide from the replicated root.
 class UMars_Processor_RootMaw_Tick : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -43,11 +46,11 @@ class UMars_Processor_RootMaw_Tick : UCk_Processor_Script_Base_UE
         if (utils_net::Get_HasAuthority(InHandle))
         {
             TickAction(Self, DeltaSeconds);
+            utils_root_maw::Publish(Self);
             return;
         }
 
-        if (Self.Get_IsFlinching() == false)
-        { EaseJaw(Self, DeltaSeconds); }
+        TickShownAction(Self, DeltaSeconds);
     }
 
     //----------------------------------------------------------------------------------------------------------------------
@@ -204,6 +207,32 @@ class UMars_Processor_RootMaw_Tick : UCk_Processor_Script_Base_UE
 
         if (Changed)
         { utils_root_maw::Broadcast_ActionPhase(InSelf, Kind, Phase); }
+    }
+
+    // A copy without authority poses the action its ledger told it of, on this machine's clock: a flinch holds a windup
+    // at its start; otherwise the phase's clock runs, capped at the phase's seconds, and the bite sets the jaw. The
+    // mirror alone changes the phase; nothing here steers, sweeps or broadcasts.
+    private void TickShownAction(FCk_Handle_RootMaw& InSelf, float32 InDeltaSeconds)
+    {
+        const auto Flinching = InSelf.Get_IsFlinching();
+        auto Action = InSelf.Get_Action();
+        if (Action.Kind == EMars_RootMaw_Action::None)
+        {
+            if (Flinching == false)
+            { EaseJaw(InSelf, InDeltaSeconds); }
+
+            return;
+        }
+
+        if (Flinching && Action.Phase == EMars_RootMaw_ActionPhase::Windup)
+        { return; }
+
+        const auto Spec = InSelf.Get_Spec();
+        const auto PhaseSeconds = utils_root_maw::Get_PhaseSeconds(Spec.Bite.Timing, Action.Phase);
+        Action.PhaseElapsed = Math::Min(Action.PhaseElapsed + InDeltaSeconds, PhaseSeconds);
+        InSelf.Get_Fragment(FMars_Fragment_RootMaw_Action).PhaseElapsed = Action.PhaseElapsed;
+        InSelf.Get_Fragment(FMars_Fragment_RootMaw_Mouth).JawOpen =
+            utils_root_maw::Get_BiteJaw(utils_root_maw::Make_Frame(Spec, Action), Action.JawAtStart);
     }
 
     private void Advance(FMars_Fragment_RootMaw_Action& InOutAction)

@@ -3,8 +3,22 @@
 // spawn owner (its root Clearance above the floor, facing +X, without visuals) and, when a row needs one, a prey
 // stand-in owned by the subject (so it exists on the server only). Each machine finds its copy by tag near the base,
 // takes its Maw, its monster's body Health and body zone, counts the OnStance and the OnDied its own copy raises and
-// the OnDamaged of its body Health, and samples it from the row's polled predicates: the largest distance the root
-// moved between two samples, the highest Emerge, and the first frame its ledger read Emerged.
+// the OnDamaged of its body Health, records the OnActionPhase (with its frame) and counts the OnBlowLanded its copy
+// raises, and samples it from the row's polled predicates: the largest distance the root moved between two samples,
+// the highest Emerge, the first frame its ledger read Emerged, the widest jaw while its action read Windup, the lowest
+// while it read Recover, the widest since its flinch count last changed, and whether it ever read flinching.
+struct FMars_NetRootMawTest_Phase
+{
+    UPROPERTY()
+    EMars_RootMaw_Action Action = EMars_RootMaw_Action::None;
+
+    UPROPERTY()
+    EMars_RootMaw_ActionPhase Phase = EMars_RootMaw_ActionPhase::None;
+
+    UPROPERTY()
+    int32 Frame = -1;
+}
+
 UCLASS(Abstract)
 class UMars_AutoTestRig_NetRootMaw : UMars_AutoTestRig_NetStrike
 {
@@ -29,6 +43,14 @@ class UMars_AutoTestRig_NetRootMaw : UMars_AutoTestRig_NetStrike
     protected float64 _MawLargestStep = 0.0;
     protected float32 _MawHighestEmerge = 0.0f;
     protected FVector _MawFoundAt = FVector::ZeroVector;
+    protected FCk_Handle_Health _PreyHealth;
+    protected TArray<FMars_NetRootMawTest_Phase> _MawPhases;
+    protected int32 _MawBlows = 0;
+    protected float32 _MawWidestInWindup = -1.0f;
+    protected float32 _MawLowestInRecover = 2.0f;
+    protected float32 _MawWidestSinceFlinch = -1.0f;
+    protected bool _MawEverFlinched = false;
+    private int32 _MawFlinchCountSeen = 0;
     private TOptional<FVector> _MawLastSample;
     private float64 _MawSampleUntil = 0.0;
 
@@ -79,7 +101,7 @@ class UMars_AutoTestRig_NetRootMaw : UMars_AutoTestRig_NetStrike
         auto Entity = utils_entity_lifetime::Request_CreateEntity(Subject);
         _PreyRoot = utils_transform::Add(Entity, FTransform(FRotator::ZeroRotator, Get_PreyLocation(InOffset)), ECk_Replication::DoesNotReplicate);
         utils_team::Add(Entity, ECk_Team_ID::One, ECk_Replication::DoesNotReplicate);
-        utils_health::Add(Entity, FMars_Health_Spec(100.0f));
+        _PreyHealth = utils_health::Add(Entity, FMars_Health_Spec(100.0f));
         auto Zone = utils_hit_zone::Add(Entity, utils_hit_zone::Make_FleshZoneSpec(GameplayTags::HitZone_Mars_Body, 1.0f));
         utils_hit_zone::AddHurtbox_Box(Zone, _PreyRoot, FMars_HitZone_Hurtbox(FVector(35.0, 35.0, 90.0), FTransform::Identity));
         utils_entity_tag::Add(Entity, n"TAG_MarsCombatTarget");
@@ -93,6 +115,12 @@ class UMars_AutoTestRig_NetRootMaw : UMars_AutoTestRig_NetStrike
     protected FVector Get_PreyLocation(FVector InOffset) const
     {
         return _Base + InOffset + FVector(0.0, 0.0, 90.0);
+    }
+
+    // A Sever hit of InAmount on this machine's copy of the body zone, with no instigator.
+    protected void Hit_MawZone(float32 InAmount)
+    {
+        _Zone.Request_Hit(FMars_Request_HitZone_Hit(FMars_DamageEvent(InAmount, GameplayTags::DamageType_Mars_Sever)));
     }
 
     //----------------------------------------------------------------------------------------------------------------------
@@ -131,6 +159,8 @@ class UMars_AutoTestRig_NetRootMaw : UMars_AutoTestRig_NetStrike
             _Maw.BindTo_OnStance(FMars_Delegate_RootMaw_OnStance(this, n"OnMawStance"));
             _MawMonster.BindTo_OnDied(FMars_Delegate_Monster_OnDied(this, n"OnMawDied"));
             _Health.BindTo_OnDamaged(FMars_Delegate_Health_OnDamaged(this, n"OnMawDamaged"));
+            _Maw.BindTo_OnActionPhase(FMars_Delegate_RootMaw_OnActionPhase(this, n"OnMawActionPhase"));
+            _Maw.BindTo_OnBlowLanded(FMars_Delegate_RootMaw_OnBlowLanded(this, n"OnMawBlowLanded"));
             if (Get_IsServer())
             { Track_ForCleanup(Candidate); }
 
@@ -221,6 +251,111 @@ class UMars_AutoTestRig_NetRootMaw : UMars_AutoTestRig_NetStrike
         _MawHighestEmerge = Math::Max(_MawHighestEmerge, _Maw.Get_Emerge());
         if (_MawLedgerEmergedFrame < 0 && Get_HasMawLedger() && Get_MawLedger().Stance == EMars_RootMaw_Stance::Emerged)
         { _MawLedgerEmergedFrame = int32(utils_time::Get_FrameCounter()); }
+
+        const auto Jaw = _Maw.Get_JawOpen();
+        const auto Phase = _Maw.Get_Action().Phase;
+        if (Phase == EMars_RootMaw_ActionPhase::Windup)
+        { _MawWidestInWindup = Math::Max(_MawWidestInWindup, Jaw); }
+
+        if (Phase == EMars_RootMaw_ActionPhase::Recover)
+        { _MawLowestInRecover = Math::Min(_MawLowestInRecover, Jaw); }
+
+        const auto FlinchCount = _Maw.Get_Hurt().FlinchCount;
+        if (FlinchCount != _MawFlinchCountSeen)
+        {
+            _MawFlinchCountSeen = FlinchCount;
+            _MawWidestSinceFlinch = Jaw;
+        }
+        else
+        { _MawWidestSinceFlinch = Math::Max(_MawWidestSinceFlinch, Jaw); }
+
+        _MawEverFlinched = _MawEverFlinched || _Maw.Get_IsFlinching();
+    }
+
+    //----------------------------------------------------------------------------------------------------------------------
+    // The recorded phases
+    //----------------------------------------------------------------------------------------------------------------------
+
+    // Where a phase falls in a bite: Windup, Active, Recover, None.
+    private int32 Get_PhaseRank(EMars_RootMaw_ActionPhase InPhase) const
+    {
+        if (InPhase == EMars_RootMaw_ActionPhase::Windup)
+        { return 0; }
+
+        if (InPhase == EMars_RootMaw_ActionPhase::Active)
+        { return 1; }
+
+        if (InPhase == EMars_RootMaw_ActionPhase::Recover)
+        { return 2; }
+
+        return 3;
+    }
+
+    private int32 Get_FirstPhaseIndex(EMars_RootMaw_ActionPhase InPhase, int32 InFrom) const
+    {
+        for (auto Index = InFrom; Index < _MawPhases.Num(); ++Index)
+        {
+            if (_MawPhases[Index].Phase == InPhase)
+            { return Index; }
+        }
+
+        return -1;
+    }
+
+    // A None was recorded after a Windup.
+    protected bool Get_HasMawBiteEnded() const
+    {
+        const auto WindupAt = Get_FirstPhaseIndex(EMars_RootMaw_ActionPhase::Windup, 0);
+        return WindupAt >= 0 && Get_FirstPhaseIndex(EMars_RootMaw_ActionPhase::None, WindupAt + 1) >= 0;
+    }
+
+    // From the first Windup to the first None after it, each phase later than the one before.
+    protected bool Get_AreMawPhasesInOrder() const
+    {
+        const auto WindupAt = Get_FirstPhaseIndex(EMars_RootMaw_ActionPhase::Windup, 0);
+        if (WindupAt < 0)
+        { return false; }
+
+        const auto EndedAt = Get_FirstPhaseIndex(EMars_RootMaw_ActionPhase::None, WindupAt + 1);
+        if (EndedAt < 0)
+        { return false; }
+
+        for (auto Index = WindupAt + 1; Index <= EndedAt; ++Index)
+        {
+            if (Get_PhaseRank(_MawPhases[Index].Phase) <= Get_PhaseRank(_MawPhases[Index - 1].Phase))
+            { return false; }
+        }
+
+        return true;
+    }
+
+    protected int32 Count_MawPhases(EMars_RootMaw_Action InAction, EMars_RootMaw_ActionPhase InPhase) const
+    {
+        auto Count = 0;
+        for (const auto& Recorded : _MawPhases)
+        {
+            if (Recorded.Action == InAction && Recorded.Phase == InPhase)
+            { ++Count; }
+        }
+
+        return Count;
+    }
+
+    protected FString Describe_MawPhases() const
+    {
+        FString Text = "";
+        for (const auto& Recorded : _MawPhases)
+        { Text += f"{Recorded.Action :n}/{Recorded.Phase :n}@{Recorded.Frame},"; }
+
+        return Text;
+    }
+
+    UFUNCTION()
+    protected void Is_MawBiteEnded(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Result = OutResult;
+        Result.Set(Get_IsMawFound() && Get_HasMawBiteEnded());
+        Sample_Maw();
     }
 
     // A wall-clock settle that keeps sampling the copy every frame, then InContinuation.
@@ -261,11 +396,20 @@ class UMars_AutoTestRig_NetRootMaw : UMars_AutoTestRig_NetStrike
         if (IsFound && Get_HasMawLedger())
         {
             const auto Ledger = Get_MawLedger();
-            LedgerText = f"{Ledger.Stance :n} {Ledger.Gape}";
+            LedgerText = f"{Ledger.Stance :n} {Ledger.Gape} action {Ledger.Action.Kind :n}/{Ledger.Action.Phase :n}/{Ledger.Action.Generation} flinch {Ledger.Flinch.Count}/{Ledger.Flinch.FoundIn :n}/{Ledger.Flinch.From.ToString()}";
+        }
+
+        FString ActionText = "none";
+        if (IsFound)
+        {
+            const auto Action = _Maw.Get_Action();
+            const auto Hurt = _Maw.Get_Hurt();
+            ActionText = f"{Action.Kind :n}/{Action.Phase :n}/{Action.Generation} elapsed {Action.PhaseElapsed} flinches {Hurt.FlinchCount}/{Hurt.FlinchFoundIn :n} flinchLeft {Hurt.FlinchLeft}";
         }
 
         const auto Body = IsFound && ck::IsValid(_Health) ? _Health.Get_Current() : -1.0f;
-        const auto Line = f"[RootMawNetTest] {InRow} {Get_MachineName()} stance={Stance} emerge={Emerge} jaw={Jaw} root={Location.ToString()} drop={Drop} travelled={Travelled} largestStep={_MawLargestStep} highestEmerge={_MawHighestEmerge} ledger=[{LedgerText}] ledgerEmergedFrame={_MawLedgerEmergedFrame} onEmerged={_MawEmergedStances} onBuried={_MawBuriedStances} emergedFrame={_MawEmergedFrame} died={_MawDied} damaged={_MawDamaged} body={Body} ensures={Get_NewEnsures()} frame={utils_time::Get_FrameCounter()} {InExtra}";
+        const auto Phases = Describe_MawPhases();
+        const auto Line = f"[RootMawNetTest] {InRow} {Get_MachineName()} stance={Stance} emerge={Emerge} jaw={Jaw} root={Location.ToString()} drop={Drop} travelled={Travelled} largestStep={_MawLargestStep} highestEmerge={_MawHighestEmerge} ledger=[{LedgerText}] ledgerEmergedFrame={_MawLedgerEmergedFrame} onEmerged={_MawEmergedStances} onBuried={_MawBuriedStances} emergedFrame={_MawEmergedFrame} died={_MawDied} damaged={_MawDamaged} body={Body} action=[{ActionText}] phases=[{Phases}] blows={_MawBlows} widestWindup={_MawWidestInWindup} lowestRecover={_MawLowestInRecover} widestSinceFlinch={_MawWidestSinceFlinch} everFlinched={_MawEverFlinched} ensures={Get_NewEnsures()} frame={utils_time::Get_FrameCounter()} {InExtra}";
         Log(Line);
     }
 
@@ -301,6 +445,22 @@ class UMars_AutoTestRig_NetRootMaw : UMars_AutoTestRig_NetStrike
         }
 
         _MawBuriedStances += 1;
+    }
+
+    UFUNCTION()
+    private void OnMawActionPhase(FCk_Handle_RootMaw InMaw, EMars_RootMaw_Action InAction, EMars_RootMaw_ActionPhase InPhase)
+    {
+        auto Recorded = FMars_NetRootMawTest_Phase();
+        Recorded.Action = InAction;
+        Recorded.Phase = InPhase;
+        Recorded.Frame = int32(utils_time::Get_FrameCounter());
+        _MawPhases.Add(Recorded);
+    }
+
+    UFUNCTION()
+    private void OnMawBlowLanded(FCk_Handle_RootMaw InMaw, EMars_RootMaw_Action InAction, FCk_Handle_HitZone InZone)
+    {
+        _MawBlows += 1;
     }
 
     UFUNCTION()

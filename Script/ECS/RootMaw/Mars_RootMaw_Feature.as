@@ -15,7 +15,10 @@ asset Mars_RootMawHandle of UCkDynamic_HandleDefinition
 // root transform replicates with it. A copy without authority runs the posture, the travel and the jaw's ease on its
 // own clock from that ledger (UMars_Processor_RootMaw_Mirror) and from the replicated root, drops every request, is
 // struck through the strike claim and dies when its monster's ledger does. A copy that composes late shows the stance
-// and the gape as they stand; its body zone goes off when its monster dies.
+// and the gape as they stand; its body zone goes off when its monster dies. The running action crosses as a level
+// (its kind, phase and generation) and a client times each phase from its arrival; a flinch crosses as a count with
+// where it came from and the stance it found the Maw in. A late copy shows a running action from its phase's start and
+// no past flinch. The blow, the sweep and OnBlowLanded are the authority's alone.
 struct FMars_Feature_RootMaw {}
 
 // Until UMars_Processor_RootMaw_Setup has bound the body zone's hits to TakeHit.
@@ -398,7 +401,8 @@ enum EMars_RootMaw_Admission
     Facing
 }
 
-// The one running action and its clocks. Written only by the request drain and the action tick.
+// The one running action and its clocks. Written only by the request drain and the action tick; on a copy without
+// authority, by the mirror (kind, phase, generation, the phase's start) and the tick (the phase's clock).
 struct FMars_Fragment_RootMaw_Action
 {
     UPROPERTY()
@@ -438,7 +442,8 @@ struct FMars_Fragment_RootMaw_Action
     float32 JawAtStart = 0.0f;
 }
 
-// What blows have done to it. Written only by the request drain (a TakeHit) and the tick (the clocks).
+// What blows have done to it. Written only by the request drain (a TakeHit) and the tick (the clocks); on a copy
+// without authority the mirror writes each arrived flinch in the drain's place.
 struct FMars_Fragment_RootMaw_Hurt
 {
     // Seconds of flinch left (0: not flinching).
@@ -452,6 +457,10 @@ struct FMars_Fragment_RootMaw_Hurt
     // Along the ground, from the Maw toward where the last flinching blow came from (zero when it cannot tell).
     UPROPERTY()
     FVector FlinchFrom = FVector::ZeroVector;
+
+    // The stance the last flinching blow found it in.
+    UPROPERTY()
+    EMars_RootMaw_Stance FlinchFoundIn = EMars_RootMaw_Stance::Buried;
 
     // A blow found it buried: it bursts up whatever the distance. Held until it is next fully up (or dies).
     UPROPERTY()
@@ -467,8 +476,34 @@ struct FMars_Fragment_RootMaw_Targeting
     float32 SenseClock = 0.0f;
 }
 
-// The replicated ledger on the root: the stance and the latched gape. Written only by utils_root_maw::Publish, from the
-// authority's request drain.
+// The running action as a level: what runs, its phase and the Start that began it.
+struct FMars_RootMaw_NetAction
+{
+    UPROPERTY()
+    EMars_RootMaw_Action Kind = EMars_RootMaw_Action::None;
+
+    UPROPERTY()
+    EMars_RootMaw_ActionPhase Phase = EMars_RootMaw_ActionPhase::None;
+
+    UPROPERTY()
+    int32 Generation = 0;
+}
+
+// The last flinch: a count (so each one is seen), where the blow came from and the stance it found the Maw in.
+struct FMars_RootMaw_NetFlinch
+{
+    UPROPERTY()
+    int32 Count = 0;
+
+    UPROPERTY()
+    FVector From = FVector::ZeroVector;
+
+    UPROPERTY()
+    EMars_RootMaw_Stance FoundIn = EMars_RootMaw_Stance::Buried;
+}
+
+// The replicated ledger on the root: the stance, the latched gape, the running action and the last flinch. Written
+// only by utils_root_maw::Publish, from the authority's request drain and its tick.
 struct FMars_Fragment_RootMaw_Net
 {
     UPROPERTY()
@@ -476,6 +511,12 @@ struct FMars_Fragment_RootMaw_Net
 
     UPROPERTY()
     float32 Gape = 0.0f;
+
+    UPROPERTY()
+    FMars_RootMaw_NetAction Action;
+
+    UPROPERTY()
+    FMars_RootMaw_NetFlinch Flinch;
 }
 
 // Each machine's own: the ledger the mirror last reconciled (unset with authority).
@@ -504,7 +545,8 @@ enum EMars_RootMaw_Reconcile
 delegate void FMars_Delegate_RootMaw_OnActionPhase(FCk_Handle_RootMaw InMaw, EMars_RootMaw_Action InAction, EMars_RootMaw_ActionPhase InPhase);
 event void FMars_Delegate_RootMaw_OnActionPhase_MC(FCk_Handle_RootMaw InMaw, EMars_RootMaw_Action InAction, EMars_RootMaw_ActionPhase InPhase);
 
-// A blow landed on a zone (the zone's own OnHit carries the damage).
+// A blow landed on a zone (the zone's own OnHit carries the damage). Raised only on a machine with authority over the
+// Maw: a copy without it never sweeps.
 delegate void FMars_Delegate_RootMaw_OnBlowLanded(FCk_Handle_RootMaw InMaw, EMars_RootMaw_Action InAction, FCk_Handle_HitZone InZone);
 event void FMars_Delegate_RootMaw_OnBlowLanded_MC(FCk_Handle_RootMaw InMaw, EMars_RootMaw_Action InAction, FCk_Handle_HitZone InZone);
 

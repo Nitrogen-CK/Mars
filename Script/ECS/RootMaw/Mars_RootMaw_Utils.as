@@ -173,21 +173,38 @@ namespace utils_root_maw
         return RootEntity.As_RootMaw();
     }
 
-    // The ledger's only writer, called last by the authority's request drain: the stance and the latched gape as they
-    // stand, written and marked dirty only when they differ from the stored ledger.
+    // The ledger's only writer, called last by the authority's request drain and at the end of its tick: the stance,
+    // the latched gape, the running action and the last flinch as they stand, written and marked dirty only when they
+    // differ from the stored ledger.
     void Publish(FCk_Handle_RootMaw& InSelf)
     {
+        const auto Action = InSelf.Get_Action();
+        const auto Hurt = InSelf.Get_Hurt();
+
         auto Next = FMars_Fragment_RootMaw_Net();
         Next.Stance = InSelf.Get_Fragment(FMars_Fragment_RootMaw_Posture).Stance;
         Next.Gape = InSelf.Get_Fragment(FMars_Fragment_RootMaw_Mouth).Gape;
+        Next.Action.Kind = Action.Kind;
+        Next.Action.Phase = Action.Phase;
+        Next.Action.Generation = Action.Generation;
+        Next.Flinch.Count = Hurt.FlinchCount;
+        Next.Flinch.From = Hurt.FlinchFrom;
+        Next.Flinch.FoundIn = Hurt.FlinchFoundIn;
 
         auto& Ledger = InSelf.Get_Fragment(FMars_Fragment_RootMaw_Net);
-        if (Ledger.Stance == Next.Stance && Ledger.Gape == Next.Gape)
+        if (Ledger.Stance == Next.Stance && Ledger.Gape == Next.Gape && Get_IsSameAction(Ledger.Action, Next.Action)
+            && Ledger.Flinch.Count == Next.Flinch.Count && Ledger.Flinch.From.Equals(Next.Flinch.From, 0.0)
+            && Ledger.Flinch.FoundIn == Next.Flinch.FoundIn)
         { return; }
 
         Ledger = Next;
         FCk_Handle Entity = InSelf;
         Entity.Request_MarkReplicationDirty(FMars_Fragment_RootMaw_Net);
+    }
+
+    bool Get_IsSameAction(const FMars_RootMaw_NetAction& InA, const FMars_RootMaw_NetAction& InB)
+    {
+        return InA.Kind == InB.Kind && InA.Phase == InB.Phase && InA.Generation == InB.Generation;
     }
 
     //----------------------------------------------------------------------------------------------------------------------
