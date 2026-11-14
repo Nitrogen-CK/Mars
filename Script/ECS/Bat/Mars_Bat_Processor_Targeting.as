@@ -1,10 +1,12 @@
-// Chooses the bat's target every SenseInterval among the entities tagged TAG_MarsCombatTarget in its world that are Hostile
-// to it and within HomeRadius of its hang point: a held target is kept while it stays valid, Hostile, near home and within
-// LoseRadius of the bat; otherwise the nearest within AcquireRadius wins (equal distances go to the lower handle string).
-// A target it could not fly to is passed over while IgnoreLeft runs. A bat that is down holds none. Every change of
-// target broadcasts OnTargetChanged (a target that went invalid is a change to none). With Sensing.SearchSeconds set, a
-// hostile target lost only by distance (past LoseRadius, still within HomeRadius) leaves its last sensed location behind
-// (LastKnown) until a target is held again or the control layer ends its search.
+// Chooses the bat's target every SenseInterval among the entities tagged TAG_MarsSharedCombatTarget in its world (every
+// player's pawn, on the machine with authority over it) that are Hostile to it and within HomeRadius of its hang point:
+// a held target is kept while it stays valid, Hostile, near home and within LoseRadius of the bat; otherwise the
+// nearest within AcquireRadius wins (equal distances go to the lower handle string). A target it could not fly to is
+// passed over while IgnoreLeft runs. A bat that is down holds none. Every change of target broadcasts OnTargetChanged
+// (a target that went invalid is a change to none). With Sensing.SearchSeconds set, a hostile target lost only by
+// distance (past LoseRadius, still within HomeRadius) leaves its last sensed location behind (LastKnown) until a target
+// is held again or the control layer ends its search. Only a machine with authority over the bat chooses: a copy holds
+// no target and raises no OnTargetChanged.
 class UMars_Processor_Bat_Targeting : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -20,6 +22,12 @@ class UMars_Processor_Bat_Targeting : UCk_Processor_Script_Base_UE
     {
         if (utils_entity_lifetime::Get_IsPendingDestroy(InHandle, ECk_EntityLifetime_DestructionPhase::BeginDestroy))
         { return; }
+
+        if (utils_net::Get_HasAuthority(InHandle) == false)
+        { return; }
+
+        // Handlers react on the bat (its state machine): scope the script world to its own.
+        const auto WorldContext = FAngelscriptGameThreadScopeWorldContext(utils_entity_lifetime::Get_WorldForEntity(InHandle));
 
         auto Self = InHandle.As_Bat();
         const auto Previous = Self.Get_Target();
@@ -104,7 +112,7 @@ class UMars_Processor_Bat_Targeting : UCk_Processor_Script_Base_UE
 
         auto Best = FCk_Handle();
         auto BestDistance = 0.0;
-        for (auto Candidate : utils_entity_tag::ForEach_Entity(InSelf, n"TAG_MarsCombatTarget"))
+        for (auto Candidate : utils_entity_tag::ForEach_Entity(InSelf, n"TAG_MarsSharedCombatTarget"))
         {
             if (Get_IsKeepable(InSelf, Candidate, InRadius) == false)
             { continue; }

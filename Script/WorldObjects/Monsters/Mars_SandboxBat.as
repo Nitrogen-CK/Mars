@@ -318,15 +318,16 @@ enum EMars_CellarBatReview_WalkStage
     Hidden
 }
 
-// The review dummy: a post the size of the room 5 target dummy (60 x 60 x 120, origin at its base) on team Two, a combat
-// target (TAG_MarsCombatTarget) with a Health, one Body zone and one hurtbox over the post. Unlike UMars_TargetDummy_EntityScript
-// its post draws without collision: a BlockAll post reaches the Jolt static world (LiveExtract takes runtime components),
-// the voxel bake carves it out of the flight volume with the bat's clearance, and the bat's swoop admission then refuses
-// every aim point on it (seen in PIE 2026-11-05: (600,0,80..170) not free, (600,0,200) free). Every OnDamaged is counted
-// and logged for the review; it never flattens (MaxHealth is high).
+// The review dummy: a post the size of the room 5 target dummy (60 x 60 x 120, origin at its base) on team Two, a
+// combat target (TAG_MarsSharedCombatTarget) with a Health, one Body zone and one hurtbox over the post. Unlike
+// UMars_TargetDummy_EntityScript its post draws without collision: a BlockAll post reaches the Jolt static world
+// (LiveExtract takes runtime components), the voxel bake carves it out of the flight volume with the bat's clearance,
+// and the bat's swoop admission then refuses every aim point on it (seen in PIE 2026-11-05: (600,0,80..170) not free,
+// (600,0,200) free). Every OnDamaged is counted and logged for the review; it never flattens (MaxHealth is high).
 class UMars_CellarBatReview_TargetDummy_EntityScript : UCk_GenericEntityScript_UE
 {
     default _ShowInPlaceActors = true;
+    // Each machine's own: it walks its own loop, and only the authority's bat hunts it.
     default _Replication = ECk_Replication::DoesNotReplicate;
 
     UPROPERTY(ExposeOnSpawn)
@@ -370,7 +371,7 @@ class UMars_CellarBatReview_TargetDummy_EntityScript : UCk_GenericEntityScript_U
         }
 
         utils_team::Add(InHandle, ECk_Team_ID::Two, ECk_Replication::DoesNotReplicate);
-        utils_entity_tag::Add(InHandle, n"TAG_MarsCombatTarget");
+        utils_entity_tag::Add(InHandle, n"TAG_MarsSharedCombatTarget");
 
         auto Health = utils_health::Add(InHandle, FMars_Health_Spec(MaxHealth));
         if (ck::Is_NOT_Valid(Health))

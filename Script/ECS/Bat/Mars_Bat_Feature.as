@@ -9,6 +9,15 @@ asset Mars_BatHandle of UCkDynamic_HandleDefinition
     Description = "A flying bat: hangs from a roost, flies a CkCrowd flying agent through a CkVoxelNav volume, telegraphs and commits one swoop at a hostile target, and falls when it dies";
 }
 
+// Replication: the authority spawns the bat and alone composes what decides and moves it (the crowd agent with its
+// velocity, acceleration and integrator, the voxel path, the damage dealer, the roost claim, the blackboards and the
+// state machine), applies its requests and runs its senses. Its drain and its tick publish the ledger
+// (FMars_Fragment_Bat_Net: the phase and the place it hangs from) through utils_bat::Publish, its one writer; the root
+// transform replicates with it. A copy without authority follows the replicated root, shows the ledger's phase on its
+// own clock (UMars_Processor_Bat_Mirror), measures its own telemetry from that root, hangs from the ledger's place,
+// drops every request, is struck through the strike claim and dies when its monster's ledger does. A copy that
+// composes late shows the phase and the place as they stand and hears no past change. The roost and the flight volume
+// are the authority's; the blow, the sweep, the fall and the corpse are the authority's alone.
 struct FMars_Feature_Bat {}
 
 // Until UMars_Processor_Bat_Setup has bound the body zone, the crowd agent and the voxel path to the kernel.
@@ -144,7 +153,8 @@ struct FMars_Bat_Flight
     float32 ArrivalRadius = 30.0f;
 }
 
-// What it notices. Targets are entities tagged TAG_MarsCombatTarget and Hostile to it.
+// What it notices (UMars_Processor_Bat_Targeting): among the entities tagged TAG_MarsSharedCombatTarget (every player's
+// pawn, on the machine with authority over it) and Hostile to it.
 struct FMars_Bat_Sensing
 {
     UPROPERTY()
@@ -540,6 +550,10 @@ struct FMars_Bat_Perch
     // The roost entity claimed or being claimed (invalid when Unowned).
     UPROPERTY()
     FCk_Handle Owner;
+
+    // The place the ledger says it hangs from, set only on a copy without authority (by UMars_Processor_Bat_Mirror).
+    UPROPERTY()
+    TOptional<FVector> ShownAnchor;
 }
 
 struct FMars_Bat_Hurt
@@ -591,7 +605,8 @@ struct FMars_Bat_Fall
     float32 Elapsed = 0.0f;
 }
 
-// Written only by the bat's processors (HandleRequests, Setup, Targeting, Tick).
+// Written only by the bat's processors: the authority's HandleRequests, Setup, Targeting and Tick, and on a copy
+// without authority the Tick (telemetry, the phase clock) and UMars_Processor_Bat_Mirror (the phase, the shown anchor).
 struct FMars_Fragment_Bat
 {
     UPROPERTY()
@@ -645,6 +660,35 @@ struct FMars_Fragment_Bat
 
     UPROPERTY()
     FMars_Bat_Fall Fall;
+}
+
+// The replicated ledger on the root: the phase and the place it hangs from. Written only by utils_bat::Publish, from
+// the authority's request drain and its tick.
+struct FMars_Fragment_Bat_Net
+{
+    UPROPERTY()
+    EMars_Bat_Phase Phase = EMars_Bat_Phase::Roosting;
+
+    UPROPERTY()
+    FVector PerchAnchor = FVector::ZeroVector;
+}
+
+// Each machine's own: the ledger the mirror last reconciled (unset with authority).
+struct FMars_Fragment_Bat_Local
+{
+    UPROPERTY()
+    TOptional<FMars_Fragment_Bat_Net> Last;
+}
+
+// Added by utils_bat::Add, dropped by UMars_Processor_Bat_Mirror once it has bound the ledger's rep-notify.
+struct FMars_Tag_Bat_NeedsMirror {}
+
+// How a copy without authority takes the ledger: as it stands when the copy binds (a copy that composed late shows the
+// bat's phase and place as they are), or as each change arrives (the phase then starts on this machine's clock).
+enum EMars_Bat_Reconcile
+{
+    AsItStands,
+    AsItArrives
 }
 
 // The control layer's own working state (the patrol's next node), written only by UMars_SmTask_Bat_Patrol; no processor
@@ -754,23 +798,29 @@ struct FMars_Fragment_BatRoost_Requests
 // Signals
 //--------------------------------------------------------------------------------------------------------------------------
 
+// Every phase change, on every machine: the authority's drain and tick raise it as they write; a copy without authority
+// raises it once per change that arrives in its ledger (UMars_Processor_Bat_Mirror). The others are the authority's
+// alone.
 delegate void FMars_Delegate_Bat_OnPhaseChanged(FCk_Handle_Bat InBat, EMars_Bat_Phase InFrom, EMars_Bat_Phase InTo);
 event void FMars_Delegate_Bat_OnPhaseChanged_MC(FCk_Handle_Bat InBat, EMars_Bat_Phase InFrom, EMars_Bat_Phase InTo);
 
-// The one damage result of swoop InGeneration (the zone's own OnHit carries the damage).
+// The one damage result of swoop InGeneration (the zone's own OnHit carries the damage). The authority's tick only.
 delegate void FMars_Delegate_Bat_OnSwoopLanded(FCk_Handle_Bat InBat, int32 InGeneration, FCk_Handle_HitZone InZone);
 event void FMars_Delegate_Bat_OnSwoopLanded_MC(FCk_Handle_Bat InBat, int32 InGeneration, FCk_Handle_HitZone InZone);
 
+// The authority's drain and tick only.
 delegate void FMars_Delegate_Bat_OnSwoopCancelled(FCk_Handle_Bat InBat, int32 InGeneration, EMars_Bat_SwoopCancel InReason);
 event void FMars_Delegate_Bat_OnSwoopCancelled_MC(FCk_Handle_Bat InBat, int32 InGeneration, EMars_Bat_SwoopCancel InReason);
 
-// Every answer to a FlyTo (Reached and each failure), once per route generation.
+// Every answer to a FlyTo (Reached and each failure), once per route generation. The authority's drain only.
 delegate void FMars_Delegate_Bat_OnRouteOutcome(FCk_Handle_Bat InBat, int32 InGeneration, EMars_Bat_RouteOutcome InOutcome);
 event void FMars_Delegate_Bat_OnRouteOutcome_MC(FCk_Handle_Bat InBat, int32 InGeneration, EMars_Bat_RouteOutcome InOutcome);
 
+// The authority's tick only.
 delegate void FMars_Delegate_Bat_OnPerchLost(FCk_Handle_Bat InBat, FCk_Handle InOwner);
 event void FMars_Delegate_Bat_OnPerchLost_MC(FCk_Handle_Bat InBat, FCk_Handle InOwner);
 
+// The authority's targeting and drain only.
 delegate void FMars_Delegate_Bat_OnTargetChanged(FCk_Handle_Bat InBat, FCk_Handle InTarget);
 event void FMars_Delegate_Bat_OnTargetChanged_MC(FCk_Handle_Bat InBat, FCk_Handle InTarget);
 

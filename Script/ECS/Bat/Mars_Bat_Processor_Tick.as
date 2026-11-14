@@ -16,7 +16,11 @@
 // 6. telemetry from the root's own motion (speed, signed turn rate, pitch);
 // 7. the phase clock.
 // The crowd agent writes the root transform while the bat flies; this processor writes it only while Falling, after the
-// agent was taken out of the crowd.
+// agent was taken out of the crowd, and while it climbs (5).
+// It has two halves. The authority runs 0 to 7 and publishes the ledger last (utils_bat::Publish). A copy without
+// authority runs only 6 and 7: it measures its telemetry from the replicated root and runs the phase clock of the
+// phase its ledger names (UMars_Processor_Bat_Mirror); it never searches a volume, claims a roost, sweeps, falls or
+// climbs.
 class UMars_Processor_Bat_Tick : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -36,18 +40,28 @@ class UMars_Processor_Bat_Tick : UCk_Processor_Script_Base_UE
         if (utils_entity_lifetime::Get_IsPendingDestroy(InHandle, ECk_EntityLifetime_DestructionPhase::BeginDestroy))
         { return; }
 
+        // Handlers react on the bat (its state machine, its look): scope the script world to its own.
+        const auto WorldContext = FAngelscriptGameThreadScopeWorldContext(utils_entity_lifetime::Get_WorldForEntity(InHandle));
+
         auto Self = InHandle.As_Bat();
         const auto DeltaSeconds = float32(InDeltaT.Get_Seconds());
+        const auto HasAuthority = utils_net::Get_HasAuthority(InHandle);
 
-        TickVolume(Self);
-        TickPerch(Self);
-        TickHurt(Self, DeltaSeconds);
-        TickSwoop(Self, DeltaSeconds);
-        TickFall(Self, DeltaSeconds);
-        TickUnstick(Self, DeltaSeconds);
+        if (HasAuthority)
+        {
+            TickVolume(Self);
+            TickPerch(Self);
+            TickHurt(Self, DeltaSeconds);
+            TickSwoop(Self, DeltaSeconds);
+            TickFall(Self, DeltaSeconds);
+            TickUnstick(Self, DeltaSeconds);
+        }
+
         TickTelemetry(Self, DeltaSeconds);
-
         Self.Get_Fragment(FMars_Fragment_Bat).PhaseClock += DeltaSeconds;
+
+        if (HasAuthority)
+        { utils_bat::Publish(Self); }
     }
 
     //----------------------------------------------------------------------------------------------------------------------

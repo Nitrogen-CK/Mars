@@ -56,15 +56,18 @@ namespace utils_bat
     }
 }
 
-// Placeable enemy: the cellar bat, composed by utils_bat::Add on the root at SpawnTransform (the body centre; place it at the
-// hang point, Spec.Roost.HangOffset under its perch). This script is the assembly: under the root it builds a presentation
-// node that it turns over while the bat hangs (never the root, which the crowd agent owns) and hangs everything seen off
-// it: the candidate skeletal mesh with its AnimBP, or, until those assets exist, a visible placeholder (a body and two wing
-// slabs). Every frame it pushes the kernel's phase and telemetry into the anim instance.
+// Placeable enemy: the cellar bat, composed by utils_bat::Add on the root at SpawnTransform (the body centre; place it
+// at the hang point, Spec.Roost.HangOffset under its perch). This script is the assembly: under the root it builds a
+// presentation node that it turns over while the bat hangs (never the root, which the crowd agent owns) and hangs
+// everything seen off it: the candidate skeletal mesh with its AnimBP, or, until those assets exist, a visible
+// placeholder (a body and two wing slabs). Every frame it pushes the kernel's phase and telemetry into the anim
+// instance. The entity, its root transform and the kernel's ledger replicate: every machine builds the look and the
+// tick and reads the kernel as it stands there, and the kernel decides on the machine with authority.
 class UMars_CellarBat_EntityScript : UCk_GenericEntityScript_UE
 {
     default _ShowInPlaceActors = true;
-    default _Replication = ECk_Replication::DoesNotReplicate;
+    // Spawned by the authority (placed, or under the replicated spawn owner); every machine composes its own copy.
+    default _Replication = ECk_Replication::Replicates;
 
     UPROPERTY(ExposeOnSpawn)
     FTransform SpawnTransform = FTransform::Identity;
@@ -132,7 +135,7 @@ class UMars_CellarBat_EntityScript : UCk_GenericEntityScript_UE
         InHandle.Request_OverrideToSelf();
         utils_handle::Set_DebugName(InHandle, n"CellarBat");
 
-        auto Root = utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::DoesNotReplicate);
+        auto Root = utils_mars_net::Add_CreatureRoot(InHandle, SpawnTransform);
         auto Composed = Spec;
         if (MouthSocketOffset.IsSet())
         { Composed.Swoop.Blow.MouthOffset = MeshOffset.TransformPosition(MouthSocketOffset.GetValue()); }
@@ -140,6 +143,8 @@ class UMars_CellarBat_EntityScript : UCk_GenericEntityScript_UE
         _Bat = utils_bat::Add(Root, Composed);
         if (ck::Is_NOT_Valid(_Bat))
         { return ECk_EntityScript_ConstructionFlow::Finished; }
+
+        utils_entity_tag::Add(InHandle, utils_bat::BatTag);
 
         if (WithVisuals)
         {
@@ -444,6 +449,7 @@ namespace utils_bat
 class UMars_BatRoost_EntityScript : UCk_GenericEntityScript_UE
 {
     default _ShowInPlaceActors = true;
+    // Each machine's own: only the authority's bat claims it; on a client it composes and stays Free.
     default _Replication = ECk_Replication::DoesNotReplicate;
 
     UPROPERTY(ExposeOnSpawn)
@@ -488,6 +494,7 @@ class UMars_BatRoost_EntityScript : UCk_GenericEntityScript_UE
 class UMars_BatFlightVolume_EntityScript : UCk_GenericEntityScript_UE
 {
     default _ShowInPlaceActors = true;
+    // The volume is the authority's: in a client's world it composes its transform only (a copy flies nothing in it).
     default _Replication = ECk_Replication::DoesNotReplicate;
 
     UPROPERTY(ExposeOnSpawn)
@@ -514,6 +521,9 @@ class UMars_BatFlightVolume_EntityScript : UCk_GenericEntityScript_UE
         utils_handle::Set_DebugName(InHandle, n"BatFlightVolume");
 
         utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::DoesNotReplicate);
+        if (utils_mars_net::Get_IsClientWorld(InHandle))
+        { return ECk_EntityScript_ConstructionFlow::Finished; }
+
         const auto Centre = SpawnTransform.GetLocation();
         _Volume = utils_bat::Add_FlightVolume(InHandle, FMars_Bat_FlightVolume_Spec(FBox(Centre - HalfExtents, Centre + HalfExtents),
             CellSize, Clearance, ECk_EnableDisable::Disable));

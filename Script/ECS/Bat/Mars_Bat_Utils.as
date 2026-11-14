@@ -73,7 +73,8 @@ struct FMars_Bat_SwoopFrame
 
 namespace utils_bat
 {
-    // Entity tags: a perch a bat may claim, and a flight volume a bat may discover.
+    // Entity tags: a bat's script entity, a perch a bat may claim, and a flight volume a bat may discover.
+    const FName BatTag = n"TAG_MarsBat";
     const FName RoostTag = n"TAG_MarsBatRoost";
     const FName FlightVolumeTag = n"TAG_MarsBatFlightVolume";
 
@@ -108,12 +109,15 @@ namespace utils_bat
         return Spec;
     }
 
-    // Composes the bat on InRoot (its flying body; the entity script hangs every visual off a presentation node under it):
-    // monster (Health, body zone, team, Dead) -> damage dealer -> the body hurtbox -> the CkCrowd flying agent with its
-    // velocity, acceleration and integrator -> the voxel path (bound to Spec.Volume when given) -> the bat's fragments
-    // (UMars_Processor_Bat_Setup then binds the zone, the agent and the path) -> LAST the state machine
-    // (Mars_Bat_Hfsm.as). The crowd agent is the only writer of the root transform while the bat is alive. A rejected
-    // spec or sub-feature ensures and returns an invalid handle.
+    // Composes the bat on InRoot (its flying body; the entity script hangs every visual off a presentation node under
+    // it): monster (Health, body zone, team, Dead) -> damage dealer -> the body hurtbox -> the CkCrowd flying agent
+    // with its velocity, acceleration and integrator -> the voxel path (bound to Spec.Volume when given) -> the bat's
+    // fragments, the replicated ledger and the mirror's state (UMars_Processor_Bat_Setup then binds the zone, the agent
+    // and the path) -> LAST the state machine (Mars_Bat_Hfsm.as). The crowd agent is the only writer of the root
+    // transform while the bat is alive. A copy without authority composes the same without the dealer, the agent and
+    // its motion, the path, the route's volume, the perch claim, the blackboards and the state machine (Params' Dealer,
+    // Agent and Path stay invalid, the perch stays Unowned), whatever handles its spec arrived with. A rejected spec or
+    // sub-feature ensures and returns an invalid handle.
     FCk_Handle_Bat Add(FCk_Handle_Transform& InRoot, FMars_Bat_Spec InSpec)
     {
         FCk_Handle RootEntity = InRoot;
@@ -125,31 +129,42 @@ namespace utils_bat
         if (ck::EnsureIfNot(Validation.IsValid(), f"[Bat] [{RootEntity.ToString()}] rejected the spec: {Validation.Get_Error()}"))
         { return FCk_Handle_Bat(); }
 
+        const auto HasAuthority = utils_net::Get_HasAuthority(RootEntity);
+
         auto Monster = utils_monster::Add(RootEntity, Spec.Monster);
         if (ck::Is_NOT_Valid(Monster))
         { return FCk_Handle_Bat(); }
 
-        auto Dealer = utils_damage_dealer::Add(RootEntity, FMars_DamageDealer_Spec());
-        if (ck::Is_NOT_Valid(Dealer))
-        { return FCk_Handle_Bat(); }
+        auto Dealer = FCk_Handle_DamageDealer();
+        if (HasAuthority)
+        {
+            Dealer = utils_damage_dealer::Add(RootEntity, FMars_DamageDealer_Spec());
+            if (ck::Is_NOT_Valid(Dealer))
+            { return FCk_Handle_Bat(); }
+        }
 
         auto BodyZone = Monster.Get_BodyZone();
         utils_hit_zone::AddHurtbox_Box(BodyZone, InRoot, FMars_HitZone_Hurtbox(HurtboxHalfExtents, FTransform::Identity));
 
-        auto Agent = utils_crowd_agent::Add(InRoot, Make_AgentSpec(Spec.Flight));
-        if (ck::EnsureIfNot(ck::IsValid(Agent), f"[Bat] [{RootEntity.ToString()}] the crowd agent was rejected"))
-        { return FCk_Handle_Bat(); }
+        auto Agent = FCk_Handle_CrowdAgent();
+        auto Path = FCk_Handle_VoxelNavPath();
+        if (HasAuthority)
+        {
+            Agent = utils_crowd_agent::Add(InRoot, Make_AgentSpec(Spec.Flight));
+            if (ck::EnsureIfNot(ck::IsValid(Agent), f"[Bat] [{RootEntity.ToString()}] the crowd agent was rejected"))
+            { return FCk_Handle_Bat(); }
 
-        utils_velocity::Add(RootEntity, FCk_Velocity_Spec(ECk_LocalWorld::World, FVector::ZeroVector), ECk_Replication::DoesNotReplicate);
-        utils_acceleration::Add(RootEntity, FCk_Acceleration_Spec(ECk_LocalWorld::World, FVector::ZeroVector), ECk_Replication::DoesNotReplicate);
-        utils_euler_integrator::Request_Start(RootEntity);
+            utils_velocity::Add(RootEntity, FCk_Velocity_Spec(ECk_LocalWorld::World, FVector::ZeroVector), ECk_Replication::DoesNotReplicate);
+            utils_acceleration::Add(RootEntity, FCk_Acceleration_Spec(ECk_LocalWorld::World, FVector::ZeroVector), ECk_Replication::DoesNotReplicate);
+            utils_euler_integrator::Request_Start(RootEntity);
 
-        auto Path = utils_voxel_nav_path::Add(RootEntity, FCk_VoxelNavPath_Spec(Spec.Flight.AgentRadius));
-        if (ck::EnsureIfNot(ck::IsValid(Path), f"[Bat] [{RootEntity.ToString()}] the voxel path was rejected"))
-        { return FCk_Handle_Bat(); }
+            Path = utils_voxel_nav_path::Add(RootEntity, FCk_VoxelNavPath_Spec(Spec.Flight.AgentRadius));
+            if (ck::EnsureIfNot(ck::IsValid(Path), f"[Bat] [{RootEntity.ToString()}] the voxel path was rejected"))
+            { return FCk_Handle_Bat(); }
 
-        if (ck::IsValid(Spec.Volume))
-        { utils_voxel_nav_path::Request_SetVolume(Path, Spec.Volume); }
+            if (ck::IsValid(Spec.Volume))
+            { utils_voxel_nav_path::Request_SetVolume(Path, Spec.Volume); }
+        }
 
         auto Params = FMars_Fragment_Bat_Params();
         Params.Spec = Spec;
@@ -161,26 +176,66 @@ namespace utils_bat
             utils_transform::Get_EntityCurrentLocation(InRoot) - Spec.Roost.HangOffset;
 
         auto State = FMars_Fragment_Bat();
-        State.Route.Volume = Spec.Volume;
-        if (ck::IsValid(Spec.Roost.PerchOwner))
+        if (HasAuthority)
         {
-            State.Perch.Claim = EMars_Bat_RoostClaim::Pending;
-            State.Perch.Owner = Spec.Roost.PerchOwner;
+            State.Route.Volume = Spec.Volume;
+            if (ck::IsValid(Spec.Roost.PerchOwner))
+            {
+                State.Perch.Claim = EMars_Bat_RoostClaim::Pending;
+                State.Perch.Owner = Spec.Roost.PerchOwner;
+            }
+            else if (Spec.Roost.DiscoverRadius.IsSet())
+            { State.Perch.Claim = EMars_Bat_RoostClaim::Pending; }
         }
-        else if (Spec.Roost.DiscoverRadius.IsSet())
-        { State.Perch.Claim = EMars_Bat_RoostClaim::Pending; }
+
+        // The mirror compares what arrives against the ledger this machine composed, not one that already arrived.
+        auto Ledger = FMars_Fragment_Bat_Net();
+        Ledger.PerchAnchor = HasAuthority && Get_IsRoost(Spec.Roost.PerchOwner) ? Get_RoostAnchor(Spec.Roost.PerchOwner) :
+            Params.FixedPerchAnchor;
+        auto Local = FMars_Fragment_Bat_Local();
+        Local.Last = TOptional<FMars_Fragment_Bat_Net>(Ledger);
 
         RootEntity.Add_Fragment(FMars_Feature_Bat());
         RootEntity.Add_Fragment(Params);
         RootEntity.Add_Fragment(State);
-        RootEntity.Add_Fragment(FMars_Fragment_Bat_PatrolBlackboard());
-        RootEntity.Add_Fragment(FMars_Fragment_Bat_SortieBlackboard());
-        RootEntity.Add_Fragment(FMars_Fragment_Bat_SearchBlackboard());
+        if (HasAuthority)
+        {
+            RootEntity.Add_Fragment(FMars_Fragment_Bat_PatrolBlackboard());
+            RootEntity.Add_Fragment(FMars_Fragment_Bat_SortieBlackboard());
+            RootEntity.Add_Fragment(FMars_Fragment_Bat_SearchBlackboard());
+        }
+
+        // A client's copy can receive the replicated ledger before it composes: the arrived ledger stands then.
+        if (RootEntity.Has_Fragment(FMars_Fragment_Bat_Net) == false)
+        { RootEntity.Add_Fragment(Ledger, ECk_Replication::Replicates); }
+
+        RootEntity.Add_Fragment(Local);
         RootEntity.Add_Fragment(FMars_Tag_Bat_NeedsSetup());
+        RootEntity.Add_Fragment(FMars_Tag_Bat_NeedsMirror());
 
         // Last: Alive's condition reads the Dead attribute as the machine enters its initial state.
-        utils_state_machine::Add(RootEntity, FCk_StateMachine_Spec(UMars_SmState_Bat_Alive));
+        if (HasAuthority)
+        { utils_state_machine::Add(RootEntity, FCk_StateMachine_Spec(UMars_SmState_Bat_Alive)); }
+
         return RootEntity.As_Bat();
+    }
+
+    // The ledger's only writer, called last by the authority's request drain and at the end of its tick: the phase and
+    // the place it hangs from (Get_PerchAnchor) as they stand, written and marked dirty only when they differ from the
+    // stored ledger.
+    void Publish(FCk_Handle_Bat& InSelf)
+    {
+        auto Next = FMars_Fragment_Bat_Net();
+        Next.Phase = InSelf.Get_Phase();
+        Next.PerchAnchor = InSelf.Get_PerchAnchor();
+
+        auto& Ledger = InSelf.Get_Fragment(FMars_Fragment_Bat_Net);
+        if (Ledger.Phase == Next.Phase && Ledger.PerchAnchor.Equals(Next.PerchAnchor, 0.0))
+        { return; }
+
+        Ledger = Next;
+        FCk_Handle Entity = InSelf;
+        Entity.Request_MarkReplicationDirty(FMars_Fragment_Bat_Net);
     }
 
     // The body zone's box round the bat's body (root frame): the wings' membranes are not part of it.
@@ -744,10 +799,14 @@ mixin bool Get_HasPerch(const FCk_Handle_Bat& Self)
     return Perch.Claim == EMars_Bat_RoostClaim::Pending && (ck::Is_NOT_Valid(Perch.Owner) || utils_bat::Get_IsRoost(Perch.Owner));
 }
 
-// Where it hangs from: the roost's location when it has one, else the fixed anchor.
+// Where it hangs from: on a copy without authority the place the ledger names; else the roost's location when it has
+// one, else the fixed anchor.
 mixin FVector Get_PerchAnchor(const FCk_Handle_Bat& Self)
 {
     const auto& Perch = Self.Get_Fragment(FMars_Fragment_Bat).Perch;
+    if (Perch.ShownAnchor.IsSet())
+    { return Perch.ShownAnchor.GetValue(); }
+
     if ((Perch.Claim == EMars_Bat_RoostClaim::Held || Perch.Claim == EMars_Bat_RoostClaim::Pending) && utils_bat::Get_IsRoost(Perch.Owner))
     { return utils_bat::Get_RoostAnchor(Perch.Owner); }
 

@@ -1,8 +1,8 @@
 // The cellar bat rig: a bat spawned through its real entity script without visuals, hanging under a roost entity 500 uu
 // over a runtime static Jolt floor (3000 x 3000 uu, top at _Origin.Z), inside a flight volume over the floor that bakes
 // once every static the test placed is in the Jolt world. A hostile target (team One, Health 100, a 70 x 70 x 180 box
-// hurtbox, TAG_MarsCombatTarget) can be placed on the floor. Each test sets _Origin to an isolated spot: the Mars autotest
-// map has no floor of its own there.
+// hurtbox, TAG_MarsSharedCombatTarget) can be placed on the floor. Each test sets _Origin to an isolated spot: the Mars
+// autotest map has no floor of its own there.
 //
 // Steps a test gets from Add_WorldSteps: the statics are in -> the bake is requested -> the bake is done -> the bat is
 // spawned -> the bat is composed and its roost claim is held.
@@ -112,7 +112,7 @@ class UMars_AutoTestRig_Bat : UCk_AutoTest_Base
         _TargetHealth = utils_health::Add(Entity, FMars_Health_Spec(100.0f));
         auto Zone = utils_hit_zone::Add(Entity, utils_hit_zone::Make_FleshZoneSpec(GameplayTags::HitZone_Mars_Body, 1.0f));
         utils_hit_zone::AddHurtbox_Box(Zone, _TargetRoot, FMars_HitZone_Hurtbox(FVector(35.0, 35.0, 90.0), FTransform::Identity));
-        utils_entity_tag::Add(Entity, n"TAG_MarsCombatTarget");
+        utils_entity_tag::Add(Entity, n"TAG_MarsSharedCombatTarget");
         _TargetHealth.BindTo_OnDamaged(FMars_Delegate_Health_OnDamaged(this, n"OnTargetDamaged"));
         return _TargetHealth;
     }

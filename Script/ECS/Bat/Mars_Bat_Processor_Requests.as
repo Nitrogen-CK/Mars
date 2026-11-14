@@ -1,7 +1,8 @@
 // The bat's arbiter: Fall -> TakeHit -> CancelSwoop -> RouteResult -> Hold -> SetPhase -> FlyTo -> StartSwoop ->
 // ReleaseRoost -> EndSearch, each kind in arrival order. SetPhase runs before FlyTo so a route issued by a state's enter task is stamped
 // with that state's phase (Route.IssuedIn). A StartSwoop is admitted only when Get_SwoopAdmission answers Admitted at drain
-// time. Signals broadcast after the state they report is written.
+// time. Signals broadcast after the state they report is written. Only a machine with authority over the bat applies
+// them; it publishes the ledger last (utils_bat::Publish).
 class UMars_Processor_Bat_HandleRequests : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -31,8 +32,14 @@ class UMars_Processor_Bat_HandleRequests : UCk_Processor_Script_Base_UE
         // InRequests is invalid past this line; removing before broadcasting lets re-entrant requests survive.
         Self.Request_TryRemove(FMars_Fragment_Bat_Requests);
 
+        if (utils_net::Get_HasAuthority(InHandle) == false)
+        { return; }
+
         if (utils_entity_lifetime::Get_IsPendingDestroy(InHandle, ECk_EntityLifetime_DestructionPhase::BeginDestroy))
         { return; }
+
+        // Handlers react on the bat (its state machine, its look): scope the script world to its own.
+        const auto WorldContext = FAngelscriptGameThreadScopeWorldContext(utils_entity_lifetime::Get_WorldForEntity(InHandle));
 
         for (const auto& Request : FallRequests)
         { HandleFall(Self); }
@@ -63,6 +70,8 @@ class UMars_Processor_Bat_HandleRequests : UCk_Processor_Script_Base_UE
 
         for (const auto& Request : EndSearchRequests)
         { Self.Get_Fragment(FMars_Fragment_Bat).LastKnown.Reset(); }
+
+        utils_bat::Publish(Self);
     }
 
     // Latched: the agent stops and leaves the crowd, the integrator stops (the tick writes the root from here on), a running

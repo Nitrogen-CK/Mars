@@ -1,6 +1,8 @@
 // Wires a new bat to its kernel, once: every hit its body zone routes becomes a TakeHit; the crowd agent's goal signals and
 // the voxel path's failures become RouteResults (so every FlyTo ends in an explicit outcome); a perch owner given in the
-// spec is claimed. The zone, the agent and the path are all on the bat's root.
+// spec is claimed. The zone, the agent and the path are all on the bat's root. A copy without authority binds only the
+// zone (its hits become requests its drain drops) and runs no Dead state: it turns its own body zone off when its
+// monster dies (at once when it already reads dead).
 class UMars_Processor_Bat_Setup : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -19,6 +21,17 @@ class UMars_Processor_Bat_Setup : UCk_Processor_Script_Base_UE
 
         auto Zone = Bat.Get_Monster().Get_BodyZone();
         Zone.BindTo_OnHit(FMars_Delegate_HitZone_OnHit(this, n"OnBodyHit"));
+
+        if (utils_net::Get_HasAuthority(InHandle) == false)
+        {
+            auto Monster = Bat.Get_Monster();
+            Monster.BindTo_OnDied(FMars_Delegate_Monster_OnDied(this, n"OnMonsterDied"));
+            if (Bat.Get_IsDead())
+            { Disable_BodyZone(Monster); }
+
+            Bat.Request_TryRemove(FMars_Tag_Bat_NeedsSetup);
+            return;
+        }
 
         auto Agent = Bat.Get_Agent();
         utils_crowd_agent::BindTo_OnGoalReached(Agent, FCk_Delegate_CrowdAgent_OnGoalReached(this, n"OnGoalReached"),
@@ -40,6 +53,18 @@ class UMars_Processor_Bat_Setup : UCk_Processor_Script_Base_UE
         }
 
         Bat.Request_TryRemove(FMars_Tag_Bat_NeedsSetup);
+    }
+
+    UFUNCTION()
+    private void OnMonsterDied(FCk_Handle_Monster InMonster, FMars_DamageEvent InCause)
+    {
+        Disable_BodyZone(InMonster);
+    }
+
+    private void Disable_BodyZone(FCk_Handle_Monster InMonster)
+    {
+        auto Zone = InMonster.Get_BodyZone();
+        Zone.Request_SetEnabled(FMars_Request_HitZone_SetEnabled(ECk_EnableDisable::Disable));
     }
 
     UFUNCTION()
