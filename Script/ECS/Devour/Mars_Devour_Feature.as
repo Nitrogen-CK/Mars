@@ -14,6 +14,11 @@ asset Mars_DevourHandle of UCkDynamic_HandleDefinition
     RequiredFragments.Add(FMars_Feature_Devour);
     Description = "A devourer that seizes one victim and takes it through the timed phases of being eaten";
 }
+// Replication: the machine with authority over the devourer applies the requests, runs the phases and publishes the
+// ledger (FMars_Fragment_Devour_Net) through its one writer, utils_devour::Publish. A copy without authority drops
+// every request and mirrors the ledger with the same two transitions (UMars_Processor_Devour_Mirror): it marks its own
+// copy of the victim, times a phase from its arrival and raises both signals. A devourer whose root does not replicate
+// has authority on every machine and runs whole there.
 struct FMars_Feature_Devour {}
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -142,7 +147,8 @@ struct FMars_Fragment_Devour_Params
 // State
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Written only by the Devour processors (UMars_Processor_Devour_Base) and utils_devour::Add.
+// Written only by the Devour processors (UMars_Processor_Devour_Base: the drain and the tick with authority, the mirror
+// without it) and utils_devour::Add.
 struct FMars_Fragment_Devour
 {
     UPROPERTY()
@@ -155,12 +161,50 @@ struct FMars_Fragment_Devour
     // Invalid while Idle.
     UPROPERTY()
     FCk_Handle Victim;
+
+    // The runs begun.
+    UPROPERTY()
+    int32 Serial = 0;
+
+    // How the latest ended run ended; meaningful once a run has ended.
+    UPROPERTY()
+    EMars_Devour_End LastEnd = EMars_Devour_End::Completed;
 }
+
+// The replicated ledger on the devourer: levels only, no clock. Written only by utils_devour::Publish.
+struct FMars_Fragment_Devour_Net
+{
+    UPROPERTY()
+    EMars_Devour_Phase Phase = EMars_Devour_Phase::Idle;
+
+    UPROPERTY()
+    int32 Serial = 0;
+
+    // While Idle this names the devourer itself, never nobody: a handle that cannot be resolved on a machine keeps the
+    // value it had there, so a cleared one would leave the released victim standing, and a later victim that machine
+    // cannot see would read as the earlier one. Read it through utils_devour::Get_KnownVictim.
+    UPROPERTY()
+    FCk_Handle Victim;
+
+    UPROPERTY()
+    EMars_Devour_End LastEnd = EMars_Devour_End::Completed;
+}
+
+// Each machine's own: the ledger the mirror last reconciled (unset with authority).
+struct FMars_Fragment_Devour_Local
+{
+    UPROPERTY()
+    TOptional<FMars_Fragment_Devour_Net> Last;
+}
+
+// Added by utils_devour::Add, dropped by UMars_Processor_Devour_Mirror once it has bound the ledger's rep-notify.
+struct FMars_Tag_Devour_NeedsMirror {}
 
 // Present while a victim is held; gates UMars_Processor_Devour_Tick.
 struct FMars_Tag_Devour_Running {}
 
-// On the victim, for as long as it is held. Written only by the Devour processors.
+// On the victim, for as long as it is held. Written only by the Devour processors (on a copy, by the mirror, on that
+// machine's copy of the victim).
 struct FMars_Fragment_Devour_Victim
 {
     UPROPERTY()

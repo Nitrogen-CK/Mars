@@ -1,5 +1,8 @@
-// Runs the held victim through the phases: each lasts its Timing seconds, and a frame long enough to cross several
-// enters each of them in order. Past Swallowed the victim is let go (Completed). A victim that is gone cancels the run.
+// Runs the held victim through the phases, in two halves. With authority over the devourer: each phase lasts its Timing
+// seconds, and a frame long enough to cross several enters each of them in order; past Swallowed the victim is let go
+// (Completed), and a victim that is gone cancels the run; the ledger is published once after the writes, then the
+// signals are raised. A copy without authority only keeps the phase's clock, capped at the phase's length: its phases
+// and its end arrive through the ledger (UMars_Processor_Devour_Mirror).
 class UMars_Processor_Devour_Tick : UMars_Processor_Devour_Base
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -14,44 +17,50 @@ class UMars_Processor_Devour_Tick : UMars_Processor_Devour_Base
     void ForEachEntity(FCk_Time InDeltaT, FCk_Handle& InHandle, FMars_Fragment_Devour& InState)
     {
         auto Self = InHandle.As_Devour();
+        const auto Timing = Self.Get_Timing();
 
-        if (ck::Is_NOT_Valid(InState.Victim))
+        if (utils_net::Get_HasAuthority(InHandle) == false)
         {
-            const auto Gone = DoRelease(Self, InState);
-            if (Self.Has_Fragment(FMars_Fragment_Devour_Signals))
-            { Self.Get_Fragment(FMars_Fragment_Devour_Signals).OnEnded.Broadcast(Self, Gone, EMars_Devour_End::Cancelled); }
+            InState.PhaseSeconds = Math::Min(InState.PhaseSeconds + float32(InDeltaT.Get_Seconds()), Timing.Get_Seconds(InState.Phase));
             return;
         }
 
-        const auto Timing = Self.Get_Timing();
-        InState.PhaseSeconds += float32(InDeltaT.Get_Seconds());
-
         TArray<EMars_Devour_Phase> Entered;
-        auto IsOver = false;
-        while (InState.PhaseSeconds >= Timing.Get_Seconds(InState.Phase))
+        auto End = TOptional<EMars_Devour_End>();
+        if (ck::Is_NOT_Valid(InState.Victim))
+        { End = TOptional<EMars_Devour_End>(EMars_Devour_End::Cancelled); }
+        else
         {
-            InState.PhaseSeconds -= Timing.Get_Seconds(InState.Phase);
-            if (InState.Phase == EMars_Devour_Phase::Swallowed)
+            InState.PhaseSeconds += float32(InDeltaT.Get_Seconds());
+            while (InState.PhaseSeconds >= Timing.Get_Seconds(InState.Phase))
             {
-                IsOver = true;
-                break;
-            }
+                InState.PhaseSeconds -= Timing.Get_Seconds(InState.Phase);
+                if (InState.Phase == EMars_Devour_Phase::Swallowed)
+                {
+                    End = TOptional<EMars_Devour_End>(EMars_Devour_End::Completed);
+                    break;
+                }
 
-            InState.Phase = EMars_Devour_Phase(int32(InState.Phase) + 1);
-            Entered.Add(InState.Phase);
+                InState.Phase = EMars_Devour_Phase(int32(InState.Phase) + 1);
+                Entered.Add(InState.Phase);
+            }
         }
 
         auto Released = FCk_Handle();
-        if (IsOver)
-        { Released = DoRelease(Self, InState); }
+        if (End.IsSet())
+        { Released = DoRelease(Self, InState, End.GetValue()); }
 
-        if (Self.Has_Fragment(FMars_Fragment_Devour_Signals) == false)
-        { return; }
+        utils_devour::Publish(Self);
 
+        // Handlers react on the devourer and its victim (a view, a state machine): scope the script world to its own.
+        const auto WorldContext = FAngelscriptGameThreadScopeWorldContext(utils_entity_lifetime::Get_WorldForEntity(InHandle));
         for (const auto Phase : Entered)
-        { Self.Get_Fragment(FMars_Fragment_Devour_Signals).OnPhaseChanged.Broadcast(Self, Phase); }
+        {
+            if (Self.Has_Fragment(FMars_Fragment_Devour_Signals))
+            { Self.Get_Fragment(FMars_Fragment_Devour_Signals).OnPhaseChanged.Broadcast(Self, Phase); }
+        }
 
-        if (IsOver)
-        { Self.Get_Fragment(FMars_Fragment_Devour_Signals).OnEnded.Broadcast(Self, Released, EMars_Devour_End::Completed); }
+        if (End.IsSet() && Self.Has_Fragment(FMars_Fragment_Devour_Signals))
+        { Self.Get_Fragment(FMars_Fragment_Devour_Signals).OnEnded.Broadcast(Self, Released, End.GetValue()); }
     }
 }

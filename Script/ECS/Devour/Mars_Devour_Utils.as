@@ -14,6 +14,19 @@ namespace utils_devour
         InHandle.Add_Fragment(Params);
         InHandle.Add_Fragment(FMars_Fragment_Devour());
 
+        // The mirror compares what arrives against the ledger this machine composed, not one that already arrived.
+        auto Ledger = FMars_Fragment_Devour_Net();
+        Ledger.Victim = InHandle;
+        auto Local = FMars_Fragment_Devour_Local();
+        Local.Last = TOptional<FMars_Fragment_Devour_Net>(Ledger);
+
+        // A client's copy can receive the replicated ledger before it composes: the arrived ledger stands then.
+        if (InHandle.Has_Fragment(FMars_Fragment_Devour_Net) == false)
+        { InHandle.Add_Fragment(Ledger, ECk_Replication::Replicates); }
+
+        InHandle.Add_Fragment(Local);
+        InHandle.Add_Fragment(FMars_Tag_Devour_NeedsMirror());
+
         return InHandle.As_Devour();
     }
 
@@ -25,6 +38,42 @@ namespace utils_devour
         { return FCk_Handle_Devour(); }
 
         return InVictim.Get_Fragment(FMars_Fragment_Devour_Victim).Devourer;
+    }
+
+    // The ledger's only writer, called by the authority's request drain and at the end of its tick: the phase, the
+    // serial, the victim (the devourer itself while Idle) and how the last run ended, written and marked dirty only
+    // when they differ from the stored ledger.
+    void Publish(FCk_Handle_Devour& InSelf)
+    {
+        const auto& State = InSelf.Get_Fragment(FMars_Fragment_Devour);
+        auto Next = FMars_Fragment_Devour_Net();
+        Next.Phase = State.Phase;
+        Next.Serial = State.Serial;
+        Next.Victim = State.Phase == EMars_Devour_Phase::Idle ? InSelf.H() : State.Victim;
+        Next.LastEnd = State.LastEnd;
+
+        auto& Ledger = InSelf.Get_Fragment(FMars_Fragment_Devour_Net);
+        if (Get_IsSameLedger(Ledger, Next))
+        { return; }
+
+        Ledger = Next;
+        FCk_Handle Entity = InSelf;
+        Entity.Request_MarkReplicationDirty(FMars_Fragment_Devour_Net);
+    }
+
+    bool Get_IsSameLedger(const FMars_Fragment_Devour_Net& InA, const FMars_Fragment_Devour_Net& InB)
+    {
+        return InA.Phase == InB.Phase && InA.Serial == InB.Serial && InA.Victim == InB.Victim && InA.LastEnd == InB.LastEnd;
+    }
+
+    // The ledger's victim as this machine knows it: invalid while Idle, when this machine cannot resolve the handle,
+    // and when it names InDevourer (the Idle value, which a machine that cannot resolve a new victim keeps).
+    FCk_Handle Get_KnownVictim(const FMars_Fragment_Devour_Net& InLedger, const FCk_Handle& InDevourer)
+    {
+        if (InLedger.Phase == EMars_Devour_Phase::Idle || ck::Is_NOT_Valid(InLedger.Victim) || InLedger.Victim == InDevourer)
+        { return FCk_Handle(); }
+
+        return InLedger.Victim;
     }
 }
 
@@ -44,7 +93,7 @@ mixin bool Get_IsActive(const FCk_Handle_Devour& Self)
 }
 
 // Whether a Begin for InVictim would be taken now: nobody is held, and the victim is valid, is not the devourer itself
-// and is not held by a live devourer.
+// and is not held by a live devourer. The authority's question: on a copy without it, it decides nothing.
 mixin bool Get_CanSeize(const FCk_Handle_Devour& Self, const FCk_Handle& InVictim)
 {
     if (Self.Get_IsActive() || ck::Is_NOT_Valid(InVictim))
@@ -56,18 +105,19 @@ mixin bool Get_CanSeize(const FCk_Handle_Devour& Self, const FCk_Handle& InVicti
     return ck::Is_NOT_Valid(utils_devour::TryGet_Devourer(InVictim));
 }
 
-// Invalid while Idle.
+// Invalid while Idle, and on a machine that does not know the victim (it cannot see it).
 mixin FCk_Handle Get_Victim(const FCk_Handle_Devour& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_Devour).Victim;
 }
 
+// This machine's own: on a copy without authority it is measured from the phase's arrival, capped at its length.
 mixin float32 Get_PhaseSeconds(const FCk_Handle_Devour& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_Devour).PhaseSeconds;
 }
 
-// How far through the current phase, 0..1; 0 while Idle.
+// How far through the current phase, 0..1; 0 while Idle. This machine's own, as Get_PhaseSeconds.
 mixin float32 Get_PhaseAlpha(const FCk_Handle_Devour& Self)
 {
     const auto& State = Self.Get_Fragment(FMars_Fragment_Devour);
