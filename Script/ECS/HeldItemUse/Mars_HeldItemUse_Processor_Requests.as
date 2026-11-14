@@ -1,5 +1,14 @@
-// Drains Refresh, then Drop, then Throw, then SetThrowArmed. Refresh, Drop and Throw carry no payload, so each kind is
-// applied at most once per drain; a Drop and a Throw of one held item are one launch (LaunchedItem): the second is dropped.
+// Drains Refresh, then Drop, then Throw, then Strike, then SetThrowArmed. Refresh, Drop and Throw carry no payload, so each
+// kind is applied at most once per drain; a Drop and a Throw of one held item are one launch (LaunchedItem): the second is
+// dropped.
+//
+// Strike is a blow another machine claims (Cue.Mars.HeldItemUse.Strike), applied only on the authority, each claim on its
+// own in arrival order, and judged against what the authority holds: refused at the first of ItemMismatch (nothing held
+// that strikes, or not the claimed item), TooSoon (the last applied blow is under k_StrikeMinIntervalFraction of the held
+// item's swing ago), NoZone (no live zone with a hurtbox at the address) and OutOfReach (the contact is past Reach + Radius
+// + k_StrikeReachSlack from the hand, or past k_StrikeZoneSlack from every hurtbox of the zone). Otherwise it is dealt
+// through the player's dealer from the authority's copy of the item's Strike trait; friendly fire and a disabled zone stay
+// the dealer's rejections. The tally records every verdict.
 //
 // Refresh owns the use interactable: a no-probe child of the player whose single Primary.UsableItem target runs the held
 // item's UseAction state. Nothing traces it, so it is focused and offered to the player's resolver here, and torn down
@@ -41,6 +50,7 @@ class UMars_Processor_HeldItemUse_HandleRequests : UCk_Processor_Script_Base_UE
         if (Throw)
         { ThrowLaunch.Aim = InRequests.ThrowRequests.Last().Aim; }
 
+        TArray<FMars_Request_HeldItemUse_Strike> StrikeRequests = InRequests.StrikeRequests;
         TArray<FMars_Request_HeldItemUse_SetThrowArmed> SetThrowArmedRequests = InRequests.SetThrowArmedRequests;
         const auto HasAuthority = utils_net::Get_HasAuthority(InHandle);
 
@@ -55,6 +65,12 @@ class UMars_Processor_HeldItemUse_HandleRequests : UCk_Processor_Script_Base_UE
 
         if (Throw && HasAuthority)
         { LaunchHeldItem(InHandle, InState, ThrowLaunch); }
+
+        if (HasAuthority)
+        {
+            for (const auto& Request : StrikeRequests)
+            { JudgeStrike(InHandle, InState, Request.Strike); }
+        }
 
         for (const auto& Request : SetThrowArmedRequests)
         { HandleSetThrowArmedRequest(Self, InState, Request); }
@@ -218,6 +234,83 @@ class UMars_Processor_HeldItemUse_HandleRequests : UCk_Processor_Script_Base_UE
 
         InState.LaunchedItem = Item;
         Broadcast_ItemLaunched(InPlayer, Item, InKind);
+    }
+
+    //--------------------------------------------------------------------------------------------------------------------------
+    // Strike
+    //--------------------------------------------------------------------------------------------------------------------------
+
+    private void JudgeStrike(FCk_Handle& InPlayer, FMars_Fragment_HeldItemUse& InState, const FMars_HeldItemUse_Strike& InClaim)
+    {
+        auto HeldItem = InPlayer.As_HeldItem();
+        const auto Item = HeldItem.Get_CurrentItem();
+        if (ck::Is_NOT_Valid(Item) || Item.Has_Strike() == false || InClaim.Item.Get() != Item.Get_Definition())
+        {
+            RefuseStrike(InState, EMars_HeldItemUse_StrikeRefusal::ItemMismatch);
+            return;
+        }
+
+        const UMars_ItemTrait_Strike Strike = Item.Get_Strike();
+        const auto Now = utils_mars_net::Get_ServerWorldSeconds(InPlayer);
+        const auto MinInterval = constants_held_item_use::k_StrikeMinIntervalFraction * (Strike.WindupSeconds + Strike.RecoverySeconds);
+        if (InState.Strikes.LastAppliedAt.IsSet() && Now - InState.Strikes.LastAppliedAt.GetValue() < MinInterval)
+        {
+            RefuseStrike(InState, EMars_HeldItemUse_StrikeRefusal::TooSoon);
+            return;
+        }
+
+        auto Zone = utils_hit_zone::TryGet_ZoneAt(FMars_HitZone_Address(InClaim.ZoneRoot, InClaim.ZoneIndex));
+        if (ck::Is_NOT_Valid(Zone) || Zone.Get_Hurtboxes().Num() == 0)
+        {
+            RefuseStrike(InState, EMars_HeldItemUse_StrikeRefusal::NoZone);
+            return;
+        }
+
+        const auto Hand = utils_transform::Get_EntityCurrentTransform(HeldItem.Get_HandAttachPoint()).GetLocation();
+        const auto IsWithinReach = (InClaim.Location - Hand).Size() <= Strike.Reach + Strike.Radius + constants_held_item_use::k_StrikeReachSlack;
+        if (IsWithinReach == false || Get_IsNearAHurtbox(Zone, InClaim.Location) == false)
+        {
+            RefuseStrike(InState, EMars_HeldItemUse_StrikeRefusal::OutOfReach);
+            return;
+        }
+
+        auto Dealer = InPlayer.As_DamageDealer(ECk_SanityCheck::UnChecked);
+        if (ck::EnsureIfNot(ck::IsValid(Dealer), f"[HeldItemUse] [{InPlayer.ToString()}] claimed a strike but has no DamageDealer"))
+        {
+            RefuseStrike(InState, EMars_HeldItemUse_StrikeRefusal::NoZone);
+            return;
+        }
+
+        InState.Strikes.Applied += 1;
+        InState.Strikes.LastAppliedAt = Now;
+
+        auto Event = utils_damage_dealer::Make_Event(Dealer, Strike.Damage, Strike.DamageType);
+        Event.Source.Causer = Item;
+        Event.Hit.Location = InClaim.Location;
+        Event.Hit.Normal = InClaim.Normal;
+        Event.Hit.Impulse = InClaim.Impulse.GetSafeNormal() * Strike.ImpulseSpeed;
+        Dealer.Request_DealDamage(FMars_Request_DamageDealer_DealDamage(Zone, Event));
+    }
+
+    private bool Get_IsNearAHurtbox(const FCk_Handle_HitZone& InZone, FVector InLocation)
+    {
+        for (auto Hurtbox : InZone.Get_Hurtboxes())
+        {
+            const auto Node = Hurtbox.As_Transform(ECk_SanityCheck::UnChecked);
+            if (ck::Is_NOT_Valid(Node))
+            { continue; }
+
+            if ((utils_transform::Get_EntityCurrentTransform(Node).GetLocation() - InLocation).Size() <= constants_held_item_use::k_StrikeZoneSlack)
+            { return true; }
+        }
+
+        return false;
+    }
+
+    private void RefuseStrike(FMars_Fragment_HeldItemUse& InState, EMars_HeldItemUse_StrikeRefusal InRefusal)
+    {
+        InState.Strikes.Refused += 1;
+        InState.Strikes.LastRefusal = InRefusal;
     }
 
     private void Broadcast_ItemLaunched(FCk_Handle& InPlayer, FCk_Handle_Item InItem, EMars_LaunchKind InKind)

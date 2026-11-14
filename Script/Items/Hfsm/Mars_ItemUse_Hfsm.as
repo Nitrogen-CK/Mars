@@ -112,7 +112,8 @@ enum EMars_ItemUse_StrikePhase
 // the dealer's Request_StrikeSweep (filtered on Probe.Mars.HitZone; Blocking world policy, so a wall in front of a
 // hurtbox stops the swing; Silent overlap notify). The first hurtbox hit is dealt through the player's DamageDealer,
 // which resolves it to its zone. Succeeds RecoverySeconds after the sweep. Fails when the player has no dealer or
-// viewpoint, or the held item has no Strike trait. Exiting mid-swing (the use torn down) cancels the local swing.
+// viewpoint, or the held item has no Strike trait. Exiting mid-swing (the use torn down) cancels the local swing. A blow
+// on a zone another machine owns is claimed to the authority through Cue.Mars.HeldItemUse.Strike.
 class UMars_SmTask_ItemUse_Strike : UCk_SmTask_EntityScript
 {
     default _TaskMode = ECk_SmTaskMode::Tick;
@@ -242,6 +243,7 @@ class UMars_SmTask_ItemUse_Strike : UCk_SmTask_EntityScript
         // The dealer is the player's entity: the sweep skips that entity's own bodies and its own zone's hurtboxes, not the
         // rest of the player's ownership tree.
         const auto Hit = _Dealer.Request_StrikeSweep(FMars_DamageDealer_Sweep(Start, Start + Forward * _Reach, _Radius), Template);
+        utils_held_item_use::Fire_StrikeCueFor(_Player, FMars_HeldItemUse_Swing(_Item, Hit, Template.Hit.Impulse));
 
         // A zone hit plays through the dealer's OnDamageDealt; a blow the world stops has no damage to cue it.
         if (Hit.Get_HitKind() != ECk_ProbeTrace_HitKind::World)

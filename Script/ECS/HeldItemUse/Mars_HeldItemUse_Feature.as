@@ -2,7 +2,11 @@
 // Cue.Mars.HeldItemUse.Launch at the player's entity with its own aim (utils_held_item_use::Fire_LaunchCue), and the
 // authority's drain launches the item as a World-mode world item under the replicated spawn owner; a client's own Drop or
 // Throw request is dropped. ThrowArmed and the use interactable are owner-local (E): the HUD's throw-armed state and the
-// use interactable live on the machine whose player holds the item, so their requests apply on every machine.
+// use interactable live on the machine whose player holds the item, so their requests apply on every machine. A blow that
+// lands on a zone another machine owns is the authority's too: the striking machine fires Cue.Mars.HeldItemUse.Strike at
+// the player's entity (utils_held_item_use::Fire_StrikeCueFor), the authority's drain judges it against what it holds and
+// deals it through the player's dealer from its own copy of the item's numbers; the tally of those claims is the
+// authority's own and never replicates.
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
@@ -54,6 +58,19 @@ struct FMars_HeldItemUse_ThrowTuning
     float32 ChargeSeconds = constants_held_item_use::k_DefaultThrowChargeSeconds;
 }
 
+// Why the authority refused a strike claim: the first check it failed, in the order the drain checks them.
+enum EMars_HeldItemUse_StrikeRefusal
+{
+    // The player holds nothing, or nothing that strikes, or not the item the claim names.
+    ItemMismatch,
+    // The player's last applied blow is more recent than the held item's swing allows.
+    TooSoon,
+    // The address names no live zone with a hurtbox here.
+    NoZone,
+    // The contact is beyond the blade's reach from the hand, or away from every hurtbox of the zone.
+    OutOfReach
+}
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Constants
 //--------------------------------------------------------------------------------------------------------------------------
@@ -71,11 +88,38 @@ namespace constants_held_item_use
 
     // Spawn distance in front of the view when the player has no hand attach point.
     const float32 k_NoHandSpawnDistance = 60.0f;
+
+    // A claimed contact may lie this much past the held item's Reach + Radius from the hand: the striking machine swung
+    // from its own view of the pawn, which leads or trails the authority's by the latency.
+    const float32 k_StrikeReachSlack = 150.0f;
+
+    // A claimed contact must lie within this of one of the zone's hurtbox nodes.
+    const float32 k_StrikeZoneSlack = 250.0f;
+
+    // Two applied blows of one player are at least this fraction of the held item's Windup + Recovery apart.
+    const float32 k_StrikeMinIntervalFraction = 0.5f;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 // State
 //--------------------------------------------------------------------------------------------------------------------------
+
+// The authority's count of the strike claims it judged. Never replicated: a client's copy stays default.
+struct FMars_HeldItemUse_StrikeTally
+{
+    UPROPERTY()
+    int32 Applied = 0;
+
+    UPROPERTY()
+    int32 Refused = 0;
+
+    UPROPERTY()
+    TOptional<EMars_HeldItemUse_StrikeRefusal> LastRefusal;
+
+    // The authority's clock (utils_mars_net::Get_ServerWorldSeconds) when the last claim was applied.
+    UPROPERTY()
+    TOptional<float64> LastAppliedAt;
+}
 
 // Lives on the player. CurrentInteractable is the no-probe interactable whose single Primary.UsableItem target runs the
 // held item's UseAction state; it is rebuilt whenever the held item changes.
@@ -99,6 +143,9 @@ struct FMars_Fragment_HeldItemUse
     // the same item before the held item changes would spawn a world item whose adopt fails.
     UPROPERTY()
     FCk_Handle_Item LaunchedItem;
+
+    UPROPERTY()
+    FMars_HeldItemUse_StrikeTally Strikes;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -203,6 +250,67 @@ struct FMars_Request_HeldItemUse_Throw
     }
 }
 
+// One blow claimed to the authority: the address of the zone it landed on (ZoneRoot, ZoneIndex), the definition of the
+// item swung, the contact and the impulse the striking machine gave it. It carries no damage: the authority deals from
+// its own copy of the held item. The payload of Cue.Mars.HeldItemUse.Strike.
+struct FMars_HeldItemUse_Strike
+{
+    UPROPERTY()
+    FCk_Handle ZoneRoot;
+
+    UPROPERTY()
+    int32 ZoneIndex = 0;
+
+    UPROPERTY()
+    TSoftObjectPtr<UCk_InventoryItem_Definition> Item;
+
+    UPROPERTY()
+    FVector Location = FVector::ZeroVector;
+
+    UPROPERTY()
+    FVector Normal = FVector::ZeroVector;
+
+    UPROPERTY()
+    FVector Impulse = FVector::ZeroVector;
+
+    FMars_HeldItemUse_Strike() {}
+}
+
+struct FMars_Request_HeldItemUse_Strike
+{
+    UPROPERTY()
+    FMars_HeldItemUse_Strike Strike;
+
+    FMars_Request_HeldItemUse_Strike() {}
+
+    FMars_Request_HeldItemUse_Strike(const FMars_HeldItemUse_Strike& InStrike)
+    {
+        Strike = InStrike;
+    }
+}
+
+// What one swing's sweep found, as the strike task has it: the item swung, the sweep's result and the blow's impulse.
+struct FMars_HeldItemUse_Swing
+{
+    UPROPERTY()
+    FCk_Handle_Item Item;
+
+    UPROPERTY()
+    FCk_ShapeCast_Result Result;
+
+    UPROPERTY()
+    FVector Impulse = FVector::ZeroVector;
+
+    FMars_HeldItemUse_Swing() {}
+
+    FMars_HeldItemUse_Swing(FCk_Handle_Item InItem, const FCk_ShapeCast_Result& InResult, FVector InImpulse)
+    {
+        Item = InItem;
+        Result = InResult;
+        Impulse = InImpulse;
+    }
+}
+
 struct FMars_Request_HeldItemUse_SetThrowArmed
 {
     UPROPERTY()
@@ -216,7 +324,7 @@ struct FMars_Request_HeldItemUse_SetThrowArmed
     }
 }
 
-// Drained Refresh -> Drop -> Throw -> SetThrowArmed; see the processor.
+// Drained Refresh -> Drop -> Throw -> Strike -> SetThrowArmed; see the processor.
 struct FMars_Fragment_HeldItemUse_Requests
 {
     UPROPERTY()
@@ -227,6 +335,9 @@ struct FMars_Fragment_HeldItemUse_Requests
 
     UPROPERTY()
     TArray<FMars_Request_HeldItemUse_Throw> ThrowRequests;
+
+    UPROPERTY()
+    TArray<FMars_Request_HeldItemUse_Strike> StrikeRequests;
 
     UPROPERTY()
     TArray<FMars_Request_HeldItemUse_SetThrowArmed> SetThrowArmedRequests;

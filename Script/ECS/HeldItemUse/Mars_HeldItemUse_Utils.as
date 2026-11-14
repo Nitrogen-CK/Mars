@@ -128,6 +128,12 @@ mixin FTransform Get_LaunchView(const FCk_Handle_HeldItemUse& Self)
     return utils_transform::Get_EntityCurrentTransform(Carrier.As_Transform());
 }
 
+// The authority's count of the strike claims it judged; default on a machine without authority.
+mixin FMars_HeldItemUse_StrikeTally Get_StrikeTally(const FCk_Handle_HeldItemUse& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_HeldItemUse).Strikes;
+}
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Requests
 //--------------------------------------------------------------------------------------------------------------------------
@@ -148,6 +154,13 @@ mixin void Request_Throw(FCk_Handle_HeldItemUse& Self, const FMars_Request_HeldI
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_HeldItemUse_Requests);
     Requests.ThrowRequests.Add(InRequest);
+}
+
+// Applied only on the authority (Cue.Mars.HeldItemUse.Strike carries a client's claim there); a non-authority drops it.
+mixin void Request_Strike(FCk_Handle_HeldItemUse& Self, const FMars_Request_HeldItemUse_Strike& InRequest)
+{
+    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_HeldItemUse_Requests);
+    Requests.StrikeRequests.Add(InRequest);
 }
 
 // HUD-only (see FMars_Fragment_HeldItemUse::ThrowArmed); the drain broadcasts OnThrowArmedChanged on change.
