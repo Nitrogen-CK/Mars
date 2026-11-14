@@ -1,6 +1,7 @@
 // The server's court emerges one rat and then destroys its raid: the rat, which lives under the raid, goes with it, and
 // the den stays on both machines with slot 0 out and the eyes on slot 1 (nothing brings a rat of an ended raid home).
-// Nothing tagged as a raid or a rat is left near the base on either machine.
+// Nothing tagged as a raid or a rat is left near the base on either machine. The client held the rat's copy, one rat,
+// before its raid ended, and the copy went with its raid copy.
 // Surface: Ck.PantryRaid.Net.AS_PantryRaid_ARaidThatEndsLeavesItsDenOnBothMachines
 class UCk_AutoTest_Net_PantryRaid_ARaidThatEndsLeavesItsDenOnBothMachines : UMars_AutoTestRig_NetPantryRaid
 {
@@ -16,6 +17,7 @@ class UCk_AutoTest_Net_PantryRaid_ARaidThatEndsLeavesItsDenOnBothMachines : UMar
     private int32 _RaidDestroyedFrame = -1;
     private int32 _RatGoneFrame = -1;
     private FString _RatAtSpawn;
+    private int32 _ClientMostRats = 0;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
@@ -134,6 +136,7 @@ class UCk_AutoTest_Net_PantryRaid_ARaidThatEndsLeavesItsDenOnBothMachines : UMar
     UFUNCTION()
     private void Is_ClientRaidGone(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
+        _ClientMostRats = Math::Max(_ClientMostRats, Count_RatsHere());
         auto Result = OutResult;
         Result.Set(Get_IsRowEnding(_RowRaid));
     }
@@ -158,7 +161,8 @@ class UCk_AutoTest_Net_PantryRaid_ARaidThatEndsLeavesItsDenOnBothMachines : UMar
         Assert_True(Get_IsRowEyeSlot(1), "the client's den copy: eye slot 1");
         Assert_True(Get_IsRowDenLedger(EMars_RatDen_Eyes::Shown, 1), "the client's den ledger reads Shown and 1");
         Assert_Equals_Int(Count_TaggedNearBase(utils_pantry_raid::RaidTag), 0, "no raid is left near the base on the client");
+        Assert_Equals_Int(_ClientMostRats, 1, "the client held one rat before its raid ended");
         Assert_Equals_Int(Count_RatsHere(), 0, "no rat exists on the client");
-        Finish_PantryRow(k_Row, "");
+        Finish_PantryRow(k_Row, f"mostRats={_ClientMostRats}");
     }
 }

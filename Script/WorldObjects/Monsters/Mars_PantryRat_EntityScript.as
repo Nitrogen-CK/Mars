@@ -63,11 +63,14 @@ struct FMars_Fragment_PantryRat_Assembly
 // the side the blow pushed (DeathToppleLeft / DeathToppleRight, the other side when that floor is blocked), then DeadHold.
 // A recreated body primitive is re-seeded: CPD 14 first, then the Eyes are re-pointed at it (the Eyes feature pushes every
 // group, 0..13, to a new plate). Headless (FApp::CanEverRender false) it composes the kernel only, unless BuildBodyHeadless
-// (tests read the real component's custom primitive data).
+// (tests read the real component's custom primitive data). The entity, its root and the kernel's ledger of its phase
+// replicate: every machine builds the look and the tick, and a copy's speed is measured from the replicated root over
+// its own kernel clock.
 class UMars_PantryRat_EntityScript : UCk_GenericEntityScript_UE
 {
     default _ShowInPlaceActors = true;
-    default _Replication = ECk_Replication::DoesNotReplicate;
+    // SPLIT: authority runs phases, navigator, claim, pocket; root and phase replicate; clips, fade, eyes are local.
+    default _Replication = ECk_Replication::Replicates;
 
     UPROPERTY(ExposeOnSpawn)
     FTransform SpawnTransform = FTransform::Identity;
@@ -155,7 +158,7 @@ class UMars_PantryRat_EntityScript : UCk_GenericEntityScript_UE
 
         auto Spawn = SpawnTransform;
         Spawn.SetLocation(Spawn.GetLocation() + FVector(0.0, 0.0, utils_pantry_rat::k_Clearance));
-        auto Root = utils_transform::Add(InHandle, Spawn, ECk_Replication::DoesNotReplicate);
+        auto Root = utils_mars_net::Add_CreatureRoot(InHandle, Spawn);
 
         _Rat = utils_pantry_rat::Add(Root, Spec);
         if (ck::Is_NOT_Valid(_Rat))

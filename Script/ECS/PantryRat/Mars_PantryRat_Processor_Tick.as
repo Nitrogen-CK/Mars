@@ -3,7 +3,10 @@
 // the no-target clock, the provider-only route rule (a move the navigator took as a StraightLine is stopped and failed),
 // and the receipts the drain waits on: the carry mount (a Persistent food settled Carried on the rat; a transient item's
 // visual constructed) -> FleeWithLoot, and the release (a Persistent food back World in its holder; a transient item in its
-// adopting world item's holder) -> DeadHold. Only this processor and the drain write the rat's state.
+// adopting world item's holder) -> DeadHold. Only this processor and the drain write the rat's state. It has two
+// halves: every machine runs the clock; the authority then runs the rest inside the rat's world and publishes the
+// ledger before it raises the steps, and a copy without authority only shows its phase's fade and hide on that clock
+// (utils_pantry_rat::Apply_ShownPresence) and never reads a raid, a den, a navigator or a pocket.
 class UMars_Processor_PantryRat_Tick : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -25,6 +28,16 @@ class UMars_Processor_PantryRat_Tick : UCk_Processor_Script_Base_UE
         auto Self = InHandle.As_PantryRat();
         InState.Clock += Math::Min(Delta, k_MaxStep);
 
+        const auto HasAuthority = utils_net::Get_HasAuthority(InHandle);
+        if (HasAuthority == false)
+        {
+            utils_pantry_rat::Apply_ShownPresence(InState, Self.Get_Tuning());
+            return;
+        }
+
+        // Handlers react on the rat (its look) and the den and the raid it asks: scope the script world to its own.
+        const auto WorldContext = FAngelscriptGameThreadScopeWorldContext(utils_entity_lifetime::Get_WorldForEntity(InHandle));
+
         Refresh_Threat(Self, InState);
         Refresh_NoTarget(Self, InState);
         Enforce_ProviderRoute(Self, InState);
@@ -35,6 +48,7 @@ class UMars_Processor_PantryRat_Tick : UCk_Processor_Script_Base_UE
         { Check_ReleaseReceipt(Self, InState); }
 
         Advance_Fade(Self, InState);
+        utils_pantry_rat::Publish(Self);
 
         if (InState.StepFrom.Num() > 0)
         { utils_pantry_rat::Emit_PhaseSteps(Self); }

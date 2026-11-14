@@ -82,22 +82,30 @@ namespace utils_pantry_rat
     // Composes the rat on InRoot, Bat-style: SurfaceMotion (the only writer of the root while it lives) -> SurfaceNavigator ->
     // monster (Health born invulnerable so no contact but a weapon hit ever depletes it; body zone; team) -> the body hurtbox
     // -> the mouth node published as AttachPoint.Mars.RatMouth -> the pocket (capacity 1, the drain-time policy, its
-    // Persistent loot riding the mouth) on a child entity the rat owns -> the rat's fragments -> LAST the state machine.
-    // A rejected spec or sub-feature ensures and returns an invalid handle.
+    // Persistent loot riding the mouth) on a child entity the rat owns -> the rat's fragments, the replicated ledger
+    // and the mirror's state -> LAST the state machine. A copy without authority composes the same without the
+    // surface motion, the navigator, the pocket and the state machine (its Navigator and Pocket stay invalid) and
+    // keeps no links: its raid and its den name nobody whatever its spec arrived with. A rejected spec or sub-feature
+    // ensures and returns an invalid handle.
     FCk_Handle_PantryRat Add(FCk_Handle_Transform& InRoot, FMars_PantryRat_Spec InSpec)
     {
         FCk_Handle RootEntity = InRoot;
-        const auto Validation = InSpec.Validate();
+        const auto HasAuthority = utils_net::Get_HasAuthority(RootEntity);
+        const auto Validation = HasAuthority ? InSpec.Validate() : InSpec.Validate_Shown();
         if (ck::EnsureIfNot(Validation.IsValid(), f"[PantryRat] [{RootEntity.ToString()}] rejected the spec: {Validation.Get_Error()}"))
         { return FCk_Handle_PantryRat(); }
 
-        auto Motion = utils_surface_motion::Add(InRoot, Make_MotionSpec());
-        if (ck::EnsureIfNot(ck::IsValid(Motion), f"[PantryRat] [{RootEntity.ToString()}] the surface motion was rejected"))
-        { return FCk_Handle_PantryRat(); }
+        auto Navigator = FCk_Handle_SurfaceNavigator();
+        if (HasAuthority)
+        {
+            auto Motion = utils_surface_motion::Add(InRoot, Make_MotionSpec());
+            if (ck::EnsureIfNot(ck::IsValid(Motion), f"[PantryRat] [{RootEntity.ToString()}] the surface motion was rejected"))
+            { return FCk_Handle_PantryRat(); }
 
-        auto Navigator = utils_surface_navigator::Add(Motion, FMars_SurfaceNavigator_Spec(InSpec.Tuning.Speeds.Creep, k_ArrivalCm, 2.0f, 15.0f, k_AgentRadius));
-        if (ck::Is_NOT_Valid(Navigator))
-        { return FCk_Handle_PantryRat(); }
+            Navigator = utils_surface_navigator::Add(Motion, FMars_SurfaceNavigator_Spec(InSpec.Tuning.Speeds.Creep, k_ArrivalCm, 2.0f, 15.0f, k_AgentRadius));
+            if (ck::Is_NOT_Valid(Navigator))
+            { return FCk_Handle_PantryRat(); }
+        }
 
         const auto BodyHealth = FMars_Health_Spec(1.0f, 1.0f, ECk_EnableDisable::Enable);
         const auto BodyZone = utils_hit_zone::Make_FleshZoneSpec(GameplayTags::HitZone_Mars_Body, 1.0f);
@@ -114,7 +122,9 @@ namespace utils_pantry_rat
         AttachPointsSpec.Points.Add(FMars_AttachPoint_Entry(Get_MouthPoint(), MouthNode));
         utils_attach_points::Add(RootEntity, AttachPointsSpec);
 
-        auto Pocket = Add_Pocket(RootEntity);
+        auto Pocket = FCk_Handle_Inventory_DataOnly();
+        if (HasAuthority)
+        { Pocket = Add_Pocket(RootEntity); }
 
         auto Params = FMars_Fragment_PantryRat_Params();
         Params.Spec = InSpec;
@@ -122,6 +132,11 @@ namespace utils_pantry_rat
         Params.Navigator = Navigator;
         Params.Pocket = Pocket;
         Params.MouthNode = MouthNode;
+        if (HasAuthority == false)
+        {
+            Params.Spec.Links.Raid = FCk_Handle();
+            Params.Spec.Links.Den = FCk_Handle();
+        }
 
         RootEntity.Add_Fragment(FMars_Feature_PantryRat());
         RootEntity.Add_Fragment(Params);
@@ -129,9 +144,75 @@ namespace utils_pantry_rat
         RootEntity.Add_Fragment(FMars_Tag_PantryRat_NeedsSetup());
         utils_entity_tag::Add(RootEntity, RatTag);
 
+        // The mirror compares what arrives against the ledger this machine composed, not one that already arrived.
+        auto Ledger = FMars_Fragment_PantryRat_Net();
+        auto Local = FMars_Fragment_PantryRat_Local();
+        Local.Last = TOptional<FMars_Fragment_PantryRat_Net>(Ledger);
+
+        // A ledger already here can only have been put here by its replicated application: this copy was born into it,
+        // has taken that state, and the mirror's first pass shows it as it stands.
+        if (RootEntity.Has_Fragment(FMars_Fragment_PantryRat_Net))
+        { Local.InitialState = EMars_Net_InitialState::Taken; }
+        else
+        { RootEntity.Add_Fragment(Ledger, ECk_Replication::Replicates); }
+
+        RootEntity.Add_Fragment(Local);
+        RootEntity.Add_Fragment(FMars_Tag_PantryRat_NeedsMirror());
+
         // Last: Alive's condition reads the Dead attribute as the machine enters its initial state.
-        utils_state_machine::Add(RootEntity, FCk_StateMachine_Spec(UMars_SmState_PantryRat_Alive));
+        if (HasAuthority)
+        { utils_state_machine::Add(RootEntity, FCk_StateMachine_Spec(UMars_SmState_PantryRat_Alive)); }
+
         return RootEntity.As_PantryRat();
+    }
+
+    // The ledger's only writer, called last by the authority's request drain and at the end of its tick: written and
+    // marked dirty only when the phase differs from the stored ledger.
+    void Publish(FCk_Handle_PantryRat& InSelf)
+    {
+        const auto Phase = InSelf.Get_Phase();
+        auto& Ledger = InSelf.Get_Fragment(FMars_Fragment_PantryRat_Net);
+        if (Ledger.Phase == Phase)
+        { return; }
+
+        Ledger.Phase = Phase;
+        FCk_Handle Entity = InSelf;
+        Entity.Request_MarkReplicationDirty(FMars_Fragment_PantryRat_Net);
+    }
+
+    // How long the authority's fade out of InPhase runs: the den entry's crouch and fade, the corpse's fade, 0 else.
+    float32 Get_FadeOutSeconds(EMars_PantryRat_Phase InPhase, const FMars_PantryRat_Tuning& InTuning)
+    {
+        if (InPhase == EMars_PantryRat_Phase::DenEnter)
+        { return InTuning.DenCrouchSeconds + InTuning.ReturnFadeSeconds; }
+
+        if (InPhase == EMars_PantryRat_Phase::CorpseFade)
+        { return InTuning.CorpseFadeSeconds; }
+
+        return 0.0f;
+    }
+
+    // A copy's reading of the authority's fade (Processor_Tick Advance_Fade) on this machine's clock: hidden is the
+    // phase DormantInDen; the den entry crouches solid for DenCrouchSeconds, then fades over ReturnFadeSeconds; the
+    // corpse fades over CorpseFadeSeconds; every other phase is solid. Only a machine without authority calls it.
+    void Apply_ShownPresence(FMars_Fragment_PantryRat& InOutState, const FMars_PantryRat_Tuning& InTuning)
+    {
+        InOutState.Hidden = InOutState.Phase == EMars_PantryRat_Phase::DormantInDen;
+        const auto Age = InOutState.Clock - InOutState.PhaseStartedAt;
+        if (InOutState.Phase == EMars_PantryRat_Phase::DenEnter)
+        {
+            InOutState.FadeAlpha = Age < InTuning.DenCrouchSeconds
+                ? 1.0f : Math::Clamp(1.0f - (Age - InTuning.DenCrouchSeconds) / InTuning.ReturnFadeSeconds, 0.0f, 1.0f);
+            return;
+        }
+
+        if (InOutState.Phase == EMars_PantryRat_Phase::CorpseFade)
+        {
+            InOutState.FadeAlpha = Math::Clamp(1.0f - Age / InTuning.CorpseFadeSeconds, 0.0f, 1.0f);
+            return;
+        }
+
+        InOutState.FadeAlpha = 1.0f;
     }
 
     // The pocket: a capacity-1, non-stacking, non-persisted inventory. CkInventory composes it on a child entity of the rat
@@ -381,9 +462,13 @@ mixin float32 Get_Clock(const FCk_Handle_PantryRat& Self)
     return Self.Get_Fragment(FMars_Fragment_PantryRat).Clock;
 }
 
-// The rat holds (or is landing) an item: its pocket is not empty, or its loot is recorded.
+// The rat holds (or is landing) an item: its pocket is not empty, or its loot is recorded. A copy without a pocket
+// reads it from its phase.
 mixin bool Get_IsLoaded(const FCk_Handle_PantryRat& Self)
 {
+    if (ck::Is_NOT_Valid(Self.Get_Pocket()))
+    { return utils_pantry_rat::Get_IsLoadedPhase(Self.Get_Phase()); }
+
     return ck::IsValid(Self.Get_Fragment(FMars_Fragment_PantryRat).Loot) || Self.Get_Pocket().Get_NumItems() > 0;
 }
 

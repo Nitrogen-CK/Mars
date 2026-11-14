@@ -1,6 +1,8 @@
 // Wires a new rat to its kernel, once: every hit its body zone routes becomes a TakeHit (the drain decides whether it is a
 // lethal weapon hit), the monster's OnDied becomes Died, and the navigator's OnArrived / OnFailed become NavResults (the
-// drain counts only the route's own goal). The zone, the monster and the navigator are all on the rat's root.
+// drain counts only the route's own goal). The zone, the monster and the navigator are all on the rat's root. A copy
+// without authority binds none of them: it turns its own body zone off when its monster dies (at once when it already
+// reads dead), as the authority's corpse does.
 class UMars_Processor_PantryRat_Setup : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -19,6 +21,15 @@ class UMars_Processor_PantryRat_Setup : UCk_Processor_Script_Base_UE
         Rat.Request_TryRemove(FMars_Tag_PantryRat_NeedsSetup);
 
         auto Monster = Rat.Get_Monster();
+        if (utils_net::Get_HasAuthority(InHandle) == false)
+        {
+            Monster.BindTo_OnDied(FMars_Delegate_Monster_OnDied(this, n"OnMonsterDied"));
+            if (Monster.Get_IsDead())
+            { Disable_BodyZone(Monster); }
+
+            return;
+        }
+
         auto Zone = Monster.Get_BodyZone();
         Zone.BindTo_OnHit(FMars_Delegate_HitZone_OnHit(this, n"OnBodyHit"));
         Monster.BindTo_OnDied(FMars_Delegate_Monster_OnDied(this, n"OnDied"));
@@ -26,6 +37,18 @@ class UMars_Processor_PantryRat_Setup : UCk_Processor_Script_Base_UE
         auto Navigator = Rat.Get_Navigator();
         Navigator.BindTo_OnArrived(FMars_Delegate_SurfaceNavigator_OnArrived(this, n"OnArrived"));
         Navigator.BindTo_OnFailed(FMars_Delegate_SurfaceNavigator_OnFailed(this, n"OnFailed"));
+    }
+
+    UFUNCTION()
+    private void OnMonsterDied(FCk_Handle_Monster InMonster, FMars_DamageEvent InCause)
+    {
+        Disable_BodyZone(InMonster);
+    }
+
+    private void Disable_BodyZone(FCk_Handle_Monster InMonster)
+    {
+        auto Zone = InMonster.Get_BodyZone();
+        Zone.Request_SetEnabled(FMars_Request_HitZone_SetEnabled(ECk_EnableDisable::Disable));
     }
 
     UFUNCTION()

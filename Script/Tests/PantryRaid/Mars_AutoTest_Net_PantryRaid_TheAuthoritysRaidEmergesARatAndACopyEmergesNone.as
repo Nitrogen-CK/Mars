@@ -1,7 +1,8 @@
 // The server's court (floor, built field, raid, den, a pack with a Monk's Rind in cargo slot 1) becomes ready and its
 // raid emerges one rat, which the server has authority over, which belongs to that raid and which walks off; the den's
 // slot 0 is out and the eyes stand for slot 1. The client's den copy shows that one change of eyes and nothing else;
-// its raid copy has run nothing although its den and pack copies stand inside its bounds, and no rat exists there.
+// its raid copy has run nothing although its den and pack copies stand inside its bounds, and the one rat there is the
+// authority's copy.
 // Surface: Ck.PantryRaid.Net.AS_PantryRaid_TheAuthoritysRaidEmergesARatAndACopyEmergesNone
 class UCk_AutoTest_Net_PantryRaid_TheAuthoritysRaidEmergesARatAndACopyEmergesNone : UMars_AutoTestRig_NetPantryRaid
 {
@@ -149,7 +150,20 @@ class UCk_AutoTest_Net_PantryRaid_TheAuthoritysRaidEmergesARatAndACopyEmergesNon
         Assert_Equals_Int(_RowRaid.Get_Dens().Num(), 0, "the client's raid copy has no den");
         Assert_Equals_Int(_RowRaid.Get_Packs().Num(), 0, "the client's raid copy has no pack");
         Assert_False(_RowRaid.Get_IsReady(), "the client's raid copy is not ready");
-        Assert_Equals_Int(Count_RatsHere(), 0, "no rat exists on the client");
+        Assert_Equals_Int(Count_RatsHere(), 1, "one rat exists on the client");
+        Assert_False(Get_IsClientRatAuthority(), "the client has no authority over that rat");
         Finish_PantryRow(k_Row, "");
+    }
+
+    // Whether this machine has authority over any rat it holds.
+    private bool Get_IsClientRatAuthority()
+    {
+        for (auto Candidate : utils_entity_tag::ForEach_Entity(Get_SubjectEntity(), utils_pantry_rat::RatTag))
+        {
+            if (Get_IsRowEnding(Candidate) == false && utils_net::Get_HasAuthority(Candidate))
+            { return true; }
+        }
+
+        return false;
     }
 }

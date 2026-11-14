@@ -8,7 +8,9 @@
 //   5. NavResult (only for the route's own goal and phase);
 //   6. Advance (the edge table: a loaded rat only flees), MoveTo (admitted only on a real provider route) and Claim (the
 //      guarded transfer into the pocket - never a CargoSlot Take).
-// Every write lands before any broadcast; the requests fragment is removed before anything else happens.
+// Every write lands before any broadcast; the requests fragment is removed before anything else happens. Only the
+// machine with authority over the rat applies them, inside the rat's world, and publishes its ledger before it
+// broadcasts; a copy drops every request.
 class UMars_Processor_PantryRat_HandleRequests : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -38,6 +40,13 @@ class UMars_Processor_PantryRat_HandleRequests : UCk_Processor_Script_Base_UE
 
         // InRequests is invalid past this line; removing before broadcasting lets re-entrant requests survive.
         Self.Request_TryRemove(FMars_Fragment_PantryRat_Requests);
+
+        const auto HasAuthority = utils_net::Get_HasAuthority(InHandle);
+        if (HasAuthority == false)
+        { return; }
+
+        // The carry visual, the dropped item and the signals' handlers belong to the rat's own world.
+        const auto WorldContext = FAngelscriptGameThreadScopeWorldContext(utils_entity_lifetime::Get_WorldForEntity(InHandle));
 
         if (Self.Get_Phase() == EMars_PantryRat_Phase::Destroyed)
         { return; }
@@ -72,6 +81,7 @@ class UMars_Processor_PantryRat_HandleRequests : UCk_Processor_Script_Base_UE
         for (const auto& Request : ClaimRequests)
         { HandleClaim(Self, Request, Changes); }
 
+        utils_pantry_rat::Publish(Self);
         utils_pantry_rat::Broadcast(Self, Changes);
     }
 

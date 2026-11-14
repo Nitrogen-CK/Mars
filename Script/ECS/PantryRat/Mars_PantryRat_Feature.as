@@ -6,6 +6,13 @@
 // the PantryRaid that spawned it, never by its den. Its phase ledger is written only by
 // UMars_Processor_PantryRat_HandleRequests (and the kernel's own Tick for receipts and clocks); the HFSM (Mars_PantryRat_Hfsm.as)
 // reads it and enqueues requests.
+// Stance SPLIT. Only the machine with authority over the rat composes what decides and moves it (the surface motion,
+// the navigator, the pocket, the state machine), reads its raid and its den, applies its requests, runs its threat,
+// its receipts, its fade and its corpse, and publishes the ledger of its phase (FMars_Fragment_PantryRat_Net, written
+// only by utils_pantry_rat::Publish). The entity, its root and that ledger replicate. A copy without authority
+// follows the replicated root, shows the ledger's phase on its own clock, fades and hides from it, and takes the
+// state it was born into once, as it stands (UMars_Processor_PantryRat_Mirror); its raid and den links name nobody.
+// The theft, the loot and the corpse's receipts are the authority's.
 asset Mars_PantryRatHandle of UCkDynamic_HandleDefinition
 {
     TypeName = "FCk_Handle_PantryRat";
@@ -213,6 +220,13 @@ mixin FMars_Validation Validate(const FMars_PantryRat_Spec& Self)
     if (Links.IsValid() == false)
     { return Links; }
 
+    return Self.Validate_Shown();
+}
+
+// What a copy without authority needs of a spec: the tuning and the hurtbox. The links name entities only the
+// authority reads.
+mixin FMars_Validation Validate_Shown(const FMars_PantryRat_Spec& Self)
+{
     const auto Tuning = Self.Tuning.Validate();
     if (Tuning.IsValid() == false)
     { return Tuning; }
@@ -376,7 +390,8 @@ struct FMars_PantryRat_Death
     FString BlockedReason;
 }
 
-// Written only by the rat's request drain and its Tick (receipts, clocks, threat); composed by Add.
+// Written only by the rat's request drain and its Tick (receipts, clocks, threat); composed by Add. On a copy without
+// authority: by the mirror (the phase) and the tick's copy half (the clock, the fade, the hide).
 struct FMars_Fragment_PantryRat
 {
     UPROPERTY()
@@ -479,13 +494,39 @@ struct FMars_Fragment_PantryRat
 // The Setup processor binds the navigator's signals and the body zone's hits, then removes this tag.
 struct FMars_Tag_PantryRat_NeedsSetup {}
 
+// The replicated ledger on the root: the phase. Written only by utils_pantry_rat::Publish, from the authority's request
+// drain and its tick.
+struct FMars_Fragment_PantryRat_Net
+{
+    UPROPERTY()
+    EMars_PantryRat_Phase Phase = EMars_PantryRat_Phase::Emerge;
+}
+
+// Each machine's own: the ledger the mirror last reconciled (unset with authority) and whether this copy has taken
+// the state it was born into.
+struct FMars_Fragment_PantryRat_Local
+{
+    UPROPERTY()
+    TOptional<FMars_Fragment_PantryRat_Net> Last;
+
+    UPROPERTY()
+    EMars_Net_InitialState InitialState = EMars_Net_InitialState::Awaited;
+}
+
+// Added by utils_pantry_rat::Add, dropped by UMars_Processor_PantryRat_Mirror once it has bound the ledger's
+// rep-notify.
+struct FMars_Tag_PantryRat_NeedsMirror {}
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Signals
 //--------------------------------------------------------------------------------------------------------------------------
 
+// With authority, once per phase step. A copy without authority raises it once for the state it was born into when
+// that is not Emerge, then once per arrived change.
 delegate void FMars_Delegate_PantryRat_OnPhaseChanged(FCk_Handle_PantryRat InRat, EMars_PantryRat_Phase InPrevious, EMars_PantryRat_Phase InNew);
 event void FMars_Delegate_PantryRat_OnPhaseChanged_MC(FCk_Handle_PantryRat InRat, EMars_PantryRat_Phase InPrevious, EMars_PantryRat_Phase InNew);
 
+// Raised only by the authority's drain; a copy never raises it.
 delegate void FMars_Delegate_PantryRat_OnClaimResolved(FCk_Handle_PantryRat InRat, EMars_PantryRat_ClaimResult InResult, FCk_Handle_Item InItem);
 event void FMars_Delegate_PantryRat_OnClaimResolved_MC(FCk_Handle_PantryRat InRat, EMars_PantryRat_ClaimResult InResult, FCk_Handle_Item InItem);
 

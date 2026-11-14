@@ -1,8 +1,9 @@
 // The raid's request drain, in order: SpawnRat (once per operation id: an operation that already has a rat, or that the raid
 // never asked for, is stale) -> RatDied (the den slot cools down, the lease drops) -> RatHome (an empty rat admitted home is
 // retired) -> ReleaseLease (only with the lease's own token) -> GrantLease (one lease per pack). Rats are spawned on the
-// raid entity, so the raid owns them; removing a den never destroys a rat. Only the machine with authority over the
-// raid applies them; a copy drops every request.
+// raid entity, so the raid owns them; removing a den never destroys a rat. A rat replicates as the raid's child and
+// ends with it on every machine. Only the machine with authority over the raid applies them; a copy drops every
+// request.
 class UMars_Processor_PantryRaid_HandleRequests : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -203,7 +204,8 @@ class UMars_Processor_PantryRaid_HandleRequests : UCk_Processor_Script_Base_UE
 namespace utils_pantry_raid
 {
     // The resident's rat, spawned on the raid entity (the raid owns it) at the den's ExitPortal facing out of the den, with
-    // the raid's tuning copied into its spec.
+    // the raid's tuning copied into its spec. It replicates as the raid's child and ends with the raid on every
+    // machine.
     FCk_Handle Request_SpawnRatEntity(FCk_Handle_PantryRaid& InRaid, const FMars_Request_PantryRaid_SpawnRat& InRequest)
     {
         const auto Den = InRequest.Den;
