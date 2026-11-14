@@ -104,8 +104,9 @@ namespace constants_steward
     // switch does, Mars_SandboxSteward.as); a steward devours a player each time it rises.
     const FName k_ServiceFailedChannel = n"Mechanism.Channel.ServiceFailed";
 
-    // On whoever a steward may devour: the players monsters can hurt (AMars_PlayerCharacter's combat receiver).
-    const FName k_VictimTag = n"TAG_MarsCombatTarget";
+    // On whoever a steward may devour: every pawn a player controls, the host's own or a joined player's, stamped on
+    // the machine with authority over the player's entity once its combat receiver is whole.
+    const FName k_VictimTag = n"TAG_MarsSharedCombatTarget";
 }
 
 // The face plate: a square SizeCm wide, DistanceCm in front of the victim's eye. Just past the 10 cm near plane, so it is

@@ -231,6 +231,13 @@ class UMars_Gameplay_CheatManager : UCheatManager
             return;
         }
 
+        // Only the machine with authority over the steward begins a run; a client's copy shows the host's.
+        if (utils_net::Get_HasAuthority(Nearest) == false)
+        {
+            ck::Trace("[Mars_Devour] only the host's steward devours: ask from the host");
+            return;
+        }
+
         if (Nearest.Get_CanSeize(Player) == false)
         {
             ck::Trace("[Mars_Devour] the steward cannot seize the player now (it holds a victim, or the player is held)");

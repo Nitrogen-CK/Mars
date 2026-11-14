@@ -53,6 +53,8 @@ class UMars_AutoTestRig_NetDevour : UMars_AutoTestRig_NetPlayerCombat
     protected TArray<FMars_NetDevourTest_End> _DevourEnds;
     protected int32 _DevouredEntries = 0;
     protected int32 _DevouredFrame = -1;
+    // The entity tag this machine's devourer is found by.
+    protected FName _DevourerTag = n"TAG_MarsTestNetDevourer";
 
     private FVector _DevourerSpot = FVector::ZeroVector;
     private EMars_NetDevourTest_Victims _Victims = EMars_NetDevourTest_Victims::A;
@@ -191,7 +193,7 @@ class UMars_AutoTestRig_NetDevour : UMars_AutoTestRig_NetPlayerCombat
         if (ck::IsValid(_Devourer))
         { return true; }
 
-        for (auto Candidate : utils_entity_tag::ForEach_Entity(Get_SubjectEntity(), n"TAG_MarsTestNetDevourer"))
+        for (auto Candidate : utils_entity_tag::ForEach_Entity(Get_SubjectEntity(), _DevourerTag))
         {
             if (Get_IsWithin(Candidate, _DevourerSpot, k_DevourerNearCm) == false)
             { continue; }
