@@ -1,11 +1,15 @@
 // Placeable target dummy (Room 5): a 60x60x120 post on team Two with a Health, one Body zone (Sever x1 Damages, Crush
 // x1.5 Ruins) and one hurtbox over the post, so the player's strikes have something to land on before the crawlers.
-// The origin is the post's base. A hit punches the post to 90% for 0.1 s; depletion flattens it to 20% height and,
-// RearmSeconds later, heals it back to MaxHealth and stands it up again.
+// The origin is the post's base. The entity, its root transform and its Health's ledger replicate; a blow reaches it as
+// any zone's does (a client's through its strike claim). The punch (90% for 0.1 s) and the flatten (20% height) follow the
+// Health's signals on every machine; only the authority's timer heals it back to MaxHealth RearmSeconds after depletion,
+// and every machine stands it up when that heal arrives.
 class UMars_TargetDummy_EntityScript : UCk_GenericEntityScript_UE
 {
     default _ShowInPlaceActors = true;
-    default _Replication = ECk_Replication::DoesNotReplicate;
+    // Stance A: the entity, its transform and its Health ledger replicate; the post, the zone and the hurtbox are each
+    // machine's own; only the authority's timer heals.
+    default _Replication = ECk_Replication::Replicates;
 
     UPROPERTY(ExposeOnSpawn)
     FTransform SpawnTransform = FTransform::Identity;
@@ -33,7 +37,8 @@ class UMars_TargetDummy_EntityScript : UCk_GenericEntityScript_UE
     UFUNCTION(BlueprintOverride)
     ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
     {
-        auto Root = utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::DoesNotReplicate);
+        auto Root = utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::Replicates);
+        utils_entity_tag::Add(InHandle, n"TAG_MarsTargetDummy");
         utils_team::Add(InHandle, ECk_Team_ID::Two, ECk_Replication::DoesNotReplicate);
 
         _Health = utils_health::Add(InHandle, FMars_Health_Spec(MaxHealth));
@@ -62,6 +67,7 @@ class UMars_TargetDummy_EntityScript : UCk_GenericEntityScript_UE
 
         _Health.BindTo_OnDamaged(FMars_Delegate_Health_OnDamaged(this, n"OnDamaged"));
         _Health.BindTo_OnDepleted(FMars_Delegate_Health_OnDepleted(this, n"OnDepleted"));
+        _Health.BindTo_OnHealed(FMars_Delegate_Health_OnHealed(this, n"OnHealed"));
 
         return ECk_EntityScript_ConstructionFlow::Finished;
     }
@@ -85,7 +91,10 @@ class UMars_TargetDummy_EntityScript : UCk_GenericEntityScript_UE
     {
         _IsFlattened = true;
         SetBodyScale(FVector(1.0, 1.0, FlattenedScaleZ));
-        _RearmTimer = RestartTimer(_RearmTimer, RearmSeconds, n"OnRearmDone");
+
+        // A copy without authority drops Health requests: it waits for the heal to arrive through the ledger instead.
+        if (utils_net::Get_HasAuthority(InHealth))
+        { _RearmTimer = RestartTimer(_RearmTimer, RearmSeconds, n"OnRearmDone"); }
     }
 
     UFUNCTION()
@@ -103,11 +112,16 @@ class UMars_TargetDummy_EntityScript : UCk_GenericEntityScript_UE
         if (_RearmTimer != InTimer)
         { return; }
 
-        _IsFlattened = false;
-        SetBodyScale(FVector::OneVector);
-
         if (ck::IsValid(_Health))
         { _Health.Request_Heal(FMars_Request_Health_Heal(MaxHealth)); }
+    }
+
+    // Raised by the authority's drain and by every other machine's mirror, so each stands the post up as the heal lands.
+    UFUNCTION()
+    private void OnHealed(FCk_Handle_Health InHealth, float32 InApplied, float32 InRemaining)
+    {
+        _IsFlattened = false;
+        SetBodyScale(FVector::OneVector);
     }
 
     //----------------------------------------------------------------------------------------------------------------------
