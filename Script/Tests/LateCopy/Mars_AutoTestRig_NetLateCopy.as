@@ -1,6 +1,6 @@
 // The late-copy probe net tests' shared steps: the server spawns the probe under the replicated spawn owner at the
 // row's base with the row's spawn value and tracks it for cleanup; each machine finds its copy by tag near the base and
-// logs what its copy recorded, and which path brought the final value to its mirror.
+// logs what its copy recorded, and whether the row's value was taken as the state the copy was born into or arrived.
 UCLASS(Abstract)
 class UMars_AutoTestRig_NetLateCopy : UCk_AutoTest_NetBase
 {
@@ -19,11 +19,14 @@ class UMars_AutoTestRig_NetLateCopy : UCk_AutoTest_NetBase
     protected FVector _Base = FVector::ZeroVector;
     protected FCk_Handle _Probe;
     protected int32 _EnsuresAtStart = 0;
+    // The value whose way to the mirror the path names (a row that writes another sets it after Begin_Rig).
+    protected int32 _PathValue = 0;
 
     protected void Begin_Rig(FVector InBase)
     {
         _Base = InBase;
         _EnsuresAtStart = utils_ensure::Get_EnsureCount();
+        _PathValue = k_FinalValue;
     }
 
     protected bool Get_IsServer()
@@ -49,12 +52,12 @@ class UMars_AutoTestRig_NetLateCopy : UCk_AutoTest_NetBase
     }
 
     // Server: the probe at the base, under the replicated spawn owner, its ledger holding InValueAtSpawn from its spawn
-    // frame.
-    protected void Spawn_ServerProbe(int32 InValueAtSpawn)
+    // frame; InCompose says when a client's copy composes its kernel.
+    protected void Spawn_ServerProbe(int32 InValueAtSpawn, EMars_TESTONLY_LateCopy_Compose InCompose)
     {
         utils_entity_script::Request_SpawnEntity(utils_mars_net::Get_ReplicatedSpawnOwner(Get_SubjectEntity()),
             UMars_NetLateCopy_Probe_EntityScript,
-            FMars_NetLateCopy_Probe_SpawnParams(FTransform(FRotator::ZeroRotator, _Base), InValueAtSpawn));
+            FMars_NetLateCopy_Probe_SpawnParams(FTransform(FRotator::ZeroRotator, _Base), InValueAtSpawn, InCompose));
     }
 
     UFUNCTION()
@@ -115,6 +118,27 @@ class UMars_AutoTestRig_NetLateCopy : UCk_AutoTest_NetBase
         return _Probe.Get_Fragment(FMars_TESTONLY_Fragment_LateCopy_Net).Value;
     }
 
+    // This machine's level on its copy; Awaited until the probe is found and its kernel composed.
+    protected EMars_Net_InitialState Get_InitialState()
+    {
+        if (ck::Is_NOT_Valid(_Probe) || _Probe.Has_Fragment(FMars_TESTONLY_Fragment_LateCopy_Local) == false)
+        { return EMars_Net_InitialState::Awaited; }
+
+        return _Probe.Get_Fragment(FMars_TESTONLY_Fragment_LateCopy_Local).InitialState;
+    }
+
+    protected int32 Get_NotifyCount(EMars_TESTONLY_LateCopy_Reconcile InWay)
+    {
+        auto Count = 0;
+        for (auto Notify : Get_Record().Notifies)
+        {
+            if (Notify.Way == InWay)
+            { ++Count; }
+        }
+
+        return Count;
+    }
+
     protected FMars_TESTONLY_Fragment_LateCopy_Record Get_Record()
     {
         if (ck::Is_NOT_Valid(_Probe) || _Probe.Has_Fragment(FMars_TESTONLY_Fragment_LateCopy_Record) == false)
@@ -123,27 +147,27 @@ class UMars_AutoTestRig_NetLateCopy : UCk_AutoTest_NetBase
         return _Probe.Get_Fragment(FMars_TESTONLY_Fragment_LateCopy_Record);
     }
 
-    // stood: the mirror's first pass already read the final value; arrived: it read the default and a notify
-    // brought the final value; anything else is spelled out.
+    // stood: the row's value was taken as it stands (the mirror's first pass read it, or the notify that brought it
+    // was the ledger's first application); arrived: a later notify brought it as a change; anything else is spelled
+    // out.
     protected FString Get_Path()
     {
         const auto Record = Get_Record();
         if (Record.Mirror.Frame < 0)
         { return "noMirror"; }
 
-        if (Record.Mirror.Value == k_FinalValue)
+        if (Record.Mirror.Value == _PathValue)
         { return "stood"; }
-
-        if (Record.Mirror.Value != 0)
-        { return "other"; }
 
         for (auto Notify : Record.Notifies)
         {
-            if (Notify.Value == k_FinalValue)
-            { return "arrived"; }
+            if (Notify.Value != _PathValue)
+            { continue; }
+
+            return Notify.Way == EMars_TESTONLY_LateCopy_Reconcile::AsItStands ? "stood" : "arrived";
         }
 
-        return "pending";
+        return Record.Mirror.Value == 0 ? "pending" : "other";
     }
 
     // Every recorded notify was taken at or after the construct.
@@ -168,9 +192,12 @@ class UMars_AutoTestRig_NetLateCopy : UCk_AutoTest_NetBase
 
         FString NotifiesText = "";
         for (auto Notify : Record.Notifies)
-        { NotifiesText += f" {Notify.Frame}:{Notify.Value}"; }
+        {
+            const auto WayText = Notify.Way == EMars_TESTONLY_LateCopy_Reconcile::AsItStands ? "stands" : "arrives";
+            NotifiesText += f" {Notify.Frame}:{Notify.Value}:{WayText}";
+        }
 
-        const auto Line = f"[LateCopyNetTest] {InRow} {Get_MachineName()} found={IsFound} authority={HasAuthority} hadLedgerAtConstruct={Record.HadLedgerAtConstruct} constructFrame={Record.ConstructFrame} mirror=[{Record.Mirror.Frame} {Record.Mirror.Value}] notifies={Record.Notifies.Num()} [{NotifiesText} ] promise=[{Record.Promise.Frame} {Record.Promise.Value}] ledger={Get_LedgerValue()} ensures={Get_NewEnsures()} path={Get_Path()} frame={utils_late_copy_probe::Get_Frame()}";
+        const auto Line = f"[LateCopyNetTest] {InRow} {Get_MachineName()} found={IsFound} authority={HasAuthority} hadLedgerAtCompose={Record.HadLedgerAtCompose} initialAtCompose={Record.InitialStateAtCompose} initial={Get_InitialState()} constructFrame={Record.ConstructFrame} mirror=[{Record.Mirror.Frame} {Record.Mirror.Value}] notifies={Record.Notifies.Num()} [{NotifiesText} ] promise=[{Record.Promise.Frame} {Record.Promise.Value}] ledger={Get_LedgerValue()} ensures={Get_NewEnsures()} path={Get_Path()} frame={utils_late_copy_probe::Get_Frame()}";
         Log(Line);
     }
 }

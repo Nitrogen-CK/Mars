@@ -64,6 +64,16 @@ class UMars_Net_Subsystem : UScriptWorldSubsystem
     }
 }
 
+// Whether a copy without authority has taken the state it was born into. Its ledger's first application carries
+// that state (the authority's values as they stood when the copy was first sent); every later one is a change.
+enum EMars_Net_InitialState
+{
+    // Composed; the ledger has not been applied on this machine yet.
+    Awaited,
+    // Taken once, as it stood. What arrives from here on is an event.
+    Taken
+}
+
 // The one place networking is spelled for Mars code: the replicated spawn owner and the questions around it.
 namespace utils_mars_net
 {

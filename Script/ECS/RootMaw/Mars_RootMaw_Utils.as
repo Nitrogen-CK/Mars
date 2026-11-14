@@ -158,8 +158,11 @@ namespace utils_root_maw
         auto Local = FMars_Fragment_RootMaw_Local();
         Local.Last = TOptional<FMars_Fragment_RootMaw_Net>(Ledger);
 
-        // A client's copy can receive the replicated ledger before it composes: the arrived ledger stands then.
-        if (RootEntity.Has_Fragment(FMars_Fragment_RootMaw_Net) == false)
+        // A ledger already here can only have been put here by its replicated application: this copy was born into it,
+        // has taken that state, and the mirror's first pass shows it as it stands.
+        if (RootEntity.Has_Fragment(FMars_Fragment_RootMaw_Net))
+        { Local.InitialState = EMars_Net_InitialState::Taken; }
+        else
         { RootEntity.Add_Fragment(Ledger, ECk_Replication::Replicates); }
 
         RootEntity.Add_Fragment(Local);

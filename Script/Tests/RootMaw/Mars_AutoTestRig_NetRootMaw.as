@@ -5,8 +5,10 @@
 // takes its Maw, its monster's body Health and body zone, counts the OnStance and the OnDied its own copy raises and
 // the OnDamaged of its body Health, records the OnActionPhase (with its frame) and counts the OnBlowLanded its copy
 // raises, and samples it from the row's polled predicates: the largest distance the root moved between two samples,
-// the highest Emerge, the first frame its ledger read Emerged, the widest jaw while its action read Windup, the lowest
-// while it read Recover, the widest since its flinch count last changed, and whether it ever read flinching.
+// the highest and the lowest Emerge, the first frame its ledger read Emerged, the widest jaw while its action read
+// Windup, the lowest while it read Recover, the widest since its flinch count last changed, and whether it ever read
+// flinching. A row whose copy must be born into a state spawns a held Maw (its ledger held at the row's values from the
+// spawn frame) and reads the way its copy took that state.
 struct FMars_NetRootMawTest_Phase
 {
     UPROPERTY()
@@ -42,6 +44,11 @@ class UMars_AutoTestRig_NetRootMaw : UMars_AutoTestRig_NetStrike
     protected int32 _MawLedgerEmergedFrame = -1;
     protected float64 _MawLargestStep = 0.0;
     protected float32 _MawHighestEmerge = 0.0f;
+    protected float32 _MawLowestEmerge = 2.0f;
+    protected int32 _MawFoundFrame = -1;
+    // Off authority: each rep-notify of the copy's ledger this rig saw, as frame:stance:gape.
+    protected FString _MawLedgerNotifies = "";
+    protected int32 _MawFirstLedgerNotifyFrame = -1;
     protected FVector _MawFoundAt = FVector::ZeroVector;
     protected FCk_Handle_Health _PreyHealth;
     protected TArray<FMars_NetRootMawTest_Phase> _MawPhases;
@@ -91,6 +98,19 @@ class UMars_AutoTestRig_NetRootMaw : UMars_AutoTestRig_NetStrike
         Params.WithVisuals = false;
         utils_entity_script::Request_SpawnEntity(utils_mars_net::Get_ReplicatedSpawnOwner(Get_SubjectEntity()),
             UMars_RootMaw_EntityScript, Params);
+    }
+
+    // The Maw as Spawn_ServerMaw spawns it, its ledger held at InLedger from its spawn frame on (the authority's own
+    // kernel keeps running underneath).
+    protected void Spawn_ServerHeldMaw(FMars_RootMaw_Spec InSpec, FMars_Fragment_RootMaw_Net InLedger)
+    {
+        auto Params = FMars_NetRootMaw_Held_SpawnParams();
+        Params.SpawnTransform = FTransform(FRotator::ZeroRotator, _Base + FVector(0.0, 0.0, utils_root_maw::Clearance));
+        Params.Spec = InSpec;
+        Params.WithVisuals = false;
+        Params.HeldLedger = InLedger;
+        utils_entity_script::Request_SpawnEntity(utils_mars_net::Get_ReplicatedSpawnOwner(Get_SubjectEntity()),
+            UMars_NetRootMaw_Held_EntityScript, Params);
     }
 
     // The single-machine rig's prey stand-in at InOffset from the base (its root 90 up), owned by the subject: team One
@@ -157,6 +177,10 @@ class UMars_AutoTestRig_NetRootMaw : UMars_AutoTestRig_NetStrike
             _Health = _MawMonster.Get_BodyHealth();
             _Zone = _MawMonster.Get_BodyZone();
             _MawFoundAt = Maw.Get_Location();
+            _MawFoundFrame = int32(utils_time::Get_FrameCounter());
+            FCk_Handle Entity = _Maw;
+            if (Get_IsServer() == false)
+            { Entity.BindTo_OnRepNotify(FMars_Fragment_RootMaw_Net, FCk_DynamicFragment_OnRepNotify(this, n"OnMawLedgerNotify")); }
             _Maw.BindTo_OnStance(FMars_Delegate_RootMaw_OnStance(this, n"OnMawStance"));
             _MawMonster.BindTo_OnDied(FMars_Delegate_Monster_OnDied(this, n"OnMawDied"));
             _Health.BindTo_OnDamaged(FMars_Delegate_Health_OnDamaged(this, n"OnMawDamaged"));
@@ -250,6 +274,9 @@ class UMars_AutoTestRig_NetRootMaw : UMars_AutoTestRig_NetStrike
 
         _MawLastSample = Here;
         _MawHighestEmerge = Math::Max(_MawHighestEmerge, _Maw.Get_Emerge());
+        // Before its ledger's first application a copy shows only what this machine composed.
+        if (Get_MawInitialState() == EMars_Net_InitialState::Taken)
+        { _MawLowestEmerge = Math::Min(_MawLowestEmerge, _Maw.Get_Emerge()); }
         if (_MawLedgerEmergedFrame < 0 && Get_HasMawLedger() && Get_MawLedger().Stance == EMars_RootMaw_Stance::Emerged)
         { _MawLedgerEmergedFrame = int32(utils_time::Get_FrameCounter()); }
 
@@ -342,6 +369,18 @@ class UMars_AutoTestRig_NetRootMaw : UMars_AutoTestRig_NetStrike
         return Count;
     }
 
+    // The frame of the first recorded OnActionPhase(InAction, InPhase); -1 when none was recorded.
+    protected int32 Get_MawPhaseFrame(EMars_RootMaw_Action InAction, EMars_RootMaw_ActionPhase InPhase) const
+    {
+        for (const auto& Recorded : _MawPhases)
+        {
+            if (Recorded.Action == InAction && Recorded.Phase == InPhase)
+            { return Recorded.Frame; }
+        }
+
+        return -1;
+    }
+
     protected FString Describe_MawPhases() const
     {
         FString Text = "";
@@ -380,6 +419,36 @@ class UMars_AutoTestRig_NetRootMaw : UMars_AutoTestRig_NetStrike
         return float64(SubjectWorld.GetTimeSeconds());
     }
 
+    // This machine's copy's level; Awaited until it is found.
+    protected EMars_Net_InitialState Get_MawInitialState()
+    {
+        if (Get_IsMawGone() || _Maw.Has_Fragment(FMars_Fragment_RootMaw_Local) == false)
+        { return EMars_Net_InitialState::Awaited; }
+
+        return _Maw.Get_Fragment(FMars_Fragment_RootMaw_Local).InitialState;
+    }
+
+    // stood: this machine's copy took the state it was born into and showed it as it stood (no OnStance(Emerged) since
+    // it was found, never sampled below fully up, never flinching); arrived: it played some of it as an event.
+    protected FString Get_MawPath()
+    {
+        if (Get_MawInitialState() == EMars_Net_InitialState::Taken && _MawEmergedStances == 0
+            && _MawLowestEmerge >= 1.0f - 0.0001f && _MawEverFlinched == false)
+        { return "stood"; }
+
+        return "arrived";
+    }
+
+    // The authority's held fragment's construct and first hold frames (-1 -1 off a held Maw).
+    protected FString Describe_MawHeld()
+    {
+        if (Get_IsMawGone() || _Maw.Has_Fragment(FMars_TESTONLY_Fragment_RootMaw_HeldLedger) == false)
+        { return "-1 -1"; }
+
+        const auto Held = _Maw.Get_Fragment(FMars_TESTONLY_Fragment_RootMaw_HeldLedger);
+        return f"{Held.ConstructFrame} {Held.FirstHoldFrame}";
+    }
+
     //----------------------------------------------------------------------------------------------------------------------
     // The log line and the finish
     //----------------------------------------------------------------------------------------------------------------------
@@ -410,7 +479,10 @@ class UMars_AutoTestRig_NetRootMaw : UMars_AutoTestRig_NetStrike
 
         const auto Body = IsFound && ck::IsValid(_Health) ? _Health.Get_Current() : -1.0f;
         const auto Phases = Describe_MawPhases();
-        const auto Line = f"[RootMawNetTest] {InRow} {Get_MachineName()} stance={Stance} emerge={Emerge} jaw={Jaw} root={Location.ToString()} drop={Drop} travelled={Travelled} largestStep={_MawLargestStep} highestEmerge={_MawHighestEmerge} ledger=[{LedgerText}] ledgerEmergedFrame={_MawLedgerEmergedFrame} onEmerged={_MawEmergedStances} onBuried={_MawBuriedStances} emergedFrame={_MawEmergedFrame} died={_MawDied} damaged={_MawDamaged} body={Body} action=[{ActionText}] phases=[{Phases}] blows={_MawBlows} widestWindup={_MawWidestInWindup} lowestRecover={_MawLowestInRecover} widestSinceFlinch={_MawWidestSinceFlinch} everFlinched={_MawEverFlinched} ensures={Get_NewEnsures()} frame={utils_time::Get_FrameCounter()} {InExtra}";
+        const auto Held = Describe_MawHeld();
+        const auto Path = Get_MawPath();
+        const auto Initial = Get_MawInitialState();
+        const auto Line = f"[RootMawNetTest] {InRow} {Get_MachineName()} stance={Stance} emerge={Emerge} jaw={Jaw} root={Location.ToString()} drop={Drop} travelled={Travelled} largestStep={_MawLargestStep} highestEmerge={_MawHighestEmerge} lowestEmerge={_MawLowestEmerge} ledger=[{LedgerText}] ledgerEmergedFrame={_MawLedgerEmergedFrame} onEmerged={_MawEmergedStances} onBuried={_MawBuriedStances} emergedFrame={_MawEmergedFrame} died={_MawDied} damaged={_MawDamaged} body={Body} action=[{ActionText}] phases=[{Phases}] blows={_MawBlows} widestWindup={_MawWidestInWindup} lowestRecover={_MawLowestInRecover} widestSinceFlinch={_MawWidestSinceFlinch} everFlinched={_MawEverFlinched} held=[{Held}] initial={Initial} path={Path} foundFrame={_MawFoundFrame} notifies=[{_MawLedgerNotifies}] ensures={Get_NewEnsures()} frame={utils_time::Get_FrameCounter()} {InExtra}";
         Log(Line);
     }
 
@@ -474,5 +546,18 @@ class UMars_AutoTestRig_NetRootMaw : UMars_AutoTestRig_NetStrike
     private void OnMawDamaged(FCk_Handle_Health InHealth, FMars_DamageEvent InEvent, float32 InApplied, float32 InRemaining)
     {
         _MawDamaged += 1;
+    }
+
+    UFUNCTION()
+    private void OnMawLedgerNotify(FCk_Handle InHandle, FCk_DynamicFragment_RepNotifyInfo InInfo)
+    {
+        if (Get_IsMawGone() || Get_HasMawLedger() == false)
+        { return; }
+
+        const auto Ledger = Get_MawLedger();
+        if (_MawFirstLedgerNotifyFrame < 0)
+        { _MawFirstLedgerNotifyFrame = int32(utils_time::Get_FrameCounter()); }
+
+        _MawLedgerNotifies += f"{utils_time::Get_FrameCounter()}:{Ledger.Stance :n}:{Ledger.Gape} ";
     }
 }

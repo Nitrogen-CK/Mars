@@ -17,9 +17,10 @@ asset Mars_PickleMimicHandle of UCkDynamic_HandleDefinition
 // follows the replicated root, runs the posture and the lid's ease on its own clock from that ledger
 // (UMars_Processor_PickleMimic_Mirror), times each arrived action phase from its arrival, takes a flinch as a count
 // with where it came from and the stance it found the mimic in, drops every request, is struck through the strike
-// claim and dies when its monster's ledger does. Its crack stage is its own, from its body Health. A copy that
-// composes late shows the stance, the gape and a running action as they stand, and no past flinch. The spill, the
-// blow, the sweep and OnBlowLanded are the authority's alone.
+// claim and dies when its monster's ledger does. Its crack stage is its own, from its body Health. A copy takes the
+// state it was born into once, as it stands, at its ledger's first application on this machine: the stance, the gape
+// and a running action as they stand, and no past flinch. The spill, the blow, the sweep and OnBlowLanded are the
+// authority's alone.
 struct FMars_Feature_PickleMimic {}
 
 // Until UMars_Processor_PickleMimic_Setup has bound the body zone's hits to TakeHit.
@@ -533,19 +534,24 @@ struct FMars_Fragment_PickleMimic_Net
     FMars_PickleMimic_NetFlinch Flinch;
 }
 
-// Each machine's own: the ledger the mirror last reconciled (unset with authority).
+// Each machine's own: the ledger the mirror last reconciled (unset with authority) and whether this copy has taken
+// the state it was born into.
 struct FMars_Fragment_PickleMimic_Local
 {
     UPROPERTY()
     TOptional<FMars_Fragment_PickleMimic_Net> Last;
+
+    UPROPERTY()
+    EMars_Net_InitialState InitialState = EMars_Net_InitialState::Awaited;
 }
 
 // Added by utils_pickle_mimic::Add, dropped by UMars_Processor_PickleMimic_Mirror once it has bound the ledger's
 // rep-notify.
 struct FMars_Tag_PickleMimic_NeedsMirror {}
 
-// How a copy without authority takes the ledger: as it stands when the copy binds (a copy that composed late shows the
-// mimic where it is), or as each change arrives (the tick then plays the stand, the tuck and the lid's ease).
+// How a copy without authority takes the ledger: as it stands at the ledger's first application on this machine (a
+// copy shows the mimic where it is), or as each later change arrives (the tick then plays the stand, the tuck and the
+// lid's ease).
 enum EMars_PickleMimic_Reconcile
 {
     AsItStands,

@@ -1,7 +1,8 @@
 // Once per Maw: the authority drops the mirror state (its drain and its tick publish the ledger). A machine without
-// authority binds the ledger's rep-notify and reconciles once as it stands, so a copy that composed late shows the Maw
-// where it is and a running action from its phase's start, and no past flinch; each later change is reconciled as it
-// arrives, and the tick then plays the rise, the sink, the jaw's ease and the action's phase on this machine's clock.
+// authority binds the ledger's rep-notify and reconciles once as it stands, which shows what this machine composed.
+// The ledger's first application is the state the copy was born into and is taken once as it stands: the Maw where it
+// is, a running action from its phase's start, no past flinch. Each later change is reconciled as it arrives, and the
+// tick then plays the rise, the sink, the jaw's ease and the action's phase on this machine's clock.
 // A reconcile raises OnActionPhase once per arrived action change (OnStance is the tick's); a phase that never arrived
 // because two of the authority's writes reached this machine as one is not replayed.
 class UMars_Processor_RootMaw_Mirror : UCk_Processor_Script_Base_UE
@@ -40,6 +41,13 @@ class UMars_Processor_RootMaw_Mirror : UCk_Processor_Script_Base_UE
         { return; }
 
         auto Maw = InHandle.As_RootMaw();
+        if (Maw.Get_Fragment(FMars_Fragment_RootMaw_Local).InitialState == EMars_Net_InitialState::Awaited)
+        {
+            Maw.Get_Fragment(FMars_Fragment_RootMaw_Local).InitialState = EMars_Net_InitialState::Taken;
+            Reconcile(Maw, EMars_RootMaw_Reconcile::AsItStands);
+            return;
+        }
+
         Reconcile(Maw, EMars_RootMaw_Reconcile::AsItArrives);
     }
 

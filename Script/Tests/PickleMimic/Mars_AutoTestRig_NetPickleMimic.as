@@ -5,12 +5,14 @@
 // (so it exists on the server only). Each machine finds its copy by tag near the base, takes its mimic, its monster's
 // body Health and body zone, counts the OnStance, the OnDied and the OnSpill its own copy raises and the OnDamaged of
 // its body Health, records the OnActionPhase (with its frame) and counts the OnBlowLanded its copy raises, and samples
-// it from the row's polled predicates: the largest distance the root moved between two samples, the highest Rise, the
-// first frame its ledger read Standing, the widest lid while its action read Windup, the lowest while it read Recover,
-// the widest since its flinch count last changed, whether it ever read flinching, whether its gait ever read Failed,
+// it from the row's polled predicates: the largest distance the root moved between two samples, the highest and the
+// lowest Rise, the first frame its ledger read Standing, the widest lid while its action read Windup, the lowest while
+// it read Recover, the widest since its flinch count last changed, whether it ever read flinching, whether its gait
+// ever read Failed,
 // and, between Begin_FeetRecord and the row's end, its feet. It records the frames of its copy's first OnDied and
 // first OnSpill, and finds the pickles lying near the base on this machine (the server hands them to the harness: they
-// belong to the world, not to the mimic).
+// belong to the world, not to the mimic). A row whose copy must be born into a state spawns a held mimic (its ledger
+// held at the row's values from the spawn frame) and reads the way its copy took that state.
 struct FMars_NetPickleMimicTest_Phase
 {
     UPROPERTY()
@@ -64,6 +66,10 @@ class UMars_AutoTestRig_NetPickleMimic : UMars_AutoTestRig_NetStrike
     protected int32 _MimicLedgerStandingFrame = -1;
     protected float64 _MimicLargestStep = 0.0;
     protected float32 _MimicHighestRise = 0.0f;
+    protected float32 _MimicLowestRise = 2.0f;
+    protected int32 _MimicFoundFrame = -1;
+    // Off authority: each rep-notify of the copy's ledger this rig saw, as frame:stance:gape.
+    protected FString _MimicLedgerNotifies = "";
     protected FVector _MimicFoundAt = FVector::ZeroVector;
     protected FCk_Handle_Health _PreyHealth;
     protected TArray<FMars_NetPickleMimicTest_Phase> _MimicPhases;
@@ -136,6 +142,19 @@ class UMars_AutoTestRig_NetPickleMimic : UMars_AutoTestRig_NetStrike
             UMars_PickleMimic_EntityScript, Params);
     }
 
+    // The mimic as Spawn_ServerMimic spawns it, its ledger held at InLedger from its spawn frame on (the authority's
+    // own kernel keeps running underneath).
+    protected void Spawn_ServerHeldMimic(FMars_PickleMimic_Spec InSpec, FMars_Fragment_PickleMimic_Net InLedger)
+    {
+        auto Params = FMars_NetPickleMimic_Held_SpawnParams();
+        Params.SpawnTransform = FTransform(FRotator::ZeroRotator, _Base + FVector(0.0, 0.0, utils_pickle_mimic::Clearance));
+        Params.Spec = InSpec;
+        Params.WithVisuals = false;
+        Params.HeldLedger = InLedger;
+        utils_entity_script::Request_SpawnEntity(utils_mars_net::Get_ReplicatedSpawnOwner(Get_SubjectEntity()),
+            UMars_NetPickleMimic_Held_EntityScript, Params);
+    }
+
     // The single-machine rig's prey stand-in at InOffset from the base (its root 90 up), owned by the subject: team One
     // (Hostile to the mimic), Health 100, a flesh body zone with one box hurtbox, TAG_MarsSharedCombatTarget (the tag
     // the mimic scans) last.
@@ -200,6 +219,10 @@ class UMars_AutoTestRig_NetPickleMimic : UMars_AutoTestRig_NetStrike
             _Health = _MimicMonster.Get_BodyHealth();
             _Zone = _MimicMonster.Get_BodyZone();
             _MimicFoundAt = Mimic.Get_Location();
+            _MimicFoundFrame = int32(utils_time::Get_FrameCounter());
+            FCk_Handle Entity = _Mimic;
+            if (Get_IsServer() == false)
+            { Entity.BindTo_OnRepNotify(FMars_Fragment_PickleMimic_Net, FCk_DynamicFragment_OnRepNotify(this, n"OnMimicLedgerNotify")); }
             _Mimic.BindTo_OnStance(FMars_Delegate_PickleMimic_OnStance(this, n"OnMimicStance"));
             _MimicMonster.BindTo_OnDied(FMars_Delegate_Monster_OnDied(this, n"OnMimicDied"));
             _Health.BindTo_OnDamaged(FMars_Delegate_Health_OnDamaged(this, n"OnMimicDamaged"));
@@ -309,6 +332,9 @@ class UMars_AutoTestRig_NetPickleMimic : UMars_AutoTestRig_NetStrike
 
         _MimicLastSample = Here;
         _MimicHighestRise = Math::Max(_MimicHighestRise, _Mimic.Get_Rise());
+        // Before its ledger's first application a copy shows only what this machine composed.
+        if (Get_MimicInitialState() == EMars_Net_InitialState::Taken)
+        { _MimicLowestRise = Math::Min(_MimicLowestRise, _Mimic.Get_Rise()); }
         if (_MimicLedgerStandingFrame < 0 && Get_HasMimicLedger() && Get_MimicLedger().Stance == EMars_PickleMimic_Stance::Standing)
         { _MimicLedgerStandingFrame = int32(utils_time::Get_FrameCounter()); }
 
@@ -574,6 +600,36 @@ class UMars_AutoTestRig_NetPickleMimic : UMars_AutoTestRig_NetStrike
     // The log line and the finish
     //----------------------------------------------------------------------------------------------------------------------
 
+    // This machine's copy's level; Awaited until it is found.
+    protected EMars_Net_InitialState Get_MimicInitialState()
+    {
+        if (Get_IsMimicGone() || _Mimic.Has_Fragment(FMars_Fragment_PickleMimic_Local) == false)
+        { return EMars_Net_InitialState::Awaited; }
+
+        return _Mimic.Get_Fragment(FMars_Fragment_PickleMimic_Local).InitialState;
+    }
+
+    // stood: this machine's copy took the state it was born into and showed it as it stood (no OnStance(Standing)
+    // since it was found, never sampled below fully up, never flinching); arrived: it played some of it as an event.
+    protected FString Get_MimicPath()
+    {
+        if (Get_MimicInitialState() == EMars_Net_InitialState::Taken && _MimicStandingStances == 0
+            && _MimicLowestRise >= 1.0f - 0.0001f && _MimicEverFlinched == false)
+        { return "stood"; }
+
+        return "arrived";
+    }
+
+    // The authority's held fragment's construct and first hold frames (-1 -1 off a held mimic).
+    protected FString Describe_MimicHeld()
+    {
+        if (Get_IsMimicGone() || _Mimic.Has_Fragment(FMars_TESTONLY_Fragment_PickleMimic_HeldLedger) == false)
+        { return "-1 -1"; }
+
+        const auto Held = _Mimic.Get_Fragment(FMars_TESTONLY_Fragment_PickleMimic_HeldLedger);
+        return f"{Held.ConstructFrame} {Held.FirstHoldFrame}";
+    }
+
     protected void Log_MimicRow(FString InRow, FString InExtra)
     {
         const auto IsFound = Get_IsMimicGone() == false;
@@ -605,7 +661,10 @@ class UMars_AutoTestRig_NetPickleMimic : UMars_AutoTestRig_NetStrike
         const auto Phases = Describe_MimicPhases();
         const auto Feet = Describe_Feet();
         const auto Pickles = Describe_Pickles();
-        const auto Line = f"[PickleMimicNetTest] {InRow} {Get_MachineName()} stance={Stance} rise={Rise} lid={Lid} root={Location.ToString()} drop={Drop} largestStep={_MimicLargestStep} highestRise={_MimicHighestRise} ledger=[{LedgerText}] ledgerStandingFrame={_MimicLedgerStandingFrame} onStanding={_MimicStandingStances} onTucked={_MimicTuckedStances} standingFrame={_MimicStandingFrame} died={_MimicDied} damaged={_MimicDamaged} body={Body} action=[{ActionText}] phases=[{Phases}] blows={_MimicBlows} widestWindup={_MimicWidestInWindup} lowestRecover={_MimicLowestInRecover} widestSinceFlinch={_MimicWidestSinceFlinch} everFlinched={_MimicEverFlinched} crack={Crack} spills={_MimicSpills}/{_MimicLastSpillCount} spilled={Spilled} diedFrame={_MimicDiedFrame} spillFrame={_MimicSpillFrame} {Pickles} gait={Gait} trusted={Trusted} gaitEverFailed={_MimicGaitEverFailed} {Feet} ensures={Get_NewEnsures()} frame={utils_time::Get_FrameCounter()} {InExtra}";
+        const auto Held = Describe_MimicHeld();
+        const auto Path = Get_MimicPath();
+        const auto Initial = Get_MimicInitialState();
+        const auto Line = f"[PickleMimicNetTest] {InRow} {Get_MachineName()} stance={Stance} rise={Rise} lid={Lid} root={Location.ToString()} drop={Drop} largestStep={_MimicLargestStep} highestRise={_MimicHighestRise} lowestRise={_MimicLowestRise} ledger=[{LedgerText}] ledgerStandingFrame={_MimicLedgerStandingFrame} onStanding={_MimicStandingStances} onTucked={_MimicTuckedStances} standingFrame={_MimicStandingFrame} died={_MimicDied} damaged={_MimicDamaged} body={Body} action=[{ActionText}] phases=[{Phases}] blows={_MimicBlows} widestWindup={_MimicWidestInWindup} lowestRecover={_MimicLowestInRecover} widestSinceFlinch={_MimicWidestSinceFlinch} everFlinched={_MimicEverFlinched} crack={Crack} spills={_MimicSpills}/{_MimicLastSpillCount} spilled={Spilled} diedFrame={_MimicDiedFrame} spillFrame={_MimicSpillFrame} {Pickles} gait={Gait} trusted={Trusted} gaitEverFailed={_MimicGaitEverFailed} {Feet} held=[{Held}] initial={Initial} path={Path} foundFrame={_MimicFoundFrame} notifies=[{_MimicLedgerNotifies}] ensures={Get_NewEnsures()} frame={utils_time::Get_FrameCounter()} {InExtra}";
         Log(Line);
     }
 
@@ -680,5 +739,15 @@ class UMars_AutoTestRig_NetPickleMimic : UMars_AutoTestRig_NetStrike
     private void OnMimicDamaged(FCk_Handle_Health InHealth, FMars_DamageEvent InEvent, float32 InApplied, float32 InRemaining)
     {
         _MimicDamaged += 1;
+    }
+
+    UFUNCTION()
+    private void OnMimicLedgerNotify(FCk_Handle InHandle, FCk_DynamicFragment_RepNotifyInfo InInfo)
+    {
+        if (Get_IsMimicGone() || Get_HasMimicLedger() == false)
+        { return; }
+
+        const auto Ledger = Get_MimicLedger();
+        _MimicLedgerNotifies += f"{utils_time::Get_FrameCounter()}:{Ledger.Stance :n}:{Ledger.Gape} ";
     }
 }

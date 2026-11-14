@@ -14,11 +14,12 @@ asset Mars_RootMawHandle of UCkDynamic_HandleDefinition
 // (FMars_Fragment_RootMaw_Net: the stance and the latched gape) through utils_root_maw::Publish, its one writer; the
 // root transform replicates with it. A copy without authority runs the posture, the travel and the jaw's ease on its
 // own clock from that ledger (UMars_Processor_RootMaw_Mirror) and from the replicated root, drops every request, is
-// struck through the strike claim and dies when its monster's ledger does. A copy that composes late shows the stance
-// and the gape as they stand; its body zone goes off when its monster dies. The running action crosses as a level
-// (its kind, phase and generation) and a client times each phase from its arrival; a flinch crosses as a count with
-// where it came from and the stance it found the Maw in. A late copy shows a running action from its phase's start and
-// no past flinch. The blow, the sweep and OnBlowLanded are the authority's alone.
+// struck through the strike claim and dies when its monster's ledger does. A copy takes the state it was born into
+// once, as it stands, at its ledger's first application on this machine: the stance and the gape where they are, a
+// running action from its phase's start, no past flinch; its body zone goes off when its monster dies. The running
+// action crosses as a level (its kind, phase and generation) and a client times each phase from its arrival; a flinch
+// crosses as a count with where it came from and the stance it found the Maw in. The blow, the sweep and
+// OnBlowLanded are the authority's alone.
 struct FMars_Feature_RootMaw {}
 
 // Until UMars_Processor_RootMaw_Setup has bound the body zone's hits to TakeHit.
@@ -520,18 +521,23 @@ struct FMars_Fragment_RootMaw_Net
     FMars_RootMaw_NetFlinch Flinch;
 }
 
-// Each machine's own: the ledger the mirror last reconciled (unset with authority).
+// Each machine's own: the ledger the mirror last reconciled (unset with authority) and whether this copy has taken
+// the state it was born into.
 struct FMars_Fragment_RootMaw_Local
 {
     UPROPERTY()
     TOptional<FMars_Fragment_RootMaw_Net> Last;
+
+    UPROPERTY()
+    EMars_Net_InitialState InitialState = EMars_Net_InitialState::Awaited;
 }
 
 // Added by utils_root_maw::Add, dropped by UMars_Processor_RootMaw_Mirror once it has bound the ledger's rep-notify.
 struct FMars_Tag_RootMaw_NeedsMirror {}
 
-// How a copy without authority takes the ledger: as it stands when the copy binds (a copy that composed late shows the
-// Maw where it is), or as each change arrives (the tick then plays the rise, the sink and the jaw's ease).
+// How a copy without authority takes the ledger: as it stands at the ledger's first application on this machine (a
+// copy shows the Maw where it is), or as each later change arrives (the tick then plays the rise, the sink and the
+// jaw's ease).
 enum EMars_RootMaw_Reconcile
 {
     AsItStands,
