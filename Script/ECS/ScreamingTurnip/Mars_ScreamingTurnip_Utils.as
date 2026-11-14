@@ -3,7 +3,8 @@ namespace utils_screaming_turnip
     // Composes the kernel on InHandle, which must be InSpec.Parts.WorldItem's own entity (the entity its body is on: the
     // contact handler resolves the kernel from the body). It starts Loose and Dormant; the Setup processor binds the body's
     // contacts and the Tick derives the real placement on its first pass. A rejected spec ensures and returns an invalid
-    // handle with nothing composed.
+    // handle with nothing composed. Every machine composes the fragments, the ledger and the mirror's state; only a
+    // machine with authority binds the body (a copy has none).
     FCk_Handle_ScreamingTurnip Add(FCk_Handle& InHandle, FMars_ScreamingTurnip_Spec InSpec)
     {
         const auto Validation = InSpec.Validate();
@@ -24,8 +25,51 @@ namespace utils_screaming_turnip
         InHandle.Add_Fragment(Params);
         InHandle.Add_Fragment(FMars_Fragment_ScreamingTurnip());
         InHandle.Add_Fragment(FMars_Fragment_ScreamingTurnip_Settle());
-        InHandle.Add_Fragment(FMars_Tag_ScreamingTurnip_NeedsSetup());
+
+        // The mirror compares what arrives against the ledger this machine composed, not one that already arrived.
+        auto Ledger = FMars_Fragment_ScreamingTurnip_Net();
+        auto Local = FMars_Fragment_ScreamingTurnip_Local();
+        Local.Last = TOptional<FMars_Fragment_ScreamingTurnip_Net>(Ledger);
+
+        // A client's copy can receive the replicated ledger before it composes: the arrived ledger stands then.
+        if (InHandle.Has_Fragment(FMars_Fragment_ScreamingTurnip_Net) == false)
+        { InHandle.Add_Fragment(Ledger, ECk_Replication::Replicates); }
+
+        InHandle.Add_Fragment(Local);
+        InHandle.Add_Fragment(FMars_Tag_ScreamingTurnip_NeedsMirror());
+
+        if (utils_net::Get_HasAuthority(InHandle))
+        { InHandle.Add_Fragment(FMars_Tag_ScreamingTurnip_NeedsSetup()); }
+
         return InHandle.As_ScreamingTurnip();
+    }
+
+    // The ledger's only writer, called by the authority's request drain after a Suspend's writes and by its tick after
+    // its writes, each before its first broadcast: the five levels as they stand, written and marked dirty only when
+    // one differs from the stored ledger.
+    void Publish(FCk_Handle_ScreamingTurnip& InSelf)
+    {
+        const auto& State = InSelf.Get_Fragment(FMars_Fragment_ScreamingTurnip);
+        auto Next = FMars_Fragment_ScreamingTurnip_Net();
+        Next.Placement = State.Placement;
+        Next.Phase = State.Phase;
+        Next.Support = InSelf.Get_HasSupport() ? EMars_ScreamingTurnip_Support::Supported : EMars_ScreamingTurnip_Support::Unsupported;
+        Next.ScreamSequence = State.ScreamSequence;
+        Next.ScreamPosition = State.LastWorldPosition;
+
+        auto& Ledger = InSelf.Get_Fragment(FMars_Fragment_ScreamingTurnip_Net);
+        if (Get_IsSameLedger(Ledger, Next))
+        { return; }
+
+        Ledger = Next;
+        FCk_Handle Entity = InSelf;
+        Entity.Request_MarkReplicationDirty(FMars_Fragment_ScreamingTurnip_Net);
+    }
+
+    bool Get_IsSameLedger(const FMars_Fragment_ScreamingTurnip_Net& InA, const FMars_Fragment_ScreamingTurnip_Net& InB)
+    {
+        return InA.Placement == InB.Placement && InA.Phase == InB.Phase && InA.Support == InB.Support
+            && InA.ScreamSequence == InB.ScreamSequence && InA.ScreamPosition.Equals(InB.ScreamPosition, 0.0);
     }
 
     // Whether InPhase is part of the warning (the voice is audible from Anticipate on).
@@ -80,18 +124,21 @@ mixin int32 Get_ScreamSequence(const FCk_Handle_ScreamingTurnip& Self)
     return Self.Get_Fragment(FMars_Fragment_ScreamingTurnip).ScreamSequence;
 }
 
-// On the kernel's clock (Get_Clock); unset before the first commit.
+// On the kernel's clock (Get_Clock); unset before the first commit. On a copy without authority it is when the scream
+// arrived there (unset for one committed before it composed), and decides nothing.
 mixin TOptional<float32> Get_LastScreamCommittedAt(const FCk_Handle_ScreamingTurnip& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_ScreamingTurnip).LastScreamCommittedAt;
 }
 
-// The kernel's monotonic time, seconds since Add (zero and bad deltas excluded).
+// The kernel's monotonic time, seconds since Add (zero and bad deltas excluded). Each machine's own.
 mixin float32 Get_Clock(const FCk_Handle_ScreamingTurnip& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_ScreamingTurnip).Clock;
 }
 
+// On a copy without authority it is measured from the arrival of the warning's phase on this machine's clock and
+// decides nothing.
 mixin float32 Get_WarningElapsed(const FCk_Handle_ScreamingTurnip& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_ScreamingTurnip).WarningElapsed;
@@ -116,7 +163,8 @@ mixin FMars_ScreamingTurnip_Vocal Get_Vocal(const FCk_Handle_ScreamingTurnip& Se
 }
 
 // Seconds until the next warning starts, if the placement stays eligible: the cooldown left while one runs, 0 when the next
-// warning is due now or running. Unset while the placement is not eligible.
+// warning is due now or running. Unset while the placement is not eligible. On a copy without authority it is this
+// machine's own reading, from the arrived levels; it decides nothing there.
 mixin TOptional<float32> Get_SecondsUntilNextWarning(const FCk_Handle_ScreamingTurnip& Self)
 {
     const auto& State = Self.Get_Fragment(FMars_Fragment_ScreamingTurnip);

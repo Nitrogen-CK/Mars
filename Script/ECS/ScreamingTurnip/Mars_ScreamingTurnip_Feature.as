@@ -11,6 +11,11 @@ asset Mars_ScreamingTurnipHandle of UCkDynamic_HandleDefinition
     RequiredFragments.Add(FMars_Feature_ScreamingTurnip);
     Description = "A screaming root on a persistent world item: placement derived from its mount and its body's settle, and a repeating warning -> scream cycle while held or settled on the ground";
 }
+// Replication: the authority runs the clock, the settle sample, the cycle and the requests, and publishes the ledger
+// (FMars_Fragment_ScreamingTurnip_Net: placement, phase, support, the scream sequence and its place) through
+// utils_screaming_turnip::Publish, its one writer. A copy without authority mirrors the levels
+// (UMars_Processor_ScreamingTurnip_Mirror), times a phase from its arrival, raises the three signals once per arrived
+// change, drops every request, and replays no scream it did not see arrive.
 struct FMars_Feature_ScreamingTurnip {}
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -206,8 +211,9 @@ struct FMars_Fragment_ScreamingTurnip_Params
 // State
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Written only by the ScreamingTurnip processors (and composed by Add). Every time is on Clock, the kernel's own monotonic
-// time accumulated from the tick's delta.
+// Written only by the ScreamingTurnip processors (and composed by Add): with authority by the tick and the drain, on a
+// copy without authority by the mirror (the levels) and the tick (Clock, WarningElapsed). Every time is on Clock, the
+// kernel's own monotonic time accumulated from the tick's delta.
 struct FMars_Fragment_ScreamingTurnip
 {
     UPROPERTY()
@@ -247,7 +253,8 @@ struct FMars_Fragment_ScreamingTurnip
 }
 
 // The settle sampler's scratch (mount World only), reset whenever the item leaves the world. Written by the Tick processor;
-// the Setup processor's contact handler stamps LastSupportAt.
+// the Setup processor's contact handler stamps LastSupportAt. On a copy without authority only HasSupport is written,
+// by the mirror, from the ledger.
 struct FMars_Fragment_ScreamingTurnip_Settle
 {
     UPROPERTY()
@@ -283,6 +290,57 @@ struct FMars_Fragment_ScreamingTurnip_Settle
 
 // The Setup processor binds the body's contacts once, then removes this tag.
 struct FMars_Tag_ScreamingTurnip_NeedsSetup {}
+
+//--------------------------------------------------------------------------------------------------------------------------
+// Ledger
+//--------------------------------------------------------------------------------------------------------------------------
+
+// The last settle sample's support, as the ledger carries it.
+enum EMars_ScreamingTurnip_Support
+{
+    Unsupported,
+    Supported
+}
+
+// The replicated ledger on the world item's root: levels only, no clock. Written only by
+// utils_screaming_turnip::Publish, from the authority's request drain and its tick. The scream's place crosses because
+// a copy's root at the arrival is a later pose than the root at the commit.
+struct FMars_Fragment_ScreamingTurnip_Net
+{
+    UPROPERTY()
+    EMars_ScreamingTurnip_Placement Placement = EMars_ScreamingTurnip_Placement::Loose;
+
+    UPROPERTY()
+    EMars_ScreamingTurnip_Phase Phase = EMars_ScreamingTurnip_Phase::Dormant;
+
+    UPROPERTY()
+    EMars_ScreamingTurnip_Support Support = EMars_ScreamingTurnip_Support::Unsupported;
+
+    UPROPERTY()
+    int32 ScreamSequence = 0;
+
+    UPROPERTY()
+    FVector ScreamPosition = FVector::ZeroVector;
+}
+
+// Each machine's own: the ledger the mirror last reconciled (unset with authority).
+struct FMars_Fragment_ScreamingTurnip_Local
+{
+    UPROPERTY()
+    TOptional<FMars_Fragment_ScreamingTurnip_Net> Last;
+}
+
+// Added by utils_screaming_turnip::Add, dropped by UMars_Processor_ScreamingTurnip_Mirror once it has bound the
+// ledger's rep-notify.
+struct FMars_Tag_ScreamingTurnip_NeedsMirror {}
+
+// How a copy without authority takes the ledger: as it stands when the copy binds (no scream committed before it is
+// raised), or as each change arrives.
+enum EMars_ScreamingTurnip_Reconcile
+{
+    AsItStands,
+    AsItArrives
+}
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Signals

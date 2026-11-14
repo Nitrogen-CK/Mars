@@ -3,8 +3,9 @@
 // sample needs them); then the ScreamingTurnip kernel on the same entity and the animated skeletal presentation that
 // follows it. The static proxy (the base's visual) stays the body's shape and the pickup's fit; it is drawn only while no
 // skeletal mesh loads. A Visual-mode spawn (a held visual of a non-persistent item) is the base's: it carries no kernel.
-// The kernel is the authority's: it samples the body, which only the authority builds. A copy without authority is the
-// base's world item and draws the proxy; it has no voice and no skeletal presentation.
+// The kernel and the skeletal presentation are composed on every machine; the body, and so the settle sample, are the
+// authority's.
+// Stance SPLIT: the voice is decided with authority and shown from the root's ledger elsewhere.
 class UMars_ScreamingTurnip_EntityScript : UMars_WorldItem_EntityScript
 {
     default Definition = mars_items::ScreamingTurnip();
@@ -33,15 +34,17 @@ class UMars_ScreamingTurnip_EntityScript : UMars_WorldItem_EntityScript
         if (ck::Is_NOT_Valid(_WorldItem))
         { return Flow; }
 
-        if (utils_net::Get_HasAuthority(InHandle) == false)
-        { return Flow; }
-
-        const auto HasBody = ck::IsValid(_WorldItem.Get_Body());
-        if (ck::EnsureIfNot(_WorldItem.Get_Persistence() == EMars_WorldItem_Persistence::Persistent && HasBody,
-            f"[ScreamingTurnip] [{InHandle.ToString()}] needs a definition with a persistent Presentation and a proxy mesh (its body)"))
+        // A copy without authority has no body to check: only the authority builds one.
+        const auto HasAuthority = utils_net::Get_HasAuthority(InHandle);
+        if (HasAuthority)
         {
-            utils_entity_lifetime::Request_DestroyEntity(InHandle);
-            return Flow;
+            const auto HasBody = ck::IsValid(_WorldItem.Get_Body());
+            if (ck::EnsureIfNot(_WorldItem.Get_Persistence() == EMars_WorldItem_Persistence::Persistent && HasBody,
+                f"[ScreamingTurnip] [{InHandle.ToString()}] needs a definition with a persistent Presentation and a proxy mesh (its body)"))
+            {
+                utils_entity_lifetime::Request_DestroyEntity(InHandle);
+                return Flow;
+            }
         }
 
         auto Spec = FMars_ScreamingTurnip_Spec();
@@ -51,6 +54,9 @@ class UMars_ScreamingTurnip_EntityScript : UMars_WorldItem_EntityScript
         _Turnip = utils_screaming_turnip::Add(InHandle, Spec);
         if (ck::Is_NOT_Valid(_Turnip))
         {
+            if (HasAuthority == false)
+            { return Flow; }
+
             utils_entity_lifetime::Request_DestroyEntity(InHandle);
             return ECk_EntityScript_ConstructionFlow::Finished;
         }

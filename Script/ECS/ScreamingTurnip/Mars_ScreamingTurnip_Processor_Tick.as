@@ -23,6 +23,11 @@
 // the scheduler's tail pump (the release's World commit answers an inventory transfer pumped after the main graph; a
 // release requested from a processor that runs after the WorldItem drain is drained there too). This processor has no
 // dirty marker and is not pumped, so it reads such a change on the next frame.
+//
+// It has two halves; both keep the two guards and advance the clock. The authority runs all of the above, then
+// publishes the ledger (utils_screaming_turnip::Publish) before its first broadcast. A copy without authority only sets
+// WarningElapsed from its own phase and clock: it never derives a placement, samples, advances a phase, commits or
+// broadcasts. Its placement, phase, support and screams come from the ledger (UMars_Processor_ScreamingTurnip_Mirror).
 class UMars_Processor_ScreamingTurnip_Tick : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -58,6 +63,14 @@ class UMars_Processor_ScreamingTurnip_Tick : UCk_Processor_Script_Base_UE
         auto Self = InHandle.As_ScreamingTurnip();
         InState.Clock += DeltaSeconds;
 
+        const auto HasAuthority = utils_net::Get_HasAuthority(InHandle);
+        if (HasAuthority == false)
+        {
+            const auto WarningSeconds = InParams.Vocal.AnticipateSeconds + InParams.Vocal.InhaleSeconds;
+            InState.WarningElapsed = Math::Min(Get_WarningElapsed(InParams.Vocal, InState), WarningSeconds);
+            return;
+        }
+
         const auto PreviousPlacement = InState.Placement;
         const auto NewPlacement = Derive_Placement(Self, DeltaSeconds);
 
@@ -78,6 +91,10 @@ class UMars_Processor_ScreamingTurnip_Tick : UCk_Processor_Script_Base_UE
 
         const auto Sequence = InState.ScreamSequence;
         const auto Position = InState.LastWorldPosition;
+        utils_screaming_turnip::Publish(Self);
+
+        // Handlers react on the root (its presentation): scope the script world to its own.
+        const auto WorldContext = FAngelscriptGameThreadScopeWorldContext(utils_entity_lifetime::Get_WorldForEntity(Self));
 
         // InState and InSettle may move under a handler that composes on another entity: nothing below reads them.
         if (NewPlacement != PreviousPlacement && Self.Has_Fragment(FMars_Fragment_ScreamingTurnip_Signals))

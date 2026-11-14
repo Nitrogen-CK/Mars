@@ -101,6 +101,70 @@ bool FCkScreamingTurnipNet_AS_ScreamingTurnip_AClientsPullReleasesOneRootOnBothM
 
 // --------------------------------------------------------------------------------------------------------------------
 
+// Auto-generated from AS class Ck_AutoTest_Net_ScreamingTurnip_AClientsSuspendIsDropped (Replicated-mode).
+// DO NOT EDIT - regenerated on editor startup and every successful AS recompile.
+
+namespace
+{
+    constexpr auto kAsClassPath_ScreamingTurnip_AClientsSuspendIsDropped = TEXT("/Script/Angelscript.Ck_AutoTest_Net_ScreamingTurnip_AClientsSuspendIsDropped");
+    constexpr auto kTimeoutSeconds_ScreamingTurnip_AClientsSuspendIsDropped = 30.0f;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+    FCkScreamingTurnipNet_AS_ScreamingTurnip_AClientsSuspendIsDropped,
+    "Ck.ScreamingTurnip.Net.AS_ScreamingTurnip_AClientsSuspendIsDropped",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ClientContext | EAutomationTestFlags::EngineFilter)
+
+bool FCkScreamingTurnipNet_AS_ScreamingTurnip_AClientsSuspendIsDropped::RunTest(const FString& Parameters)
+{
+    bSuppressLogErrors = true;
+    bSuppressLogWarnings = true;
+
+    constexpr auto NumPIEClients = 2;
+    constexpr auto ExpectedTotalWorlds = 2;
+    constexpr auto ReadyTimeoutSeconds = 30.0f;
+    constexpr auto FramesAfterSpawn = 30;
+
+    const auto MapPath = FString{TEXT("/Engine/Maps/Entry")};
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_StartPIEMultiClient(NumPIEClients, MapPath));
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_WaitForPIEReady(ExpectedTotalWorlds, ReadyTimeoutSeconds));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_RunOnServer(
+        FCk_NetAutoTest_ServerAction::CreateLambda([this](UWorld* InServer) -> void
+        {
+            auto SpawnInfo = FActorSpawnParameters{};
+            SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+            const auto SubjectClassPath = FSoftClassPath(TEXT("/Script/CkTests.Ck_AutoTest_NetSubject"));
+            auto* SubjectClass = SubjectClassPath.TryLoadClass<ACk_AutoTest_NetSubject>();
+            if (SubjectClass == nullptr)
+            { AddError(TEXT("AS-test harness: failed to resolve NetSubject class via FSoftClassPath")); return; }
+            auto* Subject = InServer->SpawnActor<ACk_AutoTest_NetSubject>(
+                SubjectClass, FTransform::Identity, SpawnInfo);
+            if (Subject == nullptr)
+            { AddError(TEXT("AS-test harness: server-side SpawnActor returned null")); }
+        })));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_TickWorlds(FramesAfterSpawn));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_RunAsTestOnAllWorlds(this, FString{kAsClassPath_ScreamingTurnip_AClientsSuspendIsDropped}, kTimeoutSeconds_ScreamingTurnip_AClientsSuspendIsDropped));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_EndPIE());
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_AssertCondition(this,
+        FCk_NetAutoTest_Assertion::CreateLambda([]() -> bool
+        {
+            FAutomationTestBase::bSuppressLogErrors = false;
+            FAutomationTestBase::bSuppressLogWarnings = false;
+            return true;
+        }),
+        TEXT("restore log suppression statics")));
+
+    return true;
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
 // Auto-generated from AS class Ck_AutoTest_Net_ScreamingTurnip_AGripperLostMidPullGivesTheBedBack (Replicated-mode).
 // DO NOT EDIT - regenerated on editor startup and every successful AS recompile.
 
@@ -293,6 +357,70 @@ bool FCkScreamingTurnipNet_AS_ScreamingTurnip_ALateBinderSeesTheStretchAsItStand
 
 // --------------------------------------------------------------------------------------------------------------------
 
+// Auto-generated from AS class Ck_AutoTest_Net_ScreamingTurnip_ALateBinderSeesTheWarningFromItsStart (Replicated-mode).
+// DO NOT EDIT - regenerated on editor startup and every successful AS recompile.
+
+namespace
+{
+    constexpr auto kAsClassPath_ScreamingTurnip_ALateBinderSeesTheWarningFromItsStart = TEXT("/Script/Angelscript.Ck_AutoTest_Net_ScreamingTurnip_ALateBinderSeesTheWarningFromItsStart");
+    constexpr auto kTimeoutSeconds_ScreamingTurnip_ALateBinderSeesTheWarningFromItsStart = 30.0f;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+    FCkScreamingTurnipNet_AS_ScreamingTurnip_ALateBinderSeesTheWarningFromItsStart,
+    "Ck.ScreamingTurnip.Net.AS_ScreamingTurnip_ALateBinderSeesTheWarningFromItsStart",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ClientContext | EAutomationTestFlags::EngineFilter)
+
+bool FCkScreamingTurnipNet_AS_ScreamingTurnip_ALateBinderSeesTheWarningFromItsStart::RunTest(const FString& Parameters)
+{
+    bSuppressLogErrors = true;
+    bSuppressLogWarnings = true;
+
+    constexpr auto NumPIEClients = 2;
+    constexpr auto ExpectedTotalWorlds = 2;
+    constexpr auto ReadyTimeoutSeconds = 30.0f;
+    constexpr auto FramesAfterSpawn = 30;
+
+    const auto MapPath = FString{TEXT("/Engine/Maps/Entry")};
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_StartPIEMultiClient(NumPIEClients, MapPath));
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_WaitForPIEReady(ExpectedTotalWorlds, ReadyTimeoutSeconds));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_RunOnServer(
+        FCk_NetAutoTest_ServerAction::CreateLambda([this](UWorld* InServer) -> void
+        {
+            auto SpawnInfo = FActorSpawnParameters{};
+            SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+            const auto SubjectClassPath = FSoftClassPath(TEXT("/Script/CkTests.Ck_AutoTest_NetSubject"));
+            auto* SubjectClass = SubjectClassPath.TryLoadClass<ACk_AutoTest_NetSubject>();
+            if (SubjectClass == nullptr)
+            { AddError(TEXT("AS-test harness: failed to resolve NetSubject class via FSoftClassPath")); return; }
+            auto* Subject = InServer->SpawnActor<ACk_AutoTest_NetSubject>(
+                SubjectClass, FTransform::Identity, SpawnInfo);
+            if (Subject == nullptr)
+            { AddError(TEXT("AS-test harness: server-side SpawnActor returned null")); }
+        })));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_TickWorlds(FramesAfterSpawn));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_RunAsTestOnAllWorlds(this, FString{kAsClassPath_ScreamingTurnip_ALateBinderSeesTheWarningFromItsStart}, kTimeoutSeconds_ScreamingTurnip_ALateBinderSeesTheWarningFromItsStart));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_EndPIE());
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_AssertCondition(this,
+        FCk_NetAutoTest_Assertion::CreateLambda([]() -> bool
+        {
+            FAutomationTestBase::bSuppressLogErrors = false;
+            FAutomationTestBase::bSuppressLogWarnings = false;
+            return true;
+        }),
+        TEXT("restore log suppression statics")));
+
+    return true;
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
 // Auto-generated from AS class Ck_AutoTest_Net_ScreamingTurnip_APullLetGoEarlyReleasesNothing (Replicated-mode).
 // DO NOT EDIT - regenerated on editor startup and every successful AS recompile.
 
@@ -404,6 +532,198 @@ bool FCkScreamingTurnipNet_AS_ScreamingTurnip_ASecondPullerIsRefusedAndTheCharge
     ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_TickWorlds(FramesAfterSpawn));
 
     ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_RunAsTestOnAllWorlds(this, FString{kAsClassPath_ScreamingTurnip_ASecondPullerIsRefusedAndTheChargeIsSpentOnce}, kTimeoutSeconds_ScreamingTurnip_ASecondPullerIsRefusedAndTheChargeIsSpentOnce));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_EndPIE());
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_AssertCondition(this,
+        FCk_NetAutoTest_Assertion::CreateLambda([]() -> bool
+        {
+            FAutomationTestBase::bSuppressLogErrors = false;
+            FAutomationTestBase::bSuppressLogWarnings = false;
+            return true;
+        }),
+        TEXT("restore log suppression statics")));
+
+    return true;
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+// Auto-generated from AS class Ck_AutoTest_Net_ScreamingTurnip_ASettledRootWarnsAndScreamsOnBothMachines (Replicated-mode).
+// DO NOT EDIT - regenerated on editor startup and every successful AS recompile.
+
+namespace
+{
+    constexpr auto kAsClassPath_ScreamingTurnip_ASettledRootWarnsAndScreamsOnBothMachines = TEXT("/Script/Angelscript.Ck_AutoTest_Net_ScreamingTurnip_ASettledRootWarnsAndScreamsOnBothMachines");
+    constexpr auto kTimeoutSeconds_ScreamingTurnip_ASettledRootWarnsAndScreamsOnBothMachines = 30.0f;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+    FCkScreamingTurnipNet_AS_ScreamingTurnip_ASettledRootWarnsAndScreamsOnBothMachines,
+    "Ck.ScreamingTurnip.Net.AS_ScreamingTurnip_ASettledRootWarnsAndScreamsOnBothMachines",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ClientContext | EAutomationTestFlags::EngineFilter)
+
+bool FCkScreamingTurnipNet_AS_ScreamingTurnip_ASettledRootWarnsAndScreamsOnBothMachines::RunTest(const FString& Parameters)
+{
+    bSuppressLogErrors = true;
+    bSuppressLogWarnings = true;
+
+    constexpr auto NumPIEClients = 2;
+    constexpr auto ExpectedTotalWorlds = 2;
+    constexpr auto ReadyTimeoutSeconds = 30.0f;
+    constexpr auto FramesAfterSpawn = 30;
+
+    const auto MapPath = FString{TEXT("/Engine/Maps/Entry")};
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_StartPIEMultiClient(NumPIEClients, MapPath));
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_WaitForPIEReady(ExpectedTotalWorlds, ReadyTimeoutSeconds));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_RunOnServer(
+        FCk_NetAutoTest_ServerAction::CreateLambda([this](UWorld* InServer) -> void
+        {
+            auto SpawnInfo = FActorSpawnParameters{};
+            SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+            const auto SubjectClassPath = FSoftClassPath(TEXT("/Script/CkTests.Ck_AutoTest_NetSubject"));
+            auto* SubjectClass = SubjectClassPath.TryLoadClass<ACk_AutoTest_NetSubject>();
+            if (SubjectClass == nullptr)
+            { AddError(TEXT("AS-test harness: failed to resolve NetSubject class via FSoftClassPath")); return; }
+            auto* Subject = InServer->SpawnActor<ACk_AutoTest_NetSubject>(
+                SubjectClass, FTransform::Identity, SpawnInfo);
+            if (Subject == nullptr)
+            { AddError(TEXT("AS-test harness: server-side SpawnActor returned null")); }
+        })));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_TickWorlds(FramesAfterSpawn));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_RunAsTestOnAllWorlds(this, FString{kAsClassPath_ScreamingTurnip_ASettledRootWarnsAndScreamsOnBothMachines}, kTimeoutSeconds_ScreamingTurnip_ASettledRootWarnsAndScreamsOnBothMachines));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_EndPIE());
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_AssertCondition(this,
+        FCk_NetAutoTest_Assertion::CreateLambda([]() -> bool
+        {
+            FAutomationTestBase::bSuppressLogErrors = false;
+            FAutomationTestBase::bSuppressLogWarnings = false;
+            return true;
+        }),
+        TEXT("restore log suppression statics")));
+
+    return true;
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+// Auto-generated from AS class Ck_AutoTest_Net_ScreamingTurnip_AStowedRootIsSilentOnBothMachines (Replicated-mode).
+// DO NOT EDIT - regenerated on editor startup and every successful AS recompile.
+
+namespace
+{
+    constexpr auto kAsClassPath_ScreamingTurnip_AStowedRootIsSilentOnBothMachines = TEXT("/Script/Angelscript.Ck_AutoTest_Net_ScreamingTurnip_AStowedRootIsSilentOnBothMachines");
+    constexpr auto kTimeoutSeconds_ScreamingTurnip_AStowedRootIsSilentOnBothMachines = 30.0f;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+    FCkScreamingTurnipNet_AS_ScreamingTurnip_AStowedRootIsSilentOnBothMachines,
+    "Ck.ScreamingTurnip.Net.AS_ScreamingTurnip_AStowedRootIsSilentOnBothMachines",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ClientContext | EAutomationTestFlags::EngineFilter)
+
+bool FCkScreamingTurnipNet_AS_ScreamingTurnip_AStowedRootIsSilentOnBothMachines::RunTest(const FString& Parameters)
+{
+    bSuppressLogErrors = true;
+    bSuppressLogWarnings = true;
+
+    constexpr auto NumPIEClients = 2;
+    constexpr auto ExpectedTotalWorlds = 2;
+    constexpr auto ReadyTimeoutSeconds = 30.0f;
+    constexpr auto FramesAfterSpawn = 30;
+
+    const auto MapPath = FString{TEXT("/Engine/Maps/Entry")};
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_StartPIEMultiClient(NumPIEClients, MapPath));
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_WaitForPIEReady(ExpectedTotalWorlds, ReadyTimeoutSeconds));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_RunOnServer(
+        FCk_NetAutoTest_ServerAction::CreateLambda([this](UWorld* InServer) -> void
+        {
+            auto SpawnInfo = FActorSpawnParameters{};
+            SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+            const auto SubjectClassPath = FSoftClassPath(TEXT("/Script/CkTests.Ck_AutoTest_NetSubject"));
+            auto* SubjectClass = SubjectClassPath.TryLoadClass<ACk_AutoTest_NetSubject>();
+            if (SubjectClass == nullptr)
+            { AddError(TEXT("AS-test harness: failed to resolve NetSubject class via FSoftClassPath")); return; }
+            auto* Subject = InServer->SpawnActor<ACk_AutoTest_NetSubject>(
+                SubjectClass, FTransform::Identity, SpawnInfo);
+            if (Subject == nullptr)
+            { AddError(TEXT("AS-test harness: server-side SpawnActor returned null")); }
+        })));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_TickWorlds(FramesAfterSpawn));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_RunAsTestOnAllWorlds(this, FString{kAsClassPath_ScreamingTurnip_AStowedRootIsSilentOnBothMachines}, kTimeoutSeconds_ScreamingTurnip_AStowedRootIsSilentOnBothMachines));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_EndPIE());
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_AssertCondition(this,
+        FCk_NetAutoTest_Assertion::CreateLambda([]() -> bool
+        {
+            FAutomationTestBase::bSuppressLogErrors = false;
+            FAutomationTestBase::bSuppressLogWarnings = false;
+            return true;
+        }),
+        TEXT("restore log suppression statics")));
+
+    return true;
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+// Auto-generated from AS class Ck_AutoTest_Net_ScreamingTurnip_AThrowCutsTheWarningOnBothMachines (Replicated-mode).
+// DO NOT EDIT - regenerated on editor startup and every successful AS recompile.
+
+namespace
+{
+    constexpr auto kAsClassPath_ScreamingTurnip_AThrowCutsTheWarningOnBothMachines = TEXT("/Script/Angelscript.Ck_AutoTest_Net_ScreamingTurnip_AThrowCutsTheWarningOnBothMachines");
+    constexpr auto kTimeoutSeconds_ScreamingTurnip_AThrowCutsTheWarningOnBothMachines = 30.0f;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+    FCkScreamingTurnipNet_AS_ScreamingTurnip_AThrowCutsTheWarningOnBothMachines,
+    "Ck.ScreamingTurnip.Net.AS_ScreamingTurnip_AThrowCutsTheWarningOnBothMachines",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ClientContext | EAutomationTestFlags::EngineFilter)
+
+bool FCkScreamingTurnipNet_AS_ScreamingTurnip_AThrowCutsTheWarningOnBothMachines::RunTest(const FString& Parameters)
+{
+    bSuppressLogErrors = true;
+    bSuppressLogWarnings = true;
+
+    constexpr auto NumPIEClients = 2;
+    constexpr auto ExpectedTotalWorlds = 2;
+    constexpr auto ReadyTimeoutSeconds = 30.0f;
+    constexpr auto FramesAfterSpawn = 30;
+
+    const auto MapPath = FString{TEXT("/Engine/Maps/Entry")};
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_StartPIEMultiClient(NumPIEClients, MapPath));
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_WaitForPIEReady(ExpectedTotalWorlds, ReadyTimeoutSeconds));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_RunOnServer(
+        FCk_NetAutoTest_ServerAction::CreateLambda([this](UWorld* InServer) -> void
+        {
+            auto SpawnInfo = FActorSpawnParameters{};
+            SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+            const auto SubjectClassPath = FSoftClassPath(TEXT("/Script/CkTests.Ck_AutoTest_NetSubject"));
+            auto* SubjectClass = SubjectClassPath.TryLoadClass<ACk_AutoTest_NetSubject>();
+            if (SubjectClass == nullptr)
+            { AddError(TEXT("AS-test harness: failed to resolve NetSubject class via FSoftClassPath")); return; }
+            auto* Subject = InServer->SpawnActor<ACk_AutoTest_NetSubject>(
+                SubjectClass, FTransform::Identity, SpawnInfo);
+            if (Subject == nullptr)
+            { AddError(TEXT("AS-test harness: server-side SpawnActor returned null")); }
+        })));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_TickWorlds(FramesAfterSpawn));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_RunAsTestOnAllWorlds(this, FString{kAsClassPath_ScreamingTurnip_AThrowCutsTheWarningOnBothMachines}, kTimeoutSeconds_ScreamingTurnip_AThrowCutsTheWarningOnBothMachines));
 
     ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_EndPIE());
 
@@ -660,6 +980,70 @@ bool FCkScreamingTurnipNet_AS_ScreamingTurnip_TwoCrossesInOneFrameReleaseOneRoot
     ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_TickWorlds(FramesAfterSpawn));
 
     ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_RunAsTestOnAllWorlds(this, FString{kAsClassPath_ScreamingTurnip_TwoCrossesInOneFrameReleaseOneRoot}, kTimeoutSeconds_ScreamingTurnip_TwoCrossesInOneFrameReleaseOneRoot));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_EndPIE());
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_AssertCondition(this,
+        FCk_NetAutoTest_Assertion::CreateLambda([]() -> bool
+        {
+            FAutomationTestBase::bSuppressLogErrors = false;
+            FAutomationTestBase::bSuppressLogWarnings = false;
+            return true;
+        }),
+        TEXT("restore log suppression statics")));
+
+    return true;
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+// Auto-generated from AS class Ck_AutoTest_Net_ScreamingTurnip_TwoRootsKeepTheirOwnLedgers (Replicated-mode).
+// DO NOT EDIT - regenerated on editor startup and every successful AS recompile.
+
+namespace
+{
+    constexpr auto kAsClassPath_ScreamingTurnip_TwoRootsKeepTheirOwnLedgers = TEXT("/Script/Angelscript.Ck_AutoTest_Net_ScreamingTurnip_TwoRootsKeepTheirOwnLedgers");
+    constexpr auto kTimeoutSeconds_ScreamingTurnip_TwoRootsKeepTheirOwnLedgers = 30.0f;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+    FCkScreamingTurnipNet_AS_ScreamingTurnip_TwoRootsKeepTheirOwnLedgers,
+    "Ck.ScreamingTurnip.Net.AS_ScreamingTurnip_TwoRootsKeepTheirOwnLedgers",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ClientContext | EAutomationTestFlags::EngineFilter)
+
+bool FCkScreamingTurnipNet_AS_ScreamingTurnip_TwoRootsKeepTheirOwnLedgers::RunTest(const FString& Parameters)
+{
+    bSuppressLogErrors = true;
+    bSuppressLogWarnings = true;
+
+    constexpr auto NumPIEClients = 2;
+    constexpr auto ExpectedTotalWorlds = 2;
+    constexpr auto ReadyTimeoutSeconds = 30.0f;
+    constexpr auto FramesAfterSpawn = 30;
+
+    const auto MapPath = FString{TEXT("/Engine/Maps/Entry")};
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_StartPIEMultiClient(NumPIEClients, MapPath));
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_WaitForPIEReady(ExpectedTotalWorlds, ReadyTimeoutSeconds));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_RunOnServer(
+        FCk_NetAutoTest_ServerAction::CreateLambda([this](UWorld* InServer) -> void
+        {
+            auto SpawnInfo = FActorSpawnParameters{};
+            SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+            const auto SubjectClassPath = FSoftClassPath(TEXT("/Script/CkTests.Ck_AutoTest_NetSubject"));
+            auto* SubjectClass = SubjectClassPath.TryLoadClass<ACk_AutoTest_NetSubject>();
+            if (SubjectClass == nullptr)
+            { AddError(TEXT("AS-test harness: failed to resolve NetSubject class via FSoftClassPath")); return; }
+            auto* Subject = InServer->SpawnActor<ACk_AutoTest_NetSubject>(
+                SubjectClass, FTransform::Identity, SpawnInfo);
+            if (Subject == nullptr)
+            { AddError(TEXT("AS-test harness: server-side SpawnActor returned null")); }
+        })));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_TickWorlds(FramesAfterSpawn));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_RunAsTestOnAllWorlds(this, FString{kAsClassPath_ScreamingTurnip_TwoRootsKeepTheirOwnLedgers}, kTimeoutSeconds_ScreamingTurnip_TwoRootsKeepTheirOwnLedgers));
 
     ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_EndPIE());
 
