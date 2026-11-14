@@ -1,3 +1,10 @@
+// Stance A. A monster's death is the authority's: only a machine with authority over the monster applies Die, and its
+// first Die writes the replicated ledger on the root (FMars_Fragment_Monster_Net: alive or dead, and the cause as plain
+// data). A copy without authority drops Die; its mirror (UMars_Processor_Monster_Mirror) writes the death into that copy
+// (the cause, the Dead attribute) and raises OnDied once, also when the monster was dead before that copy composed. A
+// mirrored cause names no instigator, causer or zone. The parts roster is each machine's own composition: parts
+// register on every machine. A monster on a host that does not replicate has authority and behaves as it always has.
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
 //--------------------------------------------------------------------------------------------------------------------------
@@ -81,7 +88,8 @@ struct FMars_Fragment_Monster_Params
 // State
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Written only by UMars_Processor_Monster_HandleRequests (and composed by Add). The roster is never pruned: a severed part
+// Written only by UMars_Processor_Monster_HandleRequests and, on a copy without authority, by
+// UMars_Processor_Monster_Mirror (which latches DeathCause), and composed by Add. The roster is never pruned: a severed part
 // stays listed, valid until its debris timer destroys it and invalid after. Readers count attached parts by the part's
 // State and check validity before any read.
 struct FMars_Fragment_Monster
@@ -105,6 +113,37 @@ struct FMars_Fragment_Monster
 }
 
 struct FMars_Tag_Monster_NeedsSetup {}
+
+//--------------------------------------------------------------------------------------------------------------------------
+// Ledger
+//--------------------------------------------------------------------------------------------------------------------------
+
+enum EMars_Monster_Life
+{
+    Alive,
+    Dead
+}
+
+// The replicated ledger on the monster root: whether it died and of what, with no handle, so it reads the same on every
+// machine. Written only by the authority's request drain, by its first Die.
+struct FMars_Fragment_Monster_Net
+{
+    UPROPERTY()
+    EMars_Monster_Life Life = EMars_Monster_Life::Alive;
+
+    UPROPERTY()
+    FMars_Health_NetHit DeathCause;
+}
+
+// Each machine's own: the ledger the mirror last reconciled (unset with authority).
+struct FMars_Fragment_Monster_Local
+{
+    UPROPERTY()
+    TOptional<FMars_Fragment_Monster_Net> Last;
+}
+
+// Added by utils_monster::Add, dropped by UMars_Processor_Monster_Mirror once it has bound the ledger's rep-notify.
+struct FMars_Tag_Monster_NeedsMirror {}
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Signals
@@ -137,7 +176,8 @@ struct FMars_Request_Monster_RegisterPart
     }
 }
 
-// Latched: only the first Die does anything. The setup processor requests it on the body Health's OnDepleted.
+// Latched: only the first Die does anything, and only on the machine with authority over the monster. The setup
+// processor requests it on the body Health's OnDepleted.
 struct FMars_Request_Monster_Die
 {
     UPROPERTY()

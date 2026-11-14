@@ -1,7 +1,8 @@
 namespace utils_monster
 {
-    // Composes the creature root on InRoot: its team, the body Health and a body zone feeding it, the Dead byte attribute
-    // and the parts roster (parts register themselves through utils_body_part::Add). A rejected spec ensures and returns
+    // Composes the creature root on InRoot: its team, the body Health and a body zone feeding it, the Dead byte attribute,
+    // the parts roster (parts register themselves through utils_body_part::Add) and the death ledger, which always
+    // replicates (on a host without a replication driver it simply has nowhere to go). A rejected spec ensures and returns
     // an invalid handle with nothing composed.
     FCk_Handle_Monster Add(FCk_Handle& InRoot, FMars_Monster_Spec InSpec)
     {
@@ -35,7 +36,19 @@ namespace utils_monster
         InRoot.Add_Fragment(FMars_Feature_Monster());
         InRoot.Add_Fragment(Params);
         InRoot.Add_Fragment(State);
+
+        // The mirror compares what arrives against the ledger this machine composed, not one that already arrived.
+        auto Ledger = FMars_Fragment_Monster_Net();
+        auto Local = FMars_Fragment_Monster_Local();
+        Local.Last = TOptional<FMars_Fragment_Monster_Net>(Ledger);
+
+        // A client's copy can receive the replicated ledger before it composes: the arrived ledger stands then.
+        if (InRoot.Has_Fragment(FMars_Fragment_Monster_Net) == false)
+        { InRoot.Add_Fragment(Ledger, ECk_Replication::Replicates); }
+
+        InRoot.Add_Fragment(Local);
         InRoot.Add_Fragment(FMars_Tag_Monster_NeedsSetup());
+        InRoot.Add_Fragment(FMars_Tag_Monster_NeedsMirror());
         return InRoot.As_Monster();
     }
 
