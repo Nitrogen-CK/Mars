@@ -20,7 +20,10 @@
 // gripper, in arrival order with the grip requests. Every machine that does not hold the grip shows the handle following
 // that Pull through the control's own spring (UMars_Processor_Control_MirroredGrip) and keeps the Operated claim on the
 // interactable the assembly watches (Request_WatchInteractable), so nobody else starts a grip; nothing simulated reads
-// the mirrored handle.
+// the mirrored handle. A control without a Mover is mirrored too, from where its grip starts, and its assembly draws
+// what TryGet_ShownGripAlpha answers (this machine's own grip, else the mirrored one). The grip mirror raises
+// OnGripHolderChanged once each time the holder it reads (Nobody, ThisMachine, AnotherMachine) changes, so an assembly
+// can dress another machine's grip.
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
@@ -523,6 +526,11 @@ event void FMars_Delegate_Control_OnTurned_MC(FCk_Handle_Control InControl, floa
 delegate void FMars_Delegate_Control_OnGripRefused(FCk_Handle_Control InControl, FCk_Handle InRefused);
 event void FMars_Delegate_Control_OnGripRefused_MC(FCk_Handle_Control InControl, FCk_Handle InRefused);
 
+// Once each time the grip mirror finds the grant held by someone else than at its last reconcile, on every machine (a
+// machine that binds late sees the holder it finds as a change from Nobody).
+delegate void FMars_Delegate_Control_OnGripHolderChanged(FCk_Handle_Control InControl, EMars_Control_GripHolder InPrevious, EMars_Control_GripHolder InHolder);
+event void FMars_Delegate_Control_OnGripHolderChanged_MC(FCk_Handle_Control InControl, EMars_Control_GripHolder InPrevious, EMars_Control_GripHolder InHolder);
+
 struct FMars_Fragment_Control_Signals
 {
     FMars_Delegate_Control_OnActiveChanged_MC OnActiveChanged;
@@ -531,6 +539,7 @@ struct FMars_Fragment_Control_Signals
     FMars_Delegate_Control_OnManipulationProgress_MC OnManipulationProgress;
     FMars_Delegate_Control_OnTurned_MC OnTurned;
     FMars_Delegate_Control_OnGripRefused_MC OnGripRefused;
+    FMars_Delegate_Control_OnGripHolderChanged_MC OnGripHolderChanged;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

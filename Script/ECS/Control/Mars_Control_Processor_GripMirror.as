@@ -7,7 +7,8 @@
 // raises OnGripRefused once per refusal. A refusal
 // naming the entity the ledger now shows gripping is old: that entity was granted since, and its grip stands.
 // Each reconcile also follows who holds the grant (Follow_Holder): another machine's grip is shown and claimed here,
-// this machine's own never is. The authority also reconciles after each grant and release its drain makes; a client
+// this machine's own never is, whether or not the control has a Mover; when the holder it reads changed it raises
+// OnGripHolderChanged once, before any refusal. The authority also reconciles after each grant and release its drain makes; a client
 // reconciles on every arrival, a changed Pull included.
 class UMars_Processor_Control_GripMirror : UCk_Processor_Script_Base_UE
 {
@@ -55,19 +56,35 @@ class UMars_Processor_Control_GripMirror : UCk_Processor_Script_Base_UE
         { LetGo(InControl, Refused); }
 
         // After a refused grip let go, so the refused machine shows and claims the grip like any other.
+        const auto PreviousHolder = InControl.Get_Fragment(FMars_Fragment_Control_Local).GripHolder;
         Follow_Holder(InControl, Ledger, Last);
 
-        if (HasNewRefusals == false || InControl.Has_Fragment(FMars_Fragment_Control_Signals) == false)
+        const auto Holder = InControl.Get_Fragment(FMars_Fragment_Control_Local).GripHolder;
+        const auto HasNewHolder = Holder != PreviousHolder;
+        if (HasNewHolder == false && HasNewRefusals == false)
+        { return; }
+
+        // Handlers dress the assembly and start its ticks: scope the script world to the control's.
+        const auto WorldContext = FAngelscriptGameThreadScopeWorldContext(utils_entity_lifetime::Get_WorldForEntity(InControl));
+
+        if (HasNewHolder && InControl.Has_Fragment(FMars_Fragment_Control_Signals))
+        { InControl.Get_Fragment(FMars_Fragment_Control_Signals).OnGripHolderChanged.Broadcast(InControl, PreviousHolder, Holder); }
+
+        if (HasNewRefusals == false)
         { return; }
 
         for (int32 Refusal = Last.RefusalSerial; Refusal < Ledger.RefusalSerial; ++Refusal)
-        { InControl.Get_Fragment(FMars_Fragment_Control_Signals).OnGripRefused.Broadcast(InControl, Refused); }
+        {
+            if (InControl.Has_Fragment(FMars_Fragment_Control_Signals))
+            { InControl.Get_Fragment(FMars_Fragment_Control_Signals).OnGripRefused.Broadcast(InControl, Refused); }
+        }
     }
 
     // Who holds the grant now, against who held it at the last reconcile. Another machine's grip takes the Operated claim
-    // and is shown (UMars_Processor_Control_MirroredGrip, from the Mover's alpha; a new grant while one is shown carries
-    // on from where it is). When it ends the claim goes, and the shown handle settles back after a let-go or a lost
-    // gripper; after a crossing a returns-to-rest handle settles and any other is left where it is for the engage's MoveTo.
+    // and is shown (UMars_Processor_Control_MirroredGrip, from where a grip starts: the Mover's alpha, or without a Mover
+    // the end the pull runs from; a new grant while one is shown carries on from where it is). When it ends the claim
+    // goes, and a Mover settles back after a let-go or a lost gripper; after a crossing a returns-to-rest Mover settles and
+    // any other is left where it is for the engage's MoveTo. A control without a Mover is shown and cleared the same way.
     private void Follow_Holder(FCk_Handle_Control& InControl, const FMars_Fragment_Control_Grip& InLedger, const FMars_Fragment_Control_Grip& InLast)
     {
         auto& Local = InControl.Get_Fragment(FMars_Fragment_Control_Local);
@@ -84,11 +101,11 @@ class UMars_Processor_Control_GripMirror : UCk_Processor_Script_Base_UE
             { Interactable.Request_Disable(FMars_Request_Interactable_Disable(EMars_Interactable_DisableReason::Operated)); }
 
             const auto IsNewGrant = Previous != EMars_Control_GripHolder::AnotherMachine || InLedger.GripSerial != InLast.GripSerial;
-            if (IsNewGrant == false || ck::Is_NOT_Valid(Mover))
+            if (IsNewGrant == false)
             { return; }
 
             if (Local.MirroredGrip.IsSet() == false)
-            { Local.MirroredGrip = FMars_Control_Spring(Mover.Get_Alpha(), 0.0f); }
+            { Local.MirroredGrip = FMars_Control_Spring(InControl.Get_GripStartAlpha(), 0.0f); }
 
             if (InControl.Has_Fragment(FMars_Tag_Control_MirroringGrip) == false)
             { InControl.Add_Fragment(FMars_Tag_Control_MirroringGrip()); }

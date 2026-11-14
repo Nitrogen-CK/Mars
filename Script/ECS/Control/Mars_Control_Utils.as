@@ -323,6 +323,17 @@ mixin TOptional<float32> TryGet_MirroredGripAlpha(const FCk_Handle_Control& Self
     return TOptional<float32>(State.MirroredGrip.GetValue().Alpha);
 }
 
+// What this machine shows of the control's grip: its own grip's alpha, else the mirrored alpha of another machine's,
+// else unset.
+mixin TOptional<float32> TryGet_ShownGripAlpha(const FCk_Handle_Control& Self)
+{
+    const auto Own = Self.TryGet_ManipulationAlpha();
+    if (Own.IsSet())
+    { return Own; }
+
+    return Self.TryGet_MirroredGripAlpha();
+}
+
 // The grip ledger's Pull as it stands on this machine (the last granted grip's, after a release).
 mixin float32 Get_GripPull(const FCk_Handle_Control& Self)
 {
@@ -599,4 +610,18 @@ mixin void UnbindFrom_OnGripRefused(FCk_Handle_Control& Self, FMars_Delegate_Con
     { return; }
 
     Self.Get_Fragment(FMars_Fragment_Control_Signals).OnGripRefused.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void BindTo_OnGripHolderChanged(FCk_Handle_Control& Self, FMars_Delegate_Control_OnGripHolderChanged InDelegate)
+{
+    auto& Fragment = Self.AddOrGet_Fragment(FMars_Fragment_Control_Signals);
+    Fragment.OnGripHolderChanged.AddUFunction(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void UnbindFrom_OnGripHolderChanged(FCk_Handle_Control& Self, FMars_Delegate_Control_OnGripHolderChanged InDelegate)
+{
+    if (Self.Has_Fragment(FMars_Fragment_Control_Signals) == false)
+    { return; }
+
+    Self.Get_Fragment(FMars_Fragment_Control_Signals).OnGripHolderChanged.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
 }

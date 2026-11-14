@@ -239,13 +239,14 @@ class UMars_ScreamingTurnipPresentationComponent : USkeletalMeshComponent
         Play_Clip(_LoopClip);
     }
 
-    // A gripped pull scrubs SRC_Tug to the Control's alpha of this frame (the Control ticked before this component did).
+    // A gripped pull, this machine's own or another machine's shown here, scrubs SRC_Tug to the alpha the Control shows
+    // this frame (the Control ticked before this component did).
     private void DoFollow_Pull()
     {
         if (ck::Is_NOT_Valid(_Pull.Control))
         { return; }
 
-        const auto Alpha = _Pull.Control.TryGet_ManipulationAlpha();
+        const auto Alpha = _Pull.Control.TryGet_ShownGripAlpha();
         if (Alpha.IsSet() == false)
         { return; }
 

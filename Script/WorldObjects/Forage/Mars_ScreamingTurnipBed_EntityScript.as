@@ -3,10 +3,14 @@
 // ManipulateControl task begins the manipulation with the player as its Puller, and the ground gained from the grip, over
 // Pull.Stretch.TravelCm (the bed's grouped tuner, FMars_ScreamingTurnipBed_PullSpec), is the Control's Pull; its spring
 // (Pull.Spring) is the stretch's alpha. The Use target is ManuallyCompleted, needs both hands free and is worked
-// AfterCompletion: the Control's threshold (Pull.Spring.EngageAlpha) ends the interaction Succeeded and runs
-// UMars_SmState_ScreamingTurnipBed_Pull, which claims the target
-// and asks the Forage for one Plucked release; Use let go (or the focus lost) before it cancels the interaction and
-// consumes nothing. The target is the bed's own (not Make_InteractTarget): TryGet_ManipulatedControl resolves the Control
+// AfterCompletion: the Control's threshold (Pull.Spring.EngageAlpha) ends the interaction Succeeded and runs the Control's
+// engage state (UMars_SmState_Control_Engage). The bed replicates, so its Control is arbitrated: the pull runs on the
+// machine that begins it, and the grip's Cross engages the Control once on the authority, where the bed turns that
+// engagement (OnEngaged) into a claim of the target and one Plucked release. Use let go (or the focus lost) before the
+// threshold cancels the interaction and consumes nothing. Every other machine learns the release from the Forage
+// ledger (OnForageReleased, OnForageExhausted) and draws another machine's pull from the Control's mirrored grip, the
+// grip ledger's pull through the same spring (TryGet_ShownGripAlpha); OnGripHolderChanged starts and ends that
+// dressing. The target is the bed's own (not Make_InteractTarget): TryGet_ManipulatedControl resolves the Control
 // through the interactable's owner, this entity, so the player's task and the prompt ring find it. The release is the ordinary Forage -> WorldItem
 // yield (Request_SpawnWorld at the release point, hopping out of the bed): the bed never spawns, parents or destroys it.
 //
@@ -28,7 +32,9 @@
 class UMars_ScreamingTurnipBed_EntityScript : UCk_GenericEntityScript_UE
 {
     default _ShowInPlaceActors = true;
-    default _Replication = ECk_Replication::DoesNotReplicate;
+    // Stance A: the bed, its root transform, its Forage ledger and its Control's two ledgers (engagements, the grip)
+    // replicate; the planted node, the grips and every visual are built on every machine.
+    default _Replication = ECk_Replication::Replicates;
 
     UPROPERTY(ExposeOnSpawn)
     FTransform SpawnTransform = FTransform::Identity;
@@ -91,8 +97,9 @@ class UMars_ScreamingTurnipBed_EntityScript : UCk_GenericEntityScript_UE
             return ECk_EntityScript_ConstructionFlow::Finished;
         }
 
-        auto Root = utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::DoesNotReplicate);
+        auto Root = utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::Replicates);
         utils_handle::Set_DebugName(InHandle, n"ScreamingTurnipBed");
+        utils_entity_tag::Add(InHandle, n"TAG_MarsScreamingTurnipBed");
         _Self = InHandle;
         _Root = Root;
 
@@ -120,6 +127,9 @@ class UMars_ScreamingTurnipBed_EntityScript : UCk_GenericEntityScript_UE
             return ECk_EntityScript_ConstructionFlow::Finished;
         }
 
+        _Control.BindTo_OnEngaged(FMars_Delegate_Control_OnEngaged(this, n"OnControlEngaged"));
+        _Control.BindTo_OnGripHolderChanged(FMars_Delegate_Control_OnGripHolderChanged(this, n"OnGripHolderChanged"));
+
         AddInteractable(Root);
         AddVisuals(Root);
         AddHarvestGrips(InHandle);
@@ -144,6 +154,12 @@ class UMars_ScreamingTurnipBed_EntityScript : UCk_GenericEntityScript_UE
                 FMars_Delegate_Interactable_OnInteractionFinished(this, n"OnPullFinished"));
         }
 
+        if (ck::IsValid(_Control))
+        {
+            _Control.UnbindFrom_OnEngaged(FMars_Delegate_Control_OnEngaged(this, n"OnControlEngaged"));
+            _Control.UnbindFrom_OnGripHolderChanged(FMars_Delegate_Control_OnGripHolderChanged(this, n"OnGripHolderChanged"));
+        }
+
         _Forage = FCk_Handle_Forage();
         _Interactable = FCk_Handle_Interactable();
         _Control = FCk_Handle_Control();
@@ -161,9 +177,9 @@ class UMars_ScreamingTurnipBed_EntityScript : UCk_GenericEntityScript_UE
     // The walk pull: ManuallyCompleted, Walk over Pull.Stretch.TravelCm with Pull.Spring, no Mover (the presentation is the
     // drawing). The HarvestGrip sockets swing about 2 cm past the crown at full pitch (authored), so the gloves travel
     // TravelCm + ~2 while the player walks TravelCm: the arms give the 2 cm.
-    // Behavior Toggle is unused: the bed's target runs UMars_SmState_ScreamingTurnipBed_Pull, never
-    // UMars_SmState_Control_Engage, so nothing engages and IsActive stays false; ReturnsToRest keeps every pull running
-    // toward the end even so.
+    // Behavior Toggle is unused: the completion runs the Control's engage state and the grip's Cross engages the Control
+    // once on the authority, after which it reads active, which nothing reads: the bed is exhausted for good, and
+    // ReturnsToRest keeps every pull running toward the end.
     private FMars_Control_Spec Make_ControlSpec() const
     {
         auto Spec = FMars_Control_Spec();
@@ -197,7 +213,7 @@ class UMars_ScreamingTurnipBed_EntityScript : UCk_GenericEntityScript_UE
         auto Target = FMars_Interactable_TargetEntry();
         Target.InteractTargetSpec = TargetSpec;
         Target.InteractPromptSpec = Prompt;
-        Target.InteractionStateClass = UMars_SmState_ScreamingTurnipBed_Pull;
+        Target.InteractionStateClass = UMars_SmState_Control_Engage;
         Target.RequiresFreeHands = true;
         Target.Work = EMars_Interactable_Work::AfterCompletion;
         Target.ReachKind = EMars_FPHands_ReachKind::Hold;
@@ -211,6 +227,9 @@ class UMars_ScreamingTurnipBed_EntityScript : UCk_GenericEntityScript_UE
             FMars_Delegate_Interactable_OnInteractionStarted(this, n"OnPullStarted"));
         _Interactable.BindTo_OnInteractionFinished(GameplayTags::InteractionChannel_Mars_Use,
             FMars_Delegate_Interactable_OnInteractionFinished(this, n"OnPullFinished"));
+
+        // Held by another machine's grip, the target is unavailable here (the Control keeps its Operated claim).
+        _Control.Request_WatchInteractable(FMars_Request_Control_WatchInteractable(_Interactable));
     }
 
     // The pull's glove targets: the bed's grip table (the interactable's owner is this entity, as a Station's is), one socket
@@ -218,7 +237,7 @@ class UMars_ScreamingTurnipBed_EntityScript : UCk_GenericEntityScript_UE
     // k_HarvestGripSocket_R / _L, on the crown), Power pose, Roll Fixed, and the handed grip rotation in the socket's frame:
     // fingers +X (round the stalk from the Use side), palm in toward the crown (-Y for the right glove, +Y for the left).
     // The sockets carry no authored rotation, so that frame is the crown bone's: whether these vectors read right on the
-    // turned stalks is Phase L Part 2's PIE call (flip them there if the gloves come out wrong). FPHands reads the sockets
+    // turned stalks can only be judged in PIE (flip them here if the gloves come out wrong). FPHands reads the sockets
     // live (FMars_FPHands_HandGrip.SocketHost), so the gloves follow the pose and the planted node's turn without help.
     private void AddHarvestGrips(FCk_Handle& InHandle)
     {
@@ -396,7 +415,16 @@ class UMars_ScreamingTurnipBed_EntityScript : UCk_GenericEntityScript_UE
     UFUNCTION()
     private void OnPullFinished(FCk_Handle_Interactable InInteractable, FCk_Handle_Interaction InInteraction, ECk_SucceededFailed InResult)
     {
-        if (InResult == ECk_SucceededFailed::Succeeded || ck::Is_NOT_Valid(_Planted) || _IsHarvested)
+        if (InResult == ECk_SucceededFailed::Succeeded)
+        { return; }
+
+        DoPlay_Cancel();
+    }
+
+    // SRC_Cancel from the strain the scrubbed Tug had reached; nothing once harvested or without the planted component.
+    private void DoPlay_Cancel()
+    {
+        if (ck::Is_NOT_Valid(_Planted) || _IsHarvested)
         { return; }
 
         const auto Strain = _Planted.Get_PlayingClip() == constants_screaming_turnip_assets::k_Clip_Tug ? _Planted.Get_PlayedAlpha() : 0.0f;
@@ -442,43 +470,42 @@ class UMars_ScreamingTurnipBed_EntityScript : UCk_GenericEntityScript_UE
     {
         Claim_Target();
     }
-}
 
-//--------------------------------------------------------------------------------------------------------------------------
-// The pull
-//--------------------------------------------------------------------------------------------------------------------------
-
-// What a completed pull does: claim the bed's target and ask its Forage for one Plucked release.
-class UMars_SmState_ScreamingTurnipBed_Pull : UMars_SmState_InteractTarget_RunTask
-{
-    default TaskClass = UMars_SmTask_ScreamingTurnipBed_Pull;
-}
-
-class UMars_SmTask_ScreamingTurnipBed_Pull : UCk_SmTask_EntityScript
-{
-    default _TaskMode = ECk_SmTaskMode::EnterExitOnly;
-
-    UFUNCTION(BlueprintOverride)
-    void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
+    // The pluck: the authority's bed turns its Control's engagement (the grip's Cross) into a claim of the target and one
+    // Plucked release. Every other machine learns both from the Forage ledger.
+    UFUNCTION()
+    private void OnControlEngaged(FCk_Handle_Control InControl)
     {
-        auto Context = Get_StateMachineContext();
-        if (Context.Has_Fragment(FMars_Fragment_InteractionContext) == false)
+        if (utils_net::Get_HasAuthority(_Self) == false || ck::Is_NOT_Valid(_Forage) || _Forage.Get_IsExhausted())
+        { return; }
+
+        Claim_Target();
+        _Forage.Request_Release(FMars_Request_Forage_Release(EMars_Forage_ReleaseReason::Plucked));
+    }
+
+    // Another machine's pull, dressed here as this machine's own is: from its grant the turn aims at the gripper and the
+    // Grip clip plays (the presentation then scrubs the Tug to the mirrored alpha); when it ends short of the break the
+    // Cancel clip plays from the strain. A crossing leaves the Tug where it is for the release to swap the visuals.
+    UFUNCTION()
+    private void OnGripHolderChanged(FCk_Handle_Control InControl, EMars_Control_GripHolder InPrevious, EMars_Control_GripHolder InHolder)
+    {
+        if (InHolder == EMars_Control_GripHolder::AnotherMachine)
         {
-            Mark_Result(ECk_SmTaskResult::Failed);
+            if (_IsHarvested || ck::Is_NOT_Valid(_Planted))
+            { return; }
+
+            _Aim = _Control.Get_Gripper().As_Transform(ECk_SanityCheck::UnChecked);
+            _Planted.Play_Clip(FMars_ScreamingTurnip_PresentationClip(constants_screaming_turnip_assets::k_Clip_Grip,
+                EMars_ScreamingTurnip_ClipEnd::HoldLastFrame, Pull.Timing.GripSeconds));
+            DoStart_Following();
             return;
         }
 
-        const auto& Interaction = Context.Get_Fragment(FMars_Fragment_InteractionContext);
-        auto Forage = Interaction.InteractableOwner.As_Forage(ECk_SanityCheck::UnChecked);
-        if (ck::Is_NOT_Valid(Forage) || Forage.Get_IsExhausted())
-        {
-            Mark_Result(ECk_SmTaskResult::Failed);
-            return;
-        }
+        if (InPrevious != EMars_Control_GripHolder::AnotherMachine || InHolder != EMars_Control_GripHolder::Nobody)
+        { return; }
 
-        auto Interactable = Interaction.Interactable;
-        Interactable.Request_Disable(FMars_Request_Interactable_Disable(EMars_Interactable_DisableReason::Exhausted));
-        Forage.Request_Release(FMars_Request_Forage_Release(EMars_Forage_ReleaseReason::Plucked));
-        Mark_Result(ECk_SmTaskResult::Succeeded);
+        _Aim = FCk_Handle_Transform();
+        if (_Control.Get_LastGripRelease() != EMars_Control_GripRelease::Crossed)
+        { DoPlay_Cancel(); }
     }
 }

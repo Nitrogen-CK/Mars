@@ -3,6 +3,8 @@
 // sample needs them); then the ScreamingTurnip kernel on the same entity and the animated skeletal presentation that
 // follows it. The static proxy (the base's visual) stays the body's shape and the pickup's fit; it is drawn only while no
 // skeletal mesh loads. A Visual-mode spawn (a held visual of a non-persistent item) is the base's: it carries no kernel.
+// The kernel is the authority's: it samples the body, which only the authority builds. A copy without authority is the
+// base's world item and draws the proxy; it has no voice and no skeletal presentation.
 class UMars_ScreamingTurnip_EntityScript : UMars_WorldItem_EntityScript
 {
     default Definition = mars_items::ScreamingTurnip();
@@ -29,6 +31,9 @@ class UMars_ScreamingTurnip_EntityScript : UMars_WorldItem_EntityScript
         // A rejected definition or spec destroyed the entity (the base ensured).
         _WorldItem = InHandle.As_WorldItem(ECk_SanityCheck::UnChecked);
         if (ck::Is_NOT_Valid(_WorldItem))
+        { return Flow; }
+
+        if (utils_net::Get_HasAuthority(InHandle) == false)
         { return Flow; }
 
         const auto HasBody = ck::IsValid(_WorldItem.Get_Body());
