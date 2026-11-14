@@ -2,6 +2,13 @@ namespace constants_mars_net
 {
     // The one entity every replicated runtime spawn is parented under (utils_mars_net::Get_ReplicatedSpawnOwner).
     const FName k_SpawnOwnerTag = n"TAG_MarsReplicatedSpawnOwner";
+
+    // How long a copy without authority eases a creature's root to each replicated location (s).
+    const float32 k_CreatureLocationSmoothSeconds = 0.1f;
+
+    // A creature root's replicated rotation is applied at once: an eased rotation turns the long way round where the
+    // yaw wraps.
+    const float32 k_CreatureRotationSmoothSeconds = 0.001f;
 }
 
 // Owns the net-correlated lifetime owner that every replicated runtime spawn goes under. Every world but a client's
@@ -115,6 +122,22 @@ namespace utils_mars_net
         { return false; }
 
         return utils_net::Get_EntityReplication(InEntity) == ECk_Replication::Replicates;
+    }
+
+    // A creature's root: its Transform at InSpawnTransform, Replicates. A copy without authority over InHandle follows
+    // the replicated root through the transform interpolation, its location eased and its rotation applied at once.
+    FCk_Handle_Transform Add_CreatureRoot(FCk_Handle& InHandle, FTransform InSpawnTransform)
+    {
+        auto Root = utils_transform::Add(InHandle, InSpawnTransform, ECk_Replication::Replicates);
+        if (utils_net::Get_HasAuthority(InHandle))
+        { return Root; }
+
+        auto Settings = FCk_Transform_Interpolation_Settings();
+        Settings.Set_Strategy(ECk_Interpolation_Strategy::Linear);
+        Settings.Set_SmoothLocationTime(FCk_Time(constants_mars_net::k_CreatureLocationSmoothSeconds));
+        Settings.Set_SmoothRotationTime(FCk_Time(constants_mars_net::k_CreatureRotationSmoothSeconds));
+        utils_transform_interpolation::Add(InHandle, Settings);
+        return Root;
     }
 
     // Asks the world, not the handle's role, so the answer holds for any handle, replicated or not.

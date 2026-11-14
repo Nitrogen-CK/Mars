@@ -1,5 +1,6 @@
 // Wires a new Root Maw's body zone to the kernel: every hit the zone routes becomes a TakeHit (the flinch, the startle, the
-// provoked target). The zone is on the Maw's root.
+// provoked target). The zone is on the Maw's root. A copy without authority runs no Dead state: it turns its own body
+// zone off when its monster dies (at once when it already reads dead).
 class UMars_Processor_RootMaw_Setup : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -18,7 +19,27 @@ class UMars_Processor_RootMaw_Setup : UCk_Processor_Script_Base_UE
         auto Zone = Maw.Get_Monster().Get_BodyZone();
         Zone.BindTo_OnHit(FMars_Delegate_HitZone_OnHit(this, n"OnBodyHit"));
 
+        if (utils_net::Get_HasAuthority(InHandle) == false)
+        {
+            auto Monster = Maw.Get_Monster();
+            Monster.BindTo_OnDied(FMars_Delegate_Monster_OnDied(this, n"OnMonsterDied"));
+            if (Maw.Get_IsDead())
+            { Disable_BodyZone(Monster); }
+        }
+
         Maw.Request_TryRemove(FMars_Tag_RootMaw_NeedsSetup);
+    }
+
+    UFUNCTION()
+    private void OnMonsterDied(FCk_Handle_Monster InMonster, FMars_DamageEvent InCause)
+    {
+        Disable_BodyZone(InMonster);
+    }
+
+    private void Disable_BodyZone(FCk_Handle_Monster InMonster)
+    {
+        auto Zone = InMonster.Get_BodyZone();
+        Zone.Request_SetEnabled(FMars_Request_HitZone_SetEnabled(ECk_EnableDisable::Disable));
     }
 
     UFUNCTION()

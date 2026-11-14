@@ -9,6 +9,13 @@ asset Mars_RootMawHandle of UCkDynamic_HandleDefinition
     Description = "The Root Maw: a turnip-headed plant that lies buried with only its leaves showing, bursts up to glide after its prey on a bed of roots, and bites with its hinged maw";
 }
 
+// Replication: the authority spawns the Maw and alone composes what decides and moves it (the surface motion, the
+// damage dealer, the senses, the drive and the state machine) and applies its requests. Its drain publishes the ledger
+// (FMars_Fragment_RootMaw_Net: the stance and the latched gape) through utils_root_maw::Publish, its one writer; the
+// root transform replicates with it. A copy without authority runs the posture, the travel and the jaw's ease on its
+// own clock from that ledger (UMars_Processor_RootMaw_Mirror) and from the replicated root, drops every request, is
+// struck through the strike claim and dies when its monster's ledger does. A copy that composes late shows the stance
+// and the gape as they stand; its body zone goes off when its monster dies.
 struct FMars_Feature_RootMaw {}
 
 // Until UMars_Processor_RootMaw_Setup has bound the body zone's hits to TakeHit.
@@ -283,7 +290,7 @@ struct FMars_Fragment_RootMaw_Params
 // State
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Composed by Add; never written afterwards.
+// Composed by Add; never written afterwards. Motion and Dealer are invalid on a copy without authority.
 struct FMars_Fragment_RootMaw
 {
     UPROPERTY()
@@ -318,7 +325,8 @@ enum EMars_RootMaw_Stance
     Emerged
 }
 
-// Emerge runs 0 (buried) .. 1 (up) toward Stance; the body sinks BuryDrop * (1 - Get_EaseInOut(Emerge)).
+// Emerge runs 0 (buried) .. 1 (up) toward Stance; the body sinks BuryDrop * (1 - Get_EaseInOut(Emerge)). On a copy
+// without authority the mirror writes Stance (and, as the ledger stands when it binds, Emerge).
 struct FMars_Fragment_RootMaw_Posture
 {
     UPROPERTY()
@@ -333,7 +341,8 @@ struct FMars_Fragment_RootMaw_Posture
 }
 
 // The maw: Gape is the latched opening the control layer asks for between bites (0 shut .. 1 wide); JawOpen is the jaw's
-// opening now, eased toward Gape, or set by the bite while one runs.
+// opening now, eased toward Gape, or set by the bite while one runs. On a copy without authority the mirror writes Gape
+// (and, as the ledger stands when it binds, JawOpen).
 struct FMars_Fragment_RootMaw_Mouth
 {
     UPROPERTY()
@@ -456,6 +465,35 @@ struct FMars_Fragment_RootMaw_Targeting
 
     UPROPERTY()
     float32 SenseClock = 0.0f;
+}
+
+// The replicated ledger on the root: the stance and the latched gape. Written only by utils_root_maw::Publish, from the
+// authority's request drain.
+struct FMars_Fragment_RootMaw_Net
+{
+    UPROPERTY()
+    EMars_RootMaw_Stance Stance = EMars_RootMaw_Stance::Buried;
+
+    UPROPERTY()
+    float32 Gape = 0.0f;
+}
+
+// Each machine's own: the ledger the mirror last reconciled (unset with authority).
+struct FMars_Fragment_RootMaw_Local
+{
+    UPROPERTY()
+    TOptional<FMars_Fragment_RootMaw_Net> Last;
+}
+
+// Added by utils_root_maw::Add, dropped by UMars_Processor_RootMaw_Mirror once it has bound the ledger's rep-notify.
+struct FMars_Tag_RootMaw_NeedsMirror {}
+
+// How a copy without authority takes the ledger: as it stands when the copy binds (a copy that composed late shows the
+// Maw where it is), or as each change arrives (the tick then plays the rise, the sink and the jaw's ease).
+enum EMars_RootMaw_Reconcile
+{
+    AsItStands,
+    AsItArrives
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

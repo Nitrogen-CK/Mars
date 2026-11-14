@@ -87,10 +87,13 @@ namespace utils_root_maw
 // and in a bed under its head, and shrink and twist away behind it (Stephen 2026-11-02). Every frame it turns the jaw bone
 // from the kernel's JawOpen, fades the eyes in while the Maw is up, breathes and leans it into its glide, jolts it on each of the
 // kernel's flinches, wilts it once dead, and feeds the trail the kernel's ground velocity and how far it is up.
+// The entity, its root transform and the kernel's ledger replicate: every machine builds the body node, the look and
+// the tick, and the kernel decides on the machine with authority.
 class UMars_RootMaw_EntityScript : UCk_GenericEntityScript_UE
 {
     default _ShowInPlaceActors = true;
-    default _Replication = ECk_Replication::DoesNotReplicate;
+    // Spawned by the authority (placed, or under the replicated spawn owner); every machine composes its own copy.
+    default _Replication = ECk_Replication::Replicates;
 
     // The root's transform: place it Clearance (30) above the floor it starts on.
     UPROPERTY(ExposeOnSpawn)
@@ -134,7 +137,7 @@ class UMars_RootMaw_EntityScript : UCk_GenericEntityScript_UE
         _Self = InHandle;
         _DebugHitSeen = CVar_Mars_RootMawDebugHit.GetInt();
 
-        auto Root = utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::DoesNotReplicate);
+        auto Root = utils_mars_net::Add_CreatureRoot(InHandle, SpawnTransform);
         auto Body = utils_scene_node::Create(Root, utils_root_maw::Get_BodyOffset(0.0f));
         auto MawSpec = Spec;
         MawSpec.Rig.Body = Body;

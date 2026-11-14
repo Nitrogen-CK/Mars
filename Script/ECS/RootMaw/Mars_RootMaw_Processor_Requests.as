@@ -1,6 +1,7 @@
 // The Root Maw's arbiter: Cancel -> TakeHit -> Stop -> Drive -> SetStance -> Gape -> Start, each kind in arrival order.
 // A Start is admitted only when Get_Admission answers Admitted at drain time (so a second Start in one drain finds the first
-// running and is dropped). Phase changes broadcast OnActionPhase after the state is written.
+// running and is dropped). Phase changes broadcast OnActionPhase after the state is written. Only a machine with
+// authority over the Maw applies them; it publishes the ledger last (utils_root_maw::Publish).
 class UMars_Processor_RootMaw_HandleRequests : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -26,6 +27,12 @@ class UMars_Processor_RootMaw_HandleRequests : UCk_Processor_Script_Base_UE
 
         // InRequests is invalid past this line; removing before broadcasting lets re-entrant requests survive.
         Self.Request_TryRemove(FMars_Fragment_RootMaw_Requests);
+
+        if (utils_net::Get_HasAuthority(InHandle) == false)
+        { return; }
+
+        // Handlers react on the Maw (its state machine, its look): scope the script world to its own.
+        const auto WorldContext = FAngelscriptGameThreadScopeWorldContext(utils_entity_lifetime::Get_WorldForEntity(InHandle));
 
         for (const auto& Request : CancelRequests)
         { HandleCancel(Self); }
@@ -61,6 +68,8 @@ class UMars_Processor_RootMaw_HandleRequests : UCk_Processor_Script_Base_UE
 
         for (const auto& Request : StartRequests)
         { HandleStart(Self, Request); }
+
+        utils_root_maw::Publish(Self);
     }
 
     private void HandleCancel(FCk_Handle_RootMaw& InSelf)

@@ -84,11 +84,14 @@ namespace utils_root_maw
         return FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, -Clearance - BuryDrop * (1.0f - Get_EaseInOut(InEmerge))));
     }
 
-    // Composes the Maw on InRoot (the SurfaceMotion body, Clearance over the ground; the entity script built the rig's body
-    // node at Get_BodyOffset(0) with every visual on it): surface motion -> monster -> damage dealer -> the body-zone
-    // hurtbox round the bulb (on the body node: buried, only the crown can be struck) -> the Maw's fragments, buried
-    // (UMars_Processor_RootMaw_Setup then binds the body zone's hits to TakeHit) -> LAST the state machine
-    // (Mars_RootMaw_Hfsm.as). A rejected spec or sub-feature ensures and returns an invalid handle.
+    // Composes the Maw on InRoot (the SurfaceMotion body, Clearance over the ground; the entity script built the rig's
+    // body node at Get_BodyOffset(0) with every visual on it). Only a machine with authority over the root composes
+    // what decides and moves it: surface motion first, then the monster, the damage dealer, the body-zone hurtbox round
+    // the bulb (on the body node: buried, only the crown can be struck), the Maw's fragments, buried, with the drive
+    // and the targeting, the replicated ledger and the mirror's state (UMars_Processor_RootMaw_Setup then binds the
+    // body zone's hits to TakeHit), and LAST the state machine (Mars_RootMaw_Hfsm.as). A copy without authority
+    // composes the same without the surface motion, the dealer, the drive, the targeting and the state machine (its
+    // Motion and Dealer stay invalid). A rejected spec or sub-feature ensures and returns an invalid handle.
     FCk_Handle_RootMaw Add(FCk_Handle_Transform& InRoot, FMars_RootMaw_Spec InSpec)
     {
         FCk_Handle RootEntity = InRoot;
@@ -96,18 +99,28 @@ namespace utils_root_maw
         if (ck::EnsureIfNot(Validation.IsValid(), f"[RootMaw] [{RootEntity.ToString()}] rejected the spec: {Validation.Get_Error()}"))
         { return FCk_Handle_RootMaw(); }
 
-        auto Motion = utils_surface_motion::Add(InRoot, Make_MotionSpec(InSpec));
-        if (ck::EnsureIfNot(ck::IsValid(Motion), f"[RootMaw] [{RootEntity.ToString()}] surface motion was rejected"))
-        { return FCk_Handle_RootMaw(); }
+        const auto HasAuthority = utils_net::Get_HasAuthority(RootEntity);
+
+        auto Motion = FCk_Handle_SurfaceMotion();
+        if (HasAuthority)
+        {
+            Motion = utils_surface_motion::Add(InRoot, Make_MotionSpec(InSpec));
+            if (ck::EnsureIfNot(ck::IsValid(Motion), f"[RootMaw] [{RootEntity.ToString()}] surface motion was rejected"))
+            { return FCk_Handle_RootMaw(); }
+        }
 
         auto Monster = utils_monster::Add(RootEntity, FMars_Monster_Spec(Get_MonsterTag(), FMars_Health_Spec(InSpec.Vitals.BodyHealth),
             utils_hit_zone::Make_FleshZoneSpec(GameplayTags::HitZone_Mars_Body, 1.0f), InSpec.Vitals.CorpseSeconds, ECk_Team_ID::Two));
         if (ck::Is_NOT_Valid(Monster))
         { return FCk_Handle_RootMaw(); }
 
-        auto Dealer = utils_damage_dealer::Add(RootEntity, FMars_DamageDealer_Spec());
-        if (ck::Is_NOT_Valid(Dealer))
-        { return FCk_Handle_RootMaw(); }
+        auto Dealer = FCk_Handle_DamageDealer();
+        if (HasAuthority)
+        {
+            Dealer = utils_damage_dealer::Add(RootEntity, FMars_DamageDealer_Spec());
+            if (ck::Is_NOT_Valid(Dealer))
+            { return FCk_Handle_RootMaw(); }
+        }
 
         auto Body = InSpec.Rig.Body.As_Transform();
         auto BodyZone = Monster.Get_BodyZone();
@@ -128,18 +141,53 @@ namespace utils_root_maw
         RootEntity.Add_Fragment(FMars_Feature_RootMaw());
         RootEntity.Add_Fragment(Params);
         RootEntity.Add_Fragment(State);
-        RootEntity.Add_Fragment(FMars_Fragment_RootMaw_Drive());
+        if (HasAuthority)
+        { RootEntity.Add_Fragment(FMars_Fragment_RootMaw_Drive()); }
+
         RootEntity.Add_Fragment(Posture);
         RootEntity.Add_Fragment(FMars_Fragment_RootMaw_Mouth());
         RootEntity.Add_Fragment(FMars_Fragment_RootMaw_Travel());
         RootEntity.Add_Fragment(FMars_Fragment_RootMaw_Action());
-        RootEntity.Add_Fragment(FMars_Fragment_RootMaw_Targeting());
+        if (HasAuthority)
+        { RootEntity.Add_Fragment(FMars_Fragment_RootMaw_Targeting()); }
+
         RootEntity.Add_Fragment(FMars_Fragment_RootMaw_Hurt());
+
+        // The mirror compares what arrives against the ledger this machine composed, not one that already arrived.
+        auto Ledger = FMars_Fragment_RootMaw_Net();
+        auto Local = FMars_Fragment_RootMaw_Local();
+        Local.Last = TOptional<FMars_Fragment_RootMaw_Net>(Ledger);
+
+        // A client's copy can receive the replicated ledger before it composes: the arrived ledger stands then.
+        if (RootEntity.Has_Fragment(FMars_Fragment_RootMaw_Net) == false)
+        { RootEntity.Add_Fragment(Ledger, ECk_Replication::Replicates); }
+
+        RootEntity.Add_Fragment(Local);
         RootEntity.Add_Fragment(FMars_Tag_RootMaw_NeedsSetup());
+        RootEntity.Add_Fragment(FMars_Tag_RootMaw_NeedsMirror());
 
         // Last: Alive's condition reads the Dead attribute as the machine enters its initial state.
-        utils_state_machine::Add(RootEntity, FCk_StateMachine_Spec(UMars_SmState_RootMaw_Alive));
+        if (HasAuthority)
+        { utils_state_machine::Add(RootEntity, FCk_StateMachine_Spec(UMars_SmState_RootMaw_Alive)); }
+
         return RootEntity.As_RootMaw();
+    }
+
+    // The ledger's only writer, called last by the authority's request drain: the stance and the latched gape as they
+    // stand, written and marked dirty only when they differ from the stored ledger.
+    void Publish(FCk_Handle_RootMaw& InSelf)
+    {
+        auto Next = FMars_Fragment_RootMaw_Net();
+        Next.Stance = InSelf.Get_Fragment(FMars_Fragment_RootMaw_Posture).Stance;
+        Next.Gape = InSelf.Get_Fragment(FMars_Fragment_RootMaw_Mouth).Gape;
+
+        auto& Ledger = InSelf.Get_Fragment(FMars_Fragment_RootMaw_Net);
+        if (Ledger.Stance == Next.Stance && Ledger.Gape == Next.Gape)
+        { return; }
+
+        Ledger = Next;
+        FCk_Handle Entity = InSelf;
+        Entity.Request_MarkReplicationDirty(FMars_Fragment_RootMaw_Net);
     }
 
     //----------------------------------------------------------------------------------------------------------------------
@@ -271,16 +319,24 @@ mixin FVector Get_GroundLocation(const FCk_Handle_RootMaw& Self)
     return Self.Get_RootTransform().TransformPosition(FVector(0.0, 0.0, -utils_root_maw::Clearance));
 }
 
-// The normal of the ground it glides on (its own up while it has none).
+// The normal of the ground it glides on (its own up while it has none, and on a copy without surface motion).
 mixin FVector Get_SurfaceUp(const FCk_Handle_RootMaw& Self)
 {
-    const auto Up = utils_surface_motion::Get_SupportNormal(Self.Get_Motion()).GetSafeNormal();
+    const auto Motion = Self.Get_Motion();
+    if (ck::Is_NOT_Valid(Motion))
+    { return Self.Get_RootTransform().GetRotation().GetUpVector(); }
+
+    const auto Up = utils_surface_motion::Get_SupportNormal(Motion).GetSafeNormal();
     return Up.IsNearlyZero() ? Self.Get_RootTransform().GetRotation().GetUpVector() : Up;
 }
 
+// False on a copy without surface motion.
 mixin bool Get_IsGrounded(const FCk_Handle_RootMaw& Self)
 {
     const auto Motion = Self.Get_Motion();
+    if (ck::Is_NOT_Valid(Motion))
+    { return false; }
+
     return utils_surface_motion::Get_Status(Motion) == ECk_ProceduralAnimation_Status::Ready &&
         utils_surface_motion::Get_Support(Motion) == ECk_SurfaceMotion_Support::Grounded;
 }

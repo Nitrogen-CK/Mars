@@ -12,6 +12,9 @@
 // 4. the jaw: the bite sets it (gape wide, slam shut, stay shut); otherwise it eases toward the latched Gape, except through
 //    a flinch, which holds it where the blow left it.
 // This processor writes no root transform: steering goes through SurfaceMotion.
+// A copy without authority runs 0 to 2 and eases the jaw toward the latched Gape (outside a flinch): no action, no
+// steering, no sweep. Its stance and gape come from the ledger (UMars_Processor_RootMaw_Mirror), its glide from the
+// replicated root.
 class UMars_Processor_RootMaw_Tick : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -28,13 +31,23 @@ class UMars_Processor_RootMaw_Tick : UCk_Processor_Script_Base_UE
         if (utils_entity_lifetime::Get_IsPendingDestroy(InHandle, ECk_EntityLifetime_DestructionPhase::BeginDestroy))
         { return; }
 
+        // Handlers react on the Maw (its state machine, its look): scope the script world to its own.
+        const auto WorldContext = FAngelscriptGameThreadScopeWorldContext(utils_entity_lifetime::Get_WorldForEntity(InHandle));
+
         auto Self = InHandle.As_RootMaw();
         const auto DeltaSeconds = float32(InDeltaT.Get_Seconds());
 
         TickHurt(Self, DeltaSeconds);
         TickPosture(Self, DeltaSeconds);
         TickTravel(Self, DeltaSeconds);
-        TickAction(Self, DeltaSeconds);
+        if (utils_net::Get_HasAuthority(InHandle))
+        {
+            TickAction(Self, DeltaSeconds);
+            return;
+        }
+
+        if (Self.Get_IsFlinching() == false)
+        { EaseJaw(Self, DeltaSeconds); }
     }
 
     //----------------------------------------------------------------------------------------------------------------------
