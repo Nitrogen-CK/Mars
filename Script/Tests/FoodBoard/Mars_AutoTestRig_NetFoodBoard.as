@@ -123,6 +123,30 @@ class UMars_TESTONLY_NetBoardStation_EntityScript : UMars_TESTONLY_Station_Entit
     }
 }
 
+// A harness fixture: the test board station whose authority asks, as it composes, a cut through its origin, a turn and
+// an uncapped sweep, so its drain answers them in the spawn frame on the empty board. A copy is born into one cut
+// answered with nothing straddling, one turn and one sweep refused NothingFree.
+class UMars_TESTONLY_NetBoardStation_BornAnswered_EntityScript : UMars_TESTONLY_NetBoardStation_EntityScript
+{
+    protected void AddVisuals(FCk_Handle_Transform& InRoot) override
+    {
+        Super::AddVisuals(InRoot);
+
+        auto Handle = InRoot.H();
+        if (utils_net::Get_HasAuthority(Handle) == false)
+        { return; }
+
+        const auto Normal = FVector::ForwardVector;
+        const auto Plane = FMars_FoodPiece_WorldPlane(SpawnTransform.GetLocation(), Normal,
+            FVector::UpVector.CrossProduct(Normal).GetSafeNormal());
+
+        auto Board = Handle.As_FoodBoard();
+        Board.Request_Cut(FMars_Request_FoodBoard_Cut(Plane));
+        Board.Request_Turn(FMars_Request_FoodBoard_Turn(90.0f));
+        Board.Request_Release(FMars_Request_FoodBoard_Release(TOptional<int32>()));
+    }
+}
+
 UCLASS(Abstract)
 class UMars_AutoTestRig_NetFoodBoard : UMars_AutoTestRig_NetFoodPiece
 {
@@ -144,6 +168,11 @@ class UMars_AutoTestRig_NetFoodBoard : UMars_AutoTestRig_NetFoodPiece
     // The frame this machine first found its copy, and the ledger it read then.
     protected int32 _FoundFrame = -1;
     protected FMars_Fragment_FoodBoard_Net _FoundLedger;
+    // Off authority: each rep-notify of the copy's ledger, its frame (as _Frame counts) and the ledger as it then read.
+    protected TArray<int32> _NotifyFrames;
+    // The copy's InitialState as this machine read it when it found the copy.
+    protected EMars_Net_InitialState _InitialAtFind = EMars_Net_InitialState::Awaited;
+    protected TArray<FMars_Fragment_FoodBoard_Net> _NotifyLedgers;
 
     private int32 _AwaitedAnswers = 0;
     private int32 _AwaitedTurns = 0;
@@ -196,7 +225,63 @@ class UMars_AutoTestRig_NetFoodBoard : UMars_AutoTestRig_NetFoodPiece
         const auto Machine = Get_MachineName();
         const auto Ensures = Get_EnsureDelta();
         const auto TestName = GetClass().GetName();
-        Log(f"[FoodBoardNetTest] {TestName} {Machine}: {InText} events=[{Describe_Events()}] found@{_FoundFrame} ({Describe_Ledger(_FoundLedger)}) ensures={Ensures}");
+        const auto Initial = Get_BoardInitialState();
+        const auto Line = f"[FoodBoardNetTest] {TestName} {Machine}: {InText} events=[{Describe_Events()}] found@{_FoundFrame} ({Describe_Ledger(_FoundLedger)}) initialAtFind={_InitialAtFind :n} initial={Initial :n} notifies=[{Describe_Notifies()}] ensures={Ensures}";
+        Log(Line);
+    }
+
+    // This machine's copy's level now; Awaited while there is none.
+    protected EMars_Net_InitialState Get_BoardInitialState()
+    {
+        if (ck::Is_NOT_Valid(_Board) || _Board.Has_Fragment(FMars_Fragment_FoodBoard_Local) == false)
+        { return EMars_Net_InitialState::Awaited; }
+
+        return _Board.Get_Fragment(FMars_Fragment_FoodBoard_Local).InitialState;
+    }
+
+    protected bool Get_HasFirstNotify() const
+    {
+        return _NotifyFrames.Num() > 0;
+    }
+
+    // The ledger the first recorded rep-notify read; the composed default while none is recorded.
+    protected FMars_Fragment_FoodBoard_Net Get_FirstNotifyLedger() const
+    {
+        if (_NotifyLedgers.Num() == 0)
+        { return FMars_Fragment_FoodBoard_Net(); }
+
+        return _NotifyLedgers[0];
+    }
+
+    protected int32 Get_FirstNotifyFrame() const
+    {
+        if (_NotifyFrames.Num() == 0)
+        { return -1; }
+
+        return _NotifyFrames[0];
+    }
+
+    protected FString Describe_Notifies() const
+    {
+        auto Text = "";
+        for (int32 Index = 0; Index < _NotifyFrames.Num(); ++Index)
+        {
+            const auto& Ledger = _NotifyLedgers[Index];
+            Text += f"{_NotifyFrames[Index]}:{Ledger.CutSerial}/{Ledger.TurnSerial}/{Ledger.ReleaseRefusalSerial} ";
+        }
+
+        return Text;
+    }
+
+    // A notify can land on a board already ending.
+    UFUNCTION()
+    private void OnRigLedgerNotify(FCk_Handle InHandle, FCk_DynamicFragment_RepNotifyInfo InInfo)
+    {
+        if (utils_foodpiece::Get_IsLiveEntity(InHandle) == false || InHandle.Has_Fragment(FMars_Fragment_FoodBoard_Net) == false)
+        { return; }
+
+        _NotifyFrames.Add(_Frame);
+        _NotifyLedgers.Add(InHandle.Get_Fragment(FMars_Fragment_FoodBoard_Net));
     }
 
     //----------------------------------------------------------------------------------------------------------------------
@@ -206,13 +291,19 @@ class UMars_AutoTestRig_NetFoodBoard : UMars_AutoTestRig_NetFoodPiece
     // Server: the test board station at the floor's top, under the spawn owner.
     protected void Spawn_ServerBoardStation()
     {
+        Spawn_ServerBoardStationOfClass(UMars_TESTONLY_NetBoardStation_EntityScript);
+    }
+
+    // Server: a station of InClass (the test board station or a subclass) at the floor's top, under the spawn owner.
+    protected void Spawn_ServerBoardStationOfClass(TSubclassOf<UCk_EntityScript_UE> InClass)
+    {
         auto Spec = FMars_Station_Spec();
         Spec.MinigameStateClass = UMars_TESTONLY_SmState_NetCutting_Idle;
         Spec.InputStance = EMars_Station_InputStance::Authority;
 
         auto Owner = utils_mars_net::Get_ReplicatedSpawnOwner(Get_SubjectEntity());
         const auto Params = FMars_TESTONLY_StationSpawnParams(FTransform(FRotator::ZeroRotator, _FloorTop), Spec);
-        utils_entity_script::Request_SpawnEntity(Owner, UMars_TESTONLY_NetBoardStation_EntityScript, Params);
+        utils_entity_script::Request_SpawnEntity(Owner, InClass, Params);
     }
 
     // This machine's board station has composed; the first time, its signals are recorded from here (and the server tracks
@@ -233,6 +324,13 @@ class UMars_AutoTestRig_NetFoodBoard : UMars_AutoTestRig_NetFoodPiece
             _Board = Board;
             _FoundFrame = _Frame;
             _FoundLedger = Board.Get_Ledger();
+            _InitialAtFind = Get_BoardInitialState();
+            if (Get_IsServer() == false)
+            {
+                FCk_Handle Entity = Candidate;
+                Entity.BindTo_OnRepNotify(FMars_Fragment_FoodBoard_Net, FCk_DynamicFragment_OnRepNotify(this, n"OnRigLedgerNotify"));
+            }
+
             _Board.BindTo_OnCutIssued(FMars_Delegate_FoodBoard_OnCutIssued(this, n"OnRigCutIssued"));
             _Board.BindTo_OnTurned(FMars_Delegate_FoodBoard_OnTurned(this, n"OnRigTurned"));
             _Board.BindTo_OnReleaseRefused(FMars_Delegate_FoodBoard_OnReleaseRefused(this, n"OnRigReleaseRefused"));

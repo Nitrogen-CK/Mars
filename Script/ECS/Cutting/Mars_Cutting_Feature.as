@@ -1,10 +1,11 @@
-// Stance A, following its host. FMars_Fragment_Cutting (the hand, the chops started, the chops landed) is the replicated
-// ledger, written only by the authority's drain and chop clock and by utils_cutting::Add; on a host with no replication
-// driver it is local. The chop clock and the operator's requests run only with authority. The clock's progress, the
-// mirror's last ledger and a predicted hand (FMars_Fragment_Cutting_Local) are each machine's own. A client mirrors the
-// ledger (UMars_Processor_Cutting_Mirror): it slides its own lateral node and raises the chop signals the authority raised.
-// The operating machine predicts its own hand (PredictHand, applied on every machine) and a remote operator chops through
-// Cue.Mars.Cutting.Chop (utils_cutting::Request_ChopFor), carrying the aim it saw.
+// Stance A, following its host. FMars_Fragment_Cutting (the hand, the chops started, the chops landed) is the
+// replicated ledger, written only by the authority's drain and chop clock and by utils_cutting::Add; on a host with no
+// replication driver it is local. The chop clock and the operator's requests run only with authority. The clock's
+// progress, the mirror's last ledger and a predicted hand (FMars_Fragment_Cutting_Local) are each machine's own. A
+// client mirrors the ledger (UMars_Processor_Cutting_Mirror): it slides its own lateral node and raises the chop
+// signals the authority raised after the state its copy was born into. The operating machine predicts its own hand
+// (PredictHand, applied on every machine) and a remote operator chops through Cue.Mars.Cutting.Chop
+// (utils_cutting::Request_ChopFor), carrying the aim it saw.
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
@@ -130,9 +131,13 @@ struct FMars_Fragment_Cutting_Local
     UPROPERTY()
     float32 ChopSecondsLeft = 0.0f;
 
-    // The ledger the mirror last reconciled; unset with authority.
+    // The ledger the mirror last reconciled (unset with authority), and whether this copy has taken the state it was
+    // born into.
     UPROPERTY()
     TOptional<FMars_Fragment_Cutting> Last;
+
+    UPROPERTY()
+    EMars_Net_InitialState InitialState = EMars_Net_InitialState::Awaited;
 
     // While set, the lateral node shows this instead of the ledger's hand (cm).
     UPROPERTY()

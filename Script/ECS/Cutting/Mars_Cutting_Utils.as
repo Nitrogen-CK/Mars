@@ -1,10 +1,11 @@
 namespace utils_cutting
 {
-    // Composes the cleaver on InHandle (the station entity; the feature does not need the Station feature). The spec's Nodes
-    // are built by the caller: the hand slides Nodes.LateralNode along local Y. The chop is the kernel's clock alone: what
-    // draws the cleaver follows its signals. It adds the replicated ledger unless it already arrived, and the mirror starts
-    // from the arrived ledger: chops started or landed before this machine composed are not raised. A rejected spec or a
-    // missing node ensures and returns an invalid handle.
+    // Composes the cleaver on InHandle (the station entity; the feature does not need the Station feature). The spec's
+    // Nodes are built by the caller: the hand slides Nodes.LateralNode along local Y. The chop is the kernel's clock
+    // alone: what draws the cleaver follows its signals. It adds the replicated ledger unless it already arrived; an
+    // arrived ledger is the state this copy was born into and has then taken: its mirror shows it as it stands, and
+    // chops started or landed before this machine composed are not raised. A rejected spec or a missing node ensures
+    // and returns an invalid handle.
     FCk_Handle_Cutting Add(FCk_Handle& InHandle, FMars_Cutting_Spec InSpec)
     {
         const auto Validation = InSpec.Validate();
@@ -20,12 +21,16 @@ namespace utils_cutting
         InHandle.Add_Fragment(FMars_Feature_Cutting());
         InHandle.Add_Fragment(Params);
 
-        // A client's copy can receive the replicated ledger before it composes: the arrived ledger stands then.
-        if (InHandle.Has_Fragment(FMars_Fragment_Cutting) == false)
+        auto Local = FMars_Fragment_Cutting_Local();
+
+        // A ledger already here can only have been put here by its replicated application: this copy was born into it,
+        // has taken that state, and the mirror's first pass shows it as it stands.
+        if (InHandle.Has_Fragment(FMars_Fragment_Cutting))
+        { Local.InitialState = EMars_Net_InitialState::Taken; }
+        else
         { InHandle.Add_Fragment(FMars_Fragment_Cutting(), ECk_Replication::Replicates); }
 
-        auto Local = FMars_Fragment_Cutting_Local();
-        Local.Last = TOptional<FMars_Fragment_Cutting>(InHandle.Get_Fragment(FMars_Fragment_Cutting));
+        Local.Last = TOptional<FMars_Fragment_Cutting>(FMars_Fragment_Cutting());
         InHandle.Add_Fragment(Local);
         InHandle.Add_Fragment(FMars_Tag_Cutting_NeedsMirror());
         return InHandle.As_Cutting();

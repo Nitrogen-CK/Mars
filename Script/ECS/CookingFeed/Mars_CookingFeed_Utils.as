@@ -70,14 +70,18 @@ namespace utils_cooking_feed
         InHandle.Add_Fragment(FMars_Fragment_CookingFeed());
         InHandle.Add_Fragment(FMars_Tag_CookingFeed_NeedsSetup());
 
-        // A copy without authority can receive the replicated ledger before it composes: the arrived ledger stands then,
-        // and a feed first read mid-transfer shows that phase finished.
-        if (InHandle.Has_Fragment(FMars_Fragment_CookingFeed_Net) == false)
+        auto Local = FMars_Fragment_CookingFeed_Local();
+
+        // A ledger already here can only have been put here by its replicated application: this copy was born into it,
+        // has taken that state, and the mirror's first pass shows it as it stands (a feed first read mid-transfer shows
+        // that phase finished).
+        if (InHandle.Has_Fragment(FMars_Fragment_CookingFeed_Net))
+        { Local.InitialState = EMars_Net_InitialState::Taken; }
+        else
         { InHandle.Add_Fragment(FMars_Fragment_CookingFeed_Net(), ECk_Replication::Replicates); }
 
         const auto Ledger = InHandle.Get_Fragment(FMars_Fragment_CookingFeed_Net);
-        auto Local = FMars_Fragment_CookingFeed_Local();
-        Local.Last = TOptional<FMars_Fragment_CookingFeed_Net>(Ledger);
+        Local.Last = TOptional<FMars_Fragment_CookingFeed_Net>(FMars_Fragment_CookingFeed_Net());
         Local.PhaseSeconds = Get_PhaseDuration(InSpec.Timing, Ledger.Phase);
         InHandle.Add_Fragment(Local);
         InHandle.Add_Fragment(FMars_Tag_CookingFeed_NeedsMirror());

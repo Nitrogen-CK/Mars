@@ -99,11 +99,56 @@ class UMars_TESTONLY_NetLateFeedStation_EntityScript : UMars_TESTONLY_NetFeedSta
     }
 }
 
+// A harness fixture: the timed test feed station whose authority, as it composes, sources its feed from the platter
+// beside it and presses add food twice, so its drain sets the source, begins a reach and refuses the second press Busy
+// in the spawn frame. A copy is born into a reach with one refusal.
+class UMars_TESTONLY_NetBornFeedStation_EntityScript : UMars_TESTONLY_NetFeedStation_EntityScript
+{
+    private const float64 k_PlatterReachCm = 500.0;
+
+    protected void AddVisuals(FCk_Handle_Transform& InRoot) override
+    {
+        Super::AddVisuals(InRoot);
+
+        auto Handle = InRoot.H();
+        if (utils_net::Get_HasAuthority(Handle) == false)
+        { return; }
+
+        const auto Platter = Find_PlatterBeside(Handle);
+        if (ck::EnsureIfNot(ck::IsValid(Platter), f"[CookingFeedNetTest] [{Handle.ToString()}] found no platter beside it"))
+        { return; }
+
+        auto Feed = Handle.As_CookingFeed();
+        Feed.Request_SetSource(FMars_Request_CookingFeed_SetSource(Platter));
+        Feed.Request_BeginTransfer(FMars_Request_CookingFeed_BeginTransfer());
+        Feed.Request_BeginTransfer(FMars_Request_CookingFeed_BeginTransfer());
+    }
+
+    // The live platter world item within k_PlatterReachCm of the spawn location; invalid when there is none.
+    private FCk_Handle_Platter Find_PlatterBeside(FCk_Handle InContext)
+    {
+        for (auto Candidate : utils_entity_tag::ForEach_Entity(InContext, n"TAG_MarsWorldItem"))
+        {
+            const auto IsLive = ck::IsValid(Candidate)
+                && utils_entity_lifetime::Get_IsPendingDestroy(Candidate, ECk_EntityLifetime_DestructionPhase::BeginDestroy) == false;
+            if (IsLive == false || Candidate.Is_Transform() == false || Candidate.Is_Platter() == false)
+            { continue; }
+
+            const auto Location = utils_transform::Get_EntityCurrentLocation(Candidate.As_Transform());
+            if (Location.Distance(SpawnTransform.GetLocation()) <= k_PlatterReachCm)
+            { return Candidate.As_Platter(); }
+        }
+
+        return FCk_Handle_Platter();
+    }
+}
+
 enum EMars_TESTONLY_NetFeedStationKind
 {
     Timed,
     Instant,
-    Late
+    Late,
+    Born
 }
 
 // One feed signal a machine's copy raised.
@@ -170,6 +215,13 @@ class UMars_AutoTestRig_NetCookingFeed : UMars_AutoTestRig_NetPlatter
     protected FCk_Handle_Transform _FeedHand;
     protected int64 _FeedFoundFrame = -1;
     private bool _WasFeedFound = false;
+    // Off authority: each rep-notify of the copy's ledger, its frame counter and the ledger as it then read.
+    protected TArray<int64> _NotifyFrames;
+    // The copy's InitialState as this machine read it when it found the copy.
+    protected EMars_Net_InitialState _InitialAtFind = EMars_Net_InitialState::Awaited;
+    protected TArray<FMars_Fragment_CookingFeed_Net> _NotifyLedgers;
+    // The lowest phase progress sampled once a first notify is recorded while the ledger still read its phase serial.
+    protected float32 _LowestFirstPhaseProgress = 2.0f;
 
     // Every signal this machine's copy raised since it was found (or since Clear_FeedRecord), in order.
     protected TArray<EMars_TESTONLY_NetFeedEvent> _Events;
@@ -217,7 +269,63 @@ class UMars_AutoTestRig_NetCookingFeed : UMars_AutoTestRig_NetPlatter
         const auto Machine = Get_MachineName();
         const auto TestName = GetClass().GetName();
         const auto Ensures = Get_EnsureDelta();
-        Log(f"[CookingFeedNetTest] {TestName} {Machine}: {InText} ensures={Ensures}");
+        const auto Find = Describe_Find();
+        const auto Line = f"[CookingFeedNetTest] {TestName} {Machine}: {InText} {Find} ensures={Ensures}";
+        Log(Line);
+    }
+
+    // This machine's copy's level now; Awaited while there is none.
+    protected EMars_Net_InitialState Get_FeedInitialState()
+    {
+        if (ck::Is_NOT_Valid(_Feed) || _Feed.Has_Fragment(FMars_Fragment_CookingFeed_Local) == false)
+        { return EMars_Net_InitialState::Awaited; }
+
+        return _Feed.Get_Fragment(FMars_Fragment_CookingFeed_Local).InitialState;
+    }
+
+    protected bool Get_HasFirstNotify() const
+    {
+        return _NotifyFrames.Num() > 0;
+    }
+
+    // The ledger the first recorded rep-notify read; the composed default while none is recorded.
+    protected FMars_Fragment_CookingFeed_Net Get_FirstNotifyLedger() const
+    {
+        if (_NotifyLedgers.Num() == 0)
+        { return FMars_Fragment_CookingFeed_Net(); }
+
+        return _NotifyLedgers[0];
+    }
+
+    protected int64 Get_FirstNotifyFrame() const
+    {
+        if (_NotifyFrames.Num() == 0)
+        { return -1; }
+
+        return _NotifyFrames[0];
+    }
+
+    protected FString Describe_Find()
+    {
+        auto Notifies = "";
+        for (int32 Index = 0; Index < _NotifyFrames.Num(); ++Index)
+        {
+            const auto& Ledger = _NotifyLedgers[Index];
+            Notifies += f"{_NotifyFrames[Index]}:{Ledger.Phase :n}/{Ledger.PhaseSerial}/{Ledger.RefusalSerial}/{Ledger.LetGoSerial} ";
+        }
+
+        return f"found@{_FeedFoundFrame} initialAtFind={_InitialAtFind :n} initial={Get_FeedInitialState() :n} notifies=[{Notifies}] lowestFirstProgress={_LowestFirstPhaseProgress}";
+    }
+
+    // A notify can land on a feed already ending.
+    UFUNCTION()
+    private void OnRigLedgerNotify(FCk_Handle InHandle, FCk_DynamicFragment_RepNotifyInfo InInfo)
+    {
+        if (utils_foodpiece::Get_IsLiveEntity(InHandle) == false || InHandle.Has_Fragment(FMars_Fragment_CookingFeed_Net) == false)
+        { return; }
+
+        _NotifyFrames.Add(utils_time::Get_FrameCounter());
+        _NotifyLedgers.Add(InHandle.Get_Fragment(FMars_Fragment_CookingFeed_Net));
     }
 
     //----------------------------------------------------------------------------------------------------------------------
@@ -289,6 +397,13 @@ class UMars_AutoTestRig_NetCookingFeed : UMars_AutoTestRig_NetPlatter
             _Feed = Feed;
             _FeedHand = Feed.Get_HandNode();
             _FeedFoundFrame = utils_time::Get_FrameCounter();
+            _InitialAtFind = Get_FeedInitialState();
+            if (Get_IsServer() == false)
+            {
+                FCk_Handle Entity = Candidate;
+                Entity.BindTo_OnRepNotify(FMars_Fragment_CookingFeed_Net, FCk_DynamicFragment_OnRepNotify(this, n"OnRigLedgerNotify"));
+            }
+
             _Feed.BindTo_OnPhaseChanged(FMars_Delegate_CookingFeed_OnPhaseChanged(this, n"OnRigPhaseChanged"));
             _Feed.BindTo_OnStockChanged(FMars_Delegate_CookingFeed_OnStockChanged(this, n"OnRigStockChanged"));
             _Feed.BindTo_OnTransferRefused(FMars_Delegate_CookingFeed_OnTransferRefused(this, n"OnRigTransferRefused"));
@@ -556,6 +671,9 @@ class UMars_AutoTestRig_NetCookingFeed : UMars_AutoTestRig_NetPlatter
         _LastPhaseSerial = Ledger.PhaseSerial;
         _LastProgress = Progress;
 
+        if (Get_HasFirstNotify() && Ledger.PhaseSerial == Get_FirstNotifyLedger().PhaseSerial)
+        { _LowestFirstPhaseProgress = Math::Min(_LowestFirstPhaseProgress, Progress); }
+
         for (const auto& Food : Get_FoodPiecesNear(_FloorTop))
         {
             if (Get_IsUnderFeedHand(Food))
@@ -652,6 +770,8 @@ class UMars_AutoTestRig_NetCookingFeed : UMars_AutoTestRig_NetPlatter
         { Pending = utils_entity_script::Request_SpawnEntity(Owner, UMars_TESTONLY_NetInstantFeedStation_EntityScript, Params); }
         else if (_StationKind == EMars_TESTONLY_NetFeedStationKind::Late)
         { Pending = utils_entity_script::Request_SpawnEntity(Owner, UMars_TESTONLY_NetLateFeedStation_EntityScript, Params); }
+        else if (_StationKind == EMars_TESTONLY_NetFeedStationKind::Born)
+        { Pending = utils_entity_script::Request_SpawnEntity(Owner, UMars_TESTONLY_NetBornFeedStation_EntityScript, Params); }
         else
         { Pending = utils_entity_script::Request_SpawnEntity(Owner, UMars_TESTONLY_NetFeedStation_EntityScript, Params); }
 

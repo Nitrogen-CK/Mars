@@ -74,6 +74,16 @@ enum EMars_Net_InitialState
     Taken
 }
 
+// How a mirror reconciles one application of its ledger on a copy without authority.
+enum EMars_Net_Reconcile
+{
+    // The state the copy was born into: every level is written and announced, every eased value is set to its
+    // end, and nothing the ledger counts is raised, because none of it happened in front of this copy.
+    AsItStands,
+    // A change that reached a copy already there: each count it has not seen is raised once, and eases run.
+    AsItArrives
+}
+
 // The one place networking is spelled for Mars code: the replicated spawn owner and the questions around it.
 namespace utils_mars_net
 {

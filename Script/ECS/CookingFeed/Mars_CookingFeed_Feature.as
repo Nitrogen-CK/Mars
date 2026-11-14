@@ -1,12 +1,13 @@
 // Stance: the feed is the authority's. Only the authority's copy takes a source, reserves, unloads, carries, releases,
-// hands a release to the station's inbox and puts a piece back; a copy without authority drops every request and its setup
-// binds nothing. The authority publishes a replicated ledger (FMars_Fragment_CookingFeed_Net): the phase and its serial,
-// where the reserved piece is and which it is, the grasp point, the source and the stock, and a serial for each refusal and
-// each piece let go. A copy without authority reads its getters from that ledger and shows the transfer from it: its own
-// clock in the ledger's phase, its own hand node posed by the same hand function, and its own copy of the reserved piece
-// under that node while the ledger says the hand holds it. There it raises OnPhaseChanged, OnStockChanged,
-// OnTransferRefused and OnPieceLetGo from the ledger (UMars_Processor_CookingFeed_Mirror). The reservation, its piece id,
-// the generation, the pending release, the hand-off, OnReleaseRequested and OnTransferSettled never leave the authority.
+// hands a release to the station's inbox and puts a piece back; a copy without authority drops every request and its
+// setup binds nothing. The authority publishes a replicated ledger (FMars_Fragment_CookingFeed_Net): the phase and its
+// serial, where the reserved piece is and which it is, the grasp point, the source and the stock, and a serial for each
+// refusal and each piece let go. A copy without authority reads its getters from that ledger and shows the transfer
+// from it: its own clock in the ledger's phase, its own hand node posed by the same hand function, and its own copy of
+// the reserved piece under that node while the ledger says the hand holds it. There it raises OnPhaseChanged,
+// OnStockChanged, OnTransferRefused and OnPieceLetGo from the ledger (UMars_Processor_CookingFeed_Mirror), after the
+// state its copy was born into. The reservation, its piece id, the generation, the pending release, the hand-off,
+// OnReleaseRequested and OnTransferSettled never leave the authority.
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
@@ -564,13 +565,16 @@ struct FMars_Fragment_CookingFeed_Net
     int32 LetGoSerial = 0;
 }
 
-// Each machine's own. Last is the ledger the mirror last reconciled (unset with authority); the rest is what a machine
-// without authority shows: its own clock in the ledger's phase, and the piece it carries under its own hand node with the
-// offset it attached it at.
+// Each machine's own. Last is the ledger the mirror last reconciled (unset with authority) and InitialState whether
+// this copy has taken the state it was born into; the rest is what a machine without authority shows: its own clock in
+// the ledger's phase, and the piece it carries under its own hand node with the offset it attached it at.
 struct FMars_Fragment_CookingFeed_Local
 {
     UPROPERTY()
     TOptional<FMars_Fragment_CookingFeed_Net> Last;
+
+    UPROPERTY()
+    EMars_Net_InitialState InitialState = EMars_Net_InitialState::Awaited;
 
     UPROPERTY()
     float32 PhaseSeconds = 0.0f;

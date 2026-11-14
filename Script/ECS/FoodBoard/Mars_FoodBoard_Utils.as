@@ -6,12 +6,13 @@ namespace utils_foodboard
     // A corner this close to the plane is on it: a piece the plane only touches is not a candidate.
     const float k_StraddleToleranceCm = 0.01;
 
-    // Composes the board on InHandle (the station entity), which must carry a Transform, and the station's admission inbox:
-    // the board receives what the station's feed releases (each a Place, posed on Spec.PileNode) and its take-outs (each a
-    // Release onto the tray). The board starts empty; an empty first drain starts its watch of the station's queue. It
-    // adds the replicated ledger unless it already arrived, and the mirror starts from the arrived ledger: answers the
-    // authority gave before this machine composed are not raised. A rejected spec, a missing Transform or a missing pile
-    // node ensures and returns an invalid handle.
+    // Composes the board on InHandle (the station entity), which must carry a Transform, and the station's admission
+    // inbox: the board receives what the station's feed releases (each a Place, posed on Spec.PileNode) and its
+    // take-outs (each a Release onto the tray). The board starts empty; an empty first drain starts its watch of the
+    // station's queue. It adds the replicated ledger unless it already arrived; an arrived ledger is the state this
+    // copy was born into and has then taken: its mirror shows it as it stands, and answers the authority gave before
+    // this machine composed are not raised. A rejected spec, a missing Transform or a missing pile node ensures and
+    // returns an invalid handle.
     FCk_Handle_FoodBoard Add(FCk_Handle& InHandle, FMars_FoodBoard_Spec InSpec)
     {
         const auto Validation = InSpec.Validate();
@@ -34,12 +35,16 @@ namespace utils_foodboard
         InHandle.Add_Fragment(FMars_Fragment_FoodBoard());
         InHandle.Add_Fragment(FMars_Fragment_FoodBoard_Requests());
 
-        // A client's copy can receive the replicated ledger before it composes: the arrived ledger stands then.
-        if (InHandle.Has_Fragment(FMars_Fragment_FoodBoard_Net) == false)
+        auto Local = FMars_Fragment_FoodBoard_Local();
+
+        // A ledger already here can only have been put here by its replicated application: this copy was born into it,
+        // has taken that state, and the mirror's first pass shows it as it stands.
+        if (InHandle.Has_Fragment(FMars_Fragment_FoodBoard_Net))
+        { Local.InitialState = EMars_Net_InitialState::Taken; }
+        else
         { InHandle.Add_Fragment(FMars_Fragment_FoodBoard_Net(), ECk_Replication::Replicates); }
 
-        auto Local = FMars_Fragment_FoodBoard_Local();
-        Local.Last = TOptional<FMars_Fragment_FoodBoard_Net>(InHandle.Get_Fragment(FMars_Fragment_FoodBoard_Net));
+        Local.Last = TOptional<FMars_Fragment_FoodBoard_Net>(FMars_Fragment_FoodBoard_Net());
         InHandle.Add_Fragment(Local);
         InHandle.Add_Fragment(FMars_Tag_FoodBoard_NeedsMirror());
 

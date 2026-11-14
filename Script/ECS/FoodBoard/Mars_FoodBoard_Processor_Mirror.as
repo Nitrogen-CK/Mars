@@ -1,9 +1,11 @@
-// Once per board: the authority drops the mirror state (its own drain publishes the ledger and broadcasts). A machine without
-// authority binds the ledger's rep-notify and reconciles once, so a ledger that replicated before the bind still counts;
-// each reconcile raises, from the arrived ledger against the one it last reconciled, OnCutIssued once per CutSerial it had
-// not seen, OnTurned once per TurnSerial and OnReleaseRefused once per ReleaseRefusalSerial (each with the ledger's last
-// answer of its kind), the kinds in the order the authority gave their latest answers, then OnHeldCountChanged when the
-// count differs. No signal about a piece is raised here: placing, cutting and releasing are the authority's.
+// Once per board: the authority drops the mirror state (its own drain publishes the ledger and broadcasts). A machine
+// without authority binds the ledger's rep-notify and reconciles once, showing the ledger this machine composed. The
+// ledger's first application is the state the copy was born into and is taken once as it stands: the count announced,
+// no answer the ledger already counts raised. Each later change is reconciled as it arrives: from the arrived ledger
+// against the one it last reconciled it raises OnCutIssued once per CutSerial it had not seen, OnTurned once per
+// TurnSerial and OnReleaseRefused once per ReleaseRefusalSerial (each with the ledger's last answer of its kind), the
+// kinds in the order the authority gave their latest answers, then OnHeldCountChanged when the count differs. No
+// signal about a piece is raised here: placing, cutting and releasing are the authority's.
 class UMars_Processor_FoodBoard_Mirror : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -31,7 +33,7 @@ class UMars_Processor_FoodBoard_Mirror : UCk_Processor_Script_Base_UE
         }
 
         InHandle.BindTo_OnRepNotify(FMars_Fragment_FoodBoard_Net, FCk_DynamicFragment_OnRepNotify(this, n"OnLedgerReplicated"));
-        Reconcile(Board);
+        Reconcile(Board, EMars_Net_Reconcile::AsItStands);
     }
 
     // An expected absence, not a defect: a notify can land on a board already ending.
@@ -42,20 +44,35 @@ class UMars_Processor_FoodBoard_Mirror : UCk_Processor_Script_Base_UE
         { return; }
 
         auto Board = InHandle.As_FoodBoard();
-        Reconcile(Board);
+        if (Board.Get_Fragment(FMars_Fragment_FoodBoard_Local).InitialState == EMars_Net_InitialState::Awaited)
+        {
+            Board.Get_Fragment(FMars_Fragment_FoodBoard_Local).InitialState = EMars_Net_InitialState::Taken;
+            Reconcile(Board, EMars_Net_Reconcile::AsItStands);
+            return;
+        }
+
+        Reconcile(Board, EMars_Net_Reconcile::AsItArrives);
     }
 
     // Last is written before any broadcast: a handler may compose on another entity and move the fragment storage, so the
     // signals fragment is read again for every broadcast.
-    private void Reconcile(FCk_Handle_FoodBoard& InBoard)
+    private void Reconcile(FCk_Handle_FoodBoard& InBoard, EMars_Net_Reconcile InHow)
     {
         const auto Ledger = InBoard.Get_Fragment(FMars_Fragment_FoodBoard_Net);
         auto& Local = InBoard.Get_Fragment(FMars_Fragment_FoodBoard_Local);
         if (ck::EnsureIfNot(Local.Last.IsSet(), f"[FoodBoard] [{InBoard.ToString()}] has no mirror state off authority"))
         { return; }
 
-        const auto Last = Local.Last.GetValue();
+        auto Last = Local.Last.GetValue();
         Local.Last = TOptional<FMars_Fragment_FoodBoard_Net>(Ledger);
+
+        // As it stands, every answer the ledger counts was given before this copy took its state.
+        if (InHow == EMars_Net_Reconcile::AsItStands)
+        {
+            Last.CutSerial = Ledger.CutSerial;
+            Last.TurnSerial = Ledger.TurnSerial;
+            Last.ReleaseRefusalSerial = Ledger.ReleaseRefusalSerial;
+        }
 
         if (InBoard.Has_Fragment(FMars_Fragment_FoodBoard_Signals) == false)
         { return; }

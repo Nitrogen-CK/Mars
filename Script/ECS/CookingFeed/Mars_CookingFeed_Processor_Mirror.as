@@ -1,10 +1,13 @@
 // Once per feed: the authority drops the mirror state (its own processors publish the ledger and broadcast). A machine
-// without authority binds the ledger's rep-notify and reconciles once, so a ledger that replicated before the bind still
-// counts; each reconcile restarts this machine's phase clock when the authority's phase serial moved, then raises, from the
-// arrived ledger against the one it last reconciled: OnPieceLetGo once per unseen LetGoSerial (naming no piece: the piece
-// is the authority's to let go), OnTransferRefused once per unseen RefusalSerial (each with the ledger's last refusal),
-// OnPhaseChanged once with the ledger's phase when its serial moved, then OnStockChanged once when the sourcing, the counts
-// or the pile differ. OnReleaseRequested and OnTransferSettled are never raised without authority.
+// without authority binds the ledger's rep-notify and reconciles once, showing the ledger this machine composed. The
+// ledger's first application is the state the copy was born into and is taken once as it stands: its phase shown
+// finished and announced, its stock announced, no refusal and no piece let go the ledger already counts raised. Each
+// later change is reconciled as it arrives: the phase clock restarts when the authority's phase serial moved, then,
+// from the arrived ledger against the one it last reconciled, it raises: OnPieceLetGo once per unseen LetGoSerial
+// (naming no piece: the piece is the authority's to let go), OnTransferRefused once per unseen RefusalSerial (each with
+// the ledger's last refusal), OnPhaseChanged once with the ledger's phase when its serial moved, then OnStockChanged
+// once when the sourcing, the counts or the pile differ. OnReleaseRequested and OnTransferSettled are never raised
+// without authority.
 class UMars_Processor_CookingFeed_Mirror : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -29,7 +32,7 @@ class UMars_Processor_CookingFeed_Mirror : UCk_Processor_Script_Base_UE
         }
 
         InHandle.BindTo_OnRepNotify(FMars_Fragment_CookingFeed_Net, FCk_DynamicFragment_OnRepNotify(this, n"OnLedgerReplicated"));
-        Reconcile(Feed);
+        Reconcile(Feed, EMars_Net_Reconcile::AsItStands);
     }
 
     // An expected absence, not a defect: a notify can land on a feed already ending.
@@ -40,23 +43,42 @@ class UMars_Processor_CookingFeed_Mirror : UCk_Processor_Script_Base_UE
         { return; }
 
         auto Feed = InHandle.As_CookingFeed();
-        Reconcile(Feed);
+        if (Feed.Get_Fragment(FMars_Fragment_CookingFeed_Local).InitialState == EMars_Net_InitialState::Awaited)
+        {
+            Feed.Get_Fragment(FMars_Fragment_CookingFeed_Local).InitialState = EMars_Net_InitialState::Taken;
+            Reconcile(Feed, EMars_Net_Reconcile::AsItStands);
+            return;
+        }
+
+        Reconcile(Feed, EMars_Net_Reconcile::AsItArrives);
     }
 
     // Last is written before any broadcast: a handler may compose on another entity and move the fragment storage, so the
     // signals fragment is read again for every broadcast.
-    private void Reconcile(FCk_Handle_CookingFeed& InFeed)
+    private void Reconcile(FCk_Handle_CookingFeed& InFeed, EMars_Net_Reconcile InHow)
     {
         const auto Ledger = InFeed.Get_Fragment(FMars_Fragment_CookingFeed_Net);
         auto& Local = InFeed.Get_Fragment(FMars_Fragment_CookingFeed_Local);
         if (ck::EnsureIfNot(Local.Last.IsSet(), f"[CookingFeed] [{InFeed.ToString()}] has no mirror state off authority"))
         { return; }
 
-        const auto Last = Local.Last.GetValue();
+        auto Last = Local.Last.GetValue();
         Local.Last = TOptional<FMars_Fragment_CookingFeed_Net>(Ledger);
 
+        // As it stands, every piece let go and every press refused that the ledger counts came before this copy took
+        // its state.
+        if (InHow == EMars_Net_Reconcile::AsItStands)
+        {
+            Last.LetGoSerial = Ledger.LetGoSerial;
+            Last.RefusalSerial = Ledger.RefusalSerial;
+        }
+
+        // A phase that arrives starts on this machine's clock; a phase the copy was born into is shown finished, as
+        // utils_cooking_feed::Add shows it.
         const auto PhaseMoved = Ledger.PhaseSerial != Last.PhaseSerial;
-        if (PhaseMoved)
+        if (PhaseMoved && InHow == EMars_Net_Reconcile::AsItStands)
+        { Local.PhaseSeconds = utils_cooking_feed::Get_PhaseDuration(InFeed.Get_Spec().Timing, Ledger.Phase); }
+        else if (PhaseMoved)
         { Local.PhaseSeconds = 0.0f; }
 
         if (InFeed.Has_Fragment(FMars_Fragment_CookingFeed_Signals) == false)

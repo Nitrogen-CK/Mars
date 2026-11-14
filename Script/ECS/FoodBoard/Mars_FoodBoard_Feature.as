@@ -1,8 +1,9 @@
-// Stance: authority-written. Only the authority's board admits, cuts, parts, turns and releases; a machine without authority
-// drops every board request. FMars_Fragment_FoodBoard_Net replicates: the piece count, the occupancy and the board's
-// answers (a chop answered, a turn, a sweep refused), a serial each, which a client's mirror raises as the same signals,
-// with OnHeldCountChanged for the count. The held list, the unparted planes, the queue and every piece's membership never
-// leave the authority; the pieces replicate their own poses and holders.
+// Stance: authority-written. Only the authority's board admits, cuts, parts, turns and releases; a machine without
+// authority drops every board request. FMars_Fragment_FoodBoard_Net replicates: the piece count, the occupancy and the
+// board's answers (a chop answered, a turn, a sweep refused), a serial each, which a client's mirror raises as the same
+// signals after the state its copy was born into, with OnHeldCountChanged for the count. The held list, the unparted
+// planes, the queue and every piece's membership never leave the authority; the pieces replicate their own poses and
+// holders.
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
@@ -230,11 +231,15 @@ struct FMars_Fragment_FoodBoard_Net
     int32 LastReleaseRefusalAt = 0;
 }
 
-// Each machine's own: the ledger the mirror last reconciled; unset with authority.
+// Each machine's own: the ledger the mirror last reconciled (unset with authority), and whether this copy has taken the
+// state it was born into.
 struct FMars_Fragment_FoodBoard_Local
 {
     UPROPERTY()
     TOptional<FMars_Fragment_FoodBoard_Net> Last;
+
+    UPROPERTY()
+    EMars_Net_InitialState InitialState = EMars_Net_InitialState::Awaited;
 }
 
 // Added by utils_foodboard::Add, dropped by UMars_Processor_FoodBoard_Mirror once it has bound the ledger's rep-notify.
