@@ -1,3 +1,10 @@
+// Stance A. The current value, the invulnerability, whether it is depleted, a serial per damage, heal and depletion and
+// the last damage as plain data (FMars_Fragment_Health_Net) are the replicated ledger, written only by the authority's
+// request drain: a copy without authority drops every Health request and reads its current value from the ledger. Its
+// mirror (UMars_Processor_Health_Mirror) writes the local latches and raises OnHealed, OnDamaged and OnDepleted from what
+// replicated; a mirrored event names no instigator, causer or zone, and several hits inside one replication are one
+// OnDamaged carrying the latest. A Health on a host that does not replicate has authority and behaves as it always has.
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
 //--------------------------------------------------------------------------------------------------------------------------
@@ -136,8 +143,9 @@ struct FMars_Fragment_Health_Params
 // State
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Written only by UMars_Processor_Health_HandleRequests (and composed by Add). The hit points themselves live in the
-// attribute; IsDepleted is latched here, not derived from the attribute, so it flips exactly once per depletion.
+// Written only by UMars_Processor_Health_HandleRequests on the authority and by UMars_Processor_Health_Mirror on a copy
+// without it (and composed by Add). The hit points themselves live in the attribute; IsDepleted is latched here, not
+// derived from the attribute, so it flips exactly once per depletion.
 struct FMars_Fragment_Health
 {
     // FloatAttribute.Mars.Health, MinMax 0..Spec.Max.
@@ -153,6 +161,86 @@ struct FMars_Fragment_Health
     // The last hit that applied damage; unset until one does.
     UPROPERTY()
     TOptional<FMars_DamageEvent> LastHit;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+// Ledger
+//--------------------------------------------------------------------------------------------------------------------------
+
+enum EMars_Health_Vitality
+{
+    Standing,
+    Depleted
+}
+
+// A hit as the ledger carries it: no handle, so it reads the same on every machine.
+struct FMars_Health_NetHit
+{
+    UPROPERTY()
+    float32 Amount = 0.0f;
+
+    UPROPERTY(meta = (Categories = "DamageType"))
+    FGameplayTag DamageType;
+
+    UPROPERTY()
+    FMars_DamageEvent_Hit Hit;
+}
+
+// The replicated ledger: what a copy without authority shows the Health from. Written only by utils_health::Publish,
+// which the authority's drain calls once after its attribute write. A serial counts every damage, heal and depletion the
+// authority applied; LastDamage is the latest damage that applied, LastDamageApplied and LastHealApplied what the
+// latest damage removed and the latest heal added.
+struct FMars_Fragment_Health_Net
+{
+    UPROPERTY()
+    float32 Current = 0.0f;
+
+    UPROPERTY()
+    ECk_EnableDisable Invulnerability = ECk_EnableDisable::Disable;
+
+    UPROPERTY()
+    EMars_Health_Vitality Vitality = EMars_Health_Vitality::Standing;
+
+    UPROPERTY()
+    int32 DamageSerial = 0;
+
+    UPROPERTY()
+    int32 HealSerial = 0;
+
+    UPROPERTY()
+    int32 DepletionSerial = 0;
+
+    UPROPERTY()
+    FMars_Health_NetHit LastDamage;
+
+    UPROPERTY()
+    float32 LastDamageApplied = 0.0f;
+
+    UPROPERTY()
+    float32 LastHealApplied = 0.0f;
+}
+
+// Each machine's own: the ledger the mirror last reconciled (unset with authority).
+struct FMars_Fragment_Health_Local
+{
+    UPROPERTY()
+    TOptional<FMars_Fragment_Health_Net> Last;
+}
+
+// Added by utils_health::Add, dropped by UMars_Processor_Health_Mirror once it has bound the ledger's rep-notify.
+struct FMars_Tag_Health_NeedsMirror {}
+
+// What the authority's drain applied, beyond the state Publish reads: the running value after its loops, how many
+// damages, heals and depletions it applied, and the latest damage and heal.
+struct FMars_Health_Answers
+{
+    float32 Current = 0.0f;
+    int32 Damages = 0;
+    int32 Heals = 0;
+    int32 Depletions = 0;
+    TOptional<FMars_DamageEvent> LastDamage;
+    float32 LastDamageApplied = 0.0f;
+    float32 LastHealApplied = 0.0f;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

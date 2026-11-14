@@ -8,6 +8,10 @@
 //
 // The state is re-fetched per request: a handler may compose Health on another entity mid-broadcast, which can move the
 // fragment storage under a reference held across the broadcast.
+//
+// Only a machine with authority over the Health applies anything; a copy without it drops every request, and its mirror
+// shows what the authority published. The ledger is published once per drain that applied a request or changed the
+// invulnerability, after the attribute write.
 class UMars_Processor_Health_HandleRequests : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -32,10 +36,18 @@ class UMars_Processor_Health_HandleRequests : UCk_Processor_Script_Base_UE
         // InRequests is invalid past this line; removing before broadcasting lets re-entrant requests survive.
         Self.Request_TryRemove(FMars_Fragment_Health_Requests);
 
+        if (utils_net::Get_HasAuthority(InHandle) == false)
+        { return; }
+
+        // Handlers react on the hit entity (a sever, a death): scope the script world to its own.
+        const auto WorldContext = FAngelscriptGameThreadScopeWorldContext(utils_entity_lifetime::Get_WorldForEntity(InHandle));
+
         const auto Attribute = InState.Attribute;
         auto Running = utils_float_attribute::Get_FinalValue(Attribute, ECk_MinMaxCurrent::Current);
         const auto Max = Self.Get_Max();
+        const auto WasInvulnerable = Self.Get_IsInvulnerable();
         auto Changed = false;
+        auto Answers = FMars_Health_Answers();
 
         for (const auto& Request : SetInvulnerableRequests)
         { Self.Get_Fragment(FMars_Fragment_Health).IsInvulnerable = Request.Invulnerability == ECk_EnableDisable::Enable; }
@@ -50,6 +62,8 @@ class UMars_Processor_Health_HandleRequests : UCk_Processor_Script_Base_UE
             const auto Applied = Math::Min(Request.Amount, Max - Running);
             Running += Applied;
             Changed = true;
+            Answers.Heals += 1;
+            Answers.LastHealApplied = Applied;
 
             if (Self.Has_Fragment(FMars_Fragment_Health_Signals))
             { Self.Get_Fragment(FMars_Fragment_Health_Signals).OnHealed.Broadcast(Self, Applied, Running); }
@@ -65,10 +79,16 @@ class UMars_Processor_Health_HandleRequests : UCk_Processor_Script_Base_UE
             Running -= Applied;
             Changed = true;
             State.LastHit = Request.Event;
+            Answers.Damages += 1;
+            Answers.LastDamage = TOptional<FMars_DamageEvent>(Request.Event);
+            Answers.LastDamageApplied = Applied;
 
             const auto Depleted = Running <= 0.0f;
             if (Depleted)
-            { State.IsDepleted = true; }
+            {
+                State.IsDepleted = true;
+                Answers.Depletions += 1;
+            }
 
             if (Self.Has_Fragment(FMars_Fragment_Health_Signals))
             { Self.Get_Fragment(FMars_Fragment_Health_Signals).OnDamaged.Broadcast(Self, Request.Event, Applied, Running); }
@@ -82,5 +102,11 @@ class UMars_Processor_Health_HandleRequests : UCk_Processor_Script_Base_UE
 
         if (Changed)
         { utils_float_attribute::Request_Override_Current(Attribute, Running); }
+
+        if (Changed == false && Self.Get_IsInvulnerable() == WasInvulnerable)
+        { return; }
+
+        Answers.Current = Running;
+        utils_health::Publish(Self, Answers);
     }
 }
