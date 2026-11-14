@@ -14,12 +14,13 @@ namespace utils_searing
     const float32 k_FaceSettleSeconds = 0.1f;
 
     // Composes the minigame on InHandle (the station entity; the feature does not need the Station feature), and the
-    // station's admission inbox and take-out readout. The spec's Nodes are built by the caller: Nodes.Pan is the Implement on
-    // the pan node (the kernel makes it Driven while hot and forwards the looks to it), and a piece counts as on the pan only
-    // while it rests on Nodes.PanBaseBody. The pan starts empty: pieces arrive only through the station's inbox
-    // (utils_cooking_feed::Request_Admit); an empty first drain starts its watch of the station's queue. A rejected spec or
-    // a missing node ensures and returns an invalid handle. The two replicated ledgers are composed on every machine (a copy
-    // without authority reads the kernel and follows the pan through them).
+    // station's admission inbox and take-out readout. The spec's Nodes are built by the caller: Nodes.Pan is the
+    // Implement on the pan node (the kernel makes it Driven while hot and forwards the looks to it), and a piece counts
+    // as on the pan only while it rests on Nodes.PanBaseBody. The pan starts empty: pieces arrive only through the
+    // station's inbox (utils_cooking_feed::Request_Admit); an empty first drain starts its watch of the station's
+    // queue. A rejected spec or a missing node ensures and returns an invalid handle. The two replicated ledgers are
+    // composed on every machine (a copy without authority reads the kernel and follows the pan through them); a ledger
+    // that arrived before is the state this copy was born into, and it has then taken it.
     FCk_Handle_Searing Add(FCk_Handle& InHandle, FMars_Searing_Spec InSpec)
     {
         const auto Validation = InSpec.Validate();
@@ -40,15 +41,21 @@ namespace utils_searing
         utils_cooking_feed::Add_Admission(InHandle);
         utils_cooking_feed::Add_TakeOut(InHandle);
 
-        // A copy without authority can receive either ledger before it composes: what arrived stands then.
-        if (InHandle.Has_Fragment(FMars_Fragment_Searing_Net) == false)
+        // A ledger already here can only have been put here by its replicated application: this copy was born into it,
+        // has taken that state, and the mirror's first pass shows it as it stands; each ledger is its own application.
+        auto Local = FMars_Fragment_Searing_Local();
+        if (InHandle.Has_Fragment(FMars_Fragment_Searing_Net))
+        { Local.InitialState = EMars_Net_InitialState::Taken; }
+        else
         { InHandle.Add_Fragment(FMars_Fragment_Searing_Net(), ECk_Replication::Replicates); }
 
-        if (InHandle.Has_Fragment(FMars_Fragment_Searing_PanNet) == false)
+        if (InHandle.Has_Fragment(FMars_Fragment_Searing_PanNet))
+        { Local.PanInitialState = EMars_Net_InitialState::Taken; }
+        else
         { InHandle.Add_Fragment(FMars_Fragment_Searing_PanNet(), ECk_Replication::Replicates); }
 
-        auto Local = FMars_Fragment_Searing_Local();
-        Local.Last = TOptional<FMars_Fragment_Searing_Net>(InHandle.Get_Fragment(FMars_Fragment_Searing_Net));
+        // The mirror compares what arrives against the ledger this machine composed.
+        Local.Last = TOptional<FMars_Fragment_Searing_Net>(FMars_Fragment_Searing_Net());
         InHandle.Add_Fragment(Local);
         InHandle.Add_Fragment(FMars_Tag_Searing_NeedsMirror());
         return InHandle.As_Searing();

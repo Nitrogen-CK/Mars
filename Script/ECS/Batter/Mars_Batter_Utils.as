@@ -3,10 +3,11 @@ namespace utils_batter
     // A coat this close to 1 is complete (the clock clamps at 1; this only absorbs float drift).
     const float32 k_CoatComplete = 0.9999f;
 
-    // Composes the batter bowl on InStation (the station entity) and makes the station a receiver: its admission inbox and
-    // its take-out readout. The spec's Nodes are built by the caller. The bowl starts Resting and empty: nothing is in it
-    // until the inbox brings a piece. A rejected spec or a missing bowl node ensures and returns an invalid handle. The
-    // replicated ledger is composed on every machine (a copy without authority reads the bowl through it).
+    // Composes the batter bowl on InStation (the station entity) and makes the station a receiver: its admission inbox
+    // and its take-out readout. The spec's Nodes are built by the caller. The bowl starts Resting and empty: nothing is
+    // in it until the inbox brings a piece. A rejected spec or a missing bowl node ensures and returns an invalid
+    // handle. The replicated ledger is composed on every machine (a copy without authority reads the bowl through it);
+    // a ledger that arrived before is the state this copy was born into, and it has then taken it.
     FCk_Handle_Batter Add(FCk_Handle& InStation, FMars_Batter_Spec InSpec)
     {
         const auto Validation = InSpec.Validate();
@@ -27,21 +28,18 @@ namespace utils_batter
         utils_cooking_feed::Add_Admission(InStation);
         utils_cooking_feed::Add_TakeOut(InStation);
 
-        // A copy without authority can receive the replicated ledger before it composes: the arrived ledger stands then, and
-        // a bowl first read dipped shows its pieces under.
-        if (InStation.Has_Fragment(FMars_Fragment_Batter_Net) == false)
+        // A ledger already here can only have been put here by its replicated application: this copy was born into it,
+        // has taken that state, and the mirror's first pass shows it as it stands (a bowl first read dipped shows its
+        // pieces under).
+        auto Local = FMars_Fragment_Batter_Local();
+        if (InStation.Has_Fragment(FMars_Fragment_Batter_Net))
+        { Local.InitialState = EMars_Net_InitialState::Taken; }
+        else
         { InStation.Add_Fragment(FMars_Fragment_Batter_Net(), ECk_Replication::Replicates); }
 
-        const auto Ledger = InStation.Get_Fragment(FMars_Fragment_Batter_Net);
-        auto Local = FMars_Fragment_Batter_Local();
-        Local.Last = TOptional<FMars_Fragment_Batter_Net>(Ledger);
-        for (const auto& Row : Ledger.Pieces)
-        {
-            auto LocalRow = FMars_Batter_LocalRow();
-            LocalRow.Id = Row.Id;
-            LocalRow.Immersion = Get_TargetImmersion(Ledger.Bowl);
-            Local.Rows.Add(LocalRow);
-        }
+        // The mirror compares what arrives against the ledger this machine composed.
+        Local.Last = TOptional<FMars_Fragment_Batter_Net>(FMars_Fragment_Batter_Net());
+        Local.Rows = Get_RowsAsTheyStand(InStation.Get_Fragment(FMars_Fragment_Batter_Net), Local.Rows);
 
         InStation.Add_Fragment(Local);
         InStation.Add_Fragment(FMars_Tag_Batter_NeedsMirror());
@@ -138,6 +136,30 @@ namespace utils_batter
         }
 
         return -1;
+    }
+
+    // InRows with every row InLedger holds at the immersion its bowl puts a piece (a row InRows lacks is added,
+    // unannounced and unattached); a row InLedger no longer holds is kept as it is, for the tick's follow to let go.
+    TArray<FMars_Batter_LocalRow> Get_RowsAsTheyStand(const FMars_Fragment_Batter_Net& InLedger, const TArray<FMars_Batter_LocalRow>& InRows)
+    {
+        auto Rows = InRows;
+        const auto Immersion = Get_TargetImmersion(InLedger.Bowl);
+        for (const auto& LedgerRow : InLedger.Pieces)
+        {
+            const auto Index = Find_LocalRowIndex(Rows, LedgerRow.Id);
+            if (Index >= 0)
+            {
+                Rows[Index].Immersion = Immersion;
+                continue;
+            }
+
+            auto Row = FMars_Batter_LocalRow();
+            Row.Id = LedgerRow.Id;
+            Row.Immersion = Immersion;
+            Rows.Add(Row);
+        }
+
+        return Rows;
     }
 
     //----------------------------------------------------------------------------------------------------------------------

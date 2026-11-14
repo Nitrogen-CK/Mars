@@ -6,7 +6,8 @@
 // (the axle Mover's alpha and the hand node's pose), from which that copy moves its own axle, hand node and, through the
 // mirror, its hinge. On that copy the kernel's tick only follows and announces (OnPieceAdded as a row's piece shows up
 // there, so the station dresses it); its mirror raises OnPressRefused, OnTakeOutRefused, OnDrumChanged, OnHatchChanged,
-// OnHoverChanged and OnHandModeChanged from the kernel's ledger. OnPieceTakenOut, OnCoverageChanged, OnPieceReseated, the
+// OnHoverChanged and OnHandModeChanged from the kernel's ledger, raising what the authority raises after the state its
+// copy was born into. OnPieceTakenOut, OnCoverageChanged, OnPieceReseated, the
 // cursor, the bodies, the pieces' cook state, holder facts and pickup claims never leave the authority.
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -702,13 +703,16 @@ struct FMars_Fragment_Tumbler_MotionNet
     FQuat HandRotationLocal = FQuat::Identity;
 }
 
-// Each machine's own: the kernel's ledger it last reconciled and the ledger rows it announced (both used only without
-// authority), the seconds since the motion ledger was last written (with authority), and the drum as this copy shows it
-// (without authority).
+// Each machine's own: the kernel's ledger it last reconciled, whether this copy has taken the state it was born into
+// and the ledger rows it announced (all used only without authority), the seconds since the motion ledger was last
+// written (with authority), and the drum as this copy shows it (without authority).
 struct FMars_Fragment_Tumbler_Local
 {
     UPROPERTY()
     TOptional<FMars_Fragment_Tumbler_Net> Last;
+
+    UPROPERTY()
+    EMars_Net_InitialState InitialState = EMars_Net_InitialState::Awaited;
 
     UPROPERTY()
     TArray<FMars_CookingFeed_PieceId> Announced;

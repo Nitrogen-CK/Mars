@@ -1,11 +1,12 @@
 // Stance: the pan's kernel is the authority's. Only the authority's copy heats, admits, judges contact, flips and loss,
-// sears, takes out and readopts; a copy without authority drops every searing request (and the releases and take-outs its
-// station queued) and reads the pan through two replicated ledgers on the station: the kernel's (the heat, the sizzle, the
-// counts, every piece it holds with its status, contact, resting face and sears floored to a tenth, and a serial for the
-// take-outs it refused) and the pan's command, which that copy's own pan Implement follows. On that copy the kernel's tick
-// only announces: OnPieceAdded as a row's piece shows up there, so the station dresses it; its mirror raises
-// OnTakeOutRefused, OnHeatChanged and OnFaceSeared from the ledger. The other searing signals, the bodies, the clocks, the
-// tally's seconds, the pieces' cook state, holder facts and pickup claims never leave the authority.
+// sears, takes out and readopts; a copy without authority drops every searing request (and the releases and take-outs
+// its station queued) and reads the pan through two replicated ledgers on the station: the kernel's (the heat, the
+// sizzle, the counts, every piece it holds with its status, contact, resting face and sears floored to a tenth, and a
+// serial for the take-outs it refused) and the pan's command, which that copy's own pan Implement follows. On that copy
+// the kernel's tick only announces: OnPieceAdded as a row's piece shows up there, so the station dresses it; its mirror
+// raises OnTakeOutRefused, OnHeatChanged and OnFaceSeared from the ledger, raising what the authority raises after the
+// state its copy was born into. The other searing signals, the bodies, the clocks, the tally's seconds, the pieces'
+// cook state, holder facts and pickup claims never leave the authority.
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
@@ -501,12 +502,20 @@ struct FMars_Fragment_Searing_PanNet
     FMars_Implement_Command Pan;
 }
 
-// Each machine's own: the kernel's ledger it last reconciled (unset with authority), the ledger rows it announced (used only
-// without authority) and the pacer of the pan's command (used only with authority).
+// Each machine's own: the kernel's ledger it last reconciled (unset with authority), whether this copy has taken the
+// state it was born into, the ledger rows it announced (used only without authority) and the pacer of the pan's command
+// (used only with authority).
 struct FMars_Fragment_Searing_Local
 {
     UPROPERTY()
     TOptional<FMars_Fragment_Searing_Net> Last;
+
+    UPROPERTY()
+    EMars_Net_InitialState InitialState = EMars_Net_InitialState::Awaited;
+
+    // The same for the pan's command, which this copy's pan follows.
+    UPROPERTY()
+    EMars_Net_InitialState PanInitialState = EMars_Net_InitialState::Awaited;
 
     UPROPERTY()
     TArray<FMars_CookingFeed_PieceId> Announced;

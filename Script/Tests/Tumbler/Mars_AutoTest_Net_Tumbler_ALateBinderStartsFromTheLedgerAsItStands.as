@@ -1,10 +1,13 @@
-// A slab first, then the station. In the continuation in which the server first finds its station ready it looks its
-// cursor away from the shut hatch's tab (where it starts) and, once nothing is hovered, presses (refused); it points at the
-// hatch and presses, and once the hatch is Open admits the slab. It holds 4 s, points at the open hatch, presses (closing)
-// and once the hatch is Closed reports (step 1). The client starts counting only once its ledger reads one press refusal,
-// the hatch Open and one row and its copy announced that row (a listener that arrives after them): OnPieceAdded was raised
-// for the row once in all, and once its hinge Mover rests at its open pose its alpha is within 0.02 of 1. After the report
-// it raised OnHatchChanged Closed once since it started counting, and no OnPressRefused and no OnPieceAdded.
+// A slab first, then the born tumbler, whose authority, as it composes, asks a take-out naming no tray and presses: its
+// spawn-frame drain refuses the take-out NoRoom and the press NoTarget (nothing is hovered yet). A copy is born into
+// that tumbler. Once the server's station is ready it looks its cursor away from the shut hatch's tab and, once nothing
+// is hovered, presses (refused); it points at the hatch and presses, and once the hatch is Open admits the slab. It
+// holds 4 s, points at the open hatch, presses (closing) and once the hatch is Closed reports (step 1). The client's
+// watch finds its copy before the first application of its ledger, which carries the born refusals; once its ledger
+// reads two press refusals, the hatch Open and one row and its copy announced the row, its hinge Mover rests at its
+// open pose (alpha within 0.02 of 1). A settled second after step 1 its copy has raised only what came after:
+// OnPressRefused once (after that application), no OnTakeOutRefused, OnHatchChanged Closed once and OnPieceAdded once,
+// and nothing but levels in that application's frame.
 // Surface: Ck.Tumbler.Net.AS_Tumbler_ALateBinderStartsFromTheLedgerAsItStands
 class UCk_AutoTest_Net_Tumbler_ALateBinderStartsFromTheLedgerAsItStands : UMars_AutoTestRig_NetHeatStation
 {
@@ -14,10 +17,7 @@ class UCk_AutoTest_Net_Tumbler_ALateBinderStartsFromTheLedgerAsItStands : UMars_
     private const float32 k_HoldSeconds = 4.0f;
     private const float32 k_HingeTolerance = 0.02f;
 
-    // Client: what it saw when its ledger first stood as the server left it, and its rested hinge.
-    private int32 _AddedBeforeClear = -1;
-    private int64 _FoundFrame = -1;
-    private int64 _ClearFrame = -1;
+    // Client: its rested hinge.
     private float32 _RestedHinge = -1.0f;
 
     protected EMars_TESTONLY_HeatStation Get_HeatStation() const override
@@ -32,6 +32,7 @@ class UCk_AutoTest_Net_Tumbler_ALateBinderStartsFromTheLedgerAsItStands : UMars_
         { FinishFailure("subject entity not found"); return; }
 
         _ServerActsOnFirstFind = true;
+        _HeatStationBirth = EMars_TESTONLY_HeatStationBirth::Born;
         Begin_HeatStationRig(InHandle, k_X);
         if (Get_IsServer() == false)
         { WaitUntil(n"Is_ClientLedgerStands", n"OnClientLedgerStands", k_SlowPolls); }
@@ -55,6 +56,7 @@ class UCk_AutoTest_Net_Tumbler_ALateBinderStartsFromTheLedgerAsItStands : UMars_
     protected void On_ServerFeedStationReady() override
     {
         Mark_Time("found");
+        Log_HeatStation(f"ready: {Describe_TumblerLedger()} {Describe_Born()}");
         Point_AwayThen(EMars_TESTONLY_NetTumblerLook::Kernel, n"OnServerAway");
     }
 
@@ -114,10 +116,11 @@ class UCk_AutoTest_Net_Tumbler_ALateBinderStartsFromTheLedgerAsItStands : UMars_
     {
         Mark_Time("step1");
         Report_HeatStep(1);
-        Assert_True(_PressRefusals.Num() == 1 && _PressRefusals[0] == EMars_Tumbler_Refusal::NoTarget,
-            f"the server refused the first press once, NoTarget ({Describe_TumblerRecord()})");
-        Assert_Equals_Int(_Tumbler.Get_PieceCount(), 1, "the server holds the slab");
-        End_HeatServer(f"{Describe_Tumbler()} {Describe_TumblerLedger()} {Describe_TumblerRecord()}");
+        const auto Ledger = _Tumbler.Get_Ledger();
+        Assert_Equals_Int(Ledger.PressRefusalSerial, 2, f"the server refused two presses ({Describe_TumblerLedger()})");
+        Assert_Equals_Int(Ledger.TakeOutRefusalSerial, 1, f"the server refused one take-out ({Describe_TumblerLedger()})");
+        Assert_Equals_Int(Ledger.Pieces.Num(), 1, "the server holds the slab");
+        End_HeatServer(f"{Describe_Tumbler()} {Describe_TumblerLedger()} {Describe_Born()}");
     }
 
     //----------------------------------------------------------------------------------------------------------------------
@@ -134,23 +137,14 @@ class UCk_AutoTest_Net_Tumbler_ALateBinderStartsFromTheLedgerAsItStands : UMars_
             return;
         }
 
-        if (_FoundFrame < 0)
-        { _FoundFrame = utils_time::Get_FrameCounter(); }
-
         const auto Ledger = _Tumbler.Get_Ledger();
-        Result.Set(Ledger.PressRefusalSerial == 1 && Ledger.Hatch == EMars_Tumbler_Hatch::Open && Ledger.Pieces.Num() == 1
+        Result.Set(Ledger.PressRefusalSerial == 2 && Ledger.Hatch == EMars_Tumbler_Hatch::Open && Ledger.Pieces.Num() == 1
             && Get_TumblerAnnouncedRows().Num() == 1);
     }
 
-    // The listener arrives now: what its copy raised before is not its to count.
     UFUNCTION()
     private void OnClientLedgerStands(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
     {
-        _ClearFrame = utils_time::Get_FrameCounter();
-        const auto Id = _Tumbler.Get_Ledger().Pieces[0].Id;
-        _AddedBeforeClear = Get_TumblerAddedCount(Id);
-        Clear_TumblerRecord();
-        Assert_Equals_Int(_AddedBeforeClear, 1, "the client raised OnPieceAdded for the row once before it started counting");
         WaitUntil(n"Is_ClientHingeRested", n"OnClientHingeRested", k_SlowPolls);
     }
 
@@ -170,12 +164,41 @@ class UCk_AutoTest_Net_Tumbler_ALateBinderStartsFromTheLedgerAsItStands : UMars_
         Await_Step(1);
     }
 
+    // A settled second after step 1.
     protected void On_ClientStep(int32 InStep) override
     {
         Mark_Time("step1");
-        Assert_Equals_Int(Get_HatchChangeCount(EMars_Tumbler_Hatch::Closed), 1, f"since it started counting the client raised OnHatchChanged Closed once ({Describe_TumblerRecord()})");
-        Assert_Equals_Int(_PressRefusals.Num(), 0, "the client raised no earlier press refusal again");
-        Assert_Equals_Int(_TumblerAddedIds.Num(), 0, "the client raised no OnPieceAdded again");
-        End_HeatClient(f"addedBeforeClear={_AddedBeforeClear} foundFrame={_FoundFrame} clearFrame={_ClearFrame} restedHinge={_RestedHinge} {Describe_Tumbler()} {Describe_TumblerLedger()} {Describe_TumblerRecord()}");
+        const auto Line = f"restedHinge={_RestedHinge} {Describe_Born()} {Describe_TumblerLedger()}";
+        const auto First = Get_BornFirstTumblerLedger();
+        const auto FirstFrame = Get_BornFirstNotifyFrame();
+        const auto Ledger = _Tumbler.Get_Ledger();
+
+        Assert_True(Get_HasBornFirstNotify(), f"the client recorded the ledger's first application ({Line})");
+        Assert_True(_BornInitialAtFind == EMars_Net_InitialState::Awaited, f"the client watched its copy before it took its state ({Line})");
+        Assert_True(Get_BornInitialState() == EMars_Net_InitialState::Taken, f"the client's copy took the state it was born into ({Line})");
+        Assert_True(First.PressRefusalSerial == 1 && First.TakeOutRefusalSerial == 1,
+            f"the first application carried the born tumbler: one refused press and one refused take-out ({Line})");
+
+        const auto Presses = Get_BornEvents(EMars_TESTONLY_NetHeatBornEventKind::PressRefused);
+        Assert_Equals_Int(Presses.Num(), Ledger.PressRefusalSerial - First.PressRefusalSerial,
+            f"OnPressRefused only for what came after ({Line})");
+        Assert_True(Presses.Num() == 0 || Presses[0].Frame > FirstFrame, f"no press refusal in the first application's frame ({Line})");
+        Assert_Equals_Int(Get_BornEventCount(EMars_TESTONLY_NetHeatBornEventKind::TakeOutRefused),
+            Ledger.TakeOutRefusalSerial - First.TakeOutRefusalSerial, f"OnTakeOutRefused only for what came after ({Line})");
+
+        auto Closed = 0;
+        for (const auto& Event : Get_BornEvents(EMars_TESTONLY_NetHeatBornEventKind::HatchChanged))
+        {
+            if (Event.Value == int32(EMars_Tumbler_Hatch::Closed))
+            { ++Closed; }
+        }
+
+        Assert_Equals_Int(Closed, 1, f"OnHatchChanged Closed once ({Line})");
+        Assert_True(_BornAddedIds.Num() == 1 && Ledger.Pieces.Num() == 1 && _BornAddedIds[0].Get_IsSame(Ledger.Pieces[0].Id),
+            f"OnPieceAdded once, for the row ({Line})");
+        const auto ActsInFirstFrame = Get_BornEventCountInFrame(EMars_TESTONLY_NetHeatBornEventKind::PressRefused, FirstFrame)
+            + Get_BornEventCountInFrame(EMars_TESTONLY_NetHeatBornEventKind::TakeOutRefused, FirstFrame);
+        Assert_Equals_Int(ActsInFirstFrame, 0, f"nothing but levels in the first application's frame ({Line})");
+        End_HeatClient(Line);
     }
 }

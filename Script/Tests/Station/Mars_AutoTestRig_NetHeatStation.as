@@ -18,8 +18,11 @@
 // exposed Tumbler spec (ready once its drum body is in the simulation on the server), records the kernel's signals and
 // samples its Movers every frame (the axle's alpha, target, tween and rest, the hinge's alpha and rest, the hand node's
 // offset, the first row's coverage); its remote rows add Use, and it points the cursor and rocks the lever, on the server's
-// own kernel or in the operator's stream. One [BatterNetTest], [SearingNetTest], [FryNetTest] or [TumblerNetTest] line per
-// test per machine.
+// own kernel or in the operator's stream. A test that sets _HeatStationBirth to Born has the server spawn the hooked
+// station's born class (its authority issues its kernel's requests as it composes), and each machine watches its copy
+// by the born test tag from its construct, whatever its docks: the kernel's signals with their frames and, off
+// authority, each rep-notify of the kernel's ledger and every frame a born bowl's piece sits under its bowl node. One
+// [BatterNetTest], [SearingNetTest], [FryNetTest] or [TumblerNetTest] line per test per machine.
 
 namespace constants_heat_station_net_autotest
 {
@@ -161,6 +164,44 @@ struct FMars_TESTONLY_NetHeatPanSample
     EMars_Searing_Heat Heat = EMars_Searing_Heat::Cold;
 }
 
+// Which class of the hooked station the server spawns: the station itself, or its born class (whose authority issues
+// its kernel's requests as it composes, so a copy is born into what that drain wrote).
+enum EMars_TESTONLY_HeatStationBirth
+{
+    Plain,
+    Born
+}
+
+enum EMars_TESTONLY_NetHeatBornEventKind
+{
+    BowlChanged,
+    PieceAdded,
+    AdmissionRefused,
+    TakeOutRefused,
+    HeatChanged,
+    FaceSeared,
+    PressRefused,
+    HatchChanged
+}
+
+// One signal the watched born station's kernel raised on this machine: its frame, and the level it carries (the bowl,
+// the heat or the hatch; 0 for the others).
+struct FMars_TESTONLY_NetHeatBornEvent
+{
+    EMars_TESTONLY_NetHeatBornEventKind Kind = EMars_TESTONLY_NetHeatBornEventKind::BowlChanged;
+    int64 Frame = 0;
+    int32 Value = 0;
+}
+
+// One frame of a born bowl's piece seated under its bowl node on this machine: the ledger's bowl then, and how far the
+// piece's offset is from where its slot puts it fully under (cm).
+struct FMars_TESTONLY_NetHeatBornBowlSample
+{
+    int64 Frame = 0;
+    EMars_Batter_Bowl Bowl = EMars_Batter_Bowl::Resting;
+    float64 DippedErrorCm = -1.0;
+}
+
 UCLASS(Abstract)
 class UMars_AutoTestRig_NetHeatStation : UMars_AutoTestRig_NetFeedStation
 {
@@ -245,6 +286,26 @@ class UMars_AutoTestRig_NetHeatStation : UMars_AutoTestRig_NetFeedStation
     // Server: the frame counter of its last marked event, for the report.
     protected int64 _EventFrame = -1;
 
+    // Set before Begin_HeatStationRig: Born spawns the hooked station's born class, which every machine watches by its
+    // test tag from its construct, whatever its docks.
+    protected EMars_TESTONLY_HeatStationBirth _HeatStationBirth = EMars_TESTONLY_HeatStationBirth::Plain;
+    // This machine's born station once watched, the frame it was found, its kernel's InitialState then, every signal
+    // its kernel raised from then on, and (off authority) each rep-notify of the kernel's ledger: its frame and the
+    // ledger as it then read. Also the frame the sampler first saw the rig's own find (which waits for the docks) done.
+    protected FCk_Handle _BornStation;
+    protected int64 _BornFoundFrame = -1;
+    protected EMars_Net_InitialState _BornInitialAtFind = EMars_Net_InitialState::Awaited;
+    protected int64 _BornRigFoundFrame = -1;
+    protected TArray<FMars_TESTONLY_NetHeatBornEvent> _BornEvents;
+    // In parallel with the PieceAdded events.
+    protected TArray<FMars_CookingFeed_PieceId> _BornAddedIds;
+    protected TArray<int64> _BornNotifyFrames;
+    protected TArray<FMars_Fragment_Batter_Net> _BornBatterLedgers;
+    protected TArray<FMars_Fragment_Searing_Net> _BornSearingLedgers;
+    protected TArray<FMars_Fragment_Tumbler_Net> _BornTumblerLedgers;
+    // Off authority, at a born bowl: every sampled frame its ledger has a row whose piece sits under the bowl node.
+    protected TArray<FMars_TESTONLY_NetHeatBornBowlSample> _BornBowlSamples;
+
     private bool _WasHeatStationFound = false;
     private int32 _AdmitIndex = 0;
     private TArray<FMars_TESTONLY_NetHeatRemoteRow> _RemoteRows;
@@ -275,6 +336,7 @@ class UMars_AutoTestRig_NetHeatStation : UMars_AutoTestRig_NetFeedStation
     private int32 _StillFrames = 0;
     private int64 _StillFrame = -1;
     private float32 _StillAlpha = -1.0f;
+    private bool _WasBornStationWatched = false;
 
     //----------------------------------------------------------------------------------------------------------------------
     // Hooks
@@ -1268,6 +1330,330 @@ class UMars_AutoTestRig_NetHeatStation : UMars_AutoTestRig_NetFeedStation
         On_HeatStationSample();
     }
 
+    // The born station is watched and its bowl sampled before the base rig's sampling, which waits for the docks.
+    protected void On_Sample(TArray<FCk_Handle> InEntities, TArray<FCk_Handle_FoodPiece> InStanding) override
+    {
+        Watch_BornHeatStation();
+        Sample_BornBowl();
+        Super::On_Sample(InEntities, InStanding);
+        if (_HeatStationBirth == EMars_TESTONLY_HeatStationBirth::Born && _WasHeatStationFound && _BornRigFoundFrame < 0)
+        { _BornRigFoundFrame = utils_time::Get_FrameCounter(); }
+    }
+
+    //----------------------------------------------------------------------------------------------------------------------
+    // The born station's watch
+    //----------------------------------------------------------------------------------------------------------------------
+
+    // Once: this machine's live station carrying the born test tag near the floor whose hooked kernel has composed; its
+    // kernel's signals are recorded from then on, and off authority each rep-notify of its ledger.
+    private void Watch_BornHeatStation()
+    {
+        if (_HeatStationBirth != EMars_TESTONLY_HeatStationBirth::Born || _WasBornStationWatched)
+        { return; }
+
+        for (auto Candidate : utils_entity_tag::ForEach_Entity(Get_SubjectEntity(), n"TAG_MarsTestNetBornHeatStation"))
+        {
+            if (Get_IsLive(Candidate) == false || Candidate.Is_Transform() == false || Get_IsNear(Candidate, _FloorTop) == false
+                || Get_IsBornKernelComposed(Candidate) == false)
+            { continue; }
+
+            _WasBornStationWatched = true;
+            _BornStation = Candidate;
+            _BornFoundFrame = utils_time::Get_FrameCounter();
+            _BornInitialAtFind = Get_BornInitialState();
+            Bind_BornKernel();
+            return;
+        }
+    }
+
+    private bool Get_IsBornKernelComposed(FCk_Handle InStation) const
+    {
+        if (Get_HeatStation() == EMars_TESTONLY_HeatStation::Searing)
+        { return InStation.Is_Searing(); }
+
+        if (Get_HeatStation() == EMars_TESTONLY_HeatStation::Tumbler)
+        { return InStation.Is_Tumbler(); }
+
+        return Get_HeatStation() == EMars_TESTONLY_HeatStation::Batter && InStation.Is_Batter();
+    }
+
+    private void Bind_BornKernel()
+    {
+        const auto IsCopy = Get_IsServer() == false;
+        if (Get_HeatStation() == EMars_TESTONLY_HeatStation::Searing)
+        {
+            auto Searing = _BornStation.As_Searing();
+            Searing.BindTo_OnHeatChanged(FMars_Delegate_Searing_OnHeatChanged(this, n"OnBornHeatChanged"));
+            Searing.BindTo_OnTakeOutRefused(FMars_Delegate_Searing_OnTakeOutRefused(this, n"OnBornPanTakeOutRefused"));
+            Searing.BindTo_OnFaceSeared(FMars_Delegate_Searing_OnFaceSeared(this, n"OnBornFaceSeared"));
+            Searing.BindTo_OnPieceAdded(FMars_Delegate_Searing_OnPieceAdded(this, n"OnBornPanPieceAdded"));
+            if (IsCopy)
+            { _BornStation.BindTo_OnRepNotify(FMars_Fragment_Searing_Net, FCk_DynamicFragment_OnRepNotify(this, n"OnBornSearingNotify")); }
+
+            return;
+        }
+
+        if (Get_HeatStation() == EMars_TESTONLY_HeatStation::Tumbler)
+        {
+            auto Tumbler = _BornStation.As_Tumbler();
+            Tumbler.BindTo_OnPressRefused(FMars_Delegate_Tumbler_OnPressRefused(this, n"OnBornPressRefused"));
+            Tumbler.BindTo_OnTakeOutRefused(FMars_Delegate_Tumbler_OnTakeOutRefused(this, n"OnBornTumblerTakeOutRefused"));
+            Tumbler.BindTo_OnHatchChanged(FMars_Delegate_Tumbler_OnHatchChanged(this, n"OnBornHatchChanged"));
+            Tumbler.BindTo_OnPieceAdded(FMars_Delegate_Tumbler_OnPieceAdded(this, n"OnBornTumblerPieceAdded"));
+            if (IsCopy)
+            { _BornStation.BindTo_OnRepNotify(FMars_Fragment_Tumbler_Net, FCk_DynamicFragment_OnRepNotify(this, n"OnBornTumblerNotify")); }
+
+            return;
+        }
+
+        auto Batter = _BornStation.As_Batter();
+        Batter.BindTo_OnBowlChanged(FMars_Delegate_Batter_OnBowlChanged(this, n"OnBornBowlChanged"));
+        Batter.BindTo_OnPieceAdded(FMars_Delegate_Batter_OnPieceAdded(this, n"OnBornBatterPieceAdded"));
+        Batter.BindTo_OnAdmissionRefused(FMars_Delegate_Batter_OnAdmissionRefused(this, n"OnBornAdmissionRefused"));
+        Batter.BindTo_OnTakeOutRefused(FMars_Delegate_Batter_OnTakeOutRefused(this, n"OnBornBatterTakeOutRefused"));
+        if (IsCopy)
+        { _BornStation.BindTo_OnRepNotify(FMars_Fragment_Batter_Net, FCk_DynamicFragment_OnRepNotify(this, n"OnBornBatterNotify")); }
+    }
+
+    // Off authority, once a born bowl is watched, every frame its ledger has a row whose piece is a live food piece
+    // under the bowl node: the ledger's bowl and the piece's distance from its fully-under offset.
+    private void Sample_BornBowl()
+    {
+        if (Get_HeatStation() != EMars_TESTONLY_HeatStation::Batter || Get_IsServer() || Get_IsLive(_BornStation) == false
+            || _BornStation.Is_Batter() == false)
+        { return; }
+
+        const auto Batter = _BornStation.As_Batter();
+        const auto Ledger = Batter.Get_Ledger();
+        const auto Spec = Batter.Get_Spec();
+        for (const auto& Row : Ledger.Pieces)
+        {
+            const auto Entity = Row.Piece;
+            if (Get_IsLive(Entity) == false || Entity.Is_FoodPiece() == false)
+            { continue; }
+
+            const auto Piece = Entity.As_FoodPiece();
+            const auto Parent = Get_Parent(Piece);
+            if (ck::Is_NOT_Valid(Parent) || Parent != Spec.Nodes.Bowl)
+            { continue; }
+
+            auto State = FMars_Batter_PieceState();
+            State.Piece = Piece;
+            State.Slot = Row.Slot;
+            State.Immersion = 1.0f;
+            const auto Dipped = utils_batter::Get_PieceOffset(Spec.Bowl, State);
+            auto Sample = FMars_TESTONLY_NetHeatBornBowlSample();
+            Sample.Frame = utils_time::Get_FrameCounter();
+            Sample.Bowl = Ledger.Bowl;
+            Sample.DippedErrorCm = Get_Offset(Piece).GetLocation().Distance(Dipped.GetLocation());
+            _BornBowlSamples.Add(Sample);
+        }
+    }
+
+    // The born kernel's InitialState on this machine; Awaited while there is none.
+    protected EMars_Net_InitialState Get_BornInitialState()
+    {
+        if (Get_IsLive(_BornStation) == false)
+        { return EMars_Net_InitialState::Awaited; }
+
+        if (Get_HeatStation() == EMars_TESTONLY_HeatStation::Searing)
+        {
+            return _BornStation.Has_Fragment(FMars_Fragment_Searing_Local)
+                ? _BornStation.Get_Fragment(FMars_Fragment_Searing_Local).InitialState : EMars_Net_InitialState::Awaited;
+        }
+
+        if (Get_HeatStation() == EMars_TESTONLY_HeatStation::Tumbler)
+        {
+            return _BornStation.Has_Fragment(FMars_Fragment_Tumbler_Local)
+                ? _BornStation.Get_Fragment(FMars_Fragment_Tumbler_Local).InitialState : EMars_Net_InitialState::Awaited;
+        }
+
+        return _BornStation.Has_Fragment(FMars_Fragment_Batter_Local)
+            ? _BornStation.Get_Fragment(FMars_Fragment_Batter_Local).InitialState : EMars_Net_InitialState::Awaited;
+    }
+
+    // The born pan's PanInitialState on this machine; Awaited while there is none.
+    protected EMars_Net_InitialState Get_BornPanInitialState()
+    {
+        if (Get_IsLive(_BornStation) == false || _BornStation.Has_Fragment(FMars_Fragment_Searing_Local) == false)
+        { return EMars_Net_InitialState::Awaited; }
+
+        return _BornStation.Get_Fragment(FMars_Fragment_Searing_Local).PanInitialState;
+    }
+
+    protected bool Get_HasBornFirstNotify() const
+    {
+        return _BornNotifyFrames.Num() > 0;
+    }
+
+    // The frame of the first recorded rep-notify of the born kernel's ledger; -1 while none is recorded.
+    protected int64 Get_BornFirstNotifyFrame() const
+    {
+        if (_BornNotifyFrames.Num() == 0)
+        { return -1; }
+
+        return _BornNotifyFrames[0];
+    }
+
+    // The ledger the first recorded rep-notify read; the composed default while none is recorded.
+    protected FMars_Fragment_Batter_Net Get_BornFirstBatterLedger() const
+    {
+        if (_BornBatterLedgers.Num() == 0)
+        { return FMars_Fragment_Batter_Net(); }
+
+        return _BornBatterLedgers[0];
+    }
+
+    protected FMars_Fragment_Searing_Net Get_BornFirstSearingLedger() const
+    {
+        if (_BornSearingLedgers.Num() == 0)
+        { return FMars_Fragment_Searing_Net(); }
+
+        return _BornSearingLedgers[0];
+    }
+
+    protected FMars_Fragment_Tumbler_Net Get_BornFirstTumblerLedger() const
+    {
+        if (_BornTumblerLedgers.Num() == 0)
+        { return FMars_Fragment_Tumbler_Net(); }
+
+        return _BornTumblerLedgers[0];
+    }
+
+    protected int32 Get_BornEventCount(EMars_TESTONLY_NetHeatBornEventKind InKind) const
+    {
+        return Get_BornEvents(InKind).Num();
+    }
+
+    // Every recorded signal in InFrame, of any kind.
+    protected int32 Get_BornEventsInFrame(int64 InFrame) const
+    {
+        auto Count = 0;
+        for (const auto& Event : _BornEvents)
+        {
+            if (Event.Frame == InFrame)
+            { ++Count; }
+        }
+
+        return Count;
+    }
+
+    // The recorded signals of InKind, in order.
+    protected TArray<FMars_TESTONLY_NetHeatBornEvent> Get_BornEvents(EMars_TESTONLY_NetHeatBornEventKind InKind) const
+    {
+        TArray<FMars_TESTONLY_NetHeatBornEvent> Events;
+        for (const auto& Event : _BornEvents)
+        {
+            if (Event.Kind == InKind)
+            { Events.Add(Event); }
+        }
+
+        return Events;
+    }
+
+    // The recorded signals of InKind in InFrame.
+    protected int32 Get_BornEventCountInFrame(EMars_TESTONLY_NetHeatBornEventKind InKind, int64 InFrame) const
+    {
+        auto Count = 0;
+        for (const auto& Event : Get_BornEvents(InKind))
+        {
+            if (Event.Frame == InFrame)
+            { ++Count; }
+        }
+
+        return Count;
+    }
+
+    // The bowl samples taken while the ledger read Dipped, and the largest distance among them (-1 without one).
+    protected int32 Get_BornDippedSampleCount() const
+    {
+        auto Count = 0;
+        for (const auto& Sample : _BornBowlSamples)
+        {
+            if (Sample.Bowl == EMars_Batter_Bowl::Dipped)
+            { ++Count; }
+        }
+
+        return Count;
+    }
+
+    protected float64 Get_BornWorstDippedCm() const
+    {
+        auto Worst = -1.0;
+        for (const auto& Sample : _BornBowlSamples)
+        {
+            if (Sample.Bowl == EMars_Batter_Bowl::Dipped && Sample.DippedErrorCm > Worst)
+            { Worst = Sample.DippedErrorCm; }
+        }
+
+        return Worst;
+    }
+
+    protected FString Describe_Born()
+    {
+        auto Notifies = "";
+        for (int32 Index = 0; Index < _BornNotifyFrames.Num(); ++Index)
+        { Notifies += f"{_BornNotifyFrames[Index]}:{Describe_BornNotify(Index)} "; }
+
+        auto Events = "";
+        for (const auto& Event : _BornEvents)
+        { Events += f"{Event.Kind :n}{Describe_BornValue(Event)}@{Event.Frame} "; }
+
+        auto Text = f"watched@{_BornFoundFrame} rigFound@{_BornRigFoundFrame} initialAtFind={_BornInitialAtFind :n} "
+            + f"initial={Get_BornInitialState() :n}";
+        if (Get_HeatStation() == EMars_TESTONLY_HeatStation::Searing)
+        { Text += f" panInitial={Get_BornPanInitialState() :n}"; }
+
+        Text += f" notifies=[{Notifies}] events=[{Events}]";
+        if (Get_HeatStation() == EMars_TESTONLY_HeatStation::Batter)
+        { Text += f" bowlSamples={_BornBowlSamples.Num()} dippedSamples={Get_BornDippedSampleCount()} worstDippedCm={Get_BornWorstDippedCm()}"; }
+
+        return Text;
+    }
+
+    // The counts the InIndex-th recorded notify carried: the bowl's bowl/serial/rows/admission and take-out refusals,
+    // the pan's heat/rows/take-out refusals, the tumbler's hatch/press and take-out refusals.
+    private FString Describe_BornNotify(int32 InIndex) const
+    {
+        if (Get_HeatStation() == EMars_TESTONLY_HeatStation::Searing)
+        {
+            const auto& Ledger = _BornSearingLedgers[InIndex];
+            return f"{Ledger.Heat :n}/{Ledger.Pieces.Num()}/{Ledger.TakeOutRefusalSerial}";
+        }
+
+        if (Get_HeatStation() == EMars_TESTONLY_HeatStation::Tumbler)
+        {
+            const auto& Ledger = _BornTumblerLedgers[InIndex];
+            return f"{Ledger.Hatch :n}/{Ledger.PressRefusalSerial}/{Ledger.TakeOutRefusalSerial}";
+        }
+
+        const auto& Ledger = _BornBatterLedgers[InIndex];
+        return f"{Ledger.Bowl :n}/{Ledger.BowlSerial}/{Ledger.Pieces.Num()}/{Ledger.AdmissionRefusalSerial}/{Ledger.TakeOutRefusalSerial}";
+    }
+
+    private FString Describe_BornValue(const FMars_TESTONLY_NetHeatBornEvent& InEvent) const
+    {
+        if (InEvent.Kind == EMars_TESTONLY_NetHeatBornEventKind::BowlChanged)
+        { return f":{EMars_Batter_Bowl(InEvent.Value) :n}"; }
+
+        if (InEvent.Kind == EMars_TESTONLY_NetHeatBornEventKind::HeatChanged)
+        { return f":{EMars_Searing_Heat(InEvent.Value) :n}"; }
+
+        if (InEvent.Kind == EMars_TESTONLY_NetHeatBornEventKind::HatchChanged)
+        { return f":{EMars_Tumbler_Hatch(InEvent.Value) :n}"; }
+
+        return "";
+    }
+
+    private void Add_BornEvent(EMars_TESTONLY_NetHeatBornEventKind InKind, int32 InValue)
+    {
+        auto Event = FMars_TESTONLY_NetHeatBornEvent();
+        Event.Kind = InKind;
+        Event.Frame = utils_time::Get_FrameCounter();
+        Event.Value = InValue;
+        _BornEvents.Add(Event);
+    }
+
     // The tumbler's Movers and hand node as this machine shows them this frame (the tumbler station only).
     private void Sample_Movers()
     {
@@ -1424,7 +1810,9 @@ class UMars_AutoTestRig_NetHeatStation : UMars_AutoTestRig_NetFeedStation
     protected void Spawn_HeatStation()
     {
         auto Owner = utils_mars_net::Get_ReplicatedSpawnOwner(Get_SubjectEntity());
-        if (Get_HeatStation() == EMars_TESTONLY_HeatStation::Searing)
+        if (_HeatStationBirth == EMars_TESTONLY_HeatStationBirth::Born)
+        { _FeedStationEntity = Spawn_BornHeatStation(Owner); }
+        else if (Get_HeatStation() == EMars_TESTONLY_HeatStation::Searing)
         { _FeedStationEntity = Spawn_SearingStation(Owner); }
         else if (Get_HeatStation() == EMars_TESTONLY_HeatStation::Fry)
         { _FeedStationEntity = Spawn_FryStation(Owner); }
@@ -1439,6 +1827,41 @@ class UMars_AutoTestRig_NetHeatStation : UMars_AutoTestRig_NetFeedStation
 
         Track_ForCleanup(_FeedStationEntity);
         WaitUntil(n"Is_RigHeatStationReady", n"OnRigHeatStationReady", k_SlowPolls);
+    }
+
+    // The born class of the hooked station with that station's spawn params and the hook's spec, as the map's spawner
+    // makes it (its own context). There is no born fry station.
+    private FCk_Handle Spawn_BornHeatStation(FCk_Handle InOwner)
+    {
+        const auto Transform = FTransform(FRotator::ZeroRotator, Get_StationLocation());
+        auto Station = FCk_Handle();
+        if (Get_HeatStation() == EMars_TESTONLY_HeatStation::Batter)
+        {
+            auto Params = UMars_BatterStation_EntityScript::Params();
+            Params.SpawnTransform = Transform;
+            Params.Batter = Make_BatterSpec();
+            Station = utils_entity_script::Request_SpawnEntity(InOwner, UMars_TESTONLY_NetBatterStation_Born_EntityScript, Params).Get_EntityUnderConstruction();
+        }
+        else if (Get_HeatStation() == EMars_TESTONLY_HeatStation::Searing)
+        {
+            auto Params = UMars_SearingStation_EntityScript::Params();
+            Params.SpawnTransform = Transform;
+            Params.Searing = Make_SearingSpec();
+            Station = utils_entity_script::Request_SpawnEntity(InOwner, UMars_TESTONLY_NetSearingStation_Born_EntityScript, Params).Get_EntityUnderConstruction();
+        }
+        else if (Get_HeatStation() == EMars_TESTONLY_HeatStation::Tumbler)
+        {
+            auto Params = UMars_TumblerStation_EntityScript::Params();
+            Params.SpawnTransform = Transform;
+            Params.Tumbler = Make_TumblerSpec();
+            Station = utils_entity_script::Request_SpawnEntity(InOwner, UMars_TESTONLY_NetTumblerStation_Born_EntityScript, Params).Get_EntityUnderConstruction();
+        }
+
+        if (ck::EnsureIfNot(ck::IsValid(Station), f"{Get_LogTag()} there is no born {Get_HeatStation() :n} station"))
+        { return Station; }
+
+        Station.Request_OverrideToSelf();
+        return Station;
     }
 
     // The real searing station with the test's exposed Searing spec, as the map's spawner makes it (its own context).
@@ -2197,5 +2620,113 @@ class UMars_AutoTestRig_NetHeatStation : UMars_AutoTestRig_NetFeedStation
     private void OnRigTumblerPieceAdded(FCk_Handle_Tumbler InTumbler, FMars_CookingFeed_PieceId InPieceId, FCk_Handle InPiece)
     {
         _TumblerAddedIds.Add(InPieceId);
+    }
+
+    UFUNCTION()
+    private void OnBornBowlChanged(FCk_Handle_Batter InBatter, EMars_Batter_Bowl InBowl)
+    {
+        Add_BornEvent(EMars_TESTONLY_NetHeatBornEventKind::BowlChanged, int32(InBowl));
+    }
+
+    UFUNCTION()
+    private void OnBornBatterPieceAdded(FCk_Handle_Batter InBatter, FMars_CookingFeed_PieceId InPieceId, FCk_Handle InPiece)
+    {
+        Add_BornEvent(EMars_TESTONLY_NetHeatBornEventKind::PieceAdded, 0);
+        _BornAddedIds.Add(InPieceId);
+    }
+
+    UFUNCTION()
+    private void OnBornAdmissionRefused(FCk_Handle_Batter InBatter, FMars_CookingFeed_PieceId InPieceId, EMars_Batter_AdmissionRefusal InRefusal)
+    {
+        Add_BornEvent(EMars_TESTONLY_NetHeatBornEventKind::AdmissionRefused, 0);
+    }
+
+    UFUNCTION()
+    private void OnBornBatterTakeOutRefused(FCk_Handle_Batter InBatter, EMars_Batter_TakeOutRefusal InRefusal)
+    {
+        Add_BornEvent(EMars_TESTONLY_NetHeatBornEventKind::TakeOutRefused, 0);
+    }
+
+    UFUNCTION()
+    private void OnBornHeatChanged(FCk_Handle_Searing InSearing, EMars_Searing_Heat InHeat)
+    {
+        Add_BornEvent(EMars_TESTONLY_NetHeatBornEventKind::HeatChanged, int32(InHeat));
+    }
+
+    UFUNCTION()
+    private void OnBornPanTakeOutRefused(FCk_Handle_Searing InSearing, EMars_CookingFeed_TakeOutRefusal InRefusal)
+    {
+        Add_BornEvent(EMars_TESTONLY_NetHeatBornEventKind::TakeOutRefused, 0);
+    }
+
+    UFUNCTION()
+    private void OnBornFaceSeared(FCk_Handle_Searing InSearing, FMars_CookingFeed_PieceId InPieceId, EMars_FoodPiece_Face InFace)
+    {
+        Add_BornEvent(EMars_TESTONLY_NetHeatBornEventKind::FaceSeared, 0);
+    }
+
+    UFUNCTION()
+    private void OnBornPanPieceAdded(FCk_Handle_Searing InSearing, FMars_CookingFeed_PieceId InPieceId, FCk_Handle InPiece)
+    {
+        Add_BornEvent(EMars_TESTONLY_NetHeatBornEventKind::PieceAdded, 0);
+        _BornAddedIds.Add(InPieceId);
+    }
+
+    UFUNCTION()
+    private void OnBornPressRefused(FCk_Handle_Tumbler InTumbler, EMars_Tumbler_Refusal InRefusal)
+    {
+        Add_BornEvent(EMars_TESTONLY_NetHeatBornEventKind::PressRefused, 0);
+    }
+
+    UFUNCTION()
+    private void OnBornTumblerTakeOutRefused(FCk_Handle_Tumbler InTumbler, EMars_CookingFeed_TakeOutRefusal InRefusal)
+    {
+        Add_BornEvent(EMars_TESTONLY_NetHeatBornEventKind::TakeOutRefused, 0);
+    }
+
+    UFUNCTION()
+    private void OnBornHatchChanged(FCk_Handle_Tumbler InTumbler, EMars_Tumbler_Hatch InHatch)
+    {
+        Add_BornEvent(EMars_TESTONLY_NetHeatBornEventKind::HatchChanged, int32(InHatch));
+    }
+
+    UFUNCTION()
+    private void OnBornTumblerPieceAdded(FCk_Handle_Tumbler InTumbler, FMars_CookingFeed_PieceId InPieceId, FCk_Handle InPiece)
+    {
+        Add_BornEvent(EMars_TESTONLY_NetHeatBornEventKind::PieceAdded, 0);
+        _BornAddedIds.Add(InPieceId);
+    }
+
+    // A notify can land on a station already ending.
+    UFUNCTION()
+    private void OnBornBatterNotify(FCk_Handle InHandle, FCk_DynamicFragment_RepNotifyInfo InInfo)
+    {
+        if (Get_IsLive(InHandle) == false || InHandle.Has_Fragment(FMars_Fragment_Batter_Net) == false)
+        { return; }
+
+        _BornNotifyFrames.Add(utils_time::Get_FrameCounter());
+        _BornBatterLedgers.Add(InHandle.Get_Fragment(FMars_Fragment_Batter_Net));
+    }
+
+    // A notify can land on a station already ending.
+    UFUNCTION()
+    private void OnBornSearingNotify(FCk_Handle InHandle, FCk_DynamicFragment_RepNotifyInfo InInfo)
+    {
+        if (Get_IsLive(InHandle) == false || InHandle.Has_Fragment(FMars_Fragment_Searing_Net) == false)
+        { return; }
+
+        _BornNotifyFrames.Add(utils_time::Get_FrameCounter());
+        _BornSearingLedgers.Add(InHandle.Get_Fragment(FMars_Fragment_Searing_Net));
+    }
+
+    // A notify can land on a station already ending.
+    UFUNCTION()
+    private void OnBornTumblerNotify(FCk_Handle InHandle, FCk_DynamicFragment_RepNotifyInfo InInfo)
+    {
+        if (Get_IsLive(InHandle) == false || InHandle.Has_Fragment(FMars_Fragment_Tumbler_Net) == false)
+        { return; }
+
+        _BornNotifyFrames.Add(utils_time::Get_FrameCounter());
+        _BornTumblerLedgers.Add(InHandle.Get_Fragment(FMars_Fragment_Tumbler_Net));
     }
 }

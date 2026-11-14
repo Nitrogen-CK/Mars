@@ -1,9 +1,12 @@
-// The platter first; then a whole food and a cut half lie loose; then the station. In the continuation in which the server
-// first finds its station it admits the food and the half (refused NotWhole) and dips the bowl, holds 4 s, lifts and
-// reports (step 1). The client starts counting only once its ledger reads one admission refusal, one row and Dipped and its
-// copy announced that row (a listener that arrives after them): OnPieceAdded was raised for the row once before that, and
-// a second later its copy hangs under its bowl at the dipped offset (0.5 cm). From the clear to step 1 it raised
-// OnBowlChanged Resting once, no OnAdmissionRefused and no OnPieceAdded.
+// The platter first; then a whole food lies loose; then the born bowl, whose authority, as it composes, releases the
+// food twice into its inbox, asks a take-out naming no tray and dips: its spawn-frame drain refuses the take-out,
+// adopts the food, refuses the second release Duplicate and dips. A copy is born into that bowl. Once its ledger reads
+// it, the server holds 4 s, asks a take-out naming no tray and a lift together, and once its ledger reads Resting and
+// two refused take-outs reports (step 1). The client's watch finds its copy before the first application of its ledger,
+// which carries the born bowl; a settled second after step 1 its copy has raised only what came after:
+// OnAdmissionRefused never, OnTakeOutRefused once (after that application), OnBowlChanged Dipped (in that frame) then
+// Resting, OnPieceAdded once for the row; and every frame its piece sat under the bowl while the ledger read Dipped it
+// sat at the dipped offset (0.5 cm).
 // Surface: Ck.Batter.Net.AS_Batter_ALateBinderStartsFromTheLedgerAsItStands
 class UCk_AutoTest_Net_Batter_ALateBinderStartsFromTheLedgerAsItStands : UMars_AutoTestRig_NetHeatStation
 {
@@ -11,14 +14,6 @@ class UCk_AutoTest_Net_Batter_ALateBinderStartsFromTheLedgerAsItStands : UMars_A
 
     private const float64 k_X = 306000.0;
     private const float32 k_DipHoldSeconds = 4.0f;
-    private const float32 k_PoseSettleSeconds = 1.0f;
-
-    // Client: what it saw when its ledger first stood as the server left it.
-    private int32 _AddedBeforeClear = -1;
-    private int32 _AddedBeforeBindAtClear = -1;
-    private int64 _FoundFrame = -1;
-    private int64 _ClearFrame = -1;
-    private float64 _PoseErrorCm = -1.0;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
@@ -27,9 +22,10 @@ class UCk_AutoTest_Net_Batter_ALateBinderStartsFromTheLedgerAsItStands : UMars_A
         { FinishFailure("subject entity not found"); return; }
 
         _ServerActsOnFirstFind = true;
+        _HeatStationBirth = EMars_TESTONLY_HeatStationBirth::Born;
         Begin_HeatStationRig(InHandle, k_X);
         if (Get_IsServer() == false)
-        { WaitUntil(n"Is_ClientLedgerStands", n"OnClientLedgerStands", k_SlowPolls); }
+        { Await_Step(1); }
     }
 
     //----------------------------------------------------------------------------------------------------------------------
@@ -44,88 +40,99 @@ class UCk_AutoTest_Net_Batter_ALateBinderStartsFromTheLedgerAsItStands : UMars_A
     UFUNCTION()
     private void OnServerFoods(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
     {
-        Spawn_CutHalfThen(n"OnServerHalf");
-    }
-
-    UFUNCTION()
-    private void OnServerHalf(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
-    {
         Spawn_HeatStation();
     }
 
     protected void On_ServerFeedStationReady() override
     {
-        _Followed.Add(_Foods[0].As_FoodPiece());
-        Admit(_Foods[0].As_FoodPiece());
-        Admit(_CutHalf);
-        _Batter.Request_Dip(FMars_Request_Batter_Dip());
+        WaitUntil(n"Is_ServerBorn", n"OnServerBorn", k_SlowPolls);
+    }
+
+    UFUNCTION()
+    private void Is_ServerBorn(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        const auto Ledger = _Batter.Get_Ledger();
+        auto Result = OutResult;
+        Result.Set(Ledger.Pieces.Num() == 1 && Ledger.Bowl == EMars_Batter_Bowl::Dipped && Ledger.AdmissionRefusalSerial == 1
+            && Ledger.LastAdmissionRefusal == EMars_Batter_AdmissionRefusal::Duplicate && Ledger.TakeOutRefusalSerial == 1);
+    }
+
+    UFUNCTION()
+    private void OnServerBorn(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
+    {
+        Log_HeatStation(f"born: {Describe_BatterLedger()} {Describe_Born()}");
         WaitSeconds(k_DipHoldSeconds, n"OnServerHeld");
     }
 
     UFUNCTION()
     private void OnServerHeld(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
     {
+        Request_TakeOutWithoutTray();
         _Batter.Request_Lift(FMars_Request_Batter_Lift());
+        WaitUntil(n"Is_ServerLifted", n"OnServerLifted", k_SlowPolls);
+    }
+
+    UFUNCTION()
+    private void Is_ServerLifted(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        const auto Ledger = _Batter.Get_Ledger();
+        auto Result = OutResult;
+        Result.Set(Ledger.Bowl == EMars_Batter_Bowl::Resting && Ledger.TakeOutRefusalSerial == 2);
+    }
+
+    UFUNCTION()
+    private void OnServerLifted(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
+    {
         Mark_Time("step1");
         Report_HeatStep(1);
-        Assert_True(_AdmissionRefusals.Num() == 1 && _AdmissionRefusals[0] == EMars_Batter_AdmissionRefusal::NotWhole,
-            f"the server refused the half once, NotWhole ({Describe_BatterRecord()})");
-        End_HeatServer(f"{Describe_Bowl()} {Describe_BatterLedger()} {Describe_BatterRecord()}");
+        const auto Ledger = _Batter.Get_Ledger();
+        Assert_Equals_Int(Ledger.Pieces.Num(), 1, f"the server's bowl holds one row ({Describe_BatterLedger()})");
+        Assert_Equals_Int(Ledger.BowlSerial, 2, "the server's bowl changed twice (dipped, then lifted)");
+        Assert_True(Ledger.AdmissionRefusalSerial == 1 && Ledger.LastAdmissionRefusal == EMars_Batter_AdmissionRefusal::Duplicate,
+            f"the server refused one admission, Duplicate ({Describe_BatterLedger()})");
+        Assert_Equals_Int(Ledger.TakeOutRefusalSerial, 2, "the server refused two take-outs");
+        End_HeatServer(f"{Describe_Bowl()} {Describe_BatterLedger()} {Describe_Born()}");
     }
 
     //----------------------------------------------------------------------------------------------------------------------
     // Client
     //----------------------------------------------------------------------------------------------------------------------
 
-    UFUNCTION()
-    private void Is_ClientLedgerStands(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
-    {
-        auto Result = OutResult;
-        if (Try_FindHeatStation() == false)
-        {
-            Result.Set(false);
-            return;
-        }
-
-        if (_FoundFrame < 0)
-        { _FoundFrame = utils_time::Get_FrameCounter(); }
-
-        const auto Ledger = _Batter.Get_Ledger();
-        Result.Set(Ledger.AdmissionRefusalSerial == 1 && Ledger.Pieces.Num() == 1 && Ledger.Bowl == EMars_Batter_Bowl::Dipped
-            && Get_IsAnnounced(Ledger.Pieces[0].Id));
-    }
-
-    // The listener arrives now: what its copy raised before is not its to count.
-    UFUNCTION()
-    private void OnClientLedgerStands(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
-    {
-        _ClearFrame = utils_time::Get_FrameCounter();
-        const auto Id = _Batter.Get_Ledger().Pieces[0].Id;
-        _AddedBeforeClear = Get_AddedCount(Id);
-        _AddedBeforeBindAtClear = _AddedBeforeBind;
-        Log_HeatStation(f"before the clear: {Describe_BatterRecord()} foundFrame={_FoundFrame} clearFrame={_ClearFrame}");
-        Clear_BatterRecord();
-        Assert_Equals_Int(_AddedBeforeClear, 1, "the client raised OnPieceAdded for the row once before it started counting");
-        WaitSeconds(k_PoseSettleSeconds, n"OnClientPoseSettled");
-    }
-
-    UFUNCTION()
-    private void OnClientPoseSettled(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
-    {
-        const auto Ids = _Batter.Get_PieceIds();
-        _PoseErrorCm = Ids.Num() == 1 ? Get_SlotErrorCm(Get_BowlCopy(Ids[0]), Get_SlotOf(Ids[0]), 1.0f) : -1.0;
-        Assert_True(_PoseErrorCm >= 0.0 && _PoseErrorCm <= constants_heat_station_net_autotest::k_OffsetToleranceCm,
-            f"the client's copy hangs under its bowl at the dipped offset (off by {_PoseErrorCm} cm; {Describe_BatterLedger()})");
-        Await_Step(1);
-    }
-
+    // A settled second after step 1.
     protected void On_ClientStep(int32 InStep) override
     {
         Mark_Time("step1");
-        Assert_True(_BowlChanges.Num() == 1 && _BowlChanges[0] == EMars_Batter_Bowl::Resting,
-            f"since it started counting the client raised OnBowlChanged Resting once ({Describe_BatterRecord()})");
-        Assert_Equals_Int(_AdmissionRefusals.Num(), 0, "the client raised no earlier refusal again");
-        Assert_Equals_Int(_AddedIds.Num(), 0, "the client raised no OnPieceAdded again");
-        End_HeatClient(f"addedBeforeClear={_AddedBeforeClear} addedBeforeBind={_AddedBeforeBindAtClear} foundFrame={_FoundFrame} clearFrame={_ClearFrame} poseErrorCm={_PoseErrorCm} {Describe_Bowl()} {Describe_BatterLedger()} {Describe_BatterRecord()}");
+        const auto Line = f"{Describe_Born()} {Describe_BatterLedger()}";
+        const auto First = Get_BornFirstBatterLedger();
+        const auto FirstFrame = Get_BornFirstNotifyFrame();
+        const auto Ledger = _Batter.Get_Ledger();
+
+        Assert_True(Get_HasBornFirstNotify(), f"the client recorded the ledger's first application ({Line})");
+        Assert_True(_BornInitialAtFind == EMars_Net_InitialState::Awaited, f"the client watched its copy before it took its state ({Line})");
+        Assert_True(Get_BornInitialState() == EMars_Net_InitialState::Taken, f"the client's copy took the state it was born into ({Line})");
+        Assert_True(First.Bowl == EMars_Batter_Bowl::Dipped && First.BowlSerial == 1 && First.Pieces.Num() == 1
+            && First.AdmissionRefusalSerial == 1 && First.TakeOutRefusalSerial == 1,
+            f"the first application carried the born bowl: dipped, one row, one refused admission and take-out ({Line})");
+
+        Assert_Equals_Int(Get_BornEventCount(EMars_TESTONLY_NetHeatBornEventKind::AdmissionRefused),
+            Ledger.AdmissionRefusalSerial - First.AdmissionRefusalSerial, f"OnAdmissionRefused only for what came after ({Line})");
+        const auto TakeOuts = Get_BornEvents(EMars_TESTONLY_NetHeatBornEventKind::TakeOutRefused);
+        Assert_Equals_Int(TakeOuts.Num(), Ledger.TakeOutRefusalSerial - First.TakeOutRefusalSerial,
+            f"OnTakeOutRefused only for what came after ({Line})");
+        Assert_True(TakeOuts.Num() == 0 || TakeOuts[0].Frame > FirstFrame, f"no take-out refusal in the first application's frame ({Line})");
+
+        const auto Bowls = Get_BornEvents(EMars_TESTONLY_NetHeatBornEventKind::BowlChanged);
+        Assert_True(Bowls.Num() == 2 && Bowls[0].Value == int32(EMars_Batter_Bowl::Dipped) && Bowls[0].Frame == FirstFrame
+            && Bowls[1].Value == int32(EMars_Batter_Bowl::Resting),
+            f"OnBowlChanged Dipped in the first application's frame, then Resting ({Line})");
+
+        Assert_True(_BornAddedIds.Num() == 1 && Ledger.Pieces.Num() == 1 && _BornAddedIds[0].Get_IsSame(Ledger.Pieces[0].Id),
+            f"OnPieceAdded once, for the row ({Line})");
+        Assert_True(Get_BornDippedSampleCount() > 0, f"the piece sat under the bowl while the ledger read Dipped ({Line})");
+        Assert_True(Get_BornWorstDippedCm() >= 0.0 && Get_BornWorstDippedCm() <= constants_heat_station_net_autotest::k_OffsetToleranceCm,
+            f"from the first frame it sat under the bowl it sat at the dipped offset ({Line})");
+        Assert_True(Ledger.Pieces.Num() == 1 && Ledger.Bowl == EMars_Batter_Bowl::Resting && Ledger.BowlSerial == 2,
+            f"the client's ledger reads one row, Resting, serial 2 ({Line})");
+        End_HeatClient(Line);
     }
 }

@@ -1,11 +1,12 @@
-// Stance: the bowl is the authority's. Only the authority's copy admits, dips, lifts, coats, takes out and readopts; a copy
-// without authority drops every bowl request (and the releases and take-outs its station queued) and reads the bowl
-// through a replicated ledger on the station: whether it is dipped, which pieces are in it at which slot, each coat
-// floored to a tenth, and serials for the refusals the authority announced. On that copy the bowl's tick only shows: it
-// sinks and lifts this machine's own copies of the pieces under its own bowl node by the kernel's law, raises
-// OnPieceAdded and OnPieceTakenOut as a piece's row appears and goes, and its mirror raises OnAdmissionRefused (naming no
-// piece), OnTakeOutRefused and OnBowlChanged from the ledger. OnCoatStage, the coat clock, the pieces' cook state, holder
-// facts and pickup claims never leave the authority.
+// Stance: the bowl is the authority's. Only the authority's copy admits, dips, lifts, coats, takes out and readopts; a
+// copy without authority drops every bowl request (and the releases and take-outs its station queued) and reads the
+// bowl through a replicated ledger on the station: whether it is dipped, which pieces are in it at which slot, each
+// coat floored to a tenth, and serials for the refusals the authority announced. On that copy the bowl's tick only
+// shows: it sinks and lifts this machine's own copies of the pieces under its own bowl node by the kernel's law, raises
+// OnPieceAdded and OnPieceTakenOut as a piece's row appears and goes, and its mirror raises OnAdmissionRefused (naming
+// no piece), OnTakeOutRefused and OnBowlChanged from the ledger, raising what the authority raises after the state its
+// copy was born into. OnCoatStage, the coat clock, the pieces' cook state, holder facts and pickup claims never leave
+// the authority.
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
@@ -311,11 +312,15 @@ struct FMars_Batter_LocalRow
     EMars_Batter_Announce Announce = EMars_Batter_Announce::Unannounced;
 }
 
-// Each machine's own: the ledger it last reconciled (unset with authority) and its rows (used only without authority).
+// Each machine's own: the ledger it last reconciled (unset with authority), whether this copy has taken the state it
+// was born into, and its rows (used only without authority).
 struct FMars_Fragment_Batter_Local
 {
     UPROPERTY()
     TOptional<FMars_Fragment_Batter_Net> Last;
+
+    UPROPERTY()
+    EMars_Net_InitialState InitialState = EMars_Net_InitialState::Awaited;
 
     UPROPERTY()
     TArray<FMars_Batter_LocalRow> Rows;

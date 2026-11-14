@@ -37,10 +37,11 @@ namespace utils_tumbler
 
     // Composes the minigame on InStation (the station entity, which carries the root transform) and makes the station a
     // receiver: its admission inbox and its take-out readout. The spec's Nodes are built by the caller (the shell with
-    // Add_DrumBodies, the hatch plate with Add_HatchBody): the hand starts Free at the workspace centre, the hatch and the
-    // drum in whatever state their Movers are in. Nothing is in the drum until the inbox brings a piece. A rejected spec, a
-    // missing node, a lever that is not a ManuallyCompleted Control with a Mover, or a hand node not on the station root
-    // ensures and returns an invalid handle.
+    // Add_DrumBodies, the hatch plate with Add_HatchBody): the hand starts Free at the workspace centre, the hatch and
+    // the drum in whatever state their Movers are in. Nothing is in the drum until the inbox brings a piece. A rejected
+    // spec, a missing node, a lever that is not a ManuallyCompleted Control with a Mover, or a hand node not on the
+    // station root ensures and returns an invalid handle. A kernel ledger that arrived before is the state this copy
+    // was born into, and it has then taken it.
     FCk_Handle_Tumbler Add(FCk_Handle& InStation, FMars_Tumbler_Spec InSpec)
     {
         const auto Validation = InSpec.Validate();
@@ -88,9 +89,14 @@ namespace utils_tumbler
         utils_cooking_feed::Add_Admission(InStation);
         utils_cooking_feed::Add_TakeOut(InStation);
 
-        // A copy without authority can receive either ledger before it composes: what arrived stands then. A motion ledger
-        // composed here starts where this copy's drum and hand start, the authority's own starting pose.
-        if (InStation.Has_Fragment(FMars_Fragment_Tumbler_Net) == false)
+        // A kernel ledger already here can only have been put here by its replicated application: this copy was born
+        // into it, has taken that state, and the mirror's first pass shows it as it stands. A motion ledger that
+        // arrived stands; one composed here starts where this copy's drum and hand start, the authority's own starting
+        // pose.
+        auto Local = FMars_Fragment_Tumbler_Local();
+        if (InStation.Has_Fragment(FMars_Fragment_Tumbler_Net))
+        { Local.InitialState = EMars_Net_InitialState::Taken; }
+        else
         { InStation.Add_Fragment(FMars_Fragment_Tumbler_Net(), ECk_Replication::Replicates); }
 
         if (InStation.Has_Fragment(FMars_Fragment_Tumbler_MotionNet) == false)
@@ -102,8 +108,8 @@ namespace utils_tumbler
             InStation.Add_Fragment(Motion, ECk_Replication::Replicates);
         }
 
-        auto Local = FMars_Fragment_Tumbler_Local();
-        Local.Last = TOptional<FMars_Fragment_Tumbler_Net>(InStation.Get_Fragment(FMars_Fragment_Tumbler_Net));
+        // The mirror compares what arrives against the ledger this machine composed.
+        Local.Last = TOptional<FMars_Fragment_Tumbler_Net>(FMars_Fragment_Tumbler_Net());
         Local.ShownDrumAlpha = InStation.Get_Fragment(FMars_Fragment_Tumbler_MotionNet).DrumAlpha;
         InStation.Add_Fragment(Local);
         InStation.Add_Fragment(FMars_Tag_Tumbler_NeedsMirror());
