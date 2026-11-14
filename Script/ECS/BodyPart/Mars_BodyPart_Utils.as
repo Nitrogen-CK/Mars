@@ -1,9 +1,11 @@
 namespace utils_body_part
 {
     // Composes a part on InPartEntity: its own Health, a HitZone feeding it, the condition ledger and the depletion
-    // policy, then registers it on InSpec.Monster. For a DetachLeg part InPartEntity IS the procedural leg (the leg entity
-    // carries the part; there is no separate part entity), and the leg must be attached. A rejected spec ensures and
-    // returns an invalid handle with nothing composed.
+    // policy, then registers it on InSpec.Monster: last in the monster's part roster (every machine's own), and, with
+    // authority over the monster, with a default entry in its replicated ledger. Its zone is addressed through the
+    // monster. For a DetachLeg part InPartEntity IS the procedural leg (the leg entity carries the part; there is no
+    // separate part entity), and the leg must be attached. A rejected spec ensures and returns an invalid handle with
+    // nothing composed.
     FCk_Handle_BodyPart Add(FCk_Handle& InPartEntity, FMars_BodyPart_Spec InSpec)
     {
         const auto Validation = InSpec.Validate();
@@ -24,9 +26,34 @@ namespace utils_body_part
         if (ck::Is_NOT_Valid(Health))
         { return FCk_Handle_BodyPart(); }
 
-        auto Zone = utils_hit_zone::Add(InPartEntity, InSpec.Zone);
+        // Known through its monster, so its address crosses the wire: the monster's body zone is that root's zone 0 and
+        // the parts follow in the order they are added.
+        auto ZoneSpec = InSpec.Zone;
+        ZoneSpec.Root = InSpec.Monster;
+        auto Zone = utils_hit_zone::Add(InPartEntity, ZoneSpec);
         if (ck::Is_NOT_Valid(Zone))
         { return FCk_Handle_BodyPart(); }
+
+        auto Monster = InSpec.Monster;
+        FCk_Handle MonsterEntity = Monster;
+
+        // The mirror compares what arrives against an empty ledger, not one that already arrived.
+        if (MonsterEntity.Has_Fragment(FMars_Fragment_BodyPart_Roster) == false)
+        {
+            auto Roster = FMars_Fragment_BodyPart_Roster();
+            Roster.Last = TOptional<FMars_Fragment_BodyPart_Net>(FMars_Fragment_BodyPart_Net());
+            MonsterEntity.Add_Fragment(Roster);
+            MonsterEntity.Add_Fragment(FMars_Tag_BodyPart_RosterNeedsMirror());
+        }
+
+        // A client's copy can receive the replicated ledger before it composes: the arrived ledger stands then.
+        if (MonsterEntity.Has_Fragment(FMars_Fragment_BodyPart_Net) == false)
+        {
+            auto Ledger = FMars_Fragment_BodyPart_Net();
+            MonsterEntity.Add_Fragment(Ledger, ECk_Replication::Replicates);
+        }
+
+        const auto RosterIndex = MonsterEntity.Get_Fragment(FMars_Fragment_BodyPart_Roster).Parts.Num();
 
         auto Params = FMars_Fragment_BodyPart_Params();
         Params.Spec = InSpec;
@@ -35,6 +62,7 @@ namespace utils_body_part
         State.Leg = Leg;
         State.Health = Health;
         State.Zone = Zone;
+        State.RosterIndex = RosterIndex;
 
         InPartEntity.Add_Fragment(FMars_Feature_BodyPart());
         InPartEntity.Add_Fragment(Params);
@@ -42,9 +70,47 @@ namespace utils_body_part
         InPartEntity.Add_Fragment(FMars_Tag_BodyPart_NeedsSetup());
 
         auto Part = InPartEntity.As_BodyPart();
-        auto Monster = InSpec.Monster;
+        // Re-fetched: the adds above may move the storage.
+        MonsterEntity.Get_Fragment(FMars_Fragment_BodyPart_Roster).Parts.Add(Part);
+
+        if (utils_net::Get_HasAuthority(MonsterEntity))
+        { Write_Ledger(Monster, RosterIndex, TOptional<FMars_BodyPart_NetEntry>()); }
+
         Monster.Request_RegisterPart(FMars_Request_Monster_RegisterPart(Part));
         return Part;
+    }
+
+    // Writes InPart's state and condition at its index in its monster's ledger. Called only by the part's processors, with
+    // authority over the part; a severed limb can outlive its monster, and then there is no ledger to write.
+    void Publish(FCk_Handle_BodyPart& InPart)
+    {
+        auto Monster = InPart.Get_Monster();
+        if (ck::Is_NOT_Valid(Monster))
+        { return; }
+
+        const auto State = InPart.Get_Fragment(FMars_Fragment_BodyPart);
+        auto Entry = FMars_BodyPart_NetEntry();
+        Entry.State = State.State;
+        Entry.Condition = State.Condition;
+        Write_Ledger(Monster, State.RosterIndex, TOptional<FMars_BodyPart_NetEntry>(Entry));
+    }
+
+    // The ledger's only writer, on the authority: grows InMonster's ledger to cover InIndex (new entries default) and, with
+    // InEntry set, writes it at InIndex.
+    void Write_Ledger(FCk_Handle_Monster InMonster, int32 InIndex, TOptional<FMars_BodyPart_NetEntry> InEntry)
+    {
+        FCk_Handle Entity = InMonster;
+        if (ck::EnsureIfNot(Entity.Has_Fragment(FMars_Fragment_BodyPart_Net), f"[BodyPart] [{Entity.ToString()}] has no part ledger: its parts were not composed through utils_body_part::Add"))
+        { return; }
+
+        auto& Ledger = Entity.Get_Fragment(FMars_Fragment_BodyPart_Net);
+        while (Ledger.Parts.Num() <= InIndex)
+        { Ledger.Parts.Add(FMars_BodyPart_NetEntry()); }
+
+        if (InEntry.IsSet())
+        { Ledger.Parts[InIndex] = InEntry.GetValue(); }
+
+        Entity.Request_MarkReplicationDirty(FMars_Fragment_BodyPart_Net);
     }
 }
 
@@ -101,6 +167,20 @@ mixin EMars_BodyPart_Condition Get_Condition(const FCk_Handle_BodyPart& Self)
 mixin float32 Get_RuinDamageTaken(const FCk_Handle_BodyPart& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_BodyPart).RuinDamageTaken;
+}
+
+mixin int32 Get_RosterIndex(const FCk_Handle_BodyPart& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_BodyPart).RosterIndex;
+}
+
+// The entry at InIndex; a default entry (Attached, Pristine) where the array does not reach.
+mixin FMars_BodyPart_NetEntry Get_Entry(const FMars_Fragment_BodyPart_Net& Self, int32 InIndex)
+{
+    if (Self.Parts.IsValidIndex(InIndex) == false)
+    { return FMars_BodyPart_NetEntry(); }
+
+    return Self.Parts[InIndex];
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

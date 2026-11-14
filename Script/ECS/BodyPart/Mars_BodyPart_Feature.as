@@ -1,3 +1,12 @@
+// Stance A. A part's hits and its sever are the authority's: only a machine with authority over the part applies RecordHit
+// and Sever. A part has no replication driver, so its state reaches other machines through the replicated ledger on its
+// monster's entity (FMars_Fragment_BodyPart_Net, one {state, condition} per part by composition order, the same on every
+// machine). A copy without authority drops RecordHit and Sever; its mirror (UMars_Processor_BodyPart_Mirror) applies each
+// changed entry to that machine's own part with the same break and detach the authority runs, so debris is each machine's
+// own, and raises OnConditionChanged, OnBroken and OnSevered. A mirrored cause is empty. A severed leg drops once on a
+// machine whose copy composes after the sever. A part's zone is addressed through its monster. A part's Health and its
+// ruin damage are the authority's alone.
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
 //--------------------------------------------------------------------------------------------------------------------------
@@ -220,8 +229,9 @@ struct FMars_Fragment_BodyPart_Params
 // State
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Written only by the BodyPart processors (and composed by Add). Readers count attached parts by State, never by handle
-// validity: a severed leg stays a valid, world-owned entity until its debris timer destroys it.
+// Written only by the BodyPart processors (the drain with authority, the mirror without) and composed by Add. Readers
+// count attached parts by State, never by handle validity: a severed leg stays a valid, world-owned entity until its
+// debris timer destroys it.
 struct FMars_Fragment_BodyPart
 {
     // The part entity as a leg; invalid for a non-leg part.
@@ -243,6 +253,10 @@ struct FMars_Fragment_BodyPart
     // Ruins-impact damage taken so far (scaled amounts).
     UPROPERTY()
     float32 RuinDamageTaken = 0.0f;
+
+    // The part's place in its monster's roster and ledger: the order the parts were composed, the same on every machine.
+    UPROPERTY()
+    int32 RosterIndex = 0;
 }
 
 // Lives between the sever drain and the leg's OnDetached callback: the cause OnSevered carries.
@@ -279,6 +293,42 @@ struct FMars_Fragment_BodyPart_PendingDebris
 }
 
 struct FMars_Tag_BodyPart_NeedsSetup {}
+
+//--------------------------------------------------------------------------------------------------------------------------
+// Ledger (on the monster's entity)
+//--------------------------------------------------------------------------------------------------------------------------
+
+// One part's state as every machine reads it, with no handle in it.
+struct FMars_BodyPart_NetEntry
+{
+    UPROPERTY()
+    EMars_BodyPart_State State = EMars_BodyPart_State::Attached;
+
+    UPROPERTY()
+    EMars_BodyPart_Condition Condition = EMars_BodyPart_Condition::Pristine;
+}
+
+// Replicated, one entry per part by roster index; an index the array does not reach reads as a default entry. Written
+// only by the authority's part processors, through utils_body_part.
+struct FMars_Fragment_BodyPart_Net
+{
+    UPROPERTY()
+    TArray<FMars_BodyPart_NetEntry> Parts;
+}
+
+// Each machine's own, never pruned: its parts in composition order, and the ledger its mirror last reconciled (unset
+// with authority).
+struct FMars_Fragment_BodyPart_Roster
+{
+    UPROPERTY()
+    TArray<FCk_Handle_BodyPart> Parts;
+
+    UPROPERTY()
+    TOptional<FMars_Fragment_BodyPart_Net> Last;
+}
+
+// Added with the roster, dropped by UMars_Processor_BodyPart_Mirror once it has bound the ledger's rep-notify.
+struct FMars_Tag_BodyPart_RosterNeedsMirror {}
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Signals
