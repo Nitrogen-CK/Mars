@@ -1,7 +1,9 @@
 // The den's single writer. Drains Emerge -> MarkOutside -> AdmitReturn -> ResidentDied -> SetEyes, then re-derives the eye
 // proxy once and broadcasts what changed. A MarkOutside / AdmitReturn / ResidentDied naming an operation id that is not the
 // slot's is stale: counted, logged at Display, never applied. AdmitReturn reads the rat's own pocket: a loaded rat is
-// refused (OnReturnRefused) and logged, never ensured - a loaded thief never goes home.
+// refused (OnReturnRefused) and logged, never ensured - a loaded thief never goes home. Only a machine with authority
+// over the den applies them; it publishes the eyes (utils_rat_den::Publish) before the signals are raised, and a copy
+// drops every request.
 class UMars_Processor_RatDen_HandleRequests : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -27,6 +29,10 @@ class UMars_Processor_RatDen_HandleRequests : UCk_Processor_Script_Base_UE
 
         // InRequests is invalid past this line; removing before broadcasting lets re-entrant requests survive.
         Self.Request_TryRemove(FMars_Fragment_RatDen_Requests);
+
+        const auto HasAuthority = utils_net::Get_HasAuthority(InHandle);
+        if (HasAuthority == false)
+        { return; }
 
         const auto EyesBefore = InState.EyeSlot;
 
@@ -79,8 +85,13 @@ class UMars_Processor_RatDen_HandleRequests : UCk_Processor_Script_Base_UE
         const auto EyesChanged = EyesBefore.IsSet() != EyesNow.IsSet()
             || (EyesNow.IsSet() && EyesBefore.GetValue() != EyesNow.GetValue());
 
+        utils_rat_den::Publish(Self);
+
         if (Self.Has_Fragment(FMars_Fragment_RatDen_Signals) == false)
         { return; }
+
+        // Handlers react on the raid, its rats and the den's eyes: scope the script world to the den's own.
+        const auto WorldContext = FAngelscriptGameThreadScopeWorldContext(utils_entity_lifetime::Get_WorldForEntity(InHandle));
 
         for (int32 Index = 0; Index < GrantedSlots.Num(); ++Index)
         { Self.Get_Fragment(FMars_Fragment_RatDen_Signals).OnEmergeReady.Broadcast(Self, GrantedSlots[Index], GrantedOperations[Index]); }

@@ -17,7 +17,9 @@ struct FMars_Fragment_RatDen_Assembly
 class UMars_RatDen_EntityScript : UCk_GenericEntityScript_UE
 {
     default _ShowInPlaceActors = true;
-    default _Replication = ECk_Replication::DoesNotReplicate;
+    // Stance A: the authority keeps the residents; the entity, its root and its eyes' ledger replicate; the shell, the
+    // plate, the face node and the Eyes are each machine's own.
+    default _Replication = ECk_Replication::Replicates;
 
     UPROPERTY(ExposeOnSpawn)
     FTransform SpawnTransform = FTransform::Identity;
@@ -59,7 +61,7 @@ class UMars_RatDen_EntityScript : UCk_GenericEntityScript_UE
         InHandle.Request_OverrideToSelf();
         utils_handle::Set_DebugName(InHandle, n"RatDen");
 
-        auto Root = utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::DoesNotReplicate);
+        auto Root = utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::Replicates);
         auto Plate = FCk_Handle_UnrealComponent();
         if (WithVisuals && FApp::CanEverRender())
         { Plate = BuildLook(Root); }

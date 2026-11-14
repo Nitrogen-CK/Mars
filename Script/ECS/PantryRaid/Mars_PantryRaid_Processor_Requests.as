@@ -1,7 +1,8 @@
 // The raid's request drain, in order: SpawnRat (once per operation id: an operation that already has a rat, or that the raid
 // never asked for, is stale) -> RatDied (the den slot cools down, the lease drops) -> RatHome (an empty rat admitted home is
 // retired) -> ReleaseLease (only with the lease's own token) -> GrantLease (one lease per pack). Rats are spawned on the
-// raid entity, so the raid owns them; removing a den never destroys a rat.
+// raid entity, so the raid owns them; removing a den never destroys a rat. Only the machine with authority over the
+// raid applies them; a copy drops every request.
 class UMars_Processor_PantryRaid_HandleRequests : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -27,6 +28,13 @@ class UMars_Processor_PantryRaid_HandleRequests : UCk_Processor_Script_Base_UE
 
         // InRequests is invalid past this line; removing before broadcasting lets re-entrant requests survive.
         Self.Request_TryRemove(FMars_Fragment_PantryRaid_Requests);
+
+        const auto HasAuthority = utils_net::Get_HasAuthority(InHandle);
+        if (HasAuthority == false)
+        { return; }
+
+        // The rat spawns and OnRatSpawned's handlers run in the raid's own world.
+        const auto WorldContext = FAngelscriptGameThreadScopeWorldContext(utils_entity_lifetime::Get_WorldForEntity(InHandle));
 
         TArray<FCk_Handle> Spawned;
         TArray<int32> SpawnedOperations;

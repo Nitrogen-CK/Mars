@@ -6,6 +6,9 @@
 // and grounded cheese packs inside its bounds, observes every chef, owns one theft lease per pack, decides emergences and
 // owns every rat it spawns (a den never owns a rat). Readiness (a built current ground nav field, a real provider route from
 // a den's OutsideStand into the bounds, at least one den) is stamped FMars_Tag_PantryRaid_Ready last.
+// Replication: the machine with authority over the raid runs it whole (its tick and its request drain); the entity
+// replicates only so that a copy is inert. A copy's Params and state are composed and never written, so read a raid on
+// the machine with authority. Rats are spawned by the authority's drain alone.
 asset Mars_PantryRaidHandle of UCkDynamic_HandleDefinition
 {
     TypeName = "FCk_Handle_PantryRaid";
@@ -529,10 +532,12 @@ struct FMars_Tag_PantryRaid_NeedsDenBinding {}
 // Signals
 //--------------------------------------------------------------------------------------------------------------------------
 
+// Raised once by the authority's tick when readiness holds; never on a copy.
 delegate void FMars_Delegate_PantryRaid_OnReady(FCk_Handle_PantryRaid InRaid);
 event void FMars_Delegate_PantryRaid_OnReady_MC(FCk_Handle_PantryRaid InRaid);
 
-// A rat entity was requested for InDen's resident InSlot (InRat is under construction).
+// A rat entity was requested for InDen's resident InSlot (InRat is under construction). Raised by the authority's
+// drain; never on a copy.
 delegate void FMars_Delegate_PantryRaid_OnRatSpawned(FCk_Handle_PantryRaid InRaid, FCk_Handle InRat, int32 InOperationId);
 event void FMars_Delegate_PantryRaid_OnRatSpawned_MC(FCk_Handle_PantryRaid InRaid, FCk_Handle InRat, int32 InOperationId);
 

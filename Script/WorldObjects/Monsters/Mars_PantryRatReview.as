@@ -24,6 +24,8 @@ enum EMars_PantryRatCourt_BotMode
 class UMars_PantryRatCourt_EntityScript : UCk_GenericEntityScript_UE
 {
     default _ShowInPlaceActors = true;
+    // Each machine's own director; only an authority world's spawns the encounter, so a client sees the host's den and
+    // pack and runs none of its own.
     default _Replication = ECk_Replication::DoesNotReplicate;
 
     UPROPERTY()
@@ -101,19 +103,6 @@ class UMars_PantryRatCourt_EntityScript : UCk_GenericEntityScript_UE
         VolumeOwner.Request_OverrideToSelf();
         _Volume = utils_ground_nav_volume::Add(VolumeOwner, Make_CourtNavSpec());
 
-        auto Spec = FMars_PantryRaid_Spec();
-        Spec.EncounterBounds = CourtBounds;
-        auto RaidParams = UMars_PantryRaid_EntityScript::Params();
-        RaidParams.Spec = Spec;
-        RaidParams.NavVolume = _Volume;
-        _RaidEntity = utils_entity_script::Request_SpawnEntity(InHandle, UMars_PantryRaid_EntityScript, RaidParams).Get_EntityUnderConstruction();
-
-        auto DenParams = UMars_RatDen_EntityScript::Params();
-        DenParams.SpawnTransform = FTransform(FRotator::ZeroRotator, DenLocation);
-        DenParams.Spec = FMars_RatDen_Spec(Spec.Population.ResidentsPerDen);
-        // Phase 5: the den's default shell (BlockAll + Ck.Jolt.NoBake) - no NoCollision override (F4-3 fixed in the den script).
-        _DenEntity = utils_entity_script::Request_SpawnEntity(InHandle, UMars_RatDen_EntityScript, DenParams).Get_EntityUnderConstruction();
-
         _CheeseHolder = Make_CheeseHolder(InHandle);
 
         utils_timer::Create_Tick(InHandle, FCk_Delegate_Timer(this, n"OnTick"));
@@ -131,6 +120,25 @@ class UMars_PantryRatCourt_EntityScript : UCk_GenericEntityScript_UE
         auto Profile = FCk_GroundNav_AgentProfile(utils_shapes::Make_Capsule(FCk_ShapeCapsule_Dimensions(22.0f, 20.0f)));
         Profile.Set_LedgeSensitivity(0.0f);
         return FCk_GroundNavVolume_Spec(CourtBounds, Config, Profile);
+    }
+
+    // The raid and the den replicate: they go under the world's replicated spawn owner, as the world items do.
+    private void Spawn_Encounter()
+    {
+        auto Owner = utils_mars_net::Get_ReplicatedSpawnOwner(_Self);
+
+        auto Spec = FMars_PantryRaid_Spec();
+        Spec.EncounterBounds = CourtBounds;
+        auto RaidParams = UMars_PantryRaid_EntityScript::Params();
+        RaidParams.Spec = Spec;
+        RaidParams.NavVolume = _Volume;
+        _RaidEntity = utils_entity_script::Request_SpawnEntity(Owner, UMars_PantryRaid_EntityScript, RaidParams).Get_EntityUnderConstruction();
+
+        auto DenParams = UMars_RatDen_EntityScript::Params();
+        DenParams.SpawnTransform = FTransform(FRotator::ZeroRotator, DenLocation);
+        DenParams.Spec = FMars_RatDen_Spec(Spec.Population.ResidentsPerDen);
+        // The den's default shell (BlockAll + Ck.Jolt.NoBake), no NoCollision override.
+        _DenEntity = utils_entity_script::Request_SpawnEntity(Owner, UMars_RatDen_EntityScript, DenParams).Get_EntityUnderConstruction();
     }
 
     // The pack and the food are replicated world items: they go under the world's replicated spawn owner, which is
@@ -181,6 +189,7 @@ class UMars_PantryRatCourt_EntityScript : UCk_GenericEntityScript_UE
             if (utils_mars_net::Get_HasReplicatedSpawnOwner(_Self) == false)
             { return; }
 
+            Spawn_Encounter();
             Spawn_WorldItems();
         }
 
@@ -625,7 +634,7 @@ class UMars_PantryRatCourt_EntityScript : UCk_GenericEntityScript_UE
     UFUNCTION()
     bool Review_IsComposed() const
     {
-        return ck::IsValid(_RaidEntity);
+        return ck::IsValid(_Self);
     }
 
     // The first live rat's phase name, "none" without one.

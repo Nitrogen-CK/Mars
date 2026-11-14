@@ -27,7 +27,8 @@ namespace utils_pantry_raid
     const FName RaidTag = n"TAG_MarsPantryRaid";
 
     // Composes the raid on InOwner (which must carry a transform: the bounds are local to its translation). Nothing is
-    // discovered and no rat emerges until the Tick processor proves readiness. A rejected spec ensures and returns an
+    // discovered and no rat emerges until the Tick processor proves readiness, and only on the machine with authority
+    // over InOwner: a copy composes the same fragments and nobody writes them. A rejected spec ensures and returns an
     // invalid handle with nothing composed.
     FCk_Handle_PantryRaid Add(FCk_Handle& InOwner, FMars_PantryRaid_Spec InSpec)
     {
@@ -99,8 +100,8 @@ namespace utils_pantry_raid
         return Best;
     }
 
-    // A chef root a raid observes: tagged TAG_MarsCombatTarget and carrying a Hotbar (a player or a test stand-in), not a
-    // monster sharing the combat tag.
+    // A chef root a raid observes: tagged TAG_MarsSharedCombatTarget (every pawn a player controls, the host's own or a
+    // joined player's, stamped on the machine with authority) and carrying a Hotbar, not a monster sharing the tag.
     bool Get_IsChef(const FCk_Handle& InCandidate)
     {
         if (ck::Is_NOT_Valid(InCandidate) || utils_world_item::Get_IsEnding(InCandidate))
@@ -113,7 +114,7 @@ namespace utils_pantry_raid
     TArray<FMars_PantryRaid_ChefSnapshot> Read_ChefsNow(const FCk_Handle& InWorldContext)
     {
         auto Chefs = TArray<FMars_PantryRaid_ChefSnapshot>();
-        for (auto Candidate : utils_entity_tag::ForEach_Entity(InWorldContext, n"TAG_MarsCombatTarget"))
+        for (auto Candidate : utils_entity_tag::ForEach_Entity(InWorldContext, n"TAG_MarsSharedCombatTarget"))
         {
             if (Get_IsChef(Candidate) == false)
             { continue; }

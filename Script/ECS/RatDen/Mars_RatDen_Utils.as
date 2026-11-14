@@ -1,8 +1,9 @@
 namespace utils_rat_den
 {
     // Composes the den on InOwner (which must carry a transform: the den frame) with ResidentCount Dormant residents and the
-    // eye proxy standing for slot 0, and tags it TAG_MarsRatDen so a PantryRaid whose bounds hold it discovers it. A
-    // rejected spec ensures and returns an invalid handle with nothing composed.
+    // eye proxy standing for slot 0, and tags it TAG_MarsRatDen so a PantryRaid whose bounds hold it discovers it.
+    // Every machine composes it; the ledger of its eyes replicates with the root. A rejected spec ensures and returns
+    // an invalid handle with nothing composed.
     FCk_Handle_RatDen Add(FCk_Handle& InOwner, FMars_RatDen_Spec InSpec)
     {
         const auto Validation = InSpec.Validate();
@@ -26,8 +27,62 @@ namespace utils_rat_den
         InOwner.Add_Fragment(FMars_Feature_RatDen());
         InOwner.Add_Fragment(Params);
         InOwner.Add_Fragment(State);
+
+        // The mirror compares what arrives against the ledger this machine composed, not one that already arrived.
+        auto Ledger = Make_Ledger(State);
+        auto Local = FMars_Fragment_RatDen_Local();
+        Local.Last = TOptional<FMars_Fragment_RatDen_Net>(Ledger);
+
+        // A client's copy can receive the replicated ledger before it composes: the arrived ledger stands then.
+        if (InOwner.Has_Fragment(FMars_Fragment_RatDen_Net) == false)
+        { InOwner.Add_Fragment(Ledger, ECk_Replication::Replicates); }
+
+        InOwner.Add_Fragment(Local);
+        InOwner.Add_Fragment(FMars_Tag_RatDen_NeedsMirror());
+
         utils_entity_tag::Add(InOwner, DenTag);
         return InOwner.As_RatDen();
+    }
+
+    // The ledger InState stands for: Shown and the slot while EyeSlot is set, else Vacant and 0.
+    FMars_Fragment_RatDen_Net Make_Ledger(const FMars_Fragment_RatDen& InState)
+    {
+        auto Ledger = FMars_Fragment_RatDen_Net();
+        if (InState.EyeSlot.IsSet())
+        {
+            Ledger.Eyes = EMars_RatDen_Eyes::Shown;
+            Ledger.EyeSlot = InState.EyeSlot.GetValue();
+        }
+
+        return Ledger;
+    }
+
+    bool Get_IsSameLedger(const FMars_Fragment_RatDen_Net& InA, const FMars_Fragment_RatDen_Net& InB)
+    {
+        return InA.Eyes == InB.Eyes && InA.EyeSlot == InB.EyeSlot;
+    }
+
+    // The eye slot InLedger stands for; unset while Vacant.
+    TOptional<int32> Get_EyeSlotOf(const FMars_Fragment_RatDen_Net& InLedger)
+    {
+        if (InLedger.Eyes == EMars_RatDen_Eyes::Vacant)
+        { return TOptional<int32>(); }
+
+        return TOptional<int32>(InLedger.EyeSlot);
+    }
+
+    // The ledger's only writer, called by the authority's request drain: written and marked dirty only when what the
+    // eyes show differs from the stored ledger.
+    void Publish(FCk_Handle_RatDen& InSelf)
+    {
+        const auto Next = Make_Ledger(InSelf.Get_Fragment(FMars_Fragment_RatDen));
+        auto& Ledger = InSelf.Get_Fragment(FMars_Fragment_RatDen_Net);
+        if (Get_IsSameLedger(Ledger, Next))
+        { return; }
+
+        Ledger = Next;
+        FCk_Handle Entity = InSelf;
+        Entity.Request_MarkReplicationDirty(FMars_Fragment_RatDen_Net);
     }
 
     // The resident the eye proxy stands for: the lowest Dormant slot while the eyes are enabled; unset when none.

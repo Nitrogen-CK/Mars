@@ -5,6 +5,9 @@
 // Composed on the den's root (its transform is the den frame: +X out of the opening, Z up, origin on the floor at the
 // front plane). A den is a service of the PantryRaid that discovers it (TAG_MarsRatDen): it owns its resident slots and
 // their emergence operation ids, never a rat's lifetime.
+// Replication: the machine with authority over the den applies the requests and publishes its eyes through
+// utils_rat_den::Publish (FMars_Fragment_RatDen_Net); a copy drops every request and mirrors the ledger into EyeSlot
+// (UMars_Processor_RatDen_Mirror). A den whose root does not replicate has authority on every machine.
 asset Mars_RatDenHandle of UCkDynamic_HandleDefinition
 {
     TypeName = "FCk_Handle_RatDen";
@@ -44,6 +47,15 @@ enum EMars_RatDen_ReturnRefusal
     NotARat,
     // The slot is out of range or its resident is not Outside / Pending.
     NotOutside
+}
+
+// What the den's eyes show, as its ledger carries it.
+enum EMars_RatDen_Eyes
+{
+    // Black: no hidden resident, or the eyes are disabled.
+    Vacant,
+    // Lit, standing for the ledger's EyeSlot.
+    Shown
 }
 
 enum EMars_RatDen_Portal
@@ -173,7 +185,8 @@ struct FMars_RatDen_Resident
     float32 DeadUntil = 0.0f;
 }
 
-// Written only by UMars_Processor_RatDen_HandleRequests (and composed by Add).
+// Written only by UMars_Processor_RatDen_HandleRequests (and composed by Add). On a copy only EyeSlot is kept, by the
+// mirror; the residents, their operation ids, EyesEnabled and the counters are the authority's.
 struct FMars_Fragment_RatDen
 {
     UPROPERTY()
@@ -196,6 +209,27 @@ struct FMars_Fragment_RatDen
     UPROPERTY()
     int32 StaleRequests = 0;
 }
+
+// The replicated ledger of the den's eyes. Written only by utils_rat_den::Publish.
+struct FMars_Fragment_RatDen_Net
+{
+    UPROPERTY()
+    EMars_RatDen_Eyes Eyes = EMars_RatDen_Eyes::Vacant;
+
+    // The resident the eyes stand for; meaningful only while Shown.
+    UPROPERTY()
+    int32 EyeSlot = 0;
+}
+
+// Each machine's own: the ledger the mirror last reconciled (unset with authority).
+struct FMars_Fragment_RatDen_Local
+{
+    UPROPERTY()
+    TOptional<FMars_Fragment_RatDen_Net> Last;
+}
+
+// Added by utils_rat_den::Add, dropped by UMars_Processor_RatDen_Mirror once it has bound the ledger's rep-notify.
+struct FMars_Tag_RatDen_NeedsMirror {}
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Signals

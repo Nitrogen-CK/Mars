@@ -1,9 +1,11 @@
-// The raid's per-frame pass, in this order: the clock (a zero, negative or non-finite delta does not advance; a hitch
-// advances at most k_MaxStep); every chef's current location (TAG_MarsCombatTarget roots with a Hotbar, anywhere: every
-// player is observed, not only the local one); den discovery inside the bounds (every DiscoverySeconds, binding each new
-// den's signals); the rat roster pruned of entities that are gone; readiness, stamped FMars_Tag_PantryRaid_Ready LAST; the
-// pack records (grounded, settled, cheese, eligible slots within reach, guard hysteresis, lease validity); then, once
-// ready, at most one emergence per frame. Everything another feature owns changes only through its requests.
+// The raid's per-frame pass, run only on the machine with authority over the raid (a copy stays as it composed), inside
+// the raid's own script world, in this order: the clock (a zero, negative or non-finite delta does not advance; a hitch
+// advances at most k_MaxStep); every chef's current location (TAG_MarsSharedCombatTarget roots with a Hotbar, anywhere:
+// every pawn a player controls, the host's own or a joined player's, stamped on the machine with authority); den
+// discovery inside the bounds (every DiscoverySeconds, binding each new den's signals); the rat roster pruned of
+// entities that are gone; readiness, stamped FMars_Tag_PantryRaid_Ready LAST; the pack records (grounded, settled,
+// cheese, eligible slots within reach, guard hysteresis, lease validity); then, once ready, at most one emergence per
+// frame. Everything another feature owns changes only through its requests.
 class UMars_Processor_PantryRaid_Tick : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -25,6 +27,13 @@ class UMars_Processor_PantryRaid_Tick : UCk_Processor_Script_Base_UE
                        FMars_Fragment_PantryRaid_Params& InParams,
                        FMars_Fragment_PantryRaid& InState)
     {
+        const auto HasAuthority = utils_net::Get_HasAuthority(InHandle);
+        if (HasAuthority == false)
+        { return; }
+
+        // OnReady's handlers and the den requests below run in the raid's own world.
+        const auto WorldContext = FAngelscriptGameThreadScopeWorldContext(utils_entity_lifetime::Get_WorldForEntity(InHandle));
+
         const auto Delta = float32(InDeltaT.Get_Seconds());
         if (Math::IsFinite(Delta) == false || Delta <= 0.0f)
         { return; }

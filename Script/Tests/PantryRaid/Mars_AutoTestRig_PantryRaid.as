@@ -10,8 +10,8 @@ class UMars_AutoTestHelper_PantryRaid_OpenHolder : UObject
 // built on request, UMars_AutoTestRig_GroundNavBuildOutcome), a PantryRaid entity at _Origin whose bounds cover the field
 // (+-560), one RatDen at k_DenOffset facing +X (toward the pack), a World-mode backpack at k_PackOffset, a Monk's Rind (the
 // cheese, Transient) and a Mushroom (Persistent Food) stowed into the two low pockets (cargo slots 1 and 2, 37.5 cm: Phase 1
-// reach), and chef stand-ins (a root, a Hotbar, TAG_MarsCombatTarget) moved by setting their transforms. Each test sets its
-// own _Origin band and may tune _Spec before Arrange_Court.
+// reach), and chef stand-ins (a root, a Hotbar, TAG_MarsSharedCombatTarget) moved by setting their transforms. Each
+// test sets its own _Origin band and may tune _Spec before Arrange_Court.
 UCLASS(Abstract)
 class UMars_AutoTestRig_PantryRaid : UMars_AutoTestRig_GroundNavBuildOutcome
 {
@@ -111,7 +111,7 @@ class UMars_AutoTestRig_PantryRaid : UMars_AutoTestRig_GroundNavBuildOutcome
         auto Spec = FMars_Hotbar_Spec();
         Spec.BagSlotCount = 1;
         utils_hotbar::Add(Chef, Spec);
-        utils_entity_tag::Add(Chef, n"TAG_MarsCombatTarget");
+        utils_entity_tag::Add(Chef, n"TAG_MarsSharedCombatTarget");
         utils_handle::Set_DebugName(Chef, n"PantryRaidTest.Chef");
         _OwnedExtra.Add(Chef);
         return Chef;
@@ -227,7 +227,7 @@ class UMars_AutoTestRig_PantryRaid : UMars_AutoTestRig_GroundNavBuildOutcome
     }
 
     // Gives chef InChefIndex the player's DamageDealer (Mars_PlayerCharacter.as composes one on the player entity, beside its
-    // Hotbar and TAG_MarsCombatTarget), scaled by InDamageScale (a fractional weapon: 20 x 0.02 = 0.4 damage).
+    // Hotbar and TAG_MarsSharedCombatTarget), scaled by InDamageScale (a fractional weapon: 20 x 0.02 = 0.4 damage).
     protected FCk_Handle_DamageDealer Make_ChefDealer(int32 InChefIndex, float32 InDamageScale)
     {
         auto Chef = _Chefs[InChefIndex];

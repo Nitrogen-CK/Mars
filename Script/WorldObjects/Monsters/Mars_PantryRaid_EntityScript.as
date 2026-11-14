@@ -1,10 +1,13 @@
 // The pantry raid encounter: composes the PantryRaid kernel on its root (the bounds are local to SpawnTransform's
 // translation) with the ground nav field it waits on. It draws nothing; dens and packs are discovered inside the bounds, and
-// the rats it spawns are its own (they live under this entity, never under a den).
+// the rats it spawns are its own (they live under this entity, never under a den). The entity and its root replicate;
+// every machine composes the kernel, and only the machine with authority runs it. NavVolume resolves only there: a copy
+// reads it invalid and never uses it.
 class UMars_PantryRaid_EntityScript : UCk_GenericEntityScript_UE
 {
     default _ShowInPlaceActors = true;
-    default _Replication = ECk_Replication::DoesNotReplicate;
+    // Stance C: the authority runs the raid; the entity replicates only so that a copy has no authority and is inert.
+    default _Replication = ECk_Replication::Replicates;
 
     UPROPERTY(ExposeOnSpawn)
     FTransform SpawnTransform = FTransform::Identity;
@@ -24,7 +27,7 @@ class UMars_PantryRaid_EntityScript : UCk_GenericEntityScript_UE
         InHandle.Request_OverrideToSelf();
         utils_handle::Set_DebugName(InHandle, n"PantryRaid");
 
-        utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::DoesNotReplicate);
+        utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::Replicates);
         auto Composed = Spec;
         Composed.Parts.NavVolume = NavVolume;
         _Raid = utils_pantry_raid::Add(InHandle, Composed);
