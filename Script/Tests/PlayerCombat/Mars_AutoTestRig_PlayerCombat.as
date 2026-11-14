@@ -203,16 +203,13 @@ class UMars_AutoTestRig_PlayerCombat : UCk_AutoTest_Base
         Res.Set(utils_state_machine::IsInState(_Sm, UMars_SmState_Alive) && _Pawn.CharacterMovement.IsMovingOnGround());
     }
 
-    // The receiver is composed only on the local host's own pawn (utils_local_session): the lane's world is a listen
-    // server (the project's PIE net mode), which counts as local, and the pawn is possessed by its local controller.
+    // Every copy of the pawn composes the receiver; the tag goes only on the pawn this machine has authority over and
+    // controls locally, which the rig's pawn is (its local controller possesses it).
     UFUNCTION()
     protected void Step_AssertLocalReceiver(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        auto PawnWorld = _Pawn.GetWorld();
-        const auto NetMode = PawnWorld.GetNetMode();
+        const auto NetMode = _Pawn.GetWorld().GetNetMode();
         ck::Trace(f"[PlayerCombat] receiver world net mode={NetMode :n} locallyControlled={_Pawn.IsLocallyControlled()}");
-        Assert_True(utils_local_session::Get_IsLocalCombatWorld(PawnWorld), f"the test world is a local combat world (net mode {NetMode :n})");
-        Assert_True(_Pawn.IsLocallyControlled(), "the pawn is locally controlled");
         Assert_Valid(Get_Health(), "the local player composed a Health");
         Assert_Valid(Get_Zone(), "the local player composed a HitZone");
         Assert_Valid(Get_Hurtbox(), "the local player registered one hurtbox");

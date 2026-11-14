@@ -1,5 +1,5 @@
 // Downed, as the player's root state reads it (Mars_PlayerCharacter_Hfsm.as): entered while the debug Downed byte is set
-// OR the composed local Health is depleted, left only once the byte is clear AND that Health is absent or not depleted -
+// OR the player's Health is depleted, left only once the byte is clear AND that Health is absent or not depleted -
 // so clearing the byte on a player at zero Health does not revive them; healing does, together with the clear byte.
 // While Downed, UMars_SmTask_Downed_Lockdown holds the character's movement.
 
@@ -12,8 +12,8 @@ namespace utils_player_sm
         return ck::IsValid(Attribute) && Attribute.Get_FinalValue(ECk_MinMaxCurrent::Current) > 0;
     }
 
-    // The player's local Health is depleted; false without one (composed only on a locally controlled pawn in a local
-    // combat world).
+    // The player's Health is depleted (on a copy without authority, as its replicated ledger reports); false without one
+    // (combat disabled in the player's config).
     bool Get_IsHealthDepleted(FCk_Handle InPlayer)
     {
         auto Health = InPlayer.As_Health(ECk_SanityCheck::UnChecked);

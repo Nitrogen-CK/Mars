@@ -108,7 +108,7 @@ class AMars_PlayerCharacter : AMars_Character
     // The player SM (UMars_SmState_Alive) and whether this copy started it (TryStartPlayerSm).
     private FCk_Handle_StateMachine _Sm;
     private bool _SmStarted = false;
-    // The player's entity and whether this copy composed its local damage receiver (TryConstructCombatReceiver).
+    // The player's entity; every copy composes its damage receiver on it (ConstructCombatReceiver).
     private FCk_Handle _PlayerEntity;
 
     // Native actor linkage precedes this pawn's gameplay assembly. Consumers of Mars features wait for this edge,
@@ -119,7 +119,6 @@ class AMars_PlayerCharacter : AMars_Character
     UFUNCTION()
     FCk_Handle Get_GameplayComposedEntity() const
     { return _GameplayComposedEntity; }
-    private bool _ReceiverConstructed = false;
     // Whether this copy spawned what its own player sees of an armed throw (TryConstructThrowPreviewVisual).
     private bool _ThrowPreviewVisualConstructed = false;
     // The body emote montage last played on this machine (Request_StopEmote ends it); null when none.
@@ -313,7 +312,8 @@ class AMars_PlayerCharacter : AMars_Character
         auto BodyProbe = utils_body_probe::Create(PlayerTransform, FMars_BodyProbe_Spec(BodyProbeSpec, this));
         utils_handle::Set_DebugName(BodyProbe.H(), n"Player.Probe.Body");
         _PlayerEntity = Player;
-        TryConstructCombatReceiver();
+        if (Config.Combat.Enabled == ECk_EnableDisable::Enable)
+        { ConstructCombatReceiver(Player); }
         TryConstructThrowPreviewVisual();
 
         auto DownedSpec = FCk_ByteAttribute_Spec(GameplayTags::ByteAttribute_Mars_Player_Downed, 0);
@@ -400,37 +400,25 @@ class AMars_PlayerCharacter : AMars_Character
         OnGameplayComposed.Broadcast(Player);
     }
 
-    // The local damage receiver, on the local host's own pawn only (utils_local_session; never a client's or a remote
-    // player's pawn): Health, the body zone, and a second capsule probe named Probe.Mars.HitZone registered as the zone's
-    // hurtbox. That capsule follows the movement capsule like the Probe.Mars.Player one (crouch and a blocked uncrouch
-    // included); the Probe.Mars.Player one stays for the volumes that filter on it. The combat-target tag goes on last,
-    // so nothing discovers a half-built receiver. Downing at zero Health is the state machine's decision
-    // (Mars_PlayerCharacter_Hfsm_Combat.as), not this actor's. Like TryStartPlayerSm it waits for local control, which
-    // only resolves after possession: called when the entity is ready, when the controller changes and every tick until
-    // it composes. One-shot: a rejected composition ensures once and is not retried.
-    private void TryConstructCombatReceiver()
+    // The damage receiver, composed on every copy of the pawn on every machine: Health, the body zone, and a second
+    // capsule probe named Probe.Mars.HitZone registered as the zone's hurtbox. That capsule follows the movement capsule
+    // like the Probe.Mars.Player one (crouch and a blocked uncrouch included); the Probe.Mars.Player one stays for the
+    // volumes that filter on it. A hit is applied by the machine with authority over the player's entity and reaches every
+    // other copy through the Health's replicated ledger. The combat-target tag is stamped last (Refresh_CombatTargetTag),
+    // so nothing discovers a half-built receiver. Downing at zero Health is still the state machine's decision
+    // (Mars_PlayerCharacter_Hfsm_Combat.as), taken by the owning copy from the Health it reads. A rejected composition
+    // ensures once (each Add on its own rejection) and is not retried.
+    private void ConstructCombatReceiver(FCk_Handle& InPlayer)
     {
-        if (_ReceiverConstructed || ck::Is_NOT_Valid(_PlayerEntity))
-        { return; }
+        auto PlayerTransform = InPlayer.As_Transform();
 
-        if (utils_local_session::Get_IsLocalCombatWorld(GetWorld()) == false || Config.Combat.Enabled == ECk_EnableDisable::Disable)
-        { return; }
-
-        if (utils_net::Get_IsEntityLocallyControlled_ByPlayer(_PlayerEntity) != ECk_Utils_Net_IsLocallyControlled_Result::IsLocallyControlled)
-        { return; }
-
-        _ReceiverConstructed = true;
-        auto Player = _PlayerEntity;
-        auto PlayerTransform = _PlayerEntity.As_Transform();
-
-        // Each Add ensures on its own rejection.
-        auto Health = utils_health::Add(Player, FMars_Health_Spec(Config.Combat.MaxHealth));
+        auto Health = utils_health::Add(InPlayer, FMars_Health_Spec(Config.Combat.MaxHealth));
         if (ck::Is_NOT_Valid(Health))
         { return; }
 
         Health.BindTo_OnDamaged(FMars_Delegate_Health_OnDamaged(this, n"OnHurt"));
 
-        auto Zone = utils_hit_zone::Add(Player, utils_hit_zone::Make_FleshZoneSpec(GameplayTags::HitZone_Mars_Body, 1.0f));
+        auto Zone = utils_hit_zone::Add(InPlayer, utils_hit_zone::Make_FleshZoneSpec(GameplayTags::HitZone_Mars_Body, 1.0f));
         if (ck::Is_NOT_Valid(Zone))
         { return; }
 
@@ -446,13 +434,38 @@ class AMars_PlayerCharacter : AMars_Character
         if (ck::Is_NOT_Valid(Hurtbox))
         { return; }
 
-        utils_entity_tag::Add(Player, n"TAG_MarsCombatTarget");
+        Refresh_CombatTargetTag();
+    }
+
+    // The receiver is whole: a Health and a zone with its hurtbox.
+    private bool Get_IsCombatReceiverComposed() const
+    {
+        const auto Zone = _PlayerEntity.As_HitZone(ECk_SanityCheck::UnChecked);
+        return ck::IsValid(_PlayerEntity.As_Health(ECk_SanityCheck::UnChecked)) && ck::IsValid(Zone) && Zone.Get_Hurtboxes().Num() > 0;
+    }
+
+    // Marks the pawn a combat target once its receiver is whole, only where this machine has authority over the player's
+    // entity and controls the pawn locally (the host's own pawn, a standalone player's). A monster is simulated on each
+    // machine until it replicates, so the authority's monsters may only choose the player whose machine shows them.
+    // Called when the receiver composes and when the controller changes; never removes the tag.
+    private void Refresh_CombatTargetTag()
+    {
+        if (ck::Is_NOT_Valid(_PlayerEntity) || Get_IsCombatReceiverComposed() == false)
+        { return; }
+
+        if (utils_entity_tag::Has(_PlayerEntity, n"TAG_MarsCombatTarget") || utils_net::Get_HasAuthority(_PlayerEntity) == false)
+        { return; }
+
+        if (utils_net::Get_IsEntityLocallyControlled_ByPlayer(_PlayerEntity) != ECk_Utils_Net_IsLocallyControlled_Result::IsLocallyControlled)
+        { return; }
+
+        utils_entity_tag::Add(_PlayerEntity, n"TAG_MarsCombatTarget");
     }
 
     // What this machine's own player sees of an armed throw (UMars_ThrowPreview_EntityScript, owned by the player's entity),
-    // on the locally controlled copy only; the ThrowPreview kernel itself is on every copy. Like TryConstructCombatReceiver
-    // it waits for local control, which only resolves after possession, and also for the kernel (the first call, beside the
-    // receiver's, comes before the entity composes it). One-shot.
+    // on the locally controlled copy only; the ThrowPreview kernel itself is on every copy. It waits for local control,
+    // which only resolves after possession, and for the kernel (the first call, in the construct, comes before the
+    // entity composes it). One-shot.
     private void TryConstructThrowPreviewVisual()
     {
         if (_ThrowPreviewVisualConstructed || ck::Is_NOT_Valid(_PlayerEntity) || _PlayerEntity.Is_ThrowPreview() == false)
@@ -520,7 +533,8 @@ class AMars_PlayerCharacter : AMars_Character
         PlayKnockFx(InPunch, utils_surface_fx::Get_SurfaceTags(InHit.Get_PhysicalMaterial().Get()), Contact);
     }
 
-    // Only the local receiver binds this (TryConstructCombatReceiver), so the victim is always this machine's player.
+    // Every copy's receiver binds this (ConstructCombatReceiver): the impact plays on every machine that shows cosmetics,
+    // the camera shakes only on the machine that controls the victim.
     UFUNCTION()
     private void OnHurt(FCk_Handle_Health InHealth, FMars_DamageEvent InEvent, float32 InApplied, float32 InRemaining)
     {
@@ -528,7 +542,8 @@ class AMars_PlayerCharacter : AMars_Character
         { return; }
 
         PlayImpactFx(InHealth, GameplayTag::MakeContainerFromTag(GameplayTags::Surface_Flesh), Make_Contact(InEvent));
-        utils_surface_fx::Play_Shake(Config.Combat.HurtShake);
+        if (utils_net::Get_IsEntityLocallyControlled_ByPlayer(InHealth) == ECk_Utils_Net_IsLocallyControlled_Result::IsLocallyControlled)
+        { utils_surface_fx::Play_Shake(Config.Combat.HurtShake); }
     }
 
     private void PlayImpactFx(FCk_Handle InPlayer, FGameplayTagContainer InSurfaceTags, FMars_SurfaceFx_Contact InContact)
@@ -595,7 +610,7 @@ class AMars_PlayerCharacter : AMars_Character
     void ControllerChanged(AController OldController, AController NewController)
     {
         TryStartPlayerSm();
-        TryConstructCombatReceiver();
+        Refresh_CombatTargetTag();
         TryConstructThrowPreviewVisual();
     }
 
@@ -603,7 +618,6 @@ class AMars_PlayerCharacter : AMars_Character
     void Tick(float DeltaSeconds)
     {
         TryStartPlayerSm();
-        TryConstructCombatReceiver();
         TryConstructThrowPreviewVisual();
         EmitSurfaceFx();
     }

@@ -84,8 +84,8 @@ struct FMars_PlayerCharacter_Body
     float32 CrouchedHalfHeightWithPack = 70.0f;
 }
 
-// The player as a local damage receiver: Health, a body HitZone and a hurtbox capsule that follows the movement capsule.
-// Composed only on the local host's own pawn (utils_local_session); this is not a networked combat model.
+// The player as a damage receiver: Health, a body HitZone and a hurtbox capsule that follows the movement capsule.
+// Composed on every copy of the pawn; the machine with authority applies a hit and the others read it from the Health.
 struct FMars_PlayerCharacter_Combat
 {
     UPROPERTY()
