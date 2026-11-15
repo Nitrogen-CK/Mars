@@ -62,7 +62,7 @@ namespace utils_fry
     // tilt by the skim. Nothing is in play until the first release from the station's inbox; an empty first drain starts
     // the watch of the station's queue. A rejected spec, a missing node or a skimmer that cannot do what the kernel asks
     // (tilt to the pour, a Commanded slide, a node axis-aligned with the root) ensures and returns an invalid handle with
-    // nothing composed.
+    // nothing composed. A ledger already on the station is the state this copy was born into, which it has then taken.
     FCk_Handle_Fry Add(FCk_Handle& InHandle, FMars_Fry_Spec InSpec)
     {
         const auto Validation = InSpec.Validate();
@@ -110,20 +110,26 @@ namespace utils_fry
         utils_cooking_feed::Add_Admission(InHandle);
         utils_cooking_feed::Add_TakeOut(InHandle);
 
-        // A copy without authority can receive either ledger before it composes: what arrived stands then. A skimmer ledger
-        // composed here starts at the park, the authority's own starting command.
-        if (InHandle.Has_Fragment(FMars_Fragment_Fry_Net) == false)
+        // A ledger already here can only have been put here by its replicated application: this copy was born
+        // into it, has taken that state, and the mirror's first pass shows it as it stands; each ledger is its
+        // own application. A skimmer ledger composed here starts at the park, the authority's own starting command.
+        auto Local = FMars_Fragment_Fry_Local();
+        if (InHandle.Has_Fragment(FMars_Fragment_Fry_Net))
+        { Local.InitialState = EMars_Net_InitialState::Taken; }
+        else
         { InHandle.Add_Fragment(FMars_Fragment_Fry_Net(), ECk_Replication::Replicates); }
 
-        if (InHandle.Has_Fragment(FMars_Fragment_Fry_SkimmerNet) == false)
-        {
-            auto Skimmer = FMars_Fragment_Fry_SkimmerNet();
-            Skimmer.Target = State.SkimmerPark;
-            InHandle.Add_Fragment(Skimmer, ECk_Replication::Replicates);
-        }
+        auto Skimmer = FMars_Fragment_Fry_SkimmerNet();
+        Skimmer.Target = State.SkimmerPark;
+        if (InHandle.Has_Fragment(FMars_Fragment_Fry_SkimmerNet))
+        { Local.SkimmerInitialState = EMars_Net_InitialState::Taken; }
+        else
+        { InHandle.Add_Fragment(Skimmer, ECk_Replication::Replicates); }
 
-        auto Local = FMars_Fragment_Fry_Local();
-        Local.Last = TOptional<FMars_Fragment_Fry_Net>(InHandle.Get_Fragment(FMars_Fragment_Fry_Net));
+        // The mirror compares what arrives against the ledgers this machine composed: its skimmer rests where
+        // they put it.
+        Local.Last = TOptional<FMars_Fragment_Fry_Net>(FMars_Fragment_Fry_Net());
+        Local.LastSkimmer = TOptional<FMars_Fragment_Fry_SkimmerNet>(Skimmer);
         InHandle.Add_Fragment(Local);
         InHandle.Add_Fragment(FMars_Tag_Fry_NeedsMirror());
         return Fry;

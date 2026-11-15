@@ -21,8 +21,9 @@
 // own kernel or in the operator's stream. A test that sets _HeatStationBirth to Born has the server spawn the hooked
 // station's born class (its authority issues its kernel's requests as it composes), and each machine watches its copy
 // by the born test tag from its construct, whatever its docks: the kernel's signals with their frames and, off
-// authority, each rep-notify of the kernel's ledger and every frame a born bowl's piece sits under its bowl node. One
-// [BatterNetTest], [SearingNetTest], [FryNetTest] or [TumblerNetTest] line per test per machine.
+// authority, each rep-notify of the kernel's ledger and every frame a born bowl's piece sits under its bowl node; at a
+// born fryer also each rep-notify of the skimmer's ledger and every frame its skimmer has taken that ledger's command.
+// One [BatterNetTest], [SearingNetTest], [FryNetTest] or [TumblerNetTest] line per test per machine.
 
 namespace constants_heat_station_net_autotest
 {
@@ -181,11 +182,13 @@ enum EMars_TESTONLY_NetHeatBornEventKind
     HeatChanged,
     FaceSeared,
     PressRefused,
-    HatchChanged
+    HatchChanged,
+    SkimChanged,
+    SkimRefused
 }
 
 // One signal the watched born station's kernel raised on this machine: its frame, and the level it carries (the bowl,
-// the heat or the hatch; 0 for the others).
+// the heat, the hatch or the skim; 0 for the others).
 struct FMars_TESTONLY_NetHeatBornEvent
 {
     EMars_TESTONLY_NetHeatBornEventKind Kind = EMars_TESTONLY_NetHeatBornEventKind::BowlChanged;
@@ -200,6 +203,16 @@ struct FMars_TESTONLY_NetHeatBornBowlSample
     int64 Frame = 0;
     EMars_Batter_Bowl Bowl = EMars_Batter_Bowl::Resting;
     float64 DippedErrorCm = -1.0;
+}
+
+// One frame of a born fryer's skimmer on this machine once it has taken its ledger's command: that ledger, and how far
+// its shown lift and slide are from their targets (cm).
+struct FMars_TESTONLY_NetHeatBornSkimmerSample
+{
+    int64 Frame = 0;
+    FMars_Fragment_Fry_SkimmerNet Ledger;
+    float64 LiftErrorCm = -1.0;
+    float64 SlideErrorCm = -1.0;
 }
 
 UCLASS(Abstract)
@@ -303,8 +316,15 @@ class UMars_AutoTestRig_NetHeatStation : UMars_AutoTestRig_NetFeedStation
     protected TArray<FMars_Fragment_Batter_Net> _BornBatterLedgers;
     protected TArray<FMars_Fragment_Searing_Net> _BornSearingLedgers;
     protected TArray<FMars_Fragment_Tumbler_Net> _BornTumblerLedgers;
+    protected TArray<FMars_Fragment_Fry_Net> _BornFryLedgers;
     // Off authority, at a born bowl: every sampled frame its ledger has a row whose piece sits under the bowl node.
     protected TArray<FMars_TESTONLY_NetHeatBornBowlSample> _BornBowlSamples;
+    // At a born fryer: its SkimmerInitialState at the find; off authority, each rep-notify of the skimmer's ledger (its
+    // frame and the ledger as it then read) and every sampled frame the skimmer had taken the ledger's command.
+    protected EMars_Net_InitialState _BornSkimmerInitialAtFind = EMars_Net_InitialState::Awaited;
+    protected TArray<int64> _BornSkimmerNotifyFrames;
+    protected TArray<FMars_Fragment_Fry_SkimmerNet> _BornSkimmerLedgers;
+    protected TArray<FMars_TESTONLY_NetHeatBornSkimmerSample> _BornSkimmerSamples;
 
     private bool _WasHeatStationFound = false;
     private int32 _AdmitIndex = 0;
@@ -1335,6 +1355,7 @@ class UMars_AutoTestRig_NetHeatStation : UMars_AutoTestRig_NetFeedStation
     {
         Watch_BornHeatStation();
         Sample_BornBowl();
+        Sample_BornSkimmer();
         Super::On_Sample(InEntities, InStanding);
         if (_HeatStationBirth == EMars_TESTONLY_HeatStationBirth::Born && _WasHeatStationFound && _BornRigFoundFrame < 0)
         { _BornRigFoundFrame = utils_time::Get_FrameCounter(); }
@@ -1361,6 +1382,7 @@ class UMars_AutoTestRig_NetHeatStation : UMars_AutoTestRig_NetFeedStation
             _BornStation = Candidate;
             _BornFoundFrame = utils_time::Get_FrameCounter();
             _BornInitialAtFind = Get_BornInitialState();
+            _BornSkimmerInitialAtFind = Get_BornSkimmerInitialState();
             Bind_BornKernel();
             return;
         }
@@ -1373,6 +1395,9 @@ class UMars_AutoTestRig_NetHeatStation : UMars_AutoTestRig_NetFeedStation
 
         if (Get_HeatStation() == EMars_TESTONLY_HeatStation::Tumbler)
         { return InStation.Is_Tumbler(); }
+
+        if (Get_HeatStation() == EMars_TESTONLY_HeatStation::Fry)
+        { return InStation.Is_Fry(); }
 
         return Get_HeatStation() == EMars_TESTONLY_HeatStation::Batter && InStation.Is_Batter();
     }
@@ -1402,6 +1427,23 @@ class UMars_AutoTestRig_NetHeatStation : UMars_AutoTestRig_NetFeedStation
             Tumbler.BindTo_OnPieceAdded(FMars_Delegate_Tumbler_OnPieceAdded(this, n"OnBornTumblerPieceAdded"));
             if (IsCopy)
             { _BornStation.BindTo_OnRepNotify(FMars_Fragment_Tumbler_Net, FCk_DynamicFragment_OnRepNotify(this, n"OnBornTumblerNotify")); }
+
+            return;
+        }
+
+        if (Get_HeatStation() == EMars_TESTONLY_HeatStation::Fry)
+        {
+            auto Fry = _BornStation.As_Fry();
+            Fry.BindTo_OnSkimChanged(FMars_Delegate_Fry_OnSkimChanged(this, n"OnBornSkimChanged"));
+            Fry.BindTo_OnSkimRefused(FMars_Delegate_Fry_OnSkimRefused(this, n"OnBornSkimRefused"));
+            Fry.BindTo_OnTakeOutRefused(FMars_Delegate_Fry_OnTakeOutRefused(this, n"OnBornFryTakeOutRefused"));
+            Fry.BindTo_OnAdmissionRefused(FMars_Delegate_Fry_OnAdmissionRefused(this, n"OnBornFryAdmissionRefused"));
+            Fry.BindTo_OnPieceAdded(FMars_Delegate_Fry_OnPieceAdded(this, n"OnBornFryPieceAdded"));
+            if (IsCopy)
+            {
+                _BornStation.BindTo_OnRepNotify(FMars_Fragment_Fry_Net, FCk_DynamicFragment_OnRepNotify(this, n"OnBornFryNotify"));
+                _BornStation.BindTo_OnRepNotify(FMars_Fragment_Fry_SkimmerNet, FCk_DynamicFragment_OnRepNotify(this, n"OnBornSkimmerNotify"));
+            }
 
             return;
         }
@@ -1450,6 +1492,34 @@ class UMars_AutoTestRig_NetHeatStation : UMars_AutoTestRig_NetFeedStation
         }
     }
 
+    // Off authority, once a born fryer is watched, every frame its skimmer's targets are the skimmer ledger's command
+    // (the lift of its skim, its target's offset from this machine's park): the ledger and how far the shown lift and
+    // slide are from those targets. A frame before the skimmer's drain has taken the command is not sampled.
+    private void Sample_BornSkimmer()
+    {
+        if (Get_HeatStation() != EMars_TESTONLY_HeatStation::Fry || Get_IsServer() || Get_IsLive(_BornStation) == false
+            || _BornStation.Is_Fry() == false)
+        { return; }
+
+        const auto Fry = _BornStation.As_Fry();
+        const auto Ledger = Fry.Get_SkimmerLedger();
+        const auto Skimmer = Fry.Get_Skimmer();
+        const auto Scoop = Fry.Get_Spec().Scoop;
+        const auto CommandedLift = Ledger.Skim == EMars_Fry_Skim::Dip ? Scoop.DipLift : Scoop.CarryLift;
+        const auto CommandedSlide = Ledger.Target - Fry.Get_SkimmerPark();
+        const auto HasTaken = Math::Abs(Skimmer.Get_TargetLift() - CommandedLift) <= 0.01f
+            && (Skimmer.Get_TargetSlide() - CommandedSlide).Size() <= 0.01;
+        if (HasTaken == false)
+        { return; }
+
+        auto Sample = FMars_TESTONLY_NetHeatBornSkimmerSample();
+        Sample.Frame = utils_time::Get_FrameCounter();
+        Sample.Ledger = Ledger;
+        Sample.LiftErrorCm = float64(Math::Abs(Skimmer.Get_Lift() - Skimmer.Get_TargetLift()));
+        Sample.SlideErrorCm = (Skimmer.Get_Slide() - Skimmer.Get_TargetSlide()).Size();
+        _BornSkimmerSamples.Add(Sample);
+    }
+
     // The born kernel's InitialState on this machine; Awaited while there is none.
     protected EMars_Net_InitialState Get_BornInitialState()
     {
@@ -1468,6 +1538,12 @@ class UMars_AutoTestRig_NetHeatStation : UMars_AutoTestRig_NetFeedStation
                 ? _BornStation.Get_Fragment(FMars_Fragment_Tumbler_Local).InitialState : EMars_Net_InitialState::Awaited;
         }
 
+        if (Get_HeatStation() == EMars_TESTONLY_HeatStation::Fry)
+        {
+            return _BornStation.Has_Fragment(FMars_Fragment_Fry_Local)
+                ? _BornStation.Get_Fragment(FMars_Fragment_Fry_Local).InitialState : EMars_Net_InitialState::Awaited;
+        }
+
         return _BornStation.Has_Fragment(FMars_Fragment_Batter_Local)
             ? _BornStation.Get_Fragment(FMars_Fragment_Batter_Local).InitialState : EMars_Net_InitialState::Awaited;
     }
@@ -1479,6 +1555,15 @@ class UMars_AutoTestRig_NetHeatStation : UMars_AutoTestRig_NetFeedStation
         { return EMars_Net_InitialState::Awaited; }
 
         return _BornStation.Get_Fragment(FMars_Fragment_Searing_Local).PanInitialState;
+    }
+
+    // The born fryer's SkimmerInitialState on this machine; Awaited while there is none.
+    protected EMars_Net_InitialState Get_BornSkimmerInitialState()
+    {
+        if (Get_IsLive(_BornStation) == false || _BornStation.Has_Fragment(FMars_Fragment_Fry_Local) == false)
+        { return EMars_Net_InitialState::Awaited; }
+
+        return _BornStation.Get_Fragment(FMars_Fragment_Fry_Local).SkimmerInitialState;
     }
 
     protected bool Get_HasBornFirstNotify() const
@@ -1518,6 +1603,85 @@ class UMars_AutoTestRig_NetHeatStation : UMars_AutoTestRig_NetFeedStation
         { return FMars_Fragment_Tumbler_Net(); }
 
         return _BornTumblerLedgers[0];
+    }
+
+    protected FMars_Fragment_Fry_Net Get_BornFirstFryLedger() const
+    {
+        if (_BornFryLedgers.Num() == 0)
+        { return FMars_Fragment_Fry_Net(); }
+
+        return _BornFryLedgers[0];
+    }
+
+    // The skimmer ledger the first recorded skimmer rep-notify read; the composed default while none is recorded.
+    protected FMars_Fragment_Fry_SkimmerNet Get_BornFirstSkimmerLedger() const
+    {
+        if (_BornSkimmerLedgers.Num() == 0)
+        { return FMars_Fragment_Fry_SkimmerNet(); }
+
+        return _BornSkimmerLedgers[0];
+    }
+
+    protected bool Get_HasBornFirstSkimmerNotify() const
+    {
+        return _BornSkimmerNotifyFrames.Num() > 0;
+    }
+
+    // The frame of the first recorded rep-notify of the born fryer's skimmer ledger; -1 while none is recorded.
+    protected int64 Get_BornFirstSkimmerNotifyFrame() const
+    {
+        if (_BornSkimmerNotifyFrames.Num() == 0)
+        { return -1; }
+
+        return _BornSkimmerNotifyFrames[0];
+    }
+
+    // The skimmer samples taken while the skimmer ledger read the first skimmer notify's command, and the largest lift
+    // and slide errors among them (-1 without one).
+    protected int32 Get_BornCommandSampleCount() const
+    {
+        auto Count = 0;
+        for (const auto& Sample : _BornSkimmerSamples)
+        {
+            if (Get_IsBornFirstCommand(Sample.Ledger))
+            { ++Count; }
+        }
+
+        return Count;
+    }
+
+    protected float64 Get_BornWorstLiftCm() const
+    {
+        auto Worst = -1.0;
+        for (const auto& Sample : _BornSkimmerSamples)
+        {
+            if (Get_IsBornFirstCommand(Sample.Ledger) && Sample.LiftErrorCm > Worst)
+            { Worst = Sample.LiftErrorCm; }
+        }
+
+        return Worst;
+    }
+
+    protected float64 Get_BornWorstSlideCm() const
+    {
+        auto Worst = -1.0;
+        for (const auto& Sample : _BornSkimmerSamples)
+        {
+            if (Get_IsBornFirstCommand(Sample.Ledger) && Sample.SlideErrorCm > Worst)
+            { Worst = Sample.SlideErrorCm; }
+        }
+
+        return Worst;
+    }
+
+    // InLedger carries the first skimmer notify's command: its drive and skim, its target within 0.01 (none before).
+    private bool Get_IsBornFirstCommand(const FMars_Fragment_Fry_SkimmerNet& InLedger) const
+    {
+        if (Get_HasBornFirstSkimmerNotify() == false)
+        { return false; }
+
+        const auto First = Get_BornFirstSkimmerLedger();
+        return InLedger.Drive == First.Drive && InLedger.Skim == First.Skim && (InLedger.Target - First.Target).Size() <= 0.01;
     }
 
     protected int32 Get_BornEventCount(EMars_TESTONLY_NetHeatBornEventKind InKind) const
@@ -1608,13 +1772,34 @@ class UMars_AutoTestRig_NetHeatStation : UMars_AutoTestRig_NetFeedStation
         if (Get_HeatStation() == EMars_TESTONLY_HeatStation::Batter)
         { Text += f" bowlSamples={_BornBowlSamples.Num()} dippedSamples={Get_BornDippedSampleCount()} worstDippedCm={Get_BornWorstDippedCm()}"; }
 
+        if (Get_HeatStation() == EMars_TESTONLY_HeatStation::Fry)
+        {
+            auto SkimmerNotifies = "";
+            for (int32 Index = 0; Index < _BornSkimmerNotifyFrames.Num(); ++Index)
+            {
+                const auto& Ledger = _BornSkimmerLedgers[Index];
+                SkimmerNotifies += f"{_BornSkimmerNotifyFrames[Index]}:{Ledger.Drive :n}/{Ledger.Skim :n}/{Ledger.Target} ";
+            }
+
+            Text += f" skimmerInitialAtFind={_BornSkimmerInitialAtFind :n} skimmerInitial={Get_BornSkimmerInitialState() :n}"
+                + f" skimmerNotifies=[{SkimmerNotifies}] skimmerSamples={_BornSkimmerSamples.Num()}"
+                + f" commandSamples={Get_BornCommandSampleCount()} worstLiftCm={Get_BornWorstLiftCm()} worstSlideCm={Get_BornWorstSlideCm()}";
+        }
+
         return Text;
     }
 
     // The counts the InIndex-th recorded notify carried: the bowl's bowl/serial/rows/admission and take-out refusals,
-    // the pan's heat/rows/take-out refusals, the tumbler's hatch/press and take-out refusals.
+    // the pan's heat/rows/take-out refusals, the tumbler's hatch/press and take-out refusals, the fryer's
+    // rows/skim, take-out and admission refusals.
     private FString Describe_BornNotify(int32 InIndex) const
     {
+        if (Get_HeatStation() == EMars_TESTONLY_HeatStation::Fry)
+        {
+            const auto& Ledger = _BornFryLedgers[InIndex];
+            return f"{Ledger.Pieces.Num()}/{Ledger.SkimRefusalSerial}/{Ledger.TakeOutRefusalSerial}/{Ledger.AdmissionRefusalSerial}";
+        }
+
         if (Get_HeatStation() == EMars_TESTONLY_HeatStation::Searing)
         {
             const auto& Ledger = _BornSearingLedgers[InIndex];
@@ -1641,6 +1826,9 @@ class UMars_AutoTestRig_NetHeatStation : UMars_AutoTestRig_NetFeedStation
 
         if (InEvent.Kind == EMars_TESTONLY_NetHeatBornEventKind::HatchChanged)
         { return f":{EMars_Tumbler_Hatch(InEvent.Value) :n}"; }
+
+        if (InEvent.Kind == EMars_TESTONLY_NetHeatBornEventKind::SkimChanged)
+        { return f":{EMars_Fry_Skim(InEvent.Value) :n}"; }
 
         return "";
     }
@@ -1830,7 +2018,7 @@ class UMars_AutoTestRig_NetHeatStation : UMars_AutoTestRig_NetFeedStation
     }
 
     // The born class of the hooked station with that station's spawn params and the hook's spec, as the map's spawner
-    // makes it (its own context). There is no born fry station.
+    // makes it (its own context).
     private FCk_Handle Spawn_BornHeatStation(FCk_Handle InOwner)
     {
         const auto Transform = FTransform(FRotator::ZeroRotator, Get_StationLocation());
@@ -1855,6 +2043,13 @@ class UMars_AutoTestRig_NetHeatStation : UMars_AutoTestRig_NetFeedStation
             Params.SpawnTransform = Transform;
             Params.Tumbler = Make_TumblerSpec();
             Station = utils_entity_script::Request_SpawnEntity(InOwner, UMars_TESTONLY_NetTumblerStation_Born_EntityScript, Params).Get_EntityUnderConstruction();
+        }
+        else if (Get_HeatStation() == EMars_TESTONLY_HeatStation::Fry)
+        {
+            auto Params = UMars_FryStation_EntityScript::Params();
+            Params.SpawnTransform = Transform;
+            Params.Fry = Make_FrySpec();
+            Station = utils_entity_script::Request_SpawnEntity(InOwner, UMars_TESTONLY_NetFryStation_Born_EntityScript, Params).Get_EntityUnderConstruction();
         }
 
         if (ck::EnsureIfNot(ck::IsValid(Station), f"{Get_LogTag()} there is no born {Get_HeatStation() :n} station"))
@@ -2728,5 +2923,58 @@ class UMars_AutoTestRig_NetHeatStation : UMars_AutoTestRig_NetFeedStation
 
         _BornNotifyFrames.Add(utils_time::Get_FrameCounter());
         _BornTumblerLedgers.Add(InHandle.Get_Fragment(FMars_Fragment_Tumbler_Net));
+    }
+
+    UFUNCTION()
+    private void OnBornSkimChanged(FCk_Handle_Fry InFry, EMars_Fry_Skim InSkim)
+    {
+        Add_BornEvent(EMars_TESTONLY_NetHeatBornEventKind::SkimChanged, int32(InSkim));
+    }
+
+    UFUNCTION()
+    private void OnBornSkimRefused(FCk_Handle_Fry InFry, EMars_Fry_Skim InSkim)
+    {
+        Add_BornEvent(EMars_TESTONLY_NetHeatBornEventKind::SkimRefused, 0);
+    }
+
+    UFUNCTION()
+    private void OnBornFryTakeOutRefused(FCk_Handle_Fry InFry, EMars_CookingFeed_TakeOutRefusal InRefusal)
+    {
+        Add_BornEvent(EMars_TESTONLY_NetHeatBornEventKind::TakeOutRefused, 0);
+    }
+
+    UFUNCTION()
+    private void OnBornFryAdmissionRefused(FCk_Handle_Fry InFry, FMars_CookingFeed_PieceId InPieceId, EMars_Fry_AdmissionRefusal InRefusal)
+    {
+        Add_BornEvent(EMars_TESTONLY_NetHeatBornEventKind::AdmissionRefused, 0);
+    }
+
+    UFUNCTION()
+    private void OnBornFryPieceAdded(FCk_Handle_Fry InFry, FMars_CookingFeed_PieceId InPieceId, FCk_Handle InPiece)
+    {
+        Add_BornEvent(EMars_TESTONLY_NetHeatBornEventKind::PieceAdded, 0);
+        _BornAddedIds.Add(InPieceId);
+    }
+
+    // A notify can land on a station already ending.
+    UFUNCTION()
+    private void OnBornFryNotify(FCk_Handle InHandle, FCk_DynamicFragment_RepNotifyInfo InInfo)
+    {
+        if (Get_IsLive(InHandle) == false || InHandle.Has_Fragment(FMars_Fragment_Fry_Net) == false)
+        { return; }
+
+        _BornNotifyFrames.Add(utils_time::Get_FrameCounter());
+        _BornFryLedgers.Add(InHandle.Get_Fragment(FMars_Fragment_Fry_Net));
+    }
+
+    // A notify can land on a station already ending.
+    UFUNCTION()
+    private void OnBornSkimmerNotify(FCk_Handle InHandle, FCk_DynamicFragment_RepNotifyInfo InInfo)
+    {
+        if (Get_IsLive(InHandle) == false || InHandle.Has_Fragment(FMars_Fragment_Fry_SkimmerNet) == false)
+        { return; }
+
+        _BornSkimmerNotifyFrames.Add(utils_time::Get_FrameCounter());
+        _BornSkimmerLedgers.Add(InHandle.Get_Fragment(FMars_Fragment_Fry_SkimmerNet));
     }
 }

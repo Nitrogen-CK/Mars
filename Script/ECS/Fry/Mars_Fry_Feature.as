@@ -5,9 +5,10 @@
 // to a tenth, and serials for the skims, take-outs and admissions it refused) and the skimmer's command (its drive, its skim
 // and its target), from which that copy gives its own skimmer Implement the commands the authority's drain gives its own.
 // On that copy the kernel's tick only announces: OnPieceAdded as a row's piece shows up there, so the station dresses it;
-// its mirror raises OnSkimChanged, OnSkimRefused, OnTakeOutRefused and OnAdmissionRefused from the ledgers. The other fry
-// signals, the bodies, the clocks, the tally's seconds, the pieces' cook state, holder facts and pickup claims never leave
-// the authority.
+// its mirror raises OnSkimChanged, OnSkimRefused, OnTakeOutRefused and OnAdmissionRefused from the ledgers, after the
+// state its copy was born into, which it shows as it stands (the skimmer at once where its command puts it). The
+// other fry signals, the bodies, the clocks, the tally's seconds, the pieces' cook state, holder facts and pickup
+// claims never leave the authority.
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
@@ -761,9 +762,9 @@ struct FMars_Fragment_Fry_SkimmerNet
     FVector2D Target = FVector2D::ZeroVector;
 }
 
-// Each machine's own: the kernel's ledger it last reconciled and the skimmer ledger it last applied (both used only without
-// authority), the ledger rows it announced (without authority) and the seconds since the skimmer ledger's target was last
-// written (with authority).
+// Each machine's own: the kernel's ledger it last reconciled and the skimmer ledger it last applied (both used only
+// without authority), for each ledger whether this copy has taken the state it was born into, the ledger rows it
+// announced (without authority) and the seconds since the skimmer ledger's target was last written (with authority).
 struct FMars_Fragment_Fry_Local
 {
     UPROPERTY()
@@ -771,6 +772,13 @@ struct FMars_Fragment_Fry_Local
 
     UPROPERTY()
     TOptional<FMars_Fragment_Fry_SkimmerNet> LastSkimmer;
+
+    UPROPERTY()
+    EMars_Net_InitialState InitialState = EMars_Net_InitialState::Awaited;
+
+    // The same for the skimmer's command, on which this copy's skimmer is settled.
+    UPROPERTY()
+    EMars_Net_InitialState SkimmerInitialState = EMars_Net_InitialState::Awaited;
 
     UPROPERTY()
     TArray<FMars_CookingFeed_PieceId> Announced;

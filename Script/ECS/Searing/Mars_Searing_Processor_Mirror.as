@@ -2,7 +2,8 @@
 // machine without authority binds both ledgers' rep-notifies, reconciles the kernel's once and applies the pan's once,
 // showing the ledgers this machine composed. Applying the pan's ledger is its pan Implement following the command. Each
 // ledger's first application is the state the copy was born into and is taken once as it stands: the heat announced, no
-// refused take-out and no seared face the ledger already counts raised, the pan starting a new session as it follows.
+// refused take-out and no seared face the ledger already counts raised, the pan starting a new session, shown at
+// once at the command it follows.
 // Each later change is reconciled as it arrives: each reconcile of the kernel's ledger raises, from the arrived ledger
 // against the one it last reconciled: OnTakeOutRefused once per unseen TakeOutRefusalSerial (with the ledger's last
 // reason), OnHeatChanged once when the heat differs, then OnFaceSeared once for every face that reads 1 in a row whose
@@ -73,13 +74,18 @@ class UMars_Processor_Searing_Mirror : UCk_Processor_Script_Base_UE
         Apply_Pan(Searing, EMars_Net_Reconcile::AsItArrives);
     }
 
-    // As it stands the pan starts a new session before it follows: the reset forgets the kick total this machine last
-    // followed, so the command's total is recorded and no toss made before this copy took its state is played.
+    // As it stands the pan starts a new session and is settled on the command it follows: the reset forgets the
+    // kick total this machine last followed, so the command's total is recorded and no toss made before this copy
+    // took its state is played, and the settle shows the command's tilt, lift and stir at once. The drain applies
+    // the reset first and the settle last, whatever the order they are asked in.
     private void Apply_Pan(FCk_Handle_Searing& InSearing, EMars_Net_Reconcile InHow)
     {
         auto Pan = InSearing.Get_Pan();
         if (InHow == EMars_Net_Reconcile::AsItStands)
-        { Pan.Request_Reset(FMars_Request_Implement_Reset()); }
+        {
+            Pan.Request_Reset(FMars_Request_Implement_Reset());
+            Pan.Request_Settle(FMars_Request_Implement_Settle());
+        }
 
         Pan.Request_Follow(FMars_Request_Implement_Follow(InSearing.Get_Fragment(FMars_Fragment_Searing_PanNet).Pan));
     }

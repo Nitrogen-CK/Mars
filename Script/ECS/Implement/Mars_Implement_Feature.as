@@ -1,7 +1,8 @@
 // Stance: each machine's own. Nothing of the implement replicates; every machine builds and ticks its own. With authority
 // its kernel feeds it (drive, looks, targets); without, it follows a command the kernel's authority publishes
 // (Request_Follow): it drops its looks, holds the commanded tilt targets instead of relaxing them, kicks its lift by the
-// command's running kick total and re-seats its orbit phase when it drifts, and the same tick tracks and springs it.
+// command's running kick total and re-seats its orbit phase when it drifts, and the same tick tracks and springs it; a
+// copy that takes a command as it stands is settled on it at once (Request_Settle).
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
@@ -654,8 +655,21 @@ struct FMars_Request_Implement_Reset
     FMars_Request_Implement_Reset() {}
 }
 
-// Applied Reset -> SetDrive -> SetLiftTarget -> SetTiltTarget -> SetSlideTarget -> Follow -> Look, so a reset and the first
-// drive, lift, tilt, slide and looks of a new session can share a drain.
+// Every value the implement eases is put at its target at once and the node written there: the tilt at its targets,
+// the lift and the slide at theirs with their springs at rest, the orbit's share at its drive's end. How a copy shows a
+// command it takes as it stands. Applied after every other request of its drain, so it settles on the targets that
+// drain set. Payload-less: one placeholder field (request doctrine).
+struct FMars_Request_Implement_Settle
+{
+    UPROPERTY()
+    bool Requested = true;
+
+    FMars_Request_Implement_Settle() {}
+}
+
+// Applied Reset -> SetDrive -> SetLiftTarget -> SetTiltTarget -> SetSlideTarget -> Follow -> Look -> Settle, so a reset
+// and the first drive, lift, tilt, slide and looks of a new session can share a drain, and a settle shows the targets
+// its drain set.
 struct FMars_Fragment_Implement_Requests
 {
     UPROPERTY()
@@ -678,4 +692,7 @@ struct FMars_Fragment_Implement_Requests
 
     UPROPERTY()
     TArray<FMars_Request_Implement_Look> LookRequests;
+
+    UPROPERTY()
+    TArray<FMars_Request_Implement_Settle> SettleRequests;
 }

@@ -282,6 +282,12 @@ mixin void Request_Follow(FCk_Handle_Implement& Self, const FMars_Request_Implem
     Requests.FollowRequests.Add(InRequest);
 }
 
+mixin void Request_Settle(FCk_Handle_Implement& Self, const FMars_Request_Implement_Settle& InRequest)
+{
+    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Implement_Requests);
+    Requests.SettleRequests.Add(InRequest);
+}
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Signal Binding
 //--------------------------------------------------------------------------------------------------------------------------

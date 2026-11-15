@@ -1,11 +1,12 @@
-// Drains Reset -> SetDrive -> SetLiftTarget -> SetTiltTarget -> SetSlideTarget -> Follow -> Look. Reset levels the
-// implement, zeroes the lift, the slide (and their targets) and the orbit, idles it and makes it steer itself (Own);
-// SetDrive, SetLiftTarget, SetTiltTarget and SetSlideTarget are last-wins (a lift target only for a Commanded lift, a slide
-// target only for a Commanded slide: any other is a caller's defect, ensured; tilt targets whatever the axes); Follow is
-// last-wins and makes it Followed: the command's drive and targets (clamped as the requests clamp them), a Kick lift's
-// velocity gains the command's rise in kick total, and the orbit phase is re-seated when it drifted; looks only collect
-// into the pending look while Driven and Own. The drain collects and the Tick measures: a dirty-marked processor is also
-// pumped with a zero DeltaT, so nothing here integrates over time (a followed kick is a velocity step, as a look's is).
+// Drains Reset -> SetDrive -> SetLiftTarget -> SetTiltTarget -> SetSlideTarget -> Follow -> Look -> Settle. Reset
+// levels the implement, zeroes the lift, the slide (and their targets) and the orbit, idles it and makes it steer
+// itself (Own); SetDrive, SetLiftTarget, SetTiltTarget and SetSlideTarget are last-wins (a lift target only for a
+// Commanded lift, a slide target only for a Commanded slide: any other is a caller's defect, ensured; tilt targets
+// whatever the axes); Follow is last-wins and makes it Followed: the command's drive and targets (clamped as the
+// requests clamp them), a Kick lift's velocity gains the command's rise in kick total, and the orbit phase is re-seated
+// when it drifted; looks only collect into the pending look while Driven and Own; Settle puts every eased value at its
+// target and writes the node there. The drain collects and the Tick measures: a dirty-marked processor is also pumped
+// with a zero DeltaT, so nothing here integrates over time (a followed kick is a velocity step, as a look's is).
 // Every copy runs it alike: with authority the kernel feeds it, without it the kernel's mirror sends the Follow.
 class UMars_Processor_Implement_HandleRequests : UCk_Processor_Script_Base_UE
 {
@@ -25,6 +26,7 @@ class UMars_Processor_Implement_HandleRequests : UCk_Processor_Script_Base_UE
         auto Self = InHandle.As_Implement();
 
         const auto HasReset = InRequests.ResetRequests.Num() > 0;
+        const auto HasSettle = InRequests.SettleRequests.Num() > 0;
         TArray<FMars_Request_Implement_SetDrive> SetDriveRequests = InRequests.SetDriveRequests;
         TArray<FMars_Request_Implement_SetLiftTarget> SetLiftTargetRequests = InRequests.SetLiftTargetRequests;
         TArray<FMars_Request_Implement_SetTiltTarget> SetTiltTargetRequests = InRequests.SetTiltTargetRequests;
@@ -60,6 +62,9 @@ class UMars_Processor_Implement_HandleRequests : UCk_Processor_Script_Base_UE
             for (const auto& Request : LookRequests)
             { Collect_Look(InState, Request); }
         }
+
+        if (HasSettle)
+        { Apply_Settle(Self, InState); }
 
         const auto NewDrive = InState.Drive;
         if (NewDrive == StartDrive || Self.Has_Fragment(FMars_Fragment_Implement_Signals) == false)
@@ -120,6 +125,28 @@ class UMars_Processor_Implement_HandleRequests : UCk_Processor_Script_Base_UE
         InState.WrittenLift = 0.0f;
         InState.WrittenSlide = FVector2D::ZeroVector;
         InState.WrittenOrbit = FVector::ZeroVector;
+    }
+
+    // The shown pose at its targets at once and the node written there, as Reset writes it: nothing eases toward a
+    // target this drain or an earlier one set. A None lift's target is its rest; a Kick lift's is its rest too.
+    private void Apply_Settle(FCk_Handle_Implement& InImplement, FMars_Fragment_Implement& InState)
+    {
+        InState.Pitch = InState.TargetPitch;
+        InState.Roll = InState.TargetRoll;
+        InState.Yaw = InState.TargetYaw;
+        InState.Lift = InState.TargetLift;
+        InState.LiftVelocity = 0.0f;
+        InState.Slide = InState.TargetSlide;
+        InState.SlideVelocity = FVector2D::ZeroVector;
+        InState.OrbitAlpha = InState.Drive == EMars_Implement_Drive::Driven ? 1.0f : 0.0f;
+
+        utils_implement::Apply_Pose(InImplement, InState);
+        InState.WrittenPitch = InState.Pitch;
+        InState.WrittenRoll = InState.Roll;
+        InState.WrittenYaw = InState.Yaw;
+        InState.WrittenLift = InState.Lift;
+        InState.WrittenSlide = InState.Slide;
+        InState.WrittenOrbit = utils_implement::Make_OrbitOffset(InImplement.Get_Spec().Orbit, InState);
     }
 
     // Only a Commanded lift has a target to set (any other is the caller's defect); the spring (the Tick) carries the node

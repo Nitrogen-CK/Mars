@@ -89,3 +89,34 @@ class UMars_TESTONLY_NetTumblerStation_Born_EntityScript : UMars_TumblerStation_
         Tumbler.Request_Press(FMars_Request_Tumbler_Press());
     }
 }
+
+// A copy is born into a driven skimmer dipped in the oil and moved off its park by a look, with one take-out refused
+// (it names no tray) and one admission refused (the release names no piece).
+class UMars_TESTONLY_NetFryStation_Born_EntityScript : UMars_FryStation_EntityScript
+{
+    // A little to the right: the target moves Reach.CmPerLookDegree cm per degree along +Y, still inside the pot.
+    private const FVector k_Look = FVector(5.0, 0.0, 0.0);
+
+    protected void Compose_AfterKernel(FCk_Handle& InHandle) override
+    {
+        Super::Compose_AfterKernel(InHandle);
+        utils_entity_tag::Add(InHandle, n"TAG_MarsTestNetBornHeatStation");
+        if (utils_net::Get_HasAuthority(InHandle) == false)
+        { return; }
+
+        // One drain applies them: the drive, the take-out (no tray: none handed back), the release (no piece: refused),
+        // the dip (the scoop is at its park, inside the pot), then the look.
+        auto Fry = InHandle.As_Fry();
+        Fry.Request_SetDrive(FMars_Request_Fry_SetDrive(EMars_Implement_Drive::Driven));
+        utils_cooking_feed::Request_StationTakeOut(InHandle, FMars_Request_StationTakeOut(4, FCk_Handle_Platter()));
+        const auto PieceId = FMars_CookingFeed_PieceId(constants_heat_station_net_autotest::k_RigGeneration + 1, 0);
+        const auto Release = FMars_CookingFeed_Release(PieceId, utils_transform::Get_EntityCurrentTransform(_ReleaseNode),
+            FVector::ZeroVector);
+        if (ck::EnsureIfNot(utils_cooking_feed::Request_Admit(InHandle, Release),
+            f"[FryNetTest] [{InHandle.ToString()}] did not take the release into its inbox"))
+        { return; }
+
+        Fry.Request_Skim(FMars_Request_Fry_Skim(EMars_Fry_Skim::Dip));
+        Fry.Request_Look(FMars_Request_Fry_Look(k_Look));
+    }
+}
