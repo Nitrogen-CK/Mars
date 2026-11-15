@@ -1,8 +1,11 @@
 // Once per monster, on the monster's entity: the authority drops the mirror state (its drain publishes the ledger). A
-// machine without authority binds the ledger's rep-notify and reconciles once, so a change that replicated before this
-// copy composed still counts. A reconcile applies each changed entry to this machine's own part at that roster index: the
-// condition (raising OnConditionChanged), then, from Attached, the same break or detach the authority ran, with an empty
-// cause. Debris from a mirrored detach is this machine's own.
+// machine without authority binds the ledger's rep-notify, and its first pass shows the ledger this machine composed.
+// The ledger's first application is the state the copy was born into and is taken once, as it stands: every changed
+// condition is announced, a broken part is broken and announced, and a severed part is detached and its limb drops as
+// debris, as a sever that arrives does. Each later change is reconciled as it arrives. A reconcile applies each changed
+// entry to this machine's own part at that roster index: the condition (raising OnConditionChanged), then, from
+// Attached, the same break or detach the authority ran, with an empty cause. Debris from a mirrored detach is this
+// machine's own.
 class UMars_Processor_BodyPart_Mirror : UMars_Processor_BodyPart_Base
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -26,7 +29,7 @@ class UMars_Processor_BodyPart_Mirror : UMars_Processor_BodyPart_Base
         }
 
         InHandle.BindTo_OnRepNotify(FMars_Fragment_BodyPart_Net, FCk_DynamicFragment_OnRepNotify(this, n"OnLedgerReplicated"));
-        Reconcile(InHandle);
+        Reconcile(InHandle, EMars_Net_Reconcile::AsItStands);
     }
 
     // An expected absence, not a defect: a notify can land on an entity already ending.
@@ -38,12 +41,20 @@ class UMars_Processor_BodyPart_Mirror : UMars_Processor_BodyPart_Base
         { return; }
 
         auto Root = InHandle;
-        Reconcile(Root);
+        if (Root.Get_Fragment(FMars_Fragment_BodyPart_Roster).InitialState == EMars_Net_InitialState::Awaited)
+        {
+            Root.Get_Fragment(FMars_Fragment_BodyPart_Roster).InitialState = EMars_Net_InitialState::Taken;
+            Reconcile(Root, EMars_Net_Reconcile::AsItStands);
+            return;
+        }
+
+        Reconcile(Root, EMars_Net_Reconcile::AsItArrives);
     }
 
     // Last is written before any part changes. Only entries that differ from the last reconciled ledger are applied, so a
-    // notify carrying another part's change, or nothing new, raises nothing.
-    private void Reconcile(FCk_Handle& InRoot)
+    // notify carrying another part's change, or nothing new, raises nothing. The ledger counts nothing, so both ways of
+    // taking it apply an entry alike.
+    private void Reconcile(FCk_Handle& InRoot, EMars_Net_Reconcile InHow)
     {
         const auto Ledger = InRoot.Get_Fragment(FMars_Fragment_BodyPart_Net);
         auto& Roster = InRoot.Get_Fragment(FMars_Fragment_BodyPart_Roster);

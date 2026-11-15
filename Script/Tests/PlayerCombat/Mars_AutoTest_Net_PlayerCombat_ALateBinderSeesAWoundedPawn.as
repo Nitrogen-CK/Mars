@@ -71,7 +71,10 @@ class UCk_AutoTest_Net_PlayerCombat_ALateBinderSeesAWoundedPawn : UMars_AutoTest
     UFUNCTION()
     private void OnClientSettled(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
     {
-        Log_Row(k_Row, "");
+        // Stood: the hit was in the state the copy took; arrived: it reached the copy after.
+        const FString Path = _Damaged.Num() == 0 ? "stood" : "arrived";
+        Log_Row(k_Row, f"path={Path}");
+        Assert_True(Get_HealthInitialState() == EMars_Net_InitialState::Taken, f"the client's pawn Health took the state it was born into ({Describe_HealthFind()})");
         Assert_Equals_Float(_Health.Get_Current(), 70.0f, 0.01f, "the client's copy reads 70");
         Assert_True(_Damaged.Num() <= 1, f"the client's copy raised OnDamaged at most once (got {_Damaged.Num()})");
         Assert_False(_Health.Get_IsDepleted(), "the client's copy is not depleted");

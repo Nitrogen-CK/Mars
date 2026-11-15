@@ -1,10 +1,13 @@
-// Once per Health: the authority drops the mirror state (its drain publishes the ledger and broadcasts). A machine without
-// authority binds the ledger's rep-notify and reconciles once, so a ledger that replicated before the bind still counts.
-// Each reconcile writes the state the ledger shows (the invulnerability, the depletion latch, LastHit once a damage has
-// applied), asks the local attribute to follow the ledger's value, then raises, from the arrived ledger against the one
-// it last reconciled and in the authority's order: OnHealed once when the heal serial advanced, OnDamaged once when the
-// damage serial advanced, OnDepleted once when the depletion serial advanced and the Health stands depleted. Several
-// heals or hits inside one replication are one signal, carrying the latest.
+// Once per Health: the authority drops the mirror state (its drain publishes the ledger and broadcasts). A machine
+// without authority binds the ledger's rep-notify, and its first pass shows the ledger this machine composed. The
+// ledger's first application is the state the copy was born into and is taken once, as it stands: the value, the
+// latches and LastHit are written, no heal or damage the ledger counts is raised, and OnDepleted is raised once when it
+// stands depleted. Each later change is reconciled as it arrives: the state the ledger shows is written (the
+// invulnerability, the depletion latch, LastHit once a damage has applied), the local attribute follows the ledger's
+// value, then, from the arrived ledger against the one last reconciled and in the authority's order: OnHealed once
+// when the heal serial advanced, OnDamaged once when the damage serial advanced, OnDepleted once when the depletion
+// serial advanced and the Health stands depleted. Several heals or hits inside one replication are one signal,
+// carrying the latest.
 class UMars_Processor_Health_Mirror : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -29,7 +32,7 @@ class UMars_Processor_Health_Mirror : UCk_Processor_Script_Base_UE
         }
 
         InHandle.BindTo_OnRepNotify(FMars_Fragment_Health_Net, FCk_DynamicFragment_OnRepNotify(this, n"OnLedgerReplicated"));
-        Reconcile(Health);
+        Reconcile(Health, EMars_Net_Reconcile::AsItStands);
     }
 
     // An expected absence, not a defect: a notify can land on an entity already ending.
@@ -41,20 +44,35 @@ class UMars_Processor_Health_Mirror : UCk_Processor_Script_Base_UE
         { return; }
 
         auto Health = InHandle.As_Health();
-        Reconcile(Health);
+        if (Health.Get_Fragment(FMars_Fragment_Health_Local).InitialState == EMars_Net_InitialState::Awaited)
+        {
+            Health.Get_Fragment(FMars_Fragment_Health_Local).InitialState = EMars_Net_InitialState::Taken;
+            Reconcile(Health, EMars_Net_Reconcile::AsItStands);
+            return;
+        }
+
+        Reconcile(Health, EMars_Net_Reconcile::AsItArrives);
     }
 
     // Last is written before the state and any broadcast: a handler may compose on another entity and move the fragment
     // storage, so the signals fragment is read again for every broadcast.
-    private void Reconcile(FCk_Handle_Health& InHealth)
+    private void Reconcile(FCk_Handle_Health& InHealth, EMars_Net_Reconcile InHow)
     {
         const auto Ledger = InHealth.Get_Fragment(FMars_Fragment_Health_Net);
         auto& Local = InHealth.Get_Fragment(FMars_Fragment_Health_Local);
         if (ck::EnsureIfNot(Local.Last.IsSet(), f"[Health] [{InHealth.ToString()}] has no mirror state off authority"))
         { return; }
 
-        const auto Last = Local.Last.GetValue();
+        auto Last = Local.Last.GetValue();
         Local.Last = TOptional<FMars_Fragment_Health_Net>(Ledger);
+
+        // As it stands, every heal and every damage the ledger counts came before this copy took its state: the value,
+        // the latches and LastHit are written below, and only a depletion that still stands is announced.
+        if (InHow == EMars_Net_Reconcile::AsItStands)
+        {
+            Last.HealSerial = Ledger.HealSerial;
+            Last.DamageSerial = Ledger.DamageSerial;
+        }
 
         auto& State = InHealth.Get_Fragment(FMars_Fragment_Health);
         State.IsInvulnerable = Ledger.Invulnerability == ECk_EnableDisable::Enable;

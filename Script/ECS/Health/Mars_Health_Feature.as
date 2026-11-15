@@ -2,8 +2,10 @@
 // the last damage as plain data (FMars_Fragment_Health_Net) are the replicated ledger, written only by the authority's
 // request drain: a copy without authority drops every Health request and reads its current value from the ledger. Its
 // mirror (UMars_Processor_Health_Mirror) writes the local latches and raises OnHealed, OnDamaged and OnDepleted from what
-// replicated; a mirrored event names no instigator, causer or zone, and several hits inside one replication are one
-// OnDamaged carrying the latest. A Health on a host that does not replicate has authority and behaves as it always has.
+// replicated after the state its copy was born into, which it takes as it stands (the value, the latches and LastHit,
+// and OnDepleted once for a depletion that stands); a mirrored event names no instigator, causer or zone, and several
+// hits inside one replication are one OnDamaged carrying the latest. A Health on a host that does not replicate has
+// authority and behaves as it always has.
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
@@ -220,11 +222,15 @@ struct FMars_Fragment_Health_Net
     float32 LastHealApplied = 0.0f;
 }
 
-// Each machine's own: the ledger the mirror last reconciled (unset with authority).
+// Each machine's own: the ledger the mirror last reconciled (unset with authority) and whether this copy has taken the
+// state it was born into.
 struct FMars_Fragment_Health_Local
 {
     UPROPERTY()
     TOptional<FMars_Fragment_Health_Net> Last;
+
+    UPROPERTY()
+    EMars_Net_InitialState InitialState = EMars_Net_InitialState::Awaited;
 }
 
 // Added by utils_health::Add, dropped by UMars_Processor_Health_Mirror once it has bound the ledger's rep-notify.

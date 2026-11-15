@@ -40,6 +40,13 @@ class UMars_AutoTestRig_NetPlayerCombat : UCk_AutoTest_NetBase
     // The frame counter when this machine's copy last entered Downed and Alive; -1 before.
     protected int32 _DownedFrame = -1;
     protected int32 _AliveFrame = -1;
+    // The frame counter when this machine first took its pawn's Health; -1 before.
+    protected int32 _HealthFoundFrame = -1;
+    // The pawn's Health's InitialState as this machine read it when it took the Health.
+    protected EMars_Net_InitialState _HealthInitialAtFind = EMars_Net_InitialState::Awaited;
+    // Off authority: each rep-notify of the pawn's Health ledger, its frame counter and the ledger as it then read.
+    protected TArray<int32> _HealthNotifyFrames;
+    protected TArray<FMars_Fragment_Health_Net> _HealthNotifyLedgers;
 
     private AStaticMeshActor _Floor;
     private bool _IsServerPawn = false;
@@ -208,6 +215,32 @@ class UMars_AutoTestRig_NetPlayerCombat : UCk_AutoTest_NetBase
         _Health.BindTo_OnDamaged(FMars_Delegate_Health_OnDamaged(this, n"OnHealthDamaged"));
         _Health.BindTo_OnHealed(FMars_Delegate_Health_OnHealed(this, n"OnHealthHealed"));
         _Health.BindTo_OnDepleted(FMars_Delegate_Health_OnDepleted(this, n"OnHealthDepleted"));
+        _HealthFoundFrame = int32(utils_time::Get_FrameCounter());
+        _HealthInitialAtFind = Get_HealthInitialState();
+        if (Get_IsServer() == false)
+        { _Player.BindTo_OnRepNotify(FMars_Fragment_Health_Net, FCk_DynamicFragment_OnRepNotify(this, n"OnHealthLedgerNotify")); }
+    }
+
+    // This machine's pawn's Health's level now; Awaited while there is none.
+    protected EMars_Net_InitialState Get_HealthInitialState()
+    {
+        if (ck::Is_NOT_Valid(_Health) || _Health.Has_Fragment(FMars_Fragment_Health_Local) == false)
+        { return EMars_Net_InitialState::Awaited; }
+
+        return _Health.Get_Fragment(FMars_Fragment_Health_Local).InitialState;
+    }
+
+    protected FString Describe_HealthFind()
+    {
+        auto Notifies = "";
+        for (int32 Index = 0; Index < _HealthNotifyFrames.Num(); ++Index)
+        {
+            const auto& Ledger = _HealthNotifyLedgers[Index];
+            Notifies += f"{_HealthNotifyFrames[Index]}:d{Ledger.DamageSerial}/h{Ledger.HealSerial}/x{Ledger.DepletionSerial} ";
+        }
+
+        return f"found@{_HealthFoundFrame} initialAtFind={_HealthInitialAtFind :n} initial={Get_HealthInitialState() :n} "
+            + f"notifies=[{Notifies}]";
     }
 
     // The AMars_PlayerCharacter in this machine's world nearest InSpot, within k_NearCm; null without one.
@@ -330,7 +363,7 @@ class UMars_AutoTestRig_NetPlayerCombat : UCk_AutoTest_NetBase
         const auto Hurtboxes = ck::IsValid(_Zone) ? _Zone.Get_Hurtboxes().Num() : -1;
         const auto HasAuthority = ck::IsValid(_Player) && utils_net::Get_HasAuthority(_Player);
         const auto IsLocal = ck::IsValid(_Pawn) && _Pawn.IsLocallyControlled();
-        const auto Line = f"[PlayerCombatNetTest] {InRow} {Get_MachineName()} current={Current} depleted={IsDepleted} hurtboxes={Hurtboxes} tag={Get_HasCombatTargetTag()} authority={HasAuthority} local={IsLocal} damaged={_Damaged.Num()} healed={_Healed} depletedSignals={_Depleted} downedEntries={_DownedEntries} aliveEntries={_AliveEntries} ledger=[cur {Ledger.Current} d{Ledger.DamageSerial} h{Ledger.HealSerial} x{Ledger.DepletionSerial}] ensures={Get_NewEnsures()} {InExtra}";
+        const auto Line = f"[PlayerCombatNetTest] {InRow} {Get_MachineName()} current={Current} depleted={IsDepleted} hurtboxes={Hurtboxes} tag={Get_HasCombatTargetTag()} authority={HasAuthority} local={IsLocal} damaged={_Damaged.Num()} healed={_Healed} depletedSignals={_Depleted} downedEntries={_DownedEntries} aliveEntries={_AliveEntries} ledger=[cur {Ledger.Current} d{Ledger.DamageSerial} h{Ledger.HealSerial} x{Ledger.DepletionSerial}] ensures={Get_NewEnsures()} {InExtra} health=[{Describe_HealthFind()}]";
         Log(Line);
     }
 
@@ -410,5 +443,16 @@ class UMars_AutoTestRig_NetPlayerCombat : UCk_AutoTest_NetBase
     private void OnHealthDepleted(FCk_Handle_Health InHealth, FMars_DamageEvent InCause)
     {
         _Depleted += 1;
+    }
+
+    // A notify can land on a pawn already ending.
+    UFUNCTION()
+    private void OnHealthLedgerNotify(FCk_Handle InHandle, FCk_DynamicFragment_RepNotifyInfo InInfo)
+    {
+        if (ck::Is_NOT_Valid(InHandle) || InHandle.Has_Fragment(FMars_Fragment_Health_Net) == false)
+        { return; }
+
+        _HealthNotifyFrames.Add(int32(utils_time::Get_FrameCounter()));
+        _HealthNotifyLedgers.Add(InHandle.Get_Fragment(FMars_Fragment_Health_Net));
     }
 }

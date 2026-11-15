@@ -316,8 +316,8 @@ struct FMars_Fragment_BodyPart_Net
     TArray<FMars_BodyPart_NetEntry> Parts;
 }
 
-// Each machine's own, never pruned: its parts in composition order, and the ledger its mirror last reconciled (unset
-// with authority).
+// Each machine's own, never pruned: its parts in composition order, the ledger its mirror last reconciled (unset
+// with authority), and whether this copy has taken the state it was born into.
 struct FMars_Fragment_BodyPart_Roster
 {
     UPROPERTY()
@@ -325,6 +325,9 @@ struct FMars_Fragment_BodyPart_Roster
 
     UPROPERTY()
     TOptional<FMars_Fragment_BodyPart_Net> Last;
+
+    UPROPERTY()
+    EMars_Net_InitialState InitialState = EMars_Net_InitialState::Awaited;
 }
 
 // Added with the roster, dropped by UMars_Processor_BodyPart_Mirror once it has bound the ledger's rep-notify.

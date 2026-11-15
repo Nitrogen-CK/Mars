@@ -1,9 +1,12 @@
-// What one machine's copy of a part raised: OnConditionChanged (with the last pair), OnBroken (with the frame of the
-// first) and OnSevered.
+// What one machine's copy of a part raised: OnConditionChanged (with the last pair and the frame of the first),
+// OnBroken (with the frame of the first) and OnSevered.
 struct FMars_NetBodyPartTest_Signals
 {
     UPROPERTY()
     int32 ConditionChanged = 0;
+
+    UPROPERTY()
+    int32 ConditionFrame = -1;
 
     UPROPERTY()
     EMars_BodyPart_Condition LastOld = EMars_BodyPart_Condition::Pristine;
@@ -19,6 +22,36 @@ struct FMars_NetBodyPartTest_Signals
 
     UPROPERTY()
     int32 Severed = 0;
+}
+
+// A harness fixture, not a creature: a test monster whose copy is born into the part states its authority asked for
+// in its construct. The part drain applies them in the spawn frame (a RecordHit before a Sever), so the copy's first
+// ledger reads part 0 Broken and Damaged and part 1 Attached and Damaged. Spawned with
+// FMars_NetCombat_Monster_SpawnParams.
+class UMars_TESTONLY_NetCombat_BornMonster_EntityScript : UMars_NetCombat_Monster_EntityScript
+{
+    UFUNCTION(BlueprintOverride)
+    ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
+    {
+        const auto Flow = Super::DoConstruct(InHandle);
+        const auto HasAuthority = utils_net::Get_HasAuthority(InHandle);
+        if (HasAuthority == false)
+        { return Flow; }
+
+        const auto Parts = InHandle.Has_Fragment(FMars_Fragment_BodyPart_Roster)
+            ? InHandle.Get_Fragment(FMars_Fragment_BodyPart_Roster).Parts : TArray<FCk_Handle_BodyPart>();
+        if (ck::EnsureIfNot(Parts.Num() == 2, f"[BodyPartNetTest] [{InHandle.ToString()}] lists {Parts.Num()} parts, not 2"))
+        { return Flow; }
+
+        const auto Reaction = FMars_HitZone_Reaction(GameplayTags::DamageType_Mars_Sever, 1.0f, EMars_HitZone_ConditionImpact::Damages);
+        auto Broken = Parts[0];
+        Broken.Request_RecordHit(FMars_Request_BodyPart_RecordHit(FMars_DamageEvent(30.0f, GameplayTags::DamageType_Mars_Sever), Reaction));
+        Broken.Request_Sever(FMars_Request_BodyPart_Sever(FMars_DamageEvent(30.0f, GameplayTags::DamageType_Mars_Sever)));
+
+        auto Damaged = Parts[1];
+        Damaged.Request_RecordHit(FMars_Request_BodyPart_RecordHit(FMars_DamageEvent(10.0f, GameplayTags::DamageType_Mars_Sever), Reaction));
+        return Flow;
+    }
 }
 
 // The body part net tests' shared steps, on top of the strike rig: the server spawns a test monster with two Break parts
@@ -43,6 +76,13 @@ class UMars_AutoTestRig_NetBodyPart : UMars_AutoTestRig_NetStrike
     protected FCk_Handle_Monster _Monster;
     protected TArray<FCk_Handle_BodyPart> _Parts;
     protected TArray<FMars_NetBodyPartTest_Signals> _PartSignals;
+    // The frame counter when this machine first took its monster; -1 before.
+    protected int32 _MonsterFoundFrame = -1;
+    // The roster's InitialState as this machine read it when it took its monster.
+    protected EMars_Net_InitialState _RosterInitialAtFind = EMars_Net_InitialState::Awaited;
+    // Off authority: each rep-notify of the copy's part ledger, its frame counter and the ledger as it then read.
+    protected TArray<int32> _RosterNotifyFrames;
+    protected TArray<FMars_Fragment_BodyPart_Net> _RosterNotifyLedgers;
 
     // A row without the striker: the monster at InBase.
     protected void Begin_BodyPart(FVector InBase)
@@ -67,10 +107,16 @@ class UMars_AutoTestRig_NetBodyPart : UMars_AutoTestRig_NetStrike
     // Server: a monster with two parts at _MonsterAt whose hits spill InPartSpill into its body.
     protected void Spawn_ServerMonster(float32 InPartSpill)
     {
+        Spawn_ServerMonsterOfClass(InPartSpill, UMars_NetCombat_Monster_EntityScript);
+    }
+
+    // Server: the same monster, of InClass (the test monster or a subclass).
+    protected void Spawn_ServerMonsterOfClass(float32 InPartSpill, TSubclassOf<UCk_EntityScript_UE> InClass)
+    {
         auto Params = FMars_NetCombat_Monster_SpawnParams(FTransform(FRotator::ZeroRotator, _MonsterAt), k_PartCount);
         Params.PartSpill = InPartSpill;
         utils_entity_script::Request_SpawnEntity(utils_mars_net::Get_ReplicatedSpawnOwner(Get_SubjectEntity()),
-            UMars_NetCombat_Monster_EntityScript, Params);
+            InClass, Params);
     }
 
     UFUNCTION()
@@ -131,8 +177,61 @@ class UMars_AutoTestRig_NetBodyPart : UMars_AutoTestRig_NetStrike
             Part.BindTo_OnSevered(FMars_Delegate_BodyPart_OnSevered(this, n"OnPartSevered"));
         }
 
+        _MonsterFoundFrame = int32(utils_time::Get_FrameCounter());
+        _RosterInitialAtFind = Get_RosterInitialState();
         if (Get_IsServer())
         { Track_ForCleanup(InRoot); }
+        else
+        { _MonsterRoot.BindTo_OnRepNotify(FMars_Fragment_BodyPart_Net, FCk_DynamicFragment_OnRepNotify(this, n"OnRosterLedgerNotify")); }
+    }
+
+    // This machine's roster's level now; Awaited while there is none.
+    protected EMars_Net_InitialState Get_RosterInitialState()
+    {
+        if (ck::Is_NOT_Valid(_MonsterRoot) || _MonsterRoot.Has_Fragment(FMars_Fragment_BodyPart_Roster) == false)
+        { return EMars_Net_InitialState::Awaited; }
+
+        return _MonsterRoot.Get_Fragment(FMars_Fragment_BodyPart_Roster).InitialState;
+    }
+
+    // The part ledger the first recorded rep-notify read; an empty one while none is recorded.
+    protected FMars_Fragment_BodyPart_Net Get_RosterFirstNotifyLedger() const
+    {
+        if (_RosterNotifyLedgers.Num() == 0)
+        { return FMars_Fragment_BodyPart_Net(); }
+
+        return _RosterNotifyLedgers[0];
+    }
+
+    protected int32 Get_RosterFirstNotifyFrame() const
+    {
+        if (_RosterNotifyFrames.Num() == 0)
+        { return -1; }
+
+        return _RosterNotifyFrames[0];
+    }
+
+    protected FString Describe_LedgerEntries(const FMars_Fragment_BodyPart_Net& InLedger) const
+    {
+        FString Text = f"{InLedger.Parts.Num()}:";
+        for (int32 Index = 0; Index < InLedger.Parts.Num(); ++Index)
+        {
+            const auto& Entry = InLedger.Parts[Index];
+            const FString Separator = Index == 0 ? "" : ",";
+            Text += f"{Separator}{Entry.State :n}/{Entry.Condition :n}";
+        }
+
+        return Text;
+    }
+
+    protected FString Describe_MonsterFind()
+    {
+        auto Notifies = "";
+        for (int32 Index = 0; Index < _RosterNotifyFrames.Num(); ++Index)
+        { Notifies += f"{_RosterNotifyFrames[Index]}:{Describe_LedgerEntries(_RosterNotifyLedgers[Index])} "; }
+
+        return f"found@{_MonsterFoundFrame} initialAtFind={_RosterInitialAtFind :n} initial={Get_RosterInitialState() :n} "
+            + f"notifies=[{Notifies}]";
     }
 
     protected bool Get_IsPartState(int32 InPart, EMars_BodyPart_State InState)
@@ -242,7 +341,7 @@ class UMars_AutoTestRig_NetBodyPart : UMars_AutoTestRig_NetStrike
         const auto Attached = IsFound ? _Monster.Get_AttachedPartCount() : -1;
         const auto PartsText = Describe_Parts();
         const auto LedgerText = Describe_Ledger();
-        const auto Line = f"[BodyPartNetTest] {InRow} {Get_MachineName()} parts={_Parts.Num()} {PartsText}body={BodyCurrent} attached={Attached} ledger=[{LedgerText}] ensures={Get_NewEnsures()} frame={utils_time::Get_FrameCounter()} {InExtra}";
+        const auto Line = f"[BodyPartNetTest] {InRow} {Get_MachineName()} parts={_Parts.Num()} {PartsText}body={BodyCurrent} attached={Attached} ledger=[{LedgerText}] ensures={Get_NewEnsures()} frame={utils_time::Get_FrameCounter()} {InExtra} {Describe_MonsterFind()}";
         Log(Line);
     }
 
@@ -271,6 +370,8 @@ class UMars_AutoTestRig_NetBodyPart : UMars_AutoTestRig_NetStrike
         _PartSignals[Index].ConditionChanged += 1;
         _PartSignals[Index].LastOld = InOld;
         _PartSignals[Index].LastNew = InNew;
+        if (_PartSignals[Index].ConditionFrame < 0)
+        { _PartSignals[Index].ConditionFrame = int32(utils_time::Get_FrameCounter()); }
     }
 
     UFUNCTION()
@@ -293,5 +394,16 @@ class UMars_AutoTestRig_NetBodyPart : UMars_AutoTestRig_NetStrike
         { return; }
 
         _PartSignals[Index].Severed += 1;
+    }
+
+    // A notify can land on a monster already ending.
+    UFUNCTION()
+    private void OnRosterLedgerNotify(FCk_Handle InHandle, FCk_DynamicFragment_RepNotifyInfo InInfo)
+    {
+        if (ck::Is_NOT_Valid(InHandle) || InHandle.Has_Fragment(FMars_Fragment_BodyPart_Net) == false)
+        { return; }
+
+        _RosterNotifyFrames.Add(int32(utils_time::Get_FrameCounter()));
+        _RosterNotifyLedgers.Add(InHandle.Get_Fragment(FMars_Fragment_BodyPart_Net));
     }
 }

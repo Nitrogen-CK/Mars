@@ -42,6 +42,11 @@ namespace utils_body_part
         {
             auto Roster = FMars_Fragment_BodyPart_Roster();
             Roster.Last = TOptional<FMars_Fragment_BodyPart_Net>(FMars_Fragment_BodyPart_Net());
+            // A ledger already here can only have been put here by its replicated application: this copy was born into
+            // it, has taken that state, and the mirror's first pass shows it as it stands.
+            if (MonsterEntity.Has_Fragment(FMars_Fragment_BodyPart_Net))
+            { Roster.InitialState = EMars_Net_InitialState::Taken; }
+
             MonsterEntity.Add_Fragment(Roster);
             MonsterEntity.Add_Fragment(FMars_Tag_BodyPart_RosterNeedsMirror());
         }
