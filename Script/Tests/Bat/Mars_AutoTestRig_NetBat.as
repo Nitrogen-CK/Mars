@@ -37,6 +37,8 @@ class UMars_AutoTestRig_NetBat : UMars_AutoTestRig_NetStrike
     protected FVector _SpawnOffset = FVector::ZeroVector;
     protected ECk_EnableDisable _GivesRoost = ECk_EnableDisable::Enable;
     protected bool _WithVisuals = false;
+    // Set: the bat is spawned through the held fixture, whose authority holds this ledger from its construct on.
+    protected TOptional<FMars_Fragment_Bat_Net> _HeldLedger;
 
     protected FVector _Floor = FVector::ZeroVector;
     protected FVector _HangAt = FVector::ZeroVector;
@@ -58,6 +60,13 @@ class UMars_AutoTestRig_NetBat : UMars_AutoTestRig_NetStrike
     protected int32 _BatDied = 0;
     protected int32 _BatDiedFrame = -1;
     protected int32 _BatDamaged = 0;
+
+    // The frame this machine found its copy and the copy's InitialState then, and off authority every ledger
+    // rep-notify from then on with its frame.
+    protected int32 _BatFoundFrame = -1;
+    protected EMars_Net_InitialState _BatInitialAtFind = EMars_Net_InitialState::Awaited;
+    protected TArray<int32> _BatNotifyFrames;
+    protected TArray<FMars_Fragment_Bat_Net> _BatNotifyLedgers;
 
     protected float64 _BatLargestStep = 0.0;
     protected float64 _BatFarthestFromHang = 0.0;
@@ -203,13 +212,26 @@ class UMars_AutoTestRig_NetBat : UMars_AutoTestRig_NetStrike
         WaitUntil(n"Is_ServerBatReady", _ServerContinuation, k_SlowPolls);
     }
 
-    // The real script under the replicated spawn owner, the rig's volume in its spec.
+    // The real script under the replicated spawn owner, the rig's volume in its spec; the held fixture when the row
+    // set _HeldLedger.
     protected void Spawn_ServerBat()
     {
         auto Spec = _Spec;
         Spec.Volume = _Volume;
         if (_GivesRoost == ECk_EnableDisable::Enable)
         { Spec.Roost.PerchOwner = _Roost; }
+
+        if (_HeldLedger.IsSet())
+        {
+            auto HeldParams = FMars_NetBat_Held_SpawnParams();
+            HeldParams.SpawnTransform = FTransform(FRotator::ZeroRotator, _HangAt + _SpawnOffset);
+            HeldParams.Spec = Spec;
+            HeldParams.WithVisuals = _WithVisuals;
+            HeldParams.HeldLedger = _HeldLedger.GetValue();
+            utils_entity_script::Request_SpawnEntity(utils_mars_net::Get_ReplicatedSpawnOwner(Get_SubjectEntity()),
+                UMars_NetBat_Held_EntityScript, HeldParams);
+            return;
+        }
 
         auto Params = UMars_CellarBat_EntityScript::Params();
         Params.SpawnTransform = FTransform(FRotator::ZeroRotator, _HangAt + _SpawnOffset);
@@ -255,8 +277,8 @@ class UMars_AutoTestRig_NetBat : UMars_AutoTestRig_NetStrike
         Result.Set(Get_IsBatFound());
     }
 
-    // This machine's copy near the base has composed; the first time, its signals are counted from here (and the server
-    // tracks it).
+    // This machine's copy near the base has composed; the first time, its signals are counted from here, the frame is
+    // kept, the server tracks it and a machine without authority records every ledger rep-notify.
     protected bool Get_IsBatFound()
     {
         if (ck::IsValid(_Bat))
@@ -285,8 +307,14 @@ class UMars_AutoTestRig_NetBat : UMars_AutoTestRig_NetStrike
             _Bat.BindTo_OnTargetChanged(FMars_Delegate_Bat_OnTargetChanged(this, n"OnBatTargetChanged"));
             _BatMonster.BindTo_OnDied(FMars_Delegate_Monster_OnDied(this, n"OnBatDied"));
             _Health.BindTo_OnDamaged(FMars_Delegate_Health_OnDamaged(this, n"OnBatDamaged"));
+            _BatFoundFrame = int32(utils_time::Get_FrameCounter());
+            _BatInitialAtFind = Get_BatInitialState();
             if (Get_IsServer())
             { Track_ForCleanup(Candidate); }
+
+            FCk_Handle Entity = _Bat;
+            if (utils_net::Get_HasAuthority(Entity) == false)
+            { Entity.BindTo_OnRepNotify(FMars_Fragment_Bat_Net, FCk_DynamicFragment_OnRepNotify(this, n"OnBatLedgerNotify")); }
 
             Sample_Bat();
             return true;
@@ -329,6 +357,52 @@ class UMars_AutoTestRig_NetBat : UMars_AutoTestRig_NetStrike
         { return FMars_Fragment_Bat_Net(); }
 
         return _Bat.Get_Fragment(FMars_Fragment_Bat_Net);
+    }
+
+    // This machine's copy's level now; Awaited while there is none.
+    protected EMars_Net_InitialState Get_BatInitialState()
+    {
+        if (Get_IsBatGone() || _Bat.Has_Fragment(FMars_Fragment_Bat_Local) == false)
+        { return EMars_Net_InitialState::Awaited; }
+
+        return _Bat.Get_Fragment(FMars_Fragment_Bat_Local).InitialState;
+    }
+
+    // The ledger the first recorded rep-notify read; unset while none is recorded.
+    protected TOptional<FMars_Fragment_Bat_Net> TryGet_BatFirstNotifyLedger() const
+    {
+        if (_BatNotifyLedgers.Num() == 0)
+        { return TOptional<FMars_Fragment_Bat_Net>(); }
+
+        return TOptional<FMars_Fragment_Bat_Net>(_BatNotifyLedgers[0]);
+    }
+
+    protected int32 Get_BatFirstNotifyFrame() const
+    {
+        if (_BatNotifyFrames.Num() == 0)
+        { return -1; }
+
+        return _BatNotifyFrames[0];
+    }
+
+    protected FString Describe_BatFind()
+    {
+        auto Notifies = FString();
+        for (int32 Index = 0; Index < _BatNotifyFrames.Num(); ++Index)
+        { Notifies += f"{_BatNotifyFrames[Index]}:{_BatNotifyLedgers[Index].Phase :n} "; }
+
+        const auto PhaseClock = Get_IsBatGone() ? -1.0f : _Bat.Get_PhaseClock();
+        return f"found@{_BatFoundFrame} initialAtFind={_BatInitialAtFind :n} initial={Get_BatInitialState() :n} notifies=[{Notifies}] phaseClock={PhaseClock}";
+    }
+
+    // The held fixture's frames on this machine's bat; "none" without it.
+    protected FString Describe_BatHeld()
+    {
+        if (Get_IsBatGone() || _Bat.Has_Fragment(FMars_TESTONLY_Fragment_Bat_HeldLedger) == false)
+        { return FString("none"); }
+
+        const auto Held = _Bat.Get_Fragment(FMars_TESTONLY_Fragment_Bat_HeldLedger);
+        return f"{Held.ConstructFrame} {Held.FirstHoldFrame}";
     }
 
     protected float64 Get_BatFromHang()
@@ -485,7 +559,7 @@ class UMars_AutoTestRig_NetBat : UMars_AutoTestRig_NetStrike
 
         const auto Body = IsFound && ck::IsValid(_Health) ? _Health.Get_Current() : -1.0f;
         const auto Phases = Describe_BatPhases();
-        const auto Line = f"[BatNetTest] {InRow} {Get_MachineName()} phase={Phase} root={Location.ToString()} anchor={Anchor.ToString()} ledger=[{LedgerText}] phases=[{Phases}] landed={_BatSwoopsLanded} cancelled={_BatSwoopsCancelled} routes={_BatRouteOutcomes} perchLost={_BatPerchLost} targets={_BatTargetChanges} died={_BatDied} diedFrame={_BatDiedFrame} damaged={_BatDamaged} body={Body} largestStep={_BatLargestStep} farthestFromHang={_BatFarthestFromHang} highestSpeed={_BatHighestSpeed} largestTurn={_BatLargestTurnRate} largestYawChange={_BatLargestYawChange} lowestHeight={_BatLowestHeight} handles=[{HandlesText}] bake=[frames {_BakeFrames} seconds {_BakeSeconds}] ensures={Get_NewEnsures()} frame={utils_time::Get_FrameCounter()} {InExtra}";
+        const auto Line = f"[BatNetTest] {InRow} {Get_MachineName()} phase={Phase} root={Location.ToString()} anchor={Anchor.ToString()} ledger=[{LedgerText}] phases=[{Phases}] landed={_BatSwoopsLanded} cancelled={_BatSwoopsCancelled} routes={_BatRouteOutcomes} perchLost={_BatPerchLost} targets={_BatTargetChanges} died={_BatDied} diedFrame={_BatDiedFrame} damaged={_BatDamaged} body={Body} largestStep={_BatLargestStep} farthestFromHang={_BatFarthestFromHang} highestSpeed={_BatHighestSpeed} largestTurn={_BatLargestTurnRate} largestYawChange={_BatLargestYawChange} lowestHeight={_BatLowestHeight} handles=[{HandlesText}] bake=[frames {_BakeFrames} seconds {_BakeSeconds}] ensures={Get_NewEnsures()} frame={utils_time::Get_FrameCounter()} {InExtra} {Describe_BatFind()} held=[{Describe_BatHeld()}]";
         Log(Line);
     }
 
@@ -560,5 +634,16 @@ class UMars_AutoTestRig_NetBat : UMars_AutoTestRig_NetStrike
     private void OnBatDamaged(FCk_Handle_Health InHealth, FMars_DamageEvent InEvent, float32 InApplied, float32 InRemaining)
     {
         _BatDamaged += 1;
+    }
+
+    // A notify can land on a bat already ending.
+    UFUNCTION()
+    private void OnBatLedgerNotify(FCk_Handle InHandle, FCk_DynamicFragment_RepNotifyInfo InInfo)
+    {
+        if (ck::Is_NOT_Valid(InHandle) || InHandle.Has_Fragment(FMars_Fragment_Bat_Net) == false)
+        { return; }
+
+        _BatNotifyFrames.Add(int32(utils_time::Get_FrameCounter()));
+        _BatNotifyLedgers.Add(InHandle.Get_Fragment(FMars_Fragment_Bat_Net));
     }
 }

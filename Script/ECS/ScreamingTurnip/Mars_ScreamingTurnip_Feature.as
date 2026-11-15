@@ -14,8 +14,9 @@ asset Mars_ScreamingTurnipHandle of UCkDynamic_HandleDefinition
 // Replication: the authority runs the clock, the settle sample, the cycle and the requests, and publishes the ledger
 // (FMars_Fragment_ScreamingTurnip_Net: placement, phase, support, the scream sequence and its place) through
 // utils_screaming_turnip::Publish, its one writer. A copy without authority mirrors the levels
-// (UMars_Processor_ScreamingTurnip_Mirror), times a phase from its arrival, raises the three signals once per arrived
-// change, drops every request, and replays no scream it did not see arrive.
+// (UMars_Processor_ScreamingTurnip_Mirror), times a phase from its arrival, takes the state it was born into as it
+// stands, then raises the three signals once per arrived change, drops every request, and replays no scream it did not
+// see arrive.
 struct FMars_Feature_ScreamingTurnip {}
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -323,19 +324,24 @@ struct FMars_Fragment_ScreamingTurnip_Net
     FVector ScreamPosition = FVector::ZeroVector;
 }
 
-// Each machine's own: the ledger the mirror last reconciled (unset with authority).
+// Each machine's own: the ledger the mirror last reconciled (unset with authority) and whether this copy has taken
+// the state it was born into.
 struct FMars_Fragment_ScreamingTurnip_Local
 {
     UPROPERTY()
     TOptional<FMars_Fragment_ScreamingTurnip_Net> Last;
+
+    UPROPERTY()
+    EMars_Net_InitialState InitialState = EMars_Net_InitialState::Awaited;
 }
 
 // Added by utils_screaming_turnip::Add, dropped by UMars_Processor_ScreamingTurnip_Mirror once it has bound the
 // ledger's rep-notify.
 struct FMars_Tag_ScreamingTurnip_NeedsMirror {}
 
-// How a copy without authority takes the ledger: as it stands when the copy binds (no scream committed before it is
-// raised), or as each change arrives.
+// How a copy without authority takes the ledger: as it stands at the ledger's first application on this machine (a
+// copy shows the root as it is, and no scream committed before it took that state is raised), or as each later change
+// arrives.
 enum EMars_ScreamingTurnip_Reconcile
 {
     AsItStands,

@@ -1,8 +1,9 @@
 // Once per bat: the authority drops the mirror state (its drain and its tick publish the ledger). A machine without
-// authority binds the ledger's rep-notify and reconciles once as it stands, so a copy that composed late shows the
-// phase and the place it hangs from as they are, and hears no past change; each later change is reconciled as it
-// arrives: the phase starts on this machine's clock and OnPhaseChanged is raised once. A phase that never arrived
-// because two of the authority's writes reached this machine as one is not replayed.
+// authority binds the ledger's rep-notify and reconciles once as it stands, which shows what this machine composed.
+// The ledger's first application is the state the copy was born into and is taken once as it stands: the phase and
+// the place it hangs from as they are, its phase clock from that moment, and no past change heard. Each later change
+// is reconciled as it arrives: the phase starts on this machine's clock and OnPhaseChanged is raised once. A phase
+// that never arrived because two of the authority's writes reached this machine as one is not replayed.
 class UMars_Processor_Bat_Mirror : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -39,6 +40,13 @@ class UMars_Processor_Bat_Mirror : UCk_Processor_Script_Base_UE
         { return; }
 
         auto Bat = InHandle.As_Bat();
+        if (Bat.Get_Fragment(FMars_Fragment_Bat_Local).InitialState == EMars_Net_InitialState::Awaited)
+        {
+            Bat.Get_Fragment(FMars_Fragment_Bat_Local).InitialState = EMars_Net_InitialState::Taken;
+            Reconcile(Bat, EMars_Bat_Reconcile::AsItStands);
+            return;
+        }
+
         Reconcile(Bat, EMars_Bat_Reconcile::AsItArrives);
     }
 

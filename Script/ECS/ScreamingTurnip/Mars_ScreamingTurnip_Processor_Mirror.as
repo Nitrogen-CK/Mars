@@ -1,10 +1,12 @@
 // Once per root: the authority drops the mirror state (its drain and its tick publish the ledger). A machine without
-// authority binds the ledger's rep-notify and reconciles once as it stands, then as each change arrives: the levels are
-// written into the state and settle fragments the presentation reads, a changed phase starts on this machine's clock,
-// and the kernel's three signals are raised once per arrived change. As it stands no scream is raised (one committed
-// before this copy composed is not replayed); a sequence that advanced by more than one raises one scream, the
-// latest; a phase that never arrived because two of the authority's writes reached this machine as one is not
-// replayed.
+// authority binds the ledger's rep-notify and reconciles once as it stands, which shows what this machine composed.
+// The ledger's first application is the state the copy was born into and is taken once as it stands: the levels are
+// written into the state and settle fragments the presentation reads and announced, a phase it was born into starts
+// on this machine's clock, and no scream is raised (one committed before this copy took its state is not replayed).
+// Each later change is reconciled as it arrives: the levels are written and announced, a changed phase starts on this
+// machine's clock, and the kernel's three signals are raised once per arrived change. A sequence that advanced by more
+// than one raises one scream, the latest; a phase that never arrived because two of the authority's writes reached
+// this machine as one is not replayed.
 class UMars_Processor_ScreamingTurnip_Mirror : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -41,6 +43,13 @@ class UMars_Processor_ScreamingTurnip_Mirror : UCk_Processor_Script_Base_UE
         { return; }
 
         auto Turnip = InHandle.As_ScreamingTurnip();
+        if (Turnip.Get_Fragment(FMars_Fragment_ScreamingTurnip_Local).InitialState == EMars_Net_InitialState::Awaited)
+        {
+            Turnip.Get_Fragment(FMars_Fragment_ScreamingTurnip_Local).InitialState = EMars_Net_InitialState::Taken;
+            Reconcile(Turnip, EMars_ScreamingTurnip_Reconcile::AsItStands);
+            return;
+        }
+
         Reconcile(Turnip, EMars_ScreamingTurnip_Reconcile::AsItArrives);
     }
 

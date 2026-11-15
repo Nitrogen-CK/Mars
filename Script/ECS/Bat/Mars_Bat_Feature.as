@@ -15,8 +15,8 @@ asset Mars_BatHandle of UCkDynamic_HandleDefinition
 // (FMars_Fragment_Bat_Net: the phase and the place it hangs from) through utils_bat::Publish, its one writer; the root
 // transform replicates with it. A copy without authority follows the replicated root, shows the ledger's phase on its
 // own clock (UMars_Processor_Bat_Mirror), measures its own telemetry from that root, hangs from the ledger's place,
-// drops every request, is struck through the strike claim and dies when its monster's ledger does. A copy that
-// composes late shows the phase and the place as they stand and hears no past change. The roost and the flight volume
+// drops every request, is struck through the strike claim and dies when its monster's ledger does. A copy takes the
+// phase and the place it was born into as they stand and hears no past change. The roost and the flight volume
 // are the authority's; the blow, the sweep, the fall and the corpse are the authority's alone.
 struct FMars_Feature_Bat {}
 
@@ -673,18 +673,23 @@ struct FMars_Fragment_Bat_Net
     FVector PerchAnchor = FVector::ZeroVector;
 }
 
-// Each machine's own: the ledger the mirror last reconciled (unset with authority).
+// Each machine's own: the ledger the mirror last reconciled (unset with authority) and whether this copy has taken
+// the state it was born into.
 struct FMars_Fragment_Bat_Local
 {
     UPROPERTY()
     TOptional<FMars_Fragment_Bat_Net> Last;
+
+    UPROPERTY()
+    EMars_Net_InitialState InitialState = EMars_Net_InitialState::Awaited;
 }
 
 // Added by utils_bat::Add, dropped by UMars_Processor_Bat_Mirror once it has bound the ledger's rep-notify.
 struct FMars_Tag_Bat_NeedsMirror {}
 
-// How a copy without authority takes the ledger: as it stands when the copy binds (a copy that composed late shows the
-// bat's phase and place as they are), or as each change arrives (the phase then starts on this machine's clock).
+// How a copy without authority takes the ledger: as it stands at the ledger's first application on this machine (a
+// copy shows the phase and the place it was born into, its phase clock from that moment, and raises nothing), or as
+// each later change arrives (the phase then starts on this machine's clock and OnPhaseChanged is raised).
 enum EMars_Bat_Reconcile
 {
     AsItStands,

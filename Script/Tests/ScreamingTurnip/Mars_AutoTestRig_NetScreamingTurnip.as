@@ -41,6 +41,12 @@ struct FMars_AutoTestHelper_NetTurnipRoot
     // The ledger as the last sample saw it, and how many changes the samples saw.
     TOptional<FMars_Fragment_ScreamingTurnip_Net> SampledLedger;
     int32 LedgerChanges = 0;
+    // The frame this machine found its copy and the copy's InitialState then, and off authority every ledger
+    // rep-notify from then on with its frame.
+    int32 FoundFrame = -1;
+    EMars_Net_InitialState InitialAtFind = EMars_Net_InitialState::Awaited;
+    TArray<int32> NotifyFrames;
+    TArray<FMars_Fragment_ScreamingTurnip_Net> NotifyLedgers;
 }
 
 // What Compose_TurnipCarrier built on the subject.
@@ -451,6 +457,21 @@ class UMars_AutoTestRig_NetScreamingTurnip : UMars_AutoTestRig_NetControl
         Track_ForCleanup(Pending.Get_EntityUnderConstruction());
     }
 
+    // Server: as Spawn_ServerRoot, through the held fixture whose authority holds InLedger from its construct on.
+    protected void Spawn_ServerHeldRoot(int32 InIndex, FMars_ScreamingTurnip_Vocal InVocal, FMars_Fragment_ScreamingTurnip_Net InLedger)
+    {
+        auto Params = FMars_NetScreamingTurnip_Held_SpawnParams();
+        Params.SpawnTransform = FTransform(FRotator::ZeroRotator, _Roots[InIndex].SpawnPlace + FVector(0.0, 0.0, 20.0));
+        Params.Definition = mars_items::ScreamingTurnip();
+        Params.Mode = EMars_WorldItem_Mode::World;
+        Params.Vocal = InVocal;
+        Params.HeldLedger = InLedger;
+
+        auto Owner = utils_mars_net::Get_ReplicatedSpawnOwner(Get_SubjectEntity());
+        auto Pending = utils_world_item::Request_SpawnWorldEntity(Owner, UMars_NetScreamingTurnip_Held_EntityScript, Params);
+        Track_ForCleanup(Pending.Get_EntityUnderConstruction());
+    }
+
     // Both machines: a hand node at InHandLocation and a Back node behind and above it, their attach points, a hotbar
     // of one bag slot (no backpack slot), HeldItem and HeldItemUse, on the subject.
     protected void Compose_TurnipCarrier(FVector InHandLocation)
@@ -478,7 +499,8 @@ class UMars_AutoTestRig_NetScreamingTurnip : UMars_AutoTestRig_NetControl
     }
 
     // This machine's copy of root InIndex: the World-mode world item within k_RootFindRadius of its spawn place in X
-    // and Y that is a ScreamingTurnip. The first time, its three signals are recorded from here.
+    // and Y that is a ScreamingTurnip. The first time, its three signals are recorded from here, the frame is kept and,
+    // off authority, every ledger rep-notify is recorded.
     protected bool Get_IsRootFound(int32 InIndex)
     {
         if (ck::IsValid(_Roots[InIndex].Turnip))
@@ -500,6 +522,12 @@ class UMars_AutoTestRig_NetScreamingTurnip : UMars_AutoTestRig_NetControl
             Turnip.BindTo_OnPhaseChanged(FMars_Delegate_ScreamingTurnip_OnPhaseChanged(this, n"OnRootPhaseChanged"));
             Turnip.BindTo_OnPlacementChanged(FMars_Delegate_ScreamingTurnip_OnPlacementChanged(this, n"OnRootPlacementChanged"));
             Turnip.BindTo_OnScreamCommitted(FMars_Delegate_ScreamingTurnip_OnScreamCommitted(this, n"OnRootScreamCommitted"));
+            _Roots[InIndex].FoundFrame = int32(utils_time::Get_FrameCounter());
+            _Roots[InIndex].InitialAtFind = Get_RootInitialState(InIndex);
+            FCk_Handle Entity = Turnip;
+            if (utils_net::Get_HasAuthority(Entity) == false)
+            { Entity.BindTo_OnRepNotify(FMars_Fragment_ScreamingTurnip_Net, FCk_DynamicFragment_OnRepNotify(this, n"OnRootLedgerNotify")); }
+
             return true;
         }
 
@@ -725,7 +753,46 @@ class UMars_AutoTestRig_NetScreamingTurnip : UMars_AutoTestRig_NetControl
         for (const auto& Scream : _Roots[InIndex].Screams)
         { ScreamsText += f"{Scream.Sequence}({Scream.Placement :n})@{Scream.Frame} "; }
 
-        return f"root {InIndex} authority {utils_net::Get_HasAuthority(Turnip)}, placement {Turnip.Get_Placement() :n}, phase {Turnip.Get_Phase() :n}, support {Turnip.Get_HasSupport()}, sequence {Turnip.Get_ScreamSequence()}, ledger [{LedgerText}], ledgerChanges {_Roots[InIndex].LedgerChanges}, mount {WorldItem.Get_Mount() :n}, body {ck::IsValid(WorldItem.Get_Body())}, phases [{PhasesText}], screams [{ScreamsText}], ensures {Get_NewEnsures()}";
+        return f"root {InIndex} authority {utils_net::Get_HasAuthority(Turnip)}, placement {Turnip.Get_Placement() :n}, phase {Turnip.Get_Phase() :n}, support {Turnip.Get_HasSupport()}, sequence {Turnip.Get_ScreamSequence()}, ledger [{LedgerText}], ledgerChanges {_Roots[InIndex].LedgerChanges}, mount {WorldItem.Get_Mount() :n}, body {ck::IsValid(WorldItem.Get_Body())}, phases [{PhasesText}], screams [{ScreamsText}], ensures {Get_NewEnsures()}, {Describe_RootFind(InIndex)}";
+    }
+
+    // This machine's copy's level now; Awaited while there is none.
+    protected EMars_Net_InitialState Get_RootInitialState(int32 InIndex)
+    {
+        if (Get_IsRootGone(InIndex) || _Roots[InIndex].Turnip.Has_Fragment(FMars_Fragment_ScreamingTurnip_Local) == false)
+        { return EMars_Net_InitialState::Awaited; }
+
+        return _Roots[InIndex].Turnip.Get_Fragment(FMars_Fragment_ScreamingTurnip_Local).InitialState;
+    }
+
+    // The ledger the first recorded rep-notify of root InIndex read; unset while none is recorded.
+    protected TOptional<FMars_Fragment_ScreamingTurnip_Net> TryGet_RootFirstNotifyLedger(int32 InIndex) const
+    {
+        if (_Roots[InIndex].NotifyLedgers.Num() == 0)
+        { return TOptional<FMars_Fragment_ScreamingTurnip_Net>(); }
+
+        return TOptional<FMars_Fragment_ScreamingTurnip_Net>(_Roots[InIndex].NotifyLedgers[0]);
+    }
+
+    protected int32 Get_RootFirstNotifyFrame(int32 InIndex) const
+    {
+        if (_Roots[InIndex].NotifyFrames.Num() == 0)
+        { return -1; }
+
+        return _Roots[InIndex].NotifyFrames[0];
+    }
+
+    protected FString Describe_RootFind(int32 InIndex)
+    {
+        const auto& Root = _Roots[InIndex];
+        auto Notifies = FString();
+        for (int32 Entry = 0; Entry < Root.NotifyFrames.Num(); ++Entry)
+        {
+            const auto& Ledger = Root.NotifyLedgers[Entry];
+            Notifies += f"{Root.NotifyFrames[Entry]}:{Ledger.Placement :n}/{Ledger.Phase :n}/{Ledger.ScreamSequence} ";
+        }
+
+        return f"found@{Root.FoundFrame} initialAtFind={Root.InitialAtFind :n} initial={Get_RootInitialState(InIndex) :n} notifies=[{Notifies}]";
     }
 
     private int32 Find_RootOf(FCk_Handle_ScreamingTurnip InTurnip) const
@@ -781,6 +848,21 @@ class UMars_AutoTestRig_NetScreamingTurnip : UMars_AutoTestRig_NetControl
         Entry.Placement = InTurnip.Get_Placement();
         Entry.Frame = int64(utils_time::Get_FrameCounter());
         _Roots[Index].Screams.Add(Entry);
+    }
+
+    // A notify can land on a root already ending.
+    UFUNCTION()
+    private void OnRootLedgerNotify(FCk_Handle InHandle, FCk_DynamicFragment_RepNotifyInfo InInfo)
+    {
+        if (ck::Is_NOT_Valid(InHandle) || InHandle.Is_ScreamingTurnip() == false || InHandle.Has_Fragment(FMars_Fragment_ScreamingTurnip_Net) == false)
+        { return; }
+
+        const auto Index = Find_RootOf(InHandle.As_ScreamingTurnip());
+        if (Index < 0)
+        { return; }
+
+        _Roots[Index].NotifyFrames.Add(int32(utils_time::Get_FrameCounter()));
+        _Roots[Index].NotifyLedgers.Add(InHandle.Get_Fragment(FMars_Fragment_ScreamingTurnip_Net));
     }
 
     //----------------------------------------------------------------------------------------------------------------------

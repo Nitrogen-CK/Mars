@@ -31,8 +31,11 @@ namespace utils_screaming_turnip
         auto Local = FMars_Fragment_ScreamingTurnip_Local();
         Local.Last = TOptional<FMars_Fragment_ScreamingTurnip_Net>(Ledger);
 
-        // A client's copy can receive the replicated ledger before it composes: the arrived ledger stands then.
-        if (InHandle.Has_Fragment(FMars_Fragment_ScreamingTurnip_Net) == false)
+        // A ledger already here can only have been put here by its replicated application: this copy was born into it,
+        // has taken that state, and the mirror's first pass shows it as it stands.
+        if (InHandle.Has_Fragment(FMars_Fragment_ScreamingTurnip_Net))
+        { Local.InitialState = EMars_Net_InitialState::Taken; }
+        else
         { InHandle.Add_Fragment(Ledger, ECk_Replication::Replicates); }
 
         InHandle.Add_Fragment(Local);
