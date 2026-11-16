@@ -11,7 +11,10 @@ class UMars_SmState_ItemUse_Consume : UMars_SmState_InteractTarget_RunTask
     default TaskClass = UMars_SmTask_ItemUse_Consume;
 }
 
-// Destroys the held item when its UseAction says the use consumes it. The slot stays selected with empty hands.
+// When the held item's UseAction says the use consumes it, asks for it to be eaten through
+// utils_held_item_use::Request_ConsumeFor: the authority judges the ask and removes the item from its slot. On a
+// machine without authority the item leaves the hands when the slot's removal arrives. The slot stays selected with
+// empty hands.
 class UMars_SmTask_ItemUse_Consume : UCk_SmTask_EntityScript
 {
     default _TaskMode = ECk_SmTaskMode::EnterExitOnly;
@@ -38,16 +41,8 @@ class UMars_SmTask_ItemUse_Consume : UCk_SmTask_EntityScript
         const UMars_ItemTrait_UseAction UseAction = Item.Get_UseAction();
         if (UseAction.ConsumeOnSuccess)
         {
-            auto Inventory = Item.Get_ParentInventory();
-            if (ck::EnsureIfNot(ck::IsValid(Inventory), f"[ItemUse] Held item [{Item.ToString()}] is in no inventory"))
-            {
-                Mark_Result(ECk_SmTaskResult::Failed);
-                return;
-            }
-
-            auto Request = FCk_Request_Inventory_RemoveItem(Item);
-            Request.Set_PostRemovePolicy(ECk_Inventory_PostRemovePolicy::DestroyItem);
-            Inventory.Request_RemoveItem(Request, FCk_Delegate_Inventory_OnOperationResult_Remove());
+            FCk_Handle Player = HeldItem;
+            utils_held_item_use::Request_ConsumeFor(Player, Item);
         }
 
         Mark_Result(ECk_SmTaskResult::Succeeded);
@@ -112,8 +107,9 @@ enum EMars_ItemUse_StrikePhase
 // the dealer's Request_StrikeSweep (filtered on Probe.Mars.HitZone; Blocking world policy, so a wall in front of a
 // hurtbox stops the swing; Silent overlap notify). The first hurtbox hit is dealt through the player's DamageDealer,
 // which resolves it to its zone. Succeeds RecoverySeconds after the sweep. Fails when the player has no dealer or
-// viewpoint, or the held item has no Strike trait. Exiting mid-swing (the use torn down) cancels the local swing. A blow
-// on a zone another machine owns is claimed to the authority through Cue.Mars.HeldItemUse.Strike.
+// viewpoint, or the held item has no Strike trait. Exiting mid-swing (the use torn down) cancels the swing on every
+// machine that was shown its start (AMars_PlayerCharacter::Request_CancelStrike). A blow on a zone another machine
+// owns is claimed to the authority through Cue.Mars.HeldItemUse.Strike.
 class UMars_SmTask_ItemUse_Strike : UCk_SmTask_EntityScript
 {
     default _TaskMode = ECk_SmTaskMode::Tick;
@@ -198,11 +194,17 @@ class UMars_SmTask_ItemUse_Strike : UCk_SmTask_EntityScript
     UFUNCTION(BlueprintOverride)
     void DoExitTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
     {
-        if (_Outcome != ECk_SmTaskResult::Running || ck::Is_NOT_Valid(_Player) || _Player.Is_HandSwing() == false)
+        if (_Outcome != ECk_SmTaskResult::Running || ck::Is_NOT_Valid(_Player))
         { return; }
 
-        auto Swing = _Player.As_HandSwing();
-        Swing.Request_Cancel(FMars_Request_HandSwing_Cancel());
+        auto Character = Cast<AMars_PlayerCharacter>(ck::ToActor(_Player, ECk_SanityCheck::UnChecked));
+        if (ck::IsValid(Character))
+        { Character.Request_CancelStrike(); }
+        else if (_Player.Is_HandSwing())
+        {
+            auto Swing = _Player.As_HandSwing();
+            Swing.Request_Cancel(FMars_Request_HandSwing_Cancel());
+        }
     }
 
     UFUNCTION(BlueprintOverride)

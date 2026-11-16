@@ -1,6 +1,6 @@
-// Drains Refresh, then Drop, then Throw, then Strike, then SetThrowArmed. Refresh, Drop and Throw carry no payload, so each
-// kind is applied at most once per drain; a Drop and a Throw of one held item are one launch (LaunchedItem): the second is
-// dropped.
+// Drains Refresh, then Drop, then Throw, then Strike, then Consume, then SetThrowArmed. Refresh, Drop and Throw carry
+// no payload, so each kind is applied at most once per drain; a Drop and a Throw of one held item are one launch
+// (LaunchedItem): the second is dropped.
 //
 // Strike is a blow another machine claims (Cue.Mars.HeldItemUse.Strike), applied only on the authority, each claim on its
 // own in arrival order, and judged against what the authority holds: refused at the first of ItemMismatch (nothing held
@@ -9,6 +9,15 @@
 // + k_StrikeReachSlack from the hand, or past k_StrikeZoneSlack from every hurtbox of the zone). Otherwise it is dealt
 // through the player's dealer from the authority's copy of the item's Strike trait; friendly fire and a disabled zone stay
 // the dealer's rejections. The tally records every verdict.
+//
+// Consume is a use that eats the held item (utils_held_item_use::Request_ConsumeFor; Cue.Mars.HeldItemUse.Consume from
+// another machine), applied only on the authority, each on its own in arrival order, and judged against what the
+// authority holds: refused at the first of ItemMismatch (nothing held, or not the named item), NotConsumable (no
+// UseAction, or one that does not eat), Leaving (a launch or an earlier consume already took the item) and TooSoon (a
+// Timed use whose last applied consume is under k_ConsumeMinIntervalFraction of its hold ago). Otherwise the item's
+// slot removes and destroys it, and ConsumedItem keeps it from a second consume or a launch until it is gone. A launch
+// yields to that, so of a drop and a consume of one item the drop acts in one drain (it drains first) and the first
+// acts across two: the item is never both eaten and dropped. Its tally records every verdict.
 //
 // Refresh owns the use interactable: a no-probe child of the player whose single Primary.UsableItem target runs the held
 // item's UseAction state. Nothing traces it, so it is focused and offered to the player's resolver here, and torn down
@@ -51,6 +60,7 @@ class UMars_Processor_HeldItemUse_HandleRequests : UCk_Processor_Script_Base_UE
         { ThrowLaunch.Aim = InRequests.ThrowRequests.Last().Aim; }
 
         TArray<FMars_Request_HeldItemUse_Strike> StrikeRequests = InRequests.StrikeRequests;
+        TArray<FMars_Request_HeldItemUse_Consume> ConsumeRequests = InRequests.ConsumeRequests;
         TArray<FMars_Request_HeldItemUse_SetThrowArmed> SetThrowArmedRequests = InRequests.SetThrowArmedRequests;
         const auto HasAuthority = utils_net::Get_HasAuthority(InHandle);
 
@@ -70,6 +80,9 @@ class UMars_Processor_HeldItemUse_HandleRequests : UCk_Processor_Script_Base_UE
         {
             for (const auto& Request : StrikeRequests)
             { JudgeStrike(InHandle, InState, Request.Strike); }
+
+            for (const auto& Request : ConsumeRequests)
+            { JudgeConsume(InHandle, InState, Request); }
         }
 
         for (const auto& Request : SetThrowArmedRequests)
@@ -191,7 +204,7 @@ class UMars_Processor_HeldItemUse_HandleRequests : UCk_Processor_Script_Base_UE
         if (ck::Is_NOT_Valid(Item))
         { return; }
 
-        if (Item == InState.LaunchedItem)
+        if (Get_IsLeaving(InPlayer, InState))
         { return; }
 
         auto WorldItem = Item.Get_PersistentWorldItem();
@@ -213,6 +226,7 @@ class UMars_Processor_HeldItemUse_HandleRequests : UCk_Processor_Script_Base_UE
             WorldItem.Request_Release(FMars_Request_WorldItem_Release(Solution.LinearVelocity, Solution.AngularVelocityDeg));
 
             InState.LaunchedItem = Item;
+            InState.LaunchedAtItemChange = HeldItem.Get_ItemChangeCount();
             Broadcast_ItemLaunched(InPlayer, Item, InKind);
             return;
         }
@@ -233,6 +247,7 @@ class UMars_Processor_HeldItemUse_HandleRequests : UCk_Processor_Script_Base_UE
         utils_world_item::Request_SpawnWorldEntity(Owner, utils_world_item::Get_WorldItemScriptClass(Item), SpawnParams);
 
         InState.LaunchedItem = Item;
+        InState.LaunchedAtItemChange = HeldItem.Get_ItemChangeCount();
         Broadcast_ItemLaunched(InPlayer, Item, InKind);
     }
 
@@ -290,6 +305,78 @@ class UMars_Processor_HeldItemUse_HandleRequests : UCk_Processor_Script_Base_UE
         Event.Hit.Normal = InClaim.Normal;
         Event.Hit.Impulse = InClaim.Impulse.GetSafeNormal() * Strike.ImpulseSpeed;
         Dealer.Request_DealDamage(FMars_Request_DamageDealer_DealDamage(Zone, Event));
+    }
+
+    //--------------------------------------------------------------------------------------------------------------------------
+    // Consume
+    //--------------------------------------------------------------------------------------------------------------------------
+
+    // The held item is already leaving the hands: a launch (Get_IsCurrentItemLaunched) or an earlier consume took it,
+    // and its world item or its slot's removal has not caught up.
+    private bool Get_IsLeaving(FCk_Handle& InPlayer, const FMars_Fragment_HeldItemUse& InState) const
+    {
+        return InPlayer.As_HeldItemUse().Get_IsCurrentItemLaunched()
+            || InPlayer.As_HeldItem().Get_CurrentItem() == InState.ConsumedItem;
+    }
+
+    private void JudgeConsume(FCk_Handle& InPlayer, FMars_Fragment_HeldItemUse& InState, const FMars_Request_HeldItemUse_Consume& InRequest)
+    {
+        auto HeldItem = InPlayer.As_HeldItem();
+        const auto Item = HeldItem.Get_CurrentItem();
+        if (ck::Is_NOT_Valid(Item) || InRequest.Item.Get() != Item.Get_Definition())
+        {
+            RefuseConsume(InState, EMars_HeldItemUse_ConsumeRefusal::ItemMismatch);
+            return;
+        }
+
+        if (Item.Has_UseAction() == false)
+        {
+            RefuseConsume(InState, EMars_HeldItemUse_ConsumeRefusal::NotConsumable);
+            return;
+        }
+
+        const UMars_ItemTrait_UseAction UseAction = Item.Get_UseAction();
+        if (UseAction.ConsumeOnSuccess == false)
+        {
+            RefuseConsume(InState, EMars_HeldItemUse_ConsumeRefusal::NotConsumable);
+            return;
+        }
+
+        if (Get_IsLeaving(InPlayer, InState))
+        {
+            RefuseConsume(InState, EMars_HeldItemUse_ConsumeRefusal::Leaving);
+            return;
+        }
+
+        const auto Now = utils_mars_net::Get_ServerWorldSeconds(InPlayer);
+        const auto MinInterval = constants_held_item_use::k_ConsumeMinIntervalFraction * UseAction.HoldSeconds;
+        const auto IsTimed = UseAction.CompletionPolicy == ECk_Interaction_CompletionPolicy::Timed;
+        if (IsTimed && InState.Consumes.LastAppliedAt.IsSet() && Now - InState.Consumes.LastAppliedAt.GetValue() < MinInterval)
+        {
+            RefuseConsume(InState, EMars_HeldItemUse_ConsumeRefusal::TooSoon);
+            return;
+        }
+
+        auto Inventory = Item.Get_ParentInventory();
+        if (ck::EnsureIfNot(ck::IsValid(Inventory), f"[HeldItemUse] held item [{Item.ToString()}] is in no inventory"))
+        {
+            RefuseConsume(InState, EMars_HeldItemUse_ConsumeRefusal::ItemMismatch);
+            return;
+        }
+
+        InState.Consumes.Applied += 1;
+        InState.Consumes.LastAppliedAt = Now;
+        InState.ConsumedItem = Item;
+
+        auto Request = FCk_Request_Inventory_RemoveItem(Item);
+        Request.Set_PostRemovePolicy(ECk_Inventory_PostRemovePolicy::DestroyItem);
+        Inventory.Request_RemoveItem(Request, FCk_Delegate_Inventory_OnOperationResult_Remove());
+    }
+
+    private void RefuseConsume(FMars_Fragment_HeldItemUse& InState, EMars_HeldItemUse_ConsumeRefusal InRefusal)
+    {
+        InState.Consumes.Refused += 1;
+        InState.Consumes.LastRefusal = InRefusal;
     }
 
     private bool Get_IsNearAHurtbox(const FCk_Handle_HitZone& InZone, FVector InLocation)

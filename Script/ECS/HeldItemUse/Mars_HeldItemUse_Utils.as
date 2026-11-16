@@ -49,11 +49,14 @@ mixin FMars_HeldItemUse_ThrowTuning Get_ThrowTuning(const FCk_Handle_HeldItemUse
     return Tuning;
 }
 
-// Launch precedes the inventory transfer; local held-item controls stop on the launch's own frame.
+// Launch precedes the inventory transfer; local held-item controls stop on the launch's own frame. Only until the hands
+// change: an item taken back is not launched.
 mixin bool Get_IsCurrentItemLaunched(const FCk_Handle_HeldItemUse& Self)
 {
-    const auto Item = Self.As_HeldItem().Get_CurrentItem();
-    return ck::IsValid(Item) && Item == Self.Get_Fragment(FMars_Fragment_HeldItemUse).LaunchedItem;
+    const auto HeldItem = Self.As_HeldItem();
+    const auto Item = HeldItem.Get_CurrentItem();
+    const auto State = Self.Get_Fragment(FMars_Fragment_HeldItemUse);
+    return ck::IsValid(Item) && Item == State.LaunchedItem && HeldItem.Get_ItemChangeCount() == State.LaunchedAtItemChange;
 }
 
 // Unset with empty hands, or when a Persistent item has lost its world item. Aimed by this machine's view.
@@ -134,6 +137,12 @@ mixin FMars_HeldItemUse_StrikeTally Get_StrikeTally(const FCk_Handle_HeldItemUse
     return Self.Get_Fragment(FMars_Fragment_HeldItemUse).Strikes;
 }
 
+// The authority's count of the consumes it judged; default on a machine without authority.
+mixin FMars_HeldItemUse_ConsumeTally Get_ConsumeTally(const FCk_Handle_HeldItemUse& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_HeldItemUse).Consumes;
+}
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Requests
 //--------------------------------------------------------------------------------------------------------------------------
@@ -161,6 +170,13 @@ mixin void Request_Strike(FCk_Handle_HeldItemUse& Self, const FMars_Request_Held
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_HeldItemUse_Requests);
     Requests.StrikeRequests.Add(InRequest);
+}
+
+// Applied only on the authority (utils_held_item_use::Request_ConsumeFor asks it there); a non-authority drops it.
+mixin void Request_Consume(FCk_Handle_HeldItemUse& Self, const FMars_Request_HeldItemUse_Consume& InRequest)
+{
+    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_HeldItemUse_Requests);
+    Requests.ConsumeRequests.Add(InRequest);
 }
 
 // HUD-only (see FMars_Fragment_HeldItemUse::ThrowArmed); the drain broadcasts OnThrowArmedChanged on change.

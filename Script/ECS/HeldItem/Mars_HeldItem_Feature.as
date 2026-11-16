@@ -43,6 +43,11 @@ struct FMars_Fragment_HeldItem
     UPROPERTY()
     FCk_Handle_Item CurrentItem;
 
+    // How many times CurrentItem has changed: a reader that remembered an item can tell the hands have held something
+    // else, or nothing, since.
+    UPROPERTY()
+    int32 ItemChangeCount = 0;
+
     UPROPERTY()
     FCk_Handle PresentationEntity;
 

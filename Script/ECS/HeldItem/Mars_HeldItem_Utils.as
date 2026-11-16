@@ -53,6 +53,12 @@ mixin FCk_Handle_Item Get_CurrentItem(const FCk_Handle_HeldItem& Self)
     return Self.Get_Fragment(FMars_Fragment_HeldItem).CurrentItem;
 }
 
+// How many times the held item has changed (to another item or to none).
+mixin int32 Get_ItemChangeCount(const FCk_Handle_HeldItem& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_HeldItem).ItemChangeCount;
+}
+
 // The selected slot; valid even when it is empty.
 mixin FCk_Handle_Inventory_DataOnly Get_CurrentInventory(const FCk_Handle_HeldItem& Self)
 {

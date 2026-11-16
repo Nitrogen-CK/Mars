@@ -40,6 +40,9 @@ class UMars_Processor_HeldItem_Sync : UCk_Processor_Script_Base_UE
         auto Self = InHandle.As_HeldItem();
         Release_Presentation(InState);
         InState.CurrentItem = NewItem;
+        // A linked body adopted for the same item is not a change.
+        if (NewItem != PrevItem)
+        { InState.ItemChangeCount += 1; }
 
         auto Item = NewItem;
         if (ck::IsValid(Item) && Item.Has_PersistentWorldItem())

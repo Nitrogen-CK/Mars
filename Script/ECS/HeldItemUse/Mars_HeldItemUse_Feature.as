@@ -1,12 +1,16 @@
 // Stance SPLIT, nothing replicates here. A drop or a throw is the authority's: every machine that decides one fires
 // Cue.Mars.HeldItemUse.Launch at the player's entity with its own aim (utils_held_item_use::Fire_LaunchCue), and the
-// authority's drain launches the item as a World-mode world item under the replicated spawn owner; a client's own Drop or
-// Throw request is dropped. ThrowArmed and the use interactable are owner-local (E): the HUD's throw-armed state and the
-// use interactable live on the machine whose player holds the item, so their requests apply on every machine. A blow that
-// lands on a zone another machine owns is the authority's too: the striking machine fires Cue.Mars.HeldItemUse.Strike at
-// the player's entity (utils_held_item_use::Fire_StrikeCueFor), the authority's drain judges it against what it holds and
-// deals it through the player's dealer from its own copy of the item's numbers; the tally of those claims is the
-// authority's own and never replicates.
+// authority's drain launches the item as a World-mode world item under the replicated spawn owner; a client's own Drop
+// or Throw request is dropped. ThrowArmed and the use interactable are owner-local (E): the HUD's throw-armed state and
+// the use interactable live on the machine whose player holds the item, so their requests apply on every machine. A
+// blow that lands on a zone another machine owns is the authority's too: the striking machine fires
+// Cue.Mars.HeldItemUse.Strike at the player's entity (utils_held_item_use::Fire_StrikeCueFor), the authority's drain
+// judges it against what it holds and deals it through the player's dealer from its own copy of the item's numbers; the
+// tally of those claims is the authority's own and never replicates. A use that eats the held item is the authority's
+// as well: the using machine asks through utils_held_item_use::Request_ConsumeFor, which fires
+// Cue.Mars.HeldItemUse.Consume when it has no authority; the authority's drain judges it against what it holds and
+// removes the item from its slot, whose replicated inventory tells every machine; that tally is the authority's own
+// too.
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
@@ -71,6 +75,19 @@ enum EMars_HeldItemUse_StrikeRefusal
     OutOfReach
 }
 
+// Why the authority refused a consume: the first check it failed, in the order the drain checks them.
+enum EMars_HeldItemUse_ConsumeRefusal
+{
+    // The player holds nothing, or not the item the consume names.
+    ItemMismatch,
+    // The held item has no UseAction, or its use does not eat it.
+    NotConsumable,
+    // The held item is already leaving the hands: a launch or an earlier consume took it.
+    Leaving,
+    // The player's last applied consume is more recent than the held item's hold allows.
+    TooSoon
+}
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Constants
 //--------------------------------------------------------------------------------------------------------------------------
@@ -98,6 +115,9 @@ namespace constants_held_item_use
 
     // Two applied blows of one player are at least this fraction of the held item's Windup + Recovery apart.
     const float32 k_StrikeMinIntervalFraction = 0.5f;
+
+    // Two applied consumes of one player are at least this fraction of the held item's hold apart (a Timed use only).
+    const float32 k_ConsumeMinIntervalFraction = 0.5f;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -121,6 +141,23 @@ struct FMars_HeldItemUse_StrikeTally
     TOptional<float64> LastAppliedAt;
 }
 
+// The authority's count of the consumes it judged. Never replicated: a client's copy stays default.
+struct FMars_HeldItemUse_ConsumeTally
+{
+    UPROPERTY()
+    int32 Applied = 0;
+
+    UPROPERTY()
+    int32 Refused = 0;
+
+    UPROPERTY()
+    TOptional<EMars_HeldItemUse_ConsumeRefusal> LastRefusal;
+
+    // The authority's clock (utils_mars_net::Get_ServerWorldSeconds) when the last consume was applied.
+    UPROPERTY()
+    TOptional<float64> LastAppliedAt;
+}
+
 // Lives on the player. CurrentInteractable is the no-probe interactable whose single Primary.UsableItem target runs the
 // held item's UseAction state; it is rebuilt whenever the held item changes.
 struct FMars_Fragment_HeldItemUse
@@ -140,12 +177,25 @@ struct FMars_Fragment_HeldItemUse
     float32 ThrowCharge = 0.0f;
 
     // The item a drop/throw already launched. Its world item adopts it a frame or more later, so a second launch of
-    // the same item before the held item changes would spawn a world item whose adopt fails.
+    // the same item before the held item changes would spawn a world item whose adopt fails. The guard holds until the
+    // hands change (LaunchedAtItemChange): an item taken back keeps its handle and launches again.
     UPROPERTY()
     FCk_Handle_Item LaunchedItem;
 
+    // The held item's change count when LaunchedItem was launched.
+    UPROPERTY()
+    int32 LaunchedAtItemChange = 0;
+
+    // The item a consume already took. Its inventory removes it a frame or more later, so a second consume or a launch
+    // of it in between must not act on it. It needs no reset: the item is destroyed.
+    UPROPERTY()
+    FCk_Handle_Item ConsumedItem;
+
     UPROPERTY()
     FMars_HeldItemUse_StrikeTally Strikes;
+
+    UPROPERTY()
+    FMars_HeldItemUse_ConsumeTally Consumes;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -311,6 +361,22 @@ struct FMars_HeldItemUse_Swing
     }
 }
 
+// A use that eats the held item, asked of the authority: the item the using machine ate, by definition. It names no
+// slot and no handle: the one item is the one the authority's HeldItem holds. The payload of
+// Cue.Mars.HeldItemUse.Consume.
+struct FMars_Request_HeldItemUse_Consume
+{
+    UPROPERTY()
+    TSoftObjectPtr<UCk_InventoryItem_Definition> Item;
+
+    FMars_Request_HeldItemUse_Consume() {}
+
+    FMars_Request_HeldItemUse_Consume(TSoftObjectPtr<UCk_InventoryItem_Definition> InItem)
+    {
+        Item = InItem;
+    }
+}
+
 struct FMars_Request_HeldItemUse_SetThrowArmed
 {
     UPROPERTY()
@@ -324,7 +390,7 @@ struct FMars_Request_HeldItemUse_SetThrowArmed
     }
 }
 
-// Drained Refresh -> Drop -> Throw -> Strike -> SetThrowArmed; see the processor.
+// Drained Refresh -> Drop -> Throw -> Strike -> Consume -> SetThrowArmed; see the processor.
 struct FMars_Fragment_HeldItemUse_Requests
 {
     UPROPERTY()
@@ -338,6 +404,9 @@ struct FMars_Fragment_HeldItemUse_Requests
 
     UPROPERTY()
     TArray<FMars_Request_HeldItemUse_Strike> StrikeRequests;
+
+    UPROPERTY()
+    TArray<FMars_Request_HeldItemUse_Consume> ConsumeRequests;
 
     UPROPERTY()
     TArray<FMars_Request_HeldItemUse_SetThrowArmed> SetThrowArmedRequests;

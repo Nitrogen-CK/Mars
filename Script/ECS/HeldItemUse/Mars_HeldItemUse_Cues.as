@@ -101,8 +101,65 @@ class UMars_Cue_HeldItemUse_Strike : UCk_GenericCue_EntityScript
     }
 }
 
+// The client-to-authority bridge for a use that eats the held item: fired at the player's replicated entity by
+// utils_held_item_use::Request_ConsumeFor on a machine without authority, carrying the definition of the item that
+// machine ate. It is applied only on the authority, as a Consume request its drain judges. No order matters: a consume
+// is judged against what the authority holds and its clock, never against another cue, so two that begin in one frame
+// eat once, and one that begins in a frame with a drop of the same item loses to it, whichever begins first.
+class UMars_Cue_HeldItemUse_Consume : UCk_GenericCue_EntityScript
+{
+    default _LifetimeBehavior = ECk_Cue_LifetimeBehavior::AfterOneFrame;
+    default _ConcurrencyPolicy = ECk_Cue_ConcurrencyPolicy::AllowMultiple;
+    default _OwnerValidationPolicy = ECk_Cue_OwnerValidationPolicy::RequireValid;
+
+    // FMars_Request_HeldItemUse_Consume's field: that struct is the cue's spawn params.
+    UPROPERTY(ExposeOnSpawn)
+    TSoftObjectPtr<UCk_InventoryItem_Definition> Item;
+
+    UFUNCTION(BlueprintOverride)
+    FGameplayTag Get_CueName() const
+    {
+        return GameplayTags::Cue_Mars_HeldItemUse_Consume;
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void DoBeginPlay(FCk_Handle InHandle)
+    {
+        const auto Owner = ck::OwnerEntity(InHandle);
+        if (utils_net::Get_HasAuthority(Owner) == false)
+        { return; }
+
+        auto Use = Owner.As_HeldItemUse(ECk_SanityCheck::UnChecked);
+        if (ck::EnsureIfNot(ck::IsValid(Use), f"[HeldItemUse] a Consume cue reached [{Owner.ToString()}], which has no HeldItemUse"))
+        { return; }
+
+        Use.Request_Consume(FMars_Request_HeldItemUse_Consume(Item));
+    }
+}
+
 namespace utils_held_item_use
 {
+    // Asks the authority to eat InPlayer's held item InItem, named by its definition. With authority over InPlayer it
+    // asks its own drain; without it, it fires Cue.Mars.HeldItemUse.Consume, the only way that cue is asked for.
+    // Nothing is predicted here: the item leaves the hands when the slot's removal arrives.
+    void Request_ConsumeFor(FCk_Handle InPlayer, const FCk_Handle_Item& InItem)
+    {
+        const auto Request = FMars_Request_HeldItemUse_Consume(utils_held_item::Make_DefinitionSoft(InItem.Get_Definition()));
+        const auto HasAuthority = utils_net::Get_HasAuthority(InPlayer);
+        if (HasAuthority)
+        {
+            auto Use = InPlayer.As_HeldItemUse(ECk_SanityCheck::UnChecked);
+            if (ck::EnsureIfNot(ck::IsValid(Use), f"[HeldItemUse] [{InPlayer.ToString()}] asked to eat but has no HeldItemUse"))
+            { return; }
+
+            Use.Request_Consume(Request);
+            return;
+        }
+
+        utils_cue_generic::Request_ExecuteCue(InPlayer, GameplayTags::Cue_Mars_HeldItemUse_Consume, Request,
+            ECk_Cue_ReliabilityPolicy::Reliable, ECk_Cue_MulticastPolicy::ServerOnly);
+    }
+
     // Claims InSwing's blow to the authority when it landed on a zone this machine has no authority over (there, the zone
     // drops the hit the swing's own dealer sent it). A miss, a world hit or a zone this machine owns sends nothing.
     void Fire_StrikeCueFor(FCk_Handle InPlayer, const FMars_HeldItemUse_Swing& InSwing)

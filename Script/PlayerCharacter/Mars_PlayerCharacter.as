@@ -746,11 +746,12 @@ class AMars_PlayerCharacter : AMars_Character
     }
 
     //----------------------------------------------------------------------------------------------------------------------
-    // Emotes and the strike. The HFSM tasks decide when (emote keys, the emote wheel, a held item's strike); the character
-    // only plays the emote montages or starts the hand swing, and carries them over the network. The machine that asks
-    // plays at once - the owner's gloves, and its body for a listen host's view - and, when it is the owner, forwards to
-    // the server, which multicasts. Each multicast skips the locally controlled copy (the owner already played it), so
-    // every machine plays each exactly once. A call on a machine that does not control this character stays local.
+    // Emotes and the strike. The HFSM tasks decide when (emote keys, the emote wheel, a held item's strike and its
+    // cancel); the character only plays the emote montages or starts and cancels the hand swing, and carries them over
+    // the network. The machine that asks plays at once - the owner's gloves, and its body for a listen host's view -
+    // and, when it is the owner, forwards to the server, which multicasts. Each multicast skips the locally controlled
+    // copy (the owner already played it), so every machine plays each exactly once. A call on a machine that does not
+    // control this character stays local.
     //----------------------------------------------------------------------------------------------------------------------
 
     // The one emote entry point. False while the gloves are busy (holding an item, or out of Rest), or when neither the
@@ -823,6 +824,20 @@ class AMars_PlayerCharacter : AMars_Character
         { return; }
 
         _Punch.Request_Mirror(FMars_Request_Punch_Mirror(InHand));
+}
+
+    // A strike abandoned mid-swing (UMars_SmTask_ItemUse_Strike's exit): the hand recovers from where it is, here and,
+    // carried as the start was, on every other machine.
+    UFUNCTION()
+    void Request_CancelStrike()
+    {
+        if (ck::Is_NOT_Valid(_HandSwing))
+        { return; }
+
+        _HandSwing.Request_Cancel(FMars_Request_HandSwing_Cancel());
+
+        if (IsLocallyControlled())
+        { Server_CancelStrike(); }
     }
 
     UFUNCTION(Server)
@@ -899,6 +914,22 @@ class AMars_PlayerCharacter : AMars_Character
         { return; }
 
         _HandSwing.Request_Start(InRequest);
+    }
+
+    UFUNCTION(Server)
+    void Server_CancelStrike()
+    {
+        Multicast_CancelStrike();
+    }
+
+    // A copy at rest ignores the cancel (the swing kernel's rule).
+    UFUNCTION(NetMulticast)
+    void Multicast_CancelStrike()
+    {
+        if (IsLocallyControlled() || ck::Is_NOT_Valid(_HandSwing))
+        { return; }
+
+        _HandSwing.Request_Cancel(FMars_Request_HandSwing_Cancel());
     }
 
     private bool PlayBodyEmote(EMars_FPEmote InEmote)
