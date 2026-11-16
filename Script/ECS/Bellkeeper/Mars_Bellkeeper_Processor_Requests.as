@@ -4,9 +4,12 @@
 // - every dial on its answer: solved, dials locked, source asserted, the remaining rewards spawned, OnSolved;
 // - otherwise: one more failure, the vent source asserted for VentPulseSeconds (a live pulse restarts), OnCommitFailed.
 // The dials keep their positions after a wrong commit, and the verdict never names the wrong dial.
+// Only the machine with authority over the lock drains; it publishes the ledger once at its end.
 class UMars_Processor_Bellkeeper_HandleRequests : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
+    // A commit judges the dials as they stand, this frame's turns included.
+    default _RunAfter.Add(n"/Script/Angelscript.Mars_Processor_Dial_HandleRequests");
     default _MarkedDirtyBy = FMars_Fragment_Bellkeeper_Requests;
 
     UFUNCTION(BlueprintOverride)
@@ -26,6 +29,9 @@ class UMars_Processor_Bellkeeper_HandleRequests : UCk_Processor_Script_Base_UE
         // InRequests is invalid past this line; removing before broadcasting lets re-entrant requests survive.
         Self.Request_TryRemove(FMars_Fragment_Bellkeeper_Requests);
 
+        if (utils_net::Get_HasAuthority(InHandle) == false)
+        { return; }
+
         for (const auto& EndVentRequest : EndVentRequests)
         {
             auto& State = Self.Get_Fragment(FMars_Fragment_Bellkeeper);
@@ -36,13 +42,15 @@ class UMars_Processor_Bellkeeper_HandleRequests : UCk_Processor_Script_Base_UE
         for (const auto& Change : CycleChanges)
         { ApplyCycleAcknowledgement(Self, Change); }
 
-        if (HasCommit == false || Self.Get_IsSolved())
-        { return; }
+        if (HasCommit && Self.Get_IsSolved() == false)
+        {
+            if (Get_IsAnswered(Self))
+            { Solve(Self); }
+            else
+            { Fail(Self); }
+        }
 
-        if (Get_IsAnswered(Self))
-        { Solve(Self); }
-        else
-        { Fail(Self); }
+        utils_bellkeeper::Publish(Self);
     }
 
     private bool Get_IsAnswered(const FCk_Handle_Bellkeeper& InBellkeeper) const
@@ -87,8 +95,13 @@ class UMars_Processor_Bellkeeper_HandleRequests : UCk_Processor_Script_Base_UE
             InBellkeeper.Get_Fragment(FMars_Fragment_Bellkeeper).RewardHandles.Add(Spawned);
         }
 
-        if (InBellkeeper.Has_Fragment(FMars_Fragment_Bellkeeper_Signals))
-        { InBellkeeper.Get_Fragment(FMars_Fragment_Bellkeeper_Signals).OnSolved.Broadcast(InBellkeeper); }
+        if (InBellkeeper.Has_Fragment(FMars_Fragment_Bellkeeper_Signals) == false)
+        { return; }
+
+        // The listeners play the bell's strokes: scope the script world to the lock's.
+        const auto WorldContext = FAngelscriptGameThreadScopeWorldContext(utils_entity_lifetime::Get_WorldForEntity(InBellkeeper));
+        InBellkeeper.Get_Fragment(FMars_Fragment_Bellkeeper_Signals).OnStateChanged.Broadcast(InBellkeeper);
+        InBellkeeper.Get_Fragment(FMars_Fragment_Bellkeeper_Signals).OnSolved.Broadcast(InBellkeeper);
     }
 
     private void Fail(FCk_Handle_Bellkeeper& InBellkeeper)
@@ -124,8 +137,13 @@ class UMars_Processor_Bellkeeper_HandleRequests : UCk_Processor_Script_Base_UE
         }
 
         const auto Remaining = InBellkeeper.Get_RemainingRewards();
-        if (InBellkeeper.Has_Fragment(FMars_Fragment_Bellkeeper_Signals))
-        { InBellkeeper.Get_Fragment(FMars_Fragment_Bellkeeper_Signals).OnCommitFailed.Broadcast(InBellkeeper, Remaining); }
+        if (InBellkeeper.Has_Fragment(FMars_Fragment_Bellkeeper_Signals) == false)
+        { return; }
+
+        // The listeners play the bell's strokes: scope the script world to the lock's.
+        const auto WorldContext = FAngelscriptGameThreadScopeWorldContext(utils_entity_lifetime::Get_WorldForEntity(InBellkeeper));
+        InBellkeeper.Get_Fragment(FMars_Fragment_Bellkeeper_Signals).OnStateChanged.Broadcast(InBellkeeper);
+        InBellkeeper.Get_Fragment(FMars_Fragment_Bellkeeper_Signals).OnCommitFailed.Broadcast(InBellkeeper, Remaining);
     }
 
     private void EndVent(FCk_Handle_Bellkeeper& InBellkeeper, FMars_Fragment_Bellkeeper& InState)

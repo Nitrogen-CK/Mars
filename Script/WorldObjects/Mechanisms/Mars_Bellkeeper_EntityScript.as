@@ -3,6 +3,8 @@
 // snaps it onto the nearest one. Nothing marks the answer. Every rising edge on CommitChannel (a pull chain) judges the dials:
 // a wrong commit asserts VentChannel for VentPulseSeconds (a steam vent listens) and costs the front reward, the last is
 // always kept; the right one locks the dials, asserts Source and spawns the remaining Rewards.
+// A machine without authority over the panel shows the lock its ledger carries (dials, candles, lamp, strokes) and
+// offers no dial to turn; it judges, vents and pays nothing.
 // The origin is the mounting surface and the plate faces local +Z, up = local -X (pitch -90 to face +X on a wall); dial 0
 // is on the viewer's left (local +Y). Above the dials, one candle per reward still at stake; beside them a lamp that
 // flashes red on a wrong commit and stays green once solved.
@@ -25,7 +27,10 @@ struct FMars_Bellkeeper_OwnedVent
 class UMars_Bellkeeper_EntityScript : UCk_GenericEntityScript_UE
 {
     default _ShowInPlaceActors = true;
-    default _Replication = ECk_Replication::DoesNotReplicate;
+    // Placed by the authority's spawner; the panel, its root transform and its lock's ledger replicate; the plate, the
+    // dials, the candles and the lamp are built on every machine; a dial is turned on the authority; only the
+    // authority judges, vents and pays.
+    default _Replication = ECk_Replication::Replicates;
 
     UPROPERTY(ExposeOnSpawn)
     FTransform SpawnTransform = FTransform::Identity;
@@ -116,7 +121,7 @@ class UMars_Bellkeeper_EntityScript : UCk_GenericEntityScript_UE
     UFUNCTION(BlueprintOverride)
     ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
     {
-        auto Root = utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::DoesNotReplicate);
+        auto Root = utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::Replicates);
         _Root = Root;
         utils_entity_tag::Add(InHandle, n"TAG_MarsBellkeeper");
         _ClickSound = assets::load::metal_punch_01_Mars_SND();
@@ -135,7 +140,8 @@ class UMars_Bellkeeper_EntityScript : UCk_GenericEntityScript_UE
         { BellPart.Material = ControlMaterialOverride; }
         _BellPart = Root.Add_MeshPart(this, BellPart);
 
-        if (OwnedVent.Enabled)
+        // A copy composes its lock now: it needs no handle to the vent, which arrives as this panel's child.
+        if (OwnedVent.Enabled && utils_net::Get_HasAuthority(InHandle))
         {
             auto VentParams = UMars_Vent_EntityScript::Params();
             VentParams.SpawnTransform = FTransform(OwnedVent.Rotation, SpawnTransform.GetLocation() + OwnedVent.OffsetWorld);
@@ -211,6 +217,7 @@ class UMars_Bellkeeper_EntityScript : UCk_GenericEntityScript_UE
 
             _Bellkeeper.BindTo_OnCommitFailed(FMars_Delegate_Bellkeeper_OnCommitFailed(this, n"OnCommitFailed"));
             _Bellkeeper.BindTo_OnSolved(FMars_Delegate_Bellkeeper_OnSolved(this, n"OnSolved"));
+            _Bellkeeper.BindTo_OnStateChanged(FMars_Delegate_Bellkeeper_OnStateChanged(this, n"OnLockStateChanged"));
         }
 
         utils_mechanism_source::TryAdd(InHandle, Source);
@@ -312,6 +319,10 @@ class UMars_Bellkeeper_EntityScript : UCk_GenericEntityScript_UE
 
         Control.BindTo_OnTurned(FMars_Delegate_Control_OnTurned(this, n"OnDialTurned"));
         Control.BindTo_OnManipulationChanged(FMars_Delegate_Control_OnManipulationChanged(this, n"OnDialGripChanged"));
+
+        // A copy's dial follows the lock's ledger and is turned on the authority: it is offered no grip.
+        if (Control.Get_MayGripHere() == false)
+        { return; }
 
         auto Probe = FMars_Interactable_ProbeInfo();
         Probe.ProbeSpec = FCk_Probe_Spec(GameplayTags::Probe_Mars_Interact);
@@ -448,6 +459,12 @@ class UMars_Bellkeeper_EntityScript : UCk_GenericEntityScript_UE
     {
         PlayStroke(_WrongStroke, 0.7f);
         StartWrongFlash();
+    }
+
+    UFUNCTION()
+    private void OnLockStateChanged(FCk_Handle_Bellkeeper InBellkeeper)
+    {
+        Repaint();
     }
 
     UFUNCTION()

@@ -1,5 +1,6 @@
-// Stance pending: Index and Locked become authority state judged with its host's commit; Angle is operator input. Its
-// one host composes it on scene nodes, so the ledger will live on the host's root.
+// Each machine's own dial: nothing here replicates. The dial on the machine with authority over its host is the one its
+// host judges; a host that replicates carries each dial's index in its own ledger and puts a copy's dial there with
+// SetIndex.
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
@@ -89,6 +90,31 @@ struct FMars_Fragment_Dial_Signals
 // Requests
 //--------------------------------------------------------------------------------------------------------------------------
 
+enum EMars_Dial_Arrival
+{
+    // The pointer is put on the detent and no detent is counted: a place found standing.
+    Placed,
+    // The pointer goes there the shorter way round and counts the detents it passes.
+    Stepped
+}
+
+struct FMars_Request_Dial_SetIndex
+{
+    UPROPERTY()
+    int32 Index = 0;
+
+    UPROPERTY()
+    EMars_Dial_Arrival Arrival = EMars_Dial_Arrival::Placed;
+
+    FMars_Request_Dial_SetIndex() {}
+
+    FMars_Request_Dial_SetIndex(int32 InIndex, EMars_Dial_Arrival InArrival)
+    {
+        Index = InIndex;
+        Arrival = InArrival;
+    }
+}
+
 // Positive turns forward, negative back; the dial wraps.
 struct FMars_Request_Dial_Step
 {
@@ -142,9 +168,13 @@ struct FMars_Request_Dial_Settle
 
 // The last lock request applies first (a locked dial drops everything else), then the steps in arrival order, then the
 // summed turn, then a settle: a step or a turn queued beside a lock is judged against it, and a settle in the same drain as
-// a turn lands on the detent the turn ended nearest.
+// a turn lands on the detent the turn ended nearest. A set applies first, lock or no lock, the last one winning: it is
+// the host's word about where the dial stands.
 struct FMars_Fragment_Dial_Requests
 {
+    UPROPERTY()
+    TArray<FMars_Request_Dial_SetIndex> SetIndexRequests;
+
     UPROPERTY()
     TArray<FMars_Request_Dial_SetLocked> LockRequests;
 

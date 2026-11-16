@@ -1,3 +1,7 @@
+// The lock is the authority's: only the machine with authority over it judges a commit. The failed commits, the lock
+// and each dial's index replicate in one ledger on the lock's entity; the vent's handshake, its clock and the reward
+// handles are the authority's alone.
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
 //--------------------------------------------------------------------------------------------------------------------------
@@ -56,8 +60,9 @@ struct FMars_Bellkeeper_Spec
     FCk_Handle_Cycle VentCycle;
 }
 
-// Dials to judge with one answer each, on the ring, none starting on it; a reward to keep; a vent pulse that runs.
-mixin FMars_Validation Validate(const FMars_Bellkeeper_Spec& Self)
+// What a copy without authority needs of a spec: dials to judge with one answer each, on the ring, none starting on it,
+// and a reward to count. The rewards' definitions and the vent are the authority's.
+mixin FMars_Validation Validate_Shown(const FMars_Bellkeeper_Spec& Self)
 {
     if (Self.Dials.Num() == 0)
     { return FMars_Validation("Dials must list at least one dial"); }
@@ -80,6 +85,16 @@ mixin FMars_Validation Validate(const FMars_Bellkeeper_Spec& Self)
 
     if (Self.Rewards.Num() == 0)
     { return FMars_Validation("Rewards must list at least one reward: the last is the one a lock always pays"); }
+
+    return FMars_Validation();
+}
+
+// What the authority needs as well: every reward's definition, a vent pulse that runs, a vent cycle it alone controls.
+mixin FMars_Validation Validate(const FMars_Bellkeeper_Spec& Self)
+{
+    const auto Shown = Self.Validate_Shown();
+    if (Shown.IsValid() == false)
+    { return Shown; }
 
     for (int32 Index = 0; Index < Self.Rewards.Num(); ++Index)
     {
@@ -162,20 +177,67 @@ struct FMars_Fragment_Bellkeeper
 
 struct FMars_Tag_Bellkeeper_NeedsSetup {}
 
+enum EMars_Bellkeeper_Lock
+{
+    Sealed,
+    Solved
+}
+
+// Replicated. Written only by utils_bellkeeper::Publish; DialIndices in panel order.
+struct FMars_Fragment_Bellkeeper_Net
+{
+    UPROPERTY()
+    int32 FailedCommits = 0;
+
+    UPROPERTY()
+    EMars_Bellkeeper_Lock Lock = EMars_Bellkeeper_Lock::Sealed;
+
+    UPROPERTY()
+    TArray<int32> DialIndices;
+}
+
+// Non-authority only (the authority's setup removes it).
+struct FMars_Fragment_Bellkeeper_Mirror
+{
+    // The ledger as this machine last reconciled it, seeded with the ledger this machine composed, so a standing
+    // verdict is shown once and no failure is raised twice.
+    UPROPERTY()
+    FMars_Fragment_Bellkeeper_Net Last;
+
+    // Whether this copy has taken the state it was born into.
+    UPROPERTY()
+    EMars_Net_InitialState InitialState = EMars_Net_InitialState::Awaited;
+}
+
+// Local: put on each of a lock's dials by the authority's setup, so a dial's index change finds its lock.
+struct FMars_Fragment_Bellkeeper_DialLink
+{
+    UPROPERTY()
+    FCk_Handle_Bellkeeper Lock;
+}
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Signals
 //--------------------------------------------------------------------------------------------------------------------------
 
+// Raised once per failure, never for one that came before a copy existed.
 delegate void FMars_Delegate_Bellkeeper_OnCommitFailed(FCk_Handle_Bellkeeper InBellkeeper, int32 InRemainingRewards);
 event void FMars_Delegate_Bellkeeper_OnCommitFailed_MC(FCk_Handle_Bellkeeper InBellkeeper, int32 InRemainingRewards);
 
+// Raised once for the solve, never on a copy born after it.
 delegate void FMars_Delegate_Bellkeeper_OnSolved(FCk_Handle_Bellkeeper InBellkeeper);
 event void FMars_Delegate_Bellkeeper_OnSolved_MC(FCk_Handle_Bellkeeper InBellkeeper);
+
+// A level: the failures counted or the lock differ from what this machine last showed. Raised with every verdict and
+// when a copy takes or receives one.
+delegate void FMars_Delegate_Bellkeeper_OnStateChanged(FCk_Handle_Bellkeeper InBellkeeper);
+event void FMars_Delegate_Bellkeeper_OnStateChanged_MC(FCk_Handle_Bellkeeper InBellkeeper);
 
 struct FMars_Fragment_Bellkeeper_Signals
 {
     FMars_Delegate_Bellkeeper_OnCommitFailed_MC OnCommitFailed;
     FMars_Delegate_Bellkeeper_OnSolved_MC OnSolved;
+    FMars_Delegate_Bellkeeper_OnStateChanged_MC OnStateChanged;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -224,10 +286,22 @@ struct FMars_Request_Bellkeeper_VentCycleChanged
     }
 }
 
+struct FMars_Request_Bellkeeper_DialMoved
+{
+    UPROPERTY()
+    bool Requested = true;
+
+    FMars_Request_Bellkeeper_DialMoved() {}
+}
+
 // Ended pulses apply first, then the commit. At most one commit is judged per drain, so a doubled edge cannot cost two
 // rewards.
 struct FMars_Fragment_Bellkeeper_Requests
 {
+    // A dial of this lock changed its index; the drain publishes.
+    UPROPERTY()
+    TArray<FMars_Request_Bellkeeper_DialMoved> DialMovedRequests;
+
     UPROPERTY()
     TArray<FMars_Request_Bellkeeper_EndVent> EndVentRequests;
 

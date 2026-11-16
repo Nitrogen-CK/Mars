@@ -38,6 +38,13 @@ namespace utils_dial
         return Wrapped < 0.0f ? Wrapped + 360.0f : Wrapped;
     }
 
+    // Detents between InFrom and InTo, the shorter way round.
+    int32 Get_DetentDistance(int32 InFrom, int32 InTo, int32 InPositions)
+    {
+        const auto Forward = Get_Wrapped(InTo - InFrom, 0, InPositions);
+        return Math::Min(Forward, InPositions - Forward);
+    }
+
     // The detent nearest InAngle (which must be in [0, 360)).
     int32 Get_NearestDetent(float32 InAngle, int32 InPositions)
     { return Get_Wrapped(Math::RoundToInt(InAngle * float32(InPositions) / 360.0f), 0, InPositions); }
@@ -70,6 +77,12 @@ mixin float32 Get_Angle(const FCk_Handle_Dial& Self)
 //--------------------------------------------------------------------------------------------------------------------------
 // Requests
 //--------------------------------------------------------------------------------------------------------------------------
+
+mixin void Request_SetIndex(FCk_Handle_Dial& Self, const FMars_Request_Dial_SetIndex& InRequest)
+{
+    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Dial_Requests);
+    Requests.SetIndexRequests.Add(InRequest);
+}
 
 mixin void Request_Step(FCk_Handle_Dial& Self, const FMars_Request_Dial_Step& InRequest)
 {
