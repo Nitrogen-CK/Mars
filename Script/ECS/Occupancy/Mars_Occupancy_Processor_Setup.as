@@ -1,6 +1,9 @@
 // On the authority: recounts on every trigger enter/exit, drives IsActive (with the release delay) and the optional
 // mover, and is the link: an occupancy that also has a MechanismSource asserts it while active. A client binds the
-// ledger's rep-notify and reconciles once instead: it moves its own mover and broadcasts what replicated.
+// ledger's rep-notify instead, and its first pass shows the ledger this machine composed. The ledger's first
+// application is the state the copy was born into, taken once as it stands: the mover put at its pose at once, and a
+// standing activation and count announced. Each later change is reconciled as it arrives: it moves its own mover and
+// broadcasts what replicated.
 class UMars_Processor_Occupancy_Setup : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -20,7 +23,7 @@ class UMars_Processor_Occupancy_Setup : UCk_Processor_Script_Base_UE
         if (utils_net::Get_HasAuthority(InHandle) == false)
         {
             InHandle.BindTo_OnRepNotify(FMars_Fragment_Occupancy, FCk_DynamicFragment_OnRepNotify(this, n"OnLedgerReplicated"));
-            Reconcile(Occupancy);
+            Reconcile(Occupancy, EMars_Net_Reconcile::AsItStands);
             Occupancy.Request_TryRemove(FMars_Tag_Occupancy_NeedsSetup);
             return;
         }
@@ -58,26 +61,47 @@ class UMars_Processor_Occupancy_Setup : UCk_Processor_Script_Base_UE
         return InActivation == EMars_Occupancy_Activation::Active ? EMars_MechanismSource_Output::Asserted : EMars_MechanismSource_Output::Deasserted;
     }
 
+    // An expected absence, not a defect: a notify can land on an occupancy already ending.
     UFUNCTION()
     private void OnLedgerReplicated(FCk_Handle InHandle, FCk_DynamicFragment_RepNotifyInfo InInfo)
     {
+        if (ck::Is_NOT_Valid(InHandle) || utils_entity_lifetime::Get_IsPendingDestroy(InHandle, ECk_EntityLifetime_DestructionPhase::BeginDestroy)
+            || InHandle.Is_Occupancy() == false)
+        { return; }
+
         auto Occupancy = InHandle.As_Occupancy();
-        Reconcile(Occupancy);
+        if (Occupancy.Get_Fragment(FMars_Fragment_Occupancy_Mirror).InitialState == EMars_Net_InitialState::Awaited)
+        {
+            Occupancy.Get_Fragment(FMars_Fragment_Occupancy_Mirror).InitialState = EMars_Net_InitialState::Taken;
+            Reconcile(Occupancy, EMars_Net_Reconcile::AsItStands);
+            return;
+        }
+
+        Reconcile(Occupancy, EMars_Net_Reconcile::AsItArrives);
     }
 
     // The authority's order: the activation edge (with its mover move), then the count.
-    private void Reconcile(FCk_Handle_Occupancy& InOccupancy)
+    private void Reconcile(FCk_Handle_Occupancy& InOccupancy, EMars_Net_Reconcile InHow)
     {
         const auto Ledger = InOccupancy.Get_Fragment(FMars_Fragment_Occupancy);
         auto& Mirror = InOccupancy.Get_Fragment(FMars_Fragment_Occupancy_Mirror);
         const auto Last = Mirror.Last;
         Mirror.Last = Ledger;
 
+        // A handler may spawn or compose in reaction: the broadcasts run inside the occupancy's own script world.
+        const auto WorldContext = FAngelscriptGameThreadScopeWorldContext(utils_entity_lifetime::Get_WorldForEntity(InOccupancy));
+
         if (Ledger.IsActive != Last.IsActive)
         {
+            // As it stands the slab is put at its pose at once; as it arrives it sinks there.
             auto Mover = InOccupancy.Get_Mover();
             if (ck::IsValid(Mover))
-            { Mover.Request_MoveTo(FMars_Request_Mover_MoveTo(Ledger.IsActive ? EMars_Mover_Pose::End : EMars_Mover_Pose::Start)); }
+            {
+                if (InHow == EMars_Net_Reconcile::AsItStands)
+                { Mover.Request_Scrub(FMars_Request_Mover_Scrub(Ledger.IsActive ? 1.0f : 0.0f)); }
+
+                Mover.Request_MoveTo(FMars_Request_Mover_MoveTo(Ledger.IsActive ? EMars_Mover_Pose::End : EMars_Mover_Pose::Start));
+            }
 
             if (InOccupancy.Has_Fragment(FMars_Fragment_Occupancy_Signals))
             {

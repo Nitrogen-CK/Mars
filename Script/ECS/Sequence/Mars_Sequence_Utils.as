@@ -17,9 +17,18 @@ namespace utils_sequence
 
         InHandle.Add_Fragment(FMars_Feature_Sequence());
         InHandle.Add_Fragment(Params);
-        InHandle.Add_Fragment(FMars_Fragment_Sequence(), ECk_Replication::Replicates);
+
+        auto Mirror = FMars_Fragment_Sequence_Mirror();
+
+        // A ledger already here can only have been put here by its replicated application: this copy was born into it,
+        // has taken that state, and the mirror's first pass shows it as it stands.
+        if (InHandle.Has_Fragment(FMars_Fragment_Sequence))
+        { Mirror.InitialState = EMars_Net_InitialState::Taken; }
+        else
+        { InHandle.Add_Fragment(FMars_Fragment_Sequence(), ECk_Replication::Replicates); }
+
         InHandle.Add_Fragment(FMars_Fragment_Sequence_Local());
-        InHandle.Add_Fragment(FMars_Fragment_Sequence_Mirror());
+        InHandle.Add_Fragment(Mirror);
         InHandle.Add_Fragment(FMars_Tag_Sequence_NeedsSetup());
         return InHandle.As_Sequence();
     }

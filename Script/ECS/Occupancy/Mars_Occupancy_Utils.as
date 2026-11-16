@@ -22,7 +22,14 @@ namespace utils_occupancy
         InHandle.Add_Fragment(FMars_Feature_Occupancy());
         InHandle.Add_Fragment(Params);
         InHandle.Add_Fragment(Local);
-        InHandle.Add_Fragment(State, ECk_Replication::Replicates);
+
+        // A ledger already here can only have been put here by its replicated application: this copy was born into it,
+        // has taken that state, and the mirror's first pass shows it as it stands.
+        if (InHandle.Has_Fragment(FMars_Fragment_Occupancy))
+        { Mirror.InitialState = EMars_Net_InitialState::Taken; }
+        else
+        { InHandle.Add_Fragment(State, ECk_Replication::Replicates); }
+
         InHandle.Add_Fragment(Mirror);
         InHandle.Add_Fragment(FMars_Tag_Occupancy_NeedsSetup());
         auto Occupancy = InHandle.As_Occupancy();

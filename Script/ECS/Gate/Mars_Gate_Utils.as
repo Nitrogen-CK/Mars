@@ -30,7 +30,14 @@ namespace utils_gate
 
         InOwner.Add_Fragment(FMars_Feature_Gate());
         InOwner.Add_Fragment(GateParams);
-        InOwner.Add_Fragment(Gate, ECk_Replication::Replicates);
+
+        // A ledger already here can only have been put here by its replicated application: this copy was born into it,
+        // has taken that state, and the mirror's first pass shows it as it stands.
+        if (InOwner.Has_Fragment(FMars_Fragment_Gate))
+        { Mirror.InitialState = EMars_Net_InitialState::Taken; }
+        else
+        { InOwner.Add_Fragment(Gate, ECk_Replication::Replicates); }
+
         InOwner.Add_Fragment(Mirror);
         InOwner.Add_Fragment(FMars_Tag_Gate_NeedsSetup());
         return InOwner.As_Gate();

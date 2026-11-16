@@ -1,7 +1,10 @@
 // The link, on the authority: a Gate that also has a MechanismSink opens while powered; a Gate that also has a
 // MechanismSource asserts while open. Both features live on the gate's own entity. A gate with a threshold retries a
-// deferred close each time something leaves it. A client wires none of it: it binds the ledger's rep-notify and
-// reconciles once, moving its own leaf and broadcasting OnOpenChanged when the replicated position changes.
+// deferred close each time something leaves it. A client wires none of it: it binds the ledger's rep-notify and its
+// first pass shows the ledger this machine composed. The ledger's first application is the state the copy was born
+// into, taken once as it stands: the leaf put at its pose at once, and OnOpenChanged announcing a standing open gate.
+// Each later change is reconciled as it arrives: the leaf swings and OnOpenChanged is broadcast when the replicated
+// position changes.
 class UMars_Processor_Gate_Setup : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -22,7 +25,7 @@ class UMars_Processor_Gate_Setup : UCk_Processor_Script_Base_UE
         if (utils_net::Get_HasAuthority(InHandle) == false)
         {
             InHandle.BindTo_OnRepNotify(FMars_Fragment_Gate, FCk_DynamicFragment_OnRepNotify(this, n"OnLedgerReplicated"));
-            Reconcile(Gate);
+            Reconcile(Gate, EMars_Net_Reconcile::AsItStands);
             return;
         }
 
@@ -47,16 +50,28 @@ class UMars_Processor_Gate_Setup : UCk_Processor_Script_Base_UE
         { Threshold.BindTo_OnEntityExited(FMars_Delegate_Trigger_OnEntityExited(this, n"OnThresholdEntityExited")); }
     }
 
+    // An expected absence, not a defect: a notify can land on a gate already ending.
     UFUNCTION()
     private void OnLedgerReplicated(FCk_Handle InHandle, FCk_DynamicFragment_RepNotifyInfo InInfo)
     {
+        if (ck::Is_NOT_Valid(InHandle) || utils_entity_lifetime::Get_IsPendingDestroy(InHandle, ECk_EntityLifetime_DestructionPhase::BeginDestroy)
+            || InHandle.Is_Gate() == false)
+        { return; }
+
         auto Gate = InHandle.As_Gate();
-        Reconcile(Gate);
+        if (Gate.Get_Fragment(FMars_Fragment_Gate_Mirror).InitialState == EMars_Net_InitialState::Awaited)
+        {
+            Gate.Get_Fragment(FMars_Fragment_Gate_Mirror).InitialState = EMars_Net_InitialState::Taken;
+            Reconcile(Gate, EMars_Net_Reconcile::AsItStands);
+            return;
+        }
+
+        Reconcile(Gate, EMars_Net_Reconcile::AsItArrives);
     }
 
     // A deferred close is still open, so it moves nothing and broadcasts nothing. The diff against Last guards the
     // reconcile and the notify alike: one replicated change broadcasts once.
-    private void Reconcile(FCk_Handle_Gate& InGate)
+    private void Reconcile(FCk_Handle_Gate& InGate, EMars_Net_Reconcile InHow)
     {
         auto& Mirror = InGate.Get_Fragment(FMars_Fragment_Gate_Mirror);
         const auto WasOpen = Mirror.Last.State != EMars_Gate_State::Closed;
@@ -67,11 +82,19 @@ class UMars_Processor_Gate_Setup : UCk_Processor_Script_Base_UE
         if (Open == WasOpen)
         { return; }
 
+        // As it stands the leaf is put at its pose at once; as it arrives it swings there.
         auto Mover = InGate.Get_MovingNode().As_Mover();
+        if (InHow == EMars_Net_Reconcile::AsItStands)
+        { Mover.Request_Scrub(FMars_Request_Mover_Scrub(Open ? 1.0f : 0.0f)); }
+
         Mover.Request_MoveTo(FMars_Request_Mover_MoveTo(Open ? EMars_Mover_Pose::End : EMars_Mover_Pose::Start));
 
-        if (InGate.Has_Fragment(FMars_Fragment_Gate_Signals))
-        { InGate.Get_Fragment(FMars_Fragment_Gate_Signals).OnOpenChanged.Broadcast(InGate, Position); }
+        if (InGate.Has_Fragment(FMars_Fragment_Gate_Signals) == false)
+        { return; }
+
+        // Handlers read the gate's position: scope the script world to the gate's.
+        const auto WorldContext = FAngelscriptGameThreadScopeWorldContext(utils_entity_lifetime::Get_WorldForEntity(InGate));
+        InGate.Get_Fragment(FMars_Fragment_Gate_Signals).OnOpenChanged.Broadcast(InGate, Position);
     }
 
     // The source asserts while the gate is open.

@@ -1,7 +1,8 @@
 // SPLIT. The count and activation (FMars_Fragment_Occupancy) are the replicated ledger (stance A), recounted on the
 // authority from its trigger; the release timer is the authority's clock (stance C) and lives with the trigger and
 // mover handles in the local FMars_Fragment_Occupancy_Local. A client mirrors the ledger: it moves its own Mover and
-// broadcasts OnActiveChanged / OnCountChanged from what replicated, never from its own trigger's overlaps.
+// broadcasts OnActiveChanged / OnCountChanged from what replicated after the state its copy was born into, never from
+// its own trigger's overlaps.
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
@@ -110,12 +111,17 @@ struct FMars_Fragment_Occupancy_Local
     FCk_Handle_Mover Mover;
 }
 
-// Non-authority only (the authority's setup removes it): the ledger as this machine last applied it, seeded with the
-// ledger as Add composed it, so a value that replicated before the setup ran is still applied.
+// Non-authority only (the authority's setup removes it).
 struct FMars_Fragment_Occupancy_Mirror
 {
+    // The ledger as this machine last reconciled it, seeded with the ledger this machine composed, so a standing
+    // activation and count are announced once.
     UPROPERTY()
     FMars_Fragment_Occupancy Last;
+
+    // Whether this copy has taken the state it was born into.
+    UPROPERTY()
+    EMars_Net_InitialState InitialState = EMars_Net_InitialState::Awaited;
 }
 
 // Lives on the trigger entity: trigger signals carry only the trigger, so this is how they find their occupancies.

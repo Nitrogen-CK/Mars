@@ -1,6 +1,7 @@
 // Stance A. Progress and the rejection record (FMars_Fragment_Sequence) are the replicated ledger, judged and written by
 // the authority's request drain; the step timer is the authority's clock and lives in the local
-// FMars_Fragment_Sequence_Local. A client mirrors the ledger and broadcasts the same four signals from it.
+// FMars_Fragment_Sequence_Local. A client mirrors the ledger and broadcasts the same four signals from it, after the
+// state its copy was born into.
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
@@ -110,12 +111,17 @@ struct FMars_Fragment_Sequence_Local
     FCk_Handle_Timer StepTimer;
 }
 
-// Non-authority only (the authority's setup removes it): the ledger as this machine last broadcast it, seeded with the
-// ledger as Add composed it, so a value that replicated before the setup ran still broadcasts.
+// Non-authority only (the authority's setup removes it).
 struct FMars_Fragment_Sequence_Mirror
 {
+    // The ledger as this machine last reconciled it, seeded with the ledger this machine composed, so standing steps
+    // are announced once.
     UPROPERTY()
     FMars_Fragment_Sequence Last;
+
+    // Whether this copy has taken the state it was born into.
+    UPROPERTY()
+    EMars_Net_InitialState InitialState = EMars_Net_InitialState::Awaited;
 }
 
 struct FMars_Tag_Sequence_NeedsSetup {}
