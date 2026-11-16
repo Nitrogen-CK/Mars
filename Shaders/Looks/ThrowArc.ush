@@ -1,18 +1,27 @@
 // /Project/Looks/ThrowArc.ush
 //
-// The throw preview's ribbon: flat colour, unlit and emissive-only, so it reads the same in a dark crypt and a lit
-// kitchen. Its look definition makes it translucent, two-sided and drawn without a depth test, so it shows from above and
-// below and over everything in front of it, the held item included. Opacity stays at the default 1.
+// The throw preview's ribbon: a white-hot core with a warm glow fading to its edges, unlit and emissive-only, so it reads
+// the same in a dark crypt and a lit kitchen. UV.x is the distance along the path in cm (the polyline's UV0), UV.y runs
+// 0..1 across the ribbon; the first FadeIn cm fade in from the hand. Its look definition makes it translucent, two-sided
+// and drawn without a depth test, so it shows over everything in front of it, the held item included.
 #pragma once
 #include "/CkUsf/Common.ush"
 
 FCkUsf_SurfaceOutput Mars_Look_ThrowArc(
     FCkUsf_SurfaceInput In,
-    float3              Tint,
-    float               Brightness)
+    float3              CoreColor,
+    float3              GlowColor,
+    float               Brightness,
+    float               FadeIn)
 {
+    const float Across = abs(In.UV.y * 2.0f - 1.0f);
+    const float Core   = 1.0f - smoothstep(0.16f, 0.38f, Across);
+    const float Glow   = pow(saturate(1.0f - Across), 2.2f);
+    const float Start  = saturate(In.UV.x / max(FadeIn, 0.001f));
+
     FCkUsf_SurfaceOutput O = CkUsf_DefaultSurface();
     O.BaseColor     = float3(0.0f, 0.0f, 0.0f);
-    O.EmissiveColor = Tint * Brightness;
+    O.EmissiveColor = lerp(GlowColor * Glow, CoreColor, Core) * Brightness;
+    O.Opacity       = saturate(max(Core, Glow * 0.8f)) * Start;
     return O;
 }

@@ -4,7 +4,7 @@
 	"_meta":
 	{
 		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
-		"sourceHash": "aa2a843dc3971855640bfe58b268320f",
+		"sourceHash": "849112a53a9251b909bf5e861c0810b1",
 		"exporterVersion": 3
 	},
 	"blendMode": "BLEND_Translucent",
@@ -23,10 +23,10 @@
 		"CameraVectorWS": 1,
 		"Custom": 1,
 		"PixelDepth": 1,
-		"ScalarParameter": 1,
+		"ScalarParameter": 2,
 		"TextureCoordinate": 1,
 		"Time": 1,
-		"VectorParameter": 1,
+		"VectorParameter": 2,
 		"VertexColor": 1,
 		"VertexNormalWS": 1,
 		"VertexTangentWS": 1,
@@ -81,27 +81,40 @@
 					},
 					{
 						"index": 6,
-						"name": "Tint",
+						"name": "CoreColor",
 						"node": 7,
 						"output": 0,
 						"mask": "rgb"
 					},
 					{
 						"index": 7,
-						"name": "Brightness",
+						"name": "GlowColor",
 						"node": 8,
-						"output": 0
+						"output": 0,
+						"mask": "rgb"
 					},
 					{
 						"index": 8,
-						"name": "Time",
+						"name": "Brightness",
 						"node": 9,
 						"output": 0
 					},
 					{
 						"index": 9,
-						"name": "UV",
+						"name": "FadeIn",
 						"node": 10,
+						"output": 0
+					},
+					{
+						"index": 10,
+						"name": "Time",
+						"node": 11,
+						"output": 0
+					},
+					{
+						"index": 11,
+						"name": "UV",
+						"node": 12,
 						"output": 0
 					}
 				],
@@ -122,7 +135,7 @@
 				],
 				"props":
 				{
-					"Code": "FCkUsf_SurfaceInput In = CkUsf_DefaultInput();\nIn.Time = Time;\nIn.UV = UV;\nIn.WorldPosition = WorldPosition;\nIn.CameraVector = CameraVector;\nIn.VertexNormal = VertexNormal;\nIn.VertexTangent = VertexTangent;\nIn.PixelDepth = PixelDepth;\nIn.VertexColor = VertexColor;\nFCkUsf_SurfaceOutput O = Mars_Look_ThrowArc(In, Tint.rgb, Brightness);\nEmissiveColor = O.EmissiveColor;\nRoughness = O.Roughness;\nMetallic = O.Metallic;\nSpecular = O.Specular;\nAmbientOcclusion = O.AmbientOcclusion;\nNormal = O.Normal;\nOpacity = O.Opacity;\nOpacityMask = O.OpacityMask;\nRefraction = O.Refraction;\nSubsurfaceColor = O.SubsurfaceColor;\nClearCoat = O.ClearCoat;\nClearCoatRoughness = O.ClearCoatRoughness;\nreturn O.BaseColor;",
+					"Code": "FCkUsf_SurfaceInput In = CkUsf_DefaultInput();\nIn.Time = Time;\nIn.UV = UV;\nIn.WorldPosition = WorldPosition;\nIn.CameraVector = CameraVector;\nIn.VertexNormal = VertexNormal;\nIn.VertexTangent = VertexTangent;\nIn.PixelDepth = PixelDepth;\nIn.VertexColor = VertexColor;\nFCkUsf_SurfaceOutput O = Mars_Look_ThrowArc(In, CoreColor.rgb, GlowColor.rgb, Brightness, FadeIn);\nEmissiveColor = O.EmissiveColor;\nRoughness = O.Roughness;\nMetallic = O.Metallic;\nSpecular = O.Specular;\nAmbientOcclusion = O.AmbientOcclusion;\nNormal = O.Normal;\nOpacity = O.Opacity;\nOpacityMask = O.OpacityMask;\nRefraction = O.Refraction;\nSubsurfaceColor = O.SubsurfaceColor;\nClearCoat = O.ClearCoat;\nClearCoatRoughness = O.ClearCoatRoughness;\nreturn O.BaseColor;",
 					"IncludeFilePaths": [
 						"/Project/Looks/ThrowArc.ush"
 					]
@@ -184,27 +197,55 @@
 				],
 				"props":
 				{
-					"DefaultValue": "(R=1.000000,G=1.000000,B=1.000000,A=1.000000)",
-					"ParameterName": "Tint"
+					"DefaultValue": "(R=1.000000,G=0.960000,B=0.860000,A=1.000000)",
+					"ParameterName": "CoreColor"
 				}
 			},
 			{
 				"id": 8,
-				"class": "ScalarParameter",
-				"name": "MaterialExpressionScalarParameter_0",
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_1",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
 				"props":
 				{
-					"DefaultValue": 1,
-					"ParameterName": "Brightness"
+					"DefaultValue": "(R=1.000000,G=0.420000,B=0.060000,A=1.000000)",
+					"ParameterName": "GlowColor"
 				}
 			},
 			{
 				"id": 9,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_0",
+				"props":
+				{
+					"DefaultValue": 1.6000000238418579,
+					"ParameterName": "Brightness"
+				}
+			},
+			{
+				"id": 10,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_1",
+				"props":
+				{
+					"DefaultValue": 30,
+					"ParameterName": "FadeIn"
+				}
+			},
+			{
+				"id": 11,
 				"class": "Time",
 				"name": "MaterialExpressionTime_0"
 			},
 			{
-				"id": 10,
+				"id": 12,
 				"class": "TextureCoordinate",
 				"name": "MaterialExpressionTextureCoordinate_0"
 			}
@@ -255,13 +296,21 @@
 	"scalarParams": [
 		{
 			"name": "Brightness",
-			"value": 1
+			"value": 1.6000000238418579
+		},
+		{
+			"name": "FadeIn",
+			"value": 30
 		}
 	],
 	"vectorParams": [
 		{
-			"name": "Tint",
-			"value": "RGBA(1, 1, 1, 1)"
+			"name": "CoreColor",
+			"value": "RGBA(1, 0.96, 0.86, 1)"
+		},
+		{
+			"name": "GlowColor",
+			"value": "RGBA(1, 0.42, 0.06, 1)"
 		}
 	],
 	"textureParams": [],

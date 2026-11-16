@@ -1,0 +1,55 @@
+// /Project/Looks/ThrowPower.ush
+//
+// The throw's power gauge, drawn on a flat quad (UV 0..1, V down) that hangs beside the gloves: a bar bowed like ")"
+// with rounded ends - a dark track inside a cream rim and a thin dark outline - filled from the bottom by Fill (0..1)
+// with a yellow-to-orange gradient. Aspect is the quad's height over its width, so the bar keeps its shape on any quad.
+// Fill is the component's custom primitive data, written every frame by the throw preview's assembly. Unlit and
+// emissive-only; its look definition makes it translucent and drawn without a depth test.
+#pragma once
+#include "/CkUsf/Common.ush"
+
+// The bar's centre line at height InY (0 at the bottom of the quad, Aspect at its top), in units of the quad's width.
+float Mars_ThrowPower_CentreX(float InY, float InAspect)
+{
+    const float T = InY / max(InAspect, 0.001f) * 2.0f - 1.0f;
+    return 0.38f + 0.24f * (1.0f - T * T);
+}
+
+FCkUsf_SurfaceOutput Mars_Look_ThrowPower(
+    FCkUsf_SurfaceInput In,
+    float               Fill,
+    float               Aspect,
+    float               Brightness)
+{
+    const float HalfWidth = 0.17f;
+    const float RimWidth  = 0.045f;
+    const float Outline   = 0.035f;
+    const float Soft      = 0.012f;
+
+    const float2 P      = float2(In.UV.x, (1.0f - In.UV.y) * Aspect);
+    const float  Bottom = HalfWidth + Outline;
+    const float  Top    = Aspect - HalfWidth - Outline;
+    const float  Y      = clamp(P.y, Bottom, Top);
+    const float  Dist   = length(P - float2(Mars_ThrowPower_CentreX(Y, Aspect), Y));
+    const float  Along  = saturate((P.y - Bottom) / max(Top - Bottom, 0.001f));
+
+    const float Inner   = 1.0f - smoothstep(HalfWidth - RimWidth - Soft, HalfWidth - RimWidth, Dist);
+    const float InRim   = 1.0f - smoothstep(HalfWidth - Soft, HalfWidth, Dist);
+    const float InShape = 1.0f - smoothstep(HalfWidth + Outline - Soft, HalfWidth + Outline, Dist);
+    const float Filled  = 1.0f - smoothstep(saturate(Fill) - 0.004f, saturate(Fill) + 0.004f, Along);
+
+    const float3 Track   = float3(0.16f, 0.13f, 0.11f);
+    const float3 Rim     = float3(1.0f, 0.86f, 0.66f);
+    const float3 Edge    = float3(0.22f, 0.1f, 0.04f);
+    const float3 FillCol = lerp(float3(1.0f, 0.8f, 0.14f), float3(1.0f, 0.42f, 0.04f), Along);
+
+    float3 Colour = Edge;
+    Colour = lerp(Colour, Rim, InRim);
+    Colour = lerp(Colour, lerp(Track, FillCol * Brightness, Filled), Inner);
+
+    FCkUsf_SurfaceOutput O = CkUsf_DefaultSurface();
+    O.BaseColor     = float3(0.0f, 0.0f, 0.0f);
+    O.EmissiveColor = Colour;
+    O.Opacity       = InShape * lerp(0.95f, 1.0f, Filled * Inner);
+    return O;
+}

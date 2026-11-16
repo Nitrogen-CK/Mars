@@ -1,0 +1,38 @@
+// /Project/Looks/ThrowRing.ush
+//
+// The throw preview's landing target: three glowing concentric rings over a faint warm disc, drawn on a flat quad (UV 0..1
+// over the quad) laid on the surface the throw lands on. The rings breathe slowly outward so the target reads as live.
+// Unlit, emissive-only; its look definition makes it translucent, two-sided and drawn without a depth test.
+#pragma once
+#include "/CkUsf/Common.ush"
+
+float Mars_ThrowRing_Band(float InRadius, float InCentre, float InHalfWidth)
+{
+    return 1.0f - smoothstep(InHalfWidth * 0.45f, InHalfWidth, abs(InRadius - InCentre));
+}
+
+FCkUsf_SurfaceOutput Mars_Look_ThrowRing(
+    FCkUsf_SurfaceInput In,
+    float3              CoreColor,
+    float3              GlowColor,
+    float               Brightness)
+{
+    const float Radius = length(In.UV * 2.0f - 1.0f);
+    const float Breath = 1.0f + 0.035f * sin(In.Time * 4.0f);
+    const float R      = Radius / Breath;
+
+    const float Rings = max(Mars_ThrowRing_Band(R, 0.88f, 0.075f),
+                        max(Mars_ThrowRing_Band(R, 0.55f, 0.065f),
+                            Mars_ThrowRing_Band(R, 0.24f, 0.06f)));
+    const float Halo  = max(Mars_ThrowRing_Band(R, 0.88f, 0.2f),
+                        max(Mars_ThrowRing_Band(R, 0.55f, 0.17f),
+                            Mars_ThrowRing_Band(R, 0.24f, 0.15f))) * 0.45f;
+    const float Disc  = (1.0f - smoothstep(0.0f, 1.0f, R)) * 0.22f;
+    const float Inside = 1.0f - smoothstep(0.96f, 1.0f, Radius);
+
+    FCkUsf_SurfaceOutput O = CkUsf_DefaultSurface();
+    O.BaseColor     = float3(0.0f, 0.0f, 0.0f);
+    O.EmissiveColor = lerp(GlowColor, CoreColor, Rings) * Brightness;
+    O.Opacity       = saturate(max(Rings, max(Halo, Disc))) * Inside;
+    return O;
+}
