@@ -104,6 +104,9 @@ asset MarsThrowPower of UCkUsf_LookDefinition
     _Parameters.Add(Brightness);
 }
 
+// 0 hides the path and its landing rings while a throw is armed; the power bar still shows. Read every frame of an aim.
+const FConsoleVariable CVar_Mars_ThrowPreviewDrawPath("Mars.ThrowPreview.DrawPath", 1);
+
 // A flat quad (the engine plane, 100 cm, facing +Z) on its own scene node: the landing rings and the power bar.
 struct FMars_ThrowPreview_Quad
 {
@@ -306,7 +309,8 @@ class UMars_ThrowPreview_EntityScript : UCk_GenericEntityScript_UE
         Show_Power(_Aiming);
 
         const auto Path = Preview.Get_Path();
-        if (Path.End == EMars_ThrowPreview_End::None || Path.Points.Num() < 2)
+        const auto DrawsPath = CVar_Mars_ThrowPreviewDrawPath.GetInt() != 0;
+        if (DrawsPath == false || Path.End == EMars_ThrowPreview_End::None || Path.Points.Num() < 2)
         {
             Draw(TArray<FVector>());
             Show(_Ring, false);

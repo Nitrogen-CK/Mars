@@ -31,17 +31,21 @@ FCkUsf_SurfaceOutput Mars_Look_ThrowPower(
     const float  Top    = Aspect - HalfWidth - Outline;
     const float  Y      = clamp(P.y, Bottom, Top);
     const float  Dist   = length(P - float2(Mars_ThrowPower_CentreX(Y, Aspect), Y));
-    const float  Along  = saturate((P.y - Bottom) / max(Top - Bottom, 0.001f));
+    // Unclamped, so the rounded ends lie below 0 and above 1: an empty bar leaves the bottom end unfilled, a full one
+    // fills the top end too.
+    const float  Along  = (P.y - Bottom) / max(Top - Bottom, 0.001f);
 
     const float Inner   = 1.0f - smoothstep(HalfWidth - RimWidth - Soft, HalfWidth - RimWidth, Dist);
     const float InRim   = 1.0f - smoothstep(HalfWidth - Soft, HalfWidth, Dist);
     const float InShape = 1.0f - smoothstep(HalfWidth + Outline - Soft, HalfWidth + Outline, Dist);
-    const float Filled  = 1.0f - smoothstep(saturate(Fill) - 0.004f, saturate(Fill) + 0.004f, Along);
+    // 0 and 1 reach past the ends (Along runs about -0.2..1.2 over them), so neither end is left half filled.
+    const float Level   = Fill <= 0.001f ? -1.0f : (Fill >= 0.999f ? 2.0f : Fill);
+    const float Filled  = 1.0f - smoothstep(Level - 0.004f, Level + 0.004f, Along);
 
     const float3 Track   = float3(0.16f, 0.13f, 0.11f);
     const float3 Rim     = float3(1.0f, 0.86f, 0.66f);
     const float3 Edge    = float3(0.22f, 0.1f, 0.04f);
-    const float3 FillCol = lerp(float3(1.0f, 0.8f, 0.14f), float3(1.0f, 0.42f, 0.04f), Along);
+    const float3 FillCol = lerp(float3(1.0f, 0.8f, 0.14f), float3(1.0f, 0.42f, 0.04f), saturate(Along));
 
     float3 Colour = Edge;
     Colour = lerp(Colour, Rim, InRim);
