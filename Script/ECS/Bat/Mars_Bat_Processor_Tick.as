@@ -18,9 +18,9 @@
 // The crowd agent writes the root transform while the bat flies; this processor writes it only while Falling, after the
 // agent was taken out of the crowd, and while it climbs (5).
 // It has two halves. The authority runs 0 to 7 and publishes the ledger last (utils_bat::Publish). A copy without
-// authority runs only 6 and 7: it measures its telemetry from the replicated root and runs the phase clock of the
-// phase its ledger names (UMars_Processor_Bat_Mirror); it never searches a volume, claims a roost, sweeps, falls or
-// climbs.
+// authority runs only 6, 7 and the clock of the swoop stage its phase names (TickShownSwoop): it measures its
+// telemetry from the replicated root and runs the phase clock of the phase its ledger names
+// (UMars_Processor_Bat_Mirror); it never searches a volume, claims a roost, sweeps, falls or climbs.
 class UMars_Processor_Bat_Tick : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -62,6 +62,8 @@ class UMars_Processor_Bat_Tick : UCk_Processor_Script_Base_UE
 
         if (HasAuthority)
         { utils_bat::Publish(Self); }
+        else
+        { TickShownSwoop(Self, DeltaSeconds); }
     }
 
     //----------------------------------------------------------------------------------------------------------------------
@@ -180,6 +182,18 @@ class UMars_Processor_Bat_Tick : UCk_Processor_Script_Base_UE
         auto& Hurt = InSelf.Get_Fragment(FMars_Fragment_Bat).Hurt;
         Hurt.HitLeft = Math::Max(Hurt.HitLeft - InDeltaSeconds, 0.0f);
         Hurt.StunLeft = Math::Max(Hurt.StunLeft - InDeltaSeconds, 0.0f);
+    }
+
+    // A copy's reading of the swoop: this machine's seconds in the stage its ledger's phase names, never past that
+    // stage's length. The authority's own stage clock is TickSwoop's.
+    private void TickShownSwoop(FCk_Handle_Bat& InSelf, float32 InDeltaSeconds)
+    {
+        auto& Swoop = InSelf.Get_Fragment(FMars_Fragment_Bat).Swoop;
+        if (Swoop.Stage == EMars_Bat_SwoopStage::None)
+        { return; }
+
+        const auto Seconds = utils_bat::Get_StageSeconds(InSelf.Get_Spec().Swoop.Timing, Swoop.Stage);
+        Swoop.StageElapsed = Math::Min(Swoop.StageElapsed + InDeltaSeconds, Seconds);
     }
 
     //----------------------------------------------------------------------------------------------------------------------

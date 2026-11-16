@@ -53,7 +53,9 @@ mixin FMars_Validation Validate(const FMars_Bat_FlightVolume_Spec& Self)
     return FMars_Validation();
 }
 
-// The swoop's progress, for whoever poses or reads it: the stage and how far through it [0, 1].
+// The swoop's progress, for whoever poses or reads it: the stage and how far through it [0, 1]. With authority both
+// are the swoop ledger's; on a copy without it the stage is the one its phase names (utils_bat::Get_ShownSwoopStage)
+// and the progress is this machine's seconds in it over the stage's length.
 struct FMars_Bat_SwoopFrame
 {
     UPROPERTY()
@@ -353,6 +355,22 @@ namespace utils_bat
         { return InTiming.RecoverSeconds; }
 
         return 0.0f;
+    }
+
+    // The swoop stage a phase names: what a copy without authority shows of the swoop, read off its ledger's phase.
+    // Screeching names a telegraph, so it keeps that stage.
+    EMars_Bat_SwoopStage Get_ShownSwoopStage(EMars_Bat_Phase InPhase)
+    {
+        if (InPhase == EMars_Bat_Phase::Telegraphing || InPhase == EMars_Bat_Phase::Screeching)
+        { return EMars_Bat_SwoopStage::Telegraphing; }
+
+        if (InPhase == EMars_Bat_Phase::Swooping)
+        { return EMars_Bat_SwoopStage::Committed; }
+
+        if (InPhase == EMars_Bat_Phase::Recovering)
+        { return EMars_Bat_SwoopStage::Recovering; }
+
+        return EMars_Bat_SwoopStage::None;
     }
 }
 

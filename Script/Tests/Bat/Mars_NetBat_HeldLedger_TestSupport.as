@@ -5,7 +5,8 @@
 // what a held bat is asked before its drain sees it: the drain publishes, and it runs in a frame's later passes (the
 // spawn frame's among them), where a processor no marker wakes cannot write the ledger back. The authority's tick
 // keeps running and publishing; the hold writes after it in every frame, so what replicates is the held ledger. A copy
-// without authority composes as the real script does.
+// without authority composes as the real script does. A row may also move the held bat's root as it composes, so its
+// copy is born away from its spawn place, as a bat that has flown reaches a player who joins.
 
 // On the authority's held bat: the ledger it holds and the frames it was written in (logged by the net rig).
 struct FMars_TESTONLY_Fragment_Bat_HeldLedger
@@ -100,13 +101,20 @@ struct FMars_NetBat_Held_SpawnParams
 
     UPROPERTY()
     FMars_Fragment_Bat_Net HeldLedger;
+
+    UPROPERTY()
+    FVector HeldRootOffset = FVector::ZeroVector;
 }
 
-// The real bat script; with authority over a composed bat it also holds HeldLedger from its construct on.
+// The real bat script; with authority over a composed bat it also holds HeldLedger from its construct on and, with a
+// non-zero HeldRootOffset, moves its root that far from its spawn place.
 class UMars_NetBat_Held_EntityScript : UMars_CellarBat_EntityScript
 {
     UPROPERTY(ExposeOnSpawn)
     FMars_Fragment_Bat_Net HeldLedger;
+
+    UPROPERTY(ExposeOnSpawn)
+    FVector HeldRootOffset = FVector::ZeroVector;
 
     UFUNCTION(BlueprintOverride)
     ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
@@ -122,6 +130,13 @@ class UMars_NetBat_Held_EntityScript : UMars_CellarBat_EntityScript
 
         // The ledger holds the row's state in the spawn frame, whichever processors run in it.
         utils_bat_held::Write(InHandle, HeldLedger);
+
+        if (HeldRootOffset.IsNearlyZero() == false)
+        {
+            auto Root = InHandle.As_Transform();
+            utils_transform::Request_SetLocation(Root, FCk_Request_Transform_SetLocation(SpawnTransform.GetLocation() + HeldRootOffset));
+        }
+
         return Flow;
     }
 }

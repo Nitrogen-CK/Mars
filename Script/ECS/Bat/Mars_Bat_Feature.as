@@ -15,8 +15,10 @@ asset Mars_BatHandle of UCkDynamic_HandleDefinition
 // (FMars_Fragment_Bat_Net: the phase and the place it hangs from) through utils_bat::Publish, its one writer; the root
 // transform replicates with it. A copy without authority follows the replicated root, shows the ledger's phase on its
 // own clock (UMars_Processor_Bat_Mirror), measures its own telemetry from that root, hangs from the ledger's place,
-// drops every request, is struck through the strike claim and dies when its monster's ledger does. A copy takes the
-// phase and the place it was born into as they stand and hears no past change. The roost and the flight volume
+// drops every request, is struck through the strike claim and dies when its monster's ledger does. It reads its
+// swoop's stage off that phase (the telegraph, the dive, the pull-out) and times it on its own clock from the moment
+// the stage was first shown, never past the stage's length: no stage, clock or count of a swoop is sent. A copy takes
+// the phase and the place it was born into as they stand and hears no past change. The roost and the flight volume
 // are the authority's; the blow, the sweep, the fall and the corpse are the authority's alone.
 struct FMars_Feature_Bat {}
 
@@ -502,7 +504,9 @@ struct FMars_Bat_Route
 }
 
 // The swoop ledger. One Generation per StartSwoop admitted; at most one damage result per generation (Results), and
-// sweeps happen only while Stage is Committed and the bat is alive.
+// sweeps happen only while Stage is Committed and the bat is alive. On a copy without authority only Stage and
+// StageElapsed are written (UMars_Processor_Bat_Mirror and the tick's copy half): the stage its ledger's phase names
+// and this machine's seconds in it.
 struct FMars_Bat_SwoopLedger
 {
     UPROPERTY()
@@ -606,7 +610,8 @@ struct FMars_Bat_Fall
 }
 
 // Written only by the bat's processors: the authority's HandleRequests, Setup, Targeting and Tick, and on a copy
-// without authority the Tick (telemetry, the phase clock) and UMars_Processor_Bat_Mirror (the phase, the shown anchor).
+// without authority the Tick (telemetry, the phase clock, the shown swoop stage's clock) and
+// UMars_Processor_Bat_Mirror (the phase, the shown anchor, the shown swoop stage).
 struct FMars_Fragment_Bat
 {
     UPROPERTY()
@@ -688,8 +693,9 @@ struct FMars_Fragment_Bat_Local
 struct FMars_Tag_Bat_NeedsMirror {}
 
 // How a copy without authority takes the ledger: as it stands at the ledger's first application on this machine (a
-// copy shows the phase and the place it was born into, its phase clock from that moment, and raises nothing), or as
-// each later change arrives (the phase then starts on this machine's clock and OnPhaseChanged is raised).
+// copy shows the phase and the place it was born into, its phase clock and its swoop stage's clock from that moment,
+// and raises nothing), or as each later change arrives (the phase then starts on this machine's clock, a swoop stage
+// the phase newly names starts with it, and OnPhaseChanged is raised).
 enum EMars_Bat_Reconcile
 {
     AsItStands,

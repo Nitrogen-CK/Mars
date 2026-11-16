@@ -3,7 +3,8 @@
 // The ledger's first application is the state the copy was born into and is taken once as it stands: the phase and
 // the place it hangs from as they are, its phase clock from that moment, and no past change heard. Each later change
 // is reconciled as it arrives: the phase starts on this machine's clock and OnPhaseChanged is raised once. A phase
-// that never arrived because two of the authority's writes reached this machine as one is not replayed.
+// that never arrived because two of the authority's writes reached this machine as one is not replayed. Both ways the
+// swoop stage the phase names is written before the phase, its clock at 0 unless it is the stage already shown.
 class UMars_Processor_Bat_Mirror : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -68,6 +69,8 @@ class UMars_Processor_Bat_Mirror : UCk_Processor_Script_Base_UE
         if (Ledger.Phase == Last.Phase)
         { return; }
 
+        Show_SwoopStage(InBat, Ledger.Phase);
+
         if (InHow == EMars_Bat_Reconcile::AsItStands)
         {
             auto& State = InBat.Get_Fragment(FMars_Fragment_Bat);
@@ -79,5 +82,18 @@ class UMars_Processor_Bat_Mirror : UCk_Processor_Script_Base_UE
         // Handlers react on the bat (its look): scope the script world to its own.
         const auto WorldContext = FAngelscriptGameThreadScopeWorldContext(utils_entity_lifetime::Get_WorldForEntity(InBat));
         utils_bat::Set_Phase(InBat, Ledger.Phase);
+    }
+
+    // The swoop stage the phase names, on this machine's clock from now. A phase that names the stage already shown
+    // (Screeching after Telegraphing) leaves its clock running.
+    private void Show_SwoopStage(FCk_Handle_Bat& InBat, EMars_Bat_Phase InPhase)
+    {
+        auto& Swoop = InBat.Get_Fragment(FMars_Fragment_Bat).Swoop;
+        const auto Stage = utils_bat::Get_ShownSwoopStage(InPhase);
+        if (Swoop.Stage == Stage)
+        { return; }
+
+        Swoop.Stage = Stage;
+        Swoop.StageElapsed = 0.0f;
     }
 }

@@ -11,6 +11,67 @@ struct FMars_NetBatTest_Phase
     int32 Frame = -1;
 }
 
+// The highest and the lowest swoop progress sampled in one stage; Samples is 0 while none was.
+struct FMars_NetBatTest_AlphaRange
+{
+    UPROPERTY()
+    float32 Highest = 0.0f;
+
+    UPROPERTY()
+    float32 Lowest = 0.0f;
+
+    UPROPERTY()
+    int32 Samples = 0;
+}
+
+// At one telegraph sample: the root's yaw and pitch error against the bearing to a row's facing point (the pitch
+// clamped as the telegraph clamps it).
+struct FMars_NetBatTest_Facing
+{
+    UPROPERTY()
+    float64 Yaw = -1.0;
+
+    UPROPERTY()
+    float64 Pitch = -1.0;
+}
+
+// The swoop as this machine's copy was sampled: each stage as it was first sampled (the first sample's included), the
+// progress range in each stage, the rewinds (a stage's clock read lower than at the sample before in the same stage),
+// the lowest telemetry pitch and, against a row's facing point, the facing at the first and the last telegraph sample
+// and how far the root turned (yaw and pitch summed) between successive telegraph samples.
+struct FMars_NetBatTest_Swoop
+{
+    UPROPERTY()
+    TArray<EMars_Bat_SwoopStage> Stages;
+
+    UPROPERTY()
+    FMars_NetBatTest_AlphaRange Telegraph;
+
+    UPROPERTY()
+    FMars_NetBatTest_AlphaRange Dive;
+
+    UPROPERTY()
+    FMars_NetBatTest_AlphaRange Recover;
+
+    UPROPERTY()
+    int32 Rewinds = 0;
+
+    UPROPERTY()
+    float32 LowestPitch = 1000.0f;
+
+    UPROPERTY()
+    int32 FacingSamples = 0;
+
+    UPROPERTY()
+    FMars_NetBatTest_Facing FacingFirst;
+
+    UPROPERTY()
+    FMars_NetBatTest_Facing FacingLast;
+
+    UPROPERTY()
+    float64 Turned = 0.0;
+}
+
 // The Cellar Bat net tests' shared steps, on top of the strike rig (whose striker only the strike row composes). The
 // server lays the single-machine rig's world, owned by its subject: a static floor (3000 square, its top at the floor
 // point), a roost entity 580 over the floor point and a flight volume over the floor, baked once every static is in;
@@ -20,8 +81,9 @@ struct FMars_NetBatTest_Phase
 // base, records its OnPhaseChanged (with the frame), counts its OnSwoopLanded, OnSwoopCancelled, OnRouteOutcome,
 // OnPerchLost, OnTargetChanged, its monster's OnDied and its body Health's OnDamaged, and samples it from the row's
 // polled predicates: the largest step between two samples, the farthest from the hang point, the highest telemetry
-// speed, the largest turn rate either way, the largest yaw change between two samples and the lowest height over the
-// floor point.
+// speed, the largest turn rate either way, the largest yaw change between two samples, the lowest height over the
+// floor point, the swoop as its copy shows it (FMars_NetBatTest_Swoop) and the frame its root first stood where it was
+// spawned.
 UCLASS(Abstract)
 class UMars_AutoTestRig_NetBat : UMars_AutoTestRig_NetStrike
 {
@@ -39,6 +101,10 @@ class UMars_AutoTestRig_NetBat : UMars_AutoTestRig_NetStrike
     protected bool _WithVisuals = false;
     // Set: the bat is spawned through the held fixture, whose authority holds this ledger from its construct on.
     protected TOptional<FMars_Fragment_Bat_Net> _HeldLedger;
+    // Set on both machines alike: the place the telegraph's facing is measured against.
+    protected TOptional<FVector> _FacingPoint;
+    // Passed to the held fixture: its authority moves the bat's root this far from its spawn place as it composes.
+    protected FVector _HeldRootOffset = FVector::ZeroVector;
 
     protected FVector _Floor = FVector::ZeroVector;
     protected FVector _HangAt = FVector::ZeroVector;
@@ -60,6 +126,20 @@ class UMars_AutoTestRig_NetBat : UMars_AutoTestRig_NetStrike
     protected int32 _BatDied = 0;
     protected int32 _BatDiedFrame = -1;
     protected int32 _BatDamaged = 0;
+    protected TArray<EMars_Bat_SwoopCancel> _BatCancelReasons;
+    protected TArray<FCk_Handle_HitZone> _BatLandedZones;
+
+    // The server's prey stand-in's Health and zone, and how many times its Health raised OnDamaged.
+    protected FCk_Handle_Health _PreyHealth;
+    protected FCk_Handle_HitZone _PreyZone;
+    protected int32 _PreyDamaged = 0;
+
+    protected FMars_NetBatTest_Swoop _BatSwoop;
+    // The frame the root was first sampled within 1 of its spawn place (the hang point, the row's offsets); -1 before.
+    protected int32 _BatSettledFrame = -1;
+    private TOptional<EMars_Bat_SwoopStage> _BatLastStage;
+    private float32 _BatLastStageElapsed = 0.0f;
+    private TOptional<FRotator> _BatLastTelegraphRotation;
 
     // The frame this machine found its copy and the copy's InitialState then, and off authority every ledger
     // rep-notify from then on with its frame.
@@ -105,6 +185,15 @@ class UMars_AutoTestRig_NetBat : UMars_AutoTestRig_NetStrike
         _HangAt = InFloor + FVector(0.0, 0.0, k_RoostHeight) + FMars_Bat_Roost().HangOffset;
         _Spec = FMars_Bat_Spec();
         Begin_Strike(_HangAt - FVector(0.0, 0.0, k_StrikeBaseUnderHang));
+    }
+
+    // The strike row with the striker's hand at the floor point plus InHandFromFloor.
+    protected void Begin_BatStrikeRowAt(FVector InFloor, FVector InHandFromFloor)
+    {
+        _Floor = InFloor;
+        _HangAt = InFloor + FVector(0.0, 0.0, k_RoostHeight) + FMars_Bat_Roost().HangOffset;
+        _Spec = FMars_Bat_Spec();
+        Begin_Strike(InFloor + InHandFromFloor - k_HandFromBase);
     }
 
     protected FVector Get_RoostAnchor() const
@@ -228,6 +317,7 @@ class UMars_AutoTestRig_NetBat : UMars_AutoTestRig_NetStrike
             HeldParams.Spec = Spec;
             HeldParams.WithVisuals = _WithVisuals;
             HeldParams.HeldLedger = _HeldLedger.GetValue();
+            HeldParams.HeldRootOffset = _HeldRootOffset;
             utils_entity_script::Request_SpawnEntity(utils_mars_net::Get_ReplicatedSpawnOwner(Get_SubjectEntity()),
                 UMars_NetBat_Held_EntityScript, HeldParams);
             return;
@@ -252,7 +342,8 @@ class UMars_AutoTestRig_NetBat : UMars_AutoTestRig_NetStrike
     }
 
     // The mimic rig's prey stand-in at InOffset from the floor point (its root 90 up), owned by the subject: team One
-    // (Hostile to the bat), Health 100, a flesh body zone with one box hurtbox, TAG_MarsSharedCombatTarget last.
+    // (Hostile to the bat), Health 100, a flesh body zone with one box hurtbox, TAG_MarsSharedCombatTarget last. Its
+    // Health and zone are kept and its Health's OnDamaged counted.
     protected void Spawn_ServerPrey(FVector InOffset)
     {
         auto Subject = Get_SubjectEntity();
@@ -260,10 +351,18 @@ class UMars_AutoTestRig_NetBat : UMars_AutoTestRig_NetStrike
         auto Root = utils_transform::Add(_PreyEntity, FTransform(FRotator::ZeroRotator, _Floor + InOffset + FVector(0.0, 0.0, 90.0)),
             ECk_Replication::DoesNotReplicate);
         utils_team::Add(_PreyEntity, ECk_Team_ID::One, ECk_Replication::DoesNotReplicate);
-        utils_health::Add(_PreyEntity, FMars_Health_Spec(100.0f));
+        _PreyHealth = utils_health::Add(_PreyEntity, FMars_Health_Spec(100.0f));
+        _PreyHealth.BindTo_OnDamaged(FMars_Delegate_Health_OnDamaged(this, n"OnPreyDamaged"));
         auto Zone = utils_hit_zone::Add(_PreyEntity, utils_hit_zone::Make_FleshZoneSpec(GameplayTags::HitZone_Mars_Body, 1.0f));
+        _PreyZone = Zone;
         utils_hit_zone::AddHurtbox_Box(Zone, Root, FMars_HitZone_Hurtbox(FVector(35.0, 35.0, 90.0), FTransform::Identity));
         utils_entity_tag::Add(_PreyEntity, n"TAG_MarsSharedCombatTarget");
+    }
+
+    // The prey's place for a row whose prey stands at InOffset from the floor point (its root, 90 up).
+    protected FVector Get_PreyPlace(FVector InOffset) const
+    {
+        return _Floor + InOffset + FVector(0.0, 0.0, 90.0);
     }
 
     //----------------------------------------------------------------------------------------------------------------------
@@ -436,6 +535,131 @@ class UMars_AutoTestRig_NetBat : UMars_AutoTestRig_NetStrike
         const auto Telemetry = _Bat.Get_Telemetry();
         _BatHighestSpeed = Math::Max(_BatHighestSpeed, Telemetry.Speed);
         _BatLargestTurnRate = Math::Max(_BatLargestTurnRate, Math::Abs(Telemetry.SignedTurnRate));
+        _BatSwoop.LowestPitch = Math::Min(_BatSwoop.LowestPitch, Telemetry.Pitch);
+
+        if (_BatSettledFrame < 0 && (Here - (_HangAt + _SpawnOffset + _HeldRootOffset)).Size() <= 1.0)
+        { _BatSettledFrame = int32(utils_time::Get_FrameCounter()); }
+
+        Sample_BatSwoop(Root);
+    }
+
+    private void Sample_BatSwoop(FTransform InRoot)
+    {
+        const auto Frame = _Bat.Get_SwoopFrame();
+        const auto Elapsed = _Bat.Get_SwoopLedger().StageElapsed;
+        if (_BatLastStage.IsSet() == false || _BatLastStage.GetValue() != Frame.Stage)
+        { _BatSwoop.Stages.Add(Frame.Stage); }
+        else if (Elapsed < _BatLastStageElapsed)
+        { _BatSwoop.Rewinds += 1; }
+
+        _BatLastStage = Frame.Stage;
+        _BatLastStageElapsed = Elapsed;
+
+        if (Frame.Stage == EMars_Bat_SwoopStage::Telegraphing)
+        { Add_AlphaSample(_BatSwoop.Telegraph, Frame.Alpha); }
+        else if (Frame.Stage == EMars_Bat_SwoopStage::Committed)
+        { Add_AlphaSample(_BatSwoop.Dive, Frame.Alpha); }
+        else if (Frame.Stage == EMars_Bat_SwoopStage::Recovering)
+        { Add_AlphaSample(_BatSwoop.Recover, Frame.Alpha); }
+
+        if (Frame.Stage != EMars_Bat_SwoopStage::Telegraphing || _FacingPoint.IsSet() == false)
+        { return; }
+
+        const auto Rotation = InRoot.GetRotation().Rotator();
+        const auto Bearing = (_FacingPoint.GetValue() - InRoot.GetLocation()).Rotation();
+        auto Facing = FMars_NetBatTest_Facing();
+        Facing.Yaw = Math::Abs(Math::FindDeltaAngleDegrees(Rotation.Yaw, Bearing.Yaw));
+        Facing.Pitch = Math::Abs(Math::FindDeltaAngleDegrees(Rotation.Pitch, Math::Clamp(Bearing.Pitch, -50.0, 20.0)));
+        if (_BatSwoop.FacingSamples == 0)
+        { _BatSwoop.FacingFirst = Facing; }
+
+        _BatSwoop.FacingLast = Facing;
+        _BatSwoop.FacingSamples += 1;
+
+        if (_BatLastTelegraphRotation.IsSet())
+        {
+            const auto Last = _BatLastTelegraphRotation.GetValue();
+            _BatSwoop.Turned += Math::Abs(Math::FindDeltaAngleDegrees(Last.Yaw, Rotation.Yaw))
+                + Math::Abs(Math::FindDeltaAngleDegrees(Last.Pitch, Rotation.Pitch));
+        }
+
+        _BatLastTelegraphRotation = Rotation;
+    }
+
+    private void Add_AlphaSample(FMars_NetBatTest_AlphaRange& InOutRange, float32 InAlpha)
+    {
+        if (InOutRange.Samples == 0)
+        {
+            InOutRange.Highest = InAlpha;
+            InOutRange.Lowest = InAlpha;
+        }
+
+        InOutRange.Highest = Math::Max(InOutRange.Highest, InAlpha);
+        InOutRange.Lowest = Math::Min(InOutRange.Lowest, InAlpha);
+        InOutRange.Samples += 1;
+    }
+
+    // The sampled stages are exactly InExpected, in that order.
+    protected bool Get_SampledStagesAre(const TArray<EMars_Bat_SwoopStage>& InExpected) const
+    {
+        if (_BatSwoop.Stages.Num() != InExpected.Num())
+        { return false; }
+
+        for (auto Index = 0; Index < InExpected.Num(); ++Index)
+        {
+            if (_BatSwoop.Stages[Index] != InExpected[Index])
+            { return false; }
+        }
+
+        return true;
+    }
+
+    // InExpected appears among the sampled stages in this order (other stages may come between).
+    protected bool Get_SampledStagesInOrder(const TArray<EMars_Bat_SwoopStage>& InExpected) const
+    {
+        auto Next = 0;
+        for (const auto& Sampled : _BatSwoop.Stages)
+        {
+            if (Next < InExpected.Num() && Sampled == InExpected[Next])
+            { ++Next; }
+        }
+
+        return Next == InExpected.Num();
+    }
+
+    protected EMars_Bat_SwoopStage Get_LastSampledStage() const
+    {
+        if (_BatSwoop.Stages.Num() == 0)
+        { return EMars_Bat_SwoopStage::None; }
+
+        return _BatSwoop.Stages[_BatSwoop.Stages.Num() - 1];
+    }
+
+    protected FString Describe_Stages() const
+    {
+        FString Text = "";
+        for (const auto& Sampled : _BatSwoop.Stages)
+        { Text += f"{Sampled :n},"; }
+
+        return Text;
+    }
+
+    protected FString Describe_BatSwoop()
+    {
+        const auto IsFound = Get_IsBatGone() == false;
+        const auto Frame = IsFound ? _Bat.Get_SwoopFrame() : FMars_Bat_SwoopFrame();
+        const auto Ledger = IsFound ? _Bat.Get_SwoopLedger() : FMars_Bat_SwoopLedger();
+        FString Reasons = "";
+        for (const auto& Reason : _BatCancelReasons)
+        { Reasons += f"{Reason :n},"; }
+
+        const auto PreyHealth = ck::IsValid(_PreyHealth) ? _PreyHealth.Get_Current() : -1.0f;
+        const auto& S = _BatSwoop;
+        return f"swoop=[stage {Frame.Stage :n} alpha {Frame.Alpha} elapsed {Ledger.StageElapsed} stages {Describe_Stages()} "
+            + f"highest {S.Telegraph.Highest}/{S.Dive.Highest}/{S.Recover.Highest} lowest {S.Telegraph.Lowest}/{S.Dive.Lowest}/{S.Recover.Lowest} "
+            + f"rewinds {S.Rewinds} facingFirst {S.FacingFirst.Yaw}/{S.FacingFirst.Pitch} facingLast {S.FacingLast.Yaw}/{S.FacingLast.Pitch} "
+            + f"turned {S.Turned} lowestPitch {S.LowestPitch} reasons {Reasons} generation {Ledger.Generation} landed {Ledger.Landed} "
+            + f"prey {PreyHealth}/{_PreyDamaged} rootAtFind {_BatFoundAt.ToString()} settledFrame {_BatSettledFrame}]";
     }
 
     // A wall-clock settle that keeps sampling the copy every frame, then InContinuation.
@@ -559,8 +783,38 @@ class UMars_AutoTestRig_NetBat : UMars_AutoTestRig_NetStrike
 
         const auto Body = IsFound && ck::IsValid(_Health) ? _Health.Get_Current() : -1.0f;
         const auto Phases = Describe_BatPhases();
-        const auto Line = f"[BatNetTest] {InRow} {Get_MachineName()} phase={Phase} root={Location.ToString()} anchor={Anchor.ToString()} ledger=[{LedgerText}] phases=[{Phases}] landed={_BatSwoopsLanded} cancelled={_BatSwoopsCancelled} routes={_BatRouteOutcomes} perchLost={_BatPerchLost} targets={_BatTargetChanges} died={_BatDied} diedFrame={_BatDiedFrame} damaged={_BatDamaged} body={Body} largestStep={_BatLargestStep} farthestFromHang={_BatFarthestFromHang} highestSpeed={_BatHighestSpeed} largestTurn={_BatLargestTurnRate} largestYawChange={_BatLargestYawChange} lowestHeight={_BatLowestHeight} handles=[{HandlesText}] bake=[frames {_BakeFrames} seconds {_BakeSeconds}] ensures={Get_NewEnsures()} frame={utils_time::Get_FrameCounter()} {InExtra} {Describe_BatFind()} held=[{Describe_BatHeld()}]";
+        const auto Line = f"[BatNetTest] {InRow} {Get_MachineName()} phase={Phase} root={Location.ToString()} anchor={Anchor.ToString()} ledger=[{LedgerText}] phases=[{Phases}] landed={_BatSwoopsLanded} cancelled={_BatSwoopsCancelled} routes={_BatRouteOutcomes} perchLost={_BatPerchLost} targets={_BatTargetChanges} died={_BatDied} diedFrame={_BatDiedFrame} damaged={_BatDamaged} body={Body} largestStep={_BatLargestStep} farthestFromHang={_BatFarthestFromHang} highestSpeed={_BatHighestSpeed} largestTurn={_BatLargestTurnRate} largestYawChange={_BatLargestYawChange} lowestHeight={_BatLowestHeight} handles=[{HandlesText}] bake=[frames {_BakeFrames} seconds {_BakeSeconds}] ensures={Get_NewEnsures()} frame={utils_time::Get_FrameCounter()} {InExtra} {Describe_BatFind()} held=[{Describe_BatHeld()}] {Describe_BatSwoop()}";
         Log(Line);
+    }
+
+    // Off authority: the copy raised none of the authority's swoop and target signals and keeps none of its swoop but
+    // the stage it shows (no generation, no blow, no cancel, no target, no dealer).
+    protected void Assert_CopyKeepsNoSwoopOfItsOwn()
+    {
+        Assert_Equals_Int(_BatSwoopsLanded, 0, "the client raised no OnSwoopLanded");
+        Assert_Equals_Int(_BatSwoopsCancelled, 0, "the client raised no OnSwoopCancelled");
+        Assert_Equals_Int(_BatTargetChanges, 0, "the client raised no OnTargetChanged");
+        if (Get_IsBatGone())
+        {
+            Assert_True(false, "the client's copy is there to read");
+            return;
+        }
+
+        const auto Ledger = _Bat.Get_SwoopLedger();
+        Assert_False(ck::IsValid(_Bat.Get_Target()), "the client's copy holds no target");
+        Assert_False(ck::IsValid(_Bat.Get_Dealer()), "the client's copy has no dealer");
+        Assert_Equals_Int(Ledger.Generation, 0, "the client's swoop ledger reads generation 0");
+        Assert_Equals_Int(Ledger.Landed, 0, "the client's swoop ledger landed nothing");
+        Assert_Equals_Int(Ledger.Cancelled, 0, "the client's swoop ledger cancelled nothing");
+    }
+
+    // At this machine's last telegraph sample the root faced the facing point within InDegrees on yaw and pitch.
+    protected void Assert_FacedTheFacingPoint(float64 InDegrees)
+    {
+        const auto& Last = _BatSwoop.FacingLast;
+        Assert_True(_BatSwoop.FacingSamples > 0, f"the {Get_MachineName()} sampled its telegraph's facing");
+        Assert_True(Last.Yaw >= 0.0 && Last.Yaw <= InDegrees, f"the {Get_MachineName()}'s yaw error at its last telegraph sample is {InDegrees} or less (reads {Last.Yaw})");
+        Assert_True(Last.Pitch >= 0.0 && Last.Pitch <= InDegrees, f"the {Get_MachineName()}'s pitch error at its last telegraph sample is {InDegrees} or less (reads {Last.Pitch})");
     }
 
     protected void Finish_BatRow(FString InRow, FString InExtra)
@@ -596,12 +850,20 @@ class UMars_AutoTestRig_NetBat : UMars_AutoTestRig_NetStrike
     private void OnBatSwoopLanded(FCk_Handle_Bat InBat, int32 InGeneration, FCk_Handle_HitZone InZone)
     {
         _BatSwoopsLanded += 1;
+        _BatLandedZones.Add(InZone);
     }
 
     UFUNCTION()
     private void OnBatSwoopCancelled(FCk_Handle_Bat InBat, int32 InGeneration, EMars_Bat_SwoopCancel InReason)
     {
         _BatSwoopsCancelled += 1;
+        _BatCancelReasons.Add(InReason);
+    }
+
+    UFUNCTION()
+    private void OnPreyDamaged(FCk_Handle_Health InHealth, FMars_DamageEvent InEvent, float32 InApplied, float32 InRemaining)
+    {
+        _PreyDamaged += 1;
     }
 
     UFUNCTION()
