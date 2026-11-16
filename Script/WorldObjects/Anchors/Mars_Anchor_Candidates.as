@@ -284,7 +284,9 @@ class UMars_Anchor_PocketNavField_EntityScript : UCk_GroundNavVolume_EntityScrip
 class UMars_Anchor_PackPlinth_EntityScript : UCk_GenericEntityScript_UE
 {
     default _ShowInPlaceActors = false;
-    default _Replication = ECk_Replication::DoesNotReplicate;
+    // Stance A: spawned by the authority's anchor under the replicated spawn owner; its root transform replicates; its
+    // slab is built on every machine.
+    default _Replication = ECk_Replication::Replicates;
 
     UPROPERTY(ExposeOnSpawn)
     FTransform SpawnTransform = FTransform::Identity;
@@ -295,10 +297,31 @@ class UMars_Anchor_PackPlinth_EntityScript : UCk_GenericEntityScript_UE
     UFUNCTION(BlueprintOverride)
     ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
     {
-        auto Root = utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::DoesNotReplicate);
+        auto Root = utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::Replicates);
         Root.Add_MeshPart(this, FMars_MeshPart(FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, 15.0), FVector(1.2, 1.2, 0.3)),
             engine::load::Cube(), assets::load::ProtoGrid_Interactable_Mars_MI(), collision::profile::BlockAll, n"PackPlinth"));
+        utils_entity_tag::Add(InHandle, n"TAG_MarsPackPlinth");
         return ECk_EntityScript_ConstructionFlow::Finished;
+    }
+}
+
+// An omen: the eyes dummy on a pocket's anchor, one on every machine.
+class UMars_Anchor_OmenEyes_EntityScript : UMars_EyesDummy_EntityScript
+{
+    default _ShowInPlaceActors = false;
+    // Stance A: spawned by the authority's anchor under the replicated spawn owner; it is placed by its spawn
+    // transform, which every machine receives; its look, gaze and expression cycle are each machine's own.
+    default _Replication = ECk_Replication::Replicates;
+
+    UPROPERTY(ExposeOnSpawn)
+    FMars_Anchor_Context Anchor;
+
+    UFUNCTION(BlueprintOverride)
+    ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
+    {
+        const auto Flow = Super::DoConstruct(InHandle);
+        utils_entity_tag::Add(InHandle, n"TAG_MarsOmenEyes");
+        return Flow;
     }
 }
 

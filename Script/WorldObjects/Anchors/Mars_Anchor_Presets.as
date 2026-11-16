@@ -1,7 +1,7 @@
 // The placeable anchors and their candidate tables. A table is a script asset, visible only in this file, so other files
 // reach it through the utils_anchor accessors below. Row order is part of the contract: a ledger names rows by index.
 // A row whose script is a Replicates class says so (EMars_AnchorRow_Net::Replicated): the anchor spawns it under the
-// replicated spawn owner. The rest stay local to the machine that resolves (crawlers, eyes, nav fields).
+// replicated spawn owner. The rest stay local to the machine that resolves (crawlers, nav fields).
 
 // Row 3, the one-sided lever gate, is eligible only for an anchor with an authored lever side (a crawl beside it): there
 // it takes 4 of 12 weight against the open arch's 4, the two-sided gate's 2 and rubble's 2; without a lever side the
@@ -40,7 +40,7 @@ asset Mars_AnchorTable_Cache of UMars_AnchorTable_Def
 asset Mars_AnchorTable_Omen of UMars_AnchorTable_Def
 {
     Family = EMars_Anchor_Family::Omen;
-    Rows.Add(FMars_AnchorTable_Row(UMars_EyesDummy_EntityScript, 3.0f, EMars_Anchor_Role::Other));
+    Rows.Add(FMars_AnchorTable_Row(UMars_Anchor_OmenEyes_EntityScript, 3.0f, EMars_Anchor_Role::Other, EMars_AnchorRow_Net::Replicated));
     Rows.Add(FMars_AnchorTable_Row(UMars_Anchor_OmenLampBank_EntityScript, 2.0f, EMars_Anchor_Role::Other, EMars_AnchorRow_Net::Replicated));
     Rows.Add(FMars_AnchorTable_Row(TSubclassOf<UCk_EntityScript_UE>(), 2.0f, EMars_Anchor_Role::Other));
 }
@@ -70,7 +70,7 @@ asset Mars_AnchorTable_Rest of UMars_AnchorTable_Def
 asset Mars_AnchorTable_Pack of UMars_AnchorTable_Def
 {
     Family = EMars_Anchor_Family::Pack;
-    Rows.Add(FMars_AnchorTable_Row(UMars_Anchor_PackPlinth_EntityScript, 1.0f, EMars_Anchor_Role::Other));
+    Rows.Add(FMars_AnchorTable_Row(UMars_Anchor_PackPlinth_EntityScript, 1.0f, EMars_Anchor_Role::Other, EMars_AnchorRow_Net::Replicated));
 }
 
 asset Mars_AnchorTable_Hunt of UMars_AnchorTable_Def
