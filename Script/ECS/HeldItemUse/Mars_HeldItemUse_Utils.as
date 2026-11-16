@@ -21,6 +21,34 @@ mixin bool Get_ThrowArmed(const FCk_Handle_HeldItemUse& Self)
     return Self.Get_Fragment(FMars_Fragment_HeldItemUse).ThrowArmed;
 }
 
+// How far the armed throw has charged, 0..1; 0 while nothing is armed.
+mixin float32 Get_ThrowCharge(const FCk_Handle_HeldItemUse& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_HeldItemUse).ThrowCharge;
+}
+
+// The share of the held item's ThrowSpeed a throw released now leaves at: its MinThrowPower uncharged, rising with the
+// charge to 1.
+mixin float32 Get_ThrowPower(const FCk_Handle_HeldItemUse& Self)
+{
+    return Math::Lerp(Self.Get_ThrowTuning().MinThrowPower, 1.0f, Self.Get_ThrowCharge());
+}
+
+// The held item's throw tuning (its Throwable trait, or the defaults without one); the defaults with empty hands.
+mixin FMars_HeldItemUse_ThrowTuning Get_ThrowTuning(const FCk_Handle_HeldItemUse& Self)
+{
+    auto Tuning = FMars_HeldItemUse_ThrowTuning();
+    const auto Item = Self.As_HeldItem().Get_CurrentItem();
+    if (ck::IsValid(Item) && Item.Has_Throwable())
+    {
+        const UMars_ItemTrait_Throwable Throwable = Item.Get_Throwable();
+        Tuning.MinThrowPower = Math::Clamp(Throwable.MinThrowPower, 0.0f, 1.0f);
+        Tuning.ChargeSeconds = Throwable.ChargeSeconds;
+    }
+
+    return Tuning;
+}
+
 // Launch precedes the inventory transfer; local held-item controls stop on the launch's own frame.
 mixin bool Get_IsCurrentItemLaunched(const FCk_Handle_HeldItemUse& Self)
 {
@@ -55,6 +83,9 @@ mixin TOptional<FMars_HeldItemUse_LaunchSolution> Get_LaunchSolution(const FCk_H
     auto Character = Cast<ACharacter>(ck::ToActor(Carrier, ECk_SanityCheck::UnChecked));
     if (ck::IsValid(Character))
     { PawnVelocity = Character.GetVelocity(); }
+
+    if (IsThrow)
+    { Speed *= Self.Get_ThrowPower(); }
 
     auto Solution = FMars_HeldItemUse_LaunchSolution();
     Solution.LinearVelocity = Forward * Speed + PawnVelocity;

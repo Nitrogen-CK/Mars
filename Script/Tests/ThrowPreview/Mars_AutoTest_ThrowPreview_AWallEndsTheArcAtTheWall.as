@@ -1,5 +1,5 @@
-// A wall ends the arc at the wall. A bare carrier holds a rock with a Static slab standing 200 cm ahead of the hand and
-// aims: the path meets the wall (End Surface, the landing names the wall), its landing normal faces back along the throw
+// A wall ends the arc at the wall. A bare carrier holds a rock with a Static slab standing 200 cm ahead of the hand, arms
+// and fully charges the throw, and aims: the path meets the wall (End Surface, the landing names the wall), its landing normal faces back along the throw
 // (+X), and the flight is short (under 0.5 s). Isolated origin (256000, -40000, -30000).
 class UMars_AutoTest_ThrowPreview_AWallEndsTheArcAtTheWall : UMars_AutoTestRig_ThrowPreview
 {
@@ -19,6 +19,8 @@ class UMars_AutoTest_ThrowPreview_AWallEndsTheArcAtTheWall : UMars_AutoTestRig_T
         Add_Step("stow the rock into the hands", n"Step_StowFirst");
         Add_Step_WaitUntil("the hands hold it", n"Check_Holding");
         Add_Step("a wall 200 cm ahead of the hand", n"Step_BuildWall");
+        Add_Step("arm the throw", n"Step_ArmThrow");
+        Add_Step_WaitUntil("the throw is charged full", n"Check_ThrowChargedFull");
         Add_Step("aim", n"Step_Aim");
         Add_Step_WaitUntil("the path meets a surface", n"Check_PathMeetsASurface", k_SlowPolls);
         Add_Step("the path ends on the wall's near face, soon", n"Step_AssertWall");

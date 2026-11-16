@@ -1,7 +1,8 @@
 // The launch is its launch solution. A bare carrier (Hand node, a hotbar of two bag slots, HeldItem, HeldItemUse; no
 // viewpoint, so it throws along its own +X) with a rock:
 //   - with empty hands Get_LaunchSolution is unset;
-//   - holding the rock, the Drop solution's speed is the rock's Throwable DropSpeed and the Throw solution's its ThrowSpeed;
+//   - holding the rock, the Drop solution's speed is the rock's Throwable DropSpeed and the Throw solution's, uncharged
+//     (nothing armed), MinThrowPower of its ThrowSpeed;
 //   - thrown, the launched world item's body, once Dynamic and past its launch, flies within 60 cm/s of the Throw
 //     solution's velocity (two steps of gravity and damping are the slack), and its first Dynamic-frame location is within
 //     8 cm of the solution's origin.
@@ -86,8 +87,9 @@ class UMars_AutoTest_HeldItemUse_TheLaunchUsesItsLaunchSolution : UMars_AutoTest
 
         _Solution = Throw.GetValue();
         const auto ThrowSpeed = _Solution.LinearVelocity.Size();
-        Assert_True(Math::Abs(ThrowSpeed - Throwable.ThrowSpeed) < 0.01,
-            f"the Throw solution's speed is the rock's ThrowSpeed {Throwable.ThrowSpeed} (got {ThrowSpeed})");
+        const auto Uncharged = Throwable.ThrowSpeed * Throwable.MinThrowPower;
+        Assert_True(Math::Abs(ThrowSpeed - Uncharged) < 0.01,
+            f"the uncharged Throw solution's speed is MinThrowPower of the rock's ThrowSpeed, {Uncharged} (got {ThrowSpeed})");
         Assert_True(_Solution.AngularVelocityDeg.Equals(Throwable.AngularVelocityDeg, 0.01),
             f"the Throw solution spins as the rock's Throwable (got {_Solution.AngularVelocityDeg})");
 

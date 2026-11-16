@@ -105,6 +105,21 @@ class UMars_AutoTestRig_ThrowPreview : UMars_AutoTestRig_Carrier
         Res.Set(_Items.Num() > 0 && _HeldItem.Get_CurrentItem() == _Items[0]);
     }
 
+    // Arms the throw as a held Drop would, so it charges (HeldItemUse); a test that measures a full-strength throw waits
+    // on Check_ThrowChargedFull after this.
+    UFUNCTION()
+    protected void Step_ArmThrow(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        _Use.Request_SetThrowArmed(FMars_Request_HeldItemUse_SetThrowArmed(true));
+    }
+
+    UFUNCTION()
+    protected void Check_ThrowChargedFull(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(_Use.Get_ThrowArmed() && _Use.Get_ThrowCharge() >= 1.0f);
+    }
+
     UFUNCTION()
     protected void Step_Aim(FCk_Handle InHandle, FInstancedStruct InPayload)
     {

@@ -36,6 +36,18 @@ struct FMars_HeldItemUse_LaunchSolution
     FVector AngularVelocityDeg = FVector::ZeroVector;
 }
 
+// How the held item's throw charges (its Throwable trait, or the defaults without one).
+struct FMars_HeldItemUse_ThrowTuning
+{
+    // An uncharged throw's share of ThrowSpeed, 0..1.
+    UPROPERTY()
+    float32 MinThrowPower = constants_held_item_use::k_DefaultMinThrowPower;
+
+    // Seconds from arming to a full charge; not positive charges at once.
+    UPROPERTY()
+    float32 ChargeSeconds = constants_held_item_use::k_DefaultThrowChargeSeconds;
+}
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Constants
 //--------------------------------------------------------------------------------------------------------------------------
@@ -45,6 +57,11 @@ namespace constants_held_item_use
     // Used when the held item has no Throwable trait.
     const float32 k_DefaultDropSpeed = 150.0f;
     const float32 k_DefaultThrowSpeed = 900.0f;
+
+    // Used when the held item has no Throwable trait: an uncharged throw's share of ThrowSpeed, and how long it takes to
+    // charge to the full ThrowSpeed.
+    const float32 k_DefaultMinThrowPower = 0.35f;
+    const float32 k_DefaultThrowChargeSeconds = 1.0f;
 
     // Spawn distance in front of the view when the player has no hand attach point.
     const float32 k_NoHandSpawnDistance = 60.0f;
@@ -61,11 +78,16 @@ struct FMars_Fragment_HeldItemUse
     UPROPERTY()
     FCk_Handle_Interactable CurrentInteractable;
 
-    // Presentation-only: requested by the drop/throw input task once Drop has been held past the throw threshold; the
-    // hint row and the throw preview follow it. Never read by gameplay - the input task decides throw-vs-drop from its
-    // own flag.
+    // Requested by the drop/throw input task once Drop has been held past the throw threshold; the hint row, the throw
+    // preview and the gloves' lowering follow it, and the throw charges while it is set. The input task still decides
+    // throw-vs-drop from its own flag (see UMars_SmTask_DropThrowIntent).
     UPROPERTY()
     bool ThrowArmed = false;
+
+    // How far the armed throw has charged, 0..1: zero when it arms, filling over the held item's ChargeSeconds and held at
+    // 1 (UMars_Processor_HeldItemUse_ChargeThrow). A throw leaves at Get_ThrowPower of the item's ThrowSpeed.
+    UPROPERTY()
+    float32 ThrowCharge = 0.0f;
 
     // The item a drop/throw already launched. Its world item adopts it a frame or more later, so a second launch of
     // the same item before the held item changes would spawn a world item whose adopt fails.

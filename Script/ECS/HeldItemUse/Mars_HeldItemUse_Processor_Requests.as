@@ -48,7 +48,7 @@ class UMars_Processor_HeldItemUse_HandleRequests : UCk_Processor_Script_Base_UE
     }
 
     //--------------------------------------------------------------------------------------------------------------------------
-    // Throw armed (HUD-only)
+    // Throw armed
     //--------------------------------------------------------------------------------------------------------------------------
 
     private void HandleSetThrowArmedRequest(
@@ -60,6 +60,8 @@ class UMars_Processor_HeldItemUse_HandleRequests : UCk_Processor_Script_Base_UE
         { return; }
 
         InState.ThrowArmed = InRequest.Armed;
+        // Every arm starts uncharged; a disarm clears what a cancelled hold had charged.
+        InState.ThrowCharge = 0.0f;
 
         if (InUse.Has_Fragment(FMars_Fragment_HeldItemUse_Signals))
         { InUse.Get_Fragment(FMars_Fragment_HeldItemUse_Signals).OnThrowArmedChanged.Broadcast(InUse, InRequest.Armed); }

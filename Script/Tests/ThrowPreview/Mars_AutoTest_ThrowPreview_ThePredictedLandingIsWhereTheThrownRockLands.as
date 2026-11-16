@@ -1,5 +1,5 @@
 // The predicted landing is where the thrown rock really lands. A bare carrier holds a rock 400 cm above a 1400 cm Static
-// floor slab and aims; once the path meets the floor its landing is kept and the rock is thrown with the held item's real
+// floor slab, arms and fully charges the throw, and aims; once the path meets the floor its landing is kept and the rock is thrown with the held item's real
 // throw. The rock's first Jolt contact is within 30 cm of the predicted landing, the landing is at least 600 cm from the
 // hand horizontally, on the slab's upward face, and every frame of the real flight keeps the rock's bounds centre within
 // 12 cm of the predicted path. The measured numbers are logged. Isolated origin (244000, -40000, -30000).
@@ -24,6 +24,8 @@ class UMars_AutoTest_ThrowPreview_ThePredictedLandingIsWhereTheThrownRockLands :
         Add_Step("stow the rock into the hands", n"Step_StowFirst");
         Add_Step_WaitUntil("the hands hold it", n"Check_Holding");
         Add_Step("a 1400 cm floor slab 400 cm under the hand", n"Step_BuildFloor");
+        Add_Step("arm the throw", n"Step_ArmThrow");
+        Add_Step_WaitUntil("the throw is charged full", n"Check_ThrowChargedFull");
         Add_Step("aim", n"Step_Aim");
         Add_Step_WaitUntil("the path meets a surface", n"Check_PathMeetsASurface", k_SlowPolls);
         Add_Step("keep the landing: on the floor's top, far enough out; throw", n"Step_AssertLandingAndThrow");
