@@ -2,7 +2,8 @@
 // the authority's request drain: a release, its yield spawn, the exhaustion and the regrow happen on the authority alone,
 // and a client's Release and Replenish requests are dropped. The release point and the regrow timer live in the local
 // FMars_Fragment_Forage_Local. A client mirrors the ledger (UMars_Processor_Forage_Mirror): it raises OnReleased (with an
-// invalid world item), OnExhausted and OnReplenished from what replicated; OnReleaseRefused is the authority's only.
+// invalid world item), OnExhausted and OnReplenished from what replicated after the state its copy was born into;
+// OnReleaseRefused is the authority's only.
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
@@ -199,10 +200,14 @@ struct FMars_Fragment_Forage_Local
     UPROPERTY()
     FCk_Handle_Timer RegrowTimer;
 
-    // Non-authority only (the authority's mirror drops it): the ledger as this machine last broadcast it, seeded with the
-    // spec's start values, so a ledger that replicated before the mirror ran still broadcasts.
+    // Non-authority only (the authority's mirror drops it): the ledger as this machine last reconciled it, seeded with
+    // the ledger this machine composed (the spec's start values), so a standing exhaustion is still announced.
     UPROPERTY()
     TOptional<FMars_Fragment_Forage> Last;
+
+    // Whether this copy has taken the state it was born into.
+    UPROPERTY()
+    EMars_Net_InitialState InitialState = EMars_Net_InitialState::Awaited;
 }
 
 // Present until UMars_Processor_Forage_Mirror has run once.

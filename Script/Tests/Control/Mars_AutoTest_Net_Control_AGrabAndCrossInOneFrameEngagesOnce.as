@@ -65,8 +65,15 @@ class UCk_AutoTest_Net_Control_AGrabAndCrossInOneFrameEngagesOnce : UMars_AutoTe
         Result.Set(Get_IsControlFound(n"TAG_MarsLever") && Get_IsStandInFound());
     }
 
+    // A settled interval after the find, so the act reaches the client's copy after the state it was born into.
     UFUNCTION()
     private void OnServerFound(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
+    {
+        WaitSeconds(k_SettleSeconds, n"OnServerReadyToGrabAndCross");
+    }
+
+    UFUNCTION()
+    private void OnServerReadyToGrabAndCross(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
     {
         Request_ServerGrip(_StandIn, EMars_Control_GripVerb::Begin);
         Request_ServerGrip(_StandIn, EMars_Control_GripVerb::Cross);

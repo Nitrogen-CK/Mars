@@ -93,20 +93,24 @@ namespace utils_control
         InHandle.Add_Fragment(FMars_Feature_Control());
         InHandle.Add_Fragment(Params);
         InHandle.Add_Fragment(Local);
-        // A client's copy can receive the ledger before it composes: the arrived one stands; the mirror's seed stays the
-        // composed state, so a value that arrived early still broadcasts.
-        if (InHandle.Has_Fragment(FMars_Fragment_Control) == false)
+        // A ledger already here can only have been put here by its replicated application: this copy was born into it,
+        // has taken that state, and the mirror's first pass shows it as it stands. The mirror's seed stays the composed
+        // state, so a standing value is announced.
+        if (InHandle.Has_Fragment(FMars_Fragment_Control))
+        { Mirror.InitialState = EMars_Net_InitialState::Taken; }
+        else
         { InHandle.Add_Fragment(State, ECk_Replication::Replicates); }
 
         InHandle.Add_Fragment(Mirror);
 
-        // A client's copy can receive the grip ledger before it composes: the arrived one stands, and the mirror starts
-        // from it.
-        if (InHandle.Has_Fragment(FMars_Fragment_Control_Grip) == false)
+        // A ledger already here can only have been put here by its replicated application: this copy was born into it,
+        // has taken that state, and the mirror's first pass shows it as it stands.
+        auto GripMirror = FMars_Fragment_Control_GripMirror();
+        if (InHandle.Has_Fragment(FMars_Fragment_Control_Grip))
+        { GripMirror.InitialState = EMars_Net_InitialState::Taken; }
+        else
         { InHandle.Add_Fragment(FMars_Fragment_Control_Grip(), ECk_Replication::Replicates); }
 
-        auto GripMirror = FMars_Fragment_Control_GripMirror();
-        GripMirror.Last = InHandle.Get_Fragment(FMars_Fragment_Control_Grip);
         InHandle.Add_Fragment(GripMirror);
         InHandle.Add_Fragment(FMars_Tag_Control_NeedsGripMirror());
 

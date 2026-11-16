@@ -2,10 +2,12 @@
 // written by the authority's request drain; a client's use arrives there as Cue.Mars.Control.Engage
 // (Mars_Control_Cues.as). The release timer, the mover, the grip and a pending engage live in the local
 // FMars_Fragment_Control_Local. A client mirrors the ledger: it moves its own Mover and broadcasts OnEngaged /
-// OnActiveChanged from what replicated. A ManuallyCompleted grip (BeginManipulation / Nudge / EndManipulation and the
-// Tick spring) runs on the machine that begins it - the authority, or a client whose control's entity replicates
-// (Get_MayGripHere): a client's threshold ends its interaction, whose completion sends the engage cue, and holds off the
-// next grip until the ledger shows that engagement or utils_control::k_PendingEngageSeconds pass.
+// OnActiveChanged from what replicated, raising what the authority raises after the state its copy was born into; a
+// copy born into another machine's standing grip shows its handle where that grip's Pull stands. A ManuallyCompleted
+// grip (BeginManipulation / Nudge / EndManipulation and the Tick spring) runs on the machine that begins it - the
+// authority, or a client whose control's entity replicates (Get_MayGripHere): a client's threshold ends its
+// interaction, whose completion sends the engage cue, and holds off the next grip until the ledger shows that
+// engagement or utils_control::k_PendingEngageSeconds pass.
 // Who grips is the authority's: on a control whose entity replicates (Get_IsGripArbitrated), the machine that begins or
 // ends a grip begun by an interaction reports it through Cue.Mars.Control.Grip (Begin, then LetGo or Cross), and the
 // authority's drain keeps the replicated FMars_Fragment_Control_Grip (the gripper, a grip serial, a refusal serial naming
@@ -421,12 +423,17 @@ struct FMars_Fragment_Control_Grip
     FCk_Handle LastRefused;
 }
 
-// The grip ledger as this machine last reconciled it, seeded with the ledger as Add found it, so a machine that binds
-// late raises nothing old. Written only by UMars_Processor_Control_GripMirror.
+// Written only by UMars_Processor_Control_GripMirror and Add.
 struct FMars_Fragment_Control_GripMirror
 {
+    // The grip ledger as this machine last reconciled it, seeded with the ledger this machine composed, so a standing
+    // holder is announced once.
     UPROPERTY()
     FMars_Fragment_Control_Grip Last;
+
+    // Whether this copy has taken the grip state it was born into.
+    UPROPERTY()
+    EMars_Net_InitialState InitialState = EMars_Net_InitialState::Awaited;
 }
 
 struct FMars_Tag_Control_NeedsGripMirror {}
@@ -479,12 +486,17 @@ struct FMars_Fragment_Control_Local
     FCk_Handle_Interactable Interactable;
 }
 
-// Non-authority only (the authority's setup removes it): the ledger as this machine last broadcast it, seeded with the
-// ledger as Add composed it, so a value that replicated before the setup ran still broadcasts.
+// Non-authority only (the authority's setup removes it).
 struct FMars_Fragment_Control_Mirror
 {
+    // The ledger as this machine last reconciled it, seeded with the ledger this machine composed, so a standing
+    // activation is announced once.
     UPROPERTY()
     FMars_Fragment_Control Last;
+
+    // Whether this copy has taken the engage state it was born into.
+    UPROPERTY()
+    EMars_Net_InitialState InitialState = EMars_Net_InitialState::Awaited;
 }
 
 // Present while Manipulation is set; gates UMars_Processor_Control_Tick.
@@ -527,7 +539,7 @@ delegate void FMars_Delegate_Control_OnGripRefused(FCk_Handle_Control InControl,
 event void FMars_Delegate_Control_OnGripRefused_MC(FCk_Handle_Control InControl, FCk_Handle InRefused);
 
 // Once each time the grip mirror finds the grant held by someone else than at its last reconcile, on every machine (a
-// machine that binds late sees the holder it finds as a change from Nobody).
+// copy announces a holder it was born into once, as a change from Nobody).
 delegate void FMars_Delegate_Control_OnGripHolderChanged(FCk_Handle_Control InControl, EMars_Control_GripHolder InPrevious, EMars_Control_GripHolder InHolder);
 event void FMars_Delegate_Control_OnGripHolderChanged_MC(FCk_Handle_Control InControl, EMars_Control_GripHolder InPrevious, EMars_Control_GripHolder InHolder);
 

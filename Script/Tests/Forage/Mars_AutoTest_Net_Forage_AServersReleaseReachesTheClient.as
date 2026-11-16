@@ -39,8 +39,15 @@ class UCk_AutoTest_Net_Forage_AServersReleaseReachesTheClient : UMars_AutoTestRi
         Result.Set(Get_IsSourceFound(n"TAG_MarsForageVine"));
     }
 
+    // A settled interval after the find, so the act reaches the client's copy after the state it was born into.
     UFUNCTION()
     private void OnServerVineFound(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
+    {
+        WaitSeconds(k_SettleSeconds, n"OnServerReadyToRelease");
+    }
+
+    UFUNCTION()
+    private void OnServerReadyToRelease(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
     {
         _Forage.Request_Release(FMars_Request_Forage_Release(EMars_Forage_ReleaseReason::Knock));
         WaitUntil(n"Is_ReleaseSeenWithAFig", n"OnServerReleased", k_SlowPolls);

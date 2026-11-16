@@ -1,8 +1,12 @@
 // One-shot per control. On the authority: a control that also has a MechanismSource asserts it while active. A client
-// binds the ledger's rep-notify and reconciles once instead: it moves its own handle and broadcasts OnEngaged once per
-// replicated engagement, then OnActiveChanged, the authority's order. The reconcile also clears the pending engage this
-// client's own pull set (UMars_Processor_Control_Tick) once the ledger counts that engagement, so the next grip reads the
-// new direction. The handle it moves leaves any mirrored grip (UMars_Processor_Control_MirroredGrip).
+// binds the ledger's rep-notify and its first pass shows the ledger this machine composed. The ledger's first
+// application is the state the copy was born into, taken once as it stands: the handle is put at its pose at once
+// unless another machine's grip is shown on it, OnActiveChanged announces a standing activation, and no engagement the
+// ledger already counts is raised. Each later change is reconciled as it arrives: it moves the handle and broadcasts
+// OnEngaged once per replicated engagement, then OnActiveChanged, the authority's order. The reconcile also clears the
+// pending engage this client's own pull set (UMars_Processor_Control_Tick) once the ledger counts that engagement, so
+// the next grip reads the new direction. The handle it moves as a change leaves any mirrored grip
+// (UMars_Processor_Control_MirroredGrip).
 class UMars_Processor_Control_Setup : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -22,7 +26,7 @@ class UMars_Processor_Control_Setup : UCk_Processor_Script_Base_UE
         if (utils_net::Get_HasAuthority(InHandle) == false)
         {
             InHandle.BindTo_OnRepNotify(FMars_Fragment_Control, FCk_DynamicFragment_OnRepNotify(this, n"OnLedgerReplicated"));
-            Reconcile(Control);
+            Reconcile(Control, EMars_Net_Reconcile::AsItStands);
             Control.Request_TryRemove(FMars_Tag_Control_NeedsSetup);
             return;
         }
@@ -43,19 +47,35 @@ class UMars_Processor_Control_Setup : UCk_Processor_Script_Base_UE
         Control.Request_TryRemove(FMars_Tag_Control_NeedsSetup);
     }
 
+    // An expected absence, not a defect: a notify can land on a control already ending.
     UFUNCTION()
     private void OnLedgerReplicated(FCk_Handle InHandle, FCk_DynamicFragment_RepNotifyInfo InInfo)
     {
+        if (ck::Is_NOT_Valid(InHandle) || utils_entity_lifetime::Get_IsPendingDestroy(InHandle, ECk_EntityLifetime_DestructionPhase::BeginDestroy)
+            || InHandle.Is_Control() == false)
+        { return; }
+
         auto Control = InHandle.As_Control();
-        Reconcile(Control);
+        if (Control.Get_Fragment(FMars_Fragment_Control_Mirror).InitialState == EMars_Net_InitialState::Awaited)
+        {
+            Control.Get_Fragment(FMars_Fragment_Control_Mirror).InitialState = EMars_Net_InitialState::Taken;
+            Reconcile(Control, EMars_Net_Reconcile::AsItStands);
+            return;
+        }
+
+        Reconcile(Control, EMars_Net_Reconcile::AsItArrives);
     }
 
-    private void Reconcile(FCk_Handle_Control& InControl)
+    private void Reconcile(FCk_Handle_Control& InControl, EMars_Net_Reconcile InHow)
     {
         const auto Ledger = InControl.Get_Fragment(FMars_Fragment_Control);
         auto& Mirror = InControl.Get_Fragment(FMars_Fragment_Control_Mirror);
-        const auto Last = Mirror.Last;
+        auto Last = Mirror.Last;
         Mirror.Last = Ledger;
+
+        // As it stands, every engagement the ledger counts came before this copy took its state.
+        if (InHow == EMars_Net_Reconcile::AsItStands)
+        { Last.Engagements = Ledger.Engagements; }
 
         auto& Local = InControl.Get_Fragment(FMars_Fragment_Control_Local);
         if (Local.PendingEngage.IsSet() && Ledger.Engagements > Local.PendingEngage.GetValue().Engagements)
@@ -69,18 +89,29 @@ class UMars_Processor_Control_Setup : UCk_Processor_Script_Base_UE
 
         const auto Changed = Ledger.IsActive != Last.IsActive;
 
-        // A returns-to-rest handle is not a state display, as on the authority. The MoveTo takes the handle from a mirrored
-        // grip, whichever of the two ledgers arrived first: a scrub after it would stop the tween where the grip left it.
+        // A returns-to-rest handle is not a state display, as on the authority. As it stands the handle is put at its
+        // pose at once, unless another machine's standing grip is shown on it: the grip keeps the handle, and its end
+        // settles it to the pose asked here. As it arrives the MoveTo takes the handle from a mirrored grip, whichever
+        // of the two ledgers arrived first: a scrub after it would stop the tween where the grip left it.
         auto Mover = InControl.Get_Mover();
         if (Changed && ck::IsValid(Mover) && InControl.Get_ReturnsToRest() == false)
         {
-            Local.MirroredGrip.Reset();
-            InControl.Request_TryRemove(FMars_Tag_Control_MirroringGrip);
+            if (InHow == EMars_Net_Reconcile::AsItArrives)
+            {
+                Local.MirroredGrip.Reset();
+                InControl.Request_TryRemove(FMars_Tag_Control_MirroringGrip);
+            }
+            else if (Local.MirroredGrip.IsSet() == false)
+            { Mover.Request_Scrub(FMars_Request_Mover_Scrub(Ledger.IsActive ? 1.0f : 0.0f)); }
+
             Mover.Request_MoveTo(FMars_Request_Mover_MoveTo(Ledger.IsActive ? EMars_Mover_Pose::End : EMars_Mover_Pose::Start));
         }
 
         if (InControl.Has_Fragment(FMars_Fragment_Control_Signals) == false)
         { return; }
+
+        // Handlers dress the assembly and start its ticks: scope the script world to the control's.
+        const auto WorldContext = FAngelscriptGameThreadScopeWorldContext(utils_entity_lifetime::Get_WorldForEntity(InControl));
 
         for (int32 Engagement = Last.Engagements; Engagement < Ledger.Engagements; ++Engagement)
         { InControl.Get_Fragment(FMars_Fragment_Control_Signals).OnEngaged.Broadcast(InControl); }

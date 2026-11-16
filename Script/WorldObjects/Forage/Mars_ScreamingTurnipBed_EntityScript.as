@@ -456,6 +456,23 @@ class UMars_ScreamingTurnipBed_EntityScript : UCk_GenericEntityScript_UE
     UFUNCTION()
     private void OnForageReleased(FCk_Handle_Forage InForage, FCk_Handle InWorldItem, EMars_Forage_ReleaseReason InReason)
     {
+        DoShow_Harvested();
+    }
+
+    UFUNCTION()
+    private void OnForageExhausted(FCk_Handle_Forage InForage)
+    {
+        Claim_Target();
+        // A bed holds one root and does not regrow: an exhausted bed is harvested, which a copy born after the pluck
+        // learns only here.
+        DoShow_Harvested();
+    }
+
+    private void DoShow_Harvested()
+    {
+        if (_IsHarvested)
+        { return; }
+
         _IsHarvested = true;
         _Aim = FCk_Handle_Transform();
         // The root is out: the planted mesh it hides draws no pull any more.
@@ -463,12 +480,6 @@ class UMars_ScreamingTurnipBed_EntityScript : UCk_GenericEntityScript_UE
         { _Planted.Set_PullDrawing(FMars_ScreamingTurnip_PullDrawing()); }
         DoDestroy_FollowTick();
         DoRefresh_Visuals();
-    }
-
-    UFUNCTION()
-    private void OnForageExhausted(FCk_Handle_Forage InForage)
-    {
-        Claim_Target();
     }
 
     // The pluck: the authority's bed turns its Control's engagement (the grip's Cross) into a claim of the target and one

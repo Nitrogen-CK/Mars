@@ -1,15 +1,16 @@
-// Every machine mirrors the grip ledger. A client binds its rep-notify once and reconciles then and on every arrival; the
-// authority reconciles when its own drain refuses a claim (it adds FMars_Tag_Control_NeedsGripMirror). Each reconcile
-// compares the ledger with the one it last reconciled (seeded by Add from the ledger as it arrived, so a machine that binds
-// late raises nothing old, while the grip it finds held is shown at once) and, for refusals it had not seen: lets this machine's own grip go when it belongs to the
-// refused entity - the local grip ends as EndManipulation ends it (reporting LetGo) and its interaction ends Failed, or,
-// past the crossing (its Cross already reported), the pending engage clears and the handle settles back at once - then
-// raises OnGripRefused once per refusal. A refusal
-// naming the entity the ledger now shows gripping is old: that entity was granted since, and its grip stands.
-// Each reconcile also follows who holds the grant (Follow_Holder): another machine's grip is shown and claimed here,
-// this machine's own never is, whether or not the control has a Mover; when the holder it reads changed it raises
-// OnGripHolderChanged once, before any refusal. The authority also reconciles after each grant and release its drain makes; a client
-// reconciles on every arrival, a changed Pull included.
+// Every machine mirrors the grip ledger. The authority reconciles its own drain's changes as they arrive (each grant,
+// release and refusal adds FMars_Tag_Control_NeedsGripMirror). A client binds its rep-notify once, and its first pass
+// shows the ledger this machine composed. The ledger's first application is the state the copy was born into, taken
+// once as it stands: another machine's standing grip is shown and claimed with its handle where the Pull stands,
+// OnGripHolderChanged is raised once, and no refusal the ledger already counts is raised. Each later change is
+// reconciled as it arrives, a changed Pull included: the reconcile compares the ledger with the one it last reconciled
+// and, for refusals it had not seen, lets this machine's own grip go when it belongs to the refused entity - the local
+// grip ends as EndManipulation ends it (reporting LetGo) and its interaction ends Failed, or, past the crossing (its
+// Cross already reported), the pending engage clears and the handle settles back at once - then raises OnGripRefused
+// once per refusal. A refusal naming the entity the ledger now shows gripping is old: that entity was granted since,
+// and its grip stands. Each reconcile also follows who holds the grant (Follow_Holder): another machine's grip is shown
+// and claimed here, this machine's own never is, whether or not the control has a Mover; when the holder it reads
+// changed it raises OnGripHolderChanged once, before any refusal.
 class UMars_Processor_Control_GripMirror : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -28,27 +29,50 @@ class UMars_Processor_Control_GripMirror : UCk_Processor_Script_Base_UE
         InHandle.Request_TryRemove(FMars_Tag_Control_NeedsGripMirror);
         auto Control = InHandle.As_Control();
 
-        // Only Add tags a client's copy, once.
-        if (utils_net::Get_HasAuthority(InHandle) == false)
-        { InHandle.BindTo_OnRepNotify(FMars_Fragment_Control_Grip, FCk_DynamicFragment_OnRepNotify(this, n"OnGripLedgerReplicated")); }
+        // The authority mirrors its own drain's changes, each as it arrives. A client's copy binds once (only Add tags
+        // it) and shows the ledger this machine composed, as it stands.
+        const auto HasAuthority = utils_net::Get_HasAuthority(InHandle);
+        if (HasAuthority)
+        {
+            Reconcile(Control, EMars_Net_Reconcile::AsItArrives);
+            return;
+        }
 
-        Reconcile(Control);
+        InHandle.BindTo_OnRepNotify(FMars_Fragment_Control_Grip, FCk_DynamicFragment_OnRepNotify(this, n"OnGripLedgerReplicated"));
+        Reconcile(Control, EMars_Net_Reconcile::AsItStands);
     }
 
+    // An expected absence, not a defect: a notify can land on a control already ending.
     UFUNCTION()
     private void OnGripLedgerReplicated(FCk_Handle InHandle, FCk_DynamicFragment_RepNotifyInfo InInfo)
     {
+        if (ck::Is_NOT_Valid(InHandle) || utils_entity_lifetime::Get_IsPendingDestroy(InHandle, ECk_EntityLifetime_DestructionPhase::BeginDestroy)
+            || InHandle.Is_Control() == false)
+        { return; }
+
         auto Control = InHandle.As_Control();
-        Reconcile(Control);
+        if (Control.Get_Fragment(FMars_Fragment_Control_GripMirror).InitialState == EMars_Net_InitialState::Awaited)
+        {
+            Control.Get_Fragment(FMars_Fragment_Control_GripMirror).InitialState = EMars_Net_InitialState::Taken;
+            Reconcile(Control, EMars_Net_Reconcile::AsItStands);
+            return;
+        }
+
+        Reconcile(Control, EMars_Net_Reconcile::AsItArrives);
     }
 
     // Last is written before any broadcast: a handler may compose on another entity and move the fragment storage.
-    private void Reconcile(FCk_Handle_Control& InControl)
+    private void Reconcile(FCk_Handle_Control& InControl, EMars_Net_Reconcile InHow)
     {
         const auto Ledger = InControl.Get_Fragment(FMars_Fragment_Control_Grip);
         auto& Mirror = InControl.Get_Fragment(FMars_Fragment_Control_GripMirror);
-        const auto Last = Mirror.Last;
+        auto Last = Mirror.Last;
         Mirror.Last = Ledger;
+
+        // As it stands, every claim the ledger counts as refused came before this copy took its state: none can be this
+        // machine's, and none is raised.
+        if (InHow == EMars_Net_Reconcile::AsItStands)
+        { Last.RefusalSerial = Ledger.RefusalSerial; }
 
         const auto HasNewRefusals = Ledger.RefusalSerial > Last.RefusalSerial;
         const auto Refused = Ledger.LastRefused;
@@ -58,6 +82,11 @@ class UMars_Processor_Control_GripMirror : UCk_Processor_Script_Base_UE
         // After a refused grip let go, so the refused machine shows and claims the grip like any other.
         const auto PreviousHolder = InControl.Get_Fragment(FMars_Fragment_Control_Local).GripHolder;
         Follow_Holder(InControl, Ledger, Last);
+
+        // As it stands another machine's grip is shown where its pull stands; as it arrives the shown handle springs
+        // there from where a grip starts.
+        if (InHow == EMars_Net_Reconcile::AsItStands && InControl.Get_GripHolder() == EMars_Control_GripHolder::AnotherMachine)
+        { InControl.Get_Fragment(FMars_Fragment_Control_Local).MirroredGrip = FMars_Control_Spring(Ledger.Pull, 0.0f); }
 
         const auto Holder = InControl.Get_Fragment(FMars_Fragment_Control_Local).GripHolder;
         const auto HasNewHolder = Holder != PreviousHolder;
