@@ -202,6 +202,13 @@ struct FMars_Fragment_FPHands
     UPROPERTY()
     TOptional<float32> ViewPitchDeg;
 
+    // Asked for by SetLowered; LowerAlpha eases toward it in the Tick (the Pitch spec's Lower).
+    UPROPERTY()
+    bool Lowered = false;
+
+    UPROPERTY()
+    float32 LowerAlpha = 0.0f;
+
     // Per-glove finger pose overrides (a station's feed closes the free glove on the food). Each applies only while that
     // glove is on a reach target; both clear when the phase returns to None.
     UPROPERTY()
@@ -409,6 +416,20 @@ struct FMars_Request_FPHands_SetPoseOverride
     }
 }
 
+// Lowers the gloves (the Pitch spec's Lower) or raises them back. The last one in a drain wins.
+struct FMars_Request_FPHands_SetLowered
+{
+    UPROPERTY()
+    bool Lowered = false;
+
+    FMars_Request_FPHands_SetLowered() {}
+
+    FMars_Request_FPHands_SetLowered(bool InLowered)
+    {
+        Lowered = InLowered;
+    }
+}
+
 struct FMars_Fragment_FPHands_Requests
 {
     UPROPERTY()
@@ -419,6 +440,9 @@ struct FMars_Fragment_FPHands_Requests
 
     UPROPERTY()
     TArray<FMars_Request_FPHands_SetPoseOverride> SetPoseOverrideRequests;
+
+    UPROPERTY()
+    TArray<FMars_Request_FPHands_SetLowered> SetLoweredRequests;
 
     UPROPERTY()
     TArray<FMars_Request_FPHands_Release> ReleaseRequests;

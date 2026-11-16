@@ -1,4 +1,4 @@
-// Drains SetHold, SetFocus, SetPoseOverride, SetPhase, Release, StartPush, then StartReach. The phase itself only moves through SetPhase
+// Drains SetHold, SetFocus, SetPoseOverride, SetLowered (the last wins), SetPhase, Release, StartPush, then StartReach. The phase itself only moves through SetPhase
 // (the Hands sub-SM's state enter tasks); StartPush, StartReach and Release only broadcast, and the sub-SM's conditions
 // turn those broadcasts into transitions.
 //
@@ -36,6 +36,7 @@ class UMars_Processor_FPHands_HandleRequests : UCk_Processor_Script_Base_UE
         TArray<FMars_Request_FPHands_SetHold> SetHoldRequests = InRequests.SetHoldRequests;
         TArray<FMars_Request_FPHands_SetFocus> SetFocusRequests = InRequests.SetFocusRequests;
         TArray<FMars_Request_FPHands_SetPoseOverride> SetPoseOverrideRequests = InRequests.SetPoseOverrideRequests;
+        TArray<FMars_Request_FPHands_SetLowered> SetLoweredRequests = InRequests.SetLoweredRequests;
         TArray<FMars_Request_FPHands_StartReach> StartReachRequests = InRequests.StartReachRequests;
         TArray<FMars_Request_FPHands_Release> ReleaseRequests = InRequests.ReleaseRequests;
         TArray<FMars_Request_FPHands_SetPhase> SetPhaseRequests = InRequests.SetPhaseRequests;
@@ -52,6 +53,9 @@ class UMars_Processor_FPHands_HandleRequests : UCk_Processor_Script_Base_UE
 
         for (const auto& Request : SetPoseOverrideRequests)
         { HandleSetPoseOverride(InState, Request); }
+
+        if (SetLoweredRequests.Num() > 0)
+        { InState.Lowered = SetLoweredRequests.Last().Lowered; }
 
         if (SetPhaseRequests.Num() > 0)
         { HandleSetPhase(InHandle, InState, SetPhaseRequests.Last().Phase); }

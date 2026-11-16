@@ -1,7 +1,7 @@
 // Every frame: advances PhaseTime, lets go of a held target that died, follows moving reach/focus anchors, eases the focus
 // lean (dropping a focus whose interactable has died), sets the held item's offset from the hand (a picked-up item riding
 // in, a held item carried out with a Place, a one-handed item riding its glove) and turns the pitch node for the view's
-// pitch. The phase itself is the Hands sub-SM's, except the end of a Grip: the gloves move to Return here, on the clock the
+// pitch (easing the gloves into or out of their lowered pose). The phase itself is the Hands sub-SM's, except the end of a Grip: the gloves move to Return here, on the clock the
 // grip-taken item's arrival also runs on (see Tick_EndGrip).
 class UMars_Processor_FPHands_Tick : UCk_Processor_Script_Base_UE
 {
@@ -162,10 +162,17 @@ class UMars_Processor_FPHands_Tick : UCk_Processor_Script_Base_UE
         return Offset;
     }
 
-    // Turns the pitch node back by the part of the view's pitch the gloves do not follow. The view is the node's parent;
-    // its pitch here is last frame's render, so it is eased before it is used.
+    // Turns the pitch node back by the part of the view's pitch the gloves do not follow, and sinks it by as much of the
+    // Lower pose as the gloves have eased into. The view is the node's parent; its pitch here is last frame's render, so it
+    // is eased before it is used.
     private void Tick_Pitch(const FMars_FPHands_PitchSpec& InSpec, FMars_Fragment_FPHands& InState, float32 InDeltaSeconds)
     {
+        const auto LowerTarget = InState.Lowered ? 1.0f : 0.0f;
+        const auto LowerEase = float32(1.0 - Math::Exp(-InSpec.Lower.InterpSpeed * InDeltaSeconds));
+        InState.LowerAlpha += (LowerTarget - InState.LowerAlpha) * LowerEase;
+        if (Math::Abs(LowerTarget - InState.LowerAlpha) < 0.001f)
+        { InState.LowerAlpha = LowerTarget; }
+
         auto Node = InSpec.Node;
         if (ck::Is_NOT_Valid(Node))
         { return; }
@@ -180,7 +187,7 @@ class UMars_Processor_FPHands_Tick : UCk_Processor_Script_Base_UE
             InState.ViewPitchDeg = TOptional<float32>(Previous + (ViewPitch - Previous) * Alpha);
         }
 
-        const auto Offset = utils_fphands::Make_PitchOffset(InSpec, InState.ViewPitchDeg.GetValue());
+        const auto Offset = utils_fphands::Make_PitchOffset(InSpec, InState.ViewPitchDeg.GetValue(), InState.LowerAlpha);
         if (Offset.Equals(utils_scene_node::Get_Offset(Node)))
         { return; }
 

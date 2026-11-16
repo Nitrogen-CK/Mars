@@ -311,6 +311,12 @@ mixin void Request_SetPoseOverride(FCk_Handle_FPHands& Self, const FMars_Request
     Requests.SetPoseOverrideRequests.Add(InRequest);
 }
 
+mixin void Request_SetLowered(FCk_Handle_FPHands& Self, const FMars_Request_FPHands_SetLowered& InRequest)
+{
+    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_FPHands_Requests);
+    Requests.SetLoweredRequests.Add(InRequest);
+}
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Signal Binding
 //--------------------------------------------------------------------------------------------------------------------------

@@ -429,14 +429,16 @@ class UMars_SmTask_DropThrowIntent : UMars_SmTask_IntentEdges
 // ThrowPreviewFollowsArm
 //--------------------------------------------------------------------------------------------------------------------------
 
-// The throw preview aims exactly while a throw is armed, on the owning copy. It decides nothing about the throw: the
-// arm is UMars_SmTask_DropThrowIntent's.
+// The throw preview aims, and the gloves lower so its landing stays in view, exactly while a throw is armed, on the
+// owning copy. It decides nothing about the throw: the arm is UMars_SmTask_DropThrowIntent's.
 class UMars_SmTask_ThrowPreviewFollowsArm : UCk_SmTask_EntityScript
 {
     default _TaskMode = ECk_SmTaskMode::EnterExitOnly;
 
     private FCk_Handle_HeldItemUse _Use;
     private FCk_Handle_ThrowPreview _Preview;
+    // Unset on a player without gloves (headless rigs).
+    private FCk_Handle_FPHands _Hands;
 
     UFUNCTION(BlueprintOverride)
     void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
@@ -447,12 +449,13 @@ class UMars_SmTask_ThrowPreviewFollowsArm : UCk_SmTask_EntityScript
         auto Player = ck::Ctx(InHandle);
         _Use = Player.As_HeldItemUse();
         _Preview = Player.As_ThrowPreview();
+        _Hands = Player.As_FPHands(ECk_SanityCheck::UnChecked);
 
         _Use.BindTo_OnThrowArmedChanged(FMars_Delegate_HeldItemUse_OnThrowArmedChanged(this, n"OnThrowArmedChanged"));
 
         // The state can be re-entered while a throw is still armed.
         if (_Use.Get_ThrowArmed())
-        { _Preview.Request_SetAim(FMars_Request_ThrowPreview_SetAim(EMars_ThrowPreview_Aim::Aiming)); }
+        { Follow(true); }
     }
 
     UFUNCTION(BlueprintOverride)
@@ -461,18 +464,26 @@ class UMars_SmTask_ThrowPreviewFollowsArm : UCk_SmTask_EntityScript
         if (ck::IsValid(_Use))
         { _Use.UnbindFrom_OnThrowArmedChanged(FMars_Delegate_HeldItemUse_OnThrowArmedChanged(this, n"OnThrowArmedChanged")); }
 
-        if (ck::IsValid(_Preview))
-        { _Preview.Request_SetAim(FMars_Request_ThrowPreview_SetAim(EMars_ThrowPreview_Aim::Idle)); }
+        Follow(false);
 
         _Use = FCk_Handle_HeldItemUse();
         _Preview = FCk_Handle_ThrowPreview();
+        _Hands = FCk_Handle_FPHands();
     }
 
     UFUNCTION()
     private void OnThrowArmedChanged(FCk_Handle_HeldItemUse InUse, bool InArmed)
     {
+        Follow(InArmed);
+    }
+
+    private void Follow(bool InArmed)
+    {
         if (ck::IsValid(_Preview))
         { _Preview.Request_SetAim(FMars_Request_ThrowPreview_SetAim(InArmed ? EMars_ThrowPreview_Aim::Aiming : EMars_ThrowPreview_Aim::Idle)); }
+
+        if (ck::IsValid(_Hands))
+        { _Hands.Request_SetLowered(FMars_Request_FPHands_SetLowered(InArmed)); }
     }
 }
 
