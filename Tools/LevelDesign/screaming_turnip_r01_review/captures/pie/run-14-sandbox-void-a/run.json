@@ -1,0 +1,29 @@
+{
+ "events": [
+  {
+   "t": 0.0,
+   "game_elapsed": 0.0,
+   "frame_delta": 0.0173,
+   "event": "begin",
+   "player": "player X=-600.000 Y=225.000 Z=77.150 health=100.0 pack=false selected=TOMBSTONE slot1=TOMBSTONE slot2=TOMBSTONE slot3=TOMBSTONE held=TOMBSTONE operating=false",
+   "world_items": 35,
+   "turnips": [],
+   "beds": [],
+   "clips": []
+  }
+ ],
+ "changes": [
+  {
+   "game": 0.075,
+   "frame_delta": 0.0749,
+   "turnips": [],
+   "clips": [],
+   "at": []
+  },
+  {
+   "game": 1.532,
+   "error": "mark() got multiple values for argument 'label'"
+  }
+ ],
+ "max_delta": 0.2715
+}
