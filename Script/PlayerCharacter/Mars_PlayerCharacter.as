@@ -2,6 +2,9 @@ event void FMars_PlayerCharacter_OnGameplayComposed(FCk_Handle InEntity);
 
 class AMars_PlayerCharacter : AMars_Character
 {
+    UPROPERTY(DefaultComponent)
+    UCk_EntityBridge_ActorComponent_UE EntityBridge;
+
     default bUseControllerRotationYaw = true;
     default bUseControllerRotationPitch = false;
     default bUseControllerRotationRoll = false;
@@ -112,7 +115,7 @@ class AMars_PlayerCharacter : AMars_Character
     private FCk_Handle _PlayerEntity;
 
     // Native actor linkage precedes this pawn's gameplay assembly. Consumers of Mars features wait for this edge,
-    // or read its cached handle after binding, rather than treating Promise_OnActorEcsReady as feature readiness.
+    // or read its cached handle after binding, rather than treating the entity bridge's promises as feature readiness.
     private FCk_Handle _GameplayComposedEntity;
     FMars_PlayerCharacter_OnGameplayComposed OnGameplayComposed;
 
@@ -234,22 +237,20 @@ class AMars_PlayerCharacter : AMars_Character
         Hat.SetStaticMesh(System::LoadAsset_Blocking(HatSpec.Mesh));
     }
 
-    // BeginPlay, not ConstructionScript: ck::TransientEntity() needs a live world.
+    // BeginPlay, not ConstructionScript: the entity bridge needs a live world.
     UFUNCTION(BlueprintOverride)
     void BeginPlay()
     {
-        auto PendingEntity = utils_entity_script::Request_SpawnEntity(
-            ck::TransientEntity(), UCk_EntityScript_WithActor_UE, FCk_EntityScript_WithActor_SpawnParams(this));
-
-        utils_pending_entity_script::Promise_OnConstructed(
-            PendingEntity, FCk_Delegate_EntityScript_Constructed(this, n"OnEntityConstructed"));
+        EntityBridge.Promise_OnEntityConstructed(FCk_Delegate_EntityScript_Constructed(this, n"OnEntityConstructed"));
+        EntityBridge.Request_SpawnEntity(UCk_EntityScript_WithActor_UE);
     }
 
-    // Every machine composes all of it. The player entity replicates with the pawn (its driver is on the pawn; a client's
-    // spawn here is a placeholder that resolves to the server's entity), so it is the replicated owner of the cues its
-    // owner fires (a drop, a throw) and of the replicated state machine below. The interaction resolver, prompts, hints,
-    // hands, viewpoint and input are owner-local (stance E). The hotbar replicates (its slot roots are children of this
-    // entity; the authority decides what they hold and what is selected) and HeldItem derives from it on every machine.
+    // Every machine composes all of it. The player entity replicates with the pawn (its driver is on the pawn; on a
+    // client the request above is ignored and the server's entity arrives as a replica bound to this pawn), so it is
+    // the replicated owner of the cues its owner fires (a drop, a throw) and of the replicated state machine below.
+    // The interaction resolver, prompts, hints, hands, viewpoint and input are owner-local (stance E). The hotbar
+    // replicates (its slot roots are children of this entity; the authority decides what they hold and what is
+    // selected) and HeldItem derives from it on every machine.
     UFUNCTION()
     private void OnEntityConstructed(FCk_Handle_EntityScript InEntityScriptHandle)
     {

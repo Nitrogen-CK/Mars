@@ -10,6 +10,9 @@ class AMars_TestLamp : AActor
 {
     default bReplicates = false;
 
+    UPROPERTY(DefaultComponent)
+    UCk_EntityBridge_ActorComponent_UE EntityBridge;
+
     // Authored shape: editor visual + collision. In game it is hidden and an entity-hosted copy renders instead,
     // because CkUsf outlines only reach components hosted by the entity (utils_unreal_component).
     UPROPERTY(DefaultComponent, RootComponent)
@@ -41,11 +44,8 @@ class AMars_TestLamp : AActor
     UFUNCTION(BlueprintOverride)
     void BeginPlay()
     {
-        auto PendingEntity = utils_entity_script::Request_SpawnEntity(
-            ck::TransientEntity(), UMars_TestLamp_EntityScript, UMars_TestLamp_EntityScript::Params(this));
-
-        utils_pending_entity_script::Promise_OnConstructed(
-            PendingEntity, FCk_Delegate_EntityScript_Constructed(this, n"OnEntityConstructed"));
+        EntityBridge.Promise_OnEntityConstructed(FCk_Delegate_EntityScript_Constructed(this, n"OnEntityConstructed"));
+        EntityBridge.Request_SpawnEntity(UMars_TestLamp_EntityScript);
     }
 
     void Toggle()

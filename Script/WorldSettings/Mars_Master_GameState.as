@@ -1,15 +1,17 @@
 delegate void FMars_Delegate_GameState_OnEcsComposed(FCk_Handle InEntity);
 event void FMars_Delegate_GameState_OnEcsComposed_MC(FCk_Handle InEntity);
 
-// Every Master_* class bridges its actor to an ECS entity the same way: BeginPlay spawns a
-// UCk_EntityScript_WithActor_UE. The real order on authority is:
-//   1. link: Promise_OnActorEcsReady -> OnEcsReady fires INSIDE the entity's Construct (the actor and entity are
-//      linked, but nothing is composed yet - ValuesReplicated "collapses to link-time on authority");
-//   2. OnConstructed -> EcsConstructionScript (compose features);
-//   3. OnEcsComposed: the composed features are safe to read.
-// Consumers that read features composed in EcsConstructionScript must wait for OnEcsComposed, not OnEcsReady.
+// Every Master_* class bridges its actor to an ECS entity the same way: it carries a Ck Entity Bridge and
+// BeginPlay requests the entity through it. The order on every machine is:
+//   1. OnEntityConstructed -> EcsConstructionScript (compose features);
+//   2. OnEcsComposed: the composed features are safe to read;
+//   3. OnEcsReady: the entity has begun play and, on a client, its replicated values have arrived.
+// Consumers that read features composed in EcsConstructionScript wait for OnEcsComposed or OnEcsReady.
 class AMars_Master_GameState : ACk_GameState_UE
 {
+    UPROPERTY(DefaultComponent)
+    UCk_EntityBridge_ActorComponent_UE EntityBridge;
+
     protected FCk_Handle ThisActorEntity;
 
     private bool _IsEcsComposed = false;
@@ -18,12 +20,9 @@ class AMars_Master_GameState : ACk_GameState_UE
     UFUNCTION(BlueprintOverride)
     void BeginPlay()
     {
-        auto PendingEntity = utils_entity_script::Request_SpawnEntity(
-            ck::TransientEntity(), UCk_EntityScript_WithActor_UE, FCk_EntityScript_WithActor_SpawnParams(this));
-
-        utils_pending_entity_script::Promise_OnConstructed(
-            PendingEntity, FCk_Delegate_EntityScript_Constructed(this, n"OnEntityConstructed"));
-        utils_entity_bridge::Promise_OnActorEcsReady(this, FCk_Delegate_EntityBridge_OnEntityReady(this, n"OnActorEcsReady"));
+        EntityBridge.Promise_OnEntityConstructed(FCk_Delegate_EntityScript_Constructed(this, n"OnEntityConstructed"));
+        EntityBridge.Promise_OnEntityReady(FCk_Delegate_EntityBridge_OnEntityReady(this, n"OnActorEcsReady"));
+        EntityBridge.Request_SpawnEntity(UCk_EntityScript_WithActor_UE);
     }
 
     UFUNCTION()
