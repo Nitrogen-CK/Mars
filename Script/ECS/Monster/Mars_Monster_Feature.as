@@ -1,9 +1,11 @@
 // Stance A. A monster's death is the authority's: only a machine with authority over the monster applies Die, and its
 // first Die writes the replicated ledger on the root (FMars_Fragment_Monster_Net: alive or dead, and the cause as plain
 // data). A copy without authority drops Die; its mirror (UMars_Processor_Monster_Mirror) writes the death into that copy
-// (the cause, the Dead attribute) and raises OnDied once, also when the monster was dead before that copy composed. A
-// mirrored cause names no instigator, causer or zone. The parts roster is each machine's own composition: parts
-// register on every machine. A monster on a host that does not replicate has authority and behaves as it always has.
+// (the cause, the Dead attribute) and raises OnDied once, also when the monster was dead before that copy composed. It
+// also records whether the death was the state the copy was born into (Get_DeathTaken), so a script can show it at its
+// end; OnDied is raised once either way. A mirrored cause names no instigator, causer or zone. The parts roster is each
+// machine's own composition: parts register on every machine. A monster on a host that does not replicate has authority
+// and behaves as it always has.
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
@@ -135,11 +137,21 @@ struct FMars_Fragment_Monster_Net
     FMars_Health_NetHit DeathCause;
 }
 
-// Each machine's own: the ledger the mirror last reconciled (unset with authority).
+// Each machine's own: the ledger the mirror last reconciled, whether it has taken the state its copy was born into, and
+// how it wrote the death (all unset or default with authority).
 struct FMars_Fragment_Monster_Local
 {
     UPROPERTY()
     TOptional<FMars_Fragment_Monster_Net> Last;
+
+    // Awaited until this copy has taken the ledger it was born into; what arrives after that is an event.
+    UPROPERTY()
+    EMars_Net_InitialState InitialState = EMars_Net_InitialState::Awaited;
+
+    // How this copy wrote the death: as it stands when the copy was born into it, as it arrives when it happened after;
+    // unset while alive and with authority.
+    UPROPERTY()
+    TOptional<EMars_Net_Reconcile> DeathTaken;
 }
 
 // Added by utils_monster::Add, dropped by UMars_Processor_Monster_Mirror once it has bound the ledger's rep-notify.

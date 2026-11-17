@@ -119,7 +119,8 @@ class UMars_RootMaw_EntityScript : UCk_GenericEntityScript_UE
     private UPoseableMeshComponent _Head;
     private UStaticMeshComponent _Throat;
     private UNiagaraComponent _Roots;
-    private float32 _Glow = 0.0f;
+    // Unset until this script's first look: what the kernel shows then happened before this copy was drawn.
+    private TOptional<float32> _Glow;
     private float32 _WrittenGlow = -1.0f;
     private float32 _JawPosed = -1.0f;
     private float32 _Time = 0.0f;
@@ -212,19 +213,24 @@ class UMars_RootMaw_EntityScript : UCk_GenericEntityScript_UE
 
         const auto DeltaSeconds = float32(InDeltaT.Get_Seconds());
         _Time += DeltaSeconds;
-        if (CVar_Mars_RootMawDebugKill.GetInt() != 0 && _DebugKillSent == false && _Maw.Get_IsDead() == false)
+        // The debug kill and hit are the authority's: a copy's damage and hit requests are dropped.
+        const bool HasAuthority = utils_net::Get_HasAuthority(_Self);
+        if (HasAuthority)
         {
-            _DebugKillSent = true;
-            auto Health = _Maw.Get_Monster().Get_BodyHealth();
-            Health.Request_ApplyDamage(FMars_Request_Health_ApplyDamage(FMars_DamageEvent(100000.0f, GameplayTags::DamageType_Mars_Blunt)));
-        }
+            if (CVar_Mars_RootMawDebugKill.GetInt() != 0 && _DebugKillSent == false && _Maw.Get_IsDead() == false)
+            {
+                _DebugKillSent = true;
+                auto Health = _Maw.Get_Monster().Get_BodyHealth();
+                Health.Request_ApplyDamage(FMars_Request_Health_ApplyDamage(FMars_DamageEvent(100000.0f, GameplayTags::DamageType_Mars_Blunt)));
+            }
 
-        const auto DebugHit = CVar_Mars_RootMawDebugHit.GetInt();
-        if (DebugHit != _DebugHitSeen)
-        {
-            _DebugHitSeen = DebugHit;
-            if (DebugHit != 0 && _Maw.Get_IsDead() == false)
-            { DebugStrike(); }
+            const auto DebugHit = CVar_Mars_RootMawDebugHit.GetInt();
+            if (DebugHit != _DebugHitSeen)
+            {
+                _DebugHitSeen = DebugHit;
+                if (DebugHit != 0 && _Maw.Get_IsDead() == false)
+                { DebugStrike(); }
+            }
         }
 
         if (WithVisuals)
@@ -238,6 +244,9 @@ class UMars_RootMaw_EntityScript : UCk_GenericEntityScript_UE
         if (DebugDraw)
         { Draw(); }
     }
+
+    // What this script shows, for a test-only subclass.
+    protected float32 Get_Wilt() const { return _Wilt; }
 
     private void PoseJaw()
     {
@@ -264,6 +273,10 @@ class UMars_RootMaw_EntityScript : UCk_GenericEntityScript_UE
 
         if (_Maw.Get_IsDead())
         {
+            // A Maw that died before this machine's copy existed is shown wilted, not wilting.
+            if (_Maw.Get_Monster().Get_DeathTaken() == EMars_Net_Reconcile::AsItStands)
+            { _Wilt = 1.0f; }
+
             _Wilt = Math::Min(_Wilt + InDeltaSeconds / utils_root_maw::WiltSeconds, 1.0f);
             Turn = FQuat(FRotator(utils_root_maw::WiltDegrees * utils_root_maw::Get_EaseInOut(_Wilt), 0.0, 0.0));
         }
@@ -303,11 +316,13 @@ class UMars_RootMaw_EntityScript : UCk_GenericEntityScript_UE
     {
         const auto Awake = _Maw.Get_IsDead() == false && (_Maw.Get_Stance() == EMars_RootMaw_Stance::Emerged || _Maw.Get_Emerge() > 0.0f);
         const auto Target = Awake ? 1.0f : 0.0f;
-        _Glow = Math::FInterpConstantTo(_Glow, Target, InDeltaSeconds, Awake ? utils_root_maw::EyeOnRate : utils_root_maw::EyeOffRate);
-        if (ck::IsValid(_Throat) && Math::Abs(_Glow - _WrittenGlow) > 0.005f)
+        const auto Rate = Awake ? utils_root_maw::EyeOnRate : utils_root_maw::EyeOffRate;
+        _Glow = TOptional<float32>(_Glow.IsSet() ? Math::FInterpConstantTo(_Glow.GetValue(), Target, InDeltaSeconds, Rate) : Target);
+        const auto Glow = _Glow.GetValue();
+        if (ck::IsValid(_Throat) && Math::Abs(Glow - _WrittenGlow) > 0.005f)
         {
-            _WrittenGlow = _Glow;
-            _Throat.SetCustomPrimitiveDataFloat(utils_root_maw::ThroatCpd_Glow, _Glow);
+            _WrittenGlow = Glow;
+            _Throat.SetCustomPrimitiveDataFloat(utils_root_maw::ThroatCpd_Glow, Glow);
         }
     }
 

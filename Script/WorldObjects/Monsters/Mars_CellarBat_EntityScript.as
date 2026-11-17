@@ -118,8 +118,9 @@ class UMars_CellarBat_EntityScript : UCk_GenericEntityScript_UE
     private USkeletalMeshComponent _Body;
     private UMars_CellarBat_AnimInstance _Anim;
     private bool _UsesPlaceholder = false;
-    private float32 _Hang = 1.0f;
-    private float32 _Down = 0.0f;
+    // Unset until this script's first look: what the kernel shows then happened before this copy was drawn.
+    private TOptional<float32> _Hang;
+    private TOptional<float32> _Down;
     private float32 _Bank = 0.0f;
     private TOptional<float64> _TrailingYaw;
     private float32 _Speed = 0.0f;
@@ -330,9 +331,11 @@ class UMars_CellarBat_EntityScript : UCk_GenericEntityScript_UE
 
         _BobClock += DeltaSeconds;
         _BobAlpha = Math::FInterpTo(_BobAlpha, utils_bat::Get_IsBobbingPhase(Phase) ? 1.0f : 0.0f, DeltaSeconds, utils_bat::BobFadeRate);
-        _Hang = Math::FInterpConstantTo(_Hang, utils_bat::Get_IsHangingPhase(Phase) ? 1.0f : 0.0f, DeltaSeconds, utils_bat::HangRate);
+        const auto HangTarget = utils_bat::Get_IsHangingPhase(Phase) ? 1.0f : 0.0f;
+        _Hang = TOptional<float32>(_Hang.IsSet() ? Math::FInterpConstantTo(_Hang.GetValue(), HangTarget, DeltaSeconds, utils_bat::HangRate) : HangTarget);
         const auto Down = Phase == EMars_Bat_Phase::Landed || Phase == EMars_Bat_Phase::Dead;
-        _Down = Math::FInterpConstantTo(_Down, Down ? 1.0f : 0.0f, DeltaSeconds, utils_bat::HangRate);
+        const auto DownTarget = Down ? 1.0f : 0.0f;
+        _Down = TOptional<float32>(_Down.IsSet() ? Math::FInterpConstantTo(_Down.GetValue(), DownTarget, DeltaSeconds, utils_bat::HangRate) : DownTarget);
         if (Get_PoseHangsItself() && _PerchSocketLocal.IsSet())
         {
             // The clip's pose as last evaluated: the perch contact moves through the hang, the release and the swing.
@@ -361,6 +364,11 @@ class UMars_CellarBat_EntityScript : UCk_GenericEntityScript_UE
             _Anim.Apply(Frame);
         }
     }
+
+    // What this script shows, for a test-only subclass (0 before its first look).
+    protected float32 Get_HangAlpha() const { return _Hang.IsSet() ? _Hang.GetValue() : 0.0f; }
+
+    protected float32 Get_DownAlpha() const { return _Down.IsSet() ? _Down.GetValue() : 0.0f; }
 
     // The bank target (see BankFollowRate): how far the trailing heading is behind the root's yaw, positive turning right.
     // Only in the air under its own wings; the trailing heading snaps to the root while it hangs, falls or lies.
@@ -393,7 +401,7 @@ class UMars_CellarBat_EntityScript : UCk_GenericEntityScript_UE
     // bob. The placeholder also banks into its turns.
     private void PoseLook(float32 InBank)
     {
-        const auto Hang = utils_bat::Get_EaseInOut(_Hang);
+        const auto Hang = utils_bat::Get_EaseInOut(Get_HangAlpha());
         auto Roll = Get_PoseHangsItself() ? 0.0 : 180.0 * Hang;
         if (_UsesPlaceholder)
         { Roll += utils_bat::PlaceholderBankDegrees * InBank * (1.0 - Hang); }
@@ -402,7 +410,7 @@ class UMars_CellarBat_EntityScript : UCk_GenericEntityScript_UE
         const auto RootRotation = Root.GetRotation();
         const auto Level = RootRotation.Inverse() * FQuat(FRotator(0.0, RootRotation.Rotator().Yaw, 0.0));
         // Levelled while it hangs and once it lies on the ground (the corpse keeps the root's last flight pitch otherwise).
-        const auto LevelAlpha = Math::Max(Hang, utils_bat::Get_EaseInOut(_Down));
+        const auto LevelAlpha = Math::Max(Hang, utils_bat::Get_EaseInOut(Get_DownAlpha()));
         const auto LookRotation = FQuat::Slerp(FQuat::Identity, Level, LevelAlpha) * FQuat(FRotator(0.0, 0.0, Roll));
         const auto Rotation = LookRotation.Rotator();
         auto Offset = FVector::ZeroVector;

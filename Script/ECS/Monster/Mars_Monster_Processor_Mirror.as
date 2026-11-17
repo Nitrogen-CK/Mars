@@ -1,7 +1,8 @@
 // Once per monster: the authority drops the mirror state (its drain writes the ledger and broadcasts). A machine without
 // authority binds the ledger's rep-notify and reconciles once, so a death that replicated before this copy composed
 // still counts. A reconcile that reads the ledger Dead while this copy's DeathCause is unset writes the death into this
-// copy (the cause, the Dead attribute) and raises OnDied, once.
+// copy (the cause, the Dead attribute) and raises OnDied, once. The first application is taken as it stands, and the
+// mirror records which way it wrote the death (Get_DeathTaken); OnDied is raised once either way.
 class UMars_Processor_Monster_Mirror : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -26,7 +27,8 @@ class UMars_Processor_Monster_Mirror : UCk_Processor_Script_Base_UE
         }
 
         InHandle.BindTo_OnRepNotify(FMars_Fragment_Monster_Net, FCk_DynamicFragment_OnRepNotify(this, n"OnLedgerReplicated"));
-        Reconcile(Monster);
+        // What this machine composed, or a ledger that arrived first: both stand.
+        Reconcile(Monster, EMars_Net_Reconcile::AsItStands);
     }
 
     // An expected absence, not a defect: a notify can land on an entity already ending.
@@ -38,11 +40,18 @@ class UMars_Processor_Monster_Mirror : UCk_Processor_Script_Base_UE
         { return; }
 
         auto Monster = InHandle.As_Monster();
-        Reconcile(Monster);
+        if (Monster.Get_Fragment(FMars_Fragment_Monster_Local).InitialState == EMars_Net_InitialState::Awaited)
+        {
+            Monster.Get_Fragment(FMars_Fragment_Monster_Local).InitialState = EMars_Net_InitialState::Taken;
+            Reconcile(Monster, EMars_Net_Reconcile::AsItStands);
+            return;
+        }
+
+        Reconcile(Monster, EMars_Net_Reconcile::AsItArrives);
     }
 
     // Last is written before the state and the broadcast; DeathCause is the once-only latch, as on the authority.
-    private void Reconcile(FCk_Handle_Monster& InMonster)
+    private void Reconcile(FCk_Handle_Monster& InMonster, EMars_Net_Reconcile InHow)
     {
         const auto Ledger = InMonster.Get_Fragment(FMars_Fragment_Monster_Net);
         auto& Local = InMonster.Get_Fragment(FMars_Fragment_Monster_Local);
@@ -60,6 +69,7 @@ class UMars_Processor_Monster_Mirror : UCk_Processor_Script_Base_UE
 
         const auto Cause = utils_health::Make_Event(Ledger.DeathCause);
         State.DeathCause = TOptional<FMars_DamageEvent>(Cause);
+        Local.DeathTaken = TOptional<EMars_Net_Reconcile>(InHow);
         utils_byte_attribute::Request_Override(State.Dead, 1, ECk_MinMaxCurrent::Current);
 
         if (InMonster.Has_Fragment(FMars_Fragment_Monster_Signals) == false)

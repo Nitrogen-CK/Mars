@@ -43,7 +43,9 @@ namespace utils_monster
         Local.Last = TOptional<FMars_Fragment_Monster_Net>(Ledger);
 
         // A client's copy can receive the replicated ledger before it composes: the arrived ledger stands then.
-        if (InRoot.Has_Fragment(FMars_Fragment_Monster_Net) == false)
+        if (InRoot.Has_Fragment(FMars_Fragment_Monster_Net))
+        { Local.InitialState = EMars_Net_InitialState::Taken; }
+        else
         { InRoot.Add_Fragment(Ledger, ECk_Replication::Replicates); }
 
         InRoot.Add_Fragment(Local);
@@ -128,6 +130,17 @@ mixin bool Get_IsDead(const FCk_Handle_Monster& Self)
 mixin TOptional<FMars_DamageEvent> Get_DeathCause(const FCk_Handle_Monster& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_Monster).DeathCause;
+}
+
+// How this machine came to show the death: AsItStands when its copy was born into it, so a script shows it at its end;
+// AsItArrives for every other death, the authority's among them. A caller asks only after Get_IsDead().
+mixin EMars_Net_Reconcile Get_DeathTaken(const FCk_Handle_Monster& Self)
+{
+    if (ck::EnsureIfNot(Self.Get_IsDead(), f"[Monster] [{Self.ToString()}] asked how it took a death it has not died"))
+    { return EMars_Net_Reconcile::AsItArrives; }
+
+    const auto Taken = Self.Get_Fragment(FMars_Fragment_Monster_Local).DeathTaken;
+    return Taken.IsSet() ? Taken.GetValue() : EMars_Net_Reconcile::AsItArrives;
 }
 
 mixin float32 Get_CorpseSeconds(const FCk_Handle_Monster& Self)

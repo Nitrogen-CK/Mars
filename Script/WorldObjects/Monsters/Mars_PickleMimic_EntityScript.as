@@ -302,7 +302,8 @@ class UMars_PickleMimic_EntityScript : UCk_GenericEntityScript_UE
     private FCk_Handle_UnrealComponent _LiquidPart;
     private UStaticMeshComponent _Liquid;
     private UStaticMeshComponent _Face;
-    private float32 _Glow = 0.0f;
+    // Unset until this script's first look: what the kernel shows then happened before this copy was drawn.
+    private TOptional<float32> _Glow;
     private float32 _WrittenGlow = -1.0f;
     private float32 _LidPosed = -1.0f;
 
@@ -323,10 +324,16 @@ class UMars_PickleMimic_EntityScript : UCk_GenericEntityScript_UE
     private bool _DebugKillSent = false;
     private float32 _Topple = 0.0f;
     private float64 _ToppleSign = 1.0;
+    // A standing death's shards are flown to rest in these steps: four seconds of flight, past the slowest shard's.
+    private const float32 k_SettleStep = 1.0f / 60.0f;
+    private const int32 k_SettleSteps = 240;
 
     // Hurt: the last flinch seen, whether the look node wears a jolt, the crack stage drawn and its shards' nodes (built
     // with the look, bare until the first crack: a node made later does not follow the look node's jolt).
-    private int32 _FlinchSeen = 0;
+    // Unset until this script's first look: what the kernel shows then happened before this copy was drawn.
+    private TOptional<int32> _FlinchSeen;
+    // Blows this machine's brine answered.
+    private int32 _FlinchesShown = 0;
     private bool _Jolted = false;
     private int32 _CrackShown = 0;
     private TArray<FCk_Handle_SceneNode> _CrackNodes;
@@ -471,19 +478,24 @@ class UMars_PickleMimic_EntityScript : UCk_GenericEntityScript_UE
         { return; }
 
         const auto DeltaSeconds = float32(InDeltaT.Get_Seconds());
-        if (CVar_Mars_PickleMimicDebugKill.GetInt() != 0 && _DebugKillSent == false && _Mimic.Get_IsDead() == false)
+        // The debug kill and hit are the authority's: a copy's damage and hit requests are dropped.
+        const bool HasAuthority = utils_net::Get_HasAuthority(_Self);
+        if (HasAuthority)
         {
-            _DebugKillSent = true;
-            auto Health = _Mimic.Get_Monster().Get_BodyHealth();
-            Health.Request_ApplyDamage(FMars_Request_Health_ApplyDamage(FMars_DamageEvent(100000.0f, GameplayTags::DamageType_Mars_Blunt)));
-        }
+            if (CVar_Mars_PickleMimicDebugKill.GetInt() != 0 && _DebugKillSent == false && _Mimic.Get_IsDead() == false)
+            {
+                _DebugKillSent = true;
+                auto Health = _Mimic.Get_Monster().Get_BodyHealth();
+                Health.Request_ApplyDamage(FMars_Request_Health_ApplyDamage(FMars_DamageEvent(100000.0f, GameplayTags::DamageType_Mars_Blunt)));
+            }
 
-        const auto DebugHit = CVar_Mars_PickleMimicDebugHit.GetInt();
-        if (DebugHit != _DebugHitSeen)
-        {
-            _DebugHitSeen = DebugHit;
-            if (DebugHit != 0 && _Mimic.Get_IsDead() == false)
-            { DebugStrike(); }
+            const auto DebugHit = CVar_Mars_PickleMimicDebugHit.GetInt();
+            if (DebugHit != _DebugHitSeen)
+            {
+                _DebugHitSeen = DebugHit;
+                if (DebugHit != 0 && _Mimic.Get_IsDead() == false)
+                { DebugStrike(); }
+            }
         }
 
         const auto DebugTell = CVar_Mars_PickleMimicDebugTell.GetInt();
@@ -503,7 +515,11 @@ class UMars_PickleMimic_EntityScript : UCk_GenericEntityScript_UE
             PoseFeet();
             FadeEyes(DeltaSeconds);
             if (_Mimic.Get_IsDead() && _Shattered == false)
-            { Shatter(); }
+            {
+                Shatter();
+                if (_Mimic.Get_Monster().Get_DeathTaken() == EMars_Net_Reconcile::AsItStands)
+                { Show_DeathAtItsEnd(); }
+            }
 
             if (_Shattered)
             {
@@ -518,6 +534,27 @@ class UMars_PickleMimic_EntityScript : UCk_GenericEntityScript_UE
         if (DebugDraw)
         { Draw(); }
     }
+
+    // What this script shows, for a test-only subclass.
+    protected float32 Get_ToppleAlpha() const { return _Topple; }
+
+    protected int32 Get_LandedShardCount() const
+    {
+        auto Count = 0;
+        for (const auto& Shard : _Shards)
+        {
+            if (Shard.Landed)
+            { ++Count; }
+        }
+
+        return Count;
+    }
+
+    protected int32 Get_ShardCount() const { return _Shards.Num(); }
+
+    protected int32 Get_FlinchesShown() const { return _FlinchesShown; }
+
+    protected bool Get_IsShattered() const { return _Shattered; }
 
     // The lid on its hinge (lifted by a tell's peek, tipped crooked off one edge while shut), the eye dome rising with it.
     private void PoseMouth()
@@ -556,8 +593,9 @@ class UMars_PickleMimic_EntityScript : UCk_GenericEntityScript_UE
     {
         const auto Awake = _Mimic.Get_IsDead() == false && (_Mimic.Get_Stance() == EMars_PickleMimic_Stance::Standing || _Mimic.Get_Rise() > 0.0f);
         const auto Target = Awake ? 1.0f : 0.0f;
-        _Glow = Math::FInterpConstantTo(_Glow, Target, InDeltaSeconds, Awake ? utils_pickle_mimic::EyeOnRate : utils_pickle_mimic::EyeOffRate);
-        const auto Glow = Math::Max(_Glow, _Glint);
+        const auto Rate = Awake ? utils_pickle_mimic::EyeOnRate : utils_pickle_mimic::EyeOffRate;
+        _Glow = TOptional<float32>(_Glow.IsSet() ? Math::FInterpConstantTo(_Glow.GetValue(), Target, InDeltaSeconds, Rate) : Target);
+        const auto Glow = Math::Max(_Glow.GetValue(), _Glint);
         if (ck::IsValid(_Face) && Math::Abs(Glow - _WrittenGlow) > 0.005f)
         {
             _WrittenGlow = Glow;
@@ -579,9 +617,12 @@ class UMars_PickleMimic_EntityScript : UCk_GenericEntityScript_UE
         if (Away.IsNearlyZero())
         { Away = -Body.GetRotation().GetForwardVector(); }
 
-        if (Hurt.FlinchCount != _FlinchSeen)
+        if (_FlinchSeen.IsSet() == false)
+        { _FlinchSeen = TOptional<int32>(Hurt.FlinchCount); }
+        else if (Hurt.FlinchCount != _FlinchSeen.GetValue())
         {
-            _FlinchSeen = Hurt.FlinchCount;
+            _FlinchSeen = TOptional<int32>(Hurt.FlinchCount);
+            _FlinchesShown += 1;
             Kick_Brine(FVector(Away.X, Away.Y, 0.0).GetSafeNormal() * utils_pickle_mimic::FlinchSloshKick);
         }
 
@@ -833,6 +874,18 @@ class UMars_PickleMimic_EntityScript : UCk_GenericEntityScript_UE
         }
     }
 
+    // A jar that broke before this machine's copy existed is shown broken: its shards where they came to rest, the jar
+    // on its side, the brine gone.
+    private void Show_DeathAtItsEnd()
+    {
+        for (int32 Step = 0; Step < k_SettleSteps && Get_LandedShardCount() < _Shards.Num(); ++Step)
+        { FlyShards(k_SettleStep); }
+
+        _Topple = 1.0f;
+        Pose_Topple();
+        _Level = -1.0f;
+    }
+
     // Tips the look node over the bottom hoop's edge on one side (chosen at the shatter): a turn about the body's X axis
     // through that edge, then down onto the floor.
     private void Topple(float32 InDeltaSeconds)
@@ -841,6 +894,15 @@ class UMars_PickleMimic_EntityScript : UCk_GenericEntityScript_UE
         { return; }
 
         _Topple = Math::Min(_Topple + InDeltaSeconds / utils_pickle_mimic::ToppleSeconds, 1.0f);
+        Pose_Topple();
+    }
+
+    // The look node at _Topple of the fall.
+    private void Pose_Topple()
+    {
+        if (ck::Is_NOT_Valid(_LookNode))
+        { return; }
+
         const auto Fall = utils_pickle_mimic::Get_EaseIn(_Topple);
         const auto Turn = FQuat(FVector::ForwardVector, _ToppleSign * Math::DegreesToRadians(utils_pickle_mimic::ToppleDegrees * Fall));
         // The edge it tips over: on the side its top falls toward.
