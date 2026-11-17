@@ -92,8 +92,9 @@ mixin TOptional<FMars_HeldItemUse_LaunchSolution> Get_LaunchSolutionFor(const FC
     const auto Aim = InLaunch.Aim.IsSet() ? InLaunch.Aim.GetValue() : utils_held_item_use::Make_Aim(Carrier);
     const auto Forward = Aim.Forward;
 
+    // The power the throw was charged to where it was thrown, which is not this machine for a client's throw.
     if (IsThrow)
-    { Speed *= Self.Get_ThrowPower(); }
+    { Speed *= Aim.ThrowPower; }
 
     auto Solution = FMars_HeldItemUse_LaunchSolution();
     Solution.LinearVelocity = Forward * Speed + Aim.PawnVelocity;

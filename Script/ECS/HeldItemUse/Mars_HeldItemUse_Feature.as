@@ -230,7 +230,8 @@ struct FMars_Request_HeldItemUse_RefreshFromHeldItem
     FMars_Request_HeldItemUse_RefreshFromHeldItem() {}
 }
 
-// Where a launch goes, taken from the launching machine's view: the authority cannot know a client's view.
+// Where a launch goes and how hard, taken from the launching machine: the authority cannot know a client's view, nor
+// how far that client charged its throw (the charge runs on the owner's copy).
 struct FMars_HeldItemUse_Aim
 {
     UPROPERTY()
@@ -238,6 +239,10 @@ struct FMars_HeldItemUse_Aim
 
     UPROPERTY()
     FVector PawnVelocity = FVector::ZeroVector;
+
+    // A throw's share of the held item's ThrowSpeed (Get_ThrowPower where it was charged); a drop ignores it.
+    UPROPERTY()
+    float32 ThrowPower = 1.0f;
 
     FMars_HeldItemUse_Aim() {}
 
