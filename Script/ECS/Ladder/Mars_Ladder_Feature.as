@@ -1,3 +1,5 @@
+// Stance D: nothing in the Ladder replicates. A ladder is static; every machine builds it from the same parameters, and
+// its zones offer it to the Climber of every pawn copy that stands in them on that machine.
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
 //--------------------------------------------------------------------------------------------------------------------------

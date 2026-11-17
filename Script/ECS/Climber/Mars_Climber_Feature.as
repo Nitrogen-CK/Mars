@@ -1,3 +1,11 @@
+// Stance SPLIT: nothing in the Climber replicates. Every copy of a player composes a Climber and every machine's
+// ladders offer themselves to it, but a climb starts only where a Mount request is issued, which is the machine whose
+// player walks into the ladder (UMars_SmTask_ClimberMountIntent reads that machine's move intent). There the request
+// drain puts the character in MOVE_Flying and the tick holds it on the climb line; the character's movement component
+// carries its position and its movement mode to the authority, which takes both as they are within the
+// client-authority radius (UMars_CharacterMovementComponent::ClientAuthMaxError), and from there to every other
+// machine. A copy on another machine never climbs: its body follows the owner's replicated position and its state
+// machine the owner's Climb state.
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
 //--------------------------------------------------------------------------------------------------------------------------

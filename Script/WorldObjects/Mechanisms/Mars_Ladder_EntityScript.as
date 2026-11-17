@@ -5,6 +5,7 @@
 class UMars_Ladder_EntityScript : UCk_GenericEntityScript_UE
 {
     default _ShowInPlaceActors = true;
+    // Stance D: static, built by every machine from its spawn parameters; nothing about it changes.
     default _Replication = ECk_Replication::DoesNotReplicate;
 
     UPROPERTY(ExposeOnSpawn)
