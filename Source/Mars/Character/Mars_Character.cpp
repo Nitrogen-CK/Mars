@@ -6,25 +6,6 @@
 
 // -------------------------------------------------------------------------------------------------
 
-namespace
-{
-	// A component loaded with its level has a stable path; any other reaches a client only on a replicated actor, and
-	// only if it replicates or its owner's class names it (ObjectReferenceCache::CreateObjectReferenceInternal).
-	bool Get_CanBaseCrossTheNetwork(const UPrimitiveComponent& InBase)
-	{
-		if (InBase.IsFullNameStableForNetworking())
-		{ return true; }
-
-		const AActor* Owner = InBase.GetOwner();
-		if (Owner == nullptr || Owner->GetIsReplicated() == false)
-		{ return false; }
-
-		return InBase.GetIsReplicated() || InBase.IsNameStableForNetworking();
-	}
-}
-
-// -------------------------------------------------------------------------------------------------
-
 AMars_Character::AMars_Character(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer.SetDefaultSubobjectClass<UMars_CharacterMovementComponent>(
 		ACharacter::CharacterMovementComponentName))
@@ -39,7 +20,9 @@ EMars_Character_NetBase AMars_Character::Get_NetBase() const
 		if (Base == nullptr)
 		{ return EMars_Character_NetBase::None; }
 
-		return Get_CanBaseCrossTheNetwork(*Base) ? EMars_Character_NetBase::Crossing : EMars_Character_NetBase::PerMachine;
+		return UMars_CharacterMovementComponent::Get_CanBaseCrossTheNetwork(*Base)
+			? EMars_Character_NetBase::Crossing
+			: EMars_Character_NetBase::PerMachine;
 	}
 
 	const FBasedMovementInfo& Replicated = GetReplicatedBasedMovement();
@@ -67,7 +50,8 @@ void AMars_Character::PreReplication(IRepChangedPropertyTracker& ChangedProperty
 	Super::PreReplication(ChangedPropertyTracker);
 
 	FBasedMovementInfo& Replicated = GetReplicatedBasedMovement_Mutable();
-	if (Replicated.MovementBase == nullptr || Get_CanBaseCrossTheNetwork(*Replicated.MovementBase))
+	if (Replicated.MovementBase == nullptr
+		|| UMars_CharacterMovementComponent::Get_CanBaseCrossTheNetwork(*Replicated.MovementBase))
 	{ return; }
 
 	Replicated.MovementBase = nullptr;

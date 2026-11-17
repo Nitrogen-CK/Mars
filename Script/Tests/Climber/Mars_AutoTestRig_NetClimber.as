@@ -447,6 +447,43 @@ class UMars_AutoTestRig_NetClimber : UMars_AutoTestRig_NetPlayerCombat
         return ck::IsValid(Movement) ? Movement.ClientAuthMaxError : -1.0f;
     }
 
+    // This copy's movement component; null when it is not the project's component.
+    protected UMars_CharacterMovementComponent Get_CourseMovement()
+    {
+        if (ck::Is_NOT_Valid(_Pawn))
+        { return nullptr; }
+
+        return Cast<UMars_CharacterMovementComponent>(_Pawn.CharacterMovement);
+    }
+
+    // What this copy's movement component counted and the last 24 events it recorded, places relative to the base
+    // (feet height for Z); a correction made also shows the owner's place as the check read it, in world space.
+    protected FString Describe_NetDiagnostics()
+    {
+        const auto Movement = Get_CourseMovement();
+        if (ck::Is_NOT_Valid(Movement))
+        { return "net=none"; }
+
+        const auto Counts = Movement.Get_NetCounts();
+        const auto Events = Movement.Get_NetEvents();
+        const auto HalfHeight = float64(_Pawn.CapsuleComponent.GetScaledCapsuleHalfHeight());
+        auto Text = f"net=[moves {Counts.ClientMovesReceived} withBase {Counts.ClientMovesWithBase} "
+            + f"corrected {Counts.CorrectionsMade} largestError {Counts.LargestClientError :.1} "
+            + f"received {Counts.CorrectionsReceived} dropped {Counts.CorrectionsDropped}] events=[";
+        for (int32 Index = Math::Max(Events.Num() - 24, 0); Index < Events.Num(); ++Index)
+        {
+            const auto& Event = Events[Index];
+            const auto Place = Event.Location - _Base;
+            Text += f"{Event.Frame}:{Event.Kind :n}({Place.X :.1},{Place.Y :.1},{Place.Z - HalfHeight :.1}){Event.Mode :n}";
+            if (Event.Kind == EMars_CharacterMovement_NetEventKind::CorrectionMade)
+            { Text += f"other({Event.Other.X :.1},{Event.Other.Y :.1},{Event.Other.Z :.1})"; }
+
+            Text += " ";
+        }
+
+        return Text + "]";
+    }
+
     // Server: hands the pawn to the one player controller in its world that is local (the host's own), found by a scan
     // of the world's player controllers. False (nothing possessed) without exactly one.
     protected bool Request_ServerPossessByLocal(APawn InPawn)
@@ -513,6 +550,7 @@ class UMars_AutoTestRig_NetClimber : UMars_AutoTestRig_NetPlayerCombat
         const auto Mode = _Pawn.CharacterMovement.MovementMode;
         const auto AuthMaxError = Get_ClientAuthMaxError();
         const auto First = Describe_FirstFlyingSamples();
+        const auto Net = Describe_NetDiagnostics();
         const auto Line = f"[ClimberNetTest] {InRow} {Get_MachineName()} highest={Rise.Highest :.2} drop={Rise.LargestDrop :.2} "
             + f"rise={Rise.LargestRise :.2} noRise={Rise.NoRiseSamples} meanFrame={Rise.MeanFrameSeconds :.4} "
             + f"flying={Modes.Flying} falling={Modes.Falling} walking={Modes.Walking} "
@@ -520,7 +558,7 @@ class UMars_AutoTestRig_NetClimber : UMars_AutoTestRig_NetPlayerCombat
             + f"candidate={_CourseEverCandidate} lastDismount={Dismount} ensures={Get_NewEnsures()} "
             + f"authMaxError={AuthMaxError} samples={_CourseSamples.Num()} frames=[mount {_CourseMountFrame} "
             + f"flying {_CourseFirstFlyingFrame} top {_CourseFirstTopFrame} climbEnd {_CourseClimbEndFrame} "
-            + f"platform {_CourseFirstPlatformFrame}] {InExtra} first=[{First}]";
+            + f"platform {_CourseFirstPlatformFrame}] {InExtra} {Net} first=[{First}]";
         Log(Line);
     }
 
