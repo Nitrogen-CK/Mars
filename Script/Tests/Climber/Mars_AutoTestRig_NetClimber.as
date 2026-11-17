@@ -22,6 +22,12 @@ struct FMars_TESTONLY_ClimberNet_Sample
 
     UPROPERTY()
     float32 DeltaSeconds = 0.0f;
+
+    UPROPERTY()
+    EMars_Character_NetBase NetBase = EMars_Character_NetBase::None;
+
+    UPROPERTY()
+    bool HasMovementBase = false;
 }
 
 // How evenly a copy rose, read from the climb's start in its samples to its first sample at the top.
@@ -66,6 +72,15 @@ enum EMars_TESTONLY_ClimberNet_Possession
     Nobody
 }
 
+// What the course's platform is built from.
+enum EMars_TESTONLY_ClimberNet_Platform
+{
+    // A spawned static mesh actor, like the rig's floor.
+    EngineCube,
+    // A mesh part under an entity of this machine's own, the way entity scripts build their parts.
+    MeshPart
+}
+
 // The climber net tests' course, on the player-combat pawn rig: each machine builds a platform 300 high (an engine
 // cube, like the rig's floor) and the real ladder script against its face, both its own (neither replicates), with the
 // ladder's out direction facing the pawn's spot. The machine that owns the pawn climbs it by Climber requests; every
@@ -107,6 +122,8 @@ class UMars_AutoTestRig_NetClimber : UMars_AutoTestRig_NetPlayerCombat
     private APlayerController _CourseLocalController;
     private APawn _CourseLocalPreviousPawn;
     private FCk_Handle _CourseLadderEntity;
+    private FCk_Handle _CoursePlatformEntity;
+    private FCk_Handle_UnrealComponent _CoursePlatformPart;
 
     protected void Begin_Course(FVector InBase)
     {
@@ -115,9 +132,20 @@ class UMars_AutoTestRig_NetClimber : UMars_AutoTestRig_NetPlayerCombat
         Spawn_Ladder();
     }
 
-    // An engine cube 400 x 400 x 300 whose near face is the ladder's plane and whose top is the platform.
+    protected EMars_TESTONLY_ClimberNet_Platform Get_PlatformKind() const
+    {
+        return EMars_TESTONLY_ClimberNet_Platform::EngineCube;
+    }
+
+    // A box 400 x 400 x 300 whose near face is the ladder's plane and whose top is the platform.
     private void Spawn_Platform()
     {
+        if (Get_PlatformKind() == EMars_TESTONLY_ClimberNet_Platform::MeshPart)
+        {
+            Spawn_MeshPartPlatform();
+            return;
+        }
+
         const auto WorldContext = FAngelscriptGameThreadScopeWorldContext(Get_TestWorld());
         auto Cube = Cast<UStaticMesh>(LoadObject(UStaticMesh, "/Engine/BasicShapes/Cube.Cube"));
         _CoursePlatform = Cast<AStaticMeshActor>(SpawnActor(AStaticMeshActor, _Base + FVector(350.0, 0.0, 150.0)));
@@ -130,6 +158,27 @@ class UMars_AutoTestRig_NetClimber : UMars_AutoTestRig_NetPlayerCombat
         _CoursePlatform.StaticMeshComponent.SetMobility(EComponentMobility::Movable);
         _CoursePlatform.StaticMeshComponent.SetStaticMesh(Cube);
         _CoursePlatform.SetActorScale3D(FVector(4.0, 4.0, 3.0));
+    }
+
+    // The same box as a mesh part under this machine's transient entity: it does not replicate, so each machine builds
+    // its own.
+    private void Spawn_MeshPartPlatform()
+    {
+        _CoursePlatformEntity = utils_entity_lifetime::Request_CreateEntity(utils_net_spawn_test::Get_TransientEntity(Get_SubjectEntity()));
+        auto Root = utils_transform::Add(_CoursePlatformEntity, FTransform(FRotator::ZeroRotator, _Base + FVector(350.0, 0.0, 0.0)),
+            ECk_Replication::DoesNotReplicate);
+        _CoursePlatformPart = Root.Add_MeshPart(this, FMars_MeshPart(
+            FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, 150.0), FVector(4.0, 4.0, 3.0)),
+            engine::load::Cube(), nullptr, collision::profile::BlockAll, n"TestPlatform"));
+    }
+
+    // The engine cube spawned, or the mesh part's component was created (it is created later than the part).
+    protected bool Get_IsPlatformReady()
+    {
+        if (Get_PlatformKind() == EMars_TESTONLY_ClimberNet_Platform::MeshPart)
+        { return ck::IsValid(_CoursePlatformPart) && ck::IsValid(utils_unreal_component::Get_Component(_CoursePlatformPart)); }
+
+        return ck::IsValid(_CoursePlatform);
     }
 
     // The production ladder script under this machine's transient entity: it does not replicate, so each machine builds
@@ -213,6 +262,8 @@ class UMars_AutoTestRig_NetClimber : UMars_AutoTestRig_NetPlayerCombat
         Sample.Mode = _Pawn.CharacterMovement.MovementMode;
         Sample.IsClimbing = ck::IsValid(Climber) && Climber.Get_IsClimbing();
         Sample.DeltaSeconds = float32(Gameplay::GetWorldDeltaSeconds());
+        Sample.NetBase = _Pawn.Get_NetBase();
+        Sample.HasMovementBase = _Pawn.Get_HasMovementBase();
 
         const auto WasClimbing = _CourseSamples.Num() > 0 && _CourseSamples[_CourseSamples.Num() - 1].IsClimbing;
         _CourseSamples.Add(Sample);
@@ -484,7 +535,7 @@ class UMars_AutoTestRig_NetClimber : UMars_AutoTestRig_NetPlayerCombat
         auto Result = OutResult;
         Sample_Copy();
         Result.Set(ck::IsValid(_Pawn) && _Pawn.IsLocallyControlled() && Get_IsInState(UMars_SmState_Alive) && Get_IsOnFloor()
-            && ck::IsValid(_CourseLadder) && ck::IsValid(Get_CourseClimber()));
+            && ck::IsValid(_CourseLadder) && ck::IsValid(Get_CourseClimber()) && Get_IsPlatformReady());
     }
 
     // Mounts this machine's ladder from the front, as the Climber's own requests.
@@ -562,9 +613,14 @@ class UMars_AutoTestRig_NetClimber : UMars_AutoTestRig_NetPlayerCombat
         if (ck::IsValid(_CoursePlatform))
         { _CoursePlatform.DestroyActor(); }
 
+        if (ck::IsValid(_CoursePlatformEntity))
+        { utils_entity_lifetime::Request_DestroyEntity(_CoursePlatformEntity); }
+
         _CourseLadderEntity = FCk_Handle();
         _CourseLadder = FCk_Handle_Ladder();
         _CoursePlatform = nullptr;
+        _CoursePlatformEntity = FCk_Handle();
+        _CoursePlatformPart = FCk_Handle_UnrealComponent();
     }
 
     UFUNCTION(BlueprintOverride)
