@@ -94,8 +94,12 @@ class UMars_Processor_Hotbar_AdoptSlots : UCk_Processor_Script_Base_UE
 
         Hotbar.Request_TryRemove(FMars_Fragment_Hotbar_AwaitingSlots);
 
-        if (Hotbar.Has_Fragment(FMars_Fragment_Hotbar_Signals))
-        { Hotbar.Get_Fragment(FMars_Fragment_Hotbar_Signals).OnReady.Broadcast(Hotbar); }
+        if (Hotbar.Has_Fragment(FMars_Fragment_Hotbar_Signals) == false)
+        { return; }
+
+        // Handlers build the hotbar's widget: scope the script world to the hotbar's.
+        const auto WorldContext = FAngelscriptGameThreadScopeWorldContext(utils_entity_lifetime::Get_WorldForEntity(Hotbar));
+        Hotbar.Get_Fragment(FMars_Fragment_Hotbar_Signals).OnReady.Broadcast(Hotbar);
     }
 
     // InSlot's index is in the layout and still free, and its kind is the layout's there.
@@ -141,9 +145,14 @@ class UMars_Processor_Hotbar_Mirror : UCk_Processor_Script_Base_UE
         Reconcile(Hotbar);
     }
 
+    // An expected absence, not a defect: a notify can land on an entity already ending.
     UFUNCTION()
     private void OnLedgerReplicated(FCk_Handle InHandle, FCk_DynamicFragment_RepNotifyInfo InInfo)
     {
+        if (ck::Is_NOT_Valid(InHandle) || utils_entity_lifetime::Get_IsPendingDestroy(InHandle, ECk_EntityLifetime_DestructionPhase::BeginDestroy)
+            || InHandle.Is_Hotbar() == false)
+        { return; }
+
         auto Hotbar = InHandle.As_Hotbar();
         Reconcile(Hotbar);
     }
@@ -157,6 +166,9 @@ class UMars_Processor_Hotbar_Mirror : UCk_Processor_Script_Base_UE
 
         if (InHotbar.Has_Fragment(FMars_Fragment_Hotbar_Signals) == false)
         { return; }
+
+        // Handlers mark the widget's selection and drop an overflow: scope the script world to the hotbar's.
+        const auto WorldContext = FAngelscriptGameThreadScopeWorldContext(utils_entity_lifetime::Get_WorldForEntity(InHotbar));
 
         if ((Now.SelectedIndex == Last.SelectedIndex) == false)
         { InHotbar.Get_Fragment(FMars_Fragment_Hotbar_Signals).OnSelectionChanged.Broadcast(InHotbar); }

@@ -28,9 +28,14 @@ class UMars_Processor_Cycle_Setup : UCk_Processor_Script_Base_UE
         Reconcile(Cycle);
     }
 
+    // An expected absence, not a defect: a notify can land on an entity already ending.
     UFUNCTION()
     private void OnLedgerReplicated(FCk_Handle InHandle, FCk_DynamicFragment_RepNotifyInfo InInfo)
     {
+        if (ck::Is_NOT_Valid(InHandle) || utils_entity_lifetime::Get_IsPendingDestroy(InHandle, ECk_EntityLifetime_DestructionPhase::BeginDestroy)
+            || InHandle.Is_Cycle() == false)
+        { return; }
+
         auto Cycle = InHandle.As_Cycle();
         Reconcile(Cycle);
     }
@@ -45,6 +50,9 @@ class UMars_Processor_Cycle_Setup : UCk_Processor_Script_Base_UE
 
         if (InCycle.Has_Fragment(FMars_Fragment_Cycle_Signals) == false)
         { return; }
+
+        // Handlers fire a vent's jet and move a trap's part: scope the script world to the cycle's.
+        const auto WorldContext = FAngelscriptGameThreadScopeWorldContext(utils_entity_lifetime::Get_WorldForEntity(InCycle));
 
         if (Ledger.PhaseEntries != Last.PhaseEntries)
         {

@@ -84,7 +84,11 @@ class UMars_Processor_FoodPiece_Mirror : UCk_Processor_Script_Base_UE
         // State and Local are not read past this line: the ride may attach the piece, which composes.
         utils_foodpiece::Update_Ride(InPiece);
 
-        if (IsNewCookState && InPiece.Has_Fragment(FMars_Fragment_FoodPiece_Signals))
-        { InPiece.Get_Fragment(FMars_Fragment_FoodPiece_Signals).OnCookStateChanged.Broadcast(InPiece); }
+        if (IsNewCookState == false || InPiece.Has_Fragment(FMars_Fragment_FoodPiece_Signals) == false)
+        { return; }
+
+        // Handlers repaint the piece's cook look: scope the script world to the piece's.
+        const auto WorldContext = FAngelscriptGameThreadScopeWorldContext(utils_entity_lifetime::Get_WorldForEntity(InPiece));
+        InPiece.Get_Fragment(FMars_Fragment_FoodPiece_Signals).OnCookStateChanged.Broadcast(InPiece);
     }
 }

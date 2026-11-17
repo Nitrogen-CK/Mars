@@ -42,9 +42,14 @@ class UMars_Processor_Hazard_Setup : UCk_Processor_Script_Base_UE
         { HitAllInside(Hazard); }
     }
 
+    // An expected absence, not a defect: a notify can land on an entity already ending.
     UFUNCTION()
     private void OnLedgerReplicated(FCk_Handle InHandle, FCk_DynamicFragment_RepNotifyInfo InInfo)
     {
+        if (ck::Is_NOT_Valid(InHandle) || utils_entity_lifetime::Get_IsPendingDestroy(InHandle, ECk_EntityLifetime_DestructionPhase::BeginDestroy)
+            || InHandle.Is_Hazard() == false)
+        { return; }
+
         auto Hazard = InHandle.As_Hazard();
         Reconcile(Hazard);
     }
@@ -60,8 +65,12 @@ class UMars_Processor_Hazard_Setup : UCk_Processor_Script_Base_UE
         if (Arming == WasArming)
         { return; }
 
-        if (InHazard.Has_Fragment(FMars_Fragment_Hazard_Signals))
-        { InHazard.Get_Fragment(FMars_Fragment_Hazard_Signals).OnArmedChanged.Broadcast(InHazard, Arming); }
+        if (InHazard.Has_Fragment(FMars_Fragment_Hazard_Signals) == false)
+        { return; }
+
+        // Handlers follow an arming: scope the script world to the hazard's.
+        const auto WorldContext = FAngelscriptGameThreadScopeWorldContext(utils_entity_lifetime::Get_WorldForEntity(InHazard));
+        InHazard.Get_Fragment(FMars_Fragment_Hazard_Signals).OnArmedChanged.Broadcast(InHazard, Arming);
     }
 
     UFUNCTION()

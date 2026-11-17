@@ -25,7 +25,7 @@ struct FMars_ForageSource_KnockBody
 // then call AddKnockBody and BindForage.
 // On every machine the yield mesh follows the forage's (mirrored) exhaustion and replenishment; the zone, the health and
 // the knock body follow them only with authority, the one machine whose releases count (a client's copies stay as they
-// are and their release requests are dropped).
+// are and their release requests are dropped), and its yield mesh, once created, shows the forage as it stands.
 UCLASS(Abstract)
 class UMars_ForageSource_EntityScript : UCk_GenericEntityScript_UE
 {
@@ -42,6 +42,23 @@ class UMars_ForageSource_EntityScript : UCk_GenericEntityScript_UE
     private FCk_Handle_Transform _KnockParent;
     private FMars_ForageSource_KnockBody _KnockBody;
     private FCk_Handle_SceneNode _KnockNode;
+
+    // A source whose copy was born exhausted heard so before its yield mesh existed; the mesh shows the forage as it
+    // stands once it is there.
+    UFUNCTION(BlueprintOverride)
+    void DoBeginPlay(FCk_Handle InHandle)
+    {
+        if (ck::Is_NOT_Valid(_YieldMesh) || ck::Is_NOT_Valid(_Forage))
+        { return; }
+
+        if (ck::IsValid(utils_unreal_component::Get_Component(_YieldMesh)))
+        {
+            SetYieldVisible(_Forage.Get_IsExhausted() == false);
+            return;
+        }
+
+        utils_unreal_component::BindTo_OnAdded(_YieldMesh, FCk_Delegate_UnrealComponent_OnAdded(this, n"OnYieldMeshAdded"));
+    }
 
     // Closing speed (uu/s) a thrown world item needs to knock a yield out. Subclasses return their placed property.
     protected float32 Get_KnockMinSpeed() const
@@ -111,6 +128,12 @@ class UMars_ForageSource_EntityScript : UCk_GenericEntityScript_UE
         { return; }
 
         _Forage.Request_Release(FMars_Request_Forage_Release(EMars_Forage_ReleaseReason::Knock));
+    }
+
+    UFUNCTION()
+    private void OnYieldMeshAdded(FCk_Handle_UnrealComponent InHandle)
+    {
+        SetYieldVisible(_Forage.Get_IsExhausted() == false);
     }
 
     UFUNCTION()

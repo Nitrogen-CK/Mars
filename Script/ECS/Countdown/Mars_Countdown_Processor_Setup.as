@@ -59,9 +59,14 @@ class UMars_Processor_Countdown_Setup : UCk_Processor_Script_Base_UE
         return InRemaining > 0 ? EMars_MechanismSource_Output::Asserted : EMars_MechanismSource_Output::Deasserted;
     }
 
+    // An expected absence, not a defect: a notify can land on an entity already ending.
     UFUNCTION()
     private void OnLedgerReplicated(FCk_Handle InHandle, FCk_DynamicFragment_RepNotifyInfo InInfo)
     {
+        if (ck::Is_NOT_Valid(InHandle) || utils_entity_lifetime::Get_IsPendingDestroy(InHandle, ECk_EntityLifetime_DestructionPhase::BeginDestroy)
+            || InHandle.Is_Countdown() == false)
+        { return; }
+
         auto Countdown = InHandle.As_Countdown();
         Reconcile(Countdown);
     }
@@ -76,6 +81,8 @@ class UMars_Processor_Countdown_Setup : UCk_Processor_Script_Base_UE
         if (Ledger.Remaining == PreviousRemaining || InCountdown.Has_Fragment(FMars_Fragment_Countdown_Signals) == false)
         { return; }
 
+        // Handlers paint a lamp bank: scope the script world to the countdown's.
+        const auto WorldContext = FAngelscriptGameThreadScopeWorldContext(utils_entity_lifetime::Get_WorldForEntity(InCountdown));
         InCountdown.Get_Fragment(FMars_Fragment_Countdown_Signals).OnRemainingChanged.Broadcast(InCountdown, Ledger.Remaining);
     }
 

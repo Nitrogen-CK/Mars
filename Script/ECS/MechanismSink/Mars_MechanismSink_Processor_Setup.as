@@ -28,9 +28,14 @@ class UMars_Processor_MechanismSink_Setup : UCk_Processor_Script_Base_UE
         Reconcile(InHandle);
     }
 
+    // An expected absence, not a defect: a notify can land on an entity already ending.
     UFUNCTION()
     private void OnLedgerReplicated(FCk_Handle InHandle, FCk_DynamicFragment_RepNotifyInfo InInfo)
     {
+        if (ck::Is_NOT_Valid(InHandle) || utils_entity_lifetime::Get_IsPendingDestroy(InHandle, ECk_EntityLifetime_DestructionPhase::BeginDestroy)
+            || InHandle.Is_MechanismSink() == false)
+        { return; }
+
         Reconcile(InHandle);
     }
 
@@ -46,7 +51,11 @@ class UMars_Processor_MechanismSink_Setup : UCk_Processor_Script_Base_UE
         if (Ledger.Power == PreviousPower || Ledger.Power == EMars_MechanismSink_Power::Unevaluated)
         { return; }
 
-        if (Sink.Has_Fragment(FMars_Fragment_MechanismSink_Signals))
-        { Sink.Get_Fragment(FMars_Fragment_MechanismSink_Signals).OnPoweredChanged.Broadcast(Sink, Ledger.Power); }
+        if (Sink.Has_Fragment(FMars_Fragment_MechanismSink_Signals) == false)
+        { return; }
+
+        // Handlers light lamps, open gates, hold countdowns and start a Steward: scope the script world to the sink's.
+        const auto WorldContext = FAngelscriptGameThreadScopeWorldContext(utils_entity_lifetime::Get_WorldForEntity(Sink));
+        Sink.Get_Fragment(FMars_Fragment_MechanismSink_Signals).OnPoweredChanged.Broadcast(Sink, Ledger.Power);
     }
 }

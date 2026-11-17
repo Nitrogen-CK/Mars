@@ -27,9 +27,14 @@ class UMars_Processor_Flame_Mirror : UCk_Processor_Script_Base_UE
         Reconcile(Flame);
     }
 
+    // An expected absence, not a defect: a notify can land on an entity already ending.
     UFUNCTION()
     private void OnLedgerReplicated(FCk_Handle InHandle, FCk_DynamicFragment_RepNotifyInfo InInfo)
     {
+        if (ck::Is_NOT_Valid(InHandle) || utils_entity_lifetime::Get_IsPendingDestroy(InHandle, ECk_EntityLifetime_DestructionPhase::BeginDestroy)
+            || InHandle.Is_Flame() == false)
+        { return; }
+
         auto Flame = InHandle.As_Flame();
         Reconcile(Flame);
     }
@@ -42,6 +47,8 @@ class UMars_Processor_Flame_Mirror : UCk_Processor_Script_Base_UE
         const auto Last = Local.Last;
         Local.Last = Now;
 
+        // Handlers refresh the flame's dressing: scope the script world to the flame's.
+        const auto WorldContext = FAngelscriptGameThreadScopeWorldContext(utils_entity_lifetime::Get_WorldForEntity(InFlame));
         utils_flame::Apply_Changes(InFlame, Last, Now);
     }
 }
