@@ -86,6 +86,14 @@ void Mars_PlaceSandboxCrawlersFunc(const TArray<FString>& Args)
 const FConsoleCommand Mars_PlaceSandboxCrawlersCommand("Mars.Sandbox.PlaceCrawlers", n"Mars_PlaceSandboxCrawlersFunc");
 
 UFUNCTION()
+void Mars_PlaceSandboxPaleCrawlerFunc(const TArray<FString>& Args)
+{
+    utils_mars_sandbox::PlacePaleCrawler();
+}
+
+const FConsoleCommand Mars_PlaceSandboxPaleCrawlerCommand("Mars.Sandbox.PlacePaleCrawler", n"Mars_PlaceSandboxPaleCrawlerFunc");
+
+UFUNCTION()
 void Mars_AddSandboxRoom5AggressionLeverFunc(const TArray<FString>& Args)
 {
     utils_mars_sandbox::AddRoom5AggressionLever();
@@ -263,6 +271,7 @@ namespace utils_mars_sandbox
     const FString k_Room6FloorLabel = "Room6_Floor";
     const FString k_Room7FloorLabel = "Room7_Floor";
     const FString k_Room5CrawlerLabelPrefix = "Mech5_Crawler";
+    const FString k_Room5PaleCrawlerLabel = "Mech5_PaleCrawler8";
     const FString k_Room5NavFieldLabel = "Mech5_NavField";
     const FString k_Room5AggressionLeverLabel = "Mech5_AggressionLever";
     const FString k_Room3BackpackPlateLabel = "Mech3_BackpackPlate";
@@ -561,6 +570,17 @@ namespace utils_mars_sandbox
         utils_mars_map_builder::SaveOpenLevel(Command);
     }
 
+    // The pale crawler alone, into a sandbox whose other Room 5 crawlers already stand (its own label guards it).
+    void PlacePaleCrawler()
+    {
+        const FString Command = "Mars.Sandbox.PlacePaleCrawler";
+        if (Get_CanAdd(Command, k_Room5PaleCrawlerLabel, "Delete it first to re-place.") == false)
+        { return; }
+
+        Spawn_Room5PaleCrawler();
+        utils_mars_map_builder::SaveOpenLevel(Command);
+    }
+
     void PlaceNavField()
     {
         const FString Command = "Mars.Sandbox.PlaceNavField";
@@ -596,11 +616,19 @@ namespace utils_mars_sandbox
         utils_mars_map_builder::Spawn_EntityScript(UMars_Sandbox_NavField_EntityScript, FMars_MapBuilder_Placement(k_Room5NavFieldLabel, FVector(-3000.0, 0.0, 0.0)));
     }
 
-    // 80uu up so they settle onto their feet.
+    // The spider and the pale crawler; the four-leg box crawler left Room 5 on 2026-10-30 (its preset class stays for the
+    // endpoint demo and the tests). 80uu up so the spider settles onto its feet.
     void Spawn_Room5Crawlers()
     {
-        utils_mars_map_builder::Spawn_EntityScript(UMars_Sandbox_Crawler4_EntityScript, FMars_MapBuilder_Placement(f"{k_Room5CrawlerLabelPrefix}4", FVector(-3400.0, -300.0, 80.0)));
         utils_mars_map_builder::Spawn_EntityScript(UMars_Sandbox_Crawler6_EntityScript, FMars_MapBuilder_Placement(f"{k_Room5CrawlerLabelPrefix}6", FVector(-3400.0, 300.0, 80.0)));
+        Spawn_Room5PaleCrawler();
+    }
+
+    // The pale crawler in Room 5's north-east quarter, clear of the pillar and the step, 30uu up (its body rides 24 cm
+    // over its feet) so it settles onto them.
+    void Spawn_Room5PaleCrawler()
+    {
+        utils_mars_map_builder::Spawn_EntityScript(UMars_Sandbox_PaleCrawler8_EntityScript, FMars_MapBuilder_Placement(k_Room5PaleCrawlerLabel, FVector(-2600.0, 350.0, 30.0)));
     }
 
     // Unrotated, it faces +X: the player walks up from -X.

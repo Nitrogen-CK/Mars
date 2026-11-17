@@ -33,9 +33,10 @@ class UMars_Sandbox_Crawler_EntityScript : UMars_Crawler_EntityScript
         Color = Get_PresetColor();
         Look = Get_PresetLook();
         Spec.RoamBounds = FBox(FVector(-3850.0, -550.0, 0.0), FVector(-2150.0, 550.0, 200.0));
-        Spec.Combat.Enabled = true;
+        Spec.Combat.Enabled = Get_PresetArmed();
         Spec.Combat.StartAggressive = ECk_EnableDisable::Disable;
-        Spec.Combat.Loadout = utils_crawler::Get_AttackReferenceLoadout(Get_AttackPreset(), Get_ReferenceKind());
+        if (Spec.Combat.Enabled)
+        { Spec.Combat.Loadout = utils_crawler::Get_AttackReferenceLoadout(Get_AttackPreset(), Get_ReferenceKind()); }
         _Sink.InputChannels.Empty();
         _Sink.InputChannels.Add(GameplayTags::ResolveGameplayTag(n"Mechanism.Channel.Room5Aggression"));
 
@@ -83,6 +84,11 @@ class UMars_Sandbox_Crawler_EntityScript : UMars_Crawler_EntityScript
     protected int32 Get_PresetLegCount() const
     { return 4; }
 
+    // Armed: wears the preset's reference loadout and answers the aggression lever. Only a preset with a reference attack
+    // catalog (Crawler4, Crawler6, Spider6) can be.
+    protected bool Get_PresetArmed() const
+    { return true; }
+
     protected FLinearColor Get_PresetColor() const
     { return FLinearColor(0.75f, 0.35f, 0.2f, 1.0f); }
 
@@ -112,6 +118,27 @@ class UMars_Sandbox_Crawler6_EntityScript : UMars_Sandbox_Crawler_EntityScript
 
     protected FMars_Crawler_Look Get_PresetLook() const override
     { return Make_SpiderLook(); }
+}
+
+// The pale crawler: the eight-leg layout measured off the Pale Crawler R01 candidate, wearing its pieces. Unarmed: the
+// attack catalog has no PaleCrawler8 reference preset yet (its clips are authored on the Radial4/6 and Spider6 rigs), so
+// it roams Room 5, flinches and loses legs like the others but never strikes, and the aggression lever does not move it.
+class UMars_Sandbox_PaleCrawler8_EntityScript : UMars_Sandbox_Crawler_EntityScript
+{
+    protected int32 Get_PresetLegCount() const override
+    { return 8; }
+
+    protected FLinearColor Get_PresetColor() const override
+    { return FLinearColor(0.86f, 0.80f, 0.70f, 1.0f); }
+
+    protected EMars_Crawler_Layout Get_PresetLayout() const override
+    { return EMars_Crawler_Layout::PaleCrawler; }
+
+    protected FMars_Crawler_Look Get_PresetLook() const override
+    { return Make_PaleCrawlerLook(); }
+
+    protected bool Get_PresetArmed() const override
+    { return false; }
 }
 
 // The Room 5 aggression lever on the west wall: an instant toggle asserting Mechanism.Channel.Room5Aggression while

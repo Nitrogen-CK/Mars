@@ -1,0 +1,105 @@
+{
+	"material": "PaleCrawler_R01_Eye_Mars_MI",
+	"packagePath": "/Game/ArtCandidates/PaleCrawler/R01/Materials/PaleCrawler_R01_Eye_Mars_MI",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "f8d621774d5ac992b110cfd1aacee4d0",
+		"exporterVersion": 3
+	},
+	"parentChain": [
+		"/Game/ArtCandidates/PaleCrawler/R01/Materials/PaleCrawler_R01_Mars_M.PaleCrawler_R01_Mars_M"
+	],
+	"blendMode": "BLEND_Opaque",
+	"twoSided": false,
+	"unlit": false,
+	"shadingModel": "MSM_DefaultLit",
+	"domain": "MD_Surface",
+	"connectedOutputs": [
+		"BaseColor"
+	],
+	"expressions":
+	{
+		"ScalarParameter": 2,
+		"VectorParameter": 1
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_0",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=1.000000,G=1.000000,B=1.000000,A=1.000000)",
+					"ParameterName": "Tint"
+				}
+			},
+			{
+				"id": 1,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_0",
+				"props":
+				{
+					"DefaultValue": 0.80000001192092896,
+					"ParameterName": "Roughness"
+				}
+			},
+			{
+				"id": 2,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_1",
+				"props":
+				{
+					"DefaultValue": 0.30000001192092896,
+					"ParameterName": "Specular"
+				}
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_BaseColor",
+				"node": 0,
+				"output": 0,
+				"mask": "rgb"
+			},
+			{
+				"property": "MP_Specular",
+				"node": 2,
+				"output": 0
+			},
+			{
+				"property": "MP_Roughness",
+				"node": 1,
+				"output": 0
+			}
+		]
+	},
+	"scalarParams": [
+		{
+			"name": "Roughness",
+			"value": 0.34999999403953552
+		},
+		{
+			"name": "Specular",
+			"value": 0.30000001192092896
+		}
+	],
+	"vectorParams": [
+		{
+			"name": "Tint",
+			"value": "RGBA(0.890005, 0.263273, 0.0134117, 1)"
+		}
+	],
+	"textureParams": [],
+	"usedTextures": []
+}

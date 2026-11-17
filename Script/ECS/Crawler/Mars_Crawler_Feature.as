@@ -296,7 +296,7 @@ struct FMars_Crawler_Spec
     UPROPERTY(NotEditable, BlueprintHidden)
     FMars_Attack_ResolvedLoadout ResolvedAttacks;
 
-    // 4 or 6 on the Radial layout, 6 on the Spider (utils_crawler::Get_LayoutRigData).
+    // 4 or 6 on the Radial layout, 6 on the Spider, 8 on the PaleCrawler (utils_crawler::Get_LayoutRigData).
     UPROPERTY()
     int32 LegCount = 4;
 
@@ -351,7 +351,7 @@ mixin UCk_ProceduralRig_Data Get_RigData(const FMars_Crawler_Spec& Self)
 mixin FMars_Validation Validate(const FMars_Crawler_Spec& Self)
 {
     if (ck::Is_NOT_Valid(Self.Get_RigData()))
-    { return FMars_Validation(f"Crawler has LegCount [{Self.LegCount}]; only 4 and 6 (Radial) and 6 (Spider) have rigs"); }
+    { return FMars_Validation(f"Crawler has LegCount [{Self.LegCount}]; only 4 and 6 (Radial), 6 (Spider) and 8 (PaleCrawler) have rigs"); }
 
     if (Self.MinLegsToWalk < 2 || Self.MinLegsToWalk > Self.LegCount)
     { return FMars_Validation(f"Crawler has MinLegsToWalk [{Self.MinLegsToWalk}] outside [2, {Self.LegCount}]"); }

@@ -281,13 +281,18 @@ class UMars_Crawler_EntityScript : UCk_GenericEntityScript_UE
         const auto Crawler = utils_crawler::Add(Root, CrawlerSpec);
         utils_entity_tag::Add(InHandle, n"TAG_MarsCrawler");
 
-        // The timer dies with the entity; nothing to unbind.
-        if (WithVisuals && ck::IsValid(Crawler) && CrawlerSpec.Combat.Enabled && Get_HasPincerCue(CrawlerSpec))
+        // A pincer crawler's fangs follow its attack cues; a crawler whose look has a fang piece but no pincer wears them
+        // at rest (anatomy, not a cue). The timer dies with the entity; nothing to unbind.
+        const auto WithPincer = CrawlerSpec.Combat.Enabled && Get_HasPincerCue(CrawlerSpec);
+        if (WithVisuals && ck::IsValid(Crawler) && (WithPincer || ck::IsValid(_LookMeshes.Fang)))
         {
-            _FangCrawler = Crawler;
             BuildFangs(InHandle, CrawlerSpec.Rig);
-            _FangCrawler.BindTo_OnAttackCue(FMars_Delegate_Crawler_OnAttackCue(this, n"OnAttackCue"));
-            utils_timer::Create_Tick(InHandle, FCk_Delegate_Timer(this, n"OnFangTick"));
+            if (WithPincer)
+            {
+                _FangCrawler = Crawler;
+                _FangCrawler.BindTo_OnAttackCue(FMars_Delegate_Crawler_OnAttackCue(this, n"OnAttackCue"));
+                utils_timer::Create_Tick(InHandle, FCk_Delegate_Timer(this, n"OnFangTick"));
+            }
         }
 
         // The timer dies with the entity; nothing to unbind.
@@ -382,6 +387,39 @@ class UMars_Crawler_EntityScript : UCk_GenericEntityScript_UE
     {
         const FString PieceName = f"Crawler_{InPart}_Mars_SM";
         return TSoftObjectPtr<UStaticMesh>(FSoftObjectPath(f"/Game/Mars/Gameplay/Monsters/Crawler/Meshes/{PieceName}.{PieceName}"));
+    }
+
+    // The pale crawler's look: the pieces of the Pale Crawler R01 candidate, built with its measured rig
+    // (Tools/Blender/mars_monsters/pale_crawler_r01/build_pale_crawler.py), in rig order: front, mid-front, mid-back and
+    // back on the right, then back to front on the left; a left leg wears its right twin's pieces. The upper piece is the
+    // coxa, femur and knee knuckle; the lower the tibia, ankle and tarsus; the foot its claw cap; the fang its chelicera,
+    // pivoting at its root under the nose.
+    protected FMars_Crawler_Look Make_PaleCrawlerLook() const
+    {
+        auto Pieces = FMars_Crawler_Look();
+        Pieces.Body = Get_PaleCrawlerMesh("Body");
+        auto Pairs = TArray<FString>();
+        Pairs.Add("Front");
+        Pairs.Add("MidFront");
+        Pairs.Add("MidBack");
+        Pairs.Add("Back");
+        Pairs.Add("Back");
+        Pairs.Add("MidBack");
+        Pairs.Add("MidFront");
+        Pairs.Add("Front");
+        for (const auto& Pair : Pairs)
+        { Pieces.Legs.Add(FMars_Crawler_LegLook(Get_PaleCrawlerMesh(f"LegUpper{Pair}"), Get_PaleCrawlerMesh(f"LegLower{Pair}"))); }
+
+        Pieces.Foot = Get_PaleCrawlerMesh("Foot");
+        Pieces.Fang = Get_PaleCrawlerMesh("Chelicera");
+        Pieces.FangRoot = FVector(21.0, 4.0, -9.2);
+        return Pieces;
+    }
+
+    private TSoftObjectPtr<UStaticMesh> Get_PaleCrawlerMesh(FString InPart) const
+    {
+        const FString PieceName = f"PaleCrawler_R01_{InPart}_Mars_SM";
+        return TSoftObjectPtr<UStaticMesh>(FSoftObjectPath(f"/Game/ArtCandidates/PaleCrawler/R01/Meshes/{PieceName}.{PieceName}"));
     }
 
     private FVector Get_BodyHalfExtents(UCk_ProceduralRig_Data InRig) const
