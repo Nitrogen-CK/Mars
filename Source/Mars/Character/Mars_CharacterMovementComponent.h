@@ -7,9 +7,9 @@
 
 #include "Mars_CharacterMovementComponent.generated.h"
 
-// The client-movement-base parameter of the server position checks overridden below. UE 5.8 calls the
-// FMovementBaseInterfaceData overloads; its UPrimitiveComponent overloads are deprecated and only forward to them, so
-// overriding those on 5.8 compiles but is never called.
+// The movement-base parameter of the server's position checks and error handling and of the owner's correction,
+// overridden below. UE 5.8 calls the FMovementBaseInterfaceData overloads; its UPrimitiveComponent overloads are
+// deprecated and only forward to them, so overriding those on 5.8 compiles but is never called.
 #if UE_VERSION_OLDER_THAN(5, 8, 0)
 using FMars_ClientMovementBase = UPrimitiveComponent;
 #else
@@ -132,11 +132,12 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Character Movement")
 	float GetExternalSpeedMultiplier() const;
 
-	// Whether a reference to InBase reaches the other machine as the same component. A component loaded with its level
-	// has a stable path; any other is addressable only below a replicated actor, and only if it replicates or its
-	// owner's class names it (ObjectReferenceCache::CreateObjectReferenceInternal). Any other reference is either not
-	// created or resolved by a name the other machine need not share.
-	static bool Get_CanBaseCrossTheNetwork(const UPrimitiveComponent& InBase);
+	// Whether a reference to InBase (a movement base: its component, or on UE 5.8 the physics object owner
+	// its interface data names) reaches the other machine as the same object. An object loaded with its level has
+	// a stable path; a component is addressable only below a replicated actor, and only if it replicates or its
+	// owner's class names it (ObjectReferenceCache::CreateObjectReferenceInternal). Any other reference is either
+	// not created or resolved by a name the other machine need not share.
+	static bool Get_CanBaseCrossTheNetwork(const UObject& InBase);
 
 	// A base that does not cross the network makes the server read a base-relative move as a world one
 	// (ServerMoveHandleClientError), or the owner drop a correction relative to a base it cannot resolve
@@ -158,7 +159,7 @@ public:
 		float TimeStamp,
 		FVector NewLoc,
 		FVector NewVel,
-		UPrimitiveComponent* NewBase,
+		FMars_ClientMovementBase* NewBase,
 		FName NewBaseBoneName,
 		bool bHasBase,
 		bool bBaseRelativePosition,
@@ -173,7 +174,7 @@ protected:
 		float DeltaTime,
 		const FVector& Accel,
 		const FVector& RelativeClientLocation,
-		UPrimitiveComponent* ClientMovementBase,
+		FMars_ClientMovementBase* ClientMovementBase,
 		FName ClientBaseBoneName,
 		uint8 ClientMovementMode) override;
 

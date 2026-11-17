@@ -7,6 +7,32 @@
 
 // -------------------------------------------------------------------------------------------------
 
+namespace
+{
+	// The object a movement-base parameter names: the component itself, or on UE 5.8 the physics object owner its
+	// interface data carries (what a move or a correction serializes).
+	const UObject* Get_BaseObject(const FMars_ClientMovementBase* InBase)
+	{
+#if UE_VERSION_OLDER_THAN(5, 8, 0)
+		return InBase;
+#else
+		return InBase != nullptr ? InBase->PhysicsObjectOwner.Get() : nullptr;
+#endif
+	}
+
+	// Whether a movement-base parameter arrived resolved on this machine.
+	bool Get_IsBaseResolved(const FMars_ClientMovementBase* InBase)
+	{
+#if UE_VERSION_OLDER_THAN(5, 8, 0)
+		return InBase != nullptr;
+#else
+		return MovementBaseUtility::IsMovementBaseDataValid(InBase);
+#endif
+	}
+}
+
+// -------------------------------------------------------------------------------------------------
+
 FMars_CharacterNetworkMoveDataContainer::FMars_CharacterNetworkMoveDataContainer()
 {
 	NewMoveData = &_MoveData[0];
@@ -18,12 +44,24 @@ void FMars_CharacterNetworkMoveData::ClientFillNetworkMoveData(const FSavedMove_
 {
 	FCharacterNetworkMoveData::ClientFillNetworkMoveData(ClientMove, MoveType);
 
-	if (MovementBase == nullptr || UMars_CharacterMovementComponent::Get_CanBaseCrossTheNetwork(*MovementBase))
+#if UE_VERSION_OLDER_THAN(5, 8, 0)
+	const UObject* Base = MovementBase;
+#else
+	const UObject* Base = MovementBasePhysicsObjectOwner.Get();
+#endif
+	if (Base == nullptr || UMars_CharacterMovementComponent::Get_CanBaseCrossTheNetwork(*Base))
 	{ return; }
 
 	Location = FRepMovement::RebaseOntoZeroOrigin(ClientMove.SavedLocation, ClientMove.CharacterOwner->GetCharacterMovement());
 	Acceleration = ClientMove.Acceleration;
+#if UE_VERSION_OLDER_THAN(5, 8, 0)
 	MovementBase = nullptr;
+#else
+	MovementBasePhysicsObjectOwner = nullptr;
+	PRAGMA_DISABLE_DEPRECATION_WARNINGS
+	MovementBase = nullptr;
+	PRAGMA_ENABLE_DEPRECATION_WARNINGS
+#endif
 	MovementBaseBoneName = NAME_None;
 }
 
@@ -142,16 +180,20 @@ bool UMars_CharacterMovementComponent::ServerExceedsAllowablePositionError(
 
 // -------------------------------------------------------------------------------------------------
 
-bool UMars_CharacterMovementComponent::Get_CanBaseCrossTheNetwork(const UPrimitiveComponent& InBase)
+bool UMars_CharacterMovementComponent::Get_CanBaseCrossTheNetwork(const UObject& InBase)
 {
 	if (InBase.IsFullNameStableForNetworking())
 	{ return true; }
 
-	const AActor* Owner = InBase.GetOwner();
+	const UActorComponent* Component = Cast<UActorComponent>(&InBase);
+	if (Component == nullptr)
+	{ return false; }
+
+	const AActor* Owner = Component->GetOwner();
 	if (Owner == nullptr || Owner->GetIsReplicated() == false)
 	{ return false; }
 
-	return InBase.GetIsReplicated() || InBase.IsNameStableForNetworking();
+	return Component->GetIsReplicated() || Component->IsNameStableForNetworking();
 }
 
 FMars_CharacterMovement_NetCounts UMars_CharacterMovementComponent::Get_NetCounts() const
@@ -202,7 +244,7 @@ void UMars_CharacterMovementComponent::ServerMoveHandleClientError(
 	float DeltaTime,
 	const FVector& Accel,
 	const FVector& RelativeClientLocation,
-	UPrimitiveComponent* ClientMovementBase,
+	FMars_ClientMovementBase* ClientMovementBase,
 	FName ClientBaseBoneName,
 	uint8 ClientMovementMode)
 {
@@ -214,7 +256,7 @@ void UMars_CharacterMovementComponent::ServerMoveHandleClientError(
 	{ ClientLocation = FRepMovement::RebaseOntoLocalOrigin(RelativeClientLocation, this); }
 
 	_NetCounts.ClientMovesReceived += 1;
-	if (ClientMovementBase != nullptr)
+	if (Get_BaseObject(ClientMovementBase) != nullptr)
 	{ _NetCounts.ClientMovesWithBase += 1; }
 
 	if (UpdatedComponent != nullptr)
@@ -241,8 +283,15 @@ void UMars_CharacterMovementComponent::ServerMoveHandleClientError(
 	const auto ServerLocation = UpdatedComponent != nullptr ? UpdatedComponent->GetComponentLocation() : FVector::ZeroVector;
 	Record_NetEvent(EMars_CharacterMovement_NetEventKind::CorrectionMade, ServerLocation, ClientLocation, MovementMode);
 
+#if UE_VERSION_OLDER_THAN(5, 8, 0)
 	UPrimitiveComponent* Base = Adjustment.NewBase;
-	if (Base == nullptr || Get_CanBaseCrossTheNetwork(*Base))
+	const UObject* BaseObject = Base;
+#else
+	FMovementBaseInterfaceData BaseData(Adjustment.NewMovementBasePhysicsObjectOwner);
+	FMovementBaseInterfaceData* Base = &BaseData;
+	const UObject* BaseObject = Adjustment.NewMovementBasePhysicsObjectOwner.Get();
+#endif
+	if (BaseObject == nullptr || Get_CanBaseCrossTheNetwork(*BaseObject))
 	{ return; }
 
 	// The owner drops a correction relative to a base it cannot resolve (ClientAdjustPosition_Implementation), and a
@@ -262,7 +311,14 @@ void UMars_CharacterMovementComponent::ServerMoveHandleClientError(
 		Adjustment.NewVel = WorldVelocity;
 	}
 
+#if UE_VERSION_OLDER_THAN(5, 8, 0)
 	Adjustment.NewBase = nullptr;
+#else
+	Adjustment.NewMovementBasePhysicsObjectOwner = nullptr;
+	PRAGMA_DISABLE_DEPRECATION_WARNINGS
+	Adjustment.NewBase = nullptr;
+	PRAGMA_ENABLE_DEPRECATION_WARNINGS
+#endif
 	Adjustment.NewBaseBoneName = NAME_None;
 	Adjustment.bBaseRelativePosition = false;
 	Adjustment.bBaseRelativeVelocity = false;
@@ -272,7 +328,7 @@ void UMars_CharacterMovementComponent::ClientAdjustPosition_Implementation(
 	float TimeStamp,
 	FVector NewLoc,
 	FVector NewVel,
-	UPrimitiveComponent* NewBase,
+	FMars_ClientMovementBase* NewBase,
 	FName NewBaseBoneName,
 	bool bHasBase,
 	bool bBaseRelativePosition,
@@ -285,7 +341,7 @@ void UMars_CharacterMovementComponent::ClientAdjustPosition_Implementation(
 	UnpackNetworkMovementMode(ServerMovementMode, NetMovementMode, NetCustomMode, NetGroundMode);
 
 	_NetCounts.CorrectionsReceived += 1;
-	if (bHasBase && NewBase == nullptr && bBaseRelativePosition)
+	if (bHasBase && Get_IsBaseResolved(NewBase) == false && bBaseRelativePosition)
 	{
 		_NetCounts.CorrectionsDropped += 1;
 		Record_NetEvent(EMars_CharacterMovement_NetEventKind::CorrectionDropped, NewLoc, FVector::ZeroVector, NetMovementMode);

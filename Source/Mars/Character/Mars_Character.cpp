@@ -3,6 +3,7 @@
 #include "Mars_CharacterMovementComponent.h"
 
 #include "Components/PrimitiveComponent.h"
+#include "Misc/EngineVersionComparison.h"
 
 // -------------------------------------------------------------------------------------------------
 
@@ -16,7 +17,11 @@ EMars_Character_NetBase AMars_Character::Get_NetBase() const
 {
 	if (HasAuthority())
 	{
-		const UPrimitiveComponent* Base = GetBasedMovement().MovementBase;
+#if UE_VERSION_OLDER_THAN(5, 8, 0)
+		const UObject* Base = GetBasedMovement().MovementBase;
+#else
+		const UObject* Base = GetBasedMovement().MovementBaseInterfaceData.PhysicsObjectOwner.Get();
+#endif
 		if (Base == nullptr)
 		{ return EMars_Character_NetBase::None; }
 
@@ -29,7 +34,11 @@ EMars_Character_NetBase AMars_Character::Get_NetBase() const
 	if (Replicated.IsBaseUnresolved())
 	{ return EMars_Character_NetBase::Unresolved; }
 
+#if UE_VERSION_OLDER_THAN(5, 8, 0)
 	if (Replicated.MovementBase != nullptr)
+#else
+	if (Replicated.MovementBaseInterfaceData.IsValid())
+#endif
 	{ return EMars_Character_NetBase::Crossing; }
 
 	return EMars_Character_NetBase::None;
@@ -37,7 +46,11 @@ EMars_Character_NetBase AMars_Character::Get_NetBase() const
 
 bool AMars_Character::Get_HasMovementBase() const
 {
+#if UE_VERSION_OLDER_THAN(5, 8, 0)
 	return GetMovementBase() != nullptr;
+#else
+	return GetMovementBaseObject() != nullptr;
+#endif
 }
 
 // A simulated copy skips SimulateMovement while its replicated base is unresolved (the authority has a base and the
@@ -50,11 +63,22 @@ void AMars_Character::PreReplication(IRepChangedPropertyTracker& ChangedProperty
 	Super::PreReplication(ChangedPropertyTracker);
 
 	FBasedMovementInfo& Replicated = GetReplicatedBasedMovement_Mutable();
-	if (Replicated.MovementBase == nullptr
-		|| UMars_CharacterMovementComponent::Get_CanBaseCrossTheNetwork(*Replicated.MovementBase))
+#if UE_VERSION_OLDER_THAN(5, 8, 0)
+	const UObject* Base = Replicated.MovementBase;
+#else
+	const UObject* Base = Replicated.MovementBaseInterfaceData.PhysicsObjectOwner.Get();
+#endif
+	if (Base == nullptr || UMars_CharacterMovementComponent::Get_CanBaseCrossTheNetwork(*Base))
 	{ return; }
 
+#if UE_VERSION_OLDER_THAN(5, 8, 0)
 	Replicated.MovementBase = nullptr;
+#else
+	Replicated.MovementBaseInterfaceData.Clear();
+	PRAGMA_DISABLE_DEPRECATION_WARNINGS
+	Replicated.MovementBase = nullptr;
+	PRAGMA_ENABLE_DEPRECATION_WARNINGS
+#endif
 	Replicated.BoneName = NAME_None;
 	Replicated.bServerHasBaseComponent = false;
 	Replicated.bRelativeRotation = false;
