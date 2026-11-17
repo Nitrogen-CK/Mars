@@ -32,9 +32,11 @@ struct FMars_Station_GripNode
 UCLASS(Abstract)
 class UMars_Station_EntityScript : UCk_GenericEntityScript_UE
 {
-    // Stance A: placed by the authority's spawner; the station, its root transform and its ledger replicate (who operates
-    // it), with the operator's back-ref; its nodes, meshes, interactables and prompt are built on every machine. A client
-    // takes or leaves it through the station's Act cue; what an operator does at it still runs on each machine's copy.
+    // Stance A: placed by the authority's spawner; the station, its root transform and its ledger replicate (who
+    // operates it), with the operator's back-ref; its nodes, meshes, interactables and prompt are built on every
+    // machine. A client takes or leaves it through the station's Act cue. What an operator does at it runs where its
+    // InputStance says: on every machine's copy (PerMachine, the default), or on the authority's alone, fed by the
+    // operator's input stream (Authority, every cooking station).
     default _Replication = ECk_Replication::Replicates;
 
     UPROPERTY(ExposeOnSpawn)

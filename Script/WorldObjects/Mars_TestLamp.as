@@ -1,6 +1,8 @@
 UCLASS(NotPlaceable)
 class UMars_TestLamp_EntityScript : UCk_EntityScript_WithActor_UE
 {
+    // Each machine's own dev prop: the lamp and its actor never replicate, so a toggle changes the light on the
+    // toggling machine only.
     default _Replication = ECk_Replication::DoesNotReplicate;
 }
 

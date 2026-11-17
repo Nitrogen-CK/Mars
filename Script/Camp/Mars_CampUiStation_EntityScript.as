@@ -5,6 +5,7 @@ struct FMars_Fragment_CampUiStation
 
 class UMars_CampUiStation_EntityScript : UCk_GenericEntityScript_UE
 {
+    // Each machine's own: spawned only by the local player controller under its own entity; nothing replicates.
     default _Replication = ECk_Replication::DoesNotReplicate;
 
     UPROPERTY(ExposeOnSpawn)

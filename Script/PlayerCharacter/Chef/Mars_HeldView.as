@@ -1,8 +1,9 @@
 // The held item as other players see it: the item in the third-person chef's hands, the arms reaching it.
 //
-// Nothing about items replicates (world items, hotbar, HeldItem and FPHands are all DoesNotReplicate), so the owner
-// describes what it holds in an FMars_HeldView - the item's look and how the gloves grip it - and AMars_PlayerCharacter
-// replicates that (_HeldView). Every machine then rebuilds the same hold on the body:
+// World items and the hotbar replicate and HeldItem follows the hotbar on every machine, but the first-person gloves
+// that grip the item tick only on the owner's machine (FPHands), so the owner describes what it holds in an
+// FMars_HeldView - the item's look and how the gloves grip it - and AMars_PlayerCharacter replicates that (_HeldView).
+// Every machine then rebuilds the same hold on the body:
 //   - the item: a static mesh on the body's grip_r bone, placed where the first-person system would put it relative to
 //     the right glove's grip (Get_ItemInGrip);
 //   - the arms: ABP_Chef's TwoBoneIK + Transform (Modify) Bone per hand, aimed at the gloves' first-person grip targets

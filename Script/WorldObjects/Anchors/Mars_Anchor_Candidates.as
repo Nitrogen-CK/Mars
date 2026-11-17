@@ -178,6 +178,7 @@ class UMars_Anchor_QuarryCrawler4_EntityScript : UMars_Crawler_EntityScript
 // The navigation island for one 30 x 24 m hunt court; the greybox builder places one at every Hunt anchor.
 class UMars_Anchor_CourtNavField_EntityScript : UCk_GroundNavVolume_EntityScript
 {
+    // Each machine's own: the framework's nav volume does not replicate, so every machine bakes this field itself.
     default _ShowInPlaceActors = true;
     default _Params = utils_surface_navigator::Make_NavFieldSpec(FBox(FVector(-1400.0, -1100.0, -100.0), FVector(1400.0, 1100.0, 600.0)));
 }
@@ -276,6 +277,7 @@ class UMars_Anchor_SentryCrawler4_EntityScript : UMars_Crawler_EntityScript
 // The navigation island for one pocket: an 8 x 8 m field; the greybox builder places one at every Threat anchor.
 class UMars_Anchor_PocketNavField_EntityScript : UCk_GroundNavVolume_EntityScript
 {
+    // Each machine's own: the framework's nav volume does not replicate, so every machine bakes this field itself.
     default _ShowInPlaceActors = true;
     default _Params = utils_surface_navigator::Make_NavFieldSpec(FBox(FVector(-400.0, -400.0, -100.0), FVector(400.0, 400.0, 600.0)));
 }

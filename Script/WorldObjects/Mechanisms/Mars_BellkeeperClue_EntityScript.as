@@ -4,6 +4,7 @@
 class UMars_BellkeeperClue_EntityScript : UCk_GenericEntityScript_UE
 {
     default _ShowInPlaceActors = true;
+    // Each machine's own: static, built from its placement; nothing about it changes, so nothing replicates.
     default _Replication = ECk_Replication::DoesNotReplicate;
 
     UPROPERTY(ExposeOnSpawn)

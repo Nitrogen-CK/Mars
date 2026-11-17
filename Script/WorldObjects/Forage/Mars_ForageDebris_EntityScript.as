@@ -1,6 +1,8 @@
 // One static piece of debris: a mesh part at SpawnTransform that destroys itself after LifetimeSeconds.
 class UMars_ForageDebris_EntityScript : UCk_GenericEntityScript_UE
 {
+    // Each machine's own: every machine whose husk breaks spawns its own pieces, which end on their own timer; nothing
+    // replicates.
     default _Replication = ECk_Replication::DoesNotReplicate;
     default _ShowInPlaceActors = false;
 

@@ -5,6 +5,8 @@
 class UMars_EyesDummy_EntityScript : UCk_GenericEntityScript_UE
 {
     default _ShowInPlaceActors = true;
+    // Each machine's own: placed dressing every machine builds from its placement; nothing collides and nothing
+    // replicates, and its gaze and expressions run on that machine's own clock.
     default _Replication = ECk_Replication::DoesNotReplicate;
 
     UPROPERTY(ExposeOnSpawn)

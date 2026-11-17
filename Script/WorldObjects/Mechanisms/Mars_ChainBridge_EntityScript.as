@@ -52,9 +52,9 @@ mixin FMars_Validation Validate(const FMars_ChainBridge_Spec& Self)
 class UMars_ChainBridge_EntityScript : UCk_GenericEntityScript_UE
 {
     default _ShowInPlaceActors = true;
-    // Stance D for now: every machine builds and runs its own copy (a client's is self-authoritative); the haul state lives
-    // on this script and the windlass on a scene node, so nothing here can replicate until the windlass is a kernel on the
-    // root, with the operator stream.
+    // Stance D: every machine builds and runs its own copy, and a client's copy has authority over itself, so a haul
+    // moves only the deck of the machine that hauls; the haul state lives on this script and the windlass on a scene
+    // node, and nothing here replicates.
     default _Replication = ECk_Replication::DoesNotReplicate;
 
     UPROPERTY(ExposeOnSpawn)
