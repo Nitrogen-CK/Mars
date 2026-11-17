@@ -5,6 +5,8 @@
 // Composed ON the dynamic body's entity, so a contact handler resolves it straight from the body. The caller adds the
 // body first, with FCk_JoltBody_Spec.Set_PersistContacts(ECk_EnableDisable::Enable): without it a resting awake body
 // reports no contact after the first step and goes Apart once GraceSeconds pass.
+// Nothing replicates, and it exists only with authority: it is composed on a piece's dynamic body, which only the
+// authority gives a piece, so its contacts, its state and its signals are the authority's.
 asset Mars_RestingHandle of UCkDynamic_HandleDefinition
 {
     TypeName = "FCk_Handle_Resting";

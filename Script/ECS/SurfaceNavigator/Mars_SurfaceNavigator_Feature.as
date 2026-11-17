@@ -1,3 +1,6 @@
+// Nothing replicates: a navigator steers the body it is given on the machine that composed it. The pantry rat composes
+// one only with authority, so its paths are the authority's.
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
 //--------------------------------------------------------------------------------------------------------------------------

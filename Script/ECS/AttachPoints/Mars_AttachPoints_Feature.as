@@ -1,6 +1,8 @@
 // Named transform nodes a carrier publishes so other features can parent things to it (the held item under the Hand,
 // the worn backpack on the Back). The carrier creates the nodes itself - it knows where its own hand and back are -
 // and this feature only stores them, keyed by an AttachPoint.* gameplay tag.
+// Each machine's own, nothing replicates: every machine's composer publishes the same nodes on its own copy of the
+// carrier, so an item mounted from replicated state lands on that machine's node.
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition

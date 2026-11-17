@@ -6,6 +6,7 @@
 UCLASS(NotPlaceable)
 class UMars_AnchorResolver_EntityScript : UCk_GenericEntityScript_UE
 {
+    // Stance C: spawned only in an anchored world, which is the authority; never on a client.
     default _Replication = ECk_Replication::DoesNotReplicate;
 
     UPROPERTY(ExposeOnSpawn)

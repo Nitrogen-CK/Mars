@@ -1,3 +1,7 @@
+// Each machine's own, nothing replicates: a prompt lives on an interact target, built on every machine with its
+// interactable, and what it shows follows that machine's disable reasons, which are derived there from replicated
+// facts.
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
 //--------------------------------------------------------------------------------------------------------------------------

@@ -1,3 +1,7 @@
+// Each machine's own, nothing replicates: the game state's entity is spawned on every machine, but only the server's
+// game mode moves the phase (Request_Play when the world is a listen server) and only it reads it; a client's copy
+// stays in Lobby and nothing reads it. What a client reads of the camp is the camp game state's replicated party state.
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
 //--------------------------------------------------------------------------------------------------------------------------

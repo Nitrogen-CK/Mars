@@ -3,6 +3,8 @@
 // expression layers) exists on every machine; the presentation (resolved cells, blink, look, the plate) only where
 // cosmetic events can run. Values reach the plate (a CkUnrealComponent plate, or a primitive one of whose material slots
 // uses the eye-plate look, such as the chef body's eye slot) only through custom primitive data (utils_eyes::Push_Group).
+// Nothing replicates: the style, the expressions and the look are each machine's own, set by whatever composes the eyes
+// from what that machine knows (a mirrored ledger, its own gaze).
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition

@@ -446,7 +446,7 @@ struct FMars_PantryRaid_RatRecord
     UPROPERTY()
     int32 OperationId = 0;
 
-    // Dead rats count against the cap until their corpse is cleaned up (Phase 4).
+    // Dead rats count against the cap until their corpse is cleaned up.
     UPROPERTY()
     bool Dead = false;
 

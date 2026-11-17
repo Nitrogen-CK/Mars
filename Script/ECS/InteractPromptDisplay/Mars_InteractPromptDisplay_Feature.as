@@ -1,3 +1,6 @@
+// Each machine's own, nothing replicates (stance E): every copy of a player composes the display, and only the local
+// player's HUD reads it.
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
 //--------------------------------------------------------------------------------------------------------------------------

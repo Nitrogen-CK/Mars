@@ -1,3 +1,8 @@
+// Nothing replicates: every copy of a player runs its own swing. The owner's strike starts it there, and the character
+// carries the start and a cancel to every other machine's copy as reliable calls (Server_PlayStrike,
+// Server_CancelStrike), whose multicasts skip the owner; a copy not composed yet shows no swing, and a player who joins
+// mid-swing sees none.
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
 //--------------------------------------------------------------------------------------------------------------------------

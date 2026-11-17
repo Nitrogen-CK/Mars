@@ -1,6 +1,7 @@
-// Stance D. Derived motion: every machine runs its own tween, from the MoveTo requests its owner's kernel issues (the
-// authority's request drain, or a client's ledger mirror). Nothing replicates. Scrub (a held grip) is authority-local
-// until the manipulation stream exists.
+// Stance D. Derived motion, nothing replicates: every machine runs its own tween and its own scrub from the requests
+// issued on that machine: the authority's request drain or a client's ledger mirror (MoveTo, and a Scrub that places a
+// pose as it stands), the machine whose player grips a control, and the mirrored grip that follows another machine's
+// pull.
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition

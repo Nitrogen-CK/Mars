@@ -1,3 +1,7 @@
+// Each machine's own, nothing replicates: every copy of a player composes a legend, rows are registered on that machine
+// by the tasks that run there (the player's own state machine, and a station's control wherever it runs), and only the
+// local player's HUD draws it.
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definitions
 //--------------------------------------------------------------------------------------------------------------------------

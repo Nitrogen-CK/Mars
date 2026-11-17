@@ -1,8 +1,9 @@
-// Stance D: a host-side detector; it runs on the authority and nothing of it replicates. A Replicates spawn stamped with
-// utils_net_spawn::Expect_Replicated (the world-item funnel, the anchor drain's replicated rows) must report replication
-// complete within constants_net_spawn::k_ReplicationFrameBudget frames, or UMars_Processor_NetSpawn_VerifyReplication
-// ensures. What makes it fire: an owner with no replication driver, a script that never finishes its construction, or a
-// framework regression that builds a Replicates script on the host without replicating it.
+// Stance C: a host-side detector; it exists and runs only on the authority, and nothing of it replicates. A Replicates
+// spawn stamped with utils_net_spawn::Expect_Replicated (the world-item funnel, the anchor drain's replicated rows)
+// must report replication complete within constants_net_spawn::k_ReplicationFrameBudget frames, or
+// UMars_Processor_NetSpawn_VerifyReplication ensures. What makes it fire: an owner with no replication driver, a script
+// that never finishes its construction, or a framework regression that builds a Replicates script on the host without
+// replicating it.
 
 namespace constants_net_spawn
 {

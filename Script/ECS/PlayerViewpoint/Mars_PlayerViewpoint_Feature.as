@@ -1,3 +1,6 @@
+// Each machine's own, nothing replicates (stance E): every copy of a player composes the viewpoint and its interaction
+// trace; only the locally controlled player's view is seen and its trace feeds that player's interactions.
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
 //--------------------------------------------------------------------------------------------------------------------------

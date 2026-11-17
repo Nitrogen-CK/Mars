@@ -709,6 +709,9 @@ struct FMars_Fragment_Item_PersistentWorldItem
 // Stamped by whoever composes an inventory whose Persistent items ride its lifetime owner (the carrier), which publishes
 // the attach point (utils_world_item::Add_MountedInventory): the hotbar's slots, a pack's cargo slots, a station's docks.
 // An inventory without it holds no Persistent item but its world item's own holder.
+// A declaration its composer owns, as a reach hint is: it is local on every machine and no processor of this feature
+// writes it. A composer whose carried item decides the offset rewrites Offset itself when that item changes (the pantry
+// rat's pocket: on the authority at its claim, on a copy from the replicated pocket).
 struct FMars_Fragment_MountedInventory
 {
     UPROPERTY()

@@ -1,6 +1,8 @@
 // Who an eye node should look at: the nearest owner of a detected probe that publishes the aim attach point, inside a
 // range shell and a cone around the node's +X, held against challengers that are not clearly closer. Gaze only picks
 // the target and its yaw/pitch; whatever looks (eyes, a head) reads them.
+// Stance D, nothing replicates: each machine picks its own target from its own probes, and the feature is composed only
+// where cosmetic events can run.
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition

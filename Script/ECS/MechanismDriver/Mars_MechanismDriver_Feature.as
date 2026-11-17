@@ -1,3 +1,7 @@
+// Stance C: the driver exists only on the authority (its subsystem spawns it there at begin play) and pushes every
+// source's state into the sinks there; nothing of it replicates, and a client sees what the sinks decide through their
+// replicated ledgers.
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
 //--------------------------------------------------------------------------------------------------------------------------

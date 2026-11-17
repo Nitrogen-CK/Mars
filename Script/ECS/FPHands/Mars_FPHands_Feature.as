@@ -1,3 +1,7 @@
+// Each machine's own (stance E): none of its fragments replicate. Every copy of a player composes the gloves and
+// their states, but they tick only for the locally controlled player. What another machine sees of a hold is the
+// character's replicated held view (Mars_HeldView.as).
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
 //--------------------------------------------------------------------------------------------------------------------------

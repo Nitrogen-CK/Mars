@@ -1,5 +1,8 @@
 // The per-world driver that turns the run's solved result into placed anchors' candidates: it finds every anchor
 // through its entity tag, whenever it appears, and resolves it once (Mars_AnchorResolver_EntityScript.as).
+// Stance C: the resolver exists only in a world whose game mode is an anchored one, which is the authority; nothing of
+// it replicates. A Replicated row's candidate reaches clients under the replicated spawn owner, never through the
+// resolver.
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition

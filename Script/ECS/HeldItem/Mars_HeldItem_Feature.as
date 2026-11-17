@@ -1,3 +1,7 @@
+// Stance D, nothing replicates: every machine derives the held item from the replicated hotbar
+// (UMars_Processor_HeldItem_Sync); the first-person visual is spawned only for a carrier that is locally controlled or
+// has no character.
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
 //--------------------------------------------------------------------------------------------------------------------------

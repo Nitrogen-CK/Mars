@@ -1,3 +1,6 @@
+// Stance D, nothing replicates: every copy of a player carries a probe shaped by that copy's own capsule; the volumes
+// on that machine feel it, and only kernels with authority decide from what they feel.
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
 //--------------------------------------------------------------------------------------------------------------------------

@@ -1,3 +1,7 @@
+// Each machine's own, nothing replicates (stance E): every copy of a player composes the wheel, but only the local
+// player's input opens and steers it; a chosen emote reaches the other machines through the character's emote call
+// (AMars_PlayerCharacter::Request_Emote).
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
 //--------------------------------------------------------------------------------------------------------------------------

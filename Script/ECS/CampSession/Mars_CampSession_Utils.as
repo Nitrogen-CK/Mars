@@ -1,6 +1,7 @@
 namespace utils_camp_session
 {
-    // The phase lives on a CkStateMachine so it can replicate with server authority; the machine does not replicate yet.
+    // The phase lives on a CkStateMachine on the game state's entity; it does not replicate: only the server's game
+    // mode moves it and reads it.
     FCk_Handle_CampSession Add(FCk_Handle& InOwner, FMars_CampSession_Spec InSpec)
     {
         const auto StartsLive = InSpec.StartPhase == EMars_CampPhase::Live;

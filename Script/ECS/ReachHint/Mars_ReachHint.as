@@ -2,6 +2,7 @@
 // Composition data, written by the owner's composer (a world item's Add, a dock's sync when a platter docks or leaves),
 // read by the gloves (utils_fphands::Resolve_ReachTarget), so the gloves never reach into the owner's own feature to size
 // a grip. No requests: it is a fact the owner declares, not state a processor advances.
+// Nothing replicates: the composer writes the same values on every machine's copy.
 struct FMars_Fragment_ReachHint
 {
     UPROPERTY()
