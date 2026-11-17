@@ -66,8 +66,8 @@ class UMars_FPHands_AnimInstance : UAnimInstance
         }
 
         auto Hands = FCk_Handle_FPHands();
-        if (Character.Get_IsActorEcsReady())
-        { Hands = Character.TryGet_ActorEntityHandle().As_FPHands(ECk_SanityCheck::UnChecked); }
+        if (Character.Get_HasEntity())
+        { Hands = Character.TryGet_Entity().As_FPHands(ECk_SanityCheck::UnChecked); }
 
         if (ck::Is_NOT_Valid(Hands))
         {
@@ -112,7 +112,7 @@ class UMars_FPHands_AnimInstance : UAnimInstance
         // The gloves attach to the UCk_CameraComponent, which FollowView moves onto the rendered view at the end of the frame;
         // the hand node hangs off that same view (the director's view anchor). Composing against the anchor rather than
         // Mesh.GetWorldTransform() keeps both sides in one ECS snapshot whatever the actor/ECS tick order.
-        const auto Viewpoint = Character.TryGet_ActorEntityHandle().As_PlayerViewpoint().Get_Viewpoint();
+        const auto Viewpoint = Character.TryGet_Entity().As_PlayerViewpoint().Get_Viewpoint();
         const auto ComponentWorld = Mesh.GetRelativeTransform() * utils_transform::Get_EntityCurrentTransform(Viewpoint);
 
         // The reach is blended after the easing, so the gesture timing stays crisp; a jab is blended over that, on the

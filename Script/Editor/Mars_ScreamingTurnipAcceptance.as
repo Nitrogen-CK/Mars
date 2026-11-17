@@ -14,7 +14,7 @@ class UMars_ScreamingTurnipAcceptance : UObject
         if (ck::Is_NOT_Valid(InCharacter) || InCharacter.GetWorld().IsGameWorld() == false)
         { return "no live character"; }
 
-        auto Player = InCharacter.TryGet_ActorEntityHandle();
+        auto Player = InCharacter.TryGet_Entity();
         FString Result;
         auto WorldItems = 0;
         for (auto Entity : utils_entity_tag::ForEach_Entity(Player, n"TAG_MarsWorldItem"))
@@ -63,7 +63,7 @@ class UMars_ScreamingTurnipAcceptance : UObject
         if (ck::Is_NOT_Valid(InCharacter) || InCharacter.GetWorld().IsGameWorld() == false)
         { return -1; }
 
-        auto Player = InCharacter.TryGet_ActorEntityHandle();
+        auto Player = InCharacter.TryGet_Entity();
         for (auto Entity : utils_entity_tag::ForEach_Entity(Player, n"TAG_MarsWorldItem"))
         {
             auto Turnip = Entity.As_ScreamingTurnip(ECk_SanityCheck::UnChecked);

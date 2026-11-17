@@ -69,7 +69,7 @@ class UMars_SmTask_Downed_Lockdown : UCk_SmTask_EntityScript
         { return; }
 
         auto Player = ck::Ctx(InHandle);
-        _Character = Cast<ACharacter>(utils_owning_actor::TryGet_EntityOwningActor_Recursive(Player));
+        _Character = Cast<ACharacter>(utils_entity_bridge::TryGet_Actor_Recursive(Player));
         if (ck::Is_NOT_Valid(_Character))
         { return; }
 

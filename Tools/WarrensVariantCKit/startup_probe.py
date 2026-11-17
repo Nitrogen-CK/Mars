@@ -40,9 +40,9 @@ def start(seed=171119713, seconds=12, name='startup_order_probe'):
             now = u.GameplayStatics.get_time_seconds(world)
             pawn = u.GameplayStatics.get_player_pawn(world,0)
             sample = dict(t=now,statics=u.Ck_Utils_JoltStaticWorld_UE.get_num_static_bodies(world),pawn_ready=False,items=[],floors={})
-            if pawn and u.Ck_Utils_OwningActor_UE.get_is_actor_ecs_ready(pawn):
+            if pawn and u.Ck_Utils_EntityBridge_UE.get_has_entity(pawn):
                 sample['pawn_ready'] = True
-                ctx = u.Ck_Utils_OwningActor_UE.try_get_actor_entity_handle(pawn)
+                ctx = u.Ck_Utils_EntityBridge_UE.try_get_entity(pawn)
                 for e in u.Ck_Utils_EntityTag_UE.for_each_entity(ctx,u.Name('TAG_MarsWorldItem')):
                     cast = u.Ck_Utils_JoltBody_UE.do_cast(e)
                     if cast[-1] != u.Ck_SucceededFailed.SUCCEEDED:

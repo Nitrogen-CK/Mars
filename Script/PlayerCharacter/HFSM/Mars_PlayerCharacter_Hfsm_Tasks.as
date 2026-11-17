@@ -417,7 +417,7 @@ class UMars_SmTask_ManipulateControl : UCk_SmTask_EntityScript
         _Intents = _Player.As_InputIntents(ECk_SanityCheck::UnChecked);
         _Hands = _Player.As_FPHands(ECk_SanityCheck::UnChecked);
         if (utils_net::Get_HasAuthority(_Player) == false)
-        { _Pawn = Cast<AMars_PlayerCharacter>(utils_owning_actor::TryGet_EntityOwningActor_Recursive(_Player)); }
+        { _Pawn = Cast<AMars_PlayerCharacter>(utils_entity_bridge::TryGet_Actor_Recursive(_Player)); }
 
         _Viewpoint = _Player.As_PlayerViewpoint(ECk_SanityCheck::UnChecked);
         if (ck::IsValid(_Viewpoint))

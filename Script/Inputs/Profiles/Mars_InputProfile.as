@@ -95,9 +95,9 @@ class UMars_InputProfile : UObject
 
     protected FCk_Handle_InputIntents TryGet_PawnIntents() const
     {
-        if (ck::Is_NOT_Valid(ControlledPawn) || ControlledPawn.Get_IsActorEcsReady() == false)
+        if (ck::Is_NOT_Valid(ControlledPawn) || ControlledPawn.Get_HasEntity() == false)
         { return FCk_Handle_InputIntents(); }
 
-        return ControlledPawn.TryGet_ActorEntityHandle().As_InputIntents(ECk_SanityCheck::UnChecked);
+        return ControlledPawn.TryGet_Entity().As_InputIntents(ECk_SanityCheck::UnChecked);
     }
 }

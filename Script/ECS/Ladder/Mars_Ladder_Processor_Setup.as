@@ -75,10 +75,10 @@ class UMars_Processor_Ladder_Setup : UCk_Processor_Script_Base_UE
         if (ck::Is_NOT_Valid(InEntity))
         { return FCk_Handle_Climber(); }
 
-        auto Actor = utils_owning_actor::TryGet_EntityOwningActor_Recursive(InEntity);
+        auto Actor = utils_entity_bridge::TryGet_Actor_Recursive(InEntity);
         if (ck::Is_NOT_Valid(Actor))
         { return FCk_Handle_Climber(); }
 
-        return Actor.TryGet_ActorEntityHandle().As_Climber(ECk_SanityCheck::UnChecked);
+        return Actor.TryGet_Entity().As_Climber(ECk_SanityCheck::UnChecked);
     }
 }

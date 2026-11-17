@@ -73,12 +73,12 @@ namespace utils_fphands
     // on (its config's FPHandsView).
     bool Get_IsFirstPersonHandNode(const FCk_Handle& InNode)
     {
-        auto Character = Cast<AMars_PlayerCharacter>(utils_owning_actor::TryGet_EntityOwningActor_Recursive(InNode));
-        if (ck::Is_NOT_Valid(Character) || Character.IsLocallyControlled() == false || Character.Get_IsActorEcsReady() == false)
+        auto Character = Cast<AMars_PlayerCharacter>(utils_entity_bridge::TryGet_Actor_Recursive(InNode));
+        if (ck::Is_NOT_Valid(Character) || Character.IsLocallyControlled() == false || Character.Get_HasEntity() == false)
         { return false; }
 
         // Characters without gloves (any other pawn) have no first-person hand node.
-        const auto Hands = Character.TryGet_ActorEntityHandle().As_FPHands(ECk_SanityCheck::UnChecked);
+        const auto Hands = Character.TryGet_Entity().As_FPHands(ECk_SanityCheck::UnChecked);
         if (ck::Is_NOT_Valid(Hands) || ck::Is_NOT_Valid(Character.Config))
         { return false; }
 

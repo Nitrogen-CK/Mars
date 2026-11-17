@@ -119,7 +119,7 @@ class UMars_Processor_Hazard_Setup : UCk_Processor_Script_Base_UE
         { return; }
 
         // The entered entity is usually a probe node under the character's entity, hence the recursive lookup.
-        auto Character = Cast<ACharacter>(utils_owning_actor::TryGet_EntityOwningActor_Recursive(InEntity));
+        auto Character = Cast<ACharacter>(utils_entity_bridge::TryGet_Actor_Recursive(InEntity));
         if (Character == nullptr)
         { return; }
 

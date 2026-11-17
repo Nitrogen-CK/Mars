@@ -94,7 +94,7 @@ class UMars_SmTask_Operating_PoseLock : UCk_SmTask_EntityScript
         { return; }
 
         auto Player = ck::Ctx(InHandle);
-        _Character = Cast<ACharacter>(utils_owning_actor::TryGet_EntityOwningActor_Recursive(Player));
+        _Character = Cast<ACharacter>(utils_entity_bridge::TryGet_Actor_Recursive(Player));
         if (ck::Is_NOT_Valid(_Character))
         { return; }
 
@@ -554,7 +554,7 @@ class UMars_SmTask_Operating_SendInput : UCk_SmTask_EntityScript
         if (utils_player_sm::Get_IsOwningCopy(InHandle, InNetContext) == false || utils_net::Get_HasAuthority(Player))
         { return; }
 
-        _Pawn = Cast<AMars_PlayerCharacter>(utils_owning_actor::TryGet_EntityOwningActor_Recursive(Player));
+        _Pawn = Cast<AMars_PlayerCharacter>(utils_entity_bridge::TryGet_Actor_Recursive(Player));
         _Intents = Player.As_InputIntents(ECk_SanityCheck::UnChecked);
         _Operator = Player.As_Operator(ECk_SanityCheck::UnChecked);
     }

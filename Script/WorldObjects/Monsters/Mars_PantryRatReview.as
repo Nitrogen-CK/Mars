@@ -247,7 +247,7 @@ class UMars_PantryRatCourt_EntityScript : UCk_GenericEntityScript_UE
     private FCk_Handle Get_Player() const
     {
         auto Character = Get_Character();
-        return ck::IsValid(Character) ? Character.TryGet_ActorEntityHandle() : FCk_Handle();
+        return ck::IsValid(Character) ? Character.TryGet_Entity() : FCk_Handle();
     }
 
     private bool Get_View(FTransform& OutView) const

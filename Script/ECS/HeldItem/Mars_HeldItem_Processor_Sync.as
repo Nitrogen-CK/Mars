@@ -73,7 +73,7 @@ class UMars_Processor_HeldItem_Sync : UCk_Processor_Script_Base_UE
     // The carrier draws its own first-person held visual: no character at all (headless tests), or a locally controlled one.
     private bool Get_DrawsFirstPerson(const FCk_Handle& InHandle) const
     {
-        auto Character = Cast<ACharacter>(utils_owning_actor::TryGet_EntityOwningActor_Recursive(InHandle));
+        auto Character = Cast<ACharacter>(utils_entity_bridge::TryGet_Actor_Recursive(InHandle));
         return Character == nullptr || Character.IsLocallyControlled();
     }
 

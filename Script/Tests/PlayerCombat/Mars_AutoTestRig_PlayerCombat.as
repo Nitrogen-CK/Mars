@@ -169,7 +169,7 @@ class UMars_AutoTestRig_PlayerCombat : UCk_AutoTest_Base
         { return; }
 
         if (ck::Is_NOT_Valid(_Player))
-        { _Player = utils_owning_actor::TryGet_ActorEntityHandle(_Pawn); }
+        { _Player = utils_entity_bridge::TryGet_Entity(_Pawn); }
 
         Res.Set(ck::IsValid(_Player) && ck::IsValid(_Player.As_StateMachine(ECk_SanityCheck::UnChecked)));
     }
@@ -185,7 +185,7 @@ class UMars_AutoTestRig_PlayerCombat : UCk_AutoTest_Base
 
         if (ck::Is_NOT_Valid(_Player))
         {
-            _Player = utils_owning_actor::TryGet_ActorEntityHandle(_Pawn);
+            _Player = utils_entity_bridge::TryGet_Entity(_Pawn);
             if (ck::Is_NOT_Valid(_Player))
             { return; }
         }

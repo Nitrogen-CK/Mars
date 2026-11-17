@@ -8,7 +8,7 @@ class UMars_ExpeditionAcceptance : UObject
     {
         if (ck::Is_NOT_Valid(InCharacter) || InCharacter.GetWorld().IsGameWorld() == false)
         { return false; }
-        auto Player = InCharacter.TryGet_ActorEntityHandle();
+        auto Player = InCharacter.TryGet_Entity();
         auto Viewpoint = Player.As_PlayerViewpoint(ECk_SanityCheck::UnChecked);
         if (ck::Is_NOT_Valid(Viewpoint))
         { return false; }
@@ -50,7 +50,7 @@ class UMars_ExpeditionAcceptance : UObject
     {
         if (ck::Is_NOT_Valid(InCharacter) || InCharacter.GetWorld().IsGameWorld() == false)
         { return false; }
-        auto Player = InCharacter.TryGet_ActorEntityHandle();
+        auto Player = InCharacter.TryGet_Entity();
         auto Intents = Player.As_InputIntents(ECk_SanityCheck::UnChecked);
         auto Viewpoint = Player.As_PlayerViewpoint(ECk_SanityCheck::UnChecked);
         if (ck::Is_NOT_Valid(Intents) || ck::Is_NOT_Valid(Viewpoint))
@@ -64,7 +64,7 @@ class UMars_ExpeditionAcceptance : UObject
     {
         if (ck::Is_NOT_Valid(InCharacter) || InCharacter.GetWorld().IsGameWorld() == false)
         { return "no live character"; }
-        auto Player = InCharacter.TryGet_ActorEntityHandle();
+        auto Player = InCharacter.TryGet_Entity();
         auto Hotbar = Player.As_Hotbar(ECk_SanityCheck::UnChecked);
         auto Held = Player.As_HeldItem(ECk_SanityCheck::UnChecked);
         auto Operator = Player.As_Operator(ECk_SanityCheck::UnChecked);
@@ -152,7 +152,7 @@ class UMars_ExpeditionAcceptance : UObject
     {
         if (ck::Is_NOT_Valid(InCharacter) || InCharacter.GetWorld().IsGameWorld() == false)
         { return "no live character"; }
-        auto Player = InCharacter.TryGet_ActorEntityHandle();
+        auto Player = InCharacter.TryGet_Entity();
         if (ck::Is_NOT_Valid(Player))
         { return "no live player entity"; }
         FString Result = f"frame={utils_time::Get_FrameCounter()}";
@@ -198,7 +198,7 @@ class UMars_ExpeditionAcceptance : UObject
     {
         if (ck::Is_NOT_Valid(InCharacter) || InCharacter.GetWorld().IsGameWorld() == false)
         { return ""; }
-        auto Player = InCharacter.TryGet_ActorEntityHandle();
+        auto Player = InCharacter.TryGet_Entity();
         FString Result;
         for (auto Entity : utils_entity_tag::ForEach_Entity(Player, n"TAG_MarsWorldItem"))
         {

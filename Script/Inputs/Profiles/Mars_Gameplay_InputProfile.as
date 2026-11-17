@@ -285,10 +285,10 @@ class UMars_InputProfile_Gameplay : UMars_InputProfile
         const auto Scale = MouseLookScale * LegacyLookScale * Sensitivity;
         const auto Intention = FVector(LookDelta.X * Scale, LookDelta.Y * Scale * PitchSign, 0.0);
 
-        if (ck::Is_NOT_Valid(ControlledPawn) || ControlledPawn.Get_IsActorEcsReady() == false)
+        if (ck::Is_NOT_Valid(ControlledPawn) || ControlledPawn.Get_HasEntity() == false)
         { return; }
 
-        utils_input_intents::Request_Look(ControlledPawn.TryGet_ActorEntityHandle(), Intention);
+        utils_input_intents::Request_Look(ControlledPawn.TryGet_Entity(), Intention);
     }
 
     // A wheel tick is pressed and released inside one frame, which a polled level row can miss - so cycling is an
@@ -310,10 +310,10 @@ class UMars_InputProfile_Gameplay : UMars_InputProfile
 
     private FCk_Handle_Hotbar TryGet_PawnHotbar() const
     {
-        if (ck::Is_NOT_Valid(ControlledPawn) || ControlledPawn.Get_IsActorEcsReady() == false)
+        if (ck::Is_NOT_Valid(ControlledPawn) || ControlledPawn.Get_HasEntity() == false)
         { return FCk_Handle_Hotbar(); }
 
-        return ControlledPawn.TryGet_ActorEntityHandle().As_Hotbar(ECk_SanityCheck::UnChecked);
+        return ControlledPawn.TryGet_Entity().As_Hotbar(ECk_SanityCheck::UnChecked);
     }
 
     //--------------------------------------------------------------------------------------------
@@ -350,7 +350,7 @@ class UMars_InputProfile_Gameplay : UMars_InputProfile
     UFUNCTION()
     private void DoTryCompose()
     {
-        if (ck::Is_NOT_Valid(OwningController) || OwningController.Get_IsActorEcsReady() == false)
+        if (ck::Is_NOT_Valid(OwningController) || OwningController.Get_HasEntity() == false)
         { return; }
 
         auto SourceSubsystem = UCk_InputSource_Subsystem::Get(OwningController);

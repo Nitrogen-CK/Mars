@@ -45,7 +45,7 @@ class UMars_DebugPage_Base : UObject
         if (ck::Is_NOT_Valid(Pawn))
         { return FCk_Handle(); }
 
-        return Pawn.TryGet_ActorEntityHandle();
+        return Pawn.TryGet_Entity();
     }
 
     // "-" before the state machine has entered its first state.

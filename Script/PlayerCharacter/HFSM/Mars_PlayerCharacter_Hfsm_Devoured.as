@@ -64,7 +64,7 @@ class UMars_SmTask_Devoured_View : UCk_SmTask_EntityScript
         _Viewpoint.Request_HoldView(FMars_Request_PlayerViewpoint_HoldView(EMars_PlayerViewpoint_ViewHolder::Devour));
         _HoldsView = true;
 
-        auto Pawn = Cast<APawn>(utils_owning_actor::TryGet_EntityOwningActor_Recursive(Player));
+        auto Pawn = Cast<APawn>(utils_entity_bridge::TryGet_Actor_Recursive(Player));
         auto Controller = ck::IsValid(Pawn) ? Cast<APlayerController>(Pawn.GetController()) : nullptr;
         _Hud = ck::IsValid(Controller) ? Cast<AMars_Master_HUD>(Controller.GetHUD()) : nullptr;
         if (ck::IsValid(_Hud))

@@ -784,7 +784,7 @@ namespace utils_fphands
         {
             ObjectSockets = Find_EntitySockets(Subject.Owner);
             if (ObjectSockets.IsSet() == false)
-            { ObjectSockets = Find_ActorSockets(utils_owning_actor::TryGet_EntityOwningActor_Recursive(Subject.Owner)); }
+            { ObjectSockets = Find_ActorSockets(utils_entity_bridge::TryGet_Actor_Recursive(Subject.Owner)); }
         }
 
         if (ObjectSockets.IsSet())

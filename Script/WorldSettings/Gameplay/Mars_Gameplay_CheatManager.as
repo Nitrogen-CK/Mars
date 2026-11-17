@@ -58,7 +58,7 @@ class UMars_Gameplay_CheatManager : UCheatManager
         }
 
         // The selected bag slot, or the first empty one (which is then selected): a fresh player selects nothing.
-        auto Hotbar = Character.TryGet_ActorEntityHandle().As_Hotbar(ECk_SanityCheck::UnChecked);
+        auto Hotbar = Character.TryGet_Entity().As_Hotbar(ECk_SanityCheck::UnChecked);
         if (ck::Is_NOT_Valid(Hotbar))
         {
             ck::Trace("[Mars_Give] the player has no hotbar");
@@ -105,7 +105,7 @@ class UMars_Gameplay_CheatManager : UCheatManager
         if (ck::Is_NOT_Valid(Character))
         { return; }
 
-        auto Resolver = Character.TryGet_ActorEntityHandle().As_InteractionResolver(ECk_SanityCheck::UnChecked);
+        auto Resolver = Character.TryGet_Entity().As_InteractionResolver(ECk_SanityCheck::UnChecked);
         if (ck::Is_NOT_Valid(Resolver))
         { return; }
 
@@ -123,7 +123,7 @@ class UMars_Gameplay_CheatManager : UCheatManager
         if (ck::Is_NOT_Valid(Character))
         { return; }
 
-        auto Swing = Character.TryGet_ActorEntityHandle().As_HandSwing(ECk_SanityCheck::UnChecked);
+        auto Swing = Character.TryGet_Entity().As_HandSwing(ECk_SanityCheck::UnChecked);
         if (ck::Is_NOT_Valid(Swing))
         {
             ck::Trace("[Mars_SwingState] the player entity has no HandSwing");
@@ -139,7 +139,7 @@ class UMars_Gameplay_CheatManager : UCheatManager
         if (ck::IsValid(HandsAnim))
         { GloveTarget = HandsAnim.GripTarget_R.GetLocation(); }
 
-        auto Player = Character.TryGet_ActorEntityHandle();
+        auto Player = Character.TryGet_Entity();
         auto Hotbar = Player.As_Hotbar(ECk_SanityCheck::UnChecked);
         auto HeldItem = Player.As_HeldItem(ECk_SanityCheck::UnChecked);
         const auto SelectedIndex = ck::IsValid(Hotbar) && Hotbar.Get_SelectedIndex().IsSet() ? Hotbar.Get_SelectedIndex().GetValue() : -1;
@@ -162,7 +162,7 @@ class UMars_Gameplay_CheatManager : UCheatManager
         if (ck::Is_NOT_Valid(Character))
         { return; }
 
-        auto Player = Character.TryGet_ActorEntityHandle();
+        auto Player = Character.TryGet_Entity();
         const auto Here = Character.GetActorLocation();
         auto Nearest = FCk_Handle_Station();
         auto NearestDistance = float64(InRangeCm);
@@ -206,7 +206,7 @@ class UMars_Gameplay_CheatManager : UCheatManager
         if (ck::Is_NOT_Valid(Character))
         { return; }
 
-        auto Player = Character.TryGet_ActorEntityHandle();
+        auto Player = Character.TryGet_Entity();
         const auto Here = Character.GetActorLocation();
         auto Nearest = FCk_Handle_Devour();
         auto NearestDistance = float64(InRangeCm);
@@ -333,7 +333,7 @@ class UMars_Gameplay_CheatManager : UCheatManager
         if (ck::Is_NOT_Valid(Character))
         { return FCk_Handle_Mortar(); }
 
-        auto Operator = Character.TryGet_ActorEntityHandle().As_Operator(ECk_SanityCheck::UnChecked);
+        auto Operator = Character.TryGet_Entity().As_Operator(ECk_SanityCheck::UnChecked);
         FCk_Handle Station = ck::IsValid(Operator) ? Operator.Get_Station() : FCk_Handle_Station();
         if (ck::Is_NOT_Valid(Station))
         {
@@ -355,7 +355,7 @@ class UMars_Gameplay_CheatManager : UCheatManager
         if (ck::Is_NOT_Valid(Character))
         { return FCk_Handle_Fishing(); }
 
-        auto Operator = Character.TryGet_ActorEntityHandle().As_Operator(ECk_SanityCheck::UnChecked);
+        auto Operator = Character.TryGet_Entity().As_Operator(ECk_SanityCheck::UnChecked);
         FCk_Handle Station = ck::IsValid(Operator) ? Operator.Get_Station() : FCk_Handle_Station();
         if (ck::Is_NOT_Valid(Station))
         {

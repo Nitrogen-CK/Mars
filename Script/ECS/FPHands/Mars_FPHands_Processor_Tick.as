@@ -18,7 +18,7 @@ class UMars_Processor_FPHands_Tick : UCk_Processor_Script_Base_UE
     {
         // First-person presentation only: remote copies of the character never run their gloves. An entity with no
         // character at all (headless tests) runs.
-        auto Character = Cast<ACharacter>(utils_owning_actor::TryGet_EntityOwningActor_Recursive(InHandle));
+        auto Character = Cast<ACharacter>(utils_entity_bridge::TryGet_Actor_Recursive(InHandle));
         if (Character != nullptr && Character.IsLocallyControlled() == false)
         { return; }
 

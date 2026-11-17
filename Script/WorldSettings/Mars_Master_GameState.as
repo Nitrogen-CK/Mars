@@ -23,7 +23,7 @@ class AMars_Master_GameState : ACk_GameState_UE
 
         utils_pending_entity_script::Promise_OnConstructed(
             PendingEntity, FCk_Delegate_EntityScript_Constructed(this, n"OnEntityConstructed"));
-        utils_owning_actor::Promise_OnActorEcsReady(this, FCk_Delegate_OwningActor_OnEcsReady(this, n"OnActorEcsReady"));
+        utils_entity_bridge::Promise_OnActorEcsReady(this, FCk_Delegate_EntityBridge_OnEntityReady(this, n"OnActorEcsReady"));
     }
 
     UFUNCTION()

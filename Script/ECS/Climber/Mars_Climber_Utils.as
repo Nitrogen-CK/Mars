@@ -19,7 +19,7 @@ namespace utils_climber
     // The character the climber moves; null without one (headless tests) or when it is not an ACharacter.
     ACharacter TryGet_Character(FCk_Handle InHandle)
     {
-        return Cast<ACharacter>(utils_owning_actor::TryGet_EntityOwningActor_Recursive(InHandle));
+        return Cast<ACharacter>(utils_entity_bridge::TryGet_Actor_Recursive(InHandle));
     }
 
     // +1 while the view points up the ladder (into the wall, or up), -1 while it points down it (out over the room, or
