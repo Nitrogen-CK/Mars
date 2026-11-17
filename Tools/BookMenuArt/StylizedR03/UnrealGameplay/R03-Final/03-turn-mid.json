@@ -1,0 +1,158 @@
+{
+  "label": "03-turn-mid",
+  "world": "/Game/Mars/Maps/UEDPIE_0_Sandbox_Mars_MAP.Sandbox_Mars_MAP",
+  "game_time": 24.70383770763874,
+  "rotation_tuple_order": [
+    "roll",
+    "pitch",
+    "yaw"
+  ],
+  "camera_location": [
+    -600.0,
+    -75.0,
+    111.90460398504048
+  ],
+  "camera_rotation": [
+    0.0,
+    0.0,
+    -0.2118997722864151
+  ],
+  "control_rotation": [
+    0.0,
+    0.0,
+    -0.2118997722864151
+  ],
+  "events": [
+    {
+      "key": "LeftMouseButton",
+      "pressed": true,
+      "game_time": 21.3088681101799
+    },
+    {
+      "key": "LeftMouseButton",
+      "pressed": false,
+      "game_time": 21.47335121035576
+    },
+    {
+      "key": "LeftMouseButton",
+      "pressed": true,
+      "game_time": 22.84366161003709
+    },
+    {
+      "key": "LeftMouseButton",
+      "pressed": false,
+      "game_time": 23.008217811584473
+    },
+    {
+      "key": "E",
+      "pressed": true,
+      "game_time": 24.13542840629816
+    },
+    {
+      "key": "E",
+      "pressed": false,
+      "game_time": 24.302446607500315
+    }
+  ],
+  "books": [
+    {
+      "name": "Mars_CookbookPresentationComponent_1",
+      "location": [
+        -563.2909710505002,
+        -75.13576340886502,
+        110.81541232147498
+      ],
+      "rotation": [
+        89.99999237060547,
+        3.1805547185895103e-15,
+        89.78810119628906
+      ],
+      "scale": [
+        1.2,
+        1.2,
+        1.2
+      ],
+      "reading_hand_offset": [
+        -25.0,
+        0.0,
+        18.0
+      ],
+      "reading_grip_below_centre": 16.0,
+      "animation_speed": 1.5,
+      "visible": true,
+      "engine_tick_enabled": false,
+      "state": "<Mars_CookbookState.TURNING_FORWARD: 3>",
+      "section": 0,
+      "sections": 3,
+      "position": 0.8526138663291931,
+      "page_materials": [
+        "/Game/Mars/Maps/UEDPIE_0_Sandbox_Mars_MAP.Sandbox_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host.Mars_CookbookPresentationComponent_1.MID_Cookbook_PageA_M_0",
+        "/Game/Mars/Maps/UEDPIE_0_Sandbox_Mars_MAP.Sandbox_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host.Mars_CookbookPresentationComponent_1.MID_Cookbook_PageB_M_0",
+        "/Game/Mars/Maps/UEDPIE_0_Sandbox_Mars_MAP.Sandbox_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host.Mars_CookbookPresentationComponent_1.MID_Cookbook_PageC_M_0",
+        "/Game/Mars/Maps/UEDPIE_0_Sandbox_Mars_MAP.Sandbox_Mars_MAP:PersistentLevel.Ck_UnrealComponent_Host.Mars_CookbookPresentationComponent_1.MID_Cookbook_PageD_M_0"
+      ],
+      "page_targets": [
+        "<Object '/Engine/Transient.Texture2D_19' (0x000001C2DB0F9000) Class 'Texture2D'>",
+        "<Object '/Engine/Transient.Texture2D_20' (0x000001C324137200) Class 'Texture2D'>",
+        "<Object '/Engine/Transient.Texture2D_21' (0x000001C324138400) Class 'Texture2D'>",
+        "<Object '/Engine/Transient.Texture2D_22' (0x000001C324134800) Class 'Texture2D'>"
+      ]
+    },
+    {
+      "name": "Mars_CookbookPresentationComponent_0",
+      "location": [
+        -450.0092468261719,
+        -0.16097485784892385,
+        1.2104866319748453
+      ],
+      "rotation": [
+        1.1086633205413818,
+        -0.0038649477064609528,
+        -0.2062772512435913
+      ],
+      "scale": [
+        1.2,
+        1.2,
+        1.2
+      ],
+      "reading_hand_offset": [
+        -25.0,
+        0.0,
+        18.0
+      ],
+      "reading_grip_below_centre": 16.0,
+      "animation_speed": 1.5,
+      "visible": true,
+      "engine_tick_enabled": false,
+      "state": "<Mars_CookbookState.CLOSED: 0>",
+      "section": 0,
+      "sections": 3,
+      "position": 0.0,
+      "page_materials": [
+        "/Game/Mars/Gameplay/PlayerCookbook/StylizedR03/Materials/Cookbook_PageA_M.Cookbook_PageA_M",
+        "/Game/Mars/Gameplay/PlayerCookbook/StylizedR03/Materials/Cookbook_PageB_M.Cookbook_PageB_M",
+        "/Game/Mars/Gameplay/PlayerCookbook/StylizedR03/Materials/Cookbook_PageC_M.Cookbook_PageC_M",
+        "/Game/Mars/Gameplay/PlayerCookbook/StylizedR03/Materials/Cookbook_PageD_M.Cookbook_PageD_M"
+      ],
+      "page_targets": [
+        null,
+        null,
+        null,
+        null
+      ]
+    }
+  ],
+  "observedBook": {
+    "name": "Mars_CookbookPresentationComponent_1",
+    "spineScale": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "spineTranslation": [
+      -1.4802973661668755e-15,
+      1.2027416100105863e-15,
+      1.4279999732970898
+    ]
+  }
+}

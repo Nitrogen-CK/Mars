@@ -127,8 +127,8 @@ class UMars_AutoTestRig_Cookbook : UMars_AutoTestRig_PlayerPath
     {
         const auto Hold = _Hands.Get_Hold();
         Assert_True(Math::IsNearlyEqual(Hold.Faces.RightY, 11.4444, 0.02), "closed gloves fit the 20 percent larger proxy");
-        Assert_True(_WorldBook.Get_BoundsFit().HalfExtents.Equals(FVector(11.4444, 16.0175832, 1.684704), 0.02),
-            "physical pickup fit spans the 20 percent larger closed book");
+        Assert_True(_WorldBook.Get_BoundsFit().HalfExtents.Equals(FVector(11.4444, 16.0175832, 3.077018), 0.02),
+            "physical pickup fit spans the chunky R03 closed book");
         Assert_True(Hold.Shape.Scale.Equals(FVector(1.2, 1.2, 1.2), 0.001), "finger contact uses the physical mesh scale");
         Assert_True(_BookPresentation.GetWorldTransform().GetScale3D().Equals(FVector(1.2, 1.2, 1.2), 0.001),
             "the native skeletal visual matches the scaled physical proxy");

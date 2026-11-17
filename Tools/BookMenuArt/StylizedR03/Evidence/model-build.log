@@ -1,0 +1,41 @@
+D:\Repositories\CkRepos\Orion\Tools\BookMenuArt\StylizedR03\Model\build_stylized.py:27: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m=bpy.data.materials.new(name); m.diffuse_color=color; m.use_nodes=True
+D:\Repositories\CkRepos\Orion\Tools\BookMenuArt\StylizedR03\Model\build_stylized.py:340: DeprecationWarning: 'World.use_nodes' is expected to be removed in Blender 6.0
+  scene.world=bpy.data.worlds.new('Warm studio'); scene.world.use_nodes=True
+00:34.219  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\BookMenuArt\StylizedR03\Model\Renders\01-closed.png'
+00:34.625  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\BookMenuArt\StylizedR03\Model\Renders\02-open.png'
+00:34.953  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\BookMenuArt\StylizedR03\Model\Renders\03-rear.png'
+00:35.297  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\BookMenuArt\StylizedR03\Model\Renders\04-side.png'
+00:35.641  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\BookMenuArt\StylizedR03\Model\Renders\05-page-turn.png'
+00:35.984  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\BookMenuArt\StylizedR03\Model\Renders\06-turn-early.png'
+00:36.359  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\BookMenuArt\StylizedR03\Model\Renders\07-turn-late.png'
+00:36.719  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\BookMenuArt\StylizedR03\Model\Renders\08-opening.png'
+00:36.797  image.write      | ERROR OpenImageIO write failed: Could not open file "C:\Users\Adam\.thumbnails\large\blender_39788_330c19552880f461ef138036461939a5.png.png"
+00:37.266  image.write      | ERROR OpenImageIO write failed: Could not open file "C:\Users\Adam\.thumbnails\large\blender_39788_9bb0933b30cf6e625bd1c1f30990689b.png.png"
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\BookMenuArt\\StylizedR03\\Model\\FBX\\SK_Cookbook_StylizedR03.fbx'
+export finished in 0.0817 sec.
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\BookMenuArt\\StylizedR03\\Model\\FBX\\Book_Lying_Open_01.fbx'
+export finished in 0.0980 sec.
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\BookMenuArt\\StylizedR03\\Model\\FBX\\Book_Lying_Open_Page_Turn_L_to_R_02.fbx'
+export finished in 0.1452 sec.
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\BookMenuArt\\StylizedR03\\Model\\FBX\\Book_Lying_Open_Page_Turn_R_to_L_02.fbx'
+export finished in 0.1304 sec.
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\BookMenuArt\\StylizedR03\\Model\\FBX\\Book_Lying_Open_to_R_01.fbx'
+export finished in 0.1565 sec.
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\BookMenuArt\\StylizedR03\\Model\\FBX\\Book_Lying_R_01.fbx'
+export finished in 0.1501 sec.
+
+FBX export starting... 'D:\\Repositories\\CkRepos\\Orion\\Tools\\BookMenuArt\\StylizedR03\\Model\\FBX\\Book_Lying_R_to_Open_01.fbx'
+export finished in 0.1186 sec.
+Info: Saved as "Cookbook_StylizedR03.blend"
+Info: Saved as "Cookbook_StylizedR03_WidgetReady.blend"
+COOKBOOK_BUILD_COMPLETE {"bones": 12, "triangles": 18124, "unweighted": 0, "states_cm": {"closed": [19.074, 26.696, 5.128], "open": [36.312, 26.696, 5.128], "opening": [19.074, 26.696, 5.128], "closing": [36.312, 26.696, 5.128], "rtl": [36.312, 26.696, 5.128], "ltr": [36.312, 26.696, 5.128], "01-closed": [19.074, 26.696, 5.128], "02-open": [36.312, 26.696, 5.128], "03-rear": [19.074, 26.696, 5.128], "04-side": [19.074, 26.696, 5.128], "05-page-turn": [36.312, 26.696, 19.577], "06-turn-early": [36.312, 26.696, 9.973], "07-turn-late": [36.312, 26.696, 13.561], "08-opening": [24.671, 26.696, 19.764]}}
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+
+Blender quit

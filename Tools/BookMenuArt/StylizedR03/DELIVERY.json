@@ -1,0 +1,111 @@
+{
+  "recordedUtc": "2026-10-30T01:37:04.931263+00:00",
+  "revision": "StylizedR03",
+  "engine": "5.7.4",
+  "activeNamespace": "/Game/Mars/Gameplay/PlayerCookbook/StylizedR03",
+  "changes": [
+    "2x cover thickness and corner radius",
+    "1.5x page-stack depth with five broad signature ridges",
+    "3x turning-sheet rim:0.7344mm at runtime",
+    "Binding folds to32 percent closed depth on opening",
+    "Matching twelve-bone mesh, six clips, four morph curves and closed pickup proxy"
+  ],
+  "retained": [
+    "17x23cm authoring reading footprint",
+    "Runtime scale1.2",
+    "R02 page widgets and artwork",
+    "Existing inputs and page navigation",
+    "R02 source/assets for rollback"
+  ],
+  "nativeBuild": {
+    "exitCode": 0,
+    "evidence": "Evidence/baseline-build-and-test.log"
+  },
+  "focusedGate": {
+    "pattern": "Cookbook",
+    "baseline": {
+      "total": 5,
+      "passed": 5,
+      "failed": []
+    },
+    "final": {
+      "total": 5,
+      "passed": 5,
+      "failed": [],
+      "skipped": 0,
+      "contaminated": 0
+    },
+    "finalExitCode": 0,
+    "evidence": "Evidence/final-cookbook-test.log"
+  },
+  "offline": {
+    "fbxChecks": "12/12",
+    "gutterChecks": "4/4",
+    "spineChecks": "4/4",
+    "turnFrames": 216,
+    "triangles": 18460
+  },
+  "pie": {
+    "evidence": "UnrealGameplay/R03-Final/journey.json",
+    "status": "complete",
+    "observed": [
+      "Loose-book spawn",
+      "Pickup",
+      "Open",
+      "Forward turn",
+      "Reverse turn",
+      "Close",
+      "Reopen",
+      "Drop mid-turn returns closed"
+    ],
+    "input": "Raw events injected through the production input inbox; no forced held/item/presentation state.",
+    "physicalKeyboard": "unverified",
+    "multiplayer": "unverified",
+    "packagedBuild": "unverified"
+  },
+  "knownVisualIssue": "The turning page briefly extends above the viewport in both R02 and R03 mid-turn captures; existing animation trajectory retained.",
+  "editor": {
+    "saved": [
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR03/Materials/Cookbook_Cover_M",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR03/Materials/Cookbook_PagesBase_M",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR03/Materials/Cookbook_PageA_M",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR03/Materials/Cookbook_PageB_M",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR03/Materials/Cookbook_PageC_M",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR03/Materials/Cookbook_PageD_M",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR03/Materials/Cookbook_PageFirst_M",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR03/Materials/Cookbook_PageLast_M",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR03/Materials/Cookbook_CoverDark_M",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR03/Materials/Cookbook_Brass_M",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR03/Materials/Cookbook_BrassLight_M",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR03/Materials/Cookbook_Scuff_M",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR03/Materials/Cookbook_Patch_M",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR03/Materials/Cookbook_Thread_M",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR03/Materials/Cookbook_Emblem_M",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR03/Materials/Cookbook_Leather_M",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR03/Materials/Cookbook_LeatherLight_M",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR03/Materials/Cookbook_PageEdgeLight_M",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR03/Materials/Cookbook_Bookmark_M",
+      "/Game/Mars/Gameplay/PlayerCookbook/StylizedR03/Materials/Cookbook_BookmarkLight_M"
+    ],
+    "dirtyMaps": [],
+    "remainingDirtyContent": []
+  },
+  "sourceChanges": {
+    "Script/Items/Mars_Item_Cookbook.as": "b0bdd7836e46cee0a54301b048969dc2c0dcb5f4254502a4ad3111259bece785",
+    "Script/Items/Presentation/Mars_CookbookPresentationComponent.as": "13bd8621ddd4c601c1ee00cce265999aed0524debf55340c585f98a803dd56d0",
+    "Script/Tests/Cookbook/Mars_AutoTestRig_Cookbook.as": "33ed06d4e13c8328e967acff93b9c0f493467a0fcb159cfbcd819d7566314793",
+    "Script/Tests/Cookbook/Mars_AutoTest_Cookbook_TransitionsReverseAndPageBoundsHold.as": "c77adcc3f595dd659ff5259d5e17a66ce28ab32c3a78c460accba2ed05405d59"
+  },
+  "git": {
+    "committed": false,
+    "pushed": false,
+    "unrelatedMapLeftUntouched": "Content/Mars/Maps/AutoTests_Mars_MAP.umap"
+  },
+  "rollback": "Restore the four source files from Evidence/Before; R02 assets remain intact. No map changes required.",
+  "tuning": {
+    "file": "Model/build_stylized.py",
+    "openBinding": "set_pose: Spine scale.z=3.125-2.125*openness; closed localZ=.019625*(1-openness)",
+    "turningLeaf": "half rim .00045 before author scale; runtime full thickness .7344mm"
+  },
+  "reimportRule": "Keep the R03 mesh/rest skeleton and all six R03 clips together. Re-run native and offline checks after geometric changes."
+}

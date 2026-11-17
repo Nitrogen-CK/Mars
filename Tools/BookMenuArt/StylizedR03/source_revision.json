@@ -1,0 +1,46 @@
+{
+  "source": "StylizedR02",
+  "revision": "StylizedR03",
+  "targets": {
+    "cover_thickness": 2,
+    "corner_radius": 2,
+    "page_stack_depth": 1.5,
+    "leaf_rim": 3
+  },
+  "reading_footprint_cm": [
+    17,
+    23
+  ],
+  "retained": [
+    "20 material slots, first eight stable",
+    "12 bone names",
+    "four morph names",
+    "six clip names",
+    "page UVs",
+    "spine-centred turn compensation",
+    "existing page content"
+  ],
+  "source_sha256": {
+    "build_stylized.py": "e7a9a86aec8eb8abf91cd7cfe489628f053300abd030e4473ec8937b25d3f529",
+    "check_gutter.py": "0f034234887ba4a5f4087cf23ee15e06b71b941b71f7f09763381bb7dde9834c",
+    "export_centimetres.py": "6850f88c4f1844fd5492a297413525887c503a8dac13a90a33d5d194ea2506fb",
+    "export_closed_proxy.py": "01d2e26e2e03a5e471191c930212024f52dda037c4893bfc70431bbf25be92dc",
+    "export_morph_curves.py": "bb2f228a63dc5f8f7455673229b632947f02f3eb60403906adafec3b5dd4ac65",
+    "inspect_fbx_units.py": "363fd28d36ba4d9328114f1b7bf9821f8c279bf4b7b5f6da1ebb0f0d55d4ce1a",
+    "make_contact_sheet.py": "3a166e2571601bfeb62ac7703cdd3c58549911dada33aa3fb9c43946618cd20b",
+    "make_motion_gif.py": "03d4758a854477c3ec47f03aee314a95894cfe6e55b7d8ac420f0b99b118efc2",
+    "render_motion.py": "03582b11c8b44f367a3aa1db5764b999bb0dc173b68435f177e9a9cd6bef6801",
+    "validate_all.py": "15aa36d0880f80644c620d3a99fa274d980e688129094614ccb4727bec1d2d9b",
+    "validate_and_roundtrip.py": "a604dafd6893af1432ea9a904cff300cfa2d9f64843c4b2f3ff3d721169236da",
+    "validate_spine_pages.py": "339cd7d4c236e744c11289d5b87405c12d1c5697fe4ec8d16022b48e675d9425"
+  },
+  "leafRefinement": "Thicker card-like rim with lower resting leaf centre to retain closed-cover clearance.",
+  "openSpine": {
+    "referencePose": "flat-open",
+    "openBoneScaleZ": 1,
+    "closedBoneScaleZ": 3.125,
+    "closedLocalZOffsetMetres": 0.019625,
+    "openToClosedDepthRatio": 0.32,
+    "reason": "The binding folds down as the covers open; page and cover bones retain their dimensions."
+  }
+}

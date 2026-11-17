@@ -1,0 +1,218 @@
+{
+  "label": "07-dropped",
+  "world": "/Game/Mars/Maps/UEDPIE_0_Sandbox_Mars_MAP.Sandbox_Mars_MAP",
+  "game_time": 14.922097366303205,
+  "rotation_tuple_order": [
+    "roll",
+    "pitch",
+    "yaw"
+  ],
+  "camera_location": [
+    -600.0,
+    -225.0,
+    112.23325244617206
+  ],
+  "camera_rotation": [
+    0.0,
+    0.0,
+    -0.035021062940359116
+  ],
+  "control_rotation": [
+    0.0,
+    0.0,
+    -0.035021062940359116
+  ],
+  "events": [
+    {
+      "key": "LeftMouseButton",
+      "pressed": true,
+      "game_time": 5.912315513938665
+    },
+    {
+      "key": "LeftMouseButton",
+      "pressed": false,
+      "game_time": 6.0667220167815685
+    },
+    {
+      "key": "LeftMouseButton",
+      "pressed": true,
+      "game_time": 5.019054297357798
+    },
+    {
+      "key": "LeftMouseButton",
+      "pressed": false,
+      "game_time": 5.173603899776936
+    },
+    {
+      "key": "LeftMouseButton",
+      "pressed": true,
+      "game_time": 6.615511003881693
+    },
+    {
+      "key": "LeftMouseButton",
+      "pressed": false,
+      "game_time": 6.847302902489901
+    },
+    {
+      "key": "E",
+      "pressed": true,
+      "game_time": 7.839027084410191
+    },
+    {
+      "key": "E",
+      "pressed": false,
+      "game_time": 8.019499983638525
+    },
+    {
+      "key": "Q",
+      "pressed": true,
+      "game_time": 9.662733882665634
+    },
+    {
+      "key": "Q",
+      "pressed": false,
+      "game_time": 9.846189085394144
+    },
+    {
+      "key": "LeftMouseButton",
+      "pressed": true,
+      "game_time": 11.456442676484585
+    },
+    {
+      "key": "LeftMouseButton",
+      "pressed": false,
+      "game_time": 11.61548087745905
+    },
+    {
+      "key": "LeftMouseButton",
+      "pressed": true,
+      "game_time": 12.752008266746998
+    },
+    {
+      "key": "LeftMouseButton",
+      "pressed": false,
+      "game_time": 12.904385566711426
+    },
+    {
+      "key": "E",
+      "pressed": true,
+      "game_time": 13.713667266070843
+    },
+    {
+      "key": "E",
+      "pressed": false,
+      "game_time": 13.87914826720953
+    },
+    {
+      "key": "R",
+      "pressed": true,
+      "game_time": 13.918492965400219
+    },
+    {
+      "key": "R",
+      "pressed": false,
+      "game_time": 14.075692664831877
+    }
+  ],
+  "books": [
+    {
+      "name": "Mars_CookbookPresentationComponent_0",
+      "location": [
+        -449.9459228515625,
+        -0.037142421780401946,
+        0.6336420838748609
+      ],
+      "rotation": [
+        0.0037219838704913855,
+        0.001775409677065909,
+        0.056561943143606186
+      ],
+      "scale": [
+        1.2,
+        1.2,
+        1.2
+      ],
+      "reading_hand_offset": [
+        -25.0,
+        0.0,
+        18.0
+      ],
+      "reading_grip_below_centre": 16.0,
+      "animation_speed": 1.5,
+      "visible": true,
+      "engine_tick_enabled": false,
+      "state": "<Mars_CookbookState.CLOSED: 0>",
+      "section": 0,
+      "sections": 3,
+      "position": 0.0,
+      "page_materials": [
+        "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_PageA_M.Cookbook_PageA_M",
+        "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_PageB_M.Cookbook_PageB_M",
+        "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_PageC_M.Cookbook_PageC_M",
+        "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_PageD_M.Cookbook_PageD_M"
+      ],
+      "page_targets": [
+        null,
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "name": "Mars_CookbookPresentationComponent_1",
+      "location": [
+        -476.9592590332031,
+        -235.4123077392578,
+        0.7471137536104173
+      ],
+      "rotation": [
+        -0.4606491029262543,
+        -0.6882107257843018,
+        89.96892547607422
+      ],
+      "scale": [
+        1.2,
+        1.2,
+        1.2
+      ],
+      "reading_hand_offset": [
+        -25.0,
+        0.0,
+        18.0
+      ],
+      "reading_grip_below_centre": 16.0,
+      "animation_speed": 1.5,
+      "visible": true,
+      "engine_tick_enabled": false,
+      "state": "<Mars_CookbookState.CLOSED: 0>",
+      "section": 0,
+      "sections": 3,
+      "position": 0.0,
+      "page_materials": [
+        "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_PageA_M.Cookbook_PageA_M",
+        "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_PageB_M.Cookbook_PageB_M",
+        "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_PageC_M.Cookbook_PageC_M",
+        "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Materials/Cookbook_PageD_M.Cookbook_PageD_M"
+      ],
+      "page_targets": [
+        null,
+        null,
+        null,
+        null
+      ]
+    }
+  ],
+  "observedBook": {
+    "name": "Mars_CookbookPresentationComponent_1",
+    "spineScale": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "spineTranslation": [
+      -6.888297802524572e-15,
+      -2.344153517130909e-14,
+      0.9520000815391543
+    ]
+  }
+}

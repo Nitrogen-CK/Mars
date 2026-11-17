@@ -1,0 +1,32 @@
+{
+  "label": "R02-Before",
+  "world": "/Game/Mars/Maps/UEDPIE_0_Sandbox_Mars_MAP.Sandbox_Mars_MAP",
+  "start": 4.393335614353418,
+  "next": 5,
+  "events": [
+    {
+      "at": 0.3104417026042938,
+      "action": "spawn loose book"
+    },
+    {
+      "at": 1.0105754025280476,
+      "action": "aim at nearest loose book"
+    },
+    {
+      "at": 1.518979899585247,
+      "action": "raw pickup"
+    },
+    {
+      "at": 2.307750701904297,
+      "action": "clear world focus"
+    },
+    {
+      "at": 2.7080639004707336,
+      "action": "held closed capture"
+    }
+  ],
+  "captures": [],
+  "yaw": -0.034988708794116974,
+  "status": "failed",
+  "error": "Traceback (most recent call last):\n  File \"D:/Repositories/CkRepos/Orion/Tools/BookMenuArt/StylizedR03/journey.py\", line 77, in tick\n    state['events'].append({'at':elapsed,'action':name});fn()\n                                                         ^^^^\n  File \"D:/Repositories/CkRepos/Orion/Tools/BookMenuArt/StylizedR03/journey.py\", line 54, in <lambda>\n    (2.7,'held closed capture',lambda:capture('01-held-closed','Closed')),\n                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:/Repositories/CkRepos/Orion/Tools/BookMenuArt/StylizedR03/journey.py\", line 30, in capture\n    assert actual.endswith(expected_state),(name,actual,expected_state)\nAssertionError: ('01-held-closed', '<Mars_CookbookState.CLOSED: 0>', 'Closed')\n"
+}

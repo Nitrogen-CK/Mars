@@ -1,0 +1,13 @@
+00:02.828  blend            | Read blend: "D:\Repositories\CkRepos\Orion\Tools\BookMenuArt\StylizedR02\Model\Cookbook_StylizedR02.blend"
+00:18.828  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\BookMenuArt\StylizedR03\Evidence\MatchedModel\StylizedR02_closed.png'
+00:19.187  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\BookMenuArt\StylizedR03\Evidence\MatchedModel\StylizedR02_side.png'
+00:19.562  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\BookMenuArt\StylizedR03\Evidence\MatchedModel\StylizedR02_open.png'
+00:19.562  blend            | Read blend: "D:\Repositories\CkRepos\Orion\Tools\BookMenuArt\StylizedR03\Model\Cookbook_StylizedR03.blend"
+00:20.250  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\BookMenuArt\StylizedR03\Evidence\MatchedModel\StylizedR03_closed.png'
+00:20.531  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\BookMenuArt\StylizedR03\Evidence\MatchedModel\StylizedR03_side.png'
+00:20.891  render           | Saved: 'D:\Repositories\CkRepos\Orion\Tools\BookMenuArt\StylizedR03\Evidence\MatchedModel\StylizedR03_open.png'
+Extensions: writing cache failed ([Errno 13] Permission denied: 'C:\\Users\\Adam\\AppData\\Roaming\\Blender Foundation\\Blender\\5.2\\extensions\\.cache\\compat.dat').
+MATCHED_MODEL_CAMERAS_COMPLETE
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+
+Blender quit

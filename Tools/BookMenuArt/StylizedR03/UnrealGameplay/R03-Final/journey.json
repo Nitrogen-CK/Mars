@@ -1,0 +1,95 @@
+{
+  "label": "R03-Final",
+  "world": "/Game/Mars/Maps/UEDPIE_0_Sandbox_Mars_MAP.Sandbox_Mars_MAP",
+  "start": 19.801966711878777,
+  "next": 19,
+  "events": [
+    {
+      "at": 0.3078950010240078,
+      "action": "spawn loose book"
+    },
+    {
+      "at": 1.0100500993430614,
+      "action": "aim at nearest loose book"
+    },
+    {
+      "at": 1.5069013983011246,
+      "action": "raw pickup"
+    },
+    {
+      "at": 2.305435501039028,
+      "action": "clear world focus"
+    },
+    {
+      "at": 2.705441500991583,
+      "action": "held closed capture"
+    },
+    {
+      "at": 3.041694898158312,
+      "action": "raw open"
+    },
+    {
+      "at": 4.006686899811029,
+      "action": "open index capture"
+    },
+    {
+      "at": 4.333461694419384,
+      "action": "raw next"
+    },
+    {
+      "at": 4.901870995759964,
+      "action": "mid-turn capture"
+    },
+    {
+      "at": 5.8068638034164906,
+      "action": "recipe capture"
+    },
+    {
+      "at": 6.15494629368186,
+      "action": "raw previous"
+    },
+    {
+      "at": 7.6038912907242775,
+      "action": "reverse index capture"
+    },
+    {
+      "at": 7.971149303019047,
+      "action": "raw close"
+    },
+    {
+      "at": 8.910631004720926,
+      "action": "closed capture"
+    },
+    {
+      "at": 9.248578403145075,
+      "action": "raw reopen"
+    },
+    {
+      "at": 10.21399700269103,
+      "action": "raw next before dropping"
+    },
+    {
+      "at": 10.414932005107403,
+      "action": "raw drop mid turn"
+    },
+    {
+      "at": 11.412858802825212,
+      "action": "dropped closed capture"
+    },
+    {
+      "at": 11.75966041535139,
+      "action": "finish"
+    }
+  ],
+  "captures": [
+    "01-held-closed",
+    "02-open-index",
+    "03-turn-mid",
+    "04-recipe",
+    "05-reverse-index",
+    "06-closed",
+    "07-dropped"
+  ],
+  "yaw": -0.2118997722864151,
+  "status": "complete"
+}

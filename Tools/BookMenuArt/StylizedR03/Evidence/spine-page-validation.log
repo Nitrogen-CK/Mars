@@ -1,0 +1,6 @@
+00:03.531  blend            | Read blend: "D:\Repositories\CkRepos\Orion\Tools\BookMenuArt\StylizedR03\Model\Cookbook_StylizedR03.blend"
+Extensions: writing cache failed ([Errno 13] Permission denied: 'C:\\Users\\Adam\\AppData\\Roaming\\Blender Foundation\\Blender\\5.2\\extensions\\.cache\\compat.dat').
+SPINE_PAGE_VALIDATION {"poses": {"closed": {"spineMinCm": -1.1398025788366795, "spineMaxCm": 3.988560289144516, "depthCm": 5.1283628679811954, "spineScale": [1.0, 1.0, 1.0], "spineLocationMetres": [0.0, 0.0, -0.0]}, "open": {"spineMinCm": -0.02169683575630188, "spineMaxCm": 1.6193792223930359, "depthCm": 1.6410760581493378, "spineScale": [1.0, 1.0, 0.3199999928474426], "spineLocationMetres": [0.0, 0.0, -0.006279999855905771]}}, "checks": {"openBindingDepthIs32Percent": true, "openBindingCrownLessThan4mmAbovePage": true, "turningSheetRuntimeThicknessAbovePoint7mm": true, "closedBoneScalePreserved": true}, "openSpineCrownAboveReadingPlaneMm": 2.933792769908905, "turningSheetAuthorThicknessMm": 0.6119990721344948, "turningSheetRuntimeThicknessMm": 0.7343988865613937}
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+
+Blender quit

@@ -60,7 +60,7 @@ class UMars_AutoTest_Cookbook_TransitionsReverseAndPageBoundsHold : UCk_AutoTest
         _Book.Request_Toggle();
         const auto ClosingPosition = _Book.GetPosition();
         auto Opening = System::LoadAsset_Blocking(TSoftObjectPtr<UAnimSequence>(FSoftObjectPath(
-            "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Animations/Cookbook_Opening_AS.Cookbook_Opening_AS")));
+            "/Game/Mars/Gameplay/PlayerCookbook/StylizedR03/Animations/Cookbook_Opening_AS.Cookbook_Opening_AS")));
         Assert_Equals_Float(OpeningPosition + ClosingPosition, Opening.GetPlayLength(), 0.001,
             "reversing the symmetric cover clips mirrors time without jumping pose");
         _Book.Request_AdvancePresentation(0.0);
@@ -75,7 +75,7 @@ class UMars_AutoTest_Cookbook_TransitionsReverseAndPageBoundsHold : UCk_AutoTest
     private void Step_TurnEndpoints(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         auto Forward = System::LoadAsset_Blocking(TSoftObjectPtr<UAnimSequence>(FSoftObjectPath(
-            "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Animations/Cookbook_TurnForward_AS.Cookbook_TurnForward_AS")));
+            "/Game/Mars/Gameplay/PlayerCookbook/StylizedR03/Animations/Cookbook_TurnForward_AS.Cookbook_TurnForward_AS")));
         const auto Duration = Forward.GetPlayLength();
         _Book.Request_Turn(1);
         _Book.Request_AdvancePresentation((Duration - 0.001f) / _Book.GlobalAnimRateScale);

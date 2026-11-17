@@ -1,0 +1,45 @@
+{
+  "baseCommit": "b072bad1ba72549af8a76e87ab772b51e5d6e473",
+  "notMine": [
+    "Content/Mars/Maps/AutoTests_Mars_MAP.umap"
+  ],
+  "gate": {
+    "pattern": "Cookbook",
+    "firstAttempt": "AS_COMPILE_FAILED before any tests: missing Get_SourceComponent binding in unrelated CkTests test",
+    "testVerdict": "5/5 fresh boot",
+    "rebuild": "Succeeded; combined Toolbox command exited0",
+    "total": 5,
+    "passed": 5,
+    "failed": 0,
+    "skipped": 0,
+    "contaminated": 0,
+    "log": "Evidence/baseline-build-and-test.log"
+  },
+  "fixtures": [
+    {
+      "path": "Tools\\BookMenuArt\\StylizedR02\\Model\\Cookbook_StylizedR02_WidgetReady.blend",
+      "mtimeUtc": "2026-10-23T08:56:08.758622+00:00",
+      "sha256": "ec22559937274f099efd7a03f80494c4628ad144e1e544b3bc0e85c5b342f767"
+    },
+    {
+      "path": "Tools\\BookMenuArt\\StylizedR02\\Model\\build_stylized.py",
+      "mtimeUtc": "2026-10-23T08:55:40.404462+00:00",
+      "sha256": "d438c69125378a3e3a4312c15edaa3e84ee68295d3fe297ebc740b5e3d3f06a3"
+    },
+    {
+      "path": "Tools\\BookMenuArt\\StylizedR02\\Model\\validation.json",
+      "mtimeUtc": "2026-10-23T04:09:03.345489+00:00",
+      "sha256": "aa98497d30ff75897749b34bfdeb2972f1dcfc294b4ee49c6b55c8d38cc4fb4a"
+    },
+    {
+      "path": "Tools\\BookMenuArt\\StylizedR02\\Model\\roundtrip_validation.json",
+      "mtimeUtc": "2026-10-23T08:56:59.254561+00:00",
+      "sha256": "be2706497476d9c298927da9de1ff5865e5ee31a5375377f661ecf5eef67553c"
+    },
+    {
+      "path": "Tools\\BookMenuArt\\StylizedR02\\Model\\Renders\\04-side.png",
+      "mtimeUtc": "2026-10-23T04:09:01.702611+00:00",
+      "sha256": "316aecd4f6ba1158dc152c1a039578367a77b704a1b705a6991a2b1fd2cb549d"
+    }
+  ]
+}

@@ -1,0 +1,111 @@
+{
+  "source_blend": "",
+  "export_coordinate_unit": "centimetres",
+  "export_scene_scale_length": 0.01,
+  "mesh_object_scale": [
+    1.0,
+    1.0,
+    1.0
+  ],
+  "armature_object_scale": [
+    1.0,
+    1.0,
+    1.0
+  ],
+  "source_scene_scale_length": 1.0,
+  "files": {
+    "SK_Cookbook_StylizedR03.fbx": {
+      "bytes": 722364,
+      "kind": "skeletal mesh"
+    },
+    "Book_Lying_Open_01.fbx": {
+      "bytes": 823356,
+      "frames": [
+        1,
+        24
+      ],
+      "root_pose_scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    "Book_Lying_Open_Page_Turn_L_to_R_02.fbx": {
+      "bytes": 876476,
+      "frames": [
+        1,
+        108
+      ],
+      "root_pose_scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    "Book_Lying_Open_Page_Turn_R_to_L_02.fbx": {
+      "bytes": 876492,
+      "frames": [
+        1,
+        108
+      ],
+      "root_pose_scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    "Book_Lying_Open_to_R_01.fbx": {
+      "bytes": 831676,
+      "frames": [
+        1,
+        48
+      ],
+      "root_pose_scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    "Book_Lying_R_01.fbx": {
+      "bytes": 823356,
+      "frames": [
+        1,
+        24
+      ],
+      "root_pose_scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    "Book_Lying_R_to_Open_01.fbx": {
+      "bytes": 831676,
+      "frames": [
+        1,
+        48
+      ],
+      "root_pose_scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  "root_rest_local_scale": [
+    1.0,
+    1.0,
+    1.0
+  ],
+  "cover_hinge_local_cm": [
+    0.0,
+    0.0,
+    1.4279999732971191
+  ],
+  "page_turn_hinge_local_cm": [
+    0.476000040769577,
+    0.0,
+    1.4926000833511353
+  ],
+  "source_data_restored": true,
+  "location_keys_restored": true
+}

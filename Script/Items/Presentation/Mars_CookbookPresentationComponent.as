@@ -30,7 +30,7 @@ class UMars_CookbookPresentationComponent : USkeletalMeshComponent
 
     UPROPERTY(EditDefaultsOnly, Category = "Cookbook")
     TSoftObjectPtr<USkeletalMesh> BookMesh = TSoftObjectPtr<USkeletalMesh>(FSoftObjectPath(
-        "/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Meshes/SK_Cookbook_Field.SK_Cookbook_Field"));
+        "/Game/Mars/Gameplay/PlayerCookbook/StylizedR03/Meshes/SK_Cookbook_Field.SK_Cookbook_Field"));
 
     UPROPERTY(EditDefaultsOnly, Category = "Cookbook")
     TArray<TSoftClassPtr<UCk_UserWidget_UE>> LeftPages;
@@ -227,7 +227,7 @@ class UMars_CookbookPresentationComponent : USkeletalMeshComponent
         TArray<UAnimSequence> LoadedClips;
         for (auto ClipName : ClipNames)
         {
-            const auto Path = f"/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Animations/Cookbook_{ClipName}_AS.Cookbook_{ClipName}_AS";
+            const auto Path = f"/Game/Mars/Gameplay/PlayerCookbook/StylizedR03/Animations/Cookbook_{ClipName}_AS.Cookbook_{ClipName}_AS";
             auto Clip = System::LoadAsset_Blocking(TSoftObjectPtr<UAnimSequence>(FSoftObjectPath(Path)));
             if (ck::EnsureIfNot(ck::IsValid(Clip), f"[Cookbook] Missing animation {Path}"))
             { return; }

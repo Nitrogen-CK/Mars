@@ -1,0 +1,38 @@
+{
+  "Script/Items/Mars_Item_Cookbook.as": [
+    [
+      "StylizedR02/Meshes",
+      "StylizedR03/Meshes"
+    ],
+    [
+      "FVector(0.9746, -constants_cookbook::k_ClosedSpineOffset, 1.0813)",
+      "FVector(1.4244, -constants_cookbook::k_ClosedSpineOffset, 1.0813)"
+    ]
+  ],
+  "Script/Items/Presentation/Mars_CookbookPresentationComponent.as": [
+    [
+      "StylizedR02/Meshes",
+      "StylizedR03/Meshes"
+    ],
+    [
+      "StylizedR02/Animations",
+      "StylizedR03/Animations"
+    ]
+  ],
+  "Script/Tests/Cookbook/Mars_AutoTestRig_Cookbook.as": [
+    [
+      "FVector(11.4444, 16.0175832, 1.684704)",
+      "FVector(11.4444, 16.0175832, 3.077018)"
+    ],
+    [
+      "physical pickup fit spans the 20 percent larger closed book",
+      "physical pickup fit spans the chunky R03 closed book"
+    ]
+  ],
+  "Script/Tests/Cookbook/Mars_AutoTest_Cookbook_TransitionsReverseAndPageBoundsHold.as": [
+    [
+      "StylizedR02/Animations",
+      "StylizedR03/Animations"
+    ]
+  ]
+}

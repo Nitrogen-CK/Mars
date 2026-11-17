@@ -5,7 +5,7 @@ asset Mars_ItemDef_Cookbook of UCk_InventoryItem_Definition
     _CoreInfo = FCk_InventoryItem_CoreInfo(FText::FromString("Cookbook"));
 
     auto Presentation = Cast<UMars_ItemTrait_Presentation>(NewObject(this, UMars_ItemTrait_Presentation));
-    Presentation.Visual.Mesh = TSoftObjectPtr<UStaticMesh>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCookbook/StylizedR02/Meshes/SM_Cookbook_Closed.SM_Cookbook_Closed"));
+    Presentation.Visual.Mesh = TSoftObjectPtr<UStaticMesh>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCookbook/StylizedR03/Meshes/SM_Cookbook_Closed.SM_Cookbook_Closed"));
     // One physical scale for the static proxy, collision, pickup fit and animated visual.
     Presentation.Visual.MeshScale = FVector(1.2, 1.2, 1.2);
     Presentation.Grip.Pose = EMars_HandGripPose::Cradle;
@@ -15,7 +15,7 @@ asset Mars_ItemDef_Cookbook of UCk_InventoryItem_Definition
     Presentation.Mounting.CarryPoint = GameplayTags::AttachPoint_Mars_Back;
     // Source +Z faces the camera; centre the closed book in the hand frame. The visual child recentres the open spine.
     Presentation.Mounting.HeldOffset = FTransform(FRotator(0.0, 90.0, 90.0),
-        FVector(0.9746, -constants_cookbook::k_ClosedSpineOffset, 1.0813) * Presentation.Visual.MeshScale);
+        FVector(1.4244, -constants_cookbook::k_ClosedSpineOffset, 1.0813) * Presentation.Visual.MeshScale);
     Presentation.WorldItem.ScriptClass = UMars_Cookbook_EntityScript;
     _ItemTraits.Add(Presentation);
 

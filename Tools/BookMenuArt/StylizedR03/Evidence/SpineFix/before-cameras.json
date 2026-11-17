@@ -1,0 +1,86 @@
+{
+  "StylizedR02_closed": {
+    "location": [
+      0.39724358916282654,
+      -0.6220871806144714,
+      1.229254126548767
+    ],
+    "rotation": [
+      0.519903302192688,
+      2.7927713475150995e-08,
+      0.46364763379096985
+    ],
+    "ortho_scale": 0.36,
+    "source": "D:\\Repositories\\CkRepos\\Orion\\Tools\\BookMenuArt\\StylizedR02\\Model\\Cookbook_StylizedR02.blend"
+  },
+  "StylizedR02_side": {
+    "location": [
+      1.4116817712783813,
+      -0.3976445198059082,
+      0.22631706297397614
+    ],
+    "rotation": [
+      1.4187273979187012,
+      -8.32721127608238e-08,
+      1.2793396711349487
+    ],
+    "ortho_scale": 0.32,
+    "source": "D:\\Repositories\\CkRepos\\Orion\\Tools\\BookMenuArt\\StylizedR02\\Model\\Cookbook_StylizedR02.blend"
+  },
+  "StylizedR02_open": {
+    "location": [
+      0.08871427178382874,
+      -0.4258284866809845,
+      1.344954013824463
+    ],
+    "rotation": [
+      0.3159230351448059,
+      2.4399289255683243e-09,
+      0.2053954303264618
+    ],
+    "ortho_scale": 0.46,
+    "source": "D:\\Repositories\\CkRepos\\Orion\\Tools\\BookMenuArt\\StylizedR02\\Model\\Cookbook_StylizedR02.blend"
+  },
+  "StylizedR03_closed": {
+    "location": [
+      0.39724358916282654,
+      -0.6220871806144714,
+      1.229254126548767
+    ],
+    "rotation": [
+      0.519903302192688,
+      2.7927713475150995e-08,
+      0.46364763379096985
+    ],
+    "ortho_scale": 0.36,
+    "source": "D:\\Repositories\\CkRepos\\Orion\\Tools\\BookMenuArt\\StylizedR03\\Model\\Cookbook_StylizedR03.blend"
+  },
+  "StylizedR03_side": {
+    "location": [
+      1.4116817712783813,
+      -0.3976445198059082,
+      0.22631706297397614
+    ],
+    "rotation": [
+      1.4187273979187012,
+      -8.32721127608238e-08,
+      1.2793396711349487
+    ],
+    "ortho_scale": 0.32,
+    "source": "D:\\Repositories\\CkRepos\\Orion\\Tools\\BookMenuArt\\StylizedR03\\Model\\Cookbook_StylizedR03.blend"
+  },
+  "StylizedR03_open": {
+    "location": [
+      0.08871427178382874,
+      -0.4258284866809845,
+      1.344954013824463
+    ],
+    "rotation": [
+      0.3159230351448059,
+      2.4399289255683243e-09,
+      0.2053954303264618
+    ],
+    "ortho_scale": 0.46,
+    "source": "D:\\Repositories\\CkRepos\\Orion\\Tools\\BookMenuArt\\StylizedR03\\Model\\Cookbook_StylizedR03.blend"
+  }
+}

@@ -1,0 +1,206 @@
+{
+  "Tools/BookMenuArt/StylizedR03/Model/build_stylized.py": {
+    "bytes": 25514,
+    "sha256": "e7a9a86aec8eb8abf91cd7cfe489628f053300abd030e4473ec8937b25d3f529"
+  },
+  "Tools/BookMenuArt/StylizedR03/Model/check_gutter.py": {
+    "bytes": 2008,
+    "sha256": "0f034234887ba4a5f4087cf23ee15e06b71b941b71f7f09763381bb7dde9834c"
+  },
+  "Tools/BookMenuArt/StylizedR03/Model/Cookbook_StylizedR03.blend": {
+    "bytes": 3845641,
+    "sha256": "93cc58bff406511822f2b8a6a8ea513d6ce5553ddebd230d2c8756925ac6ea96"
+  },
+  "Tools/BookMenuArt/StylizedR03/Model/Cookbook_StylizedR03_WidgetReady.blend": {
+    "bytes": 487279,
+    "sha256": "cc54c28c23f03584dd5af6b455f911942f67dd8514936b1a021b86cc3e88830a"
+  },
+  "Tools/BookMenuArt/StylizedR03/Model/export_centimetres.py": {
+    "bytes": 6611,
+    "sha256": "6850f88c4f1844fd5492a297413525887c503a8dac13a90a33d5d194ea2506fb"
+  },
+  "Tools/BookMenuArt/StylizedR03/Model/export_closed_proxy.py": {
+    "bytes": 1920,
+    "sha256": "01d2e26e2e03a5e471191c930212024f52dda037c4893bfc70431bbf25be92dc"
+  },
+  "Tools/BookMenuArt/StylizedR03/Model/export_morph_curves.py": {
+    "bytes": 2406,
+    "sha256": "bb2f228a63dc5f8f7455673229b632947f02f3eb60403906adafec3b5dd4ac65"
+  },
+  "Tools/BookMenuArt/StylizedR03/Model/FBX/Book_Lying_Open_01.fbx": {
+    "bytes": 823356,
+    "sha256": "a07570a38c6848686b06a9c8cd43d22eaac3447792e8686504339e6bbdc20ea3"
+  },
+  "Tools/BookMenuArt/StylizedR03/Model/FBX/Book_Lying_Open_Page_Turn_L_to_R_02.fbx": {
+    "bytes": 876476,
+    "sha256": "1409bc413fbb29077f3dca83a4562f27a01ac09f95b0d7a90f253947e4c13df3"
+  },
+  "Tools/BookMenuArt/StylizedR03/Model/FBX/Book_Lying_Open_Page_Turn_R_to_L_02.fbx": {
+    "bytes": 876492,
+    "sha256": "9a933437eee27e0a2a4df388e99e7465111b39c064eae1ee205da3e98d9adff9"
+  },
+  "Tools/BookMenuArt/StylizedR03/Model/FBX/Book_Lying_Open_to_R_01.fbx": {
+    "bytes": 831676,
+    "sha256": "225686cd84930778d26b798b84fc9f56126a6017ac0bd5d797ac5797600c0373"
+  },
+  "Tools/BookMenuArt/StylizedR03/Model/FBX/Book_Lying_R_01.fbx": {
+    "bytes": 823356,
+    "sha256": "8d347fe354905f6182ac6f3d01a8847a9ebfd8830148817f10104e889c2c484f"
+  },
+  "Tools/BookMenuArt/StylizedR03/Model/FBX/Book_Lying_R_to_Open_01.fbx": {
+    "bytes": 831676,
+    "sha256": "4d8fc075b61f41347dbd842e36ba792f2f92c432118a938531a7125b0562c6f1"
+  },
+  "Tools/BookMenuArt/StylizedR03/Model/FBX/SK_Cookbook_StylizedR03.fbx": {
+    "bytes": 722364,
+    "sha256": "821f540b6a14e6ea28277148d6480f571caf0f7d20d11323f98b37b669848951"
+  },
+  "Tools/BookMenuArt/StylizedR03/Model/FBX/SM_Cookbook_Closed.fbx": {
+    "bytes": 469228,
+    "sha256": "78ea8e1a150913fca592350164e3a77b75cafd13d6bb13033011041f14700a21"
+  },
+  "Tools/BookMenuArt/StylizedR03/Model/inspect_fbx_units.py": {
+    "bytes": 2348,
+    "sha256": "363fd28d36ba4d9328114f1b7bf9821f8c279bf4b7b5f6da1ebb0f0d55d4ce1a"
+  },
+  "Tools/BookMenuArt/StylizedR03/Model/make_contact_sheet.py": {
+    "bytes": 972,
+    "sha256": "3a166e2571601bfeb62ac7703cdd3c58549911dada33aa3fb9c43946618cd20b"
+  },
+  "Tools/BookMenuArt/StylizedR03/Model/make_motion_gif.py": {
+    "bytes": 798,
+    "sha256": "03d4758a854477c3ec47f03aee314a95894cfe6e55b7d8ac420f0b99b118efc2"
+  },
+  "Tools/BookMenuArt/StylizedR03/Model/render_motion.py": {
+    "bytes": 1327,
+    "sha256": "03582b11c8b44f367a3aa1db5764b999bb0dc173b68435f177e9a9cd6bef6801"
+  },
+  "Tools/BookMenuArt/StylizedR03/Model/validate_all.py": {
+    "bytes": 539,
+    "sha256": "15aa36d0880f80644c620d3a99fa274d980e688129094614ccb4727bec1d2d9b"
+  },
+  "Tools/BookMenuArt/StylizedR03/Model/validate_and_roundtrip.py": {
+    "bytes": 6954,
+    "sha256": "a604dafd6893af1432ea9a904cff300cfa2d9f64843c4b2f3ff3d721169236da"
+  },
+  "Tools/BookMenuArt/StylizedR03/Model/validate_spine_pages.py": {
+    "bytes": 2489,
+    "sha256": "339cd7d4c236e744c11289d5b87405c12d1c5697fe4ec8d16022b48e675d9425"
+  },
+  "Content/Mars/Gameplay/PlayerCookbook/StylizedR03/Animations/Cookbook_Closed_AS.uasset": {
+    "bytes": 40125,
+    "sha256": "8faaa5b44739f3899b5586359c18e0d6e315a309bd3e6232f9f70e1374fa0427"
+  },
+  "Content/Mars/Gameplay/PlayerCookbook/StylizedR03/Animations/Cookbook_Closing_AS.uasset": {
+    "bytes": 56096,
+    "sha256": "0216fbe629f38dec8eee576a12f01dde51f3d23b839a2e970736f1e0b3192ca7"
+  },
+  "Content/Mars/Gameplay/PlayerCookbook/StylizedR03/Animations/Cookbook_Open_AS.uasset": {
+    "bytes": 40135,
+    "sha256": "5f15664c6de1eb6a98fe9e82de70fd7f3cf91ee499ff7168487e9408826bfe17"
+  },
+  "Content/Mars/Gameplay/PlayerCookbook/StylizedR03/Animations/Cookbook_Opening_AS.uasset": {
+    "bytes": 56096,
+    "sha256": "a523feb0877e87989e8faa0f17b789a3aa0ec51bc8bbaba32e24eb005b88323e"
+  },
+  "Content/Mars/Gameplay/PlayerCookbook/StylizedR03/Animations/Cookbook_TurnForward_AS.uasset": {
+    "bytes": 110591,
+    "sha256": "2725c728e8bffc296ac146cbf509ef5dd7f5ed61ca987768e8af394c92284933"
+  },
+  "Content/Mars/Gameplay/PlayerCookbook/StylizedR03/Animations/Cookbook_TurnReverse_AS.uasset": {
+    "bytes": 110575,
+    "sha256": "25c8fb68a9be4dca147a148482becb8400994435b315087d697b9386abbee932"
+  },
+  "Content/Mars/Gameplay/PlayerCookbook/StylizedR03/Materials/Cookbook_Bookmark_M.uasset": {
+    "bytes": 9494,
+    "sha256": "ac201a322dcd7b17444a03586082ddb7989f4a410000d047189c8eb157b71a49"
+  },
+  "Content/Mars/Gameplay/PlayerCookbook/StylizedR03/Materials/Cookbook_BookmarkLight_M.uasset": {
+    "bytes": 9800,
+    "sha256": "c73bd13890207cdb84c904b0c56d8a87d1bb0af7482e9dfb2c7742a2b0f7a393"
+  },
+  "Content/Mars/Gameplay/PlayerCookbook/StylizedR03/Materials/Cookbook_Brass_M.uasset": {
+    "bytes": 10019,
+    "sha256": "259a4dce4c728855457a1abda2e3ef72265f7a7c6778e2297f2a82fdbdf83dc3"
+  },
+  "Content/Mars/Gameplay/PlayerCookbook/StylizedR03/Materials/Cookbook_BrassLight_M.uasset": {
+    "bytes": 10072,
+    "sha256": "62c182af4a891ecdc25d3afba9242835321f4091450c187aa7c7a11701deddeb"
+  },
+  "Content/Mars/Gameplay/PlayerCookbook/StylizedR03/Materials/Cookbook_Cover_M.uasset": {
+    "bytes": 9642,
+    "sha256": "e7ed52ae85e83502eb979a7eda7cc5c87a7bcc037850ddb03552bb1bd02945ea"
+  },
+  "Content/Mars/Gameplay/PlayerCookbook/StylizedR03/Materials/Cookbook_CoverDark_M.uasset": {
+    "bytes": 9397,
+    "sha256": "a799815ed12af72ca743f4c78422fce49e77abbcba4b06c6aaa0d53ed9c33df2"
+  },
+  "Content/Mars/Gameplay/PlayerCookbook/StylizedR03/Materials/Cookbook_Emblem_M.uasset": {
+    "bytes": 9994,
+    "sha256": "6138ffe8f84569118b989f6fd19ddb74fb98ce328a9512823dc63017099f17c0"
+  },
+  "Content/Mars/Gameplay/PlayerCookbook/StylizedR03/Materials/Cookbook_Leather_M.uasset": {
+    "bytes": 9467,
+    "sha256": "153458676e666351dc0ad7825736324bb7985f9265b3199fb8a6f68aebf7595e"
+  },
+  "Content/Mars/Gameplay/PlayerCookbook/StylizedR03/Materials/Cookbook_LeatherLight_M.uasset": {
+    "bytes": 9776,
+    "sha256": "ffb2de6434d3333a237a3d9b34ce8a613536bb30246af484568dbad38e8f4866"
+  },
+  "Content/Mars/Gameplay/PlayerCookbook/StylizedR03/Materials/Cookbook_PageA_M.uasset": {
+    "bytes": 18968,
+    "sha256": "6fc6d942999d20c5ef853af019d27dbb87faeaa71114315cec7ce210a96189b5"
+  },
+  "Content/Mars/Gameplay/PlayerCookbook/StylizedR03/Materials/Cookbook_PageB_M.uasset": {
+    "bytes": 17257,
+    "sha256": "c13b760e3d921169fb9f70c363ad4aeabfd75db54466121fb2fce01e62f07a0d"
+  },
+  "Content/Mars/Gameplay/PlayerCookbook/StylizedR03/Materials/Cookbook_PageC_M.uasset": {
+    "bytes": 19023,
+    "sha256": "c34d70baddaa0407654a53f82842fb220a1e6c4ae7b7fa1eff5f100d8fd7836e"
+  },
+  "Content/Mars/Gameplay/PlayerCookbook/StylizedR03/Materials/Cookbook_PageD_M.uasset": {
+    "bytes": 17202,
+    "sha256": "1e9e01a4698083771de47e63a18609e1fe66f255a68a69671ffeb1d3fe1bdb1c"
+  },
+  "Content/Mars/Gameplay/PlayerCookbook/StylizedR03/Materials/Cookbook_PageEdgeLight_M.uasset": {
+    "bytes": 9994,
+    "sha256": "e03aa7ea44ea487d8005ac85278234ca0e03c88f5555274b283008c2081b51ba"
+  },
+  "Content/Mars/Gameplay/PlayerCookbook/StylizedR03/Materials/Cookbook_PageFirst_M.uasset": {
+    "bytes": 17226,
+    "sha256": "ef4a86bc1a0ab52880fc73d654d2b31404f67ec83d44611b46f23301b7ae6970"
+  },
+  "Content/Mars/Gameplay/PlayerCookbook/StylizedR03/Materials/Cookbook_PageLast_M.uasset": {
+    "bytes": 18986,
+    "sha256": "d93cb32b165c220a95b2c1192b6d6718812d474535ba7be25b255e4285b58a72"
+  },
+  "Content/Mars/Gameplay/PlayerCookbook/StylizedR03/Materials/Cookbook_PagesBase_M.uasset": {
+    "bytes": 10031,
+    "sha256": "b435f3a1ce1801e9cdb719951a4e3605e939252d0d90c66b1f14a47d894eead1"
+  },
+  "Content/Mars/Gameplay/PlayerCookbook/StylizedR03/Materials/Cookbook_Patch_M.uasset": {
+    "bytes": 9942,
+    "sha256": "0e9e173fbf444424973a32f5546034639c17e76156591c9f81abd04f345cf365"
+  },
+  "Content/Mars/Gameplay/PlayerCookbook/StylizedR03/Materials/Cookbook_Scuff_M.uasset": {
+    "bytes": 9767,
+    "sha256": "cf5d29063c2e7ef357acbe14dceb69a46a736e5b7a6fbc213e80592452af93f3"
+  },
+  "Content/Mars/Gameplay/PlayerCookbook/StylizedR03/Materials/Cookbook_Thread_M.uasset": {
+    "bytes": 9998,
+    "sha256": "738796f5c2f62a7a75c8c16cf6fe026641e815284682f3878d6c74bdbe38dab5"
+  },
+  "Content/Mars/Gameplay/PlayerCookbook/StylizedR03/Meshes/SK_Cookbook_Field.uasset": {
+    "bytes": 6548003,
+    "sha256": "bcf9a1f31a00216f43e03cb070a129a281a2a9604d8622e1a573c30eba5ba68e"
+  },
+  "Content/Mars/Gameplay/PlayerCookbook/StylizedR03/Meshes/SK_Cookbook_Field_Skeleton.uasset": {
+    "bytes": 6021,
+    "sha256": "76b33e4f8b313520d89aa7fee7b5959ae32907d694de3b42b69fdad6ae940d83"
+  },
+  "Content/Mars/Gameplay/PlayerCookbook/StylizedR03/Meshes/SM_Cookbook_Closed.uasset": {
+    "bytes": 371915,
+    "sha256": "d0f4ed2a7cb9dacd07d93b1646b3998811a4348d378c84819514b605773a53d4"
+  }
+}
