@@ -11,7 +11,7 @@ class AMars_Master_PlayerState : ACk_PlayerState_UE
     {
         EntityBridge.Promise_OnEntityConstructed(FCk_Delegate_EntityScript_Constructed(this, n"OnEntityConstructed"));
         EntityBridge.Promise_OnEntityReady(FCk_Delegate_EntityBridge_OnEntityReady(this, n"OnActorEcsReady"));
-        EntityBridge.Request_SpawnEntity(UCk_EntityScript_WithActor_UE);
+        EntityBridge.Request_SpawnLinkedEntity(UCk_EntityScript_WithActor_UE);
     }
 
     UFUNCTION()

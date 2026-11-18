@@ -242,7 +242,7 @@ class AMars_PlayerCharacter : AMars_Character
     void BeginPlay()
     {
         EntityBridge.Promise_OnEntityConstructed(FCk_Delegate_EntityScript_Constructed(this, n"OnEntityConstructed"));
-        EntityBridge.Request_SpawnEntity(UCk_EntityScript_WithActor_UE);
+        EntityBridge.Request_SpawnLinkedEntity(UCk_EntityScript_WithActor_UE);
     }
 
     // Every machine composes all of it. The player entity replicates with the pawn (its driver is on the pawn; on a

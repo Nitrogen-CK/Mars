@@ -45,7 +45,7 @@ class AMars_TestLamp : AActor
     void BeginPlay()
     {
         EntityBridge.Promise_OnEntityConstructed(FCk_Delegate_EntityScript_Constructed(this, n"OnEntityConstructed"));
-        EntityBridge.Request_SpawnEntity(UMars_TestLamp_EntityScript);
+        EntityBridge.Request_SpawnLinkedEntity(UMars_TestLamp_EntityScript);
     }
 
     void Toggle()

@@ -16,7 +16,7 @@ class AMars_Master_PlayerController : ACk_PlayerController_UE
     void BeginPlay()
     {
         EntityBridge.Promise_OnEntityConstructed(FCk_Delegate_EntityScript_Constructed(this, n"OnEntityConstructed"));
-        EntityBridge.Request_SpawnEntity(UCk_EntityScript_WithActor_UE);
+        EntityBridge.Request_SpawnLinkedEntity(UCk_EntityScript_WithActor_UE);
 
         if (IsLocalController() == false)
         { return; }
