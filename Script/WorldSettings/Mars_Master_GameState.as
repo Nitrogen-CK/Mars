@@ -2,11 +2,26 @@ delegate void FMars_Delegate_GameState_OnEcsComposed(FCk_Handle InEntity);
 event void FMars_Delegate_GameState_OnEcsComposed_MC(FCk_Handle InEntity);
 
 // Every Master_* class bridges its actor to an ECS entity the same way: it carries a Ck Entity Bridge and
-// BeginPlay requests the entity through it. The order on every machine is:
-//   1. OnEntityConstructed -> EcsConstructionScript (compose features);
+// BeginPlay requests the entity through it, built by the class's own entity script. The order on every machine is:
+//   1. the script's DoConstruct -> Request_ComposeEntity -> EcsConstructionScript (compose features);
 //   2. OnEcsComposed: the composed features are safe to read;
 //   3. OnEcsReady: the entity has begun play and, on a client, its replicated values have arrived.
 // Consumers that read features composed in EcsConstructionScript wait for OnEcsComposed or OnEcsReady.
+UCLASS(NotPlaceable)
+class UMars_Master_GameState_EntityScript : UCk_EntityScript_WithActor_UE
+{
+    UFUNCTION(BlueprintOverride)
+    ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
+    {
+        auto Actor = Cast<AMars_Master_GameState>(DoGet_Actor());
+        if (ck::EnsureIfNot(ck::IsValid(Actor), "[Mars_Master_GameState] the entity script's Actor is not a Master GameState"))
+        { return ECk_EntityScript_ConstructionFlow::Finished; }
+
+        Actor.Request_ComposeEntity(InHandle);
+        return ECk_EntityScript_ConstructionFlow::Finished;
+    }
+}
+
 class AMars_Master_GameState : ACk_GameState_UE
 {
     UPROPERTY(DefaultComponent)
@@ -20,15 +35,14 @@ class AMars_Master_GameState : ACk_GameState_UE
     UFUNCTION(BlueprintOverride)
     void BeginPlay()
     {
-        EntityBridge.Promise_OnEntityConstructed(FCk_Delegate_EntityScript_Constructed(this, n"OnEntityConstructed"));
         EntityBridge.Promise_OnEntityReady(FCk_Delegate_EntityBridge_OnEntityReady(this, n"OnActorEcsReady"));
-        EntityBridge.Request_SpawnLinkedEntity(UCk_EntityScript_WithActor_UE);
+        EntityBridge.Request_SpawnLinkedEntity(UMars_Master_GameState_EntityScript);
     }
 
-    UFUNCTION()
-    private void OnEntityConstructed(FCk_Handle_EntityScript InEntityScriptHandle)
+    // Called by the entity script while it constructs the entity (step 1 above).
+    void Request_ComposeEntity(FCk_Handle InEntity)
     {
-        ThisActorEntity = InEntityScriptHandle;
+        ThisActorEntity = InEntity;
         utils_handle::Set_DebugName(ThisActorEntity, n"GameState");
         EcsConstructionScript(ThisActorEntity);
 
@@ -36,7 +50,7 @@ class AMars_Master_GameState : ACk_GameState_UE
         _OnEcsComposed.Broadcast(ThisActorEntity);
     }
 
-    // Fires once, right after EcsConstructionScript has composed this GameState's features (step 3 above); binding after
+    // Fires once, right after EcsConstructionScript has composed this GameState's features (step 2 above); binding after
     // the fact calls the delegate immediately.
     void Promise_OnEcsComposed(FMars_Delegate_GameState_OnEcsComposed InDelegate)
     {

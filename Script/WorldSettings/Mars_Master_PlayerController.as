@@ -1,4 +1,19 @@
 // See AMars_Master_GameState for the actor -> entity bridge contract.
+UCLASS(NotPlaceable)
+class UMars_Master_PlayerController_EntityScript : UCk_EntityScript_WithActor_UE
+{
+    UFUNCTION(BlueprintOverride)
+    ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
+    {
+        auto Actor = Cast<AMars_Master_PlayerController>(DoGet_Actor());
+        if (ck::EnsureIfNot(ck::IsValid(Actor), "[Mars_Master_PlayerController] the entity script's Actor is not a Master PlayerController"))
+        { return ECk_EntityScript_ConstructionFlow::Finished; }
+
+        Actor.Request_ComposeEntity(InHandle);
+        return ECk_EntityScript_ConstructionFlow::Finished;
+    }
+}
+
 class AMars_Master_PlayerController : ACk_PlayerController_UE
 {
     UPROPERTY(DefaultComponent)
@@ -15,8 +30,7 @@ class AMars_Master_PlayerController : ACk_PlayerController_UE
     UFUNCTION(BlueprintOverride)
     void BeginPlay()
     {
-        EntityBridge.Promise_OnEntityConstructed(FCk_Delegate_EntityScript_Constructed(this, n"OnEntityConstructed"));
-        EntityBridge.Request_SpawnLinkedEntity(UCk_EntityScript_WithActor_UE);
+        EntityBridge.Request_SpawnLinkedEntity(UMars_Master_PlayerController_EntityScript);
 
         if (IsLocalController() == false)
         { return; }
@@ -35,10 +49,10 @@ class AMars_Master_PlayerController : ACk_PlayerController_UE
         return InputComp;
     }
 
-    UFUNCTION()
-    private void OnEntityConstructed(FCk_Handle_EntityScript InEntityScriptHandle)
+    // Called by the entity script while it constructs the entity.
+    void Request_ComposeEntity(FCk_Handle InEntity)
     {
-        ThisActorEntity = InEntityScriptHandle;
+        ThisActorEntity = InEntity;
         utils_handle::Set_DebugName(ThisActorEntity, n"PlayerController");
         EcsConstructionScript(ThisActorEntity);
     }

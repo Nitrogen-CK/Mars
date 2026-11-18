@@ -1,5 +1,21 @@
 event void FMars_PlayerCharacter_OnGameplayComposed(FCk_Handle InEntity);
 
+// The player's entity script: composes the player entity through the pawn on every machine that has the entity.
+UCLASS(NotPlaceable)
+class UMars_PlayerCharacter_EntityScript : UCk_EntityScript_WithActor_UE
+{
+    UFUNCTION(BlueprintOverride)
+    ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
+    {
+        auto Actor = Cast<AMars_PlayerCharacter>(DoGet_Actor());
+        if (ck::EnsureIfNot(ck::IsValid(Actor), "[PlayerCharacter] the entity script's Actor is not a player character"))
+        { return ECk_EntityScript_ConstructionFlow::Finished; }
+
+        Actor.Request_ComposeEntity(InHandle);
+        return ECk_EntityScript_ConstructionFlow::Finished;
+    }
+}
+
 class AMars_PlayerCharacter : AMars_Character
 {
     UPROPERTY(DefaultComponent)
@@ -241,20 +257,19 @@ class AMars_PlayerCharacter : AMars_Character
     UFUNCTION(BlueprintOverride)
     void BeginPlay()
     {
-        EntityBridge.Promise_OnEntityConstructed(FCk_Delegate_EntityScript_Constructed(this, n"OnEntityConstructed"));
-        EntityBridge.Request_SpawnLinkedEntity(UCk_EntityScript_WithActor_UE);
+        EntityBridge.Request_SpawnLinkedEntity(UMars_PlayerCharacter_EntityScript);
     }
 
-    // Every machine composes all of it. The player entity replicates with the pawn (its driver is on the pawn; on a
+    // Called by UMars_PlayerCharacter_EntityScript while it constructs the entity, so every machine composes all of it
+    // before anything observes the entity. The player entity replicates with the pawn (its driver is on the pawn; on a
     // client the request above is ignored and the server's entity arrives as a replica bound to this pawn), so it is
     // the replicated owner of the cues its owner fires (a drop, a throw) and of the replicated state machine below.
     // The interaction resolver, prompts, hints, hands, viewpoint and input are owner-local (stance E). The hotbar
     // replicates (its slot roots are children of this entity; the authority decides what they hold and what is
     // selected) and HeldItem derives from it on every machine.
-    UFUNCTION()
-    private void OnEntityConstructed(FCk_Handle_EntityScript InEntityScriptHandle)
+    void Request_ComposeEntity(FCk_Handle InEntity)
     {
-        FCk_Handle Player = InEntityScriptHandle;
+        FCk_Handle Player = InEntity;
         utils_handle::Set_DebugName(Player, n"Player");
 
         utils_input_intents::Add(Player);

@@ -4,6 +4,46 @@ class UMars_TestLamp_EntityScript : UCk_EntityScript_WithActor_UE
     // Each machine's own dev prop: the lamp and its actor never replicate, so a toggle changes the light on the
     // toggling machine only.
     default _Replication = ECk_Replication::DoesNotReplicate;
+
+    UFUNCTION(BlueprintOverride)
+    ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
+    {
+        auto Actor = Cast<AMars_TestLamp>(DoGet_Actor());
+        if (ck::EnsureIfNot(ck::IsValid(Actor), "[Mars_TestLamp] the entity script's Actor is not a test lamp"))
+        { return ECk_EntityScript_ConstructionFlow::Finished; }
+
+        auto Lamp = InHandle;
+        utils_handle::Set_DebugName(Lamp, n"TestLamp");
+
+        auto Probe = FMars_Interactable_ProbeInfo();
+        Probe.ProbeSpec = FCk_Probe_Spec(GameplayTags::Probe_Mars_Interact);
+        Probe.ProbeShape = utils_shapes::Make_Box(FCk_ShapeBox_Dimensions(Actor.GetActorScale3D() * 50.0));
+
+        auto Prompt = FMars_InteractPrompt_Spec();
+        Prompt.InputAction = mars::Mars_IA_Interact_Use;
+        Prompt.PromptText = Actor.PromptText;
+
+        auto TargetSpec = FCk_InteractTarget_Spec(GameplayTags::InteractionChannel_Mars_Use);
+        TargetSpec.Set_CompletionPolicy(ECk_Interaction_CompletionPolicy::Instant);
+
+        auto Target = FMars_Interactable_TargetEntry();
+        Target.InteractTargetSpec = TargetSpec;
+        Target.InteractPromptSpec = Prompt;
+        Target.InteractionStateClass = UMars_SmState_TestLamp_Toggle;
+
+        auto Spec = FMars_Interactable_Spec();
+        Spec.ProbeInfo = Probe;
+        Spec.Targets.Add(Target);
+
+        auto LampTransform = Lamp.As_Transform();
+
+        LampTransform.Add_MeshPart(Actor, FMars_MeshPart(FTransform::Identity, Actor.Mesh.StaticMesh, Actor.Mesh.GetMaterial(0),
+            collision::profile::NoCollision, n"TestLampVisual"));
+
+        utils_interactable::Create(LampTransform, Spec);
+
+        return ECk_EntityScript_ConstructionFlow::Finished;
+    }
 }
 
 class AMars_TestLamp : AActor
@@ -44,47 +84,12 @@ class AMars_TestLamp : AActor
     UFUNCTION(BlueprintOverride)
     void BeginPlay()
     {
-        EntityBridge.Promise_OnEntityConstructed(FCk_Delegate_EntityScript_Constructed(this, n"OnEntityConstructed"));
         EntityBridge.Request_SpawnLinkedEntity(UMars_TestLamp_EntityScript);
     }
 
     void Toggle()
     {
         Light.SetVisibility(Light.IsVisible() == false);
-    }
-
-    UFUNCTION()
-    private void OnEntityConstructed(FCk_Handle_EntityScript InEntityScriptHandle)
-    {
-        FCk_Handle Lamp = InEntityScriptHandle;
-        utils_handle::Set_DebugName(Lamp, n"TestLamp");
-
-        auto Probe = FMars_Interactable_ProbeInfo();
-        Probe.ProbeSpec = FCk_Probe_Spec(GameplayTags::Probe_Mars_Interact);
-        Probe.ProbeShape = utils_shapes::Make_Box(FCk_ShapeBox_Dimensions(GetActorScale3D() * 50.0));
-
-        auto Prompt = FMars_InteractPrompt_Spec();
-        Prompt.InputAction = mars::Mars_IA_Interact_Use;
-        Prompt.PromptText = PromptText;
-
-        auto TargetSpec = FCk_InteractTarget_Spec(GameplayTags::InteractionChannel_Mars_Use);
-        TargetSpec.Set_CompletionPolicy(ECk_Interaction_CompletionPolicy::Instant);
-
-        auto Target = FMars_Interactable_TargetEntry();
-        Target.InteractTargetSpec = TargetSpec;
-        Target.InteractPromptSpec = Prompt;
-        Target.InteractionStateClass = UMars_SmState_TestLamp_Toggle;
-
-        auto Spec = FMars_Interactable_Spec();
-        Spec.ProbeInfo = Probe;
-        Spec.Targets.Add(Target);
-
-        auto LampTransform = Lamp.As_Transform();
-
-        LampTransform.Add_MeshPart(this, FMars_MeshPart(FTransform::Identity, Mesh.StaticMesh, Mesh.GetMaterial(0),
-            collision::profile::NoCollision, n"TestLampVisual"));
-
-        utils_interactable::Create(LampTransform, Spec);
     }
 }
 

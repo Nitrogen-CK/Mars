@@ -21,8 +21,8 @@ class UMars_AutoTest_Control_PendingGripFreezesCamera : UMars_AutoTestRig_LeverT
             return;
         }
 
-        _CameraHelper.EntityBridge.Promise_OnEntityConstructed(
-            FCk_Delegate_EntityScript_Constructed(this, n"OnCameraHelperReady"));
+        _CameraHelper.EntityBridge.Promise_OnEntityReady(
+            FCk_Delegate_EntityBridge_OnEntityReady(this, n"OnCameraHelperReady"));
 
         auto HandsSpec = FMars_FPHands_Spec();
         HandsSpec.Reach.Hold.ReachSeconds = 2.0f;
@@ -41,11 +41,11 @@ class UMars_AutoTest_Control_PendingGripFreezesCamera : UMars_AutoTestRig_LeverT
     }
 
     UFUNCTION()
-    private void OnCameraHelperReady(FCk_Handle_EntityScript InEntityScriptHandle)
+    private void OnCameraHelperReady(AActor InActor, FCk_Handle InEntity)
     {
         // Outside the test's own lifetime subtree: the runner's cascade would leave it alive into later tests.
-        Track_ForCleanup(InEntityScriptHandle);
-        _CameraOwner = InEntityScriptHandle.As_Transform();
+        Track_ForCleanup(InEntity);
+        _CameraOwner = InEntity.As_Transform();
     }
 
     UFUNCTION()

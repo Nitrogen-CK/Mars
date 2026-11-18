@@ -18,8 +18,8 @@ class UMars_AutoTest_CampServiceView_TargetBlendsAndCampMenuHoldsUntilRelease : 
             ACkAutoTest_GameplayCamera_Helper, FVector::ZeroVector, FRotator::ZeroRotator));
         if (ck::Is_NOT_Valid(_Helper))
         { FinishFailure("camera helper did not spawn"); return; }
-        _Helper.EntityBridge.Promise_OnEntityConstructed(
-            FCk_Delegate_EntityScript_Constructed(this, n"OnHelperReady"));
+        _Helper.EntityBridge.Promise_OnEntityReady(
+            FCk_Delegate_EntityBridge_OnEntityReady(this, n"OnHelperReady"));
 
         Add_Step_WaitUntil("helper has composed", n"Check_HelperReady", 0, 0);
         Add_Step("compose director and player viewpoint", n"Step_Compose");
@@ -36,7 +36,7 @@ class UMars_AutoTest_CampServiceView_TargetBlendsAndCampMenuHoldsUntilRelease : 
     }
 
     UFUNCTION()
-    private void OnHelperReady(FCk_Handle_EntityScript InScript)
+    private void OnHelperReady(AActor InActor, FCk_Handle InScript)
     {
         Track_ForCleanup(InScript);
         _CameraOwner = InScript.As_Transform();
