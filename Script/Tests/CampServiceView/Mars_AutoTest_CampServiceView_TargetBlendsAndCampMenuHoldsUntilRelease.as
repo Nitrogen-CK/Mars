@@ -18,7 +18,7 @@ class UMars_AutoTest_CampServiceView_TargetBlendsAndCampMenuHoldsUntilRelease : 
             ACkAutoTest_GameplayCamera_Helper, FVector::ZeroVector, FRotator::ZeroRotator));
         if (ck::Is_NOT_Valid(_Helper))
         { FinishFailure("camera helper did not spawn"); return; }
-        utils_pending_entity_script::Promise_OnConstructed(_Helper.PendingEntity,
+        _Helper.EntityBridge.Promise_OnEntityConstructed(
             FCk_Delegate_EntityScript_Constructed(this, n"OnHelperReady"));
 
         Add_Step_WaitUntil("helper has composed", n"Check_HelperReady", 0, 0);

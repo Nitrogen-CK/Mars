@@ -30,8 +30,8 @@ class UMars_AutoTest_Control_ViewStaysHeldUntilUseReleases : UMars_AutoTestRig_L
             return;
         }
 
-        utils_pending_entity_script::Promise_OnConstructed(
-            _CameraHelper.PendingEntity, FCk_Delegate_EntityScript_Constructed(this, n"OnCameraHelperReady"));
+        _CameraHelper.EntityBridge.Promise_OnEntityConstructed(
+            FCk_Delegate_EntityScript_Constructed(this, n"OnCameraHelperReady"));
 
         BuildPlayerAndLever(InHandle, FMars_FPHands_Spec());
 

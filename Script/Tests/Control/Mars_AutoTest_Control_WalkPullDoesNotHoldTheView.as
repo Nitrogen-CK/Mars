@@ -26,8 +26,8 @@ class UMars_AutoTest_Control_WalkPullDoesNotHoldTheView : UMars_AutoTestRig_Leve
             return;
         }
 
-        utils_pending_entity_script::Promise_OnConstructed(
-            _CameraHelper.PendingEntity, FCk_Delegate_EntityScript_Constructed(this, n"OnCameraHelperReady"));
+        _CameraHelper.EntityBridge.Promise_OnEntityConstructed(
+            FCk_Delegate_EntityScript_Constructed(this, n"OnCameraHelperReady"));
 
         auto PlayerEntity = InHandle;
         _PlayerRoot = utils_transform::Add(PlayerEntity, FTransform(FRotator::ZeroRotator, Get_PullerLocation(0.0)),

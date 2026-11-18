@@ -21,8 +21,8 @@ class UMars_AutoTest_Control_PendingGripFreezesCamera : UMars_AutoTestRig_LeverT
             return;
         }
 
-        utils_pending_entity_script::Promise_OnConstructed(
-            _CameraHelper.PendingEntity, FCk_Delegate_EntityScript_Constructed(this, n"OnCameraHelperReady"));
+        _CameraHelper.EntityBridge.Promise_OnEntityConstructed(
+            FCk_Delegate_EntityScript_Constructed(this, n"OnCameraHelperReady"));
 
         auto HandsSpec = FMars_FPHands_Spec();
         HandsSpec.Reach.Hold.ReachSeconds = 2.0f;
