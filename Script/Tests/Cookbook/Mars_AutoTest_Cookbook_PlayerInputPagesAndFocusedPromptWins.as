@@ -117,8 +117,7 @@ class UMars_AutoTest_Cookbook_PlayerInputPagesAndFocusedPromptWins : UMars_AutoT
         Assert_True(_HeldItem.Get_CurrentItem() == _BookItem, "picking up a second item leaves the cookbook selected");
         Assert_True(_BookPresentation.Get_IsOpen(), "Primary ran the focused world pickup instead of closing the book");
         Assert_Equals_Int(_BookPresentation.Get_PageSectionIndex(), 0, "the focused pickup did not turn a page");
-        const auto View = utils_held_view::Make(_BookItem);
-        Assert_False(View.Mesh.IsNull(), "the remote held-item view retains the closed static book proxy");
+        Assert_False(_BookItem.Get_Presentation().Visual.Mesh.IsNull(), "the book keeps its closed static mesh for the owner's held-item shadow");
     }
 
     UFUNCTION()

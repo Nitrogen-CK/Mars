@@ -62,8 +62,8 @@ enum EMars_NetRatTest_Swing
 }
 
 // The pantry rat loot net tests' shared steps, on top of the rat rig. The striker is a carrier on the subject on both
-// machines (a hand node, a belt node, their attach points, a hotbar of one bag slot, HeldItem and HeldItemUse), a team
-// and a dealer whose dealt hits each machine counts; armed is the server's cleaver in slot 0, selected. The subject
+// machines (a hand node, a belt node, their attach points, a hotbar of one bag slot, HeldItem and HeldItemUse, a viewpoint
+// on the hand node), a team and a dealer whose dealt hits each machine counts; armed is the server's cleaver in slot 0, selected. The subject
 // carries no prey tag, so no raid reads it as a chef. The food court is the rat court plus a Mushroom, stowed into
 // cargo slot 1 with the Monk's Rind in slot 2, so the first lease takes the Mushroom. Each machine samples what its
 // rat carries (its carry visual against the mouth), its first dead frame and its corpse's fade, finds its food copy
@@ -172,6 +172,12 @@ class UMars_AutoTestRig_NetPantryRatLoot : UMars_AutoTestRig_NetPantryRat
         Carrier.HeldItem = utils_held_item::Add(Subject);
         Carrier.Use = utils_held_item_use::Add(Subject);
         _Striker = Carrier;
+
+        // The view is the hand node, where the rows sweep from (the authority judges a strike's reach from the view).
+        auto Viewpoint = FMars_Fragment_PlayerViewpoint();
+        Viewpoint.Viewpoint = Carrier.Hand;
+        Subject.Add_Fragment(FMars_Feature_PlayerViewpoint());
+        Subject.Add_Fragment(Viewpoint);
 
         utils_team::Add(Subject, ECk_Team_ID::One, ECk_Replication::DoesNotReplicate);
         _StrikerDealer = utils_damage_dealer::Add(Subject, FMars_DamageDealer_Spec());

@@ -81,9 +81,9 @@ class UMars_AutoTest_FPHands_GripPointsGiveTheHeldSocketGrips : UMars_AutoTestRi
         Assert_True(Grips.Right.Equals(Right.GetValue() * HeldOffset, 0.001), f"the right socket grip [{Grips.Right}] is the right node placed by HeldOffset");
         Assert_True(Grips.Left.Equals(Left.GetValue() * HeldOffset, 0.001), f"the left socket grip [{Grips.Left}] is the left node placed by HeldOffset");
 
-        const auto View = utils_held_view::Make(Item);
-        Assert_True(View.Grip.HasSocketGrips, "the held view carries socket grips");
-        Assert_True(View.Grip.SocketGrip_R.Equals(Grips.Right, 0.001) && View.Grip.SocketGrip_L.Equals(Grips.Left, 0.001),
-            "the held view's socket grips are the gloves'");
+        const auto BodyGrip = utils_held_view::Make_Grip(Item);
+        Assert_True(BodyGrip.HasSocketGrips, "the body's grip carries socket grips");
+        Assert_True(BodyGrip.SocketGrip_R.Equals(Grips.Right, 0.001) && BodyGrip.SocketGrip_L.Equals(Grips.Left, 0.001),
+            "the body's socket grips are the gloves'");
     }
 }

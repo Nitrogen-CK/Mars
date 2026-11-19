@@ -27,34 +27,38 @@ class UMars_AutoTest_HeldView_ItemSitsAtTheRightPalm : UCk_AutoTest_Base
     UFUNCTION()
     private void Step_AssertItemInGrip(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        const auto View = utils_held_view::Make(_RockHolder.Get_Items()[0]);
-        Assert_True(View.Grip.Kind == EMars_FPHands_HoldKind::TwoHanded && View.Grip.HasSocketGrips == false,
+        const auto Rock = _RockHolder.Get_Items()[0];
+        const auto Grip = utils_held_view::Make_Grip(Rock);
+        const auto Presentation = Rock.Get_Presentation();
+        const auto HeldOffset = Presentation.Mounting.HeldOffset;
+        const auto MeshScale = Presentation.Visual.MeshScale;
+        Assert_True(Grip.Kind == EMars_FPHands_HoldKind::TwoHanded && Grip.HasSocketGrips == false,
             "the rock is a fitted two-handed hold");
-        Assert_True(View.HeldOffset.Equals(FTransform::Identity), "the rock's HeldOffset is identity (centred on the hand node)");
+        Assert_True(HeldOffset.Equals(FTransform::Identity), "the rock's HeldOffset is identity (centred on the hand node)");
 
         const auto Spec = FMars_FPHands_Spec();
-        const auto Grips = utils_held_view::Get_GripTargets(Spec, View.Grip);
-        const auto PalmGap = Grips.Right.GetLocation().Y - View.Grip.RightFaceY;
+        const auto Grips = utils_held_view::Get_GripTargets(Spec, Grip);
+        const auto PalmGap = Grips.Right.GetLocation().Y - Grip.RightFaceY;
         Assert_True(Math::Abs(PalmGap - Spec.Rest.PalmSurfaceOffset) < 0.001,
             f"the right grip sits PalmSurfaceOffset [{Spec.Rest.PalmSurfaceOffset}] outside the right face (gap {PalmGap})");
 
-        const auto ItemInGrip = utils_held_view::Get_ItemInGrip(Spec, View);
+        const auto ItemInGrip = utils_held_view::Get_ItemInGrip(Spec, HeldOffset, Grip);
         const auto Composed = ItemInGrip * Grips.Right;
-        Assert_True(Composed.Equals(View.HeldOffset, 0.001), f"item-in-grip composed with the right grip is HeldOffset (got [{Composed}])");
+        Assert_True(Composed.Equals(HeldOffset, 0.001), f"item-in-grip composed with the right grip is HeldOffset (got [{Composed}])");
 
         const auto Reach = ItemInGrip.GetLocation().Size();
-        const auto Expected = View.Grip.RightFaceY + Spec.Rest.PalmSurfaceOffset;
+        const auto Expected = Grip.RightFaceY + Spec.Rest.PalmSurfaceOffset;
         Assert_True(Math::Abs(Reach - Expected) < 0.001, f"the rock's centre is RightFaceY + PalmSurfaceOffset [{Expected}] from the palm (got {Reach})");
         // The palm (grip Z) faces the item: its centre is on the palm side of the grip.
         Assert_True(ItemInGrip.GetLocation().Z > 0.5 * Reach, f"the rock is on the palm side of the right grip ([{ItemInGrip.GetLocation()}])");
 
         // On the body the component hangs under grip_r, which carries the body's scale.
         const auto BodyScale = 1.0969f;
-        const auto BodyItem = utils_held_view::Get_BodyItemTransform(ItemInGrip, View.MeshScale, BodyScale);
+        const auto BodyItem = utils_held_view::Get_BodyItemTransform(ItemInGrip, MeshScale, BodyScale);
         const auto GripBone = FTransform(Grips.Right.GetRotation(), Grips.Right.GetLocation(), FVector(BodyScale, BodyScale, BodyScale));
         const auto OnBody = BodyItem * GripBone;
-        Assert_True(OnBody.GetLocation().Equals(View.HeldOffset.GetLocation(), 0.001), f"the body item sits where the first-person item does (got [{OnBody.GetLocation()}])");
-        Assert_True(OnBody.GetScale3D().Equals(View.MeshScale, 0.001), f"the body item keeps the item's world size (got [{OnBody.GetScale3D()}])");
+        Assert_True(OnBody.GetLocation().Equals(HeldOffset.GetLocation(), 0.001), f"the body item sits where the first-person item does (got [{OnBody.GetLocation()}])");
+        Assert_True(OnBody.GetScale3D().Equals(MeshScale, 0.001), f"the body item keeps the item's world size (got [{OnBody.GetScale3D()}])");
     }
 
     private FCk_Handle_Inventory_DataOnly MakeSeededHolder(FCk_Handle InHandle, UCk_InventoryItem_Definition InDefinition)
