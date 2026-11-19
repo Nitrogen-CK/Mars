@@ -1,6 +1,5 @@
 // Stance D, nothing replicates: every machine derives the held item from the replicated hotbar
-// (UMars_Processor_HeldItem_Sync); the first-person visual is spawned only for a carrier that is locally controlled or
-// has no character.
+// (UMars_Processor_HeldItem_Sync) and presents it in the carrier's hand on that machine, whoever controls the carrier.
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
@@ -10,7 +9,7 @@ asset Mars_HeldItemHandle of UCkDynamic_HandleDefinition
 {
     TypeName = "FCk_Handle_HeldItem";
     RequiredFragments.Add(FMars_Feature_HeldItem);
-    Description = "The item in the player's hands, derived from the selected hotbar slot, and its first-person held visual";
+    Description = "The item in the player's hands, derived from the selected hotbar slot, and its held visual";
 }
 struct FMars_Feature_HeldItem {}
 

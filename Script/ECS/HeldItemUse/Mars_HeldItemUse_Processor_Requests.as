@@ -6,7 +6,8 @@
 // own in arrival order, and judged against what the authority holds: refused at the first of ItemMismatch (nothing held
 // that strikes, or not the claimed item), TooSoon (the last applied blow is under k_StrikeMinIntervalFraction of the held
 // item's swing ago), NoZone (no live zone with a hurtbox at the address) and OutOfReach (the contact is past Reach + Radius
-// + k_StrikeReachSlack from the hand, or past k_StrikeZoneSlack from every hurtbox of the zone). Otherwise it is dealt
+// + k_StrikeReachSlack from the striker's view, or past k_StrikeZoneSlack from every hurtbox of the zone). Reach is never
+// measured from AttachPoint.Mars.Hand: it is presentation and differs per machine. Otherwise it is dealt
 // through the player's dealer from the authority's copy of the item's Strike trait; friendly fire and a disabled zone stay
 // the dealer's rejections. The tally records every verdict.
 //
@@ -28,8 +29,9 @@
 // item already has its world item: it is asked to Release (it takes the item back into its holder, then goes Dynamic and
 // launches). Either way the hotbar's sync pass sees the slot empty and the held item follows. They launch only on the
 // authority, from the aim the request carries (the launching machine's, through Cue.Mars.HeldItemUse.Launch) or, without
-// one, from the player's view here; a non-authority drops them. Refresh and SetThrowArmed are owner-local and apply on
-// every machine.
+// one, from the player's view here; a non-authority drops them. A launch leaves from the launching machine's hand when its
+// aim carries one the authority accepts (a Persistent item's Release then carries that start pose). Refresh and
+// SetThrowArmed are owner-local and apply on every machine.
 class UMars_Processor_HeldItemUse_HandleRequests : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -223,7 +225,11 @@ class UMars_Processor_HeldItemUse_HandleRequests : UCk_Processor_Script_Base_UE
 
         if (Item.Has_PersistentWorldItem())
         {
-            WorldItem.Request_Release(FMars_Request_WorldItem_Release(Solution.LinearVelocity, Solution.AngularVelocityDeg));
+            auto Release = FMars_Request_WorldItem_Release(Solution.LinearVelocity, Solution.AngularVelocityDeg);
+            if (Solution.OriginFrom == EMars_HeldItemUse_LaunchOrigin::LaunchingMachine)
+            { Release.StartPose = TOptional<FTransform>(Solution.Origin); }
+
+            WorldItem.Request_Release(Release);
 
             InState.LaunchedItem = Item;
             InState.LaunchedAtItemChange = HeldItem.Get_ItemChangeCount();
@@ -281,8 +287,9 @@ class UMars_Processor_HeldItemUse_HandleRequests : UCk_Processor_Script_Base_UE
             return;
         }
 
-        const auto Hand = utils_transform::Get_EntityCurrentTransform(HeldItem.Get_HandAttachPoint()).GetLocation();
-        const auto IsWithinReach = (InClaim.Location - Hand).Size() <= Strike.Reach + Strike.Radius + constants_held_item_use::k_StrikeReachSlack;
+        const auto View = utils_held_item_use::Get_ViewTransform(InPlayer).GetLocation();
+        const auto ReachLimit = Strike.Reach + Strike.Radius + constants_held_item_use::k_StrikeReachSlack;
+        const auto IsWithinReach = (InClaim.Location - View).Size() <= ReachLimit;
         if (IsWithinReach == false || Get_IsNearAHurtbox(Zone, InClaim.Location) == false)
         {
             RefuseStrike(InState, EMars_HeldItemUse_StrikeRefusal::OutOfReach);

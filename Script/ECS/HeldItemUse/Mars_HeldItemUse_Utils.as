@@ -87,7 +87,6 @@ mixin TOptional<FMars_HeldItemUse_LaunchSolution> Get_LaunchSolutionFor(const FC
         AngularVelocityDeg = Throwable.AngularVelocityDeg;
     }
 
-    const auto View = Self.Get_LaunchView();
     FCk_Handle Carrier = Self;
     const auto Aim = InLaunch.Aim.IsSet() ? InLaunch.Aim.GetValue() : utils_held_item_use::Make_Aim(Carrier);
     const auto Forward = Aim.Forward;
@@ -100,25 +99,74 @@ mixin TOptional<FMars_HeldItemUse_LaunchSolution> Get_LaunchSolutionFor(const FC
     Solution.LinearVelocity = Forward * Speed + Aim.PawnVelocity;
     Solution.AngularVelocityDeg = AngularVelocityDeg;
 
+    // Only a carried aim (the launching machine's) names an origin; a local launch leaves from this machine's own hand.
+    auto Accepted = TOptional<FTransform>();
+    if (InLaunch.Aim.IsSet())
+    { Accepted = Self.Get_AcceptedLaunchOrigin(InLaunch.Aim.GetValue()); }
+
     if (Item.Has_PersistentWorldItem())
     {
         const auto WorldItem = Item.Get_PersistentWorldItem();
         if (ck::Is_NOT_Valid(WorldItem))
         { return TOptional<FMars_HeldItemUse_LaunchSolution>(); }
 
+        // The item's root rides HeldOffset on the hand: on the launching machine's hand when the authority accepts it.
         FCk_Handle WorldItemEntity = WorldItem;
-        const auto Mounted = utils_transform::Get_EntityCurrentTransform(WorldItemEntity.As_Transform());
+        auto Mounted = utils_transform::Get_EntityCurrentTransform(WorldItemEntity.As_Transform());
+        if (Accepted.IsSet() && Item.Has_Presentation())
+        {
+            Mounted = Item.Get_Presentation().Mounting.HeldOffset * Accepted.GetValue();
+            Solution.OriginFrom = EMars_HeldItemUse_LaunchOrigin::LaunchingMachine;
+        }
+
         Solution.Origin = FTransform(Mounted.Rotator(), Mounted.GetLocation());
         return TOptional<FMars_HeldItemUse_LaunchSolution>(Solution);
     }
 
-    auto Origin = FTransform(View.Rotator(), View.GetLocation() + Forward * constants_held_item_use::k_NoHandSpawnDistance);
-    auto Hand = HeldItem.Get_HandAttachPoint();
-    if (ck::IsValid(Hand))
-    { Origin = utils_transform::Get_EntityCurrentTransform(Hand); }
+    auto Origin = Self.Get_OwnLaunchOrigin(Forward);
+    if (Accepted.IsSet())
+    {
+        Origin = Accepted.GetValue();
+        Solution.OriginFrom = EMars_HeldItemUse_LaunchOrigin::LaunchingMachine;
+    }
 
     Solution.Origin = FTransform(Origin.Rotator(), Origin.GetLocation());
     return TOptional<FMars_HeldItemUse_LaunchSolution>(Solution);
+}
+
+// Where this machine launches from: its copy of the hand attach point, or InForward of its view without one.
+mixin FTransform Get_OwnLaunchOrigin(const FCk_Handle_HeldItemUse& Self, FVector InForward)
+{
+    const auto Hand = Self.As_HeldItem().Get_HandAttachPoint();
+    if (ck::IsValid(Hand))
+    { return utils_transform::Get_EntityCurrentTransform(Hand); }
+
+    const auto View = Self.Get_LaunchView();
+    return FTransform(View.Rotator(), View.GetLocation() + InForward * constants_held_item_use::k_NoHandSpawnDistance);
+}
+
+// InAim's origin when it carries one within k_LaunchOriginReach of this machine's copy of the carrier, and this machine
+// does not control the carrier; unset otherwise. Where it controls it, the origin is its own hand already, and a
+// Persistent item leaves from where its body is (a start pose there would pop it past what is left of its arrival).
+mixin TOptional<FTransform> Get_AcceptedLaunchOrigin(const FCk_Handle_HeldItemUse& Self, const FMars_HeldItemUse_Aim& InAim)
+{
+    if (InAim.Origin.IsSet() == false || Self.Get_IsWithinLaunchReach(InAim.Origin.GetValue().GetLocation()) == false)
+    { return TOptional<FTransform>(); }
+
+    FCk_Handle Carrier = Self;
+    const auto Control = utils_net::Get_IsEntityLocallyControlled_ByPlayer(Carrier);
+    if (Control == ECk_Utils_Net_IsLocallyControlled_Result::IsLocallyControlled)
+    { return TOptional<FTransform>(); }
+
+    return InAim.Origin;
+}
+
+// InLocation lies within k_LaunchOriginReach of this machine's copy of the carrier.
+mixin bool Get_IsWithinLaunchReach(const FCk_Handle_HeldItemUse& Self, FVector InLocation)
+{
+    FCk_Handle Carrier = Self;
+    const auto CarrierLocation = utils_transform::Get_EntityCurrentTransform(Carrier.As_Transform()).GetLocation();
+    return (InLocation - CarrierLocation).Size() <= constants_held_item_use::k_LaunchOriginReach;
 }
 
 // The carrier's view; a carrier without a PlayerViewpoint launches from its own transform.

@@ -234,6 +234,23 @@ mixin FCk_Handle_Transform Get_HandNode(const FCk_Handle_FPHands& Self)
     return Self.Get_Fragment(FMars_Fragment_FPHands_Params).Spec.HandNode;
 }
 
+// InNode is the gloves' hand node, or rides it unmoved: a scene node directly under it at identity (the player's hand
+// mount once it is first-person).
+mixin bool Get_RidesHandNode(const FCk_Handle_FPHands& Self, const FCk_Handle_Transform& InNode)
+{
+    const auto HandNode = Self.Get_HandNode();
+    if (ck::Is_NOT_Valid(InNode) || ck::Is_NOT_Valid(HandNode))
+    { return false; }
+
+    if (HandNode == InNode)
+    { return true; }
+
+    FCk_Handle NodeEntity = InNode;
+    const auto SceneNode = NodeEntity.As_SceneNode(ECk_SanityCheck::UnChecked);
+    return ck::IsValid(SceneNode) && utils_scene_node::Get_Parent(SceneNode) == HandNode
+        && utils_scene_node::Get_Offset(SceneNode).Equals(FTransform::Identity);
+}
+
 mixin const FMars_FPHands_Spec& Get_Spec(const FCk_Handle_FPHands& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_FPHands_Params).Spec;

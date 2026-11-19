@@ -16,7 +16,11 @@ namespace utils_player_viewpoint
         State.InteractionTrace = utils_probe_trace::Create_LineTrace_Persistent(TraceSettings);
         utils_handle::Set_DebugName(State.InteractionTrace, n"PlayerViewpoint.InteractionTrace");
 
+        auto Params = FMars_Fragment_PlayerViewpoint_Params();
+        Params.AimSource = InSpec.AimSource;
+
         InHandle.Add_Fragment(FMars_Feature_PlayerViewpoint());
+        InHandle.Add_Fragment(Params);
         InHandle.Add_Fragment(State);
         return InHandle.As_PlayerViewpoint();
     }

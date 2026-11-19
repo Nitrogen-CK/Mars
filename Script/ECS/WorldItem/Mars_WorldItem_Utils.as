@@ -446,7 +446,7 @@ namespace utils_world_item
 
     // The DoesNotReplicate script a Visual-mode spawn of InItem uses: the definition's Presentation.WorldItem.VisualScriptClass
     // (the base visual unless the item's own visual dresses itself), else the base visual. A Replicates class spawned on a
-    // client is a placeholder that never builds, and on a host it would replicate a visual that is the owner's alone.
+    // client is a placeholder that never builds, and on a host it would replicate a visual each machine draws itself.
     TSubclassOf<UMars_WorldItem_EntityScript> Get_VisualScriptClass(const FCk_Handle_Item& InItem)
     {
         TSubclassOf<UMars_WorldItem_EntityScript> VisualClass = UMars_WorldItem_Visual_EntityScript;
