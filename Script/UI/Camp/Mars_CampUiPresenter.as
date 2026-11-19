@@ -393,21 +393,17 @@ class AMars_CampUiPresenter : AActor
         }
     }
 
-    // The hand chain rides the director, including remote menu targets. Hide its local presentation while reading.
+    // The hand chain rides the director, including remote menu targets. Hide its local presentation while reading: the
+    // gloves and whatever is mounted on the hand mount (AttachPoint.Mars.Hand; the player's entity owns its lifetime, the
+    // items it carries are its scene-node children).
     private void HideChefPresentation()
     {
         auto Chef = Cast<AMars_PlayerCharacter>(_Controller.GetControlledPawn());
         if (ck::Is_NOT_Valid(Chef))
         { return; }
         HideChefPrimitive(Chef.FPHands);
-        auto Hands = ck::ToEntity(Chef).As_FPHands(ECk_SanityCheck::UnChecked);
-        if (ck::Is_NOT_Valid(Hands))
-        { return; }
-        for (auto Entity : utils_fphands::Get_TransformTree(Hands.Get_HandNode()))
-        {
-            for (auto Component : utils_unreal_component::Get_ComponentsByType(Entity, UPrimitiveComponent))
-            { HideChefPrimitive(Cast<UPrimitiveComponent>(Component)); }
-        }
+        for (auto Primitive : utils_fphands::Get_MountedPrimitives(Chef.Get_HandMount()))
+        { HideChefPrimitive(Primitive); }
     }
 
     private void RestoreChefPresentation()

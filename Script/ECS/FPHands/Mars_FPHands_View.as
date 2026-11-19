@@ -69,12 +69,29 @@ namespace utils_fphands
         return Tree;
     }
 
-    // InNode is the hand node of the gloves of the player character this machine controls, with first-person rendering
-    // on (its config's FPHandsView).
+    // InHands run as a first-person view on this machine: their tick runs and they carry a held visual in. An entity
+    // with no character (a headless rig) always; a player character once its hand mount is first-person
+    // (AMars_PlayerCharacter::Get_IsHandMountFirstPerson, latched one-way); another character while locally controlled.
+    bool Get_IsFirstPersonView(const FCk_Handle_FPHands& InHands)
+    {
+        FCk_Handle HandsEntity = InHands;
+        auto Actor = utils_entity_bridge::TryGet_Actor_Recursive(HandsEntity);
+        auto PlayerCharacter = Cast<AMars_PlayerCharacter>(Actor);
+        if (ck::IsValid(PlayerCharacter))
+        { return PlayerCharacter.Get_IsHandMountFirstPerson(); }
+
+        auto Character = Cast<ACharacter>(Actor);
+        return ck::Is_NOT_Valid(Character) || Character.IsLocallyControlled();
+    }
+
+    // InNode is the hand node of the gloves of the player character whose first-person hand this machine shows
+    // (AMars_PlayerCharacter::Get_IsHandMountFirstPerson, the latch its hand mount moved under the gloves by), with
+    // first-person rendering on (its config's FPHandsView).
     bool Get_IsFirstPersonHandNode(const FCk_Handle& InNode)
     {
         auto Character = Cast<AMars_PlayerCharacter>(utils_entity_bridge::TryGet_Actor_Recursive(InNode));
-        if (ck::Is_NOT_Valid(Character) || Character.IsLocallyControlled() == false || Character.Get_HasEntity() == false)
+        if (ck::Is_NOT_Valid(Character) || Character.Get_HasEntity() == false
+            || Character.Get_IsHandMountFirstPerson() == false)
         { return false; }
 
         // Characters without gloves (any other pawn) have no first-person hand node.
@@ -110,19 +127,63 @@ namespace utils_fphands
         return EFirstPersonPrimitiveType::None;
     }
 
-    // Re-evaluates InRoot (a held or released item) and renders every static mesh in its entity tree accordingly. Call
-    // when the item is attached under, or released from, a hand.
+    // Re-evaluates InRoot (a held or released item) and renders every primitive in its entity tree accordingly (meshes,
+    // a skeletal book, a flame's card and effect). Call when the item is attached under, or released from, a hand.
     void Apply_FirstPersonType(const FCk_Handle& InRoot)
     {
         const auto Type = Get_FirstPersonType(InRoot);
+        for (auto Primitive : Get_TreePrimitives(InRoot))
+        { Primitive.SetFirstPersonPrimitiveType(Type); }
+    }
+
+    // Re-evaluates everything mounted on InMount (each scene-node child is an item's root), after InMount itself moved
+    // under or away from a hand: the items' own mounts did not change, so nothing else re-tags them.
+    void Apply_FirstPersonTypeToMounted(const FCk_Handle_Transform& InMount)
+    {
+        for (auto Child : Get_MountedRoots(InMount))
+        { Apply_FirstPersonType(Child); }
+    }
+
+    // Every primitive of what is mounted on InMount (each scene-node child's entity tree).
+    TArray<UPrimitiveComponent> Get_MountedPrimitives(const FCk_Handle_Transform& InMount)
+    {
+        TArray<UPrimitiveComponent> Primitives;
+        for (auto Child : Get_MountedRoots(InMount))
+        { Primitives.Append(Get_TreePrimitives(Child)); }
+
+        return Primitives;
+    }
+
+    // InMount's scene-node children: the roots of what it carries, whoever owns their lifetime.
+    TArray<FCk_Handle> Get_MountedRoots(const FCk_Handle_Transform& InMount)
+    {
+        TArray<FCk_Handle> Roots;
+        if (ck::Is_NOT_Valid(InMount))
+        { return Roots; }
+
+        auto Mount = InMount;
+        for (auto Child : utils_scene_node::ForEach_SceneNode(Mount, FInstancedStruct(), FCk_Lambda_InHandle()))
+        {
+            FCk_Handle ChildEntity = Child;
+            Roots.Add(ChildEntity);
+        }
+
+        return Roots;
+    }
+
+    // Every primitive component of InRoot's transform tree (Get_TransformTree).
+    TArray<UPrimitiveComponent> Get_TreePrimitives(const FCk_Handle& InRoot)
+    {
+        TArray<UPrimitiveComponent> Primitives;
         for (auto Entity : Get_TransformTree(InRoot))
         {
-            for (auto Component : utils_unreal_component::Get_ComponentsByType(Entity, UStaticMeshComponent))
+            for (auto Component : utils_unreal_component::Get_ComponentsByType(Entity, UPrimitiveComponent))
             {
                 auto Primitive = Cast<UPrimitiveComponent>(Component);
                 if (ck::IsValid(Primitive))
-                { Primitive.SetFirstPersonPrimitiveType(Type); }
+                { Primitives.Add(Primitive); }
             }
         }
+        return Primitives;
     }
 }

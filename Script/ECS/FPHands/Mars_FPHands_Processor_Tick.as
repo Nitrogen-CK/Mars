@@ -16,10 +16,9 @@ class UMars_Processor_FPHands_Tick : UCk_Processor_Script_Base_UE
 
     void ForEachEntity(FCk_Time InDeltaT, FCk_Handle& InHandle, FMars_Fragment_FPHands& InState)
     {
-        // First-person presentation only: remote copies of the character never run their gloves. An entity with no
-        // character at all (headless tests) runs.
-        auto Character = Cast<ACharacter>(utils_entity_bridge::TryGet_Actor_Recursive(InHandle));
-        if (Character != nullptr && Character.IsLocallyControlled() == false)
+        // First-person presentation only: a copy that does not show its player's first-person hand never runs its
+        // gloves (utils_fphands::Get_IsFirstPersonView). An entity with no character at all (headless tests) runs.
+        if (utils_fphands::Get_IsFirstPersonView(InHandle.As_FPHands()) == false)
         { return; }
 
         const auto& Params = InHandle.Get_Fragment(FMars_Fragment_FPHands_Params);

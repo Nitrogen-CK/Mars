@@ -3664,6 +3664,31 @@ class UMars_Processor_PlatterDock_Sync_Driver : UMars_Processor_PlatterDock_Sync
     }
 }
 
+class UMars_Processor_PlayerViewpoint_FollowAim_Driver : UMars_Processor_PlayerViewpoint_FollowAim
+{
+    UFUNCTION(BlueprintOverride)
+    void Configure(FCk_ScriptProcessorQuery& Query)
+    {
+        Query.ReadWrite(FMars_Fragment_PlayerViewpoint_Params);
+        Query.ReadWrite(FMars_Fragment_PlayerViewpoint);
+        Super::Configure(Query);
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void ForEachBatch(FCk_ScriptQueryBatch Batch, FCk_Time InDeltaT)
+    {
+        auto _CkPerfScope = ck::ScopedStat("UMars_Processor_PlayerViewpoint_FollowAim_Driver::ForEachBatch");
+        const int32 NumEntities = Batch.Num();
+        for (int32 i = 0; i < NumEntities; ++i)
+        {
+            auto Handle = Batch.GetHandle(i);
+            FMars_Fragment_PlayerViewpoint_Params& P0 = Batch.Get(i, FMars_Fragment_PlayerViewpoint_Params);
+            FMars_Fragment_PlayerViewpoint& P1 = Batch.Get(i, FMars_Fragment_PlayerViewpoint);
+            ForEachEntity(InDeltaT, Handle, P0, P1);
+        }
+    }
+}
+
 class UMars_Processor_PlayerViewpoint_HandleRequests_Driver : UMars_Processor_PlayerViewpoint_HandleRequests
 {
     UFUNCTION(BlueprintOverride)

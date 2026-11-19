@@ -3,6 +3,9 @@
 // and this feature only stores them, keyed by an AttachPoint.* gameplay tag.
 // Each machine's own, nothing replicates: every machine's composer publishes the same nodes on its own copy of the
 // carrier, so an item mounted from replicated state lands on that machine's node.
+// AttachPoint.Mars.Hand is presentation only and differs per machine: on the player's own machine it is the first-person
+// hand, on every other machine the body's hand. Authority validation never measures from it; it reads the player's
+// viewpoint or the carrier's own transform.
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition

@@ -201,7 +201,8 @@ struct FMars_WorldItem_VisualSpec
 
     // Set: spawn at this world pose and keep the offset it makes from AttachTo (an item picked up where it lay, which the
     // gloves' carry then brings in); anchored to the world for the spawn frame, so AttachTo moving that frame does not
-    // displace it. AttachOffset is then only the estimate the visual is first placed at. Ignored when ArriveFrom is set.
+    // displace it. AttachOffset stays the rest offset: a visual whose carrier has gloves that do not hold AttachTo (another
+    // machine's copy of a player) takes it at once (UMars_WorldItem_EntityScript). Ignored when ArriveFrom is set.
     UPROPERTY()
     TOptional<FTransform> SpawnAtWorld;
 
@@ -493,12 +494,16 @@ struct FMars_Fragment_WorldItem_PendingRelease
     UPROPERTY()
     FVector AngularVelocityDeg = FVector::ZeroVector;
 
+    UPROPERTY()
+    TOptional<FTransform> StartPose;
+
     FMars_Fragment_WorldItem_PendingRelease() {}
 
-    FMars_Fragment_WorldItem_PendingRelease(FVector InLinearVelocity, FVector InAngularVelocityDeg)
+    FMars_Fragment_WorldItem_PendingRelease(const FMars_Request_WorldItem_Release& InRequest)
     {
-        LinearVelocity = InLinearVelocity;
-        AngularVelocityDeg = InAngularVelocityDeg;
+        LinearVelocity = InRequest.LinearVelocity;
+        AngularVelocityDeg = InRequest.AngularVelocityDeg;
+        StartPose = InRequest.StartPose;
     }
 }
 
@@ -799,6 +804,11 @@ struct FMars_Request_WorldItem_Release
 
     UPROPERTY()
     FVector AngularVelocityDeg = FVector::ZeroVector;
+
+    // Where the root is set before the body goes Dynamic (the launching machine's hand, accepted by HeldItemUse). Unset:
+    // it leaves from where it is mounted here.
+    UPROPERTY()
+    TOptional<FTransform> StartPose;
 
     FMars_Request_WorldItem_Release() {}
 

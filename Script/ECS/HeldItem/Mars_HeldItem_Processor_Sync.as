@@ -5,16 +5,17 @@
 //
 // A Persistent item (one whose item carries FMars_Fragment_Item_PersistentWorldItem) is never respawned: its own World-mode
 // world item is a Borrowed presentation, never destroyed here, and it mounts on the hand or back from where its item lives
-// (UMars_Processor_WorldItem_Reconcile). Any other item with a Presentation gets a Visual-mode world item under the Hand,
-// spawned at a requested start pose (UMars_Processor_HeldItem_HandleRequests) when one waits. The Hand is the first-person
-// chain on every copy of a character and its body already draws the held item for the others, so the Owned visual is
-// spawned only for a carrier with no character or a locally controlled one.
+// (UMars_Processor_WorldItem_Reconcile). Any other item with a Presentation gets a Visual-mode world item under the Hand on
+// every machine, spawned at a requested start pose (UMars_Processor_HeldItem_HandleRequests) when one waits. The Hand is
+// whatever the carrier publishes (a character's hand mount: first-person on its player's own view, the body's hand on
+// every other copy); how the visual is drawn there is the visual's own (Mars_FPHands_View.as walks its parents), and where
+// a start pose has no gloves to carry it in, the visual's entity script places it at HeldOffset.
 //
 // A Persistent item's presentation is its body on every machine once this machine has linked it (the authority where
 // the holder seeded or adopted it, a client from the replicated ledger); an Owned visual is spawned only for a Transient
-// item, and only where the carrier draws first person. A Persistent item not linked here yet has no presentation (an
-// Owned visual would sit beside its replicated body); when its link appears while it is still held, its body is adopted
-// as the presentation and OnHeldItemChanged is broadcast with the same item as previous and new (a refresh).
+// item. A Persistent item not linked here yet has no presentation (an Owned visual would sit beside its replicated
+// body); when its link appears while it is still held, its body is adopted as the presentation and OnHeldItemChanged is
+// broadcast with the same item as previous and new (a refresh).
 class UMars_Processor_HeldItem_Sync : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -59,7 +60,7 @@ class UMars_Processor_HeldItem_Sync : UCk_Processor_Script_Base_UE
                 InState.PresentationOwnership = EMars_HeldItem_PresentationOwnership::Borrowed;
             }
         }
-        else if (ck::IsValid(Item) && Item.Has_Presentation() && Get_IsPersistent(Item) == false && Get_DrawsFirstPerson(InHandle))
+        else if (ck::IsValid(Item) && Item.Has_Presentation() && Get_IsPersistent(Item) == false)
         {
             InState.PresentationEntity = Spawn_Visual(Self, InState, Item);
             InState.PresentationOwnership = EMars_HeldItem_PresentationOwnership::Owned;
@@ -68,13 +69,6 @@ class UMars_Processor_HeldItem_Sync : UCk_Processor_Script_Base_UE
         // InState is not read past this line: a listener may add a request fragment to the carrier.
         if (Self.Has_Fragment(FMars_Fragment_HeldItem_Signals))
         { Self.Get_Fragment(FMars_Fragment_HeldItem_Signals).OnHeldItemChanged.Broadcast(Self, PrevItem, NewItem); }
-    }
-
-    // The carrier draws its own first-person held visual: no character at all (headless tests), or a locally controlled one.
-    private bool Get_DrawsFirstPerson(const FCk_Handle& InHandle) const
-    {
-        auto Character = Cast<ACharacter>(utils_entity_bridge::TryGet_Actor_Recursive(InHandle));
-        return Character == nullptr || Character.IsLocallyControlled();
     }
 
     // The held item is unchanged, has no presentation yet, and is a Persistent item whose body this machine has since
@@ -121,12 +115,12 @@ class UMars_Processor_HeldItem_Sync : UCk_Processor_Script_Base_UE
             InState.NextArrival.Reset();
         }
 
+        // AttachOffset stays HeldOffset under a start pose: the rest the visual takes where nothing carries it in.
         auto Visual = FMars_WorldItem_VisualSpec(InItem, Hand, Presentation.Mounting.HeldOffset);
         if (InState.NextSpawnFrom.IsSet())
         {
-            // Where the item lay, anchored to the world for the spawn frame: the hand's lateral snaps on this very equip.
-            const auto HandWorld = utils_transform::Get_EntityCurrentTransform(Hand);
-            Visual.AttachOffset = InState.NextSpawnFrom.GetValue().GetRelativeTransform(HandWorld);
+            // Where the item lay: the gloves carry it in from there where they hold the hand; elsewhere the visual's
+            // entity script places it at HeldOffset at once.
             Visual.SpawnAtWorld = InState.NextSpawnFrom;
             InState.NextSpawnFrom.Reset();
         }

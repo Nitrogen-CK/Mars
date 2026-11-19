@@ -1,17 +1,18 @@
-// The held item as other players see it: the item in the third-person chef's hands, the arms reaching it.
+// The held item as the third-person chef holds it: the arms reaching it, and where the body's hand puts the item.
 //
-// World items and the hotbar replicate and HeldItem follows the hotbar on every machine, but the first-person gloves
-// that grip the item tick only on the owner's machine (FPHands), so the owner describes what it holds in an
-// FMars_HeldView - the item's look and how the gloves grip it - and AMars_PlayerCharacter replicates that (_HeldView).
-// Every machine then rebuilds the same hold on the body:
-//   - the item: a static mesh on the body's grip_r bone, placed where the first-person system would put it relative to
-//     the right glove's grip (Get_ItemInGrip);
+// Nothing here replicates. World items and the hotbar replicate and HeldItem follows the hotbar on every machine, so each
+// copy of a player derives the hold from its own HeldItem (AMars_PlayerCharacter::OnHeldItemChanged, late joiners
+// included) and rebuilds it on the body:
+//   - the item: its own world item (a persistent body, or the Visual-mode one HeldItem spawns) on the player's hand mount,
+//     which rides the body's grip_r where the first-person system would put the gloves' hand node relative to the right
+//     glove's grip (Get_BodyHandMountOffset);
 //   - the arms: ABP_Chef's TwoBoneIK + Transform (Modify) Bone per hand, aimed at the gloves' first-person grip targets
 //     laid out in a body "hand frame" in front of the chest (FMars_TPBody_Hold, Make_HoldFrame).
 // The first-person grip math is reused, not copied: utils_fphands::Get_RestTargets is already a pure function of the
-// FPHands spec and a hold, so the view converts its grip back to an FMars_FPHands_Hold (To_Hold) and calls it.
+// FPHands spec and a hold, so the grip converts back to an FMars_FPHands_Hold (To_Hold) and calls it.
 
 // How the gloves grip the held item: FMars_FPHands_Hold without its finger-contact shape (the body skips Contact Curl).
+// Derived on every copy from the item (utils_held_view::Make_Grip).
 struct FMars_HeldView_Grip
 {
     // Empty: nothing is held (the body shows no item and lowers its arms).
@@ -44,31 +45,6 @@ struct FMars_HeldView_Grip
 
     UPROPERTY()
     FTransform SocketGrip_L;
-}
-
-// What a player holds, as replicated to everyone (AMars_PlayerCharacter::_HeldView). Every member is a UPROPERTY so it
-// replicates; the meshes are soft so the struct carries paths, not objects.
-struct FMars_HeldView
-{
-    UPROPERTY()
-    TSoftObjectPtr<UStaticMesh> Mesh;
-
-    UPROPERTY()
-    TSoftObjectPtr<UMaterialInterface> Material;
-
-    UPROPERTY()
-    FVector MeshScale = FVector::OneVector;
-
-    // The item relative to the first-person Hand node (UMars_ItemTrait_Presentation::HeldOffset).
-    UPROPERTY()
-    FTransform HeldOffset;
-
-    UPROPERTY()
-    FMars_HeldView_Grip Grip;
-
-    // Bumped on every change the owner requests, so holding an identical item again still replicates and re-applies.
-    UPROPERTY()
-    int32 Serial = 0;
 }
 
 // Each glove's grip bone target for a hold, in the hand node's space (world cm), as utils_fphands::Get_RestTargets
@@ -305,8 +281,8 @@ struct FMars_TPBody_PunchQuery
     FMars_TPBody_PunchArm Left;
 }
 
-// HeldView is the PlayerCharacter's own namespace by ruling: the replicated hold view and the body's arm math have no
-// typed-handle feature behind them, and they serve only AMars_PlayerCharacter and its anim instance.
+// HeldView is the PlayerCharacter's own namespace by ruling: the body's hold and arm math have no typed-handle feature
+// behind them, and they serve only AMars_PlayerCharacter and its anim instance.
 namespace utils_held_view
 {
     // Both arms' targets for the jabs in flight (empty hands), taken as they are, like a swing: each fist is laid out in
@@ -336,35 +312,27 @@ namespace utils_held_view
         return Target;
     }
 
-    // The view of an item held by the local gloves: its Presentation look and utils_fphands::Make_Hold's grip.
-    // Not holding when the item is invalid or has no Presentation.
-    FMars_HeldView Make(const FCk_Handle_Item& InItem)
+    // How the gloves grip InItem: utils_fphands::Make_Hold's grip. Empty when the item is invalid or has no Presentation.
+    FMars_HeldView_Grip Make_Grip(const FCk_Handle_Item& InItem)
     {
-        auto View = FMars_HeldView();
+        auto Grip = FMars_HeldView_Grip();
         if (ck::Is_NOT_Valid(InItem) || InItem.Has_Presentation() == false)
-        { return View; }
-
-        // As the WorldItem visual reads it: mesh, MeshScale on the visual, MaterialOverride on slot 0.
-        const auto Presentation = InItem.Get_Presentation();
-        View.Mesh = Presentation.Visual.Mesh;
-        View.Material = Presentation.Visual.MaterialOverride;
-        View.MeshScale = Presentation.Visual.MeshScale;
-        View.HeldOffset = Presentation.Mounting.HeldOffset;
+        { return Grip; }
 
         const auto Hold = utils_fphands::Make_Hold(InItem);
-        View.Grip.Kind = Hold.Kind;
-        View.Grip.Pose = Hold.Pose;
-        View.Grip.Layout = Hold.Layout;
-        View.Grip.RightFaceY = Hold.Faces.RightY;
-        View.Grip.LeftFaceY = Hold.Faces.LeftY;
-        View.Grip.BottomZ = Hold.Faces.BottomZ;
-        View.Grip.HasSocketGrips = Hold.SocketGrips.IsSet();
+        Grip.Kind = Hold.Kind;
+        Grip.Pose = Hold.Pose;
+        Grip.Layout = Hold.Layout;
+        Grip.RightFaceY = Hold.Faces.RightY;
+        Grip.LeftFaceY = Hold.Faces.LeftY;
+        Grip.BottomZ = Hold.Faces.BottomZ;
+        Grip.HasSocketGrips = Hold.SocketGrips.IsSet();
         if (Hold.SocketGrips.IsSet())
         {
-            View.Grip.SocketGrip_R = Hold.SocketGrips.GetValue().Right;
-            View.Grip.SocketGrip_L = Hold.SocketGrips.GetValue().Left;
+            Grip.SocketGrip_R = Hold.SocketGrips.GetValue().Right;
+            Grip.SocketGrip_L = Hold.SocketGrips.GetValue().Left;
         }
-        return View;
+        return Grip;
     }
 
     // The first-person hold a grip stands for (no finger-contact shape).
@@ -392,17 +360,28 @@ namespace utils_held_view
         return FMars_HeldView_GripTargets(Targets.Right.GripInHand, Targets.Left.GripInHand);
     }
 
-    // The item relative to the right glove's grip bone (world cm). In first person the item sits at HeldOffset * Hand
-    // and the grip at GripTarget_R * Hand, so item-in-grip = HeldOffset * Inverse(GripTarget_R) (UE order: left applies
-    // first). The body's grip_r has the gloves' grip axes (X along the handle, Z out of the palm), so it maps 1:1.
-    FTransform Get_ItemInGrip(const FMars_FPHands_Spec& InSpec, const FMars_HeldView& InView)
+    // The item at InHeldOffset relative to the right glove's grip bone (world cm). In first person the item sits at
+    // HeldOffset * Hand and the grip at GripTarget_R * Hand, so item-in-grip = HeldOffset * Inverse(GripTarget_R) (UE
+    // order: left applies first). The body's grip_r has the gloves' grip axes (X along the handle, Z out of the palm), so
+    // it maps 1:1.
+    FTransform Get_ItemInGrip(const FMars_FPHands_Spec& InSpec, const FTransform& InHeldOffset,
+        const FMars_HeldView_Grip& InGrip)
     {
-        const auto Grips = Get_GripTargets(InSpec, InView.Grip);
-        return InView.HeldOffset.GetRelativeTransform(Grips.Right);
+        const auto Grips = Get_GripTargets(InSpec, InGrip);
+        return InHeldOffset.GetRelativeTransform(Grips.Right);
     }
 
-    // The body item component's transform relative to grip_r. The bone carries the body's Scale, so the location and
-    // the mesh scale are divided by it: the item keeps its first-person world size and offset from the palm.
+    // The gloves' hand node relative to the right glove's grip bone (world cm): the player's hand mount under the body's
+    // unit-scale grip_r node. An item at HeldOffset on it sits at HeldOffset * Inverse(GripTarget_R) from grip_r
+    // (Get_ItemInGrip). An empty grip gives the empty hold's right rest grip.
+    FTransform Get_BodyHandMountOffset(const FMars_FPHands_Spec& InSpec, const FMars_HeldView_Grip& InGrip)
+    {
+        return Get_GripTargets(InSpec, InGrip).Right.Inverse();
+    }
+
+    // A component's transform relative to grip_r for an item in grip (the owner's held-item shadow). The bone carries the
+    // body's Scale, so the location and the mesh scale are divided by it: the item keeps its first-person world size and
+    // offset from the palm.
     FTransform Get_BodyItemTransform(const FTransform& InItemInGrip, const FVector& InMeshScale, float32 InBodyScale)
     {
         const auto Shrink = 1.0 / float(InBodyScale);

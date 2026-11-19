@@ -354,7 +354,7 @@
 		{
 			"TypeName": "FCk_Handle_HeldItem",
 			"ShortName": "HeldItem",
-			"Description": "The item in the player's hands, derived from the selected hotbar slot, and its first-person held visual",
+			"Description": "The item in the player's hands, derived from the selected hotbar slot, and its held visual",
 			"SourceAsset": "/Script/AngelscriptAssets.Mars_HeldItemHandle",
 			"RequiredFragments": [
 				"Mars_Feature_HeldItem"
