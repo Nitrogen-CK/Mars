@@ -15,8 +15,8 @@ struct FMars_NetStrikeTest_Damaged
 }
 
 // The strike net tests' shared steps, on top of the hotbar rig's carrier: "the striker" is the carrier composed on the
-// subject on both machines with its hand off the row's base, one bag slot, a team and a dealer whose signals each machine
-// counts; "armed" is the server's cleaver in slot 0, selected, held on each machine. The server spawns a combat target
+// subject on both machines with its hand off the row's base, one bag slot, a team, a dealer whose signals each machine
+// counts and a viewpoint on its hand node (the strike task sweeps from the view, and the authority judges reach from it); "armed" is the server's cleaver in slot 0, selected, held on each machine. The server spawns a combat target
 // (or a fig vine) under the replicated spawn owner; each machine finds its copy near where it was spawned and counts what
 // its own copy raises. A client swings as the strike task does, or claims a blow straight through the cue; the server
 // reads the tally of its copy of the subject.
@@ -74,10 +74,22 @@ class UMars_AutoTestRig_NetStrike : UMars_AutoTestRig_NetHotbar
     {
         auto Subject = Get_SubjectEntity();
         Compose_HotbarCarrier(Get_HandLocation(), 1);
+        Add_ViewAtTheHand();
         utils_team::Add(Subject, ECk_Team_ID::One, ECk_Replication::DoesNotReplicate);
         _Dealer = utils_damage_dealer::Add(Subject, FMars_DamageDealer_Spec());
         _Dealer.BindTo_OnDamageDealt(FMars_Delegate_DamageDealer_OnDamageDealt(this, n"OnDealerDealt"));
         _Dealer.BindTo_OnDamageRejected(FMars_Delegate_DamageDealer_OnDamageRejected(this, n"OnDealerRejected"));
+    }
+
+    // What utils_player_viewpoint::Add gives a player, without its camera or trace: the view is the hand node, where the
+    // rows sweep from.
+    private void Add_ViewAtTheHand()
+    {
+        auto Subject = Get_SubjectEntity();
+        auto Viewpoint = FMars_Fragment_PlayerViewpoint();
+        Viewpoint.Viewpoint = _Carrier.Hand;
+        Subject.Add_Fragment(FMars_Feature_PlayerViewpoint());
+        Subject.Add_Fragment(Viewpoint);
     }
 
     protected bool Get_IsServer()
@@ -418,11 +430,12 @@ class UMars_AutoTestRig_NetStrike : UMars_AutoTestRig_NetHotbar
         Assert_True(SameRefusal, "the server's last refusal is the expected one");
     }
 
-    // The distances the authority measures for a contact at InLocation: from the hand, and from the nearest hurtbox node
-    // of the struck zone.
+    // The distances the authority measures for a contact at InLocation: from the striker's view, and from the nearest
+    // hurtbox node of the struck zone.
     protected FString Describe_Distances(FVector InLocation)
     {
-        const auto Hand = utils_transform::Get_EntityCurrentTransform(_Carrier.HeldItem.Get_HandAttachPoint()).GetLocation();
+        auto Subject = Get_SubjectEntity();
+        const auto View = utils_held_item_use::Get_ViewTransform(Subject).GetLocation();
         auto Nearest = -1.0;
         if (ck::IsValid(_Zone))
         {
@@ -445,8 +458,8 @@ class UMars_AutoTestRig_NetStrike : UMars_AutoTestRig_NetHotbar
             ReachLimit = Strike.Reach + Strike.Radius + constants_held_item_use::k_StrikeReachSlack;
         }
 
-        const auto FromHand = (InLocation - Hand).Size();
-        return f"handToContact={FromHand} hurtboxToContact={Nearest} reachLimit={ReachLimit} zoneLimit={constants_held_item_use::k_StrikeZoneSlack}";
+        const auto FromView = (InLocation - View).Size();
+        return f"viewToContact={FromView} hurtboxToContact={Nearest} reachLimit={ReachLimit} zoneLimit={constants_held_item_use::k_StrikeZoneSlack}";
     }
 
     // The row's one log line on this machine.
