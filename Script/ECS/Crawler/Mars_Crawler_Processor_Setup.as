@@ -76,7 +76,7 @@ class UMars_Processor_Crawler_Setup : UCk_Processor_Script_Base_UE
         if (ck::Is_NOT_Valid(Crawler))
         { Crawler = InHealth.As_BodyPart().Get_Monster().As_Crawler(ECk_SanityCheck::UnChecked); }
 
-        // A severed leg is world-owned and can outlive the crawler that shed it.
+        // A leg's damage can arrive while its crawler is ending.
         if (ck::Is_NOT_Valid(Crawler))
         { return; }
 

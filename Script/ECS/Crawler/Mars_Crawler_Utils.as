@@ -319,8 +319,8 @@ mixin FCk_Handle_Transform Get_Presentation(const FCk_Handle_Crawler& Self)
     return Self.Get_Fragment(FMars_Fragment_Crawler).Presentation;
 }
 
-// Every leg the walker created, in rig order; a severed leg stays listed, and reads invalid once its debris timer
-// destroys it.
+// Every leg the walker created, in rig order; a severed leg stays listed and stays the body's, valid until the crawler
+// ends.
 mixin TArray<FCk_Handle_ProceduralLeg> Get_Legs(const FCk_Handle_Crawler& Self)
 {
     auto Legs = TArray<FCk_Handle_ProceduralLeg>();
@@ -411,7 +411,7 @@ mixin FVector Pick_RoamPoint(const FCk_Handle_Crawler& Self)
     return Raw;
 }
 
-// The leg's rig parts as the entity script built them (a severed leg's parts are debris until they die).
+// The leg's rig parts as the entity script built them (a severed leg's parts are destroyed at the cut).
 mixin FMars_Crawler_LegRig Get_LegRig(const FCk_Handle_Crawler& Self, int32 InIndex)
 {
     const auto& Legs = Self.Get_Fragment(FMars_Fragment_Crawler_Params).Spec.Rig.Legs;

@@ -111,7 +111,8 @@ class UMars_SmState_Crawler_Dead : UCk_SmState_EntityScript
 }
 
 // The teardown, all of it requests: stop the navigator, disable the brain, sever every still-attached part with the
-// death's cause (their debris is world-owned and dies on its own timer), disable the body zone, then start the corpse
+// death's cause (each leg stays the body's; what falls is one replicated limb per leg, which ends on its own timer),
+// disable the body zone, then start the corpse
 // timer whose expiry destroys the crawler root and everything it owns. The presentation keeps the body pose's collapse
 // (no legs left): that is the corpse pose. This task is the only place the corpse timer exists.
 class UMars_SmTask_Crawler_Die : UCk_SmTask_EntityScript

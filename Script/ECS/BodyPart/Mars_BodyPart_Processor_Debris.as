@@ -1,5 +1,6 @@
-// Pushes a severed limb's debris once Jolt has added each body: an impulse requested before Get_IsBodyAdded is dropped.
-// A body that died before it was added is dropped with its impulse; the fragment goes once nothing is pending.
+// Pushes the bodies a severed limb's root lists (its throw, on the authority) once Jolt has added each: an impulse
+// requested before Get_IsBodyAdded is dropped. A body that died before it was added is dropped with its impulse; the
+// fragment goes once nothing is pending.
 class UMars_Processor_BodyPart_Debris : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -7,7 +8,8 @@ class UMars_Processor_BodyPart_Debris : UCk_Processor_Script_Base_UE
     UFUNCTION(BlueprintOverride)
     void Configure(FCk_ScriptProcessorQuery& Query)
     {
-        Query.Require(FMars_Feature_BodyPart);
+        // The pending impulses are the parameter, which already requires them; naming them here too rejects the query.
+        Query.Require(FMars_Feature_SeveredLimb);
     }
 
     void ForEachEntity(FCk_Time InDeltaT, FCk_Handle& InHandle, FMars_Fragment_BodyPart_PendingDebris& InPending)

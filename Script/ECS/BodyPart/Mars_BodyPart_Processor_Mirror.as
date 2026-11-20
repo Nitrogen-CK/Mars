@@ -1,11 +1,10 @@
 // Once per monster, on the monster's entity: the authority drops the mirror state (its drain publishes the ledger). A
 // machine without authority binds the ledger's rep-notify, and its first pass shows the ledger this machine composed.
 // The ledger's first application is the state the copy was born into and is taken once, as it stands: every changed
-// condition is announced, a broken part is broken and announced, and a severed part is detached and its limb drops as
-// debris, as a sever that arrives does. Each later change is reconciled as it arrives. A reconcile applies each changed
-// entry to this machine's own part at that roster index: the condition (raising OnConditionChanged), then, from
-// Attached, the same break or detach the authority ran, with an empty cause. Debris from a mirrored detach is this
-// machine's own.
+// condition is announced, a broken part is broken and announced, and a severed part is detached, as a sever that arrives
+// is. Each later change is reconciled as it arrives. A reconcile applies each changed entry to this machine's own part at
+// that roster index: the condition (raising OnConditionChanged), then, from Attached, the same break or detach the
+// authority ran, with an empty cause.
 class UMars_Processor_BodyPart_Mirror : UMars_Processor_BodyPart_Base
 {
     default _Group = n"FGroup_Gameplay_Script";

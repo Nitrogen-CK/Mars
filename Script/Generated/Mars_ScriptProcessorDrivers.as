@@ -4197,6 +4197,73 @@ class UMars_Processor_Sequence_Setup_Driver : UMars_Processor_Sequence_Setup
     }
 }
 
+class UMars_Processor_SeveredLimb_Ease_Driver : UMars_Processor_SeveredLimb_Ease
+{
+    UFUNCTION(BlueprintOverride)
+    void Configure(FCk_ScriptProcessorQuery& Query)
+    {
+        Query.ReadWrite(FMars_Fragment_SeveredLimb);
+        Super::Configure(Query);
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void ForEachBatch(FCk_ScriptQueryBatch Batch, FCk_Time InDeltaT)
+    {
+        auto _CkPerfScope = ck::ScopedStat("UMars_Processor_SeveredLimb_Ease_Driver::ForEachBatch");
+        const int32 NumEntities = Batch.Num();
+        for (int32 i = 0; i < NumEntities; ++i)
+        {
+            auto Handle = Batch.GetHandle(i);
+            FMars_Fragment_SeveredLimb& P0 = Batch.Get(i, FMars_Fragment_SeveredLimb);
+            ForEachEntity(InDeltaT, Handle, P0);
+        }
+    }
+}
+
+class UMars_Processor_SeveredLimb_Mirror_Driver : UMars_Processor_SeveredLimb_Mirror
+{
+    UFUNCTION(BlueprintOverride)
+    void Configure(FCk_ScriptProcessorQuery& Query)
+    {
+        Super::Configure(Query);
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void ForEachBatch(FCk_ScriptQueryBatch Batch, FCk_Time InDeltaT)
+    {
+        auto _CkPerfScope = ck::ScopedStat("UMars_Processor_SeveredLimb_Mirror_Driver::ForEachBatch");
+        const int32 NumEntities = Batch.Num();
+        for (int32 i = 0; i < NumEntities; ++i)
+        {
+            auto Handle = Batch.GetHandle(i);
+            ForEachEntity(InDeltaT, Handle);
+        }
+    }
+}
+
+class UMars_Processor_SeveredLimb_Publish_Driver : UMars_Processor_SeveredLimb_Publish
+{
+    UFUNCTION(BlueprintOverride)
+    void Configure(FCk_ScriptProcessorQuery& Query)
+    {
+        Query.ReadWrite(FMars_Fragment_SeveredLimb);
+        Super::Configure(Query);
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void ForEachBatch(FCk_ScriptQueryBatch Batch, FCk_Time InDeltaT)
+    {
+        auto _CkPerfScope = ck::ScopedStat("UMars_Processor_SeveredLimb_Publish_Driver::ForEachBatch");
+        const int32 NumEntities = Batch.Num();
+        for (int32 i = 0; i < NumEntities; ++i)
+        {
+            auto Handle = Batch.GetHandle(i);
+            FMars_Fragment_SeveredLimb& P0 = Batch.Get(i, FMars_Fragment_SeveredLimb);
+            ForEachEntity(InDeltaT, Handle, P0);
+        }
+    }
+}
+
 class UMars_Processor_Station_HandleRequests_Driver : UMars_Processor_Station_HandleRequests
 {
     UFUNCTION(BlueprintOverride)

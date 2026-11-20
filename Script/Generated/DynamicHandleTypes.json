@@ -667,6 +667,15 @@
 			]
 		},
 		{
+			"TypeName": "FCk_Handle_SeveredLimb",
+			"ShortName": "SeveredLimb",
+			"Description": "A severed leg as one replicated limb: jointed Jolt pieces on the authority, posed from a replicated pose ledger on a copy",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_SeveredLimbHandle",
+			"RequiredFragments": [
+				"Mars_Feature_SeveredLimb"
+			]
+		},
+		{
 			"TypeName": "FCk_Handle_Station",
 			"ShortName": "Station",
 			"Description": "An operator point: where its one operator stands, the Use interaction that reserves it, the grip the gloves hold and an optional minigame state machine",

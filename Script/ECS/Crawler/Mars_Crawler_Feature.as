@@ -14,7 +14,7 @@ asset Mars_CrawlerHandle of UCkDynamic_HandleDefinition
 // motion, the navigator, the brain, the state machine and, armed, the action player, the damage dealer and the combat
 // state. A copy composes the walker, the monster, the leg parts and every hurtbox, and follows the replicated root on
 // its own feet; a sever, a break and a death reach it through the part, Health and monster ledgers. A copy shows no
-// attack.
+// attack. A severed leg becomes one replicated, jointed limb the authority simulates.
 struct FMars_Feature_Crawler {}
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -67,7 +67,7 @@ struct FMars_Crawler_LegRig
     UPROPERTY()
     FCk_Handle_Transform Foot;
 
-    // One per segment in chain order, the foot last: hurtbox and debris box half extents.
+    // One per segment in chain order, the foot last: hurtbox and severed-limb piece half extents.
     UPROPERTY()
     TArray<FVector> SegmentHalfExtents;
 
