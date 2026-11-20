@@ -702,9 +702,10 @@ class UMars_AutoTestRig_CrawlerMelee : UMars_AutoTestRig_Crawler
     // Targets and walls
     //----------------------------------------------------------------------------------------------------------------------
 
-    // A combat target at InLocation: a transform root on team One (the player's team; the crawler is on Two, so it reads
-    // Hostile), Health 100, a flesh HitZone on HitZone.Mars.Body, one box hurtbox of InHalfExtents at the root's own
-    // transform, and TAG_MarsCombatTarget added last, once the receiver is complete.
+    // A combat target at InLocation: a transform root on team One (the player's team; the crawler is on Two, so it
+    // reads Hostile), Health 100, a flesh HitZone on HitZone.Mars.Body, one box hurtbox of InHalfExtents at the root's
+    // own transform, and TAG_MarsSharedCombatTarget (what the crawler's scan reads) added last, once the receiver is
+    // complete.
     protected FMars_AutoTest_CrawlerMelee_Target SpawnCombatTarget(FCk_Handle InHandle, FVector InLocation, FVector InHalfExtents)
     {
         return SpawnCombatTargetAt(InHandle, FTransform(FRotator::ZeroRotator, InLocation), InHalfExtents);
@@ -714,11 +715,12 @@ class UMars_AutoTestRig_CrawlerMelee : UMars_AutoTestRig_Crawler
     protected FMars_AutoTest_CrawlerMelee_Target SpawnCombatTargetAt(FCk_Handle InHandle, FTransform InTransform, FVector InHalfExtents)
     {
         auto Target = SpawnBystanderAt(InHandle, InTransform, InHalfExtents);
-        utils_entity_tag::Add(Target.Entity, n"TAG_MarsCombatTarget");
+        utils_entity_tag::Add(Target.Entity, n"TAG_MarsSharedCombatTarget");
         return Target;
     }
 
-    // A combat target without TAG_MarsCombatTarget: a creature no crawler chooses, which can still stand in the way.
+    // A combat target without TAG_MarsSharedCombatTarget: a creature no crawler chooses, which can still stand in the
+    // way.
     protected FMars_AutoTest_CrawlerMelee_Target SpawnBystanderAt(FCk_Handle InHandle, FTransform InTransform, FVector InHalfExtents)
     {
         auto Target = FMars_AutoTest_CrawlerMelee_Target();

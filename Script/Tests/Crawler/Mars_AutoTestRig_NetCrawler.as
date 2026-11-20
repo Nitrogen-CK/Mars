@@ -85,6 +85,78 @@ struct FMars_NetCrawlerTest_LimbRecord
     bool ContactsBound = false;
 }
 
+// One attack generation as one machine saw it. The server reads its kernel: its phases from OnAttackPhaseChanged, its
+// clip and slots from the plan. A copy reads its ledger and its show: its phases from its cue batches, its clip and
+// slots from its own resolved entry. From FirstFrame on, every frame samples the presentation's offset in the root's
+// frame and each claimed leg's foot in the root's frame, keeping their largest distance from FirstFrame.
+struct FMars_NetCrawlerTest_AttackRecord
+{
+    UPROPERTY() int32 Generation = 0;
+    UPROPERTY() FGameplayTag AttackId;
+    UPROPERTY() FString SourceClip;
+    UPROPERTY() FString Slots;
+    UPROPERTY() TArray<int32> ClaimedLegs;
+    // Server: Windup entered; copy: its action created.
+    UPROPERTY() int32 FirstFrame = -1;
+    UPROPERTY() float64 FirstSeconds = -1.0;
+    UPROPERTY() TArray<EMars_Crawler_AttackPhase> Phases;
+    UPROPERTY() int32 Admitted = 0;
+    UPROPERTY() int32 Interrupted = 0;
+    UPROPERTY() int32 Completed = 0;
+    UPROPERTY() bool RecoverCuedAfterInterrupt = false;
+    UPROPERTY() FCk_Handle_ProceduralAction Action;
+    UPROPERTY() int64 ActionIdentity = 0;
+    UPROPERTY() int32 Started = 0;
+    UPROPERTY() int32 Finished = 0;
+    UPROPERTY() ECk_ProceduralAction_Outcome Outcome = ECk_ProceduralAction_Outcome::None;
+    UPROPERTY() int32 FinishedFrame = -1;
+    UPROPERTY() float64 FinishedSeconds = -1.0;
+    UPROPERTY() FVector BodyAtFirst = FVector::ZeroVector;
+    UPROPERTY() TArray<FVector> FeetAtFirst;
+    UPROPERTY() float64 BodyPeak = 0.0;
+    UPROPERTY() float64 FootPeak = 0.0;
+    UPROPERTY() int32 BackAtNeutralFrame = -1;
+    UPROPERTY() float64 BackAtNeutralSeconds = -1.0;
+    // Server: the ledger writes it sampled while this generation was the ledger's; a copy: the notifies carrying it.
+    UPROPERTY() TArray<FMars_Fragment_Crawler_Net> Ledgers;
+    UPROPERTY() TArray<int32> LedgerFrames;
+    UPROPERTY() int32 NotifyFrame = -1;
+    // The offensive phases the ledgers carried, in order, each once.
+    UPROPERTY() TArray<EMars_Crawler_AttackPhase> Notified;
+    UPROPERTY() int32 CancelFrame = -1;
+    UPROPERTY() float64 CancelSeconds = -1.0;
+    // A copy: the first frame from CancelFrame on its action read Cancelling, Returning or Finished, or was gone.
+    UPROPERTY() int32 CancelSeenFrame = -1;
+    // Server, read as the attack returns to Idle.
+    UPROPERTY() FString LastCancelAtIdle;
+    UPROPERTY() bool CommittedAtIdle = false;
+}
+
+// What the server publishes of one of its attacks for the client to compare against.
+struct FMars_NetCrawlerTest_AttackSummary
+{
+    UPROPERTY() int32 Generation = 0;
+    UPROPERTY() FGameplayTag AttackId;
+    UPROPERTY() FString SourceClip;
+    UPROPERTY() FString Slots;
+    UPROPERTY() int32 FirstFrame = -1;
+    UPROPERTY() float64 BodyPeak = 0.0;
+    UPROPERTY() float64 FootPeak = 0.0;
+}
+
+// Test-only, on the crawler's root: the server's own record of its attacks once it has measured them, replicated so the
+// client can set its copy's records beside them. HitFrame is the frame of the server's hit on the crawler's body (-1
+// without one); StruckGeneration the attack whose blow first hurt the row's pawn (0 without one); Pawn* what the server
+// read of that pawn's Health.
+struct FMars_TESTONLY_Fragment_Crawler_ServerAttacks
+{
+    UPROPERTY() TArray<FMars_NetCrawlerTest_AttackSummary> Attacks;
+    UPROPERTY() int32 HitFrame = -1;
+    UPROPERTY() int32 StruckGeneration = 0;
+    UPROPERTY() float32 PawnHealth = -1.0f;
+    UPROPERTY() TArray<float32> PawnApplied;
+}
+
 // Test-only, on a limb's root: the server's world pose of every piece once its limb reads at rest, replicated so the
 // client can set its own beside it.
 struct FMars_TESTONLY_Fragment_SeveredLimb_RestPose
@@ -1150,6 +1222,9 @@ class UMars_AutoTestRig_NetCrawler : UMars_AutoTestRig_NetStrike
 
         if (_FeetRecording)
         { Sample_Feet(); }
+
+        if (_AttackRecording)
+        { Sample_Attacks(); }
     }
 
     //----------------------------------------------------------------------------------------------------------------------
@@ -1212,6 +1287,806 @@ class UMars_AutoTestRig_NetCrawler : UMars_AutoTestRig_NetStrike
         { Lifts += f"{Record.HighestLift}/{Record.Lifted}/{Record.PlantedAgain},"; }
 
         return f"feet=[frames {_FeetFrames} lifts {Lifts} worstPlanted {_FeetWorstPlanted} lowestTrusted {_FeetLowestTrusted}]";
+    }
+
+    //----------------------------------------------------------------------------------------------------------------------
+    // Attacks: an armed crawler, its prey, and every attack generation each machine sees
+    //----------------------------------------------------------------------------------------------------------------------
+
+    // The prey's near face stands this far in front of the jab's neutral hit centre (where the pincer row stands it).
+    protected const float64 k_PreyFaceAhead = 30.0;
+    protected const FVector k_PreyHalfExtents = FVector(10.0, 20.0, 20.0);
+    protected const float64 k_NeutralCm = 1.0;
+
+    // Server: the prey its attacks are driven at; a copy: its decoy, its own, where the prey stands.
+    protected FCk_Handle _Prey;
+    protected FCk_Handle_Health _PreyHealth;
+    protected TArray<float32> _PreyApplied;
+
+    protected bool _AttackRecording = false;
+    protected TArray<FMars_NetCrawlerTest_AttackRecord> _Attacks;
+    protected FMars_Fragment_Crawler_Net _LedgerLast;
+    // Server: every ledger write it sampled; a copy: every rep-notify of its ledger. As frame:ledger.
+    protected FString _LedgerLog = "";
+    protected int32 _LedgerNotifies = 0;
+    protected EMars_Net_InitialState _LedgerInitialAtFind = EMars_Net_InitialState::Awaited;
+    protected int32 _AttackCues = 0;
+    // A copy: whether its kernel ever read a phase other than Idle.
+    protected bool _CopyEverOutOfIdle = false;
+
+    // Server: a hit of this on the body zone the frame an attack enters Strike, and aggression switched off this long
+    // after Windup or at Strike if sooner.
+    protected TOptional<float32> _HurtAtStrike;
+    protected TOptional<float32> _DisableAfterWindupSeconds;
+    protected int32 _HitFrame = -1;
+    protected int32 _DisabledFrame = -1;
+    private bool _ServerTargetRequested = false;
+
+    // A copy: the frame and seconds its hurt count first read above 0; every sampled frame's world seconds.
+    protected int32 _CopyHurtFrame = -1;
+    protected float64 _CopyHurtSeconds = -1.0;
+    private TArray<int32> _SampleFrames;
+    private TArray<float64> _SampleSeconds;
+
+    // Combat on, the row's aggression and the shipped 4-leg parity loadout (its jab and pincer): a content asset, so
+    // its soft path resolves on the client.
+    protected FMars_Crawler_Spec Make_ArmedRowSpec(FVector InRoamHalfExtent, ECk_EnableDisable InAggression) const
+    {
+        auto Spec = Make_RowSpec(InRoamHalfExtent);
+        Spec.Combat.Enabled = true;
+        Spec.Combat.StartAggressive = InAggression;
+        Spec.Combat.Loadout = utils_crawler::Get_AttackReferenceLoadout(EMars_Crawler_AttackPreset::Crawler4, EMars_AttackReference_Kind::Parity);
+        return Spec;
+    }
+
+    // This machine's copy's action (its show's); invalid with authority.
+    protected FCk_Handle_ProceduralAction Get_CopyAction()
+    {
+        if (Get_IsCrawlerGone())
+        { return FCk_Handle_ProceduralAction(); }
+
+        return _Crawler.Get_AttackShow().Action;
+    }
+
+    // This machine's ledger.
+    protected FMars_Fragment_Crawler_Net Get_CopyLedger()
+    {
+        if (Get_IsCrawlerGone())
+        { return FMars_Fragment_Crawler_Net(); }
+
+        return _Crawler.Get_AttackLedger();
+    }
+
+    // How many actions this machine's copy started; 0 with authority.
+    protected int32 Get_CopyStarted()
+    {
+        if (Get_IsCrawlerGone())
+        { return 0; }
+
+        return _Crawler.Get_AttackShow().Started;
+    }
+
+    // The attack generation this machine's copy took as it stood (never played); -1 without a mirror state.
+    protected int32 Get_CopyStoodGeneration()
+    {
+        if (Get_IsCrawlerGone() || _CrawlerRoot.Has_Fragment(FMars_Fragment_Crawler_Local) == false)
+        { return -1; }
+
+        return _CrawlerRoot.Get_Fragment(FMars_Fragment_Crawler_Local).StoodGeneration;
+    }
+
+    protected EMars_Net_InitialState Get_CopyLedgerInitial()
+    {
+        if (Get_IsCrawlerGone() || _CrawlerRoot.Has_Fragment(FMars_Fragment_Crawler_Local) == false)
+        { return EMars_Net_InitialState::Awaited; }
+
+        return _CrawlerRoot.Get_Fragment(FMars_Fragment_Crawler_Local).InitialState;
+    }
+
+    protected bool Get_HasCopyShow()
+    {
+        return Get_IsCrawlerGone() == false && _CrawlerRoot.Has_Fragment(FMars_Fragment_Crawler_AttackShow);
+    }
+
+    // From here on: each machine binds the crawler's cues, the server its phase changes and a copy its ledger's
+    // rep-notifies, and every sample records the attack generations.
+    protected void Begin_AttackRecord()
+    {
+        _AttackRecording = true;
+        _LedgerInitialAtFind = Get_CopyLedgerInitial();
+        _Crawler.BindTo_OnAttackCue(FMars_Delegate_Crawler_OnAttackCue(this, n"OnRowAttackCue"));
+        if (Get_IsServer())
+        {
+            _Crawler.BindTo_OnAttackPhaseChanged(FMars_Delegate_Crawler_OnAttackPhaseChanged(this, n"OnRowAttackPhaseChanged"));
+            return;
+        }
+
+        if (_CrawlerRoot.Has_Fragment(FMars_Fragment_Crawler_Net))
+        { _CrawlerRoot.BindTo_OnRepNotify(FMars_Fragment_Crawler_Net, FCk_DynamicFragment_OnRepNotify(this, n"OnRowLedgerNotify")); }
+    }
+
+    // The prey (the server's) or the decoy (a copy's): team One, Health 100, a flesh body zone and one box hurtbox,
+    // squared to the crawler's forward with its near face k_PreyFaceAhead in front of the jab's neutral hit centre. It
+    // carries no tag: the rows drive the kernel, the scan is not under test.
+    protected void Spawn_Prey()
+    {
+        const auto Jab = utils_crawler::Find_ResolvedAttack(_Crawler.Get_Spec().ResolvedAttacks, GameplayTags::Attack_Mars_Jab);
+        if (Jab.IsSet() == false || Jab.GetValue().Definition.Hit.Emitters.Num() == 0)
+        {
+            FinishFailure(f"the {Get_MachineName()}'s crawler has no resolved jab emitter");
+            return;
+        }
+
+        const auto Root = utils_transform::Get_EntityCurrentTransform(_Crawler.As_Transform());
+        const auto Forward = Root.GetRotation().GetForwardVector().GetSafeNormal2D();
+        const auto Presentation = utils_transform::Get_EntityCurrentTransform(_Crawler.Get_Presentation());
+        const auto Center = utils_crawler::Get_HitCenter(Presentation, Jab.GetValue().Definition.Hit.Emitters[0].LocalCenter);
+        const auto At = Center + Forward * (k_PreyFaceAhead + k_PreyHalfExtents.X);
+
+        _Prey = utils_entity_lifetime::Request_CreateEntity(Get_SubjectEntity());
+        auto PreyRoot = utils_transform::Add(_Prey, FTransform(Forward.Rotation(), At), ECk_Replication::DoesNotReplicate);
+        utils_team::Add(_Prey, ECk_Team_ID::One, ECk_Replication::DoesNotReplicate);
+        _PreyHealth = utils_health::Add(_Prey, FMars_Health_Spec(100.0f));
+        auto PreyZone = utils_hit_zone::Add(_Prey, utils_hit_zone::Make_FleshZoneSpec(GameplayTags::HitZone_Mars_Body, 1.0f));
+        utils_hit_zone::AddHurtbox_Box(PreyZone, PreyRoot, FMars_HitZone_Hurtbox(k_PreyHalfExtents, FTransform::Identity));
+        _PreyHealth.BindTo_OnDamaged(FMars_Delegate_Health_OnDamaged(this, n"OnRowPreyDamaged"));
+    }
+
+    // Server: the prey as the combat target (once), then, once the attack is Idle and would be admitted, one attack at
+    // it with fresh selection. True when the start was requested.
+    protected bool Request_ServerAttack()
+    {
+        if (_ServerTargetRequested == false)
+        {
+            _Crawler.Request_SetCombatTarget(FMars_Request_Crawler_SetCombatTarget(_Prey));
+            _ServerTargetRequested = true;
+            return false;
+        }
+
+        if (_Crawler.Get_HasPendingCombatRequests() || _Crawler.Get_AttackPhase() != EMars_Crawler_AttackPhase::Idle
+            || _Crawler.Get_StartRejection(_Prey).IsSet())
+        { return false; }
+
+        _Crawler.Request_StartAttack(FMars_Request_Crawler_StartAttack(_Prey));
+        return true;
+    }
+
+    private int32 _AttacksBeforeRequest = 0;
+    private FName _AfterServerAttack;
+
+    // Server: one attack driven at the prey (Request_ServerAttack until one is admitted) and waited back to Idle, then
+    // InContinuation. Samples every frame.
+    protected void Run_ServerAttack(FName InContinuation)
+    {
+        _AttacksBeforeRequest = Count_StartedAttacks();
+        _AfterServerAttack = InContinuation;
+        WaitUntil(n"Is_ServerAttackAdmitted", n"OnServerAttackAdmitted", k_SlowPolls);
+    }
+
+    UFUNCTION()
+    protected void Is_ServerAttackAdmitted(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        Sample_Crawler();
+        const auto Admitted = Count_StartedAttacks() > _AttacksBeforeRequest;
+        if (Admitted == false)
+        { Request_ServerAttack(); }
+
+        auto Result = OutResult;
+        Result.Set(Admitted);
+    }
+
+    UFUNCTION()
+    private void OnServerAttackAdmitted(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
+    {
+        WaitUntil(n"Is_ServerAttackIdle", _AfterServerAttack, k_SlowPolls);
+    }
+
+    // The newest attack went back to Idle.
+    UFUNCTION()
+    protected void Is_ServerAttackIdle(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        Sample_Crawler();
+        auto Result = OutResult;
+        Result.Set(_Crawler.Get_AttackPhase() == EMars_Crawler_AttackPhase::Idle && _Attacks.Num() > 0
+            && _Attacks.Last().Phases.Num() > 0 && _Attacks.Last().Phases.Last() == EMars_Crawler_AttackPhase::Idle);
+    }
+
+    // The newest record that started an action; -1 without one.
+    protected int32 Find_LastStartedAttack() const
+    {
+        for (int32 Index = _Attacks.Num() - 1; Index >= 0; --Index)
+        {
+            if (_Attacks[Index].Started > 0)
+            { return Index; }
+        }
+
+        return -1;
+    }
+
+    // Server: a hit of InAmount of InType on its copy of the body zone, no instigator.
+    protected void Hit_ServerBody(float32 InAmount, FGameplayTag InType)
+    {
+        _Zone.Request_Hit(FMars_Request_HitZone_Hit(FMars_DamageEvent(InAmount, InType)));
+        _HitFrame = int32(utils_time::Get_FrameCounter());
+    }
+
+    protected void Request_ServerDisable()
+    {
+        if (_DisabledFrame >= 0)
+        { return; }
+
+        _Crawler.Request_SetAggression(FMars_Request_Crawler_SetAggression(ECk_EnableDisable::Disable));
+        _DisabledFrame = int32(utils_time::Get_FrameCounter());
+    }
+
+    // The record of InGeneration; added when InAdd and there is none. -1 without one.
+    protected int32 Find_Attack(int32 InGeneration, bool InAdd)
+    {
+        for (int32 Index = 0; Index < _Attacks.Num(); ++Index)
+        {
+            if (_Attacks[Index].Generation == InGeneration)
+            { return Index; }
+        }
+
+        if (InAdd == false)
+        { return -1; }
+
+        auto Record = FMars_NetCrawlerTest_AttackRecord();
+        Record.Generation = InGeneration;
+        _Attacks.Add(Record);
+        return _Attacks.Num() - 1;
+    }
+
+    // The record whose action was InIdentity; -1 without one.
+    private int32 Find_AttackByAction(int64 InIdentity)
+    {
+        for (int32 Index = 0; Index < _Attacks.Num(); ++Index)
+        {
+            if (InIdentity != 0 && _Attacks[Index].ActionIdentity == InIdentity)
+            { return Index; }
+        }
+
+        return -1;
+    }
+
+    // The entry's id, source clip, slots and the leg index each slot claims.
+    private void Take_Entry(int32 InIndex, const FMars_Attack_ResolvedEntry& InEntry)
+    {
+        auto& Record = _Attacks[InIndex];
+        Record.AttackId = InEntry.Identity.Id;
+        Record.SourceClip = InEntry.SourceClip.ToSoftObjectPath().ToString();
+        Record.Slots = "";
+        Record.ClaimedLegs.Reset();
+        for (const auto& Slot : InEntry.Slots)
+        {
+            Record.Slots += f"{Slot.Slot}:{Slot.Binding.LimbId},";
+            for (int32 Leg = 0; Leg < _LegRigs.Num(); ++Leg)
+            {
+                if (_LegRigs[Leg].LegId == Slot.Binding.LimbId)
+                { Record.ClaimedLegs.Add(Leg); }
+            }
+        }
+    }
+
+    private FVector Get_PresentationInRoot() const
+    {
+        const auto Root = utils_transform::Get_EntityCurrentTransform(_Crawler.As_Transform());
+        const auto Presentation = utils_transform::Get_EntityCurrentTransform(_Crawler.Get_Presentation());
+        return Presentation.GetRelativeTransform(Root).GetLocation();
+    }
+
+    private FVector Get_FootInRoot(int32 InLeg) const
+    {
+        const auto Root = utils_transform::Get_EntityCurrentTransform(_Crawler.As_Transform());
+        return Root.InverseTransformPosition(utils_transform::Get_EntityCurrentLocation(_LegRigs[InLeg].Foot));
+    }
+
+    // FirstFrame: now, with the presentation and the claimed feet where they stand.
+    private void Begin_AttackMotion(int32 InIndex)
+    {
+        if (_Attacks[InIndex].FirstFrame >= 0)
+        { return; }
+
+        auto& Record = _Attacks[InIndex];
+        Record.FirstFrame = int32(utils_time::Get_FrameCounter());
+        Record.FirstSeconds = Get_WorldSeconds();
+        Record.BodyAtFirst = Get_PresentationInRoot();
+        Record.FeetAtFirst.Reset();
+        for (const auto Leg : Record.ClaimedLegs)
+        { Record.FeetAtFirst.Add(Get_FootInRoot(Leg)); }
+    }
+
+    // Each new action identity is one start; this machine hears its OnFinished.
+    private void Attach_Action(int32 InIndex, FCk_Handle_ProceduralAction InAction)
+    {
+        auto Action = InAction;
+        if (ck::Is_NOT_Valid(Action) || Action.Get_Identity().Get_Value() == _Attacks[InIndex].ActionIdentity)
+        { return; }
+
+        auto& Record = _Attacks[InIndex];
+        Record.Action = Action;
+        Record.ActionIdentity = Action.Get_Identity().Get_Value();
+        Record.Started += 1;
+        utils_procedural_action::BindTo_OnFinished(Action, FCk_Delegate_ProceduralAction_OnFinished(this, n"OnRowActionFinished"));
+    }
+
+    // One ledger this machine saw (a server's write, a copy's notify): logged, and kept on its generation's record.
+    private void Note_Ledger(const FMars_Fragment_Crawler_Net& InLedger)
+    {
+        const auto Frame = int32(utils_time::Get_FrameCounter());
+        _LedgerLog += f"{Frame}:{Describe_Ledger(InLedger)} ";
+        if (InLedger.AttackGeneration <= 0)
+        { return; }
+
+        const auto Index = Find_Attack(InLedger.AttackGeneration, true);
+        auto& Record = _Attacks[Index];
+        Record.Ledgers.Add(InLedger);
+        Record.LedgerFrames.Add(Frame);
+        if (Record.NotifyFrame < 0)
+        { Record.NotifyFrame = Frame; }
+
+        if (utils_crawler::Get_IsOffensivePhase(InLedger.Phase) && (Record.Notified.IsEmpty() || Record.Notified.Last() != InLedger.Phase))
+        { Record.Notified.Add(InLedger.Phase); }
+
+        if (InLedger.Cancelled && Record.CancelFrame < 0)
+        {
+            Record.CancelFrame = Frame;
+            Record.CancelSeconds = Get_WorldSeconds();
+        }
+    }
+
+    protected FString Describe_Ledger(const FMars_Fragment_Crawler_Net& InLedger) const
+    {
+        return f"{InLedger.AttackId.ToString()}/{InLedger.AttackGeneration}/{InLedger.Phase :n}/c{InLedger.Cancelled}/h{InLedger.HurtCount}";
+    }
+
+    private bool Get_IsLedgerEqual(const FMars_Fragment_Crawler_Net& InA, const FMars_Fragment_Crawler_Net& InB) const
+    {
+        return InA.AttackId == InB.AttackId && InA.AttackGeneration == InB.AttackGeneration && InA.Phase == InB.Phase
+            && InA.Cancelled == InB.Cancelled && InA.HurtCount == InB.HurtCount;
+    }
+
+    private void Sample_Attacks()
+    {
+        const auto Frame = int32(utils_time::Get_FrameCounter());
+        _SampleFrames.Add(Frame);
+        _SampleSeconds.Add(Get_WorldSeconds());
+
+        if (Get_IsServer())
+        {
+            const auto Ledger = Get_CopyLedger();
+            if (Get_IsLedgerEqual(Ledger, _LedgerLast) == false)
+            {
+                _LedgerLast = Ledger;
+                Note_Ledger(Ledger);
+            }
+
+            if (_DisableAfterWindupSeconds.IsSet() && _Attacks.Num() > 0 && _Attacks.Last().FirstSeconds >= 0.0
+                && Get_WorldSeconds() - _Attacks.Last().FirstSeconds >= _DisableAfterWindupSeconds.GetValue())
+            { Request_ServerDisable(); }
+        }
+        else
+        {
+            _CopyEverOutOfIdle = _CopyEverOutOfIdle || _Crawler.Get_AttackPhase() != EMars_Crawler_AttackPhase::Idle;
+            if (_CopyHurtFrame < 0 && _Crawler.Get_HurtCount() > 0)
+            {
+                _CopyHurtFrame = Frame;
+                _CopyHurtSeconds = Get_WorldSeconds();
+            }
+        }
+
+        for (int32 Index = 0; Index < _Attacks.Num(); ++Index)
+        { Sample_AttackRecord(Index); }
+    }
+
+    private void Sample_AttackRecord(int32 InIndex)
+    {
+        if (_Attacks[InIndex].FirstFrame < 0 || _Attacks[InIndex].BackAtNeutralFrame >= 0)
+        { return; }
+
+        const auto Frame = int32(utils_time::Get_FrameCounter());
+        auto& Record = _Attacks[InIndex];
+        FCk_Handle ActionEntity = Record.Action;
+        const auto ActionGone = Record.ActionIdentity != 0 && (ck::Is_NOT_Valid(ActionEntity)
+            || utils_entity_lifetime::Get_IsPendingDestroy(ActionEntity, ECk_EntityLifetime_DestructionPhase::BeginDestroy));
+        if (Record.CancelFrame >= 0 && Record.CancelSeenFrame < 0 && Record.ActionIdentity != 0)
+        {
+            const auto State = ActionGone ? ECk_ProceduralAction_State::Finished : Record.Action.Get_State();
+            if (State == ECk_ProceduralAction_State::Cancelling || State == ECk_ProceduralAction_State::Returning
+                || State == ECk_ProceduralAction_State::Finished)
+            { Record.CancelSeenFrame = Frame; }
+        }
+
+        // An action gone without its OnFinished: finished here, outcome None.
+        if (ActionGone && Record.Finished == 0 && Record.FinishedFrame < 0)
+        {
+            Record.FinishedFrame = Frame;
+            Record.FinishedSeconds = Get_WorldSeconds();
+        }
+
+        const auto Body = (Get_PresentationInRoot() - Record.BodyAtFirst).Size();
+        Record.BodyPeak = Math::Max(Record.BodyPeak, Body);
+        auto Neutral = Body <= k_NeutralCm;
+        auto Subject = _Crawler.Get_Articulation();
+        for (int32 Claim = 0; Claim < Record.ClaimedLegs.Num() && Claim < Record.FeetAtFirst.Num(); ++Claim)
+        {
+            const auto Leg = Record.ClaimedLegs[Claim];
+            Record.FootPeak = Math::Max(Record.FootPeak, (Get_FootInRoot(Leg) - Record.FeetAtFirst[Claim]).Size());
+            const auto Control = Subject.Get_LimbControl(_LegRigs[Leg].LegId).Get_State();
+            const auto Phase = utils_procedural_leg::Get_Foot(_LegParts[Leg].Get_Leg()).Get_Phase();
+            Neutral = Neutral && Control == ECk_ProceduralLimbControl_State::Default && Phase == ECk_ProceduralLeg_FootPhase::Planted;
+        }
+
+        if (Record.FinishedFrame >= 0 && Neutral)
+        {
+            Record.BackAtNeutralFrame = Frame;
+            Record.BackAtNeutralSeconds = Get_WorldSeconds();
+        }
+    }
+
+    // This machine's world seconds at InFrame (the first sample at or after it); -1 when none was sampled.
+    protected float64 Get_SecondsAtFrame(int32 InFrame) const
+    {
+        for (int32 Index = 0; Index < _SampleFrames.Num(); ++Index)
+        {
+            if (_SampleFrames[Index] >= InFrame)
+            { return _SampleSeconds[Index]; }
+        }
+
+        return -1.0;
+    }
+
+    // Server: its records as summaries, with its hit frame and its pawn's readings, on the crawler's root, replicated.
+    protected void Publish_ServerAttacks(int32 InStruckGeneration, float32 InPawnHealth, TArray<float32> InPawnApplied)
+    {
+        if (_CrawlerRoot.Has_Fragment(FMars_TESTONLY_Fragment_Crawler_ServerAttacks))
+        { return; }
+
+        auto Readout = FMars_TESTONLY_Fragment_Crawler_ServerAttacks();
+        for (const auto& Record : _Attacks)
+        {
+            if (Record.FirstFrame < 0)
+            { continue; }
+
+            auto Summary = FMars_NetCrawlerTest_AttackSummary();
+            Summary.Generation = Record.Generation;
+            Summary.AttackId = Record.AttackId;
+            Summary.SourceClip = Record.SourceClip;
+            Summary.Slots = Record.Slots;
+            Summary.FirstFrame = Record.FirstFrame;
+            Summary.BodyPeak = Record.BodyPeak;
+            Summary.FootPeak = Record.FootPeak;
+            Readout.Attacks.Add(Summary);
+        }
+
+        Readout.HitFrame = _HitFrame;
+        Readout.StruckGeneration = InStruckGeneration;
+        Readout.PawnHealth = InPawnHealth;
+        Readout.PawnApplied = InPawnApplied;
+        _CrawlerRoot.Add_Fragment(Readout, ECk_Replication::Replicates);
+    }
+
+    protected bool Get_HasServerAttacks()
+    {
+        return Get_IsCrawlerGone() == false && _CrawlerRoot.Has_Fragment(FMars_TESTONLY_Fragment_Crawler_ServerAttacks);
+    }
+
+    protected FMars_TESTONLY_Fragment_Crawler_ServerAttacks Get_ServerAttacks()
+    {
+        if (Get_HasServerAttacks() == false)
+        { return FMars_TESTONLY_Fragment_Crawler_ServerAttacks(); }
+
+        return _CrawlerRoot.Get_Fragment(FMars_TESTONLY_Fragment_Crawler_ServerAttacks);
+    }
+
+    // A copy waits on the server's readout this long at most from the wait's start.
+    protected const float32 k_ReadoutCeilingSeconds = 22.0f;
+    private float64 _AwaitSince = -1.0;
+    private float64 _ReadoutSeenSeconds = -1.0;
+
+    // A copy: once the server's readout has been here for a second (the server's last step had that long to arrive),
+    // or k_ReadoutCeilingSeconds after this call without one, InContinuation. Samples every frame.
+    protected void Await_ServerAttacks(FName InContinuation)
+    {
+        _AwaitSince = Get_WorldSeconds();
+        WaitUntil(n"Is_ServerAttacksSettled", InContinuation, k_SlowPolls);
+    }
+
+    UFUNCTION()
+    protected void Is_ServerAttacksSettled(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        Sample_Crawler();
+        const auto Now = Get_WorldSeconds();
+        if (_ReadoutSeenSeconds < 0.0 && Get_HasServerAttacks())
+        { _ReadoutSeenSeconds = Now; }
+
+        auto Result = OutResult;
+        Result.Set((_ReadoutSeenSeconds >= 0.0 && Now - _ReadoutSeenSeconds >= 1.0) || Now - _AwaitSince >= k_ReadoutCeilingSeconds);
+    }
+
+    protected FString Describe_ServerAttacks()
+    {
+        const auto Readout = Get_ServerAttacks();
+        FString Text = "";
+        for (const auto& Summary : Readout.Attacks)
+        {
+            Text += f"[gen {Summary.Generation} {Summary.AttackId.ToString()} clip {Summary.SourceClip} slots {Summary.Slots} "
+                + f"first {Summary.FirstFrame} body {Summary.BodyPeak} foot {Summary.FootPeak}] ";
+        }
+
+        return f"readout=[present {Get_HasServerAttacks()} seenAt {_ReadoutSeenSeconds} hitFrame {Readout.HitFrame} "
+            + f"struck {Readout.StruckGeneration} pawnHealth {Readout.PawnHealth} attacks {Text}]";
+    }
+
+    // A copy, against one attack the server published: a record of the same generation, attack, source clip and slot
+    // list, one action started for it, its cued phases the posed phases its notifies carried, its body and claimed feet
+    // within InTolerance of the server's peaks, and back at neutral within InNeutralSeconds of its OnFinished.
+    protected void Assert_CopyPlayedTheServersAttack(const FMars_NetCrawlerTest_AttackSummary& InServer, float64 InTolerance, float64 InNeutralSeconds)
+    {
+        const auto Index = Find_Attack(InServer.Generation, false);
+        if (Index < 0)
+        {
+            Assert_True(false, f"the client recorded the server's generation {InServer.Generation}");
+            return;
+        }
+
+        const auto Record = _Attacks[Index];
+        const auto Gen = InServer.Generation;
+        Assert_True(Record.AttackId == InServer.AttackId && Record.SourceClip == InServer.SourceClip && Record.Slots == InServer.Slots,
+            f"gen {Gen}: the copy played the server's attack, clip and slots (copy {Record.AttackId.ToString()} {Record.SourceClip} {Record.Slots}; server {InServer.AttackId.ToString()} {InServer.SourceClip} {InServer.Slots})");
+        Assert_Equals_Int(Record.Started, 1, f"gen {Gen}: the copy started one action for it");
+        Assert_True(Get_IsPosedSubsequence(Record.Phases) && Describe_Phases(Record.Phases) == Describe_Phases(Record.Notified),
+            f"gen {Gen}: the copy cued each posed phase its notifies carried, once, in order (cued {Describe_Phases(Record.Phases)} notified {Describe_Phases(Record.Notified)})");
+        Assert_True(Math::Abs(Record.BodyPeak - InServer.BodyPeak) <= InTolerance * InServer.BodyPeak,
+            f"gen {Gen}: the copy's body peak is within {InTolerance * 100.0} percent of the server's ({Record.BodyPeak} against {InServer.BodyPeak})");
+        Assert_True(Math::Abs(Record.FootPeak - InServer.FootPeak) <= InTolerance * InServer.FootPeak,
+            f"gen {Gen}: the copy's claimed-foot peak is within {InTolerance * 100.0} percent of the server's ({Record.FootPeak} against {InServer.FootPeak})");
+        Assert_True(Record.BackAtNeutralSeconds >= 0.0 && Record.BackAtNeutralSeconds - Record.FinishedSeconds <= InNeutralSeconds,
+            f"gen {Gen}: the copy is back at neutral within {InNeutralSeconds} s of its OnFinished ({Record.BackAtNeutralSeconds - Record.FinishedSeconds} s, neutral frame {Record.BackAtNeutralFrame})");
+    }
+
+    // A copy, for a cancelled attack: its action was created before the cancel arrived, reads Cancelling, Returning or
+    // Finished within ten frames of that notify, finished once short of Completed, raised Admitted and Interrupted once
+    // and Completed never, cued no Recover after the cancel, and is back at neutral within 1.5 s of its OnFinished.
+    protected void Assert_CopyCancelledTheAttack(int32 InGeneration)
+    {
+        const auto Index = Find_Attack(InGeneration, false);
+        if (Index < 0)
+        {
+            Assert_True(false, f"the client recorded the server's generation {InGeneration}");
+            return;
+        }
+
+        const auto Record = _Attacks[Index];
+        Assert_True(Record.FirstFrame >= 0 && Record.CancelFrame >= 0 && Record.FirstFrame <= Record.CancelFrame,
+            f"the copy's action was created before the cancel arrived (created {Record.FirstFrame}, cancel notify {Record.CancelFrame})");
+        Assert_True(Record.CancelSeenFrame >= 0 && Record.CancelSeenFrame - Record.CancelFrame <= 10,
+            f"the copy's action reads Cancelling, Returning or Finished within ten frames of the cancel (cancel {Record.CancelFrame}, seen {Record.CancelSeenFrame})");
+        Assert_Equals_Int(Record.Finished, 1, "the copy's action raised OnFinished once");
+        Assert_True(Record.Outcome != ECk_ProceduralAction_Outcome::Completed, f"the copy's action ended short of Completed ({Record.Outcome :n})");
+        Assert_True(Record.Admitted == 1 && Record.Interrupted == 1 && Record.Completed == 0,
+            f"the copy raised Admitted 1, Interrupted 1, Completed 0 (raised {Record.Admitted}/{Record.Interrupted}/{Record.Completed})");
+        Assert_False(Record.RecoverCuedAfterInterrupt, "the copy cued no Recover after the cancel");
+        Assert_True(Record.BackAtNeutralSeconds >= 0.0 && Record.BackAtNeutralSeconds - Record.FinishedSeconds <= 1.5,
+            f"the copy is back at neutral within 1.5 s of its OnFinished ({Record.BackAtNeutralSeconds - Record.FinishedSeconds} s)");
+    }
+
+    // The records that started an action on this machine.
+    protected int32 Count_StartedAttacks() const
+    {
+        auto Count = 0;
+        for (const auto& Record : _Attacks)
+        {
+            if (Record.Started > 0)
+            { Count += 1; }
+        }
+
+        return Count;
+    }
+
+    protected FString Describe_Phases(const TArray<EMars_Crawler_AttackPhase>& InPhases) const
+    {
+        FString Text = "";
+        for (const auto Phase : InPhases)
+        { Text += f"{Phase :n},"; }
+
+        return Text;
+    }
+
+    // Each of InPhases is a posed phase later than the one before it.
+    protected bool Get_IsPosedSubsequence(const TArray<EMars_Crawler_AttackPhase>& InPhases) const
+    {
+        auto Last = -1;
+        for (const auto Phase : InPhases)
+        {
+            if (utils_crawler::Get_IsOffensivePhase(Phase) == false || int32(Phase) <= Last)
+            { return false; }
+
+            Last = int32(Phase);
+        }
+
+        return true;
+    }
+
+    protected FString Describe_Attacks()
+    {
+        FString Text = "";
+        for (const auto& Record : _Attacks)
+        {
+            FString Ledgers = "";
+            for (int32 Index = 0; Index < Record.Ledgers.Num(); ++Index)
+            { Ledgers += f"{Record.LedgerFrames[Index]}:{Record.Ledgers[Index].Phase :n}/c{Record.Ledgers[Index].Cancelled}/h{Record.Ledgers[Index].HurtCount},"; }
+
+            Text += f"[gen {Record.Generation} {Record.AttackId.ToString()} clip {Record.SourceClip} slots {Record.Slots} "
+                + f"first {Record.FirstFrame} phases {Describe_Phases(Record.Phases)} cues {Record.Admitted}/{Record.Interrupted}/{Record.Completed} "
+                + f"recoverAfterInterrupt {Record.RecoverCuedAfterInterrupt} started {Record.Started} finished {Record.Finished} "
+                + f"outcome {Record.Outcome :n} finishedFrame {Record.FinishedFrame} body {Record.BodyPeak} foot {Record.FootPeak} "
+                + f"neutralFrame {Record.BackAtNeutralFrame} neutralAfter {Record.BackAtNeutralSeconds - Record.FinishedSeconds} "
+                + f"notify {Record.NotifyFrame} notified {Describe_Phases(Record.Notified)} cancel {Record.CancelFrame} "
+                + f"cancelSeen {Record.CancelSeenFrame} lastCancelAtIdle {Record.LastCancelAtIdle} committed {Record.CommittedAtIdle} "
+                + f"ledgers {Ledgers}] ";
+        }
+
+        return Text;
+    }
+
+    protected FString Describe_AttackState()
+    {
+        if (Get_IsCrawlerGone())
+        { return "attack=[gone]"; }
+
+        FString Applied = "";
+        for (const auto Amount : _PreyApplied)
+        { Applied += f"{Amount},"; }
+
+        const auto PreyHealth = ck::IsValid(_PreyHealth) ? _PreyHealth.Get_Current() : -1.0f;
+        return f"attack=[armed {_Crawler.Get_IsCombatArmed()} player {ck::IsValid(_Crawler.Get_ActionPlayer())} "
+            + f"ledger {Describe_Ledger(Get_CopyLedger())} initialAtFind {_LedgerInitialAtFind :n} stood {Get_CopyStoodGeneration()} "
+            + f"show {Get_HasCopyShow()} copyStarted {Get_CopyStarted()} hurt {_Crawler.Get_HurtCount()} copyHurtFrame {_CopyHurtFrame} "
+            + f"hitFrame {_HitFrame} disabledFrame {_DisabledFrame} cues {_AttackCues} everOutOfIdle {_CopyEverOutOfIdle} "
+            + f"prey [health {PreyHealth} damaged {_PreyApplied.Num()} applied {Applied}] notifies {_LedgerNotifies} "
+            + f"ledgerLog [{_LedgerLog}] records {Describe_Attacks()}]";
+    }
+
+    // A copy plays, and keeps nothing it could attack with: not armed, no combat, attack, observation, intent or
+    // request state, no dealer, its kernel Idle at every sample, its gait Ready and never Failed and four legs enabled.
+    protected void Assert_CopyKeepsNoAttackOfItsOwn()
+    {
+        Assert_True(ck::IsValid(_Crawler.Get_ActionPlayer()), "the client's copy composes an action player");
+        Assert_False(_Crawler.Get_IsCombatArmed(), "the client's copy is not armed");
+        Assert_False(_CrawlerRoot.Has_Fragment(FMars_Fragment_Crawler_Combat) || _CrawlerRoot.Has_Fragment(FMars_Fragment_Crawler_Attack)
+            || _CrawlerRoot.Has_Fragment(FMars_Fragment_Crawler_AttackObservations) || _CrawlerRoot.Has_Fragment(FMars_Fragment_Crawler_AttackIntents)
+            || _CrawlerRoot.Has_Fragment(FMars_Fragment_Crawler_Requests),
+            "the client's copy has no combat, attack, observation, intent or request state");
+        Assert_False(ck::IsValid(_Crawler.Get_CombatDealer()), "the client's copy has no damage dealer");
+        Assert_False(_CopyEverOutOfIdle, "the client's copy's kernel read Idle at every sample");
+        Assert_True(Get_GaitStatus() == ECk_ProceduralAnimation_Status::Ready, "the client's gait reads Ready");
+        Assert_False(_CrawlerGaitEverFailed, "the client's gait never read Failed");
+        Assert_Equals_Int(utils_procedural_gait::Get_EnabledLegCount(_Crawler.Get_Gait()), k_LegCount, "the client's four legs are enabled");
+    }
+
+    // A copy's decoy: nothing the copy did touched it.
+    protected void Assert_DecoyUntouched()
+    {
+        Assert_True(ck::IsValid(_PreyHealth) && Math::IsNearlyEqual(_PreyHealth.Get_Current(), 100.0f, 0.01f),
+            "the client's decoy reads 100");
+        Assert_Equals_Int(_PreyApplied.Num(), 0, "the client's decoy raised no OnDamaged");
+    }
+
+    UFUNCTION()
+    private void OnRowPreyDamaged(FCk_Handle_Health InHealth, FMars_DamageEvent InEvent, float32 InApplied, float32 InRemaining)
+    {
+        _PreyApplied.Add(InApplied);
+    }
+
+    // Server only: Windup opens the admission's record, every phase is appended to the newest record, and the row's
+    // hit or aggression switch fires at Strike.
+    UFUNCTION()
+    private void OnRowAttackPhaseChanged(FCk_Handle_Crawler InCrawler, EMars_Crawler_AttackPhase InOld, EMars_Crawler_AttackPhase InNew)
+    {
+        if (InNew == EMars_Crawler_AttackPhase::Windup)
+        {
+            const auto Index = Find_Attack(_Crawler.Get_AttackAdmission().AttemptGeneration, true);
+            Take_Entry(Index, _Crawler.Get_AttackPlan().Entry);
+            Begin_AttackMotion(Index);
+            Attach_Action(Index, _Crawler.Get_AttackAction());
+        }
+
+        if (_Attacks.Num() == 0)
+        { return; }
+
+        const auto Last = _Attacks.Num() - 1;
+        _Attacks[Last].Phases.Add(InNew);
+        if (InNew == EMars_Crawler_AttackPhase::Idle)
+        {
+            const auto LastCancel = _Crawler.Get_AttackLastCancel();
+            _Attacks[Last].LastCancelAtIdle = LastCancel.IsSet() ? f"{LastCancel.GetValue() :n}" : FString("");
+            _Attacks[Last].CommittedAtIdle = _Crawler.Get_AttackDamageCommitted();
+        }
+
+        if (InNew != EMars_Crawler_AttackPhase::Strike)
+        { return; }
+
+        if (_HurtAtStrike.IsSet() && _HitFrame < 0)
+        { Hit_ServerBody(_HurtAtStrike.GetValue(), GameplayTags::DamageType_Mars_Blunt); }
+
+        if (_DisableAfterWindupSeconds.IsSet())
+        { Request_ServerDisable(); }
+    }
+
+    // Both machines count the batches per generation; a copy's Admitted opens its record on its action, and its posed
+    // observations are its phases.
+    UFUNCTION()
+    private void OnRowAttackCue(FCk_Handle_Crawler InCrawler, FMars_Attack_CueBatch InBatch)
+    {
+        _AttackCues += 1;
+        const auto Index = Find_Attack(InBatch.AdmissionAttemptGeneration, true);
+        if (InBatch.Admitted)
+        {
+            _Attacks[Index].Admitted += 1;
+            if (Get_IsServer() == false)
+            {
+                const auto Entry = utils_crawler::Find_ResolvedAttack(_Crawler.Get_Spec().ResolvedAttacks, InBatch.AttackId);
+                if (Entry.IsSet())
+                { Take_Entry(Index, Entry.GetValue()); }
+
+                Begin_AttackMotion(Index);
+                Attach_Action(Index, Get_CopyAction());
+            }
+        }
+
+        if (InBatch.Interrupted)
+        { _Attacks[Index].Interrupted += 1; }
+
+        if (InBatch.Completed)
+        { _Attacks[Index].Completed += 1; }
+
+        if (Get_IsServer())
+        { return; }
+
+        for (const auto& Observation : InBatch.Observations)
+        {
+            const auto PhaseId = Observation.Interval.Get_PhaseId();
+            auto Phase = EMars_Crawler_AttackPhase::Idle;
+            if (PhaseId == InBatch.Motion.WindupPhase)
+            { Phase = EMars_Crawler_AttackPhase::Windup; }
+            else if (PhaseId == InBatch.Motion.StrikePhase)
+            { Phase = EMars_Crawler_AttackPhase::Strike; }
+            else if (PhaseId == InBatch.Motion.RecoverPhase)
+            { Phase = EMars_Crawler_AttackPhase::Recover; }
+
+            _Attacks[Index].Phases.Add(Phase);
+            if (Phase == EMars_Crawler_AttackPhase::Recover && _Attacks[Index].Interrupted > 0)
+            { _Attacks[Index].RecoverCuedAfterInterrupt = true; }
+        }
+    }
+
+    UFUNCTION()
+    private void OnRowActionFinished(FCk_Handle_ProceduralAction InAction, FCk_ProceduralAction_Terminal InTerminal)
+    {
+        const auto Index = Find_AttackByAction(InTerminal.Get_Identity().Get_Value());
+        if (Index < 0)
+        { return; }
+
+        _Attacks[Index].Finished += 1;
+        _Attacks[Index].Outcome = InTerminal.Get_Result().Get_Outcome();
+        if (_Attacks[Index].FinishedFrame < 0)
+        {
+            _Attacks[Index].FinishedFrame = int32(utils_time::Get_FrameCounter());
+            _Attacks[Index].FinishedSeconds = Get_WorldSeconds();
+        }
+    }
+
+    // A notify can land on a crawler already ending.
+    UFUNCTION()
+    private void OnRowLedgerNotify(FCk_Handle InHandle, FCk_DynamicFragment_RepNotifyInfo InInfo)
+    {
+        if (ck::Is_NOT_Valid(InHandle) || InHandle.Has_Fragment(FMars_Fragment_Crawler_Net) == false)
+        { return; }
+
+        _LedgerNotifies += 1;
+        const auto Ledger = InHandle.Get_Fragment(FMars_Fragment_Crawler_Net);
+        Note_Ledger(Ledger);
     }
 
     //----------------------------------------------------------------------------------------------------------------------
