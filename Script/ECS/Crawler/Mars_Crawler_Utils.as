@@ -71,15 +71,18 @@ namespace utils_crawler
     }
 
     // Composes the crawler on InRoot (the simulation body; the entity script built the rig's transform entities and
-    // their visuals): surface motion -> walker (legs, gait, rigs, body pose, and the action player when armed) -> monster -> the
-    // damage dealer (armed only) -> one part per leg on the leg entity, with a hurtbox on every segment and the foot ->
-    // the body hurtbox -> the navigator (on the root, steering the surface motion) -> the brain (Mars_Crawler_Goap.as)
-    // -> the crawler fragments and, armed only, the combat fragments -> LAST the state machine (Mars_Crawler_Hfsm.as),
-    // whose conditions bind the brain and the Dead attribute as it enters Alive. Only the machine with authority over
-    // InRoot composes the surface motion, the navigator, the brain and the state machine; every machine composes the
-    // walker, the monster, the hurtboxes, the leg parts and the crawler fragments. Armed = Spec.Combat.Enabled on the
-    // machine with authority; an unarmed crawler composes no action player, dealer or combat fragment. A rejected spec
-    // (rig and combat profile included) or sub-feature ensures and returns an invalid handle.
+    // their visuals): surface motion -> walker (legs, gait, rigs, body pose, and the action player when combat is
+    // enabled) -> monster -> the damage dealer (armed only) -> one part per leg on the leg entity, with a hurtbox on
+    // every segment and the foot -> the body hurtbox -> the navigator (on the root, steering the surface motion) -> the
+    // brain (Mars_Crawler_Goap.as) -> the crawler fragments, the attack ledger and its mirror state when combat is
+    // enabled and, armed only, the combat fragments -> LAST the state machine (Mars_Crawler_Hfsm.as), whose conditions
+    // bind the brain and the Dead attribute as it enters Alive. Only the machine with authority over InRoot composes
+    // the surface motion, the navigator, the brain and the state machine; every machine composes the walker, the
+    // monster, the hurtboxes, the leg parts and the crawler fragments. Spec.Combat.Enabled gives every machine the
+    // action player, the replicated attack ledger, the mirror state and its tag, and a copy without authority its
+    // attack show; Armed = Spec.Combat.Enabled on the machine with authority, which alone composes the dealer and the
+    // combat fragments. A crawler without combat composes none of it. A rejected spec (rig and combat profile included)
+    // or sub-feature ensures and returns an invalid handle.
     FCk_Handle_Crawler Add(FCk_Handle_Transform& InRoot, FMars_Crawler_Spec InSpec)
     {
         FCk_Handle RootEntity = InRoot;
@@ -121,8 +124,9 @@ namespace utils_crawler
         WalkerSpec.Set_Chains(Chains);
         WalkerSpec.Set_BodyPose(ECk_EnableDisable::Enable);
         WalkerSpec.Set_BodyPoseSpec(PoseSpec);
-        // Armed crawlers own one body-channel player on the walker's articulation.
-        if (Armed)
+        // A combat-enabled crawler owns one body-channel player on the walker's articulation on every machine: the
+        // authority plays its attacks on it, a copy shows them.
+        if (InSpec.Combat.Enabled)
         {
             WalkerSpec.Set_ActionPlayer(ECk_EnableDisable::Enable);
             auto PlayerSpec = FCk_ProceduralActionPlayer_Spec();
@@ -203,6 +207,25 @@ namespace utils_crawler
         RootEntity.Add_Fragment(State);
         RootEntity.Add_Fragment(FMars_Tag_Crawler_NeedsSetup());
 
+        if (InSpec.Combat.Enabled)
+        {
+            // The mirror compares what arrives against the ledger this machine composed, not one that already arrived.
+            auto Local = FMars_Fragment_Crawler_Local();
+            Local.Last = TOptional<FMars_Fragment_Crawler_Net>(FMars_Fragment_Crawler_Net());
+
+            // A ledger already here can only have been put here by its replicated application: this copy was born into
+            // it, and the mirror's first pass takes it as it stands.
+            if (RootEntity.Has_Fragment(FMars_Fragment_Crawler_Net))
+            { Local.InitialState = EMars_Net_InitialState::Taken; }
+            else
+            { RootEntity.Add_Fragment(FMars_Fragment_Crawler_Net(), ECk_Replication::Replicates); }
+
+            RootEntity.Add_Fragment(Local);
+            RootEntity.Add_Fragment(FMars_Tag_Crawler_NeedsMirror());
+            if (HasAuthority == false)
+            { RootEntity.Add_Fragment(FMars_Fragment_Crawler_AttackShow()); }
+        }
+
         if (Armed)
         {
             auto Combat = FMars_Fragment_Crawler_Combat();
@@ -235,6 +258,29 @@ namespace utils_crawler
         { utils_state_machine::Add(RootEntity, FCk_StateMachine_Spec(UMars_SmState_Crawler_Alive)); }
 
         return RootEntity.As_Crawler();
+    }
+
+    // The ledger's only writer, called once per attack tick by the authority: the current or last attack's id and the
+    // generation it was admitted at, its phase, whether a cancel has bumped the attack's generation past the
+    // admission's, and the hurt count, written and marked dirty only when they differ from the stored ledger.
+    void Publish_Attack(FCk_Handle_Crawler& InSelf)
+    {
+        const auto& Attack = InSelf.Get_Fragment(FMars_Fragment_Crawler_Attack);
+        auto Next = FMars_Fragment_Crawler_Net();
+        Next.AttackId = Attack.Admission.AttackId;
+        Next.AttackGeneration = Attack.Admission.AttemptGeneration;
+        Next.Phase = Attack.Phase;
+        Next.Cancelled = Attack.Generation != Attack.Admission.AttemptGeneration;
+        Next.HurtCount = InSelf.Get_HurtCount();
+
+        auto& Ledger = InSelf.Get_Fragment(FMars_Fragment_Crawler_Net);
+        if (Ledger.AttackId == Next.AttackId && Ledger.AttackGeneration == Next.AttackGeneration && Ledger.Phase == Next.Phase
+            && Ledger.Cancelled == Next.Cancelled && Ledger.HurtCount == Next.HurtCount)
+        { return; }
+
+        Ledger = Next;
+        FCk_Handle Entity = InSelf;
+        Entity.Request_MarkReplicationDirty(FMars_Fragment_Crawler_Net);
     }
 
     // The crawler's brain over the Mars_Crawler_Goap.as catalog: its goal, Settled, is never written true, so the plan's
@@ -358,10 +404,28 @@ mixin FCk_Handle_Brain Get_Brain(const FCk_Handle_Crawler& Self)
     return Self.As_Brain();
 }
 
-// Damage events on the body or any leg so far.
+// Damage events on the body or any leg so far (a copy: as its ledger last said).
 mixin int32 Get_HurtCount(const FCk_Handle_Crawler& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_Crawler).HurtCount;
+}
+
+// The attack ledger the authority publishes (a copy: as it last arrived); the default on a crawler without combat.
+mixin FMars_Fragment_Crawler_Net Get_AttackLedger(const FCk_Handle_Crawler& Self)
+{
+    if (Self.Has_Fragment(FMars_Fragment_Crawler_Net) == false)
+    { return FMars_Fragment_Crawler_Net(); }
+
+    return Self.Get_Fragment(FMars_Fragment_Crawler_Net);
+}
+
+// A combat-enabled copy's show of the authority's attacks; the default with authority and without combat.
+mixin FMars_Fragment_Crawler_AttackShow Get_AttackShow(const FCk_Handle_Crawler& Self)
+{
+    if (Self.Has_Fragment(FMars_Fragment_Crawler_AttackShow) == false)
+    { return FMars_Fragment_Crawler_AttackShow(); }
+
+    return Self.Get_Fragment(FMars_Fragment_Crawler_AttackShow);
 }
 
 // The behaviour sub-SM's current state (Idle / Roam / Flinch / Cower), or null outside Alive. Read-only walk: the root

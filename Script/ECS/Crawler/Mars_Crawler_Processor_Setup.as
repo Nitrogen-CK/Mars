@@ -1,7 +1,8 @@
 // Turns the crawler's gait leg-set changes and every Health it owns (the body's and each leg part's) into Brain facts,
 // the only way anything outside the brain changes its world state: CanWalk from the enabled leg count, IsHurt (and the
 // HurtCount the Flinch task watches) from any damage. A copy without authority has no brain and runs no Dead state: it
-// turns its own body zone off when its monster dies (at once when it already reads dead).
+// turns its own body zone off when its monster dies (at once when it already reads dead), and its HurtCount is written
+// by UMars_Processor_Crawler_Mirror from the ledger, never here.
 class UMars_Processor_Crawler_Setup : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";

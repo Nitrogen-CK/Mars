@@ -39,7 +39,8 @@ struct FMars_Crawler_AttackPhaseChange
 //   5. settling: CancelRecover ends in Cooldown on the action's terminal record; Cooldown counts down and returns to Idle
 //      once the player has released the action whose terminal record the resolver acknowledged.
 // Existing accepted receipts establish admission and its costs before cancellation, even at zero DeltaT. No readiness,
-// reuse, global recovery or cleanup clock advances without positive time.
+// reuse, global recovery or cleanup clock advances without positive time. After the cues, every tick publishes the
+// attack ledger (utils_crawler::Publish_Attack).
 class UMars_Processor_Crawler_AttackTick : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -72,6 +73,7 @@ class UMars_Processor_Crawler_AttackTick : UCk_Processor_Script_Base_UE
         const auto CueObservations = Self.Get_Fragment(FMars_Fragment_Crawler_AttackObservations).PendingCueObservations;
         Self.Get_Fragment(FMars_Fragment_Crawler_AttackObservations).PendingCueObservations.Empty();
         utils_crawler::Dispatch_AttackCues(Self, CueBefore, CueObservations);
+        utils_crawler::Publish_Attack(Self);
 
         if (Self.Has_Fragment(FMars_Fragment_Crawler_Signals) == false)
         { return; }
@@ -606,16 +608,11 @@ class UMars_Processor_Crawler_AttackTick : UCk_Processor_Script_Base_UE
         { return false; }
 
         utils_crawler::Recover_UnplantedLimbs(InSelf);
-        auto Bindings = TArray<FCk_ProceduralAction_SlotBinding>();
         auto Claimed = TArray<FName>();
         for (const auto& Slot : InPlan.Entry.Slots)
-        {
-            Bindings.Add(FCk_ProceduralAction_SlotBinding(Slot.Slot, Slot.Binding.LimbId));
-            Claimed.Add(Slot.Binding.LimbId);
-        }
+        { Claimed.Add(Slot.Binding.LimbId); }
 
-        auto PlaySpec = FCk_ProceduralAction_PlaySpec(InPlan.Entry.Definition.Clip);
-        PlaySpec.Set_SlotBindings(Bindings);
+        auto PlaySpec = utils_crawler::Make_AttackPlaySpec(InPlan.Entry);
         PlaySpec.Set_Delivery(ECk_ProceduralAction_Delivery::Explicit);
         FCk_Handle Owner = InSelf;
         const auto Action = utils_procedural_action::Create_FromClip(Owner, Player, PlaySpec);

@@ -13,8 +13,10 @@ asset Mars_CrawlerHandle of UCkDynamic_HandleDefinition
 // machine with authority over the root alone composes and applies what decides and moves the crawler: the surface
 // motion, the navigator, the brain, the state machine and, armed, the action player, the damage dealer and the combat
 // state. A copy composes the walker, the monster, the leg parts and every hurtbox, and follows the replicated root on
-// its own feet; a sever, a break and a death reach it through the part, Health and monster ledgers. A copy shows no
-// attack. A severed leg becomes one replicated, jointed limb the authority simulates.
+// its own feet; a sever, a break and a death reach it through the part, Health and monster ledgers. The authority
+// publishes its running attack and hurt count in one ledger (FMars_Fragment_Crawler_Net); a combat-enabled copy plays
+// the same clip on its own articulation from it and raises the cues from its phase, and never sweeps, deals or advances
+// a phase. A severed leg becomes one replicated, jointed limb the authority simulates.
 struct FMars_Feature_Crawler {}
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -408,9 +410,10 @@ struct FMars_Fragment_Crawler_Params
 // State
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Composed by Add; afterwards only UMars_Processor_Crawler_Setup's damage handler writes it (HurtCount). The walker's
-// legs, the parts, the navigator and the brain on the same root keep their own state. On a copy without authority
-// Motion, ActionPlayer and Navigator stay invalid.
+// Composed by Add; afterwards only UMars_Processor_Crawler_Setup's damage handler writes it (HurtCount), and on a copy
+// without authority UMars_Processor_Crawler_Mirror (HurtCount, from the ledger). The walker's legs, the parts, the
+// navigator and the brain on the same root keep their own state. On a copy without authority Motion and Navigator stay
+// invalid; ActionPlayer is valid on every combat-enabled crawler.
 struct FMars_Fragment_Crawler
 {
     UPROPERTY()
@@ -425,7 +428,7 @@ struct FMars_Fragment_Crawler
     UPROPERTY()
     FCk_Handle_ProceduralBodyPose BodyPose;
 
-    // Armed crawlers own one body-channel player on the walker's articulation.
+    // A combat-enabled crawler owns one body-channel player on the walker's articulation on every machine.
     UPROPERTY()
     FCk_Handle_ProceduralActionPlayer ActionPlayer;
 
@@ -444,6 +447,55 @@ struct FMars_Fragment_Crawler
     // lands while the flinch is being cleared cannot leave the crawler waiting on a fact that never clears.
     UPROPERTY()
     int32 HurtCount = 0;
+}
+
+// Each machine's own, on a combat-enabled crawler: the ledger the mirror last reconciled (unset with authority),
+// whether this copy has taken the state it was born into, and the attack generation it took as it stood (never shown).
+struct FMars_Fragment_Crawler_Local
+{
+    UPROPERTY()
+    TOptional<FMars_Fragment_Crawler_Net> Last;
+
+    UPROPERTY()
+    EMars_Net_InitialState InitialState = EMars_Net_InitialState::Awaited;
+
+    UPROPERTY()
+    int32 StoodGeneration = 0;
+}
+
+// Added by utils_crawler::Add on a combat-enabled crawler, dropped by UMars_Processor_Crawler_Mirror once it has bound
+// the ledger's rep-notify.
+struct FMars_Tag_Crawler_NeedsMirror {}
+
+// A combat-enabled copy's own show of the authority's attacks, written only by UMars_Processor_Crawler_AttackShow: the
+// generation and attack it shows, the last posed phase it cued, the action it plays (invalid once that action
+// finished), whether it asked that action to cancel, whether the shown attack's last cue was raised, how many actions
+// it started and the last terminal's outcome.
+struct FMars_Fragment_Crawler_AttackShow
+{
+    UPROPERTY()
+    int32 Generation = 0;
+
+    UPROPERTY()
+    FGameplayTag AttackId;
+
+    UPROPERTY()
+    EMars_Crawler_AttackPhase Phase = EMars_Crawler_AttackPhase::Idle;
+
+    UPROPERTY()
+    FCk_Handle_ProceduralAction Action;
+
+    UPROPERTY()
+    bool CancelRequested = false;
+
+    UPROPERTY()
+    bool Ended = false;
+
+    UPROPERTY()
+    int32 Started = 0;
+
+    UPROPERTY()
+    ECk_ProceduralAction_Outcome LastOutcome = ECk_ProceduralAction_Outcome::None;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -684,6 +736,27 @@ struct FMars_Fragment_Crawler_Attack
 
     UPROPERTY()
     FMars_Crawler_AttackDiagnostics Diagnostics;
+}
+
+// The replicated ledger on a combat-enabled crawler's root: the current or last attack (its id and the generation it
+// was admitted at), its phase, whether it was cancelled, and the hurt count. Written only by
+// utils_crawler::Publish_Attack, from the authority's attack tick.
+struct FMars_Fragment_Crawler_Net
+{
+    UPROPERTY()
+    FGameplayTag AttackId;
+
+    UPROPERTY()
+    int32 AttackGeneration = 0;
+
+    UPROPERTY()
+    EMars_Crawler_AttackPhase Phase = EMars_Crawler_AttackPhase::Idle;
+
+    UPROPERTY()
+    bool Cancelled = false;
+
+    UPROPERTY()
+    int32 HurtCount = 0;
 }
 
 // One stored hit on the attack's target, committed or discarded by the next attack tick.
