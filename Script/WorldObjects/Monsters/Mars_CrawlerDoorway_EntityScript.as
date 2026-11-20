@@ -2,6 +2,9 @@
 // body/limb pose. No transform teleports, disabled collisions, scaled bones, or independent leg animation clocks.
 class UMars_CrawlerDoorway_EntityScript : UMars_Crawler_EntityScript
 {
+    // A single-machine motion gym: it composes no crawler, so nothing of it replicates.
+    default _Replication = ECk_Replication::DoesNotReplicate;
+
     UPROPERTY(ExposeOnSpawn)
     bool Loop = true;
 

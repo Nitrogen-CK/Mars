@@ -45,8 +45,8 @@ class UMars_Sandbox_Crawler_EntityScript : UMars_Crawler_EntityScript
         return Flow;
     }
 
-    // Only on a crawler that composed armed: a rejected spec has no crawler, and outside a local combat world the crawler
-    // is unarmed and would refuse the aggression request.
+    // Only on a crawler that composed armed: a rejected spec has no crawler, and without authority over its root the
+    // crawler is unarmed and would refuse the aggression request.
     private void ComposeAggressionSink(FCk_Handle& InHandle)
     {
         const auto Crawler = InHandle.As_Crawler(ECk_SanityCheck::UnChecked);

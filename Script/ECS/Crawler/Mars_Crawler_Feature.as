@@ -9,6 +9,12 @@ asset Mars_CrawlerHandle of UCkDynamic_HandleDefinition
     Description = "The legged crawler archetype: a procedural walker, one body part per leg with hurtboxes, a monster root, a navigator and a brain";
 }
 
+// Replication: the script, its root transform, its body Health, its monster ledger and its part ledger replicate. The
+// machine with authority over the root alone composes and applies what decides and moves the crawler: the surface
+// motion, the navigator, the brain, the state machine and, armed, the action player, the damage dealer and the combat
+// state. A copy composes the walker, the monster, the leg parts and every hurtbox, and follows the replicated root on
+// its own feet; a sever, a break and a death reach it through the part, Health and monster ledgers. A copy shows no
+// attack.
 struct FMars_Feature_Crawler {}
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -223,8 +229,8 @@ struct FMars_Crawler_Prepare
     float32 TimeoutSeconds = 2.0f;
 }
 
-// Off by default: a crawler without Enabled composes no combat state. Enabled arms it only in a local combat world
-// (utils_local_session::Get_IsLocalCombatWorld).
+// Off by default: a crawler without Enabled composes no combat state. Enabled arms it only on the machine with
+// authority over its root.
 struct FMars_Crawler_Combat
 {
     // What the crawler attacks with: the definitions, their selection and execution policy.
@@ -403,7 +409,8 @@ struct FMars_Fragment_Crawler_Params
 //--------------------------------------------------------------------------------------------------------------------------
 
 // Composed by Add; afterwards only UMars_Processor_Crawler_Setup's damage handler writes it (HurtCount). The walker's
-// legs, the parts, the navigator and the brain on the same root keep their own state.
+// legs, the parts, the navigator and the brain on the same root keep their own state. On a copy without authority
+// Motion, ActionPlayer and Navigator stay invalid.
 struct FMars_Fragment_Crawler
 {
     UPROPERTY()
@@ -518,7 +525,7 @@ enum EMars_Crawler_AttackReject
 // Composed by Add on an armed crawler; never written afterwards.
 struct FMars_Fragment_Crawler_Combat
 {
-    // Spec.Combat.Enabled in a local combat world.
+    // Spec.Combat.Enabled, on the machine with authority.
     UPROPERTY()
     bool Armed = false;
 

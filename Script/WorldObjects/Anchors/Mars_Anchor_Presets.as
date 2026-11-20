@@ -48,7 +48,7 @@ asset Mars_AnchorTable_Omen of UMars_AnchorTable_Def
 asset Mars_AnchorTable_Threat of UMars_AnchorTable_Def
 {
     Family = EMars_Anchor_Family::Threat;
-    Rows.Add(FMars_AnchorTable_Row(UMars_Anchor_SentryCrawler4_EntityScript, 2.0f, EMars_Anchor_Role::Other));
+    Rows.Add(FMars_AnchorTable_Row(UMars_Anchor_SentryCrawler4_EntityScript, 2.0f, EMars_Anchor_Role::Other, EMars_AnchorRow_Net::Replicated));
     Rows.Add(FMars_AnchorTable_Row(TSubclassOf<UCk_EntityScript_UE>(), 3.0f, EMars_Anchor_Role::Other));
 }
 
@@ -76,7 +76,7 @@ asset Mars_AnchorTable_Pack of UMars_AnchorTable_Def
 asset Mars_AnchorTable_Hunt of UMars_AnchorTable_Def
 {
     Family = EMars_Anchor_Family::Hunt;
-    Rows.Add(FMars_AnchorTable_Row(UMars_Anchor_QuarryCrawler4_EntityScript, 1.0f, EMars_Anchor_Role::Quarry));
+    Rows.Add(FMars_AnchorTable_Row(UMars_Anchor_QuarryCrawler4_EntityScript, 1.0f, EMars_Anchor_Role::Quarry, EMars_AnchorRow_Net::Replicated));
     Rows.Add(FMars_AnchorTable_Row(TSubclassOf<UCk_EntityScript_UE>(), 1.0f, EMars_Anchor_Role::Other));
 }
 

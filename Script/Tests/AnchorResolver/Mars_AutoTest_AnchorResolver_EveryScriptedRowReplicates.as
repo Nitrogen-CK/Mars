@@ -1,20 +1,14 @@
 // Every candidate an anchor can draw reaches every machine where the anchor stands: a scripted row that stays local
-// would be a candidate with a body that only the host would have. The crawlers do not replicate, so their two rows are
-// the only local ones.
-class UMars_AutoTest_AnchorResolver_OnlyTheCrawlerRowsStayLocal : UMars_AutoTestRig_AnchorResolverPure
+// would be a candidate with a body that only the host would have.
+class UMars_AutoTest_AnchorResolver_EveryScriptedRowReplicates : UMars_AutoTestRig_AnchorResolverPure
 {
     default _TimeoutSeconds = 10.0f;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
-        Add_Step("every scripted row replicates but the two crawler rows", n"Step_Rows");
+        Add_Step("every scripted row replicates", n"Step_Rows");
         Run_Steps(InHandle);
-    }
-
-    private bool Get_IsCrawlerScript(TSubclassOf<UCk_EntityScript_UE> InScript) const
-    {
-        return InScript == UMars_Anchor_SentryCrawler4_EntityScript || InScript == UMars_Anchor_QuarryCrawler4_EntityScript;
     }
 
     UFUNCTION()
@@ -44,12 +38,11 @@ class UMars_AutoTest_AnchorResolver_OnlyTheCrawlerRowsStayLocal : UMars_AutoTest
                 if (Row.Net == EMars_AnchorRow_Net::Local)
                 { LocalRows += 1; }
 
-                const auto Expected = Get_IsCrawlerScript(Row.Script) ? EMars_AnchorRow_Net::Local : EMars_AnchorRow_Net::Replicated;
-                Assert_True(Row.Net == Expected,
-                    f"{Table.GetName()} row {Index} ({Row.Script.Get().GetName()}) is {Expected :n}, not {Row.Net :n}");
+                Assert_True(Row.Net == EMars_AnchorRow_Net::Replicated,
+                    f"{Table.GetName()} row {Index} ({Row.Script.Get().GetName()}) is Replicated, not {Row.Net :n}");
             }
         }
 
-        Assert_Equals_Int(LocalRows, 2, "exactly two scripted rows stay local");
+        Assert_Equals_Int(LocalRows, 0, "no scripted row stays local");
     }
 }

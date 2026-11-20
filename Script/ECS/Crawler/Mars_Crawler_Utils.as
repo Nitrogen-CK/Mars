@@ -75,9 +75,11 @@ namespace utils_crawler
     // damage dealer (armed only) -> one part per leg on the leg entity, with a hurtbox on every segment and the foot ->
     // the body hurtbox -> the navigator (on the root, steering the surface motion) -> the brain (Mars_Crawler_Goap.as)
     // -> the crawler fragments and, armed only, the combat fragments -> LAST the state machine (Mars_Crawler_Hfsm.as),
-    // whose conditions bind the brain and the Dead attribute as it enters Alive. Armed = Spec.Combat.Enabled in a local
-    // combat world; an unarmed crawler composes no action player, dealer or combat fragment. A rejected spec (rig and
-    // combat profile included) or sub-feature ensures and returns an invalid handle.
+    // whose conditions bind the brain and the Dead attribute as it enters Alive. Only the machine with authority over
+    // InRoot composes the surface motion, the navigator, the brain and the state machine; every machine composes the
+    // walker, the monster, the hurtboxes, the leg parts and the crawler fragments. Armed = Spec.Combat.Enabled on the
+    // machine with authority; an unarmed crawler composes no action player, dealer or combat fragment. A rejected spec
+    // (rig and combat profile included) or sub-feature ensures and returns an invalid handle.
     FCk_Handle_Crawler Add(FCk_Handle_Transform& InRoot, FMars_Crawler_Spec InSpec)
     {
         FCk_Handle RootEntity = InRoot;
@@ -93,16 +95,18 @@ namespace utils_crawler
             { return FCk_Handle_Crawler(); }
         }
 
+        const auto HasAuthority = utils_net::Get_HasAuthority(RootEntity);
         const auto& Rig = InSpec.Rig;
 
-        auto Motion = utils_surface_motion::Add(InRoot, Make_MotionSpec(InSpec.Layout));
+        auto Motion = FCk_Handle_SurfaceMotion();
+        if (HasAuthority)
+        { Motion = utils_surface_motion::Add(InRoot, Make_MotionSpec(InSpec.Layout)); }
 
         auto Chains = TArray<FCk_ProceduralWalker_LegChain>();
         for (const auto& Leg : Rig.Legs)
         { Chains.Add(Make_LegChain(Leg, InSpec.Layout)); }
 
-        const auto Armed = InSpec.Combat.Enabled &&
-            utils_local_session::Get_IsLocalCombatWorld(utils_entity_lifetime::Get_WorldForEntity(RootEntity));
+        const auto Armed = InSpec.Combat.Enabled && HasAuthority;
 
         auto Support = FCk_ProceduralBodyPose_Support();
         Support.Set_CollapseDrop(45.0f);
@@ -129,7 +133,7 @@ namespace utils_crawler
 
         auto Walker = utils_procedural_animation::Add_Walker(InRoot, WalkerSpec);
         auto Gait = Walker.Get_Gait();
-        if (ck::EnsureIfNot(ck::IsValid(Gait) && ck::IsValid(Motion),
+        if (ck::EnsureIfNot(ck::IsValid(Gait) && (HasAuthority == false || ck::IsValid(Motion)),
             f"[Crawler] [{RootEntity.ToString()}] surface motion or walker composition was rejected"))
         { return FCk_Handle_Crawler(); }
 
@@ -172,10 +176,14 @@ namespace utils_crawler
             LegParts.Add(Part);
         }
 
-        auto Navigator = utils_surface_navigator::Add(Motion, Make_NavigatorSpec(InSpec.Layout));
-        auto Brain = utils_brain::Add(RootEntity, Make_BrainSpec());
-        if (ck::Is_NOT_Valid(Navigator) || ck::Is_NOT_Valid(Brain))
-        { return FCk_Handle_Crawler(); }
+        auto Navigator = FCk_Handle_SurfaceNavigator();
+        if (HasAuthority)
+        {
+            Navigator = utils_surface_navigator::Add(Motion, Make_NavigatorSpec(InSpec.Layout));
+            auto Brain = utils_brain::Add(RootEntity, Make_BrainSpec());
+            if (ck::Is_NOT_Valid(Navigator) || ck::Is_NOT_Valid(Brain))
+            { return FCk_Handle_Crawler(); }
+        }
 
         auto Params = FMars_Fragment_Crawler_Params();
         Params.Spec = InSpec;
@@ -223,7 +231,9 @@ namespace utils_crawler
         }
 
         // Last: Alive's conditions read the Dead attribute and the brain as the machine enters its initial state.
-        utils_state_machine::Add(RootEntity, FCk_StateMachine_Spec(UMars_SmState_Crawler_Alive));
+        if (HasAuthority)
+        { utils_state_machine::Add(RootEntity, FCk_StateMachine_Spec(UMars_SmState_Crawler_Alive)); }
+
         return RootEntity.As_Crawler();
     }
 
@@ -415,7 +425,7 @@ mixin FMars_Crawler_LegRig Get_LegRig(const FCk_Handle_Crawler& Self, int32 InIn
 // Combat getters (read-only; an unarmed crawler reads Idle, no target and nothing pending)
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Spec.Combat.Enabled in a local combat world: only then does the crawler carry any combat state.
+// Spec.Combat.Enabled, on the machine with authority: only then does the crawler carry any combat state.
 mixin bool Get_IsCombatArmed(const FCk_Handle_Crawler& Self)
 {
     return Self.Has_Fragment(FMars_Fragment_Crawler_Combat) && Self.Get_Fragment(FMars_Fragment_Crawler_Combat).Armed;

@@ -155,6 +155,9 @@ struct FMars_Crawler_MeshRenderer
 // the rig requires) with ISM box visuals tinted Color, or the pieces of Look when it is set, then hands them to
 // utils_crawler::Add in Spec.Rig, which composes the walker, the monster, the leg parts and their hurtboxes. Render scale
 // lives on the ISM proxies, never on the entities: the gait, the rig and Jolt use the unscaled transforms.
+// The entity and its root transform replicate (its body Health, monster and part ledgers ride the root); every
+// machine builds its own rig entities, visuals, light sense and fangs, and a copy's legs are its own, planted on its
+// own ground.
 //
 // A pincer crawler also wears two fangs under the front of its body: scene nodes on the presentation, so they ride the
 // body through the rear and the lunge. They are dressing only (no hurtbox, no hit): each frame they ease toward the pose
@@ -162,7 +165,8 @@ struct FMars_Crawler_MeshRenderer
 class UMars_Crawler_EntityScript : UCk_GenericEntityScript_UE
 {
     default _ShowInPlaceActors = true;
-    default _Replication = ECk_Replication::DoesNotReplicate;
+    // Spawned by the authority (placed, or under the replicated spawn owner); every machine composes its own copy.
+    default _Replication = ECk_Replication::Replicates;
 
     UPROPERTY(ExposeOnSpawn)
     FTransform SpawnTransform = FTransform::Identity;
@@ -274,7 +278,7 @@ class UMars_Crawler_EntityScript : UCk_GenericEntityScript_UE
             CrawlerSpec.ResolvedAttacks = _AttackConstruction.Resolved;
         }
 
-        auto Root = utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::DoesNotReplicate);
+        auto Root = utils_mars_net::Add_CreatureRoot(InHandle, SpawnTransform);
         CrawlerSpec.Rig = BuildRig(InHandle, RigData);
         ComposeLightSense(Root, CrawlerSpec);
 
