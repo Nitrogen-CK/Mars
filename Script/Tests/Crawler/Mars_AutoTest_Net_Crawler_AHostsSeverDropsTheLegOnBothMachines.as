@@ -1,7 +1,11 @@
-// The server hits leg 0 of a crawler that stays put (Sever 20, 0.3 s apart) until its part severs. On the client the
-// part reads Severed and within ten frames leg 0 left its copy, OnSevered raised once and its zone off; a second later
-// the three other legs are attached, the gait and the body pose read Ready and the gait trusts a contact. The released
-// rig parts are logged, not asserted. Each machine's limb dies on that machine before the row ends.
+// The server hits leg 0 of a crawler that stays put (Sever 20, 0.3 s apart) until its part severs. On each machine every
+// captured leg-0 rig part is gone within ten frames of its OnSevered. A second later the server has exactly one limb near
+// the base, with a body per piece and every joint added, and leg 0's entity is valid, detached and its part Severed; the
+// client has exactly one limb there with the same pieces, no body and no joint (no limb of its own). On the client leg 0
+// left its copy with OnSevered raised once and its zone off, and a second later the three other legs walk on. Once the
+// server's limb reads at rest it publishes the pieces' rest poses: the client's limb, at rest, has every piece within
+// 3 cm and 3 degrees of them, again 0.5 s later, and every joint gap within 4 cm. The server's widest joint gap stayed
+// within 2 cm and its limb lived about its 8 s. Each machine ends once no limb is near its base.
 // Surface: Ck.Crawler.Net.AS_Crawler_AHostsSeverDropsTheLegOnBothMachines
 class UCk_AutoTest_Net_Crawler_AHostsSeverDropsTheLegOnBothMachines : UMars_AutoTestRig_NetCrawler
 {
@@ -45,7 +49,7 @@ class UCk_AutoTest_Net_Crawler_AHostsSeverDropsTheLegOnBothMachines : UMars_Auto
     {
         if (Get_IsPartState(0, EMars_BodyPart_State::Severed))
         {
-            WaitUntil(n"Is_SeveredLimbsGone", n"OnServerLimbGone", k_SlowPolls);
+            Follow_ServerLeg0Limb("AHostsSeverDropsTheLegOnBothMachines");
             return;
         }
 
@@ -61,8 +65,7 @@ class UCk_AutoTest_Net_Crawler_AHostsSeverDropsTheLegOnBothMachines : UMars_Auto
         WaitSampling(k_LegHitSpacingSeconds, n"OnServerHitDue");
     }
 
-    UFUNCTION()
-    private void OnServerLimbGone(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
+    protected void Assert_ServerLimbTail() override
     {
         const auto Segments = _LegRigs[0].Segments.Num();
         Assert_True(Get_IsPartState(0, EMars_BodyPart_State::Severed), "the server's part 0 is Severed");
@@ -70,7 +73,6 @@ class UCk_AutoTest_Net_Crawler_AHostsSeverDropsTheLegOnBothMachines : UMars_Auto
         Assert_Equals_Int(_LegSignals[0].Released, Segments + 1, "the server's sever released every segment and the foot");
         Assert_Equals_Int(_CrawlerMonster.Get_AttachedPartCount(), k_LegCount - 1, "the server's crawler has three attached parts");
         Assert_True(Get_GaitStatus() == ECk_ProceduralAnimation_Status::Ready, "the server's gait reads Ready");
-        Hold_CrawlerServerRow("AHostsSeverDropsTheLegOnBothMachines", "");
     }
 
     UFUNCTION()

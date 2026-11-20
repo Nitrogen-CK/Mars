@@ -1,11 +1,10 @@
 // Depleting a leg part severs the leg: after the crawler walks for 1 s (and has moved), 30 Sever damage on leg 1's Health
-// depletes it, the part reads Severed, OnSevered fires once with the 3 released parts (2 segments + foot), the leg reads Detached but stays
-// in the body's record, the gait runs on 3 enabled legs (OnLegSetChanged 3 of 4) and stays Ready, the leg's hurtboxes are
-// destroyed, the released parts are the leg's lifetime children and the leg is world-owned. Every released part gets a
-// dynamic Jolt body that Jolt adds; the segments fall to the floor; one debris timer on the leg then destroys the leg and
-// its parts, and only then does the body's record drop to 3 legs.
-//
-// The debris lifetime is shortened to 2.5 s through the spawn params (the default is 8 s).
+// depletes it, the part reads Severed, OnSevered fires once with the 3 released parts (2 segments + foot), the leg reads
+// Detached and stays in the body's record, the gait runs on 3 enabled legs (OnLegSetChanged 3 of 4) and stays Ready, the
+// leg's hurtboxes are destroyed, and the leg stays the body's. Within ten frames of OnSevered every released part is
+// gone; exactly one severed limb appears near the crawler with a Jolt body on every piece and every joint added, and
+// its pieces fall to the floor (it ragdolls, jointed). The limb is gone after its 1 s lifetime; the crawler lives on with
+// 3 attached legs and keeps the severed one, valid and detached.
 class UMars_AutoTest_BodyPart_DepletionSeversLegAndRagdollsParts : UMars_AutoTestRig_Crawler
 {
     default _TimeoutSeconds = 25.0f;
@@ -14,15 +13,16 @@ class UMars_AutoTest_BodyPart_DepletionSeversLegAndRagdollsParts : UMars_AutoTes
     private FCk_Handle_BodyPart _Part;
     private FCk_Handle_ProceduralLeg _Leg;
     private TArray<FCk_Handle> _Hurtboxes;
-    private TArray<FCk_Handle_Transform> _Segments;
     private float64 _WalkStart = 0.0;
     private FVector _WalkStartLocation;
 
     private int32 _SeveredCount = 0;
+    private int32 _SeveredFrame = -1;
     private FMars_DamageEvent _SeveredCause;
     private TArray<FCk_Handle_Transform> _Released;
     private TArray<int32> _LegSetEnabled;
     private TArray<int32> _LegSetTotal;
+    private FCk_Handle_SeveredLimb _Limb;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
@@ -32,21 +32,21 @@ class UMars_AutoTest_BodyPart_DepletionSeversLegAndRagdollsParts : UMars_AutoTes
         Add_Step_WaitUntil("the crawler is composed, its gait Ready and its 4 parts registered", n"Check_Ready", k_SlowPolls, 0);
         Add_Step("bind leg 1's OnSevered and the gait's OnLegSetChanged", n"Step_Bind");
         Add_Step_WaitUntil("the crawler walks +X for 1 s", n"Check_Walked", k_SlowPolls, 0);
-        Add_Step("record leg 1's hurtboxes and segments; deplete its Health with 30 Sever", n"Step_Deplete");
+        Add_Step("record leg 1's hurtboxes; deplete its Health with 30 Sever", n"Step_Deplete");
         Add_Step_WaitUntil("leg 1 is severed, detached and its hurtboxes are gone", n"Check_Severed", 0, 0);
         Add_Step("the sever contract holds", n"Step_AssertSevered");
-        Add_Step_WaitUntil("every released part's debris body is in the Jolt world", n"Check_BodiesAdded", k_SlowPolls, 0);
-        Add_Step_WaitUntil("both segments fell to the floor", n"Check_SegmentsFell", k_SlowPolls, 0);
-        Add_Step_WaitUntil("the debris timer destroyed the leg and its parts", n"Check_LegTreeGone", k_SlowPolls, 0);
-        Add_Step_WaitUntil("the body's record drops the destroyed leg", n"Check_RecordDropped", 0, 0);
-        Add_Step("the crawler lives on with 3 legs", n"Step_AssertAfterDebris");
+        Add_Step_WaitUntil("every released part is gone within ten frames of OnSevered", n"Check_ReleasedGone", 0, 0);
+        Add_Step_WaitUntil("one severed limb is near, a body on every piece and every joint added", n"Check_OneLimb", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the limb's pieces fell to the floor", n"Check_LimbFell", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the limb is gone after its lifetime", n"Check_NoLimbNear", k_SlowPolls, 0);
+        Add_Step("the crawler lives on with 3 legs and keeps the severed one", n"Step_AssertAfterLimb");
         Run_Steps(InHandle);
     }
 
     private FMars_Crawler_Spec Make_Spec()
     {
         auto Spec = Make_CrawlerSpec(FVector(400.0, 400.0, 200.0));
-        Spec.Vitals.LegDebris.LifetimeSeconds = 2.5f;
+        Spec.Vitals.LegDebris.LifetimeSeconds = 1.0f;
         return Spec;
     }
 
@@ -58,6 +58,7 @@ class UMars_AutoTest_BodyPart_DepletionSeversLegAndRagdollsParts : UMars_AutoTes
     private void OnSevered(FCk_Handle_BodyPart InPart, FMars_DamageEvent InCause, TArray<FCk_Handle_Transform> InReleased)
     {
         ++_SeveredCount;
+        _SeveredFrame = int32(utils_time::Get_FrameCounter());
         _SeveredCause = InCause;
         _Released = InReleased;
     }
@@ -100,9 +101,8 @@ class UMars_AutoTest_BodyPart_DepletionSeversLegAndRagdollsParts : UMars_AutoTes
         Assert_True(Walked > 30.0, f"the crawler walked before the sever (moved {Walked} uu in the 1 s walk)");
 
         _Hurtboxes = _Part.Get_Zone().Get_Hurtboxes();
-        _Segments = _Crawler.Get_LegRig(1).Segments;
         Assert_Equals_Int(_Hurtboxes.Num(), 3, "leg 1 has 3 hurtboxes before the sever");
-        Assert_Equals_Int(_Segments.Num(), 2, "leg 1 has 2 segments");
+        Assert_Equals_Int(_Crawler.Get_LegRig(1).Segments.Num(), 2, "leg 1 has 2 segments");
 
         auto Health = _Part.Get_Health();
         Health.Request_ApplyDamage(FMars_Request_Health_ApplyDamage(FMars_DamageEvent(30.0f, GameplayTags::DamageType_Mars_Sever)));
@@ -146,16 +146,7 @@ class UMars_AutoTest_BodyPart_DepletionSeversLegAndRagdollsParts : UMars_AutoTes
             Assert_Equals_Int(_LegSetTotal[0], 4, "OnLegSetChanged reports 4 total");
         }
 
-        for (int32 Index = 0; Index < _Released.Num(); ++Index)
-        {
-            const auto Released = _Released[Index];
-            Assert_True(utils_entity_lifetime::Get_LifetimeOwner(Released) == _Leg, f"released part {Index} is owned by the leg");
-            Assert_True(Released.Is_JoltBody(), f"released part {Index} has a Jolt body");
-        }
-
-        const auto LegOwner = utils_entity_lifetime::Get_LifetimeOwner(_Leg);
-        Assert_True(LegOwner != Root, "the severed leg is no longer body-owned");
-        Assert_True(ck::IsValid(LegOwner) && utils_entity_lifetime::Get_IsTransientEntity(LegOwner), "the severed leg is world-owned");
+        Assert_True(utils_entity_lifetime::Get_LifetimeOwner(_Leg) == Root, "the severed leg stays the body's");
 
         const auto Monster = _Crawler.Get_Monster();
         Assert_Equals_Int(Monster.Get_Parts().Num(), 4, "the roster keeps the severed part");
@@ -164,60 +155,66 @@ class UMars_AutoTest_BodyPart_DepletionSeversLegAndRagdollsParts : UMars_AutoTes
     }
 
     UFUNCTION()
-    private void Check_BodiesAdded(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    private void Check_ReleasedGone(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
-        auto AllAdded = true;
+        auto Gone = true;
         for (auto Released : _Released)
         {
-            const auto Body = Released.As_JoltBody(ECk_SanityCheck::UnChecked);
-            AllAdded = AllAdded && ck::IsValid(Body) && utils_jolt_body::Get_IsBodyAdded(Body);
+            FCk_Handle Entity = Released;
+            Gone = Gone && (ck::Is_NOT_Valid(Entity) || utils_entity_lifetime::Get_IsPendingDestroy(Entity, ECk_EntityLifetime_DestructionPhase::BeginDestroy));
         }
 
-        auto Res = OutResult;
-        Res.Set(AllAdded);
-    }
-
-    UFUNCTION()
-    private void Check_SegmentsFell(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
-    {
-        auto Res = OutResult;
-        auto AllDown = true;
-        for (auto Segment : _Segments)
+        const auto Frames = int32(utils_time::Get_FrameCounter()) - _SeveredFrame;
+        if (Gone == false && Frames > 10)
         {
-            if (ck::Is_NOT_Valid(Segment))
-            {
-                FinishFailure("a segment died before it was seen on the floor");
-                return;
-            }
-
-            AllDown = AllDown && utils_transform::Get_EntityCurrentLocation(Segment).Z <= _Origin.Z + 60.0;
+            FinishFailure(f"a released part is still valid {Frames} frames after OnSevered");
+            return;
         }
-
-        Res.Set(AllDown);
-    }
-
-    UFUNCTION()
-    private void Check_LegTreeGone(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
-    {
-        auto Gone = ck::Is_NOT_Valid(_Leg);
-        for (auto Released : _Released)
-        { Gone = Gone && ck::Is_NOT_Valid(Released); }
 
         auto Res = OutResult;
         Res.Set(Gone);
     }
 
     UFUNCTION()
-    private void Check_RecordDropped(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    private void Check_OneLimb(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
+        const auto Limbs = Get_LimbsNear(InHandle);
+        if (Limbs.Num() > 1)
+        {
+            FinishFailure(f"{Limbs.Num()} limbs near the crawler for one severed leg");
+            return;
+        }
+
         auto Res = OutResult;
-        Res.Set(ck::IsValid(_Crawler) && utils_procedural_leg::Get_Legs(_Crawler, ECk_ProceduralLeg_Filter::NoFilter).Num() == 3);
+        Res.Set(Limbs.Num() == 1 && Get_IsLimbSimulated(Limbs[0]));
+        if (Limbs.Num() == 1)
+        { _Limb = Limbs[0]; }
     }
 
     UFUNCTION()
-    private void Step_AssertAfterDebris(FCk_Handle InHandle, FInstancedStruct InPayload)
+    private void Check_LimbFell(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
-        Assert_True(ck::IsValid(_Crawler), "the crawler outlives its severed leg");
+        if (ck::Is_NOT_Valid(_Limb))
+        {
+            FinishFailure("the limb died before its pieces were seen on the floor");
+            return;
+        }
+
+        auto AllDown = true;
+        for (auto Piece : _Limb.Get_Pieces())
+        { AllDown = AllDown && utils_transform::Get_EntityCurrentLocation(Piece).Z <= _Origin.Z + 60.0; }
+
+        auto Res = OutResult;
+        Res.Set(AllDown);
+    }
+
+    UFUNCTION()
+    private void Step_AssertAfterLimb(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        Assert_True(ck::IsValid(_Crawler), "the crawler outlives its severed limb");
+        Assert_True(ck::IsValid(_Leg), "the severed leg stays valid while the crawler lives");
+        Assert_False(utils_procedural_leg::Get_IsAttached(_Leg), "the severed leg stays detached");
+        Assert_True(_Part.Get_State() == EMars_BodyPart_State::Severed, "the severed part reads Severed");
         Assert_Equals_Int(utils_procedural_gait::Get_EnabledLegCount(_Crawler.Get_Gait()), 3, "the gait still runs on 3 legs");
         const auto GaitStatus = utils_procedural_gait::Get_Status(_Crawler.Get_Gait());
         Assert_True(GaitStatus == ECk_ProceduralAnimation_Status::Ready, f"the gait is still Ready (got {GaitStatus :n})");

@@ -1135,6 +1135,19 @@ class AMars_AutoTest_BodyPart_ADirectSeverSeversOnce_Actor : ACk_AutoTestRunner
     }
 }
 
+class AMars_AutoTest_BodyPart_ASeveredLimbStaysJointedAndComesToRest_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 25.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_BodyPart_ASeveredLimbStaysJointedAndComesToRest");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
 class AMars_AutoTest_BodyPart_CrushRuinsAndSeverPreservesCondition_Actor : ACk_AutoTestRunner
 {
     default _TimeoutSeconds = 15.0f;

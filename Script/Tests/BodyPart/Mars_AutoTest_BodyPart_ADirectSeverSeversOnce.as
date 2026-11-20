@@ -1,7 +1,7 @@
 // A direct Sever request (no Health depletion) severs a DetachLeg part once: two Sever requests on leg 0 in one frame
 // (7 Sever, then 9 Crush) sever it once with the first cause, the leg detaches and the part's Health is untouched (30).
 // A third Sever, drained beside a 10 Sever ledger hit whose spill moves the body 120 -> 115 (the proof the part's drain
-// ran), changes nothing: OnSevered stays at one.
+// ran), changes nothing: OnSevered stays at one. The severed leg's limb (1 s) is gone before the test ends.
 class UMars_AutoTest_BodyPart_ADirectSeverSeversOnce : UMars_AutoTestRig_Crawler
 {
     default _TimeoutSeconds = 15.0f;
@@ -16,7 +16,10 @@ class UMars_AutoTest_BodyPart_ADirectSeverSeversOnce : UMars_AutoTestRig_Crawler
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
-        SpawnFloorAndCrawler(InHandle, Make_CrawlerSpec(FVector(400.0, 400.0, 200.0)));
+        auto Spec = Make_CrawlerSpec(FVector(400.0, 400.0, 200.0));
+        // The limb lives under the replicated spawn owner: it must end inside the test (no leak).
+        Spec.Vitals.LegDebris.LifetimeSeconds = 1.0f;
+        SpawnFloorAndCrawler(InHandle, Spec);
 
         Add_Step_WaitUntil("the crawler is composed, its gait Ready and its 4 parts registered", n"Check_Ready", k_SlowPolls, 0);
         Add_Step("bind leg 0's OnSevered; request two severs in one frame", n"Step_SeverTwice");
@@ -24,6 +27,7 @@ class UMars_AutoTest_BodyPart_ADirectSeverSeversOnce : UMars_AutoTestRig_Crawler
         Add_Step("severed once with the first cause; request a third sever beside a ledger hit", n"Step_AssertSeveredAndSeverAgain");
         Add_Step_WaitUntil("the body reads 115", n"Check_BodyAt115", 0, 0);
         Add_Step("the third sever changed nothing", n"Step_AssertSeveredOnce");
+        Add_Step_WaitUntil("no severed limb is left near the crawler", n"Check_NoLimbNear", k_SlowPolls, 0);
         Run_Steps(InHandle);
     }
 

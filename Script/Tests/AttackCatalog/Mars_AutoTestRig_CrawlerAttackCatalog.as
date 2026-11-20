@@ -136,17 +136,14 @@ class UMars_AutoTestRig_CrawlerAttackCatalog : UMars_AutoTestRig_CrawlerMelee
         SpawnParams.WithVisuals = false;
         auto Pending = utils_entity_script::Request_SpawnEntity(InHandle, UMars_Crawler_EntityScript, SpawnParams);
         utils_pending_entity_script::Promise_OnConstructed(Pending, FCk_Delegate_EntityScript_Constructed(this, n"OnCrawlerConstructed"));
+        Track_LimbsForCleanup(InHandle);
     }
 
     UFUNCTION()
     protected void Step_BindCatalogSignals(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        // Sever/death deliberately moves debris into the world; this fixture still owns its cleanup.
-        for (const auto& Part : _Crawler.Get_LegParts())
-        {
-            FCk_Handle Entity = Part;
-            Track_ForCleanup(Entity);
-        }
+        // A severed part stays the crawler's and dies with it. A severed leg's limb lives under the replicated spawn owner:
+        // the rig tracks every limb near the origin for cleanup (Track_LimbsForCleanup), not the leg parts.
         _Crawler.BindTo_OnAttackAdmitted(FMars_Delegate_Crawler_OnAttackAdmitted(this, n"OnCatalogAdmitted"));
         _Crawler.BindTo_OnAttackCompleted(FMars_Delegate_Crawler_OnAttackCompleted(this, n"OnCatalogCompleted"));
         _Crawler.BindTo_OnAttackDecisionChanged(FMars_Delegate_Crawler_OnAttackDecisionChanged(this, n"OnCatalogDecision"));

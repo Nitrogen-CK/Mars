@@ -2,8 +2,8 @@
 // rest foot 60 in front of its hand (0.6 s apart, each at its own copy's last segment of leg 0) until its part 0
 // reads Severed. The server applied at least one claim and refused none, and its part 0 severed once. On the client
 // leg 0 left its copy within ten frames, OnSevered raised once and its zone off; a second later the three other legs
-// walk on, and its body Health raised OnDamaged (the spill). Each machine's limb dies on that machine before the row
-// ends.
+// walk on, and its body Health raised OnDamaged (the spill). From the sever on, both machines follow the one limb as
+// the host's sever row does.
 // Surface: Ck.Crawler.Net.AS_Crawler_AClientsBlowsSeverTheLegOnBothMachines
 class UCk_AutoTest_Net_Crawler_AClientsBlowsSeverTheLegOnBothMachines : UMars_AutoTestRig_NetCrawler
 {
@@ -47,18 +47,16 @@ class UCk_AutoTest_Net_Crawler_AClientsBlowsSeverTheLegOnBothMachines : UMars_Au
     UFUNCTION()
     private void OnServerSevered(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
     {
-        WaitUntil(n"Is_SeveredLimbsGone", n"OnServerLimbGone", k_SlowPolls);
+        Follow_ServerLeg0Limb("AClientsBlowsSeverTheLegOnBothMachines");
     }
 
-    UFUNCTION()
-    private void OnServerLimbGone(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
+    protected void Assert_ServerLimbTail() override
     {
         const auto Tally = Get_Tally();
         Assert_True(Tally.Applied >= 1, f"the server applied at least one claim ({Tally.Applied})");
         Assert_Equals_Int(Tally.Refused, 0, "the server refused no claim");
         Assert_True(Get_IsPartState(0, EMars_BodyPart_State::Severed), "the server's part 0 is Severed");
         Assert_Equals_Int(_LegSignals[0].Severed, 1, "the server's part 0 raised OnSevered once");
-        Hold_CrawlerServerRow("AClientsBlowsSeverTheLegOnBothMachines", "");
     }
 
     UFUNCTION()

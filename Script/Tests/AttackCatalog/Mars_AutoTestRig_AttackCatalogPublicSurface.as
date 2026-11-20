@@ -43,6 +43,8 @@ class UMars_AutoTestRig_AttackCatalogPublicSurface : UMars_AutoTestRig_CrawlerMe
         Spec.Layout = EMars_Crawler_Layout::Spider;
         Wear_ReferenceLoadout(Spec, EMars_Crawler_AttackClipKind::Pincer);
         _ProbeClip = Get_ReferenceClip(Spec.Layout, EMars_Crawler_AttackClipKind::Pincer);
+        // A row that severs ends once its limb is gone (Check_NoLimbNear): it lives under the spawn owner, not the test.
+        Spec.Vitals.LegDebris.LifetimeSeconds = 1.0f;
         SpawnFloorAndCrawler(InHandle, Spec);
         Add_SettleSteps();
         Add_Step_WaitUntil("the pincer has two available claws and trusted support", n"Check_ProbeStance", k_SlowPolls, 0);
