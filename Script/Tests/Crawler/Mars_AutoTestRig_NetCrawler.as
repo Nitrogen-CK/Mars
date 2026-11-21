@@ -28,6 +28,104 @@ struct FMars_NetCrawlerTest_FootRecord
     bool PlantedAgain = false;
 }
 
+// The authority's diagnosis of one limb: which leg it was, when its bodies, joints and launch landed, its widest joint
+// gap with what every piece did at that frame, the contacts its pieces reported, and the gap trace.
+struct FMars_NetCrawlerTest_LimbDiag
+{
+    UPROPERTY()
+    int32 Leg = -1;
+
+    UPROPERTY()
+    float64 LegDistance = -1.0;
+
+    UPROPERTY()
+    int32 BodiesFrame = -1;
+
+    UPROPERTY()
+    int32 JointsFrame = -1;
+
+    UPROPERTY()
+    int32 LaunchFrame = -1;
+
+    UPROPERTY()
+    int32 FloorContactFrame = -1;
+
+    UPROPERTY()
+    float64 FloorContactSeconds = -1.0;
+
+    UPROPERTY()
+    int32 LastSampleFrame = -1;
+
+    UPROPERTY()
+    int32 Samples = 0;
+
+    UPROPERTY()
+    int32 LargestSampleStep = 0;
+
+    UPROPERTY()
+    float64 PrevSeconds = -1.0;
+
+    UPROPERTY()
+    TArray<FQuat> PrevRotations;
+
+    UPROPERTY()
+    TArray<float64> KneeSignedStart;
+
+    UPROPERTY()
+    float64 PeakGap = -1.0;
+
+    UPROPERTY()
+    int32 PeakFrame = -1;
+
+    UPROPERTY()
+    float64 PeakAge = -1.0;
+
+    UPROPERTY()
+    int32 PeakJoint = -1;
+
+    UPROPERTY()
+    FString PeakKnee = "";
+
+    UPROPERTY()
+    FString PeakSpeeds = "";
+
+    UPROPERTY()
+    FString PeakTrace = "";
+
+    UPROPERTY()
+    int32 PeakTraceLeft = 0;
+
+    UPROPERTY()
+    TArray<FString> RecentGaps;
+
+    UPROPERTY()
+    FString GapTrace = "";
+
+    UPROPERTY()
+    int32 ForeignContacts = 0;
+
+    UPROPERTY()
+    TArray<int32> ContactFrames;
+
+    UPROPERTY()
+    TArray<FString> Contacts;
+
+    UPROPERTY()
+    FString Slide = "";
+
+    UPROPERTY()
+    float64 NextSlideSeconds = -1.0;
+
+    UPROPERTY()
+    TArray<FVector> SlideStart;
+
+    UPROPERTY()
+    FString PieceText = "";
+
+    UPROPERTY()
+    bool Logged = false;
+}
+
 // One severed limb as this machine saw it, from the first frame it was near the base to the row's end: when it arrived
 // and left, its widest joint gap, each knee's angle when first seen and its largest departure from it, its first
 // piece's first and last place, its ledger's notifies and the frame it first read at rest.
@@ -77,12 +175,22 @@ struct FMars_NetCrawlerTest_LimbRecord
     UPROPERTY()
     FString LedgerInitial = "";
 
+    // Its lowest piece's height over the floor plane at any sample, and the most pieces it had.
+    UPROPERTY()
+    float64 LowestOverFloor = 1000000.0;
+
+    UPROPERTY()
+    int32 PieceCount = 0;
+
     // Authority: the contacts its pieces' bodies reported with another piece of the same limb.
     UPROPERTY()
     int32 NeighbourContacts = 0;
 
     UPROPERTY()
     bool ContactsBound = false;
+
+    UPROPERTY()
+    FMars_NetCrawlerTest_LimbDiag Diag;
 }
 
 // One attack generation as one machine saw it. The server reads its kernel: its phases from OnAttackPhaseChanged, its
@@ -157,12 +265,44 @@ struct FMars_TESTONLY_Fragment_Crawler_ServerAttacks
     UPROPERTY() TArray<float32> PawnApplied;
 }
 
-// Test-only, on a limb's root: the server's world pose of every piece once its limb reads at rest, replicated so the
-// client can set its own beside it.
+// Test-only, on a limb's root: the server's world pose and half extents of every piece once its limb reads at rest,
+// replicated so the client can set its own beside them.
 struct FMars_TESTONLY_Fragment_SeveredLimb_RestPose
 {
     UPROPERTY()
     TArray<FTransform> Pieces;
+
+    UPROPERTY()
+    TArray<FVector> HalfExtents;
+}
+
+// A placed lever's spawn: its transform only, so its class's own defaults (channel, prompt) stand; injection matches by
+// property name.
+struct FMars_TESTONLY_NetCrawler_LeverSpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform;
+}
+
+// One named frame the server marked (a hit, a clear, a lever flip), on the shared frame counter.
+struct FMars_NetCrawlerTest_Mark
+{
+    UPROPERTY() FString Name;
+    UPROPERTY() int32 Frame = -1;
+}
+
+// Test-only, on the crawler's root: the spec the server composed and the frames it marked, replicated so a copy can
+// compare its own against them. Written again (and marked dirty) as the server marks more frames.
+struct FMars_TESTONLY_Fragment_Crawler_ServerReadout
+{
+    UPROPERTY() int32 LegCount = 0;
+    UPROPERTY() EMars_Crawler_Layout Layout = EMars_Crawler_Layout::Radial;
+    UPROPERTY() FBox RoamBounds;
+    UPROPERTY() bool CombatEnabled = false;
+    UPROPERTY() FVector BodyHalfExtents = FVector::ZeroVector;
+    UPROPERTY() float32 HomeRadius = 0.0f;
+    UPROPERTY() float32 AcquireRadius = 0.0f;
+    UPROPERTY() TArray<FMars_NetCrawlerTest_Mark> Marks;
 }
 
 // A crawler that severs its own leg part 0 (a 30 Sever cause) in its construction, with authority only: a copy is born
@@ -189,8 +329,10 @@ class UMars_TESTONLY_NetCrawler_BornSevered_EntityScript : UMars_Crawler_EntityS
 
 // The crawler net tests' shared steps, on top of the strike rig (whose striker only the strike row composes): each
 // machine lays its own static floor owned by its subject (a copy's walker finds its ground in this machine's world);
-// the server spawns a 4-leg crawler through its real entity script under the replicated spawn owner (its root 65
-// above the floor, facing +X, without visuals, combat off). Each machine finds its copy by tag near where it was
+// the server spawns a crawler of the row's layout and leg count (4 Radial unless the row sets _LegCount and _Layout)
+// through its real entity script under the replicated spawn owner (its root the layout's clearance above the floor,
+// facing +X, without visuals, combat off). A row may tilt the floor about Y (_FloorPitchDegrees): every height is then
+// measured to the floor's plane. Each machine finds its copy by tag near where it was
 // spawned, takes its leg parts in order and every leg's rig parts (segments, then the foot), counts what each of its
 // own parts and its monster raise and the OnDamaged of its body Health, records the part ledger's rep-notifies off
 // authority, and samples its copy from the row's polled predicates: the root's path and largest step, its farthest
@@ -218,8 +360,8 @@ class UMars_AutoTestRig_NetCrawler : UMars_AutoTestRig_NetStrike
     protected const float64 k_ClaimedFootFromHand = 60.0;
     // A limb within this of the base (horizontally) is this row's.
     protected const float64 k_LimbNearCm = 600.0;
-    // Decision tolerances: the authority's joints at every sample, a copy's at rest, a copy's piece against the published
-    // rest pose, a knee's least swing and its farthest.
+    // Decision tolerances: the authority's joints at every sample, a copy's at rest, a copy's piece against the
+    // published rest pose, a knee's least swing and its farthest.
     protected const float64 k_AuthorityGapCm = 2.0;
     protected const float64 k_CopyGapCm = 4.0;
     protected const float64 k_RestPoseCm = 3.0;
@@ -227,6 +369,13 @@ class UMars_AutoTestRig_NetCrawler : UMars_AutoTestRig_NetStrike
     protected const float64 k_KneeLeastSwingDegrees = 5.0;
     protected const float64 k_KneeMostSwingDegrees = 70.0;
     protected const float64 k_BelowFloorCm = 2.0;
+
+    // A row sets these before Begin_*: the crawler's legs and layout (the 4-leg rows keep k_LegCount, Radial), the
+    // radius its limbs are looked for in (k_LimbNearCm) and the floor's fall toward +X in degrees (level).
+    protected int32 _LegCount = 4;
+    protected EMars_Crawler_Layout _Layout = EMars_Crawler_Layout::Radial;
+    protected float64 _LimbNearCm = 600.0;
+    protected float64 _FloorPitchDegrees = 0.0;
 
     protected FVector _CrawlerAt = FVector::ZeroVector;
     protected FCk_Handle_Crawler _Crawler;
@@ -268,6 +417,19 @@ class UMars_AutoTestRig_NetCrawler : UMars_AutoTestRig_NetStrike
     // The row this machine follows a leg-0 sever under, and the first frame every captured leg-0 rig part read gone.
     protected FString _LimbRow = "";
     protected int32 _Leg0PartsGoneFrame = -1;
+    // The copy's spec's limb lifetime, read at the find.
+    protected float64 _LimbLifetimeSeconds = 8.0;
+
+    // This machine's floor box, and each leg's first segment where it was last seen attached.
+    protected FCk_Handle _FloorEntity;
+    private TArray<FVector> _LegFirstSegmentLast;
+
+    // Every sampled frame and this machine's world seconds at it: the frame counter is the machines' shared clock.
+    private TArray<int32> _ClockFrames;
+    private TArray<float64> _ClockSeconds;
+    // The server's readout as this machine last read it (a copy keeps it once its crawler is gone).
+    protected FMars_TESTONLY_Fragment_Crawler_ServerReadout _Readout;
+    protected bool _HasReadout = false;
 
     // A row without the striker: the base, the ensure count, this machine's floor; the crawler at the base.
     protected void Begin_CrawlerRow(FVector InBase)
@@ -295,12 +457,14 @@ class UMars_AutoTestRig_NetCrawler : UMars_AutoTestRig_NetStrike
     // Each machine: the floor. Server: the crawler
     //----------------------------------------------------------------------------------------------------------------------
 
-    // A static Jolt box whose top face is at the base's Z, owned by this machine's subject (it dies with the test).
+    // A static Jolt box whose top face passes through the base, tilted to fall _FloorPitchDegrees toward +X, owned by
+    // this machine's subject (it dies with the test).
     private void Spawn_CrawlerFloor()
     {
         auto Subject = Get_SubjectEntity();
         auto Box = utils_entity_lifetime::Request_CreateEntity(Subject);
-        utils_transform::Add(Box, FTransform(FRotator::ZeroRotator, _Base - FVector(0.0, 0.0, k_FloorHalfExtents.Z)),
+        _FloorEntity = Box;
+        utils_transform::Add(Box, FTransform(Get_FloorRotation(), _Base - Get_FloorNormal() * k_FloorHalfExtents.Z),
             ECk_Replication::DoesNotReplicate);
         auto Shape = FCk_Jolt_ShapeDimensions(ECk_Jolt_ShapeType::Box);
         Shape.Set_HalfExtents(k_FloorHalfExtents);
@@ -311,22 +475,38 @@ class UMars_AutoTestRig_NetCrawler : UMars_AutoTestRig_NetStrike
         utils_jolt_body::Add(Box, BoxSpec);
     }
 
-    // 4 legs roaming the box of InRoamHalfExtent around the crawler, dwelling 0.3 s, a severed limb living 8 s, combat
-    // off.
+    protected FRotator Get_FloorRotation() const
+    {
+        return FRotator(-_FloorPitchDegrees, 0.0, 0.0);
+    }
+
+    protected FVector Get_FloorNormal() const
+    {
+        return Get_FloorRotation().RotateVector(FVector::UpVector);
+    }
+
+    // InLocation's height over the floor's plane (the plane through the base).
+    protected float64 Get_HeightOverFloor(FVector InLocation) const
+    {
+        return (InLocation - _Base).DotProduct(Get_FloorNormal());
+    }
+
+    // The row's legs and layout roaming the box of InRoamHalfExtent around the crawler, dwelling 0.3 s, a severed limb
+    // living 8 s, combat off.
     protected FMars_Crawler_Spec Make_RowSpec(FVector InRoamHalfExtent) const
     {
-        auto Spec = FMars_Crawler_Spec(k_LegCount, FBox(_CrawlerAt - InRoamHalfExtent, _CrawlerAt + InRoamHalfExtent));
+        auto Spec = FMars_Crawler_Spec(_LegCount, FBox(_CrawlerAt - InRoamHalfExtent, _CrawlerAt + InRoamHalfExtent));
+        Spec.Layout = _Layout;
         Spec.RoamDwellSeconds = 0.3f;
         Spec.Vitals.LegDebris.LifetimeSeconds = 8.0f;
         Spec.Combat.Enabled = false;
         return Spec;
     }
 
-    // Where leg InIndex's foot rests in the 4-leg crawler's body frame.
+    // Where leg InIndex's foot rests in the row's crawler's body frame.
     protected FVector Get_RestFootLocal(int32 InIndex) const
     {
-        const auto Spec = FMars_Crawler_Spec(k_LegCount, FBox(FVector::ZeroVector, FVector::OneVector));
-        const TArray<FCk_ProceduralLeg_Spec> Legs = Spec.Get_RigData().Get_Legs();
+        const TArray<FCk_ProceduralLeg_Spec> Legs = utils_crawler::Get_LayoutRigData(_Layout, _LegCount).Get_Legs();
         return Legs[InIndex].Get_Placement().Get_RestFootLocal();
     }
 
@@ -335,13 +515,23 @@ class UMars_AutoTestRig_NetCrawler : UMars_AutoTestRig_NetStrike
         Spawn_ServerCrawlerOfClass(InSpec, UMars_Crawler_EntityScript);
     }
 
-    // The crawler of InClass under the replicated spawn owner, its root 65 above the floor, facing +X, without visuals.
+    // The crawler of InClass under the replicated spawn owner, its root the layout's clearance above the floor, facing
+    // +X, without visuals.
     protected void Spawn_ServerCrawlerOfClass(FMars_Crawler_Spec InSpec, TSubclassOf<UCk_EntityScript_UE> InClass)
     {
+        const auto Clearance = float64(utils_crawler::Get_LayoutClearance(_Layout));
+        Spawn_ServerCrawlerAt(InSpec, InClass, FTransform(FRotator::ZeroRotator, _CrawlerAt + FVector(0.0, 0.0, Clearance)), false);
+    }
+
+    // The crawler of InClass at InTransform under the replicated spawn owner (the channel a spawner with authority
+    // queues a placed crawler under). The base script's params: native injection matches by property name, so a preset
+    // class takes them too.
+    protected void Spawn_ServerCrawlerAt(FMars_Crawler_Spec InSpec, TSubclassOf<UCk_EntityScript_UE> InClass, FTransform InTransform, bool InWithVisuals)
+    {
         auto Params = UMars_Crawler_EntityScript::Params();
-        Params.SpawnTransform = FTransform(FRotator::ZeroRotator, _CrawlerAt + FVector(0.0, 0.0, k_RootOverFloor));
+        Params.SpawnTransform = InTransform;
         Params.Spec = InSpec;
-        Params.WithVisuals = false;
+        Params.WithVisuals = InWithVisuals;
         utils_entity_script::Request_SpawnEntity(utils_mars_net::Get_ReplicatedSpawnOwner(Get_SubjectEntity()), InClass, Params);
     }
 
@@ -388,7 +578,7 @@ class UMars_AutoTestRig_NetCrawler : UMars_AutoTestRig_NetStrike
     // counted from here (and the server tracks it).
     protected bool Get_IsCrawlerFound()
     {
-        if (_LegParts.Num() == k_LegCount)
+        if (_LegParts.Num() == _LegCount)
         { return true; }
 
         for (auto Candidate : utils_entity_tag::ForEach_Entity(Get_SubjectEntity(), n"TAG_MarsCrawler"))
@@ -397,7 +587,7 @@ class UMars_AutoTestRig_NetCrawler : UMars_AutoTestRig_NetStrike
             { continue; }
 
             auto Crawler = Candidate.As_Crawler(ECk_SanityCheck::UnChecked);
-            if (ck::Is_NOT_Valid(Crawler) || Crawler.Get_LegParts().Num() != k_LegCount)
+            if (ck::Is_NOT_Valid(Crawler) || Crawler.Get_LegParts().Num() != _LegCount)
             { continue; }
 
             Take_Crawler(Candidate, Crawler);
@@ -427,6 +617,7 @@ class UMars_AutoTestRig_NetCrawler : UMars_AutoTestRig_NetStrike
         _CrawlerMonster.BindTo_OnDied(FMars_Delegate_Monster_OnDied(this, n"OnCrawlerDied"));
         _Health.BindTo_OnDamaged(FMars_Delegate_Health_OnDamaged(this, n"OnCrawlerBodyDamaged"));
         _CrawlerFoundFrame = int32(utils_time::Get_FrameCounter());
+        _LimbLifetimeSeconds = float64(InCrawler.Get_Spec().Vitals.LegDebris.LifetimeSeconds);
         _RosterInitialAtFind = Get_RosterInitialState();
         if (Get_IsServer())
         { Track_ForCleanup(InRoot); }
@@ -448,7 +639,7 @@ class UMars_AutoTestRig_NetCrawler : UMars_AutoTestRig_NetStrike
         auto Result = OutResult;
         Result.Set(Get_IsCrawlerFound() && Get_IsCrawlerGone() == false
             && Get_GaitStatus() == ECk_ProceduralAnimation_Status::Ready
-            && _CrawlerMonster.Get_Parts().Num() == k_LegCount);
+            && _CrawlerMonster.Get_Parts().Num() == _LegCount);
     }
 
     UFUNCTION()
@@ -530,10 +721,10 @@ class UMars_AutoTestRig_NetCrawler : UMars_AutoTestRig_NetStrike
     // The row's sever spilled into the body: the copy's body Health raised OnDamaged.
     protected bool _ExpectBodySpill = false;
 
-    // Once its part 0 reads Severed: within ten frames of its OnSevered leg 0 left its copy, raising OnSevered once with
-    // its zone off, and every captured leg-0 rig part is gone (no local limb); a second later the other legs walk on and
-    // exactly one limb is near, not this machine's; then the client's rest asserts, and the row finishes once no limb is
-    // left.
+    // Once its part 0 reads Severed: within ten frames of its OnSevered leg 0 left its copy, raising OnSevered once
+    // with its zone off, and every captured leg-0 rig part is gone (no local limb); a second later the other legs walk
+    // on and exactly one limb is near, not this machine's; then the client's rest asserts, and the row finishes once no
+    // limb is left.
     protected void Follow_ClientLeg0Sever(FString InRow)
     {
         _SeverRow = InRow;
@@ -561,7 +752,7 @@ class UMars_AutoTestRig_NetCrawler : UMars_AutoTestRig_NetStrike
     UFUNCTION()
     private void OnClientLeg0Settled(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
     {
-        for (int32 Index = 1; Index < k_LegCount; ++Index)
+        for (int32 Index = 1; Index < _LegCount; ++Index)
         { Assert_True(Get_IsLegAttached(Index), f"the client's leg {Index} is attached"); }
 
         Assert_True(Get_GaitStatus() == ECk_ProceduralAnimation_Status::Ready, "the client's gait reads Ready");
@@ -579,6 +770,12 @@ class UMars_AutoTestRig_NetCrawler : UMars_AutoTestRig_NetStrike
     UFUNCTION()
     private void OnClientLeg0LimbGone(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
     {
+        Finish_ClientLeg0Row();
+    }
+
+    // The end of a client's leg-0 sever, once no limb is near: a row may add its asserts first.
+    protected void Finish_ClientLeg0Row()
+    {
         Finish_CrawlerRow(_SeverRow, f"severedFrame={_ClientSeveredFrame}");
     }
 
@@ -586,11 +783,11 @@ class UMars_AutoTestRig_NetCrawler : UMars_AutoTestRig_NetStrike
     // Server: its leg-0 sever and the one limb it spawns
     //----------------------------------------------------------------------------------------------------------------------
 
-    // From the sever on: within ten frames of OnSevered every captured leg-0 rig part is gone; a second later exactly one
-    // limb is near, with authority, a body per piece and every joint added, and leg 0's entity is valid and detached with
-    // its part Severed. Once the limb reads at rest (the sampler publishes its rest pose), the server waits until it is
-    // gone: its widest joint gap stayed within k_AuthorityGapCm and it lived between 7.5 and 9 s. The row's own tail
-    // (Assert_ServerLimbTail) runs, and the row holds.
+    // From the sever on: within ten frames of OnSevered every captured leg-0 rig part is gone; a second later exactly
+    // one limb is near, with authority, a body per piece and every joint added, and leg 0's entity is valid and
+    // detached with its part Severed. Once the limb reads at rest (the sampler publishes its rest pose), the server
+    // waits until it is gone: its widest joint gap stayed within k_AuthorityGapCm and it lived between 7.5 and 9 s. The
+    // row's own tail (Assert_ServerLimbTail) runs, and the row holds.
     protected void Follow_ServerLeg0Limb(FString InRow)
     {
         _LimbRow = InRow;
@@ -634,7 +831,9 @@ class UMars_AutoTestRig_NetCrawler : UMars_AutoTestRig_NetStrike
             const auto Record = _Limbs[0];
             Assert_True(Record.WidestGap <= k_AuthorityGapCm, f"the server's limb's widest joint gap {Record.WidestGap} is at most {k_AuthorityGapCm}");
             const auto Lived = Record.GoneSeconds - Record.FirstSeconds;
-            Assert_True(Lived >= 7.5 && Lived <= 9.0, f"the server's limb lived {Lived} s (7.5 to 9)");
+            const auto Shortest = _LimbLifetimeSeconds - 0.5;
+            const auto Longest = _LimbLifetimeSeconds + 1.0;
+            Assert_True(Lived >= Shortest && Lived <= Longest, f"the server's limb lived {Lived} s ({Shortest} to {Longest})");
         }
 
         Assert_ServerLimbTail();
@@ -645,7 +844,7 @@ class UMars_AutoTestRig_NetCrawler : UMars_AutoTestRig_NetStrike
     // Limbs
     //----------------------------------------------------------------------------------------------------------------------
 
-    // Every valid limb within k_LimbNearCm of the base (horizontally), not pending destroy.
+    // Every valid limb within _LimbNearCm of the base (horizontally), not pending destroy.
     protected TArray<FCk_Handle> Get_LimbsNear()
     {
         auto Limbs = TArray<FCk_Handle>();
@@ -660,7 +859,7 @@ class UMars_AutoTestRig_NetCrawler : UMars_AutoTestRig_NetStrike
 
             auto Offset = utils_transform::Get_EntityCurrentLocation(Transform) - _Base;
             Offset.Z = 0.0;
-            if (Offset.Size() < k_LimbNearCm)
+            if (Offset.Size() < _LimbNearCm)
             { Limbs.Add(Candidate); }
         }
 
@@ -807,6 +1006,14 @@ class UMars_AutoTestRig_NetCrawler : UMars_AutoTestRig_NetStrike
         if (_LegRigs.Num() > 0 && _LegSignals.Num() > 0 && _LegSignals[0].Severed > 0 && _Leg0PartsGoneFrame < 0 && Get_ValidRigParts(0) == 0)
         { _Leg0PartsGoneFrame = int32(utils_time::Get_FrameCounter()); }
 
+        _LegFirstSegmentLast.SetNum(_LegRigs.Num());
+        for (int32 Leg = 0; Leg < _LegRigs.Num(); ++Leg)
+        {
+            if (_LegRigs[Leg].Segments.Num() > 0 && ck::IsValid(_LegRigs[Leg].Segments[0])
+                && utils_entity_lifetime::Get_IsPendingDestroy(_LegRigs[Leg].Segments[0], ECk_EntityLifetime_DestructionPhase::BeginDestroy) == false)
+            { _LegFirstSegmentLast[Leg] = utils_transform::Get_EntityCurrentLocation(_LegRigs[Leg].Segments[0]); }
+        }
+
         for (auto Limb : Get_LimbsNear())
         {
             auto Index = Find_LimbRecord(Limb);
@@ -835,8 +1042,239 @@ class UMars_AutoTestRig_NetCrawler : UMars_AutoTestRig_NetStrike
             { continue; }
 
             if (ck::Is_NOT_Valid(Record.Limb) || utils_entity_lifetime::Get_IsPendingDestroy(Record.Limb, ECk_EntityLifetime_DestructionPhase::BeginDestroy))
-            { Record.GoneSeconds = Get_WorldSeconds(); }
+            {
+                Record.GoneSeconds = Get_WorldSeconds();
+                Log_LimbDiag(Index);
+            }
         }
+    }
+
+    //----------------------------------------------------------------------------------------------------------------------
+    // Limb diagnosis (authority)
+    //----------------------------------------------------------------------------------------------------------------------
+
+    // Knee InKnee's angle from the upper piece's X to the lower's, signed about the upper piece's Z (the hinge's axis).
+    private float64 Get_SignedKnee(const TArray<FCk_Handle_Transform>& InPieces, int32 InKnee)
+    {
+        const auto Upper = utils_transform::Get_EntityCurrentTransform(InPieces[InKnee]).GetRotation();
+        const auto Lower = utils_transform::Get_EntityCurrentTransform(InPieces[InKnee + 1]).GetRotation();
+        const auto UpperX = Upper.GetAxisX();
+        const auto LowerX = Lower.GetAxisX();
+        const auto Sine = UpperX.CrossProduct(LowerX).DotProduct(Upper.GetAxisZ());
+        return Math::RadiansToDegrees(Math::Atan2(Sine, UpperX.DotProduct(LowerX)));
+    }
+
+    private FCk_Handle_JoltBody Get_PieceBody(FCk_Handle_Transform InPiece)
+    {
+        FCk_Handle Entity = InPiece;
+        return Entity.As_JoltBody(ECk_SanityCheck::UnChecked);
+    }
+
+    // Once per frame per limb on the authority: the leg it was cut from, the frames its bodies, joints and launch
+    // landed, its peak gap with each piece's speeds and the knee's swing at that frame, the gap trace and, on a slope,
+    // the slide.
+    private void Sample_LimbDiag(int32 InIndex, const TArray<float64>& InGaps)
+    {
+        const auto Limb = _Limbs[InIndex].Limb;
+        const auto Pieces = Get_LimbPieces(Limb);
+        const auto Frame = int32(utils_time::Get_FrameCounter());
+        const auto Now = Get_WorldSeconds();
+        auto& Diag = _Limbs[InIndex].Diag;
+        if (Pieces.Num() == 0 || Diag.LastSampleFrame == Frame)
+        { return; }
+
+        if (Diag.LastSampleFrame >= 0)
+        { Diag.LargestSampleStep = Math::Max(Diag.LargestSampleStep, Frame - Diag.LastSampleFrame); }
+
+        Diag.LastSampleFrame = Frame;
+        Diag.Samples += 1;
+
+        if (Diag.Leg < 0)
+        {
+            const auto FirstPiece = utils_transform::Get_EntityCurrentLocation(Pieces[0]);
+            for (int32 Leg = 0; Leg < _LegFirstSegmentLast.Num(); ++Leg)
+            {
+                const auto Distance = (_LegFirstSegmentLast[Leg] - FirstPiece).Size();
+                if (Diag.Leg < 0 || Distance < Diag.LegDistance)
+                {
+                    Diag.Leg = Leg;
+                    Diag.LegDistance = Distance;
+                }
+            }
+
+            for (int32 Knee = 0; Knee + 2 < Pieces.Num(); ++Knee)
+            { Diag.KneeSignedStart.Add(Get_SignedKnee(Pieces, Knee)); }
+
+            const auto Severed = Limb.As_SeveredLimb(ECk_SanityCheck::UnChecked);
+            const TArray<FCk_ProceduralLeg_Spec> Legs = utils_crawler::Get_LayoutRigData(_Layout, _LegCount).Get_Legs();
+            for (int32 Piece = 0; Piece < Pieces.Num(); ++Piece)
+            {
+                const auto HalfX = Severed.Get_PieceHalfExtents(Piece).X;
+                auto HalfLength = -1.0;
+                if (Diag.Leg >= 0 && Diag.Leg < Legs.Num() && Piece < Legs[Diag.Leg].Get_Chain().Get_SegmentLengths().Num())
+                { HalfLength = float64(Legs[Diag.Leg].Get_Chain().Get_SegmentLengths()[Piece]) * 0.5; }
+
+                Diag.PieceText += f"p{Piece}:halfX {HalfX :.2} halfLength {HalfLength :.2};";
+            }
+        }
+
+        auto BodiesAdded = 0;
+        for (auto Piece : Pieces)
+        {
+            const auto Body = Get_PieceBody(Piece);
+            if (ck::IsValid(Body) && utils_jolt_body::Get_IsBodyAdded(Body))
+            { BodiesAdded += 1; }
+        }
+
+        if (Diag.BodiesFrame < 0 && BodiesAdded == Pieces.Num())
+        { Diag.BodiesFrame = Frame; }
+
+        if (Diag.JointsFrame < 0 && Get_LimbJointsAdded(Limb) == Pieces.Num() - 1)
+        { Diag.JointsFrame = Frame; }
+
+        if (Diag.LaunchFrame < 0 && Limb.Has_Fragment(FMars_Fragment_BodyPart_PendingDebris) == false)
+        { Diag.LaunchFrame = Frame; }
+
+        auto Widest = -1.0;
+        auto WidestJoint = -1;
+        for (int32 Joint = 0; Joint < InGaps.Num(); ++Joint)
+        {
+            if (InGaps[Joint] > Widest)
+            {
+                Widest = InGaps[Joint];
+                WidestJoint = Joint;
+            }
+        }
+
+        const auto GapPair = f"{Frame}:{Widest :.2}";
+        if (Diag.Samples <= 30)
+        { Diag.GapTrace += f"{GapPair},"; }
+
+        if (Diag.PeakTraceLeft > 0)
+        {
+            Diag.PeakTrace += f"{GapPair},";
+            Diag.PeakTraceLeft -= 1;
+        }
+
+        const auto DeltaSeconds = Diag.PrevSeconds >= 0.0 ? Now - Diag.PrevSeconds : 0.0;
+        if (Widest > Diag.PeakGap)
+        {
+            Diag.PeakGap = Widest;
+            Diag.PeakFrame = Frame;
+            Diag.PeakAge = Now - _Limbs[InIndex].FirstSeconds;
+            Diag.PeakJoint = WidestJoint;
+            Diag.PeakTrace = "";
+            for (const auto& Recent : Diag.RecentGaps)
+            { Diag.PeakTrace += f"{Recent},"; }
+
+            Diag.PeakTrace += f"[{GapPair}],";
+            Diag.PeakTraceLeft = 5;
+
+            Diag.PeakKnee = "";
+            if (WidestJoint + 2 < Pieces.Num() && WidestJoint < Diag.KneeSignedStart.Num())
+            {
+                const auto Swing = Get_SignedKnee(Pieces, WidestJoint) - Diag.KneeSignedStart[WidestJoint];
+                const auto Limit = float64(constants_severed_limb::k_KneeLimitDegrees);
+                FString Where = "inside";
+                if (Math::Abs(Swing) > Limit)
+                { Where = "past"; }
+                else if (Math::Abs(Swing) >= Limit - 1.0)
+                { Where = "at"; }
+
+                Diag.PeakKnee = f"swing {Swing :.2} {Where} limit";
+            }
+            else
+            { Diag.PeakKnee = "ankle"; }
+
+            Diag.PeakSpeeds = "";
+            for (int32 Piece = 0; Piece < Pieces.Num(); ++Piece)
+            {
+                const auto Body = Get_PieceBody(Pieces[Piece]);
+                const auto Linear = ck::IsValid(Body) ? utils_jolt_body::Get_LinearVelocity(Body).Size() : -1.0;
+                auto Angular = -1.0;
+                if (DeltaSeconds > 0.0 && Piece < Diag.PrevRotations.Num())
+                {
+                    const auto Rotation = utils_transform::Get_EntityCurrentTransform(Pieces[Piece]).GetRotation();
+                    Angular = Math::RadiansToDegrees(Rotation.AngularDistance(Diag.PrevRotations[Piece])) / DeltaSeconds;
+                }
+
+                Diag.PeakSpeeds += f"p{Piece}:{Linear :.1}cm/s,{Angular :.1}deg/s ";
+            }
+        }
+
+        Diag.RecentGaps.Add(GapPair);
+        if (Diag.RecentGaps.Num() > 5)
+        { Diag.RecentGaps.RemoveAt(0); }
+
+        Diag.PrevRotations.SetNum(Pieces.Num());
+        for (int32 Piece = 0; Piece < Pieces.Num(); ++Piece)
+        { Diag.PrevRotations[Piece] = utils_transform::Get_EntityCurrentTransform(Pieces[Piece]).GetRotation(); }
+
+        Diag.PrevSeconds = Now;
+        Sample_LimbSlide(InIndex, Pieces);
+    }
+
+    // On a sloped floor, from the limb's first floor contact, every 0.25 s per piece: its speed down the slope, its
+    // speed along the floor's normal, its sleep state and how far down the slope it moved since that contact.
+    private void Sample_LimbSlide(int32 InIndex, const TArray<FCk_Handle_Transform>& InPieces)
+    {
+        auto& Diag = _Limbs[InIndex].Diag;
+        if (_FloorPitchDegrees == 0.0 || Diag.FloorContactFrame < 0 || Get_WorldSeconds() < Diag.NextSlideSeconds)
+        { return; }
+
+        const auto Downhill = Get_FloorRotation().RotateVector(FVector::ForwardVector);
+        const auto Normal = Get_FloorNormal();
+        if (Diag.SlideStart.Num() == 0)
+        {
+            for (auto Piece : InPieces)
+            { Diag.SlideStart.Add(utils_transform::Get_EntityCurrentLocation(Piece)); }
+        }
+
+        FString Line = f"t+{Get_WorldSeconds() - Diag.FloorContactSeconds :.2}[";
+        for (int32 Piece = 0; Piece < InPieces.Num() && Piece < Diag.SlideStart.Num(); ++Piece)
+        {
+            const auto Body = Get_PieceBody(InPieces[Piece]);
+            const auto Velocity = ck::IsValid(Body) ? utils_jolt_body::Get_LinearVelocity(Body) : FVector::ZeroVector;
+            const auto Sleep = ck::IsValid(Body) ? f"{utils_jolt_body::Get_SleepState(Body) :n}" : FString("none");
+            const auto Moved = (utils_transform::Get_EntityCurrentLocation(InPieces[Piece]) - Diag.SlideStart[Piece]).DotProduct(Downhill);
+            Line += f"p{Piece}:down {Velocity.DotProduct(Downhill) :.1} normal {Velocity.DotProduct(Normal) :.1} {Sleep} moved {Moved :.1};";
+        }
+
+        Diag.Slide += f"{Line}] ";
+        Diag.NextSlideSeconds = Get_WorldSeconds() + 0.25;
+    }
+
+    // One line per limb on the authority, once, when it goes (or when the row logs it still standing).
+    protected void Log_LimbDiag(int32 InIndex)
+    {
+        auto& Record = _Limbs[InIndex];
+        if (Record.Diag.Logged || Record.Diag.Samples == 0)
+        { return; }
+
+        Record.Diag.Logged = true;
+        const auto& Diag = Record.Diag;
+        FString PeakContacts = "";
+        for (int32 Contact = 0; Contact < Diag.Contacts.Num() && Contact < Diag.ContactFrames.Num(); ++Contact)
+        {
+            if (Math::Abs(Diag.ContactFrames[Contact] - Diag.PeakFrame) <= 2)
+            { PeakContacts += f"{Diag.Contacts[Contact]};"; }
+        }
+
+        FString FloorContacts = "";
+        auto Shown = 0;
+        for (int32 Contact = 0; Contact < Diag.Contacts.Num() && Shown < 12; ++Contact)
+        {
+            FloorContacts += f"{Diag.Contacts[Contact]};";
+            Shown += 1;
+        }
+
+        const auto Machine = Get_MachineName();
+        Log(f"[CrawlerNetLimbDiag] {_LimbRow} {Machine} limb={InIndex} leg={Diag.Leg} legDistance={Diag.LegDistance :.2} first={Record.FirstFrame} "
+            + f"bodies={Diag.BodiesFrame} joints={Diag.JointsFrame} launch={Diag.LaunchFrame} floorContact={Diag.FloorContactFrame} "
+            + f"samples={Diag.Samples} largestStep={Diag.LargestSampleStep} peak=[gap {Diag.PeakGap :.2} frame {Diag.PeakFrame} age {Diag.PeakAge :.3} "
+            + f"joint {Diag.PeakJoint} knee {Diag.PeakKnee} speeds {Diag.PeakSpeeds}contacts {PeakContacts}] foreign={Diag.ForeignContacts} "
+            + f"sameLimb={Record.NeighbourContacts} rest={Record.RestSeconds - Record.FirstSeconds :.2} pieces=[{Diag.PieceText}] "
+            + f"firstContacts=[{FloorContacts}] gapTrace=[{Diag.GapTrace}] peakTrace=[{Diag.PeakTrace}] slide=[{Diag.Slide}]");
     }
 
     private void Sample_Limb(int32 InIndex)
@@ -860,6 +1298,10 @@ class UMars_AutoTestRig_NetCrawler : UMars_AutoTestRig_NetStrike
         for (int32 Index = 0; Index < Knees.Num() && Index < Record.KneeStart.Num(); ++Index)
         { Record.KneeSwing[Index] = Math::Max(Record.KneeSwing[Index], Math::Abs(Knees[Index] - Record.KneeStart[Index])); }
 
+        Record.PieceCount = Math::Max(Record.PieceCount, Pieces.Num());
+        for (auto Piece : Pieces)
+        { Record.LowestOverFloor = Math::Min(Record.LowestOverFloor, Get_HeightOverFloor(utils_transform::Get_EntityCurrentLocation(Piece))); }
+
         if (Pieces.Num() > 0)
         {
             const auto FirstPiece = utils_transform::Get_EntityCurrentLocation(Pieces[0]);
@@ -880,11 +1322,15 @@ class UMars_AutoTestRig_NetCrawler : UMars_AutoTestRig_NetStrike
             }
         }
 
-        if (Record.RestFrame >= 0 || AtRest == false)
+        if (utils_net::Get_HasAuthority(Limb))
+        { Sample_LimbDiag(InIndex, Gaps); }
+
+        if (_Limbs[InIndex].RestFrame >= 0 || AtRest == false)
         { return; }
 
-        Record.RestFrame = int32(utils_time::Get_FrameCounter());
-        Record.RestSeconds = Get_WorldSeconds();
+        auto& Resting = _Limbs[InIndex];
+        Resting.RestFrame = int32(utils_time::Get_FrameCounter());
+        Resting.RestSeconds = Get_WorldSeconds();
         if (Get_IsServer())
         { Publish_RestPose(Limb); }
     }
@@ -894,25 +1340,59 @@ class UMars_AutoTestRig_NetCrawler : UMars_AutoTestRig_NetStrike
     {
         FCk_Handle BodyEntity = InBody;
         const FCk_Handle OtherEntity = InPayload.Get_OtherEntity();
+        auto MineRecord = -1;
+        auto MinePiece = -1;
+        auto OtherRecord = -1;
+        auto OtherPiece = -1;
         for (int32 RecordIndex = 0; RecordIndex < _Limbs.Num(); ++RecordIndex)
         {
             const auto Pieces = Get_LimbPieces(_Limbs[RecordIndex].Limb);
-            auto Mine = -1;
-            auto Other = -1;
             for (int32 Index = 0; Index < Pieces.Num(); ++Index)
             {
                 FCk_Handle Entity = Pieces[Index];
                 if (Entity == BodyEntity)
-                { Mine = Index; }
+                {
+                    MineRecord = RecordIndex;
+                    MinePiece = Index;
+                }
                 if (Entity == OtherEntity)
-                { Other = Index; }
+                {
+                    OtherRecord = RecordIndex;
+                    OtherPiece = Index;
+                }
             }
+        }
 
-            if (Mine < 0 || Other < 0)
-            { continue; }
+        if (MineRecord < 0)
+        { return; }
 
-            _Limbs[RecordIndex].NeighbourContacts += 1;
-            return;
+        auto& Record = _Limbs[MineRecord];
+        const auto Frame = int32(utils_time::Get_FrameCounter());
+        FString Class = "other";
+        if (OtherRecord == MineRecord)
+        {
+            Class = f"sameLimb p{OtherPiece}";
+            Record.NeighbourContacts += 1;
+        }
+        else if (OtherRecord >= 0)
+        {
+            Class = f"limb{OtherRecord} p{OtherPiece}";
+            Record.Diag.ForeignContacts += 1;
+        }
+        else if (OtherEntity == _FloorEntity)
+        {
+            Class = "floor";
+            if (Record.Diag.FloorContactFrame < 0)
+            {
+                Record.Diag.FloorContactFrame = Frame;
+                Record.Diag.FloorContactSeconds = Get_WorldSeconds();
+            }
+        }
+
+        if (Record.Diag.Contacts.Num() < 200)
+        {
+            Record.Diag.ContactFrames.Add(Frame);
+            Record.Diag.Contacts.Add(f"{Frame}:p{MinePiece}:{Class}:{InPayload.Get_RelativeNormalSpeed() :.1}");
         }
     }
 
@@ -924,8 +1404,13 @@ class UMars_AutoTestRig_NetCrawler : UMars_AutoTestRig_NetStrike
         { return; }
 
         auto Readout = FMars_TESTONLY_Fragment_SeveredLimb_RestPose();
-        for (auto Piece : Get_LimbPieces(Limb))
-        { Readout.Pieces.Add(utils_transform::Get_EntityCurrentTransform(Piece)); }
+        const auto Pieces = Get_LimbPieces(Limb);
+        const auto Severed = Limb.As_SeveredLimb(ECk_SanityCheck::UnChecked);
+        for (int32 Index = 0; Index < Pieces.Num(); ++Index)
+        {
+            Readout.Pieces.Add(utils_transform::Get_EntityCurrentTransform(Pieces[Index]));
+            Readout.HalfExtents.Add(ck::IsValid(Severed) ? Severed.Get_PieceHalfExtents(Index) : FVector::ZeroVector);
+        }
 
         Limb.Add_Fragment(Readout, ECk_Replication::Replicates);
     }
@@ -1002,9 +1487,9 @@ class UMars_AutoTestRig_NetCrawler : UMars_AutoTestRig_NetStrike
 
     private FName _AfterClientLimbRest;
 
-    // Once the server published its limb's rest pose and this copy's limb reads at rest: every piece within k_RestPoseCm
-    // and k_RestPoseDegrees of the published pose and not more than k_BelowFloorCm below the floor, every joint gap within
-    // k_CopyGapCm; again 0.5 s later; then InContinuation once no limb is near.
+    // Once the server published its limb's rest pose and this copy's limb reads at rest: every piece within
+    // k_RestPoseCm and k_RestPoseDegrees of the published pose and not more than k_BelowFloorCm below the floor, every
+    // joint gap within k_CopyGapCm; again 0.5 s later; then InContinuation once no limb is near.
     protected void Await_ClientLimbRest(FName InContinuation)
     {
         _AfterClientLimbRest = InContinuation;
@@ -1055,8 +1540,8 @@ class UMars_AutoTestRig_NetCrawler : UMars_AutoTestRig_NetStrike
             const auto Degrees = Math::RadiansToDegrees(Mine.GetRotation().AngularDistance(Published[Index].GetRotation()));
             Assert_True(Distance <= k_RestPoseCm && Degrees <= k_RestPoseDegrees,
                 f"the client's piece {Index} is {Distance} cm and {Degrees} deg from the server's rest pose {InWhen}");
-            Assert_True(Mine.GetLocation().Z >= _Base.Z - k_BelowFloorCm,
-                f"the client's piece {Index} is not below the floor ({Mine.GetLocation().Z - _Base.Z}) {InWhen}");
+            Assert_True(Get_HeightOverFloor(Mine.GetLocation()) >= -k_BelowFloorCm,
+                f"the client's piece {Index} is not below the floor ({Get_HeightOverFloor(Mine.GetLocation())}) {InWhen}");
         }
 
         const auto Gaps = Get_LimbJointGaps(Limb);
@@ -1064,8 +1549,8 @@ class UMars_AutoTestRig_NetCrawler : UMars_AutoTestRig_NetStrike
         { Assert_True(Gaps[Index] <= k_CopyGapCm, f"the client's joint {Index} gap {Gaps[Index]} is at most {k_CopyGapCm} {InWhen}"); }
     }
 
-    // Every limb this machine saw, one line each: authority / bodies / joints / widest gap / knee start and swing / birth
-    // lift / same-limb contacts / at rest / piece poses, and the published rest pose.
+    // Every limb this machine saw, one line each: authority / bodies / joints / widest gap / knee start and swing /
+    // birth lift / same-limb contacts / at rest / piece poses, and the published rest pose.
     protected FString Describe_Limbs()
     {
         FString Text = f"leg0PartsGone={_Leg0PartsGoneFrame} ";
@@ -1077,7 +1562,7 @@ class UMars_AutoTestRig_NetCrawler : UMars_AutoTestRig_NetStrike
             { Knees += f"{Record.KneeStart[Index]}/{Record.KneeSwing[Index]},"; }
 
             const auto Moved = (Record.FirstPieceLast - Record.FirstPieceStart).Size();
-            Text += f"[limb first={Record.FirstFrame}@{Record.FirstSeconds} gone={Record.GoneSeconds} widestGap={Record.WidestGap} knees(start/swing)={Knees} firstPieceMoved={Moved} rest={Record.RestFrame}@{Record.RestSeconds} notifies={Record.Notifies} beforeRest={Record.NotifiesBeforeRest} ledger={Record.LedgerInitial} contacts={Record.NeighbourContacts}";
+            Text += f"[limb first={Record.FirstFrame}@{Record.FirstSeconds} gone={Record.GoneSeconds} widestGap={Record.WidestGap} knees(start/swing)={Knees} firstPieceMoved={Moved} rest={Record.RestFrame}@{Record.RestSeconds} notifies={Record.Notifies} beforeRest={Record.NotifiesBeforeRest} ledger={Record.LedgerInitial} contacts={Record.NeighbourContacts} lowest={Record.LowestOverFloor} pieces={Record.PieceCount}";
             if (ck::IsValid(Limb) && utils_entity_lifetime::Get_IsPendingDestroy(Limb, ECk_EntityLifetime_DestructionPhase::BeginDestroy) == false)
             {
                 FString Poses = "";
@@ -1199,13 +1684,26 @@ class UMars_AutoTestRig_NetCrawler : UMars_AutoTestRig_NetStrike
         return utils_transform::Get_EntityCurrentLocation(_Crawler.As_Transform());
     }
 
+    // A rig's own per-sample work, before the copy's.
+    protected void Sample_RowExtra()
+    {
+    }
+
     // One sample of this machine's copy: the root's step, path and offset from the base, the gait and, while recording,
     // the feet. Quiet once the copy is gone.
     protected void Sample_Crawler()
     {
+        Sample_Clock();
         Sample_Limbs();
+        Sample_RowExtra();
         if (Get_IsCrawlerGone())
         { return; }
+
+        if (_CrawlerRoot.Has_Fragment(FMars_TESTONLY_Fragment_Crawler_ServerReadout))
+        {
+            _Readout = _CrawlerRoot.Get_Fragment(FMars_TESTONLY_Fragment_Crawler_ServerReadout);
+            _HasReadout = true;
+        }
 
         const auto Here = Get_RootLocation();
         if (_CrawlerLastSample.IsSet())
@@ -1235,7 +1733,7 @@ class UMars_AutoTestRig_NetCrawler : UMars_AutoTestRig_NetStrike
     {
         _FeetRecording = true;
         _FeetRecords.Reset();
-        for (int32 Index = 0; Index < k_LegCount; ++Index)
+        for (int32 Index = 0; Index < _LegCount; ++Index)
         { _FeetRecords.Add(FMars_NetCrawlerTest_FootRecord()); }
     }
 
@@ -1247,7 +1745,7 @@ class UMars_AutoTestRig_NetCrawler : UMars_AutoTestRig_NetStrike
             { continue; }
 
             const auto Foot = utils_procedural_leg::Get_Foot(_LegParts[Index].Get_Leg());
-            const auto Lift = Foot.Get_Position().Z - _Base.Z;
+            const auto Lift = Get_HeightOverFloor(Foot.Get_Position());
             auto& Record = _FeetRecords[Index];
             Record.HighestLift = Math::Max(Record.HighestLift, Lift);
             if (Foot.Get_Phase() == ECk_ProceduralLeg_FootPhase::Planted)
@@ -1268,7 +1766,7 @@ class UMars_AutoTestRig_NetCrawler : UMars_AutoTestRig_NetStrike
     // Every foot lifted more than InLift over the floor and was seen planted again.
     protected bool Get_HaveAllFeetStepped(float64 InLift) const
     {
-        if (_FeetRecords.Num() != k_LegCount)
+        if (_FeetRecords.Num() != _LegCount)
         { return false; }
 
         for (const auto& Record : _FeetRecords)
@@ -1962,7 +2460,7 @@ class UMars_AutoTestRig_NetCrawler : UMars_AutoTestRig_NetStrike
         Assert_False(_CopyEverOutOfIdle, "the client's copy's kernel read Idle at every sample");
         Assert_True(Get_GaitStatus() == ECk_ProceduralAnimation_Status::Ready, "the client's gait reads Ready");
         Assert_False(_CrawlerGaitEverFailed, "the client's gait never read Failed");
-        Assert_Equals_Int(utils_procedural_gait::Get_EnabledLegCount(_Crawler.Get_Gait()), k_LegCount, "the client's four legs are enabled");
+        Assert_Equals_Int(utils_procedural_gait::Get_EnabledLegCount(_Crawler.Get_Gait()), _LegCount, f"the client's {_LegCount} legs are enabled");
     }
 
     // A copy's decoy: nothing the copy did touched it.
@@ -2090,6 +2588,299 @@ class UMars_AutoTestRig_NetCrawler : UMars_AutoTestRig_NetStrike
     }
 
     //----------------------------------------------------------------------------------------------------------------------
+    // The shared clock and the server's readout
+    //----------------------------------------------------------------------------------------------------------------------
+
+    private void Sample_Clock()
+    {
+        const auto Frame = int32(utils_time::Get_FrameCounter());
+        if (_ClockFrames.Num() > 0 && _ClockFrames.Last() == Frame)
+        { return; }
+
+        _ClockFrames.Add(Frame);
+        _ClockSeconds.Add(Get_WorldSeconds());
+    }
+
+    // This machine's world seconds at InFrame (its first sample at or after it); -1 when it sampled none.
+    protected float64 Get_ClockSecondsAtFrame(int32 InFrame) const
+    {
+        if (InFrame < 0)
+        { return -1.0; }
+
+        for (int32 Index = 0; Index < _ClockFrames.Num(); ++Index)
+        {
+            if (_ClockFrames[Index] >= InFrame)
+            { return _ClockSeconds[Index]; }
+        }
+
+        return -1.0;
+    }
+
+    // The seconds between two frames on this machine's clock; -1 when either was not sampled.
+    protected float64 Get_SecondsBetweenFrames(int32 InFrom, int32 InTo) const
+    {
+        const auto From = Get_ClockSecondsAtFrame(InFrom);
+        const auto To = Get_ClockSecondsAtFrame(InTo);
+        return From < 0.0 || To < 0.0 ? -1.0 : To - From;
+    }
+
+    // Server: the spec it composed, on the crawler's root, replicated (once).
+    protected void Publish_ServerReadout()
+    {
+        auto Root = _CrawlerRoot;
+        if (Root.Has_Fragment(FMars_TESTONLY_Fragment_Crawler_ServerReadout))
+        { return; }
+
+        const auto Spec = _Crawler.Get_Spec();
+        auto Readout = FMars_TESTONLY_Fragment_Crawler_ServerReadout();
+        Readout.LegCount = Spec.LegCount;
+        Readout.Layout = Spec.Layout;
+        Readout.RoamBounds = Spec.RoamBounds;
+        Readout.CombatEnabled = Spec.Combat.Enabled;
+        Readout.BodyHalfExtents = Spec.Rig.BodyHalfExtents;
+        Readout.HomeRadius = Spec.Combat.Targeting.HomeRadius;
+        Readout.AcquireRadius = Spec.Combat.Targeting.AcquireRadius;
+        Root.Add_Fragment(Readout, ECk_Replication::Replicates);
+        _Readout = Readout;
+        _HasReadout = true;
+    }
+
+    // Server: InName marked at InFrame on the readout (published first if it was not).
+    protected void Publish_ServerMark(FString InName, int32 InFrame)
+    {
+        Publish_ServerReadout();
+        auto Root = _CrawlerRoot;
+        auto& Readout = Root.Get_Fragment(FMars_TESTONLY_Fragment_Crawler_ServerReadout);
+        auto Mark = FMars_NetCrawlerTest_Mark();
+        Mark.Name = InName;
+        Mark.Frame = InFrame;
+        Readout.Marks.Add(Mark);
+        Root.Request_MarkReplicationDirty(FMars_TESTONLY_Fragment_Crawler_ServerReadout);
+        _Readout = Readout;
+    }
+
+    // The frame the server marked InName at, as this machine last read the readout; -1 without it.
+    protected int32 Get_ServerMark(FString InName) const
+    {
+        for (const auto& Mark : _Readout.Marks)
+        {
+            if (Mark.Name == InName)
+            { return Mark.Frame; }
+        }
+
+        return -1;
+    }
+
+    protected FString Describe_Readout() const
+    {
+        FString Marks = "";
+        for (const auto& Mark : _Readout.Marks)
+        { Marks += f"{Mark.Name}@{Mark.Frame},"; }
+
+        return f"readoutSpec=[present {_HasReadout} legs {_Readout.LegCount} layout {_Readout.Layout :n} bounds {_Readout.RoamBounds.Min}/{_Readout.RoamBounds.Max} "
+            + f"combat {_Readout.CombatEnabled} body {_Readout.BodyHalfExtents} home {_Readout.HomeRadius} acquire {_Readout.AcquireRadius} marks {Marks}]";
+    }
+
+    private FString _AwaitedMark = "";
+
+    // Off authority: once the server's readout carries InMark (InMark empty: once the readout is here), InContinuation.
+    // Samples every frame.
+    protected void Await_ServerMark(FString InMark, FName InContinuation)
+    {
+        _AwaitedMark = InMark;
+        WaitUntil(n"Is_ServerMarkHere", InContinuation, k_SlowPolls);
+    }
+
+    UFUNCTION()
+    protected void Is_ServerMarkHere(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        Sample_Crawler();
+        auto Result = OutResult;
+        Result.Set(_HasReadout && (_AwaitedMark.IsEmpty() || Get_ServerMark(_AwaitedMark) >= 0));
+    }
+
+    protected bool Get_IsNearlyEqualVector(FVector InA, FVector InB, float64 InTolerance) const
+    {
+        return Math::Abs(InA.X - InB.X) <= InTolerance && Math::Abs(InA.Y - InB.Y) <= InTolerance && Math::Abs(InA.Z - InB.Z) <= InTolerance;
+    }
+
+    // A copy, against the server's readout: no authority over its root; no surface motion, navigator, brain or state
+    // machine; its gait Ready and never Failed; and the server's LegCount, Layout, RoamBounds (within 0.01) and
+    // Combat.Enabled in its own spec.
+    protected void Assert_CopyLikeTheServer()
+    {
+        if (Get_IsCrawlerGone())
+        {
+            Assert_True(false, "the client's copy is here to compare against the server's readout");
+            return;
+        }
+
+        Assert_True(_HasReadout, "the server's readout reached the client");
+        Assert_False(utils_net::Get_HasAuthority(_CrawlerRoot), "the client has no authority over its root");
+        Assert_False(ck::IsValid(_Crawler.Get_Motion()), "the client's copy has no surface motion");
+        Assert_False(ck::IsValid(_Crawler.Get_Navigator()), "the client's copy has no navigator");
+        Assert_False(ck::IsValid(_CrawlerRoot.As_Brain(ECk_SanityCheck::UnChecked)), "the client's copy has no brain");
+        Assert_False(ck::IsValid(_CrawlerRoot.As_StateMachine(ECk_SanityCheck::UnChecked)), "the client's copy has no state machine");
+        Assert_True(Get_GaitStatus() == ECk_ProceduralAnimation_Status::Ready, "the client's gait reads Ready");
+        Assert_False(_CrawlerGaitEverFailed, "the client's gait never read Failed");
+
+        const auto Spec = _Crawler.Get_Spec();
+        Assert_Equals_Int(Spec.LegCount, _Readout.LegCount, "the client's copy has the server's LegCount");
+        Assert_True(Spec.Layout == _Readout.Layout, f"the client's copy has the server's Layout ({Spec.Layout :n} against {_Readout.Layout :n})");
+        Assert_True(Get_IsNearlyEqualVector(Spec.RoamBounds.Min, _Readout.RoamBounds.Min, 0.01)
+            && Get_IsNearlyEqualVector(Spec.RoamBounds.Max, _Readout.RoamBounds.Max, 0.01),
+            f"the client's copy has the server's RoamBounds ({Spec.RoamBounds.Min}/{Spec.RoamBounds.Max} against {_Readout.RoamBounds.Min}/{_Readout.RoamBounds.Max})");
+        Assert_True(Spec.Combat.Enabled == _Readout.CombatEnabled, f"the client's copy has the server's Combat.Enabled ({Spec.Combat.Enabled})");
+    }
+
+    // The C1 shape for the row's leg count: InLegs attached and registered, a body Health of 120 and each leg's zone
+    // addressed through its root.
+    protected void Assert_CopyComposedWithLegs(int32 InLegs)
+    {
+        Assert_Equals_Int(Get_AttachedLegs(), InLegs, f"the client's {InLegs} legs are attached");
+        Assert_Equals_Int(_CrawlerMonster.Get_Parts().Num(), InLegs, f"the client's monster lists {InLegs} parts");
+        Assert_Equals_Int(_Crawler.Get_Spec().LegCount, InLegs, f"the client's copy was spawned with LegCount {InLegs}");
+        Assert_True(Math::IsNearlyEqual(_Health.Get_Current(), 120.0f, 0.01f), f"the client's body Health reads 120 ({_Health.Get_Current()})");
+        for (int32 Index = 0; Index < _LegParts.Num(); ++Index)
+        {
+            const auto Zone = _LegParts[Index].Get_Zone();
+            const auto Address = Zone.Get_Address();
+            Assert_True(Address.Root == _CrawlerRoot && Address.Index == Index + 1,
+                f"the client's leg {Index} zone's address is its root and {Index + 1} (reads {Address.Index})");
+            Assert_True(utils_hit_zone::TryGet_ZoneAt(Address) == Zone, f"the client's leg {Index} zone's address resolves back to it");
+        }
+    }
+
+    //----------------------------------------------------------------------------------------------------------------------
+    // Server: an anchor of a family, local to it, resolving a pinned row
+    //----------------------------------------------------------------------------------------------------------------------
+
+    // The test entity: a local anchor is its child.
+    protected FCk_Handle _Runner;
+    protected FCk_Handle _Anchor;
+    private int32 _AnchorRow = 0;
+    private EMars_Anchor_Role _AnchorRole = EMars_Anchor_Role::Other;
+
+    // An anchor of InClass at the crawler's spot, local to the server and the runner's, pinned to InRow; once it is
+    // constructed it resolves InRow as InRole with its own context.
+    protected void Spawn_ServerAnchor(TSubclassOf<UCk_EntityScript_UE> InClass, int32 InRow, EMars_Anchor_Role InRole)
+    {
+        _AnchorRow = InRow;
+        _AnchorRole = InRole;
+        auto Params = FMars_TESTONLY_AnchorSpawnParams();
+        Params.SpawnTransform = FTransform(FRotator::ZeroRotator, _CrawlerAt);
+        Params.AnchorId = GameplayTags::Anchor_Mars_Test_A;
+        Params.Channel = GameplayTags::ResolveGameplayTag(n"Mechanism.Channel.Anchor.Test.A");
+        Params.PinnedRow = TOptional<int32>(InRow);
+        auto Pending = utils_entity_script::Request_SpawnEntity(_Runner, InClass, Params);
+        utils_pending_entity_script::Promise_OnConstructed(Pending, FCk_Delegate_EntityScript_Constructed(this, n"OnServerAnchorConstructed"));
+    }
+
+    UFUNCTION()
+    private void OnServerAnchorConstructed(FCk_Handle_EntityScript InEntityScriptHandle)
+    {
+        _Anchor = FCk_Handle(InEntityScriptHandle);
+        auto Anchor = _Anchor.As_Anchor();
+        auto Context = FMars_Anchor_Context();
+        Context.AnchorId = Anchor.Get_AnchorId();
+        Context.Channel = Anchor.Get_Channel();
+        Context.SpanCm = Anchor.Get_SpanCm();
+        Context.HomeRadiusCm = Anchor.Get_HomeRadiusCm();
+        Anchor.Request_Resolve(FMars_Request_Anchor_Resolve(_AnchorRow, _AnchorRole, Context));
+    }
+
+    // Server: the anchor's spawned candidate is this machine's crawler.
+    protected bool Get_IsAnchorsCrawler()
+    {
+        if (ck::Is_NOT_Valid(_Anchor) || Get_IsCrawlerGone())
+        { return false; }
+
+        const auto Anchor = _Anchor.As_Anchor(ECk_SanityCheck::UnChecked);
+        return ck::IsValid(Anchor) && Anchor.Get_Spawned() == _CrawlerRoot;
+    }
+
+    protected void Request_ServerClearAnchor()
+    {
+        auto Anchor = _Anchor.As_Anchor();
+        Anchor.Request_Clear(FMars_Request_Anchor_Clear());
+    }
+
+    protected FString Describe_Anchor()
+    {
+        if (ck::Is_NOT_Valid(_Anchor))
+        { return f"anchor=[none here {Count_AnchorsNear()}]"; }
+
+        const auto Anchor = _Anchor.As_Anchor(ECk_SanityCheck::UnChecked);
+        if (ck::Is_NOT_Valid(Anchor))
+        { return "anchor=[gone]"; }
+
+        const auto Spawned = Anchor.Get_Spawned();
+        const auto Replicates = ck::IsValid(Spawned) && utils_mars_net::Get_ReplicatesHere(Spawned);
+        return f"anchor=[family {Anchor.Get_Family() :n} state {Anchor.Get_State() :n} role {Anchor.Get_Role() :n} home {Anchor.Get_HomeRadiusCm()} "
+            + f"spawnedIsCrawler {Get_IsAnchorsCrawler()} replicates {Replicates} near {Count_AnchorsNear()}]";
+    }
+
+    // The anchors (TAG_MarsAnchor) near the base on this machine.
+    protected int32 Count_AnchorsNear()
+    {
+        auto Count = 0;
+        for (auto Candidate : utils_entity_tag::ForEach_Entity(Get_SubjectEntity(), n"TAG_MarsAnchor"))
+        {
+            if (Get_IsNear(Candidate, _CrawlerAt))
+            { Count += 1; }
+        }
+
+        return Count;
+    }
+
+    //----------------------------------------------------------------------------------------------------------------------
+    // A lever, placed by the server, engaged by a client's cue
+    //----------------------------------------------------------------------------------------------------------------------
+
+    protected FCk_Handle_Control _Lever;
+
+    // Server: the lever of InClass at InTransform under the replicated spawn owner, with nothing but its transform
+    // injected (its class's own channel and behaviour stand).
+    protected void Spawn_ServerLever(TSubclassOf<UCk_EntityScript_UE> InClass, FTransform InTransform)
+    {
+        auto Params = FMars_TESTONLY_NetCrawler_LeverSpawnParams();
+        Params.SpawnTransform = InTransform;
+        utils_entity_script::Request_SpawnEntity(utils_mars_net::Get_ReplicatedSpawnOwner(Get_SubjectEntity()), InClass, Params);
+    }
+
+    // This machine's lever (TAG_MarsLever) within k_NearCm of InAt; the server tracks it the first time.
+    protected bool Get_IsLeverFound(FVector InAt)
+    {
+        if (ck::IsValid(_Lever))
+        { return true; }
+
+        for (auto Candidate : utils_entity_tag::ForEach_Entity(Get_SubjectEntity(), n"TAG_MarsLever"))
+        {
+            if (Get_IsNear(Candidate, InAt) == false)
+            { continue; }
+
+            const auto Control = Candidate.As_Control(ECk_SanityCheck::UnChecked);
+            if (ck::Is_NOT_Valid(Control))
+            { continue; }
+
+            _Lever = Control;
+            if (Get_IsServer())
+            { Track_ForCleanup(Candidate); }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    // A client: the control's engage cue on its copy of the lever, to the server.
+    protected void Fire_LeverEngageCue()
+    {
+        utils_cue_generic::Request_ExecuteCue(_Lever, GameplayTags::Cue_Mars_Control_Engage, UMars_Cue_Control_Engage::Params(),
+            ECk_Cue_ReliabilityPolicy::Reliable, ECk_Cue_MulticastPolicy::ServerOnly);
+    }
+
+    //----------------------------------------------------------------------------------------------------------------------
     // The log line
     //----------------------------------------------------------------------------------------------------------------------
 
@@ -2137,7 +2928,7 @@ class UMars_AutoTestRig_NetCrawler : UMars_AutoTestRig_NetStrike
             if (ck::IsValid(Entity.As_JoltBody(ECk_SanityCheck::UnChecked)))
             { WithBody += 1; }
 
-            Heights += f"{utils_transform::Get_EntityCurrentLocation(Part).Z - _Base.Z},";
+            Heights += f"{Get_HeightOverFloor(utils_transform::Get_EntityCurrentLocation(Part))},";
         }
 
         return f"{Valid}/{WithBody}/[{Heights}]";
@@ -2158,7 +2949,7 @@ class UMars_AutoTestRig_NetCrawler : UMars_AutoTestRig_NetStrike
             GaitText = f"{utils_procedural_gait::Get_Status(Gait) :n}/{utils_procedural_gait::Get_Failure(Gait) :n}";
             PoseText = f"{Get_BodyPoseStatus() :n}";
             const auto Root = Get_RootLocation();
-            RootText = f"{Root.X - _CrawlerAt.X},{Root.Y - _CrawlerAt.Y},{Root.Z - _Base.Z}";
+            RootText = f"{Root.X - _CrawlerAt.X},{Root.Y - _CrawlerAt.Y},{Get_HeightOverFloor(Root)}";
             BodyText = f"{_Health.Get_Current()} dead={_CrawlerMonster.Get_IsDead()} bodyZone={_Zone.Get_IsEnabled()}";
         }
 
@@ -2171,7 +2962,7 @@ class UMars_AutoTestRig_NetCrawler : UMars_AutoTestRig_NetStrike
     protected void Finish_CrawlerRow(FString InRow, FString InExtra)
     {
         Log_CrawlerRow(InRow, InExtra);
-        Assert_Equals_Int(Get_NewEnsures(), 0, f"no ensure on the {Get_MachineName()}");
+        Assert_Equals_Int(Get_NewEnsures(), 0, f"no ensure in this PIE process (both machines share the counter), on the {Get_MachineName()}");
         FinishSuccess();
     }
 
@@ -2179,7 +2970,7 @@ class UMars_AutoTestRig_NetCrawler : UMars_AutoTestRig_NetStrike
     protected void Hold_CrawlerServerRow(FString InRow, FString InExtra)
     {
         Log_CrawlerRow(InRow, InExtra);
-        Assert_Equals_Int(Get_NewEnsures(), 0, "no ensure on the server");
+        Assert_Equals_Int(Get_NewEnsures(), 0, "no ensure in this PIE process (both machines share the counter), on the server");
         WaitSeconds(k_ServerHoldSeconds, n"OnServerHeld");
     }
 
