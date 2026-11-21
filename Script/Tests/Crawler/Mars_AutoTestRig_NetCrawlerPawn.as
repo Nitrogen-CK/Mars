@@ -471,7 +471,6 @@ class UMars_AutoTestHelper_HeldFlameDepth : UObject
     int32 FlipFrame = -1;
     int32 Deepest = -1;
     int32 HeldSamples = 0;
-    FString TreeAtDeepest = "";
 
     // Binds InItem's mount signal; an item already Held reads "heldBeforeWatch".
     void Watch(AMars_PlayerCharacter InPawn, FCk_Handle_WorldItem InItem)
@@ -553,12 +552,7 @@ class UMars_AutoTestHelper_HeldFlameDepth : UObject
         { return; }
 
         HeldSamples += 1;
-        const auto Depth = mars_test_scene_depth::Get_Deepest(Item.H());
-        if (Depth > Deepest)
-        {
-            Deepest = Depth;
-            TreeAtDeepest = mars_test_scene_depth::Describe(Item.H());
-        }
+        Deepest = Math::Max(Deepest, mars_test_scene_depth::Get_Deepest(Item.H()));
     }
 
     // The light's world distance from half the look's FxSize over the flame node; -1 without both nodes.
@@ -598,6 +592,6 @@ class UMars_AutoTestHelper_HeldFlameDepth : UObject
     {
         return f"heldFlame=[parentAtMount {ParentAtMount} mountFrame {MountFrame} flipFrame {FlipFrame} depthAtMount {DepthAtMount} "
             + f"handMountAtMount {HandMountDepthAtMount} handMountNow {Get_HandMountDepth()} deepest {Deepest} samples {HeldSamples} "
-            + f"lightError {Get_LightErrorCm() :.3} flameNodeError {Get_FlameNodeErrorCm() :.3} tree [{TreeAtDeepest}]]";
+            + f"lightError {Get_LightErrorCm() :.3} flameNodeError {Get_FlameNodeErrorCm() :.3}]";
     }
 }

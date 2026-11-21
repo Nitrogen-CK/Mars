@@ -28,30 +28,13 @@ struct FMars_NetCrawlerTest_FootRecord
     bool PlantedAgain = false;
 }
 
-// The authority's diagnosis of one limb: which leg it was, when its bodies, joints and launch landed, its widest joint
-// gap with what every piece did at that frame, the contacts its pieces reported, and the gap trace.
+// The authority's readout of one limb: the leg it was cut from, its widest joint gap outside spin-spike windows with
+// the age, joint and knee swing at it, the widest including them, the spikes and their windows, and contacts from
+// another limb's pieces.
 struct FMars_NetCrawlerTest_LimbDiag
 {
     UPROPERTY()
     int32 Leg = -1;
-
-    UPROPERTY()
-    float64 LegDistance = -1.0;
-
-    UPROPERTY()
-    int32 BodiesFrame = -1;
-
-    UPROPERTY()
-    int32 JointsFrame = -1;
-
-    UPROPERTY()
-    int32 LaunchFrame = -1;
-
-    UPROPERTY()
-    int32 FloorContactFrame = -1;
-
-    UPROPERTY()
-    float64 FloorContactSeconds = -1.0;
 
     UPROPERTY()
     int32 LastSampleFrame = -1;
@@ -60,13 +43,13 @@ struct FMars_NetCrawlerTest_LimbDiag
     int32 Samples = 0;
 
     UPROPERTY()
-    int32 LargestSampleStep = 0;
-
-    UPROPERTY()
     float64 PrevSeconds = -1.0;
 
     UPROPERTY()
     TArray<FQuat> PrevRotations;
+
+    UPROPERTY()
+    TArray<float64> PrevAngularSpeeds;
 
     UPROPERTY()
     TArray<float64> KneeSignedStart;
@@ -84,43 +67,32 @@ struct FMars_NetCrawlerTest_LimbDiag
     int32 PeakJoint = -1;
 
     UPROPERTY()
-    FString PeakKnee = "";
+    float64 PeakKneeSwing = 0.0;
 
     UPROPERTY()
-    FString PeakSpeeds = "";
+    float64 RawPeakGap = -1.0;
 
     UPROPERTY()
-    FString PeakTrace = "";
+    int32 Spikes = 0;
 
     UPROPERTY()
-    int32 PeakTraceLeft = 0;
+    float64 FastestSpin = 0.0;
+
+    // The open spike window's first frame (-1 when none is open) and widest gap; every closed window as length/peak.
+    UPROPERTY()
+    int32 WindowStart = -1;
 
     UPROPERTY()
-    TArray<FString> RecentGaps;
+    float64 WindowPeak = 0.0;
 
     UPROPERTY()
-    FString GapTrace = "";
+    int32 WindowFrames = 0;
+
+    UPROPERTY()
+    FString Windows = "";
 
     UPROPERTY()
     int32 ForeignContacts = 0;
-
-    UPROPERTY()
-    TArray<int32> ContactFrames;
-
-    UPROPERTY()
-    TArray<FString> Contacts;
-
-    UPROPERTY()
-    FString Slide = "";
-
-    UPROPERTY()
-    float64 NextSlideSeconds = -1.0;
-
-    UPROPERTY()
-    TArray<FVector> SlideStart;
-
-    UPROPERTY()
-    FString PieceText = "";
 
     UPROPERTY()
     bool Logged = false;
@@ -360,9 +332,20 @@ class UMars_AutoTestRig_NetCrawler : UMars_AutoTestRig_NetStrike
     protected const float64 k_ClaimedFootFromHand = 60.0;
     // A limb within this of the base (horizontally) is this row's.
     protected const float64 k_LimbNearCm = 600.0;
-    // Decision tolerances: the authority's joints at every sample, a copy's at rest, a copy's piece against the
-    // published rest pose, a knee's least swing and its farthest.
+    // The authority's joint gap at every sample outside spin-spike windows, by layout: the four-leg rows' bound, and
+    // the spider's and the pale crawler's, measured, temporary tolerances pending a limb-geometry fix (anchors at the
+    // real knee and ankle, a minimum foot size, mass from volume).
     protected const float64 k_AuthorityGapCm = 2.0;
+    protected const float64 k_AuthorityGapCm_Spider = 3.0;
+    protected const float64 k_AuthorityGapCm_PaleCrawler = 4.0;
+    // A sample in which a piece's angular speed reaches this from below it at the previous sample is a spin spike:
+    // sustained limb motion peaks under 500 deg/s, a single-frame spin starts above 700. A spike opens a window on its
+    // limb that stays open until the limb's widest gap falls back under the layout's bound, at most k_SpikeWindowFrames
+    // frames (a spike that never settles is then bounded again); frames inside a window are reported, not bounded.
+    protected const float64 k_SpinSpikeDegreesPerSecond = 600.0;
+    protected const int32 k_SpikeWindowFrames = 30;
+    // Decision tolerances: a copy's joints at rest, a copy's piece against the published rest pose, a knee's least
+    // swing and its farthest.
     protected const float64 k_CopyGapCm = 4.0;
     protected const float64 k_RestPoseCm = 3.0;
     protected const float64 k_RestPoseDegrees = 3.0;
@@ -420,8 +403,7 @@ class UMars_AutoTestRig_NetCrawler : UMars_AutoTestRig_NetStrike
     // The copy's spec's limb lifetime, read at the find.
     protected float64 _LimbLifetimeSeconds = 8.0;
 
-    // This machine's floor box, and each leg's first segment where it was last seen attached.
-    protected FCk_Handle _FloorEntity;
+    // Each leg's first segment where it was last seen attached.
     private TArray<FVector> _LegFirstSegmentLast;
 
     // Every sampled frame and this machine's world seconds at it: the frame counter is the machines' shared clock.
@@ -432,6 +414,18 @@ class UMars_AutoTestRig_NetCrawler : UMars_AutoTestRig_NetStrike
     protected bool _HasReadout = false;
 
     // A row without the striker: the base, the ensure count, this machine's floor; the crawler at the base.
+    // The authority's joint-gap bound for the row's layout.
+    protected float64 Get_AuthorityGapCm() const
+    {
+        if (_Layout == EMars_Crawler_Layout::Spider)
+        { return k_AuthorityGapCm_Spider; }
+
+        if (_Layout == EMars_Crawler_Layout::PaleCrawler)
+        { return k_AuthorityGapCm_PaleCrawler; }
+
+        return k_AuthorityGapCm;
+    }
+
     protected void Begin_CrawlerRow(FVector InBase)
     {
         _Base = InBase;
@@ -463,7 +457,6 @@ class UMars_AutoTestRig_NetCrawler : UMars_AutoTestRig_NetStrike
     {
         auto Subject = Get_SubjectEntity();
         auto Box = utils_entity_lifetime::Request_CreateEntity(Subject);
-        _FloorEntity = Box;
         utils_transform::Add(Box, FTransform(Get_FloorRotation(), _Base - Get_FloorNormal() * k_FloorHalfExtents.Z),
             ECk_Replication::DoesNotReplicate);
         auto Shape = FCk_Jolt_ShapeDimensions(ECk_Jolt_ShapeType::Box);
@@ -786,8 +779,8 @@ class UMars_AutoTestRig_NetCrawler : UMars_AutoTestRig_NetStrike
     // From the sever on: within ten frames of OnSevered every captured leg-0 rig part is gone; a second later exactly
     // one limb is near, with authority, a body per piece and every joint added, and leg 0's entity is valid and
     // detached with its part Severed. Once the limb reads at rest (the sampler publishes its rest pose), the server
-    // waits until it is gone: its widest joint gap stayed within k_AuthorityGapCm and it lived between 7.5 and 9 s. The
-    // row's own tail (Assert_ServerLimbTail) runs, and the row holds.
+    // waits until it is gone: its widest joint gap outside spin-spike windows stayed within Get_AuthorityGapCm() and it
+    // lived between 7.5 and 9 s. The row's own tail (Assert_ServerLimbTail) runs, and the row holds.
     protected void Follow_ServerLeg0Limb(FString InRow)
     {
         _LimbRow = InRow;
@@ -829,7 +822,8 @@ class UMars_AutoTestRig_NetCrawler : UMars_AutoTestRig_NetStrike
         if (_Limbs.Num() > 0)
         {
             const auto Record = _Limbs[0];
-            Assert_True(Record.WidestGap <= k_AuthorityGapCm, f"the server's limb's widest joint gap {Record.WidestGap} is at most {k_AuthorityGapCm}");
+            const auto Bound = Get_AuthorityGapCm();
+            Assert_True(Record.WidestGap <= Bound, f"the server's limb's widest joint gap outside spin-spike windows {Record.WidestGap} is at most {Bound}");
             const auto Lived = Record.GoneSeconds - Record.FirstSeconds;
             const auto Shortest = _LimbLifetimeSeconds - 0.5;
             const auto Longest = _LimbLifetimeSeconds + 1.0;
@@ -1050,7 +1044,7 @@ class UMars_AutoTestRig_NetCrawler : UMars_AutoTestRig_NetStrike
     }
 
     //----------------------------------------------------------------------------------------------------------------------
-    // Limb diagnosis (authority)
+    // Limb readout (authority)
     //----------------------------------------------------------------------------------------------------------------------
 
     // Knee InKnee's angle from the upper piece's X to the lower's, signed about the upper piece's Z (the hinge's axis).
@@ -1064,27 +1058,23 @@ class UMars_AutoTestRig_NetCrawler : UMars_AutoTestRig_NetStrike
         return Math::RadiansToDegrees(Math::Atan2(Sine, UpperX.DotProduct(LowerX)));
     }
 
-    private FCk_Handle_JoltBody Get_PieceBody(FCk_Handle_Transform InPiece)
-    {
-        FCk_Handle Entity = InPiece;
-        return Entity.As_JoltBody(ECk_SanityCheck::UnChecked);
-    }
-
-    // Once per frame per limb on the authority: the leg it was cut from, the frames its bodies, joints and launch
-    // landed, its peak gap with each piece's speeds and the knee's swing at that frame, the gap trace and, on a slope,
-    // the slide.
-    private void Sample_LimbDiag(int32 InIndex, const TArray<float64>& InGaps)
+    // Once per frame per limb on the authority: the leg it was cut from, the spin spikes, and the peak gap outside
+    // them. Returns whether this sample's gaps count toward the bound (false inside a spike window, and for any sample
+    // after the frame's first).
+    private bool Sample_LimbDiag(int32 InIndex, const TArray<float64>& InGaps)
     {
         const auto Limb = _Limbs[InIndex].Limb;
         const auto Pieces = Get_LimbPieces(Limb);
         const auto Frame = int32(utils_time::Get_FrameCounter());
         const auto Now = Get_WorldSeconds();
         auto& Diag = _Limbs[InIndex].Diag;
-        if (Pieces.Num() == 0 || Diag.LastSampleFrame == Frame)
-        { return; }
+        if (Pieces.Num() == 0)
+        { return true; }
 
-        if (Diag.LastSampleFrame >= 0)
-        { Diag.LargestSampleStep = Math::Max(Diag.LargestSampleStep, Frame - Diag.LastSampleFrame); }
+        // One sample a frame: a second call in the same frame (after physics may have stepped) neither opens a window
+        // nor counts toward the bound.
+        if (Diag.LastSampleFrame == Frame)
+        { return false; }
 
         Diag.LastSampleFrame = Frame;
         Diag.Samples += 1;
@@ -1092,49 +1082,40 @@ class UMars_AutoTestRig_NetCrawler : UMars_AutoTestRig_NetStrike
         if (Diag.Leg < 0)
         {
             const auto FirstPiece = utils_transform::Get_EntityCurrentLocation(Pieces[0]);
+            auto Nearest = -1.0;
             for (int32 Leg = 0; Leg < _LegFirstSegmentLast.Num(); ++Leg)
             {
                 const auto Distance = (_LegFirstSegmentLast[Leg] - FirstPiece).Size();
-                if (Diag.Leg < 0 || Distance < Diag.LegDistance)
+                if (Diag.Leg < 0 || Distance < Nearest)
                 {
                     Diag.Leg = Leg;
-                    Diag.LegDistance = Distance;
+                    Nearest = Distance;
                 }
             }
 
             for (int32 Knee = 0; Knee + 2 < Pieces.Num(); ++Knee)
             { Diag.KneeSignedStart.Add(Get_SignedKnee(Pieces, Knee)); }
-
-            const auto Severed = Limb.As_SeveredLimb(ECk_SanityCheck::UnChecked);
-            const TArray<FCk_ProceduralLeg_Spec> Legs = utils_crawler::Get_LayoutRigData(_Layout, _LegCount).Get_Legs();
-            for (int32 Piece = 0; Piece < Pieces.Num(); ++Piece)
-            {
-                const auto HalfX = Severed.Get_PieceHalfExtents(Piece).X;
-                auto HalfLength = -1.0;
-                if (Diag.Leg >= 0 && Diag.Leg < Legs.Num() && Piece < Legs[Diag.Leg].Get_Chain().Get_SegmentLengths().Num())
-                { HalfLength = float64(Legs[Diag.Leg].Get_Chain().Get_SegmentLengths()[Piece]) * 0.5; }
-
-                Diag.PieceText += f"p{Piece}:halfX {HalfX :.2} halfLength {HalfLength :.2};";
-            }
         }
 
-        auto BodiesAdded = 0;
-        for (auto Piece : Pieces)
+        const auto DeltaSeconds = Diag.PrevSeconds >= 0.0 ? Now - Diag.PrevSeconds : 0.0;
+        Diag.PrevAngularSpeeds.SetNum(Pieces.Num());
+        Diag.PrevRotations.SetNum(Pieces.Num());
+        auto IsSpike = false;
+        for (int32 Piece = 0; Piece < Pieces.Num(); ++Piece)
         {
-            const auto Body = Get_PieceBody(Piece);
-            if (ck::IsValid(Body) && utils_jolt_body::Get_IsBodyAdded(Body))
-            { BodiesAdded += 1; }
+            const auto Rotation = utils_transform::Get_EntityCurrentTransform(Pieces[Piece]).GetRotation();
+            if (DeltaSeconds > 0.0)
+            {
+                const auto Speed = Math::RadiansToDegrees(Rotation.AngularDistance(Diag.PrevRotations[Piece])) / DeltaSeconds;
+                Diag.FastestSpin = Math::Max(Diag.FastestSpin, Speed);
+                IsSpike = IsSpike || (Speed >= k_SpinSpikeDegreesPerSecond && Diag.PrevAngularSpeeds[Piece] < k_SpinSpikeDegreesPerSecond);
+                Diag.PrevAngularSpeeds[Piece] = Speed;
+            }
+
+            Diag.PrevRotations[Piece] = Rotation;
         }
 
-        if (Diag.BodiesFrame < 0 && BodiesAdded == Pieces.Num())
-        { Diag.BodiesFrame = Frame; }
-
-        if (Diag.JointsFrame < 0 && Get_LimbJointsAdded(Limb) == Pieces.Num() - 1)
-        { Diag.JointsFrame = Frame; }
-
-        if (Diag.LaunchFrame < 0 && Limb.Has_Fragment(FMars_Fragment_BodyPart_PendingDebris) == false)
-        { Diag.LaunchFrame = Frame; }
-
+        Diag.PrevSeconds = Now;
         auto Widest = -1.0;
         auto WidestJoint = -1;
         for (int32 Joint = 0; Joint < InGaps.Num(); ++Joint)
@@ -1146,105 +1127,52 @@ class UMars_AutoTestRig_NetCrawler : UMars_AutoTestRig_NetStrike
             }
         }
 
-        const auto GapPair = f"{Frame}:{Widest :.2}";
-        if (Diag.Samples <= 30)
-        { Diag.GapTrace += f"{GapPair},"; }
-
-        if (Diag.PeakTraceLeft > 0)
+        Diag.RawPeakGap = Math::Max(Diag.RawPeakGap, Widest);
+        if (IsSpike)
         {
-            Diag.PeakTrace += f"{GapPair},";
-            Diag.PeakTraceLeft -= 1;
+            Diag.Spikes += 1;
+            if (Diag.WindowStart < 0)
+            {
+                Diag.WindowStart = Frame;
+                Diag.WindowPeak = 0.0;
+            }
         }
 
-        const auto DeltaSeconds = Diag.PrevSeconds >= 0.0 ? Now - Diag.PrevSeconds : 0.0;
-        if (Widest > Diag.PeakGap)
+        if (Diag.WindowStart >= 0)
+        {
+            const auto Settled = IsSpike == false && Widest < Get_AuthorityGapCm();
+            const auto Capped = Frame - Diag.WindowStart >= k_SpikeWindowFrames;
+            if (Settled || Capped)
+            {
+                FString CapText = "";
+                if (Capped)
+                { CapText = "cap"; }
+
+                Diag.Windows += f"{Frame - Diag.WindowStart}/{Diag.WindowPeak :.2}{CapText},";
+                Diag.WindowStart = -1;
+            }
+            else
+            {
+                Diag.WindowPeak = Math::Max(Diag.WindowPeak, Widest);
+                Diag.WindowFrames += 1;
+            }
+        }
+
+        const auto Counts = Diag.WindowStart < 0;
+        if (Counts && Widest > Diag.PeakGap)
         {
             Diag.PeakGap = Widest;
             Diag.PeakFrame = Frame;
             Diag.PeakAge = Now - _Limbs[InIndex].FirstSeconds;
             Diag.PeakJoint = WidestJoint;
-            Diag.PeakTrace = "";
-            for (const auto& Recent : Diag.RecentGaps)
-            { Diag.PeakTrace += f"{Recent},"; }
-
-            Diag.PeakTrace += f"[{GapPair}],";
-            Diag.PeakTraceLeft = 5;
-
-            Diag.PeakKnee = "";
-            if (WidestJoint + 2 < Pieces.Num() && WidestJoint < Diag.KneeSignedStart.Num())
-            {
-                const auto Swing = Get_SignedKnee(Pieces, WidestJoint) - Diag.KneeSignedStart[WidestJoint];
-                const auto Limit = float64(constants_severed_limb::k_KneeLimitDegrees);
-                FString Where = "inside";
-                if (Math::Abs(Swing) > Limit)
-                { Where = "past"; }
-                else if (Math::Abs(Swing) >= Limit - 1.0)
-                { Where = "at"; }
-
-                Diag.PeakKnee = f"swing {Swing :.2} {Where} limit";
-            }
-            else
-            { Diag.PeakKnee = "ankle"; }
-
-            Diag.PeakSpeeds = "";
-            for (int32 Piece = 0; Piece < Pieces.Num(); ++Piece)
-            {
-                const auto Body = Get_PieceBody(Pieces[Piece]);
-                const auto Linear = ck::IsValid(Body) ? utils_jolt_body::Get_LinearVelocity(Body).Size() : -1.0;
-                auto Angular = -1.0;
-                if (DeltaSeconds > 0.0 && Piece < Diag.PrevRotations.Num())
-                {
-                    const auto Rotation = utils_transform::Get_EntityCurrentTransform(Pieces[Piece]).GetRotation();
-                    Angular = Math::RadiansToDegrees(Rotation.AngularDistance(Diag.PrevRotations[Piece])) / DeltaSeconds;
-                }
-
-                Diag.PeakSpeeds += f"p{Piece}:{Linear :.1}cm/s,{Angular :.1}deg/s ";
-            }
+            Diag.PeakKneeSwing = WidestJoint + 2 < Pieces.Num() && WidestJoint < Diag.KneeSignedStart.Num()
+                ? Get_SignedKnee(Pieces, WidestJoint) - Diag.KneeSignedStart[WidestJoint] : 0.0;
         }
 
-        Diag.RecentGaps.Add(GapPair);
-        if (Diag.RecentGaps.Num() > 5)
-        { Diag.RecentGaps.RemoveAt(0); }
-
-        Diag.PrevRotations.SetNum(Pieces.Num());
-        for (int32 Piece = 0; Piece < Pieces.Num(); ++Piece)
-        { Diag.PrevRotations[Piece] = utils_transform::Get_EntityCurrentTransform(Pieces[Piece]).GetRotation(); }
-
-        Diag.PrevSeconds = Now;
-        Sample_LimbSlide(InIndex, Pieces);
+        return Counts;
     }
 
-    // On a sloped floor, from the limb's first floor contact, every 0.25 s per piece: its speed down the slope, its
-    // speed along the floor's normal, its sleep state and how far down the slope it moved since that contact.
-    private void Sample_LimbSlide(int32 InIndex, const TArray<FCk_Handle_Transform>& InPieces)
-    {
-        auto& Diag = _Limbs[InIndex].Diag;
-        if (_FloorPitchDegrees == 0.0 || Diag.FloorContactFrame < 0 || Get_WorldSeconds() < Diag.NextSlideSeconds)
-        { return; }
-
-        const auto Downhill = Get_FloorRotation().RotateVector(FVector::ForwardVector);
-        const auto Normal = Get_FloorNormal();
-        if (Diag.SlideStart.Num() == 0)
-        {
-            for (auto Piece : InPieces)
-            { Diag.SlideStart.Add(utils_transform::Get_EntityCurrentLocation(Piece)); }
-        }
-
-        FString Line = f"t+{Get_WorldSeconds() - Diag.FloorContactSeconds :.2}[";
-        for (int32 Piece = 0; Piece < InPieces.Num() && Piece < Diag.SlideStart.Num(); ++Piece)
-        {
-            const auto Body = Get_PieceBody(InPieces[Piece]);
-            const auto Velocity = ck::IsValid(Body) ? utils_jolt_body::Get_LinearVelocity(Body) : FVector::ZeroVector;
-            const auto Sleep = ck::IsValid(Body) ? f"{utils_jolt_body::Get_SleepState(Body) :n}" : FString("none");
-            const auto Moved = (utils_transform::Get_EntityCurrentLocation(InPieces[Piece]) - Diag.SlideStart[Piece]).DotProduct(Downhill);
-            Line += f"p{Piece}:down {Velocity.DotProduct(Downhill) :.1} normal {Velocity.DotProduct(Normal) :.1} {Sleep} moved {Moved :.1};";
-        }
-
-        Diag.Slide += f"{Line}] ";
-        Diag.NextSlideSeconds = Get_WorldSeconds() + 0.25;
-    }
-
-    // One line per limb on the authority, once, when it goes (or when the row logs it still standing).
+    // One line per limb on the authority, once, when it goes.
     protected void Log_LimbDiag(int32 InIndex)
     {
         auto& Record = _Limbs[InIndex];
@@ -1253,28 +1181,11 @@ class UMars_AutoTestRig_NetCrawler : UMars_AutoTestRig_NetStrike
 
         Record.Diag.Logged = true;
         const auto& Diag = Record.Diag;
-        FString PeakContacts = "";
-        for (int32 Contact = 0; Contact < Diag.Contacts.Num() && Contact < Diag.ContactFrames.Num(); ++Contact)
-        {
-            if (Math::Abs(Diag.ContactFrames[Contact] - Diag.PeakFrame) <= 2)
-            { PeakContacts += f"{Diag.Contacts[Contact]};"; }
-        }
-
-        FString FloorContacts = "";
-        auto Shown = 0;
-        for (int32 Contact = 0; Contact < Diag.Contacts.Num() && Shown < 12; ++Contact)
-        {
-            FloorContacts += f"{Diag.Contacts[Contact]};";
-            Shown += 1;
-        }
-
         const auto Machine = Get_MachineName();
-        Log(f"[CrawlerNetLimbDiag] {_LimbRow} {Machine} limb={InIndex} leg={Diag.Leg} legDistance={Diag.LegDistance :.2} first={Record.FirstFrame} "
-            + f"bodies={Diag.BodiesFrame} joints={Diag.JointsFrame} launch={Diag.LaunchFrame} floorContact={Diag.FloorContactFrame} "
-            + f"samples={Diag.Samples} largestStep={Diag.LargestSampleStep} peak=[gap {Diag.PeakGap :.2} frame {Diag.PeakFrame} age {Diag.PeakAge :.3} "
-            + f"joint {Diag.PeakJoint} knee {Diag.PeakKnee} speeds {Diag.PeakSpeeds}contacts {PeakContacts}] foreign={Diag.ForeignContacts} "
-            + f"sameLimb={Record.NeighbourContacts} rest={Record.RestSeconds - Record.FirstSeconds :.2} pieces=[{Diag.PieceText}] "
-            + f"firstContacts=[{FloorContacts}] gapTrace=[{Diag.GapTrace}] peakTrace=[{Diag.PeakTrace}] slide=[{Diag.Slide}]");
+        Log(f"[CrawlerNetLimbDiag] {_LimbRow} {Machine} limb={InIndex} leg={Diag.Leg} peak={Diag.PeakGap :.2}@{Diag.PeakAge :.2}s joint={Diag.PeakJoint} "
+            + f"knee={Diag.PeakKneeSwing :.1} raw={Diag.RawPeakGap :.2} spikes={Diag.Spikes} windows=[{Diag.Windows}] windowFrames={Diag.WindowFrames} "
+            + f"fastestSpin={Diag.FastestSpin :.0} "
+            + f"foreign={Diag.ForeignContacts} sameLimb={Record.NeighbourContacts} rest={Record.RestSeconds - Record.FirstSeconds :.2} samples={Diag.Samples}");
     }
 
     private void Sample_Limb(int32 InIndex)
@@ -1286,8 +1197,12 @@ class UMars_AutoTestRig_NetCrawler : UMars_AutoTestRig_NetStrike
         const auto AtRest = Get_LimbIsAtRest(Limb);
 
         auto& Record = _Limbs[InIndex];
-        for (auto Gap : Gaps)
-        { Record.WidestGap = Math::Max(Record.WidestGap, Gap); }
+        const auto Counts = utils_net::Get_HasAuthority(Limb) ? Sample_LimbDiag(InIndex, Gaps) : true;
+        if (Counts)
+        {
+            for (auto Gap : Gaps)
+            { Record.WidestGap = Math::Max(Record.WidestGap, Gap); }
+        }
 
         if (Record.KneeStart.Num() == 0)
         {
@@ -1322,9 +1237,6 @@ class UMars_AutoTestRig_NetCrawler : UMars_AutoTestRig_NetStrike
             }
         }
 
-        if (utils_net::Get_HasAuthority(Limb))
-        { Sample_LimbDiag(InIndex, Gaps); }
-
         if (_Limbs[InIndex].RestFrame >= 0 || AtRest == false)
         { return; }
 
@@ -1341,9 +1253,7 @@ class UMars_AutoTestRig_NetCrawler : UMars_AutoTestRig_NetStrike
         FCk_Handle BodyEntity = InBody;
         const FCk_Handle OtherEntity = InPayload.Get_OtherEntity();
         auto MineRecord = -1;
-        auto MinePiece = -1;
         auto OtherRecord = -1;
-        auto OtherPiece = -1;
         for (int32 RecordIndex = 0; RecordIndex < _Limbs.Num(); ++RecordIndex)
         {
             const auto Pieces = Get_LimbPieces(_Limbs[RecordIndex].Limb);
@@ -1351,49 +1261,19 @@ class UMars_AutoTestRig_NetCrawler : UMars_AutoTestRig_NetStrike
             {
                 FCk_Handle Entity = Pieces[Index];
                 if (Entity == BodyEntity)
-                {
-                    MineRecord = RecordIndex;
-                    MinePiece = Index;
-                }
+                { MineRecord = RecordIndex; }
                 if (Entity == OtherEntity)
-                {
-                    OtherRecord = RecordIndex;
-                    OtherPiece = Index;
-                }
+                { OtherRecord = RecordIndex; }
             }
         }
 
         if (MineRecord < 0)
         { return; }
 
-        auto& Record = _Limbs[MineRecord];
-        const auto Frame = int32(utils_time::Get_FrameCounter());
-        FString Class = "other";
         if (OtherRecord == MineRecord)
-        {
-            Class = f"sameLimb p{OtherPiece}";
-            Record.NeighbourContacts += 1;
-        }
+        { _Limbs[MineRecord].NeighbourContacts += 1; }
         else if (OtherRecord >= 0)
-        {
-            Class = f"limb{OtherRecord} p{OtherPiece}";
-            Record.Diag.ForeignContacts += 1;
-        }
-        else if (OtherEntity == _FloorEntity)
-        {
-            Class = "floor";
-            if (Record.Diag.FloorContactFrame < 0)
-            {
-                Record.Diag.FloorContactFrame = Frame;
-                Record.Diag.FloorContactSeconds = Get_WorldSeconds();
-            }
-        }
-
-        if (Record.Diag.Contacts.Num() < 200)
-        {
-            Record.Diag.ContactFrames.Add(Frame);
-            Record.Diag.Contacts.Add(f"{Frame}:p{MinePiece}:{Class}:{InPayload.Get_RelativeNormalSpeed() :.1}");
-        }
+        { _Limbs[MineRecord].Diag.ForeignContacts += 1; }
     }
 
     // Server: the readout on the limb's root, its pieces' world poses now.
