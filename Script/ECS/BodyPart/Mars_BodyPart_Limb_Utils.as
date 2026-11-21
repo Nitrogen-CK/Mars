@@ -197,6 +197,9 @@ namespace utils_severed_limb
         BodySpec.Set_MotionType(ECk_MotionType::Dynamic);
         BodySpec.Set_MassSource(ECk_JoltBody_MassSource::Explicit);
         BodySpec.Set_MassKg(InDebris.MassKg);
+        BodySpec.Set_SurfaceSource(ECk_JoltBody_SurfaceSource::Explicit);
+        BodySpec.Set_Friction(InDebris.Friction);
+        BodySpec.Set_Restitution(0.0f);
         BodySpec.Set_CollisionProfileName(InDebris.CollisionProfile);
 
         auto Piece = InPiece.Piece;

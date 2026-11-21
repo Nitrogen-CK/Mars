@@ -83,6 +83,11 @@ struct FMars_BodyPart_Debris
     UPROPERTY()
     float32 LifetimeSeconds = 8.0f;
 
+    // Each piece's surface friction (Jolt combines two as the root of their product), the world item's: on a floor of
+    // the same friction a limb holds on a slope up to about 31 degrees, on one of Jolt's default 0.2 up to about 19.
+    UPROPERTY()
+    float32 Friction = 0.6f;
+
     // A profile the gait's and surface motion's Visibility probes do not trace, so a limb never reads as ground.
     UPROPERTY()
     FName CollisionProfile = n"Ragdoll";
@@ -108,6 +113,9 @@ mixin FMars_Validation Validate(const FMars_BodyPart_Debris& Self)
 
     if (Math::IsFinite(Self.OutwardSpeed) == false || Math::IsFinite(Self.UpSpeed) == false || Self.OutwardSpeed < 0.0f || Self.UpSpeed < 0.0f)
     { return FMars_Validation(f"BodyPart debris has a non-finite or negative speed [{Self.OutwardSpeed}, {Self.UpSpeed}]"); }
+
+    if (Math::IsFinite(Self.Friction) == false || Self.Friction < 0.0f)
+    { return FMars_Validation(f"BodyPart debris has a non-finite or negative Friction [{Self.Friction}]"); }
 
     if (Self.CollisionProfile.IsNone())
     { return FMars_Validation("BodyPart debris has no CollisionProfile"); }

@@ -234,12 +234,24 @@ class UMars_FlameDressing : UObject
         Apply_Brightness(IsLit ? 1.0f : 0.0f);
     }
 
-    // The light sits mid-flame, half the flame height over the flame node on a node of its own: inside the mesh of a big
-    // fire (the brazier's coals and tongues) a light at the root reads as a sphere cut by geometry and leaks through it.
-    // A flame without a card (FxSize 0, the candle) keeps its light at the node.
+    // The light sits mid-flame, half the flame height over the flame node on a node of its own: inside the mesh of a
+    // big fire (the brazier's coals and tongues) a light at the root reads as a sphere cut by geometry and leaks
+    // through it. A flame without a card (FxSize 0, the candle) keeps its light at the node. The light's node is the
+    // flame node's sibling, at the flame node's offset composed with its own, so it adds no scene-node layer below the
+    // flame; a flame node that is not a scene node keeps the light as its child.
     private void AddLight(FCk_Handle_Transform& InNode)
     {
-        auto LightNode = utils_scene_node::Create(InNode, FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, _Look.FxSize * 0.5))).As_Transform();
+        const auto OverFlame = FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, _Look.FxSize * 0.5));
+        auto Parent = InNode;
+        auto Offset = OverFlame;
+        const auto FlameNode = InNode.H().As_SceneNode(ECk_SanityCheck::UnChecked);
+        if (ck::IsValid(FlameNode) && ck::IsValid(utils_scene_node::Get_Parent(FlameNode)))
+        {
+            Parent = utils_scene_node::Get_Parent(FlameNode);
+            Offset = OverFlame * utils_scene_node::Get_Offset(FlameNode);
+        }
+
+        auto LightNode = utils_scene_node::Create(Parent, Offset).As_Transform();
         utils_handle::Set_DebugName(LightNode.H(), n"Flame.Light");
 
         auto Archetype = Cast<UPointLightComponent>(NewObject(this, UPointLightComponent));
