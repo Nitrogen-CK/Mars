@@ -293,21 +293,21 @@ bool FCkReplicationNet_AS_Replication_SpawnOwnerIsServerPublished::RunTest(const
 
 // --------------------------------------------------------------------------------------------------------------------
 
-// Auto-generated from AS class Ck_AutoTest_Net_Replication_TwoInventoriesOnOneOwnerShareContentsOnAClient (Replicated-mode).
+// Auto-generated from AS class Ck_AutoTest_Net_Replication_TwoInventoriesOnOneOwnerKeepTheirOwnContentsOnAClient (Replicated-mode).
 // DO NOT EDIT - regenerated on editor startup and every successful AS recompile.
 
 namespace
 {
-    constexpr auto kAsClassPath_Replication_TwoInventoriesOnOneOwnerShareContentsOnAClient = TEXT("/Script/Angelscript.Ck_AutoTest_Net_Replication_TwoInventoriesOnOneOwnerShareContentsOnAClient");
-    constexpr auto kTimeoutSeconds_Replication_TwoInventoriesOnOneOwnerShareContentsOnAClient = 30.0f;
+    constexpr auto kAsClassPath_Replication_TwoInventoriesOnOneOwnerKeepTheirOwnContentsOnAClient = TEXT("/Script/Angelscript.Ck_AutoTest_Net_Replication_TwoInventoriesOnOneOwnerKeepTheirOwnContentsOnAClient");
+    constexpr auto kTimeoutSeconds_Replication_TwoInventoriesOnOneOwnerKeepTheirOwnContentsOnAClient = 30.0f;
 }
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(
-    FCkReplicationNet_AS_Replication_TwoInventoriesOnOneOwnerShareContentsOnAClient,
-    "Ck.Replication.Net.AS_Replication_TwoInventoriesOnOneOwnerShareContentsOnAClient",
+    FCkReplicationNet_AS_Replication_TwoInventoriesOnOneOwnerKeepTheirOwnContentsOnAClient,
+    "Ck.Replication.Net.AS_Replication_TwoInventoriesOnOneOwnerKeepTheirOwnContentsOnAClient",
     EAutomationTestFlags::EditorContext | EAutomationTestFlags::ClientContext | EAutomationTestFlags::EngineFilter)
 
-bool FCkReplicationNet_AS_Replication_TwoInventoriesOnOneOwnerShareContentsOnAClient::RunTest(const FString& Parameters)
+bool FCkReplicationNet_AS_Replication_TwoInventoriesOnOneOwnerKeepTheirOwnContentsOnAClient::RunTest(const FString& Parameters)
 {
     bSuppressLogErrors = true;
     bSuppressLogWarnings = true;
@@ -339,7 +339,7 @@ bool FCkReplicationNet_AS_Replication_TwoInventoriesOnOneOwnerShareContentsOnACl
 
     ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_TickWorlds(FramesAfterSpawn));
 
-    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_RunAsTestOnAllWorlds(this, FString{kAsClassPath_Replication_TwoInventoriesOnOneOwnerShareContentsOnAClient}, kTimeoutSeconds_Replication_TwoInventoriesOnOneOwnerShareContentsOnAClient));
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_RunAsTestOnAllWorlds(this, FString{kAsClassPath_Replication_TwoInventoriesOnOneOwnerKeepTheirOwnContentsOnAClient}, kTimeoutSeconds_Replication_TwoInventoriesOnOneOwnerKeepTheirOwnContentsOnAClient));
 
     ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_EndPIE());
 
