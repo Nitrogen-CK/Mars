@@ -116,6 +116,20 @@
       "reason": "Suite-only failure; green alone. Cause not traced (load annotation clean, 58 FPS).",
       "evidence": "Gate58-Rebased-v178 (Mars feature/ue58-upgrade rebased onto dev 6f4597ec + Ck re-pin 35916246: CkFoundation e7bcb43cf, CkTests 7bf54cba, CkGameplayDebugger e5c07cc29; engine ue58_engine 417f32a755, UE 5.8.4; UnrealToolbox v1.78; 2026-11-07, 5475 run / 41 failed): red. Green alone (Solo58R-3, 2026-11-07).",
       "added": "2026-11-07"
+    },
+    {
+      "test": "Ck.AggroDebugger.Authored.PIE",
+      "status": "red",
+      "reason": "HOST-COUPLED: red only in Mars. Expected 'Engaged-only control follows a public active-target request' (Plugins/CkTests/Source/CkTests/Private/UnitTests/CkAggro/Test_AggroDebugger_AuthoredPie.spec.cpp). Green in CkPlugins and BusterBlock, and green alone in CkPlugins at Mars's exact Ck pins; Mars went red after its 2026-11-12 rebase onto dev. CkTests a4d15748 pruned it from CkTests' list, so it moves here with this bump. Owner: Mars.",
+      "evidence": "Alone at Mars_58port chore/ck-clipboard-bump + CkTests a4d15748 (CkFoundation 4481c2ccf, CkGameplayDebugger b15a08c6), UE 5.8.4, UnrealToolbox v1.88, screen unlocked, 2026-11-21 (MarsBumpCkTests-9-D.log): red. Earlier: Mars_58port alone 2026-11-18 (Alone-20261118-Aggro-StyleLab.log, toolbox v1.87, CkFoundation e5328e833 / CkGameplayDebugger 8d1c00cae / CkTests 148a02e1a): red; CkPlugins_gatespeed alone at the same pins (AB-MarsPins-Aggro-StyleLab.log): green; Mars_58port red in every run 11-14 to 11-15 (10/10), green 11-05 to 11-11 (7/7). Listed in CkTests' file in the full gate ClipboardBump-Gate.log (2026-11-20): still red.",
+      "added": "2026-11-21"
+    },
+    {
+      "test": "Ck.UiAuthoring.StyleLab.Window",
+      "status": "red",
+      "reason": "HOST-COUPLED, OSCILLATES - listed red, not flaky, so a pass reports 'Now passing'. Red only in Mars. Renderer pass: Expected 'Routed All Tones click updates the production sample' / '... its physical checkbox' (CkStyleLab_WindowAuthored.spec.cpp:208/210). In Mars it fails whenever a PIE test ran earlier in the renderer editor (with Ck.GoapDebugger.AgentColumn.Authored.PIE first it is red at both Mars dev's Ck pins and this bump, along with four other physical-click renderer tests), and was also red alone on 2026-11-18. Green in CkPlugins and BusterBlock. CkGameplayDebugger 098e8112 pruned it from that plugin's list, so it moves here with this bump. Owner: Mars.",
+      "evidence": "Full gate ClipboardBump-Gate.log (2026-11-20, bump, locked desktop): red. Mars_58port chore/ck-clipboard-bump + CkTests a4d15748 (CkFoundation 4481c2ccf, CkGameplayDebugger b15a08c6), UE 5.8.4, UnrealToolbox v1.88, screen unlocked, 2026-11-21: with the Goap PIE test first red (MarsBump-Pie6-B.log); in a 5-test renderer batch with no PIE test green (MarsBump-15-B2.log). Mars dev pins (CkFoundation 57bf2c6c6, CkGameplayDebugger 4a397383, CkTests 3c2fce0f) with the Goap PIE test first: red (MarsDev-Pie6-A.log). Alone 2026-11-18 (Alone-20261118-Aggro-StyleLab.log): red; CkPlugins_gatespeed alone at Mars's pins: green.",
+      "added": "2026-11-21"
     }
   ]
 }
