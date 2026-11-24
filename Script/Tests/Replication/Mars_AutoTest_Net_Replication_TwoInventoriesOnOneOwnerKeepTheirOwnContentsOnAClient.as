@@ -1,13 +1,14 @@
 // Pins a framework fact: two replicated capacity-1 DataOnly inventories (Slot.0, Slot.1) on one lifetime owner, the test
-// subject, composed on both machines, show the same contents on a client. The server seeds one item into Slot.0 only and
-// keeps the slots apart (Slot.0 holds it, Slot.1 is empty); the client's Slot.0 and Slot.1 both hold that one item, the
-// same entity. DataOnly replication keys its container by struct type on the lifetime owner, not by inventory.
-// The hotbar is built on this fact: each slot is a root of its own (UMars_HotbarSlot_EntityScript, see the header of
-// Script/ECS/Hotbar/Mars_Hotbar_Feature.as) so that no two slot inventories share an owner. Red means the framework
-// changed: if the client's slots now hold what the server's hold, DataOnly contents replicate per inventory and the
-// per-slot roots may be simplified back to inventories on the carrier; any other result, re-check the hotbar's slots.
-// Surface: Ck.Replication.Net.AS_Replication_TwoInventoriesOnOneOwnerShareContentsOnAClient
-class UCk_AutoTest_Net_Replication_TwoInventoriesOnOneOwnerShareContentsOnAClient : UCk_AutoTest_NetBase
+// subject, composed on both machines, each show their own contents on a client. The server seeds one item into Slot.0
+// only (Slot.0 holds it, Slot.1 is empty); the client's Slot.0 holds that one item and its Slot.1 stays empty. DataOnly
+// replication sends a complete named snapshot per inventory (CkFoundation 652aa471b), so siblings on one owner no longer
+// overwrite each other.
+// Before that commit the client's Slot.1 showed Slot.0's item, and the hotbar was built around it: each slot is a root
+// of its own (UMars_HotbarSlot_EntityScript, see the header of Script/ECS/Hotbar/Mars_Hotbar_Feature.as) so that no two
+// slot inventories share an owner. With this green, those per-slot roots are no longer required. Red means named
+// siblings share contents again: re-check the hotbar's slots before simplifying them.
+// Surface: Ck.Replication.Net.AS_Replication_TwoInventoriesOnOneOwnerKeepTheirOwnContentsOnAClient
+class UCk_AutoTest_Net_Replication_TwoInventoriesOnOneOwnerKeepTheirOwnContentsOnAClient : UCk_AutoTest_NetBase
 {
     default _TimeoutSeconds = 12.0f;
 
@@ -78,15 +79,12 @@ class UCk_AutoTest_Net_Replication_TwoInventoriesOnOneOwnerShareContentsOnAClien
     {
         auto Items0 = _Slot0.Get_Items();
         auto Items1 = _Slot1.Get_Items();
-        const auto SameItem = Items0.Num() == 1 && Items1.Num() == 1 && Items0[0] == Items1[0];
-        Log(f"[MarsNet] two inventories on one owner, client: slot0={Describe(Items0)} slot1={Describe(Items1)} sameItemInBoth={SameItem}");
+        Log(f"[MarsNet] two inventories on one owner, client: slot0={Describe(Items0)} slot1={Describe(Items1)}");
 
         Assert_False(utils_net::Get_HasAuthority(_Slot0), "the client's Slot.0 has no authority");
         Assert_Equals_Int(Items0.Num(), 1, "the client's Slot.0 holds the seeded item");
         Assert_Equals_Int(Get_ValidCount(Items0), 1, "the client's Slot.0 item is valid");
-        Assert_Equals_Int(Items1.Num(), 1, "the client's Slot.1 shows Slot.0's item although the server's is empty");
-        Assert_Equals_Int(Get_ValidCount(Items1), 1, "the client's Slot.1 item is valid");
-        Assert_True(SameItem, "both client slots hold the same item entity");
+        Assert_Equals_Int(Items1.Num(), 0, "the client's Slot.1 stays empty, as the server's is");
         FinishSuccess();
     }
 
