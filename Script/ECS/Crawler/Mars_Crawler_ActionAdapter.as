@@ -1,9 +1,23 @@
 // The crawler owns damage, cooldown and cancellation policy; the attack tick plays one loadout clip per attack as an action
 // of the crawler with explicit receipt delivery (the resolver needs every accepted interval), its slots bound to the
 // limbs the plan claimed. The tick cancels the action; the player releases it once the resolver has acknowledged its
-// terminal record, and a claim the return left unplanted is handed back to the gait.
+// terminal record, and a claim the return left unplanted is handed back to the gait. A copy's show plays the same
+// entry's clip with the same bindings with the player's own delivery: nothing reads its receipts.
 namespace utils_crawler
 {
+    // InEntry's clip with each of its slots bound to the limb the slot claims; Delivery is left at its default. The one
+    // play spec for both machines: the authority's attack sets Explicit on it, a copy's show plays it as it is.
+    FCk_ProceduralAction_PlaySpec Make_AttackPlaySpec(const FMars_Attack_ResolvedEntry& InEntry)
+    {
+        auto Bindings = TArray<FCk_ProceduralAction_SlotBinding>();
+        for (const auto& Slot : InEntry.Slots)
+        { Bindings.Add(FCk_ProceduralAction_SlotBinding(Slot.Slot, Slot.Binding.LimbId)); }
+
+        auto PlaySpec = FCk_ProceduralAction_PlaySpec(InEntry.Definition.Clip);
+        PlaySpec.Set_SlotBindings(Bindings);
+        return PlaySpec;
+    }
+
     // The action is gone before its terminal record was read: something other than its own release destroyed it.
     bool Get_IsAttackActionLost(const FCk_Handle_Crawler& InSelf)
     {

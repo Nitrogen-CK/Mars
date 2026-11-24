@@ -92,16 +92,19 @@ class AMars_PlayerCharacter : AMars_Character
     default Hat.bReceivesDecals = false;
     default Hat.SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
-    // The held item as other players see it: in the body's right hand (a bone is a valid socket; the AttachSocket warning
-    // before the body mesh is assigned at spawn is harmless). Pawn-owned so OwnerNoSee works: the owner sees its
-    // first-person item instead, and (WorldSpaceRepresentation, set in ConstructionScript) only this one's shadow.
+    // The owner's held-item shadow, in the body's right hand (a bone is a valid socket; the AttachSocket warning before the
+    // body mesh is assigned at spawn is harmless). Every machine draws the held item by its own world item on the hand
+    // mount; on the owner's machine that one is first-person and casts no world shadow, so this draws the item's
+    // Presentation mesh for the shadow alone (OwnerNoSee, WorldSpaceRepresentation set in ConstructionScript). Its mesh is
+    // set only on the copy that is its player's own view, from the local held-item change (Refresh_HeldItemShadow), and
+    // stays empty on every other copy; nothing about it replicates.
     UPROPERTY(DefaultComponent, Attach = CharacterMesh0, AttachSocket = grip_r)
-    UStaticMeshComponent BodyHeldItem;
-    default BodyHeldItem.SetMobility(EComponentMobility::Movable);
-    default BodyHeldItem.bOwnerNoSee = true;
-    default BodyHeldItem.CastShadow = true;
-    default BodyHeldItem.bReceivesDecals = false;
-    default BodyHeldItem.SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    UStaticMeshComponent HeldItemShadow;
+    default HeldItemShadow.SetMobility(EComponentMobility::Movable);
+    default HeldItemShadow.bOwnerNoSee = true;
+    default HeldItemShadow.CastShadow = true;
+    default HeldItemShadow.bReceivesDecals = false;
+    default HeldItemShadow.SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
     UPROPERTY(ExposeOnSpawn)
     UMars_PlayerCharacter_Config Config = mars::Mars_PlayerCharacter_Config;
@@ -111,7 +114,15 @@ class AMars_PlayerCharacter : AMars_Character
     // here so a footstep never loads one.
     private FMars_SurfaceFx_GaitCounts _SurfaceFxSeen;
     private TArray<UObject> _SurfaceFxAssets;
+    // The gloves' hand node (the first-person swing node).
     private FCk_Handle_Transform _HandNode;
+    // Player.BodyGrip follows the body's grip_r at unit scale. Player.HandMount is AttachPoint.Mars.Hand: under BodyGrip
+    // at _HandMountBodyOffset until this copy is its player's own view, then under _HandNode at identity for good
+    // (Refresh_HandMount).
+    private FCk_Handle_SceneNode _BodyGrip;
+    private FCk_Handle_Transform _HandMount;
+    private FTransform _HandMountBodyOffset = FTransform::Identity;
+    private bool _HandMountIsFirstPerson = false;
     private FCk_Handle_Sway _HandSway;
     private FCk_Handle_FPHands _Hands;
     // The melee swing of the hand (HandSwing): offsets the swing node the gloves and held item hang off, and is read by
@@ -143,12 +154,11 @@ class AMars_PlayerCharacter : AMars_Character
     // The body emote montage last played on this machine (Request_StopEmote ends it); null when none.
     private UAnimMontage _BodyEmoteMontage;
 
-    // What this player holds, for everyone (Mars_HeldView.as). The owner sets it (Request_SetHeldView); the server's copy
-    // replicates to every client, late joiners included.
-    UPROPERTY(Replicated, ReplicatedUsing = OnRep_HeldView)
-    private FMars_HeldView _HeldView;
+    // How this copy's HeldItem grips what it holds (Mars_HeldView.as), derived on every copy from the local held-item change
+    // (OnHeldItemChanged): the arms' hold and the hand mount's body offset both come from it.
+    private FMars_HeldView_Grip _HeldGrip;
 
-    // The query the arms' targets for _HeldView were built from (rebuilt around the swing's pose while the hand swings),
+    // The query the arms' targets for _HeldGrip were built from (rebuilt around the swing's pose while the hand swings),
     // those targets at full alpha, and the eased frame the anim instance reads (Update_BodyHold).
     private FMars_TPBody_HoldQuery _BodyHoldQuery;
     private FMars_TPBody_HoldFrame _BodyHoldTarget;
@@ -188,7 +198,7 @@ class AMars_PlayerCharacter : AMars_Character
         // The body and its held item stay hidden from the owner but cast the owner's shadow (the first-person shadow path).
         const auto BodyType = IsFirstPerson ? EFirstPersonPrimitiveType::WorldSpaceRepresentation : EFirstPersonPrimitiveType::None;
         Mesh.SetFirstPersonPrimitiveType(BodyType);
-        BodyHeldItem.SetFirstPersonPrimitiveType(BodyType);
+        HeldItemShadow.SetFirstPersonPrimitiveType(BodyType);
         CameraComponent.SetEnableFirstPersonScale(IsFirstPerson);
         CameraComponent.SetFirstPersonScale(View.FirstPersonScale);
 
@@ -264,9 +274,10 @@ class AMars_PlayerCharacter : AMars_Character
     // before anything observes the entity. The player entity replicates with the pawn (its driver is on the pawn; on a
     // client the request above is ignored and the server's entity arrives as a replica bound to this pawn), so it is
     // the replicated owner of the cues its owner fires (a drop, a throw) and of the replicated state machine below.
-    // The interaction resolver, prompts, hints, hands, viewpoint and input are owner-local (stance E). The hotbar
-    // replicates (its slot roots are children of this entity; the authority decides what they hold and what is
-    // selected) and HeldItem derives from it on every machine.
+    // The interaction resolver, prompts, hints, hands and input are owner-local (stance E); the viewpoint is composed on
+    // every copy and follows the pawn's aim where it is not controlled. The hotbar replicates (its slot roots are
+    // children of this entity; the authority decides what they hold and what is selected) and HeldItem derives from it
+    // on every machine.
     void Request_ComposeEntity(FCk_Handle InEntity)
     {
         FCk_Handle Player = InEntity;
@@ -313,8 +324,10 @@ class AMars_PlayerCharacter : AMars_Character
         auto HeadTransform = Head.As_Transform();
         auto Camera = utils_camera::Add(HeadTransform, CameraSpec);
 
+        // On a copy this machine does not control, the view follows this pawn's replicated aim.
         auto ViewpointSpec = Config.View.Viewpoint;
         ViewpointSpec.Camera = Camera;
+        ViewpointSpec.AimSource = this;
         utils_player_viewpoint::Add(Player, ViewpointSpec);
         utils_interaction_resolver::Add(Player, Config.InteractionResolver, ECk_Replication::DoesNotReplicate);
         utils_interact_prompt_display::Add(Player);
@@ -377,8 +390,11 @@ class AMars_PlayerCharacter : AMars_Character
         auto Belt = utils_scene_node::Create(PlayerTransform, Config.Inventory.BeltOffset);
         utils_handle::Set_DebugName(Belt.H(), n"Player.Belt");
 
+        // The one hand items mount on, on every copy: the body's hand until this copy is its player's own view.
+        ConstructHandMount(PlayerTransform);
+
         auto AttachPointsSpec = FMars_AttachPoints_Spec();
-        AttachPointsSpec.Points.Add(FMars_AttachPoint_Entry(GameplayTags::AttachPoint_Mars_Hand, _HandNode));
+        AttachPointsSpec.Points.Add(FMars_AttachPoint_Entry(GameplayTags::AttachPoint_Mars_Hand, _HandMount));
         AttachPointsSpec.Points.Add(FMars_AttachPoint_Entry(GameplayTags::AttachPoint_Mars_Back, Back.As_Transform()));
         AttachPointsSpec.Points.Add(FMars_AttachPoint_Entry(GameplayTags::AttachPoint_Mars_Belt, Belt.As_Transform()));
         // Other characters' gazes look here: Player.Head is the bob node the camera director renders from, i.e. the eyes.
@@ -388,7 +404,10 @@ class AMars_PlayerCharacter : AMars_Character
         auto HotbarSpec = FMars_Hotbar_Spec();
         HotbarSpec.BagSlotCount = Config.Inventory.BagSlotCount;
         utils_hotbar::Add(Player, HotbarSpec);
-        utils_held_item::Add(Player);
+        auto HeldItem = utils_held_item::Add(Player);
+        if (ck::IsValid(HeldItem))
+        { HeldItem.BindTo_OnHeldItemChanged(FMars_Delegate_HeldItem_OnHeldItemChanged(this, n"OnHeldItemChanged")); }
+
         utils_held_item_use::Add(Player);
         utils_throw_preview::Add(Player, Config.Inventory.ThrowPreview);
         utils_emote_wheel::Add(Player, Config.EmoteWheel);
@@ -410,6 +429,7 @@ class AMars_PlayerCharacter : AMars_Character
         ConstructEyes(PlayerTransform);
 
         TryStartPlayerSm();
+        Refresh_HandMount();
 
         // Last: every feature the HUD consumes has now been added, regardless of actor-link/possession ordering.
         _GameplayComposedEntity = Player;
@@ -637,6 +657,7 @@ class AMars_PlayerCharacter : AMars_Character
         TryStartPlayerSm();
         Refresh_CombatTargetTags();
         TryConstructThrowPreviewVisual();
+        Refresh_HandMount();
     }
 
     UFUNCTION(BlueprintOverride)
@@ -644,7 +665,144 @@ class AMars_PlayerCharacter : AMars_Character
     {
         TryStartPlayerSm();
         TryConstructThrowPreviewVisual();
+        Refresh_HandMount();
         EmitSurfaceFx();
+    }
+
+    //----------------------------------------------------------------------------------------------------------------------
+    // The hand mount (AttachPoint.Mars.Hand): one node per copy that every held item mounts on, so an item is drawn once,
+    // by its own entity script, wherever this machine shows the hand. On the copy that is its player's own view it is the
+    // gloves' first-person hand; on every other copy it is the body's right hand, placed where the gloves' hand node
+    // would be relative to the right glove's grip, so an item sits on grip_r as the first-person item sits on the glove.
+    //----------------------------------------------------------------------------------------------------------------------
+
+    // This copy is its player's own view: locally controlled by a player. Sampled live; the hand mount latches it once
+    // (Get_IsHandMountFirstPerson), and everything first-person reads the latch.
+    bool Get_IsLocalPlayerView() const
+    {
+        if (ck::Is_NOT_Valid(_PlayerEntity))
+        { return false; }
+
+        return utils_net::Get_IsEntityLocallyControlled_ByPlayer(_PlayerEntity) == ECk_Utils_Net_IsLocallyControlled_Result::IsLocallyControlled;
+    }
+
+    // The hand mount has moved under the gloves' hand node: the first time this copy was its player's own view
+    // (Get_IsLocalPlayerView), for good. The one sample of "this copy shows its player's first-person hand": the parent
+    // walk that renders first-person (utils_fphands::Get_IsFirstPersonHandNode), the gloves' tick and the carry-in of a
+    // held visual (utils_fphands::Get_IsFirstPersonView) read it, so an unpossess changes none of them.
+    bool Get_IsHandMountFirstPerson() const
+    {
+        return _HandMountIsFirstPerson;
+    }
+
+    // AttachPoint.Mars.Hand.
+    FCk_Handle_Transform Get_HandMount() const
+    {
+        return _HandMount;
+    }
+
+    // The scene node following the body's grip_r at unit scale. Test-only (the hand-mount rows read the mount's parent).
+    FCk_Handle_SceneNode Get_BodyGrip() const
+    {
+        return _BodyGrip;
+    }
+
+    // The hand mount's offset under BodyGrip for the item held now (OnHeldItemChanged). Test-only (the body-hand rows'
+    // expected placement).
+    FTransform Get_HandMountBodyOffset() const
+    {
+        return _HandMountBodyOffset;
+    }
+
+    // BodyGrip follows the socket at unit scale: its offset undoes the scale the socket carries (the body's Scale), measured
+    // here. A body mesh without grip_r ensures and the hand mount rides the player's root instead.
+    private void ConstructHandMount(FCk_Handle_Transform& InPlayerTransform)
+    {
+        if (ck::EnsureIfNot(Mesh.DoesSocketExist(BodyGripBone_R),
+            f"[PlayerCharacter] TPBody: the body mesh has no [{BodyGripBone_R}] bone for the hand mount - held items ride the player's root"))
+        { _BodyGrip = utils_scene_node::Create(InPlayerTransform, FTransform::Identity); }
+        else
+        {
+            const auto SocketScale = Mesh.GetSocketTransform(BodyGripBone_R).GetScale3D();
+            const auto IsUniform = SocketScale.X > KINDA_SMALL_NUMBER && SocketScale.Equals(FVector(SocketScale.X, SocketScale.X, SocketScale.X), 0.001);
+            ck::EnsureIfNot(IsUniform, f"[PlayerCharacter] TPBody: grip_r's world scale [{SocketScale}] is not uniform and positive - the hand mount takes its X");
+            const auto Unscale = 1.0 / Math::Max(SocketScale.X, KINDA_SMALL_NUMBER);
+            _BodyGrip = utils_scene_node::CreateAndAttachToUnrealMesh(InPlayerTransform, Mesh, BodyGripBone_R,
+                FTransform(FQuat::Identity, FVector::ZeroVector, FVector(Unscale, Unscale, Unscale)));
+        }
+
+        utils_handle::Set_DebugName(_BodyGrip.H(), n"Player.BodyGrip");
+        _HandMountBodyOffset = Make_HandMountBodyOffset(_HeldGrip);
+        auto BodyGripTransform = _BodyGrip.As_Transform();
+        auto HandMount = utils_scene_node::Create(BodyGripTransform, _HandMountBodyOffset);
+        utils_handle::Set_DebugName(HandMount.H(), n"Player.HandMount");
+        _HandMount = HandMount.As_Transform();
+    }
+
+    // One-way: the first time this copy is its player's own view, the hand mount moves under the gloves' hand node at
+    // identity (detach, then add: utils_scene_node::Add never re-parents an attached node) and what it carries is drawn
+    // first-person from then on. Called at composition, when the controller changes and every tick until it moves: local
+    // control only resolves a few frames after possession.
+    private void Refresh_HandMount()
+    {
+        if (_HandMountIsFirstPerson || ck::Is_NOT_Valid(_HandMount) || ck::Is_NOT_Valid(_HandNode) || Get_IsLocalPlayerView() == false)
+        { return; }
+
+        _HandMountIsFirstPerson = true;
+        auto SceneNode = _HandMount.H().As_SceneNode();
+        utils_scene_node::Request_Detach(SceneNode);
+        auto FirstPersonNode = utils_scene_node::Add(_HandMount, _HandNode, FTransform::Identity);
+        // A body offset requested earlier this frame must not land on the first-person mount: the last request wins.
+        utils_scene_node::Request_UpdateOffset(FirstPersonNode, FCk_Request_SceneNode_UpdateRelativeTransform(FTransform::Identity));
+        utils_fphands::Apply_FirstPersonTypeToMounted(_HandMount);
+        Refresh_HeldItemShadow(Get_HeldItemNow());
+    }
+
+    // Every copy, late joiners included (HeldItem follows the replicated hotbar): the hold is derived here from the item,
+    // including the refresh when a persistent body links after the selection (its fit changes the hold). It aims the arms
+    // (Apply_BodyHold), sets the owner's shadow and moves the hand mount's body offset; once the mount is first-person it
+    // stays at identity.
+    UFUNCTION()
+    private void OnHeldItemChanged(FCk_Handle_HeldItem InHeldItem, FCk_Handle_Item InPrev, FCk_Handle_Item InNew)
+    {
+        _HeldGrip = utils_held_view::Make_Grip(InNew);
+        _HandMountBodyOffset = Make_HandMountBodyOffset(_HeldGrip);
+        Apply_BodyHold();
+        Refresh_HeldItemShadow(InNew);
+        if (_HandMountIsFirstPerson)
+        { return; }
+
+        auto SceneNode = _HandMount.H().As_SceneNode();
+        utils_scene_node::Request_UpdateOffset(SceneNode, FCk_Request_SceneNode_UpdateRelativeTransform(_HandMountBodyOffset));
+    }
+
+    // Where the gloves' hand node is relative to the right glove's grip for InGrip, with the body's palm
+    // (utils_held_view::Get_BodyHandMountOffset): an item at HeldOffset on the mount sits on grip_r as the first-person item
+    // sits on the right glove. Empty hands (and an item with no Presentation) take the empty hold's right rest grip.
+    private FTransform Make_HandMountBodyOffset(const FMars_HeldView_Grip& InGrip) const
+    {
+        return utils_held_view::Get_BodyHandMountOffset(Make_BodyHandsSpec(), InGrip);
+    }
+
+    // What this copy's HeldItem holds now; invalid before composition and with empty hands.
+    private FCk_Handle_Item Get_HeldItemNow() const
+    {
+        if (ck::Is_NOT_Valid(_PlayerEntity))
+        { return FCk_Handle_Item(); }
+
+        const auto HeldItem = _PlayerEntity.As_HeldItem(ECk_SanityCheck::UnChecked);
+        if (ck::Is_NOT_Valid(HeldItem))
+        { return FCk_Handle_Item(); }
+
+        return HeldItem.Get_CurrentItem();
+    }
+
+    // The gloves' layout with the body's own palm thickness for the fitted grips.
+    private FMars_FPHands_Spec Make_BodyHandsSpec() const
+    {
+        auto HandsSpec = Config.FPHands;
+        HandsSpec.Rest.PalmSurfaceOffset = Config.TPBody.Hold.PalmSurfaceOffset;
+        return HandsSpec;
     }
 
     //----------------------------------------------------------------------------------------------------------------------
@@ -992,39 +1150,10 @@ class AMars_PlayerCharacter : AMars_Character
     }
 
     //----------------------------------------------------------------------------------------------------------------------
-    // The held item on the body (Mars_HeldView.as). The owner describes what its gloves hold; the view replicates and every
-    // machine shows it on the body: the item on grip_r, the arms aimed by ABP_Chef's IK. The owner applies at once and,
-    // as a client, forwards to the server, which stores the replicated copy and applies it too. OnRep skips the locally
-    // controlled copy (the owner already applied it), so every machine applies each change once.
+    // The held item on the body (Mars_HeldView.as). Every copy derives the hold from its own HeldItem (OnHeldItemChanged):
+    // the item itself is on the hand mount, drawn by its own world item; ABP_Chef's IK aims the arms at the hold. Nothing
+    // about it replicates.
     //----------------------------------------------------------------------------------------------------------------------
-
-    UFUNCTION()
-    void Request_SetHeldView(FMars_HeldView InView)
-    {
-        auto View = InView;
-        View.Serial = _HeldView.Serial + 1;
-        _HeldView = View;
-        ApplyHeldView();
-
-        if (HasAuthority() == false)
-        { Server_SetHeldView(View); }
-    }
-
-    UFUNCTION(Server)
-    void Server_SetHeldView(FMars_HeldView InView)
-    {
-        _HeldView = InView;
-        ApplyHeldView();
-    }
-
-    UFUNCTION()
-    private void OnRep_HeldView()
-    {
-        if (IsLocallyControlled())
-        { return; }
-
-        ApplyHeldView();
-    }
 
     // The eased arm targets, component space; UMars_Chef_AnimInstance reads them after Update_BodyHold.
     UFUNCTION()
@@ -1033,7 +1162,7 @@ class AMars_PlayerCharacter : AMars_Character
         return _BodyHoldFrame;
     }
 
-    // Eases the arms toward _HeldView's hold. Driven by UMars_Chef_AnimInstance's update (the body's anim always ticks,
+    // Eases the arms toward _HeldGrip's hold. Driven by UMars_Chef_AnimInstance's update (the body's anim always ticks,
     // see Mesh's VisibilityBasedAnimTickOption), so the arms move exactly as often as the pose is evaluated and the
     // character needs no actor tick. While the hand swings (a held item's strike), the hold is rebuilt around the
     // swing's pose every update and taken as is: the swing is the motion, and easing it would blunt the blow. With empty
@@ -1043,7 +1172,7 @@ class AMars_PlayerCharacter : AMars_Character
         auto Target = _BodyHoldTarget;
         const auto& Speed = Config.TPBody.Hold.InterpSpeed;
         auto Step = Speed.IsSet() ? Math::Clamp(InDeltaSeconds * Speed.GetValue(), 0.0f, 1.0f) : 1.0f;
-        const auto IsEmptyHanded = _HeldView.Grip.Kind == EMars_FPHands_HoldKind::Empty;
+        const auto IsEmptyHanded = _HeldGrip.Kind == EMars_FPHands_HoldKind::Empty;
         if (IsEmptyHanded == false && ck::IsValid(_HandSwing) && _HandSwing.Get_IsSwinging())
         {
             auto Query = _BodyHoldQuery;
@@ -1077,49 +1206,58 @@ class AMars_PlayerCharacter : AMars_Character
         return Query;
     }
 
-    // Shows _HeldView on the body: the item mesh relative to grip_r where the first-person system puts it relative to the
-    // right glove's grip, and the arms' targets. Empty hands clear the mesh and lower both arms (they keep their last
-    // targets while the alphas ease out).
-    private void ApplyHeldView()
+    // The arms' targets for _HeldGrip. Empty hands lower both arms (they keep their last targets while the alphas ease out).
+    private void Apply_BodyHold()
     {
-        const auto& View = _HeldView;
-        if (View.Grip.Kind == EMars_FPHands_HoldKind::Empty)
+        const auto& Grip = _HeldGrip;
+        if (Grip.Kind == EMars_FPHands_HoldKind::Empty)
         {
-            BodyHeldItem.SetStaticMesh(nullptr);
             _BodyHoldTarget.Left.Alpha = 0.0f;
             _BodyHoldTarget.Right.Alpha = 0.0f;
             return;
         }
 
         const auto& Body = Config.TPBody;
-        // The body's own palm thickness replaces the gloves' for the fitted grips; the rest of the layout is the gloves'.
-        auto HandsSpec = Config.FPHands;
-        HandsSpec.Rest.PalmSurfaceOffset = Body.Hold.PalmSurfaceOffset;
-
-        UStaticMesh ItemMesh = nullptr;
-        if (View.Mesh.IsNull() == false)
-        { ItemMesh = System::LoadAsset_Blocking(View.Mesh); }
-
-        // No material clears the override (the mesh's own material shows), as on the WorldItem visual.
-        UMaterialInterface ItemMaterial = nullptr;
-        if (View.Material.IsNull() == false)
-        { ItemMaterial = System::LoadAsset_Blocking(View.Material); }
-
-        BodyHeldItem.SetStaticMesh(ItemMesh);
-        BodyHeldItem.SetMaterial(0, ItemMaterial);
-        const auto ItemInGrip = utils_held_view::Get_ItemInGrip(HandsSpec, View);
-        BodyHeldItem.SetRelativeTransform(utils_held_view::Get_BodyItemTransform(ItemInGrip, View.MeshScale, Body.Scale));
-
+        const auto HandsSpec = Make_BodyHandsSpec();
         auto Query = FMars_TPBody_HoldQuery();
-        Query.Grips = utils_held_view::Get_GripTargets(HandsSpec, View.Grip);
-        Query.Kind = View.Grip.Kind;
-        Query.IsSocketGrip = View.Grip.HasSocketGrips;
+        Query.Grips = utils_held_view::Get_GripTargets(HandsSpec, Grip);
+        Query.Kind = Grip.Kind;
+        Query.IsSocketGrip = Grip.HasSocketGrips;
         Query.Hold = Body.Hold;
         Query.BodyScale = Body.Scale;
         Query.HandInGrip_R = Get_HandInGrip(BodyGripBone_R);
         Query.HandInGrip_L = Get_HandInGrip(BodyGripBone_L);
         _BodyHoldQuery = Query;
         _BodyHoldTarget = utils_held_view::Make_HoldFrame(Query);
+    }
+
+    // On the copy that is its player's own view (the hand mount is first-person), HeldItemShadow draws InItem's
+    // Presentation mesh relative to grip_r where the first-person item sits relative to the right glove's grip, so the
+    // owner's held item still casts a shadow. Nothing for empty hands, and nothing on every other copy, where the item's
+    // own world item is in the body's hand. Refreshed on every held-item change and when the mount turns first-person.
+    private void Refresh_HeldItemShadow(const FCk_Handle_Item& InItem)
+    {
+        if (_HandMountIsFirstPerson == false || _HeldGrip.Kind == EMars_FPHands_HoldKind::Empty || ck::Is_NOT_Valid(InItem)
+            || InItem.Has_Presentation() == false)
+        {
+            HeldItemShadow.SetStaticMesh(nullptr);
+            return;
+        }
+
+        const auto Presentation = InItem.Get_Presentation();
+        UStaticMesh ItemMesh = nullptr;
+        if (Presentation.Visual.Mesh.IsNull() == false)
+        { ItemMesh = System::LoadAsset_Blocking(Presentation.Visual.Mesh); }
+
+        // No material clears the override (the mesh's own material shows), as on the WorldItem visual.
+        UMaterialInterface ItemMaterial = nullptr;
+        if (Presentation.Visual.MaterialOverride.IsNull() == false)
+        { ItemMaterial = System::LoadAsset_Blocking(Presentation.Visual.MaterialOverride); }
+
+        HeldItemShadow.SetStaticMesh(ItemMesh);
+        HeldItemShadow.SetMaterial(0, ItemMaterial);
+        const auto ItemInGrip = utils_held_view::Get_ItemInGrip(Make_BodyHandsSpec(), Presentation.Mounting.HeldOffset, _HeldGrip);
+        HeldItemShadow.SetRelativeTransform(utils_held_view::Get_BodyItemTransform(ItemInGrip, Presentation.Visual.MeshScale, Config.TPBody.Scale));
     }
 
     // The grip bone's parent (the hand ABP_Chef's IK moves) relative to the grip bone, from the body's reference pose.

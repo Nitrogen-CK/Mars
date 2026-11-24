@@ -1,5 +1,8 @@
 // Each machine's own, nothing replicates (stance E): every copy of a player composes the viewpoint and its interaction
-// trace; only the locally controlled player's view is seen and its trace feeds that player's interactions.
+// trace; only the locally controlled player's view is seen and its trace feeds that player's interactions. Only that copy
+// is fed look input, so every other copy's view turns with its pawn's replicated aim instead
+// (UMars_Processor_PlayerViewpoint_FollowAim): what a machine reads from another player's view points where that player
+// looks.
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
@@ -39,6 +42,11 @@ struct FMars_PlayerViewpoint_Spec
     // Degrees of view rotation per unit of look intention (the input profile pre-scales by sensitivity).
     UPROPERTY(Category = "Camera")
     float32 LookSpeed = 1.0f;
+
+    // The pawn whose aim (GetBaseAimRotation) the view follows on every copy that is not locally controlled. Set at
+    // composition (a config asset leaves it empty); unset, the view is only ever turned by its own camera.
+    UPROPERTY()
+    TWeakObjectPtr<APawn> AimSource;
 }
 
 mixin FMars_Validation Validate(const FMars_PlayerViewpoint_Spec& Self)
@@ -90,6 +98,16 @@ enum EMars_PlayerViewpoint_ViewHolder
     Devour,
     // The camp parchment or departure board owns the local view until it closes.
     CampMenu
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+// Params
+//--------------------------------------------------------------------------------------------------------------------------
+
+struct FMars_Fragment_PlayerViewpoint_Params
+{
+    UPROPERTY()
+    TWeakObjectPtr<APawn> AimSource;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

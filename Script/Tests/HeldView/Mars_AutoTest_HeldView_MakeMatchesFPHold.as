@@ -1,7 +1,6 @@
-// The held view an owner replicates describes the same hold its gloves play: for real sandbox items (the Rock, a fitted
-// sphere, and the Cleaver, a fitted box) utils_held_view::Make carries the item's Presentation look and
-// utils_fphands::Make_Hold's grip, and the grip targets rebuilt from the view (To_Hold -> Get_RestTargets) are the
-// first-person ones. An invalid item makes an empty view.
+// The grip the body derives from an item describes the same hold the gloves play: for real sandbox items (the Rock, a
+// fitted sphere, and the Cleaver, a fitted box) utils_held_view::Make_Grip carries utils_fphands::Make_Hold's grip, and the
+// grip targets rebuilt from it (To_Hold -> Get_RestTargets) are the first-person ones. An invalid item makes an empty grip.
 class UMars_AutoTest_HeldView_MakeMatchesFPHold : UCk_AutoTest_Base
 {
     private FCk_Handle_Inventory_DataOnly _RockHolder;
@@ -14,8 +13,8 @@ class UMars_AutoTest_HeldView_MakeMatchesFPHold : UCk_AutoTest_Base
         _CleaverHolder = MakeSeededHolder(InHandle, mars_items::Cleaver());
 
         Add_Step_WaitUntil("both holders are seeded with their item", n"Check_Seeded", 0, 0);
-        Add_Step("the view of each item matches its Presentation and its first-person hold", n"Step_AssertViews");
-        Add_Step("an invalid item makes an empty view", n"Step_AssertEmpty");
+        Add_Step("the grip of each item matches its first-person hold", n"Step_AssertViews");
+        Add_Step("an invalid item makes an empty grip", n"Step_AssertEmpty");
         Run_Steps(InHandle);
     }
 
@@ -36,9 +35,8 @@ class UMars_AutoTest_HeldView_MakeMatchesFPHold : UCk_AutoTest_Base
     UFUNCTION()
     private void Step_AssertEmpty(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        const auto View = utils_held_view::Make(FCk_Handle_Item());
-        Assert_True(View.Grip.Kind == EMars_FPHands_HoldKind::Empty, "an invalid item is not held");
-        Assert_True(View.Mesh.IsNull(), "an invalid item has no mesh");
+        const auto Grip = utils_held_view::Make_Grip(FCk_Handle_Item());
+        Assert_True(Grip.Kind == EMars_FPHands_HoldKind::Empty, "an invalid item is not held");
     }
 
     private void AssertMatches(FCk_Handle_Item InItem, const FString& InName)
@@ -47,17 +45,10 @@ class UMars_AutoTest_HeldView_MakeMatchesFPHold : UCk_AutoTest_Base
         if (InItem.Has_Presentation() == false)
         { return; }
 
-        const auto Presentation = InItem.Get_Presentation();
         const auto Hold = utils_fphands::Make_Hold(InItem);
-        const auto View = utils_held_view::Make(InItem);
+        const auto Grip = utils_held_view::Make_Grip(InItem);
 
-        Assert_True(View.Grip.Kind != EMars_FPHands_HoldKind::Empty && Hold.Kind != EMars_FPHands_HoldKind::Empty, f"{InName}: the view and the gloves both hold it");
-        Assert_True(View.Mesh == Presentation.Visual.Mesh, f"{InName}: the view carries the Presentation mesh");
-        Assert_True(View.Material == Presentation.Visual.MaterialOverride, f"{InName}: the view carries the Presentation material");
-        Assert_True(View.MeshScale.Equals(Presentation.Visual.MeshScale), f"{InName}: the view carries MeshScale [{View.MeshScale}]");
-        Assert_True(View.HeldOffset.Equals(Presentation.Mounting.HeldOffset), f"{InName}: the view carries HeldOffset");
-
-        const auto& Grip = View.Grip;
+        Assert_True(Grip.Kind != EMars_FPHands_HoldKind::Empty && Hold.Kind != EMars_FPHands_HoldKind::Empty, f"{InName}: the grip and the gloves both hold it");
         Assert_True(Grip.Kind == Hold.Kind, f"{InName}: the hold kind matches ({Grip.Kind :n})");
         Assert_True(Grip.Pose == Hold.Pose, f"{InName}: the grip pose matches");
         Assert_True(Grip.HasSocketGrips == Hold.SocketGrips.IsSet(), f"{InName}: socket grips match");

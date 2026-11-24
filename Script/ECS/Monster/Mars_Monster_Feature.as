@@ -92,8 +92,8 @@ struct FMars_Fragment_Monster_Params
 
 // Written only by UMars_Processor_Monster_HandleRequests and, on a copy without authority, by
 // UMars_Processor_Monster_Mirror (which latches DeathCause), and composed by Add. The roster is never pruned: a severed part
-// stays listed, valid until its debris timer destroys it and invalid after. Readers count attached parts by the part's
-// State and check validity before any read.
+// stays listed and valid while the monster lives (its leg stays the body's), invalid once the monster is destroyed.
+// Readers count attached parts by the part's State and check validity before any read.
 struct FMars_Fragment_Monster
 {
     UPROPERTY()

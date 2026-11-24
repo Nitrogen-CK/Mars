@@ -1,8 +1,9 @@
 // Body depletion kills the monster once: 200 Blunt on the crawler's body zone depletes its 120 body Health, the monster
 // reads IsDead with the hit as its DeathCause, ByteAttribute.Mars.Monster.Dead reads 1 and OnDied fires once. A second
 // lethal hit and a direct Die request change nothing (still one OnDied, the first cause kept). The monster's drain sheds
-// nothing itself; the crawler HFSM's Dead state does (all 4 legs severed), and the severed limbs - world-owned, debris
-// lifetime 1.0 s here - die on their own timer inside the test.
+// nothing itself; the crawler HFSM's Dead state does (all 4 legs severed: each part reads Severed and stays valid while
+// the monster lives), and the four limbs they drop - under the replicated spawn owner, lifetime 1.0 s here - are gone
+// before the test ends.
 class UMars_AutoTest_Monster_BodyDepletionSetsDeadAndSignals : UMars_AutoTestRig_Crawler
 {
     default _TimeoutSeconds = 15.0f;
@@ -10,6 +11,7 @@ class UMars_AutoTest_Monster_BodyDepletionSetsDeadAndSignals : UMars_AutoTestRig
 
     private TArray<FMars_DamageEvent> _DiedCauses;
     private TArray<FCk_Handle_BodyPart> _Legs;
+    private int32 _MostLimbsNear = 0;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
@@ -22,14 +24,14 @@ class UMars_AutoTest_Monster_BodyDepletionSetsDeadAndSignals : UMars_AutoTestRig
         Add_Step("one OnDied with the lethal hit; hit again and request Die directly", n"Step_AssertDiedAndKillAgain");
         Add_Step_WaitFrames("let the second hit and the direct Die drain", 10);
         Add_Step("still one OnDied, the first cause kept", n"Step_AssertLatched");
-        Add_Step_WaitUntil("the Dead state shed every leg and the severed limbs died on their timer", n"Check_LegsShedAndGone", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the Dead state shed every leg, four limbs fell and they are gone after their lifetime", n"Check_LegsShedAndGone", k_SlowPolls, 0);
         Run_Steps(InHandle);
     }
 
     private FMars_Crawler_Spec Make_Spec()
     {
         auto Spec = Make_CrawlerSpec(FVector(400.0, 400.0, 200.0));
-        // The Dead state severs every leg; the world-owned limbs must die before the test ends (no leak).
+        // The Dead state severs every leg; the limbs must be gone before the test ends (no leak).
         Spec.Vitals.LegDebris.LifetimeSeconds = 1.0f;
         return Spec;
     }
@@ -116,10 +118,16 @@ class UMars_AutoTest_Monster_BodyDepletionSetsDeadAndSignals : UMars_AutoTestRig
 
         for (const auto& Leg : _Legs)
         {
-            if (ck::IsValid(Leg))
+            if (ck::IsValid(Leg) && Leg.Get_State() != EMars_BodyPart_State::Severed)
             { return; }
         }
 
-        Res.Set(_Crawler.Get_Monster().Get_AttachedPartCount() == 0);
+        // The limbs must have been seen before their absence counts.
+        const auto LimbsNear = Get_LimbsNear(InHandle).Num();
+        _MostLimbsNear = Math::Max(_MostLimbsNear, LimbsNear);
+        if (_MostLimbsNear < _Legs.Num() || LimbsNear > 0)
+        { return; }
+
+        Res.Set(ck::Is_NOT_Valid(_Crawler) || _Crawler.Get_Monster().Get_AttachedPartCount() == 0);
     }
 }

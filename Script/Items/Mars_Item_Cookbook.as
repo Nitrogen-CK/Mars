@@ -1,5 +1,5 @@
-// One persistent physical book: the closed proxy supplies collision, glove contact and the remote held-item view;
-// UMars_Cookbook_EntityScript substitutes the animated skeletal presentation on the owning copy.
+// One persistent physical book: the closed mesh supplies collision, glove contact and the owner's held-item shadow;
+// UMars_Cookbook_EntityScript draws the animated skeletal presentation in its place on every machine.
 asset Mars_ItemDef_Cookbook of UCk_InventoryItem_Definition
 {
     _CoreInfo = FCk_InventoryItem_CoreInfo(FText::FromString("Cookbook"));

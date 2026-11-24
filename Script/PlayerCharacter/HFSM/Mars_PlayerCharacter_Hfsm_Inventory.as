@@ -108,18 +108,17 @@ class UMars_SmTask_HotbarEjectDrops : UCk_SmTask_EntityScript
 //--------------------------------------------------------------------------------------------------------------------------
 
 // The gloves hold what HeldItem holds (FPHands builds the hold from the item, utils_fphands::Make_Hold): told on enter and
-// on every held-item change. With it go the hold's other two consumers: the character's replicated view of it (the body
-// others see, AMars_PlayerCharacter::Request_SetHeldView) and the hold's lateral on the gloves' side node (empty hands and
-// two-handed holds centre the hand node between the gloves; a one-handed item moves it to the right glove). An item in the
-// hands stops a playing emote. A carrier without gloves or HeldItem (a test rig) binds nothing; one without a character
-// or side node skips those.
+// on every held-item change. With it goes the hold's lateral on the gloves' side node (empty hands and two-handed holds
+// centre the hand node between the gloves; a one-handed item moves it to the right glove). An item in the hands stops a
+// playing emote. The body others see derives its own hold from HeldItem on every copy
+// (AMars_PlayerCharacter::OnHeldItemChanged). A carrier without gloves or HeldItem (a test rig) binds nothing; one
+// without a side node skips the lateral.
 class UMars_SmTask_HeldItemDrivesHands : UCk_SmTask_EntityScript
 {
     default _TaskMode = ECk_SmTaskMode::EnterExitOnly;
 
     private FCk_Handle_HeldItem _HeldItem;
     private FCk_Handle_FPHands _Hands;
-    private AMars_PlayerCharacter _Character;
 
     UFUNCTION(BlueprintOverride)
     void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
@@ -137,7 +136,6 @@ class UMars_SmTask_HeldItemDrivesHands : UCk_SmTask_EntityScript
             return;
         }
 
-        _Character = Cast<AMars_PlayerCharacter>(ck::ToActor(Player, ECk_SanityCheck::UnChecked));
         _HeldItem.BindTo_OnHeldItemChanged(FMars_Delegate_HeldItem_OnHeldItemChanged(this, n"OnHeldItemChanged"));
         Apply_Hold(_HeldItem.Get_CurrentItem());
     }
@@ -150,7 +148,6 @@ class UMars_SmTask_HeldItemDrivesHands : UCk_SmTask_EntityScript
 
         _HeldItem = FCk_Handle_HeldItem();
         _Hands = FCk_Handle_FPHands();
-        _Character = nullptr;
     }
 
     UFUNCTION()
@@ -167,9 +164,6 @@ class UMars_SmTask_HeldItemDrivesHands : UCk_SmTask_EntityScript
         const auto Hold = utils_fphands::Make_Hold(InItem);
         if (Hold.Kind != EMars_FPHands_HoldKind::Empty)
         { utils_fphands::Stop_Emote(_Hands); }
-
-        if (ck::IsValid(_Character))
-        { _Character.Request_SetHeldView(utils_held_view::Make(InItem)); }
 
         auto SideNode = _Hands.Get_SideNode();
         if (ck::Is_NOT_Valid(SideNode))

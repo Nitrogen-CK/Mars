@@ -2,7 +2,7 @@
 // their Health (30 Sever each); both sever, the gait reports 2 of 4 enabled, the crawler's setup writes CanWalk false
 // through the brain, the only plan is [Cower], and the behaviour sub-SM reaches Cower (the first sever may pass through
 // Flinch on the way: the test waits for Cower, not for the path). CanWalk reads false, the navigator is Idle and the
-// body stays within 50 uu of where it cowered for 2 s.
+// body stays within 50 uu of where it cowered for 2 s. The two limbs (1 s each) are gone before the test ends.
 class UMars_AutoTest_Crawler_CrippledCowers : UMars_AutoTestRig_Crawler
 {
     default _TimeoutSeconds = 30.0f;
@@ -29,6 +29,7 @@ class UMars_AutoTest_Crawler_CrippledCowers : UMars_AutoTestRig_Crawler
         Add_Step_WaitUntil("the behaviour sub-SM reaches Cower", n"Check_InCower", 0, 0);
         Add_Step("CanWalk is false, the leaf is Cower and the navigator Idle", n"Step_AssertCowering");
         Add_Step_WaitUntil("the body holds within 50 uu for 2 s", n"Check_HoldsStill", 0, k_HoldSeconds + k_HoldSlackSeconds);
+        Add_Step_WaitUntil("no severed limb is left near the crawler", n"Check_NoLimbNear", k_SlowPolls, 0);
         Run_Steps(InHandle);
     }
 
@@ -37,7 +38,7 @@ class UMars_AutoTest_Crawler_CrippledCowers : UMars_AutoTestRig_Crawler
         auto Spec = Make_CrawlerSpec(FVector(300.0, 300.0, 200.0));
         Spec.RoamDwellSeconds = 0.3f;
         Spec.MinLegsToWalk = 3;
-        // The severed limbs are world-owned; they must die on their debris timer before the 2 s hold ends (no leak).
+        // The severed limbs live under the replicated spawn owner: they must end inside the test (no leak).
         Spec.Vitals.LegDebris.LifetimeSeconds = 1.0f;
         return Spec;
     }

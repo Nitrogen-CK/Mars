@@ -150,11 +150,91 @@ struct FMars_Crawler_MeshRenderer
     UCk_IsmRenderer_Data Renderer;
 }
 
+// The ISM renderers a crawler's pieces wear, each created on first use: one per look mesh (its slot 0 a material when one
+// is given) and one engine cube per tint, with its own LitMetal MID. A MID needs a world, so an entity script holds this:
+// the crawler's, and each severed limb's, which wears the same pieces.
+struct FMars_Crawler_PieceRenderers
+{
+    UPROPERTY()
+    TArray<FMars_Crawler_MeshRenderer> Meshes;
+
+    UPROPERTY()
+    TArray<FMars_Crawler_TintedRenderer> Tints;
+
+    UCk_IsmRenderer_Data GetOrCreate_ForMesh(FCk_Handle& InRoot, UStaticMesh InMesh, UMaterialInterface InMaterial)
+    {
+        for (const auto& Existing : Meshes)
+        {
+            if (Existing.Mesh == InMesh && ck::IsValid(Existing.Renderer))
+            { return Existing.Renderer; }
+        }
+
+        auto EntityWorld = utils_entity_lifetime::Get_WorldForEntity(InRoot);
+        if (ck::Is_NOT_Valid(EntityWorld))
+        { return nullptr; }
+
+        auto Overrides = TArray<FCk_MeshMaterialOverride>();
+        if (ck::IsValid(InMaterial))
+        { Overrides.Add(FCk_MeshMaterialOverride(0, InMaterial)); }
+
+        auto Renderer = utils_ism_renderer_transient_factory::GetOrCreate_ForMeshWithMaterials(EntityWorld, InMesh, Overrides, ECk_Mobility::Movable);
+        if (ck::Is_NOT_Valid(Renderer))
+        { return nullptr; }
+
+        auto Entry = FMars_Crawler_MeshRenderer();
+        Entry.Mesh = InMesh;
+        Entry.Renderer = Renderer;
+        Meshes.Add(Entry);
+        return Renderer;
+    }
+
+    UCk_IsmRenderer_Data GetOrCreate_ForTint(FCk_Handle& InRoot, FLinearColor InColor)
+    {
+        for (const auto& Existing : Tints)
+        {
+            if (Existing.Color.Equals(InColor) && ck::IsValid(Existing.Renderer))
+            { return Existing.Renderer; }
+        }
+
+        auto EntityWorld = utils_entity_lifetime::Get_WorldForEntity(InRoot);
+        if (ck::Is_NOT_Valid(EntityWorld))
+        { return nullptr; }
+
+        auto Mesh = engine::load::Cube();
+        if (ck::EnsureIfNot(ck::IsValid(Mesh), f"[Crawler] [{InRoot.ToString()}] could not load the engine cube"))
+        { return nullptr; }
+
+        auto Material = utils_usf::Create_MID_ForLook(CkUsf::LitMetal, EntityWorld);
+        if (ck::Is_NOT_Valid(Material))
+        { return nullptr; }
+
+        utils_usf::Set_Vector(Material, n"ColorA", InColor);
+        utils_usf::Set_Vector(Material, n"ColorB", InColor);
+        utils_usf::Set_Scalar(Material, n"Tiles", 0.0f);
+
+        auto Overrides = TArray<FCk_MeshMaterialOverride>();
+        Overrides.Add(FCk_MeshMaterialOverride(0, Material));
+        auto Renderer = utils_ism_renderer_transient_factory::GetOrCreate_ForMeshWithMaterials(EntityWorld, Mesh, Overrides, ECk_Mobility::Movable);
+        if (ck::Is_NOT_Valid(Renderer))
+        { return nullptr; }
+
+        auto Entry = FMars_Crawler_TintedRenderer();
+        Entry.Color = InColor;
+        Entry.Renderer = Renderer;
+        Tints.Add(Entry);
+        return Renderer;
+    }
+}
+
 // Placeable crawler (Room 5): a 4- or 6-legged procedural walker whose every leg is a body part. This script owns the
 // visuals: it builds the presentation, segment and foot transform entities (each a DIRECT lifetime child of the root, as
 // the rig requires) with ISM box visuals tinted Color, or the pieces of Look when it is set, then hands them to
 // utils_crawler::Add in Spec.Rig, which composes the walker, the monster, the leg parts and their hurtboxes. Render scale
 // lives on the ISM proxies, never on the entities: the gait, the rig and Jolt use the unscaled transforms.
+// The entity and its root transform replicate (its body Health, monster and part ledgers ride the root); every
+// machine builds its own rig entities, visuals, light sense and fangs, and a copy's legs are its own, planted on its
+// own ground. With authority over the root this script spawns, for each severed leg, the one limb that falls
+// (UMars_SeveredLimb_EntityScript) dressed as the leg was; a copy spawns nothing.
 //
 // A pincer crawler also wears two fangs under the front of its body: scene nodes on the presentation, so they ride the
 // body through the rear and the lunge. They are dressing only (no hurtbox, no hit): each frame they ease toward the pose
@@ -162,7 +242,8 @@ struct FMars_Crawler_MeshRenderer
 class UMars_Crawler_EntityScript : UCk_GenericEntityScript_UE
 {
     default _ShowInPlaceActors = true;
-    default _Replication = ECk_Replication::DoesNotReplicate;
+    // Spawned by the authority (placed, or under the replicated spawn owner); every machine composes its own copy.
+    default _Replication = ECk_Replication::Replicates;
 
     UPROPERTY(ExposeOnSpawn)
     FTransform SpawnTransform = FTransform::Identity;
@@ -217,19 +298,21 @@ class UMars_Crawler_EntityScript : UCk_GenericEntityScript_UE
     private const float32 FangEaseRate = 10.0f;
     private const float32 FangSnapRate = 45.0f;
 
-    // Created on first use of each tint.
-    private TArray<FMars_Crawler_TintedRenderer> _Renderers;
+    // Created on first use of each tint and, with a look, of each look mesh.
+    private FMars_Crawler_PieceRenderers _PieceRenderers;
 
     // Loaded authored graph and source/frozen clips survive for the crawler's entire lifetime.
     UPROPERTY()
     private FMars_Crawler_AttackConstruction _AttackConstruction;
 
-    // Look only: its pieces (empty without one) and a renderer per piece, created on first use.
+    // Look only: its pieces (empty without one).
     private FMars_Crawler_LookMeshes _LookMeshes;
-    private TArray<FMars_Crawler_MeshRenderer> _MeshRenderers;
 
     // DebugDrawAttack only: all geometry remains in the kernel's copied accepted observations.
     private FCk_Handle_Crawler _DebugCrawler;
+
+    // Authority only: the crawler whose leg parts' OnSevered spawn a limb.
+    private FCk_Handle_Crawler _SeverCrawler;
 
     // Fangs only: the crawler they follow, the two nodes (right then left), their roots in the body's frame and the pose
     // they hold now.
@@ -274,12 +357,21 @@ class UMars_Crawler_EntityScript : UCk_GenericEntityScript_UE
             CrawlerSpec.ResolvedAttacks = _AttackConstruction.Resolved;
         }
 
-        auto Root = utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::DoesNotReplicate);
+        auto Root = utils_mars_net::Add_CreatureRoot(InHandle, SpawnTransform);
         CrawlerSpec.Rig = BuildRig(InHandle, RigData);
         ComposeLightSense(Root, CrawlerSpec);
 
         const auto Crawler = utils_crawler::Add(Root, CrawlerSpec);
         utils_entity_tag::Add(InHandle, n"TAG_MarsCrawler");
+
+        // The parts die with the crawler; nothing to unbind.
+        if (ck::IsValid(Crawler) && utils_net::Get_HasAuthority(InHandle))
+        {
+            _SeverCrawler = Crawler;
+            auto LegParts = _SeverCrawler.Get_LegParts();
+            for (int32 Index = 0; Index < LegParts.Num(); ++Index)
+            { LegParts[Index].BindTo_OnSevered(FMars_Delegate_BodyPart_OnSevered(this, n"OnLegSevered")); }
+        }
 
         // A pincer crawler's fangs follow its attack cues; a crawler whose look has a fang piece but no pincer wears them
         // at rest (anatomy, not a cue). The timer dies with the entity; nothing to unbind.
@@ -338,6 +430,75 @@ class UMars_Crawler_EntityScript : UCk_GenericEntityScript_UE
         _FangCuePhase = Phase == InBatch.Motion.WindupPhase ? EMars_Crawler_AttackPhase::Windup :
             Phase == InBatch.Motion.StrikePhase ? EMars_Crawler_AttackPhase::Strike :
             Phase == InBatch.Motion.RecoverPhase ? EMars_Crawler_AttackPhase::Recover : EMars_Crawler_AttackPhase::Idle;
+    }
+
+    // Authority only. The limb goes under the replicated spawn owner, never under the crawler, which it outlives. It is
+    // cut where the leg's first released part is; its pieces are the released parts in chain order (the foot last),
+    // each at its offset from the cut, at the half extents the rig gave it and in what BuildRig dressed it.
+    UFUNCTION()
+    private void OnLegSevered(FCk_Handle_BodyPart InPart, FMars_DamageEvent InCause, TArray<FCk_Handle_Transform> InReleased)
+    {
+        if (InReleased.Num() == 0 || ck::Is_NOT_Valid(_SeverCrawler))
+        { return; }
+
+        const auto LegParts = _SeverCrawler.Get_LegParts();
+        auto LegIndex = -1;
+        for (int32 Index = 0; Index < LegParts.Num(); ++Index)
+        {
+            if (LegParts[Index] == InPart)
+            { LegIndex = Index; }
+        }
+
+        FCk_Handle Root = _SeverCrawler;
+        if (ck::EnsureIfNot(LegIndex >= 0, f"[Crawler] [{Root.ToString()}] heard a sever of a part that is not one of its legs"))
+        { return; }
+
+        if (ck::EnsureIfNot(utils_mars_net::Get_HasReplicatedSpawnOwner(Root),
+            f"[Crawler] [{Root.ToString()}] severed leg [{LegIndex}] before the replicated spawn owner exists: no limb falls"))
+        { return; }
+
+        const auto LegRig = _SeverCrawler.Get_LegRig(LegIndex);
+        auto Chain = LegRig.Segments;
+        Chain.Add(LegRig.Foot);
+
+        auto Params = UMars_SeveredLimb_EntityScript::Params();
+        auto Centre = FVector::ZeroVector;
+        auto HasCut = false;
+        for (int32 Index = 0; Index < Chain.Num(); ++Index)
+        {
+            if (InReleased.Contains(Chain[Index]) == false)
+            { continue; }
+
+            const auto World = utils_transform::Get_EntityCurrentTransform(Chain[Index]);
+            if (HasCut == false)
+            {
+                Params.SpawnTransform = World;
+                HasCut = true;
+            }
+
+            auto Piece = FMars_SeveredLimb_Piece();
+            Piece.Offset = World.GetRelativeTransform(Params.SpawnTransform);
+            Piece.HalfExtents = LegRig.SegmentHalfExtents[Index];
+            Piece.Mesh = Get_LegPieceMesh(LegIndex, Index, LegRig.Segments.Num());
+            Piece.Color = Get_LegPieceColor(Index, LegRig.Segments.Num());
+            Params.Pieces.Add(Piece);
+            Centre += World.GetLocation();
+        }
+
+        if (ck::EnsureIfNot(Params.Pieces.Num() == InReleased.Num(),
+            f"[Crawler] [{Root.ToString()}] leg [{LegIndex}] released [{InReleased.Num()}] parts, [{Params.Pieces.Num()}] of them its rig's"))
+        { return; }
+
+        if (_LookMeshes.Get_IsComplete())
+        { Params.Material = Look.Material; }
+
+        Params.Debris = _SeverCrawler.Get_Spec().Vitals.LegDebris;
+        Params.LaunchVelocity = utils_severed_limb::Get_Velocity(InPart, Centre / float64(Params.Pieces.Num()));
+        Params.WithVisuals = WithVisuals;
+
+        auto Pending = utils_entity_script::Request_SpawnEntity(utils_mars_net::Get_ReplicatedSpawnOwner(Root), UMars_SeveredLimb_EntityScript, Params);
+        auto Limb = Pending.Get_EntityUnderConstruction();
+        utils_net_spawn::Expect_Replicated(Limb);
     }
 
     // What feels lantern light: a sphere of the body's half length on a scene node at the root, filtering Probe.Mars.Light,
@@ -451,7 +612,7 @@ class UMars_Crawler_EntityScript : UCk_GenericEntityScript_UE
         // the fang and centred on it.
         const auto Scale = WearsMesh ? FVector::OneVector : FVector(FangLength * 0.5, FangHalfThickness, FangHalfThickness) / 50.0;
         _FangPivotDistance = WearsMesh ? 0.0 : FangLength * 0.5;
-        auto Renderer = WearsMesh ? GetOrCreate_MeshRenderer(InRoot, _LookMeshes.Fang) : GetOrCreate_Renderer(InRoot, FangColor);
+        auto Renderer = WearsMesh ? _PieceRenderers.GetOrCreate_ForMesh(InRoot, _LookMeshes.Fang, _LookMeshes.Material) : _PieceRenderers.GetOrCreate_ForTint(InRoot, FangColor);
         auto Presentation = InRig.Presentation;
         _FangPose = FMars_Crawler_FangPose(FangRestSpread, FangRestDroop);
 
@@ -600,7 +761,6 @@ class UMars_Crawler_EntityScript : UCk_GenericEntityScript_UE
         Rig.Presentation = AddVisual(InRoot, FMars_Crawler_PartVisual(Rig.BodyHalfExtents, Color, _LookMeshes.Body));
 
         const auto FootHalfExtents = WearsLook ? Get_MeshHalfExtents(_LookMeshes.Foot) : FVector(FootHalfExtent, FootHalfExtent, FootHalfExtent);
-        const auto FootColor = FLinearColor(0.85f, 0.85f, 0.8f, 1.0f);
 
         for (int32 LegIndex = 0; LegIndex < LegSpecs.Num(); ++LegIndex)
         {
@@ -613,19 +773,42 @@ class UMars_Crawler_EntityScript : UCk_GenericEntityScript_UE
             {
                 auto SegmentMesh = WearsLook ? (Index == 0 ? _LookMeshes.Legs[LegIndex].Upper : _LookMeshes.Legs[LegIndex].Lower) : nullptr;
                 const auto HalfExtents = WearsLook ? Get_MeshHalfExtents(SegmentMesh) : FVector(Lengths[Index] * 0.5, SegmentHalfThickness, SegmentHalfThickness);
-                auto Shade = Color * (1.0 - 0.25 * Index);
-                Shade.A = 1.0f;
 
-                LegRig.Segments.Add(AddVisual(InRoot, FMars_Crawler_PartVisual(HalfExtents, Shade, SegmentMesh)));
+                LegRig.Segments.Add(AddVisual(InRoot, FMars_Crawler_PartVisual(HalfExtents, Get_LegPieceColor(Index, Lengths.Num()), SegmentMesh)));
                 LegRig.SegmentHalfExtents.Add(HalfExtents);
             }
 
-            LegRig.Foot = AddVisual(InRoot, FMars_Crawler_PartVisual(FootHalfExtents, FootColor, _LookMeshes.Foot));
+            LegRig.Foot = AddVisual(InRoot, FMars_Crawler_PartVisual(FootHalfExtents, Get_LegPieceColor(Lengths.Num(), Lengths.Num()), _LookMeshes.Foot));
             LegRig.SegmentHalfExtents.Add(FootHalfExtents);
             Rig.Legs.Add(LegRig);
         }
 
         return Rig;
+    }
+
+    // A leg's chain piece InChainIndex (the foot past its InSegmentCount segments): its tint darkens along the segments,
+    // and the foot is bone.
+    private FLinearColor Get_LegPieceColor(int32 InChainIndex, int32 InSegmentCount) const
+    {
+        if (InChainIndex >= InSegmentCount)
+        { return FLinearColor(0.85f, 0.85f, 0.8f, 1.0f); }
+
+        auto Shade = Color * (1.0 - 0.25 * InChainIndex);
+        Shade.A = 1.0f;
+        return Shade;
+    }
+
+    // With a look, the piece a leg's chain piece wears (the first segment the upper, the rest the lower, then the foot);
+    // unset without one.
+    private TSoftObjectPtr<UStaticMesh> Get_LegPieceMesh(int32 InLegIndex, int32 InChainIndex, int32 InSegmentCount) const
+    {
+        if (_LookMeshes.Get_IsComplete() == false)
+        { return TSoftObjectPtr<UStaticMesh>(); }
+
+        if (InChainIndex >= InSegmentCount)
+        { return Look.Foot; }
+
+        return InChainIndex == 0 ? Look.Legs[InLegIndex].Upper : Look.Legs[InLegIndex].Lower;
     }
 
     // A direct lifetime child of InRoot with a transform at the spawn and an ISM visual: the part's mesh at its authored
@@ -640,7 +823,7 @@ class UMars_Crawler_EntityScript : UCk_GenericEntityScript_UE
         { return Transform; }
 
         const auto WearsMesh = ck::IsValid(InVisual.Mesh);
-        auto Renderer = WearsMesh ? GetOrCreate_MeshRenderer(InRoot, InVisual.Mesh) : GetOrCreate_Renderer(InRoot, InVisual.Color);
+        auto Renderer = WearsMesh ? _PieceRenderers.GetOrCreate_ForMesh(InRoot, InVisual.Mesh, _LookMeshes.Material) : _PieceRenderers.GetOrCreate_ForTint(InRoot, InVisual.Color);
         if (ck::IsValid(Renderer))
         {
             auto ProxySpec = FCk_IsmProxy_Spec(Renderer);
@@ -661,7 +844,7 @@ class UMars_Crawler_EntityScript : UCk_GenericEntityScript_UE
         if (WithVisuals)
         {
             FCk_Handle Owner = InParent;
-            auto Renderer = GetOrCreate_Renderer(Owner, InVisual.Color);
+            auto Renderer = _PieceRenderers.GetOrCreate_ForTint(Owner, InVisual.Color);
             if (ck::IsValid(Renderer))
             {
                 auto ProxySpec = FCk_IsmProxy_Spec(Renderer);
@@ -718,71 +901,5 @@ class UMars_Crawler_EntityScript : UCk_GenericEntityScript_UE
         return FVector(Math::Max(Math::Abs(Bounds.Min.X), Math::Abs(Bounds.Max.X)),
                        Math::Max(Math::Abs(Bounds.Min.Y), Math::Abs(Bounds.Max.Y)),
                        Math::Max(Math::Abs(Bounds.Min.Z), Math::Abs(Bounds.Max.Z)));
-    }
-
-    // Look only: one renderer per piece, its slot 0 the look's material when it has one.
-    private UCk_IsmRenderer_Data GetOrCreate_MeshRenderer(FCk_Handle& InRoot, UStaticMesh InMesh)
-    {
-        for (const auto& Existing : _MeshRenderers)
-        {
-            if (Existing.Mesh == InMesh && ck::IsValid(Existing.Renderer))
-            { return Existing.Renderer; }
-        }
-
-        auto EntityWorld = utils_entity_lifetime::Get_WorldForEntity(InRoot);
-        if (ck::Is_NOT_Valid(EntityWorld))
-        { return nullptr; }
-
-        auto Overrides = TArray<FCk_MeshMaterialOverride>();
-        if (ck::IsValid(_LookMeshes.Material))
-        { Overrides.Add(FCk_MeshMaterialOverride(0, _LookMeshes.Material)); }
-
-        auto Renderer = utils_ism_renderer_transient_factory::GetOrCreate_ForMeshWithMaterials(EntityWorld, InMesh, Overrides, ECk_Mobility::Movable);
-        if (ck::Is_NOT_Valid(Renderer))
-        { return nullptr; }
-
-        auto Entry = FMars_Crawler_MeshRenderer();
-        Entry.Mesh = InMesh;
-        Entry.Renderer = Renderer;
-        _MeshRenderers.Add(Entry);
-        return Renderer;
-    }
-
-    // NewObject-backed MIDs need a world; hence a method on the entity script, not on the feature.
-    private UCk_IsmRenderer_Data GetOrCreate_Renderer(FCk_Handle& InRoot, FLinearColor InColor)
-    {
-        for (const auto& Tinted : _Renderers)
-        {
-            if (Tinted.Color.Equals(InColor) && ck::IsValid(Tinted.Renderer))
-            { return Tinted.Renderer; }
-        }
-
-        auto EntityWorld = utils_entity_lifetime::Get_WorldForEntity(InRoot);
-        if (ck::Is_NOT_Valid(EntityWorld))
-        { return nullptr; }
-
-        auto Mesh = engine::load::Cube();
-        if (ck::EnsureIfNot(ck::IsValid(Mesh), f"[Crawler] [{InRoot.ToString()}] could not load the engine cube"))
-        { return nullptr; }
-
-        auto Material = utils_usf::Create_MID_ForLook(CkUsf::LitMetal, EntityWorld);
-        if (ck::Is_NOT_Valid(Material))
-        { return nullptr; }
-
-        utils_usf::Set_Vector(Material, n"ColorA", InColor);
-        utils_usf::Set_Vector(Material, n"ColorB", InColor);
-        utils_usf::Set_Scalar(Material, n"Tiles", 0.0f);
-
-        auto Overrides = TArray<FCk_MeshMaterialOverride>();
-        Overrides.Add(FCk_MeshMaterialOverride(0, Material));
-        auto Renderer = utils_ism_renderer_transient_factory::GetOrCreate_ForMeshWithMaterials(EntityWorld, Mesh, Overrides, ECk_Mobility::Movable);
-        if (ck::Is_NOT_Valid(Renderer))
-        { return nullptr; }
-
-        auto Tinted = FMars_Crawler_TintedRenderer();
-        Tinted.Color = InColor;
-        Tinted.Renderer = Renderer;
-        _Renderers.Add(Tinted);
-        return Renderer;
     }
 }

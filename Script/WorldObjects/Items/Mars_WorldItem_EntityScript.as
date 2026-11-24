@@ -59,7 +59,8 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
     FMars_WorldItem_Arrival ArriveFrom;
 
     // Visual: when set (and ArriveFrom is not), the visual spawns at this world pose and keeps the offset it makes from
-    // AttachTo, anchored to the world for the spawn frame (FMars_WorldItem_VisualSpec.SpawnAtWorld).
+    // AttachTo, anchored to the world for the spawn frame (FMars_WorldItem_VisualSpec.SpawnAtWorld), unless its carrier has
+    // gloves that do not hold AttachTo: then it takes AttachOffset (DoConstruct).
     UPROPERTY(ExposeOnSpawn)
     TOptional<FTransform> SpawnAtWorld;
 
@@ -145,12 +146,21 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
             return ECk_EntityScript_ConstructionFlow::Finished;
         }
 
-        // The attach node as it will stand once this frame's transform pass has run: a carrier's hand moves by the hold's
-        // lateral on the very equip that spawns this visual (utils_fphands::Predict_HandWorldOnHold); any other node, as it is.
+        // The attach node as it will stand once this frame's transform pass has run: a carrier's hand (or a mount riding it)
+        // moves by the hold's lateral on the very equip that spawns this visual (utils_fphands::Predict_HandWorldOnHold);
+        // any other node, as it is.
         auto AttachWorld = utils_transform::Get_EntityCurrentTransform(AttachTransform);
         auto CarrierHands = utils_entity_lifetime::Get_LifetimeOwner(InHandle).As_FPHands(ECk_SanityCheck::UnChecked);
-        if (ck::IsValid(CarrierHands) && ck::IsValid(Presentation) && CarrierHands.Get_HandNode() == AttachTransform)
+        const auto RidesGloves = ck::IsValid(CarrierHands) && utils_fphands::Get_IsFirstPersonView(CarrierHands)
+            && CarrierHands.Get_RidesHandNode(AttachTransform);
+        if (RidesGloves && ck::IsValid(Presentation))
         { AttachWorld = utils_fphands::Predict_HandWorldOnHold(CarrierHands, Presentation.Grip.Handedness); }
+
+        // A spawn-from pose is the gloves' pickup carry: their tick moves the item from where it lay to its hold. A carrier
+        // whose gloves do not hold this node or do not tick (utils_fphands::Get_IsFirstPersonView: another machine's copy of
+        // a player, whose hand mount rides the body) has nothing to carry it in, so the visual takes AttachOffset at once.
+        // A carrier without gloves keeps the pose.
+        const auto IsCarriedIn = RidesGloves || ck::Is_NOT_Valid(CarrierHands);
 
         if (ArriveFrom.IsSet)
         {
@@ -176,7 +186,7 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
 
             Spec.Arrival = TOptional<FMars_Fragment_WorldItem_Arrival>(Arrival);
         }
-        else if (SpawnAtWorld.IsSet())
+        else if (SpawnAtWorld.IsSet() && IsCarriedIn)
         {
             // Spawn where the item was, at the offset that makes against the predicted attach node; the Arrive processor
             // re-anchors it to that world pose once (a swing between hand and side node would skew the prediction), then

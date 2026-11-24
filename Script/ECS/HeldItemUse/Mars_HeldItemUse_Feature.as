@@ -35,13 +35,27 @@ enum EMars_LaunchKind
     Throw
 }
 
+// Whose hand a launch leaves from.
+enum EMars_HeldItemUse_LaunchOrigin
+{
+    // This machine's: its copy of the hand, or a Persistent item's mounted world item where it is.
+    ThisMachine,
+    // The launching machine's, carried in the aim and accepted (Get_AcceptedLaunchOrigin): a Persistent item's body is
+    // moved there before it leaves (the Release's start pose).
+    LaunchingMachine
+}
+
 // What a drop or throw of the held item would launch with right now. The launch and anything that predicts it read
 // this one definition.
 struct FMars_HeldItemUse_LaunchSolution
 {
-    // Where the item's body is when it leaves: the hand attach point, or a Persistent item's own mounted world item.
+    // Where the item's body is when it leaves: the hand attach point, or a Persistent item's own mounted world item; either
+    // taken from the launching machine's hand when the aim carries one the authority accepts (OriginFrom).
     UPROPERTY()
     FTransform Origin;
+
+    UPROPERTY()
+    EMars_HeldItemUse_LaunchOrigin OriginFrom = EMars_HeldItemUse_LaunchOrigin::ThisMachine;
 
     UPROPERTY()
     FVector LinearVelocity = FVector::ZeroVector;
@@ -71,7 +85,7 @@ enum EMars_HeldItemUse_StrikeRefusal
     TooSoon,
     // The address names no live zone with a hurtbox here.
     NoZone,
-    // The contact is beyond the blade's reach from the hand, or away from every hurtbox of the zone.
+    // The contact is beyond the blade's reach from the striker's view, or away from every hurtbox of the zone.
     OutOfReach
 }
 
@@ -106,8 +120,13 @@ namespace constants_held_item_use
     // Spawn distance in front of the view when the player has no hand attach point.
     const float32 k_NoHandSpawnDistance = 60.0f;
 
-    // A claimed contact may lie this much past the held item's Reach + Radius from the hand: the striking machine swung
-    // from its own view of the pawn, which leads or trails the authority's by the latency.
+    // A launching machine's origin is used while it lies within this of the authority's copy of the carrier: an arm's
+    // reach from the capsule's centre to the hand (about 100) plus k_StrikeReachSlack's latency lead or trail. Distance
+    // only: no line-of-sight check, so a claimed origin up to this far away may lie behind a wall (follow-up).
+    const float32 k_LaunchOriginReach = 250.0f;
+
+    // A claimed contact may lie this much past the held item's Reach + Radius from the striker's view: the striking machine
+    // swept from its own eye (Mars_ItemUse_Hfsm's DoSwing), which leads or trails the authority's copy of it by the latency.
     const float32 k_StrikeReachSlack = 150.0f;
 
     // A claimed contact must lie within this of one of the zone's hurtbox nodes.
@@ -243,6 +262,13 @@ struct FMars_HeldItemUse_Aim
     // A throw's share of the held item's ThrowSpeed (Get_ThrowPower where it was charged); a drop ignores it.
     UPROPERTY()
     float32 ThrowPower = 1.0f;
+
+    // Where the launching machine's hand is (Get_OwnLaunchOrigin there): only the owner places the first-person hand; other
+    // machines hold it in the body's hand. Unset, past k_LaunchOriginReach of the authority's pawn, or on the machine that
+    // controls the carrier (where it is its own hand already): the authority's own.
+    // A Persistent item leaves from HeldOffset on it (its world item's Release start pose).
+    UPROPERTY()
+    TOptional<FTransform> Origin;
 
     FMars_HeldItemUse_Aim() {}
 

@@ -1,5 +1,6 @@
-// The ordinary persistent WorldItem owns pickup, mounting, collision and release. Its closed static proxy remains the
-// definition's remote held-item mesh; only this assembly replaces its local drawing with the animated book.
+// The ordinary persistent WorldItem owns pickup, mounting, collision and release. Its closed static mesh stays the body's
+// shape and the owner's held-item shadow (AMars_PlayerCharacter::HeldItemShadow); this assembly draws the animated book in
+// its place on every machine (the open/page state is local: other machines see it closed).
 class UMars_Cookbook_EntityScript : UMars_WorldItem_EntityScript
 {
     default Definition = mars_items::Cookbook();

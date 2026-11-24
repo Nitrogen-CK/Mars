@@ -5,7 +5,8 @@
 // leg 0's. Nothing touches a Health directly: dealer -> zone -> part ledger + spill -> Health -> depletion -> sever.
 // Two swings sever the 30 HP leg; the first hit makes the crawler flinch (polled: the behaviour sub-SM's signal is not
 // reachable from here), and it roams again afterwards on its 3 remaining legs. The body took the spill of both hits as
-// the zone scaled them (0.5 x 20 each, before the leg Health clamps the second to its remaining 10): 120 -> 100.
+// the zone scaled them (0.5 x 20 each, before the leg Health clamps the second to its remaining 10): 120 -> 100. The
+// severed leg stays valid and detached, one limb falls near the crawler (1 s) and is gone before the test ends.
 class UMars_AutoTest_Crawler_StrikeSeversLegEndToEnd : UMars_AutoTestRig_Crawler
 {
     default _TimeoutSeconds = 30.0f;
@@ -37,7 +38,9 @@ class UMars_AutoTest_Crawler_StrikeSeversLegEndToEnd : UMars_AutoTestRig_Crawler
         Add_Step_WaitUntil("strike leg 0 through the shared sweep until it is severed", n"Check_StrikeUntilSevered", k_SlowPolls, 0);
         Add_Step_WaitUntil("the crawler flinched and roams again", n"Check_FlinchedThenRoams", k_SlowPolls, 0);
         Add_Step("two swept hits on leg 0's zone; body 100; three legs walk", n"Step_AssertEndToEnd");
-        Add_Step_WaitUntil("the severed limb died on its debris timer", n"Check_SeveredLegGone", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the severed leg's limb fell near the crawler", n"Check_OneLimbNear", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the limb is gone after its lifetime", n"Check_NoLimbNear", k_SlowPolls, 0);
+        Add_Step("the severed leg stays valid and detached", n"Step_AssertLegKept");
         Run_Steps(InHandle);
     }
 
@@ -45,7 +48,7 @@ class UMars_AutoTest_Crawler_StrikeSeversLegEndToEnd : UMars_AutoTestRig_Crawler
     {
         auto Spec = Make_CrawlerSpec(FVector(300.0, 300.0, 200.0));
         Spec.RoamDwellSeconds = 0.3f;
-        // The severed limb is world-owned: it must die inside the test (no leak).
+        // The severed limb lives under the replicated spawn owner: it must end inside the test (no leak).
         Spec.Vitals.LegDebris.LifetimeSeconds = 1.0f;
         return Spec;
     }
@@ -189,9 +192,23 @@ class UMars_AutoTest_Crawler_StrikeSeversLegEndToEnd : UMars_AutoTestRig_Crawler
     }
 
     UFUNCTION()
-    private void Check_SeveredLegGone(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    private void Check_OneLimbNear(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
+        const auto Limbs = Get_LimbsNear(InHandle);
         auto Res = OutResult;
-        Res.Set(ck::Is_NOT_Valid(_SeveredLeg));
+        Res.Set(Limbs.Num() == 1 && Get_IsLimbSimulated(Limbs[0]));
+    }
+
+    UFUNCTION()
+    private void Step_AssertLegKept(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        Assert_True(ck::IsValid(_SeveredLeg), "the severed leg's entity stays valid (it stays the body's)");
+        const auto Part = _SeveredLeg.As_BodyPart(ECk_SanityCheck::UnChecked);
+        if (ck::Is_NOT_Valid(Part))
+        { return; }
+
+        Assert_True(Part.Get_State() == EMars_BodyPart_State::Severed, "the severed leg's part reads Severed");
+        Assert_False(utils_procedural_leg::Get_IsAttached(Part.Get_Leg()), "the severed leg is not attached");
+        Assert_Equals_Int(_Crawler.Get_Monster().Get_AttachedPartCount(), 3, "3 parts are attached");
     }
 }

@@ -41,7 +41,8 @@ class UMars_FlameItem_EntityScript : UMars_WorldItem_EntityScript
 
         auto Root = InHandle.As_Transform();
         auto FlameParent = Make_FlameParent(Root);
-        auto FlameNode = utils_scene_node::Create(FlameParent, FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, Get_FlameHeight()))).As_Transform();
+        const auto OverParent = Get_FlameHeight() - Get_FlameParentHeight();
+        auto FlameNode = utils_scene_node::Create(FlameParent, FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, OverParent))).As_Transform();
         utils_handle::Set_DebugName(FlameNode.H(), n"FlameItem.Flame");
 
         _Dressing = Cast<UMars_FlameDressing>(NewObject(this, UMars_FlameDressing));
@@ -68,8 +69,16 @@ class UMars_FlameItem_EntityScript : UMars_WorldItem_EntityScript
         return 0.0;
     }
 
-    // The transform the flame node (and so the light and the flame effect) hangs under: the item's root, unless a subclass
-    // puts a moving node between them (the lantern's swinging bail). Called before the flame node exists.
+    // The flame parent's height over the item's pivot while it rests: the flame node stands Get_FlameHeight() minus
+    // this over its parent.
+    protected float64 Get_FlameParentHeight() const
+    {
+        return 0.0;
+    }
+
+    // The transform the flame node (and so the light and the flame effect) hangs under: the item's root, unless a
+    // subclass puts a moving node between them (the lantern's swinging bail, Get_FlameParentHeight). Called before the
+    // flame node exists.
     protected FCk_Handle_Transform Make_FlameParent(FCk_Handle_Transform& InRoot)
     {
         return InRoot;

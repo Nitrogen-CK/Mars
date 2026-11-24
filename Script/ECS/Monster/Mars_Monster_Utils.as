@@ -103,13 +103,13 @@ mixin FCk_Handle_ByteAttribute Get_DeadAttribute(const FCk_Handle_Monster& Self)
     return Self.Get_Fragment(FMars_Fragment_Monster).Dead;
 }
 
-// Every part ever registered: a severed one stays listed, and its handle goes invalid once its debris timer destroys it.
+// Every part ever registered: a severed one stays listed and valid while its monster lives (its leg stays the body's).
 mixin TArray<FCk_Handle_BodyPart> Get_Parts(const FCk_Handle_Monster& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_Monster).Parts;
 }
 
-// Parts whose State is Attached. Validity only guards the read: a severed part is still valid until its debris timer.
+// Parts whose State is Attached. Validity only guards the read: a severed part stays valid while its monster lives.
 mixin int32 Get_AttachedPartCount(const FCk_Handle_Monster& Self)
 {
     auto Count = 0;

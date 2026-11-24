@@ -63,6 +63,42 @@ namespace utils_crawler
         if (Batch.Admitted || Batch.Interrupted || Batch.Completed || Batch.Observations.IsEmpty() == false)
         { InSelf.Get_Fragment(FMars_Fragment_Crawler_Signals).OnAttackCue.Broadcast(InSelf, Batch); }
     }
+
+    // A copy's batch for the attack it shows: the entry's profile and motion, the shown attack and ledger generation,
+    // the copy's action identity (none once it finished), no flag set (the show sets the one it raises) and, for a
+    // posed phase, one observation of that phase. The interval is empty: the copy cues the mirrored phase, not its
+    // clip's receipts.
+    FMars_Attack_CueBatch Make_ShownAttackCue(const FMars_Fragment_Crawler_AttackShow& InShow, const FMars_Attack_ResolvedEntry& InEntry,
+        EMars_Crawler_AttackPhase InPhase)
+    {
+        auto Batch = FMars_Attack_CueBatch();
+        Batch.Profile = InEntry.Definition.CueProfile;
+        Batch.AttackId = InShow.AttackId;
+        FCk_Handle Action = InShow.Action;
+        if (ck::IsValid(Action))
+        { Batch.ActionIdentity = InShow.Action.Get_Identity(); }
+
+        Batch.AdmissionAttemptGeneration = InShow.Generation;
+        Batch.Motion = InEntry.Definition.Motion;
+
+        auto PhaseId = NAME_None;
+        if (InPhase == EMars_Crawler_AttackPhase::Windup)
+        { PhaseId = Batch.Motion.WindupPhase; }
+        else if (InPhase == EMars_Crawler_AttackPhase::Strike)
+        { PhaseId = Batch.Motion.StrikePhase; }
+        else if (InPhase == EMars_Crawler_AttackPhase::Recover)
+        { PhaseId = Batch.Motion.RecoverPhase; }
+
+        if (PhaseId == NAME_None)
+        { return Batch; }
+
+        auto Observation = FMars_Attack_CueObservation();
+        Observation.Interval = FCk_ProceduralAction_Interval(FCk_Time(0.0), FCk_Time(0.0), PhaseId, ECk_ProceduralAction_Continuity::Continuous,
+            TArray<FName>(), TArray<FCk_ProceduralAction_Event>());
+        Observation.ObservationFrame = int64(utils_time::Get_FrameCounter());
+        Batch.Observations.Add(Observation);
+        return Batch;
+    }
 }
 
 mixin void BindTo_OnAttackCue(FCk_Handle_Crawler& Self, FMars_Delegate_Crawler_OnAttackCue InDelegate)

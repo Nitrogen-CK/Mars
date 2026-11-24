@@ -8,8 +8,9 @@
 // replicated refusal) naming the initiator.
 //
 // A Release validates before it mutates: the item must sit in an inventory other than the holder, with no release already
-// in flight. It then transfers the item back into the holder; the transfer's answer commits World (detach, Dynamic, own
-// profile, the launch, the pickup's Mounted claim released). A refused transfer ensures and changes nothing. Every release
+// in flight. It then transfers the item back into the holder; the transfer's answer sets the body at the release's start
+// pose when it carries one, then commits World (detach, Dynamic, own profile, the launch, the pickup's Mounted claim
+// released). A refused transfer ensures and changes nothing. Every release
 // that does not end in the World commit is answered with OnReleaseRefused, so whoever released waits on one of the two.
 class UMars_Processor_WorldItem_HandleRequests : UCk_Processor_Script_Base_UE
 {
@@ -163,7 +164,7 @@ class UMars_Processor_WorldItem_HandleRequests : UCk_Processor_Script_Base_UE
             return;
         }
 
-        InWorldItem.Add_Fragment(FMars_Fragment_WorldItem_PendingRelease(InRequest.LinearVelocity, InRequest.AngularVelocityDeg));
+        InWorldItem.Add_Fragment(FMars_Fragment_WorldItem_PendingRelease(InRequest));
 
         Source.Request_TransferItem_ToDataOnly(
             FCk_Request_Inventory_TransferItem_ToDataOnly(Item, InState.Holder),
@@ -195,9 +196,24 @@ class UMars_Processor_WorldItem_HandleRequests : UCk_Processor_Script_Base_UE
             return;
         }
 
+        // Queued ahead of the commit's SetMotionType, so the body is at the start pose before it goes Dynamic; the commit
+        // detaches the node in this call, before the body drains the teleport.
+        Request_TeleportToStartPose(WorldItem, Release.StartPose);
+
         const auto Launch = FMars_Fragment_WorldItem_PendingLaunch(Release.LinearVelocity, Release.AngularVelocityDeg);
         utils_world_item::Commit_World(WorldItem, TOptional<FMars_Fragment_WorldItem_PendingLaunch>(Launch),
             FCk_Delegate_Request_OnCompleted(this, n"OnOwnProfileRestored"));
+    }
+
+    // A machine without the body has nothing to place: the root follows the authority's replicated pose.
+    private void Request_TeleportToStartPose(FCk_Handle_WorldItem& InWorldItem, const TOptional<FTransform>& InStartPose)
+    {
+        auto Body = InWorldItem.Get_Fragment(FMars_Fragment_WorldItem).Body;
+        if (InStartPose.IsSet() == false || ck::Is_NOT_Valid(Body))
+        { return; }
+
+        const auto Pose = InStartPose.GetValue();
+        utils_jolt_body::Request_Teleport(Body, FCk_Request_JoltBody_Teleport(Pose.GetLocation(), Pose.Rotator()));
     }
 
     private void Refuse_Release(FCk_Handle_WorldItem& InWorldItem, EMars_WorldItem_ReleaseRefusal InReason)

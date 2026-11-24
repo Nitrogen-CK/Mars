@@ -187,8 +187,8 @@ namespace utils_held_item_use
             ECk_Cue_ReliabilityPolicy::Reliable, ECk_Cue_MulticastPolicy::ServerOnly);
     }
 
-    // Where InPlayer's launch goes and how hard, from this machine's view of it: the view's forward, the pawn's
-    // velocity and the throw's charge here.
+    // Where InPlayer's launch leaves from, where it goes and how hard, from this machine's view of it: the hand here, the
+    // view's forward, the pawn's velocity and the throw's charge here.
     FMars_HeldItemUse_Aim Make_Aim(FCk_Handle InPlayer)
     {
         const auto View = Get_ViewTransform(InPlayer);
@@ -202,12 +202,16 @@ namespace utils_held_item_use
         auto Aim = FMars_HeldItemUse_Aim(View.GetRotation().GetForwardVector(), PawnVelocity);
         const auto Use = InPlayer.As_HeldItemUse(ECk_SanityCheck::UnChecked);
         if (ck::IsValid(Use))
-        { Aim.ThrowPower = Use.Get_ThrowPower(); }
+        {
+            Aim.ThrowPower = Use.Get_ThrowPower();
+            Aim.Origin = TOptional<FTransform>(Use.Get_OwnLaunchOrigin(Aim.Forward));
+        }
 
         return Aim;
     }
 
-    // The player's view; a carrier without a PlayerViewpoint (a test rig) launches from its own transform.
+    // The player's view: a launch aims along it and the authority judges a strike's reach from it. A carrier without a
+    // PlayerViewpoint (a test rig) stands in with its own transform.
     FTransform Get_ViewTransform(FCk_Handle InPlayer)
     {
         auto Viewpoint = InPlayer.As_PlayerViewpoint(ECk_SanityCheck::UnChecked);

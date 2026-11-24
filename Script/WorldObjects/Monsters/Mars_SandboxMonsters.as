@@ -13,10 +13,11 @@ class UMars_Sandbox_Tenderizer_EntityScript : UMars_WorldItem_EntityScript
 }
 
 // The Room 5 crawlers: armed but passive until the Room 5 aggression lever powers their sink (channel
-// Mechanism.Channel.Room5Aggression), then they hunt the player and strike with the rearing pincer (the body rears up
-// with both front legs thrown high, then lunges as they slam down; the mouth's fangs flare and snap with it); pulling the
-// lever back calms them. The spec and the sink are set in DoConstruct, not as subclass defaults: the spawn-params
-// generator emits a non-default struct default as a positional constructor call. RoamBounds is Room 5 inset by 150 uu.
+// Mechanism.Channel.Room5Aggression), then they hunt the players (every player-controlled pawn) and strike with the
+// rearing pincer (the body rears up with both front legs thrown high, then lunges as they slam down; the mouth's fangs
+// flare and snap with it); pulling the lever back calms them. The spec and the sink are set in DoConstruct, not as
+// subclass defaults: the spawn-params generator emits a non-default struct default as a positional constructor call.
+// RoamBounds is Room 5 inset by 150 uu.
 UCLASS(Abstract)
 class UMars_Sandbox_Crawler_EntityScript : UMars_Crawler_EntityScript
 {
@@ -45,8 +46,8 @@ class UMars_Sandbox_Crawler_EntityScript : UMars_Crawler_EntityScript
         return Flow;
     }
 
-    // Only on a crawler that composed armed: a rejected spec has no crawler, and outside a local combat world the crawler
-    // is unarmed and would refuse the aggression request.
+    // Only on a crawler that composed armed: a rejected spec has no crawler, and without authority over its root the
+    // crawler is unarmed and would refuse the aggression request.
     private void ComposeAggressionSink(FCk_Handle& InHandle)
     {
         const auto Crawler = InHandle.As_Crawler(ECk_SanityCheck::UnChecked);

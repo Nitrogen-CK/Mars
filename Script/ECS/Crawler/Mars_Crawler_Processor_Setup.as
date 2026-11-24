@@ -1,6 +1,8 @@
 // Turns the crawler's gait leg-set changes and every Health it owns (the body's and each leg part's) into Brain facts,
 // the only way anything outside the brain changes its world state: CanWalk from the enabled leg count, IsHurt (and the
-// HurtCount the Flinch task watches) from any damage.
+// HurtCount the Flinch task watches) from any damage. A copy without authority has no brain and runs no Dead state: it
+// turns its own body zone off when its monster dies (at once when it already reads dead), and its HurtCount is written
+// by UMars_Processor_Crawler_Mirror from the ledger, never here.
 class UMars_Processor_Crawler_Setup : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -17,6 +19,17 @@ class UMars_Processor_Crawler_Setup : UCk_Processor_Script_Base_UE
     {
         auto Crawler = InHandle.As_Crawler();
 
+        if (utils_net::Get_HasAuthority(InHandle) == false)
+        {
+            auto Monster = Crawler.Get_Monster();
+            Monster.BindTo_OnDied(FMars_Delegate_Monster_OnDied(this, n"OnMonsterDied"));
+            if (Monster.Get_IsDead())
+            { Disable_BodyZone(Monster); }
+
+            Crawler.Request_TryRemove(FMars_Tag_Crawler_NeedsSetup);
+            return;
+        }
+
         auto Gait = Crawler.Get_Gait();
         utils_procedural_gait::BindTo_OnLegSetChanged(Gait, FCk_Delegate_ProceduralGait_OnLegSetChanged(this, n"OnLegSetChanged"));
 
@@ -30,6 +43,18 @@ class UMars_Processor_Crawler_Setup : UCk_Processor_Script_Base_UE
         }
 
         Crawler.Request_TryRemove(FMars_Tag_Crawler_NeedsSetup);
+    }
+
+    UFUNCTION()
+    private void OnMonsterDied(FCk_Handle_Monster InMonster, FMars_DamageEvent InCause)
+    {
+        Disable_BodyZone(InMonster);
+    }
+
+    private void Disable_BodyZone(FCk_Handle_Monster InMonster)
+    {
+        auto Zone = InMonster.Get_BodyZone();
+        Zone.Request_SetEnabled(FMars_Request_HitZone_SetEnabled(ECk_EnableDisable::Disable));
     }
 
     // The gait lives on the crawler root.
@@ -52,7 +77,7 @@ class UMars_Processor_Crawler_Setup : UCk_Processor_Script_Base_UE
         if (ck::Is_NOT_Valid(Crawler))
         { Crawler = InHealth.As_BodyPart().Get_Monster().As_Crawler(ECk_SanityCheck::UnChecked); }
 
-        // A severed leg is world-owned and can outlive the crawler that shed it.
+        // A leg's damage can arrive while its crawler is ending.
         if (ck::Is_NOT_Valid(Crawler))
         { return; }
 

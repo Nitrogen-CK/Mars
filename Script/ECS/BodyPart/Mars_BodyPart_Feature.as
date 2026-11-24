@@ -2,10 +2,11 @@
 // and Sever. A part has no replication driver, so its state reaches other machines through the replicated ledger on its
 // monster's entity (FMars_Fragment_BodyPart_Net, one {state, condition} per part by composition order, the same on every
 // machine). A copy without authority drops RecordHit and Sever; its mirror (UMars_Processor_BodyPart_Mirror) applies each
-// changed entry to that machine's own part with the same break and detach the authority runs, so debris is each machine's
-// own, and raises OnConditionChanged, OnBroken and OnSevered. A mirrored cause is empty. A severed leg drops once on a
-// machine whose copy composes after the sever. A part's zone is addressed through its monster. A part's Health and its
-// ruin damage are the authority's alone.
+// changed entry to that machine's own part with the same break and detach the authority runs, and raises
+// OnConditionChanged, OnBroken and OnSevered. A mirrored cause is empty. A sever releases the leg's parts and destroys
+// them on every machine; what falls is one limb the part's host spawns, once, with authority (a severed limb,
+// utils_severed_limb). A part's zone is addressed through its monster. A part's Health and its ruin damage are the
+// authority's alone.
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
@@ -49,8 +50,8 @@ enum EMars_BodyPart_DepletionPolicy
     None,
     // The zone is disabled and OnBroken fires; the entity stays as it is.
     Break,
-    // The part entity is a procedural leg: it is detached from its body, its released segments ragdoll as debris and
-    // the severed limb (the leg and its parts) is destroyed by one timer on the leg.
+    // The part entity is a procedural leg: it is detached and stays the body's; its released parts are destroyed, and
+    // OnSevered's handler spawns the limb that falls.
     DetachLeg
 }
 
@@ -65,7 +66,7 @@ enum EMars_BodyPart_State
 // Spec
 //--------------------------------------------------------------------------------------------------------------------------
 
-// How a severed limb's released parts fall.
+// How a severed leg's limb falls and how long it lies.
 struct FMars_BodyPart_Debris
 {
     UPROPERTY()
@@ -78,11 +79,16 @@ struct FMars_BodyPart_Debris
     UPROPERTY()
     float32 UpSpeed = 150.0f;
 
-    // From the sever to the destruction of the severed limb.
+    // From the sever to the limb's destruction.
     UPROPERTY()
     float32 LifetimeSeconds = 8.0f;
 
-    // A profile the gait's and surface motion's Visibility probes do not trace, so debris never reads as ground.
+    // Each piece's surface friction (Jolt combines two as the root of their product), the world item's: on a floor of
+    // the same friction a limb holds on a slope up to about 31 degrees, on one of Jolt's default 0.2 up to about 19.
+    UPROPERTY()
+    float32 Friction = 0.6f;
+
+    // A profile the gait's and surface motion's Visibility probes do not trace, so a limb never reads as ground.
     UPROPERTY()
     FName CollisionProfile = n"Ragdoll";
 
@@ -107,6 +113,9 @@ mixin FMars_Validation Validate(const FMars_BodyPart_Debris& Self)
 
     if (Math::IsFinite(Self.OutwardSpeed) == false || Math::IsFinite(Self.UpSpeed) == false || Self.OutwardSpeed < 0.0f || Self.UpSpeed < 0.0f)
     { return FMars_Validation(f"BodyPart debris has a non-finite or negative speed [{Self.OutwardSpeed}, {Self.UpSpeed}]"); }
+
+    if (Math::IsFinite(Self.Friction) == false || Self.Friction < 0.0f)
+    { return FMars_Validation(f"BodyPart debris has a non-finite or negative Friction [{Self.Friction}]"); }
 
     if (Self.CollisionProfile.IsNone())
     { return FMars_Validation("BodyPart debris has no CollisionProfile"); }
@@ -164,7 +173,7 @@ struct FMars_BodyPart_Spec
     UPROPERTY()
     FCk_Handle_Monster Monster;
 
-    // DetachLeg only: debris box half extents of the leg's released parts, one per segment in chain order, the foot last.
+    // DetachLeg only: the half extents the leg's parts are drawn at, one per segment in chain order, the foot last.
     UPROPERTY()
     TArray<FVector> SegmentHalfExtents;
 
@@ -230,8 +239,8 @@ struct FMars_Fragment_BodyPart_Params
 //--------------------------------------------------------------------------------------------------------------------------
 
 // Written only by the BodyPart processors (the drain with authority, the mirror without) and composed by Add. Readers
-// count attached parts by State, never by handle validity: a severed leg stays a valid, world-owned entity until its
-// debris timer destroys it.
+// count attached parts by State, never by handle validity: a severed leg stays a valid entity, its body's, until the body
+// ends.
 struct FMars_Fragment_BodyPart
 {
     // The part entity as a leg; invalid for a non-leg part.
@@ -266,7 +275,7 @@ struct FMars_Fragment_BodyPart_PendingSever
     FMars_DamageEvent Cause;
 }
 
-// One debris body and the impulse it takes once Jolt has added it.
+// One body and the impulse it takes once Jolt has added it.
 struct FMars_BodyPart_PendingImpulse
 {
     UPROPERTY()
@@ -284,8 +293,8 @@ struct FMars_BodyPart_PendingImpulse
     }
 }
 
-// Debris bodies waiting for Jolt to add them; an impulse before Get_IsBodyAdded is dropped (UMars_Processor_BodyPart_Debris
-// applies each once its body is in, then removes the fragment when empty).
+// Bodies waiting for Jolt to add them, on a severed limb's root; an impulse before Get_IsBodyAdded is dropped
+// (UMars_Processor_BodyPart_Debris applies each once its body is in, then removes the fragment when empty).
 struct FMars_Fragment_BodyPart_PendingDebris
 {
     UPROPERTY()
@@ -340,8 +349,8 @@ struct FMars_Tag_BodyPart_RosterNeedsMirror {}
 delegate void FMars_Delegate_BodyPart_OnConditionChanged(FCk_Handle_BodyPart InPart, EMars_BodyPart_Condition InOld, EMars_BodyPart_Condition InNew);
 event void FMars_Delegate_BodyPart_OnConditionChanged_MC(FCk_Handle_BodyPart InPart, EMars_BodyPart_Condition InOld, EMars_BodyPart_Condition InNew);
 
-// Fires once, when the leg has detached and its released parts have their debris bodies; InReleased are those parts
-// (segments in chain order, the foot last), lifetime children of the now world-owned leg.
+// Fires once, when the leg has detached; InReleased are the parts it released (segments in chain order, the foot last),
+// valid during the signal only: they are destroyed right after it.
 delegate void FMars_Delegate_BodyPart_OnSevered(FCk_Handle_BodyPart InPart, FMars_DamageEvent InCause, TArray<FCk_Handle_Transform> InReleased);
 event void FMars_Delegate_BodyPart_OnSevered_MC(FCk_Handle_BodyPart InPart, FMars_DamageEvent InCause, TArray<FCk_Handle_Transform> InReleased);
 

@@ -24,6 +24,7 @@ class UMars_AutoTest_AttackCatalog_SeverRecoveryEvidence : UMars_AutoTestRig_Att
         Add_Step("report managed result and request public recovery if needed", n"Step_RecoverSurvivor");
         Add_Step_WaitUntil("the surviving claw is Default and planted on an operational articulation", n"Check_SurvivorRecovered", k_SlowPolls, 0);
         Add_Step("assert processed-state evidence and explicit recovery distinction", n"Step_Assert");
+        Add_Step_WaitUntil("the severed claw's limb is gone after its lifetime", n"Check_NoLimbNear", k_SlowPolls, 0);
         Run_Steps(InHandle);
     }
 

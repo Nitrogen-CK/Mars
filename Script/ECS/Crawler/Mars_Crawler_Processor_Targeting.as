@@ -1,6 +1,6 @@
 // Chooses an aggressive armed crawler's combat target every SenseInterval (a passive one never scans), among the
-// entities tagged TAG_MarsCombatTarget in its
-// world: a valid target (Get_IsCombatTargetValid) Hostile to the crawler, within AcquireRadius of it (horizontally), within
+// entities tagged TAG_MarsSharedCombatTarget in its world (every pawn a player controls, a joined player's among them):
+// a valid target (Get_IsCombatTargetValid) Hostile to the crawler, within AcquireRadius of it (horizontally), within
 // HomeRadius of its home and within the largest MaxHeightDifference of its loadout's attacks of its height. The nearest wins; equal distances go to the lower
 // handle string, so the choice is stable. A held target is kept, without the AcquireRadius check, until it stops being
 // valid, Hostile or within HomeRadius of home. Only a changed choice is published, as Request_SetCombatTarget, and no
@@ -67,7 +67,7 @@ class UMars_Processor_Crawler_Targeting : UCk_Processor_Script_Base_UE
 
         auto Best = FCk_Handle();
         auto BestDistance = 0.0;
-        for (auto Candidate : utils_entity_tag::ForEach_Entity(InSelf, n"TAG_MarsCombatTarget"))
+        for (auto Candidate : utils_entity_tag::ForEach_Entity(InSelf, n"TAG_MarsSharedCombatTarget"))
         {
             if (Get_IsKeepable(InSelf, Candidate) == false)
             { continue; }

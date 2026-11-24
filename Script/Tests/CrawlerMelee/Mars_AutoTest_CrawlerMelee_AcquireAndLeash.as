@@ -149,7 +149,7 @@ class UMars_AutoTest_CrawlerMelee_AcquireAndLeash : UMars_AutoTestRig_CrawlerMel
         Target.Health = utils_health::Add(Target.Entity, FMars_Health_Spec(100.0f));
         Target.Zone = utils_hit_zone::Add(Target.Entity, utils_hit_zone::Make_FleshZoneSpec(GameplayTags::HitZone_Mars_Body, 1.0f));
         Target.Hurtbox = utils_hit_zone::AddHurtbox_Box(Target.Zone, Target.Root, FMars_HitZone_Hurtbox(k_HalfExtents, FTransform::Identity));
-        utils_entity_tag::Add(Target.Entity, n"TAG_MarsCombatTarget");
+        utils_entity_tag::Add(Target.Entity, n"TAG_MarsSharedCombatTarget");
         return Target;
     }
 
