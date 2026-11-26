@@ -2,7 +2,8 @@
 // under /Script/AngelscriptAssets) named by soft pointer in the channel's Spec. The channel resolves it through
 // CkResourceLoader at setup on every machine; on the client (and the server) it resolves to that very asset, with no
 // ensure, and the asset's inner radius plus falloff equals the channel's audible range, so a voice fades to silence where
-// the server stops sending it. The channel is the production Spec on the test subject (see
+// the server stops sending it. The same setup resolves the channel's SoundClass, Mars's voice class (the one the "Voice
+// chat" slider, audio.voice, overrides), on both machines. The channel is the production Spec on the test subject (see
 // Mars_AutoTestRig_NetRealPawnVoice.as).
 // Surface: Ck.RealPawn.Net.AS_RealPawn_TheProximityChannelResolvesItsAttenuationOnTheClient
 class UCk_AutoTest_Net_RealPawn_TheProximityChannelResolvesItsAttenuationOnTheClient : UMars_AutoTestRig_NetRealPawnVoice
@@ -27,7 +28,9 @@ class UCk_AutoTest_Net_RealPawn_TheProximityChannelResolvesItsAttenuationOnTheCl
     private void Is_AttenuationResolved(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Result = OutResult;
-        Result.Set(Get_IsPastDeadline() || (ck::IsValid(_Channel) && ck::IsValid(utils_voice_channel::Get_ResolvedAttenuation(_Channel))));
+        Result.Set(Get_IsPastDeadline() || (ck::IsValid(_Channel)
+            && ck::IsValid(utils_voice_channel::Get_ResolvedAttenuation(_Channel))
+            && ck::IsValid(utils_voice_channel::Get_ResolvedSoundClass(_Channel))));
     }
 
     UFUNCTION()
@@ -40,12 +43,18 @@ class UCk_AutoTest_Net_RealPawn_TheProximityChannelResolvesItsAttenuationOnTheCl
             ? Resolved.Attenuation.AttenuationShapeExtents.X + float64(Resolved.Attenuation.FalloffDistance)
             : -1.0;
         const auto ResolvedPath = ck::IsValid(Resolved) ? Resolved.GetPathName() : "none";
+        const auto ExpectedClass = assets::VoiceSoundClass_Mars();
+        const auto ResolvedClass = utils_voice_channel::Get_ResolvedSoundClass(_Channel);
+        const auto ResolvedClassPath = ck::IsValid(ResolvedClass) ? ResolvedClass.GetPathName() : "none";
 
-        Log_VoiceRow(k_Row, f"resolved={ResolvedPath} expected={Expected.GetPathName()} silentAt={Silent :.0} range={Range :.0} policy={utils_voice_channel::Get_SpatializationPolicy(_Channel) :n}");
+        Log_VoiceRow(k_Row, f"resolved={ResolvedPath} expected={Expected.GetPathName()} silentAt={Silent :.0} range={Range :.0} policy={utils_voice_channel::Get_SpatializationPolicy(_Channel) :n} soundClass={ResolvedClassPath} expectedClass={ExpectedClass.ToString()}");
         Assert_True(ck::IsValid(Resolved), f"the {Get_MachineName()}'s proximity channel resolved its authored attenuation");
         Assert_True(Resolved == Expected, f"the {Get_MachineName()}'s proximity channel resolved the script attenuation asset ({Expected.GetPathName()})");
         Assert_True(Math::Abs(Silent - Range) <= k_RangeToleranceCm,
             f"the attenuation goes silent where the channel's audible range ends (inner radius + falloff {Silent :.0} cm, range {Range :.0} cm)");
+        Assert_True(ck::IsValid(ResolvedClass), f"the {Get_MachineName()}'s proximity channel resolved its authored SoundClass");
+        Assert_True(ResolvedClassPath == ExpectedClass.ToString(),
+            f"the {Get_MachineName()}'s proximity channel resolved Mars's voice SoundClass ({ResolvedClassPath}, expected {ExpectedClass.ToString()})");
         Assert_True(Get_NewEnsures() == 0, f"no ensure fired during the row ({Get_NewEnsures()})");
         FinishSuccess();
     }

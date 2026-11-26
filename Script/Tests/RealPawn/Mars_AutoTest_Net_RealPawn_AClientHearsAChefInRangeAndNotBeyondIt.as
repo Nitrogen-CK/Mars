@@ -4,7 +4,9 @@
 // back: distance alone silenced it, the tone never stopped (the server checks its own copy still captures while far).
 // Also proves a listen host's own possessed chef opens its open mic: the open mic the Alive task armed made its first
 // attempt on the host's owning copy, and once re-armed over the tone it opened the transmit the client hears, with no
-// Start request. The channel is the production Spec on the test subject (see Mars_AutoTestRig_NetRealPawnVoice.as).
+// Start request. The client plays that voice from the chef's head: its synth for the host's chef is a child of the
+// client's copy of the body mesh at the face bone (Config.TPBody.Head.Face.Bone), read through the mesh's attach children.
+// The channel is the production Spec on the test subject (see Mars_AutoTestRig_NetRealPawnVoice.as).
 // Surface: Ck.RealPawn.Net.AS_RealPawn_AClientHearsAChefInRangeAndNotBeyondIt
 class UCk_AutoTest_Net_RealPawn_AClientHearsAChefInRangeAndNotBeyondIt : UMars_AutoTestRig_NetRealPawnVoice
 {
@@ -245,15 +247,41 @@ class UCk_AutoTest_Net_RealPawn_AClientHearsAChefInRangeAndNotBeyondIt : UMars_A
         Result.Set(Get_IsPastDeadline() || (Get_Phase() == EMars_TESTONLY_NetVoicePhase::Back && Get_AmplitudeOf(_Pawn) > 0.0f));
     }
 
+    // This machine's voice synths attached to InPawn's body mesh, and the sockets they sit at ("none" when there is none).
+    private int32 Get_HeadSynthCount(AMars_PlayerCharacter InPawn, FString& OutSockets)
+    {
+        OutSockets = "none";
+        if (ck::Is_NOT_Valid(InPawn))
+        { return 0; }
+
+        TArray<USceneComponent> Children;
+        InPawn.Mesh.GetChildrenComponents(false, Children);
+        auto Count = 0;
+        for (auto Child : Children)
+        {
+            if (ck::Is_NOT_Valid(Cast<UCk_VoiceChatSynthComponent_UE>(Child)))
+            { continue; }
+
+            OutSockets = Count == 0 ? f"{Child.GetAttachSocketName()}" : f"{OutSockets},{Child.GetAttachSocketName()}";
+            Count += 1;
+        }
+        return Count;
+    }
+
     UFUNCTION()
     private void OnClientHeardBack(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
     {
         const auto BackAmplitude = Get_AmplitudeOf(_Pawn);
-        Log_VoiceRow(k_Row, f"nearPeak={_NearPeak :.3} farPeak={_FarPeak :.3} farSamples={_FarSamples} back={BackAmplitude :.3} phase={Get_Phase() :n} speaker=[{Describe_Talker(_Pawn)}]");
+        const auto HeadBone = _Pawn.Config.TPBody.Head.Face.Bone;
+        FString SynthSockets;
+        const auto SynthCount = Get_HeadSynthCount(_Pawn, SynthSockets);
+        Log_VoiceRow(k_Row, f"nearPeak={_NearPeak :.3} farPeak={_FarPeak :.3} farSamples={_FarSamples} back={BackAmplitude :.3} phase={Get_Phase() :n} meshSynths={SynthCount} sockets={SynthSockets} speaker=[{Describe_Talker(_Pawn)}]");
         Assert_True(Get_Phase() == EMars_TESTONLY_NetVoicePhase::Back && BackAmplitude > 0.0f,
             f"the client heard the host's chef again once it was back beside its own (phase {Get_Phase() :n}, amplitude {BackAmplitude :.3})");
         Assert_True(Get_CaptureOf(_Pawn) == ECk_VoiceChat_CaptureStartResult::NotAttempted,
             f"the client's copy of the host's chef never tried to open a microphone ({Get_CaptureOf(_Pawn) :n})");
+        Assert_True(SynthCount == 1 && SynthSockets == f"{HeadBone}",
+            f"the client plays the host's chef from its head: one voice synth on its body mesh at [{HeadBone}] ({SynthCount} at [{SynthSockets}])");
         Assert_True(Get_NewEnsures() == 0, f"no ensure fired during the row ({Get_NewEnsures()})");
         FinishSuccess();
     }
