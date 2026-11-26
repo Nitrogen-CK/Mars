@@ -37,6 +37,70 @@
 
 // --------------------------------------------------------------------------------------------------------------------
 
+// Auto-generated from AS class Ck_AutoTest_Net_RealPawn_AClientHearsAChefInRangeAndNotBeyondIt (Replicated-mode).
+// DO NOT EDIT - regenerated on editor startup and every successful AS recompile.
+
+namespace
+{
+    constexpr auto kAsClassPath_RealPawn_AClientHearsAChefInRangeAndNotBeyondIt = TEXT("/Script/Angelscript.Ck_AutoTest_Net_RealPawn_AClientHearsAChefInRangeAndNotBeyondIt");
+    constexpr auto kTimeoutSeconds_RealPawn_AClientHearsAChefInRangeAndNotBeyondIt = 30.0f;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+    FCkRealPawnNet_AS_RealPawn_AClientHearsAChefInRangeAndNotBeyondIt,
+    "Ck.RealPawn.Net.AS_RealPawn_AClientHearsAChefInRangeAndNotBeyondIt",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ClientContext | EAutomationTestFlags::EngineFilter)
+
+bool FCkRealPawnNet_AS_RealPawn_AClientHearsAChefInRangeAndNotBeyondIt::RunTest(const FString& Parameters)
+{
+    bSuppressLogErrors = true;
+    bSuppressLogWarnings = true;
+
+    constexpr auto NumPIEClients = 2;
+    constexpr auto ExpectedTotalWorlds = 2;
+    constexpr auto ReadyTimeoutSeconds = 30.0f;
+    constexpr auto FramesAfterSpawn = 30;
+
+    const auto MapPath = FString{TEXT("/Engine/Maps/Entry")};
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_StartPIEMultiClient(NumPIEClients, MapPath));
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_WaitForPIEReady(ExpectedTotalWorlds, ReadyTimeoutSeconds));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_RunOnServer(
+        FCk_NetAutoTest_ServerAction::CreateLambda([this](UWorld* InServer) -> void
+        {
+            auto SpawnInfo = FActorSpawnParameters{};
+            SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+            const auto SubjectClassPath = FSoftClassPath(TEXT("/Script/CkTests.Ck_AutoTest_NetSubject"));
+            auto* SubjectClass = SubjectClassPath.TryLoadClass<ACk_AutoTest_NetSubject>();
+            if (SubjectClass == nullptr)
+            { AddError(TEXT("AS-test harness: failed to resolve NetSubject class via FSoftClassPath")); return; }
+            auto* Subject = InServer->SpawnActor<ACk_AutoTest_NetSubject>(
+                SubjectClass, FTransform::Identity, SpawnInfo);
+            if (Subject == nullptr)
+            { AddError(TEXT("AS-test harness: server-side SpawnActor returned null")); }
+        })));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_TickWorlds(FramesAfterSpawn));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_RunAsTestOnAllWorlds(this, FString{kAsClassPath_RealPawn_AClientHearsAChefInRangeAndNotBeyondIt}, kTimeoutSeconds_RealPawn_AClientHearsAChefInRangeAndNotBeyondIt));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_EndPIE());
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_AssertCondition(this,
+        FCk_NetAutoTest_Assertion::CreateLambda([]() -> bool
+        {
+            FAutomationTestBase::bSuppressLogErrors = false;
+            FAutomationTestBase::bSuppressLogWarnings = false;
+            return true;
+        }),
+        TEXT("restore log suppression statics")));
+
+    return true;
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
 // Auto-generated from AS class Ck_AutoTest_Net_RealPawn_AClientOperatesAStationOnBothMachines (Replicated-mode).
 // DO NOT EDIT - regenerated on editor startup and every successful AS recompile.
 
@@ -741,6 +805,70 @@ bool FCkRealPawnNet_AS_RealPawn_AClientsViewForwardFollowsItsAimOnTheHost::RunTe
 
 // --------------------------------------------------------------------------------------------------------------------
 
+// Auto-generated from AS class Ck_AutoTest_Net_RealPawn_AClientsVoiceReachesTheHost (Replicated-mode).
+// DO NOT EDIT - regenerated on editor startup and every successful AS recompile.
+
+namespace
+{
+    constexpr auto kAsClassPath_RealPawn_AClientsVoiceReachesTheHost = TEXT("/Script/Angelscript.Ck_AutoTest_Net_RealPawn_AClientsVoiceReachesTheHost");
+    constexpr auto kTimeoutSeconds_RealPawn_AClientsVoiceReachesTheHost = 30.0f;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+    FCkRealPawnNet_AS_RealPawn_AClientsVoiceReachesTheHost,
+    "Ck.RealPawn.Net.AS_RealPawn_AClientsVoiceReachesTheHost",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ClientContext | EAutomationTestFlags::EngineFilter)
+
+bool FCkRealPawnNet_AS_RealPawn_AClientsVoiceReachesTheHost::RunTest(const FString& Parameters)
+{
+    bSuppressLogErrors = true;
+    bSuppressLogWarnings = true;
+
+    constexpr auto NumPIEClients = 2;
+    constexpr auto ExpectedTotalWorlds = 2;
+    constexpr auto ReadyTimeoutSeconds = 30.0f;
+    constexpr auto FramesAfterSpawn = 30;
+
+    const auto MapPath = FString{TEXT("/Engine/Maps/Entry")};
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_StartPIEMultiClient(NumPIEClients, MapPath));
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_WaitForPIEReady(ExpectedTotalWorlds, ReadyTimeoutSeconds));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_RunOnServer(
+        FCk_NetAutoTest_ServerAction::CreateLambda([this](UWorld* InServer) -> void
+        {
+            auto SpawnInfo = FActorSpawnParameters{};
+            SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+            const auto SubjectClassPath = FSoftClassPath(TEXT("/Script/CkTests.Ck_AutoTest_NetSubject"));
+            auto* SubjectClass = SubjectClassPath.TryLoadClass<ACk_AutoTest_NetSubject>();
+            if (SubjectClass == nullptr)
+            { AddError(TEXT("AS-test harness: failed to resolve NetSubject class via FSoftClassPath")); return; }
+            auto* Subject = InServer->SpawnActor<ACk_AutoTest_NetSubject>(
+                SubjectClass, FTransform::Identity, SpawnInfo);
+            if (Subject == nullptr)
+            { AddError(TEXT("AS-test harness: server-side SpawnActor returned null")); }
+        })));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_TickWorlds(FramesAfterSpawn));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_RunAsTestOnAllWorlds(this, FString{kAsClassPath_RealPawn_AClientsVoiceReachesTheHost}, kTimeoutSeconds_RealPawn_AClientsVoiceReachesTheHost));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_EndPIE());
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_AssertCondition(this,
+        FCk_NetAutoTest_Assertion::CreateLambda([]() -> bool
+        {
+            FAutomationTestBase::bSuppressLogErrors = false;
+            FAutomationTestBase::bSuppressLogWarnings = false;
+            return true;
+        }),
+        TEXT("restore log suppression statics")));
+
+    return true;
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
 // Auto-generated from AS class Ck_AutoTest_Net_RealPawn_AHostsHeldRockIsInItsBodyHandOnTheClient (Replicated-mode).
 // DO NOT EDIT - regenerated on editor startup and every successful AS recompile.
 
@@ -1044,6 +1172,134 @@ bool FCkRealPawnNet_AS_RealPawn_ALateClientSeesTheHostsHeldTorchInItsBodyHand::R
     ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_TickWorlds(FramesAfterSpawn));
 
     ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_RunAsTestOnAllWorlds(this, FString{kAsClassPath_RealPawn_ALateClientSeesTheHostsHeldTorchInItsBodyHand}, kTimeoutSeconds_RealPawn_ALateClientSeesTheHostsHeldTorchInItsBodyHand));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_EndPIE());
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_AssertCondition(this,
+        FCk_NetAutoTest_Assertion::CreateLambda([]() -> bool
+        {
+            FAutomationTestBase::bSuppressLogErrors = false;
+            FAutomationTestBase::bSuppressLogWarnings = false;
+            return true;
+        }),
+        TEXT("restore log suppression statics")));
+
+    return true;
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+// Auto-generated from AS class Ck_AutoTest_Net_RealPawn_BothChefsAreProximityMembersOnTheClient (Replicated-mode).
+// DO NOT EDIT - regenerated on editor startup and every successful AS recompile.
+
+namespace
+{
+    constexpr auto kAsClassPath_RealPawn_BothChefsAreProximityMembersOnTheClient = TEXT("/Script/Angelscript.Ck_AutoTest_Net_RealPawn_BothChefsAreProximityMembersOnTheClient");
+    constexpr auto kTimeoutSeconds_RealPawn_BothChefsAreProximityMembersOnTheClient = 30.0f;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+    FCkRealPawnNet_AS_RealPawn_BothChefsAreProximityMembersOnTheClient,
+    "Ck.RealPawn.Net.AS_RealPawn_BothChefsAreProximityMembersOnTheClient",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ClientContext | EAutomationTestFlags::EngineFilter)
+
+bool FCkRealPawnNet_AS_RealPawn_BothChefsAreProximityMembersOnTheClient::RunTest(const FString& Parameters)
+{
+    bSuppressLogErrors = true;
+    bSuppressLogWarnings = true;
+
+    constexpr auto NumPIEClients = 2;
+    constexpr auto ExpectedTotalWorlds = 2;
+    constexpr auto ReadyTimeoutSeconds = 30.0f;
+    constexpr auto FramesAfterSpawn = 30;
+
+    const auto MapPath = FString{TEXT("/Engine/Maps/Entry")};
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_StartPIEMultiClient(NumPIEClients, MapPath));
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_WaitForPIEReady(ExpectedTotalWorlds, ReadyTimeoutSeconds));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_RunOnServer(
+        FCk_NetAutoTest_ServerAction::CreateLambda([this](UWorld* InServer) -> void
+        {
+            auto SpawnInfo = FActorSpawnParameters{};
+            SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+            const auto SubjectClassPath = FSoftClassPath(TEXT("/Script/CkTests.Ck_AutoTest_NetSubject"));
+            auto* SubjectClass = SubjectClassPath.TryLoadClass<ACk_AutoTest_NetSubject>();
+            if (SubjectClass == nullptr)
+            { AddError(TEXT("AS-test harness: failed to resolve NetSubject class via FSoftClassPath")); return; }
+            auto* Subject = InServer->SpawnActor<ACk_AutoTest_NetSubject>(
+                SubjectClass, FTransform::Identity, SpawnInfo);
+            if (Subject == nullptr)
+            { AddError(TEXT("AS-test harness: server-side SpawnActor returned null")); }
+        })));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_TickWorlds(FramesAfterSpawn));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_RunAsTestOnAllWorlds(this, FString{kAsClassPath_RealPawn_BothChefsAreProximityMembersOnTheClient}, kTimeoutSeconds_RealPawn_BothChefsAreProximityMembersOnTheClient));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_EndPIE());
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_AssertCondition(this,
+        FCk_NetAutoTest_Assertion::CreateLambda([]() -> bool
+        {
+            FAutomationTestBase::bSuppressLogErrors = false;
+            FAutomationTestBase::bSuppressLogWarnings = false;
+            return true;
+        }),
+        TEXT("restore log suppression statics")));
+
+    return true;
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+// Auto-generated from AS class Ck_AutoTest_Net_RealPawn_TheProximityChannelResolvesItsAttenuationOnTheClient (Replicated-mode).
+// DO NOT EDIT - regenerated on editor startup and every successful AS recompile.
+
+namespace
+{
+    constexpr auto kAsClassPath_RealPawn_TheProximityChannelResolvesItsAttenuationOnTheClient = TEXT("/Script/Angelscript.Ck_AutoTest_Net_RealPawn_TheProximityChannelResolvesItsAttenuationOnTheClient");
+    constexpr auto kTimeoutSeconds_RealPawn_TheProximityChannelResolvesItsAttenuationOnTheClient = 30.0f;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+    FCkRealPawnNet_AS_RealPawn_TheProximityChannelResolvesItsAttenuationOnTheClient,
+    "Ck.RealPawn.Net.AS_RealPawn_TheProximityChannelResolvesItsAttenuationOnTheClient",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ClientContext | EAutomationTestFlags::EngineFilter)
+
+bool FCkRealPawnNet_AS_RealPawn_TheProximityChannelResolvesItsAttenuationOnTheClient::RunTest(const FString& Parameters)
+{
+    bSuppressLogErrors = true;
+    bSuppressLogWarnings = true;
+
+    constexpr auto NumPIEClients = 2;
+    constexpr auto ExpectedTotalWorlds = 2;
+    constexpr auto ReadyTimeoutSeconds = 30.0f;
+    constexpr auto FramesAfterSpawn = 30;
+
+    const auto MapPath = FString{TEXT("/Engine/Maps/Entry")};
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_StartPIEMultiClient(NumPIEClients, MapPath));
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_WaitForPIEReady(ExpectedTotalWorlds, ReadyTimeoutSeconds));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_RunOnServer(
+        FCk_NetAutoTest_ServerAction::CreateLambda([this](UWorld* InServer) -> void
+        {
+            auto SpawnInfo = FActorSpawnParameters{};
+            SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+            const auto SubjectClassPath = FSoftClassPath(TEXT("/Script/CkTests.Ck_AutoTest_NetSubject"));
+            auto* SubjectClass = SubjectClassPath.TryLoadClass<ACk_AutoTest_NetSubject>();
+            if (SubjectClass == nullptr)
+            { AddError(TEXT("AS-test harness: failed to resolve NetSubject class via FSoftClassPath")); return; }
+            auto* Subject = InServer->SpawnActor<ACk_AutoTest_NetSubject>(
+                SubjectClass, FTransform::Identity, SpawnInfo);
+            if (Subject == nullptr)
+            { AddError(TEXT("AS-test harness: server-side SpawnActor returned null")); }
+        })));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_TickWorlds(FramesAfterSpawn));
+
+    ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_RunAsTestOnAllWorlds(this, FString{kAsClassPath_RealPawn_TheProximityChannelResolvesItsAttenuationOnTheClient}, kTimeoutSeconds_RealPawn_TheProximityChannelResolvesItsAttenuationOnTheClient));
 
     ADD_LATENT_AUTOMATION_COMMAND(FCk_Latent_EndPIE());
 
