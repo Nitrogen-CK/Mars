@@ -27,6 +27,10 @@ class AMars_Master_GameState : ACk_GameState_UE
     UPROPERTY(DefaultComponent)
     UCk_EntityBridge_ActorComponent_UE EntityBridge;
 
+    // The proximity voice channel this GameState hosts (Mars_Voice_Assets.as).
+    UPROPERTY(EditDefaultsOnly, Category = "Voice")
+    UMars_Voice_Config VoiceConfig = mars::Mars_Voice_Config;
+
     protected FCk_Handle ThisActorEntity;
 
     private bool _IsEcsComposed = false;
@@ -44,10 +48,22 @@ class AMars_Master_GameState : ACk_GameState_UE
     {
         ThisActorEntity = InEntity;
         utils_handle::Set_DebugName(ThisActorEntity, n"GameState");
+        ConstructVoiceChannel();
         EcsConstructionScript(ThisActorEntity);
 
         _IsEcsComposed = true;
         _OnEcsComposed.Broadcast(ThisActorEntity);
+    }
+
+    // The proximity voice channel, on every machine and in every mode (a live camp has chefs too): a client applies the
+    // replicated membership only once it has composed the channel itself. Chefs join it by name (Mars_Voice_Assets.as). A
+    // rejected Spec ensures in Add and leaves the world without proximity voice.
+    private void ConstructVoiceChannel()
+    {
+        if (ck::EnsureIfNot(ck::IsValid(VoiceConfig), "[Mars_Master_GameState] VoiceConfig is unset - this world has no proximity voice channel"))
+        { return; }
+
+        utils_voice_channel::Add(ThisActorEntity, VoiceConfig.ProximityChannel);
     }
 
     // Fires once, right after EcsConstructionScript has composed this GameState's features (step 2 above); binding after

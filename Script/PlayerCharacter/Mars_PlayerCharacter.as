@@ -415,6 +415,12 @@ class AMars_PlayerCharacter : AMars_Character
         utils_operator::Add(Player);
         utils_locomotion_speed::Add(Player, FMars_LocomotionSpeed_Spec(Config.Movement.Speeds.Walk, Config.Movement.Speeds.Sprint));
 
+        // The chef's voice, on every copy: CkVoiceChat routes by the talker's entity on the server and plays a remote
+        // chef's voice from its actor on each listener's machine, so every copy needs it. It joins the GameState's
+        // proximity channel by name on the authority (Config.Voice); the Alive state opens its microphone on the owning
+        // copy (UMars_SmTask_VoiceOpenMic).
+        utils_voice_talker::Add(Player, Config.Voice.Talker);
+
         // Owning-client authoritative: the owner evaluates the conditions against its input and its transitions replicate
         // to the server and the other clients, so every copy runs the owner's states. It must not auto-start: the start
         // (TryStartPlayerSm) waits for local control, or the nested sub-SMs snapshot their net identity as a non-owning

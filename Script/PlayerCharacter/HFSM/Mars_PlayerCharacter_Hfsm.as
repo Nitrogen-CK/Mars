@@ -1,5 +1,6 @@
 // The player's state machine. Alive keeps only what outlives both of its modes - the overflow eject, the held-item ->
-// gloves link and the gloves' sub-SM (Script/ECS/FPHands/Mars_FPHands_Hfsm.as); every interaction task lives on the
+// gloves link, the open microphone (Mars_PlayerCharacter_Hfsm_Voice.as) and the gloves' sub-SM
+// (Script/ECS/FPHands/Mars_FPHands_Hfsm.as); every interaction task lives on the
 // mode that uses it: Locomotion is free roam, Operating is the station mode. A parent's transitions keep firing while
 // any descendant is active, and leaving a parent tears down its subtree - so Alive->Downed interrupts any locomotion or
 // operating state, and Locomotion->Operating tears down every free-roam task (focus cleared, intents closed,
@@ -55,6 +56,7 @@ class UMars_SmState_Alive : UCk_SmState_EntityScript
         AddTask(InHandle, UMars_SmTask_HotbarEjectDrops);
         AddTask(InHandle, UMars_SmTask_HeldItemDrivesHands);
         AddTask(InHandle, UMars_SmTask_PackSetsCrouchHeight);
+        AddTask(InHandle, UMars_SmTask_VoiceOpenMic);
         AddTask(InHandle, UMars_SmTask_AliveSubSm);
         AddTask(InHandle, UMars_SmTask_HandsSubSm);
     }
