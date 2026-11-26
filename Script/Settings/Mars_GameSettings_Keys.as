@@ -13,6 +13,9 @@ namespace constants_settings
     const FName k_AudioSfx = n"audio.sfx";
     const FName k_AudioVoice = n"audio.voice";
 
+    // Registered by Mars on the Audio page: false = open microphone, true = push to talk (UMars_SmTask_VoiceTransmit).
+    const FName k_VoicePushToTalk = n"audio.voice_push_to_talk";
+
     // Registered by Mars with Mars presentation; the video pack binds their UGameUserSettings accessors afterwards.
     const FName k_VideoQualityPreset = n"video.quality_preset";
     const FName k_VideoVSync = n"video.vsync";

@@ -252,6 +252,7 @@ class UMars_ChalkSettings_Widget : UCk_GameSettingsUI_ScreenWidget
             Keys.Add(constants_settings::k_AudioMusic);
             Keys.Add(constants_settings::k_AudioSfx);
             Keys.Add(constants_settings::k_AudioVoice);
+            Keys.Add(constants_settings::k_VoicePushToTalk);
         }
         else if (InCategory == constants_settings::k_Category_Video)
         {
@@ -297,6 +298,8 @@ class UMars_ChalkSettings_Widget : UCk_GameSettingsUI_ScreenWidget
             { Description = NSLOCTEXT("MarsSettings", "SfxHelp", "Adjusts footsteps, interactions and other sound effects."); }
             else if (InKey == constants_settings::k_AudioVoice)
             { Description = NSLOCTEXT("MarsSettings", "VoiceHelp", "Adjusts audio routed through the voice channel."); }
+            else if (InKey == constants_settings::k_VoicePushToTalk)
+            { Description = NSLOCTEXT("MarsSettings", "VoiceModeHelp", "Open mic: nearby chefs hear you whenever you are alive. Push to talk: only while you hold the push-to-talk key (V)."); }
             HelpDescription.SetText(Description.IsEmpty()
                 ? NSLOCTEXT("MarsSettings", "NoSettingDescription", "Apply saves this setting. Cancel restores its previous value.")
                 : Description);

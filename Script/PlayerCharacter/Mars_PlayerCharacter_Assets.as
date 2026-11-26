@@ -146,7 +146,8 @@ struct FMars_PlayerCharacter_Inventory
 struct FMars_PlayerCharacter_Voice
 {
     // The chef's voice (CkVoiceChat VoiceTalker), composed on every copy. It joins the proximity channel by name
-    // (_AutoJoinChannels, Mars_Voice_Assets.as); the Alive state holds its microphone open (UMars_SmTask_VoiceOpenMic).
+    // (_AutoJoinChannels, Mars_Voice_Assets.as). Its authored mode stays PushToTalk so no copy arms an open mic at Add; the
+    // Alive state sets the owning copy's mode from the audio.voice_push_to_talk setting (UMars_SmTask_VoiceTransmit).
     UPROPERTY()
     FCk_VoiceTalker_Spec Talker;
 }
@@ -332,8 +333,8 @@ namespace mars
 
         EmoteWheel.Definition = TSoftObjectPtr<UMars_EmoteWheel_Definition>(FSoftObjectPath("/Game/Mars/Gameplay/Emotes/EmoteWheel_Mars_DA.EmoteWheel_Mars_DA"));
 
-        // An open microphone: the voice gate stays open (at the module's default threshold of 0.07 a real microphone's
-        // normal speech did not open it). The engine's own silence detector still drops silence.
+        // The voice gate (OpenMic only; PushToTalk bypasses it) stays open: at the module's default threshold of 0.07 a real
+        // microphone's normal speech did not open it. The engine's own silence detector still drops silence.
         Voice.Talker.Set_VadThreshold(0.0f);
         auto VoiceChannels = FGameplayTagContainer();
         VoiceChannels.AddTag(GameplayTags::VoiceChat_Channel_Mars_Proximity);

@@ -417,8 +417,8 @@ class AMars_PlayerCharacter : AMars_Character
 
         // The chef's voice, on every copy: CkVoiceChat routes by the talker's entity on the server and plays a remote
         // chef's voice from its actor on each listener's machine, so every copy needs it. It joins the GameState's
-        // proximity channel by name on the authority (Config.Voice); the Alive state opens its microphone on the owning
-        // copy (UMars_SmTask_VoiceOpenMic).
+        // proximity channel by name on the authority (Config.Voice); the Alive state sets the owning copy's transmit mode
+        // (open mic or push-to-talk, UMars_SmTask_VoiceTransmit).
         utils_voice_talker::Add(Player, Config.Voice.Talker);
 
         // Owning-client authoritative: the owner evaluates the conditions against its input and its transitions replicate

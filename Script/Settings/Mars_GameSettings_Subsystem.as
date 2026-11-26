@@ -22,6 +22,9 @@ class UMars_GameSettings_Subsystem : UScriptWorldSubsystem
         if (!utils_game_settings::Get_IsSettingRegistered(constants_settings::k_LookSensitivity))
         { RegisterControls(); }
 
+        if (!utils_game_settings::Get_IsSettingRegistered(constants_settings::k_VoicePushToTalk))
+        { RegisterVoice(); }
+
         // The audio pack owns its definitions and sound-class handlers; it skips keys that already exist.
         if (!utils_game_settings::Get_IsSettingRegistered(constants_settings::k_AudioMaster) ||
             !utils_game_settings::Get_IsSettingRegistered(constants_settings::k_AudioMusic) ||
@@ -181,6 +184,26 @@ class UMars_GameSettings_Subsystem : UScriptWorldSubsystem
         Controls.Add(InvertY);
         Controls.Add(SprintToggle);
         utils_game_settings::Request_RegisterSettings(Controls);
+    }
+
+    // A Mars key beside the audio pack's volumes: its category is the pack's Audio.Voice tag, so the row lands on the Audio
+    // page next to the voice volume.
+    private void RegisterVoice()
+    {
+        auto PushToTalk = FCk_GameSettings_SettingDefinition(
+            constants_settings::k_VoicePushToTalk, ECk_GameSettings_ValueType::Bool, "false");
+        PushToTalk.Set_DisplayName(NSLOCTEXT("MarsSettings", "VoiceMode", "Voice chat mode"));
+        PushToTalk.Set_Description(NSLOCTEXT("MarsSettings", "VoiceModeDescription",
+            "Open mic sends your voice whenever you are alive. Push to talk sends it only while the push-to-talk key is held."));
+        TArray<FCk_GameSettings_SettingOption> VoiceModeOptions;
+        VoiceModeOptions.Add(FCk_GameSettings_SettingOption(NSLOCTEXT("MarsSettings", "VoiceOpenMic", "Open mic"), "false"));
+        VoiceModeOptions.Add(FCk_GameSettings_SettingOption(NSLOCTEXT("MarsSettings", "VoicePushToTalk", "Push to talk"), "true"));
+        PushToTalk.Set_Options(VoiceModeOptions);
+        PushToTalk.Set_CategoryTags(GameplayTag::MakeContainerFromTag(GameplayTags::Audio_Voice));
+
+        TArray<FCk_GameSettings_SettingDefinition> Voice;
+        Voice.Add(PushToTalk);
+        utils_game_settings::Request_RegisterSettings(Voice);
     }
 
     // The video pack's contract for a game-owned video.* key: UGameUserSettings holds the value, the store never does.

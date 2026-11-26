@@ -152,6 +152,17 @@ namespace mars
         Cast<UCk_PlayerMappableKeySettings_UE>(PlayerMappableKeySettings).Set_ScopeTags(GameplayTag::MakeContainerFromTag(GameplayTags::Input_Scope_Gameplay));
     }
 
+    // Held: the chef's microphone transmits while the key is down, when the audio.voice_push_to_talk setting is on
+    // (UMars_SmTask_VoiceTransmit). With the setting off the microphone is open and this key does nothing.
+    asset Mars_IA_PushToTalk of UCk_Boolean_InputAction
+    {
+        PlayerMappableKeySettings = NewObject(Mars_IA_PushToTalk, UCk_PlayerMappableKeySettings_UE);
+        PlayerMappableKeySettings.Name = n"IA_PushToTalk";
+        PlayerMappableKeySettings.DisplayName = NSLOCTEXT("MarsSettingsUI", "KeybindPushToTalk", "Push to talk (hold)");
+        PlayerMappableKeySettings.DisplayCategory = NSLOCTEXT("MarsSettingsUI", "KeybindCategoryVoice", "Voice");
+        Cast<UCk_PlayerMappableKeySettings_UE>(PlayerMappableKeySettings).Set_ScopeTags(GameplayTag::MakeContainerFromTag(GameplayTags::Input_Scope_Gameplay));
+    }
+
     // Pressed while operating a cooking station: the free hand adds one raw piece (a press while the hand is busy does
     // nothing). Shares Q with the emote wheel, which only runs outside a station.
     asset Mars_IA_StationAddFood of UCk_Boolean_InputAction

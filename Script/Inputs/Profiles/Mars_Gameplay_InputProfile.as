@@ -190,6 +190,7 @@ class UMars_InputProfile_Gameplay : UMars_InputProfile
         // The open held book consumes Q before the emote wheel; station feeding keeps its own Locomotion-free mode.
         Context.MapKey(mars::Mars_IA_CookbookPrevious, EKeys::Q);
         Context.MapKey(mars::Mars_IA_CookbookNext, EKeys::E);
+        Context.MapKey(mars::Mars_IA_PushToTalk, EKeys::V);
         Context.MapKey(mars::Mars_IA_Emote_Wave, EKeys::Five);
         Context.MapKey(mars::Mars_IA_Emote_ThumbsUp, EKeys::Six);
         Context.MapKey(mars::Mars_IA_Emote_Point, EKeys::Seven);
@@ -336,6 +337,7 @@ class UMars_InputProfile_Gameplay : UMars_InputProfile
         Rows.Add(FMars_Gameplay_IntentRow("DR", n"IA_Drop", GameplayTags::Mars_Intent_Drop));
         Rows.Add(FMars_Gameplay_IntentRow("BK", n"IA_Back", GameplayTags::Mars_Intent_Back));
         Rows.Add(FMars_Gameplay_IntentRow("EM", n"IA_EmoteWheel", GameplayTags::Mars_Intent_EmoteWheel));
+        Rows.Add(FMars_Gameplay_IntentRow("PT", n"IA_PushToTalk", GameplayTags::Mars_Intent_PushToTalk));
         Rows.Add(FMars_Gameplay_IntentRow("AF", n"IA_StationAddFood", GameplayTags::Mars_Intent_StationAddFood));
         Rows.Add(FMars_Gameplay_IntentRow("BP", n"IA_CookbookPrevious", utils_cookbook::Get_PreviousIntent()));
         Rows.Add(FMars_Gameplay_IntentRow("BN", n"IA_CookbookNext", utils_cookbook::Get_NextIntent()));
