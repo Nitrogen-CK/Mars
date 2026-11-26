@@ -2,8 +2,9 @@
 // beyond the proximity channel's audible range plus the hysteresis margin, then back. On the client, its copy of the host's
 // chef is heard while near (positive control), reads silent for as long as it stands far, and is heard again once it is
 // back: distance alone silenced it, the tone never stopped (the server checks its own copy still captures while far).
-// Also proves the open-mic task ran on the host's owning copy (its own attempt resolved before the tone replaced the
-// microphone). The channel is the production Spec on the test subject (see Mars_AutoTestRig_NetRealPawnVoice.as).
+// Also proves a listen host's own possessed chef opens its open mic: the open mic the Alive task armed made its first
+// attempt on the host's owning copy, and once re-armed over the tone it opened the transmit the client hears, with no
+// Start request. The channel is the production Spec on the test subject (see Mars_AutoTestRig_NetRealPawnVoice.as).
 // Surface: Ck.RealPawn.Net.AS_RealPawn_AClientHearsAChefInRangeAndNotBeyondIt
 class UCk_AutoTest_Net_RealPawn_AClientHearsAChefInRangeAndNotBeyondIt : UMars_AutoTestRig_NetRealPawnVoice
 {
@@ -136,7 +137,7 @@ class UCk_AutoTest_Net_RealPawn_AClientHearsAChefInRangeAndNotBeyondIt : UMars_A
     {
         Log_VoiceRow(k_Row, f"farCapture={_ServerFarCapture :.3} farDistance={_FarDistance :.0} silentBeyond={Get_SilentBeyondCm() :.0} speaker=[{Describe_Talker(_Pawn)}]");
         Assert_True(_AliveCapture != ECk_VoiceChat_CaptureStartResult::NotAttempted,
-            "the open-mic task tried to open the host's chef's microphone on its owning copy");
+            "the open mic tried to open the host's chef's microphone on its owning copy");
         Assert_True(_ServerFarCapture > 0.0f, f"the host's chef was still capturing the tone while it stood far ({_ServerFarCapture :.3})");
         Assert_True(_FarDistance > Get_SilentBeyondCm(),
             f"the server's copy of the host's chef stood beyond range plus margin while far ({_FarDistance :.0} cm, silent beyond {Get_SilentBeyondCm() :.0} cm)");

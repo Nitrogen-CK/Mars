@@ -1,18 +1,18 @@
 // The proximity-voice real-pawn net tests' shared steps, on top of the real-pawn rig: production chefs, each composing its
-// own VoiceTalker (AMars_PlayerCharacter::Request_ComposeEntity) and holding a microphone open while Alive
-// (UMars_SmTask_VoiceOpenMic).
+// own VoiceTalker (AMars_PlayerCharacter::Request_ComposeEntity) whose owning copy's transmit mode the Alive state sets
+// from the audio.voice_push_to_talk setting (UMars_SmTask_VoiceTransmit; open mic by default).
 //
 // The channel's host is a stand-in. Mars composes its proximity channel on AMars_Master_GameState's entity, but a net
 // test runs in the harness's /Engine/Maps/Entry under the project's GlobalDefaultGameMode (a CkFoundation gym mode), so no
 // Mars GameState exists in a test world. Every machine therefore composes the production Spec (mars::Mars_Voice_Config,
 // the one the GameState composes) on the test's replicated subject entity instead. What these rows prove is the chefs'
-// side (talker, auto-join, routing, playback, the open-mic task) against the production channel Spec; that the
+// side (talker, auto-join, routing, playback, the transmit task) against the production channel Spec; that the
 // GameState's own entity carries the channel's control plane to a client is not proven here.
 //
-// A gate lane never opens a microphone (the engine source reports Unavailable_UnattendedProcess, so the Alive task's
+// A gate lane never opens a microphone (the engine source reports Unavailable_UnattendedProcess, so the open mic's own
 // StartTransmit completes Failed), so a speaking row replaces its speaker's microphone with a tone on the speaker's
-// owning machine (the CkTests hook UCk_Utils_AutoTest_VoiceChat_UE::Debug_InjectToneCaptureSource) and starts the transmit
-// itself, once the Alive task's own attempt has resolved.
+// owning machine (the CkTests hook UCk_Utils_AutoTest_VoiceChat_UE::Debug_InjectToneCaptureSource) once the open mic's
+// first attempt has resolved, and arms the open mic again: the module opens the transmit, with no Start request.
 
 enum EMars_TESTONLY_NetVoicePhase
 {
@@ -22,7 +22,13 @@ enum EMars_TESTONLY_NetVoicePhase
     // The speaker stands beyond the channel's audible range plus the hysteresis margin.
     Far,
     // The speaker is back beside the listener.
-    Back
+    Back,
+    // Push-to-talk: the client presses and holds its key.
+    KeyHeld,
+    // Push-to-talk: the host heard the held key; the client lets go.
+    KeyReleased,
+    // Push-to-talk: the host has finished watching and wrote its report.
+    Done
 }
 
 // Written by the server only, through Get_Fragment + Request_MarkReplicationDirty (test-only: a feature's processors are
@@ -58,13 +64,11 @@ class UMars_AutoTestRig_NetRealPawnVoice : UMars_AutoTestRig_NetRealPawn
     protected const float32 k_ToneFrequencyHz = 300.0f;
 
     protected FCk_Handle_VoiceChannel _Channel;
-    // What the Alive task's own StartTransmit left on the speaker's owning copy before the tone replaced its microphone.
+    // What the open mic's first attempt left on the speaker's owning copy before the tone replaced its microphone.
     protected ECk_VoiceChat_CaptureStartResult _AliveCapture = ECk_VoiceChat_CaptureStartResult::NotAttempted;
 
     private AMars_PlayerCharacter _ToneSpeaker;
     private FName _ToneContinuation;
-    private bool _IsToneCompleted = false;
-    private ECk_Request_OperationResult _ToneResult = ECk_Request_OperationResult::Failed;
     private AStaticMeshActor _ExtraFloor;
 
     //------------------------------------------------------------------------------------------------------------------
@@ -164,28 +168,34 @@ class UMars_AutoTestRig_NetRealPawnVoice : UMars_AutoTestRig_NetRealPawn
     // The speaker's tone (the speaker's owning machine)
     //------------------------------------------------------------------------------------------------------------------
 
-    // Waits for the Alive task's own attempt to open InSpeaker's microphone to resolve (recorded in _AliveCapture), stops
-    // the transmit if a real microphone opened (an attended run), replaces the microphone with the tone and starts the
-    // transmit; then InContinuation, where Get_IsToneTransmitting answers. Only the machine that owns InSpeaker calls it.
+    // Waits for the open mic the Alive task armed to make its first attempt on InSpeaker's microphone (recorded in
+    // _AliveCapture), takes the talker to Disabled (closing a real microphone in an attended run: injection refuses a
+    // transmitting talker), replaces the microphone with the tone and sets OpenMic again; the module then opens the
+    // transmit with no Start request. Then InContinuation, where Get_IsToneTransmitting answers. Only the machine that
+    // owns InSpeaker calls it.
     protected void Request_ToneTransmit(AMars_PlayerCharacter InSpeaker, FName InContinuation)
     {
         _ToneSpeaker = InSpeaker;
         _ToneContinuation = InContinuation;
-        _IsToneCompleted = false;
         Mark_Deadline(10.0);
         WaitUntil(n"Is_ToneSpeakerAttempted", n"OnToneSpeakerAttempted", k_SlowPolls);
     }
 
+    // The tone speaker's talker transmits from a capture that started (the tone: a gate lane's engine microphone never
+    // starts).
     protected bool Get_IsToneTransmitting()
     {
-        return _IsToneCompleted && _ToneResult == ECk_Request_OperationResult::Succeeded;
+        const auto Talker = Get_TalkerOf(_ToneSpeaker);
+        return ck::IsValid(Talker) && utils_voice_talker::Get_IsTransmitting(Talker)
+            && utils_voice_talker::Get_CaptureStartResult(Talker) == ECk_VoiceChat_CaptureStartResult::Started;
     }
 
     protected FString Describe_Tone()
     {
-        return f"aliveCapture={_AliveCapture :n} toneCompleted={_IsToneCompleted} toneResult={_ToneResult :n}";
+        return f"aliveCapture={_AliveCapture :n} toneSpeaker=[{Describe_Talker(_ToneSpeaker)}]";
     }
 
+    // The open mic's first attempt resolved: a capture outcome is recorded, or it is transmitting (an attended run).
     UFUNCTION()
     private void Is_ToneSpeakerAttempted(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
@@ -206,54 +216,48 @@ class UMars_AutoTestRig_NetRealPawnVoice : UMars_AutoTestRig_NetRealPawn
         _AliveCapture = utils_voice_talker::Get_CaptureStartResult(Talker);
         if (_AliveCapture == ECk_VoiceChat_CaptureStartResult::NotAttempted && utils_voice_talker::Get_IsTransmitting(Talker) == false)
         {
-            FinishFailure(f"the Alive task never tried to open the speaker's microphone on its owning copy ({Describe_Talker(_ToneSpeaker)}; states [{Describe_ActiveStates()}])");
+            FinishFailure(f"the open mic never tried to open the speaker's microphone on its owning copy ({Describe_Talker(_ToneSpeaker)}; mode {utils_voice_talker::Get_TransmitMode(Talker) :n}; states [{Describe_ActiveStates()}])");
             return;
         }
 
-        if (utils_voice_talker::Get_IsTransmitting(Talker) == false)
-        {
-            OnToneSpeakerReady(InTimer, InChrono, InDeltaT);
-            return;
-        }
-
-        // An attended run: the Alive task opened a real microphone. The tone can replace it only while nothing transmits.
-        utils_voice_talker::Request_StopTransmit(Talker);
-        WaitUntil(n"Is_ToneSpeakerStopped", n"OnToneSpeakerReady", k_SlowPolls);
+        utils_voice_talker::Request_SetTransmitMode(Talker, ECk_VoiceChat_TransmitMode::Disabled);
+        WaitUntil(n"Is_ToneSpeakerDisabled", n"OnToneSpeakerDisabled", k_SlowPolls);
     }
 
     UFUNCTION()
-    private void Is_ToneSpeakerStopped(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    private void Is_ToneSpeakerDisabled(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         const auto Talker = Get_TalkerOf(_ToneSpeaker);
         auto Result = OutResult;
-        Result.Set(Get_IsPastDeadline() || (ck::IsValid(Talker) && utils_voice_talker::Get_IsTransmitting(Talker) == false));
+        Result.Set(Get_IsPastDeadline() || (ck::IsValid(Talker)
+            && utils_voice_talker::Get_TransmitMode(Talker) == ECk_VoiceChat_TransmitMode::Disabled
+            && utils_voice_talker::Get_IsTransmitting(Talker) == false));
     }
 
     UFUNCTION()
-    private void OnToneSpeakerReady(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
+    private void OnToneSpeakerDisabled(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
     {
         auto Talker = Get_TalkerOf(_ToneSpeaker);
         if (ck::Is_NOT_Valid(Talker) || utils_voice_talker::Get_IsTransmitting(Talker))
         { FinishFailure(f"the speaker's talker cannot take the tone ({Describe_Talker(_ToneSpeaker)})"); return; }
 
-        UCk_Utils_AutoTest_VoiceChat_UE::Debug_InjectToneCaptureSource(Talker, FCk_Time(0.0), FCk_Time(k_ToneSeconds), k_ToneAmplitude, k_ToneFrequencyHz);
-        utils_voice_talker::Request_StartTransmit(Talker, FCk_Request_VoiceTalker_StartTransmit(),
-            FCk_Delegate_Request_OnCompleted(this, n"OnToneTransmitCompleted"));
-        WaitUntil(n"Is_ToneTransmitCompleted", _ToneContinuation, k_SlowPolls);
+        Inject_Tone(Talker);
+        utils_voice_talker::Request_SetTransmitMode(Talker, ECk_VoiceChat_TransmitMode::OpenMic);
+        WaitUntil(n"Is_ToneTransmitResolved", _ToneContinuation, k_SlowPolls);
     }
 
+    // The re-armed open mic opened the tone; the deadline ends the wait when it never does.
     UFUNCTION()
-    private void OnToneTransmitCompleted(FCk_Handle InRequestOwner, ECk_Request_OperationResult InResult)
-    {
-        _ToneResult = InResult;
-        _IsToneCompleted = true;
-    }
-
-    UFUNCTION()
-    private void Is_ToneTransmitCompleted(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    private void Is_ToneTransmitResolved(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Result = OutResult;
-        Result.Set(Get_IsPastDeadline() || _IsToneCompleted);
+        Result.Set(Get_IsPastDeadline() || Get_IsToneTransmitting());
+    }
+
+    // Replaces InTalker's microphone with the row's tone; InTalker must not be transmitting.
+    protected void Inject_Tone(FCk_Handle_VoiceTalker& InTalker)
+    {
+        UCk_Utils_AutoTest_VoiceChat_UE::Debug_InjectToneCaptureSource(InTalker, FCk_Time(0.0), FCk_Time(k_ToneSeconds), k_ToneAmplitude, k_ToneFrequencyHz);
     }
 
     //------------------------------------------------------------------------------------------------------------------

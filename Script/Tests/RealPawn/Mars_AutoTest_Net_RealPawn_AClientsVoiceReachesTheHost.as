@@ -1,8 +1,9 @@
-// The client's chef speaks (its microphone replaced by a steady tone on the client, its owning machine) beside the host's
-// chef. The voice goes the real client path (encoded on the client, sent up through the client's relay, routed by the
-// server) and the host's copy of the client's chef plays it: it reads the level riding the bundles the host receives. Also
-// proves the open-mic task acts only on the owning copy: the client's chef and the host's chef each tried to open their
-// microphone on their own machine, and neither machine's copy of the other chef ever tried. The channel is the production
+// The client's chef speaks (its microphone replaced by a steady tone on the client, its owning machine, and opened by the
+// open mic the Alive task armed: no Start request) beside the host's chef. The voice goes the real client path (encoded on
+// the client, sent up through the client's relay, routed by the server) and the host's copy of the client's chef plays
+// it: it reads the level riding the bundles the host receives. Also proves the open mic opens only on the copy its machine
+// controls: the client's chef and the host's possessed chef each tried to open their microphone on their own machine, and
+// neither machine's copy of the other chef ever tried. The channel is the production
 // Spec on the test subject (see Mars_AutoTestRig_NetRealPawnVoice.as).
 // Surface: Ck.RealPawn.Net.AS_RealPawn_AClientsVoiceReachesTheHost
 class UCk_AutoTest_Net_RealPawn_AClientsVoiceReachesTheHost : UMars_AutoTestRig_NetRealPawnVoice
@@ -54,8 +55,8 @@ class UCk_AutoTest_Net_RealPawn_AClientsVoiceReachesTheHost : UMars_AutoTestRig_
         WaitUntil(n"Is_ServerHeard", n"OnServerHeard", k_SlowPolls);
     }
 
-    // The host's copy of the client's chef reads the level of the bundles the host receives, and the host's own chef's
-    // open-mic attempt has resolved.
+    // The host's copy of the client's chef reads the level of the bundles the host receives, and the open mic on the
+    // host's own possessed chef has made its attempt.
     UFUNCTION()
     private void Is_ServerHeard(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
@@ -73,7 +74,7 @@ class UCk_AutoTest_Net_RealPawn_AClientsVoiceReachesTheHost : UMars_AutoTestRig_
         Log_VoiceRow(k_Row, f"heardPeak={_HeardPeak :.3} clientChef=[{Describe_Talker(_Viewer)}] hostChef=[{Describe_Talker(_Pawn)}] distance={Get_DistanceBetween(_Pawn, _Viewer) :.0}");
         Assert_True(_HeardPeak > 0.0f, f"the host received the client's chef's voice (peak {_HeardPeak :.3}; client's chef on the host [{Describe_Talker(_Viewer)}])");
         Assert_True(HostChef != ECk_VoiceChat_CaptureStartResult::NotAttempted,
-            "the open-mic task tried to open the host's chef's microphone on its owning copy");
+            "the open mic tried to open the host's possessed chef's microphone on its owning copy");
         Assert_True(ClientChef == ECk_VoiceChat_CaptureStartResult::NotAttempted,
             f"the host's copy of the client's chef never tried to open a microphone ({ClientChef :n})");
         Assert_True(Get_NewEnsures() == 0, f"no ensure fired during the row ({Get_NewEnsures()})");
@@ -128,7 +129,7 @@ class UCk_AutoTest_Net_RealPawn_AClientsVoiceReachesTheHost : UMars_AutoTestRig_
         Log_VoiceRow(k_Row, f"report={Report.Serial} heardPeak={Report.HeardPeak :.3} clientChefOnServer={Report.ClientChefOnServer :n} hostChefOnServer={Report.HostChefOnServer :n} hostChefHere={HostChefHere :n} speaker=[{Describe_Talker(Get_Viewer())}]");
         Assert_True(Report.HeardPeak > 0.0f, f"the host reported hearing this client's chef (peak {Report.HeardPeak :.3}, report {Report.Serial})");
         Assert_True(_AliveCapture != ECk_VoiceChat_CaptureStartResult::NotAttempted,
-            "the open-mic task tried to open this client's chef's microphone on its owning copy");
+            "the open mic tried to open this client's chef's microphone on its owning copy");
         Assert_True(HostChefHere == ECk_VoiceChat_CaptureStartResult::NotAttempted,
             f"this client's copy of the host's chef never tried to open a microphone ({HostChefHere :n})");
         Assert_True(Get_NewEnsures() == 0, f"no ensure fired during the row ({Get_NewEnsures()})");
