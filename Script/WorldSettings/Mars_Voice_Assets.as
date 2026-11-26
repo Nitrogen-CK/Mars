@@ -5,7 +5,8 @@
 class UMars_Voice_Config : UDataAsset
 {
     // Positional3D: the server sends a chef's voice only to chefs inside _AudibleRange (held to range + the module's
-    // hysteresis margin), and each listener plays it from the speaker's body through _Attenuation.
+    // hysteresis margin), and each listener plays it from the speaker's head (the body mesh's face bone, set by
+    // AMars_PlayerCharacter on the talker) through _Attenuation, in the voice SoundClass.
     UPROPERTY(Category = "Voice")
     FCk_VoiceChannel_Spec ProximityChannel;
 }
@@ -23,6 +24,8 @@ namespace mars
         // A script asset is created the first time its accessor runs: naming the object here (not its path) is what makes
         // it exist before the channel's CkResourceLoader batch looks for /Script/AngelscriptAssets.Mars_Voice_ProximityAttenuation.
         ProximityChannel.Set_Attenuation(TSoftObjectPtr<USoundAttenuation>(mars::Mars_Voice_ProximityAttenuation));
+        // The class the "Voice chat" volume slider (audio.voice, Config/DefaultCkFoundation.ini) overrides.
+        ProximityChannel.Set_SoundClass(assets::VoiceSoundClass_Mars());
     }
 
     // How a chef's voice falls off with distance on the listener's machine. Full volume within the inner sphere, then

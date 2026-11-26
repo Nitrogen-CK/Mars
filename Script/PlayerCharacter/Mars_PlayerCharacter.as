@@ -416,10 +416,19 @@ class AMars_PlayerCharacter : AMars_Character
         utils_locomotion_speed::Add(Player, FMars_LocomotionSpeed_Spec(Config.Movement.Speeds.Walk, Config.Movement.Speeds.Sprint));
 
         // The chef's voice, on every copy: CkVoiceChat routes by the talker's entity on the server and plays a remote
-        // chef's voice from its actor on each listener's machine, so every copy needs it. It joins the GameState's
-        // proximity channel by name on the authority (Config.Voice); the Alive state sets the owning copy's transmit mode
-        // (open mic or push-to-talk, UMars_SmTask_VoiceTransmit).
-        utils_voice_talker::Add(Player, Config.Voice.Talker);
+        // chef's voice from that chef's copy on each listener's machine, so every copy needs it. It plays from the head:
+        // the body mesh at the bone the eyes follow (Config.TPBody.Head.Face.Bone), each copy naming its own mesh. A body
+        // without that bone (an invalid TPBody, which ConstructEyes reports) plays from the actor's root instead. It joins
+        // the GameState's proximity channel by name on the authority (Config.Voice); the Alive state sets the owning
+        // copy's transmit mode (open mic or push-to-talk, UMars_SmTask_VoiceTransmit).
+        auto TalkerSpec = Config.Voice.Talker;
+        const auto VoiceBone = Config.TPBody.Head.Face.Bone;
+        if (Mesh.DoesSocketExist(VoiceBone))
+        {
+            TalkerSpec.Set_PlaybackAttachComponent(TWeakObjectPtr<USceneComponent>(Mesh));
+            TalkerSpec.Set_PlaybackAttachSocketName(VoiceBone);
+        }
+        utils_voice_talker::Add(Player, TalkerSpec);
 
         // Owning-client authoritative: the owner evaluates the conditions against its input and its transitions replicate
         // to the server and the other clients, so every copy runs the owner's states. It must not auto-start: the start

@@ -146,8 +146,10 @@ struct FMars_PlayerCharacter_Inventory
 struct FMars_PlayerCharacter_Voice
 {
     // The chef's voice (CkVoiceChat VoiceTalker), composed on every copy. It joins the proximity channel by name
-    // (_AutoJoinChannels, Mars_Voice_Assets.as). Its authored mode stays PushToTalk so no copy arms an open mic at Add; the
-    // Alive state sets the owning copy's mode from the audio.voice_push_to_talk setting (UMars_SmTask_VoiceTransmit).
+    // (_AutoJoinChannels, Mars_Voice_Assets.as). Where it plays from (the head bone) is set per copy by
+    // AMars_PlayerCharacter::Request_ComposeEntity, not here: the attach component is that copy's body mesh. Its authored
+    // mode stays PushToTalk so no copy arms an open mic at Add; the Alive state sets the owning copy's mode from the
+    // audio.voice_push_to_talk setting (UMars_SmTask_VoiceTransmit).
     UPROPERTY()
     FCk_VoiceTalker_Spec Talker;
 }
