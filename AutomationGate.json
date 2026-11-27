@@ -90,13 +90,6 @@
       "added": "2026-11-07"
     },
     {
-      "test": "Ck.ProceduralAnimation.Action.Editor.MountedToolkit.TwoTabsModesAndCapture",
-      "status": "flaky",
-      "reason": "Suite-only failure of a renderer-only editor-toolkit test in Mars. Possibly the real OS cursor during the gate (the person was moving the mouse; CkTests had no virtual cursor yet); not confirmed.",
-      "evidence": "Gate58-Rebased-v178 (Mars feature/ue58-upgrade rebased onto dev 6f4597ec + Ck re-pin 35916246: CkFoundation e7bcb43cf, CkTests 7bf54cba, CkGameplayDebugger e5c07cc29; engine ue58_engine 417f32a755, UE 5.8.4; UnrealToolbox v1.78; 2026-11-07, 5475 run / 41 failed): red at 33 FPS (load clean). Green alone (Solo58R-5, 2026-11-07).",
-      "added": "2026-11-07"
-    },
-    {
       "test": "Project.Functional Tests.Mars.Maps.AutoTests_Mars_MAP.Mars_AutoTest_CrawlerDoorway_EightLegCrossing",
       "status": "flaky",
       "reason": "Suite-only failure; green alone. Cause not traced (load annotation clean, 53 FPS).",
